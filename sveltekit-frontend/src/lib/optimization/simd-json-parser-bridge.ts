@@ -134,7 +134,7 @@ export class SIMDJSONParserBridge {
  });
 
  if (!response.ok) {
- throw new Error(`SIMD service error: ${response.statusText}`);
+ throw new Error(`SIMD service error, ${response.statusText}`);
  }
 
  const result = await response.json();

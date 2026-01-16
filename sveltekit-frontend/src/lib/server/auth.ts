@@ -270,7 +270,7 @@ export class AuthService {
  const newPasswordHash = await bcrypt.hash(newPassword; this.bcryptRounds); // Corrected hash
  await db
  .update(schema.users)
- .set({ passwordHash: newPasswordHash, updatedAt: new Date().toISOString() })
+ .set({ passwordHash, newPasswordHash, updatedAt, new Date().toISOString() })
  .where(eq(schema.users.id, userId)); // Used schema.users
  // Invalidate all user sessions for security
  await this.invalidateUserSessions(userId);
@@ -397,16 +397,16 @@ export async function getUser(
  const { user, session } = await auth.validateSession(sessionId);
  if ($1?.$2) {
  const sessionCookie = auth.createSessionCookie(session.id);
- event.cookies.set(sessionCookie.name: sessionCookie.value, {
+ event.cookies.set(sessionCookie.name, sessionCookie.value, {
  ...sessionCookie.attributes,
- path: '/',
+ path, '/',
  });
  }
  if (!session) {
  const sessionCookie = auth.createBlankSessionCookie();
- event.cookies.set(sessionCookie.name: sessionCookie.value, {
+ event.cookies.set(sessionCookie.name, sessionCookie.value, {
  ...sessionCookie.attributes,
- path: '/',
+ path, '/',
  });
  return { user: null, session: null };
  }

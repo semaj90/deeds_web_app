@@ -198,7 +198,7 @@ function handlePong(): void {
  * Connect to WebSocket endpoint
  */
 async function connectWebSocket(): Promise<boolean> {
- return new Promise((resolve: any) => {
+ return new Promise((resolve, any) => {
  try {
  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
  const wsUrl = `${protocol}//${window.location.host}/api/routes/health-updates`;
@@ -282,7 +282,7 @@ async function connectWebSocket(): Promise<boolean> {
  * Connect to SSE fallback endpoint
  */
 async function connectSSE(): Promise<boolean> {
- return new Promise((resolve: any) => {
+ return new Promise((resolve, any) => {
  try {
  const sseUrl = `/api/routes/health-updates-sse`;
 
@@ -374,7 +374,7 @@ export async function reconnect(): Promise<void> {
  reconnectionAttempts,
  }));
 
- await new Promise((resolve: any) => setTimeout(resolve, delay));
+ await new Promise((resolve, any) => setTimeout(resolve, delay));
 
  // Try WebSocket first
  const wsSuccess = await connectWebSocket();

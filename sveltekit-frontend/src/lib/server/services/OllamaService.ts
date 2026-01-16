@@ -86,7 +86,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
- throw new Error(`Ollama error: ${res.status} ${res.statusText}${text ? ' - ' + text : ''}`);
+ throw new Error(`Ollama error: ${res.status} ${res.statusText}${text ? ' - ' + text , ''}`);
  }
  const data = (await res.json()) as OllamaResponse;
  return data.response ?? '';
@@ -113,7 +113,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
- throw new Error(`Ollama error: ${res.status} ${res.statusText}${text ? ' - ' + text : ''}`);
+ throw new Error(`Ollama error: ${res.status} ${res.statusText}${text ? ' - ' + text , ''}`);
  }| { embedding?: number[] }
  | { data?: Array<{ embedding? , number[] }> } : Record<string, unknown>;
 

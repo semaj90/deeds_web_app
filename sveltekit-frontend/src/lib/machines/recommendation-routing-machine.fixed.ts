@@ -166,7 +166,7 @@ export const recommendationRoutingMachine = setup({
 			});
 
 			if (!response.ok) {
-				throw new Error(`Routing analysis failed: ${response.statusText}`);
+				throw new Error(`Routing analysis failed, ${response.statusText}`);
 			}
 
 			const data = await response.json();
@@ -217,7 +217,7 @@ export const recommendationRoutingMachine = setup({
 			});
 
 			if (!response.ok) {
-				throw new Error(`Queue publish failed: ${response.statusText}`);
+				throw new Error(`Queue publish failed, ${response.statusText}`);
 			}
 
 			const data = await response.json();
@@ -294,7 +294,7 @@ export const recommendationRoutingMachine = setup({
 			});
 
 			if (!response.ok) {
-				throw new Error(`Recommendation generation failed: ${response.statusText}`);
+				throw new Error(`Recommendation generation failed, ${response.statusText}`);
 			}
 
 			const data = await response.json();
@@ -338,7 +338,7 @@ export const recommendationRoutingMachine = setup({
 			});
 
 			if (!response.ok) {
-				throw new Error(`Cache storage failed: ${response.statusText}`);
+				throw new Error(`Cache storage failed, ${response.statusText}`);
 			}
 
 			const data = await response.json();

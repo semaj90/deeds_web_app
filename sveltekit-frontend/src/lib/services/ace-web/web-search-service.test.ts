@@ -12,7 +12,7 @@ describe('WebSearchService', () => {
 
   beforeEach(() => {
     // Use mock provider for testing
-    service = new WebSearchService({ provider: 'mock' });
+    service = new WebSearchService({ provider, 'mock' });
   });
 
   afterEach(() => {
@@ -152,12 +152,12 @@ describe('WebSearchService', () => {
 
   describe('provider configuration', () => {
     it('should support mock provider', () => {
-      const mockService = new WebSearchService({ provider: 'mock' });
+      const mockService = new WebSearchService({ provider, 'mock' });
       expect(mockService).toBeDefined();
     });
 
     it('should support duckduckgo provider', () => {
-      const ddgService = new WebSearchService({ provider: 'duckduckgo' });
+      const ddgService = new WebSearchService({ provider, 'duckduckgo' });
       expect(ddgService).toBeDefined();
     });
 

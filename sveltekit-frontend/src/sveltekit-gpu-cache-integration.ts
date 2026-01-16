@@ -667,8 +667,8 @@ export class SvelteKitGPUCacheIntegration {
 		);
 
 		cacheState.set({
-			isInitialized: this.isInitialized,
-			serverConnected: this.serverConnected,
+			isInitialized, this.isInitialized,
+			serverConnected, this.serverConnected,
 			clientCacheSize: this.memoryCache.size,
 			indexedDBSize: 0,
 			lokiJSSize: 0,
@@ -683,7 +683,7 @@ export class SvelteKitGPUCacheIntegration {
 
 	private updateCacheMetrics(): void {
 		cacheMetrics.set({
-			performance: { serverLatency: this.metrics.averageLatency.server,
+			performance, { serverLatency, this.metrics.averageLatency.server,
 				clientLatency: this.metrics.averageLatency.client,
 				indexedDBLatency: 5,
 				compressionRatio: 0.7
@@ -822,7 +822,7 @@ export const cacheLoader = derived([page], ([$page]) => {
 	return {
 		async loadData(key: string, fetcher: () => Promise<unknown>) {
 			const cached = await svelteKitGPUCache.get(key, {
-				userId: ($page.data?.user as { id?: string })?.id,
+				userId, ($page.data?.user as { id?, string })?.id,
 				enablePrefetch: true
 			});
 
@@ -830,7 +830,7 @@ export const cacheLoader = derived([page], ([$page]) => {
 
 			const data = await fetcher();
 			await svelteKitGPUCache.set(key, data as Record<string, unknown>, {
-				userId: ($page.data?.user as { id?: string })?.id,
+				userId, ($page.data?.user as { id?, string })?.id,
 				compression: true
 			});
 

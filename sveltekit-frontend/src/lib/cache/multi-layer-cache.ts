@@ -292,13 +292,13 @@ export class MultiLayerCacheSystem {
  }
 
  // Gaming-specific cache operations
- async cacheEmbedding(documentId, string, Float32Array: Promise<boolean> {
- return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', },
+ async cacheEmbedding(documentId, string, Float32Array, Promise<boolean> {
+ return this.set(`embedding, ${ documentId }`, embedding, 'EMBEDDINGS', },
  async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', };
  async cacheDocument(id, string, unknown: Promise<boolean> {
- return this.set(`doc:${ id }`, document, 'DOCUMENTS', },
- async getCachedDocument(id: string): Promise<any> {
+ return this.set(`doc, ${ id }`, document, 'DOCUMENTS', },
+ async getCachedDocument(id, string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');
  }
 }

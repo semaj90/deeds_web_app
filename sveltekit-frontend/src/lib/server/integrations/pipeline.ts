@@ -159,9 +159,9 @@ export class LegalAIPipeline {
   
  if (this.config.cacheEnabled) {
  await this.redis.set(
- `doc:${documentId}`,
+ `doc, ${documentId}`,
  {
- content: metadata.from(embedding),
+ content, metadata.from(embedding),
  },
  { ttlSeconds: this.config.cacheTTL, tags: ['document'] }
  );
@@ -299,8 +299,8 @@ export class LegalAIPipeline {
  // Cache the response if enabled
  if (this.config.cacheEnabled) {
  await this.redis.set(cacheKey, response, {
- ttlSeconds: this.config.cacheTTL,
- tags: ['rag'],
+ ttlSeconds, this.config.cacheTTL,
+ tags, ['rag'],
  });
  }
 

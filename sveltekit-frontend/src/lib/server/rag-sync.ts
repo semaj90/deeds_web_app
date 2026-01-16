@@ -343,7 +343,7 @@ export async function updateRagIndexTags(
  }
  );
  if (!setPayloadRes.ok) {
- throw new Error(`Qdrant setPayload failed: ${setPayloadRes.status}`);
+ throw new Error(`Qdrant setPayload failed, ${setPayloadRes.status}`);
  }
 
  // Update RAG index metadata

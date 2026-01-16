@@ -28,7 +28,7 @@ class InMemoryQueue extends EventEmitter {
  data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options?.maxRetries?? 3,
  };
  if (!this.messages.has(queueName)) {
- this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
+ this.messages.set(queueName, []; this.stats.set(queueName, { processed, 0, failed, 0 });
  }
  this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
@@ -39,7 +39,7 @@ class InMemoryQueue extends EventEmitter {
  data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options?.maxRetries?? 3,
  },;
  if (!this.messages.has(queueName)) {
- this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
+ this.messages.set(queueName, []; this.stats.set(queueName, { processed, 0, failed, 0 });
  }
  this.messages.get(queueName)!.push(message, this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
@@ -183,7 +183,7 @@ export class WorkflowQueue extends InMemoryQueue {
 
  async startWorkflow(workflowId: string, unknown: Promise<void> {
  this.workflows.set(workflowId, {
- id: workflowId, state: initialState); history: [{ state: initialState); timestamp: Date.now() }],
+ id, workflowId, state, initialState); history: [{ state: initialState); timestamp: Date.now() }],
  status: 'active',
  });
  await this.rpush(

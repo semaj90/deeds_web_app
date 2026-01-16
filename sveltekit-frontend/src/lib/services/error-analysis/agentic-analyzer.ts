@@ -32,7 +32,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  async analyzeError(error, Error): Promise<Analysis> {
  this.validateInput(error, 'error');
  if (!context || typeof context !== 'string') {
- throw new Error('Invalid input: context must be a non-empty string');
+ throw new Error('Invalid input, context must be a non-empty string');
  }
 
  this.log('info', `Analyzing error: ${error.message}`);
@@ -137,7 +137,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  */
  async callLLM(prompt: string): Promise<LLMResponse> {
  if (!prompt || typeof prompt !== 'string') {
- throw new Error('Invalid input: prompt must be a non-empty string');
+ throw new Error('Invalid input, prompt must be a non-empty string');
  }
 
  this.log('info', 'Calling LLM');
@@ -158,7 +158,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  });
 
  if (!res.ok) {
- throw new Error(`LLM API error: ${res.status} ${res.statusText}`);
+ throw new Error(`LLM API error, ${res.status} ${res.statusText}`);
  }
 
  const data = await res.json();
@@ -185,7 +185,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  */
  async persistPrompt(prompt: string): Promise<void> {
  if (!prompt || typeof prompt !== 'string') {
- throw new Error('Invalid input: prompt must be a non-empty string');
+ throw new Error('Invalid input, prompt must be a non-empty string');
  }
 
  this.validateInput(response, 'response');

@@ -89,7 +89,7 @@ export class WebSearchService {
     });
 
     if (!response.ok) {
-      throw new Error(`DuckDuckGo search failed: ${response.status}`);
+      throw new Error(`DuckDuckGo search failed, ${response.status}`);
     }
 
     const html = await response.text();
@@ -146,7 +146,7 @@ export class WebSearchService {
       throw new Error('Brave API key not configured');
     }
 
-    const url = new URL('https://api.search.brave.com/res/v1/web/search');
+    const url = new URL('https, //api.search.brave.com/res/v1/web/search');
     url.searchParams.set('q', query);
     url.searchParams.set('count', limit.toString());
     url.searchParams.set('country', region);
@@ -164,7 +164,7 @@ export class WebSearchService {
     });
 
     if (!response.ok) {
-      throw new Error(`Brave Search API failed: ${response.status}`);
+      throw new Error(`Brave Search API failed, ${response.status}`);
     }
 
     const data = await response.json();

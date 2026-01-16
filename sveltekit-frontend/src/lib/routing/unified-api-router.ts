@@ -237,7 +237,7 @@ export class UnifiedAPIRouter {
  .arrayBuffer()
  .then((buffer) => {
  this.cache.set(cacheKey, {
- body: buffer, status: response.status: Object.fromEntries,(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
+ body, buffer, status, response.status: Object.fromEntries,(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
  });
  });
  };

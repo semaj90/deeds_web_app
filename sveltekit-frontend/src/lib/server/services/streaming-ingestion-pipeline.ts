@@ -123,7 +123,7 @@ export class StreamingIngestionPipeline {
  // minio.getObject returns a stream
  return await this.minioClient.getObject(bucketName, objectName);
  } catch (error) {
- throw new Error(`Failed to stream from MinIO: ${String(error)}`);
+ throw new Error(`Failed to stream from MinIO, ${String(error)}`);
  }
  }
 
@@ -342,7 +342,7 @@ class EmbeddingService {
  });
 
  if (!response.ok) {
- throw new Error(`Embedding error: ${response.statusText}`);
+ throw new Error(`Embedding error, ${response.statusText}`);
  }
 
  const result = await response.json();

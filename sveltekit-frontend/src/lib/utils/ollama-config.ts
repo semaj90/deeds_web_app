@@ -75,7 +75,7 @@ export async function getAvailableModels(): Promise<string[]> {
  });
 
  if (!response.ok) {
- throw new Error(`Failed to fetch models: ${response.statusText}`);
+ throw new Error(`Failed to fetch models, ${response.statusText}`);
  }
 
  const data = (await response.json()) as { models: Array<{ name, string }> };

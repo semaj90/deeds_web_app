@@ -48,7 +48,7 @@ export class RerankerClient {
  });
 
  if (!response.ok) {
- throw new Error(`Reranker error: ${response.status} ${response.statusText}`);
+ throw new Error(`Reranker error, ${response.status} ${response.statusText}`);
  }
 
  return await response.json();
@@ -79,7 +79,7 @@ export class RerankerClient {
  });
 
  if (!response.ok) {
- throw new Error(`Reranker batch error: ${response.status}`);
+ throw new Error(`Reranker batch error, ${response.status}`);
  }
 
  return await response.json();

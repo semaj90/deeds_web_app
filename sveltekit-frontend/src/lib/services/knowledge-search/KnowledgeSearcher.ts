@@ -236,7 +236,7 @@ Answer:`;
       case 'claude':
         return await this.callClaude(prompt);
       default:
-        throw new Error(`Unsupported LLM provider: ${ provider }`);
+        throw new Error(`Unsupported LLM provider, ${ provider }`);
     }
   }
 
@@ -256,7 +256,7 @@ Answer:`;
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.statusText}`);
+        throw new Error(`Ollama API error, ${response.statusText}`);
       }
 
       const data = await response.json();

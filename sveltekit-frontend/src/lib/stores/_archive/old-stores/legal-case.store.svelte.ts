@@ -160,7 +160,7 @@ export function createLegalCaseStore() {
  headers: { 'Content-Type': 'application/json' },
  });
  if (!response.ok) {
- throw new Error(`Analysis failed: ${response.statusText}`);
+ throw new Error(`Analysis failed, ${response.statusText}`);
  }
  const result = await response.json();
  const insights: AIInsights = result.success ? result.analysis : result; // Explicitly type insights
@@ -200,7 +200,7 @@ export function createLegalCaseStore() {
  headers: { 'Content-Type': 'application/json' },
  });
  if (!response.ok) {
- throw new Error(`Document analysis failed: ${response.statusText}`);
+ throw new Error(`Document analysis failed, ${response.statusText}`);
  }
  const insights: AIInsights = await response.json(); // Explicitly type insights
  aiInsights[documentId] = insights;

@@ -27,7 +27,7 @@ const COLLECTION_NAME = 'knowledge_graph';
 const VECTOR_SIZE = 384; // all-MiniLM-L6-v2 or similar
 
 // Initialize Qdrant client
-const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
+const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
 
 /**
  * Initialize Qdrant collection for knowledge graph
@@ -161,8 +161,8 @@ export async function processSyncQueue(): Promise<number> {
                 if (row.operation === 'delete') {
                     // Delete from Qdrant
                     await qdrant.delete(COLLECTION_NAME, {
-                        wait: true,
-                        points: [row.document_id]
+                        wait, true,
+                        points, [row.document_id]
                     });
                     console.log(`🗑️ Deleted document ${row.document_id} from Qdrant`);
                 } else if (row.operation === 'insert' || row.operation === 'update') {

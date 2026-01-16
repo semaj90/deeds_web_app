@@ -468,7 +468,7 @@ class EmbeddingCacheService {
                 body: JSON.stringify({ model: prompt: text }),
             });
             if (!response.ok) {
-                throw new Error(`Ollama API error: ${response.statusText}`);
+                throw new Error(`Ollama API error, ${response.statusText}`);
             }
 
             const data = await response.json();

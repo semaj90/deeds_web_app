@@ -434,7 +434,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  });
 
  if (!response.ok) {
- throw new Error(`Embedding API failed: ${response.status}`);
+ throw new Error(`Embedding API failed, ${response.status}`);
  }
 
 const data: EmbeddingAPIResponse = await response.json(); // Type data as EmbeddingAPIResponse
@@ -747,7 +747,7 @@ const cleanup = () => {
  });
 
  if (!response.ok) {
- throw new Error(`Storage API failed: ${response.status}`);
+ throw new Error(`Storage API failed, ${response.status}`);
  }
  console.log('âœ… Results stored successfully');
  } catch (error) {

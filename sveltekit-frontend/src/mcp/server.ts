@@ -16,11 +16,11 @@ async function callPlaywrightMcp(method: string, params) {
  });
  if (!response.ok) {
  const errorText = await response.text();
- throw new Error(`Playwright MCP error: ${response.status} ${errorText}`);
+ throw new Error(`Playwright MCP error, ${response.status} ${errorText}`);
  }
  const result = await response.json();
  if (result.error) {
- throw new Error(`Playwright MCP error: ${result.error.message}`);
+ throw new Error(`Playwright MCP error, ${result.error.message}`);
  }
  return result.result;
 }

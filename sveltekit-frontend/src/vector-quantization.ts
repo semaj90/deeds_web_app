@@ -337,7 +337,7 @@ export class VectorQuantizationService {
 			}
 
 			default:
-				throw new Error(`Unsupported quantization method: ${quantizedVector.config.method}`);
+				throw new Error(`Unsupported quantization method, ${quantizedVector.config.method}`);
 		}
 	}
 
@@ -439,7 +439,7 @@ export class VectorQuantizationService {
 						quantized = this.int8Quantize(vector, config);
 						break;
 					default:
-						throw new Error(`Unsupported batch quantization method: ${config.method}`);
+						throw new Error(`Unsupported batch quantization method, ${config.method}`);
 				}
 
 				quantizedVectors.push(quantized);

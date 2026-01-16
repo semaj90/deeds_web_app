@@ -133,7 +133,7 @@ class OllamaIntegrationLayer {
     try {
       // Mock status update - in production, would query actual services
       this.serviceStatus.set({
-        comprehensive: { status: 'healthy', health: 100 },
+        comprehensive, { status, 'healthy', health: 100 },
         langchain: { status: 'healthy', connected: true },
         cuda: { status: 'healthy', available: true },
         gemma3: { status: 'healthy', model: 'gemma3-legal:latest' },
@@ -272,7 +272,7 @@ class OllamaIntegrationLayer {
       });
 
       if (!response.ok) {
-        throw new Error(`Chat API failed: ${response.status}`);
+        throw new Error(`Chat API failed, ${response.status}`);
       }
 
       return await response.json();
@@ -334,7 +334,7 @@ Please answer the question using the provided context.`;
 
   async getServiceHealth(): Promise<OllamaServiceStatus> {
     await this.updateServiceStatus();
-    return new Promise((resolve: any) => {
+    return new Promise((resolve, any) => {
       this.serviceStatus.subscribe((status: any) => resolve(status))();
     });
   }

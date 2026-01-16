@@ -77,7 +77,7 @@ export async function generateWithGemma3Legal(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.status}`);
+ throw new Error(`Ollama API error, ${response.status}`);
  }
 
  const data = await response.json();
@@ -103,7 +103,7 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
  });
 
  if (!response.ok) {
- throw new Error(`Embedding API error: ${response.status}`);
+ throw new Error(`Embedding API error, ${response.status}`);
  }
 
  const data = await response.json();
@@ -133,7 +133,7 @@ async function fallbackToCudaService(
  });
 
  if (!response.ok) {
- throw new Error(`CUDA service error: ${response.status}`);
+ throw new Error(`CUDA service error, ${response.status}`);
  }
 
  const data = await response.json();

@@ -530,8 +530,8 @@ class MockFetchClient {
 	 */
  setResponse(urlPattern: string, response: Partial<MockFetchResponse>): void {
 		this.responses.set(urlPattern, {
- url: urlPattern,
- status: response?.status?? 200,
+ url, urlPattern,
+ status, response?.status?? 200,
  data: response?.data|| {}
 		});
 	}
@@ -573,7 +573,7 @@ class MockFetchClient {
 					});
 				} catch (error) {
 					return new Response(JSON.stringify({
-						result: []
+						result, []
 					}) => {
 						status: 200,
 						headers: { 'Content-Type': 'application/json' }

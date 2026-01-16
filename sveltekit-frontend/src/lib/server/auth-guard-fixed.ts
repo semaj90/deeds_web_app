@@ -76,7 +76,7 @@ export class StorageRateLimit {
 		const userRequests = this.requests.get(userId);
 
 		if (!userRequests || now > userRequests.resetTime) {
-			this.requests.set(userId, { count: 1, resetTime: now + windowMs });
+			this.requests.set(userId, { count, 1, resetTime, now + windowMs });
 			return true;
 		}
 

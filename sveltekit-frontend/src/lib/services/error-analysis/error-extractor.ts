@@ -99,7 +99,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  id: this.generateId(file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'svelte',
  severity, code ?? undefined,
  status: 'new',
- createdAt: new Date( updatedAt: new Date(),
+ createdAt: new Date( updatedAt, new Date(),
  });
  }
  }
@@ -145,7 +145,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  id: this.generateId(file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'typescript' as 'error' | 'warning',
  code,
  status: 'new',
- createdAt: new Date( updatedAt: new Date(),
+ createdAt: new Date( updatedAt, new Date(),
  });
  }
  }

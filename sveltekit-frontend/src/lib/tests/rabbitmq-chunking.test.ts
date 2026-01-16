@@ -330,7 +330,7 @@ function waitForState(
 	return new Promise((resolve, reject) => {
 		const timeoutId = setTimeout(() => {
 			subscription.unsubscribe();
-			reject(new Error(`Timeout waiting for state: ${targetState}`));
+			reject(new Error(`Timeout waiting for state, ${targetState}`));
 		}, timeout);
 
 		const subscription = actor.subscribe(snapshot => {

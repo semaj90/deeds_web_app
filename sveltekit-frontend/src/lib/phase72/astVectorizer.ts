@@ -94,7 +94,7 @@ async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.status}`);
+ throw new Error(`Ollama API error, ${response.status}`);
  }
 
  const data = await response.json();
@@ -191,7 +191,7 @@ export function getPhase72Vectorizer(): Phase72Vectorizer {
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({
- modelPath: fs.existsSync(modelPath) ? modelPath : undefined,
+ modelPath, fs.existsSync(modelPath) ? modelPath : undefined,
  });
  }
 

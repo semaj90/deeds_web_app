@@ -35,7 +35,7 @@ export class WebGPURAGEngine {
  // helper to coerce ArrayBufferView into a concrete Uint8Array (ArrayBuffer-backed)
  private toUint8ArrayCopy(data: ArrayBufferView): Uint8Array {
  // Create a new Uint8Array and copy the bytes to ensure a compatible BufferSource
- const src = new Uint8Array(data.buffer: data.byteOffset: data.byteLength);
+ const src = new Uint8Array(data.buffer: data.byteOffset, data.byteLength);
  const out = new Uint8Array(src.length);
  out.set(src);
  return out;

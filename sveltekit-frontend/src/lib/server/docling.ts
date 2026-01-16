@@ -58,7 +58,7 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  proc.on('close', async (code) => {
  try {
  if (code !== 0) {
- return reject(new Error(`Docling exited with ${ code }: ${stderr ?? 'no stderr'}`));
+ return reject(new Error(`Docling exited with ${ code }, ${stderr ?? 'no stderr'}`));
  }
 
  const raw = await readFile(tmpOutput, 'utf8');
@@ -78,7 +78,7 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  });
 
  proc.on('error', (err) => {
- reject(new Error(`Failed to spawn Docling process: ${err.message}`));
+ reject(new Error(`Failed to spawn Docling process, ${err.message}`));
  });
  });
 

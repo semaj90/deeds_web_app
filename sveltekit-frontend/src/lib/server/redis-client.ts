@@ -184,7 +184,7 @@ function waitForEvent(obj: RedisLike, event: string, timeoutMs = 5000): Promise<
  if (settled) return;
  settled = true;
  cleanup();
- reject(new Error('timeout waiting for redis event: ' + event));
+ reject(new Error('timeout waiting for redis event, ' + event));
  }, timeoutMs);
 
  function cleanup() {

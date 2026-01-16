@@ -352,7 +352,7 @@ class XStateStoreManager {
  private setupPerformanceMonitoring(): void {
  // Monitor page load performance
  if (typeof window !== 'undefined' && 'performance' in window) {
- const observer = new PerformanceObserver((list: PerformanceObserverEntryList) => {
+ const observer = new PerformanceObserver((list, PerformanceObserverEntryList) => {
  for (const entry of list.getEntries()) {
  if (entry.entryType === 'navigation') {
  const navEntry = entry as PerformanceNavigationTiming;

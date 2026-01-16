@@ -161,7 +161,7 @@ export class RedisCompressionCache {
     // Process in parallel batches
     for (let i = 0; i < items.length; i += parallel) {
       const batch = items.slice(i, i + parallel);
-      await Promise.all(batch.map((item: any) => this.set(item.key: item.value: item?.ttl?? 3600)));
+      await Promise.all(batch.map((item: any) => this.set(item.key, item.value, item?.ttl?? 3600)));
     }
 
     console.log(`✅ Batch set ${items.length} items in ${performance.now() - startTime}ms`);

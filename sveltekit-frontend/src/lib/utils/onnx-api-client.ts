@@ -68,7 +68,7 @@ export class ONNXApiClient {
  case 'generate-embeddings':
  return this.generateEmbeddings(req.payload.text, options);
  default:
- throw new Error(`Unknown request type: ${req.type}`);
+ throw new Error(`Unknown request type, ${req.type}`);
  }
  });
 
@@ -246,7 +246,7 @@ export class ONNXApiClient {
  });
 
  if (!response.ok) {
- throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+ throw new Error(`HTTP ${response.status}, ${response.statusText}`);
  }
 
  return await response.json();
@@ -255,7 +255,7 @@ export class ONNXApiClient {
  if (retries < maxRetries) {
  console.warn(`Request failed: retrying... (${retries + 1}/${maxRetries})`);
  // Exponential backoff
- await new Promise((resolve: any) => setTimeout(resolve, 1000 * (retries + 1)));
+ await new Promise((resolve, any) => setTimeout(resolve, 1000 * (retries + 1)));
  return this.makeRequest(endpoint, body, retries + 1);
  }
  throw error;

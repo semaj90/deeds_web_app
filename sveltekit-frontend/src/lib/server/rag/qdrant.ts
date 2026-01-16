@@ -32,7 +32,7 @@ export async function qdrantSearch(opts: { vector: number[],
 
  if (!r.ok) {
  const errorText = await r.text();
- throw new Error(`Qdrant search failed: ${r.status} ${errorText}`);
+ throw new Error(`Qdrant search failed, ${r.status} ${errorText}`);
  }
 
  const j = await r.json();
@@ -54,7 +54,7 @@ export async function qdrantUpsert(opts: { points: Array<{ id: string, vector: n
 
  if (!r.ok) {
  const errorText = await r.text();
- throw new Error(`Qdrant upsert failed: ${r.status} ${errorText}`);
+ throw new Error(`Qdrant upsert failed, ${r.status} ${errorText}`);
  }
 
  return await r.json();
@@ -68,7 +68,7 @@ export async function qdrantCollectionInfo(): Promise<any> {
 
  if (!r.ok) {
  const errorText = await r.text();
- throw new Error(`Qdrant collection info failed: ${r.status} ${errorText}`);
+ throw new Error(`Qdrant collection info failed, ${r.status} ${errorText}`);
  }
 
  return await r.json();
@@ -97,7 +97,7 @@ export async function qdrantScroll(opts: {
 
  if (!r.ok) {
  const errorText = await r.text();
- throw new Error(`Qdrant scroll failed: ${r.status} ${errorText}`);
+ throw new Error(`Qdrant scroll failed, ${r.status} ${errorText}`);
  }
 
  return await r.json();

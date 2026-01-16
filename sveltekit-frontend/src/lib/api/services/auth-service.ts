@@ -105,7 +105,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
  } catch (error: Error | unknown) {
  const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
  console.error('Login error: ', errorMessage);
- throw new Error(`Authentication failed: ${errorMessage}`);
+ throw new Error(`Authentication failed, ${errorMessage}`);
  }
 }
 
@@ -165,7 +165,7 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
  } catch (error: Error | unknown) {
  const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
  console.error('Registration error: ', errorMessage);
- throw new Error(`Registration failed: ${errorMessage}`);
+ throw new Error(`Registration failed, ${errorMessage}`);
  }
 }
 

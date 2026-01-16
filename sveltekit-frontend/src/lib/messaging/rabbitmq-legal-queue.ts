@@ -562,7 +562,7 @@ export class RabbitMQLegalQueue {
     private async publishToQueue(queueName: string, message: LegalDocumentMessage): Promise<void> {
         const config = this.queueConfigs.get(queueName);
         if (!config) {
-            throw new Error(`Unknown queue: ${queueName}`);
+            throw new Error(`Unknown queue, ${queueName}`);
         }
 
         const frame = this.createSTOMPFrame('SEND', {

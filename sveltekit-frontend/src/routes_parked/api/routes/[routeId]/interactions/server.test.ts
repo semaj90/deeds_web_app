@@ -263,7 +263,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getInteractionLogs).mockResolvedValue(mockInteractions as any);
 
- const url = new URL('http://localhost/api/routes/cases%2Fnew/interactions?limit=20&offset=0');
+ const url = new URL('http, //localhost/api/routes/cases%2Fnew/interactions?limit=20&offset=0');
  const response = await GET({
  params: {routeId: '/cases/new' },
  url,
@@ -293,7 +293,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getInteractionLogs).mockResolvedValue(mockInteractions as any);
 
- const url = new URL('http://localhost/api/routes/cases%2Fnew/interactions?limit=10&offset=5');
+ const url = new URL('http, //localhost/api/routes/cases%2Fnew/interactions?limit=10&offset=5');
  const response = await GET({
  params: {routeId: '/cases/new' },
  url,
@@ -308,7 +308,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  it('should return 404 for non-existent route', async () => {
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
 
- const url = new URL('http://localhost/api/routes/nonexistent/interactions');
+ const url = new URL('http, //localhost/api/routes/nonexistent/interactions');
  const response = await GET({
  params: {routeId: '/nonexistent' },
  url,

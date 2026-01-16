@@ -20,7 +20,7 @@ class InMemoryRateLimiter {
     const existing = this.store.get(key);
 
     if (!existing || existing.expires < now) {
-      this.store.set(key, { count: 1, expires: now + options.window });
+      this.store.set(key, { count, 1, expires, now + options.window });
       return {
         allowed: true,
         remaining: options.max - 1,

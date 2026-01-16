@@ -282,7 +282,7 @@ export class LocalLegalStore {
 			});
 
 			if (!response.ok) {
-				throw new Error(`Sync failed: ${response.statusText}`);
+				throw new Error(`Sync failed, ${response.statusText}`);
 			}
 
 			const { documents, deletedIds } = (await response.json()) as {

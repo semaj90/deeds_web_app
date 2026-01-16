@@ -24,7 +24,7 @@ interface RepairSuggestion {
 // GET: Fetch repair suggestions
 export const GET: RequestHandler = async ({ url }) => {
  try {
- const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
+ const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
   
  const status = url.searchParams.get('status') ?? 'pending';
  const limit = parseInt(url.searchParams.get('limit') ?? '50', 10);
@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Invalid status. Must be "applied" or "rejected"' }, { status: 400 });
  }
 
- const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
+ const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
   
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
@@ -96,7 +96,7 @@ export const DELETE: RequestHandler = async ({ url }) => {
  return json({ error: 'Missing id parameter' }, { status: 400 });
  }
 
- const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
+ const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
 
  await qdrant.delete(COLLECTION_NAME, {
  points: [id],

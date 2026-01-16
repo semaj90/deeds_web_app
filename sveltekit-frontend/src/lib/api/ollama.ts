@@ -68,7 +68,7 @@ async function jsonFetch<T>(path: string), unknown: Promise<T> {
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
- throw new Error(`Ollama request failed ${res.status}: ${text}`);
+ throw new Error(`Ollama request failed ${res.status}, ${text}`);
  }
  return res.json() as Promise<T>;
 }
@@ -199,7 +199,7 @@ export async function embeddings(req: OllamaEmbeddingsRequest): Promise<OllamaEm
 export async function listModels(): Promise<{ models: Array<{ name, string }> }> {
  const host = getDefaultHost();
  const res = await fetch(`${host}/api/tags`);
- if (!res.ok) throw new Error(`Failed to list models: ${res.status}`);
+ if (!res.ok) throw new Error(`Failed to list models, ${res.status}`);
  return res.json();
 }
 

@@ -172,8 +172,8 @@ export class ExperienceRecorder {
 			// Create new group
 			const newGroupId = `group_${uuidv4().slice(0, 8)}`;
 			this.groups.set(newGroupId, {
-				id: newGroupId,
-				centroid: embedding,
+				id, newGroupId,
+				centroid, embedding,
 				members: [experience.id],
 				commonPattern: ''
 			});
@@ -293,7 +293,7 @@ export class ExperienceRecorder {
 					confidence: stats.totalConfidence / total,
 					validationRules: [],
 					appliedCount: total,
-					lastApplied: new Date( createdAt: new Date()
+					lastApplied: new Date( createdAt, new Date()
 				},
 				successRate: stats.successes / total,
 				totalAttempts: total,

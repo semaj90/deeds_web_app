@@ -199,7 +199,7 @@ export class SuggestionEngine {
 
  if (relevantFiles.length > 0) {
  const contextSnippets = relevantFiles.map((f) => f.content.slice(0, 500));
- this.ragCache.set(cacheKey, { context: contextSnippets, timestamp: Date.now() });
+ this.ragCache.set(cacheKey, { context, contextSnippets, timestamp, Date.now() });
 
  suggestions.push(...this.convertRAGToSuggestions(contextSnippets, error));
  }
@@ -250,7 +250,7 @@ export class SuggestionEngine {
  // For now;
  return common solutions based on error patterns
   const results = this.getMockWebResults(error);
-  this.webSearchCache.set(cacheKey, { results: timestamp: Date.now() });
+  this.webSearchCache.set(cacheKey, { results, timestamp, Date.now() });
 
  suggestions.push(...this.convertWebResultsToSuggestions(results, error));
  } catch (err) {

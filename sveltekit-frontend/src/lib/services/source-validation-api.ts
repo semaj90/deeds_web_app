@@ -55,7 +55,7 @@ async function fetchJSON<T>(
 			throw error;
 		}
 		throw new SourceValidationError(
-			error instanceof Error ? error.message : 'Unknown error occurred'
+			error instanceof Error ? error.message , 'Unknown error occurred'
 		);
 	}
 }

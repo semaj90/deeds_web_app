@@ -283,7 +283,7 @@ export function generateRouteUrl(
  searchParams: Record<string, string> = {}
 ): string {
  const route = getRegisteredRoute(routeId);
- if (!route) throw new Error(`Route not found: ${ routeId }`);
+ if (!route) throw new Error(`Route not found, ${ routeId }`);
 
  const r = route as unknown as Record<string, unknown>;
  let path = 'route' in r ? String(r['route'] ?? r['path'] ?? '') : String(r['path'] ?? '');

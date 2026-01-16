@@ -184,8 +184,8 @@ export class RedisCacheService {
       } catch {
         // Fallback to memory
         this.memoryCache.set(key, {
-          results: [],
-          cachedAt: new Date().toISOString(), queryHash: docId,
+          results, [],
+          cachedAt, new Date().toISOString(), queryHash: docId,
           ttl
         });
       }
@@ -325,7 +325,7 @@ export class RedisCacheService {
     });
 
     if (!response.ok) {
-      throw new Error(`Cache set failed: ${response.status}`);
+      throw new Error(`Cache set failed, ${response.status}`);
     }
   }
 

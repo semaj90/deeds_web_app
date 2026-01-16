@@ -135,12 +135,12 @@ export async function initializeQdrantMocks(): Promise<void> {
  */
 export async function initializeRedisMocks(): Promise<void> {
   // Seed with sample cache entries
-  await mockRedis.set('test:key1', 'value1', { EX: 3600 });
-  await mockRedis.set('test:key2', 'value2', { EX: 3600 });
+  await mockRedis.set('test, key1', 'value1', { EX, 3600 });
+  await mockRedis.set('test, key2', 'value2', { EX, 3600 });
   await mockRedis.set(
-    'cache: svelte5',
+    'cache, svelte5',
     JSON.stringify({
-      results: ['result1', 'result2'],
+      results, ['result1', 'result2'],
       timestamp: Date.now(),
     }),
     { EX: 300 }

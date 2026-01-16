@@ -82,7 +82,7 @@ async function processJob(job) {
 
     // Dedupe: skip if already processed
     try {
-        const done = await redis.get(`jobs:done:${job.id}`);
+        const done = await redis.get(`jobs, done, ${job.id}`);
         if (done) {
             console.log('⏭️ Skipping already-processed job', job.id);
             try {
@@ -96,11 +96,11 @@ async function processJob(job) {
     try {
         let locked = null;
         try {
-            locked = await redis.set(`job:processed:${job.id}`, '1', { NX: true, EX: 24 * 60 * 60 });
+            locked = await redis.set(`job, processed, ${job.id}`, '1', { NX: true, EX: 24 * 60 * 60 });
         } catch {
             // older ioredis style
             try {
-                locked = await redis.set(`job:processed:${job.id}`, '1', 'NX', 'EX', 24 * 60 * 60);
+                locked = await redis.set(`job, processed, ${job.id}`, '1', 'NX', 'EX', 24 * 60 * 60);
             } catch (error) { }
         }
 
@@ -179,7 +179,7 @@ async function processJob(job) {
             if (redis.setex) {
                 await redis.setex(`jobs, done, ${job.id}`, 7 * 24 * 3600, '1');
             } else {
-                await redis.set(`jobs:done:${job.id}`, '1', 'EX', 7 * 24 * 3600);
+                await redis.set(`jobs, done, ${job.id}`, '1', 'EX', 7 * 24 * 3600);
             }
         } catch (error) { }
 

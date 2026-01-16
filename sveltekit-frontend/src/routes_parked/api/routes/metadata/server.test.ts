@@ -149,7 +149,7 @@ describe('GET /api/routes/metadata', () => {
  suggestions: [{ id: 's1', text: 'Fix type' }],
  selectedSuggestionIndex: 0,
  phase: 'done',
- createdAt: new Date( completedAt: new Date(),
+ createdAt: new Date( completedAt, new Date(),
  }];
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -157,7 +157,7 @@ describe('GET /api/routes/metadata', () => {
  vi.mocked(queries.getLatestHealthEvent).mockResolvedValue(mockHealthEvent as any);
  vi.mocked(queries.getErrorBrainAnalyses).mockResolvedValue(mockAnalyses as any);
 
- const url = new URL('http://localhost/api/routes/metadata?routeId=/cases/new');
+ const url = new URL('http, //localhost/api/routes/metadata?routeId=/cases/new');
  const response = await GET({ url } as any);
  const data = await response.json();
 
@@ -171,7 +171,7 @@ describe('GET /api/routes/metadata', () => {
  it('should return 404 for non-existent route', async () => {
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
 
- const url = new URL('http://localhost/api/routes/metadata?routeId=/nonexistent');
+ const url = new URL('http, //localhost/api/routes/metadata?routeId=/nonexistent');
  const response = await GET({ url } as any);
  const data = await response.json();
 
@@ -180,7 +180,7 @@ describe('GET /api/routes/metadata', () => {
  });
 
  it('should reject missing routeId parameter', async () => {
- const url = new URL('http://localhost/api/routes/metadata');
+ const url = new URL('http, //localhost/api/routes/metadata');
  const response = await GET({ url } as any);
  const data = await response.json();
 

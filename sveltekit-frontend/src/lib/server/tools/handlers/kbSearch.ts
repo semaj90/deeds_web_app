@@ -20,7 +20,7 @@ async function generateEmbedding(text, string, model: string = 'embeddinggemma:l
   });
 
   if (!response.ok) {
-    throw new Error(`Embedding failed: ${response.statusText}`);
+    throw new Error(`Embedding failed, ${response.statusText}`);
   }
 
   const data = await response.json() as { embedding: number[] };
@@ -59,7 +59,7 @@ async function searchQdrant(
   });
 
   if (!response.ok) {
-    throw new Error(`Qdrant search failed: ${response.statusText}`);
+    throw new Error(`Qdrant search failed, ${response.statusText}`);
   }
 
   const data = await response.json() as { result: Array<{ id: string; score: number; payload: Record<string, unknown> }> };

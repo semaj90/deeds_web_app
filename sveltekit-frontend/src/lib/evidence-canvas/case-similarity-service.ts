@@ -50,7 +50,7 @@ export class CaseSimilarityService {
  try {
  const response = await fetch('/api/evidence');
  if (!response.ok) {
- throw new Error(`Failed to load evidence: ${response.status}`);
+ throw new Error(`Failed to load evidence, ${response.status}`);
  }
  return await response.json();
  } catch (error) {
@@ -91,7 +91,7 @@ export class CaseSimilarityService {
  });
 
  if (!response.ok) {
- throw new Error(`Embedding API error: ${response.status}`);
+ throw new Error(`Embedding API error, ${response.status}`);
  }
 
  const result = await response.json();

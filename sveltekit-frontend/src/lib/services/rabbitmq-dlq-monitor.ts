@@ -106,7 +106,7 @@ export class DLQMonitor {
  // Wait for backoff period
  if (attemptNumber > 0) {
  console.log(`⏱️ Waiting ${backoffDelay}ms before retry...`);
- await new Promise((resolve: any) => setTimeout(resolve, backoffDelay));
+ await new Promise((resolve, any) => setTimeout(resolve, backoffDelay));
  }
 
  // Attempt to retry the job

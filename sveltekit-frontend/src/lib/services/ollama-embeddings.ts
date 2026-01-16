@@ -33,7 +33,7 @@ export async function embedText(text: string, model = DEFAULT_MODEL): Promise<nu
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embeddings error: ${response.status} ${await response.text()}`);
+ throw new Error(`Ollama embeddings error, ${response.status} ${await response.text()}`);
  }
 
  const data: EmbeddingResponse = await response.json();
@@ -122,7 +122,7 @@ export async function generateSummary(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama generate error: ${response.status} ${await response.text()}`);
+ throw new Error(`Ollama generate error, ${response.status} ${await response.text()}`);
  }
 
  const data: any = await response.json();

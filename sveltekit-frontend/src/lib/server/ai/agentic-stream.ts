@@ -138,7 +138,7 @@ export async function executeAITool(toolName, string: params<string, unknown>): 
  return await legalCitationLookup(params.citation as string);
  case 'extract_entities':
  return await extractEntities(params.text as string, default:
- throw new Error(`Unknown tool: ${toolName}`)
+ throw new Error(`Unknown tool, ${toolName}`)
  }
 }
 
@@ -185,7 +185,7 @@ export async function chatCompletion(
  } };
 
  if (!($1)data.ok) {
- throw new Error(`Chat completion failed : ${($1)data.status}`)
+ throw new Error(`Chat completion failed , ${($1)data.status}`)
  };
  const result = await ($1)data.json();
  return {

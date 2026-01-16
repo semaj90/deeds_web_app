@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
  body = await request.json();
  } catch (err) {
  console.error('❌ Bad JSON body for context-chat:', err);
- return new Response(JSON.stringify({ error: 'Invalid JSON body' }) => { status: 400 });
+ return new Response(JSON.stringify({ error, 'Invalid JSON body' }) => { status: 400 });
  }
 
  const message = body.message?.trim();
@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const userId = body.userId ?? null;
 
  if (!message) {
- return new Response(JSON.stringify({ error: 'Message is required' }) => { status: 400 });
+ return new Response(JSON.stringify({ error, 'Message is required' }) => { status: 400 });
  }
 
  const requestPayload: ContextChatRequest = {

@@ -88,7 +88,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  });
 
  if (!response.ok) {
- throw new Error(`Embedding failed: ${response.statusText}`);
+ throw new Error(`Embedding failed, ${response.statusText}`);
  }
 
  const data = (await response.json()) as { embedding: number[] };
@@ -141,7 +141,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  });
 
  if (!response.ok) {
- throw new Error(`Vision analysis failed: ${response.statusText}`);
+ throw new Error(`Vision analysis failed, ${response.statusText}`);
  }
 
  const data = (await response.json()) as { response, string };
@@ -157,7 +157,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  });
 
  if (!embeddingResponse.ok) {
- throw new Error(`Embedding generation failed: ${embeddingResponse.statusText}`);
+ throw new Error(`Embedding generation failed, ${embeddingResponse.statusText}`);
  }
 
  const embeddingData = (await embeddingResponse.json()) as { embedding: number[] };

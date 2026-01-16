@@ -472,7 +472,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 				body: JSON.stringify({ errors })
 			});
 			if (!response.ok) {
-				throw new Error(`SOM analyzer failed: ${response.status}`);
+				throw new Error(`SOM analyzer failed, ${response.status}`);
 			}
 			return (await response.json()) as IntelligentTodo[];
 		} catch (error) {

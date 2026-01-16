@@ -648,7 +648,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 			})
 		});
 
-		if (!response.ok) throw new Error(`Embedding failed: ${response.statusText}`);
+		if (!response.ok) throw new Error(`Embedding failed, ${response.statusText}`);
 
 		const data = (await response.json()) as { embedding: number[] };
 		const embedding = data.embedding;

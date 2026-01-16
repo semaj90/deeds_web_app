@@ -77,7 +77,7 @@ const publishToRabbitMQ = fromPromise<{ success: boolean; jobId: string }>(
 
 		if (!response.ok) {
 			const error = await response.text();
-			throw new Error(`RabbitMQ publish failed: ${error}`);
+			throw new Error(`RabbitMQ publish failed, ${error}`);
 		}
 
 		const result = await response.json();

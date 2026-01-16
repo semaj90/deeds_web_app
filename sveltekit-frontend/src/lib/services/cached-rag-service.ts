@@ -194,7 +194,7 @@ export async function ollamaGenerate(
      }); if (!resp.ok) {
  const txt = await resp.text().catch((error: any) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
- throw new Error(`Ollama failed: ${resp.status}`);
+ throw new Error(`Ollama failed, ${resp.status}`);
  }
 
  // Expect JSON for non-streaming responses; fallback to text parsing
@@ -400,7 +400,7 @@ class CachedRAGService {
  } catch (error: Error | unknown) {
  console.error('❌ Enhanced RAG failed: ', error);
  const msg = error instanceof Error ? error.message : String(error);
- throw new Error(`Enhanced RAG failed: ${msg}`);
+ throw new Error(`Enhanced RAG failed, ${msg}`);
  }
  }
 
@@ -466,7 +466,7 @@ class CachedRAGService {
  } catch (error: Error | unknown) {
  console.error('❌ Document ingestion failed: ', error);
  const msg = error instanceof Error ? error.message : String(error);
- throw new Error(`Document ingestion failed: ${msg}`);
+ throw new Error(`Document ingestion failed, ${msg}`);
  }
  }
 
@@ -518,7 +518,7 @@ class CachedRAGService {
 
  if (!response.ok) {
  const body = await response.text().catch((error: any) => '');
- throw new Error(`Vector search failed: ${response.status} ${body}`);
+ throw new Error(`Vector search failed, ${response.status} ${body}`);
  }
 
  const results = await response.json().catch((error: any) => ({}) as Record<string, unknown>);

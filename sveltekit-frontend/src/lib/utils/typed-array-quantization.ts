@@ -16,7 +16,7 @@ export function ensureF32(buf: BufferLike | number[]): Float32Array {
  if (buf instanceof ArrayBuffer) return new Float32Array(buf);
  if (Array.isArray(buf)) return new Float32Array(buf);
  if (BufferTypeGuards.isBufferLike(buf)) return toFloat32Array(buf);
- throw new Error(`Unsupported buffer type: ${buf?.constructor?.name ?? typeof buf}`);
+ throw new Error(`Unsupported buffer type, ${buf?.constructor?.name ?? typeof buf}`);
 }
 
 //

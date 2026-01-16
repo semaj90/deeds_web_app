@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
  });
 
  if (!submitResponse.ok) {
- throw new Error(`CUDA server error: ${submitResponse.status}`);
+ throw new Error(`CUDA server error, ${submitResponse.status}`);
  }
 
  const submitData = await submitResponse.json();
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const resultResponse = await fetch(`${CUDA_SERVER_URL}/api/v1/result/${taskId}`);
  if (!resultResponse.ok) {
- throw new Error(`Failed to get result: ${resultResponse.status}`);
+ throw new Error(`Failed to get result, ${resultResponse.status}`);
  }
 
  const resultData = await resultResponse.json();
@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  if (resultData.error) {
- throw new Error(`CUDA task failed: ${resultData.error}`);
+ throw new Error(`CUDA task failed, ${resultData.error}`);
  }
 
  return json({ message: 'Task is still processing', taskId, status: 'processing' });

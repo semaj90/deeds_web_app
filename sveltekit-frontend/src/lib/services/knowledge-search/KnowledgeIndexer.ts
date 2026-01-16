@@ -211,7 +211,7 @@ export class KnowledgeIndexer {
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama embedding failed: ${response.status}`);
+        throw new Error(`Ollama embedding failed, ${response.status}`);
       }
 
       const data = await response.json();
@@ -220,7 +220,7 @@ export class KnowledgeIndexer {
       // Validate dimension
       if (!Array.isArray(embedding) || embedding.length !== 768) {
         // Warning: model might not be 768 dim
-        // throw new Error(`Invalid embedding dimension: ${embedding?.length}`);
+        // throw new Error(`Invalid embedding dimension, ${embedding?.length}`);
       }
 
       return embedding;
@@ -253,7 +253,7 @@ Summary:`;
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama summary failed: ${response.status}`);
+        throw new Error(`Ollama summary failed, ${response.status}`);
       }
 
       const data = await response.json();

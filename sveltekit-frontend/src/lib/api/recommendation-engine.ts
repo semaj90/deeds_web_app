@@ -30,7 +30,7 @@ export async function getRecentCases(limit: number = 5): Promise<RecentCase[]> {
  });
 
  if (!response.ok) {
- throw new Error(`HTTP error! status: ${response.status}`);
+ throw new Error(`HTTP error! status, ${response.status}`);
  }
 
  const result: RecentCaseResponse = await response.json();
@@ -72,7 +72,7 @@ export async function updateCaseRecommendation(
  });
 
  if (!response.ok) {
- throw new Error(`HTTP error! status: ${response.status}`);
+ throw new Error(`HTTP error! status, ${response.status}`);
  }
 
  const result = await response.json();
@@ -95,7 +95,7 @@ export async function searchCases(query: string, limit: number = 10): Promise<Re
  });
 
  if (!response.ok) {
- throw new Error(`HTTP error! status: ${response.status}`);
+ throw new Error(`HTTP error! status, ${response.status}`);
  }
 
  const result = await response.json();
@@ -123,7 +123,7 @@ export async function getContextualRecommendations(context: {
  });
 
  if (!response.ok) {
- throw new Error(`HTTP error! status: ${response.status}`);
+ throw new Error(`HTTP error! status, ${response.status}`);
  }
 
  const result = await response.json();

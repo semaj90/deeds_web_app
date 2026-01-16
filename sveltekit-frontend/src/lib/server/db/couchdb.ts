@@ -156,7 +156,7 @@ export async function upsertNode(node, Omit<KnowledgeNode, '_rev'>): Promise<Kno
         });
 
         if (!response.ok) {
-            throw new Error(`CouchDB upsert failed: ${response.statusText}`);
+            throw new Error(`CouchDB upsert failed, ${response.statusText}`);
         }
 
         const result = await response.json();
@@ -179,7 +179,7 @@ export async function createEdge(edge, Omit<KnowledgeEdge, '_rev'>): Promise<Kno
         });
 
         if (!response.ok) {
-            throw new Error(`CouchDB edge creation failed: ${response.statusText}`);
+            throw new Error(`CouchDB edge creation failed, ${response.statusText}`);
         }
 
         const result = await response.json();
@@ -269,7 +269,7 @@ export async function bulkInsertNodes(nodes, Omit<KnowledgeNode, '_rev'>[]): Pro
         });
 
         if (!response.ok) {
-            throw new Error(`Bulk insert failed: ${response.statusText}`);
+            throw new Error(`Bulk insert failed, ${response.statusText}`);
         }
 
         const results = await response.json();

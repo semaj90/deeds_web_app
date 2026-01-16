@@ -66,7 +66,7 @@ export class CitationManagementService {
  // Verify ownershipcitationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
- throw new Error('Unauthorized: Citation not found or not owned by user');
+ throw new Error('Unauthorized, Citation not found or not owned by user');
  }
 
  const updates: string[] = [];
@@ -125,7 +125,7 @@ export class CitationManagementService {
  // Verify ownershipcitationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
- throw new Error('Unauthorized: Citation not found or not owned by user');
+ throw new Error('Unauthorized, Citation not found or not owned by user');
  }
 
  await db.query('DELETE FROM saved_citations WHERE id = $1', [citationId]);
@@ -292,7 +292,7 @@ export class CitationManagementService {
  collectionCheck.rows.length === 0 ||
  collectionCheck.rows[0].user_id !== userId
  ) {
- throw new Error('Unauthorized: Citation or collection not found');
+ throw new Error('Unauthorized, Citation or collection not found');
  }
 
  await db.query(
@@ -324,7 +324,7 @@ export class CitationManagementService {
  );
 
  if (collectionCheck.rows.length === 0 || collectionCheck.rows[0].user_id !== userId) {
- throw new Error('Unauthorized: Collection not found');
+ throw new Error('Unauthorized, Collection not found');
  }
 
  await db.query(

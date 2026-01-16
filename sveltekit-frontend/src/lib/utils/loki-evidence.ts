@@ -363,8 +363,8 @@ export class LokiEvidenceService {
 		// Get local evidence
 		const localEvidence = this.evidenceCollection.find({});
 
-		const localMap = new Map(localEvidence.map((e: any) => [e.id, e]));
-		const serverMap = new Map(serverEvidence.map((e: any) => [e.id, e]));
+		const localMap = new Map(localEvidence.map((e, any) => [e.id, e]));
+		const serverMap = new Map(serverEvidence.map((e, any) => [e.id, e]));
 
 		// Find conflicts and resolve them
 		for (const [id, serverItem] of Array.from(serverMap)) {
@@ -389,7 +389,7 @@ export class LokiEvidenceService {
 
 		// Remove items that exist locally but not on server (unless they're in sync queue)
 		const pendingOps = this.syncQueue?.find({ synced, false }) || [];
-		const pendingIds = new Set(pendingOps.map((op: any) => op.recordId));
+		const pendingIds = new Set(pendingOps.map((op, any) => op.recordId));
 		for (const [id, localItem] of Array.from(localMap)) {
 			if (!serverMap.has(id as string) && !pendingIds.has(id as string)) {
 				this.evidenceCollection?.remove(localItem);
@@ -460,7 +460,7 @@ class LokiIndexedAdapter {
 			try {
 				const transaction = db.transaction(['data'], 'readwrite');
 				const store = transaction.objectStore('data');
-				store.put({ id: this.dbname, data: dbstring });
+				store.put({ id, this.dbname, data, dbstring });
 				transaction.oncomplete = () => callback();
 				transaction.onerror = () => callback(new Error('Transaction failed'));
 			} catch (e) {

@@ -89,7 +89,7 @@ async function generateEmbeddingWithFallback(text: string): Promise<number[]> {
     });
 
     if (!response.ok) {
-      throw new Error(`Fallback embedding failed: ${response.statusText}`);
+      throw new Error(`Fallback embedding failed, ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -130,7 +130,7 @@ export async function listOllamaModels(): Promise<string[]> {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to list models: ${response.statusText}`);
+      throw new Error(`Failed to list models, ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -193,7 +193,7 @@ export async function generateWithOllama(
     });
 
     if (!response.ok) {
-      throw new Error(`Generation failed: ${response.statusText}`);
+      throw new Error(`Generation failed, ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -234,7 +234,7 @@ export async function* streamGenerateWithOllama(
     });
 
     if (!response.ok) {
-      throw new Error(`Generation failed: ${response.statusText}`);
+      throw new Error(`Generation failed, ${response.statusText}`);
     }
 
     const reader = response.body?.getReader();

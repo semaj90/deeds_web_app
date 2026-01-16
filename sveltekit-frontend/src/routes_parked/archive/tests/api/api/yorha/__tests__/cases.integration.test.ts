@@ -57,8 +57,8 @@ describe('YoRHa Cases API Integration', () => {
 
  it('should update a case', async () => {.update(yorhaCases)
  .set({
- title: 'Updated Test Case',
- priority: 'critical',
+ title, 'Updated Test Case',
+ priority, 'critical',
  updated_at: new Date(),
  })
  .where(eq(yorhaCases.id, createdCaseId))
@@ -78,8 +78,8 @@ describe('YoRHa Cases API Integration', () => {
 
  it('should soft delete a case', async () => {.update(yorhaCases)
  .set({
- status: 'archived',
- updated_at: new Date(),
+ status, 'archived',
+ updated_at, new Date(),
  })
  .where(eq(yorhaCases.id, createdCaseId))
  .returning();

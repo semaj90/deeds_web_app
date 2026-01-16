@@ -280,7 +280,7 @@ export class CrewAIService {
  });
 
  if (!res.ok) {
- throw new Error(`CrewAI error: ${res.status} ${res.statusText}`);
+ throw new Error(`CrewAI error, ${res.status} ${res.statusText}`);
  }
 
  const data = (await res.json()) as CrewExecution;
@@ -304,7 +304,7 @@ export class CrewAIService {
  });
 
  if (!res.ok) {
- throw new Error(`Failed to get execution: ${res.status}`);
+ throw new Error(`Failed to get execution, ${res.status}`);
  }
 
  return (await res.json()) as CrewExecution;
@@ -454,7 +454,7 @@ export async function analyzeLegalCaseWithCrew(
  let status = execution.status;
 
  while (status === 'running' && attempts < maxAttempts) {
- await new Promise((r: any) => setTimeout(r, 5000));
+ await new Promise((r, any) => setTimeout(r, 5000));
  const updated = await crewAIService.getExecution(execution.id);
  status = updated.status;
  attempts++;
@@ -503,7 +503,7 @@ export async function analyzeContractWithCrew(
  let status = execution.status;
 
  while (status === 'running' && attempts < maxAttempts) {
- await new Promise((r: any) => setTimeout(r, 5000));
+ await new Promise((r, any) => setTimeout(r, 5000));
  const updated = await crewAIService.getExecution(execution.id);
  status = updated.status;
  attempts++;

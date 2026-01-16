@@ -183,7 +183,7 @@ export class NativeWindowsServiceManager {
  const process = spawn(command, args, { detached: true, stdio: 'ignore' });
  service.pid = process.pid;
  process.unref();
- await new Promise((resolve: any) => setTimeout(resolve, 3000));
+ await new Promise((resolve, any) => setTimeout(resolve, 3000));
  return this.checkServiceStatus(service);
  } else {
  console.log(`🌐 Browser mode, Cannot directly start ${service.displayName}`);
@@ -208,7 +208,7 @@ export class NativeWindowsServiceManager {
  } else {
  results.failed.push(serviceName);
  }
- await new Promise((resolve: any) => setTimeout(resolve, 2000));
+ await new Promise((resolve, any) => setTimeout(resolve, 2000));
  } catch (error: Error | unknown) {
  results.failed.push(serviceName);
  console.error(`❌ Failed to start ${serviceName}:`, error);

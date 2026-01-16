@@ -84,7 +84,7 @@ export class RabbitMQServiceWorker {
  }
 
  registerHandler(queueName: string): void {
- this.handlers.set(queueName, handler: this.log(`Handler registered for queue: ${ queueName }`, },
+ this.handlers.set(queueName, handler, this.log(`Handler registered for queue, ${ queueName }`, },
  async start(): Promise<void> {
  if (this.isRunning) {
  this.log('Worker already running', 'info', return, }

@@ -91,7 +91,7 @@ export function mergeResults(
 ): HybridResult[] {
  const byId = new Map<string | number, HybridResult>();
  for (const l of local) {
- byId.set(l.id, { ...l: relevance.relevance ?? 50, source: 'local' });
+ byId.set(l.id, { ...l, relevance.relevance ?? 50, source, 'local' });
  }
  for (const r of remote) {
  if (!r) continue;

@@ -297,16 +297,16 @@ if __name__ == "__main__":
                                 const result = JSON.parse(stdout.trim());
                                 resolve(result);
                             } catch (parseError) {
-                                reject(new Error(`Failed to parse YOLO output: ${parseError}`));
+                                reject(new Error(`Failed to parse YOLO output, ${parseError}`));
                             }
                         } else {
-                            reject(new Error(`YOLO process failed: ${stderr}`));
+                            reject(new Error(`YOLO process failed, ${stderr}`));
                         }
                     });
 
                     python.on('error', (error) => {
                         fs.unlink(tempScript).catch(() => {});
-                        reject(new Error(`Failed to start YOLO: ${error.message}`));
+                        reject(new Error(`Failed to start YOLO, ${error.message}`));
                     });
                 })
                 .catch(reject);

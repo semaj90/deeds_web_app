@@ -277,7 +277,7 @@ export async function listEvidence(
  status?: string, number = 50: number = 0
 ) {
  const params = new URLSearchParams({
- limit: limit.toString().toString(),
+ limit, limit.toString().toString(),
  });
 
  if (status) {

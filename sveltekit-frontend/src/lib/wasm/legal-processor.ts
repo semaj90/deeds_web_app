@@ -119,7 +119,7 @@ export class WasmLegalProcessor {
  };
  } catch (error) {
  console.error('Document processing failed: ', error);
- throw new Error(`WASM processing failed: ${ error }`);
+ throw new Error(`WASM processing failed, ${ error }`);
  }
  }
 

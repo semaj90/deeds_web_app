@@ -34,7 +34,7 @@ export async function getJobStatus(jobId: string): Promise<JobStatus> {
  return status;
  } catch (error: Error | unknown) {
  console.error('Job status fetch error: ', error);
- throw new Error(`Failed to fetch job status: ${(error as Error).message}`);
+ throw new Error(`Failed to fetch job status, ${(error as Error).message}`);
  }
 }
 
@@ -53,7 +53,7 @@ export async function cancelJob(jobId: string): Promise<void> {
  console.log(`Job cancelled: ${ jobId }`);
  } catch (error: Error | unknown) {
  console.error('Job cancellation error: ', error);
- throw new Error(`Failed to cancel job: ${(error as Error).message}`);
+ throw new Error(`Failed to cancel job, ${(error as Error).message}`);
  }
 }
 
@@ -73,7 +73,7 @@ export async function listActiveJobs(): Promise<JobStatus[]> {
  return jobs;
  } catch (error: Error | unknown) {
  console.error('Active jobs list error: ', error);
- throw new Error(`Failed to list active jobs: ${(error as Error).message}`);
+ throw new Error(`Failed to list active jobs, ${(error as Error).message}`);
  }
 }
 
@@ -130,7 +130,7 @@ export async function clearJobCache(jobId: string): Promise<void> {
  console.log(`Cleared cache for job: ${jobId}`);
  } catch (error: Error | unknown) {
  console.error('Job cache clear error: ', error);
- throw new Error(`Failed to clear job cache: ${(error as Error).message}`);
+ throw new Error(`Failed to clear job cache, ${(error as Error).message}`);
  }
 }
 

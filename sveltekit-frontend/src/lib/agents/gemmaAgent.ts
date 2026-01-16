@@ -54,7 +54,7 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  });
 
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.statusText}`);
+ throw new Error(`Ollama error, ${response.statusText}`);
  }
 
  const data = await response.json();
@@ -144,7 +144,7 @@ export async function* streamAgentResponse(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.statusText}`);
+ throw new Error(`Ollama error, ${response.statusText}`);
  }
 
  const reader = response.body?.getReader();

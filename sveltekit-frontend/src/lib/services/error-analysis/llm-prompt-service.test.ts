@@ -195,7 +195,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  const originalUpdatedAt = stored.updatedAt;
 
  // Wait a bit to ensure timestamp difference
- await new Promise((resolve: any) => setTimeout(resolve, 10));
+ await new Promise((resolve, any) => setTimeout(resolve, 10));
 
  const updated = await service.updatePrompt(stored.id, { confidence: 0.9 });
 
@@ -340,7 +340,7 @@ describe('LLMPromptService - Unit Tests (Task 11.1)', () => {
  prompts.push(p);
 
  // Small delay to ensure different timestamps
- await new Promise((resolve: any) => setTimeout(resolve, 5));
+ await new Promise((resolve, any) => setTimeout(resolve, 5));
  }
 
  const history = await service.retrievePromptHistory(10, 0);

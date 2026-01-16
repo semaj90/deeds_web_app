@@ -203,7 +203,7 @@ const aiAnalysisService = fromPromise<{
         integrityStatus: input.integrityStatus,
         verificationResults: input.verificationResults } }) });
   if (!analysisResponse.ok) {
-    throw new Error(`AI analysis failed: ${analysisResponse.statusText}`);
+    throw new Error(`AI analysis failed, ${analysisResponse.statusText}`);
   }
 
   const analysisResult = await analysisResponse.json() as {

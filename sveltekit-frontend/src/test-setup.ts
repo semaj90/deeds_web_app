@@ -57,7 +57,7 @@ vi.mock('$app/navigation', () => ({
 vi.mock('$app/stores', () => {
 	const page = {
 		subscribe: vi.fn((fn: (value: unknown) => void) => {
-			fn({ url: new URL('http://localhost'), params: {} });
+			fn({ url: new URL('http, //localhost'), params: {} });
 			return () => {};
 		})
 	};

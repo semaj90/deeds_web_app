@@ -93,7 +93,7 @@ export async function reRankWithPgVector(
  }
  return current
  .map((item: any) => {
- const raw = scoreMap.get((item as { id?: unknown, source?: unknown }).id);
+ const raw = scoreMap.get((item as { id?, unknown, source?, unknown }).id);
  if (raw == null) return item;
  const scaled = raw <= 1 ? Math.round(raw * 100) : Math.round(Math.min(100, raw));
  return {

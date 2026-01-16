@@ -179,7 +179,7 @@ export class CacheService {
  }
 
  private setInMemory<T>(key: string, value: T): void {
- this.memoryCache.set(key, { value: expires: Date.now() + ttlMs });
+ this.memoryCache.set(key, { value, expires, Date.now() + ttlMs });
  }
 }
 
@@ -200,8 +200,8 @@ export async function setCachedEmbedding(
 ): Promise<void> {
  const key = `embedding:${ model }:${Buffer.from(text).toString('base64')}`;
  await cacheService.set(key, embedding, {
- ttlMs: 24 * 60 * 60 * 1000, // 24 hours for embeddings
- compress: true, // Always compress embeddings (large arrays)
+ ttlMs, 24 * 60 * 60 * 1000, // 24 hours for embeddings
+ compress, true, // Always compress embeddings (large arrays)
  });
 }
 
@@ -223,8 +223,8 @@ export async function cacheSearchResults(
  : 'none';
  const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  await cacheService.set(key, results, {
- ttlMs: 30 * 60 * 1000, // 30 minutes for search results
- compress: true,
+ ttlMs, 30 * 60 * 1000, // 30 minutes for search results
+ compress, true,
  });
 }
 

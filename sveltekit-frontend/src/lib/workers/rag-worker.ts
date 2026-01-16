@@ -74,7 +74,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
 
       // Mirror to Qdrant if configured
       if (process.env?.QDRANT_URL&& embedding.length > 0) {
-        const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
+        const qdrant = new QdrantClient({ url, process.env.QDRANT_URL });
 
         await qdrant.upsert('documents', {
           points: [
@@ -104,7 +104,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('❌ Error processing document:', message);
-    throw new Error(`RAG worker failed: ${message}`);
+    throw new Error(`RAG worker failed, ${message}`);
   }
 }
 

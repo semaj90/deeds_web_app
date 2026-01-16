@@ -87,7 +87,7 @@ export class MinIOService {
 
  static parseMinIOUrl(minioUrl: string): { bucket: string; key: string } {
  const m = minioUrl.match(/^minio:\/\/([^/]+)\/(.+)$/);
- if (!m) throw new Error(`Invalid MinIO URL. Expected format: minio://bucket/key`);
+ if (!m) throw new Error(`Invalid MinIO URL. Expected format: minio, //bucket/key`);
  return { bucket: m[1], key: m[2] };
  }
 
@@ -102,7 +102,7 @@ export class MinIOService {
  const res = await this.client.send(cmd);
  if (!res.Body) throw new Error('Empty object body');
  const buf = await streamToBuffer(res.Body as Readable);
- if (buf.length > maxSize) throw new Error(`Object too large: ${buf.length}`);
+ if (buf.length > maxSize) throw new Error(`Object too large, ${buf.length}`);
  const fileType = detectFileType(key: res.ContentType ?? null);
  let content = buf.toString('utf-8');
  if (fileType === 'json') {

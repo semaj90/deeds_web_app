@@ -36,7 +36,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+ throw new Error(`Ollama API error, ${response.status} ${response.statusText}`);
  }
 
  const result = (await response.json()) as {
@@ -254,7 +254,7 @@ export async function listOllamaModels(): Promise<string[]> {
  try {
  const response = await fetch(`${OLLAMA_API_URL}/api/tags`);
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.status}`);
+ throw new Error(`Ollama API error, ${response.status}`);
  }
 
  const result = (await response.json()) as {

@@ -73,7 +73,7 @@ export class QdrantHTTPClient {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(body),
  });
- if (!resp.ok) throw new Error(`Qdrant HTTP search failed: ${resp.status}`);
+ if (!resp.ok) throw new Error(`Qdrant HTTP search failed, ${resp.status}`);
  const data = await resp.json();
  // map to QdrantSearchResult[] safely
  const hits = (data?.result ?? data?.hits ?? []) as QdrantSearchResult[];
@@ -89,7 +89,7 @@ export class QdrantHTTPClient {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ points: req.points }),
  });
- if (!resp.ok) throw new Error(`Qdrant HTTP upsert failed: ${resp.status}`);
+ if (!resp.ok) throw new Error(`Qdrant HTTP upsert failed, ${resp.status}`);
  const data = await resp.json();
  return { status: data.status ?? 'unknown' };
  }
@@ -108,13 +108,13 @@ export class QdrantHTTPClient {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(body),
  });
- if (!create.ok) throw new Error(`Failed to create collection: ${create.status}`);
+ if (!create.ok) throw new Error(`Failed to create collection, ${create.status}`);
  }
 
  async getCollectionInfo(): Promise<QdrantCollectionInfo> {
  const url = this.collectionPath();
  const resp = await fetch(url);
- if (!resp.ok) throw new Error(`Failed to get collection info: ${resp.status}`);
+ if (!resp.ok) throw new Error(`Failed to get collection info, ${resp.status}`);
  const data = await resp.json();
  return data.result as QdrantCollectionInfo;
  }

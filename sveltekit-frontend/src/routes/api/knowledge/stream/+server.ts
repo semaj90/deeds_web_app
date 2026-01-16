@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!query || typeof query !== 'string' || query.trim().length === 0) {
 			return new Response(
-				JSON.stringify({ error: 'Query is required' }) => { status: 400, headers: { 'Content-Type': 'application/json' } }
+				JSON.stringify({ error, 'Query is required' }) => { status: 400, headers: { 'Content-Type': 'application/json' } }
 			);
 		}
 
@@ -98,7 +98,7 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
 	} catch (error) {
 		console.error('SSE Stream error:', error);
 		return new Response(
-			JSON.stringify({ error: 'Stream initialization failed' }) => { status: 500, headers: { 'Content-Type': 'application/json' } }
+			JSON.stringify({ error, 'Stream initialization failed' }) => { status: 500, headers: { 'Content-Type': 'application/json' } }
 		);
 	}
 };
@@ -128,7 +128,7 @@ async function streamOllamaResponse(
 	});
 
 	if (!response?.ok|| !response.body) {
-		throw new Error(`Ollama request failed: ${response.statusText}`);
+		throw new Error(`Ollama request failed, ${response.statusText}`);
 	}
 
 	const reader = response.body.getReader();

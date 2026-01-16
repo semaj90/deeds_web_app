@@ -307,7 +307,7 @@ export class RecoveryStrategy {
  * Delay helper
  */
  private static delay(ms: number): Promise<void> {
- return new Promise((resolve: any) => setTimeout(resolve, ms));
+ return new Promise((resolve, any) => setTimeout(resolve, ms));
  }
 
  /**

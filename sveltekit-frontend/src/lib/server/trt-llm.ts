@@ -10,7 +10,7 @@ export async function inferLLM(input: string) {
  body: JSON.stringify({ prompt, input }),
  });
 
- if (!res.ok) throw new Error(`TRT-LLM error: ${res.status}`);
+ if (!res.ok) throw new Error(`TRT-LLM error, ${res.status}`);
  return await parseFast(await res.text());
  } catch (err) {
  console.error('[TensorRT-LLM]', err);

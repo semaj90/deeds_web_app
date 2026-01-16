@@ -203,7 +203,7 @@ function generateSummaryResponse(caseData: any, sources: any[]): string {
 }
 
 function generateEvidenceResponse(caseData: any, sources: any[]): string {new Set(
- sources.map((s: any) => {
+ sources.map((s, any) => {
  const evidence = caseData.evidence.find((e: any) => e.id === s.id);
  return evidence?.type ?? 'unknown';
  })
@@ -307,7 +307,7 @@ export async function demoGenerateCaseSummary(caseId: string): Promise<string> {
  '\n\n## Evidence Summary\n\n- **Total Evidence Items**: ' +
  caseData.evidence.length +
  '\n\n- **Document Types**: ' +
- Array.from(new Set(caseData.evidence.map((e: any) => e.type))).join(', ') +
+ Array.from(new Set(caseData.evidence.map((e, any) => e.type))).join(', ') +
  '\n\n- **Date Range**: ' +
  new Date(
  Math.min(...caseData.evidence.map((e, any) => e.uploadedAt.getTime()))

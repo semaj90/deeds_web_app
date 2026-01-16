@@ -25,8 +25,8 @@ export const POST: RequestHandler = async ({ request }) => {
  [result] = await db
  .update(canvasStates)
  .set({
- canvasData: canvasState,
- updatedAt: new Date( version: (existing[0].version ?? 1) + 1,
+ canvasData, canvasState,
+ updatedAt, new Date( version, (existing[0].version ?? 1) + 1,
  })
  .where(eq(canvasStates.caseId, caseId))
  .returning();

@@ -155,7 +155,7 @@ export class GraphService {
 
  return result.records.map((record) => ({
  id: record.get('id', title: record.get('title') ?? 'Unknown',
- caseNumber: record.get('caseNumber', outcome: record.get('outcome', year: record.get('year', relevanceScore: 1.0, // All results are equally relevant
+ caseNumber: record.get('caseNumber', outcome, record.get('outcome', year, record.get('year', relevanceScore: 1.0, // All results are equally relevant
  }));
  } catch (error) {
  console.error('Error finding related cases:', error);
@@ -256,7 +256,7 @@ export class GraphService {
  );
 
  return result.records.map((record) => ({
- code: record.get('code', title: record.get('title', linkType: record.get('linkType', createdAt: record.get('createdAt'),
+ code: record.get('code', title, record.get('title', linkType, record.get('linkType', createdAt: record.get('createdAt'),
  }));
  } catch (error) {
  console.error('Error getting case-statute relationships:', error);

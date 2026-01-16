@@ -142,7 +142,7 @@ export class EmbeddingWorkerManager {
 			setTimeout(() => {
 				if (this.pendingTasks.has(message.id)) {
 					this.pendingTasks.delete(message.id);
-					reject(new Error(`Worker task timeout: ${message.id}`));
+					reject(new Error(`Worker task timeout, ${message.id}`));
 				}
 			}, 30000);
 		});

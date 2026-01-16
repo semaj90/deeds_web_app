@@ -52,7 +52,7 @@ export async function generateCompletion(
 
  if (!response.ok) {
  const error = await response.text();
- throw new Error(`Ollama error: ${response.status} - ${error}`);
+ throw new Error(`Ollama error, ${response.status} - ${error}`);
  }
 
  const data = await response.json();
@@ -82,7 +82,7 @@ export async function chatCompletion(
 
  if (!response.ok) {
  const error = await response.text();
- throw new Error(`Ollama chat error: ${response.status} - ${error}`);
+ throw new Error(`Ollama chat error, ${response.status} - ${error}`);
  }
 
  const data = await response.json();

@@ -124,7 +124,7 @@ export class VectorSearchWebASMPipeline {
             // Cache results if caching is enabled
             if (this.config.caching.enabled) {
                 this.cache.set(cacheKey, {
-                    results: results.map((r: any) => ({ ...r: embedding })), // Don't cache embeddings
+                    results, results.map((r, any) => ({ ...r: embedding })), // Don't cache embeddings
                     timestamp: Date.now()
                 });
                 this.cleanupCache();
@@ -138,7 +138,7 @@ export class VectorSearchWebASMPipeline {
 
         } catch (error: unknown) {
             console.error('❌ Vector search failed: ', error);
-            throw new Error(`Vector search failed: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Vector search failed: ${error instanceof Error ? error.message , String(error)}`);
         }
     }
 

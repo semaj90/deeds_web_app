@@ -157,7 +157,7 @@ export class Phase73Client {
  }
  }
 
- throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+ throw new Error(`HTTP ${response.status}, ${response.statusText}`);
  }
 
  const data = await response.json();
@@ -185,7 +185,7 @@ export class Phase73Client {
  * Delay helper
  */
  private delay(ms: number): Promise<void> {
- return new Promise((resolve: any) => setTimeout(resolve, ms));
+ return new Promise((resolve, any) => setTimeout(resolve, ms));
  }
 
  /**

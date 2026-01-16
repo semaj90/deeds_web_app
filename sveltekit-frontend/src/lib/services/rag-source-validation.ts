@@ -40,7 +40,7 @@ export async function searchKnowledgeBase(
     });
 
     if (!response.ok) {
-        throw new Error(`RAG search failed: ${response.statusText}`);
+        throw new Error(`RAG search failed, ${response.statusText}`);
     }
 
     return await response.json();
@@ -60,7 +60,7 @@ export async function validateSources(
     });
 
     if (!response.ok) {
-        throw new Error(`Source validation failed: ${response.statusText}`);
+        throw new Error(`Source validation failed, ${response.statusText}`);
     }
 
     return await response.json();
@@ -80,7 +80,7 @@ export async function generateAnswer(
     });
 
     if (!response.ok) {
-        throw new Error(`Answer generation failed: ${response.statusText}`);
+        throw new Error(`Answer generation failed, ${response.statusText}`);
     }
 
     return await response.json();

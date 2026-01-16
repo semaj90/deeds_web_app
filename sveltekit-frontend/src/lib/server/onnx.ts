@@ -151,16 +151,16 @@ if __name__ == "__main__", input_file = sys.argv[1]
  reject(new Error(result.error));
  }
  } catch (parseError) {
- reject(new Error(`Failed to parse ONNX output: ${ parseError }`));
+ reject(new Error(`Failed to parse ONNX output, ${ parseError }`));
  }
  } else {
- reject(new Error(`ONNX process failed: ${stderr}`));
+ reject(new Error(`ONNX process failed, ${stderr}`));
  }
  });
 
  python.on('error', (error) => {
  fs.unlink(tempScript).catch(() => {});
- reject(new Error(`Failed to start ONNX: ${error.message}`));
+ reject(new Error(`Failed to start ONNX, ${error.message}`));
  });
  })
  .catch(reject);

@@ -78,7 +78,7 @@ export class LegalAIJobQueue {
             this.queues.set(name, queue);
 
             // Create worker for each queue
-            const worker = new RabbitMQWorker(name: this.createJobProcessor(name) => {
+            const worker = new RabbitMQWorker(name, this.createJobProcessor(name) => {
                 connection: redisConnection,
                 concurrency,
                 limiter: { max: concurrency * 2,
@@ -102,7 +102,7 @@ export class LegalAIJobQueue {
         return async (job: RabbitMQJob<LegalJobData>) => {
             const { id } = job;
             console.log(`🚀 Processing job ${ id } in ${ queueName }`);
-            await new Promise((resolve: any) => setTimeout(resolve, 1000));
+            await new Promise((resolve, any) => setTimeout(resolve, 1000));
             return { status: 'completed', queue: queueName, jobId: id };
         };
     }

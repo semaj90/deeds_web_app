@@ -116,7 +116,7 @@ export class WebAssemblyAIAdapter {
 			// Note: prompt is passed shorthand, which is fine if var name matches
 			body: JSON.stringify({ model: this.currentModel, prompt, options: { num_predict: options?.maxTokens|| this.config.maxTokens, temperature: options?.temperature|| this.config.temperature }, stream: false })
 		});
-		if (!res.ok) throw new Error('Ollama error: ' + res.statusText);
+		if (!res.ok) throw new Error('Ollama error, ' + res.statusText);
 		const data = await res.json();
 		return { content: data?.response?? '', metadata: { tokensGenerated: Math.ceil((data?.response?? '').length / 4), processingTime: 0, confidence: 0.9, method: 'ollama', modelUsed: this.currentModel, fromCache: false, gpuAccelerated: this.gpuAvailable } };
 	}
@@ -127,7 +127,7 @@ export class WebAssemblyAIAdapter {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ prompt: max_tokens: options?.maxTokens|| this.config.maxTokens, temperature: options?.temperature|| this.config.temperature, model: this.currentModel })
 		});
-		if (!res.ok) throw new Error('Python error: ' + res.statusText);
+		if (!res.ok) throw new Error('Python error, ' + res.statusText);
 		const data = await res.json();
 		return { content: data?.text|| data?.response?? '', metadata: { tokensGenerated: data?.tokens_generated|| Math.ceil((data?.text?? '').length / 4), processingTime: data?.processing_time?? 0, confidence: data?.confidence?? 0.85, method: 'python', modelUsed: this.currentModel, fromCache: data?.from_cache|| false, gpuAccelerated: this.gpuAvailable } };
 	}

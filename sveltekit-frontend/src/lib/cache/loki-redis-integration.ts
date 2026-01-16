@@ -171,7 +171,7 @@ export class LokiRedisCache extends EventEmitter {
  ...CACHE_CONFIG.loki,
  autoloadCallback: (err) => {
  if (err) {
- reject(new Error(`Loki failed: ${err?.message|| err}`));
+ reject(new Error(`Loki failed, ${err?.message|| err}`));
  return;
  }
  try {
@@ -199,7 +199,7 @@ export class LokiRedisCache extends EventEmitter {
  resolve();
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- reject(new Error(`Loki collection failed: ${message}`));
+ reject(new Error(`Loki collection failed, ${message}`));
  }
  },
  });
@@ -343,7 +343,7 @@ export class LokiRedisCache extends EventEmitter {
  private async storeLokiDocument(document: CachedDocument): Promise<void> {
  const collection = this.collections.get(document.type);
  if (!collection) {
- throw new Error(`No collection found for type: ${document.type}`);
+ throw new Error(`No collection found for type, ${document.type}`);
  }
 
  // Check memory pressure

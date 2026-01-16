@@ -121,7 +121,7 @@ async function httpRequest(path, string, method = 'GET', body?: unknown): Promis
 	const res = await f(url, init);
 	if (!res.ok) {
 		const txt = await res.text().catch(() => '');
-		throw new Error(`Qdrant HTTP ${res.status} ${res.statusText}: ${txt}`);
+		throw new Error(`Qdrant HTTP ${res.status} ${res.statusText}, ${txt}`);
 	}
 	if (res.status === 204) return null;
 	return res.json().catch(() => null);
@@ -271,7 +271,7 @@ const qdrant = {
 					return await sdk.delete(collectionName, { points, ids });
 				}
 				if (sdk.points?.delete) {
-					return await sdk.points.delete({ collection_name: collectionName, points: ids });
+					return await sdk.points.delete({ collection_name, collectionName, points, ids });
 				}
 			} catch (e) {
 				console.warn('[Qdrant] SDK delete failed, falling back to HTTP', e);

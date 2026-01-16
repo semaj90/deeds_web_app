@@ -23,7 +23,7 @@ export async function uploadEvidenceImage(formData: FormData): Promise<ImageAnal
  });
 
  if (!response.ok) {
- throw new Error(`Image analysis failed: ${response.statusText}`);
+ throw new Error(`Image analysis failed, ${response.statusText}`);
  }
 
  return response.json();
@@ -36,7 +36,7 @@ export async function uploadEvidenceVideo(formData: FormData): Promise<VideoAnal
  });
 
  if (!response.ok) {
- throw new Error(`Video analysis failed: ${response.statusText}`);
+ throw new Error(`Video analysis failed, ${response.statusText}`);
  }
 
  return response.json();
@@ -58,7 +58,7 @@ export async function getSimilaritySearch(
  });
 
  if (!response.ok) {
- throw new Error(`Similarity search failed: ${response.statusText}`);
+ throw new Error(`Similarity search failed, ${response.statusText}`);
  }
 
  return response.json();

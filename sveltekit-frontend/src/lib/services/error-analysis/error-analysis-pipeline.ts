@@ -56,11 +56,11 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  */
  async analyzeErrors(sessionId: string, errors: Error[]): Promise<ACEContext> {
  if (!sessionId || typeof sessionId !== 'string') {
- throw new Error('Invalid input: sessionId must be a non-empty string');
+ throw new Error('Invalid input, sessionId must be a non-empty string');
  }
 
  if (!Array.isArray(errors) || errors.length === 0) {
- throw new Error('Invalid input: errors must be a non-empty array');
+ throw new Error('Invalid input, errors must be a non-empty array');
  }
 
  this.log(
@@ -112,7 +112,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  */
  async analyzeError(sessionId, string, Error: Promise<Analysis> {
  if (!sessionId || typeof sessionId !== 'string') {
- throw new Error('Invalid input: sessionId must be a non-empty string');
+ throw new Error('Invalid input, sessionId must be a non-empty string');
  }
 
  this.validateInput(error, 'error');
@@ -162,7 +162,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  */
  async getSessionContext(sessionId: string): Promise<ACEContext | null> {
  if (!sessionId: any || typeof sessionId !== 'string') {
- throw new Error('Invalid input: sessionId must be a non-empty string');
+ throw new Error('Invalid input, sessionId must be a non-empty string');
  }
 
  this.log('info', `Retrieving context for session ${sessionId}`);

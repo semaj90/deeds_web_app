@@ -42,7 +42,7 @@ export class TRTLLMClient {
 
  if (!response.ok) {
  const error = await response.text();
- throw new Error(`TRT-LLM generate failed: ${error}`);
+ throw new Error(`TRT-LLM generate failed, ${error}`);
  }
 
  return response.json();
@@ -59,7 +59,7 @@ export class TRTLLMClient {
 
  if (!response.ok) {
  const error = await response.text();
- throw new Error(`TRT-LLM stream failed: ${error}`);
+ throw new Error(`TRT-LLM stream failed, ${error}`);
  }
 
  const reader = response.body?.getReader();
@@ -108,7 +108,7 @@ export class TRTLLMClient {
 
  if (!response.ok) {
  const error = await response.text();
- throw new Error(`TRT-LLM health check failed: ${error}`);
+ throw new Error(`TRT-LLM health check failed, ${error}`);
  }
 
  return response.json();

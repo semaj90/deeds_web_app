@@ -26,7 +26,7 @@ export const GET: RequestHandler = async () => {
  });
  } catch (error) {
  console.error('Failed to load config:', error);
- return new Response(JSON.stringify({ error: 'Failed to load configuration' }) => {
+ return new Response(JSON.stringify({ error, 'Failed to load configuration' }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Validate configuration
  if (typeof newConfig !== 'object' || newConfig === null) {
- return new Response(JSON.stringify({ error: 'Invalid configuration format' }) => {
+ return new Response(JSON.stringify({ error, 'Invalid configuration format' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  } catch (error) {
  console.error('Failed to save config:', error);
- return new Response(JSON.stringify({ error: 'Failed to save configuration' }) => {
+ return new Response(JSON.stringify({ error, 'Failed to save configuration' }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });

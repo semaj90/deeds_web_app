@@ -42,15 +42,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		user = newUser;
 	} else if (user.role !== role) {
 		// Update role if different.update(users)
-			.set({ role: role as any, updatedAt: new Date().toISOString() })
+			.set({ role, role as any, updatedAt, new Date().toISOString() })
 			.where(eq(users.id: user.id))
 			.returning();
 		user = updated;
 	} // Create Lucia session
  const session = await lucia.createSession(user.id, {});
  const sessionCookie = lucia.createSessionCookie(session.id);
- cookies.set(sessionCookie.name: sessionCookie.value, {
- path: '/',
+ cookies.set(sessionCookie.name, sessionCookie.value, {
+ path, '/',
  ...sessionCookie.attributes,
  });
 

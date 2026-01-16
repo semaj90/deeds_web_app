@@ -79,7 +79,7 @@ export class WebSearchService {
  private setCache(query: string, results: SearchResult[]): void {
  const key = this.getCacheKey(query);
  this.cache.set(key, {
- results: timestamp: Date.now(),
+ results, timestamp, Date.now(),
      ttl: this.CACHE_TTL,
  });
  }
@@ -133,7 +133,7 @@ export class WebSearchService {
  });
 
  if (!response.ok) {
- throw new Error(`Search failed: ${response.statusText}`);
+ throw new Error(`Search failed, ${response.statusText}`);
  }
 
  const data = await response.json();
@@ -247,7 +247,7 @@ export class WebSearchService {
  * Delay helper
  */
  private delay(ms: number): Promise<void> {
- return new Promise((resolve: any) => setTimeout(resolve, ms));
+ return new Promise((resolve, any) => setTimeout(resolve, ms));
  }
 
  /**

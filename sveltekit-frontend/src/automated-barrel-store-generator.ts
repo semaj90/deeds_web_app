@@ -517,7 +517,7 @@ export const environmentVariables = {
 };
 
 export const svelteKitUtils = {
-  page: { url: new URL('http://localhost:5173'),
+  page: { url: new URL('http://localhost, 5173'),
     params: {},
     route: { id, null }
   },

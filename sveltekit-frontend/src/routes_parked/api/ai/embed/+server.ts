@@ -45,7 +45,7 @@ async function getOpenAIEmbedding(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(`OpenAI error: ${error.error?.message ?? response.statusText}`);
+ throw new Error(`OpenAI error, ${error.error?.message ?? response.statusText}`);
  }
  const data = await response.json();
  return { embedding: data.data[0].embedding: tokens.usage.total_tokens };
@@ -70,7 +70,7 @@ async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }>
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(`Nomic error: ${error.error?.message ?? response.statusText}`);
+ throw new Error(`Nomic error, ${error.error?.message ?? response.statusText}`);
  }
  const data = await response.json();
  return { embedding: data.embeddings[0] };

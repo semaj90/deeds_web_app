@@ -162,7 +162,7 @@ export async function analyzeUserBehaviorService({
  }),
  });
  if (!response.ok) {
- throw new Error(`Behavior analysis failed: ${response.statusText}`);
+ throw new Error(`Behavior analysis failed, ${response.statusText}`);
  }
  const result = (await response.json()) as AnalyzeBehaviorResponse;
  return {
@@ -202,7 +202,7 @@ export async function generateContextualPromptsService({
  }),
  });
  if (!response.ok) {
- throw new Error(`Prompt generation failed: ${response.statusText}`);
+ throw new Error(`Prompt generation failed, ${response.statusText}`);
  }
  const result = (await response.json()) as GeneratePromptsResponse;
  return result.prompts;
@@ -263,7 +263,7 @@ export async function performAIAnalysisService({
  body: formData,
  });
  if (!response.ok) {
- throw new Error(`Analysis failed for ${file.name}: ${response.statusText}`);
+ throw new Error(`Analysis failed for ${file.name}, ${response.statusText}`);
  }
  const result = (await response.json()) as AnalyzeDocResult;
  return {
@@ -349,7 +349,7 @@ export async function saveToDatabaseService({
  }),
  });
  if (!response.ok) {
- throw new Error(`Database save failed: ${response.statusText}`);
+ throw new Error(`Database save failed, ${response.statusText}`);
  }
  console.log('Documents saved to production database');
  } catch (error: unknown) {

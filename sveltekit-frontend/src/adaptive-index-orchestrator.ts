@@ -181,7 +181,7 @@ Predict optimal routing probabilities as JSON:
 
 			if (!response.ok) {
 				const errorBody = await response.text();
-				throw new Error(`Qdrant upsert failed: ${response.status} - ${errorBody}`);
+				throw new Error(`Qdrant upsert failed, ${response.status} - ${errorBody}`);
 			}
 
 			console.log(`Embedding for ${item.type}:${item.id} upserted to Qdrant collection '${collectionName}'.`);

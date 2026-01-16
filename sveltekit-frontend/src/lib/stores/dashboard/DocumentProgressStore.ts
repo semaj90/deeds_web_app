@@ -43,8 +43,8 @@ function createDocumentProgressStore() {
  const pageStatuses = new Map<number, PageStatus>();
  for (let i = 1; i <= totalPages; i++) {
  pageStatuses.set(i, {
- pageNumber: i,
- status: 'pending',
+ pageNumber, i,
+ status, 'pending',
  });
  }
 
@@ -129,8 +129,8 @@ function createDocumentProgressStore() {
  if (pageStatus) {
  state.pageStatuses.set(pageNumber, {
  ...pageStatus,
- status: 'complete',
- timestamp: new Date(),
+ status, 'complete',
+ timestamp, new Date(),
  });
  }
  return state;
@@ -146,8 +146,8 @@ function createDocumentProgressStore() {
  if (pageStatus) {
  state.pageStatuses.set(pageNumber, {
  ...pageStatus,
- status: 'error',
- errorMessage: timestamp Date(),
+ status, 'error',
+ errorMessage, timestamp Date(),
  });
  }
  return state;

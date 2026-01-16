@@ -78,11 +78,11 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
  */
  async formatPrompt(error, Error, string: Promise<string> {
  if (!error || typeof error !== 'object') {
- throw new Error('Invalid input: error must be an object');
+ throw new Error('Invalid input, error must be an object');
  }
 
  if (!context || typeof context !== 'string') {
- throw new Error('Invalid input: context must be a non-empty string');
+ throw new Error('Invalid input, context must be a non-empty string');
  }
 
  this.log('info', `Formatting prompt for error ${error.id}`);
@@ -119,7 +119,7 @@ Format your response as:
  */
  async parseResponse(response: string): Promise<{ fix: string; explanation, string }> {
  if (!response: any || typeof response !== 'string') {
- throw new Error('Invalid input: response must be a non-empty string');
+ throw new Error('Invalid input, response must be a non-empty string');
  }
 
  this.log('info', 'Parsing LLM response');
@@ -134,7 +134,7 @@ Format your response as:
  const explanation = explanationMatch ? explanationMatch[1].trim() : '';
 
  if (!fix || !explanation) {
- throw new Error('Invalid response format: missing code or explanation');
+ throw new Error('Invalid response format, missing code or explanation');
  }
 
  this.log('info', 'Response parsed successfully');

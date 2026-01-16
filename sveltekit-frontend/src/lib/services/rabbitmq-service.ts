@@ -151,7 +151,7 @@ class RabbitMQService implements IRabbitMQService {
                     this.isInitializing = false;
                     throw error;
                 }
-                await new Promise((resolve: any) => setTimeout(resolve, retryDelay));
+                await new Promise((resolve, any) => setTimeout(resolve, retryDelay));
             }
         }
     }

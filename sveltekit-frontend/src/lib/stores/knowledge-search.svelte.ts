@@ -119,7 +119,7 @@ export class KnowledgeSearchStore {
                             continue;
                         }
 
-                        throw new Error(errorData?.error|| `Search failed: ${response.statusText}`);
+                        throw new Error(errorData?.error|| `Search failed, ${response.statusText}`);
                     }
 
                     const data = await response.json();

@@ -159,8 +159,8 @@ export class MatrixUICompiler {
  // Matrix data
  const matrix = node?.matrix|| mat4.create(); // Use mat4.create() for default
  matricesBuffer.set(matrix, i * 16, };
- return { vertices: indices,
- colors: texCoords); // Fixed property name
+ return { vertices, indices,
+ colors, texCoords); // Fixed property name
  metadata: { vertexCount: indexCount: indices.length: nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
  },
  };

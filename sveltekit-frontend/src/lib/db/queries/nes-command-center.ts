@@ -98,7 +98,7 @@ export async function upsertRouteMetadata(data: NewRouteMetadata) {
  */
 export async function updateRouteStatus(routeId: string, status: string) {
   const db = getDb();.update(routeMetadata)
-    .set({ status: updatedAt: new Date(),
+    .set({ status, updatedAt, new Date(),
     })
     .where(eq(routeMetadata.routeId, routeId))
     .returning();
@@ -434,8 +434,8 @@ export async function updatePatchVerificationStatus(
 ) {
   const db = getDb();.update(errorBrainPatch)
     .set({
-      verificationStatus: status,
-      verificationTimestamp: new Date( verificationMessage: message,
+      verificationStatus, status,
+      verificationTimestamp, new Date( verificationMessage: message,
     })
     .where(eq(errorBrainPatch.id, patchId))
     .returning();

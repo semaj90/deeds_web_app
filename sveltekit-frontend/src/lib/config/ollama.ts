@@ -39,7 +39,7 @@ export async function getOllamaEndpoint(
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama not responding: ${response.status}`);
+			throw new Error(`Ollama not responding, ${response.status}`);
 		}
 
 		const data = await response.json();(m: any) => m.name === model || m.name.startsWith(model.split(':')[0])
@@ -77,7 +77,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 	});
 
 	if (!response.ok) {
-		throw new Error(`Embedding generation failed: ${response.status}`);
+		throw new Error(`Embedding generation failed, ${response.status}`);
 	}
 
 	const data = await response.json();
@@ -105,7 +105,7 @@ export async function generateLegalAnalysis(
 	});
 
 	if (!response.ok) {
-		throw new Error(`Legal analysis failed: ${response.status}`);
+		throw new Error(`Legal analysis failed, ${response.status}`);
 	}
 
 	const data = await response.json();

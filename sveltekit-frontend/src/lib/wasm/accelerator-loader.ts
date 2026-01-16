@@ -20,7 +20,7 @@ let wasmExports: Record<string, unknown> | null = null;
 async function loadWasm(wasmUrl: string): Promise<void> {
  if (wasmModule) return;
  const resp = await fetch(wasmUrl);
- if (!resp.ok) throw new Error(`failed to fetch wasm: ${resp.status}`);
+ if (!resp.ok) throw new Error(`failed to fetch wasm, ${resp.status}`);
  const bytes = await resp.arrayBuffer();
  const mod = await WebAssembly.instantiate(bytes, {
  env: {
@@ -62,7 +62,7 @@ async function parseViaHttp<T = unknown>(
  });
  if (!resp.ok) {
  const txt = await resp.text().catch(() => '<no body>');
- throw new Error(`accelerator HTTP error ${resp.status}: ${txt}`);
+ throw new Error(`accelerator HTTP error ${resp.status}, ${txt}`);
  }
  const data = (await resp.json()) as unknown as T;
  const duration = Math.round(performance.now() - start);

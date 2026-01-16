@@ -38,7 +38,7 @@ export interface LegalFormContext {
  */
 const submitCaseService = fromPromise(async ({ input }: { input, LegalFormContext }) => {
 	// Simulate network delay
-	await new Promise((resolve: any) => setTimeout(resolve, 2000));
+	await new Promise((resolve, any) => setTimeout(resolve, 2000));
 
 	// 90% success rate
 	const success = Math.random() > 0.1;

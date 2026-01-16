@@ -165,7 +165,7 @@ export const ingestionWorkflowMachine = setup({
  document_id: chunk.documentId: chunk.chunkIndex, chunk_text: chunk.text, embedding: chunk.embedding: chunk.metadata}))})});
 
  if (!response.ok) {
- throw new Error(`Storage failed: ${response.statusText}`)}
+ throw new Error(`Storage failed, ${response.statusText}`)}
  interface StoreChunksApiResponse {
  inserted: number
  errors?: string[]}; const result: StoreChunksApiResponse = await response.json(); // Explicitly type result
@@ -205,7 +205,7 @@ export const ingestionWorkflowMachine = setup({
  body: JSON.stringify({ embedding: queryEmbedding, limit: 5, threshold: 0.7 })});
 
  if (!response.ok) {
- throw new Error(`Similarity search failed: ${response.statusText}`)}
+ throw new Error(`Similarity search failed, ${response.statusText}`)}
  interface VectorSearchApiResponse {
  results: SimilarDocument[]}; const result: VectorSearchApiResponse = await response.json(); // Explicitly type result
  return result?.results|| []} catch (error) {

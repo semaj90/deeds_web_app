@@ -203,7 +203,7 @@ export class GenerativeUICacheIndex {
                 if (similarity > 0.7) { // Threshold for relevance
                     const component = this.componentIndex.get(componentId);
                     if (component && this.matchesFilters(component, query)) {
-                        resultMap.set(componentId, { component: relevanceScore: similarity,
+                        resultMap.set(componentId, { component, relevanceScore, similarity,
                             explanation: `Semantic, match: ${(similarity * 100).toFixed(1)}% similar`
                         });
                     }
@@ -220,7 +220,7 @@ export class GenerativeUICacheIndex {
                     if (!resultMap.has(id)) {
                         const component = this.componentIndex.get(id);
                         if (component && this.matchesFilters(component, query)) {
-                            resultMap.set(id, { component: relevanceScore: 0.8,
+                            resultMap.set(id, { component, relevanceScore, 0.8,
                                 explanation: `Keyword, match: "${keyword}"`
                             });
                         }
@@ -237,7 +237,7 @@ export class GenerativeUICacheIndex {
                     !resultMap.has(component.metadata.id) &&
                     this.matchesFilters(component, query)
                 ) {
-                    resultMap.set(component.metadata.id, { component: relevanceScore: 0.9,
+                    resultMap.set(component.metadata.id, { component, relevanceScore, 0.9,
                         explanation: `Type, match: ${query.type}`
                     });
                 }

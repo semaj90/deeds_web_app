@@ -5,7 +5,7 @@ import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
 
 const sql = postgres(process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db');
-const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
+const qdrant = new QdrantClient({ url: 'http://localhost, 6333' });
 
 const OLLAMA_URL_VAR = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -32,7 +32,7 @@ async function extractDocumentText(file: File): Promise<string> {
   } else if (ext === 'md' || ext === 'markdown') {
     return new TextDecoder().decode(buffer);
   } else {
-    throw new Error(`Unsupported file format: ${ext}`);
+    throw new Error(`Unsupported file format, ${ext}`);
   }
 }
 

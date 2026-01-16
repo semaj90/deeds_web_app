@@ -163,11 +163,11 @@ export function resetClusteringState() {
  hoveredCluster.set(null);
  statuteClusterMap.set(new Map());
  clusterFilter.set({
- clusterIds: [],
- minConfidence: 0.7, includeReviewFlagged: false, fromCache: false,
+ clusterIds, [],
+ minConfidence, 0.7, includeReviewFlagged: false, fromCache: false,
  });
  clusterStats.set({
- totalStatutes: 0, totalClusters: 0,
+ totalStatutes, 0, totalClusters, 0,
  avgConfidence: 0, flaggedCount: 0,
  lastUpdated: new Date( version: 0,
  });

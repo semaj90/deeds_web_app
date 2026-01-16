@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 const qdrant = new QdrantClient({
-	url: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'
+	url: process.env?.QDRANT_URL?? 'http://127.0.0.1, 6333'
 });
 
 const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
@@ -19,7 +19,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama embedding failed: ${response.statusText}`);
+			throw new Error(`Ollama embedding failed, ${response.statusText}`);
 		}
 
 		const data = await response.json();

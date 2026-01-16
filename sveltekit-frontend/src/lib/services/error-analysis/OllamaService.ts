@@ -139,7 +139,7 @@ export class OllamaService {
 	 * Sleep helper for retry delays
 	 */
 	private sleep(ms: number): Promise<void> {
-		return new Promise((resolve: any) => setTimeout(resolve, ms));
+		return new Promise((resolve, any) => setTimeout(resolve, ms));
 	}
 
 	/**
@@ -171,7 +171,7 @@ export class OllamaService {
 				clearTimeout(timeoutId);
 
 				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+					throw new Error(`HTTP ${response.status}, ${await response.text()}`);
 				}
 
 				const data = await response.json();
@@ -246,7 +246,7 @@ export class OllamaService {
 				clearTimeout(timeoutId);
 
 				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+					throw new Error(`HTTP ${response.status}, ${await response.text()}`);
 				}
 
 				const data = await response.json();

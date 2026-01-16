@@ -146,7 +146,7 @@ export class OllamaAdapter implements OllamaClient {
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama embed failed: ${response.statusText}`);
+      throw new Error(`Ollama embed failed, ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -171,7 +171,7 @@ export class OllamaAdapter implements OllamaClient {
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama generate failed: ${response.statusText}`);
+      throw new Error(`Ollama generate failed, ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -196,7 +196,7 @@ export class OllamaAdapter implements OllamaClient {
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama chat failed: ${response.statusText}`);
+      throw new Error(`Ollama chat failed, ${response.statusText}`);
     }
 
     if (opts?.stream) {
@@ -232,7 +232,7 @@ export class OllamaAdapter implements OllamaClient {
     const url = `${this.config?.baseUrl?? 'http://localhost:11434'}/api/tags`;
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Ollama listModels failed: ${response.statusText}`);
+      throw new Error(`Ollama listModels failed, ${response.statusText}`);
     }
     const data = await response.json();
     return data.models?.map((m: { name, string }) => m.name) || [];

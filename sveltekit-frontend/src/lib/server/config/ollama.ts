@@ -60,7 +60,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.status}`);
+ throw new Error(`Ollama error, ${response.status}`);
  }
 
  const data = await response.json();
@@ -96,7 +96,7 @@ export async function generateText(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.status}`);
+ throw new Error(`Ollama error, ${response.status}`);
  }
 
  const data = await response.json();
@@ -131,7 +131,7 @@ export async function* streamText(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.status}`);
+ throw new Error(`Ollama error, ${response.status}`);
  }
 
  const reader = response.body?.getReader();

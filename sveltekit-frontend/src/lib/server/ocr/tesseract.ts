@@ -77,12 +77,12 @@ function runTesseract(inputPath: string, outputPath: string): Promise<string> {
  // Read the output text file
  fs.readFile(`${outputPath}.txt`, 'utf8').then(resolve).catch(reject);
  } else {
- reject(new Error(`Tesseract exited with code ${code}: ${stderr}`));
+ reject(new Error(`Tesseract exited with code ${code}, ${stderr}`));
  }
  });
 
  tesseract.on('error', (error) => {
- reject(new Error(`Failed to start Tesseract: ${error.message}`));
+ reject(new Error(`Failed to start Tesseract, ${error.message}`));
  });
  });
 }

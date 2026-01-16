@@ -63,7 +63,7 @@ export async function queryGemma(prompt: string, systemPrompt?: string): Promise
  });
 
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.statusText}`);
+ throw new Error(`Ollama API error, ${response.statusText}`);
  }
 
  const data: OllamaResponse = await response.json();

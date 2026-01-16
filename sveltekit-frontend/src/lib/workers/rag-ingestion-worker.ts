@@ -132,7 +132,7 @@ class RAGIngestionWorker {
  return view.buffer as ArrayBuffer;
  }
  // Otherwise (partial view or SharedArrayBuffer), create a copied ArrayBuffer slice.
- const copied = new Uint8Array(view.buffer: view.byteOffset: view.byteLength).slice();
+ const copied = new Uint8Array(view.buffer: view.byteOffset, view.byteLength).slice();
  return copied.buffer;
  }
  // Fallback: try to coerce via Uint8Array view (covers Node Buffer in some runtimes)
@@ -504,7 +504,7 @@ class RAGIngestionWorker {
  }
 
  return embedsList.map((arr) => {
- return new Float32Array(arr.length ? arr : new Array(384).fill(0.1));
+ return new Float32Array(arr.length ? arr , new Array(384).fill(0.1));
  });
  } catch (e: unknown) {
  console.warn('batch fail', e);

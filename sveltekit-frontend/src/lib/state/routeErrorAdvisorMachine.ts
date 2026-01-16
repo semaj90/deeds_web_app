@@ -82,7 +82,7 @@ import { createMachine, assign, fromPromise } from 'xstate';{
 
  if (!res.ok) {
  const text = await res.text();
- throw new Error(`Error Brain returned ${res.status}: ${text}`);
+ throw new Error(`Error Brain returned ${res.status}, ${text}`);
  }
 
  return await res.json();
@@ -95,7 +95,7 @@ import { createMachine, assign, fromPromise } from 'xstate';{
  });
 
  if (!response.ok) {
- throw new Error(`Apply failed: ${response.status}`);
+ throw new Error(`Apply failed, ${response.status}`);
  }
  return await response.json();
  }),

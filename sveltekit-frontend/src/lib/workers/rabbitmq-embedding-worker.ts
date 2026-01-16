@@ -156,7 +156,7 @@ class RabbitMQEmbeddingWorker {
                     result = await this.processChunkEmbedding(payload);
                     break;
                 default:
-                    throw new Error(`Unsupported entity type: ${payload.entity_type}`);
+                    throw new Error(`Unsupported entity type, ${payload.entity_type}`);
             }
 
             this.processedJobs++;
@@ -483,7 +483,7 @@ class RabbitMQEmbeddingWorker {
                     result = await this.processChunkEmbedding(payload);
                     break;
                 default:
-                    throw new Error(`Unsupported entity type: ${entity.entity_type}`);
+                    throw new Error(`Unsupported entity type, ${entity.entity_type}`);
             }
 
             return {

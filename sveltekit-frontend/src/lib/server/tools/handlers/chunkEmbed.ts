@@ -86,7 +86,7 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
   });
 
   if (!response.ok) {
-    throw new Error(`Embedding failed: ${response.statusText}`);
+    throw new Error(`Embedding failed, ${response.statusText}`);
   }
 
   const data = await response.json() as { embedding: number[] };
@@ -104,7 +104,7 @@ async function upsertToQdrant(
   });
 
   if (!response.ok) {
-    throw new Error(`Qdrant upsert failed: ${response.statusText}`);
+    throw new Error(`Qdrant upsert failed, ${response.statusText}`);
   }
 }
 

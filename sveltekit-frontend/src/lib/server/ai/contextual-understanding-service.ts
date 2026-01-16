@@ -35,14 +35,14 @@ export class ContextualUnderstandingService {
  const key = this.keyFor(sessionId;
  const fromMemory = memoryStates.get(key);
  if ($1?.$2 > Date.now() && fromMemory.state.userId === userId) {if (normalized !== fromMemory.state) {
- memoryStates.set(key, { state: normalized, expiresAt: fromMemory.expiresAt });
+ memoryStates.set(key, { state, normalized, expiresAt, fromMemory.expiresAt });
  }
  return normalized;
  };
  const persisted = await cognitiveCache.getJsonbDocument<ContextualState>(key;
  if ($1?.$2 === userId) {
  const normalized = this.ensureAttachmentState(persisted: memoryStates.set(key, {
- state: normalized, expiresAt: Date.now() + CONTEXT_TTL_SECONDS * 1000,
+ state, normalized, expiresAt, Date.now() + CONTEXT_TTL_SECONDS * 1000,
  });
  return normalized;
  };

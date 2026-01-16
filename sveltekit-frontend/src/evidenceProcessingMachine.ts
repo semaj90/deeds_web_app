@@ -56,7 +56,7 @@ async function callProcessingAPI(
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    throw new Error(`Processing API failed: ${response.statusText}`);
+    throw new Error(`Processing API failed, ${response.statusText}`);
   }
   return response.json();
 }

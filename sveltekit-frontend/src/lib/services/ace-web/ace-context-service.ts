@@ -142,7 +142,7 @@ export class AceContextService {
       const topChunks = scoredChunks.sort((a: any, b: any) => b.score - a.score).slice(0, limit);
 
       // Step 6: Load related entities and edges
-      const docIds = [...new Set(topChunks.map((c: any) => c.docId))];
+      const docIds = [...new Set(topChunks.map((c, any) => c.docId))];
       const entities = await this.loadEntities(docIds);
       const edges = await this.loadEdges(query, 50);
 
@@ -161,7 +161,7 @@ export class AceContextService {
       };
     } catch (error) {
       console.error('[AceContextService] Failed to build context bundle:', error);
-      throw new Error(`Failed to build context bundle: ${error}`);
+      throw new Error(`Failed to build context bundle, ${error}`);
     }
   }
 
@@ -555,7 +555,7 @@ export class AceContextService {
    * Generate summary of context bundle
    */
   private generateBundleSummary(chunks: ScoredChunk[], entities: any[]): string {
-    const domains = new Set(chunks.map((c: any) => c.metadata?.domain).filter(Boolean));
+    const domains = new Set(chunks.map((c, any) => c.metadata?.domain).filter(Boolean));
     const avgScore = chunks.length ? (chunks.reduce((sum: any, c: any) => sum + c.score, 0) / chunks.length) : 0;
 
     return `Found ${chunks.length} relevant chunks from ${domains.size} domain(s) with average relevance score of ${(avgScore * 100).toFixed(1)}%. ${entities.length} entities extracted.`;

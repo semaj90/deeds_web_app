@@ -47,7 +47,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date( updatedAt: new Date(),
+  createdAt: new Date( updatedAt, new Date(),
       };
 
       // Seed Qdrant with test patterns
@@ -123,7 +123,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date( updatedAt: new Date(),
+  createdAt: new Date( updatedAt, new Date(),
       };
 
       // Seed Qdrant with many patterns
@@ -302,7 +302,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date( updatedAt: new Date(),
+  createdAt: new Date( updatedAt, new Date(),
       };
 
       await expect(retriever.queryPatterns(error, 0)).rejects.toThrow('topK must be at least 1');

@@ -222,7 +222,7 @@ const searchRelatedEvidenceService = async ({ input }: { input: LegalCaseActors[
  })
  });
  if (!response.ok) {
- throw new Error(`Evidence search failed: ${response.statusText}`);
+ throw new Error(`Evidence search failed, ${response.statusText}`);
  }
  const data = await response.json();
  return data?.results|| [];

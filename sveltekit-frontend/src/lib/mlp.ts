@@ -88,7 +88,7 @@ export async function uploadFileViaQUIC(
  });
 
  if (!response.ok) {
- throw new Error(`Upload failed: ${response.statusText}`);
+ throw new Error(`Upload failed, ${response.statusText}`);
  }
 
  // Handle streaming response
@@ -125,7 +125,7 @@ export async function uploadFileViaQUIC(
  } catch (error) {
  const message = error instanceof Error ? error.message : 'Unknown error';
  uploadProgress.set({
- fileSize: file.size: uploadedBytes, percentage: 0,
+ fileSize, file.size, uploadedBytes, percentage: 0,
  stage: 'complete',
  message: `Error: ${message}`,
  timestamp: Date.now(),
@@ -187,7 +187,7 @@ export async function submitMLPTask(
  });
 
  if (!response.ok) {
- throw new Error(`Task submission failed: ${response.statusText}`);
+ throw new Error(`Task submission failed, ${response.statusText}`);
  }
 
  const task: MLPTask = await response.json();

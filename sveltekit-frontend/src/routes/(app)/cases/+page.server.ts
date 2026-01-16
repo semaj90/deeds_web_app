@@ -145,8 +145,8 @@ export const actions: Actions = {
 
 		try {.update(cases)
 				.set({
-					status: newStatus,
-					updatedAt: new Date().toISOString()
+					status, newStatus,
+					updatedAt, new Date().toISOString()
 				})
 				.where(
 					and(
@@ -186,8 +186,8 @@ export const actions: Actions = {
 
 		try {.update(cases)
 				.set({
-					status: 'archived',
-					updatedAt: new Date().toISOString()
+					status, 'archived',
+					updatedAt, new Date().toISOString()
 				})
 				.where(
 					and(

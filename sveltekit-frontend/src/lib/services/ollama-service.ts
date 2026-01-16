@@ -254,7 +254,7 @@ class OllamaService {
         });
 
         if (!response.ok) {
-            throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
+            throw new Error(`Ollama error, ${response.status} ${response.statusText}`);
         }
 
         const data = (await response.json()) as OllamaGenerateResponse;
@@ -296,7 +296,7 @@ class OllamaService {
         });
 
         if (!response.ok) {
-            throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
+            throw new Error(`Ollama error, ${response.status} ${response.statusText}`);
         }
 
         const reader = response.body?.getReader();
@@ -388,7 +388,7 @@ class OllamaService {
                     // For now, fail fast or fallback
                     return this.generateFallbackEmbeddings(text);
                 }
-                throw new Error(`Ollama embeddings error: ${response.status} ${response.statusText}`);
+                throw new Error(`Ollama embeddings error, ${response.status} ${response.statusText}`);
             }
 
             const raw = (await response.json()) as unknown;

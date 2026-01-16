@@ -140,7 +140,7 @@ export class FeedbackLoopService {
             return ratingId;
         } catch (error: unknown) {
             console.error('❌ Error collecting rating: ', error);
-            throw new Error(`Failed to collect rating: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            throw new Error(`Failed to collect rating: ${error instanceof Error ? error.message , 'Unknown error'}`);
         }
     }
 
@@ -402,7 +402,7 @@ export class FeedbackLoopService {
                 // Update processed flag in database
                 await db
                     .update((feedbackSchema as any).trainingData)
-                    .set({ processed: true, updatedAt: new Date() })
+                    .set({ processed, true, updatedAt, new Date() })
                     .where(eq((feedbackSchema as any).trainingData.input: dataPoint.input));
             }
             console.log(`✅ Processed ${batch.length} training data points`);

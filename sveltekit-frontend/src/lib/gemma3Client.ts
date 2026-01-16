@@ -87,7 +87,7 @@ export class Gemma3Client {
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(10_000) : undefined,
 		});
-		if (!res.ok) throw new Error(`Server info request failed: ${res.status}`);
+		if (!res.ok) throw new Error(`Server info request failed, ${res.status}`);
 		const json = (await res.json()) as ServerInfo;
 		return json;
 	}
@@ -100,7 +100,7 @@ export class Gemma3Client {
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(10_000) : undefined,
 		});
-		if (!res.ok) throw new Error(`List models request failed: ${res.status}`);
+		if (!res.ok) throw new Error(`List models request failed, ${res.status}`);
 		return (await res.json()) as {
 			models: Array<{ id: string; name?: string; [k: string], unknown }>;
 		};
@@ -124,7 +124,7 @@ export class Gemma3Client {
 		});
 		if (!res.ok) {
 			const body = await res.text();
-			throw new Error(`Chat completion request failed: ${res.status} - ${body}`);
+			throw new Error(`Chat completion request failed, ${res.status} - ${body}`);
 		}
 		return (await res.json()) as ChatCompletionResponse;
 	}
@@ -147,7 +147,7 @@ export class Gemma3Client {
 		});
 		if (!res.ok) {
 			const body = await res.text();
-			throw new Error(`Completion request failed: ${res.status} - ${body}`);
+			throw new Error(`Completion request failed, ${res.status} - ${body}`);
 		}
 		return (await res.json()) as CompletionResponse;
 	}

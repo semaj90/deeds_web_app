@@ -70,8 +70,8 @@ export function collectRoutes(): RouteEntry[] {
  map.set(id, {
  id,
  path,
- files: {},
- methods: [],
+ files, {},
+ methods, [],
  tags: inferTags(path, kind: 'page',
  });
  }

@@ -119,7 +119,7 @@ export class LokiHybridStore {
   | undefined);
  this.qdrantCollection = cfg.qdrantCollection ?? 'legal_documents';
  this.pgPool =
- cfg.pgPool ?? (cfg.postgresUrl ? new Pool({ connectionString: cfg.postgresUrl })  | undefined);
+ cfg.pgPool ?? (cfg.postgresUrl ? new Pool({ connectionString, cfg.postgresUrl })  | undefined);
  this.neo4jDriver =
  cfg.neo4jDriver ??
  (cfg?.neo4jUrl&& cfg?.neo4jUser&& cfg.neo4jPassword
@@ -384,8 +384,8 @@ export class LokiHybridStore {
  }) as Array<string : { name: string, weight, number }>; // Cast to Fuse's expected key type
 
  this.contexts.set(spec.name, {
- name: spec.name as Collection,
- fuse: fuseKeys: spec.fuseKeys ?? [],
+ name, spec.name as Collection,
+ fuse, fuseKeys: spec.fuseKeys ?? [],
  });
 
  }
@@ -505,7 +505,7 @@ export class LokiHybridStore {
  console.warn('[kgcl] OpenAI API key not provided, embeddings disabled.');
  return undefined;
  }
- this.embeddings = new OpenAIEmbeddings({ openAIApiKey: this.openAiApiKey });
+ this.embeddings = new OpenAIEmbeddings({ openAIApiKey, this.openAiApiKey });
  }
  return this.embeddings;
  }

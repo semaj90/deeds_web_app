@@ -295,7 +295,7 @@ export async function executeTerminalFunction(
  return await generateSummary(args.caseId);
 
  default:
- throw new Error(`Unknown function: ${functionName}`);
+ throw new Error(`Unknown function, ${functionName}`);
  }
 }
 

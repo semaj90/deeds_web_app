@@ -43,7 +43,7 @@ export async function generateText(prompt: string): Promise<string> {
  if (!res.ok) {
  const text = await res.text().catch(() => '');
  console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
- throw new Error(`Ollama chat failed: ${res.status}`);
+ throw new Error(`Ollama chat failed, ${res.status}`);
  }
 
  const data = (await res.json()) as {
@@ -82,7 +82,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
  if (!res.ok) {
  const text = await res.text().catch(() => '');
  console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
- throw new Error(`Ollama chat failed: ${res.status}`);
+ throw new Error(`Ollama chat failed, ${res.status}`);
  }
 
  const data = (await res.json()) as {

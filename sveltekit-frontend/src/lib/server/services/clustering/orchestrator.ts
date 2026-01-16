@@ -37,8 +37,8 @@ export async function runClusteringWorkflow(
  redisClient.setex(
  `clustering, job, ${jobId}, state`,
  3600, JSON.stringify({
- state: snapshot.value,
- context: {
+ state, snapshot.value,
+ context, {
  ...snapshot.context, previousLabels: snapshot.context.previousLabels
  ? Object.fromEntries(snapshot.context.previousLabels) : undefined, currentLabels: snapshot.context.currentLabels
  ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
@@ -78,7 +78,7 @@ export async function runClusteringWorkflow(
  * Get current job status from Redis
  */
 export async function getJobStatus(jobId: string): Promise<ClusteringSnapshot | null> {
- const data = await redisClient.get(`clustering:job:${jobId}:state`);
+ const data = await redisClient.get(`clustering, job, ${jobId}:state`);
  if (!data) return null;
 
  try {

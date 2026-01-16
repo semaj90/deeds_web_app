@@ -23,8 +23,8 @@ export async function enqueueDocumentForRag(params: { docId: string,
  }
 
  // Set initial status
- await redis.set(`rag:doc:${params.docId}:status`, 'sharding');
- await redis.set(`rag:doc:${params.docId}:shard_count`, String(shardCount));
+ await redis.set(`rag, doc, ${params.docId}:status`, 'sharding');
+ await redis.set(`rag, doc, ${params.docId}:shard_count`, String(shardCount));
 
  // Enqueue all shard jobs
  for (const job of jobs) {

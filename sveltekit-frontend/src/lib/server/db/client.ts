@@ -16,10 +16,10 @@ function getAdminDatabaseUrl(): string {
 // Create merged schema object
 const mergedSchema = { ...schema, canvasAutosaves };
 
-const pool = new Pool({ connectionString: getDatabaseUrl() });
+const pool = new Pool({ connectionString, getDatabaseUrl() });
 export const db = drizzle(pool, { schema, mergedSchema });
 
-const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
+const adminPool = new Pool({ connectionString, getAdminDatabaseUrl() });
 export const adminDb = drizzle(adminPool, { schema, mergedSchema });
 
 export async function closeConnections(): Promise<void> {

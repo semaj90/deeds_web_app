@@ -30,11 +30,11 @@ export function createFileUploader(url: string): MockUploader {
  console.log(`Mock uploading file: ${file.name} to ${ url }`);
  // Simulate upload progress
  for (let i = 0; i <= 100; i += 20) {
- await new Promise((resolve: any) => setTimeout(resolve, 200));
+ await new Promise((resolve, any) => setTimeout(resolve, 200));
  listeners.progress?.forEach((cb: any) => cb(i));
  }
 
- await new Promise((resolve: any) => setTimeout(resolve, 500)); // Simulate network delay
+ await new Promise((resolve, any) => setTimeout(resolve, 500)); // Simulate network delay
 
  // Simulate success or failure
  if (Math.random() > 0.1) {

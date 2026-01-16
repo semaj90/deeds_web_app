@@ -87,9 +87,9 @@ export class LegalAIWorkflowOrchestrator {
         this.updateWorkflow(id, { status: 'processing', message: 'Starting research...', progress: 10 });
 
         // Simulate async work
-        await new Promise((resolve: any) => setTimeout(resolve, 1000));
+        await new Promise((resolve, any) => setTimeout(resolve, 1000));
         this.updateWorkflow(id, { progress: 50, message: 'Analyzing precedents...' });
-        await new Promise((resolve: any) => setTimeout(resolve, 1000));
+        await new Promise((resolve, any) => setTimeout(resolve, 1000));
 
         const result = { success: true, results: [] };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Complete', result });
@@ -100,7 +100,7 @@ export class LegalAIWorkflowOrchestrator {
         const id = this.createWorkflow('document-processing');
         this.updateWorkflow(id, { status: 'processing', message: 'Processing document...', progress: 20 });
 
-        await new Promise((resolve: any) => setTimeout(resolve, 1500));
+        await new Promise((resolve, any) => setTimeout(resolve, 1500));
 
         const result = { success: true, documentId: request.documentId };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Processed', result });
@@ -111,7 +111,7 @@ export class LegalAIWorkflowOrchestrator {
         const id = this.createWorkflow('case-creation');
         this.updateWorkflow(id, { status: 'processing', message: 'Creating case...', progress: 30 });
 
-        await new Promise((resolve: any) => setTimeout(resolve, 1000));
+        await new Promise((resolve, any) => setTimeout(resolve, 1000));
 
         const result = { success: true, caseId: 'case_' + Date.now() };
         this.updateWorkflow(id, { status: 'completed', progress: 100, message: 'Case created', result });

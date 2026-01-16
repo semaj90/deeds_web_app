@@ -115,7 +115,7 @@ export class VectorSearchClient {
 
 			if (!response.ok) {
 				const errorText = await response.text();
-				throw new Error(`Vector failed: ${response.status} ${errorText}`);
+				throw new Error(`Vector failed, ${response.status} ${errorText}`);
 			}
 
 			const responseBuffer = await response.arrayBuffer();
@@ -125,7 +125,7 @@ export class VectorSearchClient {
 			return searchResponse;
 		} catch (error: any) {
 			console.error('Protocol buffer vector error: ', error);
-			throw new Error(`Vector failed: ${error.message}`);
+			throw new Error(`Vector failed, ${error.message}`);
 		}
 	}
 
@@ -175,7 +175,7 @@ export class VectorSearchClient {
 			});
 
 			if (!response.ok) {
-				throw new Error(`Batch failed: ${response.status}`);
+				throw new Error(`Batch failed, ${response.status}`);
 			}
 			const batchResponse = await response.json();
 			return batchResponse.responses;

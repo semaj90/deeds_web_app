@@ -93,7 +93,7 @@ export class OllamaSuggestionsService {
 		} catch (error: unknown) {
 			const err = error instanceof Error ? error : new Error(String(error));
 			console.error('Ollama suggestion failed:', err);
-			throw new Error(`Failed to generate suggestions: ${err.message}`);
+			throw new Error(`Failed to generate suggestions, ${err.message}`);
 		}
 	}
 
@@ -210,7 +210,7 @@ export class OllamaSuggestionsService {
 			clearTimeout(timeoutId);
 
 			if (!response.ok) {
-				throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
+				throw new Error(`Ollama error, ${response.status} ${response.statusText}`);
 			}
 
 			const json = (await response.json()) as OllamaResponse;
@@ -252,7 +252,7 @@ export class OllamaSuggestionsService {
 			clearTimeout(timeoutId);
 
 			if (!response.ok) {
-				throw new Error(`Ollama streaming error: ${response.status} ${response.statusText}`);
+				throw new Error(`Ollama streaming error, ${response.status} ${response.statusText}`);
 			}
 
 			const reader = response.body?.getReader();

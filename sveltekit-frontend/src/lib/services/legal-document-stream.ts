@@ -204,7 +204,7 @@ export class LegalDocumentStreamService {
     ): Promise<void> {
         const connection = this.connections.get(connectionId);
         if (!connection || !connection.isActive) {
-            throw new Error(`Invalid or inactive connection: ${connectionId}`);
+            throw new Error(`Invalid or inactive connection, ${connectionId}`);
         }
 
         const {
@@ -253,7 +253,7 @@ export class LegalDocumentStreamService {
                 documentId: document.id,
                 data: { entities: semanticAnalysis.legalEntities,
                     count: semanticAnalysis.legalEntities.length,
-                    entityTypes: [...new Set(semanticAnalysis.legalEntities.map((e: any) => e.type))]
+                    entityTypes: [...new Set(semanticAnalysis.legalEntities.map((e, any) => e.type))]
                 }
             });
 
@@ -355,7 +355,7 @@ export class LegalDocumentStreamService {
     ): Promise<void> {
         const connection = this.connections.get(connectionId);
         if (!connection || !connection.isActive) {
-            throw new Error(`Invalid or inactive connection: ${connectionId}`);
+            throw new Error(`Invalid or inactive connection, ${connectionId}`);
         }
 
         const {

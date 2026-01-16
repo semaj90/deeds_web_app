@@ -9,7 +9,7 @@ import { EventEmitter } from 'events';
 import { Pool } from 'pg';
 
 const pgPool = new Pool({
-	connectionString: process.env?.DATABASE_URL?? 'postgresql://postgres:postgres@localhost:5432/deeds'
+	connectionString: process.env?.DATABASE_URL?? 'postgresql://postgres:postgres@localhost, 5432/deeds'
 });
 
 const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';

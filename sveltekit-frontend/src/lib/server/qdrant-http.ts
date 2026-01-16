@@ -20,7 +20,7 @@ export type QdrantHit = {
  */
 export async function getCollections(): Promise<string[]> {
 	const r = await fetch(`${QDRANT_URL}/collections`);
-	if (!r.ok) throw new Error(`Qdrant getCollections failed: ${r.status}`);
+	if (!r.ok) throw new Error(`Qdrant getCollections failed, ${r.status}`);
 	const data = await r.json();
 	return (data?.result?.collections ?? []).map((c: any) => c.name);
 }
@@ -50,7 +50,7 @@ export async function scrollPoints(opts: { collection: string,
 		body: JSON.stringify(body)
 	});
 
-	if (!r.ok) throw new Error(`Qdrant scroll failed: ${r.status} ${await r.text()}`);
+	if (!r.ok) throw new Error(`Qdrant scroll failed, ${r.status} ${await r.text()}`);
 	const data = await r.json();
 
 	return {
@@ -84,7 +84,7 @@ export async function searchVector(opts: { collection: string,
 		body: JSON.stringify(body)
 	});
 
-	if (!r.ok) throw new Error(`Qdrant search failed: ${r.status} ${await r.text()}`);
+	if (!r.ok) throw new Error(`Qdrant search failed, ${r.status} ${await r.text()}`);
 	const data = await r.json();
 	return data?.result ?? [];
 }
@@ -103,7 +103,7 @@ export async function upsertPoints(opts: { collection: string,
 		}
 	);
 
-	if (!r.ok) throw new Error(`Qdrant upsert failed: ${r.status} ${await r.text()}`);
+	if (!r.ok) throw new Error(`Qdrant upsert failed, ${r.status} ${await r.text()}`);
 	return await r.json();
 }
 

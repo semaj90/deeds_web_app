@@ -94,7 +94,7 @@ export async function generateEmbeddings(
  });
 
  if (!response.ok) {
- throw new Error(`Embedding failed: ${response.status}`);
+ throw new Error(`Embedding failed, ${response.status}`);
  }
 
  const result = await response.json();
@@ -158,7 +158,7 @@ Provide your analysis in a clear, structured format.`;
  });
 
  if (!response.ok) {
- throw new Error(`Legal analysis failed: ${response.status}`);
+ throw new Error(`Legal analysis failed, ${response.status}`);
  }
 
  const result = await response.json();

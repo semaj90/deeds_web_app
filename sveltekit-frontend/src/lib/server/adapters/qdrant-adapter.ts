@@ -45,7 +45,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  });
  if (!res.ok) {
  const txt = await res.text();
- throw new Error(`Qdrant index error: ${res.status} ${txt}`);
+ throw new Error(`Qdrant index error, ${res.status} ${txt}`);
  }
  }
 
@@ -64,7 +64,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  });
  if (!res.ok) {
  const txt = await res.text();
- throw new Error(`Qdrant search error: ${res.status} ${txt}`);
+ throw new Error(`Qdrant search error, ${res.status} ${txt}`);
  }
  const data = await res.json();
  // Map Qdrant result shape to QdrantSearchResult type

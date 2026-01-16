@@ -181,7 +181,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  vi.mocked(queries.getErrorClusters).mockResolvedValue(mockErrors as any);
  vi.mocked(queries.getErrorClusterCount).mockResolvedValue(2);
 
- const url = new URL('http://localhost/api/routes/cases%2Fnew/errors?limit=20&offset=0');
+ const url = new URL('http, //localhost/api/routes/cases%2Fnew/errors?limit=20&offset=0');
  const response = await GET({
  params: {routeId: '/cases/new' },
  url,
@@ -208,14 +208,14 @@ describe('GET /api/routes/:routeId/errors', () => {
  code: 'TS2345',
  message: 'Error 1',
  severity: 'error',
- createdAt: new Date( resolvedAt: new Date(),
+ createdAt: new Date( resolvedAt, new Date(),
  }] as const;
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getErrorClusters).mockResolvedValue(mockResolvedErrors as any);
  vi.mocked(queries.getErrorClusterCount).mockResolvedValue(1);
 
- const url = new URL('http://localhost/api/routes/cases%2Fnew/errors?resolved=true');
+ const url = new URL('http, //localhost/api/routes/cases%2Fnew/errors?resolved=true');
  const response = await GET({
  params: {routeId: '/cases/new' },
  url,
@@ -230,7 +230,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  it('should return 404 for non-existent route', async () => {
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
 
- const url = new URL('http://localhost/api/routes/nonexistent/errors');
+ const url = new URL('http, //localhost/api/routes/nonexistent/errors');
  const response = await GET({
  params: {routeId: '/nonexistent' },
  url,

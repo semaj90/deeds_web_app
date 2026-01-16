@@ -52,7 +52,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  );
 
  if (!res.ok) {
- throw new Error(`Qdrant query failed: ${res.status} ${res.statusText}`);
+ throw new Error(`Qdrant query failed, ${res.status} ${res.statusText}`);
  }
 
  return res.json();
@@ -155,7 +155,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  );
 
  if (!res.ok) {
- throw new Error(`Qdrant store failed: ${res.status} ${res.statusText}`);
+ throw new Error(`Qdrant store failed, ${res.status} ${res.statusText}`);
  }
 
  return res.json();

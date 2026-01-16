@@ -206,7 +206,7 @@ export class AceAdapter {
       });
 
       if (!response.ok) {
-        throw new Error(`Ingestion API failed: ${response.status} ${response.statusText}`);
+        throw new Error(`Ingestion API failed, ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -242,7 +242,7 @@ export class AceAdapter {
       } else if (provider === 'gemini') {
         return await this.callGemini(prompt, temperature, maxTokens);
       } else {
-        throw new Error(`Unsupported LLM provider: ${provider}`);
+        throw new Error(`Unsupported LLM provider, ${provider}`);
       }
     } catch (error) {
       console.error('[ACE] LLM call failed:', error);
@@ -269,7 +269,7 @@ export class AceAdapter {
     });
 
     if (!response.ok) {
-      throw new Error(`Gemma3 API failed: ${response.status} ${response.statusText}`);
+      throw new Error(`Gemma3 API failed, ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();

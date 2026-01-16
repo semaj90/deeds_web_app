@@ -440,7 +440,7 @@ export class DocumentSummarizationWorker extends SpecializedWorker {
 
   protected async processJob(job: SpecializedJob): Promise<unknown> {
     if (job.type !== 'SUMMARIZE_DOCUMENT') {
-      throw new Error(`Invalid job type: ${job.type}`);
+      throw new Error(`Invalid job type, ${job.type}`);
     }
 
     const payload = job.payload as SummarizePayload;
@@ -498,7 +498,7 @@ export class CaseLawWorker extends SpecializedWorker {
 
   protected async processJob(job: SpecializedJob): Promise<unknown> {
     if (job.type !== 'GET_CASE_LAW') {
-      throw new Error(`Invalid job type: ${job.type}`);
+      throw new Error(`Invalid job type, ${job.type}`);
     }
 
     const payload = job.payload as CaseLawPayload;
@@ -560,7 +560,7 @@ export class EmbeddingWorker extends SpecializedWorker {
 
   protected async processJob(job: SpecializedJob): Promise<unknown> {
     if (job.type !== 'GENERATE_EMBEDDING') {
-      throw new Error(`Invalid job type: ${job.type}`);
+      throw new Error(`Invalid job type, ${job.type}`);
     }
 
     const payload = job.payload as EmbeddingPayload;

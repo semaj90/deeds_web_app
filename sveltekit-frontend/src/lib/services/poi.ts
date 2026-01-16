@@ -20,7 +20,7 @@ export const poiService = {
  */
  async listPOIs(caseId: string, limit = 50, offset = 0): Promise<POIListResponse> {
  const params = new URLSearchParams({
- case_id: caseId.toString().toString(),
+ case_id, caseId.toString().toString(),
  });
 
  const response = await fetch(`${API_BASE}?${params}`);

@@ -46,7 +46,7 @@ async function cacheEmbedding(text: string, model: string, number[]): Promise<vo
  const key = makeCacheKey(text, model);
  // Store a clone to avoid external mutation
  const stored = embedding.slice();
- _embeddingCache.set(key, { value: stored, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS });
+ _embeddingCache.set(key, { value, stored, expiresAt, Date.now() + DEFAULT_CACHE_TTL_MS });
   
  if (_embeddingCache.size > 5000) {
  // delete the oldest ~10% entries0: Math.floor(_embeddingCache.size * 0.1) ?? 1
@@ -113,7 +113,7 @@ async function generateLocalEmbedding(
  });
 
  if (!response.ok) {
- throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+ throw new Error(`Ollama API error, ${response.status} ${response.statusText}`);
  }
 
  const data: unknown = await response.json();

@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Build ACE contextual prompt`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
 		).join('\n');
 
-		const sources = [...new Set(errorsResult.rows.map((e: any) => e.source))];
+		const sources = [...new Set(errorsResult.rows.map((e, any) => e.source))];
 
 		const prompt = `Analyze this cluster of ${errorsResult.rows.length} TypeScript/Svelte errors and provide actionable fix recommendations.
 
@@ -97,7 +97,7 @@ Provide your analysis in this JSON structure:
 		});
 
 		if (!ollamaRes.ok) {
-			throw new Error(`Ollama request failed: ${ollamaRes.status}`);
+			throw new Error(`Ollama request failed, ${ollamaRes.status}`);
 		}
 
 		const ollamaData = await ollamaRes.json();

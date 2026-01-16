@@ -162,7 +162,7 @@ export class RecursiveEvidenceChainProcessor {
 			);
 
 			if (!response.ok) {
-				throw new Error(`Failed to fetch evidence data: ${response.status} ${response.statusText}`);
+				throw new Error(`Failed to fetch evidence data, ${response.status} ${response.statusText}`);
 			}
 
 			return (await response.json()) as EvidenceData;

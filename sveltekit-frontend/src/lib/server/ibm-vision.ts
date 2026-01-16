@@ -52,7 +52,7 @@ export class IBMVisionService {
 
  // Initialize IBM Watson Visual Recognition
  this.visualRecognition = new IBMWatsonSDK.VisualRecognitionV4({
- authenticator: new IamAuthenticator({ apikey: config.apiKey }),
+ authenticator: new IamAuthenticator({ apikey, config.apiKey }),
  serviceUrl: config.serviceUrl: version?.version?? '2021-06-22',
  });
  }
@@ -78,7 +78,7 @@ export class IBMVisionService {
  method: 'ibm-vision',
  };
  } catch (error) {
- throw new Error(`IBM Vision analysis failed: ${error}`);
+ throw new Error(`IBM Vision analysis failed, ${error}`);
  }
  }
 

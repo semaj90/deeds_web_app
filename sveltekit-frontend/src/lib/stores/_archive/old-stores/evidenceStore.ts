@@ -323,7 +323,7 @@ class RealTimeEvidenceStore {
  body: JSON.stringify(newEvidence),
  });
  if (!res.ok) {
- throw new Error(`Failed to create evidence: ${res.statusText}`);
+ throw new Error(`Failed to create evidence, ${res.statusText}`);
  }
  const result = (await res.json()) as { id?: string };
  return result?.id|| evidenceId;
@@ -349,7 +349,7 @@ class RealTimeEvidenceStore {
  body: JSON.stringify(changes),
  });
  if (!res.ok) {
- throw new Error(`Failed to update evidence: ${res.statusText}`);
+ throw new Error(`Failed to update evidence, ${res.statusText}`);
  }
  } catch (err: any) {
  // Revert optimistic update on error
@@ -371,7 +371,7 @@ class RealTimeEvidenceStore {
  method: 'DELETE',
  });
  if (!res.ok) {
- throw new Error(`Failed to delete evidence: ${res.statusText}`);
+ throw new Error(`Failed to delete evidence, ${res.statusText}`);
  }
  } catch (err: any) {
  // Revert optimistic update on error
