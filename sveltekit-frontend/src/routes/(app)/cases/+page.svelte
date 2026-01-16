@@ -161,7 +161,7 @@
 				<span class="text-sm font-medium text-amber-100">
 					{selectedCases.size} case(s) selected
 				</span>
-				<form method="POST" action="?/updateStatus" use, enhance class="flex gap-2">
+				<form method="POST" action="?/updateStatus" use:enhance class="flex gap-2">
 					{#each Array.from(selectedCases) as caseId}
 						<input type="hidden" name="caseId" value={caseId} />
 					{/each}
@@ -179,7 +179,7 @@
 					<button
 						type="submit"
 						disabled={!bulkStatus}
-						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled: opacity-50, disabled, cursor-not-allowed"
+						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						Update
 					</button>
@@ -209,7 +209,7 @@
 					<div class="text-6xl mb-4">📂</div>
 					<h2 class="text-xl font-semibold mb-2">No Cases Found</h2>
 					<p class="text-slate-400 mb-6">
-						{#if searchQuery ?? statusFilter !== 'all' || priorityFilter}
+						{#if searchQuery || statusFilter !== 'all' || priorityFilter}
 							No cases match your current filters. Try adjusting your search criteria.
 						{:else}
 							Create your first case to get started.
@@ -225,10 +225,10 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="grid gap-4 md: grid-cols-2, lg, grid-cols-3">
+				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{#each data.cases as caseItem (caseItem.id)}
 						<div
-							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover: border-emerald-500/50, hover:bg-slate-900"
+							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover:border-emerald-500/50 hover:bg-slate-900"
 						>
 							<!-- Selection Checkbox -->
 							<input

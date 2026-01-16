@@ -84,7 +84,7 @@ export const actions: Actions = {
 		const jurisdiction = formData.get('jurisdiction')?.toString();
 
 		// Validation
-		if (!title ?? title.trim().length === 0) {
+		if (!title || title.trim().length === 0) {
 			return fail(400, {
 				error: 'Title is required',
 				field: 'title',
@@ -144,7 +144,7 @@ export const actions: Actions = {
 		const caseIds = formData.getAll('caseId').map(id => id.toString());
 		const newStatus = formData.get('status')?.toString() as typeof cases.status.enumValues[number];
 
-		if (!caseIds.length ?? !newStatus) {
+		if (!caseIds.length || !newStatus) {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 

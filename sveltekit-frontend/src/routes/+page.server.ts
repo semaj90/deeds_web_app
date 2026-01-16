@@ -1,4 +1,4 @@
-import db from '$lib/server/db';
+import { db } from '$lib/server/db/client';
 import { auditLog, cases, criminals, evidence } from '$lib/server/db/schema';
 import { count, desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
