@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-16T20:32:13.978Z",
+  "timestamp": "2026-01-16T20:32:21.708Z",
   "filesScanned": 3002,
   "filesWithFixes": 396,
   "totalFixes": 1089,
@@ -339,6 +339,21 @@
       "totalFixes": 10
     },
     {
+      "file": "src\\lib\\db\\vector-operations.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 9,
+          "examples": [
+            "new ServiceError(ERR.INVALID_INPUT: 'Embedding must be a non-empty array of numbers')",
+            "new ServiceError(ERR.INVALID_INPUT: 'Embedding array must contain finite numbers')"
+          ]
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
       "file": "src\\lib\\services\\quic-client.ts",
       "fixes": [
         {
@@ -363,21 +378,6 @@
           "examples": [
             "new Error(`Legal document failed: ${msg}`)",
             "new Error(`Compliance report failed: ${msg}`)"
-          ]
-        }
-      ],
-      "totalFixes": 9
-    },
-    {
-      "file": "src\\lib\\db\\vector-operations.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 9,
-          "examples": [
-            "new ServiceError(ERR.INVALID_INPUT: 'Embedding must be a non-empty array of numbers')",
-            "new ServiceError(ERR.INVALID_INPUT: 'Embedding array must contain finite numbers')"
           ]
         }
       ],
@@ -1503,21 +1503,6 @@
       "totalFixes": 5
     },
     {
-      "file": "src\\lib\\services\\dashboard\\DocumentProcessingAPI.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 5,
-          "examples": [
-            "new Error(`API error: ${response.statusText}`)",
-            "new Error(`API error: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 5
-    },
-    {
       "file": "src\\lib\\services\\knowledge-search\\MinioKnowledgeStore.ts",
       "fixes": [
         {
@@ -1527,6 +1512,21 @@
           "examples": [
             "new Error(`Failed to create bucket: ${response.status}`)",
             "new Error(`Failed to put object: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src\\lib\\services\\dashboard\\DocumentProcessingAPI.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 5,
+          "examples": [
+            "new Error(`API error: ${response.statusText}`)",
+            "new Error(`API error: ${response.statusText}`)"
           ]
         }
       ],
@@ -2229,6 +2229,146 @@
           "count": 1,
           "examples": [
             "new Error(`AI query failed: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\integrations\\full-stack-workflow.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Full Stack initialization failed: ${ msg }`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\integrations\\flashattention-multicore-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`FlashAttention2 + Multicore failed: ${message}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\integrations\\enhanced-rabbitmq-cuda-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`CUDA service error: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\graph\\sora-graph-traversal.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(originalIndex, (result as { records?: unknown, id?: unknown, rerankScore?: unknown }.rerankScore)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\gpu\\webgpu-cuda-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Set(patterns.map((p: any)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\gpu\\markdown-pipeline.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Python service error: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\error-brain\\run-id.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\detective-mode\\comprehensive-integration.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date( processing_time: response.processingTime })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\config\\unified-config.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Configuration validation failed:\\n${errors.join('\\n')"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\config\\endpoints.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Invalid service: ${service}`)"
           ]
         }
       ],
@@ -3313,140 +3453,14 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\integrations\\full-stack-workflow.ts",
+      "file": "src\\lib\\client\\streaming-handler.ts",
       "fixes": [
         {
           "pattern": "constructor_colon_to_comma",
           "description": "new Class(a: b) → new Class(a, b)",
           "count": 1,
           "examples": [
-            "new Error(`Full Stack initialization failed: ${ msg }`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\integrations\\flashattention-multicore-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`FlashAttention2 + Multicore failed: ${message}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\integrations\\enhanced-rabbitmq-cuda-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`CUDA service error: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\graph\\sora-graph-traversal.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(originalIndex, (result as { records?: unknown, id?: unknown, rerankScore?: unknown }.rerankScore)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\gpu\\webgpu-cuda-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Set(patterns.map((p: any)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\gpu\\markdown-pipeline.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Python service error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\error-brain\\run-id.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\detective-mode\\comprehensive-integration.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date( processing_time: response.processingTime })"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\config\\unified-config.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Configuration validation failed:\\n${errors.join('\\n')"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\config\\endpoints.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Invalid service: ${service}`)"
+            "new Error(`HTTP ${response.status}: ${response.statusText}`)"
           ]
         }
       ],
@@ -3475,20 +3489,6 @@
           "count": 1,
           "examples": [
             ".set(key, { value: parsed.value as CacheEntry<T>['value'], expiresAt: parsed.expiresAt ? ? null, size: parsed.size ?? this.byteSizeOf(parsed.value)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\client\\streaming-handler.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`HTTP ${response.status}: ${response.statusText}`)"
           ]
         }
       ],
@@ -3915,20 +3915,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\server\\storage\\storage-utils.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(userId, { count: 1: now + windowMs }, resetTime)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\server\\ssr\\enhanced-load.ts",
       "fixes": [
         {
@@ -3937,6 +3923,20 @@
           "count": 1,
           "examples": [
             ".set(_key, { data: expires: Date.now()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\storage\\storage-utils.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(userId, { count: 1: now + windowMs }, resetTime)"
           ]
         }
       ],
@@ -4377,6 +4377,20 @@
       "totalFixes": 1
     },
     {
+      "file": "src\\lib\\server\\grpc\\vector-cache-client.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new VectorCacheServiceClient( GRPC_VECTORCACHE_URL: credentials.createInsecure()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
       "file": "src\\lib\\server\\helpers\\redis.ts",
       "fixes": [
         {
@@ -4419,20 +4433,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\server\\grpc\\vector-cache-client.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new VectorCacheServiceClient( GRPC_VECTORCACHE_URL: credentials.createInsecure()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\server\\error-brain\\run-tracker.ts",
       "fixes": [
         {
@@ -4441,6 +4441,34 @@
           "count": 1,
           "examples": [
             "new RunTracker(data.runId: data.config)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\connections\\connection-pool.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new QdrantClient({ url: apiKey // 10 second timeout })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\concurrency\\advisory-locks.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date( expiresAt: timeout ? new Date(Date.now()"
           ]
         }
       ],
@@ -4497,34 +4525,6 @@
           "count": 1,
           "examples": [
             "new Error(`Vector store unavailable: ${error.message}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\connections\\connection-pool.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new QdrantClient({ url: apiKey // 10 second timeout })"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\concurrency\\advisory-locks.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date( expiresAt: timeout ? new Date(Date.now()"
           ]
         }
       ],
@@ -4595,6 +4595,34 @@
           "count": 1,
           "examples": [
             "new Error(typeof payload === 'string' ? payload : JSON.stringify(payload)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\agents\\crewRouter.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Unknown agentic task: ${task.type}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\acp\\phase90-tools.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Unknown Phase 90 tool: ${ toolName }`)"
           ]
         }
       ],
@@ -4749,34 +4777,6 @@
           "count": 1,
           "examples": [
             "new Error(`Ollama embedding API error: ${response.status }- ${errorText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\agents\\crewRouter.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Unknown agentic task: ${task.type}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\acp\\phase90-tools.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Unknown Phase 90 tool: ${ toolName }`)"
           ]
         }
       ],
@@ -5819,20 +5819,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\routes\\(app)\\command-center\\codebase\\clusters\\[id]\\+page.server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Failed to fetch cluster: ${clusterResponse.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\routes\\(app)\\command-center\\codebase\\components\\[id]\\+page.server.ts",
       "fixes": [
         {
@@ -5847,7 +5833,21 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\routes_parked\\archive\\tests\\api\\api\\cases\\__tests__\\case-links.test.ts",
+      "file": "src\\routes\\(app)\\command-center\\codebase\\clusters\\[id]\\+page.server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Failed to fetch cluster: ${clusterResponse.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes_parked\\archive\\tests\\api\\api\\citations\\__tests__\\citations.test.ts",
       "fixes": [
         {
           "pattern": "constructor_colon_to_comma",
@@ -5861,7 +5861,7 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\routes_parked\\archive\\tests\\api\\api\\citations\\__tests__\\citations.test.ts",
+      "file": "src\\routes_parked\\archive\\tests\\api\\api\\cases\\__tests__\\case-links.test.ts",
       "fixes": [
         {
           "pattern": "constructor_colon_to_comma",
