@@ -29,7 +29,10 @@ export interface AIAssistantContext {
     availableModels: string[];
     gpuReady: boolean;
     error: string | null;
-}| { type: 'SEND_MESSAGE'; message: string }
+}
+
+type AIAssistantEvent =
+    | { type: 'SEND_MESSAGE'; message: string }
     | { type: 'CLEAR_CONVERSATION' }
     | { type: 'SET_MODEL'; model: string }
     | { type: 'STREAM_CHUNK'; chunk: string }
@@ -59,7 +62,7 @@ export const aiAssistantMachine = createMachine({
     states: {
         initializing: {
             invoke: {
-                src: fromPromise<{ gpuReady, boolean }, void>(async () => {
+                src: fromPromise(async () => {
                     // Check for GPU availability or other services
                     const gpuReady = typeof navigator !== 'undefined' && 'gpu' in navigator;
                     return { gpuReady };
@@ -103,14 +106,13 @@ export const aiAssistantMachine = createMachine({
         processing: {
             entry: assign({ isProcessing: true, response: '' }),
             invoke: {
-                src: fromPromise<string>(async (params) => {
-                    const { input } = params as { input: { prompt: string; model: string } };
+                src: fromPromise(async ({ input }: { input: { query: string; history: Array<{ role: string; content: string }> } }) => {
                     const response = await fetch('/api/ai/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            prompt: input.prompt,
-                            model: input.model
+                            query: input.query,
+                            conversationHistory: input.history
                         })
                     });
 

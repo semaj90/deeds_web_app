@@ -44,7 +44,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
     protected taaManager: any = null;
     protected enhancedMaterial: THREE.ShaderMaterial | null = null;
 
-    protected mesh!: THREE.Mesh;
+    protected declare mesh: THREE.Mesh;
     protected isDisabled: boolean = false;
 
     constructor(style: YoRHaAAStyle = {}) {
@@ -80,8 +80,8 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
 
         this.enhancedMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                baseColor: { value, baseColor },
-                edgeColor: { value, edgeColor },
+                baseColor: { value: baseColor },
+                edgeColor: { value: edgeColor },
                 edgeWidth: { value: this.style?.borderWidth?? 0.02 },
                 aaStrength: { value: 1.0 },
                 time: { value: 0 }
