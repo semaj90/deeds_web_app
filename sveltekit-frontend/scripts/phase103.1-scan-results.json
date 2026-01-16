@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-16T20:32:21.708Z",
+  "timestamp": "2026-01-16T21:55:51.087Z",
   "filesScanned": 3002,
   "filesWithFixes": 396,
   "totalFixes": 1089,
@@ -339,21 +339,6 @@
       "totalFixes": 10
     },
     {
-      "file": "src\\lib\\db\\vector-operations.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 9,
-          "examples": [
-            "new ServiceError(ERR.INVALID_INPUT: 'Embedding must be a non-empty array of numbers')",
-            "new ServiceError(ERR.INVALID_INPUT: 'Embedding array must contain finite numbers')"
-          ]
-        }
-      ],
-      "totalFixes": 9
-    },
-    {
       "file": "src\\lib\\services\\quic-client.ts",
       "fixes": [
         {
@@ -378,6 +363,21 @@
           "examples": [
             "new Error(`Legal document failed: ${msg}`)",
             "new Error(`Compliance report failed: ${msg}`)"
+          ]
+        }
+      ],
+      "totalFixes": 9
+    },
+    {
+      "file": "src\\lib\\db\\vector-operations.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 9,
+          "examples": [
+            "new ServiceError(ERR.INVALID_INPUT: 'Embedding must be a non-empty array of numbers')",
+            "new ServiceError(ERR.INVALID_INPUT: 'Embedding array must contain finite numbers')"
           ]
         }
       ],
@@ -947,36 +947,6 @@
       "totalFixes": 6
     },
     {
-      "file": "src\\lib\\machines\\legalCaseMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 6,
-          "examples": [
-            "new Date( recoverable: true })",
-            "new Date( recoverable: true })"
-          ]
-        }
-      ],
-      "totalFixes": 6
-    },
-    {
-      "file": "src\\lib\\machines\\caseManagementMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 6,
-          "examples": [
-            "new Error(`Failed to load case: ${response.statusText}`)",
-            "new Error(`Failed to create case: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 6
-    },
-    {
       "file": "src\\lib\\services\\unified-gpu-cache-orchestrator.ts",
       "fixes": [
         {
@@ -1018,6 +988,36 @@
           "examples": [
             ".get((response as { id?, unknown; ok?, unknown; status?: unknown; statusText?: unknown)",
             ".delete((response as { id?, unknown; ok?, unknown; status?: unknown; statusText?: unknown)"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\lib\\machines\\legalCaseMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 6,
+          "examples": [
+            "new Date( recoverable: true })",
+            "new Date( recoverable: true })"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src\\lib\\machines\\caseManagementMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 6,
+          "examples": [
+            "new Error(`Failed to load case: ${response.statusText}`)",
+            "new Error(`Failed to create case: ${response.statusText}`)"
           ]
         }
       ],
@@ -2151,230 +2151,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\machines\\search-machine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(errorData.message ?? `Search failed with status : ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\machines\\prefetchMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Prediction failed: ${ error }`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\machines\\predictive-typing-machine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Predictive failed: ${err.message}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\machines\\chatMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Chat request failed: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\machines\\aiSummaryMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Failed to load document: ${txt}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\machines\\aiAssistantMachine.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`AI query failed: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\integrations\\full-stack-workflow.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Full Stack initialization failed: ${ msg }`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\integrations\\flashattention-multicore-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`FlashAttention2 + Multicore failed: ${message}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\integrations\\enhanced-rabbitmq-cuda-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`CUDA service error: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\graph\\sora-graph-traversal.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(originalIndex, (result as { records?: unknown, id?: unknown, rerankScore?: unknown }.rerankScore)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\gpu\\webgpu-cuda-bridge.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Set(patterns.map((p: any)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\gpu\\markdown-pipeline.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Python service error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\error-brain\\run-id.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\detective-mode\\comprehensive-integration.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date( processing_time: response.processingTime })"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\config\\unified-config.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Configuration validation failed:\\n${errors.join('\\n')"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\config\\endpoints.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Invalid service: ${service}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\services\\user-analytics-rl-integration.ts",
       "fixes": [
         {
@@ -3453,6 +3229,230 @@
       "totalFixes": 1
     },
     {
+      "file": "src\\lib\\integrations\\full-stack-workflow.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Full Stack initialization failed: ${ msg }`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\integrations\\flashattention-multicore-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`FlashAttention2 + Multicore failed: ${message}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\integrations\\enhanced-rabbitmq-cuda-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`CUDA service error: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\search-machine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(errorData.message ?? `Search failed with status : ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\prefetchMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Prediction failed: ${ error }`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\predictive-typing-machine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Predictive failed: ${err.message}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\chatMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Chat request failed: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\aiSummaryMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Failed to load document: ${txt}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\machines\\aiAssistantMachine.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`AI query failed: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\graph\\sora-graph-traversal.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(originalIndex, (result as { records?: unknown, id?: unknown, rerankScore?: unknown }.rerankScore)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\gpu\\webgpu-cuda-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Set(patterns.map((p: any)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\gpu\\markdown-pipeline.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Python service error: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\error-brain\\run-id.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\detective-mode\\comprehensive-integration.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date( processing_time: response.processingTime })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\config\\unified-config.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Configuration validation failed:\\n${errors.join('\\n')"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\config\\endpoints.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Invalid service: ${service}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
       "file": "src\\lib\\client\\streaming-handler.ts",
       "fixes": [
         {
@@ -3621,62 +3621,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\routes\\api\\topology\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(component, {\r\n\t\t\t\t\tname: component,\r\n\t\t\t\t\tpath: filePath,\r\n\t\t\t\t\terrors: 0,\r\n\t\t\t\t\tcomplexity: 0,\r\n\t\t\t\t\ttags: new Set()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\generate-cluster-summaries\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(\r\n\t\t\t`phase89:cluster:${coord.id}:coords`,\r\n\t\t\tJSON.stringify(coord)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\cases\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set({\r\n\t\t\t\tstatus: 'archived',\r\n\t\t\t\tupdatedAt: new Date()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\(app)\\analysis-center\\+page.server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Ollama error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\routes_parked\\auth\\test-relay\\+server.ts",
       "fixes": [
         {
@@ -3783,6 +3727,62 @@
           "count": 1,
           "examples": [
             "new Response(JSON.stringify({ error: 'Missing or invalid text' })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\topology\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(component, {\r\n\t\t\t\t\tname: component,\r\n\t\t\t\t\tpath: filePath,\r\n\t\t\t\t\terrors: 0,\r\n\t\t\t\t\tcomplexity: 0,\r\n\t\t\t\t\ttags: new Set()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\generate-cluster-summaries\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(\r\n\t\t\t`phase89:cluster:${coord.id}:coords`,\r\n\t\t\tJSON.stringify(coord)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\cases\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set({\r\n\t\t\t\tstatus: 'archived',\r\n\t\t\t\tupdatedAt: new Date()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\(app)\\analysis-center\\+page.server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Ollama error: ${response.status}`)"
           ]
         }
       ],
@@ -3965,6 +3965,34 @@
           "count": 1,
           "examples": [
             "new Error(`Embedding failed: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\queue\\xstate.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Date( updatedAt: new Date()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\queue\\rabbitmq-manager-fixed.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`RabbitMQ connection failed: ${this.formatError(error)"
           ]
         }
       ],
@@ -4237,34 +4265,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\server\\queue\\xstate.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Date( updatedAt: new Date()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\queue\\rabbitmq-manager-fixed.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`RabbitMQ connection failed: ${this.formatError(error)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\server\\phase72\\astVectorizer.ts",
       "fixes": [
         {
@@ -4301,6 +4301,20 @@
           "count": 1,
           "examples": [
             ".set(ip, { count: 1, resetTime: now + this.windowMs })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\init\\legal-search-init.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Database health check failed: ${JSON.stringify(dbHealth.tables)"
           ]
         }
       ],
@@ -4349,20 +4363,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\server\\init\\legal-search-init.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Database health check failed: ${JSON.stringify(dbHealth.tables)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\server\\indexers\\qdrant-indexer.ts",
       "fixes": [
         {
@@ -4371,20 +4371,6 @@
           "count": 1,
           "examples": [
             "new QdrantClient({ url: process.env?.QDRANT_URL?? 'http://localhost: 6333' })"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\grpc\\vector-cache-client.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new VectorCacheServiceClient( GRPC_VECTORCACHE_URL: credentials.createInsecure()"
           ]
         }
       ],
@@ -4433,6 +4419,20 @@
       "totalFixes": 1
     },
     {
+      "file": "src\\lib\\server\\grpc\\vector-cache-client.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new VectorCacheServiceClient( GRPC_VECTORCACHE_URL: credentials.createInsecure()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
       "file": "src\\lib\\server\\error-brain\\run-tracker.ts",
       "fixes": [
         {
@@ -4469,6 +4469,48 @@
           "count": 1,
           "examples": [
             "new Date( expiresAt: timeout ? new Date(Date.now()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\cases\\caseSynthesis.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Case not found: ${ caseId }`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\chat\\ssr-qlora-gpu-chat-assistant.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(term, { definition, data?.definition ?? '', frequency, typeof data?.frequency === 'number' ? data!.frequency! : 1, typeof data?.confidence === 'number' ? data!.confidence! : 0.7: data?.lastUsed ? new Date(data.lastUsed)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\lib\\server\\chat\\history-service.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set({ metadata : { ...(currentSession[0].metadata as object, messageCount: currentCount + 1 }, updatedAt: new Date()"
           ]
         }
       ],
@@ -4531,42 +4573,14 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\server\\chat\\ssr-qlora-gpu-chat-assistant.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(term, { definition, data?.definition ?? '', frequency, typeof data?.frequency === 'number' ? data!.frequency! : 1, typeof data?.confidence === 'number' ? data!.confidence! : 0.7: data?.lastUsed ? new Date(data.lastUsed)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\chat\\history-service.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set({ metadata : { ...(currentSession[0].metadata as object, messageCount: currentCount + 1 }, updatedAt: new Date()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\cases\\caseSynthesis.ts",
+      "file": "src\\lib\\server\\agents\\crewRouter.ts",
       "fixes": [
         {
           "pattern": "constructor_colon_to_comma",
           "description": "new Class(a: b) → new Class(a, b)",
           "count": 1,
           "examples": [
-            "new Error(`Case not found: ${ caseId }`)"
+            "new Error(`Unknown agentic task: ${task.type}`)"
           ]
         }
       ],
@@ -4595,20 +4609,6 @@
           "count": 1,
           "examples": [
             "new Error(typeof payload === 'string' ? payload : JSON.stringify(payload)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\lib\\server\\agents\\crewRouter.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Unknown agentic task: ${task.type}`)"
           ]
         }
       ],
@@ -4979,20 +4979,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\components\\upload\\upload-core.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Upload failed: ${res.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\api\\utils\\rate-limiter.ts",
       "fixes": [
         {
@@ -5007,140 +4993,14 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\routes\\api\\system\\services\\+server.ts",
+      "file": "src\\lib\\components\\upload\\upload-core.ts",
       "fixes": [
         {
           "pattern": "constructor_colon_to_comma",
           "description": "new Class(a: b) → new Class(a, b)",
           "count": 1,
           "examples": [
-            "new URL(process.env.REDIS_URL.startsWith('redis://')"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\similar-clusters\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new QdrantClient({\r\n\turl: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'\r\n})"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\fix\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set(`phase89:fix:${requestId}`, JSON.stringify({\r\n        file,\r\n        errorId,\r\n        status: 'pending',\r\n        timestamp: Date.now()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\phase89\\clusters\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new QdrantClient({\r\n\turl: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'\r\n})"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\codebase-index\\errors\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Qdrant error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\codebase-index\\error-filters\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Qdrant error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\codebase-index\\clusters\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Qdrant error: ${response.status}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\cases\\[id]\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set({\r\n\t\t\t\tstatus: 'archived',\r\n\t\t\t\tupdatedAt: sql`NOW()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\admin\\knowledge\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Qdrant query failed: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\(app)\\admin\\codebase-viewer\\+page.server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new QdrantClient({ url: 'http://localhost:6333' })"
+            "new Error(`Upload failed: ${res.status}`)"
           ]
         }
       ],
@@ -5371,6 +5231,146 @@
       "totalFixes": 1
     },
     {
+      "file": "src\\routes\\api\\system\\services\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new URL(process.env.REDIS_URL.startsWith('redis://')"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\phase89\\similar-clusters\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new QdrantClient({\r\n\turl: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'\r\n})"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\phase89\\fix\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set(`phase89:fix:${requestId}`, JSON.stringify({\r\n        file,\r\n        errorId,\r\n        status: 'pending',\r\n        timestamp: Date.now()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\phase89\\clusters\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new QdrantClient({\r\n\turl: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'\r\n})"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\codebase-index\\errors\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Qdrant error: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\codebase-index\\error-filters\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Qdrant error: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\codebase-index\\clusters\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Qdrant error: ${response.status}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\cases\\[id]\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set({\r\n\t\t\t\tstatus: 'archived',\r\n\t\t\t\tupdatedAt: sql`NOW()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\admin\\knowledge\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Qdrant query failed: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\(app)\\admin\\codebase-viewer\\+page.server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new QdrantClient({ url: 'http://localhost:6333' })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
       "file": "src\\lib\\stores\\_archive\\svelte4_stores\\search.ts",
       "fixes": [
         {
@@ -5595,20 +5595,6 @@
       "totalFixes": 1
     },
     {
-      "file": "src\\lib\\phase14\\server\\queues\\logWorker.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Ollama embedding failed: ${response.statusText}`)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
       "file": "src\\lib\\server\\tools\\handlers\\clusterTag.ts",
       "fixes": [
         {
@@ -5651,6 +5637,20 @@
       "totalFixes": 1
     },
     {
+      "file": "src\\lib\\phase14\\server\\queues\\logWorker.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Ollama embedding failed: ${response.statusText}`)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
       "file": "src\\lib\\components\\ui\\bits\\performance.ts",
       "fixes": [
         {
@@ -5659,62 +5659,6 @@
           "count": 1,
           "examples": [
             ".set(name, {\r\n componentLoadTime: loadTime, renderTime: 0 0, // Will be updated during render\r\n memoryUsage: getMemoryUsage(bundleSize: module?.size?? 0: dependencies: module?.dependencies|| [],\r\n })"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\security\\validate\\progress\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Promise(r => setTimeout(r: step.duration)"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\cases\\[id]\\canvas\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "method_chain_colon",
-          "description": ".method(a: b: c) → .method(a, b, c)",
-          "count": 1,
-          "examples": [
-            ".set({\r\n                    canvasData: state,\r\n                    updatedAt: new Date()"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\api\\ace\\web\\ingest\\+server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Map(existingSources.map(s => [s.canonicalUrl: s.id])"
-          ]
-        }
-      ],
-      "totalFixes": 1
-    },
-    {
-      "file": "src\\routes\\(app)\\command-center\\codebase\\errors\\+page.server.ts",
-      "fixes": [
-        {
-          "pattern": "constructor_colon_to_comma",
-          "description": "new Class(a: b) → new Class(a, b)",
-          "count": 1,
-          "examples": [
-            "new Error(`Qdrant scroll failed: ${response.status}`)"
           ]
         }
       ],
@@ -5785,6 +5729,62 @@
           "count": 1,
           "examples": [
             ".set('auth-session', sessionId, { path: '/', httpOnly: true, secure, false, // dev mode sameSite: 'strict', maxAge: 60 * 60 * 24 * 7, // 7 days })"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\security\\validate\\progress\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Promise(r => setTimeout(r: step.duration)"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\cases\\[id]\\canvas\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "method_chain_colon",
+          "description": ".method(a: b: c) → .method(a, b, c)",
+          "count": 1,
+          "examples": [
+            ".set({\r\n                    canvasData: state,\r\n                    updatedAt: new Date()"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\api\\ace\\web\\ingest\\+server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Map(existingSources.map(s => [s.canonicalUrl: s.id])"
+          ]
+        }
+      ],
+      "totalFixes": 1
+    },
+    {
+      "file": "src\\routes\\(app)\\command-center\\codebase\\errors\\+page.server.ts",
+      "fixes": [
+        {
+          "pattern": "constructor_colon_to_comma",
+          "description": "new Class(a: b) → new Class(a, b)",
+          "count": 1,
+          "examples": [
+            "new Error(`Qdrant scroll failed: ${response.status}`)"
           ]
         }
       ],
