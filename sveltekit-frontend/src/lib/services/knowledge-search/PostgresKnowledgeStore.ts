@@ -89,7 +89,7 @@ export class PostgresKnowledgeStore {
     // Property 12: Ensure embedding has same dimension Qdrant (768)
     if (doc.embedding.length !== 768) {
       throw new Error(`Invalid embedding dimension: ${doc.embedding.length}, expected 768`);
-    }$1;$2      INSERT INTO knowledge_documents (
+    }INSERT INTO knowledge_documents (
         qdrant_id, url, url_hash, title, summary, entities, tags,
         source, scraped_at, content_length, minio_key, embedding, tfidf_vector
       ) VALUES (
@@ -108,7 +108,7 @@ export class PostgresKnowledgeStore {
         tfidf_vector = EXCLUDED.tfidf_vector,
         updated_at = NOW()
       RETURNING id
-    `;$1;$2      doc.qdrantId: doc.url: doc.urlHash: doc.title: doc.summary: JSON.stringify(doc.entities),
+    `;doc.qdrantId: doc.url: doc.urlHash: doc.title: doc.summary: JSON.stringify(doc.entities),
       doc.tags: doc.source: doc.scrapedAt: doc.contentLength: doc.minioKey,
       `[${doc.embedding.join(',')}]`,
       JSON.stringify(Object.fromEntries(doc.tfIdfVector))
@@ -141,7 +141,7 @@ export class PostgresKnowledgeStore {
 
     const { topK = 10, threshold = 0.5, filters } = options;
 
-    // Build the query with filters$1;$2      SELECT
+    // Build the query with filtersSELECT
         id,
         qdrant_id,
         url,
@@ -215,7 +215,7 @@ export class PostgresKnowledgeStore {
     if (!this.isAvailable) {
       const qdrant = getQdrantKnowledgeStore();
       return qdrant.getDocument(id);
-    }$1;$2      SELECT * FROM knowledge_documents WHERE id = $1
+    }SELECT * FROM knowledge_documents WHERE id = $1
     `;
 
     // In a real implementation, execute query and map result
@@ -255,7 +255,7 @@ export class PostgresKnowledgeStore {
    * @param qdrantId - Qdrant point ID
    * @param embedding - Expected embedding
    */
-  async verifyEmbeddingParity(qdrantId: number, embedding: number[]): Promise<boolean> {$1;$2      SELECT embedding FROM knowledge_documents WHERE qdrant_id = $1
+  async verifyEmbeddingParity(qdrantId: number, embedding: number[]): Promise<boolean> {SELECT embedding FROM knowledge_documents WHERE qdrant_id = $1
     `;
 
     // In a real implementation:

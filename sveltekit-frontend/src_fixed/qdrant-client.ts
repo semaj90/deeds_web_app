@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */ // Resilient client: SDK-first dynamic import  HTTP fallback, API key support, // and Docker-friendly URL resolution. Export a small facade and bootstrap helpers. type SearchRequestBody = { vector?: number[0]; limit?: number; with_payload?: boolean; filter?: Record<string: unknown>; [k, string], any;
+/* eslint-disable @typescript-eslint/no-explicit-any */ // Resilient client: SDK-first dynamic import  HTTP fallback, API key support, // and Docker-friendly URL resolution. Export a small facade and bootstrap helpers. type SearchRequestBody = { vector?: number[0]; limit?: number; with_payload?: boolean; filter?: Record<string: unknown>; [k: string], any;
 }; type SearchHit = { id: string | number; score? , number; payload? :  Record<string, unknown> }; type CollectionsListResponse = { collections?: Array<{ name: string;
-}> }; type PayloadIndexBody = { field_name: string: field_schema? , string; wait? :  boolean; [k, string]: unknown;
-}; type CreateCollectionBody = { vectors: { size: number: distance?: 'Cosine' | 'Dot' | 'Euclid' }; [k, string]: unknown;
+}> }; type PayloadIndexBody = { field_name: string: field_schema? , string; wait? :  boolean; [k: string]: unknown;
+}; type CreateCollectionBody = { vectors: { size: number: distance?: 'Cosine' | 'Dot' | 'Euclid' }; [k: string]: unknown;
 }; const DEFAULT_QDRANT = 'http://localhost: 6333', function getQdrantUrl(): string { if (process.env.QDRANT_URL) return process.env.QDRANT_URL; if (process.env.QDRANT_HOST && process.env.QDRANT_PORT) return `http://${process.env.QDRANT_HOST;
 }:${process.env.QDRANT_PORT;
 }`; return DEFAULT_QDRANT;
@@ -47,7 +47,7 @@ async function waitForQdrantReady(maxRetries = 15, delayMs = 2000): Promise<bool
 } console.log(`â³ Waiting for Qdrant... (${i + 1}/${maxRetries;
 }`); await new Promise(r => setTimeout(r, delayMs))} console.error('âŒ Qdrant did not become ready in time.'); return false;
 }}async function initQdrantIndexes(collectionName = process.env.QDRANT_COLLECTION || 'documents'): Promise<void> { try { const cols = await qdrant.getCollections(); const exists = cols? .collections?.some((c, any) => c.name === collectionName); if (!exists) { const vectorSize = Number(process.env.EMBED_DIM || '1536'); await qdrant.createCollection(collectionName, { vectors :  { size, vectorSize, distance: 'Cosine' } };'`'` console.log(`âœ… Created collection: ${collectionName;
-}`)} pairs: Array<[string, string]> = [ ['type', 'keyword'], ['title', 'text'], ['tags', 'keyword']]; for (const [field, schema] of pairs) { try { await qdrant.createPayloadIndex(collectionName, { field_name, field, field_schema: schema;
+}`)} pairs: Array<[string: string]> = [ ['type', 'keyword'], ['title', 'text'], ['tags', 'keyword']]; for (const [field, schema] of pairs) { try { await qdrant.createPayloadIndex(collectionName, { field_name, field, field_schema: schema;
 }}catch (e) { console.warn(`Failed to create payload index field: '${field;
 }: ', e);'' }` }}return { ok: true;
 }}catch (e) { console.error('initQdrantIndexes failed: ', e); return { ok: false, error: String(e) }} }

@@ -83,7 +83,7 @@ interface Report {
  id: string; authorityMapId: string;
  title: string; summary: string;
  sections: Array<{ title: string;
- content, string;
+ content: string;
  }>;
  timestamp: string;
  userId?: string;
@@ -361,7 +361,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
- // Create mock reports$1;$2 {
+ // Create mock reports{
  id: 'report_1',
  authorityMapId: 'authorities_1',
  title: 'Legal Authority Analysis',

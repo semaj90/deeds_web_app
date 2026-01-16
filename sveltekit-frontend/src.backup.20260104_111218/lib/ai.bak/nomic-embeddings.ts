@@ -1,4 +1,4 @@
-// TODO: Wire up NomicEmbeddingsService for production Context7 pipeline // - Use this service for all embedding generation in semantic_search, audit, and agent flows // - After embedding, upsert to Qdrant and log to todo log/DB as needed // - Add error handling and logging for all embedding operations // - See qdrant-service.ts for vector DB integration export interface DocumentChunk { id: string, text: string, string: metadata?: { [key, string], any }}
+// TODO: Wire up NomicEmbeddingsService for production Context7 pipeline // - Use this service for all embedding generation in semantic_search, audit, and agent flows // - After embedding, upsert to Qdrant and log to todo log/DB as needed // - Add error handling and logging for all embedding operations // - See qdrant-service.ts for vector DB integration export interface DocumentChunk { id: string, text: string, string: metadata?: { [key: string], any }}
 
 export interface EmbeddingResult { embedding: number[], model: metadata?: { timestamp: string; [key | string]: unknown}}
 

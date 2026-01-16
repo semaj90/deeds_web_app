@@ -16,7 +16,7 @@ describe('Phase 9 Property-Based Tests', () => {
  describe('Property 28: Error Brain Analysis Storage', () => {
  it('should store analysis with all required fields', () => {
  // Generate random analysis data
- const routePath = 'test-route';$1;$2 { title: 'Fix 1', description: 'Description 1' },
+ const routePath = 'test-route';{ title: 'Fix 1', description: 'Description 1' },
  { title: 'Fix 2', description: 'Description 2' }];
  const phase = 'suggesting';
 
@@ -27,7 +27,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(phase).toBeDefined();
  });
 
- it('should preserve suggestions array structure', () => {$1;$2 { title: 'Fix', description: 'Desc', code: 'code' },
+ it('should preserve suggestions array structure', () => {{ title: 'Fix', description: 'Desc', code: 'code' },
  { title: 'Fix2', description: 'Desc2' }];
 
  // Verify structure is preserved
@@ -212,7 +212,7 @@ describe('Phase 9 Property-Based Tests', () => {
  * Validates: Requirement 4.5
  */
  describe('Property 31: Patch Success Rate Calculation', () => {
- it('should calculate 100% success rate for all passed patches', () => {$1;$2 { verification_status: 'passed' },
+ it('should calculate 100% success rate for all passed patches', () => {{ verification_status: 'passed' },
  { verification_status: 'passed' },
  { verification_status: 'passed' }];
 
@@ -222,7 +222,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(successRate).toBe(1.0);
  });
 
- it('should calculate 0% success rate for all failed patches', () => {$1;$2 { verification_status: 'failed' },
+ it('should calculate 0% success rate for all failed patches', () => {{ verification_status: 'failed' },
  { verification_status: 'failed' },
  { verification_status: 'failed' }];
 
@@ -232,7 +232,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(successRate).toBe(0.0);
  });
 
- it('should calculate 50% success rate for mixed patches', () => {$1;$2 { verification_status: 'passed' },
+ it('should calculate 50% success rate for mixed patches', () => {{ verification_status: 'passed' },
  { verification_status: 'failed' },
  { verification_status: 'passed' },
  { verification_status: 'failed' }];
@@ -252,7 +252,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(successRate).toBe(1.0);
  });
 
- it('should handle pending patches in calculation', () => {$1;$2 { verification_status: 'passed' },
+ it('should handle pending patches in calculation', () => {{ verification_status: 'passed' },
  { verification_status: 'pending' },
  { verification_status: 'failed' }];
 
@@ -274,7 +274,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(passedCount).toBe(500);
  });
 
- it('should handle uneven distribution', () => {$1;$2 ...Array.from({ length: 70 }, () => ({ verification_status: 'passed' })),
+ it('should handle uneven distribution', () => {...Array.from({ length: 70 }, () => ({ verification_status: 'passed' })),
  ...Array.from({ length: 30 }, () => ({ verification_status: 'failed' }))];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
@@ -292,7 +292,7 @@ describe('Phase 9 Property-Based Tests', () => {
  expect(successRate).toBeNaN();
  });
 
- it('should handle success rate as percentage', () => {$1;$2 { verification_status: 'passed' },
+ it('should handle success rate as percentage', () => {{ verification_status: 'passed' },
  { verification_status: 'passed' },
  { verification_status: 'failed' }];
 
@@ -353,7 +353,7 @@ describe('Phase 9 Property-Based Tests', () => {
  suggestions: [
  { title: 'Fix 1', description: 'Desc 1' },
  { title: 'Fix 2', description: 'Desc 2' }],
- };$1;$2 {
+ };{
  analysis_id: analysis.id,
  patch_content: 'patch 1',
  verification_status: 'passed',
@@ -371,11 +371,11 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should calculate success rate for analysis patches', () => {
  const analysis = {
  id: '123e4567-e89b-12d3-a456-426614174000',
- };$1;$2 { analysis_id: analysis.id, verification_status: 'passed' },
+ };{ analysis_id: analysis.id, verification_status: 'passed' },
  { analysis_id: analysis.id, verification_status: 'passed' },
  { analysis_id: analysis.id, verification_status: 'failed' }];
 
- const analysisPatchCount = patches.filter((p) => p.analysis_id === analysis.id).length;$1;$2 (p) => p.analysis_id === analysis?.id&& p.verification_status === 'passed'
+ const analysisPatchCount = patches.filter((p) => p.analysis_id === analysis.id).length;(p) => p.analysis_id === analysis?.id&& p.verification_status === 'passed'
  ).length;
  const successRate = passedCount / analysisPatchCount;
 

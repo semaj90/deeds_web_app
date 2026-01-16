@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Case ID and canvas state are required' }, { status: 400 });
  }
 
- // Check if canvas state already exists for this case$1;$2 .select()
+ // Check if canvas state already exists for this case.select()
  .from(canvasStates)
  .where(eq(canvasStates.caseId, caseId))
  .limit(1);
@@ -64,7 +64,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
  if (!caseId) {
  return json({ error: 'Case ID is required' }, { status: 400 });
- }$1;$2 .select()
+ }.select()
  .from(canvasStates)
  .where(eq(canvasStates.caseId, caseId))
  .limit(1);

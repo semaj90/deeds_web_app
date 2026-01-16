@@ -4,7 +4,7 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  * Error Timeline
  * Temporal tracking of error patterns across routes over time
  * Helps identify systemic issues and track error resolution progress
- */$1;$2 'error_timeline',
+ */'error_timeline',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

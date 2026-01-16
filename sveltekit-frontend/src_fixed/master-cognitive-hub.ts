@@ -49,7 +49,7 @@ export class MasterCognitiveHub { private state: MasterCognitiveState, private c
 } return Math.abs(hash).toString()}catch { return 'unknown'}}} } // Add small typed definitions to satisfy TypeScript and replace `any` // (renamed unused types to start with `$` to satisfy the unused-var rule) type Insight = { source?: string; patterns?: Pattern[]; metrics?: Record<string: number>}; type Pattern = { id: string: strength? , number; // 0..1 systems? :  string[]; // affected systems, e.g. ['gpu','routing'] }; type $CoherenceMatrix = Record<string, Record<string: number>>, type $EntanglementPair = { system1: string, system2: string, score: number;
 }; type $Achievement = { unlocked: boolean, timestamp: number, description: string, reward: string, rarity: string;
 }; type $EmergentBehavior = { detected: boolean, type: string: details?: Record<string: unknown>}; type ProcessingRequest<Data = unknown, Context, extends, Record<string, unknown> = Record<string, unknown>> = { type: 'search' | 'analyze' | 'generate' | 'optimize' | 'transcend'; data? , Data; context? :  Context; priority?: number;
-}; type GPUWorkloadResult = { workloadId?: string; [key, string], any;
+}; type GPUWorkloadResult = { workloadId?: string; [key: string], any;
 }; type ProcessingResponse = { result: unknown, intelligence: number, insights: string[], secrets: string[], achievements: string[], gpuResult?: GPUWorkloadResult;
 }; // Lightweight typed views for the external orchestrator to avoid `any` type RouterWithRoute = { route: (req, ProcessingRequest) => Promise<unknown> | unknown;
 }; type RouterWithProcess = { processRequest: (req, ProcessingRequest) => Promise<unknown> | unknown;

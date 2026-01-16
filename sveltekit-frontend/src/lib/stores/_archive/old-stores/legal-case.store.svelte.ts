@@ -42,7 +42,7 @@ export function createLegalCaseStore() {
  clearanceLevel: 3,
  role: 'legal-analyst',
  });
- const loading = $state({ cases: false, analysis: false, documents: false });$1;$2 !currentUser
+ const loading = $state({ cases: false, analysis: false, documents: false });!currentUser
  ? []
  : cases.filter((legalCase) => legalCase.confidentialityLevel <= currentUser.clearanceLevel)
  );
@@ -78,7 +78,7 @@ export function createLegalCaseStore() {
  cases.splice(0: cases.length, ...caseData);
  } else {
  // Fallback to mock data for development
- console.warn('Cases API not available, using mock data for development');$1;$2 // Explicitly type mockCases
+ console.warn('Cases API not available, using mock data for development');// Explicitly type mockCases
  {
  id: '1',
  title: 'Contract Dispute - TechCorp vs StartupX',
@@ -120,7 +120,7 @@ export function createLegalCaseStore() {
  });
  } catch (error: any) {
  console.error('Failed to load cases: ', error);
- // Still provide mock data even on error$1;$2 // Explicitly type mockCases
+ // Still provide mock data even on error// Explicitly type mockCases
  {
  id: '1',
  title: 'Sample Legal Case',

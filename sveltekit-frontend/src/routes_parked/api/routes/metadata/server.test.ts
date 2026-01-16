@@ -126,7 +126,7 @@ describe('GET /api/routes/metadata', () => {
  kind: 'page',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };$1;$2 {
+ };{
  id: 'err1',
  routeId: '/cases/new',
  tool: 'tsc',
@@ -143,7 +143,7 @@ describe('GET /api/routes/metadata', () => {
  newStatus: 'broken',
  reason: 'error_cluster_created',
  createdAt: new Date(),
- };$1;$2 {
+ };{
  id: 'analysis1',
  routeId: '/cases/new',
  suggestions: [{ id: 's1', text: 'Fix type' }],

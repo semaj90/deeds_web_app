@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Compute confidence and rank strategies
 		const confidence = policy.computeConfidence(embedding, similarErrors);
 
-		// Get fix strategies from similar errors$1;$2			.flatMap(se => se.fixStrategies)
+		// Get fix strategies from similar errors.flatMap(se => se.fixStrategies)
 			.filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i);
 
 		// Rank strategies

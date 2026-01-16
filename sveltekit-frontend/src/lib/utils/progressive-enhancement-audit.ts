@@ -282,7 +282,7 @@ export function auditAllForms(): FormAuditResult[] {
 
 // Generate audit report
 export function generateAuditReport(results: FormAuditResult[]): string {
- const totalForms = results.length;$1;$2 totalForms === 0 ? 0 : results.reduce((sum: any, r: any) => sum + r.compliance.score, 0) / totalForms;$1;$2 r.compliance.issues.filter((i: any) => i.type === 'critical')
+ const totalForms = results.length;totalForms === 0 ? 0 : results.reduce((sum: any, r: any) => sum + r.compliance.score, 0) / totalForms;r.compliance.issues.filter((i: any) => i.type === 'critical')
  );
  const excellentFormsCount = results.filter((r: any) => r.compliance.level === 'excellent').length;
 

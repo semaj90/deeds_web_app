@@ -12,14 +12,14 @@ export interface QueueState {
 export interface QueueContext {
  jobs: Map<string, QueueState>; activeJobs: Set<string>;
  maxConcurrency: number; retryDelay: number;
-}$1;$2 | { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
+}| { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
  | { type: 'START_JOB'; jobId: string }
  | { type: 'COMPLETE_JOB'; jobId: string; result?: any }
  | { type: 'FAIL_JOB'; jobId: string; error: string }
  | { type: 'RETRY_JOB'; jobId: string }
  | { type: 'CANCEL_JOB'; jobId: string }
  | { type: 'PROCESS_QUEUE' }
- | { type: 'SET_CONCURRENCY'; maxConcurrency: number };$1;$2 {
+ | { type: 'SET_CONCURRENCY'; maxConcurrency: number };{
  id: 'queue',
  initial: 'idle',
  context: { jobs: new Map(),
@@ -120,7 +120,7 @@ export interface QueueContext {
  context.maxConcurrency = event.maxConcurrency;
  return context;
  }, processQueue: (context) => {
- // Find idle jobs that can be started$1;$2 .filter((job) => job.status === 'idle')
+ // Find idle jobs that can be started.filter((job) => job.status === 'idle')
  .sort((a, b) => {
  // Sort by priority first, then by creation time
  const priorityOrder = { urgent: 4, high: 3, normal: 2, low: 1 };

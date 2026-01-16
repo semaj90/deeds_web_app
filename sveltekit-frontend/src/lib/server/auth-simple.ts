@@ -38,7 +38,7 @@ export class SimpleAuthService {
  async login(email: string, options: string): Promise<SimpleUser> {
  const client = await this.getClient();
  try {
- // Query only the columns that exist in the actual database$1;$2 `SELECT id, email, hashed_password, first_name, last_name, role, is_active FROM users WHERE email = $1 AND is_active = true`,
+ // Query only the columns that exist in the actual database`SELECT id, email, hashed_password, first_name, last_name, role, is_active FROM users WHERE email = $1 AND is_active = true`,
  [email]
  );
 

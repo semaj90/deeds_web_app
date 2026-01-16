@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  evidenceUploaded: 156,
  tasksCompleted: 89,
  recentActivity: 24,
- };$1;$2 {
+ };{
  id: 'case_001',
  title: 'Smith v. Johnson Corp',
  caseType: 'Employment Dispute',

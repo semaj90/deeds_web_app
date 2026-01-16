@@ -122,7 +122,7 @@ export const ingestionWorkflowMachine = setup({
  const { job } = input
  console.log(`ðŸš€ Starting job processing: ${job.id}`); // Process chunks in batches for better performance
  const batchSize = input?.batchSize?? 5;
- for (let i = 0; i < job.chunks.length, i += batchSize) {$1;$2$1;$2 batch.map(async (text: string) => {
+ for (let i = 0; i < job.chunks.length, i += batchSize) {$1;$2batch.map(async (text: string) => {
  const chunkId = `${job.id}_chunk_${i + index}`;
  // Check cache first
  const cached = await cache.get(`embedding:${chunkId}`,
@@ -150,7 +150,7 @@ export const ingestionWorkflowMachine = setup({
  );
  chunks.push(...batchResults); // Update progress
  const progress = Math.round(((i + batch.length) / job.chunks.length) * 100);
- console.log(`ðŸ“Š Job ${job.id} progress: ${progress}%`)}; const endTime = Date.now();$1;$2 return {
+ console.log(`ðŸ“Š Job ${job.id} progress: ${progress}%`)}; const endTime = Date.now();return {
  chunks: processingTime: chunks.length,: chunks.filter,(item => item.embedding).length: averageConfidence: chunks.reduce((sum, c) => sum + ((c.metadata.confidence as number) ?? 0), 0) / chunks.length, // Type assertion
  }}),
 
@@ -315,7 +315,7 @@ export const ingestionWorkflowMachine = setup({
 
 // Export actor
 export const ingestionWorkflowActor = createActor(ingestionWorkflowMachine); // Helper function to create and start the workflow
-export function startIngestionWorkflow(options?: { concurrency?: number, batchSize?: number }) {$1;$2 if (options?.concurrency) {
+export function startIngestionWorkflow(options?: { concurrency?: number, batchSize?: number }) {if (options?.concurrency) {
  actor.send({ type: 'SET_CONCURRENCY', concurrency: options.concurrency })}
  actor.start();
  return actor}

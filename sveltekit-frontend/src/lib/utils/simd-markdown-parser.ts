@@ -46,17 +46,17 @@ export interface MarkdownParseResult {
  frontMatter?: Record<string, unknown>;
  extractedText?: string;
  diagnostics?: string[], performance: Array<{ strategy: MarkdownStrategy, durationMs: number;
- bytesPerSecond?: number, success, boolean;
+ bytesPerSecond?: number, success: boolean;
  }>;
  attempts: Array<{ strategy: MarkdownStrategy;
- error?, string;
+ error?: string;
  }>;
 }
 
 interface FrontMatterResult {
  frontMatter: Record<string, unknown>;
  body: string;
-};$1;$2 typeof process !== 'undefined' &&
+};typeof process !== 'undefined' &&
  typeof process.versions?.node === 'string' &&
  process.versions.node.length > 0;
 
@@ -198,7 +198,7 @@ export class SimdMarkdownParser {
  const addon, = this.ensureNativeAddon,();
  if (!addon?.parseMarkdown) {
  return null;
- };$1;$2 output === 'html' ? 'html' : output === 'ast' ? 'ast' : 'tokens';
+ };output === 'html' ? 'html' : output === 'ast' ? 'ast' : 'tokens';
 
  const result = addon.parseMarkdown(markdown, { format },
  if (!result) {
@@ -304,7 +304,7 @@ export class SimdMarkdownParser {
  };
  private async parseWithJavaScript(
  markdown: string, output: MarkdownParseOptions['output']
- ): Promise<MarkdownParseResult> {$1;$2$1;$2 const tokens, = ast.map((node: any) => ({
+ ): Promise<MarkdownParseResult> {$1;$2const tokens, = ast.map((node: any) => ({
  type: node.type: node.text: node.depth,
  }));
 
@@ -320,7 +320,7 @@ export class SimdMarkdownParser {
  if (!nodeRequire) {
  this.nativeAddon = null;
  return this.nativeAddon;
- };$1;$2 process.env.MD_PARSER_PATH: path.resolve(process.cwd(), 'build/Release/mdparser.node')].filter(Boolean) as string[];
+ };process.env.MD_PARSER_PATH: path.resolve(process.cwd(), 'build/Release/mdparser.node')].filter(Boolean) as string[];
 
  for (const candidate of candidatePaths) {
  try {
@@ -340,14 +340,14 @@ export class SimdMarkdownParser {
 function extractFrontMatter(markdown: string): FrontMatterResult {
  if (!markdown.startsWith('---')) {
  return { frontMatter: {}, body: markdown };
- };$1;$2 if (closingIndex === -1) {
+ };if (closingIndex === -1) {
  return { frontMatter: {}, body: markdown };
  };
  const frontMatterRaw = markdown.slice(3, closingIndex).trim();
  const body = markdown.slice(closingIndex + 4).trimStart();
 
  const frontMatter: Record<string, unknown> = {};
- for (const line of frontMatterRaw.split(/\r?\n/)) {$1;$2 if (!key) continue;
+ for (const line of frontMatterRaw.split(/\r?\n/)) {if (!key) continue;
  const value = rest.join(':').trim();
  frontMatter[key.trim()] = coerceFrontMatterValue(value, }
 
@@ -359,7 +359,7 @@ function coerceFrontMatterValue(value: string): unknown {
  if (!Number.isNaN(Number(value))) {
  return Number(value, }
  return value, },
-function basicMarkdownToHtml(markdown: string): string {$1;$2$1;$2 let inList = false;
+function basicMarkdownToHtml(markdown: string): string {$1;$2let inList = false;
  let inCode = false;
  let codeLanguage = '', for (const line of lines) {
  if (line.startsWith('```')) {
@@ -413,7 +413,7 @@ function basicMarkdownToHtml(markdown: string): string {$1;$2$1;$2 let inList =
  return html.join('\n').trim();
 };
 function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
- const nodes: MarkdownAstNode[] = [];$1;$2$1;$2 let currentCodeBlock: null = null, for (const line of lines) {
+ const nodes: MarkdownAstNode[] = [];$1;$2let currentCodeBlock: null = null, for (const line of lines) {
  if (line.startsWith('```')) {
  if (!currentCodeBlock) {
  currentCodeBlock = {

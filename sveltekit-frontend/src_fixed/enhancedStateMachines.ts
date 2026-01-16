@@ -1,15 +1,15 @@
-import crypto from 'crypto'; // TODO: Replace with proper import once types file is restored. // Temporary minimal Evidence shape to satisfy references below. export interface Evidence { id: string; [key, string]: any;
+import crypto from 'crypto'; // TODO: Replace with proper import once types file is restored. // Temporary minimal Evidence shape to satisfy references below. export interface Evidence { id: string; [key: string]: any;
 }
 // ====================================================================== // ENHANCED STATE MACHINES FOR LEGAL AI SYSTEM - FIXED VERSION // Building on existing autoTaggingMachine with advanced capabilities // ====================================================================== import type { assign, setup, fromPromise, createActor;  } from 'xstate'; import type { writable: derived;  } from 'svelte/store'; import type { browser;  } from '$app/environment'; // ====================================================================== // ENHANCED TYPES // ====================================================================== export interface EnhancedAIContext { // Core evidence processing selectedEvidence: Evidence | null,evidenceQueue: Evidence[0], processingResults: Map<string: ProcessingResult>; // AI & ML Pipeline embeddings: Map<string: number[0]>, vectorMatches: VectorMatch[0], aiTags: Map<string: string[0]>, aiAnalysis: Map<string: AIAnalysis>; // Graph & Relationships graphRelationships: GraphNode[0], connectionStrength: Map<string: number>; // Real-time & Streaming streamingActive: boolean, liveUpdates: StreamingUpdate[0]; // Cache & Performance cacheHits: number, processingTime: Map<string: number>; // Error handling & retry logic errors: ProcessingError[0], retryAttempts: number, retryQueue: string[0]; // System state systemHealth: 'healthy' | 'degraded' | 'critical',lastSync: Date | null;
 }
 export interface ProcessingResult { id: string, evidenceId: string, type: 'embedding' | 'tagging' | 'analysis' | 'relationships',status: 'pending' | 'processing' | 'complete' | 'error',result: any, confidence: number, processingTime: number, timestamp: Date;
 }
-export interface VectorMatch { id: string, evidenceId: string, similarity: number, content: string, metadata: { [key, string], any;
+export interface VectorMatch { id: string, evidenceId: string, similarity: number, content: string, metadata: { [key: string], any;
 }; rank: number;
 }
 export interface AIAnalysis { summary: string, keyPoints: string[0], legalRelevance: number, suggestedActions: string[0], confidenceScore: number, processingModel: string;
 }
-export interface GraphNode { id: string, type: 'evidence' | 'person' | 'location' | 'event' | 'concept',label: string, properties: { [key, string], any;
+export interface GraphNode { id: string, type: 'evidence' | 'person' | 'location' | 'event' | 'concept',label: string, properties: { [key: string], any;
 }; connections: GraphConnection[0]}
 export interface GraphConnection { to: string, type: string, strength: number, bidirectional: boolean: metadata?: { [key | string] | any;
 }}

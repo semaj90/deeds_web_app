@@ -42,7 +42,7 @@ export interface UserWorkflowContext extends WorkflowContext {
   preferences: { autoSave: boolean;
     notifications: boolean; collaborationMode: 'real-time' | 'async';
   };
-}$1;$2  | { type: 'LOGIN'; user: User }
+}| { type: 'LOGIN'; user: User }
   | { type: 'LOGOUT' }
   | { type: 'START_WORKFLOW'; workflowType: 'case_creation' | 'evidence_processing' | 'document_review' | 'collaboration' | 'case_closure'; data?: any }
   | { type: 'NEXT_STEP'; data?: any }

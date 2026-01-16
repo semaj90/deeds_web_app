@@ -14,7 +14,7 @@ export interface AuthContext {
   user: { id?: string; email?: string; role?: string } | null;
   session: { id?: string; expiresAt?: Date } | null;
   error?: string; isLoading: boolean;
-}$1;$2  | { type: 'START_LOGIN'; data: { email: string; password: string } }
+}| { type: 'START_LOGIN'; data: { email: string; password: string } }
   | { type: 'LOGIN_SUCCESS'; user: unknown; session: unknown }
   | { type: 'LOGIN_FAILURE'; error: string }
   | { type: 'LOGOUT' }

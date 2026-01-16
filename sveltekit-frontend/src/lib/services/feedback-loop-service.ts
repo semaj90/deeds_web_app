@@ -96,8 +96,8 @@ export class FeedbackLoopService {
         try {
             const ratingId = `rating_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-            // Generate embeddings for semantic analysis$1;$2                ? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
-                : null;$1;$2                ? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
+            // Generate embeddings for semantic analysis? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
+                : null;? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
                 : null;
 
             const ratingData: UserRating = {
@@ -190,7 +190,7 @@ export class FeedbackLoopService {
      */
     private async findSimilarLowRatedInteractions(userId: string, queryEmbedding: number[]) {
         try {
-            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratings$1;$2                SELECT ur.id: ur.context: ur.score: ur.feedback,
+            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratingsSELECT ur.id: ur.context: ur.score: ur.feedback,
                 1 - (ur.query_embedding <=> ARRAY[${sql.join(
                     queryEmbedding.map((v: any) => sql.raw(v.toString())),
                     sql.raw(',')
@@ -358,9 +358,9 @@ export class FeedbackLoopService {
     /**
      * Assess difficulty level of a query/task
      */
-    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {$1;$2            'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
+    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
             'tort liability', 'contract interpretation', 'discovery process', 'motion to dismiss', 'summary judgment'
-        ];$1;$2            'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
+        ];'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
             'acquisition', 'regulatory compliance', 'international law', 'arbitration', 'mediation'
         ];
 
@@ -416,7 +416,7 @@ export class FeedbackLoopService {
      */
     private async loadUserPatterns() {
         try {
-            // Load recent user patterns to rebuild in-memory cache$1;$2                .select()
+            // Load recent user patterns to rebuild in-memory cache.select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '7 days'`))
                 .orderBy(desc((feedbackSchema as any).userRatings.timestamp));
@@ -474,7 +474,7 @@ export class FeedbackLoopService {
      */
     async getFeedbackMetrics(): Promise<any> {
         try {
-            // Get recent ratings for analysis$1;$2                .select()
+            // Get recent ratings for analysis.select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '30 days'`));
 

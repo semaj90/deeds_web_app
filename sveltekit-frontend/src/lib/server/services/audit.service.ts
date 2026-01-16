@@ -240,7 +240,7 @@ class AuditService {
  async getAuditStatistics(hoursBack: number = 24): Promise<{ totalOperations: number, successfulOperations: number; failedOperations: number, successRate: number; operationsByType: Record<string, number>;
  }> {
  try {
- const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);$1;$2 .select()
+ const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);.select()
  .from(auditLog)
  .where((table) => table.timestamp >= since);
 

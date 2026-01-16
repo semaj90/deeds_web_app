@@ -179,7 +179,7 @@ export class QdrantService {
 
     const { vector, limit = 40, filter, scoreThreshold = 0.15 } = params;
 
-    try {$1;$2        `${this.baseUrl}/collections/${this.collectionName}/points/search`,
+    try {`${this.baseUrl}/collections/${this.collectionName}/points/search`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -219,7 +219,7 @@ export class QdrantService {
       throw new Error('Invalid chunkId: must be a non-empty string');
     }
 
-    try {$1;$2        `${this.baseUrl}/collections/${this.collectionName}/points/delete`,
+    try {`${this.baseUrl}/collections/${this.collectionName}/points/delete`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

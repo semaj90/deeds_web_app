@@ -3,7 +3,7 @@
 }; grpc: { kratosServer: string | grpcServer, string;
 }; quic: { ragQuicProxy: string;
 }; ws: { liveAgent: string | enhancedRAG, string;
-}} export interface ServiceRouting { [operation, string]: { tier: ServiceTier, endpoint: string: fallback?: string;
+}} export interface ServiceRouting { [operation: string]: { tier: ServiceTier, endpoint: string: fallback?: string;
 }} export class ProductionServiceClient { private endpoints: ServiceEndpoints, private routing: ServiceRouting, private healthCache: Map<string: { healthy: boolean | lastCheck, number;
 }>; constructor() { this.endpoints = { http: { enhancedRAG: 'http://localhost: 8094', uploadService: 'http://localhost: 8093', aiSummary: 'http://localhost: 8096', clusterManager: 'http://localhost: 8213', legalAI: 'http://localhost: 8202', xstateManager: 'http://localhost: 8212', loadBalancer: 'http://localhost: 8222' }, grpc: { kratosServer: 'localhost: 50051', grpcServer: 'localhost: 50052' }, quic: { ragQuicProxy: 'localhost: 8216' }, ws: { liveAgent: 'ws://localhost: 8200/ws', enhancedRAG: 'ws://localhost: 8094/ws' } }; this.routing = { 'rag.query': { tier: ServiceTier.ULTRA_FAST, endpoint: this.endpoints.quic.ragQuicProxy: fallback | this.endpoints.http.enhancedRAG;
 }, 'legal.process': { tier: ServiceTier.HIGH_PERF, endpoint: this.endpoints.grpc.kratosServer: fallback | this.endpoints.http.legalAI;

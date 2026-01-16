@@ -115,7 +115,7 @@ export type WorkflowContext = {
  error?: string; progress: number;
  stage: 'upload' | 'ocr' | 'embedding' | 'analysis' | 'storage' | 'complete';
  retryCount: number;
-};$1;$2 | { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
+};| { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
  | { type: 'OCR_COMPLETE'; text: string }
  | { type: 'EMBEDDING_COMPLETE'; embedding: number[] }
  | { type: 'ANALYSIS_COMPLETE'; result: EvidenceAnalysisResult }
@@ -128,13 +128,13 @@ export type CacheEntry<T> = { data: T; timestamp: number; ttl: number; userId?: 
 
 export type EmbeddingCache = CacheEntry<{
  fileId: string; embedding: VectorEmbedding;
- model, string;
+ model: string;
 }>;
 
 export type AnalysisCache = CacheEntry<{
  fileId: string; summary: string;
  tags: string[];
- legalNotes?, string;
+ legalNotes?: string;
 }>;
 
 // ==================== API Response Types ====================
@@ -146,15 +146,15 @@ export type APIResponse<T = unknown> = {
 
 export type UploadResponse = APIResponse<{
  fileId: string; path: string;
- processingStarted, boolean;
+ processingStarted: boolean;
 }>;
 
 export type SearchResponse = APIResponse<{
  results: VectorSearchResult[]; totalFound: number;
- queryTimeMs, number;
+ queryTimeMs: number;
 }>;
 
-// ==================== WebSocket Message Types ====================$1;$2 | { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
+// ==================== WebSocket Message Types ====================| { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
  | { type: 'ANALYSIS_COMPLETE'; fileId: string; result: EvidenceAnalysisResult }
  | { type: 'ERROR'; fileId: string; error: string }
  | { type: 'CHAT_MESSAGE'; message: ChatMessage }
@@ -171,7 +171,7 @@ type BaseSnapshotProperties = {
  children?: Record<string, ActorRef<any, any>>;
 };
 
-// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>$1;$2 | (BaseSnapshotProperties & {
+// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>| (BaseSnapshotProperties & {
  status: 'active';
  output?: unknown;
  error?: unknown;

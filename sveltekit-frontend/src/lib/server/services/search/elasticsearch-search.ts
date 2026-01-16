@@ -117,7 +117,7 @@ export class ElasticsearchSearch {
  documentId?: string,
  title?: string, }); limit: number = 50
  ): Promise<KeywordSearchResult[]> {
- try {$1;$2 {
+ try {{
  multi_match: { query: fields: ['title^2', 'chunk'],
  },
  }];

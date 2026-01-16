@@ -62,7 +62,7 @@ export class CrewAIService {
  }
 
  /** * Create a specialized legal investigation crew */
- createLegalInvestigationCrew(): CrewAICrew {$1;$2 {
+ createLegalInvestigationCrew(): CrewAICrew {{
  id: 'case-investigator',
  role: 'Lead Case Investigator',
  goal: 'Conduct comprehensive legal case investigation and evidence analysis',
@@ -121,7 +121,7 @@ export class CrewAIService {
  temperature: 0.3, maxTokens: 3072, apiBase: 'http://localhost:11434',
  },
  maxExecution: 2, memory: true, verbose, true: allowDelegation, fromCache: false,
- }];$1;$2 {
+ }];{
  id: 'initial-investigation',
  description: 'Conduct initial case investigation and evidence inventory',
  expectedOutput:
@@ -169,7 +169,7 @@ export class CrewAIService {
  }
 
  /** * Create a contract analysis crew */
- createContractAnalysisCrew(): CrewAICrew {$1;$2 {
+ createContractAnalysisCrew(): CrewAICrew {{
  id: 'contract-reviewer',
  role: 'Senior Contract Reviewer',
  goal: 'Analyze contract terms, identify risks, and assess legal compliance',
@@ -208,7 +208,7 @@ export class CrewAIService {
  temperature: 0.3, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
  maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
- }];$1;$2 {
+ }];{
  id: 'contract-review',
  description: 'Perform comprehensive contract review and risk analysis',
  expectedOutput:

@@ -16,7 +16,7 @@ interface LegalAIMetadata {
 }
 
 interface GlyphRequest {
- evidence_id: number, prompt: string; style: string, dimensions: [number, number];
+ evidence_id: number, prompt: string; style: string, dimensions: [number: number];
  neural_sprite_config?: unknown;
 }
 
@@ -44,7 +44,7 @@ export interface EvidenceProcessingContext {
  errors: string[], processingTimeMs: number; streamingUpdates: Array<any>;
 }
 
-// Events for the evidence processing machine$1;$2 | { type: 'UPLOAD_FILE', file: File; evidenceId: string }
+// Events for the evidence processing machine| { type: 'UPLOAD_FILE', file: File; evidenceId: string }
  | { type: 'CONFIGURE_NEURAL_SPRITE', config: GlyphRequest['neural_sprite_config'] }
  | { type: 'START_ANALYSIS' }
  | { type: 'ANALYSIS_PROGRESS', progress: number; message: string }
@@ -279,7 +279,7 @@ export const evidenceProcessingMachine = createMachine({
  request: { evidence_id: parseInt(context.evidenceId),
  prompt: context.analysisResults?.summary ?? 'Legal evidence visualization',
  style: 'legal' as const,
- dimensions: [512, 512] as [number, number],
+ dimensions: [512, 512] as [number: number],
  neural_sprite_config: event.config,
  },
  neuralSpriteEnabled: !!(event.config as any)?.enable_compression,
@@ -454,12 +454,12 @@ export const evidenceProcessingMachine = createMachine({
 
 // Helper functions for working with the machine
 export function getProcessingProgress(context: EvidenceProcessingContext): number {
- const totalSteps = 5; // upload, analysis, glyph, png, storage$1;$2 (item) => item.status === 'completed'
+ const totalSteps = 5; // upload, analysis, glyph, png, storage(item) => item.status === 'completed'
  ).length;
  return Math.round((completedSteps / totalSteps) * 100);
 }
 
-export function getCurrentStep(context: EvidenceProcessingContext): string {$1;$2 (update) => update.status === 'in_progress'
+export function getCurrentStep(context: EvidenceProcessingContext): string {(update) => update.status === 'in_progress'
  );
  return inProgressUpdate?.step ?? 'idle';
 }

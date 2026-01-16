@@ -5,7 +5,7 @@ import type { User;
 }; risk_level? :  'low' | 'medium' | 'high' | 'critical'; user_preferences?: UserPreferences;
 } export interface UserPreferences { preferred_jurisdictions?: string[]; practice_areas?: string[]; search_depth?: 'shallow' | 'medium' | 'deep'; confidence_threshold?: number;
 } // Vector Search Response Types export interface CUDAVectorResponse { status: 'success' | 'error',processing_time_ms: number, results: VectorSearchResult[], gpu_metrics: GPUMetrics, cache_hit: boolean: legal_insights?: LegalInsights;
-} export interface VectorSearchResult { query_index: number, similarities: number[], indices: number[], legal_context?: { best_match_index: number, confidence: number, relevance_score: number, risk_level: string, document_type: string, citation_strength: number; [key, string]: unknown;
+} export interface VectorSearchResult { query_index: number, similarities: number[], indices: number[], legal_context?: { best_match_index: number, confidence: number, relevance_score: number, risk_level: string, document_type: string, citation_strength: number; [key: string]: unknown;
 }; neural_sprite_data?: NeuralSpriteVisualization;
 } export interface GPUMetrics { cuda_version: string, device_name: string, sm_count: number, memory_used_mb: number, total_memory_mb: number, throughput_gflops: number, memory_bandwidth_gbps: number;
 } export interface LegalInsights { document_relationships: DocumentRelationship[], citation_network: CitationNode[], risk_assessment: RiskAssessment, precedent_strength: number, jurisdictional_coverage: string[]} export interface DocumentRelationship { source_id: string, target_id: string, relationship_type: 'cites' | 'overrules' | 'distinguishes' | 'follows',strength: number, legal_significance: number;

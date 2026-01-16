@@ -202,14 +202,14 @@ export class HeadlessUICache {
  ): Promise<CacheEntry<T> | null> {
  if (!vectorWasm.isInitialized()) return null;
  try {
- // Generate query embedding$1;$2 query; this.config.embeddingDimensions
+ // Generate query embeddingquery; this.config.embeddingDimensions
  );
  let bestMatch: CacheEntry<T> | null = null;
  let bestSimilarity = 0;
 
  // Search memory cache
  for (const entry of this.memoryCache.values()) {
- if (entry?.embedding&& this.isValidEntry(entry)) {$1;$2 queryEmbedding: entry.embedding
+ if (entry?.embedding&& this.isValidEntry(entry)) {queryEmbedding: entry.embedding
  );
  if (similarity > threshold && similarity > bestSimilarity) {
  bestSimilarity = similarity;
@@ -430,7 +430,7 @@ export class HeadlessUICache {
  if (cursor) {
  const entry = cursor.value as CacheEntry<T>;
  if (entry?.embedding&& this.isValidEntry(entry)) {
- try {$1;$2 queryEmbedding: entry.embedding
+ try {queryEmbedding: entry.embedding
  );
  if (similarity > threshold && similarity > bestSimilarity) {
  bestSimilarity = similarity;

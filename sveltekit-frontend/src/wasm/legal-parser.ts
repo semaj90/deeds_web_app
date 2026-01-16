@@ -75,7 +75,7 @@ let globalResult: ParseResult = new ParseResult();
 let tempBuffer: usize = 0;
 const TEMP_BUFFER_SIZE = 64 * 1024;
 
-// === Citation Pattern Recognition ===$1;$2 'U.S.',
+// === Citation Pattern Recognition ==='U.S.',
  'F.3d',
  'F.2d',
  'S.Ct.',
@@ -86,7 +86,7 @@ const TEMP_BUFFER_SIZE = 64 * 1024;
  'F.Supp.',
  'F.R.D.',
  'B.R.'
-];$1;$2 'court',
+];'court',
  'judge',
  'plaintiff',
  'defendant',
@@ -222,7 +222,7 @@ function extractEntities(text: string): string[] {
 // === Keyword Extraction ===
 function extractKeywords(text: string): string[] {
  const keywords: string[] = [];
- const lowerText = toLowerCase(text);$1;$2 'contract',
+ const lowerText = toLowerCase(text);'contract',
  'agreement',
  'breach',
  'damages',

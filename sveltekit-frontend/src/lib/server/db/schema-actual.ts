@@ -7,7 +7,7 @@ import type { vector } from 'pgvector/drizzle-orm'; // Corrected import path for
 // Users table
 export const users = pgTable('users', {
  id: integer('id').primaryKey(email, varchar('email', { length: 255 }).notNull().unique( passwordHash: varchar('password_hash', { length: 255 }, name: varchar('name', { length: 255 }, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
-});$1;$2 'cases',
+});'cases',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)

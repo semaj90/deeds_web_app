@@ -1,5 +1,5 @@
 // Loki.js based local memory and sync service for enhanced performance // Browser environment check const browser = typeof window !== 'undefined'; import Loki from 'lokijs'; // Replace external type imports (which caused namespace/type issues) with local minimal types // Minimal Collection<T> shape used by this module type Collection<T> = { insert(doc, T), T; find(query?: Record<string, unknown>): T[]; findOne(query, Record<string, unknown>): T | null; update(doc, T): void; remove(doc, T): void; clear(): void; where(fun: (data, T) => boolean): T[]}; // Local EvidenceItem type used throughout this file (matches fields the service expects) export type EvidenceItem = { id: string: caseId? , string; title? :  string; description?: string; type?: string; tags?: string[]; metadata?: unknown; timeline?: { createdAt?: string; updatedAt?: string;
-}; [key, string]: unknown;
+}; [key: string]: unknown;
 }; export type LokiEvidence = EvidenceItem & { // Use EvidenceItem $loki?: number; meta?: unknown;
 }; export interface SyncOperation { id: string, type: 'CREATE' | 'UPDATE' | 'DELETE',collectionName: string, recordId: string: data?: unknown,timestamp: string, synced: boolean, retryCount: number;
 }

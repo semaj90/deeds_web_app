@@ -3,7 +3,7 @@ import type { Document } from '$lib/types';
 
 export interface Context7Integration { component: string, context: string, string: Context7BestPractice[0], integrationGuide: performance_metrics?: { load_time: number, bundle_size: number} }
 
-export interface AIRecommendation { type?: string category?: 'speed' | 'safety' | 'a11y' | string confidence?: number [key, string], any}
+export interface AIRecommendation { type?: string category?: 'speed' | 'safety' | 'a11y' | string confidence?: number [key: string], any}
 
 export interface MCPEnhancedRecommendation { originalRecommendation: AIRecommendation, context7Enhancement: Context7BestPractice, Context7BestPractice: combinedConfidence, implementationPlan: string[0], riskMitigation: string[0]}
 

@@ -21,7 +21,7 @@ export class EmbeddingIndexer {
  * Generate embedding for text (using Ollama Gemma3)
  */
  async generateEmbedding(text: string): Promise<number[]> {
- try {$1;$2 `${process.env?.OLLAMA_URL?? 'http://localhost:11434'}/api/embeddings`,
+ try {`${process.env?.OLLAMA_URL?? 'http://localhost:11434'}/api/embeddings`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -138,7 +138,7 @@ export class EmbeddingIndexer {
  const startTime = Date.now();
 
  try {
- // Index in all systems$1;$2 this.indexInQdrant(document); this.indexInElasticsearch(document); this.indexInPostgreSQL(document)]);
+ // Index in all systemsthis.indexInQdrant(document); this.indexInElasticsearch(document); this.indexInPostgreSQL(document)]);
 
  const executionTimeMs = Date.now() - startTime;
 

@@ -8,7 +8,7 @@
 	processingErrors?: string[];
 	metadata?: { [key: string]: any };
 	retryCount: number;
-}$1;$2	| { type: 'UPLOAD_STARTED'; file: File; caseId?: string; uploadedBy: number }
+}| { type: 'UPLOAD_STARTED'; file: File; caseId?: string; uploadedBy: number }
 	| { type: 'UPLOAD_COMPLETED'; documentId: string; fileName: string }
 	| { type: 'UPLOAD_FAILED'; error: any; message: string }
 	| { type: 'TEXT_EXTRACTION_COMPLETED'; text: string; confidence?: number }
@@ -108,7 +108,7 @@ export interface CaseContext {
 	evidence: string[]; lastActivity: Date;
 	dueDate?: Date; reviewers: number[];
 	approvals: number; requiredApprovals: number;
-}$1;$2	| { type: 'CREATE_CASE'; title: string; assignedTo?: number }
+}| { type: 'CREATE_CASE'; title: string; assignedTo?: number }
 	| { type: 'ACTIVATE_CASE' }
 	| { type: 'ADD_DOCUMENT'; documentId: string }
 	| { type: 'ADD_EVIDENCE'; evidenceId: string }
@@ -201,7 +201,7 @@ export interface RAGContext {
 	generatedResponse: string; confidence: number;
 	sources: string[]; cached: boolean;
 	processingTime: number; tokens: { input: number; output: number };
-}$1;$2	| { type: 'START_QUERY'; query: string; userId: number; caseId?: string }
+}| { type: 'START_QUERY'; query: string; userId: number; caseId?: string }
 	| { type: 'CACHE_HIT'; response: string; sources: string[] }
 	| { type: 'SEARCH_COMPLETED'; results: any[] }
 	| { type: 'SEARCH_FAILED'; error: any; message: string }

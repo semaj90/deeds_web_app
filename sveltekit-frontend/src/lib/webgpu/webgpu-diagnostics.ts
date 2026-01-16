@@ -123,7 +123,7 @@ export class WebGPUDiagnosticsService {
  }
 
  // requestAdapterInfo is optional/experimental; guard it
- try {$1;$2 typeof (this.adapter as GPUAdapterWithInfo).requestAdapterInfo === 'function'
+ try {typeof (this.adapter as GPUAdapterWithInfo).requestAdapterInfo === 'function'
  ? await (this.adapter as GPUAdapterWithInfo).requestAdapterInfo()
  : null;
 
@@ -162,7 +162,7 @@ export class WebGPUDiagnosticsService {
  return;
  }
 
- const features = Array.from(this.device.features ?? []);$1;$2 Object.entries(this.device.limits ?? {}).map(([k, v]) => [k, Number(v ?? 0)])
+ const features = Array.from(this.device.features ?? []);Object.entries(this.device.limits ?? {}).map(([k, v]) => [k, Number(v ?? 0)])
  ) as Record<string, number>;
 
  diagnostics.deviceInfo = {
@@ -184,7 +184,7 @@ export class WebGPUDiagnosticsService {
 
  try {
  console.log('[WEBGPU] Testing compute capability...');
- // Minimal WGSL compute shader$1;$2				@compute @workgroup_size(1)
+ // Minimal WGSL compute shader@compute @workgroup_size(1)
 				fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 				}
 			`;

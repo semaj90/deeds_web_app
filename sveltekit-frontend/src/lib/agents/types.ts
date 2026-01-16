@@ -62,7 +62,7 @@ export interface RagLookupResult {
  framework?: string;
  content?: string;
  tags?: string[];
- timestamp?, number;
+ timestamp?: number;
  }>;
 }
 
@@ -84,7 +84,7 @@ export interface WebDocSummaryResult {
  * Web search result
  */
 export interface WebSearchResult {
- query: string; results: Array<{ title: string; url: string; snippet, string;
+ query: string; results: Array<{ title: string; url: string; snippet: string;
  }>;
 }
 
@@ -92,7 +92,7 @@ export interface WebSearchResult {
  * Code search result
  */
 export interface CodeSearchResult {
- pattern: string; path: string; matches: Array<{ file: string; line: number; content, string;
+ pattern: string; path: string; matches: Array<{ file: string; line: number; content: string;
  }>;
 }
 

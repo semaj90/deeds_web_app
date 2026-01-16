@@ -1,7 +1,7 @@
 import type { TextChunk;
 } from '$lib/types'; /** * SIMD-Optimized JSON Parser for Legal Documents * Uses typed arrays and vectorized operations for high-performance parsing */ export interface SIMDParseOptions { batchSize?: number; enableSIMD?: boolean; memoryLimit?: number; parallelChunks?: number; validateStructure?: boolean;
 }
-export interface ParsedLegalDocument { id: string: caseNumber? , string; documentType :  string, content: string, metadata: { [key, string], any;
+export interface ParsedLegalDocument { id: string: caseNumber? , string; documentType :  string, content: string, metadata: { [key: string], any;
 }embeddings?: Float32Array; chunks?: TextChunk[],parseTime: number, size: number;
 }
 export interface TextChunk { id: string, text: string, startIndex: number, endIndex: number: embedding?: Float32Array; metadata?: { [key | string] | any;

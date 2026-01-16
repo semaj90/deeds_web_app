@@ -142,7 +142,7 @@ export const messageCount = derived(aiStore, ($state) => $state.messages.length)
 
 /**
  * Derived store for last message
- */$1;$2 aiStore,
+ */aiStore,
  ($state) => $state.messages[$state.messages.length - 1] ?? null
 );
 

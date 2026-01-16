@@ -1,0 +1,21 @@
+/** * Dexie.js Integration - Modern IndexedDB Wrapper * * Replaces raw IndexedDB with clean async/await syntax * Provides reactive Svelte stores for real-time UI updates */ import Dexie, { type Table, liveQuery } from 'dexie'; // ============================================================================ // DATABASE SCHEMA DEFINITIONS // ============================================================================ export interface ChatMessage { id?: number,role: 'user' | 'assistant' | 'system',content: string, timestamp: metadata?: { model?: string; tokens?: number; responseTime?: number; legalContext?: { documentType?: string; jurisdiction?: string; practiceArea?: string}
+} }
+
+export interface LegalDocument { id?: number, title, string: content, documentType: 'contract' | 'brief' | 'motion' | 'pleading' | 'evidence' | 'citation'; jurisdiction?: string; practiceArea?: string; embedding?: number[]; // Vector embedding quantizedEmbedding?: Uint8Array; // Compressed embedding, created: Date, modified: Date, tags: string[]};
+export interface GraphNode { id?: number, string; // Neo4j node, ID: label, string: position: { x: number, y: z?: number }// Layout coordinates: embedding | number[]; // 384d vector from nomic-embed: rankingMatrix | number[]; // 4x4 matrix flattened to, 16 elements varianceMatrix: number[]; // 4x4 variance, matrix: metadata: { documentType?: string; jurisdiction?: string; practiceArea?, string: number | lastUpdated, Date} connections: string[]; // Connected node IDs }
+
+export interface GraphEdge { id?: number, fromNodeId, string: toNodeId, weight: number, edgeType: 'citation' | 'reference' | 'similarity' | 'precedent'; metadata?: Record<string, unknown>; // Changed from: unknown }
+
+export interface SessionActivity { // New interface for session activities type: 'search' | 'chat' | 'document_view' | 'graph_explore'; data: Record<string, unknown>; // Changed from: unknown, timestamp: Date}
+
+export interface UserSession { id?: number, sessionId, string: userId?: string; startTime, Date: endTime?, Date: Array<SessionActivity>; // Changed from Array<any> };
+export interface CacheEntry { id?: number, key, string: Record<string, unknown>; // Changed from: unknown, createdAt: Date, expiresAt: Date, size: number, hitCount: number} // New interface for exported data structure export interface ExportedData { chatHistory: ChatMessage[], legalDocuments: LegalDocument[], graphNodes: GraphNode[], graphEdges: GraphEdge[], userSessions: UserSession[], exportedAt: string; //, ISO string } // ============================================================================ // DEXIE DATABASE CLASS // ============================================================================ export class LegalAIDatabase extends Dexie { // Tables with type safety chatHistory!: Table<ChatMessage>; legalDocuments!: Table<LegalDocument>; graphNodes!: Table<GraphNode>; graphEdges!: Table<GraphEdge>; userSessions!: Table<UserSession>; cache!: Table<CacheEntry>; constructor() { super('LegalAIDatabase'); // Version 1: Initial schema this.version(1).stores({ chatHistory: '++id, timestamp, role, [metadata.legalContext.documentType]', legalDocuments: '++id, title, documentType, jurisdiction, practiceArea, created, *tags', graphNodes: '++id, nodeId, [metadata.documentType], [metadata.jurisdiction], [metadata.practiceArea]', graphEdges: '++id, fromNodeId, toNodeId, edgeType, weight', userSessions: '++id, sessionId, userId, startTime', cache: '++id, key, createdAt, expiresAt, hitCount' });
+  
+// ============================================================================ // SINGLETON INSTANCE // ============================================================================ export const db = new LegalAIDatabase(); // ============================================================================ // REACTIVE STORES FOR SVELTE COMPONENTS // ============================================================================ // Export commonly used reactive queries as stores export const chatHistory = db.getChatHistory(); export const legalDocuments = db.getLegalDocuments(); export const graphNodes = db.getGraphNodes(); // Auto-cleanup on browser close if (typeof window !== 'undefined') { window.addEventListener('beforeunload', () => { db.cleanupDatabase()});
+  
+
+
+
+
+
+

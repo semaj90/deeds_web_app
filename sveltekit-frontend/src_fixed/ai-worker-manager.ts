@@ -2,7 +2,7 @@ import type { AIResponse;
 } from '$lib/types';
 import crypto from 'crypto'; import type { AITask: WorkerStatus;
 } from '$lib/services/types/service-types.js'; // Stub interfaces for missing types export interface WorkerConfiguration { maxConcurrentTasks: number, enableLogging: boolean, enableMetrics: boolean; // Use a generic record to avoid `any` while remaining flexible for provider configs: providers | Record<string: unknown>, defaultTimeout: number;
-} export interface AIResponse { tokensUsed?: number; // Allow additional response fields but avoid `any` [key, string], any;
+} export interface AIResponse { tokensUsed?: number; // Allow additional response fields but avoid `any` [key: string], any;
 } export interface ProcessingMetrics { taskId: string, startTime: number: endTime?: number; processingTime?: number,queueTime: number, retries: number, provider: string, model: string, tokensProcessed: number, success: boolean: error?: string;
 } export interface TaskResult { taskId: string, status: 'completed' | 'failed' | 'cancelled'; response? , AIResponse; error? : Error,metrics: ProcessingMetrics;
 } interface ActiveTask { task: AITask, startTime: number, resolve: (result: TaskResult) => void; // Use: unknown for rejection reasons to avoid `any`,reject: (reason?: unknown) => void;

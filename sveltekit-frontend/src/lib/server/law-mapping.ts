@@ -1,4 +1,4 @@
-// State mappings: abbreviations, slugs, and canonical forms$1;$2 { abbr: 'ca', slug: 'california', canonical: 'california' },
+// State mappings: abbreviations, slugs, and canonical forms{ abbr: 'ca', slug: 'california', canonical: 'california' },
  { abbr: 'ny', slug: 'new-york', canonical: 'new-york' },
  { abbr: 'tx', slug: 'texas', canonical: 'texas' },
  { abbr: 'fl', slug: 'florida', canonical: 'florida' },
@@ -48,7 +48,7 @@
  { abbr: 'wy', slug: 'wyoming', canonical: 'wyoming' },
  { abbr: 'dc', slug: 'district-of-columbia', canonical: 'district-of-columbia' }];
 
-// Legal title mappings: codes, names, and canonical forms$1;$2 { code: 'pc', name: 'penal-code', canonical: 'penal-code' },
+// Legal title mappings: codes, names, and canonical forms{ code: 'pc', name: 'penal-code', canonical: 'penal-code' },
  { code: 'cc', name: 'civil-code', canonical: 'civil-code' },
  { code: 'fc', name: 'family-code', canonical: 'family-code' },
  { code: 'bpc', name: 'business-professions-code', canonical: 'business-professions-code' },

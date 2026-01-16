@@ -100,7 +100,7 @@ export interface LegalAIContext {
     };
     metrics: { errorCount: number; performanceScore: number; uptime: number };
   };
-}$1;$2  | { type: 'AUTH.LOGIN'; credentials: { email: string; password: string } }
+}| { type: 'AUTH.LOGIN'; credentials: { email: string; password: string } }
   | { type: 'AUTH.LOGOUT' }
   | { type: 'AUTH.REGISTER'; userData: RegistrationData }
   | { type: 'CASES.LOAD'; filters?: Partial<LegalAIContext['cases']['filters']> }
@@ -144,7 +144,7 @@ const initialContext: LegalAIContext = {
     },
     metrics: { errorCount: 0, performanceScore: 0, uptime: 0 },
   },
-};$1;$2  {
+};{
     id: 'legalAI',
     initial: 'initializing',
     context: initialContext,
@@ -294,7 +294,7 @@ const initialContext: LegalAIContext = {
     // XState v5 expects service factories under `services` in the machine options
     services: {
       checkSystemStatus: fromPromise(async () => {
-        try {$1;$2            productionServiceClient.makeRequest('/api/system/cluster-status', { method: 'GET' }),
+        try {productionServiceClient.makeRequest('/api/system/cluster-status', { method: 'GET' }),
             productionServiceClient.makeRequest('/api/system/service-health', { method: 'GET' }),
           ]);
 
@@ -309,7 +309,7 @@ const initialContext: LegalAIContext = {
           const serviceHealth = (serviceResp.data as LooseObject[] | undefined) ?? [];
 
           const totalServices = (clusterStatus?.totalServices as number) ?? 0;
-          const healthyServices = (clusterStatus?.healthyServices as number) ?? 0;$1;$2            totalServices > 0 ? Math.round((healthyServices / totalServices) * 100) : 0;
+          const healthyServices = (clusterStatus?.healthyServices as number) ?? 0;totalServices > 0 ? Math.round((healthyServices / totalServices) * 100) : 0;
 
           return {
             connected: healthyServices > 0,

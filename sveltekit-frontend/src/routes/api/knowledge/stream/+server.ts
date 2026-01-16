@@ -49,10 +49,9 @@ export const POST: RequestHandler = async ({ request }) => {
 							score: r.score,
 							url: r.url
 						}))
-					});$1;$2						.slice(0, topK)
+					});.slice(0, topK)
 						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r?.summary|| r.content?.slice(0, 500) ?? 'No content'}`)
-						.join('\n\n');$1;$2
-Question: ${query}
+						.join('\n\n');Question: ${query}
 
 Context:
 ${context}

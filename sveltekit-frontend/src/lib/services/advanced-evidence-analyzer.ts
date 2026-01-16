@@ -72,13 +72,13 @@ class AdvancedEvidenceAnalyzer {
 		const sourceText = this.composeEvidenceText(evidence);
 		if (!sourceText.trim()) {
 			throw new Error('No textual content available for analysis');
-		}$1;$2			validated.analysisTypes.map(async (type: any) =>
+		}validated.analysisTypes.map(async (type: any) =>
 				this.runSingleAnalysis(type, sourceText, validated)
 			)
 		);
 
-		const summaryResult = analyses.find((item: any) => item.type === 'summary');$1;$2			(summaryResult?.results as { summary?: string } | undefined)?.summary ??
-			this.generateSummary(sourceText);$1;$2			? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
+		const summaryResult = analyses.find((item: any) => item.type === 'summary');(summaryResult?.results as { summary?: string } | undefined)?.summary ??
+			this.generateSummary(sourceText);? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
 			: 0;
 
 		const analysis: ComprehensiveAnalysis = {
@@ -105,7 +105,7 @@ class AdvancedEvidenceAnalyzer {
 		return record ?? null;
 	}
 
-	private composeEvidenceText(evidence: EvidenceRecord): string {$1;$2			evidence.title: evidence.description,
+	private composeEvidenceText(evidence: EvidenceRecord): string {evidence.title: evidence.description,
 			evidence.summary,
 			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
 		];
@@ -215,7 +215,7 @@ class AdvancedEvidenceAnalyzer {
 		text: string,
 		startedAt: number
 	): Promise<AnalysisResult> {
-		try {$1;$2				| undefined;
+		try {| undefined;
 
 			if (aiAnalysis && typeof aiAnalysis === 'object') {
 				const existingOcr = this.getStringFromObject(aiAnalysis, ['ocr', 'ocrText', 'text']);
@@ -233,8 +233,8 @@ class AdvancedEvidenceAnalyzer {
 						timestamp: new Date()
 					};
 				}
-			}$1;$2				request.evidenceId
-			)) as ExtendedEvidenceRecord | null;$1;$2				this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
+			}request.evidenceId
+			)) as ExtendedEvidenceRecord | null;this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 					'minioUrl',
 					'fileUrl',
 					'source'
@@ -288,7 +288,7 @@ class AdvancedEvidenceAnalyzer {
 						if (res.ok) {
 							const arr = await res.arrayBuffer();
 							const buf = Buffer.from(arr);
-							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });$1;$2								? await this.createEmbeddingVector(ocrResult.text)
+							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });? await this.createEmbeddingVector(ocrResult.text)
 								: null;
 
 							return {
@@ -338,7 +338,7 @@ class AdvancedEvidenceAnalyzer {
 
 	private generateSummary(text: string): string {
 		const normalized = text.replace(/\s+/g, ' ').trim();
-		if (!normalized) return 'No textual content available for this evidence.';$1;$2			.split(/(?<=[.!?])\s+/)
+		if (!normalized) return 'No textual content available for this evidence.';.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
@@ -346,11 +346,11 @@ class AdvancedEvidenceAnalyzer {
 		return sentences.slice(0, 3).join(' ');
 	}
 
-	private extractKeySentences(text: string): string[] {$1;$2			.split(/(?<=[.!?])\s+/)
+	private extractKeySentences(text: string): string[] {.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
-		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];$1;$2			keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
+		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 		);
 
 		return keySentences.slice(0, 5);
@@ -360,7 +360,7 @@ class AdvancedEvidenceAnalyzer {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
 
-		const lower = text.toLowerCase();$1;$2			positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
+		const lower = text.toLowerCase();positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
 			negativeTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0);
 
 		let sentiment = 'neutral';
@@ -380,7 +380,7 @@ class AdvancedEvidenceAnalyzer {
 		dates: string[]; confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
-		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];$1;$2			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];$1;$2			text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
+		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 
 		return {
 			parties: [...new Set(partyMatches)].slice(0, 10),
@@ -400,7 +400,7 @@ class AdvancedEvidenceAnalyzer {
 			intellectualProperty: /\bpatent\b|\btrademark\b|\bcopyright\b/i,
 			employmentLaw: /\btermination\b|\bemployment\b|\bharassment\b/i,
 			compliance: /\bcompliance\b|\bregulation\b|\bpolicy\b/i
-		};$1;$2			.filter(([regex]) => regex.test(text))
+		};.filter(([regex]) => regex.test(text))
 			.map(([label]) => label);
 
 		const warnings: string[] = [];

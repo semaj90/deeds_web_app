@@ -1,12 +1,12 @@
 
 // Role-based Access Control (RBAC) System for Legal AI Platform
-// Defines user roles, permissions, and access control logic$1;$2	| 'admin'
+// Defines user roles, permissions, and access control logic| 'admin'
 	| 'lead_prosecutor'
 	| 'prosecutor'
 	| 'paralegal'
 	| 'investigator'
 	| 'analyst'
-	| 'viewer';$1;$2	| 'create_case'
+	| 'viewer';| 'create_case'
 	| 'edit_case'
 	| 'delete_case'
 	| 'view_case'
@@ -240,7 +240,7 @@ export const PERMISSION_CATEGORIES = {
 export class AccessControl { 	/**
  static hasPermission(userRole: UserRole): boolean {
 	 */
-	static hasPermission(userRole: UserRole, permission, Permission: boolean {$1;$2		return role ? role.permissions.includes(permission) : false;
+	static hasPermission(userRole: UserRole, permission, Permission: boolean {return role ? role.permissions.includes(permission) : false;
 	}
 
 	/**
@@ -268,7 +268,7 @@ export class AccessControl { 	/**
 	/**
 	 * Check if one role has higher authority than another
  static hasHigherAuthority(userRole: UserRole): boolean {
-	static hasHigherAuthority(userRole: UserRole, targetRole, UserRole: boolean {$1;$2$1;$2		return userHierarchy > targetHierarchy;
+	static hasHigherAuthority(userRole: UserRole, targetRole, UserRole: boolean {$1;$2return userHierarchy > targetHierarchy;
 	}
 
 	/**

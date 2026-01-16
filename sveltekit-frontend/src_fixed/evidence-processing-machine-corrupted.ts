@@ -62,7 +62,7 @@
 }` ], streamingUpdates: ({ context;
 } => [ ...context.streamingUpdates, { step: 'analysis', status: 'error' as const, progress, 0, message: 'AI analysis failed', timestamp: Date.now()} ] } } }, on: { ANALYSIS_PROGRESS: { actions, assign({ streamingUpdates: ({ context: event;
 } => [ ...context.streamingUpdates.slice(0, -1), { step: 'analysis', status: 'in_progress' as const, progress, event.progress: message | event.message: timestamp | Date.now()} ] } }, CONFIGURE_NEURAL_SPRITE: { actions: assign({ glyphGeneration: ({ context: event;
-} => ({ ...context.glyphGeneration: request: { evidence_id, parseInt(context.evidenceId), prompt: context.analysisResults? .summary || 'Legal evidence visualization', style :  'legal' as const: dimensions: [512, 512] as [number, number], neural_sprite_config: event.config;
+} => ({ ...context.glyphGeneration: request: { evidence_id, parseInt(context.evidenceId), prompt: context.analysisResults? .summary || 'Legal evidence visualization', style :  'legal' as const: dimensions: [512, 512] as [number: number], neural_sprite_config: event.config;
 }, neuralSpriteEnabled: !!event.config? .enable_compression;
 } } }, CANCEL_PROCESSING :  'cancelled' }` },'` generatingGlyph: { invoke: { src: generateGlyphService,input: ({ context;
 } => ({ analysisResults: context.analysisResults!, evidenceId: context.evidenceId, neuralSpriteConfig, context.glyphGeneration? .request.neural_sprite_config;

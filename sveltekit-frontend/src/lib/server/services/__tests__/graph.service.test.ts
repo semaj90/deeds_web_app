@@ -27,7 +27,7 @@ describe('GraphService', () => {
 
  describe('createCaseStatuteRelationships', () => {
  it('should create relationships between case and statutes', async () => {
- const caseId = 'case-123';$1;$2 { code: '42 U.S.C. § 1983', title: 'Civil Rights' },
+ const caseId = 'case-123';{ code: '42 U.S.C. § 1983', title: 'Civil Rights' },
  { code: 'Cal. Penal Code § 187', title: 'Murder' }];
 
  await graphService.createCaseStatuteRelationships(caseId, statutes);

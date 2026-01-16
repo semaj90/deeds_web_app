@@ -47,7 +47,7 @@ interface NESMemory {
  getDocument(
  documentId: string
  ):
- | (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key, string]: unknown })
+ | (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key: string]: unknown })
  | null;
  getMemoryStats(): {
  documentCount?: number;
@@ -68,7 +68,7 @@ export interface LegalDocument {
  priority: number;
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  confidenceLevel?: number;
- metadata?: { [key, string]: any};
+ metadata?: { [key: string]: any};
  createdAt: Date;
  updatedAt: Date;
 }

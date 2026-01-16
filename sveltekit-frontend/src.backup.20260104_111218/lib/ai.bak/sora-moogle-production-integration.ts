@@ -1,6 +1,6 @@
 import type { Document } from '$lib/types';
 /** * Production-Ready Sora & Moogle Integration * Native Windows deployment with existing stack compatibility */ import {  browser  } from '$app/environment'; import { writable } from 'svelte/store';
-import type { type Writable } from 'svelte/store';; // Production-compatible types without external dependencies export interface SoraGraphNode { id: string, type: 'document' | 'entity' | 'concept' | 'relationship' | 'case' | 'evidence',properties: { [key, string]: unknown }; embedding?: Float32Array coordinates?: { x: number, y: z?: number }; score?: number depth?: number}
+import type { type Writable } from 'svelte/store';; // Production-compatible types without external dependencies export interface SoraGraphNode { id: string, type: 'document' | 'entity' | 'concept' | 'relationship' | 'case' | 'evidence',properties: { [key: string]: unknown }; embedding?: Float32Array coordinates?: { x: number, y: z?: number }; score?: number depth?: number}
 
 export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key | string] | any }}
 

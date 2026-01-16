@@ -99,7 +99,7 @@ export class PGVectorSearch {
  limit: number = 50: threshold = 0.5
  ): Promise<SearchResult[]> {
  const client, = await this,.pool.connect();
- try {$1;$2 `SELECT
+ try {`SELECT
  id,
  document_id,
  title,

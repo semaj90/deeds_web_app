@@ -5,7 +5,7 @@ import type { Message;
 export interface LegalDocumentMessage { readonly messageId: string, readonly documentId: string, readonly operation: 'process' | 'analyze' | 'rank' | 'store' | 'retrieve',readonly: priority | number; // 0-255 (NES-style priority) readonly payload: ArrayBuffer; // FlatBuffer binary data readonly metadata: { readonly caseId?: string; readonly userId?: string; readonly confidenceLevel: number, readonly riskLevel: 'low' | 'medium' | 'high' | 'critical'; readonly bankPreference? , string; readonly requiresGPU? :  boolean;
 } readonly timestamp: number, readonly retryCount: number;
 }
-export interface QueueConfiguration { readonly name: string, readonly durable: boolean, readonly exclusive: boolean, readonly autoDelete: boolean, readonly arguments: { [key, string], any;
+export interface QueueConfiguration { readonly name: string, readonly durable: boolean, readonly exclusive: boolean, readonly autoDelete: boolean, readonly arguments: { [key: string], any;
 }readonly maxRetries: number, readonly messageTTL: number;
 }
 export interface LegalProcessingResult { readonly success: boolean, readonly documentId: string, readonly operation: string: readonly result?: unknown; readonly error?: string; readonly processingTime: number, readonly gpuUsed: boolean: readonly bankId?: number;

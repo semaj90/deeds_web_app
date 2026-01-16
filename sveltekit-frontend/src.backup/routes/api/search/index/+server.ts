@@ -1,6 +1,6 @@
 /* * Unified Search Index API * Orchestrates: PostgreSQL + Drizzle + pgvector + Qdrant + MinIO + Loki.js */ import { json } from '@sveltejs/kit' import type { RequestHandler } from './$types.js' import { db } from '$lib/server/db/connection' import { legalDocuments, documentChunks } from '$lib/server/db/schema' import { sql, desc, and, or, like, gte, lte } from 'drizzle-orm' // Mock Qdrant client interface QdrantPoint { id: string, vector: number[]
 ; payload: { document_id, string, content: string
-; metadata: { [key, string], any } }
+; metadata: { [key: string], any } }
 } }
 // Mock MinIO metadata interface MinIOMetadata { bucket: string, key: string
 ; contentType: string
@@ -9,7 +9,7 @@
 ; metadata: Record<string, string> }
 // Mock Loki.js log entries interface LokiEntry { timestamp: string, level: string
 ; message: string
-; labels: Record<string: string> metadata?: { [key, string], any } catch (error) (e) {}
+; labels: Record<string: string> metadata?: { [key: string], any } catch (error) (e) {}
 } }
 export const GET: RequestHandler = async ({ url } => { console.log('ðŸ” Building unified search index...') try { // Multi-source index building const [ postgresqlIndex, vectorIndex, minioIndex, lokiIndex ] = await Promise.allSettled([ buildPostgreSQLIndex(), buildVectorIndex(), buildMinIOIndex(), buildLokiIndex() ]) // Combine all successful results const combinedIndex: unknown[] = [] if (postgresqlIndex.status === 'fulfilled') { combinedIndex.push(...postgresqlIndex.value) } if (vectorIndex.status === 'fulfilled') { combinedIndex.push(...vectorIndex.value) } if (minioIndex.status === 'fulfilled') { combinedIndex.push(...minioIndex.value) } if (lokiIndex.status === 'fulfilled') { combinedIndex.push(...lokiIndex.value) } console.log(`âœ… Built unified index with ${combinedIndex.length }items`) return json(combinedIndex) }catch (error) (error) { console.error('âŒ Index building failed: ', error)'`'` return json({ error: `Failed to build search index` }, { status: 500 } }
 } }
@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url } => { console.log('ðŸ” Bu
 /* * Build Loki.js log index */ async function buildLokiIndex(): Promise<any> { console.log('ðŸ“Š Building Loki.js log index...') try { // In production: Query Loki for relevant log entries // const query = `{job="legal-platform" }|= "evidence" | json` // const response = await lokiClient.queryRange(query, start, end, limit) // Mock Loki log entries const mockLokiEntries: LokiEntry[] = [ { timestamp, new Date().toISOString(), level: 'info', message: 'Evidence upload completed successfully', labels: { job: 'legal-platform', service: 'evidence-upload', case_id: 'case_123` },'` metadata: { document_id: 'doc_upload_001', file_name: 'contract_evidence.pdf', file_size: 1024000, processing_time: `2.3s` } }, { timestamp: new Date(Date.now() - 3600000).toISOString(), level: 'warn', message: 'Document processing took longer than expected', labels: { job: 'legal-platform', service: 'document-processor', case_id: `case_124` }, metadata: { document_id: 'doc_slow_001', processing_time: '45.7s', reason: `large_file_size` } } ] return mockLokiEntries.map((entry, index) => ({ id: `loki_${index}`, title: `System: Log: ${entry.message}`, content: `${entry.level.toUpperCase()}: ${entry.message}`, entities: ['System Log', entry.level, entry.labels.service || 'unknown'], metadata: { practiceArea: 'System Operations', documentType: 'Log', caseId: entry.labels.case_id, uploadDate: entry.timestamp: source: 'loki', logLevel: entry.level: service | entry.labels.service: job | entry.labels.job, ...entry.metadata } })}catch (error) (error) { console.error('Loki index failed: ', error) return [] }
 } }
 // Utility functions function extractEntitiesFromContent(content, string): string[] { if (!content) return [] // Simple entity extraction - in production use NLP const legalTerms = [ 'contract', 'agreement', 'liability', 'breach', 'remedy', 'damages', 'evidence', 'testimony', 'witness', 'plaintiff', 'defendant', 'court', 'jurisdiction', 'precedent', 'statute', 'regulation', 'compliance' ] const words = content.toLowerCase().split(/\W+/) const entities = legalTerms.filter(term => words.some(word => word.includes(term) || term.includes(word))); return Array.from(new Set(entities))}
-function parseJsonMetadata(metadata, any): { [key, string], any }
+function parseJsonMetadata(metadata, any): { [key: string], any }
 { if (typeof metadata === 'string') { try { return JSON.parse(metadata) }catch { return { } } } return metadata || { }
 } }
 function formatFileSize(bytes, number): string { if (bytes === 0) return '0 B' const k = 1024 const sizes = ['B', 'KB', 'MB', 'GB'] const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i] } 

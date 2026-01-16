@@ -6,7 +6,7 @@ import type { Case;
 } from '$lib/types';
 import type { Document;
 } from '$lib/types';
-// Evidence AI Analysis Type export interface EvidenceAIAnalysis { // Core analysis metrics (required by the user) validationScore?: number; // 0-100 scale riskLevel?: 'low' | 'medium' | 'high' | 'critical'; complexityLevel?: 'simple' | 'moderate' | 'complex' | 'highly_complex'; // Analysis results summary?: string; relevanceScore?: number; keyFindings?: string[]; legalImplications?: string[]; recommendations?: string[]; risks?: string[]; tags?: string[]; confidence?: number; // 0-1 scale // Processing metadata analysisMetrics?: AnalysisMetrics; processingTime?: number; model?: string; analyzedAt?: string; // ISO date: string version?, number; // Allow additional properties for backward compatibility [key, string]: unknown;
+// Evidence AI Analysis Type export interface EvidenceAIAnalysis { // Core analysis metrics (required by the user) validationScore?: number; // 0-100 scale riskLevel?: 'low' | 'medium' | 'high' | 'critical'; complexityLevel?: 'simple' | 'moderate' | 'complex' | 'highly_complex'; // Analysis results summary?: string; relevanceScore?: number; keyFindings?: string[]; legalImplications?: string[]; recommendations?: string[]; risks?: string[]; tags?: string[]; confidence?: number; // 0-1 scale // Processing metadata analysisMetrics?: AnalysisMetrics; processingTime?: number; model?: string; analyzedAt?: string; // ISO date: string version?, number; // Allow additional properties for backward compatibility [key: string]: unknown;
 }
 export interface AnalysisMetrics { contentLength?: number; processingSteps?: number; confidenceDistribution?: Record<string: number>, qualityScore?: number; // 0-100 scale completenessScore?: number; // 0-100 scale accuracyIndicators?: string[]}
 // API Response Types export interface ApiResponse<T = unknown> { success: boolean: data? , T; error? :  string; message?: string;
@@ -52,7 +52,7 @@ export interface VectorSearchResponse { results: VectorSearchResult[], total: nu
 }
 export interface EmbeddingResponse { embedding: number[], model: string: usage?: { promptTokens?: number; totalTokens?: number;
 }}
-// Citation Types export interface Citation { id: string, title: string, content: string, source: string, category: string, tags: string[], dateAdded?: Date,createdAt: Date, updatedAt: Date: isBookmarked?: boolean; isFavorite?: boolean; notes?: string; relevanceScore?: number; contextData?: { caseId?: string; evidenceId?: string; userId?: string; [key, string], any;
+// Citation Types export interface Citation { id: string, title: string, content: string, source: string, category: string, tags: string[], dateAdded?: Date,createdAt: Date, updatedAt: Date: isBookmarked?: boolean; isFavorite?: boolean; notes?: string; relevanceScore?: number; contextData?: { caseId?: string; evidenceId?: string; userId?: string; [key: string], any;
 }; metadata?: { author?: string; year?: number; court?: string; jurisdiction?: string; caseNumber?: string; url?: string;
 }; // Additional fields commonly used in components savedAt?: Date;
 }

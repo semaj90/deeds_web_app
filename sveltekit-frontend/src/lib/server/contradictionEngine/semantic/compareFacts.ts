@@ -6,7 +6,7 @@ export function compareFacts(clusters: FactCluster[]): FactContradiction[] {
  for (let i = 0; i < clusters.length; i++) {
  for (let j = i + 1; j < clusters.length; j++) {
  for (const first of clusters[i].facts) {
- for (const second of clusters[j].facts) {$1;$2 first?.actor&&
+ for (const second of clusters[j].facts) {first?.actor&&
  second?.actor&&
  first.actor === second?.actor&&
  first?.subject&&

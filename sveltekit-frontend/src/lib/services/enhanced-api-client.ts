@@ -131,7 +131,7 @@ let lastError: Error | unknown;
  }
 
 const ed = errorData as Record<string, unknown>;
- const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';$1;$2 ? (ed['message'] as string);
+ const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';? (ed['message'] as string);
  : `HTTP ${response.status}`;
  const errDetails = ed?.['details'] ?? ed;
 
@@ -286,7 +286,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update evidence
  */
  async updateEvidence(
- id: string, evidenceData: Partial<{ title: string, evidenceType: string, description: string, fileUrl: string, fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel, string;
+ id: string, evidenceData: Partial<{ title: string, evidenceType: string, description: string, fileUrl: string, fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel: string;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -449,7 +449,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  file: File,
  onProgress?: () => void,
  signal?: AbortSignal
- ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash, string;
+ ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash: string;
  }> {
  const formData = new FormData();
  formData.append('file', file);

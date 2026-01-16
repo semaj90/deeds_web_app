@@ -14,7 +14,7 @@ export interface CaseEntity extends UserOwnedEntity { id: string, title: string:
 }
 export interface DocumentEntity extends UserOwnedEntity { id: string: caseId? , string; title :  string: filename?: string; fileType?: string; fileSize?: number; content?: string; extractedText?: string; embedding?: number[]; metadata?: DocumentMetadata; tags?: string[],isIndexed: boolean;
 }
-export interface DocumentMetadata { pageCount?: number; extractionMethod?: string; confidence?: number; language?: string; processingTime?: number; chunkCount?: number; avgChunkSize?: number; [key, string], any;
+export interface DocumentMetadata { pageCount?: number; extractionMethod?: string; confidence?: number; language?: string; processingTime?: number; chunkCount?: number; avgChunkSize?: number; [key: string], any;
 }
 // ============================================================================ // AI/ML TYPES // ============================================================================ export interface EmbeddingResult { vector: number[], model: string, dimensions: number, processingTime: number;
 }

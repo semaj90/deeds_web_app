@@ -81,7 +81,7 @@ export async function hybridVectorSearch<T = unknown>(
  }
 
  // Fallback to pgvector: compute cosine distance via SQL fragment
- try {$1;$2 .select()
+ try {.select()
  .from(table as any)
  .orderBy(sql`${column as any} <#> ${sql.array(embedding)}`) // uses pgvector distance operator
  .limit(limit)

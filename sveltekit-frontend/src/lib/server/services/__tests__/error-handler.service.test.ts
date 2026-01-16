@@ -29,7 +29,7 @@ describe('ErrorHandlerService', () => {
  expect(operation).toHaveBeenCalledTimes(1);
  });
 
- it('should retry on transient error', async () => {$1;$2 .fn()
+ it('should retry on transient error', async () => {.fn()
  .mockRejectedValueOnce(new Error('ECONNREFUSED'))
  .mockResolvedValueOnce('success');
 
@@ -72,7 +72,7 @@ describe('ErrorHandlerService', () => {
  describe('executeWithFallback', () => {
  it('should use primary operation on success', async () => {
  const primary = vi.fn().mockResolvedValue('primary');
- const fallback = vi.fn().mockResolvedValue('fallback');$1;$2 primary,
+ const fallback = vi.fn().mockResolvedValue('fallback');primary,
  fallback,
  'test-operation'
  );
@@ -84,7 +84,7 @@ describe('ErrorHandlerService', () => {
 
  it('should use fallback on primary failure', async () => {
  const primary = vi.fn().mockRejectedValue(new Error('primary failed'));
- const fallback = vi.fn().mockResolvedValue('fallback');$1;$2 primary,
+ const fallback = vi.fn().mockResolvedValue('fallback');primary,
  fallback,
  'test-operation'
  );
@@ -106,7 +106,7 @@ describe('ErrorHandlerService', () => {
 
  describe('executeWithTimeout', () => {
  it('should complete within timeout', async () => {
- const operation = vi.fn().mockResolvedValue('success');$1;$2 operation,
+ const operation = vi.fn().mockResolvedValue('success');operation,
  1000,
  'test-operation'
  );
@@ -114,7 +114,7 @@ describe('ErrorHandlerService', () => {
  expect(result).toBe('success');
  });
 
- it('should timeout if operation takes too long', async () => {$1;$2 () => new Promise((resolve) => setTimeout(() => resolve('success'), 2000))
+ it('should timeout if operation takes too long', async () => {() => new Promise((resolve) => setTimeout(() => resolve('success'), 2000))
  );
 
  await expect(
@@ -124,7 +124,7 @@ describe('ErrorHandlerService', () => {
  });
 
  describe('isTransientError', () => {
- it('should identify transient errors', () => {$1;$2 new Error('ECONNREFUSED'),
+ it('should identify transient errors', () => {new Error('ECONNREFUSED'),
  new Error('ECONNRESET'),
  new Error('timeout'),
  new Error('service unavailable')];
@@ -134,7 +134,7 @@ describe('ErrorHandlerService', () => {
  });
  });
 
- it('should not identify permanent errors as transient', () => {$1;$2 new Error('unauthorized'),
+ it('should not identify permanent errors as transient', () => {new Error('unauthorized'),
  new Error('not found'),
  new Error('invalid request')];
 
@@ -145,7 +145,7 @@ describe('ErrorHandlerService', () => {
  });
 
  describe('isPermanentError', () => {
- it('should identify permanent errors', () => {$1;$2 new Error('unauthorized'),
+ it('should identify permanent errors', () => {new Error('unauthorized'),
  new Error('forbidden'),
  new Error('not found'),
  new Error('invalid request')];
@@ -155,7 +155,7 @@ describe('ErrorHandlerService', () => {
  });
  });
 
- it('should not identify transient errors as permanent', () => {$1;$2 new Error('ECONNREFUSED'),
+ it('should not identify transient errors as permanent', () => {new Error('ECONNREFUSED'),
  new Error('timeout'),
  new Error('service unavailable')];
 

@@ -318,9 +318,9 @@ export type Maintenance = ApiContract<MaintenanceRequest, MaintenanceResponse>;
 // ==================== TYPE UTILITY FUNCTIONS ====================
 
 export type RequestOf<T extends ApiContract<unknown, unknown>> = T['request'];
-export type ResponseOf<T extends ApiContract<unknown, unknown>> = T['response'];$1;$2    T['response'] extends StandardApiResponse<infer U> ? U : never;
+export type ResponseOf<T extends ApiContract<unknown, unknown>> = T['response'];T['response'] extends StandardApiResponse<infer U> ? U : never;
 
-// ==================== CLIENT API HELPERS ====================$1;$2    request: RequestOf<T>
+// ==================== CLIENT API HELPERS ====================request: RequestOf<T>
 ) => Promise<ResponseOf<T>>;
 
 export interface ApiEndpoint<T extends ApiContract<unknown, unknown>> {

@@ -55,7 +55,7 @@ describe('YoRHa Cases API Integration', () => {
  expect(result[0].case_number).toBe(mockCase.case_number);
  });
 
- it('should update a case', async () => {$1;$2 .update(yorhaCases)
+ it('should update a case', async () => {.update(yorhaCases)
  .set({
  title: 'Updated Test Case',
  priority: 'critical',
@@ -76,7 +76,7 @@ describe('YoRHa Cases API Integration', () => {
  expect(result.every((c) => c.status === 'active')).toBe(true);
  });
 
- it('should soft delete a case', async () => {$1;$2 .update(yorhaCases)
+ it('should soft delete a case', async () => {.update(yorhaCases)
  .set({
  status: 'archived',
  updated_at: new Date(),

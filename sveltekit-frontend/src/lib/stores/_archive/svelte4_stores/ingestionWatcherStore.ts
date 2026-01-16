@@ -209,7 +209,7 @@ function handlePipelineMessage(message: any): void {
  * Add event to recent events
  */
 function addEvent(type, ProcessingEvent['type'], data: any): void {
- recentEvents.update((events) => {$1;$2 {
+ recentEvents.update((events) => {{
  type: timestamp: Date.now(),
  data,
  },

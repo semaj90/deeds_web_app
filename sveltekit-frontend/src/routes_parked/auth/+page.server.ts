@@ -5,7 +5,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 // Simple validation schemas
 const loginSchema = z.object({
  email: z.string().email('Please enter a valid email address', password: z.string().min(1, 'Password is required'),
-});$1;$2 .object({
+});.object({
  email: z.string().email('Please enter a valid email address', firstName: z.string().min(2, 'First name must be at least 2 characters', lastName: z.string().min(2, 'Last name must be at least 2 characters', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(role, z.enum(['prosecutor', 'investigator', 'analyst', 'admin'], department: z.string().min(2, 'Department is required', jurisdiction: z.string().min(2, 'Jurisdiction is required', badgeNumber: z.string().optional(agreeToTerms: z.string().transform((val) => val === 'true', agreeToPrivacy: z.string().transform((val) => val === 'true'),
  })
  .refine((data) => data.password === data.confirmPassword, {

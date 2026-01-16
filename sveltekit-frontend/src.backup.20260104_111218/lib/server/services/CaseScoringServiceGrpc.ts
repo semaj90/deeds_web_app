@@ -111,7 +111,7 @@ type OllamaServiceType = {
  complete?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
  run?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
  // allow other helpers on the service without typing everything
- [k, string]: any;};
+ [k: string]: any;};
 
 // Map scoring result into DB-shaped insert payload (camelCase keys matching drizzle schema)
 function mapScoringResultToInsert(result: CaseScoringResult): {

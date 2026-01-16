@@ -407,7 +407,7 @@ function startCacheWarming(): void {
 /**
  * Queue common cache warming tasks
  */
-function queueCommonCacheWarming(): void {$1;$2 {
+function queueCommonCacheWarming(): void {{
  id: 'legal-templates',
  type: 'legal_document',
  priority: 10,
@@ -441,7 +441,7 @@ async function processCacheWarmingQueue(): Promise<void> {
  return;
  }
 
- // Get highest priority tasks$1;$2 .sort((a: CacheWarmingTask, b) => b.priority - a.priority)
+ // Get highest priority tasks.sort((a: CacheWarmingTask, b) => b.priority - a.priority)
  .slice(0, maxConcurrent - currentRunning);
 
  for (const task of tasksToProcess) {

@@ -222,7 +222,7 @@ export class StreamingIngestionPipeline {
 
  // Cache operations
  private async getCachedEmbedding(textHash: string): Promise<{ embedding: number[] } | null> {
- try {$1;$2 .select()
+ try {.select()
  .from(embeddingCache512)
  .where(eq(embeddingCache512.textHash, textHash))
  .limit(1);
@@ -302,7 +302,7 @@ export class StreamingIngestionPipeline {
  const cutoffDate = new Date();
  cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
- try {$1;$2 .delete(embeddingCache512)
+ try {.delete(embeddingCache512)
  .where(
  and(
  lt(embeddingCache512.lastAccessed, cutoffDate),

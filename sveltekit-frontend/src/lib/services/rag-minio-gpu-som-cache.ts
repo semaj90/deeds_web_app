@@ -119,7 +119,7 @@ export class RAGMinIOGPUSOMCache {
     let bestY = 0;
 
     for (let i = 0; i < this.gridHeight; i++) {
-      for (let j = 0; j < this.gridWidth; j++) {$1;$2          inputVector: this.somGrid[i][j].weights
+      for (let j = 0; j < this.gridWidth; j++) {inputVector: this.somGrid[i][j].weights
         );
         const distance = 1 - similarity;
         if (distance < bestDistance) {

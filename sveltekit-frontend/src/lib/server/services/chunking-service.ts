@@ -154,7 +154,7 @@ export function chunkFromLangExtract(
   const allChunks: Chunk[] = [];
   let chunkIndex = 0;
 
-  for (const section of sections) {$1;$2      section.text,
+  for (const section of sections) {section.text,
       section.section_type,
       section.section_subtype,
       caseId,

@@ -15,7 +15,7 @@ export type PatchCandidate = {
  ruleId?: string; // "param-colon-drift", "import-type-misuse", etc.
 };
 
-export type ApplyMode = 'off' | 'safe' | 'full';$1;$2 | 'queued'
+export type ApplyMode = 'off' | 'safe' | 'full';| 'queued'
  | 'analyzing'
  | 'proposing'
  | 'applying'
@@ -41,12 +41,12 @@ export type ApplyResult = {
  runId: string; ts: string;
  mode: ApplyMode; applied: Array<{
  file: string; beforeHash: string;
- afterHash, string;
+ afterHash: string;
  }>;
  rejected: Array<{ file: string;
- reason, string;
+ reason: string;
  }>;
-};$1;$2 | { type: 'run.started'; runId: string; ts: number }
+};| { type: 'run.started'; runId: string; ts: number }
  | { type: 'run.progress'; runId: string; step: string; pct: number; ts: number }
  | {
  type: 'run.patch.proposed'; runId: string;

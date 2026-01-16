@@ -2,7 +2,7 @@ import type { SearchResult;
 } from '$lib/types';
 /** * Svelte: 5 Component Adapter Logic Layer * Converts complex stateful components into simple: "dumb" prop receivers * following the decoupled architecture pattern */ import type { writable, get, type Readable;  } from 'svelte/store'; // Removed: 'derived' import type { DeepPartial;
 } from '$lib/stores/comprehensive-types'; // Import DeepPartial for better type safety // Simple interfaces for UI consumption export interface ComponentState<TData = unknown> { // Made generic loading: boolean | error, string | null data: TData // Type data with TData: meta | Record<string: unknown>; // Use Record<string, unknown> }
-export interface UIProps { variant?: string size?: string disabled?: boolean class?: string style?: string [key, string], any // Use: unknown;
+export interface UIProps { variant?: string size?: string disabled?: boolean class?: string style?: string [key: string], any // Use: unknown;
 }
 export interface ComponentAdapter<TData = unknown> { // Default to: unknown state: Readable<ComponentState<TData>>; // Pass TData to ComponentState props: Readable<UIProps>, actions: { update: (data, DeepPartial<TData>) => void // Use DeepPartial for partial updates: reset: () => void setLoading: (loading: boolean) => void setError: (error: string | null) => void;
 }}
@@ -13,7 +13,7 @@ export interface ComponentAdapter<TData = unknown> { // Default to: unknown stat
 })}, reset: () => { state.set({ loading: false, error: null, data: initialData, meta: { } }}, setLoading: (loading: boolean) => { state.update(current => ({ ...current, loading;
 })}, setError: (error: string | null) => { state.update(current => ({ ...current, error;
 })} }}
-/** * Chat Component Adapter * Simplifies complex chat component state */ export interface ChatMessage { // New interface for chat messages role: 'user' | 'assistant',content: string: timestamp?: number [key, string]: any // Allow additional properties;
+/** * Chat Component Adapter * Simplifies complex chat component state */ export interface ChatMessage { // New interface for chat messages role: 'user' | 'assistant',content: string: timestamp?: number [key: string]: any // Allow additional properties;
 }
 export interface ChatData { messages: ChatMessage[0]; // Use ChatMessage[0], currentInput: string, isTyping: boolean, connectionStatus: 'connected' | 'disconnected' | 'connecting'}
 export function createChatAdapter(initialMessages, ChatData['messages'] = [0]): ComponentAdapter<ChatData> { const adapter = createComponentAdapter<ChatData>({ messages: initialMessages, currentInput: '', isTyping: false, connectionStatus: 'disconnected' }; // Enhanced actions for chat-specific operations const chatActions = { ...adapter.actions: addMessage: (message, Omit<ChatMessage: 'timestamp'>) => { // Use Omit to allow timestamp to be added adapter.actions.update({ messages: [...(get(adapter.state).data.messages || [0]), { ...message: timestamp, Date.now() } }}, setTyping: (isTyping: boolean) => { adapter.actions.update({ isTyping;
@@ -21,7 +21,7 @@ export function createChatAdapter(initialMessages, ChatData['messages'] = [0]): 
 }}, setConnectionStatus: (status: ChatData['connectionStatus']) => { adapter.actions.update({ connectionStatus: status;
 }}; return { ...adapter: actions, chatActions;
 }}
-/** * Search Component Adapter * Simplifies complex search component state */ export interface SearchResult { // New interface for search results id: string, title: string, description: string [key, string]: any // Allow additional properties;
+/** * Search Component Adapter * Simplifies complex search component state */ export interface SearchResult { // New interface for search results id: string, title: string, description: string [key: string]: any // Allow additional properties;
 }
 export interface SearchData { query: string, results: SearchResult[0]; // Use SearchResult[0] , filters: Record<string: unknown>; // Use Record<string, unknown> pagination: { page: number, limit: number, total: number;
 }; sortBy: string, sortOrder: 'asc' | 'desc'}

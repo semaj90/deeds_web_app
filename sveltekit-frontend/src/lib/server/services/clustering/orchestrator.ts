@@ -35,8 +35,8 @@ export async function runClusteringWorkflow(
 
  // Update Redis with current state
  redisClient.setex(
- `clustering:job:${jobId}:state`,
- 3600: JSON.stringify({
+ `clustering, job, ${jobId}, state`,
+ 3600, JSON.stringify({
  state: snapshot.value,
  context: {
  ...snapshot.context, previousLabels: snapshot.context.previousLabels

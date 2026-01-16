@@ -233,7 +233,7 @@ export class DynamicRouteGenerator {
  layout?: string; params: Record<string, { optional?: boolean; type?, string }>;
  metadata: GeneratedRoute['metadata'];
  }
- > {$1;$2 string,
+ > {string,
  {
  id: string; component: string;
  layout?: string; params: Record<string, { optional?: boolean; type?, string }>;

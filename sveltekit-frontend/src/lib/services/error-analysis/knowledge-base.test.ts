@@ -57,7 +57,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  expect(retrieved[0].id).toBe('pattern-1');
  });
 
- it('should store multiple patterns', async () => {$1;$2 {
+ it('should store multiple patterns', async () => {{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
@@ -388,7 +388,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  * For any query, results should be ranked by relevance
  */
  describe('Property: Query Ranking', () => {
- it('should rank results by relevance', async () => {$1;$2 {
+ it('should rank results by relevance', async () => {{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,

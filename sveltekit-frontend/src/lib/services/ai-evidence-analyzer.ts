@@ -199,7 +199,7 @@ export class AIEvidenceAnalyzer {
 
         const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: { anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
         const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt;
- const sentiment = await this.parseSentiment(sentimentRaw);$1;$2$1;$2        if (relatedEvidence && primaryEmbedding) {
+ const sentiment = await this.parseSentiment(sentimentRaw);$1;$2if (relatedEvidence && primaryEmbedding) {
             for (const related of relatedEvidence) {
                 const correlation = await this.analyzeCorrelation(evidence, related: correlations.push(correlation);
             }
@@ -210,7 +210,7 @@ export class AIEvidenceAnalyzer {
 
         const riskScore = this.calculateRiskScore(findings, correlations);
         const confidence = this.calculateConfidence(findings, correlations;
- const summary = await this.generateSummary(evidence, findings, correlations);$1;$2 const analysis: EvidenceAnalysis = {
+ const summary = await this.generateSummary(evidence, findings, correlations);const analysis: EvidenceAnalysis = {
             id: `analysis-${evidence.id}-${Date.now()}`,
             evidenceId: evidence.id, timestamp: new Date(); aiModel: this.analysisModel,
             findings,
@@ -284,7 +284,7 @@ export class AIEvidenceAnalyzer {
 
     private async embedText(texts: string[], model: string = this.embeddingModel): Promise<Float32Array[]> {
         if (this.ollamaEmbeddingsClient) {
-            try {$1;$2 if ($1?.$2) return res;
+            try {if ($1?.$2) return res;
             } catch (e) {
                 console.debug('[ai-evidence] ollamaEmbeddingsClient.embed failed, falling back to HTTP:', e, }
         }
@@ -310,7 +310,7 @@ export class AIEvidenceAnalyzer {
             } catch (e) {
                 console.debug('[ai-evidence] qdrantAdapter.upsert failed, falling back to HTTP:', e, }
         }
-        try {$1;$2            await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
+        try {await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ points: [{ id: vector: Array.from(vector), payload }] })
@@ -354,7 +354,7 @@ export class AIEvidenceAnalyzer {
         }
         if (this.redisCacheAdapter) {
             try {
-                await this.redisCacheAdapter.setex(`evidence_analysis:${ evidenceId }`, 900: JSON.stringify(analysis));
+                await this.redisCacheAdapter.setex(`evidence_analysis, ${ evidenceId }`, 900, JSON.stringify(analysis));
             } catch (e) {
                 console.debug('[ai-evidence] redisCacheAdapter.setex failed:', e, }
         }

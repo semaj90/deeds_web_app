@@ -42,7 +42,7 @@ export async function getOllamaEndpoint(
 			throw new Error(`Ollama not responding: ${response.status}`);
 		}
 
-		const data = await response.json();$1;$2			(m: any) => m.name === model || m.name.startsWith(model.split(':')[0])
+		const data = await response.json();(m: any) => m.name === model || m.name.startsWith(model.split(':')[0])
 		);
 
 		if (!modelExists) {

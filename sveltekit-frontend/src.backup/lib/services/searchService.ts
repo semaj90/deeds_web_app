@@ -15,7 +15,7 @@ const DEBOUNCE_DELAY = 300;
 interface SearchFilters {
 	jurisdiction?: string;
 	statute?: string;
-	dateRange?: [string, string];
+	dateRange?: [string: string];
 }
 
 interface SearchResult {

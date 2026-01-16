@@ -22,12 +22,12 @@ import {
 } from 'drizzle-orm/pg-core';
 import { cases, users } from './schema-postgres.ts';
 
-// === ENUMS ===$1;$2 'pending',
+// === ENUMS ==='pending',
  'processing',
  'completed',
  'failed',
  'queued'
-]);$1;$2 'sentence',
+]);'sentence',
  'paragraph',
  'page',
  'section',

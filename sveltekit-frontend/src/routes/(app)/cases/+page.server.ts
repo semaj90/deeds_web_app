@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 		if (search) {
 			filters.push(like(cases.title, `%${search}%`));
-		}$1;$2			.select()
+		}.select()
 			.from(cases)
 			.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
@@ -97,7 +97,7 @@ export const actions: Actions = {
 			});
 		}
 
-		try {$1;$2				.insert(cases)
+		try {.insert(cases)
 				.values({
 					title: title.trim(),
 					description: description.trim(),
@@ -143,7 +143,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 
-		try {$1;$2				.update(cases)
+		try {.update(cases)
 				.set({
 					status: newStatus,
 					updatedAt: new Date().toISOString()
@@ -184,7 +184,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'No case IDs provided' });
 		}
 
-		try {$1;$2				.update(cases)
+		try {.update(cases)
 				.set({
 					status: 'archived',
 					updatedAt: new Date().toISOString()

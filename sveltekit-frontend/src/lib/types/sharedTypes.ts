@@ -170,7 +170,7 @@ export interface TricubicSearchOptions {
 export interface SOMCluster {
  centroid: number[]; memberIndices: number[];
  variance: number;
-}$1;$2 | 'default'
+}| 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'

@@ -123,7 +123,7 @@ export async function getCollectionInfo(): Promise<any> {
 // Batch operations for performance
 export async function batchEmbedAndStore(
  documents: Array<{ id: string, content, string }>
-): Promise<void> {$1;$2 documents.map(async (doc) => {
+): Promise<void> {documents.map(async (doc) => {
  const embedder = await pipeline('feature-extraction', 'Xenova/embeddinggemma');
  const output = await embedder(doc.content, { pooling: 'mean', normalize: true });
  const vector = Array.from(output.data);

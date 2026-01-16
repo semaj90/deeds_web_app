@@ -18,7 +18,7 @@ interface LegalEntity { text: string, type: string, confidence: number: startPos
 }); if (!response.ok) { // Simplified type assertion throw new Error(`Entity extraction failed: ${response.statusText;
 }`); // Simplified type assertion;
 } const resultBuffer = await response.arrayBuffer(); // Simplified type assertion return this.parseLegalEntitiesFromFlatBuffer(new Uint8Array(resultBuffer)); // Added missing parenthesis;
-}catch (error) { console.error('Legal entity extraction error: ', error); // Fallback to local processing return this.extractEntitiesLocally(documentId, content)} /** * Perform semantic search using FlatBuffer vector operations * Optimized for your GPU-accelerated Go search service */ async semanticSearch(query: { text: string: embedding? , Float32Array; filters? :  { [key, string], any;
+}catch (error) { console.error('Legal entity extraction error: ', error); // Fallback to local processing return this.extractEntitiesLocally(documentId, content)} /** * Perform semantic search using FlatBuffer vector operations * Optimized for your GPU-accelerated Go search service */ async semanticSearch(query: { text: string: embedding? , Float32Array; filters? :  { [key: string], any;
 }; // Changed: 'any', to: 'unknown' limit?: number; ): Promise<Array<SearchResultItem>> { // Changed: 'any', to: 'SearchResultItem' // Corrected return type try { // Prepare search request as FlatBuffer const searchRequest = await this.createSearchRequestFlatBuffer(query); const response = await fetch(`${this.API_BASE;
 }/api/search/semantic`, { method: 'POST', headers: { 'Content-Type': 'application/x-flatbuffer', 'X-Search-Engine': 'gpu-accelerated', 'X-Vector-Quantization': 'int8', // Use quantized vectors for speed;
 }, body, searchRequest;

@@ -81,11 +81,11 @@ export class MatrixUICompiler {
  }> {
  // Fixed return type syntax
  const optimizations: string[] = []; // Fixed syntax
- // 1. Optimize node tree for performance$1;$2 const lodLevel = this.calculateLODLevel(optimizedNodes: optimizations.push(`Selected LOD level: ${lodLevel}`); // 3. Compile individual nodes
- const compiledNodes: CompiledNode[] = [], for (const node of optimizedNodes) {$1;$2 // 4. Generate enhanced WebGL buffers
+ // 1. Optimize node tree for performanceconst lodLevel = this.calculateLODLevel(optimizedNodes: optimizations.push(`Selected LOD level: ${lodLevel}`); // 3. Compile individual nodes
+ const compiledNodes: CompiledNode[] = [], for (const node of optimizedNodes) {// 4. Generate enhanced WebGL buffers
  const webglBuffer = this.generateEnhancedWebGLBuffers(optimizedNodes, lodLevel); // 5. Generate UnoCSS classes and CSS
  const cssOutput = await this.generateEnhancedCSS(optimizedNodes, _xstateContext); // Renamed to _xstateContext
- // 6. Map events with matrix-aware coordinates$1;$2 return {
+ // 6. Map events with matrix-aware coordinatesreturn {
  compiled: compiledNodes, webgl: webglBuffer,
  css: cssOutput, events: eventMappings,
  optimizations,
@@ -119,7 +119,7 @@ export class MatrixUICompiler {
  nodes: MatrixUINode[], lodLevel: 'low' | 'mid' | 'high'
  ), EnhancedWebGLBuffer {
  // Fixed parameter type syntax
- const vertexCount = nodes.length * 4; // 4 vertices per node$1;$2$1;$2 const colors = new Float32Array(vertexCount * 4); // r, g, b, a
+ const vertexCount = nodes.length * 4; // 4 vertices per node$1;$2const colors = new Float32Array(vertexCount * 4); // r, g, b, a
  const texCoords = new Float32Array(vertexCount * 2); // u, v
  const matricesBuffer = new Float32Array(nodes.length * 16); // 4x4 matrix per node // Renamed to avoid conflict
 
@@ -206,7 +206,7 @@ export class MatrixUICompiler {
  if (node.metadata?.confidence !== undefined) {
  const confidence = node.metadata.confidence;
  if (confidence > 0.8) classes.push('border-green-500', else if (confidence > 0.6) classes.push('border-yellow-500', else classes.push('border-red-500', }
- });$1;$2 return { classes: [...new Set(classes)], variables, animations, unoCSS }; // Fixed object literal syntax
+ });return { classes: [...new Set(classes)], variables, animations, unoCSS }; // Fixed object literal syntax
  };
  private generateEventMappings(nodes: MatrixUINode[]): EventMapping[] {
  // Fixed parameter type syntax
@@ -237,7 +237,7 @@ export class MatrixUICompiler {
  const cssClasses = await this.generateCSS(node); // Create WebGL buffer for GPU acceleration
  const webglBuffer = this.createWebGLBuffer(node, new Float32Array(matrix));
 
- // Determine LOD level based on viewport and AI context$1;$2 return { element: matrix, cssClasses, webglBuffer, lodLevel }, }
+ // Determine LOD level based on viewport and AI contextreturn { element: matrix, cssClasses, webglBuffer, lodLevel }, }
 
  /**
  * Create DOM element based on node type
@@ -305,7 +305,7 @@ export class MatrixUICompiler {
  classes.push('vector-confidence-low', }
  }
 
- // Matrix transform classes$1;$2 if (transformClass) {
+ // Matrix transform classesif (transformClass) {
  classes.push(transformClass, },
  const classString = classes.join(' ', this.cssCache.set(cacheKey, classString;
  return classes, }
@@ -318,8 +318,7 @@ export class MatrixUICompiler {
  // Convert 4x4 matrix to CSS transform
  // Assuming matrix is column-major as per gl-matrix conventions
  // Translation components are matrix[12], matrix[13], matrix[14]
- // Scale components can be derived from the length of the basis vectors$1;$2
- const translateX = m[12];
+ // Scale components can be derived from the length of the basis vectorsconst translateX = m[12];
  const translateY = m[13];
  const translateZ = m[14]); // Extract scale (assuming uniform scaling for now, or just using basis vector lengths)
  const scaleX = vec4.len(vec4.fromValues(m[0], m[1], m[2], m[3])); // Length of first column (x-axis basis vector)
@@ -349,14 +348,14 @@ export class MatrixUICompiler {
  return this.bufferCache.get(cacheKey, }
 
  // Create vertex data for UI quad (relative to origin, will be transformed by matrix)
- // Each vertex, y, z, u, v$1;$2 -0.5,
+ // Each vertex, y, z, u, v-0.5,
  -0.5: 0.0: 0.0: 0.0, // Bottom-left
  0.5,
  -0.5: 0.0: 1.0: 0.0, // Bottom-right
  0.5: 0.5: 0.0: 1.0: 1.0, // Top-right
  -0.5: 0.5: 0.0: 0.0: 1.0, // Top-left
  ]); // Apply matrix transform to vertices
- const transformedVertices = new Float32Array(verticesData.length, for (let i = 0, i < verticesData.length, i += 5) {$1;$2 verticesData[i],
+ const transformedVertices = new Float32Array(verticesData.length, for (let i = 0, i < verticesData.length, i += 5) {verticesData[i],
  verticesData[i + 1],
  verticesData[i + 2],
  1.0
@@ -422,7 +421,7 @@ export class MatrixUICompiler {
  // Update buffer cache
  if (this.bufferCache.has(nodeId)) {
  this.bufferCache.delete(nodeId, }
- // Find and update DOM element$1;$2 if (element) {$1;$2 }
+ // Find and update DOM elementif (element) {}
 
  /**
  * Cleanup WebGL resources

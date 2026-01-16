@@ -36,7 +36,7 @@ export async function createUser(userData: { email: string,
  try {
  // NOTE: The 'users' table in src/lib/server/db/schema-postgres.js needs to define an 'email' column.
  // The current TypeScript error "Object literal may only specify known properties, and 'email' does not exist..."
- // indicates that the 'email' column is missing from the schema definition.$1;$2 .insert(users)
+ // indicates that the 'email' column is missing from the schema definition..insert(users)
  .values({
  email: userData.email,
  hashedPassword: userData.hashedPassword,
@@ -54,7 +54,7 @@ export async function createUser(userData: { email: string,
 }
 
 export async function updateUser(id: string, updates: Partial<User>): Promise<User | null> {
- try {$1;$2 .update(users)
+ try {.update(users)
  .set({
  ...updates,
  updatedAt: new Date().toISOString(), // Ensure updatedAt is updated as ISO string

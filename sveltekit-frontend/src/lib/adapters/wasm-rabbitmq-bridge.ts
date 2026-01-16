@@ -69,7 +69,7 @@ export function createWASMHandler(
 /**
  * Determine if a message should use WASM acceleration
  */
-function shouldUseWASM(message: unknown): boolean {$1;$2    'embeddings',
+function shouldUseWASM(message: unknown): boolean {'embeddings',
     'vectors',
     'similarity',
     'tensor',
@@ -96,6 +96,7 @@ async function enhanceMessageWithWASM(
     tensorCompression?: boolean;
   }
 ): Promise<Record<string, unknown>> {
+    // TODO: ACE: Async function without await (check if async is needed)
   if (!wasmModule || !wasmReady) return message as Record<string, unknown>;
 
   const enhanced = { ...(message as Record<string, unknown>) };
@@ -109,7 +110,7 @@ async function enhanceMessageWithWASM(
       const length = embeddings.length;
 
       const inputPtr = (wasmModule.instance.exports.__new as (size: number, id: number) => number)(length * 4, 0);
-      floatView.set(embeddings, inputPtr / 4);$1;$2        inputPtr,
+      floatView.set(embeddings, inputPtr / 4);inputPtr,
         length
       );
 
@@ -140,6 +141,7 @@ export async function computeVectorSimilarityWASM(
   targetVectors: number[][],
   algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan' = 'cosine'
 ): Promise<number[]> {
+    // TODO: ACE: Async function without await (check if async is needed)
   if (!wasmModule || !wasmReady) {
     throw new Error('WASM module not ready for similarity computation');
   }
@@ -153,7 +155,7 @@ export async function computeVectorSimilarityWASM(
   const algorithmMap: Record<string, number> = { cosine: 0, euclidean: 1, dot: 2, manhattan: 3 };
 
   try {
-    const queryPtr = (wasmModule.instance.exports.__new as (size: number, id: number) => number)(vectorDim * 4, 0);$1;$2      vectorCount * vectorDim * 4,
+    const queryPtr = (wasmModule.instance.exports.__new as (size: number, id: number) => number)(vectorDim * 4, 0);vectorCount * vectorDim * 4,
       0
     );
     const resultsPtr = (wasmModule.instance.exports.__new as (size: number, id: number) => number)(vectorCount * 4, 0);
@@ -193,7 +195,7 @@ export async function computeVectorSimilarityWASM(
  * Register WASM-accelerated handlers with RabbitMQ worker
  */
 export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): void {
-  console.log('🚀 Registering WASM-accelerated RabbitMQ handlers...');$1;$2    async (message: unknown) => {
+  console.log('🚀 Registering WASM-accelerated RabbitMQ handlers...');async (message: unknown) => {
       const msg = message as Record<string, unknown>;
       console.log(`🔨 WASM-accelerated embedding generation: ${msg.documentId}`);
       if (msg._wasmProcessed) {
@@ -207,10 +209,10 @@ export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): 
     },
     { batchNormalization, true }
   );
-  worker.registerHandler('legal.chunks.embed', vectorEmbeddingHandler);$1;$2    async (message: unknown) => {
+  worker.registerHandler('legal.chunks.embed', vectorEmbeddingHandler);async (message: unknown) => {
       const msg = message as Record<string, unknown>;
       console.log(`🔍 WASM-accelerated similarity search: ${msg?.queryId?? 'unknown'}`);
-      if (msg?.queryVector&& msg.candidateVectors) {$1;$2          msg.queryVector as number[],
+      if (msg?.queryVector&& msg.candidateVectors) {msg.queryVector as number[],
           msg.candidateVectors as number[][],
           (msg.algorithm as 'cosine' | 'euclidean' | 'dot' | 'manhattan') ?? 'cosine'
         );

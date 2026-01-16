@@ -22,7 +22,7 @@ export interface SearchResult {
 }
 
 export interface SearchMatch {
- indices: [number, number][];
+ indices: [number: number][];
  key: string;
  value: string;
 }

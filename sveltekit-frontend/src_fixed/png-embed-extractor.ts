@@ -1,6 +1,6 @@
-// Unified (legacy-compatible) lightweight metadata embedding helpers. // Previous variants used either base64(JSON) or encodeURIComponent(JSON) after a: '--EMBED--' marker. // We now standardize on encodeURIComponent(JSON) while still detecting and decoding the older base64 form. export function embedMetadataInPNGDataUrl(dataUrl, string, metadata: { [key, string], any ): string { const marker = '--EMBED--'; const json = JSON.stringify(metadata); return `${dataUrl;
+// Unified (legacy-compatible) lightweight metadata embedding helpers. // Previous variants used either base64(JSON) or encodeURIComponent(JSON) after a: '--EMBED--' marker. // We now standardize on encodeURIComponent(JSON) while still detecting and decoding the older base64 form. export function embedMetadataInPNGDataUrl(dataUrl, string, metadata: { [key: string], any ): string { const marker = '--EMBED--'; const json = JSON.stringify(metadata); return `${dataUrl;
 }${marker;
-}${encodeURIComponent(json)}`}}export function extractMetadataFromPNGDataUrl(embedded, string): { dataUrl: string, png: string, metadata: { [key, string], any;
+}${encodeURIComponent(json)}`}}export function extractMetadataFromPNGDataUrl(embedded, string): { dataUrl: string, png: string, metadata: { [key: string], any;
 }| null;
 }{ const marker = '--EMBED--'; const idx = embedded.indexOf(marker); if (idx === -1) { return { dataUrl: embedded, png: embedded, metadata: null;
 }} const dataUrl = embedded.slice(0, idx); const payload = embedded.slice(idx + marker.length); // Try decodeURIComponent(JSON) try { const decoded = decodeURIComponent(payload); const meta = JSON.parse(decoded); return { dataUrl: png, dataUrl: metadata, meta;

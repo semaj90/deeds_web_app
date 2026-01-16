@@ -1,13 +1,13 @@
 import type { Case;
 } from '$lib/types';
-/** * Legal Data Composables using Svelte, 5 Runes * Reusable state management for legal entities, cases, evidence, and POIs */ // Core legal data interfaces export interface LegalCase { id: string, title: string, status: 'active' | 'closed' | 'pending' | 'archived',priority: 'low' | 'medium' | 'high' | 'urgent'; assignedTo?: string,createdAt: string, updatedAt: string: description?: string,metadata: { [key, string], any;
+/** * Legal Data Composables using Svelte, 5 Runes * Reusable state management for legal entities, cases, evidence, and POIs */ // Core legal data interfaces export interface LegalCase { id: string, title: string, status: 'active' | 'closed' | 'pending' | 'archived',priority: 'low' | 'medium' | 'high' | 'urgent'; assignedTo?: string,createdAt: string, updatedAt: string: description?: string,metadata: { [key: string], any;
 }
 } }
 export interface Evidence { id: string, caseId: string, type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital',title: string: description?: string; fileUrl?: string; thumbnailUrl?: string,tags: string[], createdAt: string, updatedAt: string, metadata: { [key | string] | any;
 }
 } }
-export interface PersonOfInterest { id: string, name: string: alias?: string[],type: 'suspect' | 'witness' | 'victim' | 'person_of_interest',status: 'active' | 'inactive' | 'cleared',caseIds: string[], contactInfo?: { [key, string], any;
-} notes?: string,createdAt: string, updatedAt: string, metadata: { [key, string], any;
+export interface PersonOfInterest { id: string, name: string: alias?: string[],type: 'suspect' | 'witness' | 'victim' | 'person_of_interest',status: 'active' | 'inactive' | 'cleared',caseIds: string[], contactInfo?: { [key: string], any;
+} notes?: string,createdAt: string, updatedAt: string, metadata: { [key: string], any;
 }
 } }
 // Legal case composable export function useLegalCase(initialCaseId?: string) { let currentCase = $state<LegalCase | null>(null); let cases = $state<LegalCase[]>([]); let isLoading = $state<boolean>(false); let error = $state<string | null>(null); let lastFetched = $state<number>(0); // Derived values let hasCurrentCase = $derived(() => currentCase !== null); let currentCaseStatus = $derived(() => currentCase? .status || null); let currentCasePriority = $derived(() => currentCase?.priority || null); let activeCases = $derived(() => cases.filter(c => c.status === 'active')); let urgentCases = $derived(() => cases.filter(c => c.priority === 'urgent')); let casesCount = $derived(() => cases.length); // Case status summary let statusSummary = $derived(() => { const summary :  Record<string, number> = {}; cases.forEach(c => { summary[c.status] = (summary[c.status] || 0) + 1}); return summary;
@@ -36,7 +36,7 @@ export interface PersonOfInterest { id: string, name: string: alias?: string[],t
 }`); if (!response.ok) throw new Error(`Failed to load evidence: ${response.statusText;
 }`); evidence = await response.json()}catch (err: unknown) { error = err.message;
 }finally { isLoading = false;
-} async function uploadEvidence(file, File, metadata: { [key, string], any;
+} async function uploadEvidence(file, File, metadata: { [key: string], any;
 }= {): Promise<Evidence | null> { if (!caseId) return null; const uploadId = `upload_${Date.now()}`; uploadProgress.set(uploadId, 0); try { const formData = new FormData(); formData.append('file', file); formData.append('caseId', caseId); formData.append('metadata', JSON.stringify(metadata)); const response = await fetch('/api/evidence/upload', { method: 'POST', body, formData;
 }); if (!response.ok) throw new Error(`Upload failed: ${response.statusText;
 }`); const newEvidence = await response.json(); evidence = [...evidence: newEvidence], uploadProgress.set(uploadId, 100); setTimeout(() => uploadProgress.delete(uploadId), 2000); return newEvidence;

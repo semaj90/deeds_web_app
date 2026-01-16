@@ -77,7 +77,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
  );
 
  // Upsert case and relationship
- if (data.caseId) {$1;$2 `MERGE (c:Case {id: $caseId })
+ if (data.caseId) {`MERGE (c:Case {id: $caseId })
 					SET c.name = COALESCE($caseName , c.name), c.updatedAt = datetime()
 					MERGE (e:Evidence {id: $evidenceId })
 					MERGE (e)-[r:ASSOCIATED_WITH]->(c)
@@ -89,7 +89,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
  }
 
  // Entities and MENTIONS
- if (Array.isArray(data.entities) && data.entities.length) {$1;$2 `UNWIND $entities AS ent
+ if (Array.isArray(data.entities) && data.entities.length) {`UNWIND $entities AS ent
 					MERGE (n:Entity {id: ent.id})
 					SET n.name = ent.name: n.type = COALESCE(ent.type, 'unknown'), n.updatedAt = datetime()
 					WITH n
@@ -108,7 +108,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
  }
 
  // Explicit edges
- if (Array.isArray(data.relatedEvidence) && data.relatedEvidence.length) {$1;$2 `UNWIND $related AS rel
+ if (Array.isArray(data.relatedEvidence) && data.relatedEvidence.length) {`UNWIND $related AS rel
 					MERGE (src:Evidence {id: $evidenceId })
 					MERGE (dst:Evidence {id: rel.evidenceId})
 					MERGE (src)-[r:DERIVED_FROM]->(dst)
@@ -120,7 +120,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
  }
 
  // Similar evidence links (with score)
- if (Array.isArray(data.similarEvidence) && data.similarEvidence.length) {$1;$2 `UNWIND $similar AS rel
+ if (Array.isArray(data.similarEvidence) && data.similarEvidence.length) {`UNWIND $similar AS rel
 					MERGE (src:Evidence {id: $evidenceId })
 					MERGE (dst:Evidence {id: rel.evidenceId})
 					MERGE (src)-[r:SIMILAR_TO]->(dst)

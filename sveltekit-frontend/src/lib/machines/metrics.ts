@@ -9,7 +9,7 @@ export interface MetricsContext {
  metrics: any | null;
  error: string | null;
  retryCount: number; maxRetries: number;
-}$1;$2 | { type: 'FETCH' }
+}| { type: 'FETCH' }
  | { type: 'FETCH_SUCCESS'; data: any }
  | { type: 'FETCH_ERROR'; error: string }
  | { type: 'RETRY' }
@@ -17,7 +17,7 @@ export interface MetricsContext {
 
 /**
  * Create metrics state machine
- */$1;$2 createMachine<MetricsContext, MetricsEvent>(
+ */createMachine<MetricsContext, MetricsEvent>(
  {
  id: 'metrics',
  initial: 'idle',

@@ -82,7 +82,7 @@ export class VerificationService {
  */
  async checkSourceVerification(sourceUrl: string): Promise<SourceCheckResult> {
  try {
- // Check cache first$1;$2 .select()
+ // Check cache first.select()
  .from(sourceVerification)
  .where(eq(sourceVerification.sourceUrl, sourceUrl))
  .limit(1);
@@ -236,7 +236,7 @@ Use only for context, not charging authority.`;
  * Check if citation requires verification
  */
  async requiresVerification(citationId: string): Promise<boolean> {
- try {$1;$2 .select()
+ try {.select()
  .from(citationMetadata)
  .where(eq(citationMetadata.citationId, citationId))
  .limit(1);
@@ -258,7 +258,7 @@ Use only for context, not charging authority.`;
  validateAIResponse(response: string): { valid: boolean; violations: string[] } {
  const violations: string[] = [];
 
- // Check for prohibited language$1;$2 /should\s+be\s+convicted/i,
+ // Check for prohibited language/should\s+be\s+convicted/i,
  /defendant\s+is\s+guilty/i,
  /obvious\s+violation/i,
  /clearly\s+violated/i,

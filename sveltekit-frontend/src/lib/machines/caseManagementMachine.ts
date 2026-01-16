@@ -34,7 +34,7 @@ export interface CaseManagementContext {
 	userId: string;
 }
 
-// Machine Events$1;$2	| { type: 'LOAD_CASE'; caseId: string }
+// Machine Events| { type: 'LOAD_CASE'; caseId: string }
 	| { type: 'CREATE_CASE'; caseData: Omit<CaseData, 'id' | 'createdAt' | 'updatedAt'> }
 	| { type: 'UPDATE_CASE'; caseId: string; updates: Partial<CaseData> }
 	| { type: 'DELETE_CASE'; caseId: string }

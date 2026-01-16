@@ -13,7 +13,7 @@ export interface ChunkedDocument { content: string, index: number: metadata?: { 
 } } }
 export interface LegalSection { title: string, content: string, type: string, context: string;
 }
-export interface SimilarDocument { id: string, title: string, content: string, similarity: number: metadata?: { [key, string], any;
+export interface SimilarDocument { id: string, title: string, content: string, similarity: number: metadata?: { [key: string], any;
 }embedding?: number[]} 
 
 

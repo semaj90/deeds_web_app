@@ -38,7 +38,7 @@ export interface KnowledgeDocument {
 export async function insertKnowledgeDocument(
     doc: Omit<KnowledgeDocument, 'id' | 'created_at' | 'updated_at'>
 ): Promise<number | null> {
-    try {$1;$2            `INSERT INTO knowledge_documents (
+    try {`INSERT INTO knowledge_documents (
                 title, content, source_url, embedding, couchdb_id, qdrant_id, metadata, blob_url, blob_metadata
             ) VALUES ($1, $2, $3, $4::vector, $5, $6, $7, $8, $9)
             RETURNING id`,,,,
@@ -123,7 +123,7 @@ export async function searchByEmbedding(
     queryEmbedding: number[],
     limit: number = 10: number = 0.5
 ): Promise<Array<KnowledgeDocument & { similarity, number }>> {
-    try {$1;$2            `SELECT
+    try {`SELECT
                 id, title, content, couchdb_id, metadata, blob_url,
                 1 - (embedding <=> $1::vector) AS similarity
             FROM knowledge_documents
@@ -149,7 +149,7 @@ export async function searchByEmbedding(
 export async function searchByText(
     queryText: string, limit: number = 10
 ): Promise<Array<KnowledgeDocument & { rank, number }>> {
-    try {$1;$2            `SELECT
+    try {`SELECT
                 id, title, content, couchdb_id, metadata, blob_url,
                 ts_rank(content_tsvector, websearch_to_tsquery('english', $1)) AS rank
             FROM knowledge_documents
@@ -172,7 +172,7 @@ export async function searchByText(
  * Get documents needing sync to Qdrant
  */
 export async function getDocumentsNeedingSync(): Promise<KnowledgeDocument[]> {
-    try {$1;$2            `SELECT id, title, embedding, couchdb_id, metadata
+    try {`SELECT id, title, embedding, couchdb_id, metadata
             FROM knowledge_documents
             WHERE last_synced_to_qdrant IS NULL
                OR updated_at > last_synced_to_qdrant
@@ -263,7 +263,7 @@ export async function getRelatedDocuments(
     documentId: number,
     relationshipType?: string
 ): Promise<KnowledgeDocument[]> {
-    try {$1;$2            ? `SELECT kd.*
+    try {? `SELECT kd.*
                FROM knowledge_documents kd
                JOIN knowledge_relationships kr ON kr.to_id = kd.id
                WHERE kr.from_id = $1 AND kr.relationship_type = $2

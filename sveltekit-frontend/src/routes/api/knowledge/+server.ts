@@ -255,12 +255,11 @@ export const PATCH: RequestHandler = async ({ request }) => {
       vector: queryEmbedding,
       limit: max_context_chunks,
       score_threshold: 0.6
-    });$1;$2      .map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
-      .join('\n\n');$1;$2      ? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
+    });.map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
+      .join('\n\n');? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
       : 0;
 
-    // 2. Build augmented prompt$1;$2
-KNOWLEDGE BASE CONTEXT:
+    // 2. Build augmented promptKNOWLEDGE BASE CONTEXT:
 ${context ?? 'No matching documents found in knowledge base.'}
 
 ---
@@ -277,7 +276,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
     let llmUsed = '';
 
     if (use_gemini && GEMINI_API_KEY) {
-      llmUsed = 'gemini-2.0-flash-exp';$1;$2        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+      llmUsed = 'gemini-2.0-flash-exp';`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

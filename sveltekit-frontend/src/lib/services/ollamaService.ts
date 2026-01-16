@@ -32,9 +32,22 @@ type HealthCheckResult = {
 	model: string[];
 };
 
-import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';$1;$2	typeof env?.PUBLIC_OLLAMA_API_URL === 'string' && env?.PUBLIC_OLLAMA_API_URL?.length > 0
+import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
+
+/**
+ * TODO: Phase 103.1+ - Migrate to TensorRT-LLM + Triton Inference Server
+ * - PTX/CUDA kernel integration for GPU-accelerated inference
+ * - Triton Inference Server for multi-model serving
+ * - FlatBuffer gRPC for binary serialization (eliminate JSON overhead)
+ * - SvelteKit 2.0 migration with RPC endpoints + graceful JSON API fallbacks
+ * - QUIC/HTTP3 + Caddy hosting for production deployment
+ */
+const envFallback =
+	typeof env?.PUBLIC_OLLAMA_API_URL === 'string' && env?.PUBLIC_OLLAMA_API_URL?.length > 0
 		? env?.PUBLIC_OLLAMA_API_URL
-		: DEFAULT_OLLAMA;$1;$2	typeof process !== 'undefined' && !!(process && (process as any)?.versions?.node);
+		: DEFAULT_OLLAMA;
+const isNode =
+	typeof process !== 'undefined' && !!(process && (process as any)?.versions?.node);
 
 export class OllamaService {
 	baseUrl: string;

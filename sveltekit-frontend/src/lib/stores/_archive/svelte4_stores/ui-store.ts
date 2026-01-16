@@ -141,12 +141,12 @@ export function createUIStore() {
  const searchResults = writable<any[]>([]);
  const isSearching = writable(false);
 
- // Derived stores$1;$2 $files.filter((f) => f.status === 'uploading')
- );$1;$2 $files.filter((f) => f.status === 'analyzed')
- );$1;$2 [typewriterPrompts, currentPromptIndex],
+ // Derived stores$files.filter((f) => f.status === 'uploading')
+ );$files.filter((f) => f.status === 'analyzed')
+ );[typewriterPrompts, currentPromptIndex],
  ([$prompts, $index]) => $prompts[$index]
- );$1;$2 $scenes.filter((s) => !s.validated)
- );$1;$2 $scenes.find((s) => s.id === $id)
+ );$scenes.filter((s) => !s.validated)
+ );$scenes.find((s) => s.id === $id)
  );
 
  // ============================================

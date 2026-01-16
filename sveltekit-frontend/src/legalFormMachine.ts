@@ -20,7 +20,7 @@ export interface LegalFormContext {
 
 	// Progress tracking
 	confidence: number; currentStep: number; totalSteps: number; validationErrors: Record<string, string>;
-}$1;$2	| { type: 'NEXT' }
+}| { type: 'NEXT' }
 	| { type: 'BACK' }
 	| { type: 'SUBMIT' }
 	| { type: 'UPLOAD_EVIDENCE'; files: File[] }
@@ -86,7 +86,7 @@ export const legalFormMachine = setup({
 				suggestedHelp: 'Upload evidence files to begin case analysis'
 			},
 			on: { UPLOAD_EVIDENCE: { actions: assign({ evidenceFiles: ({ event }) => event.files,
-						confidence: ({ context, event }) => {$1;$2								(f: any) =>
+						confidence: ({ context, event }) => {(f: any) =>
 									f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
 							);
 							return hasDigitalEvidence

@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	}
 
 	try {
-		// 1. Get route health statistics$1;$2			.select({
+		// 1. Get route health statistics.select({
 				total: sql<number>`COUNT(*)::int`,
 				healthy: sql<number>`COUNT(*) FILTER (WHERE status = 'healthy')::int`,
 				degraded: sql<number>`COUNT(*) FILTER (WHERE status = 'degraded')::int`,
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.from(routeMetadata)
 			.execute();
 
-		// 2. Get critical routes (top 10 by priority)$1;$2			.select({
+		// 2. Get critical routes (top 10 by priority).select({
 				id: routeMetadata.id,
 				path: routeMetadata.path,
 				kind: routeMetadata.kind,
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.orderBy(desc(routeMetadata.priority))
 			.limit(10);
 
-		// 3. Get AI suggestions with their associated routes$1;$2			.select({
+		// 3. Get AI suggestions with their associated routes.select({
 				id: errorSuggestionsTable.id,
 				routePath: errorSuggestionsTable.routePath,
 				summary: errorSuggestionsTable.summary,
@@ -58,7 +58,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.orderBy(desc(errorSuggestionsTable.createdAt))
 			.limit(20);
 
-		// 4. Get suggestion quality statistics$1;$2			.select({
+		// 4. Get suggestion quality statistics.select({
 				total: sql<number>`COUNT(*)::int`,
 				complete: sql<number>`COUNT(*) FILTER (WHERE LENGTH(patch) >= 100 AND patch NOT LIKE '%See error messages%')::int`,
 				incomplete: sql<number>`COUNT(*) FILTER (WHERE LENGTH(patch) < 100)::int`,
@@ -71,7 +71,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.from(errorSuggestionsTable)
 			.execute();
 
-		// 5. Get error cluster statistics$1;$2			.select({
+		// 5. Get error cluster statistics.select({
 				total: sql<number>`COUNT(*)::int`,
 				active: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NULL)::int`,
 				resolved: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NOT NULL)::int`

@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
   const topK = parseInt(url.searchParams.get('topK') ?? '5');
 
   try {
-    // Get node and its embedding$1;$2      SELECT id, kind, label, embedding FROM kg_nodes WHERE id = ${id}
+    // Get node and its embeddingSELECT id, kind, label, embedding FROM kg_nodes WHERE id = ${id}
     `;
 
     if (!node) {
@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       return json({ error: 'Node has no embedding', results: [] });
     }
 
-    // Find similar nodes using cosine distance$1;$2      SELECT
+    // Find similar nodes using cosine distanceSELECT
         id,
         kind,
         label,

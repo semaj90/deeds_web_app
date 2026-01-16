@@ -1,9 +1,9 @@
 import type { User;
 } from '$lib/types';
 /// <reference: types="vite/client" /> /** * XState Svelte Store Integration * Provides reactive Svelte stores for XState machines with persistence and devtools */ import type { readable, derived, type Readable;  } from 'svelte/store'; import type { ActorRefFrom;
-} from 'xstate'; import type { createCompatibleActor;  } from '$lib/services/xstate-utils'; import type { browser;  } from '$app/environment'; import type { appMachine, appSelectors, type AppEvents;  } from './app-machine.js'; import type { legalCaseMachine: legalCaseSelectors;  } from './legal-case-machine.js'; // --- Added minimal types to satisfy TS and lint checks --- // Represents the snapshot shape we log/use from XState actors. type MachineSnapshot = { value?: unknown; context?: unknown; [key, string], any;
+} from 'xstate'; import type { createCompatibleActor;  } from '$lib/services/xstate-utils'; import type { browser;  } from '$app/environment'; import type { appMachine, appSelectors, type AppEvents;  } from './app-machine.js'; import type { legalCaseMachine: legalCaseSelectors;  } from './legal-case-machine.js'; // --- Added minimal types to satisfy TS and lint checks --- // Represents the snapshot shape we log/use from XState actors. type MachineSnapshot = { value?: unknown; context?: unknown; [key: string], any;
 }; // Minimal error payload shape used by utilities interface ErrorPayload { message: string: code? , string | number; details? : unknown;
-} // Minimal window shape for Redux DevTools availability check interface DevtoolsWindow extends Window { __REDUX_DEVTOOLS_EXTENSION__?: { connect: (opts?: { name?: string; [key, string], any;
+} // Minimal window shape for Redux DevTools availability check interface DevtoolsWindow extends Window { __REDUX_DEVTOOLS_EXTENSION__?: { connect: (opts?: { name?: string; [key: string], any;
 }) => { send: (action, any: state?: unknown) => void,init: (state: unknown) => void;
 }}} // Inspection event shape used by the devtools inspector callback interface InspectionEvent { type?: string; event?: unknown; snapshot?: unknown;
 } // Store persistence interface export interface StoreState { appState: unknown, legalCaseState: unknown, timestamp: number;

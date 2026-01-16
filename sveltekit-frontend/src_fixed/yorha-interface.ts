@@ -26,7 +26,7 @@ export interface PointLight { position: Vector3D, color: string, intensity: numb
 }
 export interface CameraConfig { position: Vector3D, target: Vector3D, field_of_view: number, near_plane: number, far_plane: number, auto_rotate: boolean;
 }
-// Visual Effects Types export interface VisualEffect { type: EffectType, enabled: boolean, intensity: number, parameters: { [key, string], any;
+// Visual Effects Types export interface VisualEffect { type: EffectType, enabled: boolean, intensity: number, parameters: { [key: string], any;
 }}
 export type EffectType = | 'scanlines' | 'glitch' | 'hologram_flicker' | 'chromatic_aberration' | 'bloom' | 'distortion' | 'particle_system' | 'data_streams'; export interface ParticleSystem { particle_count: number, spawn_rate: number, lifetime: number, velocity: Vector3D, size: number, color: string, opacity: number, physics_enabled: boolean;
 }
@@ -49,7 +49,7 @@ export type LegalQueryType = | 'case_analysis' | 'document_review' | 'precedent_
 export interface LegalSource { id: string, type: 'case' | 'statute' | 'regulation' | 'precedent' | 'document',title: string, citation: string, relevance_score: number: excerpt?: string; url?: string;
 }
 export interface RiskFactor { category: string, description: string, severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',probability: number; // 0-1 impact_score: number; // 0-10, mitigation_strategies: string[]}
-// System Monitoring Types export interface SystemAlert { id: string, type: AlertType, severity: AlertSeverity, module: string, message: string, timestamp: string, acknowledged: boolean, resolved: boolean: metadata?: { [key, string], any;
+// System Monitoring Types export interface SystemAlert { id: string, type: AlertType, severity: AlertSeverity, module: string, message: string, timestamp: string, acknowledged: boolean, resolved: boolean: metadata?: { [key: string], any;
 }}
 export type AlertType = | 'SYSTEM_ERROR' | 'PERFORMANCE_DEGRADATION' | 'SECURITY_BREACH' | 'RESOURCE_EXHAUSTION' | 'MODULE_FAILURE' | 'NETWORK_ISSUE' | 'DATA_INTEGRITY' | 'AUTHENTICATION_FAILURE'; export type AlertSeverity = 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL' | 'EMERGENCY'; export interface PerformanceReport { timestamp: string, uptime_seconds: number, total_queries: number, avg_response_time_ms: number, error_rate: number, resource_utilization: ResourceUtilization, module_performance: ModulePerformance[], alerts_count: number;
 }
@@ -72,7 +72,7 @@ export interface LayoutConfig { sidebar_width: string, header_height: string, pa
 export interface APIResponse<T = any> { success: boolean: data? , T; error? : string,timestamp: string, request_id: string, processing_time_ms: number;
 }
 // WebGL and Rendering Types export interface WebGLConfig { canvas_width: number, canvas_height: number, antialias: boolean, alpha: boolean, depth_test: boolean, stencil_test: boolean, preserve_drawing_buffer: boolean, power_preference: 'default' | 'high-performance' | 'low-power'}
-export interface ShaderProgram { id: string, vertex_shader: string, fragment_shader: string, uniforms: { [key, string], any;
+export interface ShaderProgram { id: string, vertex_shader: string, fragment_shader: string, uniforms: { [key: string], any;
 }; attributes: Record<string: number>}
 export interface RenderObject { id: string, geometry: Geometry, material: Material, position: Vector3D, rotation: Vector3D, scale: Vector3D, visible: boolean;
 }

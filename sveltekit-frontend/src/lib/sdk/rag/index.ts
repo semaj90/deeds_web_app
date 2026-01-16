@@ -137,7 +137,7 @@ export class RAGClient {
 	/**
 	 * Augment a prompt with retrieved context
 	 */
-	augmentPrompt(userPrompt: string, retrievedDocs: RAGDocument[]): string {$1;$2			.map((doc, i) => `[Document ${i + 1}]\n${doc.content}`)
+	augmentPrompt(userPrompt: string, retrievedDocs: RAGDocument[]): string {.map((doc, i) => `[Document ${i + 1}]\n${doc.content}`)
 			.join('\n\n');
 
 		return `Context:\n${context}\n\nUser Question: ${userPrompt}\n\nAnswer:`;

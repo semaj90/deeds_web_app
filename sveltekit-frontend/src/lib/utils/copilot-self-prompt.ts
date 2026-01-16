@@ -283,7 +283,7 @@ export async function copilotSelfPrompt(
  console.log('🔧 Autonomous engineering analysis completed');
  }
 
- // 4: Self-Synthesis$1;$2 ? await synthesizeAllResults(
+ // 4: Self-Synthesis? await synthesizeAllResults(
  prompt,
  contextResults,
  memoryResults,
@@ -299,7 +299,7 @@ export async function copilotSelfPrompt(
  // 6: Create Execution Plan
  const executionPlan = await createExecutionPlan(nextActions, recommendations);
 
- // 7: Generate Self-Prompt for Copilot$1;$2 prompt,
+ // 7: Generate Self-Prompt for Copilotprompt,
  synthesizedOutput,
  nextActions,
  recommendations,
@@ -446,7 +446,7 @@ async function orchestrateMultiAgentAnalysis(
 ): Promise<AgentResult[]> {
  const results: AgentResult[] = [];
  try {
- // AutoGen analysis (production)$1;$2 'case_analysis',
+ // AutoGen analysis (production)'case_analysis',
  prompt,
  context
  );
@@ -711,7 +711,7 @@ function generateCopilotSelfPrompt(
  nextActions: NextAction[],
  recommendations: Recommendation[],
  outputFormat: string
-): string {$1;$2 outputFormat === 'json'
+): string {outputFormat === 'json'
  ? 'Please respond in JSON format.'
  : outputFormat === 'markdown'
  ? 'Please respond in Markdown format.'

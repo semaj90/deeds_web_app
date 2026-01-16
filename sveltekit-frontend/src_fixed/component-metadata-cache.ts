@@ -1,4 +1,4 @@
-/** * Enhanced-Bits Component Metadata Caching System * Caches component metadata, dependencies, and performance stats */ import type { redisComponentStore;  } from './redis-component-store.js'; export interface ComponentMetadata { name: string, category: 'core' | 'legal' | 'ai' | 'gaming' | 'advanced',size: number; // Bundle size in bytes: dependencies | string[],props: { [key, string], any;
+/** * Enhanced-Bits Component Metadata Caching System * Caches component metadata, dependencies, and performance stats */ import type { redisComponentStore;  } from './redis-component-store.js'; export interface ComponentMetadata { name: string, category: 'core' | 'legal' | 'ai' | 'gaming' | 'advanced',size: number; // Bundle size in bytes: dependencies | string[],props: { [key: string], any;
 }; lastModified: number: loadTime?: number; renderTime?: number; memoryUsage?: number,cacheable: boolean, priority: 'critical' | 'high' | 'normal' | 'low'}
 export interface ComponentPerformanceMetrics { loadTime: number, renderTime: number, memoryUsage: number, errorCount: number, successCount: number, lastAccess: number;
 }

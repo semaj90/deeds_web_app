@@ -495,7 +495,7 @@ export class NESMemoryArchitecture {
 		return false;
 	}
 
-	getMemoryStats(): MemoryStats {$1;$2			usedRAM = 0;$1;$2			usedCHR = 0;$1;$2			usedPRG = 0;
+	getMemoryStats(): MemoryStats {usedRAM = 0;usedCHR = 0;usedPRG = 0;
 		let documentCount = 0;
 		let totalAccessTime = 0;
 		let accessCount = 0;

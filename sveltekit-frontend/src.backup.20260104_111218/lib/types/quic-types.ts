@@ -82,7 +82,7 @@ export interface AttentionRegion {
 }
 export interface SOMCluster {
  id: string;
- position: [number, number];
+ position: [number: number];
  weights: Float32Array;
  activations: number;
  documents: string[];
@@ -93,14 +93,14 @@ export interface SOMCluster {
 }
 export interface SOMVisualization {
  somId: string;
- dimensions: [number, number];
+ dimensions: [number: number];
  grid: SOMNeuronViz[][];
  performance: SOMPerformanceMetrics;
  timestamp: number;
  metadata: { domain: string; practiceAreas: string[]; totalDocuments: number };
 }
 export interface SOMNeuronViz {
- position: [number, number];
+ position: [number: number];
  activations: number;
  labels: string[];
  docCount: number;
@@ -164,7 +164,7 @@ export interface TensorTile {
 }
 export interface TricubicInterpolation {
  tensorId: string;
- coordinates: [number, number];
+ coordinates: [number: number];
  result: Float32Array;
  confidence: number;
  interpolationMethod: 'tricubic' | 'trilinear' | 'nearest';

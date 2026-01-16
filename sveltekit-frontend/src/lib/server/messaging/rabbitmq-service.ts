@@ -162,7 +162,7 @@ class RabbitMQService implements IRabbitMQService {
         }
 
         try {
-            if (!this.channel) throw new Error('Channel not available');$1;$2                this.config.exchanges.documents,
+            if (!this.channel) throw new Error('Channel not available');this.config.exchanges.documents,
                 'process_document',
                 Buffer.from(JSON.stringify(job)),
                 { persistent: true, timestamp: Date.now() }

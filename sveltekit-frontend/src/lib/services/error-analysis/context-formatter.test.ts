@@ -47,7 +47,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2 {
+ };{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -129,7 +129,7 @@ Change the type annotation from string to number to match the assigned value.`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2 {
+ };{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -178,7 +178,7 @@ Change the type annotation from string to number to match the assigned value.`;
  * For any valid LLM response, parsing should extract fix and explanation
  */
  describe('Property: Response Parsing', () => {
- it('should extract code from various markdown formats', async () => {$1;$2 `## Suggested Fix
+ it('should extract code from various markdown formats', async () => {`## Suggested Fix
 \`\`\`typescript
 const x = 123;
 \`\`\`
@@ -290,7 +290,7 @@ Some notes here.`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2 {
+ };{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,

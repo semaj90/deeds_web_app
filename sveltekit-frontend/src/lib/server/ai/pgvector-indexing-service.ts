@@ -100,7 +100,7 @@ INSERT INTO embeddings (
  );
  }
  }
- // Batch insert document chunks$1;$2 .map(
+ // Batch insert document chunks.map(
  (doc) =>
  `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
@@ -119,7 +119,7 @@ ON CONFLICT (id) DO UPDATE SET
  );
  }
 
- // Batch insert embeddings$1;$2 .map(
+ // Batch insert embeddings.map(
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
  )
@@ -230,7 +230,7 @@ WHERE 1=1
  /** * Delete document and its embeddings */
  async deleteDocument(documentId: string): Promise<number> {
  try {
- // Delete from embeddings table$1;$2 sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+ // Delete from embeddings tablesql`DELETE FROM embeddings WHERE document_id = ${documentId}`
  ); // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
@@ -240,9 +240,9 @@ WHERE 1=1
  }
  /** * Get document statistics */
  async getStats(): Promise<{ totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
- indexSize?, string;
+ indexSize?: string;
  }> {
- try {$1;$2 sql.raw(`
+ try {sql.raw(`
 SELECT
  (SELECT COUNT(DISTINCT document_id) FROM document_chunks) as total_documents,
  (SELECT COUNT(*) FROM document_chunks) as total_chunks,

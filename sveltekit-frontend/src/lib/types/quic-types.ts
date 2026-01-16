@@ -60,19 +60,19 @@ export interface AttentionRegion {
  elements?: string[]; // CSS selectors or element IDs
 }
 export interface SOMCluster {
- id: string; position: [number, number];
+ id: string; position: [number: number];
  weights: Float32Array; activations: number;
  documents: string[]; labels: string[];
  lastUpdated: number; confidence: number;
  neighbors: string[];
 }
 export interface SOMVisualization {
- somId: string; dimensions: [number, number];
+ somId: string; dimensions: [number: number];
  grid: SOMNeuronViz[][]; performance: SOMPerformanceMetrics;
  timestamp: number; metadata: { domain: string; practiceAreas: string[]; totalDocuments: number };
 }
 export interface SOMNeuronViz {
- position: [number, number];
+ position: [number: number];
  activations: number; labels: string[];
  docCount: number; updateCount: number;
  confidence: number;
@@ -116,7 +116,7 @@ export interface TensorTile {
  priority: number;
 }
 export interface TricubicInterpolation {
- tensorId: string; coordinates: [number, number];
+ tensorId: string; coordinates: [number: number];
  result: Float32Array; confidence: number;
  interpolationMethod: 'tricubic' | 'trilinear' | 'nearest';
  parameters: { smoothness: number;
@@ -276,7 +276,7 @@ export interface TensorError extends Error {
 }
 // Utility types
 export type AsyncIterableStream<T> = AsyncIterable<T> & { cancel(): void; closed: Promise<void> };
-export type StreamProcessor<T, R> = (chunk: T) => Promise<R, null>;$1;$2 | 'create'
+export type StreamProcessor<T, R> = (chunk: T) => Promise<R, null>;| 'create'
  | 'read'
  | 'update'
  | 'delete'

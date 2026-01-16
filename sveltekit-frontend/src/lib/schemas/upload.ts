@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB$1;$2 'image/jpeg',
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB'image/jpeg',
  'image/png',
  'image/webp',
  'image/gif',

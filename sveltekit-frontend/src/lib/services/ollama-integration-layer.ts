@@ -305,7 +305,7 @@ User Question: ${originalMessage}
 Please answer the question using the provided context.`;
   }
 
-  private extractSuggestions(response: string): string[] {$1;$2      .split(/[.!? ]+/)
+  private extractSuggestions(response: string): string[] {.split(/[.!? ]+/)
       .filter((s: any) => s.length > 10);
 
     return sentences

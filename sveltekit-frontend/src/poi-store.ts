@@ -16,7 +16,7 @@ import { writable, derived } from 'svelte/store';
 
 /**
  * Types
- */$1;$2	| 'defendant'
+ */| 'defendant'
 	| 'plaintiff'
 	| 'witness'
 	| 'suspect'

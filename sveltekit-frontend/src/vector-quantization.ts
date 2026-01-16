@@ -163,7 +163,7 @@ export class VectorQuantizationService {
 			let closestIndex = 0;
 			let minDistance = Infinity;
 
-			for (let c = 0; c < codebook.centroids.length; c++) {$1;$2					subspace * subspaceSize,
+			for (let c = 0; c < codebook.centroids.length; c++) {subspace * subspaceSize,
 					subspace * subspaceSize + subvector.length
 				);
 				const distance = this.calculateL2Distance(subvector, centroid);
@@ -204,7 +204,7 @@ export class VectorQuantizationService {
 		const numSubspaces = Math.ceil(trainingVectors[0].length / subspaceSize);
 		const centroids: Float32Array[] = [];
 
-		// Legal domain term weights$1;$2			? new Map([
+		// Legal domain term weights? new Map([
 					['contract', 1.5],
 					['liability', 1.4],
 					['obligation', 1.3],
@@ -258,7 +258,7 @@ export class VectorQuantizationService {
 		const maxIterations = 100;
 		let converged = false;
 
-		for (let iter = 0; iter < maxIterations && !converged; iter++) {$1;$2				.fill(null)
+		for (let iter = 0; iter < maxIterations && !converged; iter++) {.fill(null)
 				.map(() => []);
 
 			// Assign points to closest centroid
@@ -327,7 +327,7 @@ export class VectorQuantizationService {
 				return this.reconstructInt8(quantized, metadata[0], metadata[1]);
 			}
 
-			case 'product': {$1;$2					`pq_${quantizedVector.config.codebookSize}_${quantizedVector.config.clusters}`
+			case 'product': {`pq_${quantizedVector.config.codebookSize}_${quantizedVector.config.clusters}`
 				);
 				if (!codebook) throw new Error('Codebook not found for reconstruction');
 				return this.reconstructProductQuantization(

@@ -12,7 +12,7 @@ export interface SplitterOptions {
  mergeThreshold?: number; // Length below which a fragment is merged with neighbor
  customAbbreviations?: string[]; // Additional abbreviations
  streamBufferSize?: number; // For future streaming improvements
-}$1;$2 'Inc.',
+}'Inc.',
  'Corp.',
  'Ltd.',
  'Co.',
@@ -29,7 +29,7 @@ export function splitSentencesEnhanced(text: string, options: SplitterOptions = 
  if (!text || !text.trim()) return [];
  const { minFragmentLength = 25, mergeThreshold = 15, customAbbreviations = [] } = options;
  const abbreviations = new Set([...DEFAULT_ABBREVIATIONS, ...customAbbreviations]);
- // First pass naive split$1;$2 .split(/([.!? ]+)/)
+ // First pass naive split.split(/([.!? ]+)/)
  .reduce<string[]>((acc, part, idx, arr) => {
  if (!part.trim()) return acc;
  // If punctuation token, append to previous

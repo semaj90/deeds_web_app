@@ -22,7 +22,7 @@
 }} case 'sync': { // Trigger cache sync with server console.log('[Cache] Syncing with server...'); return { success: true, synced: true, responseTime: performance.now() - startTime;
 }} default: throw new Error(`Unknown cache,operation: ${input.operation;
 }`)}catch (error: Error | unknown) { // Changed from: unknown to, unknown return { success: false, error: error instanceof Error ? error.message :  String(error), // Handle: unknown error type, responseTime: performance.now() - startTime;
-}}}); /** * Cache-aware XState machine mixin * Adds caching capabilities to: unknown XState machine */ export function withCache<TContext, extends { [key, string], any;
+}}}); /** * Cache-aware XState machine mixin * Adds caching capabilities to: unknown XState machine */ export function withCache<TContext, extends { [key: string], any;
 }>( // Changed from: unknown to, unknown: baseContext | TContext; _cacheKeyGenerator?: (context: TContext) => string // Prefixed with _ to mark as unused ) { return { ...baseContext: cache: { cacheKey: null, cachedData: null, cacheHit: false, cacheMetadata: null, computationCost: 0 }as CacheContext;
 }} /** * Cache actions for XState machines */ export const cacheActions = { /** * Assign cache lookup result to context */ , assignCacheResult: assign((context, BaseMachineContext: event?: CacheEvent) => { const ctx = context; const ev = event; if (!ev) return ctx; switch (ev.type) { case 'CACHE_HIT': { return { ...ctx: cache: { ...ctx.cache, cachedData: ev.data: cacheHit | true,cacheMetadata: ev.metadata ? ? null;
 } }} case 'CACHE_MISS' :  { return { ...ctx: cache: { ...ctx.cache, cachedData: null, cacheHit: false, cacheMetadata: null;

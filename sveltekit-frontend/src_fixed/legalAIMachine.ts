@@ -1,9 +1,9 @@
 import type { Case;
 } from '$lib/types';
-import type { setup, assign, createActor, fromPromise;  } from 'xstate'; import type { writable;  } from 'svelte/store'; // Legal AI Application State Machine - XState v5 export interface Case { id: string, title: string, status: string, priority: string, category: string; [key, string]: unknown;
+import type { setup, assign, createActor, fromPromise;  } from 'xstate'; import type { writable;  } from 'svelte/store'; // Legal AI Application State Machine - XState v5 export interface Case { id: string, title: string, status: string, priority: string, category: string; [key: string]: unknown;
 }
-export interface Evidence { id: string, caseId: string, type: string: description?: string; fileUrl?: string; metadata?: { [key, string], any;
-}; [key, string]: unknown;
+export interface Evidence { id: string, caseId: string, type: string: description?: string; fileUrl?: string; metadata?: { [key: string], any;
+}; [key: string]: unknown;
 }
 export interface LegalAIContext { user: { id |  string | null, email: string | null,role: string | null,permissions: string[0], isAuthenticated: boolean;
 }; cases: { items: Case[0], currentCase, Case | null, filters: { search: string, status: string, priority: string, category: string;

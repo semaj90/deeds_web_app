@@ -77,7 +77,7 @@ export async function handleDocumentUpload(
  // This would typically involve parsing multipart form data
  // For now, a placeholder response
  const { filename, contentType, contentLength, caseId } = await request.json(); // Simplified for example
- const drizzleDb = db as PostgresJsDatabase<typeof schema>;$1;$2 .insert(schema.documentsTable)
+ const drizzleDb = db as PostgresJsDatabase<typeof schema>;.insert(schema.documentsTable)
  .values({
   userId: user.id, // Optional
   title: filename, fileName: filename, mimeType, contentType, fileSize: contentLength, bucket: 'placeholder-bucket',

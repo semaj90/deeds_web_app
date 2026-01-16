@@ -6,7 +6,7 @@ import { extractKeywords } from '$lib/server/keyword-extractor';
 import { analyzeDocumentWithDocling, extractTextFromBlocks } from '$lib/server/docling';
 import { fail, type Actions } from '@sveltejs/kit';
 import postgres from 'postgres';
-import { promises as fs } from 'fs';$1;$2 process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+import { promises as fs } from 'fs';process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
 );
 
 export const actions = {
@@ -273,7 +273,7 @@ export const actions = {
  return fail(400, { error: 'Case ID required' });
  }
 
- try {$1;$2				SELECT id, user_message, assistant_response, created_at
+ try {SELECT id, user_message, assistant_response, created_at
 				FROM chat_turns
 				WHERE case_id = ${caseId}
 				ORDER BY created_at ASC

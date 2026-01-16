@@ -4,7 +4,7 @@ import type { pgTable, timestamp, uuid, integer, boolean, decimal, varchar, inde
   
 export interface ShaderPredictionContext { userId: string, currentWorkflow: caseContext?: unknown; userHistory?: ShaderUserPattern[]; sessionContext?: unknown}
 export interface ReinforcementReward { timestamp: number, reward: number, context: string, performanceBonus: number, userSatisfactionScore: number}
-export interface PredictionResult { shaderCacheId: string, confidence: number, model: string, features: { [key, string], any }, priority: number}
+export interface PredictionResult { shaderCacheId: string, confidence: number, model: string, features: { [key: string], any }, priority: number}
 
 
 

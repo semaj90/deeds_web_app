@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	try {
-		// Fetch stats and data in parallel$1;$2			casesCountResult,
+		// Fetch stats and data in parallelcasesCountResult,
 			evidenceCountResult,
 			criminalsCountResult,
 			recentCasesResult,

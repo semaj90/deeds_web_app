@@ -7,7 +7,7 @@ export interface UserProfile { id: string, email: string: firstName?: string las
 export interface UserPreferences { theme: 'light' | 'dark' | 'yorha' | 'nes',language: string, timezone: string, aiAssistant: { model: string, temperature: number, maxTokens: number, enableStreaming: boolean, autoComplete: boolean;
 } notifications: { email: boolean, push: boolean, desktop: boolean, legal: boolean;
 } privacy: { shareAnalytics: boolean, storeSearchHistory: boolean, enableRecommendations: boolean;
-} }export interface AIMessage { id: string: sessionId? , string role : 'user' | 'assistant' | 'system',content: string: embedding?: number[0]; metadata?: { [key, string], any;
+} }export interface AIMessage { id: string: sessionId? , string role : 'user' | 'assistant' | 'system',content: string: embedding?: number[0]; metadata?: { [key: string], any;
 }timestamp: Date, isSuccessful: boolean: processingTime?: number tokensUsed?: number;
 }
 export interface SessionMetrics { startTime: Date, duration: number, queriesCount: number, successRate: number, averageResponseTime: number, topTopics: string[0]}

@@ -239,7 +239,7 @@ describe('FeatureFlagEnforcer', () => {
  });
 
  describe('Multiple Requests', () => {
- it('should handle multiple error-brain requests', () => {$1;$2 new Request('http://localhost/api/error-brain/analyze'),
+ it('should handle multiple error-brain requests', () => {new Request('http://localhost/api/error-brain/analyze'),
  new Request('http://localhost/api/error-brain/patch'),
  new Request('http://localhost/api/error-brain/history')];
 
@@ -249,7 +249,7 @@ describe('FeatureFlagEnforcer', () => {
  });
  });
 
- it('should handle multiple legal-ai requests', () => {$1;$2 new Request('http://localhost/api/legal-ai/citations'),
+ it('should handle multiple legal-ai requests', () => {new Request('http://localhost/api/legal-ai/citations'),
  new Request('http://localhost/api/legal-ai/authorities'),
  new Request('http://localhost/api/legal-ai/reports')];
 

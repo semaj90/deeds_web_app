@@ -17,7 +17,7 @@ export interface Shortcut {
  aiSummary?: string | null; // For AI summary/metadata
 }
 
-// Static essential shortcuts (always present)$1;$2 {
+// Static essential shortcuts (always present){
  key: 'Ctrl+I',
  description: 'Open context menu',
  action: () => {}, // To be set by consumer (e.g., contextMenuActions.open)

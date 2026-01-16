@@ -262,7 +262,7 @@ export interface IngestionResult {
  metadata?: JsonObject;
  confidentialityLevel?: string;
 }
-type JsonObject = { [key, string]: unknown }
+type JsonObject = { [key: string]: unknown }
 
 interface DBChunkRow {
  id: string;
@@ -273,7 +273,7 @@ interface DBChunkRow {
  confidentiality_level: string | null;
  similarity?: number | null;
  text_rank?: number | null;
- [key, string]: unknown;
+ [key: string]: unknown;
 }
 type CombinedResult = DBChunkRow & { score: number; highlights: string[] }
 
@@ -461,10 +461,10 @@ type RunnableInvokeInput = {
  query?: string;
  documentType?: string;
  content?: string;
- [key, string]: unknown; // Allow other arbitrary properties
+ [key: string]: unknown; // Allow other arbitrary properties
 };
 /** * Type for the output of Runnable.invoke. * Can be a string or a more complex object (e.g., from Ollama's /api/generate). */
-type RunnableInvokeOutput = string | { response: string; [key, string]: unknown };
+type RunnableInvokeOutput = string | { response: string; [key: string]: unknown };
 /** * Minimal OllamaHTTPEmbeddings adapter for generating embeddings via Ollama's HTTP API. * Implements EmbeddingsProvider interface. */
 class OllamaHTTPEmbeddings implements EmbeddingsProvider {
  constructor(private baseUrl: string, private model: string) {}

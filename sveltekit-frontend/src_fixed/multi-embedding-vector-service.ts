@@ -3,10 +3,10 @@ import type { User;
 // Multi-Embedding Vector Service // Manages different embedding models and metadata schemes for optimal semantic search // Supports pgvector, Gemma embeddings, specialized legal embeddings, and contextual metadata import type { browser;  } from '$app/environment'; import type { dev;  } from '$app/environment'; export interface EmbeddingConfig { model: 'embeddinggemma, latest' | 'embeddinggemma' | 'gemma3: legal-latest' | 'gemma-embedding-fast' | 'gemma-embedding-large' | 'legal-bert' | 'nomic-embed-text' | 'custom-legal',dimensions: number, contextWindow: number, specialized: boolean, costPerToken: number, latencyMs: number, accuracy: number;
 }
 export interface MetadataSchema { schemaType: 'legal-case' | 'chat-message' | 'document' | 'evidence' | 'citation' | 'user-query' | 'contextual',required_fields: string[], optional_fields: string[], vector_fields: string[], search_boost_fields: string[], temporal_fields: string[]}
-export interface EmbeddingEntry { id: string, content: string, embedding_model: string, embedding_vector: number[], metadata_schema: string, metadata: { [key, string], any;
+export interface EmbeddingEntry { id: string, content: string, embedding_model: string, embedding_vector: number[], metadata_schema: string, metadata: { [key: string], any;
 }hybrid_embeddings?: { semantic: number[]; // General semantic understanding, legal_domain: number[]; // Legal domain-specific: contextual | number[]; // User context and history: temporal | number[]; // Time-aware embeddings;
 } created_at: Date, updated_at: Date, usage_count: number, relevance_scores: { semantic: number, legal: number, contextual: number, temporal: number;
-} }export interface SearchQuery { query: string, embedding_models: string[], metadata_filters: { [key, string], any;
+} }export interface SearchQuery { query: string, embedding_models: string[], metadata_filters: { [key: string], any;
 }schema_types: string[], hybrid_weights: { semantic: number, legal: number, contextual: number, temporal: number;
 } similarity_threshold: number, max_results: number, boost_recent: boolean: user_context?: { userId: string, sessionId: string: caseId?: string; practiceArea?: string; jurisdiction?: string;
 } }class MultiEmbeddingVectorService { private: embeddingConfigs, Map<string, EmbeddingConfig> = new Map(); private metadataSchemas: Map<string, MetadataSchema> = new Map(); private embeddingCache: Map<string: { vector: number[], timestamp, Date;

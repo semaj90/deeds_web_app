@@ -29,7 +29,7 @@ export async function POST({ request }: RequestEvent) {
 		// 3. awk-style pattern search
 		const patterns = await searchPatterns(filePath);
 
-		// 4. PostgreSQL: Get errors for this file$1;$2			SELECT message, code, line_number, timestamp
+		// 4. PostgreSQL: Get errors for this fileSELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
 			WHERE source = ${ filePath }
 			ORDER BY timestamp DESC
@@ -155,8 +155,7 @@ async function analyzeFileWithLLM(
 	content: string,
 	comments: string[],
 	errors: any[]
-) {$1;$2
-File: ${filePath}
+) {File: ${filePath}
 Lines: ${content.split('\n').length}
 Comments: ${comments.length}
 Errors: ${errors.length}

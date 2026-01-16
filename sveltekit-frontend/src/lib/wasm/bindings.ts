@@ -69,7 +69,7 @@ export async function loadSimdJsonParser(): Promise<SimdJsonParserModule> {
 /**
  * Preload all WASM modules for faster runtime access
  */
-export async function preloadWasmModules() {$1;$2 loadVectorOps(),
+export async function preloadWasmModules() {loadVectorOps(),
  loadLegalParser(),
  loadSimdJsonParser()
  ]);

@@ -13,7 +13,7 @@
 }:{ content_hash;
 } }as const interface RedisWebGPUConfig { enableWebGPU: boolean, enableSIMD: boolean, enableCrossUserSharing: boolean, cacheStrategy: 'aggressive' | 'balanced' | 'conservative',maxCacheSize: number; // MB: defaultTTL | number; // seconds;
 }interface ProcessingMetrics { redisHits: number, webgpuComputations: number, simdParsing: number, totalProcessingTime: number, cacheEfficiency: number;
-}// --- New Interfaces for Type Safety --- interface LegalDocumentData { content: string; [key, string]: unknown; // Allow other properties, but content is required;
+}// --- New Interfaces for Type Safety --- interface LegalDocumentData { content: string; [key: string]: unknown; // Allow other properties, but content is required;
 }interface EntityResult { entity: string | confidence, number;
 }interface SimilarityResult { id: string | similarity, number;
 }interface RiskAssessmentResult { risk_score: number, factors: string[]}interface LegalDocumentAnalysis { entities: EntityResult[], sentiment: number, embeddings: number[], similarity: SimilarityResult[], risk_assessment: RiskAssessmentResult: webgpu_accelerated?: boolean; cpu_processed?: boolean,processing_time: number;

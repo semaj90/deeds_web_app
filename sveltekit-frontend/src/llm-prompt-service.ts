@@ -112,7 +112,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 		this.log('info', `Retrieving prompts for error ${errorId}`);
 
 		try {
-			const promptIds = this.errorIdIndex.get(errorId) || [];$1;$2				.map((id) => this.prompts.get(id))
+			const promptIds = this.errorIdIndex.get(errorId) || [];.map((id) => this.prompts.get(id))
 				.filter((p) => p !== undefined) as LLMPrompt[];
 
 			// Sort by creation date descending (newest first)

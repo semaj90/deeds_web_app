@@ -20,7 +20,7 @@ export interface CacheContext {
  hitRatio: number; responseTime: number;
  } | null;
  semanticQuery?: string; computationCost: number;
-}$1;$2 | { type: 'CACHE_LOOKUP'; key: string; semanticQuery?: string }
+}| { type: 'CACHE_LOOKUP'; key: string; semanticQuery?: string }
  | { type: 'CACHE_HIT'; data: Record<string, unknown>; metadata: CacheContext['cacheMetadata'] }
  | { type: 'CACHE_MISS' }
  | { type: 'CACHE_STORE'; key: string; data: unknown; semanticText?: string }
@@ -29,7 +29,7 @@ export interface CacheContext {
  | { type: 'COMPUTE_REQUIRED'; cost: number }
  | { type: 'FETCH_DATA' }; // Added for createCachedMachineStates example
 
-// Define the return type of cacheActor for better type safety in onDone$1;$2 | {
+// Define the return type of cacheActor for better type safety in onDone| {
  success: true; hit: true; data: Record<string, unknown>;
  metadata: CacheContext['cacheMetadata'];
  }
@@ -39,7 +39,7 @@ export interface CacheContext {
  | { success: true; synced: true; responseTime: number }
  | { success: false; error: string; responseTime: number };
 
-/** * XState Cache Actor - manages caching operations */$1;$2 async ({
+/** * XState Cache Actor - manages caching operations */async ({
  input,
  }: { input: { operation: 'get' | 'set' | 'invalidate' | 'sync',
  key?: string,

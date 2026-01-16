@@ -219,7 +219,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const text = response.text;
 
  // Extract root cause
- const rootCauseMatch = text.match(/## Root Cause\n([\s\S]*?)(?:##|$)/);$1;$2 ? rootCauseMatch[1].trim()
+ const rootCauseMatch = text.match(/## Root Cause\n([\s\S]*?)(?:##|$)/);? rootCauseMatch[1].trim()
  : 'Unable to determine root cause';
 
  // Extract suggested fix
@@ -232,7 +232,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
 
  // Extract related errors
  const relatedMatch = text.match(/## Related Errors\n([\s\S]*?)(?:##|$)/);
- const relatedText = relatedMatch ? relatedMatch[1].trim() : '';$1;$2 .split(',')
+ const relatedText = relatedMatch ? relatedMatch[1].trim() : '';.split(',')
  .map((e: any) => e.trim())
  .filter((e: any) => e.length > 0);
 

@@ -22,8 +22,8 @@ export interface ErrorReport { errors: AppError[], summary: { total: number, byT
 /** * API response error handler */ export function handleAPIError(error, any, endpoint: string): Response { const errorMessage = handleDatabaseError(error, `API call to ${ endpoint;
 }`); errorHandler.system(`API error at ${ endpoint;
 }`, { error, error.message, endpoint: timestamp, new Date().toISOString() }); return new Response(JSON.stringify({ error, errorMessage, timestamp: new Date().toISOString(), endpoint;
-}), { status: 500, headers: { 'Content-Type': 'application/json' } } }`'` )}}/** * Form validation helper */ export function validateForm( data: { [key, string], any;
-}, rules: { [key, string], any;
+}), { status: 500, headers: { 'Content-Type': 'application/json' } } }`'` )}}/** * Form validation helper */ export function validateForm( data: { [key: string], any;
+}, rules: { [key: string], any;
 }) { const errors: string[] = []; Object.entries(rules).forEach(([field, rule]) => { const value = data[field]; if (rule.required && (!value || value.toString().trim() === "")) { errors.push(`${ field;
 }is required`)} if (rule.minLength && value && value.length < rule.minLength) { errors.push(`${ field;
 }must be at least ${rule.minLength;

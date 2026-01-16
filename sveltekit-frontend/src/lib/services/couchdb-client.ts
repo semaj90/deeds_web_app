@@ -215,7 +215,7 @@ class CouchDBClient {
    */
   async info(database: string): Promise<{ db_name: string;
     doc_count: number; doc_del_count: number;
-    update_seq: string; disk_size, number;
+    update_seq: string; disk_size: number;
   }> {
     return this.request(`/${database}`);
   }

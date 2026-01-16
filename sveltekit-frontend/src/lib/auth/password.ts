@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'; // Password hashing utilities using bcrypt // Sal
  password: string,
  hashedPassword: string
 ): Promise<boolean> {
+    // TODO: ACE: Async function without await (check if async is needed)
  return bcrypt.compare(password, hashedPassword);
 }
 /** * Generate a secure random token */ export function generateRandomToken(

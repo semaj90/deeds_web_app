@@ -1,7 +1,7 @@
 import type { redis } from '$lib/server/redis';
 import crypto from 'crypto';
 
-function keyForQuery(query, string, scope: string = 'global'): string {$1;$2 .createHash('sha256')
+function keyForQuery(query, string, scope: string = 'global'): string {.createHash('sha256')
  .update(query + '|' + scope)
  .digest('hex');
  return `cache:search:${ scope }:${h}`;

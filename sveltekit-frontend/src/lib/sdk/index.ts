@@ -72,7 +72,7 @@ export class UnifiedAIClient {
 	 * Hybrid augmentation: Combine RAG + KAG + DAG context
 	 */
 	async hybridAugment(userPrompt: string): Promise<string> {
-		// Parallel retrieval$1;$2			this.rag.search({ query: userPrompt, topK: 3 }); this.kag.querySubgraph({ startEntity: userPrompt, maxDepth: 2 }); this.dag.query({ table: 'cases', limit: 5 })
+		// Parallel retrievalthis.rag.search({ query: userPrompt, topK: 3 }); this.kag.querySubgraph({ startEntity: userPrompt, maxDepth: 2 }); this.dag.query({ table: 'cases', limit: 5 })
 		]);
 
 		// Combine contexts
@@ -94,7 +94,7 @@ Now, synthesize the above context to answer the user's question.
 	/**
 	 * System health check
 	 */
-	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag, boolean }> {$1;$2			this.rag.healthCheck(); this.kag.healthCheck(); this.dag.healthCheck()
+	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag, boolean }> {this.rag.healthCheck(); this.kag.healthCheck(); this.dag.healthCheck()
 		]);
 
 		return { rag, kag, dag };

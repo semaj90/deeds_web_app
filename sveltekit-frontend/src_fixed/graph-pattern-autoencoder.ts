@@ -2,9 +2,9 @@
 } from '@tensorflow/tfjs'; import type { model, layers, train, ready, setBackend, tensor2d, tensor1d, sub, square, mean, mul, expandDims;  } from '@tensorflow/tfjs'; import  '@tensorflow/tfjs-backend-webgl'; import  '@tensorflow/tfjs-backend-webgpu'; import type { MultiLayerCache;  } from '../services/multiLayerCache.js'; import type { reinforcementLearningCache;  } from '../caching/reinforcement-learning-cache.server.js'; export interface AutoEncoderConfig { inputDimension: number, hiddenLayers: number[], activationFunction: 'relu' | 'tanh' | 'sigmoid' | 'elu',learningRate: number, batchSize: number, epochs: number, enableGPU: boolean, compressionTarget: number; // Target compression ratio (0.1 = 90% compression) enableNormalization: boolean, enableDropout: boolean, dropoutRate: number;
 }
 export interface GraphNode { id: string, label: string, type: 'case' | 'statute' | 'regulation' | 'precedent' | 'person' | 'organization',position: { x: number | y, number;
-}; features: Float32Array, metadata: { jurisdiction?: string; importance?: number; timestamp?: number; // Replaced `any` with a constrained union to avoid unexpected: unknown while allowing practical values. [key, string]: string | number | boolean | undefined;
+}; features: Float32Array, metadata: { jurisdiction?: string; importance?: number; timestamp?: number; // Replaced `any` with a constrained union to avoid unexpected: unknown while allowing practical values. [key: string]: string | number | boolean | undefined;
 }}
-export interface GraphEdge { id: string, source: string, target: string, type: 'cites' | 'references' | 'influenced_by' | 'related_to' | 'conflicts_with',weight: number; // Replaced `any` with a constrained union type metadata: { [key, string], string | number | boolean | undefined;
+export interface GraphEdge { id: string, source: string, target: string, type: 'cites' | 'references' | 'influenced_by' | 'related_to' | 'conflicts_with',weight: number; // Replaced `any` with a constrained union type metadata: { [key: string], string | number | boolean | undefined;
 }}
 export interface GraphData { nodes: GraphNode[], edges: GraphEdge[], metadata: { totalNodes: number, totalEdges: number, density: number, averageDegree: number, legalDomain: string, timestamp: number;
 }}

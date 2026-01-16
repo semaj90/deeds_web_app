@@ -1112,7 +1112,7 @@ Object.assign(handlers, {
 
 			// Execute query via docker exec
 			const cmd = `docker exec ${containerName} psql -U ${dbUser} -d ${dbName} -t -A -F "," -c "${query.replace(/"/g, '\\"')}"`;
-			const output = execSync(cmd, { encoding: 'utf-8', timeout: 30000 });$1;$2				.trim()
+			const output = execSync(cmd, { encoding: 'utf-8', timeout: 30000 });.trim()
 				.split('\n')
 				.filter((line: any) => line.trim())
 				.map((line: any) => {
@@ -1146,7 +1146,7 @@ Object.assign(handlers, {
 
 			const query = `SELECT table_name FROM information_schema.tables WHERE table_schema='${schema}' ORDER BY table_name`;
 			const cmd = `docker exec ${containerName} psql -U ${dbUser} -d ${dbName} -t -A -c "${query}"`;
-			const output = execSync(cmd, { encoding: 'utf-8', timeout: 10000 });$1;$2				.trim()
+			const output = execSync(cmd, { encoding: 'utf-8', timeout: 10000 });.trim()
 				.split('\n')
 				.filter((line: any) => line.trim());
 
@@ -1791,8 +1791,7 @@ Object.assign(handlers, {
 /**
  * Execute an ACP tool
  */
-export async function executeACPTool(toolName: string, unknown: Promise<ToolResult> {$1;$2
-	if (!tool) {
+export async function executeACPTool(toolName: string, unknown: Promise<ToolResult> {if (!tool) {
 		return {
 			success: false,
 			error: `Unknown, tool: ${toolName}`,

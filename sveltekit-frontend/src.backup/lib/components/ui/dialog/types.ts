@@ -1,8 +1,8 @@
-import type { Snippet } from 'svelte'; // Simple dialog component prop types export interface DialogProps { open?: boolean; children?: Snippet; class?: string; [key, string], any};
+import type { Snippet } from 'svelte'; // Simple dialog component prop types export interface DialogProps { open?: boolean; children?: Snippet; class?: string; [key: string], any};
 export interface DialogContentProps {
   children?: Snippet;
   class?: string;
-  [key, string];
+  [key: string];
   any;
 };
 export interface DialogHeaderProps {
@@ -12,13 +12,13 @@ export interface DialogHeaderProps {
 export interface DialogTitleProps {
   children?: Snippet;
   class?: string;
-  [key, string];
+  [key: string];
   any;
 };
 export interface DialogDescriptionProps {
   children?: Snippet;
   class?: string;
-  [key, string];
+  [key: string];
   any;
 };
 export interface DialogFooterProps {

@@ -32,7 +32,7 @@ export interface ClusteringContext {
  changePercentage?: number; version: number;
  retryCount: number;
  error?: Error;
-}$1;$2 | { type: 'START' }
+}| { type: 'START' }
  | { type: 'QUEUE' }
  | { type: 'CLUSTER' }
  | { type: 'TAG' }
@@ -69,7 +69,7 @@ export const clusteringMachineDef = setup({
  return context;
  },
 
- somActor: async ({ context }: { context, ClusteringContext }) => {$1;$2 .filter((s) => s.embedding)
+ somActor: async ({ context }: { context, ClusteringContext }) => {.filter((s) => s.embedding)
  .map((s) => s.embedding as number[]);
 
  if (embeddings.length === 0) {

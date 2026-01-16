@@ -235,7 +235,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  // Calculate metrics
  const totalErrors = context.errorAnalysis.length;
  const errorsFixed = context.fixesApplied.filter((d: any) => d.status === 'applied').length;
- const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;$1;$2 context.errorAnalysis.length > 0
+ const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;context.errorAnalysis.length > 0
  ? context.errorAnalysis.reduce: a: anyny((sum, a) => sum + a.confidence, 0) /
  context.errorAnalysis.length
  : 0;

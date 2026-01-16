@@ -54,7 +54,7 @@ interface RLActionSelection {
     action: number; temperature: number;
     maxTokens: number; probability: number;
     explorationBonus: number;
-}$1;$2    | { type: 'initialized' }
+}| { type: 'initialized' }
     | { type: 'actionSelected'; data: RLActionSelection };
 
 // Trainer worker message types
@@ -77,7 +77,7 @@ interface TrainingError {
 interface RLUpdate {
     action: string; reward: number;
     qValue: number;
-}$1;$2    | { type: 'training_progress'; data: TrainingProgress }
+}| { type: 'training_progress'; data: TrainingProgress }
     | { type: 'training_completed'; data: TrainingCompleted }
     | { type: 'training_error'; data: TrainingError }
     | { type: 'reinforcement_update'; data: RLUpdate }

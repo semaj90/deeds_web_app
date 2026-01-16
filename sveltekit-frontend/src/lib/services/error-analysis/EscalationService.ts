@@ -76,7 +76,7 @@ export class EscalationService {
 		confidence: number, toolResults: DiagnosticResult[],
 		context: ErrorContext
 	): Promise<EscalationResult> {
-		// Check max open tickets$1;$2			(t: any) => t.status === 'open' || t.status === 'in_progress'
+		// Check max open tickets(t: any) => t.status === 'open' || t.status === 'in_progress'
 		);
 		if (openTickets.length >= this.config.maxOpenTickets) {
 			return {
@@ -152,7 +152,7 @@ export class EscalationService {
 			ticket.resolvedAt = new Date();
 
 			// Record as high-value experience
-			const recorder = getExperienceRecorder();$1;$2				ticket.errorReport,
+			const recorder = getExperienceRecorder();ticket.errorReport,
 				fix,
 				'success',
 				ticket.context,
@@ -162,7 +162,7 @@ export class EscalationService {
 			);
 
 			// Update policy with increased weight for human fixes
-			const policy = getGRPOPolicy();$1;$2				ticket,
+			const policy = getGRPOPolicy();ticket,
 				fix,
 				policy
 			);
@@ -236,16 +236,16 @@ export class EscalationService {
 			patternCounts.set(pattern, (patternCounts.get(pattern) ?? 0) + 1);
 		}
 
-		// Sort by frequency$1;$2			.sort((a: any, b: any) => b[1] - a[1])
+		// Sort by frequency.sort((a: any, b: any) => b[1] - a[1])
 			.slice(0, 10)
 			.map(([pattern, count]) => ({ pattern, count }));
 
 		// Calculate resolution metrics
-		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');$1;$2			? resolvedTickets.reduce((sum: any, t: any) => {$1;$2						? t.resolvedAt.getTime() - t.createdAt.getTime()
+		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');? resolvedTickets.reduce((sum: any, t: any) => {? t.resolvedAt.getTime() - t.createdAt.getTime()
 						: 0;
 					return sum + resolveTime;
 				}, 0) / resolvedTickets.length / (1000 * 60 * 60) // hours
-			: 0;$1;$2			? resolvedTickets.length / tickets.length
+			: 0;? resolvedTickets.length / tickets.length
 			: 0;
 
 		return {

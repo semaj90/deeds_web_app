@@ -25,13 +25,13 @@ import {
 
 export const routeHealthStateEnum = pgEnum('route_health_state', ['healthy', 'flaky', 'broken']);
 
-export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'error', 'fatal']);$1;$2 'typescript',
+export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'error', 'fatal']);'typescript',
  'svelte',
  'lint',
  'build',
  'runtime',
  'api',
- 'other']);$1;$2 'pending',
+ 'other']);'pending',
  'applied',
  'dismissed',
  'snoozed']);
@@ -45,7 +45,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  *
  * Stores the latest state from routeHealthMachine per route.
  * Joins with Phase 72 route-ast-graph.json via route_path.
- */$1;$2 'route_health',
+ */'route_health',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull().unique(),
@@ -72,7 +72,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  * Each row = one error log entry.
  * Batch-inserted during collection runs.
  * Clustered asynchronously via CUDA embedder.
- */$1;$2 'error_events',
+ */'error_events',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull(),
@@ -104,7 +104,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  *
  * Each cluster = one "type" of error.
  * Storing canonical message + embedding + count for fast lookup.
- */$1;$2 'error_clusters',
+ */'error_clusters',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  canonicalMessage: text('canonical_message').notNull(),
@@ -121,7 +121,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  },
  (table) => ({
  idxSeverity: index('idx_error_clusters_severity').on(table.severity),
- idxEventCount: index('idx_error_clusters_count').on(table.eventCount),$1;$2 'error_suggestions',
+ idxEventCount: index('idx_error_clusters_count').on(table.eventCount),'error_suggestions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  clusterId: uuid('cluster_id')
@@ -165,7 +165,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  *
  * Who applied what patch, when, to which file.
  * Tied to specific user, can be rolled back.
- */$1;$2 'error_patch_log',
+ */'error_patch_log',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  suggestionId: uuid('suggestion_id')
@@ -192,7 +192,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  * Refreshed periodically or on-demand to speed up LLM queries.
  *
  * Keyed by route_path for fast lookup.
- */$1;$2 'route_context_cache',
+ */'route_context_cache',
  {
  id: uuid('id').primaryKey().defaultRandom(routePath, ,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
  kagGraph: jsonb('kag_graph').notNull().default('{}'), // nodes + edges
@@ -217,7 +217,7 @@ export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'erro
  *
  * One row per (suggestionId, routePath, userId) tuple.
  * Allows per-user filtering and analytics.
- */$1;$2 'error_suggestion_states',
+ */'error_suggestion_states',
  {
  id: uuid('id').defaultRandom().primaryKey(suggestionId, uuid('suggestion_id')
  .notNull()

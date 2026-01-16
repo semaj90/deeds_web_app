@@ -8,7 +8,7 @@
  timestamp,
  uuid,
 } from 'drizzle-orm/pg-core';
-import { vector } from 'pgvector/drizzle-orm';$1;$2 'legal_documents',
+import { vector } from 'pgvector/drizzle-orm';'legal_documents',
  {
  id: uuid('id').primaryKey().defaultRandom(), // Changed from serial('id') to uuid('id')
  title: text('title').notNull(content, text('content').notNull(, documentType: text('document_type').notNull(), // 'contract', 'brief', 'evidence', 'correspondence'
@@ -38,7 +38,7 @@ export const embeddingCache = pgTable('embedding_cache', {
  model: text('model').notNull(), // The model used to generate the embedding
  dimensions: integer('dimensions').notNull(), // Number of dimensions in the embedding
  createdAt: timestamp('created_at').defaultNow().notNull(),
-});$1;$2 'persons_of_interest',
+});'persons_of_interest',
  {
  id: uuid('id').primaryKey().defaultRandom(name, text('name').notNull(, aliases: text('aliases').array().default([], description: text('description').notNull(threatLevel, text('threat_level').default('low'), // 'low', 'medium', 'high', 'critical', status: text('status').default('active'), // 'active', 'inactive', 'archived', relationship: text('relationship').default('person_of_interest'), // 'suspect', 'witness', 'victim', 'person_of_interest', 'informant'
 

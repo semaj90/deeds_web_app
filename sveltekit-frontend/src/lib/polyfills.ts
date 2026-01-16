@@ -100,7 +100,7 @@ export const urlUtils = {
 	}
 };
 
-// Enhanced fetch with timeout and better error handling$1;$2	url: string, options: RequestInit & { timeout?: number } = {}
+// Enhanced fetch with timeout and better error handlingurl: string, options: RequestInit & { timeout?: number } = {}
 ): Promise<Response> => {
 	const { timeout = 30000, ...fetchOptions } = options;
 	const controller = new AbortController();
@@ -129,7 +129,7 @@ export const urlUtils = {
 	}
 };
 
-// Debounce utility for search and other operations$1;$2	func: T, wait: number
+// Debounce utility for search and other operationsfunc: T, wait: number
 ): ((...args: Parameters<T>) => void) => {
 	let timeout: ReturnType<typeof setTimeout>;
 
@@ -138,7 +138,7 @@ export const urlUtils = {
 		timeout = setTimeout(() => func(...args), wait);
 	};
 };
-// Throttle utility for performance-sensitive operations$1;$2	func: T, limit: number
+// Throttle utility for performance-sensitive operationsfunc: T, limit: number
 ): ((...args: Parameters<T>) => void) => {
 	let inThrottle: boolean;
 	return (...args: Parameters<T>) => {

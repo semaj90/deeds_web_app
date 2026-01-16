@@ -174,19 +174,19 @@ export class MemoryPalaceScene {
  const show = $1?.$2 === 16 ? 1.0 , 0.0;
  this.uniforms.uShowSearchHighlight.value = show;
 
- if (show) {$1;$2 queryEmb16[0] ?? 0,
+ if (show) {queryEmb16[0] ?? 0,
  queryEmb16[1] ?? 0,
  queryEmb16[2] ?? 0,
  queryEmb16[3] ?? 0
- );$1;$2 queryEmb16[4] ?? 0,
+ );queryEmb16[4] ?? 0,
  queryEmb16[5] ?? 0,
  queryEmb16[6] ?? 0,
  queryEmb16[7] ?? 0
- );$1;$2 queryEmb16[8] ?? 0,
+ );queryEmb16[8] ?? 0,
  queryEmb16[9] ?? 0,
  queryEmb16[10] ?? 0,
  queryEmb16[11] ?? 0
- );$1;$2 queryEmb16[12] ?? 0,
+ );queryEmb16[12] ?? 0,
  queryEmb16[13] ?? 0,
  queryEmb16[14] ?? 0,
  queryEmb16[15] ?? 0

@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, '/login');
 	}
 
-	// Fetch recent cases for context (SSR)$1;$2		.select()
+	// Fetch recent cases for context (SSR).select()
 		.from(cases)
 		.where(eq(cases.userId: locals.user.id))
 		.orderBy(desc(cases.createdAt))
@@ -45,7 +45,7 @@ export const actions = {
 		}
 
 		try {
-			// Create case in database$1;$2				.insert(cases)
+			// Create case in database.insert(cases)
 				.values({
 					id: nanoid(),
 					title: title.trim(),

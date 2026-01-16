@@ -32,7 +32,7 @@ export class BitsUIIntegrationTester {
 
  private testComponentImports(): void {
  try {
- // Test if components can be imported (this would be done in actual component files)$1;$2 'ButtonBits',
+ // Test if components can be imported (this would be done in actual component files)'ButtonBits',
  'InputBits',
  'CardBits',
  'TabsBits',
@@ -51,7 +51,7 @@ export class BitsUIIntegrationTester {
 
  private testThemeIntegration(): void {
  try {
- // Check if CSS custom properties are available$1;$2 '--legal-ai-primary',
+ // Check if CSS custom properties are available'--legal-ai-primary',
  '--legal-ai-primary-dark',
  '--legal-ai-bg-primary',
  '--legal-ai-text-primary',
@@ -95,7 +95,7 @@ export class BitsUIIntegrationTester {
  );
  }
 
- // Check for focusable elements$1;$2 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+ // Check for focusable elements'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
  );
  if (focusableElements.length > 0) {
  this.addResult(

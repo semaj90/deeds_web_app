@@ -529,7 +529,7 @@ describe('KnowledgeBaseLearning', () => {
  severity: 'error',
  status: 'fixed',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2 diff,
+ };diff,
  error,
  'Use const for immutable variables'
  );
@@ -543,7 +543,7 @@ describe('KnowledgeBaseLearning', () => {
  expect(fix.confidence).toBeGreaterThanOrEqual(0.05);
  expect(fix.confidence).toBeLessThanOrEqual(0.95);
 
- // Property: Confidence should match success rate$1;$2 0.95,
+ // Property: Confidence should match success rate0.95,
  (fix.successCount / fix.appliedCount) * 0.95 + 0.05
  );
  expect(fix.confidence).toBeCloseTo(expectedConfidence, 5);

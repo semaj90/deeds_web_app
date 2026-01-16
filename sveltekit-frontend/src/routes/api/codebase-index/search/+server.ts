@@ -56,7 +56,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       console.warn('FastAPI search service not available, using mock data:', backendError);
     }
 
-    // Mock search results for development$1;$2      {
+    // Mock search results for development{
         id: 'route-home',
         filePath: 'src/routes/+page.svelte',
         label: '+page.svelte',
@@ -113,7 +113,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     ];
 
     // Simple fuzzy search
-    const queryLower = query.toLowerCase();$1;$2      .filter(item => {$1;$2          item.label.toLowerCase().includes(queryLower) ||
+    const queryLower = query.toLowerCase();.filter(item => {item.label.toLowerCase().includes(queryLower) ||
           item.filePath.toLowerCase().includes(queryLower) ||
           (item.snippet?.toLowerCase().includes(queryLower));
 

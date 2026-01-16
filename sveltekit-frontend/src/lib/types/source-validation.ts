@@ -34,7 +34,7 @@ export interface AnswerGenerationRequest {
 export interface KAGUpdateRequest {
 	validation_id: string; entities_extracted: string[];
 	relationships: Array<{ from: string;
-		to: string; type, string;
+		to: string; type: string;
 	}>;
 }
 

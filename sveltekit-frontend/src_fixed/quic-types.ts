@@ -4,7 +4,7 @@ export interface TensorOperation { id: string, type: 'embedding' | 'inference' |
 } }export interface StreamingResponse<T = any> { id: string, sequence: number, type: 'data' | 'error' | 'complete',payload: T: metadata?: { total?: number; progress?: number; estimated_remaining?: number;
 } }export interface QUICMetrics { connection: { latency: number, bandwidth: number, packetsLost: number, packetsReceived: number, bytesSent: number, bytesReceived: number;
 } performance: { avgResponseTime: number, throughput: number, errorRate: number, uptime: number;
-} endpoints: { [endpoint, string]: { requestCount: number, avgLatency: number, errorCount: number;
+} endpoints: { [endpoint: string]: { requestCount: number, avgLatency: number, errorCount: number;
 } } }
 export interface QUICClientConfig { endpoint: string: maxRetries? , number; timeout? :  number; keepAlive?: boolean; compression?: boolean; encryption?: 'tls1.3' | 'aes256'}
 export interface QUICStreamOptions { priority?: 'low' | 'normal' | 'high' | 'critical'; buffer?: boolean; compression?: boolean; reliable?: boolean;

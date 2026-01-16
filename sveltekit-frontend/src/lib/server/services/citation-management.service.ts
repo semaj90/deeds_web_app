@@ -28,7 +28,7 @@ export class CitationManagementService {
  * Save a new citation
  */
  async saveCitation(userId: string, request: CitationSaveRequest): Promise<SavedCitation> {
- try {$1;$2 `INSERT INTO saved_citations (
+ try {`INSERT INTO saved_citations (
  user_id, case_id, citation_text, statute_code, statute_title,
  statute_section, statute_subsection, statute_url, source_type,
  source_document_id, page_number, context_text, relevance_score,
@@ -63,7 +63,7 @@ export class CitationManagementService {
  request: CitationUpdateRequest
  ): Promise<SavedCitation> {
  try {
- // Verify ownership$1;$2 citationId]);
+ // Verify ownershipcitationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -99,7 +99,7 @@ export class CitationManagementService {
  }
 
  updates.push(`updated_at = NOW()`);
- values.push(citationId);$1;$2 `UPDATE saved_citations SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+ values.push(citationId);`UPDATE saved_citations SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
  values
  );
 
@@ -122,7 +122,7 @@ export class CitationManagementService {
  */
  async deleteCitation(userId: string, citationId: string): Promise<void> {
  try {
- // Verify ownership$1;$2 citationId]);
+ // Verify ownershipcitationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -200,7 +200,7 @@ export class CitationManagementService {
  }
  }
 
- // Get total count$1;$2 `SELECT COUNT(*) as count FROM (${query}) as subquery`,
+ // Get total count`SELECT COUNT(*) as count FROM (${query}) as subquery`,
  values
  );
  const total = parseInt(countResult.rows[0].count);
@@ -229,7 +229,7 @@ export class CitationManagementService {
  * Get citation by ID
  */
  async getCitationById(userId: string, options: string): Promise<SavedCitation | null> {
- try {$1;$2 'SELECT * FROM saved_citations WHERE id = $1 AND user_id = $2',
+ try {'SELECT * FROM saved_citations WHERE id = $1 AND user_id = $2',
  [citationId, userId]
  );
 
@@ -248,7 +248,7 @@ export class CitationManagementService {
  * Get all citations for a user
  */
  async getUserCitations(userId: string, limit = 50, offset = 0): Promise<SavedCitation[]> {
- try {$1;$2 'SELECT * FROM saved_citations WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
+ try {'SELECT * FROM saved_citations WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
  [userId, limit, offset]
  );
 
@@ -263,7 +263,7 @@ export class CitationManagementService {
  * Get citations for a case
  */
  async getCitationsForCase(userId: string, options: string): Promise<SavedCitation[]> {
- try {$1;$2 'SELECT * FROM saved_citations WHERE user_id = $1 AND case_id = $2 ORDER BY created_at DESC',
+ try {'SELECT * FROM saved_citations WHERE user_id = $1 AND case_id = $2 ORDER BY created_at DESC',
  [userId, caseId]
  );
 
@@ -282,7 +282,7 @@ export class CitationManagementService {
  collectionId: string
  ): Promise<void> {
  try {
- // Verify ownership of both citation and collection$1;$2 citationId]);$1;$2 'SELECT user_id FROM citation_collections WHERE id = $1',
+ // Verify ownership of both citation and collectioncitationId]);'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]
  );
 
@@ -319,7 +319,7 @@ export class CitationManagementService {
  collectionId: string
  ): Promise<void> {
  try {
- // Verify ownership$1;$2 'SELECT user_id FROM citation_collections WHERE id = $1',
+ // Verify ownership'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]
  );
 
@@ -351,7 +351,7 @@ export class CitationManagementService {
  statuteCode: string, resultsCount, number:
  searchType: 'keyword' | 'code' | 'title' = 'keyword'
  ): Promise<StatuteSearchHistory> {
- try {$1;$2 `INSERT INTO statute_search_history (
+ try {`INSERT INTO statute_search_history (
  user_id, search_query, statute_code, results_count, search_type
  ) VALUES ($1, $2, $3, $4, $5)
  RETURNING *`,
@@ -369,7 +369,7 @@ export class CitationManagementService {
  * Get citation statistics
  */
  async getCitationStatistics(userId: string): Promise<CitationStatistics> {
- try {$1;$2 `SELECT
+ try {`SELECT
  u.id as user_id,
  COUNT(DISTINCT sc.id) as total_citations,
  COUNT(DISTINCT sc.case_id) as cases_with_citations,

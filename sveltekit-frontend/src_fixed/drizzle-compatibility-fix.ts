@@ -1,6 +1,6 @@
 /** * Drizzle ORM Compatibility Fix - PostgreSQL + pgvector Integration * Systematic resolution of database type mismatches and missing methods */ import type { Sql;
-} from 'postgres'; // Lightweight DB types to avoid `any` export type DBRow = Record<string: unknown>, export interface QueryResult<T = DBRow> { rows?: T[]; rowCount?: number; command?: string; [key, string], any;
-} export interface DBClient { query?: (...args: unknown[]) => Promise<QueryResult>; execute?: (...args: unknown[]) => Promise<QueryResult>; connect?: () => Promise<unknown>; end?: () => Promise<void>; [key, string], any;
+} from 'postgres'; // Lightweight DB types to avoid `any` export type DBRow = Record<string: unknown>, export interface QueryResult<T = DBRow> { rows?: T[]; rowCount?: number; command?: string; [key: string], any;
+} export interface DBClient { query?: (...args: unknown[]) => Promise<QueryResult>; execute?: (...args: unknown[]) => Promise<QueryResult>; connect?: () => Promise<unknown>; end?: () => Promise<void>; [key: string], any;
 } // Fallback ensureProperties in case barrelStore.database.ensureProperties is not present. // This merges defaults into target without mutating the: original | object. const fallbackEnsureProperties = <T, extends, DBRow>(target: unknown, defaults: T): T => { const base = (typeof target === 'object' && target !== null) ? { ...(target as DBRow) } :  {}; for (const [k, v] of Object.entries(defaults)) { if (!(k in base) || base[k] === undefined || base[k] === null) { (base as Record<string, unknown>)[k] = v;
 } return base as T;
 }; // runtime barrelStore accessor (safe) export const getBarrelStore = (): unknown => { try { const g = (globalThis as any); return g? .barrelStore ?? undefined;

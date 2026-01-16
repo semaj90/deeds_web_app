@@ -1,4 +1,4 @@
-// Central shared type definitions (incremental widening to unblock svelte-check)$1;$2 | 'default'
+// Central shared type definitions (incremental widening to unblock svelte-check)| 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'
@@ -18,7 +18,7 @@
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
-// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds$1;$2 | 'text'
+// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds| 'text'
  | 'number'
  | 'date'
  | 'email'
@@ -71,7 +71,7 @@ export interface ProfileData {
  modusOperandi?: string;
  knownHabits?: string[];
  associates?: string[];
-}$1;$2 | 'person_of_interest'
+}| 'person_of_interest'
  | 'witness'
  | 'suspect'
  | 'victim'
@@ -120,14 +120,14 @@ export interface FormSubmissionResult<T = unknown> {
  metadata?: { requestId: string; timestamp: string; processingTimeMs: number };
 }
 
-// AI / Worker$1;$2 | 'generate'
+// AI / Worker| 'generate'
  | 'analyze'
  | 'embed'
  | 'search'
  | 'embedding'
  | 'analysis'
  | 'classification'
- | 'summarization';$1;$2 | 'error'
+ | 'summarization';| 'error'
  | 'status'
  | 'result'
  | 'task'
@@ -242,7 +242,7 @@ export interface GlobalAppContext {
  user: { id: string; email: string } | null;
  activeCaseId: string | null;
  theme: 'light' | 'dark';
-}$1;$2 | { type: 'LOGIN'; user: { id: string; email: string } }
+}| { type: 'LOGIN'; user: { id: string; email: string } }
  | { type: 'LOGOUT' }
  | { type: 'SET_CASE'; caseId: string } // Corrected syntax
  | { type: 'SET_THEME'; theme: 'light' | 'dark' };

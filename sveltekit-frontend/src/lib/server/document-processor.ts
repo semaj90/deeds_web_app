@@ -24,14 +24,14 @@ export interface DocumentProcessingResult {
  layout?: { regions: Array<{
  type: string; bbox: number[];
  confidence: number;
- text?, string;
+ text?: string;
  }>;
  };
  objects?: Array<{ class: string;
- bbox: number[]; confidence, number;
+ bbox: number[]; confidence: number;
  }>;
  classifications?: Array<{ class: string;
- confidence, number;
+ confidence: number;
  }>;
  faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
@@ -43,7 +43,7 @@ export interface DocumentProcessingResult {
  }>;
  images?: Array<{ content: Buffer;
  bbox?: number[];
- caption?, string;
+ caption?: string;
  }>;
  method: string; engines: string[];
 }
@@ -230,13 +230,13 @@ export class DocumentProcessor {
  }
 
  // For speed priority, use fastest result
- if (priority === 'speed') {$1;$2 (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev , curr
+ if (priority === 'speed') {(prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev , curr
  );
  return fastest as DocumentProcessingResult;
  }
 
  // For accuracy priority, use highest confidence
- if (priority === 'accuracy') {$1;$2 (prev.metadata?.confidence ?? 0) > (curr.metadata?.confidence ?? 0) ? prev : curr
+ if (priority === 'accuracy') {(prev.metadata?.confidence ?? 0) > (curr.metadata?.confidence ?? 0) ? prev : curr
  );
  return mostAccurate as DocumentProcessingResult;
  }

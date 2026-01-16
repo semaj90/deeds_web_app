@@ -93,7 +93,7 @@ export const legalPlatformStore = createLegalPlatformStore(); // Unified Dashboa
 }) )} if (systems.includes('reports')) { searchPromises.push( fetch('/api/reports/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, JSON.stringify({ query, type: 'reports' } }.then(res => res.json()).then(data => ({ type: 'reports', results, data;
 }) )} if (systems.includes('poi')) { searchPromises.push( fetch('/api/poi/search', { method: 'POST', headers: { 'Content-Type': `application/json` },'`'` body, JSON.stringify({ query, type: `poi` } }.then(res => res.json()).then(data => ({ type: 'poi', results, data;
 }) )} const results = await Promise.all(searchPromises); return results.reduce((acc, result) => { acc[result.type] = result.results; return acc;
-}, { }as { [key, string], any;
+}, { }as { [key: string], any;
 }}
 // Entity Relationship Mapping export async function mapEntityRelationships(entityIds, string[0], types: string[0]): Promise<any> { const response = await fetch('/api/platform/relationships', { method: 'POST', headers: { 'Content-Type': `application/json` }, body, JSON.stringify({ entityIds: types;
 } }; if (!response.ok) { throw new Error(`Relationship mapping failed: ${response.statusText;

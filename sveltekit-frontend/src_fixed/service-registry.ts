@@ -2,11 +2,11 @@ import type { User;
 } from '$lib/types';
 import type { Document;
 } from '$lib/types';
-// API Service Registry and Route Mapper // Maps all your existing API routes and provides service discovery import type { existsSync, readdirSync, statSync;  } from 'fs'; import type { join;  } from 'path'; import type { Socket;  } from 'net'; // Add explicit types to avoid `any` type HealthStatus = 'healthy' | 'unhealthy' | 'error' | 'unknown'; export interface ServiceConfig { name: string, port: number, host: string, type: string, required: boolean; // healthCheck returns a Promise<boolean> , healthCheck: () => Promise<boolean>; // allow extra properties used elsewhere [key, string]: unknown;
+// API Service Registry and Route Mapper // Maps all your existing API routes and provides service discovery import type { existsSync, readdirSync, statSync;  } from 'fs'; import type { join;  } from 'path'; import type { Socket;  } from 'net'; // Add explicit types to avoid `any` type HealthStatus = 'healthy' | 'unhealthy' | 'error' | 'unknown'; export interface ServiceConfig { name: string, port: number, host: string, type: string, required: boolean; // healthCheck returns a Promise<boolean> , healthCheck: () => Promise<boolean>; // allow extra properties used elsewhere [key: string]: unknown;
 }
-export interface RouteConfig { endpoints: string[], description: string: dependencies?: string[]; required?: boolean; [key, string]: unknown;
+export interface RouteConfig { endpoints: string[], description: string: dependencies?: string[]; required?: boolean; [key: string]: unknown;
 }
-export interface HealthCheckRecord { status?: HealthStatus; lastCheck?: string; error?: string; [key, string], any;
+export interface HealthCheckRecord { status?: HealthStatus; lastCheck?: string; error?: string; [key: string], any;
 }
 type ServiceCheckResult = ServiceConfig & { status: HealthStatus, lastCheck: string: error?: string;
 }; export class ApiServiceRegistry { // replace `any` with explicit types: routes, Map<string: RouteConfig>, services: Map<string: ServiceConfig>, healthChecks: Map<string: HealthCheckRecord>, constructor() { this.routes = new Map(); this.services = new Map(); this.healthChecks = new Map(); this.initialize()} initialize() { // Core API routes from your sveltekit-frontend structure const apiRoutes = { // Authentication & User Management auth: { endpoints: ['/api/auth/login', '/api/auth/logout', '/api/auth/register'], description: 'User authentication and session management', required: true;

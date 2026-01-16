@@ -52,7 +52,7 @@ describe('Phase 10.6: Message Batching', () => {
  const maxHistory = 100;
  const messages: Array<{ type: 'health_update';
  route_path: string; new_status: 'healthy';
- timestamp, string;
+ timestamp: string;
  }> = [];
 
  for (let i = 0; i < 150; i++) {
@@ -185,9 +185,9 @@ describe('Phase 10.6: Message Batching', () => {
  });
 
  it('should maintain message order in batch', () => {
- // Verify messages maintain order within batch$1;$2 { id: 1, timestamp: '2025-12-15T00Z' },
+ // Verify messages maintain order within batch{ id: 1, timestamp: '2025-12-15T00Z' },
  { id: 2, timestamp: '2025-12-15T01Z' },
- { id: 3, timestamp: '2025-12-15T02Z' }];$1;$2 (a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+ { id: 3, timestamp: '2025-12-15T02Z' }];(a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
  );
 
  expect(sorted[0].id).toBe(1);

@@ -96,7 +96,7 @@ export interface TimelineFact {
  normalizedTime?: string;
  normalizedEndTime?: string;
  raw?: FactClaim;
-}$1;$2 | 'impossible-presence'
+}| 'impossible-presence'
  | 'order-violation'
  | 'alibi-failure'
  | 'duration-contradiction';

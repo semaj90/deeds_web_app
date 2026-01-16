@@ -142,7 +142,7 @@ class JSONValidationPipeline {
  }
 }
 
-// Test data for validation$1;$2 '{"name": "John Doe", "age": 30, "legal": true}',
+// Test data for validation'{"name": "John Doe", "age": 30, "legal": true}',
  '{"case": {"id": "CASE-2025-001", "type": "contract", "parties": ["Alice", "Bob"]}}',
  '{"evidence": [{"id": "EVID-001", "type": "document", "size": 1024}]}',
  '{"metadata": {"created": "2025-01-01", "tags": ["legal", "contract", "binding"]}}',
@@ -174,7 +174,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  expect(successfulResults.length).toBeGreaterThan(0);
  });
 
- test('should report results to MCP', async () => {$1;$2 { backend: 'native', success: true, performance: 1.5 },
+ test('should report results to MCP', async () => {{ backend: 'native', success: true, performance: 1.5 },
  { backend: 'simdnode', success: true, performance: 0.8 }];
 
  // Mock fetch for testing
@@ -195,7 +195,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  global.fetch = originalFetch;
  });
 
- test('should generate performance report', async () => {$1;$2 { backend: 'native', success: true, performance: 2.0 },
+ test('should generate performance report', async () => {{ backend: 'native', success: true, performance: 2.0 },
  { backend: 'native', success: true, performance: 1.5 },
  { backend: 'simdnode', success: true, performance: 1.0 },
  { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error' }];

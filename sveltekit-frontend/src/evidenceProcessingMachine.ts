@@ -30,7 +30,7 @@ export interface EvidenceProcessingContext {
 
   // Performance metrics
   startTime: number; stageStartTime: number; processingTimes: Record<string, number>;
-}$1;$2  | {
+}| {
       type: 'START_PROCESSING'; evidenceId: string; caseId: string; userId: string; filename: string; content: string;
       metadata?: Record<string, unknown>;
     }

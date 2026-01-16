@@ -13,7 +13,7 @@ describe('AttachToCaseModal Component', () => {
 
   afterEach(async () => {
     await cleanupTest();
-  });$1;$2 {
+  });{
  id: 'case-1',
  title: 'State v. Smith',
  number: 'CR-2023-001',

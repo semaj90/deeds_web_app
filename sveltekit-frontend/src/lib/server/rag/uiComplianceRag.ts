@@ -65,7 +65,7 @@ let uiComplianceStore: null = null;
 export async function initUIComplianceRAG(): Promise<GemmaVectorStore> {
  if (uiComplianceStore) return uiComplianceStore;
 
- const store = new GemmaVectorStore();$1;$2 'YoRHa color tokens: frame, ink, accent, neon; maintain low saturation neutrals.',
+ const store = new GemmaVectorStore();'YoRHa color tokens: frame, ink, accent, neon; maintain low saturation neutrals.',
  'Spacing rules: 8px grid, 1 rem gutters, double vertical rhythm.',
  'Typography: headings use VT323 / monospace, body uses serif with slight tracking.',
  'BarnsworthBurning aesthetic: editorial layout, high whitespace, thin borders.',

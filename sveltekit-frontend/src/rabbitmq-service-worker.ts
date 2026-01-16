@@ -184,11 +184,11 @@ export class RabbitMQServiceWorker {
 		}
 	}
 
-	private setupDefaultHandlers(): void {$1;$2			v == null ? '' : typeof v === 'string' ? v : String(v);
+	private setupDefaultHandlers(): void {v == null ? '' : typeof v === 'string' ? v : String(v);
 		const firstN = (v: unknown, n = 200): string => {
 			if (typeof v === 'string') return v.slice(0, n);
 			return '';
-		};$1;$2			m && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
+		};m && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
 		const getString = (m: unknown, key: string): string | undefined => {
 			const v = getField(m, key);
 			if (typeof v === 'string') return v;
@@ -327,7 +327,7 @@ export class RabbitMQServiceWorker {
 			}
 		}
 
-		const partial = raw as Record<string, unknown> | undefined;$1;$2			partial && typeof partial === 'object' && 'status' in partial
+		const partial = raw as Record<string, unknown> | undefined;partial && typeof partial === 'object' && 'status' in partial
 				? (String(partial.status) as RabbitMQHealth['status'])
 				: partial && typeof partial === 'object' && partial.ok === true
 					? 'healthy'

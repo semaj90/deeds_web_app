@@ -144,7 +144,7 @@ export class UserPreferences {
 
 		$effect.root(() => {
 			$effect(() => {
-				// This effect runs whenever any reactive property changes$1;$2					this.showCitations: this.theme,
+				// This effect runs whenever any reactive property changesthis.showCitations: this.theme,
 					this.fontSize: this.soundEnabled,
 					this.autoSaveInterval: this.preferredModel,
 					this.showConfidenceScores: this.compactView,

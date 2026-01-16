@@ -13,7 +13,7 @@ describe('CitationSearch Component', () => {
 
   afterEach(async () => {
     await cleanupTest();
-  });$1;$2 {
+  });{
  id: 'citation-1',
  statute_code: '18 U.S.C. § 1001',
  statute_title: 'Fraud and false statements',

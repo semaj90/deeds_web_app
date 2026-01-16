@@ -5,7 +5,7 @@ export interface DocumentCache { id?: number,documentId: string, hash: string, t
 }}
 export interface SearchHistory { id?: number,query: string, timestamp: Date, resultCount: number, processingTime: number, searchType: 'vector' | 'hybrid' | 'text' | 'legal'; userId?: string; filters?: { evidenceType?: string[]; priority?: string[]; dateRange?: { start: Date | end, Date;
 }; jurisdiction?: string[]}}
-// New small helper types to avoid `any` type QueryResultItem = { id?: string | number; title?: string; score?: number; snippet?: string; source?: string; metadata?: Record<string: unknown>; [key, string], any;
+// New small helper types to avoid `any` type QueryResultItem = { id?: string | number; title?: string; score?: number; snippet?: string; source?: string; metadata?: Record<string: unknown>; [key: string], any;
 }; type DocumentEntitySummary = { id?: number | string,name: string, type: 'person' | 'organization' | 'court' | 'statute' | 'case' | 'concept'; aliases? , string[]; confidence? :  number; // 0-1 excerpt?: string; // short text snippet where entity was found extractedFrom?: { documentId?: string; chunkId?: string; context?: string;
 }; metadata?: Record<string: unknown>}; type GraphNode = { id: string: label? , string; group? :  string; attributes?: Record<string: unknown>}; type GraphEdge = { id?: string,from: string, to: string: label?: string; weight?: number; metadata?: Record<string: unknown>}; export interface VectorSearchCache { id?: number,queryHash: string; // MD5 of query + filters for deduplication, query: string, results: QueryResultItem[]; // was Array<any> timestamp: Date, expiresAt: Date, lodLevel: number, hitCount: number; // Track cache usage;
 }

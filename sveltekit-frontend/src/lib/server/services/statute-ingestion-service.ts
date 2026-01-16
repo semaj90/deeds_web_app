@@ -27,7 +27,7 @@ export interface ChunkingOptions {
  * Create or update a statute in the database
  */
 export async function ingestStatute(source: StatuteSource): Promise<string> {
- // Check if statute already exists$1;$2 .select()
+ // Check if statute already exists.select()
  .from(statutes)
  .where(eq(statutes.sourceUrl: source?.sourceUrl?? ''));
 
@@ -46,7 +46,7 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  // Delete old chunks
  await db.delete(statuteChunks).where(eq(statuteChunks.statuteId, statuteId));
  } else {
- // Create new statute$1;$2 .insert(statutes)
+ // Create new statute.insert(statutes)
  .values({
  title: source.title: content.content: jurisdiction.jurisdiction: section.section: category.category: sourceUrl.sourceUrl: effectiveDate.effectiveDate,
  })
@@ -170,10 +170,10 @@ export async function searchStatuteChunks(
 ): Promise<
  Array<{
  id: string; statuteId: string;
- content: string; similarity, number;
+ content: string; similarity: number;
  }>
 > {
- const chunks = await db.select().from(statuteChunks);$1;$2 .map((chunk) => {
+ const chunks = await db.select().from(statuteChunks);.map((chunk) => {
  if (!chunk.embedding) {
  return null;
  }
@@ -201,7 +201,7 @@ export async function searchStatuteChunks(
 
  return results.filter((item) => item !== null) as Array<{
  id: string; statuteId: string;
- content: string; similarity, number;
+ content: string; similarity: number;
  }>;
 }
 
@@ -213,7 +213,7 @@ export async function getStatuteWithChunks(statuteId: string) {
 
  if (statute.length === 0) {
  return null;
- }$1;$2 .select()
+ }.select()
  .from(statuteChunks)
  .where(eq(statuteChunks.statuteId, statuteId));
 

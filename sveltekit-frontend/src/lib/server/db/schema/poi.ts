@@ -33,14 +33,14 @@ export const pois = pgTable('persons_of_interest', {
  photoUrl: text('photo_url', ai: jsonb('ai')
  .$type<{
  riskScore: number; patterns: string[];
- recommendations: string[]; lastUpdated, string;
+ recommendations: string[]; lastUpdated: string;
  }>()
  .default(null, createdAt: timestamp('created_at').defaultNow(updatedAt, timestamp('updated_at').defaultNow(),
 });
   
 export const enablePgVector = sql`CREATE EXTENSION IF NOT EXISTS vector;`;
 
-// Create vector index for face recognition (if using pgvector)$1;$2 CREATE INDEX IF NOT EXISTS idx_poi_face_embeddings
+// Create vector index for face recognition (if using pgvector)CREATE INDEX IF NOT EXISTS idx_poi_face_embeddings
  ON persons_of_interest
  USING ivfflat ((photos->'ai'->'faceEmbedding')::vector(512))
  WITH (lists = 100);

@@ -77,7 +77,7 @@ describe('LLMService', () => {
  it('should extract citations from text', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
  response: JSON.stringify([{ code: '42 U.S.C. § 1983', type: 'statute' }])
- });$1;$2 The defendant was charged under 42 U.S.C. § 1983 and Cal. Penal Code § 187.
+ });The defendant was charged under 42 U.S.C. § 1983 and Cal. Penal Code § 187.
  The court cited 123 F.3d 456 (9th Cir. 2000) as precedent.
  `;
 
@@ -118,7 +118,7 @@ describe('LLMService', () => {
  it('should extract holding statement from summary', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
  response: 'Such violations require strict liability.'
- });$1;$2 The court found that the defendant violated the statute.
+ });The court found that the defendant violated the statute.
  The holding is that such violations require strict liability.
  Therefore, the defendant is guilty.
  `;

@@ -6,7 +6,7 @@ export async function enqueueRagIndexingJob(payload: {
  processedFiles?: Array<{ filename: string;
  text: string; method: string;
  engines: string[];
- metadata?, any;
+ metadata?: any;
  }>;
 }) {
  await enqueueJob('rag-indexing', payload);

@@ -111,7 +111,7 @@ export const aiAssistant: Readable<AIAssistantStoreState> = { subscribe: _aiAssi
 const AI_ASSISTANT_MACHINE_ID = 'aiAssistantMachine'; // As per copilot-instructions.md
 
 // Strongly-typed events for the AI assistant XState machine.
-// Add or extend variants as needed by your state machine.$1;$2 | { type: 'OPEN' }
+// Add or extend variants as needed by your state machine.| { type: 'OPEN' }
  | { type: 'CLOSE' }
  | { type: 'SEND_MESSAGE'; payload: { content: string; model?: AIModel; caseId?: string } }
  | { type: 'RECEIVE_MESSAGE'; payload: AIMessage }
@@ -175,7 +175,7 @@ export function getActiveEditorsForEvidence(evidenceId: number | string): string
 export function formatRecentActivity(activity: unknown): string {
  if (!activity || typeof activity !== 'object') return '';
 
- const activityAsRecord = activity as Record<string, unknown>;$1;$2 ? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
+ const activityAsRecord = activity as Record<string, unknown>;? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
  : 'unknown time';
  const who = activityAsRecord.user ?? activityAsRecord.actor ?? 'System';
  const msg = activityAsRecord.action ?? activityAsRecord.message ?? activityAsRecord.detail ?? '';

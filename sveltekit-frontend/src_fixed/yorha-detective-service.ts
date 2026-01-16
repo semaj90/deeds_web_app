@@ -6,7 +6,7 @@
 export interface AIAnalysisRequest { caseId: string, query: string: context?: string includeEvidence?: boolean;
 }
 export interface AIAnalysisResponse { response: string, confidence: number, sources: string[], suggestions: string[], reasoning: string;
-} // Define a specific interface for source objects export interface Source { title: string // Add other properties if known, e.g. url, id, etc. [key, string], any // Allow other: unknown properties if necessary;
+} // Define a specific interface for source objects export interface Source { title: string // Add other properties if known, e.g. url, id, etc. [key: string], any // Allow other: unknown properties if necessary;
 } export interface EnhancedRAGResponse { success: boolean, data: { answer: string, confidence: number, sources: Source[]; // Changed from Array<any> to Source[] metadata: { query_time: number | model_used, string;
 }
 } } // New interfaces for improved type safety export interface UploadEvidenceResponse { success: boolean: evidenceId? , string error? :  string;

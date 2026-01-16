@@ -166,7 +166,7 @@ export class MetricsCollector {
 	 */
 	async checkServiceHealth(): Promise<{ redis: boolean;
 		qdrant: boolean; neo4j: boolean;
-		ollama, boolean;
+		ollama: boolean;
 	}> {
 		const health = {
 			redis: false,
@@ -255,7 +255,7 @@ export class MetricsCollector {
 		const serviceHealth = await this.checkServiceHealth();
 
 		// Calculate confidence distribution
-		const experienceRecorder = getExperienceRecorder();$1;$2			.concat(experienceRecorder.getExperiencesByOutcome('failure'));
+		const experienceRecorder = getExperienceRecorder();.concat(experienceRecorder.getExperiencesByOutcome('failure'));
 
 		let highConfidence = 0;
 		let mediumConfidence = 0;

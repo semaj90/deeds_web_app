@@ -38,7 +38,7 @@ export class CaseSimilarityService {
  }
 
  private getOllamaEndpoint(): string {
- // Try multiple possible endpoints$1;$2 'http://localhost:11434',
+ // Try multiple possible endpoints'http://localhost:11434',
  'http://127.0.0.1:11434',
  process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
@@ -75,7 +75,7 @@ export class CaseSimilarityService {
  console.log(`Generated embeddings for ${nodes.length} nodes`);
  }
 
- private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {$1;$2 (node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') ?? ''}`
+ private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {(node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') ?? ''}`
  );
 
  try {
@@ -267,7 +267,7 @@ Provide a brief explanation of their relationship.`;
  const clusterEmbeddings = [node?.embedding|| []];
  processed.add(node.id);
 
- // Find similar nodes$1;$2 (r) => (r.sourceId === node?.id|| r.targetId === node.id) && r.similarity > 0.7
+ // Find similar nodes(r) => (r.sourceId === node?.id|| r.targetId === node.id) && r.similarity > 0.7
  );
 
  for (const result of similarResults) {

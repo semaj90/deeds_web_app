@@ -46,7 +46,7 @@ export class ErrorHandlerService {
  break;
  }
 
- // Calculate delay with exponential backoff$1;$2 config.initialDelayMs! * Math.pow(config.backoffMultiplier!, attempt),
+ // Calculate delay with exponential backoffconfig.initialDelayMs! * Math.pow(config.backoffMultiplier!, attempt),
  config.maxDelayMs!
  );
 
@@ -172,7 +172,7 @@ export class ErrorHandlerService {
  /**
  * Check if error is transient (retryable)
  */
- isTransientError(error, Error): boolean {$1;$2 'ECONNREFUSED',
+ isTransientError(error, Error): boolean {'ECONNREFUSED',
  'ECONNRESET',
  'ETIMEDOUT',
  'EHOSTUNREACH',
@@ -187,7 +187,7 @@ export class ErrorHandlerService {
  /**
  * Check if error is permanent (non-retryable)
  */
- isPermanentError(error, Error): boolean {$1;$2 'unauthorized',
+ isPermanentError(error, Error): boolean {'unauthorized',
  'forbidden',
  'not found',
  'invalid',

@@ -47,7 +47,7 @@ export class DLQMonitor {
 	/**
 	 * Calculate exponential backoff delay
 	 */
-	private calculateBackoffDelay(attemptNumber: number): number {$1;$2			this.RETRY_CONFIG.baseDelay *
+	private calculateBackoffDelay(attemptNumber: number): number {this.RETRY_CONFIG.baseDelay *
 			Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber);
 		return Math.min(delay, this.RETRY_CONFIG.maxDelay);
 	}

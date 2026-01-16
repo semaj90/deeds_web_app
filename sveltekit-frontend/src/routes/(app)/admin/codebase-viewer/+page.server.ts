@@ -15,7 +15,7 @@ const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
 export const load: PageServerLoad = async () => {
 	try {
 		// Get Qdrant collections
-		const collections = await qdrant.getCollections();$1;$2		collections.collections.map(async (col) => {
+		const collections = await qdrant.getCollections();collections.collections.map(async (col) => {
 			const info = await qdrant.getCollection(col.name);
 			return {
 				name: col.name,
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async () => {
 				status: info.status
 			};
 		})
-	);		// Get PostgreSQL embedded files$1;$2			SELECT
+	);		// Get PostgreSQL embedded filesSELECT
 				source,
 				COUNT(*) as error_count,
 				MAX(indexed_at) as last_indexed,
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async () => {
 			LIMIT 100
 		`);
 
-		// Get file timeline from PostgreSQL$1;$2			SELECT
+		// Get file timeline from PostgreSQLSELECT
 				file_path,
 				indexed_at,
 				tagged_at,
@@ -48,7 +48,7 @@ export const load: PageServerLoad = async () => {
 			LIMIT 50
 		`).catch(() => ({ rows: [] }));
 
-		// Get embedding statistics$1;$2			SELECT
+		// Get embedding statisticsSELECT
 				COUNT(DISTINCT source) as total_files,
 				COUNT(*) as total_errors,
 				COUNT(DISTINCT error_code) as unique_error_codes,

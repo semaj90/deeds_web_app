@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Missing error report' }, { status: 400 });
 		}
 
-		const escalation = getEscalationService();$1;$2			error,
+		const escalation = getEscalationService();error,
 			attemptedStrategies || [],
 			confidence ?? 0,
 			toolResults || [],

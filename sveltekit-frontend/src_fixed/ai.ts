@@ -1,6 +1,6 @@
 import type { AIResponse;
 } from '$lib/types';
-export interface AIResponse { confidence?: number; keyTerms?: string[]; processingTime?: number; gpuProcessed?: boolean; legalRisk?: string; [key, string], any;
+export interface AIResponse { confidence?: number; keyTerms?: string[]; processingTime?: number; gpuProcessed?: boolean; legalRisk?: string; [key: string], any;
 }
 export interface VectorSearchResult { id: string, content: string, score: number: metadata?: Record<string: unknown>, source?: { type: string, name: string, url: string;
 }; highlights?: string[]; confidence?: number;

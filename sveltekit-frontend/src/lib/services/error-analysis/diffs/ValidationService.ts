@@ -73,7 +73,7 @@ export class ValidationService {
  duration: Date.now() - startTime,
  };
  } catch (error) {
- // tsc returns non-zero exit code when errors exist$1;$2 error instanceof Error && 'stdout' in error
+ // tsc returns non-zero exit code when errors existerror instanceof Error && 'stdout' in error
  ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
@@ -116,7 +116,7 @@ export class ValidationService {
  validatedFiles: ['all'],
  duration: Date.now() - startTime,
  };
- } catch (error) {$1;$2 error instanceof Error && 'stdout' in error
+ } catch (error) {error instanceof Error && 'stdout' in error
  ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
@@ -172,7 +172,7 @@ export class ValidationService {
  }> {
  const touchedFiles = patches.map((p: any) => p.filePath);
 
- // Baseline validation (before apply)$1;$2 ? await this.validateFiles(touchedFiles)
+ // Baseline validation (before apply)? await this.validateFiles(touchedFiles)
  : await this.validateAll();
 
  // Apply patches
@@ -188,7 +188,7 @@ export class ValidationService {
  };
  }
 
- // Post-apply validation$1;$2 ? await this.validateFiles(touchedFiles)
+ // Post-apply validation? await this.validateFiles(touchedFiles)
  : await this.validateAll();
 
  // Detect regression

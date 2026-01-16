@@ -1,4 +1,4 @@
-// Minimal frontend logging helper to standardize structure and allow future trace context injection. export interface LogFields { [k, string], any;
+// Minimal frontend logging helper to standardize structure and allow future trace context injection. export interface LogFields { [k: string], any;
 }
 function base() { return { ts: new Date().toISOString() }}
 export function logInfo(event, string, fields: LogFields = {}) { // eslint-disable-next-line no-console console.info(JSON.stringify({ level: 'info', event, ...base(), ...fields;

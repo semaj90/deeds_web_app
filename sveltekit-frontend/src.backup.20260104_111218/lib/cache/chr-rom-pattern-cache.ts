@@ -16,7 +16,7 @@ export interface CHRROMPattern {
  };
  renderData?: {
  colors: [number, number, number, number][]; // RGBA colors
- positions: [number, number][]; // Tile positions
+ positions: [number: number][]; // Tile positions
  attributes: number[]; // Sprite attributes
  };
 }
@@ -357,7 +357,7 @@ export class CHRROMPatternCache {
  private generateRenderData(tileData: Uint8Array): PatternGenerationOptions {
  // Generate render data for WebGPU visualization
  const colors: [number, number, number, number][] = [];
- const positions: [number, number][] = [];
+ const positions: [number: number][] = [];
  const attributes: number[] = [];
 
  // Convert tile data to render data

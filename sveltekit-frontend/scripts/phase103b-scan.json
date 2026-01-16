@@ -1,0 +1,2850 @@
+{
+  "timestamp": "2026-01-16T18:23:33.408Z",
+  "filesScanned": 3002,
+  "filesWithFixes": 403,
+  "totalFixes": 843,
+  "patternCounts": {
+    "property_comma_to_colon": 221,
+    "index_signature_comma_to_colon": 605,
+    "redis_setex_fix": 17
+  },
+  "files": [
+    {
+      "file": "src\\lib\\proto\\legal-ai-types.ts",
+      "fixes": 28,
+      "patterns": [
+        "property_comma_to_colon: 28"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\utils\\logger.ts",
+      "fixes": 17,
+      "patterns": [
+        "index_signature_comma_to_colon: 17"
+      ]
+    },
+    {
+      "file": "src\\lib\\state\\phase13StateMachine.ts",
+      "fixes": 15,
+      "patterns": [
+        "index_signature_comma_to_colon: 15"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\machines\\types.ts",
+      "fixes": 15,
+      "patterns": [
+        "index_signature_comma_to_colon: 15"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\types.ts",
+      "fixes": 15,
+      "patterns": [
+        "index_signature_comma_to_colon: 15"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\comprehensive-database-orchestrator.ts",
+      "fixes": 14,
+      "patterns": [
+        "index_signature_comma_to_colon: 14"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\global.ts",
+      "fixes": 11,
+      "patterns": [
+        "index_signature_comma_to_colon: 11"
+      ]
+    },
+    {
+      "file": "src\\lib\\machines\\predictive-typing-machine.ts",
+      "fixes": 11,
+      "patterns": [
+        "index_signature_comma_to_colon: 11"
+      ]
+    },
+    {
+      "file": "src\\lib\\caching\\multi-dimensional-image-cache.ts",
+      "fixes": 10,
+      "patterns": [
+        "index_signature_comma_to_colon: 10"
+      ]
+    },
+    {
+      "file": "src\\lib\\integrations\\full-stack-workflow.ts",
+      "fixes": 9,
+      "patterns": [
+        "index_signature_comma_to_colon: 8",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\wasm-types.ts",
+      "fixes": 8,
+      "patterns": [
+        "index_signature_comma_to_colon: 8"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhanced-recommendation-integration.ts",
+      "fixes": 8,
+      "patterns": [
+        "index_signature_comma_to_colon: 8"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\analyticsStore.svelte.ts",
+      "fixes": 8,
+      "patterns": [
+        "index_signature_comma_to_colon: 8"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\nomic-embedding-service.ts",
+      "fixes": 7,
+      "patterns": [
+        "index_signature_comma_to_colon: 7"
+      ]
+    },
+    {
+      "file": "src\\lib\\wasm\\ultra-json-parser.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\production-service-client.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\enhanced-ai-synthesis-orchestrator.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\evidence-cache-service.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\barrel-store-manager.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\v1\\detective\\patterns\\+server.ts",
+      "fixes": 6,
+      "patterns": [
+        "index_signature_comma_to_colon: 6"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\case-transform.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\state.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\gpu-cache-integration.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\database-api-bridge.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\system-integration.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\gpu-llm-streaming-pipeline.ts",
+      "fixes": 5,
+      "patterns": [
+        "property_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\legal-reports.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\ai-agent.ts",
+      "fixes": 5,
+      "patterns": [
+        "index_signature_comma_to_colon: 5"
+      ]
+    },
+    {
+      "file": "src\\lib\\webasm\\llama-cpp-engine.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\ui\\matrix-lod.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\vector-search.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\quic-types.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\legal-types.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\evidence.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\database.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\state\\evidenceCustodyMachine.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\document-processor.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\optimization\\simd-json-index-processor.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\vite-error-logger.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\recommendation-engine.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\production-monitoring-dashboard.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\qdrant-client.ts",
+      "fixes": 4,
+      "patterns": [
+        "index_signature_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\mirror-query.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\cases\\caseSynthesis.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\dashboard\\DocumentProcessingAPI.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\error-brain-api.ts",
+      "fixes": 4,
+      "patterns": [
+        "property_comma_to_colon: 4"
+      ]
+    },
+    {
+      "file": "src\\qdrant-vector-store.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\embedding-worker-enhanced.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\tensorrt-types.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\shared.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 2",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\route-analytics.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\legal-ai-metadata.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\terminalFunctions.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\moogle\\stage6-production-orchestrator.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\machines\\legalAIMachine.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\machines\\case-workflow-machine.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\integrations\\flashattention-multicore-bridge.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\user-analytics-rl-integration.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\real-ai-service.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\quic-tensor-client.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 2",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\qlora-rl-training-service.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 2",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\precedent-analysis-engine.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\minio-upload-service.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 2",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\legal-ai-integration.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-resolution-engine.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\chr-rom-precomputation-service.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\chr-rom-pattern-optimizer.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\composables\\legal-data-runes.svelte.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\cache\\loki-redis-integration.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 2",
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\agents\\types.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\unified-search-service.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\embedding\\embedding-repository.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\chat\\ssr-qlora-gpu-chat-assistant.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\auth\\utils.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\api\\service-registry.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\qdrant-vector-store.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\orchestrator-test.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\llm-orchestrator-bridge.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\graph-rag-orchestrator.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\enhanced-legal-search.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\config.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\search\\utils.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\yorha\\enhanced-rag\\+server.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\component-adapter-store.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\barrel-functions.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\diffs\\RedisCache.ts",
+      "fixes": 3,
+      "patterns": [
+        "property_comma_to_colon: 1",
+        "redis_setex_fix: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\bits\\types.ts",
+      "fixes": 3,
+      "patterns": [
+        "index_signature_comma_to_colon: 3"
+      ]
+    },
+    {
+      "file": "src\\webgpu-langchain-bridge.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\crewAIOrchestrationMachine.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\rabbitmq-embedding-worker.ts",
+      "fixes": 2,
+      "patterns": [
+        "redis_setex_fix: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\predictive-prefetch.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\wasm\\webassembly-accelerator.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\wasm\\legal-processor.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\wasm\\graphEngine.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\ux-pattern-validator.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\transitions.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\simd-markdown-parser.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\errorHandler.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\vector.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\user.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\rust-bridge.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\gpu-services.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\auth.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\ai-assistant.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\admin.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\storage\\vector-quantization.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\state\\evidence-processing-machine.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\schemas\\vector.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\yolo.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\webgpu-langchain-bridge.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\knowledge-cache.ts",
+      "fixes": 2,
+      "patterns": [
+        "redis_setex_fix: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\docling.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\integrations\\comprehensive-agent-orchestration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\error-brain\\types.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\detective-mode\\comprehensive-integration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\detective-mode\\comprehensive-integration.svelte.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\webgpu-wasm-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-inference-integration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\tensorrt-llm-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "redis_setex_fix: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\telemetry-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\reinforcement-learning-cache-optimizer.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\recommendation-orchestrator.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\real-vector-search-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\quic-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\production-pipeline-integration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\png-embed-extractor.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\node-simd-json.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\neo4jGraphService.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\multiLayerCache.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\multi-embedding-vector-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\mcp-gpu-orchestrator.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\legal-ai-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\langchain-config-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\instant-search-engine.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\go-microservice-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\glyph-diffusion-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhanced-rag-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhanced-api-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\end-to-end-pipeline.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\cuda-vector-integration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\crud-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\comprehensive-integration.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\caseService.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\aiAutoTagging.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\advanced-bit-encoder.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\database\\drizzle-compatibility-fix.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\db\\client-db.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 1",
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\data\\mock-legal-data.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\cache\\chr-rom-pattern-cache.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\vector\\EnhancedVectorService.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\search\\vector-search.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\vector.service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\statute-ingestion-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\relay-auth-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\qdrant-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\neo4j-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\neo4j-client.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag\\types.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\error-brain\\knowledge-base.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\chrrom\\patterns.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ace-web\\ace-context-service.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\types\\service-types.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\documents\\process\\+server.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\ai\\search\\+server.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\v1\\detective\\insights\\+server.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\v1\\citations\\verify\\+server.ts",
+      "fixes": 2,
+      "patterns": [
+        "property_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\three\\yorha-ui\\webgpu\\YoRHaOptimizedTextureManager.ts",
+      "fixes": 2,
+      "patterns": [
+        "index_signature_comma_to_colon: 2"
+      ]
+    },
+    {
+      "file": "src\\pgvector-indexing-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\mcp-gpu-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\integrated-rag-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\ai-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\gemma3Client.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\command-center-manifest.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\ClientEmbeddingService.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\ClientEmbeddingGemma.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\queue-worker.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\embeddings-worker.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\workers\\comprehensive-worker.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\webgpu\\graph-texture-layout.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\vite\\vscode-extension.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\vite\\vscode-error-logger.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\vision\\api.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\type-guards.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\todo-autogen.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\simd-json-parser.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\security.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\rag-cache.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\llm-retry-wrapper.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\flatbuffer-legal.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\data-helpers.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\buffer-utils.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\upload.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\source-validation.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\search.types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\predictor.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\llm.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\ingest.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\component-props.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\common.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\case.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\types\\canvas.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\state\\evidence-processing-machine-corrupted.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\state\\crewAIOrchestrationMachine.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\shims\\melt-ui-shim.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\search\\local-pipeline.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\routing\\route-guards.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\routing\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\vlm-document-analyzer.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\thread-safe-postgres.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\redis-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag-sync.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag-query.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\message-queue.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\keyword-extractor.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ibm-vision.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\gemma3-vlm-embedder.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\authUtils.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\polyfills\\sveltekit2-universal-polyfill.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\performance\\optimizations.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\parsers\\simd-json-parser.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\orchestration\\master-cognitive-hub.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\orchestration\\complete-legal-ai-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\orchestration\\autoencoder-context-switcher.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\optimization\\simd-json-parser.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\optimization\\simd-json-parser-bridge.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\optimization\\context7-mcp-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\middleware\\binary-encoding.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\metrics\\gpuMetricsBatcher.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\logic\\Report.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\logic\\HistoryManager.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\machines\\graph-cache-machine.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\machines\\aiAssistantMachine.minimal.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\json\\fastjson.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\integrations\\revolutionary-multicore-bridge.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\integrations\\redis-webgpu-simd-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\graph\\sora-graph-traversal.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\embedding\\client-embedding-generator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\yorha-detective-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\xstate-utils.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\webgpu-som-error-fixer.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\webgpu-som-enhanced-cache.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\webasm-inference-rag.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\vectorRankingService.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\vector-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\vector-search-index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\upload-telemetry-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-wasm-gpu-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-simd-parser.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-legal-simd-pgvector.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-legal-orchestration-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\unified-legal-cache-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\simd-json-acceleration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\semantic-search.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\searchService.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\redis-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\rag-pipeline-integrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\queue-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\productionServiceClient.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\postgresql-vector-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\parallel-orchestration-master.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ollama-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ollama-embeddings.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ollama-cuda-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\nodejs-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\nes-cache-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\logging-aggregation-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\keyboard-shortcuts-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\healthUpdates.batch.test.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\gpu-som-embeddings.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\gpu-cluster-acceleration.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\go-microservices-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\gemma-embedding.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\fuse-lazy-search-indexeddb.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\evidence-chain-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-pattern-rag.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-handler.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhancedRAGPipeline.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhanced-nats-messaging.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\enhanced-caching-optimizer.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\documentUpdateLoop.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\cross-encoder-reranker.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\couchdb-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\contextual-memory-chat-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\context7-phase13-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\context7-mcp-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\context-aware-ai-memory-types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\concurrent-indexeddb-search.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\comprehensive-ollama-summarizer.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\complete-gpu-error-pipeline.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\autosuggester-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\api-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ai-worker-manager.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ai-suggestions-grpc-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ai-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ai-evidence-analyzer.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\ai-error-fixer.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\advanced-simd-pipeline.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\db\\schema-example-legal.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\db\\dexie-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\data\\types.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\client\\ocr-tensor-processor.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\caching\\reinforcement-learning-cache.server.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\cache\\glyph-shader-cache-bridge.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\ast\\error-vectorizer.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\ws\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\legal-ai\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\error-brain\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\(tools)_disabled\\search\\+page.server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\ui\\autocomplete\\indexeddb-cache.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\utils\\dashboard\\ErrorHandler.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\shared\\types\\parser.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\workflows\\shared-types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\workflows\\ingestion-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\workers\\citation-extraction.worker.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\vector\\qdrant-optimized.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\utils\\avatar-upload.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\vector-service-simple.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\user-recommendation-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\unified-vector-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\statute-storage-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\statute-search.service.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\statute-prefetch-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\router-inference.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\recovery.service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\QdrantService.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\conversation-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\citation-library.service.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\cache.service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\ai-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\adaptive-index-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag\\rag-types.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag\\cache.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\rag\\cache-old.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\orchestrator\\gemma-agent.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\monitoring\\logger.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\llm\\ollama-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ingest\\worker-pool.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ingest\\ingest-worker.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\database\\vector-schema-simple.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\database\\redis-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\concurrency\\advisory-locks.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\vector-operations.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\unified-client-backup.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema-test-rag.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema-poi.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema-gpu-metrics.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\qdrant-sync.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\chat\\history-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\streaming-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\som-bitmap-visualizer.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\pgvector-indexing-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\mcp-context7-embedding-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\legal-bert-onnx-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\feedback-loop.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\ai\\contextual-understanding-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\knowledge-search\\RedisCacheService.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\validation-service.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\MetricsCollector.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\DecisionEngine.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\error-analysis\\CacheService.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\types\\quic-types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\types\\legal.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\db\\queries\\nes-command-center-archive.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\client\\api\\analytics.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\yorha\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\headless\\texture-streaming.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\detective\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes\\api\\codebase\\apply-patch\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes\\api\\ace\\summarize-clusters\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\phase82\\upgrade-route\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\phase72\\suggest-fix\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\vector-search.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\userDataStore.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\ui.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\realtime.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\lokiStore.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\legal-platform-integration.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\legal-case.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\global-loki.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\global-loki-store.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\evidence-workflow.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\evidence-unified.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\evidence-unified-fixed.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\evidence-global-store.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\enhancedLokiStore.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\enhanced-auth.svelte.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\stores\\_archive\\old-stores\\component-metadata-cache.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\search\\search-orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\search\\reranker-client.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\persistence\\redis-json-schema.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\services\\clustering\\orchestrator.ts",
+      "fixes": 1,
+      "patterns": [
+        "redis_setex_fix: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema\\poi.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema\\gpu-cache-schema.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\server\\db\\schema\\ai_chat.ts",
+      "fixes": 1,
+      "patterns": [
+        "property_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\services\\providers\\ollama\\streaming.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\switch\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\slider\\index.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\types\\gaming-types.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\lib\\components\\ui\\gaming\\types\\gaming-types-minimal.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    },
+    {
+      "file": "src\\routes_parked\\api\\ai\\summarize\\cache\\[key]\\+server.ts",
+      "fixes": 1,
+      "patterns": [
+        "index_signature_comma_to_colon: 1"
+      ]
+    }
+  ]
+}

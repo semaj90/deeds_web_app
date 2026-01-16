@@ -30,7 +30,7 @@ export async function generateReportWithGemma(opts: { caseTitle: string,
  how,
  persons,
  evidence,
- } = opts;$1;$2 template === 'charging_memo'
+ } = opts;template === 'charging_memo'
  ? 'Charging Memorandum for Prosecutor'
  : 'Intake Summary for Prosecutor';$1;$2You are a prosecutor-assistant legal AI.
 

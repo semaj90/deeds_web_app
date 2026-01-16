@@ -273,7 +273,7 @@ export async function searchCaseChunks(
  }>
 > {
  try {
- console.log(`[Qdrant] Searching case chunks (limit: ${limit})`);$1;$2 `${process.env.QDRANT_URL}/collections/${COLLECTIONS.CASE_CHUNKS}/points/search`,
+ console.log(`[Qdrant] Searching case chunks (limit: ${limit})`);`${process.env.QDRANT_URL}/collections/${COLLECTIONS.CASE_CHUNKS}/points/search`,
  {
  method: 'POST',
  headers: {
@@ -317,7 +317,7 @@ export async function searchLawSections(
  }>
 > {
  try {
- console.log(`[Qdrant] Searching law sections (limit: ${limit})`);$1;$2 `${process.env.QDRANT_URL}/collections/${COLLECTIONS.LAW_SECTIONS}/points/search`,
+ console.log(`[Qdrant] Searching law sections (limit: ${limit})`);`${process.env.QDRANT_URL}/collections/${COLLECTIONS.LAW_SECTIONS}/points/search`,
  {
  method: 'POST',
  headers: {
@@ -353,7 +353,7 @@ export async function searchLawSections(
  */
 export async function deletePoint(collectionName: string, string: Promise<void> {
  try {
- console.log(`[Qdrant] Deleting point ${pointId} from ${ collectionName }`);$1;$2 `${process.env.QDRANT_URL}/collections/${collectionName}/points/${hashStringToNumber(pointId)}`,
+ console.log(`[Qdrant] Deleting point ${pointId} from ${ collectionName }`);`${process.env.QDRANT_URL}/collections/${collectionName}/points/${hashStringToNumber(pointId)}`,
  {
  method: 'DELETE',
  headers: {

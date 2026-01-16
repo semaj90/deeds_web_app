@@ -47,7 +47,7 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
  throw error;
  }
 
- // Calculate delay with exponential backoff$1;$2 config.initialDelayMs * Math.pow(config.backoffMultiplier, attempt),
+ // Calculate delay with exponential backoffconfig.initialDelayMs * Math.pow(config.backoffMultiplier, attempt),
  config.maxDelayMs
  );
 

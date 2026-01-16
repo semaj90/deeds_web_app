@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request }) => {
  `Invalid embedding dimension - expected 384D from embeddinggemma, got ${embedding?.length}`
  );
  }
- // Store document chunk$1;$2 .insert(schema.documentChunks)
+ // Store document chunk.insert(schema.documentChunks)
  .values({
  entity_id: entityType === 'evidence' ? entityId, chunk_text,
  embedding: JSON.stringify(embedding, chunk_sequence: i, chunk_metadata: metadata ? JSON.stringify(metadata) : null,

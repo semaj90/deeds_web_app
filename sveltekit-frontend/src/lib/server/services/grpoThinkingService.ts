@@ -295,7 +295,7 @@ export async function searchGrpoThinkingResponses(
  practiceAreaCondition = sql`AND (metadata->'practiceArea' ?| ${practiceAreaArray})`;
  }
 
- // Execute advanced similarity search with timestamp weighting$1;$2 WITH similarity_scores AS (
+ // Execute advanced similarity search with timestamp weightingWITH similarity_scores AS (
  SELECT
  message_id,
  conversation_id,
@@ -436,7 +436,7 @@ export async function getTrendingGrpoPatterns(
  day: '1 day',
  week: '1 week',
  month: '1 month',
- }[timeWindow];$1;$2 WITH thinking_patterns AS (
+ }[timeWindow];WITH thinking_patterns AS (
  SELECT
  thinking_type,
  -- Extract common reasoning patterns

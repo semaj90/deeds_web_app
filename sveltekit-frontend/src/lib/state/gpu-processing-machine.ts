@@ -47,7 +47,7 @@ interface GPUProcessingContext {
  retryCount: Map<string, number>;
 }
 
-// Events$1;$2 | ({ type: 'PROCESS_DOCUMENT' } & DocumentInput)
+// Events| ({ type: 'PROCESS_DOCUMENT' } & DocumentInput)
  | { type: 'BATCH_PROCESS'; documents: DocumentInput[] }
  | { type: 'DOCUMENT_COMPLETED'; documentId: string; result: ProcessingResult }
  | { type: 'DOCUMENT_FAILED'; documentId: string; error: string }
@@ -178,7 +178,7 @@ const updateMetrics = ({ context }: { context, GPUProcessingContext }) => {
  context.metrics.gpuUtilization = Math.random() * 100;
 
  // Calculate average processing time
- if (context.completedDocuments.length > 0) {$1;$2 (sum, doc) => sum + (doc?.processingTime?? 0),
+ if (context.completedDocuments.length > 0) {(sum, doc) => sum + (doc?.processingTime?? 0),
  0
  );
  context.metrics.averageTime = totalTime / context.completedDocuments.length;

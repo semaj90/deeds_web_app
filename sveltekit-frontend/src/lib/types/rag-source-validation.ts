@@ -14,17 +14,17 @@
 
 // =============================================================================
 // Enums
-// =============================================================================$1;$2  | 'document'
+// =============================================================================| 'document'
   | 'statute'
   | 'case_law'
   | 'regulation'
   | 'contract'
   | 'evidence'
   | 'precedent'
-  | 'expert_opinion';$1;$2  | 'pending'
+  | 'expert_opinion';| 'pending'
   | 'approved'
   | 'rejected'
-  | 'needs_review';$1;$2  | 'high'    // score >= 0.85
+  | 'needs_review';| 'high'    // score >= 0.85
   | 'medium'  // score >= 0.70
   | 'low'     // score >= 0.50
   | 'marginal'; // score < 0.50

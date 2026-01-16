@@ -290,7 +290,7 @@ export const fallbackActive = derived(documentProgressStore, ($state) => $state.
 
 /**
  * Derived store for fallback confidence
- */$1;$2 documentProgressStore,
+ */documentProgressStore,
  ($state) => $state.fallbackConfidence
 );
 

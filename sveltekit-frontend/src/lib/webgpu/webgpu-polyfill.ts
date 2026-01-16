@@ -50,7 +50,7 @@ export class WebGPUPolyfillService {
 
  /** Initializes WebGPU if available; otherwise attempts WebGL2 fallback. */
  async initialize(): Promise<boolean> {
- // Try WebGPU first$1;$2 typeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU) : undefined;
+ // Try WebGPU firsttypeof navigator !== 'undefined' ? (navigator as unknown as NavigatorWithGPU) : undefined;
  if (nav?.gpu) {
  try {
  this.adapter =
@@ -157,7 +157,7 @@ export class WebGPUPolyfillService {
  }
 
  /** Embedding computation entry point — prefers GPU/WebGL but falls back to CPU. */
- async computeEmbedding(inputVector: number[], dimensions = 384): Promise<number[]> {$1;$2 typeof performance !== 'undefined' && typeof performance.now === 'function'
+ async computeEmbedding(inputVector: number[], dimensions = 384): Promise<number[]> {typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now();
  try {
@@ -170,7 +170,7 @@ export class WebGPUPolyfillService {
  this.performanceStats.webglOpsCount++;
  } else {
  result = this.computeEmbeddingCPU(inputVector, dimensions);
- }$1;$2 (typeof performance !== 'undefined' && typeof performance.now === 'function'
+ }(typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);
@@ -215,7 +215,7 @@ export class WebGPUPolyfillService {
 
  /** Similarity entry point — prefers GPU/WebGL but falls back to CPU. */
  async computeSimilarity(vector1: number[], vector2: number[]): Promise<number> {
- if (vector1.length !== vector2.length) throw new Error('Vectors must have the same dimensions');$1;$2 typeof performance !== 'undefined' && typeof performance.now === 'function'
+ if (vector1.length !== vector2.length) throw new Error('Vectors must have the same dimensions');typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now();
  try {
@@ -228,7 +228,7 @@ export class WebGPUPolyfillService {
  this.performanceStats.webglOpsCount++;
  } else {
  similarity = this.computeSimilarityCPU(vector1, vector2);
- }$1;$2 (typeof performance !== 'undefined' && typeof performance.now === 'function'
+ }(typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now()) - startTime;
  this.updatePerformanceStats(processingTime);

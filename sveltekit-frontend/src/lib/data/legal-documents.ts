@@ -7,7 +7,7 @@ export interface LegalDocument {
  code: string;
  url?: string;
  sections?: string[];
-}$1;$2 {
+}{
  id: 'ca-pen-187',
  title: 'California Penal Code Section, 187 - Murder',
  description: 'Defines murder in the first and second degree under California law',

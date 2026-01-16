@@ -44,7 +44,7 @@ export async function qdrantSearch(opts: { vector: number[],
  */
 export async function qdrantUpsert(opts: { points: Array<{ id: string, vector: number[], payload?: Record<string, any> }>;
  wait?: boolean;
-}): Promise<any> {$1;$2 `${process.env.QDRANT_URL}/collections/${COLLECTION}/points?wait=${opts.wait ? 'true' : 'false'}`,
+}): Promise<any> {`${process.env.QDRANT_URL}/collections/${COLLECTION}/points?wait=${opts.wait ? 'true' : 'false'}`,
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },

@@ -4,7 +4,7 @@ import { integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-or
  * Route Health Tracking
  * Maintains current health state per route
  * Linked to error_events and error_suggestions
- */$1;$2 'route_health',
+ */'route_health',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

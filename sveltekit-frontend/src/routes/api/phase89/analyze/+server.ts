@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Missing cluster_id' }, { status: 400 });
 		}
 
-		// Fetch cluster errors from PostgreSQL$1;$2			`SELECT id, source, raw_text, line_number, tags
+		// Fetch cluster errors from PostgreSQL`SELECT id, source, raw_text, line_number, tags
 			 FROM raw_error_embeddings
 			 WHERE cluster_id = $1
 			 ORDER BY id
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'No errors found for cluster' }, { status: 404 });
 		}
 
-		// Build ACE contextual prompt$1;$2			`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
+		// Build ACE contextual prompt`- ${e.source}:${e.line_number}: ${e.raw_text.slice(0, 150)}`
 		).join('\n');
 
 		const sources = [...new Set(errorsResult.rows.map((e: any) => e.source))];

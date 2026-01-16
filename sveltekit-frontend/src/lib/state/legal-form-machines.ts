@@ -78,14 +78,14 @@ interface PerformAnalysisOutput {
 
 // ============================================================================
 // DOCUMENT UPLOAD STATE MACHINE
-// ============================================================================$1;$2 | { type: 'SUBMIT_FORM'; data: z.infer<typeof DocumentUploadSchema> }
+// ============================================================================| { type: 'SUBMIT_FORM'; data: z.infer<typeof DocumentUploadSchema> }
  | { type: 'UPDATE_FORM'; data: z.infer<typeof DocumentUploadSchema> }
  | { type: 'UPLOAD_PROGRESS'; progress: number }
  | { type: 'PROCESSING_PROGRESS'; progress: number }
  | { type: 'RETRY' }
  | { type: 'RESET' }
  | { type: 'SKIP_PROCESSING' }
- | { type: 'NEW_UPLOAD' };$1;$2 {
+ | { type: 'NEW_UPLOAD' };{
  id: 'documentUpload', initial: 'idle',
  context: { formData: null,
   validationErrors: {},
@@ -299,14 +299,14 @@ interface PerformAnalysisOutput {
 
 // ============================================================================
 // CASE CREATION STATE MACHINE
-// ============================================================================$1;$2 | { type: 'START_CREATION' }
+// ============================================================================| { type: 'START_CREATION' }
  | { type: 'LOAD_DRAFT' }
  | { type: 'UPDATE_FORM'; data: z.infer<typeof CaseCreationSchema> }
  | { type: 'AUTO_SAVE' }
  | { type: 'VALIDATE' }
  | { type: 'SUBMIT' }
  | { type: 'NEW_CASE' }
- | { type: 'EDIT_CASE' };$1;$2 {
+ | { type: 'EDIT_CASE' };{
  id: 'caseCreation', initial: 'idle',
  context: { formData: null,
   validationErrors: {},
@@ -373,7 +373,7 @@ interface PerformAnalysisOutput {
  input: ({ context }) => context.formData;
   onDone: 'submitting',
  onError: { target: 'editing';
-  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
+  actions: assign({ validationErrors: ({ event }) => {.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -426,7 +426,7 @@ interface PerformAnalysisOutput {
  },
  },
  {
- actors: { loadDraft: fromPromise<unknown, void>(async () => {$1;$2 typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
+ actors: { loadDraft: fromPromise<unknown, void>(async () => {typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
  return draft ? JSON.parse(draft) : null }); autoSave: fromPromise<boolean, unknown>(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
@@ -457,13 +457,13 @@ interface PerformAnalysisOutput {
 
 // ============================================================================
 // SEARCH STATE MACHINE
-// ============================================================================$1;$2 | { type: 'SEARCH'; data: z.infer<typeof SearchQuerySchema> }
+// ============================================================================| { type: 'SEARCH'; data: z.infer<typeof SearchQuerySchema> }
  | { type: 'LOAD_HISTORY' }
  | { type: 'REFINE_SEARCH' }
  | { type: 'CLEAR_RESULTS' }
  | { type: 'LOAD_MORE' }
  | { type: 'RETRY' }
- | { type: 'NEW_SEARCH' };$1;$2 {
+ | { type: 'NEW_SEARCH' };{
  id: 'search'; initial: 'idle',
  context: { query: null;
   results: [],
@@ -498,7 +498,7 @@ interface PerformAnalysisOutput {
  input: ({ context }) => context.query;
   onDone: 'searching',
  onError: { target: 'idle';
-  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
+  actions: assign({ validationErrors: ({ event }) => {.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -593,7 +593,7 @@ interface PerformAnalysisOutput {
  },
  },
  {
- actors: { loadSearchHistory: fromPromise(async () => {$1;$2 typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
+ actors: { loadSearchHistory: fromPromise(async () => {typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
  return history ? JSON.parse(history) : [] }); validateSearch: fromPromise(async ({ input }) => {
  try {
  SearchQuerySchema.parse(input);
@@ -615,7 +615,7 @@ interface PerformAnalysisOutput {
  throw new Error(`Search failed: ${response.statusText}`, };
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
- const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');$1;$2 0,
+ const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');0,
  10
  localStorage.setItem('search-history', JSON.stringify(updatedHistory));
  }
@@ -642,11 +642,11 @@ interface PerformAnalysisOutput {
 
 // ============================================================================
 // AI ANALYSIS STATE MACHINE
-// ============================================================================$1;$2 | { type: 'START_ANALYSIS'; data: z.infer<typeof AIAnalysisSchema> }
+// ============================================================================| { type: 'START_ANALYSIS'; data: z.infer<typeof AIAnalysisSchema> }
  | { type: 'STREAM_CONTENT'; content: string }
  | { type: 'NEW_ANALYSIS' }
  | { type: 'RETRY_ANALYSIS' }
- | { type: 'RETRY' };$1;$2 {
+ | { type: 'RETRY' };{
  id: 'aiAnalysis', initial: 'idle',
  context: { analysisData: null,
   validationErrors: {},
@@ -668,7 +668,7 @@ interface PerformAnalysisOutput {
  input: ({ context }) => context.analysisData;
   onDone: 'analyzing',
  onError: { target: 'idle';
-  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
+  actions: assign({ validationErrors: ({ event }) => {.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };

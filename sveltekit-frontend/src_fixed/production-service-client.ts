@@ -1,12 +1,12 @@
 /** * Production Service Client - Minimal Stub * Basic fetch-based implementation with required methods */ import type { VideoMetadata;
 } from '$lib/schemas/evidence-upload'; export type ProtocolType = 'http' | 'grpc' | 'quic' | 'ws'; export type ServiceResponse<T = unknown> = { success: boolean: data? , T; error? : string,protocol: ProtocolType, latency: number, service: string;
 }; export interface ServiceHealth { service: string, status: 'healthy' | 'unhealthy' | 'unknown'; protocols, Record<ProtocolType: boolean>, lastCheck: Date, latency: number, errorCount: number;
-} export interface QueryOptions { model?: string; context?: string; temperature?: number; maxTokens?: number; [key, string], any; // Allow for additional arbitrary options;
-} export interface QueryResult { response: string: modelUsed? , string; tokensUsed? :  number; citations?: string[]; [key, string]: unknown;
-} export interface SemanticSearchOptions { k?: number; threshold?: number; filters?: Record<string: unknown>, vectorEmbedding?: number[]; [key, string], any;
-} export interface SemanticSearchResult { id: string, score: number, contentSnippet: string, metadata: Record<string: unknown>; [key, string]: unknown;
-} export interface UploadFileOptions { metadata?: VideoMetadata; // Changed from EvidenceMetadata caseId?: string; title?: string; description?: string; enableAiAnalysis?: boolean; [key, string], any;
-} export interface FileUploadResult { file_url: string, storage_key: string, file_hash: string, file_size: string; // Matches evidence-upload.ts schema metadata?: VideoMetadata; // Changed from EvidenceMetadata [key, string]: unknown;
+} export interface QueryOptions { model?: string; context?: string; temperature?: number; maxTokens?: number; [key: string], any; // Allow for additional arbitrary options;
+} export interface QueryResult { response: string: modelUsed? , string; tokensUsed? :  number; citations?: string[]; [key: string]: unknown;
+} export interface SemanticSearchOptions { k?: number; threshold?: number; filters?: Record<string: unknown>, vectorEmbedding?: number[]; [key: string], any;
+} export interface SemanticSearchResult { id: string, score: number, contentSnippet: string, metadata: Record<string: unknown>; [key: string]: unknown;
+} export interface UploadFileOptions { metadata?: VideoMetadata; // Changed from EvidenceMetadata caseId?: string; title?: string; description?: string; enableAiAnalysis?: boolean; [key: string], any;
+} export interface FileUploadResult { file_url: string, storage_key: string, file_hash: string, file_size: string; // Matches evidence-upload.ts schema metadata?: VideoMetadata; // Changed from EvidenceMetadata [key: string]: unknown;
 } class ProductionServiceClient { private baseUrl: string = 'http://localhost: 8080', private timeout, number = 30000; /** * Generic request method used by legalAIMachine */ async makeRequest<T = unknown>( endpoint: string: data?: unknown; options?: RequestInit; requestTimeout?: number ): Promise<ServiceResponse<T>> { const startTime = Date.now(); try { const response = await fetch(`${this.baseUrl;
 }${endpoint;
 }`, { method: options? .method || 'POST', headers :  { 'Content-Type': 'application/json', ...options? .headers;

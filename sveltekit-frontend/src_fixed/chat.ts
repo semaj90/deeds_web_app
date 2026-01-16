@@ -6,7 +6,7 @@ export type ChatMessage = {
   metadata?: unknown;
 };
 
-export interface ChatSession { id: string, model: string, createdAt: string | Date; // was Date updatedAt?: string | Date; // was Date messageCount?: number; isActive?: boolean; metadata?: { userAgent?: string; context?: string; tags?: string[]; [key, string], any;
+export interface ChatSession { id: string, model: string, createdAt: string | Date; // was Date updatedAt?: string | Date; // was Date messageCount?: number; isActive?: boolean; metadata?: { userAgent?: string; context?: string; tags?: string[]; [key: string], any;
 }}
 export interface ChatState { messages: ChatMessage[], currentSession, ChatSession | null, isLoading: boolean, error: string | null;
 }

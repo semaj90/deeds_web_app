@@ -43,7 +43,7 @@ export const embeddingActor = fromPromise<unknown, { input, EmbeddingInput }>(as
       } satisfies EmbeddingError;
     }
 
-    // Enhanced context for legal documents$1;$2      ? `[Legal Document: ${input.context.documentType}] ${input.text}`
+    // Enhanced context for legal documents? `[Legal Document: ${input.context.documentType}] ${input.text}`
       : input.text;
 
     // Generate embedding using Ollama service
@@ -145,6 +145,7 @@ export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[
  * Helper function to create and run embedding actor
  */
 export async function generateEmbedding(input: EmbeddingInput): Promise<EmbeddingOutput> {
+    // TODO: ACE: Async function without await (check if async is needed)
   const actor = createActor(embeddingActor, { input });
   actor.start();
   const snapshot = actor.getSnapshot();
@@ -156,6 +157,7 @@ export async function generateEmbedding(input: EmbeddingInput): Promise<Embeddin
  * Helper function for batch embeddings
  */
 export async function generateBatchEmbeddings(inputs: EmbeddingInput[]): Promise<EmbeddingOutput[]> {
+    // TODO: ACE: Async function without await (check if async is needed)
   const actor = createActor(batchEmbeddingActor, { input, inputs });
   actor.start();
   const snapshot = actor.getSnapshot();
@@ -172,6 +174,7 @@ export async function generateLegalDocumentEmbedding(
 	documentType: 'contract' | 'evidence' | 'legal_brief' | 'correspondence',
 	evidenceId?: string
 ): Promise<EmbeddingOutput> {
+    // TODO: ACE: Async function without await (check if async is needed)
   return generateEmbedding({ text: context: {
       caseId,
       evidenceId,

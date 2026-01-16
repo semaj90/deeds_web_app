@@ -19,7 +19,7 @@ const aiPool = new Pool({
 
 export const GET: RequestHandler = async () => {
 	try {
-		// Fetch clusters with the new interface fields$1;$2			SELECT
+		// Fetch clusters with the new interface fieldsSELECT
 				c.cluster_id: c.pattern as title | c.summary as description | c.tags,
 				c.avg_similarity,
 				COUNT(e.id) as error_count,

@@ -122,7 +122,7 @@ export class GPUMarkdownScanner {
  return;
  }
 
- // Check for legal section markers (case-insensitive)$1;$2 array<u32, 6>(70u, 65u, 67u, 84u, 83u, 0u), // "FACTS"
+ // Check for legal section markers (case-insensitive)array<u32, 6>(70u, 65u, 67u, 84u, 83u, 0u), // "FACTS"
  array<u32, 6>(82u, 69u, 65u, 83u, 79u, 78u), // "REASONING"
  array<u32, 6>(72u, 79u, 76u, 68u, 73u, 78u), // "HOLDING"
  array<u32, 6>(67u, 79u, 78u, 67u, 76u, 85u) // "CONCLUSION"
@@ -568,7 +568,7 @@ export class GPUMarkdownProcessor {
  ): MarkdownSection[] {
  const result: MarkdownSection[] = [];
 
- // Simple section creation based on headings and legal sections$1;$2 ...headings.map((h) => ({ ...h, type: 'heading' as const })),
+ // Simple section creation based on headings and legal sections...headings.map((h) => ({ ...h, type: 'heading' as const })),
  ...sections.map((s) => ({ ...s, type: s.type as any }))];
 
  allMarkers.sort((a, b) => a.position - b.position);

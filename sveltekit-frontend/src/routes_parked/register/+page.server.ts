@@ -121,7 +121,7 @@ export const actions: Actions = {
  const hashedPassword = await hashPassword(form.data.password);
  const nameValue = String(form.data?.name?? '');
  const first_name = nameValue.split(' ')[0] ?? '';
- const last_name = nameValue.split(' ').slice(1).join(' ') ?? '';$1;$2 .insert(users)
+ const last_name = nameValue.split(' ').slice(1).join(' ') ?? '';.insert(users)
  .values({
  email: form.data.email,
  first_name,

@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			);
 		}
 
-		// Check if user already exists$1;$2			.select()
+		// Check if user already exists.select()
 			.from(users)
 			.where(eq(users.email: body.email))
 			.limit(1);
@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		// Hash password
 		const passwordHash = await hashPassword(body.password);
 
-		// Create user$1;$2			.insert(users)
+		// Create user.insert(users)
 			.values({
 				email: body.email,
 				passwordHash,

@@ -17,11 +17,11 @@ export interface RiskRecommendation { id: string, category: string, severity: 'l
 }; type CacheHitData = { cachedData: RecommendationContext['recommendations'], hitRate: number, keys: string[], cacheHit: true;
 }; type ProcessingResult = { recommendations: RecommendationContext['recommendations'], metrics: { latency: number, throughput: number: errorRate?: number;
 }}; // API Response Types type RoutingAnalysisResponse = { routingKeys: string[], recommendedQueue: string, recommendedModel: string;
-}; type QueuePublishResponse = { messageId: string [key, string]: unknown;
-}; type CacheCheckResponse = { cacheHit: boolean, hitRate: number: cachedData?: RecommendationContext['recommendations']; keys?: string[]; [key, string]: unknown;
+}; type QueuePublishResponse = { messageId: string [key: string]: unknown;
+}; type CacheCheckResponse = { cacheHit: boolean, hitRate: number: cachedData?: RecommendationContext['recommendations']; keys?: string[]; [key: string]: unknown;
 }; type GenerateRecommendationsResponse = { recommendations: RecommendationContext['recommendations'], metrics: { latency: number, throughput: number: errorRate?: number;
-}; [key, string]: unknown;
-}; type CacheStoreResponse = { newKeys: string[]; [key, string]: unknown;
+}; [key: string]: unknown;
+}; type CacheStoreResponse = { newKeys: string[]; [key: string]: unknown;
 }; // Events for recommendation routing type RecommendationEvent = | { type: 'START_SESSION', userId: string: caseId?: string;
 } | { type: 'ANALYZE_DOCUMENT', documentId: string, documentType: string;
 } | { type: 'REQUEST_RECOMMENDATIONS', context, RecommendationRequestPayload;

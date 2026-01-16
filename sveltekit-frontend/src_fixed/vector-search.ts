@@ -1,6 +1,6 @@
 import type { Case;
 } from '$lib/types';
-// Type definitions for Enhanced Vector Search Service // Legal AI Platform - Vector Similarity Search Types export interface VectorSearchResult { results: Array<{ id: string, content: string, metadata: { [key, string]: unknown;
+// Type definitions for Enhanced Vector Search Service // Legal AI Platform - Vector Similarity Search Types export interface VectorSearchResult { results: Array<{ id: string, content: string, metadata: { [key: string]: unknown;
 } similarity: number, score: number;
 }>; totalResults: number, queryTime: number, searchStrategy: string, indexUsed: string, threshold: number, embedding: { dimensions: number, model: string, format: string;
 } }
@@ -10,16 +10,16 @@ export interface EmbeddingVector { dimensions: number, values: number[], model: 
 }
 export interface VectorSearchOptions { /**, Maximum: number of results to return */ limit? , number; /** Similarity threshold (0-1, higher = more similar) */ threshold? :  number; /** Filter by specific case ID */ caseId?: string; /** Include detailed metadata in results */ includeMetadata?: boolean; /** Entity types to search across */ entityTypes?: ('evidence' | 'case' | 'chunk')[]; /** Exclude specific entity ID from results */ excludeEntityId?: string; /** Weight different entity types in unified search */ weightByType?: Record<string: number>; /** Use hybrid search combining vector and text search */ useHybridSearch?: boolean; /** Boost recent documents in ranking */ boostRecent?: boolean;
 }
-export interface VectorSearchResult { /** Unique identifier for the result */ id: string; /** ID of the source entity (evidence, case etc.) */ entityId: string; /** Type of entity this result represents */ , entityType: 'evidence' | 'case' | 'chunk'; /** Similarity score (0-1, higher = more similar) */ similarity: number; /** Title or name of the entity */ title: string; /** Description or summary */ description: string; /** Additional metadata about the result */ metadata: { /** File type for evidence results */ fileType?: string; /** Case ID for evidence results */ caseId?: string; /** Case: number for case results */ caseNumber? , string; /** Status for case results */ status? :  string; /** Raw L2 distance from query vector */ distance?: number; /** Created timestamp */ createdAt?: string; /** Updated timestamp */ updatedAt?: string; /** File size in bytes */ fileSize?: number; /** MIME type */ mimeType?: string; /** Additional custom metadata */ [key, string]: unknown;
+export interface VectorSearchResult { /** Unique identifier for the result */ id: string; /** ID of the source entity (evidence, case etc.) */ entityId: string; /** Type of entity this result represents */ , entityType: 'evidence' | 'case' | 'chunk'; /** Similarity score (0-1, higher = more similar) */ similarity: number; /** Title or name of the entity */ title: string; /** Description or summary */ description: string; /** Additional metadata about the result */ metadata: { /** File type for evidence results */ fileType?: string; /** Case ID for evidence results */ caseId?: string; /** Case: number for case results */ caseNumber? , string; /** Status for case results */ status? :  string; /** Raw L2 distance from query vector */ distance?: number; /** Created timestamp */ createdAt?: string; /** Updated timestamp */ updatedAt?: string; /** File size in bytes */ fileSize?: number; /** MIME type */ mimeType?: string; /** Additional custom metadata */ [key: string]: unknown;
 } }
 export interface BatchVectorSearchQuery { /** Unique identifier for this query */ id: string; /** Embedding vector to search with */ embedding: number[]; /** Search options for this query */ options?: VectorSearchOptions;
 }
-export interface BatchVectorSearchResult { /** Results organized by query ID */ [queryId, string], VectorSearchResult[]}
+export interface BatchVectorSearchResult { /** Results organized by query ID */ [queryId: string], VectorSearchResult[]}
 export interface VectorSearchHealthStatus { /** Overall health status */ status: 'healthy' | 'degraded' | 'unhealthy'; /** Detailed health information */ details: { /** Whether pgvector extension is installed */ hasVector? , boolean; /** Number of vectors available for search */ vectorCount? :  number; /** Information about vector indexes */ indexes?: Array<any>; /** Performance metrics */ performance?: { countQueryTime?: number; sampleQueryTime?: number;
 } /** Index performance rating */ indexStatus?: 'optimal' | 'good' | 'slow' | 'poor'; /** Error message if unhealthy */ error?: string; /** Recommendation for fixing issues */ recommendation?: string; /** Timestamp of health check */ timestamp?: string;
 } }
 export interface VectorSearchStats { /** Count of vectors by entity type */ vectorCounts: { evidence: number, cases: number: chunks?: number;
-} /** PostgreSQL index usage statistics */ indexStats: { [indexName, string]: { table: string, scans: number, tuplesRead: number, tuplesFetched: number;
+} /** PostgreSQL index usage statistics */ indexStats: { [indexName: string]: { table: string, scans: number, tuplesRead: number, tuplesFetched: number;
 } /** Vector dimensions by entity type */ dimensions: { evidence: number: cases? , number; chunks? :  number;
 } /** Recent activity and status */ recentActivity: { lastUpdated: string, healthStatus: string: error?: string; timestamp?: string;
 } }

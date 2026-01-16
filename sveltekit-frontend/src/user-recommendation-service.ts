@@ -59,7 +59,7 @@ export class UserRecommendationService {
 	 * Store AI chat interaction with full context for analytics
 	 */
 	async storeAiChatInteraction(params: StoreAiChatParams): Promise<string> {
-		try {$1;$2				.insert(userAiQueries)
+		try {.insert(userAiQueries)
 				.values({
 					userId: params.userId,
 					caseId: params?.caseId?? null,
@@ -111,7 +111,7 @@ export class UserRecommendationService {
 	 * Create new RAG session for user
 	 */
 	async createRagSession(params: CreateRagSessionParams): Promise<string> {
-		try {$1;$2				.insert(ragSessions)
+		try {.insert(ragSessions)
 				.values({
 					userId: params.userId,
 					title: params?.sessionName|| `Session ${new Date().toISOString()}`,
@@ -133,7 +133,7 @@ export class UserRecommendationService {
 	 * Analyze user behavior patterns for recommendations
 	 */
 	async analyzeUserPatterns(userId: string): Promise<UserPattern> {
-		try {$1;$2				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
+		try {this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
 			]);
 
 			return { userId: commonQueries: queryStats.commonQueries,
@@ -185,19 +185,19 @@ export class UserRecommendationService {
 	 * Get comprehensive chat analytics for a user
 	 */
 	async getChatAnalytics(userId: string, timeRange?: TimeRange): Promise<ChatAnalytics> {
-		try {$1;$2				? and(
+		try {? and(
 						eq(userAiQueries.userId, userId),
 						sql`"createdAt" >= ${timeRange.from}`,
 						sql`"createdAt" <= ${timeRange.to}`
 					)
-				: eq(userAiQueries.userId, userId);$1;$2				.select({
+				: eq(userAiQueries.userId, userId);.select({
 					totalQueries: count(userAiQueries.id),
 					successfulQueries: sql<number>`COUNT(CASE WHEN is_successful = true THEN 1 END)`,
 					avgProcessingTime: sql<number>`AVG(processing_time_ms)`,
 					totalTokens: sql<number>`SUM(tokens_used)`
 				})
 				.from(userAiQueries)
-				.where(whereCondition);$1;$2				stats.totalQueries > 0 ? (stats.successfulQueries / stats.totalQueries) * 100 : 0;
+				.where(whereCondition);stats.totalQueries > 0 ? (stats.successfulQueries / stats.totalQueries) * 100 : 0;
 
 			const topTopics = await this.extractTopTopics(userId, 10);
 
@@ -217,7 +217,7 @@ export class UserRecommendationService {
 
 	// ===== PRIVATE HELPER METHODS =====
 
-	private async getUserQueryStats(userId: string) {$1;$2			.select({
+	private async getUserQueryStats(userId: string) {.select({
 				query: userAiQueries.query,
 				caseId: userAiQueries.caseId,
 				metadata: userAiQueries.metadata
@@ -237,7 +237,7 @@ export class UserRecommendationService {
 		};
 	}
 
-	private async getUserSessionStats(userId: string) {$1;$2			.select({
+	private async getUserSessionStats(userId: string) {.select({
 				startedAt: ragSessions.startedAt,
 				endedAt: ragSessions.endedAt,
 				messageCount: ragSessions.messageCount
@@ -247,7 +247,7 @@ export class UserRecommendationService {
 			.orderBy(desc(ragSessions.createdAt))
 			.limit(50);
 
-		const activeHours = this.extractActiveHours(sessions);$1;$2			s?.endedAt&& s.startedAt
+		const activeHours = this.extractActiveHours(sessions);s?.endedAt&& s.startedAt
 				? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
 				: 30
 		);
@@ -263,7 +263,7 @@ export class UserRecommendationService {
 		};
 	}
 
-	private async analyzeUserTopics(userId: string) {$1;$2			.select({ query: userAiQueries.query })
+	private async analyzeUserTopics(userId: string) {.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId))
 			.limit(200);
@@ -308,7 +308,7 @@ export class UserRecommendationService {
 	private async extractTopTopics(
 		userId: string,
 		limit: number
-	): Promise<Array<{ topic: string; count, number }>> {$1;$2			.select({ query: userAiQueries.query })
+	): Promise<Array<{ topic: string; count, number }>> {.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId))
 			.limit(500);
@@ -383,7 +383,7 @@ export class UserRecommendationService {
 	}
 
 	private extractTopicsFromQueries(queries: string[]): string[] {
-		const topics = new Set<string>();$1;$2			'contract',
+		const topics = new Set<string>();'contract',
 			'liability',
 			'negligence',
 			'damages',
@@ -415,7 +415,7 @@ export class UserRecommendationService {
 		return Array.from(topics).slice(0, 10);
 	}
 
-	private extractTopicsFromText(text: string): string[] {$1;$2			'contract',
+	private extractTopicsFromText(text: string): string[] {'contract',
 			'liability',
 			'negligence',
 			'damages',
@@ -440,7 +440,7 @@ export class UserRecommendationService {
 		return topics;
 	}
 
-	private calculateSatisfactionScore(successRate: number, avgProcessingTime: number): number {$1;$2			avgProcessingTime < 1000 ? 100 : Math.max(0, 100 - (avgProcessingTime - 1000) / 100);
+	private calculateSatisfactionScore(successRate: number, avgProcessingTime: number): number {avgProcessingTime < 1000 ? 100 : Math.max(0, 100 - (avgProcessingTime - 1000) / 100);
 		return Math.round(successRate * 0.7 + speedScore * 0.3);
 	}
 
@@ -448,7 +448,7 @@ export class UserRecommendationService {
 		stats: { avgProcessingTime?: number | null, successfulQueries?: number, totalQueries?: number },
 		topTopics: Array<{ topic: string; count, number }>
 	): string[] {
-		const suggestions: string[] = [];$1;$2			stats?.totalQueries&& stats.totalQueries > 0
+		const suggestions: string[] = [];stats?.totalQueries&& stats.totalQueries > 0
 				? ((stats.successfulQueries ?? 0) / stats.totalQueries) * 100
 				: 0;
 

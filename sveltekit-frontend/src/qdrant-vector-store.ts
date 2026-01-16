@@ -96,7 +96,7 @@ export class QdrantVectorStore {
 
 	/** Ensure collection exists, create if not */
 	private async ensureCollection(collectionName: string, size: number): Promise<void> {
-		try {$1;$2				(await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
+		try {(await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
 			const exists = (collections.collections ?? []).some((c) => c.name === collectionName);
 
 			if (!exists) {
@@ -152,7 +152,7 @@ export class QdrantVectorStore {
 		entity: LegalEntity,
 		embedding: number[]
 	): Promise<string> {
-		await this.ensureInitialized();$1;$2			.createHash('sha256')
+		await this.ensureInitialized();.createHash('sha256')
 			.update(`${sessionId}-${entity.type}-${entity.value}`)
 			.digest('hex')
 			.substring(0, 32);
@@ -181,7 +181,7 @@ export class QdrantVectorStore {
 		embedding: number[],
 		metadata?: { turnCount?: number, currentState?: number, confidence?: number }
 	): Promise<string> {
-		await this.ensureInitialized();$1;$2			.createHash('sha256')
+		await this.ensureInitialized();.createHash('sha256')
 			.update(`summary-${sessionId}-${Date.now()}`)
 			.digest('hex')
 			.substring(0, 32);
@@ -214,7 +214,7 @@ export class QdrantVectorStore {
 			userMessage?: string;
 			agentResponse?: string;
 			intent?: string;
-			hmmState?, number;
+			hmmState?: number;
 		}>
 	> {
 		await this.ensureInitialized();
@@ -259,10 +259,10 @@ export class QdrantVectorStore {
 			sessionId?: string;
 			entityType?: string;
 			entityValue?: string;
-			confidence?, number;
+			confidence?: number;
 		}>
 	> {
-		await this.ensureInitialized();$1;$2			? { must: [{ key: 'entityType', match: { value, entityType } }] }
+		await this.ensureInitialized();? { must: [{ key: 'entityType', match: { value, entityType } }] }
 			: undefined;
 
 		const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
@@ -294,7 +294,7 @@ export class QdrantVectorStore {
 			sessionId?: string;
 			summary?: string;
 			turnCount?: number;
-			currentState?, number;
+			currentState?: number;
 		}>
 	> {
 		await this.ensureInitialized();

@@ -48,7 +48,7 @@ interface PatchResult {
  id: string; analysisId: string;
  patch: { filePath: string;
  changes: Array<{ type: 'add' | 'remove' | 'modify';
- line: number; content, string;
+ line: number; content: string;
  }>;
  };
  timestamp: string;
@@ -316,7 +316,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
- // Create mock history$1;$2 {
+ // Create mock history{
  id: 'history_1',
  type: 'analysis',
  data: { id: 'analysis_1',

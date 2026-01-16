@@ -73,7 +73,7 @@ export async function POST({ request }: RequestEvent) {
 	}
 };
 
-async function searchTagOccurrences(tag: string, collection: string) {$1;$2		? await getCollections()
+async function searchTagOccurrences(tag: string, collection: string) {? await getCollections()
 		: [collection];
 
 	const results: any[] = [];
@@ -114,8 +114,7 @@ async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 		message: o.payload?.message ?? o.payload?.text ?? '',
 		source: o.payload?.source ?? o.payload?.file_path ?? '',
 		collection: o.collection
-	}));$1;$2
-Tag: ${ tag }
+	}));Tag: ${ tag }
 Occurrences: ${occurrences.length}
 
 Sample Data:

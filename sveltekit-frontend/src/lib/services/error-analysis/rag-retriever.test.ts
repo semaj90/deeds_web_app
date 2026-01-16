@@ -153,7 +153,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
    * 3. Be idempotent
    */
   describe('Property: Pattern Ranking Consistency', () => {
-    it('should rank patterns by similarity descending', async () => {$1;$2        {
+    it('should rank patterns by similarity descending', async () => {{
           id: 'p1',
           filePath: 'a.ts',
           lineNumber: 1,
@@ -189,7 +189,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
       expect(ranked[2].similarity).toBe(0.5);
     });
 
-    it('should be idempotent', async () => {$1;$2        {
+    it('should be idempotent', async () => {{
           id: 'p1',
           filePath: 'a.ts',
           lineNumber: 1,
@@ -231,7 +231,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
    * 3. Be valid markdown
    */
   describe('Property: Context Formatting', () => {
-    it('should format patterns as markdown context', async () => {$1;$2        {
+    it('should format patterns as markdown context', async () => {{
           id: 'p1',
           filePath: 'a.ts',
           lineNumber: 1,
@@ -268,7 +268,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
       expect(context).toBe('');
     });
 
-    it('should include code snippets', async () => {$1;$2        {
+    it('should include code snippets', async () => {{
           id: 'p1',
           filePath: 'test.ts',
           lineNumber: 10,

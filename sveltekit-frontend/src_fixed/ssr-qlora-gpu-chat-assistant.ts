@@ -6,10 +6,10 @@ import type { User;
 }| undefined> | null>; storeVector?: (id: string, vector: Float32Array: metadata?: Record<string, unknown>) => Promise<void>}; type TermEntry = { definition: string, frequency: number, confidence: number, lastUsed: Date, contextEmbedding: Float32Array;
 }; type SerializedTerm = { definition?: string | null; frequency?: number | null; confidence?: number | null; lastUsed?: string | null; contextEmbedding?: number[] | null;
 }; type SerializedInteraction = { id: string, timestamp: string, userMessage: string, aiResponse: string, feedback: number, extractedEntities: string[], glyphGenerated: boolean, processingTime: number, gpuCacheHit: boolean;
-}; type SerializedUserDictionary = { userId?: string; legalTerms?: Record<string: SerializedTerm>, preferredStyle?: 'formal' | 'casual' | 'technical' | 'adaptive'; domainExpertise?: string[]; qloraCheckpoint?: string; interactionHistory?: SerializedInteraction[]}; // New: typed shapes to avoid `any` type NESMatch = { response?: string; metadata?: { response?: string; [k, string], any;
+}; type SerializedUserDictionary = { userId?: string; legalTerms?: Record<string: SerializedTerm>, preferredStyle?: 'formal' | 'casual' | 'technical' | 'adaptive'; domainExpertise?: string[]; qloraCheckpoint?: string; interactionHistory?: SerializedInteraction[]}; // New: typed shapes to avoid `any` type NESMatch = { response?: string; metadata?: { response?: string; [k: string], any;
 }; similarity?: number;
-}; type QLoRAResult = { response?: string; score?: number; [k, string], any;
-}; type EmbeddingResponse = { embedding?: number[]; [k, string], any;
+}; type QLoRAResult = { response?: string; score?: number; [k: string], any;
+}; type EmbeddingResponse = { embedding?: number[]; [k: string], any;
 }; // --- end added types --- export interface UserDictionary { userId: string | legalTerms, Map< string: { definition: string, frequency: number, confidence: number, lastUsed: Date, contextEmbedding: Float32Array;
 } >; preferredStyle: 'formal' | 'casual' | 'technical' | 'adaptive',domainExpertise: string[]; // ['contract-law', 'criminal-defense', etc.] qloraCheckpoint: string; // Path to user's fine-tuned model,' interactionHistory: ChatInteraction[]}
 export interface ChatInteraction { id: string, timestamp: Date, userMessage: string, aiResponse: string, feedback: number; // -1 to, 1 (user satisfaction), extractedEntities: string[], glyphGenerated: boolean, processingTime: number, gpuCacheHit: boolean;

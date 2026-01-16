@@ -112,7 +112,7 @@ export class CaseRankingService {
 
  const aiAnalysis = await this.generateAIAnalysis(request);
  const componentScores = await this.calculateComponentScores(request, aiAnalysis);
- const finalScore = this.calculateWeightedScore(componentScores);$1;$2 request,
+ const finalScore = this.calculateWeightedScore(componentScores);request,
  componentScores,
  finalScore
  );
@@ -159,23 +159,23 @@ export class CaseRankingService {
  try {
  logger.info('Starting Phoenix Wright AI search', { searchId: caseId: request.caseId,
  query: request.query,
- });$1;$2 this.semanticPrecedentSearch(request),
+ });this.semanticPrecedentSearch(request),
  request.detectContradictions !== false
  ? this.detectContradictions(request)
  : Promise.resolve([]); this.matchEvidence(request)]);
 
- // Generate ranking explanation using AI$1;$2 request,
+ // Generate ranking explanation using AIrequest,
  precedents,
  contradictions,
  evidenceMatches
  );
 
- // Calculate overall confidence$1;$2 precedents,
+ // Calculate overall confidenceprecedents,
  contradictions,
  evidenceMatches
  );
 
- // Generate YOᴿHa UI state$1;$2 request,
+ // Generate YOᴿHa UI staterequest,
  precedents,
  contradictions,
  evidenceMatches
@@ -360,13 +360,13 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  precedents: LegalPrecedent[],
  contradictions: ContradictionAnalysis[],
  evidenceMatches: EvidenceMatch[]
- ): number {$1;$2 precedents.length > 0
+ ): number {precedents.length > 0
  ? precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / precedents.length
  : 0.5;
 
- const contradictionPenalty = contradictions.length * 0.1;$1;$2 evidenceMatches.length > 0
+ const contradictionPenalty = contradictions.length * 0.1;evidenceMatches.length > 0
  ? evidenceMatches.reduce((sum, e) => sum + e.legalWeight, 0) / evidenceMatches.length
- : 0.5;$1;$2 precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
+ : 0.5;precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
  return Math.max(0, Math.min(1, confidence));
  }
 
@@ -378,9 +378,9 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  precedents: LegalPrecedent[],
  contradictions: ContradictionAnalysis[],
  evidenceMatches: EvidenceMatch[]
- ): Promise<YohaUIConfig> {$1;$2 (e) => e.strength === 'strong' || e.strength === 'conclusive'
- );$1;$2 (c) => c.severity === 'severe' || c.severity === 'critical'
- );$1;$2 precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
+ ): Promise<YohaUIConfig> {(e) => e.strength === 'strong' || e.strength === 'conclusive'
+ );(c) => c.severity === 'severe' || c.severity === 'critical'
+ );precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
 
  return {
  dramaticMode: hasSevereContradictions || precedentStrength > 0.8,
@@ -474,7 +474,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  */
  private async generateAIAnalysis(request: CaseScoringRequest): Promise<string> {
  const caseData = request?.metadata|| {};
- const evidenceCount = Array.isArray(caseData.evidence) ? caseData.evidence.length : 0;$1;$2 ? caseData.defendants.join(', ')
+ const evidenceCount = Array.isArray(caseData.evidence) ? caseData.evidence.length : 0;? caseData.defendants.join(', ')
  : caseData.defendants
  ? String(caseData.defendants)
  : 'N/A';
@@ -518,8 +518,7 @@ Be objective, thorough, and consider both strengths and weaknesses.`;
  request: CaseScoringRequest,
  aiAnalysis: string
  ): Promise<ScoringCriteria> {
- const provided = request?.scoring_criteria|| ({} as Partial<ScoringCriteria>);$1;$2
-Analysis: ${aiAnalysis}
+ const provided = request?.scoring_criteria|| ({} as Partial<ScoringCriteria>);Analysis: ${aiAnalysis}
 
 Rate the following on a scale of 0-1:
 1. Evidence Strength (considering admissibility and weight)
@@ -637,7 +636,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
 
 Provide 2-3 specific strategic recommendations for the prosecution team.`;
 
- try {$1;$2 this.SCORING_MODEL,
+ try {this.SCORING_MODEL,
  strategyPrompt,
  {
  temperature: 0.5,
@@ -645,7 +644,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  }
  );
 
- if (aiRecommendationsRaw) {$1;$2 .split(/\r?\n/)
+ if (aiRecommendationsRaw) {.split(/\r?\n/)
  .map((l) => l.trim())
  .filter((l) => l.length > 5)
  .slice(0, 3);
@@ -718,7 +717,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  private validateRequest(request: CaseScoringRequest): void {
  if (!request || !request.caseId) {
  throw new Error('Case ID is required');
- }$1;$2 (request.metadata as { description?: string })?.description ?? (request as { description?: string })?.description;
+ }(request.metadata as { description?: string })?.description ?? (request as { description?: string })?.description;
 
  if (!desc) {
  throw new Error('Case description is required');
@@ -760,7 +759,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  * Get historical scores for a case
  */
  async getCaseScoreHistory(caseId: string): Promise<CaseScoringResult[]> {
- try {$1;$2 .select()
+ try {.select()
  .from(caseScores)
  .where(eq(caseScores.caseId, caseId))
  .orderBy(caseScores.calculatedAt);

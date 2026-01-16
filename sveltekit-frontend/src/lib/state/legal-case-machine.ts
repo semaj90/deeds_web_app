@@ -72,7 +72,7 @@ export interface LegalCaseContext {
  stats: { totalEvidence: number, processedEvidence: number; averageConfidence: number, processingTime: number;
  };
 }
-// Event types$1;$2 | { type: 'LOAD_CASE', caseId: string }
+// Event types| { type: 'LOAD_CASE', caseId: string }
  | { type: 'CREATE_CASE', caseData: NewCase }
  | { type: 'UPDATE_CASE', updates: Partial<Case> }
  | { type: 'DELETE_CASE' }

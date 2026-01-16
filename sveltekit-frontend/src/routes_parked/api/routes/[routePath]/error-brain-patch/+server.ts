@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request, params }) => {
  return json({ error: 'Missing or invalid file_path' }, { status: 400 });
  }
 
- // Create patch record$1;$2 .insert(routeErrorPatchesTable)
+ // Create patch record.insert(routeErrorPatchesTable)
  .values({ routePath: filePath: body.file_path,
  patchContent: body.patch_content,
  description: body.description ?? null,

@@ -223,7 +223,7 @@ export class TagExtractor {
     const normalized = this.normalizeTag(partial);
     if (normalized.length < 2) return [];
 
-    // Filter existing tags that match$1;$2      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
+    // Filter existing tags that match.filter((tag: any) => this.normalizeTag(tag).includes(normalized))
       .slice(0, 10);
 
     return suggestions;

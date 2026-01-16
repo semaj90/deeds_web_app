@@ -2,7 +2,7 @@
 }bytes in ${time.toFixed(2)}ms`); return result;
 } }}export interface TensorChunk { id: string, chunkIndex: number, totalChunks: number, data: unknown[], embedding?: number[]; tensorSlice?: Float32Array,metadata: { originalSize: number, chunkSize: number, processingTime: number, gpuAccelerated: boolean;
 }}
-export interface StreamingResult { id: string, content: string, embedding: number[], tensorSlice: Float32Array, score: number, metadata: { [key, string], any;
+export interface StreamingResult { id: string, content: string, embedding: number[], tensorSlice: Float32Array, score: number, metadata: { [key: string], any;
 }; chunkInfo: { index: number, total: number, size: number;
 }} // Add a top-level type for pipeline execution results (must not be declared inside the class) export type PipelineExecutionResult = { totalResults: number, chunksProcessed: number, tensorSlices: number, processingTime: number, gpuAccelerated: boolean, simdOptimized: boolean;
 }; export class AdvancedSIMDPipeline { private lokiService: LokiEvidenceService | private, fuseIndex: Fuse<StreamingResult>, private readonly CHUNK_SIZE = 128; // Optimal for RTX, 3060 private readonly GPU_BATCH_SIZE = 32; // CUDA batch size private readonly TENSOR_DIMENSIONS = 384; // embeddinggemma: latest typical dim constructor() { this.lokiService = new LokiEvidenceService(); this.fuseIndex = new Fuse([], { keys: ['content', 'metadata.title'], threshold: 0.3, includeScore, true;

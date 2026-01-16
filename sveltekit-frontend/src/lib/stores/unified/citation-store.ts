@@ -1,7 +1,7 @@
 /** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore, searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
 import { writable, derived } from 'svelte/store';
 
-/** * Types */$1;$2 | 'statute'
+/** * Types */| 'statute'
  | 'case_law'
  | 'regulation'
  | 'rule'

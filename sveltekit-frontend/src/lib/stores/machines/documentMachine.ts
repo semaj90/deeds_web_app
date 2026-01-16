@@ -37,7 +37,7 @@ export interface DocumentContext {
  riskScore?: number;
  confidence?: number;
  processedAt?: Date;
-}$1;$2 | { type: 'UPLOAD'; document: _FallbackLegalDocument }
+}| { type: 'UPLOAD'; document: _FallbackLegalDocument }
  | { type: 'START_PROCESSING' }
  | { type: 'EXTRACT_TEXT'; text: string }
  | { type: 'ANALYZE_AI'; analysis: _FallbackAIAnalysis }
@@ -48,7 +48,7 @@ export interface DocumentContext {
  | { type: 'ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
- | { type: 'RESET' };$1;$2 {
+ | { type: 'RESET' };{
  id: 'documentProcessor',
  initial: 'idle',
  context: { processingProgress: 0,

@@ -73,7 +73,7 @@ export class KAGClient {
 
 		const session = this.driver.session();
 
-		try {$1;$2				MATCH path = (start)-[r*1..${query?.maxDepth?? 2}]-(connected)
+		try {MATCH path = (start)-[r*1..${query?.maxDepth?? 2}]-(connected)
 				WHERE id(start) = $startId
 				${query.relationshipTypes?.length ? `AND ALL(rel IN r WHERE type(rel) IN $types)` : ''}
 				RETURN path

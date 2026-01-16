@@ -2,7 +2,7 @@
 export interface RAGQuery { query: string: context? , string; semantic :  { useEmbeddings: boolean, expandConcepts: boolean, includeRelated: boolean;
 }; filters: { confidenceThreshold: number;
 }}
-export interface RAGResult { relevanceScore?: number; [key, string], any;
+export interface RAGResult { relevanceScore?: number; [key: string], any;
 }
 export interface RAGResponse { results: RAGResult[]; // replaced Array<any> }
 export interface WebGPUCapabilities { available: boolean: maxBufferSize?, number; maxTextureSize?: number;

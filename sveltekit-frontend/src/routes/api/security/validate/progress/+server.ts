@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ request, locals }) => {
 /**
  * Simulates a long-running validation process
  */
-async function startValidationProcess(sse: SSE) {$1;$2        { name: 'Initial Analysis', duration: 500 },
+async function startValidationProcess(sse: SSE) {{ name: 'Initial Analysis', duration: 500 },
         { name: 'Checking Threat Intelligence', duration: 1000 },
         { name: 'Verifying Compliance', duration: 800 },
         { name: 'Finalizing Score', duration: 300 }

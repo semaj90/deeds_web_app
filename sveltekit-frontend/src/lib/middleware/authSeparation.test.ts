@@ -306,8 +306,8 @@ describe('AuthSeparation', () => {
  expect(legalAiResult.authenticated).toBe(false);
  });
 
- it('should use different auth types for features', () => {$1;$2 new Request('http://localhost/api/error-brain/analyze')
- );$1;$2 new Request('http://localhost/api/legal-ai/citations')
+ it('should use different auth types for features', () => {new Request('http://localhost/api/error-brain/analyze')
+ );new Request('http://localhost/api/legal-ai/citations')
  );
 
  expect(errorBrainContext.authType).toBe('development');
@@ -316,7 +316,7 @@ describe('AuthSeparation', () => {
  });
 
  describe('Multiple Requests', () => {
- it('should handle multiple error-brain requests', () => {$1;$2 new Request('http://localhost/api/error-brain/analyze'),
+ it('should handle multiple error-brain requests', () => {new Request('http://localhost/api/error-brain/analyze'),
  new Request('http://localhost/api/error-brain/patch'),
  new Request('http://localhost/api/error-brain/history')];
 

@@ -16,7 +16,7 @@ export interface AgentShellContext {
   caseId?: string;
   serviceHealth?: { enhancedRAG: boolean; uploadService: boolean; kratosServer: boolean;
   };
-}$1;$2  | { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
+}| { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
   | { type: 'xstate.done.actor.callAgent'; data: string }
   | { type: 'ACCEPT_PATCH'; jobId: string; userId: string; patchContent: string }
   | { type: 'RATE_SUGGESTION'; jobId: string; rating: number; userId: string; feedback?: string }

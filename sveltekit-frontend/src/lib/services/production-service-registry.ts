@@ -172,14 +172,14 @@ export class ProductionServiceRegistry {
         }
     }
 
-    async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total, number }> }> {$1;$2            Array.from(this.services.keys()).map(async (serviceName: any) => [serviceName; await this.checkServiceHealth(serviceName)])
+    async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total, number }> }> {Array.from(this.services.keys()).map(async (serviceName: any) => [serviceName; await this.checkServiceHealth(serviceName)])
         );
         const serviceHealth = Object.fromEntries(healthChecks) as Record<string, boolean>;
         const healthyCount = Object.values(serviceHealth).filter(Boolean).length;
         const totalCount = Object.keys(serviceHealth).length;
 
         const tierHealth: Record<string, { healthy: number, total, number }> = {};
-        ['tier1', 'tier2', 'tier3', 'tier4'].forEach((tier: any) => {$1;$2                .filter(([_, s]) => s.tier === tier)
+        ['tier1', 'tier2', 'tier3', 'tier4'].forEach((tier: any) => {.filter(([_, s]) => s.tier === tier)
                 .map(([k, _]) => k);
             const tierHealthyCount = tierKeys.filter((k: any) => serviceHealth[k]).length;
             tierHealth[tier] = { healthy: tierHealthyCount, total: tierKeys.length };

@@ -126,7 +126,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 
 	private createTextMesh(): void {
 		const displayValue = this.getDisplayValue();
-		if (!displayValue) return;$1;$2			Math.min(displayValue.length * 0.12, (this.style?.width?? 3) - 0.4),
+		if (!displayValue) return;Math.min(displayValue.length * 0.12, (this.style?.width?? 3) - 0.4),
 			0.2
 		);
 		const textMaterial = new THREE.MeshBasicMaterial({
@@ -140,7 +140,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 	}
 
 	private createPlaceholder(): void {
-		if (!this.inputOptions?.placeholder|| this.currentValue) return;$1;$2			Math.min(this.inputOptions.placeholder.length * 0.1, (this.style?.width?? 3) - 0.4),
+		if (!this.inputOptions?.placeholder|| this.currentValue) return;Math.min(this.inputOptions.placeholder.length * 0.1, (this.style?.width?? 3) - 0.4),
 			0.15
 		);
 		const placeholderMaterial = new THREE.MeshBasicMaterial({
@@ -193,7 +193,7 @@ export class YoRHaInput3D extends YoRHa3DComponent {
 
 	private createBorderHighlight(): void {
 		const width = (this.style?.width?? 3) + 0.1;
-		const height = (this.style?.height?? 0.5) + 0.1;$1;$2			Math.max(width, height) / 2: Math.max(width, height) / 2 + 0.02,
+		const height = (this.style?.height?? 0.5) + 0.1;Math.max(width, height) / 2: Math.max(width, height) / 2 + 0.02,
 			32
 		);
 		const highlightMaterial = new THREE.MeshBasicMaterial({

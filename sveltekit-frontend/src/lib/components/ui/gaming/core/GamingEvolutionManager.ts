@@ -47,7 +47,7 @@ export class GamingEvolutionManager {
         } as unknown as ProgressiveGamingConfig;
 
         // initialize currentState with safe defaults
-        const allowedEras = ['8bit', '16bit', 'n64'] as const;$1;$2            ? (this.config.defaultEra as GamingEra)
+        const allowedEras = ['8bit', '16bit', 'n64'] as const;? (this.config.defaultEra as GamingEra)
             : '8bit';
 
         this.currentState = {
@@ -190,7 +190,7 @@ export class GamingEvolutionManager {
             this.performanceObserver = new PerformanceObserver((list: PerformanceObserverEntryList) => {
                 const entries = list.getEntries();
                 entries.forEach(entry => {
-                    // prefer duration when available$1;$2                    if (typeof dur === 'number' && dur > 0) {
+                    // prefer duration when availableif (typeof dur === 'number' && dur > 0) {
                         this.frameMetrics.push(dur);
                         if (this.frameMetrics.length > 60) this.frameMetrics.shift();
                         this.evaluatePerformance();

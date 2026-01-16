@@ -10,7 +10,7 @@ type UserContext = { userId?: string; preferences?: unknown; intent?: string; ti
 type RerankResult = { id: string, score: number, metadata: unknown }
 type GraphNode = { id: string | properties, any }
 type GraphEdge = { id: string, source: string, target: string, weight: number } export interface SoraGraphNode { id: string, type: 'document' | 'entity' | 'concept' | 'relationship' | 'case' | 'evidence',properties: { [key | string]: unknown } embedding?: Float32Array; coordinates?: { x: number, y: number, z: number } score?: number; depth?: number}
-export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key, string], any }
+export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key: string], any }
 } }
 export interface SoraTraversalPath { nodes: SoraGraphNode[0], edges: SoraGraphEdge[0], totalScore: number, pathLength: number, semanticCoherence: number}
 export interface SoraTraversalOptions { maxDepth: number, maxNodes: number, scoreThreshold: number, traversalStrategy: 'breadth-first' | 'depth-first' | 'best-first' | 'reinforcement',semanticFiltering: boolean, useGPUAcceleration: boolean, reinforcementLearning: { enabled: boolean, explorationRate: number, learningRate: number, discountFactor: number} }

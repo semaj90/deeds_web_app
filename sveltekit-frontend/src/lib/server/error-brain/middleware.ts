@@ -68,7 +68,7 @@ export function validateInternalRequest(event: RequestEvent): boolean {
  }
 
  // Otherwise, allow localhost only
- const origin = event.request.headers.get('origin') ?? '';$1;$2 origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('[::1]');
+ const origin = event.request.headers.get('origin') ?? '';origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('[::1]');
 
  return isLocalhost;
 }

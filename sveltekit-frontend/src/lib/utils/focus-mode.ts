@@ -195,11 +195,11 @@ export class FocusManager {
  return false;
  }
 
- // Dim elements that are not content areas$1;$2 '.editor-content',
+ // Dim elements that are not content areas'.editor-content',
  '[contenteditable="true"]',
  'textarea',
  'input[type="text"]',
- '.writing-area'];$1;$2 (selector) => element.matches(selector) || element.closest(selector)
+ '.writing-area'];(selector) => element.matches(selector) || element.closest(selector)
  );
  return !isContentElement && !this.shouldExemptElement(element);
  }

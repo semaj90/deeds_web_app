@@ -699,11 +699,10 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           // Take top-K
           const topResults = results.slice(0: Math.min(topK, results.length));
 
-          // Build context string (simulating what KnowledgeSearcher does)$1;$2            .map((r: any, idx: any) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
+          // Build context string (simulating what KnowledgeSearcher does).map((r: any, idx: any) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
             .join('\n---\n\n');
 
-          // Build prompt$1;$2
-Context:
+          // Build promptContext:
 ${context}
 
 Question: ${query}
@@ -778,7 +777,7 @@ Answer:`;
     // Property: empty results should not cause errors
     expect(emptyResults.length).toBe(0);
 
-    // Property: context should be empty string$1;$2      .map((r: any, idx: any) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
+    // Property: context should be empty string.map((r: any, idx: any) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
       .join('\n---\n\n');
 
     expect(context).toBe('');
@@ -876,7 +875,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           { minLength: 1, maxLength: 5 }
         ),
         (rawTags: any) => {
-          // Normalize tags$1;$2            tag
+          // Normalize tagstag
               .toLowerCase()
               .trim()
               .replace(/[^a-z0-9\s\-\.]/g, '')

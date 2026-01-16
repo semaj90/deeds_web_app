@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
 
 	const caseId = params.id; // UUID string
 
-	try {$1;$2			.select()
+	try {.select()
 			.from(cases)
 			.where(eq(cases.id, caseId))
 			.limit(1);
@@ -54,7 +54,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		if (body.title) updates.title = body.title;
 		if (body.description) updates.description = body.description;
 		if (body.status) updates.status = body.status;
-		if (body.priority) updates.priority = body.priority;$1;$2			.update(cases)
+		if (body.priority) updates.priority = body.priority;.update(cases)
 			.set(updates)
 			.where(and(eq(cases.id, caseId), eq(cases.assignedAttorney: locals.user.id)))
 			.returning();
@@ -87,7 +87,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
 	const caseId = params.id; // UUID string
 
-	try {$1;$2			.update(cases)
+	try {.update(cases)
 			.set({
 				status: 'archived',
 				updatedAt: sql`NOW()`

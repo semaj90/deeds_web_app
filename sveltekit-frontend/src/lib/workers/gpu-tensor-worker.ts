@@ -9,7 +9,7 @@ export type MultiDimArray = {
   timestamp?: number;
   lodLevel?: number;
   dimensions?: number;
-};$1;$2  | MultiDimArray
+};| MultiDimArray
   | MultiDimArray[]
   | { goServiceUrl?: string; cacheLimit?: number }
   | { cleared?: boolean }

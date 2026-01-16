@@ -122,7 +122,7 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			expect(reassembled).toBe(SAMPLE_LEGAL_DOCUMENT);
 		});
 
-		it('should handle edge cases (empty, single char, exact chunk size)', () => {$1;$2				{ text: '', expectedChunks: 1 }, // Empty becomes single chunk
+		it('should handle edge cases (empty, single char, exact chunk size)', () => {{ text: '', expectedChunks: 1 }, // Empty becomes single chunk
 				{ text: 'A', expectedChunks: 1 },
 				{ text: 'A'.repeat(500), expectedChunks: 1 }, // Exact chunk size
 				{ text: 'A'.repeat(501), expectedChunks: 2 }  // Just over

@@ -35,7 +35,7 @@ export interface DraggableOptions {
     onDrag?.(x, y, id);
   }
 
-  function applyConstraints(x: number, y: number): [number, number] {
+  function applyConstraints(x: number, y: number): [number: number] {
     let constrainedX = x;
     let constrainedY = y;
     if (constraint) {

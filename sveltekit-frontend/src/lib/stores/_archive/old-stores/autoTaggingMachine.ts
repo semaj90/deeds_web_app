@@ -4,10 +4,10 @@ export interface AutoTagContext {
  selectedNode: any; aiTags: any;
  error: string | null;
  retryCount: number;
-}$1;$2 | { type: 'DROP_FILE'; node: any }
+}| { type: 'DROP_FILE'; node: any }
  | { type: 'SELECT_NODE'; node: any }
  | { type: 'RETRY' }
- | { type: 'RESET' };$1;$2 {
+ | { type: 'RESET' };{
  id: 'autoTagging',
  initial: 'idle',
  context: { selectedNode: null,

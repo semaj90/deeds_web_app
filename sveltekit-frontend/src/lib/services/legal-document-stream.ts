@@ -67,7 +67,7 @@ const grpcAIOrchestrator = {
     }
 };
 
-// Streaming Event Types$1;$2    | 'document_received' 
+// Streaming Event Types| 'document_received' 
     | 'analysis_started' 
     | 'entities_extracted' 
     | 'embeddings_generated' 
@@ -391,7 +391,7 @@ export class LegalDocumentStreamService {
                 }
             });
 
-            if (parallelProcessing) {$1;$2                    this.streamDocument(connectionId, doc, { streamProgress, false })
+            if (parallelProcessing) {this.streamDocument(connectionId, doc, { streamProgress, false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
                 await Promise.all(promises);

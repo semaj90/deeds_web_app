@@ -17,7 +17,7 @@ describe('ErrorBrainAPI', () => {
   });
 
   describe('analyzeErrors', () => {
-    it('should analyze valid errors', async () => {$1;$2        {
+    it('should analyze valid errors', async () => {{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -37,7 +37,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.error).toContain('non-empty array');
     });
 
-    it('should reject invalid error objects', async () => {$1;$2        {
+    it('should reject invalid error objects', async () => {{
           file: 'test.ts',
           // missing required fields
         }] as unknown as AnalysisError[];
@@ -48,7 +48,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.error).toContain('Invalid error object');
     });
 
-    it('should handle errors with optional code field', async () => {$1;$2        {
+    it('should handle errors with optional code field', async () => {{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -61,7 +61,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should handle svelte errors', async () => {$1;$2        {
+    it('should handle svelte errors', async () => {{
           file: 'test.svelte',
           line: 5, column: 2, message: 'Svelte error',
           type: 'svelte',
@@ -73,7 +73,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should handle multiple errors', async () => {$1;$2        {
+    it('should handle multiple errors', async () => {{
           file: 'test1.ts',
           line: 10, column: 5, message: 'Error 1',
           type: 'typescript',
@@ -91,7 +91,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.analyses.length).toBeGreaterThanOrEqual(0);
     });
 
-    it('should return error message on failure', async () => {$1;$2        {
+    it('should return error message on failure', async () => {{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -105,7 +105,7 @@ describe('ErrorBrainAPI', () => {
       }
     });
 
-    it('should validate error types', async () => {$1;$2        {
+    it('should validate error types', async () => {{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'invalid-type', // invalid type
@@ -117,7 +117,7 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should validate error severity', async () => {$1;$2        {
+    it('should validate error severity', async () => {{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -164,7 +164,7 @@ describe('ErrorBrainAPI', () => {
     });
 
     it('should have all feature flags in status', async () => {
-      const status = await api.getStatus();$1;$2        'error-brain',
+      const status = await api.getStatus();'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -251,7 +251,7 @@ describe('ErrorBrainAPI', () => {
     });
 
     it('should have all expected feature flags', async () => {
-      const result = await api.getFeatures();$1;$2        'error-brain',
+      const result = await api.getFeatures();'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -310,7 +310,7 @@ describe('ErrorBrainAPI', () => {
       expect(features.features['diff-generation']).toBe(false);
     });
 
-    it('should handle all valid flags', async () => {$1;$2        'error-brain',
+    it('should handle all valid flags', async () => {'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -459,7 +459,7 @@ describe('ErrorBrainAPI', () => {
       status = await api.getStatus();
       expect(status.enabled).toBe(true);
 
-      // Analyze errors$1;$2        {
+      // Analyze errors{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',

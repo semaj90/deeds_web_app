@@ -80,7 +80,7 @@ export const actions: Actions = {
                 'Original-Filename': file.name
             });
 
-			// 2. Create DB Record$1;$2				.insert(evidence)
+			// 2. Create DB Record.insert(evidence)
 				.values({
 					userId: locals.user.id,
 					caseId: caseId ?? null,
@@ -153,7 +153,7 @@ export const actions: Actions = {
 
 			if (!evidenceId) {
 				return { success: false, error: 'No evidence ID provided' };
-			}$1;$2				.update(evidence)
+			}.update(evidence)
 				.set({
 					title,
 					description,

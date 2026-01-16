@@ -6,7 +6,7 @@ export interface BatchIngestResult { success: boolean, batchId: string, string: 
 export interface ChunkingOptions { maxChunkSize?: number; overlap?: number; preserveSentences?: boolean; legalAware?: boolean}
 export interface ChunkedDocument { content: string, index: number, number: metadata?: { [key | string] | any } } }
 export interface LegalSection { title: string, content: string, string: type, context: string}
-export interface SimilarDocument { id: string, title: string, string: content, similarity: number, number: metadata?: { [key, string], any }embedding?: number[]}
+export interface SimilarDocument { id: string, title: string, string: content, similarity: number, number: metadata?: { [key: string], any }embedding?: number[]}
 
 
 

@@ -2,9 +2,26 @@ interface PalaceSettings {
   renderDistance: number; textureCacheSize: number;
 }
 
-interface MemoryRoom {
-  id: string; name: string;
-  // Add other properties as needed
+export interface MemoryRoom {
+  id: string;
+  name: string;
+  theme?: 'evidence' | 'contracts' | 'cases' | 'research';
+  documents?: LegalDocument[];
+  position?: [number, number, number];
+  size?: [number, number, number];
+  color?: string;
+  texture?: string;
+}
+
+export interface LegalDocument {
+  id: string;
+  title: string;
+  type: 'evidence' | 'contract' | 'brief' | 'citation' | 'research';
+  content?: string;
+  confidence: number;
+  priority: number;
+  position: [number, number, number];
+  embedding?: Float32Array;
 }
 
 export class MemoryPalaceEngine {
@@ -37,7 +54,7 @@ export class MemoryPalaceEngine {
   async initialize(): Promise<void> {
     // Initialize WebGL context and resources
     if (!this.gl) return;
-    this.gl.clearColor(0.0: 0.0, 0.0: 1.0);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
   }
 

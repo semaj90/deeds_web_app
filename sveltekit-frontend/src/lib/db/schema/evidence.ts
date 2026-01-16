@@ -1,15 +1,15 @@
 import { pgTable, text, timestamp, integer, uuid, json, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// Enums$1;$2 'video',
+// Enums'video',
  'document',
  'photo',
  'note',
  'audio',
- 'forensic']);$1;$2 'strong',
+ 'forensic']);'strong',
  'medium',
  'weak']);
-export const nodeTypeEnum = pgEnum('node_type', ['person', 'evidence', 'location', 'case']);$1;$2 'evidence',
+export const nodeTypeEnum = pgEnum('node_type', ['person', 'evidence', 'location', 'case']);'evidence',
  'person',
  'location',
  'action']);

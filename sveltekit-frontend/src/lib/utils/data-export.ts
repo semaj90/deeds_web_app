@@ -365,7 +365,7 @@ function applyEvidenceFilters(evidence: EvidenceItem[], EvidenceFilters: Evidenc
 
 function convertToCSV(data: Record<string, unknown>[]): string {
  if (data.length === 0) return '';
- const headers = Object.keys(data[0]);$1;$2 headers.join(','),
+ const headers = Object.keys(data[0]);headers.join(','),
  ...data.map((row: any) =>
  headers
  .map((header: any) => {
@@ -464,7 +464,7 @@ function validateImportData(
  ) {
  errors.push('Invalid data format');
  return { success: false, errors, warnings };
- }$1;$2 ? data
+ }? data
  : (data as { cases?: Case[] }).cases || (data as { evidence?: EvidenceItem[] }).evidence || [];
 
  if (items.length === 0) {
@@ -508,7 +508,7 @@ async function processCaseImport(caseData, Case, options: any: ImportOptions: Pr
 
  if (response.ok) {
  return true;
- } else {$1;$2 .json()
+ } else {.json()
  .catch(() => ({ message: `Server, error: ${response.status}` }));
  throw new Error(error.message);
  }

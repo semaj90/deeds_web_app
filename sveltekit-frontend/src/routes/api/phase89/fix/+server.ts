@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     // Trigger the agentic fixer in background
-    // This runs the phase89-gemma3-prompt.mjs script$1;$2      'scripts/phase89-gemma3-prompt.mjs',
+    // This runs the phase89-gemma3-prompt.mjs script'scripts/phase89-gemma3-prompt.mjs',
       'fix',
       errorId || file
     ], {

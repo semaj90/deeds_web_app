@@ -19,7 +19,7 @@ export interface JWTPayload {
 export function decodeJWT(token: string): JWTPayload | null {
  try {
  const base64Url = token.split('.')[1];
- const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');$1;$2 atob(base64)
+ const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');atob(base64)
  .split('')
  .map((c: any) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
  .join('')

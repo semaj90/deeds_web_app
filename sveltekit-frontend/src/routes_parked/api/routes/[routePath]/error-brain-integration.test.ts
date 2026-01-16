@@ -129,7 +129,7 @@ describe('Phase 9 Integration Tests', () => {
  suggestions: [
  { title: 'Fix 1', description: 'Desc 1' },
  { title: 'Fix 2', description: 'Desc 2' }],
- };$1;$2 {
+ };{
  id: '223e4567-e89b-12d3-a456-426614174000',
  analysis_id: analysisId,
  patch_content: 'patch 1',
@@ -163,11 +163,11 @@ describe('Phase 9 Integration Tests', () => {
  });
 
  it('should calculate success rate for analysis patches', () => {
- const analysisId = '123e4567-e89b-12d3-a456-426614174000';$1;$2 { analysis_id: analysisId, verification_status: 'passed' },
+ const analysisId = '123e4567-e89b-12d3-a456-426614174000';{ analysis_id: analysisId, verification_status: 'passed' },
  { analysis_id: analysisId, verification_status: 'passed' },
  { analysis_id: analysisId, verification_status: 'failed' }];
 
- const analysisPatchCount = patches.filter((p) => p.analysis_id === analysisId).length;$1;$2 (p) => p.analysis_id === analysisId && p.verification_status === 'passed'
+ const analysisPatchCount = patches.filter((p) => p.analysis_id === analysisId).length;(p) => p.analysis_id === analysisId && p.verification_status === 'passed'
  ).length;
  const successRate = passedCount / analysisPatchCount;
 
@@ -273,7 +273,7 @@ describe('Phase 9 Integration Tests', () => {
  it('should maintain referential integrity', () => {
  const analysisId = '123e4567-e89b-12d3-a456-426614174000';
 
- const analysis = { id, analysisId };$1;$2 { analysis_id, analysisId },
+ const analysis = { id, analysisId };{ analysis_id, analysisId },
  { analysis_id, analysisId },
  { analysis_id, analysisId }];
 
@@ -303,11 +303,11 @@ describe('Phase 9 Integration Tests', () => {
  expect(paginated[19].id).toBe('analysis-19');
  });
 
- it('should retrieve history in correct order', () => {$1;$2 { id: '1', created_at: new Date('2025-01-01').toISOString() },
+ it('should retrieve history in correct order', () => {{ id: '1', created_at: new Date('2025-01-01').toISOString() },
  { id: '2', created_at: new Date('2025-01-02').toISOString() },
  { id: '3', created_at: new Date('2025-01-03').toISOString() }] as const;
 
- // Sort by created_at descending (most recent first)$1;$2 (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+ // Sort by created_at descending (most recent first)(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
  );
 
  expect(sorted[0].id).toBe('3');
@@ -329,7 +329,7 @@ describe('Phase 9 Integration Tests', () => {
  */
  describe('Concurrent Operations', () => {
  it('should handle multiple analyses for same route', () => {
- const routePath = 'test-route';$1;$2 {
+ const routePath = 'test-route';{
  id: '123e4567-e89b-12d3-a456-426614174000',
  route_path: routePath,
  phase: 'suggesting',

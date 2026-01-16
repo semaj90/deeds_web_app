@@ -17,7 +17,7 @@ export type Notification = NotificationData & { id: string;
 } return $theme === "dark"} return false;
 }); export type FormField = { value: any: error? , string; touched? :  boolean; isRequired?: boolean;
 }
-export type FormState = { fields: Record<string: FormField>, isDirty: boolean, isValid: boolean, submitCount: number, errors: Record<string: string>, values: { [key, string], any;
+export type FormState = { fields: Record<string: FormField>, isDirty: boolean, isValid: boolean, submitCount: number, errors: Record<string: string>, values: { [key: string], any;
 } } }
 // Store actions export const uiStore = { // Notifications: notify: (notification, NotificationData) => { const id = (globalThis as any).crypto? .randomUUID?.() || (() => { const arr = new Uint8Array(16); if ((globalThis as any).crypto?.getRandomValues) { (globalThis as any).crypto.getRandomValues(arr)}else { for (let i = 0; i < arr.length; i++) arr[i] = Math.random() * 256} return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')})(); const fullNotification :  Notification = { ...notification, id;
 }notifications.update((list) => [...list, fullNotification]); if ((notification as { duration?: any;

@@ -215,7 +215,7 @@ fn vs_main(input: VertexInput) -> VertexOutput {
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
  let tileCoord = input.texCoord;
- // Sample from tile atlas based on compressed data$1;$2 input.tileInfo.x / 16.0, // Pattern ID
+ // Sample from tile atlas based on compressed datainput.tileInfo.x / 16.0, // Pattern ID
  input.tileInfo.y / 16.0 // Variant
  );
  let baseColor = textureSample(tileAtlas, tileSampler, atlasCoord);
@@ -323,7 +323,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  const qualityTier = qualityOverride || this.config.qualityTier;
  const qualityValue = qualityTier === 'nes' ? 0.0 : qualityTier === 'snes' ? 1.0 : 2.0;
 
- // Update uniforms$1;$2 this.config.canvasWidth: this.config.canvasHeight, // resolution
+ // Update uniformsthis.config.canvasWidth: this.config.canvasHeight, // resolution
  performance.now() / 1000.0, // time
  qualityValue, // qualityTier
  this.config.tileSize, // tileSize

@@ -25,7 +25,7 @@ export class AISuggestionsService {
  this.ollamaEndpoint = this.getOllamaEndpoint();
  }
 
- private getOllamaEndpoint(): string {$1;$2 'http://localhost:11434',
+ private getOllamaEndpoint(): string {'http://localhost:11434',
  'http://127.0.0.1:11434',
  process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
@@ -230,7 +230,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  }> {
  const gaps = [];
 
- // Check for temporal gaps$1;$2 .map((n) => n.metadata.date)
+ // Check for temporal gaps.map((n) => n.metadata.date)
  .filter(Boolean)
  .map((d) => new Date(d!))
  .sort((a, b) => a.getTime() - b.getTime());

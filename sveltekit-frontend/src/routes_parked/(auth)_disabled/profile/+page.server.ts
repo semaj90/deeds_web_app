@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
  if (!profile) {
  return { profile: null, stats: null };
- }$1;$2 db.select({ value: sql<number>`count(*)::int` }).from(cases), // Correct Drizzle select syntax
+ }db.select({ value: sql<number>`count(*)::int` }).from(cases), // Correct Drizzle select syntax
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(cases)

@@ -4,8 +4,8 @@ import type { User;
 }
 export interface UserSession { id: string, userId: string, expiresAt: Date: user?: User; // Optional complete: user | object;
 }
-export interface UserProfile extends User { preferences?: { [key, string], any;
-}; settings?: { [key, string], any;
+export interface UserProfile extends User { preferences?: { [key: string], any;
+}; settings?: { [key: string], any;
 }} 
 
 

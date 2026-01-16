@@ -19,11 +19,11 @@ import { z } from 'zod';
 // COMMON PRIMITIVES
 // ============================================================================
 
-export const uuidSchema = z.string().uuid('Invalid UUID format');$1;$2	.string()
+export const uuidSchema = z.string().uuid('Invalid UUID format');.string()
 	.email('Invalid email address')
-	.max(255, 'Email too long');$1;$2	.string()
+	.max(255, 'Email too long');.string()
 	.datetime({ message: 'Invalid ISO 8601 timestamp' })
-	.or(z.date());$1;$2	.string()
+	.or(z.date());.string()
 	.url('Invalid URL')
 	.max(2048, 'URL too long');
 
@@ -49,12 +49,12 @@ export const searchSchema = z.object({
 
 // ============================================================================
 // CASE MANAGEMENT
-// ============================================================================$1;$2	'open',
+// ============================================================================'open',
 	'in_progress',
 	'pending_review',
 	'closed',
 	'archived'
-]);$1;$2	'low',
+]);'low',
 	'medium',
 	'high',
 	'critical',
@@ -82,7 +82,7 @@ export const deleteCaseSchema = z.object({
 
 // ============================================================================
 // EVIDENCE MANAGEMENT
-// ============================================================================$1;$2	'document',
+// ============================================================================'document',
 	'photo',
 	'video',
 	'audio',
@@ -132,7 +132,7 @@ export const chatMigrationSchema = z.object({
 
 // ============================================================================
 // USER & AUTHENTICATION
-// ============================================================================$1;$2	'prosecutor',
+// ============================================================================'prosecutor',
 	'detective',
 	'admin',
 	'analyst',
@@ -157,7 +157,7 @@ export const updateProfileSchema = z.object({
 
 // ============================================================================
 // DOCUMENT PROCESSING
-// ============================================================================$1;$2	'case_law',
+// ============================================================================'case_law',
 	'statute',
 	'regulation',
 	'brief',
@@ -236,7 +236,7 @@ export const apiResponseSchema = z.object({
 
 /**
  * Paginated response wrapper
- */$1;$2	z.object({
+ */z.object({
 		success: z.boolean(),
 		data: z.array(itemSchema),
 		pagination: z.object({ page: z.number().int(),

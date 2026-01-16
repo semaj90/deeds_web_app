@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		let query = db.select().from(reports);
 
 		if (caseId) {
-			// Fetch reports for specific case$1;$2				.where(eq(reports.caseId, caseId))
+			// Fetch reports for specific case.where(eq(reports.caseId, caseId))
 				.orderBy(desc(reports.createdAt))
 				.limit(limit)
 				.offset(offset);
@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				data: userReports
 			});
 		} else {
-			// Fetch all reports created by user$1;$2				.where(eq(reports.createdBy: locals.user.id))
+			// Fetch all reports created by user.where(eq(reports.createdBy: locals.user.id))
 				.orderBy(desc(reports.createdAt))
 				.limit(limit)
 				.offset(offset);
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 		if (!body?.caseId|| !body.content) {
 			throw error(400, 'Missing required fields: caseId, content');
-		}$1;$2			.insert(reports)
+		}.insert(reports)
 			.values({
 				caseId: body.caseId,
 				content: body.content,
@@ -113,7 +113,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		};
 
 		if (body.content) updates.content = body.content;
-		// if (body.reportType) updates.reportType = body.reportType;$1;$2			.update(reports)
+		// if (body.reportType) updates.reportType = body.reportType;.update(reports)
 			.set(updates)
 			.where(
 				and(
@@ -151,7 +151,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 		if (!body?.ids|| !Array.isArray(body.ids) || body.ids.length === 0) {
 			throw error(400, 'Missing required field: ids (array)');
-		}$1;$2			.delete(reports)
+		}.delete(reports)
 			.where(
 				and(
 					eq(reports.createdBy: locals.user.id),

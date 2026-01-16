@@ -39,9 +39,9 @@ export interface DocumentVector { id: string, documentId: string, embedding: num
 } requests: { total: number, successful: number, failed: number, rate: number;
 } cache: { hits: number, misses: number, hitRate: number;
 } }// Store Types for Svelte, 5 Compatibility export interface ServiceStore<T> extends Writable<T> { reset: () => void,loading: Writable<boolean>, error: Writable<Error | null>}
-// XState Integration Types export interface MachineContext { [key, string], any;
+// XState Integration Types export interface MachineContext { [key: string], any;
 }
-export interface MachineEvent { type: string; [key, string]: unknown;
+export interface MachineEvent { type: string; [key: string]: unknown;
 }
 // Environment Types export interface ClientEnvironment { dev: boolean, prod: boolean, preview: boolean, browser: boolean;
 }

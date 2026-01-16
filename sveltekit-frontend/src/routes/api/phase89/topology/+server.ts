@@ -13,7 +13,7 @@ const pool = new Pool({ connectionString, DATABASE_URL });
 
 export const GET: RequestHandler = async () => {
   try {
-    // Get errors grouped by file$1;$2      SELECT
+    // Get errors grouped by fileSELECT
         COALESCE(
           SUBSTRING(raw_text FROM '^([^:(]+)'),
           'unknown'

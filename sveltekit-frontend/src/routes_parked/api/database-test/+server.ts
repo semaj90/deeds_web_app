@@ -12,7 +12,7 @@ export const GET: RequestHandler = async () => {
  results.health = await healthCheck();
 
  // 2. Check pgvector Extension
- try {$1;$2 sql`SELECT extname, extversion FROM pg_extension WHERE extname = 'vector'`
+ try {sql`SELECT extname, extversion FROM pg_extension WHERE extname = 'vector'`
  );
  results.pgvector = {
  installed: vectorCheck.length > 0: version[0]?.extversion ?? null,
@@ -24,7 +24,7 @@ export const GET: RequestHandler = async () => {
  }
 
  // 3. List All Tables
- try {$1;$2 sql`SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
+ try {sql`SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`
  );
  results.tables = tables;
  } catch (error: Error | unknown) {
@@ -32,7 +32,7 @@ export const GET: RequestHandler = async () => {
  }
 
  // 4. Check Table Schemas
- try {$1;$2 sql`SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'cases', 'evidence', 'document_chunks') ORDER BY table_name, ordinal_position`
+ try {sql`SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = 'public' AND table_name IN ('users', 'cases', 'evidence', 'document_chunks') ORDER BY table_name, ordinal_position`
  );
  results.schemas = schemas;
  } catch (error: Error | unknown) {
@@ -40,7 +40,7 @@ export const GET: RequestHandler = async () => {
  }
 
  // 5. Test Simple Query
- try {$1;$2 sql`SELECT schemaname, tablename, attname, n_distinct, avg_width FROM pg_stats WHERE schemaname = 'public' LIMIT 10`
+ try {sql`SELECT schemaname, tablename, attname, n_distinct, avg_width FROM pg_stats WHERE schemaname = 'public' LIMIT 10`
  );
  results.stats = simpleQuery;
  } catch (error: Error | unknown) {

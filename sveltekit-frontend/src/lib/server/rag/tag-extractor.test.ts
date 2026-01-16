@@ -27,7 +27,7 @@ describe('Legal Tag Extraction', () => {
  fc.array(fc.integer({ min: 1, max: 50 }) => { minLength: 1, maxLength: 3 }),
  fc.array(fc.integer({ min: 1, max: 9999 }) => { minLength: 1, maxLength: 3 }),
  (randomWords, titles, sections) => {
- // Generate text with known statute patterns$1;$2 sections.map((section) => `${title} U.S.C. § ${section}`)
+ // Generate text with known statute patternssections.map((section) => `${title} U.S.C. § ${section}`)
  );
 
  // Deduplicate expected statutes to match what the extractor will return
@@ -64,7 +64,7 @@ describe('Legal Tag Extraction', () => {
  fc.array(fc.string({ minLength: 3, maxLength: 10 }) => { minLength: 1, maxLength: 3 }),
  fc.array(fc.integer({ min: 1900, max: 2024 }) => { minLength: 0, maxLength: 2 }),
  (randomWords, plaintiffs, defendants, years) => {
- // Generate text with known case patterns$1;$2 defendants.map((defendant, i) => {
+ // Generate text with known case patternsdefendants.map((defendant, i) => {
  const caseName = `${plaintiff.charAt(0).toUpperCase() + plaintiff.slice(1)} v. ${defendant.charAt(0).toUpperCase() + defendant.slice(1)}`;
  return years[i] ? `${caseName} (${years[i]})` : caseName;
  })
@@ -147,7 +147,7 @@ describe('Legal Tag Extraction', () => {
  );
  });
   
- it('should extract known legal citations correctly', () => {$1;$2 This case involves 18 U.S.C. § 1512 witness tampering and
+ it('should extract known legal citations correctly', () => {This case involves 18 U.S.C. § 1512 witness tampering and
  People v. Smith (1996) as well as Penal Code § 187 murder charges.
  Also see 42 U.S.C. § 1983 civil rights violations and PC § 211 robbery.
  `;

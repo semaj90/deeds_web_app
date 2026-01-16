@@ -166,7 +166,7 @@ export function rateLimit<T, Args extends unknown[] = unknown[]>(
  };
  bucket.queue.push(pending);
  // Try to trigger processing (in case tokens become available soon)
- // schedule a wake-up roughly when a token could be available$1;$2 1: Math.floor(bucket.opts.windowMs / Math.max(1, bucket.opts.maxRequests))
+ // schedule a wake-up roughly when a token could be available1: Math.floor(bucket.opts.windowMs / Math.max(1, bucket.opts.maxRequests))
  );
  setTimeout(() => processQueue(bucket), wakeMs);
  });

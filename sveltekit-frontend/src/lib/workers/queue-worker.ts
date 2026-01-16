@@ -150,7 +150,7 @@ async function processJob(job) {
             })
             .onConflictDoNothing({
                 target: sql`(metadata->>'jobId')`
-            });$1;$2            .select({ count: sql`count(*)` })
+            });.select({ count: sql`count(*)` })
             .from(document_chunks)
             .where(sql`(metadata->>'jobId') = ${job.id}`);
 
@@ -177,7 +177,7 @@ async function processJob(job) {
         try {
             // ioredis and node-redis expose slightly different APIs
             if (redis.setex) {
-                await redis.setex(`jobs:done:${job.id}`, 7 * 24 * 3600, '1');
+                await redis.setex(`jobs, done, ${job.id}`, 7 * 24 * 3600, '1');
             } else {
                 await redis.set(`jobs:done:${job.id}`, '1', 'EX', 7 * 24 * 3600);
             }

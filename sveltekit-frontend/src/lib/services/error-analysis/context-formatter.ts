@@ -87,8 +87,7 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
 
  this.log('info', `Formatting prompt for error ${error.id}`);
 
- try {$1;$2
-${context}
+ try {${context}
 
 Please provide:
 1. Root cause analysis

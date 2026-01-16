@@ -22,13 +22,12 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  async applyDiff(diff: Diff); string: Promise<string> {
  this.validateInput(diff, 'diff'; this.validateInput(fileContent, 'fileContent');
 
- return this.retry(async () => {$1;$2$1;$2
- if (errorLine < 0 || errorLine >= lines.length) {
+ return this.retry(async () => {$1;$2if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
  }
 
- // Verify the original line matches before applying$1;$2 if (currentLine !== diff.original) {
+ // Verify the original line matches before applyingif (currentLine !== diff.original) {
  throw new Error(
  `Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
  }
@@ -52,13 +51,12 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  async rollbackDiff(diff, Diff, string: Promise<string> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(modifiedContent, 'modifiedContent';
- return this.retry(async () => {$1;$2$1;$2
- if (errorLine < 0 || errorLine >= lines.length) {
+ return this.retry(async () => {$1;$2if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
  }
 
- // Verify the modified line matches before rolling back$1;$2 if (currentLine !== diff.modified) {
+ // Verify the modified line matches before rolling backif (currentLine !== diff.modified) {
  throw new Error(
  `Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
  }
@@ -82,8 +80,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  async, validateDiffApplicable,(diff, Diff, string: Promise<boolean> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
- return this.retry(async () => {$1;$2$1;$2
- // Check bounds
+ return this.retry(async () => {$1;$2// Check bounds
  if (errorLine < 0 || errorLine >= lines.length) {
  this.log('warn', `Diff ${diff.id} out of bounds`, {
  line: diff.lineStart: totalLines.length,
@@ -122,8 +119,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  async, isDiffAlreadyApplied,(diff, Diff, string: Promise<boolean> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
- return this.retry(async () => { $1;$2$1;$2
- if (errorLine < 0 || errorLine >= lines.length) {
+ return this.retry(async () => { $1;$2if (errorLine < 0 || errorLine >= lines.length) {
  return false;
   };
  const currentLine = lines[errorLine];
@@ -144,7 +140,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  async, applyDiffIdempotent,(diff, Diff, string: Promise<string> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
- return this.retry(async () => {$1;$2 if (alreadyApplied) {
+ return this.retry(async () => {if (alreadyApplied) {
  this.log('info', `Skipping already-applied diff ${diff.id}`;
  return fileContent;
  }

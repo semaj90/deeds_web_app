@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ params }) => {
   const { id } = params;
 
   try {
-    // Get node details$1;$2      SELECT id, kind, label, meta, embedding FROM kg_nodes WHERE id = ${id}
+    // Get node detailsSELECT id, kind, label, meta, embedding FROM kg_nodes WHERE id = ${id}
     `;
 
     if (!node) {

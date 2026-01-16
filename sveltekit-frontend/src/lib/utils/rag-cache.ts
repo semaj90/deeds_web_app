@@ -144,7 +144,7 @@ export class RedisRAGCache {
  async getStats(): Promise<{ totalEntries: number;
  hitRate?: number;
  oldestEntry?: number;
- newestEntry?, number;
+ newestEntry?: number;
  }> {
  try {
  const pattern = `${this.config.keyPrefix}*`;

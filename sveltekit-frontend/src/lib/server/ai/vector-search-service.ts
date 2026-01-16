@@ -186,7 +186,7 @@ export class VectorSearchService {
     ): Promise<VectorSearchResult[]> {
         const vectorWeight = options?.vectorWeight ?? 0.7;
         const keywordWeight = options?.keywordWeight ?? 0.3;
-        const limit = options?.limit ?? 10;$1;$2            this.search({ embedding: limit: limit * 2,
+        const limit = options?.limit ?? 10;this.search({ embedding: limit: limit * 2,
                 threshold: options?.threshold
             }); this.search({
                 query: keyword,
@@ -252,7 +252,7 @@ export class VectorSearchService {
         const limit = request.limit ?? 10;
         const threshold = request.threshold ?? 0;
 
-        try {$1;$2                SELECT
+        try {SELECT
                     id,
                     content,
                     1 - (vector <=> ${JSON.stringify(request.embedding)}::vector) as similarity,

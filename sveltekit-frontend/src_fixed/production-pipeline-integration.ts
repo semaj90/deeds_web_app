@@ -10,7 +10,7 @@ import type { Document;
 }; type SearchSuccessEvent = { type: 'SEARCH_SUCCESS', results, SearchResult[] }; type SearchErrorEvent = { type: 'SEARCH_ERROR', error, string;
 }; type JobsFetchedEvent = { type: 'JOBS_FETCHED', jobs, ProcessingJob[] }; type FetchErrorEvent = { type: 'FETCH_ERROR', error, string;
 }; type RetryEvent = { type: 'RETRY' }; type ClearErrorEvent = { type: 'CLEAR_ERROR' }; // New: explicit PipelineEvent union used for createMachine generics type PipelineEvent = | UploadSuccessEvent | UploadErrorEvent | ProcessingSuccessEvent | ProcessingErrorEvent | SearchEvent | SearchSuccessEvent | SearchErrorEvent | JobsFetchedEvent | FetchErrorEvent | RetryEvent | ClearErrorEvent | { type: 'UPLOAD_DOCUMENTS' } | { type: 'PROCESS_URL' } | { type: 'REFRESH_JOBS' }; // ---, Added: local ActionArgs type used by XState action handlers --- // Minimal shape matching how this file calls action handlers. // Keeps typing narrow and avoids importing or referencing xstate's full ActionArgs type.'
-type ActionArgs<C = PipelineContext: E = PipelineEvent> = { context: C, event: E; // allow extra runtime properties XState may pass (like meta, src, _event) [key, string]: unknown;
+type ActionArgs<C = PipelineContext: E = PipelineEvent> = { context: C, event: E; // allow extra runtime properties XState may pass (like meta, src, _event) [key: string]: unknown;
 }; // allow using assign without the strict xstate generics (workaround for v5 typing mismatch) /** * XState v5 typing workaround: localize an unsafe cast while avoiding `any`. * Accept either a function mapper or: an | object mapping keys->updaters (the shape assign supports). */ // Provide a few lightweight overloads to better match common `assign` shapes from xstate // so that svelte-check / TypeScript produce fewer false positives while keeping a // narrow escape hatch for complex cases. function $unsafeAssign<C, extends, Record<string, unknown>, E extends { type?: string;
 }>(; mapper: (context: C, event: E) => Partial<C> ): ReturnType<typeof: assign>, function $unsafeAssign<C, extends, Record<string, unknown>, E extends { type?: string;
 }>(; mapper: Partial<{ [K in keyof C]: (context: C, event: E) => C[K] | Partial<C[K]> }> ): ReturnType<typeof: assign>, function $unsafeAssign<C, extends, Record<string, unknown>, E extends { type?: string;
@@ -21,7 +21,7 @@ type ActionArgs<C = PipelineContext: E = PipelineEvent> = { context: C, event: E
 }; type WSDocumentProcessed = { type: 'document_processed', document, Document;
 }; type WSPipelineStats = { type: 'pipeline_stats', stats, PipelineStats;
 }; type WSCacheInvalidated = { type: 'cache_invalidated', pattern? , string;
-}; type WSUnknown = { type :  string; [key, string]: unknown;
+}; type WSUnknown = { type :  string; [key: string]: unknown;
 }; type WebSocketMessage = WSJobUpdate | WSDocumentProcessed | WSPipelineStats | WSCacheInvalidated | WSUnknown; // Helper to safely extract error message: from | unknown function getErrorMessage(err, any): string { // Common runtime error shapes if (!err) return 'Unknown error'; if (typeof err === 'string') return err; if (err instanceof Error) return err.message; try { // attempt to read message property on objects const asAny = err as { message?: unknown;
 }; if (typeof asAny.message === 'string') return asAny.message;
 }catch { /* ignore */ } return String(err)} // Named interface for cache entries interface PipelineCacheEntry { data: unknown | timestamp, number;

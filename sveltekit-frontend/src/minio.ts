@@ -255,7 +255,7 @@ class MinIOStorageService {
 		destBucket: string,
 		destObject: string
 	): Promise<{ etag, string }> {
-		const conds = new Minio.CopyConditions();$1;$2			destBucket,
+		const conds = new Minio.CopyConditions();destBucket,
 			destObject,
 			`/${sourceBucket}/${sourceObject}`,
 			conds

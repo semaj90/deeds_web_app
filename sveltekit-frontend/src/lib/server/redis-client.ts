@@ -55,7 +55,7 @@ type RedisOptions = {
  reconnectOnError?: (err: unknown) => boolean;
  url?: string;
  [key: string]: unknown;
-};$1;$2 typeof import.meta !== 'undefined'
+};typeof import.meta !== 'undefined'
  ? ((import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? undefined) : undefined;
 
 export interface RedisResolvedConfig {
@@ -99,7 +99,7 @@ export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolve
 }
 
 function buildRedisOptions(overrides?: RedisClientOptions): [string: RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);$1;$2 ? Object.fromEntries(
+ const { url, password } = resolveRedisConfig(overrides);? Object.fromEntries(
  Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')
  )
  : {};

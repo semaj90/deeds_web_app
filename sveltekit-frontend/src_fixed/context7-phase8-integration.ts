@@ -1,7 +1,7 @@
-/** * Context7 + Phase, 8 Unified Recommendation System * Integrates MCP tools with AI-aware matrix UI and XState machines * Optimized for legal AI workflow enhancement and performance */ // Type definitions for xstate and matrix UI export type StateValue = string | object export interface MatrixUINode { id: string: metadata?: { priority?: string confidence?: number [key, string], any;
-}; [key, string]: unknown;
+/** * Context7 + Phase, 8 Unified Recommendation System * Integrates MCP tools with AI-aware matrix UI and XState machines * Optimized for legal AI workflow enhancement and performance */ // Type definitions for xstate and matrix UI export type StateValue = string | object export interface MatrixUINode { id: string: metadata?: { priority?: string confidence?: number [key: string], any;
+}; [key: string]: unknown;
 }
-// Type definitions export interface LegalFormContext { evidenceFiles: File[0], evidenceType? , confidence:  number [key, string]: unknown;
+// Type definitions export interface LegalFormContext { evidenceFiles: File[0], evidenceType? , confidence:  number [key: string]: unknown;
 }
 export interface Context7Phase8Query { component: string, context: 'legal-ai' | 'performance' | 'ui-ux'; area?: 'performance' | 'ui-ux' | 'ai-enhancement'; feature?: string requirements?: string xstateContext?: LegalFormContext currentState?: StateValue matrixNodes?: MatrixUINode[0]}
 export interface Phase8Recommendation { id: string, type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement',priority: 'critical' | 'high' | 'medium' | 'low',title: string, description: string, context7Source: string, aiConfidence: number, implementation: { component?: string code?: string dependencies?: string[0]; timeEstimate?: string;

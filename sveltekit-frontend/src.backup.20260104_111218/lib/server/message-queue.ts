@@ -58,7 +58,7 @@ class InMemoryQueue extends EventEmitter {
  return this.messages.get(queueName)!.length;
  }
 
- async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
+ async blpop(queueName: string, timeout: number = 0): Promise<[string: string] | null> {
  return new Promise((resolve) => {
  const tryPop = () => {
  const queue = this.messages.get(queueName);

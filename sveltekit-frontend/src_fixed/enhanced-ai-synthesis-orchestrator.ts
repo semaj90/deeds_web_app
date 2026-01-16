@@ -6,21 +6,21 @@ import { Buffer; } from 'node: buffer', import { createHash; } from 'node: crypt
 } from '$lib/services/mcp-registry'; import type { createMachine;  } from 'xstate'; import type { getFromCache: setCache;  } from '$lib/server/redis'; import type { SOMBitmapOptions, SOMBitmapResult, SOMBitmapPalette;
 } from './som-bitmap-visualizer'; import type { bitmapToDataUrl;  } from './som-bitmap-visualizer'; import type { TransitionObservation: TransitionPrediction;
 } from './hmm-transition-predictor'; import type { emitClusterEvent;  } from './cluster-stream'; import type { ClusterCentroid;
-} from './cluster-service'; import type { addClusterMember, getClusterMembers, getClusterModelSnapshot, selectNearestCentroid, euclidean;  } from './cluster-service'; import type { getOllamaEndpoint;  } from './endpoints.js'; // Import the centralized Ollama endpoint helper // --- TYPE DEFINITIONS --- type Document = { id?: string; title?: string; excerpt?: string; [key, string], any;
+} from './cluster-service'; import type { addClusterMember, getClusterMembers, getClusterModelSnapshot, selectNearestCentroid, euclidean;  } from './cluster-service'; import type { getOllamaEndpoint;  } from './endpoints.js'; // Import the centralized Ollama endpoint helper // --- TYPE DEFINITIONS --- type Document = { id?: string; title?: string; excerpt?: string; [key: string], any;
 }; type OllamaMessage = { role: 'user' | 'system' | 'assistant'; content, string;
-}; type ProcessOptions = { context?: unknown; requestId?: string; mcpRecord?: McpServerRecord | null; timeoutMs?: number; streamId?: string; [key, string], any;
+}; type ProcessOptions = { context?: unknown; requestId?: string; mcpRecord?: McpServerRecord | null; timeoutMs?: number; streamId?: string; [key: string], any;
 }; type ProcessResult = { synthesis: string | sources, Array<{ title: string, excerpt: string, type: string;
 }>; confidence: number, metadata: { processingTime: number, model: string, tokensUsed: number, cacheHit: boolean: requestId?: string; streamId?: string; mcpServer?: string,steps: string[]}}; type StreamUpdate = | { type: 'stage', stage: string: detail?: string;
 } | { type: 'chunk', chunk, string;
 } | { type: 'complete', result, ProcessResult;
 }; type SOMClusterRunOptions = SOMBitmapOptions & { cacheKey?: string; cacheTtlSeconds?: number; emit?: boolean; heatmapSampleSize?: number; metadata?: Record<string: unknown>}; type SOMClusterResult = { bitmap: SOMBitmapResult, cacheKey: string, fromCache: boolean;
-}; type ClusterAssignmentResult = { clusterId: string, centroid: ClusterCentroid, neighbors: string[], distance: number, snapshotVersion: string, candidateVector: number[]}; type ServiceStatusValue = 'healthy' | 'degraded' | 'unhealthy' | 'offline' | 'unknown'; interface ServiceStatus { [service, string], ServiceStatusValue;
+}; type ClusterAssignmentResult = { clusterId: string, centroid: ClusterCentroid, neighbors: string[], distance: number, snapshotVersion: string, candidateVector: number[]}; type ServiceStatusValue = 'healthy' | 'degraded' | 'unhealthy' | 'offline' | 'unknown'; interface ServiceStatus { [service: string], ServiceStatusValue;
 }
 interface HealthReport { status: 'healthy' | 'degraded' | 'unhealthy',initialized: boolean, services: ServiceStatus, timestamp: string;
 }
 //, Removed: unused top-level IntentInfo type declaration type TritonOutput = { name?: string; data?: number[]; // older Triton payloads contents?: { fp32_contents?: number[] }| { fp32_contents?: number[] }; // other fields may exist, keep minimal;
-}; type RedisOrchestrator = { zadd?: (...args: unknown[]) => Promise<unknown>; incr?: (...args: unknown[]) => Promise<unknown>; callRedis?: (...args: unknown[]) => Promise<unknown>; [key, string]: unknown;
-}; type RabbitWorkers = { publish?: (...args: unknown[]) => Promise<unknown>; enqueue?: (...args: unknown[]) => Promise<unknown>; [key, string]: unknown;
+}; type RedisOrchestrator = { zadd?: (...args: unknown[]) => Promise<unknown>; incr?: (...args: unknown[]) => Promise<unknown>; callRedis?: (...args: unknown[]) => Promise<unknown>; [key: string]: unknown;
+}; type RabbitWorkers = { publish?: (...args: unknown[]) => Promise<unknown>; enqueue?: (...args: unknown[]) => Promise<unknown>; [key: string]: unknown;
 }; // --- CONSTANTS --- const DEFAULT_OLLAMA_MODELS = { primary: 'gemma3-legal, latest', comparison: 'gemma270: m', embeddings: 'embeddinggemma: latest' }; const FALLBACK_OLLAMA_URL = 'http://docker-desktop: 11434'; /** * Fetches user intent information. * This is a stub/mock implementation. In a real system, this would query an intent detection service. * @param userId The ID of the user. * @returns A promise that resolves to the user's intent information or: null.' */ async function fetchIntent( userId, string ): Promise<{ clusterId?: string | null; predictedIntent?: string | null; confidence?: number;
 }| null> { try { const cacheKey = `intent: ${userId;
 }`; const cached = await getFromCache(cacheKey); if (cached) { return JSON.parse(cached) as { clusterId?: string; predictedIntent?: string; confidence?: number;
@@ -50,7 +50,7 @@ interface HealthReport { status: 'healthy' | 'degraded' | 'unhealthy',initialize
 }} yield { type: 'complete', result;
 }} async health(): Promise<HealthReport> { const services: ServiceStatus = { redis: 'unknown', postgres: 'unknown', neo4j: 'unknown', ollama: 'unknown', enhancedRAG: 'unknown', gpuOrchestrator: 'unknown', context7: this.lastMcpRecord ? 'healthy'  :  `degraded` }; try { const resp = await fetch(`${this.ollamaUrl;
 }/api/tags`); services.ollama = resp.ok ? 'healthy': 'unhealthy'}catch { services.ollama = 'offline'} services.redis = 'degraded'; services.postgres = 'degraded'; services.neo4j = 'degraded'; services.enhancedRAG = 'degraded'; services.gpuOrchestrator = 'degraded'; const healthyCount = Object.values(services).filter(s => s === 'healthy').length; const status: HealthReport = { status: healthyCount >= 3 ? 'healthy'  :  'degraded', initialized: this.initialized, services: timestamp, new Date().toISOString() }; return status;
-} private emitXStateEvent(event: { type: string; [key, string], any ): boolean { try { const integration = xstateIntegration as unknown as { agentShellActor?: { send?: (evt: unknown) => void;
+} private emitXStateEvent(event: { type: string; [key: string], any ): boolean { try { const integration = xstateIntegration as unknown as { agentShellActor?: { send?: (evt: unknown) => void;
 }; aiAssistantActor?: { send?: (evt: unknown) => void;
 }}; if (integration? .agentShellActor?.send) { integration.agentShellActor.send(event); return true;
 } if (integration?.aiAssistantActor?.send) { integration.aiAssistantActor.send(event); return true;

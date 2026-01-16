@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-01-16T18:30:59.620Z",
+  "mode": "applied",
+  "initialErrors": 21432,
+  "totalFixesApplied": 4,
+  "results": [
+    {
+      "chunk": 1,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 2,
+      "files": [
+        "src\\lib\\services\\error-analysis\\diffs\\RedisCache.ts",
+        "src\\lib\\workers\\rabbitmq-embedding-worker.ts"
+      ],
+      "fixesApplied": 3,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 3,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 4,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 5,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 6,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 7,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21432,
+      "errorsAfter": 21432,
+      "status": "success"
+    },
+    {
+      "chunk": 8,
+      "files": [
+        "src\\lib\\server\\services\\clustering\\orchestrator.ts"
+      ],
+      "fixesApplied": 1,
+      "errorsBefore": 21432,
+      "errorsAfter": 21431,
+      "status": "success"
+    },
+    {
+      "chunk": 9,
+      "files": [],
+      "fixesApplied": 0,
+      "errorsBefore": 21431,
+      "errorsAfter": 21431,
+      "status": "success"
+    }
+  ]
+}

@@ -146,7 +146,7 @@ export async function searchSemantic(
 
  const statutes = await getAllStatutes();
 
- // Simple cosine similarity on 256d embeddings$1;$2 .map((statute) => {
+ // Simple cosine similarity on 256d embeddings.map((statute) => {
  if (!statute?.embedding256|| statute.embedding256.length === 0) {
  return { statute: score, 0 };
  }
@@ -255,7 +255,7 @@ export async function clearCache(): Promise<void> {
  */
 export async function getCacheStats(): Promise<{ count: number;
  lastUpdated: number | null;
- isStale, boolean;
+ isStale: boolean;
 }> {
  if (!db) await initIndexedDB();
 

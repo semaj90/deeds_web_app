@@ -94,14 +94,14 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
 }
 
 function extractFileMetadata(content: string, filePath: string): any {
-  const lines = content.split('\n');$1;$2    .filter(l => l.match(/^import\s+/))
+  const lines = content.split('\n');.filter(l => l.match(/^import\s+/))
     .slice(0, 10)
-    .map(l => l.trim());$1;$2    .filter(l => l.match(/^export\s+/))
+    .map(l => l.trim());.filter(l => l.match(/^export\s+/))
     .slice(0, 10)
     .map(l => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
-  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;$1;$2    ? 'svelte'
+  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;? 'svelte'
     : filePath.endsWith('.ts')
       ? 'typescript'
       : 'javascript';
@@ -199,7 +199,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const chunk = chunks[idx];
             const embedding = await generateEmbedding(chunk);
 
-            if (!embedding || embedding.length === 0) continue;$1;$2              parseInt(
+            if (!embedding || embedding.length === 0) continue;parseInt(
                 crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
                 16
               ) %
@@ -276,7 +276,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         }
       }
 
-      // Fetch error clusters$1;$2        SELECT DISTINCT
+      // Fetch error clustersSELECT DISTINCT
           file_path,
           error_code,
           message,
@@ -306,7 +306,7 @@ Phase: Phase 66-79 Error Analysis
 
           const embedding = await generateEmbedding(errorContext);
 
-          if (!embedding || embedding.length === 0) continue;$1;$2            parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
+          if (!embedding || embedding.length === 0) continue;parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
             (10 ** 8);
 
           const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`, {

@@ -8,7 +8,7 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_sources: Tracks discovered URLs from web search
- */$1;$2  'ace_sources',
+ */'ace_sources',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     sourceType: text('source_type').notNull().default('web'), // 'web', 'api', 'file'
@@ -30,7 +30,7 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_docs: Stores document metadata and MinIO pointers
- */$1;$2  'ace_docs',
+ */'ace_docs',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     sourceId: uuid('source_id').references(() => aceSources.id),
@@ -51,7 +51,7 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_chunks: Text chunks with embeddings for RAG
- */$1;$2  'ace_chunks',
+ */'ace_chunks',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     docId: uuid('doc_id').references(() => aceDocs.id, { onDelete: 'cascade' }),
@@ -81,7 +81,7 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_entities: Extracted entities for KAG
- */$1;$2  'ace_entities',
+ */'ace_entities',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     docId: uuid('doc_id').references(() => aceDocs.id, { onDelete: 'cascade' }),
@@ -98,7 +98,7 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_edges: Entity relationships for KAG graph
- */$1;$2  'ace_edges',
+ */'ace_edges',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     srcEntity: text('src_entity').notNull(),

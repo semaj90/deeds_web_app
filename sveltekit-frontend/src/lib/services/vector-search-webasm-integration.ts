@@ -211,7 +211,7 @@ export class VectorSearchWebASMPipeline {
             }
         }
         // Enforce max cache size
-        if (this.cache.size > this.config.caching.maxSize) {$1;$2                .sort(([a], [b]) => a.timestamp - b.timestamp);
+        if (this.cache.size > this.config.caching.maxSize) {.sort(([a], [b]) => a.timestamp - b.timestamp);
             const toDelete = entries.slice(0; this.cache.size - this.config.caching.maxSize);
             for (const [key] of toDelete) {
                 this.cache.delete(key);

@@ -221,7 +221,7 @@ export async function searchSimilarMessages(
 ): Promise<VectorSearchResult[]> {
     const { limit = 10, threshold = 0.7, includeMetadata = true } = options;
     try {
-        const vectorString = arrayToVector(queryEmbedding);$1;$2            SELECT * FROM search_similar_messages(
+        const vectorString = arrayToVector(queryEmbedding);SELECT * FROM search_similar_messages(
                 ${vectorString}::vector,
                 ${ threshold }::float,
                 ${ limit }::int
@@ -249,7 +249,7 @@ export async function searchSimilarEvidence(
     const { limit = 10, threshold = 0.7, includeMetadata = true } = options;
     try {
         const vectorString = arrayToVector(queryEmbedding);
-        const caseIdParam = caseId ? `${escapeLiteral(caseId)}::uuid` : 'NULL::uuid';$1;$2            SELECT * FROM search_similar_evidence(
+        const caseIdParam = caseId ? `${escapeLiteral(caseId)}::uuid` : 'NULL::uuid';SELECT * FROM search_similar_evidence(
                 ${vectorString}::vector,
                 ${caseIdParam},
                 ${ threshold }::float,
@@ -280,7 +280,7 @@ export async function insertChatMessageWithEmbedding(messageData: { id: string,
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
     try {
-        const vectorString = arrayToVector(messageData.embedding);$1;$2            INSERT INTO chat_messages (
+        const vectorString = arrayToVector(messageData.embedding);INSERT INTO chat_messages (
                 id, session_id, role, content, embedding, metadata
             ) VALUES (
                 ${escapeLiteral(messageData.id)}::uuid,
@@ -316,7 +316,7 @@ export async function updateEvidenceEmbeddings(
         }
         if (updates.length === 0) {
             return false;
-        }$1;$2            UPDATE evidence
+        }UPDATE evidence
             SET ${updates.join(', ')}
             WHERE id = ${escapeLiteral(evidenceId)}::uuid
         `;
@@ -387,7 +387,7 @@ export function calculateCosineSimilarity(a: number[], b: number[]): number {
  * Health check for pgvector functionality
  */
 export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
-    try {$1;$2            SELECT EXISTS (
+    try {SELECT EXISTS (
                 SELECT 1 FROM pg_extension WHERE extname = 'vector'
             ) as has_vector,
             (SELECT extversion FROM pg_extension WHERE extname = 'vector') as version
@@ -400,7 +400,7 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
                 functions: [],
                 error: 'pgvector extension not installed'
             };
-        }$1;$2            SELECT routine_name
+        }SELECT routine_name
             FROM information_schema.routines
             WHERE routine_schema = 'public'
             AND routine_name IN (

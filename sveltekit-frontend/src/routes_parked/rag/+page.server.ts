@@ -82,7 +82,7 @@ export const actions: Actions = {
  }
  // create a Buffer from the uploaded blob/file
  const buffer = Buffer.from(await file.arrayBuffer());
- const uploadRes: unknown = await minio.putObject(bucket, objectName, buffer);$1;$2 typeof tags === 'string'
+ const uploadRes: unknown = await minio.putObject(bucket, objectName, buffer);typeof tags === 'string'
  ? tags
  .split(',')
  .map((t) => t.trim())

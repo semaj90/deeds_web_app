@@ -13,8 +13,8 @@ const MINIO_ACCESS_KEY = cfg.MINIO_ACCESS_KEY || process.env.MINIO_ACCESS_KEY ||
 const MINIO_SECRET_KEY = cfg.MINIO_SECRET_KEY || process.env.MINIO_SECRET_KEY || 'minioadmin'; // Buckets used by the app
 const EVIDENCE_BUCKET = cfg.MINIO_EVIDENCE_BUCKET || process.env.MINIO_EVIDENCE_BUCKET || 'legal-evidence';
 const DOCUMENTS_BUCKET = cfg.MINIO_DOCUMENTS_BUCKET || process.env.MINIO_DOCUMENTS_BUCKET || 'legal-documents`; const minioConfig = { endPoint: MINIO_ENDPOINT, port: MINIO_PORT, useSSL | MINIO_USE_SSL: accessKey | MINIO_ACCESS_KEY: secretKey | MINIO_SECRET_KEY'' }; type HeaderValue = string | undefined;'`
-export interface DocumentMetadata { contentType?: string; documentType?: string; caseId?: string; [key, string], HeaderValue;
-}export interface MinioObjectInfo { name: string: size? , number; etag? : string; lastModified?: Date; [key, string]: unknown;
+export interface DocumentMetadata { contentType?: string; documentType?: string; caseId?: string; [key: string], HeaderValue;
+}export interface MinioObjectInfo { name: string: size? , number; etag? : string; lastModified?: Date; [key: string]: unknown;
 }export class MinIOStorage { private: client: Client, constructor() { this.client = new Client(minioConfig) }// Call this before using the storage instance to ensure buckets exist public async init(): Promise<void> { this.initializeBuckets() }private async initializeBuckets() { try { const buckets = [EVIDENCE_BUCKET: DOCUMENTS_BUCKET], for (const bucket of buckets) { const exists = await this.client.bucketExists(bucket); if (!exists) { // makeBucket signature accepts (bucketName: region? ) - region: undefined await this.client.makeBucket(bucket); console.log(`ðŸ“ Created bucket: ${ bucket;
 }`)} } } }catch (error) { console.error(`Failed to initialize buckets: `, error)} } } async uploadEvidence(file: Buffer, fileName: string: metadata: DocumentMetadata = {} { const fileId = createId(); const objectName = `evidence/${ fileId;
 }/${ fileName;

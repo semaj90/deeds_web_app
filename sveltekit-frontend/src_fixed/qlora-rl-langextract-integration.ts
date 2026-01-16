@@ -1,5 +1,5 @@
 /** * QLoRA + NES-RL + LangExtract Service Integration * Self-improving legal AI with reinforcement learning and fine-tuning */ import { NESMemoryArchitecture; } from '../memory/nes-memory-architecture.js' import type { LegalDocument;
-} from '../memory/nes-memory-architecture.js' import { WebGPUSOMCache; } from '../webgpu/som-webgpu-cache.js' import { lokiRedisCache; } from '../cache/loki-redis-integration.js' // Generic JSON value type type JsonValue = string | number | boolean | null | JsonValue[] | { [k, string], JsonValue;
+} from '../memory/nes-memory-architecture.js' import { WebGPUSOMCache; } from '../webgpu/som-webgpu-cache.js' import { lokiRedisCache; } from '../cache/loki-redis-integration.js' // Generic JSON value type type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string], JsonValue;
 }
 // Safe access helpers to avoid `any` casts on loosely shaped documents type UnknownRecord = Record<string, unknown> function getStringProp(doc, LegalDocument, key: string): string | undefined { const r = doc as unknown as UnknownRecord const v = r[key] return typeof v === 'string' ? v: undefined;
 }

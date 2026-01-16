@@ -302,12 +302,14 @@ export async function getEvidenceAnalysis(evidenceId: string): Promise<EvidenceA
 export async function searchEvidence(
  query: string, options: EvidenceListOptions = {}
 ): Promise<EvidenceListResponse> {
+    // TODO: ACE: Async function without await (check if async is needed)
  return listEvidence({ ...options, search: query });
 }
 
 export async function getEvidenceByCase(
  caseId: string, options: EvidenceListOptions = {}
 ): Promise<EvidenceListResponse> {
+    // TODO: ACE: Async function without await (check if async is needed)
  return listEvidence({ ...options, caseId });
 }
 
@@ -339,6 +341,7 @@ export async function uploadEvidenceAttachment(
  evidenceId: string, file: File,
  progressCallback?: (progress: number) => void
 ): Promise<EvidenceAttachment> {
+    // TODO: ACE: Async function without await (check if async is needed)
  try {
  const formData = new FormData();
  formData.append('file', file);

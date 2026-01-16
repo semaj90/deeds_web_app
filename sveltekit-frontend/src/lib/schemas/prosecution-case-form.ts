@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 // ============================================================================
 // ENUMS & CONSTANTS
-// ============================================================================$1;$2 'open',
+// ============================================================================'open',
  'pending_review',
  'in_discovery',
  'pre_trial',
@@ -16,14 +16,14 @@ import { z } from 'zod';
  'post_trial',
  'closed',
  'archived']);
-export const CasePriorityEnum = z.enum(['low', 'medium', 'high', 'critical', 'urgent']);$1;$2 'felony',
+export const CasePriorityEnum = z.enum(['low', 'medium', 'high', 'critical', 'urgent']);'felony',
  'misdemeanor',
  'violation',
  'infraction',
  'civil',
  'traffic',
  'other']);
-export const JurisdictionEnum = z.enum(['state', 'federal', 'county', 'municipal', 'tribal']);$1;$2 'available',
+export const JurisdictionEnum = z.enum(['state', 'federal', 'county', 'municipal', 'tribal']);'available',
  'pending',
  'lost',
  'destroyed',
@@ -240,7 +240,7 @@ export function getProsecutionCaseDefaults(): Partial<ProsecutionCaseForm> {
  };
 }
 
-export function estimateCaseCompleteness(form: Partial<ProsecutionCaseForm>): number {$1;$2 'caseNumber',
+export function estimateCaseCompleteness(form: Partial<ProsecutionCaseForm>): number {'caseNumber',
  'title',
  'who',
  'what',
@@ -249,7 +249,7 @@ export function estimateCaseCompleteness(form: Partial<ProsecutionCaseForm>): nu
  'narrative',
  'defendants',
  'evidence',
- 'charges'];$1;$2 (f) => form[f] && (Array.isArray(form[f]) ? (form[f] as any[]).length > 0 : true)
+ 'charges'];(f) => form[f] && (Array.isArray(form[f]) ? (form[f] as any[]).length > 0 : true)
  ).length;
  return Math.round((filled / fields.length) * 100);
 }

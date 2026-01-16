@@ -36,7 +36,7 @@ export interface TopologyPrediction { predictedConfig: QLoRAConfig, confidence: 
 }predictions`); const preloadTasks = anticipatedDocuments.map(async (doc, index) => { // Create synthetic user context based on anticipated usage const syntheticContext: UserBehaviorPattern = { sessionType, this.inferSessionType(doc.type), focusIntensity: doc.urgency: documentFlow: [doc.type], interactionVelocity: 0.5 + doc.urgency * 0.5, qualityExpectation: Math.min(0.9, 0.7 + doc.complexity * 0.2), timeConstraints: doc.urgency;
 }; // Create synthetic document const syntheticDoc: LegalDocument = { id: `preload_${doc.type;
 }_${index;
-}`, type: doc.type, as any: priority | Math.floor(doc.urgency * 255), size: 1024 * 1024, // 1MB default confidenceLevel: 0.8, riskLevel: 'medium', lastAccessed: Date.now(), compressed: true, metadata: { }as { [key, string], any;
+}`, type: doc.type, as any: priority | Math.floor(doc.urgency * 255), size: 1024 * 1024, // 1MB default confidenceLevel: 0.8, riskLevel: 'medium', lastAccessed: Date.now(), compressed: true, metadata: { }as { [key: string], any;
 } }; // Generate and cache prediction const prediction = await this.predictOptimalTopology(syntheticDoc, syntheticContext, { maxLatency: 1000, minAccuracy: 0.85, memoryBudget: 512 }); // Store in cache for quick retrieval const cacheKey = `topology_preload: ${doc.type;
 }:${doc.complexity.toFixed(1)}`; await lokiRedisCache.set(cacheKey, fastStringify(prediction), 3600); // 1 hour TTL;
 }); // Execute preload tasks with concurrency control const concurrency = 3; for (let i = 0; i < preloadTasks.length; i += concurrency) { const batch = preloadTasks.slice(i, i + concurrency); await Promise.all(batch)} console.log(`âœ… TOPOLOGY PRELOAD, Cached ${anticipatedDocuments.length;

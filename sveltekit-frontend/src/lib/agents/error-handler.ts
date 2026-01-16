@@ -252,10 +252,11 @@ export async function withTimeout<T>(
   timeoutMs: number,
   context: string
 ): Promise<T> {
+    // TODO: ACE: Async function without await (check if async is needed)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {$1;$2      fn(),
+  try {fn(),
       new Promise<T>((_, reject) => {
         controller.signal.addEventListener('abort', () => {
           reject(

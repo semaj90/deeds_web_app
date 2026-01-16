@@ -127,7 +127,7 @@ const defaultState: GlobalUserState = {
 // ===== SVELTE 5 RUNES STORE =====
 let globalUserState = $state<GlobalUserState>(defaultState);
 
-// Reactive computations using Svelte 5 $derived$1;$2 globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
+// Reactive computations using Svelte 5 $derivedglobalUserState.profile?.name ?? globalUserState.profile?.firstName ||
  globalUserState.profile?.email ?? 'Anonymous User'
 );
 
@@ -255,11 +255,11 @@ export const globalUserStore = {
  const metrics = globalUserState.sessionMetrics;
  // Update duration
  metrics.duration = Date.now() - metrics.startTime.getTime();
- // Update success rate$1;$2 (item) => item.isSuccessful
+ // Update success rate(item) => item.isSuccessful
  ).length;
  metrics.successRate = successfulMessages / globalUserState.chatHistory.length;
  // Update average response time
- if (message.processingTime) {$1;$2 (sum, m) => sum + (m?.processingTime?? 0),
+ if (message.processingTime) {(sum, m) => sum + (m?.processingTime?? 0),
  0
  );
  metrics.averageResponseTime = totalTime / globalUserState.chatHistory.length;
@@ -271,7 +271,7 @@ export const globalUserStore = {
  }
  },
 
- extractTopics(content: string): string[] {$1;$2 'contract',
+ extractTopics(content: string): string[] {'contract',
  'liability',
  'negligence',
  'damages',

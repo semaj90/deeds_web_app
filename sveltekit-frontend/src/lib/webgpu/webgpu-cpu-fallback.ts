@@ -71,7 +71,7 @@ export class WebGPUCPUFallback {
  ): Promise<Float32Array> {
  if (!this.gpu) {
  throw new Error('GPU.js not initialized');
- }$1;$2 .createKernel(function (embeddings: Float32Array): string {
+ }.createKernel(function (embeddings: Float32Array): string {
  const idx = this.thread.x;
  const value = embeddings[idx];
 
@@ -104,7 +104,7 @@ export class WebGPUCPUFallback {
  ): Promise<Float32Array> {
  if (!this.gpu) {
  throw new Error('GPU.js not initialized');
- }$1;$2 .createKernel(function (a: Float32Array, b: Float32Array, colsA) {
+ }.createKernel(function (a: Float32Array, b: Float32Array, colsA) {
  let sum = 0;
  for (let i = 0; i < colsA; i++) {
  sum += a[this.thread.y * colsA + i] * b[i * colsB + this.thread.x];
@@ -121,7 +121,7 @@ export class WebGPUCPUFallback {
  async softmax(input: Float32Array): Promise<Float32Array> {
  if (!this.gpu) {
  throw new Error('GPU.js not initialized');
- }$1;$2 .createKernel(function (input: Float32Array) {
+ }.createKernel(function (input: Float32Array) {
  const idx = this.thread.x;
  const expVal = Math.exp(input[idx]);
  // Note: This is a simplified softmax - real implementation needs max subtraction and normalization

@@ -148,7 +148,7 @@ export async function withDeadlockRetry<T>(
  for (let attempt = 0; attempt < maxRetries; attempt++) {
  try {
  return await fn();
- } catch (error) {$1;$2 error instanceof Error &&
+ } catch (error) {error instanceof Error &&
  (error.message.includes('deadlock') ||
  error.message.includes('DEADLOCK') ||
  error.code === '40P01');
@@ -174,7 +174,7 @@ export async function handleConstraintViolation(error, any,
  operationName?: string,
  affectedData?: any;
  }
-): Promise<void> {$1;$2 error instanceof Error &&
+): Promise<void> {error instanceof Error &&
  (error.message.includes('constraint') ||
  error.message.includes('CONSTRAINT') ||
  error.code === '23505' || // Unique violation

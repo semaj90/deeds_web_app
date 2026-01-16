@@ -130,7 +130,7 @@ export async function setupQueues(): Promise<void> {
     await ch.assertQueue('evidence.failed', { durable: true, arguments: { 'x-message-ttl': 86400000 } });
     await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed');
 
-    // Assert all defined queues$1;$2      ...Object.values(QUEUES.evidence),
+    // Assert all defined queues...Object.values(QUEUES.evidence),
       ...Object.values(QUEUES.ai),
       ...Object.values(QUEUES.notification)
     ];

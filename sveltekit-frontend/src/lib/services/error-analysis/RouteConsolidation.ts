@@ -273,7 +273,7 @@ export class RouteConsolidation {
 
 		// Find routes that are not referenced
 		for (const route of this.routes) {
-			const routeName = route.path.split('/').pop() ?? '';$1;$2				dep.includes(routeName) || route.path.includes(dep)
+			const routeName = route.path.split('/').pop() ?? '';dep.includes(routeName) || route.path.includes(dep)
 			);
 
 			// Skip root and common routes

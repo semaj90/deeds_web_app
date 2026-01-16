@@ -5,7 +5,7 @@
  * Supports: gemma3-legal: latest, embeddinggemma: latest
  */
 
-// Environment-based endpoint resolution$1;$2 import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
+// Environment-based endpoint resolutionimport.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
  (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ?? 'http://localhost:11434';
 
 const OLLAMA_DOCKER_HOST = 'http://ollama:11434';
@@ -101,6 +101,7 @@ export async function ollamaGenerate(
  max_tokens?: number;
  } = {}
 ): Promise<Response> {
+    // TODO: ACE: Async function without await (check if async is needed)
  const {
  model = OLLAMA_MODELS.chat,
  context = 'client',
@@ -135,6 +136,7 @@ export async function ollamaChat(
  temperature?: number;
  } = {}
 ): Promise<Response> {
+    // TODO: ACE: Async function without await (check if async is needed)
  const {
  model = OLLAMA_MODELS.chat,
  context = 'client',

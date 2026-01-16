@@ -31,7 +31,7 @@ export interface IntelligentTodo {
  confidence: number;
  tags: string[];
  created_at: string;
- metadata: { [key, string]: any};
+ metadata: { [key: string]: any};
 }
 
 // Respect environment flag to enable/disable WebGPU features in dev

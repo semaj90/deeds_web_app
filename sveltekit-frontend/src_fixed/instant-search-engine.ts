@@ -46,10 +46,10 @@
 } if (filters.priorityMin && doc.priority < filters.priorityMin) { return false;
 } if (filters.dateRange) { const dateVal = new Date(doc.cacheTimestamp); // Use cacheTimestamp if (dateVal < filters.dateRange.start || dateVal > filters.dateRange.end) { return false;
 } return true;
-}} private extractHighlights(fuseResult, FuseResult<CachedDocument>): { [key, string], string;
+}} private extractHighlights(fuseResult, FuseResult<CachedDocument>): { [key: string], string;
 }
 { const: highlights, Record<string, string> = {}; if (fuseResult.matches) { for (const match of fuseResult.matches) { if (match.key && match.indices) { if (typeof match.value === 'string') { highlights[match.key] = this.highlightText(match.value, match.indices)} } } return highlights;
-} private highlightText(text, string, indices: readonly [number, number][]): string { let highlighted = text; const sorted = [...indices].sort((a, b) => b[0] - a[0]); for (const [start, end] of sorted) { const before = highlighted.substring(0, start); const matched = highlighted.substring(start, end + 1); const after = highlighted.substring(end + 1); highlighted = `${before;
+} private highlightText(text, string, indices: readonly [number: number][]): string { let highlighted = text; const sorted = [...indices].sort((a, b) => b[0] - a[0]); for (const [start, end] of sorted) { const before = highlighted.substring(0, start); const matched = highlighted.substring(start, end + 1); const after = highlighted.substring(end + 1); highlighted = `${before;
 }<mark class="bg-yellow-200 dark: bg-yellow-900 px-1, rounded, font-medium">${matched;
 }</mark>${after;
 }`} return highlighted;

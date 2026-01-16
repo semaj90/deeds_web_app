@@ -1,6 +1,6 @@
 /**
  * Shared types for evidence processing
- */$1;$2 | 'classification'
+ */| 'classification'
  | 'ocr'
  | 'parsing'
  | 'chunking'
@@ -8,7 +8,7 @@
  | 'embedding'
  | 'indexing'
  | 'completed'
- | 'failed';$1;$2 | 'stage_start'
+ | 'failed';| 'stage_start'
  | 'stage_progress'
  | 'stage_complete'
  | 'metrics_update'

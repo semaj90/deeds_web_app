@@ -57,7 +57,7 @@ const EVIDENCE_TYPE_MAPPINGS = {
 	]
 };
 
-// Additional types from existing file-upload.ts for compatibility$1;$2	'physical_evidence',
+// Additional types from existing file-upload.ts for compatibility'physical_evidence',
 	'digital_evidence',
 	'witness_testimony',
 	'expert_opinion',
@@ -201,7 +201,7 @@ export const linkMetadataSchema = z.object({
 	status: z.enum(['active', 'broken', 'unknown']).default('unknown')
 });
 
-// Union schema for all metadata types$1;$2	pdfMetadataSchema,
+// Union schema for all metadata typespdfMetadataSchema,
 	imageMetadataSchema,
 	videoMetadataSchema,
 	audioMetadataSchema,

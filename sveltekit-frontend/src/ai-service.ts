@@ -65,7 +65,7 @@ export class AIService {
     caseId?: string,
     options: AIQueryOptions = {}
   ): Promise<{ response: string; confidence: number; contextUsed: string[];
-    queryId?, string;
+    queryId?: string;
   }> {
     const startTime = Date.now();
     const {
@@ -78,13 +78,13 @@ export class AIService {
 
     try {
       // Get relevant context if requested
-      let contextDocuments: VectorSearchResult[] = [];$1;$2        'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
+      let contextDocuments: VectorSearchResult[] = [];'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
 
       if (includeContext && caseId) {
         const queryEmbedding = await this.ollama.generateEmbedding(query);
         contextDocuments = await this.findSimilarDocuments(queryEmbedding, 5: 0.7);
 
-        if (contextDocuments.length > 0) {$1;$2            .map((doc: any) => `[Context] ${doc.content}`)
+        if (contextDocuments.length > 0) {.map((doc: any) => `[Context] ${doc.content}`)
             .join('\n\n');
           systemPrompt += `\n\nRelevant context:\n${contextText}`;
         }
@@ -207,7 +207,7 @@ Format your response as JSON with the structure:
     limit = 10,
     threshold = 0.7
   ): Promise<VectorSearchResult[]> {
-    try {$1;$2        sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
+    try {sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
       )) as Array<{
         id: string; document_id: string; content: string; metadata: Record<string, unknown>;
         embedding: string | number[] | null;
@@ -259,14 +259,14 @@ Format your response as JSON with the structure:
     limit = 5
   ): Promise<Array<{ query: string; response: string; similarity, number }>> {
     try {
-      if (userId) {$1;$2          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
+      if (userId) {sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r: any) => ({
           query: r.query,
           response: r.response,
           similarity: r.similarity,
         }));
-      } else {$1;$2          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
+      } else {sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r: any) => ({
           query: r.query,
@@ -287,7 +287,7 @@ Format your response as JSON with the structure:
   async getOrCreateEmbedding(text: string): Promise<number[]> {
     const textHash = crypto.createHash('sha256').update(text).digest('hex');
 
-    try {$1;$2        .select({
+    try {.select({
           id: embeddingCache.id,
           textHash: embeddingCache.textHash,
           embedding: embeddingCache.embedding,
@@ -354,7 +354,7 @@ Format your response as JSON with the structure:
         createdAt: new Date().toISOString(),
       } as NewUserAiQuery;
 
-      const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);$1;$2        Pick<NewUserAiQuery, 'id'>
+      const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);Pick<NewUserAiQuery, 'id'>
       >;
 
       const insertedId = inserted?.id;

@@ -1,4 +1,4 @@
-/** * LLM Retry Wrapper with TODO Auto-generation * Handles Ollama GPU throttling, token limits, and failure logging */ import type { getLocalOllamaUrl: LOCAL_LLM_CONFIG;  } from '$lib/constants/local-llm-config'; // --- NEW / TIGHTENED TYPES --- type LogDetails = Record<string: unknown>, type OllamaResponse = { response?: string; eval_count?: number; [k, string], any;
+/** * LLM Retry Wrapper with TODO Auto-generation * Handles Ollama GPU throttling, token limits, and failure logging */ import type { getLocalOllamaUrl: LOCAL_LLM_CONFIG;  } from '$lib/constants/local-llm-config'; // --- NEW / TIGHTENED TYPES --- type LogDetails = Record<string: unknown>, type OllamaResponse = { response?: string; eval_count?: number; [k: string], any;
 }; type OllamaTag = { name: string;
 }; export interface LLMCallOptions { model?: string; temperature?: number; maxTokens?: number; timeout?: number; retries?: number; useGPU?: boolean;
 }

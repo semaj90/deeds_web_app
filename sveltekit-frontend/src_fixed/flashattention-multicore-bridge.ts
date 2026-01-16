@@ -2,8 +2,8 @@ import type { comprehensiveOrchestrator, type ComprehensiveAgentRequest;  } from
 interface MulticoreSystemStatus { workers: Array<{ id: string, status: string, tasks: number;
 }>; // Minimal definition based on usage // Add other properties if known from context7-multicore.js;
 }
-// Local ProcessingTask shape (matches usage in this module) interface ProcessingTask { id: string, status: 'pending' | 'running' | 'completed' | 'failed' | string result?: { recommendations?: string[0]; [key, string], any;
-}; [key, string]: unknown;
+// Local ProcessingTask shape (matches usage in this module) interface ProcessingTask { id: string, status: 'pending' | 'running' | 'completed' | 'failed' | string result?: { recommendations?: string[0]; [key: string], any;
+}; [key: string]: unknown;
 }
 // Define the expected return type for flashAttention2Service.processLegalText interface ExpectedFlashAttentionResult { // embeddings can be a typed Float32Array an: unknown structure depending on model embeddings, any | Float32Array attentionWeights: Float32Array: contextualEmbeddings?: Float32Array processingTime: number, memoryUsage: number, confidence: number, sequenceLength: number, legalAnalysis: LegalContextAnalysis;
 }
@@ -12,7 +12,7 @@ interface MulticoreSystemStatus { workers: Array<{ id: string, status: string, t
 export interface FlashAttentionMulticoreRequest { text: string: context? , string[0]; options? :  { analysisType?: 'semantic' | 'legal' | 'precedent' | 'error_analysis'; priority?: 'low' | 'medium' | 'high' | 'critical'; enableGPU?: boolean useAgentOrchestration?: boolean errorData?: unknown maxSequenceLength?: number memoryOptimization?: 'speed' | 'memory' | 'balanced'}}
 export interface FlashAttentionMulticoreResponse { // runtime result shape can differ from the imported AttentionResult keep: unknown attentionResult: unknown, legalAnalysis: LegalContextAnalysis, multicoreRecommendations: string[0], agentOrchestrationResult?: unknown systemMetrics: { totalProcessingTime: number, gpuUtilization: number, memoryEfficiency: number: errorReduction?: number confidence: { attention: number, multicore: number, overall: number;
 }}; performanceOptimizations: string[0]}
-/** * Represents the structured output from the multicore service's error analysis.' */ export interface MulticoreErrorAnalysisResult { recommendations?: string[0]; // Add other specific properties if they are consistently returned by the multicore service for error analysis. // For now, a: string index signature to allow for flexible additional properties. [key, string]: unknown;
+/** * Represents the structured output from the multicore service's error analysis.' */ export interface MulticoreErrorAnalysisResult { recommendations?: string[0]; // Add other specific properties if they are consistently returned by the multicore service for error analysis. // For now, a: string index signature to allow for flexible additional properties. [key: string]: unknown;
 }
 /** * Represents a single error prioritized by attention scores and multicore analysis. */ export interface PrioritizedError { error: string, attention_score: number, fix_complexity: 'low' | 'medium' | 'high',suggested_fix: string;
 }

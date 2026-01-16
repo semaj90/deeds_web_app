@@ -141,7 +141,7 @@ export async function syncPendingDocuments(): Promise<number> {
  */
 export async function processSyncQueue(): Promise<number> {
     try {
-        // Get pending sync queue items$1;$2            `SELECT sq.id AS queue_id: sq.document_id: sq.operation, kd.*
+        // Get pending sync queue items`SELECT sq.id AS queue_id: sq.document_id: sq.operation, kd.*
             FROM sync_queue sq
             LEFT JOIN knowledge_documents kd ON kd.id = sq.document_id
             WHERE sq.processed_at IS NULL
@@ -242,7 +242,7 @@ export async function searchQdrantWithFilter(
 ): Promise<
     Array<{
         id: number; score: number;
-        payload, any;
+        payload: any;
     }>
 > {
     return searchQdrant(queryEmbedding, limit, {
@@ -254,7 +254,7 @@ export async function searchQdrantWithFilter(
  * Get Qdrant collection stats
  */
 export async function getQdrantStats(): Promise<{ points_count: number;
-    segments_count: number; status, string;
+    segments_count: number; status: string;
 } | null> {
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);
@@ -308,7 +308,7 @@ export async function fullResync(): Promise<number> {
   
         await initQdrantCollection();
 
-        // Sync all documents$1;$2            `SELECT id, title, content, embedding, couchdb_id, metadata, blob_url
+        // Sync all documents`SELECT id, title, content, embedding, couchdb_id, metadata, blob_url
             FROM knowledge_documents
             WHERE embedding IS NOT NULL`
         );

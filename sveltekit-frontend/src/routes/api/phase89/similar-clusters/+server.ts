@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			limit: limit + 1, // +1 to exclude the query cluster itself
 			with_payload: true,
 			with_vector: false
-		} as any);$1;$2			.filter((result) => result.payload?.cluster_id !== cluster_id)
+		} as any);.filter((result) => result.payload?.cluster_id !== cluster_id)
 			.slice(0, limit)
 			.map((result) => ({
 				cluster_id: result.payload?.cluster_id,

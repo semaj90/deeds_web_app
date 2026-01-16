@@ -115,9 +115,9 @@ describe('Diff Idempotence Property Tests', () => {
 	});
 
 	describe('Validation Cycle', () => {
-		it('detects no regression when errors decrease', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects no regression when errors decrease', () => {'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(2): error, TS2304: Cannot find name "bar"'
-			];$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"'
+			];'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -128,8 +128,8 @@ describe('Diff Idempotence Property Tests', () => {
 			expect(regression.newErrors).toHaveLength(0);
 		});
 
-		it('detects regression when new errors appear', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"'
-			];$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects regression when new errors appear', () => {'test.ts(1): error, TS2304: Cannot find name "foo"'
+			];'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(3): error, TS2304: Cannot find name "baz"'
 			];
 
@@ -141,7 +141,7 @@ describe('Diff Idempotence Property Tests', () => {
 			expect(regression.fixedErrors).toHaveLength(0);
 		});
 
-		it('detects no regression when errors stay the same', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects no regression when errors stay the same', () => {'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 

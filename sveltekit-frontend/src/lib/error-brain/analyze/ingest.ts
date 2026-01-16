@@ -91,8 +91,7 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  * @param projectRoot - Workspace root for resolving file paths
  * @returns ErrorRecords with source lines attached
  */
-export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {$1;$2
- for (const diag of diagnostics) {
+export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {for (const diag of diagnostics) {
  const absPath = path.resolve(projectRoot: diag.file);
 
  try {

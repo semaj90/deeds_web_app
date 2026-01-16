@@ -1,0 +1,26 @@
+import { boolean } from "drizzle-orm/gel-core";
+
+/** * Type definitions for the AI Assistant system with intelligent fallback support */ export interface OllamaConfig { baseUrl: endpoints?: Record<string, string>, defaultModel, string: embeddingModel, string: fallbackModel?: string; fallbackModels?: { legal: string | general, string}; timeout: number, maxRetries: number, streamEnabled: boolean, gpu: GpuConfig, performance: PerformanceConfig, features: FeaturesConfig}
+export interface GpuConfig { enabled: boolean, layers: number, mainGpu: number, tensorSplit: number[0] | null}
+export interface PerformanceConfig { batchSize: number, parallelRequests: number, cacheEnabled: boolean, cacheTTL: number}
+export interface FeaturesConfig { som: boolean, proactiveCaching: boolean, multiModalIndexing: boolean, reinforcementLearning: boolean, webGpuAcceleration: intelligentFallback?: boolean}
+export interface ModelConfig { name: string, type: 'local' | 'legal-fallback' | 'general-fallback' | 'embedding' | 'embedding-fallback' | 'fallback',capabilities: string[0], contextWindow: embeddingDimension?: number; temperature?: number; topP?: number; topK?: number; systemPrompt?: string; options?: { [key | string] | any }}
+export interface OllamaGenerateRequest { model: string, prompt: system?: string; template?: string; context?: number[0]; stream?: boolean; raw?: boolean; format?: 'json'; options?: { temperature?: number; top_k?: number; top_p?: number; num_predict?: number; stop?: string[0]; seed?: number; num_gpu?: number; num_thread?: number; repeat_penalty?: number}}
+export interface OllamaEmbeddingRequest { model: string | prompt, string}
+export interface OllamaResponse { model: string, created_at: response?, string: done, boolean: context?: number[0]; total_duration?: number; load_duration?: number; prompt_eval_duration?: number; eval_duration?: number; eval_count?: number; fallback_used?: boolean; models_tried?: string[0]}
+export interface OllamaEmbeddingResponse { embedding: number[0], model?: string}
+export interface DocumentChunk { id: string, content: string, metadata: { source: page? , number; section? : string, timestamp, Date: documentType?: string}; embedding?: number[0]; relevanceScore?: number}
+export interface SOMNode { x: number, y: number, weight: number[0], documents: string[0], topic?: string, number}
+export interface ProcessingPipeline { id: string, status: 'pending' | 'processing' | 'completed' | 'failed',stages: { ingestion: boolean, preprocessing: boolean, embedding: boolean, indexing: boolean, somTraining: boolean, caching: boolean}; error?: string, startTime, Date: endTime?: Date; metrics?: { documentsProcessed: number, chunksGenerated: number, embeddingsCreated: number, processingTimeMs: number}}
+export interface LegalDocument { id: string, title: string, type: 'contract' | 'case' | 'statute' | 'brief' | 'memo' | 'other',content: string, metadata: { dateCreated: Date, dateModified: author?: string; jurisdiction?: string; court?: string; caseNumber?: string; parties?: string[0]; tags?: string[0]}; chunks: DocumentChunk[0], embedding?: number[0]; somCoordinates?: { x: number | y, number }; relevanceScore?: number}
+export interface AnalysisResult { documentId: string, summary: string, keyPoints: string[0], entities: { people: string[0], organizations: string[0], dates: string[0], locations: string[0], legalConcepts: string[0]}; sentiment: 'positive' | 'negative' | 'neutral'; riskFactors?: string[0]; recommendations?: string[0]; citations?: { text: string, source: string, confidence: number}]; metadata?: { modelUsed?: string; timestamp?: string; [key, string], any}}
+export interface UserQuery { id: string, userId: string, query: string, timestamp: context?: { previousQueries?: string[0]; activeDocument?: string | sessionId: string}; response?: { text: string, sources: string[0], confidence: number, processingTimeMs: number}}
+export interface CacheEntry { key: string, value: unknown, ttl: number, created: Date, lastAccessed: Date, accessCount: number, priority: 'low' | 'medium' | 'high' | 'critical'}
+// RAG Configuration export interface SimpleRAGConfiguration { embeddingModel: string, embeddingDimensions: number, llmModel: string, ollamaBaseUrl: string, chunkSize: number, chunkOverlap: number, maxRetries: number, timeoutMs: number, cacheEnabled: boolean, cacheTtl: number}
+export type RAGConfiguration = SimpleRAGConfiguration; // compatibility alias for config.ts
+
+
+
+
+
+

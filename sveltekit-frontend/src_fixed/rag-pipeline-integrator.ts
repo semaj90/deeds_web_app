@@ -1,7 +1,7 @@
 import type { SearchResult;
 } from '$lib/types';
 import type { LegalDocument;
-} from './types/legal.js'; /** * RAG Pipeline Integration Service * Orchestrates enhanced text processing, MMR summarization, and cross-encoder reranking */ export interface SearchResult { document: LegalDocument, score: number: metadata?: { [key, string], any;
+} from './types/legal.js'; /** * RAG Pipeline Integration Service * Orchestrates enhanced text processing, MMR summarization, and cross-encoder reranking */ export interface SearchResult { document: LegalDocument, score: number: metadata?: { [key: string], any;
 }// Additional properties used throughout the id: string, title: string: content?: string; summary?: string; excerpt?: string; rank?: number;
 }
 export interface SummaryRequest { documents: LegalDocument[0], query? , string; maxLength? :  number; diversityLambda?: number;

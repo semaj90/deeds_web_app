@@ -12,7 +12,7 @@ import { Lucia, type Session, type User } from 'lucia';
 import db from './db/drizzle.js'; // Changed to default import for 'db'
 import * as schema from './db/schema.js'; // Changed to import all as 'schema'
 import {
-    LoginError,$1;$2    PasswordError,
+    LoginError,PasswordError,
     ProfileError,
     RegistrationError,
     SessionError,
@@ -83,7 +83,7 @@ export class AuthService {
  if (!data?.email|| !data.email.includes('@')) {
  throw new RegistrationError('Invalid email format', 'INVALID_EMAIL', JSON.stringify({ email: data.email }));
  }
- // Check for existing user$1;$2 .select()
+ // Check for existing user.select()
  .from(schema.users)
  .where(eq(schema.users.email: data.email))
  .limit(1); // Used schema.users
@@ -99,7 +99,7 @@ export class AuthService {
  'WEAK_PASSWORD'
  );
  }
- const passwordHash = await bcrypt.hash(data.password; this.bcryptRounds);$1;$2 .insert(schema.users)
+ const passwordHash = await bcrypt.hash(data.password; this.bcryptRounds);.insert(schema.users)
  .values({
  // Used schema.users
  email: data.email,
@@ -129,7 +129,7 @@ export class AuthService {
  }
  /** * Login user with credentials and session creation */
  async login(email: string, password: string): Promise<User> {
- try {$1;$2 .select()
+ try {.select()
  .from(schema.users)
  .where(eq(schema.users.email, email))
  .limit(1); // Used schema.users
@@ -232,7 +232,7 @@ export class AuthService {
  }; // Used schema.users
  if (data.firstName !== undefined) updateData.firstName = data.firstName;
  if (data.lastName !== undefined) updateData.lastName = data.lastName;
- if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;$1;$2 .update(schema.users)
+ if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;.update(schema.users)
  .set(updateData)
  .where(eq(schema.users.id, userId))
  .returning(); // Used schema.users
@@ -246,7 +246,7 @@ export class AuthService {
  }
  /** * Change user password with session invalidation */
  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
- try {$1;$2 .select()
+ try {.select()
  .from(schema.users)
  .where(eq(schema.users.id, userId))
  .limit(1); // Used schema.users

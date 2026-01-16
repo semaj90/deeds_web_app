@@ -205,7 +205,7 @@ export class OllamaService {
 		const results: (number[] | null)[] = [];
 
 		for (let i = 0; i < texts.length; i += concurrency) {
-			const batch = texts.slice(i, i + concurrency);$1;$2				batch.map((text: any) => this.generateEmbedding(text))
+			const batch = texts.slice(i, i + concurrency);batch.map((text: any) => this.generateEmbedding(text))
 			);
 			results.push(...batchResults);
 
@@ -276,11 +276,10 @@ export class OllamaService {
 	/**
 	 * Generate fix suggestion for an error using ACE prompting
 	 */
-	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {$1;$2			.filter((e: any) => e.fix)
+	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {.filter((e: any) => e.fix)
 			.slice(0, 3)
 			.map((e: any, i: any) => `Example ${i + 1}:\nError: ${e.message}\nFix: ${e.fix}`)
-			.join('\n\n');$1;$2
-${fewShotExamples ? `Here are similar errors and their fixes:\n${fewShotExamples}\n\n` : ''}
+			.join('\n\n');${fewShotExamples ? `Here are similar errors and their fixes:\n${fewShotExamples}\n\n` : ''}
 Current Error:
 File: ${error.file}
 Line: ${error.line}

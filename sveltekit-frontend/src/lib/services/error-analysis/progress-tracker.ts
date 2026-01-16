@@ -101,7 +101,7 @@ export class ProgressTracker extends BaseService {
  this.metrics.successRate = (this.metrics.errorsFixed / this.metrics.errorsAnalyzed) * 100;
  }
 
- // Update average confidence$1;$2 this.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
+ // Update average confidencethis.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
  this.metrics.averageConfidence = totalConfidence / this.metrics.errorsAnalyzed;
 
  // Update error reduction

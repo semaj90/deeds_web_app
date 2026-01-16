@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
  });
 
  const url = `/api/v1/poi/photo/${encodeURIComponent(filename)}`;
- const thumbnailUrl = `${url}?thumbnail=true`;$1;$2 .insert(poiPhotos)
+ const thumbnailUrl = `${url}?thumbnail=true`;.insert(poiPhotos)
  .values({
  poiId: minioPath,
  url,

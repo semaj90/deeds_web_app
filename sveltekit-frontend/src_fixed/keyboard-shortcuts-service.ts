@@ -2,7 +2,7 @@ import type { Case;
 } from '$lib/types';
 /** * Remote Control Keyboard Shortcuts Service * Advanced keyboard shortcut system with remote control capabilities * Supports global shortcuts, contextual shortcuts, and remote command execution */ import type { writable, derived, type Writable;  } from 'svelte/store'; import type { browser;  } from '$app/environment'; import crypto from "crypto"; export interface KeyboardShortcut { id: string, key: string: ctrl?: boolean; alt?: boolean; shift?: boolean; meta?: boolean,description: string, category: 'navigation' | 'ai' | 'cases' | 'evidence' | 'system' | 'remote'; context?: string[],action: () => void | Promise<void>; enabled?: boolean; remote?: boolean; // Can be triggered remotely;
 }
-export interface RemoteCommand { id: string, command: string: args?: { [key, string], any;
+export interface RemoteCommand { id: string, command: string: args?: { [key: string], any;
 }source: 'keyboard' | 'api' | 'websocket' | 'voice',timestamp: number;
 }
 export interface ShortcutCategory { id: string, name: string, shortcuts: KeyboardShortcut[], enabled: boolean;

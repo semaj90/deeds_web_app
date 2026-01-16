@@ -1,7 +1,7 @@
 import type { SearchResult;
 } from '$lib/types';
 import type { LegalDocument;
-} from './types/legal.js'; export interface SearchResult { document: LegalDocument, score: number: metadata?: { [key, string], any;
+} from './types/legal.js'; export interface SearchResult { document: LegalDocument, score: number: metadata?: { [key: string], any;
 }; id: string, title: string: content?: string; summary?: string; excerpt?: string; rank?: number;
 } export interface RerankingConfig { threshold?: number; maxResults?: number; useSemanticSimilarity?: boolean;
 } export interface ScoredResult { document: LegalDocument, originalScore: number, rerankScore: number, combinedScore: number, metadata: { modelUsed: string, processingTime: number, confidence: number;

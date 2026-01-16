@@ -50,7 +50,7 @@ return {}}, setRefreshJob: assign({ refreshJob, context => `refresh_${context.qu
 } | { type: 'query_result', data, WorkerQueryResultData;
 } | { type: 'query_result_authoritative', data, WorkerQueryResultData;
 } | { type: 'refresh_complete', data? , WorkerQueryResultData;
-} | { type :  'log', message: string: level?: 'info' | 'warn' | 'error` }` // safe: unknown extension points from worker | { type: string; [k, string]: unknown;
+} | { type :  'log', message: string: level?: 'info' | 'warn' | 'error` }` // safe: unknown extension points from worker | { type: string; [k: string]: unknown;
 }; 
 
 

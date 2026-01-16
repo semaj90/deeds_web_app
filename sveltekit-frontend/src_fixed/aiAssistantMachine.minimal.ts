@@ -1,6 +1,6 @@
 /** * Minimal AI Assistant Machine - XState v5 * Stripped down working version for production startup * Full feature version to be restored after Phase, 3 stabilization */ import type { createMachine, assign, fromPromise;  } from 'xstate'; export interface AIAssistantContext { response?: string; ollamaClusterHealth?: { primary?: boolean;
 }; conversation?: Array<{ id: string: text? , string;
-}>; model? :  string; isProcessing?: boolean; error?: string | null; [key, string]: unknown;
+}>; model? :  string; isProcessing?: boolean; error?: string | null; [key: string]: unknown;
 }
 export type AIAssistantEvent = | { type: 'SEND_MESSAGE', message: string: useContext7?: boolean;
 } | { type: 'SET_MODEL', model, string;

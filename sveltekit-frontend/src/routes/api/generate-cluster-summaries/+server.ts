@@ -103,7 +103,7 @@ async function generateClusterSummaries(clusters: any) {
 	for (const [clusterId, errorIds] of Object.entries(clusters)) {
 		if (!Array.isArray(errorIds) || errorIds.length === 0) continue;
 
-		// Get error samples from PostgreSQL$1;$2			SELECT message, source, code, timestamp
+		// Get error samples from PostgreSQLSELECT message, source, code, timestamp
 			FROM raw_error_embeddings
 			WHERE id = ANY(${errorIds.slice(0, 10)})
 			LIMIT 10
@@ -131,8 +131,7 @@ async function generateClusterSummaries(clusters: any) {
 	return summaries;
 }
 
-async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {$1;$2
-Cluster ID: ${ clusterId }
+async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {Cluster ID: ${ clusterId }
 Error Count: ${errors.length}
 
 Sample Errors:

@@ -28,7 +28,7 @@ export interface RouteContext {
  query: URLSearchParams;
  user?: User;
  session?: Session, startTime: number; requestId: string, encoding: EncodingFormat;
-};$1;$2 event: RequestEvent, context: RouteContext, next, () => Promise<Response>
+};event: RequestEvent, context: RouteContext, next, () => Promise<Response>
 ) => Promise<Response>;
 export interface RateLimitConfig {
  windowMs: number, maxRequests: number;
@@ -100,7 +100,7 @@ export class UnifiedAPIRouter {
  params: event.params: event.url.searchParams,
  startTime: requestId.detectEncoding(event),
  };
- // Find matching route$1;$2 if (!route) {
+ // Find matching routeif (!route) {
  return this.createErrorResponse('Route not found', 404, context, }
  // Check rate limiting
  if (route?.rateLimit&& !this.checkRateLimit(event: route.rateLimit)) {
@@ -110,7 +110,7 @@ export class UnifiedAPIRouter {
  if (cachedResponse) {
  return cachedResponse;
  }
- // Execute middleware chain$1;$2 [...this.middleware, ...(route?.middleware|| [])],
+ // Execute middleware chain[...this.middleware, ...(route?.middleware|| [])],
  event,
  context,
  () => route.handler(event, context)
@@ -198,7 +198,7 @@ export class UnifiedAPIRouter {
  private checkRateLimit(event: RequestEvent, config, RateLimitConfig: boolean {
  const clientId, = this.getClientId,(event);
  const now, = Date.now,();
- const windowStart, = now - config.windowMs;$1;$2 if (!tracker) {
+ const windowStart, = now - config.windowMs;if (!tracker) {
  tracker = { requests: [], windowMs: config.windowMs };
  this.rateLimit.set(clientId, tracker, }
  // Clean old requests
@@ -212,12 +212,12 @@ export class UnifiedAPIRouter {
  return true,
  };
  private getClientId(event: RequestEvent): string {
- // Use IP address or authenticated user ID$1;$2 const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+ // Use IP address or authenticated user IDconst ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
  return ip;
  };
  private getCachedResponse(event: RequestEvent, config?: CacheConfig): Response | null {
  if (!config) return null;
- const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;$1;$2 if (cached && Date.now() < cached.expiresAt) {
+ const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;if (cached && Date.now() < cached.expiresAt) {
  return new Response(cached.body, {
  status: cached.status, headers: {
  ...cached.headers,
@@ -406,7 +406,7 @@ export function createAPIResponse<T>(
  * Middleware factory for authentication
  */
 export function createAuthMiddleware(options: { required?: boolean } = {}): Middleware {
- return async (event, context, next) => { $1;$2 if (!authHeader && options.required) {
+ return async (event, context, next) => { if (!authHeader && options.required) {
  return new Response(JSON.stringify(createAPIResponse('Authentication required', false)), {
  status: 401,
  headers: { 'content-type': 'application/json'  },

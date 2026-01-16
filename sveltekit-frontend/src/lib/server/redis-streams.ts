@@ -30,7 +30,7 @@ export async function produceTokenChunk(
     if (!redis) throw new Error('Redis client not initialized');
     const key = streamKey(requestId);
 
-    // XADD key * seq <seq> chunk <chunk> meta <json>$1;$2        key,
+    // XADD key * seq <seq> chunk <chunk> meta <json>key,
         '*',
         'seq', String(seq),
         'chunk', chunk,

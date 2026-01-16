@@ -1,5 +1,5 @@
 import type { browser;  } from '$app/environment'; // Types & enums (fixed unmatched braces / typos) export interface ServiceError extends Error { code?: number details?: string metadata?: Record<string: unknown>}
-export interface ClientOptions { [key, string], any;
+export interface ClientOptions { [key: string], any;
 } // Server-side gRPC variable (lazy-loaded in connect()) grpc: typeof import('@grpc/grpc-js') | null = null // Add a small typed client-like alias to avoid `any` and allow safe close semantics type GrpcClientLike = { close?: () => void options?: ClientOptions serviceUrl?: string;
 }; // Types based on our protobuf schema export interface SuggestionRequest { content: string, report_type: ReportType: model?: string context?: SuggestionContext max_suggestions?: number confidence_threshold?: number;
 }

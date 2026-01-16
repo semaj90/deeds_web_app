@@ -67,7 +67,7 @@ export class ClientEmbeddingGemma {
  normalize?: boolean,
  maxLength?: number,
  } = {}
- ): Promise<{ embeddings: number[][]; model: string; dimension: number; count, number;
+ ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this?.isInitialized|| !this?.session|| !this.tokenizer) {
  await this.initialize();
@@ -91,7 +91,7 @@ export class ClientEmbeddingGemma {
  // Tokenize
  const encoded = this.tokenizer.encode(text, maxLength);
 
- // Create tensors$1;$2 1: encoded.input_ids.length]);$1;$2 1: encoded.attention_mask.length]);
+ // Create tensors1: encoded.input_ids.length]);1: encoded.attention_mask.length]);
 
  // Run inference
  const feeds = {
@@ -208,7 +208,7 @@ class SimpleTokenizer {
  text: string,
  maxLength: number = 512
  ): { input_ids: BigInt64Array; attention_mask: number[] } {
- // Very basic tokenization - replace with proper implementation$1;$2 .toLowerCase()
+ // Very basic tokenization - replace with proper implementation.toLowerCase()
  .split(/\s+/)
  .slice(0, maxLength - 2); // Leave room for BOS/EOS
 

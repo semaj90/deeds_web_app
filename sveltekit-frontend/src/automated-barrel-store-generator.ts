@@ -405,7 +405,7 @@ export class AutomatedBarrelStoreGenerator {
     }
   }
 
-  private addKnownMissingPatterns(analysis: MissingImportAnalysis): void {$1;$2      'QDRANT_URL',
+  private addKnownMissingPatterns(analysis: MissingImportAnalysis): void {'QDRANT_URL',
       'OLLAMA_URL',
       'ENHANCED_RAG_MAX_RESULTS',
       'pgTable',
@@ -501,7 +501,7 @@ export class AutomatedBarrelStoreGenerator {
     analysis?: MissingImportAnalysis,
     _resolution?: WebFetchResolution,
     _svelteCompleteDocs?: Context7Docs | null
-  ): Promise<string> {$1;$2      t.includes('_')
+  ): Promise<string> {t.includes('_')
     );
     return `/**
  * AUTO-GENERATED SVELTEKIT BARREL STORE
@@ -532,7 +532,7 @@ export const svelteKitUtils = {
     analysis?: MissingImportAnalysis,
     _resolution?: WebFetchResolution,
     _drizzleDocs?: Context7Docs | null
-  ): Promise<string> {$1;$2      [
+  ): Promise<string> {[
         'pgTable',
         'serial',
         'text',
@@ -632,7 +632,7 @@ ${classes.map((c: any) => `export class ${c} { constructor(..._args: unknown[]) 
   async executeAutomatedResolution(
     typeScriptErrorOutput: string
   ): Promise<Record<string, string>> {
-    const analysis = await this.analyzeTypeScriptErrors(typeScriptErrorOutput);$1;$2      ...analysis.missingFunctions,
+    const analysis = await this.analyzeTypeScriptErrors(typeScriptErrorOutput);...analysis.missingFunctions,
       ...analysis.missingClasses,
       ...analysis.missingMethods,
       ...analysis.missingTypes

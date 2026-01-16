@@ -150,7 +150,7 @@ describe('Diff Pipeline Integration', () => {
 
  it('runs in dry-run mode without applying', async () => {
  const file = testFiles[0];
- const originalContent = await readFile(file, 'utf8');$1;$2 {
+ const originalContent = await readFile(file, 'utf8');{
  filePath: file,
  originalContent,
  proposedContent: 'const modified = true;\n',
@@ -175,7 +175,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Isolation - Concurrent Runs', () => {
- it('handles multiple concurrent runs', async () => {$1;$2 { length: 3 },
+ it('handles multiple concurrent runs', async () => {{ length: 3 },
  (_: any, i: any) =>
  new DiffRunner({
  runId: `concurrent-run-${i}`,
@@ -206,7 +206,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Error Recovery', () => {
- it('recovers from patch generation errors', async () => {$1;$2 {
+ it('recovers from patch generation errors', async () => {{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -358,7 +358,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Progress Tracking', () => {
- it('tracks all phases', async () => {$1;$2 {
+ it('tracks all phases', async () => {{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -410,7 +410,7 @@ describe('Diff Pipeline Integration', () => {
  runner.dispose();
  });
 
- it('tracks duration', async () => {$1;$2 {
+ it('tracks duration', async () => {{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',

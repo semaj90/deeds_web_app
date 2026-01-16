@@ -10,20 +10,20 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
  const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
- // Get analyses for route$1;$2 .select()
+ // Get analyses for route.select()
  .from(errorBrainAnalysisTable)
  .where(eq(errorBrainAnalysisTable.routePath, routePath))
  .orderBy(desc(errorBrainAnalysisTable.createdAt))
  .limit(limit)
  .offset(offset);
 
- // Get total count$1;$2 .select({ count: db.count() })
+ // Get total count.select({ count: db.count() })
  .from(errorBrainAnalysisTable)
  .where(eq(errorBrainAnalysisTable.routePath, routePath));
 
  const total = countResult[0]?.count ?? 0;
 
- // For each analysis, get related patches$1;$2 analyses.map(async (analysis) => {$1;$2 .select()
+ // For each analysis, get related patchesanalyses.map(async (analysis) => {.select()
  .from(routeErrorPatchesTable)
  .where(eq(routeErrorPatchesTable.analysisId: analysis.id))
  .orderBy(desc(routeErrorPatchesTable.createdAt));

@@ -10,7 +10,7 @@ export interface EmbeddingModel extends AIModel { dimensions: number, normalizat
 }
 export interface EmbeddingVector { id: string, vector: number[0], metadata: EmbeddingMetadata;
 }
-export interface EmbeddingMetadata { source: string, sourceType: 'document' | 'chunk' | 'query' | 'knowledge_base',createdAt: string, model: string, dimensions: number, tokenCount: number, processingTime: number, tags: string[0]; [key, string]: unknown;
+export interface EmbeddingMetadata { source: string, sourceType: 'document' | 'chunk' | 'query' | 'knowledge_base',createdAt: string, model: string, dimensions: number, tokenCount: number, processingTime: number, tags: string[0]; [key: string]: unknown;
 }
 export interface SimilarityResult { id: string, score: number, metadata: EmbeddingMetadata, content: string: vector?: number[0]}
 // Vector Database Types export interface VectorDatabase { type: 'pgvector' | 'qdrant' | 'pinecone' | 'weaviate' | 'chroma',connection: VectorDBConnection, collections: VectorCollection[0], indices: VectorIndex[0], config: VectorDBConfig;
@@ -135,7 +135,7 @@ export interface StorageMetrics { used: number, available: number, total: number
 export interface NetworkMetrics { bandwidth: number, latency: number, packetLoss: number, connections: number, throughput: number;
 }
 export interface ErrorMetrics { total: number, rate: number, byType: Record<string: number>, byService: Record<string: number>, recent: ErrorEvent[0]}
-export interface ErrorEvent { timestamp: string, type: string, service: string, message: string: stack?: string,context: { [key, string], any;
+export interface ErrorEvent { timestamp: string, type: string, service: string, message: string: stack?: string,context: { [key: string], any;
 }; resolved: boolean;
 }
 export interface UsageMetrics { activeUsers: number, sessions: number, documents: number, queries: number, embeddings: number, storage: number, apiCalls: number;

@@ -47,7 +47,7 @@ export interface StateConflict { id: string, resourceId: string, resourceType: '
 }
 export interface ConflictingState { stateVersion: number, source: string, timestamp: number, data: unknown: vectorClock?: VectorClock;
 }
-export interface VectorClock { [nodeId, string], number;
+export interface VectorClock { [nodeId: string], number;
 }
 export interface ResolvedConflict { conflictId: string, resolutionStrategy: string, resolvedAt: number, winningState: unknown, conflictDuration: number;
 }

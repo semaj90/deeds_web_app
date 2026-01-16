@@ -26,7 +26,7 @@ export class NativeWindowsServiceManager {
  this.initializeServiceDefinitions();
  }
 
- private initializeServiceDefinitions(): void {$1;$2 {
+ private initializeServiceDefinitions(): void {{
  name: 'legal-ai-frontend',
  displayName: 'Legal AI SvelteKit Frontend',
  executable: 'npm run dev',
@@ -193,7 +193,7 @@ export class NativeWindowsServiceManager {
 
  async startAllServices(): Promise<any> {
  console.log('🚀 Starting all Legal AI services...');
- const results = { started: [], failed: [] };$1;$2 'postgresql-service',
+ const results = { started: [], failed: [] };'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service',
@@ -348,7 +348,7 @@ export class NativeWindowsServiceManager {
  console.log('🏗️ Deploying native Windows services...');
  const deployed: string[] = [];
  const failed: string[] = [];
- await this.integrateConcurrentSearch();$1;$2 'postgresql-service',
+ await this.integrateConcurrentSearch();'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service'];
@@ -414,7 +414,7 @@ echo 🤖 Ollama: http://localhost:11434
 echo ⚡ RAG: http://localhost:8094
 echo 📁 Service: http://localhost:8093
 pause
-`;$1;$2 'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
+`;'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
  if (typeof window === 'undefined') {
  const fs = await import('fs');
  fs.writeFileSync(scriptPath, scriptContent);

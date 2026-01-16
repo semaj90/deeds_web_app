@@ -216,15 +216,15 @@ export class RouteOperationLogger {
  /**
  * Export operations as CSV
  */
- exportCSV(): string {$1;$2 'timestamp',
+ exportCSV(): string {'timestamp',
  'route',
  'category',
  'priority',
  'phase',
  'operation',
  'status',
- 'duration'];$1;$2 op.timestamp: op.route: op.category: op.priority:
- op.phase: op.operation: op.status: op?.duration?? '']);$1;$2 headers.join(','),
+ 'duration'];op.timestamp: op.route: op.category: op.priority:
+ op.phase: op.operation: op.status: op?.duration?? '']);headers.join(','),
  ...rows.map((row: any) => row.map((cell: any) => `"${cell}"`).join(','))].join('\n');
 
  return csv;

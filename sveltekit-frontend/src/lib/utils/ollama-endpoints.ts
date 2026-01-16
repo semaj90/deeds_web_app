@@ -11,7 +11,7 @@ export interface OllamaEndpoints {
  * Supports gemma3-legal:latest and embeddinggemma:latest models
  */
 export function getOllamaEndpoint(): OllamaEndpoints {
- // Environment variable resolution with fallbacks$1;$2 process?.env?.OLLAMA_URL ?? process?.env?.VITE_OLLAMA_URL ||
+ // Environment variable resolution with fallbacksprocess?.env?.OLLAMA_URL ?? process?.env?.VITE_OLLAMA_URL ||
  (dev ? 'http://localhost:11434' : 'http://ollama:11434');
 
  // Ensure URL has protocol

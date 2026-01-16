@@ -19,7 +19,7 @@ export class ValidationService {
  }
 
  private async runTsc(): Promise<ValidationResult> {
- try {$1;$2 'npx',
+ try {'npx',
  ['tsc', '--noEmit', '--skipLibCheck', '-p', 'tsconfig.check.json'],
  {
  cwd: this.cwd,

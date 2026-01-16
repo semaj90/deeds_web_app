@@ -135,7 +135,7 @@ describe('Legal-AI API Endpoints', () => {
  authType: 'production',
  isAuthenticated: false,
  },
- });$1;$2 JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
+ });JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);
@@ -458,7 +458,7 @@ describe('Legal-AI API Endpoints', () => {
  authType: 'production',
  isAuthenticated: false,
  },
- });$1;$2 JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
+ });JSON.stringify({ error: 'production authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);

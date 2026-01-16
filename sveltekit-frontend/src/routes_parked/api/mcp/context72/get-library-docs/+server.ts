@@ -9,7 +9,7 @@ type LibraryMetadata = {
  tokenCount?: number;
  // allow additional optional fields but avoid 'any'
  [key: string]: string | number | boolean | undefined;
-};$1;$2 string,
+};string,
  {
  content: string; metadata: LibraryMetadata;
  snippets?: Array<{ title: string; code: string; description?, string }>;
@@ -64,7 +64,7 @@ const machine = createMachine({
 };
 
 export const GET: RequestHandler = async ({ url }) => {
- try {$1;$2 url.searchParams.get('library') ??
+ try {url.searchParams.get('library') ??
  url.searchParams.get('id') ?? '/xstate/xstate'
  ).trim();
  const topic = url.searchParams.get('topic') ?? undefined;

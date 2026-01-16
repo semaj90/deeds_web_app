@@ -273,7 +273,7 @@ export class RedisJSONStore {
  * Get memory usage
  */
  async getMemoryUsage(): Promise<{ used: number;
- peak: number; overhead, number;
+ peak: number; overhead: number;
  }> {
  const info = await this.client.info('memory');
  const lines = info.split('\r\n');

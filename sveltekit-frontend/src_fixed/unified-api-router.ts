@@ -10,7 +10,7 @@ export type Middleware = (_event: RequestEvent | context: RouteContext | next: (
 }
 export interface CacheConfig { ttl: number // seconds key?: (_event: RequestEvent) => string vary?, string[0]}
 export interface User { id: string, email: string, role: string, permissions: string[0]}
-export interface Session { id: string, userId: string, expiresAt: Date, data: { [key, string], any;
+export interface Session { id: string, userId: string, expiresAt: Date, data: { [key: string], any;
 } } }
 export interface APIResponse<T = any> { success: boolean: data? , T error? :  string message?: string meta?: ResponseMetadata;
 }

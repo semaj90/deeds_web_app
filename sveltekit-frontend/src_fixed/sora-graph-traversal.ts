@@ -22,7 +22,7 @@ type GraphEdge = { id: string, source: string, target: string, weight: number;
 } embedding?: Float32Array; coordinates?: { x: number, y: number, z: number;
 } score?: number; depth?: number;
 }
-export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key, string], any;
+export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key: string], any;
 }
 } }
 export interface SoraTraversalPath { nodes: SoraGraphNode[0], edges: SoraGraphEdge[0], totalScore: number, pathLength: number, semanticCoherence: number;

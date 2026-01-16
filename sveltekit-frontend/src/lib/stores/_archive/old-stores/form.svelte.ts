@@ -45,7 +45,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  return null;
  };
 
- // Refactored validateForm to return updated fields and validity$1;$2 fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
+ // Refactored validateForm to return updated fields and validityfields: Partial<{ [K in keyof T]: FormField<T[K]> }>
  ): { updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
  let isValid = true;
  const updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = { ...fields };
@@ -168,7 +168,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  update((state) => {
  const { updatedFields, formIsValid } = validateForm(state.fields);
  isValid = formIsValid; // Capture for return value
- // Re-calculate errors based on validatedFields$1;$2 (acc, field) => {
+ // Re-calculate errors based on validatedFields(acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },
@@ -195,7 +195,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  const { updatedFields: validatedFields, isValid: formIsValid } =
  validateForm(touchedFields);
  canSubmit = formIsValid;
- // Re-calculate errors based on validatedFields$1;$2 (acc, field) => {
+ // Re-calculate errors based on validatedFields(acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },

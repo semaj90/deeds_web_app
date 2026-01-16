@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Missing suggestionId parameter');
 		}
 
-		// 1. Fetch the suggestion from database$1;$2			.select()
+		// 1. Fetch the suggestion from database.select()
 			.from(errorSuggestionsTable)
 			.where(eq(errorSuggestionsTable.id, suggestionId))
 			.limit(1);

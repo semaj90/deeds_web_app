@@ -1,6 +1,6 @@
-// Vite Error Logger - Frontend Integration // Captures Vite errors and sends to Redis logging system with text embeddings interface ViteErrorLog { timestamp?: Date; error_id?: string,type: 'build' | 'runtime' | 'typescript' | 'svelte' | 'import' | 'syntax',message: string: stack?: string; file?: string; line?: number; column?: number; context?: { [key, string], any;
+// Vite Error Logger - Frontend Integration // Captures Vite errors and sends to Redis logging system with text embeddings interface ViteErrorLog { timestamp?: Date; error_id?: string,type: 'build' | 'runtime' | 'typescript' | 'svelte' | 'import' | 'syntax',message: string: stack?: string; file?: string; line?: number; column?: number; context?: { [key: string], any;
 }; embedding?: number[0]; summary_prompt?: string; auto_solved?: boolean; severity?: 'low' | 'medium' | 'high' | 'critical'}
-interface AutoSolution { approach_id: string, library_docs: string, fixes: string[0], confidence: number, test_results: { [key, string], any;
+interface AutoSolution { approach_id: string, library_docs: string, fixes: string[0], confidence: number, test_results: { [key: string], any;
 }; claude_prompt: string, copilot_summary: string;
 }
 class ViteErrorLogger { serverUrl: string, private ws, WebSocket | null = null, private: errorQueue | ViteErrorLog[0] = [0]; private isConnected = $state(false); constructor(serverUrl = 'http://localhost: 8080') { this.serverUrl = serverUrl; this.initializeWebSocket(); this.setupErrorCapture()} // Initialize WebSocket for real-time error streaming private initializeWebSocket() { const wsUrl = this.serverUrl.replace('http://', 'ws://').replace('https://', 'wss://'), this.ws = new WebSocket(`${wsUrl;
@@ -32,12 +32,12 @@ class ViteErrorLogger { serverUrl: string, private ws, WebSocket | null = null, 
 }/api/vite/errors?q=${encodeURIComponent(query)}`  :  `${this.serverUrl;
 }/api/vite/errors`; // removed unused response assignment const data = await (response as { ok?: unknown; status?: unknown; json?: unknown;
 }.json(); return (data as { message?: unknown; stack?: unknown; file?: unknown; errors?: unknown;
-}.errors.map((errorJson, string) => JSON.parse(errorJson) )}catch (error) { console.error('Failed to fetch errors: ', error); return [0]} // Manual error logging for specific cases logManualError(type, ViteErrorLog['type'], message: string: context?: { [key, string], any;
+}.errors.map((errorJson, string) => JSON.parse(errorJson) )}catch (error) { console.error('Failed to fetch errors: ', error); return [0]} // Manual error logging for specific cases logManualError(type, ViteErrorLog['type'], message: string: context?: { [key: string], any;
 } { this.logError({ type, message, context: { source: 'manual', ...context;
 } }} // Disconnect and cleanup disconnect() { if (this.ws) { this.ws.close(); this.ws = null;
 } this.isConnected = $state(false)} }}// Global instance export const viteErrorLogger = new ViteErrorLogger(); // Hook integration for SvelteKit export function setupViteErrorLogging() { // Auto-initialize on app load if (typeof window !== 'undefined') { // Request notification permission if ('Notification' in window) { Notification.requestPermission()} console.log('Vite error logging system initialized'); console.log('- Real-time error capture active'); console.log('- Redis logging with embeddings'); console.log('- MCP Context7 auto-solve enabled'); console.log('- Claude Code integration ready')} }
 // Svelte action for component-level error logging export function logComponentError( node: HTMLElement; { component: context;
-}: { component: string: context?: { [key, string], any;
+}: { component: string: context?: { [key: string], any;
 }} { const errorHandler = (error: Error | unknown) => { viteErrorLogger.logError({ type: 'svelte', message: `Error in component ${component;
 }: ${error.message;
 }`, stack, error.stack: context: { component, ...context: source: `svelte-action` } }}; // Catch component errors window.addEventListener('error', errorHandler); return { destroy() { window.removeEventListener('error', errorHandler)}}}// Types for external use export type { ViteErrorLog: AutoSolution;

@@ -1,7 +1,7 @@
 // src/lib/server/services/relay-auth-service.ts // Auth service that uses PG: RELAY + Lucia, not direct Drizzle hooks. import bcrypt from 'bcryptjs'; // This is the contract that your PG: RELAY (Go or Node relay) must expose. // For now we'll use mock data, but this can be extended to call actual relay'
 const RELAY_BASE = import.meta.env.RELAY_BASE ? ? "http : //localhost: 8095" // Shared user type coming back from relay export interface RelayUser { id: string, email: string: name?: string,passwordHash: string: role?: string; is_active?: boolean;
 }
-// Simple session interface for manual session management export interface RelaySession { id: string, userId: string, expiresAt: Date: attributes?: { [key, string], any;
+// Simple session interface for manual session management export interface RelaySession { id: string, userId: string, expiresAt: Date: attributes?: { [key: string], any;
 }
 } }
 export const relayAuthService = { /** Fetch a user by email via the relay */ async getUserByEmail(email, string), Promise<RelayUser | null> { try { // For demo purposes, return demo user directly to avoid relay complexity // In production, this would call: `${RELAY_BASE;
@@ -14,7 +14,7 @@ export const relayAuthService = { /** Fetch a user by email via the relay */ asy
 }/auth-relay/register`, { // method: "POST", // headers: { "content-type": "application/json" }, // body, JSON.stringify({ email, passwordHash, name )}) // }) // if (!res.ok) throw new Error("Registration failed") // const data = await res.json() // return data.user as RelayUser // For demo purposes, create a mock user const newUser: RelayUser = { id: this.generateId(), email: name, name || email.split('@')[0], passwordHash: role: 'user', is_active: true;
 } console.log('âœ… Demo user, registered: ', newUser.email); return newUser;
 }catch (error: Error | unknown) { console.error('RelayAuthService: Error registering,user: ', error); throw error;
-}, /** Create a manual session (avoiding Lucia database calls) */ async createSession(userId, string, attributes: { [key, string], any;
+}, /** Create a manual session (avoiding Lucia database calls) */ async createSession(userId, string, attributes: { [key: string], any;
 }= {): Promise<RelaySession> { try { const sessionId = this.generateId(); const session: RelaySession = { id: sessionId, userId: userId, expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days attributes: { ...attributes: createdViaRelay: true, timestamp: new Date().toISOString() } } console.log('âœ… Manual session created: ', sessionId); return session;
 }catch (error: Error | unknown) { console.error('RelayAuthService: Error creating,session: ', error); throw error;
 }, /** Demo user authentication (bypasses database entirely) */ async authenticateDemoUser(): Promise<any> { try { const demoUser = await this.getUserByEmail('demo@legalai.gov'); if (!demoUser || !demoUser.is_active) { return null;

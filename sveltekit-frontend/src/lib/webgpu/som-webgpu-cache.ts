@@ -59,7 +59,7 @@ const _ENABLE_GPU = (() => {
 		// ignore
 	}
 
-	try {$1;$2			| string
+	try {| string
 			| boolean
 			| undefined;
 		if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';
@@ -319,10 +319,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			return cached;
 		}
 
-		const errors = this.parseNPMErrors(npmOutput);$1;$2			? await this.computeErrorEmbeddingsGPU(errors)
+		const errors = this.parseNPMErrors(npmOutput);? await this.computeErrorEmbeddingsGPU(errors)
 			: this.computeErrorEmbeddingsCPU(errors);
 
-		const intelligentTodos = await this.callGoSOMAnalyzer(errors);$1;$2			? await this.refineRankingWithWebGPU(intelligentTodos)
+		const intelligentTodos = await this.callGoSOMAnalyzer(errors);? await this.refineRankingWithWebGPU(intelligentTodos)
 			: intelligentTodos;
 
 		this.cacheResult(cacheKey, rankedTodos);
@@ -493,7 +493,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const todos: IntelligentTodo[] = [];
 		let todoId = 0;
 
-		categories.forEach((categoryErrors, category) => {$1;$2				(max, error) =>
+		categories.forEach((categoryErrors, category) => {(max, error) =>
 					this.getSeverityWeight(error.severity) > this.getSeverityWeight(max)
 						? error.severity
 						: max,

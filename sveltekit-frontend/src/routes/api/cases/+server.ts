@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		filters.push(eq(cases.priority, priority as typeof cases.priority.enumValues[number]));
 	}		if (search) {
 			filters.push(like(cases.title, `%${search}%`));
-		}$1;$2			.where(and(...filters))
+		}.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
 			.limit(limit)
 			.offset(offset);
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		// Validate required fields
 		if (!body?.title|| !body.description) {
 			throw error(400, 'Missing required fields: title, description');
-		}$1;$2			.insert(cases)
+		}.insert(cases)
 			.values({
 				title: body.title,
 				description: body.description,
@@ -122,7 +122,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		};
 
 		if (body.status) updates.status = body.status;
-		if (body.priority) updates.priority = body.priority;$1;$2			.update(cases)
+		if (body.priority) updates.priority = body.priority;.update(cases)
 			.set(updates)
 			.where(
 				and(
@@ -162,7 +162,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Missing required field: ids (array)');
 		}
 
-		// Soft delete: set status to 'archived'$1;$2			.update(cases)
+		// Soft delete: set status to 'archived'.update(cases)
 			.set({
 				status: 'archived',
 				updatedAt: new Date().toISOString()

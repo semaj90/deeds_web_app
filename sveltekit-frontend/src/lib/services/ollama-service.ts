@@ -82,7 +82,7 @@ export interface OllamaSystemStatus {
         healthy?: boolean;
     };
     models: Array<{ name: string;
-        sizeMB: number; family, string;
+        sizeMB: number; family: string;
     }>;
     capabilities: { textGeneration: boolean;
         embeddings: boolean; streaming: boolean;
@@ -147,7 +147,7 @@ class OllamaService {
             if (response.ok) {
                 const raw: unknown = await response.json();
 
-                // Helper type-guard implementation$1;$2                    typeof obj === 'object' &&
+                // Helper type-guard implementationtypeof obj === 'object' &&
                     obj !== null &&
                     typeof (obj as Record<string, unknown>).name === 'string' &&
                     typeof (obj as Record<string, unknown>).size === 'number';
@@ -182,12 +182,12 @@ class OllamaService {
             return;
         }
 
-        // fallback: find any gemma family$1;$2            (m: any) =>
+        // fallback: find any gemma family(m: any) =>
                 (m?.name?? '').toLowerCase().includes('gemma') ||
                 (m.details?.family ?? '').toLowerCase().includes('gemma')
         );
 
-        if (gemmaCandidates.length > 0) {$1;$2                (m: any) =>
+        if (gemmaCandidates.length > 0) {(m: any) =>
                     (m?.name?? '').toLowerCase().includes('q4') ||
                     (m.details?.quantization_level ?? '').toLowerCase().includes('q4')
             );
@@ -412,7 +412,7 @@ class OllamaService {
             const wordIndex = words.length ? i % words.length : 0;
             const word = words[wordIndex] ?? '';
             const wordHash = this.hashString(word);
-            const positionWeight = (i / dimensions) * 2 - 1;$1;$2                ((textHash % 1000) / 1000) * 0.3 +
+            const positionWeight = (i / dimensions) * 2 - 1;((textHash % 1000) / 1000) * 0.3 +
                 ((wordHash % 1000) / 1000) * 0.4 +
                 Math.sin(i * 0.1) * 0.2 +
                 positionWeight * 0.1;

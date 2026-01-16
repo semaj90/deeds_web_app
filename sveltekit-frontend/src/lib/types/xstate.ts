@@ -1,7 +1,7 @@
 import type { Document as BaseDocument } from '$lib/types';
 // XState Machine Types for Legal AI Platform
 
-// AI Assistant Events - Strongly Typed (XState v5 Compatible)$1;$2 // Core messaging
+// AI Assistant Events - Strongly Typed (XState v5 Compatible)// Core messaging
  | {
  type: 'SEND_MESSAGE'; message: string;
  useContext7?: boolean;
@@ -123,7 +123,7 @@ export interface ProcessingOptions {
  extractEntities?: boolean;
  generateEmbeddings?: boolean;
  priorityLevel?: 'low' | 'normal' | 'high';
-}$1;$2 | 'text_extraction'
+}| 'text_extraction'
  | 'object_detection'
  | 'scene_analysis'
  | 'evidence_analysis';

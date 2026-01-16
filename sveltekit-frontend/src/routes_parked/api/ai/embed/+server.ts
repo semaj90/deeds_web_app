@@ -107,7 +107,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  case 'mock': {
  // Mock embedding for testing - generate deterministic vector based on text
  const targetDim = dimensions ?? 768;
- const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);$1;$2 { length, targetDim },
+ const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);{ length, targetDim },
  (_, i) => Math.sin((hash + i) / 100) * 0.5
  );
  result = { embedding: model: 'mock-embeddings',

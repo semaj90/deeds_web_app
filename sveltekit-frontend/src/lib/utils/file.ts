@@ -352,7 +352,7 @@ export function isAudioFile(file: File): boolean {
  * @param file - File to check
  * @returns true if file is a document
  */
-export function isDocumentFile(file: File): boolean {$1;$2 'application/pdf',
+export function isDocumentFile(file: File): boolean {'application/pdf',
  'application/msword',
  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
  'application/vnd.ms-excel',

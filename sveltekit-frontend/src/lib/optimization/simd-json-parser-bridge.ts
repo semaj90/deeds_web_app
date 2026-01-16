@@ -46,7 +46,7 @@ export interface BatchParseResponse {
  id: string; results: Array<{
  index: number; success: boolean;
  data?: any;
- error?: string; timeMs, number;
+ error?: string; timeMs: number;
  }>;
  totalTimeMs: number; speedupRatio: number; // vs native JSON
 }

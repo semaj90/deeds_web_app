@@ -10,7 +10,7 @@ export interface PerformanceMetrics { avgResponseTime: number; // milliseconds, 
 // Status and Capability Types export type LLMStatus = 'online' | 'offline' | 'busy' | 'loading' | 'error' | 'maintenance'; export type LLMCapability = | 'text-generation' | 'embeddings' | 'chat' | 'completion' | 'streaming' | 'function-calling' | 'multi-agent' | 'code-execution' | 'high-throughput' | 'batch-processing' | 'role-based' | 'collaborative' | 'workflow' | 'reasoning' | 'legal-analysis' | 'document-processing'; export type ModelSpecialization = | 'general' | 'legal' | 'code' | 'reasoning' | 'chat' | 'embedding' | 'analysis' | 'medical' | 'financial' | 'technical'; // Model Parameters export interface ModelParameters { temperature?: number; topP?: number; topK?: number; maxTokens?: number; presencePenalty?: number; frequencyPenalty?: number; stopSequences?: string[]}
 // Multi-Agent System Types export interface AgentDefinition { id: string, name: string, role: string, description: string, llmProvider: string, systemPrompt: string, tools: AgentTool[], collaborators: string[], capabilities: AgentCapability[], config: AgentConfig;
 }
-// Temporary AgentConfig type to satisfy references export interface AgentConfig extends LLMAgentConfig { [key, string], any; // Changed from 'any' to: 'unknown' }
+// Temporary AgentConfig type to satisfy references export interface AgentConfig extends LLMAgentConfig { [key: string], any; // Changed from 'any' to: 'unknown' }
 export interface AgentTool { id: string, name: string, description: string, parameters: ToolParameter[], required: boolean;
 }
 export interface ToolParameter { name: string, type: 'string' | 'number' | 'boolean' | 'array' | 'object',description: string, required: boolean: default?: unknown;

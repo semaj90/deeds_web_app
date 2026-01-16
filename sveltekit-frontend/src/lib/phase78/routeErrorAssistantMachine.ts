@@ -9,7 +9,7 @@ import type {
 interface RouteErrorAssistantContext extends ErrorAssistantState {
  history: RouteErrorCluster[]; suggestions: PatchSuggestion[];
  selectedSuggestionIndex: number; lastUpdated: string | null;
-}$1;$2 | { type: 'ANALYZE_ROUTE'; route: RouteMeta }
+}| { type: 'ANALYZE_ROUTE'; route: RouteMeta }
  | { type: 'SELECT_SUGGESTION'; index: number }
  | { type: 'APPLY_PATCH'; index?: number }
  | { type: 'VERIFY_SUCCESS' }
@@ -41,7 +41,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  tool: 'svelte-check',
  lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
  rawLogSnippet: 'Expected type `{ slug, string }` but received `{ id, number }`',
- };$1;$2 {
+ };{
  title: 'Synchronize load output and PageData',
  severity: 'warning',
  patch: [
@@ -113,7 +113,7 @@ export const routeErrorAssistantMachine = setup({
  retryCount: context.retryCount + 1,
  })),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignSelectedSuggestion: assign(({ context, event }) => {$1;$2 Math.max((event as { index?, number }).index ?? 0, 0),
+ assignSelectedSuggestion: assign(({ context, event }) => {Math.max((event as { index?, number }).index ?? 0, 0),
  context.suggestions.length - 1
  );
  return {
@@ -122,7 +122,7 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignActiveSuggestion: assign(({ context, event }) => {$1;$2 Math.max((event as { index?, number }).index ?? 0, 0),
+ assignActiveSuggestion: assign(({ context, event }) => {Math.max((event as { index?, number }).index ?? 0, 0),
  context.suggestions.length - 1
  );
  return {

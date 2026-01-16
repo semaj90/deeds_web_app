@@ -18,7 +18,7 @@ export interface AsyncState<T> {
     lastUpdated: number | null;
 }
 
-// Result Pattern$1;$2    | { success: true; data: T }
+// Result Pattern| { success: true; data: T }
     | { success: false; error: E };
 
 // Deep Partial
@@ -29,7 +29,7 @@ export type DeepPartial<T> = {
 // Constructor type
 export type Constructor<T = any> = new (...args: any[]) => T;
 
-// Extract the type of an array element$1;$2    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+// Extract the type of an array elementArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 
 

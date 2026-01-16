@@ -15,7 +15,7 @@ export const GET: RequestHandler = async () => {
 			host: 'localhost',
 			port: 5434,
 			database: 'legal_ai_db'
-		});$1;$2			SELECT source, line_number, raw_text, tags
+		});SELECT source, line_number, raw_text, tags
 			FROM raw_error_embeddings
 			ORDER BY source, line_number
 		`);

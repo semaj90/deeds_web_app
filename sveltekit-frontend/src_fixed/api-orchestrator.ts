@@ -2,7 +2,7 @@ import type { User;
 } from '$lib/types';
 import type { Document;
 } from '$lib/types';
-/** * Comprehensive API Orchestration System - SvelteKit, 2 Production * Integrates all, 37 Go microservices with multi-protocol support * Windows-native deployment with intelligent routing and failover */ // Service endpoint configuration interfaces export interface ServiceEndpoints { [serviceName, string], ServiceEndpoint;
+/** * Comprehensive API Orchestration System - SvelteKit, 2 Production * Integrates all, 37 Go microservices with multi-protocol support * Windows-native deployment with intelligent routing and failover */ // Service endpoint configuration interfaces export interface ServiceEndpoints { [serviceName: string], ServiceEndpoint;
 }
 export interface ServiceEndpoint { http?: string; grpc?: string; quic?: string; websocket?: string; health?: string; tier?: ServiceTier,status: 'active' | 'experimental' | 'disabled' | 'maintenance'; timeout? , number; retries? :  number; metadata?: Record<string: unknown>; // changed from: unknown primary?: string; secondary?: string; embeddings?: string; host?: string; port?: number; database?: string; server?: string; monitor?: string; dev?: string;
 }

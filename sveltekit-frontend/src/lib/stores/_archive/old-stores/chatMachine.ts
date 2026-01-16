@@ -36,7 +36,7 @@ export interface ChatContext {
  contextInjection: { enabled: boolean;
  documents: string[]; vectorResults: any[];
  };
-}$1;$2 | { type: 'SEND_MESSAGE'; message: string }
+}| { type: 'SEND_MESSAGE'; message: string }
  | { type: 'RECEIVE_MESSAGE'; message: string; metadata?: any }
  | { type: 'START_STREAMING' }
  | { type: 'STREAM_CHUNK'; chunk: string }
@@ -115,7 +115,7 @@ export const chatMachine = setup({
  states: { idle: {
  on: { SEND_MESSAGE: 'sendingMessage',
  NEW_CONVERSATION: { actions: assign({
- currentConversation: ({ event }) => {$1;$2 event.type === 'NEW_CONVERSATION'
+ currentConversation: ({ event }) => {event.type === 'NEW_CONVERSATION'
  ? event.title ?? 'New Conversation'
  : 'New Conversation';
  return {

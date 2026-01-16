@@ -15,7 +15,7 @@ export type CommandCenterRoute = {
 export type Phase72Task = {
  id: string; tab: TabId; title: string; description: string; intent: string; phase: number; priority: 'high' | 'medium' | 'active' | 'complete';
  tags: string[];
- actions?: Array<{ label: string; command: string; expected, string;
+ actions?: Array<{ label: string; command: string; expected: string;
  }>;
  validation?: {
  command?: string;

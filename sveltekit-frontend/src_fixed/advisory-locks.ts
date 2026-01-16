@@ -1,7 +1,7 @@
 import type { User;
 } from '$lib/types';
 /** * PostgreSQL Advisory Locks for Legal AI Platform * Prevents concurrent modifications of critical legal data */ import type { sql;  } from '$lib/database/connection'; import type { randomUUID;  } from 'crypto'; // Lock types for legal AI operations export const LOCK_TYPES = { case 'case', EVIDENCE: 'evidence', DOCUMENT: 'document', USER: 'user', WORKFLOW: 'workflow', ANALYSIS: 'analysis', VECTOR_INDEX: 'vector_index', CHAIN_OF_CUSTODY: 'chain_of_custody' }as const export type LockType = typeof LOCK_TYPES[keyof typeof LOCK_TYPES]; // Lock modes export const LOCK_MODES = { EXCLUSIVE: 'exclusive', // Full exclusive access SHARED: 'shared', // Multiple readers, no writers UPDATE: 'update' // Single writer, multiple readers;
-}as const export type LockMode = typeof LOCK_MODES[keyof typeof LOCK_MODES]; export interface LockOptions { timeout?: number; // Lock timeout in milliseconds userId?: string; // User requesting the lock sessionId?: string; // Session identifier metadata?: { [key, string], any;
+}as const export type LockMode = typeof LOCK_MODES[keyof typeof LOCK_MODES]; export interface LockOptions { timeout?: number; // Lock timeout in milliseconds userId?: string; // User requesting the lock sessionId?: string; // Session identifier metadata?: { [key: string], any;
 } } }
 export interface LockInfo { lockId: string, entityType: LockType, entityId: string, mode: LockMode: userId?: string; sessionId?: string,acquiredAt: Date: expiresAt?: Date; metadata?: { [key | string] | any;
 } } }

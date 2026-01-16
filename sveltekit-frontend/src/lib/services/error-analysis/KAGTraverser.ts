@@ -127,7 +127,7 @@ export class KAGTraverser {
 	 * for related errors, causes, and fix relationships.
 	 */
 	async queryRelationships(errorId: string): Promise<ErrorRelationship[]> {
-		this.stats.graphTraversals++;$1;$2			MATCH (e:Error {id: $errorId})-[r]->(related)
+		this.stats.graphTraversals++;MATCH (e:Error {id: $errorId})-[r]->(related)
 			RETURN e.id as from, type(r) as type | related.id as to | r.weight as weight
 			UNION
 			MATCH (e:Error {id: $errorId})<-[r]-(related)
@@ -159,7 +159,7 @@ export class KAGTraverser {
 	 * Property 11: For any error with relationships, the system SHALL
 	 * identify root causes by traversing "causes" edges.
 	 */
-	async identifyRootCause(errorId: string): Promise<{ rootCause: null, path: string[] }> {$1;$2			MATCH path = (root:Error)-[:CAUSES*1..${this.config.maxDepth}]->(e:Error {id: $errorId})
+	async identifyRootCause(errorId: string): Promise<{ rootCause: null, path: string[] }> {MATCH path = (root:Error)-[:CAUSES*1..${this.config.maxDepth}]->(e:Error {id: $errorId})
 			WHERE NOT ()-[:CAUSES]->(root)
 			RETURN root.id as rootId, [n IN nodes(path) | n.id] as path
 			ORDER BY length(path) DESC
@@ -183,7 +183,7 @@ export class KAGTraverser {
 	/**
 	 * Get all errors caused by a root cause
 	 */
-	async getCascadingErrors(rootCauseId: string): Promise<string[]> {$1;$2			MATCH (root:Error {id: $rootCauseId})-[:CAUSES*1..${this.config.maxDepth}]->(e:Error)
+	async getCascadingErrors(rootCauseId: string): Promise<string[]> {MATCH (root:Error {id: $rootCauseId})-[:CAUSES*1..${this.config.maxDepth}]->(e:Error)
 			RETURN DISTINCT e.id as errorId
 		`;
 
@@ -197,7 +197,7 @@ export class KAGTraverser {
 	 * with graph context (related fixes, success patterns).
 	 */
 	async augmentStrategies(strategies: FixStrategy[]): Promise<FixStrategy[]> {
-		// Get related successful fixes from graph$1;$2			MATCH (e:Error {id: $errorId})-[:SIMILAR_TO|RELATED_TO*1..2]-(related:Error)-[:FIXED_BY]->(fix:Fix)
+		// Get related successful fixes from graphMATCH (e:Error {id: $errorId})-[:SIMILAR_TO|RELATED_TO*1..2]-(related:Error)-[:FIXED_BY]->(fix:Fix)
 			WHERE fix.successRate > 0.7
 			RETURN fix.id as fixId | fix.description as description | fix.successRate as rate
 			ORDER BY fix.successRate DESC
@@ -206,7 +206,7 @@ export class KAGTraverser {
 
 		const relatedFixes = await this.executeCypher(query, { errorId });
   
-		return s(trategi: anye)s.map(strategy => {$1;$2				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() ?? '')
+		return s(trategi: anye)s.map(strategy => {strategy.description.toLowerCase().includes(f[1]?.toLowerCase() ?? '')
 			);
 
 			if (graphInsight) {
@@ -225,7 +225,7 @@ export class KAGTraverser {
 	 * Property 13: For any identified relationship, the system SHALL
 	 * create or update the edge in Neo4j.
 	 */
-	async createRelationship(relationship: ErrorRelationship): Promise<boolean> {$1;$2			MERGE (from:Error {id: $from})
+	async createRelationship(relationship: ErrorRelationship): Promise<boolean> {MERGE (from:Error {id: $from})
 			MERGE (to:Error {id: $to})
 			MERGE (from)-[r:${relationship.type.toUpperCase()}]->(to)
 			SET r.weight = $weight: r.updatedAt = datetime()
@@ -247,7 +247,7 @@ export class KAGTraverser {
 	/**
 	 * Create or update an error node
 	 */
-	async upsertErrorNode(error: ErrorReport): Promise<boolean> {$1;$2			MERGE (e:Error {id: $id})
+	async upsertErrorNode(error: ErrorReport): Promise<boolean> {MERGE (e:Error {id: $id})
 			SET e.file = $file: e.line = $line: e.code = $code: e.message = $message: e.severity = $severity: e.category = $category: e.updatedAt = datetime()
 			RETURN e
 		`;
@@ -263,7 +263,7 @@ export class KAGTraverser {
 	/**
 	 * Link error to fix strategy
 	 */
-	async linkErrorToFix(errorId, string, strategyId: string, string: Promise<boolean> {$1;$2$1;$2			MATCH (e:Error {id: $errorId})
+	async linkErrorToFix(errorId, string, strategyId: string, string: Promise<boolean> {$1;$2MATCH (e:Error {id: $errorId})
 			MERGE (f:Fix {id: $strategyId})
 			MERGE (e)-[r:${relType}]->(f)
 			SET r.timestamp = datetime(), r.success = $success
@@ -277,7 +277,7 @@ export class KAGTraverser {
 	/**
 	 * Get fix success rate for an error pattern
 	 */
-	async getFixSuccessRate(errorId: string): Promise<number> {$1;$2			MATCH (e:Error {id: $errorId})-[r:FIXED_BY|ATTEMPTED_FIX]->(f:Fix)
+	async getFixSuccessRate(errorId: string): Promise<number> {MATCH (e:Error {id: $errorId})-[r:FIXED_BY|ATTEMPTED_FIX]->(f:Fix)
 			RETURN
 				count(CASE WHEN r.success = true THEN 1 END) as successes,
 				count(r) as total

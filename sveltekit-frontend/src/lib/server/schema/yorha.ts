@@ -18,7 +18,7 @@ import {
 
 /**
  * Cases table - stores detective cases
- */$1;$2 'yorha_cases',
+ */'yorha_cases',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_number: varchar('case_number', { length: 100 }).notNull().unique(),
@@ -53,7 +53,7 @@ import {
 
 /**
  * Evidence nodes table - stores evidence items on the evidence board
- */$1;$2 'yorha_evidence_nodes',
+ */'yorha_evidence_nodes',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -101,7 +101,7 @@ import {
 
 /**
  * Evidence connections table - stores relationships between evidence nodes
- */$1;$2 'yorha_evidence_connections',
+ */'yorha_evidence_connections',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -132,7 +132,7 @@ import {
 
 /**
  * Chat sessions table - stores conversation sessions
- */$1;$2 'yorha_chat_sessions',
+ */'yorha_chat_sessions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -163,7 +163,7 @@ import {
 
 /**
  * Chat messages table - stores individual messages in chat sessions
- */$1;$2 'yorha_chat_messages',
+ */'yorha_chat_messages',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  session_id: uuid('session_id').notNull(),
@@ -195,7 +195,7 @@ import {
 
 /**
  * System metrics table - stores historical system metrics
- */$1;$2 'yorha_system_metrics',
+ */'yorha_system_metrics',
  {
  id: serial('id').primaryKey(),
 

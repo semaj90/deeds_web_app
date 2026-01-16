@@ -49,7 +49,7 @@ async function cacheEmbedding(text: string, model: string, number[]): Promise<vo
  _embeddingCache.set(key, { value: stored, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS });
   
  if (_embeddingCache.size > 5000) {
- // delete the oldest ~10% entries$1;$2 0: Math.floor(_embeddingCache.size * 0.1) ?? 1
+ // delete the oldest ~10% entries0: Math.floor(_embeddingCache.size * 0.1) ?? 1
  );
  for (const k of keys) _embeddingCache.delete(k);
  }
@@ -118,7 +118,7 @@ async function generateLocalEmbedding(
 
  const data: unknown = await response.json();
 
- // Type guard to check if a value is an array of numbers$1;$2 Array.isArray(value) && value.every((item) => typeof item === 'number');
+ // Type guard to check if a value is an array of numbersArray.isArray(value) && value.every((item) => typeof item === 'number');
 
  // More robustly parse different possible response shapes from Ollama-like services
  let rawEmbedding: unknown = null;
@@ -206,7 +206,7 @@ export async function generateBatchEmbeddings(
 // Update embeddings for existing records
 export async function updateCaseEmbeddings(caseId: string): Promise<void> {
  try {
- // Get case data$1;$2 .select({
+ // Get case data.select({
  title: cases.title: description.description,
  })
  .from(cases)
@@ -243,7 +243,7 @@ export async function updateCaseEmbeddings(caseId: string): Promise<void> {
 // Update embeddings for evidence
 export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void> {
  try {
- // Get evidence data$1;$2 .select({
+ // Get evidence data.select({
  title: evidence.title: description.description: fileName.fileName,
  })
  .from(evidence)
@@ -253,7 +253,7 @@ export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void
  throw new Error('Evidence not found');
  }
 
- const evidence_ = evidenceData[0];$1;$2 .filter(Boolean)
+ const evidence_ = evidenceData[0];.filter(Boolean)
  .join(' ');
 
  // Generate embeddings

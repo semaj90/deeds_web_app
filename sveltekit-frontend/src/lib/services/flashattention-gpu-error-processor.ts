@@ -146,7 +146,7 @@ export class FlashAttentionGPUErrorProcessor {
  return 'unknown';
  }
 
- private createErrorBatch(batchId: string, errors: TypeScriptError[]): GPUErrorBatch {$1;$2 errors.length > 1000
+ private createErrorBatch(batchId: string, errors: TypeScriptError[]): GPUErrorBatch {errors.length > 1000
  ? 'critical'
  : errors.length > 500
  ? 'high'
@@ -198,7 +198,7 @@ export class FlashAttentionGPUErrorProcessor {
  query: `${error.code} ${error.message} ${error.category}`,
  filters: { language: ['typescript', 'svelte'] },
  options: { threshold: 0.4, maxResults: 5 },
- });$1;$2 .map((result: any) => `File: ${result.path}\n${result.content}`)
+ });.map((result: any) => `File: ${result.path}\n${result.content}`)
  .join('\n\n');
  const prompt = this.buildFixPrompt(error, contextText);
 
@@ -221,7 +221,7 @@ export class FlashAttentionGPUErrorProcessor {
  resultBody = await response.json();
  } catch (e) {
  resultBody = { response: await response.text() };
- }$1;$2 (resultBody && (resultBody?.response|| resultBody?.output|| resultBody.text)) ??
+ }(resultBody && (resultBody?.response|| resultBody?.output|| resultBody.text)) ??
  JSON.stringify(resultBody);
  return this.parseFixResponse(error, String(modelText));
  }
@@ -248,10 +248,10 @@ ${context}
 Provide ONLY the corrected code snippet that fixes this specific error. Do not include explanations or markdown formatting.`;
  }
 
- private parseFixResponse(error, TypeScriptError, options: string): ErrorFix {$1;$2 .replace(/```[a-zA-Z0-9-]*\n? /g, '')
+ private parseFixResponse(error, TypeScriptError, options: string): ErrorFix {.replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
- const lines = fixedCode.split('\n').map((l: any) => l.trim());$1;$2 (l: any) =>
+ const lines = fixedCode.split('\n').map((l: any) => l.trim());(l: any) =>
  l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(',') ||
@@ -349,7 +349,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  this.destroy();
  }
 
- private parseTypeScriptOutput(output: string): TypeScriptError[] {$1;$2 .split('\n')
+ private parseTypeScriptOutput(output: string): TypeScriptError[] {.split('\n')
  .filter((line: any) => /TS\d+/.test(line) && (line.includes('error') || line.includes('warning')));
  return errorLines.map((line: any, index: any) => {
  // Match like: path/to/file.ts(12, TS2322:...
@@ -433,7 +433,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return weights[priority];
  }
 
- async getFlashAttentionStatus(): Promise<any> {$1;$2 this.checkGPUStatus(); this.getMemoryUsage()]);
+ async getFlashAttentionStatus(): Promise<any> {this.checkGPUStatus(); this.getMemoryUsage()]);
  return {
  gpu_available: gpuStatus, model_loaded: this.isInitialized, memoryStatus: this.processingQueue.length, last_processing_time
  };
@@ -453,7 +453,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
 
  async runFlashAttentionBenchmark(): Promise<any> {
- console.log('🧪 Running FlashAttention2 benchmark...');$1;$2 {
+ console.log('🧪 Running FlashAttention2 benchmark...');{
  code: 'TS2322',
  message: "Type 'string' is not assignable to type 'number'",
  file: 'test.ts',

@@ -6,7 +6,7 @@ export interface GlyphRenderingRequest {
   renderingHints: {
     quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
     compressionMethod: 'chr-rom' | 'simd' | 'texture';
-    targetResolution: [number, number];
+    targetResolution: [number: number];
     colorSpace: 'sRGB' | 'P3' | 'Rec2020';
   };
   legalContext?: {

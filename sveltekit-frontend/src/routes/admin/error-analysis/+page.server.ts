@@ -29,8 +29,8 @@ export const load: PageServerLoad = async () => {
 			limit: 50,
 			with_payload: true,
 			with_vector: false
-		});$1;$2			clusters.points.map(async (point) => {
-				const payload = point.payload as any;$1;$2					SELECT
+		});clusters.points.map(async (point) => {
+				const payload = point.payload as any;SELECT
 						c.cluster_id,
 						COUNT(*) as error_count,
 						STRING_AGG(DISTINCT i.source, ', ') as files,

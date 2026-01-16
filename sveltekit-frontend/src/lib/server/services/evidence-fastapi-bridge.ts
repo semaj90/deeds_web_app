@@ -20,7 +20,7 @@ export class EvidenceFastAPIBridge {
  try {
  console.log(`🔄 Processing evidence ${ evidenceId } with FastAPI RAG pipeline`);
 
- // Get evidence record$1;$2 .select()
+ // Get evidence record.select()
  .from(evidence)
  .where(eq(evidence.id, evidenceId))
  .limit(1);

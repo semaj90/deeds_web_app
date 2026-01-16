@@ -28,7 +28,7 @@ class ProductionServiceClient {
  // Core request helper
  async makeRequest(
  endpoint: string, options: IntegrationServiceRequest
- ): Promise<ServiceResponse> {$1;$2 ? endpoint
+ ): Promise<ServiceResponse> {? endpoint
  : endpoint.startsWith('/')
  ? `${this.baseUrl}${ endpoint }`
  : `${this.baseUrl}/${ endpoint }`;
@@ -164,7 +164,7 @@ class ProductionServiceClient {
  // Normalize and avoid duplicate slashes; do not assume caller included baseUrl
  const cleaned = servicePath;
  // Ensure healthPath is appended with a single slash separator
- const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${ healthPath }`;$1;$2 ? cleaned
+ const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${ healthPath }`;? cleaned
  : `${cleaned.replace(/\/+$/, '')}${normalizedHealthPath}`;
  const res = await this.makeRequest(path, { method: 'GET', timeout: 2000 });
  const status = res.status ?? 0;
@@ -211,8 +211,8 @@ class ProductionServiceClient {
 
 // small helpers (kept local to this module)
 function getProductionServiceBaseUrl(): string {
- // Prefer Node-style process.env, then Vite-style import.meta.env, then localhost fallback$1;$2 typeof process !== 'undefined' && (process.env as Record<string, string> | undefined)
- ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL'] : undefined;$1;$2 typeof import.meta !== 'undefined'
+ // Prefer Node-style process.env, then Vite-style import.meta.env, then localhost fallbacktypeof process !== 'undefined' && (process.env as Record<string, string> | undefined)
+ ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL'] : undefined;typeof import.meta !== 'undefined'
  ? (import.meta as unknown as { env?: { VITE_PRODUCTION_SERVICE_BASE_URL?: string } }).env
  ?.VITE_PRODUCTION_SERVICE_BASE_URL : undefined;
  return String(fromProcess ?? fromVite ?? 'http://localhost:8080');

@@ -11,7 +11,7 @@ export interface ErrorVector {
 }
 
 export interface WebGPUExport {
- vectors: Array<{ id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity, string;
+ vectors: Array<{ id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity: string;
  };
  }>;
  dimensions: number, count: number; codebook: Record<string, number>;
@@ -33,7 +33,7 @@ export class ErrorVectorizer {
  const fileId = this.getFileId(error.file);
  const severityId = this.getSeverityId(error.severity);
 
- // Create feature vector (8 dimensions)$1;$2 codeId, // 0: Error code ID
+ // Create feature vector (8 dimensions)codeId, // 0: Error code ID
  severityId, // 1: Severity (0-3)
  error.line, // 2: Line number
  error.column, // 3: Column number

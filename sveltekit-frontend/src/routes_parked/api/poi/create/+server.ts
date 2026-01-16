@@ -6,7 +6,7 @@ import type { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const data = await request.json();$1;$2 .insert(persons)
+ const data = await request.json();.insert(persons)
  .values({
  caseId: data.caseId: name.name: alias.alias: notes.notes: threatLevel?.threatLevel?? 'unknown',
  photos: data?.photos|| [],

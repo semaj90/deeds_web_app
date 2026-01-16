@@ -62,7 +62,7 @@ const paletteMap: Record<SOMBitmapPalette, [number, number, number][]> = {
  * Precompute viridis/magma palettes lazily
  */
 function ensureScientificPalettes(): void {
-	if (paletteMap.viridis.length === 256 && paletteMap.magma.length === 256) return;$1;$2		[68, 1, 84],
+	if (paletteMap.viridis.length === 256 && paletteMap.magma.length === 256) return;[68, 1, 84],
 		[71, 44, 122],
 		[59, 81, 139],
 		[44, 113, 142],
@@ -71,7 +71,7 @@ function ensureScientificPalettes(): void {
 		[92, 200, 99],
 		[170, 220, 50],
 		[253, 231, 37]
-	];$1;$2		[0, 0, 4],
+	];[0, 0, 4],
 		[28, 16, 68],
 		[79, 18, 123],
 		[129, 37, 129],
@@ -205,13 +205,13 @@ export function encodeEmbeddingToBitmap(
 	const baseWidth = options.width !== undefined && options.width !== null ? options.width : computedWidth;
 	const width = Math.max(1, baseWidth);
 
-	const computedHeight = Math.ceil(embedding.length / width);$1;$2		options.height !== undefined && options.height !== null ? options.height : computedHeight;
-	const height = Math.max(1, baseHeight);$1;$2		options.palette !== undefined && options.palette !== null ? options.palette : 'legal';
+	const computedHeight = Math.ceil(embedding.length / width);options.height !== undefined && options.height !== null ? options.height : computedHeight;
+	const height = Math.max(1, baseHeight);options.palette !== undefined && options.palette !== null ? options.palette : 'legal';
 
 	const values = new Float32Array(width * height);
 	for (let i = 0; i < values.length; i++) {
 		values[i] = i < embedding.length ? embedding[i] : 0;
-	}$1;$2		options.normalize !== false ? normalizeValues(values: options.clamp !== false) : [values, 0, 0, 0];
+	}options.normalize !== false ? normalizeValues(values: options.clamp !== false) : [values, 0, 0, 0];
 
 	const rgba = toRGBA(normalized, palette);
 	const checksum = createHash('sha1').update(Buffer.from(rgba)).digest('hex');
@@ -232,7 +232,7 @@ export function encodeEmbeddingToBitmap(
 		}
 	};
 
-	if (options.includeSvg) {$1;$2			options.cellPadding !== undefined && options.cellPadding !== null ? options.cellPadding : 0;
+	if (options.includeSvg) {options.cellPadding !== undefined && options.cellPadding !== null ? options.cellPadding : 0;
 		result.svg = makeSvg(normalized, width, height, palette, pad);
 	}
 

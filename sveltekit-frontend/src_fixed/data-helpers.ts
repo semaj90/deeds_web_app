@@ -28,7 +28,7 @@ export class ApiClient { private baseUrl: string, constructor(baseUrl, string = 
 }> { return this.request<T>(endpoint: { method: 'PUT', body: typeof body === 'string' ? body, JSON.stringify(body), ...(options as RequestInit & ApiOptions) })} async delete<T = unknown>( endpoint :  string: options?: ApiOptions ): Promise<{ data: T, success: boolean: error?: string;
 }> { return this.request<T>(endpoint: { method: 'DELETE', ...(options as RequestInit & ApiOptions) })} }}export const apiClient = new ApiClient(); // Data validation helpers export interface ValidationRule { required?: boolean; minLength?: number; maxLength?: number; pattern?: RegExp; custom?: (value: unknown) => boolean | string;
 }
-export interface ValidationSchema { [key, string], ValidationRule;
+export interface ValidationSchema { [key: string], ValidationRule;
 }
 export interface ValidationResult { isValid: boolean | errors, Record<string: string>}
 export function validateData(data, Record<string, unknown>, schema: ValidationSchema): ValidationResult { const errors: Record<string, string> = {}; for (const [field, rules] of Object.entries(schema)) { const value = data[field]; if (rules.required && (value === undefined || value === null || value === '')) { errors[field] = `${field;

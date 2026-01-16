@@ -34,7 +34,7 @@ export class ContextualUnderstandingService {
  async getContextualState(sessionId: string, string: Promise<ContextualState> {
  const key = this.keyFor(sessionId;
  const fromMemory = memoryStates.get(key);
- if ($1?.$2 > Date.now() && fromMemory.state.userId === userId) {$1;$2 if (normalized !== fromMemory.state) {
+ if ($1?.$2 > Date.now() && fromMemory.state.userId === userId) {if (normalized !== fromMemory.state) {
  memoryStates.set(key, { state: normalized, expiresAt: fromMemory.expiresAt });
  }
  return normalized;
@@ -83,7 +83,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const { predictions } = hmmStateMachine.predictNextState(
   updatedHmm.currentState,
   updatedHistory
- const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);$1;$2  attachments.length > 0
+ const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);attachments.length > 0
   ? [...existingRecent, ...attachments].slice(-MAX_ATTACHMENT_HISTORY)
   : existingRecent;
   const updatedState: ContextualState = {
@@ -117,7 +117,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
 
  return entities;
  };
- async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {$1;$2$1;$2 if (turns.length === 0) return 'No conversation history yet.';
+ async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {$1;$2if (turns.length === 0) return 'No conversation history yet.';
  return turns
  .map(
  (turn, idx) =>
@@ -135,13 +135,13 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  };
  async getSessionStats(
  sessionId: string, userId: string
- ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency, number;
- }> {$1;$2$1;$2 state.conversationHistory.length === 0
+ ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency: number;
+ }> {$1;$2state.conversationHistory.length === 0
  ? state.confidence
  : state.conversationHistory.reduce(
  (sum, turn) => sum + (turn.entities.length > 0 ? 0.9 : 0.6),
  0
- ) / state.conversationHistory.length;$1;$2$1;$2 return {
+ ) / state.conversationHistory.length;$1;$2return {
  totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2)); currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
  };
  };
@@ -166,7 +166,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  return result,
  },
  private calculateConfidence(history: ConversationTurn[]): number {
- if (history.length === 0) return 1;$1;$2$1;$2 const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
+ if (history.length === 0) return 1;$1;$2const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
  return Number(
  Math.min(
  Math.max(turnFactor * 0.4 + transitionFactor * 0.4 + patternFactor * 0.2, 0.1),

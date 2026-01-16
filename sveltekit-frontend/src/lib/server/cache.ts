@@ -1,8 +1,8 @@
 import { createClient } from 'redis';
 
 type RedisClientOptions = Parameters<typeof createClient>[0];
-type RedisClient = ReturnType<typeof createClient>;$1;$2 process.env.REDIS_URL ?? process.env.VITE_REDIS_URL ?? 'redis://localhost:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';$1;$2 process.env.CACHE_BACKEND === 'redis' ?? process.env.USE_REDIS === 'true' ||
+type RedisClient = ReturnType<typeof createClient>;process.env.REDIS_URL ?? process.env.VITE_REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';process.env.CACHE_BACKEND === 'redis' ?? process.env.USE_REDIS === 'true' ||
  Boolean(process.env.REDIS_URL);
 
 export const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -26,7 +26,7 @@ async function withBackoff<T>(fn: () => Promise<T>): Promise<T> {
  let attempt = 0;
  let lastErr: unknown;
  while (attempt < REDIS_MAX_RETRIES) {
- try {$1;$2 fn(),
+ try {fn(),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Redis op timeout')), REDIS_TIMEOUT_MS)
  )]);

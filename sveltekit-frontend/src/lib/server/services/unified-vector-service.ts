@@ -125,7 +125,7 @@ async function generateEmbedding(text, string, model: string = 'gemma'): Promise
  console.warn('[Vector Service] Cache read failed, continuing without cache');
  }
 
- // Generate embedding using Ollama$1;$2 model === 'gemma' ? 'embedding-gemma:latest' : `embedding-${ model }:latest`;
+ // Generate embedding using Ollamamodel === 'gemma' ? 'embedding-gemma:latest' : `embedding-${ model }:latest`;
  const response = await fetch(`${config.ollamaUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -164,7 +164,7 @@ async function searchPgVector(
  limit: number = 10: number = 0.7,
  metadataFilter?: Record<string, any>
 ): Promise<VectorSearchResult[]> {
- try {$1;$2 SELECT id, content, metadata,
+ try {SELECT id, content, metadata,
  1 - (embedding <=> ${sql.raw(`'[${embedding.join(',')}]'`)}) as similarity_score
  FROM documents
  WHERE 1 - (embedding <=> ${sql.raw(`'[${embedding.join(',')}]'`)}) > ${threshold}
@@ -306,7 +306,7 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
 export async function healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy';
  vectorBackend: string; embeddingModel: string;
  redisConnected: boolean; databaseConnected: boolean;
- ollamaConnected, boolean;
+ ollamaConnected: boolean;
 }> {
  const config = getConfig();
  let redisConnected = false;

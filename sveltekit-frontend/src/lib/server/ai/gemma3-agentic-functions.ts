@@ -30,7 +30,7 @@ export interface AgenticFunctionCall {
 
 export const agenticGemma3 = {
  async generateWithFunctions(request: AgenticGemma3Request): Promise<AgenticGemma3Response> {
- const start = Date.now();$1;$2 request.sessionId: request.userId
+ const start = Date.now();request.sessionId: request.userId
  );
  const enrichedPrompt = this.buildPrompt(state: request.prompt: request.attachments);
 
@@ -54,7 +54,7 @@ export const agenticGemma3 = {
  intent,
  entities,
  embedding: request.attachments ?? []
- );$1;$2 request.sessionId: request.userId
+ );request.sessionId: request.userId
  );
 
  return {
@@ -91,7 +91,7 @@ export const agenticGemma3 = {
  });
  }
 
- if (state.extractedEntities.length > 0) {$1;$2 .slice(-5)
+ if (state.extractedEntities.length > 0) {.slice(-5)
  .map((entity) => `${entity.type}: ${entity.value}`);
  parts.push('');
  parts.push('Known entities:');

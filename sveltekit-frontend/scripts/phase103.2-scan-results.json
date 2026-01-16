@@ -1,0 +1,824 @@
+{
+  "timestamp": "2026-01-16T19:34:59.716Z",
+  "totalFiles": 1623,
+  "totalFixes": 3073,
+  "patterns": {
+    "dollar_sign_corruption": {
+      "count": 1322,
+      "description": "$1;$2 artifacts → clean syntax",
+      "confidence": "HIGH"
+    },
+    "index_signature": {
+      "count": 1747,
+      "description": "[key, string] → [key: string]",
+      "confidence": "HIGH"
+    },
+    "interface_property": {
+      "count": 4,
+      "description": "prop, Type; → prop: Type;",
+      "confidence": "HIGH"
+    }
+  },
+  "topFiles": [
+    {
+      "file": "src/lib/server/services/citation.service.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2                ",
+            "$1;$2\t\t\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/lib/services/error-analysis/ErrorClustering.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2\t\t\t",
+            "$1;$2\t\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/lib/types.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/nintendo-memory-manager.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2\t\t\t\t",
+            "$1;$2\t\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/routes/api/indexing/+server.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2    ",
+            "$1;$2    "
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/routes/api/phase89/status/+server.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2\t\t\t",
+            "$1;$2\t\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/routes_parked/api/legal/precedent/search/+server.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src/som-bitmap-visualizer.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "$1;$2\t\t",
+            "$1;$2\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src_fixed/enhanced-ai-synthesis-orchestrator.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src_fixed/evidence-cache-service.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src_fixed/logging-aggregation-service.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src_fixed/production-monitoring-dashboard.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "[k, string]",
+            "[k, string]"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": "src_fixed/production-service-client.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 6,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 6
+    },
+    {
+      "file": ".phase72-backups/2025-12-18T00-24-10/src/lib/components/three/yorha-ui/api/YoRHaAPIClient.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": ".phase72-backups/2025-12-18T00-32-14/src/lib/components/three/yorha-ui/api/YoRHaAPIClient.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": ".phase72-backups/2025-12-18T00-32-30/src/lib/components/three/yorha-ui/api/YoRHaAPIClient.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": ".phase72-backups/2025-12-18T00-32-30/src/lib/detective-mode/comprehensive-integration.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[k, string]",
+            "[k, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/ai.bak/multi-core-mcp-vector-server.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/server/database-api-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/services/enhancedRAGPipeline.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[k, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/services/system-integration.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/stores/_archive/old-stores/ai-agent.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/stores/_archive/old-stores/legal-reports.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/types/state.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup.20260104_111218/lib/utils/case-transform.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/ai.bak/multi-core-mcp-vector-server.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/components/three/yorha-ui/api/YoRHaAPIClient.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/detective-mode/comprehensive-integration.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[k, string]",
+            "[k, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/server/database-api-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/services/enhancedRAGPipeline.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[k, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/services/nes-cache-orchestrator.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/services/system-integration.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/stores/_archive/old-stores/ai-agent.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/stores/_archive/old-stores/legal-reports.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/lib/types/state.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/routes/api/legal-chat/+server.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/routes/api/rag/enhanced/+server.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src.backup/routes/api/v1/detective/analyze/+server.ts",
+      "fixes": [
+        {
+          "pattern": "index_signature",
+          "description": "[key, string] → [key: string]",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "[key, string]",
+            "[key, string]"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/cache/glyph-shader-cache-bridge.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/client/ocr-tensor-processor.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/db/schema/ace-web.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2  ",
+            "$1;$2  "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/schemas/prosecution-case-form.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/acp/phase90-tools.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2  ",
+            "$1;$2    "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/ai/embeddings.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/db/postgres-knowledge.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2            ",
+            "$1;$2            "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/db/query-utils.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2\r\n ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/db/schema-evidence-crud.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/db/warden-schema.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/error-brain/knowledge-base.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2\t\t\t\t"
+          ]
+        }
+      ],
+      "totalFixes": 5
+    },
+    {
+      "file": "src/lib/server/rag/ranker.test.ts",
+      "fixes": [
+        {
+          "pattern": "dollar_sign_corruption",
+          "description": "$1;$2 artifacts → clean syntax",
+          "confidence": "HIGH",
+          "count": 5,
+          "examples": [
+            "$1;$2 ",
+            "$1;$2 "
+          ]
+        }
+      ],
+      "totalFixes": 5
+    }
+  ]
+}

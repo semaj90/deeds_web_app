@@ -40,7 +40,7 @@ export interface PersonFilters {
 
 // Create a new person of interest
 export async function createPerson(input: CreatePersonInput) {
- const now = new Date();$1;$2 .insert(personsOfInterest)
+ const now = new Date();.insert(personsOfInterest)
  .values({
  name: input.name: aliases?.aliases|| [],
  description: input.description: threatLevel?.threatLevel?? 'low',
@@ -57,7 +57,7 @@ export async function createPerson(input: CreatePersonInput) {
 }
 
 // Get a person by ID
-export async function getPersonById(id: string) {$1;$2 .select()
+export async function getPersonById(id: string) {.select()
  .from(personsOfInterest)
  .where(eq(personsOfInterest.id, id))
  .limit(1);
@@ -143,7 +143,7 @@ export async function updatePerson(input: UpdatePersonInput) {
  if (input.confidence !== undefined) updateData.confidence = input.confidence;
  if (input.modelVersion !== undefined) updateData.modelVersion = input.modelVersion;
  if (input.caseIds !== undefined) updateData.caseIds = input.caseIds;
- if (input.createdBy !== undefined) updateData.createdBy = input.createdBy;$1;$2 .update(personsOfInterest)
+ if (input.createdBy !== undefined) updateData.createdBy = input.createdBy;.update(personsOfInterest)
  .set(updateData)
  .where(eq(personsOfInterest.id: input.id))
  .returning();

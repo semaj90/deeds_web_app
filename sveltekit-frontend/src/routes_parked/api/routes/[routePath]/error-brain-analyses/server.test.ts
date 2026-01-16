@@ -25,7 +25,7 @@ describe('GET /api/routes/:routePath/error-brain-analyses', () => {
  expect(parseInt(offset!)).toBe(20);
  });
 
- it('should handle both limit and offset', async () => {$1;$2 'http://localhost/api/routes/test-route/error-brain-analyses?limit=15&offset=30'
+ it('should handle both limit and offset', async () => {'http://localhost/api/routes/test-route/error-brain-analyses?limit=15&offset=30'
  );
  const limit = url.searchParams.get('limit');
  const offset = url.searchParams.get('offset');
@@ -85,7 +85,7 @@ describe('GET /api/routes/:routePath/error-brain-analyses', () => {
  expect(url.pathname).toContain('my-special-route');
  });
 
- it('should handle multiple query parameters', async () => {$1;$2 'http://localhost/api/routes/test-route/error-brain-analyses?limit=25&offset=50&extra=param'
+ it('should handle multiple query parameters', async () => {'http://localhost/api/routes/test-route/error-brain-analyses?limit=25&offset=50&extra=param'
  );
 
  expect(url.searchParams.get('limit')).toBe('25');
@@ -147,15 +147,15 @@ describe('GET /api/routes/:routePath/error-brain-analyses', () => {
  });
 
  it('should handle pagination sequence', async () => {
- // First page$1;$2 'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=0'
+ // First page'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=0'
  );
  expect(parseInt(url1.searchParams.get('offset')!)).toBe(0);
 
- // Second page$1;$2 'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=20'
+ // Second page'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=20'
  );
  expect(parseInt(url2.searchParams.get('offset')!)).toBe(20);
 
- // Third page$1;$2 'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=40'
+ // Third page'http://localhost/api/routes/test-route/error-brain-analyses?limit=20&offset=40'
  );
  expect(parseInt(url3.searchParams.get('offset')!)).toBe(40);
  });

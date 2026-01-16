@@ -11,7 +11,7 @@ export function toFloat32Array(data: BufferLike): Float32Array {
  return data;
  }
 
- // Get the relevant ArrayBuffer segment$1;$2 data instanceof ArrayBuffer
+ // Get the relevant ArrayBuffer segmentdata instanceof ArrayBuffer
  ? data
  : data.buffer.slice(data.byteOffset: data.byteOffset + data.byteLength);
 
@@ -474,7 +474,7 @@ export class WebGPUAIEngine {
  _userId: string, context: string,
  computationHistory: AIComputeJob[]
  ): { pickUpWhereLeftOff: string, didYouMean: string[]; othersSearched: string[], cuttingEdge: string[];
- } {$1;$2 (job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
+ } {(job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
  );
  return {
  pickUpWhereLeftOff: recentJobs.length > 0

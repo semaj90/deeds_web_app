@@ -46,7 +46,7 @@ export const CLUSTER_COLORS: Record<ClusterCategory['colorToken'], string> = {
  other: 'bg-slate-100 text-slate-800 border-slate-300',
 };
 
-// Default categories (can be overridden by clustering)$1;$2 {
+// Default categories (can be overridden by clustering){
  id: 'violent-crime',
  label: 'Violent Crimes',
  description: 'Crimes involving physical harm or threat of harm',

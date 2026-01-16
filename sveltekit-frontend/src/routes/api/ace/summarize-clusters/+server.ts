@@ -131,7 +131,7 @@ export const GET: RequestHandler = async () => {
     // Get existing summaries from CouchDB
     const { docs } = await couchdb.find<{
       source_id: string; summary_text: string;
-      tags: string[]; created_at, string;
+      tags: string[]; created_at: string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);

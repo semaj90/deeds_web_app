@@ -47,7 +47,7 @@ function getEmbeddingCacheKey(text, string, model: string = 'text-embedding-3-sm
 function getSearchCacheKey(
 	collection: string, queryHash: string,
 	filters?: Record<string, unknown>
-): string {$1;$2		? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
+): string {? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
 		: 'none';
 
 	return `search:${ collection }:${queryHash}:${filterHash}`;
@@ -86,7 +86,7 @@ export async function getCacheStats(cacheType: string) {
 	}
 }
 
-export async function getAllCacheStats() {$1;$2		getCacheStats('embeddings'),
+export async function getAllCacheStats() {getCacheStats('embeddings'),
 		getCacheStats('search')
 	]);
 
@@ -123,7 +123,7 @@ export async function setCachedEmbedding(
 	const cacheKey = getEmbeddingCacheKey(text, model);
 
 	try {
-		await redis.setex(cacheKey: TTL.embeddings: JSON.stringify(embedding));
+		await redis.setex(cacheKey, TTL.embeddings, JSON.stringify(embedding));
 	} catch (error) {
 		console.error('Failed to cache embedding:', error);
 	}
@@ -161,7 +161,7 @@ export async function setCachedSearchResults(
 	const cacheKey = getSearchCacheKey(collection, queryHash, filters);
 
 	try {
-		await redis.setex(cacheKey: TTL.search: JSON.stringify(results));
+		await redis.setex(cacheKey, TTL.search, JSON.stringify(results));
 	} catch (error) {
 		console.error('Failed to cache search results:', error);
 	}

@@ -1,7 +1,7 @@
 import type { User;
 } from '$lib/types';
 // @ts-nocheck - Emergency TypeScript error suppression // --- // TYPE GUARD UTILITIES // // This file provides type guard functions for safely handling union types and // unknown values, addressing TypeScript errors related to type discrimination. // --- import type { AITask, APIResponse, WorkerStatus, WorkerMessage, WorkerMessageType, AITaskType;
-} from '$lib/types'; // Define missing types locally type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown'; interface Evidence { id: string, type: string, content: string: metadata?: { [key, string], any;
+} from '$lib/types'; // Define missing types locally type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown'; interface Evidence { id: string, type: string, content: string: metadata?: { [key: string], any;
 }
 } }
 interface User { id: string, email: string, name: string: role?: string;
@@ -25,7 +25,7 @@ export function isNumber(_value, any): value is, number { return typeof value ==
 export function isBoolean(_value, any): value is, boolean { return typeof value === 'boolean'}
 export function isObject(_value, any): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value)}
 export function isArray(_value, any): value is, unknown[] { return Array.isArray(value)}
-export function isRecord(_value, any): value is { [key, string], any;
+export function isRecord(_value, any): value is { [key: string], any;
 }{ return isObject(value)}
 // --- Enhanced Discrimination Helpers --- export function discriminateWorkerMessage(message, WorkerMessage): { isAITask: boolean, isWorkerStatus: boolean, isAPIResponse<any>,: boolean; aiTask?: AITask; workerStatus?: WorkerStatus; apiResponse?: APIResponse<any>}{ const result = { isAITask: false, isWorkerStatus: false, isAPIResponse: false;
 }, as any; if (message.payload) { if (isAITask(message.payload)) { (result as { isAITask?: unknown; aiTask?: unknown; isWorkerStatus?: unknown; workerStatus?: unknown; isAPIResponse?: unknown; apiResponse?: unknown;

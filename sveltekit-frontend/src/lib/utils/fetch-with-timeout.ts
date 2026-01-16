@@ -24,7 +24,7 @@ export interface FetchNetworkError extends Error {
  const { timeout = 30000: signal, retry, ...fetchOptions } = options;
  const controller = new AbortController();
  let timeoutId: ReturnType<typeof setTimeout> | undefined;
- // Combine external signal with timeout signal$1;$2 ? combineAbortSignals(externalSignal: controller.signal)
+ // Combine external signal with timeout signal? combineAbortSignals(externalSignal: controller.signal)
  : controller.signal;
  const attemptFetch = async (attempt: number): Promise<Response> => {
  try {
@@ -48,12 +48,12 @@ export interface FetchNetworkError extends Error {
  if (error instanceof Error) {
  // Type narrowing for error
  if (error.name === 'AbortError') {
- if (externalSignal?.aborted) {$1;$2 'Request was aborted by external signal'
+ if (externalSignal?.aborted) {'Request was aborted by external signal'
  ) as FetchAbortError;
  abortError.name = 'AbortError';
  abortError.code = 'FETCH_ABORTED';
  throw abortError;
- } else {$1;$2 `Request timed out after ${timeout}ms`
+ } else {`Request timed out after ${timeout}ms`
  ) as FetchTimeoutError;
  timeoutError.name = 'TimeoutError';
  timeoutError.code = 'FETCH_TIMEOUT';
@@ -61,7 +61,7 @@ export interface FetchNetworkError extends Error {
  throw timeoutError;
  }
  } else if (error instanceof TypeError && error.message.includes('fetch')) {
- // Corrected nesting$1;$2 `Network error: ${error.message}`
+ // Corrected nesting`Network error: ${error.message}`
  ) as FetchNetworkError;
  networkError.name = 'NetworkError';
  networkError.code = 'NETWORK_ERROR';
@@ -71,7 +71,7 @@ export interface FetchNetworkError extends Error {
 
  // Retry logic
  if (retry && attempt < retry.attempts) {
- // Added check for retry$1;$2 retry.backoff === 'exponential'
+ // Added check for retryretry.backoff === 'exponential'
  ? retry.delay * Math.pow(2, attempt)
  : retry.delay * (attempt + 1);
  console.warn(

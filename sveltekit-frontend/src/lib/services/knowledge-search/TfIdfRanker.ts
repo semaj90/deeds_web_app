@@ -268,7 +268,7 @@ export class TfIdfRanker {
     // Convert to lowercase and extract words
     const words = text.toLowerCase().match(/\b[a-z]{3}\b/g) || [];
 
-    // Filter out common stop words$1;$2      'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all',
+    // Filter out common stop words'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all',
       'can', 'had', 'her', 'was', 'one', 'our', 'out', 'has',
       'have', 'been', 'were', 'they', 'this', 'that', 'with',
       'from', 'will', 'would', 'there', 'their', 'what', 'about',

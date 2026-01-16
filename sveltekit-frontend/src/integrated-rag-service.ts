@@ -667,7 +667,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 export async function processDocument(
 	file: File,
 	content: string
-): Promise<{ documentId: string; filename: string; chunks: number; qdrantStored: boolean; cudaUsed, boolean;
+): Promise<{ documentId: string; filename: string; chunks: number; qdrantStored: boolean; cudaUsed: boolean;
 }> {
 	await initializeIntegratedRAG();
 
@@ -823,7 +823,7 @@ export async function searchSimilarDocuments(
 		}
 	}
 
-	try {$1;$2			SELECT
+	try {SELECT
 				content_text,
 				1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) as similarity,
 				metadata

@@ -131,7 +131,7 @@ describe('Error-Brain API Endpoints', () => {
  authType: 'development',
  isAuthenticated: false,
  },
- });$1;$2 JSON.stringify({ error: 'development authentication required' }) => { status: 401 }
+ });JSON.stringify({ error: 'development authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);

@@ -264,7 +264,7 @@ export interface CollaborationState {
  };
  selection?: { reportId: string;
  sectionId: string; range: {
- start: number; end, number;
+ start: number; end: number;
  };
  };
  }>;

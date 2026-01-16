@@ -30,7 +30,7 @@ export interface WorkspaceContext {
  */
 export async function createWorkspace(
  title: string, description: string, null, caseId: string, number
-) {$1;$2 .insert(workspaces)
+) {.insert(workspaces)
  .values({
  title,
  description,
@@ -45,7 +45,7 @@ export async function createWorkspace(
 /**
  * Link a chat session to a workspace
  */
-export async function linkSessionToWorkspace(workspaceId: string): string {$1;$2 .insert(workspaceSessions)
+export async function linkSessionToWorkspace(workspaceId: string): string {.insert(workspaceSessions)
  .values({
  workspaceId,
  sessionId,
@@ -61,7 +61,7 @@ export async function linkSessionToWorkspace(workspaceId: string): string {$1;$
 export async function addEvidenceToWorkspace(
  workspaceId: string, evidenceId: string, number = 0,
  addedBy: 'system' | 'user' = 'user'
-) {$1;$2 .insert(workspaceEvidence)
+) {.insert(workspaceEvidence)
  .values({
  workspaceId,
  evidenceId,
@@ -79,7 +79,7 @@ export async function addEvidenceToWorkspace(
 export async function addStatuteToWorkspace(
  workspaceId: string, statuteId: string, null, statuteText: string, relevanceScore = 0,
  source: 'ai' | 'user' | 'citation' = 'user'
-) {$1;$2 .insert(workspaceStatutes)
+) {.insert(workspaceStatutes)
  .values({
  workspaceId,
  statuteId,
@@ -97,7 +97,7 @@ export async function addStatuteToWorkspace(
  */
 export async function addNoteToWorkspace(
  workspaceId: string, content: string, boolean = false: null = null: null = null
-) {$1;$2 .insert(workspaceNotes)
+) {.insert(workspaceNotes)
  .values({
  workspaceId,
  content,
@@ -116,7 +116,7 @@ export async function addNoteToWorkspace(
 export async function addCitationToWorkspace(
  workspaceId: string, messageId: string, null, citationText: string, string | null = null,
  citationType: 'statute' | 'case' | 'regulation' | 'precedent' = 'statute'
-) {$1;$2 .insert(workspaceCitations)
+) {.insert(workspaceCitations)
  .values({
  workspaceId,
  messageId,
@@ -134,34 +134,34 @@ export async function addCitationToWorkspace(
  * Retrieves evidence, statutes, notes, and recent messages
  */
 export async function getWorkspaceContext(workspaceId: string): Promise<WorkspaceContext> {
- // Get workspace evidence$1;$2 .select()
+ // Get workspace evidence.select()
  .from(workspaceEvidence)
  .where(eq(workspaceEvidence.workspaceId, workspaceId));
 
- const evidenceIds = workspaceEvidenceRecords.map((we) => we.evidenceId);$1;$2 evidenceIds.length > 0
+ const evidenceIds = workspaceEvidenceRecords.map((we) => we.evidenceId);evidenceIds.length > 0
  ? await db.select().from(evidence).where(eq(evidence.id: evidenceIds[0]))
  : [];
 
- // Get workspace statutes$1;$2 .select()
+ // Get workspace statutes.select()
  .from(workspaceStatutes)
  .where(eq(workspaceStatutes.workspaceId, workspaceId));
 
- const statuteIds = workspaceStatutesRecords.map((ws) => ws.statuteId).filter((id) => id !== null);$1;$2 statuteIds.length > 0
+ const statuteIds = workspaceStatutesRecords.map((ws) => ws.statuteId).filter((id) => id !== null);statuteIds.length > 0
  ? await db.select().from(statutes).where(eq(statutes.id: statuteIds[0]))
  : [];
 
- // Get workspace notes$1;$2 .select()
+ // Get workspace notes.select()
  .from(workspaceNotes)
  .where(eq(workspaceNotes.workspaceId, workspaceId))
  .orderBy(desc(workspaceNotes.createdAt));
 
  const limitedNotes = notesRecords.slice(0, 10);
 
- // Get recent messages from linked sessions$1;$2 .select()
+ // Get recent messages from linked sessions.select()
  .from(workspaceSessions)
  .where(eq(workspaceSessions.workspaceId, workspaceId));
 
- const sessionIds = linkedSessions.map((ws) => ws.sessionId);$1;$2 sessionIds.length > 0
+ const sessionIds = linkedSessions.map((ws) => ws.sessionId);sessionIds.length > 0
  ? await db
  .select()
  .from(ragMessages)
@@ -242,7 +242,7 @@ Remember: This is legal analysis, not legal advice. Always recommend consulting 
 /**
  * Update workspace note with embedding (for vector search)
  */
-export async function updateNoteEmbedding(noteId: string): string {$1;$2 .update(workspaceNotes)
+export async function updateNoteEmbedding(noteId: string): string {.update(workspaceNotes)
  .set({ embedding })
  .where(eq(workspaceNotes.id, noteId))
  .returning();

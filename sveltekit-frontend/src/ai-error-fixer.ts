@@ -48,8 +48,7 @@ export class AIErrorFixer {
 	async fixErrors(errors: ErrorAnalysisResult[]): Promise<ErrorFix[]> {
 		if (!errors || errors.length === 0) return [];
 
-		const startTime = performance.now();$1;$2			(e: any) =>
-				e &&
+		const startTime = performance.now();(e: any) =>
 				e?.fixable&&
 				(typeof e.confidence === 'number' ? e.confidence > this.config.confidenceThreshold : true)
 		);
@@ -329,7 +328,7 @@ ${this.getCommonFixes(error.code ?? '')}`;
 		const allAttempts = this.getFixHistory();
 		const totalAttempts = allAttempts.length;
 		const successfulFixes = allAttempts.filter((a: any) => a.result === 'success').length;
-		const failedFixes = allAttempts.filter((a: any) => a.result === 'failed').length;$1;$2			allAttempts.reduce((sum, a) => sum + (a.confidence ?? 0), 0) / (allAttempts.length ?? 1);
+		const failedFixes = allAttempts.filter((a: any) => a.result === 'failed').length;allAttempts.reduce((sum, a) => sum + (a.confidence ?? 0), 0) / (allAttempts.length ?? 1);
 		const appliedFixes = allAttempts.filter((a: any) => a.applied).length;
 
 		return {

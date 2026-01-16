@@ -1,5 +1,44 @@
 # Phase 72 – Gemini / FastMCP Agent
 
+## 🔧 Phase 103.1 ACE Error Fixing (January 16, 2026)
+
+### Current Status
+- **TSC Errors**: 20,385 (down from 21,432)
+- **Reduction**: -1,047 (-4.9%)
+
+### Key Learnings
+
+**✅ SAFE Patterns (Apply Automatically):**
+| Pattern | Example | Fixes |
+|---------|---------|-------|
+| `index_signature` | `[key, string]` → `[key: string]` | ~10 |
+| `interface_property` | `prop, Type;` → `prop: Type;` | ~10 |
+
+**⚠️ UNSAFE Patterns (Causes Regressions):**
+| Pattern | Example | Impact |
+|---------|---------|--------|
+| `constructor_colon_to_comma` | `new Class(a: b)` → `new Class(a, b)` | +194 errors |
+
+### Full File Rewrites (Most Effective)
+Files with >200 errors should be completely rewritten. Each rewrite removes 300-400 errors.
+
+**Fixed This Session:**
+- `legal-ai-integration.ts` - 358 errors ✅
+- `change-detection-service.ts` - 358 errors ✅
+- `minio-service.ts` - 330 errors ✅
+
+### Scripts Available
+```bash
+node scripts/phase103.1-ace-autofix.mjs           # Dry-run
+node scripts/phase103.1-ace-autofix.mjs --apply --max=100
+```
+
+### References
+- See `documents/TYPE_FIXING_STRATEGY.md` for full strategy
+- See `documents/TOP_100_ERROR_FILES.md` for prioritized file list
+
+---
+
 ## 🎯 Phase 67-68 Error Reduction (January 11, 2026)
 
 ### Massive Error Reduction Results

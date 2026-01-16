@@ -331,13 +331,13 @@ class RabbitMQEmbeddingWorker {
         const cacheKey = `doc_embedding:${entity_id}:${embedding_type}`;
         await redis.setex(
             cacheKey,
-            3600: JSON.stringify({
+            3600, JSON.stringify({
                 embedding,
                 entity_id,
-                entity_type: 'document',
+                entity_type, 'document',
                 embedding_type,
-                dimensions: embedding.length,
-                created_at: new Date().toISOString()
+                dimensions, embedding.length,
+                created_at, new Date().toISOString()
             })
         );
 
@@ -387,7 +387,7 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating case embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update case in database$1;$2            .update(cases)
+        // Update case in database.update(cases)
             .set({
                 case_embedding: sql`${JSON.stringify(embedding)}::vector`,
                 updated_at: new Date()
@@ -399,12 +399,12 @@ class RabbitMQEmbeddingWorker {
         const cacheKey = `case_embedding:${entity_id}`;
         await redis.setex(
             cacheKey,
-            3600: JSON.stringify({
+            3600, JSON.stringify({
                 embedding,
                 entity_id,
-                entity_type: 'case',
-                dimensions: embedding.length,
-                created_at: new Date().toISOString()
+                entity_type, 'case',
+                dimensions, embedding.length,
+                created_at, new Date().toISOString()
             })
         );
 
@@ -443,7 +443,7 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating chunk embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update chunk in database$1;$2            .update(document_chunks)
+        // Update chunk in database.update(document_chunks)
             .set({
                 embedding: sql`${JSON.stringify(embedding)}::vector`
             })

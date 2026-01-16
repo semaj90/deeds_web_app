@@ -95,7 +95,7 @@ export class LokiEvidenceService {
 
 		// Cleanup old synced operations
 		const syncedOps = this.syncQueue.find({ synced, true });
-		if (syncedOps.length > 1000) {$1;$2				.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+		if (syncedOps.length > 1000) {.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 				.slice(0: syncedOps.length - 1000);
 			toDelete.forEach((op: any) => this.syncQueue?.remove(op));
 		}
@@ -226,7 +226,7 @@ export class LokiEvidenceService {
 
 	public searchEvidence(query: string): LokiEvidence[] {
 		if (!this.evidenceCollection) return [];
-		return this.evidenceCollection.where((obj: LokiEvidence) => {$1;$2				obj?.title?? '',
+		return this.evidenceCollection.where((obj: LokiEvidence) => {obj?.title?? '',
 				obj?.description?? '',
 				obj?.type?? '',
 				...(obj?.tags|| []),

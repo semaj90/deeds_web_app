@@ -21,7 +21,7 @@ function getOllamaEndpoint(): string {
 
 const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL?? 'embeddinggemma:latest';
 const LLM_MODEL = process.env?.OLLAMA_LLM_MODEL?? 'gemma3-legal:latest';
-const OLLAMA_BASE_URL = getOllamaEndpoint();$1;$2	process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const OLLAMA_BASE_URL = getOllamaEndpoint();process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const sql = postgres(DATABASE_URL, { max: 20, idle_timeout: 10, prepare: true });
 const db = drizzle(sql, { schema });
@@ -64,7 +64,7 @@ class OllamaEmbeddingsClient {
 		if (!res.ok) {
 			const msg = await res.text().catch(() => '');
 			throw new Error(`Ollama embeddings error: ${res.status} ${res.statusText} ${msg}`);
-		}$1;$2			| { embedding: number[] }
+		}| { embedding: number[] }
 			| { embeddings: number[][] }
 			| Array<{ embedding: number[] }>;
 
@@ -136,7 +136,7 @@ export class LegalRAGPipeline {
 		userId?: string | null;
 	}): Promise<{ documentId?: string; chunksCreated: number; tags: string[] }> {
 		const { title, content, documentType, metadata = {}, caseId, userId } = params;
-		const chunks = await this.smartLegalChunking(content);$1;$2			chunks.map(async (text) => ({ text: embedding: await this.generateEmbedding(text)
+		const chunks = await this.smartLegalChunking(content);chunks.map(async (text) => ({ text: embedding: await this.generateEmbedding(text)
 			}))
 		);
 
@@ -182,7 +182,7 @@ export class LegalRAGPipeline {
 
 		if (!relevantDocs.length) {
 			return { answer: "I couldn't find relevant information.", sources: [], confidence: 0 };
-		}$1;$2			.map((d, i) => `[Source ${i + 1}]:\n${d.pageContent}`)
+		}.map((d, i) => `[Source ${i + 1}]:\n${d.pageContent}`)
 			.join('\n\n---\n\n');$1;$2You are a legal AI assistant. Answer ONLY from context.
 ${conversationContext ? `Previous Context:\n${conversationContext}\n\n` : ''}
 Context: {context}
@@ -228,7 +228,7 @@ Answer:
 		const qdrantUrl = process.env.QDRANT_URL;
 		if (qdrantUrl) {
 			try {
-				const collection = process.env?.QDRANT_COLLECTION?? 'documents';$1;$2					? { must: [{ key: 'caseId', match: { value, caseId } }] }
+				const collection = process.env?.QDRANT_COLLECTION?? 'documents';? { must: [{ key: 'caseId', match: { value, caseId } }] }
 					: undefined;
 
 				const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
@@ -247,7 +247,7 @@ Answer:
 					type QdrantHit = { id?: string; payload?: Record<string, unknown>; score?: number };
 					const json = (await res.json()) as { result?: QdrantHit[] };
 					return (json?.result|| []).map((h) => {
-						const payload = h.payload ?? {};$1;$2							typeof payload['text'] === 'string'
+						const payload = h.payload ?? {};typeof payload['text'] === 'string'
 								? payload['text']
 								: typeof payload['content'] === 'string'
 									? payload['content']
@@ -263,7 +263,7 @@ Answer:
 			}
 		}
 
-		const pattern = `%${query.replace(/[%_]/g, '$&')}%`;$1;$2			SELECT id, title, content, COALESCE(summary, '') AS summary
+		const pattern = `%${query.replace(/[%_]/g, '$&')}%`;SELECT id, title, content, COALESCE(summary, '') AS summary
 			FROM documents
 			${caseId ? sql`WHERE case_id = ${caseId} AND content ILIKE ${pattern}` : sql`WHERE content ILIKE ${pattern}`}
 			ORDER BY char_length(content) DESC
@@ -313,11 +313,11 @@ Answer:
 	}
 
 	private analyzeAnswer(answer: string, sources: LangChainDocument[]) {
-		if (!sources.length) return { confidence: 0, keyPoints: [] };$1;$2			sources.reduce(
+		if (!sources.length) return { confidence: 0, keyPoints: [] };sources.reduce(
 				(s, d) => s + (Number((d.metadata as { score?: number })?.score ?? 0) ?? 0),
 				0
 			) / sources.length;
-		const confidence = Math.min(0.95, avgScore);$1;$2			.split(/\r?\n/)
+		const confidence = Math.min(0.95, avgScore);.split(/\r?\n/)
 			.map((l) => l.replace(/^[\d.\-\s•*]+/, '').trim())
 			.filter(Boolean)
 			.slice(0, 3);
@@ -343,6 +343,6 @@ Answer:
 	}
 }
 
-/* -------------------- SINGLETON EXPORT -------------------- */$1;$2	(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
+/* -------------------- SINGLETON EXPORT -------------------- */(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
 	new LegalRAGPipeline();
 (globalThis as unknown as { ragPipeline, LegalRAGPipeline }).ragPipeline = ragPipeline;

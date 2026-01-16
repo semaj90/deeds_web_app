@@ -30,7 +30,7 @@ export class VisualMemoryPalace {
  throw new Error('Invalid query embedding');
  }
  if (this.nodes.length === 0) return [];
- const embArr = this.nodes.map((n) => n.embedding);$1;$2 (topKSimilar(embArr, embedding, k) as Array<{
+ const embArr = this.nodes.map((n) => n.embedding);(topKSimilar(embArr, embedding, k) as Array<{
  index: number;
  score?, number | string | null;
  }>) || [];
@@ -50,7 +50,7 @@ export class VisualMemoryPalace {
  pos.x += r.node.position.x * score;
  pos.y += r.node.position.y * score;
  pos.z += (r.node.position?.z?? 0) * score;
- }$1;$2 results.reduce(
+ }results.reduce(
  (s, r) => s + (typeof r.score === 'number' ? r.score : Number(r.score) ?? 0),
  0
  ) ?? 1;

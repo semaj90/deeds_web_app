@@ -43,7 +43,7 @@ export interface ChatRequest { query: string: context?: { userRole?: string; cas
 }; settings?: { enhancementLevel?: 'basic' | 'standard' | 'advanced' | 'comprehensive'; includeConfidenceScores?: boolean; enableStreamingResponse?: boolean; model?: string; temperature?: number; maxTokens?: number;
 }}
 export interface ChatResponse { response: string: synthesizedInput? , any; legalAnalysis? : unknown; ragResults?: unknown,confidence: number, processingTime: number, metadata: { model: string: tokensUsed? , number; enabledFeatures :  string[], fallbacksUsed?: string[]; cacheHits?: string[]}; recommendations?: string[]; contextualPrompts?: unknown[]}
-export type Chat = ApiContract<ChatRequest: ChatResponse>; // ==================== VECTOR SEARCH API CONTRACTS ==================== export interface VectorSearchFilters { [key, string], any;
+export type Chat = ApiContract<ChatRequest: ChatResponse>; // ==================== VECTOR SEARCH API CONTRACTS ==================== export interface VectorSearchFilters { [key: string], any;
 }
 export interface VectorSearchSearchRequest { query: string: type?: 'semantic' | 'similarity' | 'hybrid'; limit?: number; threshold?: number; filters?: VectorSearchFilters;
 }

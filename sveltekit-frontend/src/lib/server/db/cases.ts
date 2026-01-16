@@ -10,7 +10,7 @@ import { eq } from 'drizzle-orm';
 /**
  * Auto-create case for prosecutor
  */
-export async function autoCreateCaseForProsecutor(prosecutorId: string): Promise<string> {$1;$2 .insert(wardenCases)
+export async function autoCreateCaseForProsecutor(prosecutorId: string): Promise<string> {.insert(wardenCases)
  .values({ prosecutorId: title: `Case ${new Date().toISOString().split('T')[0]}`,
  })
  .returning({ id: wardenCases.id });
@@ -49,7 +49,7 @@ export async function getCaseWithEvidence(caseId: string): string {
  */
 export async function updateCaseTitle(
  caseId: string, prosecutorId: string, string
-): Promise<boolean> {$1;$2 .update(wardenCases)
+): Promise<boolean> {.update(wardenCases)
  .set({ title: updatedAt Date() })
  .where((cases, { eq, and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId)));
 

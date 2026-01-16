@@ -4,7 +4,7 @@
  * PHASE 35: Event type system for error-brain
  *
  * All events flow through transports (SSE/Redis/both)
- */$1;$2 | 'run.started'
+ */| 'run.started'
  | 'run.progress'
  | 'run.patch.proposed'
  | 'run.patch.applied'
@@ -58,7 +58,7 @@ export interface RunCompletedEvent extends ErrorBrainEventBase {
  patchesProposed: number; patchesApplied: number;
  patchesRejected: number; elapsedSeconds: number;
  };
-}$1;$2 | RunStartedEvent
+}| RunStartedEvent
  | RunProgressEvent
  | PatchProposedEvent
  | PatchAppliedEvent

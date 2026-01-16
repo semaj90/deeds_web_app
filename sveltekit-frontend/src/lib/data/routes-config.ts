@@ -3,7 +3,7 @@ import type { ComponentType } from 'svelte';
 /**
  * Complete Routes Configuration for YoRHa Navigation
  * Single source of truth for nav + route dashboards.
- */$1;$2	| 'main'
+ */| 'main'
 	| 'demo'
 	| 'admin'
 	| 'dev'
@@ -26,7 +26,7 @@ export interface RouteDefinition {
 /**
  * NOTE: Keep this list readable. If you generate routes, generate into a separate file
  * and merge/dedupe at build time.
- */$1;$2	// === MAIN OPERATIONS ===
+ */// === MAIN OPERATIONS ===
 	{
 		id: 'command-center',
 		label: 'Command Center',
@@ -213,7 +213,7 @@ export function getRoutesByTag(tag: string): RouteDefinition[] {
 	return allRoutes.filter((r) => r.tags.includes(tag));
 }
 
-/** ---------- categories metadata ---------- */$1;$2	RouteCategory,
+/** ---------- categories metadata ---------- */RouteCategory,
 	{ label: string; icon: string; description: string; color, string }
 > = {
 	main: { label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },

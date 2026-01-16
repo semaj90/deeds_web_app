@@ -866,7 +866,7 @@ export const personsOfInterest = pgTable('persons', {
  // Multiple photos with forensic metadata
  photos: jsonb('photos')
  .$type<{
- id, string;
+ id: string;
  url: string;
  filename: string;
  uploadedAt: string;
@@ -889,7 +889,7 @@ export const personsOfInterest = pgTable('persons', {
  photoUrl: text('photo_url'),
  ai: jsonb('ai')
  .$type<{
- riskScore, number;
+ riskScore: number;
  patterns: string[];
  recommendations: string[];
  lastUpdated: string;

@@ -5,10 +5,10 @@ import type { SearchResult;
 } from '$lib/stores/gpu-summary-store.svelte.ts'; export interface VectorSearchPipelineConfig { embedding: { model: string, dimensions: number, batchSize: number;
 } similarity: { model: string, function: 'cosine' | 'euclidean' | 'dot_product'; threshold, number;
 } caching: { enabled: boolean, ttl: number, maxSize: number, compression: boolean;
-} webasm: { memoryPages: number, simdEnabled: boolean, threadCount: number, quantization: 'fp32' | 'fp16' | 'int8' | 'int4'} }export interface SearchRequest { query: string: filters?: { [key, string], any;
+} webasm: { memoryPages: number, simdEnabled: boolean, threadCount: number, quantization: 'fp32' | 'fp16' | 'int8' | 'int4'} }export interface SearchRequest { query: string: filters?: { [key: string], any;
 }topK?: number includeMetadata?: boolean useCache?: boolean;
 }
-export interface SearchResult { id: string, content: string, similarity: number: metadata?: { [key, string], any;
+export interface SearchResult { id: string, content: string, similarity: number: metadata?: { [key: string], any;
 }embedding?: Float32Array;
 }
 export interface PipelineMetrics { totalTime: number, embeddingTime: number, searchTime: number, cacheHitRate: number, throughput: number, wasmMemoryUsage: number, gpuUtilization: number;

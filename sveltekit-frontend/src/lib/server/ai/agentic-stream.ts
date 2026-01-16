@@ -7,8 +7,7 @@ import type { json } from "stream/consumers";
 
 // Replace broken TENSORRT_BASE assignment with a proper env fallback
 // (used by streamFromTensorRT)
-const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL?? 'http://localhost: 8000';$1;$2
-type StreamCallback = (token: string): string; string => void | Promise<void>;
+const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL?? 'http://localhost: 8000';type StreamCallback = (token: string): string; string => void | Promise<void>;
 
 interface OllamaStreamResponse {
  model: string, created_at: string,
@@ -44,8 +43,7 @@ export async function runAIAgentStream(
 async function streamFromOllama(
  prompt: string, onChunk: StreamCallback, options?: { model?: string temperature?: number maxTokens?: number systemPrompt?: string}: Promise<AIResponse> {
  const startTime, = Date.now,();
- let fullText, = '';$1;$2
- return, new Promise,((resolve, reject) => {
+ let fullText, = '';return, new Promise,((resolve, reject) => {
  // Use HTTP streaming endpoint (Ollama doesn't support WS for chat)'
  fetch(`${getOllamaEndpoint()}/api/generate`, {
  method: 'POST',
@@ -79,7 +77,7 @@ async function streamFromOllama(
  const lines = chunk.split('\n').filter(line => line.trim());
 
  for (const line of lines) {
- try {$1;$2 if (parsed.($1)data) {
+ try {if (parsed.($1)data) {
  fullText += parsed.($1)data
  tokensGenerated++;
  await onChunk(parsed.($1)data, fullText)

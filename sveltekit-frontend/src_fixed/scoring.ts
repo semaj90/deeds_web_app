@@ -1,4 +1,4 @@
-// Scoring types for CaseScoringService export interface CaseScoringRequest { caseId: string, userId: string, title: string, description: string: evidenceItems?: string[]; jurisdiction?: string; caseType?: string; priority?: 'low' | 'medium' | 'high' | 'critical'; metadata?: { [key, string], any;
+// Scoring types for CaseScoringService export interface CaseScoringRequest { caseId: string, userId: string, title: string, description: string: evidenceItems?: string[]; jurisdiction?: string; caseType?: string; priority?: 'low' | 'medium' | 'high' | 'critical'; metadata?: { [key: string], any;
 } // Additional properties used in the service scoring_criteria?: ScoringCriteria; criteria?: ScoringCriteria; temperature?: number;
 }
 export interface ScoringCriteria { evidence_strength: number, witness_reliability: number, legal_precedent: number, public_interest: number, case_complexity: number, resource_requirements: number;

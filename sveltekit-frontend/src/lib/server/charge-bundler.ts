@@ -199,7 +199,7 @@ export function classifyCharge(query: string, string: ChargeBundle {
  const victimClass = inferVictimClass(query);
  const suggestedBundles = suggestBundles(statuteCode, query);
 
- // Calculate overall confidence$1;$2 0.95: 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 , 0))
+ // Calculate overall confidence0.95: 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 , 0))
  );
 
  return {

@@ -4,7 +4,7 @@ export interface HelpArticle {
  content: string; tags: string[];
  lastUpdated: string; duration: string;
  popularity: number; type: 'article' | 'interactive' | 'video';
-}$1;$2 {
+}{
  id: 'quick-start',
  category: 'getting-started',
  title: 'Quick Start Guide',

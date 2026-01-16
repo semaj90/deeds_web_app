@@ -32,7 +32,7 @@ describe('Integration Tests', () => {
  it('should generate summary from case charges through storage', async () => {
  const charges = ['42 U.S.C. § 1983', 'Cal. Penal Code § 187'];
 
- // Step 1: Retrieve statutes and case law$1;$2 ragService.retrieveStatutes(charges),
+ // Step 1: Retrieve statutes and case lawragService.retrieveStatutes(charges),
  ragService.retrieveCaseLaw(charges)]);
 
  expect(statutes).toBeDefined();
@@ -61,7 +61,7 @@ describe('Integration Tests', () => {
 
  expect(holding).toBeDefined();
 
- // Step 5: Store summary in database$1;$2 testCaseId: generatedSummary.overview,
+ // Step 5: Store summary in databasetestCaseId: generatedSummary.overview,
  citations,
  holding,
  testUserId
@@ -85,7 +85,7 @@ describe('Integration Tests', () => {
  const charges = ['murder'];
 
  try {
- // Attempt full pipeline$1;$2 ragService.retrieveStatutes(charges),
+ // Attempt full pipelineragService.retrieveStatutes(charges),
  ragService.retrieveCaseLaw(charges)]);
 
  const context = {
@@ -97,7 +97,7 @@ describe('Integration Tests', () => {
 
  const generatedSummary = await llmService.generateSummary(context);
  const citations = await llmService.extractCitations(generatedSummary.overview);
- const holding = await llmService.extractHolding(generatedSummary.overview);$1;$2 testCaseId: generatedSummary.overview,
+ const holding = await llmService.extractHolding(generatedSummary.overview);testCaseId: generatedSummary.overview,
  citations,
  holding,
  testUserId
@@ -112,7 +112,7 @@ describe('Integration Tests', () => {
  });
 
  describe('Database transaction management', () => {
- it('should commit transaction on successful summary generation', async () => {$1;$2 testCaseId,
+ it('should commit transaction on successful summary generation', async () => {testCaseId,
  'Test summary',
  [],
  'Test holding',
@@ -145,7 +145,7 @@ describe('Integration Tests', () => {
 
  describe('Cache invalidation workflow', () => {
  it('should invalidate cache when summary is updated', async () => {
- // Generate initial summary$1;$2 testCaseId,
+ // Generate initial summarytestCaseId,
  'Original summary',
  [],
  'Original holding',
@@ -189,7 +189,7 @@ describe('Integration Tests', () => {
 
  describe('PDF export functionality', () => {
  it('should export summary as PDF', async () => {
- // Generate summary$1;$2 testCaseId,
+ // Generate summarytestCaseId,
  'Test summary for PDF export',
  [{ code: '42 U.S.C. § 1983', title: 'Civil Rights', jurisdiction: 'Federal' }],
  'Test holding',
@@ -198,7 +198,7 @@ describe('Integration Tests', () => {
 
  expect(summary).toBeDefined();
 
- // Export to PDF (simplified - actual implementation would use PDF library)$1;$2 `CASE SUMMARY\nCase ID: ${testCaseId}\nSummary: ${summary.text}`
+ // Export to PDF (simplified - actual implementation would use PDF library)`CASE SUMMARY\nCase ID: ${testCaseId}\nSummary: ${summary.text}`
  ).toString('base64');
 
  expect(pdfContent).toBeDefined();
@@ -239,7 +239,7 @@ describe('Integration Tests', () => {
 
  describe('Version history management', () => {
  it('should maintain version history for summaries', async () => {
- // Generate first version$1;$2 testCaseId,
+ // Generate first versiontestCaseId,
  'Version 1',
  [],
  'Holding 1',
@@ -248,7 +248,7 @@ describe('Integration Tests', () => {
 
  expect(v1.version).toBe(1);
 
- // Generate second version$1;$2 testCaseId,
+ // Generate second versiontestCaseId,
  'Version 2',
  [],
  'Holding 2',
@@ -264,7 +264,7 @@ describe('Integration Tests', () => {
  });
 
  it('should retrieve specific version', async () => {
- // Generate multiple versions$1;$2 testCaseId,
+ // Generate multiple versionstestCaseId,
  'Version 1',
  [],
  'Holding 1',
@@ -297,7 +297,7 @@ describe('Integration Tests', () => {
  testUserId
  );
 
- // Concurrent retrievals$1;$2 caseSummaryService.getSummary(testCaseId),
+ // Concurrent retrievalscaseSummaryService.getSummary(testCaseId),
  caseSummaryService.getSummary(testCaseId),
  caseSummaryService.getSummary(testCaseId)]);
 
@@ -312,7 +312,7 @@ describe('Integration Tests', () => {
  it('should generate summary within target time', async () => {
  const charges = ['murder'];
 
- const startTime = Date.now();$1;$2 ragService.retrieveStatutes(charges),
+ const startTime = Date.now();ragService.retrieveStatutes(charges),
  ragService.retrieveCaseLaw(charges)]);
 
  const context = {

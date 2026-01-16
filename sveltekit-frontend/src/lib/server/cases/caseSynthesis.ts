@@ -17,17 +17,17 @@ export interface CaseSynthesis {
  notes: Array<{ id: string;
  title: string | null;
  content: string; is_pinned: boolean;
- is_ai: boolean; updated_at, string;
+ is_ai: boolean; updated_at: string;
  }>;
  evidence: Array<{ id: string;
  filename: string; file_type: string;
- processing_status: string; created_at, string;
+ processing_status: string; created_at: string;
  }>;
  summaries: Array<{ id: string;
- summary_text: string; created_at, string;
+ summary_text: string; created_at: string;
  }>;
  recentChat: Array<{ user_message: string;
- assistant_response: string; created_at, string;
+ assistant_response: string; created_at: string;
  }>;
 }
 
@@ -45,13 +45,13 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  throw new Error(`Case not found: ${ caseId }`);
  }
 
- // Fetch most recent 25 notes (pinned first, then by update date)$1;$2 .select()
+ // Fetch most recent 25 notes (pinned first, then by update date).select()
  .from(caseNotes)
  .where(eq(caseNotes.case_id, caseId))
  .orderBy(desc(caseNotes.is_pinned), desc(caseNotes.updated_at))
  .limit(25);
 
- // Fetch most recent 25 evidence items$1;$2 .select()
+ // Fetch most recent 25 evidence items.select()
  .from(evidenceFiles)
  .where(eq(evidenceFiles.case_id, caseId))
  .orderBy(desc(evidenceFiles.created_at))

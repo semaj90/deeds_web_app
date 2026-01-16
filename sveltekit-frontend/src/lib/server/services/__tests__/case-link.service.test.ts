@@ -76,7 +76,7 @@ describe('CaseLinkService', () => {
  });
 
  describe('updateLinkMetadata', () => {
- it('should update link metadata', async () => {$1;$2 mockCaseId,
+ it('should update link metadata', async () => {mockCaseId,
  mockStatuteCode,
  { link_type: 'CITED_IN', notes: 'Updated notes' },
  mockUserId

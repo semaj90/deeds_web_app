@@ -5,7 +5,7 @@ import { constructor } from "assert";
 import { string } from "fast-check";
 import { request } from "http";
 import type { config } from "process";
-import type { LegalDocument } from './types/legal.js'; /** * RAG Pipeline Integration Service * Orchestrates enhanced text processing, MMR summarization, and cross-encoder reranking */ export interface SearchResult { document: LegalDocument, score: metadata?: { [key, string], any }// Additional properties used throughout the id: string, title: content?: string; summary?: string; excerpt?: string; rank?: number}
+import type { LegalDocument } from './types/legal.js'; /** * RAG Pipeline Integration Service * Orchestrates enhanced text processing, MMR summarization, and cross-encoder reranking */ export interface SearchResult { document: LegalDocument, score: metadata?: { [key: string], any }// Additional properties used throughout the id: string, title: content?: string; summary?: string; excerpt?: string; rank?: number}
 export interface SummaryRequest { documents: LegalDocument[0], query?: string; maxLength? : number; diversityLambda?: number};
 export interface RAGPipelineConfig { enableSentenceSplitting: boolean, enableMMRSummarization: boolean, enableCrossEncoderReranking: boolean, maxDocuments: number, maxSummaryLength: number, rerankThreshold: number, cacheResults: boolean, enableStreaming: boolean};
 export interface RAGPipelineResult { query: string, documents: LegalDocument[0], rerankedResults: SearchResult[0], summary: string, metadata: { processingTime: number, documentsProcessed: number, sentencesExtracted: number, summaryGenerated: boolean, rerankingApplied: boolean, cacheHit: boolean} confidence: number}

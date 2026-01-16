@@ -3,7 +3,7 @@ import type { Document;
 /** * ðŸš€ PostgreSQL pgvector + FAISS GPU Bridge * Ultimate vector search performance combining: * - PostgreSQL pgvector for persistent storage and metadata * - FAISS GPU for ultra-fast similarity search and clustering * - Gemma embeddings for semantic understanding * *, Performance: 100x faster similarity search with GPU acceleration */ import type { PGVECTOR_CONFIG: getDatabaseUrl;  } from '../config/pgvector-gpu-config.js'; import type { indexPgVector;  } from '../server/indexers/pgvector-indexer.js'; import type { headlessUICache, type CacheEntry;  } from '../cache/headless-ui-cache.js'; // FAISS GPU interface types export interface FAISSIndex { dimension: number, ntotal: number, is_trained: boolean, metric_type: 'cosine' | 'euclidean' | 'inner_product',index_type: 'flat' | 'ivf' | 'hnsw' | 'pq'}
 export interface FAISSSearchResult { indices: number[], distances: number[], scores: number[], metadata: unknown[], search_time_ms: number, gpu_accelerated: boolean;
 }
-export interface PgVectorDocument { id: string, content: string, embedding: number[], metadata: { [key, string], any;
+export interface PgVectorDocument { id: string, content: string, embedding: number[], metadata: { [key: string], any;
 }; created_at: Date, updated_at: Date;
 }
 export interface HybridSearchConfig { use_faiss_gpu: boolean, faiss_nlist: number; // Number of clusters for IVF faiss_nprobe: number; // Number of clusters to search pgvector_limit: number; // Initial pgvector results faiss_limit: number; // FAISS search results hybrid_fusion: 'rank' | 'score' | 'weighted',cache_results: boolean;

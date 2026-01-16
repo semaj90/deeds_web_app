@@ -28,9 +28,9 @@ export interface RAGQuery { id: string, text: string: intent?: string; filters?:
 export interface RAGFilters { dateRange?: { start: string | end, string;
 }; documentTypes?: string[]; confidenceThreshold?: number;
 }
-export interface RAGResult { id: string, content: string, score: number, metadata: { [key, string], any;
+export interface RAGResult { id: string, content: string, score: number, metadata: { [key: string], any;
 }; highlights?: string[]}
-// User Workflow Context export interface UserWorkflowContext extends BaseMachineContext { workflow: WorkflowDefinition, currentStep: number, completedSteps: string[], userInputs: { [key, string], any;
+// User Workflow Context export interface UserWorkflowContext extends BaseMachineContext { workflow: WorkflowDefinition, currentStep: number, completedSteps: string[], userInputs: { [key: string], any;
 }; aiSuggestions?: AISuggestion[]}
 export interface WorkflowDefinition { id: string, name: string, steps: WorkflowStep[], metadata?: { [key | string] | any;
 }}
@@ -42,8 +42,8 @@ export interface AISuggestion { type: 'field_completion' | 'next_action' | 'work
 }; PROCESSING_PROGRESS: { progress: number;
 }; PROCESSING_COMPLETE: { result: AITaskResult;
 }; PROCESSING_ERROR: { error: string;
-}; RETRY_PROCESSING: { [key, string], any;
-}; CANCEL_PROCESSING: { [key, string], any;
+}; RETRY_PROCESSING: { [key: string], any;
+}; CANCEL_PROCESSING: { [key: string], any;
 }}
 export interface DocumentEvents { UPLOAD_DOCUMENT: { file: File;
 }; START_OCR: { options?: unknown;
@@ -53,36 +53,36 @@ export interface DocumentEvents { UPLOAD_DOCUMENT: { file: File;
 }; SAVE_DOCUMENT: { document: DocumentInfo | fields, ExtractedField[] }; DOCUMENT_ERROR: { error: string;
 }}
 export interface GoMicroserviceEvents { CONNECT: { endpoint: string;
-}; CONNECTION_SUCCESS: { [key, string], any;
+}; CONNECTION_SUCCESS: { [key: string], any;
 }; CONNECTION_ERROR: { error: string;
-}; HEALTH_CHECK: { [key, string], any;
+}; HEALTH_CHECK: { [key: string], any;
 }; HEALTH_CHECK_SUCCESS: { status: unknown;
 }; HEALTH_CHECK_ERROR: { error: string;
 }; MAKE_REQUEST: { request: GoServiceRequest;
 }; REQUEST_SUCCESS: { response: GoServiceResponse;
 }; REQUEST_ERROR: { error: string;
-}; DISCONNECT: { [key, string], any;
+}; DISCONNECT: { [key: string], any;
 }}
 export interface RAGEvents { START_QUERY: { query: string | options?: unknown;
 }; ANALYZE_INTENT: { query: RAGQuery;
 }; INTENT_ANALYZED: { intent: string | expandedQueries, string[] }; SEARCH_DOCUMENTS: { queries: string[], filters? , RAGFilters;
 }; DOCUMENTS_FOUND :  { results: RAGResult[] }; RANK_RESULTS: { results: RAGResult[] }; RESULTS_RANKED: { rankedResults: RAGResult[] }; SYNTHESIZE_ANSWER: { results: RAGResult[], query, RAGQuery;
 }; ANSWER_SYNTHESIZED: { answer: string | sources, RAGResult[] }; QUERY_ERROR: { error: string;
-}; RESET_QUERY: { [key, string], any;
+}; RESET_QUERY: { [key: string], any;
 }}
 export interface UserWorkflowEvents { START_WORKFLOW: { workflowId: string;
-}; NEXT_STEP: { [key, string], any;
-}; PREVIOUS_STEP: { [key, string], any;
+}; NEXT_STEP: { [key: string], any;
+}; PREVIOUS_STEP: { [key: string], any;
 }; SUBMIT_INPUT: { stepId: string | input, any;
 }; REQUEST_AI_SUGGESTION: { stepId: string | context, any;
-}; AI_SUGGESTION_RECEIVED: { suggestions: AISuggestion[] }; COMPLETE_WORKFLOW: { [key, string], any;
-}; CANCEL_WORKFLOW: { [key, string], any;
+}; AI_SUGGESTION_RECEIVED: { suggestions: AISuggestion[] }; COMPLETE_WORKFLOW: { [key: string], any;
+}; CANCEL_WORKFLOW: { [key: string], any;
 }; WORKFLOW_ERROR: { error: string;
 }}
 // Machine States export type AIProcessingState = 'idle' | 'processing' | 'success' | 'error' | 'cancelled'; export type DocumentState = | 'idle' | 'uploading' | 'processing_ocr' | 'extracting_fields' | 'validating' | 'saving' | 'complete' | 'error'; export type GoMicroserviceState = 'disconnected' | 'connecting' | 'connected' | 'requesting' | 'error'; export type RAGState = 'idle' | 'analyzing_intent' | 'searching' | 'ranking' | 'synthesizing' | 'complete' | 'error'; export type UserWorkflowState = | 'idle' | 'active' | 'waiting_input' | 'processing_ai' | 'complete' | 'cancelled' | 'error'; // Service configuration export interface ServiceConfig { retryCount: number, timeout: number, baseURL: string: headers?: Record<string: string>}
-// Machine options export interface MachineOptions { services?: { [key, string], any;
-}; guards?: { [key, string], any;
-}; actions?: { [key, string], any;
+// Machine options export interface MachineOptions { services?: { [key: string], any;
+}; guards?: { [key: string], any;
+}; actions?: { [key: string], any;
 }; delays?: Record<string: number>} 
 
 

@@ -1,7 +1,7 @@
 import type { SearchResult;
 } from '$lib/types';
 import type { QdrantClient;  } from '@qdrant/js-client-rest'; import type { Schemas;
-} from '@qdrant/js-client-rest'; import type { QDRANT_HOST, QDRANT_PORT, QDRANT_API_KEY;  } from '$env/static/private'; // Production Qdrant Service - Fixed vector dimensions and stub implementations export interface QdrantPoint { id: string, vector: number[], payload: { content: string, type: 'evidence' | 'case' | 'chat' | 'precedent'; caseId? , string; evidenceId? : string,tags: string[], metadata: { [key, string], any;
+} from '@qdrant/js-client-rest'; import type { QDRANT_HOST, QDRANT_PORT, QDRANT_API_KEY;  } from '$env/static/private'; // Production Qdrant Service - Fixed vector dimensions and stub implementations export interface QdrantPoint { id: string, vector: number[], payload: { content: string, type: 'evidence' | 'case' | 'chat' | 'precedent'; caseId? , string; evidenceId? : string,tags: string[], metadata: { [key: string], any;
 }; createdAt: string, updatedAt: string: aiSummaryScore?: number; // 0-100 case AI scoring;
 }}
 export interface SearchResult { id: string, score: number, payload: QdrantPoint['payload']}
@@ -10,7 +10,7 @@ class QdrantService { private: client: QdrantClient, private collectionName = 'l
 }catch (error: Error | unknown) { console.error('Qdrant failed: ', error); throw error;
 } async healthCheck(): Promise<boolean> { try { // The client doesn't have a direct health check method in this version,' // so we'll infer health by trying to get collections.' const response = await this.client.getCollections(); return !!response;
 }catch (error: Error | unknown) { console.error('Qdrant health failed: ', error); return false;
-} async storeEvidence( evidenceId: string, content: string, metadata: { caseId?: string,type: string: tags? , string[]; [key, string], any;
+} async storeEvidence( evidenceId: string, content: string, metadata: { caseId?: string,type: string: tags? , string[]; [key: string], any;
 } ) :  Promise<string> { await this.initialize(); // Mock embedding for now - replace with actual VectorService const embedding = new Array(384).fill(0).map(() => Math.random()); point: Schemas['PointStruct'] = { id: evidenceId, vector: embedding, payload: { content: type: 'evidence', caseId: metadata.caseId, evidenceId: tags, metadata.tags || [], metadata: createdAt | new Date().toISOString(), updatedAt: new Date().toISOString(), aiSummaryScore: 75, // Mock score;
 } }; await this.client.upsertPoints(this.collectionName, { wait: true, points: [point] }); return evidenceId;
 } async upsertPoints(points, Schemas['PointStruct'][]): Promise<void> { await this.initialize(); await this.client.upsertPoints(this.collectionName, { wait: true, points;

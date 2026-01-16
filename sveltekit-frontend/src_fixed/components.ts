@@ -2,7 +2,7 @@ import type { Document;
 } from '$lib/types';
 // ðŸ”§ Component Type Definitions (resolved duplicate export conflicts) // Centralizes commonly used UI component prop & event types import type { UploadedFile;
 } from './global.js'; // ===================================================== // FILE UPLOAD COMPONENT FIX // ===================================================== export interface FileUploadSectionProps { onFileUpload?: (files: File[]) => void; accept? , string; maxFiles? :  number; maxFileSize?: number;
-} // ===================================================== // COMPONENT PROPS INTERFACE FIXES // ===================================================== export interface ComponentPropsBase { class?: string; id?: string; children?: import('svelte').Snippet; [key, string], any;
+} // ===================================================== // COMPONENT PROPS INTERFACE FIXES // ===================================================== export interface ComponentPropsBase { class?: string; id?: string; children?: import('svelte').Snippet; [key: string], any;
 }
 export interface ButtonProps extends ComponentPropsBase { variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive'; size?: 'default' | 'sm' | 'lg' | 'xl'; disabled?: boolean; type?: 'button' | 'submit' | 'reset'; onclick?: (_event: MouseEvent) => void;
 }

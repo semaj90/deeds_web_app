@@ -18,7 +18,7 @@ export interface SearchRequest {
   filters?: {
     type?: string[];
     language?: string[];
-    dateRange?: [number, number];
+    dateRange?: [number: number];
   };
   options?: {
     threshold?: number;

@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  throw error(400, 'Invalid anonId');
  }
 
- // Reassign evidence rows that were uploaded by the anonId to the authenticated user$1;$2 .update(evidence)
+ // Reassign evidence rows that were uploaded by the anonId to the authenticated user.update(evidence)
  .set({ uploadedBy, userId })
  .where(eq(evidence.uploadedBy, anonId))
  .returning();

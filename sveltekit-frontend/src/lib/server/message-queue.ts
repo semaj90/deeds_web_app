@@ -44,9 +44,9 @@ class InMemoryQueue extends EventEmitter {
  this.messages.get(queueName)!.push(message, this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
  };
- async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
+ async blpop(queueName: string, timeout: number = 0): Promise<[string: string] | null> {
  return new Promise((resolve) => {
- const tryPop = () => {$1;$2 if ($1?.$2 > 0) {
+ const tryPop = () => {if ($1?.$2 > 0) {
  const message = queue.shift()!;
  resolve([queueName: JSON.stringify(message.data)]);
  return;
@@ -66,7 +66,7 @@ class InMemoryQueue extends EventEmitter {
  tryPop();
  }),;
  };
- async llen(queueName: string): Promise<number> {$1;$2 return queue, ? queue.length, : 0, }
+ async llen(queueName: string): Promise<number> {return queue, ? queue.length, : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
@@ -81,7 +81,7 @@ class InMemoryQueue extends EventEmitter {
  options: unknown = {}
  ): Promise<void> {
  const processMessage, = async () => { 
- try {$1;$2 if (result) {
+ try {if (result) {
  const [messageData] = result;
  const message: QueueMessage = JSON.parse(messageData) as QueueMessage; // Cast to QueueMessage
  try {

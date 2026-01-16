@@ -63,7 +63,7 @@ export type EmbeddingPayload = {
 	text: string;
 	model?: string;
 	options?: { dimensions?: number; includeText?: boolean } & Record<string, unknown>;
-};$1;$2	| SummarizePayload
+};| SummarizePayload
 	| CaseLawPayload
 	| EmbeddingPayload
 	| Record<string, unknown>;
@@ -244,7 +244,7 @@ export class JobOrchestrator extends EventEmitter {
             this.stats.failedJobs++;
           }
 
-          // Update average processing time$1;$2            (sum, r) => sum + r.processingTime,
+          // Update average processing time(sum, r) => sum + r.processingTime,
             0
           );
           this.stats.averageProcessingTime =
@@ -615,7 +615,7 @@ export async function createSpecializedWorkerSystem(
 	rabbitmqUrl: string = 'amqp://localhost'
 ): Promise<{ orchestrator: JobOrchestrator, workers, SpecializedWorker[] }> {
 	const orchestrator = new JobOrchestrator(rabbitmqUrl);
-	await orchestrator.initialize();$1;$2		new DocumentSummarizationWorker('summarizer_001', rabbitmqUrl),
+	await orchestrator.initialize();new DocumentSummarizationWorker('summarizer_001', rabbitmqUrl),
 		new CaseLawWorker('caselaw_001', rabbitmqUrl),
 		new EmbeddingWorker('embedding_001', rabbitmqUrl)
 	];

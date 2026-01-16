@@ -16,7 +16,7 @@
  | 'evidence-analysis'
  | 'relationship-mapping'
  | 'pattern-detection'
- | 'forensic-timeline';$1;$2 | 'pending'
+ | 'forensic-timeline';| 'pending'
  | 'queued'
  | 'processing'
  | 'completed'

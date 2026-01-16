@@ -2,7 +2,7 @@ import type { User;
 } from '$lib/types';
 /** * User-Owned Data Store (Svelte 5) * Manages all user-specific data: AI assistant history, reports, citations, cases, evidence, etc. * Integrates with session store and provides drizzle-orm ready structure */ // Session data is now passed from server via SvelteKit data flow import type { browser;  } from '$app/environment'; import type { formatRelativeTime: formatDetailedTimestamp;  } from '$lib/utils/formatting'; // ===== TYPES ===== export interface UserCase { id: string, title: string: description?: string,status: 'open' | 'closed' | 'pending' | 'archived',priority: 'low' | 'medium' | 'high' | 'critical',jurisdiction: string: caseNumber?: string,assignedUserId: string, createdAt: Date, updatedAt: Date, evidenceCount: number, citationCount: number, reportCount: number;
 }
-export interface UserEvidence { id: string, caseId: string, filename: string, fileType: string, fileSize: number, minioUrl: string, uploadedBy: string, uploadedAt: Date, tags: string[], notes?: string,metadata: { [key, string], any;
+export interface UserEvidence { id: string, caseId: string, filename: string, fileType: string, fileSize: number, minioUrl: string, uploadedBy: string, uploadedAt: Date, tags: string[], notes?: string,metadata: { [key: string], any;
 }; aiAnalysisStatus: 'pending' | 'processing' | 'completed' | 'failed'}
 export interface UserCitation { id: string, userId: string: caseId?: string,title: string, source: string, citationType: 'case_law' | 'statute' | 'regulation' | 'secondary' | 'other',jurisdiction: string: year?: number; url?: string; notes?: string,createdAt: Date, updatedAt: Date, isFavorite: boolean;
 }
@@ -10,7 +10,7 @@ export interface UserReport { id: string, userId: string: caseId?: string,title:
 export interface AIAssistantMessage { id: string, userId: string, conversationId: string, role: 'user' | 'assistant' | 'system',content: string, timestamp: Date: contextType?: 'case' | 'evidence' | 'citation' | 'general'; contextId?: string; tokens?: number; model?: string;
 }
 export interface AIConversation { id: string, userId: string, title: string: contextType?: 'case' | 'evidence' | 'citation' | 'general'; contextId?: string,messageCount: number, lastMessageAt: Date, createdAt: Date, isArchived: boolean, tags: string[]}
-export interface UserActivity { id: string, userId: string, action: string, resourceType: 'case' | 'evidence' | 'citation' | 'report' | 'ai_chat' | 'system'; resourceId?: string,details: { [key, string], any;
+export interface UserActivity { id: string, userId: string, action: string, resourceType: 'case' | 'evidence' | 'citation' | 'report' | 'ai_chat' | 'system'; resourceId?: string,details: { [key: string], any;
 }; timestamp: Date: ipAddress?: string; userAgent?: string;
 }
 export interface UserDataState { cases: UserCase[], evidence: UserEvidence[], citations: UserCitation[], reports: UserReport[], aiConversations: AIConversation[], recentActivity: UserActivity[], isLoading: boolean, lastSyncAt: number, cachedAt: number;

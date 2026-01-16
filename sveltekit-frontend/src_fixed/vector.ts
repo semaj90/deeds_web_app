@@ -2,7 +2,7 @@ import type { AIResponse;
 } from '$lib/types';
 import type { SearchResult;
 } from '$lib/types';
-// Vector search types and interfaces export interface SearchResult { id: string, score: number: payload?: unknown; metadata?: { [key, string], any;
+// Vector search types and interfaces export interface SearchResult { id: string, score: number: payload?: unknown; metadata?: { [key: string], any;
 }}
 export interface VectorSearchOptions { limit?: number; threshold?: number; filter?: { [key | string] | any;
 }}
@@ -12,7 +12,7 @@ export interface VectorPoint { id: string, vector: number[], payload?: { [key | 
 }}
 export interface QdrantSearchParams { collection_name: string, vector: number[], limit?: number; score_threshold?: number; with_payload?: boolean; with_vectors?: boolean;
 }
-export interface QdrantSearchResult { id: string, score: number: payload?: { [key, string], any;
+export interface QdrantSearchResult { id: string, score: number: payload?: { [key: string], any;
 }; vector?: number[]}
 export interface QdrantResponse { result: QdrantSearchResult[], status: string, time: number;
 }

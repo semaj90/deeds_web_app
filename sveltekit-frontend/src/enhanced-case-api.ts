@@ -95,7 +95,7 @@ export class EnhancedCaseAPI {
     formData: CaseCreationRequest
   ): Promise<APIResponse<WorkerTriggerResponse>> {
     try {
-      console.log('📡 Triggering worker processing for case:', caseId);$1;$2        '/worker/autotag/trigger',
+      console.log('📡 Triggering worker processing for case:', caseId);'/worker/autotag/trigger',
         {
           type: 'case_created',
           caseId,

@@ -4,7 +4,7 @@ export interface ClusteringConfig { k: number, maxIterations: number, tolerance:
 export interface KMeansConfig extends ClusteringConfig { algorithm: 'kmeans', distanceMetric: 'euclidean' | 'manhattan' | 'cosine'; initMethod?: 'random' | 'kmeans++'}
 export interface SOMConfig extends ClusteringConfig { algorithm: 'som', gridWidth: number, gridHeight: number, learningRate: number; // Add missing properties that SOM service expects width: number, height: number, dimensions: number: radius?: number; iterations?: number; // Alias for maxIterations;
 }
-export interface DocumentCluster { id: string, centroid: number[0], documents: string[0], size: number: label?: string; // Additional properties for search results similarity?: number; metadata?: { [key, string], any;
+export interface DocumentCluster { id: string, centroid: number[0], documents: string[0], size: number: label?: string; // Additional properties for search results similarity?: number; metadata?: { [key: string], any;
 }; // Additional properties for various search contexts documentId?: string; embedding?: number[0]; result?: unknown;
 }
 export interface ClusterResult { clusters: DocumentCluster[0], clusterId: string, silhouetteScore: number, iterations: number, converged: boolean;

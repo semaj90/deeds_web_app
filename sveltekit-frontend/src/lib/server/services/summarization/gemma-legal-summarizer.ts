@@ -113,8 +113,7 @@ function parseHoldingResponse(response: string): LegalSummary {
 /**
  * Extract citations from text
  */
-export async function extractCitations(text: string): Promise<string[]> {$1;$2
-Text:
+export async function extractCitations(text: string): Promise<string[]> {Text:
 ${ text }
 
 Return as JSON array of strings:
@@ -164,7 +163,7 @@ export async function summarizeSection(
 /**
  * Validate that response is legal research, not advice
  */
-export function validateLegalResearchOnly(text: string): boolean {$1;$2 /you should/i,
+export function validateLegalResearchOnly(text: string): boolean {/you should/i,
  /you must/i,
  /i recommend/i,
  /i advise/i,

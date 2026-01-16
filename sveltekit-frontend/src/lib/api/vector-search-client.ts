@@ -227,7 +227,7 @@ export class VectorSearchClient {
 
 export const vectorSearchClient = new VectorSearchClient();
 export const searchVectors = (request: VectorSearchRequest) => vectorSearchClient.search(request);
-export const batchSearchVectors = (requests: VectorSearchRequest[]) => vectorSearchClient.batchSearch(requests);$1;$2	vectorSearchClient.searchWithRetry(request, maxRetries);
+export const batchSearchVectors = (requests: VectorSearchRequest[]) => vectorSearchClient.batchSearch(requests);vectorSearchClient.searchWithRetry(request, maxRetries);
 
 export function isVectorSearchResponse(obj: any): obj is VectorSearchResponse {
 	return (

@@ -99,7 +99,7 @@ class MockQdrantClient {
 		const collection = this.collections.get(collectionName)!;
 		const { vector, limit, filter, scoreThreshold = 0 } = options;
 
-		// Calculate cosine similarity for each point$1;$2			.map(point => ({
+		// Calculate cosine similarity for each point.map(point => ({
  id: point.id, score: this.cosineSimilarity(vector: point.vector, payload: point.payload
 			}))
 			.filter(result => {
@@ -330,7 +330,7 @@ class MockOllamaClient {
 		prompt: string,
 		stream?: boolean;
 	}): Promise<{ response, string }> {
-		// Check if we have a pre-configured response$1;$2			`Mock response for: ${options.prompt.substring(0, 50)}...`;
+		// Check if we have a pre-configured response`Mock response for: ${options.prompt.substring(0, 50)}...`;
 
 		return { response };
 	}
@@ -448,7 +448,7 @@ class MockMinIOClient {
 		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 
-		if (!object) return null;$1;$2			? Buffer.byteLength(object.data)
+		if (!object) return null;? Buffer.byteLength(object.data)
 			: object.data.length;
 
 		return { size };
@@ -462,7 +462,7 @@ class MockMinIOClient {
 
 		for (const [objectKey, object] of this.objects.entries()) {
 			if (object.bucket !== bucket) continue;
-			if (prefix && !object.key.startsWith(prefix)) continue;$1;$2				? Buffer.byteLength(object.data)
+			if (prefix && !object.key.startsWith(prefix)) continue;? Buffer.byteLength(object.data)
 				: object.data.length;
 
 			results.push({ name: object.key, size });

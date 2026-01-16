@@ -18,7 +18,7 @@ export const load: PageServerLoad = async (event) => {
  }
 
  // Registration success banner
- const registered = event.url.searchParams.get('registered');$1;$2 registered === 'true' ? 'Account created successfully! You can now sign in.' : undefined;
+ const registered = event.url.searchParams.get('registered');registered === 'true' ? 'Account created successfully! You can now sign in.' : undefined;
 
  // Initialize SuperForms form for initial page render.
  // Use schema-only overload for initial render
@@ -32,7 +32,7 @@ export const actions: Actions = {
  default: async (event) => {
  const { cookies } = event; // request wasn't used, so only keep cookies to avoid unused variable warnings'
 
- // Cast the Zod schema to ValidationAdapter so TS matches the (data, adapter) overload.$1;$2 await event.request.formData(),
+ // Cast the Zod schema to ValidationAdapter so TS matches the (data, adapter) overload.await event.request.formData(),
  loginSchema // Removed 'as unknown as ValidationAdapter<Record<string, unknown>, Record<string, unknown>>'
  );
  if (!form.valid) {

@@ -197,7 +197,7 @@ describe('RAG Lookup Tool - Property 6: RAG Search Results', () => {
         points: [
           { id: 1, vector: Array(384).fill(0.9, payload: { id: 1 } },
           { id: 2, vector: Array(384).fill(0.8, payload: { id: 2 } }],
-      });$1;$2        toolRegistry.rag_lookup({ query: 'query1', topK: 2 }),
+      });toolRegistry.rag_lookup({ query: 'query1', topK: 2 }),
         toolRegistry.rag_lookup({ query: 'query2', topK: 2 }),
         toolRegistry.rag_lookup({ query: 'query3', topK: 2 })];
 

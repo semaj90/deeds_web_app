@@ -73,7 +73,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  let context = await this.contextManager.createContext(sessionId);
 
  // Generate embeddings for all errors
- this.log('info', 'Generating embeddings for errors');$1;$2 errors.map(async (error: any) => ({
+ this.log('info', 'Generating embeddings for errors');errors.map(async (error: any) => ({
  ...error, embedding: await; await this.embedder.generateEmbedding(error.message),
  }))
  );

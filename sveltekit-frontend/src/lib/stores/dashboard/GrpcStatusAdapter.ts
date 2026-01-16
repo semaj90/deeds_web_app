@@ -32,7 +32,7 @@ export function validateEvent(data: unknown): data is ProcessingEvent {
 
  const event = data as Record<string, unknown>;
 
- // Check required fields$1;$2 'stage',
+ // Check required fields'stage',
  'status',
  'page',
  'pages_total',
@@ -260,7 +260,7 @@ export class GrpcStatusAdapter {
  }
 
  // Parse and format details
- const parsed = parseEventDetails(event.details);$1;$2 .map(([key, value]) => `${key}: ${ value }`)
+ const parsed = parseEventDetails(event.details);.map(([key, value]) => `${key}: ${ value }`)
  .join(', ');
 
  return formatted;

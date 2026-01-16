@@ -209,7 +209,7 @@ export async function setCachedEmbedding(
 export async function getCachedSearchResults(
  query: string, type: string,
  filters?: unknown
-): Promise<unknown[] | null> {$1;$2 ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
+): Promise<unknown[] | null> {? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
  : 'none';
  const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  return await cacheService.get<unknown[]>(key);
@@ -219,7 +219,7 @@ export async function cacheSearchResults(
  query: string, type: string,
  results: any[],
  filters?: unknown
-): Promise<void> {$1;$2 ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
+): Promise<void> {? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
  : 'none';
  const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  await cacheService.set(key, results, {

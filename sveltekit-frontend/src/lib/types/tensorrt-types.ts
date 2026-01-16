@@ -64,11 +64,11 @@ export interface DocumentAnalysisResponse {
  };
  risks: Array<{ type: string;
  severity: 'low' | 'medium' | 'high';
- description: string; recommendation, string;
+ description: string; recommendation: string;
  }>;
  compliance_issues: Array<{ regulation: string;
  severity: 'minor' | 'major' | 'critical';
- description: string; remediation, string;
+ description: string; remediation: string;
  }>;
  summary: string; recommendations: string[];
  };
@@ -229,7 +229,7 @@ export interface PerformanceAnalytics {
  time_series: Array<{ timestamp: number;
  latency_ms: number; throughput_tps: number;
  error_count: number; memory_usage_mb: number;
- gpu_utilization, number;
+ gpu_utilization: number;
  }>;
  percentiles: { p50: number;
  p95: number; p99: number;

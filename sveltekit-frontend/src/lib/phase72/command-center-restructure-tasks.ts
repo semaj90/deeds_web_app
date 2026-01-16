@@ -3,7 +3,7 @@
  *
  * These entries appear in the command center with labeled intent tags
  * for system consolidation, archive cleanup, and evidence grid unification.
- */$1;$2 // System Tab Tasks
+ */// System Tab Tasks
  {
  id: 'api-consolidation',
  tab: 'system',

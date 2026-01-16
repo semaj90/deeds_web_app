@@ -4,7 +4,7 @@ import type { Case;
 } from '$lib/services/png-embed-extractor'; // Evidence Processing State Machine interface EvidenceContext { file: File | null,evidenceId: string, caseId: string, metadata: LegalAIMetadata | null,pngArtifact: ArrayBuffer | null,uploadProgress: number, processingSteps: string[], error: string | null,artifactUrl: string | null;
 }
 type StartProcessingEvent = { type: 'START_PROCESSING', file: File, evidenceId: string, caseId: string;
-}; type RetryEvent = { type: 'RETRY' }; type ResetEvent = { type: 'RESET' }; type EvidenceEvents = StartProcessingEvent | RetryEvent | ResetEvent | { type: string; [key, string]: any;
+}; type RetryEvent = { type: 'RETRY' }; type ResetEvent = { type: 'RESET' }; type EvidenceEvents = StartProcessingEvent | RetryEvent | ResetEvent | { type: string; [key: string]: any;
 }; const evidenceProcessingMachine = createMachine({ id: 'evidenceProcessor', initial: 'idle', // Using xstate v5 generic types requires runtime noop; cast for compile-time only types: { }as { context: EvidenceContext | events, EvidenceEvents;
 }, context: { file: null, evidenceId: '', caseId: '', metadata: null, pngArtifact: null, uploadProgress: 0, processingSteps: [], error: null, artifactUrl: null;
 }, states: { idle: { on: { START_PROCESSING: { target: 'validating', actions: assign({ file: ({ event;

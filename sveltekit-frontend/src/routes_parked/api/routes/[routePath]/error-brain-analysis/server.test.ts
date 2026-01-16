@@ -110,7 +110,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  expect(body.suggestions.length).toBe(0);
  });
 
- it('should handle multiple suggestions', async () => {$1;$2 { title: 'Fix 1', description: 'Description 1' },
+ it('should handle multiple suggestions', async () => {{ title: 'Fix 1', description: 'Description 1' },
  { title: 'Fix 2', description: 'Description 2' },
  { title: 'Fix 3', description: 'Description 3' }];
 
@@ -140,7 +140,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  }
  });
 
- it('should preserve route path from URL params', async () => {$1;$2 'http://localhost/api/routes/my-special-route/error-brain-analysis',
+ it('should preserve route path from URL params', async () => {'http://localhost/api/routes/my-special-route/error-brain-analysis',
  {
  method: 'POST',
  body: JSON.stringify({suggestions: [],

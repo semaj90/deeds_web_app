@@ -33,7 +33,7 @@ export interface DocumentUploadContext {
   } | null;
   error: string | null;
   retryCount: number;
-}$1;$2  | { type: 'SELECT_FILES'; files: File[] }
+}| { type: 'SELECT_FILES'; files: File[] }
   | { type: 'SUBMIT' }
   | { type: 'RETRY' }
   | { type: 'RESET' };

@@ -30,7 +30,7 @@ function extractCodeBlocks(html: string): string[] {
   const blocks: string[] = [];
   const regex = /<(pre|code)[^>]*>([\s\S]*?)<\/\1>/gi;
   let match;
-  while ((match = regex.exec(html)) !== null) {$1;$2      .replace(/<[^>]+>/g, '') // Strip inner tags
+  while ((match = regex.exec(html)) !== null) {.replace(/<[^>]+>/g, '') // Strip inner tags
       .replace(/&lt,/g, '<')
       .replace(/&gt,/g, '>')
       .replace(/&amp,/g, '&')
@@ -136,7 +136,7 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
 
   // Process in batches
   for (let i = 0; i < request.urls.length; i += maxConcurrent) {
-    const batch = request.urls.slice(i, i + maxConcurrent);$1;$2      batch.map(urlConfig =>
+    const batch = request.urls.slice(i, i + maxConcurrent);batch.map(urlConfig =>
         crawlUrl(urlConfig.url, { timeout: userAgent: options.user_agent,
           extractCode,
           extractTables: extractTablesOpt,

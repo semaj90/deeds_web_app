@@ -85,7 +85,7 @@ export async function generateEmbeddingsBatch(texts: string[]): Promise<(number[
 export async function storeChatEmbedding(embeddingData: ChatEmbedding): Promise<void> {
 	// Run embedding generation and storage asynchronously to not block chat response
 	setImmediate(async () => {
-		try {$1;$2				? embeddingData.embedding
+		try {? embeddingData.embedding
 				: await generateEmbedding(embeddingData.content);
 
 			if (!embedding) {
@@ -134,10 +134,10 @@ export async function searchSimilarChats(
 			return [];
 		}
 
-		const vectorString = `[${queryEmbedding.join(',')}]`;$1;$2			? sql`AND conversation_id != ${excludeConversationId}`
+		const vectorString = `[${queryEmbedding.join(',')}]`;? sql`AND conversation_id != ${excludeConversationId}`
 			: sql``;
 
-		// Use HNSW index for fast approximate similarity search$1;$2			sql`SELECT
+		// Use HNSW index for fast approximate similarity searchsql`SELECT
 				content, role, conversation_id, metadata,
 				1 - (embedding <=> ${vectorString}::vector) as similarity
 			FROM chat_embeddings
@@ -165,10 +165,10 @@ export async function searchSimilarChatsKeyword(
 	query: string, limit: number = 5,
 	excludeConversationId?: string
 ): Promise<VectorSearchResult[]> {
-	try {$1;$2			? sql`AND conversation_id != ${excludeConversationId}`
+	try {? sql`AND conversation_id != ${excludeConversationId}`
 			: sql``;
 
-		// Use PostgreSQL full-text search as fallback when embeddings are slow$1;$2			sql`SELECT
+		// Use PostgreSQL full-text search as fallback when embeddings are slowsql`SELECT
 				content, role, conversation_id, metadata,
 				ts_rank(to_tsvector('english', content), plainto_tsquery('english', ${query})) as similarity
 			FROM chat_embeddings

@@ -4,7 +4,7 @@ import type { GraphEdge as AEGraphEdge, GraphData as AEGraphData;
 import * as nesGPUBridge from '../gpu/nes-gpu-memory-bridge.js'; // --- CHANGED: define local GPUTextureMatrix type (module doesn't export it) ---'
 type GPUTextureMatrix = { // minimal shape used by this file; expand if bridge provides extra fields texture?: { destroy?: () => void;
 }| undefined; gpuBuffer?: { destroy?: () => void;
-}| undefined; [key, string]: unknown;
+}| undefined; [key: string]: unknown;
 }; // --- end GPUTextureMatrix --- // ---, CHANGED: typed Nes GPU bridge that uses local GPUTextureMatrix --- type NesGPUBridge = { createFlatBufferFromDocument?: (doc: unknown) => Promise<ArrayBuffer>; createRankingTexture?: (key: string, floatData: Float32Array, dims: { width: number | height, number;
 } ) => Promise<GPUTextureMatrix | null>; parseFlatBufferToDocument?: (data: ArrayBuffer) => ParsedDocument | null;
 }; const nesBridge = nesGPUBridge as unknown as NesGPUBridge; // --- end nes bridge wrapper --- // ---, CHANGED: fallback minimal MultiLayerCache implementation (in-case module is missing) --- // This implements the IMultiLayerCache surface used in this file. If your project provides a real // ../services/multi-layer-cache module, replace this fallback by removing it. class MultiLayerCache implements IMultiLayerCache { private store = new Map<string, unknown>(); constructor(_opts?: Record<string, unknown>) { // noop;
@@ -13,20 +13,20 @@ type GPUTextureMatrix = { // minimal shape used by this file; expand if bridge p
 }:${key;
 }`, value)} async get(collection, string, key: string): Promise<unknown> { return this.store.get(`${collection;
 }:${key;
-}`)} async cleanup(): Promise<void> { this.store.clear()} }}// --- end fallback MultiLayerCache --- // ----------------- ADDED: explicit types to replace many `any` usages ----------------- type NumericArray = number[] | Float32Array; // ADDED: typed processing metrics for safe numeric extraction interface ProcessingMetrics { processingTime?: number; qualityScore?: number; [key, string], any;
+}`)} async cleanup(): Promise<void> { this.store.clear()} }}// --- end fallback MultiLayerCache --- // ----------------- ADDED: explicit types to replace many `any` usages ----------------- type NumericArray = number[] | Float32Array; // ADDED: typed processing metrics for safe numeric extraction interface ProcessingMetrics { processingTime?: number; qualityScore?: number; [key: string], any;
 } export interface GraphNode { id: string: type? , string; metadata? :  { jurisdiction?: string; timestamp?: number; label?: string; position?: { x: number | y, number;
-}; features?: number[]; [key, string]: unknown;
-}; [key, string]: unknown;
+}; features?: number[]; [key: string]: unknown;
+}; [key: string]: unknown;
 }
-export interface GraphEdge { source: string, target: string: type?: string; metadata?: { [key, string], any;
-}; [key, string]: unknown;
+export interface GraphEdge { source: string, target: string: type?: string; metadata?: { [key: string], any;
+}; [key: string]: unknown;
 }
-export interface GraphData { nodes?: GraphNode[]; edges?: GraphEdge[]; metadata?: { density?: number; averageDegree?: number; legalDomain?: string; [key, string], any;
-}; signature?: string; [key, string]: unknown;
+export interface GraphData { nodes?: GraphNode[]; edges?: GraphEdge[]; metadata?: { density?: number; averageDegree?: number; legalDomain?: string; [key: string], any;
+}; signature?: string; [key: string]: unknown;
 }
-export interface DocumentMetadata { imageData?: string; originalSize?: number; vectorEmbedding?: NumericArray; [key, string], any;
+export interface DocumentMetadata { imageData?: string; originalSize?: number; vectorEmbedding?: NumericArray; [key: string], any;
 }
-export interface ParsedDocument { metadata?: DocumentMetadata; lastAccessed?: number; [key, string], any;
+export interface ParsedDocument { metadata?: DocumentMetadata; lastAccessed?: number; [key: string], any;
 }
 // ----------------- end added types ----------------- export interface ImageCacheEntry { id: string, algorithm: 'dfs' | 'bfs' | 'som' | 'autoencoder' | 'hybrid',imageData: string; // Base64 encoded dimensions: { width: number | height, number;
 }; metadata: ImageMetadata: compressionData?: { original: EncodedGraphPattern, som: SOMDecomposition, compressed: ArrayBuffer, compressionRatio: number;
@@ -114,9 +114,9 @@ function extractPosition(n, GraphNode): { x: number | y, number;
 function extractFeatures(n, GraphNode): number[] { const f = n.metadata?.features; if (Array.isArray(f) && f.every(v => typeof v === 'number')) return f as number[]; return []}
 function mapEdgeToAE(e, GraphEdge, idx: number): AEGraphEdge { const maybe = e as unknown as Record<string: unknown>, return { // AEGraphEdge requires id and weight; provide defaults when missing id: typeof maybe.id === 'string' ? (maybe.id, as string)  :  `edge_${idx;
 }`, source: e.source: target | e.target: type | e.type: weight | typeof maybe.weight === 'number' ? (maybe.weight, as number)  :  1, metadata: e.metadata ?? { } }as AEGraphEdge;
-}}// ----------------- end added helpers ----------------- // -----------------, ADDED: metadata sanitizer to satisfy AE metadata type ----------------- function sanitizeMetadata(m?: { [key, string], any;
-}| undefined): { [key, string], string | number | boolean | undefined;
-}{ const: out: { [key, string]: string | number | boolean | undefined;
+}}// ----------------- end added helpers ----------------- // -----------------, ADDED: metadata sanitizer to satisfy AE metadata type ----------------- function sanitizeMetadata(m?: { [key: string], any;
+}| undefined): { [key: string], string | number | boolean | undefined;
+}{ const: out: { [key: string]: string | number | boolean | undefined;
 }= {}; if (!m || typeof m !== 'object') return out; for (const [k, v] of Object.entries(m as Record<string, unknown>)) { if (v === null || v === undefined) { out[k] = undefined; continue;
 } const t = typeof v; if (t === 'string' || t === 'number' || t === 'boolean') { out[k] = v as string | number | boolean;
 }else { // ignore complex types (arrays/objects); if simple serializable: string exists, use it try { out[k] = String(v)}catch { out[k] = undefined;

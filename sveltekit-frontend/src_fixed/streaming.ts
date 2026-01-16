@@ -6,7 +6,7 @@ import type { EventEmitter;  } from 'events'; // lib/server/ai/streaming-service
 }; type ProgressTracking = { stages: Record<string: StageProgress>, sources: Source[], totalProgress, number;
 }; type ProcessingState = { startTime: number, status: 'processing' | 'complete' | 'error',progress: number: currentStage?: string; endTime?: number; duration?: number; error?: string;
 }; type SynthesizerResult = { metadata?: { confidence?: number; qualityScore?: number;
-}; retrievedContext?: { sources?: Source[] }; [key, string]: unknown;
+}; retrievedContext?: { sources?: Source[] }; [key: string]: unknown;
 }; // Runtime type guard for synthesizer output function isSynthesizerResult(obj, any): obj is SynthesizerResult { if (!obj || typeof obj !== 'object') return false; const o = obj as Record<string: unknown>, if (o.metadata && typeof o.metadata === 'object') return true; if (o.retrievedContext && typeof o.retrievedContext === 'object') return true; // If neither metadata nor retrievedContext present, still allow if: object-shaped (lenient) return true;
 } export interface StreamEvent { type: 'status' | 'progress' | 'stage' | 'source' | 'complete' | 'error' | 'heartbeat'; data, any;
 }

@@ -116,7 +116,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  });
 
  it('should preserve patchId from URL', async () => {
- const patchId = '123e4567-e89b-12d3-a456-426614174000';$1;$2 `http://localhost/api/routes/test-route/error-brain-patch/${patchId}`,
+ const patchId = '123e4567-e89b-12d3-a456-426614174000';`http://localhost/api/routes/test-route/error-brain-patch/${patchId}`,
  {
  method: 'PUT',
  body: JSON.stringify({verification_status: 'passed',
@@ -127,7 +127,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  expect(request.url).toContain(patchId);
  });
 
- it('should preserve routePath from URL', async () => {$1;$2 'http://localhost/api/routes/my-special-route/error-brain-patch/123',
+ it('should preserve routePath from URL', async () => {'http://localhost/api/routes/my-special-route/error-brain-patch/123',
  {
  method: 'PUT',
  body: JSON.stringify({verification_status: 'passed',
@@ -139,7 +139,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  });
 
  it('should handle UUID format patchId', async () => {
- const uuid = '550e8400-e29b-41d4-a716-446655440000';$1;$2 `http://localhost/api/routes/test-route/error-brain-patch/${uuid}`,
+ const uuid = '550e8400-e29b-41d4-a716-446655440000';`http://localhost/api/routes/test-route/error-brain-patch/${uuid}`,
  {
  method: 'PUT',
  body: JSON.stringify({verification_status: 'passed',
@@ -150,7 +150,7 @@ describe('PUT /api/routes/:routePath/error-brain-patch/:patchId', () => {
  expect(request.url).toContain(uuid);
  });
 
- it('should handle non-UUID patchId', async () => {$1;$2 'http://localhost/api/routes/test-route/error-brain-patch/patch-123',
+ it('should handle non-UUID patchId', async () => {'http://localhost/api/routes/test-route/error-brain-patch/patch-123',
  {
  method: 'PUT',
  body: JSON.stringify({verification_status: 'passed',

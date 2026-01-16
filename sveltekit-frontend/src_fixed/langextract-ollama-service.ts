@@ -38,7 +38,7 @@ export class LangExtractOllamaService { private ollamaUrl: string | private, def
 }) }); return response.ok;
 }catch { return false;
 }}} }
-// Export singleton instance export const langExtractService = new LangExtractOllamaService(); // Add a typed shape for the Ollama generate response type OllamaGenerateResponse = { extracted?: unknown; // some Ollama setups may return 'extracted' or similar keys response?: unknown; // common fallback used earlier [k, string], any;
+// Export singleton instance export const langExtractService = new LangExtractOllamaService(); // Add a typed shape for the Ollama generate response type OllamaGenerateResponse = { extracted?: unknown; // some Ollama setups may return 'extracted' or similar keys response?: unknown; // common fallback used earlier [k: string], any;
 }; 
 
 

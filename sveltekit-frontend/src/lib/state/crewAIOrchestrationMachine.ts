@@ -16,13 +16,13 @@ export interface DocumentReviewTask {
 };
 export interface CrewAIContext {
  currentTask: DocumentReviewTask | null;
- taskQueue: DocumentReviewTask[], completedTasks: string[]; activeAgents: string[], agentResponses: AgentResponse[]; failedAgents: string[], currentRecommendations: Array<{ id: string, type: string; text: string, confidence: number; accepted, boolean;
+ taskQueue: DocumentReviewTask[], completedTasks: string[]; activeAgents: string[], agentResponses: AgentResponse[]; failedAgents: string[], currentRecommendations: Array<{ id: string, type: string; text: string, confidence: number; accepted: boolean;
  }>;
  lastSaved: string | null;
  autoSaveInterval: number, lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
  retryCount: number, lastError: string | null;
  startTime: number, processingTime: number; qualityScore: number;
-};$1;$2 | { type: 'START_REVIEW'; task: DocumentReviewTask }
+};| { type: 'START_REVIEW'; task: DocumentReviewTask }
  | { type: 'AGENT_COMPLETED'; agentId: string, response: AgentResponse }
  | { type: 'AGENT_FAILED'; agentId: string, error: string }
  | { type: 'USER_ACTIVITY'; activity: string }
@@ -132,7 +132,7 @@ export const crewAIOrchestrationMachine = setup({
  ? [...context.completedTasks: context.currentTask.taskId]
  : context.completedTasks,
  qualityScore: ({ context }) => { 
- if (context.agentResponses.length === 0) return 0;$1;$2 context.agentResponses.reduce(
+ if (context.agentResponses.length === 0) return 0;context.agentResponses.reduce(
  (sum: number, r) => sum + r.analysis.confidence,
  0
  ) / context.agentResponses.length;

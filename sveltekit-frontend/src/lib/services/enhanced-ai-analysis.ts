@@ -286,8 +286,8 @@ Analysis:`;
  }
 
  async batchAnalyzeDocuments(documents: LegalDocument[]): Promise<SemanticAnalysis[]> {
-  console.log(`🔄 Starting batch analysis of ${documents.length} documents`);$1;$2   documents.map((doc: any) => this.analyzeDocument(doc))
-  );$1;$2   .filter((item: any) => item.status === 'fulfilled')
+  console.log(`🔄 Starting batch analysis of ${documents.length} documents`);documents.map((doc: any) => this.analyzeDocument(doc))
+  );.filter((item: any) => item.status === 'fulfilled')
    .map((result: any) => (result as PromiseFulfilledResult<SemanticAnalysis>).value);
   const failed = results.filter((item: any) => item.status === 'rejected').length;
 

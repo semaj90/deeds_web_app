@@ -123,7 +123,7 @@ export interface LangChainChain {
  type: ChainType; config: ChainConfig;
  components: ChainComponent[]; memory: ChainMemory;
  tools: ChainTool[]; status: ChainStatus;
-}$1;$2 | 'conversation'
+}| 'conversation'
  | 'qa'
  | 'summarization'
  | 'analysis'
@@ -189,7 +189,7 @@ export interface LegalDocument {
  classification: DocumentClassification; metadata: LegalDocumentMetadata;
  processing: DocumentProcessing; analysis: LegalAnalysis;
  relationships: DocumentRelationship[];
-}$1;$2 | 'contract'
+}| 'contract'
  | 'case_law'
  | 'statute'
  | 'regulation'
@@ -332,7 +332,7 @@ export interface NamedEntity {
  text: string; label: EntityLabel;
  confidence: number; startChar: number;
  endChar: number; metadata: Record<string, unknown>;
-}$1;$2 | 'PERSON'
+}| 'PERSON'
  | 'ORGANIZATION'
  | 'LOCATION'
  | 'DATE'
@@ -379,7 +379,7 @@ export interface KeyFinding {
  importance: number; confidence: number;
  description: string; evidence: EvidenceReference[];
  implications: string[]; relatedFindings: string[];
-}$1;$2 | 'fact'
+}| 'fact'
  | 'legal_principle'
  | 'procedural_issue'
  | 'evidence_issue'
@@ -404,7 +404,7 @@ export interface LegalIssue {
  applicableLaw: ApplicableLaw[]; elements: LegalElement[];
  analysis: string; strength: IssueStrength;
  precedents: Precedent[]; counterarguments: Counterargument[];
-}$1;$2 | 'constitutional'
+}| 'constitutional'
  | 'contract'
  | 'tort'
  | 'criminal'
@@ -452,7 +452,7 @@ export interface RiskCategory {
  probability: number; impact: number;
  description: string; factors: RiskFactor[];
  timeline: string;
-}$1;$2 | 'liability'
+}| 'liability'
  | 'financial'
  | 'reputational'
  | 'operational'
@@ -503,7 +503,7 @@ export interface Recommendation {
  steps: ActionStep[]; timeline: string;
  resources: RequiredResource[]; risks: string[];
  benefits: string[]; alternatives: Alternative[];
-}$1;$2 | 'strategy'
+}| 'strategy'
  | 'discovery'
  | 'motion'
  | 'settlement'
@@ -577,7 +577,7 @@ export interface LegalChange {
  date: string; change: string;
  cause: ChangeReason[]; impact: number;
  cases: string[];
-}$1;$2 | 'legislation'
+}| 'legislation'
  | 'judicial_decision'
  | 'social_change'
  | 'technology'
@@ -594,7 +594,7 @@ export interface AnalysisTimeline {
  significance: number; category: TimelineCategory;
  details: string; related_documents: string[];
  legal_implications: string[];
-}$1;$2 | 'filing'
+}| 'filing'
  | 'discovery'
  | 'motion'
  | 'hearing'
@@ -611,7 +611,7 @@ export interface DocumentRelationship {
  verified: boolean;
  verifiedBy?: string;
  verifiedAt?: string;
-}$1;$2 | 'amendment'
+}| 'amendment'
  | 'exhibits'
  | 'references'
  | 'contradicts'
@@ -1641,7 +1641,7 @@ export interface WorkflowStep {
  inputs: StepInput[]; outputs: StepOutput[];
  conditions: StepCondition[]; retryPolicy: RetryPolicy;
  timeout: number;
-}$1;$2 | 'ai_analysis'
+}| 'ai_analysis'
  | 'document_processing'
  | 'email'
  | 'webhook'
@@ -1739,7 +1739,7 @@ export interface WorkflowExecution {
  duration?: number; trigger: ExecutionTrigger;
  steps: StepExecution[]; context: ExecutionContext;
  error?: ExecutionError;
-}$1;$2 | 'pending'
+}| 'pending'
  | 'running'
  | 'completed'
  | 'failed'

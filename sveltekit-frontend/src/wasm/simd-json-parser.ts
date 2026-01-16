@@ -17,7 +17,7 @@ export class SIMDStringOps {
  static findLegalEntity(text: string, pattern, string: number {
  // Corrected type annotations
  // Simplified implementation for TypeScript compatibility
- // In actual WASM, this would use SIMD instructions$1;$2$1;$2 if (patternLen > textLen) return -1;
+ // In actual WASM, this would use SIMD instructions$1;$2if (patternLen > textLen) return -1;
  // Optimized: string search that can be compiled to WASM with SIMD
  for (let i = 0; i <= textLen - patternLen; i++) {
  let match = true;
@@ -35,7 +35,7 @@ export class SIMDStringOps {
  static extractCitations(text: string): string[] {
  // Corrected type annotation
  const citations: string[] = [];
- // Common legal citation patterns$1;$2 '\\d+ U\\.S\\. \\d+', // Supreme Court
+ // Common legal citation patterns'\\d+ U\\.S\\. \\d+', // Supreme Court
  '\\d+ F\\.\\d+d \\d+', // Federal courts
  '\\d+ S\\.Ct\\. \\d+', // Supreme Court Reporter
  '\\d+ L\\.Ed\\.\\d+d \\d+', // Lawyer's Edition
@@ -141,7 +141,7 @@ export class SIMDJSONParser {
  private static countLegalEntities(text: string): number {
  // Corrected type annotation
  let count = 0;
- // Legal entity patterns (simplified)$1;$2 'United States Code',
+ // Legal entity patterns (simplified)'United States Code',
  'Code of Federal Regulations',
  'Federal Register',
  'Supreme Court',

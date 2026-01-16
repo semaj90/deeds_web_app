@@ -1,6 +1,6 @@
 /** * UTF-8 to FP32 Text Converter for SvelteKit * Optimized for GPU processing and neural network inputs */ export interface TextConversionOptions {
 	normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
-	outputRange: [number, number]; // Min/max values for FP32 output
+	outputRange: [number: number]; // Min/max values for FP32 output
 	paddingValue: number; // Value to use for padding
 	maxLength?: number; // Maximum sequence length
 	preserveSpecialChars: boolean; // Keep special characters vs normalize them

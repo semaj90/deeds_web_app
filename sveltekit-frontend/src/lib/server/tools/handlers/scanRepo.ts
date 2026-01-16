@@ -104,7 +104,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     excludes: request.excludes ?? ['node_modules', '.git', 'dist']
   };
 
-  for (const patternDef of request.patterns) {$1;$2      patternDef.pattern: request.paths,
+  for (const patternDef of request.patterns) {patternDef.pattern: request.paths,
       {
         ...options,
         isRegex: patternDef.type === 'regex'

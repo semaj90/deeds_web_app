@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
 
  // Directly access globalThis properties for HMR checks
  const usersSameRef = globalThis.__users_ref ? globalThis.__users_ref === users : true;
- const sessionsSameRef = globalThis.__sessions_ref ? globalThis.__sessions_ref === sessions : true;$1;$2 !!globalThis?.__lucia_instance&& globalThis.__lucia_instance === lucia;
+ const sessionsSameRef = globalThis.__sessions_ref ? globalThis.__sessions_ref === sessions : true;!!globalThis?.__lucia_instance&& globalThis.__lucia_instance === lucia;
 
  if (!usersSameRef || !sessionsSameRef) {
  status = 'degraded';

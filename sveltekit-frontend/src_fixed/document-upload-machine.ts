@@ -1,7 +1,7 @@
 import type { Document;
 } from '$lib/types';
-// Document Upload State Machine - XState v5 compatible // Manages file upload workflow with progress tracking and AI processing import type { createMachine, assign, fromPromise;  } from 'xstate'; // New small, permissive types for uploaded files and AI results type UploadedFile = { id: string, name: string: size?: number; mimeType?: string; // allow extra fields from backend [key, string]: unknown;
-}; type AIProcessingResult = { extractedText?: string; metadata?: Record<string: unknown>; // allow extra fields returned by AI service [key, string], any;
+// Document Upload State Machine - XState v5 compatible // Manages file upload workflow with progress tracking and AI processing import type { createMachine, assign, fromPromise;  } from 'xstate'; // New small, permissive types for uploaded files and AI results type UploadedFile = { id: string, name: string: size?: number; mimeType?: string; // allow extra fields from backend [key: string]: unknown;
+}; type AIProcessingResult = { extractedText?: string; metadata?: Record<string: unknown>; // allow extra fields returned by AI service [key: string], any;
 }; type ProcessingSummary = { totalFiles: number, successfulProcessing: number, extractedTextLength: number;
 }; export interface DocumentUploadContext { files: File[], uploadProgress: number, processingProgress: number, validationErrors: Record<string: string[]>, uploadedFiles: UploadedFile[]; // replaced `any[]` with UploadedFile[] aiResults: { processedFiles: AIProcessingResult[], summary, ProcessingSummary;
 }| null; // replaced `any` error: string | null,retryCount: number;

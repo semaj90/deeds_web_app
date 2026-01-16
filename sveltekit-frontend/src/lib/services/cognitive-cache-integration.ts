@@ -382,7 +382,7 @@ export async function queryLegalDocuments(
     const docs = await queryJsonb(`metadata.${key}`, value, '@>');
     results.push(...docs.map((d: any) => d.content as LegalDocument));
   }
-  // Remove duplicates$1;$2    (doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
+  // Remove duplicates(doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
   );
   return unique;
 }

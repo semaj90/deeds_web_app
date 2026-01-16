@@ -90,7 +90,7 @@ export const videoEvidence = pgTable('video_evidence', {
  start: number; end: number;
  text: string;
  speaker?: string;
- critical?, boolean;
+ critical?: boolean;
  }>
  >(),
  metadata: jsonb('metadata'),

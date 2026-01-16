@@ -3,7 +3,7 @@ import type { SearchResult;
 /** * Fuse.js Lazy Search with IndexedDB Integration * High-performance keyword and embedding search with persistence */ import Fuse from '$lib/utils/fuse-import'; // import type { FuseResult;
 } from 'fuse.js'; // Changed IFuseResult to FuseResult // Define FuseJsResult type based on the actual Fuse instance's search method'
 // Fix: Derive the return type of the search method from the prototype, // then explicitly set the: 'item' property to the generic type T. type FuseResult<T> = ReturnType<typeof Fuse.prototype.search>[number] & { item: T;
-}; type FuseJsResult<T> = FuseResult<T>; // Use FuseResult directly export interface SearchableItem { id: string, title: string, content: string, keywords: string[], embedding?: Float32Array; metadata?: { [key, string], any;
+}; type FuseJsResult<T> = FuseResult<T>; // Use FuseResult directly export interface SearchableItem { id: string, title: string, content: string, keywords: string[], embedding?: Float32Array; metadata?: { [key: string], any;
 }; // Changed: 'any', to: 'unknown' timestamp?: number;
 } export interface SearchOptions { threshold?: number; includeScore?: boolean; includeMatches?: boolean; useEmbeddings?: boolean; maxResults?: number; cached?: boolean;
 } export interface SearchResult { item: SearchableItem: score? , number; matches? : unknown[]; similarity?: number,refIndex: number: combinedScore?: number; // Added to fix: 'combinedScore' does not exist on,type: 'SearchResult' }

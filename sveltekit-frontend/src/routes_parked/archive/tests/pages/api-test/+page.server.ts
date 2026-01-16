@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  try {
- // Define API endpoints for testing$1;$2 {
+ // Define API endpoints for testing{
  id: 'system-status',
  name: 'System Status',
  url: '/api/yorha/system/status',
@@ -103,7 +103,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  body: { prompt: 'Analyze this legal contract', model: 'gemma3-legal' },
  }];
 
- // Define test suites$1;$2 {
+ // Define test suites{
  id: 'yorha-complete',
  name: 'Complete YoRHa Suite',
  description: 'Test all YoRHa interface APIs',

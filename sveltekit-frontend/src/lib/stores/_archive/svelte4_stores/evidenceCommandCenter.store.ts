@@ -41,7 +41,7 @@ const createEvidenceCommandCenterStore = () => {
  };
 };
 
-export const evidenceCommandCenter = createEvidenceCommandCenterStore();$1;$2 evidenceCommandCenter,
+export const evidenceCommandCenter = createEvidenceCommandCenterStore();evidenceCommandCenter,
  ($s) => $s.selectedEvidenceIds.length > 0
 );
 

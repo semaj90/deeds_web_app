@@ -543,7 +543,7 @@ export class NESMemoryArchitecture {
    }
   }
   return false;
- } getMemoryStats(): MemoryStats {$1;$2 usedRAM = 0;$1;$2 usedCHR = 0;$1;$2 usedPRG = 0;
+ } getMemoryStats(): MemoryStats {usedRAM = 0;usedCHR = 0;usedPRG = 0;
  let documentCount = 0;
  let totalAccessTime = 0;
  let accessCount = 0;
@@ -900,7 +900,7 @@ class PlannerMemoryManager {
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
- // Reuse existing if seen (transposition) — return existing handle.$1;$2 if (existing !== undefined) return existing;
+ // Reuse existing if seen (transposition) — return existing handle.if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -962,7 +962,7 @@ class PlannerMemoryManager {
  this.valueSum[handle] += value;
  }
 
- selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2$1;$2 let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
@@ -1072,7 +1072,7 @@ class PlannerMemoryManager {
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
- // Reuse existing if seen (transposition) — return existing handle.$1;$2 if (existing !== undefined) return existing;
+ // Reuse existing if seen (transposition) — return existing handle.if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -1134,7 +1134,7 @@ class PlannerMemoryManager {
  this.valueSum[handle] += value;
  }
 
- selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2$1;$2 let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];

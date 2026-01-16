@@ -46,8 +46,7 @@ export class LLMService {
  * Extract citations from text
  */
  async extractCitations(text: string): Promise<Citation[]> {
- try {$1;$2
-Text:
+ try {Text:
 ${ text }
 
 Return only valid JSON array.`;
@@ -64,8 +63,7 @@ Return only valid JSON array.`;
  * Extract holding statement
  */
  async extractHolding(text: string): Promise<string> {
- try {$1;$2
-Text:
+ try {Text:
 ${ text }`;
 
  const response = await this.callOllama(prompt);
@@ -79,7 +77,7 @@ ${ text }`;
  /**
  * Build summary generation prompt
  */
- private buildSummaryPrompt(context: SummaryContext): string {$1;$2 .map((s) => `${s.code} (${s.jurisdiction}): ${s.title}`)
+ private buildSummaryPrompt(context: SummaryContext): string {.map((s) => `${s.code} (${s.jurisdiction}): ${s.title}`)
  .join('\n');
 
  const caseLawText = context.caseLaw.map((c) => `${c.title}: ${c.summary}`).join('\n');

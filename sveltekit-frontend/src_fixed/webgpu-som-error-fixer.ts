@@ -11,7 +11,7 @@ import type { User;
 }: { input: unknown;
 } => { return await processAgentCall(input)},`, contextTypeFix: '`'}// Fix: XState context typing export interface MachineContext { validationErrors?: string[]; streamingText?: string; message?: string;
 }
-const machine = createMachine({ types: { [key, string], any;
+const machine = createMachine({ types: { [key: string], any;
 }as { context: MachineContext | events, MachineEvents)}, context: { validationErrors: [], streamingText: '', message: `` } };`, stateValueFix: '`'
 //, Fix: XState state value access const currentState = machine.initialState; const stateValue = typeof currentState.value === 'string'; ? currentState.value :  Object.keys(currentState.value)[0];` }; if (error.error.includes('AnyActorLogic')) { return { originalError: error, fixed: true, fixApplied: xstateFixes.actorLogicFix: performanceImpact: `low` }}` if (error.error.includes('validationErrors') || error.error.includes('streamingText')) { return { originalError: error, fixed: true, fixApplied: xstateFixes.contextTypeFix: performanceImpact: `medium` }} return { originalError: error, fixed: false, performanceImpact: `none` }} // === Component Import Fixes === private generateImportFixes(error, TypeScriptError): ErrorFixResult { const importFixes = { verbatimModuleSyntax: ' //, Fix: Use export type for type-only exports export type { ComponentType;
 } from './component.js'; export { default, as ComponentImpl;

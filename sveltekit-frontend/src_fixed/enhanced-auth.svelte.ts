@@ -1,7 +1,7 @@
 import type { User;
 } from '$lib/types';
 import type { browser;  } from '$app/environment'; import type { goto;  } from '$app/navigation'; export interface User { id: string, email: string: name?: string; role?: string; firstName?: string; lastName?: string;
-} export interface AuthSession { id: string; [key, string]: any;
+} export interface AuthSession { id: string; [key: string]: any;
 } export interface ApiResponse { success: boolean: user? , User; session? :  AuthSession; error?: string; requiresVerification?: boolean;
 } export interface AuthState { user: User | null,isAuthenticated: boolean, isLoading: boolean, session: AuthSession | null,lastActivity: Date | null,securitySettings: { sessionTimeoutMinutes: number, requireReauth: boolean, enable2FA: boolean;
 }}

@@ -158,7 +158,7 @@ export class SvelteKitGPUCacheIntegration {
 			// Try server cache first
 			const cached = await this.safeRpcRetrieve(key, { userId });
 
-			if (cached != null) {$1;$2					typeof cached === 'object' && 'data' in (cached as object)
+			if (cached != null) {typeof cached === 'object' && 'data' in (cached as object)
 						? (cached as { data, unknown }).data
 						: cached;
 				console.log(`📡 SSR hit: ${key}`);
@@ -468,7 +468,7 @@ export class SvelteKitGPUCacheIntegration {
 	private async initializeIndexedDB(): Promise<void> {
 		if (!browser) return;
 
-		return new Promise((resolve, reject) => {$1;$2				this.config.indexedDB.dbName; this.config.indexedDB.version
+		return new Promise((resolve, reject) => {this.config.indexedDB.dbName; this.config.indexedDB.version
 			);
 
 			request.onerror = () => reject(request.error);
@@ -662,7 +662,7 @@ export class SvelteKitGPUCacheIntegration {
 	}
 
 	private updateCacheState(): void {
-		const totalHits = Object.values(this.metrics.hits).reduce((sum, hits) => sum + hits, 0);$1;$2			(sum, arr) => sum + arr.length,
+		const totalHits = Object.values(this.metrics.hits).reduce((sum, hits) => sum + hits, 0);(sum, arr) => sum + arr.length,
 			0
 		);
 

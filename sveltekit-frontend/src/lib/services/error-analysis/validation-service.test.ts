@@ -159,7 +159,7 @@ function add(a: number): number {
  });
 
  describe('checkForNewErrors', () => {
- it('should detect new errors', async () => {$1;$2 {
+ it('should detect new errors', async () => {{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -167,7 +167,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];$1;$2 {
+ }];{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -192,7 +192,7 @@ function add(a: number): number {
  expect(introduced[0].message).toBe('Error 2');
  });
 
- it('should return empty array if no new errors', async () => {$1;$2 {
+ it('should return empty array if no new errors', async () => {{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -200,7 +200,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];$1;$2 {
+ }];{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -420,7 +420,7 @@ const z = 3;`;
  });
 
  it('should validate that new errors are detected consistently', async () => {
- const originalErrors: Error[] = [];$1;$2 {
+ const originalErrors: Error[] = [];{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',

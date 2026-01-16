@@ -63,7 +63,7 @@ export class FixSynthesizer {
         };
       }
 
-      // Build context from similar errors$1;$2        .filter((e) => e.fixStrategies.length > 0 && e.successRate > 0.7)
+      // Build context from similar errors.filter((e) => e.fixStrategies.length > 0 && e.successRate > 0.7)
         .flatMap((e) => e.fixStrategies)
         .slice(0, 3);
 
@@ -115,7 +115,7 @@ export class FixSynthesizer {
    * Estimate confidence based on similar errors
    */
   private estimateConfidence(similarErrors: SimilarError[]): number {
-    if (similarErrors.length === 0) return 0.5;$1;$2      similarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;$1;$2      similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
+    if (similarErrors.length === 0) return 0.5;similarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
 
     return avgSimilarity * 0.6 + avgSuccessRate * 0.4;
   }

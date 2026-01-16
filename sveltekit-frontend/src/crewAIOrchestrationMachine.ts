@@ -16,13 +16,13 @@ export interface DocumentReviewTask {
 
 export interface CrewAIContext {
   currentTask: DocumentReviewTask | null;
-  taskQueue: DocumentReviewTask[]; completedTasks: string[]; activeAgents: string[]; agentResponses: AgentResponse[]; failedAgents: string[]; currentRecommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean;
+  taskQueue: DocumentReviewTask[]; completedTasks: string[]; activeAgents: string[]; agentResponses: AgentResponse[]; failedAgents: string[]; currentRecommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean;
   }>;
   lastSaved: string | null;
   autoSaveInterval: number; lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
   retryCount: number; lastError: string | null;
   startTime: number; processingTime: number; qualityScore: number;
-}$1;$2  | { type: 'START_REVIEW'; task: DocumentReviewTask }
+}| { type: 'START_REVIEW'; task: DocumentReviewTask }
   | { type: 'AGENT_COMPLETED'; agentId: string; response: AgentResponse }
   | { type: 'AGENT_FAILED'; agentId: string; error: string }
   | { type: 'USER_ACTIVITY'; activity: string }
@@ -49,7 +49,7 @@ async function autoSaveDocument({ input }: { input: { documentId: string, conten
 async function generateSelfPrompt({ input }: { input: { context, CrewAIContext } }): Promise<{ recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean }> }> {
   await new Promise((resolve: any) => setTimeout(resolve, 800));
 
-  const recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted, boolean;
+  const recommendations: Array<{ id: string; type: string; text: string; confidence: number; accepted: boolean;
   }> = [];
 
   if (input.context.userIntent === 'idle') {

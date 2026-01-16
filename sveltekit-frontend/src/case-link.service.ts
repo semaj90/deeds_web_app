@@ -159,7 +159,7 @@ class CaseLinkService {
       }
 
       updates.push(`updated_at = CURRENT_TIMESTAMP`);
-      params.push(caseId, statuteCode);$1;$2        `UPDATE case_statute_links
+      params.push(caseId, statuteCode);`UPDATE case_statute_links
          SET ${updates.join(', ')}
          WHERE case_id = $${paramIndex} AND statute_code = $${paramIndex + 1}
          RETURNING *`,
@@ -195,7 +195,7 @@ class CaseLinkService {
    * Get link detail
    */
   async getLinkDetail(caseId: string, statuteCode: string): Promise<CaseStatuteLink | null> {
-    try {$1;$2        `SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,
+    try {`SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,
         [caseId, statuteCode]
       );
 
@@ -214,7 +214,7 @@ class CaseLinkService {
    * Get link count for case
    */
   async getLinkCount(caseId: string): Promise<number> {
-    try {$1;$2        `SELECT COUNT(*) as count FROM case_statute_links WHERE case_id = $1`,
+    try {`SELECT COUNT(*) as count FROM case_statute_links WHERE case_id = $1`,
         [caseId]
       );
 
@@ -231,7 +231,7 @@ class CaseLinkService {
   async getLinkStats(caseId: string): Promise<{ total: number; byLinkType: Record<string, number>;
   }> {
     try {
-      const total = await this.getLinkCount(caseId);$1;$2        `SELECT link_type, COUNT(*) as count
+      const total = await this.getLinkCount(caseId);`SELECT link_type, COUNT(*) as count
          FROM case_statute_links
          WHERE case_id = $1
          GROUP BY link_type`,

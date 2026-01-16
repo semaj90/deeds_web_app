@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params }) => {
  try {
- // Load evidence with associated chat turns for keywords and suggestions$1;$2 SELECT
+ // Load evidence with associated chat turns for keywords and suggestionsSELECT
  e.*,
  json_agg(
  json_build_object(

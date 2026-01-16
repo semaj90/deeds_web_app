@@ -5,7 +5,7 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = { maxFileSize: 50 * 1024 
 }
 // Authentication and session management export interface UserSession { userId: string, username: string: name?: string,role: string, permissions: string[], loginTime: number, lastActivity: number, sessionId: string: isLegalProfessional?: boolean; barNumber?: string; jurisdiction?: string;
 }
-export interface SecurityEvent { type: | "login" | "logout" | "access_denied" | "suspicious_activity" | "file_upload" | "data_export" | "privileged_access" | "evidence_access"; userId? , string; timestamp :  number, details: { [key, string], any;
+export interface SecurityEvent { type: | "login" | "logout" | "access_denied" | "suspicious_activity" | "file_upload" | "data_export" | "privileged_access" | "evidence_access"; userId? , string; timestamp :  number, details: { [key: string], any;
 } severity: "low" | "medium" | "high" | "critical"; ipAddress?: string; userAgent?: string; legalContext?: { caseId?: string; clientId?: string; isPrivileged?: boolean;
 } }
 // Session management class SessionManager { private session: UserSession | null = null; private config: SecurityConfig, private: sessionCheckInterval | number | null = null; constructor(config, SecurityConfig = DEFAULT_SECURITY_CONFIG) { this.config = config;

@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       console.warn('FastAPI backend not available, using mock data:', backendError);
     }
 
-    // Return mock data for development/demo$1;$2      // Routes
+    // Return mock data for development/demo// Routes
       {
         id: 'route-home',
         label: '+page.svelte',
@@ -219,7 +219,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
         exports: ['formatDate', 'formatCurrency', 'truncate'],
         functions: ['formatDate', 'formatCurrency', 'truncate']
       }
-    ];$1;$2      // Route imports
+    ];// Route imports
       { source: 'route-home', target: 'comp-button', type: 'import' },
       { source: 'route-home', target: 'store-user', type: 'import' },
       { source: 'route-dashboard', target: 'comp-evidence-board', type: 'import' },

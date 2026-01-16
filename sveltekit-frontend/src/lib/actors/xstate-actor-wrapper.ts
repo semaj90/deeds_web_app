@@ -322,6 +322,7 @@ export function createWorkflowActor(input: WorkflowInput): ActorRefFrom<typeof w
 
 // ===== UTILITY FUNCTIONS =====
 export async function runActor<T>(actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor | typeof workflowActor>): Promise<T> {
+    // TODO: ACE: Async function without await (check if async is needed)
   return new Promise((resolve, reject) => {
     const subscription = actor.subscribe({
       next: (snapshot) => {

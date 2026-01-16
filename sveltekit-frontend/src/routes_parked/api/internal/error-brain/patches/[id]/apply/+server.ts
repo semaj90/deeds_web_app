@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ params }) => {
  return json({ error: 'Invalid patch ID' }, { status: 400 });
  }
 
- // Fetch patch from database$1;$2 .select()
+ // Fetch patch from database.select()
  .from(errorBrainDiffs)
  .where(eq(errorBrainDiffs.id, patchId))
  .limit(1);
@@ -82,7 +82,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
  if (isNaN(patchId)) {
  return json({ error: 'Invalid patch ID' }, { status: 400 });
- }$1;$2 .select()
+ }.select()
  .from(errorBrainDiffs)
  .where(eq(errorBrainDiffs.id, patchId))
  .limit(1);

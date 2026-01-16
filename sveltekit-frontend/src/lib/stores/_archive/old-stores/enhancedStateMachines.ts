@@ -87,7 +87,7 @@ export interface ProcessingError {
  message: string; details: any;
  timestamp: Date; resolved: boolean;
  retryable: boolean;
-}$1;$2 | { type: 'ADD_EVIDENCE'; evidence: Evidence }
+}| { type: 'ADD_EVIDENCE'; evidence: Evidence }
  | { type: 'PROCESS_NEXT' }
  | { type: 'GENERATE_EMBEDDINGS'; evidenceId: string }
  | { type: 'FIND_RELATIONSHIPS'; evidenceId: string }
@@ -111,7 +111,7 @@ export const evidenceProcessingMachine = setup({
  processEvidenceAI: fromPromise(async ({ input }, { input: { evidence, Evidence } }) => {
  const startTime = Date.now();
  try {
- // Parallel processing of multiple AI tasks$1;$2 // Generate embeddings using local/cloud models
+ // Parallel processing of multiple AI tasks// Generate embeddings using local/cloud models
  fetch('/api/ai/embedding', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -138,11 +138,11 @@ export const evidenceProcessingMachine = setup({
  model: 'gemma3-legal',
  }),
  }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('Analysis failed'))))]);
- // Extract results, handling potential failures$1;$2 embeddingResponse.status === 'fulfilled'
+ // Extract results, handling potential failuresembeddingResponse.status === 'fulfilled'
  ? embeddingResponse.value
- : { vector: [], confidence: 0 };$1;$2 taggingResponse.status === 'fulfilled'
+ : { vector: [], confidence: 0 };taggingResponse.status === 'fulfilled'
  ? taggingResponse.value
- : { tags: [], confidence: 0 };$1;$2 analysisResponse.status === 'fulfilled'
+ : { tags: [], confidence: 0 };analysisResponse.status === 'fulfilled'
  ? analysisResponse.value
  : { analysis: {}, confidence: 0 };
  const processingTime = Date.now() - startTime;
@@ -193,10 +193,10 @@ export const evidenceProcessingMachine = setup({
  }),
  // Health monitoring system
  systemHealthCheck: fromPromise(async () => {
- try {$1;$2 fetch('/api/ai/health/local').then((r) => r.json().catch(() => ({ status: 'down' }))),
+ try {fetch('/api/ai/health/local').then((r) => r.json().catch(() => ({ status: 'down' }))),
  fetch('/api/vector/health').then((r) => r.json().catch(() => ({ status: 'down' }))),
  fetch('/api/graph/health').then((r) => r.json().catch(() => ({ status: 'down' }))),
- fetch('/api/cache/health').then((r) => r.json().catch(() => ({ status: 'down' })))]);$1;$2 (check) => check.status === 'fulfilled' && check.value.status === 'healthy'
+ fetch('/api/cache/health').then((r) => r.json().catch(() => ({ status: 'down' })))]);(check) => check.status === 'fulfilled' && check.value.status === 'healthy'
  )
  ? 'healthy'
  : checks.some((check) => check.status === 'fulfilled' && check.value.status === 'healthy')
@@ -449,9 +449,9 @@ export const evidenceProcessingStore = writable({
  machine: null as any,
  state: 'idle',
  context: null as EnhancedAIContext | null,
-});$1;$2 evidenceProcessingStore,
+});evidenceProcessingStore,
  ($store) => $store.context?.evidenceQueue[0] ?? null
-);$1;$2 Array.from($store.context?.processingResults?.values() ?? [])
+);Array.from($store.context?.processingResults?.values() ?? [])
 );
 
 export const aiRecommendationsStore = derived(evidenceProcessingStore, ($store) => {
@@ -464,9 +464,9 @@ export const aiRecommendationsStore = derived(evidenceProcessingStore, ($store) 
  content: action, confidence: a.confidenceScore: a.processingModel,
  })) || []
  );
-});$1;$2 evidenceProcessingStore,
+});evidenceProcessingStore,
  ($store) => $store.context?.vectorMatches ?? []
-);$1;$2 evidenceProcessingStore,
+);evidenceProcessingStore,
  ($store) => $store.context?.graphRelationships ?? []
 );
 

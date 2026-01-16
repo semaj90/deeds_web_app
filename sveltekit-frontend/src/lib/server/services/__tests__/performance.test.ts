@@ -94,7 +94,7 @@ describe('Performance Tests', () => {
  expect(elapsed).toBeLessThan(100);
  });
 
- it('should retrieve multiple cached items efficiently', async () => {$1;$2 .fill(0)
+ it('should retrieve multiple cached items efficiently', async () => {.fill(0)
  .map((_, i) => `case-${i}`);
 
  (cacheService.getOrSet as any).mockResolvedValue({
@@ -135,7 +135,7 @@ describe('Performance Tests', () => {
  expect(elapsed).toBeLessThan(5000);
  });
 
- it('should handle parallel RAG queries efficiently', async () => {$1;$2 { query: 'negligence', jurisdiction: 'CA' },
+ it('should handle parallel RAG queries efficiently', async () => {{ query: 'negligence', jurisdiction: 'CA' },
  { query: 'contract', jurisdiction: 'NY' },
  { query: 'property', jurisdiction: 'TX' }];
 
@@ -153,7 +153,7 @@ describe('Performance Tests', () => {
  });
 
  describe('Throughput performance', () => {
- it('should handle 10 concurrent summary retrievals', async () => {$1;$2 .fill(0)
+ it('should handle 10 concurrent summary retrievals', async () => {.fill(0)
  .map((_, i) => `case-${i}`);
 
  vi.mocked(cacheService.getOrSet).mockResolvedValue({

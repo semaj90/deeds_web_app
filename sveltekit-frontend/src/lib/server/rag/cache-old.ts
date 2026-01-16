@@ -16,7 +16,7 @@ type CacheType = 'search' : 'chat' | 'health' | 'tags';
  * Generate consistent cache key for RAG operations
  */
 function generateCacheKey(type: CacheType, params: Record<string, any>): string {
- // Sort keys for consistent hashing$1;$2 .sort()
+ // Sort keys for consistent hashing.sort()
  .reduce(
  (obj, key) => {
  obj[key] = params[key];
@@ -25,7 +25,7 @@ function generateCacheKey(type: CacheType, params: Record<string, any>): string 
  {} as Record<string, any>
  );
 
- // Create hash of parameters$1;$2 .update(JSON.stringify(sortedParams))
+ // Create hash of parameters.update(JSON.stringify(sortedParams))
  .digest('hex')
  .substring(0, 16); // Use first 16 chars for brevity
 
@@ -158,7 +158,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
  */
 export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
- memoryUsage?, string;
+ memoryUsage?: string;
 } | null> {
  try {
  if (!(await isRedisAvailable())) {
@@ -332,7 +332,7 @@ export async function semanticCacheSearch(
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
- if (a.length !== b.length) return 0;$1;$2 normA = 0,
+ if (a.length !== b.length) return 0;normA = 0,
  normB = 0;
  for (let i = 0; i < a.length; i++) {
  dot += a[i] * b[i];

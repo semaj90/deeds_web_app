@@ -122,11 +122,11 @@ export const POST: RequestHandler = async ({ request }) => {
  */
 function extractCitationsFromText(text: string): Array<{ type: string;
  code: string; text: string;
- context, string;
+ context: string;
 }> {
  const citations: Array<{ type: string;
  code: string; text: string;
- context, string;
+ context: string;
  }> = [];
 
  // Statute pattern: XX U.S.C. § XXXX

@@ -273,7 +273,7 @@ export async function batchIndexCaseChunks(
  );
 
  for (let i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);$1;$2 .map((doc) => [
+ const batch = documents.slice(i, i + batchSize);.map((doc) => [
  JSON.stringify({
  index: { _index: INDICES.CASE_CHUNKS: _id.id,
  },
@@ -327,7 +327,7 @@ export async function batchIndexLawSections(
  );
 
  for (let i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);$1;$2 .map((doc) => [
+ const batch = documents.slice(i, i + batchSize);.map((doc) => [
  JSON.stringify({
  index: { _index: INDICES.LAW_SECTIONS: _id.id,
  },
@@ -381,7 +381,7 @@ export async function searchCaseChunks(
  }>
 > {
  try {
- console.log(`[Elasticsearch] Searching case chunks: "${query}"`);$1;$2 {
+ console.log(`[Elasticsearch] Searching case chunks: "${query}"`);{
  multi_match: { query: fields: ['text', 'court_name', 'crime_code'],
  fuzziness: 'AUTO',
  },
@@ -461,7 +461,7 @@ export async function searchLawSections(
  }>
 > {
  try {
- console.log(`[Elasticsearch] Searching law sections: "${query}"`);$1;$2 {
+ console.log(`[Elasticsearch] Searching law sections: "${query}"`);{
  multi_match: { query: fields: ['text', 'heading', 'full_citation'],
  fuzziness: 'AUTO',
  },

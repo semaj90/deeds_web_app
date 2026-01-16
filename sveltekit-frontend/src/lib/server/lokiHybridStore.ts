@@ -11,7 +11,7 @@ import { query } from "$app/server";
 import client from "./db/client";
 
 // Define FuseOptionKey locally as it's not consistently exported or recognized
-type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string; weight?: number };$1;$2 text: string,
+type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string; weight?: number };text: string,
  options?: Record<string, unknown>
 ) => Promise<Array<{ summary_text?, string }>>;
 

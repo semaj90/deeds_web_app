@@ -38,8 +38,7 @@ export const ollamaService: OllamaClient = mockOllamaClient;
 // You might also have a function to summarize with Gemma specifically
 export async function summarizeWithGemma(params: { query: string,
  context: string,
-}): Promise<string> {$1;$2
-Query: ${params.query}
+}): Promise<string> {Query: ${params.query}
 Context: ${params.context}
 
 Summary:`;

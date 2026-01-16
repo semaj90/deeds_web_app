@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  }
 
  try {
- // Fetch all evidence for this case$1;$2 SELECT
+ // Fetch all evidence for this caseSELECT
  id, case_id, evidence_type, file_type, file_url, file_name,
  file_size, mime_type, hash, tags, ai_summary, ai_tags,
  uploaded_by, uploaded_at, created_by, created_at
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  ORDER BY created_at DESC
  `;
 
- // Fetch recent chat turns for this case$1;$2 SELECT
+ // Fetch recent chat turns for this caseSELECT
  id, case_id, user_id, message, answer, extracted_keywords,
  suggestions, created_at
  FROM chat_turns

@@ -237,7 +237,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 		return this.crtShader;
 	}
 
-	private addScanlineEffect(): void {$1;$2			(this.hybridStyle?.width?? 2) * 1.1,
+	private addScanlineEffect(): void {(this.hybridStyle?.width?? 2) * 1.1,
 			(this.hybridStyle?.height?? 1) * 1.1
 		);
 
@@ -960,7 +960,7 @@ void main() {
 			});
 
 			if (cam) return cam;
-		}$1;$2			? window.innerWidth / window.innerHeight : 1;
+		}? window.innerWidth / window.innerHeight : 1;
 		return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
 	}
 

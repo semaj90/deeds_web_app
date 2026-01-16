@@ -62,7 +62,7 @@ async function webgpuRerank(
  query: string, candidates: Candidate[] | Array<Record<string, unknown>>
 ): Promise<Candidate[]> {
  const qTokens = query.toLowerCase().split(/\s+/).filter(Boolean);
- const scored = (candidates as Candidate[]).map((c) => {$1;$2 (c?.metadata&& (c.metadata['text'] as string)) || (c['text'] as string) ?? '';
+ const scored = (candidates as Candidate[]).map((c) => {(c?.metadata&& (c.metadata['text'] as string)) || (c['text'] as string) ?? '';
  const text = (textFromMeta ?? '').toLowerCase();
  let overlap = 0;
  for (const t of qTokens) {

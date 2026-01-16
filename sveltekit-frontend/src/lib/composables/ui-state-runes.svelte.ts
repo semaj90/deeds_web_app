@@ -63,7 +63,7 @@ interface Toast {
 export function useToast() {
 	let toasts = $state<Toast[]>([]);
 
-	// Derive active toasts from current toasts array$1;$2		toasts.filter((t) => {
+	// Derive active toasts from current toasts arraytoasts.filter((t) => {
 			const now = Date.now();
 			const duration = t?.duration?? 5000;
 			return now - t.createdAt < duration;
@@ -102,7 +102,7 @@ export function useToast() {
 		toasts = [];
 	}
 
-	// Convenience methods$1;$2		addToast('success', title, message, duration);$1;$2		addToast('error', title, message, duration);$1;$2		addToast('warning', title, message, duration);$1;$2		addToast('info', title, message, duration);
+	// Convenience methodsaddToast('success', title, message, duration);addToast('error', title, message, duration);addToast('warning', title, message, duration);addToast('info', title, message, duration);
 
 	return {
 		get toasts() {
@@ -128,7 +128,7 @@ export function useForm<T extends Record<string, any>>(initialValues: T) {
 	let touched = $state<Partial<Record<keyof T, boolean>>>({});
 	let isSubmitting = $state<boolean>(false);
 
-	let isValid = $derived(Object.keys(errors).length === 0);$1;$2		Object.keys(values).some((key) => (values as any)[key] !== (initialValues as any)[key])
+	let isValid = $derived(Object.keys(errors).length === 0);Object.keys(values).some((key) => (values as any)[key] !== (initialValues as any)[key])
 	);
 
 	function setValue<K extends keyof T>(field: K, value: T[K]): void {

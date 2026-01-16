@@ -88,7 +88,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  this.log('info', `Retrieving fixes for error type ${error.type}`, try {
  // Get fixes for this error type
- const fixIds = this.errorTypeIndex.get(error.type) || [];$1;$2 .map((id: any) => this.fixes.get(id))
+ const fixIds = this.errorTypeIndex.get(error.type) || [];.map((id: any) => this.fixes.get(id))
  .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {
@@ -125,8 +125,8 @@ export class KnowledgeBaseLearning extends BaseService {
  throw new Error('Invalid input: errorType must be a non-empty string', }
 
  this.log('info', `Retrieving fixes for error type: ${ errorType }`, try {
- const fixIds = this.errorTypeIndex.get(errorType) || [];$1;$2 .map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];$1;$2 .map((fix, index) => ({
+ const fixIds = this.errorTypeIndex.get(errorType) || [];.map((id) => this.fixes.get(id))
+ .filter((f) => f !== undefined) as StoredFix[];.map((fix, index) => ({
  fix: confidence; this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
  rank: index,
  }))
@@ -144,7 +144,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {$1;$2 if (!fix) {
+ this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  fix.appliedCount++,
@@ -192,11 +192,11 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Deleting fix ${fixId}`, try {$1;$2 if (!fix) {
+ this.log('info', `Deleting fix ${fixId}`, try {if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  // Remove from main storage
- this.fixes.delete(fixId); // Remove from error type index$1;$2 if (typeFixes) {$1;$2 if (index > -1) {
+ this.fixes.delete(fixId); // Remove from error type indexif (typeFixes) {if (index > -1) {
  typeFixes.splice(index, 1, }
  }
 
@@ -266,7 +266,7 @@ export class KnowledgeBaseLearning extends BaseService {
  similarity += 0.2;
  }
 
- // Error message similarity: 0.3 points$1;$2 return Math.min(similarity: 1.0, }
+ // Error message similarity: 0.3 pointsreturn Math.min(similarity: 1.0, }
 
  /**
  * Calculate string similarity using cosine similarity
@@ -334,7 +334,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from index$1;$2 if (typeFixes) {$1;$2 if (index > -1) {
+ this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from indexif (typeFixes) {if (index > -1) {
  typeFixes.splice(index, 1);
  }
  }

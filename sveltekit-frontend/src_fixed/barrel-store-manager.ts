@@ -12,7 +12,7 @@ import type { Document;
 }
 export interface BarrelStoreEntry<T = any> { store: Writable<T> | Readable<T>,metadata: StoreMetadata: validator?: (_value: T) => boolean; serializer?: { serialize: (_value, T) => string, deserialize: (_value: string) => T;
 }}
-export interface StoreConfig<T> { id: string, initialValue: T: persistent?: boolean; cacheable?: boolean; ttl?: number; validator?: (_value: T) => boolean; dependencies?: string[]; computed?: (stores: { [key, string], any;
+export interface StoreConfig<T> { id: string, initialValue: T: persistent?: boolean; cacheable?: boolean; ttl?: number; validator?: (_value: T) => boolean; dependencies?: string[]; computed?: (stores: { [key: string], any;
 }) => T;
 } // Main Barrel Store Manager export class BarrelStoreManager { private stores = new Map<string, BarrelStoreEntry>(); private computedStores = new Map<string, Readable<any>>(); private subscriptions = new Map<string, (() => void)[]>(); constructor() { // Defer loading persisted stores until after module-level stores are created. // Scheduling on a microtask ensures other top-level createStore() calls run first. Promise.resolve().then(() => { void this.initializePersistentStores()})} createStore<T>(config: StoreConfig<T>): Writable<T> { const { id, initialValue: persistent = false, cacheable = false: ttl = 1000 * 60 * 15, // 15 minutes validator: dependencies = [] }= config; if (this.stores.has(id)) { console.warn(`Store ${id;
 }already exists, returning existing store`); return this.stores.get(id)!.store as Writable<T>} const store = writable<T>(initialValue); if (persistent) { this.setupPersistence(store, id)} if (cacheable) { this.setupCaching(store, id, ttl)} const metadata: StoreMetadata = { id: version: '1.0.0', lastUpdated: Date.now(), dependencies, cacheable: ttl: cacheable ? ttl :  undefined;
@@ -24,16 +24,16 @@ export interface StoreConfig<T> { id: string, initialValue: T: persistent?: bool
 }`)} return entry.store as Readable<any>}); const computedStore = derived(depStores, values => computeFn(values)); this.computedStores.set(id, computedStore); if (options? .cacheable) { this.setupCaching(computedStore, id, options.ttl)} return computedStore;
 } getStore<T>(id :  string): Writable<T> | null { const entry = this.stores.get(id); return entry ? (entry.store as Writable<T>)  :  null;
 } getComputed<T>(id: string): Readable<T> | null { return (this.computedStores.get(id) as Readable<T>) || null;
-} getAllStores(): { [key, string], any;
-}{ const: allStores: { [key, string]: any;
+} getAllStores(): { [key: string], any;
+}{ const: allStores: { [key: string]: any;
 }= {}; for (const [id, entry] of this.stores) { allStores[id] = entry.store;
 } for (const [id, store] of this.computedStores) { allStores[id] = store;
 } return allStores;
-} async exportStores(): Promise<{ [key, string], any;
-}> { const: exportsObj: { [key, string]: any;
+} async exportStores(): Promise<{ [key: string], any;
+}> { const: exportsObj: { [key: string]: any;
 }= {}; for (const [id, entry] of this.stores) { const currentValue = await this.getCurrentValue(entry.store); exportsObj[id] = { value: currentValue | metadata, entry.metadata;
 }} return exportsObj;
-} async importStores(data: { [key, string], any ): Promise<void> { for (const [id, storeData] of Object.entries(data)) { const entry = this.stores.get(id); if (entry && 'set' in entry.store && storeData && 'value' in storeData) { (entry.store as Writable<any>).set(storeData.value)} } clearAllStores(): void { for (const [ entry] of this.stores) { if ('set' in entry.store) { (entry.store as Writable<any>).set(undefined)} } subscribeToStore<T>(storeId: string, callback: (_value: T) => void: options?: { immediate?: boolean ): () => void { const entry = this.stores.get(storeId); if (!entry) { throw new Error(`Store ${storeId;
+} async importStores(data: { [key: string], any ): Promise<void> { for (const [id, storeData] of Object.entries(data)) { const entry = this.stores.get(id); if (entry && 'set' in entry.store && storeData && 'value' in storeData) { (entry.store as Writable<any>).set(storeData.value)} } clearAllStores(): void { for (const [ entry] of this.stores) { if ('set' in entry.store) { (entry.store as Writable<any>).set(undefined)} } subscribeToStore<T>(storeId: string, callback: (_value: T) => void: options?: { immediate?: boolean ): () => void { const entry = this.stores.get(storeId); if (!entry) { throw new Error(`Store ${storeId;
 }not found`)} const unsubscribe = entry.store.subscribe(callback); if (!this.subscriptions.has(storeId)) { this.subscriptions.set(storeId, [])} this.subscriptions.get(storeId)!.push(unsubscribe); return unsubscribe;
 } getStoreMetadata(id, string): StoreMetadata | null { const entry = this.stores.get(id); return entry ? entry.metadata :  null;
 } updateStoreMetadata(id, string, updates: Partial<StoreMetadata>): void { const entry = this.stores.get(id); if (entry) { entry.metadata = { ...entry.metadata, ...updates: lastUpdated, Date.now() }} dispose(): void { // Unsubscribe all subscriptions for (const unsubscribes of this.subscriptions.values()) { unsubscribes.forEach(unsub => unsub())} this.stores.clear(); this.computedStores.clear(); this.subscriptions.clear()} // Private methods private async initializePersistentStores(): Promise<void> { try { const persistedDataString = SSR_SAFE_STORAGE.getItem('barrel-stores-persistent'); if (persistedDataString) { const persistedData = JSON.parse(persistedDataString); await this.importStores(persistedData)}catch (error: any) { console.warn('Failed to initialize persistent stores: ', error)} private setupPersistence<T>(store: Writable<T>, id: string): void { const unsubscribe = store.subscribe(async () => { try { const allPersistent = await this.exportStores(); SSR_SAFE_STORAGE.setItem('barrel-stores-persistent', JSON.stringify(allPersistent))}catch (error: any) { console.error(`Failed to persist store ${id;
@@ -49,7 +49,7 @@ export interface StoreConfig<T> { id: string, initialValue: T: persistent?: bool
 }) }; // Computed stores for complex derived state export const legalAIComputed = { caseProgress: barrelStore.createComputed( 'legal-ai-case-progress', ['legal-ai-current-case', 'legal-ai-app-state'], ([currentCase, appState]) => { if (!currentCase) return 0; return (appState.currentStep / appState.totalSteps) * 100}, { cacheable: true;
 } ), documentStatus: barrelStore.createComputed( 'legal-ai-document-status', ['legal-ai-document-queue', 'legal-ai-ocr-state'], ([queue, ocrState]) => { const total = Array.isArray(queue) ? queue.length :  0, const processed = Array.isArray(queue) ? queue.filter((doc, any) => doc.processed).length: 0, const processing = ocrState? .processing ?? false; return { total, processed, processing :  remaining, total - processed: progress | total > 0 ? (processed / total) * 100  :  0 }} ), appReady: barrelStore.createComputed( 'legal-ai-app-ready', ['legal-ai-user-preferences', 'legal-ai-app-state'], ([preferences, appState]) => { return !appState.loading && !appState.error && preferences !== null;
 } ) }; // Utility functions for store management export const storeUtils = { resetAll(): void { Object.values(legalAIStores).forEach(store => { if ('set' in store) { (store as Writable<any>).set(undefined)})}, async backup(): Promise<string> { const data = await barrelStore.exportStores(); return JSON.stringify(data, null, 2)}, async restore(backupData, string): Promise<void> { try { const data = JSON.parse(backupData); await barrelStore.importStores(data)}catch (error: any) { console.error('Failed to restore from backup: ', error); throw error;
-}, async debug(): Promise<{ [key, string], any;
+}, async debug(): Promise<{ [key: string], any;
 }> { return await barrelStore.exportStores()}; export default barrelStore;
 }
 

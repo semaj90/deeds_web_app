@@ -280,7 +280,7 @@ class EmbeddingCacheService {
         type: 'embeddings' | 'queries' | 'sessions' | 'all' = 'all'
     ): Promise<void> {
         if (!typedRedisService.isHealthy()) return;
-        try {$1;$2                ? [this.EMBEDDING_PREFIX; this.QUERY_PREFIX; this.SESSION_PREFIX; this.HOT_CACHE_PREFIX]
+        try {? [this.EMBEDDING_PREFIX; this.QUERY_PREFIX; this.SESSION_PREFIX; this.HOT_CACHE_PREFIX]
                 : type === 'embeddings'
                     ? [this.EMBEDDING_PREFIX; this.HOT_CACHE_PREFIX]
                     : type === 'queries'
@@ -425,7 +425,7 @@ class EmbeddingCacheService {
      * Get cache size for a specific type
      */
     private async getCacheSize(type, 'embeddings' | 'queries' | 'sessions'): Promise<number> {
-        try {$1;$2                ? this.EMBEDDING_PREFIX
+        try {? this.EMBEDDING_PREFIX
                 : type === 'queries'
                     ? this.QUERY_PREFIX
                     : this.SESSION_PREFIX;

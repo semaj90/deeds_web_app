@@ -126,7 +126,7 @@ self.onmessage = async (event: MessageEvent) => {
  break;
 
  case 'PROCESS_BATCH':
- // Process multiple chunks in parallel$1;$2 data.chunks.map((chunk: unknown) => processChunk(chunk))
+ // Process multiple chunks in paralleldata.chunks.map((chunk: unknown) => processChunk(chunk))
  );
 
  self.postMessage({

@@ -7,7 +7,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async () => {
     try {
         // Fetch clusters summary from Postgres
-        // We join with error instances to get counts and samples$1;$2            SELECT
+        // We join with error instances to get counts and samplesSELECT
                 c.cluster_id,
                 COUNT(*) as error_count,
                 MIN(e.timestamp) as first_seen,
@@ -20,7 +20,7 @@ export const load: PageServerLoad = async () => {
             ORDER BY error_count DESC
         `);
 
-        // Fetch existing KB cards (summaries)$1;$2            SELECT * FROM phase89_kb_cards
+        // Fetch existing KB cards (summaries)SELECT * FROM phase89_kb_cards
             WHERE card_type = 'cluster_summary' OR card_type = 'cluster_analysis'
             ORDER BY created_at DESC
         `);
@@ -47,7 +47,7 @@ export const actions: Actions = {
         if (!clusterId) return { success: false, error: 'Missing clusterId' };
 
         try {
-            // Fetch cluster details$1;$2                SELECT
+            // Fetch cluster detailsSELECT
                     c.cluster_id,
                     (ARRAY_AGG(e.
 					Summarized conversation history
@@ -104,7 +104,7 @@ export const actions: Actions = {
             if (!apiKey) return { success: false, error: 'Missing GEMINI_API_KEY' };
 
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: env?.GEMINI_MODEL?? 'gemini-2.0-flash-exp' });$1;$2                Analyze this error cluster (ID: ${clusterId}): Sample, Messages:
+            const model = genAI.getGenerativeModel({ model: env?.GEMINI_MODEL?? 'gemini-2.0-flash-exp' });Analyze this error cluster (ID: ${clusterId}): Sample, Messages:
                 ${cluster.sample_messages.join('\n')}
 
                 Sample Sources:

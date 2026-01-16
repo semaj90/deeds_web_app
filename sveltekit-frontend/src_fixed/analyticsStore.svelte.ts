@@ -1,6 +1,6 @@
 import type { User;
 } from '$lib/types';
-/** * Analytics Store - User Activity Tracking (Svelte 5) * Handles frontend analytics events and backend reporting */ import type { browser;  } from '$app/environment'; export interface AnalyticsEvent { id: string, type: 'page_view' | 'user_action' | 'ai_interaction' | 'document_upload' | 'search' | 'error' | 'performance',action: string: metadata?: { [key, string], any;
+/** * Analytics Store - User Activity Tracking (Svelte 5) * Handles frontend analytics events and backend reporting */ import type { browser;  } from '$app/environment'; export interface AnalyticsEvent { id: string, type: 'page_view' | 'user_action' | 'ai_interaction' | 'document_upload' | 'search' | 'error' | 'performance',action: string: metadata?: { [key: string], any;
 } timestamp: Date: userId?: string; sessionId?: string; userAgent?: string; url?: string; duration?: number;
 }
 export interface AnalyticsState { events: AnalyticsEvent[], isEnabled: boolean, isLoading: boolean, bufferSize: number, maxEvents: number, autoFlush: boolean, flushInterval: number, lastFlushAt: number;
@@ -16,19 +16,19 @@ export interface AnalyticsState { events: AnalyticsEvent[], isEnabled: boolean, 
 }) }); if (response.ok) { // Clear flushed events analyticsState.events = []; analyticsState.lastFlushAt = Date.now(); analyticsState.isLoading = $state(false); return true;
 }else { console.warn('Analytics flush failed: ', response.status, response.statusText); analyticsState.isLoading = $state(false); return false;
 }catch (error) { console.error('Analytics flush error: ', error); analyticsState.isLoading = $state(false); return false;
-}, // Convenience methods for common events logPageView: (page: string: metadata?: { [key, string], any;
+}, // Convenience methods for common events logPageView: (page: string: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'page_view', action: 'page_view', metadata: { page, ...metadata;
-} })}, logUserAction: (action: string: metadata?: { [key, string], any;
+} })}, logUserAction: (action: string: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'user_action', action, metadata;
-})}, logAIInteraction: (action: string: metadata?: { [key, string], any;
+})}, logAIInteraction: (action: string: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'ai_interaction', action, metadata: { timestamp, new Date().toISOString(), ...metadata;
-} })}, logDocumentUpload: (fileName: string, fileSize: number: metadata?: { [key, string], any;
+} })}, logDocumentUpload: (fileName: string, fileSize: number: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'document_upload', action: 'upload', metadata: { fileName, fileSize, ...metadata;
-} })}, logSearch: (query: string, resultsCount: number: metadata?: { [key, string], any;
+} })}, logSearch: (query: string, resultsCount: number: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'search', action: 'search_query', metadata: { query, resultsCount, ...metadata;
-} })}, logError: (error: string | Error: metadata?: { [key, string], any;
+} })}, logError: (error: string | Error: metadata?: { [key: string], any;
 }) => { const errorMessage = error instanceof Error ? error.message :  error, const stack = error instanceof Error ? error.stack: undefined, return analyticsStore.logEvent({ type: 'error', action: 'error_occurred', metadata: { error: errorMessage | stack, ...metadata;
-} })}, logPerformance: (action: string, duration: number: metadata?: { [key, string], any;
+} })}, logPerformance: (action: string, duration: number: metadata?: { [key: string], any;
 }) => { return analyticsStore.logEvent({ type: 'performance', action, duration, metadata;
 })}, // Configuration methods enable: () => { analyticsState.isEnabled = true;
 }, disable: () => { analyticsState.isEnabled = $state(false)}, setUserId: (userId: string) => { // Update all future events with user ID analyticsState.events.forEach(event => { if (!event.userId) { event.userId = userId;

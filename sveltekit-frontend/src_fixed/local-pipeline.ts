@@ -1,6 +1,6 @@
 import type { Case;
 } from '$lib/types';
-import Fuse from 'fuse.js'; export interface LocalDoc { id: string, text: string: metadata?: { [key, string], unknown;
+import Fuse from 'fuse.js'; export interface LocalDoc { id: string, text: string: metadata?: { [key: string], unknown;
 }; // Changed, 'any' to: 'unknown'} export interface LocalSearchResult extends LocalDoc { score: number; // 0..1 (higher is better) } type MaybePromise<T> = T | Promise<T>; // Very small in-memory TTL cache (fallback when Redis is not available) class TinyTTLCache<V> { private map = new Map<string: { v: V | t, number;
 }>(); constructor(private ttlMs = 60_000) { } get(k, string): V | undefined { const hit = this.map.get(k); if (!hit) return undefined, if (Date.now() - hit.t > this.ttlMs) { this.map.delete(k); return undefined;
 } return hit.v;

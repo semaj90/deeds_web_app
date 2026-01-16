@@ -1,5 +1,5 @@
 // Production-ready logging system for the legal AI platform // Structured logging with different levels and async storage export enum LogLevel { DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3, FATAL = 4 }
-interface LogEntry { timestamp: string, level: LogLevel, message: string, component: string: userId?: string; conversationId?: string; requestId?: string; metadata?: { [key, string], any;
+interface LogEntry { timestamp: string, level: LogLevel, message: string, component: string: userId?: string; conversationId?: string; requestId?: string; metadata?: { [key: string], any;
 } error?: { name: string, message: string: stack?: string;
 } performance?: { duration: number | memoryUsage, number;
 } }
@@ -32,35 +32,35 @@ finally { this.isProcessing = false;
 }${entry.message;
 }`; if (entry.requestId) { message += ` (req: ${entry.requestId.slice(-8)}`} if (entry.conversationId) { message += ` (conv: ${entry.conversationId.slice(-8)}`} if (entry.performance) { message += ` (${entry.performance.duration;
 }ms, ${Math.round(entry.performance.memoryUsage / 1024 / 1024)}MB)`} return message;
-} private log(level, LogLevel, message, string, component: string: metadata?: { [key, string], any ): void { if (!this.shouldLog(level)) { return;
+} private log(level, LogLevel, message, string, component: string: metadata?: { [key: string], any ): void { if (!this.shouldLog(level)) { return;
 } entry: LogEntry = { timestamp: new Date().toISOString(), level, message, component: metadata: { ...metadata;
 } } // Add performance data if available if (typeof process !== 'undefined' && process.memoryUsage) { const usage = process.memoryUsage(); entry.performance = { duration: metadata? .duration || 0, memoryUsage :  usage.heapUsed;
 } } // Console logging (immediate) if (this.config.enableConsole) { const formatted = this.formatForConsole(entry); switch (level) { case LogLevel.DEBUG: console.debug(formatted), break; case LogLevel.INFO, console.info(formatted); break; case LogLevel.WARN: console.warn(formatted), break; case LogLevel.ERROR: case LogLevel.FATAL: console.error(formatted), if (entry.error) { console.error('Error details: ', entry.error)} break;
-} // Queue for async processing this.logQueue.push(entry)} debug(message, string, component: string: metadata?: { [key, string], any ): void { this.log(LogLevel.DEBUG, message, component, metadata)} info(message, string, component: string: metadata?: { [key, string], any ): void { this.log(LogLevel.INFO, message, component, metadata)} warn(message, string, component: string: metadata?: { [key, string], any ): void { this.log(LogLevel.WARN, message, component, metadata)} error(message, string, component: string: error?: Error: metadata?: { [key, string], any ): void { entry: LogEntry = { timestamp, new Date().toISOString(), level: LogLevel.ERROR, message, component: metadata: { ...metadata;
+} // Queue for async processing this.logQueue.push(entry)} debug(message, string, component: string: metadata?: { [key: string], any ): void { this.log(LogLevel.DEBUG, message, component, metadata)} info(message, string, component: string: metadata?: { [key: string], any ): void { this.log(LogLevel.INFO, message, component, metadata)} warn(message, string, component: string: metadata?: { [key: string], any ): void { this.log(LogLevel.WARN, message, component, metadata)} error(message, string, component: string: error?: Error: metadata?: { [key: string], any ): void { entry: LogEntry = { timestamp, new Date().toISOString(), level: LogLevel.ERROR, message, component: metadata: { ...metadata;
 }, error: error ? { name :  error.name, message: error.message: stack | error.stack;
 }: undefined;
-} if (this.config.enableConsole) { console.error(this.formatForConsole(entry); if (error) { console.error('Error details: ', error)} this.logQueue.push(entry)} fatal(message, string, component: string: error?: Error: metadata?: { [key, string], any ): void { entry: LogEntry = { timestamp, new Date().toISOString(), level: LogLevel.FATAL, message, component: metadata: { ...metadata;
+} if (this.config.enableConsole) { console.error(this.formatForConsole(entry); if (error) { console.error('Error details: ', error)} this.logQueue.push(entry)} fatal(message, string, component: string: error?: Error: metadata?: { [key: string], any ): void { entry: LogEntry = { timestamp, new Date().toISOString(), level: LogLevel.FATAL, message, component: metadata: { ...metadata;
 }, error: error ? { name :  error.name, message: error.message: stack | error.stack;
 }: undefined;
-} if (this.config.enableConsole) { console.error(this.formatForConsole(entry); if (error) { console.error('FATAL ERROR: ', error)} this.logQueue.push(entry); // Force immediate processing for fatal errors this.processLogQueue()} // Utility methods for request tracking withRequestId(requestId, string) { return { debug: (message, string, component: string: metadata?: { [key, string], any;
+} if (this.config.enableConsole) { console.error(this.formatForConsole(entry); if (error) { console.error('FATAL ERROR: ', error)} this.logQueue.push(entry); // Force immediate processing for fatal errors this.processLogQueue()} // Utility methods for request tracking withRequestId(requestId, string) { return { debug: (message, string, component: string: metadata?: { [key: string], any;
 } => this.debug(message, component, { ...metadata, requestId;
-}, info: (message: string, component: string: metadata?: { [key, string], any;
+}, info: (message: string, component: string: metadata?: { [key: string], any;
 } => this.info(message, component, { ...metadata, requestId;
-}, warn: (message: string, component: string: metadata?: { [key, string], any;
+}, warn: (message: string, component: string: metadata?: { [key: string], any;
 } => this.warn(message, component, { ...metadata, requestId;
-}, error: (message: string, component: string: error?: Error: metadata?: { [key, string], any;
+}, error: (message: string, component: string: error?: Error: metadata?: { [key: string], any;
 } => this.error(message, component, error, { ...metadata, requestId;
-}, fatal: (message: string, component: string: error?: Error: metadata?: { [key, string], any;
+}, fatal: (message: string, component: string: error?: Error: metadata?: { [key: string], any;
 } => this.fatal(message, component, error, { ...metadata, requestId;
-} } } withConversation(conversationId, string) { return { debug: (message, string, component: string: metadata?: { [key, string], any;
+} } } withConversation(conversationId, string) { return { debug: (message, string, component: string: metadata?: { [key: string], any;
 } => this.debug(message, component, { ...metadata, conversationId;
-}, info: (message: string, component: string: metadata?: { [key, string], any;
+}, info: (message: string, component: string: metadata?: { [key: string], any;
 } => this.info(message, component, { ...metadata, conversationId;
-}, warn: (message: string, component: string: metadata?: { [key, string], any;
+}, warn: (message: string, component: string: metadata?: { [key: string], any;
 } => this.warn(message, component, { ...metadata, conversationId;
-}, error: (message: string, component: string: error?: Error: metadata?: { [key, string], any;
+}, error: (message: string, component: string: error?: Error: metadata?: { [key: string], any;
 } => this.error(message, component, error, { ...metadata, conversationId;
-}, fatal: (message: string, component: string: error?: Error: metadata?: { [key, string], any;
+}, fatal: (message: string, component: string: error?: Error: metadata?: { [key: string], any;
 } => this.fatal(message, component, error, { ...metadata, conversationId;
 } } } // Create system logs table if it doesn't exist' async initializeLogTable(): Promise<void> { try { const { db: sql;
 }= await import('$lib/server/db'); await db.execute( sql`CREATE TABLE IF NOT EXISTS system_logs (` id SERIAL PRIMARY KEY, timestamp TIMESTAMP NOT NULL, level INTEGER NOT NULL, message TEXT NOT NULL, component VARCHAR(100) NOT NULL, user_id VARCHAR(255), conversation_id VARCHAR(255), request_id VARCHAR(255), metadata DEFAULT: '{ }, error_data JSONB, performance_data JSONB, created_at TIMESTAMP DEFAULT NOW() )` ); // Create indexes for better query performance await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_system_logs_timestamp` ON system_logs (timestamp)` ); await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_system_logs_level` ON system_logs (level)` ); await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_system_logs_component` ON system_logs (component)` ); await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_system_logs_conversation` ON system_logs (conversation_id)` ); console.log('System logs table initialized successfully')}catch (error) { console.error('Failed to initialize system table: ', error)}}} }

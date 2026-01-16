@@ -7,7 +7,7 @@ query: context?: string; semantic : { useEmbeddings: boolean, expandConcepts: bo
 }
 
 export interface RAGResult {
-relevanceScore?: number; [key, string], any
+relevanceScore?: number; [key: string], any
 }
 
 export interface RAGResponse {
@@ -15,7 +15,7 @@ results: RAGResult[]; // replaced Array<any>
 }
 
 export interface WebGPUCapabilities {
-available: maxBufferSize?, number; maxTextureSize?: number
+available: maxBufferSize?: number; maxTextureSize?: number
 }
 
 export interface SystemStatus {

@@ -35,7 +35,7 @@ export interface VectorJobContext {
  startTime?: number;
  endTime?: number;
  processingTimeMs?: number, attempts: number; maxAttempts: number, useWebGPU: boolean; webGPUAvailable: boolean;
-};$1;$2 | {
+};| {
  type: 'SUBMIT_JOB'; jobId: string, ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
@@ -117,7 +117,7 @@ const vectorJobServices = {
 
  return (await response.json()) as VectorJobResult;
  },
-};$1;$2 {
+};{
  id: 'vectorJob',
  initial: 'idle',
  context: { jobId: null, ownerType: null,

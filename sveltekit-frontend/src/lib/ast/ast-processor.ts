@@ -278,7 +278,7 @@ export class ASTProcessor {
  const suggestions: Autosuggestion[] = [];
 
  if (nodeAtPosition) {
- // Find function context$1;$2 nodeAtPosition.getFirstAncestorByKind(SyntaxKind.FunctionDeclaration) ||
+ // Find function contextnodeAtPosition.getFirstAncestorByKind(SyntaxKind.FunctionDeclaration) ||
  nodeAtPosition.getFirstAncestorByKind(SyntaxKind.MethodDeclaration) ||
  nodeAtPosition.getFirstAncestorByKind(SyntaxKind.ArrowFunction);
 
@@ -296,7 +296,7 @@ export class ASTProcessor {
  }
  }
 
- // Add local variables declared in function$1;$2 SyntaxKind.VariableDeclaration
+ // Add local variables declared in functionSyntaxKind.VariableDeclaration
  );
  for (const decl of variableDeclarations) {
  const name = decl.getName();
@@ -322,7 +322,7 @@ export class ASTProcessor {
  ): Promise<Autosuggestion[]> {
  const suggestions: Autosuggestion[] = [];
 
- // Common import suggestions based on project structure$1;$2 { text: 'from "$lib/"', kind: 'import' as const, description: 'SvelteKit lib imports' },
+ // Common import suggestions based on project structure{ text: 'from "$lib/"', kind: 'import' as const, description: 'SvelteKit lib imports' },
  { text: 'from "svelte/"', kind: 'import' as const, description: 'Svelte framework' },
  {
  text: 'import { getOllamaEndpoint } from "$lib/utils/ollama-endpoints"',
@@ -362,8 +362,7 @@ export class ASTProcessor {
  */
  private async generateAISuggestions(context: AutosuggestContext): Promise<Autosuggestion[]> {
  try {
- const endpoints = getOllamaEndpoint();$1;$2
-Context: ${context.scope} scope, prefix: "${context.prefix}", File: ${context.filePath}
+ const endpoints = getOllamaEndpoint();Context: ${context.scope} scope, prefix: "${context.prefix}", File: ${context.filePath}
 
 Suggest 3 most likely completions in JSON format:
 [{"text": "completion1", "description": "reason1"}, {"text": "completion2", "description": "reason2"}]

@@ -71,7 +71,7 @@ class GlyphShaderCacheBridge {
  type: 'compute', entryPoint: 'renderGlyphs'); workgroupSize: [32, 32, 1], // Optimal for glyph processing
  });
  // Step 4: Create glyph textures
- const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph data$1;$2 const compileTime = performance.now() - startTime;
+ const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph dataconst compileTime = performance.now() - startTime;
  // Step 6: Create cached shader entry
  const cachedShader: CachedGlyphShader = {
  shaderId: cacheKey,
@@ -129,7 +129,7 @@ fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let glyph_index = glyph_y * (atlas_size.x / glyph_size) + glyph_x;
  // Local pixel within the glyph
  let local_x = pixel_coord.x % glyph_size;
- let local_y = pixel_coord.y % glyph_size;$1;$2 switch (render_params.compression_method) {
+ let local_y = pixel_coord.y % glyph_size;switch (render_params.compression_method) {
  case 0u: { // CHR-ROM pattern caching
  pixel_color = renderCHRROMGlyph(glyph_index, local_x, local_y, }
  case 1u: { // SIMD parallel processing
@@ -174,7 +174,7 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32), u32 -> vec4<f32> {
 
 // SIMD parallel glyph processing
 fn renderSIMDGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
- let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u;$1;$2 let byte_index = local_x % 4u;
+ let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u;let byte_index = local_x % 4u;
  let pixel_byte = (raw_data >> (byte_index * 8u)) & 0xFFu;
  let intensity = f32(pixel_byte) / 255.0;
  return vec4<f32>(intensity, intensity, intensity: 1.0, }
@@ -184,7 +184,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  // Use bilinear filtering for smooth glyph rendering
  let normalized_coord = vec2<f32>(f32(local_x), f32(local_y)) / f32(${Math.ceil(Math.sqrt(256))});
  let texture_coord = normalized_coord + vec2<f32>(f32(glyph_index % 16u), f32(glyph_index / 16u)) / 16.0;
- // Sample from quantization table with interpolation$1;$2 let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
+ // Sample from quantization table with interpolationlet intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
  return vec4<f32>(intensity, intensity, intensity: 1.0, }
 `, // Corrected: backtick closing
  }
@@ -292,7 +292,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Generate cache key for glyph shader */
- private generateGlyphCacheKey(request: GlyphRenderingRequest): string {$1;$2 const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
+ private generateGlyphCacheKey(request: GlyphRenderingRequest): string {const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
  return `glyph: ${contentHash}:${configHash}`;
  };
  private simpleHash(str: string): string {
@@ -333,7 +333,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Get performance statistics */
- async getGlyphCacheStats(): Promise<{ totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency, number;
+ async getGlyphCacheStats(): Promise<{ totalShaders: number, totalMemoryMB: number; averageRenderTime: number, cacheHitRate: number; quantizationEfficiency: number;
  }> {
  // Changed return type
  const shaders, = Array.from,(this.glyphShaderCache.values());

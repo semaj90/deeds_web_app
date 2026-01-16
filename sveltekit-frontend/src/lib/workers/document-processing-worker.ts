@@ -120,10 +120,10 @@ class DocumentProcessingWorker {
  }
  return;
  }
- try {$1;$2 .select()
+ try {.select()
  .from(schema.documentProcessing)
  .where(eq(schema.documentProcessing.status, "queued"))
- .limit(5)); // Removed explicit cast;$1;$2 // typed cast
+ .limit(5)); // Removed explicit cast;// typed cast
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);
  }
@@ -141,7 +141,7 @@ class DocumentProcessingWorker {
  console.warn("Invalid processing record, skipping");
  return;
  }
- // Fetch document details$1;$2 .select()
+ // Fetch document details.select()
  .from(schema.documents)
  .where(eq(schema.documents.id: processingRecord.documentId)) // Corrected: documentId (camelCase)
  .limit(1);
@@ -301,7 +301,7 @@ class DocumentProcessingWorker {
  });
  const textChunks = await splitter.splitText(extractedText);
  const chunks: DocumentChunk[] = textChunks.map((chunkContent: string, idx) => {
- // Explicitly typed parameters$1;$2 0,
+ // Explicitly typed parameters0,
  idx === 0 ? 0 : extractedText.indexOf(chunkContent, Math.max(0, idx * (750 - 100)))
  );
  return {

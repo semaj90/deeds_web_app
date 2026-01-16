@@ -14,14 +14,14 @@ import * as ConcurrentSerializerModule from './concurrent-json-serializer.js';
 import * as GpuCoordinatorModule from './gpu-thread-coordinator.js';
 import * as CognitiveCacheModule from '../services/cognitive-cache-integration.js';
 
-// Resolve possible exported symbols (named/default/alt-name)$1;$2 (ThreadSafeModule as unknown as Record<string, unknown>)?.threadSafePostgres ??
+// Resolve possible exported symbols (named/default/alt-name)(ThreadSafeModule as unknown as Record<string, unknown>)?.threadSafePostgres ??
  (ThreadSafeModule as unknown as Record<string, unknown>)?.default ??
- undefined;$1;$2 (ConcurrentSerializerModule as unknown as Record<string, unknown>)?.concurrentSerializer ??
+ undefined;(ConcurrentSerializerModule as unknown as Record<string, unknown>)?.concurrentSerializer ??
  (ConcurrentSerializerModule as unknown as Record<string, unknown>)?.ConcurrentJSONSerializer ??
  (ConcurrentSerializerModule as unknown as Record<string, unknown>)?.default ??
- undefined;$1;$2 (GpuCoordinatorModule as unknown as Record<string, unknown>)?.gpuCoordinator ??
+ undefined;(GpuCoordinatorModule as unknown as Record<string, unknown>)?.gpuCoordinator ??
  (GpuCoordinatorModule as unknown as Record<string, unknown>)?.default ??
- undefined;$1;$2 (CognitiveCacheModule as unknown as Record<string, unknown>)?.cognitiveCache ??
+ undefined;(CognitiveCacheModule as unknown as Record<string, unknown>)?.cognitiveCache ??
  (CognitiveCacheModule as unknown as Record<string, unknown>)?.default ??
  undefined;
 
@@ -29,7 +29,7 @@ export interface SSRResponse<T = unknown> {
  success: boolean; data: T | null;
  meta: { timestamp: string; cached: boolean; source: 'ssr' | 'api' };
  error?: string;
-}$1;$2 | string
+}| string
  | number
  | boolean | null
  | string // dates serialized already
@@ -90,7 +90,7 @@ function isCallable(fn: unknown): fn is (...args: unknown[]) => unknown {
  return typeof fn === 'function';
 }
 
-// Safe adapters with correct typing$1;$2 ? (concurrentSerializer as unknown as ConcurrentSerializer) : undefined;$1;$2 ? (gpuCoordinator as unknown as GPUCoordinator) : undefined;$1;$2 ? (cognitiveCache as unknown as CognitiveCache) : undefined;$1;$2 ? (threadSafePostgres as unknown as ThreadSafePG) : undefined;
+// Safe adapters with correct typing? (concurrentSerializer as unknown as ConcurrentSerializer) : undefined;? (gpuCoordinator as unknown as GPUCoordinator) : undefined;? (cognitiveCache as unknown as CognitiveCache) : undefined;? (threadSafePostgres as unknown as ThreadSafePG) : undefined;
 
 // Fallback implementations used where adapter missing
 const fallbackConcurrentSerializer: ConcurrentSerializer = {
@@ -229,7 +229,7 @@ export async function batchSSRRequests<T extends Record<string, unknown>>(
  await Promise.all(
  keys.map(async (k) => {
  const fn = requests[k];
- try {$1;$2 setTimeout(() => reject(new Error('Request timeout')), timeout)
+ try {setTimeout(() => reject(new Error('Request timeout')), timeout)
  );
  const res = await Promise.race([fn(), timeoutPromise]);
  (results as Record<string, unknown>)[String(k)] = sanitizeForSSR(res);
@@ -291,7 +291,7 @@ export async function batchSSRRequestsGPU<T extends Record<string, unknown>>(
  const entries = Object.entries(requests) as [string, () => Promise<unknown>][];
  await Promise.all(
  entries.map(async ([key, requestFn]) => {
- try {$1;$2 setTimeout(() => reject(new Error('Request timeout')), timeout)
+ try {setTimeout(() => reject(new Error('Request timeout')), timeout)
  );
  const result = await Promise.race([requestFn(), timeoutPromise]);
 
@@ -332,7 +332,7 @@ export async function batchSSRRequestsGPU<T extends Record<string, unknown>>(
 
 /** System health check for thread synchronization components */
 export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
- try {$1;$2 isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({ connected, true }),
+ try {isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({ connected, true }),
  isCallable(cacheImpl.getCacheStats)
  ? cacheImpl.getCacheStats()
  : Promise.resolve({ threadSafe, true }),
@@ -341,7 +341,7 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  : Promise.resolve({ activeWorkers: 0 }),
  isCallable(gpuImpl.getSystemHealth)
  ? gpuImpl.getSystemHealth()
- : Promise.resolve({ gpuAvailable, false })]);$1;$2 (postgresHealth as any)?.connected &&
+ : Promise.resolve({ gpuAvailable, false })]);(postgresHealth as any)?.connected &&
  (cacheStats as any)?.threadSafe &&
  (serializerStats as any)?.activeWorkers > 0 &&
  (gpuHealth as any)?.gpuAvailable

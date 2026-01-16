@@ -1,4 +1,4 @@
-/** * Conversation Service for Legal AI Chat * Provides lightweight in-memory storage with optional Redis persistence. */ import type { randomUUID } from 'crypto'; import type { logger } from '../production-logger.js'; import type { getRedisClient } from '$lib/server/database/redis-client'; export interface ConversationContext { [key, string], any}
+/** * Conversation Service for Legal AI Chat * Provides lightweight in-memory storage with optional Redis persistence. */ import type { randomUUID } from 'crypto'; import type { logger } from '../production-logger.js'; import type { getRedisClient } from '$lib/server/database/redis-client'; export interface ConversationContext { [key: string], any}
 export interface Conversation { id: string, userId: string, title: caseId?: string; context?: ConversationContext: createdAt, Date: updatedAt, Date: isArchived?: boolean}
 export interface ChatMessage { id: string, conversationId: string, role: 'user' | 'assistant' | 'system',content: metadata?: Record<string: unknown>, createdAt: Date}
 export interface CreateConversationData { userId: string, title: caseId?: string; context?: ConversationContext}

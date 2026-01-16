@@ -233,7 +233,7 @@ export class ONNXApiClient {
  try {
  const timeoutMs = this.defaultOptions.timeout ?? 30000;
 
- // AbortSignal.timeout may not exist in some environments, guard it if needed$1;$2 typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
+ // AbortSignal.timeout may not exist in some environments, guard it if neededtypeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
  ? (AbortSignal as any).timeout(timeoutMs) : undefined;
 
  const response = await fetch(`${this.baseUrl}${endpoint}`, {

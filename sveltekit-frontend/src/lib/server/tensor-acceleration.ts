@@ -88,7 +88,7 @@ export class TensorAccelerator {
     private async createComputePipelines(): Promise<void> {
         if (!this.device) return;
 
-        // Similarity computation pipeline$1;$2            @group(0) @binding(0) var<storage, read> vectorA: array<f32>;
+        // Similarity computation pipeline@group(0) @binding(0) var<storage, read> vectorA: array<f32>;
             @group(0) @binding(1) var<storage, read> vectorB: array<f32>;
             @group(0) @binding(2) var<storage, read_write> result: array<f32>;
             @group(0) @binding(3) var<uniform> params: vec4<u32>; // [length, tile_size, 0, 0]
@@ -115,7 +115,7 @@ export class TensorAccelerator {
             }
         `;
 
-        // Transform pipeline for embedding processing$1;$2            @group(0) @binding(0) var<storage, read> input: array<f32>;
+        // Transform pipeline for embedding processing@group(0) @binding(0) var<storage, read> input: array<f32>;
             @group(0) @binding(1) var<storage, read_write> output: array<f32>;
             @group(0) @binding(2) var<uniform> params: vec4<u32>; // [length, transform_type, scale, offset]
 
@@ -147,7 +147,7 @@ export class TensorAccelerator {
             }
         `;
 
-        // Image analysis pipeline for visual document processing$1;$2            @group(0) @binding(0) var<storage, read> image_data: array<u32>;
+        // Image analysis pipeline for visual document processing@group(0) @binding(0) var<storage, read> image_data: array<u32>;
             @group(0) @binding(1) var<storage, read_write> features: array<f32>;
             @group(0) @binding(2) var<uniform> params: vec4<u32>; // [width, height, channels, tile_size]
 

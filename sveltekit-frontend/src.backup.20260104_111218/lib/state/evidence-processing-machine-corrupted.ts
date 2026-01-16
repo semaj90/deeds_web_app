@@ -310,7 +310,7 @@ export const evidenceProcessingMachine = createMachine({
  evidence_id: parseInt(context.evidenceId),
  prompt: context.analysisResults?.summary || 'Legal evidence visualization',
  style: 'legal' as const,
- dimensions: [512, 512] as [number, number],
+ dimensions: [512, 512] as [number: number],
  neural_sprite_config: event.config,
  },
  neuralSpriteEnabled: !!event.config?.enable_compression,

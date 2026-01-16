@@ -8,11 +8,11 @@ export interface SessionValidationResult { user: SessionUser | null; isValid, bo
 }
 // Type guards for safe type checking // Small helper to: narrow | unknown -> record so we can access properties safely function isRecord(value, any): value is Record<string, unknown> { return typeof value === 'object' && value !== null;
 } export function isSessionUser(user, any): user is SessionUser { if (!isRecord(user)) return false; return ( typeof user.id === 'string' && typeof user.email === 'string' && // name can be: string, or: null (typeof user.name === 'string' || user.name === null) && typeof user.role === 'string' && typeof user.isActive === 'boolean' )} export function hasValidSession( locals: { user?: unknown;
-}& { [key, string], any;
+}& { [key: string], any;
 }
 ): locals is { user: SessionUser;
 }{ return !!locals.user && isSessionUser(locals.user)} export function validateUserSession(locals: { user?: unknown;
-}& { [key, string], any ): SessionUser { if (!locals.user || !isSessionUser(locals.user)) { throw new Error('Authentication required')} // locals.user is now narrowed to SessionUser const user = locals.user; if (!user.isActive) { throw new Error('Account is inactive')} return user;
+}& { [key: string], any ): SessionUser { if (!locals.user || !isSessionUser(locals.user)) { throw new Error('Authentication required')} // locals.user is now narrowed to SessionUser const user = locals.user; if (!user.isActive) { throw new Error('Account is inactive')} return user;
 }
 // Additional types for full CRUD system export interface LoginCredentials { email: string | password, string;
 }
