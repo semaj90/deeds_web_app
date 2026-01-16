@@ -40,7 +40,7 @@ export const pois = pgTable('persons_of_interest', {
   
 export const enablePgVector = sql`CREATE EXTENSION IF NOT EXISTS vector;`;
 
-// Create vector index for face recognition (if using pgvector)$1;$2 CREATE INDEX IF NOT EXISTS idx_poi_face_embeddings
+// Create vector index for face recognition (if using pgvector)CREATE INDEX IF NOT EXISTS idx_poi_face_embeddings
  ON persons_of_interest
  USING ivfflat ((photos->'ai'->'faceEmbedding')::vector(512))
  WITH (lists = 100);

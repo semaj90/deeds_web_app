@@ -823,7 +823,7 @@ export async function searchSimilarDocuments(
 		}
 	}
 
-	try {$1;$2			SELECT
+	try {SELECT
 				content_text,
 				1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) as similarity,
 				metadata

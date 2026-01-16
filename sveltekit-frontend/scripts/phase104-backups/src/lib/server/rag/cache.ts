@@ -61,7 +61,7 @@ export const setCached = cacheSetJSON;
  */
 export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
- memoryUsage?, string;
+ memoryUsage?: string;
 }> {
  try {
  await ensureRedis();
@@ -101,7 +101,7 @@ export async function getCacheStats(): Promise<{ available: boolean;
 export function extractKeywords(text: string): string[] {
  if (!text || typeof text !== 'string') return [];
 
- // Extract meaningful words (3+ chars, alphanumeric)$1;$2 .toLowerCase()
+ // Extract meaningful words (3+ chars, alphanumeric).toLowerCase()
  .replace(/[^\w\s]/g, ' ')
  .split(/\s+/)
  .filter((w) => w.length >= 3)

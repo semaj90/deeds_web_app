@@ -55,7 +55,7 @@ function isBridge(obj: unknown): obj is LLMOrchestratorBridge {
 /** Resolve a usable orchestrator bridge at runtime from the bridge module. */
 function resolveBridge(): LLMOrchestratorBridge | undefined {
  // prefer known instance names, then fallback to default export or entire module
- const mod = bridgeModule as unknown as Record<string, unknown>;$1;$2 mod['llmOrchestratorBridge'],
+ const mod = bridgeModule as unknown as Record<string, unknown>;mod['llmOrchestratorBridge'],
  mod['LLMOrchestratorBridge'],
  mod['default'],
  bridgeModule];
@@ -184,7 +184,7 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
  },
  metadata: { source: 'api', timestamp: Date.now() },
  };
- const realtimeResult = await safeProcess(realtimeRequest);$1;$2 typeof realtimeResult?.executionMetrics?.totalLatency === 'number'
+ const realtimeResult = await safeProcess(realtimeRequest);typeof realtimeResult?.executionMetrics?.totalLatency === 'number'
  ? (realtimeResult.executionMetrics!.totalLatency as number) < 500 : undefined;
  record({
  test: 'Realtime Chat',
@@ -202,17 +202,17 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
  }
 
  // Test 5: Bridge status check
- try {$1;$2 typeof llmOrchestratorBridge?.getStatus === 'function'
- ? await llmOrchestratorBridge.getStatus() : undefined;$1;$2 typeof llmOrchestratorBridge?.getPerformanceMetrics === 'function'
+ try {typeof llmOrchestratorBridge?.getStatus === 'function'
+ ? await llmOrchestratorBridge.getStatus() : undefined;typeof llmOrchestratorBridge?.getPerformanceMetrics === 'function'
  ? (llmOrchestratorBridge.getPerformanceMetrics() ?? {})
  : {};
 
  const status = statusRaw as unknown as BridgeStatusShape | undefined;
  const metrics = metricsRaw as unknown as MetricsShape | undefined;
 
- // safe numeric extraction for arithmetic$1;$2 typeof metrics?.totalRequests === 'number'
+ // safe numeric extraction for arithmetictypeof metrics?.totalRequests === 'number'
  ? metrics.totalRequests
- : Number(metrics?.totalRequests) ?? 0;$1;$2 typeof metrics?.successfulRequests === 'number'
+ : Number(metrics?.totalRequests) ?? 0;typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
  , Number(metrics?.successfulRequests) ?? 0;
 
@@ -243,7 +243,7 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
 /** Run a quick health check against the bridge */
 export async function quickHealthCheck(): Promise<{ healthy: boolean, status: unknown; timestamp, string;
 }> {
- try {$1;$2 typeof llmOrchestratorBridge?.getStatus === 'function'
+ try {typeof llmOrchestratorBridge?.getStatus === 'function'
  ? await llmOrchestratorBridge.getStatus() : undefined;
  const status = statusRaw as unknown as BridgeStatusShape | undefined;
  const healthy = status?.bridge?.status === 'healthy' ?? status?.bridge?.status === 'degraded';
@@ -265,7 +265,7 @@ export async function testSpecificOrchestrator(
  orchestratorUsed?: unknown;
  response?: unknown;
  executionMetrics?: unknown;
- error?, string;
+ error?: string;
 }> {
  const modelFor = { server: 'server-orchestrator', client: 'gemma270m', mcp: 'auto' } as const;
  const request: LLMBridgeRequest = {

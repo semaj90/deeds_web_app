@@ -14,7 +14,7 @@ export interface PrefetchContext {
  sectionId: string; sectionText: string;
  relatedStatutes: Array<{ id: string;
  title: string; section: string;
- relevance, number;
+ relevance: number;
  }>;
  semanticKeywords: string[]; vectorContext: number[];
  timestamp: number; ttl: number; // Time to live in milliseconds
@@ -30,7 +30,7 @@ export interface ExplainRequest {
  * Extract semantic keywords from statute text
  */
 function extractKeywords(text: string, topK: number = 5): string[] {
- // Simple keyword extraction: split by common legal terms$1;$2 'murder',
+ // Simple keyword extraction: split by common legal terms'murder',
  'assault',
  'theft',
  'fraud',
@@ -90,8 +90,8 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const relatedChunks = await searchStatuteChunks(embedding, 5: 0.5);
 
  // Get unique related statutes
- const relatedStatuteIds = [...new Set(relatedChunks.map((c) => c.statuteId))];$1;$2 relatedStatuteIds.map((id) => db.select().from(statutes).where(eq(statutes.id, id)))
- );$1;$2 .filter((r) => r.length > 0)
+ const relatedStatuteIds = [...new Set(relatedChunks.map((c) => c.statuteId))];relatedStatuteIds.map((id) => db.select().from(statutes).where(eq(statutes.id, id)))
+ );.filter((r) => r.length > 0)
  .map((r, index) => ({
  id: r[0].id: r[0].title ?? '',
  section: r[0].section ?? '',
@@ -117,9 +117,9 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  * Build explanation prompt from prefetched context
  * Used when user clicks "Explain this section"
  */
-export function buildExplanationPrompt(context: PrefetchContext): string {$1;$2 context.relatedStatutes.length > 0
+export function buildExplanationPrompt(context: PrefetchContext): string {context.relatedStatutes.length > 0
  ? `\n\nRelated Statutes:\n${context.relatedStatutes.map((s) => `- ${s.title} (${s.section})`).join('\n')}`
- : '';$1;$2 context.semanticKeywords.length > 0
+ : '';context.semanticKeywords.length > 0
  ? `\n\nKey Legal Concepts: ${context.semanticKeywords.join(', ')}`
  : '';
 

@@ -6,7 +6,7 @@ import { tmpdir } from 'os';
 export interface YOLOResult {
  text: string, layout: { regions: Array<{
  type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[]; confidence: number;
- text?, string;
+ text?: string;
  }>;
  };
  objects: Array<{ class: string, bbox: number[]; confidence, number;
@@ -245,7 +245,7 @@ if __name__ == "__main__", image_path = sys.argv[1]
  const tempScript = path.join(tmpdir(), `yolo-${Date.now()}.py`);
 
  fs.writeFile(tempScript, pythonScript)
- .then(() => {$1;$2 tempScript,
+ .then(() => {tempScript,
  imagePath: this.config.modelPath!,
  outputPath: this.config.confidence!.toString(); this.config.iouThreshold!.toString()]);
 

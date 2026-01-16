@@ -8,7 +8,7 @@ export interface SearchEvidenceResult {
  results: Array<{ id: string;
  title: string; classification: string;
  status: string; relevance: number;
- snippet, string;
+ snippet: string;
  }>;
 }
 
@@ -23,7 +23,7 @@ export interface FindCitationsResult {
  evidenceId: string; citations: Array<{
  type: 'statute' | 'case' | 'regulation';
  reference: string; title: string;
- year?, number;
+ year?: number;
  }>;
 }
 
@@ -50,7 +50,7 @@ export async function searchEvidence(
  query: string,
  caseId?: string
 ): Promise<SearchEvidenceResult> {
- // Mock implementation - in production, would query Elasticsearch + pgvector$1;$2 {
+ // Mock implementation - in production, would query Elasticsearch + pgvector{
  id: 'ev-001',
  title: 'Witness Statement - John Doe',
  classification: 'confidential',
@@ -217,7 +217,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
 export async function analyzeRelationships(
  evidenceIds: string[]
 ): Promise<AnalyzeRelationshipsResult> {
- // Mock implementation - in production, would use Gemma + embeddings$1;$2 {
+ // Mock implementation - in production, would use Gemma + embeddings{
  source: 'ev-001',
  target: 'ev-002',
  type: 'supports' as const,

@@ -22,7 +22,7 @@ export interface CrewAIContext {
   autoSaveInterval: number; lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
   retryCount: number; lastError: string | null;
   startTime: number; processingTime: number; qualityScore: number;
-}$1;$2  | { type: 'START_REVIEW'; task: DocumentReviewTask }
+}| { type: 'START_REVIEW'; task: DocumentReviewTask }
   | { type: 'AGENT_COMPLETED'; agentId: string; response: AgentResponse }
   | { type: 'AGENT_FAILED'; agentId: string; error: string }
   | { type: 'USER_ACTIVITY'; activity: string }

@@ -19,7 +19,7 @@ export interface ChatCompletionResponse {
 	choices: Array<{
 		index?: number;
 		message?: { role?: string; content?: string };
-		finish_reason?, string;
+		finish_reason?: string;
 	}>;
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
@@ -153,7 +153,7 @@ export class Gemma3Client {
 	}
 
 	// Helpers tailored for legal workflows
-	async askLegalQuestion(question: string, context?: string): Promise<string> {$1;$2			{
+	async askLegalQuestion(question: string, context?: string): Promise<string> {{
 				role: 'system',
 				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${context ? `\n\nAdditional context: ${ context }` : ''}`,
 			},
@@ -162,7 +162,7 @@ export class Gemma3Client {
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async analyzeDocument(documentText, string, analysisType = 'general'): Promise<string> {$1;$2			{
+	async analyzeDocument(documentText, string, analysisType = 'general'): Promise<string> {{
 				role: 'system',
 				content: `You are a Legal AI Assistant for document analysis. Focus on ${ analysisType } analysis.`,
 			},
@@ -171,7 +171,7 @@ export class Gemma3Client {
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async reviewContract(contractText: string, reviewFocus?: string): Promise<string> {$1;$2			{
+	async reviewContract(contractText: string, reviewFocus?: string): Promise<string> {{
 				role: 'system',
 				content: `You are a Legal AI Assistant for contract review.${reviewFocus ? ` Focus particularly on: ${ reviewFocus }` : ''}`,
 			},
@@ -180,7 +180,7 @@ export class Gemma3Client {
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async createDocumentTemplate(documentType: string, requirements: string): Promise<string> {$1;$2			{ role: 'system', content: 'You are a Legal AI Assistant for document generation.' },
+	async createDocumentTemplate(documentType: string, requirements: string): Promise<string> {{ role: 'system', content: 'You are a Legal AI Assistant for document generation.' },
 			{
 				role: 'user',
 				content: `Generate a ${documentType} template with these requirements:\n\n${requirements}`,
@@ -189,7 +189,7 @@ export class Gemma3Client {
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async summarizeContent(content, string, type = 'general'): Promise<string> {$1;$2			{
+	async summarizeContent(content, string, type = 'general'): Promise<string> {{
 				role: 'system',
 				content: `You are a Legal AI Assistant for summarization. Provide concise summaries focusing on ${type}.`,
 			},
@@ -204,7 +204,7 @@ export const gemma3Client = new Gemma3Client();
 
 // Detect available server(s)
 export async function detectAvailableServer(): Promise<{ url: string; backend?, string } | null> {
-	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';$1;$2		{ url: getOllamaEndpoint(name, 'Ollama' },
+	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';{ url: getOllamaEndpoint(name, 'Ollama' },
 		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }],
 	for (const s of servers) {
 		const client = new Gemma3Client(s.url);

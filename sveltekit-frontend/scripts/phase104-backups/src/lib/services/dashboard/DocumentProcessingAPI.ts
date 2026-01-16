@@ -114,7 +114,7 @@ export class DocumentProcessingAPI {
  async getStatus(documentId: string): Promise<{ documentId: string;
  status: string; progress: number;
  currentPage: number; totalPages: number;
- stage, string;
+ stage: string;
  }> {
  try {
  const response = await fetch(`${this.baseUrl}/api/document-processing/status/${documentId}`, {
@@ -141,10 +141,10 @@ export class DocumentProcessingAPI {
  Array<{
  timestamp: string; stage: string;
  status: string; page: number;
- percent, number;
+ percent: number;
  }>
  > {
- try {$1;$2 `${this.baseUrl}/api/document-processing/history/${documentId}`,
+ try {`${this.baseUrl}/api/document-processing/history/${documentId}`,
  {
  headers: {
  ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
@@ -171,7 +171,7 @@ export class DocumentProcessingAPI {
  metadata?: Record<string, string>
  ): Promise<{ documentId: string;
  fileName: string; fileSize: number;
- uploadedAt, string;
+ uploadedAt: string;
  }> {
  try {
  const formData = new FormData();
@@ -207,12 +207,12 @@ export class DocumentProcessingAPI {
  status: 'processing' | 'completed' | 'failed';
  results: { text: string;
  tables: Array<{ rows: string[][];
- confidence, number;
+ confidence: number;
  }>;
  metadata: Record<string, unknown>;
  };
  }> {
- try {$1;$2 `${this.baseUrl}/api/document-processing/results/${documentId}`,
+ try {`${this.baseUrl}/api/document-processing/results/${documentId}`,
  {
  headers: {
  ...(this?.token&& { Authorization: `Bearer ${this.token}` }),

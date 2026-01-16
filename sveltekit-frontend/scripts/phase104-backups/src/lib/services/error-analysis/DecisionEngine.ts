@@ -181,7 +181,7 @@ export class DecisionEngine {
 		}
 
 		// Record experience;
- const recorder = getExperienceRecorder();$1;$2			error,
+ const recorder = getExperienceRecorder();error,
 			strategy,
 			outcome,
 			context,
@@ -228,7 +228,7 @@ export class DecisionEngine {
 		}
 
 		// Record experience;
- const recorder = getExperienceRecorder();$1;$2			error,
+ const recorder = getExperienceRecorder();error,
 			strategy,
 			outcome,
 			context,
@@ -260,7 +260,7 @@ export class DecisionEngine {
  const toolResults = await toolInvoker.runDiagnostics(error.file);
 		toolsInvoked.push(...toolResults.map((r: any) => r.tool));
 
-		// Update confidence based on tool results;$1;$2			strategy.confidence,
+		// Update confidence based on tool results;strategy.confidence,
 			toolResults
 		);
 
@@ -282,7 +282,7 @@ export class DecisionEngine {
 			} else {
 				this.stats.failedFixes++;
 			};
- const recorder = getExperienceRecorder();$1;$2				error,
+ const recorder = getExperienceRecorder();error,
 				updatedStrategy,
 				outcome,
 				context,
@@ -317,7 +317,7 @@ export class DecisionEngine {
 		this.stats.escalated++;
 
 		// Record as failed attempt requiring human intervention;
- const recorder = getExperienceRecorder();$1;$2			error,
+ const recorder = getExperienceRecorder();error,
 			strategy,
 			'failure',
 			context,
@@ -369,7 +369,7 @@ export class DecisionEngine {
 	 */
 	updateThresholds(thresholds: Partial<{ high: number,
 		medium: number, low: number;
-		critical, number;
+		critical: number;
 	}>): void {
 		if (thresholds.high !== undefined) {
 			this.config.highConfidenceThreshold = thresholds.high;

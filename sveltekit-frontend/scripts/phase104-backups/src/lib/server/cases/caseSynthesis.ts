@@ -45,13 +45,13 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  throw new Error(`Case not found: ${ caseId }`);
  }
 
- // Fetch most recent 25 notes (pinned first, then by update date)$1;$2 .select()
+ // Fetch most recent 25 notes (pinned first, then by update date).select()
  .from(caseNotes)
  .where(eq(caseNotes.case_id, caseId))
  .orderBy(desc(caseNotes.is_pinned), desc(caseNotes.updated_at))
  .limit(25);
 
- // Fetch most recent 25 evidence items$1;$2 .select()
+ // Fetch most recent 25 evidence items.select()
  .from(evidenceFiles)
  .where(eq(evidenceFiles.case_id, caseId))
  .orderBy(desc(evidenceFiles.created_at))

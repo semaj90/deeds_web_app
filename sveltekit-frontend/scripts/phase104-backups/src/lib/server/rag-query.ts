@@ -83,7 +83,7 @@ export async function getContextFromRag(opts: { query: string,
                 match: { any, tags },
             });
             console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
-        }$1;$2            filterConditions.length > 0
+        }filterConditions.length > 0
                 ? {
                       must: filterConditions,
                   }
@@ -114,7 +114,7 @@ export async function getContextFromRag(opts: { query: string,
             let score = result?.score?? 0;
 
             // Check if this result matches any of the requested tags
-            const resultTags = payload?.tags|| [];$1;$2                $1?.$2 > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
+            const resultTags = payload?.tags|| [];$1?.$2 > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
 
             // Apply 1.5x weight boost if tags match (Requirement 3.3)
             if (matchedTags.length > 0) {
@@ -148,7 +148,7 @@ export async function getContextFromRag(opts: { query: string,
         // Sort citations by score (descending) after applying tag boost
         citations.sort((a, b) => b.score - a.score);
 
-        // 5. Combine context chunks$1;$2            contextChunks.length > 0
+        // 5. Combine context chunkscontextChunks.length > 0
                 ? contextChunks.join('\n\n---\n\n')
                 : 'No relevant evidence found in the knowledge base.';
 

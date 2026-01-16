@@ -1,5 +1,5 @@
 // Search System Type Definitions
-// Enhanced search with Fuse.js integration$1;$2 | 'component'
+// Enhanced search with Fuse.js integration| 'component'
  | 'service'
  | 'documentation'
  | 'api'
@@ -16,7 +16,7 @@ export interface SearchResult {
 }
 
 export interface SearchMatch {
- indices: [number, number][];
+ indices: [number: number][];
  key: string; value: string;
 }
 

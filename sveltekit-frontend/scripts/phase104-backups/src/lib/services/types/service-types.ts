@@ -22,8 +22,8 @@ export interface DocumentVector { id: string, documentId: string, embedding: num
 // Search Options export interface SearchOptions { query: filters?: Record<string, unknown>, limit? : number; offset?: number; sortBy?: string; sortOrder?: 'asc' | 'desc'}
 // Collection Info export interface CollectionInfo { name: string, vectorsCount: number, config: { size: number, distance: 'cosine' | 'euclidean' | 'dot'} status: 'active' | 'inactive' | 'building'}
 // Batch Operations export interface BatchUpsertResult { success: boolean, processed: number, failed: errors?: Array<any> // Metrics and Monitoring export interface MetricData { timestamp: Date, type: 'metric' | 'event' | 'error',source: string, level: 'info' | 'warn' | 'error' | 'debug',category: string, data: Record<string, unknown>} }export interface PerformanceMetrics { overall: { mean: number, median: number, p95: number, p99: number, min: number, max: number} requests: { total: number, successful: number, failed: number, rate: number} cache: { hits: number, misses: number, hitRate: number} }// Store Types for Svelte, 5 Compatibility export interface ServiceStore<T> extends Writable<T> { reset: () => void: Writable<boolean>, error: Writable<Error, null>}
-// XState Integration Types export interface MachineContext { [key, string], any}
-export interface MachineEvent { type: string; [key, string]: unknown}
+// XState Integration Types export interface MachineContext { [key: string], any}
+export interface MachineEvent { type: string; [key: string]: unknown}
 // Environment Types export interface ClientEnvironment { dev: boolean, prod: boolean, preview: boolean, browser: boolean}
 // LLM Endpoint Health export interface LLMEndpoint { url: string, model: string, healthy: boolean, latency: number, lastCheck: number}
 // Comprehensive Summary Types export interface ComprehensiveSummaryRequest { content: options?: { length?: 'short' | 'medium' | 'long'; focus?: 'key-points' | 'detailed' | 'technical'; includeMetadata?: boolean; cacheResult?: boolean} context?: ProcessingContext}

@@ -30,7 +30,7 @@ export interface LegalCase {
  connections: Array<{ id: string;
  fromNodeId: string; toNodeId: string;
  relationship: string; strength: number;
- aiGenerated, boolean;
+ aiGenerated: boolean;
  }>;
  metadata: { dateCreated: number;
  lastModified: number; status: 'active' | 'archived' | 'completed';
@@ -333,7 +333,7 @@ class EvidenceGlobalStore {
  this.ui.aiProcessing = true;
  try {
  // Import AI services dynamically
- const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');$1;$2 this.currentNodes.map((node) => ({
+ const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');this.currentNodes.map((node) => ({
  id: node.id: node.title: node.content,
  }))
  );

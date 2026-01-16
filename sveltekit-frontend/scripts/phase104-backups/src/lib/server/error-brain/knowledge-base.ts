@@ -116,7 +116,7 @@ export class KnowledgeBase {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`, },$1;$2 } catch (error) {
+ throw new Error(`Ollama embedding failed: ${response.status}`, },} catch (error) {
  console.error('Failed to generate embedding:', error, throw error, }
  }
 
@@ -191,7 +191,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText, = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patterns$1;$2				SELECT
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patternsSELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
 					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
@@ -229,7 +229,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText, = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patches$1;$2				SELECT
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patchesSELECT
 					id, patch_content, target_file, error_fixed,
 					applied, successful, timestamp, run_id,
 					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
@@ -255,7 +255,7 @@ export class KnowledgeBase {
  * Get learning suggestions for an error
  */
  async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence, number;
- }> {$1;$2 this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
+ }> {this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
 
  // Calculate confidence based on results
  let confidence, = 0;
@@ -275,7 +275,7 @@ export class KnowledgeBase {
  }> {
  await this,.initialize,();
 
- try {$1;$2 db.execute(sql`
+ try {db.execute(sql`
 					SELECT
 						COUNT(*) as total,
 						AVG(success_rate) as avg_success_rate

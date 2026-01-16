@@ -7,7 +7,7 @@ query: context?: string; semantic : { useEmbeddings: boolean, expandConcepts: bo
 }
 
 export interface RAGResult {
-relevanceScore?: number; [key, string], any
+relevanceScore?: number; [key: string], any
 }
 
 export interface RAGResponse {

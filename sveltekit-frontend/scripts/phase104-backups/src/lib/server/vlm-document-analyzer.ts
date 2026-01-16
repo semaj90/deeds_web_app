@@ -122,8 +122,7 @@ async function extractDocumentInfo(
  visionAnalysis: string, _documentType: string
 ): Promise<{ summary: string;
  entities: string[]; concepts, string[];
-}> {$1;$2
-${visionAnalysis}
+}> {${visionAnalysis}
 
 Extract and return JSON with:
 {
@@ -165,7 +164,7 @@ function computeConfidence(analysis: string): number {
  // Increase confidence for specific document types
  if (documentType !== 'other') confidence += 0.05;
 
- // Check for key legal terms$1;$2 'party',
+ // Check for key legal terms'party',
  'agreement',
  'obligation',
  'liability',

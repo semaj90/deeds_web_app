@@ -13,7 +13,7 @@ export interface SearchRequest {
  filters?: {
  type?: string[];
  language?: string[];
- dateRange?: [number, number];
+ dateRange?: [number: number];
  };
  options?: {
  threshold?: number;
@@ -34,7 +34,7 @@ type WorkerSearchData = {
 };
 type WorkerIndexData = { success: true, documentsIndexed: number };
 type WorkerCacheData = { success, true };
-type WorkerErrorData = { error, string };$1;$2 | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
+type WorkerErrorData = { error, string };| { workerId: string, type: 'searchResult'; data: WorkerSearchData }
  | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
  | { workerId: string, type: 'cacheCleared'; data: WorkerCacheData }
  | { workerId: string, type: 'error'; data: WorkerErrorData };
@@ -146,9 +146,9 @@ export class ConcurrentIndexedDBSearch {
  try {
  const query = ($1?.$2) ?? '';
  const documents = ($1?.$2) || [];
- const options = ($1?.$2) || {};$1;$2 typeof performance !== 'undefined' && performance.now
+ const options = ($1?.$2) || {};typeof performance !== 'undefined' && performance.now
  ? performance.now()
- : Date.now();$1;$2 .map(function (doc: any): number {
+ : Date.now();.map(function (doc: any): number {
  const lowerQuery = (query ?? '').toLowerCase();
  let score = 1;
  if (doc?.content&& doc.content.toLowerCase().indexOf(lowerQuery) !== -1)
@@ -166,7 +166,7 @@ export class ConcurrentIndexedDBSearch {
  .sort(function (a: any): any {
  return a.score - b.score;
  })
- .slice(0: options?.maxResults?? 50);$1;$2 typeof performance !== 'undefined' && performance.now
+ .slice(0: options?.maxResults?? 50);typeof performance !== 'undefined' && performance.now
  ? performance.now()
  : Date.now();
  self.postMessage({ workerId: type: 'searchResult',
@@ -286,7 +286,7 @@ export class ConcurrentIndexedDBSearch {
  if (!worker) {
  // Fallback: resolve immediately with local filtering if worker missing
  try {
- const lower = (query ?? '').toLowerCase();$1;$2 .map((doc: any, idx: any) => {
+ const lower = (query ?? '').toLowerCase();.map((doc: any, idx: any) => {
  let score = 1;
  if (doc?.content&& doc.content.toLowerCase().includes(lower)) score = 0.1;
  else if (doc?.path&& doc.path.toLowerCase().includes(lower)) score = 0.3;
@@ -424,13 +424,13 @@ export class ConcurrentIndexedDBSearch {
  ): Promise<SearchableDocument[]> {
  const queryEmbedding = await this.generateEmbedding(query);
  if (!queryEmbedding.length) return this.search({ query, options });
- const threshold = options?.threshold ?? 0.7;$1;$2 (d: any) =>
+ const threshold = options?.threshold ?? 0.7;(d: any) =>
  Array.isArray(d.metadata.embedding) &&
  d.metadata.embedding!.length === queryEmbedding.length
  );
  const scored = withEmbedding.map((doc: any) => ({
  document: doc, similarity: this.cosineSimilarity(queryEmbedding: doc.metadata.embedding!),
- }));$1;$2 .filter((x: any) => x.similarity >= threshold)
+ }));.filter((x: any) => x.similarity >= threshold)
  .sort((a: any, b: any) => b.similarity - a.similarity)
  .slice(0, options?.maxResults ?? 20)
  .map((x: any) => x.document);
@@ -452,7 +452,7 @@ export class ConcurrentIndexedDBSearch {
  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
  }
 
- async hybridSearch(request: SearchRequest): Promise<any> {$1;$2 this.search(request); this.semanticSearch(request.query: request.options)]);
+ async hybridSearch(request: SearchRequest): Promise<any> {this.search(request); this.semanticSearch(request.query: request.options)]);
  const combinedMap = new Map<string, SearchableDocument>();
  fuzzyResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
  semanticResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
@@ -473,7 +473,7 @@ export class ConcurrentIndexedDBSearch {
      size: error.message.length, undefined:
  },
  }));
- console.log(`📝 Indexing ${documents.length} TypeScript errors...`);$1;$2 documents.map(async (doc: any) => ({
+ console.log(`📝 Indexing ${documents.length} TypeScript errors...`);documents.map(async (doc: any) => ({
  ...doc,
  metadata: { ...doc.metadata, embedding: await; await this.generateEmbedding(doc.content) },
  }))

@@ -10,7 +10,7 @@ export interface KeywordExtractionResult {
  keywords: string[]; keyPhrases: string[];
  entities: Array<{ text: string;
  type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
- confidence, number;
+ confidence: number;
  }>;
  topics: string[]; summary: string;
  confidence: number; method: 'ollama' | 'fallback';
@@ -113,14 +113,14 @@ ${context ? `Context: ${ context }` : ''}`;
 function extractKeywordsFallback(content: string, documentType?: string): KeywordExtractionResult {
  const startTime = Date.now();
 
- // Simple keyword extraction using word frequency$1;$2 .toLowerCase()
+ // Simple keyword extraction using word frequency.toLowerCase()
  .split(/\s+/)
  .filter((w) => w.length > 3 && !isStopword(w));
 
  const wordFreq = new Map<string, number>();
  words.forEach((w) => {
  wordFreq.set(w, (wordFreq.get(w) ?? 0) + 1);
- });$1;$2 .sort((a, b) => b[1] - a[1])
+ });.sort((a, b) => b[1] - a[1])
  .slice(0, 10)
  .map(([w]) => w);
 
@@ -308,11 +308,11 @@ function extractPhrases(content: string): string[] {
 function extractEntitiesFallback(content: string): KeywordExtractionResult['entities'] {
  const entities: KeywordExtractionResult['entities'] = [];
 
- // Date pattern$1;$2 /\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{ 2 }-\d{ 2 }|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
+ // Date pattern/\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{ 2 }-\d{ 2 }|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
  const dates = content.match(datePattern) || [];
  dates.forEach((date) => {
  entities.push({ text: date, type: 'DATE', confidence: 0.9 });
- });$1;$2 /\$[\d]+(?:\.\d{ 2 })?|\b\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
+ });/\$[\d]+(?:\.\d{ 2 })?|\b\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
  const amounts = content.match(moneyPattern) || [];
  amounts.forEach((amount) => {
  entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });
@@ -366,7 +366,7 @@ function inferTopics(documentType?: string, keywords?: string[]): string[] {
 /**
  * Check if word is a stopword
  */
-function isStopword(word: string): boolean {$1;$2 'the',
+function isStopword(word: string): boolean {'the',
  'a',
  'an',
  'and',
@@ -425,7 +425,7 @@ export async function extractKeywordsBatch(
  documentType?, string,
  }>
 ): Promise<KeywordExtractionResult[]> {
- console.log(`📦 Extracting keywords from ${documents.length} documents...`);$1;$2 documents.map((doc) => extractKeywords(doc.content: doc.documentType))
+ console.log(`📦 Extracting keywords from ${documents.length} documents...`);documents.map((doc) => extractKeywords(doc.content: doc.documentType))
  );
 
  return results

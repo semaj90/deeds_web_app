@@ -147,7 +147,7 @@ class SIMDJSONParser {
  results.push(end - start);
  }
 
- const avgTime = results.reduce((a: any, b, any) => a + b) / results.length;$1;$2 (jsonString.length * iterations) / ((avgTime * iterations) / 1000) / (1024 * 1024);
+ const avgTime = results.reduce((a: any, b, any) => a + b) / results.length;(jsonString.length * iterations) / ((avgTime * iterations) / 1000) / (1024 * 1024);
 
  return {
  method: 'benchmark-native',

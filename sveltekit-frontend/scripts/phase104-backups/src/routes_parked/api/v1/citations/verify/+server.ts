@@ -567,7 +567,7 @@ Be specific about any legal forms, contracts, evidence, or official documents.`;
  */
 async function extractTextWithLegalVLM(imageData: Buffer | string): Promise<{ extracted_text: string;
 	legal_entities: string[]; document_type: string;
-	confidence, number;
+	confidence: number;
 }> {
 	try {
 		const ollamaUrl = getOllamaEndpoint();

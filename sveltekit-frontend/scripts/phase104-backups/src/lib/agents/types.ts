@@ -62,7 +62,7 @@ export interface RagLookupResult {
  framework?: string;
  content?: string;
  tags?: string[];
- timestamp?, number;
+ timestamp?: number;
  }>;
 }
 

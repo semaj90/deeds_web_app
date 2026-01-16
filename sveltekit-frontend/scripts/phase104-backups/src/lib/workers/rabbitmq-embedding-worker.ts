@@ -387,7 +387,7 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating case embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update case in database$1;$2            .update(cases)
+        // Update case in database.update(cases)
             .set({
                 case_embedding: sql`${JSON.stringify(embedding)}::vector`,
                 updated_at: new Date()
@@ -443,7 +443,7 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating chunk embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update chunk in database$1;$2            .update(document_chunks)
+        // Update chunk in database.update(document_chunks)
             .set({
                 embedding: sql`${JSON.stringify(embedding)}::vector`
             })

@@ -75,7 +75,7 @@ export async function addEvidenceToRagIndex(
  console.log(`[RAG Sync] Adding evidence ${evidenceId} to RAG index...`);
 
  try {
- // 1. Get evidence file metadata$1;$2 SELECT id, case_id, filename, content_type
+ // 1. Get evidence file metadataSELECT id, case_id, filename, content_type
  FROM evidence_files
  WHERE id = ${evidenceId}
  `;
@@ -90,7 +90,7 @@ export async function addEvidenceToRagIndex(
  const evidence = evidenceResult[0];
  const jurisdiction = 'Other'; // Default jurisdiction - can be extracted from filename later
 
- // 2. Get all chunks for this evidence$1;$2 SELECT id, chunk_index, content, page_number, metadata
+ // 2. Get all chunks for this evidenceSELECT id, chunk_index, content, page_number, metadata
  FROM evidence_chunks
  WHERE evidence_id = ${evidenceId}
  ORDER BY chunk_index ASC
@@ -110,7 +110,7 @@ export async function addEvidenceToRagIndex(
  // 3. Get tags for this evidence (optional - tables may not exist)
  let tags: string[] = [];
  try {
- // Check if citation_tags and evidence_tags tables exist$1;$2 SELECT EXISTS (
+ // Check if citation_tags and evidence_tags tables existSELECT EXISTS (
  SELECT 1 FROM information_schema.tables
  WHERE table_name = 'citation_tags'
  ) AND EXISTS (
@@ -119,7 +119,7 @@ export async function addEvidenceToRagIndex(
  ) as tables_exist
  `;
 
- if (tableCheck[0].tables_exist) {$1;$2 SELECT ct.name
+ if (tableCheck[0].tables_exist) {SELECT ct.name
  FROM citation_tags ct
  INNER JOIN evidence_tags et ON et.tag_id = ct.id
  WHERE et.evidence_id = ${evidenceId}
@@ -311,7 +311,7 @@ export async function updateRagIndexTags(
  console.log(`[RAG Sync] New tags: ${newTags.join(', ') ?? 'none'}`);
 
  try {
- // 1. Get all chunks for this evidence$1;$2 SELECT id
+ // 1. Get all chunks for this evidenceSELECT id
  FROM evidence_chunks
  WHERE evidence_id = ${evidenceId}
  `;
@@ -333,7 +333,7 @@ export async function updateRagIndexTags(
  for (const chunk of chunksResult) {
  try {
  // Update Qdrant point payload using fetch
- const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';$1;$2 `${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/payload?wait=true`,
+ const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';`${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/payload?wait=true`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -420,7 +420,7 @@ export async function removeEvidenceFromRagIndex(
  console.log(`[RAG Sync] Removing evidence ${evidenceId} from RAG index...`);
 
  try {
- // 1. Get all chunk IDs for this evidence$1;$2 SELECT id
+ // 1. Get all chunk IDs for this evidenceSELECT id
  FROM evidence_chunks
  WHERE evidence_id = ${evidenceId}
  `;
@@ -438,7 +438,7 @@ export async function removeEvidenceFromRagIndex(
 
  // 2. Delete from Qdrant using fetch
  try {
- const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';$1;$2 `${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/delete?wait=true`,
+ const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';`${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/delete?wait=true`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },

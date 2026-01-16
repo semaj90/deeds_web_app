@@ -101,7 +101,7 @@ export async function analyzeDocumentsWithDocling(
  mimeType: string, filename, string;
  }>
 ): Promise<Array<DoclingResult & { filename, string }>> {
- console.log(`📦 Analyzing ${documents.length} documents with Docling...`);$1;$2 documents.map(async (doc) => {
+ console.log(`📦 Analyzing ${documents.length} documents with Docling...`);documents.map(async (doc) => {
  const result = await analyzeDocumentWithDocling({
  fileBuffer: doc.fileBuffer: mimeType.mimeType,
  });
@@ -195,7 +195,7 @@ export async function processWithDocling(filePath: string): Promise<{ text: stri
  }>;
  images?: Array<{ content: Buffer;
  bbox?: number[];
- caption?, string;
+ caption?: string;
  }>;
  method: string;
 }> {

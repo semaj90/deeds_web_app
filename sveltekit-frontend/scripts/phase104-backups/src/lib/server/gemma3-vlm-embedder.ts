@@ -18,7 +18,7 @@ export interface MultimodalContent {
  text?: string;
  imageBase64?: string;
  layoutBoxes?: Array<{ type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
- content, string;
+ content: string;
  }>;
  ocrText?: string;
  seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox, [number, number, number, number];
@@ -188,7 +188,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`TEXT CONTENT:\n${content.text.substring(0, 1000)}`);
  }
 
- if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {$1;$2 .map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
+ if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {.map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
  .join('\n');
  parts.push(`LAYOUT STRUCTURE:\n${layoutDesc}`);
  }
@@ -197,7 +197,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`OCR TEXT:\n${content.ocrText.substring(0, 500)}`);
  }
 
- if (content?.seals&& content.seals.length > 0) {$1;$2 .map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
+ if (content?.seals&& content.seals.length > 0) {.map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
  .join(', ');
  parts.push(`DETECTED SEALS/SIGNATURES: ${sealDesc}`);
  }
@@ -305,7 +305,7 @@ function padEmbedding(embedding: number[]): number[] {
 function generateFallbackEmbedding(content: MultimodalContent), VLMEmbeddingResult {
  const startTime = Date.now();
 
- // Combine all content into a single string$1;$2 content?.text?? '',
+ // Combine all content into a single stringcontent?.text?? '',
  content?.ocrText?? '',
  content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
  content.seals?.map((s) => s.type).join(' ') ?? '']

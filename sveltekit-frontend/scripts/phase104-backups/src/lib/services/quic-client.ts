@@ -246,7 +246,7 @@ class QUICClient {
 
 	async parseJsonBatch(requests: Array<{ text: string,
 		type?: string,
-		field?, string;
+		field?: string;
 	}>): Promise<SimdBatchResponse> {
 		try {
 			const response = await this.fetch('/parse/batch', {
@@ -514,7 +514,7 @@ class QUICClient {
 			this.erroredStreamCount++;
 		} else {
 			this.completedStreamCount++;
-		}$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
+		}(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		this.performanceMetrics.update((metrics: any) => ({
@@ -545,7 +545,7 @@ class QUICClient {
 			stream.status = 'active';
 		}
 
-		this.totalBytesReceived += bytesReceived;$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
+		this.totalBytesReceived += bytesReceived;(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		this.performanceMetrics.update((metrics: any) => ({
@@ -645,7 +645,7 @@ class QUICClient {
 		active: number; completed: number;
 		errors: number; byTypes: Record<string, number>;
 	} {
-		const total = Object.values(this.typeCounts).reduce((a: any, b: any) => a + b, 0);$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
+		const total = Object.values(this.typeCounts).reduce((a: any, b: any) => a + b, 0);(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		return {

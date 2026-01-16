@@ -42,7 +42,7 @@ export interface EvidenceCustodyContext {
     }>;
     annotations: Array<{ userId: string;
       content: string; position: unknown;
-      timestamp, string;
+      timestamp: string;
     }>;
   };
   // Workflow progress
@@ -53,7 +53,7 @@ export interface EvidenceCustodyContext {
   custodyEvents: Array<{ id: string;
     eventType: string; timestamp: string;
     userId: string; details: unknown;
-    signature, string;
+    signature: string;
   }>;
   // Performance and timing
   startTime: number; stageStartTime: number;
@@ -61,7 +61,7 @@ export interface EvidenceCustodyContext {
   // Error handling
   error?: string; warnings: string[];
   retryCount: number; maxRetries: number;
-}$1;$2  | {
+}| {
       type: 'START_CUSTODY_WORKFLOW'; evidenceId: string;
       caseId: string; userId: string;
       originalHash: string;

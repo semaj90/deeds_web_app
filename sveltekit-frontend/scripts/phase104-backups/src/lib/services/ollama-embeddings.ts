@@ -79,7 +79,7 @@ export async function embedTextsBatch(
  */
 export async function checkOllamaHealth(): Promise<{ healthy: boolean;
  models: string[];
- error?, string;
+ error?: string;
 }> {
  try {
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/tags`);

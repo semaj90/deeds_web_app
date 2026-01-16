@@ -67,7 +67,7 @@ export type TagBrowseResponse = {
  tags: Array<{ id: string;
  namespace: string; name: string;
  jurisdiction: string | null;
- created_at, string;
+ created_at: string;
  }>;
 };
 

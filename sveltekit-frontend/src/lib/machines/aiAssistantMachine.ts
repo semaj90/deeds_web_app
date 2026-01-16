@@ -70,7 +70,7 @@ export const aiAssistantMachine = createMachine({
                 onDone: {
                     target: 'idle',
                     actions: assign({
-                        gpuReady: ({ event }) => event.output.gpuReady
+                        gpuReady: ({ event }: { event: any }) => event.output.gpuReady
                     })
                 },
                 onError: {
@@ -83,8 +83,8 @@ export const aiAssistantMachine = createMachine({
                 SEND_MESSAGE: {
                     target: 'processing',
                     actions: assign({
-                        currentQuery: ({ event }) => event.message,
-                        conversationHistory: ({ context, event }) => [
+                        currentQuery: ({ event }: { event: Extract<AIAssistantEvent, { type: 'SEND_MESSAGE' }> }) => event.message,
+                        conversationHistory: ({ context, event }: { context: AIAssistantContext; event: Extract<AIAssistantEvent, { type: 'SEND_MESSAGE' }> }) => [
                             ...context.conversationHistory,
                             {
                                 id: `user_${Date.now()}`,
@@ -99,7 +99,7 @@ export const aiAssistantMachine = createMachine({
                     actions: assign({ conversationHistory: [] })
                 },
                 SET_MODEL: {
-                    actions: assign({ model: ({ event }) => event.model })
+                    actions: assign({ model: ({ event }: { event: Extract<AIAssistantEvent, { type: 'SET_MODEL' }> }) => event.model })
                 }
             }
         },
@@ -121,7 +121,7 @@ export const aiAssistantMachine = createMachine({
                     const data = await response.json();
                     return data.response as string;
                 }),
-                input: ({ context }) => ({
+                input: ({ context }: { context: AIAssistantContext }) => ({
                     prompt: context.currentQuery,
                     model: context.model
                 }),
@@ -129,8 +129,8 @@ export const aiAssistantMachine = createMachine({
                     target: 'idle',
                     actions: assign({
                         isProcessing: false,
-                        response: ({ event }) => event.output,
-                        conversationHistory: ({ context, event }) => [
+                        response: ({ event }: { event: any }) => event.output,
+                        conversationHistory: ({ context, event }: { context: AIAssistantContext; event: any }) => [
                             ...context.conversationHistory,
                             {
                                 id: `assistant_${Date.now()}`,
@@ -145,7 +145,7 @@ export const aiAssistantMachine = createMachine({
                     target: 'error',
                     actions: assign({
                         isProcessing: false,
-                        error: ({ event }) => (event.error as Error).message
+                        error: ({ event }: { event: any }) => (event.error as Error).message
                     })
                 }
             },
@@ -159,7 +159,7 @@ export const aiAssistantMachine = createMachine({
                 },
                 STREAM_CHUNK: {
                     actions: assign({
-                        response: ({ context, event }) => context.response + event.chunk
+                        response: ({ context, event }: { context: AIAssistantContext; event: Extract<AIAssistantEvent, { type: 'STREAM_CHUNK' }> }) => context.response + event.chunk
                     })
                 }
             }

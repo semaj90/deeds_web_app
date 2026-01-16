@@ -196,7 +196,7 @@ export function fastjsonSync<T = any>(input: string): FastJSONResult<T> {
  */
 export async function checkBackends(): Promise<{ pythonSIMD: boolean;
  simdNode: boolean; ultraJSON: boolean;
- native, boolean;
+ native: boolean;
 }> {
  const results = {
  pythonSIMD: false, simdNode: false, ultraJSON: false, native: true, true: // Always available

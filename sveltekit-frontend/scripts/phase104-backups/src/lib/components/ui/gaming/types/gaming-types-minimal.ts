@@ -32,7 +32,7 @@ export interface GamingComponentProps {
  loading?: boolean;
  class?: string;
  style?: string;
- [key, string];
+ [key: string];
  any;
 }
 

@@ -1,4 +1,4 @@
-/** * AI Assistant Types - Complete type definitions for multi-backend AI system */$1;$2 | 'tensorRT-llm'
+/** * AI Assistant Types - Complete type definitions for multi-backend AI system */| 'tensorRT-llm'
  | 'ollama'
  | 'webasm'
  | 'go-micro'
@@ -97,7 +97,7 @@ export interface VectorSearchQuery {
  filters?: {
  sessionId?: string;
  legalDomain?: string;
- dateRange?: [number, number];
+ dateRange?: [number: number];
  };
 }
 
@@ -221,7 +221,7 @@ export type ExportFormat = 'json' | 'markdown' | 'pdf' | 'docx' | 'csv';
 
 export interface ExportOptions {
  format: ExportFormat; includeMetadata: boolean;
- dateRange?: [number, number];
+ dateRange?: [number: number];
  filterBy?: {
  backend?: Backend;
  role?: 'user' | 'assistant';

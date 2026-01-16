@@ -24,7 +24,7 @@ export interface IBMVisionResult {
  dates?: string[];
  };
  classifications?: Array<{ class: string;
- confidence, number;
+ confidence: number;
  }>;
  faces?: Array<{ bbox: number[];
  age?: { min: number; max: number };
@@ -67,7 +67,7 @@ export class IBMVisionService {
  // Convert buffer to base64 for IBM API
  const imageBase64 = imageBuffer.toString('base64');
 
- // Perform comprehensive analysis$1;$2 this.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
+ // Perform comprehensive analysisthis.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
 
  const processingTime = Date.now() - startTime;
 
@@ -88,7 +88,7 @@ export class IBMVisionService {
  private async extractText(imageBase64: string): Promise<{ text: string;
  confidence: number;
  language?: string;
- entities?, any;
+ entities?: any;
  }> {
  const params = {
  images_file: { value: Buffer.from(imageBase64, 'base64'),

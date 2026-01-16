@@ -207,7 +207,7 @@ export async function listStatuteSources(
  */
 export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): Promise<{ bucket: string;
  basePath: string; year: number;
- estimatedSize, string;
+ estimatedSize: string;
 }> {
  try {
  // In production, query MinIO for actual size

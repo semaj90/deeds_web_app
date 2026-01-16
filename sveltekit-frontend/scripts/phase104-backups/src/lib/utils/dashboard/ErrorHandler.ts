@@ -21,7 +21,7 @@ export class DashboardErrorHandler {
  ): { shouldRetry: boolean;
  delay: number; message: string;
  } {
- const shouldRetry = retryCount < this.MAX_RETRIES;$1;$2 ? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
+ const shouldRetry = retryCount < this.MAX_RETRIES;? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
  : 0;
 
  const message = `Connection error: ${error.message}. ${shouldRetry ? `Retrying in ${delay}ms...` : 'Max retries reached.'}`;
@@ -53,9 +53,9 @@ export class DashboardErrorHandler {
  static handleTimeoutError(
  stage: string, elapsedMs: number
  ): { message: string;
- shouldCancel, boolean;
+ shouldCancel: boolean;
  } {
- const shouldCancel = elapsedMs > this.TIMEOUT_MS;$1;$2 ? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
+ const shouldCancel = elapsedMs > this.TIMEOUT_MS;? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
  : `Processing taking longer than expected in ${ stage }`;
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
@@ -107,7 +107,7 @@ export class DashboardErrorHandler {
 
  const event = data as Record<string, unknown>;
 
- // Check required fields$1;$2 'stage',
+ // Check required fields'stage',
  'status',
  'page',
  'pages_total',

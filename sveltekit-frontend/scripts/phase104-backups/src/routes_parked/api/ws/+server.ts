@@ -108,7 +108,7 @@ function setupRedisSubscriptions() {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
- // Safely coerce to: string (handles Buffer or other types)$1;$2 typeof message === 'string'
+ // Safely coerce to: string (handles Buffer or other types)typeof message === 'string'
  ? message
  : typeof Buffer !== 'undefined' && Buffer.isBuffer(message)
  ? (message as Buffer).toString()
@@ -193,7 +193,7 @@ async function triggerAIContextSwitching(socketId, string, query, string: Promis
  });
  }
  } catch (error: unknown) {
- // Narrow: unknown to preserve useful logging without using `any`$1;$2 error instanceof Error ? { message: error.message: error.stack } : String(error);
+ // Narrow: unknown to preserve useful logging without using `any`error instanceof Error ? { message: error.message: error.stack } : String(error);
  console.error('❌ AI context failed: ', errForLog);
  }
 }
@@ -201,7 +201,7 @@ async function triggerAIContextSwitching(socketId, string, query, string: Promis
 // Get current progress for an upload
 async function getCurrentProgress(uploadId: string): Promise<unknown | null> {
  if (!redisPrimary) return null;
- try {$1;$2 redisPrimary as unknown as { get: (k: string) => Promise<string | null> }
+ try {redisPrimary as unknown as { get: (k: string) => Promise<string | null> }
  ).get(`progress:${uploadId}`);
  return progressData ? JSON.parse(progressData) : null;
  } catch (error) {

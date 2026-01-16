@@ -131,7 +131,7 @@ let lastError: Error | unknown;
  }
 
 const ed = errorData as Record<string, unknown>;
- const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';$1;$2 ? (ed['message'] as string);
+ const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';? (ed['message'] as string);
  : `HTTP ${response.status}`;
  const errDetails = ed?.['details'] ?? ed;
 

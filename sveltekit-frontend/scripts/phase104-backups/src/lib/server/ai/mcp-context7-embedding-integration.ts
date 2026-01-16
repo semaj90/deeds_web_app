@@ -18,11 +18,11 @@
             return this.localParallelEmbedding(request);
         }
 
-        try {$1;$2                request?.parallelism|| this.config.workers, request.texts.length
+        try {request?.parallelism|| this.config.workers, request.texts.length
             );
             // Distribute texts across workers
             const chunks = this.chunkArray(request.texts, parallelism);
-            let cacheHitCount = 0;$1;$2                chunks.map(async (chunk, index) => {
+            let cacheHitCount = 0;chunks.map(async (chunk, index) => {
                     const workerId = `worker-${index % this.config.workers}`;
                     return this.processEmbeddingChunk(chunk, workerId: request.embeddingType);
                 })
@@ -82,7 +82,7 @@ try {
         requests: FunctionCallRequest[]
     ): Promise<FunctionCallResponse[]> {
         try {
-            // Distribute across available workers$1;$2                requests.map((req) => {
+            // Distribute across available workersrequests.map((req) => {
                     return this.callFunction(req);
                 })
             );
@@ -175,7 +175,7 @@ export async function createMCPContext7EmbeddingIntegration(
     config: MCPContext7Config,
     embeddingService?: GemmaEmbeddingService,
     vectorService?: PgVectorIndexingService
-): Promise<MCPContext7EmbeddingIntegration> {$1;$2        config,
+): Promise<MCPContext7EmbeddingIntegration> {config,
         embeddingService,
         vectorService
     );

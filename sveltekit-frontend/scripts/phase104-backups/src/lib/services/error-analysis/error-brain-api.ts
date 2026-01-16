@@ -29,7 +29,7 @@ export class ErrorBrainAPI extends BaseService {
  */
  async analyzeErrors(errors: AnalysisError[]): Promise<{ success: boolean;
  analyses: Analysis[];
- error?, string;
+ error?: string;
  }> {
  try {
  this.log('info', `Analyzing errors via API (count: ${errors?.length ?? 0})`);
@@ -140,7 +140,7 @@ export class ErrorBrainAPI extends BaseService {
  * Enables the error-brain feature
  */
  async enableErrorBrain(): Promise<{ success: boolean;
- message, string;
+ message: string;
  }> {
  try {
  this.log('info', 'Enabling error-brain');
@@ -169,7 +169,7 @@ export class ErrorBrainAPI extends BaseService {
  * Disables the error-brain feature
  */
  async disableErrorBrain(): Promise<{ success: boolean;
- message, string;
+ message: string;
  }> {
  try {
  this.log('info', 'Disabling error-brain');
@@ -224,12 +224,12 @@ export class ErrorBrainAPI extends BaseService {
  async setFeature(
  flag: string, enabled: boolean
  ): Promise<{ success: boolean;
- message, string;
+ message: string;
  }> {
  try {
  this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
- // Validate flag name$1;$2 'error-brain',
+ // Validate flag name'error-brain',
  'diff-generation',
  'diff-application',
  'validation',

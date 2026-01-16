@@ -148,7 +148,7 @@ export class ValidationService extends BaseService implements IValidationService
  async validateDiffSafety(
  diff: Diff, originalContent: string
  ): Promise<{ safe: boolean;
- reason?, string;
+ reason?: string;
  }> {
  this.validateInput(diff, 'diff');
  this.validateInput(originalContent, 'originalContent');

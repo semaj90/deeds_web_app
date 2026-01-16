@@ -35,11 +35,11 @@ export interface ScoredChunk {
 export interface ContextBundle {
   chunks: ScoredChunk[]; entities: Array<{
     entity: string; type: string;
-    docId, string;
+    docId: string;
   }>;
   edges: Array<{ src: string;
     rel: string; dst: string;
-    weight, number;
+    weight: number;
   }>;
   summary: string; totalResults: number;
 }
@@ -213,7 +213,7 @@ export class AceContextService {
       // User formula: 0.65*cosine + 0.10*freshness + 0.05*graph.
       // Assuming components are 0-1 range.
       // The weights sum to 0.8. Maybe missing text match weight?
-      // I'll stick to provided formula logic.$1;$2        this.COSINE_WEIGHT * cosineSim +
+      // I'll stick to provided formula logic.this.COSINE_WEIGHT * cosineSim +
         this.FRESHNESS_WEIGHT * freshnessBoost +
         this.GRAPH_WEIGHT * graphBoost;
 
@@ -280,7 +280,7 @@ export class AceContextService {
       });
     }
 
-    // De-duplicate actions based on tool and query$1;$2        index === self.findIndex((a: any) => (
+    // De-duplicate actions based on tool and queryindex === self.findIndex((a: any) => (
             a.tool === action?.tool&&
             JSON.stringify(a.params) === JSON.stringify(action.params)
         ))
@@ -435,7 +435,7 @@ export class AceContextService {
         );
       }
 
-      // Query with vector similarity$1;$2        .select({
+      // Query with vector similarity.select({
           id: aceChunks.id,
           score: sql<number>`1 - (${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector)`,
           payload: aceChunks.metadata,
@@ -458,7 +458,7 @@ export class AceContextService {
       }
 
       // Order by similarity and limit
-      // Note: <=> is distance, so order by distance ASC$1;$2        .orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
+      // Note: <=> is distance, so order by distance ASC.orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
         .limit(limit);
 
       console.log(`[AceContextService] pgvector returned ${results.length} results`);
@@ -482,7 +482,7 @@ export class AceContextService {
       return [];
     }
 
-    try {$1;$2        .select({
+    try {.select({
           entity: aceEntities.entity,
           type: aceEntities.entityType,
           docId: aceEntities.docId,
@@ -512,7 +512,7 @@ export class AceContextService {
         return [];
       }
 
-      // Find edges where source or destination matches query entities$1;$2        .select({
+      // Find edges where source or destination matches query entities.select({
           src: aceEdges.srcEntity,
           rel: aceEdges.rel,
           dst: aceEdges.dstEntity,
@@ -543,7 +543,7 @@ export class AceContextService {
    */
   private extractEntities(text: string): string[] {
     // Split on spaces and filter for meaningful words (>3 chars)
-    // Remove punctuation$1;$2      .split(/\s+/)
+    // Remove punctuation.split(/\s+/)
       .map((w: any) => w.replace(/[^a-zA-Z0-9]/g, ''))
       .filter((w: any) => w.length > 3);
 

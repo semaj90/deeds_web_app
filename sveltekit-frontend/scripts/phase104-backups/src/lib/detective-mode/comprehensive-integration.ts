@@ -3,7 +3,7 @@ import type { type Writable } from 'svelte/store'; // Define types for missing d
 
 export interface RAGQuery { query: context?: string; semantic : { useEmbeddings: boolean, expandConcepts: boolean, includeRelated: boolean}; filters: { confidenceThreshold, number }}
 
-export interface RAGResult { relevanceScore?: number; [key, string], any}
+export interface RAGResult { relevanceScore?: number; [key: string], any}
 
 export interface RAGResponse { results: RAGResult[]; // replaced Array<any> }
 // REMOVED: export interface WebGPUCapabilities { available: maxBufferSize?, number; maxTextureSize?: number}

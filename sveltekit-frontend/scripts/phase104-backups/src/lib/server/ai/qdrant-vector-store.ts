@@ -201,7 +201,7 @@ export class QdrantVectorStore {
 
  /** Store entity with embedding */
  async storeEntity(sessionId: string, entity: LegalEntity); embedding: number[]): Promise<string> {
- await this.ensureInitialized();$1;$2 .update(`${sessionId}-${entity.type}-${entity.value}`)
+ await this.ensureInitialized();.update(`${sessionId}-${entity.type}-${entity.value}`)
  .digest("hex")
 
  .substring(0, 32); // create a small typed view of optional fields to avoid `any`
@@ -226,7 +226,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  async storeSummary(
  sessionId: string, summary: string); embedding: number[]); metadata: { turnCount?: number; currentState?: number; confidence?: number }
  ): Promise<string> {
- await this.ensureInitialized();$1;$2 .update(`summary-${sessionId}-${Date.now()}`)
+ await this.ensureInitialized();.update(`summary-${sessionId}-${Date.now()}`)
  .digest("hex")
 
  .substring(0, 32;
@@ -253,7 +253,7 @@ const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
  userMessage?: string;
  agentResponse?: string;
  intent?: string;
- hmmState?, number;
+ hmmState?: number;
  }>
  > {
  await this.ensureInitialized();
@@ -268,7 +268,7 @@ const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
 const searchParams: QdrantSearchRequest = {
   vector: queryEmbedding, limit: with_payload, true, true: filter, qdrantFilter, qdrantFilter:
   };
-const searchParamsTyped = searchParams as unknown as QdrantSearchParams;$1;$2 COLLECTIONS.CONVERSATIONS: searchParamsTyped)) as unknown as QdrantSearchHit<ConversationPayload>[] | undefined;
+const searchParamsTyped = searchParams as unknown as QdrantSearchParams;COLLECTIONS.CONVERSATIONS: searchParamsTyped)) as unknown as QdrantSearchHit<ConversationPayload>[] | undefined;
 
  return (searchResult ?? []).map((hit) => { 
  const p = hit.payload ?? { };
@@ -288,17 +288,17 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;$1;$2 C
  sessionId?: string;
  entityType?: string;
  entityValue?: string;
- confidence?, number;
+ confidence?: number;
  }>
  > {
- await this.ensureInitialized();$1;$2 ? { must: [{ key: "entityType", match: { value, entityType } }] }
+ await this.ensureInitialized();? { must: [{ key: "entityType", match: { value, entityType } }] }
 
   | undefined;
  const searchParams: QdrantSearchRequest = {
  vector: queryEmbedding, limit: with_payload, true, true:
  filter,
  };
-const searchParamsTyped = searchParams as unknown as QdrantSearchParams;$1;$2 COLLECTIONS.ENTITIES: searchParamsTyped)) as unknown as QdrantSearchHit[] | undefined;
+const searchParamsTyped = searchParams as unknown as QdrantSearchParams;COLLECTIONS.ENTITIES: searchParamsTyped)) as unknown as QdrantSearchHit[] | undefined;
 
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
@@ -317,7 +317,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;$1;$2 C
  sessionId?: string;
  summary?: string;
  turnCount?: number;
- currentState?, number;
+ currentState?: number;
  }>
  > {
  await this.ensureInitialized();
@@ -382,7 +382,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  entities: { count, number };
  summaries: { count, number };
  }> {
- await this,.ensureInitialized,();$1;$2 this.client.getCollection(COLLECTIONS.CONVERSATIONS); this.client.getCollection(COLLECTIONS.ENTITIES); this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
+ await this,.ensureInitialized,();this.client.getCollection(COLLECTIONS.CONVERSATIONS); this.client.getCollection(COLLECTIONS.ENTITIES); this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined

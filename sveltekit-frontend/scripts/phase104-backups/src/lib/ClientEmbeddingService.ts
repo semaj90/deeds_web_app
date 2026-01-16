@@ -109,7 +109,7 @@ export class ClientEmbeddingService {
  }
 
  // Create input tensor
- const ort = await import('onnxruntime-web');$1;$2 'int64',
+ const ort = await import('onnxruntime-web');'int64',
  new BigInt64Array(inputIds.map((x) => BigInt(x))),
  [1, maxLength]
  );
