@@ -145,10 +145,7 @@ export const POST: RequestHandler = async ({ request }) => {
             sourceType: 'web' as const,
             crawlStatus: 'new' as const,
           };
-        });
-
-        const inserted = await db
-          .insert(aceSources)
+        });$1;$2          .insert(aceSources)
           .values(values)
           .returning({
             id: aceSources.id,

@@ -5,9 +5,7 @@ interface LegalSuggestion {
  description?: string; confidence: number;
 }
 
-// Crime/offense database with abbreviations and aliases
-const crimes = [
- { name: 'child neglect', codes: ['273a', '273d'], abbr: ['cn'] },
+// Crime/offense database with abbreviations and aliases$1;$2 { name: 'child neglect', codes: ['273a', '273d'], abbr: ['cn'] },
  { name: 'dui injury', codes: ['23153', '23154'], abbr: ['dui'] },
  { name: 'assault', codes: ['240', '241', '242'], abbr: ['asl'] },
  { name: 'battery', codes: ['242', '243'], abbr: ['bat'] },
@@ -37,9 +35,7 @@ const crimes = [
  { name: 'probation violation', codes: ['1203.2'], abbr: ['pv'] },
  { name: 'parole violation', codes: ['3000'], abbr: ['parv'] }];
 
-// Statute code patterns
-const statuePatterns = [
- /^\d{1,5}$/, // Simple codes like 273a, 211
+// Statute code patterns$1;$2 /^\d{1,5}$/, // Simple codes like 273a, 211
  /^\d{1,5}[a-z]$/, // Codes with letter suffix like 273a
  /^\d{1,5}\.\d{1,2}$/, // Codes with decimal like 243.4
  /^\d{1,5}\s+[A-Z]{2}$/, // Codes with state like "720 ILCS"
@@ -248,9 +244,7 @@ export function getLegalAutocomplete(query: string, limit: number = 8): LegalSug
 
  const queryLower = query.toLowerCase().trim();
 
- // Collect all suggestions from different sources
- const allSuggestions, LegalSuggestion[] = [
- ...searchCrimes(queryLower),
+ // Collect all suggestions from different sources$1;$2 ...searchCrimes(queryLower),
  ...searchStatutes(queryLower),
  ...searchStates(queryLower),
  ...searchTitles(queryLower)];

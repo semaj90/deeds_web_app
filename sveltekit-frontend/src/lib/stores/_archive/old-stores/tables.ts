@@ -58,9 +58,7 @@ class TableManager {
  updateSort(tableId, string, column: string, direction?: 'asc' | 'desc') {
  const table = this.getTable(tableId);
  if (!table) return; // Added return to prevent error on null table
- table.update((state) => {
- const newDirection =
- direction ||
+ table.update((state) => {$1;$2 direction ||
  (state.sortColumn === column && state.sortDirection === 'asc' ? 'desc' : 'asc');
  return {
  ...state, sortColumn: column,
@@ -302,9 +300,7 @@ export function exportTableData(data: any[], filename?: string): void {
 function convertToCSV(data: any[]): string {
  if (data.length === 0) return '';
  const headers = Object.keys(data[0]);
- const csvHeaders = headers.join(',');
- const csvRows = data.map((row) =>
- headers
+ const csvHeaders = headers.join(',');$1;$2 headers
  .map((header) => {
  const value = row[header];
  const stringValue = typeof value === 'string' ? value : String(value ?? ''); // Fixed comma operator

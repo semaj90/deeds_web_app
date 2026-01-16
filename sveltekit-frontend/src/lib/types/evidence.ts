@@ -115,10 +115,7 @@ export type WorkflowContext = {
  error?: string; progress: number;
  stage: 'upload' | 'ocr' | 'embedding' | 'analysis' | 'storage' | 'complete';
  retryCount: number;
-};
-
-export type WorkflowEvent =
- | { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
+};$1;$2 | { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
  | { type: 'OCR_COMPLETE'; text: string }
  | { type: 'EMBEDDING_COMPLETE'; embedding: number[] }
  | { type: 'ANALYSIS_COMPLETE'; result: EvidenceAnalysisResult }
@@ -157,9 +154,7 @@ export type SearchResponse = APIResponse<{
  queryTimeMs, number;
 }>;
 
-// ==================== WebSocket Message Types ====================
-export type WSMessage =
- | { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
+// ==================== WebSocket Message Types ====================$1;$2 | { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
  | { type: 'ANALYSIS_COMPLETE'; fileId: string; result: EvidenceAnalysisResult }
  | { type: 'ERROR'; fileId: string; error: string }
  | { type: 'CHAT_MESSAGE'; message: ChatMessage }
@@ -176,9 +171,7 @@ type BaseSnapshotProperties = {
  children?: Record<string, ActorRef<any, any>>;
 };
 
-// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>
-export type EvidenceSnapshot =
- | (BaseSnapshotProperties & {
+// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>$1;$2 | (BaseSnapshotProperties & {
  status: 'active';
  output?: unknown;
  error?: unknown;

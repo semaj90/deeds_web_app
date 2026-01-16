@@ -19,20 +19,11 @@ import { z } from 'zod';
 // COMMON PRIMITIVES
 // ============================================================================
 
-export const uuidSchema = z.string().uuid('Invalid UUID format');
-
-export const emailSchema = z
-	.string()
+export const uuidSchema = z.string().uuid('Invalid UUID format');$1;$2	.string()
 	.email('Invalid email address')
-	.max(255, 'Email too long');
-
-export const timestampSchema = z
-	.string()
+	.max(255, 'Email too long');$1;$2	.string()
 	.datetime({ message: 'Invalid ISO 8601 timestamp' })
-	.or(z.date());
-
-export const urlSchema = z
-	.string()
+	.or(z.date());$1;$2	.string()
 	.url('Invalid URL')
 	.max(2048, 'URL too long');
 
@@ -58,18 +49,12 @@ export const searchSchema = z.object({
 
 // ============================================================================
 // CASE MANAGEMENT
-// ============================================================================
-
-export const caseStatusSchema = z.enum([
-	'open',
+// ============================================================================$1;$2	'open',
 	'in_progress',
 	'pending_review',
 	'closed',
 	'archived'
-]);
-
-export const casePrioritySchema = z.enum([
-	'low',
+]);$1;$2	'low',
 	'medium',
 	'high',
 	'critical',
@@ -97,10 +82,7 @@ export const deleteCaseSchema = z.object({
 
 // ============================================================================
 // EVIDENCE MANAGEMENT
-// ============================================================================
-
-export const evidenceTypeSchema = z.enum([
-	'document',
+// ============================================================================$1;$2	'document',
 	'photo',
 	'video',
 	'audio',
@@ -150,10 +132,7 @@ export const chatMigrationSchema = z.object({
 
 // ============================================================================
 // USER & AUTHENTICATION
-// ============================================================================
-
-export const userRoleSchema = z.enum([
-	'prosecutor',
+// ============================================================================$1;$2	'prosecutor',
 	'detective',
 	'admin',
 	'analyst',
@@ -178,10 +157,7 @@ export const updateProfileSchema = z.object({
 
 // ============================================================================
 // DOCUMENT PROCESSING
-// ============================================================================
-
-export const documentTypeSchema = z.enum([
-	'case_law',
+// ============================================================================$1;$2	'case_law',
 	'statute',
 	'regulation',
 	'brief',
@@ -260,9 +236,7 @@ export const apiResponseSchema = z.object({
 
 /**
  * Paginated response wrapper
- */
-export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
-	z.object({
+ */$1;$2	z.object({
 		success: z.boolean(),
 		data: z.array(itemSchema),
 		pagination: z.object({ page: z.number().int(),

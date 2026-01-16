@@ -150,10 +150,7 @@ describe('Diff Pipeline Integration', () => {
 
  it('runs in dry-run mode without applying', async () => {
  const file = testFiles[0];
- const originalContent = await readFile(file, 'utf8');
-
- const proposals: DiffProposal[] = [
- {
+ const originalContent = await readFile(file, 'utf8');$1;$2 {
  filePath: file,
  originalContent,
  proposedContent: 'const modified = true;\n',
@@ -178,9 +175,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Isolation - Concurrent Runs', () => {
- it('handles multiple concurrent runs', async () => {
- const runners = Array.from(
- { length: 3 },
+ it('handles multiple concurrent runs', async () => {$1;$2 { length: 3 },
  (_: any, i: any) =>
  new DiffRunner({
  runId: `concurrent-run-${i}`,
@@ -211,9 +206,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Error Recovery', () => {
- it('recovers from patch generation errors', async () => {
- const proposals: DiffProposal[] = [
- {
+ it('recovers from patch generation errors', async () => {$1;$2 {
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -365,9 +358,7 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Progress Tracking', () => {
- it('tracks all phases', async () => {
- const proposals: DiffProposal[] = [
- {
+ it('tracks all phases', async () => {$1;$2 {
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -419,9 +410,7 @@ describe('Diff Pipeline Integration', () => {
  runner.dispose();
  });
 
- it('tracks duration', async () => {
- const proposals: DiffProposal[] = [
- {
+ it('tracks duration', async () => {$1;$2 {
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',

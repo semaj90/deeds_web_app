@@ -24,9 +24,7 @@ try {
 
 /**
  * PostgreSQL connection configuration
- */
-const connectionString =
-  DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+ */$1;$2  DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 
 /**
  * Connection pool configuration

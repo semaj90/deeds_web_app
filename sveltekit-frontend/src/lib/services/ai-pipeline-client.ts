@@ -406,13 +406,9 @@ export class AIPipelineClient {
 		const words = content.toLowerCase().split(/\s+/);
 		const wordCount = words.length;
 
-		// Extract potential entities (capitalized words)
-		const entities =
-			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
+		// Extract potential entities (capitalized words)$1;$2			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
 
-		// Common legal keywords
-		const legalKeywords = [
-			'contract',
+		// Common legal keywords$1;$2			'contract',
 			'agreement',
 			'evidence',
 			'witness',

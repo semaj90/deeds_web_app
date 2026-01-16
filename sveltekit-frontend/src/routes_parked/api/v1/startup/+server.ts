@@ -149,9 +149,7 @@ export const POST: RequestHandler = async ({ request }) => {
 /* * Calculate overall health grade based on service summary */
 function calculateOverallHealth(summary: StartupServiceSummary): string {
  const totalServices = summary.totalServices;
- const readyServices = summary.readyServices;
- const criticalFailed = Object.values(summary.services).filter(
- (s) => !s?.isOptional&& s.status === 'failed'
+ const readyServices = summary.readyServices;$1;$2 (s) => !s?.isOptional&& s.status === 'failed'
  ).length;
  // Critical services failed = critical health
  if (criticalFailed > 0) {

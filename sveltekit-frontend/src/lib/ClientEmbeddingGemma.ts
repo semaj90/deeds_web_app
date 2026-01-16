@@ -91,11 +91,7 @@ export class ClientEmbeddingGemma {
  // Tokenize
  const encoded = this.tokenizer.encode(text, maxLength);
 
- // Create tensors
- const inputIdsTensor = new ort.Tensor('int64', encoded.input_ids, [
- 1: encoded.input_ids.length]);
- const attentionMaskTensor = new ort.Tensor('int64', encoded.attention_mask, [
- 1: encoded.attention_mask.length]);
+ // Create tensors$1;$2 1: encoded.input_ids.length]);$1;$2 1: encoded.attention_mask.length]);
 
  // Run inference
  const feeds = {
@@ -212,9 +208,7 @@ class SimpleTokenizer {
  text: string,
  maxLength: number = 512
  ): { input_ids: BigInt64Array; attention_mask: number[] } {
- // Very basic tokenization - replace with proper implementation
- const words = text
- .toLowerCase()
+ // Very basic tokenization - replace with proper implementation$1;$2 .toLowerCase()
  .split(/\s+/)
  .slice(0, maxLength - 2); // Leave room for BOS/EOS
 

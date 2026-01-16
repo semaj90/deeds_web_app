@@ -5,9 +5,7 @@
  * Supports: gemma3-legal: latest, embeddinggemma: latest
  */
 
-// Environment-based endpoint resolution
-const OLLAMA_HOST =
- import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
+// Environment-based endpoint resolution$1;$2 import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
  (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ?? 'http://localhost:11434';
 
 const OLLAMA_DOCKER_HOST = 'http://ollama:11434';

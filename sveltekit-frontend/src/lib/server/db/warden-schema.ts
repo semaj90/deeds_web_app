@@ -40,9 +40,7 @@ export const wardenCases = pgTable('warden_cases', {
  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Evidence (immutable, SHA-256 locked)
-export const wardenEvidence = pgTable(
- 'warden_evidence',
+// Evidence (immutable, SHA-256 locked)$1;$2 'warden_evidence',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  caseId: uuid('case_id')
@@ -87,9 +85,7 @@ export const wardenOCR = pgTable('warden_ocr', {
  extractedAt: timestamp('extracted_at').defaultNow(),
 });
 
-// Chunks (512-token legal chunks for embeddings)
-export const wardenChunks = pgTable(
- 'warden_chunks',
+// Chunks (512-token legal chunks for embeddings)$1;$2 'warden_chunks',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  evidenceId: uuid('evidence_id')
@@ -112,9 +108,7 @@ export const wardenChunks = pgTable(
  })
 );
 
-// Citations (statute and precedent references)
-export const wardenCitations = pgTable(
- 'warden_citations',
+// Citations (statute and precedent references)$1;$2 'warden_citations',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  evidenceId: uuid('evidence_id')
@@ -164,9 +158,7 @@ export const wardenHMMTopics = pgTable('warden_hmm_topics', {
  createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Chain-of-Custody Audit Log (immutable events)
-export const wardenAuditLog = pgTable(
- 'warden_audit_log',
+// Chain-of-Custody Audit Log (immutable events)$1;$2 'warden_audit_log',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  prosecutorId: uuid('prosecutor_id')
@@ -203,9 +195,7 @@ export const wardenEvidenceSummaries = pgTable('warden_evidence_summaries', {
  createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Citation Graph (for Neo4j sync + authority scoring)
-export const wardenCitationGraph = pgTable(
- 'warden_citation_graph',
+// Citation Graph (for Neo4j sync + authority scoring)$1;$2 'warden_citation_graph',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  caseId: varchar('case_id', { length: 128 }).notNull(),

@@ -16,10 +16,7 @@ import { desc, eq } from 'drizzle-orm';
 export const GET: RequestHandler = async ({ url }) => {
  const runId = url.searchParams.get('runId');
  const applied = url.searchParams.get('applied');
- const limit = parseInt(url.searchParams.get('limit') ?? '50');
-
- let query = db
- .select()
+ const limit = parseInt(url.searchParams.get('limit') ?? '50');$1;$2 .select()
  .from(errorBrainDiffs)
  .orderBy(desc(errorBrainDiffs.createdAt))
  .limit(limit);
@@ -54,10 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  if (!runId || !filePath || !diffText || !beforeSha256 || !afterSha256 || !afterText) {
  return json({ error: 'Missing required fields' }, { status: 400 });
- }
-
- const [inserted] = await db
- .insert(errorBrainDiffs)
+ }$1;$2 .insert(errorBrainDiffs)
  .values({
  runId,
  filePath,

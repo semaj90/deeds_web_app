@@ -6,9 +6,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json();
  const description = typeof body?.description === 'string' ? body.description : '';
 
- // Simple title suggestion based on description keywords
- const suggestions = [
- `Case ${description.substring(0, 50)}${description.length > 50 ? '...' : ''}`,
+ // Simple title suggestion based on description keywords$1;$2 `Case ${description.substring(0, 50)}${description.length > 50 ? '...' : ''}`,
  `Investigation: ${description.split(' ').slice(0, 5).join(' ')}`,
  `Matter: ${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`];
 

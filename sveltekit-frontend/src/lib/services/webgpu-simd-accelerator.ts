@@ -157,9 +157,7 @@ export class WebGPUSIMDAccelerator {
         // Categorize inputs by complexity for optimal processing
         const batches = this.categorizeBatches(jsonStrings);
 
-        // Process each batch with optimal method
-        const batchPromises = [
-            batches.webgpu.length > 0
+        // Process each batch with optimal method$1;$2            batches.webgpu.length > 0
                 ? this.webgpuBatchProcess(batches.webgpu, mode)
                 : Promise.resolve([] as AccelerationResult[]),
             batches.simd.length > 0
@@ -223,17 +221,13 @@ export class WebGPUSIMDAccelerator {
             const commandEncoder = this.device.createCommandEncoder();
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(computePipeline);
-            passEncoder.setBindGroup(0, bindGroup);
-            const workgroups = Math.max(
-                1, Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
+            passEncoder.setBindGroup(0, bindGroup);$1;$2                1, Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
             );
             passEncoder.dispatchWorkgroups(workgroups);
             passEncoder.end();
             this.device.queue.submit([commandEncoder.finish()]);
 
-            // Simplified read: let SIMD parser produce the final structured result for now
-            const fallbackResult = await (unifiedSIMDParser as any).parseOptimal(
-                jsonString: ParseMode.WEBGPU_ACCELERATED
+            // Simplified read: let SIMD parser produce the final structured result for now$1;$2                jsonString: ParseMode.WEBGPU_ACCELERATED
             );
 
             return {
@@ -364,9 +358,7 @@ export class WebGPUSIMDAccelerator {
         const results: AccelerationResult[] = [];
 
         for (let i = 0; i < jsonStrings.length; i += batchSize) {
-            const batch = jsonStrings.slice(i, i + batchSize);
-            const batchResults = await Promise.all(
-                batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
+            const batch = jsonStrings.slice(i, i + batchSize);$1;$2                batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
             );
             results.push(...batchResults);
         }

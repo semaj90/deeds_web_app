@@ -160,10 +160,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  routeId: '/cases/new',
  status: 'broken',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- },
-
- const mockErrors = [
- {
+ },$1;$2 {
  id: 'err1',
  routeId: '/cases/new',
  tool: 'tsc',
@@ -204,10 +201,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
-
- const mockResolvedErrors = [
- {
+ };$1;$2 {
  id: 'err1',
  routeId: '/cases/new',
  tool: 'tsc',

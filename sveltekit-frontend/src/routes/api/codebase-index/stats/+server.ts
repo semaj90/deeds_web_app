@@ -35,9 +35,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			console.warn('FastAPI backend not available, falling back to Qdrant:', backendError);
 		}
 
-		// Fallback: Get error cards count and stats directly from Qdrant
-		const errorCardsResponse = await fetch(
-			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		// Fallback: Get error cards count and stats directly from Qdrant$1;$2			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -84,9 +82,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				.sort((a, b) => b.count - a.count);
 		}
 
-		// Get cluster count
-		const clustersResponse = await fetch(
-			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
+		// Get cluster count$1;$2			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

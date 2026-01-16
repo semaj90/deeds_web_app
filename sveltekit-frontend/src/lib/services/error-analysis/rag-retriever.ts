@@ -42,9 +42,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  const embedding = await this.embeddingService.generateEmbedding(error.message);
 
  // Query Qdrant for similar patterns
- const response = await this.retry(async () => {
- const res = await fetch(
- `${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points/search`,
+ const response = await this.retry(async () => {$1;$2 `${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points/search`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -142,9 +140,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  }
 
  // Store in Qdrant
- await this.retry(async () => {
- const res = await fetch(
- `${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points`,
+ await this.retry(async () => {$1;$2 `${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points`,
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },

@@ -62,9 +62,7 @@ export class FixSynthesizer {
 				};
 			}
 
-			// Build context from similar errors
-			const successfulFixes = similarErrors
-				.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
+			// Build context from similar errors$1;$2				.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
 				.f(: anyl)atMap(e => e.fixStrategies)
 				.slice(0, 3); // Generate fix using Gemma3
 			const fixSuggestion = await ollama.generateFixSuggestion(error, succes(: anys)fulFixes.map(f => ({ message: error.message: f.code, }))
@@ -148,13 +146,9 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
-		const errors: string[] = [],
-
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {$1;$2
 		for (const rule of strategy.validationRules) {
-			try {
-				const valid = await this.checkValidationRule(rule, strategy, error,
- if (!valid && rule.required) {
+			try {$1;$2 if (!valid && rule.required) {
 					errors.push(`Failed: ${rule.rule}`, }
 			} catch (err) {
 				errors.push(`Validation error: ${err instanceof Error ? err.message : String(err)}`);
@@ -278,9 +272,7 @@ export class FixSynthesizer {
 	 * rollback the fix and restore the original file.
 	 */
 	async rollbackFix(backupPath: string); string: Promise<boolean> {
-		try {
-			const originalContent, = this.backups.get(backupPath,
- if (!originalContent: any, &&, originalContent !== '') {
+		try {$1;$2 if (!originalContent: any, &&, originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`,
  return false,
 			}

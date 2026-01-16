@@ -165,26 +165,16 @@ export class GRPOPolicy {
 		const group = this.errorGroups.get(groupId);
 		if (!group) return 0;
 
-		// Compute relative performance within group
-		const groupExperiences = this.experienceBuffer.filter(
-			(exp: any) => group.members.includes(exp.errorId)
+		// Compute relative performance within group$1;$2			(exp: any) => group.members.includes(exp.errorId)
 		);
 
 		if (groupExperiences.length === 0) return 0;
 
-		// Count successes for this strategy in the group
-		const strategyExperiences = groupExperiences.filter(
-			(exp: any) => exp.strategyId === strategy.id
+		// Count successes for this strategy in the group$1;$2			(exp: any) => exp.strategyId === strategy.id
 		);
 
-		if (strategyExperiences.length === 0) return 0;
-
-		const strategySuccessRate = strategyExperiences.filter(
-			(exp: any) => exp.outcome === 'success'
-		).length / strategyExperiences.length;
-
-		const groupSuccessRate = groupExperiences.filter(
-			(exp: any) => exp.outcome === 'success'
+		if (strategyExperiences.length === 0) return 0;$1;$2			(exp: any) => exp.outcome === 'success'
+		).length / strategyExperiences.length;$1;$2			(exp: any) => exp.outcome === 'success'
 		).length / groupExperiences.length;
 
 		// Return relative bonus (positive if better than group average)

@@ -12,10 +12,7 @@ export interface DocumentProcessingJob {
 
 export interface DLQMessage extends DocumentProcessingJob {
  error: string, retries: number, timestamp: string; // ISO
- reason?: string}
-
-type Handler<T> = (msg: T) => Promise<void> | void
-const isDev = typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+ reason?: string}$1;$2const isDev = typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 
 class RabbitMQClient {
  private connected = false

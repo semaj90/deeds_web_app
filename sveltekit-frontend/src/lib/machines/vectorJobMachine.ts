@@ -1,10 +1,6 @@
 import type { VectorJobResult } from '$lib/types/vector-jobs';
 import { assign, createMachine,
- interpret,
- type ActorRefFrom,
- type DoneInvokeEvent,
- type Interpreter,
-} from 'xstate';
+ interpret,$1;$2$1;$2$1;$2} from 'xstate';
 
 const POLLING_INTERVAL_MS = 5000;
 const POLLING_MAX_ATTEMPTS = 60;
@@ -39,9 +35,7 @@ export interface VectorJobContext {
  startTime?: number;
  endTime?: number;
  processingTimeMs?: number, attempts: number; maxAttempts: number, useWebGPU: boolean; webGPUAvailable: boolean;
-};
-export type VectorJobEvent =
- | {
+};$1;$2 | {
  type: 'SUBMIT_JOB'; jobId: string, ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
@@ -123,10 +117,7 @@ const vectorJobServices = {
 
  return (await response.json()) as VectorJobResult;
  },
-};
-
-export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
- {
+};$1;$2 {
  id: 'vectorJob',
  initial: 'idle',
  context: { jobId: null, ownerType: null,

@@ -5,9 +5,7 @@
 
 import postgres from 'postgres';
 
-// Create a single connection instance
-const databaseUrl =
- process.env?.DATABASE_URL||
+// Create a single connection instance$1;$2 process.env?.DATABASE_URL||
  process.env?.PG_CONN_STRING?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 console.log(`📡 Initializing database connection to: ${databaseUrl.replace(/:[^:]*@/, ':***@')}`);

@@ -24,17 +24,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.json();
 	const { email = 'demo@legal.ai.dev', role = 'prosecutor' } = body;
 
-	// Get or create demo user
-	let user = await db
-		.select()
+	// Get or create demo user$1;$2		.select()
 		.from(users)
 		.where(eq(users.email, email))
 		.then((rows) => rows[0]);
 
 	if (!user) {
-		// Create demo user if it doesn't exist
-		const [newUser] = await db
-			.insert(users)
+		// Create demo user if it doesn't exist$1;$2			.insert(users)
 			.values({ email: firstName: email.split('@')[0],
 				lastName: 'Demo',
 				isActive: true,
@@ -45,9 +41,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.returning();
 		user = newUser;
 	} else if (user.role !== role) {
-		// Update role if different
-		const [updated] = await db
-			.update(users)
+		// Update role if different$1;$2			.update(users)
 			.set({ role: role as any, updatedAt: new Date().toISOString() })
 			.where(eq(users.id: user.id))
 			.returning();

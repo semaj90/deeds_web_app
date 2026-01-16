@@ -213,18 +213,14 @@ export class KnowledgeSearcher {
     query: string, results: SearchResult[],
     provider: 'ollama' | 'gemini' | 'claude' = 'ollama'
   ): Promise<string> {
-    // Build context from top results
-    const context = results
-      .slice(0, 5) // Use top 5 results
+    // Build context from top results$1;$2      .slice(0, 5) // Use top 5 results
       .map((r: any, idx: any) => {
         const content = r?.content|| r.summary;
         return `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${content}\n`;
       })
       .join('\n---\n\n');
 
-    // Build prompt
-    const prompt = `You are a helpful AI assistant. Answer the following question using ONLY the provided context. If the context doesn't contain enough information, say so.
-
+    // Build prompt$1;$2
 Context:
 ${context}
 

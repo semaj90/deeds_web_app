@@ -22,36 +22,26 @@ import { relations } from 'drizzle-orm/relations';
 
 // Note: vector type is handled via sql`` template in table definitions
 
-// === ENUMS FOR LEGAL AI APPLICATION ===
-export const userRoleEnum = pgEnum('user_role', [
- 'prosecutor',
+// === ENUMS FOR LEGAL AI APPLICATION ===$1;$2 'prosecutor',
  'detective',
  'admin',
  'analyst',
- 'paralegal']);
-export const caseStatusEnum = pgEnum('case_status', [
- 'open',
+ 'paralegal']);$1;$2 'open',
  'in_progress',
  'pending_review',
  'closed',
- 'archived']);
-export const casePriorityEnum = pgEnum('case_priority', [
- 'low',
+ 'archived']);$1;$2 'low',
  'medium',
  'high',
  'critical',
- 'urgent']);
-export const evidenceTypeEnum = pgEnum('evidence_type', [
- 'document',
+ 'urgent']);$1;$2 'document',
  'photo',
  'video',
  'audio',
  'physical',
  'digital',
  'witness_statement',
- 'forensic']);
-export const evidenceRelationshipTypeEnum = pgEnum('evidence_relationship_type', [
- 'supports',
+ 'forensic']);$1;$2 'supports',
  'contradicts',
  'same_person',
  'timeline',
@@ -68,46 +58,32 @@ export const evidenceRelationshipTypeEnum = pgEnum('evidence_relationship_type',
  'direct_evidence',
  'hearsay',
  'privileged',
- 'inadmissible']);
-export const evidenceRelationshipStrengthEnum = pgEnum('evidence_relationship_strength', [
- 'low',
+ 'inadmissible']);$1;$2 'low',
  'medium',
  'high']);
-export const threatLevelEnum = pgEnum('threat_level', ['low', 'medium', 'high', 'critical']);
-export const documentTypeEnum = pgEnum('document_type', [
- 'case_law',
+export const threatLevelEnum = pgEnum('threat_level', ['low', 'medium', 'high', 'critical']);$1;$2 'case_law',
  'statute',
  'regulation',
  'brief',
  'contract',
  'evidence',
  'report',
- 'precedent']);
-export const confidentialityEnum = pgEnum('confidentiality_level', [
- 'public',
+ 'precedent']);$1;$2 'public',
  'standard',
  'confidential',
  'restricted',
- 'classified']);
-export const activityStatusEnum = pgEnum('activity_status', [
- 'pending',
+ 'classified']);$1;$2 'pending',
  'in_progress',
  'completed',
  'cancelled',
- 'postponed']);
-export const reportStatusEnum = pgEnum('report_status', [
- 'draft',
+ 'postponed']);$1;$2 'draft',
  'review',
  'approved',
  'published',
- 'archived']);
-export const verificationStatusEnum = pgEnum('verification_status', [
- 'pending',
+ 'archived']);$1;$2 'pending',
  'verified',
  'rejected',
- 'needs_review']);
-export const documentStatusEnum = pgEnum('document_status', [
- 'queued',
+ 'needs_review']);$1;$2 'queued',
  'processing',
  'processed',
  'failed',
@@ -116,13 +92,9 @@ export const documentStatusEnum = pgEnum('document_status', [
  'pending_embedding',
  'embedding_completed',
  'pending_summary',
- 'summary_completed']);
-export const summaryTypeEnum = pgEnum('summary_type', [
- 'legal_analysis',
+ 'summary_completed']);$1;$2 'legal_analysis',
  'executive_summary',
- 'key_facts']);
-export const caseRiskLevelEnum = pgEnum('case_risk_level', [
- 'low',
+ 'key_facts']);$1;$2 'low',
  'medium',
  'high',
  'critical',
@@ -143,10 +115,7 @@ export const users = pgTable('users', {
  avatarUrl: text('avatar_url'),
  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-});
-
-export const sessions = pgTable(
- 'sessions',
+});$1;$2 'sessions',
  {
  id: text('id').primaryKey().notNull(),
  userId: uuid('user_id').notNull(),
@@ -160,10 +129,7 @@ export const sessions = pgTable(
  name: 'sessions_user_id_users_id_fk',
  }).onDelete('cascade')],
  })
-);
-
-export const emailVerificationCodes = pgTable(
- 'email_verification_codes',
+);$1;$2 'email_verification_codes',
  {
  id: serial('id').primaryKey().notNull(), // Assuming serial ID
  userId: uuid('user_id').notNull(),
@@ -180,10 +146,7 @@ export const emailVerificationCodes = pgTable(
  }).onDelete('cascade')],
  uniqueConstraints: [unique('email_verification_codes_user_id_unique').on(table.userId)],
  })
-);
-
-export const passwordResetTokens = pgTable(
- 'password_reset_tokens',
+);$1;$2 'password_reset_tokens',
  {
  tokenHash: varchar('token_hash', { length: 63 }).primaryKey().notNull(), // Assuming tokenHash is primary key
  userId: uuid('user_id').notNull(),
@@ -199,9 +162,7 @@ export const passwordResetTokens = pgTable(
  })
 );
 
-// === CASE MANAGEMENT ===
-export const cases = pgTable(
- 'cases',
+// === CASE MANAGEMENT ===$1;$2 'cases',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -246,9 +207,7 @@ export const cases = pgTable(
  })
 );
 
-// === CRIMINAL RECORDS ===
-export const criminals = pgTable(
- 'criminals',
+// === CRIMINAL RECORDS ===$1;$2 'criminals',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -331,9 +290,7 @@ export const evidence = pgTable('evidence', {
  uploadedAt: timestamp('uploaded_at', { mode: 'string' }),
 });
 
-// === EVIDENCE RELATIONSHIPS ===
-export const evidenceRelationships = pgTable(
- 'evidence_relationships',
+// === EVIDENCE RELATIONSHIPS ===$1;$2 'evidence_relationships',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -399,9 +356,7 @@ export const documents = pgTable('documents', {
  userId: uuid('user_id'),
 });
 
-// Define legalDocuments table (based on documents, with additional fields for Qdrant integration)
-export const legalDocuments = pgTable(
- 'legal_documents',
+// Define legalDocuments table (based on documents, with additional fields for Qdrant integration)$1;$2 'legal_documents',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -469,9 +424,7 @@ export const legalDocuments = pgTable(
  })
 );
 
-// Define storageFiles table
-export const storageFiles = pgTable(
- 'storage_files',
+// Define storageFiles table$1;$2 'storage_files',
  {
  id: uuid('id')
  .primaryKey()
@@ -495,9 +448,7 @@ export const storageFiles = pgTable(
  })
 );
 
-// === VECTOR METADATA ===
-export const vectorMetadata = pgTable(
- 'vector_metadata',
+// === VECTOR METADATA ===$1;$2 'vector_metadata',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -513,9 +464,7 @@ export const vectorMetadata = pgTable(
  (table) => [unique('vector_metadata_document_id_unique').on(table.documentId)]
 );
 
-// === CASE SCORING SYSTEM ===
-export const caseScores = pgTable(
- 'case_scores',
+// === CASE SCORING SYSTEM ===$1;$2 'case_scores',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -545,9 +494,7 @@ export const caseScores = pgTable(
  }).onDelete('set null')]
 );
 
-// === EMBEDDING CACHE ===
-export const embeddingCache = pgTable(
- 'embedding_cache',
+// === EMBEDDING CACHE ===$1;$2 'embedding_cache',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -561,9 +508,7 @@ export const embeddingCache = pgTable(
  (table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
 );
 
-// === USER AI QUERIES ===
-export const userAiQueriesTable = pgTable(
- 'user_ai_queries',
+// === USER AI QUERIES ===$1;$2 'user_ai_queries',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -595,9 +540,7 @@ export const userAiQueriesTable = pgTable(
  })
 );
 
-// === AUTO TAGS ===
-export const autoTagsTable = pgTable(
- 'auto_tags',
+// === AUTO TAGS ===$1;$2 'auto_tags',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -844,9 +787,7 @@ export const personsOfInterest = pgTable('persons', {
  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// POI Photos table for better organization
-export const poiPhotos = pgTable(
- 'poi_photos',
+// POI Photos table for better organization$1;$2 'poi_photos',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -991,9 +932,7 @@ export const statutes = pgTable('statutes', {
  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Chunked statute sections for RAG search
-export const statuteChunks = pgTable(
- 'statute_chunks',
+// Chunked statute sections for RAG search$1;$2 'statute_chunks',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1308,9 +1247,7 @@ export const userEmbeddingsRelations = relations(userEmbeddings, ({ one }) => ({
  user: one(users, { fields: [userEmbeddings.userId], references: [users.id] }),
 }));
 
-// === EVIDENCE BOARD MANAGEMENT ===
-export const evidenceBoardConnections = pgTable(
- 'evidence_board_connections',
+// === EVIDENCE BOARD MANAGEMENT ===$1;$2 'evidence_board_connections',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1349,9 +1286,7 @@ export const evidenceBoardConnections = pgTable(
 );
 
 // === CASE NOTES ===
-// User notes attached to cases (searchable, with optional AI-generated content)
-export const caseNotes = pgTable(
- 'case_notes',
+// User notes attached to cases (searchable, with optional AI-generated content)$1;$2 'case_notes',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1380,9 +1315,7 @@ export const caseNotes = pgTable(
 );
 
 // === CASE NOTE EVIDENCE REFERENCES ===
-// Links case notes to evidence items for cross-referencing
-export const caseNoteEvidenceRefs = pgTable(
- 'case_note_evidence_refs',
+// Links case notes to evidence items for cross-referencing$1;$2 'case_note_evidence_refs',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1406,9 +1339,7 @@ export const caseNoteEvidenceRefs = pgTable(
 );
 
 // === MULTI-PANEL WORKSPACE MANAGEMENT ===
-// Workspaces group chat sessions with evidence, statutes, notes, and citations
-export const workspaces = pgTable(
- 'workspaces',
+// Workspaces group chat sessions with evidence, statutes, notes, and citations$1;$2 'workspaces',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1431,9 +1362,7 @@ export const workspaces = pgTable(
  })
 );
 
-// Link chat sessions to workspaces (one workspace can have multiple chat sessions)
-export const workspaceSessions = pgTable(
- 'workspace_sessions',
+// Link chat sessions to workspaces (one workspace can have multiple chat sessions)$1;$2 'workspace_sessions',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1455,9 +1384,7 @@ export const workspaceSessions = pgTable(
  })
 );
 
-// Evidence panel: link evidence items to workspaces
-export const workspaceEvidence = pgTable(
- 'workspace_evidence',
+// Evidence panel: link evidence items to workspaces$1;$2 'workspace_evidence',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1481,9 +1408,7 @@ export const workspaceEvidence = pgTable(
  })
 );
 
-// Statute panel: link statutes/laws to workspaces
-export const workspaceStatutes = pgTable(
- 'workspace_statutes',
+// Statute panel: link statutes/laws to workspaces$1;$2 'workspace_statutes',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1506,9 +1431,7 @@ export const workspaceStatutes = pgTable(
  })
 );
 
-// User notes and legal memos (searchable via vector embeddings)
-export const workspaceNotes = pgTable(
- 'workspace_notes',
+// User notes and legal memos (searchable via vector embeddings)$1;$2 'workspace_notes',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1534,9 +1457,7 @@ export const workspaceNotes = pgTable(
  })
 );
 
-// Citations and references (links messages to legal sources)
-export const workspaceCitations = pgTable(
- 'workspace_citations',
+// Citations and references (links messages to legal sources)$1;$2 'workspace_citations',
  {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)
@@ -1728,9 +1649,7 @@ export const helpers = { sql };
 
 /**
  * YoRHa Cases table - stores detective cases
- */
-export const yorhaCases = pgTable(
- 'yorha_cases',
+ */$1;$2 'yorha_cases',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_number: varchar('case_number', { length: 100 }).notNull().unique(),
@@ -1757,9 +1676,7 @@ export const yorhaCases = pgTable(
 
 /**
  * YoRHa Evidence Nodes table - stores evidence items on the evidence board
- */
-export const yorhaEvidenceNodes = pgTable(
- 'yorha_evidence_nodes',
+ */$1;$2 'yorha_evidence_nodes',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -1793,9 +1710,7 @@ export const yorhaEvidenceNodes = pgTable(
 
 /**
  * YoRHa Evidence Connections table - stores relationships between evidence nodes
- */
-export const yorhaEvidenceConnections = pgTable(
- 'yorha_evidence_connections',
+ */$1;$2 'yorha_evidence_connections',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -1820,9 +1735,7 @@ export const yorhaEvidenceConnections = pgTable(
 
 /**
  * YoRHa Chat Sessions table - stores conversation sessions
- */
-export const yorhaChatSessions = pgTable(
- 'yorha_chat_sessions',
+ */$1;$2 'yorha_chat_sessions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -1845,9 +1758,7 @@ export const yorhaChatSessions = pgTable(
 
 /**
  * YoRHa Chat Messages table - stores individual messages in chat sessions
- */
-export const yorhaChatMessages = pgTable(
- 'yorha_chat_messages',
+ */$1;$2 'yorha_chat_messages',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  session_id: uuid('session_id').notNull(),
@@ -1869,9 +1780,7 @@ export const yorhaChatMessages = pgTable(
 
 /**
  * YoRHa System Metrics table - stores historical system metrics
- */
-export const yorhaSystemMetrics = pgTable(
- 'yorha_system_metrics',
+ */$1;$2 'yorha_system_metrics',
  {
  id: serial('id').primaryKey(),
  cpu_usage: integer('cpu_usage'),
@@ -1976,28 +1885,20 @@ export type NewYoRHaSystemMetrics = typeof yorhaSystemMetrics.$inferInsert;
 
 export const routeHealthStateEnum = pgEnum('route_health_state', ['healthy', 'flaky', 'broken']);
 
-export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'error', 'fatal']);
-
-export const errorKindEnum = pgEnum('error_kind', [
- 'typescript',
+export const errorSeverityEnum = pgEnum('error_severity', ['info', 'warn', 'error', 'fatal']);$1;$2 'typescript',
  'svelte',
  'lint',
  'build',
  'runtime',
  'api',
- 'other']);
-
-export const suggestionStateEnum = pgEnum('suggestion_state', [
- 'pending',
+ 'other']);$1;$2 'pending',
  'applied',
  'dismissed',
  'snoozed']);
 
 /**
  * route_health: Current health state of each route (HMM-style state tracking)
- */
-export const routeHealth = pgTable(
- 'route_health',
+ */$1;$2 'route_health',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull().unique(),
@@ -2023,9 +1924,7 @@ export const routeHealth = pgTable(
 
 /**
  * error_events: Individual error occurrences
- */
-export const errorEvents = pgTable(
- 'error_events',
+ */$1;$2 'error_events',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull(),
@@ -2051,9 +1950,7 @@ export const errorEvents = pgTable(
 
 /**
  * error_clusters: Grouped similar errors with embeddings
- */
-export const errorClusters = pgTable(
- 'error_clusters',
+ */$1;$2 'error_clusters',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  kind: errorKindEnum('kind').notNull(),
@@ -2073,9 +1970,7 @@ export const errorClusters = pgTable(
 
 /**
  * error_suggestions: LLM-generated fix suggestions
- */
-export const errorSuggestions = pgTable(
- 'error_suggestions',
+ */$1;$2 'error_suggestions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  clusterId: uuid('cluster_id')
@@ -2098,9 +1993,7 @@ export const errorSuggestions = pgTable(
 
 /**
  * route_error_patches: Track patches applied to routes
- */
-export const routeErrorPatches = pgTable(
- 'route_error_patches',
+ */$1;$2 'route_error_patches',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull(),
@@ -2130,9 +2023,7 @@ export const routeErrorPatches = pgTable(
 
 /**
  * error_timeline: Timeline of error events for audit trail
- */
-export const errorTimeline = pgTable(
- 'error_timeline',
+ */$1;$2 'error_timeline',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  routePath: varchar('route_path', { length: 255 }).notNull(),
@@ -2150,9 +2041,7 @@ export const errorTimeline = pgTable(
 
 /**
  * error_suggestion_states: Track user feedback on AI suggestions (dismiss, snooze, apply)
- */
-export const errorSuggestionStates = pgTable(
- 'error_suggestion_states',
+ */$1;$2 'error_suggestion_states',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  suggestionId: uuid('suggestion_id')
@@ -2177,9 +2066,7 @@ export const errorSuggestionStates = pgTable(
 
 /**
  * error_feedback: User feedback on suggestions
- */
-export const errorFeedback = pgTable(
- 'error_feedback',
+ */$1;$2 'error_feedback',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  suggestionId: uuid('suggestion_id')

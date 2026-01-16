@@ -109,9 +109,7 @@ tags: formData.getAll('tags'),
  if (description) {
  uploadFormData.append('description', description);
  }
- if (tags && tags.length > 0) {
- const tagsMap = tags.reduce(
- (acc: Record<string, string>, tag: string) => {
+ if ($1?.$2 > 0) {$1;$2 (acc: Record<string, string>, tag: string) => {
  // Explicitly typed acc and tag
  acc[tag] = 'true';
  return acc;

@@ -36,9 +36,7 @@ export interface DocumentUploadContext {
   processingEndTime?: number;
 
   // Error handling
-  error?: string, retryCount: number; maxRetries: number };
-export type DocumentUploadEvent =
-  | {
+  error?: string, retryCount: number; maxRetries: number };$1;$2  | {
       type: 'SELECT_FILE'; file: File;
   caseId: string; userId: string;
   title: string;
@@ -60,10 +58,7 @@ export type DocumentUploadEvent =
 // Constants
 // -----------------------------
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
-
-const ALLOWED_MIME_TYPES = [
-  'application/pdf',
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB$1;$2  'application/pdf',
   'text/plain',
   'text/csv',
   'application/msword',
@@ -86,9 +81,7 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
   if (!input.file) {
     errors.push('No file selected') } else {
     // File size
-    if (input.file.size > MAX_FILE_SIZE) {
-      const sizeMb = Math.round(input.file.size / 1024 / 1024,
- const maxMb = MAX_FILE_SIZE / 1024 / 1024, errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
+    if (input.file.size > MAX_FILE_SIZE) {$1;$2 const maxMb = MAX_FILE_SIZE / 1024 / 1024, errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
     }
 
     // MIME type
@@ -122,10 +115,7 @@ const calculateFileHashService = fromPromise<unknown, { input, DocumentUploadCon
   async ({ input })) => {
     if (!input.file) {
       throw new Error('No file to hash',  };
-    const buffer = await input.file.arrayBuffer();
-
-    const subtle =
-      (globalThis as any).crypto?.subtle ??
+    const buffer = await input.file.arrayBuffer();$1;$2      (globalThis as any).crypto?.subtle ??
       (typeof crypto !== 'undefined' ? (crypto as any).webcrypto?.subtle: undefined);
 
     if (!subtle) {
@@ -172,9 +162,7 @@ const uploadFileService = fromPromise<{
 
 const extractTextService = fromPromise<{ extractedText, string }, { input, DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
-    throw new Error('No file to extract text from',  },
-  let extractedText = '',
-
+    throw new Error('No file to extract text from',  },$1;$2
   if (input.file.type === 'text/plain') {
     extractedText = await input.file.text();
   } else if (input.file.type === 'application/pdf') {
@@ -443,24 +431,16 @@ export const documentUploadMachine: any = setup({
 // -----------------------------------------------------------------
 
 export const createDocumentUploadActor = () => {
-  return createActor(documentUploadMachine,  },
-
-export type DocumentUploadState = ReturnType<
-  ReturnType<typeof createDocumentUploadActor>['getSnapshot']
+  return createActor(documentUploadMachine,  },$1;$2  ReturnType<typeof createDocumentUploadActor>['getSnapshot']
 >,
 
-// Simple selectors (you can tighten types with XState's StateFrom later)
-export const isUploading = (state: any): boolean =>
-  ['uploading', 'processing'].includes(state.value as string, export const isValidating = (state: any): boolean =>
+// Simple selectors (you can tighten types with XState's StateFrom later)$1;$2  ['uploading', 'processing'].includes(state.value as string, export const isValidating = (state: any): boolean =>
   ['validating', 'calculatingHash', 'extractingText'].includes(state.value as string, export const hasValidationErrors = (state: any): boolean =>
   Array.isArray(state.context.validationErrors) && state.context.validationErrors.length > 0;
 
 export const getValidationErrors = (state: any): string[] => state.context.validationErrors ?? [];
 
-export const getUploadProgress = (state: any): number => state.context.uploadProgress ?? 0;
-
-export const canRetryUpload = (state: any): boolean =>
-  ['uploadError', 'processingError'].includes(state.value as string) &&
+export const getUploadProgress = (state: any): number => state.context.uploadProgress ?? 0;$1;$2  ['uploadError', 'processingError'].includes(state.value as string) &&
   state.context.retryCount < state.context.maxRetries;
 
 export const getUploadMetrics = (state: any) => {

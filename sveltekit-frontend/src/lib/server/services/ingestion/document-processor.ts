@@ -54,9 +54,7 @@ export function splitSentences(text: string): string[] {
  // Check for sentence boundaries
  if ((char === '.' || char === '? ' ?? char === '!') && nextChar === ' ') {
  // Skip if it's an abbreviation
- const lastWord = current.trim().split(/\s+/).pop() ?? '';
- const isAbbreviation =
- /^[A-Z]\.? $/.test(lastWord) ?? /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
+ const lastWord = current.trim().split(/\s+/).pop() ?? '';$1;$2 /^[A-Z]\.? $/.test(lastWord) ?? /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
  lastWord
  );
 
@@ -107,9 +105,7 @@ export function chunkDocument(
  const chunkText = chunkTokens.join(' ');
 
  // Find actual character positions
- const startCharIdx = text.indexOf(chunkTokens[0]);
- const endCharIdx =
- text.lastIndexOf(chunkTokens[chunkTokens.length - 1]) +
+ const startCharIdx = text.indexOf(chunkTokens[0]);$1;$2 text.lastIndexOf(chunkTokens[chunkTokens.length - 1]) +
  chunkTokens[chunkTokens.length - 1].length;
 
  chunks.push({
@@ -132,16 +128,12 @@ export function chunkDocument(
 export function extractCitations(text: string): Citation[] {
  const citations: Citation[] = [];
 
- // Case citation patterns
- const casePatterns = [
- /(\d+)\s+Cal(?:\.)?(?:\s+App)?(?:\.)?(?:\s+\d+)?(?:th)?\s+(\d+)/gi, // California cases
+ // Case citation patterns$1;$2 /(\d+)\s+Cal(?:\.)?(?:\s+App)?(?:\.)?(?:\s+\d+)?(?:th)?\s+(\d+)/gi, // California cases
  /(\d+)\s+F\.(?:2d|3d|Supp\.?)\s+(\d+)/gi, // Federal cases
  /(\d+)\s+U\.S\.\s+(\d+)/gi, // Supreme Court
  ];
 
- // Statute citation patterns
- const statutePatterns = [
- /Cal(?:ifornia)?\.?\s+(?:Penal|Civil|Family|Probate|Code)\s+(?:§|Section)\s+(\d+)/gi,
+ // Statute citation patterns$1;$2 /Cal(?:ifornia)?\.?\s+(?:Penal|Civil|Family|Probate|Code)\s+(?:§|Section)\s+(\d+)/gi,
  /Cal\.?\s+(?:Pen\.|Civ\.|Fam\.|Prob\.)\s+Code\s+§\s+(\d+)/gi];
 
  // Extract case citations
@@ -177,9 +169,7 @@ export function extractCitations(text: string): Citation[] {
  * Extract holding from case text
  */
 export function extractHolding(text: string): string {
- // Look for common holding indicators
- const holdingIndicators = [
- /held[:]?\s+(.+?)(?:\.|$)/i,
+ // Look for common holding indicators$1;$2 /held[:]?\s+(.+?)(?:\.|$)/i,
  /the court held[:]?\s+(.+?)(?:\.|$)/i,
  /we hold[:]?\s+(.+?)(?:\.|$)/i,
  /holding[:]?\s+(.+?)(?:\.|$)/i];
@@ -210,9 +200,7 @@ export function extractMetadata(text: string, string: DocumentMetadata {
  metadata.year = parseInt(yearMatch[1]);
  }
 
- // Extract court
- const courtPatterns = [
- /Supreme Court/i,
+ // Extract court$1;$2 /Supreme Court/i,
  /Court of Appeal/i,
  /Superior Court/i,
  /District Court/i];
@@ -235,9 +223,7 @@ export function extractMetadata(text: string, string: DocumentMetadata {
  * Extract keywords from text
  */
 export function extractKeywords(text: string): string[] {
- // Legal keywords
- const legalKeywords = [
- 'child abuse',
+ // Legal keywords$1;$2 'child abuse',
  'neglect',
  'dependency',
  'restitution',

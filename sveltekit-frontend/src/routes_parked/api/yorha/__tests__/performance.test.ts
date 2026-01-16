@@ -16,9 +16,7 @@ describe('YoRHa Performance Tests', () => {
  let caseId: string;
 
  beforeAll(async () => {
- // Create test case
- const result = await db
- .insert(yorhaCases)
+ // Create test case$1;$2 .insert(yorhaCases)
  .values({
  case_number: 'PERF-CASE-001',
  title: 'Performance Test Case',

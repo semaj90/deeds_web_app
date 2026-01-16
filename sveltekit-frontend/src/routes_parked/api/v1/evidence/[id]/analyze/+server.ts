@@ -3,9 +3,7 @@ import type { Case } from '$lib // TODO: Verify store subscription is correct fo
 import { cuidSchema } from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/z-schemas';
 /* * Individual Evidence AI Analysis API Route * POST /api/v1/evidence/[id]/analyze - Analyze specific evidence with AI */ import {
  json,
- error,
- type RequestHandler,
-} from '@sveltejs/kit';
+ error,$1;$2} from '@sveltejs/kit';
 import makeHttpErrorPayload from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/api/makeHttpError';
 import { EvidenceCRUDService } from '$lib // TODO: Verify store subscription is correct for Svelte 5/server/services/user-scoped-crud';
 import { z } from 'zod';

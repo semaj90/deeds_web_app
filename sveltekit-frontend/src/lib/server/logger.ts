@@ -31,9 +31,7 @@ export async function logStructuredError(payload, { source: string,
  const sentryAdapter = await import('./log-adapters/sentry.js');
  const captureException = (sentryAdapter as any).captureException;
  const isEnabled = (sentryAdapter as any).isEnabled;
- if (payload.level === 'error' && typeof captureException === 'function' && isEnabled) {
- const errorToCapture =
- payload.error instanceof Error ? payload.error : new Error(payload.message);
+ if (payload.level === 'error' && typeof captureException === 'function' && isEnabled) {$1;$2 payload.error instanceof Error ? payload.error : new Error(payload.message);
  captureException(errorToCapture, {
  extra: { source: payload.source,
  event: payload.event,

@@ -1,9 +1,6 @@
 /**
  * Shared types for evidence processing
- */
-
-export type ProcessingStage =
- | 'classification'
+ */$1;$2 | 'classification'
  | 'ocr'
  | 'parsing'
  | 'chunking'
@@ -11,10 +8,7 @@ export type ProcessingStage =
  | 'embedding'
  | 'indexing'
  | 'completed'
- | 'failed';
-
-export type EventType =
- | 'stage_start'
+ | 'failed';$1;$2 | 'stage_start'
  | 'stage_progress'
  | 'stage_complete'
  | 'metrics_update'

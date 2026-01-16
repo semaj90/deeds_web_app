@@ -46,9 +46,7 @@ export class LLMService {
  * Extract citations from text
  */
  async extractCitations(text: string): Promise<Citation[]> {
- try {
- const prompt = `Extract all legal citations from the following text. Return as JSON array with fields: code, jurisdiction, title.
-
+ try {$1;$2
 Text:
 ${ text }
 
@@ -66,9 +64,7 @@ Return only valid JSON array.`;
  * Extract holding statement
  */
  async extractHolding(text: string): Promise<string> {
- try {
- const prompt = `Extract the main holding or legal principle from the following case summary. Return a single concise sentence.
-
+ try {$1;$2
 Text:
 ${ text }`;
 
@@ -83,16 +79,12 @@ ${ text }`;
  /**
  * Build summary generation prompt
  */
- private buildSummaryPrompt(context: SummaryContext): string {
- const statuteText = context.statutes
- .map((s) => `${s.code} (${s.jurisdiction}): ${s.title}`)
+ private buildSummaryPrompt(context: SummaryContext): string {$1;$2 .map((s) => `${s.code} (${s.jurisdiction}): ${s.title}`)
  .join('\n');
 
  const caseLawText = context.caseLaw.map((c) => `${c.title}: ${c.summary}`).join('\n');
 
- // Add legal constraints
- const legalConstraints = `
-⚖️ LEGAL CONSTRAINTS - YOU MUST FOLLOW THESE RULES:
+ // Add legal constraints$1;$2⚖️ LEGAL CONSTRAINTS - YOU MUST FOLLOW THESE RULES:
 
 ✔ YOU CAN:
 - Summarize sentencings, judgments, motions, complaints

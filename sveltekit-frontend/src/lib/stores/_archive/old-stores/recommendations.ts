@@ -82,9 +82,7 @@ const initialState: RecommendationState = {
 };
 // Core store
 export const recommendationStore = writable<RecommendationState>(initialState);
-// Derived stores
-export const highPriorityRecommendations = derived(recommendationStore, ($store) =>
- $store.activeRecommendations
+// Derived stores$1;$2 $store.activeRecommendations
  .filter((r) => r.priority === 'high' || r.priority === 'urgent')
  .sort((a, b) => b.confidence - a.confidence)
 );
@@ -183,9 +181,7 @@ export const recommendationActions = {
  includeUserAnalytics: true, maxRecommendations: 10,
  },
  });
- const resp = isRecord(rawResponse) ? rawResponse : {};
- const recs = Array.isArray(resp['recommendations'])
- ? (resp['recommendations'] as Recommendation[])
+ const resp = isRecord(rawResponse) ? rawResponse : {};$1;$2 ? (resp['recommendations'] as Recommendation[])
  : [];
  const insights = resp['insights'] ?? undefined;
  const latency = Date.now() - startTime;
@@ -280,9 +276,7 @@ export const recommendationActions = {
  },
  /** * Track recommendation accuracy based on user feedback */
  updateAccuracyMetrics(feedback: Array<{ helpful: boolean, confidence, number }>): void {
- if (!feedback || feedback.length === 0) return;
- const accuracy =
- feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence), 0) /
+ if (!feedback || feedback.length === 0) return;$1;$2 feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence), 0) /
  feedback.length;
  recommendationStore.update((state) => ({ ...state, recommendationAccuracy: accuracy }));
  },

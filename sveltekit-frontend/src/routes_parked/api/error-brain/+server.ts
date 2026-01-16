@@ -316,9 +316,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
- // Create mock history
- const history: HistoryEntry[] = [
- {
+ // Create mock history$1;$2 {
  id: 'history_1',
  type: 'analysis',
  data: { id: 'analysis_1',

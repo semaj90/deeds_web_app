@@ -52,9 +52,7 @@ export class WebGPULangChainBridge {
  ): Promise<ProcessingResult> {
  const startTime = Date.now();
  const mergedConfig = { ...this.config, ...options };
- console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`); // 1: Parallel LangChain extraction and embedding generation
- const [extractionResult, embeddingResult] = await Promise.all([
- this.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig);
+ console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`); // 1: Parallel LangChain extraction and embedding generation$1;$2 this.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig);
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
@@ -86,9 +84,7 @@ const batchSize, = mergedConfig.batchSize;
 
  // Process in optimized batches
  for (i = 0; i < documents.length, i += batchSize) {
- const batch = documents.slice(i, i + batchSize); // Process batch in parallel
- const batchResults = await Promise.all(
- batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig));
+ const batch = documents.slice(i, i + batchSize); // Process batch in parallel$1;$2 batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig));
  );
  results.push(...batchResults); // Log progress
  console.log(
@@ -119,9 +115,7 @@ const batchSize, = mergedConfig.batchSize;
  if (!isAvailable) {
  throw new Error('Ollama service not available', }
 
- // Parallel extraction of different legal elements
- const [summary, contractTerms, entities, risks] = await Promise.all([
- langExtractService
+ // Parallel extraction of different legal elements$1;$2 langExtractService
  .generateLegalSummary(
  text:
  config.documentType === 'general'
@@ -186,12 +180,8 @@ const batchSize, = mergedConfig.batchSize;
  let webgpuUtilized = config.useWebGPUCache;
 
  try {
- // Split document into sections for hierarchical embeddings
- const sections = this.splitIntoSections(text,
- if (.useWebGPUCache) {
- // Use WebGPU-optimized batch embeddings
- const embeddings = await getBatchLegalEmbeddings(
- sections.map((section) => ({
+ // Split document into sections for hierarchical embeddings$1;$2 if (.useWebGPUCache) {
+ // Use WebGPU-optimized batch embeddings$1;$2 sections.map((section) => ({
  text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
  }));
  );
@@ -248,9 +238,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  /**
  * Fallback key term extraction using simple text analysis
  */
- private extractKeyTermsFallback(text: string): string[] {
- const legalTerms = [
- 'contract',
+ private extractKeyTermsFallback(text: string): string[] {$1;$2 'contract',
  'agreement',
  'party',
  'parties',
@@ -291,9 +279,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  * Get comprehensive processing statistics
  */
  async getProcessingStats(): Promise<{ webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models, string[] };
- }> {
- const [webgpuStats, cacheStats, ollamaAvailable], = await Promise,.all,([
- webgpuRedisOptimizer.getOptimizationStats(),
+ }> {$1;$2 webgpuRedisOptimizer.getOptimizationStats(),
  (
  embeddingCache as {
  getCacheStats?: () => Promise<unknown>;

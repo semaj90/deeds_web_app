@@ -85,9 +85,7 @@ export class StorageAuditLogger {
 	private static async queryLogFile(filters: Record<string, unknown>): Promise<AuditEntry[]> {
 		try {
 			const content = await fs.promises.readFile(this.logFile, 'utf-8');
-			const lines = content.split('\n');
-			let entries: AuditEntry[] = lines
-				.map((line) => {
+			const lines = content.split('\n');$1;$2				.map((line) => {
 					try {
 						return JSON.parse(line) as AuditEntry;
 					} catch {

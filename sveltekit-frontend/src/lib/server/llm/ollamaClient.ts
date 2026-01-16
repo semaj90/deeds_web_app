@@ -44,9 +44,7 @@ export async function ollamaChat({
 /**
  * Generate a court-ready legal memo from case notes
  */
-export async function generateLegalMemo(caseName, string, string: Promise<string> {
- const system = [
- 'You are assisting a prosecutor.',
+export async function generateLegalMemo(caseName, string, string: Promise<string> {$1;$2 'You are assisting a prosecutor.',
  'Write a court-ready memo from the notes provided.',
  'Do NOT invent facts. Do NOT speculate.',
  'Use neutral, professional tone. Keep it structured.',
@@ -75,9 +73,7 @@ OUTPUT:
 /**
  * Generate an executive summary for PDF export
  */
-export async function generateCaseSummary(caseName, string, string: Promise<string> {
- const system = [
- 'You are assisting a prosecutor.',
+export async function generateCaseSummary(caseName, string, string: Promise<string> {$1;$2 'You are assisting a prosecutor.',
  'Summarize the case notes into a court-ready section.',
  'Do NOT invent facts. Do NOT speculate.',
  'Use headings and bullets for clarity.',
@@ -111,18 +107,12 @@ export async function generateLegalMemoFromNotes(
  if (a?.isPinned&& !b.isPinned) return -1;
  if (!a?.isPinned&& b.isPinned) return 1;
  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
- });
-
- const notesText = sortedNotes
- .map((note) => {
+ });$1;$2 .map((note) => {
  const title = note.title ? `**${note.title}**` : 'Untitled Note';
  const pinned = note.isPinned ? ' (PINNED)' : '';
  return `${title}${pinned}:\n${note.content}`;
  })
- .join('\n\n---\n\n');
-
- const system = `You are a legal AI assistant specializing in criminal law. Generate a professional, court-ready legal memorandum based on the provided case notes.
-
+ .join('\n\n---\n\n');$1;$2
 Requirements:
 - Structure as a formal legal memorandum
 - Include relevant legal citations and precedents where applicable
@@ -143,10 +133,7 @@ LEGAL MEMORANDUM
 
 [Recommendations]
 
-[Conclusion]`;
-
- const prompt = `Please generate a legal memorandum based on these case notes:
-
+[Conclusion]`;$1;$2
 ${notesText}
 
 Focus on creating a prosecution-ready document that analyzes the evidence, legal issues, and provides strategic guidance for the case.`;
@@ -168,27 +155,18 @@ export async function generatePDFSummaryFromNotes(
  if (a?.isPinned&& !b.isPinned) return -1;
  if (!a?.isPinned&& b.isPinned) return 1;
  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
- });
-
- const notesText = sortedNotes
- .map((note) => {
+ });$1;$2 .map((note) => {
  const title = note?.title?? 'Untitled Note';
  const pinned = note.isPinned ? ' [PINNED]' : '';
  return `${title}${pinned}: ${note.content.substring(0, 200)}${note.content.length > 200 ? '...' : ''}`;
  })
- .join('\n');
-
- const system = `You are a legal AI assistant. Create a concise executive summary suitable for PDF export from case notes.
-
+ .join('\n');$1;$2
 Requirements:
 - Maximum 500 words
 - Highlight key evidence and legal issues
 - Include case viability assessment
 - Professional but concise language
-- Focus on prosecution strategy`;
-
- const prompt = `Create a PDF-ready executive summary from these case notes:
-
+- Focus on prosecution strategy`;$1;$2
 ${notesText}`;
 
  return ollamaChat({

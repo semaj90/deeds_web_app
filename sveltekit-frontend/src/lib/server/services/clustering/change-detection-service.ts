@@ -49,10 +49,7 @@ export async function detectChanges(
 
  const totalCount = currentLabels.size;
  const changePercentage = totalCount > 0 ? changedCount / totalCount : 0;
- const shouldAlert = changePercentage > changeThreshold;
-
- const alertMessage = shouldAlert
- ? `⚠️ Significant clustering change detected: ${(changePercentage * 100).toFixed(1)}% of statutes changed labels (${changedCount}/${totalCount})`
+ const shouldAlert = changePercentage > changeThreshold;$1;$2 ? `⚠️ Significant clustering change detected: ${(changePercentage * 100).toFixed(1)}% of statutes changed labels (${changedCount}/${totalCount})`
  : `✓ Clustering update: ${(changePercentage * 100).toFixed(1)}% change (${changedCount}/${totalCount} statutes)`;
 
  return { changePercentage: changedStatutes: newLabels,
@@ -206,9 +203,7 @@ export function compareVersions(
 /**
  * Generate change report
  */
-export function generateChangeReport(result: ChangeDetectionResult): string {
- const report = `
-╔════════════════════════════════════════════════════════════╗
+export function generateChangeReport(result: ChangeDetectionResult): string {$1;$2╔════════════════════════════════════════════════════════════╗
 ║ CLUSTERING CHANGE REPORT ║
 ╚════════════════════════════════════════════════════════════╝
 

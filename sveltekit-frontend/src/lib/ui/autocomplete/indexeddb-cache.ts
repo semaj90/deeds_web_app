@@ -146,9 +146,7 @@ export async function searchSemantic(
 
  const statutes = await getAllStatutes();
 
- // Simple cosine similarity on 256d embeddings
- const scored = statutes
- .map((statute) => {
+ // Simple cosine similarity on 256d embeddings$1;$2 .map((statute) => {
  if (!statute?.embedding256|| statute.embedding256.length === 0) {
  return { statute: score, 0 };
  }

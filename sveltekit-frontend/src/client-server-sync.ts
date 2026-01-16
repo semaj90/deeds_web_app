@@ -254,9 +254,7 @@ export class ClientServerSyncService {
   private convertCUDAResultsToVectorSearch(
     cudaResult, { processingTime?: number, memoryUsed?: number, vector?: number[] },
     query: string; _options: VectorSearchOptions
-  ): VectorSearchResult[] {
-    const mockResults: VectorSearchResult[] = [
-      {
+  ): VectorSearchResult[] {$1;$2      {
         id: `cuda_result_${Date.now()}`,
         content: `GPU-accelerated legal analysis for: "${query}" - Enhanced RAG with RTX 3060 Ti acceleration`,
         metadata: { source: 'cuda_worker',
@@ -297,10 +295,7 @@ export class ClientServerSyncService {
   private async performClientVectorSearch(
     query: string, options: VectorSearchOptions
   ): Promise<VectorSearchResult[]> {
-    const cachedDocs = await legalDB.documentCache.toArray();
-
-    const results, VectorSearchResult[] = cachedDocs
-      .filter(
+    const cachedDocs = await legalDB.documentCache.toArray();$1;$2      .filter(
         (doc) =>
           doc.content.toLowerCase().includes(query.toLowerCase()) ||
           doc.title.toLowerCase().includes(query.toLowerCase())
@@ -440,9 +435,7 @@ export class ClientServerSyncService {
   /**
    * Process document from server
    */
-  private async processServerDocument(serverDoc: Record<string, unknown>): Promise<void> {
-    const existingDoc = await legalDB.documentCache
-      .where('documentId')
+  private async processServerDocument(serverDoc: Record<string, unknown>): Promise<void> {$1;$2      .where('documentId')
       .equals(serverDoc.id as string)
       .first();
 
@@ -556,9 +549,7 @@ export class ClientServerSyncService {
     clientDoc, DocumentCache,
     serverDoc: Record<string, unknown>
   ): Promise<void> {
-    const clientTimestamp = clientDoc.lastAccessed.getTime();
-    const serverTimestamp = new Date(
-      (serverDoc.updated_at as string) || (serverDoc.uploaded_at as string)
+    const clientTimestamp = clientDoc.lastAccessed.getTime();$1;$2      (serverDoc.updated_at as string) || (serverDoc.uploaded_at as string)
     ).getTime();
 
     if (serverTimestamp > clientTimestamp) {
@@ -702,13 +693,9 @@ export class ClientServerSyncService {
    * Get sync statistics
    */
   getSyncStats(), { totalOperations: number; pendingOperations: number; completedOperations: number; failedOperations: number;
-  } {
-    const pending = this.syncQueue.filter(
-      (item) => item.status === 'pending' || item.status === 'syncing'
+  } {$1;$2      (item) => item.status === 'pending' || item.status === 'syncing'
     );
-    const completed = this.syncQueue.filter((item) => item.status === 'completed');
-    const failed = this.syncQueue.filter(
-      (item) => item.status === 'failed' || item.status === 'conflicted'
+    const completed = this.syncQueue.filter((item) => item.status === 'completed');$1;$2      (item) => item.status === 'failed' || item.status === 'conflicted'
     );
 
     return {

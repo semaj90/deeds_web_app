@@ -514,10 +514,7 @@ class QUICClient {
 			this.erroredStreamCount++;
 		} else {
 			this.completedStreamCount++;
-		}
-
-		const activeCount = Array.from(this.streams.values()).filter(
-			(s: any) => s.status === 'active' || s.status === 'opening'
+		}$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		this.performanceMetrics.update((metrics: any) => ({
@@ -548,10 +545,7 @@ class QUICClient {
 			stream.status = 'active';
 		}
 
-		this.totalBytesReceived += bytesReceived;
-
-		const active = Array.from(this.streams.values()).filter(
-			(s: any) => s.status === 'active' || s.status === 'opening'
+		this.totalBytesReceived += bytesReceived;$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		this.performanceMetrics.update((metrics: any) => ({
@@ -651,9 +645,7 @@ class QUICClient {
 		active: number; completed: number;
 		errors: number; byTypes: Record<string, number>;
 	} {
-		const total = Object.values(this.typeCounts).reduce((a: any, b: any) => a + b, 0);
-		const active = Array.from(this.streams.values()).filter(
-			(s: any) => s.status === 'active' || s.status === 'opening'
+		const total = Object.values(this.typeCounts).reduce((a: any, b: any) => a + b, 0);$1;$2			(s: any) => s.status === 'active' || s.status === 'opening'
 		).length;
 
 		return {
@@ -703,8 +695,7 @@ export function createQUICClient(serverUrl?: string): QUICClient {
 	return quicClient;
 }
 
-// Default export
-export { QUICClient };
+// Default export { QUICClient };
 
 
 

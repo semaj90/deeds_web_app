@@ -4,9 +4,7 @@ import { redirect } from '@sveltejs/kit';
 export const load: LayoutServerLoad = async ({ url, locals }) => {
  const path = url.pathname;
  // Check if user is already authenticated and trying to access login/register
- const user = locals?.user?? null;
- const isLoginOrRegister =
- path === '/auth/login' ||
+ const user = locals?.user?? null;$1;$2 path === '/auth/login' ||
  path === '/auth/register' ||
  path === '/login' ||
  path === '/register';

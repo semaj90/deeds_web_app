@@ -12,9 +12,7 @@
  * "/all-routes" → "routes"
  */
 export function computeRouteCluster(routePath: string): string {
- // Normalize: remove leading/trailing slashes and parentheses
- const normalized = routePath
- .split('/')
+ // Normalize: remove leading/trailing slashes and parentheses$1;$2 .split('/')
  .filter(Boolean)
  .map((seg) => seg.replace(/[()]/g, '')) // remove parentheses
  .filter(Boolean);

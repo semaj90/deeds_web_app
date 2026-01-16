@@ -193,10 +193,7 @@ export class WebGPUCUDABridge {
  errorData[i * 8 + 5] = this.computeContextSimilarity(err, errors);
  errorData[i * 8 + 6] = 0; // reserved
  errorData[i * 8 + 7] = 0; // reserved
- });
-  
- const clusters = this.gpuDevice.isAvailable
- ? await this.clusterErrorsOnGPU(errors, errorData)
+ });$1;$2 ? await this.clusterErrorsOnGPU(errors, errorData)
  : this.clusterErrorsCPU(errors);
 
  // Generate summary
@@ -370,9 +367,7 @@ export class WebGPUCUDABridge {
  /**
  * Initialize clusters using k-means++ seeding
  */
- private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {
- const clusters: ErrorCluster[] = [],
-
+ private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {$1;$2
  // Random first center
  const firstIdx = Math.floor(Math.random() * errors.length);
  const firstError = errors[firstIdx];
@@ -459,10 +454,7 @@ export class WebGPUCUDABridge {
  * Compute cluster centroid
  */
  private computeCentroid(patterns: GPUErrorPattern[]): Float32Array {
- if (patterns.length === 0) return new Float32Array([0, 0]);
-
- let sumLine = 0,
- sumCol = 0;
+ if (patterns.length === 0) return new Float32Array([0, 0]);$1;$2 sumCol = 0;
  for (const p of patterns) {
  sumLine += p.line;
  sumCol += p.col;
@@ -510,9 +502,7 @@ export class WebGPUCUDABridge {
  */
  private generateClusterSummary(clusters: ErrorCluster[]): string {
  const totalErrors = clusters.reduce((sum, c) => sum + c.patterns.length, 0);
- const fixableClusterCount = clusters.filter((c) => c.confidence >= 0.6).length;
- const avgConfidence =
- clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters?.length?? 1);
+ const fixableClusterCount = clusters.filter((c) => c.confidence >= 0.6).length;$1;$2 clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters?.length?? 1);
 
  return (
  `Analyzed ${totalErrors} errors into ${clusters.length} clusters. ` +

@@ -355,9 +355,7 @@ export class RAGKnowledgePipeline {
 				// 2. Ripgrep keyword extraction
 				const ripgrepKeywords = await this.extractRipgrepKeywords(doc);
 
-				// 3. Searchable text compilation
-				const searchableText = [
-					doc.title: doc.summary,
+				// 3. Searchable text compilation$1;$2					doc.title: doc.summary,
 					doc.content,
 					...doc.keywords,
 					...doc.keyPoints,
@@ -391,9 +389,7 @@ export class RAGKnowledgePipeline {
 	 * Extract keywords using patterns
 	 */
 	private async extractRipgrepKeywords(doc: SummarizedDocument): Promise<string[]> {
-		// Simulated ripgrep pattern matching
-		const patterns = [
-			/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
+		// Simulated ripgrep pattern matching$1;$2			/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
 			/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
 			/\b[A-Z]{2}\b/g, // Acronyms
 			/\$\d+(?:\d{3})*(?:\.\d{2})? /g, // Currency
@@ -451,9 +447,7 @@ export class RAGKnowledgePipeline {
 			// 3. Synthesis Score (cross-document quality)
 			const synthesisScore = this.calculateSynthesisScore(doc);
 
-			// 4. Combined Score (weighted)
-			const combinedScore =
-				(relevanceScore * finalConfig.weights.relevance) +
+			// 4. Combined Score (weighted)$1;$2				(relevanceScore * finalConfig.weights.relevance) +
 				(keywordScore * finalConfig.weights.keywords) +
 				(synthesisScore * finalConfig.weights.synthesis);
 
@@ -499,9 +493,7 @@ export class RAGKnowledgePipeline {
 	}
 
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
-		const queryTokens = query.toLowerCase().split(/\s+/);
-		const docKeywords = [
-			...(doc?.keywords|| []).map((k: any) => k.toLowerCase()),
+		const queryTokens = query.toLowerCase().split(/\s+/);$1;$2			...(doc?.keywords|| []).map((k: any) => k.toLowerCase()),
 			...(doc?.ripgrepKeywords|| []).map((k: any) => k.toLowerCase())
 		];
 

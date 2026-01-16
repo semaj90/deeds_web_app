@@ -34,10 +34,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property 1: Error Extraction Completeness', () => {
     it('should create ACE context for session', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -55,10 +52,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should retrieve session context', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -83,10 +77,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Pipeline Workflow', () => {
     it('should handle multiple errors', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error 1',
@@ -121,10 +112,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should calculate metrics correctly', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -165,9 +153,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
       await expect(pipeline.analyzeError('session-1', null as any)).rejects.toThrow();
     });
 
-    it('should reject empty session ID in analyzeErrors', async () => {
-      const errors: Error[] = [
-        {
+    it('should reject empty session ID in analyzeErrors', async () => {$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -200,10 +186,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Context Persistence', () => {
     it('should persist context after analysis', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -222,10 +205,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should maintain context state across retrievals', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -251,10 +231,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Analysis Completeness', () => {
     it('should have metrics in context', async () => {
-      const sessionId = 'session-1';
-
-      const errors: Error[] = [
-        {
+      const sessionId = 'session-1';$1;$2        {
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',

@@ -162,9 +162,7 @@ export class DiffRunner {
  }
 
  // Apply with validation
- this.tracker.startValidating(0); // TODO: Get actual error count
- const result = await this.validator.applyWithValidation(
- patches,
+ this.tracker.startValidating(0); // TODO: Get actual error count$1;$2 patches,
  contentMap,
  true // fast path - validate touched files only
  );
@@ -180,9 +178,7 @@ export class DiffRunner {
  }
  }
 
- // Update validation status
- const validationStatus = result.regression?.hasRegression
- ? 'regression'
+ // Update validation status$1;$2 ? 'regression'
  : result.validationResult.success
  ? 'passed'
  : 'failed';

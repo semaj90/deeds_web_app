@@ -67,9 +67,7 @@ export async function uploadFileViaQUIC(
  formData.append('doc_id', docId);
 
  try {
- // Update progress
- const updateProgress = (
- stage: UploadProgress['stage'],
+ // Update progress$1;$2 stage: UploadProgress['stage'],
  percentage: number, message: string
  ) => {
  const progress: UploadProgress = {

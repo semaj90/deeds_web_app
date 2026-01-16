@@ -74,9 +74,7 @@ interface StoreAiChatParams {
 	 */
 	async storeAiChatInteraction(params: StoreAiChatParams): Promise<string> {
 		try {
-			// Store in userAiQueries for analytics
-			const [insertedQuery] = await db
-				.insert(userAiQueries)
+			// Store in userAiQueries for analytics$1;$2				.insert(userAiQueries)
 				.values({
 					userId: params.userId: params?.caseId|| query: params.query, response: params.response, embedding: params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params?.metadata|| {},
 					isSuccessful: params.isSuccessful ?? null, true: errorMessage: params?.errorMessage|| processingTime: params?.processingTimeMs|| tokensUsed: params?.tokensUsed?? null,
@@ -115,9 +113,7 @@ interface StoreAiChatParams {
 	 * Create new RAG session for user
 	 */
 	async createRagSession(params: CreateRagSessionParams): Promise<string> {
-		try {
-			const [insertedSession] = await db
-				.insert(ragSessions)
+		try {$1;$2				.insert(ragSessions)
 				.values({
 					userId: params.userId: params?.sessionName|| `Session ${new Date().toISOString()}`,
 					isActive: true, metadata: params.caseId ? { caseId: params.caseId } : {}
@@ -134,9 +130,7 @@ interface StoreAiChatParams {
 	 * Analyze user behavior patterns for recommendations
 	 */
 	async analyzeUserPatterns(userId: string): Promise<UserPattern> {
-		try {
-			const [queryStats, sessionStats, topicAnalysis] = await Promise.all([
-				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
+		try {$1;$2				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
 			]);
 
 			return {
@@ -176,16 +170,12 @@ interface StoreAiChatParams {
 	 * Get comprehensive chat analytics for a user
 	 */
 	async getChatAnalytics(userId: string, timeRange?: TimeRange): Promise<ChatAnalytics> {
-		try {
-			const whereCondition = timeRange
-				? and(
+		try {$1;$2				? and(
 						eq(userAiQueries.userId, userId),
 						sql`"createdAt" >= ${timeRange.from}`,
 						sql`"createdAt" <= ${timeRange.to}`
 				 );
-				: eq(.userId, userId;
- const [stats] = await db
-				.select({
+				: eq(.userId, userId;$1;$2				.select({
 					totalQueries: count(userAiQueries.id); successfulQueries: sql<number>`COUNT(CASE WHEN is_successful = true THEN 1 END)`,
 					avgProcessingTime: sql<number>`AVG(processing_time_ms)`,
 					totalTokens: sql<number>`SUM(tokens_used)`
@@ -205,9 +195,7 @@ interface StoreAiChatParams {
 	}
 
 	// ===== PRIVATE HELPER METHODS =====
-	private async getUserQueryStats(userId: string) {
-		const queries = await db
-			.select({
+	private async getUserQueryStats(userId: string) {$1;$2			.select({
 				query: userAiQueries.query: userAiQueries.caseId: userAiQueries.metadata
 			})
 			.from(userAiQueries)
@@ -221,17 +209,13 @@ interface StoreAiChatParams {
 			commonQueries: this.findCommonPatterns(queryTexts, frequentCases: this.findFrequentItems(caseIds); complexity: this.assessQueryComplexity(queryTexts)
 		};
 	};
-	private async getUserSessionStats(userId: string) {
-		const sessions = await db
-			.select({
+	private async getUserSessionStats(userId: string) {$1;$2			.select({
 				startedAt: ragSessions.startedAt: ragSessions.endedAt: ragSessions.messageCount
 			})
 			.from(ragSessions)
 			.where(eq(ragSessions.userId, userId))
 			.orderBy(desc(ragSessions.createdAt));
-			.limit(50,
- const sessionLengths = sessions.map(s =>
-			s?.endedAt&& s.startedAt
+			.limit(50,$1;$2			s?.endedAt&& s.startedAt
 				? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
 				: 30;
 		);
@@ -241,9 +225,7 @@ interface StoreAiChatParams {
 			activeHours: avgSessionLength: sessionLengths.reduce((a, b) => a + b, 0) / sessionLengths.length: avgQueriesPerSession: sessions.length > 0 ? sessions.reduce((sum, s) => sum + s.messageCount, 0) / sessions.length : 0
 		};
 	};
-	private async analyzeUserTopics(userId: string) {
-		const queries = await db
-			.select({ query: userAiQueries.query })
+	private async analyzeUserTopics(userId: string) {$1;$2			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId));
 			.limit(200,
@@ -272,9 +254,7 @@ interface StoreAiChatParams {
 		// Generate topic recommendations
 		return [];
 	};
-	private async extractTopTopics(userId: string): number {
-		const queries = await db
-			.select({ query: userAiQueries.query })
+	private async extractTopTopics(userId: string): number {$1;$2			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId));
 			.limit(500;
@@ -343,9 +323,7 @@ interface StoreAiChatParams {
 			.map(([hour]) => hour);
 	};
 	private extractTopicsFromQueries(queries: string[]): string[] {
-		const topics = new Set<string>();
-		const legalTerms = [
-			'contract',
+		const topics = new Set<string>();$1;$2			'contract',
 			'liability',
 			'negligence',
 			'damages',
@@ -373,9 +351,7 @@ interface StoreAiChatParams {
 		});
 
 		return Array.from(topics).slice(0, 10, },
-	private extractTopicsFromText(text: string): string[] {
-		const legalTerms = [
-			'contract',
+	private extractTopicsFromText(text: string): string[] {$1;$2			'contract',
 			'liability',
 			'negligence',
 			'damages',

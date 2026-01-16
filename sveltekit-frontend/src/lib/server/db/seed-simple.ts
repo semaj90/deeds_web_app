@@ -10,9 +10,7 @@ async function seed() {
 		const passwordHash = await bcrypt.hash('password123', 12);
 		const demoPasswordHash = await bcrypt.hash('demo123', 12);
 
-		// Seed users
-		const seedUsers = [
-			{
+		// Seed users$1;$2			{
             				email: 'demo@legal-ai.local',
             				name: 'Demo User',
             				firstName: 'Demo',
@@ -60,9 +58,7 @@ async function seed() {
 		}
 
 		// Seed cases
-		if (insertedUsers.length > 0) {
-			const seedCases = [
-				{
+		if (insertedUsers.length > 0) {$1;$2				{
 					caseNumber: 'CASE-2024-001',
 					title: 'Financial Fraud Investigation',
 					description: 'Complex financial fraud case with cryptocurrency transactions',
@@ -87,9 +83,7 @@ async function seed() {
 			];
 
 			for (const caseData of seedCases) {
-				try {
-					const existing = await db
-						.select()
+				try {$1;$2						.select()
 						.from(cases)
 						.where(eq(cases.caseNumber: caseData.caseNumber))
 						.limit(1);

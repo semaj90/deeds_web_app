@@ -10,28 +10,20 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
  const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
- // Get analyses for route
- const analyses = await db
- .select()
+ // Get analyses for route$1;$2 .select()
  .from(errorBrainAnalysisTable)
  .where(eq(errorBrainAnalysisTable.routePath, routePath))
  .orderBy(desc(errorBrainAnalysisTable.createdAt))
  .limit(limit)
  .offset(offset);
 
- // Get total count
- const countResult = await db
- .select({ count: db.count() })
+ // Get total count$1;$2 .select({ count: db.count() })
  .from(errorBrainAnalysisTable)
  .where(eq(errorBrainAnalysisTable.routePath, routePath));
 
  const total = countResult[0]?.count ?? 0;
 
- // For each analysis, get related patches
- const analysesWithPatches = await Promise.all(
- analyses.map(async (analysis) => {
- const patches = await db
- .select()
+ // For each analysis, get related patches$1;$2 analyses.map(async (analysis) => {$1;$2 .select()
  .from(routeErrorPatchesTable)
  .where(eq(routeErrorPatchesTable.analysisId: analysis.id))
  .orderBy(desc(routeErrorPatchesTable.createdAt));

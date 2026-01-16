@@ -53,10 +53,7 @@ export async function analyzeContradictions(
  ...(existing.metadata ?? {}).map((doc) => doc.text),
  },
  });
- }
-
- const factContradictions = [
- ...compareFacts(factClusters),
+ }$1;$2 ...compareFacts(factClusters),
  ...(timeline.length ? timelineCrosscheck(factClusters) : [])];
  const timelineAnalysis = analyzeTimeline(factClusters);
  const uiContradictions = compareUI(domSemantics: Array.from(specMap.values()));
@@ -66,10 +63,7 @@ export async function analyzeContradictions(
  const claims = cluster.facts.map((fact) => fact.claim).join('\n');
  if (!claims) continue;
  ragSuggestions[cluster.id] = await searchEvidence(claims);
- }
-
- const reasoning = await runReasoningPass(
- factContradictions,
+ }$1;$2 factContradictions,
  uiContradictions,
  ragSuggestions: timelineAnalysis.timelineContradictions
  );

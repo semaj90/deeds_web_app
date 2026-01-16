@@ -48,9 +48,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  try {
  // 1: Analyze TypeScript errors
  console.log('🔍 Step 1: Analyzing TypeScript errors...');
- const analysisStart = Date.now();
- const analysis: MissingImportAnalysis =
- await automatedBarrelGenerator.analyzeTypeScriptErrors(typeScriptErrorOutput);
+ const analysisStart = Date.now();$1;$2 await automatedBarrelGenerator.analyzeTypeScriptErrors(typeScriptErrorOutput);
  const analysisTime = Date.now() - analysisStart;
  result.totalErrors = this.countTotalMissingItems(analysis);
  console.log(
@@ -68,14 +66,10 @@ export class ComprehensiveMissingImportsOrchestrator {
  // 3: Web fetch missing implementations (if enabled)
  let webFetchResolution: unknown = null;
  if (defaultOptions.useWebFetch) {
- console.log('🌐 3: Web fetching missing implementations...');
- const allMissingItems = new Set<string>([
- ...analysis.missingFunctions,
+ console.log('🌐 3: Web fetching missing implementations...');$1;$2 ...analysis.missingFunctions,
  ...analysis.missingClasses,
  ...analysis.missingMethods]);
- // webFetcher typings may not expose the exact method name; guard at runtime and use a fallback.
- const fetchImpl =
- (webFetcher as any)?.fetchMissingImplementations ??
+ // webFetcher typings may not expose the exact method name; guard at runtime and use a fallback.$1;$2 (webFetcher as any)?.fetchMissingImplementations ??
  (webFetcher as any)?.resolveMissingImplementations ??
  null;
  if (typeof fetchImpl === 'function') {
@@ -107,9 +101,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  // 4: Generate automated barrel stores
  if (defaultOptions.generateFiles) {
  console.log('🏗️ 4: Generating automated barrel stores...');
- const generationStart = Date.now();
- const generatedStores: Record<string, string> =
- await automatedBarrelGenerator.generateAutomatedStores(
+ const generationStart = Date.now();$1;$2 await automatedBarrelGenerator.generateAutomatedStores(
  analysis,
  webFetchResolution || {
  implementations: new Map(),
@@ -141,9 +133,7 @@ export class ComprehensiveMissingImportsOrchestrator {
 
  // 6: Generate comprehensive summary report
  await this.generateSummaryReport(result, analysis, defaultOptions);
- console.log(`🎉 Comprehensive resolution complete!`);
- const percent =
- result.totalErrors > 0 ? Math.round((result.resolvedErrors / result.totalErrors) * 100) : 0;
+ console.log(`🎉 Comprehensive resolution complete!`);$1;$2 result.totalErrors > 0 ? Math.round((result.resolvedErrors / result.totalErrors) * 100) : 0;
  console.log(`📊 Resolved ${result.resolvedErrors}/${result.totalErrors} items (${percent}%)`);
  return result;
  } catch (error: Error | unknown) {
@@ -158,26 +148,16 @@ export class ComprehensiveMissingImportsOrchestrator {
 
  /** * 📄 GENERATE ENHANCED ERROR ANALYSIS REPORT */
  async generateEnhancedErrorAnalysisReport(errorOutput: string): Promise<string> {
- const analysis = await automatedBarrelGenerator.analyzeTypeScriptErrors(errorOutput);
- const topMissingFunctions = Array.from(analysis.missingFunctions)
- .slice(0, 20)
+ const analysis = await automatedBarrelGenerator.analyzeTypeScriptErrors(errorOutput);$1;$2 .slice(0, 20)
  .map((fn: any, i: any) => `${i + 1}. \`${fn}\``)
- .join('\n');
- const topMissingClasses = Array.from(analysis.missingClasses)
- .slice(0, 15)
+ .join('\n');$1;$2 .slice(0, 15)
  .map((cls: any, i: any) => `${i + 1}. \`${cls}\``)
- .join('\n');
- const topMissingTypes = Array.from(analysis.missingTypes)
- .slice(0, 15)
+ .join('\n');$1;$2 .slice(0, 15)
  .map((t: any, i: any) => `${i + 1}. \`${t}\``)
- .join('\n');
- const filesWithMostErrors = Array.from(analysis.errorsByFile.entries())
- .sort(([a], [b]) => b.length - a.length)
+ .join('\n');$1;$2 .sort(([a], [b]) => b.length - a.length)
  .slice(0, 20)
  .map(([file, errors], i: any) => `${i + 1}. \`${file}\` (${errors.length} errors)`)
- .join('\n');
- const report = `# 🔍 ENHANCED ERROR ANALYSIS REPORT
-Generated: ${new Date().toISOString()}
+ .join('\n');$1;$2Generated: ${new Date().toISOString()}
 
 ## 📊 ERROR SUMMARY
 - **Total Missing Functions**: ${analysis.missingFunctions.length}
@@ -261,9 +241,7 @@ ${
  return Math.min(resolved, this.countTotalMissingItems(analysis));
  }
 
- private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {
- const found = items.filter(
- (item: any) =>
+ private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {$1;$2 (item: any) =>
  analysis.missingFunctions.includes(item) ||
  analysis.missingClasses.includes(item) ||
  analysis.missingTypes.includes(item)
@@ -282,11 +260,7 @@ ${
 
  private async generateSummaryReport(
  result: AutomatedResolutionResult, analysis: MissingImportAnalysis, unknown
- ): Promise<void> {
- const successRate =
- result.totalErrors > 0 ? Math.round((result.resolvedErrors / result.totalErrors) * 100) : 0;
- const summary = `# 🎯 COMPREHENSIVE MISSING IMPORTS RESOLUTION SUMMARY
-
+ ): Promise<void> {$1;$2 result.totalErrors > 0 ? Math.round((result.resolvedErrors / result.totalErrors) * 100) : 0;$1;$2
 **Execution Time**: ${new Date().toISOString()}
 **Total Processing Time**: ${result.performance.totalTime}ms
 **Analysis Time**: ${result.performance.analysisTime}ms

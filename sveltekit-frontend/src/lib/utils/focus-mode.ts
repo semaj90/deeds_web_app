@@ -195,15 +195,11 @@ export class FocusManager {
  return false;
  }
 
- // Dim elements that are not content areas
- const contentSelectors = [
- '.editor-content',
+ // Dim elements that are not content areas$1;$2 '.editor-content',
  '[contenteditable="true"]',
  'textarea',
  'input[type="text"]',
- '.writing-area'];
- const isContentElement = contentSelectors.some(
- (selector) => element.matches(selector) || element.closest(selector)
+ '.writing-area'];$1;$2 (selector) => element.matches(selector) || element.closest(selector)
  );
  return !isContentElement && !this.shouldExemptElement(element);
  }
@@ -297,9 +293,7 @@ export function focusModeAction(node: HTMLElement, enabled: boolean = false) {
  };
 }
 
-// CSS classes for focus mode styling
-export const focusModeStyles = `
-.focus-mode-active {
+// CSS classes for focus mode styling$1;$2.focus-mode-active {
  --focus-dim-opacity: 0.3;
  --focus-transition: opacity 0.3s ease;
 }

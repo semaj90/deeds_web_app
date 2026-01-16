@@ -36,9 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body: AttentionRequest = await request.json();
  const {
  jobId,
- text,
- type = 'attention',
- useCache = true,
+ text,$1;$2 useCache = true,
  userId,
  context,
  options = {},

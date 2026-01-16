@@ -211,9 +211,7 @@ export interface RollbackStep {
   originalContent?: string;
 }
 
-// HMM State definitions for SvelteKit routes
-export const ROUTE_STATES = [
-  '+page.svelte',
+// HMM State definitions for SvelteKit routes$1;$2  '+page.svelte',
   '+page.ts',
   '+page.server.ts',
   '+layout.svelte',
@@ -451,9 +449,7 @@ export interface CheckpointResult {
   createdAt: Date;
 }
 
-// Validation checks to run
-export const PRODUCTION_CHECKS = [
-  'svelte-check', // Zero Svelte errors
+// Validation checks to run$1;$2  'svelte-check', // Zero Svelte errors
   'tsc', // Zero TypeScript errors
   'eslint', // Linting passes
   'vitest', // Tests pass

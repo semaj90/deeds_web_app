@@ -35,10 +35,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 		if (search) {
 			filters.push(like(cases.title, `%${search}%`));
-		}
-
-		const userCases = await db
-			.select()
+		}$1;$2			.select()
 			.from(cases)
 			.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
@@ -100,9 +97,7 @@ export const actions: Actions = {
 			});
 		}
 
-		try {
-			const [newCase] = await db
-				.insert(cases)
+		try {$1;$2				.insert(cases)
 				.values({
 					title: title.trim(),
 					description: description.trim(),
@@ -120,7 +115,7 @@ export const actions: Actions = {
 			// Redirect to the new case detail page
 			throw redirect(303, `/cases/${newCase.id}`);
 		} catch (err) {
-			if (err instanceof Error && 'status' in err && err.status === 303) {
+			if (err instanceof Error && 'status' in $1?.$2 === 303) {
 				throw err; // Re-throw redirect
 			}
 			console.error('Error creating case:', err);
@@ -148,9 +143,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 
-		try {
-			const updated = await db
-				.update(cases)
+		try {$1;$2				.update(cases)
 				.set({
 					status: newStatus,
 					updatedAt: new Date().toISOString()
@@ -191,9 +184,7 @@ export const actions: Actions = {
 			return fail(400, { error: 'No case IDs provided' });
 		}
 
-		try {
-			const archived = await db
-				.update(cases)
+		try {$1;$2				.update(cases)
 				.set({
 					status: 'archived',
 					updatedAt: new Date().toISOString()

@@ -14,9 +14,7 @@ export const GET: RequestHandler = async () => {
  };
 
  // Check Ollama service
- try {
- const ollamaCheck = (await Promise.race([
- fetch('http://localhost:11434/api/tags', { method: 'GET' }),
+ try {$1;$2 fetch('http://localhost:11434/api/tags', { method: 'GET' }),
  new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))])) as Response;
 
  if (ollamaCheck.ok) {
@@ -42,9 +40,7 @@ export const GET: RequestHandler = async () => {
  }
 
  // Check Enhanced RAG service
- try {
- const ragCheck = (await Promise.race([
- fetch('http://localhost:8094/health', { method: 'GET' }),
+ try {$1;$2 fetch('http://localhost:8094/health', { method: 'GET' }),
  new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))])) as Response;
 
  if (ragCheck.ok) {
@@ -71,9 +67,7 @@ export const GET: RequestHandler = async () => {
  }
 
  // Check Upload service
- try {
- const uploadCheck = (await Promise.race([
- fetch('http://localhost:8093/health', { method: 'GET' }),
+ try {$1;$2 fetch('http://localhost:8093/health', { method: 'GET' }),
  new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))])) as Response;
 
  if (uploadCheck.ok) {
@@ -122,9 +116,7 @@ export const GET: RequestHandler = async () => {
  ...(healthData.services.ollama?.models ?? []),
  ...(healthData.services.enhancedRAG?.status === 'healthy' ? ['enhanced-rag-legal'] : [])];
 
- // Return appropriate HTTP status
- const httpStatus =
- healthData.overall === 'healthy' ? 200 : healthData.overall === 'degraded' ? 207 : 503;
+ // Return appropriate HTTP status$1;$2 healthData.overall === 'healthy' ? 200 : healthData.overall === 'degraded' ? 207 : 503;
  return json(healthData, { status, httpStatus });
 };
 

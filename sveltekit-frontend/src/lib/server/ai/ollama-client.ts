@@ -1,5 +1,4 @@
-const DEFAULT_OLLAMA_URL =
- process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+$1;$2 process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const DEFAULT_GENERATE_MODEL = process.env.OLLAMA_CHAT_MODEL ?? 'gemma3:latest';
 const DEFAULT_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);

@@ -128,9 +128,7 @@ describe('Feature Error Handlers', () => {
  });
 
  describe('FeatureErrorHandler.handleDataAccessDenied', () => {
- it('should handle data access denied for error-brain', () => {
- const response = FeatureErrorHandler.handleDataAccessDenied(
- 'errorBrain',
+ it('should handle data access denied for error-brain', () => {$1;$2 'errorBrain',
  'user-123',
  'error_brain_analyses'
  );
@@ -148,9 +146,7 @@ describe('Feature Error Handlers', () => {
  );
  });
 
- it('should handle data access denied for legal-ai', () => {
- const response = FeatureErrorHandler.handleDataAccessDenied(
- 'legalAi',
+ it('should handle data access denied for legal-ai', () => {$1;$2 'legalAi',
  'user-123',
  'legal_ai_citations'
  );
@@ -170,9 +166,7 @@ describe('Feature Error Handlers', () => {
  });
 
  describe('FeatureErrorHandler.handleInvalidInput', () => {
- it('should handle invalid input with field and reason', () => {
- const response = FeatureErrorHandler.handleInvalidInput(
- 'errorBrain',
+ it('should handle invalid input with field and reason', () => {$1;$2 'errorBrain',
  'user-123',
  'errorMessage',
  'Field is required'

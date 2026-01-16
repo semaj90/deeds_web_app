@@ -58,9 +58,7 @@ export async function getErrorContextChunks(
  const chunks: ErrorContextChunk[] = [];
 
  try {
- // Get last error cluster for this route
- const lastCluster = await sql`
- SELECT ec.id: ec.canonical_message: ec.event_count: ec.suggested_fix
+ // Get last error cluster for this route$1;$2 SELECT ec.id: ec.canonical_message: ec.event_count: ec.suggested_fix
  FROM error_clusters ec
  JOIN error_events ee ON ee.cluster_id = ec.id
  WHERE ee.route_path = ${ routePath }
@@ -92,9 +90,7 @@ export async function getErrorContextChunks(
  });
  }
 
- // Get similar clusters (via event count + severity, simple heuristic)
- const similarClusters = await sql`
- SELECT canonical_message, event_count
+ // Get similar clusters (via event count + severity, simple heuristic)$1;$2 SELECT canonical_message, event_count
  FROM error_clusters
  WHERE id != ${clusterId}
  ORDER BY event_count DESC
@@ -120,9 +116,7 @@ export async function getErrorContextChunks(
  */
 export async function getAstSnippet(routePath: string): Promise<ErrorContextChunk | null> {
  try {
- const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');
- const routeFile = path.join(
- frontendDir,
+ const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');$1;$2 frontendDir,
  'src/routes',
  routePath.replace(/^\//, ''),
  '+page.svelte'
@@ -175,17 +169,13 @@ export async function getSchemaContext(
  const tables = tableGuesses[`/${routeBase}`] ?? [];
 
  for (const tableName of tables) {
- try {
- const schema = await sql`
- SELECT column_name, data_type, is_nullable
+ try {$1;$2 SELECT column_name, data_type, is_nullable
  FROM information_schema.columns
  WHERE table_name = ${tableName}
  ORDER BY ordinal_position;
  `;
 
- if (schema.length > 0) {
- const cols = schema
- .map((c) => `${c.column_name}: ${c.data_type}${c.is_nullable ? '' : ' NOT NULL'}`)
+ if (schema.length > 0) {$1;$2 .map((c) => `${c.column_name}: ${c.data_type}${c.is_nullable ? '' : ' NOT NULL'}`)
  .join(', ');
 
  chunks.push({
@@ -225,9 +215,7 @@ export async function buildKagGraph(
  kind: 'route',
  });
   
- const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');
- const possibleFiles = [
- `src/routes${routePath}/+page.svelte`,
+ const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');$1;$2 `src/routes${routePath}/+page.svelte`,
  `src/routes${routePath}/+layout.svelte`,
  `src/routes${routePath}/+server.ts`];
 
@@ -296,9 +284,7 @@ export async function buildKagGraph(
  }
  }
 
- // 5. Test nodes
- const testFiles = [
- `src/routes${routePath}/__tests__/+page.test.ts`,
+ // 5. Test nodes$1;$2 `src/routes${routePath}/__tests__/+page.test.ts`,
  `src/routes${routePath}/__tests__/+page.test.svelte`,
  `src/routes${routePath}/${routePath.split('/').pop()}.test.ts`];
 
@@ -350,9 +336,7 @@ export async function buildRouteContext(
  const kagGraph = await buildKagGraph(sql, routePath);
 
  // Extract related tests & migrations from KAG
- const relatedTests = kagGraph.nodes.filter((n) => n.kind === 'test').map((n) => n.label);
- const relatedMigrations = kagGraph.nodes
- .filter((n) => n.kind === 'migration')
+ const relatedTests = kagGraph.nodes.filter((n) => n.kind === 'test').map((n) => n.label);$1;$2 .filter((n) => n.kind === 'migration')
  .map((n) => n.label);
 
  return {

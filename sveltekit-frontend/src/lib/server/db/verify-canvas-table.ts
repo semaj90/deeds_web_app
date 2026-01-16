@@ -17,9 +17,7 @@ export async function verifyCanvasStatesTable(): Promise<boolean> {
         return canvasStatesExists;
     }
 
-    try {
-        const result = await db.execute(
-            sql`SELECT to_regclass('public.canvas_states') IS NOT NULL AS exists`
+    try {$1;$2            sql`SELECT to_regclass('public.canvas_states') IS NOT NULL AS exists`
         );
 
         canvasStatesExists = result.rows?.[0]?.exists === true;

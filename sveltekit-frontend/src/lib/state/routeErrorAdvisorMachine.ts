@@ -1,9 +1,6 @@
 // @ts-nocheck
 
-import { createMachine, assign, fromPromise } from 'xstate';
-
-export const routeErrorAdvisorMachine = createMachine(
- {
+import { createMachine, assign, fromPromise } from 'xstate';$1;$2 {
  id: 'routeErrorAdvisor',
  initial: 'closed',
  context: { routePath: null, filePath: null, suggestion, // { summary, patch, riskLevel, source }
@@ -80,10 +77,7 @@ export const routeErrorAdvisorMachine = createMachine(
  const { routePath } = input;
  if (!routePath) {
  throw new Error('Missing routePath in fetchSuggestion');
- }
-
- const res = await fetch(
- `/api/error-brain/recommend?routePath=${encodeURIComponent(routePath)}`
+ }$1;$2 `/api/error-brain/recommend?routePath=${encodeURIComponent(routePath)}`
  );
 
  if (!res.ok) {

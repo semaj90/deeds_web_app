@@ -212,9 +212,7 @@ export class RecoveryStrategy {
  result,
  },
  } catch (fallbackError) {
- // Both operations failed
- const lastError =
- fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
+ // Both operations failed$1;$2 fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
 
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({

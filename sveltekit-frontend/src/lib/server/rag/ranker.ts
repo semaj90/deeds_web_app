@@ -38,9 +38,7 @@ export function rerankLegalAware(opts: { hits: QdrantHit[],
  // Check jurisdiction match
  const sameJurisdiction = jur && h.payload?.jurisdiction === jur ? 1 : 0;
 
- // Calculate weighted final score
- const finalScore =
- w.cosine * cosine + w.sharedTags * sharedTags + w.sameJurisdiction * sameJurisdiction;
+ // Calculate weighted final score$1;$2 w.cosine * cosine + w.sharedTags * sharedTags + w.sameJurisdiction * sameJurisdiction;
 
  const explain: RankExplain = { cosine, sharedTags, sameJurisdiction, finalScore };
 

@@ -4,9 +4,7 @@ import type { mergePromptCluster, mergeTransition } from '$lib/server/graph-serv
 export async function POST({ request }): Promise<any> {
  const body = await request.json().catch(() => ({}));
 
- if (body.action === 'mergePrompt') {
- const res = await mergePromptCluster(
- String(body?.prompt?? ''),
+ if (body.action === 'mergePrompt') {$1;$2 String(body?.prompt?? ''),
  String(body?.cluster?? ''),
  body.userId
  );

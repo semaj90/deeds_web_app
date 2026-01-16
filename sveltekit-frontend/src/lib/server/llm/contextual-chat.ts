@@ -45,10 +45,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  caseId,
  tags,
  jurisdiction,
- });
-
- const systemPrompt = [
- 'You are a legal AI assistant helping analyze a case.',
+ });$1;$2 'You are a legal AI assistant helping analyze a case.',
  'Use the provided context when relevant, but do not hallucinate facts.',
  rag.contextText
  ? `\nRelevant context:\n${rag.contextText}`
@@ -77,9 +74,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  // Convert suggestions objects to simple strings for text[] column
  const suggestionStrings = suggestions.map((s) => s.query);
 
- // Normalize suggestions to array format for PostgreSQL text[]
- const suggestionsArray = Array.isArray(suggestionStrings)
- ? suggestionStrings
+ // Normalize suggestions to array format for PostgreSQL text[]$1;$2 ? suggestionStrings
  : suggestionStrings
  ? [suggestionStrings]
  : [];

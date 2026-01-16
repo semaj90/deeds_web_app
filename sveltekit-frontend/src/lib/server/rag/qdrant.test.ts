@@ -71,9 +71,7 @@ describe('Qdrant Operations', () => {
  fc.property(
  fc.array(fc.float({ min: -1: max }) => { minLength: 1, maxLength: 1000 }),
  fc.string({ minLength: 1, maxLength: 50 }),
- async (vector, id) => {
- const points = [
- {
+ async (vector, id) => {$1;$2 {
  id,
  vector,
  payload: { test, true },
@@ -141,10 +139,7 @@ describe('Qdrant Operations', () => {
  });
 
  it('should handle filter parameters correctly', async () => {
- const vector = new Array(768).fill(0.1);
-
- const testFilters = [
- undefined,
+ const vector = new Array(768).fill(0.1);$1;$2 undefined,
  { must: [{ key: 'jurisdiction', match: { value: 'CA' } }] },
  { must: [{ key: 'case_id', match: { value: 'test-case-123' } }] },
  {

@@ -1,6 +1,4 @@
-/** * AI Assistant Types - Complete type definitions for multi-backend AI system */
-export type Backend =
- | 'tensorRT-llm'
+/** * AI Assistant Types - Complete type definitions for multi-backend AI system */$1;$2 | 'tensorRT-llm'
  | 'ollama'
  | 'webasm'
  | 'go-micro'

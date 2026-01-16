@@ -25,9 +25,7 @@ import {
  * - Store pgvector embeddings in Postgres
  * - Track Qdrant sync state
  * - Prevent data loss with soft deletes
- */
-export const documentChunks = pgTable(
- 'document_chunks',
+ */$1;$2 'document_chunks',
  {
  // Primary key
  id: uuid('id').primaryKey().defaultRandom(),
@@ -80,9 +78,7 @@ export const documentChunks = pgTable(
  * Legal Documents - Phase 90 Hardened
  *
  * Enhanced with lifecycle tracking and vector sync state
- */
-export const legalDocuments = pgTable(
- 'legal_documents',
+ */$1;$2 'legal_documents',
  {
  id: uuid('id').primaryKey().defaultRandom(),
 
@@ -125,9 +121,7 @@ export const legalDocuments = pgTable(
 );
 /**
  * Cases - Phase 90 Hardened
- */
-export const cases = pgTable(
- 'cases',
+ */$1;$2 'cases',
  {
  id: uuid('id').primaryKey().defaultRandom(),
 
@@ -149,9 +143,7 @@ export const cases = pgTable(
 );
 /**
  * Evidence - Phase 90 Hardened
- */
-export const evidence = pgTable(
- 'evidence',
+ */$1;$2 'evidence',
  {
  id: uuid('id').primaryKey().defaultRandom(),
 
@@ -199,9 +191,7 @@ export const evidence = pgTable(
  *
  * Note: Uses 768 dimensions for error topology clustering
  * This is INTENTIONALLY different from legal documents (384d)
- */
-export const phase72ErrorVector = pgTable(
- 'phase72_error_vector',
+ */$1;$2 'phase72_error_vector',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  errorId: uuid('error_id')
@@ -227,9 +217,7 @@ export const phase72ErrorVector = pgTable(
  qdrantSyncPendingIdx: index('phase72_error_vector_qdrant_pending_idx').on(
  table.qdrantSyncedAt: table.embeddingUpdatedAt
  ) })
-);
-export const phase72Error = pgTable(
- 'phase72_error',
+);$1;$2 'phase72_error',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  errorHash: text('error_hash').notNull().unique(),

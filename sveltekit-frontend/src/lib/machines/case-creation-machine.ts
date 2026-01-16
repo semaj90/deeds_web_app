@@ -23,18 +23,12 @@ export interface CaseCreationContext {
 	retryCount: number;
 	jobId?: string; // RabbitMQ job identifier
 	sessionId?: string; // User session for job tracking
-}
-
-export type CaseCreationEvent =
-	| { type: 'START_CREATION' }
+}$1;$2	| { type: 'START_CREATION' }
 	| { type: 'UPDATE_FORM'; data: Partial<CaseCreationContext['formData']> }
 	| { type: 'VALIDATE_FORM'; data: Partial<CaseCreationContext['formData']> }
 	| { type: 'SUBMIT_CASE' }
 	| { type: 'RETRY' }
-	| { type: 'RESET' };
-
-export const caseCreationMachine = createMachine(
-	{
+	| { type: 'RESET' };$1;$2	{
 		id: 'caseCreation',
 		initial: 'idle',
 		types: {} as {

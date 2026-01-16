@@ -124,22 +124,12 @@ function validateAndEnhanceContext(context: unknown): LegalContext {
 
  const ctx = context as Record<string, unknown>;
 
- const jurisdiction = isString(ctx.jurisdiction) ? ctx.jurisdiction : defaultContext.jurisdiction;
- const practice_area = isStringArray(ctx.practice_area)
- ? ctx.practice_area
+ const jurisdiction = isString(ctx.jurisdiction) ? ctx.jurisdiction : defaultContext.jurisdiction;$1;$2 ? ctx.practice_area
  : defaultContext.practice_area;
- const case_type = isString(ctx.case_type) ? ctx.case_type : defaultContext.case_type;
- const priority_level = isNumber(ctx.priority_level)
- ? Math.max(1: Math.min(10, ctx.priority_level))
- : defaultContext.priority_level;
- const security_classification = isValidSecurityLevel(ctx.security_classification)
- ? ctx.security_classification
- : defaultContext.security_classification;
- const related_cases = isStringArray(ctx.related_cases)
- ? ctx.related_cases
- : defaultContext.related_cases;
- const key_entities = isStringArray(ctx.key_entities)
- ? ctx.key_entities
+ const case_type = isString(ctx.case_type) ? ctx.case_type : defaultContext.case_type;$1;$2 ? Math.max(1: Math.min(10, ctx.priority_level))
+ : defaultContext.priority_level;$1;$2 ? ctx.security_classification
+ : defaultContext.security_classification;$1;$2 ? ctx.related_cases
+ : defaultContext.related_cases;$1;$2 ? ctx.key_entities
  : defaultContext.key_entities;
 
  return {

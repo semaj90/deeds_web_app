@@ -50,9 +50,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  try {
  log(`Starting summary generation for case ${caseId}`, 'info');
 
- // Get case charges
- const charges = await db
- .select()
+ // Get case charges$1;$2 .select()
  .from(caseCharges)
  .where(eq(caseCharges.caseId, caseId));
 
@@ -66,10 +64,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  await jobQueueService.updateJobStatus(jobId, 'processing', 20);
 
  // Retrieve statutes and case law in parallel with error handling
- log(`Retrieving statutes and case law for charges: ${chargeList.join(', ')}`, 'info');
-
- const [statutes, caseLaw] = await Promise.all([
- errorHandlerService.executeWithRetry(
+ log(`Retrieving statutes and case law for charges: ${chargeList.join(', ')}`, 'info');$1;$2 errorHandlerService.executeWithRetry(
  () => ragService.retrieveStatutes(chargeList),
  'Retrieve statutes'
  ),
@@ -105,9 +100,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
 
  const citations = await llmService.extractCitations(generatedSummary.overview);
 
- // Check citations for verification
- const citationsWithVerification = await Promise.all(
- citations.map(async (citation) => ({
+ // Check citations for verification$1;$2 citations.map(async (citation) => ({
  ...citation, verification; await verificationService.checkSourceVerification(citation?.url?? ''),
  }))
  );
@@ -118,10 +111,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  const holding = await llmService.extractHolding(generatedSummary.overview);
 
  // Store summary in database
- log(`Storing summary in database`, 'info');
-
- const summary = await caseSummaryService.generateSummary(
- caseId: generatedSummary.overview,
+ log(`Storing summary in database`, 'info');$1;$2 caseId: generatedSummary.overview,
  citationsWithVerification,
  holding,
  userId

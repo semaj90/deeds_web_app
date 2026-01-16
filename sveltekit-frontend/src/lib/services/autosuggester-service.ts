@@ -79,14 +79,10 @@ export class AutosuggesterService {
  }
  }
 
- // Check if inside a function
- const functionMatches = beforeCursor.match(
- /(?:function\s+\w+|const\s+\w+\s*=\s*(?:\([^)]*\)\s*=>|\w+\s*\())[\s\S]*?{/g
+ // Check if inside a function$1;$2 /(?:function\s+\w+|const\s+\w+\s*=\s*(?:\([^)]*\)\s*=>|\w+\s*\())[\s\S]*?{/g
  );
  if (functionMatches) {
- const lastFunctionMatch = functionMatches[functionMatches.length - 1];
- const functionStart =
- beforeCursor.lastIndexOf(lastFunctionMatch) + lastFunctionMatch.length;
+ const lastFunctionMatch = functionMatches[functionMatches.length - 1];$1;$2 beforeCursor.lastIndexOf(lastFunctionMatch) + lastFunctionMatch.length;
  const braceCount = this.countBraces(beforeCursor.substring(functionStart));
  if (braceCount > 0) {
  return 'function';

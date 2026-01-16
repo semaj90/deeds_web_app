@@ -37,8 +37,7 @@ export interface EnhancedRAGEngine {
  analyze: (content: string) => Promise<SemanticEntity[]>;
 }
 // Chat related types for AI Assistant
-// Define ChatMessage locally to fix the missing export
-export interface ChatMessage {
+// Define ChatMessage locally to fix the missing export interface ChatMessage {
  role: 'user' | 'assistant' | 'system';
  content: string;
  timestamp?: string;

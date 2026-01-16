@@ -19,10 +19,7 @@ export interface UniversalASTNode {
   kind?: string; start: number;
   end: number; children: UniversalASTNode[];
   metadata: Record<string, unknown>;
-}
-
-export type ASTNodeType =
-  | 'Program'
+}$1;$2  | 'Program'
   | 'Module'
   | 'Script'
   | 'Template'
@@ -313,9 +310,7 @@ class UniversalASTParser {
       });
     }
 
-    // Extract template (remaining content)
-    let templateContent = content
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
+    // Extract template (remaining content)$1;$2      .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
       .trim();
 

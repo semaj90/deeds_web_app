@@ -32,10 +32,7 @@ export async function generateText(prompt: string): Promise<string> {
  model: CHAT_MODEL,
  messages: [{ role: 'user', content: prompt }],
  stream: false,
- };
-
- const res = await withTimeout(
- fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+ };$1;$2 fetch(`${OLLAMA_BASE_URL}/api/chat`, {
  method: 'POST',
  headers: { 'content-type': 'application/json' },
  body: JSON.stringify(body),
@@ -71,9 +68,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
 
  const startTime = Date.now();
 
- try {
- const res = await withTimeout(
- fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+ try {$1;$2 fetch(`${OLLAMA_BASE_URL}/api/chat`, {
  method: 'POST',
  headers: { 'content-type': 'application/json' },
  body: JSON.stringify(body),

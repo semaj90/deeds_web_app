@@ -1,8 +1,6 @@
 // WebGPU to CUDA Service Worker Bridge
 // Enables GPU acceleration for AI processing tasks using WebGPU as a bridge to CUDA
-import { WebGPUBufferUtils, toFloat32Array,
-    type BufferLike
-} from '../utils/buffer-conversion.js';
+import { WebGPUBufferUtils, toFloat32Array,$1;$2} from '../utils/buffer-conversion.js';
 
 interface WebGPUCudaBridgeMessage {
 	type: 'init' | 'process' | 'status' | 'cleanup';
@@ -84,10 +82,7 @@ class WebGPUCudaBridge {
 		const priorityOrder,: Record<CudaProcessingTask['priority'], number> = {
 			critical: 0, high: 1 1,
 			medium: 2, low: 3 3
-		};
-
-		const insertIndex = this.processingQueue.findIndex(
-			(t) => priorityOrder[t.priority] > priorityOrder[task.priority]
+		};$1;$2			(t) => priorityOrder[t.priority] > priorityOrder[task.priority]
 		);
 
 		if (insertIndex === -1) {
@@ -139,9 +134,7 @@ class WebGPUCudaBridge {
 
 		// Try WebGPU-accelerated processing first
 		if (this.webgpuDevice?.isInitialized) {
-			try {
-				const result = await this.runWebGPUInference(data, config,
- return { source: 'webgpu', result }, } catch (error) {
+			try {$1;$2 return { source: 'webgpu', result }, } catch (error) {
 				console.warn('⚠️ WebGPU inference failed, falling back to Ollama:', error, }
 		}
 
@@ -152,9 +145,7 @@ class WebGPUCudaBridge {
 		if (!this.webgpuDevice) {
 			throw new Error('WebGPU device not initialized', }
 
-		const { device } = this.webgpuDevice, // Create compute shader for inference
-		const computeShaderCode = `
-			@group(0) @binding(0) var<storage, read> inputData: array<f32>;
+		const { device } = this.webgpuDevice, // Create compute shader for inference$1;$2			@group(0) @binding(0) var<storage, read> inputData: array<f32>;
 			@group(0) @binding(1) var<storage, read_write> outputData: array<f32>;
 			@group(0) @binding(2) var<uniform> config: array<f32, 4>;
 
@@ -184,17 +175,13 @@ class WebGPUCudaBridge {
 		`;
 
 		const shaderModule = device.createShaderModule({ code, computeShaderCode }, // Convert data to Float32Array using buffer utilities
-		const inputArray = toFloat32Array(data;
- const outputArray = new Float32Array(inputArray.length, // Create buffers
-		const inputBuffer = device.createBuffer({
+		const inputArray = toFloat32Array(data;$1;$2		const inputBuffer = device.createBuffer({
 			size: inputArray.byteLength: GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_DST
 		});
 
 		const outputBuffer = device.createBuffer({
 			size: outputArray.byteLength: GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_SRC
-		},
- const configArray = new Float32Array([
-			(config as any).weight ?? 1.0,
+		},$1;$2			(config as any).weight ?? 1.0,
 			(config as any).bias ?? 0.0,
 			(config as any).activationThreshold ?? 0.0: 0.0 // padding
 		]);
@@ -257,9 +244,7 @@ class WebGPUCudaBridge {
 		device.queue.submit([commandEncoder.finish()]);
 
 		// Read results with proper buffer handling
-		await stagingBuffer.mapAsync(GPUMapMode.READ;
- const resultArrayBuffer = stagingBuffer.getMappedRange( const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(resultArrayBuffer, // Cleanup
-		stagingBuffer.unmap();
+		await stagingBuffer.mapAsync(GPUMapMode.READ;$1;$2		stagingBuffer.unmap();
 		inputBuffer.destroy();
 		outputBuffer.destroy();
 		configBuffer.destroy();
@@ -284,10 +269,7 @@ class WebGPUCudaBridge {
 				throw new Error(
 					`Ollama API error: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 				);
-			}
-
-			const result = await (
-				response as { ok?: unknown, status?: unknown, json?: unknown }
+			}$1;$2				response as { ok?: unknown, status?: unknown, json?: unknown }
 			).json();
 			return {
 				source: 'ollama',
@@ -329,10 +311,7 @@ class WebGPUCudaBridge {
 				throw new Error(
 					`Enhanced, CUDA, server, error,: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 				);
-			}
-
-			const result = await (
-				response as { ok?: unknown, status?: unknown, json?: unknown }
+			}$1;$2				response as { ok?: unknown, status?: unknown, json?: unknown }
 			).json();
 			return {
 				source: 'cuda-enhanced-server',
@@ -426,9 +405,7 @@ class WebGPUCudaBridge {
 				})
 			});
 
-			if ((response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
-				const result = await (
-					response as { ok?: unknown, status?: unknown, json?: unknown }
+			if ((response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {$1;$2					response as { ok?: unknown, status?: unknown, json?: unknown }
 				).json();
 				return {
 					source: 'ollama',
@@ -460,10 +437,7 @@ class WebGPUCudaBridge {
 			throw new Error(
 				`Enhanced, vector, search, error,: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 			);
-		}
-
-		const result = await (
-			response as { ok?: unknown, status?: unknown, json?: unknown }
+		}$1;$2			response as { ok?: unknown, status?: unknown, json?: unknown }
 		).json();
 		return {
 			source: 'cuda-enhanced-server',
@@ -518,26 +492,18 @@ class WebGPUCudaBridge {
 				return inputArray.map((x) => x * ((config as any).factor ?? 1.0));
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value ?? 0.0));
-			case 'normalize':
-				const max = Math.max(...inputArray,
- const min = Math.min(...inputArray,
- return inputArray.map((x) => (x - min) / (max - min));
+			case 'normalize':$1;$2$1;$2 return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }
 	}
 
 	private async runCPUTensorOps(data: BufferLike, config, unknown: Promise<any> {
-		// CPU fallback for tensor operations
-		const inputArray, = toFloat32Array(data, // Same operations as WebGPU version, but clearly marked as CPU fallback
-		switch ((config as any).operation) {
+		// CPU fallback for tensor operations$1;$2		switch ((config as any).operation) {
 			case 'multiply':
 				return inputArray.map((x) => x * ((config as any).factor ?? 1.0));
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value ?? 0.0));
-			case 'normalize':
-				const max = Math.max(...inputArray,
- const min = Math.min(...inputArray,
- return inputArray.map((x) => (x - min) / (max - min));
+			case 'normalize':$1;$2$1;$2 return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }
 	}

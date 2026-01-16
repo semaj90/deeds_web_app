@@ -96,10 +96,7 @@ export interface RiskRecommendation {
 	mitigation: string[];
 }
 
-// ===== Event Types =====
-
-export type RecommendationEvent =
-	| { type: 'START_SESSION'; userId: string; caseId?: string }
+// ===== Event Types =====$1;$2	| { type: 'START_SESSION'; userId: string; caseId?: string }
 	| { type: 'ANALYZE_DOCUMENT'; documentId: string; documentType: string }
 	| { type: 'REQUEST_RECOMMENDATIONS'; context: Record<string, unknown> }
 	| { type: 'ROUTE_TO_QUEUE'; priority: 'high' | 'standard' | 'background'; taskType: string }

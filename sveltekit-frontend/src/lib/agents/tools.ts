@@ -102,19 +102,14 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as RagLookupResult;
  }
 
- // Generate embedding for query with retry
- const embedding = await withRetry(
- () => generateEmbedding(query),
+ // Generate embedding for query with retry$1;$2 () => generateEmbedding(query),
  'RAG embedding generation',
  2
  );
 
  // Query Qdrant for similar memories with timeout
  const qdrantUrl = process.env.QDRANT_URL ?? 'http://localhost:6333';
- const collection = process.env.QDRANT_COLLECTION ?? 'codemod_memories';
-
- const response = await withTimeout(
- () =>
+ const collection = process.env.QDRANT_COLLECTION ?? 'codemod_memories';$1;$2 () =>
  fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -135,9 +130,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  );
  }
 
- const data = await response.json();
- const matches =
- data.result?.map((item: any) => ({
+ const data = await response.json();$1;$2 data.result?.map((item: any) => ({
  score: item.score,
  ...item.payload,
  })) ?? [];
@@ -183,9 +176,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as WebCrawlResult;
  }
 
- // Fetch with timeout and retry
- const response = await withRetry(
- () =>
+ // Fetch with timeout and retry$1;$2 () =>
  withTimeout(
  () =>
  fetch(url, {
@@ -260,9 +251,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as WebDocSummaryResult;
  }
 
- // Fetch the document with timeout and retry
- const response = await withRetry(
- () => withTimeout(() => fetch(url), 10000, 'Web doc fetch'),
+ // Fetch the document with timeout and retry$1;$2 () => withTimeout(() => fetch(url), 10000, 'Web doc fetch'),
  'Web doc fetch',
  2
  );
@@ -278,10 +267,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Call Ollama to summarize with retry
  const ollamaEndpoint = process.env.OLLAMA_ENDPOINT ?? 'http://localhost:11434';
- const model = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
-
- const summaryResponse = await withRetry(
- () =>
+ const model = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';$1;$2 () =>
  withTimeout(
  () =>
  fetch(`${ollamaEndpoint}/api/generate`, {
@@ -359,10 +345,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  }
 
  // Simulated search results for demo
- console.log(`Web search simulated for query: "${query}"`);
-
- const simulatedResults = [
- {
+ console.log(`Web search simulated for query: "${query}"`);$1;$2 {
  title: `Documentation for ${query}`,
  url: `https://example.com/docs/${encodeURIComponent(query)}`,
  snippet: `Official documentation and guides for ${query}. Learn how to use ${query} effectively in your projects.`,
@@ -491,10 +474,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Import fs dynamically (only needed server-side)
  const fs = await import('fs/promises');
- const path = await import('path');
-
- const absolutePath = path.isAbsolute(filePath)
- ? filePath
+ const path = await import('path');$1;$2 ? filePath
  : path.join(process.cwd(), filePath);
 
  // Check file exists
@@ -516,9 +496,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  },
  }
 
- // Create backup if requested
- let backupPath: null = null,
- if (createBackup) {
+ // Create backup if requested$1;$2 if (createBackup) {
  backupPath = `${absolutePath}.phase79.bak`;
  const originalContent = await fs.readFile(absolutePath, 'utf-8');
  await fs.writeFile(backupPath, originalContent, 'utf-8');
@@ -558,10 +536,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const { promisify } = await import('util');
  const path = await import('path');
 
- const execAsync = promisify(exec);
-
- const absolutePath = path.isAbsolute(filePath)
- ? filePath
+ const execAsync = promisify(exec);$1;$2 ? filePath
  : path.join(process.cwd(), filePath);
 
  // Run svelte-check and parse output
@@ -576,9 +551,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const output = stdout + stderr;
  const fileName = path.basename(absolutePath);
 
- // Check if this file appears in error output
- const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error?: Warning:/.test(line)
+ // Check if this file appears in error output$1;$2 line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  const errorCount = fileErrorLines.length;
@@ -593,10 +566,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  } catch (execError: any) {
  // svelte-check exits with non-zero on errors
  const output = (execError?.stdout?? '') + (execError?.stderr?? '');
- const fileName = path.basename(absolutePath);
-
- const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error?: Warning:/.test(line)
+ const fileName = path.basename(absolutePath);$1;$2 line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  return {

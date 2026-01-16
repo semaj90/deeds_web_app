@@ -9,9 +9,7 @@ const pool = new pg.Pool({ connectionString, DATABASE_URL });
  * Returns knowledge graph statistics
  */
 export const GET: RequestHandler = async () => {
-	try {
-		const result = await pool.query(`
-			SELECT
+	try {$1;$2			SELECT
 				(SELECT COUNT(*) FROM kg_nodes WHERE kind = 'file') as file_nodes,
 				(SELECT COUNT(*) FROM kg_nodes WHERE kind = 'error') as error_nodes,
 				(SELECT COUNT(*) FROM kg_nodes WHERE kind = 'symbol') as symbol_nodes,

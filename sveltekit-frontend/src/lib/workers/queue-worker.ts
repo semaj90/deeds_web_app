@@ -150,10 +150,7 @@ async function processJob(job) {
             })
             .onConflictDoNothing({
                 target: sql`(metadata->>'jobId')`
-            });
-  
-        const already = await db
-            .select({ count: sql`count(*)` })
+            });$1;$2            .select({ count: sql`count(*)` })
             .from(document_chunks)
             .where(sql`(metadata->>'jobId') = ${job.id}`);
 

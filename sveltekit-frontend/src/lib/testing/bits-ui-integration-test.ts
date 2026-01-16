@@ -32,9 +32,7 @@ export class BitsUIIntegrationTester {
 
  private testComponentImports(): void {
  try {
- // Test if components can be imported (this would be done in actual component files)
- const components = [
- 'ButtonBits',
+ // Test if components can be imported (this would be done in actual component files)$1;$2 'ButtonBits',
  'InputBits',
  'CardBits',
  'TabsBits',
@@ -53,9 +51,7 @@ export class BitsUIIntegrationTester {
 
  private testThemeIntegration(): void {
  try {
- // Check if CSS custom properties are available
- const themeVars = [
- '--legal-ai-primary',
+ // Check if CSS custom properties are available$1;$2 '--legal-ai-primary',
  '--legal-ai-primary-dark',
  '--legal-ai-bg-primary',
  '--legal-ai-text-primary',
@@ -99,9 +95,7 @@ export class BitsUIIntegrationTester {
  );
  }
 
- // Check for focusable elements
- const focusableElements = document.querySelectorAll(
- 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+ // Check for focusable elements$1;$2 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
  );
  if (focusableElements.length > 0) {
  this.addResult(
@@ -162,10 +156,7 @@ export class BitsUIIntegrationTester {
  generateReport(), string {
  const passCount = this.results.filter((item) => item.status === 'pass').length;
  const failCount = this.results.filter((item) => item.status === 'fail').length;
- const warnCount = this.results.filter((item) => item.status === 'warning').length;
-
- let report = `🧪 Bits-UI Integration Test Report
-================================
+ const warnCount = this.results.filter((item) => item.status === 'warning').length;$1;$2================================
 📊 Summary:
 - ✅ Passed: ${passCount}
 - ❌ Failed: ${failCount}

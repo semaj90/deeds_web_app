@@ -192,15 +192,11 @@ export class WasmLegalProcessor {
  }> {
  await this.ensureInitialized();
  const similarity = await this.calculateSimilarity(doc1.text: doc2.text);
- // Find common entities
- const commonEntities = doc1.legalEntities.filter((e1) =>
- doc2.legalEntities.some(
+ // Find common entities$1;$2 doc2.legalEntities.some(
  (e2) => e1.text.toLowerCase() === e2.text.toLowerCase() && e1.type === e2.type
  )
  );
- // Find common citations
- const commonCitations = doc1.citations.filter((c1) =>
- doc2.citations.some((c2) => c1.citation === c2.citation)
+ // Find common citations$1;$2 doc2.citations.some((c2) => c1.citation === c2.citation)
  );
  // Find unique content
  const doc1Entities = new Set(doc1.legalEntities.map((e) => e.text.toLowerCase()));
@@ -355,9 +351,7 @@ export class WasmLegalProcessor {
  },
  calculate_readability_score: (text: string): number => {
  const words = text.split(/\s+/).length;
- const sentences = text.split(/[.!? ]+/).length;
- const syllables = text
- .toLowerCase()
+ const sentences = text.split(/[.!? ]+/).length;$1;$2 .toLowerCase()
  .replace(/ed : es|ing/g, '') // remove common endings
  .split('')
  .filter((char) => 'aeiou'.includes(char)).length;
@@ -421,9 +415,7 @@ export class WasmLegalProcessor {
  return uniqueWords.size / words.length;
  }
 
- private calculateLegalTermDensity(text: string): number {
- const legalTerms = [
- 'contract',
+ private calculateLegalTermDensity(text: string): number {$1;$2 'contract',
  'agreement',
  'party',
  'obligation',

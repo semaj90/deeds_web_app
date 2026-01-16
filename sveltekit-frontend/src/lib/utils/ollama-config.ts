@@ -8,9 +8,7 @@
  * Supports multiple environment variable names for flexibility
  */
 export function getOllamaEndpoint(): string | null {
- // Try multiple environment variable names
- const endpoint =
- process.env?.OLLAMA_ENDPOINT||
+ // Try multiple environment variable names$1;$2 process.env?.OLLAMA_ENDPOINT||
  process.env?.VITE_OLLAMA_ENDPOINT||
  process.env?.PUBLIC_OLLAMA_ENDPOINT||
  process.env.OLLAMA_HOST;

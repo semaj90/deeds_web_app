@@ -15,9 +15,7 @@ describe('CaseStatuteLinks Component', () => {
     await cleanupTest();
   });
 
- const mockCaseId = 'case-123';
- const mockLinks = [
- {
+ const mockCaseId = 'case-123';$1;$2 {
  id: 'link-1',
  case_id: mockCaseId,
  statute_code: '18 U.S.C. § 1001',
@@ -106,9 +104,7 @@ describe('CaseStatuteLinks Component', () => {
  props: { caseId, mockCaseId },
  });
 
- await waitFor(() => {
- const linkTypeSelect = container.querySelector(
- '#link-type-filter'
+ await waitFor(() => {$1;$2 '#link-type-filter'
  ) as HTMLSelectElement;
  expect(linkTypeSelect).toBeTruthy();
  });

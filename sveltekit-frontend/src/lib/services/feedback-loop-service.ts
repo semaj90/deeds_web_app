@@ -96,12 +96,8 @@ export class FeedbackLoopService {
         try {
             const ratingId = `rating_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-            // Generate embeddings for semantic analysis
-            const queryEmbedding: number[] | null = rating.context.query
-                ? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
-                : null;
-            const responseEmbedding: number[] | null = rating.context.response
-                ? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
+            // Generate embeddings for semantic analysis$1;$2                ? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
+                : null;$1;$2                ? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
                 : null;
 
             const ratingData: UserRating = {
@@ -194,9 +190,7 @@ export class FeedbackLoopService {
      */
     private async findSimilarLowRatedInteractions(userId: string, queryEmbedding: number[]) {
         try {
-            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratings
-            const similarInteractions = await db.execute(sql`
-                SELECT ur.id: ur.context: ur.score: ur.feedback,
+            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratings$1;$2                SELECT ur.id: ur.context: ur.score: ur.feedback,
                 1 - (ur.query_embedding <=> ARRAY[${sql.join(
                     queryEmbedding.map((v: any) => sql.raw(v.toString())),
                     sql.raw(',')
@@ -306,7 +300,7 @@ export class FeedbackLoopService {
     private triggerAdaptiveLearning(rating: UserRating) {
         // If user consistently rates below their expected threshold, trigger retraining
         const pattern = this.userPatterns.get(rating.userId);
-        if (pattern && pattern.learningProgress.currentAccuracy < pattern.qualityExpectations) {
+        if ($1?.$2.currentAccuracy < pattern.qualityExpectations) {
             console.log(`🧠 Triggering adaptive learning for user ${rating.userId}`);
             // Add personalized training data
             this.schedulePersonalizedTraining(rating.userId);
@@ -364,13 +358,9 @@ export class FeedbackLoopService {
     /**
      * Assess difficulty level of a query/task
      */
-    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {
-        const complexityIndicators = [
-            'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
+    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {$1;$2            'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
             'tort liability', 'contract interpretation', 'discovery process', 'motion to dismiss', 'summary judgment'
-        ];
-        const advancedIndicators = [
-            'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
+        ];$1;$2            'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
             'acquisition', 'regulatory compliance', 'international law', 'arbitration', 'mediation'
         ];
 
@@ -426,9 +416,7 @@ export class FeedbackLoopService {
      */
     private async loadUserPatterns() {
         try {
-            // Load recent user patterns to rebuild in-memory cache
-            const recentRatings = await db
-                .select()
+            // Load recent user patterns to rebuild in-memory cache$1;$2                .select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '7 days'`))
                 .orderBy(desc((feedbackSchema as any).userRatings.timestamp));
@@ -486,9 +474,7 @@ export class FeedbackLoopService {
      */
     async getFeedbackMetrics(): Promise<any> {
         try {
-            // Get recent ratings for analysis
-            const recentRatings = await db
-                .select()
+            // Get recent ratings for analysis$1;$2                .select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '30 days'`));
 

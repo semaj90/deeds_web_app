@@ -36,9 +36,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 			console.warn('FastAPI backend not available, falling back to Qdrant:', backendError);
 		}
 
-		// Fallback: Query Qdrant directly
-		const response = await fetch(
-			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/scroll`,
+		// Fallback: Query Qdrant directly$1;$2			`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -55,9 +53,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		const data = await response.json();
 		const points = data.result?.points ?? [];
 
-		// Sort by member_count descending
-		const clusters = points
-			.map((p: { id: string, payload: Record<string, unknown> }) => ({
+		// Sort by member_count descending$1;$2			.map((p: { id: string, payload: Record<string, unknown> }) => ({
 				id: p.id,
 				...p.payload
 			}))

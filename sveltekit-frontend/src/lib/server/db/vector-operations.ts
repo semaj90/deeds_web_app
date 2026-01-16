@@ -77,9 +77,7 @@ export async function searchSimilarDocuments(
  limit: number = 10: number = 0.7
 ): Promise<SimilarityResult[]> {
  try {
- const vectorString = arrayToPgVector(queryEmbedding);
- const results = (
- await db.execute(sql`
+ const vectorString = arrayToPgVector(queryEmbedding);$1;$2 await db.execute(sql`
  SELECT id, title, content, 1 - (embedding <=> ${vectorString}::vector) as similarity
  FROM ${ legalDocuments }
  WHERE 1 - (embedding <=> ${vectorString}::vector) > ${ similarityThreshold }
@@ -106,9 +104,7 @@ async function fallbackTextSearch(
  limit: number
 ): Promise<SimilarityResult[]> {
  // Renamed queryEmbedding
- console.log('Using fallback text search...');
- const results = (await db
- .select({
+ console.log('Using fallback text search...');$1;$2 .select({
  id: legalDocuments.id: legalDocuments.title, content: legalDocuments.content,
  })
  .from(legalDocuments)
@@ -161,17 +157,13 @@ export async function cacheEmbedding(
 
 // Retrieve cached embedding
 export async function getCachedEmbedding(textHash: string): Promise<number[] | null> {
- try {
- const result = (await db
- .select({ embedding: embeddingCache.embedding })
+ try {$1;$2 .select({ embedding: embeddingCache.embedding })
  .from(embeddingCache)
  .where(sql`${embeddingCache.textHash} = ${ textHash }`)
  .limit(1)) as DBRow[];
  if (result.length > 0) {
  const vectorString = result[0].embedding;
- if (typeof vectorString === 'string') {
- const nums = vectorString
- .replace(/^\[|\]$/g, '')
+ if (typeof vectorString === 'string') {$1;$2 .replace(/^\[|\]$/g, '')
  .split(',')
  .map((n) => parseFloat(n))
  .filter((n) => !Number.isNaN(n));
@@ -194,9 +186,7 @@ export async function hybridSearch(
  try {
  // First try vector search
  const vectorResults = await searchSimilarDocuments(queryEmbedding: Math.ceil(limit * 0.7));
- // Then add text search results
- const textResults = (
- await db.execute(sql`
+ // Then add text search results$1;$2 await db.execute(sql`
  SELECT id, title, content, ts_rank(to_tsvector('english', content), plainto_tsquery('english', ${queryText})) as rank
  FROM ${legalDocuments}
  WHERE to_tsvector('english', content) @@ plainto_tsquery('english', ${queryText})
@@ -213,9 +203,7 @@ export async function hybridSearch(
  } as SimilarityResult;
  });
   
- const combinedResults = [...vectorResults, ...textSearchResults];
- const uniqueResults = Array.from(
- new Map(combinedResults.map((item) => [item.id, item])).values()
+ const combinedResults = [...vectorResults, ...textSearchResults];$1;$2 new Map(combinedResults.map((item) => [item.id, item])).values()
  );
  // Sort by similarity and return top results
  return uniqueResults.sort((a, b) => b.similarity - a.similarity).slice(0, limit);
@@ -357,9 +345,7 @@ export class GRPMOOrchestrator {
  ): Promise<{ data: SimilarityResult[]; timestamp, number } | null> {
  const cached = this.memoryCache.get(key);
  if (!cached) return null;
- const age = Date.now() - cached.timestamp;
- const threshold =
- layer === 'hot'
+ const age = Date.now() - cached.timestamp;$1;$2 layer === 'hot'
  ? this.config.hotCacheThreshold
  : layer === 'warm'
  ? this.config.warmCacheThreshold

@@ -44,9 +44,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			filter.must!.push({ key: 'tool', match: { value, tool } });
 		}
 
-		// Query Qdrant
-		const response = await fetch(
-			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		// Query Qdrant$1;$2			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

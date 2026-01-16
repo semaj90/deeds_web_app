@@ -205,9 +205,7 @@ export class OllamaService {
 		const results: (number[] | null)[] = [];
 
 		for (let i = 0; i < texts.length; i += concurrency) {
-			const batch = texts.slice(i, i + concurrency);
-			const batchResults = await Promise.all(
-				batch.map((text: any) => this.generateEmbedding(text))
+			const batch = texts.slice(i, i + concurrency);$1;$2				batch.map((text: any) => this.generateEmbedding(text))
 			);
 			results.push(...batchResults);
 
@@ -278,15 +276,10 @@ export class OllamaService {
 	/**
 	 * Generate fix suggestion for an error using ACE prompting
 	 */
-	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {
-		const fewShotExamples = similarErrors
-			.filter((e: any) => e.fix)
+	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {$1;$2			.filter((e: any) => e.fix)
 			.slice(0, 3)
 			.map((e: any, i: any) => `Example ${i + 1}:\nError: ${e.message}\nFix: ${e.fix}`)
-			.join('\n\n');
-
-		const prompt = `You are a TypeScript/Svelte expert. Analyze this error and suggest a fix.
-
+			.join('\n\n');$1;$2
 ${fewShotExamples ? `Here are similar errors and their fixes:\n${fewShotExamples}\n\n` : ''}
 Current Error:
 File: ${error.file}

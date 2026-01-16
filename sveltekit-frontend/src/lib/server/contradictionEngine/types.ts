@@ -96,10 +96,7 @@ export interface TimelineFact {
  normalizedTime?: string;
  normalizedEndTime?: string;
  raw?: FactClaim;
-}
-
-export type TimelineContradictionType =
- | 'impossible-presence'
+}$1;$2 | 'impossible-presence'
  | 'order-violation'
  | 'alibi-failure'
  | 'duration-contradiction';

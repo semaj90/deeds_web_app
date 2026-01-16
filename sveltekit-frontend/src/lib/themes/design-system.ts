@@ -196,9 +196,7 @@ export function getCurrentTheme(): Partial<CustomTheme> | null {
 
 /** * CSS utility classes generator */
 export function generateUtilityCSS(theme: CustomTheme): string {
- // Corrected type syntax
- const css = `
- /* Design System Utility Classes */
+ // Corrected type syntax$1;$2 /* Design System Utility Classes */
  .ds-font-mono { font-family: ${theme.typography.fontFamily.mono}; }
  .ds-font-sans { font-family: ${theme.typography.fontFamily.sans}; }
  .ds-font-pixel { font-family: ${theme.typography.fontFamily.pixel}; }
@@ -294,9 +292,7 @@ export function initializeDesignSystem(
 if (typeof window !== 'undefined') {
  // Check for stored theme preference
  const stored = getCurrentTheme();
- if (stored && stored.name) {
- const themeName = Object.keys(THEME_PRESETS).find(
- (key) => THEME_PRESETS[key as keyof typeof THEME_PRESETS].name === stored.name
+ if ($1?.$2) {$1;$2 (key) => THEME_PRESETS[key as keyof typeof THEME_PRESETS].name === stored.name
  ) as keyof typeof THEME_PRESETS;
  if (themeName) {
  initializeDesignSystem(themeName); // Added missing semicolon

@@ -95,9 +95,7 @@ export async function searchVector(opts: { collection: string,
 export async function upsertPoints(opts: { collection: string,
 	points: QdrantPoint[],
 	wait?: boolean;
-}): Promise<any> {
-	const r = await fetch(
-		`${QDRANT_URL}/collections/${opts.collection}/points?wait=${opts.wait ? 'true' : 'false'}`,
+}): Promise<any> {$1;$2		`${QDRANT_URL}/collections/${opts.collection}/points?wait=${opts.wait ? 'true' : 'false'}`,
 		{
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },

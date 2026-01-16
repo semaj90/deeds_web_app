@@ -67,9 +67,7 @@ export class QdrantSyncWorker {
  /**
  * Ensure Qdrant collections exist with correct dimensions
  */
- async ensureCollections(): Promise<void> {
- const collections = [
- { name: 'legal_documents', dimension: 384 },
+ async ensureCollections(): Promise<void> {$1;$2 { name: 'legal_documents', dimension: 384 },
  { name: 'legal_evidence', dimension: 384 },
  { name: 'phase72_errors', dimension: 768 }];
 

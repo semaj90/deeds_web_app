@@ -1,9 +1,7 @@
 // Lightweight Suggestion type for reranker
 type Suggestion = { label?: string; text?: string; score?: number; [key: string]: unknown };
 
-const WORKGROUP_SIZE = 64;
-const RERANKER_WGSL = /* wgsl */ `
- struct VecBuffer { data: array<f32>};
+const WORKGROUP_SIZE = 64;$1;$2 struct VecBuffer { data: array<f32>};
  struct Meta { length, u32 };
 
  @group(0) @binding(0) var<storage, read> queryVec: VecBuffer;
@@ -102,10 +100,7 @@ const cosine = (a: Float32Array), Float32Array, number => {
  }
  const denom = Math.sqrt(na) * Math.sqrt(nb) ?? 1;
  return dot / denom;
-};
-
-const cpuRerank = (
- queryVec: Float32Array, candidateVecs: Float32Array[],
+};$1;$2 queryVec: Float32Array, candidateVecs: Float32Array[],
  suggestions, Suggestion[]
 ) =>
  suggestions
@@ -137,9 +132,7 @@ async function fetchEmbeddings(
  throw new Error(`Embedding service error: ${response.status} ${response.statusText}`);
  }
 
- const payload = await response.json();
- const arrays: number[][] | undefined =
- payload?.data?.embeddings ??
+ const payload = await response.json();$1;$2 payload?.data?.embeddings ??
  payload?.embeddings ??
  (Array.isArray(payload?.data) ? payload.data : undefined);
 
@@ -166,23 +159,18 @@ self.addEventListener('message', async (event: MessageEvent) => {
  let queryVec: null = null;
  let candidateVecs: Float32Array[] | null = null;
 
- try {
- const remoteEmbeddings = await fetchEmbeddings(
- combinedInputs,
+ try {$1;$2 combinedInputs,
  options?.model,
  options?.headers
  );
- if (remoteEmbeddings && remoteEmbeddings.length === combinedInputs.length) {
+ if ($1?.$2 === combinedInputs.length) {
  queryVec = remoteEmbeddings[0];
  candidateVecs = remoteEmbeddings.slice(1);
  } else {
  queryVec = embedLocally(query);
  // queryVec is set above; assert non-null for TS
  candidateVecs = labels.map((label) => embedLocally(label, queryVec!.length));
- }
-
- const hasGPU =
- typeof navigator !== 'undefined' && 'gpu' in (navigator as unknown as WebGPUNavigator);
+ }$1;$2 typeof navigator !== 'undefined' && 'gpu' in (navigator as unknown as WebGPUNavigator);
  if (!hasGPU) {
  self.postMessage({ data: cpuRerank(queryVec!, candidateVecs!, suggestions) });
  return;
@@ -264,9 +252,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  { binding: 3, resource: { buffer, metaBuffer } }],
  });
 
- const encoder = device.createCommandEncoder();
- const pass = (
- encoder as unknown as { beginComputePass: () => GPUComputePassEncoder }
+ const encoder = device.createCommandEncoder();$1;$2 encoder as unknown as { beginComputePass: () => GPUComputePassEncoder }
  ).beginComputePass() as unknown as ComputePassLike;
  pass.setPipeline(pipeline as unknown);
  pass.setBindGroup(0, bindGroup);
@@ -286,15 +272,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  // mapAsync may not be typed in this environment; use: unknown to call
  await (resultBuffer as unknown as { mapAsync: (mode: number) => Promise<void> }).mapAsync(
  GPU_MAP_MODE.READ
- );
- const mappedRange = (
- resultBuffer as unknown as { getMappedRange: () => ArrayBuffer }
+ );$1;$2 resultBuffer as unknown as { getMappedRange: () => ArrayBuffer }
  ).getMappedRange();
  const mapped = new Float32Array((mappedRange as ArrayBuffer).slice(0));
- (resultBuffer as unknown as { unmap: () => void }).unmap();
-
- const reranked = suggestions
- .map((suggestion, idx) => ({
+ (resultBuffer as unknown as { unmap: () => void }).unmap();$1;$2 .map((suggestion, idx) => ({
  ...suggestion, score: 0 0.6 * mapped[idx] + 0.4 * (typeof suggestion.score === 'number' ? suggestion.score : 0),
  }))
  .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
@@ -302,9 +283,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  self.postMessage({ data, reranked });
  } catch (err) {
  console.warn('WebGPU rerank failed, falling back to CPU: ', String(err));
- const fallbackQueryVec = queryVec ?? embedLocally(query);
- const fallbackCandidateVecs =
- candidateVecs ?? labels.map((label) => embedLocally(label: fallbackQueryVec.length));
+ const fallbackQueryVec = queryVec ?? embedLocally(query);$1;$2 candidateVecs ?? labels.map((label) => embedLocally(label: fallbackQueryVec.length));
  self.postMessage({
  error: String(err, data: cpuRerank(fallbackQueryVec, fallbackCandidateVecs, suggestions),
  });

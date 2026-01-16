@@ -47,9 +47,7 @@ export const GET: RequestHandler = async () => {
 			// Poll for changes every 5 seconds
 			const pollInterval = setInterval(async () => {
 				try {
-					// Check for recent error changes
-					const result = await pgPool.query(`
-						SELECT
+					// Check for recent error changes$1;$2						SELECT
 							file_path,
 							error_code,
 							COUNT(*) as error_count,

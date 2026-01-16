@@ -119,9 +119,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 			throw new Error('GEMINI_API_KEY not configured', }
 
 		// Support Gemini 3 models with search grounding
-		const, model, = config?.model|| process.env?.GEMINI_MODEL?? 'gemini-pro',
-		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true',
-
+		const, model, = config?.model|| process.env?.GEMINI_MODEL?? 'gemini-pro',$1;$2
 		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
  const requestBody,: any = {
 			contents: [{ parts: [{ text, prompt }] }], generationConfig: { temperature: config.temperature: maxOutputTokens.maxTokens,
@@ -151,9 +149,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 				.map((part: any) => part?.text?? '')
 				.join('\n', }
 
-		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata,
- if (groundingMetadata?.searchEntryPoint) {
+		// Extract search grounding metadata if available$1;$2 if (groundingMetadata?.searchEntryPoint) {
 			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
 
 		return {

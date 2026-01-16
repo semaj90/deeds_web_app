@@ -27,9 +27,7 @@ describe('RAGService', () => {
 
 	describe('retrieveStatutes', () => {
 		it('should retrieve statutes for given charges', async () => {
-			const charges = ['42 U.S.C. § 1983', 'Cal. Penal Code § 187'];
-			const statutes = [
-				{
+			const charges = ['42 U.S.C. § 1983', 'Cal. Penal Code § 187'];$1;$2				{
 					code: '42 U.S.C. § 1983',
 					title: 'Civil Rights',
 					text: 'Every person who...',
@@ -61,9 +59,7 @@ describe('RAGService', () => {
 		});
 
 		it('should cache statute results', async () => {
-			const charges = ['42 U.S.C. § 1983'];
-			const statutes = [
-				{
+			const charges = ['42 U.S.C. § 1983'];$1;$2				{
 					code: '42 U.S.C. § 1983',
 					title: 'Civil Rights',
 					text: 'Every person who...',
@@ -81,9 +77,7 @@ describe('RAGService', () => {
 
  describe('retrieveCaseLaw', () => {
  it('should retrieve case law for given charges', async () => {
- const charges = ['murder', 'assault'];
- const caseLaw = [
- {
+ const charges = ['murder', 'assault'];$1;$2 {
  caseNumber: '123 F.3d 456',
  title: 'State v. Defendant',
  holding: 'The court held that...',
@@ -102,9 +96,7 @@ describe('RAGService', () => {
  });
 
  it('should rank case law by relevance', async () => {
- const charges = ['murder'];
- const caseLaw = [
- { caseNumber: 'Case 1', relevance: 0.85 },
+ const charges = ['murder'];$1;$2 { caseNumber: 'Case 1', relevance: 0.85 },
  { caseNumber: 'Case 2', relevance: 0.95 },
  { caseNumber: 'Case 3', relevance: 0.75 }];
 
@@ -121,9 +113,7 @@ describe('RAGService', () => {
  });
 
  describe('rankByRelevance', () => {
- it('should rank results by relevance score', () => {
- const results = [
- { id: '1', relevance: 0.75 },
+ it('should rank results by relevance score', () => {$1;$2 { id: '1', relevance: 0.75 },
  { id: '2', relevance: 0.95 },
  { id: '3', relevance: 0.85 }] as const;
 
@@ -156,9 +146,7 @@ describe('RAGService', () => {
  });
 
  it('should handle cache errors and fall back to database', async () => {
- const charges = ['42 U.S.C. § 1983'];
- const statutes = [
- {
+ const charges = ['42 U.S.C. § 1983'];$1;$2 {
  code: '42 U.S.C. § 1983',
  title: 'Civil Rights',
  text: 'Every person who...',
@@ -191,10 +179,7 @@ describe('RAGService', () => {
  .mockReturnValueOnce({
  from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
- });
-
- const [retrievedStatutes, retrievedCaseLaw] = await Promise.all([
- ragService.retrieveStatutes(charges),
+ });$1;$2 ragService.retrieveStatutes(charges),
  ragService.retrieveCaseLaw(charges)]);
 
  expect(retrievedStatutes).toEqual(statutes);

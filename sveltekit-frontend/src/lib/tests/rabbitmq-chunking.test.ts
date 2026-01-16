@@ -16,10 +16,7 @@ const TEST_CONFIG = {
 	maxLengthBytes: 1_000_000_000, // 1GB for testing
 	maxAge: '1D',
 	prefetchCount: 100
-};
-
-const SAMPLE_LEGAL_DOCUMENT = `
-PROSECUTION MEMORANDUM
+};$1;$2PROSECUTION MEMORANDUM
 
 CASE NO: 2024-CR-12345
 DEFENDANT: John Doe
@@ -125,9 +122,7 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			expect(reassembled).toBe(SAMPLE_LEGAL_DOCUMENT);
 		});
 
-		it('should handle edge cases (empty, single char, exact chunk size)', () => {
-			const testCases = [
-				{ text: '', expectedChunks: 1 }, // Empty becomes single chunk
+		it('should handle edge cases (empty, single char, exact chunk size)', () => {$1;$2				{ text: '', expectedChunks: 1 }, // Empty becomes single chunk
 				{ text: 'A', expectedChunks: 1 },
 				{ text: 'A'.repeat(500), expectedChunks: 1 }, // Exact chunk size
 				{ text: 'A'.repeat(501), expectedChunks: 2 }  // Just over

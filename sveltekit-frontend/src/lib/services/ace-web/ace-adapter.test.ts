@@ -27,9 +27,7 @@ describe('AceAdapter', () => {
 
   describe('processRequest', () => {
     it('should process request with sufficient context', async () => {
-      // Mock context service to return sufficient context
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+      // Mock context service to return sufficient context$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -52,9 +50,7 @@ describe('AceAdapter', () => {
       expect(response.metadata.llmProvider).toBe('gemma3');
     });
 
-    it('should trigger web search when context is insufficient', async () => {
-      const mockFetch = vi.fn()
-        // Mock ingestion API
+    it('should trigger web search when context is insufficient', async () => {$1;$2        // Mock ingestion API
         .mockResolvedValueOnce({
           ok: true, json: async () => ({ jobIds: ['job-1'], success: true }),
         })
@@ -79,9 +75,7 @@ describe('AceAdapter', () => {
       expect(response.metadata.webSearchTriggered).toBeDefined();
     });
 
-    it('should include error context in query', async () => {
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+    it('should include error context in query', async () => {$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -102,9 +96,7 @@ describe('AceAdapter', () => {
       expect(response.context).toBeDefined();
     });
 
-    it('should handle LLM API failures gracefully', async () => {
-      const mockFetch = vi.fn()
-        .mockRejectedValueOnce(new Error('LLM API unavailable'));
+    it('should handle LLM API failures gracefully', async () => {$1;$2        .mockRejectedValueOnce(new Error('LLM API unavailable'));
 
       global.fetch = mockFetch;
 
@@ -115,9 +107,7 @@ describe('AceAdapter', () => {
       await expect(adapter.processRequest(request)).rejects.toThrow();
     });
 
-    it('should use provided session ID', async () => {
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+    it('should use provided session ID', async () => {$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -135,9 +125,7 @@ describe('AceAdapter', () => {
       expect(response.metadata.sessionId).toBe(sessionId);
     });
 
-    it('should generate unique session ID if not provided', async () => {
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+    it('should generate unique session ID if not provided', async () => {$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -155,9 +143,7 @@ describe('AceAdapter', () => {
   });
 
   describe('LLM integration', () => {
-    it('should call Gemma3 with correct parameters', async () => {
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+    it('should call Gemma3 with correct parameters', async () => {$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Gemma3 response' }),
         });
 
@@ -195,9 +181,7 @@ describe('AceAdapter', () => {
   });
 
   describe('context quality assessment', () => {
-    it('should detect stale context', async () => {
-      const mockFetch = vi.fn()
-        .mockResolvedValueOnce({
+    it('should detect stale context', async () => {$1;$2        .mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock response' }),
         });
 

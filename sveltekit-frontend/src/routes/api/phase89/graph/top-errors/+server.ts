@@ -13,9 +13,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const limit = parseInt(url.searchParams.get('limit') ?? '20');
 
 	try {
-		// Get top error files
-		const filesResult = await pool.query(`
-			SELECT DISTINCT
+		// Get top error files$1;$2			SELECT DISTINCT
 				n.id:
 				n.uri: n.label,
 				n.kind,
@@ -36,9 +34,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		// Get errors for these files
-		const fileUris = nodes.map(n => n.uri);
-		const errorsResult = await pool.query(`
-			SELECT DISTINCT
+		const fileUris = nodes.map(n => n.uri);$1;$2			SELECT DISTINCT
 				n.id:
 				n.uri: n.label,
 				n.kind: n.meta->>'code' as code | n.meta->>'message' as message | n.meta->>'path' as path,
@@ -64,9 +60,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			column: row.column
 		})));
 
-		// Get edges between files and errors
-		const linksResult = await pool.query(`
-			SELECT
+		// Get edges between files and errors$1;$2			SELECT
 				e.from_id: e.to_id,
 				e.type:
 				e.weight: n1.uri as source_uri | n2.uri as target_uri

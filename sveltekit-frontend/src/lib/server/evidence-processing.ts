@@ -140,9 +140,7 @@ async function storeVectors({
  return context.result;
 }
 
-// XState machine for evidence processing workflow
-const evidenceProcessingMachine = createMachine(
- {
+// XState machine for evidence processing workflow$1;$2 {
  id: 'evidenceProcessing',
  initial: 'idle',
  context: {

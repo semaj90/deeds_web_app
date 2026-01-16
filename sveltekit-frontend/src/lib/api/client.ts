@@ -80,9 +80,7 @@ class EnhancedApiClient {
  retries?: number;
  requestId?: string;
  } = {}
- ): Promise<StandardApiResponse<TResponse>> {
- const requestId =
- options?.requestId|| `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+ ): Promise<StandardApiResponse<TResponse>> {$1;$2 options?.requestId|| `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  const timeout = options?.timeout|| this.config.timeout;
  const maxRetries = options.retries !== undefined ? options.retries : this.config.retries;
  let lastError: Error | null = null;
@@ -271,9 +269,7 @@ class EnhancedApiClient {
  public async updateEvidence(
  id: string, data: RequestOf<EvidenceAPI.Update>,
  custodyNotes?: string
- ): Promise<StandardApiResponse<EvidenceAPI.Update>> {
- const url = custodyNotes
- ? `/api/evidence?id=${ id }&custodyNotes=${encodeURIComponent(custodyNotes)}`
+ ): Promise<StandardApiResponse<EvidenceAPI.Update>> {$1;$2 ? `/api/evidence?id=${ id }&custodyNotes=${encodeURIComponent(custodyNotes)}`
  : `/api/evidence?id=${ id }`;
  return this.put(url, data);
  }

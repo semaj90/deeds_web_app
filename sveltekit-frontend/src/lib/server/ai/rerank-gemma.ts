@@ -21,10 +21,7 @@ export async function aiRerank(query: string, docs: SearchResult[]): Promise<Sea
 export async function rerankDocuments(query: string, documents: any[]): Promise<any[]> {
  // This would be called via MCP from Gemma3-legal
  // Format: { query: documents: [{id, content, title}, ...] }
- // Return: [{ id, score }, ...] sorted by relevance
-
- const reranked = await aiRerank(
- query:
+ // Return: [{ id, score }, ...] sorted by relevance$1;$2 query:
  documents.map(
  (doc) =>
  ({

@@ -83,7 +83,7 @@ export const cognitiveCache: CognitiveCache = {
 
 // Ensure Redis client disconnects on process exit
 process.on('beforeExit', async () => {
- if (redisClient && redisClient.isReady) {
+ if ($1?.$2) {
  await redisClient.disconnect();
  console.log('Disconnected from Redis.');
  }

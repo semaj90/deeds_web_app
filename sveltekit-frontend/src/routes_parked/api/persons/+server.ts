@@ -6,9 +6,7 @@ export const GET: RequestHandler = async ({ url }) => {
  try {
  // Parse query parameters
  const search = url.searchParams.get('search') ?? '';
- const status = url.searchParams.get('status') as 'active' | 'inactive' | 'archived' | null;
- const priority = url.searchParams.get('priority') as
- | 'low'
+ const status = url.searchParams.get('status') as 'active' | 'inactive' | 'archived' | null;$1;$2 | 'low'
  | 'medium'
  | 'high'
  | 'critical'

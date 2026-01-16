@@ -13,10 +13,7 @@ import path from 'path';
 import crypto from 'crypto';
 import type { error } from "console";
 import { json } from "stream/consumers";
-import type { run } from "svelte/legacy";
-
-export type RunState =
- | 'queued'
+import type { run } from "svelte/legacy";$1;$2 | 'queued'
  | 'analyzing'
  | 'proposing'
  | 'applying'

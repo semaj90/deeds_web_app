@@ -96,9 +96,7 @@ export class QdrantVectorStore {
 
 	/** Ensure collection exists, create if not */
 	private async ensureCollection(collectionName: string, size: number): Promise<void> {
-		try {
-			const collections =
-				(await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
+		try {$1;$2				(await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
 			const exists = (collections.collections ?? []).some((c) => c.name === collectionName);
 
 			if (!exists) {
@@ -154,10 +152,7 @@ export class QdrantVectorStore {
 		entity: LegalEntity,
 		embedding: number[]
 	): Promise<string> {
-		await this.ensureInitialized();
-
-		const pointId = crypto
-			.createHash('sha256')
+		await this.ensureInitialized();$1;$2			.createHash('sha256')
 			.update(`${sessionId}-${entity.type}-${entity.value}`)
 			.digest('hex')
 			.substring(0, 32);
@@ -186,10 +181,7 @@ export class QdrantVectorStore {
 		embedding: number[],
 		metadata?: { turnCount?: number, currentState?: number, confidence?: number }
 	): Promise<string> {
-		await this.ensureInitialized();
-
-		const pointId = crypto
-			.createHash('sha256')
+		await this.ensureInitialized();$1;$2			.createHash('sha256')
 			.update(`summary-${sessionId}-${Date.now()}`)
 			.digest('hex')
 			.substring(0, 32);
@@ -270,9 +262,7 @@ export class QdrantVectorStore {
 			confidence?, number;
 		}>
 	> {
-		await this.ensureInitialized();
-		const filter = entityType
-			? { must: [{ key: 'entityType', match: { value, entityType } }] }
+		await this.ensureInitialized();$1;$2			? { must: [{ key: 'entityType', match: { value, entityType } }] }
 			: undefined;
 
 		const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {

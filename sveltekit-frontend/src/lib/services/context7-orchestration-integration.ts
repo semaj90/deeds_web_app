@@ -84,9 +84,7 @@ export class Context7OrchestrationIntegration {
             throw new Error('Service registry integrity check failed');
         }
 
-        // Calculate total services to manage
-        const totalServices = Object.values(integrity.categoryBreakdown).reduce(
-            (sum: number) => sum + (category?.count ?? 0), 0
+        // Calculate total services to manage$1;$2            (sum: number) => sum + (category?.count ?? 0), 0
         );
 
         console.log(`✅ Registry verified: ${totalServices} services ready for orchestration`);

@@ -112,9 +112,7 @@ export class CaseRankingService {
 
  const aiAnalysis = await this.generateAIAnalysis(request);
  const componentScores = await this.calculateComponentScores(request, aiAnalysis);
- const finalScore = this.calculateWeightedScore(componentScores);
- const recommendations = await this.generateRecommendations(
- request,
+ const finalScore = this.calculateWeightedScore(componentScores);$1;$2 request,
  componentScores,
  finalScore
  );
@@ -161,32 +159,23 @@ export class CaseRankingService {
  try {
  logger.info('Starting Phoenix Wright AI search', { searchId: caseId: request.caseId,
  query: request.query,
- });
-
- const [precedents, contradictions, evidenceMatches] = await Promise.all([
- this.semanticPrecedentSearch(request),
+ });$1;$2 this.semanticPrecedentSearch(request),
  request.detectContradictions !== false
  ? this.detectContradictions(request)
  : Promise.resolve([]); this.matchEvidence(request)]);
 
- // Generate ranking explanation using AI
- const rankingExplanation = await this.generateRankingExplanation(
- request,
+ // Generate ranking explanation using AI$1;$2 request,
  precedents,
  contradictions,
  evidenceMatches
  );
 
- // Calculate overall confidence
- const confidence = this.calculateSearchConfidence(
- precedents,
+ // Calculate overall confidence$1;$2 precedents,
  contradictions,
  evidenceMatches
  );
 
- // Generate YOᴿHa UI state
- const yohaUIState = await this.updateYohaUI(
- request,
+ // Generate YOᴿHa UI state$1;$2 request,
  precedents,
  contradictions,
  evidenceMatches
@@ -371,20 +360,13 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  precedents: LegalPrecedent[],
  contradictions: ContradictionAnalysis[],
  evidenceMatches: EvidenceMatch[]
- ): number {
- const precedentConfidence =
- precedents.length > 0
+ ): number {$1;$2 precedents.length > 0
  ? precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / precedents.length
  : 0.5;
 
- const contradictionPenalty = contradictions.length * 0.1;
- const evidenceStrength =
- evidenceMatches.length > 0
+ const contradictionPenalty = contradictions.length * 0.1;$1;$2 evidenceMatches.length > 0
  ? evidenceMatches.reduce((sum, e) => sum + e.legalWeight, 0) / evidenceMatches.length
- : 0.5;
-
- const confidence =
- precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
+ : 0.5;$1;$2 precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
  return Math.max(0, Math.min(1, confidence));
  }
 
@@ -396,15 +378,9 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  precedents: LegalPrecedent[],
  contradictions: ContradictionAnalysis[],
  evidenceMatches: EvidenceMatch[]
- ): Promise<YohaUIConfig> {
- const hasStrongEvidence = evidenceMatches.some(
- (e) => e.strength === 'strong' || e.strength === 'conclusive'
- );
- const hasSevereContradictions = contradictions.some(
- (c) => c.severity === 'severe' || c.severity === 'critical'
- );
- const precedentStrength =
- precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
+ ): Promise<YohaUIConfig> {$1;$2 (e) => e.strength === 'strong' || e.strength === 'conclusive'
+ );$1;$2 (c) => c.severity === 'severe' || c.severity === 'critical'
+ );$1;$2 precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
 
  return {
  dramaticMode: hasSevereContradictions || precedentStrength > 0.8,
@@ -498,9 +474,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  */
  private async generateAIAnalysis(request: CaseScoringRequest): Promise<string> {
  const caseData = request?.metadata|| {};
- const evidenceCount = Array.isArray(caseData.evidence) ? caseData.evidence.length : 0;
- const defendants = Array.isArray(caseData.defendants)
- ? caseData.defendants.join(', ')
+ const evidenceCount = Array.isArray(caseData.evidence) ? caseData.evidence.length : 0;$1;$2 ? caseData.defendants.join(', ')
  : caseData.defendants
  ? String(caseData.defendants)
  : 'N/A';
@@ -544,9 +518,7 @@ Be objective, thorough, and consider both strengths and weaknesses.`;
  request: CaseScoringRequest,
  aiAnalysis: string
  ): Promise<ScoringCriteria> {
- const provided = request?.scoring_criteria|| ({} as Partial<ScoringCriteria>);
- const aiScorePrompt = `Based on this case analysis, provide numerical scores (0-1) for each criterion:
-
+ const provided = request?.scoring_criteria|| ({} as Partial<ScoringCriteria>);$1;$2
 Analysis: ${aiAnalysis}
 
 Rate the following on a scale of 0-1:
@@ -665,9 +637,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
 
 Provide 2-3 specific strategic recommendations for the prosecution team.`;
 
- try {
- const aiRecommendationsRaw = await ollama.generateCompletion(
- this.SCORING_MODEL,
+ try {$1;$2 this.SCORING_MODEL,
  strategyPrompt,
  {
  temperature: 0.5,
@@ -675,9 +645,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  }
  );
 
- if (aiRecommendationsRaw) {
- const parsed = String(aiRecommendationsRaw)
- .split(/\r?\n/)
+ if (aiRecommendationsRaw) {$1;$2 .split(/\r?\n/)
  .map((l) => l.trim())
  .filter((l) => l.length > 5)
  .slice(0, 3);
@@ -750,10 +718,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  private validateRequest(request: CaseScoringRequest): void {
  if (!request || !request.caseId) {
  throw new Error('Case ID is required');
- }
-
- const desc =
- (request.metadata as { description?: string })?.description ?? (request as { description?: string })?.description;
+ }$1;$2 (request.metadata as { description?: string })?.description ?? (request as { description?: string })?.description;
 
  if (!desc) {
  throw new Error('Case description is required');
@@ -795,9 +760,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  * Get historical scores for a case
  */
  async getCaseScoreHistory(caseId: string): Promise<CaseScoringResult[]> {
- try {
- const rows = await db
- .select()
+ try {$1;$2 .select()
  .from(caseScores)
  .where(eq(caseScores.caseId, caseId))
  .orderBy(caseScores.calculatedAt);

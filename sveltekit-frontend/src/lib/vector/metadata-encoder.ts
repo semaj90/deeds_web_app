@@ -36,9 +36,7 @@ function adaptiveScalingDecision(
  thresholds: { maxRenderTime: number, maxMemoryUsage: number, maxTemperature: number },
  mode: AdaptiveScalingMode
 ): { shouldScale: boolean, recommendedDimensions: VectorDimensions; recommendedQuantization: QuantizationLevel } {
- // Simple decision logic
- const shouldScale = avgMetrics.renderTime > thresholds?.maxRenderTime||
- avgMetrics.memoryUsage > thresholds?.maxMemoryUsage||
+ // Simple decision logic$1;$2 avgMetrics.memoryUsage > thresholds?.maxMemoryUsage||
  avgMetrics.temperature > thresholds.maxTemperature;
  let recommendedDimensions: VectorDimensions = 768;
  let recommendedQuantization: QuantizationLevel = 'int8';

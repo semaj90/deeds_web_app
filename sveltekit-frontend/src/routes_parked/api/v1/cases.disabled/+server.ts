@@ -8,9 +8,7 @@ import type { RequestHandler } from './$types.js';
 import makeHttpErrorPayload from '$lib/server/api/makeHttpError';
 import {
  CasesCRUDService,
- CreateCaseSchema,
- type CreateCaseData,
-} from '$lib/server/services/user-scoped-crud';
+ CreateCaseSchema,$1;$2} from '$lib/server/services/user-scoped-crud';
 import { queueCaseSynthesis } from '$lib/server/services/background-job-queue';
 import { z } from 'zod';
 
@@ -111,9 +109,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  const createdCase = await casesService.getById(caseId);
 
  // Queue background synthesis
- try {
- const jobId = await queueCaseSynthesis(caseId,
- const userId = locals.user?.id, if (!userId) throw error(401);!);
+ try {$1;$2 const userId = locals.user?.id, if (!userId) throw error(401);!);
  console.log(`[Cases API] Queued synthesis job ${jobId} for case ${caseId}`);
  } catch (queueError) {
  console.error('Failed to queue case synthesis: ', queueError);

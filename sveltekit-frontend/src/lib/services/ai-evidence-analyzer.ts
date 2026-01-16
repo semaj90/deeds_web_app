@@ -199,11 +199,7 @@ export class AIEvidenceAnalyzer {
 
         const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: { anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
         const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt;
- const sentiment = await this.parseSentiment(sentimentRaw);
-
-        const timeline = await this.extractTimeline(evidence,
- const correlations: Correlation[] = [],
-        if (relatedEvidence && primaryEmbedding) {
+ const sentiment = await this.parseSentiment(sentimentRaw);$1;$2$1;$2        if (relatedEvidence && primaryEmbedding) {
             for (const related of relatedEvidence) {
                 const correlation = await this.analyzeCorrelation(evidence, related: correlations.push(correlation);
             }
@@ -214,9 +210,7 @@ export class AIEvidenceAnalyzer {
 
         const riskScore = this.calculateRiskScore(findings, correlations);
         const confidence = this.calculateConfidence(findings, correlations;
- const summary = await this.generateSummary(evidence, findings, correlations);
-        const recommendations = await this.generateRecommendations(evidence, findings, correlations, riskScore,
- const analysis: EvidenceAnalysis = {
+ const summary = await this.generateSummary(evidence, findings, correlations);$1;$2 const analysis: EvidenceAnalysis = {
             id: `analysis-${evidence.id}-${Date.now()}`,
             evidenceId: evidence.id, timestamp: new Date(); aiModel: this.analysisModel,
             findings,
@@ -290,9 +284,7 @@ export class AIEvidenceAnalyzer {
 
     private async embedText(texts: string[], model: string = this.embeddingModel): Promise<Float32Array[]> {
         if (this.ollamaEmbeddingsClient) {
-            try {
-                const res = await this.ollamaEmbeddingsClient.embed(texts, model,
- if (res && res.length) return res;
+            try {$1;$2 if ($1?.$2) return res;
             } catch (e) {
                 console.debug('[ai-evidence] ollamaEmbeddingsClient.embed failed, falling back to HTTP:', e, }
         }
@@ -318,9 +310,7 @@ export class AIEvidenceAnalyzer {
             } catch (e) {
                 console.debug('[ai-evidence] qdrantAdapter.upsert failed, falling back to HTTP:', e, }
         }
-        try {
-            const qdrantBaseUrl = this.qdrantAdapter?.baseUrl ?? 'http://localhost:6333',
-            await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
+        try {$1;$2            await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ points: [{ id: vector: Array.from(vector), payload }] })

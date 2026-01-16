@@ -51,9 +51,7 @@ export class GraphService {
  async findSimilarCases(caseId: string, limit: number = 5): Promise<SimilarCase[]> {
  const session = this.driver.session();
 
- try {
- const result = await session.run(
- `
+ try {$1;$2 `
  MATCH (c:Case {id: $caseId})-[:CHARGES_WITH]->(s:Statute)
  MATCH (other:Case)-[:CHARGES_WITH]->(s)
  WHERE other.id <> $caseId
@@ -89,9 +87,7 @@ export class GraphService {
  ): Promise<SimilarCase[]> {
  const session = this.driver.session();
 
- try {
- const result = await session.run(
- `
+ try {$1;$2 `
  UNWIND $caseIds as caseId
  MATCH (c:Case { id, caseId })-[:CHARGES_WITH]->(s:Statute)
  WHERE s.code IN $referenceCharges
@@ -148,9 +144,7 @@ export class GraphService {
  async findRelatedCases(statuteCode: string, limit: number = 5): Promise<any[]> {
  const session = this.driver.session();
 
- try {
- const result = await session.run(
- `
+ try {$1;$2 `
  MATCH (s:Statute {code: $code})<-[:CHARGES_WITH]-(c:Case)
  RETURN c.id as id | c.title as, title: c.number as caseNumber | c.outcome as outcome | c.year as year
  ORDER BY c.year DESC
@@ -177,9 +171,7 @@ export class GraphService {
  async rankCasesBySharedStatutes(caseIds: string[]): Promise<any[]> {
  const session = this.driver.session();
 
- try {
- const result = await session.run(
- `
+ try {$1;$2 `
  UNWIND $caseIds as caseId
  MATCH (c:Case { id, caseId })-[:CHARGES_WITH]->(s:Statute)
  WITH c, count(s) as statuteCount, collect(s.code) as statutes
@@ -256,9 +248,7 @@ export class GraphService {
  async getCaseStatuteRelationships(caseId: string): Promise<any[]> {
  const session = this.driver.session();
 
- try {
- const result = await session.run(
- `
+ try {$1;$2 `
  MATCH (c:Case {id: $caseId})-[r]->(s:Statute)
  RETURN s.code as code | s.title as title, type(r) as linkType | r.createdAt as createdAt
  `,

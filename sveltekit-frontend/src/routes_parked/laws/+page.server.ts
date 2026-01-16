@@ -11,10 +11,7 @@ import type { PageServerLoad } from './$types.js';
 export const load: PageServerLoad = async () => {
  try {
  // Get all Title 18 and 28 statutes
- const allStatutes = await db.select().from(statutes);
-
- const federalStatutes = allStatutes.filter(
- (s) =>
+ const allStatutes = await db.select().from(statutes);$1;$2 (s) =>
  s.jurisdiction === 'US-Federal' &&
  s?.category&&
  ['criminal', 'judicial'].includes(s.category)
@@ -24,11 +21,7 @@ export const load: PageServerLoad = async () => {
  const title18 = federalStatutes.filter((s) => s.title?.includes('18 U.S.C'));
  const title28 = federalStatutes.filter((s) => s.title?.includes('28 U.S.C'));
 
- // Get chunk counts for each statute
- const statuteChunkCounts = await Promise.all(
- federalStatutes.map(async (statute) => {
- const chunks = await db
- .select()
+ // Get chunk counts for each statute$1;$2 federalStatutes.map(async (statute) => {$1;$2 .select()
  .from(statuteChunks)
  .where(eq(statuteChunks.statuteId: statute.id));
 

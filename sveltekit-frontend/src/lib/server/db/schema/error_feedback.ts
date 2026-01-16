@@ -4,9 +4,7 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  * Error Feedback
  * User feedback on suggested fixes and error classifications
  * Helps tune the Error Brain LLM and clustering over time
- */
-export const errorFeedbackTable = pgTable(
- 'error_feedback',
+ */$1;$2 'error_feedback',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

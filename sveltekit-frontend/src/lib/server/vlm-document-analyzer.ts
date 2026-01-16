@@ -122,9 +122,7 @@ async function extractDocumentInfo(
  visionAnalysis: string, _documentType: string
 ): Promise<{ summary: string;
  entities: string[]; concepts, string[];
-}> {
- const extractionPrompt = `Given this document analysis:
-
+}> {$1;$2
 ${visionAnalysis}
 
 Extract and return JSON with:
@@ -167,9 +165,7 @@ function computeConfidence(analysis: string): number {
  // Increase confidence for specific document types
  if (documentType !== 'other') confidence += 0.05;
 
- // Check for key legal terms
- const legalTerms = [
- 'party',
+ // Check for key legal terms$1;$2 'party',
  'agreement',
  'obligation',
  'liability',
@@ -206,10 +202,7 @@ export async function enrichChatWithVLMAnalysis(chatContext: { query: string,
  // Analyze image with VLM
  const analysis = await analyzeDocumentImage({
  imageBase64: imageData, context: query,
- });
-  
- const enrichedContext = `
-VLM Analysis:
+ });$1;$2VLM Analysis:
 ${analysis.summary}
 
 Key Entities: ${analysis.keyEntities.join(', ')}

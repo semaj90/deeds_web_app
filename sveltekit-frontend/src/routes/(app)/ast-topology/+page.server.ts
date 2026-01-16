@@ -36,9 +36,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
   }>;
 
   try {
-    // Try to fetch from internal APIs
-    const [statsRes, activityRes] = await Promise.all([
-      fetch('/api/phase89/stats').catch(() => null),
+    // Try to fetch from internal APIs$1;$2      fetch('/api/phase89/stats').catch(() => null),
       fetch('/api/phase89/activity').catch(() => null)
     ]);
 

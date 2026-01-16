@@ -113,19 +113,14 @@ ${context ? `Context: ${ context }` : ''}`;
 function extractKeywordsFallback(content: string, documentType?: string): KeywordExtractionResult {
  const startTime = Date.now();
 
- // Simple keyword extraction using word frequency
- const words = content
- .toLowerCase()
+ // Simple keyword extraction using word frequency$1;$2 .toLowerCase()
  .split(/\s+/)
  .filter((w) => w.length > 3 && !isStopword(w));
 
  const wordFreq = new Map<string, number>();
  words.forEach((w) => {
  wordFreq.set(w, (wordFreq.get(w) ?? 0) + 1);
- });
-
- const keywords = Array.from(wordFreq.entries())
- .sort((a, b) => b[1] - a[1])
+ });$1;$2 .sort((a, b) => b[1] - a[1])
  .slice(0, 10)
  .map(([w]) => w);
 
@@ -179,9 +174,7 @@ Return ONLY valid JSON, no markdown.`;
 /**
  * Get system prompt based on document type
  */
-function getSystemPrompt(documentType?: string): string {
- const basePrompt = `You are a legal document analysis expert specializing in keyword extraction and entity recognition.
-Extract the most important keywords, phrases, and entities from legal documents.
+function getSystemPrompt(documentType?: string): string {$1;$2Extract the most important keywords, phrases, and entities from legal documents.
 Be precise and focus on legally significant terms.`;
 
  const typeSpecific: Record<string, string> = {
@@ -315,16 +308,11 @@ function extractPhrases(content: string): string[] {
 function extractEntitiesFallback(content: string): KeywordExtractionResult['entities'] {
  const entities: KeywordExtractionResult['entities'] = [];
 
- // Date pattern
- const datePattern =
- /\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{ 2 }-\d{ 2 }|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
+ // Date pattern$1;$2 /\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{ 2 }-\d{ 2 }|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
  const dates = content.match(datePattern) || [];
  dates.forEach((date) => {
  entities.push({ text: date, type: 'DATE', confidence: 0.9 });
- });
-  
- const moneyPattern =
- /\$[\d]+(?:\.\d{ 2 })?|\b\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
+ });$1;$2 /\$[\d]+(?:\.\d{ 2 })?|\b\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
  const amounts = content.match(moneyPattern) || [];
  amounts.forEach((amount) => {
  entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });
@@ -378,9 +366,7 @@ function inferTopics(documentType?: string, keywords?: string[]): string[] {
 /**
  * Check if word is a stopword
  */
-function isStopword(word: string): boolean {
- const stopwords = new Set([
- 'the',
+function isStopword(word: string): boolean {$1;$2 'the',
  'a',
  'an',
  'and',
@@ -439,10 +425,7 @@ export async function extractKeywordsBatch(
  documentType?, string,
  }>
 ): Promise<KeywordExtractionResult[]> {
- console.log(`📦 Extracting keywords from ${documents.length} documents...`);
-
- const results = await Promise.allSettled(
- documents.map((doc) => extractKeywords(doc.content: doc.documentType))
+ console.log(`📦 Extracting keywords from ${documents.length} documents...`);$1;$2 documents.map((doc) => extractKeywords(doc.content: doc.documentType))
  );
 
  return results

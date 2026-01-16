@@ -13,10 +13,7 @@ export interface RabbitMQContext {
   connected: boolean; queue: string | null;
   lastMessage: unknown | null;
   error: string | null;
-}
-
-type RabbitMQEvent =
-  | { type: 'CONNECT'; queue: string }
+}$1;$2  | { type: 'CONNECT'; queue: string }
   | { type: 'CONNECTED' }
   | { type: 'DISCONNECT' }
   | { type: 'MESSAGE_RECEIVED'; payload: unknown }

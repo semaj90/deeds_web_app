@@ -25,9 +25,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
  return json({ error: 'Missing required field: prompt' }, { status: 400 });
  }
 
- try {
- const result = context
- ? await executeAgentWithContext(prompt, context)
+ try {$1;$2 ? await executeAgentWithContext(prompt, context)
  : await executeAgentWithTools(prompt);
 
  return json(result);

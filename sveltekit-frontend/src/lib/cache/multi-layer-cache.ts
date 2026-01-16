@@ -108,9 +108,7 @@ export class MultiLayerCacheSystem {
  return this.getFromLayer<T>(key, layerName);
  }
 
- // Search all layers by priority
- const sortedLayers = this.layerConfigs.sort(
- (a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
+ // Search all layers by priority$1;$2 (a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
  );
 
  for (const config of sortedLayers) {

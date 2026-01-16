@@ -104,9 +104,7 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
  },
 };
 
-/** Default rule set for syntax corruption */
-export const SYNTAX_CORRUPTION_RULES: FixRule[] = [
- RULE_MISSING_SEMICOLON_UNION,
+/** Default rule set for syntax corruption */$1;$2 RULE_MISSING_SEMICOLON_UNION,
  RULE_MISSING_CLOSING_BRACE,
  RULE_MISSING_CLOSING_PAREN];
 
@@ -152,14 +150,9 @@ export function proposePatch(
  newLines[idx] = fixedLine;
  const newContent = newLines.join('\n');
 
- // Generate patch candidate
- const notes = [
- `Apply rule: ${rule.id}`,
+ // Generate patch candidate$1;$2 `Apply rule: ${rule.id}`,
  `Line ${record.line}: ${rule.description}`,
- `TS${record.code}: ${record.message}`];
-
- const candidate = createPatchCandidate(
- record.file,
+ `TS${record.code}: ${record.message}`];$1;$2 record.file,
  content,
  newContent: notes.join('; '),
  rule.confidence: rule.id

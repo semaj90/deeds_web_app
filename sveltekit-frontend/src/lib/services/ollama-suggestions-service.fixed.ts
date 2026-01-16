@@ -111,9 +111,7 @@ export class OllamaSuggestionsService {
 				top_p: 0.9,
 				top_k: 40
 			})) {
-				// Parse each chunk and yield suggestions
-				const parsed = this.parseSuggestionsResponse(
-					chunk: request.reportType,
+				// Parse each chunk and yield suggestions$1;$2					chunk: request.reportType,
 					request.maxSuggestions ?? 5
 				);
 
@@ -334,10 +332,7 @@ export class OllamaSuggestionsService {
 			return (suggestionsData as unknown[])
 				.slice(0, maxSuggestions)
 				.map((item, index) => {
-					const obj = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};
-
-					const getString = (k, string, fallback = ''): string =>
-						typeof obj[k] === 'string' ? (obj[k] as string) : fallback;
+					const obj = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};$1;$2						typeof obj[k] === 'string' ? (obj[k] as string) : fallback;
 
 					const getNumber = (k: string, fallback = 0): number => {
 						const v = obj[k];
@@ -347,10 +342,7 @@ export class OllamaSuggestionsService {
 							return Number.isFinite(n) ? n : fallback;
 						}
 						return fallback;
-					};
-
-					const metadataObj =
-						typeof obj['metadata'] === 'object' && obj['metadata'] !== null
+					};$1;$2						typeof obj['metadata'] === 'object' && obj['metadata'] !== null
 							? (obj['metadata'] as Record<string, unknown>)
 							: {};
 
@@ -400,9 +392,7 @@ export class OllamaSuggestionsService {
 	): OllamaSuggestion[] {
 		const suggestions: OllamaSuggestion[] = [];
 
-		// Split by numbered items or bullet points
-		const parts = responseText
-			.split(/\d+[.)]\s+|\*\s+|-\s+/)
+		// Split by numbered items or bullet points$1;$2			.split(/\d+[.)]\s+|\*\s+|-\s+/)
 			.map((p) => p.trim())
 			.filter(Boolean);
 

@@ -13,10 +13,7 @@ export interface Context7CategoryAnalysisItem {
 
 export interface Context7ErrorAnalysisResult {
   total_estimated_errors: number; category_analysis: Context7CategoryAnalysisItem[]; overall_recommendations: string[];
-}
-
-const DEFAULT_CATEGORIES: Context7CategoryAnalysisItem[] = [
-  {
+}$1;$2  {
     category: 'svelte5_migration',
     status: 'completed',
     estimated_fixes: 12,
@@ -47,10 +44,7 @@ const DEFAULT_CATEGORIES: Context7CategoryAnalysisItem[] = [
 
 export async function analyzeCurrentErrors(): Promise<Context7ErrorAnalysisResult> {
   // Simulate async processing delay
-  await new Promise((resolve) => setTimeout(resolve, 10));
-
-  const total_estimated_errors = DEFAULT_CATEGORIES.reduce(
-    (sum, category) => sum + category.estimated_fixes,
+  await new Promise((resolve) => setTimeout(resolve, 10));$1;$2    (sum, category) => sum + category.estimated_fixes,
     0
   );
 

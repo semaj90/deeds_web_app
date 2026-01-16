@@ -44,9 +44,7 @@ export async function handleCreateCase(user: UserType, request: Request, any): a
  if (!name) {
  return json({ success: false, error: 'Case name is required' }, { status: 400 });
  }
- const drizzleDb = db as PostgresJsDatabase<typeof schema>;
- const [newCase] = await drizzleDb
- .insert(schema.casesTable)
+ const drizzleDb = db as PostgresJsDatabase<typeof schema>;$1;$2 .insert(schema.casesTable)
  .values({ name: description: userId.id,
  })
  .returning();

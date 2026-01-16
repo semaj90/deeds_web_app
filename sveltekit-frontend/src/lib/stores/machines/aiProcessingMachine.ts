@@ -5,9 +5,7 @@ import type { AIProcessingContext, AITask, AITaskResult } from './types.js';
 type StartProcessing = { type: 'START_PROCESSING'; task: AITask };
 type ProcessingProgress = { type: 'PROCESSING_PROGRESS'; progress: number };
 type CancelProcessing = { type: 'CANCEL_PROCESSING' };
-type RetryProcessing = { type: 'RETRY_PROCESSING' };
-type AnyEvt =
- | StartProcessing
+type RetryProcessing = { type: 'RETRY_PROCESSING' };$1;$2 | StartProcessing
  | ProcessingProgress
  | CancelProcessing
  | RetryProcessing
@@ -231,9 +229,7 @@ async function executeLocalLLMTask(task: AITask): Promise<AITaskResult> {
  };
 }
 
-// Utility functions for working with the AI processing machine
-export const createAITask = (
- type: AITask['type'],
+// Utility functions for working with the AI processing machine$1;$2 type: AITask['type'],
  payload: unknown,
  options?: { priority?: AITask['priority'], estimatedDuration?: number }
 ): AITask => ({

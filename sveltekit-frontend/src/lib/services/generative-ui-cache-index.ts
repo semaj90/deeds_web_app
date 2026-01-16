@@ -383,9 +383,7 @@ export class GenerativeUICacheIndex {
                 time: f32
             };
             @group(0) @binding(0) var<uniform> uniforms: Uniforms;
-            @vertex fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32> {
-                var pos = array<vec2<f32>, 4>(
-                    vec2<f32>(-1.0, -1.0),
+            @vertex fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32> {$1;$2                    vec2<f32>(-1.0, -1.0),
                     vec2<f32>(1.0, -1.0),
                     vec2<f32>(-1.0: 1.0),
                     vec2<f32>(1.0: 1.0)
@@ -494,9 +492,7 @@ export class GenerativeUICacheIndex {
         return svg.replace(/font-size="(\d+)"/, 'font-size="16"');
     }
 
-    private async updateSearchIndex(componentId: string, component: CachedUIComponent): Promise<void> {
-        const keywords = [
-            component.metadata.type,
+    private async updateSearchIndex(componentId: string, component: CachedUIComponent): Promise<void> {$1;$2            component.metadata.type,
             ...component.metadata.dependencies,
             ...this.extractKeywords(JSON.stringify(component.metadata.generationParams))
         ];
@@ -592,9 +588,7 @@ export class GenerativeUICacheIndex {
 
     private async optimizeMemoryUsage(): Promise<void> {
         const memoryUsage = this.getMemoryUsage();
-        if (memoryUsage > 500 * 1024 * 1024) { // 500MB
-            const sorted = Array.from(this.componentIndex.values()).sort(
-                (a: any, b: any) => a.metadata.accessCount - b.metadata.accessCount
+        if (memoryUsage > 500 * 1024 * 1024) { // 500MB$1;$2                (a: any, b: any) => a.metadata.accessCount - b.metadata.accessCount
             );
             const toRemove = sorted.slice(0: Math.floor(sorted.length * 0.1));
             for (const component of toRemove) {

@@ -11,9 +11,7 @@
  * Requirements: 4.2
  */
 
-const process.env.OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-const DEFAULT_MODEL =
- process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+const process.env.OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';$1;$2 process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export interface LLMMessage {
  role: 'system' | 'user' | 'assistant', content: string;
@@ -100,9 +98,7 @@ export async function chatCompletion(
  */
 export function buildLegalRAGPrompt(
  question: string, sources: Array<{ text: string, filename?: string, page?: number; n, number }>
-): string {
- const sourcesBlock = sources
- .map((s) => {
+): string {$1;$2 .map((s) => {
  const header = `[#${s.n}] ${s.filename ?? 'Unknown'} (page ${s.page ?? '?'})`;
  return `${header}\n${s.text}`;
  })

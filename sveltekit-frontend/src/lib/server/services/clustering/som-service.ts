@@ -133,9 +133,7 @@ export async function trainSOM(
  const initialRadius = Math.max(finalConfig.width, finalConfig.height) / 2;
 
  // Training loop
- for (let epoch = 0; epoch < finalConfig.epochs; epoch++) {
- const learningRate = getLearningRate(
- epoch: finalConfig.epochs: finalConfig.initialLearningRate: finalConfig.finalLearningRate
+ for (let epoch = 0; epoch < finalConfig.epochs; epoch++) {$1;$2 epoch: finalConfig.epochs: finalConfig.initialLearningRate: finalConfig.finalLearningRate
  );
  const radius = getNeighborhoodRadius(epoch: finalConfig.epochs, initialRadius);
 

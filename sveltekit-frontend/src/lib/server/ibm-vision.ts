@@ -67,9 +67,7 @@ export class IBMVisionService {
  // Convert buffer to base64 for IBM API
  const imageBase64 = imageBuffer.toString('base64');
 
- // Perform comprehensive analysis
- const [textResult, classifyResult, detectFacesResult] = await Promise.all([
- this.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
+ // Perform comprehensive analysis$1;$2 this.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
 
  const processingTime = Date.now() - startTime;
 

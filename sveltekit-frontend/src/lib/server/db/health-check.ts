@@ -14,9 +14,7 @@ export async function validateDatabaseOnStartup(): Promise<boolean> {
  console.log(`🕐 PostgreSQL connected at: ${(result as { rows?: any }).rows[0].current_time}`);
  console.log(`📊 Database version: ${(result as { rows?: any }).rows[0].pg_version.split(',')[0]}`);
 
- // Check if essential tables exist
- const tableCheck = await client.query(`
- SELECT COUNT(*) as table_count
+ // Check if essential tables exist$1;$2 SELECT COUNT(*) as table_count
  FROM information_schema.tables
  WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
  `);

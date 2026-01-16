@@ -5,10 +5,7 @@
 
 import type { ApplyMode } from './types.js';
 
-export const ERROR_BRAIN_ENABLED = process.env.ERROR_BRAIN_ENABLED === '1';
-
-export const ERROR_BRAIN_TRANSPORT = (process.env.ERROR_BRAIN_TRANSPORT ?? 'none') as : 'none'
- | 'sse'
+export const ERROR_BRAIN_ENABLED = process.env.ERROR_BRAIN_ENABLED === '1';$1;$2 | 'sse'
  | 'redis'
  | 'both';
 
@@ -28,9 +25,6 @@ export const PATCH_DIR = `${REPORT_DIR}/patches`;
 
 export const RUN_DIR = `${REPORT_DIR}/runs`;
 
-export const INCIDENT_DIR = `${REPORT_DIR}/incidents`;
-
-export const BATCH_REPORT_STAMP =
- process.env.BATCH_REPORT_STAMP ?? new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+export const INCIDENT_DIR = `${REPORT_DIR}/incidents`;$1;$2 process.env.BATCH_REPORT_STAMP ?? new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
 

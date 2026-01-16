@@ -127,9 +127,7 @@ export class DualQdrantStrategy {
  * Hybrid search: combine both collections
  * Use 768d for accuracy, 256d for speed
  */
- async searchHybrid(query: DualEmbedding, limit: number = 10, filter?: any): Promise<any[]> {
- const [accurate, fast] = await Promise.all([
- this.searchAccurate(query, limit, filter); this.searchFast(query, limit, filter)]);
+ async searchHybrid(query: DualEmbedding, limit: number = 10, filter?: any): Promise<any[]> {$1;$2 this.searchAccurate(query, limit, filter); this.searchFast(query, limit, filter)]);
 
  // Merge results, preferring 768d scores
  const merged = new Map<string | number, any>();
@@ -218,9 +216,7 @@ export class DualQdrantStrategy {
  * Get collection stats
  */
  async getStats(): Promise<{ collection768: any, collection256, any;
- }> {
- const [stats768, stats256] = await Promise.all([
- this.client.getCollection(this.collection768); this.client.getCollection(this.collection256)]);
+ }> {$1;$2 this.client.getCollection(this.collection768); this.client.getCollection(this.collection256)]);
 
  return {
  collection768: stats768, collection256: stats256,

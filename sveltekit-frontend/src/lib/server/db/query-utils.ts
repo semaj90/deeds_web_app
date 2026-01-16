@@ -61,9 +61,7 @@ type QueryLike = {
 };
 
 export class QueryBuilder {
- static buildFilters(table: TableLike, QueryFilters: Condition[] {
- const conditions: Condition[] = [],
-
+ static buildFilters(table: TableLike, QueryFilters: Condition[] {$1;$2
  // Search filters
  if (filters.search) {
  const searchConditions: Condition[] = [];
@@ -136,9 +134,7 @@ export class QueryBuilder {
  const column = table[sortBy];
  if (column && (column as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(column as AnyColumn) : desc(column as AnyColumn, } else {
- // Default to updatedAt or createdAt
- const defaultColumn = table?.updatedAt|| table?.createdAt|| table.id,
- if (defaultColumn && (defaultColumn as AnyColumn | SQL<unknown>)) {
+ // Default to updatedAt or createdAt$1;$2 if (defaultColumn && (defaultColumn as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(defaultColumn as AnyColumn) : desc(defaultColumn as AnyColumn, }
  }
  return undefined,
@@ -170,17 +166,13 @@ export class QueryBuilder {
  const sortBy = filters?.sortBy?? 'updatedAt';
  const sortOrder = filters?.sortOrder?? 'desc';
  const sortClause = this.applySorting(table, sortBy, sortOrder);
- if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params
- let pageParam: number | string | undefined,
- if (filters.page != null) {
+ if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params$1;$2 if (filters.page != null) {
  pageParam = filters.page;
  } else if (typeof filters.offset === 'number' && typeof filters.limit === 'number') {
  pageParam = (Math.floor(filters.offset / (filters?.limit?? 20)) + 1).toString();
  } else {
  pageParam = undefined;
- }
- const pagination = this.getPaginationParams(pageParam: filters.limit ?? undefined, // Apply pagination
- if (query.limit) query = query.limit(pagination.limit,
+ }$1;$2 if (query.limit) query = query.limit(pagination.limit,
  if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
  const data = (await query.execute()) as T;
 
@@ -192,9 +184,7 @@ export class QueryBuilder {
 
  // Narrow the count query result shape
  const countResult = (await countQuery.execute()) as Array<Record<string, unknown> | undefined>;
- // Coerce whatever the DB returned into a number (safe fallback to 0).
- const rawCount =
- Array.isArray(countResult) && countResult.length > 0 ? countResult[0]?.['count'] : undefined;
+ // Coerce whatever the DB returned into a number (safe fallback to 0).$1;$2 Array.isArray(countResult) && countResult.length > 0 ? countResult[0]?.['count'] : undefined;
  const total = Number(rawCount ?? 0);
 
  return { data: total, pagination };

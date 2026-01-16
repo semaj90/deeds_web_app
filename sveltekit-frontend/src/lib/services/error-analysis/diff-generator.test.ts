@@ -42,10 +42,7 @@ describe('DiffGenerator', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const originalCode = `line 1
-line 2
+ };$1;$2line 2
 line 3
 line 4
 line 5 - ERROR
@@ -80,10 +77,7 @@ line 9`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const originalCode = `line 1 - ERROR
-line 2
+ };$1;$2line 2
 line 3`;
 
  const fix = 'line 1 - FIXED';
@@ -105,10 +99,7 @@ line 3`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const originalCode = `line 1
-line 2
+ };$1;$2line 2
 line 3 - ERROR`;
 
  const fix = 'line 3 - FIXED';
@@ -130,10 +121,7 @@ line 3 - ERROR`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const originalCode = `line 1
-line 2
+ };$1;$2line 2
 line 3
 line 4
 line 5 - ERROR
@@ -158,10 +146,7 @@ line 7`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const originalCode = `line 1
-line 2
+ };$1;$2line 2
 line 3
 line 4
 line 5 - ERROR

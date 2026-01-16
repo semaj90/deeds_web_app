@@ -50,9 +50,7 @@ export async function searchEvidence(
  query: string,
  caseId?: string
 ): Promise<SearchEvidenceResult> {
- // Mock implementation - in production, would query Elasticsearch + pgvector
- const mockEvidence = [
- {
+ // Mock implementation - in production, would query Elasticsearch + pgvector$1;$2 {
  id: 'ev-001',
  title: 'Witness Statement - John Doe',
  classification: 'confidential',
@@ -219,9 +217,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
 export async function analyzeRelationships(
  evidenceIds: string[]
 ): Promise<AnalyzeRelationshipsResult> {
- // Mock implementation - in production, would use Gemma + embeddings
- const relationships = [
- {
+ // Mock implementation - in production, would use Gemma + embeddings$1;$2 {
  source: 'ev-001',
  target: 'ev-002',
  type: 'supports' as const,

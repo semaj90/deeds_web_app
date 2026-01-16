@@ -18,9 +18,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
  let evidenceData: Array<typeof evidence.$inferSelect> = []; // Corrected type
 
  if (reportId) {
- // Load existing canvas state
- const [canvasStateResult] = await db
- .select()
+ // Load existing canvas state$1;$2 .select()
  .from(canvasStates)
  .where(eq(canvasStates.caseId, reportId)) // Used eq directly, removed as any
  .limit(1);
@@ -32,9 +30,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
  // Load associated evidence
  evidenceData = await db.select().from(evidence).where(eq(evidence.caseId, reportId)); // Used eq directly, removed as any
 
- // Load report/case data
- const [caseResult] = await db
- .select()
+ // Load report/case data$1;$2 .select()
  .from(cases)
  .where(eq(cases.id, reportId)) // Used eq directly, removed as any
  .limit(1);

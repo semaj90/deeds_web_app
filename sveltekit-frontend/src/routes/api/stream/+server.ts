@@ -22,9 +22,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return new Response('Missing query parameter', { status: 400 });
 	}
 
-	try {
-		const stream =
-			mode === 'rag'
+	try {$1;$2			mode === 'rag'
 				? createSSEStream(streamRAGResponse(query))
 				: createSSEStream(streamOllamaResponse(query));
 

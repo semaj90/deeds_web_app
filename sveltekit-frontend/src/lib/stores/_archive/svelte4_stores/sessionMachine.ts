@@ -13,10 +13,7 @@ export interface SessionContext {
  user: User | null;
  session: Session | null;
  lastSyncAt: number; error: string | null;
-}
-
-type SessionEvent =
- | { type: 'INIT'; pageData?: any }
+}$1;$2 | { type: 'INIT'; pageData?: any }
  | { type: 'SET_SESSION'; user: null; session: null }
  | { type: 'CLEAR_SESSION' }
  | { type: 'REFRESH' }

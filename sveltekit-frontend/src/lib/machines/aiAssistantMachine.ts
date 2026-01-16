@@ -29,10 +29,7 @@ export interface AIAssistantContext {
     availableModels: string[];
     gpuReady: boolean;
     error: string | null;
-}
-
-export type AIAssistantEvent =
-    | { type: 'SEND_MESSAGE'; message: string }
+}$1;$2    | { type: 'SEND_MESSAGE'; message: string }
     | { type: 'CLEAR_CONVERSATION' }
     | { type: 'SET_MODEL'; model: string }
     | { type: 'STREAM_CHUNK'; chunk: string }

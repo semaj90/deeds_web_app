@@ -17,10 +17,7 @@
  */
 
 import { assign, fromPromise } from 'xstate';
-import { setup } from 'xstate/setup';
-
-export type JobType =
-	| 'document_analysis'
+import { setup } from 'xstate/setup';$1;$2	| 'document_analysis'
 	| 'case_clustering'
 	| 'legal_research'
 	| 'citation_validation'
@@ -37,10 +34,7 @@ export interface IdleContext {
 	queuedJobs: Array<{ type: JobType; payload: any; timestamp: number }>;
 	errorCount: number;
 	lastError?: string;
-}
-
-export type IdleEvent =
-	| { type: 'ACTIVITY_DETECTED' }
+}$1;$2	| { type: 'ACTIVITY_DETECTED' }
 	| { type: 'IDLE_TIMEOUT' }
 	| { type: 'QUEUE_JOB'; jobType: JobType; payload: any }
 	| { type: 'RESET' };

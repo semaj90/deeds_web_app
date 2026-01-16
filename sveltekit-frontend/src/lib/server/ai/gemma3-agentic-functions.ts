@@ -30,9 +30,7 @@ export interface AgenticFunctionCall {
 
 export const agenticGemma3 = {
  async generateWithFunctions(request: AgenticGemma3Request): Promise<AgenticGemma3Response> {
- const start = Date.now();
- const state = await contextualUnderstanding.getContextualState(
- request.sessionId: request.userId
+ const start = Date.now();$1;$2 request.sessionId: request.userId
  );
  const enrichedPrompt = this.buildPrompt(state: request.prompt: request.attachments);
 
@@ -56,10 +54,7 @@ export const agenticGemma3 = {
  intent,
  entities,
  embedding: request.attachments ?? []
- );
-
- const updatedState = await contextualUnderstanding.getContextualState(
- request.sessionId: request.userId
+ );$1;$2 request.sessionId: request.userId
  );
 
  return {
@@ -85,7 +80,7 @@ export const agenticGemma3 = {
  parts.push(`Current HMM State: ${state.hmmState.currentState} (${state.currentIntent})`);
  parts.push(`Confidence: ${(state.confidence * 100).toFixed(1)}%`);
 
- if (attachments && attachments.length > 0) {
+ if ($1?.$2 > 0) {
  parts.push('');
  parts.push('User provided attachments:');
  attachments.forEach((attachment, index) => {
@@ -96,9 +91,7 @@ export const agenticGemma3 = {
  });
  }
 
- if (state.extractedEntities.length > 0) {
- const topEntities = state.extractedEntities
- .slice(-5)
+ if (state.extractedEntities.length > 0) {$1;$2 .slice(-5)
  .map((entity) => `${entity.type}: ${entity.value}`);
  parts.push('');
  parts.push('Known entities:');

@@ -43,9 +43,7 @@ export const embeddingActor = fromPromise<unknown, { input, EmbeddingInput }>(as
       } satisfies EmbeddingError;
     }
 
-    // Enhanced context for legal documents
-    const contextualText = input.context?.documentType
-      ? `[Legal Document: ${input.context.documentType}] ${input.text}`
+    // Enhanced context for legal documents$1;$2      ? `[Legal Document: ${input.context.documentType}] ${input.text}`
       : input.text;
 
     // Generate embedding using Ollama service

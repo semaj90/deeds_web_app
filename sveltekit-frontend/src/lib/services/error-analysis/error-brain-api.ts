@@ -229,9 +229,7 @@ export class ErrorBrainAPI extends BaseService {
  try {
  this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
- // Validate flag name
- const validFlags = [
- 'error-brain',
+ // Validate flag name$1;$2 'error-brain',
  'diff-generation',
  'diff-application',
  'validation',

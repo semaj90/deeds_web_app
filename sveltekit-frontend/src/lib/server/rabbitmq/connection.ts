@@ -24,9 +24,7 @@ interface RabbitMQConfig {
 	description: string;
 }
 
-// Connection configurations with fallback priority
-const RABBITMQ_CONFIGS: RabbitMQConfig[] = [
-	{
+// Connection configurations with fallback priority$1;$2	{
 		url: 'amqp://localhost:5672',
 		description: 'Docker RabbitMQ (default)'
 	},

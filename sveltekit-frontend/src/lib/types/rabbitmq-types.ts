@@ -16,10 +16,7 @@
  | 'evidence-analysis'
  | 'relationship-mapping'
  | 'pattern-detection'
- | 'forensic-timeline';
-
-export type JobStatus =
- | 'pending'
+ | 'forensic-timeline';$1;$2 | 'pending'
  | 'queued'
  | 'processing'
  | 'completed'

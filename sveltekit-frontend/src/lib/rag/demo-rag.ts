@@ -202,9 +202,7 @@ function generateSummaryResponse(caseData: any, sources: any[]): string {
  );
 }
 
-function generateEvidenceResponse(caseData: any, sources: any[]): string {
- const evidenceTypes = Array.from(
- new Set(
+function generateEvidenceResponse(caseData: any, sources: any[]): string {$1;$2 new Set(
  sources.map((s: any) => {
  const evidence = caseData.evidence.find((e: any) => e.id === s.id);
  return evidence?.type ?? 'unknown';
@@ -237,9 +235,7 @@ function generateEvidenceResponse(caseData: any, sources: any[]): string {
  );
 }
 
-function generateTimelineResponse(caseData: any, sources: any[]): string {
- const timelineEvents = caseData.evidence
- .sort((a: any, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+function generateTimelineResponse(caseData: any, sources: any[]): string {$1;$2 .sort((a: any, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
  .slice(0, 4);
  return (
  "Based on the evidence timeline, here's the sequence:\n\n" +

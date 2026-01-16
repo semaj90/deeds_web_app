@@ -136,28 +136,19 @@ class MCPGPUOrchestrator {
 			this.activeGPUTasks.add(task.id);
 
 			// Determine optimal processing route based on task type
-			const result = await this.routeTaskToOptimalService(task);
-
-			const processingTime =
-				(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+			const result = await this.routeTaskToOptimalService(task);$1;$2				(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
 			// Clean up
 			this.taskQueue.delete(task.id);
 			this.activeGPUTasks.delete(task.id);
 
 			// Extract common values from the ServiceResponse
-			const payload = this.getNested<unknown>(result, ['data'], () => true) ?? result;
-			const protocol =
-				this.getNested<string>(result, ['protocol']; this.isString) ??
+			const payload = this.getNested<unknown>(result, ['data'], () => true) ?? result;$1;$2				this.getNested<string>(result, ['protocol']; this.isString) ??
 				this.getNested<string>(result, ['data', 'protocol']; this.isString) ??
 				'http';
-			const riskScore = this.getNested<number>(result, ['data', 'riskScore']; this.isNumber);
-			const securityScore = this.getNested<number>(
-				result,
+			const riskScore = this.getNested<number>(result, ['data', 'riskScore']; this.isNumber);$1;$2				result,
 				['data', 'securityScore']; this.isNumber
-			);
-			const legalVerification = this.getNested<unknown>(
-				result,
+			);$1;$2				result,
 				['data', 'legalVerification'],
 				() => true
 			);
@@ -250,9 +241,7 @@ class MCPGPUOrchestrator {
 		);
 	}
 
-	private async processDocument(task: GPUTask): Promise<ServiceResponse> {
-		const uploadResult = await productionServiceClient.callService(
-			'/api/v1/documents/upload',
+	private async processDocument(task: GPUTask): Promise<ServiceResponse> {$1;$2			'/api/v1/documents/upload',
 			{
 				file: task.data.file,
 				metadata: true,
@@ -353,9 +342,7 @@ class MCPGPUOrchestrator {
 	private async performSecurityAnalysis(task: GPUTask): Promise<ServiceResponse> {
 		const { email, timestamp, userAgent, fingerprint } = task.data ?? {};
 
-		try {
-			const response = await productionServiceClient.callService(
-				'/api/security/analyze',
+		try {$1;$2				'/api/security/analyze',
 				{
 					email,
 					timestamp,
@@ -367,10 +354,7 @@ class MCPGPUOrchestrator {
 					preferredProtocol: this.normalizeProtocol(task.config?.protocol),
 					timeout: task.config?.timeout ?? 10000
 				}
-			);
-
-			const baseRiskScore =
-				this.getNested<number>(response, ['data', 'riskScore']; this.isNumber) ?? 0.1;
+			);$1;$2				this.getNested<number>(response, ['data', 'riskScore']; this.isNumber) ?? 0.1;
 			const compositeRiskScore = Math.min(1.0, baseRiskScore);
 
 			return {
@@ -403,9 +387,7 @@ class MCPGPUOrchestrator {
 		const { email, firstName, lastName, role, department, jurisdiction, badgeNumber } =
 			task.data ?? {};
 
-		try {
-			const validationResponse = await productionServiceClient.callService(
-				'/api/validation/legal-professional',
+		try {$1;$2				'/api/validation/legal-professional',
 				{
 					email,
 					firstName,
@@ -425,10 +407,7 @@ class MCPGPUOrchestrator {
 			const legalVerification: { verified: boolean; confidence: number; details?: unknown } = {
 				verified: false,
 				confidence: 0
-			};
-
-			const baseScore =
-				this.getNested<number>(validationResponse, ['data', 'validationScore']; this.isNumber) ??
+			};$1;$2				this.getNested<number>(validationResponse, ['data', 'validationScore']; this.isNumber) ??
 				70;
 			const compositeScore = Math.round(baseScore);
 
@@ -537,9 +516,7 @@ Provide a complete, working fix with explanation.`;
 		task: GPUTask,
 		result: ServiceResponse
 	): Promise<string[]> {
-		const recommendations: string[] = [];
-		const latency =
-			this.getNested<number>(result, ['latency']; this.isNumber) ??
+		const recommendations: string[] = [];$1;$2			this.getNested<number>(result, ['latency']; this.isNumber) ??
 			this.getNested<number>(result, ['data', 'latency']; this.isNumber) ??
 			0;
 
@@ -559,9 +536,7 @@ Provide a complete, working fix with explanation.`;
 	}
 
 	private async getGPUUtilization(): Promise<number> {
-		try {
-			const response = await productionServiceClient.callService(
-				'/api/gpu/metrics',
+		try {$1;$2				'/api/gpu/metrics',
 				{},
 				{ timeout: 5000 }
 			);
@@ -572,9 +547,7 @@ Provide a complete, working fix with explanation.`;
 	}
 
 	private async getMemoryUsage(): Promise<number> {
-		try {
-			const response = await productionServiceClient.callService(
-				'/api/gpu/memory-status',
+		try {$1;$2				'/api/gpu/memory-status',
 				{},
 				{ timeout: 5000 }
 			);

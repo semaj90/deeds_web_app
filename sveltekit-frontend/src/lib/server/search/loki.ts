@@ -97,9 +97,7 @@ export class LokiSearchService {
     ): SearchResult<T & any> {
         const collection = this.getCollection<T>(collectionName);
         const chain = collection.chain().find(query as any);
-        const total = chain.count();
-        const data = chain
-            .offset((page - 1) * limit)
+        const total = chain.count();$1;$2            .offset((page - 1) * limit)
             .limit(limit)
             .data();
 

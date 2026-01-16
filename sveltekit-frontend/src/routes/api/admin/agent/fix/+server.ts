@@ -64,9 +64,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const searchData = await searchResponse.json();
 		const results = searchData?.result|| [];
 
-		// Concatenate relevant knowledge
-		const knowledge = results
-			.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
+		// Concatenate relevant knowledge$1;$2			.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
 			.filter(Boolean)
 			.join('\n\n');
 

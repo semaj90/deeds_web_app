@@ -249,9 +249,7 @@ export class Context7Phase8Integrator {
  if (!query?.matrixNodes|| query.matrixNodes.length === 0) return [];
  const recommendations: Partial<Phase8Recommendation>[] = [];
 
- // Analyze matrix complexity
- const highComplexityNodes = query.matrixNodes.filter(
- (node: any) =>
+ // Analyze matrix complexity$1;$2 (node: any) =>
  node.metadata?.priority === 'critical' ?? (node.metadata?.confidence && node.metadata.confidence > 90)
  );
 
@@ -305,7 +303,7 @@ const adaptiveLOD = {
  benefits: rec?.benefits|| [],
  risks: rec?.risks|| [],
  relatedStates: rec?.relatedStates|| [],
- },);
+ }$1;
  }
  });
  });
@@ -339,9 +337,7 @@ const adaptiveLOD = {
  },
 
  try {
- // Apply simple contextual boosts and compute rerank scores
- const reranked = rerankInput
- .map((item: any) => {
+ // Apply simple contextual boosts and compute rerank scores$1;$2 .map((item: any) => {
  let score = item.confidence / 100;
  if (userContext.userRole === 'admin') score += 0.05;
  if (userContext.workflowState === 'review') score += 0.05;
@@ -352,12 +348,8 @@ const adaptiveLOD = {
  })
  .sort((a: any, b: any) => b.rerankScore - a.rerankScore);
 
- // Map rerank results back to original recommendations and sort
- const result = recommendations
- .map((rec: any) => {
- const rerankedItem = reranked.find((r: any) => r.id === rec.id);
- const aiConfidence = rerankedItem
- ? Math.round(rerankedItem.rerankScore * 100)
+ // Map rerank results back to original recommendations and sort$1;$2 .map((rec: any) => {
+ const rerankedItem = reranked.find((r: any) => r.id === rec.id);$1;$2 ? Math.round(rerankedItem.rerankScore * 100)
  : rec.aiConfidence;
  return { ...rec, aiConfidence };
  })
@@ -397,9 +389,7 @@ const adaptiveLOD = {
  }
 
  private extractBenefits(content: string): string[] {
- // Simple keyword extraction for benefits
- const benefitKeywords = [
- 'improve',
+ // Simple keyword extraction for benefits$1;$2 'improve',
  'optimize',
  'enhance',
  'faster',

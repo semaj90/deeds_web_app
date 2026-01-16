@@ -42,10 +42,7 @@ describe('DiffApplicator', () => {
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result = await applicator.applyDiff(diff, fileContent);
@@ -88,10 +85,7 @@ line 3`;
  explanation: 'Fix export',
  lineStart: 3, lineEnd: 3, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-line 2
+ };$1;$2line 2
 export default App;`;
 
  const result = await applicator.applyDiff(diff, fileContent);
@@ -110,10 +104,7 @@ export default App;`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: number = 123;
+ };$1;$2const x: number = 123;
 line 3`;
 
  await expect(applicator.applyDiff(diff, fileContent)).rejects.toThrow(
@@ -132,10 +123,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 100, lineEnd: 100, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-line 2
+ };$1;$2line 2
 line 3`;
 
  await expect(applicator.applyDiff(diff, fileContent)).rejects.toThrow('out of bounds');
@@ -176,10 +164,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const modifiedContent = `line 1
-const x: number = 123;
+ };$1;$2const x: number = 123;
 line 3`;
 
  const result = await applicator.rollbackDiff(diff, modifiedContent);
@@ -200,10 +185,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const modifiedContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  await expect(applicator.rollbackDiff(diff, modifiedContent)).rejects.toThrow(
@@ -222,10 +204,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 100, lineEnd: 100, status: 'pending',
  createdAt: new Date(),
- };
-
- const modifiedContent = `line 1
-line 2
+ };$1;$2line 2
 line 3`;
 
  await expect(applicator.rollbackDiff(diff, modifiedContent)).rejects.toThrow('out of bounds');
@@ -244,10 +223,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result = await applicator.validateDiffApplicable(diff, fileContent);
@@ -266,10 +242,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: number = 123;
+ };$1;$2const x: number = 123;
 line 3`;
 
  const result = await applicator.validateDiffApplicable(diff, fileContent);
@@ -288,10 +261,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 100, lineEnd: 100, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-line 2
+ };$1;$2line 2
 line 3`;
 
  const result = await applicator.validateDiffApplicable(diff, fileContent);
@@ -310,10 +280,7 @@ line 3`;
  explanation: 'No change',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result = await applicator.validateDiffApplicable(diff, fileContent);
@@ -334,10 +301,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: number = 123;
+ };$1;$2const x: number = 123;
 line 3`;
 
  const result = await applicator.isDiffAlreadyApplied(diff, fileContent);
@@ -356,10 +320,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result = await applicator.isDiffAlreadyApplied(diff, fileContent);
@@ -380,10 +341,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result = await applicator.applyDiffIdempotent(diff, fileContent);
@@ -402,10 +360,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: number = 123;
+ };$1;$2const x: number = 123;
 line 3`;
 
  const result = await applicator.applyDiffIdempotent(diff, fileContent);
@@ -424,10 +379,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  const result1 = await applicator.applyDiffIdempotent(diff, fileContent);
@@ -449,10 +401,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  // Apply once
@@ -476,10 +425,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  // Apply diff
@@ -503,10 +449,7 @@ line 3`;
  explanation: 'Fix type',
  lineStart: 2, lineEnd: 2, status: 'pending',
  createdAt: new Date(),
- };
-
- const fileContent = `line 1
-const x: string = 123;
+ };$1;$2const x: string = 123;
 line 3`;
 
  // Validate

@@ -20,10 +20,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.1: logInteraction() helper', () => {
  it('should POST interaction to correct endpoint', async () => {
- fetchMock.mockResolvedValueOnce({ ok, true });
-  
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockResolvedValueOnce({ ok, true });$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -42,10 +39,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
 
  it('should include metadata in request', async () => {
- fetchMock.mockResolvedValueOnce({ ok, true });
-
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockResolvedValueOnce({ ok, true });$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -60,10 +54,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
 
  it('should handle API errors gracefully', async () => {
- fetchMock.mockResolvedValueOnce({ ok: false, status: 500 });
-
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockResolvedValueOnce({ ok: false, status: 500 });$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  try {
@@ -79,10 +70,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
 
  it('should handle network errors gracefully', async () => {
- fetchMock.mockRejectedValueOnce(new Error('Network error'));
-
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockRejectedValueOnce(new Error('Network error'));$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  try {
@@ -184,10 +172,7 @@ describe('Phase 7: Interaction Logging', () => {
  const interactionTypes = ['view', 'navigate', 'analyze', 'patch_apply'] as const;
 
  for (const type of interactionTypes) {
- fetchMock.mockResolvedValueOnce({ ok, true });
-
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockResolvedValueOnce({ ok, true });$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -207,10 +192,7 @@ describe('Phase 7: Interaction Logging', () => {
  * in the order they are called.
  */
  it('should log interactions in order', async () => {
- fetchMock.mockResolvedValue({ ok, true });
-
- const logInteraction = async (
- routeId: string, interactionType: string, string:
+ fetchMock.mockResolvedValue({ ok, true });$1;$2 routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
  ) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -302,10 +284,7 @@ describe('Phase 8: Error Display', () => {
  kind: 'page' as const,
  errorState: 'healthy' as const,
  status: 'ok' as const,
- };
-
- const getEmoji = (state: string) =>
- state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
+ };$1;$2 state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
  const emoji = getEmoji(route.errorState);
  expect(emoji).toBe('✅');
  });
@@ -317,10 +296,7 @@ describe('Phase 8: Error Display', () => {
  kind: 'page' as const,
  errorState: 'flaky' as const,
  status: 'warning' as const,
- };
-
- const getEmoji = (state: string) =>
- state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
+ };$1;$2 state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
  const emoji = getEmoji(route.errorState);
  expect(emoji).toBe('🟡');
  });
@@ -332,10 +308,7 @@ describe('Phase 8: Error Display', () => {
  kind: 'page' as const,
  errorState: 'broken' as const,
  status: 'error' as const,
- };
-
- const getEmoji = (state: string) =>
- state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
+ };$1;$2 state === 'healthy' ? '✅' : state === 'flaky' ? '🟡' : '❌';
  const emoji = getEmoji(route.errorState);
  expect(emoji).toBe('❌');
  });
@@ -414,9 +387,7 @@ describe('Phase 8: Error Display', () => {
  * For any route with errors, the error count should be displayed
  * correctly on the route card.
  */
- it('should display error count for all routes with errors', () => {
- const routes = [
- { id: 'r1', errorCount: 1, errorState: 'broken' as const },
+ it('should display error count for all routes with errors', () => {$1;$2 { id: 'r1', errorCount: 1, errorState: 'broken' as const },
  { id: 'r2', errorCount: 5, errorState: 'broken' as const },
  { id: 'r3', errorCount: 10, errorState: 'broken' as const },
  { id: 'r4', errorCount: 0, errorState: 'healthy' as const }] as const;
@@ -453,9 +424,7 @@ describe('Phase 8: Error Display', () => {
  * should be displayed.
  */
  it('should display both timestamp and message for error details', () => {
- const now = new Date();
- const routes = [
- {
+ const now = new Date();$1;$2 {
  id: 'r1',
  lastErrorAt: now.toISOString(), lastErrorMessage: 'Error 1',
  },

@@ -106,9 +106,7 @@ const services = {
 	context7: process.env?.CONTEXT7_URL?? 'http://localhost:8777'
 };
 
-// ===== DATABASE CONNECTION =====
-const pgConnectionString =
-	process.env?.DATABASE_URL||
+// ===== DATABASE CONNECTION =====$1;$2	process.env?.DATABASE_URL||
 	`postgresql://${process.env?.POSTGRES_USER?? 'legal_admin'}:${process.env?.POSTGRES_PASSWORD?? '123456'}@${process.env?.POSTGRES_HOST?? 'localhost'}:${process.env?.POSTGRES_PORT?? '5432'}/${process.env?.POSTGRES_DB?? 'legal_ai_db'}`;
 
 const pgConnection = postgres(pgConnectionString, {
@@ -359,9 +357,7 @@ export class EnhancedAISynthesisOrchestrator {
 		}
 
 		// Check Postgres
-		try {
-			const result = await db
-				.select()
+		try {$1;$2				.select()
 				.from(synthesisCache)
 				.where(sql`${synthesisCache.queryHash} = ${key}`)
 				.limit(1);
@@ -474,9 +470,7 @@ export class EnhancedAISynthesisOrchestrator {
 		// 3) Embeddings
 		const embedding = await this.generateNomicEmbeddings(query);
 
-		// 4) Parallel searches
-		const [neo4jResults, pgVectorResults, ragResults, goLlamaResponse] = await Promise.all([
-			this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline({ query: embeddings: embedding }); this.runGoLlamaPipeline({ query, legalBertAnalysis })
+		// 4) Parallel searches$1;$2			this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline({ query: embeddings: embedding }); this.runGoLlamaPipeline({ query, legalBertAnalysis })
 		]);
 
 		// 5) Ranking
@@ -573,17 +567,13 @@ export class EnhancedAISynthesisOrchestrator {
 }
 
 // ===== PROMPT BUILDER =====
-function buildEnhancedPrompt(input: EnhancedPromptInput): string {
-	let prompt = `You are an expert legal AI assistant using gemma3-legal:latest with access to comprehensive legal knowledge.
-
+function buildEnhancedPrompt(input: EnhancedPromptInput): string {$1;$2
 QUERY: ${String(input?.query ?? '')}
 
 `;
 
 	if (input?.legalBertAnalysis) {
-		const entities = input.legalBertAnalysis.entities?.map((e) => e?.text).filter(Boolean) ?? [];
-		const concepts =
-			input.legalBertAnalysis.concepts?.map((c) => c?.concept).filter(Boolean) ?? [];
+		const entities = input.legalBertAnalysis.entities?.map((e) => e?.text).filter(Boolean) ?? [];$1;$2			input.legalBertAnalysis.concepts?.map((c) => c?.concept).filter(Boolean) ?? [];
 		const complexity = input.legalBertAnalysis?.complexity?.legalComplexity ?? 0;
 		const jurisdiction = input.legalBertAnalysis?.jurisdiction ?? 'General';
 
@@ -597,15 +587,9 @@ QUERY: ${String(input?.query ?? '')}
 
 	if (Array.isArray(input?.rankedResults) && input.rankedResults.length > 0) {
 		prompt += `\nRELEVANT SOURCES:\n`;
-		input.rankedResults.slice(0, 5).forEach((source, i) => {
-			const title =
-				(source?.metadata as Record<string, unknown>)?.title ?? `Document ${i + 1}`;
-			const content = String(source?.pageContent ?? source?.content ?? source?.text ?? '').substring(
-				0,
+		input.rankedResults.slice(0, 5).forEach((source, i) => {$1;$2				(source?.metadata as Record<string, unknown>)?.title ?? `Document ${i + 1}`;$1;$2				0,
 				500
-			);
-			const relevance =
-				typeof source?.crossEncoderScore === 'number'
+			);$1;$2				typeof source?.crossEncoderScore === 'number'
 					? source.crossEncoderScore
 					: typeof source?.score === 'number'
 						? source.score

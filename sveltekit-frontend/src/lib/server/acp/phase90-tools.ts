@@ -76,10 +76,7 @@ async function getRedis(): Promise<RedisClientExt> {
 
 // ============================================================================
 // TOOL DEFINITIONS (OpenAI Function Calling Format)
-// ============================================================================
-
-export const PHASE90_TOOLS = [
-  {
+// ============================================================================$1;$2  {
     name: 'phase90_search_errors',
     description: 'Semantic search for TypeScript errors using CUDA embeddings. Returns top-k similar errors from the 73,313 indexed signatures.',
     parameters: { type: 'object',
@@ -183,9 +180,7 @@ export async function phase90_search_errors(
   const client = await getQdrant();
 
   // For now, use scroll with filter since we don't have embedding model in TS
-  // In production, call Python embedding service
-  const filter = clusterId !== undefined
-    ? { must: [{ key: 'cluster_id', match: { value, clusterId } }] }
+  // In production, call Python embedding service$1;$2    ? { must: [{ key: 'cluster_id', match: { value, clusterId } }] }
      | undefined;
 
   const results = await client.scroll('phase90_cuda_embeddings', {
@@ -194,9 +189,7 @@ export async function phase90_search_errors(
     with_payload: true
   });
   
-  const queryLower = query.toLowerCase();
-  const filtered = results.points
-    .filter(p => {
+  const queryLower = query.toLowerCase();$1;$2    .filter(p => {
       const msg = (p.payload?.message as string ?? '').toLowerCase();
       const file = (p.payload?.filePath as string ?? '').toLowerCase();
       return msg.includes(queryLower) || file.includes(queryLower);
@@ -221,10 +214,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
   const clusterResults = await client.scroll('phase90_error_clusters', {
     limit: 100,
     with_payload: true
-  });
-
-  const cluster = clusterResults.points.find(
-    p => p.payload?.cluster_id === clusterId
+  });$1;$2    p => p.payload?.cluster_id === clusterId
   );
 
   if (!cluster) {
@@ -371,10 +361,7 @@ export async function phase90_get_file_errors(
     with_payload: true
   });
 
-  const pathLower = filePath.toLowerCase().replace(/\\/g, '/');
-
-  const filtered = results.points
-    .filter(p => {
+  const pathLower = filePath.toLowerCase().replace(/\\/g, '/');$1;$2    .filter(p => {
       const file = (p.payload?.filePath as string ?? '').toLowerCase().replace(/\\/g, '/');
       return file.includes(pathLower);
     })

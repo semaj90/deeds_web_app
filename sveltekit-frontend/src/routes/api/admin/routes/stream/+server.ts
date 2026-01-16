@@ -68,9 +68,7 @@ export const GET: RequestHandler = async () => {
 			// Monitor for changes
 			const monitor = setInterval(async () => {
 				try {
-					// Check for recent file changes
-					const result = await pgPool.query(`
-						SELECT
+					// Check for recent file changes$1;$2						SELECT
 							file_path,
 							COUNT(*) as error_count,
 							MAX(created_at) as last_updated

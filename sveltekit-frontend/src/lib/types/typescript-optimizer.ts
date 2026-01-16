@@ -242,28 +242,20 @@ export interface ErrorEvent extends WebSocketEvent {
  };
 }
 
-// Export utility types
-export type ProcessingStrategy =
- | 'auto'
+// Export utility types$1;$2 | 'auto'
  | 'optimized'
  | 'gpu_first'
  | 'llama_thinking'
  | 'template_only'
  | 'hybrid'
- | 'streaming';
-
-export type ProcessingStatus =
- | 'queued'
+ | 'streaming';$1;$2 | 'queued'
  | 'processing'
  | 'completed'
  | 'failed'
  | 'cancelled'
  | 'streaming';
 
-export type PerformanceGrade = 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
-
-export type PerformanceTier =
- | 'minimal'
+export type PerformanceGrade = 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';$1;$2 | 'minimal'
  | 'basic'
  | 'standard'
  | 'professional'

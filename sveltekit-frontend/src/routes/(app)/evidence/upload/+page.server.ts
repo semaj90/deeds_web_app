@@ -104,9 +104,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	// Get available cases for the current user
-	try {
-		const userCases = await db
-			.select({
+	try {$1;$2			.select({
 				id: cases.id,
 				title: cases.title,
 				case_number: cases.case_number,
@@ -154,14 +152,10 @@ export const actions: Actions = {
 			const caseId = (formData.get('case_id') ?? '')?.toString() ?? null;
 			const title = (formData.get('title') ?? '').toString();
 			const description = (formData.get('description') ?? '').toString();
-			const evidenceType = (formData.get('evidenceType') ?? 'UNKNOWN').toString().toUpperCase();
-			const enableOcrFlag = ['on', 'true', '1'].includes(
-				(formData.get('enableOcr') ?? '').toString()
+			const evidenceType = (formData.get('evidenceType') ?? 'UNKNOWN').toString().toUpperCase();$1;$2				(formData.get('enableOcr') ?? '').toString()
 			);
 
-			// parse tags (allow multiple)
-			const tags = formData
-				.getAll('tags')
+			// parse tags (allow multiple)$1;$2				.getAll('tags')
 				.map((t) => t.toString())
 				.filter(Boolean);
 
@@ -194,9 +188,7 @@ export const actions: Actions = {
 			// 6) Optional OCR (fail-soft)
 			let ocrResult: OcrResultData | null = null;
 			if (enableOcrFlag && (evidenceType === 'PDF' || evidenceType === 'IMAGE')) {
-				try {
-					const ocrBase =
-						(metaEnv as any).OCR_BASE_URL ??
+				try {$1;$2						(metaEnv as any).OCR_BASE_URL ??
 						(metaEnv as any).BASE_URL ??
 						(dev ? 'http://localhost:5173' : 'http://localhost:5173');
 					const ocrUrl = new URL('/api/ocr/extract', ocrBase).toString();
@@ -311,9 +303,7 @@ export const actions: Actions = {
 			};
 
 			// 10) Insert evidence record into DB (write to BOTH old and new columns for graceful migration)
-			const secureUserId = locals.user?.id;
-			const inserted = await db
-				.insert(evidence)
+			const secureUserId = locals.user?.id;$1;$2				.insert(evidence)
 				.values({
 					// Core fields
 					caseId: caseId ?? null,

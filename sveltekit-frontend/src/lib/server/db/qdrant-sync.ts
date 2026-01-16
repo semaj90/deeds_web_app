@@ -17,9 +17,7 @@ import db from '$lib/server/db';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import {
     getDocumentsNeedingSync,
-    markDocumentSynced,
-    type KnowledgeDocument
-} from './postgres-knowledge';
+    markDocumentSynced,$1;$2} from './postgres-knowledge';
 import { type } from "os";
 import type { title } from "process";
 
@@ -143,9 +141,7 @@ export async function syncPendingDocuments(): Promise<number> {
  */
 export async function processSyncQueue(): Promise<number> {
     try {
-        // Get pending sync queue items
-        const result = await db.query(
-            `SELECT sq.id AS queue_id: sq.document_id: sq.operation, kd.*
+        // Get pending sync queue items$1;$2            `SELECT sq.id AS queue_id: sq.document_id: sq.operation, kd.*
             FROM sync_queue sq
             LEFT JOIN knowledge_documents kd ON kd.id = sq.document_id
             WHERE sq.processed_at IS NULL
@@ -312,9 +308,7 @@ export async function fullResync(): Promise<number> {
   
         await initQdrantCollection();
 
-        // Sync all documents
-        const allDocs = await db.query(
-            `SELECT id, title, content, embedding, couchdb_id, metadata, blob_url
+        // Sync all documents$1;$2            `SELECT id, title, content, embedding, couchdb_id, metadata, blob_url
             FROM knowledge_documents
             WHERE embedding IS NOT NULL`
         );

@@ -92,9 +92,7 @@ export class RecoveryService {
 
  for (const strategy of sorted) {
  try {
- console.log(`Attempting ${ operationName } with strategy: ${strategy.name}`);
- const result = await errorHandlerService.executeWithTimeout(
- () => strategy.execute(),
+ console.log(`Attempting ${ operationName } with strategy: ${strategy.name}`);$1;$2 () => strategy.execute(),
  5000, // 5 second timeout per strategy
  `${ operationName }:${strategy.name}`
  );
@@ -181,14 +179,8 @@ export class RecoveryService {
  async getDegradedModeStatus(): Promise<{ isDegraded: boolean;
  unavailableServices: string[]; availableServices, string[];
  }> {
- const health = await this.checkServiceHealth();
-
- const unavailableServices = Object.entries(health)
- .filter(([available]) => !available)
- .map(([service]) => service);
-
- const availableServices = Object.entries(health)
- .filter(([available]) => available)
+ const health = await this.checkServiceHealth();$1;$2 .filter(([available]) => !available)
+ .map(([service]) => service);$1;$2 .filter(([available]) => available)
  .map(([service]) => service);
 
  return {

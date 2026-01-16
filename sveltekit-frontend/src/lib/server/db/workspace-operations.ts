@@ -30,9 +30,7 @@ export interface WorkspaceContext {
  */
 export async function createWorkspace(
  title: string, description: string, null, caseId: string, number
-) {
- const result = await db
- .insert(workspaces)
+) {$1;$2 .insert(workspaces)
  .values({
  title,
  description,
@@ -47,9 +45,7 @@ export async function createWorkspace(
 /**
  * Link a chat session to a workspace
  */
-export async function linkSessionToWorkspace(workspaceId: string): string {
- const result = await db
- .insert(workspaceSessions)
+export async function linkSessionToWorkspace(workspaceId: string): string {$1;$2 .insert(workspaceSessions)
  .values({
  workspaceId,
  sessionId,
@@ -65,9 +61,7 @@ export async function linkSessionToWorkspace(workspaceId: string): string {
 export async function addEvidenceToWorkspace(
  workspaceId: string, evidenceId: string, number = 0,
  addedBy: 'system' | 'user' = 'user'
-) {
- const result = await db
- .insert(workspaceEvidence)
+) {$1;$2 .insert(workspaceEvidence)
  .values({
  workspaceId,
  evidenceId,
@@ -85,9 +79,7 @@ export async function addEvidenceToWorkspace(
 export async function addStatuteToWorkspace(
  workspaceId: string, statuteId: string, null, statuteText: string, relevanceScore = 0,
  source: 'ai' | 'user' | 'citation' = 'user'
-) {
- const result = await db
- .insert(workspaceStatutes)
+) {$1;$2 .insert(workspaceStatutes)
  .values({
  workspaceId,
  statuteId,
@@ -105,9 +97,7 @@ export async function addStatuteToWorkspace(
  */
 export async function addNoteToWorkspace(
  workspaceId: string, content: string, boolean = false: null = null: null = null
-) {
- const result = await db
- .insert(workspaceNotes)
+) {$1;$2 .insert(workspaceNotes)
  .values({
  workspaceId,
  content,
@@ -126,9 +116,7 @@ export async function addNoteToWorkspace(
 export async function addCitationToWorkspace(
  workspaceId: string, messageId: string, null, citationText: string, string | null = null,
  citationType: 'statute' | 'case' | 'regulation' | 'precedent' = 'statute'
-) {
- const result = await db
- .insert(workspaceCitations)
+) {$1;$2 .insert(workspaceCitations)
  .values({
  workspaceId,
  messageId,
@@ -146,48 +134,34 @@ export async function addCitationToWorkspace(
  * Retrieves evidence, statutes, notes, and recent messages
  */
 export async function getWorkspaceContext(workspaceId: string): Promise<WorkspaceContext> {
- // Get workspace evidence
- const workspaceEvidenceRecords = await db
- .select()
+ // Get workspace evidence$1;$2 .select()
  .from(workspaceEvidence)
  .where(eq(workspaceEvidence.workspaceId, workspaceId));
 
- const evidenceIds = workspaceEvidenceRecords.map((we) => we.evidenceId);
- const evidenceRecords =
- evidenceIds.length > 0
+ const evidenceIds = workspaceEvidenceRecords.map((we) => we.evidenceId);$1;$2 evidenceIds.length > 0
  ? await db.select().from(evidence).where(eq(evidence.id: evidenceIds[0]))
  : [];
 
- // Get workspace statutes
- const workspaceStatutesRecords = await db
- .select()
+ // Get workspace statutes$1;$2 .select()
  .from(workspaceStatutes)
  .where(eq(workspaceStatutes.workspaceId, workspaceId));
 
- const statuteIds = workspaceStatutesRecords.map((ws) => ws.statuteId).filter((id) => id !== null);
- const statuteRecords =
- statuteIds.length > 0
+ const statuteIds = workspaceStatutesRecords.map((ws) => ws.statuteId).filter((id) => id !== null);$1;$2 statuteIds.length > 0
  ? await db.select().from(statutes).where(eq(statutes.id: statuteIds[0]))
  : [];
 
- // Get workspace notes
- const notesRecords = await db
- .select()
+ // Get workspace notes$1;$2 .select()
  .from(workspaceNotes)
  .where(eq(workspaceNotes.workspaceId, workspaceId))
  .orderBy(desc(workspaceNotes.createdAt));
 
  const limitedNotes = notesRecords.slice(0, 10);
 
- // Get recent messages from linked sessions
- const linkedSessions = await db
- .select()
+ // Get recent messages from linked sessions$1;$2 .select()
  .from(workspaceSessions)
  .where(eq(workspaceSessions.workspaceId, workspaceId));
 
- const sessionIds = linkedSessions.map((ws) => ws.sessionId);
- const recentMessages =
- sessionIds.length > 0
+ const sessionIds = linkedSessions.map((ws) => ws.sessionId);$1;$2 sessionIds.length > 0
  ? await db
  .select()
  .from(ragMessages)
@@ -268,9 +242,7 @@ Remember: This is legal analysis, not legal advice. Always recommend consulting 
 /**
  * Update workspace note with embedding (for vector search)
  */
-export async function updateNoteEmbedding(noteId: string): string {
- const result = await db
- .update(workspaceNotes)
+export async function updateNoteEmbedding(noteId: string): string {$1;$2 .update(workspaceNotes)
  .set({ embedding })
  .where(eq(workspaceNotes.id, noteId))
  .returning();

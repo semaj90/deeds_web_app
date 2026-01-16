@@ -159,9 +159,7 @@ class JSONValidationPipelineRunner {
  }
 
  private async runPlaywrightTests(): Promise<boolean> {
- try {
- const command =
- 'npx playwright test src/lib/testing/json-validation-pipeline.ts --config playwright.json-validation.config.js --reporter=json';
+ try {$1;$2 'npx playwright test src/lib/testing/json-validation-pipeline.ts --config playwright.json-validation.config.js --reporter=json';
  const output = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
   
  const results = JSON.parse(output);
@@ -188,9 +186,7 @@ class JSONValidationPipelineRunner {
  const mcpResponse = await fetch('http://localhost:3003/mcp/metrics');
  const mcpMetrics = await mcpResponse.json();
 
- // Generate report
- const report = `# Phase52 JSON Validation Performance Report
-
+ // Generate report$1;$2
 ## MCP Server Metrics
 - Backends Available: ${Object.keys(mcpMetrics.backends)
  .filter((k) => mcpMetrics.backends[k])

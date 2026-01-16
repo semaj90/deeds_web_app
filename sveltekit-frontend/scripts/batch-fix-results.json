@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-01-16T17:58:48.042Z",
+  "totalFixes": 148,
+  "results": [
+    {
+      "file": "src/lib/memory/nes-memory-architecture.ts",
+      "originalSize": 39240,
+      "newSize": 39182,
+      "fixesApplied": 35,
+      "patterns": [
+        "trailing_comma_before_close: 13",
+        "double_colon_first_to_comma: 2",
+        "interface_prop_semicolon: 2",
+        "brace_newline: 18"
+      ]
+    },
+    {
+      "file": "src/lib/server/ai/rag-pipeline-enhanced.ts",
+      "originalSize": 59340,
+      "newSize": 59285,
+      "fixesApplied": 43,
+      "patterns": [
+        "trailing_comma_before_close: 1",
+        "double_colon_first_to_comma: 3",
+        "interface_prop_semicolon: 5",
+        "colon_spacing: 6",
+        "brace_newline: 24",
+        "index_signature_fix: 4"
+      ]
+    },
+    {
+      "file": "src/lib/ui/matrix-compiler.ts",
+      "originalSize": 18158,
+      "newSize": 18158,
+      "fixesApplied": 21,
+      "patterns": [
+        "trailing_comma_before_close: 19",
+        "double_colon_first_to_comma: 1",
+        "brace_newline: 1"
+      ]
+    },
+    {
+      "file": "src/lib/server/services/audit.service.ts",
+      "originalSize": 8067,
+      "newSize": 8059,
+      "fixesApplied": 17,
+      "patterns": [
+        "double_colon_first_to_comma: 9",
+        "interface_prop_semicolon: 8"
+      ]
+    },
+    {
+      "file": "src/legal-ai-integration.ts",
+      "originalSize": 16391,
+      "newSize": 16317,
+      "fixesApplied": 32,
+      "patterns": [
+        "double_colon_first_to_comma: 3",
+        "interface_prop_semicolon: 8",
+        "brace_newline: 18",
+        "index_signature_fix: 3"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,4 @@
-const REQUIRE_AUTH =
- (process.env.CONTEXTUAL_UPLOADS_REQUIRE_AUTH ?? 'true').toLowerCase() !== 'false';
+$1;$2 (process.env.CONTEXTUAL_UPLOADS_REQUIRE_AUTH ?? 'true').toLowerCase() !== 'false';
 
 let luciaAvailableForUploads = false;
 

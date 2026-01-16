@@ -85,9 +85,7 @@ describe('POST /api/routes/:routePath/error-brain-patch', () => {
  }
  });
 
- it('should handle multiline patch content', async () => {
- const multilinePatch = `--- a/src/test.ts
-+++ b/src/test.ts
+ it('should handle multiline patch content', async () => {$1;$2+++ b/src/test.ts
 @@ -1,3 +1,3 @@
 -import { Type } from 'types';
 +import { Type } from './types.js';

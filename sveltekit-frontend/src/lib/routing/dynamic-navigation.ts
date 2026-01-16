@@ -17,9 +17,7 @@ interface RouteDescriptor {
 }
 interface RouteRegistryShape {
  getRoute: (id: string) => RouteDescriptor | undefined;
-}
-const routeRegistry: RouteRegistryShape = (
- RouteRegistryModule as unknown as {
+}$1;$2 RouteRegistryModule as unknown as {
  routeRegistry?: RouteRegistryShape;
  RouteRegistry?: RouteRegistryShape;
  default?: RouteRegistryShape;
@@ -307,14 +305,12 @@ export class DynamicNavigation {
  let currentPath = '';
  for (let i = 0; i < segments.length; i++) {
  currentPath += `/${segments[i]}`;
- const isActive = i === segments.length - 1;
- let label = segments[i]
- .split('-')
+ const isActive = i === segments.length - 1;$1;$2 .split('-')
  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
  .join(' ');
  // attempt to use route metadata for label if available
  const route = routeRegistry.getRoute(routeId ?? '');
- if (route && route.label) label = String(route.label);
+ if ($1?.$2) label = String(route.label);
  breadcrumbs.push({ label: path, currentPath: routeId, isActive });
  }
  return breadcrumbs;

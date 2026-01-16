@@ -28,17 +28,13 @@ export class CaseSummaryService {
 				throw new Error(`Legal constraint violation: ${validation.violations.join(', ')}`);
 			}
 
-			// Check citations for verification requirements
-			const citationsWithVerification = await Promise.all(
-				citations.map(async (citation) => ({
+			// Check citations for verification requirements$1;$2				citations.map(async (citation) => ({
 					...citation,
 					verification: await verificationService.checkSourceVerification(citation?.url?? ''),
 				}))
 			);
 
-			// Get current version
-			const currentVersion = await db
-				.select({ version: caseReports.version })
+			// Get current version$1;$2				.select({ version: caseReports.version })
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 				.limit(1);
@@ -53,9 +49,7 @@ export class CaseSummaryService {
 					.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 			}
 
-			// Insert new summary with verification metadata
-			const [newSummary] = await db
-				.insert(caseReports)
+			// Insert new summary with verification metadata$1;$2				.insert(caseReports)
 				.values({
 					caseId,
 					summaryText,
@@ -89,9 +83,7 @@ export class CaseSummaryService {
 			return await cacheService.getOrSet(
 				caseId,
 				async () => {
-					// Query database
-					const [summary] = await db
-						.select()
+					// Query database$1;$2						.select()
 						.from(caseReports)
 						.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 						.limit(1);
@@ -114,9 +106,7 @@ export class CaseSummaryService {
 	 * Retrieve a specific version of a summary
 	 */
  async getSummaryVersion(caseId: string): Promise<CaseSummary | null> {
-		try {
-			const [summary] = await db
-				.select()
+		try {$1;$2				.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
 				.limit(1);
@@ -134,9 +124,7 @@ export class CaseSummaryService {
 	 * Get all versions of a summary
 	 */
 	async getSummaryVersions(caseId: string): Promise<CaseSummaryVersion[]> {
-		try {
-			const versions = await db
-				.select()
+		try {$1;$2				.select()
 				.from(caseReports)
 				.where(eq(caseReports.caseId, caseId))
 				.orderBy(desc(caseReports.version));
@@ -163,9 +151,7 @@ export class CaseSummaryService {
 		userId: string
 	): Promise<CaseSummary> {
 		try {
-			// Get the version to restore
-			const [versionToRestore] = await db
-				.select()
+			// Get the version to restore$1;$2				.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
 				.limit(1);
@@ -180,9 +166,7 @@ export class CaseSummaryService {
 				.set({ isCurrent, false })
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 
-			// Create new version with restored content
-			const [restoredSummary] = await db
-				.insert(caseReports)
+			// Create new version with restored content$1;$2				.insert(caseReports)
 				.values({ caseId: summaryText: versionToRestore.summaryText,
 					citations: versionToRestore.citations,
 					holding: versionToRestore.holding,
@@ -211,9 +195,7 @@ export class CaseSummaryService {
 	 */
  async deleteSummary(caseId: string): Promise<void> {
 		try {
-			// Get the summary to delete
-			const [summary] = await db
-				.select()
+			// Get the summary to delete$1;$2				.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 				.limit(1);

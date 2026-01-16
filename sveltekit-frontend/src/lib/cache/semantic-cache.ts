@@ -177,7 +177,7 @@ export class SemanticCache {
  }
  }
 
- if (bestMatch && bestMatch.similarity >= SEMANTIC_CACHE_CONFIG.similarityThreshold) {
+ if ($1?.$2 >= SEMANTIC_CACHE_CONFIG.similarityThreshold) {
  console.log(`⚡ Best semantically similar entry: ${bestMatch.key} (sim=${bestMatch.similarity.toFixed(2)})`);
  return bestMatch.entry!.response;
  }

@@ -136,9 +136,7 @@ async function httpCreateCollection(name: string, body: CreateCollectionBody): P
 }
 
 async function httpCreatePayloadIndex(collectionName: string, body: PayloadIndexBody): Promise<unknown> {
-	const base = getQdrantUrl().replace(/\/$/, '');
-	const tries = [
-		`${base}/collections/${encodeURIComponent(collectionName)}/payload/index`,
+	const base = getQdrantUrl().replace(/\/$/, '');$1;$2		`${base}/collections/${encodeURIComponent(collectionName)}/payload/index`,
 		`${base}/collections/${encodeURIComponent(collectionName)}/index`,
 		`${base}/collections/${encodeURIComponent(collectionName)}/create_index`
 	];
@@ -320,10 +318,7 @@ async function initQdrantIndexes(
 				vectors: { size: vectorSize, distance: 'Cosine' }
 			});
 			console.log(`✅ Created collection: ${collectionName}`);
-		}
-
-		const pairs: Array<[string, string]> = [
-			['type', 'keyword'],
+		}$1;$2			['type', 'keyword'],
 			['title', 'text'],
 			['tags', 'keyword']
 		];

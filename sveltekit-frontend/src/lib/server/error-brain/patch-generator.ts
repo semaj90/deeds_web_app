@@ -48,9 +48,7 @@ export class PatchGenerator {
  parseLLMResponse(responseText: string): ParsedLLMResponse {
  const fixes: LLMCodeFix[] = [];
 
- // Match code blocks with file path, before, and after sections
- const codeBlockRegex =
- /```(?:typescript|javascript|svelte)?\s*\n?\/\/\s*File:\s*(.+?)\s*\n\/\/\s*Before:\s*\n([\s\S]+?)\n\/\/\s*After:\s*\n([\s\S]+?)\n(?:\/\/\s*Reason:\s*(.+?)\s*\n)?```/gi;
+ // Match code blocks with file path, before, and after sections$1;$2 /```(?:typescript|javascript|svelte)?\s*\n?\/\/\s*File:\s*(.+?)\s*\n\/\/\s*Before:\s*\n([\s\S]+?)\n\/\/\s*After:\s*\n([\s\S]+?)\n(?:\/\/\s*Reason:\s*(.+?)\s*\n)?```/gi;
 
  let match;
  while ((match = codeBlockRegex.exec(responseText)) !== null) {
@@ -108,9 +106,7 @@ export class PatchGenerator {
  /**
  * Store generated patches in database
  */
- async storePatch(patch: PatchCandidate): Promise<number> {
- const [inserted] = await db
- .insert(errorBrainDiffs)
+ async storePatch(patch: PatchCandidate): Promise<number> {$1;$2 .insert(errorBrainDiffs)
  .values({
  runId: patch.runId: filePath.filePath: diffText.diffText: beforeSha256.beforeSha256: afterSha256.afterSha256: afterText.afterText: reason.reason: confidence.confidence,
  validationResult: null, createdAt: new Date(),

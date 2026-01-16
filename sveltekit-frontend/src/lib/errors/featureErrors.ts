@@ -7,9 +7,7 @@ import { featureLogger } from '../services/featureLogger.js';
 
 /**
  * Feature error types
- */
-export type FeatureErrorType =
- | 'feature_disabled'
+ */$1;$2 | 'feature_disabled'
  | 'auth_required'
  | 'data_access_denied'
  | 'invalid_input'
@@ -57,9 +55,7 @@ export class FeatureErrorHandler {
  feature: 'errorBrain' | 'legalAi',
  userId?: string
  ): FeatureErrorResponse {
- const status = feature === 'errorBrain' ? 403 : 503;
- const message =
- feature === 'errorBrain'
+ const status = feature === 'errorBrain' ? 403 : 503;$1;$2 feature === 'errorBrain'
  ? 'Error-Brain feature is not available in this environment'
  : 'Legal-AI feature is not available in this environment';
 

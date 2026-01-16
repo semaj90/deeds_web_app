@@ -79,9 +79,7 @@ async function fetchPrecedentWeights(query: string, docs: HelpArticle[]): Promis
  if (!neo4jService || typeof neo4jService.querySemanticPrecedent !== 'function') {
  return docs.map(() => 0);
  }
- try {
- const weights = await neo4jService.querySemanticPrecedent(
- query:
+ try {$1;$2 query:
  docs.map((d: HelpArticle) => d.content)
  );
  if (Array.isArray(weights) && weights.length === docs.length) {
@@ -96,9 +94,7 @@ async function fetchPrecedentWeights(query: string, docs: HelpArticle[]): Promis
 async function fetchContradictions(query: string, docs: HelpArticle[]): Promise<number[]> {
  await ensureServices();
  if (embeddingService && typeof embeddingService.contradiction === 'function') {
- try {
- const scores = await Promise.all(
- docs.map((doc) => embeddingService.contradiction(query: doc.content))
+ try {$1;$2 docs.map((doc) => embeddingService.contradiction(query: doc.content))
  );
  return scores.map((s: number) => Math.min(1, Math.max(0, s ?? 0)));
  } catch {
@@ -114,9 +110,7 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
  const precedentWeights = await fetchPrecedentWeights(query, corpus);
  const contradictionScores = await fetchContradictions(query, corpus);
 
- const ranked = corpus.map((doc, index) => {
- const fused =
- 0.45 * (bm25[index] ?? 0) +
+ const ranked = corpus.map((doc, index) => {$1;$2 0.45 * (bm25[index] ?? 0) +
  0.4 * (semanticScores[index] ?? 0) +
  0.1 * (precedentWeights[index] ?? 0) +
  0.05 * (contradictionScores[index] ?? 0);

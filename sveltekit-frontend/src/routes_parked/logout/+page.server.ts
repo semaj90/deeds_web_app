@@ -5,9 +5,7 @@ import type { invalidateSession, deleteSessionTokenCookie } from '$lib/server/se
 export const load: PageServerLoad = async ({ cookies, locals }) => {
  if (!locals.user) throw redirect(302, '/login');
 
- // Read common cookie name variants to be robust and normalize the value
- const _rawSession =
- cookies.get('session_id') ?? cookies.get('sessionId') ?? cookies.get('session');
+ // Read common cookie name variants to be robust and normalize the value$1;$2 cookies.get('session_id') ?? cookies.get('sessionId') ?? cookies.get('session');
 
  const sessionId = typeof _rawSession === 'string' ? _rawSession.trim() ?? undefined  | undefined;
 

@@ -37,9 +37,7 @@ import type {
  * Compatible with both Docker and native Windows services
  */
 export function loadServiceEnvironment(): ServiceEnvironment {
-  // Parse process.env.DATABASE_URL or construct from components
-  const databaseUrl =
-    process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+  // Parse process.env.DATABASE_URL or construct from components$1;$2    process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
   const dbUrl = new URL(databaseUrl.replace('postgres://', 'postgresql://'));
 
   return {
@@ -428,9 +426,7 @@ export class PgVectorAdapter implements PgVectorClient {
     vector: number[],
     limit?: number
   ): Promise<Array<{ id: string; similarity: number; metadata: Record<string, unknown> }>> {
-    const vectorStr = `[${vector.join(',')}]`;
-    const sql = `
-      SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
+    const vectorStr = `[${vector.join(',')}]`;$1;$2      SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
       FROM ${collection}
       ORDER BY embedding <=> $1::vector
       LIMIT $2
@@ -442,17 +438,12 @@ export class PgVectorAdapter implements PgVectorClient {
   async insert(
     collection: string,
     vectors: Array<{ id: string, vector: number[], metadata?: Record<string, unknown> }>
-  ): Promise<void> {
-    const values = vectors
-      .map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
+  ): Promise<void> {$1;$2      .map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
       .join(',');
     const params: unknown[] = [];
     vectors.forEach((v) => {
       params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v?.metadata|| {}));
-    });
-
-    const sql = `
-      INSERT INTO ${collection} (id, embedding, metadata)
+    });$1;$2      INSERT INTO ${collection} (id, embedding, metadata)
       VALUES ${values}
       ON CONFLICT (id) DO UPDATE SET
         embedding = EXCLUDED.embedding,

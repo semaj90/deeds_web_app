@@ -72,9 +72,7 @@ describe('Legal-Aware Ranker', () => {
  // Same jurisdiction should be 0 or 1
  expect([0, 1]).toContain(explain.sameJurisdiction);
 
- // Final score should be calculated correctly
- const expectedFinalScore =
- weights.cosine * explain.cosine +
+ // Final score should be calculated correctly$1;$2 weights.cosine * explain.cosine +
  weights.sharedTags * explain.sharedTags +
  weights.sameJurisdiction * explain.sameJurisdiction;
 
@@ -115,14 +113,8 @@ describe('Legal-Aware Ranker', () => {
  queryTagIds: [],
  jurisdiction: targetJurisdiction,
  weights: { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 },
- });
-  
- const matchingJurisdiction = ranked.filter(
- (r) => r.payload?.jurisdiction === targetJurisdiction
- );
-
- const nonMatchingJurisdiction = ranked.filter(
- (r) => r.payload?.jurisdiction !== targetJurisdiction
+ });$1;$2 (r) => r.payload?.jurisdiction === targetJurisdiction
+ );$1;$2 (r) => r.payload?.jurisdiction !== targetJurisdiction
  );
 
  // All matching jurisdiction results should have sameJurisdiction = 1
@@ -150,9 +142,7 @@ describe('Legal-Aware Ranker', () => {
  );
  });
 
- it('should handle shared tags correctly', () => {
- const hits: QdrantHit[] = [
- {
+ it('should handle shared tags correctly', () => {$1;$2 {
  id: 'hit1',
  score: 0.8,
  payload: { tag_ids: ['tag1', 'tag2', 'tag3'], jurisdiction: 'CA' },
@@ -185,9 +175,7 @@ describe('Legal-Aware Ranker', () => {
  expect(hit3Result?.explain.sharedTags).toBe(0);
  });
 
- it('should use default weights when none provided', () => {
- const hits: QdrantHit[] = [
- { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } }];
+ it('should use default weights when none provided', () => {$1;$2 { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } }];
 
  const ranked = rerankLegalAware({ hits: queryTagIds: ['tag1'],
  jurisdiction: 'CA',

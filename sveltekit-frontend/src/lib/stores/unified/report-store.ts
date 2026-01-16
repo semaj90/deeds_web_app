@@ -1,9 +1,7 @@
 /** * ReportStore - Unified Report Generation & Management * * Phase 8, Consolidation: Merges * - reports.ts * - reportStore.ts * - report-builder.ts * - report-export.ts * * Usage: * import type { reportStore } from '$lib/stores/unified'; * * await reportStore.createReport('legal_memo'); * $: reports = $reportStore .reports; */
 import { writable } from 'svelte/store';
 
-/** * Types */
-export type ReportType =
- | 'analysis'
+/** * Types */$1;$2 | 'analysis'
  | 'summary'
  | 'timeline'
  | 'evidence_review'
@@ -155,9 +153,7 @@ function createReportStore() {
  },
  /** * Update report section */
  updateSection(sectionId: string, updates: Partial<ReportSection>) {
- update((s: ReportStoreState) => {
- const sectionIndex = s.editorContent.findIndex(
- (sec: ReportSection) => sec.id === sectionId
+ update((s: ReportStoreState) => {$1;$2 (sec: ReportSection) => sec.id === sectionId
  );
  if (sectionIndex === -1) return s;
  const newContent = [...s.editorContent];
@@ -184,9 +180,7 @@ function createReportStore() {
  },
  /** * Reorder sections */
  reorderSections(sectionIds: string[]) {
- update((s: ReportStoreState) => {
- const reordered = sectionIds
- .map((id) => s.editorContent.find((sec: ReportSection) => sec.id === id))
+ update((s: ReportStoreState) => {$1;$2 .map((id) => s.editorContent.find((sec: ReportSection) => sec.id === id))
  .filter(Boolean) as ReportSection[];
  return {
  ...s, editorContent: reordered.map((sec: ReportSection, idx) => ({
@@ -259,9 +253,7 @@ function createReportStore() {
  },
  /** * Insert citation into report */
  insertCitation: (sectionId: string, citation: { id: string; text: string }) => {
- update((s: ReportStoreState) => {
- const sectionIndex = s.editorContent.findIndex(
- (sec: ReportSection) => sec.id === sectionId
+ update((s: ReportStoreState) => {$1;$2 (sec: ReportSection) => sec.id === sectionId
  );
  if (sectionIndex === -1) return s;
  const newEditorContent = [...s.editorContent];
@@ -275,9 +267,7 @@ function createReportStore() {
  },
  /** * Insert evidence reference into report */
  insertEvidence: (sectionId: string, evidence: { id: string; name: string }) => {
- update((s: ReportStoreState) => {
- const sectionIndex = s.editorContent.findIndex(
- (sec: ReportSection) => sec.id === sectionId
+ update((s: ReportStoreState) => {$1;$2 (sec: ReportSection) => sec.id === sectionId
  );
  if (sectionIndex === -1) return s;
  const newEditorContent = [...s.editorContent];

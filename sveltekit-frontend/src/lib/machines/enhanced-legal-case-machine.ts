@@ -53,10 +53,7 @@ export interface EnhancedLegalCaseContext {
 	error: string | null;
 	jobId?: string; // RabbitMQ job identifier
 	sessionId?: string; // User session for job tracking
-}
-
-export type EnhancedLegalCaseEvent =
-	| { type: 'LOAD_CASE'; caseId: string }
+}$1;$2	| { type: 'LOAD_CASE'; caseId: string }
 	| { type: 'CREATE_CASE'; data: CaseForm }
 	| { type: 'ADD_EVIDENCE'; caseId: string; evidence: EvidenceInput }
 	| { type: 'START_AI_ANALYSIS'; caseId: string }
@@ -70,10 +67,7 @@ const initialContext: EnhancedLegalCaseContext = {
 	validationErrors: {},
 	loading: false,
 	error: null
-};
-
-export const enhancedLegalCaseMachine = createMachine(
-	{
+};$1;$2	{
 		id: 'enhancedLegalCase',
 		initial: 'initializing',
 		types: {} as {

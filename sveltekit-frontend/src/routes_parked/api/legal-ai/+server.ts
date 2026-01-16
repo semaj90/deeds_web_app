@@ -361,9 +361,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
- // Create mock reports
- const reports: Report[] = [
- {
+ // Create mock reports$1;$2 {
  id: 'report_1',
  authorityMapId: 'authorities_1',
  title: 'Legal Authority Analysis',

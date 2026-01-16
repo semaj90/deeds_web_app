@@ -79,7 +79,7 @@ export class RedisCompressionCache {
         const compressTimeMs = performance.now() - compressedStart;
 
         // Only use compression if it saves space
-        if (compressed && compressed.length < serialized.length * 0.8) {
+        if ($1?.$2 < serialized.length * 0.8) {
           stored = compressed;
           metadata.compressed = true;
 

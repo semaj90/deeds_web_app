@@ -22,10 +22,7 @@ export interface LegalDocumentContext {
  // Error handling
  error: string | null;
  retryCount: number; maxRetries: number;
-}
-
-export type LegalDocumentEvent =
- | {
+}$1;$2 | {
  type: 'QUEUE_DOCUMENT'; documentId: string;
  caseId: string; fileName: string;
  fileContent: ArrayBuffer;

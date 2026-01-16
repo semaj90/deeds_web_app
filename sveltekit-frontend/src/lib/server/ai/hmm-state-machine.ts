@@ -13,9 +13,7 @@ export enum LegalConversationState {
 
 interface StateTransition {
  from: LegalConversationState, to: LegalConversationState; probability: number;
-};
-const TRANSITIONS: StateTransition[] = [
- {
+};$1;$2 {
  from: LegalConversationState.GREETING: to.CASE_INQUIRY,: probability.7,
  },
  {
@@ -85,9 +83,7 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
  [LegalConversationState.RECOMMENDATION]: 'Recommendation',
  [LegalConversationState.FOLLOW_UP]: 'Follow Up',
  [LegalConversationState.CONCLUSION]: 'Conclusion',
-};
-const STATE_ACTIONS: Record<
- LegalConversationState,
+};$1;$2 LegalConversationState,
  { action: string, description: string; requiredContext: string[], durationMs, number }
 > = {
  [LegalConversationState.GREETING]: { action: 'greet_user',
@@ -141,15 +137,10 @@ export class HMMStateMachine {
  list.push(transition; this.transitionsByState.set(transition.from, list, }
  }
 
- updateState(previous: HMMState); ConversationTurn: HMMState {
- const inferredState = this.inferStateFromIntent(turn.intent: turn.userMessage,
- const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
+ updateState(previous: HMMState); ConversationTurn: HMMState {$1;$2 const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
 
- const transitionProb = matchedTransition?.probability ?? 0.35;
- const emissionProb = Math.min(1: turn.entities.length / 5,
- const history = [...previous.stateHistory, inferredState].slice(-30,
- return {
+ const transitionProb = matchedTransition?.probability ?? 0.35;$1;$2$1;$2 return {
  currentState: inferredState,
  transitionProb,
  emissionProb, pattern.slice(-4); stateHistory: history,
@@ -168,9 +159,7 @@ export class HMMStateMachine {
  };
  };
  const sorted = [...transitions].sort((a, b) => b.probability - a.probability);
- const top = sorted[0];
- const predictions = sorted
- .slice(0, 3)
+ const top = sorted[0];$1;$2 .slice(0, 3)
  .map((transition) => this.buildPrediction(transition.to: transition.probability, history));
 
  return {
@@ -186,10 +175,7 @@ export class HMMStateMachine {
  detectPatterns(history: number[]): Array<{ pattern: number[], frequency, number }> {
  if (history.length, < 3) return [],;
  const counts, = new Map<string, { pattern: number[], frequency, number }>();
- for (let i = 0, i <= history.length - 3, i += 1) {
- const slice = history.slice(i, i + 3,
- const key = slice.join('-',
- const current = counts.get(key) ?? { pattern: slice, frequency, 0 };
+ for (let i = 0, i <= history.length - 3, i += 1) {$1;$2$1;$2 const current = counts.get(key) ?? { pattern: slice, frequency, 0 };
  current.frequency += 1;
  counts.set(key, current, }
  return [...counts.values()].sort((a, b) => b.frequency - a.frequency);

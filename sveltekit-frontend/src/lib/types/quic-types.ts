@@ -276,9 +276,7 @@ export interface TensorError extends Error {
 }
 // Utility types
 export type AsyncIterableStream<T> = AsyncIterable<T> & { cancel(): void; closed: Promise<void> };
-export type StreamProcessor<T, R> = (chunk: T) => Promise<R, null>;
-export type TensorOperationType =
- | 'create'
+export type StreamProcessor<T, R> = (chunk: T) => Promise<R, null>;$1;$2 | 'create'
  | 'read'
  | 'update'
  | 'delete'

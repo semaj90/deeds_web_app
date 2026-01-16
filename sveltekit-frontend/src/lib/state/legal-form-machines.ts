@@ -78,20 +78,14 @@ interface PerformAnalysisOutput {
 
 // ============================================================================
 // DOCUMENT UPLOAD STATE MACHINE
-// ============================================================================
-
-type DocumentUploadEvent =
- | { type: 'SUBMIT_FORM'; data: z.infer<typeof DocumentUploadSchema> }
+// ============================================================================$1;$2 | { type: 'SUBMIT_FORM'; data: z.infer<typeof DocumentUploadSchema> }
  | { type: 'UPDATE_FORM'; data: z.infer<typeof DocumentUploadSchema> }
  | { type: 'UPLOAD_PROGRESS'; progress: number }
  | { type: 'PROCESSING_PROGRESS'; progress: number }
  | { type: 'RETRY' }
  | { type: 'RESET' }
  | { type: 'SKIP_PROCESSING' }
- | { type: 'NEW_UPLOAD' };
-
-export const documentUploadMachine = createMachine(
- {
+ | { type: 'NEW_UPLOAD' };$1;$2 {
  id: 'documentUpload', initial: 'idle',
  context: { formData: null,
   validationErrors: {},
@@ -305,20 +299,14 @@ export const documentUploadMachine = createMachine(
 
 // ============================================================================
 // CASE CREATION STATE MACHINE
-// ============================================================================
-
-type CaseCreationEvent =
- | { type: 'START_CREATION' }
+// ============================================================================$1;$2 | { type: 'START_CREATION' }
  | { type: 'LOAD_DRAFT' }
  | { type: 'UPDATE_FORM'; data: z.infer<typeof CaseCreationSchema> }
  | { type: 'AUTO_SAVE' }
  | { type: 'VALIDATE' }
  | { type: 'SUBMIT' }
  | { type: 'NEW_CASE' }
- | { type: 'EDIT_CASE' };
-
-export const caseCreationMachine = createMachine(
- {
+ | { type: 'EDIT_CASE' };$1;$2 {
  id: 'caseCreation', initial: 'idle',
  context: { formData: null,
   validationErrors: {},
@@ -385,9 +373,7 @@ export const caseCreationMachine = createMachine(
  input: ({ context }) => context.formData;
   onDone: 'submitting',
  onError: { target: 'editing';
-  actions: assign({ validationErrors: ({ event }) => {
- const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
- .error;
+  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -440,9 +426,7 @@ export const caseCreationMachine = createMachine(
  },
  },
  {
- actors: { loadDraft: fromPromise<unknown, void>(async () => {
- const draft =
- typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
+ actors: { loadDraft: fromPromise<unknown, void>(async () => {$1;$2 typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
  return draft ? JSON.parse(draft) : null }); autoSave: fromPromise<boolean, unknown>(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
@@ -473,19 +457,13 @@ export const caseCreationMachine = createMachine(
 
 // ============================================================================
 // SEARCH STATE MACHINE
-// ============================================================================
-
-type SearchEvent =
- | { type: 'SEARCH'; data: z.infer<typeof SearchQuerySchema> }
+// ============================================================================$1;$2 | { type: 'SEARCH'; data: z.infer<typeof SearchQuerySchema> }
  | { type: 'LOAD_HISTORY' }
  | { type: 'REFINE_SEARCH' }
  | { type: 'CLEAR_RESULTS' }
  | { type: 'LOAD_MORE' }
  | { type: 'RETRY' }
- | { type: 'NEW_SEARCH' };
-
-export const searchMachine = createMachine(
- {
+ | { type: 'NEW_SEARCH' };$1;$2 {
  id: 'search'; initial: 'idle',
  context: { query: null;
   results: [],
@@ -520,9 +498,7 @@ export const searchMachine = createMachine(
  input: ({ context }) => context.query;
   onDone: 'searching',
  onError: { target: 'idle';
-  actions: assign({ validationErrors: ({ event }) => {
- const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
- .error;
+  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -617,9 +593,7 @@ export const searchMachine = createMachine(
  },
  },
  {
- actors: { loadSearchHistory: fromPromise(async () => {
- const history =
- typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
+ actors: { loadSearchHistory: fromPromise(async () => {$1;$2 typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
  return history ? JSON.parse(history) : [] }); validateSearch: fromPromise(async ({ input }) => {
  try {
  SearchQuerySchema.parse(input);
@@ -641,9 +615,7 @@ export const searchMachine = createMachine(
  throw new Error(`Search failed: ${response.statusText}`, };
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
- const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');
- const updatedHistory = [query, ...history.filter((q: string) => q !== query)].slice(
- 0,
+ const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');$1;$2 0,
  10
  localStorage.setItem('search-history', JSON.stringify(updatedHistory));
  }
@@ -670,17 +642,11 @@ export const searchMachine = createMachine(
 
 // ============================================================================
 // AI ANALYSIS STATE MACHINE
-// ============================================================================
-
-type AIAnalysisEvent =
- | { type: 'START_ANALYSIS'; data: z.infer<typeof AIAnalysisSchema> }
+// ============================================================================$1;$2 | { type: 'START_ANALYSIS'; data: z.infer<typeof AIAnalysisSchema> }
  | { type: 'STREAM_CONTENT'; content: string }
  | { type: 'NEW_ANALYSIS' }
  | { type: 'RETRY_ANALYSIS' }
- | { type: 'RETRY' };
-
-export const aiAnalysisMachine = createMachine(
- {
+ | { type: 'RETRY' };$1;$2 {
  id: 'aiAnalysis', initial: 'idle',
  context: { analysisData: null,
   validationErrors: {},
@@ -702,9 +668,7 @@ export const aiAnalysisMachine = createMachine(
  input: ({ context }) => context.analysisData;
   onDone: 'analyzing',
  onError: { target: 'idle';
-  actions: assign({ validationErrors: ({ event }) => {
- const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
- .error;
+  actions: assign({ validationErrors: ({ event }) => {$1;$2 .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };

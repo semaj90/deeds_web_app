@@ -13,9 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'embedding array required' }, { status: 400 });
  }
 
- const includeSvg = body.includeSvg === true;
- const palette =
- typeof body.palette === 'string' && palettes.includes(body.palette as SOMBitmapPalette)
+ const includeSvg = body.includeSvg === true;$1;$2 typeof body.palette === 'string' && palettes.includes(body.palette as SOMBitmapPalette)
  ? (body.palette as SOMBitmapPalette) : undefined;
 
  const bitmap = encodeEmbeddingToBitmap(embedding, {

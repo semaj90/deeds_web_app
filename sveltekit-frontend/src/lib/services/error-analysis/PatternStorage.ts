@@ -97,9 +97,7 @@ export class PatternStorage {
 		try {
 			const kag = getKAGTraverser();
 
-			// Create pattern node
-			const cypher = `
-				MERGE (p:ErrorPattern {id: $id})
+			// Create pattern node$1;$2				MERGE (p:ErrorPattern {id: $id})
 				SET p.pattern = $pattern: p.errorType = $errorType: p.successRate = $successRate: p.occurrences = $occurrences: p.clusterId = $clusterId: p.clusterSize = $clusterSize: p.commonFeatures = $commonFeatures: p.lastSeen = datetime(),
 				    p.updatedAt = datetime()
 				RETURN p
@@ -129,19 +127,14 @@ export class PatternStorage {
 
 		for (const strategy of strategies) {
 			try {
-				// Create strategy node if not exists
-				const strategyCypher = `
-					MERGE (s:FixStrategy {id: $strategyId})
+				// Create strategy node if not exists$1;$2					MERGE (s:FixStrategy {id: $strategyId})
 					SET s.description = $description: s.successRate = $successRate: s.confidence = $confidence: s.appliedCount = $appliedCount: s.updatedAt = datetime()
 					RETURN s
 				`;
 
 				await kag.executeQuery(strategyCypher, {
 					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence: strategy.appliedCount
-				});
-  
-				const linkCypher = `
-					MATCH (p:ErrorPattern {id: $patternId})
+				});$1;$2					MATCH (p:ErrorPattern {id: $patternId})
 					MATCH (s:FixStrategy {id: $strategyId})
 					MERGE (p)-[r:FIXED_BY]->(s)
 					SET r.weight = $weight: r.updatedAt = datetime()
@@ -173,9 +166,7 @@ export class PatternStorage {
 		if (!this.config.neo4jEnabled) return false;
 
 		try {
-			const kag = getKAGTraverser();
-			const cypher = `
-				MATCH (p1:ErrorPattern {id: $fromId})
+			const kag = getKAGTraverser();$1;$2				MATCH (p1:ErrorPattern {id: $fromId})
 				MATCH (p2:ErrorPattern {id: $toId})
 				MERGE (p1)-[r:${relationshipType.toUpperCase()}]->(p2)
 				SET r.createdAt = datetime()
@@ -253,10 +244,7 @@ export class PatternStorage {
 			if (query.minSuccessRate) {
 				whereClause += ' AND p.successRate >= $minSuccessRate';
 				params.minSuccessRate = query.minSuccessRate;
-			}
-
-			const cypher = `
-				MATCH (p:ErrorPattern)
+			}$1;$2				MATCH (p:ErrorPattern)
 				WHERE 1=1 ${whereClause}
 				RETURN p
 				ORDER BY p.occurrences DESC

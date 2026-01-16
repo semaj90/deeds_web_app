@@ -104,9 +104,7 @@ export class RecursiveEvidenceChainProcessor {
 			// Find related evidence (children in the hierarchy)
 			const relatedEvidence = await this.findRelatedEvidence(rootEvidenceId);
 
-			// Recursive processing of children (limit to first 10 to prevent explosion)
-			const children = await Promise.all(
-				relatedEvidence
+			// Recursive processing of children (limit to first 10 to prevent explosion)$1;$2				relatedEvidence
 					.slice(0, 10)
 					.map((related) =>
 						this.processEvidenceHierarchy(related.evidenceId, currentDepth + 1, [
@@ -116,15 +114,11 @@ export class RecursiveEvidenceChainProcessor {
 					)
 			);
 
-			// Analyze relationships
-			const relationships = await this.analyzeEvidenceRelationships(
-				rootEvidenceId,
+			// Analyze relationships$1;$2				rootEvidenceId,
 				relatedEvidence
 			);
 
-			// Generate legal implications
-			const legalImplications = await this.generateLegalImplications(
-				evidenceData,
+			// Generate legal implications$1;$2				evidenceData,
 				chainOfCustody,
 				relationships
 			);
@@ -164,9 +158,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async fetchEvidenceData(evidenceId: string): Promise<EvidenceData> {
-		try {
-			const response = await fetch(
-				`${this.apiBaseUrl}/evidence/${encodeURIComponent(evidenceId)}`
+		try {$1;$2				`${this.apiBaseUrl}/evidence/${encodeURIComponent(evidenceId)}`
 			);
 
 			if (!response.ok) {
@@ -182,9 +174,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async getChainOfCustody(evidenceId: string): Promise<ChainEntry[]> {
-		try {
-			const response = await fetch(
-				`${this.apiBaseUrl}/evidence/${encodeURIComponent(evidenceId)}/chain-of-custody`
+		try {$1;$2				`${this.apiBaseUrl}/evidence/${encodeURIComponent(evidenceId)}/chain-of-custody`
 			);
 
 			if (!response.ok) {
@@ -216,9 +206,7 @@ export class RecursiveEvidenceChainProcessor {
 				return [];
 			}
 
-			const correlationResults = (await response.json()) as { correlations?: unknown };
-			const correlations = Array.isArray(correlationResults.correlations)
-				? (correlationResults.correlations as unknown[])
+			const correlationResults = (await response.json()) as { correlations?: unknown };$1;$2				? (correlationResults.correlations as unknown[])
 				: [];
 
 			return (
@@ -226,9 +214,7 @@ export class RecursiveEvidenceChainProcessor {
 					.map((c): RelatedEvidence | null => {
 						const corr = c as CorrelationResult;
 						const a = typeof corr.evidenceA === 'string' ? corr.evidenceA : undefined;
-						const b = typeof corr.evidenceB === 'string' ? corr.evidenceB : undefined;
-						const corrType =
-							typeof corr.correlationType === 'string' ? corr.correlationType : 'unknown';
+						const b = typeof corr.evidenceB === 'string' ? corr.evidenceB : undefined;$1;$2							typeof corr.correlationType === 'string' ? corr.correlationType : 'unknown';
 						const strength = typeof corr.strength === 'number' ? corr.strength : 0;
 						const otherMetadata: Record<string, unknown> = {
 							...(corr as Record<string, unknown>)
@@ -317,9 +303,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async isChainLinked(evidenceId1: string, evidenceId2: string): Promise<boolean> {
-		try {
-			const [chain1, chain2] = await Promise.all([
-				this.getChainOfCustody(evidenceId1); this.getChainOfCustody(evidenceId2)
+		try {$1;$2				this.getChainOfCustody(evidenceId1); this.getChainOfCustody(evidenceId2)
 			]);
 
 			return chain1.some((entry1) =>
@@ -339,13 +323,8 @@ export class RecursiveEvidenceChainProcessor {
 		evidenceId1: string,
 		evidenceId2: string
 	): Promise<boolean> {
-		try {
-			const [data1, data2] = await Promise.all([
-				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
-			]);
-
-			const time1 = new Date(
-				data1?.collectedAt|| data1?.uploadedAt|| data1?.createdAt?? 0
+		try {$1;$2				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
+			]);$1;$2				data1?.collectedAt|| data1?.uploadedAt|| data1?.createdAt?? 0
 			).getTime();
 me2 = new Date(
 				data2?.collectedAt|| data2?.uploadedAt|| data2?.createdAt?? 0
@@ -364,9 +343,7 @@ me2 = new Date(
 		evidenceId1: string,
 		evidenceId2: string
 	): Promise<boolean> {
-		try {
-			const [data1, data2] = await Promise.all([
-				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
+		try {$1;$2				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
 			]);
 
 			const loc1 = (data1?.location?? '').toString().toLowerCase();
@@ -457,15 +434,10 @@ me2 = new Date(
 	}
 
 	private async identifyTimelineGaps(chainOfCustody: ChainEntry[]): Promise<boolean> {
-		if (!chainOfCustody || chainOfCustody.length < 2) return false;
-
-		const sortedChain = [...chainOfCustody].sort(
-			(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+		if (!chainOfCustody || chainOfCustody.length < 2) return false;$1;$2			(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
 		);
 
-		for (let i = 1; i < sortedChain.length; i++) {
-			const timeDiff =
-				new Date(sortedChain[i].timestamp).getTime() -
+		for (let i = 1; i < sortedChain.length; i++) {$1;$2				new Date(sortedChain[i].timestamp).getTime() -
 				new Date(sortedChain[i - 1].timestamp).getTime();
 
 			// Flag gaps longer than 24 hours
@@ -481,9 +453,7 @@ me2 = new Date(
 		chainOfCustody: ChainEntry[],
 		relationships: EvidenceRelationship[]
 	): number {
-		const chainValidation = this.validateChainCompleteness(chainOfCustody);
-		const relationshipStrength =
-			relationships && relationships.length > 0
+		const chainValidation = this.validateChainCompleteness(chainOfCustody);$1;$2			$1?.$2 > 0
 				? relationships.reduce((sum, rel) => sum + rel.confidence, 0) / relationships.length
 				: 0.5;
 

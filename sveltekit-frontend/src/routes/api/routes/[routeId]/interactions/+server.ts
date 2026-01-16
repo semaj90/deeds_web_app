@@ -11,9 +11,7 @@
 import {
     getInteractions,
     getRouteMetadata,
-    logInteraction,
-    type NewRouteInteractionLog,
-} from '$lib/db/queries/nes-command-center';
+    logInteraction,$1;$2} from '$lib/db/queries/nes-command-center';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

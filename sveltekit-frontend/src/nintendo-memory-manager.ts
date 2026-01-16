@@ -191,9 +191,7 @@ export class NintendoMemoryManager {
 		const activeBank = this.l1Banks.find((bank) => bank.isActive);
 
 		if (!activeBank || activeBank.currentSize + size > activeBank.maxSize) {
-			// Try bank switching
-			const availableBank = this.l1Banks.find(
-				(bank) => !bank?.isActive&& bank.currentSize + size <= bank.maxSize
+			// Try bank switching$1;$2				(bank) => !bank?.isActive&& bank.currentSize + size <= bank.maxSize
 			);
 
 			if (availableBank) {
@@ -211,16 +209,12 @@ export class NintendoMemoryManager {
 	 * Store in L2 System RAM
 	 */
 	private storeInL2(key: string, data: Record<string, unknown>, priority: Priority): boolean {
-		const size = this.calculateSize(data);
-		const activeBank = this.l2Banks.find(
-			(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
+		const size = this.calculateSize(data);$1;$2			(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
 		);
 
 		if (!activeBank) {
 			// Evict lowest priority items
-			this.evictFromL2(size);
-			const retryBank = this.l2Banks.find(
-				(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
+			this.evictFromL2(size);$1;$2				(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
 			);
 			if (!retryBank) return false;
 			this.l2Cache.set(key, data);
@@ -278,9 +272,7 @@ export class NintendoMemoryManager {
 		console.log('Performing Nintendo-style bank switching...');
 
 		// Find items with lowest priority for eviction
-		const candidates = await this.redis.hgetall('memory:items');
-		const sortedItems = Object.entries(candidates)
-			.map(([key, metadata]) => ({
+		const candidates = await this.redis.hgetall('memory:items');$1;$2			.map(([key, metadata]) => ({
 				key,
 				...JSON.parse(metadata)
 			}))
@@ -331,9 +323,7 @@ export class NintendoMemoryManager {
 	 * Perform Redis eviction based on priority
 	 */
 	private async performRedisEviction(): Promise<void> {
-		const candidates = await this.redis.hgetall('memory:items');
-		const lowPriorityItems = Object.entries(candidates)
-			.map(([key, metadata]) => ({
+		const candidates = await this.redis.hgetall('memory:items');$1;$2			.map(([key, metadata]) => ({
 				key,
 				...JSON.parse(metadata)
 			}))
@@ -381,10 +371,7 @@ export class NintendoMemoryManager {
 		let freedSize = 0;
 
 		for (const bank of this.l2Banks) {
-			if (freedSize >= requiredSize) break;
-
-			const sortedItems = Array.from(bank.items.values()).sort(
-				(a, b) => a.priority - b?.priority|| a.lastAccessed - b.lastAccessed
+			if (freedSize >= requiredSize) break;$1;$2				(a, b) => a.priority - b?.priority|| a.lastAccessed - b.lastAccessed
 			);
 
 			for (const item of sortedItems) {

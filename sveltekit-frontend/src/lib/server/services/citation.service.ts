@@ -95,10 +95,7 @@ class CitationService {
 		try {
 			const limit = filters?.limit?? 20;
 			const offset = filters?.offset?? 0;
-			const queryPattern = `%${query}%`;
-
-			const conditions = [
-                eq(savedCitations.userId, userId),
+			const queryPattern = `%${query}%`;$1;$2                eq(savedCitations.userId, userId),
                 or(
                     like(savedCitations.statuteCode, queryPattern),
                     like(savedCitations.statuteTitle, queryPattern)
@@ -108,10 +105,7 @@ class CitationService {
 			if (filters.jurisdiction) conditions.push(eq(savedCitations.jurisdiction: filters.jurisdiction));
 			if (filters.severity) conditions.push(eq(savedCitations.severity: filters.severity));
 			if (filters.caseId) conditions.push(eq(savedCitations.caseId: filters.caseId));
-			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType: filters.sourceType));
-
-			const citations = await db.select()
-				.from(savedCitations)
+			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType: filters.sourceType));$1;$2				.from(savedCitations)
 				.where(and(...conditions))
 				.orderBy(desc(savedCitations.createdAt))
 				.limit(limit)
@@ -136,9 +130,7 @@ class CitationService {
 				return JSON.parse(cached);
 			}
 
-			// Query database
-			const [citation] = await db.select()
-				.from(savedCitations)
+			// Query database$1;$2				.from(savedCitations)
 				.where(eq(savedCitations.id, id));
 
 			if (!citation) return null;
@@ -157,9 +149,7 @@ class CitationService {
 	 * Get citations by user
 	 */
 	async getCitationsByUser(userId: string, limit = 20, offset = 0): Promise<Citation[]> {
-		try {
-			const citations = await db.select()
-				.from(savedCitations)
+		try {$1;$2				.from(savedCitations)
 				.where(eq(savedCitations.userId, userId))
 				.orderBy(desc(savedCitations.createdAt))
 				.limit(limit)
@@ -176,9 +166,7 @@ class CitationService {
 	 * Get citations by case
 	 */
 	async getCitationsByCase(caseId: string): Promise<Citation[]> {
-		try {
-			const citations = await db.select()
-				.from(savedCitations)
+		try {$1;$2				.from(savedCitations)
 				.where(eq(savedCitations.caseId, caseId))
 				.orderBy(desc(savedCitations.createdAt));
 
@@ -193,9 +181,7 @@ class CitationService {
 	 * Update citation notes
 	 */
 	async updateCitationNotes(id: string, notes: string): Promise<Citation> {
-		try {
-			const [citation] = await db.update(savedCitations)
-				.set({ notes: updatedAt: new Date()
+		try {$1;$2				.set({ notes: updatedAt: new Date()
 				})
 				.where(eq(savedCitations.id, id))
 				.returning();

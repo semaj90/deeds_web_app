@@ -5,10 +5,7 @@
 
 import { createActor } from 'xstate';
 import {
- clusteringMachineDef,
- type ClusteringContext,
- type ClusteringSnapshot,
-} from './xstate-machine.js';
+ clusteringMachineDef,$1;$2$1;$2} from './xstate-machine.js';
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {

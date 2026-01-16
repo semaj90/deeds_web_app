@@ -185,9 +185,7 @@ export interface WasmVectorModule {
  benchmarkOperation: (operation: number, dataSize: number): number => number;
 }
 export type VectorOperation = 'similarity' | 'embedding' | 'search' | 'matrix' | 'chunk';
-export type SimilarityAlgorithm = 'cosine' | 'euclidean' | 'dot' | 'manhattan';
-export type MatrixOperationType =
- | 'multiply'
+export type SimilarityAlgorithm = 'cosine' | 'euclidean' | 'dot' | 'manhattan';$1;$2 | 'multiply'
  | 'transpose'
  | 'inverse'
  | 'eigenvalues'

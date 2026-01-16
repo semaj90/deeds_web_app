@@ -7,9 +7,7 @@ interface IOllamaEmbeddingService {
 }
 
 // Default endpoints (Docker/Prod fallback)
-// prefer Docker service hostnames first, then local dev
-const API_URL =
- process.env?.OLLAMA_API_URL||
+// prefer Docker service hostnames first, then local dev$1;$2 process.env?.OLLAMA_API_URL||
  process.env?.PUBLIC_OLLAMA_API_URL||
  process.env?.OLLAMA_URL?? 'http://localhost:11434';
 const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL?? 'embeddinggemma:latest';

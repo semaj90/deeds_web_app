@@ -87,7 +87,7 @@ export class TagExtractor {
     const tags = new Set<string>();
 
     // 1. Extract from entities (primary source)
-    if (entities && entities.length > 0) {
+    if ($1?.$2 > 0) {
       for (const entity of entities) {
         const normalized = this.normalizeTag(entity);
         if (normalized && this.isValidTag(normalized)) {
@@ -223,9 +223,7 @@ export class TagExtractor {
     const normalized = this.normalizeTag(partial);
     if (normalized.length < 2) return [];
 
-    // Filter existing tags that match
-    const suggestions = existingTags
-      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
+    // Filter existing tags that match$1;$2      .filter((tag: any) => this.normalizeTag(tag).includes(normalized))
       .slice(0, 10);
 
     return suggestions;

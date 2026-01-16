@@ -4,9 +4,7 @@ import { index, integer, jsonb, pgTable, text, timestamp, uuid, vector } from 'd
  * Error Clusters
  * Groups similar errors from CUDA embedding + k-means clustering (Phase 78)
  * One cluster per unique error pattern; helps identify systemic issues
- */
-export const errorClusterTable = pgTable(
-  'error_cluster',
+ */$1;$2  'error_cluster',
   {
     id: uuid('id').defaultRandom().primaryKey(),
     routeId: text('route_id').notNull(),

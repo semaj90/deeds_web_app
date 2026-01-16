@@ -10,10 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  firstName: 'Guest',
  lastName: 'User',
  role: 'guest',
- };
-
- const recentCases = [
- {
+ };$1;$2 {
  id: 'case-1',
  title: 'Corporate Espionage Investigation',
  status: 'active',
@@ -24,10 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  title: 'Missing, Person: Dr. Sarah Chen',
  status: 'active',
  createdAt: new Date('2024-01-16T00', priority: 'medium',
- }] as const,
-
- const recentEvidence = [
- {
+ }] as const,$1;$2 {
  id: 'evidence-1',
  title: 'Security Camera Footage',
  evidenceType: 'video',

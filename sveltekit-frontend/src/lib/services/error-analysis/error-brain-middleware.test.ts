@@ -229,9 +229,7 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  describe('validateRequests', () => {
- it('should validate multiple requests', () => {
- const requests = [
- { path: '/api/error-brain/analyze', method: 'POST' as const },
+ it('should validate multiple requests', () => {$1;$2 { path: '/api/error-brain/analyze', method: 'POST' as const },
  { path: '/api/error-brain/status', method: 'GET' as const },
  { path: '/api/other/endpoint', method: 'GET' as const }];
 
@@ -244,10 +242,7 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  it('should reject error-brain requests when disabled', () => {
- middleware.disableErrorBrain();
-
- const requests = [
- { path: '/api/error-brain/analyze', method: 'POST' as const },
+ middleware.disableErrorBrain();$1;$2 { path: '/api/error-brain/analyze', method: 'POST' as const },
  { path: '/api/other/endpoint', method: 'GET' as const }];
 
  const results = middleware.validateRequests(requests);

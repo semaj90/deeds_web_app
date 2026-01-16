@@ -62,10 +62,7 @@ export async function upsertChunkContent(
  }
 ): Promise<{ created: boolean; version, number }> {
  const { id, documentId, chunkIndex, content } = params;
- const hash = calculateContentHash(content);
-
- const [existing] = await db
- .select()
+ const hash = calculateContentHash(content);$1;$2 .select()
  .from(schema.documentChunks)
  .where(eq(schema.documentChunks.id, id))
  .limit(1);
@@ -128,10 +125,7 @@ export async function upsertDocumentContent(
  }
 ): Promise<{ created: boolean; version, number }> {
  const { id, title, content, userId, caseId, filename, mimeType } = params;
- const hash = calculateContentHash(content);
-
- const [existing] = await db
- .select()
+ const hash = calculateContentHash(content);$1;$2 .select()
  .from(schema.legalDocuments)
  .where(eq(schema.legalDocuments.id, id))
  .limit(1);
@@ -277,9 +271,7 @@ export async function softDeleteCase(
  .where(eq(schema.cases.id, caseId));
 
  let evidenceCount = 0;
- if (cascadeEvidence) {
- const result = await db
- .update(schema.evidence)
+ if (cascadeEvidence) {$1;$2 .update(schema.evidence)
  .set({
  isActive: false, deletedAt: new Date( updatedAt: new Date(),
  })

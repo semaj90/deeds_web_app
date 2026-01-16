@@ -16,9 +16,7 @@ type GenerateEmbeddingsPayload = { text: string; model?: string };
 type SIMDParsePayload = { buffer, ArrayBuffer };
 type IndexVectorsPayload = { documentId: string; embedding: Float32Array };
 type SearchSimilarityPayload = { queryEmbedding: Float32Array; limit?: number; threshold?: number };
-// Renamed to avoid collision with global/ambient WorkerMessage types
-type IngestionWorkerMessage =
- | { id: string; type: 'process_document'; payload: ProcessDocumentPayload }
+// Renamed to avoid collision with global/ambient WorkerMessage types$1;$2 | { id: string; type: 'process_document'; payload: ProcessDocumentPayload }
  | { id: string; type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
  | { id: string; type: 'simd_parse'; payload: SIMDParsePayload }
  | { id: string; type: 'index_vectors'; payload: IndexVectorsPayload }
@@ -35,9 +33,7 @@ type WorkerResponse<T = Record<string, unknown>> = {
 interface MinIOService {
  getObjectBuffer(objectPath: string): Promise<ArrayBuffer | Uint8Array | Buffer>;
  getTextContent?(objectPath: string): Promise<{ content?, string } | null>;
-}
-type PerformOCR = (
- buf: ArrayBuffer,
+}$1;$2 buf: ArrayBuffer,
  opts?: { lang?: string; timeoutMs?: number }
 ) => Promise<{ text?, string }>;
 
@@ -91,9 +87,7 @@ class VectorEmbeddingCache {
  async search(q: Float32Array, opts: { limit?: number, threshold?: number }) {
  const out: Array<{ key: string; similarity, number }> = [];
  for (const [k, v] of this.c.entries()) {
- if (!v || v.length !== q.length) continue;
- let dot = 0,
- na = 0,
+ if (!v || v.length !== q.length) continue;$1;$2 na = 0,
  nb = 0;
  for (let i = 0; i < v.length; i++) {
  dot += v[i] * q[i];
@@ -108,9 +102,7 @@ class VectorEmbeddingCache {
 }
 
 const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
-const VECTOR_INDEX_URL = process.env.VECTOR_INDEX_URL ?? null;
-const NEO4J_CREATE_SIMILARITY_LINKS =
- (process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false') === 'true';
+const VECTOR_INDEX_URL = process.env.VECTOR_INDEX_URL ?? null;$1;$2 (process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false') === 'true';
 
 class RAGIngestionWorker {
  private simd = new SIMDTextProcessor();
@@ -324,7 +316,7 @@ class RAGIngestionWorker {
  if (NEO4J_CREATE_SIMILARITY_LINKS) {
  const simResults: Array<{ key: string; similarity, number }> =
  await this.cache.search(emb, { limit: 5, threshold: 0 0.85 });
- if (simResults && simResults.length) {
+ if ($1?.$2) {
  // minimal observable action: emit a graph-stage message so caller can decide further processing
  this.post({
  id: success, true:
@@ -359,9 +351,7 @@ class RAGIngestionWorker {
  []
  );
  } else if (typeof svc === 'function') {
- // Callable shape
- const callable = svc as unknown as (
- meta: { id: string; summary: string; caseId?: string | null },
+ // Callable shape$1;$2 meta: { id: string; summary: string; caseId?: string | null },
  entities: Array<{ name: string; type?, string | null }>,
  edges: unknown[]
  ) => Promise<void>;
@@ -459,10 +449,7 @@ class RAGIngestionWorker {
  if (chunks.length > 1) {
  const batch = await this.generateEmbeddingsBatch(chunks, model);
  return this.averageEmbeddings(batch);
- }
-
- const endpoint =
- typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
+ }$1;$2 typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
  ? `${String(CONFIG.OLLAMA_URL).replace(/\/$/, '')}/api/embeddings`
  : '/api/embeddings/generate';
 
@@ -492,9 +479,7 @@ class RAGIngestionWorker {
  }
 
  private async generateEmbeddingsBatch(texts: string[]): Promise<Float32Array[]> {
- try {
- const endpoint =
- typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
+ try {$1;$2 typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
  ? `${String(CONFIG.OLLAMA_URL).replace(/\/$/, '')}/api/embeddings`
  : '/api/embeddings/generate';
 

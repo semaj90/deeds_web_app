@@ -207,9 +207,7 @@ function extractEntities(text: string): string[] {
 	// Extract capitalized terms, Svelte concepts, code patterns
 	const entities = new Set<string>();
 
-	// Patterns for technical terms
-	const patterns = [
-		/\$state/g,
+	// Patterns for technical terms$1;$2		/\$state/g,
 		/\$derived/g,
 		/\$effect/g,
 		/\$props/g,
@@ -246,9 +244,7 @@ function extractRelationships(
 ): Array<{ from: string; to: string; type: string }> {
 	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
-	// Pattern: "X uses Y", "X depends on Y", "X references Y"
-	const patterns = [
-		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
+	// Pattern: "X uses Y", "X depends on Y", "X references Y"$1;$2		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
 		{ regex: /(\w+)\s+depends?\s+on\s+(\w+)/gi, type: 'DEPENDS_ON' },
 		{ regex: /(\w+)\s+references?\s+(\w+)/gi, type: 'REFERENCES' },
 		{ regex: /(\w+)\s+extends?\s+(\w+)/gi, type: 'EXTENDS' },

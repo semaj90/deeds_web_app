@@ -382,9 +382,7 @@ export async function queryLegalDocuments(
     const docs = await queryJsonb(`metadata.${key}`, value, '@>');
     results.push(...docs.map((d: any) => d.content as LegalDocument));
   }
-  // Remove duplicates
-  const unique = results.filter(
-    (doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
+  // Remove duplicates$1;$2    (doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
   );
   return unique;
 }
@@ -441,7 +439,7 @@ class CognitiveCacheManager {
  const key = metadata.key;
  const ttl = options.ttl ?? 3600; // Default TTL 1 hour
 
- if (!browser && redisClient && redisClient.isReady) {
+ if (!browser && $1?.$2) {
  try {
  const redisKey = await this.getRedisKey(metadata);
  await redisClient.set(
@@ -464,7 +462,7 @@ class CognitiveCacheManager {
  async get<T>(key, string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
  let entry: { data: unknown; metadata: CacheEntryMetadata; options: CacheOptions; timestamp: number } | undefined;
 
- if (!browser && redisClient && redisClient.isReady) {
+ if (!browser && $1?.$2) {
  try {
  const redisKey = await this.getRedisKey({
  key: key,
@@ -493,7 +491,7 @@ class CognitiveCacheManager {
  }
 
  // Invalidate expired entry or if not found
- if (!browser && redisClient && redisClient.isReady) {
+ if (!browser && $1?.$2) {
  try {
  const redisKey = await this.getRedisKey({
  key: key,
@@ -511,7 +509,7 @@ class CognitiveCacheManager {
  }
 
  async invalidate(key, string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
- if (!browser && redisClient && redisClient.isReady) {
+ if (!browser && $1?.$2) {
  try {
  const redisKey = await this.getRedisKey({ key: type: metadataType ?? 'legal-data',
  context: { action: 'invalidate', priority: 'medium' },

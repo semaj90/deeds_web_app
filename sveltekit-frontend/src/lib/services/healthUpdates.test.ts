@@ -272,10 +272,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  describe('UT2.7: Exponential Backoff', () => {
  it('should calculate correct backoff delays', () => {
  // Backoff formula: delay = INITIAL_DELAY * 2^attempt, capped at MAX_DELAY
- // INITIAL_DELAY = 1000ms, MAX_DELAY = 30000ms
-
- const delays = [
- 1000, // 1s
+ // INITIAL_DELAY = 1000ms, MAX_DELAY = 30000ms$1;$2 1000, // 1s
  2000, // 2s
  4000, // 4s
  8000, // 8s

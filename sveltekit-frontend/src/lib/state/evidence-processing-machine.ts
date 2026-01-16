@@ -44,9 +44,7 @@ export interface EvidenceProcessingContext {
  errors: string[], processingTimeMs: number; streamingUpdates: Array<any>;
 }
 
-// Events for the evidence processing machine
-export type EvidenceProcessingEvent =
- | { type: 'UPLOAD_FILE', file: File; evidenceId: string }
+// Events for the evidence processing machine$1;$2 | { type: 'UPLOAD_FILE', file: File; evidenceId: string }
  | { type: 'CONFIGURE_NEURAL_SPRITE', config: GlyphRequest['neural_sprite_config'] }
  | { type: 'START_ANALYSIS' }
  | { type: 'ANALYSIS_PROGRESS', progress: number; message: string }
@@ -456,16 +454,12 @@ export const evidenceProcessingMachine = createMachine({
 
 // Helper functions for working with the machine
 export function getProcessingProgress(context: EvidenceProcessingContext): number {
- const totalSteps = 5; // upload, analysis, glyph, png, storage
- const completedSteps = context.streamingUpdates.filter(
- (item) => item.status === 'completed'
+ const totalSteps = 5; // upload, analysis, glyph, png, storage$1;$2 (item) => item.status === 'completed'
  ).length;
  return Math.round((completedSteps / totalSteps) * 100);
 }
 
-export function getCurrentStep(context: EvidenceProcessingContext): string {
- const inProgressUpdate = context.streamingUpdates.find(
- (update) => update.status === 'in_progress'
+export function getCurrentStep(context: EvidenceProcessingContext): string {$1;$2 (update) => update.status === 'in_progress'
  );
  return inProgressUpdate?.step ?? 'idle';
 }

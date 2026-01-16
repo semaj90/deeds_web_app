@@ -93,10 +93,7 @@ export class KnowledgeIndexer {
       format: 'markdown',
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
-    });
-
-    const pgId = await this.storeInPostgres(
-      id:
+    });$1;$2      id:
       qdrantId.toString(),
       doc,
       embedding,
@@ -238,9 +235,7 @@ export class KnowledgeIndexer {
    * Generate AI summary using LLM
    */
   private async generateSummary(content: string, title: string): Promise<string> {
-    try {
-      const prompt = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
-
+    try {$1;$2
 Title: ${title}
 
 Content:
@@ -285,9 +280,7 @@ Summary:`;
     // Simple entity extraction based on common patterns
     const entities: Set<string> = new Set();
 
-    // Technology patterns
-    const techPatterns = [
-      /\b(Svelte|SvelteKit|React|Vue|Angular|Next\.js|Nuxt)\b/gi,
+    // Technology patterns$1;$2      /\b(Svelte|SvelteKit|React|Vue|Angular|Next\.js|Nuxt)\b/gi,
       /\b(TypeScript|JavaScript|Python|Go|Rust|Java)\b/gi,
       /\b(PostgreSQL|Redis|Qdrant|Neo4j|MongoDB|MySQL)\b/gi,
       /\b(Docker|Kubernetes|AWS|GCP|Azure)\b/gi,
@@ -362,9 +355,7 @@ Summary:`;
   ): Promise<number> {
     const qdrantId = Date.now(); // Simple integer ID for now, or use UUID if collection supports it
 
-    try {
-      const response = await fetch(
-        `${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
+    try {$1;$2        `${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

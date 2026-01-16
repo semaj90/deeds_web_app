@@ -68,9 +68,7 @@ export async function checkIntegrationStatus(): Promise<IntegrationStatus> {
  }
  return status;
 }
-export function formatStatusReport(status: IntegrationStatus): string {
- const sections = [
- '🔧 WebAssembly Client Integration Status',
+export function formatStatusReport(status: IntegrationStatus): string {$1;$2 '🔧 WebAssembly Client Integration Status',
  '='.repeat(50),
  '',
  '📄 WebAssembly:',

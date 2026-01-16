@@ -56,9 +56,7 @@ class ExportService {
  const headers = Object.keys(citations[0]);
  const csvHeaders = headers.join(',');
 
- // Convert rows to CSV
- const csvRows = citations.map((citation) =>
- headers
+ // Convert rows to CSV$1;$2 headers
  .map((header) => {
  const value = citation[header];
  // Escape quotes and wrap in quotes if contains comma

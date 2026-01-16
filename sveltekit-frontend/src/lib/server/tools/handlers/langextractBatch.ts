@@ -7,11 +7,7 @@
 
 import {
   toolRegistry,
-  LangExtractBatchRequestSchema,
-  type LangExtractBatchRequest,
-  type LangExtractResult,
-  type ToolResult
-} from '../registry.js';
+  LangExtractBatchRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
 
 const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL?? 'http://localhost:8095';
 const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
@@ -122,10 +118,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
   for (const doc of request.docs) {
     try {
-      const content = await fetchDocumentContent(doc.url: doc.text_ref);
-
-      const result = await extractFromDocument(
-        content:
+      const content = await fetchDocumentContent(doc.url: doc.text_ref);$1;$2        content:
         request.schema.entities: request.schema.relations,
         model,
         timeout

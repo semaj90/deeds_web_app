@@ -1,6 +1,4 @@
-// Central shared type definitions (incremental widening to unblock svelte-check)
-export type ButtonVariant =
- | 'default'
+// Central shared type definitions (incremental widening to unblock svelte-check)$1;$2 | 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'
@@ -20,9 +18,7 @@ export type ButtonVariant =
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
-// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds
-export type FormFieldType =
- | 'text'
+// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds$1;$2 | 'text'
  | 'number'
  | 'date'
  | 'email'
@@ -75,10 +71,7 @@ export interface ProfileData {
  modusOperandi?: string;
  knownHabits?: string[];
  associates?: string[];
-}
-
-export type PoiStatus =
- | 'person_of_interest'
+}$1;$2 | 'person_of_interest'
  | 'witness'
  | 'suspect'
  | 'victim'
@@ -127,19 +120,14 @@ export interface FormSubmissionResult<T = unknown> {
  metadata?: { requestId: string; timestamp: string; processingTimeMs: number };
 }
 
-// AI / Worker
-export type AITaskType =
- | 'generate'
+// AI / Worker$1;$2 | 'generate'
  | 'analyze'
  | 'embed'
  | 'search'
  | 'embedding'
  | 'analysis'
  | 'classification'
- | 'summarization';
-
-export type WorkerMessageType =
- | 'error'
+ | 'summarization';$1;$2 | 'error'
  | 'status'
  | 'result'
  | 'task'
@@ -254,10 +242,7 @@ export interface GlobalAppContext {
  user: { id: string; email: string } | null;
  activeCaseId: string | null;
  theme: 'light' | 'dark';
-}
-
-export type GlobalAppEvent =
- | { type: 'LOGIN'; user: { id: string; email: string } }
+}$1;$2 | { type: 'LOGIN'; user: { id: string; email: string } }
  | { type: 'LOGOUT' }
  | { type: 'SET_CASE'; caseId: string } // Corrected syntax
  | { type: 'SET_THEME'; theme: 'light' | 'dark' };

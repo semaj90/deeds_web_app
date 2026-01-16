@@ -82,9 +82,7 @@ export async function getSearchSuggestions(
  query: string,
  type: 'cases' | 'laws' = 'laws'
 ): Promise<string[]> {
- try {
- const response = await fetch(
- `/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
+ try {$1;$2 `/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
  );
  if (!response.ok) return [];
  const data = await response.json();

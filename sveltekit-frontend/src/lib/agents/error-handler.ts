@@ -255,9 +255,7 @@ export async function withTimeout<T>(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {
-    const result = await Promise.race([
-      fn(),
+  try {$1;$2      fn(),
       new Promise<T>((_, reject) => {
         controller.signal.addEventListener('abort', () => {
           reject(

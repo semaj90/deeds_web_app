@@ -194,9 +194,7 @@ export async function createEdge(edge, Omit<KnowledgeEdge, '_rev'>): Promise<Kno
  * Query MapReduce view: Get children of a node
  */
 export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
-    try {
-        const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${ nodeId }"`
+    try {$1;$2            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];
@@ -213,9 +211,7 @@ export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
  * Query MapReduce view: Get neighbors (connected nodes)
  */
 export async function getNeighbors(nodeId: string): Promise<string[]> {
-    try {
-        const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${ nodeId }"`
+    try {$1;$2            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];
@@ -248,9 +244,7 @@ export async function getNode(nodeId: string): Promise<KnowledgeNode | null> {
  * Get nodes by source (e.g., all Svelte docs)
  */
 export async function getNodesBySource(source: string): Promise<KnowledgeNode[]> {
-    try {
-        const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/by_source?key="${source}"`
+    try {$1;$2            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/by_source?key="${source}"`
         );
 
         if (!response.ok) return [];

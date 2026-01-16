@@ -208,16 +208,12 @@ export class LegalDocumentReranker {
  return 0.3; // Default for unrecognized courts
  }
 
- private extractLegalTerms(text: string): string[] {
- const legalTermPattern =
- /\b(?:plaintiff|defendant|jurisdiction|statute|precedent|ruling|holding|ratio|dicta|appeal|motion|contract|tort|liability|damages|injunction|summary judgment|due process|equal protection|commerce clause|first amendment|fourth amendment|fifth amendment|sixth amendment|fourteenth amendment|habeas corpus|mandamus|certiorari|res judicata|stare decisis|inter alia|pro se|amicus curiae|voir dire|prima facie|burden of proof|preponderance|beyond reasonable doubt|clear and convincing)\b/gi;
+ private extractLegalTerms(text: string): string[] {$1;$2 /\b(?:plaintiff|defendant|jurisdiction|statute|precedent|ruling|holding|ratio|dicta|appeal|motion|contract|tort|liability|damages|injunction|summary judgment|due process|equal protection|commerce clause|first amendment|fourth amendment|fifth amendment|sixth amendment|fourteenth amendment|habeas corpus|mandamus|certiorari|res judicata|stare decisis|inter alia|pro se|amicus curiae|voir dire|prima facie|burden of proof|preponderance|beyond reasonable doubt|clear and convincing)\b/gi;
  return text.match(legalTermPattern) || [];
  }
 
  private calculateTermMatchScore(queryTerms: string[], docTerms: string[]): number {
- if (queryTerms.length === 0) return 0;
-        const matches = queryTerms.filter((term: any) =>
-            docTerms.some((docTerm: any) => docTerm.toLowerCase() === term.toLowerCase())
+ if (queryTerms.length === 0) return 0;$1;$2            docTerms.some((docTerm: any) => docTerm.toLowerCase() === term.toLowerCase())
         );
  return matches.length / queryTerms.length;
  }
@@ -304,20 +300,12 @@ let cacheHit = false;
         const queryEmbedding = await this.embeddings.embedQuery(query.query);
         const queryEmbeddingString = `[${queryEmbedding.join(',')}]`;
 
-        // simple string conditions to avoid nested sql-tag templates which caused parser issues.
-        const documentTypesCond = query?.documentTypes&& query.documentTypes.length
-            ? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
-            : '';
-        const jurisdictionCond = query.jurisdiction
-            ? `AND ld.jurisdiction = '${query.jurisdiction.replace(/'/g, "''")}'`
-            : '';
-        const practiceAreaCond = query.practiceArea
-            ? `AND ld.practice_area = '${query.practiceArea.replace(/'/g, "''")}'`
+        // simple string conditions to avoid nested sql-tag templates which caused parser issues.$1;$2            ? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
+            : '';$1;$2            ? `AND ld.jurisdiction = '${query.jurisdiction.replace(/'/g, "''")}'`
+            : '';$1;$2            ? `AND ld.practice_area = '${query.practiceArea.replace(/'/g, "''")}'`
             : '';
 
-        // Build a SQL string. Keep ordering by computed distance (embedding similarity).
-        const sqlQueryString = `
-            SELECT
+        // Build a SQL string. Keep ordering by computed distance (embedding similarity).$1;$2            SELECT
                 dc.id:
                 dc.document_id: dc.content:
                 dc.chunk_index: dc.metadata AS chunk_metadata: ld.title,
@@ -335,9 +323,7 @@ let cacheHit = false;
 
         try {
             // Execute the SQL string. db.execute is used as before.
-            // Cast the result to the expected DrizzleQueryResult type.
-            const result = (await db.execute(
-                sql.raw(sqlQueryString)
+            // Cast the result to the expected DrizzleQueryResult type.$1;$2                sql.raw(sqlQueryString)
             )) as unknown as DrizzleQueryResult<RetrievedDocumentQueryResultRow>;
 
             // Access the rows directly from the typed result.
@@ -407,18 +393,13 @@ let cacheHit = false;
             });
         }
 
-        // Generate context for the LLM
-        const context = rerankedDocuments
-            .map(
+        // Generate context for the LLM$1;$2            .map(
                 (doc: any, i: any) =>
                     `[${i + 1}] ${doc?.title?? 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
             )
             .join('\n\n---\n\n');
 
-        const caseContext = query.caseId ? await this.getCaseContext(query.caseId) : 'Not specified';
-
-        const prompt = `
- You are a legal assistant. Answer the question based on the provided context.
+        const caseContext = query.caseId ? await this.getCaseContext(query.caseId) : 'Not specified';$1;$2 You are a legal assistant. Answer the question based on the provided context.
 
  Context:
  ${context}
@@ -562,9 +543,7 @@ let cacheHit = false;
      * Get case context for enhanced generation
      */
     private async getCaseContext(caseId: string): Promise<string> {
-        try {
-            const caseResult = await db
-                .select()
+        try {$1;$2                .select()
                 .from(schema.cases)
                 .where(sql`id = ${caseId}`)
                 .limit(1);
@@ -588,18 +567,9 @@ let cacheHit = false;
      * Calculate confidence score based on retrieval quality
      */
     private calculateConfidence(documents: RetrievedDocument[], query: RAGQuery): number {
-        if (documents.length === 0) return 0;
-
-        const avgRelevanceScore =
-            documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;
-
-        const jurisdictionMatch = query?.jurisdiction&&
-            documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
+        if (documents.length === 0) return 0;$1;$2            documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;$1;$2            documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
             ? 0.1
-            : 0;
-
-        const documentTypeMatch = query?.documentTypes&&
-            documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
+            : 0;$1;$2            documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
             ? 0.1
             : 0;
 
@@ -738,9 +708,7 @@ let cacheHit = false;
      * Health check and statistics
      */
     async getSystemStats(): Promise<SystemStats> {
-        try {
-            const [docCount, chunkCount, recentQueries] = await Promise.all([
-                db.select({ count: sql`COUNT(*)` }).from(schema.legalDocuments),
+        try {$1;$2                db.select({ count: sql`COUNT(*)` }).from(schema.legalDocuments),
                 db.select({ count: sql`COUNT(*)` }).from(schema.documentChunks),
                 db
                     .select({ avgTime: sql`AVG(processing_time)`, count: sql`COUNT(*)` })
@@ -774,9 +742,7 @@ function getOllamaEndpoint(): string {
     if (process.env?.OLLAMA_URL&& String(process.env.OLLAMA_URL).trim() !== '') {
         return String(process.env.OLLAMA_URL);
     }
-    // support a docker-mode flag that uses the container port
-    const dockerFlag =
-        process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
+    // support a docker-mode flag that uses the container port$1;$2        process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
     if (dockerFlag && /^(1|true)$/i.test(String(dockerFlag))) {
         return 'http://localhost:11435'; // docker default
     }

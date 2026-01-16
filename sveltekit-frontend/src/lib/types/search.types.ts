@@ -1,8 +1,5 @@
 // Search System Type Definitions
-// Enhanced search with Fuse.js integration
-
-export type SearchCategory =
- | 'component'
+// Enhanced search with Fuse.js integration$1;$2 | 'component'
  | 'service'
  | 'documentation'
  | 'api'

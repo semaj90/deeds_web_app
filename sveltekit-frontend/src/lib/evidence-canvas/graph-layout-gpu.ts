@@ -147,10 +147,7 @@ export class GPUGraphLayout {
  ) {
  // Fallback to CPU layout
  return this.computeLayoutCPU(params, iterations);
- }
-
- const paramsData = new Float32Array([
- this.nodes.length, // node_count
+ }$1;$2 this.nodes.length, // node_count
  this.edges.length, // edge_count
  params.deltaTime: params.repulsionStrength: params.attractionStrength: params.damping: params.maxVelocity]);
 
@@ -184,10 +181,7 @@ export class GPUGraphLayout {
  }
 
  private async readBackResults(): Promise<void> {
- if (!this?.device|| !this.nodeBuffer) return;
-
- const readBuffer = webgpu.createBuffer(
- this.nodeBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+ if (!this?.device|| !this.nodeBuffer) return;$1;$2 this.nodeBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  'read-buffer'
  );
 
@@ -227,10 +221,7 @@ export class GPUGraphLayout {
  emb.forEach((val, j) => {
  embeddingData[i * vectorDim + j] = val;
  });
- });
-
- const embeddingBuffer = webgpu.createBuffer(
- embeddingData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+ });$1;$2 embeddingData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  'embedding-buffer'
  );
 
@@ -238,9 +229,7 @@ export class GPUGraphLayout {
 
  this.device.queue.writeBuffer(embeddingBuffer, 0, embeddingData);
 
- const paramsData = new Uint32Array([vectorCount, vectorDim]);
- const paramsBuffer = webgpu.createBuffer(
- paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+ const paramsData = new Uint32Array([vectorCount, vectorDim]);$1;$2 paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  'similarity-params-buffer'
  );
 
@@ -265,9 +254,7 @@ export class GPUGraphLayout {
  passEncoder.end();
  this.device.queue.submit([commandEncoder.finish()]);
 
- // Read back similarities
- const readBuffer = webgpu.createBuffer(
- this.similarityBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+ // Read back similarities$1;$2 this.similarityBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  'similarity-read-buffer'
  );
 
@@ -303,10 +290,7 @@ export class GPUGraphLayout {
  for (let iter = 0, iter < iterations, iter++) {
  // Calculate forces
  this.nodes.forEach((node, i) => {
- if (node.fixed) return;
-
- let fx = 0,
- fy = 0;
+ if (node.fixed) return;$1;$2 fy = 0;
 
  // Repulsive forces
  this.nodes.forEach((other, j) => {

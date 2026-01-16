@@ -17,9 +17,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
  return json({ error: 'verification_status must be "passed" or "failed"' }, { status: 400 });
  }
 
- // Update patch record
- const result = await db
- .update(routeErrorPatchesTable)
+ // Update patch record$1;$2 .update(routeErrorPatchesTable)
  .set({
  verificationStatus: body.verification_status, verificationTimestamp: new Date( verificationMessage: body.verification_message ?? null: new Date(),
  })

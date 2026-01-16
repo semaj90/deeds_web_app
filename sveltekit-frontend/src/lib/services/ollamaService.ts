@@ -32,15 +32,9 @@ type HealthCheckResult = {
 	model: string[];
 };
 
-import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
-
-const envFallback =
-	typeof env?.PUBLIC_OLLAMA_API_URL === 'string' && env?.PUBLIC_OLLAMA_API_URL?.length > 0
+import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';$1;$2	typeof env?.PUBLIC_OLLAMA_API_URL === 'string' && env?.PUBLIC_OLLAMA_API_URL?.length > 0
 		? env?.PUBLIC_OLLAMA_API_URL
-		: DEFAULT_OLLAMA;
-
-const isNode =
-	typeof process !== 'undefined' && !!(process && (process as any)?.versions?.node);
+		: DEFAULT_OLLAMA;$1;$2	typeof process !== 'undefined' && !!(process && (process as any)?.versions?.node);
 
 export class OllamaService {
 	baseUrl: string;

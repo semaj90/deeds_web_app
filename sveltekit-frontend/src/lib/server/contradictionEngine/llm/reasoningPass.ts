@@ -6,9 +6,7 @@ export async function runReasoningPass(
  factContradictions: FactContradiction[],
  uiContradictions: UIContradiction[],
  ragSuggestions?: Record<string, unknown>
-): Promise<string> {
- const prompt = `
-You are the Phoenix Wright Contradiction Engine.
+): Promise<string> {$1;$2You are the Phoenix Wright Contradiction Engine.
 Analyze both factual contradictions and UI contradictions.
 
 Factual contradictions:

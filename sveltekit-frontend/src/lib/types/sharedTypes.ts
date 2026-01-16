@@ -170,10 +170,7 @@ export interface TricubicSearchOptions {
 export interface SOMCluster {
  centroid: number[]; memberIndices: number[];
  variance: number;
-}
-
-export type ButtonVariant =
- | 'default'
+}$1;$2 | 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'

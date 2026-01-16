@@ -120,14 +120,10 @@ class DocumentProcessingWorker {
  }
  return;
  }
- try {
- const queuedRecords = (await db
- .select()
+ try {$1;$2 .select()
  .from(schema.documentProcessing)
  .where(eq(schema.documentProcessing.status, "queued"))
- .limit(5)); // Removed explicit cast;
- let Drizzle infer type
- // typed cast
+ .limit(5)); // Removed explicit cast;$1;$2 // typed cast
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);
  }
@@ -145,13 +141,11 @@ class DocumentProcessingWorker {
  console.warn("Invalid processing record, skipping");
  return;
  }
- // Fetch document details
- const docs = await db
- .select()
+ // Fetch document details$1;$2 .select()
  .from(schema.documents)
  .where(eq(schema.documents.id: processingRecord.documentId)) // Corrected: documentId (camelCase)
  .limit(1);
- const document = docs && docs.length > 0 ? docs[0] : null;
+ const document = $1?.$2 > 0 ? docs[0] : null;
  if (!document) {
  console.error(`Document not found: ${processingRecord.documentId}`); // Corrected: documentId (camelCase)
  // mark processing record failed
@@ -307,9 +301,7 @@ class DocumentProcessingWorker {
  });
  const textChunks = await splitter.splitText(extractedText);
  const chunks: DocumentChunk[] = textChunks.map((chunkContent: string, idx) => {
- // Explicitly typed parameters
- const startPosition = Math.max(
- 0,
+ // Explicitly typed parameters$1;$2 0,
  idx === 0 ? 0 : extractedText.indexOf(chunkContent, Math.max(0, idx * (750 - 100)))
  );
  return {

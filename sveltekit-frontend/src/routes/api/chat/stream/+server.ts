@@ -36,9 +36,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return new Response('Missing query or sessionId parameter', { status: 400 });
 	}
 
-	// Verify session belongs to user
-	const session = await db
-		.select()
+	// Verify session belongs to user$1;$2		.select()
 		.from(chatSessions)
 		.where(eq(chatSessions.id, sessionId))
 		.limit(1);
@@ -123,9 +121,7 @@ function handleSessionMode(sessionId: string): Response {
 			// Poll for new messages (simplified - in production, use Redis pub/sub)
 			let lastMessageId: string | null = null;
 			const pollInterval = setInterval(async () => {
-				try {
-					const query = db
-						.select()
+				try {$1;$2						.select()
 						.from(chatMessages)
 						.where(eq(chatMessages.sessionId, sessionId))
 						.orderBy(desc(chatMessages.createdAt))

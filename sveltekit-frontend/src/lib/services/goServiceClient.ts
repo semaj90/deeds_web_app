@@ -75,9 +75,7 @@ export class GoServiceClient {
         }
     }
 
-    async checkHealth(): Promise<{ rag: boolean; upload: boolean; kratos: boolean }> {
-        const results = await Promise.allSettled([
-            fetch(`${this.config.enhancedRagUrl}/health`, { signal: AbortSignal.timeout(5000) }),
+    async checkHealth(): Promise<{ rag: boolean; upload: boolean; kratos: boolean }> {$1;$2            fetch(`${this.config.enhancedRagUrl}/health`, { signal: AbortSignal.timeout(5000) }),
             fetch(`${this.config.uploadServiceUrl}/health`, { signal: AbortSignal.timeout(5000) }),
             fetch(`${this.config.kratosServerUrl}/health`, { signal: AbortSignal.timeout(5000) })
         ]);

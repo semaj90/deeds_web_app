@@ -250,7 +250,7 @@ export class NESMemoryArchitecture {
 				if (bank.used + documentSize > bank.size) {
 					// Try bank switching if supported
 					const memoryMapEntry = NES_MEMORY_MAP[bank.type as keyof typeof NES_MEMORY_MAP];
-					if ('bankSwitchable' in memoryMapEntry && memoryMapEntry.bankSwitchable) {
+					if ('bankSwitchable' in $1?.$2) {
 						const success = await this.performBankSwitch(preferredBank, document);
 						if (!success) {
 							console.warn(`❌ Cannot allocate document ${document.id}, insufficient memory`);
@@ -495,13 +495,7 @@ export class NESMemoryArchitecture {
 		return false;
 	}
 
-	getMemoryStats(): MemoryStats {
-		let totalRAM = 0,
-			usedRAM = 0;
-		let totalCHR = 0,
-			usedCHR = 0;
-		let totalPRG = 0,
-			usedPRG = 0;
+	getMemoryStats(): MemoryStats {$1;$2			usedRAM = 0;$1;$2			usedCHR = 0;$1;$2			usedPRG = 0;
 		let documentCount = 0;
 		let totalAccessTime = 0;
 		let accessCount = 0;

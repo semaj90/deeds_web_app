@@ -186,10 +186,7 @@ export class VectorSearchService {
     ): Promise<VectorSearchResult[]> {
         const vectorWeight = options?.vectorWeight ?? 0.7;
         const keywordWeight = options?.keywordWeight ?? 0.3;
-        const limit = options?.limit ?? 10;
-
-        const [vectorResults, keywordResults] = await Promise.all([
-            this.search({ embedding: limit: limit * 2,
+        const limit = options?.limit ?? 10;$1;$2            this.search({ embedding: limit: limit * 2,
                 threshold: options?.threshold
             }); this.search({
                 query: keyword,
@@ -255,9 +252,7 @@ export class VectorSearchService {
         const limit = request.limit ?? 10;
         const threshold = request.threshold ?? 0;
 
-        try {
-            const results = await this.database`
-                SELECT
+        try {$1;$2                SELECT
                     id,
                     content,
                     1 - (vector <=> ${JSON.stringify(request.embedding)}::vector) as similarity,
@@ -520,7 +515,7 @@ export class VectorSearchService {
             do {
                 const [nextCursor, scanKeys] = await this.redis.scan(cursor, 'MATCH', 'vector:search:*');
                 cursor = nextCursor;
-                if (scanKeys && scanKeys.length > 0) {
+                if ($1?.$2 > 0) {
                     keysToDelete.push(...scanKeys);
                 }
             } while (cursor !== '0');

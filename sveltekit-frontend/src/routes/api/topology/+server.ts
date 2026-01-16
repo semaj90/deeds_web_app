@@ -14,9 +14,7 @@ const pgPool = new Pool({
 
 export const GET: RequestHandler = async () => {
 	try {
-		// Load errors from PostgreSQL
-		const result = await pgPool.query(`
-			SELECT
+		// Load errors from PostgreSQL$1;$2			SELECT
 				file_path,
 				error_code,
 				COUNT(*) as error_count,
@@ -66,10 +64,7 @@ export const GET: RequestHandler = async () => {
 			comp.error_codes = Array.from(comp.error_codes);
 			comp.recommended_action = recommendAction(comp);
 			comp.dependencies = [];  // Would need AST parsing for accurate deps
-		}
-
-		const components = Array.from(componentMap.values())
-			.map(comp => ({
+		}$1;$2			.map(comp => ({
 				...comp,
 				importance: comp.errors * (1 + comp.complexity)
 			}))

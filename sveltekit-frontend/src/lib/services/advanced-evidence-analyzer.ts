@@ -72,21 +72,13 @@ class AdvancedEvidenceAnalyzer {
 		const sourceText = this.composeEvidenceText(evidence);
 		if (!sourceText.trim()) {
 			throw new Error('No textual content available for analysis');
-		}
-
-		const analyses = await Promise.all(
-			validated.analysisTypes.map(async (type: any) =>
+		}$1;$2			validated.analysisTypes.map(async (type: any) =>
 				this.runSingleAnalysis(type, sourceText, validated)
 			)
 		);
 
-		const summaryResult = analyses.find((item: any) => item.type === 'summary');
-		const summaryText =
-			(summaryResult?.results as { summary?: string } | undefined)?.summary ??
-			this.generateSummary(sourceText);
-
-		const overallScore = analyses.length
-			? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
+		const summaryResult = analyses.find((item: any) => item.type === 'summary');$1;$2			(summaryResult?.results as { summary?: string } | undefined)?.summary ??
+			this.generateSummary(sourceText);$1;$2			? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
 			: 0;
 
 		const analysis: ComprehensiveAnalysis = {
@@ -113,9 +105,7 @@ class AdvancedEvidenceAnalyzer {
 		return record ?? null;
 	}
 
-	private composeEvidenceText(evidence: EvidenceRecord): string {
-		const segments: Array<string | null | undefined> = [
-			evidence.title: evidence.description,
+	private composeEvidenceText(evidence: EvidenceRecord): string {$1;$2			evidence.title: evidence.description,
 			evidence.summary,
 			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
 		];
@@ -225,9 +215,7 @@ class AdvancedEvidenceAnalyzer {
 		text: string,
 		startedAt: number
 	): Promise<AnalysisResult> {
-		try {
-			const aiAnalysis = (await this.loadEvidence(request.evidenceId))?.aiAnalysis as : Record<string, unknown>
-				| undefined;
+		try {$1;$2				| undefined;
 
 			if (aiAnalysis && typeof aiAnalysis === 'object') {
 				const existingOcr = this.getStringFromObject(aiAnalysis, ['ocr', 'ocrText', 'text']);
@@ -245,14 +233,8 @@ class AdvancedEvidenceAnalyzer {
 						timestamp: new Date()
 					};
 				}
-			}
-
-			const evidenceRecord = (await this.loadEvidence(
-				request.evidenceId
-			)) as ExtendedEvidenceRecord | null;
-
-			const fileUrlCandidate =
-				this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
+			}$1;$2				request.evidenceId
+			)) as ExtendedEvidenceRecord | null;$1;$2				this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 					'minioUrl',
 					'fileUrl',
 					'source'
@@ -306,9 +288,7 @@ class AdvancedEvidenceAnalyzer {
 						if (res.ok) {
 							const arr = await res.arrayBuffer();
 							const buf = Buffer.from(arr);
-							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });
-							const embedding = ocrResult.text
-								? await this.createEmbeddingVector(ocrResult.text)
+							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });$1;$2								? await this.createEmbeddingVector(ocrResult.text)
 								: null;
 
 							return {
@@ -358,10 +338,7 @@ class AdvancedEvidenceAnalyzer {
 
 	private generateSummary(text: string): string {
 		const normalized = text.replace(/\s+/g, ' ').trim();
-		if (!normalized) return 'No textual content available for this evidence.';
-
-		const sentences = normalized
-			.split(/(?<=[.!?])\s+/)
+		if (!normalized) return 'No textual content available for this evidence.';$1;$2			.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
@@ -369,16 +346,11 @@ class AdvancedEvidenceAnalyzer {
 		return sentences.slice(0, 3).join(' ');
 	}
 
-	private extractKeySentences(text: string): string[] {
-		const sentences = text
-			.split(/(?<=[.!?])\s+/)
+	private extractKeySentences(text: string): string[] {$1;$2			.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
-		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];
-
-		const keySentences = sentences.filter((sentence: any) =>
-			keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
+		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];$1;$2			keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 		);
 
 		return keySentences.slice(0, 5);
@@ -388,9 +360,7 @@ class AdvancedEvidenceAnalyzer {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
 
-		const lower = text.toLowerCase();
-		const score =
-			positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
+		const lower = text.toLowerCase();$1;$2			positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
 			negativeTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0);
 
 		let sentiment = 'neutral';
@@ -410,11 +380,7 @@ class AdvancedEvidenceAnalyzer {
 		dates: string[]; confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
-		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
-		const dateMatches =
-			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];
-		const locationMatches =
-			text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
+		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];$1;$2			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];$1;$2			text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 
 		return {
 			parties: [...new Set(partyMatches)].slice(0, 10),
@@ -434,10 +400,7 @@ class AdvancedEvidenceAnalyzer {
 			intellectualProperty: /\bpatent\b|\btrademark\b|\bcopyright\b/i,
 			employmentLaw: /\btermination\b|\bemployment\b|\bharassment\b/i,
 			compliance: /\bcompliance\b|\bregulation\b|\bpolicy\b/i
-		};
-
-		const matched = Object.entries(patterns)
-			.filter(([regex]) => regex.test(text))
+		};$1;$2			.filter(([regex]) => regex.test(text))
 			.map(([label]) => label);
 
 		const warnings: string[] = [];

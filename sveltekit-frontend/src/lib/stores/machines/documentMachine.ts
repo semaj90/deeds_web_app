@@ -37,10 +37,7 @@ export interface DocumentContext {
  riskScore?: number;
  confidence?: number;
  processedAt?: Date;
-}
-
-export type DocumentEvent =
- | { type: 'UPLOAD'; document: _FallbackLegalDocument }
+}$1;$2 | { type: 'UPLOAD'; document: _FallbackLegalDocument }
  | { type: 'START_PROCESSING' }
  | { type: 'EXTRACT_TEXT'; text: string }
  | { type: 'ANALYZE_AI'; analysis: _FallbackAIAnalysis }
@@ -51,10 +48,7 @@ export type DocumentEvent =
  | { type: 'ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
- | { type: 'RESET' };
-
-export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
- {
+ | { type: 'RESET' };$1;$2 {
  id: 'documentProcessor',
  initial: 'idle',
  context: { processingProgress: 0,

@@ -199,10 +199,7 @@ export class PgVectorIndexingService {
 
 			const limit = options?.limit|| this.maxResults;
 			const threshold = options?.threshold?? 0.5;
-			const vectorStr = this.vectorToString(embedding);
-
-			let query = `
-				SELECT
+			const vectorStr = this.vectorToString(embedding);$1;$2				SELECT
 					e.id:
 					e.content:
 					e.document_id as "documentId",
@@ -256,10 +253,7 @@ export class PgVectorIndexingService {
 			}
 
 			const vectorStr = this.vectorToString(embedding);
-			const keywordEscaped = keyword ? this.escape(keyword) : '';
-
-			let query = `
-				SELECT
+			const keywordEscaped = keyword ? this.escape(keyword) : '';$1;$2				SELECT
 					e.id:
 					e.content:
 					e.document_id as "documentId",
@@ -293,9 +287,7 @@ export class PgVectorIndexingService {
 	 */
 	async deleteDocument(documentId: string): Promise<number> {
 		try {
-			// Delete from embeddings table
-			const embedResult = await this.db.execute(
-				sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+			// Delete from embeddings table$1;$2				sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
 			);
 
 			// Delete from document_chunks table
@@ -316,9 +308,7 @@ export class PgVectorIndexingService {
 		averageEmbeddingDimension: number;
 		indexSize?, string;
 	}> {
-		try {
-			const stats = await this.db.execute(
-				sql.raw(`
+		try {$1;$2				sql.raw(`
 					SELECT
 						(SELECT COUNT(DISTINCT document_id) FROM document_chunks) as total_documents,
 						(SELECT COUNT(*) FROM document_chunks) as total_chunks,

@@ -91,9 +91,7 @@ class SIMDJSONCache {
 	}
 
 	private async checkSIMDSupport(): Promise<boolean> {
-		try {
-			const wasmBytes = new Uint8Array([
-				0x00, 0x61, 0x73, 0x6d,
+		try {$1;$2				0x00, 0x61, 0x73, 0x6d,
 				0x01, 0x00, 0x00, 0x00,
 				0x01, 0x05, 0x01, 0x60, 0x00, 0x01, 0x7b
 			]);
@@ -313,9 +311,7 @@ class SIMDJSONCache {
 		return { ...this.metrics };
 	}
 
-	public getSIMDStatus(): { loaded: boolean; available: boolean; performance: string } {
-		const simdPerformance =
-			this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
+	public getSIMDStatus(): { loaded: boolean; available: boolean; performance: string } {$1;$2			this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
 				? `${Math.round((this.metrics.averageNativeTime / this.metrics.averageSIMDTime) * 100) / 100}x faster`
 				: 'No comparison data';
 
@@ -330,9 +326,7 @@ class SIMDJSONCache {
 		this.cache.clear();
 	}
 
-	public getCacheStats(): { memoryEntries: number; hitRate: number; compressionRatio: number } {
-		const hitRate =
-			this.metrics.totalParses > 0
+	public getCacheStats(): { memoryEntries: number; hitRate: number; compressionRatio: number } {$1;$2			this.metrics.totalParses > 0
 				? this.metrics.cacheHits / this.metrics.totalParses
 				: 0;
 

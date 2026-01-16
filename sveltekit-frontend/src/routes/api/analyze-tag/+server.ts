@@ -73,9 +73,7 @@ export async function POST({ request }: RequestEvent) {
 	}
 };
 
-async function searchTagOccurrences(tag: string, collection: string) {
-	const collections = collection === 'all'
-		? await getCollections()
+async function searchTagOccurrences(tag: string, collection: string) {$1;$2		? await getCollections()
 		: [collection];
 
 	const results: any[] = [];
@@ -116,10 +114,7 @@ async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 		message: o.payload?.message ?? o.payload?.text ?? '',
 		source: o.payload?.source ?? o.payload?.file_path ?? '',
 		collection: o.collection
-	}));
-
-	const prompt = `Analyze this Qdrant tag and provide a concise summary.
-
+	}));$1;$2
 Tag: ${ tag }
 Occurrences: ${occurrences.length}
 

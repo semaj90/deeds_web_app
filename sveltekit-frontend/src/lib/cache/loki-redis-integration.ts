@@ -15,9 +15,7 @@ import { Collection } from 'lokijs';
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
 
-// Conditional imports to avoid circular dependencies
-const redisServicePromise = import('$lib/server/redis-service.js')
- .then((m) => m.redisService)
+// Conditional imports to avoid circular dependencies$1;$2 .then((m) => m.redisService)
  .catch(() => null);
 
 // Define a type for the Redis client to avoid `any`
@@ -191,9 +189,7 @@ export class LokiRedisCache extends EventEmitter {
  this.collections.set(type, collection);
  }
 
- // Search results collection
- const searchCollection =
- this.loki!.getCollection('search_results') ||
+ // Search results collection$1;$2 this.loki!.getCollection('search_results') ||
  this.loki!.addCollection('search_results', {
  indices: ['query', 'timestamp'],
  });
@@ -777,9 +773,7 @@ export class LokiRedisCache extends EventEmitter {
  this.responseTimeTracker.push(responseTime);
  if (this.responseTimeTracker.length > 1000) {
  this.responseTimeTracker = this.responseTimeTracker.slice(-1000);
- }
- const total =
- this.stats.loki.hits +
+ }$1;$2 this.stats.loki.hits +
  this.stats.loki.misses +
  this.stats.redis.hits +
  this.stats.redis.misses;

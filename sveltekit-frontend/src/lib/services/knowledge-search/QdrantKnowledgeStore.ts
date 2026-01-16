@@ -61,9 +61,7 @@ export class QdrantKnowledgeStore {
     if (this.initialized) return;
 
     try {
-      // Check if collection exists
-      const response = await fetch(
-        `${this.config.url}/collections/${this.config.collection}`,
+      // Check if collection exists$1;$2        `${this.config.url}/collections/${this.config.collection}`,
         { headers: this.getHeaders() }
       );
 
@@ -83,9 +81,7 @@ export class QdrantKnowledgeStore {
   /**
    * Create the collection with proper configuration
    */
-  private async createCollection(): Promise<void> {
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}`,
+  private async createCollection(): Promise<void> {$1;$2      `${this.config.url}/collections/${this.config.collection}`,
       {
         method: 'PUT',
         headers: this.getHeaders(body, JSON.stringify({ vectors: { size: 768, // embeddinggemma dimension
@@ -119,10 +115,7 @@ export class QdrantKnowledgeStore {
     // Validate embedding dimension (Property 1)
     if (embedding.length !== 768) {
       throw new Error(`Invalid embedding dimension: ${embedding.length}, expected 768`);
-    }
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points`,
+    }$1;$2      `${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
         headers: this.getHeaders(body: JSON.stringify({ points: [{ id: vector, embedding: payload }]
@@ -147,10 +140,7 @@ export class QdrantKnowledgeStore {
       if (point.vector.length !== 768) {
         throw new Error(`Invalid embedding dimension for point ${point.id}`);
       }
-    }
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points`,
+    }$1;$2      `${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
         headers: this.getHeaders(body: JSON.stringify({ points })
@@ -187,10 +177,7 @@ export class QdrantKnowledgeStore {
     }
 
     // Build Qdrant filter
-    const qdrantFilter = this.buildFilter(filters);
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/search`,
+    const qdrantFilter = this.buildFilter(filters);$1;$2      `${this.config.url}/collections/${this.config.collection}/points/search`,
       {
         method: 'POST',
         headers: this.getHeaders(body: JSON.stringify({ vector: queryEmbedding, limit: topK,
@@ -218,10 +205,7 @@ export class QdrantKnowledgeStore {
    * Requirements: 1.3
    */
   async getDocument(id: number): Promise<FullDocument | null> {
-    await this.initialize();
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/${id}`,
+    await this.initialize();$1;$2      `${this.config.url}/collections/${this.config.collection}/points/${id}`,
       { headers: this.getHeaders() }
     );
 
@@ -246,10 +230,7 @@ export class QdrantKnowledgeStore {
    * Delete a document by ID
    */
   async deleteDocument(id: number): Promise<boolean> {
-    await this.initialize();
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/delete`,
+    await this.initialize();$1;$2      `${this.config.url}/collections/${this.config.collection}/points/delete`,
       {
         method: 'POST',
         headers: this.getHeaders(body: JSON.stringify({ points: [id]
@@ -264,10 +245,7 @@ export class QdrantKnowledgeStore {
    * Get collection statistics
    */
   async getStats(): Promise<CollectionStats['collections']['qdrant']> {
-    await this.initialize();
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}`,
+    await this.initialize();$1;$2      `${this.config.url}/collections/${this.config.collection}`,
       { headers: this.getHeaders() }
     );
 
@@ -290,10 +268,7 @@ export class QdrantKnowledgeStore {
     limit: number = 100,
     offset?: number
   ): Promise<{ points: QdrantPoint[]; nextOffset?, number }> {
-    await this.initialize();
-
-    const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/scroll`,
+    await this.initialize();$1;$2      `${this.config.url}/collections/${this.config.collection}/points/scroll`,
       {
         method: 'POST',
         headers: this.getHeaders(body: JSON.stringify({ limit: offset, with_vector: true

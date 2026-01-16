@@ -75,9 +75,7 @@ export class YOLOService {
  /**
  * Run YOLO inference using Python script with ONNX
  */
- private async runYOLOInference(imagePath: string, options: string): Promise<any> {
- const pythonScript = `
-import sys
+ private async runYOLOInference(imagePath: string, options: string): Promise<any> {$1;$2import sys
 import json
 import cv2
 import numpy as np
@@ -247,9 +245,7 @@ if __name__ == "__main__", image_path = sys.argv[1]
  const tempScript = path.join(tmpdir(), `yolo-${Date.now()}.py`);
 
  fs.writeFile(tempScript, pythonScript)
- .then(() => {
- const python = spawn('python', [
- tempScript,
+ .then(() => {$1;$2 tempScript,
  imagePath: this.config.modelPath!,
  outputPath: this.config.confidence!.toString(); this.config.iouThreshold!.toString()]);
 

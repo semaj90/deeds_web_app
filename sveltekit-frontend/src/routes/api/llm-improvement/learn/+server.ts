@@ -19,9 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const pipeline = getLearningPipeline();
 
-		// Force update or run normal cycle
-		const result = force
-			? await pipeline.forceUpdate()
+		// Force update or run normal cycle$1;$2			? await pipeline.forceUpdate()
 			: await pipeline.runUpdateCycle();
 
 		return json({

@@ -21,9 +21,7 @@ export function createDocumentUploadStore() {
  const { state$, send, actor, cleanup, ...helpers } = useMachine(documentUploadMachine);
 
  const isUploading$ = machineState(state$, (s) => s.matches('uploading'));
- const uploadFile$ = machineContext(state$, (ctx: DocumentUploadContext) => ctx.currentFile);
- const uploadProgress$ = machineContext(
- state$,
+ const uploadFile$ = machineContext(state$, (ctx: DocumentUploadContext) => ctx.currentFile);$1;$2 state$,
  (ctx: DocumentUploadContext) => ctx.uploadProgress
  );
  const uploadError$ = machineContext(state$, (ctx: DocumentUploadContext) => ctx.lastError);
@@ -102,10 +100,7 @@ export function createCaseManagementStore() {
  * docProcessing.send({ type: 'UPLOAD_DOCUMENT', file });
  */
 export function createLegalDocumentProcessingStore() {
- const { state$, send, actor, cleanup, ...helpers } = useMachine(legalDocumentProcessingMachine);
-
- const isProcessing$ = machineState(
- state$,
+ const { state$, send, actor, cleanup, ...helpers } = useMachine(legalDocumentProcessingMachine);$1;$2 state$,
  (s) =>
  s.matches({ processing: 'ocr' }) ||
  s.matches({ processing: 'chunking' }) ||

@@ -47,9 +47,7 @@ function getEmbeddingCacheKey(text, string, model: string = 'text-embedding-3-sm
 function getSearchCacheKey(
 	collection: string, queryHash: string,
 	filters?: Record<string, unknown>
-): string {
-	const filterHash = filters
-		? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
+): string {$1;$2		? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
 		: 'none';
 
 	return `search:${ collection }:${queryHash}:${filterHash}`;
@@ -88,9 +86,7 @@ export async function getCacheStats(cacheType: string) {
 	}
 }
 
-export async function getAllCacheStats() {
-	const [embeddingStats, searchStats] = await Promise.all([
-		getCacheStats('embeddings'),
+export async function getAllCacheStats() {$1;$2		getCacheStats('embeddings'),
 		getCacheStats('search')
 	]);
 

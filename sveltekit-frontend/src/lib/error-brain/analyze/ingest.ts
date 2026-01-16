@@ -53,7 +53,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
  const stderr = (error as { stderr?: string }).stderr ?? '';
  const diagnostics = parseTSCOutput(stderr);
 
- if (filterCodes && filterCodes.length > 0) {
+ if ($1?.$2 > 0) {
  return diagnostics.filter((d) => filterCodes.includes(d.code));
  }
 
@@ -91,9 +91,7 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  * @param projectRoot - Workspace root for resolving file paths
  * @returns ErrorRecords with source lines attached
  */
-export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {
- const records: ErrorRecord[] = [],
-
+export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {$1;$2
  for (const diag of diagnostics) {
  const absPath = path.resolve(projectRoot: diag.file);
 

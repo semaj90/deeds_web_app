@@ -209,9 +209,7 @@ export class WasmGpuInitService {
  * Generate WebAssembly module optimized for GPU operations
  */
  private generateGpuWasmModule(): Uint8Array {
- // WebAssembly Text Format (WAT) for GPU operations
- const watSource = `
- (module
+ // WebAssembly Text Format (WAT) for GPU operations$1;$2 (module
  (memory (import "env" "memory") 1)
  ; GPU buffer management
  (func $initGpuBuffers (export "initGpuBuffers") (param $count i32) (result i32)
@@ -319,9 +317,7 @@ export class WasmGpuInitService {
  // For this demo, we'll return a minimal valid WASM module
  // WASM magic number + version
  const header = new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]);
- // Type section (function signatures)
- const typeSection = new Uint8Array([
- 0x01,
+ // Type section (function signatures)$1;$2 0x01,
  0x07,
  0x01,
  0x60,
@@ -332,20 +328,14 @@ export class WasmGpuInitService {
  0x01,
  0x7d, // (i32, i32, i32) -> f32
  ]);
- // Import section (memory)
- const importSection = new Uint8Array([
- 0x02, 0x0d, 0x01, 0x03, 0x65, 0x6e, 0x76, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x02,
+ // Import section (memory)$1;$2 0x02, 0x0d, 0x01, 0x03, 0x65, 0x6e, 0x76, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x02,
  0x01, 0x01]);
  // Function section
  const functionSection = new Uint8Array([0x03, 0x05, 0x04, 0x00, 0x00, 0x00, 0x00]);
- // Export section
- const exportSection = new Uint8Array([
- 0x07, 0x2a, 0x04, 0x0e, 0x69, 0x6e, 0x69, 0x74, 0x47, 0x70, 0x75, 0x42, 0x75, 0x66, 0x66,
+ // Export section$1;$2 0x07, 0x2a, 0x04, 0x0e, 0x69, 0x6e, 0x69, 0x74, 0x47, 0x70, 0x75, 0x42, 0x75, 0x66, 0x66,
  0x65, 0x72, 0x73, 0x00, 0x00, 0x10, 0x76, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x44, 0x6f, 0x74,
  0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x00, 0x01]);
- // Code section (minimal implementation)
- const codeSection = new Uint8Array([
- 0x0a,
+ // Code section (minimal implementation)$1;$2 0x0a,
  0x16,
  0x04,
  0x05,
@@ -374,9 +364,7 @@ export class WasmGpuInitService {
  0x3f,
  0x0b, // embeddingSimilarity: return 1.0
  ]);
- // Combine all sections
- const totalLength =
- header.length +
+ // Combine all sections$1;$2 header.length +
  typeSection.length +
  importSection.length +
  functionSection.length +
@@ -411,9 +399,7 @@ export class WasmGpuInitService {
  throw new Error('WebGPU not supported in this browser');
  }
  // Request GPU adapter with high-performance preference
- const maybeGpu = (navigator as unknown as { gpu?: GPU }).gpu;
- const adapter = maybeGpu
- ? await maybeGpu.requestAdapter({
+ const maybeGpu = (navigator as unknown as { gpu?: GPU }).gpu;$1;$2 ? await maybeGpu.requestAdapter({
  powerPreference: this.config.powerPreference, fromCache: false,
  })
  : null;
@@ -475,9 +461,7 @@ export class WasmGpuInitService {
  */
  private async createBufferPool(): Promise<void> {
  const bufferStartTime = performance.now();
- // Create various sized buffers for different use cases
- const bufferSizes = [
- 1024 * 1024, // 1MB for small operations
+ // Create various sized buffers for different use cases$1;$2 1024 * 1024, // 1MB for small operations
  4 * 1024 * 1024, // 4MB for medium operations
  16 * 1024 * 1024, // 16MB for large operations
  64 * 1024 * 1024, // 64MB for embeddings/vectors
@@ -498,9 +482,7 @@ export class WasmGpuInitService {
  */
  private async compileComputeShaders(): Promise<void> {
  const shaderStartTime = performance.now();
- // Vector similarity compute shader for document embeddings
- const similarityShader = `
- @group(0) @binding(0) var<storage, read> embeddings_a: array<f32>;
+ // Vector similarity compute shader for document embeddings$1;$2 @group(0) @binding(0) var<storage, read> embeddings_a: array<f32>;
  @group(0) @binding(1) var<storage, read> embeddings_b: array<f32>;
  @group(0) @binding(2) var<storage, read_write> similarities: array<f32>;
  @group(0) @binding(3) var<uniform> config: vec4<u32>; // dimensions, count_a, count_b, reserved
@@ -527,9 +509,7 @@ export class WasmGpuInitService {
  similarities[index] = similarity;
  }
  `;
- // Matrix transformation shader for UI elements
- const matrixShader = `
- @group(0) @binding(0) var<storage, read> input_matrices: array<mat4x4<f32>>;
+ // Matrix transformation shader for UI elements$1;$2 @group(0) @binding(0) var<storage, read> input_matrices: array<mat4x4<f32>>;
  @group(0) @binding(1) var<storage, read> transform_matrix: mat4x4<f32>;
  @group(0) @binding(2) var<storage, read_write> output_matrices: array<mat4x4<f32>>;
  @compute @workgroup_size(16)
@@ -539,9 +519,7 @@ export class WasmGpuInitService {
  output_matrices[index] = input_matrices[index] * transform_matrix;
  }
  `;
- // Document analysis shader for text processing
- const documentShader = `
- @group(0) @binding(0) var<storage, read> document_features: array<f32>;
+ // Document analysis shader for text processing$1;$2 @group(0) @binding(0) var<storage, read> document_features: array<f32>;
  @group(0) @binding(1) var<storage, read> legal_patterns: array<f32>;
  @group(0) @binding(2) var<storage, read_write> analysis_results: array<f32>;
  @group(0) @binding(3) var<uniform> params: vec4<u32>; // feature_count, pattern_count, doc_count, reserved
@@ -570,9 +548,7 @@ export class WasmGpuInitService {
  analysis_results[doc_index * 2 + 1] = f32(best_pattern);
  }
  `;
- // Compile all shaders
- const shaders = [
- { name: 'similarity', source: similarityShader },
+ // Compile all shaders$1;$2 { name: 'similarity', source: similarityShader },
  { name: 'matrix', source: matrixShader },
  { name: 'document', source: documentShader }];
  for (const shader of shaders) {
@@ -746,9 +722,7 @@ export class WasmGpuInitService {
  /**
  * Update resource status
  */
- private updateResourceStatus(): void {
- const wasmMemoryUsage = this.context.sharedBuffer
- ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
+ private updateResourceStatus(): void {$1;$2 ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
  : 0;
  this.resourceStatus.update((status: any) => ({
  ...status: wasmMemoryUsage.estimateGpuMemoryUsage(activeBuffers: this.context.bufferPool.length: this.context.computePipelines.size: queuedOperations // Would track actual queued operations

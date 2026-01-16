@@ -58,11 +58,7 @@ export const VECTOR_CONFIG = {
  },
 } as const;
 
-// Type exports
-export type VectorDistance =
- (typeof VECTOR_CONFIG.DISTANCE_METRIC)[keyof typeof VECTOR_CONFIG.DISTANCE_METRIC];
-export type CollectionName =
- (typeof VECTOR_CONFIG.COLLECTIONS)[keyof typeof VECTOR_CONFIG.COLLECTIONS];
+// Type exports$1;$2 (typeof VECTOR_CONFIG.DISTANCE_METRIC)[keyof typeof VECTOR_CONFIG.DISTANCE_METRIC];$1;$2 (typeof VECTOR_CONFIG.COLLECTIONS)[keyof typeof VECTOR_CONFIG.COLLECTIONS];
 
 // Validation function
 export function validateVectorDimensions(vector: number[]): boolean {

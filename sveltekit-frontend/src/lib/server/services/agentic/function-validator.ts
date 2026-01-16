@@ -242,9 +242,7 @@ function validateParameter(name: string, value: any): ValidationResult {
  if (schema.type === 'object' && typeof value === 'object' && value !== null) {
  if (schema.properties) {
  for (const [propName, propSchema] of Object.entries(schema.properties)) {
- if (propName in value) {
- const propValidation = validateParameter(
- `${name}.${propName}`,
+ if (propName in value) {$1;$2 `${name}.${propName}`,
  value[propName],
  propSchema
  );

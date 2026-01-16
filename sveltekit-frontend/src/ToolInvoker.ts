@@ -86,9 +86,7 @@ export class ToolInvoker {
 		this.stats.toolInvocations++;
 		this.stats.svelteCheckRuns++;
 
-		try {
-			const cmd = path
-				? `npx svelte-check --threshold warning --filter "${path}"`
+		try {$1;$2				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
 			const { stdout, stderr } = await execAsync(cmd, {

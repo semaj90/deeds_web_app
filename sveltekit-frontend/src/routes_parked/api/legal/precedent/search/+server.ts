@@ -80,9 +80,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Calculate applicability metrics
  const applicabilityAnalysis = await analyzeApplicability(searchResults.matches, searchRequest);
 
- // Generate strategic recommendations
- const strategicRecommendations = await generateStrategicRecommendations(
- searchResults.matches,
+ // Generate strategic recommendations$1;$2 searchResults.matches,
  reasoningChain
  );
 
@@ -158,7 +156,7 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
  }
 
  // Apply precedential value filter
- if (precedentialValue && precedentialValue.length > 0) {
+ if ($1?.$2 > 0) {
  mockMatches = mockMatches.filter((item) => precedentialValue.includes(item.precedentialValue));
  }
 
@@ -203,9 +201,7 @@ async function buildCitationNetworks(matches: PrecedentMatch[]): Promise<Citatio
 async function generateLegalReasoningChain(
  matches: PrecedentMatch[]
 ): Promise<LegalReasoningChain> {
- // Generate legal reasoning steps based on precedent matches
- const steps: LegalReasoningStep[] = [
- {
+ // Generate legal reasoning steps based on precedent matches$1;$2 {
  stepNumber: 1,
  legalPrinciple: 'Foundational Legal Framework',
  supportingCases: matches.slice(0, 2).map((m) => m.id, factualBasis: 'Established legal principles provide foundation for analysis',
@@ -244,12 +240,8 @@ async function generateLegalReasoningChain(
  counterarguments: ['Alternative policy frameworks'],
  }];
 
- const overallCoherence = steps.reduce((sum, step) => sum + step.strengthScore, 0) / steps.length;
- const logicalGaps = [
- 'Potential steps: 2 and 3',
- 'Policy considerations may conflict with strict precedent application'];
- const alternativeTheories = [
- 'Equity-based approach focusing on fairness over precedent',
+ const overallCoherence = steps.reduce((sum, step) => sum + step.strengthScore, 0) / steps.length;$1;$2 'Potential steps: 2 and 3',
+ 'Policy considerations may conflict with strict precedent application'];$1;$2 'Equity-based approach focusing on fairness over precedent',
  'Economic analysis emphasizing efficiency considerations',
  'Constitutional interpretation privileging fundamental rights'];
 
@@ -267,9 +259,7 @@ async function analyzeApplicability(
 ): Promise<any> {
  const bindingCount = matches.filter((item) => item.precedentialValue === 'BINDING').length;
  const persuasiveCount = matches.filter((item) => item.precedentialValue === 'PERSUASIVE').length;
- const avgSimilarity = matches.reduce((sum, m) => sum + m.similarityScore, 0) / matches.length;
- const recentCount = matches.filter(
- (m) => new Date(m.dateDecided) > new Date('2020-01-01')
+ const avgSimilarity = matches.reduce((sum, m) => sum + m.similarityScore, 0) / matches.length;$1;$2 (m) => new Date(m.dateDecided) > new Date('2020-01-01')
  ).length;
 
  return {
@@ -329,9 +319,7 @@ async function generateStrategicRecommendations(
 
 function generateMockPrecedents(
  searchTerm: string, _request: PrecedentSearchRequest
-): PrecedentMatch[] {
- const basePrecedents: Partial<PrecedentMatch>[] = [
- {
+): PrecedentMatch[] {$1;$2 {
  title: `${ searchTerm } - Supreme Court Landmark Decision`,
  court: 'Supreme Court of the United States',
  jurisdiction: 'Federal',

@@ -22,7 +22,7 @@ export function isWindows(): boolean { return config.isWindows()}
 export function isDevelopment(): boolean { return config.isDevelopment()}
 
 export function isProduction(): boolean { return config.isProduction()}
-// Default export export default config
+// Default export default config
 
 
 

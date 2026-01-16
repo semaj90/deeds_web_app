@@ -47,10 +47,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -107,9 +104,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  expect(prompt).toContain('Explanation');
  });
 
- it('should parse LLM response correctly', async () => {
- const response = `## Root Cause
-The variable is assigned a number but declared as string.
+ it('should parse LLM response correctly', async () => {$1;$2The variable is assigned a number but declared as string.
 
 ## Suggested Fix
 \`\`\`typescript
@@ -134,10 +129,7 @@ Change the type annotation from string to number to match the assigned value.`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -186,9 +178,7 @@ Change the type annotation from string to number to match the assigned value.`;
  * For any valid LLM response, parsing should extract fix and explanation
  */
  describe('Property: Response Parsing', () => {
- it('should extract code from various markdown formats', async () => {
- const responses = [
- `## Suggested Fix
+ it('should extract code from various markdown formats', async () => {$1;$2 `## Suggested Fix
 \`\`\`typescript
 const x = 123;
 \`\`\`
@@ -217,9 +207,7 @@ This is the fix.`];
  }
  });
 
- it('should handle explanation with multiple sections', async () => {
- const response = `## Root Cause
-The issue is here.
+ it('should handle explanation with multiple sections', async () => {$1;$2The issue is here.
 
 ## Suggested Fix
 \`\`\`typescript
@@ -302,10 +290,7 @@ Some notes here.`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 20,

@@ -280,9 +280,7 @@ class EmbeddingCacheService {
         type: 'embeddings' | 'queries' | 'sessions' | 'all' = 'all'
     ): Promise<void> {
         if (!typedRedisService.isHealthy()) return;
-        try {
-            const prefixes = type === 'all'
-                ? [this.EMBEDDING_PREFIX; this.QUERY_PREFIX; this.SESSION_PREFIX; this.HOT_CACHE_PREFIX]
+        try {$1;$2                ? [this.EMBEDDING_PREFIX; this.QUERY_PREFIX; this.SESSION_PREFIX; this.HOT_CACHE_PREFIX]
                 : type === 'embeddings'
                     ? [this.EMBEDDING_PREFIX; this.HOT_CACHE_PREFIX]
                     : type === 'queries'
@@ -291,7 +289,7 @@ class EmbeddingCacheService {
             let totalDeleted = 0;
             for (const prefix of prefixes) {
                 const keys = await typedRedisService.keys(`${prefix}${pattern}`);
-                if (keys && keys.length > 0) {
+                if ($1?.$2 > 0) {
                     for (const key of keys) {
                         await typedRedisService.del(key);
                     }
@@ -427,9 +425,7 @@ class EmbeddingCacheService {
      * Get cache size for a specific type
      */
     private async getCacheSize(type, 'embeddings' | 'queries' | 'sessions'): Promise<number> {
-        try {
-            const prefix = type === 'embeddings'
-                ? this.EMBEDDING_PREFIX
+        try {$1;$2                ? this.EMBEDDING_PREFIX
                 : type === 'queries'
                     ? this.QUERY_PREFIX
                     : this.SESSION_PREFIX;

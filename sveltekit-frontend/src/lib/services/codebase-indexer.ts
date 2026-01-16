@@ -139,10 +139,7 @@ async function indexCodebaseFiles(
 
         if (!embedding || embedding.length === 0) {
           continue;
-        }
-
-        const pointId =
-          parseInt(crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8), 16) %
+        }$1;$2          parseInt(crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8), 16) %
           (10 ** 8);
 
         // Upsert to Qdrant via REST API
@@ -194,9 +191,7 @@ async function indexErrorClusters(): Promise<void> {
     }
   }
 
-  // Fetch error clusters from PostgreSQL
-  const errorClusters = await sql`
-    SELECT DISTINCT
+  // Fetch error clusters from PostgreSQL$1;$2    SELECT DISTINCT
       file_path,
       error_code,
       message,
@@ -223,9 +218,7 @@ async function indexErrorClusters(): Promise<void> {
       console.log(`⚠️  ${ error_code }: ${message.slice(0, 60)}...`);
       console.log(`    File: ${ file_path } (${ error_count } occurrences)`);
 
-      // Create rich query for embedding
-      const errorContext = `
-Error Code: ${error_code}
+      // Create rich query for embedding$1;$2Error Code: ${error_code}
 File: ${ file_path }
 Message: ${ message }
 Occurrences: ${ error_count }
@@ -286,23 +279,14 @@ Phase: Phase 66-79 Error Analysis
 // ============================================================================
 
 function extractFileMetadata(content: string, options: string): any {
-  const lines = content.split('\n');
-
-  const imports = lines
-    .filter((l: any) => l.match(/^import\s+/))
+  const lines = content.split('\n');$1;$2    .filter((l: any) => l.match(/^import\s+/))
     .slice(0, 10)
-    .map((l: any) => l.trim());
-
-  const exports = lines
-    .filter((l: any) => l.match(/^export\s+/))
+    .map((l: any) => l.trim());$1;$2    .filter((l: any) => l.match(/^export\s+/))
     .slice(0, 10)
     .map((l: any) => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
-  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;
-
-  const language = filePath.endsWith('.svelte')
-    ? 'svelte'
+  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;$1;$2    ? 'svelte'
     : filePath.endsWith('.ts')
       ? 'typescript'
       : 'javascript';

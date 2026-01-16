@@ -33,10 +33,7 @@ export interface DocumentUploadContext {
   } | null;
   error: string | null;
   retryCount: number;
-}
-
-export type DocumentUploadEvent =
-  | { type: 'SELECT_FILES'; files: File[] }
+}$1;$2  | { type: 'SELECT_FILES'; files: File[] }
   | { type: 'SUBMIT' }
   | { type: 'RETRY' }
   | { type: 'RESET' };

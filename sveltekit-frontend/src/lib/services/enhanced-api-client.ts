@@ -131,9 +131,7 @@ let lastError: Error | unknown;
  }
 
 const ed = errorData as Record<string, unknown>;
- const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';
- const errMessage = typeof ed?.['message'] === 'string'
- ? (ed['message'] as string);
+ const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';$1;$2 ? (ed['message'] as string);
  : `HTTP ${response.status}`;
  const errDetails = ed?.['details'] ?? ed;
 
@@ -482,7 +480,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  if (status >= 200 && status < 300) {
  const parsed = text ? JSON.parse(text) : {};
  // Expect server to return ApiResponse-like payload
- if (parsed && parsed.data) {
+ if ($1?.$2) {
  resolve(parsed.data);
  } else {
  resolve(parsed);

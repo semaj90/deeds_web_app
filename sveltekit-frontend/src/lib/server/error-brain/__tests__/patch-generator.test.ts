@@ -34,10 +34,7 @@ describe('Error Brain Patch Integration', () => {
  });
 
  it('should parse LLM response correctly', () => {
- const generator = new PatchGenerator(TEST_WORKSPACE);
-
- const llmResponse = `
-Here's the fix:
+ const generator = new PatchGenerator(TEST_WORKSPACE);$1;$2Here's the fix:
 
 \`\`\`typescript
 // File: src/utils.ts
@@ -61,10 +58,7 @@ This should resolve the issue.
  });
 
  it('should handle multiple fixes in one response', () => {
- const generator = new PatchGenerator(TEST_WORKSPACE);
-
- const llmResponse = `
-I found two issues:
+ const generator = new PatchGenerator(TEST_WORKSPACE);$1;$2I found two issues:
 
 \`\`\`typescript
 // File: src/file1.ts
@@ -99,10 +93,7 @@ let b = 20;
  const originalContent = 'const test = "original";\n';
  await fs.writeFile(TEST_FILE, originalContent);
 
- const generator = new PatchGenerator(TEST_WORKSPACE);
-
- const llmResponse = `
-\`\`\`typescript
+ const generator = new PatchGenerator(TEST_WORKSPACE);$1;$2\`\`\`typescript
 // File: test-patch-file.ts
 // Before:
 const test = "original";
@@ -133,10 +124,7 @@ const test = "modified";
  const originalContent = 'const real = "content";\n';
  await fs.writeFile(TEST_FILE, originalContent);
 
- const generator = new PatchGenerator(TEST_WORKSPACE);
-
- const llmResponse = `
-\`\`\`typescript
+ const generator = new PatchGenerator(TEST_WORKSPACE);$1;$2\`\`\`typescript
 // File: test-patch-file.ts
 // Before:
 const fake = "doesntexist";

@@ -286,7 +286,7 @@ export async function searchGrpoThinkingResponses(
  }
 
  let practiceAreaCondition = sql``;
- if (practiceArea && practiceArea.length > 0) {
+ if ($1?.$2 > 0) {
  // Correctly format array for PostgreSQL '?' operator
  const practiceAreaArray = sql`ARRAY[${sql.join(
  practiceArea.map((pa) => sql`${pa}`),
@@ -295,9 +295,7 @@ export async function searchGrpoThinkingResponses(
  practiceAreaCondition = sql`AND (metadata->'practiceArea' ?| ${practiceAreaArray})`;
  }
 
- // Execute advanced similarity search with timestamp weighting
- const results = await db.execute(sql`
- WITH similarity_scores AS (
+ // Execute advanced similarity search with timestamp weighting$1;$2 WITH similarity_scores AS (
  SELECT
  message_id,
  conversation_id,
@@ -438,10 +436,7 @@ export async function getTrendingGrpoPatterns(
  day: '1 day',
  week: '1 week',
  month: '1 month',
- }[timeWindow];
-
- const results = await db.execute(sql`
- WITH thinking_patterns AS (
+ }[timeWindow];$1;$2 WITH thinking_patterns AS (
  SELECT
  thinking_type,
  -- Extract common reasoning patterns

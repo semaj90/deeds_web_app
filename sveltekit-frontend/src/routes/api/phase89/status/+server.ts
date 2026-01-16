@@ -17,9 +17,7 @@ const REDIS_URL = 'redis://localhost:6379/0';
 
 export const GET: RequestHandler = async () => {
 	try {
-		// PostgreSQL Stats
-		const [errorStats, embeddingsCount, fixAttempts, kbCards] = await Promise.all([
-			pgPool.query(`
+		// PostgreSQL Stats$1;$2			pgPool.query(`
 				SELECT
 					COUNT(*) FILTER (WHERE status = 'open') as open,
 					COUNT(*) FILTER (WHERE status = 'stale') as stale,
@@ -42,10 +40,7 @@ export const GET: RequestHandler = async () => {
 
 		// Redis Stats
 		const redisClient = createClient({ url, REDIS_URL });
-		await redisClient.connect();
-
-		const [totalKeys, phase89Keys, embKeys, topkKeys, kbKeys] = await Promise.all([
-			redisClient.dbsize(),
+		await redisClient.connect();$1;$2			redisClient.dbsize(),
 			redisClient.keys('phase89:*').then(k => k.length),
 			redisClient.keys('emb:*').then(k => k.length),
 			redisClient.keys('topk:*').then(k => k.length),
@@ -62,9 +57,7 @@ export const GET: RequestHandler = async () => {
 			kb_keys: kbKeys
 		};
 
-		// Qdrant Stats
-		const qdrantCollections = [
-			'phase89_error_chunks',
+		// Qdrant Stats$1;$2			'phase89_error_chunks',
 			'phase89_ast_embeddings',
 			'phase89_error_clusters',
 			'phase89_rag_patterns',
@@ -88,9 +81,7 @@ export const GET: RequestHandler = async () => {
 			}
 		}
 
-		// Cluster Stats
-		const clusterResult = await pgPool.query(`
-			SELECT
+		// Cluster Stats$1;$2			SELECT
 				cluster_id,
 				cluster_pattern,
 				COUNT(*) as count,
@@ -110,9 +101,7 @@ export const GET: RequestHandler = async () => {
 			}))
 		};
 
-		// Timeline (recent events)
-		const timelineResult = await pgPool.query(`
-			SELECT
+		// Timeline (recent events)$1;$2			SELECT
 				timestamp,
 				event_type,
 				file_path,
@@ -131,9 +120,7 @@ export const GET: RequestHandler = async () => {
 			details: row.details
 		}));
 
-		// Cosine Rankings (top matches)
-		const rankingsResult = await pgPool.query(`
-			SELECT
+		// Cosine Rankings (top matches)$1;$2			SELECT
 				query_text,
 				top_match,
 				similarity_score,

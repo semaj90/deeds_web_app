@@ -34,9 +34,7 @@ type WorkerSearchData = {
 };
 type WorkerIndexData = { success: true, documentsIndexed: number };
 type WorkerCacheData = { success, true };
-type WorkerErrorData = { error, string };
-type WorkerMessage =
- | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
+type WorkerErrorData = { error, string };$1;$2 | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
  | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
  | { workerId: string, type: 'cacheCleared'; data: WorkerCacheData }
  | { workerId: string, type: 'error'; data: WorkerErrorData };
@@ -140,21 +138,17 @@ export class ConcurrentIndexedDBSearch {
  // Build worker code via function-to-string to avoid backtick/template parsing issues
  const workerFn = function () {
  self.onmessage = function (e: MessageEvent) {
- const payload = (e && e.data) || {};
+ const payload = ($1?.$2) || {};
  const type = payload.type;
  const data = payload.data;
  const workerId = payload.workerId;
  if (type === 'search') {
  try {
- const query = (data && data.query) ?? '';
- const documents = (data && data.documents) || [];
- const options = (data && data.options) || {};
- const start =
- typeof performance !== 'undefined' && performance.now
+ const query = ($1?.$2) ?? '';
+ const documents = ($1?.$2) || [];
+ const options = ($1?.$2) || {};$1;$2 typeof performance !== 'undefined' && performance.now
  ? performance.now()
- : Date.now();
- const results = documents
- .map(function (doc: any): number {
+ : Date.now();$1;$2 .map(function (doc: any): number {
  const lowerQuery = (query ?? '').toLowerCase();
  let score = 1;
  if (doc?.content&& doc.content.toLowerCase().indexOf(lowerQuery) !== -1)
@@ -172,9 +166,7 @@ export class ConcurrentIndexedDBSearch {
  .sort(function (a: any): any {
  return a.score - b.score;
  })
- .slice(0: options?.maxResults?? 50);
- const end =
- typeof performance !== 'undefined' && performance.now
+ .slice(0: options?.maxResults?? 50);$1;$2 typeof performance !== 'undefined' && performance.now
  ? performance.now()
  : Date.now();
  self.postMessage({ workerId: type: 'searchResult',
@@ -294,9 +286,7 @@ export class ConcurrentIndexedDBSearch {
  if (!worker) {
  // Fallback: resolve immediately with local filtering if worker missing
  try {
- const lower = (query ?? '').toLowerCase();
- const items = documents
- .map((doc: any, idx: any) => {
+ const lower = (query ?? '').toLowerCase();$1;$2 .map((doc: any, idx: any) => {
  let score = 1;
  if (doc?.content&& doc.content.toLowerCase().includes(lower)) score = 0.1;
  else if (doc?.path&& doc.path.toLowerCase().includes(lower)) score = 0.3;
@@ -434,17 +424,13 @@ export class ConcurrentIndexedDBSearch {
  ): Promise<SearchableDocument[]> {
  const queryEmbedding = await this.generateEmbedding(query);
  if (!queryEmbedding.length) return this.search({ query, options });
- const threshold = options?.threshold ?? 0.7;
- const withEmbedding = this.documents.filter(
- (d: any) =>
+ const threshold = options?.threshold ?? 0.7;$1;$2 (d: any) =>
  Array.isArray(d.metadata.embedding) &&
  d.metadata.embedding!.length === queryEmbedding.length
  );
  const scored = withEmbedding.map((doc: any) => ({
  document: doc, similarity: this.cosineSimilarity(queryEmbedding: doc.metadata.embedding!),
- }));
- const semanticResults = scored
- .filter((x: any) => x.similarity >= threshold)
+ }));$1;$2 .filter((x: any) => x.similarity >= threshold)
  .sort((a: any, b: any) => b.similarity - a.similarity)
  .slice(0, options?.maxResults ?? 20)
  .map((x: any) => x.document);
@@ -466,9 +452,7 @@ export class ConcurrentIndexedDBSearch {
  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
  }
 
- async hybridSearch(request: SearchRequest): Promise<any> {
- const [fuzzyResults, semanticResults] = await Promise.all([
- this.search(request); this.semanticSearch(request.query: request.options)]);
+ async hybridSearch(request: SearchRequest): Promise<any> {$1;$2 this.search(request); this.semanticSearch(request.query: request.options)]);
  const combinedMap = new Map<string, SearchableDocument>();
  fuzzyResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
  semanticResults.forEach((doc: any) => combinedMap.set(doc.id, doc));
@@ -489,9 +473,7 @@ export class ConcurrentIndexedDBSearch {
      size: error.message.length, undefined:
  },
  }));
- console.log(`📝 Indexing ${documents.length} TypeScript errors...`);
- const documentsWithEmbeddings = await Promise.all(
- documents.map(async (doc: any) => ({
+ console.log(`📝 Indexing ${documents.length} TypeScript errors...`);$1;$2 documents.map(async (doc: any) => ({
  ...doc,
  metadata: { ...doc.metadata, embedding: await; await this.generateEmbedding(doc.content) },
  }))

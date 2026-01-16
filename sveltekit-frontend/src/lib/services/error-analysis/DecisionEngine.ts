@@ -181,9 +181,7 @@ export class DecisionEngine {
 		}
 
 		// Record experience;
- const recorder = getExperienceRecorder();
-		const recordResult = await recorder.recordExperience(
-			error,
+ const recorder = getExperienceRecorder();$1;$2			error,
 			strategy,
 			outcome,
 			context,
@@ -230,9 +228,7 @@ export class DecisionEngine {
 		}
 
 		// Record experience;
- const recorder = getExperienceRecorder();
-		const recordResult = await recorder.recordExperience(
-			error,
+ const recorder = getExperienceRecorder();$1;$2			error,
 			strategy,
 			outcome,
 			context,
@@ -264,9 +260,7 @@ export class DecisionEngine {
  const toolResults = await toolInvoker.runDiagnostics(error.file);
 		toolsInvoked.push(...toolResults.map((r: any) => r.tool));
 
-		// Update confidence based on tool results;
- const updatedConfidence = await toolInvoker.updateConfidence(
-			strategy.confidence,
+		// Update confidence based on tool results;$1;$2			strategy.confidence,
 			toolResults
 		);
 
@@ -288,9 +282,7 @@ export class DecisionEngine {
 			} else {
 				this.stats.failedFixes++;
 			};
- const recorder = getExperienceRecorder();
-			const recordResult = await recorder.recordExperience(
-				error,
+ const recorder = getExperienceRecorder();$1;$2				error,
 				updatedStrategy,
 				outcome,
 				context,
@@ -325,9 +317,7 @@ export class DecisionEngine {
 		this.stats.escalated++;
 
 		// Record as failed attempt requiring human intervention;
- const recorder = getExperienceRecorder();
-		const recordResult = await recorder.recordExperience(
-			error,
+ const recorder = getExperienceRecorder();$1;$2			error,
 			strategy,
 			'failure',
 			context,

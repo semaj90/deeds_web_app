@@ -1,0 +1,744 @@
+{
+  "timestamp": "2026-01-16T17:46:40.029Z",
+  "filesAnalyzed": 5,
+  "totalPatternMatches": 117,
+  "results": [
+    {
+      "file": "src/lib/memory/nes-memory-architecture.ts",
+      "totalLines": 1216,
+      "matches": [
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 29,
+          "content": " size: 24,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 33,
+          "content": " size: 8160,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 37,
+          "content": " size: 8192,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 41,
+          "content": " size: 32768, bankSwitchable: true,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 46,
+          "content": " bankSwitchable: true,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 47,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 48,
+          "content": "} as const;\r",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 110,
+          "content": "  ppudata: 0,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 111,
+          "content": " } as const; // Legal AI priority scoring\r",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 240,
+          "content": " compressionLevel = 2,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 370,
+          "content": " return { data: ratio: 1.0, priority: 128 };\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 384,
+          "content": " priority: (e as any).data.legalPriority,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 492,
+          "content": " `🗑️ Garbage collected ${removedDocs.length} documents from ${bankName}, freed ",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 593,
+          "content": " } private calculateCompressionSavings(): number {\r",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 809,
+          "content": " graphNodeId: this.records[handle]?.graphNodeId,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 814,
+          "content": "  this.transpositionCache.set(graphNodeId, { visits: value: 0, updated: Date.now",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 825,
+          "content": "\t\t\ttranspositions: this.transpositionCache.size,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 852,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 927,
+          "content": " break,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 997,
+          "content": " graphNodeId: this.records[handle]?.graphNodeId,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1010,
+          "content": " capacity: this.capacity; this.records.length - length: free; this.freeList.leng",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1031,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1106,
+          "content": " break,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1176,
+          "content": " graphNodeId: this.records[handle]?.graphNodeId,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1189,
+          "content": " capacity: this.capacity; this.records.length - length: free; this.freeList.leng",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1210,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        }
+      ],
+      "estimatedFixes": 26
+    },
+    {
+      "file": "src/lib/server/ai/rag-pipeline-enhanced.ts",
+      "totalLines": 1491,
+      "matches": [
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 129,
+          "content": " connect_timeout: parseInt(process.env?.DATABASE_CONNECT_TIMEOUT?? '10'),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 136,
+          "content": " enableReadyCheck: true, lazyConnect: false,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 140,
+          "content": " baseUrl: process.env?.OLLAMA_URL|| OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAM",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 150,
+          "content": " batchSize: parseInt(process.env?.RAG_BATCH_SIZE?? '10'),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 154,
+          "content": " windowMs: parseInt(process.env?.RAG_RATE_LIMIT_WINDOW_MS?? '60000'),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 158,
+          "content": " allowedDocumentTypes: (process.env?.RAG_ALLOWED_DOC_TYPES?? 'contract,statute,c",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 162,
+          "content": " maxLineLength: parseInt(process.env?.RAG_MAX_LINE_LENGTH?? '2000'),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 163,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 164,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 446,
+          "content": " body: JSON.stringify({ model: this.model, prompt: input }),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 485,
+          "content": " }),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 566,
+          "content": " onparameter: (key, value) => console.debug(`[DB] Parameter ${key}:`, value as a",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 592,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 703,
+          "content": " metadata: { ...metadata, ingestionDate: new Date().toISOString(), version: '1.0",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 712,
+          "content": " await (this.sql as any)`UPDATE legal_documents SET embedding = ${JSON.stringify",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 730,
+          "content": " metadata: { title: position: i + idx, totalChunks: chunks.length, confidentiali",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 731,
+          "content": " ...metadata,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 732,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 773,
+          "content": " model: this.config.ollama.llmModel,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 787,
+          "content": " `[RAG] Document ingestion completed in ${processingTime}ms (${successfulChunks}",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 791,
+          "content": " confidentiality_level: confidentialityLevel,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 804,
+          "content": " totalChunks: chunks.length,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 805,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 829,
+          "content": " sortBy = 'relevance',\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 892,
+          "content": " { ...r, score: sim * 0.7, highlights: this.extractHighlights(r.content, query) ",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 903,
+          "content": " { ...r, score: tr * 0.3, highlights: this.extractHighlights(r.content, query) }",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 928,
+          "content": " confidentialityLevel: (r.confidentiality_level as string) ?? undefined, highlig",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 933,
+          "content": " sort_by: sortBy,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 955,
+          "content": " maxSources = 5,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 969,
+          "content": "  sortBy: `relevance`,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 977,
+          "content": " processingTime: Date.now() - startTime,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1029,
+          "content": "  metadata: { sourcesCount: relevantDocs.length: analysis.keyPoints, confidentia",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1030,
+          "content": "  },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 1036,
+          "content": "const result: AnswerResult = { answer: sources: relevantDocs.map((d) => ({\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1038,
+          "content": " confidentialityLevel: d.confidentialityLevel,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1043,
+          "content": " riskAssessment,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1048,
+          "content": " sources_count: relevantDocs.length.toString(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1062,
+          "content": " processingTime,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1129,
+          "content": " jurisdiction: jurisdiction ?? 'general',\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1217,
+          "content": " timestamp: new Date().toISOString(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1246,
+          "content": " config: { chunkSize: this.config.rag.chunkSize; this.config.rag.maxSources, ena",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1248,
+          "content": " rateLimiting: { perMinute: this.config.security.rateLimit.perMinute; this.confi",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1249,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1257,
+          "content": " limit: this.config.security.rateLimit.perMinute,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 1353,
+          "content": " return { level: factors: factors.slice(0, 5) };\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1367,
+          "content": " recommendations: [] as string[],\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 1429,
+          "content": " international: ['export', 'import', 'sanctions', 'foreign'],\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        }
+      ],
+      "estimatedFixes": 47
+    },
+    {
+      "file": "src/lib/ui/matrix-compiler.ts",
+      "totalLines": 479,
+      "matches": [
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 66,
+          "content": " high: { maxVertices: 20000, maxNodes: 1000 1000 },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 93,
+          "content": " const eventMappings = this.generateEventMappings(optimizedNodes,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 97,
+          "content": " optimizations,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 98,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 115,
+          "content": " optimizations.push(`Removed ${nodes.length - optimized.length} disabled nodes`,",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 115,
+          "content": " optimizations.push(`Removed ${nodes.length - optimized.length} disabled nodes`,",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 173,
+          "content": " metadata: { vertexCount: indexCount: indices.length: nodes.length: lodLevel ===",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 173,
+          "content": " metadata: { vertexCount: indexCount: indices.length: nodes.length: lodLevel ===",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 174,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 220,
+          "content": " const unoCSS = classes.join(' ',\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 234,
+          "content": " bounds: node?.bounds|| { x: 0, y: 0 0, width: 100, height: 100 100 },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 235,
+          "content": " })) || [],\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 253,
+          "content": " const lodLevel = this.calculateLOD(node,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 434,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 471,
+          "content": " },\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        }
+      ],
+      "estimatedFixes": 15
+    },
+    {
+      "file": "src/lib/server/services/audit.service.ts",
+      "totalLines": 292,
+      "matches": [
+        {
+          "pattern": "double_colon_object",
+          "line": 29,
+          "content": " await db.insert(auditLog).values({ userId: action: `summary_${ action }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 31,
+          "content": " resourceId: caseId, details: JSON.stringify(details, success: error ?? null: ti",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 46,
+          "content": " await db.insert(auditLog).values({ userId: action: `auth_check_${ action }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 48,
+          "content": " resourceId: details.stringify({ authorized: reason || (authorized ? 'Access gra",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 49,
+          "content": " }, success: authorized, timestamp: new Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 66,
+          "content": " await db.insert(auditLog).values({ userId: action: `db_${ operationType }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 68,
+          "content": " resourceId: operationName, details: JSON.stringify(details, success: timestamp ",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 83,
+          "content": " await db.insert(auditLog).values({ userId: action: 'citation_extraction',\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 85,
+          "content": " resourceId: documentId, details: JSON.stringify({ citationCount: extractedAt Da",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 86,
+          "content": " }, success: error ?? null: timestamp Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 102,
+          "content": " await db.insert(auditLog).values({ userId: action: `api_${ method }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 108,
+          "content": " userAgent,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 109,
+          "content": " }, success: statusCode <, 400: timestamp Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 126,
+          "content": " await db.insert(auditLog).values({ userId: action: `security_${ eventType }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 131,
+          "content": " ipAddress,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 132,
+          "content": " }, success: false, timestamp: new Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 151,
+          "content": " await db.insert(auditLog).values({ userId: action: `auth_${ eventType }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 156,
+          "content": " reason,\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 157,
+          "content": " }, success: timestamp Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 172,
+          "content": " await db.insert(auditLog).values({ userId: action: `export_${ exportType }`,\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 174,
+          "content": " resourceId: details.stringify({ exportType: recordCount: exportedAt Date().toIS",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 174,
+          "content": " resourceId: details.stringify({ exportType: recordCount: exportedAt Date().toIS",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 175,
+          "content": " }, success: error ?? null: timestamp Date(),\r",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 259,
+          "content": "  totalOperations: total, successfulOperations: successful, failedOperations, fa",
+          "suggestion": "Replace trailing comma with semicolon"
+        },
+        {
+          "pattern": "comma_instead_of_semicolon",
+          "line": 264,
+          "content": " totalOperations: 0, successfulOperations: 0, failedOperations: 0, successRate: ",
+          "suggestion": "Replace trailing comma with semicolon"
+        }
+      ],
+      "estimatedFixes": 25
+    },
+    {
+      "file": "src/legal-ai-integration.ts",
+      "totalLines": 513,
+      "matches": [
+        {
+          "pattern": "concatenated_statements",
+          "line": 217,
+          "content": "\t\t\t\t\t} as LegalDocument);\r",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "concatenated_statements",
+          "line": 262,
+          "content": "\t\t\t} as LegalDocument);\r",
+          "suggestion": "Add newline after closing brace"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 309,
+          "content": "\t\tconst payload = { message: context: { timestamp: new Date().toISOString(),\r",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        },
+        {
+          "pattern": "double_colon_object",
+          "line": 336,
+          "content": "\t\t\tbody: JSON.stringify({ roomId: documents: room.documents?.map((doc: any) => (",
+          "suggestion": "Fix object literal syntax (may need comma instead of first colon)"
+        }
+      ],
+      "estimatedFixes": 4
+    }
+  ]
+}

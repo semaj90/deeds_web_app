@@ -63,9 +63,7 @@ export async function handleCreateEvidence(user: UserType, request: Request, any
  if (!title || !fileName) {
  return json({ success: false, error: 'Title and filename are required' }, { status: 400 });
  }
- const drizzleDb = db as PostgresJsDatabase<typeof schema>;
- const [newEvidence] = await drizzleDb
- .insert(schema.evidenceTable)
+ const drizzleDb = db as PostgresJsDatabase<typeof schema>;$1;$2 .insert(schema.evidenceTable)
  .values({
  title,
  description,

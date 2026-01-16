@@ -4,9 +4,7 @@ import { boolean, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-c
  * Error Suggestions
  * AI-generated or manual fix suggestions for errors
  * Matches actual PostgreSQL schema
- */
-export const errorSuggestionsTable = pgTable(
-  'error_suggestions',
+ */$1;$2  'error_suggestions',
   {
     id: uuid('id').defaultRandom().primaryKey(),
     routePath: text('route_path').notNull(),

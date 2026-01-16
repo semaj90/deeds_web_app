@@ -158,9 +158,7 @@ describe('ErrorBrainModal Component', () => {
  });
  });
 
- it('should display analyses in list format', async () => {
- const mockAnalyses = [
- {
+ it('should display analyses in list format', async () => {$1;$2 {
  id: '1',
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix 1', description: 'Desc 1' }],
@@ -192,9 +190,7 @@ describe('ErrorBrainModal Component', () => {
  });
  });
 
- it('should display patch count for each analysis', async () => {
- const mockAnalyses = [
- {
+ it('should display patch count for each analysis', async () => {$1;$2 {
  id: '1',
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix', description: 'Desc' }],
@@ -231,9 +227,7 @@ describe('ErrorBrainModal Component', () => {
  });
 
  describe('Analysis Selection', () => {
- it('should display details when analysis is selected', async () => {
- const mockAnalyses = [
- {
+ it('should display details when analysis is selected', async () => {$1;$2 {
  id: '1',
  route_path: TEST_ROUTE_PATH,
  suggestions: [

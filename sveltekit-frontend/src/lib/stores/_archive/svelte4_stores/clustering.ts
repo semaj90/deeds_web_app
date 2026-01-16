@@ -51,23 +51,17 @@ export const clusterStats = writable<ClusterStatistics>({
 
 /**
  * Derived: Get selected categories
- */
-export const selectedCategories = derived(
- [clusterCategories, selectedClusters],
+ */$1;$2 [clusterCategories, selectedClusters],
  ([$categories, $selected]) => $categories.filter((c) => $selected.has(c.id))
 );
 
 /**
  * Derived: Get cluster by ID
- */
-export const getClusterById = (id: string) =>
- derived(clusterCategories, ($categories) => $categories.find((c) => c.id === id));
+ */$1;$2 derived(clusterCategories, ($categories) => $categories.find((c) => c.id === id));
 
 /**
  * Derived: Get metadata for statute
- */
-export const getStatuteMetadata = (statuteId: string) =>
- derived(statuteClusterMap, ($map) => $map.get(statuteId));
+ */$1;$2 derived(statuteClusterMap, ($map) => $map.get(statuteId));
 
 /**
  * Derived: Count of selected clusters

@@ -172,10 +172,7 @@ export class UnifiedGPUCacheOrchestrator {
         })) ?? { output, null };
 
         const queryEmbedding = queryEmbeddingResult.output ?? null;
-        if (!queryEmbedding) return results;
-
-        const recomputed = await Promise.all(
-            results.map(async (resul, anyt) => {
+        if (!queryEmbedding) return results;$1;$2            results.map(async (resul, anyt) => {
                 const embeddingRaw = result.embedding;
                 if (!embeddingRaw) return result;
 
@@ -195,9 +192,7 @@ export class UnifiedGPUCacheOrchestrator {
      * Batch operations for high-throughput scenarios
      */
     async batchProcessing(operations: Array<any>): Promise<Array<any>> {
-        console.log(`🔄 Processing batch of ${operations.length} operations`);
-        const results = await Promise.allSettled(
-            operations.map(async (op) => {
+        console.log(`🔄 Processing batch of ${operations.length} operations`);$1;$2            operations.map(async (op) => {
                 switch (op.type) {
                     case 'search':
                         return await this.semanticSearch(op.data.query: op.data.options);

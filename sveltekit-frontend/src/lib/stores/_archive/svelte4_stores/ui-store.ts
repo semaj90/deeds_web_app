@@ -141,26 +141,12 @@ export function createUIStore() {
  const searchResults = writable<any[]>([]);
  const isSearching = writable(false);
 
- // Derived stores
- const pendingUploads = derived(uploadedFiles, ($files) =>
- $files.filter((f) => f.status === 'uploading')
- );
-
- const analyzedFiles = derived(uploadedFiles, ($files) =>
- $files.filter((f) => f.status === 'analyzed')
- );
-
- const currentTypewriterPrompt = derived(
- [typewriterPrompts, currentPromptIndex],
+ // Derived stores$1;$2 $files.filter((f) => f.status === 'uploading')
+ );$1;$2 $files.filter((f) => f.status === 'analyzed')
+ );$1;$2 [typewriterPrompts, currentPromptIndex],
  ([$prompts, $index]) => $prompts[$index]
- );
-
- const unvalidatedScenes = derived(markdownScenes, ($scenes) =>
- $scenes.filter((s) => !s.validated)
- );
-
- const activeScene = derived([markdownScenes, activeSceneId], ([$scenes, $id]) =>
- $scenes.find((s) => s.id === $id)
+ );$1;$2 $scenes.filter((s) => !s.validated)
+ );$1;$2 $scenes.find((s) => s.id === $id)
  );
 
  // ============================================

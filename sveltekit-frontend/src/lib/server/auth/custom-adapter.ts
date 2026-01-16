@@ -76,9 +76,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
  selectExists: !!(db && typeof db.select === 'function', dbType: typeof db,
  });
  return [null, null];
- }
- const result = await db
- .select({ user: users, session: sessions }) // Corrected select syntax
+ }$1;$2 .select({ user: users, session: sessions }) // Corrected select syntax
  .from(sessions)
  .innerJoin(users, eq(sessions.userId: users.id)) // Changed sessions.user_id to sessions.userId
  .where(eq(sessions.id, sessionId))

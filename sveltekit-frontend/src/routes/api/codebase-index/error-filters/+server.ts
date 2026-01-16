@@ -13,9 +13,7 @@ const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 export const GET: RequestHandler = async () => {
-	try {
-		const response = await fetch(
-			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+	try {$1;$2			`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

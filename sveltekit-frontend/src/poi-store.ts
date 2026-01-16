@@ -16,9 +16,7 @@ import { writable, derived } from 'svelte/store';
 
 /**
  * Types
- */
-export type POIRole =
-	| 'defendant'
+ */$1;$2	| 'defendant'
 	| 'plaintiff'
 	| 'witness'
 	| 'suspect'

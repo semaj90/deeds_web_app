@@ -121,10 +121,7 @@ export async function generateVisionEmbedding(imageBase64: string): Promise<VLME
  const startTime = Date.now();
 
  try {
- console.log(`📸 Generating vision embedding...`);
-
- const prompt = `Analyze this image and provide a detailed description for embedding:
-1. Document type and layout
+ console.log(`📸 Generating vision embedding...`);$1;$21. Document type and layout
 2. Key visual elements
 3. Text content (if visible)
 4. Seals, signatures, or stamps
@@ -191,9 +188,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`TEXT CONTENT:\n${content.text.substring(0, 1000)}`);
  }
 
- if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {
- const layoutDesc = content.layoutBoxes
- .map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
+ if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {$1;$2 .map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
  .join('\n');
  parts.push(`LAYOUT STRUCTURE:\n${layoutDesc}`);
  }
@@ -202,9 +197,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`OCR TEXT:\n${content.ocrText.substring(0, 500)}`);
  }
 
- if (content?.seals&& content.seals.length > 0) {
- const sealDesc = content.seals
- .map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
+ if (content?.seals&& content.seals.length > 0) {$1;$2 .map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
  .join(', ');
  parts.push(`DETECTED SEALS/SIGNATURES: ${sealDesc}`);
  }
@@ -312,9 +305,7 @@ function padEmbedding(embedding: number[]): number[] {
 function generateFallbackEmbedding(content: MultimodalContent), VLMEmbeddingResult {
  const startTime = Date.now();
 
- // Combine all content into a single string
- const combined = [
- content?.text?? '',
+ // Combine all content into a single string$1;$2 content?.text?? '',
  content?.ocrText?? '',
  content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
  content.seals?.map((s) => s.type).join(' ') ?? '']

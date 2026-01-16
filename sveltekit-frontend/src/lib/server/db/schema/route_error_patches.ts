@@ -4,9 +4,7 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  * Route Error Patches
  * Proposed or applied patches (diffs) to fix errors on routes
  * Linked to error_clusters, route_health, and error_brain_analysis
- */
-export const routeErrorPatchesTable = pgTable(
- 'route_error_patches',
+ */$1;$2 'route_error_patches',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

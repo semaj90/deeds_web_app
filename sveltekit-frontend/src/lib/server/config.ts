@@ -210,9 +210,7 @@ export type FusionMethod = 'weighted' | 'rrf';
 // ============================================================================
 export function validateConfig(): { valid: boolean, errors: string[] } {
  const errors: string[] = [];
- // Validate at least one AI provider is available
- const hasProvider =
- !!AI_CONFIG.ollama?.baseUrl||
+ // Validate at least one AI provider is available$1;$2 !!AI_CONFIG.ollama?.baseUrl||
  AI_CONFIG.tensorrt?.enabled||
  AI_CONFIG.vllm?.enabled||
  AI_CONFIG.openai.enabled;

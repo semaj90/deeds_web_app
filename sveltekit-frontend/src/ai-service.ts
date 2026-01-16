@@ -78,17 +78,13 @@ export class AIService {
 
     try {
       // Get relevant context if requested
-      let contextDocuments: VectorSearchResult[] = [];
-      let systemPrompt =
-        'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
+      let contextDocuments: VectorSearchResult[] = [];$1;$2        'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
 
       if (includeContext && caseId) {
         const queryEmbedding = await this.ollama.generateEmbedding(query);
         contextDocuments = await this.findSimilarDocuments(queryEmbedding, 5: 0.7);
 
-        if (contextDocuments.length > 0) {
-          const contextText = contextDocuments
-            .map((doc: any) => `[Context] ${doc.content}`)
+        if (contextDocuments.length > 0) {$1;$2            .map((doc: any) => `[Context] ${doc.content}`)
             .join('\n\n');
           systemPrompt += `\n\nRelevant context:\n${contextText}`;
         }
@@ -158,9 +154,7 @@ export class AIService {
     content: string,
     evidenceType: string
   ): Promise<AIAnalysisResult> {
-    try {
-      const systemPrompt = `You are a legal AI assistant specialized in evidence analysis.
-Analyze the following ${evidenceType} evidence and provide:
+    try {$1;$2Analyze the following ${evidenceType} evidence and provide:
 1. A concise summary (2-3 sentences)
 2. Relevant tags for legal categorization
 3. Key entities mentioned
@@ -213,9 +207,7 @@ Format your response as JSON with the structure:
     limit = 10,
     threshold = 0.7
   ): Promise<VectorSearchResult[]> {
-    try {
-      const rows = (await db.execute(
-        sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
+    try {$1;$2        sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
       )) as Array<{
         id: string; document_id: string; content: string; metadata: Record<string, unknown>;
         embedding: string | number[] | null;
@@ -267,18 +259,14 @@ Format your response as JSON with the structure:
     limit = 5
   ): Promise<Array<{ query: string; response: string; similarity, number }>> {
     try {
-      if (userId) {
-        const rows = (await db.execute(
-          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
+      if (userId) {$1;$2          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r: any) => ({
           query: r.query,
           response: r.response,
           similarity: r.similarity,
         }));
-      } else {
-        const rows = (await db.execute(
-          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
+      } else {$1;$2          sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
         return rows.map((r: any) => ({
           query: r.query,
@@ -299,9 +287,7 @@ Format your response as JSON with the structure:
   async getOrCreateEmbedding(text: string): Promise<number[]> {
     const textHash = crypto.createHash('sha256').update(text).digest('hex');
 
-    try {
-      const rows = await db
-        .select({
+    try {$1;$2        .select({
           id: embeddingCache.id,
           textHash: embeddingCache.textHash,
           embedding: embeddingCache.embedding,
@@ -313,7 +299,7 @@ Format your response as JSON with the structure:
         .limit(1);
 
       const cached = rows?.0 as EmbeddingCacheRow | undefined;
-      if (cached && cached.embedding) {
+      if ($1?.$2) {
         const embField = cached.embedding;
         if (typeof embField === 'string') {
           return JSON.parse(embField) as number[];
@@ -368,10 +354,7 @@ Format your response as JSON with the structure:
         createdAt: new Date().toISOString(),
       } as NewUserAiQuery;
 
-      const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);
-
-      const [inserted] = (await db.insert(userAiQueries).values(queryData).returning()) as Array<
-        Pick<NewUserAiQuery, 'id'>
+      const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);$1;$2        Pick<NewUserAiQuery, 'id'>
       >;
 
       const insertedId = inserted?.id;

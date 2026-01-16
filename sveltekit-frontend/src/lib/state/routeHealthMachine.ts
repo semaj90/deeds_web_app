@@ -23,10 +23,7 @@ export interface RouteHealthContext {
  lastErrorAt?: number;
  lastErrorClusterId?: string;
  lastErrorMessageShort?: string;
-}
-
-export type RouteHealthEvent =
- | {
+}$1;$2 | {
  type: 'ERROR_OBSERVED'; clusterId: string;
  severity: 'warn' | 'error' | 'fatal';
  message: string;
@@ -37,10 +34,7 @@ export type RouteHealthEvent =
 
 // ============================================================================
 // MACHINE DEFINITION
-// ============================================================================
-
-export const createRouteHealthMachine = (routePath: string, file?: string) =>
- createMachine(
+// ============================================================================$1;$2 createMachine(
  {
  id: `routeHealth:${ routePath }`,
  types: { context: {} as RouteHealthContext,

@@ -4,9 +4,7 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  * Error Events
  * Logs individual error occurrences from build/runtime
  * Linked to route_health and error_suggestions
- */
-export const errorEventsTable = pgTable(
- 'error_events',
+ */$1;$2 'error_events',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

@@ -51,7 +51,7 @@ export function createRedisInstance(options?: RedisConnectionOptions): RedisClie
  };
 
  // Only add password if it's actually set and not empty
- if (REDIS_PASSWORD && REDIS_PASSWORD.trim() !== '') {
+ if ($1?.$2() !== '') {
  defaultOptions.password = REDIS_PASSWORD;
  }
 
@@ -110,7 +110,7 @@ export function createRedisConnection(options?: Partial<RedisConnectionOptions>)
  } as RedisConnectionOptions;
 
  // Only add password if it's actually set and not empty
- if (REDIS_PASSWORD && REDIS_PASSWORD.trim() !== '') {
+ if ($1?.$2() !== '') {
  finalOptions.password = REDIS_PASSWORD;
  }
 

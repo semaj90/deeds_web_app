@@ -94,23 +94,14 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
 }
 
 function extractFileMetadata(content: string, filePath: string): any {
-  const lines = content.split('\n');
-
-  const imports = lines
-    .filter(l => l.match(/^import\s+/))
+  const lines = content.split('\n');$1;$2    .filter(l => l.match(/^import\s+/))
     .slice(0, 10)
-    .map(l => l.trim());
-
-  const exports = lines
-    .filter(l => l.match(/^export\s+/))
+    .map(l => l.trim());$1;$2    .filter(l => l.match(/^export\s+/))
     .slice(0, 10)
     .map(l => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
-  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;
-
-  const language = filePath.endsWith('.svelte')
-    ? 'svelte'
+  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;$1;$2    ? 'svelte'
     : filePath.endsWith('.ts')
       ? 'typescript'
       : 'javascript';
@@ -208,10 +199,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const chunk = chunks[idx];
             const embedding = await generateEmbedding(chunk);
 
-            if (!embedding || embedding.length === 0) continue;
-
-            const pointId =
-              parseInt(
+            if (!embedding || embedding.length === 0) continue;$1;$2              parseInt(
                 crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
                 16
               ) %
@@ -288,9 +276,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
         }
       }
 
-      // Fetch error clusters
-      const errorClusters = await sql`
-        SELECT DISTINCT
+      // Fetch error clusters$1;$2        SELECT DISTINCT
           file_path,
           error_code,
           message,
@@ -311,10 +297,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       for (const cluster of errorClusters) {
         try {
-          const { file_path, error_code, message, error_count } = cluster;
-
-          const errorContext = `
-Error Code: ${ error_code }
+          const { file_path, error_code, message, error_count } = cluster;$1;$2Error Code: ${ error_code }
 File: ${ file_path }
 Message: ${ message }
 Occurrences: ${ error_count }
@@ -323,10 +306,7 @@ Phase: Phase 66-79 Error Analysis
 
           const embedding = await generateEmbedding(errorContext);
 
-          if (!embedding || embedding.length === 0) continue;
-
-          const pointId =
-            parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
+          if (!embedding || embedding.length === 0) continue;$1;$2            parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
             (10 ** 8);
 
           const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`, {

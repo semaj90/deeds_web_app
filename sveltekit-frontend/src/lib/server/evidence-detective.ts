@@ -26,7 +26,7 @@ export class EvidenceDetectiveService {
  // Get evidence for the case
  let evidenceQuery = db.select().from(schema.evidence).where(eq(schema.evidence.caseId, caseId));
 
- if (evidenceIds && evidenceIds.length > 0) {
+ if ($1?.$2 > 0) {
  // Filter by specific evidence IDs if provided
  evidenceQuery = evidenceQuery
  .where
@@ -37,10 +37,7 @@ export class EvidenceDetectiveService {
  const evidence = await evidenceQuery;
 
  // Build analysis prompt
- const evidenceText = evidence.map((e) => `${e.title}: ${e.description}`).join('\n');
-
- const analysisPrompt = `
-Evidence Detective Analysis Request: Case, ID: ${ caseId }
+ const evidenceText = evidence.map((e) => `${e.title}: ${e.description}`).join('\n');$1;$2Evidence Detective Analysis Request: Case, ID: ${ caseId }
 Query: ${ query }
 
 Available Evidence:

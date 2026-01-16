@@ -52,9 +52,7 @@ describe('CaseSummaryService', () => {
 		it('should generate and store a new summary', async () => {
 			const caseId = 'case-123';
 			const userId = 'user-456';
-			const text = 'Test summary text';
-			const citations = [
-				{ code: '42 U.S.C. § 1983', title: 'Civil Rights', jurisdiction: 'Federal', url: 'http://example.com' }];
+			const text = 'Test summary text';$1;$2				{ code: '42 U.S.C. § 1983', title: 'Civil Rights', jurisdiction: 'Federal', url: 'http://example.com' }];
 			const holding = 'Test holding statement';
 
 			const dbResult = {
@@ -70,10 +68,7 @@ describe('CaseSummaryService', () => {
 			vi.mocked(db.insert).mockReturnValueOnce({
 				values: vi.fn().mockReturnValueOnce({ returning: vi.fn().mockResolvedValueOnce([dbResult])
 				})
-			} as any);
-
-			const result = await caseSummaryService.generateSummary(
-				caseId,
+			} as any);$1;$2				caseId,
 				text,
 				citations,
 				holding,
@@ -243,9 +238,7 @@ describe('CaseSummaryService', () => {
 
 	describe('getSummaryVersions', () => {
 		it('should retrieve all versions of a summary', async () => {
-			const caseId = 'case-123';
-			const versions = [
-				{ version: 1, summaryText: 'Version 1', createdAt: new Date() },
+			const caseId = 'case-123';$1;$2				{ version: 1, summaryText: 'Version 1', createdAt: new Date() },
 				{ version: 2, summaryText: 'Version 2', createdAt: new Date() }];
 
 			vi.mocked(db.select).mockReturnValueOnce({

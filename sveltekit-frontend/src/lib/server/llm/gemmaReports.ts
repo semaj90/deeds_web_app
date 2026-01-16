@@ -30,15 +30,9 @@ export async function generateReportWithGemma(opts: { caseTitle: string,
  how,
  persons,
  evidence,
- } = opts;
-
- const templateLabel =
- template === 'charging_memo'
+ } = opts;$1;$2 template === 'charging_memo'
  ? 'Charging Memorandum for Prosecutor'
- : 'Intake Summary for Prosecutor';
-
- const prompt = `
-You are a prosecutor-assistant legal AI.
+ : 'Intake Summary for Prosecutor';$1;$2You are a prosecutor-assistant legal AI.
 
 Write a ${templateLabel} in HTML suitable for rendering in a rich text editor (TipTap). Use headings (<h2>), paragraphs, and bullet lists. Do NOT include <html>, <head>, or <body> tags.
 

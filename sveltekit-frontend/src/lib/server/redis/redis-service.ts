@@ -59,7 +59,6 @@ export function getRedisService(): RedisService {
  return redisService;
 }
 
-// Default export
-export default redisService;
+// Default export default redisService;
 
 

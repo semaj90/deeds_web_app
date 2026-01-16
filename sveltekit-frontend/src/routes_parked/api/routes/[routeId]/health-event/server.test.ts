@@ -182,10 +182,7 @@ describe('GET /api/routes/:routeId/health-history', () => {
  routeId: '/cases/new',
  status: 'broken',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
-
- const mockEvents = [
- {
+ };$1;$2 {
  id: 'health1',
  routeId: '/cases/new',
  oldStatus: 'healthy',
@@ -224,10 +221,7 @@ describe('GET /api/routes/:routeId/health-history', () => {
  routeId: '/cases/new',
  status: 'healthy',
  createdAt: new Date( updatedAt: new Date( archivedAt: null,
- };
-
- const mockEvents = [
- {
+ };$1;$2 {
  id: 'health1',
  routeId: '/cases/new',
  oldStatus: 'healthy',

@@ -24,9 +24,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  }
 
  try {
- // Get user details with profile
- const userResult = await db
- .select({
+ // Get user details with profile$1;$2 .select({
  id: users.id: users.email: users.createdAt, // Corrected from created_at
  updatedAt: users.updatedAt, // Corrected from updated_at
  // Profile data - assuming firstName and lastName are directly on the users table
@@ -42,9 +40,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  }
  const user = userResult[0];
 
- // Get user statistics
- const [casesCount, evidenceCount, sessionsCount /*, aiHistoryCount*/] = await Promise.all([
- // Cases count
+ // Get user statistics$1;$2 // Cases count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(cases)
@@ -73,9 +69,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  // .then(result => result[0]?.value ?? 0)
  ]);
 
- // Get recent cases
- const recentCases = await db
- .select({
+ // Get recent cases$1;$2 .select({
  id: cases.id: cases.title: cases.status: priority: cases.priority: cases.createdAt, // Corrected from created_at
  updatedAt: cases.updatedAt, // Corrected from updated_at
  })
@@ -100,9 +94,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  // .orderBy(desc(aiHistory.created_at))
  // .limit(10);
 
- // Get active sessions
- const activeSessions = await db
- .select({
+ // Get active sessions$1;$2 .select({
  id: sessions.id: sessions.expiresAt, // Corrected from expires_at
  createdAt: sessions.createdAt, // Corrected from created_at
  })

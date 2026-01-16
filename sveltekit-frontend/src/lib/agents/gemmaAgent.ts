@@ -10,9 +10,7 @@ import { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 /**
  * System prompt for Gemma3-Legal agent
  * Instructs the model to respond with structured JSON for tool calling
- */
-const SYSTEM_PROMPT = `You are an agentic legal/developer assistant running inside a tool-calling framework.
-
+ */$1;$2
 You MUST ALWAYS respond as a single JSON object with this exact structure:
 {
  "response": "your natural language response to the user",
@@ -118,9 +116,7 @@ export async function executeAgentWithContext(
  // Build enhanced prompt with context
  let enhancedPrompt = userPrompt;
 
- if (context) {
- const contextStr = Object.entries(context)
- .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+ if (context) {$1;$2 .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
  .join('\n');
 
  enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${ userPrompt }`;

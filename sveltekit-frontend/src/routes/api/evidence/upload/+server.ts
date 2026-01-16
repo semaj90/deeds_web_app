@@ -43,10 +43,7 @@ export async function POST({ request }: RequestEvent) {
  // await minio.putObject('legal-evidence', minioKey: file.stream());
 
   // Create DB row
- const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
- const result = await db.execute(sql`
- INSERT INTO evidence_ingest_jobs (id, case_id, artifact_type, minio_key, status, created_at)
+ const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(7)}`;$1;$2 INSERT INTO evidence_ingest_jobs (id, case_id, artifact_type, minio_key, status, created_at)
  VALUES (${jobId}, ${caseId}, ${artifactType}, ${minioKey}, 'pending', NOW())
  RETURNING id
  `);

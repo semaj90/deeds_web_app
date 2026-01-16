@@ -21,9 +21,7 @@ export const GET: RequestHandler = async () => {
 		const srcPath = path.join(process.cwd(), 'src');
 		const routes = await scanDirectory(srcPath);
 
-		// Enrich with error data from PostgreSQL
-		const errorResult = await pgPool.query(`
-			SELECT
+		// Enrich with error data from PostgreSQL$1;$2			SELECT
 				file_path,
 				COUNT(*) as error_count,
 				MAX(metadata) as metadata

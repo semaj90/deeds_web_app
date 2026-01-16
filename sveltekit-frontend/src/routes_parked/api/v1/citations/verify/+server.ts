@@ -93,9 +93,7 @@ async function performYoRHaAnalysis(
 	dbResults: DBRecord[],
 	analysisType: string
 ): Promise<AnalysisResult[]> {
-	// Combine all results
-	const allResults: AnalysisResult[] = [
-;
+	// Combine all results$1;$2;
 		...rerankedResults.map((r: ExternalRerankResult) => ({
 			...(r as unknown as Record<string, unknown>, source: 'enhanced-rag',
 			yorha_type: 'AI_ANALYSIS',
@@ -108,9 +106,7 @@ async function performYoRHaAnalysis(
 		}))
 	];
 
-	// Apply YoRHa-specific scoring and analysis
-	const enhancedResults = await Promise.all(
-,
+	// Apply YoRHa-specific scoring and analysis$1;$2,
 		allResults.map(async result => {
 			const enhancedResult = {
 				...result,
@@ -160,9 +156,7 @@ async function generateYoRHaRecommendations(
 	query: string, analysisResults: AnalysisResult[],
 	_dataType: string = 'documents' // prefixed with underscore to satisfy unused-arg pattern
 ): Promise<Recommendation[]> {
-	// Basic recommendation logic (would be enhanced with actual AI)
-	const recommendations: Recommendation[] = [
-;
+	// Basic recommendation logic (would be enhanced with actual AI)$1;$2;
 		{
 			id: `REC-${Date.now()}-1`,
 			type: 'INVESTIGATE',
@@ -211,7 +205,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Process uploaded files with multi-engine document processing if enabled
 		let processedFiles: any[] = [];
-		if (files && files.length > 0) {
+		if ($1?.$2 > 0) {
 			try {
 				const fileProcessingPromises = files.map(async (file: any) => {
 					const engines = [];
@@ -233,9 +227,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 
-		// Enhanced RAG search with reranking
-		const rerankedResults = await (enhancedSearchWithNeo4j as any)(
-;
+		// Enhanced RAG search with reranking$1;$2;
 			query,
 			`Analyzing ${dataType} for legal insights with ${enableVLM ? 'VLM' : 'text'} processing`,
 			undefined, // neo4jContext omitted for basic search
@@ -283,9 +275,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					.limit(limit);
 				break;
 		}
-		// Combine and analyze results including processed files
-		const analysisResults = await performYoRHaAnalysis(
-;
+		// Combine and analyze results including processed files$1;$2;
 			query,
 			[...rerankedResults, ...processedFiles],
 			dbResults,
@@ -589,10 +579,7 @@ async function extractTextWithLegalVLM(imageData: Buffer | string): Promise<{ ex
 			imageBase64 = imageData;
 		} else {
 			throw new Error('Invalid image data format');
-		}
-
-		const prompt = `Extract all visible text from this legal document image. Focus on:
-;
+		}$1;$2;
 - Contract terms and clauses
 - Legal citations and references
 - Names, dates, and signatures
@@ -666,9 +653,7 @@ async function generateEmbeddings(text: string): Promise<number[]> {
 }
 
 // Helper functions for parsing VLM responses
-function extractSection(text: string, sectionName) | null {
-	const patterns = [
-;
+function extractSection(text: string, sectionName) | null {$1;$2;
 		new RegExp(`${ sectionName }:\\s*([^\\n]+)`, 'i'),
 		new RegExp(`${ sectionName }\\s*:\\s*([\\s\\S]*?)(? =\\n\\n : $)`, 'i')
 	];
@@ -682,9 +667,7 @@ function extractSection(text: string, sectionName) | null {
 	return null;
 }
 
-function extractEntities(text: string): string[] {
-	const entityPatterns = [
-;
+function extractEntities(text: string): string[] {$1;$2;
 		/(?:persons?|individuals?|people):?\s*([^\\n]+)/gi,
 		/(?:organizations?|companies?|entities):?\s*([^\\n]+)/gi,
 		/(?:dates?|times?):?\s*([^\\n]+)/gi,
@@ -704,9 +687,7 @@ function extractEntities(text: string): string[] {
 }
 
 function extractTextContent(text: string): string {
-	// Extract text between quotes or after "text:" markers
-	const textPatterns = [
-;
+	// Extract text between quotes or after "text:" markers$1;$2;
 		/"([^"]+)"/g,
 		/'([^']+)'/g,
 		/text:? \s*([^\\n]+)/gi
@@ -724,9 +705,7 @@ function extractTextContent(text: string): string {
 	return extracted.trim() ?? text;
 }
 
-function extractLegalEntities(text: string): string[] {
-	const legalPatterns = [
-;
+function extractLegalEntities(text: string): string[] {$1;$2;
 		/(?:case|file)\s+(?:no\.?|number)?:?\s*([A-Z0-9\-]+)/gi,
 		/(?:citation|cite):?\s*([^\\n]+)/gi,
 		/(?:contract|agreement)\s+(?:no\.?|number)?:?\s*([^\\n]+)/gi,

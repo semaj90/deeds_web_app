@@ -12,9 +12,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import {
  queryAuditLog,
- getResourceHistory,
- type AuditResourceType,
-} from '$lib/server/services/audit-service';
+ getResourceHistory,$1;$2} from '$lib/server/services/audit-service';
 
 const VALID_RESOURCE_TYPES: AuditResourceType[] = ['Evidence', 'Tag', 'EvidenceTag', 'RAGIndex'];
 

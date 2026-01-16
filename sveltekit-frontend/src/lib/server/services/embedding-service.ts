@@ -86,9 +86,7 @@ export async function generateEmbeddingsBatch(
 
  // Process texts with concurrency limit
  for (let i = 0; i < texts.length; i += concurrency) {
- const batch = texts.slice(i, i + concurrency);
- const batchPromises = batch.map((text, batchIndex) =>
- generateEmbedding(text)
+ const batch = texts.slice(i, i + concurrency);$1;$2 generateEmbedding(text)
  .then((embedding) => {
  embeddings[i + batchIndex] = embedding;
  })

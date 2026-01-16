@@ -1,7 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-
-export const buttonVariants = cva(
-    'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible: ring-offset-2, disabled: opacity-50, disabled:pointer-events-none',
+import { cva, type VariantProps } from 'class-variance-authority';$1;$2    'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible: ring-offset-2, disabled: opacity-50, disabled:pointer-events-none',
     {
         variants: { variant: {
                 default: 'bg-primary text-white hover:bg-primary/90',

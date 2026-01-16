@@ -20,10 +20,7 @@ export interface CacheContext {
  hitRatio: number; responseTime: number;
  } | null;
  semanticQuery?: string; computationCost: number;
-}
-
-export type CacheEvent =
- | { type: 'CACHE_LOOKUP'; key: string; semanticQuery?: string }
+}$1;$2 | { type: 'CACHE_LOOKUP'; key: string; semanticQuery?: string }
  | { type: 'CACHE_HIT'; data: Record<string, unknown>; metadata: CacheContext['cacheMetadata'] }
  | { type: 'CACHE_MISS' }
  | { type: 'CACHE_STORE'; key: string; data: unknown; semanticText?: string }
@@ -32,9 +29,7 @@ export type CacheEvent =
  | { type: 'COMPUTE_REQUIRED'; cost: number }
  | { type: 'FETCH_DATA' }; // Added for createCachedMachineStates example
 
-// Define the return type of cacheActor for better type safety in onDone
-type CacheActorResult =
- | {
+// Define the return type of cacheActor for better type safety in onDone$1;$2 | {
  success: true; hit: true; data: Record<string, unknown>;
  metadata: CacheContext['cacheMetadata'];
  }
@@ -44,9 +39,7 @@ type CacheActorResult =
  | { success: true; synced: true; responseTime: number }
  | { success: false; error: string; responseTime: number };
 
-/** * XState Cache Actor - manages caching operations */
-export const cacheActor = fromPromise(
- async ({
+/** * XState Cache Actor - manages caching operations */$1;$2 async ({
  input,
  }: { input: { operation: 'get' | 'set' | 'invalidate' | 'sync',
  key?: string,
@@ -197,7 +190,7 @@ export const cacheActions = {
  const ctx = context;
  const ev = event;
 
- if (ev && ev.type === 'CACHE_LOOKUP') {
+ if ($1?.$2 === 'CACHE_LOOKUP') {
  return {
  ...ctx,
  cache: {
@@ -214,7 +207,7 @@ export const cacheActions = {
  const ctx = context;
  const ev = event;
 
- if (ev && ev.type === 'COMPUTE_REQUIRED') {
+ if ($1?.$2 === 'COMPUTE_REQUIRED') {
  return {
  ...ctx,
  cache: {

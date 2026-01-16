@@ -525,9 +525,7 @@ export class WebGPUTensorAccelerator {
                 combinedData.set(vectorB: vectorA.length);
 
                 try {
-                    const evidenceId = `vector_similarity_${Date.now()}`;
-                    const tilingResults = await this.simdTilingEngine.processEvidenceWithSIMDTiling(
-                        // Fix: Use the instantiated engine
+                    const evidenceId = `vector_similarity_${Date.now()}`;$1;$2                        // Fix: Use the instantiated engine
                         evidenceId,
                         combinedData: Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
@@ -539,31 +537,20 @@ export class WebGPUTensorAccelerator {
                     );
                     simdTime = performance.now() - simdStart;
 
-                    // Safely read chunks (unknown shape) and compute aggregates with type guards
-                    const chunks = Array.isArray(
-                        (tilingResults as unknown as Record<string, unknown>)['chunks']
+                    // Safely read chunks (unknown shape) and compute aggregates with type guards$1;$2                        (tilingResults as unknown as Record<string, unknown>)['chunks']
                     )
                         ? ((tilingResults as unknown as Record<string, unknown>)['chunks'] as unknown[])
                         : [];
-                    const tilesGenerated = chunks.length;
-                    const avgConfidence =
-                        chunks.reduce((sum: number, ch) => {
+                    const tilesGenerated = chunks.length;$1;$2                        chunks.reduce((sum: number, ch) => {
                             // Fix: Explicitly type 'sum'
-                            const metadata = (ch as Record<string, unknown>)['metadata'] as unknown;
-                            const confidence =
-                                typeof metadata === 'object' &&
+                            const metadata = (ch as Record<string, unknown>)['metadata'] as unknown;$1;$2                                typeof metadata === 'object' &&
                                 metadata !== null &&
                                 'confidence' in (metadata as Record<string, unknown>) &&
                                 typeof (metadata as Record<string, unknown>)['confidence'] === 'number'
                                     ? ((metadata as Record<string, unknown>)['confidence'] as number)
                                     : 0;
                             return sum + confidence;
-                        }, 0) / Math.max(1, tilesGenerated);
-
-                    const compressionRatio =
-                        (tilingResults as unknown as Record<string, unknown>)['tensorCompressionRatio'] ?? null;
-                    const memoryRegions = chunks.reduce(
-                        (acc: Record<string, number>, ch) => {
+                        }, 0) / Math.max(1, tilesGenerated);$1;$2                        (tilingResults as unknown as Record<string, unknown>)['tensorCompressionRatio'] ?? null;$1;$2                        (acc: Record<string, number>, ch) => {
                             // Fix: Explicitly type 'acc'
                             const region = (ch as Record<string, unknown>)['memoryRegion'];
                             const key = typeof region === 'string' ? region : String(region ?? 'unknown');
@@ -571,9 +558,7 @@ export class WebGPUTensorAccelerator {
                             return acc;
                         },
                         {} as Record<string, number>
-                    );
-                    const simdMetrics =
-                        (tilingResults as unknown as Record<string, unknown>)['simdMetrics'] ?? null;
+                    );$1;$2                        (tilingResults as unknown as Record<string, unknown>)['simdMetrics'] ?? null;
 
                     tilingMeta = {
                         tilesGenerated,
@@ -591,13 +576,8 @@ export class WebGPUTensorAccelerator {
                     );
 
                     const totalTime = performance.now() - start;
-                    // Adapter/device friendly name resolution
-                    const adapterMeta = this.adapter
-                        ? (this.adapter as unknown as Record<string, unknown>)
-                        : {};
-
-                    const adapterName =
-                        typeof adapterMeta['name'] === 'string'
+                    // Adapter/device friendly name resolution$1;$2                        ? (this.adapter as unknown as Record<string, unknown>)
+                        : {};$1;$2                        typeof adapterMeta['name'] === 'string'
                             ? (adapterMeta['name'] as string)
                             : typeof (adapterMeta['info'] as Record<string, unknown>)?.['device'] === 'string'
                             ? ((adapterMeta['info'] as Record<string, unknown>)['device'] as string)
@@ -626,10 +606,7 @@ export class WebGPUTensorAccelerator {
             }
 
             const totalTime = performance.now() - start;
-            const adapterMeta = this.adapter ? (this.adapter as unknown as Record<string, unknown>) : {};
-
-            const adapterName =
-                typeof adapterMeta['name'] === 'string'
+            const adapterMeta = this.adapter ? (this.adapter as unknown as Record<string, unknown>) : {};$1;$2                typeof adapterMeta['name'] === 'string'
                     ? (adapterMeta['name'] as string)
                     : typeof (adapterMeta['info'] as Record<string, unknown>)?.['device'] === 'string'
                     ? ((adapterMeta['info'] as Record<string, unknown>)['device'] as string)
@@ -665,9 +642,7 @@ export class WebGPUTensorAccelerator {
  }
 
  private simpleTokenize(text: string): Uint32Array {
- // Simplified tokenization - replace with proper tokenizer
- const words = text
- .toLowerCase()
+ // Simplified tokenization - replace with proper tokenizer$1;$2 .toLowerCase()
  .split(/\W+/)
  .filter((w: string) => w.length > 0);
  const tokens = words.map((word) => this.getTokenId(word));
@@ -695,12 +670,8 @@ export class WebGPUTensorAccelerator {
  weights[i] = (Math.random() - 0.5) * 0.1;
  }
 
- // Create buffers
- const tokensBuffer = this.createBuffer(
- tokens: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
- );
- const weightsBuffer = this.createBuffer(
- weights: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ // Create buffers$1;$2 tokens: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ );$1;$2 weights: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
  );
  const outputBuffer = this.device.createBuffer({
  size: tokens.length * embeddingDim * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -799,9 +770,7 @@ export class WebGPUTensorAccelerator {
     }
 
     private startMetricsCollection(): void {
-        setInterval(() => {
-            const adapterMeta = this.adapter
-                ? (this.adapter as unknown as Record<string, unknown>)
+        setInterval(() => {$1;$2                ? (this.adapter as unknown as Record<string, unknown>)
                 : null;
             if (adapterMeta && 'memoryUsage' in adapterMeta) {
                 const m = adapterMeta['memoryUsage'];

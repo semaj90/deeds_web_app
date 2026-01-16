@@ -42,9 +42,7 @@ export const actions: Actions = {
  }
 
  // Validate file
- const maxSize = 50 * 1024 * 1024; // 50MB
- const allowedTypes = [
- 'application/pdf',
+ const maxSize = 50 * 1024 * 1024; // 50MB$1;$2 'application/pdf',
  'image/png',
  'image/jpeg',
  'image/tiff',

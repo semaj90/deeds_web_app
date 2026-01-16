@@ -39,9 +39,7 @@ export async function apiFetch<T = unknown>(
  const res = await fetch(`${url}${qs}`, { method: headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined, controller?.signal,
  } as RequestInit);
  if (!res.ok) throw new Error(`HTTP ${res.status}`);
- const ct = res.headers.get('content-type') ?? '';
- const out = (
- ct.includes('application/json') ? await res.json() : ((await res.text()) as unknown)
+ const ct = res.headers.get('content-type') ?? '';$1;$2 ct.includes('application/json') ? await res.json() : ((await res.text()) as unknown)
  ) as T;
  if (t) clearTimeout(t);
  // Attach lightweight request metadata for observability (non-enumerable)

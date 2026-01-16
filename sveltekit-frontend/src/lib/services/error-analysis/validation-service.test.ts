@@ -62,9 +62,7 @@ $: x = 5;`;
  expect(Array.isArray(errors)).toBe(true);
  });
 
- it('should detect syntax errors', async () => {
- const fileContent = `const x
-const y: string = "hello";`;
+ it('should detect syntax errors', async () => {$1;$2const y: string = "hello";`;
 
  const errors = await validator.validateCode(fileContent, 'test.ts');
 
@@ -161,9 +159,7 @@ function add(a: number): number {
  });
 
  describe('checkForNewErrors', () => {
- it('should detect new errors', async () => {
- const originalErrors: Error[] = [
- {
+ it('should detect new errors', async () => {$1;$2 {
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -171,10 +167,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];
-
- const newErrors: Error[] = [
- {
+ }];$1;$2 {
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -199,9 +192,7 @@ function add(a: number): number {
  expect(introduced[0].message).toBe('Error 2');
  });
 
- it('should return empty array if no new errors', async () => {
- const originalErrors: Error[] = [
- {
+ it('should return empty array if no new errors', async () => {$1;$2 {
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -209,10 +200,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];
-
- const newErrors: Error[] = [
- {
+ }];$1;$2 {
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -432,9 +420,7 @@ const z = 3;`;
  });
 
  it('should validate that new errors are detected consistently', async () => {
- const originalErrors: Error[] = [];
- const newErrors: Error[] = [
- {
+ const originalErrors: Error[] = [];$1;$2 {
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',

@@ -54,9 +54,7 @@ const _ENABLE_GPU = (() => {
 	}
 
 	// Global override (e.g., set on window/globalThis)
-	try {
-		const gv = (globalThis as unknown as Record<string, unknown>)?.ENABLE_GPU as : string
-			| boolean
+	try {$1;$2			| boolean
 			| undefined;
 		if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';
 		if (typeof gv === 'boolean') return gv;
@@ -320,9 +318,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			return cached;
 		}
 
-		const errors = this.parseNPMErrors(npmOutput);
-		const embeddings = this.device
-			? await this.computeErrorEmbeddingsGPU(errors)
+		const errors = this.parseNPMErrors(npmOutput);$1;$2			? await this.computeErrorEmbeddingsGPU(errors)
 			: this.computeErrorEmbeddingsCPU(errors);
 
 		const clusters = this.performSOMClustering(embeddings);
@@ -380,9 +376,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const embeddings: Float32Array[] = [];
 		const embeddingDim = 128;
 
-		for (const error of errors) {
-			const textBuffer = new Uint32Array(
-				error.message.split('').map((c) => c.charCodeAt(0))
+		for (const error of errors) {$1;$2				error.message.split('').map((c) => c.charCodeAt(0))
 			);
 			const embedding = new Float32Array(embeddingDim);
 
@@ -507,10 +501,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			high: 75,
 			medium: 50,
 			low: 25
-		};
-
-		const totalWeight = errors.reduce(
-			(sum, e) => sum + (severityWeights[e.severity] ?? 50),
+		};$1;$2			(sum, e) => sum + (severityWeights[e.severity] ?? 50),
 			0
 		);
 		return Math.min(100, Math.round(totalWeight / errors.length));

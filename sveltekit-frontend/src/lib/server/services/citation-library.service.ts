@@ -98,10 +98,7 @@ class CitationLibraryService {
  const cached = await redis.get(cacheKey);
  if (cached) {
  return JSON.parse(cached);
- }
-
- const collections = await db.raw(`SELECT * FROM citation_collections WHERE id = $1`, [
- collectionId]);
+ }$1;$2 collectionId]);
 
  if (collections.length === 0) {
  return null;
@@ -109,9 +106,7 @@ class CitationLibraryService {
 
  const collection = collections[0] as CitationCollection;
 
- // Get citation count
- const countResult = await db.raw(
- `SELECT COUNT(*) as count FROM collection_citations WHERE collection_id = $1`,
+ // Get citation count$1;$2 `SELECT COUNT(*) as count FROM collection_citations WHERE collection_id = $1`,
  [collectionId]
  );
 
@@ -249,9 +244,7 @@ class CitationLibraryService {
  * Get tags for citation
  */
  async getCitationTags(citationId: string): Promise<CitationTag[]> {
- try {
- const tags = await db.raw(
- `SELECT * FROM citation_tags WHERE citation_id = $1 ORDER BY created_at DESC`,
+ try {$1;$2 `SELECT * FROM citation_tags WHERE citation_id = $1 ORDER BY created_at DESC`,
  [citationId]
  );
 
@@ -266,9 +259,7 @@ class CitationLibraryService {
  * Get citations in collection
  */
  async getCollectionCitations(collectionId: string): Promise<any[]> {
- try {
- const citations = await db.raw(
- `SELECT sc.*, cc.added_at
+ try {$1;$2 `SELECT sc.*, cc.added_at
  FROM collection_citations cc
  JOIN saved_citations sc ON cc.citation_id = sc.id
  WHERE cc.collection_id = $1
@@ -287,9 +278,7 @@ class CitationLibraryService {
  * Get popular tags
  */
  async getPopularTags(limit: number = 20): Promise<{ tag: string, count, number }[]> {
- try {
- const tags = await db.raw(
- `SELECT tag, COUNT(*) as count
+ try {$1;$2 `SELECT tag, COUNT(*) as count
  FROM citation_tags
  GROUP BY tag
  ORDER BY count DESC

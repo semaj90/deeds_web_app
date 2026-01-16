@@ -15,9 +15,7 @@ import {
  CircuitBreaker,
  ServiceHealthMonitor,
  ErrorCategory,
- RecoveryStrategy,
- type ErrorRecoveryContext,
-} from '../error-recovery.js';
+ RecoveryStrategy,$1;$2} from '../error-recovery.js';
 
 describe('Error Handling - Property 3: Error Handling', () => {
   beforeEach(async () => {
@@ -35,9 +33,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  */
 
  describe('Error Classification', () => {
- it('should classify network errors correctly', () => {
- const networkErrors = [
- new Error('Network error'),
+ it('should classify network errors correctly', () => {$1;$2 new Error('Network error'),
  new Error('fetch failed'),
  new Error('Connection refused'),
  new Error('ECONNREFUSED')];
@@ -48,9 +44,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify timeout errors correctly', () => {
- const timeoutErrors = [
- new Error('Timeout'),
+ it('should classify timeout errors correctly', () => {$1;$2 new Error('Timeout'),
  new Error('Request timed out'),
  new Error('Operation timeout')];
 
@@ -60,9 +54,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify validation errors correctly', () => {
- const validationErrors = [
- new Error('Validation failed'),
+ it('should classify validation errors correctly', () => {$1;$2 new Error('Validation failed'),
  new Error('Invalid input'),
  new Error('Required field missing')];
 
@@ -72,9 +64,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify service errors correctly', () => {
- const serviceErrors = [
- new Error('Service unavailable'),
+ it('should classify service errors correctly', () => {$1;$2 new Error('Service unavailable'),
  new Error('500 Internal Server Error'),
  new Error('503 Service Unavailable')];
 
@@ -149,9 +139,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
 
  describe('Backoff Delay Calculation', () => {
- it('should calculate exponential backoff delays', () => {
- const delays = [
- calculateBackoffDelay(1, 100),
+ it('should calculate exponential backoff delays', () => {$1;$2 calculateBackoffDelay(1, 100),
  calculateBackoffDelay(2, 100),
  calculateBackoffDelay(3, 100),
  calculateBackoffDelay(4, 100)];
@@ -238,9 +226,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  expect(executeFn).toHaveBeenCalledTimes(1);
  });
 
- it('should retry on failure and succeed', async () => {
- const executeFn = vi
- .fn()
+ it('should retry on failure and succeed', async () => {$1;$2 .fn()
  .mockRejectedValueOnce(new Error('Network error'))
  .mockResolvedValueOnce({ success, true });
 

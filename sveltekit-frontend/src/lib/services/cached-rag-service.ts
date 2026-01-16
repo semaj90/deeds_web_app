@@ -84,9 +84,7 @@ type $PostgresJSONStore = {
 // These helpers assume server endpoints exist under /api/* and are small wrappers for typing.
 export function getOllamaEndpoint(): string {
  // Prefer server-side env vars (process.env), then Vite-style runtime vars (import.meta.env),
- // finally fall back to sensible defaults constructed from host/port to avoid hardcoded URL literals.
- const serverEnv =
- typeof process !== 'undefined' && typeof process.env !== 'undefined'
+ // finally fall back to sensible defaults constructed from host/port to avoid hardcoded URL literals.$1;$2 typeof process !== 'undefined' && typeof process.env !== 'undefined'
  ? process.env.OLLAMA_API_URL ?? process.env.OLLAMA_URL
   | undefined;
 
@@ -100,14 +98,10 @@ export function getOllamaEndpoint(): string {
  viteEnv = undefined;
  }
 
- // Construct fallback from host/port envs (avoid a single hardcoded full URL literal)
- const fallbackHost =
- (typeof process !== 'undefined' &&
+ // Construct fallback from host/port envs (avoid a single hardcoded full URL literal)$1;$2 (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_HOST) ||
- (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_HOST) ?? 'localhost';
- const fallbackPort =
- (typeof process !== 'undefined' &&
+ (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_HOST) ?? 'localhost';$1;$2 (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_PORT) ||
  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_PORT) ?? '11434';
@@ -140,14 +134,10 @@ export async function ollamaEmbed(
  const body = await resp.json().catch((error: any) => ({}) as Record<string, unknown>);
 
  // Ollama may respond as { embedding: [...], model: `...` } for single,
- // or { embeddings: [[...], [...]], model: `...` } for batch, or variations.
- const singleEmbedding =
- Array.isArray((body as Record<string, unknown>)['embedding']) &&
+ // or { embeddings: [[...], [...]], model: `...` } for batch, or variations.$1;$2 Array.isArray((body as Record<string, unknown>)['embedding']) &&
  ((body as Record<string, unknown>)['embedding'] as unknown[]).every(
  (n: any) => typeof n === 'number'
- );
- const batchEmbeddings =
- Array.isArray((body as Record<string, unknown>)['embeddings']) &&
+ );$1;$2 Array.isArray((body as Record<string, unknown>)['embeddings']) &&
  ((body as Record<string, unknown>)['embeddings'] as unknown[]).every((e: any) =>
  Array.isArray(e)
  );
@@ -163,9 +153,7 @@ export async function ollamaEmbed(
  }));
  }
 
- // fallback: some services return results/outputs
- const results = ((body as Record<string, unknown>)['results'] ??
- (body as Record<string, unknown>)['output'] ??
+ // fallback: some services return results/outputs$1;$2 (body as Record<string, unknown>)['output'] ??
  []) as unknown[];
  if (Array.isArray(results) && results.length > 0) {
  // try to extract numeric arrays
@@ -352,9 +340,7 @@ class CachedRAGService {
  console.log(`🔍 Processing enhanced RAG query: "${(query?.query?? '').substring(0, 50)}..."`);
 
  // 1: Get cached query results (includes vector search)
- const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
- const queryResult = (await caching.getCachedQueryResults?.(
- query.query: query.filters,
+ const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;$1;$2 query.query: query.filters,
  async (queryEmbedding: number[]) => {
  // This function performs the actual vector search when cache misses
  return await this.performVectorSearch(queryEmbedding: query.filters);
@@ -363,16 +349,11 @@ class CachedRAGService {
  cacheStats.totalCacheTime += Number(queryResult?.processingTime ?? 0);
 
  // 2: Get cached response using gemma3:legal-latest
- const rawResults: any[] = Array.isArray(queryResult?.results) ? queryResult.results : [];
- const contextTexts: string[] = rawResults
- .map((r: any) => {
+ const rawResults: any[] = Array.isArray(queryResult?.results) ? queryResult.results : [];$1;$2 .map((r: any) => {
  const rr = r as Record<string, unknown> | null;
  return String(this.extractResultField(rr, 'excerpt', 'content') ?? '').trim();
  })
- .filter(Boolean);
-
- const responseResult = (await caching.getCachedResponse?.(
- query.query,
+ .filter(Boolean);$1;$2 query.query,
  contextTexts,
  async (q: string, ctx: string[]) => {
  return await this.generateLegalResponse(q, ctx);
@@ -444,9 +425,7 @@ class CachedRAGService {
  metadata: { ...(metadata ?? {}, chunkIndex: index, documentId },
  }));
 
- const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
- const embeddingResults: EmbeddingResult[] =
- (await caching.getCachedBatchEmbeddings.batchRequest) ?? [];
+ const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;$1;$2 (await caching.getCachedBatchEmbeddings.batchRequest) ?? [];
 
  // Optionally persist raw chunks to Postgres jsonb for audit
  try {
@@ -456,10 +435,7 @@ class CachedRAGService {
  });
  } catch {
  // non-fatal
- }
-
- const embeddingsGenerated = embeddingResults.filter((it: any) =>
- Array.isArray(it.embedding)
+ }$1;$2 Array.isArray(it.embedding)
  ).length;
  const embeddingsCached = embeddingResults.filter((it: any) => !!it.cached).length;
 
@@ -587,9 +563,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
 		chunkSize: number = 1000,
 		overlap: number = 100
 	): string[] {
- const chunks: string[] = [];
- const words = String(content ?? '')
- .split(/\s+/)
+ const chunks: string[] = [];$1;$2 .split(/\s+/)
  .filter(Boolean);
  if (words.length === 0) return [];
 
@@ -623,9 +597,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
  }
 
  /** * Warmup cache with common legal queries */
- async warmupCacheWithLegalQueries(): Promise<void> {
- const commonLegalQueries = [
- 'What constitutes breach of contract?',
+ async warmupCacheWithLegalQueries(): Promise<void> {$1;$2 'What constitutes breach of contract?',
  'Elements of negligence in tort law',
  'Requirements for valid contract formation',
  'Statute of limitations for personal injury claims',

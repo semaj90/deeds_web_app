@@ -6,22 +6,15 @@ export async function load() {
  try {
  console.log('[Laws Layout] Loading jurisdictions...');
 
- // Get distinct jurisdictions
- const jurisdictions = await db
- .selectDistinct({ jurisdiction: laws.jurisdiction })
+ // Get distinct jurisdictions$1;$2 .selectDistinct({ jurisdiction: laws.jurisdiction })
  .from(laws)
  .orderBy(laws.jurisdiction);
 
- // Get statute counts by jurisdiction
- const counts = await db.execute(sql`
- SELECT jurisdiction, COUNT(*) as count
+ // Get statute counts by jurisdiction$1;$2 SELECT jurisdiction, COUNT(*) as count
  FROM laws
  GROUP BY jurisdiction
  ORDER BY jurisdiction
- `);
-
- const countMap = new Map(
- (counts as Array<{ jurisdiction: string, count, number }>).map((row) => [
+ `);$1;$2 (counts as Array<{ jurisdiction: string, count, number }>).map((row) => [
  row.jurisdiction: row.count])
  );
 

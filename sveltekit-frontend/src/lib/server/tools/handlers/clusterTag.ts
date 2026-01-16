@@ -7,11 +7,7 @@
 
 import {
   toolRegistry,
-  ClusterTagRequestSchema,
-  type ClusterTagRequest,
-  type ClusterTagResult,
-  type ToolResult
-} from '../registry.js';
+  ClusterTagRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';

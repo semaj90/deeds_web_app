@@ -69,9 +69,7 @@ export class JobQueueService {
  // Get queue name based on job type
  const queueName = this.getQueueName(payload.type);
 
- // Create job record in database
- const [job] = await db
- .insert(processingJobs)
+ // Create job record in database$1;$2 .insert(processingJobs)
  .values({
  uuid: `job-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
  jobType: payload.type,
@@ -124,9 +122,7 @@ export class JobQueueService {
  * Get job status
  */
  async getJobStatus(jobId: string): Promise<JobResult> {
- try {
- const [job] = await db
- .select()
+ try {$1;$2 .select()
  .from(processingJobs)
  .where(eq(processingJobs.uuid, jobId))
  .limit(1);

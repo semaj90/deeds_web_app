@@ -27,18 +27,11 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  const startTime = Date.now();
 
  try {
- // Check service availability
- const [ollamaAvailable, ollamaModels] = await Promise.allSettled([
- langExtractService.isOllamaAvailable(),
- langExtractService.listAvailableModels().catch(() => [])]);
-
- const isOllamaAvailable =
- ollamaAvailable.status === 'fulfilled' ? ollamaAvailable.value : false;
+ // Check service availability$1;$2 langExtractService.isOllamaAvailable(),
+ langExtractService.listAvailableModels().catch(() => [])]);$1;$2 ollamaAvailable.status === 'fulfilled' ? ollamaAvailable.value : false;
  const availableModels = ollamaModels.status === 'fulfilled' ? ollamaModels.value : [];
 
- // Fetch recent sessions with document counts
- const recentSessionsQuery = db
- .select({
+ // Fetch recent sessions with document counts$1;$2 .select({
  id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount: lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
  })
  .from(ragSessions)
@@ -46,23 +39,17 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  .orderBy(desc(ragSessions.updatedAt))
  .limit(5);
 
- // Fetch recent documents
- const recentDocumentsQuery = db
- .select({
+ // Fetch recent documents$1;$2 .select({
  id: legalDocuments.id: legalDocuments.title: legalDocuments.summary: documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms: legalDocuments.keyTerms,
  })
  .from(legalDocuments)
  .orderBy(desc(legalDocuments.createdAt))
  .limit(10);
 
- // Execute queries in parallel
- const [recentSessions, recentDocuments] = await Promise.all([
- recentSessionsQuery,
+ // Execute queries in parallel$1;$2 recentSessionsQuery,
  recentDocumentsQuery]);
 
- // Count documents per session
- const sessionsWithCounts = await Promise.all(
- recentSessions.map(async (session) => {
+ // Count documents per session$1;$2 recentSessions.map(async (session) => {
  const [{ count }] = await db
  .select({ count: sql<number>`count(*)` })
  .from(legalDocuments)
@@ -76,9 +63,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  })
  );
 
- // Get total counts for metadata
- const [totalDocumentsResult, totalSessionsResult] = await Promise.all([
- db.select({ count: sql<number>`count(*)` }).from(legalDocuments),
+ // Get total counts for metadata$1;$2 db.select({ count: sql<number>`count(*)` }).from(legalDocuments),
  db.select({ count: sql<number>`count(*)` }).from(ragSessions)]);
 
  const totalDocuments = totalDocumentsResult.length;

@@ -187,9 +187,7 @@ let _defaultVectorizer: null = null;
  */
 export function getPhase72Vectorizer(): Phase72Vectorizer {
  if (!_defaultVectorizer) {
- // Try to load model from standard location (optional)
- const modelPath =
- process.env?.PHASE72_MODEL_PATH||
+ // Try to load model from standard location (optional)$1;$2 process.env?.PHASE72_MODEL_PATH||
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({

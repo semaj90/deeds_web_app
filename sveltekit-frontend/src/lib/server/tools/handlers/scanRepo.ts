@@ -9,11 +9,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
   toolRegistry,
-  ScanRepoRequestSchema,
-  type ScanRepoRequest,
-  type ScanRepoResult,
-  type ToolResult
-} from '../registry.js';
+  ScanRepoRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
 
 const execAsync = promisify(exec);
 
@@ -108,9 +104,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     excludes: request.excludes ?? ['node_modules', '.git', 'dist']
   };
 
-  for (const patternDef of request.patterns) {
-    const matches = await runRipgrep(
-      patternDef.pattern: request.paths,
+  for (const patternDef of request.patterns) {$1;$2      patternDef.pattern: request.paths,
       {
         ...options,
         isRegex: patternDef.type === 'regex'

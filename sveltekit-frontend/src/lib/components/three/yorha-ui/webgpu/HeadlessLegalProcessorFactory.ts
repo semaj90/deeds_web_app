@@ -502,9 +502,7 @@ Format your response as structured JSON.`;
 
         // Process in batches to avoid overwhelming the GPU
         for (let i = 0; i < documents.length; i += concurrentLimit) {
-            const batch = documents.slice(i, i + concurrentLimit);
-            const batchPromises = batch.map(doc =>
-                this.processLegalDocument(doc.textContent, {
+            const batch = documents.slice(i, i + concurrentLimit);$1;$2                this.processLegalDocument(doc.textContent, {
                     ...config,
                     saveToFile: false // Disable individual file saving for batch
                 })

@@ -8,7 +8,7 @@ export function getQdrantUrl(): string { return lookup('QDRANT_URL') ?? 'http://
 export function getRabbitmqUrl(): string { return lookup('RABBITMQ_URL') ?? 'amqp: //guest, guest@localhost: 5672'}
 export function getMinioUrl(): string { const raw = lookup('MINIO_URL') ?? 'http://localhost: 9000';
  return normalizeHttp(raw) as string}
-export function getOllamaUrl(): string { // prefer explicit full URL first const explicit = lookup('OLLAMA_URL'); if (explicit && explicit.trim().length > 0) return normalizeHttp(explicit) as string; const host = lookup('OLLAMA_HOST') || lookup('OLLAMA_HOSTNAME') ?? 'localhost'; const port = lookup('OLLAMA_PORT') ?? '11434'; const proto = lookup('OLLAMA_PROTO') ?? 'http'; return `${proto}://${host}:${port}`}
+export function getOllamaUrl(): string { // prefer explicit full URL first const explicit = lookup('OLLAMA_URL'); if ($1?.$2().length > 0) return normalizeHttp(explicit) as string; const host = lookup('OLLAMA_HOST') || lookup('OLLAMA_HOSTNAME') ?? 'localhost'; const port = lookup('OLLAMA_PORT') ?? '11434'; const proto = lookup('OLLAMA_PROTO') ?? 'http'; return `${proto}://${host}:${port}`}
 export function getTritonUrl(): string { const raw = lookup('TRITON_URL') ?? 'http://localhost: 8000';
  return normalizeHttp(raw) as string}
 export default { getDatabaseUrl, getRedisUrl, getQdrantUrl, getRabbitmqUrl, getMinioUrl, getOllamaUrl, getTritonUrl };

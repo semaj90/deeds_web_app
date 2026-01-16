@@ -3,10 +3,7 @@
  *
  * These entries appear in the command center with labeled intent tags
  * for system consolidation, archive cleanup, and evidence grid unification.
- */
-
-export const phase6_72_restructure_tasks = [
- // System Tab Tasks
+ */$1;$2 // System Tab Tasks
  {
  id: 'api-consolidation',
  tab: 'system',

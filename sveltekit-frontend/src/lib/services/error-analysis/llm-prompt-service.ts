@@ -90,9 +90,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Retrieving prompts for error ${errorId}`);
 
  try {
- const promptIds = this.errorIdIndex.get(errorId) || [];
- const prompts = promptIds
- .map((id: any) => this.prompts.get(id))
+ const promptIds = this.errorIdIndex.get(errorId) || [];$1;$2 .map((id: any) => this.prompts.get(id))
  .fil(: anyt)er((p) => p !== undefined) as LLMPrompt[];
 
  // Sort by creation date descending (newest first)
@@ -168,19 +166,13 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  this.log('info', `Deleting prompt ${promptId}`);
 
- try {
- const prompt = this.prompts.get(promptId,
- if (!prompt) {
+ try {$1;$2 if (!prompt) {
  throw new Error(`Prompt ${promptId} not found`, }
 
  // Remove from main storage
  this.prompts.delete(promptId);
 
- // Remove from error ID index
- const errorPrompts = this.errorIdIndex.get(prompt.errorId,
- if (errorPrompts) {
- const index = errorPrompts.indexOf(promptId,
- if (index > -1) {
+ // Remove from error ID index$1;$2 if (errorPrompts) {$1;$2 if (index > -1) {
  errorPrompts.splice(index, 1, }
  }
 

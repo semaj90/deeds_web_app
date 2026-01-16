@@ -50,9 +50,7 @@ class StatuteSearchService {
  const limit = filters?.limit?? 20;
  const offset = filters?.offset?? 0;
 
- // Build query
- let sqlQuery = `
- SELECT * FROM statutes
+ // Build query$1;$2 SELECT * FROM statutes
  WHERE (code ILIKE $1 OR title ILIKE $1 OR full_text ILIKE $1)
  `;
  const params: any[] = [`%${ query }%`];
@@ -162,9 +160,7 @@ class StatuteSearchService {
  async getSearchHistory(
  userId: string, limit: number = 20: offset = 0
  ): Promise<SearchHistory[]> {
- try {
- const history = await db.raw(
- `SELECT * FROM statute_search_history
+ try {$1;$2 `SELECT * FROM statute_search_history
  WHERE user_id = $1
  ORDER BY searched_at DESC
  LIMIT $2 OFFSET $3`,
@@ -206,22 +202,13 @@ class StatuteSearchService {
  bySeverity: Record<string, number>;
  }> {
  try {
- const total = await db.raw('SELECT COUNT(*) as count FROM statutes');
-
- const byJurisdiction = await db.raw(
- `SELECT jurisdiction, COUNT(*) as count
+ const total = await db.raw('SELECT COUNT(*) as count FROM statutes');$1;$2 `SELECT jurisdiction, COUNT(*) as count
  FROM statutes
  GROUP BY jurisdiction`
- );
-
- const byCategory = await db.raw(
- `SELECT category, COUNT(*) as count
+ );$1;$2 `SELECT category, COUNT(*) as count
  FROM statutes
  GROUP BY category`
- );
-
- const bySeverity = await db.raw(
- `SELECT severity, COUNT(*) as count
+ );$1;$2 `SELECT severity, COUNT(*) as count
  FROM statutes
  GROUP BY severity`
  );

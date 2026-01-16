@@ -14,26 +14,17 @@
 
 // =============================================================================
 // Enums
-// =============================================================================
-
-export type SourceType =
-  | 'document'
+// =============================================================================$1;$2  | 'document'
   | 'statute'
   | 'case_law'
   | 'regulation'
   | 'contract'
   | 'evidence'
   | 'precedent'
-  | 'expert_opinion';
-
-export type ValidationStatus =
-  | 'pending'
+  | 'expert_opinion';$1;$2  | 'pending'
   | 'approved'
   | 'rejected'
-  | 'needs_review';
-
-export type ConfidenceLevel =
-  | 'high'    // score >= 0.85
+  | 'needs_review';$1;$2  | 'high'    // score >= 0.85
   | 'medium'  // score >= 0.70
   | 'low'     // score >= 0.50
   | 'marginal'; // score < 0.50

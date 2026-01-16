@@ -393,9 +393,7 @@ export class MinioKnowledgeStore {
    * Build URL for MinIO request
    */
   private buildUrl(key: string): string {
-    const protocol = this.config.useSSL ? 'https' : 'http';
-    const port = this.config.port !== 80 && this.config.port !== 443
-      ? `:${this.config.port}`
+    const protocol = this.config.useSSL ? 'https' : 'http';$1;$2      ? `:${this.config.port}`
       : '';
     return `${protocol}://${this.config.endpoint}${port}/${this.config.bucket}/${key}`;
   }

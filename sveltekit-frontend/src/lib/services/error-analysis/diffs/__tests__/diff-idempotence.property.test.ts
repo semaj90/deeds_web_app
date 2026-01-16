@@ -115,13 +115,9 @@ describe('Diff Idempotence Property Tests', () => {
 	});
 
 	describe('Validation Cycle', () => {
-		it('detects no regression when errors decrease', () => {
-			const beforeErrors = [
-				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects no regression when errors decrease', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(2): error, TS2304: Cannot find name "bar"'
-			];
-			const afterErrors = [
-				'test.ts(1): error, TS2304: Cannot find name "foo"'
+			];$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"'
 			];
 
 			const regression = validator.detectRegression(beforeErrors, afterErrors);
@@ -132,12 +128,8 @@ describe('Diff Idempotence Property Tests', () => {
 			expect(regression.newErrors).toHaveLength(0);
 		});
 
-		it('detects regression when new errors appear', () => {
-			const beforeErrors = [
-				'test.ts(1): error, TS2304: Cannot find name "foo"'
-			];
-			const afterErrors = [
-				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects regression when new errors appear', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"'
+			];$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(3): error, TS2304: Cannot find name "baz"'
 			];
 
@@ -149,9 +141,7 @@ describe('Diff Idempotence Property Tests', () => {
 			expect(regression.fixedErrors).toHaveLength(0);
 		});
 
-		it('detects no regression when errors stay the same', () => {
-			const errors = [
-				'test.ts(1): error, TS2304: Cannot find name "foo"',
+		it('detects no regression when errors stay the same', () => {$1;$2				'test.ts(1): error, TS2304: Cannot find name "foo"',
 				'test.ts(2): error, TS2304: Cannot find name "bar"'
 			];
 
@@ -227,9 +217,7 @@ describe('Diff Idempotence Property Tests', () => {
 	});
 
 	describe('Error Parsing', () => {
-		it('parses TypeScript error output correctly', () => {
-			const output = `
-src/test.ts(10): error, TS2304: Cannot find name 'foo'.
+		it('parses TypeScript error output correctly', () => {$1;$2src/test.ts(10): error, TS2304: Cannot find name 'foo'.
 src/test.ts(15): error, TS2322: Type 'string' is not assignable to type 'number'.
 Found 2 errors in 1 file.
 			`;

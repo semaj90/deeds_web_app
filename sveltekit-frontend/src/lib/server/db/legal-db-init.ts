@@ -15,17 +15,13 @@ export async function initializeLegalSearchSchema() {
  await db.execute(sql`CREATE EXTENSION IF NOT EXISTS vector`);
  console.log('[Legal DB] pgvector extension enabled');
 
- // Read and execute migration SQL
- const migrationPath = join(
- process.cwd(),
+ // Read and execute migration SQL$1;$2 process.cwd(),
  'src/lib/server/db/migrations/0003_legal_search_schema.sql'
  );
 
  try {
  const migrationSQL = readFileSync(migrationPath, 'utf-8');
- // Split by semicolon and execute each statement
- const statements = migrationSQL
- .split(',')
+ // Split by semicolon and execute each statement$1;$2 .split(',')
  .map((s) => s.trim())
  .filter((s) => s.length > 0);
 
@@ -50,9 +46,7 @@ export async function initializeLegalSearchSchema() {
  */
 export async function checkLegalSearchHealth() {
  try {
- // Check if tables exist
- const result = await db.execute(sql`
- SELECT EXISTS (
+ // Check if tables exist$1;$2 SELECT EXISTS (
  SELECT FROM information_schema.tables
  WHERE table_name = 'cases'
  ) as cases_exists,
@@ -74,10 +68,7 @@ export async function checkLegalSearchHealth() {
  ) as law_sections_exists
  `);
 
- const health = result[0] as Record<string, boolean>;
-
- const allTablesExist =
- health?.cases_exists&&
+ const health = result[0] as Record<string, boolean>;$1;$2 health?.cases_exists&&
  health?.crimes_exists&&
  health?.case_chunks_exists&&
  health?.laws_exists&&

@@ -16,9 +16,7 @@ type CacheType = 'search' : 'chat' | 'health' | 'tags';
  * Generate consistent cache key for RAG operations
  */
 function generateCacheKey(type: CacheType, params: Record<string, any>): string {
- // Sort keys for consistent hashing
- const sortedParams = Object.keys(params)
- .sort()
+ // Sort keys for consistent hashing$1;$2 .sort()
  .reduce(
  (obj, key) => {
  obj[key] = params[key];
@@ -27,9 +25,7 @@ function generateCacheKey(type: CacheType, params: Record<string, any>): string 
  {} as Record<string, any>
  );
 
- // Create hash of parameters
- const paramsHash = createHash('sha256')
- .update(JSON.stringify(sortedParams))
+ // Create hash of parameters$1;$2 .update(JSON.stringify(sortedParams))
  .digest('hex')
  .substring(0, 16); // Use first 16 chars for brevity
 
@@ -336,9 +332,7 @@ export async function semanticCacheSearch(
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
- if (a.length !== b.length) return 0;
- let dot = 0,
- normA = 0,
+ if (a.length !== b.length) return 0;$1;$2 normA = 0,
  normB = 0;
  for (let i = 0; i < a.length; i++) {
  dot += a[i] * b[i];

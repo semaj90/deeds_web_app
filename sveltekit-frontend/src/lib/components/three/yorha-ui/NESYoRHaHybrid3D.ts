@@ -237,9 +237,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 		return this.crtShader;
 	}
 
-	private addScanlineEffect(): void {
-		const scanlineGeometry = new THREE.PlaneGeometry(
-			(this.hybridStyle?.width?? 2) * 1.1,
+	private addScanlineEffect(): void {$1;$2			(this.hybridStyle?.width?? 2) * 1.1,
 			(this.hybridStyle?.height?? 1) * 1.1
 		);
 
@@ -453,9 +451,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	/**
 	 * Create GPU compute shader for different NES pixel effects
 	 */
-	private createPixelProcessingShader(effect, 'quantize' | 'scanlines' | 'crt'): string {
-		const baseShader = `
-@group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
+	private createPixelProcessingShader(effect, 'quantize' | 'scanlines' | 'crt'): string {$1;$2@group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
 @group(0) @binding(1) var<storage, read_write> outputPixels: array<vec4f>;
 @group(0) @binding(2) var<uniform> config: vec4f;
 
@@ -964,10 +960,7 @@ void main() {
 			});
 
 			if (cam) return cam;
-		}
-
-		const aspect = typeof window !== 'undefined' && window?.innerWidth&& window.innerHeight
-			? window.innerWidth / window.innerHeight : 1;
+		}$1;$2			? window.innerWidth / window.innerHeight : 1;
 		return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
 	}
 

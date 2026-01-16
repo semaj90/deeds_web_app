@@ -113,9 +113,7 @@ function parseHoldingResponse(response: string): LegalSummary {
 /**
  * Extract citations from text
  */
-export async function extractCitations(text: string): Promise<string[]> {
- const prompt = `Extract all legal citations from the following text. Include statutes, case names, constitutional references, and regulations.
-
+export async function extractCitations(text: string): Promise<string[]> {$1;$2
 Text:
 ${ text }
 
@@ -166,9 +164,7 @@ export async function summarizeSection(
 /**
  * Validate that response is legal research, not advice
  */
-export function validateLegalResearchOnly(text: string): boolean {
- const advicePatterns = [
- /you should/i,
+export function validateLegalResearchOnly(text: string): boolean {$1;$2 /you should/i,
  /you must/i,
  /i recommend/i,
  /i advise/i,

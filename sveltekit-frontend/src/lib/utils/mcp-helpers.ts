@@ -153,9 +153,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  rag: async (prompt: string, _context?: unknown) => {
  // Added types
  try {
- // leave RAG URL resolution as-is for now (could be centralized similarly)
- const ragUrl =
- typeof window !== 'undefined' ? 'http://localhost:5173' : 'http://localhost:5173'; // Corrected URL string
+ // leave RAG URL resolution as-is for now (could be centralized similarly)$1;$2 typeof window !== 'undefined' ? 'http://localhost:5173' : 'http://localhost:5173'; // Corrected URL string
  const response = await fetch(`${ragUrl}/api/rag`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -199,9 +197,7 @@ export async function copilotOrchestrator(
  results.directory = await mcpReadDirectory(options.directoryPath);
  }
  // Step 6: Multi-Agent Orchestration (dynamic agent registry)
- if (options?.useMultiAgent|| (options?.agents&& options.agents.length > 0)) {
- const agentsToRun =
- options?.agents&& options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
+ if (options?.useMultiAgent|| (options?.agents&& options.agents.length > 0)) {$1;$2 options?.agents&& options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
  results.agentResults = [] as AgentOutcome[];
  for (const agent of agentsToRun) {
  if (agentRegistry[agent]) {
@@ -288,15 +284,9 @@ export interface OrchestrationOptions {
 // centralized endpoint helper for Ollama (respects Vite and Node envs, falls back to localhost)
 export function getOllamaEndpoint(): string {
  /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config: import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
- type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
- const viteUrl =
- typeof import.meta !== 'undefined'
- ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax
- const nodeUrl =
- typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax
- const dockerEnvUrl =
- typeof process !== 'undefined' && typeof process.env !== 'undefined'
+ type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };$1;$2 typeof import.meta !== 'undefined'
+ ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax$1;$2 typeof process !== 'undefined' && typeof process.env !== 'undefined'
+ ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax$1;$2 typeof process !== 'undefined' && typeof process.env !== 'undefined'
  ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL : undefined; // Corrected syntax
  const dockerDefault = 'http://ollama:11434'; // Corrected URL string
  // prefer explicit config first
@@ -525,7 +515,7 @@ export function formatMCPResponse(response: any): string {
  if (typeof response === 'string') {
  return response;
  }
- if (isRecord(response) && 'content' in response && response.content !== undefined) {
+ if (isRecord(response) && 'content' in $1?.$2 !== undefined) {
  const content = (response as { content?: unknown }).content;
  if (Array.isArray(content)) {
  return content.map(formatContentItem).join('\n');
@@ -552,9 +542,7 @@ function formatContentItem(item: any): string {
  if (textVal) return textVal;
  const contentVal = item['content'];
  if (typeof contentVal === 'string') return contentVal;
- if (isRecord(contentVal)) {
- const innerText =
- tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
+ if (isRecord(contentVal)) {$1;$2 tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
  if (innerText) return innerText;
  }
  // fallback to stringified : object
@@ -700,9 +688,7 @@ export async function mcpRankErrors(errorLog: any): Promise<unknown[]> {
  try {
  // If errorLog is an array, perform a simple severity-based sort
  if (Array.isArray(errorLog)) {
- const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a: any, b: any) => {
- const score = (e: Record<string, unknown>) =>
- e.severity === 'critical' ? 3 : e.severity === 'high' ? 2 : 1; // Corrected syntax
+ const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a: any, b: any) => {$1;$2 e.severity === 'critical' ? 3 : e.severity === 'high' ? 2 : 1; // Corrected syntax
  return score(b as Record<string, unknown>) - score(a as Record<string, unknown>);
  });
  return ranked;

@@ -31,9 +31,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
 
  describe('Svelte Error Parsing', () => {
  it('should parse svelte-check output correctly', async () => {
- // Mock extractSvelteErrors to return parsed errors
- const mockSvelteErrors = [
- {
+ // Mock extractSvelteErrors to return parsed errors$1;$2 {
  id: 'test-1',
  file: 'src/routes/+page.svelte',
  line: 10,
@@ -71,9 +69,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[1].severity).toBe('warning');
  });
 
- it('should normalize file paths correctly', async () => {
- const mockSvelteErrors = [
- {
+ it('should normalize file paths correctly', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/routes/+page.svelte',
  line: 10,
@@ -96,9 +92,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  });
 
  describe('TypeScript Error Parsing', () => {
- it('should parse tsc output correctly', async () => {
- const mockTsErrors = [
- {
+ it('should parse tsc output correctly', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/lib/utils.ts',
  line: 25,
@@ -122,9 +116,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].code).toBe('TS2304');
  });
 
- it('should handle both error and warning severity levels', async () => {
- const mockTsErrors = [
- {
+ it('should handle both error and warning severity levels', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,
@@ -190,9 +182,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].status).toBe('new');
  });
 
- it('should include error code when available', async () => {
- const mockTsErrors = [
- {
+ it('should include error code when available', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,
@@ -213,9 +203,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].code).toBe('TS2322');
  });
 
- it('should handle errors without code gracefully', async () => {
- const mockSvelteErrors = [
- {
+ it('should handle errors without code gracefully', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/test.svelte',
  line: 10,
@@ -237,9 +225,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  });
 
  describe('Error Normalization', () => {
- it('should normalize file paths to relative paths', async () => {
- const mockTsErrors = [
- {
+ it('should normalize file paths to relative paths', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/lib/utils.ts',
  line: 10,
@@ -260,9 +246,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].file).toMatch(/^src\//);
  });
 
- it('should trim whitespace from error messages', async () => {
- const mockTsErrors = [
- {
+ it('should trim whitespace from error messages', async () => {$1;$2 {
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,

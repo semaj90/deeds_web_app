@@ -110,9 +110,7 @@ export function createDocumentUploadForm(
   const state = writable(snapshot.status === 'active' ? (snapshot.value as string) : snapshot.status);
   const context = writable(snapshot.context);
 
-  const isValid = derived([form.form], ([$form]) => !!$form);
-  const isSubmitting = derived([state], ([$state]) =>
-    $state === 'uploading' || $state === 'processing' || $state === 'validating'
+  const isValid = derived([form.form], ([$form]) => !!$form);$1;$2    $state === 'uploading' || $state === 'processing' || $state === 'validating'
   );
 
   const errors = derived([form.errors, context], ([$errors, $context]) => {

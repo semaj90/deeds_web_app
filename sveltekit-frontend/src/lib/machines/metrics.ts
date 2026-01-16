@@ -9,10 +9,7 @@ export interface MetricsContext {
  metrics: any | null;
  error: string | null;
  retryCount: number; maxRetries: number;
-}
-
-export type MetricsEvent =
- | { type: 'FETCH' }
+}$1;$2 | { type: 'FETCH' }
  | { type: 'FETCH_SUCCESS'; data: any }
  | { type: 'FETCH_ERROR'; error: string }
  | { type: 'RETRY' }
@@ -20,9 +17,7 @@ export type MetricsEvent =
 
 /**
  * Create metrics state machine
- */
-export const createMetricsMachine = () =>
- createMachine<MetricsContext, MetricsEvent>(
+ */$1;$2 createMachine<MetricsContext, MetricsEvent>(
  {
  id: 'metrics',
  initial: 'idle',

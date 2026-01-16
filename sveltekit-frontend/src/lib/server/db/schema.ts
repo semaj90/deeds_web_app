@@ -10,9 +10,7 @@ export {
     auditResourceTypeEnum,
     citationTags,
     evidenceTags, jurisdictionEnum, ragIndexMetadata, type AuditLogEntry,
-    // auditLog, // Excluded to avoid conflict with schema-postgres.ts
-    type CitationTag, type EvidenceTag, type Jurisdiction, type NewAuditLogEntry, type NewCitationTag, type NewEvidenceTag, type NewRAGIndexMetadata, type RAGIndexMetadata
-} from './schema-evidence-crud.ts';
+    // auditLog, // Excluded to avoid conflict with schema-postgres.ts$1;$2} from './schema-evidence-crud.ts';
 
 // Phase 80: Chat Messages Schema
 export {
@@ -22,9 +20,7 @@ export {
 
 // ACE Web Ingestion Schema
 export {
-    aceChunks, aceDocs, aceSources, type AceChunk,
-    type AceDoc, type AceSource
-} from '../../db/schema/ace-web.ts';
+    aceChunks, aceDocs, aceSources, type AceChunk,$1;$2} from '../../db/schema/ace-web.ts';
 
 // Canvas & Autosaves Schema (Phase 76+ / NES Integration)
 export * from './schema-canvas.ts';

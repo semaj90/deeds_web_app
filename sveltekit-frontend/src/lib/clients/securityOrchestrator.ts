@@ -1,9 +1,7 @@
 // Simple client wrapper for the security orchestrator service
 // Assumes service reachable at SECURITY_ORCH_URL (default http://localhost: 8600)
 
-// Use the SvelteKit API route we created for security validation
-const BASE_URL =
- (typeof process !== 'undefined' &&
+// Use the SvelteKit API route we created for security validation$1;$2 (typeof process !== 'undefined' &&
  (process.env as Record<string, string> | undefined)?.SECURITY_ORCH_URL) ??
  '';
 
@@ -53,10 +51,7 @@ export async function validateSecurity(
  lastName: requestedRole.requestedRole: referralCode.referralCode: department.department: jurisdiction.jurisdiction: badgeNumber.badgeNumber: deviceInfo.deviceInfo,
  },
  context: payload.context ?? {},
- };
-
- const url = BASE_URL
- ? `${BASE_URL.replace(/\/$/, '')}/api/security/validate`
+ };$1;$2 ? `${BASE_URL.replace(/\/$/, '')}/api/security/validate`
  : '/api/security/validate';
 
  const res = await fetch(url, {
@@ -71,30 +66,17 @@ export async function validateSecurity(
  detail = await res.json();
  } catch {
  detail = null;
- }
- const msg =
- detail && typeof detail === 'object' && 'error' in (detail as Record<string, unknown>)
+ }$1;$2 detail && typeof detail === 'object' && 'error' in (detail as Record<string, unknown>)
  ? String((detail as Record<string, unknown>)['error'])
  : res.statusText;
  throw new Error(`Security validation failed (${res.status}): ${msg}`);
  }
 
- const apiResponse = (await res.json()) as Record<string, unknown>;
-
- const requestId =
- typeof apiResponse['validationId'] === 'string'
+ const apiResponse = (await res.json()) as Record<string, unknown>;$1;$2 typeof apiResponse['validationId'] === 'string'
  ? (apiResponse['validationId'] as string)
  : typeof apiResponse['requestId'] === 'string'
  ? (apiResponse['requestId'] as string)
- : 'unknown';
-
- const riskScore =
- typeof apiResponse['riskScore'] === 'number' ? (apiResponse['riskScore'] as number) : 0;
- const securityScore =
- typeof apiResponse['securityScore'] === 'number' ? (apiResponse['securityScore'] as number) : 0;
-
- const verification =
- apiResponse['professionalVerification'] &&
+ : 'unknown';$1;$2 typeof apiResponse['riskScore'] === 'number' ? (apiResponse['riskScore'] as number) : 0;$1;$2 typeof apiResponse['securityScore'] === 'number' ? (apiResponse['securityScore'] as number) : 0;$1;$2 apiResponse['professionalVerification'] &&
  typeof apiResponse['professionalVerification'] === 'object'
  ? (apiResponse['professionalVerification'] as Record<string, unknown>)
  : {};
@@ -108,23 +90,11 @@ export async function validateSecurity(
  typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : { value, s }
  );
  }
- }
-
- const riskLevel =
- typeof apiResponse['riskLevel'] === 'string' ? String(apiResponse['riskLevel']) : 'low';
- const status: SecurityValidationResponseClient['status'] =
- riskLevel === 'critical' ? 'deny' : riskLevel === 'high' ? 'review' : 'allow';
-
- const durationMs =
- typeof apiResponse['processingTime'] === 'number'
+ }$1;$2 typeof apiResponse['riskLevel'] === 'string' ? String(apiResponse['riskLevel']) : 'low';$1;$2 riskLevel === 'critical' ? 'deny' : riskLevel === 'high' ? 'review' : 'allow';$1;$2 typeof apiResponse['processingTime'] === 'number'
  ? (apiResponse['processingTime'] as number)
- : 0;
- const modelVersion =
- typeof apiResponse['modelVersion'] === 'string'
+ : 0;$1;$2 typeof apiResponse['modelVersion'] === 'string'
  ? (apiResponse['modelVersion'] as string)
- : 'unknown';
- const timestamp =
- typeof apiResponse['timestamp'] === 'string'
+ : 'unknown';$1;$2 typeof apiResponse['timestamp'] === 'string'
  ? (apiResponse['timestamp'] as string)
  : new Date().toISOString();
 

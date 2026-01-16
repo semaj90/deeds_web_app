@@ -87,9 +87,7 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
 
  this.log('info', `Formatting prompt for error ${error.id}`);
 
- try {
- const prompt = `You are an expert TypeScript/Svelte developer. Analyze the following error and provide a fix.
-
+ try {$1;$2
 ${context}
 
 Please provide:

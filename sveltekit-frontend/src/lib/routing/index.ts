@@ -50,15 +50,9 @@ const registeredRouteRegistry = RR.routeRegistry ?? RR.RouteRegistry ?? null;
 const registryView = registeredRouteRegistry as unknown as {
  get?: (id: string) => unknown;
  getAll?: () => unknown[];
-} | null;
-
-const getRegisteredRoute = (id: string) =>
- RR.getRoute.id ??
+} | null;$1;$2 RR.getRoute.id ??
  // fallback to routeRegistry.get if present (use typed view)
- (registryView && typeof registryView.get === 'function' ? registryView.get!(id) : undefined);
-
-const registerDynamicRoute = (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) =>
- RR.registerDynamicRoute?.(id, path, cfg) ??
+ (registryView && typeof registryView.get === 'function' ? registryView.get!(id) : undefined);$1;$2 RR.registerDynamicRoute?.(id, path, cfg) ??
  // fallback: some registries provide registerRoute(id, descriptor)
  (RR.registerRoute?.(id, { route: path, ...(cfg ?? {}) }) as unknown);
 
@@ -72,22 +66,15 @@ export {
  getDynamicRoutesByCategory,
  removeDynamicRoute,
  hasDynamicRoute,
- createDynamicRouteHandler,
- type DynamicRouteConfig,
- type GeneratedRoute,
-} from './dynamic-route-generator.js';
+ createDynamicRouteHandler,$1;$2$1;$2} from './dynamic-route-generator.js';
 
 // Export the raw module namespace plus safe aliases for commonly expected members.
 export { RouteRegistry };
 
 // Export commonly-used registry members if they exist, with safe fallbacks.
-export const routeRegistry = RR.routeRegistry ?? RR.RouteRegistry ?? null;
-export const routes = (RR.routes ??
- (routeRegistry && (routeRegistry as unknown as { routes?: unknown }).routes) ??
+export const routeRegistry = RR.routeRegistry ?? RR.RouteRegistry ?? null;$1;$2 (routeRegistry && (routeRegistry as unknown as { routes?: unknown }).routes) ??
  []) as unknown;
-export const dynamicRoutes = RR.dynamicRoutes ?? ([] as unknown);
-export const allRegisteredRoutes =
- RR.allRegisteredRoutes ?? ((typeof RR.getAll === 'function' ? RR.getAll!() : []) as unknown);
+export const dynamicRoutes = RR.dynamicRoutes ?? ([] as unknown);$1;$2 RR.allRegisteredRoutes ?? ((typeof RR.getAll === 'function' ? RR.getAll!() : []) as unknown);
 export const currentRoute = RR.currentRoute ?? null;
 export const favoriteRoutes = RR.favoriteRoutes ?? null;
 export const recentRoutes = RR.recentRoutes ?? null;
@@ -257,7 +244,7 @@ export function matchRoute(
 
  // simple length mismatch -> not a match, except when pattern ends with a splat
  const lastPattern = patternParts[patternParts.length - 1];
- const isSplat = lastPattern && lastPattern.startsWith('...');
+ const isSplat = $1?.$2('...');
  if (!isSplat && patternParts.length !== pathParts.length) {
  return { match: false, params };
  }
@@ -348,14 +335,9 @@ export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dyna
 } {
  const dynamicRoutes = getAllDynamicRoutes();
 
- // try to read registered static routes from route registry if available
- const staticFromRegistry =
- registryView && typeof registryView.getAll === 'function'
+ // try to read registered static routes from route registry if available$1;$2 registryView && typeof registryView.getAll === 'function'
  ? (registryView.getAll!() as Array<Record<string, unknown>>)
- : [];
-
- const routeList = [
- ...staticFromRegistry.map((r) => ({
+ : [];$1;$2 ...staticFromRegistry.map((r) => ({
  id: String(r['id'] ?? '', path: , String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
   category: r['category'] as, string | undefined, status: r['status'] as, string | undefined,
  })),

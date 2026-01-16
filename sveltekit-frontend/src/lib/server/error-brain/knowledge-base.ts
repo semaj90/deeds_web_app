@@ -116,9 +116,7 @@ export class KnowledgeBase {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`, },
- const data = await response.json( return data.embedding,
- } catch (error) {
+ throw new Error(`Ollama embedding failed: ${response.status}`, },$1;$2 } catch (error) {
  console.error('Failed to generate embedding:', error, throw error, }
  }
 
@@ -193,9 +191,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText, = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patterns
- const results, = await db.execute<ErrorPattern>(sql`
-				SELECT
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patterns$1;$2				SELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
 					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
@@ -233,9 +229,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText, = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patches
- const results, = await db.execute<PatchKnowledge>(sql`
-				SELECT
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patches$1;$2				SELECT
 					id, patch_content, target_file, error_fixed,
 					applied, successful, timestamp, run_id,
 					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
@@ -261,9 +255,7 @@ export class KnowledgeBase {
  * Get learning suggestions for an error
  */
  async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence, number;
- }> {
- const [similarErrors, suggestedPatches], = await Promise,.all,([
- this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
+ }> {$1;$2 this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
 
  // Calculate confidence based on results
  let confidence, = 0;
@@ -283,9 +275,7 @@ export class KnowledgeBase {
  }> {
  await this,.initialize,();
 
- try {
- const [patternsResult, patchesResult], = await Promise.all([
- db.execute(sql`
+ try {$1;$2 db.execute(sql`
 					SELECT
 						COUNT(*) as total,
 						AVG(success_rate) as avg_success_rate

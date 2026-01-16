@@ -4,9 +4,7 @@ const LANGEXTRACT_API_URL = env?.LANGEXTRACT_API_URL?? 'http://localhost:8000';
 
 /**
  * Section types for legal documents
- */
-export type SectionType =
-  | 'facts'
+ */$1;$2  | 'facts'
   | 'issues'
   | 'reasoning'
   | 'holding'
@@ -64,10 +62,7 @@ export async function extractSectionsFromText(
   documentType: 'statute' | 'case' = 'case'
 ): Promise<LangExtractOutput> {
   try {
-    console.log(`[LangExtract] Extracting sections from document: ${documentId}`);
-
-    const prompt =
-      documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
+    console.log(`[LangExtract] Extracting sections from document: ${documentId}`);$1;$2      documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
 
     const response = await fetch(`${LANGEXTRACT_API_URL}/extract`, {
       method: 'POST',
@@ -181,9 +176,7 @@ export function detectSectionsHeuristic(
 /**
  * Validate section types
  */
-export function isValidSectionType(value: string): value is SectionType {
-  const validTypes: SectionType[] = [
-    'facts',
+export function isValidSectionType(value: string): value is SectionType {$1;$2    'facts',
     'issues',
     'reasoning',
     'holding',
@@ -273,9 +266,7 @@ export async function extractSectionsBatch(
 
   // Process documents with concurrency limit
   for (let i = 0; i < documents.length; i += concurrency) {
-    const batch = documents.slice(i, i + concurrency);
-    const batchPromises = batch.map((doc) =>
-      extractSectionsFromText(doc.text, doc.id, doc?.type?? 'case')
+    const batch = documents.slice(i, i + concurrency);$1;$2      extractSectionsFromText(doc.text, doc.id, doc?.type?? 'case')
         .then((result) => {
           results.push(result);
         })

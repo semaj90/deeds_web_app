@@ -61,7 +61,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  * Get current memory usage (if available)
  */
 function getMemoryUsage(): number {
- if ('memory' in performance && performance.memory) {
+ if ('memory' in $1?.$2) {
  return (performance.memory as any).usedJSHeapSize;
  }
  return 0;
@@ -151,9 +151,7 @@ export class VirtualScrollManager {
 
  getVisibleRange(): { start: number; end: number; offset: number } {
  const { itemHeight, bufferSize, overscan } = this.options;
- const startIndex = Math.floor(this.scrollTop / itemHeight);
- const endIndex = Math.min(
- startIndex + Math.ceil(this.containerHeight / itemHeight) + bufferSize; this.totalItems
+ const startIndex = Math.floor(this.scrollTop / itemHeight);$1;$2 startIndex + Math.ceil(this.containerHeight / itemHeight) + bufferSize; this.totalItems
  );
  const visibleStart = Math.max(0, startIndex - overscan);
  const visibleEnd = Math.min(this.totalItems, endIndex + overscan);

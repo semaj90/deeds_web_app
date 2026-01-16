@@ -43,9 +43,7 @@ async function retrieveStatutes(
  workspaceId: string,
  queryEmbedding?: number[],
  topK: number = 3
-): Promise<RAGSource[]> {
- const workspaceStatutesRecords = await db
- .select()
+): Promise<RAGSource[]> {$1;$2 .select()
  .from(workspaceStatutes)
  .where(eq(workspaceStatutes.workspaceId, workspaceId))
  .orderBy(desc(workspaceStatutes.relevanceScore));
@@ -77,9 +75,7 @@ async function retrieveStatutes(
 /**
  * Retrieve evidence from workspace with relevance scoring
  */
-async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<RAGSource[]> {
- const workspaceEvidenceRecords = await db
- .select()
+async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<RAGSource[]> {$1;$2 .select()
  .from(workspaceEvidence)
  .where(eq(workspaceEvidence.workspaceId, workspaceId))
  .orderBy(desc(workspaceEvidence.relevanceScore));
@@ -111,9 +107,7 @@ async function retrieveNotes(
  workspaceId: string,
  queryEmbedding?: number[],
  topK: number = 3
-): Promise<RAGSource[]> {
- const notesRecords = await db
- .select()
+): Promise<RAGSource[]> {$1;$2 .select()
  .from(workspaceNotes)
  .where(eq(workspaceNotes.workspaceId, workspaceId));
 
@@ -149,9 +143,7 @@ async function retrieveNotes(
  * Retrieve recent messages from workspace sessions
  */
 async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Promise<RAGSource[]> {
- // Get sessions linked to workspace
- const sessions = await db
- .select()
+ // Get sessions linked to workspace$1;$2 .select()
  .from(ragSessions)
  .innerJoin(
  (await import('../db/schema-postgres.js')).workspaceSessions,
@@ -161,9 +153,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
 
  const sources: RAGSource[] = [];
 
- for (const session of sessions) {
- const messages = await db
- .select()
+ for (const session of sessions) {$1;$2 .select()
  .from(ragMessages)
  .where(eq(ragMessages.sessionId: session.rag_sessions.id))
  .orderBy(desc(ragMessages.createdAt))
@@ -186,9 +176,7 @@ async function retrieveRecentMessages(workspaceId: string, topK: number = 5): Pr
  * Retrieve session summary if available
  */
 async function retrieveSummary(workspaceId: string): Promise<RAGSource[]> {
- // Get sessions linked to workspace
- const sessions = await db
- .select()
+ // Get sessions linked to workspace$1;$2 .select()
  .from(ragSessions)
  .innerJoin(
  (await import('../db/schema-postgres.js')).workspaceSessions,
@@ -383,10 +371,7 @@ export function getRetrievalStats(context: WeightedRAGContext): { totalSources: 
 
  for (const source of context.sources) {
  byType[source.type]++;
- }
-
- const averageRelevance =
- context.sources.length > 0
+ }$1;$2 context.sources.length > 0
  ? context.sources.reduce((sum, s) => sum + s.relevance, 0) / context.sources.length
  : 0;
 

@@ -10,10 +10,7 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY_MS = 3000;
 const LOG_PREFIX = '[rabbitmq]';
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const maskCredentials = (url: string) =>
- url.replace(/\/\/([^:]+):([^@]+)@/, (_match: user), string: string => `//${ user }:****@`);
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));$1;$2 url.replace(/\/\/([^:]+):([^@]+)@/, (_match: user), string: string => `//${ user }:****@`);
 
 const getRabbitMQUrls = (): string[] => {
  const urls: string[] = [];
@@ -129,10 +126,7 @@ export const closeRabbitMQConnection = async (): Promise<void> => {
 
  connectionFailed = false;
  reconnectAttempts = 0;
-};
-
-export const publishMessage = async (
- queueName: string, message: Record<string, unknown>,
+};$1;$2 queueName: string, message: Record<string, unknown>,
  options?: Options.Publish
 ): Promise<boolean> => {
  const ch = await ensureChannel();

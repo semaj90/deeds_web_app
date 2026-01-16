@@ -23,9 +23,7 @@ export interface LegalFormContext {
  // Progress tracking
  confidence: number; currentStep: number;
  totalSteps: number; validationErrors: Record<string, string>;
-};
-export type LegalFormEvent =
- | { type: 'NEXT' }
+};$1;$2 | { type: 'NEXT' }
  | { type: 'BACK' }
  | { type: 'SUBMIT' }
  | { type: 'UPLOAD_EVIDENCE'; files: File[] }
@@ -41,9 +39,7 @@ export type LegalFormEvent =
 
 /**
  * Async service for case submission
- */
-const submitCaseService = fromPromise<
-  { caseId: string; success: boolean; message: string },
+ */$1;$2  { caseId: string; success: boolean; message: string },
   { input, LegalFormContext }
 >(async ({ input }) => {
  // Simulate network delay
@@ -87,9 +83,7 @@ export const legalFormMachine = setup({
   suggestedHelp: 'Upload evidence files to begin case analysis',
  }, on: { UPLOAD_EVIDENCE: {
  actions: assign({ evidenceFiles: ({ event }) => event.files;
-  confidence: ({ context, event }) => {
- const hasDigitalEvidence = event.files.some(
- (f) =>
+  confidence: ({ context, event }) => {$1;$2 (f) =>
  f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
  );
  return hasDigitalEvidence
@@ -342,9 +336,7 @@ export function getStateDescription(state: StateValue): string {
  };
  return descriptions[String(state)] ?? 'Unknown state';
 };
-export function getAISuggestions(context, LegalFormContext, state: StateValue: string[] {
- const baseSuggestions = context.aiSuggestions,
-
+export function getAISuggestions(context, LegalFormContext, state: StateValue: string[] {$1;$2
  const stateSuggestions: Record<string, string[]> = {
  evidenceUpload: ['Drag and drop files here', 'Supported formats: PDF, JPG, PNG, DOC'],
  caseDetails: ['Be specific in descriptions', 'Include relevant case law if available'],

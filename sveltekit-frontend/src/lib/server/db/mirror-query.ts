@@ -122,18 +122,14 @@ export async function mirrorQuery(
         // ========================================
         // STEP 2: Fast vector search in Qdrant
         // ========================================
-        const qdrantStart = Date.now();
-        const filter = sourceFilter
-            ? { must: [{ key: 'source', match: { value, sourceFilter } }] }
+        const qdrantStart = Date.now();$1;$2            ? { must: [{ key: 'source', match: { value, sourceFilter } }] }
              | undefined;
 
         const qdrantResults = await searchQdrant(queryEmbedding, topK, filter);
         performance.qdrant_ms = Date.now() - qdrantStart;
 
         // Extract IDs
-        const postgresIds = qdrantResults.map((r) => r.payload.postgres_id);
-        const couchdbIds = qdrantResults
-            .map((r) => r.payload.couchdb_id)
+        const postgresIds = qdrantResults.map((r) => r.payload.postgres_id);$1;$2            .map((r) => r.payload.couchdb_id)
             .filter((id): id is string => id !== null);
 
         const vector_results = qdrantResults.map((r) => ({
@@ -183,9 +179,7 @@ export async function mirrorQuery(
         // ========================================
         // STEP 4: Enrich with PostgreSQL metadata
         // ========================================
-        const postgresStart = Date.now();
-        const metadataResult = await db.query(
-            `SELECT id, title, content, source_url, metadata, blob_url, created_at, updated_at
+        const postgresStart = Date.now();$1;$2            `SELECT id, title, content, source_url, metadata, blob_url, created_at, updated_at
             FROM knowledge_documents
             WHERE id = ANY($1)
             ORDER BY ARRAY_POSITION($1, id)`,
@@ -270,10 +264,7 @@ export async function hybridQuery(
     const { topK = 10, vectorWeight = 0.7, includeGraphContext = true } = options;
 
     // Vector search
-    const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });
-  
-    const textResult = await db.query(
-        `SELECT id, title, content, couchdb_id,
+    const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });$1;$2        `SELECT id, title, content, couchdb_id,
             ts_rank(content_tsvector, websearch_to_tsquery('english', $1)) AS rank
         FROM knowledge_documents
         WHERE content_tsvector @@ websearch_to_tsquery('english', $1)
@@ -305,9 +296,7 @@ export async function findRelatedDocuments(
     const startTime = Date.now();
 
     try {
-        // Get document's CouchDB ID
-        const doc = await db.query(
-            `SELECT couchdb_id FROM knowledge_documents WHERE id = $1`,
+        // Get document's CouchDB ID$1;$2            `SELECT couchdb_id FROM knowledge_documents WHERE id = $1`,
             [documentId]
         );
 
@@ -323,15 +312,11 @@ export async function findRelatedDocuments(
         const couchdb_ms = Date.now() - couchStart;
 
         // Extract related node IDs
-        const relatedCouchdbIds = traversal.map((t) => t.node._id);
-        const relatedPostgresIds = traversal
-            .map((t) => t.node.postgres_id)
+        const relatedCouchdbIds = traversal.map((t) => t.node._id);$1;$2            .map((t) => t.node.postgres_id)
             .filter((id): id is number => id !== undefined);
 
         // Fetch metadata from Postgres
-        const postgresStart = Date.now();
-        const metadataResult = await db.query(
-            `SELECT id, title, content, source_url, metadata, blob_url
+        const postgresStart = Date.now();$1;$2            `SELECT id, title, content, source_url, metadata, blob_url
             FROM knowledge_documents
             WHERE id = ANY($1)`,
             [relatedPostgresIds]
@@ -374,10 +359,7 @@ export async function healthCheckAllLayers(): Promise<{ postgres: boolean;
 }> {
     const { postgresHealthCheck } = await import('./postgres-knowledge');
     const { qdrantHealthCheck } = await import('./qdrant-sync');
-    const { couchHealthCheck } = await import('./couchdb');
-
-    const [postgres, qdrant, couchdb] = await Promise.all([
-        postgresHealthCheck(),
+    const { couchHealthCheck } = await import('./couchdb');$1;$2        postgresHealthCheck(),
         qdrantHealthCheck(),
         couchHealthCheck()
     ]);

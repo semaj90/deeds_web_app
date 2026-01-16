@@ -52,9 +52,7 @@ export const authStore = (() => {
 	let error = $state<string | null>(null);
 
 	// Derived values
-	let isAuthenticated = $derived(session !== null);
-	let displayName = $derived(
-		session?.user?.firstName&& session?.user.lastName
+	let isAuthenticated = $derived(session !== null);$1;$2		session?.user?.firstName&& session?.user.lastName
 			? `${session.user.firstName} ${session.user.lastName}`
 			: session?.user.email ?? null
 	);
@@ -194,9 +192,7 @@ export const aiStore = (() => {
 
 	// Derived values
 	let messageCount = $derived(messages.length);
-	let averageConfidence = $derived(() => {
-		const confidences = messages
-			.filter((m) => m.confidence !== undefined)
+	let averageConfidence = $derived(() => {$1;$2			.filter((m) => m.confidence !== undefined)
 			.map((m) => m.confidence!);
 		if (confidences.length === 0) return 1.0;
 		return confidences.reduce((a, b) => a + b, 0) / confidences.length;
@@ -273,9 +269,7 @@ export const chatStore = (() => {
 
 	// Derived values
 	let activeChatMetadata = $derived(chats.find((c) => c.id === activeChat) ?? null);
-	let chatCount = $derived(chats.length);
-	let recentChats = $derived(
-		[...chats].sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime()).slice(0, 10)
+	let chatCount = $derived(chats.length);$1;$2		[...chats].sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime()).slice(0, 10)
 	);
 
 	return {
@@ -341,11 +335,7 @@ export const chatStore = (() => {
 // ========================================
 // Theme Store (with localStorage persistence)
 // ========================================
-export const themeStore = (() => {
-	const savedTheme =
-		typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
-	let theme = $state<'light' | 'dark' | 'nier'>(
-		(savedTheme as 'light' | 'dark' | 'nier') ?? 'dark'
+export const themeStore = (() => {$1;$2		typeof window !== 'undefined' ? localStorage.getItem('theme') : null;$1;$2		(savedTheme as 'light' | 'dark' | 'nier') ?? 'dark'
 	);
 
 	// Persist to localStorage and update DOM

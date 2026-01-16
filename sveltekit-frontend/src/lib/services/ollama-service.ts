@@ -147,9 +147,7 @@ class OllamaService {
             if (response.ok) {
                 const raw: unknown = await response.json();
 
-                // Helper type-guard implementation
-                const isModelObj = (obj: unknown): obj is OllamaModelInfo =>
-                    typeof obj === 'object' &&
+                // Helper type-guard implementation$1;$2                    typeof obj === 'object' &&
                     obj !== null &&
                     typeof (obj as Record<string, unknown>).name === 'string' &&
                     typeof (obj as Record<string, unknown>).size === 'number';
@@ -184,16 +182,12 @@ class OllamaService {
             return;
         }
 
-        // fallback: find any gemma family
-        const gemmaCandidates = this.availableModels.filter(
-            (m: any) =>
+        // fallback: find any gemma family$1;$2            (m: any) =>
                 (m?.name?? '').toLowerCase().includes('gemma') ||
                 (m.details?.family ?? '').toLowerCase().includes('gemma')
         );
 
-        if (gemmaCandidates.length > 0) {
-            const q4 = gemmaCandidates.find(
-                (m: any) =>
+        if (gemmaCandidates.length > 0) {$1;$2                (m: any) =>
                     (m?.name?? '').toLowerCase().includes('q4') ||
                     (m.details?.quantization_level ?? '').toLowerCase().includes('q4')
             );
@@ -418,10 +412,7 @@ class OllamaService {
             const wordIndex = words.length ? i % words.length : 0;
             const word = words[wordIndex] ?? '';
             const wordHash = this.hashString(word);
-            const positionWeight = (i / dimensions) * 2 - 1;
-
-            const rawValue =
-                ((textHash % 1000) / 1000) * 0.3 +
+            const positionWeight = (i / dimensions) * 2 - 1;$1;$2                ((textHash % 1000) / 1000) * 0.3 +
                 ((wordHash % 1000) / 1000) * 0.4 +
                 Math.sin(i * 0.1) * 0.2 +
                 positionWeight * 0.1;
@@ -453,10 +444,7 @@ class OllamaService {
         }
         try {
             const content = (document?.content ?? document?.text ?? '').toString();
-            const snippet = content.substring(0, 2000);
-
-            const analysisPrompt = `Analyze this legal document and provide:
-1. A concise summary
+            const snippet = content.substring(0, 2000);$1;$21. A concise summary
 2. Key legal points
 3. Potential risks or issues
 4. Important dates and deadlines

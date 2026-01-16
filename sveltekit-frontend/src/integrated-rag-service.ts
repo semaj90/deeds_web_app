@@ -823,9 +823,7 @@ export async function searchSimilarDocuments(
 		}
 	}
 
-	try {
-		const pgResults = await db.execute(sql`
-			SELECT
+	try {$1;$2			SELECT
 				content_text,
 				1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) as similarity,
 				metadata

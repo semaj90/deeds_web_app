@@ -18,9 +18,7 @@ import {
 
 /**
  * Cases table - stores detective cases
- */
-export const cases = pgTable(
- 'yorha_cases',
+ */$1;$2 'yorha_cases',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_number: varchar('case_number', { length: 100 }).notNull().unique(),
@@ -55,9 +53,7 @@ export const cases = pgTable(
 
 /**
  * Evidence nodes table - stores evidence items on the evidence board
- */
-export const evidence_nodes = pgTable(
- 'yorha_evidence_nodes',
+ */$1;$2 'yorha_evidence_nodes',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -105,9 +101,7 @@ export const evidence_nodes = pgTable(
 
 /**
  * Evidence connections table - stores relationships between evidence nodes
- */
-export const evidence_connections = pgTable(
- 'yorha_evidence_connections',
+ */$1;$2 'yorha_evidence_connections',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -138,9 +132,7 @@ export const evidence_connections = pgTable(
 
 /**
  * Chat sessions table - stores conversation sessions
- */
-export const chat_sessions = pgTable(
- 'yorha_chat_sessions',
+ */$1;$2 'yorha_chat_sessions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -171,9 +163,7 @@ export const chat_sessions = pgTable(
 
 /**
  * Chat messages table - stores individual messages in chat sessions
- */
-export const chat_messages = pgTable(
- 'yorha_chat_messages',
+ */$1;$2 'yorha_chat_messages',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  session_id: uuid('session_id').notNull(),
@@ -205,9 +195,7 @@ export const chat_messages = pgTable(
 
 /**
  * System metrics table - stores historical system metrics
- */
-export const system_metrics = pgTable(
- 'yorha_system_metrics',
+ */$1;$2 'yorha_system_metrics',
  {
  id: serial('id').primaryKey(),
 

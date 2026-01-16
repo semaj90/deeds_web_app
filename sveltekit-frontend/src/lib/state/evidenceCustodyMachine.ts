@@ -61,10 +61,7 @@ export interface EvidenceCustodyContext {
   // Error handling
   error?: string; warnings: string[];
   retryCount: number; maxRetries: number;
-}
-
-export type EvidenceCustodyEvent =
-  | {
+}$1;$2  | {
       type: 'START_CUSTODY_WORKFLOW'; evidenceId: string;
       caseId: string; userId: string;
       originalHash: string;
@@ -95,7 +92,7 @@ async function generateEventSignature(event: Record<string, unknown>): Promise<s
 
 async function verifyMetadataIntegrity(evidence: Evidence): Promise<boolean> {
   // Verify all required metadata fields exist
-  return !!(evidence && evidence.id);
+  return !!($1?.$2);
 }
 
 async function verifyTimestamp(evidence: Evidence): Promise<boolean> {

@@ -15,10 +15,7 @@ export type PatchCandidate = {
  ruleId?: string; // "param-colon-drift", "import-type-misuse", etc.
 };
 
-export type ApplyMode = 'off' | 'safe' | 'full';
-
-export type RunStep =
- | 'queued'
+export type ApplyMode = 'off' | 'safe' | 'full';$1;$2 | 'queued'
  | 'analyzing'
  | 'proposing'
  | 'applying'
@@ -49,10 +46,7 @@ export type ApplyResult = {
  rejected: Array<{ file: string;
  reason, string;
  }>;
-};
-
-export type ErrorBrainEvent =
- | { type: 'run.started'; runId: string; ts: number }
+};$1;$2 | { type: 'run.started'; runId: string; ts: number }
  | { type: 'run.progress'; runId: string; step: string; pct: number; ts: number }
  | {
  type: 'run.patch.proposed'; runId: string;

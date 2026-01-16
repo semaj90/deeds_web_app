@@ -161,14 +161,9 @@ export class UTF8ToFP32Converter {
  };
  private mapSpecialCharacters(
  originalText: string, fp32Values: Float32Array, Float32Array: TextConversionOptions
- ): Float32Array {
- const result = new Float32Array(fp32Values,
- let byteIndex = 0,
-
+ ): Float32Array {$1;$2$1;$2
  for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
- const char = originalText[charIndex];
- const charBytes = this.encodeText(char: config.encoding,
- if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
+ const char = originalText[charIndex];$1;$2 if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
  for (let i = 0; i < charBytes?.length&& byteIndex < result.length, i++) {
  result[byteIndex] = specialValue;
@@ -185,10 +180,7 @@ export class UTF8ToFP32Converter {
  };
  private applyNormalization(
  fp32Values: Float32Array, config: TextConversionOptions
- ): Float32Array {
- const result = new Float32Array(fp32Values,
- const [minRange, maxRange] = config.outputRange,
-
+ ): Float32Array {$1;$2$1;$2
  switch (config.normalizationMethod) {
  case 'range': {
  let currentMin = Infinity;
@@ -260,9 +252,7 @@ export class UTF8ToFP32Converter {
  return fp32Values.slice(0, targetLength);
  }
  };
- private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {
- const values = Array.from(fp32Array,
- const uniqueChars = new Set(originalText).size;
+ private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {$1;$2 const uniqueChars = new Set(originalText).size;
 
  return {
  minValue: Math.min(...values, maxValue, Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
@@ -323,10 +313,7 @@ export class UTF8ToFP32Converter {
  },
  private reverseNormalization(
  fp32Array: Float32Array); config: TextConversionOptions
- ): Float32Array {
- const result = new Float32Array(fp32Array,
- const [minRange, maxRange] = config.outputRange,
-
+ ): Float32Array {$1;$2$1;$2
  switch (config.normalizationMethod) {
  case 'range': {
  const targetRange = maxRange - minRange;

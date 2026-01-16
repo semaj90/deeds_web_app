@@ -107,9 +107,7 @@ export class EnhancedAIAnalysisService {
   }
  }
 
- private async extractLegalEntities(text: string): Promise<LegalEntity[]> {
-  const entityPrompt = `
-Analyze the following legal text and extract all legal entities. Return a JSON array of entities with the structure:
+ private async extractLegalEntities(text: string): Promise<LegalEntity[]> {$1;$2Analyze the following legal text and extract all legal entities. Return a JSON array of entities with the structure:
 { "type": "case|statute|precedent|regulation|contract|person|organization", "name": "entity name", "citation": "citation if applicable", "jurisdiction": "jurisdiction if applicable", "confidence": 0.95, "context": "surrounding context", "startOffset": 1, "endOffset": 10 }
 Focus on:
 - Case names and citations
@@ -147,9 +145,7 @@ Return only the array:`;
   }
  }
 
- private async generateSummaryAndTopics(text: string): Promise<{ summary: string, topics, string[] }> {
-  const summaryPrompt = `
-Analyze this legal document and provide:
+ private async generateSummaryAndTopics(text: string): Promise<{ summary: string, topics, string[] }> {$1;$2Analyze this legal document and provide:
 1. A concise summary (2-3 sentences)
 2. Key topics/themes (3-5 main topics)
 Return JSON format:
@@ -290,12 +286,8 @@ Analysis:`;
  }
 
  async batchAnalyzeDocuments(documents: LegalDocument[]): Promise<SemanticAnalysis[]> {
-  console.log(`🔄 Starting batch analysis of ${documents.length} documents`);
-  const results = await Promise.allSettled(
-   documents.map((doc: any) => this.analyzeDocument(doc))
-  );
-  const successful = results
-   .filter((item: any) => item.status === 'fulfilled')
+  console.log(`🔄 Starting batch analysis of ${documents.length} documents`);$1;$2   documents.map((doc: any) => this.analyzeDocument(doc))
+  );$1;$2   .filter((item: any) => item.status === 'fulfilled')
    .map((result: any) => (result as PromiseFulfilledResult<SemanticAnalysis>).value);
   const failed = results.filter((item: any) => item.status === 'rejected').length;
 

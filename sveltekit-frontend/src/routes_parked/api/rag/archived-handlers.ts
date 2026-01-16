@@ -203,9 +203,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  options: { temperature: 0.1, num_predict: 1500 },
  }),
  });
- const resultJson = (await response.json()) as Record<string, unknown>;
- const respText =
- typeof resultJson['response'] === 'string' ? (resultJson['response'] as string) : undefined;
+ const resultJson = (await response.json()) as Record<string, unknown>;$1;$2 typeof resultJson['response'] === 'string' ? (resultJson['response'] as string) : undefined;
  let parsedResult: PGaiSummary | string | Record<string, unknown>;
  if (typeof respText === 'string') {
  try {

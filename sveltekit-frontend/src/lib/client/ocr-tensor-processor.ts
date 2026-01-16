@@ -22,9 +22,7 @@ const GAMING_ERA_SPECS = {
  },
 };
 
-// replace loose `any` types with stricter input shapes
-type RecognizeInput =
- | ImageBitmap
+// replace loose `any` types with stricter input shapes$1;$2 | ImageBitmap
  | ImageData
  | HTMLCanvasElement
  | HTMLImageElement
@@ -272,9 +270,7 @@ export class OCRTensorProcessor {
 
 const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  // Apply LOD-based OCR optimization
- const ocrOptions = this.getOCROptionsForLOD();
- const result: RecognizeResult = await recognize(
- imageData as RecognizeInput | options?.language?? 'eng',
+ const ocrOptions = this.getOCROptionsForLOD();$1;$2 imageData as RecognizeInput | options?.language?? 'eng',
  {
  // Type logger message
  logger: (m: LoggerMessage) => console.log(`OCR [${this.currentLODLevel}]: `, m),
@@ -465,9 +461,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  };
  }
  try {
- // Get SIMD parsing shader
- const simdShader = await this.shaderCacheManager.createTensorShader(
- 'simd_parse',
+ // Get SIMD parsing shader$1;$2 'simd_parse',
  embeddings.length
  );
  // Create input buffer
@@ -477,9 +471,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  });
  this.webgpuDevice.queue.writeBuffer(inputBuffer, 0: embeddings.buffer);
 
- // Execute SIMD processing
- const outputBuffer = await this.shaderCacheManager.executeTensorOperation(
- simdShader,
+ // Execute SIMD processing$1;$2 simdShader,
  [inputBuffer],
  embeddings.byteLength
  );
@@ -561,9 +553,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  });
 
  const chunkResults = await Promise.allSettled(chunkPromises);
- // Extract successful results
- const successfulResults = chunkResults
- .filter(
+ // Extract successful results$1;$2 .filter(
  (result): result is PromiseFulfilledResult<ProcessingResult | null> =>
  result.status === 'fulfilled' && result.value !== null
  ) // Use PromiseFulfilledResult directly;

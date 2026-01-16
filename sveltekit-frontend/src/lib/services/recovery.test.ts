@@ -47,9 +47,7 @@ describe('Recovery Strategy', () => {
  expect(operation).toHaveBeenCalledTimes(1);
  });
 
- it('should retry on failure and succeed', async () => {
- const operation = vi
- .fn()
+ it('should retry on failure and succeed', async () => {$1;$2 .fn()
  .mockRejectedValueOnce(new Error('First attempt failed'))
  .mockResolvedValueOnce('success');
 
@@ -147,10 +145,7 @@ describe('Recovery Strategy', () => {
  describe('Graceful Degradation', () => {
  it('should use primary operation when successful', async () => {
  const primaryOp = vi.fn().mockResolvedValue('primary result');
- const fallbackOp = vi.fn().mockResolvedValue('fallback result');
-
- const result = await RecoveryStrategy.gracefulDegrade(
- primaryOp,
+ const fallbackOp = vi.fn().mockResolvedValue('fallback result');$1;$2 primaryOp,
  fallbackOp,
  'errorBrain',
  'user-123'
@@ -171,10 +166,7 @@ describe('Recovery Strategy', () => {
 
  it('should use fallback when primary fails', async () => {
  const primaryOp = vi.fn().mockRejectedValue(new Error('Primary failed'));
- const fallbackOp = vi.fn().mockResolvedValue('fallback result');
-
- const result = await RecoveryStrategy.gracefulDegrade(
- primaryOp,
+ const fallbackOp = vi.fn().mockResolvedValue('fallback result');$1;$2 primaryOp,
  fallbackOp,
  'errorBrain',
  'user-123'
@@ -195,10 +187,7 @@ describe('Recovery Strategy', () => {
 
  it('should fail when both operations fail', async () => {
  const primaryOp = vi.fn().mockRejectedValue(new Error('Primary failed'));
- const fallbackOp = vi.fn().mockRejectedValue(new Error('Fallback failed'));
-
- const result = await RecoveryStrategy.gracefulDegrade(
- primaryOp,
+ const fallbackOp = vi.fn().mockRejectedValue(new Error('Fallback failed'));$1;$2 primaryOp,
  fallbackOp,
  'legalAi',
  'user-123'

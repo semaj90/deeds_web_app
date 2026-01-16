@@ -77,10 +77,7 @@ Analyze and provide fix recommendations.`;
 
 				try {
 					const copilotPath = path.join(process.cwd(), '.github', 'copilot.md');
-					const timestamp = new Date().toISOString();
-
-					const entry = `
-## Cluster #${cluster_id} - ${pattern}
+					const timestamp = new Date().toISOString();$1;$2## Cluster #${cluster_id} - ${pattern}
 
 **Analyzed:** ${timestamp}
 **Files:** ${file_paths.length}

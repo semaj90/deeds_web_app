@@ -17,9 +17,7 @@ export interface ResourceAllocation {
  gpu_memory_mb?: number; disk_space_mb: number;
  network_bandwidth_mbps: number;
 }
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'CRITICAL';
-export type ModuleStatus =
- | 'ACTIVE'
+export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'CRITICAL';$1;$2 | 'ACTIVE'
  | 'STANDBY'
  | 'INACTIVE'
  | 'ERROR'
@@ -75,9 +73,7 @@ export interface CommandDefinition {
 export interface Vector3D {
  x: number; y: number;
  z: number;
-}
-export type HolographicType =
- | 'sphere'
+}$1;$2 | 'sphere'
  | 'cube'
  | 'cylinder'
  | 'torus'
@@ -85,9 +81,7 @@ export type HolographicType =
  | 'points'
  | 'mesh'
  | 'text'
- | 'particles';
-export type AnimationType =
- | 'rotate'
+ | 'particles';$1;$2 | 'rotate'
  | 'pulse'
  | 'flow'
  | 'wave'
@@ -115,9 +109,7 @@ export interface PointLight {
 export interface LightingConfig {
  ambient_color: string; ambient_intensity: number;
  directional_lights: DirectionalLight[]; point_lights: PointLight[];
-}
-export type EffectType =
- | 'scanlines'
+}$1;$2 | 'scanlines'
  | 'glitch'
  | 'hologram_flicker'
  | 'chromatic_aberration'
@@ -148,9 +140,7 @@ export interface ParticleSystem {
  opacity: number; physics_enabled: boolean;
 }
 
-// Data Visualization Types
-export type VisualizationType =
- | 'network_graph'
+// Data Visualization Types$1;$2 | 'network_graph'
  | 'data_flow'
  | 'neural_network'
  | 'system_topology'
@@ -181,9 +171,7 @@ export interface NeuralNode {
  position: Vector3D; activation: number;
  bias: number; connections: NeuralConnection[];
  node_type: 'input' | 'hidden' | 'output';
-}
-export type TrainingStatus =
- | 'IDLE'
+}$1;$2 | 'IDLE'
  | 'TRAINING'
  | 'VALIDATING'
  | 'TESTING'
@@ -203,9 +191,7 @@ export interface LegalContext {
  case_type: string; priority_level: number;
  security_classification: SecurityLevel; related_cases: string[];
  key_entities: string[];
-}
-export type LegalQueryType =
- | 'case_analysis'
+}$1;$2 | 'case_analysis'
  | 'document_review'
  | 'precedent_search'
  | 'risk_assessment'
@@ -246,9 +232,7 @@ export interface LegalAISession {
  context: LegalContext;
 }
 
-// System Monitoring Types
-export type AlertType =
- | 'SYSTEM_ERROR'
+// System Monitoring Types$1;$2 | 'SYSTEM_ERROR'
  | 'PERFORMANCE_DEGRADATION'
  | 'SECURITY_BREACH'
  | 'RESOURCE_EXHAUSTION'
@@ -359,9 +343,7 @@ export interface WebGLConfig {
  preserve_drawing_buffer: boolean; power_preference: 'default' | 'high-performance' | 'low-power';
 }
 
-// Utility Types
-export type YoRHaEventType =
- | 'system_boot'
+// Utility Types$1;$2 | 'system_boot'
  | 'module_start'
  | 'module_stop'
  | 'command_executed'

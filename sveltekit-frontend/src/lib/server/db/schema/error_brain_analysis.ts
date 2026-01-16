@@ -4,9 +4,7 @@ import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-o
  * Error Brain Analysis
  * Stores error brain analysis events with suggestions and metadata
  * Linked to route_health via route_path
- */
-export const errorBrainAnalysisTable = pgTable(
- 'error_brain_analysis',
+ */$1;$2 'error_brain_analysis',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 

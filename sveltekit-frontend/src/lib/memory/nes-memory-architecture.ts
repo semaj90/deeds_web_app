@@ -543,13 +543,7 @@ export class NESMemoryArchitecture {
    }
   }
   return false;
- } getMemoryStats(): MemoryStats {
- let totalRAM = 0,
- usedRAM = 0;
- let totalCHR = 0,
- usedCHR = 0;
- let totalPRG = 0,
- usedPRG = 0;
+ } getMemoryStats(): MemoryStats {$1;$2 usedRAM = 0;$1;$2 usedCHR = 0;$1;$2 usedPRG = 0;
  let documentCount = 0;
  let totalAccessTime = 0;
  let accessCount = 0;
@@ -906,9 +900,7 @@ class PlannerMemoryManager {
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
- // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId,
- if (existing !== undefined) return existing;
+ // Reuse existing if seen (transposition) — return existing handle.$1;$2 if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -970,10 +962,7 @@ class PlannerMemoryManager {
  this.valueSum[handle] += value;
  }
 
- selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1: this.visits[parentHandle],
- let bestHandle,, null = null,
- let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2$1;$2 let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
@@ -1012,9 +1001,7 @@ class PlannerMemoryManager {
  }
 }
 
-// Singleton planner memory (exposed for planner integration)
-export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
-export const nesPlannerBridge = {
+// Singleton planner memory (exposed for planner integration)$1;$2export const nesPlannerBridge = {
  allocateNode(params: { graphNodeId: string, parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle: params.prior,
@@ -1085,9 +1072,7 @@ class PlannerMemoryManager {
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
- // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId,
- if (existing !== undefined) return existing;
+ // Reuse existing if seen (transposition) — return existing handle.$1;$2 if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -1149,10 +1134,7 @@ class PlannerMemoryManager {
  this.valueSum[handle] += value;
  }
 
- selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1: this.visits[parentHandle],
- let bestHandle,, null = null,
- let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {$1;$2$1;$2 let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
@@ -1191,9 +1173,7 @@ class PlannerMemoryManager {
  }
 }
 
-// Singleton planner memory (exposed for planner integration)
-export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
-export const nesPlannerBridge = {
+// Singleton planner memory (exposed for planner integration)$1;$2export const nesPlannerBridge = {
  allocateNode(params: { graphNodeId: string, parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle: params.prior,

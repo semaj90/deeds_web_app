@@ -62,11 +62,7 @@ export type {
 // } from './services/comprehensive-ollama-summarizer.js';
 
 export {
-    ollamaIntegrationLayer,
-    type IntegratedChatRequest,
-    type IntegratedChatResponse,
-    type OllamaServiceStatus
-} from './services/ollama-integration-layer.js';
+    ollamaIntegrationLayer,$1;$2$1;$2$1;$2} from './services/ollama-integration-layer.js';
 
 // Temporarily disabled - file is in ai.bak folder, not ai folder
 // export {

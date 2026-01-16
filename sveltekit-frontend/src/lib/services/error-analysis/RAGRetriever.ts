@@ -272,9 +272,7 @@ export class RAGRetriever {
 		// Rank by relevance and recency
 		const ranked = this.rankKnowledge(similar);
 
-		// Fetch fix strategies for each
-		const withStrategies = await Promise.all(
-			ranked.map(async (error: any) => {
+		// Fetch fix strategies for each$1;$2			ranked.map(async (error: any) => {
 				const strategies = await this.getFixStrategies(error.id);
 				return { ...error, fixStrategies: strategies };
 			})

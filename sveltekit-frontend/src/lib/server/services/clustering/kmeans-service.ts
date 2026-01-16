@@ -261,9 +261,7 @@ export async function generateClusterLabels(
  const labels = new Map<number, string>();
 
  // For now, use generic labels
- // In production, call LLM to generate meaningful labels
- const defaultLabels = [
- 'Violent Crimes',
+ // In production, call LLM to generate meaningful labels$1;$2 'Violent Crimes',
  'Property Crimes',
  'White Collar Crimes',
  'Drug Crimes',

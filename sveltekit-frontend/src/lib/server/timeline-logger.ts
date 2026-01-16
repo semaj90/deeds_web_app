@@ -45,9 +45,7 @@ export async function logAttachToCase(userId: string, caseId: string): string {
 }
 
 export async function getUserTimeline(userId: string, limit: number = 50) {
- try {
- const events = await db
- .select()
+ try {$1;$2 .select()
  .from(userTimeline)
  .where((t) => t.userId === userId)
  .orderBy((t) => t.createdAt)

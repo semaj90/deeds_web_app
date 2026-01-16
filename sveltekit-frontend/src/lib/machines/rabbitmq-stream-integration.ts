@@ -41,10 +41,7 @@ export interface StreamContext {
 	lastOffset: number;
 	publishedCount: number;
 	consumedCount: number;
-}
-
-export type StreamEvent =
-	| { type: 'CONNECT'; config: RabbitMQStreamConfig }
+}$1;$2	| { type: 'CONNECT'; config: RabbitMQStreamConfig }
 	| { type: 'DISCONNECT' }
 	| { type: 'PUBLISH'; message: StreamMessage }
 	| { type: 'MESSAGE_RECEIVED'; message: StreamMessage }

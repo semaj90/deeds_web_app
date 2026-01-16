@@ -38,9 +38,7 @@ describe('NamespaceRouter', () => {
  expect(feature).toBeNull();
  });
 
- it('should handle various error-brain paths', () => {
- const paths = [
- '/api/error-brain/analyze',
+ it('should handle various error-brain paths', () => {$1;$2 '/api/error-brain/analyze',
  '/api/error-brain/patch',
  '/api/error-brain/history'];
  paths.forEach((path) => {
@@ -48,9 +46,7 @@ describe('NamespaceRouter', () => {
  });
  });
 
- it('should handle various legal-ai paths', () => {
- const paths = [
- '/api/legal-ai/citations',
+ it('should handle various legal-ai paths', () => {$1;$2 '/api/legal-ai/citations',
  '/api/legal-ai/authorities',
  '/api/legal-ai/reports'];
  paths.forEach((path) => {

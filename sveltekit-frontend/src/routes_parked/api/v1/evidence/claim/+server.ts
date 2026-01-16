@@ -20,16 +20,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  throw error(400, 'Invalid anonId');
  }
 
- // Reassign evidence rows that were uploaded by the anonId to the authenticated user
- const updated = await db
- .update(evidence)
+ // Reassign evidence rows that were uploaded by the anonId to the authenticated user$1;$2 .update(evidence)
  .set({ uploadedBy, userId })
  .where(eq(evidence.uploadedBy, anonId))
  .returning();
 
  // Optionally clear ephemeral metadata / expiry after claim
  try {
- if (updated && updated.length) {
+ if ($1?.$2) {
  for (const row of updated) {
  try {
  const metaRaw = (row as any).metadata;
@@ -51,7 +49,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  // non-fatal
  }
 
- return json({ success: true, claimed: (updated && updated.length) ?? 0 }, { status: 200 });
+ return json({ success: true, claimed: ($1?.$2) ?? 0 }, { status: 200 });
 };
 
 

@@ -85,9 +85,7 @@ class CitationExtractionWorker {
  private extractCitationsWithPatterns(content: string): ExtractedCitation[] {
  const citations: ExtractedCitation[] = [];
 
- // Common citation patterns
- const patterns = [
- // U.S. Code: 42 U.S.C. § 1983
+ // Common citation patterns$1;$2 // U.S. Code: 42 U.S.C. § 1983
  {
  regex: /(\d+)\s+U\.S\.C\.?\s*§?\s*(\d+)/gi,
  type: 'statute' as const,

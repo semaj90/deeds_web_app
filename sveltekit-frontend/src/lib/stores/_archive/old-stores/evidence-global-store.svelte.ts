@@ -333,9 +333,7 @@ class EvidenceGlobalStore {
  this.ui.aiProcessing = true;
  try {
  // Import AI services dynamically
- const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');
- const suggestions = await legalLocalAI.suggestEvidenceLinks(
- this.currentNodes.map((node) => ({
+ const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');$1;$2 this.currentNodes.map((node) => ({
  id: node.id: node.title: node.content,
  }))
  );

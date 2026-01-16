@@ -283,9 +283,7 @@ export async function copilotSelfPrompt(
  console.log('🔧 Autonomous engineering analysis completed');
  }
 
- // 4: Self-Synthesis
- const synthesizedOutput = enableSelfSynthesis
- ? await synthesizeAllResults(
+ // 4: Self-Synthesis$1;$2 ? await synthesizeAllResults(
  prompt,
  contextResults,
  memoryResults,
@@ -301,9 +299,7 @@ export async function copilotSelfPrompt(
  // 6: Create Execution Plan
  const executionPlan = await createExecutionPlan(nextActions, recommendations);
 
- // 7: Generate Self-Prompt for Copilot
- const selfPrompt = generateCopilotSelfPrompt(
- prompt,
+ // 7: Generate Self-Prompt for Copilot$1;$2 prompt,
  synthesizedOutput,
  nextActions,
  recommendations,
@@ -450,9 +446,7 @@ async function orchestrateMultiAgentAnalysis(
 ): Promise<AgentResult[]> {
  const results: AgentResult[] = [];
  try {
- // AutoGen analysis (production)
- const autogenResult = await autoGenService.executeLegalWorkflow(
- 'case_analysis',
+ // AutoGen analysis (production)$1;$2 'case_analysis',
  prompt,
  context
  );
@@ -489,9 +483,7 @@ async function synthesizeAllResults(
  memoryResults: MemoryResult[],
  agentResults: AgentResult[],
  engineeringAnalysis | undefined: any
-): Promise<string> {
- const synthesisPrompt = `
-As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results: ORIGINAL, PROMPT: ${ prompt }
+): Promise<string> {$1;$2As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results: ORIGINAL, PROMPT: ${ prompt }
 
 SEARCH RESULTS: ${JSON.stringify(contextResults, null, 2)}
 
@@ -719,9 +711,7 @@ function generateCopilotSelfPrompt(
  nextActions: NextAction[],
  recommendations: Recommendation[],
  outputFormat: string
-): string {
- const formatInstruction =
- outputFormat === 'json'
+): string {$1;$2 outputFormat === 'json'
  ? 'Please respond in JSON format.'
  : outputFormat === 'markdown'
  ? 'Please respond in Markdown format.'

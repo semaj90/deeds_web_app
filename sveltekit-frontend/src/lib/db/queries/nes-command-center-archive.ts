@@ -42,14 +42,9 @@ export async function getArchivedErrorClusters(
 
   if (endDate) {
     conditions.push(sql`archived_at <= ${endDate}`);
-  }
+  }$1;$2    conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
 
-  const whereClause =
-    conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
-
-  // Query archived error clusters
-  const result = await db.execute(sql`
-    SELECT
+  // Query archived error clusters$1;$2    SELECT
       id,
       route_id,
       tool,
@@ -78,9 +73,7 @@ export async function getArchivedErrorClusters(
     OFFSET ${offset}
   `);
 
-  // Get total count
-  const countResult = await db.execute(sql`
-    SELECT COUNT(*) as total
+  // Get total count$1;$2    SELECT COUNT(*) as total
     FROM error_cluster_archive
     WHERE ${whereClause}
   `);
@@ -129,14 +122,9 @@ export async function getArchivedInteractions(
 
   if (interactionType) {
     conditions.push(sql`interaction_type = ${interactionType}`);
-  }
+  }$1;$2    conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
 
-  const whereClause =
-    conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
-
-  // Query archived interactions
-  const result = await db.execute(sql`
-    SELECT
+  // Query archived interactions$1;$2    SELECT
       id,
       route_id,
       user_id,
@@ -159,9 +147,7 @@ export async function getArchivedInteractions(
     OFFSET ${offset}
   `);
 
-  // Get total count
-  const countResult = await db.execute(sql`
-    SELECT COUNT(*) as total
+  // Get total count$1;$2    SELECT COUNT(*) as total
     FROM route_interaction_log_archive
     WHERE ${whereClause}
   `);
@@ -199,9 +185,7 @@ export async function getCombinedErrorClusters(
   const { limit = 50, offset = 0, includeArchived = false } = options;
 
   if (!includeArchived) {
-    // Only query main table
-    const result = await db.execute(sql`
-      SELECT
+    // Only query main table$1;$2      SELECT
         id,
         route_id,
         tool,
@@ -228,10 +212,7 @@ export async function getCombinedErrorClusters(
       ORDER BY created_at DESC
       LIMIT ${limit}
       OFFSET ${offset}
-    `);
-
-    const countResult = await db.execute(sql`
-      SELECT COUNT(*) as total
+    `);$1;$2      SELECT COUNT(*) as total
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
@@ -248,9 +229,7 @@ export async function getCombinedErrorClusters(
     };
   }
 
-  // Query both tables and combine
-  const result = await db.execute(sql`
-    (
+  // Query both tables and combine$1;$2    (
       SELECT
         id,
         route_id,
@@ -307,9 +286,7 @@ export async function getCombinedErrorClusters(
     OFFSET ${offset}
   `);
 
-  // Get combined count
-  const countResult = await db.execute(sql`
-    SELECT
+  // Get combined count$1;$2    SELECT
       (SELECT COUNT(*) FROM error_cluster WHERE route_id = ${routeId} AND archived_at IS NULL) +
       (SELECT COUNT(*) FROM error_cluster_archive WHERE route_id = ${routeId})
       as total
@@ -348,9 +325,7 @@ export async function getCombinedInteractions(
   const { limit = 50, offset = 0, includeArchived = false } = options;
 
   if (!includeArchived) {
-    // Only query main table
-    const result = await db.execute(sql`
-      SELECT
+    // Only query main table$1;$2      SELECT
         id,
         route_id,
         user_id,
@@ -370,10 +345,7 @@ export async function getCombinedInteractions(
       ORDER BY created_at DESC
       LIMIT ${limit}
       OFFSET ${offset}
-    `);
-
-    const countResult = await db.execute(sql`
-      SELECT COUNT(*) as total
+    `);$1;$2      SELECT COUNT(*) as total
       FROM route_interaction_log
       WHERE route_id = ${routeId}
     `);
@@ -389,9 +361,7 @@ export async function getCombinedInteractions(
     };
   }
 
-  // Query both tables and combine
-  const result = await db.execute(sql`
-    (
+  // Query both tables and combine$1;$2    (
       SELECT
         id,
         route_id,
@@ -435,9 +405,7 @@ export async function getCombinedInteractions(
     OFFSET ${offset}
   `);
 
-  // Get combined count
-  const countResult = await db.execute(sql`
-    SELECT
+  // Get combined count$1;$2    SELECT
       (SELECT COUNT(*) FROM route_interaction_log WHERE route_id = ${routeId}) +
       (SELECT COUNT(*) FROM route_interaction_log_archive WHERE route_id = ${routeId})
       as total
@@ -463,10 +431,7 @@ export async function getCombinedInteractions(
  * @returns Archive statistics for monitoring
  */
 export async function getArchiveStatistics() {
-	const db = getDb();
-
-	const result = await db.execute(sql`
-    SELECT * FROM archive_statistics
+	const db = getDb();$1;$2    SELECT * FROM archive_statistics
   `);
 
 	return result.rows;

@@ -28,9 +28,7 @@ export interface ValidationResult {
 }
 
 const API_BASE = '/api/evidence';
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-const ALLOWED_TYPES = [
- 'application/pdf',
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB$1;$2 'application/pdf',
  'image/png',
  'image/jpeg',
  'image/tiff',

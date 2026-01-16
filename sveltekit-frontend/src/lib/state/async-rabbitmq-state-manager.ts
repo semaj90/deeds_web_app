@@ -25,10 +25,7 @@ export interface RabbitMQContext {
 	failedJobs: string[]; currentJob: JobState | null;
 	error: string | null;
 	retryCount: number; maxRetries: number;
-}
-
-export type RabbitMQEvent =
-	| { type: 'CONNECT'; url: string }
+}$1;$2	| { type: 'CONNECT'; url: string }
 	| { type: 'CONNECTION_SUCCESS' }
 	| { type: 'CONNECTION_ERROR'; error: string }
 	| {

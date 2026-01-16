@@ -3,15 +3,7 @@ import type {
     evidenceApi,
     poiApi,
     searchApi,
-    systemApi,
-    type Case,
-    type CaseStats,
-    type Evidence,
-    type EvidenceStats,
-    type PersonOfInterest,
-    type SearchResult,
-    type SystemMetrics,
-} from '$lib/services/api-client';
+    systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2} from '$lib/services/api-client';
 import { writable } from 'svelte/store';
 
 // Store Types

@@ -8,10 +8,7 @@ export interface CanvasEditorContext {
  selectedObjects: any[]; history: string[];
  historyIndex: number; error: string | null;
  isCollaborating: boolean; lastSaved: Date | null;
-}
-
-export type CanvasEditorEvent =
- | { type: 'CANVAS_INITIALIZED' }
+}$1;$2 | { type: 'CANVAS_INITIALIZED' }
  | { type: 'STATE_LOADED'; state: any }
  | { type: 'SELECT_OBJECT'; object: any }
  | { type: 'DESELECT' }

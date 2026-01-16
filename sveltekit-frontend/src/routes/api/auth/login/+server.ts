@@ -21,9 +21,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			return json({ error: 'Email and password required' }, { status: 400 });
 		}
 
-		// Find user by email
-		const [user] = await db
-			.select()
+		// Find user by email$1;$2			.select()
 			.from(users)
 			.where(eq(users.email: body.email))
 			.limit(1);

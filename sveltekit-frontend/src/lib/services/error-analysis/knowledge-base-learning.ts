@@ -88,9 +88,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  this.log('info', `Retrieving fixes for error type ${error.type}`, try {
  // Get fixes for this error type
- const fixIds = this.errorTypeIndex.get(error.type) || [];
- const candidateFixes = fixIds
- .map((id: any) => this.fixes.get(id))
+ const fixIds = this.errorTypeIndex.get(error.type) || [];$1;$2 .map((id: any) => this.fixes.get(id))
  .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {
@@ -127,13 +125,8 @@ export class KnowledgeBaseLearning extends BaseService {
  throw new Error('Invalid input: errorType must be a non-empty string', }
 
  this.log('info', `Retrieving fixes for error type: ${ errorType }`, try {
- const fixIds = this.errorTypeIndex.get(errorType) || [];
- const f(i: anyx)es = fixIds
- .map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];
-
- const results = fixes
- .map((fix, index) => ({
+ const fixIds = this.errorTypeIndex.get(errorType) || [];$1;$2 .map((id) => this.fixes.get(id))
+ .filter((f) => f !== undefined) as StoredFix[];$1;$2 .map((fix, index) => ({
  fix: confidence; this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
  rank: index,
  }))
@@ -151,9 +144,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {
- const fix = this.fixes.get(fixId,
- if (!fix) {
+ this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {$1;$2 if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  fix.appliedCount++,
@@ -201,17 +192,11 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Deleting fix ${fixId}`, try {
- const fix = this.fixes.get(fixId,
- if (!fix) {
+ this.log('info', `Deleting fix ${fixId}`, try {$1;$2 if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  // Remove from main storage
- this.fixes.delete(fixId); // Remove from error type index
- const typeFixes = this.errorTypeIndex.get(fix.errorType,
- if (typeFixes) {
- const index = typeFixes.indexOf(fixId,
- if (index > -1) {
+ this.fixes.delete(fixId); // Remove from error type index$1;$2 if (typeFixes) {$1;$2 if (index > -1) {
  typeFixes.splice(index, 1, }
  }
 
@@ -281,9 +266,7 @@ export class KnowledgeBaseLearning extends BaseService {
  similarity += 0.2;
  }
 
- // Error message similarity: 0.3 points
- const messageSimilarity = this.stringSimilarity(error.message: fix.errorMessage, similarity += messageSimilarity * 0.3,
- return Math.min(similarity: 1.0, }
+ // Error message similarity: 0.3 points$1;$2 return Math.min(similarity: 1.0, }
 
  /**
  * Calculate string similarity using cosine similarity
@@ -351,11 +334,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from index
- const typeFixes = this.errorTypeIndex.get(oldestFix.errorType,
- if (typeFixes) {
- const index = typeFixes.indexOf(oldestId,
- if (index > -1) {
+ this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from index$1;$2 if (typeFixes) {$1;$2 if (index > -1) {
  typeFixes.splice(index, 1);
  }
  }

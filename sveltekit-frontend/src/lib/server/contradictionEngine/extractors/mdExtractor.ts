@@ -9,10 +9,7 @@ export async function extractFactsFromMarkdown(input: MarkdownEvidenceInput): Pr
  prefer: 'auto',
  output: 'html-and-ast',
  includeFrontMatter: true,
- });
-
- const prompt = `
-Extract factual propositions from the following evidence.
+ });$1;$2Extract factual propositions from the following evidence.
 Return JSON in the following structure:
 [
  { "claim": "...", "actor": "...", "subject": "...", "time": "...", "certainty": 0-1 }

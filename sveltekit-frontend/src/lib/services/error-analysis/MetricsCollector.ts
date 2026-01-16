@@ -255,9 +255,7 @@ export class MetricsCollector {
 		const serviceHealth = await this.checkServiceHealth();
 
 		// Calculate confidence distribution
-		const experienceRecorder = getExperienceRecorder();
-		const experiences = experienceRecorder.getExperiencesByOutcome('success')
-			.concat(experienceRecorder.getExperiencesByOutcome('failure'));
+		const experienceRecorder = getExperienceRecorder();$1;$2			.concat(experienceRecorder.getExperiencesByOutcome('failure'));
 
 		let highConfidence = 0;
 		let mediumConfidence = 0;

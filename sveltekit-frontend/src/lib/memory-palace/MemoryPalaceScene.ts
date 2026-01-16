@@ -171,30 +171,22 @@ export class MemoryPalaceScene {
  if (!this?.points|| !this?.uniforms|| !this.highlightAttr) return;
 
  // 1) Update query vector uniforms
- const show = queryEmb16 && queryEmb16.length === 16 ? 1.0 , 0.0;
+ const show = $1?.$2 === 16 ? 1.0 , 0.0;
  this.uniforms.uShowSearchHighlight.value = show;
 
- if (show) {
- const q0 = new THREE.Vector4(
- queryEmb16[0] ?? 0,
+ if (show) {$1;$2 queryEmb16[0] ?? 0,
  queryEmb16[1] ?? 0,
  queryEmb16[2] ?? 0,
  queryEmb16[3] ?? 0
- );
- const q1 = new THREE.Vector4(
- queryEmb16[4] ?? 0,
+ );$1;$2 queryEmb16[4] ?? 0,
  queryEmb16[5] ?? 0,
  queryEmb16[6] ?? 0,
  queryEmb16[7] ?? 0
- );
- const q2 = new THREE.Vector4(
- queryEmb16[8] ?? 0,
+ );$1;$2 queryEmb16[8] ?? 0,
  queryEmb16[9] ?? 0,
  queryEmb16[10] ?? 0,
  queryEmb16[11] ?? 0
- );
- const q3 = new THREE.Vector4(
- queryEmb16[12] ?? 0,
+ );$1;$2 queryEmb16[12] ?? 0,
  queryEmb16[13] ?? 0,
  queryEmb16[14] ?? 0,
  queryEmb16[15] ?? 0

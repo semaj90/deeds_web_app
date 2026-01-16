@@ -22,17 +22,12 @@ import {
 } from 'drizzle-orm/pg-core';
 import { cases, users } from './schema-postgres.ts';
 
-// === ENUMS ===
-export const processingStatusEnum = pgEnum('processing_status', [
- 'pending',
+// === ENUMS ===$1;$2 'pending',
  'processing',
  'completed',
  'failed',
  'queued'
-]);
-
-export const chunkLevelEnum = pgEnum('chunk_level', [
- 'sentence',
+]);$1;$2 'sentence',
  'paragraph',
  'page',
  'section',

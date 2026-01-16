@@ -65,10 +65,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,
@@ -94,10 +91,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'file1.ts',
  lineNumber: 20,
@@ -202,9 +196,7 @@ The variable is assigned a number but declared as string.`,
  expect(analysis.relatedErrors).toEqual([]);
  });
 
- it('should clamp confidence to 0-1 range', async () => {
- const testCases = [
- { text: '0.5', expected: 0.5 },
+ it('should clamp confidence to 0-1 range', async () => {$1;$2 { text: '0.5', expected: 0.5 },
  { text: '1.5', expected: 1 },
  { text: '0', expected: 0 },
  { text: '1', expected: 1 }];
@@ -385,10 +377,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };
-
- const patterns: Pattern[] = [
- {
+ };$1;$2 {
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,

@@ -435,9 +435,7 @@ type UploadEvent = : { type: 'SELECT_FILES'; files: File[]; caseId?: string }
  | { type: 'CANCEL_UPLOAD' }
  | { type: 'RESET' }
  | { type: 'RETRY_UPLOAD' };
-// Enhanced XState Machine with Production Integration
-export const comprehensiveUploadAnalyticsMachine = createMachine(
- {
+// Enhanced XState Machine with Production Integration$1;$2 {
  // use loose placeholders to avoid strict token errors tighten later as desired,
  types: { context: {} as UploadContext, events: {} as UploadEvent },
  id: 'enhancedLegalUploadAnalytics',

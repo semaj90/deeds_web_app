@@ -93,14 +93,10 @@ export class ErrorClustering {
 			);
 		}
 
-		// Get embedding vectors
-		const vectors: number[][] = validErrors.map(
-			(e) => embeddings.get(e?.hash?? '') || new Array(this.config.embeddingDimension).fill(0)
+		// Get embedding vectors$1;$2			(e) => embeddings.get(e?.hash?? '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
-		// Run K-means clustering
-		const assignments = this.cudaAvailable
-			? await this.cudaKMeans(vectors)
+		// Run K-means clustering$1;$2			? await this.cudaKMeans(vectors)
 			: this.cpuKMeans(vectors);
 
 		// Build cluster results
@@ -115,10 +111,7 @@ export class ErrorClustering {
 		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
-			if (members.length < this.config.minClusterSize) continue;
-
-			const centroid = this.computeCentroid(
-				members.map((m) => embeddings.get(m?.hash?? '') || [])
+			if (members.length < this.config.minClusterSize) continue;$1;$2				members.map((m) => embeddings.get(m?.hash?? '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members);
 			const description = await this.generateDescription(members, commonFeatures);
@@ -236,10 +229,7 @@ export class ErrorClustering {
 		members.forEach((m) => {
 			const code = m?.code?? 'unknown';
 			errorCodes.set(code, (errorCodes.get(code) ?? 0) + 1);
-		});
-
-		const sortedCodes = [...errorCodes.entries()]
-			.sort((a, b) => b[1] - a[1])
+		});$1;$2			.sort((a, b) => b[1] - a[1])
 			.slice(0, 3);
 		sortedCodes.forEach(([code]) => features.push(`error_code:${code}`));
 
@@ -249,10 +239,7 @@ export class ErrorClustering {
 			const file = m?.file?? '';
 			const dir = file.split('/').slice(0, -1).join('/');
 			if (dir) filePatterns.set(dir, (filePatterns.get(dir) ?? 0) + 1);
-		});
-
-		const sortedDirs = [...filePatterns.entries()]
-			.sort((a, b) => b[1] - a[1])
+		});$1;$2			.sort((a, b) => b[1] - a[1])
 			.slice(0, 2);
 		sortedDirs.forEach(([dir]) => features.push(`directory:${dir}`));
 
@@ -267,14 +254,9 @@ export class ErrorClustering {
 		commonFeatures: string[]
 	): Promise<string> {
 		try {
-			const ollamaService = getOllamaService();
-			const sampleMessages = members
-				.slice(0, 3)
+			const ollamaService = getOllamaService();$1;$2				.slice(0, 3)
 				.map((m) => m.message)
-				.join('\n');
-
-			const prompt = `Summarize these related errors in one sentence:
-Features: ${commonFeatures.join(', ')}
+				.join('\n');$1;$2Features: ${commonFeatures.join(', ')}
 Sample errors:
 ${sampleMessages}`;
 

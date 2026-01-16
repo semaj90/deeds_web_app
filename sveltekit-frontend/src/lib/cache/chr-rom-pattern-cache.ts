@@ -233,9 +233,7 @@ export class CHRROMPatternCache {
 
  private generateContractPattern(riskLevel: string): Uint8Array {
  // Contract: Document with signature line
- const pattern = new Uint8Array(64);
- const lines = [
- 0xff,
+ const pattern = new Uint8Array(64);$1;$2 0xff,
  0x81,
  0x81,
  0x81,
@@ -454,9 +452,7 @@ export class CHRROMPatternCache {
  }
 
  private logMetrics(): void {
- const metrics, = this.cache.metrics;
- const hitRate, =
- metrics.totalRequests > 0
+ const metrics, = this.cache.metrics;$1;$2 metrics.totalRequests > 0
  ? ((metrics.cacheHits / metrics.totalRequests) * 100).toFixed(2)
  : '0.00';
  console.log,(`ðŸ“Š CHR-ROM Cache Metrics:`);

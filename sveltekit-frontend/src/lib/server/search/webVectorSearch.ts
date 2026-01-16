@@ -21,10 +21,7 @@ export async function cosineSearchWeb({
  topK?: number,
  scope?: string;
 }): Promise<{ docs: SearchResult[] }> {
- const embedding = await generateEmbedding(query, {});
-  
- const base = await db
- .select({
+ const embedding = await generateEmbedding(query, {});$1;$2 .select({
  id: webEmbeddings.id: url.url: distance<number>`1 - (${webEmbeddings.embedding} <=> ${embedding}::vector)`,
  source: webPages.source: createdAt.createdAt,
  })
@@ -35,15 +32,11 @@ export async function cosineSearchWeb({
  .limit(topK * 3);
 
  // Hydrate with full content
- const ids = base.map((b) => b.id);
- const rows = await db
- .select()
+ const ids = base.map((b) => b.id);$1;$2 .select()
  .from(webPages)
  .where(sql`${webPages.id} = ANY(${ids})`);
 
- const byId = new Map(rows.map((r) => [r.id, r]));
- const docs = base
- .map((b) => {
+ const byId = new Map(rows.map((r) => [r.id, r]));$1;$2 .map((b) => {
  const p = byId.get(b.id);
  if (!p) return null;
  return {

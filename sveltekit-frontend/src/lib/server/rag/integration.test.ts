@@ -31,9 +31,7 @@ describe('RAG System Integration Tests', () => {
  });
 
  it('should complete full indexing → search → chat workflow', async () => {
- // Step 1: Extract legal tags from sample text
- const sampleText = `
- This case involves 18 U.S.C. § 1512 witness tampering charges.
+ // Step 1: Extract legal tags from sample text$1;$2 This case involves 18 U.S.C. § 1512 witness tampering charges.
  The defendant in People v. Smith (1996) was found guilty under
  Penal Code § 187 for murder in the first degree.
  See also 42 U.S.C. § 1983 for civil rights violations.
@@ -128,9 +126,7 @@ describe('RAG System Integration Tests', () => {
  await sql`DELETE FROM chunk_tag_links WHERE chunk_id IN (${chunk1Id}, ${chunk2Id})`;
  });
 
- it('should validate tag extraction accuracy with real legal text', async () => {
- const realLegalText = `
- Defendant is charged with violating 18 U.S.C. § 1512(b)(3), witness tampering,
+ it('should validate tag extraction accuracy with real legal text', async () => {$1;$2 Defendant is charged with violating 18 U.S.C. § 1512(b)(3), witness tampering,
  and 18 U.S.C. § 1503, obstruction of justice. The government alleges that
  defendant attempted to influence the testimony of witnesses in violation of
  federal law. This case is distinguishable from United States v. Johnson (2019)
@@ -158,9 +154,7 @@ describe('RAG System Integration Tests', () => {
  expect(tags.caCodes).toEqual([...new Set(tags.caCodes)]);
  });
 
- it('should handle edge cases in legal text extraction', async () => {
- const edgeCaseTexts = [
- '', // Empty string
+ it('should handle edge cases in legal text extraction', async () => {$1;$2 '', // Empty string
  ' \n\t ', // Whitespace only
  'No legal citations here', // No matches
  '18 USC 1512 without periods', // Alternative format
@@ -191,10 +185,7 @@ describe('RAG System Integration Tests', () => {
 
  it('should maintain performance under load', async () => {
  const startTime = Date.now();
- const iterations = 100;
-
- const sampleTexts = [
- 'Case involving 18 U.S.C. § 1512 witness tampering',
+ const iterations = 100;$1;$2 'Case involving 18 U.S.C. § 1512 witness tampering',
  'People v. Smith (1996) precedent case',
  'Violation of Penal Code § 187 murder statute',
  'Multiple citations: 42 U.S.C. § 1983, PC § 211, Jones v. State (2020)'];

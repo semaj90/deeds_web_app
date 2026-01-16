@@ -121,9 +121,7 @@ export const shaderDependencies = pgTable('shader_dependencies', {
  updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow(),
 });
 
-// Define valid status values as a union type
-export type ShaderCompilationStatus =
- | 'pending'
+// Define valid status values as a union type$1;$2 | 'pending'
  | 'processing'
  | 'completed'
  | 'failed'

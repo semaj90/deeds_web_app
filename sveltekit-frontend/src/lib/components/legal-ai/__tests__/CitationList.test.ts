@@ -4,9 +4,7 @@ import CitationList from '../CitationList.svelte';
 import { setupTest, cleanupTest, mockQdrant, mockRedis, mockOllama, mockPostgres, mockMinio } from '$lib/test-utils/setup';
 
 // Mock fetch
-describe('CitationList Component', () => {
- const mockCitations = [
- {
+describe('CitationList Component', () => {$1;$2 {
  id: 'citation-1',
  statute_code: '18 U.S.C. § 1001',
  statute_title: 'Fraud and false statements',
@@ -72,9 +70,7 @@ describe('CitationList Component', () => {
  it('should filter by jurisdiction', async () => {
  const { container } = render(CitationList);
 
- await waitFor(() => {
- const jurisdictionSelect = container.querySelector(
- '#jurisdiction-filter'
+ await waitFor(() => {$1;$2 '#jurisdiction-filter'
  ) as HTMLSelectElement;
  expect(jurisdictionSelect).toBeTruthy();
  });
@@ -83,9 +79,7 @@ describe('CitationList Component', () => {
  it('should filter by severity', async () => {
  const { container } = render(CitationList);
 
- await waitFor(() => {
- const severitySelect = container.querySelector(
- '#severity-filter'
+ await waitFor(() => {$1;$2 '#severity-filter'
  ) as HTMLSelectElement;
  expect(severitySelect).toBeTruthy();
  });

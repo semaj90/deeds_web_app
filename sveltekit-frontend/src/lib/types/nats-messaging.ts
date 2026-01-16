@@ -1,6 +1,4 @@
-/** * Type definitions for NATS Messaging Service */ // Define the union type for message categories
-export type MessageType =
- | 'case_management'
+/** * Type definitions for NATS Messaging Service */ // Define the union type for message categories$1;$2 | 'case_management'
  | 'document_processing'
  | 'ai_analysis'
  | 'search_operation'
@@ -216,9 +214,7 @@ export interface DeliveryInfo {
 export interface NATSEvent {
  type: NATSEventType; timestamp: string;
  data: MessageData;
-}
-export type NATSEventType =
- | 'connected'
+}$1;$2 | 'connected'
  | 'disconnected'
  | 'reconnecting'
  | 'error'

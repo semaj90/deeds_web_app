@@ -68,9 +68,7 @@ export const sessionStore = createSessionStore();
 
 // Helper functions for accessing reactive state
 export const getUser = () => sessionStore.state.context.user;
-export const getIsAuthenticated = () => sessionStore.state.matches('authenticated');
-export const getIsLoading = () =>
- sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
+export const getIsAuthenticated = () => sessionStore.state.matches('authenticated');$1;$2 sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
 
 // Utility functions for upload operations
 export const getUserForUpload = (): { uploadedBy: string;

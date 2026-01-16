@@ -7,8 +7,7 @@ declare module '$lib/ai/langchain-rag' {
  const _default: unknown;
  export default _default;
 
- // Named export
- export const vectorStore: unknown;
+ // Named export const vectorStore: unknown;
 
  // Allow additional exports
  export const __esModule: boolean;

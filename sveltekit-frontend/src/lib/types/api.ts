@@ -324,9 +324,7 @@ export interface ApiError {
  timestamp: Date;
 }
 
-// Generic API Handler Types
-export type ApiHandler<TRequest = unknown, TResponse = unknown> = (
- request: TRequest
+// Generic API Handler Types$1;$2 request: TRequest
 ) => Promise<ApiResponse<TResponse>>;
 
 export type ApiErrorHandler = (error, Error) => ApiResponse<never>;
@@ -810,9 +808,7 @@ export interface ProtocolRouter {
  getAllServices(): unknown[];
 }
 
-// Utility Type for API Route Handlers with Enhanced Context
-export type EnhancedAPIHandler<TRequest = unknown, TResponse = APIResponse> = (
- request: TRequest, context: APIRequestContext
+// Utility Type for API Route Handlers with Enhanced Context$1;$2 request: TRequest, context: APIRequestContext
 ) => Promise<TResponse>;
 
 // Multi-Protocol Request Options

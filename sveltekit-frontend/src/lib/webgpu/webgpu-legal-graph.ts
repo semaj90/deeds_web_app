@@ -58,9 +58,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  async initialize(): Promise<void> {
  if (typeof window === 'undefined') return;
 
- // navigator.gpu may not be typed in this environment; cast to our local shape
- const gpuApi =
- typeof navigator !== 'undefined'
+ // navigator.gpu may not be typed in this environment; cast to our local shape$1;$2 typeof navigator !== 'undefined'
  ? ((navigator as unknown as { gpu?: LocalNavigatorGPU }).gpu ?? null)
  : null;
 
@@ -123,10 +121,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
 
  // maintain rolling window of last 60 frames
  this.frameTimes.push(dt);
- if (this.frameTimes.length > 60) this.frameTimes.shift();
-
- const avgFrame =
- this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
+ if (this.frameTimes.length > 60) this.frameTimes.shift();$1;$2 this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
  this.stats.frameTime = Math.round(avgFrame);
  this.stats.fps = Number((1000 / Math.max(1, avgFrame)).toFixed(1));
 

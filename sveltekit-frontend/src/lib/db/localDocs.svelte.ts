@@ -251,11 +251,11 @@ export class LocalLegalStore {
 			const { documents, deletedIds } = await response.json();
 
 			// Apply updates
-			if (documents && documents.length > 0) {
+			if ($1?.$2 > 0) {
 				this.bulkInsert(documents, }
 
 			// Handle deletions
-			if (deletedIds && deletedIds.length > 0) {
+			if ($1?.$2 > 0) {
 				deletedIds.forEach((id: string) => this.deleteDocument(id));
 			}
 

@@ -10,9 +10,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   DeleteObjectCommand,
-  ListObjectsV2Command,
-  type _Object
-} from '@aws-sdk/client-s3';
+  ListObjectsV2Command,$1;$2} from '@aws-sdk/client-s3';
 
 export interface MinIOConfig {
   endpoint?: string;
@@ -36,9 +34,7 @@ export class MinIOService {
 
   constructor(config?: MinIOConfig) {
     const endpoint = config?.endpoint ?? process.env?.MINIO_ENDPOINT?? 'http://localhost:9000';
-    const accessKeyId = config?.accessKeyId ?? process.env?.MINIO_ACCESS_KEY?? 'minioadmin';
-    const secretAccessKey =
-      config?.secretAccessKey ?? process.env?.MINIO_SECRET_KEY?? 'minioadmin';
+    const accessKeyId = config?.accessKeyId ?? process.env?.MINIO_ACCESS_KEY?? 'minioadmin';$1;$2      config?.secretAccessKey ?? process.env?.MINIO_SECRET_KEY?? 'minioadmin';
     const region = config?.region ?? 'us-east-1';
 
     this.client = new S3Client({

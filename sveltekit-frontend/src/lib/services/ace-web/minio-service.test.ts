@@ -142,9 +142,7 @@ describe('MinIOService', () => {
     it('should store chunks successfully', async () => {
       mockSend.mockResolvedValueOnce({});
 
-      const docId = 'doc-456';
-      const chunks = [
-        { text: 'Chunk 1 content', metadata: { index: 0 } },
+      const docId = 'doc-456';$1;$2        { text: 'Chunk 1 content', metadata: { index: 0 } },
         { text: 'Chunk 2 content', metadata: { index: 1 } }];
 
       const key = await service.storeChunks(docId, chunks);

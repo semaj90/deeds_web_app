@@ -115,9 +115,7 @@ export class TRTLLMClient {
  }
 
  // Convenience method for legal document analysis
- async analyzeLegalDocument(content: string, query?: string): Promise<TRTLLMResponse> {
- const prompt = query
- ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
+ async analyzeLegalDocument(content: string, query?: string): Promise<TRTLLMResponse> {$1;$2 ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
  : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
 
  return this.generate({
@@ -131,9 +129,7 @@ export class TRTLLMClient {
  async *analyzeLegalDocumentStream(
  content: string,
  query?: string
- ): AsyncGenerator<TRTLLMResponse> {
- const prompt = query
- ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
+ ): AsyncGenerator<TRTLLMResponse> {$1;$2 ? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
  : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
 
  yield* this.generateStream({

@@ -276,9 +276,7 @@ export async function* streamRAGResponse(
 			timestamp: Date.now()
 		};
 
-		// 4. Stream LLM response with injected context
-		const enhancedPrompt = context
-			? `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:`
+		// 4. Stream LLM response with injected context$1;$2			? `Context:\n${context}\n\nQuestion: ${query}\n\nAnswer:`
 			: `Question: ${query}\n\nAnswer:`;
 
 		yield* streamOllamaResponse(enhancedPrompt);

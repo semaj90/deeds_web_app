@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-01-16T18:14:56.086Z",
+  "mode": "dry-run",
+  "totalMatches": 2,
+  "files": [
+    {
+      "file": "src/lib/server/ai/rag-pipeline-enhanced.ts",
+      "exists": true,
+      "size": 58519,
+      "matchCount": 2,
+      "matches": [
+        {
+          "pattern": "embeddings_constructor_fix",
+          "line": 602,
+          "before": "this.embeddings = new OllamaHTTPEmbeddings(this.config.ollam",
+          "after": "this.embeddings = new OllamaHTTPEmbeddings(this.config.ollam"
+        },
+        {
+          "pattern": "redis_setex_fix",
+          "line": 660,
+          "before": "await this.redis.setex(cacheKey: this.config.redis.cacheTtl:",
+          "after": "await this.redis.setex(cacheKey, this.config.redis.cacheTtl,"
+        }
+      ]
+    }
+  ]
+}

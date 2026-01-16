@@ -67,7 +67,7 @@ export class EnhancedCaseAPI {
       console.log('✅ Case created successfully:', createdCase);
 
       // Step 2: Trigger PostgreSQL-first worker for auto-tagging
-      if (createdCase && createdCase.id) {
+      if ($1?.$2) {
         try {
           await this.triggerWorkerProcessing(createdCase.id, data);
         } catch (workerError) {
@@ -95,10 +95,7 @@ export class EnhancedCaseAPI {
     formData: CaseCreationRequest
   ): Promise<APIResponse<WorkerTriggerResponse>> {
     try {
-      console.log('📡 Triggering worker processing for case:', caseId);
-
-      const workerResponse = await restClient.post<WorkerTriggerResponse>(
-        '/worker/autotag/trigger',
+      console.log('📡 Triggering worker processing for case:', caseId);$1;$2        '/worker/autotag/trigger',
         {
           type: 'case_created',
           caseId,

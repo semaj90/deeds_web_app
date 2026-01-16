@@ -26,9 +26,7 @@ export class NativeWindowsServiceManager {
  this.initializeServiceDefinitions();
  }
 
- private initializeServiceDefinitions(): void {
- const serviceDefinitions: WindowsService[] = [
- {
+ private initializeServiceDefinitions(): void {$1;$2 {
  name: 'legal-ai-frontend',
  displayName: 'Legal AI SvelteKit Frontend',
  executable: 'npm run dev',
@@ -195,9 +193,7 @@ export class NativeWindowsServiceManager {
 
  async startAllServices(): Promise<any> {
  console.log('🚀 Starting all Legal AI services...');
- const results = { started: [], failed: [] };
- const serviceOrder = [
- 'postgresql-service',
+ const results = { started: [], failed: [] };$1;$2 'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service',
@@ -352,9 +348,7 @@ export class NativeWindowsServiceManager {
  console.log('🏗️ Deploying native Windows services...');
  const deployed: string[] = [];
  const failed: string[] = [];
- await this.integrateConcurrentSearch();
- const criticalServices = [
- 'postgresql-service',
+ await this.integrateConcurrentSearch();$1;$2 'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service'];
@@ -378,9 +372,7 @@ export class NativeWindowsServiceManager {
  return { deployed, failed };
  }
 
- async generateWindowsServiceScript(): Promise<string> {
- const scriptContent = `@echo off
-REM Legal AI Native Windows Service Deployment Generated: ${new Date().toISOString()}
+ async generateWindowsServiceScript(): Promise<string> {$1;$2REM Legal AI Native Windows Service Deployment Generated: ${new Date().toISOString()}
 echo 🚀 Starting Legal AI Native Services...
 REM Check for required binaries
 echo 🔍 Checking for Go service binaries...
@@ -422,9 +414,7 @@ echo 🤖 Ollama: http://localhost:11434
 echo ⚡ RAG: http://localhost:8094
 echo 📁 Service: http://localhost:8093
 pause
-`;
- const scriptPath =
- 'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
+`;$1;$2 'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
  if (typeof window === 'undefined') {
  const fs = await import('fs');
  fs.writeFileSync(scriptPath, scriptContent);

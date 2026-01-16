@@ -299,9 +299,7 @@ export const SERVICES_CONFIG: Record<string, ServiceConfig> = {
  },
 };
 
-// Multi-Protocol API Routes Configuration
-export const API_ROUTES: ProtocolRoute[] = [
- // Enhanced RAG Routes
+// Multi-Protocol API Routes Configuration$1;$2 // Enhanced RAG Routes
  {
  service: 'enhancedRag',
  endpoint: '/api/v1/rag',

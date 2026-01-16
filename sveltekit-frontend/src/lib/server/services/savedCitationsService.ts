@@ -38,9 +38,7 @@ type PgPool = {
  connect: () => Promise<PgClient>;
 };
 
-// Type guards
-const isPgPool = (p: unknown): p is PgPool =>
- typeof p === 'object' && p !== null && 'connect' in p && typeof (p as PgPool).connect === 'function';
+// Type guards$1;$2 typeof p === 'object' && p !== null && 'connect' in p && typeof (p as PgPool).connect === 'function';
 
 const hasQuery = (p: unknown): p is { query: (sql: string, params?: unknown[]) => Promise<unknown> } =>
  typeof p === 'object' && p !== null && 'query' in p && typeof (p as { query?: unknown }).query === 'function';
@@ -66,9 +64,7 @@ export async function getSavedCitationsForUser(userId: string): Promise<Citation
  // and postgres-js style clients (pool.query returns rows or an array)
  let client: null = null;
 
- try {
- const sql = `
- SELECT id, title, content, source, tags, category, is_favorite, notes, saved_at, context_data
+ try {$1;$2 SELECT id, title, content, source, tags, category, is_favorite, notes, saved_at, context_data
  FROM saved_citations
  WHERE user_id = $1
  ORDER BY saved_at DESC

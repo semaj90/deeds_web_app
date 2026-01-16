@@ -10,10 +10,7 @@
 type ParseResult<T> = {
  data: T; backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
-};
-
-const DEFAULT_HTTP_ENDPOINT =
- typeof window !== 'undefined'
+};$1;$2 typeof window !== 'undefined'
  ? import.meta.env.VITE_SIMD_ACCELERATOR_URL ?? 'https://localhost:8095/json'
  : 'http://localhost:8095/json';
 

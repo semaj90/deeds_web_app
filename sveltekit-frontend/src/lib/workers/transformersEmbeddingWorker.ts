@@ -12,9 +12,7 @@ self.onmessage = async (e: MessageEvent) => {
 		const pipe = await transformers.pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 		const out = await pipe(String(text));
 
-		// flatten nested arrays into a single numeric array
-		const flatten = (arr: unknown): number[] =>
-			Array.isArray(arr) ? arr.flatMap(flatten) : typeof arr === 'number' ? [arr] : [];
+		// flatten nested arrays into a single numeric array$1;$2			Array.isArray(arr) ? arr.flatMap(flatten) : typeof arr === 'number' ? [arr] : [];
 
 		const flat = flatten(out);
 		self.postMessage({ embedding, flat });

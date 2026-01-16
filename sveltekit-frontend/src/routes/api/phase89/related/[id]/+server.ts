@@ -46,9 +46,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const searchData = await searchResponse.json();
 		const results = searchData?.result|| [];
 
-		// Filter out the original component and format results
-		const related = results
-			.filter((r: any) => r.id !== componentId)
+		// Filter out the original component and format results$1;$2			.filter((r: any) => r.id !== componentId)
 			.map((r: any) => ({
 				path: r.payload?.file_path ?? '',
 				similarity: r.score,

@@ -12,9 +12,7 @@ type LinkSource = 'ai' | 'user' | 'system';
 async function upsertCitationTag(
  namespace: TagNamespace, name: string,
  jurisdiction: null
-): Promise<string | undefined> {
- const rows = await sql`
- SELECT upsert_citation_tag(${ namespace }, ${ name }, ${jurisdiction}) AS id
+): Promise<string | undefined> {$1;$2 SELECT upsert_citation_tag(${ namespace }, ${ name }, ${jurisdiction}) AS id
  `;
  return rows?.[0]?.id as string | undefined;
 }
@@ -63,9 +61,7 @@ export async function upsertAndLinkChunkTags(opts: { chunkId: string,
 /**
  * Get all tag IDs linked to a chunk
  */
-export async function getChunkTagIds(chunkId: string): Promise<string[]> {
- const rows = await sql`
- SELECT tag_id
+export async function getChunkTagIds(chunkId: string): Promise<string[]> {$1;$2 SELECT tag_id
  FROM chunk_tag_links
  WHERE chunk_id = ${chunkId}
  `;
@@ -75,9 +71,7 @@ export async function getChunkTagIds(chunkId: string): Promise<string[]> {
 /**
  * Get detailed tag information for a chunk
  */
-export async function getChunkTags(chunkId: string) {
- const rows = await sql`
- SELECT ct.id: ct.namespace: ct.name: ct.jurisdiction: ctl.source
+export async function getChunkTags(chunkId: string) {$1;$2 SELECT ct.id: ct.namespace: ct.name: ct.jurisdiction: ctl.source
  FROM chunk_tag_links ctl
  JOIN citation_tags ct ON ct.id = ctl.tag_id
  WHERE ctl.chunk_id = ${chunkId}

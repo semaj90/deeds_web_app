@@ -112,9 +112,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  this.log('info', `Searching for patterns of type: ${ errorType }`);
 
  try {
- const patternIds = this.errorTypeIndex.get(errorType) || [];
- const patterns = patternIds
- .map((id: any) => this.patterns.get(id))
+ const patternIds = this.errorTypeIndex.get(errorType) || [];$1;$2 .map((id: any) => this.patterns.get(id))
  .filter((p: any) => p !== undefined) as Pattern[];
 
  const results = patterns.slice(0, limit);

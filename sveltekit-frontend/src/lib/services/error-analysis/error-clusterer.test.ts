@@ -101,9 +101,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  });
 
  it('should assign errors to clusters based on similarity', async () => {
- // Create two groups of similar errors
- const group1: Error[] = [
- {
+ // Create two groups of similar errors$1;$2 {
  id: 'error-1',
  file: 'test.ts',
  line: 10, column: 5, message: 'Type, error: expected string',
@@ -120,10 +118,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];
-
- const group2: Error[] = [
- {
+ }];$1;$2 {
  id: 'error-3',
  file: 'test.svelte',
  line: 5, column: 2, message: 'Svelte component error',

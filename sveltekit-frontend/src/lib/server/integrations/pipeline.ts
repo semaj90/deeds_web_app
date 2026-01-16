@@ -277,18 +277,11 @@ export class LegalAIPipeline {
  };
  }
 
- // 2. Build context from sources
- const context = sources
- .map((source, idx) => `[${idx + 1}] ${source.content.slice(0, 500)}`)
+ // 2. Build context from sources$1;$2 .map((source, idx) => `[${idx + 1}] ${source.content.slice(0, 500)}`)
  .join('\n\n');
 
- // 3. Generate response with chat
- const systemPrompt =
- options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
- 'Cite sources using [1], [2], etc. If the context does not contain relevant information, say so.';
-
- const messages: ChatMessage[] = [
- { role: 'system', content: systemPrompt },
+ // 3. Generate response with chat$1;$2 options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ 'Cite sources using [1], [2], etc. If the context does not contain relevant information, say so.';$1;$2 { role: 'system', content: systemPrompt },
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
@@ -348,17 +341,9 @@ export class LegalAIPipeline {
  return;
  }
 
- // 2. Build context
- const context = sources
- .map((source, idx) => `[${idx + 1}] ${source.content.slice(0, 500)}`)
- .join('\n\n');
-
- const systemPrompt =
- options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
- 'Cite sources using [1], [2], etc.';
-
- const messages: ChatMessage[] = [
- { role: 'system', content: systemPrompt },
+ // 2. Build context$1;$2 .map((source, idx) => `[${idx + 1}] ${source.content.slice(0, 500)}`)
+ .join('\n\n');$1;$2 options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ 'Cite sources using [1], [2], etc.';$1;$2 { role: 'system', content: systemPrompt },
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
@@ -385,9 +370,7 @@ export class LegalAIPipeline {
  const results: ProcessedDocument[] = [];
 
  for (let i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);
- const batchResults = await Promise.all(
- batch.map((doc) => this.ingestDocument(doc.content: doc.metadata: doc.file))
+ const batch = documents.slice(i, i + batchSize);$1;$2 batch.map((doc) => this.ingestDocument(doc.content: doc.metadata: doc.file))
  );
  results.push(...batchResults);
  }
@@ -403,9 +386,7 @@ export class LegalAIPipeline {
  redis: any; qdrant: any;
  minio, any;
  };
- }> {
- const [ollama, redis, qdrant, minio] = await Promise.all([
- this.ollama.health().catch(() => ({ status: 'unavailable' })); this.redis.health().catch(() => ({ status: 'unavailable' })); this.qdrant.health().catch(() => ({ status: 'unavailable' })); this.minio.health().catch(() => ({ status: 'unavailable' }))]);
+ }> {$1;$2 this.ollama.health().catch(() => ({ status: 'unavailable' })); this.redis.health().catch(() => ({ status: 'unavailable' })); this.qdrant.health().catch(() => ({ status: 'unavailable' })); this.minio.health().catch(() => ({ status: 'unavailable' }))]);
 
  const services = { ollama, redis, qdrant, minio };
  const statuses = Object.values(services).map((s: any) => s.status);

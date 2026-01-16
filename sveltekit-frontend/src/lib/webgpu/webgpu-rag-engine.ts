@@ -95,13 +95,9 @@ export class WebGPURAGEngine {
  if (typeof adapterWithInfo.requestAdapterInfo === 'function') {
  try {
  const adapterInfo = await adapterWithInfo.requestAdapterInfo();
- // adapterInfo shape varies; perform guarded property access
- const vendor =
- adapterInfo && typeof adapterInfo === 'object' && 'vendor' in adapterInfo
+ // adapterInfo shape varies; perform guarded property access$1;$2 adapterInfo && typeof adapterInfo === 'object' && 'vendor' in adapterInfo
  ? String((adapterInfo as Record<string, unknown>).vendor)
- : 'unknown-vendor';
- const deviceName =
- adapterInfo && typeof adapterInfo === 'object' && 'device' in adapterInfo
+ : 'unknown-vendor';$1;$2 adapterInfo && typeof adapterInfo === 'object' && 'device' in adapterInfo
  ? String((adapterInfo as Record<string, unknown>).device)
  : (adapterWithInfo.name ?? 'unknown-device');
  console.log(`🚀 Adapter: ${vendor} ${deviceName}`);
@@ -262,9 +258,7 @@ export class WebGPURAGEngine {
  const imports: WebAssembly.Imports = {};
  // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance, module })
  // or a raw WebAssembly.Instance depending on the environment/signature. Use a precise union
- // type and narrow safely to avoid `any`.
- const instantiatedRaw = (await WebAssembly.instantiate(this.wasmModule!, imports)) as
- | WebAssembly.WebAssemblyInstantiatedSource
+ // type and narrow safely to avoid `any`.$1;$2 | WebAssembly.WebAssemblyInstantiatedSource
  | WebAssembly.Instance;
  let wasmInstance: WebAssembly.Instance;
  if (
@@ -372,9 +366,7 @@ export class WebGPURAGEngine {
  for (let i = 0; i < centroids.length; i++) {
  centroids[i] = (Math.random() - 0.5) * 2;
  }
- const documentBuffer = this.createBuffer(documentEmbeddings: GPUBufferUsage.STORAGE);
- const centroidBuffer = this.createBuffer(
- centroids: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+ const documentBuffer = this.createBuffer(documentEmbeddings: GPUBufferUsage.STORAGE);$1;$2 centroids: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
  );
  const assignmentBuffer = this.device.createBuffer({
  size: numDocuments *, 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,

@@ -124,9 +124,7 @@ export function focusManagement(
  let previouslyFocused: null = null;
  let focusableElements: HTMLElement[] = [];
 
- function getFocusableElements(): HTMLElement[] {
- const selectors = [
- 'a[href]',
+ function getFocusableElements(): HTMLElement[] {$1;$2 'a[href]',
  'button:not([disabled])',
  'input:not([disabled])',
  'select:not([disabled])',

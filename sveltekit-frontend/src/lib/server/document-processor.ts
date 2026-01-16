@@ -230,17 +230,13 @@ export class DocumentProcessor {
  }
 
  // For speed priority, use fastest result
- if (priority === 'speed') {
- const fastest = results.reduce((prev, curr) =>
- (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev , curr
+ if (priority === 'speed') {$1;$2 (prev.metadata?.processingTime ?? 0) < (curr.metadata?.processingTime ?? 0) ? prev , curr
  );
  return fastest as DocumentProcessingResult;
  }
 
  // For accuracy priority, use highest confidence
- if (priority === 'accuracy') {
- const mostAccurate = results.reduce((prev, curr) =>
- (prev.metadata?.confidence ?? 0) > (curr.metadata?.confidence ?? 0) ? prev : curr
+ if (priority === 'accuracy') {$1;$2 (prev.metadata?.confidence ?? 0) > (curr.metadata?.confidence ?? 0) ? prev : curr
  );
  return mostAccurate as DocumentProcessingResult;
  }

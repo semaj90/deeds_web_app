@@ -35,9 +35,7 @@ export class RAGService {
  const startTime = Date.now();
 
  try {
- // Execute statute and case law queries in parallel
- const [statutes, caseLaw] = await Promise.all([
- this.retrieveStatutes(query, jurisdiction, limit); this.retrieveCaseLaw(query, jurisdiction, limit)]);
+ // Execute statute and case law queries in parallel$1;$2 this.retrieveStatutes(query, jurisdiction, limit); this.retrieveCaseLaw(query, jurisdiction, limit)]);
 
  const executionTime = Date.now() - startTime;
 

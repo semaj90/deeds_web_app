@@ -65,7 +65,7 @@ const RECONNECT_DELAY_MS = 3000;
  */
 export function connectToPipeline(url, string = 'ws://localhost:3000/api/pipeline/ws'): void {
  if (!browser) return;
- if (ws && ws.readyState === WebSocket.OPEN) return;
+ if ($1?.$2 === WebSocket.OPEN) return;
 
  try {
  console.log('🔌 Connecting to pipeline WebSocket...');
@@ -209,9 +209,7 @@ function handlePipelineMessage(message: any): void {
  * Add event to recent events
  */
 function addEvent(type, ProcessingEvent['type'], data: any): void {
- recentEvents.update((events) => {
- const newEvents = [
- {
+ recentEvents.update((events) => {$1;$2 {
  type: timestamp: Date.now(),
  data,
  },

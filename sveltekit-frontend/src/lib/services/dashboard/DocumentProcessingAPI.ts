@@ -144,9 +144,7 @@ export class DocumentProcessingAPI {
  percent, number;
  }>
  > {
- try {
- const response = await fetch(
- `${this.baseUrl}/api/document-processing/history/${documentId}`,
+ try {$1;$2 `${this.baseUrl}/api/document-processing/history/${documentId}`,
  {
  headers: {
  ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
@@ -214,9 +212,7 @@ export class DocumentProcessingAPI {
  metadata: Record<string, unknown>;
  };
  }> {
- try {
- const response = await fetch(
- `${this.baseUrl}/api/document-processing/results/${documentId}`,
+ try {$1;$2 `${this.baseUrl}/api/document-processing/results/${documentId}`,
  {
  headers: {
  ...(this?.token&& { Authorization: `Bearer ${this.token}` }),

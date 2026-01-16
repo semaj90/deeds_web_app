@@ -59,9 +59,7 @@ export class UserRecommendationService {
 	 * Store AI chat interaction with full context for analytics
 	 */
 	async storeAiChatInteraction(params: StoreAiChatParams): Promise<string> {
-		try {
-			const [insertedQuery] = await db
-				.insert(userAiQueries)
+		try {$1;$2				.insert(userAiQueries)
 				.values({
 					userId: params.userId,
 					caseId: params?.caseId?? null,
@@ -113,9 +111,7 @@ export class UserRecommendationService {
 	 * Create new RAG session for user
 	 */
 	async createRagSession(params: CreateRagSessionParams): Promise<string> {
-		try {
-			const [insertedSession] = await db
-				.insert(ragSessions)
+		try {$1;$2				.insert(ragSessions)
 				.values({
 					userId: params.userId,
 					title: params?.sessionName|| `Session ${new Date().toISOString()}`,
@@ -137,9 +133,7 @@ export class UserRecommendationService {
 	 * Analyze user behavior patterns for recommendations
 	 */
 	async analyzeUserPatterns(userId: string): Promise<UserPattern> {
-		try {
-			const [queryStats, sessionStats, topicAnalysis] = await Promise.all([
-				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
+		try {$1;$2				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
 			]);
 
 			return { userId: commonQueries: queryStats.commonQueries,
@@ -191,27 +185,19 @@ export class UserRecommendationService {
 	 * Get comprehensive chat analytics for a user
 	 */
 	async getChatAnalytics(userId: string, timeRange?: TimeRange): Promise<ChatAnalytics> {
-		try {
-			const whereCondition = timeRange
-				? and(
+		try {$1;$2				? and(
 						eq(userAiQueries.userId, userId),
 						sql`"createdAt" >= ${timeRange.from}`,
 						sql`"createdAt" <= ${timeRange.to}`
 					)
-				: eq(userAiQueries.userId, userId);
-
-			const [stats] = await db
-				.select({
+				: eq(userAiQueries.userId, userId);$1;$2				.select({
 					totalQueries: count(userAiQueries.id),
 					successfulQueries: sql<number>`COUNT(CASE WHEN is_successful = true THEN 1 END)`,
 					avgProcessingTime: sql<number>`AVG(processing_time_ms)`,
 					totalTokens: sql<number>`SUM(tokens_used)`
 				})
 				.from(userAiQueries)
-				.where(whereCondition);
-
-			const successRate =
-				stats.totalQueries > 0 ? (stats.successfulQueries / stats.totalQueries) * 100 : 0;
+				.where(whereCondition);$1;$2				stats.totalQueries > 0 ? (stats.successfulQueries / stats.totalQueries) * 100 : 0;
 
 			const topTopics = await this.extractTopTopics(userId, 10);
 
@@ -231,9 +217,7 @@ export class UserRecommendationService {
 
 	// ===== PRIVATE HELPER METHODS =====
 
-	private async getUserQueryStats(userId: string) {
-		const queries = await db
-			.select({
+	private async getUserQueryStats(userId: string) {$1;$2			.select({
 				query: userAiQueries.query,
 				caseId: userAiQueries.caseId,
 				metadata: userAiQueries.metadata
@@ -253,9 +237,7 @@ export class UserRecommendationService {
 		};
 	}
 
-	private async getUserSessionStats(userId: string) {
-		const sessions = await db
-			.select({
+	private async getUserSessionStats(userId: string) {$1;$2			.select({
 				startedAt: ragSessions.startedAt,
 				endedAt: ragSessions.endedAt,
 				messageCount: ragSessions.messageCount
@@ -265,9 +247,7 @@ export class UserRecommendationService {
 			.orderBy(desc(ragSessions.createdAt))
 			.limit(50);
 
-		const activeHours = this.extractActiveHours(sessions);
-		const sessionLengths = sessions.map((s) =>
-			s?.endedAt&& s.startedAt
+		const activeHours = this.extractActiveHours(sessions);$1;$2			s?.endedAt&& s.startedAt
 				? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
 				: 30
 		);
@@ -283,9 +263,7 @@ export class UserRecommendationService {
 		};
 	}
 
-	private async analyzeUserTopics(userId: string) {
-		const queries = await db
-			.select({ query: userAiQueries.query })
+	private async analyzeUserTopics(userId: string) {$1;$2			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId))
 			.limit(200);
@@ -330,9 +308,7 @@ export class UserRecommendationService {
 	private async extractTopTopics(
 		userId: string,
 		limit: number
-	): Promise<Array<{ topic: string; count, number }>> {
-		const queries = await db
-			.select({ query: userAiQueries.query })
+	): Promise<Array<{ topic: string; count, number }>> {$1;$2			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
 			.where(eq(userAiQueries.userId, userId))
 			.limit(500);
@@ -407,9 +383,7 @@ export class UserRecommendationService {
 	}
 
 	private extractTopicsFromQueries(queries: string[]): string[] {
-		const topics = new Set<string>();
-		const legalTerms = [
-			'contract',
+		const topics = new Set<string>();$1;$2			'contract',
 			'liability',
 			'negligence',
 			'damages',
@@ -441,9 +415,7 @@ export class UserRecommendationService {
 		return Array.from(topics).slice(0, 10);
 	}
 
-	private extractTopicsFromText(text: string): string[] {
-		const legalTerms = [
-			'contract',
+	private extractTopicsFromText(text: string): string[] {$1;$2			'contract',
 			'liability',
 			'negligence',
 			'damages',
@@ -468,9 +440,7 @@ export class UserRecommendationService {
 		return topics;
 	}
 
-	private calculateSatisfactionScore(successRate: number, avgProcessingTime: number): number {
-		const speedScore =
-			avgProcessingTime < 1000 ? 100 : Math.max(0, 100 - (avgProcessingTime - 1000) / 100);
+	private calculateSatisfactionScore(successRate: number, avgProcessingTime: number): number {$1;$2			avgProcessingTime < 1000 ? 100 : Math.max(0, 100 - (avgProcessingTime - 1000) / 100);
 		return Math.round(successRate * 0.7 + speedScore * 0.3);
 	}
 
@@ -478,9 +448,7 @@ export class UserRecommendationService {
 		stats: { avgProcessingTime?: number | null, successfulQueries?: number, totalQueries?: number },
 		topTopics: Array<{ topic: string; count, number }>
 	): string[] {
-		const suggestions: string[] = [];
-		const successRate =
-			stats?.totalQueries&& stats.totalQueries > 0
+		const suggestions: string[] = [];$1;$2			stats?.totalQueries&& stats.totalQueries > 0
 				? ((stats.successfulQueries ?? 0) / stats.totalQueries) * 100
 				: 0;
 

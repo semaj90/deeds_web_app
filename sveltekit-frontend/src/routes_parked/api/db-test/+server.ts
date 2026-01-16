@@ -8,7 +8,7 @@ export async function GET() {
  const result = await db.execute(sql`SELECT 1 as connected;`);
 
  // Check if the query returned a result
- if (result && result.length > 0) {
+ if ($1?.$2 > 0) {
  return json({
  status: 'success',
  message: 'Database connected successfully!',

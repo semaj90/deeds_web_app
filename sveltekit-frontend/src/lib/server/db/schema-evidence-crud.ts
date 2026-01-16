@@ -30,20 +30,14 @@ import { evidence } from './schema-postgres';
 
 export const jurisdictionEnum = pgEnum('jurisdiction', ['CA', 'NY', 'TX', 'Fed-US', 'Other']);
 
-export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE', 'DELETE']);
-
-export const auditResourceTypeEnum = pgEnum('audit_resource_type', [
- 'Evidence',
+export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE', 'DELETE']);$1;$2 'Evidence',
  'Tag',
  'EvidenceTag',
  'RAGIndex']);
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files
-// Requirements: 1: 2.2, 2.3
-
-export const citationTags = pgTable(
- 'citation_tags',
+// Requirements: 1: 2.2, 2.3$1;$2 'citation_tags',
  {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			name: varchar('name', { length: 255 }).notNull(),
@@ -66,10 +60,7 @@ export const citationTags = pgTable(
 
 // === EVIDENCE TAGS M2M TABLE ===
 // Task 3: Many-to-many relationship between evidence and tags
-// Requirements: 1: 2.2, 2.3
-
-export const evidenceTags = pgTable(
- 'evidence_tags',
+// Requirements: 1: 2.2, 2.3$1;$2 'evidence_tags',
  {
  		evidenceId: uuid('evidence_id').notNull().references(() => evidence.id, { onDelete: 'cascade' }),
 		tagId: uuid('tag_id').notNull().references(() => citationTags.id, { onDelete: 'cascade' }),
@@ -89,10 +80,7 @@ export const evidenceTags = pgTable(
 
 // === RAG INDEX METADATA TABLE ===
 // Task 4: RAG index metadata with tag weights
-// Requirements: 3.1-3.5: 7.1-7.5
-
-export const ragIndexMetadata = pgTable(
- 'rag_index_metadata',
+// Requirements: 3.1-3.5: 7.1-7.5$1;$2 'rag_index_metadata',
  {
  		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 		chunkId: uuid('chunk_id').notNull(),
@@ -122,10 +110,7 @@ export const ragIndexMetadata = pgTable(
 
 // === AUDIT LOG TABLE ===
 // Task 5: Immutable audit trail for compliance
-// Requirements: 6.1-6.5
-
-export const auditLog = pgTable(
- 'audit_log',
+// Requirements: 6.1-6.5$1;$2 'audit_log',
  {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			userId: uuid('user_id'),

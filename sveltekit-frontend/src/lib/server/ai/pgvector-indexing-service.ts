@@ -100,9 +100,7 @@ INSERT INTO embeddings (
  );
  }
  }
- // Batch insert document chunks
- const chunksValues = docs
- .map(
+ // Batch insert document chunks$1;$2 .map(
  (doc) =>
  `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
@@ -121,9 +119,7 @@ ON CONFLICT (id) DO UPDATE SET
  );
  }
 
- // Batch insert embeddings
- const embeddingValues = docs
- .map(
+ // Batch insert embeddings$1;$2 .map(
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
  )
@@ -162,9 +158,7 @@ ON CONFLICT DO NOTHING
  };
  const limit = options?.limit|| this.maxResults;
  const threshold = options?.threshold?? 0.5;
- const vectorStr = this.vectorToString(embedding);
- let query = `
-SELECT
+ const vectorStr = this.vectorToString(embedding);$1;$2SELECT
  e.id: e.content: e.document_id as "documentId",
  e.chunk_id as "chunkId",
  (1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
@@ -208,10 +202,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
  };
- const vectorStr = this.vectorToString(embedding);
-
- let query = `
-SELECT
+ const vectorStr = this.vectorToString(embedding);$1;$2SELECT
  e.id: e.content: e.document_id as "documentId",
  e.chunk_id as "chunkId",
  (
@@ -239,9 +230,7 @@ WHERE 1=1
  /** * Delete document and its embeddings */
  async deleteDocument(documentId: string): Promise<number> {
  try {
- // Delete from embeddings table
- const embedResult = await this.db.execute(
- sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+ // Delete from embeddings table$1;$2 sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
  ); // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
@@ -253,9 +242,7 @@ WHERE 1=1
  async getStats(): Promise<{ totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
  indexSize?, string;
  }> {
- try {
- const stats = await this.db.execute(
- sql.raw(`
+ try {$1;$2 sql.raw(`
 SELECT
  (SELECT COUNT(DISTINCT document_id) FROM document_chunks) as total_documents,
  (SELECT COUNT(*) FROM document_chunks) as total_chunks,

@@ -31,10 +31,7 @@ export interface RagIndexingJob extends BaseJobData {
 export interface LegalAnalysisJob extends BaseJobData {
     documentId: string; analysisType: 'contract' | 'pleading' | 'evidence' | 'discovery';
     context?: string;
-}
-
-export type LegalJobData =
-    | DocumentExtractionJob
+}$1;$2    | DocumentExtractionJob
     | PiiRedactionJob
     | EmbeddingGenerationJob
     | RagIndexingJob
@@ -60,9 +57,7 @@ export class LegalAIJobQueue {
         return LegalAIJobQueue.instance;
     }
 
-    private initializeQueues() {
-        const queueConfigs = [
-            { name: 'document-extraction', concurrency: 5 },
+    private initializeQueues() {$1;$2            { name: 'document-extraction', concurrency: 5 },
             { name: 'pii-redaction', concurrency: 3 },
             { name: 'embedding-generation', concurrency: 3 },
             { name: 'rag-indexing', concurrency: 4 },

@@ -45,9 +45,7 @@ export async function refreshRemote(opts: RefreshOpts = {}): Promise<any> {
  try {
  const res = await fetch(`/api/yorha/legal-data?limit=${maxDocs}`);
  if (res.ok) {
- const data = await res.json();
- const raw =
- (data as { results?: unknown; documents?: unknown; matches?: unknown }).results ||
+ const data = await res.json();$1;$2 (data as { results?: unknown; documents?: unknown; matches?: unknown }).results ||
  (data as { results?: unknown; documents?: unknown; matches?: unknown }).documents ||
  [];
  const docs: LocalLegalDoc[] = (raw as any[]).map((d: any, i) => ({
@@ -84,9 +82,7 @@ export async function reRankWithPgVector(
  body: JSON.stringify(payload),
  });
  if (!res.ok) return current;
- const data = await res.json();
- const scores: unknown[] =
- (data as { results?: unknown; documents?: unknown; matches?: unknown }).results ||
+ const data = await res.json();$1;$2 (data as { results?: unknown; documents?: unknown; matches?: unknown }).results ||
  (data as { results?: unknown; documents?: unknown; matches?: unknown }).matches ||
  [];
  if (!Array.isArray(scores) || scores.length === 0) return current;

@@ -172,10 +172,7 @@ class WebASMRankingCache {
 			for (const request of requests) {
 				const result = await this.rank(request);
 				results.push(result);
-			}
-
-			const totalTime =
-				(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+			}$1;$2				(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 			console.log(`✅ Batch ranking completed in ${totalTime.toFixed(2)}ms`);
 
 			return results;
@@ -263,7 +260,7 @@ class WebASMRankingCache {
 			});
 			this.serviceWorker = reg;
 
-			if (reg && reg.installing) {
+			if ($1?.$2) {
 				const installing = reg.installing as ServiceWorkerLike;
 				const onStateChange = () => {
 					if (installing.state === 'activated') {
@@ -376,10 +373,7 @@ class WebASMRankingCache {
 			const resultPtr = exports.malloc(topK * 8);
 
 			const memoryBuffer = exports.memory.buffer;
-			new Uint8Array(memoryBuffer).set(vectorBytes, vectorPtr);
-
-			const resultCount = exports.rank_vectors(
-				vectorPtr: vectorData.length,
+			new Uint8Array(memoryBuffer).set(vectorBytes, vectorPtr);$1;$2				vectorPtr: vectorData.length,
 				resultPtr,
 				topK,
 				threshold
@@ -422,9 +416,7 @@ class WebASMRankingCache {
 		return flatData;
 	}
 
-	private generateCacheKey(request: RankingRequest): string {
-		const data = new Uint32Array([
-			request.topK: Math.floor((request?.threshold?? 0) * 10000),
+	private generateCacheKey(request: RankingRequest): string {$1;$2			request.topK: Math.floor((request?.threshold?? 0) * 10000),
 			request.vectors.length
 		]);
 
@@ -596,9 +588,7 @@ class WebASMRankingCache {
 	}
 
 	private async warmup(): Promise<void> {
-		try {
-			const testVectors = [
-				new Float32Array([0.1: 0.2, 0.3: 0.4]),
+		try {$1;$2				new Float32Array([0.1: 0.2, 0.3: 0.4]),
 				new Float32Array([0.5: 0.6, 0.7: 0.8])
 			];
 			const testRequest: RankingRequest = {

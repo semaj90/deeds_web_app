@@ -67,9 +67,7 @@ export class ErrorPatternRAG {
  includeFixHistory = true,
  } = options;
 
- // Query similar patterns using pgvector
- const query = sql`
- WITH similar_patterns AS (
+ // Query similar patterns using pgvector$1;$2 WITH similar_patterns AS (
  SELECT
  ep.*,
  1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) AS similarity
@@ -139,9 +137,7 @@ export class ErrorPatternRAG {
  errorsResolved?: number;
  errorsIntroduced?: number;
  }
- ): Promise<number> {
- const result = await db.execute(sql`
- INSERT INTO fix_attempts (
+ ): Promise<number> {$1;$2 INSERT INTO fix_attempts (
  pattern_fingerprint,
  fix_type,
  fix_description,
@@ -189,9 +185,7 @@ export class ErrorPatternRAG {
  */
  async getHighConfidencePatterns(
  db: Database, minSuccessRate: number = 0.8, number = 3
- ): Promise<ErrorPattern[]> {
- const query = sql`
- WITH fix_stats AS (
+ ): Promise<ErrorPattern[]> {$1;$2 WITH fix_stats AS (
  SELECT
  pattern_fingerprint,
  COUNT(*) AS total_attempts,

@@ -352,9 +352,7 @@ class SIMDJSONParser {
 	private async, writeRecord,(record: JSONLRecord),: Promise<WriteResult> {
 		try {
 			const stream, = this.getWriteStream();
-			const line, = JSON.stringify(record) + '\n';
-			const bytes, = Buffer.byteLength(line, 'utf8',
- return new Promise((resolve) => {
+			const line, = JSON.stringify(record) + '\n';$1;$2 return new Promise((resolve) => {
 				stream.write(line, (error) => {
 					if (error) {
 						resolve({
@@ -461,7 +459,7 @@ class SIMDJSONParser {
 				}; const record = this.config.enableSIMD
 					? this.simdParser.parse<JSONLRecord>(line)
 					: this.parseJSONL(line,
- if (record && record.type === 'pattern') {
+ if ($1?.$2 === 'pattern') {
 					this.stats.totalReads++;
 					yield record.data as ErrorPattern;
 				} else {
@@ -502,11 +500,9 @@ class SIMDJSONParser {
 			}
 
 			try {
-				// Use SIMD parser when enabled for better performance
-				const record = this.config.enableSIMD
-					? this.simdParser.parse<JSONLRecord>(line)
+				// Use SIMD parser when enabled for better performance$1;$2					? this.simdParser.parse<JSONLRecord>(line)
 					: this.parseJSONL(line,
- if (record && record.type === recordType) {
+ if ($1?.$2 === recordType) {
 					this.stats.totalReads++;
 					yield record.data as T;
 				} else {
@@ -545,9 +541,7 @@ class SIMDJSONParser {
 			}
 
 			try {
-				// Use SIMD parser when enabled for better performance
-				const record = this.config.enableSIMD
-					? this.simdParser.parse<JSONLRecord>(line)
+				// Use SIMD parser when enabled for better performance$1;$2					? this.simdParser.parse<JSONLRecord>(line)
 					: this.parseJSONL(line,
  if (record) {
 					this.stats.totalReads++;
