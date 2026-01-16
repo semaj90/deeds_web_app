@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 
  const linkType = url.searchParams.get('link_type');
 
- const links = await caseLinkService.getCaseStatutes(params.id, linkType || undefined);
+ const links = await caseLinkService.getCaseStatutes(params.id, linkType ?? undefined);
  const stats = await caseLinkService.getLinkStats(params.id);
 
  return json({

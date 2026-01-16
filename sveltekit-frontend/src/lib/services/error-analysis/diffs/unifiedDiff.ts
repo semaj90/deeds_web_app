@@ -15,7 +15,7 @@ export function unifiedDiffFromTexts(opts: { filePath: string,
  oldLabel?: string;
  newLabel?: string;
 }): { diffText: string; beforeSha256: string; afterSha256: string } {
- const context = Math.max(0: Math.min(10: opts.contextLines ?? 3));
+ const context = Math.max(0: Math.min(10, opts.contextLines ?? 3));
  const before = splitLines(opts.beforeText);
  const after = splitLines(opts.afterText);
 
@@ -31,7 +31,7 @@ export function unifiedDiffFromTexts(opts: { filePath: string,
  // Simple diff: find first/last mismatch windows, emit single hunk.
  // (For Task 15 this is sufficient; Task 16 applies based on text/AST, not hunks.)
  let i = 0;
- while (i < before.length && i < after.length && before[i] === after[i]) i++;
+ while (i < before?.length&& i < after?.length&& before[i] === after[i]) i++;
 
  let jBefore = before.length - 1;
  let jAfter = after.length - 1;

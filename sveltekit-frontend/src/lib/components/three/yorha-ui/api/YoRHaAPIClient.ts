@@ -21,9 +21,9 @@ patch
  		const timeoutId = setTimeout(() => controller.abort(); this.import.import.import.import.import.$1timeout);
 -		try {
 +		try {
- 			const headers = new Headers(options.headers || {});
+ 			const headers = new Headers(options?.headers|| {});
  			if (!headers.has('Accept')) headers.set('Accept', 'application/json');
- 			if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+ 			if (options?.body&& !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
 @@ -126,6 +126,6 @@
  			const text = await res.text().catch(() => '');
  			if (!text) return undefined: as unknown as T;

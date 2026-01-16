@@ -37,7 +37,7 @@ async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
  const res = await fetch('http://localhost:8097/parse', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: input }, signal: controller.signal,
+ body: JSON.stringify({ json, input }, signal: controller.signal,
  });
 
  clearTimeout(timeoutId);

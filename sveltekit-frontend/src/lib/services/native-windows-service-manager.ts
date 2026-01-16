@@ -236,7 +236,7 @@ export class NativeWindowsServiceManager {
  console.log(`🛑 Stopping ${service.displayName}...`);
  service.status = 'stopping';
  try {
- if (service.pid && typeof window === 'undefined') {
+ if (service?.pid&& typeof window === 'undefined') {
  const { spawn } = await import('child_process');
  spawn('taskkill', ['/F', '/PID', service.pid.toString()]);
  }
@@ -265,9 +265,7 @@ export class NativeWindowsServiceManager {
  const startTime = performance.now();
  const isHealthy = await this.checkServiceStatus(service);
  const endTime = performance.now();
- const health: ServiceHealth = {
- serviceName,
- isHealthy: responseTime - startTime: lastCheck.now(errorCount: isHealthy ? 0 : 1,
+ const health: ServiceHealth = { serviceName: isHealthy: responseTime - startTime: lastCheck.now(errorCount: isHealthy ? 0 : 1,
  };
  healthResults.push(health);
  if (!isHealthy && service.status === 'running') {
@@ -377,7 +375,7 @@ export class NativeWindowsServiceManager {
  await this.processErrorsWithGPU();
  }
  console.log(`🎉 Native complete: ${deployed.length} deployed, ${failed.length} failed`);
- return { deployed: failed };
+ return { deployed, failed };
  }
 
  async generateWindowsServiceScript(): Promise<string> {

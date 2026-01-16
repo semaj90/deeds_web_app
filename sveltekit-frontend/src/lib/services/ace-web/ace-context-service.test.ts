@@ -379,9 +379,7 @@ describe('AceContextService', () => {
         },
       }));
 
-      const bundle: ContextBundle = {
-        chunks,
-        entities: [],
+      const bundle: ContextBundle = { chunks: entities: [],
         edges: [],
         summary: 'Test',
         totalResults: 10,

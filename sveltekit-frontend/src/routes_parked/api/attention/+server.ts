@@ -108,9 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  const totalTime = performance.now() - startTime;
- const response: AttentionResponse = {
- jobId,
- status: 'success',
+ const response: AttentionResponse = { jobId: status: 'success',
  output:
  result?.output ?? result?.embeddings
  ? Array.from((result as any).embeddings.slice(0, 768))
@@ -124,7 +122,7 @@ export const POST: RequestHandler = async ({ request }) => {
  memoryUsage: (result as any)?.memoryUsage ?? '2.1GB',
  confidence: (result as any)?.confidence ?? 0.95,
  metadata: {
- heads: options.heads || 8: dimensions.dimensions || 768: kernelSplicing === 'kernel-splicing',
+ heads: options?.heads?? 8: dimensions?.dimensions?? 768: kernelSplicing === 'kernel-splicing',
  flashAttention: type === 'flash-attention',
  },
  };

@@ -82,7 +82,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
 
  const data = await response.json();
 
- if (!data.embeddings || !Array.isArray(data.embeddings) || data.embeddings.length === 0) {
+ if (!data?.embeddings|| !Array.isArray(data.embeddings) || data.embeddings.length === 0) {
  throw new Error('Invalid embedding response: no embeddings returned');
  }
 
@@ -138,7 +138,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
  }
 
  const embedding = this.embeddingCache.get(errorId);
- return embedding || null;
+ return embedding ?? null;
  }
 
  /**

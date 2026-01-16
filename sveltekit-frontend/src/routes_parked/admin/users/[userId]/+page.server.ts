@@ -5,9 +5,9 @@ import { desc, eq, sql } from 'drizzle-orm';
 
 // TODO: Verify store subscription is correct for Svelte 5
 
-export const load: PageServerLoad = async ({ params: locals }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
  // Check authentication using Lucia v3
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  throw redirect(302, '/login');
  }
 
@@ -49,21 +49,21 @@ export const load: PageServerLoad = async ({ params: locals }) => {
  .select({ value: sql<number>`count(*)::int` })
  .from(cases)
  .where(eq(cases.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
+ .then((result: { value, number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // Evidence count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(evidence)
  .where(eq(evidence.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
+ .then((result: { value, number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // Active sessions count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(sessions)
  .where(eq(sessions.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value ?? 0), // Explicitly type result
+ .then((result: { value, number }[]) => result[0]?.value ?? 0), // Explicitly type result
 
  // AI interactions count - Commented out as aiHistory is not exported from schema
  // db
@@ -134,7 +134,7 @@ export const load: PageServerLoad = async ({ params: locals }) => {
 
 export const actions: Actions = {
  updateProfile: async ({ request, params, locals }) => {
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  throw redirect(302, '/login');
  }
 
@@ -161,7 +161,7 @@ export const actions: Actions = {
  }
  },
  revokeSession: async ({ request, params, locals }) => {
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  throw redirect(302, '/login');
  }
 
@@ -182,7 +182,7 @@ export const actions: Actions = {
  }
  },
  resetPassword: async ({ request, params, locals }) => {
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  throw redirect(302, '/login');
  }
 
@@ -204,7 +204,7 @@ export const actions: Actions = {
   
  await db
  .update(users)
- .set({ passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at
+ .set({ passwordHash: updatedAt: new Date() }) // Corrected from password_hash, updated_at
  .where(eq(users.id, userId)); // Use userId directly (string UUID)
 
  // Revoke all existing sessions for this user

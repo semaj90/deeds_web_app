@@ -4,10 +4,10 @@ import { JSDOM } from 'jsdom';
 import pdfParse from 'pdf-parse';
 import postgres from 'postgres';
 
-const sql = postgres(process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db');
+const sql = postgres(process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db');
 const qdrant = new QdrantClient({ url: 'http://localhost:6333' });
 
-const OLLAMA_URL_VAR = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_URL_VAR = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -28,7 +28,7 @@ async function extractDocumentText(file: File): Promise<string> {
   } else if (ext === 'html' ?? ext === 'htm') {
     const html = new TextDecoder().decode(buffer);
     const dom = new JSDOM(html);
-    return dom.window.document.body.textContent || '';
+    return dom.window.document.body?.textContent?? '';
   } else if (ext === 'md' || ext === 'markdown') {
     return new TextDecoder().decode(buffer);
   } else {
@@ -61,7 +61,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     });
 
     const data = await response.json();
-    return data.embedding || [];
+    return data?.embedding|| [];
   } catch (err) {
     console.error('❌ Embedding failed:', err);
     throw new Error('Failed to generate embedding');
@@ -94,7 +94,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
-    const source = formData.get('source') as string || 'user-upload';
+    const source = formData.get('source') as string ?? 'user-upload';
 
     if (!files || files.length === 0) {
       return json({ error: 'No files provided' }, { status: 400 });
@@ -185,7 +185,7 @@ export const POST: RequestHandler = async ({ request }) => {
  */
 export const GET: RequestHandler = async ({ url }) => {
   const query = url.searchParams.get('q');
-  const limit = parseInt(url.searchParams.get('limit') || '5');
+  const limit = parseInt(url.searchParams.get('limit') ?? '5');
 
   if (!query) {
     return json({ error: 'Query parameter required' }, { status: 400 });
@@ -269,7 +269,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
     const augmentedPrompt = `You are an expert legal AI assistant. Use the following knowledge base context to answer the user's question.
 
 KNOWLEDGE BASE CONTEXT:
-${context || 'No matching documents found in knowledge base.'}
+${context ?? 'No matching documents found in knowledge base.'}
 
 ---
 
@@ -291,7 +291,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: augmentedPrompt }] }]
+          body: JSON.stringify({ contents: [{ parts: [{ text, augmentedPrompt }] }]
           })
         }
       );
@@ -310,7 +310,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       });
 
       const ollamaData = await ollamaRes.json();
-      response = ollamaData.response || '';
+      response = ollamaData?.response?? '';
     }
 
     return json({

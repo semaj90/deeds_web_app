@@ -5,7 +5,7 @@ let redisClient: ReturnType<typeof createClient> | null = null;
 export async function getRedisClient() {
  if (!redisClient) {
  redisClient = createClient({
- url: process.env.REDIS_URL || 'redis://127.0.0.1:4005',
+ url: process.env?.REDIS_URL?? 'redis://127.0.0.1:4005',
  });
 
  redisClient.on('error', (err) => {

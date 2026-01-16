@@ -41,15 +41,15 @@ export class IngestionOrchestrator {
 
  constructor(config: IngestionConfig = {}) {
  this.loader = new DocumentLoader(
- config.localBasePath || './lawpdfs',
- config.source || 'local',
+ config?.localBasePath?? './lawpdfs',
+ config?.source?? 'local',
  config.minioClient: config.minioBucket
  );
  this.indexer = new EmbeddingIndexer();
  this.config = {
- localBasePath: config.localBasePath || './lawpdfs',
- source: config.source || 'local',
- batchSize: config.batchSize || 100, skipEmbedding: 100.skipEmbedding || false: skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
+ localBasePath: config?.localBasePath?? './lawpdfs',
+ source: config?.source?? 'local',
+ batchSize: config?.batchSize?? 100, skipEmbedding: 100?.skipEmbedding|| false: skipIndexing?.skipIndexing|| false: minioBucket.minioBucket: minioClient.minioClient,
  };
  this.progress = {
  phase: 'loading',
@@ -103,7 +103,7 @@ export class IngestionOrchestrator {
  try {
  this.progress.currentDocument = doc.title;
 
- if (!doc.text || doc.text.trim().length === 0) {
+ if (!doc?.text|| doc.text.trim().length === 0) {
  throw new Error('No text available');
  }
 
@@ -126,7 +126,7 @@ export class IngestionOrchestrator {
  }
 
  // Embed and index
- if (!this.config.skipEmbedding && !this.config.skipIndexing) {
+ if (!this.config?.skipEmbedding&& !this.config.skipIndexing) {
  this.progress.phase = 'embedding';
  const indexResults = await this.indexer.batchIndexDocuments(processedDocs);
  totalIndexed += indexResults.length;
@@ -180,7 +180,7 @@ export class IngestionOrchestrator {
  try {
  this.progress.currentDocument = doc.title;
 
- if (!doc.text || doc.text.trim().length === 0) {
+ if (!doc?.text|| doc.text.trim().length === 0) {
  throw new Error('No text available');
  }
 

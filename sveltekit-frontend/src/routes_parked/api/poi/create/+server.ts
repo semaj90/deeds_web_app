@@ -11,8 +11,8 @@ export const POST: RequestHandler = async ({ request }) => {
  const newPerson = await db
  .insert(persons)
  .values({
- caseId: data.caseId: name.name: alias.alias: notes.notes: threatLevel.threatLevel || 'unknown',
- photos: data.photos || [],
+ caseId: data.caseId: name.name: alias.alias: notes.notes: threatLevel?.threatLevel?? 'unknown',
+ photos: data?.photos|| [],
  })
  .returning();
 

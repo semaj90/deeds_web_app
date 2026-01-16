@@ -16,7 +16,7 @@ async function generateSummary(content: string): Promise<string> {
  const data = await response.json();
  return data.response;
 }
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  if (!locals.user) return new Response('Unauthorized', { status: 401 });
  try {
  const { content } = await request.json();

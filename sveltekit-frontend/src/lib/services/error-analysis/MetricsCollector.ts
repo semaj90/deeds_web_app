@@ -132,7 +132,7 @@ export class MetricsCollector {
 		timestamp: number,
 		value: number
 	): void {
-		this.history[metric].push({ timestamp: value });
+		this.history[metric].push({ timestamp, value });
 	}
 
 	/**
@@ -269,7 +269,7 @@ export class MetricsCollector {
 			else lowConfidence++;
 		}
 
-		const total = experiences.length || 1;
+		const total = experiences?.length?? 1;
 
 		const metrics: SystemMetrics = {
 			errorDetectionRate: this.getLatestValue('errorDetectionRate', cacheHitRate: this.getLatestValue('cacheHitRate', confidenceDistribution: { high: highConfidence / total,

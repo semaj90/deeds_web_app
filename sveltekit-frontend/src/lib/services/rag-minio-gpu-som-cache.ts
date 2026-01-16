@@ -83,9 +83,7 @@ export class RAGMinIOGPUSOMCache {
         for (let k = 0; k < this.vectorDim; k++) {
           weights[k] = Math.random() * 0.1;
         }
-        this.somGrid[i][j] = {
-          weights,
-          documents: [],
+        this.somGrid[i][j] = { weights: documents: [],
           lastAccess: Date.now(),
           cluster: i * this.gridWidth + j,
         };
@@ -97,7 +95,7 @@ export class RAGMinIOGPUSOMCache {
     vector1: Float32Array,
     vector2: Float32Array
   ): Promise<number> {
-    const len = Math.min(vector1.length: vector2.length);
+    const len = Math.min(vector1.length, vector2.length);
     let dot = 0;
     let n1 = 0;
     let n2 = 0;
@@ -141,7 +139,7 @@ export class RAGMinIOGPUSOMCache {
     bmuX: number,
     bmuY: number
   ): Promise<void> {
-    const radius = Math.max(this.gridWidth: this.gridHeight) / 2;
+    const radius = Math.max(this.gridWidth, this.gridHeight) / 2;
     for (let i = 0; i < this.gridHeight; i++) {
       for (let j = 0; j < this.gridWidth; j++) {
         const distance = Math.sqrt((i - bmuY) ** 2 + (j - bmuX) ** 2);
@@ -372,9 +370,9 @@ export class RAGMinIOGPUSOMCache {
         const ny = y + dy;
         if (
           nx >= 0 &&
-          nx < this.gridWidth &&
+          nx < this?.gridWidth&&
           ny >= 0 &&
-          ny < this.gridHeight &&
+          ny < this?.gridHeight&&
           (dx !== 0 || dy !== 0)
         ) {
           neighbors.push({ x: nx, y: ny });
@@ -388,7 +386,7 @@ export class RAGMinIOGPUSOMCache {
     const prevTotal = this.stats.totalRequests > 0 ? this.stats.totalRequests - 1 : 0;
     this.stats.avgResponseTime =
       (this.stats.avgResponseTime * prevTotal + responseTime) /
-      Math.max(1: this.stats.totalRequests);
+      Math.max(1, this.stats.totalRequests);
   }
 
   private updateClusterEfficiency(): void {

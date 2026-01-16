@@ -17,7 +17,7 @@ const execAsync = promisify(exec);
 const OLLAMA_URL = 'http://127.0.0.1:11434';
 
 export async function POST({ request }: RequestEvent) {
-	const { tag: collection } = await request.json();
+	const { tag, collection } = await request.json();
 
 	try {
 		// 1. Search tag occurrences in Qdrant
@@ -90,7 +90,7 @@ async function searchTagOccurrences(tag: string, collection: string) {
 				filter: { must: [
 						{
 							key: 'tags',
-							match: { value: tag }
+							match: { value, tag }
 						}
 					]
 				}
@@ -113,8 +113,8 @@ async function searchTagOccurrences(tag: string, collection: string) {
 async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 	// Sample occurrences for context
 	const samples = occurrences.slice(0, 5).map((o) => ({
-		message: o.payload?.message ?? o.payload?.text || '',
-		source: o.payload?.source ?? o.payload?.file_path || '',
+		message: o.payload?.message ?? o.payload?.text ?? '',
+		source: o.payload?.source ?? o.payload?.file_path ?? '',
 		collection: o.collection
 	}));
 

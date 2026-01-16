@@ -507,11 +507,11 @@ import type { Client as MinioClient } from 'minio';
 import type { RedisClientType } from 'redis';
 
 // Environment configuration
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT || 'localhost';
-const MINIO_PORT = parseInt(process.env.MINIO_PORT || '9000', 10);
+const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT ?? 'localhost';
+const MINIO_PORT = parseInt(process.env.MINIO_PORT ?? '9000', 10);
 
 // Database connection
 const queryClient = postgres(DATABASE_URL);
@@ -599,12 +599,12 @@ export async function initializeIntegratedRAG(): Promise<void> {
 	if (!qdrantClient) {
 		try {
 			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			qdrantClient = new QdrantClient({ url: QDRANT_URL });
+			qdrantClient = new QdrantClient({ url, QDRANT_URL });
 
 			try {
 				const collectionsRes = await qdrantClient.getCollections();
-				const collections = (collectionsRes as { collections?: { name: string }[] })?.collections ?? [];
-				const exists = collections.some((c) => c?.name === 'legal-documents');
+				const collections = (collectionsRes as { collections?: { name, string }[] })?.collections ?? [];
+				const exists = collections.some((c: any) => c?.name === 'legal-documents');
 
 				if (!exists) {
 					await qdrantClient.createCollection('legal-documents', {
@@ -698,7 +698,7 @@ export async function processDocument(
 		chunks.push(content.slice(i, i + chunkSize));
 	}
 
-	const embeddings = await Promise.all(chunks.map((chunk) => generateEmbedding(chunk)));
+	const embeddings = await Promise.all(chunks.map((chunk: any) => generateEmbedding(chunk)));
 
 	for (let i = 0; i < chunks.length; i++) {
 		try {
@@ -708,12 +708,12 @@ export async function processDocument(
 					${`${documentId}_chunk_${i}`},
 					1,
 					${`${filename} - Chunk ${i + 1}`},
-					${chunks[i].slice(0, 200)},
-					${chunks[i]},
+					${chunks?.i.slice(0, 200)},
+					${chunks?.i},
 					${minioUrl},
 					${file.type},
 					${file.size},
-					${JSON.stringify(embeddings[i])}::vector,
+					${JSON.stringify(embeddings?.i)}::vector,
 					${JSON.stringify({
 						source_file: filename,
 						chunkIndex: i,
@@ -730,7 +730,7 @@ export async function processDocument(
 		try {
 			const points = chunks.map((chunk, i) => ({
 				id: i,
-				vector: embeddings[i],
+				vector: embeddings?.i,
 				payload: { content: chunk,
 					filename,
 					chunkIndex: i,
@@ -807,7 +807,7 @@ export async function searchSimilarDocuments(
 				with_payload: true
 			});
 
-			results = (qdrantResults as QdrantHit[]).map((r) => ({
+			results = (qdrantResults as QdrantHit[]).map((r: any) => ({
 				content: r.payload.content,
 				similarity: r.score,
 				metadata: { source_file: r.payload.filename,
@@ -839,7 +839,7 @@ export async function searchSimilarDocuments(
 			pgResults.rows as Array<{
 				content_text: string; similarity: number; metadata, MetadataMap;
 			}>
-		).map((r) => ({
+		).map((r: any) => ({
 			content: r.content_text,
 			similarity: r.similarity,
 			metadata: r.metadata
@@ -859,7 +859,7 @@ export async function getDocumentRecommendations(
 ): Promise<SearchResult[]> {
 	await initializeIntegratedRAG();
 
-	const doc = lokiCollection.findOne({ id: documentId });
+	const doc = lokiCollection.findOne({ id, documentId });
 	if (!doc) return [];
 
 	return searchSimilarDocuments(doc.c

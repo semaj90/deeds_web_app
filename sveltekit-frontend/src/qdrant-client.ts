@@ -40,14 +40,14 @@ const DEFAULT_QDRANT = 'http://localhost:6333';
 
 function getQdrantUrl(): string {
 	if (process.env.QDRANT_URL) return process.env.QDRANT_URL;
-	if (process.env.QDRANT_HOST && process.env.QDRANT_PORT) {
+	if (process.env?.QDRANT_HOST&& process.env.QDRANT_PORT) {
 		return `http://${process.env.QDRANT_HOST}:${process.env.QDRANT_PORT}`;
 	}
 	return DEFAULT_QDRANT;
 }
 
 function getApiKeyHeader(): Record<string, string> {
-	const key = process.env.QDRANT_API_KEY || '';
+	const key = process.env?.QDRANT_API_KEY?? '';
 	return key ? { Authorization: `ApiKey ${key}` } : {};
 }
 
@@ -60,7 +60,7 @@ async function ensureFetch(): Promise<FetchFn> {
 	try {
 		const nf = await import('node-fetch');
 		const mod = nf as { default?: unknown };
-		return (mod.default || nf) as unknown as FetchFn;
+		return (mod?.default|| nf) as unknown as FetchFn;
 	} catch {
 		throw new Error('fetch is not available and node-fetch cannot be loaded');
 	}
@@ -107,7 +107,7 @@ async function tryCreateSdkClient(): Promise<SdkClientLike | null> {
 }
 
 // HTTP fallback methods
-async function httpRequest(path: string, method = 'GET', body?: unknown): Promise<unknown> {
+async function httpRequest(path, string, method = 'GET', body?: unknown): Promise<unknown> {
 	const f = await ensureFetch();
 	const base = getQdrantUrl().replace(/\/$/, '');
 	const headers: Record<string, string> = {
@@ -115,7 +115,7 @@ async function httpRequest(path: string, method = 'GET', body?: unknown): Promis
 		...getApiKeyHeader()
 	};
 	const url = path.startsWith('/') ? `${base}${path}` : `${base}/${path}`;
-	const init: RequestInit = { method: headers };
+	const init: RequestInit = { method, headers };
 	if (body !== undefined) init.body = JSON.stringify(body);
 
 	const res = await f(url, init);
@@ -182,7 +182,7 @@ async function httpDelete(collectionName: string, ids: (string | number)[]): Pro
 	return await httpRequest(
 		`/collections/${encodeURIComponent(collectionName)}/points/delete`,
 		'POST',
-		{ points: ids }
+		{ points, ids }
 	);
 }
 
@@ -270,7 +270,7 @@ const qdrant = {
 		if (sdk) {
 			try {
 				if (typeof sdk.delete === 'function') {
-					return await sdk.delete(collectionName, { points: ids });
+					return await sdk.delete(collectionName, { points, ids });
 				}
 				if (sdk.points?.delete) {
 					return await sdk.points.delete({ collection_name: collectionName, points: ids });
@@ -308,7 +308,7 @@ async function waitForQdrantReady(maxRetries = 15, delayMs = 2000): Promise<bool
 }
 
 async function initQdrantIndexes(
-	collectionName = process.env.QDRANT_COLLECTION || 'documents'
+	collectionName = process.env?.QDRANT_COLLECTION?? 'documents'
 ): Promise<{ ok: boolean; error?, string }> {
 	try {
 		const cols = await qdrant.getCollections();
@@ -330,13 +330,13 @@ async function initQdrantIndexes(
 
 		for (const [field, _schema] of pairs) {
 			try {
-				await qdrant.createPayloadIndex(collectionName, { field_name: field });
+				await qdrant.createPayloadIndex(collectionName, { field_name, field });
 			} catch (e) {
 				console.warn(`Failed to create payload index for field: '${field}'`, e);
 			}
 		}
 
-		return { ok: true };
+		return { ok, true };
 	} catch (e) {
 		console.error('initQdrantIndexes failed:', e);
 		return { ok: false, error: String(e) };
@@ -346,7 +346,7 @@ async function initQdrantIndexes(
 async function bootstrapQdrant(collectionName?: string): Promise<{ ok: boolean; error?, string }> {
 	const ready = await waitForQdrantReady();
 	if (!ready) throw new Error('Qdrant startup timeout');
-	return await initQdrantIndexes(collectionName || process.env.QDRANT_COLLECTION || 'documents');
+	return await initQdrantIndexes(collectionName || process.env?.QDRANT_COLLECTION?? 'documents');
 }
 
 export { qdrant, initQdrantIndexes, qdrantHealthCheck, waitForQdrantReady, bootstrapQdrant };

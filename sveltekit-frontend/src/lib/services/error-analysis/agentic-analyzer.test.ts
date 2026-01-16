@@ -209,7 +209,7 @@ The variable is assigned a number but declared as string.`,
  { text: '0', expected: 0 },
  { text: '1', expected: 1 }];
 
- for (const { text: expected } of testCases) {
+ for (const { text, expected } of testCases) {
  const response: LLMResponse = {
  text: `## Root Cause
 Test

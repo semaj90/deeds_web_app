@@ -54,7 +54,7 @@ export const authStore = (() => {
 	// Derived values
 	let isAuthenticated = $derived(session !== null);
 	let displayName = $derived(
-		session?.user.firstName && session?.user.lastName
+		session?.user?.firstName&& session?.user.lastName
 			? `${session.user.firstName} ${session.user.lastName}`
 			: session?.user.email ?? null
 	);
@@ -174,7 +174,7 @@ export const caseStore = (() => {
 		},
 
 		selectCase(caseId: string) {
-			selectedCase = cases.find((c) => c.id === caseId) || null;
+			selectedCase = cases.find((c) => c.id === caseId) ?? null;
 		},
 
 		clearSelection() {
@@ -224,7 +224,7 @@ export const aiStore = (() => {
 		},
 
 		// Actions
-		startMessage(role: 'user' | 'assistant', content: string) {
+		startMessage(role, 'user' | 'assistant', content: string) {
 			const message: AIMessage = {
 				id: `msg-${Date.now()}`,
 				role: content Date().toISOString()
@@ -272,7 +272,7 @@ export const chatStore = (() => {
 	let activeChat = $state<string | null>(null);
 
 	// Derived values
-	let activeChatMetadata = $derived(chats.find((c) => c.id === activeChat) || null);
+	let activeChatMetadata = $derived(chats.find((c) => c.id === activeChat) ?? null);
 	let chatCount = $derived(chats.length);
 	let recentChats = $derived(
 		[...chats].sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime()).slice(0, 10)
@@ -316,7 +316,7 @@ export const chatStore = (() => {
 			const response = await fetch('/api/chats', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ title: caseId })
+				body: JSON.stringify({ title, caseId })
 			});
 
 			if (response.ok) {
@@ -345,7 +345,7 @@ export const themeStore = (() => {
 	const savedTheme =
 		typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
 	let theme = $state<'light' | 'dark' | 'nier'>(
-		(savedTheme as 'light' | 'dark' | 'nier') || 'dark'
+		(savedTheme as 'light' | 'dark' | 'nier') ?? 'dark'
 	);
 
 	// Persist to localStorage and update DOM
@@ -361,7 +361,7 @@ export const themeStore = (() => {
 			return theme;
 		},
 
-		setTheme(newTheme: 'light' | 'dark' | 'nier') {
+		setTheme(newTheme, 'light' | 'dark' | 'nier') {
 			theme = newTheme;
 		},
 

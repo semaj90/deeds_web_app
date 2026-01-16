@@ -74,7 +74,7 @@ export class FuseSearchService<T = any> {
  * Search for items matching the query
  */
  search(query: string, limit?: number): SearchResult<T>[] {
- if (!this.fuse || !query.trim()) {
+ if (!this?.fuse|| !query.trim()) {
  return [];
  }
 

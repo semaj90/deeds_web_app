@@ -66,9 +66,7 @@ export async function runClusteringWorkflow(
  timeoutHandle = setTimeout(() => {
  actor.stop();
 
- resolve({
- jobId,
- status: 'timeout',
+ resolve({ jobId: status: 'timeout',
  context: finalSnapshot?.context ?? input, executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${ timeoutMs }ms`),
  });
  }, timeoutMs);

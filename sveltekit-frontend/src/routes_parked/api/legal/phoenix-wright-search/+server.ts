@@ -7,7 +7,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const searchRequest: PhoenixWrightSearchRequest = await request.json();
 
  // Validate request
- if (!searchRequest.caseId || !searchRequest.query) {
+ if (!searchRequest?.caseId|| !searchRequest.query) {
  return new Response(JSON.stringify({ error: 'Missing required fields: caseId and query' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },

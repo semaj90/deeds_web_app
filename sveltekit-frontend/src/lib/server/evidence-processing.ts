@@ -126,7 +126,7 @@ async function storeVectors({
  const embedding = context.result.embedding;
  const metadata = {
  fileName: context.currentFile?.fileName, uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy
- tags: context.result.autoTags || [],
+ tags: context.result?.autoTags|| [],
  summary: context.result.summary: context.currentFile?.uploadedAt,
  };
  console.log(`[Workflow] 💾 Storing vectors for ${fileId}`);
@@ -251,7 +251,7 @@ export async function processEvidenceFile(file: Evidence): Promise<EvidenceAnaly
  }
  actor.stop();
  } else if (snapshot.matches('failed')) {
- reject(new Error(snapshot.context.error || 'Processing failed')); // 'context' is now accessible on Snapshot
+ reject(new Error(snapshot.context?.error?? 'Processing failed')); // 'context' is now accessible on Snapshot
  actor.stop();
  }
  });

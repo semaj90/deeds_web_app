@@ -71,11 +71,11 @@ export function createQdrantFilter(opts: {
  }
 
  // Optional: strict tag filtering (can be used instead of rerank-only approach)
- if (opts.tagIds && opts.tagIds.length > 0) {
+ if (opts?.tagIds&& opts.tagIds.length > 0) {
  conditions.push({ key: 'tag_ids', match: { any: opts.tagIds } });
  }
 
- return conditions.length > 0 ? { must: conditions }  | undefined;
+ return conditions.length > 0 ? { must, conditions }  | undefined;
 }
 
 

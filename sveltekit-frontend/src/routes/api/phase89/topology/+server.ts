@@ -9,7 +9,7 @@ import pg from 'pg';
 const { Pool } = pg;
 
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const pool = new Pool({ connectionString: DATABASE_URL });
+const pool = new Pool({ connectionString, DATABASE_URL });
 
 export const GET: RequestHandler = async () => {
   try {
@@ -31,15 +31,14 @@ export const GET: RequestHandler = async () => {
 
     // Build topology nodes
     const nodes = errorsResult.rows.map((row, i) => ({
-      id: row.file_path || `unknown_${i}`,
-      label: (row.file_path || 'unknown').split('/').pop() || 'unknown',
+      id: row?.file_path|| `unknown_${i}`,
+      label: (row?.file_path?? 'unknown').split('/').pop() ?? 'unknown',
       type: 'file' as const,
       errorCount: parseInt(row.error_count),
       embeddedCount: parseInt(row.embedded_count),
       source: row.source,
       status: parseInt(row.embedded_count) === parseInt(row.error_count)
-        ? 'clean' as const
-        : parseInt(row.error_count) > 10
+        ? 'clean' as const | parseInt(row.error_count) > 10
           ? 'error' as const
           : 'warning' as const
     }));
@@ -49,7 +48,7 @@ export const GET: RequestHandler = async () => {
     const dirGroups = new Map<string, string[]>();
 
     for (const node of nodes) {
-      const dir = node.id.split('/').slice(0, -1).join('/') || 'root';
+      const dir = node.id.split('/').slice(0, -1).join('/') ?? 'root';
       if (!dirGroups.has(dir)) {
         dirGroups.set(dir, []);
       }

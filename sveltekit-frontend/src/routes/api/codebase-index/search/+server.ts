@@ -17,9 +17,9 @@ interface SearchResult {
   snippet?: string;
 }
 
-export const GET: RequestHandler = async ({ url: fetch }) => {
-  const query = url.searchParams.get('q') || '';
-  const limit = parseInt(url.searchParams.get('limit') || '10');
+export const GET: RequestHandler = async ({ url, fetch }) => {
+  const query = url.searchParams.get('q') ?? '';
+  const limit = parseInt(url.searchParams.get('limit') ?? '10');
   const types = url.searchParams.get('types')?.split(',').filter(Boolean) ?? [];
 
   if (!query.trim()) {
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 
   try {
     // Try to fetch from FastAPI backend (Task 16.2 integration)
-    const backendUrl = env.FASTAPI_URL || env.CODEBASE_INDEXER_URL || 'http://localhost:8090';
+    const backendUrl = env?.FASTAPI_URL|| env?.CODEBASE_INDEXER_URL?? 'http://localhost:8090';
 
     try {
       // Use FastAPI admin routes (Task 16.2)

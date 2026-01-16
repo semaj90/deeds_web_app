@@ -98,7 +98,7 @@ export type HandleFetch = (input: { event: RequestEvent;
 // SvelteKit stores
 export interface PageStore {
  url: URL; params: Record<string, string>;
- route: { id: null };
+ route: { id, null };
  data: Record<string, unknown>;
  error: any; state: Record<string, unknown>;
  form: any;

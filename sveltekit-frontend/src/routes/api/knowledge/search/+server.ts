@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const body = (await request.json()) as SearchRequest;
 
     // Validate required fields
-    if (!body.query || typeof body.query !== 'string') {
+    if (!body?.query|| typeof body.query !== 'string') {
       return json(
         { error: 'Query is required and must be a string' },
         { status: 400 }
@@ -81,11 +81,9 @@ export const POST: RequestHandler = async ({ request }) => {
       success: true,
       query: body.query,
       results,
-      metadata: {
-        queryTime,
-        totalResults: results.length,
-        synthesized: body.synthesize || false,
-        llmProvider: body.llmProvider || 'ollama'
+      metadata: { queryTime: totalResults: results.length,
+        synthesized: body?.synthesize|| false,
+        llmProvider: body?.llmProvider?? 'ollama'
       }
     });
   } catch (error) {

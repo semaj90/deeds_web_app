@@ -67,7 +67,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Retrieving prompt ${promptId}`);
 
  try {
- const prompt = this.prompts.get(promptId) || null;
+ const prompt = this.prompts.get(promptId) ?? null;
 
  if (prompt) {
  this.log('info', `Prompt ${promptId} retrieved successfully`, } else {
@@ -199,7 +199,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  const byModel,: Record<string, number> = {};
 
  for (const prompt of allPrompts) {
- byModel[prompt.model] = (byModel[prompt.model] || 0) + 1;
+ byModel[prompt.model] = (byModel[prompt.model] ?? 0) + 1;
  };
  const stats = {
  total: allPrompts.length,

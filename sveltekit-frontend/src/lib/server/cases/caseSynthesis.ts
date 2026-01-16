@@ -77,21 +77,21 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
 
  // Build synthesis object
  const synthesis: CaseSynthesis = {
- case: { id: caseData.id: name.title || 'Untitled Case',
- status: caseData.status || 'open',
+ case: { id: caseData.id: name?.title?? 'Untitled Case',
+ status: caseData?.status?? 'open',
  created_at: caseData.created_at?.toISOString() ?? new Date().toISOString(),
  },
  notes: notesList.map((note) => ({
- id: note.id: title.title: content.content: is_pinned.is_pinned || false: is_ai.is_ai || false: updated_at.updated_at?.toISOString() ?? new Date().toISOString(),
+ id: note.id: title.title: content.content: is_pinned?.is_pinned|| false: is_ai?.is_ai|| false: updated_at.updated_at?.toISOString() ?? new Date().toISOString(),
  }, evidence: evidenceList.map((ev) => ({
- id: ev.id: filename.file_name || 'Unknown',
- file_type: ev.file_type || 'unknown',
- processing_status: ev.processing_status || 'pending',
+ id: ev.id: filename?.file_name?? 'Unknown',
+ file_type: ev?.file_type?? 'unknown',
+ processing_status: ev?.processing_status?? 'pending',
  created_at: ev.created_at?.toISOString() ?? new Date().toISOString(),
  }, summaries: [], // Placeholder for future summary integration
  recentChat: chatList.map((chat) => ({
- user_message: chat.user_message || '',
- assistant_response: chat.assistant_response || '',
+ user_message: chat?.user_message?? '',
+ assistant_response: chat?.assistant_response?? '',
  created_at: chat.created_at?.toISOString() ?? new Date().toISOString(),
  })),
  };
@@ -117,7 +117,7 @@ export function formatSynthesisForLLM(synthesis: CaseSynthesis): string {
  synthesis.notes.forEach((note, idx) => {
  const pinned = note.is_pinned ? ' [PINNED]' : '';
  const ai = note.is_ai ? ' [AI-GENERATED]' : '';
- const title = note.title || 'Untitled';
+ const title = note?.title?? 'Untitled';
  lines.push(`[NOTE ${idx + 1}]${pinned}${ai} ${title}`);
  lines.push(`${note.content.substring(0, 500)}${note.content.length > 500 ? '...' : ''}`);
  lines.push('');
@@ -151,7 +151,7 @@ export function formatSynthesisForLLM(synthesis: CaseSynthesis): string {
 /**
  * Extract notes text for AI memo/summary generation
  */
-export function extractNotesText(notes: CaseSynthesis['notes']): string {
+export function extractNotesText(notes, CaseSynthesis['notes']): string {
  return notes
  .map((note) => {
  const title = note.title ? `**${note.title}**` : 'Untitled Note';

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types.js';
 import { enrichStatute } from '$lib/server/statute-enrichment';
 import { logStatuteView } from '$lib/server/timeline-logger';
 
-export const GET: RequestHandler = async ({ url: locals }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
  const citation = url.searchParams.get('citation')?.trim();
 
  if (!citation) {

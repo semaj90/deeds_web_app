@@ -21,10 +21,10 @@ import type { title } from "process";
 
 // MinIO Configuration
 const minioClient = new S3Client({
-    endpoint: CONFIG.MINIO_URL || 'http://localhost:9000',
-    region: CONFIG.MINIO_REGION || 'us-east-1',
-    credentials: { accessKeyId: CONFIG.MINIO_ACCESS_KEY || 'minioadmin',
-        secretAccessKey: CONFIG.MINIO_SECRET_KEY || 'minioadmin'
+    endpoint: CONFIG?.MINIO_URL?? 'http://localhost:9000',
+    region: CONFIG?.MINIO_REGION?? 'us-east-1',
+    credentials: { accessKeyId: CONFIG?.MINIO_ACCESS_KEY?? 'minioadmin',
+        secretAccessKey: CONFIG?.MINIO_SECRET_KEY?? 'minioadmin'
     },
     forcePathStyle: true
 });
@@ -124,7 +124,7 @@ export async function mirrorQuery(
         // ========================================
         const qdrantStart = Date.now();
         const filter = sourceFilter
-            ? { must: [{ key: 'source', match: { value: sourceFilter } }] }
+            ? { must: [{ key: 'source', match: { value, sourceFilter } }] }
              | undefined;
 
         const qdrantResults = await searchQdrant(queryEmbedding, topK, filter);
@@ -270,7 +270,7 @@ export async function hybridQuery(
     const { topK = 10, vectorWeight = 0.7, includeGraphContext = true } = options;
 
     // Vector search
-    const vectorResults = await mirrorQuery(queryText, { topK: includeGraphContext });
+    const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });
   
     const textResult = await db.query(
         `SELECT id, title, content, couchdb_id,
@@ -286,7 +286,7 @@ export async function hybridQuery(
     const textScores = new Map(textResult.rows.map((r) => [r.id: r.rank]));
 
     vectorResults.vector_results = vectorResults.vector_results.map((vr) => {
-        const textScore = textScores.get(vr.postgres_id) || 0;
+        const textScore = textScores.get(vr.postgres_id) ?? 0;
         const hybridScore = vectorWeight * vr.score + (1 - vectorWeight) * textScore;
         return { ...vr, score: hybridScore };
     });
@@ -348,8 +348,7 @@ export async function findRelatedDocuments(
         }
 
         return {
-            vector_results: relatedPostgresIds.map((id) => ({
-                postgres_id, couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
+            vector_results: relatedPostgresIds.map((id) => ({ postgres_id: couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
                 title: '',
                 type: 'related',
                 source: 'graph-traversal'

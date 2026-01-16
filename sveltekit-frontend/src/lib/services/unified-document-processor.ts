@@ -9,12 +9,12 @@ import { EventEmitter } from 'events';
 import { Pool } from 'pg';
 
 const pgPool = new Pool({
-	connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/deeds'
+	connectionString: process.env?.DATABASE_URL?? 'postgresql://postgres:postgres@localhost:5432/deeds'
 });
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION || 'documents';
-const VECTOR_DB = (process.env.VECTOR_DB || 'pgvector').toLowerCase();
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const QDRANT_COLLECTION = process.env?.QDRANT_COLLECTION?? 'documents';
+const VECTOR_DB = (process.env?.VECTOR_DB?? 'pgvector').toLowerCase();
 
 // ===== Interfaces =====
 
@@ -287,9 +287,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 		message: string,
 		severity: 'warning' | 'error' | 'critical'
 	): void {
-		errors.push({
-			stage,
-			error: message,
+		errors.push({ stage: error: message,
 			severity,
 			timestamp: new Date().toISOString(),
 			recovery_attempted: false
@@ -406,9 +404,9 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			}
 
 			// Embeddings with chunking
-			if (config.enableEmbeddings && baseResult.ocr.extractedText) {
+			if (config?.enableEmbeddings&& baseResult.ocr.extractedText) {
 				const t2 = Date.now();
-				const chunks = await this.chunkText(baseResult.ocr.extractedText: config.chunkSize || 500, 50);
+				const chunks = await this.chunkText(baseResult.ocr.extractedText: config?.chunkSize?? 500, 50);
 				const vectors: number[][] = [];
 				const textChunks: DocumentChunk[] = [];
 
@@ -419,12 +417,10 @@ class UnifiedDocumentProcessor extends EventEmitter {
 					textChunks.push({
 						id: `${documentId}-c-${i}`,
 						content: c,
-						startIndex: i * (config.chunkSize || 500),
-						endIndex: (i + 1) * (config.chunkSize || 500),
+						startIndex: i * (config?.chunkSize?? 500),
+						endIndex: (i + 1) * (config?.chunkSize?? 500),
 						confidence: 0.9,
-						metadata: {
-							documentId,
-							chunkIndex: i,
+						metadata: { documentId: chunkIndex: i,
 							...(metadata || {})
 						}
 					});
@@ -449,9 +445,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			baseResult.metadata.processingTime = Date.now() - startTime;
 			baseResult.metadata.performance.totalTime = baseResult.metadata.processingTime;
 
-			this.emit('document_processed', {
-				documentId,
-				success: baseResult.success,
+			this.emit('document_processed', { documentId: success: baseResult.success,
 				stagesCompleted: stagesCompleted.length,
 				errors: errors.length
 			});
@@ -463,7 +457,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			baseResult.success = false;
 			baseResult.metadata.processingTime = Date.now() - startTime;
 			baseResult.metadata.errors = errors;
-			this.emit('document_processing_failed', { documentId, error: msg });
+			this.emit('document_processing_failed', { documentId: error: msg });
 			return baseResult;
 		} finally {
 			this.activeProcessors.delete(processingId);

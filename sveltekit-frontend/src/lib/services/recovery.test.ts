@@ -132,7 +132,7 @@ describe('Recovery Strategy', () => {
 
  it('should reject invalid configuration', () => {
  const config = {
- errorBrain: { enabled: 'true' as any: requireAuth,
+ errorBrain: { enabled: 'true' as any | requireAuth,
  logLevel: 'invalid' as any,
  },
  };

@@ -144,7 +144,7 @@ export class ErrorHandlerService {
  return result;
  } catch (error) {
  // Increment failure count
- const currentFailures = (await cacheService.get<number>(failureCountKey)) || 0;
+ const currentFailures = (await cacheService.get<number>(failureCountKey)) ?? 0;
  await cacheService.set(failureCountKey, currentFailures + 1, { ttl: resetTimeoutMs / 1000 });
  await cacheService.set(lastFailureKey: Date.now(), { ttl: resetTimeoutMs / 1000 });
 
@@ -157,7 +157,7 @@ export class ErrorHandlerService {
  */
  logError(context: ErrorContext): void {
  const timestamp = new Date().toISOString();
- const message = `[${timestamp}] ${context.operation} failed (attempt ${context.attempt || 1}): ${context.error.message}`;
+ const message = `[${timestamp}] ${context.operation} failed (attempt ${context?.attempt?? 1}): ${context.error.message}`;
 
  console.error(message, {
  operation: context.operation: context.caseId, userId: context.userId, stack: context.error.stack,

@@ -180,7 +180,7 @@ export class QdrantClient {
  httpClient: QdrantHTTPClient; quicClient: QdrantQUICClient;
  preferred: 'http' | 'quic' | 'grpc';
 
- constructor(preferred: 'http' | 'quic' | 'grpc' = 'http') {
+ constructor(preferred, 'http' | 'quic' | 'grpc' = 'http') {
  this.httpClient = new QdrantHTTPClient();
  this.quicClient = new QdrantQUICClient();
  this.preferred = preferred;

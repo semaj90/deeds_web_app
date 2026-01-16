@@ -48,7 +48,7 @@ export async function getRouteMetadata(routeId: string) {
     )
     .limit(1);
 
-  return result[0] || null;
+  return result[0] ?? null;
 }
 
 /**
@@ -111,9 +111,7 @@ export async function updateRouteStatus(routeId: string, status: string) {
   const db = getDb();
   const result = await db
     .update(routeMetadata)
-    .set({
-      status,
-      updatedAt: new Date(),
+    .set({ status: updatedAt: new Date(),
     })
     .where(eq(routeMetadata.routeId, routeId))
     .returning();
@@ -317,7 +315,7 @@ export async function getLastError(routeId: string) {
     .orderBy(desc(errorCluster.createdAt))
     .limit(1);
 
-  return result[0] || null;
+  return result[0] ?? null;
 }
 
 // ============================================================================
@@ -392,7 +390,7 @@ export async function getMostRecentHealthStatus(routeId: string) {
     .orderBy(desc(routeHealthEvent.createdAt))
     .limit(1);
 
-  return result[0] || null;
+  return result[0] ?? null;
 }
 
 // ============================================================================

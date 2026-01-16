@@ -166,7 +166,7 @@ export class WebGPUPolyfillService {
  : Date.now();
  try {
  let result: number[];
- if (this.isWebGPUAvailable && this.device && this.queue) {
+ if (this?.isWebGPUAvailable&& this?.device&& this.queue) {
  result = await this.computeEmbeddingWebGPU(inputVector, dimensions);
  this.performanceStats.webgpuOpsCount++;
  } else if (this.webglFallback) {
@@ -192,7 +192,7 @@ export class WebGPUPolyfillService {
  _inputVector: number[],
  dimensions: number
  ): Promise<number[]> {
- if (!this.device || !this.queue) throw new Error('WebGPU device not available');
+ if (!this?.device|| !this.queue) throw new Error('WebGPU device not available');
  // Future: implement WGSL compute shader for embeddings
  return this.computeEmbeddingCPU(new Array(dimensions).fill(0), dimensions);
  }
@@ -228,7 +228,7 @@ export class WebGPUPolyfillService {
  : Date.now();
  try {
  let similarity: number;
- if (this.isWebGPUAvailable && this.device && this.queue) {
+ if (this?.isWebGPUAvailable&& this?.device&& this.queue) {
  similarity = await this.computeSimilarityWebGPU(vector1, vector2);
  this.performanceStats.webgpuOpsCount++;
  } else if (this.webglFallback) {
@@ -250,7 +250,7 @@ export class WebGPUPolyfillService {
  }
 
  private async computeSimilarityWebGPU(vector1: number[], vector2: number[]): Promise<number> {
- if (!this.device || !this.queue) throw new Error('WebGPU device not available');
+ if (!this?.device|| !this.queue) throw new Error('WebGPU device not available');
  // Future: implement WGSL compute shader for GPU acceleration.
  return this.computeSimilarityCPU(vector1, vector2);
  }
@@ -285,7 +285,7 @@ export class WebGPUPolyfillService {
 
  /** Returns performance statistics for WebGPU/WebGL operations. */
  getPerformanceStats() {
- const total = Math.max(1: this.performanceStats.operationsCompleted);
+ const total = Math.max(1, this.performanceStats.operationsCompleted);
  const webgpuPercentage = Math.round((this.performanceStats.webgpuOpsCount / total) * 100);
  const webglPercentage = Math.round((this.performanceStats.webglOpsCount / total) * 100);
  return {
@@ -326,7 +326,7 @@ export class WebGPUPolyfillService {
 
  // Cleanup WebGL resources
  try {
- if (this.webglFallback && this.canvas) {
+ if (this?.webglFallback&& this.canvas) {
  const gl = this.webglFallback;
  const loseExt = gl.getExtension('WEBGL_lose_context') as {
  loseContext?: () => void;

@@ -17,11 +17,11 @@ export const GET: RequestHandler = async () => {
  // Count by tag
  for (const route of routes) {
  for (const tag of route.tags) {
- stats.byTag[tag] = (stats.byTag[tag] || 0) + 1;
+ stats.byTag[tag] = (stats.byTag[tag] ?? 0) + 1;
  }
  }
 
- return new Response(JSON.stringify({ routes: stats }) => {
+ return new Response(JSON.stringify({ routes, stats }) => {
  headers: { 'Content-Type': 'application/json' },
  });
 };

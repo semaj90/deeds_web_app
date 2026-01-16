@@ -143,7 +143,7 @@ describe('AuthSeparation', () => {
  });
 
  it('should return 200 for authenticated requests', () => {
- const result = { authenticated: true };
+ const result = { authenticated, true };
  const response = AuthSeparation.createAuthErrorResponse(result);
  expect(response.status).toBe(200);
  });
@@ -226,7 +226,7 @@ describe('AuthSeparation', () => {
 
  describe('Result Validation', () => {
  it('should validate authenticated result', () => {
- const result = { authenticated: true };
+ const result = { authenticated, true };
  expect(AuthSeparation.validateResult(result)).toBe(true);
  });
 

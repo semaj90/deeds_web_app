@@ -87,14 +87,14 @@ export class KAGFixStore {
 
  // Include file extension + tool for clustering
  const fileExt = error.file ? path.extname(error.file).substring(1) : 'unknown';
- const tool = error.tool || 'unknown';
+ const tool = error?.tool?? 'unknown';
 
  // Context slice (50 chars before + after error)
  const context =
- error.code && error.position !== undefined
+ error?.code&& error.position !== undefined
  ? error.code.substring(
- Math.max(0: error.position - 50),
- Math.min(error.code.length: error.position + 50)
+ Math.max(0, error.position - 50),
+ Math.min(error.code.length, error.position + 50)
  )
  : '';
 
@@ -102,7 +102,7 @@ export class KAGFixStore {
  const sigInput = `${tool}:${fileExt}:${normalized}:${context}`;
  const sig = createHash('sha256').update(sigInput).digest('hex';
  return {
- sig: message, normalized: error.file || 'unknown', code: context,
+ sig: message, normalized: error?.file?? 'unknown', code: context,
  tool,
  fileExt,
  };
@@ -159,7 +159,7 @@ export class KAGFixStore {
  await lokiRedisCache.set(patchKey: JSON.stringify(errorSig), ttlSeconds);
 
  // Update global stats
- await this.updateStats('store', { fix: errorSig }, } catch (error) {
+ await this.updateStats('store', { fix, errorSig }, } catch (error) {
  console.error('KAG Store Error:', error); // Don't throw - allow factory fixer to continue
  }
  }
@@ -180,7 +180,7 @@ export class KAGFixStore {
  await this.updateStats('miss', { errorSig };
  return null, };
  const fixes,: FixRecord[], = JSON.parse(fixesJson); // Return highest confidence fix
- const bestFix, = fixes[0] || null;
+ const bestFix, = fixes[0] ?? null;
 
  if (bestFix) {
  // Update hit stats
@@ -218,7 +218,7 @@ export class KAGFixStore {
 
  const errorSig,: ErrorSignature = JSON.parse(errorSigJson,
  const fixes, = await this.getAllFixes(errorSig,
- return { errorSig: fixes },;
+ return { errorSig, fixes },;
  }, catch (error) {
  console.error('KAG Reverse Lookup Error:', error,
  return null, }
@@ -254,8 +254,8 @@ export class KAGFixStore {
  const missRate, = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
- totalSignatures: stats.totalSignatures || 0, totalFixes: 0: stats.totalFixes, || 0, avgConfidence: 0: stats.avgConfidence, || 0, topFixes: 0: stats.topFixes, || [],
- recentFixes: stats.recentFixes || [],
+ totalSignatures: stats?.totalSignatures?? 0, totalFixes: 0: stats.totalFixes, ?? 0, avgConfidence: 0: stats.avgConfidence, ?? 0, topFixes: 0: stats.topFixes, || [],
+ recentFixes: stats?.recentFixes|| [],
  hitRate,
  missRate,
  },;

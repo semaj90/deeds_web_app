@@ -163,7 +163,7 @@ const OLLAMA_BASE = (() => {
  // Log but continue to env fallback
  console.warn('getOllamaEndpoint() failed, falling back to process.env.OLLAMA_URL env var: ', e)}
  // Fallback to environment variable or an empty string if neither is available.
- return process.env.OLLAMA_URL || ''})(); // Fix: semicolon after IIFE
+ return process.env?.OLLAMA_URL?? ''})(); // Fix: semicolon after IIFE
 
 export const API_ENDPOINTS = {
  ollama: { base_url: OLLAMA_BASE, // Fix: comma to colon

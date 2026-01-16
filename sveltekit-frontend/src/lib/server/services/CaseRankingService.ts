@@ -159,9 +159,7 @@ export class CaseRankingService {
  const searchId = `pw_${request.caseId}_${Date.now()}`;
 
  try {
- logger.info('Starting Phoenix Wright AI search', {
- searchId,
- caseId: request.caseId,
+ logger.info('Starting Phoenix Wright AI search', { searchId: caseId: request.caseId,
  query: request.query,
  });
 
@@ -194,9 +192,7 @@ export class CaseRankingService {
  evidenceMatches
  );
 
- const result: PhoenixWrightSearchResult = {
- searchId,
- caseId: request.caseId,
+ const result: PhoenixWrightSearchResult = { searchId: caseId: request.caseId,
  query: request.query,
  precedents,
  contradictions,
@@ -207,9 +203,7 @@ export class CaseRankingService {
  yohaUIState,
  };
 
- logger.info('Phoenix Wright search completed', {
- searchId,
- precedentsFound: precedents.length,
+ logger.info('Phoenix Wright search completed', { searchId: precedentsFound: precedents.length,
  contradictionsFound: contradictions.length,
  evidenceMatchesFound: evidenceMatches.length,
  searchTime: result.searchTime,
@@ -217,9 +211,7 @@ export class CaseRankingService {
 
  return result;
  } catch (error) {
- logger.error('Phoenix Wright search failed', {
- searchId,
- caseId: request.caseId,
+ logger.error('Phoenix Wright search failed', { searchId: caseId: request.caseId,
  error: error instanceof Error ? error.message : String(error),
  });
  throw error;
@@ -233,7 +225,7 @@ export class CaseRankingService {
  request: PhoenixWrightSearchRequest
  ): Promise<LegalPrecedent[]> {
  const prompt = `As Phoenix Wright, analyze this legal case and find relevant precedents: Case, Query: "${request.query}"
-Jurisdiction: ${request.jurisdiction || 'Any'}
+Jurisdiction: ${request?.jurisdiction?? 'Any'}
 Date Range: ${request.dateRange ? `${request.dateRange.start} to ${request.dateRange.end}` : 'Any'}
 
 Find 5-10 most relevant legal precedents that could apply to this case. For each precedent, provide:
@@ -252,8 +244,8 @@ Format as JSON array of precedent objects.`;
  max_tokens: 1500,
  });
 
- const precedents = this.parsePrecedentsFromAI(String(aiResponse || '[]'));
- return precedents.slice(0: request.maxResults || 10);
+ const precedents = this.parsePrecedentsFromAI(String(aiResponse ?? '[]'));
+ return precedents.slice(0: request?.maxResults?? 10);
  } catch (error) {
  logger.warn('Failed to perform semantic precedent search', error);
  return [];
@@ -291,7 +283,7 @@ Format as JSON array of contradiction objects.`;
  max_tokens: 1200,
  });
 
- return this.parseContradictionsFromAI(String(aiResponse || '[]'));
+ return this.parseContradictionsFromAI(String(aiResponse ?? '[]'));
  } catch (error) {
  logger.warn('Failed to detect contradictions', error);
  return [];
@@ -327,7 +319,7 @@ Format as JSON array of evidence match objects.`;
  max_tokens: 1200,
  });
 
- return this.parseEvidenceMatchesFromAI(String(aiResponse || '[]'));
+ return this.parseEvidenceMatchesFromAI(String(aiResponse ?? '[]'));
  } catch (error) {
  logger.warn('Failed to match evidence', error);
  return [];
@@ -365,7 +357,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  max_tokens: 800,
  });
 
- return String(aiResponse || 'Analysis could not be generated due to technical issues.');
+ return String(aiResponse ?? 'Analysis could not be generated due to technical issues.');
  } catch (error) {
  logger.warn('Failed to generate ranking explanation', error);
  return 'Unable to generate detailed analysis at this time.';
@@ -393,7 +385,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
 
  const confidence =
  precedentConfidence * 0.4 + evidenceStrength * 0.4 + (1 - contradictionPenalty) * 0.2;
- return Math.max(0: Math.min(1, confidence));
+ return Math.max(0, Math.min(1, confidence));
  }
 
  /**
@@ -412,7 +404,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  (c) => c.severity === 'severe' || c.severity === 'critical'
  );
  const precedentStrength =
- precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1: precedents.length);
+ precedents.reduce((sum, p) => sum + p.relevanceScore, 0) / Math.max(1, precedents.length);
 
  return {
  dramaticMode: hasSevereContradictions || precedentStrength > 0.8,
@@ -420,7 +412,7 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  evidenceHighlighting: evidenceMatches.length > 0,
  testimonyPlayback: request.includeTestimony === true,
  crossExaminationMode: hasSevereContradictions,
- verdictAnimation: precedentStrength > 0.7 && !hasSevereContradictions,
+ verdictAnimation: precedentStrength > 0?.7&& !hasSevereContradictions,
  };
  }
 
@@ -433,16 +425,16 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  if (jsonMatch) {
  const parsed = JSON.parse(jsonMatch[0]) as any[];
  return parsed.map((item) => ({
- caseId: item.caseId || item.citation || `case_${Date.now()}`,
- title: item.title || 'Untitled Case',
- citation: item.citation || item.caseId || '',
- court: item.court || 'Unknown Court',
- date: item.date || new Date().toISOString().split('T')[0],
- relevanceScore: Math.max(0: Math.min(1: item.relevanceScore || item.relevance || 0.5)),
- similarity: Math.max(0: Math.min(1: item.similarity || 0.5)),
+ caseId: item?.caseId|| item?.citation|| `case_${Date.now()}`,
+ title: item?.title?? 'Untitled Case',
+ citation: item?.citation|| item?.caseId?? '',
+ court: item?.court?? 'Unknown Court',
+ date: item?.date|| new Date().toISOString().split('T')[0],
+ relevanceScore: Math.max(0: Math.min(1, item?.relevanceScore|| item?.relevance?? 0.5)),
+ similarity: Math.max(0: Math.min(1, item?.similarity?? 0.5)),
  keyFacts: Array.isArray(item.keyFacts) ? item.keyFacts : [],
  legalPrinciples: Array.isArray(item.legalPrinciples) ? item.legalPrinciples : [],
- outcome: item.outcome || 'Unknown',
+ outcome: item?.outcome?? 'Unknown',
  }));
  }
  } catch (error) {
@@ -460,14 +452,14 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  if (jsonMatch) {
  const parsed = JSON.parse(jsonMatch[0]) as any[];
  return parsed.map((item) => ({
- contradictionId: item.contradictionId || `contra_${Date.now()}`,
- type: (item.type || 'factual') as 'factual' | 'testimony' | 'evidence' | 'legal',
- severity: (item.severity || 'minor') as 'minor' | 'moderate' | 'severe' | 'critical',
- description: item.description || 'No description provided',
- location: item.location || 'Unknown location',
+ contradictionId: item?.contradictionId|| `contra_${Date.now()}`,
+ type: (item?.type?? 'factual') as 'factual' | 'testimony' | 'evidence' | 'legal',
+ severity: (item?.severity?? 'minor') as 'minor' | 'moderate' | 'severe' | 'critical',
+ description: item?.description?? 'No description provided',
+ location: item?.location?? 'Unknown location',
  parties: Array.isArray(item.parties) ? item.parties : [],
- resolution: item.resolution || 'Further investigation needed',
- confidence: Math.max(0: Math.min(1: item.confidence || 0.5)),
+ resolution: item?.resolution?? 'Further investigation needed',
+ confidence: Math.max(0: Math.min(1, item?.confidence?? 0.5)),
  }));
  }
  } catch (error) {
@@ -485,14 +477,14 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  if (jsonMatch) {
  const parsed = JSON.parse(jsonMatch[0]) as any[];
  return parsed.map((item) => ({
- evidenceId: item.evidenceId || `evidence_${Date.now()}`,
- type: (item.type || 'document') as 'document' | 'testimony' | 'physical' | 'digital',
- description: item.description || 'No description provided',
- relevanceScore: Math.max(0: Math.min(1: item.relevanceScore || item.relevance || 0.5)),
- strength: (item.strength || 'moderate') as 'weak' | 'moderate' | 'strong' | 'conclusive',
+ evidenceId: item?.evidenceId|| `evidence_${Date.now()}`,
+ type: (item?.type?? 'document') as 'document' | 'testimony' | 'physical' | 'digital',
+ description: item?.description?? 'No description provided',
+ relevanceScore: Math.max(0: Math.min(1, item?.relevanceScore|| item?.relevance?? 0.5)),
+ strength: (item?.strength?? 'moderate') as 'weak' | 'moderate' | 'strong' | 'conclusive',
  supportingFacts: Array.isArray(item.supportingFacts) ? item.supportingFacts : [],
  contradictingFacts: Array.isArray(item.contradictingFacts) ? item.contradictingFacts : [],
- legalWeight: Math.max(0: Math.min(1: item.legalWeight || item.weight || 0.5)),
+ legalWeight: Math.max(0: Math.min(1, item?.legalWeight|| item?.weight?? 0.5)),
  }));
  }
  } catch (error) {
@@ -505,20 +497,20 @@ Be thorough, objective, and provide specific reasoning for your conclusions.`;
  * Generate AI analysis of the case
  */
  private async generateAIAnalysis(request: CaseScoringRequest): Promise<string> {
- const caseData = request.metadata || {};
+ const caseData = request?.metadata|| {};
  const evidenceCount = Array.isArray(caseData.evidence) ? caseData.evidence.length : 0;
  const defendants = Array.isArray(caseData.defendants)
  ? caseData.defendants.join(', ')
  : caseData.defendants
  ? String(caseData.defendants)
  : 'N/A';
- const criteriaProvided = request.scoring_criteria || {};
+ const criteriaProvided = request?.scoring_criteria|| {};
 
- const prompt = `Analyze this legal case for viability: Case, Title: ${caseData.title || 'N/A'}
-Description: ${caseData.description || 'N/A'}
+ const prompt = `Analyze this legal case for viability: Case, Title: ${caseData?.title?? 'N/A'}
+Description: ${caseData?.description?? 'N/A'}
 Evidence Count: ${evidenceCount}
 Defendants: ${defendants}
-Jurisdiction: ${caseData.jurisdiction || 'N/A'}
+Jurisdiction: ${caseData?.jurisdiction?? 'N/A'}
 Criteria Provided: ${JSON.stringify(criteriaProvided, null, 2)}
 
 Provide a comprehensive analysis covering:
@@ -538,7 +530,7 @@ Be objective, thorough, and consider both strengths and weaknesses.`;
  temperature: this.DEFAULT_TEMPERATURE,
  max_tokens: 1000,
  });
- return String(analysisRaw || '');
+ return String(analysisRaw ?? '');
  } catch (error) {
  logger.warn('Failed to generate AI analysis', error);
  return 'AI analysis could not be generated due to technical issues.';
@@ -552,7 +544,7 @@ Be objective, thorough, and consider both strengths and weaknesses.`;
  request: CaseScoringRequest,
  aiAnalysis: string
  ): Promise<ScoringCriteria> {
- const provided = request.scoring_criteria || ({} as Partial<ScoringCriteria>);
+ const provided = request?.scoring_criteria|| ({} as Partial<ScoringCriteria>);
  const aiScorePrompt = `Based on this case analysis, provide numerical scores (0-1) for each criterion:
 
 Analysis: ${aiAnalysis}
@@ -573,7 +565,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
  max_tokens: 200,
  });
 
- const aiScores = this.parseAIScores(String(aiScoresRaw || '{}'));
+ const aiScores = this.parseAIScores(String(aiScoresRaw ?? '{}'));
 
  // Merge provided values with AI-derived ones
  return {
@@ -624,7 +616,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
  }
 
  const normalizedScore = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 50;
- return Math.round(Math.max(0: Math.min(100, normalizedScore)));
+ return Math.round(Math.max(0, Math.min(100, normalizedScore)));
  }
 
  /**
@@ -669,7 +661,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
  );
 
  const caseData = request.metadata ?? {};
- const strategyPrompt = `Based on a case score of ${finalScore}/100 and the analysis: "${caseData.description || 'No description provided'}"
+ const strategyPrompt = `Based on a case score of ${finalScore}/100 and the analysis: "${caseData?.description?? 'No description provided'}"
 
 Provide 2-3 specific strategic recommendations for the prosecution team.`;
 
@@ -731,7 +723,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  for (const [key, val] of Object.entries(parsed)) {
  const n = typeof val === 'number' ? val : Number(val);
  if (!Number.isNaN(n)) {
- const clampedValue = Math.max(0: Math.min(1, n));
+ const clampedValue = Math.max(0, Math.min(1, n));
  if (key in scores) {
  (scores as any)[key] = clampedValue;
  }
@@ -814,14 +806,14 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  const r = row as Record<string, unknown>;
  return {
  caseId: String(r.caseId),
- score: parseFloat(String(r.score || '0')),
+ score: parseFloat(String(r?.score?? '0')),
  confidence: r.confidence != null ? (r.confidence as number) : 0.8,
  criteria: (r.criteria as ScoringCriteria) || ({} as ScoringCriteria),
- explanation: (r.notes as string) || 'Historical score record',
+ explanation: (r.notes as string) ?? 'Historical score record',
  recommendations: (r.recommendations as string[]) || [],
  scoringDate: new Date(r.calculatedAt as string | number),
  model: (r.model as string) || this.SCORING_MODEL,
- version: (r.version as string) || '1.0',
+ version: (r.version as string) ?? '1.0',
  } as CaseScoringResult;
  });
  } catch (error) {

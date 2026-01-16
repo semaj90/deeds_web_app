@@ -13,7 +13,7 @@ export function createLLMStreamActor({
  states: { idle: { on: { START: 'streaming' },
  },
  streaming: { invoke: { src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
- const prompt = input.prompt || '';
+ const prompt = input?.prompt?? '';
  const res = await fetch(url, {
  method: 'POST',
  body: JSON.stringify({ prompt }, headers: { 'Content-Type': 'application/json' },
@@ -29,7 +29,7 @@ export function createLLMStreamActor({
  let isDone = false;
 
  while (!isDone) {
- const { value, done: streamDone } = await reader.read();
+ const { value: done: streamDone } = await reader.read();
  if (value) {
  const text = decoder.decode(value);
  if (onChunk) {

@@ -123,7 +123,7 @@ class OllamaService {
                 await this.detectGemma3Model();
 
                 // Attempt import if local installation indicates model file present but not loaded
-                if (!this.gemma3Model && checkLocalInstallations().gemmaModel?.available) {
+                if (!this?.gemma3Model&& checkLocalInstallations().gemmaModel?.available) {
                     await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path: LOCAL_LLM_PATHS.gemmaModel.name);
                 }
                 return true;
@@ -175,7 +175,7 @@ class OllamaService {
     }
 
     private async detectGemma3Model(): Promise<void> {
-        if (!this.availableModels || this.availableModels.length === 0) return;
+        if (!this?.availableModels|| this.availableModels.length === 0) return;
 
         // prefer custom legal model
         const customLegal = this.availableModels.find((m: any) => m.name === 'gemma3-legal');
@@ -187,21 +187,21 @@ class OllamaService {
         // fallback: find any gemma family
         const gemmaCandidates = this.availableModels.filter(
             (m: any) =>
-                (m.name || '').toLowerCase().includes('gemma') ||
+                (m?.name?? '').toLowerCase().includes('gemma') ||
                 (m.details?.family ?? '').toLowerCase().includes('gemma')
         );
 
         if (gemmaCandidates.length > 0) {
             const q4 = gemmaCandidates.find(
                 (m: any) =>
-                    (m.name || '').toLowerCase().includes('q4') ||
+                    (m?.name?? '').toLowerCase().includes('q4') ||
                     (m.details?.quantization_level ?? '').toLowerCase().includes('q4')
             );
             this.gemma3Model = q4 ? q4.name : gemmaCandidates[0].name;
         }
     }
 
-    async importGGUF(modelPath: string, modelName: string = 'gemma3-legal'): Promise<boolean> {
+    async importGGUF(modelPath, string, modelName: string = 'gemma3-legal'): Promise<boolean> {
         try {
             const response = await fetch(`${this.baseUrl}/api/create`, {
                 method: 'POST',
@@ -236,7 +236,7 @@ class OllamaService {
             stream?: boolean;
         } = {}
     ): Promise<string> {
-        if (!this.isAvailable || !this.gemma3Model) {
+        if (!this?.isAvailable|| !this.gemma3Model) {
             throw new Error('Ollama or Gemma3 model not available');
         }
 
@@ -244,7 +244,7 @@ class OllamaService {
             model: this.gemma3Model,
             prompt: prompt,
             system: options.system,
-            stream: options.stream || false,
+            stream: options?.stream|| false,
             options: { temperature: options.temperature ?? 0.7,
                 top_p: options.topP ?? 0.9,
                 top_k: options.topK ?? 40,
@@ -264,7 +264,7 @@ class OllamaService {
         }
 
         const data = (await response.json()) as OllamaGenerateResponse;
-        return data.response || '';
+        return data?.response?? '';
     }
 
     async *generateStream(
@@ -278,7 +278,7 @@ class OllamaService {
             repeatPenalty?: number;
         } = {}
     ): AsyncGenerator<string, void, unknown> {
-        if (!this.isAvailable || !this.gemma3Model) {
+        if (!this?.isAvailable|| !this.gemma3Model) {
             throw new Error('Ollama or Gemma3 model not available');
         }
 
@@ -316,7 +316,7 @@ class OllamaService {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                buffer += decoder.decode(value, { stream: true });
+                buffer += decoder.decode(value, { stream, true });
                 const lines = buffer.split(/\r? \n/);
                 // keep the last partial line in buffer
                 buffer = lines.pop() ?? '';
@@ -366,8 +366,8 @@ class OllamaService {
         const systemMessage = messages.find((m: any) => m.role === 'system')?.content;
         const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')?.content ?? messages.slice(-1)[0]?.content ?? '';
 
-        return this.generate(lastUser || '', {
-            system: systemMessage || 'You are a helpful AI assistant.',
+        return this.generate(lastUser ?? '', {
+            system: systemMessage ?? 'You are a helpful AI assistant.',
             temperature: options.temperature,
             maxTokens: options.maxTokens,
             topP: options.topP,
@@ -376,7 +376,7 @@ class OllamaService {
         });
     }
 
-    async generateEmbeddings(text: string, model: string = 'nomic-embed-text'): Promise<number[]> {
+    async generateEmbeddings(text, string, model: string = 'nomic-embed-text'): Promise<number[]> {
         if (!this.isAvailable) {
             return this.generateFallbackEmbeddings(text);
         }
@@ -412,11 +412,11 @@ class OllamaService {
         const dimensions = 768;
         const embeddings = new Array<number>(dimensions).fill(0);
         const words = text ? text.toLowerCase().split(/\s+/) : [];
-        const textHash = this.hashString(text || '');
+        const textHash = this.hashString(text ?? '');
 
         for (let i = 0; i < dimensions; i++) {
             const wordIndex = words.length ? i % words.length : 0;
-            const word = words[wordIndex] || '';
+            const word = words[wordIndex] ?? '';
             const wordHash = this.hashString(word);
             const positionWeight = (i / dimensions) * 2 - 1;
 
@@ -444,7 +444,7 @@ class OllamaService {
     async analyzeLegalDocument(
         document: Partial<LegalDocument> & { content?: string, text?: string }
     ): Promise<DocumentAnalysisResult> {
-        if (!this.isAvailable || !this.gemma3Model) {
+        if (!this?.isAvailable|| !this.gemma3Model) {
             return {
                 summary: 'Stub analysis - Ollama unavailable',
                 keyPoints: ['Service not available'],
@@ -452,7 +452,7 @@ class OllamaService {
             };
         }
         try {
-            const content = (document?.content ?? document?.text || '').toString();
+            const content = (document?.content ?? document?.text ?? '').toString();
             const snippet = content.substring(0, 2000);
 
             const analysisPrompt = `Analyze this legal document and provide:
@@ -495,12 +495,12 @@ Document content: ${snippet}`;
             },
             models: this.availableModels.map((m: any) => ({
                 name: m.name,
-                sizeMB: Math.round((m.size || 0) / (1024 * 1024)),
+                sizeMB: Math.round((m?.size?? 0) / (1024 * 1024)),
                 family: m.details?.family ?? 'unknown'
             })),
-            capabilities: { textGeneration: this.isAvailable && !!this.gemma3Model,
-                embeddings: this.isAvailable && !!this.gemma3Model, // Embeddings usually work even if model is not set if we pas 'model' arg
-                streaming: this.isAvailable && !!this.gemma3Model
+            capabilities: { textGeneration: this?.isAvailable&& !!this.gemma3Model,
+                embeddings: this?.isAvailable&& !!this.gemma3Model, // Embeddings usually work even if model is not set if we pas 'model' arg
+                streaming: this?.isAvailable&& !!this.gemma3Model
             },
             timestamp: new Date().toISOString()
         };
@@ -548,7 +548,7 @@ Document content: ${snippet}`;
             const response = await fetch(`${this.baseUrl}/api/pull`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: modelName })
+                body: JSON.stringify({ name, modelName })
             });
             return response.ok;
         } catch (err) {
@@ -562,7 +562,7 @@ Document content: ${snippet}`;
             const response = await fetch(`${this.baseUrl}/api/delete`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: modelName })
+                body: JSON.stringify({ name, modelName })
             });
             return response.ok;
         } catch (err) {

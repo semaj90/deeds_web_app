@@ -48,9 +48,7 @@ function createDocumentProgressStore() {
  });
  }
 
- set({
- documentId,
- documentTitle: isProcessing,
+ set({ documentId: documentTitle: isProcessing,
  currentEvent: null,
  pageStatuses: fallbackActive,
  fallbackConfidence: 0,
@@ -82,7 +80,7 @@ function createDocumentProgressStore() {
  // Check for fallback
  if (event.stage === 'tesseract_fallback') {
  newState.fallbackActive = true;
- newState.fallbackConfidence = event.confidence || 0;
+ newState.fallbackConfidence = event?.confidence?? 0;
  }
 
  // Check for completion

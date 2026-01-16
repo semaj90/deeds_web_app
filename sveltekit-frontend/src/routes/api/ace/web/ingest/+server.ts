@@ -20,7 +20,7 @@ async function getAmqpChannel() {
   if (amqpChannel) return amqpChannel;
 
   try {
-    const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+    const rabbitmqUrl = process.env?.RABBITMQ_URL?? 'amqp://localhost:5672';
     if (!amqpConnection) {
       amqpConnection = await (amqp as any).connect(rabbitmqUrl);
 
@@ -39,7 +39,7 @@ async function getAmqpChannel() {
     }
 
     amqpChannel = await amqpConnection.createChannel();
-    await amqpChannel.assertQueue('ace_web_ingest', { durable: true });
+    await amqpChannel.assertQueue('ace_web_ingest', { durable, true });
 
     return amqpChannel;
   } catch (error) {
@@ -234,7 +234,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const statusCode = jobIds.length > 0 ? 200 : 400; // Partial success is 200
 
-    return json(response, { status: statusCode });
+    return json(response, { status, statusCode });
   } catch (error) {
     console.error('[ACE Ingest] Endpoint error:', error);
     return json(

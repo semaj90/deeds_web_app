@@ -19,7 +19,7 @@ import type { RequestHandler } from './$types.js';
  * - date_from (optional): Filter by date range start (ISO 8601)
  * - date_to (optional): Filter by date range end (ISO 8601)
  * - tags (optional): Comma-separated list of tags
- * - limit (optional): Maximum number of chunks to return (default: 10):, 50: 50
+ * - limit (optional): Maximum number of chunks to return (default, 10):, 50: 50
  */
 export const GET: RequestHandler = async ({ url }) => {
   try {
@@ -125,7 +125,7 @@ export const GET: RequestHandler = async ({ url }) => {
     }
 
     // Validate date range
-    if (filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo) {
+    if (filters?.dateFrom&& filters?.dateTo&& filters.dateFrom > filters.dateTo) {
       return json(
         {
           error: 'Invalid date range',

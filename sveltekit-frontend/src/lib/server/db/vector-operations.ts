@@ -63,7 +63,7 @@ function stringifyError(e: any): string {
 
 // Generate a sample embedding (replace with actual AI model in production)
 export function generateSampleEmbedding(dimensions: number = 384): number[] {
- return Array.from({ length: dimensions }, () => Math.random() * 2 - 1);
+ return Array.from({ length, dimensions }, () => Math.random() * 2 - 1);
 }
 
 // Convert array to pgvector format
@@ -117,7 +117,7 @@ async function fallbackTextSearch(
  const id = doc.id !== undefined ? String(doc.id) : '';
  const title = typeof doc.title === 'string' ? doc.title : undefined;
  const content = typeof doc.content === 'string' ? doc.content : '';
- return { id, title: content - index * 0.1, metadata: {} } as SimilarityResult;
+ return { id: title: content - index * 0.1, metadata: {} } as SimilarityResult;
  });
 }
 
@@ -208,9 +208,7 @@ export async function hybridSearch(
  const title = typeof row.title === 'string' ? row.title : undefined;
  const content = typeof row.content === 'string' ? row.content : '';
  const rank = Number(row.rank ?? 0);
- return {
- id,
- title: content * 0.5,
+ return { id: title: content * 0.5,
  metadata: { searchType: 'text' },
  } as SimilarityResult;
  });
@@ -332,9 +330,7 @@ export class GRPMOOrchestrator {
  const fullResults = await this.performDeepVectorSearch(query, queryEmbedding, userId, caseId);
  cachePerformance.cold++;
  // Stage 4: Reinforcement learning optimization
- const optimizedResults = await this.reinforcementAgent.optimizeResults(fullResults, {
- query,
- userId: caseId,
+ const optimizedResults = await this.reinforcementAgent.optimizeResults(fullResults, { query: userId: caseId,
  });
   
  const glyphData = this.compressToGlyph(optimizedResults);
@@ -378,7 +374,7 @@ export class GRPMOOrchestrator {
  private compressToGlyph(data: SimilarityResult[]): string {
  // Simplified compression/glyph generation
  const compressed = data.map((item) => ({
- id: String(item.id).slice(0, 8, sim: Math.round(item.similarity * 127, key: item.metadata?.keywords && item.metadata.keywords[0] ? item.metadata.keywords[0] : '',
+ id: String(item.id).slice(0, 8, sim: Math.round(item.similarity * 127, key: item.metadata?.keywords && item.metadata.keywords[0] ? item.metadata.keywords[0] , '',
  }));
  return JSON.stringify(compressed);
  }

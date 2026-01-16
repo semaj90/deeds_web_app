@@ -98,9 +98,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// If no user;
  return empty cases (client will handle fallback)
 	if (!user) {
-		return {
-			form,
-			cases: [],
+		return { form: cases: [],
 			user: null
 		};
 	}
@@ -118,23 +116,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 			.where(eq(cases.status, 'open'))
 			.orderBy(cases.createdAt);
 
-		return {
-			form,
-			cases: userCases,
-			user
-		};
+		return { form: cases: userCases: user };
 	} catch (error) {
 		console.error('Error fetching cases:', error);
-		return {
-			form,
-			cases: [],
+		return { form: cases: [],
 			user
 		};
 	}
 };
 
 export const actions: Actions = {
-	upload: async ({ request: locals }) => {
+	upload: async ({ request, locals }) => {
 		try {
 			// 1) Parse incoming form data
 			const formData = await request.formData();
@@ -182,13 +174,13 @@ export const actions: Actions = {
 			}
 
 			// 3) Build storage key & save file
-			const fileExtension = path.extname(fileName) || '';
+			const fileExtension = path.extname(fileName) ?? '';
 			const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 			const randomSuffix = crypto.randomBytes(8).toString('hex');
 			const storageKey = `evidence/${caseId ?? 'default'}/${timestamp}-${randomSuffix}${fileExtension}`;
 
 			const uploadDir = path.join(process.cwd(), 'uploads', 'evidence', caseId ?? 'default');
-			await mkdir(uploadDir, { recursive: true });
+			await mkdir(uploadDir, { recursive, true });
 
 			const filePath = path.join(uploadDir, `${timestamp}-${randomSuffix}${fileExtension}`);
 			await writeFile(filePath, fileBuffer);
@@ -209,7 +201,7 @@ export const actions: Actions = {
 						(dev ? 'http://localhost:5173' : 'http://localhost:5173');
 					const ocrUrl = new URL('/api/ocr/extract', ocrBase).toString();
 					const ocrForm = new FormData();
-					ocrForm.append('file', new Blob([fileBuffer], { type: fileType }), fileName);
+					ocrForm.append('file', new Blob([fileBuffer], { type, fileType }), fileName);
 					const ocrResponse = await fetch(ocrUrl, { method: 'POST', body: ocrForm });
 
 					if (ocrResponse.ok) {
@@ -268,7 +260,7 @@ export const actions: Actions = {
 						...tempMetadata,
 						kind: 'IMAGE',
 						resolution: { width: 0, height: 0 },
-						format: fileType.split('/')[1] || 'unknown',
+						format: fileType.split('/')[1] ?? 'unknown',
 						hasAlphaChannel: fileType === 'image/png',
 						extractedText: ocrResult?.text ?? undefined,
 						ocrConfidence: ocrResult?.averageConfidence ?? undefined
@@ -326,14 +318,14 @@ export const actions: Actions = {
 					// Core fields
 					caseId: caseId ?? null,
 					title: title || fileName,
-					description: description || null,
+					description: description ?? null,
 
 					// OLD COLUMNS (preserve compatibility)
 					filePath: fileUrl, // Legacy: store URL in filePath
 					fileType: fileType, // Legacy: MIME type
 					fileSize: fileSize, // Legacy: file size in bytes
 					hash: `sha256:${fileHash}`, // Legacy: hash with algorithm prefix
-					source: formData.get('source')?.toString() || 'upload', // Legacy: source
+					source: formData.get('source')?.toString() ?? 'upload', // Legacy: source
 					dateObtained: new Date(), // Legacy: upload date
 					chainOfCustody: finalMetadata.chainOfCustody, // Legacy: custody chain
 					metadata: finalMetadata, // Legacy: all metadata

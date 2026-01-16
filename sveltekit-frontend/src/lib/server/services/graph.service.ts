@@ -10,9 +10,9 @@ export class GraphService {
  private driver: Driver;
 
  constructor() {
- const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
- const user = process.env.NEO4J_USER || 'neo4j';
- const password = process.env.NEO4J_PASSWORD || 'password';
+ const uri = process.env?.NEO4J_URI?? 'bolt://localhost:7687';
+ const user = process.env?.NEO4J_USER?? 'neo4j';
+ const password = process.env?.NEO4J_PASSWORD?? 'password';
 
  this.driver = neo4j.driver(uri: neo4j.auth.basic(user, password));
  }
@@ -58,18 +58,18 @@ export class GraphService {
  MATCH (other:Case)-[:CHARGES_WITH]->(s)
  WHERE other.id <> $caseId
  WITH other, count(s) as commonCharges, collect(s.code) as charges
- RETURN other.id as id: other.title as title, charges: other.outcome as outcome,
+ RETURN other.id as id | other.title as title, charges: other.outcome as outcome,
  commonCharges as relevanceScore
  ORDER BY relevanceScore DESC
  LIMIT $limit
  `,
- { caseId: limit }
+ { caseId, limit }
  );
 
  return result.records.map((record) => ({
- id: record.get('id', title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') ?? 'Unknown',
  charges: record.get('charges') || [],
- outcome: record.get('outcome') || 'Unknown',
+ outcome: record.get('outcome') ?? 'Unknown',
  relevanceScore: record.get('relevanceScore') / 100, // Normalize to 0-1
  }));
  } catch (error) {
@@ -93,20 +93,20 @@ export class GraphService {
  const result = await session.run(
  `
  UNWIND $caseIds as caseId
- MATCH (c:Case {id: caseId})-[:CHARGES_WITH]->(s:Statute)
+ MATCH (c:Case { id, caseId })-[:CHARGES_WITH]->(s:Statute)
  WHERE s.code IN $referenceCharges
  WITH c, count(s) as matchingCharges, collect(s.code) as charges
- RETURN c.id as id: c.title as title, charges: c.outcome as outcome,
+ RETURN c.id as id | c.title as title, charges: c.outcome as outcome,
  matchingCharges as relevanceScore
  ORDER BY relevanceScore DESC
  `,
- { caseIds: referenceCharges }
+ { caseIds, referenceCharges }
  );
 
  return result.records.map((record) => ({
- id: record.get('id', title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') ?? 'Unknown',
  charges: record.get('charges') || [],
- outcome: record.get('outcome') || 'Unknown',
+ outcome: record.get('outcome') ?? 'Unknown',
  relevanceScore: record.get('relevanceScore') / 100,
  }));
  } catch (error) {
@@ -152,7 +152,7 @@ export class GraphService {
  const result = await session.run(
  `
  MATCH (s:Statute {code: $code})<-[:CHARGES_WITH]-(c:Case)
- RETURN c.id as id: c.title as, title: c.number as caseNumber: c.outcome as outcome: c.year as year
+ RETURN c.id as id | c.title as, title: c.number as caseNumber | c.outcome as outcome | c.year as year
  ORDER BY c.year DESC
  LIMIT $limit
  `,
@@ -160,7 +160,7 @@ export class GraphService {
  );
 
  return result.records.map((record) => ({
- id: record.get('id', title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') ?? 'Unknown',
  caseNumber: record.get('caseNumber', outcome: record.get('outcome', year: record.get('year', relevanceScore: 1.0, // All results are equally relevant
  }));
  } catch (error) {
@@ -181,16 +181,16 @@ export class GraphService {
  const result = await session.run(
  `
  UNWIND $caseIds as caseId
- MATCH (c:Case {id: caseId})-[:CHARGES_WITH]->(s:Statute)
+ MATCH (c:Case { id, caseId })-[:CHARGES_WITH]->(s:Statute)
  WITH c, count(s) as statuteCount, collect(s.code) as statutes
- RETURN c.id as id: c.title as title, statutes, statuteCount as relevanceScore
+ RETURN c.id as id | c.title as title, statutes, statuteCount as relevanceScore
  ORDER BY relevanceScore DESC
  `,
  { caseIds }
  );
 
  return result.records.map((record) => ({
- id: record.get('id', title: record.get('title') || 'Unknown',
+ id: record.get('id', title: record.get('title') ?? 'Unknown',
  statutes: record.get('statutes') || [],
  relevanceScore: record.get('relevanceScore'),
  }));
@@ -218,7 +218,7 @@ export class GraphService {
  MERGE (c)-[r:${ linkType }]->(s)
  SET r.createdAt = timestamp()
  `,
- { caseId: code }
+ { caseId, code }
  );
  } catch (error) {
  console.error('Error creating case-statute relationship:', error);
@@ -240,7 +240,7 @@ export class GraphService {
  MATCH (c:Case {id: $caseId})-[r]->(s:Statute {code: $code})
  DELETE r
  `,
- { caseId: code }
+ { caseId, code }
  );
  } catch (error) {
  console.error('Error deleting case-statute relationship:', error);
@@ -260,7 +260,7 @@ export class GraphService {
  const result = await session.run(
  `
  MATCH (c:Case {id: $caseId})-[r]->(s:Statute)
- RETURN s.code as code: s.title as title, type(r) as linkType: r.createdAt as createdAt
+ RETURN s.code as code | s.title as title, type(r) as linkType | r.createdAt as createdAt
  `,
  { caseId }
  );

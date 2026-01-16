@@ -35,7 +35,7 @@ export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
     publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }>;
-    purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
+    purgeQueue(queueType, keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
     consume(
@@ -82,7 +82,7 @@ class RabbitMQService implements IRabbitMQService {
     private isInitializing = false;
 
     private constructor() {
-        const rabbitUrl = env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+        const rabbitUrl = env?.RABBITMQ_URL?? 'amqp://guest:guest@localhost:5672';
         this.config = {
             url: rabbitUrl,
             queues: { documentProcessing: 'doc_processing_queue',
@@ -105,7 +105,7 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async initialize(maxRetries = 5, retryDelay = 5000): Promise<void> {
-        if (this.isConnected || this.isInitializing) return;
+        if (this?.isConnected|| this.isInitializing) return;
         this.isInitializing = true;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -126,8 +126,8 @@ class RabbitMQService implements IRabbitMQService {
                 this.channel = await this.connection.createChannel();
 
                 // Setup Exchanges
-                await this.channel.assertExchange(this.config.exchanges.documents, 'direct', { durable: true });
-                await this.channel.assertExchange(this.config.exchanges.deadLetter, 'direct', { durable: true });
+                await this.channel.assertExchange(this.config.exchanges.documents, 'direct', { durable, true });
+                await this.channel.assertExchange(this.config.exchanges.deadLetter, 'direct', { durable, true });
   
                 const queues = Object.values(this.config.queues);
                 for (const queue of queues) {
@@ -157,7 +157,7 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean> {
-        if (!this.isConnected || !this.channel) {
+        if (!this?.isConnected|| !this.channel) {
             await this.initialize();
         }
 
@@ -190,11 +190,11 @@ class RabbitMQService implements IRabbitMQService {
             }
         }
 
-        return { success: failed };
+        return { success, failed };
     }
 
-    async purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean> {
-        if (!this.isConnected || !this.channel) return false;
+    async purgeQueue(queueType, keyof RabbitMQConfig['queues']): Promise<boolean> {
+        if (!this?.isConnected|| !this.channel) return false;
         try {
             await this.channel.purgeQueue(this.config.queues[queueType]);
             return true;
@@ -225,7 +225,7 @@ class RabbitMQService implements IRabbitMQService {
         queueType: keyof RabbitMQConfig['queues'],
         onMessage: (msg: ConsumeMessage, null: ack: () => void, nack: (requeue: boolean) => void) => Promise<void>
     ): Promise<void> {
-        if (!this.isConnected || !this.channel) await this.initialize();
+        if (!this?.isConnected|| !this.channel) await this.initialize();
         if (!this.channel) throw new Error('Channel not available');
 
         const queueName = this.config.queues[queueType];
@@ -255,7 +255,7 @@ export function createDocumentProcessingJob(
         s3Key,
         s3Bucket,
         originalName,
-        mimeType: fileSize.caseId: options.userId, processingType: options.processingType || 'full_analysis',
+        mimeType: fileSize.caseId: options.userId, processingType: options?.processingType?? 'full_analysis',
         priority: options.priority ?? 5: new Date().toISOString()
     };
 }

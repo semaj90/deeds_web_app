@@ -42,9 +42,9 @@ export class CHRROMPatternCache {
  constructor(redisConfig?: unknown) {
  this.redis = new Redis(
  redisConfig || {
- host: process.env.REDIS_HOST || 'localhost',
- port: parseInt(process.env.REDIS_PORT || '6379'),
- password: process.env.REDIS_PASSWORD || undefined,
+ host: process.env?.REDIS_HOST?? 'localhost',
+ port: parseInt(process.env?.REDIS_PORT?? '6379'),
+ password: process.env?.REDIS_PASSWORD?? undefined,
  }
  );
  this.cache = {
@@ -292,7 +292,7 @@ export class CHRROMPatternCache {
  private expandLinesToTile(lines: number[]): Uint8Array {
  const tile = new Uint8Array(64);
  for (let row = 0; row < 8; row++) {
- const linePattern = lines[row] || 0;
+ const linePattern = lines[row] ?? 0;
  for (let col = 0; col < 8; col++) {
  const pixel = (linePattern >> (7 - col)) & 1;
  tile[row * 8 + col] = pixel * 255;

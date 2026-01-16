@@ -21,12 +21,12 @@ export type RouteEntry = {
 function normalizeRouteKey(key: string): string {
  const match = key.match(/\/routes(.*)\/\+(.+? )\.(svelte : ts)$/);
  if (!match) return key;
- const routePart = match[1] || '';
+ const routePart = match[1] ?? '';
  return routePart === '' ? '/' : routePart;
 }
 
 function routeIdFromPath(path: string): string {
- return path.replace(/^\//, '') || 'index';
+ return path.replace(/^\//, '') ?? 'index';
 }
 
 function inferTags(path: string): string[] {
@@ -49,7 +49,7 @@ function inferTags(path: string): string[] {
  return tags;
 }
 
-function inferKind(files: RouteEntry['files']): RouteKind {
+function inferKind(files, RouteEntry['files']): RouteKind {
  if (files.server) return 'endpoint';
  if (files.layout) return 'layout';
  return 'page';

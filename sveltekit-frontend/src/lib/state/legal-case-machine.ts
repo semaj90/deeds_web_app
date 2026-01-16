@@ -113,7 +113,7 @@ export type LegalCaseEvents =
 
 // Define actor types for services
 export type LegalCaseActors = {
- loadCase: { input: { caseId: string };
+ loadCase: { input: { caseId, string };
  output: Case;
  };
  createCase: { input: NewCase, output: Case;
@@ -124,10 +124,10 @@ export type LegalCaseActors = {
  uploadEvidence: { input: { files: File[], caseId: string; documentType: string };
  output: UploadEvidenceServiceResult;
  };
- processEvidence: { input: { evidenceId: string };
+ processEvidence: { input: { evidenceId, string };
  output: ProcessEvidenceServiceResult;
  };
- aiSummarizeCase: { input: { caseId: string };
+ aiSummarizeCase: { input: { caseId, string };
  output: CaseSummaryServiceResult;
  };
  findSimilarCases: { input: { caseId?: string };
@@ -136,10 +136,10 @@ export type LegalCaseActors = {
  updateCase: { input: { caseId: string, updates: Partial<Case> };
  output: Case;
  };
- deleteCase: { input: { caseId: string };
+ deleteCase: { input: { caseId, string };
  output: boolean;
  };
- generateEmbedding: { input: { text: string };
+ generateEmbedding: { input: { text, string };
  output: EmbeddingServiceResult;
  };
  searchRelatedEvidence: { input: { text?: string; caseId?: string };
@@ -208,7 +208,7 @@ const generateEmbeddingService = async ({ input }: { input: LegalCaseActors['gen
  // Use the real embedder (local Gemma3 or Nomic fallback)
  const embedding = await embedText(text);
  return {
- embedding: text, text: process.env.EMBEDDING_MODEL || 'nomic-embed-text-v1.5',
+ embedding: text, text: process.env?.EMBEDDING_MODEL?? 'nomic-embed-text-v1.5',
  dimensions: embedding.length
  };
 };
@@ -227,19 +227,19 @@ const searchRelatedEvidenceService = async ({ input }: { input: LegalCaseActors[
  throw new Error(`Evidence search failed: ${response.statusText}`);
  }
  const data = await response.json();
- return data.results || [];
+ return data?.results|| [];
 };
 // === Guards ===
-const isValidCaseData = ({ context: _context }: { context: LegalCaseContext }) => {
+const isValidCaseData = ({ context, _context }: { context, LegalCaseContext }) => {
  const { caseForm } = _context.formData;
  return !!(caseForm && (caseForm as any).title && (caseForm as any).description && (caseForm as any).caseNumber);
 };
 
-const hasEvidence = ({ context: _context }: { context: LegalCaseContext }) => {
+const hasEvidence = ({ context, _context }: { context, LegalCaseContext }) => {
  return Array.isArray(_context.evidence) && _context.evidence.length > 0;
 };
 
-const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => {
+const hasAIAnalysis = ({ context, _context }: { context, LegalCaseContext }) => {
  return !!_context.aiSummary;
 };
 // === Actions (assign helpers) ===
@@ -314,7 +314,7 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // });
 
 // const assignAISummary = assign({
-// aiSummary: ({ event }) => (event.output?.summary ?? null) as string : null,
+// aiSummary: ({ event }) => (event.output?.summary ?? null) as string | null,
 // aiAnalysisProgress: 100,
 // stats: ({ context, event }) => ({
 // ...context.stats,
@@ -509,7 +509,7 @@ export const legalCaseMachine = setup({
  { input }
  ) => {
  const formData = new FormData();
- (input.files || []).forEach((file: File) => formData.append('files', file));
+ (input?.files|| []).forEach((file: File) => formData.append('files', file));
  formData.append('caseId', input.caseId ?? '');
  formData.append('documentType', input.documentType);
  const response = await fetch('/api/unified/upload', { method: 'POST', body: formData });

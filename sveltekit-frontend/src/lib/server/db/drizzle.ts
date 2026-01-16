@@ -5,7 +5,7 @@ import type { Client } from 'minio'; // Corrected: MinioClient is not exported, 
 import lazyDb from './client.ts'; // Note: SvelteKit will resolve to client.ts
 import * as schema from './schema-unified.ts';
 
-const _CFG: unknown = (typeof globalThis !== 'undefined' && (globalThis as any)._CFG) || undefined;
+const _CFG: unknown = (typeof globalThis !== 'undefined' && (globalThis as any)._CFG) ?? undefined;
 
 // Lazy-load project's cache/redis helper at runtime.
 // Returns | undefined when the module cannot be found or fails to import.
@@ -137,13 +137,13 @@ export async function storeEmbedding(
 // MinIO helper using project's Minio usage patterns (create client if library not exported centrally)
 function makeMinioClient(): Client {
  // Changed return type to Client
- const endpoint = (_CFG as any)?.MINIO_ENDPOINT ?? process.env.MINIO_ENDPOINT || 'localhost:9000';
- const accessKey = (_CFG as any)?.MINIO_ACCESS_KEY ?? process.env.MINIO_ACCESS_KEY || 'minioadmin';
- const secretKey = (_CFG as any)?.MINIO_SECRET_KEY ?? process.env.MINIO_SECRET_KEY || 'minioadmin';
+ const endpoint = (_CFG as any)?.MINIO_ENDPOINT ?? process.env?.MINIO_ENDPOINT?? 'localhost:9000';
+ const accessKey = (_CFG as any)?.MINIO_ACCESS_KEY ?? process.env?.MINIO_ACCESS_KEY?? 'minioadmin';
+ const secretKey = (_CFG as any)?.MINIO_SECRET_KEY ?? process.env?.MINIO_SECRET_KEY?? 'minioadmin';
  const useSSL = String(endpoint).startsWith('https');
 
  const [host, portStr] = endpoint.split(':');
- const port = parseInt(portStr || '9000', 10);
+ const port = parseInt(portStr ?? '9000', 10);
 
  return new Client({
  endPoint: host, // Corrected: use host

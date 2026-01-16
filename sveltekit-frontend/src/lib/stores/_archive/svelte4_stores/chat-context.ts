@@ -10,9 +10,7 @@ export interface ChatContextItem {
 function createChatContextStore() {
  const { subscribe, set, update } = writable<ChatContextItem[]>([]);
 
- return {
- subscribe,
- addTopic: (topic: TopicNode) => {
+ return { subscribe: addTopic: (topic: TopicNode) => {
  update((items) => {
  // Remove any existing item with same ID
  const filtered = items.filter((item) => item.id !== topic.id);

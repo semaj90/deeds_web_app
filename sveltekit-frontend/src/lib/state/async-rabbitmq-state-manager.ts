@@ -43,11 +43,11 @@ export type RabbitMQEvent =
 	| { type: 'RESET' };
 
 // RabbitMQ connection service
-async function connectToRabbitMQ(input: { url: string }) {
+async function connectToRabbitMQ(input: { url, string }) {
 	// Simulated connection - replace with actual RabbitMQ client
 	await new Promise((resolve) => setTimeout(resolve, 1000));
 
-	if (!input.url || !input.url.includes('amqp://')) {
+	if (!input?.url|| !input.url.includes('amqp://')) {
 		throw new Error('Invalid RabbitMQ URL');
 	}
 
@@ -55,7 +55,7 @@ async function connectToRabbitMQ(input: { url: string }) {
 }
 
 // Job dispatch service
-async function dispatchJob(input: { job: JobState }) {
+async function dispatchJob(input: { job, JobState }) {
 	// Simulated job dispatch - replace with actual RabbitMQ publish
 	await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -212,15 +212,15 @@ export const rabbitMQStateMachine = setup({
 }) as any;
 
 // Helper selectors
-export function isConnected(state: { context: RabbitMQContext }): boolean {
+export function isConnected(state: { context, RabbitMQContext }): boolean {
 	return state.context.isConnected;
 }
 
-export function getActiveJobCount(state: { context: RabbitMQContext }): number {
+export function getActiveJobCount(state: { context, RabbitMQContext }): number {
 	return state.context.activeJobs.length;
 }
 
-export function hasErrors(state: { context: RabbitMQContext }): boolean {
+export function hasErrors(state: { context, RabbitMQContext }): boolean {
 	return state.context.error !== null;
 }
 

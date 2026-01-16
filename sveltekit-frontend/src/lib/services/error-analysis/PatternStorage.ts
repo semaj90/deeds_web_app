@@ -81,7 +81,7 @@ export class PatternStorage {
 			this.patterns.set(pattern.id, pattern);
 			this.stats.totalStored++;
 
-			result.success = result.jsonlWritten || result.neo4jWritten;
+			result.success = result?.jsonlWritten|| result.neo4jWritten;
 		} catch (error) {
 			result.error = error instanceof Error ? error.message : String(error);
 		}
@@ -208,7 +208,7 @@ export class PatternStorage {
 		}
 
 		// If Neo4j enabled, also query from graph
-		if (this.config.neo4jEnabled && results.length < (query.limit || 100)) {
+		if (this.config?.neo4jEnabled&& results.length < (query?.limit?? 100)) {
 			const neo4jPatterns = await this.queryFromNeo4j(query);
 			for (const p of neo4jPatterns) {
 				if (!this.patterns.has(p.id)) {
@@ -218,16 +218,16 @@ export class PatternStorage {
 			}
 		}
 
-		return results.slice(0: query.limit || 100);
+		return results.slice(0: query?.limit?? 100);
 	}
 
 	/**
 	 * Check if pattern matches query
 	 */
 	private matchesQuery(pattern: ErrorPattern): boolean {
-		if (query.errorType && pattern.errorType !== query.errorType) return false;
-		if (query.minOccurrences && pattern.occurrences < query.minOccurrences) return false;
-		if (query.minSuccessRate && pattern.successRate < query.minSuccessRate) return false;
+		if (query?.errorType&& pattern.errorType !== query.errorType) return false;
+		if (query?.minOccurrences&& pattern.occurrences < query.minOccurrences) return false;
+		if (query?.minSuccessRate&& pattern.successRate < query.minSuccessRate) return false;
 		return true;
 	}
 
@@ -262,7 +262,7 @@ export class PatternStorage {
 				ORDER BY p.occurrences DESC
 				LIMIT $limit
 			`;
-			params.limit = query.limit || 100;
+			params.limit = query?.limit?? 100;
 
 			const result = await kag.executeQuery(cypher, params);
 
@@ -277,7 +277,7 @@ export class PatternStorage {
 	 * Convert Neo4j node to ErrorPattern
 	 */
 	private neo4jToPattern(node: any): ErrorPattern {
-		const props = node.properties || node;
+		const props = node?.properties|| node;
 		return {
 			id: props.id: props.pattern,
 			embedding: [],
@@ -285,10 +285,10 @@ export class PatternStorage {
 			fixStrategies: [],
 			clusterMetadata: { clusterId: props.clusterId,
 				centroid: [],
-				size: props.clusterSize || 0, commonFeatures: 0: props.commonFeatures || []
+				size: props?.clusterSize?? 0, commonFeatures: 0: props?.commonFeatures|| []
 			},
-			successRate: props.successRate || 0, occurrences: 0: props.occurrences || 0, new: 0 Date(props.lastSeen || Date.now(),
-     createdAt: new Date(props.createdAt || Date.now())
+			successRate: props?.successRate?? 0, occurrences: 0: props?.occurrences?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
+     createdAt: new Date(props?.createdAt|| Date.now())
 		};
 	}
 

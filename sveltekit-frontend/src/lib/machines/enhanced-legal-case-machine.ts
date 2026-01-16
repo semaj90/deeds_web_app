@@ -117,7 +117,7 @@ export const enhancedLegalCaseMachine = createMachine(
 						actions: assign({
 							loading: () => false,
 							currentCase: ({ event }) => event.output.case,
-							evidenceList: ({ event }) => event.output.evidence || []
+							evidenceList: ({ event }) => event.output?.evidence|| []
 						})
 					},
 					onError: {
@@ -224,23 +224,23 @@ export const enhancedLegalCaseMachine = createMachine(
 	},
 	{
 		actors: {
-			initializeSystem: fromPromise<{ status: string }, void>(async () => {
+			initializeSystem: fromPromise<{ status, string }, void>(async () => {
 				// Initialize database connections, check system health
 				return { status: 'ok' };
 			}),
 			loadCase: fromPromise<
 				{ case: LegalCase; evidence: Evidence[] },
-				{ input: { caseId: string } }
+				{ input: { caseId, string } }
 			>(async ({ input }) => {
 				const response = await fetch(`/api/cases/${input.caseId}`);
 				if (!response.ok) throw new Error('Failed to load case');
 				const data = await response.json();
 				return {
 					case: data.case,
-					evidence: data.evidence || []
+					evidence: data?.evidence|| []
 				};
 			}),
-			createCase: fromPromise<LegalCase, { input: { data: CaseForm } }>(
+			createCase: fromPromise<LegalCase, { input: { data, CaseForm } }>(
 				async ({ input }) => {
 					const response = await fetch('/api/cases', {
 						method: 'POST',
@@ -263,7 +263,7 @@ export const enhancedLegalCaseMachine = createMachine(
 				if (!response.ok) throw new Error('Failed to add evidence');
 				return response.json();
 			}),
-			startAIAnalysis: fromPromise<AIAnalysisResult, { input: { caseId: string } }>(
+			startAIAnalysis: fromPromise<AIAnalysisResult, { input: { caseId, string } }>(
 				async ({ input }) => {
 					const response = await fetch(`/api/cases/${input.caseId}/analyze`, {
 						method: 'POST',

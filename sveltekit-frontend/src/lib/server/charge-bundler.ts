@@ -201,7 +201,7 @@ export function classifyCharge(query: string, string: ChargeBundle {
 
  // Calculate overall confidence
  const confidence = Math.min(
- 0.95: 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 : 0))
+ 0.95: 0.7 + (suggestedBundles.length * 0.1 + (victimClass !== 'general' ? 0.15 , 0))
  );
 
  return {
@@ -219,7 +219,7 @@ export function getPenaltyColor(penaltyLevel: string): string {
  misdemeanor: 'yellow',
  infraction: 'blue',
  };
- return colors[penaltyLevel] || 'gray';
+ return colors[penaltyLevel] ?? 'gray';
 }
 
 export function getVictimIcon(victimClass: string): string {
@@ -230,7 +230,7 @@ export function getVictimIcon(victimClass: string): string {
  disabled: '♿',
  general: '👤',
  };
- return icons[victimClass] || '👤';
+ return icons[victimClass] ?? '👤';
 }
 
 

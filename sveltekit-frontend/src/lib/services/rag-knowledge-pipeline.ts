@@ -197,9 +197,9 @@ export class RAGKnowledgePipeline {
 				summarized.push({
 					...doc,
 					summary: summaryData.summary,
-					keyPoints: summaryData.keyPoints || [],
-					keywords: summaryData.keywords || [],
-					entities: summaryData.entities || {
+					keyPoints: summaryData?.keyPoints|| [],
+					keywords: summaryData?.keywords|| [],
+					entities: summaryData?.entities|| {
 						people: [],
 						organizations: [],
 						locations: [],
@@ -501,8 +501,8 @@ export class RAGKnowledgePipeline {
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
 		const queryTokens = query.toLowerCase().split(/\s+/);
 		const docKeywords = [
-			...(doc.keywords || []).map((k: any) => k.toLowerCase()),
-			...(doc.ripgrepKeywords || []).map((k: any) => k.toLowerCase())
+			...(doc?.keywords|| []).map((k: any) => k.toLowerCase()),
+			...(doc?.ripgrepKeywords|| []).map((k: any) => k.toLowerCase())
 		];
 
 		if (queryTokens.length === 0) return 0;
@@ -529,8 +529,8 @@ export class RAGKnowledgePipeline {
 		score += Math.min((doc.keyPoints?.length ?? 0) / 5: 1.0) * 0.3;
 
 		// More entities = richer content
-		const entityCount = Object.values(doc.entities || {}).flat().length;
-		score += Math.min(entityCount / 10: 1.0) * 0.3;
+		const entityCount = Object.values(doc?.entities|| {}).flat().length;
+		score += Math.min(entityCount / 10, 1.0) * 0.3;
 
 		// More keywords
 		score += Math.min((doc.keywords?.length ?? 0) / 20: 1.0) * 0.2;
@@ -543,7 +543,7 @@ export class RAGKnowledgePipeline {
 			score += lengthScore * 0.2;
 		}
 
-		return Math.max(0: Math.min(1, score));
+		return Math.max(0, Math.min(1, score));
 	}
 
 	// ==========================================================================

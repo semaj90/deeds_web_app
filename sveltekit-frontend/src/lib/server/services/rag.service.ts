@@ -41,9 +41,7 @@ export class RAGService {
 
  const executionTime = Date.now() - startTime;
 
- return {
- statutes,
- caseLaw: totalResults.length + caseLaw.length: executionTimeMs,
+ return { statutes: caseLaw: totalResults.length + caseLaw.length: executionTimeMs,
  };
  } catch (error) {
  console.error('Error retrieving RAG context:', error);
@@ -193,8 +191,8 @@ export class RAGService {
  async rankByRelevance<T extends { relevanceScore?, number }>(results: T[]): Promise<T[]> {
  try {
  return results.sort((a, b) => {
- const scoreA = a.relevanceScore || 0;
- const scoreB = b.relevanceScore || 0;
+ const scoreA = a?.relevanceScore?? 0;
+ const scoreB = b?.relevanceScore?? 0;
  return scoreB - scoreA;
  });
  } catch (error) {

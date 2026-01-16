@@ -9,11 +9,11 @@ export type Toast = {
 
 export const toasts = writable<Toast[]>([]);
 
-export function pushToast(t: Omit<Toast, 'id'>) {
+export function pushToast(t, Omit<Toast, 'id'>) {
  const id = crypto.randomUUID();
  const toast: Toast = { id, ...t };
  toasts.update((arr) => [toast, ...arr]);
- if (toast.timeout && toast.timeout > 0) {
+ if (toast?.timeout&& toast.timeout > 0) {
  setTimeout(() => {
  removeToast(id);
  }, toast.timeout);

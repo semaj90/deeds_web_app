@@ -10,15 +10,15 @@ import { statuteSearchService } from '$lib/server/services/statute-search.servic
 /**
  * GET: Get search history
  */
-export const GET: RequestHandler = async ({ url: locals }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {
  return json({ success: false, error: 'Unauthorized' }, { status: 401 });
  }
 
- const limit = parseInt(url.searchParams.get('limit') || '20');
- const offset = parseInt(url.searchParams.get('offset') || '0');
+ const limit = parseInt(url.searchParams.get('limit') ?? '20');
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
  const history = await statuteSearchService.getSearchHistory(user.id, limit, offset);
 

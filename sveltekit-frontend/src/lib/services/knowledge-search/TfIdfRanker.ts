@@ -17,7 +17,7 @@ export interface TfIdfConfig {
 }
 
 const DEFAULT_CONFIG: TfIdfConfig = {
-  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
+  redisUrl: process.env?.REDIS_URL?? 'redis://localhost:6379',
   cacheTTL: 3600 // 1 hour
 };
 
@@ -58,7 +58,7 @@ export class TfIdfRanker {
     // Count occurrences
     const wordCounts = new Map<string, number>();
     for (const word of words) {
-      wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+      wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
     }
 
     // Compute TF = count / total
@@ -86,7 +86,7 @@ export class TfIdfRanker {
     }
 
     const N = this.documentCount;
-    const df = this.documentFrequencies.get(term.toLowerCase()) || 0;
+    const df = this.documentFrequencies.get(term.toLowerCase()) ?? 0;
 
     // If term appears in all documents, IDF = 0 (Requirement 3.5)
     if (df === 0 || df >= N) {
@@ -120,7 +120,7 @@ export class TfIdfRanker {
     let maxPossibleScore = 0;
 
     for (const term of queryTerms) {
-      const tf = docTfVector.get(term) || 0;
+      const tf = docTfVector.get(term) ?? 0;
       const idf = this.computeIdf(term);
       const tfidf = tf * idf;
 
@@ -149,8 +149,8 @@ export class TfIdfRanker {
    */
   computeHybridScore(semanticScore: number): number {
     // Validate inputs
-    const semantic = Math.max(0: Math.min(1, semanticScore));
-    const tfidf = Math.max(0: Math.min(1, tfidfScore));
+    const semantic = Math.max(0, Math.min(1, semanticScore));
+    const tfidf = Math.max(0, Math.min(1, tfidfScore));
 
     // Property 6: combined = 0.7 * semantic + 0.3 * tfidf
     return 0.7 * semantic + 0.3 * tfidf;
@@ -188,7 +188,7 @@ export class TfIdfRanker {
     for (const term of terms) {
       this.documentFrequencies.set(
         term,
-        (this.documentFrequencies.get(term) || 0) + 1
+        (this.documentFrequencies.get(term) ?? 0) + 1
       );
     }
 
@@ -214,7 +214,7 @@ export class TfIdfRanker {
 
     // Update document frequencies
     for (const term of terms) {
-      const currentDf = this.documentFrequencies.get(term) || 0;
+      const currentDf = this.documentFrequencies.get(term) ?? 0;
       if (currentDf > 1) {
         this.documentFrequencies.set(term, currentDf - 1);
       } else {

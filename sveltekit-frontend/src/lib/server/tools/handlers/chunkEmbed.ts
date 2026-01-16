@@ -12,8 +12,8 @@ import {
   type ToolResult
 } from '../registry.js';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
 interface ChunkEmbedResult {
   chunks_created: number; embeddings_generated: number;
@@ -72,7 +72,7 @@ function chunkText(
           content: chunk,
           metadata: {},
           start_idx: i,
-          end_idx: Math.min(i + chunkSize: content.length)
+          end_idx: Math.min(i + chunkSize, content.length)
         });
       }
     }
@@ -85,7 +85,7 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, prompt: text })
+    body: JSON.stringify({ model: prompt: text })
   });
 
   if (!response.ok) {
@@ -112,16 +112,16 @@ async function upsertToQdrant(
 }
 
 async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult<ChunkEmbedResult>> {
-  const chunkingConfig = request.chunking || {};
-  const embeddingConfig = request.embedding || {};
-  const storageConfig = request.storage || {};
+  const chunkingConfig = request?.chunking|| {};
+  const embeddingConfig = request?.embedding|| {};
+  const storageConfig = request?.storage|| {};
 
-  const strategy = chunkingConfig.strategy || 'recursive';
-  const chunkSize = chunkingConfig.chunk_size || 512;
-  const overlap = chunkingConfig.overlap || 50;
-  const model = embeddingConfig.model || 'embeddinggemma:latest';
-  const batchSize = embeddingConfig.batch_size || 32;
-  const collection = storageConfig.collection || 'embeddings';
+  const strategy = chunkingConfig?.strategy?? 'recursive';
+  const chunkSize = chunkingConfig?.chunk_size?? 512;
+  const overlap = chunkingConfig?.overlap?? 50;
+  const model = embeddingConfig?.model?? 'embeddinggemma:latest';
+  const batchSize = embeddingConfig?.batch_size?? 32;
+  const collection = storageConfig?.collection?? 'embeddings';
 
   let chunksCreated = 0;
   let embeddingsGenerated = 0;
@@ -163,7 +163,7 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   }
 
   // Store in Qdrant
-  if (storageConfig.upsert && allPoints.length > 0) {
+  if (storageConfig?.upsert&& allPoints.length > 0) {
     try {
       await upsertToQdrant(collection, allPoints);
       storedInQdrant = allPoints.length;

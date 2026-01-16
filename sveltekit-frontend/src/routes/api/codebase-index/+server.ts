@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {
@@ -28,29 +28,27 @@ interface QdrantScrollResponse {
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		const limit = parseInt(url.searchParams.get('limit') || '100');
-		const offset = url.searchParams.get('offset') || null;
-		const role = url.searchParams.get('role') || null;
-		const risk = url.searchParams.get('risk') || null;
-		const surface = url.searchParams.get('surface') || null;
-		const search = url.searchParams.get('search') || null;
+		const limit = parseInt(url.searchParams.get('limit') ?? '100');
+		const offset = url.searchParams.get('offset') ?? null;
+		const role = url.searchParams.get('role') ?? null;
+		const risk = url.searchParams.get('risk') ?? null;
+		const surface = url.searchParams.get('surface') ?? null;
+		const search = url.searchParams.get('search') ?? null;
 
 		// Build filter
 		const must: any[] = [];
 		if (role) {
-			must.push({ key: 'role', match: { value: role } });
+			must.push({ key: 'role', match: { value, role } });
 		}
 		if (risk) {
-			must.push({ key: 'risk', match: { value: risk } });
+			must.push({ key: 'risk', match: { value, risk } });
 		}
 		if (surface) {
 			must.push({ key: 'surface', match: { any: [surface] } });
 		}
 
 		// Scroll through Qdrant collection
-		const scrollPayload: any = {
-			limit,
-			with_payload: true,
+		const scrollPayload: any = { limit: with_payload: true,
 			with_vector: false
 		};
 
@@ -102,10 +100,10 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		for (const file of files) {
 			const p = file.payload;
-			stats.byRole[p.role] = (stats.byRole[p.role] || 0) + 1;
-			stats.byRisk[p.risk] = (stats.byRisk[p.risk] || 0) + 1;
+			stats.byRole[p.role] = (stats.byRole[p.role] ?? 0) + 1;
+			stats.byRisk[p.risk] = (stats.byRisk[p.risk] ?? 0) + 1;
 			for (const s of p.surface) {
-				stats.bySurface[s] = (stats.bySurface[s] || 0) + 1;
+				stats.bySurface[s] = (stats.bySurface[s] ?? 0) + 1;
 			}
 		}
 
@@ -167,7 +165,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const data = await searchResponse.json();
 		return json({
-			files: data.result || [],
+			files: data?.result|| [],
 			query
 		});
 	} catch (error) {

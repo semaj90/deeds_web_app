@@ -2,10 +2,10 @@ import type { Client as MinioClient } from 'minio';
 import {  env  } from '$env /dynamic/private';
 
 // Parse MINIO_ENDPOINT which may be: 'host', 'host: port', or: 'http(s)://host: port'
-const _raw = env.MINIO_ENDPOINT || 'localhost';
+const _raw = env?.MINIO_ENDPOINT?? 'localhost';
 let _host = _raw;
-let _port = Number(env.MINIO_PORT || 9000);
-let _useSSL = (env.MINIO_USE_SSL || 'false') === 'true';
+let _port = Number(env?.MINIO_PORT?? 9000);
+let _useSSL = (env?.MINIO_USE_SSL?? 'false') === 'true';
 try {
  if (_raw.includes('://')) {
  const u = new URL(_raw);
@@ -29,8 +29,8 @@ const MINIO_PORT = _port;
 const MINIO_USE_SSL = _useSSL;
 
 // Fallback to MINIO_ROOT_USER/MINIO_ROOT_PASSWORD when access/secret not provided
-const MINIO_ACCESS_KEY = env.MINIO_ACCESS_KEY || env.MINIO_ROOT_USER || 'minioadmin';
-const MINIO_SECRET_KEY = env.MINIO_SECRET_KEY || env.MINIO_ROOT_PASSWORD || 'minioadmin';
+const MINIO_ACCESS_KEY = env?.MINIO_ACCESS_KEY|| env?.MINIO_ROOT_USER?? 'minioadmin';
+const MINIO_SECRET_KEY = env?.MINIO_SECRET_KEY|| env?.MINIO_ROOT_PASSWORD?? 'minioadmin';
 
 export const minio = new MinioClient({
  endPoint: MINIO_ENDPOINT,
@@ -82,7 +82,7 @@ export async function putObject(
  const fs = await import('fs/promises');
  const projectRoot = path.resolve(process.cwd());
  const localDir = path.join(projectRoot, '.local_storage', bucketName);
- await fs.mkdir(localDir, { recursive: true });
+ await fs.mkdir(localDir, { recursive, true });
  const localPath = path.join(localDir, objectName);
  await fs.writeFile(localPath, buffer);
  // Return a local file URI so callers can distinguish storage location

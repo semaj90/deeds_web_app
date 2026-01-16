@@ -28,7 +28,7 @@ export class TRTLLMClient {
  private baseUrl: string;
 
  constructor(baseUrl?: string) {
- this.baseUrl = baseUrl || env.PUBLIC_TRT_LLM_ENDPOINT || 'http://localhost:8090';
+ this.baseUrl = baseUrl || env?.PUBLIC_TRT_LLM_ENDPOINT?? 'http://localhost:8090';
  }
 
  async generate(request: TRTLLMRequest): Promise<TRTLLMResponse> {
@@ -73,15 +73,15 @@ export class TRTLLMClient {
 
  try {
  while (true) {
- const { done: value } = await reader.read();
+ const { done, value } = await reader.read();
 
  if (done) break;
 
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  const lines = buffer.split('\n');
 
  // Keep the last incomplete line in buffer
- buffer = lines.pop() || '';
+ buffer = lines.pop() ?? '';
 
  for (const line of lines) {
  if (line.startsWith('data: ')) {

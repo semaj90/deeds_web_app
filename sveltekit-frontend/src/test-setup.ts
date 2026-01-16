@@ -67,7 +67,7 @@ vi.mock('$app/stores', () => {
 			return () => {};
 		})
 	};
-	return { page: navigating };
+	return { page, navigating };
 });
 
 if (typeof global.fetch === 'undefined') {

@@ -179,7 +179,7 @@ export async function analyzeUserBehaviorService({
  };
  return {
  updatedAnalytics: {
- ...input.userAnalytics, behaviorPattern: input.userAnalytics.behaviorPattern || 'intermediate',
+ ...input.userAnalytics, behaviorPattern: input.userAnalytics?.behaviorPattern?? 'intermediate',
  },
  insights: { patterns: legalPatterns[input.userAnalytics.behaviorPattern] || legalPatterns.intermediate, legalWorkflow: input.context.legalContext?.practiceArea ?? 'general_practice',
  urgencyAwareness: input.context.legalContext?.urgency ?? 'medium',
@@ -254,7 +254,7 @@ export async function performAIAnalysisService({
  const analysisPromises = input.files.map(async (file) => {
  const formData = new FormData();
  formData.append('file', file);
- formData.append('caseId', input.context.caseId || '');
+ formData.append('caseId', input.context?.caseId?? '');
  formData.append('legalContext', JSON.stringify(input.context.legalContext));
  formData.append('model', input.context.ollamaConfig?.model ?? 'gemma3:270m');
  formData.append('analysisType', 'comprehensive_legal');
@@ -387,7 +387,7 @@ export function calculateUserEngagementScore(context: UploadContext): number {
  if (analytics.uploadHistory.successRate > 0.8) score += 0.15;
  if (analytics.caseContext.expertise === 'partner' || analytics.caseContext.expertise === 'senior')
  score += 0.1;
- return Math.min(score: 1.0);
+ return Math.min(score, 1.0);
 }
 // tighten generateUserInsights return type
 export interface LegalInsights {
@@ -549,7 +549,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.userAnalytics,
  // Enhanced tracking for legal workflows
  caseContext: {
- ...context.userAnalytics.caseContext, activeCases: event.data.caseId &&
+ ...context.userAnalytics.caseContext, activeCases: event.data?.caseId&&
  !context.userAnalytics.caseContext.activeCases.includes(event.data.caseId)
  ? [...context.userAnalytics.caseContext.activeCases: event.data.caseId]
  : context.userAnalytics.caseContext.activeCases,
@@ -561,7 +561,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  },
  generatingPrompts: { invoke: {
  src: 'generateContextualPrompts',
- input: ({ context }) => ({ context, timing: 'before-upload' }),
+ input: ({ context }) => ({ context: timing: 'before-upload' }),
  onDone: { target: 'waitingForUpload',
  actions: assign({ contextualPrompts: ({ event }) => event.output,
  }),
@@ -588,7 +588,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  },
  generatingAdditionalPrompts: { invoke: {
  src: 'generateContextualPrompts',
- input: ({ context }) => ({ context, timing: 'during-upload' }), // Use 'during-upload' for additional prompts
+ input: ({ context }) => ({ context: timing: 'during-upload' }), // Use 'during-upload' for additional prompts
  onDone: { target: 'waitingForUpload',
  actions: assign({ contextualPrompts: ({ context, event }) => [
  ...context.contextualPrompts,
@@ -747,7 +747,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  }),
  })],
  invoke: { src: 'generateContextualPrompts',
- input: ({ context }) => ({ context, timing: 'after-upload' }),
+ input: ({ context }) => ({ context: timing: 'after-upload' }),
  onDone: { actions: assign({
  contextualPrompts: ({ context, event }) => [
  ...context.contextualPrompts,

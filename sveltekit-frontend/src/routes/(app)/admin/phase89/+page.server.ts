@@ -110,7 +110,7 @@ export const actions: Actions = {
             if (!apiKey) return { success: false, error: 'Missing GEMINI_API_KEY' };
 
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const model = genAI.getGenerativeModel({ model: env?.GEMINI_MODEL?? 'gemini-2.0-flash-exp' });
 
             const prompt = `
                 Analyze this error cluster (ID: ${clusterId}): Sample, Messages:

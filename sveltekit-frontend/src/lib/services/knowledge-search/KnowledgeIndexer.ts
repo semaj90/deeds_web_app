@@ -25,15 +25,15 @@ export interface KnowledgeIndexerConfig {
 }
 
 const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
-  qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
+  qdrantUrl: process.env?.QDRANT_URL?? 'http://localhost:6333',
   qdrantCollection: 'phase76_knowledge_base',
-  postgresUrl: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
-  minioEndpoint: process.env.MINIO_ENDPOINT || 'localhost',
-  minioBucket: process.env.MINIO_BUCKET || 'knowledge-docs',
-  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
-  ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-  embeddingModel: process.env.EMBEDDING_MODEL || 'nomic-embed-text:latest',
-  summaryModel: process.env.OLLAMA_MODEL || 'gemma3-legal:latest'
+  postgresUrl: process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  minioEndpoint: process.env?.MINIO_ENDPOINT?? 'localhost',
+  minioBucket: process.env?.MINIO_BUCKET?? 'knowledge-docs',
+  redisUrl: process.env?.REDIS_URL?? 'redis://localhost:6379',
+  ollamaUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+  embeddingModel: process.env?.EMBEDDING_MODEL?? 'nomic-embed-text:latest',
+  summaryModel: process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest'
 };
 
 /**
@@ -340,7 +340,7 @@ Summary:`;
 
     const wordCounts = new Map<string, number>();
     words.forEach((word: any) => {
-      wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+      wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
     });
 
     // Compute TF (term frequency)

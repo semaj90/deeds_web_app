@@ -52,11 +52,11 @@ function getDefaultHost(): string {
  // Tries VITE_OLLAMA_HOST, then OLLAMA_HOST, then localhost:11434
  if (typeof window === 'undefined') {
  // Server-side (Node)
- return process.env.OLLAMA_HOST || 'http://localhost:11434';
+ return process.env?.OLLAMA_HOST?? 'http://localhost:11434';
  }
  // Client-side (browser)
  const viteHost = import.meta.env.VITE_OLLAMA_HOST;
- return viteHost || 'http://localhost:11434';
+ return viteHost ?? 'http://localhost:11434';
 }
 
 async function jsonFetch<T>(path: string), unknown: Promise<T> {
@@ -93,7 +93,7 @@ export async function* generateStream(
  }),
  });
 
- if (!res.ok || !res.body) {
+ if (!res?.ok|| !res.body) {
  throw new Error(`Ollama stream failed ${res.status}`);
  }
 
@@ -103,9 +103,9 @@ export async function* generateStream(
 
  try {
  while (true) {
- const { value: done } = await reader.read();
+ const { value, done } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  let idx: number;
  while ((idx = buffer.indexOf('\n')) >= 0) {
  const line = buffer.slice(0, idx).trim();
@@ -152,7 +152,7 @@ export async function* chatStream(
  }),
  });
 
- if (!res.ok || !res.body) {
+ if (!res?.ok|| !res.body) {
  throw new Error(`Ollama chat stream failed ${res.status}`);
  }
 
@@ -162,9 +162,9 @@ export async function* chatStream(
 
  try {
  while (true) {
- const { value: done } = await reader.read();
+ const { value, done } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  let idx: number;
  while ((idx = buffer.indexOf('\n')) >= 0) {
  const line = buffer.slice(0, idx).trim();

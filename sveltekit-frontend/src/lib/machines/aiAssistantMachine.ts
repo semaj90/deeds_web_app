@@ -62,7 +62,7 @@ export const aiAssistantMachine = createMachine({
     states: {
         initializing: {
             invoke: {
-                src: fromPromise<{ gpuReady: boolean }, void>(async () => {
+                src: fromPromise<{ gpuReady, boolean }, void>(async () => {
                     // Check for GPU availability or other services
                     const gpuReady = typeof navigator !== 'undefined' && 'gpu' in navigator;
                     return { gpuReady };

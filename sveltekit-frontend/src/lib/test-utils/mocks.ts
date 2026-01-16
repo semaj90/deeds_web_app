@@ -51,7 +51,7 @@ class MockQdrantClient {
 	/**
 	 * Create or recreate a collection
 	 */
-	async createCollection(collectionName: string, config: { vectors: { size: number } }): Promise<void> {
+	async createCollection(collectionName: string, config: { vectors: { size, number } }): Promise<void> {
 		this.collections.set(collectionName, []);
 		this.collectionConfigs.set(collectionName, { vectorSize: config.vectors.size });
 	}
@@ -212,7 +212,7 @@ class MockRedisClient {
 		if (!entry) return null;
 
 		// Check expiration
-		if (entry.expiresAt && Date.now() > entry.expiresAt) {
+		if (entry?.expiresAt&& Date.now() > entry.expiresAt) {
 			this.store.delete(key);
 			return null;
 		}
@@ -251,7 +251,7 @@ class MockRedisClient {
 		if (!entry) return 0;
 
 		// Check expiration
-		if (entry.expiresAt && Date.now() > entry.expiresAt) {
+		if (entry?.expiresAt&& Date.now() > entry.expiresAt) {
 			this.store.delete(key);
 			return 0;
 		}
@@ -315,7 +315,7 @@ class MockOllamaClient {
 	/**
 	 * Generate embeddings
 	 */
-	async embeddings(options: { model: string, prompt: string }): Promise<{ embedding, number[] }> {
+	async embeddings(options: { model: string, prompt: string }): Promise<{ embedding: number[] }> {
 		// Generate deterministic fake embedding based on prompt
 		const seed = this.hashString(options.prompt);
 		const embedding = Array.from({ length: this.embeddingDimension }, (_, i) => {
@@ -393,7 +393,7 @@ class MockPostgreSQLClient {
 			}
 		}
 
- return { rows, rowCount: rows.length };
+ return { rows: rowCount: rows.length };
 	}
 
 	/**
@@ -532,7 +532,7 @@ class MockFetchClient {
 	private defaultResponse: MockFetchResponse = {
 		url: '',
 		status: 200,
-		data: { success: true }
+		data: { success, true }
 	};
 
 	/**
@@ -541,8 +541,8 @@ class MockFetchClient {
  setResponse(urlPattern: string, response: Partial<MockFetchResponse>): void {
 		this.responses.set(urlPattern, {
  url: urlPattern,
- status: response.status || 200,
- data: response.data || {}
+ status: response?.status?? 200,
+ data: response?.data|| {}
 		});
 	}
 
@@ -562,9 +562,9 @@ class MockFetchClient {
 
           // Parse request body to get search vector and limit
           const body = options?.body ? JSON.parse(options.body as string) : {};
-          const vector = body.vector || [];
-          const limit = body.limit || 5;
-          const scoreThreshold = body.score_threshold || 0;
+          const vector = body?.vector|| [];
+          const limit = body?.limit?? 5;
+          const scoreThreshold = body?.score_threshold?? 0;
 
           // Query mockQdrant with correct options object
           const results = await mockQdrant.search(collectionName, {

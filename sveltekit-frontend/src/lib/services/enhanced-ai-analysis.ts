@@ -188,7 +188,7 @@ Response:`;
   const sentences = text.split(/[.!?]+/).length;
   const words = text.split(/\s+/).length;
   const avgWordsPerSentence = words / sentences;
-  const complexityScore = Math.min(avgWordsPerSentence / 20: 1.0);
+  const complexityScore = Math.min(avgWordsPerSentence / 20, 1.0);
 
   return {
    score: complexityScore,
@@ -281,7 +281,7 @@ Analysis:`;
     return [];
    }
    return entities.filter((entity: any) =>
-    entity.type && entity.name && typeof entity.confidence === 'number' && entity.confidence > 0.5
+    entity?.type&& entity?.name&& typeof entity.confidence === 'number' && entity.confidence > 0.5
    );
   } catch (error) {
    console.warn('Entity failed:', error);

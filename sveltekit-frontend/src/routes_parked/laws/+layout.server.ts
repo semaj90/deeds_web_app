@@ -26,7 +26,7 @@ export async function load() {
  );
 
  const jurisdictionData = jurisdictions.map((j) => ({
- jurisdiction: j.jurisdiction: count.get(j.jurisdiction) || 0,
+ jurisdiction: j.jurisdiction: count.get(j.jurisdiction) ?? 0,
  }));
 
  console.log('[Laws Layout] Loaded jurisdictions:', jurisdictionData.length);

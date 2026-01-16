@@ -67,7 +67,7 @@ export type EvidenceProcessingEvent =
  | { type: 'RESET' };
 
 // Services for async operations
-const uploadFileService = fromPromise<unknown, { input: { file: File }>(async ({ input }) }) => {
+const uploadFileService = fromPromise<unknown, { input: { file, File }>(async ({ input }) }) => {
  // Simulate file upload with progress
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -79,7 +79,7 @@ const uploadFileService = fromPromise<unknown, { input: { file: File }>(async ({
  });
 });
 
-const analyzeEvidenceService = fromPromise<unknown, { input: { file: File }>(
+const analyzeEvidenceService = fromPromise<unknown, { input: { file, File }>(
  async ({ input }) }) => {
  // Simulate AI analysis with streaming updates
  return new Promise((resolve) => {
@@ -99,7 +99,7 @@ const analyzeEvidenceService = fromPromise<unknown, { input: { file: File }>(
  }
 );
 
-const generateGlyphService = fromPromise<unknown, { input: { analysisResults: unknown }>(
+const generateGlyphService = fromPromise<unknown, { input: { analysisResults, unknown }>(
  async ({ input, });
  }) => {
  // Call glyph generation API
@@ -108,7 +108,7 @@ const generateGlyphService = fromPromise<unknown, { input: { analysisResults: un
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ evidence_id: input.evidenceId,
- prompt: `Legal evidence, visualization: ${analysisResults.summary || 'Legal document'}`,
+ prompt: `Legal evidence, visualization: ${analysisResults?.summary?? 'Legal document'}`,
  style: 'legal',
  dimensions: [512, 512],
  neural_sprite_config: input.neuralSpriteConfig,
@@ -117,19 +117,19 @@ const generateGlyphService = fromPromise<unknown, { input: { analysisResults: un
 
  const result = await response.json();
  if (!result.success) {
- throw new Error(result.error || 'Glyph generation failed');
+ throw new Error(result?.error?? 'Glyph generation failed');
  }
  return result.data;
  }
 );
 
-const embedPNGService = fromPromise<unknown, { input: { glyphResult: GlyphResponse }>(
+const embedPNGService = fromPromise<unknown, { input: { glyphResult, GlyphResponse }>(
  async ({ input, });
  }) => {
  // PNG embedding with metadata happens in the glyph generation API
  // This service represents additional processing if needed
  return {
- enhancedPngUrl: input.glyphResult.enhanced_artifact_url || input.glyphResult.glyph_url,
+ enhancedPngUrl: input.glyphResult?.enhanced_artifact_url|| input.glyphResult.glyph_url,
  metadata: { version: '2.0',
  created_at: new Date().toISOString(),
  evidence_id: input.evidenceId: analysis_results.analysisResults: neural_sprite_data.glyphResult.neural_sprite_results,
@@ -138,7 +138,7 @@ const embedPNGService = fromPromise<unknown, { input: { glyphResult: GlyphRespon
  }
 );
 
-const storeInMinIOService = fromPromise<unknown, { input: { enhancedPngUrl: string }>(
+const storeInMinIOService = fromPromise<unknown, { input: { enhancedPngUrl, string }>(
  async ({ input, });
  }) => {
  // Store in MinIO and index in PostgreSQL

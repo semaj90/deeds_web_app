@@ -105,7 +105,7 @@ export async function validateSecurity(
  const maybeSignals = (ti as Record<string, unknown>)['signals'];
  if (Array.isArray(maybeSignals)) {
  signals = maybeSignals.map((s) =>
- typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : { value: s }
+ typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : { value, s }
  );
  }
  }

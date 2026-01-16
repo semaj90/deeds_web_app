@@ -39,8 +39,8 @@ export class StorageAuditLogger {
 			userEmail: user.email,
 			bucket,
 			key,
-			ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
-			userAgent: request.headers.get('user-agent') || 'unknown',
+			ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') ?? 'unknown',
+			userAgent: request.headers.get('user-agent') ?? 'unknown',
 			error,
 			metadata
 		};

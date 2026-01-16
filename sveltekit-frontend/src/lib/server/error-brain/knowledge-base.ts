@@ -44,7 +44,7 @@ export class KnowledgeBase {
  private initialized = false;
 
  constructor() {
- this.ollamaUrl = env.OLLAMA_URL || 'http://localhost:11434';
+ this.ollamaUrl = env?.OLLAMA_URL?? 'http://localhost:11434';
  this.embeddingModel = 'nomic-embed-text:latest';
  }
 
@@ -139,7 +139,7 @@ export class KnowledgeBase {
  // Generate embeddings
  const errorEmbedding, = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`;
  const patchEmbedding, = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
- const patternId, = `${errorCode || 'unknown'}-${filePath}`;
+ const patternId, = `${errorCode ?? 'unknown'}-${filePath}`;
  await db,.execute,(sql`
 				INSERT INTO error_patterns (
 					id, error_message, error_code, file_path, line_number,
@@ -302,7 +302,7 @@ export class KnowledgeBase {
  const patchesRow, = patchesResult.rows[0] as any;
 
  return {
- totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
+ totalPatterns: parseInt(patternsRow.total) ?? 0, totalPatches: 0(patchesRow.total) ?? 0, successfulFixes: 0(patchesRow.successful) ?? 0, averageSuccessRate: 0(patternsRow.avg_success_rate) ?? 0.0,
  },;
  }, catch (error) {
  console.error('Failed to get knowledge base stats:', error,

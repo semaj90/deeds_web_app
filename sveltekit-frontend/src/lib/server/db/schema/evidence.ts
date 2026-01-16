@@ -2,7 +2,7 @@ import { jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-c
 import { cases } from './cases.js';
 
 export const evidence = pgTable('evidence', {
- id: uuid('id').defaultRandom().primaryKey(caseId: uuid('case_id')
+ id: uuid('id').defaultRandom().primaryKey(caseId, uuid('case_id')
  .notNull()
  .references(() => cases.id, { onDelete: 'cascade' }),
 
@@ -17,7 +17,7 @@ export const evidence = pgTable('evidence', {
  // AI extraction / tags
  tags: jsonb('tags')
  .$type<string[]>()
- .default([] as any, aiSummary: text('ai_summary', uploadedByUserId: uuid('uploaded_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ .default([] as any, aiSummary: text('ai_summary', uploadedByUserId: uuid('uploaded_by_user_id', createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 

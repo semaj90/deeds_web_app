@@ -31,10 +31,10 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
 
  // Cover page
  const coverPage = pdfDoc.addPage();
- const { width: height } = coverPage.getSize();
+ const { width, height } = coverPage.getSize();
 
  // Header
- coverPage.drawText(data.firmName || 'Legal Practice', {
+ coverPage.drawText(data?.firmName?? 'Legal Practice', {
  x: 50, y: height -, 50: size,
  font: boldFont, color: rgb(0, 0, 0),
  });

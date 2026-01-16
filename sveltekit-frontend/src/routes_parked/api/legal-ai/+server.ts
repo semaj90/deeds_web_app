@@ -134,7 +134,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body = (await request.json()) as ExtractCitationsRequest;
 
  // Validate request
- if (!body.documentId || !body.documentContent) {
+ if (!body?.documentId|| !body.documentContent) {
  return json(
  {
  error: 'documentId and documentContent are required',
@@ -245,7 +245,7 @@ export const PUT: RequestHandler = async ({ request }) => {
  const body = (await request.json()) as MapAuthoritiesRequest;
 
  // Validate request
- if (!body.citationIds || body.citationIds.length === 0) {
+ if (!body?.citationIds|| body.citationIds.length === 0) {
  return json(
  {
  error: 'citationIds array is required and must not be empty',
@@ -358,8 +358,8 @@ export const GET: RequestHandler = async ({ request }) => {
 
  // Get query parameters
  const url = new URL(request.url);
- const limit = parseInt(url.searchParams.get('limit') || '10', 10);
- const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+ const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
+ const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
  // Create mock reports
  const reports: Report[] = [
@@ -384,9 +384,7 @@ export const GET: RequestHandler = async ({ request }) => {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'get_reports',
  userId: authResult.context?.userId,
- details: {
- limit,
- offset: count.length,
+ details: { limit: offset: count.length,
  },
  level: 'debug',
  });

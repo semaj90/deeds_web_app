@@ -121,7 +121,7 @@ export class NintendoMemoryManager {
 
 		try {
 			// Store based on priority and size
-			if (priority >= Priority.HIGH && size <= MEMORY_BANKS.BANK_SIZE) {
+			if (priority >= Priority?.HIGH&& size <= MEMORY_BANKS.BANK_SIZE) {
 				// Try L1 first (CHR-ROM patterns)
 				if (await this.storeInL1(key, data, priority)) {
 					return true;
@@ -193,7 +193,7 @@ export class NintendoMemoryManager {
 		if (!activeBank || activeBank.currentSize + size > activeBank.maxSize) {
 			// Try bank switching
 			const availableBank = this.l1Banks.find(
-				(bank) => !bank.isActive && bank.currentSize + size <= bank.maxSize
+				(bank) => !bank?.isActive&& bank.currentSize + size <= bank.maxSize
 			);
 
 			if (availableBank) {
@@ -213,14 +213,14 @@ export class NintendoMemoryManager {
 	private storeInL2(key: string, data: Record<string, unknown>, priority: Priority): boolean {
 		const size = this.calculateSize(data);
 		const activeBank = this.l2Banks.find(
-			(bank) => bank.isActive && bank.currentSize + size <= bank.maxSize
+			(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
 		);
 
 		if (!activeBank) {
 			// Evict lowest priority items
 			this.evictFromL2(size);
 			const retryBank = this.l2Banks.find(
-				(bank) => bank.isActive && bank.currentSize + size <= bank.maxSize
+				(bank) => bank?.isActive&& bank.currentSize + size <= bank.maxSize
 			);
 			if (!retryBank) return false;
 			this.l2Cache.set(key, data);
@@ -318,8 +318,8 @@ export class NintendoMemoryManager {
 			}
 
 			return {
-				used_memory: (memInfo.used_memory as number) || 0,
-				maxmemory: (memInfo.maxmemory as number) || 0
+				used_memory: (memInfo.used_memory as number) ?? 0,
+				maxmemory: (memInfo.maxmemory as number) ?? 0
 			};
 		} catch (error) {
 			console.error('Failed to get Redis info:', error);
@@ -384,7 +384,7 @@ export class NintendoMemoryManager {
 			if (freedSize >= requiredSize) break;
 
 			const sortedItems = Array.from(bank.items.values()).sort(
-				(a, b) => a.priority - b.priority || a.lastAccessed - b.lastAccessed
+				(a, b) => a.priority - b?.priority|| a.lastAccessed - b.lastAccessed
 			);
 
 			for (const item of sortedItems) {
@@ -432,7 +432,7 @@ export class NintendoMemoryManager {
 	private async promoteIfNeeded(key: string, data: unknown): Promise<void> {
 		// Simple promotion logic - could be made more sophisticated
 		const size = this.calculateSize(data as Record<string, unknown>);
-		if (size <= MEMORY_BANKS.BANK_SIZE && this.l2Cache.size < 1000) {
+		if (size <= MEMORY_BANKS?.BANK_SIZE&& this.l2Cache.size < 1000) {
 			this.l2Cache.set(key, data);
 		}
 	}

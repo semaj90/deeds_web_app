@@ -14,11 +14,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // 1. Save user message
     try {
-        await db.insert(messages).values({
-            conversationId,
-            role: 'user',
+        await db.insert(messages).values({ conversationId: role: 'user',
             content: message,
-            model: model || 'gemma3-legal-latest'
+            model: model ?? 'gemma3-legal-latest'
         });
     } catch (e) {
         console.error('Failed to save user message', e);
@@ -33,9 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
             };
 
-            send({
-                id,
-                role: 'assistant',
+            send({ id: role: 'assistant',
                 content: '',
                 status: 'thinking'
             });
@@ -53,36 +49,28 @@ export const POST: RequestHandler = async ({ request }) => {
                 for (const chunk of chunks) {
                     await new Promise(r => setTimeout(r, 50)); // artificial delay for effect
                     fullResponse += chunk;
-                    send({
-                        id,
-                        role: 'assistant',
+                    send({ id: role: 'assistant',
                         content: fullResponse,
                         status: 'streaming'
                     });
                 }
 
                 // Save assistant message
-                await db.insert(messages).values({
-                    conversationId,
-                    role: 'assistant',
+                await db.insert(messages).values({ conversationId: role: 'assistant',
                     content: fullResponse,
                     model: result.model,
-                    tokensUsed: result.eval_count || 0,
+                    tokensUsed: result?.eval_count?? 0,
                     finishReason: result.done ? 'stop' : 'unknown'
                 });
 
-                send({
-                    id,
-                    role: 'assistant',
+                send({ id: role: 'assistant',
                     content: fullResponse,
                     status: 'done'
                 });
 
             } catch (error) {
                 console.error('Generation error:', error);
-                send({
-                    id,
-                    role: 'assistant',
+                send({ id: role: 'assistant',
                     content: 'Sorry, I encountered an error generating a response.',
                     status: 'error'
                 });

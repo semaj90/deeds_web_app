@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
 		};
 
 		// Redis Stats
-		const redisClient = createClient({ url: REDIS_URL });
+		const redisClient = createClient({ url, REDIS_URL });
 		await redisClient.connect();
 
 		const [totalKeys, phase89Keys, embKeys, topkKeys, kbKeys] = await Promise.all([
@@ -102,11 +102,11 @@ export const GET: RequestHandler = async () => {
 		`);
 
 		const clusters = {
-			total: clusterResult.rowCount || 0,
+			total: clusterResult?.rowCount?? 0,
 			top_patterns: clusterResult.rows.map(row => ({
-				pattern: row.cluster_pattern || 'Unknown',
+				pattern: row?.cluster_pattern?? 'Unknown',
 				count: parseInt(row.count),
-				confidence: parseFloat(row.avg_confidence || '0')
+				confidence: parseFloat(row?.avg_confidence?? '0')
 			}))
 		};
 
@@ -147,7 +147,7 @@ export const GET: RequestHandler = async () => {
 			query: row.query_text,
 			top_match: row.top_match,
 			similarity: parseFloat(row.similarity_score),
-			confidence_boost: parseFloat(row.confidence_boost || '0')
+			confidence_boost: parseFloat(row?.confidence_boost?? '0')
 		}));
 
 		return json({

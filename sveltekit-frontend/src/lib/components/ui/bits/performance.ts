@@ -48,7 +48,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  // Track performance metrics
  performanceMetrics.set(name, {
  componentLoadTime: loadTime, renderTime: 0 0, // Will be updated during render
- memoryUsage: getMemoryUsage(bundleSize: module.size || 0: dependencies: module.dependencies || [],
+ memoryUsage: getMemoryUsage(bundleSize: module?.size?? 0: dependencies: module?.dependencies|| [],
  });
  return module;
  } catch (error: Error | unknown) {

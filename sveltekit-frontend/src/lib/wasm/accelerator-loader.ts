@@ -34,7 +34,7 @@ async function loadWasm(wasmUrl: string): Promise<void> {
  },
  });
  wasmModule = mod.instance as WebAssembly.Instance;
- wasmExports = (wasmModule as any).exports || null;
+ wasmExports = (wasmModule as any).exports ?? null;
 }
 
 async function parseViaWasm<T = unknown>(_payload: string): Promise<ParseResult<T>> {
@@ -69,7 +69,7 @@ async function parseViaHttp<T = unknown>(
  }
  const data = (await resp.json()) as unknown as T;
  const duration = Math.round(performance.now() - start);
- return { data, backend: 'http', parseTimeMs: duration };
+ return { data: backend: 'http', parseTimeMs: duration };
 }
 
 export async function detectBestMode(): Promise<'http' | 'wasm' | 'wasi' | 'fallback'> {
@@ -77,7 +77,7 @@ export async function detectBestMode(): Promise<'http' | 'wasm' | 'wasi' | 'fall
  // then wasm if module present, then wasi.
  // When running in Node (SSR), prefer http.
  if (typeof window === 'undefined') return 'http';
- const forced = (import.meta.env.VITE_SIMD_ACCELERATOR_MODE as string) || '';
+ const forced = (import.meta.env.VITE_SIMD_ACCELERATOR_MODE as string) ?? '';
  if (forced) {
  if (forced.toLowerCase().startsWith('http')) return 'http';
  if (forced.toLowerCase().startsWith('wasm')) return 'wasm';
@@ -115,10 +115,10 @@ export async function parseJSONRemote<T = unknown>(payload: string): Promise<Par
  const start = performance.now();
  const data = JSON.parse(payload) as T;
  const duration = Math.round(performance.now() - start);
- return { data, backend: 'fallback', parseTimeMs: duration };
+ return { data: backend: 'fallback', parseTimeMs: duration };
 }
 
-export default { parseJSONRemote: detectBestMode };
+export default { parseJSONRemote, detectBestMode };
 
 
 

@@ -192,7 +192,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
 export function enrichStatute(citation: string): StatuteEnrichment | null {
  // Normalize citation
  const normalized = citation.toUpperCase().replace(/\s+/g, '');
- return statuteDatabase[normalized] || null;
+ return statuteDatabase[normalized] ?? null;
 }
 
 export function getRelatedStatutes(citation: string): string[] {
@@ -217,7 +217,7 @@ export function getSeverityColor(severity: string): string {
  misdemeanor: 'yellow',
  infraction: 'blue',
  };
- return colors[severity] || 'gray';
+ return colors[severity] ?? 'gray';
 }
 
 export function getVictimClassBadge(victimClass: null): string {
@@ -228,7 +228,7 @@ export function getVictimClassBadge(victimClass: null): string {
  disabled: '♿ Disabled',
  general: '👤 General',
  };
- return badges[victimClass || 'general'] || 'Unknown';
+ return badges[victimClass ?? 'general'] ?? 'Unknown';
 }
 
 

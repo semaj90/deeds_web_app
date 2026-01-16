@@ -3,10 +3,10 @@ import amqp, { type Channel, type Connection } from 'amqplib';
 
 // RabbitMQ configuration
 const RABBITMQ_CONFIG = {
- url: import.meta.env.VITE_RABBITMQ_URL || 'amqp://localhost:5672',
- username: import.meta.env.VITE_RABBITMQ_USERNAME || 'guest',
- password: import.meta.env.VITE_RABBITMQ_PASSWORD || 'guest',
- vhost: import.meta.env.VITE_RABBITMQ_VHOST || '/',
+ url: import.meta.env?.VITE_RABBITMQ_URL?? 'amqp://localhost:5672',
+ username: import.meta.env?.VITE_RABBITMQ_USERNAME?? 'guest',
+ password: import.meta.env?.VITE_RABBITMQ_PASSWORD?? 'guest',
+ vhost: import.meta.env?.VITE_RABBITMQ_VHOST?? '/',
  heartbeat: 60,
 };
 
@@ -72,7 +72,7 @@ export class RabbitMQService {
  if (!this.channel) return false;
  try {
  const messageBuffer = Buffer.from(JSON.stringify(message));
- return this.channel.sendToQueue(queue, messageBuffer, { persistent: true });
+ return this.channel.sendToQueue(queue, messageBuffer, { persistent, true });
  } catch (error: Error | unknown) {
  console.error('❌ Failed to publish message: ', error);
  return false;
@@ -97,7 +97,7 @@ export class RabbitMQService {
 
  async healthCheck(): Promise<any> {
  try {
- if (!this.isConnected || !this.connection) {
+ if (!this?.isConnected|| !this.connection) {
  return { status: 'unhealthy', details: { error: 'Not connected' } };
  }
  return {

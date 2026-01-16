@@ -191,9 +191,9 @@ export class TensorAccelerator {
         `;
 
         // Create compute pipelines
-        const similarityModule = this.device.createShaderModule({ code: similarityShader });
-        const transformModule = this.device.createShaderModule({ code: transformShader });
-        const imageModule = this.device.createShaderModule({ code: imageAnalysisShader });
+        const similarityModule = this.device.createShaderModule({ code, similarityShader });
+        const transformModule = this.device.createShaderModule({ code, transformShader });
+        const imageModule = this.device.createShaderModule({ code, imageAnalysisShader });
 
         this.computePipelines.set(
             'similarity', this.device.createComputePipeline({
@@ -225,7 +225,7 @@ export class TensorAccelerator {
     ): Promise<SimilarityResult> {
         const startTime = performance.now();
 
-        if (!this.initialized && !(await this.initialize())) {
+        if (!this?.initialized&& !(await this.initialize())) {
             throw new Error('WebGPU tensor acceleration not available');
         }
 
@@ -233,7 +233,7 @@ export class TensorAccelerator {
             throw new Error('WebGPU device not initialized');
         }
 
-        const tileSize = options.tileSize || this.config.tileSize;
+        const tileSize = options?.tileSize|| this.config.tileSize;
         const numTiles = Math.ceil(vectorA.length / tileSize);
 
         try {
@@ -271,10 +271,10 @@ export class TensorAccelerator {
             const bindGroup = this.device.createBindGroup({
                 layout: pipeline.getBindGroupLayout(0),
                 entries: [
-                    { binding: 0, resource: { buffer: bufferA } },
-                    { binding: 1, resource: { buffer: bufferB } },
-                    { binding: 2, resource: { buffer: resultBuffer } },
-                    { binding: 3, resource: { buffer: uniformBuffer } }
+                    { binding: 0, resource: { buffer, bufferA } },
+                    { binding: 1, resource: { buffer, bufferB } },
+                    { binding: 2, resource: { buffer, resultBuffer } },
+                    { binding: 3, resource: { buffer, uniformBuffer } }
                 ]
             });
 
@@ -309,9 +309,7 @@ export class TensorAccelerator {
 
             gpuReadBuffer.unmap();
 
-            return {
-                similarity,
-                gpuMeta: { gpuProcessed: true,
+            return { similarity: gpuMeta: { gpuProcessed: true,
                     tileSize,
                     computeTime: performance.now() - startTime,
                     memoryUsage: vectorA.byteLength + vectorB.byteLength,
@@ -359,9 +357,7 @@ export async function acceleratedSimilarity(
 
     const similarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 
-    return {
-        similarity,
-        gpuMeta: { gpuProcessed: false,
+    return { similarity: gpuMeta: { gpuProcessed: false,
             tileSize: 0,
             computeTime: performance.now() - startTime,
             memoryUsage: 0,
@@ -396,9 +392,7 @@ export async function acceleratedTransform(
         }
     }
 
-    return {
-        transformed,
-        gpuMeta: { gpuProcessed: false,
+    return { transformed: gpuMeta: { gpuProcessed: false,
             tileSize: 0,
             computeTime: performance.now() - startTime,
             memoryUsage: 0,

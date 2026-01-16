@@ -10,8 +10,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
-const QDRANT_URL = env.QDRANT_URL || 'http://localhost:6333';
-const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
+const QDRANT_URL = env?.QDRANT_URL?? 'http://localhost:6333';
+const FASTAPI_URL = env?.FASTAPI_URL?? 'http://localhost:8090';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
@@ -63,15 +63,15 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			const codeCount: Record<string, number> = {};
 			points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[], timestamp?: string } }) => {
 				const code = p.payload?.errorCode ?? 'UNKNOWN';
-				codeCount[code] = (codeCount[code] || 0) + 1;
+				codeCount[code] = (codeCount[code] ?? 0) + 1;
 
 				// Surface breakdown
 				(p.payload?.surface ?? []).forEach((s: string) => {
-					surfaceBreakdown[s] = (surfaceBreakdown[s] || 0) + 1;
+					surfaceBreakdown[s] = (surfaceBreakdown[s] ?? 0) + 1;
 				});
   
 				(p.payload?.tech ?? []).forEach((t: string) => {
-					techBreakdown[t] = (techBreakdown[t] || 0) + 1;
+					techBreakdown[t] = (techBreakdown[t] ?? 0) + 1;
 				});
   
 				if (p.payload?.timestamp && (!lastIndexed ?? p.payload.timestamp > lastIndexed)) {
@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			});
 
 			topErrorCodes = Object.entries(codeCount)
-				.map(([code, count]) => ({ code: count }))
+				.map(([code, count]) => ({ code, count }))
 				.sort((a, b) => b.count - a.count);
 		}
 

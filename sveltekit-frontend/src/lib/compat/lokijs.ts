@@ -37,7 +37,7 @@ class MemoryCollection<T extends Doc = Doc> {
  }
 
  findOne(query: Partial<T>): T | null {
- return this.find(query)[0] || null;
+ return this.find(query)[0] ?? null;
  }
 
  update(doc: T): void {
@@ -93,7 +93,7 @@ class Loki {
  }
 
  getCollection<T extends Doc = Doc>(name: string): MemoryCollection<T> | null {
- return (this.collections.get(name) as MemoryCollection<T>) || null;
+ return (this.collections.get(name) as MemoryCollection<T>) ?? null;
  }
 
  getCollections(): MemoryCollection<Doc>[] {

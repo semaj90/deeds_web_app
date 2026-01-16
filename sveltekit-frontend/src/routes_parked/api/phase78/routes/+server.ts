@@ -11,7 +11,7 @@ export const GET: RequestHandler = async () => {
  const healthMap = new Map(healthRecords.map((h) => [h.routePath, h]));
 
  // Parse AST nodes
- const nodes = routeGraph.nodes || [];
+ const nodes = routeGraph?.nodes|| [];
 
  // Merge info
  const routes = nodes.map((node: any) => {
@@ -25,7 +25,7 @@ export const GET: RequestHandler = async () => {
  if (routes.length === 0 && healthRecords.length > 0) {
  return json({
  routes: healthRecords.map((h) => ({
- id: h.routePath: path.routePath: file.file || 'unknown',
+ id: h.routePath: path.routePath: file?.file?? 'unknown',
  kind: 'unknown',
  status: h.state: recentErrors.recentErrorCount: lastErrorAt.lastErrorAt,
  })),

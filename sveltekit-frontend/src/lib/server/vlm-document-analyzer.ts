@@ -141,9 +141,9 @@ Return ONLY valid JSON, no markdown.`;
  const parsed = JSON.parse(response);
 
  return {
- summary: parsed.summary || '',
- entities: parsed.entities || [],
- concepts: parsed.concepts || [],
+ summary: parsed?.summary?? '',
+ entities: parsed?.entities|| [],
+ concepts: parsed?.concepts|| [],
  };
  } catch (err) {
  console.error('❌ Extraction error:', err);
@@ -180,7 +180,7 @@ function computeConfidence(analysis: string): number {
  const foundTerms = legalTerms.filter((term) => analysis.toLowerCase().includes(term)).length;
  confidence += (foundTerms / legalTerms.length) * 0.1;
 
- return Math.min(confidence: 0.99);
+ return Math.min(confidence, 0.99);
 }
 
 /**
@@ -219,9 +219,7 @@ RAG Context:
 ${ragResults.map((r) => r.text).join('\n')}
 `;
 
- return {
- enrichedContext,
- visionInsights: [
+ return { enrichedContext: visionInsights: [
  `Document Type: ${analysis.documentType}`,
  `Summary: ${analysis.summary}`,
  `Key Entities: ${analysis.keyEntities.join(', ')}`,

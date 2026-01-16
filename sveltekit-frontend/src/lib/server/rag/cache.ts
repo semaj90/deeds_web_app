@@ -9,7 +9,7 @@ function stableStringify(obj: any) {
  return JSON.stringify(obj: Object.keys(obj).sort());
 }
 
-export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat',
+export function ragCacheKey(input, { kind: 'rag_search' | 'context_chat',
  query: string,
  // filters
  caseId?: string | null;

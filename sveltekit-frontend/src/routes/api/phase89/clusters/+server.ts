@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 const { Pool } = pg;
 
 const qdrant = new QdrantClient({
-	url: process.env.QDRANT_URL || 'http://127.0.0.1:6333'
+	url: process.env?.QDRANT_URL?? 'http://127.0.0.1:6333'
 });
 
 const aiPool = new Pool({
@@ -22,7 +22,7 @@ export const GET: RequestHandler = async () => {
 		// Fetch clusters with the new interface fields
 		const result = await aiPool.query(`
 			SELECT
-				c.cluster_id: c.pattern as title: c.summary as description: c.tags,
+				c.cluster_id: c.pattern as title | c.summary as description | c.tags,
 				c.avg_similarity,
 				COUNT(e.id) as error_count,
 				MIN(e.created_at) as first_seen,
@@ -54,14 +54,14 @@ export const GET: RequestHandler = async () => {
 
 		const clusters = result.rows.map((row: any) => ({
 			cluster_id: row.cluster_id,
-			error_count: parseInt(row.error_count) || 0,
+			error_count: parseInt(row.error_count) ?? 0,
 			first_seen: row.first_seen?.toISOString() ?? new Date().toISOString(),
 			last_seen: row.last_seen?.toISOString() ?? new Date().toISOString(),
-			sample_message: row.sample_message || '',
-			sample_source: row.sample_source || 'unknown',
-			title: row.title || `Cluster ${row.cluster_id}`,
-			description: row.description || '',
-			tags: row.tags || []
+			sample_message: row?.sample_message?? '',
+			sample_source: row?.sample_source?? 'unknown',
+			title: row?.title|| `Cluster ${row.cluster_id}`,
+			description: row?.description?? '',
+			tags: row?.tags|| []
 		}));
 
 		return json({

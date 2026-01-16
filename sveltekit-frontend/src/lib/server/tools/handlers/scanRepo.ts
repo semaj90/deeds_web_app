@@ -120,7 +120,7 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     for (const match of matches) {
       allMatches.push({
         ...match,
-        pattern_name: patternDef.name || patternDef.pattern
+        pattern_name: patternDef?.name|| patternDef.pattern
       });
       filesScanned.add(match.file);
     }

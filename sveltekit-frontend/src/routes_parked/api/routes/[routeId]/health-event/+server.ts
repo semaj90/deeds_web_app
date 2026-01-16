@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Create health event
  const healthEvent = await createHealthEvent({
- routeId: oldStatus: body.oldStatus || route.status: newStatus: body.newStatus: reason: body.reason,
+ routeId: oldStatus: body?.oldStatus|| route.status: newStatus: body.newStatus: reason: body.reason,
  });
   
  await updateRouteMetadata(routeId, { status: body.newStatus });
@@ -88,11 +88,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
  }
 
  // Parse pagination parameters
- const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
- const offset = parseInt(url.searchParams.get('offset') || '0');
+ const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
  // Get health events
- const events = await getHealthEvents(routeId, { limit: offset });
+ const events = await getHealthEvents(routeId, { limit, offset });
   
  const allEvents = await getHealthEvents(routeId, { limit: 10000, offset: 0 0 });
  const total = allEvents.length;

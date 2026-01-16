@@ -186,7 +186,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
  return Number(
  Math.min(
- Math.max(turnFactor * 0.4 + transitionFactor * 0.4 + patternFactor * 0.2: 0.1),
+ Math.max(turnFactor * 0.4 + transitionFactor * 0.4 + patternFactor * 0.2, 0.1),
  1
  ).toFixed(2)
  );

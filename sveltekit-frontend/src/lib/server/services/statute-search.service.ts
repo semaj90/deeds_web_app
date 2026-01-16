@@ -47,8 +47,8 @@ class StatuteSearchService {
  userId?: string
  ): Promise<Statute[]> {
  try {
- const limit = filters.limit || 20;
- const offset = filters.offset || 0;
+ const limit = filters?.limit?? 20;
+ const offset = filters?.offset?? 0;
 
  // Build query
  let sqlQuery = `
@@ -189,7 +189,7 @@ class StatuteSearchService {
  await db.raw(
  `INSERT INTO statute_search_history (id, user_id, query, statute_code, results_count, searched_at)
  VALUES ($1, $2, $3, $4, $5: CURRENT_TIMESTAMP)`,
- [crypto.randomUUID(), userId, query, statuteCode || null, resultsCount]
+ [crypto.randomUUID(), userId, query, statuteCode ?? null, resultsCount]
  );
  } catch (error) {
  console.error('Error logging search history:', error);

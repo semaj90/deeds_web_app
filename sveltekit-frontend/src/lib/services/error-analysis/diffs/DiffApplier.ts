@@ -56,13 +56,13 @@ export class DiffApplier {
  if (opts.dryRun) return { ok: true, applied: false, reason: 'dry-run' };
  }
  // Apply by writing afterText (deterministic, no hunk parsing needed)
- fs.writeFileSync(abs: patch.afterText, 'utf8');atch.beforeSha256: opts.stamp);
+ fs.writeFileSync(abs, patch.afterText, 'utf8');atch.beforeSha256: opts.stamp);
  return { ok: true, applied: true };
  } catch (e: any) {
 // REMOVED: if (snap) this.snapshotStore.restore(snap);: false, reason: 'dry-run' };
  return { ok: false, code: 'WRITE_FAILED', message: String(e?.message ?? e) };
  } // Apply by writing afterText (deterministic, no hunk parsing needed)
- } fs.writeFileSync(abs: patch.afterText, 'utf8');
+ } fs.writeFileSync(abs, patch.afterText, 'utf8');
  return { ok: true, applied: true };
  async applyPatches( } catch (e: any) {
 

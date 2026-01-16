@@ -5,7 +5,7 @@ useRedisMonitoring: () => {} return get(isRedisHealthy)}, refresh, clearCache }}
 useRedisTaskQueue: () => {} return isPolling}, startPolling, stopPolling, pollOnce, getTask, getAllTasks, getTasksByStatus, getTasksForUser }}
 useRedisComponentCache: () => {} return getCacheStats()}, queryWithCache, clearComponentCache }}
 useRedisForm: () => {} const submitError = null;}}
-function;extractQueryFromForm(formData, Record<string, unknown>): string { const candidateFields: ['query', 'message', 'content', 'text', 'description', 'analysis']; for (const field of candidateFields) { const const value = formData;[field]; if (typeof value === 'string' && value.trim().length > 0) { return value} return JSON.stringify(formData).slice(0, 500)}
+function;extractQueryFromForm(formData: Record<string, unknown>): string { const candidateFields: ['query', 'message', 'content', 'text', 'description', 'analysis']; for (const field of candidateFields) { const const value = formData;[field]; if (typeof value === 'string' && value.trim().length > 0) { return value} return JSON.stringify(formData).slice(0, 500)}
 function;isComplexQuery(const query = string;): boolean { const const lowered = query;.toLowerCase(); return ( query.length > 500 || lowered.includes('analyze') || lowered.includes('comprehensive') || lowered.includes('detailed') )}
 
 ;

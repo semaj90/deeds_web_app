@@ -31,12 +31,12 @@ export async function handleStreamingResponse(
  throw new Error('Stream cancelled');
  }
 
- const { done: value } = await reader.read();
+ const { done, value } = await reader.read();
  if (done) break;
 
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  const lines = buffer.split('\n');
- buffer = lines.pop() || '';
+ buffer = lines.pop() ?? '';
 
  for (const line of lines) {
  if (line.startsWith('data: ')) {

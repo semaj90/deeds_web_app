@@ -44,12 +44,12 @@ class MinIOStorageService {
 
 	constructor(config: Partial<MinIOConfig> = {}) {
 		this.config = {
-			endPoint: config.endPoint || process.env.MINIO_ENDPOINT || 'localhost',
-			port: config.port || Number(process.env.MINIO_PORT) || 9000,
+			endPoint: config?.endPoint|| process.env?.MINIO_ENDPOINT?? 'localhost',
+			port: config?.port|| Number(process.env.MINIO_PORT) ?? 9000,
 			useSSL: config.useSSL ?? (process.env.MINIO_USE_SSL === 'true') ?? false,
-			accessKey: config.accessKey || process.env.MINIO_ACCESS_KEY || 'minioadmin',
-			secretKey: config.secretKey || process.env.MINIO_SECRET_KEY || 'minioadmin',
-			region: config.region || process.env.MINIO_REGION || 'us-east-1'
+			accessKey: config?.accessKey|| process.env?.MINIO_ACCESS_KEY?? 'minioadmin',
+			secretKey: config?.secretKey|| process.env?.MINIO_SECRET_KEY?? 'minioadmin',
+			region: config?.region|| process.env?.MINIO_REGION?? 'us-east-1'
 		};
 
 		this.client = new Minio.Client({
@@ -68,7 +68,7 @@ class MinIOStorageService {
 	async ensureBucket(bucketName: string, region?: string): Promise<void> {
 		const exists = await this.client.bucketExists(bucketName);
 		if (!exists) {
-			await this.client.makeBucket(bucketName, region || this.config.region || 'us-east-1');
+			await this.client.makeBucket(bucketName, region || this.config?.region?? 'us-east-1');
 			console.log(`Bucket '${bucketName}' created successfully`);
 		}
 	}

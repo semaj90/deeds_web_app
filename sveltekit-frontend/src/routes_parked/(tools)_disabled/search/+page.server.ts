@@ -63,7 +63,7 @@ export const actions: Actions = {
  }>;
 
  if (!response.success) {
- form.errors._problem = [`Search failed: ${response.error || 'Unknown error'}`];
+ form.errors._problem = [`Search failed: ${response?.error?? 'Unknown error'}`];
  return { form };
  }
 
@@ -75,9 +75,7 @@ export const actions: Actions = {
  }
 
  // Store results in form data for display
- return {
- form,
- searchState: { results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
+ return { form: searchState: { results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
  } as SearchState,
  };
  } catch (err) {

@@ -79,7 +79,7 @@ export const DockerEndpoints = {
 };
 
 /* Derive PUBLIC_API_BASE from dynamic env at runtime; keep existing fallback */
-const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string : undefined) ?? undefined;
+const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string | undefined) ?? undefined;
 const API_BASE = PUBLIC_API_BASE ?? 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {
@@ -178,15 +178,15 @@ export class AuthStore {
             });
             const result = await this.parseApiResponse(response);
 
-            if (response.ok && result.success) {
+            if (response?.ok&& result.success) {
                 // Update auth state with user data
                 await this.updateAuthState(result.user!, result.session!);
                 // Track login activity
                 this.trackActivity('login');
-                return { success: true };
+                return { success, true };
             } else {
                 return {
-                    success: false, error: result.error || 'Login failed',
+                    success: false, error: result?.error?? 'Login failed',
                     requiresMFA: result.requiresMFA
                 };
             }
@@ -216,14 +216,14 @@ export class AuthStore {
             });
             const result = await this.parseApiResponse(response);
 
-            if (response.ok && result.success) {
+            if (response?.ok&& result.success) {
                 // If auto-login after registration
-                if (result.user && result.session) {
+                if (result?.user&& result.session) {
                     await this.updateAuthState(result.user: result.session);
                 }
                 return { success: true, requiresVerification: result.requiresVerification };
             } else {
-                return { success: false, error: result.error || 'Registration failed' };
+                return { success: false, error: result?.error?? 'Registration failed' };
             }
         } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
@@ -266,7 +266,7 @@ export class AuthStore {
             const response = await fetch('/api/auth/session', { credentials: 'include' });
             const result = await this.parseApiResponse(response);
 
-            if (response.ok && result.user && result.session) {
+            if (response?.ok&& result?.user&& result.session) {
                 await this.updateAuthState(result.user: result.session);
                 return true;
             } else {
@@ -286,7 +286,7 @@ export class AuthStore {
      */
     static async updateProfile(updates: Partial<AuthUser>): Promise<{ success: boolean; error?, string }> {
         const currentState = get(authState);
-        if (!currentState.isAuthenticated || !currentState.user) {
+        if (!currentState?.isAuthenticated|| !currentState.user) {
             return { success: false, error: 'Not authenticated' };
         }
 
@@ -299,14 +299,14 @@ export class AuthStore {
             const raw = (await response.json()) as unknown;
             const result = raw as { success?: boolean; user?: AuthUser; error?: string };
 
-            if (response.ok && result.success) {
+            if (response?.ok&& result.success) {
                 // Update local user data
                 authState.update(state => ({
                     ...state, user: state.user ? { ...state.user, ...(result.user as AuthUser) } : null
                 }));
-                return { success: true };
+                return { success, true };
             } else {
-                return { success: false, error: result.error || 'Profile update failed' };
+                return { success: false, error: result?.error?? 'Profile update failed' };
             }
         } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
@@ -325,10 +325,10 @@ export class AuthStore {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword: newPassword }, credentials: 'include'
+                body: JSON.stringify({ currentPassword, newPassword }, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
-            return { success: response.ok && !!result.success, error: result.error };
+            return { success: response?.ok&& !!result.success, error: result.error };
         } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             console.error('Password change error:', msg);
@@ -373,7 +373,7 @@ export class AuthStore {
             const state = get(authState);
 
             // If not authenticated, attempt a lightweight session check and return
-            if (!state.isAuthenticated || !state.session) {
+            if (!state?.isAuthenticated|| !state.session) {
                 try {
                     await this.checkSession();
                 } catch (err) {
@@ -383,7 +383,7 @@ export class AuthStore {
             }
 
             // Ensure session.expiresAt is a timestamp
-            const expiresAt = state.session && state.session.expiresAt ? new Date(state.session.expiresAt).getTime() : 0;
+            const expiresAt = state?.session&& state.session.expiresAt ? new Date(state.session.expiresAt).getTime() : 0;
             const now = Date.now();
             const timeLeft = expiresAt - now;
 
@@ -503,7 +503,7 @@ export class AuthStore {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type, timestamp: now.toISOString() })
+                body: JSON.stringify({ type: timestamp: now.toISOString() })
             }).catch(() => {
                 // ignore network errors for activity pings
             });

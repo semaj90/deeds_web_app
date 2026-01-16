@@ -16,7 +16,7 @@ interface PatchResult {
     }>;
 }
 
-export const POST: RequestHandler = async ({ request: fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch }) => {
     try {
         const body: ApplyPatchRequest = await request.json();
         const { clusterId, dryRun = true } = body;
@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 1,
                 with_payload: true,
-                filter: { must: [{ key: 'cluster_id', match: { value: clusterId } }]
+                filter: { must: [{ key: 'cluster_id', match: { value, clusterId } }]
                 }
             })
         });
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ limit: 100,
                 with_payload: true,
-                filter: { must: [{ key: 'clusterId', match: { value: clusterId } }]
+                filter: { must: [{ key: 'clusterId', match: { value, clusterId } }]
                 }
             })
         });

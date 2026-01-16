@@ -73,7 +73,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
       let mirrored = false;
 
       // Mirror to Qdrant if configured
-      if (process.env.QDRANT_URL && embedding.length > 0) {
+      if (process.env?.QDRANT_URL&& embedding.length > 0) {
         const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
 
         await qdrant.upsert('documents', {
@@ -81,9 +81,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
             {
               id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
               vector: embedding,
-              payload: {
-                title,
-                source_uri: `minio://${ bucket }/${ objectKey }`
+              payload: { title: source_uri: `minio://${ bucket }/${ objectKey }`
               }
             }
           ]

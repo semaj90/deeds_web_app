@@ -69,8 +69,8 @@ export interface OllamaServiceStatus {
 }
 
 export interface SummarizerStats {
-  services: { cuda: { status: string };
-    gemma3: { status: string };
+  services: { cuda: { status, string };
+    gemma3: { status, string };
     cluster: { status: string; nodes: number };
     streaming: { status: string; activeStreams: number };
   };
@@ -195,13 +195,13 @@ class OllamaIntegrationLayer {
   }
 
   private determineProcessingStrategy(request: IntegratedChatRequest): string {
-    if (request.documentContext && request.summaryOptions?.includeSummary) {
+    if (request?.documentContext&& request.summaryOptions?.includeSummary) {
       return 'comprehensive-with-summary';
     }
-    if (request.useRAG && request.message && request.message.length > 100) {
+    if (request?.useRAG&& request?.message&& request.message.length > 100) {
       return 'langchain-rag';
     }
-    if (request.stream && request.advancedOptions?.enableStreaming) {
+    if (request?.stream&& request.advancedOptions?.enableStreaming) {
       return 'streaming-enhanced';
     }
     return 'standard-chat';
@@ -223,7 +223,7 @@ class OllamaIntegrationLayer {
     }
 
     // Then process the chat with summary context
-    const enhancedMessage = this.enhanceMessageWithSummary(request.message || '', summary);
+    const enhancedMessage = this.enhanceMessageWithSummary(request?.message?? '', summary);
     const chatResponse = await this.callChatAPI({
       ...request,
       message: enhancedMessage,
@@ -240,10 +240,10 @@ class OllamaIntegrationLayer {
         performance: { duration: 200,
           tokens: 150,
           tokensPerSecond: 750,
-          model: request.model || 'langchain-ollama',
+          model: request?.model?? 'langchain-ollama',
         },
         relatedCases: ['Case A', 'Case B'],
-        suggestions: this.extractSuggestions(request.message || ''),
+        suggestions: this.extractSuggestions(request?.message?? ''),
       };
     } catch (error) {
       console.warn('LangChain RAG failed, falling back to standard chat:', error);

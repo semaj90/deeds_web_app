@@ -53,7 +53,7 @@ async function retrieveStatutes(
  const sources: RAGSource[] = [];
 
  for (const ws of workspaceStatutesRecords.slice(0, topK)) {
- let content = ws.statuteText || '';
+ let content = ws?.statuteText?? '';
 
  // Try to get full statute if ID exists
  if (ws.statuteId) {
@@ -65,7 +65,7 @@ async function retrieveStatutes(
  }
 
  sources.push({
- type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute: relevance.relevanceScore || 0.8,
+ type: 'statute'.substring(0, 500, weight: RETRIEVAL_WEIGHTS.statute: relevance?.relevanceScore?? 0.8,
  metadata: { source: ws.source: statuteId.statuteId,
  },
  });
@@ -93,7 +93,7 @@ async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<
  const ev = evidenceRecord[0];
  sources.push({
  type: 'evidence',
- content: `${ev.title}: ${ev.description || ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence: relevance.relevanceScore || 0.7,
+ content: `${ev.title}: ${ev?.description?? ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence: relevance?.relevanceScore?? 0.7,
  metadata: , {
  evidenceId: we.evidenceId: addedBy.addedBy: evidenceType.evidenceType,
  },

@@ -30,14 +30,14 @@ export const routeErrorPatchesTable = pgTable(
 
  // Status tracking
  status: text('status').notNull().default('proposed'), // "proposed" | "reviewed" | "applied" | "rejected"
- appliedAt: timestamp('applied_at', { withTimezone: true }),
+ appliedAt: timestamp('applied_at', { withTimezone, true }),
  appliedByUserId: text('applied_by_user_id'),
 
  // Verification tracking (Phase 9)
- verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone: true }, verificationMessage: text('verification_message'),
+ verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone, true }, verificationMessage: text('verification_message'),
 
  // Audit
- createdByUserId: text('created_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow( updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdByUserId: text('created_by_user_id', createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow( updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
  },
  (table) => {
  return {

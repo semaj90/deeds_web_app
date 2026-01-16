@@ -3,8 +3,8 @@ import { db } from '../db/drizzle.js';
 import { caseChunks, lawSections } from '../db/schema/legal-index.js';
 import { eq } from 'drizzle-orm';
 
-const OLLAMA_API_URL = env.OLLAMA_API_URL || 'http://localhost:11434';
-const EMBEDDING_MODEL = env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest';
+const OLLAMA_API_URL = env?.OLLAMA_API_URL?? 'http://localhost:11434';
+const EMBEDDING_MODEL = env?.OLLAMA_EMBEDDING_MODEL?? 'embeddinggemma:latest';
 const EMBEDDING_DIMENSION = 768;
 
 /**
@@ -46,7 +46,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
  // Handle both single and batch responses
  let embedding: number[];
- if (result.embeddings && result.embeddings.length > 0) {
+ if (result?.embeddings&& result.embeddings.length > 0) {
  embedding = result.embeddings[0];
  } else if (result.embedding) {
  embedding = result.embedding;

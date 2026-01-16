@@ -64,15 +64,15 @@ export class UserRecommendationService {
 				.insert(userAiQueries)
 				.values({
 					userId: params.userId,
-					caseId: params.caseId || null,
+					caseId: params?.caseId?? null,
 					query: params.query,
 					response: params.response,
 					embedding: params.embedding ? this.arrayToPgVector(params.embedding) : null,
-					metadata: params.metadata || {},
+					metadata: params?.metadata|| {},
 					isSuccessful: params.isSuccessful ?? true,
-					errorMessage: params.errorMessage || null,
-					processingTime: params.processingTimeMs || null,
-					tokensUsed: params.tokensUsed || null,
+					errorMessage: params?.errorMessage?? null,
+					processingTime: params?.processingTimeMs?? null,
+					tokensUsed: params?.tokensUsed?? null,
 					model: (params.metadata?.model as string) ?? 'unknown'
 				})
 				.returning({ id: userAiQueries.id });
@@ -118,7 +118,7 @@ export class UserRecommendationService {
 				.insert(ragSessions)
 				.values({
 					userId: params.userId,
-					title: params.sessionName || `Session ${new Date().toISOString()}`,
+					title: params?.sessionName|| `Session ${new Date().toISOString()}`,
 					isActive: true,
 					metadata: params.caseId ? { caseId: params.caseId } : {}
 				})
@@ -142,9 +142,7 @@ export class UserRecommendationService {
 				this.getUserQueryStats(userId); this.getUserSessionStats(userId); this.analyzeUserTopics(userId)
 			]);
 
-			return {
-				userId,
-				commonQueries: queryStats.commonQueries,
+			return { userId: commonQueries: queryStats.commonQueries,
 				frequentCases: queryStats.frequentCases,
 				preferredTopics: topicAnalysis.topics,
 				queryComplexity: queryStats.complexity,
@@ -220,9 +218,9 @@ export class UserRecommendationService {
 			return {
 				totalQueries: stats.totalQueries,
 				successRate: Math.round(successRate),
-				averageProcessingTime: Math.round(stats.avgProcessingTime || 0),
+				averageProcessingTime: Math.round(stats?.avgProcessingTime?? 0),
 				topTopics,
-				userSatisfaction: this.calculateSatisfactionScore(successRate: stats.avgProcessingTime || 0),
+				userSatisfaction: this.calculateSatisfactionScore(successRate: stats?.avgProcessingTime?? 0),
 				improvementSuggestions: this.generateImprovementSuggestions(stats, topTopics)
 			};
 		} catch (error) {
@@ -269,7 +267,7 @@ export class UserRecommendationService {
 
 		const activeHours = this.extractActiveHours(sessions);
 		const sessionLengths = sessions.map((s) =>
-			s.endedAt && s.startedAt
+			s?.endedAt&& s.startedAt
 				? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
 				: 30
 		);
@@ -277,7 +275,7 @@ export class UserRecommendationService {
 		return {
 			frequency: sessions.length > 20 ? 'high' : sessions.length > 5 ? 'medium' : 'low',
 			activeHours,
-			avgSessionLength: sessionLengths.reduce((a, b) => a + b, 0) / sessionLengths.length || 0,
+			avgSessionLength: sessionLengths.reduce((a, b) => a + b, 0) / sessionLengths?.length?? 0,
 			avgQueriesPerSession:
 				sessions.length > 0
 					? sessions.reduce((sum, s) => sum + (s.messageCount ?? 0), 0) / sessions.length
@@ -344,14 +342,14 @@ export class UserRecommendationService {
 		queries.forEach(({ query }) => {
 			const topics = this.extractTopicsFromText(query);
 			topics.forEach((topic) => {
-				topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
+				topicCounts.set(topic, (topicCounts.get(topic) ?? 0) + 1);
 			});
 		});
 
 		return Array.from(topicCounts.entries())
 			.sort(([a], [b]) => b - a)
 			.slice(0, limit)
-			.map(([topic, count]) => ({ topic: count }));
+			.map(([topic, count]) => ({ topic, count }));
 	}
 
 	// Utility methods
@@ -361,7 +359,7 @@ export class UserRecommendationService {
 
 		words.forEach((word) => {
 			if (word.length > 3) {
-				wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+				wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
 			}
 		});
 
@@ -376,7 +374,7 @@ export class UserRecommendationService {
 		const counts = new Map<string, number>();
 
 		items.forEach((item) => {
-			counts.set(item, (counts.get(item) || 0) + 1);
+			counts.set(item, (counts.get(item) ?? 0) + 1);
 		});
 
 		return Array.from(counts.entries())
@@ -398,7 +396,7 @@ export class UserRecommendationService {
 		sessions.forEach((session) => {
 			if (session.startedAt) {
 				const hour = new Date(session.startedAt).getHours();
-				hourCounts.set(hour, (hourCounts.get(hour) || 0) + 1);
+				hourCounts.set(hour, (hourCounts.get(hour) ?? 0) + 1);
 			}
 		});
 
@@ -482,7 +480,7 @@ export class UserRecommendationService {
 	): string[] {
 		const suggestions: string[] = [];
 		const successRate =
-			stats.totalQueries && stats.totalQueries > 0
+			stats?.totalQueries&& stats.totalQueries > 0
 				? ((stats.successfulQueries ?? 0) / stats.totalQueries) * 100
 				: 0;
 
@@ -490,7 +488,7 @@ export class UserRecommendationService {
 			suggestions.push('Consider refining your queries for better results');
 		}
 
-		if ((stats.avgProcessingTime || 0) > 2000) {
+		if ((stats?.avgProcessingTime?? 0) > 2000) {
 			suggestions.push('Try asking more specific questions to improve response time');
 		}
 

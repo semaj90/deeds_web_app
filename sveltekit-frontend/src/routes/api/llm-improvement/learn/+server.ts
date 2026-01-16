@@ -74,7 +74,7 @@ export const GET: RequestHandler = async () => {
 export const PUT: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { action: config } = body as {
+		const { action, config } = body as {
 			action: 'start' | 'stop' | 'configure';
 			config?: Record<string, any>;
 		};

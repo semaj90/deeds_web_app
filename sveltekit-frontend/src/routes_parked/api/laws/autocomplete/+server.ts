@@ -4,7 +4,7 @@ import { getLegalAutocomplete } from '$lib/server/legal-autocomplete';
 
 export const GET: RequestHandler = async ({ url }) => {
  const query = url.searchParams.get('q')?.trim() ?? '';
- const limit = Math.min(parseInt(url.searchParams.get('limit') || '8'), 20);
+ const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '8'), 20);
 
  if (!query || query.length < 1) {
  return json({ suggestions: [] });

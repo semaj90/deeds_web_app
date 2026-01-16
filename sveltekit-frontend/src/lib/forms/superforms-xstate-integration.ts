@@ -89,7 +89,7 @@ export function createDocumentUploadForm(
     delayMs: 500,
     timeoutMs: 8000,
     invalidateAll: false,
-    onUpdated: ({ form: updatedForm }) => {
+    onUpdated: ({ form, updatedForm }) => {
       if (updatedForm.valid) {
         actor.send({ type: 'VALIDATE_FORM', data: updatedForm.data });
       } else {
@@ -118,7 +118,7 @@ export function createDocumentUploadForm(
   const errors = derived([form.errors, context], ([$errors, $context]) => {
     const flattened: Record<string, string[]> = {};
 
-    const flattenErrors = (obj: any, prefix = '') => {
+    const flattenErrors = (obj, any, prefix = '') => {
       for (const [key, value] of Object.entries(obj || {})) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
         if (Array.isArray(value)) {
@@ -174,7 +174,7 @@ export function createCaseCreationForm(
     delayMs: 500,
     timeoutMs: 10000,
     invalidateAll: true,
-    onUpdated: ({ form: updatedForm }) => {
+    onUpdated: ({ form, updatedForm }) => {
       actor.send({ type: 'UPDATE_FORM', data: updatedForm.data });
     },
     onSubmit: async ({ formData, cancel }) => {
@@ -196,7 +196,7 @@ export function createCaseCreationForm(
 
   const errors = derived([form.errors, context], ([$errors, $context]) => {
     const flattened: Record<string, string[]> = {};
-    const flattenErrors = (obj: any, prefix = '') => {
+    const flattenErrors = (obj, any, prefix = '') => {
       for (const [key, value] of Object.entries(obj || {})) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
         if (Array.isArray(value)) {
@@ -255,7 +255,7 @@ export function createSearchForm(
     delayMs: 300,
     timeoutMs: 15000,
     invalidateAll: false,
-    onUpdated: ({ form: updatedForm }) => {
+    onUpdated: ({ form, updatedForm }) => {
       if (updatedForm.data?.query && updatedForm.data.query.length > 2) {
         // actor.send({ type: 'UPDATE_QUERY', query: updatedForm.data.query });
       }
@@ -279,7 +279,7 @@ export function createSearchForm(
 
   const errors = derived([form.errors, context], ([$errors, $context]) => {
     const flattened: Record<string, string[]> = {};
-    const flattenErrors = (obj: any, prefix = '') => {
+    const flattenErrors = (obj, any, prefix = '') => {
       for (const [key, value] of Object.entries(obj || {})) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
         if (Array.isArray(value)) {
@@ -354,7 +354,7 @@ export function createAIAnalysisForm(
 
   const errors = derived([form.errors, context], ([$errors, $context]) => {
     const flattened: Record<string, string[]> = {};
-    const flattenErrors = (obj: any, prefix = '') => {
+    const flattenErrors = (obj, any, prefix = '') => {
       for (const [key, value] of Object.entries(obj || {})) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
         if (Array.isArray(value)) {

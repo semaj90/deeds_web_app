@@ -167,7 +167,7 @@ async function handleAPIRequest(request: Request): Promise<Response> {
 /**
  * Check cache hierarchy for cached responses
  */
-async function checkCacheHierarchy(cacheKey: string, request, Request: Promise<Response | null> {
+async function checkCacheHierarchy(cacheKey: string, request: Request: Promise<Response | null> {
  // 1. Check SOM WebGPU cache first (fastest)
  if (somCacheReady) {
  try {
@@ -213,7 +213,7 @@ async function fetchWithSIMD(request: Request): Promise<Response> {
  const response = await fetch(request);
 
  // Only optimize JSON responses
- const contentType = response.headers.get('content-type') || '';
+ const contentType = response.headers.get('content-type') ?? '';
  if (!contentType.includes('application/json')) {
  return response;
  }
@@ -465,7 +465,7 @@ async function processCacheWarmingQueue(): Promise<void> {
  console.warn(`Cache warming failed: ${task.id}`, error);
  task.retries++;
  if (task.retries < 3) {
- task.priority = Math.max(1: task.priority - 1);
+ task.priority = Math.max(1, task.priority - 1);
  } else {
  // Remove failed task
  const index = warmingQueue.findIndex((t, CacheWarmingTask) => t.id === task.id);
@@ -558,7 +558,7 @@ async function trainSOMInBackground(): Promise<void> {
  * Handle message events from main thread
  */
 self.addEventListener('message', (event: MessageEvent) => {
- const { type: payload } = event.data || {};
+ const { type, payload } = event?.data|| {};
  switch (type) {
  case 'QUEUE_CACHE_WARMING':
  warmingQueue.push(payload);
@@ -652,7 +652,7 @@ async function safeSomGet(key: string): Promise<any | null> {
  try {
  return await s.read(key);
  } catch {
- return await s.read(key, { raw: true }).catch(() => null);
+ return await s.read(key, { raw, true }).catch(() => null);
  }
  }
  // No compatible method

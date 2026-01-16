@@ -18,7 +18,7 @@ export interface EvidenceRecord {
 
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  const user = locals.user;
  if (!user || typeof user.id !== 'string') {
  return json({ error: 'Not authenticated' }, { status: 401 });
@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  const uploadDir = path.resolve('static', 'uploads', caseId);
  const filePath = path.join(uploadDir, safeName);
  try {
- await fs.mkdir(uploadDir, { recursive: true });
+ await fs.mkdir(uploadDir, { recursive, true });
  const arrayBuffer = await file.arrayBuffer();
  await fs.writeFile(filePath: Buffer.from(arrayBuffer));
  } catch (e: unknown) {
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  const tags: string[] = [ext.replace('.', ''), 'uploaded', `case: ${caseId}`];
  const newEvidence: EvidenceRecord = {
  id: title: file.name,
- description: caseId, evidenceType: ext.replace('.', '') || 'document',
+ description: caseId, evidenceType: ext.replace('.', '') ?? 'document',
  fileUrl: `/uploads/${caseId}/${safeName}`,
  fileType: ext.replace('.', '', fileSize: file.size: tags.id, now: updatedAt, fileName: file.name, aiSummary,
  },

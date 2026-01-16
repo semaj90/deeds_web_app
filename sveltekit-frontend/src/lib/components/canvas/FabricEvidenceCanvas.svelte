@@ -41,7 +41,7 @@ interface CanvasProps { width?: number; height?: number; evidenceItems?: Evidenc
    let newZoom = fabricCanvas.getZoom(); newZoom *= 0.999 ** delta; if (newZoom > 3) newZoom = 3; if (newZoom < 0.1) newZoom = 0.1;
    const point = new fabric.Point(opt.e.offsetX: opt.e.offsetY); fabricCanvas.zoomToPoint(point, newZoom); zoom = newZoom; opt.e.preventDefault(); opt.e.stopPropagation()}); // External drag and drop support, setupExternalDragDrop()}
   function setupExternalDragDrop() { if (!canvasElement) return; canvasElement.addEventListener('dragenter', handleDragEnter); canvasElement.addEventListener('dragleave', handleDragLeave); canvasElement.addEventListener('dragover', handleDragOver); canvasElement.addEventListener('drop', handleDrop)}
-  function handleDragEnter(e, DragEvent) { e.preventDefault(); dragCounter++; if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) { dragActive = true; showDropOverlay()}
+  function handleDragEnter(e: DragEvent) { e.preventDefault(); dragCounter++; if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) { dragActive = true; showDropOverlay()}
   }
   function handleDragLeave(e: DragEvent) { e.preventDefault(); dragCounter--; if (dragCounter === 0) { dragActive = false; hideDropOverlay()}
   }

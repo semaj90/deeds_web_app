@@ -121,7 +121,7 @@ fn compute_similarity(@builtin(global_invocation_id) global_id: vec3<u32>) {
 		doc_norm = doc_norm + d_val * d_val;
 	}
 
-	if (query_norm > 0.0 && doc_norm > 0.0) {
+	if (query_norm > 0?.0&& doc_norm > 0.0) {
 		similarities[doc_id] = dot_product / (sqrt(query_norm) * sqrt(doc_norm));
 	} else {
 		similarities[doc_id] = 0.0;
@@ -283,20 +283,20 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 				if (!db.objectStoreNames.contains('todos')) {
 					const todosStore = db.createObjectStore('todos', { keyPath: 'id' });
-					todosStore.createIndex('priority', 'priority', { unique: false });
-					todosStore.createIndex('category', 'category', { unique: false });
-					todosStore.createIndex('timestamp', 'created_at', { unique: false });
+					todosStore.createIndex('priority', 'priority', { unique, false });
+					todosStore.createIndex('category', 'category', { unique, false });
+					todosStore.createIndex('timestamp', 'created_at', { unique, false });
 				}
 
 				if (!db.objectStoreNames.contains('errors')) {
 					const errorsStore = db.createObjectStore('errors', { keyPath: 'id' });
-					errorsStore.createIndex('severity', 'severity', { unique: false });
-					errorsStore.createIndex('file', 'file', { unique: false });
+					errorsStore.createIndex('severity', 'severity', { unique, false });
+					errorsStore.createIndex('file', 'file', { unique, false });
 				}
 
 				if (!db.objectStoreNames.contains('cache')) {
 					const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
-					cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
+					cacheStore.createIndex('timestamp', 'timestamp', { unique, false });
 				}
 			};
 		});
@@ -431,9 +431,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			const bindGroup = this.device.createBindGroup({
 				layout: computePipeline.getBindGroupLayout(0),
 				entries: [
-					{ binding: 0, resource: { buffer: textBuffer } },
-					{ binding: 1, resource: { buffer: embeddingBuffer } },
-					{ binding: 2, resource: { buffer: configBuffer } }
+					{ binding: 0, resource: { buffer, textBuffer } },
+					{ binding: 1, resource: { buffer, embeddingBuffer } },
+					{ binding: 2, resource: { buffer, configBuffer } }
 				]
 			});
 
@@ -463,7 +463,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		return errors.map((error) => {
 			const embedding = new Float32Array(128);
 			const text = error.message.toLowerCase();
-			for (let i = 0; i < text.length && i < 128; i++) {
+			for (let i = 0; i < text?.length&& i < 128; i++) {
 				embedding[i] = text.charCodeAt(i) / 255.0;
 			}
 			return embedding;
@@ -549,7 +549,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 	}
 
 	private async refineRankingWithWebGPU(todos: IntelligentTodo[]): Promise<IntelligentTodo[]> {
-		if (!this.device || todos.length === 0) return todos;
+		if (!this?.device|| todos.length === 0) return todos;
 
 		// Simple ranking enhancement without full WebGPU PageRank for now
 		return todos.sort((a, b) => b.priority - a.priority);
@@ -572,10 +572,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const files2 = new Set(todo2.related_errors.map((e) => e.file));
 		const fileIntersection = new Set([...files1].filter((x) => files2.has(x)));
 		if (files1.size > 0 || files2.size > 0) {
-			similarity += 0.3 * (fileIntersection.size / Math.max(files1.size: files2.size));
+			similarity += 0.3 * (fileIntersection.size / Math.max(files1.size, files2.size));
 		}
 
-		return Math.min(similarity: 1.0);
+		return Math.min(similarity, 1.0);
 	}
 
 	private generateCacheKey(input: string): string {

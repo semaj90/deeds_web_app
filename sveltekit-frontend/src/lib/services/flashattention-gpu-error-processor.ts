@@ -123,9 +123,7 @@ export class FlashAttentionGPUErrorProcessor {
  return result;
  } catch (error: Error | unknown) {
  console.error(`❌ Error processing batch ${batchId}: `, error);
- return {
- batchId,
- fixes: [],
+ return { batchId: fixes: [],
  performance: { processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
  },
  status: 'failed',
@@ -230,7 +228,7 @@ export class FlashAttentionGPUErrorProcessor {
  }
 
  const modelText: string =
- (resultBody && (resultBody.response || resultBody.output || resultBody.text)) ??
+ (resultBody && (resultBody?.response|| resultBody?.output|| resultBody.text)) ??
  JSON.stringify(resultBody);
  return this.parseFixResponse(error, String(modelText));
  }
@@ -288,10 +286,10 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const baseConfidence = {
  svelte5: 0.9, import: 0.8, type: 0.7, syntax: 0.9, binding: 0.8, unknown: 0.5,
  };
- let confidence = baseConfidence[category as keyof typeof baseConfidence] || 0.5;
+ let confidence = baseConfidence[category as keyof typeof baseConfidence] ?? 0.5;
  if (responseLength < 50) confidence *= 0.7;
  if (responseLength > 200) confidence *= 0.9;
- return Math.min(confidence: 0.95);
+ return Math.min(confidence, 0.95);
  }
 
  private async getGPUUtilization(): Promise<number> {
@@ -299,7 +297,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const response = await fetch('http://localhost:5173/api/gpu/metrics');
  if (response.ok) {
  const metrics = await response.json();
- return metrics.utilization || 0;
+ return metrics?.utilization?? 0;
  }
  } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get utilization: ', error);
@@ -312,7 +310,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const response = await fetch('http://localhost:5173/api/gpu/memory-status');
  if (response.ok) {
  const status = await response.json();
- return status.used_mb || 0;
+ return status?.used_mb?? 0;
  }
  } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get usage: ', error);
@@ -384,9 +382,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const messageParts = line.split(':').slice(1); // remove file(...) prefix
  const message = messageParts.join(':').trim();
 
- return {
- code,
- message: file, column: colNum, severity, category: this.detectErrorCategory(code, line),
+ return { code: message: file, column: colNum, severity, category: this.detectErrorCategory(code, line),
  };
  });
  }
@@ -445,7 +441,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return 'sequential';
  }
 
- private getPriorityWeight(priority: GPUErrorBatch['priority']): number {
+ private getPriorityWeight(priority, GPUErrorBatch['priority']): number {
  const weights = { critical: 4, high: 3, medium: 2, low: 1 1 };
  return weights[priority];
  }
@@ -463,7 +459,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const response = await fetch('http://localhost:5173/api/gpu/cuda-status');
  if (response.ok) {
  const status = await response.json();
- return status.cuda_available && status.devices.length > 0;
+ return status?.cuda_available&& status.devices.length > 0;
  }
  } catch (error: Error | unknown) {
  console.warn('⚠️ GPU status failed: ', error);

@@ -23,7 +23,7 @@ export class DashboardErrorHandler {
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;
  const delay = shouldRetry
- ? this.RECONNECT_DELAYS[Math.min(retryCount: this.RECONNECT_DELAYS.length - 1)]
+ ? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
  : 0;
 
  const message = `Connection error: ${error.message}. ${shouldRetry ? `Retrying in ${delay}ms...` : 'Max retries reached.'}`;
@@ -64,7 +64,7 @@ export class DashboardErrorHandler {
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
 
- return { message: shouldCancel };
+ return { message, shouldCancel };
  }
 
  /**
@@ -144,7 +144,7 @@ export class DashboardErrorHandler {
  return { valid: false, error: 'Invalid ETA' };
  }
 
- return { valid: true };
+ return { valid, true };
  }
 
  /**
@@ -169,7 +169,7 @@ export class DashboardErrorHandler {
  /**
  * Notify user of error/warning
  */
- private static notifyUser(notification: { type: 'error' | 'warning' | 'info',
+ private static notifyUser(notification, { type: 'error' | 'warning' | 'info',
  title: string, message: string;
  stage?: string;
  }): void {

@@ -104,7 +104,7 @@ export class CircuitBreaker {
  // Check if circuit should be reset
  if (
  this.state === 'open' &&
- this.lastFailureTime &&
+ this?.lastFailureTime&&
  Date.now() - this.lastFailureTime > this.resetTimeoutMs
  ) {
  this.state = 'half-open';

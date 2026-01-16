@@ -63,7 +63,7 @@ export class KnowledgeSearchStore {
     }
 
     get canUseWebSearch() {
-        return this.isGemini && this.useWebSearch;
+        return this?.isGemini&& this.useWebSearch;
     }
 
     get resultCount() {
@@ -119,18 +119,18 @@ export class KnowledgeSearchStore {
                             continue;
                         }
 
-                        throw new Error(errorData.error || `Search failed: ${response.statusText}`);
+                        throw new Error(errorData?.error|| `Search failed: ${response.statusText}`);
                     }
 
                     const data = await response.json();
                     this.results = data.results;
-                    this.synthesized = data.synthesized || '';
-                    this.webSources = data.webSources || [];
-                    this.searchUsed = data.searchUsed || false;
+                    this.synthesized = data?.synthesized?? '';
+                    this.webSources = data?.webSources|| [];
+                    this.searchUsed = data?.searchUsed|| false;
                     this.metadata = data.metadata;
 
                     // Show fallback message
-                    if (searchProvider !== this.provider && this.synthesizeEnabled) {
+                    if (searchProvider !== this?.provider&& this.synthesizeEnabled) {
                         this.error = `📝 Note: Using Ollama fallback (${this.provider} quota exceeded)`;
                     }
                     break;
@@ -210,12 +210,12 @@ export class KnowledgeSearchStore {
                 let buffer = '';
 
                 while (true) {
-                    const { done: value } = await reader.read();
+                    const { done, value } = await reader.read();
                     if (done) break;
 
-                    buffer += decoder.decode(value, { stream: true });
+                    buffer += decoder.decode(value, { stream, true });
                     const lines = buffer.split('\n\n');
-                    buffer = lines.pop() || '';
+                    buffer = lines.pop() ?? '';
 
                     for (const line of lines) {
                         const eventMatch = line.match(/^event: (.*)$/m);
@@ -225,7 +225,7 @@ export class KnowledgeSearchStore {
                             const event = eventMatch[1];
                             const data = JSON.parse(dataMatch[1]);
 
-                            yield { event: data };
+                            yield { event, data };
 
                             this.handleStreamEvent(event, data);
                         }

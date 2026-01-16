@@ -24,16 +24,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  return json({ success: false, error: 'Forbidden' }, { status: 403 });
  }
 
- const { id: caseId } = params;
+ const { id, caseId } = params;
 
  if (!caseId) {
  return json({ success: false, error: 'caseId is required' }, { status: 400 });
  }
 
  // Enqueue job
- const jobId = await jobQueueService.enqueueJob({
- caseId,
- type: 'summary_generation',
+ const jobId = await jobQueueService.enqueueJob({ caseId: type: 'summary_generation',
  data: {jobId: `job-${Date.now()}`,
  includeEvidence: true, includeTimeline: true,
  analysisDepth: 'comprehensive',

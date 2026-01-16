@@ -77,10 +77,10 @@ export async function checkLegalSearchHealth() {
  const health = result[0] as Record<string, boolean>;
 
  const allTablesExist =
- health.cases_exists &&
- health.crimes_exists &&
- health.case_chunks_exists &&
- health.laws_exists &&
+ health?.cases_exists&&
+ health?.crimes_exists&&
+ health?.case_chunks_exists&&
+ health?.laws_exists&&
  health.law_sections_exists;
 
  return {

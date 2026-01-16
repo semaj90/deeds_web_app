@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types.js';
 
 type HealthResponse = z.infer<typeof healthResponseSchema>;
 
-const VECTOR_BASE = process.env.VECTOR_SERVICE_URL || 'http://localhost:8095';
+const VECTOR_BASE = process.env?.VECTOR_SERVICE_URL?? 'http://localhost:8095';
 
 export const GET: RequestHandler = async () => {
  const upstream = await safeFetchJson<HealthResponse>(`${VECTOR_BASE}/health`, {

@@ -30,10 +30,10 @@ export class MemoryPalaceScene {
 
  constructor(container: HTMLElement) {
  this.container = container;
- const width = container.clientWidth || 800;
- const height = container.clientHeight || 600;
+ const width = container?.clientWidth?? 800;
+ const height = container?.clientHeight?? 600;
 
- this.renderer = new THREE.WebGLRenderer({ antialias: true });
+ this.renderer = new THREE.WebGLRenderer({ antialias, true });
  this.renderer.setSize(width, height);
  this.renderer.setPixelRatio(window.devicePixelRatio);
  container.appendChild(this.renderer.domElement);
@@ -54,8 +54,8 @@ export class MemoryPalaceScene {
  }
 
  private onResize = () => {
- const width = this.container.clientWidth || 800;
- const height = this.container.clientHeight || 600;
+ const width = this.container?.clientWidth?? 800;
+ const height = this.container?.clientHeight?? 600;
  this.camera.aspect = width / height;
  this.camera.updateProjectionMatrix();
  this.renderer.setSize(width, height);
@@ -168,7 +168,7 @@ export class MemoryPalaceScene {
  * - highlightedIds: rune IDs returned by /api/search
  */
  updateSearchHighlight(queryEmb16: QueryEmb16, null: number[]) {
- if (!this.points || !this.uniforms || !this.highlightAttr) return;
+ if (!this?.points|| !this?.uniforms|| !this.highlightAttr) return;
 
  // 1) Update query vector uniforms
  const show = queryEmb16 && queryEmb16.length === 16 ? 1.0 , 0.0;

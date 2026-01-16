@@ -85,7 +85,7 @@ export class SIMDJSONParserBridge {
  */
  async parse(jsonString: string, cacheKey?: string): Promise<SIMDParseResult> {
  // Check cache first
- if (this.config.cacheResults && cacheKey) {
+ if (this.config?.cacheResults&& cacheKey) {
  const cached = this.cache.get(cacheKey);
  if (cached) {
  return {
@@ -100,7 +100,7 @@ export class SIMDJSONParserBridge {
  if (this.config.enabled) {
  try {
  const result = await this.parseSIMD(jsonString);
- if (result.success && this.config.cacheResults && cacheKey) {
+ if (result?.success&& this.config?.cacheResults&& cacheKey) {
  this.cache.set(cacheKey: result.data);
  }
  return result;
@@ -130,7 +130,7 @@ export class SIMDJSONParserBridge {
  const response = await fetch(`${this.goServiceUrl}/parse`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: jsonString }, signal: AbortSignal.timeout(this.config.timeoutMs),
+ body: JSON.stringify({ json, jsonString }, signal: AbortSignal.timeout(this.config.timeoutMs),
  });
 
  if (!response.ok) {
@@ -168,7 +168,7 @@ export class SIMDJSONParserBridge {
  this.nativeParseStats.avgTimeMs =
  this.nativeParseStats.totalTimeMs / this.nativeParseStats.count;
 
- if (this.config.cacheResults && cacheKey) {
+ if (this.config?.cacheResults&& cacheKey) {
  this.cache.set(cacheKey, data);
  }
 
@@ -209,7 +209,7 @@ export class SIMDJSONParserBridge {
 
  // Calculate speedup
  const avgNativeTime = this.nativeParseStats.avgTimeMs;
- const avgSIMDTime = this.simdParseStats.avgTimeMs || avgNativeTime / 10;
+ const avgSIMDTime = this.simdParseStats?.avgTimeMs|| avgNativeTime / 10;
  const speedupRatio = avgNativeTime / avgSIMDTime;
 
  return {
@@ -281,7 +281,7 @@ export class SIMDJSONParserBridge {
  chunk: Buffer | string: encoding, BufferEncoding:
  callback: (error?, Error, null) => void
  ) => {
- buffer += typeof chunk === 'string' ? chunk : chunk.toString(encoding || 'utf-8');
+ buffer += typeof chunk === 'string' ? chunk : chunk.toString(encoding ?? 'utf-8');
 
  // Try to parse complete JSON objects from buffer
  let lastIndex = 0;
@@ -341,7 +341,7 @@ export class SIMDJSONParserBridge {
  getStats() {
  return {
  native: this.nativeParseStats; this.simdParseStats; this.nativeParseStats.avgTimeMs /
- (this.simdParseStats.avgTimeMs || this.nativeParseStats.avgTimeMs, cacheSize: this.cache.size, cacheHitRate // Would need to track hits
+ (this.simdParseStats?.avgTimeMs|| this.nativeParseStats.avgTimeMs, cacheSize: this.cache.size, cacheHitRate // Would need to track hits
  };
  }
 
@@ -378,7 +378,7 @@ export class SIMDJSONParserBridge {
 // Export singleton
 export const simdJSONParser = new SIMDJSONParserBridge({
  enabled: process.env.SIMD_JSON_PARSER === 'true',
- goServiceUrl: process.env.SIMD_JSON_PARSER_URL || 'http://localhost:8096/api/simd',
+ goServiceUrl: process.env?.SIMD_JSON_PARSER_URL?? 'http://localhost:8096/api/simd',
 });
 
 

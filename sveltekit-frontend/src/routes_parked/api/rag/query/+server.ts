@@ -5,7 +5,7 @@ import { ragCacheKey, cacheGetJSON, cacheSetJSON } from '$lib/server/rag/cache';
 
 const CACHE_TTL_SECONDS = 90;
 
-export const POST: RequestHandler = async ({ request: getClientAddress }) => {
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
  const started = Date.now();
 
  let body: any;
@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request: getClientAddress }) => {
 };
 
 export const GET: RequestHandler = async () => {
- return json({ ok: true });
+ return json({ ok, true });
 };
 
 

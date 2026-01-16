@@ -29,7 +29,7 @@ export interface OCROptions {
 export class OCRClient {
   private endpoint: string;
 
-  constructor(endpoint: string = 'http://localhost:8080/ocr') {
+  constructor(endpoint, string = 'http://localhost:8080/ocr') {
     this.endpoint = endpoint;
   }
 

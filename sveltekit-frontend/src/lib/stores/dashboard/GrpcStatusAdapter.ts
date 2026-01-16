@@ -90,7 +90,7 @@ export function normalizeEvent(rawEvent: unknown): ProcessingEvent | null {
  }
 
  return {
- ...event, status: event.status || getDefaultStatus(event.stage, details: event.details || '',
+ ...event, status: event?.status|| getDefaultStatus(event.stage, details: event?.details?? '',
  },
 }
 
@@ -106,7 +106,7 @@ function isValidStage(stage: string): stage is ProcessingEvent['stage'] {
  * Get default status message for stage
  */
 function getDefaultStatus(stage: string): string {
- return STAGE_MESSAGES[stage] || 'Processing…';
+ return STAGE_MESSAGES[stage] ?? 'Processing…';
 }
 
 /**
@@ -120,11 +120,11 @@ export function getStageLabelLabel(stage: string): string {
  * Get status message for stage
  */
 export function getStatusMessage(stage: string): string {
- return STAGE_MESSAGES[stage] || 'Processing…';
+ return STAGE_MESSAGES[stage] ?? 'Processing…';
 }
 
 /**
- * Format ETA as MM:SS
+ * Format ETA as MM | SS
  */
 export function formatETA(seconds: number): string {
  if (seconds < 0) {
@@ -153,7 +153,7 @@ export function getStageIcon(stage: string): string {
  granite_docling: '📄',
  tesseract_fallback: '⚠️',
  };
- return icons[stage] || '⚙️';
+ return icons[stage] ?? '⚙️';
 }
 
 /**
@@ -166,7 +166,7 @@ export function getPageStatusIcon(status: string): string {
  pending: '○',
  error: '✗',
  };
- return icons[status] || '?';
+ return icons[status] ?? '?';
 }
 
 /**
@@ -179,7 +179,7 @@ export function getPageStatusColor(status: string): string {
  pending: '#999999', // gray
  error: '#8b3a3a', // red
  };
- return colors[status] || '#999999';
+ return colors[status] ?? '#999999';
 }
 
 /**
@@ -231,7 +231,7 @@ export class GrpcStatusAdapter {
  } {
  return {
  label: getStageLabelLabel(event.stage),
- message: event.status || getStatusMessage(event.stage, icon: getStageIcon(event.stage),
+ message: event?.status|| getStatusMessage(event.stage, icon: getStageIcon(event.stage),
  };
  }
 

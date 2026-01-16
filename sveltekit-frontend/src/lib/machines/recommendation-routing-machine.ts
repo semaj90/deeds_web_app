@@ -174,15 +174,15 @@ export const recommendationRoutingMachine = setup({
 
 			const data = await response.json();
 			return {
-				routingKeys: data.routingKeys || [],
-				recommendedQueue: data.recommendedQueue || 'standard-priority',
-				recommendedModel: data.recommendedModel || 'gemma3-legal:latest'
+				routingKeys: data?.routingKeys|| [],
+				recommendedQueue: data?.recommendedQueue?? 'standard-priority',
+				recommendedModel: data?.recommendedModel?? 'gemma3-legal:latest'
 			};
 		}),
 
 		// Publish to RabbitMQ queue with streaming support
 		publishToQueue: fromPromise<
-			{ messageId: string },
+			{ messageId, string },
 			{
 				queue: string;
 				routingKeys: string[];
@@ -243,7 +243,7 @@ export const recommendationRoutingMachine = setup({
 		>(async ({ input }) => {
 			const { sessionId, caseId, currentDocument } = input;
 
-			const cacheKey = `recommendations:${sessionId}:${caseId || 'default'}:${currentDocument?.id || 'none'}`;
+			const cacheKey = `recommendations:${sessionId}:${caseId ?? 'default'}:${currentDocument?.id ?? 'none'}`;
 
 			const response = await fetch(`/api/cache/check?key=${encodeURIComponent(cacheKey)}`);
 
@@ -253,10 +253,10 @@ export const recommendationRoutingMachine = setup({
 
 			const data = await response.json();
 			return {
-				cacheHit: data.cacheHit || false,
-				hitRate: data.hitRate || 0,
+				cacheHit: data?.cacheHit|| false,
+				hitRate: data?.hitRate?? 0,
 				cachedData: data.cachedData,
-				keys: data.keys || []
+				keys: data?.keys|| []
 			};
 		}),
 
@@ -291,7 +291,7 @@ export const recommendationRoutingMachine = setup({
 					userId,
 					caseId,
 					document: currentDocument,
-					model: aiModels.currentModel || aiModels.primary,
+					model: aiModels?.currentModel|| aiModels.primary,
 					stream: true // Enable streaming
 				})
 			});
@@ -305,14 +305,12 @@ export const recommendationRoutingMachine = setup({
 
 			return {
 				recommendations: {
-					legal: data.legal || [],
-					documents: data.documents || [],
-					actions: data.actions || [],
-					risks: data.risks || []
+					legal: data?.legal|| [],
+					documents: data?.documents|| [],
+					actions: data?.actions|| [],
+					risks: data?.risks|| []
 				},
-				metrics: {
-					latency,
-					throughput: data.metrics?.throughput || 0,
+				metrics: { latency: throughput: data.metrics?.throughput ?? 0,
 					errorRate: data.metrics?.errorRate
 				}
 			};
@@ -330,7 +328,7 @@ export const recommendationRoutingMachine = setup({
 		>(async ({ input }) => {
 			const { sessionId, caseId, currentDocument, recommendations } = input;
 
-			const cacheKey = `recommendations:${sessionId}:${caseId || 'default'}:${currentDocument?.id || 'none'}`;
+			const cacheKey = `recommendations:${sessionId}:${caseId ?? 'default'}:${currentDocument?.id ?? 'none'}`;
 
 			const response = await fetch('/api/cache/store', {
 				method: 'POST',
@@ -347,7 +345,7 @@ export const recommendationRoutingMachine = setup({
 			}
 
 			const data = await response.json();
-			return { newKeys: data.keys || [cacheKey] };
+			return { newKeys: data?.keys|| [cacheKey] };
 		})
 	}
 }).createMachine({
@@ -449,7 +447,7 @@ export const recommendationRoutingMachine = setup({
 						target: 'cached',
 						actions: assign({
 							recommendations: ({ event }) =>
-								event.output.cachedData || {
+								event.output?.cachedData|| {
 									legal: [],
 									documents: [],
 									actions: [],
@@ -458,7 +456,7 @@ export const recommendationRoutingMachine = setup({
 							cache: ({ context, event }) => ({
 								...context.cache,
 								hitRate: event.output.hitRate,
-								redisKeys: event.output.keys || [],
+								redisKeys: event.output?.keys|| [],
 								lastUpdate: new Date()
 							})
 						})
@@ -476,7 +474,7 @@ export const recommendationRoutingMachine = setup({
 			invoke: {
 				src: 'publishToQueue',
 				input: ({ context }) => ({
-					queue: context.rabbitMQRouting.currentQueue || 'standard-priority',
+					queue: context.rabbitMQRouting?.currentQueue?? 'standard-priority',
 					routingKeys: context.rabbitMQRouting.routingKeys,
 					sessionId: context.sessionId,
 					userId: context.userId,
@@ -518,7 +516,7 @@ export const recommendationRoutingMachine = setup({
 							...context.processingMetrics,
 							averageLatency: event.output.metrics.latency,
 							throughput: event.output.metrics.throughput,
-							errorRate: event.output.metrics.errorRate || 0
+							errorRate: event.output.metrics?.errorRate?? 0
 						})
 					})
 				},

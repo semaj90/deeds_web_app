@@ -78,7 +78,7 @@ export class RecursiveEvidenceChainProcessor {
 		const startTime = performance.now();
 
 		// Base case: avoid infinite recursion or excessive depth
-		if (currentDepth >= this.maxDepth || this.visitedEvidence.has(rootEvidenceId)) {
+		if (currentDepth >= this?.maxDepth|| this.visitedEvidence.has(rootEvidenceId)) {
 			return {
 				evidenceId: rootEvidenceId,
 				depth: currentDepth,
@@ -139,9 +139,7 @@ export class RecursiveEvidenceChainProcessor {
 				relationships,
 				legalImplications,
 				confidence: this.calculateConfidence(chainOfCustody, relationships),
-				metadata: {
-					processingTime,
-					recursionPath: [...recursionPath, rootEvidenceId],
+				metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
 				}
 			};
@@ -194,7 +192,7 @@ export class RecursiveEvidenceChainProcessor {
 			}
 
 			const data = await response.json();
-			return data.chainOfCustody || [];
+			return data?.chainOfCustody|| [];
 		} catch (error: unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
 			console.warn(`Could not fetch chain of custody for ${evidenceId}:`, msg);
@@ -327,7 +325,7 @@ export class RecursiveEvidenceChainProcessor {
 			return chain1.some((entry1) =>
 				chain2.some(
 					(entry2) =>
-						entry1.officer_id === entry2.officer_id ||
+						entry1.officer_id === entry2?.officer_id||
 						Math.abs(new Date(entry1.timestamp).getTime() - new Date(entry2.timestamp).getTime()) <
 							3600000 // 1 hour
 				)
@@ -347,10 +345,10 @@ export class RecursiveEvidenceChainProcessor {
 			]);
 
 			const time1 = new Date(
-				data1.collectedAt || data1.uploadedAt || data1.createdAt || 0
+				data1?.collectedAt|| data1?.uploadedAt|| data1?.createdAt?? 0
 			).getTime();
 me2 = new Date(
-				data2.collectedAt || data2.uploadedAt || data2.createdAt || 0
+				data2?.collectedAt|| data2?.uploadedAt|| data2?.createdAt?? 0
 			).getTime();
 
 			if (!time1 || !time2) return false;
@@ -371,8 +369,8 @@ me2 = new Date(
 				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
 			]);
 
-			const loc1 = (data1.location || '').toString().toLowerCase();
-			const loc2 = (data2.location || '').toString().toLowerCase();
+			const loc1 = (data1?.location?? '').toString().toLowerCase();
+			const loc2 = (data2?.location?? '').toString().toLowerCase();
 
 			if (!loc1 || !loc2) return false;
 

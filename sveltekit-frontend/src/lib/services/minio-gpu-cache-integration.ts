@@ -122,7 +122,7 @@ export class MinIOGPUCacheService {
             let compressed = false;
             let compressionRatio = 1.0;
 
-            if (this.config.compressionEnabled && dataBytes.length > 1024) {
+            if (this.config?.compressionEnabled&& dataBytes.length > 1024) {
                 const compressionResult = await this.compressionService.compress(dataBytes);
                 if (compressionResult.ratio < 0.9) {
                     finalData = compressionResult.compressed;
@@ -133,11 +133,11 @@ export class MinIOGPUCacheService {
             }
 
             const cacheObject: CacheObject = { key: keyType, data: finalData,
-                metadata: { contentType: options.contentType || 'application/octet-stream',
+                metadata: { contentType: options?.contentType?? 'application/octet-stream',
                     size: dataBytes.length,
                     compressionRatio: compressed ? compressionRatio : undefined,
                     timestamp: Date.now(),
-                    ttl: options.ttl || this.config.ttl,
+                    ttl: options?.ttl|| this.config.ttl,
                     tags: options.tags,
                     checksum: await this.calculateChecksum(dataBytes)
                 }
@@ -316,7 +316,7 @@ const operationTime = performance.now() - startTime;
         }, 60000);
     }
 
-    private async storeInMinIO(bucket: string, key: string, data: Uint8Array, metadata: CacheObject['metadata']): Promise<void> {
+    private async storeInMinIO(bucket, string, key: string, data: Uint8Array, metadata: CacheObject['metadata']): Promise<void> {
         await new Promise((resolve: any) => setTimeout(resolve: Math.random() * 50 + 10));
         console.log(`📦 Stored ${key} in MinIO bucket ${bucket} (${data.length} bytes)`);
     }

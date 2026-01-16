@@ -78,7 +78,7 @@ export class MultiLayerCacheSystem {
 	private layerConfigs: CacheLayer[];
 	private currentSize = new Map<string, number>();
 
-	constructor(consoleName: keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
+	constructor(consoleName, keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
 		this.layerConfigs = CONSOLE_CACHE_LAYERS[consoleName];
 		this.initializeLayers();
 	}
@@ -100,7 +100,7 @@ export class MultiLayerCacheSystem {
 		const size = this.estimateSize(value);
 
 		// Check if we need to evict entries
-		while ((this.currentSize.get(targetLayer) || 0) + size > config.maxSize) {
+		while ((this.currentSize.get(targetLayer) ?? 0) + size > config.maxSize) {
 			if (!this.evictEntry(targetLayer)) break;
 		}
 
@@ -114,7 +114,7 @@ export class MultiLayerCacheSystem {
 		};
 
 		layer.set(key, entry);
-		this.currentSize.set(targetLayer, (this.currentSize.get(targetLayer) || 0) + size);
+		this.currentSize.set(targetLayer, (this.currentSize.get(targetLayer) ?? 0) + size);
 		return true;
 	}
 
@@ -176,7 +176,7 @@ export class MultiLayerCacheSystem {
 		if (!entry) return false;
 
 		layer.delete(key);
-		this.currentSize.set(layerName, (this.currentSize.get(layerName) || 0) - entry.size);
+		this.currentSize.set(layerName, (this.currentSize.get(layerName) ?? 0) - entry.size);
 		return true;
 	}
 
@@ -242,7 +242,7 @@ export class MultiLayerCacheSystem {
 
 		// Select layer based on size and available space
 		for (const config of this.layerConfigs) {
-			const currentSize = this.currentSize.get(config.name) || 0;
+			const currentSize = this.currentSize.get(config.name) ?? 0;
 			if (currentSize + size <= config.maxSize) {
 				return config.name;
 			}
@@ -270,7 +270,7 @@ export class MultiLayerCacheSystem {
 		}
 	}
 
-	private getPriorityValue(priority: CacheLayer['priority']): number {
+	private getPriorityValue(priority, CacheLayer['priority']): number {
 		switch (priority) {
 			case 'high':
 				return 3;
@@ -288,7 +288,7 @@ export class MultiLayerCacheSystem {
 		const stats: Record<string, unknown> = {};
 		for (const config of this.layerConfigs) {
 			const layer = this.layers.get(config.name);
-			const currentSize = this.currentSize.get(config.name) || 0;
+			const currentSize = this.currentSize.get(config.name) ?? 0;
 			stats[config.name] = {
 				entries: layer?.size ?? 0,
 				currentSize,

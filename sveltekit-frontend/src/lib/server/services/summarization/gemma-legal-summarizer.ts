@@ -27,7 +27,7 @@ export async function extractHolding(request: SummarizationRequest): Promise<Leg
  try {
  const response = await generateText(prompt, {
  temperature: 0.3, // Lower temp for consistency
- numPredict: request.maxTokens || 256,
+ numPredict: request?.maxTokens?? 256,
  });
 
  return parseHoldingResponse(response);
@@ -92,9 +92,9 @@ function parseHoldingResponse(response: string): LegalSummary {
  const parsed = JSON.parse(jsonMatch[0]);
 
  return {
- issue: parsed.issue || '',
- holding: parsed.holding || '',
- reasoning: parsed.reasoning || '',
+ issue: parsed?.issue?? '',
+ holding: parsed?.holding?? '',
+ reasoning: parsed?.reasoning?? '',
  citations: Array.isArray(parsed.citations) ? parsed.citations : [],
  confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
  };

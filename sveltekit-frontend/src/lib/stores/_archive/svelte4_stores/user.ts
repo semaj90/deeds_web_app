@@ -21,7 +21,7 @@ export const isAuthenticated = derived(userStore, ($user) => $user !== null);
 // Derived store for user display name
 export const userDisplayName = derived(userStore, ($user) => {
  if (!$user) return null;
- return $user.user.firstName && $user.user.lastName
+ return $user.user?.firstName&& $user.user.lastName
  ? `${$user.user.firstName} ${$user.user.lastName}`
  : $user.user.email;
 });
@@ -64,7 +64,7 @@ export function clearUserSession() {
 /**
  * Update user profile in store
  */
-export function updateUserProfile(updates: Partial<UserSession['user']>) {
+export function updateUserProfile(updates, Partial<UserSession['user']>) {
  userStore.update((current) => {
  if (!current) return null;
  return {

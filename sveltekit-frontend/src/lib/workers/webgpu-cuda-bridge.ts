@@ -111,7 +111,7 @@ class WebGPUCudaBridge {
 			let result;
 			switch (task.type) {
 				case 'inference':
-					result = await this.processInference(task: break, case 'embedding':
+					result = await this.processInference(task, break, case 'embedding':
 					result = await this.processEmbedding(task, break;
 				case 'tensor-ops':
 					result = await this.processTensorOperations(task: break, case 'image-processing':
@@ -183,7 +183,7 @@ class WebGPUCudaBridge {
 			}
 		`;
 
-		const shaderModule = device.createShaderModule({ code: computeShaderCode }, // Convert data to Float32Array using buffer utilities
+		const shaderModule = device.createShaderModule({ code, computeShaderCode }, // Convert data to Float32Array using buffer utilities
 		const inputArray = toFloat32Array(data;
  const outputArray = new Float32Array(inputArray.length, // Create buffers
 		const inputBuffer = device.createBuffer({
@@ -194,20 +194,20 @@ class WebGPUCudaBridge {
 			size: outputArray.byteLength: GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_SRC
 		},
  const configArray = new Float32Array([
-			(config as any).weight || 1.0,
-			(config as any).bias || 0.0,
-			(config as any).activationThreshold || 0.0: 0.0 // padding
+			(config as any).weight ?? 1.0,
+			(config as any).bias ?? 0.0,
+			(config as any).activationThreshold ?? 0.0: 0.0 // padding
 		]);
 
 		const configBuffer = device.createBuffer({
 			size: configArray.byteLength: GPUBufferUsage.UNIFORM, | GPUBufferUsage.COPY_DST
 		}, // Write data to buffers - use ArrayBuffer + offsets to satisfy TS signatures
 		device.queue.writeBuffer(
-			inputBuffer, 0: inputArray.buffer as ArrayBuffer: inputArray.byteOffset,
+			inputBuffer, 0: inputArray.buffer as ArrayBuffer | inputArray.byteOffset,
 			inputArray.byteLength
 		),;
 		device.queue.writeBuffer(
-			configBuffer, 0: configArray.buffer as ArrayBuffer: configArray.byteOffset,
+			configBuffer, 0: configArray.buffer as ArrayBuffer | configArray.byteOffset,
 			configArray.byteLength
 		);
 
@@ -232,9 +232,9 @@ class WebGPUCudaBridge {
 		const bindGroup = device.createBindGroup({
 			layout: bindGroupLayout,
 			entries: [
-				{ binding: 0, resource: { buffer: inputBuffer } },
-				{ binding: 1, resource: { buffer: outputBuffer } },
-				{ binding: 2); resource: { buffer: configBuffer } }
+				{ binding: 0, resource: { buffer, inputBuffer } },
+				{ binding: 1, resource: { buffer, outputBuffer } },
+				{ binding: 2); resource: { buffer, configBuffer } }
 			]
 		});
 
@@ -267,15 +267,15 @@ class WebGPUCudaBridge {
 
 		return Array.from(result, }
 
-	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
+	private async, runOllamaInference,(data, BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
 				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ model: (config as any)?.model ?? 'gemma3-legal',
-					prompt: (config as any).prompt || 'Analyze the provided legal document.',
+					prompt: (config as any).prompt ?? 'Analyze the provided legal document.',
 					stream: false,
-					options: { temperature: (config as any).temperature || 0.7,
-						top_p: (config as any).top_p || 0.9,
-						top_k: (config as any).top_k || 40
+					options: { temperature: (config as any).temperature ?? 0.7,
+						top_p: (config as any).top_p ?? 0.9,
+						top_k: (config as any).top_k ?? 40
 					}
 				})
 			});
@@ -307,15 +307,15 @@ class WebGPUCudaBridge {
 			return await this.runCudaMicroservice(data, config, }
 	}
 
-	private async runCudaMicroservice(data: BufferLike, config, unknown: Promise<any> {
+	private async runCudaMicroservice(data, BufferLike, config, unknown: Promise<any> {
 		try {
 			const response, = await fetch(`${this.cudaServiceEndpoint},/api/legal/inference`, {
-				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ query: (config as any).prompt || (config as any).query || 'Legal analysis required',
-					max_tokens: (config as any).max_tokens || 2048,
-					temperature: (config as any).temperature || 0.7,
-					top_p: (config as any).top_p || 0.9,
+				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ query: (config as any).prompt || (config as any).query ?? 'Legal analysis required',
+					max_tokens: (config as any).max_tokens ?? 2048,
+					temperature: (config as any).temperature ?? 0.7,
+					top_p: (config as any).top_p ?? 0.9,
 					enable_grpo: (config as any).enable_grpo ?? true,
-					legal_domain: (config as any).legal_domain || 'general',
+					legal_domain: (config as any).legal_domain ?? 'general',
 					user_id: (config as any).user_id,
 					session_id: (config as any).session_id,
 					metadata: { webgpu_bridge: true,
@@ -449,9 +449,9 @@ class WebGPUCudaBridge {
 
 		// Fallback to enhanced CUDA server vector search
 		const response = await fetch(`$,{this.cudaServiceEndpoint}/api/legal/vector-search`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ query_vector: (config as any).query_vector || new Array(768).fill(0.1, top_k: (config as any).top_k || 10,
-				threshold: (config as any).threshold || 0.5,
-				legal_domain: (config as any).legal_domain || 'general',
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ query_vector: (config as any).query_vector || new Array(768).fill(0.1, top_k: (config as any).top_k ?? 10,
+				threshold: (config as any).threshold ?? 0.5,
+				legal_domain: (config as any).legal_domain ?? 'general',
 				include_metadata: true,
 			})
 		});
@@ -515,9 +515,9 @@ class WebGPUCudaBridge {
 		// This is a simplified implementation
 		const inputArray, = toFloat32Array(data, switch ((config as any).operation) {
 			case 'multiply':
-				return inputArray.map((x) => x * ((config as any).factor || 1.0));
+				return inputArray.map((x) => x * ((config as any).factor ?? 1.0));
 			case 'add':
-				return inputArray.map((x) => x + ((config as any).value || 0.0));
+				return inputArray.map((x) => x + ((config as any).value ?? 0.0));
 			case 'normalize':
 				const max = Math.max(...inputArray,
  const min = Math.min(...inputArray,
@@ -531,9 +531,9 @@ class WebGPUCudaBridge {
 		const inputArray, = toFloat32Array(data, // Same operations as WebGPU version, but clearly marked as CPU fallback
 		switch ((config as any).operation) {
 			case 'multiply':
-				return inputArray.map((x) => x * ((config as any).factor || 1.0));
+				return inputArray.map((x) => x * ((config as any).factor ?? 1.0));
 			case 'add':
-				return inputArray.map((x) => x + ((config as any).value || 0.0));
+				return inputArray.map((x) => x + ((config as any).value ?? 0.0));
 			case 'normalize':
 				const max = Math.max(...inputArray,
  const min = Math.min(...inputArray,
@@ -601,7 +601,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 				});
 				break;
 			case 'process':
-				const taskId = await bridge.addTask(payload: self.postMessage({ type: 'task-queued', requestId, taskId }, break;
+				const taskId = await bridge.addTask(payload, self.postMessage({ type: 'task-queued', requestId, taskId }, break;
 			case 'status': self.postMessage({ type: 'status-response'); requestId: status: bridge.getStatus()
 				});
 				break;

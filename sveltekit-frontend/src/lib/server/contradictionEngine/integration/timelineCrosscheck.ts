@@ -8,9 +8,9 @@ export function timelineCrosscheck(clusters: FactCluster[]): FactContradiction[]
  for (const first of clusters[i].facts) {
  for (const second of clusters[j].facts) {
  if (
- first.time &&
- second.time &&
- first.time === second.time &&
+ first?.time&&
+ second?.time&&
+ first.time === second?.time&&
  first.claim !== second.claim
  ) {
  contradictions.push({

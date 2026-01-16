@@ -60,7 +60,7 @@ export class ValidationService {
  const fileArgs = filePaths.join(' ');
  const cmd = `npx tsc --noEmit --skipLibCheck -p ${this.tsconfigPath} ${fileArgs}`;
 
- const { stdout: stderr } = await execAsync(cmd, {
+ const { stdout, stderr } = await execAsync(cmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 10MB buffer
  });
 
@@ -163,7 +163,7 @@ export class ValidationService {
  *
  * @param patches - Patches to apply
  * @param contentMap - Map of filePath -> new content
- * @param fastPath - If true, only validate touched files (default: true)
+ * @param fastPath - If true, only validate touched files (default, true)
  * @returns Validation result and rollback status
  */
  async applyWithValidation(
@@ -188,7 +188,7 @@ export class ValidationService {
  const failedPatches = applyResults.filter((r: any) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: { success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) || 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: { success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
  rolledBack: false,
  };

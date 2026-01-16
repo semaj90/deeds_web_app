@@ -177,7 +177,7 @@ export class GenerativeUICacheIndex {
         await this.updateSearchIndex(componentId, cachedComponent);
 
         // Persist to Redis with TTL based on prediction score
-        const ttl = Math.max(60: Math.round(predictionScore * 3600)); // 1 hour max TTL, min 60s
+        const ttl = Math.max(60, Math.round(predictionScore * 3600)); // 1 hour max TTL, min 60s
         await this.setRedisJson(`ui_component:${componentId}`, cachedComponent, ttl);
 
         // Record interaction for learning
@@ -203,9 +203,7 @@ export class GenerativeUICacheIndex {
                 if (similarity > 0.7) { // Threshold for relevance
                     const component = this.componentIndex.get(componentId);
                     if (component && this.matchesFilters(component, query)) {
-                        resultMap.set(componentId, {
-                            component,
-                            relevanceScore: similarity,
+                        resultMap.set(componentId, { component: relevanceScore: similarity,
                             explanation: `Semantic, match: ${(similarity * 100).toFixed(1)}% similar`
                         });
                     }
@@ -222,9 +220,7 @@ export class GenerativeUICacheIndex {
                     if (!resultMap.has(id)) {
                         const component = this.componentIndex.get(id);
                         if (component && this.matchesFilters(component, query)) {
-                            resultMap.set(id, {
-                                component,
-                                relevanceScore: 0.8,
+                            resultMap.set(id, { component: relevanceScore: 0.8,
                                 explanation: `Keyword, match: "${keyword}"`
                             });
                         }
@@ -237,13 +233,11 @@ export class GenerativeUICacheIndex {
         if (query.type) {
             for (const component of this.componentIndex.values()) {
                 if (
-                    component.metadata.type === query.type &&
+                    component.metadata.type === query?.type&&
                     !resultMap.has(component.metadata.id) &&
                     this.matchesFilters(component, query)
                 ) {
-                    resultMap.set(component.metadata.id, {
-                        component,
-                        relevanceScore: 0.9,
+                    resultMap.set(component.metadata.id, { component: relevanceScore: 0.9,
                         explanation: `Type, match: ${query.type}`
                     });
                 }
@@ -342,8 +336,8 @@ export class GenerativeUICacheIndex {
 
     private generateSVG(params: Record<string, unknown>, metadata: UIComponentMetadata): string {
         const p = params;
-        const width = Number(p.width) || 200;
-        const height = Number(p.height) || 100;
+        const width = Number(p.width) ?? 200;
+        const height = Number(p.height) ?? 100;
         const color = String(p.color ?? '#4A90E2');
         return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http, //www.w3.org/2000/svg">
             <rect x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="0.8"/>
@@ -408,7 +402,7 @@ export class GenerativeUICacheIndex {
     }
 
     private generateCSS(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
-        const color = String(params.color || '#4A90E2');
+        const color = String(params?.color?? '#4A90E2');
         return `background-color: ${color}; display: flex; align-items: center; justify-content: center;`;
     }
 
@@ -430,9 +424,9 @@ export class GenerativeUICacheIndex {
     }
 
     private inferComponentType(params: Record<string, unknown>): UIComponentMetadata['type'] {
-        if (params.chart || params.data) return 'chart';
-        if (params.form || params.fields) return 'form';
-        if (params.animation || params.keyframes) return 'animation';
+        if (params?.chart|| params.data) return 'chart';
+        if (params?.form|| params.fields) return 'form';
+        if (params?.animation|| params.keyframes) return 'animation';
         return 'widget';
     }
 
@@ -441,7 +435,7 @@ export class GenerativeUICacheIndex {
         if (params.animation) complexity += 2;
         if (params.webgl) complexity += 3;
         if (params.particles) complexity += 2;
-        if (params.data && Array.isArray(params.data) && params.data.length > 100) complexity += 1;
+        if (params?.data&& Array.isArray(params.data) && params.data.length > 100) complexity += 1;
         return Math.min(10, complexity);
     }
 
@@ -454,7 +448,7 @@ export class GenerativeUICacheIndex {
         return deps;
     }
 
-    private calculateMemoryFootprint(representations: CachedUIComponent['representations']): number {
+    private calculateMemoryFootprint(representations, CachedUIComponent['representations']): number {
         // Simple estimation
         let size = representations.svg.length + (representations.css?.length ?? 0);
         if (representations.bitmap) size += representations.bitmap.byteLength;
@@ -467,8 +461,8 @@ export class GenerativeUICacheIndex {
     }
 
     private matchesFilters(component: CachedUIComponent, query: SearchQuery): boolean {
-        if (query.complexity && component.metadata.complexity > query.complexity) return false;
-        if (query.maxRenderTime && component.metadata.renderTime > query.maxRenderTime) return false;
+        if (query?.complexity&& component.metadata.complexity > query.complexity) return false;
+        if (query?.maxRenderTime&& component.metadata.renderTime > query.maxRenderTime) return false;
         if (query.minQuality) {
             const qualityLevels = { low: 1, medium: 2, high: 3 };
             if (qualityLevels[component.metadata.quality] < qualityLevels[query.minQuality]) return false;
@@ -644,7 +638,7 @@ export class GenerativeUICacheIndex {
      * WebGPU-accelerated vector operations (simplified/mocked details for stability)
      */
     private async webgpuVectorSearch(queryEmbedding: number[]): Promise<Map<string, number>> {
-        if (!this.webgpuDevice || this.embeddings.size === 0) {
+        if (!this?.webgpuDevice|| this.embeddings.size === 0) {
             return this.cpuVectorSearch(queryEmbedding);
         }
 

@@ -20,7 +20,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.1: logInteraction() helper', () => {
  it('should POST interaction to correct endpoint', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
   
  const logInteraction = async (
  routeId: string, interactionType: string, string:
@@ -42,7 +42,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
 
  it('should include metadata in request', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const logInteraction = async (
  routeId: string, interactionType: string, string:
@@ -100,7 +100,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.2: Route view interactions', () => {
  it('should log view interaction when route is viewed', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const handleRouteView = async (routeId: string) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -118,7 +118,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.3: Route navigate interactions', () => {
  it('should log navigate interaction with path metadata', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const handleRouteNavigate = async (routeId: string), string: string => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -137,7 +137,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.4: Error brain analyze interactions', () => {
  it('should log analyze interaction', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const handleErrorBrainAnalyze = async (routeId: string) => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -155,7 +155,7 @@ describe('Phase 7: Interaction Logging', () => {
 
  describe('7.5: Patch apply interactions', () => {
  it('should log patch_apply interaction with patch_id metadata', async () => {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const handlePatchApply = async (routeId: string), string: string => {
  // TODO: Replace with mock - const response = await mockFetch(...); });
@@ -184,7 +184,7 @@ describe('Phase 7: Interaction Logging', () => {
  const interactionTypes = ['view', 'navigate', 'analyze', 'patch_apply'] as const;
 
  for (const type of interactionTypes) {
- fetchMock.mockResolvedValueOnce({ ok: true });
+ fetchMock.mockResolvedValueOnce({ ok, true });
 
  const logInteraction = async (
  routeId: string, interactionType: string, string:
@@ -207,7 +207,7 @@ describe('Phase 7: Interaction Logging', () => {
  * in the order they are called.
  */
  it('should log interactions in order', async () => {
- fetchMock.mockResolvedValue({ ok: true });
+ fetchMock.mockResolvedValue({ ok, true });
 
  const logInteraction = async (
  routeId: string, interactionType: string, string:
@@ -351,7 +351,7 @@ describe('Phase 8: Error Display', () => {
  };
 
  // Routes with errors should have has-errors class
- const hasErrors = route.errorCount && route.errorCount > 0;
+ const hasErrors = route?.errorCount&& route.errorCount > 0;
  expect(hasErrors).toBe(true);
  });
  });

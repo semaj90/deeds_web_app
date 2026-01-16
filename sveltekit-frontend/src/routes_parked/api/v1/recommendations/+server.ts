@@ -25,9 +25,7 @@ export const GET: RequestHandler = async ({ url }) => {
  confidence: 0.4,
  }] as const;
 
- return json({
- data,
- pagination: {
+ return json({ data: pagination: {
  page,
  limit,
  total: data.length,

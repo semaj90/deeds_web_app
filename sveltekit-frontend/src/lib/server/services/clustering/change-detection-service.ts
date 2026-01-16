@@ -55,9 +55,7 @@ export async function detectChanges(
  ? `⚠️ Significant clustering change detected: ${(changePercentage * 100).toFixed(1)}% of statutes changed labels (${changedCount}/${totalCount})`
  : `✓ Clustering update: ${(changePercentage * 100).toFixed(1)}% change (${changedCount}/${totalCount} statutes)`;
 
- return {
- changePercentage,
- changedStatutes: newLabels,
+ return { changePercentage: changedStatutes: newLabels,
  previousLabels,
  shouldAlert,
  alertMessage,
@@ -246,8 +244,8 @@ export function exportChangeDataAsCSV(result: ChangeDetectionResult): string {
  const rows = [['Statute ID', 'Previous Label', 'Current Label', 'Changed']];
 
  for (const statuteId of result.changedStatutes) {
- const previousLabel = result.previousLabels.get(statuteId) || 'N/A';
- const currentLabel = result.newLabels.get(statuteId) || 'N/A';
+ const previousLabel = result.previousLabels.get(statuteId) ?? 'N/A';
+ const currentLabel = result.newLabels.get(statuteId) ?? 'N/A';
  rows.push([statuteId, previousLabel, currentLabel, 'Yes']);
  }
 

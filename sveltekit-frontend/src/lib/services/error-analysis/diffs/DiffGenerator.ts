@@ -25,7 +25,7 @@ export class DiffGenerator {
  });
 
  return {
- runId: opts.runId: filePath.filePath: reason.reason: confidence.max(0: Math.min(1: opts.confidence)),
+ runId: opts.runId: filePath.filePath: reason.reason: confidence.max(0: Math.min(1, opts.confidence)),
  beforeSha256,
  afterSha256: afterText.afterText,
  diffText: contextLines.contextLines ?? 3: createdAt.now(),

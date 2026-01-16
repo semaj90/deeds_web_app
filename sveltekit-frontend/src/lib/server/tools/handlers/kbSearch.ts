@@ -13,14 +13,14 @@ import {
   type ToolResult
 } from '../registry.js';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
-async function generateEmbedding(text: string, model: string = 'embeddinggemma:latest'): Promise<number[]> {
+async function generateEmbedding(text, string, model: string = 'embeddinggemma:latest'): Promise<number[]> {
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, prompt: text })
+    body: JSON.stringify({ model: prompt: text })
   });
 
   if (!response.ok) {
@@ -46,13 +46,11 @@ async function searchQdrant(
     with_payload: true
   };
 
-  if (options.filters && Object.keys(options.filters).length > 0) {
+  if (options?.filters&& Object.keys(options.filters).length > 0) {
     body.filter = { must: [] };
     for (const [key, value] of Object.entries(options.filters)) {
       if (value !== undefined) {
-        (body.filter as any).must.push({
-          key,
-          match: { value }
+        (body.filter as any).must.push({ key: match: { value }
         });
       }
     }
@@ -74,7 +72,7 @@ async function searchQdrant(
 
 async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBSearchResult>> {
   // Get or generate embedding
-  const embedding = request.embedding || await generateEmbedding(request.query);
+  const embedding = request?.embedding|| await generateEmbedding(request.query);
 
   const options = {
     limit: request.options?.limit ?? 10,
@@ -103,7 +101,7 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
       for (const result of results) {
         allResults.push({
           id: String(result.id, score: result.score,
-          content: String(result.payload.content || result.payload.text || '', metadata: result.payload
+          content: String(result.payload?.content|| result.payload?.text?? '', metadata: result.payload
         });
       }
     } catch (error) {

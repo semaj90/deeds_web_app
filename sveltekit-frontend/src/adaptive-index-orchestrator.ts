@@ -57,7 +57,7 @@ export class AdaptiveIndexOrchestrator {
 
 	constructor() {
 		this.ollamaUrl = getOllamaEndpoint();
-		this.qdrantUrl = process.env.QDRANT_URL || 'http://localhost:6333';
+		this.qdrantUrl = process.env?.QDRANT_URL?? 'http://localhost:6333';
 	}
 
 	/**
@@ -156,7 +156,7 @@ Predict optimal routing probabilities as JSON:
 		item: EmbeddingOrchestrationPayload,
 		embedding: number[]
 	): Promise<void> {
-		const collectionName = process.env.QDRANT_COLLECTION_NAME || 'legal_docs';
+		const collectionName = process.env?.QDRANT_COLLECTION_NAME?? 'legal_docs';
 		const qdrantUpsertUrl = `${this.qdrantUrl}/collections/${collectionName}/points?wait=true`;
 
 		try {
@@ -246,7 +246,7 @@ Predict optimal routing probabilities as JSON:
 		// Store embedding if generated
 		if (embedding) {
 			// Store in Qdrant if configured
-			if (routingDecision.useQdrantForStorage > 0.5 || process.env.ENABLE_QDRANT_UPSERT === 'true') {
+			if (routingDecision.useQdrantForStorage > 0?.5|| process.env.ENABLE_QDRANT_UPSERT === 'true') {
 				try {
 					await this.upsertToQdrant(item, embedding);
 				} catch (e) {

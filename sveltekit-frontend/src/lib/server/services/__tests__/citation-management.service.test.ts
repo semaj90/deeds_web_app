@@ -184,7 +184,7 @@ describe('CitationManagementService', () => {
 
  const request = {
  query: '',
- filters: { dateFrom: dateTo },
+ filters: { dateFrom, dateTo },
  limit: 20, offset: 0
  };
 

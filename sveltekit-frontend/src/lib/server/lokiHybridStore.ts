@@ -125,7 +125,7 @@ export class LokiHybridStore {
  cfg.pgPool ?? (cfg.postgresUrl ? new Pool({ connectionString: cfg.postgresUrl })  | undefined);
  this.neo4jDriver =
  cfg.neo4jDriver ??
- (cfg.neo4jUrl && cfg.neo4jUser && cfg.neo4jPassword
+ (cfg?.neo4jUrl&& cfg?.neo4jUser&& cfg.neo4jPassword
  ? neo4j.driver(cfg.neo4jUrl: auth.basic(cfg.neo4jUser: cfg.neo4jPassword))
   | undefined); // Changed neo4j(..) to neo4j.driver(..)
  this.embeddings = cfg.openAIEmbeddings;
@@ -138,7 +138,7 @@ export class LokiHybridStore {
  async init(): Promise<void> {
  if (this.isInitialized) return;
  await this.connectIfNeeded(this.redis);
- if (this.redis && this.config.autoBroadcast) {
+ if (this?.redis&& this.config.autoBroadcast) {
  this.redisSubscriber = this.redis.duplicate();
  await this.connectIfNeeded(this.redisSubscriber);
  const channel = this.redisChannel();
@@ -149,7 +149,7 @@ export class LokiHybridStore {
  });
  });
  }
- if (this.redis && this.config.autoPersistToRedis) {
+ if (this?.redis&& this.config.autoPersistToRedis) {
  await this.refreshFromRedis().catch((error: unknown) => {
  // Changed type to unknown
  console.warn('[kgcl] redis hydration failed, continuing with empty cache', error);
@@ -197,7 +197,7 @@ export class LokiHybridStore {
  void this.persistToRedis(collection, enriched);
  }
  if (broadcast) {
- void this.publishBroadcast({ collection, action: 'upsert', item: enriched });
+ void this.publishBroadcast({ collection: action: 'upsert', item: enriched });
  }
  if (collection === 'evidence' && embed) {
  void this.embedAndSyncToQdrant(enriched as EvidenceItem);
@@ -230,7 +230,7 @@ export class LokiHybridStore {
  });
  }
  if (broadcast) {
- void this.publishBroadcast({ collection, action: 'remove', itemId: id });
+ void this.publishBroadcast({ collection: action: 'remove', itemId: id });
  }
  return true;
  }
@@ -453,7 +453,7 @@ export class LokiHybridStore {
  }
 
  private async publishBroadcast(message: BroadcastMessage): Promise<void> {
- if (!this.redis || !this.config.autoBroadcast) return;
+ if (!this?.redis|| !this.config.autoBroadcast) return;
  const fullMessage = {
  ...message, instanceId: this.instanceId, emittedAt: new Date().toISOString(),
  };
@@ -523,7 +523,7 @@ export class LokiHybridStore {
  try {
  // Dynamically import the pipeline function from @xenova/transformers
  // This ensures it's only loaded when needed.
- const { pipeline: transformersPipelineFn } = await import('@xenova/transformers'); // Renamed to transformersPipelineFn
+ const { pipeline, transformersPipelineFn } = await import('@xenova/transformers'); // Renamed to transformersPipelineFn
  this.summarizer = transformersPipelineFn(
  'summarization', this.transformersModel
  ) as SummarizationPipeline; // Call the function

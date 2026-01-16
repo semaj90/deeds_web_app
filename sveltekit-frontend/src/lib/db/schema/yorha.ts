@@ -22,15 +22,15 @@ export const yorhaCases = pgTable('yorha_cases', {
  priority: varchar('priority', { length: 20 }).notNull().default('medium'),
  caseType: varchar('case_type', { length: 100 }),
  jurisdiction: varchar('jurisdiction', { length: 200 }),
- filedDate: timestamp('filed_date', { withTimezone: true }),
- closedDate: timestamp('closed_date', { withTimezone: true }),
+ filedDate: timestamp('filed_date', { withTimezone, true }),
+ closedDate: timestamp('closed_date', { withTimezone, true }),
  createdBy: uuid('created_by')
  .notNull()
  .references(() => users.id),
  assignedTo: uuid('assigned_to').references(() => users.id),
  metadata: jsonb('metadata'),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
 });
 
 export const yorhaEvidenceNodes = pgTable('yorha_evidence_nodes', {
@@ -46,7 +46,7 @@ export const yorhaEvidenceNodes = pgTable('yorha_evidence_nodes', {
  color: varchar('color', { length: 20 }).default('blue'),
  icon: varchar('icon', { length: 100 }),
  source: varchar('source', { length: 500 }),
- dateCollected: timestamp('date_collected', { withTimezone: true }),
+ dateCollected: timestamp('date_collected', { withTimezone, true }),
  relevanceScore: integer('relevance_score').default(0),
  filePath: varchar('file_path', { length: 1000 }),
  fileType: varchar('file_type', { length: 100 }),
@@ -58,8 +58,8 @@ export const yorhaEvidenceNodes = pgTable('yorha_evidence_nodes', {
  createdBy: uuid('created_by')
  .notNull()
  .references(() => users.id),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
 });
 
 export const yorhaEvidenceConnections = pgTable('yorha_evidence_connections', {
@@ -81,8 +81,8 @@ export const yorhaEvidenceConnections = pgTable('yorha_evidence_connections', {
  createdBy: uuid('created_by')
  .notNull()
  .references(() => users.id),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
 });
 
 export const yorhaChatSessions = pgTable('yorha_chat_sessions', {
@@ -96,9 +96,9 @@ export const yorhaChatSessions = pgTable('yorha_chat_sessions', {
  contextId: uuid('context_id'),
  status: varchar('status', { length: 50 }).notNull().default('active'),
  messageCount: integer('message_count').default(0),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
- lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
+ lastMessageAt: timestamp('last_message_at', { withTimezone, true }),
 });
 
 export const yorhaChatMessages = pgTable('yorha_chat_messages', {
@@ -112,8 +112,8 @@ export const yorhaChatMessages = pgTable('yorha_chat_messages', {
  referencedEvidence: jsonb('referenced_evidence'),
  modelUsed: varchar('model_used', { length: 100 }),
  tokensUsed: integer('tokens_used'),
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
 });
 
 export const yorhaSystemMetrics = pgTable('yorha_system_metrics', {
@@ -134,7 +134,7 @@ export const yorhaSystemMetrics = pgTable('yorha_system_metrics', {
  systemHealth: varchar('system_health', { length: 50 }).default('healthy'),
  activeCases: integer('active_cases').default(0),
  activeSessions: integer('active_sessions').default(0),
- recordedAt: timestamp('recorded_at', { withTimezone: true }).notNull().defaultNow(),
+ recordedAt: timestamp('recorded_at', { withTimezone, true }).notNull().defaultNow(),
 });
 
 

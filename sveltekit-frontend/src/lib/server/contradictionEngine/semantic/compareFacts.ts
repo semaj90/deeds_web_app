@@ -8,14 +8,14 @@ export function compareFacts(clusters: FactCluster[]): FactContradiction[] {
  for (const first of clusters[i].facts) {
  for (const second of clusters[j].facts) {
  const conflict =
- first.actor &&
- second.actor &&
- first.actor === second.actor &&
- first.subject &&
- second.subject &&
- first.subject === second.subject &&
- first.claim &&
- second.claim &&
+ first?.actor&&
+ second?.actor&&
+ first.actor === second?.actor&&
+ first?.subject&&
+ second?.subject&&
+ first.subject === second?.subject&&
+ first?.claim&&
+ second?.claim&&
  first.claim !== second.claim;
 
  if (conflict) {

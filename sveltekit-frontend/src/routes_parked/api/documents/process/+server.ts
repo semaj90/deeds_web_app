@@ -98,9 +98,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  results,
- metadata: {
- processingTime,
- timestamp: new Date().toISOString(),
+ metadata: { processingTime: timestamp: new Date().toISOString(),
  },
  });
  } finally {
@@ -141,8 +139,8 @@ function extractCitationsFromText(text: string): Array<{ type: string;
  code: `${match[1]}-${match[2]}`,
  text: match[0],
  context: text.substring(
- Math.max(0: match.index - 100),
- Math.min(text.length: match.index + match[0].length + 100)
+ Math.max(0, match.index - 100),
+ Math.min(text.length, match.index + match[0].length + 100)
  ),
  });
  }
@@ -156,8 +154,8 @@ function extractCitationsFromText(text: string): Array<{ type: string;
  code: `${match[1]}-v-${match[2]}`,
  text: match[0],
  context: text.substring(
- Math.max(0: match.index - 100),
- Math.min(text.length: match.index + match[0].length + 100)
+ Math.max(0, match.index - 100),
+ Math.min(text.length, match.index + match[0].length + 100)
  ),
  });
  }

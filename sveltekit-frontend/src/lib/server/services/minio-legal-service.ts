@@ -1,9 +1,9 @@
 import { Client } from 'minio';
 import { env } from '$lib/env';
 
-const MINIO_ENDPOINT = env.MINIO_ENDPOINT || 'localhost:9000';
-const MINIO_ACCESS_KEY = env.MINIO_ACCESS_KEY || 'minioadmin';
-const MINIO_SECRET_KEY = env.MINIO_SECRET_KEY || 'minioadmin';
+const MINIO_ENDPOINT = env?.MINIO_ENDPOINT?? 'localhost:9000';
+const MINIO_ACCESS_KEY = env?.MINIO_ACCESS_KEY?? 'minioadmin';
+const MINIO_SECRET_KEY = env?.MINIO_SECRET_KEY?? 'minioadmin';
 const MINIO_USE_SSL = env.MINIO_USE_SSL === 'true' ? true : false;
 
 const BUCKET_LAWS = 'minio_bucket_laws';
@@ -19,7 +19,7 @@ function getMinioClient(): Client {
  if (!minioClient) {
  minioClient = new Client({
  endPoint: MINIO_ENDPOINT.split(':')[0],
- port: parseInt(MINIO_ENDPOINT.split(':')[1] || '9000', useSSL: MINIO_USE_SSL, accessKey: MINIO_ACCESS_KEY,
+ port: parseInt(MINIO_ENDPOINT.split(':')[1] ?? '9000', useSSL: MINIO_USE_SSL, accessKey: MINIO_ACCESS_KEY,
  secretKey: MINIO_SECRET_KEY,
  });
  }
@@ -72,7 +72,7 @@ export async function uploadRawPDF(
  const client = getMinioClient();
  const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }/${ fileName }`;
 
- await client.putObject(BUCKET_LAWS: key.length, {
+ await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',
  });
 
@@ -96,7 +96,7 @@ export async function uploadParsedText(
  const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }.txt`;
  const buffer = Buffer.from(text, 'utf-8');
 
- await client.putObject(BUCKET_LAWS_PARSED: key.length, {
+ await client.putObject(BUCKET_LAWS_PARSED, key.length, {
  'Content-Type': 'text/plain',
  });
 
@@ -120,7 +120,7 @@ export async function uploadMetadata(
  const key = `${jurisdiction}/${ codeAbbrev }/${sectionNumber}.json`;
  const buffer = Buffer.from(JSON.stringify(metadata, null, 2), 'utf-8');
 
- await client.putObject(BUCKET_LAWS_METADATA: key.length, {
+ await client.putObject(BUCKET_LAWS_METADATA, key.length, {
  'Content-Type': 'application/json',
  });
 
@@ -144,7 +144,7 @@ export async function uploadCaseChunk(
  const client = getMinioClient();
  const key = `cases/${jurisdiction}/${caseId}/chunk_${chunkIndex}/${ fileName }`;
 
- await client.putObject(BUCKET_LAWS: key.length, {
+ await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',
  });
 

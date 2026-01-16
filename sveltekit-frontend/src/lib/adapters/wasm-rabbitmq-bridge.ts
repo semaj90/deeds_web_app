@@ -105,7 +105,7 @@ async function enhanceMessageWithWASM(
   const floatView = new Float32Array(wasmMemory.buffer);
 
   try {
-    if (enhanced.embeddings && Array.isArray(enhanced.embeddings)) {
+    if (enhanced?.embeddings&& Array.isArray(enhanced.embeddings)) {
       console.log('🔧 Normalizing embeddings with WASM...');
       const embeddings = new Float32Array(enhanced.embeddings as number[]);
       const length = embeddings.length;
@@ -215,29 +215,29 @@ export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): 
         });
       }
     },
-    { batchNormalization: true }
+    { batchNormalization, true }
   );
   worker.registerHandler('legal.chunks.embed', vectorEmbeddingHandler);
 
   const similarityHandler = createWASMHandler(
     async (message: unknown) => {
       const msg = message as Record<string, unknown>;
-      console.log(`🔍 WASM-accelerated similarity search: ${msg.queryId || 'unknown'}`);
-      if (msg.queryVector && msg.candidateVectors) {
+      console.log(`🔍 WASM-accelerated similarity search: ${msg?.queryId?? 'unknown'}`);
+      if (msg?.queryVector&& msg.candidateVectors) {
         const similarities = await computeVectorSimilarityWASM(
           msg.queryVector as number[],
           msg.candidateVectors as number[][],
-          (msg.algorithm as 'cosine' | 'euclidean' | 'dot' | 'manhattan') || 'cosine'
+          (msg.algorithm as 'cosine' | 'euclidean' | 'dot' | 'manhattan') ?? 'cosine'
         );
         await worker.publishMessage('legal.search.results', {
           ...msg,
           similarities,
           wasmAccelerated: true,
-          processingTime: performance.now() - ((msg.timestamp as number) || 0),
+          processingTime: performance.now() - ((msg.timestamp as number) ?? 0),
         });
       }
     },
-    { vectorSimilarity: true }
+    { vectorSimilarity, true }
   );
   worker.registerHandler('legal.similarity.compute', similarityHandler);
 
@@ -249,9 +249,7 @@ export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): 
  */
 export function getBridgeStatus(): { wasmReady: boolean; wasmModuleLoaded: boolean; timestamp: number; capabilities: string[];
 } {
-  return {
-    wasmReady,
-    wasmModuleLoaded: wasmModule !== null,
+  return { wasmReady: wasmModuleLoaded: wasmModule !== null,
     timestamp: Date.now(),
     capabilities: wasmReady
       ? ['vector_normalization', 'batch_processing', 'similarity_computation', 'tensor_operations']

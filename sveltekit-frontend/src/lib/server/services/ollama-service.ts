@@ -18,7 +18,7 @@ export default {
  throw new Error(`Ollama query failed: ${response.statusText}`);
  }
  const result = await response.json();
- return result.response || '';
+ return result?.response?? '';
  } catch (error) {
  console.error('Ollama query error:', error);
  throw error;

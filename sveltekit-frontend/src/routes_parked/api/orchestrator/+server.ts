@@ -35,9 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  if (action === 'start') {
  const id = generateUuidV4();
- workflows[id] = {
- id,
- state: 'running',
+ workflows[id] = { id: state: 'running',
  createdAt: new Date().toISOString(),
  };
  return json({ success: true, workflowId: id });

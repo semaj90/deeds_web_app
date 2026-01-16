@@ -153,16 +153,16 @@ export function createCrewAIOrchestrationStore() {
  const isFailed$ = machineState(state$, (s) => s.matches('failed'));
 
  // Context subscribers
- const activeAgents$ = machineContext(state$, (ctx: any) => ctx.activeAgents || []);
- const agentResponses$ = machineContext(state$, (ctx: any) => ctx.agentResponses || []);
- const recommendations$ = machineContext(state$, (ctx: any) => ctx.currentRecommendations || []);
- const failedAgents$ = machineContext(state$, (ctx: any) => ctx.failedAgents || []);
- const qualityScore$ = machineContext(state$, (ctx: any) => ctx.qualityScore || 0);
- const processingTime$ = machineContext(state$, (ctx: any) => ctx.processingTime || 0);
- const orchestrationError$ = machineContext(state$, (ctx: any) => ctx.lastError || null);
- const retryCount$ = machineContext(state$, (ctx: any) => ctx.retryCount || 0);
- const currentTask$ = machineContext(state$, (ctx: any) => ctx.currentTask || null);
- const userIntent$ = machineContext(state$, (ctx: any) => ctx.userIntent || 'idle');
+ const activeAgents$ = machineContext(state$, (ctx: any) => ctx?.activeAgents|| []);
+ const agentResponses$ = machineContext(state$, (ctx: any) => ctx?.agentResponses|| []);
+ const recommendations$ = machineContext(state$, (ctx: any) => ctx?.currentRecommendations|| []);
+ const failedAgents$ = machineContext(state$, (ctx: any) => ctx?.failedAgents|| []);
+ const qualityScore$ = machineContext(state$, (ctx: any) => ctx?.qualityScore?? 0);
+ const processingTime$ = machineContext(state$, (ctx: any) => ctx?.processingTime?? 0);
+ const orchestrationError$ = machineContext(state$, (ctx: any) => ctx?.lastError?? null);
+ const retryCount$ = machineContext(state$, (ctx: any) => ctx?.retryCount?? 0);
+ const currentTask$ = machineContext(state$, (ctx: any) => ctx?.currentTask?? null);
+ const userIntent$ = machineContext(state$, (ctx: any) => ctx?.userIntent?? 'idle');
 
  return {
  state$,

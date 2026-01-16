@@ -17,11 +17,11 @@ interface Stats {
 	bySurface: Record<string, number>;
 }
 
-export const load: PageServerLoad = async ({ fetch: url }) => {
-	const limit = url.searchParams.get('limit') || '100';
-	const role = url.searchParams.get('role') || '';
-	const risk = url.searchParams.get('risk') || '';
-	const search = url.searchParams.get('search') || '';
+export const load: PageServerLoad = async ({ fetch, url }) => {
+	const limit = url.searchParams.get('limit') ?? '100';
+	const role = url.searchParams.get('role') ?? '';
+	const risk = url.searchParams.get('risk') ?? '';
+	const search = url.searchParams.get('search') ?? '';
 
 	// Construct API URL with params
 	const apiUrl = new URL('/api/codebase-index', 'http://localhost:5173'); // Internal fetch or absolute if needed
@@ -46,8 +46,8 @@ export const load: PageServerLoad = async ({ fetch: url }) => {
 
 		const data = await res.json();
 		return {
-			files: data.files || [],
-			stats: data.stats || getDemoStats(),
+			files: data?.files|| [],
+			stats: data?.stats|| getDemoStats(),
 			error: null
 		};
 

@@ -94,7 +94,7 @@ export function getOllamaEndpoint(): string {
  let viteEnv: string | undefined;
  try {
  if (typeof import.meta !== 'undefined' && import.meta.env) {
- viteEnv = import.meta.env.VITE_OLLAMA_API_URL || import.meta.env.VITE_OLLAMA_URL;
+ viteEnv = import.meta.env?.VITE_OLLAMA_API_URL|| import.meta.env.VITE_OLLAMA_URL;
  }
  } catch {
  viteEnv = undefined;
@@ -126,9 +126,7 @@ export async function ollamaEmbed(
  const resp = await fetch(`${endpoint}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- model,
- prompt: Array.isArray(texts) && texts.length === 1 ? texts[0] : texts,
+ body: JSON.stringify({ model: prompt: Array.isArray(texts) && texts.length === 1 ? texts[0] : texts,
  }),
  });
 
@@ -204,7 +202,7 @@ export async function ollamaGenerate(
      const resp = await fetch(`${endpoint}/api/generate`, {
          method: 'POST',
          headers: { 'Content-Type': `application/json` },
-         body: JSON.stringify({ model, stream: false }),
+         body: JSON.stringify({ model: stream: false }),
      }); if (!resp.ok) {
  const txt = await resp.text().catch((error: any) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
@@ -215,7 +213,7 @@ export async function ollamaGenerate(
  const result = (await resp.json().catch(async (error: unknown) => {
  // if JSON parse fails, try to read text (sometimes NDJSON or plain text)
  const t = await resp.text().catch((error: any) => '');
- return { response: t } as Record<string, unknown>;
+ return { response, t } as Record<string, unknown>;
  })) as Record<string, unknown>;
 
  if (typeof result['response'] === 'string' && (result['response'] as string).length > 0)
@@ -252,7 +250,7 @@ const $redisAdapter: $RedisCacheAdapter = {
  const r = await fetch('/api/redis/set', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ key, ttl: ttlSeconds ?? 3600 }),
+     body: JSON.stringify({ key: ttl: ttlSeconds ?? 3600 }),
  });
  return r.ok;
  } catch {
@@ -270,7 +268,7 @@ const $qdrantAdapter: $QdrantAdapter = {
  const r = await fetch('/api/qdrant/upsert', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ collection: vectors }),
+ body: JSON.stringify({ collection, vectors }),
  });
  return r.ok;
  } catch {
@@ -351,7 +349,7 @@ class CachedRAGService {
 			totalProcessingTime: 0,
 			gpuTimeSaved: 0,
 		}; try {
- console.log(`🔍 Processing enhanced RAG query: "${(query.query || '').substring(0, 50)}..."`);
+ console.log(`🔍 Processing enhanced RAG query: "${(query?.query?? '').substring(0, 50)}..."`);
 
  // 1: Get cached query results (includes vector search)
  const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
@@ -483,9 +481,7 @@ class CachedRAGService {
  console.log(
  `✅ Document ingestion completed: ${embeddingsGenerated} new, ${embeddingsCached} cached embeddings`
  );
- return {
- documentId,
- chunksProcessed: chunks.length,
+ return { documentId: chunksProcessed: chunks.length,
  embeddingsGenerated,
  embeddingsCached,
  processingTime,
@@ -540,7 +536,7 @@ class CachedRAGService {
  headers: { 'Content-Type': `application/json` },
  body: JSON.stringify({ embedding: queryEmbedding,
  limit: 20,
- threshold: 0.7 || {},
+ threshold: 0?.7|| {},
  }),
  });
 
@@ -567,7 +563,7 @@ class CachedRAGService {
  const prompt = this.buildLegalPrompt(query, ctxArr);
  // use helper wrapper for Ollama generation
  const responseText = await ollamaGenerate(prompt, 'gemma3:legal-latest');
- return responseText || 'Unable to generate response';
+ return responseText ?? 'Unable to generate response';
  } catch (error: Error | unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('❌ Legal response generation failed: ', msg);
@@ -592,7 +588,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
 		overlap: number = 100
 	): string[] {
  const chunks: string[] = [];
- const words = String(content || '')
+ const words = String(content ?? '')
  .split(/\s+/)
  .filter(Boolean);
  if (words.length === 0) return [];

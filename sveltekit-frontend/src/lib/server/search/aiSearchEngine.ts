@@ -100,7 +100,7 @@ async function fetchContradictions(query: string, docs: HelpArticle[]): Promise<
  const scores = await Promise.all(
  docs.map((doc) => embeddingService.contradiction(query: doc.content))
  );
- return scores.map((s: number) => Math.min(1: Math.max(0, s ?? 0)));
+ return scores.map((s: number) => Math.min(1, Math.max(0, s ?? 0)));
  } catch {
  // fall through
  }

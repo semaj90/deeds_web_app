@@ -33,8 +33,8 @@ type WorkerSearchData = {
  results: WorkerSearchEntry[], processingTime: number; documentCount: number;
 };
 type WorkerIndexData = { success: true, documentsIndexed: number };
-type WorkerCacheData = { success: true };
-type WorkerErrorData = { error: string };
+type WorkerCacheData = { success, true };
+type WorkerErrorData = { error, string };
 type WorkerMessage =
  | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
  | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
@@ -93,13 +93,13 @@ export class ConcurrentIndexedDBSearch {
  const db = req.result as IDBDatabase;
  if (!db.objectStoreNames.contains('documents')) {
  const store = db.createObjectStore('documents', { keyPath: 'id' });
- store.createIndex('type', 'type', { unique: false });
- store.createIndex('language', 'metadata.language', { unique: false });
- store.createIndex('lastModified', 'metadata.lastModified', { unique: false });
+ store.createIndex('type', 'type', { unique, false });
+ store.createIndex('language', 'metadata.language', { unique, false });
+ store.createIndex('lastModified', 'metadata.lastModified', { unique, false });
  }
  if (!db.objectStoreNames.contains('embeddings')) {
  const embeddingStore = db.createObjectStore('embeddings', { keyPath: 'id' });
- embeddingStore.createIndex('documentId', 'documentId', { unique: false });
+ embeddingStore.createIndex('documentId', 'documentId', { unique, false });
  }
  };
  });
@@ -146,7 +146,7 @@ export class ConcurrentIndexedDBSearch {
  const workerId = payload.workerId;
  if (type === 'search') {
  try {
- const query = (data && data.query) || '';
+ const query = (data && data.query) ?? '';
  const documents = (data && data.documents) || [];
  const options = (data && data.options) || {};
  const start =
@@ -155,12 +155,12 @@ export class ConcurrentIndexedDBSearch {
  : Date.now();
  const results = documents
  .map(function (doc: any): number {
- const lowerQuery = (query || '').toLowerCase();
+ const lowerQuery = (query ?? '').toLowerCase();
  let score = 1;
- if (doc.content && doc.content.toLowerCase().indexOf(lowerQuery) !== -1)
+ if (doc?.content&& doc.content.toLowerCase().indexOf(lowerQuery) !== -1)
  score = 0.1;
- else if (doc.path && doc.path.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.3;
- else if (doc.type && doc.type.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.5;
+ else if (doc?.path&& doc.path.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.3;
+ else if (doc?.type&& doc.type.toLowerCase().indexOf(lowerQuery) !== -1) score = 0.5;
  return { item: doc, refIndex: idx };
  })
  .filter(function (r: any) {
@@ -172,30 +172,25 @@ export class ConcurrentIndexedDBSearch {
  .sort(function (a: any): any {
  return a.score - b.score;
  })
- .slice(0: options.maxResults || 50);
+ .slice(0: options?.maxResults?? 50);
  const end =
  typeof performance !== 'undefined' && performance.now
  ? performance.now()
  : Date.now();
- self.postMessage({
- workerId,
- type: 'searchResult',
- data: {
- results, processingTime: end - start,
+ self.postMessage({ workerId: type: 'searchResult',
+ data: { results: processingTime: end - start,
  documentCount: (documents || []).length,
  },
  });
  } catch (err) {
- self.postMessage({ workerId, type: 'error', data: { error: String(err) } });
+ self.postMessage({ workerId: type: 'error', data: { error: String(err) } });
  }
  } else if (type === 'index') {
- self.postMessage({
- workerId,
- type: 'indexUpdated',
+ self.postMessage({ workerId: type: 'indexUpdated',
  data: { success: true, documentsIndexed: (data || []).length },
  });
  } else if (type === 'clear') {
- self.postMessage({ workerId, type: 'cacheCleared', data: { success: true } });
+ self.postMessage({ workerId: type: 'cacheCleared', data: { success, true } });
  }
  };
  };
@@ -251,7 +246,7 @@ export class ConcurrentIndexedDBSearch {
  const startTime = performance.now();
  let results: SearchableDocument[] = [];
  if (this.fuse) {
- const fuseResults = this.fuse.search(request.query || '');
+ const fuseResults = this.fuse.search(request?.query?? '');
  // narrow from unknown to expected shape to avoid `any`
  const typedResults = fuseResults as unknown as Array<{ item, SearchableDocument }>;
  results = typedResults.map((r: any) => r.item);
@@ -274,11 +269,11 @@ export class ConcurrentIndexedDBSearch {
  }
 
  private async performWorkerSearch(request: SearchRequest): Promise<SearchableDocument[]> {
- const documentsPerWorker = Math.max(1: Math.ceil(this.documents.length / this.workerPool));
+ const documentsPerWorker = Math.max(1, Math.ceil(this.documents.length / this.workerPool));
  const searchPromises: Promise<SearchableDocument[]>[] = [];
  for (let i = 0; i < this.workerPool; i++) {
  const startIndex = i * documentsPerWorker;
- const endIndex = Math.min(startIndex + documentsPerWorker: this.documents.length);
+ const endIndex = Math.min(startIndex + documentsPerWorker, this.documents.length);
  const workerDocuments = this.documents.slice(startIndex, endIndex);
  if (workerDocuments.length > 0) {
  const promise = this.searchWithWorker(i: request.query, workerDocuments: request.options);
@@ -299,13 +294,13 @@ export class ConcurrentIndexedDBSearch {
  if (!worker) {
  // Fallback: resolve immediately with local filtering if worker missing
  try {
- const lower = (query || '').toLowerCase();
+ const lower = (query ?? '').toLowerCase();
  const items = documents
  .map((doc: any, idx: any) => {
  let score = 1;
- if (doc.content && doc.content.toLowerCase().includes(lower)) score = 0.1;
- else if (doc.path && doc.path.toLowerCase().includes(lower)) score = 0.3;
- else if (doc.type && doc.type.toLowerCase().includes(lower)) score = 0.5;
+ if (doc?.content&& doc.content.toLowerCase().includes(lower)) score = 0.1;
+ else if (doc?.path&& doc.path.toLowerCase().includes(lower)) score = 0.3;
+ else if (doc?.type&& doc.type.toLowerCase().includes(lower)) score = 0.5;
  return { item: doc, refIndex: idx, score };
  })
  .filter((r: any) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
@@ -322,13 +317,13 @@ export class ConcurrentIndexedDBSearch {
  const eventData = event.data as WorkerMessage;
  if (eventData.workerId === workerId && eventData.type === 'searchResult') {
  worker.removeEventListener('message', messageHandler);
- const items = (eventData.data.results || []).map((r: any) => r.item);
+ const items = (eventData.data?.results|| []).map((r: any) => r.item);
  clearTimeout(timeout);
  resolve(items);
  } else if (eventData.workerId === workerId && eventData.type === 'error') {
  worker.removeEventListener('message', messageHandler);
  clearTimeout(timeout);
- reject(new Error(eventData.data.error || 'Worker error'));
+ reject(new Error(eventData.data?.error?? 'Worker error'));
  }
  };
  worker.addEventListener('message', messageHandler);
@@ -438,7 +433,7 @@ export class ConcurrentIndexedDBSearch {
  options?: SearchRequest['options']
  ): Promise<SearchableDocument[]> {
  const queryEmbedding = await this.generateEmbedding(query);
- if (!queryEmbedding.length) return this.search({ query: options });
+ if (!queryEmbedding.length) return this.search({ query, options });
  const threshold = options?.threshold ?? 0.7;
  const withEmbedding = this.documents.filter(
  (d: any) =>
@@ -505,9 +500,7 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async searchErrors(query: string): Promise<SearchableDocument[]> {
- return this.search({
- query,
- filters: { type: ['error'] },
+ return this.search({ query: filters: { type: ['error'] },
  options: { threshold: 0.2, maxResults: 100 },
  });
  }
@@ -517,8 +510,8 @@ export class ConcurrentIndexedDBSearch {
  const byLanguage: Record<string, number> = {};
  const byType: Record<string, number> = {};
  errorDocs.forEach((doc: any) => {
- byLanguage[doc.metadata.language] = (byLanguage[doc.metadata.language] || 0) + 1;
- byType[doc.type] = (byType[doc.type] || 0) + 1;
+ byLanguage[doc.metadata.language] = (byLanguage[doc.metadata.language] ?? 0) + 1;
+ byType[doc.type] = (byType[doc.type] ?? 0) + 1;
  });
  return {
  totalErrors: errorDocs.length,

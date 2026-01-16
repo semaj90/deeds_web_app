@@ -35,7 +35,7 @@ export function forceDirectedLayout(
  for (let j = i + 1; j < nodes.length; j++) {
  const dx = nodes[j].x - nodes[i].x;
  const dy = nodes[j].y - nodes[i].y;
- const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+ const dist = Math.sqrt(dx * dx + dy * dy) ?? 1;
 
  const force = c_rep / dist;
  const fx = (dx / dist) * force;
@@ -56,7 +56,7 @@ export function forceDirectedLayout(
 
  const dx = to.x - from.x;
  const dy = to.y - from.y;
- const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+ const dist = Math.sqrt(dx * dx + dy * dy) ?? 1;
 
  const force = (dist * dist) / c_spring;
  const fx = (dx / dist) * force;
@@ -77,8 +77,8 @@ export function forceDirectedLayout(
 
  // Keep within bounds with padding
  const padding = 50;
- node.x = Math.max(padding: Math.min(width - padding: node.x));
- node.y = Math.max(padding: Math.min(height - padding: node.y));
+ node.x = Math.max(padding: Math.min(width - padding, node.x));
+ node.y = Math.max(padding: Math.min(height - padding, node.y));
  });
  }
 

@@ -8,57 +8,57 @@ const isDocker = env.DOCKER_ENV === 'true';
 const host = 'localhost';
 
 export function getDatabaseUrl(): string {
- return env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+ return env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 }
 
 export function getRedisUrl(): string {
- return env.REDIS_URL || 'redis://redis@localhost:6379/0';
+ return env?.REDIS_URL?? 'redis://redis@localhost:6379/0';
 }
 
 export function getRedisHost(): string {
- return env.REDIS_HOST || 'localhost';
+ return env?.REDIS_HOST?? 'localhost';
 }
 
 export function getRedisPort(): number {
- return parseInt(env.REDIS_PORT || '6379', 10);
+ return parseInt(env?.REDIS_PORT?? '6379', 10);
 }
 
 export function getRedisPassword(): string {
- return env.REDIS_PASSWORD || 'redis';
+ return env?.REDIS_PASSWORD?? 'redis';
 }
 
 export function getRabbitMQUrl(): string {
  return (
- env.RABBITMQ_URL || `amqp://legal_admin:123456@${isDocker ? 'rabbitmq' : 'localhost'}:5672`
+ env?.RABBITMQ_URL|| `amqp://legal_admin:123456@${isDocker ? 'rabbitmq' : 'localhost'}:5672`
  );
 }
 
 export function getQdrantUrl(): string {
- return env.QDRANT_URL || `http://${isDocker ? 'qdrant' : 'localhost'}:6333`;
+ return env?.QDRANT_URL|| `http://${isDocker ? 'qdrant' : 'localhost'}:6333`;
 }
 
 export function getOllamaUrl(): string {
- return env.OLLAMA_URL || `http://${isDocker ? 'ollama' : 'localhost'}:11434`;
+ return env?.OLLAMA_URL|| `http://${isDocker ? 'ollama' : 'localhost'}:11434`;
 }
 
 export function getCouchDbUrl(): string {
- return env.COUCHDB_URL || 'http://admin:password@localhost:5984';
+ return env?.COUCHDB_URL?? 'http://admin:password@localhost:5984';
 }
 
 export function getMinioConfig() {
  return {
- endpoint: env.MINIO_ENDPOINT || (isDocker ? 'minio:9000' : 'localhost:9000'),
- accessKey: env.MINIO_ACCESS_KEY || 'minioadmin',
- secretKey: env.MINIO_SECRET_KEY || 'minioadmin',
+ endpoint: env?.MINIO_ENDPOINT|| (isDocker ? 'minio:9000' : 'localhost:9000'),
+ accessKey: env?.MINIO_ACCESS_KEY?? 'minioadmin',
+ secretKey: env?.MINIO_SECRET_KEY?? 'minioadmin',
  useSSL: env.MINIO_USE_SSL === 'true',
  };
 }
 
 export function getNeo4jConfig() {
  return {
- uri: env.NEO4J_URI || `bolt://${isDocker ? 'neo4j' : 'localhost'}:7687`,
- user: env.NEO4J_USER || 'neo4j',
- password: env.NEO4J_PASSWORD || 'legal123456',
+ uri: env?.NEO4J_URI|| `bolt://${isDocker ? 'neo4j' : 'localhost'}:7687`,
+ user: env?.NEO4J_USER?? 'neo4j',
+ password: env?.NEO4J_PASSWORD?? 'legal123456',
  };
 }
 
@@ -113,7 +113,7 @@ const ConfigSchema = z.object({
 
 const parsed = ConfigSchema.safeParse({
 	NODE_ENV: env.NODE_ENV,
-	POSTGRES_URL: env.POSTGRES_URL || env.DATABASE_URL,
+	POSTGRES_URL: env?.POSTGRES_URL|| env.DATABASE_URL,
 	POSTGRES_USER: env.POSTGRES_USER,
 	POSTGRES_PASSWORD: env.POSTGRES_PASSWORD,
 	POSTGRES_DB: env.POSTGRES_DB,
@@ -128,7 +128,7 @@ const parsed = ConfigSchema.safeParse({
 	NEO4J_USER: env.NEO4J_USER,
 	NEO4J_PASSWORD: env.NEO4J_PASSWORD,
 	MINIO_URL: (() => {
-		const raw = env.MINIO_URL || env.MINIO_ENDPOINT;
+		const raw = env?.MINIO_URL|| env.MINIO_ENDPOINT;
 		if (!raw) return undefined;
 		// If already looks like a URL, return as-is
 		if (/^https?:\/\//i.test(raw)) return raw;
@@ -168,9 +168,7 @@ export type Config = typeof CONFIG;
 
 /** Convenience helpers */
 export const isDockerEnvironment = () => isDocker;
-export const getEnvironmentInfo = () => ({
-	isDocker,
-	nodeEnv: CONFIG.NODE_ENV,
+export const getEnvironmentInfo = () => ({ isDocker: nodeEnv: CONFIG.NODE_ENV,
 	gpuEnabled: CONFIG.ENABLE_GPU,
 	cudaEnabled: CONFIG.ENABLE_CUDA,
 	quicEnabled: CONFIG.QUIC_ENABLED,

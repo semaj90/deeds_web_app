@@ -170,9 +170,7 @@ describe('Legal-Aware Ranker', () => {
 
  const queryTagIds = ['tag1', 'tag2'];
 
- const ranked = rerankLegalAware({
- hits,
- queryTagIds: jurisdiction,
+ const ranked = rerankLegalAware({ hits: queryTagIds: jurisdiction,
  });
   
  const hit1Result = ranked.find((r) => r.id === 'hit1');
@@ -191,9 +189,7 @@ describe('Legal-Aware Ranker', () => {
  const hits: QdrantHit[] = [
  { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } }];
 
- const ranked = rerankLegalAware({
- hits,
- queryTagIds: ['tag1'],
+ const ranked = rerankLegalAware({ hits: queryTagIds: ['tag1'],
  jurisdiction: 'CA',
  });
 

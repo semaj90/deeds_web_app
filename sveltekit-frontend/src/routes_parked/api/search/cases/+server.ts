@@ -1,7 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
-const GO_MICROSERVICE_URL = env.GO_MICROSERVICE_URL || 'http://localhost:8080';
+const GO_MICROSERVICE_URL = env?.GO_MICROSERVICE_URL?? 'http://localhost:8080';
 
 /**
  * Search cases endpoint
@@ -44,16 +44,16 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Optional filters
  const filters: Record<string, string> = {};
- if (body.jurisdiction && typeof body.jurisdiction === 'string') {
+ if (body?.jurisdiction&& typeof body.jurisdiction === 'string') {
  filters.jurisdiction = body.jurisdiction;
  }
- if (body.crime_category && typeof body.crime_category === 'string') {
+ if (body?.crime_category&& typeof body.crime_category === 'string') {
  filters.crime_category = body.crime_category;
  }
- if (body.crime_classification && typeof body.crime_classification === 'string') {
+ if (body?.crime_classification&& typeof body.crime_classification === 'string') {
  filters.crime_classification = body.crime_classification;
  }
- if (body.section_type && typeof body.section_type === 'string') {
+ if (body?.section_type&& typeof body.section_type === 'string') {
  filters.section_type = body.section_type;
  }
 

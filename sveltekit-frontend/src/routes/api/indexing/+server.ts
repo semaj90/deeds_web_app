@@ -17,22 +17,22 @@ import postgres from 'postgres';
 
 // Configuration
 const CONFIG = {
-  qdrant: { url: process.env.QDRANT_URL || 'http://localhost:6333',
+  qdrant: { url: process.env?.QDRANT_URL?? 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  minio: { endpoint: process.env.MINIO_ENDPOINT || 'localhost',
-    port: parseInt(process.env.MINIO_PORT || '9000'),
-    accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+  minio: { endpoint: process.env?.MINIO_ENDPOINT?? 'localhost',
+    port: parseInt(process.env?.MINIO_PORT?? '9000'),
+    accessKey: process.env?.MINIO_ACCESS_KEY?? 'minioadmin',
+    secretKey: process.env?.MINIO_SECRET_KEY?? 'minioadmin',
     useSSL: process.env.MINIO_USE_SSL === 'true',
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
-  ollama: { url: process.env.OLLAMA_URL || 'http://localhost:11434',
+  ollama: { url: process.env?.OLLAMA_URL?? 'http://localhost:11434',
     embeddingModel: 'embeddinggemma:latest'
   },
-  postgres: { url: process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+  postgres: { url: process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
   }
 };
 
@@ -61,7 +61,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     });
 
     const data = await response.json();
-    return data.embedding || [];
+    return data?.embedding|| [];
   } catch (err) {
     console.error('Embedding error:', err);
     return [];
@@ -141,7 +141,7 @@ function chunkFileContent(content: string, chunkSize: number = 500, overlap: num
 // POST /api/indexing/codebase
 // ============================================================================
 
-export const POST: RequestHandler = async ({ request: url }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
   const pathname = url.pathname;
   const action = url.searchParams.get('action');
 
@@ -149,7 +149,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
   if (pathname === '/api/indexing/codebase' || action === 'codebase') {
     try {
       const body = await request.json();
-      const rootPath = body.rootPath || './src';
+      const rootPath = body?.rootPath?? './src';
 
       const minio = getMinIOClient();
 
@@ -262,7 +262,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
         success: true,
         indexed,
         results,
-        message: `Indexed ${indexed} of ${Math.min(50: files.length)} files`
+        message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
     } catch (err: any) {
       return json(
@@ -416,7 +416,7 @@ Phase: Phase 66-79 Error Analysis
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData.result || [];
+      const results = searchData?.result|| [];
 
       return json({
         success: true,
@@ -465,7 +465,7 @@ Phase: Phase 66-79 Error Analysis
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData.result || [];
+      const results = searchData?.result|| [];
 
       return json({
         success: true,

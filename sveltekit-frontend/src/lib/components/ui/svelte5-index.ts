@@ -32,7 +32,7 @@ export {
 } from './dialog';
 
 // Bits-UI components (Svelte 5 compatible)
-export { Svelte5Button: Svelte5Dialog } from './bits';
+export { Svelte5Button as Svelte5Dialog } from './bits';
 
 // Form components (Svelte 5 runes)
 export { default as Svelte5Select } from './select/Svelte5Select.svelte';

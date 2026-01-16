@@ -25,7 +25,7 @@ export const errorFeedbackTable = pgTable(
  userRole: text('user_role'), // "developer" | "reviewer" | "ai-trainer"
 
  // Timestamp
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
  },
  (table) => {
  return {

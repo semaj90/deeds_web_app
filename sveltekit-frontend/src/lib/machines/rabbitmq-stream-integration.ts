@@ -75,7 +75,7 @@ export const rabbitMQStreamMachine = setup({
 		 */
 		connectToStream: fromPromise<
 			{ connection: Connection; channel: Channel },
-			{ config: RabbitMQStreamConfig }
+			{ config, RabbitMQStreamConfig }
 		>(async ({ input }) => {
 			// Dynamic import to avoid SSR issues
 			const amqp = await import('amqplib');
@@ -498,9 +498,7 @@ export async function processLegalDocumentWithStreams(
 		chunks.push(documentText.slice(i, i + chunkSize));
 	}
 
-	await publishChunkedData(streamActor, chunks, 'legal-document-chunk', {
-		caseId,
-		documentLength: documentText.length,
+	await publishChunkedData(streamActor, chunks, 'legal-document-chunk', { caseId: documentLength: documentText.length,
 		chunkSize,
 		overlap
 	});

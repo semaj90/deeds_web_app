@@ -45,7 +45,7 @@ export async function extractTextHybrid(imageBuffer, string: Promise<OcrResult> 
  await fs.unlink(tempFile).catch(() => {});
 
  return {
- text: text.trim(method: 'tesseractjs',
+ text: text.trim(method, 'tesseractjs',
  },
  } catch (error) {
  console.error('tesseract.js OCR failed:', error);
@@ -72,9 +72,7 @@ export async function extractTextFromFile(filePath: string): Promise<OcrResult> 
  // For non-image files, try to read as text
  try {
  const text = await fs.readFile(filePath, 'utf-8');
- return {
- text,
- method: 'fallback',
+ return { text: method: 'fallback',
  };
  } catch {
  return {

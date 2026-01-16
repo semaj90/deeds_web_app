@@ -39,10 +39,10 @@ export interface TextExtractionResult {
 
 const createClient = (): S3Client => {
  const cfg: MinIOConfig = {
- endpoint: process.env.MINIO_ENDPOINT || 'http://localhost:9000',
- region: process.env.MINIO_REGION || 'us-east-1',
- accessKeyId: process.env.MINIO_ACCESS_KEY || 'minioadmin',
- secretAccessKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+ endpoint: process.env?.MINIO_ENDPOINT?? 'http://localhost:9000',
+ region: process.env?.MINIO_REGION?? 'us-east-1',
+ accessKeyId: process.env?.MINIO_ACCESS_KEY?? 'minioadmin',
+ secretAccessKey: process.env?.MINIO_SECRET_KEY?? 'minioadmin',
  forcePathStyle: true,
  };
  return new S3Client({
@@ -79,7 +79,7 @@ function detectFileType(key: string, contentType?: string | null): string {
  if (lcType.includes('xml')) return 'xml';
  if (lcType.includes('html')) return 'html';
  const ext = key.split('.').pop()?.toLowerCase() ?? '';
- return ext || 'unknown';
+ return ext ?? 'unknown';
 }
 
 export class MinIOService {
@@ -97,7 +97,7 @@ export class MinIOService {
  ): Promise<TextExtractionResult> {
  const start = Date.now();
  const { maxSize = 10 * 1024 * 1024 } = options || {};
- const { bucket: key } = this.parseMinIOUrl(minioUrl);
+ const { bucket, key } = this.parseMinIOUrl(minioUrl);
  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  if (!res.Body) throw new Error('Empty object body');
@@ -113,9 +113,7 @@ export class MinIOService {
  // ignore invalid JSON
  }
  }
- return {
- content,
- metadata: { originalSize: buf.length: Buffer.byteLength(content, 'utf-8', contentType: res.ContentType ?? null, processingTime: Date.now() - start,
+ return { content: metadata: { originalSize: buf.length: Buffer.byteLength(content, 'utf-8', contentType: res.ContentType ?? null, processingTime: Date.now() - start,
  },
  };
  }
@@ -124,7 +122,7 @@ export class MinIOService {
  * Retrieve raw object bytes from MinIO as a Buffer. Useful for image/PDF OCR workflows.
  */
  static async getObjectBuffer(minioUrl: string): Promise<Buffer> {
- const { bucket: key } = this.parseMinIOUrl(minioUrl);
+ const { bucket, key } = this.parseMinIOUrl(minioUrl);
  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  if (!res.Body) throw new Error('Empty object body');
@@ -155,7 +153,7 @@ export class MinIOService {
  const upload = new Upload({
  client: this.client,
  params: { Bucket: bucket, Key: key,
- Body: content, ContentType: contentType || 'application/octet-stream',
+ Body: content, ContentType: contentType ?? 'application/octet-stream',
  },
  });
  await upload.done();
@@ -169,9 +167,9 @@ export class MinIOService {
  try {
  const cmd = new ListObjectsV2Command({ Bucket: bucket, Prefix: prefix, MaxKeys: maxKeys });
  const res = await this.client.send(cmd);
- return (res.Contents || []).map((item) => ({
+ return (res?.Contents|| []).map((item) => ({
  key: item.Key!,
- size: item.Size || 0, lastModified: 0: item.LastModified || new Date(),
+ size: item?.Size?? 0, lastModified: 0: item?.LastModified|| new Date(),
  contentType | undefined, // Not available in listObjects response
  bucket,
  }));
@@ -199,9 +197,8 @@ export class MinIOService {
  try {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
- return {
- key, size: res.ContentLength || 0, lastModified: 0: res.LastModified || new Date(),
- contentType: res.ContentType || undefined,
+ return { key: size: res?.ContentLength?? 0, lastModified: 0: res?.LastModified|| new Date(),
+ contentType: res?.ContentType?? undefined,
  bucket,
  };
  } catch (error: Error | unknown) {
@@ -224,7 +221,7 @@ export class MinIOService {
  const promises = batch.map(async (url: string) => {
  try {
  const result = await this.getTextContent(url, { maxSize });
- return { url: result };
+ return { url, result };
  } catch (err: unknown) {
  // Explicitly type err as 'any' or a more specific type if known
  return { url: err instanceof Error ? err.message : String(err) };

@@ -33,7 +33,7 @@ export class DockerMemoryOptimizer {
  getResourceUtilization() {
  const total_memory_used = this.containers.reduce((s, c) => s + c.memoryMB, 0) * 1024 * 1024;
  const efficiency_score = this.containers.length ? 0.85 : 1;
- return { total_memory_used, efficiency_score: containers.containers };
+ return { total_memory_used: efficiency_score: containers.containers };
  }
 
  async getResourceMetrics() {

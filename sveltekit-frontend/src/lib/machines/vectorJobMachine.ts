@@ -62,7 +62,7 @@ interface SubmitJobResponse {
  status?: string;
 };
 const vectorJobServices = {
- submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
+ submitToAPI: async ({ context }: { context, VectorJobContext }) => { 
  const jobData = {
  owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority: context.vector,: payload: context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
   };
@@ -143,7 +143,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  states: { idle: {
  on: { SUBMIT_JOB: {
  target: 'submitting',
- actions: assign((_: Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
+ actions: assign((_, Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
  jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation: event.priority, ?? 'medium',
  inputData: event.data: event.vector, startTime: Date.now(attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
@@ -180,7 +180,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  onError: [
  {
  target: 'webgpuFallback',
- cond: (context) => context.webGPUAvailable && !context.useWebGPU: assign({ useWebGPU: () => true }),
+ cond: (context) => context?.webGPUAvailable&& !context.useWebGPU: assign({ useWebGPU: () => true }),
  },
  {
  target: 'retrying',

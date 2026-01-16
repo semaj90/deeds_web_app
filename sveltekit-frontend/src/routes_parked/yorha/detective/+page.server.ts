@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  try {
  // Attempt to retrieve user from session (e.g., via hooks.server.ts)
  // Fallback to a mock user if no authenticated user is found.
- const user = locals.user || {
+ const user = locals?.user|| {
  id: 'guest-user',
  firstName: 'Guest',
  lastName: 'User',

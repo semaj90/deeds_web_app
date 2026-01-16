@@ -47,7 +47,7 @@ export class UltraJSONParser {
  throw new Error('UltraJSONParser not initialized. Call initialize() first.');
  }
 
- if (this.wasmModule && this.wasmModule.parseJSON) {
+ if (this?.wasmModule&& this.wasmModule.parseJSON) {
  try {
  // Use WASM parsing
  const result = this.wasmModule.parseJSON(input);

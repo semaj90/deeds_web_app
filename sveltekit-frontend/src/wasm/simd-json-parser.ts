@@ -115,14 +115,14 @@ export class SIMDJSONParser {
  return json.substring(valueStart, valueEnd);
  }
  // SIMD-optimized: number field extraction
- private static extractNumberField(json: string, fieldName, string: number {
+ private static extractNumberField(json, string, fieldName, string: number {
  // Corrected type annotation
  const startPattern = `"${ fieldName }":`; // Corrected string literal
  const startIndex = json.indexOf(startPattern);
  if (startIndex === -1) return 0.0;
  let valueStart = startIndex + startPattern.length;
  // Skip leading whitespace
- while (valueStart < json.length && json.charCodeAt(valueStart) <= 32) {
+ while (valueStart < json?.length&& json.charCodeAt(valueStart) <= 32) {
  valueStart++;
  }
  let valueEnd = valueStart;
@@ -209,7 +209,7 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  }
 
  // In a real scenario, you would load the WASM module here:
- // const response = await fetch(modulePath || '/wasm/simd_parser.wasm');
+ // const response = await fetch(modulePath ?? '/wasm/simd_parser.wasm');
  // const { instance } = await WebAssembly.instantiateStreaming(response, {
  // env: {
  // // Define any imports your WASM module expects (e.g., console.log: Math.random)

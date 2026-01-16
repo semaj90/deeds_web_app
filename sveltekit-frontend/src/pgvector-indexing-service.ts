@@ -80,9 +80,9 @@ export class PgVectorIndexingService {
 	constructor(config: VectorIndexConfig) {
 		this.db = config.database;
 		this.dimensions = config.embeddingDimensions;
-		this.indexType = config.indexType || 'hnsw';
-		this.distanceMetric = config.distanceMetric || 'cosine';
-		this.maxResults = config.maxResults || 10;
+		this.indexType = config?.indexType?? 'hnsw';
+		this.distanceMetric = config?.distanceMetric?? 'cosine';
+		this.maxResults = config?.maxResults?? 10;
 	}
 
 	/**
@@ -105,17 +105,17 @@ export class PgVectorIndexingService {
 				) VALUES (
 					${doc.id},
 					${doc.content},
-					${JSON.stringify(doc.metadata || {})}::jsonb,
+					${JSON.stringify(doc?.metadata|| {})}::jsonb,
 					${doc.documentId},
 					${doc.metadata?.documentType ?? null},
 					${doc.metadata?.confidentialityLevel ?? 'public'},
-					${doc.modelUsed || 'embeddinggemma:latest'},
+					${doc?.modelUsed?? 'embeddinggemma:latest'},
 					${this.dimensions},
 					NOW(),
 					NOW()
 				) ON CONFLICT (id) DO UPDATE SET
 					content = ${doc.content},
-					metadata = ${JSON.stringify(doc.metadata || {})}::jsonb,
+					metadata = ${JSON.stringify(doc?.metadata|| {})}::jsonb,
 					updated_at = NOW()
 			`);
 
@@ -129,10 +129,10 @@ export class PgVectorIndexingService {
 					${doc.content},
 					${this.vectorToString(doc.embedding)}::vector,
 					${doc.documentId},
-					${doc.chunkId || doc.id},
+					${doc?.chunkId|| doc.id},
 					${doc.embeddingType},
-					${doc.modelUsed || 'embeddinggemma:latest'},
-					${JSON.stringify(doc.metadata || {})}::jsonb,
+					${doc?.modelUsed?? 'embeddinggemma:latest'},
+					${JSON.stringify(doc?.metadata|| {})}::jsonb,
 					NOW()
 				) ON CONFLICT DO NOTHING
 			`);
@@ -197,8 +197,8 @@ export class PgVectorIndexingService {
 				);
 			}
 
-			const limit = options.limit || this.maxResults;
-			const threshold = options.threshold || 0.5;
+			const limit = options?.limit|| this.maxResults;
+			const threshold = options?.threshold?? 0.5;
 			const vectorStr = this.vectorToString(embedding);
 
 			let query = `
@@ -209,7 +209,7 @@ export class PgVectorIndexingService {
 					e.chunk_id as "chunkId",
 					(1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
 					(e.vector <-> '${vectorStr}'::vector) as distance,
-					ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank: e.metadata:
+					ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank | e.metadata:
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
@@ -245,9 +245,9 @@ export class PgVectorIndexingService {
 		options: { limit?: number, vectorWeight?: number, keywordWeight?: number } = {}
 	): Promise<VectorSearchResult[]> {
 		try {
-			const limit = options.limit || this.maxResults;
-			const vectorWeight = options.vectorWeight || 0.7;
-			const keywordWeight = options.keywordWeight || 0.3;
+			const limit = options?.limit|| this.maxResults;
+			const vectorWeight = options?.vectorWeight?? 0.7;
+			const keywordWeight = options?.keywordWeight?? 0.3;
 
 			if (embedding.length !== this.dimensions) {
 				throw new Error(
@@ -268,7 +268,7 @@ export class PgVectorIndexingService {
 						${vectorWeight} * (1 - (e.vector <-> '${vectorStr}'::vector)) +
 						${keywordWeight} * (CASE WHEN e.content ILIKE '%${keywordEscaped}%' THEN 1.0 ELSE 0.0 END)
 					) as similarity,
-					(e.vector <-> '${vectorStr}'::vector) as distance: e.metadata:
+					(e.vector <-> '${vectorStr}'::vector) as distance | e.metadata:
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE 1=1

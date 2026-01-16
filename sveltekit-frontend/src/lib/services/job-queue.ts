@@ -69,7 +69,7 @@ export class LegalAIJobQueue {
             { name: 'legal-analysis', concurrency: 2 }
         ];
 
-        queueConfigs.forEach(({ name: concurrency }) => {
+        queueConfigs.forEach(({ name, concurrency }) => {
             const queue = new RabbitMQQueue(name, {
                 connection: redisConnection,
                 defaultJobOptions: { removeOnComplete: 100,

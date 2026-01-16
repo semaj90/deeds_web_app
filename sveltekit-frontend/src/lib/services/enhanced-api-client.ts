@@ -102,9 +102,7 @@ export class LegalAIApiClient {
  });
  }
 
-const requestInit: RequestInit = {
- method,
- headers: { 'Content-Type': 'application/json', ...headers },
+const requestInit: RequestInit = { method: headers: { 'Content-Type': 'application/json', ...headers },
  signal,
  };
 
@@ -119,7 +117,7 @@ let lastError: Error | unknown;
  try {
  const response = await fetch(url.toString(), requestInit);
  let parsed, unknown = null;
- const contentType = response.headers.get('content-type') || '';
+ const contentType = response.headers.get('content-type') ?? '';
 
  if (contentType.includes('application/json')) {
  parsed = await response.json().catch(() => null);
@@ -184,7 +182,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/cases', { query: signal });
+ return this.request<PaginatedResponse<unknown>>('/cases', { query, signal });
  }
 
  /**
@@ -249,7 +247,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/evidence', { query: signal });
+ return this.request<PaginatedResponse<unknown>>('/evidence', { query, signal });
  }
 
  /**
@@ -323,7 +321,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/reports', { query: signal });
+ return this.request<PaginatedResponse<unknown>>('/reports', { query, signal });
  }
 
  /**
@@ -389,7 +387,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query: signal });
+ return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query, signal });
  }
 
  /**
@@ -466,11 +464,11 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  xhr.abort();
  reject(new Error('Upload aborted'));
  };
- signal.addEventListener('abort', onAbort, { once: true });
+ signal.addEventListener('abort', onAbort, { once, true });
  }
 
  xhr.upload.addEventListener('progress', (event: any) => {
- if (event.lengthComputable && onProgress) {
+ if (event?.lengthComputable&& onProgress) {
  const progress = (event.loaded / event.total) * 100;
  onProgress(progress);
  }

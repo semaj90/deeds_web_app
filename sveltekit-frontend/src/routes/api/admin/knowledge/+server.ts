@@ -12,7 +12,7 @@ interface KBEntry {
 
 export const GET: RequestHandler = async ({ url }) => {
 	const filePath = url.searchParams.get('file_path');
-	const limit = parseInt(url.searchParams.get('limit') || '10');
+	const limit = parseInt(url.searchParams.get('limit') ?? '10');
 
 	if (!filePath) {
 		return json({ error: 'file_path parameter required' }, { status: 400 });
@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
 					must: [
 						{
 							key: 'file_path',
-							match: { value: filePath }
+							match: { value, filePath }
 						}
 					]
 				},
@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const entries: KBEntry[] = points.map((point: any) => ({
 			id: point.id,
 			score: 1.0, // No scoring in scroll query
-			content: point.payload?.content ?? point.payload?.text || '',
+			content: point.payload?.content ?? point.payload?.text ?? '',
 			tags: point.payload?.tags ?? [],
 			type: point.payload?.type ?? 'unknown',
 			file_path: point.payload?.file_path ?? filePath,
@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ url }) => {
 					must: [
 						{
 							key: 'file_path',
-							match: { value: filePath }
+							match: { value, filePath }
 						}
 					]
 				},
@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				entries.push({
 					id: point.id,
 					score: 1.0,
-					content: point.payload?.content ?? point.payload?.error_message || '',
+					content: point.payload?.content ?? point.payload?.error_message ?? '',
 					tags: [...(point.payload?.tags ?? []), 'error'],
 					type: 'error',
 					file_path: point.payload?.file_path ?? filePath,

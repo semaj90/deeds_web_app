@@ -123,7 +123,7 @@ class AdvancedEvidenceAnalyzer {
 	}
 
 	private extractTextFromMetadata(evidence: EvidenceRecord): string | undefined {
-		if (!evidence.aiAnalysis || typeof evidence.aiAnalysis !== 'object') return undefined;
+		if (!evidence?.aiAnalysis|| typeof evidence.aiAnalysis !== 'object') return undefined;
 
 		const analysis = evidence.aiAnalysis as Record<string, unknown>;
 		const textFields = ['content', 'transcript', 'notes'];
@@ -148,12 +148,8 @@ class AdvancedEvidenceAnalyzer {
 			switch (type) {
 				case 'summary': {
 					const summary = this.generateSummary(text);
-					return {
-						type,
-						confidence: 0.82,
-						results: {
-							summary,
-							keySentences: this.extractKeySentences(text),
+					return { type: confidence: 0.82,
+						results: { summary: keySentences: this.extractKeySentences(text),
 							length: summary.length
 						},
 						processingTime: Date.now() - startedAt,
@@ -164,9 +160,7 @@ class AdvancedEvidenceAnalyzer {
 
 				case 'sentiment': {
 					const sentiment = this.analyseSentiment(text);
-					return {
-						type,
-						confidence: sentiment.confidence,
+					return { type: confidence: sentiment.confidence,
 						results: sentiment,
 						processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
@@ -176,9 +170,7 @@ class AdvancedEvidenceAnalyzer {
 
 				case 'entities': {
 					const entities = this.extractEntities(text);
-					return {
-						type,
-						confidence: entities.confidence,
+					return { type: confidence: entities.confidence,
 						results: entities,
 						processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
@@ -188,9 +180,7 @@ class AdvancedEvidenceAnalyzer {
 
 				case 'patterns': {
 					const patterns = this.detectPatterns(text: request.options);
-					return {
-						type,
-						confidence: patterns.confidence,
+					return { type: confidence: patterns.confidence,
 						results: patterns,
 						processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
@@ -200,9 +190,7 @@ class AdvancedEvidenceAnalyzer {
 
 				case 'precedents': {
 					const precedents = this.suggestPrecedents(text: request.options);
-					return {
-						type,
-						confidence: precedents.confidence,
+					return { type: confidence: precedents.confidence,
 						results: precedents,
 						processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
@@ -212,9 +200,7 @@ class AdvancedEvidenceAnalyzer {
 
 				case 'timeline': {
 					const timeline = this.buildTimeline(text);
-					return {
-						type,
-						confidence: timeline.length ? 0.75 : 0.4,
+					return { type: confidence: timeline.length ? 0.75 : 0.4,
 						results: { timeline },
 						processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
@@ -282,7 +268,7 @@ class AdvancedEvidenceAnalyzer {
 							try {
 								const buf = await MinIOService.getObjectBuffer(fileUrlCandidate);
 								const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });
-								content = ocrResult.text || '';
+								content = ocrResult?.text?? '';
 
 								const embedding = content ? await this.createEmbeddingVector(content) : null;
 								return {
@@ -499,7 +485,7 @@ class AdvancedEvidenceAnalyzer {
 		return matches.slice(0, 10).map((date: any) => {
 			const index = text.indexOf(date);
 			const contextWindow = text.substring(Math.max(0, index - 50), index + date.length + 50).trim();
-			return { date, context: contextWindow };
+			return { date: context: contextWindow };
 		});
 	}
 
@@ -578,10 +564,8 @@ class AdvancedEvidenceAnalyzer {
 
 	private createErrorResult(type: string, error: Error | unknown, startedAt: number): AnalysisResult {
 		const message = error instanceof Error ? error.message : String(error);
-		return {
-			type,
-			confidence: 0,
-			results: { error: message },
+		return { type: confidence: 0,
+			results: { error, message },
 			processingTime: Date.now() - startedAt,
 			model: 'error',
 			timestamp: new Date()

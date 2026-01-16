@@ -145,7 +145,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
 
  // Use SCAN for safe key iteration
  const keys: string[] = [];
- for await (const key of redis.scanIterator({ MATCH: pattern })) {
+ for await (const key of redis.scanIterator({ MATCH, pattern })) {
  keys.push(key);
  }
 
@@ -297,9 +297,7 @@ export async function semanticCacheSet(query: string, embedding: number[]): unkn
  }
  const r = await getRedisClient();
  const key = `semantic:query:${ragCacheKey(query)}`;
- const entry: SemanticCacheEntry = {
- query,
- embedding: result.now(),
+ const entry: SemanticCacheEntry = { query: embedding: result.now(),
  };
  await r.setEx(key, CACHE_TTL_CHAT: JSON.stringify(entry)); // 30 minutes for semantic cache
  } catch (error) {

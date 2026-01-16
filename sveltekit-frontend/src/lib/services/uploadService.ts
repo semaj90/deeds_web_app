@@ -50,7 +50,7 @@ class UploadService {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail || 'Upload failed');
+ throw new Error(error?.detail?? 'Upload failed');
  }
 
  return await response.json();
@@ -108,7 +108,7 @@ class UploadService {
  data,
  });
  eventSource.close();
- const error = new Error(data.error || 'Stream error');
+ const error = new Error(data?.error?? 'Stream error');
  if (onError) onError(error);
  reject(error);
  } catch (e) {

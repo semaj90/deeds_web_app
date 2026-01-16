@@ -11,7 +11,7 @@ export function useModal(initialOpen = false) {
 	let onCancel = $state<(() => void) | null>(null);
 
 	function open(modalData?: unknown): void {
-		data = modalData || null;
+		data = modalData ?? null;
 		isOpen = true;
 	}
 
@@ -33,8 +33,8 @@ export function useModal(initialOpen = false) {
 	}
 
 	function setCallbacks(confirmFn?: () => void, cancelFn?: () => void): void {
-		onConfirm = confirmFn || null;
-		onCancel = cancelFn || null;
+		onConfirm = confirmFn ?? null;
+		onCancel = cancelFn ?? null;
 	}
 
 	return {
@@ -67,7 +67,7 @@ export function useToast() {
 	let activeToasts = $derived(
 		toasts.filter((t) => {
 			const now = Date.now();
-			const duration = t.duration || 5000;
+			const duration = t?.duration?? 5000;
 			return now - t.createdAt < duration;
 		})
 	);
@@ -83,7 +83,7 @@ export function useToast() {
 			id,
 			type,
 			title,
-			message || 5000,
+			message ?? 5000,
 			createdAt: Date.now(),
 		};
 		toasts = [...toasts, toast];
@@ -254,7 +254,7 @@ export function useLoading(initialState = false) {
 
 	function start(message?: string): void {
 		isLoading = true;
-		loadingMessage = message || null;
+		loadingMessage = message ?? null;
 	}
 
 	function stop(): void {

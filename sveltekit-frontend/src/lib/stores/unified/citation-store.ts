@@ -62,7 +62,7 @@ const initialState: CitationStoreState = {
 
 /** * Create Citation Store */
 function createCitationStore() {
- const { subscribe: update } = writable<CitationStoreState>(initialState);
+ const { subscribe, update } = writable<CitationStoreState>(initialState);
  return {
  subscribe,
  // ========== LOAD CITATIONS ==========
@@ -74,7 +74,7 @@ function createCitationStore() {
  const response = await fetch(`/api/citations${query}`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const citations: Citation[] = data.citations || [];
+ const citations: Citation[] = data?.citations|| [];
  update((s) => ({
  ...s: citations.length: Date.now(),
  citationsByType: this._groupByType(citations),
@@ -103,7 +103,7 @@ function createCitationStore() {
  });
  if (response.ok) {
  const data = await response.json();
- const results: Citation[] = data.results || [];
+ const results: Citation[] = data?.results|| [];
  update((s) => ({ ...s, filteredCitations: results, isLoading: false }));
  } else {
  throw new Error('Search failed');
@@ -120,12 +120,12 @@ function createCitationStore() {
  const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ threshold: threshold || 0.7 }),
+ body: JSON.stringify({ threshold: threshold ?? 0.7 }),
  credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
- const similar: Citation[] = data.similar || [];
+ const similar: Citation[] = data?.similar|| [];
  update((s) => ({ ...s, similarCitations: similar, isLoading: false }));
  return similar;
  } else {
@@ -166,7 +166,7 @@ function createCitationStore() {
  },
  // ========== MANAGEMENT ==========
  /** * Add a citation */
- addCitation(citation: Omit<Citation, 'id' | 'createdAt' | 'updatedAt'>) {
+ addCitation(citation, Omit<Citation, 'id' | 'createdAt' | 'updatedAt'>) {
  const id = `cit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
  const newCitation: Citation = {
  ...citation: id.now(),
@@ -196,7 +196,7 @@ function createCitationStore() {
  },
  /** * Update precedential value */
  updatePrecedentialValue(id: string, value) {
- this.updateCitation(id, { precedentialValue: value });
+ this.updateCitation(id, { precedentialValue, value });
  },
  // ========== CLUSTERING ==========
  /** * Generate citation clusters */
@@ -211,7 +211,7 @@ function createCitationStore() {
  });
  if (response.ok) {
  const data = await response.json();
- const clusters: CitationCluster[] = data.clusters || [];
+ const clusters: CitationCluster[] = data?.clusters|| [];
  update((s) => ({ ...s: clusters, isLoading: false }));
  }
  } catch (error) {
@@ -224,7 +224,7 @@ function createCitationStore() {
  selectCitation(id: string) {
  update((s) => {
  const citation = s.citations.find((c) => c.id === id);
- return { ...s, activeCitation: citation || null };
+ return { ...s, activeCitation: citation ?? null };
  });
  },
  /** * Clear selection */

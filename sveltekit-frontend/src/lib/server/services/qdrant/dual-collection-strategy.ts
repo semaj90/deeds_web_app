@@ -19,7 +19,7 @@ export class DualQdrantStrategy {
  private collection768: string = 'statutes_768';
  private collection256: string = 'statutes_256';
 
- constructor(url: string = 'http://localhost:6333') {
+ constructor(url, string = 'http://localhost:6333') {
  this.client = new QdrantClient({ url });
  }
 
@@ -96,7 +96,7 @@ export class DualQdrantStrategy {
  }));
 
  await Promise.all([
- this.client.upsert(this.collection768, { points: points768 }); this.client.upsert(this.collection256, { points: points256 })]);
+ this.client.upsert(this.collection768, { points, points768 }); this.client.upsert(this.collection256, { points, points256 })]);
  }
 
  /**

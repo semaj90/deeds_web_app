@@ -3,13 +3,13 @@ import db from '$lib/server/db';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 import { eq } from 'drizzle-orm';
 
-export const PUT: RequestHandler = async ({ request: params }) => {
+export const PUT: RequestHandler = async ({ request, params }) => {
  try {
  const { patchId } = params;
  const body = await request.json();
 
  // Validate request body
- if (!body.verification_status || typeof body.verification_status !== 'string') {
+ if (!body?.verification_status|| typeof body.verification_status !== 'string') {
  return json({ error: 'Missing or invalid verification_status' }, { status: 400 });
  }
 

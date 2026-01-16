@@ -34,7 +34,7 @@ describe('CitationDetail Component', () => {
 
  it('should render citation detail', () => {
  const { container } = render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(container.querySelector('.citation-detail')).toBeTruthy();
@@ -42,7 +42,7 @@ describe('CitationDetail Component', () => {
 
  it('should display statute code', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText('18 U.S.C. § 1001')).toBeTruthy();
@@ -50,7 +50,7 @@ describe('CitationDetail Component', () => {
 
  it('should display statute title', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText('Fraud and false statements')).toBeTruthy();
@@ -58,7 +58,7 @@ describe('CitationDetail Component', () => {
 
  it('should display metadata', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText('Federal')).toBeTruthy();
@@ -68,7 +68,7 @@ describe('CitationDetail Component', () => {
 
  it('should display highlighted text', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText('Fraud and false statements')).toBeTruthy();
@@ -76,7 +76,7 @@ describe('CitationDetail Component', () => {
 
  it('should display notes', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText('Important statute')).toBeTruthy();
@@ -139,7 +139,7 @@ describe('CitationDetail Component', () => {
 
  it('should display timestamps', () => {
  render(CitationDetail, {
- props: { citation: mockCitation },
+ props: { citation, mockCitation },
  });
 
  expect(screen.getByText(/Created:/)).toBeTruthy();

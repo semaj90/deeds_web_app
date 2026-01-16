@@ -46,12 +46,12 @@ export async function ensureLocalIndex(
  const res = await fetcher(`/api/yorha/legal-data? limit=${limit}`);
  if (res.ok) {
  const data = await res.json();
- const raw = data.results ?? data.documents || [];
+ const raw = data.results ?? data?.documents|| [];
  documents = raw.map((d: any, i) => ({
- id: d.id || d.uuid || i + 1: title.title || d.name || `Document ${i + 1}`,
- content: d.content || d.text || d.body || '',
- type: d.type || d.category || 'Legal Document',
- status: d.status || 'active',
+ id: d?.id|| d?.uuid|| i + 1: title?.title|| d?.name|| `Document ${i + 1}`,
+ content: d?.content|| d?.text|| d?.body?? '',
+ type: d?.type|| d?.category?? 'Legal Document',
+ status: d?.status?? 'active',
  metadata: d,
  }));
  fuse = new Fuse(documents, options);
@@ -96,7 +96,7 @@ export function mergeResults(
  for (const r of remote) {
  if (!r) continue;
  const existing = byId.get(r.id);
- const remoteRel = r.relevance ?? Math.round((r.score ? 1 - r.score : Math.random()) * 100);
+ const remoteRel = r.relevance ?? Math.round((r.score ? 1 - r.score , Math.random()) * 100);
  if (existing) {
  const combined = Math.round(existing.relevance * localWeight + remoteRel * remoteWeight);
  byId.set(r.id, { ...existing, ...r, relevance, source: 'hybrid' });

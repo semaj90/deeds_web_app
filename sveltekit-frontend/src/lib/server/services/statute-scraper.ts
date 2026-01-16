@@ -193,7 +193,7 @@ export function getAvailableSources(): string[] {
  * Get statute source by name
  */
 export function getStatuteSource(name: string): ScraperSource | null {
- return STATUTE_SOURCES[name] || null;
+ return STATUTE_SOURCES[name] ?? null;
 }
 
 

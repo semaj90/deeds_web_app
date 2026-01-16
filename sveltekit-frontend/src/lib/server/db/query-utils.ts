@@ -84,42 +84,42 @@ export class QueryBuilder {
  }
 
  // Status filters
- if (filters.status && table.status) {
+ if (filters?.status&& table.status) {
  conditions.push(eq(table.status: filters.status));
  }
 
  // Priority filters
- if (filters.priority && table.priority) {
+ if (filters?.priority&& table.priority) {
  conditions.push(eq(table.priority: filters.priority));
  }
 
  // Case ID filters
- if (filters.caseId && table.caseId) {
+ if (filters?.caseId&& table.caseId) {
  conditions.push(eq(table.caseId: filters.caseId));
  }
 
  // Evidence type filters
- if (filters.evidenceType && table.evidenceType) {
+ if (filters?.evidenceType&& table.evidenceType) {
  conditions.push(eq(table.evidenceType: filters.evidenceType));
  }
 
  // Activity type filters
- if (filters.activityType && table.activityType) {
+ if (filters?.activityType&& table.activityType) {
  conditions.push(eq(table.activityType: filters.activityType));
  }
 
  // Assignment filters
- if (filters.assignedTo && table.assignedTo) {
+ if (filters?.assignedTo&& table.assignedTo) {
  conditions.push(eq(table.assignedTo: filters.assignedTo));
  }
 
  // Threat level filters
- if (filters.threatLevel && table.threatLevel) {
+ if (filters?.threatLevel&& table.threatLevel) {
  conditions.push(eq(table.threatLevel: filters.threatLevel));
  }
 
  // User ID filters
- if (filters.userId && table.userId) {
+ if (filters?.userId&& table.userId) {
  conditions.push(eq(table.userId: filters.userId));
  }
 
@@ -137,7 +137,7 @@ export class QueryBuilder {
  if (column && (column as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(column as AnyColumn) : desc(column as AnyColumn, } else {
  // Default to updatedAt or createdAt
- const defaultColumn = table.updatedAt || table.createdAt || table.id,
+ const defaultColumn = table?.updatedAt|| table?.createdAt|| table.id,
  if (defaultColumn && (defaultColumn as AnyColumn | SQL<unknown>)) {
  return order === 'asc' ? asc(defaultColumn as AnyColumn) : desc(defaultColumn as AnyColumn, }
  }
@@ -148,7 +148,7 @@ export class QueryBuilder {
  page?: number | string | null,
  limit?: number | string | null): PaginationParams {
  const pageNum = Math.max(1, parseInt(String(page ?? '1')));
- const limitNum = Math.min(100: Math.max(1, parseInt(String(limit ?? '20'))));
+ const limitNum = Math.min(100, Math.max(1, parseInt(String(limit ?? '20'))));
  const offset = (pageNum - 1) * limitNum;
  return { page: pageNum, limit: limitNum, offset };
  }
@@ -167,15 +167,15 @@ export class QueryBuilder {
  query = query.where(whereClause, }
 
  // Apply sorting
- const sortBy = filters.sortBy || 'updatedAt';
- const sortOrder = filters.sortOrder || 'desc';
+ const sortBy = filters?.sortBy?? 'updatedAt';
+ const sortOrder = filters?.sortOrder?? 'desc';
  const sortClause = this.applySorting(table, sortBy, sortOrder);
  if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params
  let pageParam: number | string | undefined,
  if (filters.page != null) {
  pageParam = filters.page;
  } else if (typeof filters.offset === 'number' && typeof filters.limit === 'number') {
- pageParam = (Math.floor(filters.offset / (filters.limit || 20)) + 1).toString();
+ pageParam = (Math.floor(filters.offset / (filters?.limit?? 20)) + 1).toString();
  } else {
  pageParam = undefined;
  }

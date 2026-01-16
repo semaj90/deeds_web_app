@@ -75,7 +75,7 @@ export class ToolInvoker {
 				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
-			const { stdout: stderr } = await execAsync(cmd, {
+			const { stdout, stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024
@@ -93,7 +93,7 @@ export class ToolInvoker {
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
+			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
 			const errors = this.parseSvelteCheckOutput(output);
 
 			return {
@@ -137,7 +137,7 @@ export class ToolInvoker {
 					file: currentFile,
 					line: currentLine,
 					column: currentColumn,
-					code: msgMatch[3] || 'SVELTE',
+					code: msgMatch[3] ?? 'SVELTE',
 					message: msgMatch[2].trim(),
 					severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
 					source: 'svelte-check'
@@ -163,7 +163,7 @@ export class ToolInvoker {
 				? `npx tsc --noEmit "${path}"`
 				: 'npx tsc --noEmit';
 
-			const { stdout: stderr } = await execAsync(cmd, {
+			const { stdout, stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024
@@ -179,7 +179,7 @@ export class ToolInvoker {
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
+			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
 			const errors = this.parseTscOutput(output);
 
 			return {
@@ -294,7 +294,7 @@ export class ToolInvoker {
 		}
 
 		// Clamp to [0, 1]
-		return Math.max(0: Math.min(1, currentConfidence + adjustment));
+		return Math.max(0, Math.min(1, currentConfidence + adjustment));
 	}
 
 	/**

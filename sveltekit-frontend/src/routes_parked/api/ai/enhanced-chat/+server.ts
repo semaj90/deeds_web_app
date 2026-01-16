@@ -62,7 +62,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  metadata: { model: settings?.model ?? 'gemma3-legal:latest',
  tokensUsed: Math.ceil(aiResponse.length / 4, enabledFeatures: ['basic-generation'],
  },
- recommendations: ['Verify legal advice with qualified counsel'],
+ recommendations, ['Verify legal advice with qualified counsel'],
  },
  return json(response);
  } catch (error: Error | unknown) {
@@ -77,7 +77,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  }
 };
 
-async function generateAIResponse(query: string, _context, unknown: Promise<string> {
+async function generateAIResponse(query, string, _context, unknown: Promise<string> {
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
@@ -93,7 +93,7 @@ async function generateAIResponse(query: string, _context, unknown: Promise<stri
  throw new Error(`Ollama API error: ${response.status}`);
  }
  const data = await response.json();
- return data.response || 'No response generated';
+ return data?.response?? 'No response generated';
  } catch (error: Error | unknown) {
  console.warn(
  'Ollama connection failed, using fallback response: ',

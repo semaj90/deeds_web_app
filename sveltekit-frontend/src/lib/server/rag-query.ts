@@ -17,7 +17,7 @@ import { generateEmbedding } from './embedding-service';
 
 // Initialize Qdrant client
 const qdrantClient = new QdrantClient({
-    url: process.env.QDRANT_URL || 'http://localhost:6333',
+    url: process.env?.QDRANT_URL?? 'http://localhost:6333',
 });
 
 const COLLECTION_NAME = 'phase72_evidence_embeddings';
@@ -63,7 +63,7 @@ export async function getContextFromRag(opts: { query: string,
         if (caseId) {
             filterConditions.push({
                 key: 'case_id',
-                match: { value: caseId },
+                match: { value, caseId },
             });
             console.log(`[RAG] Filtering by case_id: ${caseId}`);
         }
@@ -71,7 +71,7 @@ export async function getContextFromRag(opts: { query: string,
         if (jurisdiction) {
             filterConditions.push({
                 key: 'jurisdiction',
-                match: { value: jurisdiction },
+                match: { value, jurisdiction },
             });
             console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
         }
@@ -80,7 +80,7 @@ export async function getContextFromRag(opts: { query: string,
             // Filter: results must have at least one of the specified tags
             filterConditions.push({
                 key: 'tags',
-                match: { any: tags },
+                match: { any, tags },
             });
             console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
         }
@@ -111,13 +111,13 @@ export async function getContextFromRag(opts: { query: string,
 
         for (const result of results) {
             const payload = result.payload as Record<string, any>;
-            const text = payload.text || payload.content || '';
-            const evidenceId = payload.evidence_id || result.id;
-            const fileName = payload.file_name || `Evidence ${evidenceId}`;
-            let score = result.score || 0;
+            const text = payload?.text|| payload?.content?? '';
+            const evidenceId = payload?.evidence_id|| result.id;
+            const fileName = payload?.file_name|| `Evidence ${evidenceId}`;
+            let score = result?.score?? 0;
 
             // Check if this result matches any of the requested tags
-            const resultTags = payload.tags || [];
+            const resultTags = payload?.tags|| [];
             const matchedTags =
                 tags && tags.length > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
 
@@ -189,13 +189,13 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
 }> {
     try {
         const collections = await qdrantClient.getCollections();
-        const collectionsList = collections.collections || [];
+        const collectionsList = collections?.collections|| [];
         const collection = collectionsList.find((c: any) => c.name === COLLECTION_NAME);
 
         if (!collection) {
             return {
                 healthy: false,
-                message: `Collection "${COLLECTION_NAME}" not found. Available: ${collectionsList.map((c: any) => c.name).join(', ') || 'none'}`,
+                message: `Collection "${COLLECTION_NAME}" not found. Available: ${collectionsList.map((c: any) => c.name).join(', ') ?? 'none'}`,
             };
         }
 
@@ -216,7 +216,7 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
             healthy: true,
             message: `Collection "${COLLECTION_NAME}" is healthy`,
             collectionInfo: { name: COLLECTION_NAME,
-                pointsCount: collectionInfo.points_count || 0,
+                pointsCount: collectionInfo?.points_count?? 0,
                 vectorSize,
             },
         };
@@ -233,12 +233,10 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
  */
 export async function debugListRecentPoints(limit: number = 5): Promise<any[]> {
     try {
-        const result = await qdrantClient.scroll(COLLECTION_NAME, {
-            limit,
-            with_payload: true,
+        const result = await qdrantClient.scroll(COLLECTION_NAME, { limit: with_payload: true,
             with_vector: false,
         });
-        return result.points || [];
+        return result?.points|| [];
     } catch (err) {
         console.error('[RAG] Debug list failed:', err);
         return [];

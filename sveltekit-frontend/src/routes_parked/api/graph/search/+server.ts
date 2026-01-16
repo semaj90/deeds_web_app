@@ -4,7 +4,7 @@ import type { vectorSearchService } from '$lib/services/real-vector-search-servi
 
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const { query: options } = await request.json();
+ const { query, options } = await request.json();
  if (!query || typeof query !== 'string') {
  return json({ success: false, error: 'Missing query' }, { status: 400 });
  }

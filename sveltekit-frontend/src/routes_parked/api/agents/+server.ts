@@ -12,14 +12,14 @@ import { checkOllamaHealth } from '$lib/ai/ollama-config';
 /**
  * POST handler for agent endpoints
  */
-export const POST: RequestHandler = async ({ request: url }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
  const path = url.pathname;
 
  try {
  // Agent chat endpoint
  if (path.endsWith('/chat')) {
  const body = await request.json();
- const { prompt: context } = body;
+ const { prompt, context } = body;
 
  if (!prompt) {
  return json({ error: 'Missing required field: prompt' }, { status: 400 });
@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  // Tool execution endpoint
  if (path.endsWith('/execute-tool')) {
  const body = await request.json();
- const { tool: arguments } = body;
+ const { tool, arguments } = body;
 
  if (!tool) {
  return json({ error: 'Missing required field: tool' }, { status: 400 });

@@ -82,11 +82,11 @@ export class WebGPULangChainBridge {
 	constructor(config: Partial<LangChainWebGPUConfig> = {}) {
 		this.config = {
 			useWebGPUCache: config.useWebGPUCache ?? true,
-			batchSize: config.batchSize || 128,
+			batchSize: config?.batchSize?? 128,
 			cacheEmbeddings: config.cacheEmbeddings ?? true,
 			compressVectors: config.compressVectors ?? true,
-			practiceArea: config.practiceArea || 'general',
-			documentType: config.documentType || 'general'
+			practiceArea: config?.practiceArea?? 'general',
+			documentType: config?.documentType?? 'general'
 		};
 	}
 
@@ -118,9 +118,7 @@ export class WebGPULangChainBridge {
 				processingTime: embeddingResult.data.processingTime,
 				cacheHit: embeddingResult.data.cacheHit
 			},
-			performance: {
-				totalTime,
-				extractionTime: extractionResult.processingTime,
+			performance: { totalTime: extractionTime: extractionResult.processingTime,
 				embeddingTime: embeddingResult.data.processingTime,
 				webgpuUtilized: embeddingResult.data.webgpuUtilized ?? false,
 				throughput: documentText.length / (totalTime / 1000)
@@ -212,9 +210,7 @@ export class WebGPULangChainBridge {
 					? langExtractService.extractContractTerms(text).catch(() => null)
 					: Promise.resolve(null),
 				langExtractService
-					.extractLegalEntities({
-						text,
-						documentType: docType,
+					.extractLegalEntities({ text: documentType: docType,
 						extractionType: 'entities'
 					})
 					.catch(() => [])
@@ -271,7 +267,7 @@ export class WebGPULangChainBridge {
 			// Split document into sections for hierarchical embeddings
 			const sections = this.splitIntoSections(text);
 
-			if (config.useWebGPUCache && getBatchLegalEmbeddings) {
+			if (config?.useWebGPUCache&& getBatchLegalEmbeddings) {
 				// Use WebGPU-optimized batch embeddings
 				const embeddings = await getBatchLegalEmbeddings(
 					sections.map((section) => ({
@@ -284,9 +280,7 @@ export class WebGPULangChainBridge {
 				const documentEmbedding = embeddings[0] || new Float32Array(768);
 
 				return {
-					data: {
-						documentEmbedding,
-						sectionEmbeddings: embeddings,
+					data: { documentEmbedding: sectionEmbeddings: embeddings,
 						compressionRatio: config.compressVectors ? 4.2 : 1.0,
 						processingTime: Date.now() - startTime,
 						cacheHit,
@@ -295,9 +289,7 @@ export class WebGPULangChainBridge {
 				};
 			} else if (getLegalEmbedding) {
 				// Standard embedding generation
-				const legalQuery = {
-					text,
-					documentType: config.documentType === 'general' ? 'case' : config.documentType,
+				const legalQuery = { text: documentType: config.documentType === 'general' ? 'case' : config.documentType,
 					practiceArea: config.practiceArea
 				};
 
@@ -403,7 +395,7 @@ export class WebGPULangChainBridge {
 		// Count occurrences of legal terms
 		words.forEach((word) => {
 			if (legalTerms.includes(word)) {
-				wordCount.set(word, (wordCount.get(word) || 0) + 1);
+				wordCount.set(word, (wordCount.get(word) ?? 0) + 1);
 			}
 		});
 

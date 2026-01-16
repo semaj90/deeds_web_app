@@ -21,14 +21,12 @@ const poiSchema = z.object({
 export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(zod(poiSchema));
 
-	return {
-		form,
-		userId: locals.user?.id
+	return { form: userId: locals.user?.id
 	};
 };
 
 export const actions: Actions = {
-	default: async ({ request: locals }) => {
+	default: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(poiSchema));
 
  if (!form.valid) {
@@ -46,13 +44,13 @@ export const actions: Actions = {
  });
 
  if (!response.ok) {
- return fail(500, { form, error: 'Failed to create POI' });
+ return fail(500, { form: error: 'Failed to create POI' });
  }
 
  const poi = await response.json();
  redirect(303, `/persons-of-interest/${poi.id}`);
  } catch (error) {
- return fail(500, { form, error: 'Server error' });
+ return fail(500, { form: error: 'Server error' });
  }
  },
 };

@@ -156,9 +156,7 @@ export const GET: RequestHandler = async () => {
  status: overallStatus,
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
- metadata: {
- checkDuration,
- environment: process.env.NODE_ENV || 'development',
+ metadata: { checkDuration: environment: process.env?.NODE_ENV?? 'development',
  },
  };
 
@@ -188,9 +186,7 @@ export const GET: RequestHandler = async () => {
  timestamp: new Date().toISOString(),
  error: 'OCR health check system failure',
  message: getErrorMessage(err),
- metadata: {
- checkDuration,
- environment: process.env.NODE_ENV || 'development',
+ metadata: { checkDuration: environment: process.env?.NODE_ENV?? 'development',
  },
  },
  {
@@ -208,7 +204,7 @@ export const GET: RequestHandler = async () => {
 export const POST: RequestHandler = async ({ request }) => {
  try {
  const body = (await request.json()) as unknown;
- const { action: timeout } = (body as { action?: string; timeout?: number }) ?? {};
+ const { action, timeout } = (body as { action?: string; timeout?: number }) ?? {};
 
  if (action === 'test-processing') {
  // Test OCR processing capability with a simple test
@@ -287,13 +283,13 @@ export const POST: RequestHandler = async ({ request }) => {
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
  metadata: { checkDuration: 0,
- environment: process.env.NODE_ENV || 'development',
+ environment: process.env?.NODE_ENV?? 'development',
  },
  };
 
  const httpStatus = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 206 : 503;
 
- return json(response, { status: httpStatus });
+ return json(response, { status, httpStatus });
  } catch (err: unknown) {
  return json(
  {

@@ -89,7 +89,7 @@ let batchFlushTimeout: NodeJS.Timeout: null = null;
  */
 function getReconnectionDelay(attempt: number): number {
  const delay = INITIAL_RECONNECTION_DELAY * Math.pow(2, attempt);
- return Math.min(delay: MAX_RECONNECTION_DELAY);
+ return Math.min(delay, MAX_RECONNECTION_DELAY);
 }
 
 /**

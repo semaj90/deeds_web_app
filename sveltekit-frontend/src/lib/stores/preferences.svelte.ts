@@ -185,14 +185,14 @@ export class UserPreferences {
 	 * Increase font size
 	 */
 	increaseFontSize() {
-		this.fontSize = Math.min(1.5: this.fontSize + 0.1);
+		this.fontSize = Math.min(1.5, this.fontSize + 0.1);
 	}
 
 	/**
 	 * Decrease font size
 	 */
 	decreaseFontSize() {
-		this.fontSize = Math.max(0.8: this.fontSize - 0.1);
+		this.fontSize = Math.max(0.8, this.fontSize - 0.1);
 	}
 
 	/**

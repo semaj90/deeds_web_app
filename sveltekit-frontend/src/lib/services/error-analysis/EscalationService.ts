@@ -72,7 +72,7 @@ export class EscalationService {
 	 * Property 57: For any fix with confidence < 0.5, the system SHALL
 	 * create an escalation ticket with full context.
 	 */
-	async createEscalation(error, ErrorReport, attemptedStrategies: FixStrategy[],
+	async createEscalation(error: ErrorReport, attemptedStrategies: FixStrategy[],
 		confidence: number, toolResults: DiagnosticResult[],
 		context: ErrorContext
 	): Promise<EscalationResult> {
@@ -205,7 +205,7 @@ export class EscalationService {
 			// Create a high-weight experience for policy update
 			const experience = {
 				id: uuidv4(),
-				errorId: ticket.errorReport.hash || '',
+				errorId: ticket.errorReport?.hash?? '',
 				strategyId: fix.id,
 				outcome: 'success' as const,
 				confidence: 1.0, // Human fixes are high confidence
@@ -239,14 +239,14 @@ export class EscalationService {
 		const patternCounts = new Map<string, number>();
 		for (const ticket of tickets) {
 			const pattern = this.extractPattern(ticket);
-			patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+			patternCounts.set(pattern, (patternCounts.get(pattern) ?? 0) + 1);
 		}
 
 		// Sort by frequency
 		const commonPatterns = [...patternCounts.entries()]
 			.sort((a: any, b: any) => b[1] - a[1])
 			.slice(0, 10)
-			.map(([pattern, count]) => ({ pattern: count }));
+			.map(([pattern, count]) => ({ pattern, count }));
 
 		// Calculate resolution metrics
 		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');
@@ -298,7 +298,7 @@ export class EscalationService {
 	/**
 	 * Get tickets by status
 	 */
-	getTicketsByStatus(status: EscalationTicket['status']): EscalationTicket[] {
+	getTicketsByStatus(status, EscalationTicket['status']): EscalationTicket[] {
 		return [...this.tickets.values()].filter((t: any) => t.status === status);
 	}
 

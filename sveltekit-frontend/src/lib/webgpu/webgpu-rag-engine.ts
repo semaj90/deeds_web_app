@@ -120,9 +120,7 @@ export class WebGPURAGEngine {
  if (adapter.features.has('texture-compression-bc')) {
  requiredFeatures.push('texture-compression-bc');
  }
- this.device = await adapter.requestDevice({
- requiredFeatures,
- requiredLimits: { maxComputeWorkgroupStorageSize: 32768, maxComputeInvocationsPerWorkgroup: 1024 1024,
+ this.device = await adapter.requestDevice({ requiredFeatures: requiredLimits: { maxComputeWorkgroupStorageSize: 32768, maxComputeInvocationsPerWorkgroup: 1024 1024,
  maxComputeWorkgroupsPerDimension: 65535,
  },
  });
@@ -195,7 +193,7 @@ export class WebGPURAGEngine {
  this.bindGroupLayouts.set('similarity', bindGroupLayout);
  // Create compute pipeline
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'cosine_similarity',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code, shaderCode }, entryPoint: 'cosine_similarity',
  },
  });
  this.computePipelines.set('similarity', computePipeline);
@@ -212,7 +210,7 @@ export class WebGPURAGEngine {
  });
  this.bindGroupLayouts.set('clustering', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'kmeans_assignment',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code, shaderCode }, entryPoint: 'kmeans_assignment',
  },
  });
  this.computePipelines.set('clustering', computePipeline);
@@ -229,7 +227,7 @@ export class WebGPURAGEngine {
  });
  this.bindGroupLayouts.set('entity_extraction', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'extract_legal_entities',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code, shaderCode }, entryPoint: 'extract_legal_entities',
  },
  });
  this.computePipelines.set('entity_extraction', computePipeline);
@@ -247,7 +245,7 @@ export class WebGPURAGEngine {
  });
  this.bindGroupLayouts.set('semantic_search', bindGroupLayout);
  const computePipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code: shaderCode }, entryPoint: 'semantic_search_scoring',
+ layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: this.device.createShaderModule({ code, shaderCode }, entryPoint: 'semantic_search_scoring',
  },
  });
  this.computePipelines.set('semantic_search', computePipeline);
@@ -259,10 +257,10 @@ export class WebGPURAGEngine {
  console.warn('CUDA interop requires WASM module');
  return;
  }
- // WebAssembly.instantiate can return either an Instance or an object with { instance: module }.
+ // WebAssembly.instantiate can return either an Instance or an object with { instance, module }.
  // Provide a correctly typed import object and defensively extract the instance.
  const imports: WebAssembly.Imports = {};
- // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance: module })
+ // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance, module })
  // or a raw WebAssembly.Instance depending on the environment/signature. Use a precise union
  // type and narrow safely to avoid `any`.
  const instantiatedRaw = (await WebAssembly.instantiate(this.wasmModule!, imports)) as
@@ -285,7 +283,7 @@ export class WebGPURAGEngine {
  // Narrow the function signature for safety
  const cudaInit = maybeCudaInit as (deviceId: number) => number;
  try {
- const result = cudaInit(this.cudaConfig.cudaDeviceId || 0);
+ const result = cudaInit(this.cudaConfig?.cudaDeviceId?? 0);
  if (result === 0) {
  this.cudaInterop = true;
  console.log('🔗 CUDA interoperability enabled');
@@ -306,7 +304,7 @@ export class WebGPURAGEngine {
  async computeSimilarities(
  documentEmbeddings: Float32Array, queryEmbedding: Float32Array
  ): Promise<Float32Array> {
- if (!this.device || !this.computePipelines.has('similarity')) {
+ if (!this?.device|| !this.computePipelines.has('similarity')) {
  throw new Error('WebGPU not initialized or similarity pipeline not available');
  }
  const pipeline = this.computePipelines.get('similarity')!;
@@ -327,10 +325,10 @@ export class WebGPURAGEngine {
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
- { binding: 0, resource: { buffer: inputBuffer } },
- { binding: 1, resource: { buffer: queryBuffer } },
- { binding: 2, resource: { buffer: resultBuffer } },
- { binding: 3, resource: { buffer: configBuffer } }],
+ { binding: 0, resource: { buffer, inputBuffer } },
+ { binding: 1, resource: { buffer, queryBuffer } },
+ { binding: 2, resource: { buffer, resultBuffer } },
+ { binding: 3, resource: { buffer, configBuffer } }],
  });
   
  const commandEncoder = this.device.createCommandEncoder();
@@ -362,7 +360,7 @@ export class WebGPURAGEngine {
  documentEmbeddings: Float32Array, numClusters: number,
  maxIterations: number = 100
  ): Promise<{ centroids: Float32Array, assignments, Uint32Array }> {
- if (!this.device || !this.computePipelines.has('clustering')) {
+ if (!this?.device|| !this.computePipelines.has('clustering')) {
  throw new Error('WebGPU not initialized or clustering pipeline not available');
  }
  const pipeline = this.computePipelines.get('clustering')!;
@@ -388,10 +386,10 @@ export class WebGPURAGEngine {
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
- { binding: 0, resource: { buffer: documentBuffer } },
- { binding: 1, resource: { buffer: centroidBuffer } },
- { binding: 2, resource: { buffer: assignmentBuffer } },
- { binding: 3, resource: { buffer: configBuffer } }],
+ { binding: 0, resource: { buffer, documentBuffer } },
+ { binding: 1, resource: { buffer, centroidBuffer } },
+ { binding: 2, resource: { buffer, assignmentBuffer } },
+ { binding: 3, resource: { buffer, configBuffer } }],
  });
   
  for (let iteration = 0; iteration < maxIterations; iteration++) {

@@ -111,7 +111,7 @@ interface SummaryPayload {
 // --- end revised types ---
 
 // Environment variables
-const QDRANT_URL = process.env.QDRANT_URL || "http://localhost:6333";
+const QDRANT_URL = process.env?.QDRANT_URL?? "http://localhost:6333";
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 
 // Collection names
@@ -130,7 +130,7 @@ export class QdrantVectorStore {
  private initialized = false;
 
  constructor() {
- const config: QdrantClientParams = { url: QDRANT_URL };
+ const config: QdrantClientParams = { url, QDRANT_URL };
  if (QDRANT_API_KEY) config.apiKey = QDRANT_API_KEY;
  this.client = new QdrantClient(config, }
 
@@ -153,7 +153,7 @@ export class QdrantVectorStore {
  const createCfg = {
  vectors: {
  // "embeddings" is the named vector field required at runtime
- embeddings: { size, distance: "Cosine" },
+ embeddings: { size: distance: "Cosine" },
  },
  optimizers_config: { default_segment_number: 2 },
  replication_factor: 1,
@@ -299,7 +299,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  > {
  await this.ensureInitialized();
  const filter = entityType
- ? { must: [{ key: "entityType", match: { value: entityType } }] }
+ ? { must: [{ key: "entityType", match: { value, entityType } }] }
 
   | undefined;
  const searchParams: QdrantSearchRequest = {
@@ -346,7 +346,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  async getEntityClusters(entityType: string, minClusterSize: number = 3) {
  await this.ensureInitialized();
  const scrollReq = {
- filter: { must: [{ key: "entityType", match: { value: entityType } }] },
+ filter: { must: [{ key: "entityType", match: { value, entityType } }] },
  limit: 1000, with_payload: true,
  } as unknown as QdrantScrollParams;
  const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, scrollReq)) as unknown as { points?: Array<{ payload?, EntityPayload }> } | undefined;
@@ -377,7 +377,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  await this,.ensureInitialized,();
  const deleteReq,: QdrantDeleteParams = {
  wait: true,
- filter: { must: [{ key: "sessionId", match: { value: sessionId } }] },
+ filter: { must: [{ key: "sessionId", match: { value, sessionId } }] },
  } as unknown as QdrantDeleteParams;
 
  // Cast to the runtime parameter type expected by the client to avoid TS mismatches across versions.
@@ -388,8 +388,8 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  }
 
  /** Get collection statistics */
- async getStatistics(): Promise<{ conversations: { count: number };
- entities: { count: number };
+ async getStatistics(): Promise<{ conversations: { count, number };
+ entities: { count, number };
  summaries: { count, number };
  }> {
  await this,.ensureInitialized,();

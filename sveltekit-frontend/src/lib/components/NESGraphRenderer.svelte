@@ -162,7 +162,7 @@
 		ctx.setLineDash([]);
 	}
 
-	function handleCanvasClick(e, MouseEvent) {
+	function handleCanvasClick(e: MouseEvent) {
 		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = e.clientX - rect.left;
@@ -183,7 +183,7 @@
 		}
 	}
 
-	function handleCanvasMove(e, MouseEvent) {
+	function handleCanvasMove(e: MouseEvent) {
 		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = e.clientX - rect.left;

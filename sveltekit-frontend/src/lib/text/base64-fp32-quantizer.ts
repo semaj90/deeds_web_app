@@ -123,7 +123,7 @@ export class Base64FP32Quantizer {
  private async parallelQuantization(
  rawBytes: Uint8Array, config: QuantizationOptions
  ): Promise<Float32Array> {
- const threadsPerBlock = Math.min(config.cudaThreads: this.CUDA_BLOCK_SIZE);
+ const threadsPerBlock = Math.min(config.cudaThreads, this.CUDA_BLOCK_SIZE);
  const numBlocks = Math.ceil(rawBytes.length / threadsPerBlock);
  const promises: Promise<Float32Array>[] = [];
 
@@ -148,7 +148,7 @@ export class Base64FP32Quantizer {
  threadsPerBlock: number, config: QuantizationOptions
  ): Promise<Float32Array> {
  const startIdx = blockId * threadsPerBlock;
- const endIdx = Math.min(startIdx + threadsPerBlock: data.length);
+ const endIdx = Math.min(startIdx + threadsPerBlock, data.length);
  const blockSize = endIdx - startIdx;
 
  if (blockSize <= 0) {
@@ -275,7 +275,7 @@ export class Base64FP32Quantizer {
  const quantizationResult = await this.quantizeGemmaOutput(base64Output, options);
 
  return {
- modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array: new Float32Array(0),
+ modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array | new Float32Array(0),
  logits: new Float32Array(0),
  perplexity: 1.0, confidence: 0.8,
  legalClassification: { documentType: 'brief',

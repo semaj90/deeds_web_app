@@ -64,8 +64,8 @@ async function webgpuRerank(
  const qTokens = query.toLowerCase().split(/\s+/).filter(Boolean);
  const scored = (candidates as Candidate[]).map((c) => {
  const textFromMeta =
- (c.metadata && (c.metadata['text'] as string)) || (c['text'] as string) || '';
- const text = (textFromMeta || '').toLowerCase();
+ (c?.metadata&& (c.metadata['text'] as string)) || (c['text'] as string) ?? '';
+ const text = (textFromMeta ?? '').toLowerCase();
  let overlap = 0;
  for (const t of qTokens) {
  if (text.includes(t)) overlap++;

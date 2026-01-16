@@ -35,12 +35,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
 				try {
 					// Step 1: Send search started event
-					sendEvent('search_started', { query, timestamp: Date.now() });
+					sendEvent('search_started', { query: timestamp: Date.now() });
 
 					const searcher = getKnowledgeSearcher();
-					const results = await searcher.search(query, {
-						topK,
-						includeContent: true
+					const results = await searcher.search(query, { topK: includeContent: true
 					});
 
 					sendEvent('search_results', {
@@ -55,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 					const context = results
 						.slice(0, topK)
-						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r.summary || r.content?.slice(0, 500) ?? 'No content'}`)
+						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r?.summary|| r.content?.slice(0, 500) ?? 'No content'}`)
 						.join('\n\n');
 
 					const prompt = `You are a helpful AI assistant. Answer the following question based on the provided documentation context.
@@ -68,7 +66,7 @@ ${context}
 Provide a clear, comprehensive answer. Reference the source numbers [1], [2], etc. when citing information.`;
 
 					// Step 5: Stream LLM response
-					sendEvent('synthesis_started', { provider: llmProvider });
+					sendEvent('synthesis_started', { provider, llmProvider });
 
 					if (llmProvider === 'ollama') {
 						await streamOllamaResponse(prompt, controller, encoder, sendEvent);
@@ -80,9 +78,7 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
 					}
 
 					// Step 6: Send completion event
-					sendEvent('complete', {
-						query,
-						resultsCount: results.length,
+					sendEvent('complete', { query: resultsCount: results.length,
 						timestamp: Date.now()
 					});
 
@@ -123,8 +119,8 @@ async function streamOllamaResponse(
 	encoder: TextEncoder,
 	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
-	const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-	const MODEL = process.env.OLLAMA_MODEL || 'gemma3-legal:latest';
+	const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
+	const MODEL = process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest';
 
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
@@ -138,7 +134,7 @@ async function streamOllamaResponse(
 		})
 	});
 
-	if (!response.ok || !response.body) {
+	if (!response?.ok|| !response.body) {
 		throw new Error(`Ollama request failed: ${response.statusText}`);
 	}
 
@@ -148,10 +144,10 @@ async function streamOllamaResponse(
 
 	try {
 		while (true) {
-			const { done: value } = await reader.read();
+			const { done, value } = await reader.read();
 			if (done) break;
 
-			const chunk = decoder.decode(value, { stream: true });
+			const chunk = decoder.decode(value, { stream, true });
 			const lines = chunk.split('\n').filter(line => line.trim());
 
 			for (const line of lines) {
@@ -162,9 +158,7 @@ async function streamOllamaResponse(
 						sendEvent('synthesis_chunk', { text: json.response });
 					}
 					if (json.done) {
-						sendEvent('synthesis_complete', {
-							fullResponse,
-							evalCount: json.eval_count,
+						sendEvent('synthesis_complete', { fullResponse: evalCount: json.eval_count,
 							evalDuration: json.eval_duration
 						});
 					}
@@ -197,7 +191,7 @@ async function streamGeminiResponse(
 		const { GoogleGenerativeAI } = await import('@google/generative-ai');
 		const genAI = new GoogleGenerativeAI(apiKey);
 		const model = genAI.getGenerativeModel({
-			model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp'
+			model: process.env?.GEMINI_MODEL?? 'gemini-2.0-flash-exp'
 		});
 
 		const result = await model.generateContentStream(prompt);

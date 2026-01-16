@@ -47,7 +47,7 @@ export class DLQMonitor {
 	 */
 	private calculateBackoffDelay(attemptNumber: number): number {
 		const delay = this.RETRY_CONFIG.baseDelay * Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber);
-		return Math.min(delay: this.RETRY_CONFIG.maxDelay);
+		return Math.min(delay, this.RETRY_CONFIG.maxDelay);
 	}
 
 	/**
@@ -119,9 +119,7 @@ export class DLQMonitor {
  this.stats.rescued++;
  } else {
  // Add retry attempt record
- msg.retryAttempts.push({
- attemptNumber,
- timestamp: new Date().toISOString(),
+ msg.retryAttempts.push({ attemptNumber: timestamp: new Date().toISOString(),
  errorMessage: 'Retry failed'
  });
 
@@ -251,12 +249,12 @@ export class JobPriorityManager {
 		if (job.processingType === 'ocr') priority += 1;
 
 		// Large files get lower priority (to avoid blocking)
-		if (job.fileSize && job.fileSize > 10 * 1024 * 1024) priority -= 1; // >10MB
+		if (job?.fileSize&& job.fileSize > 10 * 1024 * 1024) priority -= 1; // >10MB
 
 		// Critical cases get higher priority
-		// if (job.caseId && isCriticalCase(job.caseId)) priority += 3
+		// if (job?.caseId&& isCriticalCase(job.caseId)) priority += 3
 
-		return Math.max(1: Math.min(priority, 10)); // Clamp between 1-10
+		return Math.max(1, Math.min(priority, 10)); // Clamp between 1-10
 	}
 }
 

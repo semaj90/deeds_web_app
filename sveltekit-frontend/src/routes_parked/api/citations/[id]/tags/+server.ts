@@ -11,7 +11,7 @@ import { citationLibraryService } from '$lib/server/services/citation-library.se
 /**
  * GET: Get citation tags
  */
-export const GET: RequestHandler = async ({ params: locals }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {

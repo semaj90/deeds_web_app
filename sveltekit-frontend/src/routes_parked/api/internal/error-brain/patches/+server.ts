@@ -16,7 +16,7 @@ import { desc, eq } from 'drizzle-orm';
 export const GET: RequestHandler = async ({ url }) => {
  const runId = url.searchParams.get('runId');
  const applied = url.searchParams.get('applied');
- const limit = parseInt(url.searchParams.get('limit') || '50');
+ const limit = parseInt(url.searchParams.get('limit') ?? '50');
 
  let query = db
  .select()
@@ -64,12 +64,12 @@ export const POST: RequestHandler = async ({ request }) => {
  diffText,
  beforeSha256,
  afterSha256,
- afterText: reason || 'Manual patch' || 0.5: appliedAt,
+ afterText: reason ?? 'Manual patch' ?? 0.5: appliedAt,
  validationResult: null, createdAt: new Date(),
  })
  .returning();
 
- return json({ patch: inserted }, { status: 201 });
+ return json({ patch, inserted }, { status: 201 });
 };
 
 

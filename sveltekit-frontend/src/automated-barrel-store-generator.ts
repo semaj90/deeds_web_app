@@ -55,7 +55,7 @@ export interface WasmClusteringService {
 
 export interface NESGPUBridge {
   computeSimilarity(a: Float32Array, b: Float32Array): Promise<number>;
-  allocateBuffer(size: number): GPUBuffer | { size: number };
+  allocateBuffer(size: number): GPUBuffer | { size, number };
 }
 
 /**
@@ -63,9 +63,8 @@ export interface NESGPUBridge {
  */
 function getOllamaEndpoint(): string | null {
   return (
-    (process?.env?.OLLAMA_URL as string : undefined) ||
-    (process?.env?.VITE_OLLAMA_URL as string : undefined) ||
-    null
+    (process?.env?.OLLAMA_URL as string | undefined) ||
+    (process?.env?.VITE_OLLAMA_URL as string | undefined) ?? null
   );
 }
 
@@ -82,16 +81,16 @@ export async function ollamaEmbed(
       const resp = await fetch(`${base}/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, input: texts })
+        body: JSON.stringify({ model: input: texts })
       });
       if (resp.ok) {
         const json: unknown = await resp.json();
-        if (Array.isArray(json) && json.every((it) => Array.isArray(it))) {
+        if (Array.isArray(json) && json.every((it: any) => Array.isArray(it))) {
           return json as unknown as number[][];
         }
         if (typeof json === 'object' && json !== null) {
           const asObj = json as Record<string, unknown>;
-          if (Array.isArray(asObj.embeddings) && asObj.embeddings.every((it) => Array.isArray(it))) {
+          if (Array.isArray(asObj.embeddings) && asObj.embeddings.every((it: any) => Array.isArray(it))) {
             return asObj.embeddings as unknown as number[][];
           }
         }
@@ -102,7 +101,7 @@ export async function ollamaEmbed(
   }
 
   // Fallback: produce stable pseudo-embeddings based on text content
-  return texts.map((txt) => {
+  return texts.map((txt: any) => {
     const len = 128;
     const embedding = new Array<number>(len);
     let h = 2166136261 >>> 0;
@@ -111,7 +110,7 @@ export async function ollamaEmbed(
     }
     for (let i = 0; i < len; i++) {
       h = Math.imul(h ^ i, 16777619) >>> 0;
-      embedding[i] = ((h % 1000) / 1000) * 2 - 1;
+      embedding?.i = ((h % 1000) / 1000) * 2 - 1;
     }
     return embedding;
   });
@@ -139,7 +138,7 @@ export class RedisCache {
   constructor(private client?: RedisLikeClient) {}
 
   async get(key: string): Promise<string | null> {
-    if (this.client && typeof this.client.get === 'function') {
+    if (this?.client&& typeof this.client.get === 'function') {
       const res = await Promise.resolve(this.client.get(key));
       return res as string | null;
     }
@@ -147,7 +146,7 @@ export class RedisCache {
   }
 
   async set(key: string, value: string, ttlSec?: number): Promise<'OK' | null> {
-    if (this.client && typeof this.client.set === 'function') {
+    if (this?.client&& typeof this.client.set === 'function') {
       if (ttlSec) {
         return (await Promise.resolve(this.client.set(key, value, 'EX', ttlSec))) as 'OK' | null;
       }
@@ -159,7 +158,7 @@ export class RedisCache {
   }
 
   async del(key: string): Promise<number> {
-    if (this.client && typeof this.client.del === 'function') {
+    if (this?.client&& typeof this.client.del === 'function') {
       return (await Promise.resolve(this.client.del(key))) as number;
     }
     return this.store.delete(key) ? 1 : 0;
@@ -183,7 +182,7 @@ export class QdrantIndexer {
         await fetch(`${this.baseUrl}/collections/${collection}/points?wait=true`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ points: vectors })
+          body: JSON.stringify({ points, vectors })
         });
       }
       return { success: true, count: vectors.length };
@@ -199,7 +198,7 @@ export class QdrantIndexer {
         const resp = await fetch(`${this.baseUrl}/collections/${collection}/points/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vector, limit: topK })
+          body: JSON.stringify({ vector: limit: topK })
         });
         if (resp.ok) return await resp.json();
       }
@@ -217,10 +216,10 @@ export class PostgresJSONStore {
   constructor(private pool?: PostgresPool) {}
 
   async upsertJson(table: string, id: string | number, json: unknown) {
-    if (this.pool && typeof this.pool.query === 'function') {
+    if (this?.pool&& typeof this.pool.query === 'function') {
       const sql = `INSERT INTO ${table} (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data`;
       await this.pool.query(sql, [id, json]);
-      return { success: true };
+      return { success, true };
     }
     return { success: true, note: 'noop' };
   }
@@ -248,7 +247,7 @@ export class AutomatedBarrelStoreGenerator {
       errorsByCategory: new Map()
     };
 
-    const errorLines = (errorOutput || '').split('\n').filter((line) => line.includes('error TS'));
+    const errorLines = (errorOutput ?? '').split('\n').filter((line: any) => line.includes('error TS'));
     for (const errorLine of errorLines) {
       await this.parseErrorLine(errorLine, analysis);
     }
@@ -380,22 +379,22 @@ export class AutomatedBarrelStoreGenerator {
   ): Promise<void> {
     if (errorLine.includes("Cannot find name '")) {
       const match = errorLine.match(/Cannot find name '([^']+)'/);
-      if (match) analysis.missingFunctions.add(match[1]);
+      if (match) analysis.missingFunctions.add(match?.1);
     }
 
     if (errorLine.includes("Property '") && errorLine.includes("' does not exist on type")) {
       const match = errorLine.match(/Property '([^']+)' does not exist on type/);
-      if (match) analysis.missingMethods.add(match[1]);
+      if (match) analysis.missingMethods.add(match?.1);
     }
 
     if (errorLine.includes("Module '") && errorLine.includes("' has no exported member")) {
       const match = errorLine.match(/Module '[^']+' has no exported member '([^']+)'/);
-      if (match) analysis.missingClasses.add(match[1]);
+      if (match) analysis.missingClasses.add(match?.1);
     }
 
     if (errorLine.includes("Cannot find module '")) {
       const match = errorLine.match(/Cannot find module '([^']+)'/);
-      if (match) analysis.missingModules.add(match[1]);
+      if (match) analysis.missingModules.add(match?.1);
     }
 
     const fileMatch = errorLine.match(/^([^:]+):(\d+):(\d+):/);
@@ -456,9 +455,9 @@ export class AutomatedBarrelStoreGenerator {
       'createBuffer'
     ];
 
-    knownMissing.forEach((item) => {
+    knownMissing.forEach((item: any) => {
       if (item.includes('_')) analysis.missingTypes.add(item);
-      else if (item[0] === item[0].toUpperCase()) analysis.missingClasses.add(item);
+      else if (item?.0 === item?.0.toUpperCase()) analysis.missingClasses.add(item);
       else analysis.missingFunctions.add(item);
     });
   }
@@ -505,26 +504,26 @@ export class AutomatedBarrelStoreGenerator {
     _resolution?: WebFetchResolution,
     _svelteCompleteDocs?: Context7Docs | null
   ): Promise<string> {
-    const envs = Array.from(analysis?.missingTypes ?? new Set<string>()).filter((t) =>
+    const envs = Array.from(analysis?.missingTypes ?? new Set<string>()).filter((t: any) =>
       t.includes('_')
     );
     return `/**
  * AUTO-GENERATED SVELTEKIT BARREL STORE
  */
 export const svelte5Runes = {
-  state: <T>(initial: T) => ({ current: initial }),
+  state: <T>(initial: T) => ({ current, initial }),
   derived: <T>(computation: () => T) => ({ current: computation() }),
   effect: (fn: () => void | (() => void)) => fn()
 };
 
 export const environmentVariables = {
-  ${envs.map((e) => `${e}: process?.env?.${e} ?? ''`).join(',\n  ')}
+  ${envs.map((e: any) => `${e}: process?.env?.${e} ?? ''`).join(',\n  ')}
 };
 
 export const svelteKitUtils = {
   page: { url: new URL('http://localhost:5173'),
     params: {},
-    route: { id: null }
+    route: { id, null }
   },
   navigating: null,
   browser: typeof window !== 'undefined',
@@ -538,7 +537,7 @@ export const svelteKitUtils = {
     _resolution?: WebFetchResolution,
     _drizzleDocs?: Context7Docs | null
   ): Promise<string> {
-    const drizzleFunctions = Array.from(analysis?.missingFunctions ?? []).filter((fn) =>
+    const drizzleFunctions = Array.from(analysis?.missingFunctions ?? []).filter((fn: any) =>
       [
         'pgTable',
         'serial',
@@ -557,7 +556,7 @@ export const svelteKitUtils = {
  * AUTO-GENERATED DATABASE BARREL STORE
  */
 export const drizzleColumns = {
-  ${drizzleFunctions.map((fn) => `${fn}: (...args: unknown[]) => ({ name: args[0], type: '${fn}' })`).join(',\n  ')}
+  ${drizzleFunctions.map((fn: any) => `${fn}: (...args: unknown[]) => ({ name: args?.0, type: '${fn}' })`).join(',\n  ')}
 };
 
 export const drizzleOperators = {
@@ -630,9 +629,9 @@ export const apiClients = {
     return `/**
  * AUTO-GENERATED TYPE DEFINITIONS
  */
-${types.map((t) => `export type ${t} = unknown;`).join('\n')}
+${types.map((t: any) => `export type ${t} = unknown;`).join('\n')}
 
-${classes.map((c) => `export class ${c} { constructor(..._args: unknown[]) {} }`).join('\n')}
+${classes.map((c: any) => `export class ${c} { constructor(..._args: unknown[]) {} }`).join('\n')}
 `;
   }
 

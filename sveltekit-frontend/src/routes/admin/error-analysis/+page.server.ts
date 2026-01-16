@@ -10,10 +10,10 @@ import type { PageServerLoad } from './$types';
 
 const { Pool } = pg;
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://127.0.0.1:6333';
 
 export const load: PageServerLoad = async () => {
-	const qdrant = new QdrantClient({ url: QDRANT_URL });
+	const qdrant = new QdrantClient({ url, QDRANT_URL });
 
 	const aiPool = new Pool({
 		host: '127.0.0.1',
@@ -52,11 +52,11 @@ export const load: PageServerLoad = async () => {
 				return {
 					id: point.id,
 					cluster_id: payload.cluster_id,
-					pattern: payload.pattern || 'Unknown',
-					error_count: parseInt(data.error_count) || 0,
-					files: data.files || '',
-					tags: data.tags || [],
-					payload_tags: payload.tags || []
+					pattern: payload?.pattern?? 'Unknown',
+					error_count: parseInt(data.error_count) ?? 0,
+					files: data?.files?? '',
+					tags: data?.tags|| [],
+					payload_tags: payload?.tags|| []
 				};
 			})
 		);

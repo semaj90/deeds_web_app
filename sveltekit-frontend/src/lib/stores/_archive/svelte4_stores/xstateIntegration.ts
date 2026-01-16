@@ -56,7 +56,7 @@ export function useMachine<T extends AnyStateMachine>(
  // Helper accessors
  canTransition: (transitionName: string) => {
  const snapshot = actor.getSnapshot() as AnySnapshot;
- return snapshot.can({ type: transitionName });
+ return snapshot.can({ type, transitionName });
  },
  isInState: (stateName: string) => {
  const snapshot = actor.getSnapshot() as AnySnapshot;

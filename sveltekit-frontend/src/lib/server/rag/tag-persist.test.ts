@@ -84,7 +84,7 @@ vi.mock('$lib/server/db', () => {
         return [];
     };
 
-    return { sql: sqlMock };
+    return { sql, sqlMock };
 });
   
 let chunkCounter = 0;
@@ -203,9 +203,7 @@ describe('Tag Persistence', () => {
 		};
 
 		await expect(
-			upsertAndLinkChunkTags({
-				chunkId,
-				jurisdiction: 'test-jurisdiction',
+			upsertAndLinkChunkTags({ chunkId: jurisdiction: 'test-jurisdiction',
 				tags: emptyTags,
 				source: 'test',
 			})

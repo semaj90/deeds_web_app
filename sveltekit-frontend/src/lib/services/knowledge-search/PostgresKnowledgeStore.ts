@@ -37,8 +37,7 @@ export interface PostgresDocument {
 }
 
 const DEFAULT_CONFIG: PostgresConfig = {
-  connectionString: process.env.DATABASE_URL ||
-    'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  connectionString: process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
   maxConnections: 10, idleTimeout: 30000 30000
 };
 
@@ -170,7 +169,7 @@ export class PostgresKnowledgeStore {
 
     // Apply filters
     if (filters) {
-      if (filters.tags && filters.tags.length > 0) {
+      if (filters?.tags&& filters.tags.length > 0) {
         query += ` AND tags && $${paramIndex}`;
         params.push(filters.tags);
         paramIndex++;

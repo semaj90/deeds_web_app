@@ -27,7 +27,7 @@ export class NESCacheOrchestrator { private $1 AdvancedCacheManager, private bas
      const state = states.find({\n  find() {
      state.lastAccessed = Date.now({\n  now() {
      optimizedFabricJSON = this.applyNESPaletteReduction({\n  applyNESPaletteReduction() {
-     // This would generate multiple resolution versions // For now, we'll just return the original` }` return { ...$1 $1 optimizedFabricJSON, $1 { ...state.$1 $1 true, $1 !!options.$1 lodLevels | options.lodLevels || 1 } }})} private applyNESPaletteReduction({\n  applyNESPaletteReduction() {
+     // This would generate multiple resolution versions // For now, we'll just return the original` }` return { ...$1 $1 optimizedFabricJSON, $1 { ...state.$1 $1 true, $1 !!options.$1 lodLevels | options?.lodLevels?? 1 } }})} private applyNESPaletteReduction({\n  applyNESPaletteReduction() {
      optimized.objects.forEach({\n  forEach() {
      obj.fill = this.quantizeColor({\n  quantizeColor() {
      obj.stroke = this.quantizeColor({\n  quantizeColor() {

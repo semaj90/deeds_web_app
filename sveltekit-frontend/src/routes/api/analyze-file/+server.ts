@@ -62,7 +62,7 @@ export async function POST({ request }: RequestEvent) {
 				${errors.rows.length},
 				${JSON.stringify(analysis.recommendations)},
 				${JSON.stringify(qdrantTag)},
-				${JSON.stringify({ patterns, timestamp: new Date().toISOString() })},
+				${JSON.stringify({ patterns: timestamp: new Date().toISOString() })},
 				NOW()
 			)
 			ON CONFLICT (file_path) DO UPDATE SET
@@ -119,32 +119,32 @@ async function searchPatterns(filePath: string): Promise<any> {
 
 	try {
 		// TODO/FIXME
-		const { stdout: todos } = await execAsync(
+		const { stdout, todos } = await execAsync(
 			`rg -c "TODO|FIXME" "${filePath}"`,
 			{ timeout: 2000 }
 		).catch(() => ({ stdout: '0' }));
-		patterns.todoComments = parseInt(todos.trim().split(':').pop() || '0');
+		patterns.todoComments = parseInt(todos.trim().split(':').pop() ?? '0');
 
 		// any types
-		const { stdout: anys } = await execAsync(
+		const { stdout, anys } = await execAsync(
 			`rg -c ": any" "${filePath}"`,
 			{ timeout: 2000 }
 		).catch(() => ({ stdout: '0' }));
-		patterns.anyTypes = parseInt(anys.trim().split(':').pop() || '0');
+		patterns.anyTypes = parseInt(anys.trim().split(':').pop() ?? '0');
 
 		// try/catch
-		const { stdout: errors } = await execAsync(
+		const { stdout, errors } = await execAsync(
 			`rg -c "try|catch" "${filePath}"`,
 			{ timeout: 2000 }
 		).catch(() => ({ stdout: '0' }));
-		patterns.errorHandlers = parseInt(errors.trim().split(':').pop() || '0');
+		patterns.errorHandlers = parseInt(errors.trim().split(':').pop() ?? '0');
 
 		// Svelte 5 runes
-		const { stdout: runes } = await execAsync(
+		const { stdout, runes } = await execAsync(
 			`rg -c "\\$state|\\$derived|\\$effect|\\$props" "${filePath}"`,
 			{ timeout: 2000 }
 		).catch(() => ({ stdout: '0' }));
-		patterns.svelte5Runes = parseInt(runes.trim().split(':').pop() || '0');
+		patterns.svelte5Runes = parseInt(runes.trim().split(':').pop() ?? '0');
 	} catch (err) {
 		console.warn('Pattern search failed:', err);
 	}
@@ -211,14 +211,14 @@ Be concise and actionable.`;
 	}
 
 	return {
-		summary: text.split('\n\n')[0] || 'Analysis complete',
+		summary: text.split('\n\n')[0] ?? 'Analysis complete',
 		recommendations: recommendations.slice(0, 5)
 	};
 }
 
 async function generateEnhancedTag(filePath: string, analysis: any) {
-	const fileName = filePath.split(/[\\/]/).pop() || '';
-	const fileType = fileName.split('.').pop() || '';
+	const fileName = filePath.split(/[\\/]/).pop() ?? '';
+	const fileType = fileName.split('.').pop() ?? '';
 
 	// Determine tag category
 	let category = 'general';

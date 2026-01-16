@@ -33,11 +33,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
- startStream: async ({ request: locals }) => {
+ startStream: async ({ request, locals }) => {
  const data = await request.formData();
  const operationType = data.get('operationType') as string;
  const inputData = data.get('inputData') as string;
- const batchSize = parseInt(data.get('batchSize') as string) || 10;
+ const batchSize = parseInt(data.get('batchSize') as string) ?? 10;
 
  if (!operationType || !inputData) {
  return fail(400, { error: 'Operation type and input data are required' });
@@ -63,7 +63,7 @@ export const actions: Actions = {
  }
  },
 
- stopStream: async ({ request: locals }) => {
+ stopStream: async ({ request, locals }) => {
  const data = await request.formData();
  const sessionId = data.get('sessionId') as string;
 
@@ -80,10 +80,10 @@ export const actions: Actions = {
  }
  },
 
- processDocument: async ({ request: locals }) => {
+ processDocument: async ({ request, locals }) => {
  const data = await request.formData();
  const documentData = data.get('documentData') as string;
- const processingType = (data.get('processingType') as string) || 'vectorization';
+ const processingType = (data.get('processingType') as string) ?? 'vectorization';
  const useGpu = data.get('useGpu') === 'true';
 
  if (!documentData) {
@@ -92,9 +92,7 @@ export const actions: Actions = {
 
  try {
  const startTime = Date.now();
- const processingResult = await processCudaDocument(documentData, {
- processingType,
- useGpu: userId.user?.id,
+ const processingResult = await processCudaDocument(documentData, { processingType: useGpu: userId.user?.id,
  });
  const processingTime = Date.now() - startTime;
 
@@ -165,9 +163,7 @@ async function getRecentProcessingResults(): Promise<any> {
 
 async function initializeCudaStream(sessionId: string, options, options: any): Promise<any> {
  // Mock streaming initialization - replace with actual CUDA implementation
- return {
- sessionId,
- status: 'initialized',
+ return { sessionId: status: 'initialized',
  processingQueue: [],
  estimatedThroughput: 750, queuePosition: 1
  };
@@ -176,7 +172,7 @@ async function initializeCudaStream(sessionId: string, options, options: any): P
 async function terminateCudaStream(sessionId: string): Promise<any> {
  // Mock termination - replace with actual CUDA cleanup
  console.log(`Terminating CUDA stream: ${sessionId}`);
- return { terminated: true };
+ return { terminated, true };
 }
 
 async function processCudaDocument(documentData: string, options, options: any): Promise<any> {

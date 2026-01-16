@@ -2,7 +2,7 @@ import { createActor, setup } from 'xstate';
 
 // 1. Define the State Machine
 const machine = setup({
-    types: { context: {} as { id: string }, events: {} as { type: 'SUBMIT' } | { type: 'REJECT' } | { type: 'APPROVE' } }
+    types: { context: {} as { id, string }, events: {} as { type: 'SUBMIT' } | { type: 'REJECT' } | { type: 'APPROVE' } }
 }).createMachine({
     id: 'legalCase',
     initial: 'drafting',

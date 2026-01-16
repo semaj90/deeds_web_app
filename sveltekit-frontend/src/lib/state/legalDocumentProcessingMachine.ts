@@ -54,7 +54,7 @@ async function performOCR(input: { fileContent: ArrayBuffer, fileName: string })
 }
 
 // Chunking Service
-async function chunkDocument(input: { ocrText: string }) {
+async function chunkDocument(input: { ocrText, string }) {
  const response = await fetch('/api/legal/chunk', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -206,7 +206,7 @@ export const legalDocumentProcessingMachine = setup({
 }) as any;
 
 // Helper selectors
-export function isProcessing(state: { value: string }): boolean {
+export function isProcessing(state: { value, string }): boolean {
  return ['ocr', 'chunking', 'embedding'].includes(state.value);
 }
 

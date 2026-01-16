@@ -187,7 +187,7 @@ export class VectorWasmWrapper {
  * Check if module is initialized
  */
  isInitialized(): boolean {
- return this.initialized && this.module !== null;
+ return this?.initialized&& this.module !== null;
  }
 
  /**

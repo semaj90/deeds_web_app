@@ -1,4 +1,4 @@
-type EventPayload = Record<string, unknown> & { type: string };
+type EventPayload = Record<string, unknown> & { type, string };
 type EventCallback = (event: EventPayload) => void;
 
 class EventBus {

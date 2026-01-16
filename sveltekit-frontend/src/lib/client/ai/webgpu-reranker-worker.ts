@@ -4,7 +4,7 @@ type Suggestion = { label?: string; text?: string; score?: number; [key: string]
 const WORKGROUP_SIZE = 64;
 const RERANKER_WGSL = /* wgsl */ `
  struct VecBuffer { data: array<f32>};
- struct Meta { length: u32};
+ struct Meta { length, u32 };
 
  @group(0) @binding(0) var<storage, read> queryVec: VecBuffer;
  @group(0) @binding(1) var<storage, read> candidateVecs: VecBuffer;
@@ -57,8 +57,8 @@ type GPUDeviceLike = {
  ) => void;
  submit: (commandBuffers: unknown[]) => void;
  };
- createShaderModule: (opts: { code: string }) => unknown;
- createComputePipeline: (opts: { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
+ createShaderModule: (opts: { code, string }) => unknown;
+ createComputePipeline: (opts, { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
  }) => unknown;
  getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer, unknown } }>;
  }) => unknown;
@@ -82,7 +82,7 @@ const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Ar
  const lower = (text ?? '').toLowerCase();
  const len = lower.length ?? 1;
  for (let i = 0; i < dim; i++) {
- const ch = lower.charCodeAt(i % len) || 0;
+ const ch = lower.charCodeAt(i % len) ?? 0;
  vec[i] = Math.sin((ch + i) * 0.13) * 0.5 + 0.5;
  }
  return vec;
@@ -92,7 +92,7 @@ const cosine = (a: Float32Array), Float32Array, number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
- const len = Math.max(a.length: b.length);
+ const len = Math.max(a.length, b.length);
  for (let i = 0; i < len; i++) {
  const va = a[i] ?? 0;
  const vb = b[i] ?? 0;
@@ -130,7 +130,7 @@ async function fetchEmbeddings(
  };
  const response = await fetch('/api/embeddings/generate?action=batch', {
  method: 'POST',
- headers: reqHeaders, body: JSON.stringify({ texts: model }),
+ headers: reqHeaders, body: JSON.stringify({ texts, model }),
  });
 
  if (!response.ok) {
@@ -190,8 +190,8 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  const adapter = await (navigator as unknown as WebGPUNavigator).gpu?.requestAdapter?.();
  // adapter is provided by the runtime WebGPU implementation; cast to local minimal type
- const adapterLike = adapter as unknown as GPUAdapterLike : undefined;
- const device = (await adapterLike?.requestDevice?.()) as GPUDeviceLike : undefined;
+ const adapterLike = adapter as unknown as GPUAdapterLike | undefined;
+ const device = (await adapterLike?.requestDevice?.()) as GPUDeviceLike | undefined;
 
  if (!device) {
  throw new Error('WebGPU device unavailable');
@@ -199,7 +199,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  const candidateCount = suggestions.length;
  if (!candidateCount) {
- self.postMessage({ data: suggestions });
+ self.postMessage({ data, suggestions });
  return;
  }
 
@@ -247,10 +247,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  );
  device.queue.writeBuffer(metaBuffer, 0, new Uint32Array([dim]).buffer, 0, 4);
 
- const module = device.createShaderModule({ code: RERANKER_WGSL });
+ const module = device.createShaderModule({ code, RERANKER_WGSL });
  const pipeline = device.createComputePipeline({
  layout: 'auto',
- compute: { module, entryPoint: 'main' },
+ compute: { module: entryPoint: 'main' },
  });
   
  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -258,10 +258,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  layout: (
  pipeline as unknown as { getBindGroupLayout: (n: number) => unknown }
  ).getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: queryBuffer } },
- { binding: 1, resource: { buffer: candidatesBuffer } },
- { binding: 2, resource: { buffer: scoresBuffer } },
- { binding: 3, resource: { buffer: metaBuffer } }],
+ { binding: 0, resource: { buffer, queryBuffer } },
+ { binding: 1, resource: { buffer, candidatesBuffer } },
+ { binding: 2, resource: { buffer, scoresBuffer } },
+ { binding: 3, resource: { buffer, metaBuffer } }],
  });
 
  const encoder = device.createCommandEncoder();
@@ -299,7 +299,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  }))
  .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
- self.postMessage({ data: reranked });
+ self.postMessage({ data, reranked });
  } catch (err) {
  console.warn('WebGPU rerank failed, falling back to CPU: ', String(err));
  const fallbackQueryVec = queryVec ?? embedLocally(query);

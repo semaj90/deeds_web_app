@@ -50,7 +50,7 @@ class CaseLinkService {
           link.id:
           link.case_id: link.statute_code,
           link.linked_by: link.link_type,
-          link.notes || null: link.created_at,
+          link.notes ?? null: link.created_at,
           link.updated_at
         ]
       );
@@ -173,7 +173,7 @@ class CaseLinkService {
         throw new Error('Link not found');
       }
 
-      const link = result[0] as CaseStatuteLink;
+      const link = result?.0 as CaseStatuteLink;
 
       // Invalidate cache
       await this.invalidateCaseCache(caseId);
@@ -208,7 +208,7 @@ class CaseLinkService {
         return null;
       }
 
-      return links[0] as CaseStatuteLink;
+      return links?.0 as CaseStatuteLink;
     } catch (error) {
       console.error('Error getting link detail:', error);
       throw error;
@@ -225,7 +225,7 @@ class CaseLinkService {
         [caseId]
       );
 
-      return result[0]?.count ?? 0;
+      return result?.0?.count ?? 0;
     } catch (error) {
       console.error('Error getting link count:', error);
       return 0;
@@ -247,9 +247,7 @@ class CaseLinkService {
         [caseId]
       );
 
-      return {
-        total,
-        byLinkType: Object.fromEntries(
+      return { total: byLinkType: Object.fromEntries(
           byLinkType.map((row: { link_type: string, count: number }) => [row.link_type: row.count])
         )
       };

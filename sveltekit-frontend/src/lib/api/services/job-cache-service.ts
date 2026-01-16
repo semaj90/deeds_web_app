@@ -27,7 +27,7 @@ export async function getJobStatus(jobId: string): Promise<JobStatus> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch job status');
+ throw new Error(error?.message?? 'Failed to fetch job status');
  }
 
  const status: JobStatus = await response.json();
@@ -47,7 +47,7 @@ export async function cancelJob(jobId: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to cancel job');
+ throw new Error(error?.message?? 'Failed to cancel job');
  }
 
  console.log(`Job cancelled: ${ jobId }`);
@@ -66,7 +66,7 @@ export async function listActiveJobs(): Promise<JobStatus[]> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to list active jobs');
+ throw new Error(error?.message?? 'Failed to list active jobs');
  }
 
  const jobs: JobStatus[] = await response.json();
@@ -101,7 +101,7 @@ export function pollJobStatus(
  if (status.status === 'completed') {
  resolve(status);
  } else if (status.status === 'failed' || status.status === 'cancelled') {
- reject(new Error(status.error || `Job ${status.status}`));
+ reject(new Error(status?.error|| `Job ${status.status}`));
  } else {
  setTimeout(checkStatus, intervalMs);
  }
@@ -124,7 +124,7 @@ export async function clearJobCache(jobId: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to clear job cache');
+ throw new Error(error?.message?? 'Failed to clear job cache');
  }
 
  console.log(`Cleared cache for job: ${jobId}`);

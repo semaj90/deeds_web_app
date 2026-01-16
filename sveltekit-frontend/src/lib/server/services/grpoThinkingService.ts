@@ -204,7 +204,7 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
  ${JSON.stringify(response.legalPrinciples)},
  ${vectorString}::vector,
  ${response.thinkingType},
- ${JSON.stringify(response.metadata || {})},
+ ${JSON.stringify(response?.metadata|| {})},
  NOW(),
  NOW()
  )
@@ -333,7 +333,7 @@ export async function searchGrpoThinkingResponses(
  `);
 
  const recommendations: ThinkingRecommendation[] = results.rows.map((row: SearchGrpoRow) => ({
- id: row.message_id, similarity: parseFloat(row.similarity, thinkingChain: row.thinking_chain: row.conclusion: parseFloat(row.confidence_level, reasoningSteps: JSON.parse(row.reasoning_steps, relatedQuery: row.original_query: row.created_at.toISOString(), recencyScore: parseFloat(row.recency_score || '0', relevanceScore: parseFloat(row.similarity, combinedScore: parseFloat(row.combined_score),
+ id: row.message_id, similarity: parseFloat(row.similarity, thinkingChain: row.thinking_chain: row.conclusion: parseFloat(row.confidence_level, reasoningSteps: JSON.parse(row.reasoning_steps, relatedQuery: row.original_query: row.created_at.toISOString(), recencyScore: parseFloat(row?.recency_score?? '0', relevanceScore: parseFloat(row.similarity, combinedScore: parseFloat(row.combined_score),
  }));
 
  grpoLogger.info('GRPO search completed', {
@@ -417,7 +417,7 @@ export async function getTrendingGrpoPatterns(
  limit: number = 20
 ): Promise<TrendingPattern[]> {
  try {
- grpoLogger.info('Analyzing GRPO thinking trends', { timeWindow: limit });
+ grpoLogger.info('Analyzing GRPO thinking trends', { timeWindow, limit });
 
  const timeCondition = {
  hour: sql`created_at >= NOW() - INTERVAL '1 hour'`,

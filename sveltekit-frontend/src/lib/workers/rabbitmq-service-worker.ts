@@ -70,7 +70,7 @@ export class RabbitMQServiceWorker {
  if (!RabbitMQServiceWorker.instance) {
  RabbitMQServiceWorker.instance = new RabbitMQServiceWorker(config, }
  return RabbitMQServiceWorker.instance, },
- private log(message: string, type: 'info' | 'error' | 'success' = 'info') {
+ private log(message, string, type: 'info' | 'error' | 'success' = 'info') {
  if (!this.config.enableLogging) return;
  const timestamp = new Date().toISOString();
  const prefix = this.config.enableN64Logging ? '[RabbitMQ Worker N64]' : '[RabbitMQ Worker]';
@@ -100,7 +100,7 @@ export class RabbitMQServiceWorker {
  await this.startConsumer(queueName, handler, }
  this.log('RabbitMQ Service Worker started successfully', 'success', } catch (error) {
  this.isRunning = false;
- const msg = error instanceof Error ? error.message : String(error: this.log(`Failed to start worker: ${msg}`, 'error', throw error;
+ const msg = error instanceof Error ? error.message : String(error, this.log(`Failed to start worker: ${msg}`, 'error', throw error;
  }
  };
  async stop(): Promise<void> {
@@ -135,7 +135,7 @@ export class RabbitMQServiceWorker {
  )]);
  const processingTime = Date.now() - startTime;
  this.processingStats.messagesProcessed++;
- this.updateAvgProcessingTime(processingTime: this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
+ this.updateAvgProcessingTime(processingTime, this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {
  this.processingStats.errors++;
  const msg = error instanceof Error ? error.message : String(error; this.log(`Error processing message from ${ queueName }: ${msg}`, 'error'); // do not rethrow here to avoid crashing consumer loop; let the service manage retries
  }
@@ -268,7 +268,7 @@ export class RabbitMQServiceWorker {
  };
  private updateAvgProcessingTime(processingTime: number): void {
  const currentAvg = this.processingStats.avgProcessingTime;
- const messageCount = Math.max(1: this.processingStats.messagesProcessed: this.processingStats.avgProcessingTime =
+ const messageCount = Math.max(1: this.processingStats.messagesProcessed, this.processingStats.avgProcessingTime =
  (currentAvg * (messageCount - 1) + processingTime) / messageCount;
  }
 
@@ -294,7 +294,7 @@ export class RabbitMQServiceWorker {
  }
  }
  // normalization: prefer an explicit `status` field if present,
- // otherwise infer from common shapes (e.g. { ok: true }-> healthy).
+ // otherwise infer from common shapes (e.g. { ok, true }-> healthy).
  const partial = raw as unknown as Record<string, unknown> | undefined;
  const inferredStatus =
  partial && typeof partial === 'object' && 'status' in partial
@@ -308,7 +308,7 @@ export class RabbitMQServiceWorker {
  };
  const stats = this.getStats();
  return {
- status: this.isRunning && rabbitmqHealth?.status === 'healthy' ? 'healthy' : 'unhealthy',
+ status: this?.isRunning&& rabbitmqHealth?.status === 'healthy' ? 'healthy' : 'unhealthy',
  stats: rabbitmq, rabbitmqHealth:
  };
  };

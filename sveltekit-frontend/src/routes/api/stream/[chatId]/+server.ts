@@ -2,10 +2,10 @@
 import { createClient } from 'redis';
 import type { RequestHandler } from './$types';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = process.env?.REDIS_URL?? 'redis://localhost:6379';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const subscriber = createClient({ url: REDIS_URL });
+    const subscriber = createClient({ url, REDIS_URL });
     await subscriber.connect();
 
     const stream = new ReadableStream({

@@ -31,10 +31,10 @@ export async function searchCases(
 ): Promise<SearchResponse> {
  const params = new URLSearchParams({
  query: query.query,
- limit: String(query.limit || 10),
- ...(query.jurisdiction && { jurisdiction: query.jurisdiction }),
- ...(query.crimeCategory && { crimeCategory: query.crimeCategory }),
- ...(query.crimeClassification && { crimeClassification: query.crimeClassification }),
+ limit: String(query?.limit?? 10),
+ ...(query?.jurisdiction&& { jurisdiction: query.jurisdiction }),
+ ...(query?.crimeCategory&& { crimeCategory: query.crimeCategory }),
+ ...(query?.crimeClassification&& { crimeClassification: query.crimeClassification }),
  });
 
  return fetchWithStreaming(`/api/search/cases?${params}`, {
@@ -58,9 +58,9 @@ export async function searchLaws(
 ): Promise<SearchResponse> {
  const params = new URLSearchParams({
  query: query.query,
- limit: String(query.limit || 10),
- ...(query.jurisdiction && { jurisdiction: query.jurisdiction }),
- ...(query.sectionType && { sectionType: query.sectionType }),
+ limit: String(query?.limit?? 10),
+ ...(query?.jurisdiction&& { jurisdiction: query.jurisdiction }),
+ ...(query?.sectionType&& { sectionType: query.sectionType }),
  });
 
  return fetchWithStreaming(`/api/search/laws?${params}`, {

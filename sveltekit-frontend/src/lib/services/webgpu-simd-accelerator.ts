@@ -78,7 +78,7 @@ export class WebGPUSIMDAccelerator {
 
             // adapter info can vary across implementations, log safely
             console.log('✅ WebGPU initialized: ', {
-                adapter: (adapter as any).name || '(adapter)',
+                adapter: (adapter as any).name ?? '(adapter)',
             });
 
             this.isInitialized = true;
@@ -183,7 +183,7 @@ export class WebGPUSIMDAccelerator {
         jsonString: string,
         mode: ParseMode
     ): Promise<AccelerationResult> {
-        if (!this.device || !this.isInitialized) {
+        if (!this?.device|| !this.isInitialized) {
             return this.simdAcceleratedParse(jsonString, mode);
         }
 
@@ -205,7 +205,7 @@ export class WebGPUSIMDAccelerator {
 
             // Create a very small illustrative compute shader (WGSL)
             const shaderCode = this.createJSONParsingShader();
-            const computeShader = this.device.createShaderModule({ code: shaderCode });
+            const computeShader = this.device.createShaderModule({ code, shaderCode });
             const computePipeline = this.device.createComputePipeline({
                 layout: 'auto',
                 compute: { module: computeShader, entryPoint: 'main' },
@@ -216,8 +216,8 @@ export class WebGPUSIMDAccelerator {
             const bindGroup = this.device.createBindGroup({
                 layout: bindGroupLayout,
                 entries: [
-                    { binding: 0, resource: { buffer: inputBuffer } },
-                    { binding: 1, resource: { buffer: outputBuffer } }],
+                    { binding: 0, resource: { buffer, inputBuffer } },
+                    { binding: 1, resource: { buffer, outputBuffer } }],
             });
 
             const commandEncoder = this.device.createCommandEncoder();
@@ -225,7 +225,7 @@ export class WebGPUSIMDAccelerator {
             passEncoder.setPipeline(computePipeline);
             passEncoder.setBindGroup(0, bindGroup);
             const workgroups = Math.max(
-                1: Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
+                1, Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
             );
             passEncoder.dispatchWorkgroups(workgroups);
             passEncoder.end();
@@ -261,12 +261,12 @@ export class WebGPUSIMDAccelerator {
         const result = (await (unifiedSIMDParser as any).parseOptimal(jsonString, mode)) as any;
         return {
             data: result.data,
-            processing_time_ms: result.processing_time_ms || 0,
+            processing_time_ms: result?.processing_time_ms?? 0,
             acceleration_method: 'SIMD_Multi_Backend',
             gpu_memory_used: 0,
-            simd_backend: result.backend_used || 'WASM_SIMD',
+            simd_backend: result?.backend_used?? 'WASM_SIMD',
             cache_status: 'miss',
-            performance_gain: this.calculateSIMDGain(result.backend_used || 'V1_Legacy'),
+            performance_gain: this.calculateSIMDGain(result?.backend_used?? 'V1_Legacy'),
         };
     }
 
@@ -313,7 +313,7 @@ export class WebGPUSIMDAccelerator {
      * Determine if input should use WebGPU acceleration
      */
     private shouldUseWebGPU(jsonString: string), boolean {
-        if (!this.config.enableWebGPU || !this.isInitialized) return false;
+        if (!this.config?.enableWebGPU|| !this.isInitialized) return false;
         const size = jsonString.length;
         const complexity = (jsonString.match(/[\[\{]/g) || []).length;
         return size > 50000 || complexity > 1000;
@@ -387,9 +387,9 @@ export class WebGPUSIMDAccelerator {
             processing_time_ms: r.parse_time_ms ?? r.processing_time_ms ?? 0,
             acceleration_method: 'SIMD_Batch_Redis',
             gpu_memory_used: 0,
-            simd_backend: r.backend_used || 'WASM_SIMD',
-            cache_status: (r.backend_used || '').includes('CACHED') ? 'hit' : 'miss',
-            performance_gain: this.calculateSIMDGain(r.backend_used || 'V1_Legacy'),
+            simd_backend: r?.backend_used?? 'WASM_SIMD',
+            cache_status: (r?.backend_used?? '').includes('CACHED') ? 'hit' : 'miss',
+            performance_gain: this.calculateSIMDGain(r?.backend_used?? 'V1_Legacy'),
         }));
     }
 
@@ -470,7 +470,7 @@ export class WebGPUSIMDAccelerator {
             V1_Legacy: 5,
             Native_JSON: 1,
         };
-        return gains[backend] || 1;
+        return gains[backend] ?? 1;
     }
 
     /**
@@ -488,7 +488,7 @@ export class WebGPUSIMDAccelerator {
      */
     public getPerformanceStats() {
         return {
-            webgpu_enabled: this.config.enableWebGPU && this.isInitialized,
+            webgpu_enabled: this.config?.enableWebGPU&& this.isInitialized,
             simd_enabled: this.config.enableSIMD,
             redis_enabled: this.config.enableRedisCache,
             gpu_memory_limit: this.config.gpuMemoryLimit,

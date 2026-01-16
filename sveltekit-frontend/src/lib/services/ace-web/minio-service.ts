@@ -35,16 +35,16 @@ export class MinIOService {
   };
 
   constructor(config?: MinIOConfig) {
-    const endpoint = config?.endpoint ?? process.env.MINIO_ENDPOINT || 'http://localhost:9000';
-    const accessKeyId = config?.accessKeyId ?? process.env.MINIO_ACCESS_KEY || 'minioadmin';
+    const endpoint = config?.endpoint ?? process.env?.MINIO_ENDPOINT?? 'http://localhost:9000';
+    const accessKeyId = config?.accessKeyId ?? process.env?.MINIO_ACCESS_KEY?? 'minioadmin';
     const secretAccessKey =
-      config?.secretAccessKey ?? process.env.MINIO_SECRET_KEY || 'minioadmin';
+      config?.secretAccessKey ?? process.env?.MINIO_SECRET_KEY?? 'minioadmin';
     const region = config?.region ?? 'us-east-1';
 
     this.client = new S3Client({
       endpoint,
       region,
-      credentials: { accessKeyId: secretAccessKey },
+      credentials: { accessKeyId, secretAccessKey },
       forcePathStyle: true // Required for MinIO
     });
 
@@ -413,10 +413,10 @@ export class MinIOService {
       });
 
       const response = await this.client.send(command);
-      const objects = (response.Contents || []).map((obj: _Object) => ({
-        key: obj.Key || '',
-        size: obj.Size || 0,
-        lastModified: obj.LastModified || new Date()
+      const objects = (response?.Contents|| []).map((obj: _Object) => ({
+        key: obj?.Key?? '',
+        size: obj?.Size?? 0,
+        lastModified: obj?.LastModified|| new Date()
       }));
 
       console.log(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`);

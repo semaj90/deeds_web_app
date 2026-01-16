@@ -88,7 +88,7 @@ class AuthStore {
 				return true;
 			} else {
 				const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
-				this.error = errorData.message || 'Login failed';
+				this.error = errorData?.message?? 'Login failed';
 				return false;
 			}
 		} catch (err) {
@@ -154,7 +154,7 @@ class AuthStore {
 				return true;
 			} else {
 				const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-				this.error = errorData.message || 'Registration failed';
+				this.error = errorData?.message?? 'Registration failed';
 				return false;
 			}
 		} catch (err) {
@@ -192,7 +192,7 @@ class AuthStore {
 				return true;
 			} else {
 				const errorData = await response.json().catch(() => ({ message: 'Update failed' }));
-				this.error = errorData.message || 'Update failed';
+				this.error = errorData?.message?? 'Update failed';
 				return false;
 			}
 		} catch (err) {

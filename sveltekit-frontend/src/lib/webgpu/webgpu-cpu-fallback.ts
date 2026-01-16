@@ -37,7 +37,7 @@ export class WebGPUCPUFallback {
  maxTextureSize: this.gpu.getMaxTextureSize ? this.gpu.getMaxTextureSize() : 4096,
  supportedFloatTypes: ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4'],
  supportedIntTypes: ['int', 'ivec2', 'ivec3', 'ivec4'],
- maxThreads: navigator.hardwareConcurrency || 4,
+ maxThreads: navigator?.hardwareConcurrency?? 4,
  };
 
  return this.capabilities;

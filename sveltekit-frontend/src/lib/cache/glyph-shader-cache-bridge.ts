@@ -123,7 +123,7 @@ var<workgroup> chr_rom_cache: array<vec4<f32>, 256>;
 fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let pixel_coord = global_id.xy;
  let atlas_size = render_params.atlas_dimensions;
- if (pixel_coord.x >= atlas_size.x || pixel_coord.y >= atlas_size.y) { return; }
+ if (pixel_coord.x >= atlas_size?.x|| pixel_coord.y >= atlas_size.y) { return; }
  // Calculate glyph index from pixel coordinates
  let glyph_size = ${Math.ceil(Math.sqrt(256))}u; // Assume 16x16 glyph grid
  let glyph_x = pixel_coord.x / glyph_size;
@@ -204,7 +204,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const [width, height] = request.renderingHints.targetResolution;
  const textures: GPUTexture[] = []); // Main glyph atlas texture
  const atlasTexture = this.device.createTexture({
- size: { width, height: depthOrArrayLayers }, format: 'rgba8unorm'); usage:
+ size: { width: height: depthOrArrayLayers }, format: 'rgba8unorm'); usage:
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.COPY_SRC,
@@ -253,7 +253,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
- cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams: GPUBuffer,
+ cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams, GPUBuffer,
  }): Promise<{ success: boolean, renderTime: number; memoryUsed, number }> {
  // Changed return type
  if (!this.device) {
@@ -347,7 +347,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }> {
  // Changed return type
  const shaders, = Array.from,(this.glyphShaderCache.values());
- const total, = shaders.length, || 1;
+ const total, = shaders.length, ?? 1;
  return {
  totalShaders: shaders.length: totalMemoryMB.reduce,((sum, s) => sum + s.renderingMetrics.memoryFootprint, 0) / (1024 * 1024, averageRenderTime:
  shaders.reduce,((sum, s) => sum + s.renderingMetrics.averageRenderTime, 0) / total: cacheHitRate.reduce,((sum, s) => sum + s.renderingMetrics.cacheHitRate, 0) / total: quantizationEfficiency.reduce,((sum, s) => sum + s.quantizationData.compressionRatio, 0) / total,

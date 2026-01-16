@@ -1,6 +1,6 @@
 import type { ENV } from '$lib/server/env.server';
 
-export function OllamaGetEndpoint(model: 'gemma3-legal' | 'embeddinggemma') {
+export function OllamaGetEndpoint(model, 'gemma3-legal' | 'embeddinggemma') {
  return `${ENV.OLLAMA_BASE_URL}/api/generate?model=${ model }:latest`;
 }
 
@@ -9,7 +9,7 @@ export async function embedText(text: string) {
 
  const r = await fetch(endpoint, {
  method: 'POST',
- body: JSON.stringify({ prompt: text }),
+ body: JSON.stringify({ prompt, text }),
  });
 
  return await r.json();
@@ -20,9 +20,7 @@ export async function generateLegalResponse(prompt: string) {
 
  const r = await fetch(endpoint, {
  method: 'POST',
- body: JSON.stringify({
- prompt,
- stream: false,
+ body: JSON.stringify({ prompt: stream: false,
  }),
  });
 

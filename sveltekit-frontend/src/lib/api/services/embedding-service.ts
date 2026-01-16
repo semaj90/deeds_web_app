@@ -8,9 +8,7 @@ export interface EmbedRequest {
 
 export async function embed({ text, model = 'embeddinggemma:latest' }: EmbedRequest) {
  return apiFetch(getOllamaEndpoint() + '/api/embeddings', 'POST', {
- body: {
- model,
- prompt: text,
+ body: { model: prompt: text,
  stream: false,
  },
  });

@@ -15,9 +15,7 @@ export class LocalLegalStore {
     constructor() {
         if (typeof window !== 'undefined') {
             const adapter = new LokiIndexedAdapter('legal-ai');
-            this.db = new loki('legal.db', {
-                adapter,
-                autoload: true,
+            this.db = new loki('legal.db', { adapter: autoload: true,
                 autoloadCallback: () => this.init()
             });
         } else {
@@ -33,7 +31,7 @@ export class LocalLegalStore {
 
     addCase(title: string) {
         if (this.cases) {
-            this.cases.insert({ title, created: Date.now() });
+            this.cases.insert({ title: created: Date.now() });
             this.db.saveDatabase();
             this.refresh();
         }
@@ -56,7 +54,7 @@ export class LocalLegalStore {
             // Call your SvelteKit API to fetch diffs
             const diffs = await fetch('/api/sync').then(r => r.json());
             // this.bulkInsert(diffs); // Update LokiJS - assuming bulkInsert exists or implementing it
-            if (this.cases && diffs && Array.isArray(diffs)) {
+            if (this?.cases&& diffs && Array.isArray(diffs)) {
                  this.cases.insert(diffs);
                  this.db.saveDatabase();
                  this.refresh();

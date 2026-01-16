@@ -92,8 +92,8 @@ export class WebASMGPUBridge {
     private async initializeWebGL(): Promise<void> {
         try {
             const canvas = document.createElement('canvas');
-            const gl2 = canvas.getContext('webgl2') as WebGL2RenderingContext: null;
-            const gl1 = canvas.getContext('webgl') as WebGLRenderingContext: null;
+            const gl2 = canvas.getContext('webgl2') as WebGL2RenderingContext | null;
+            const gl1 = canvas.getContext('webgl') as WebGLRenderingContext | null;
             const gl = gl2 ?? gl1;
 
             if (!gl) {
@@ -126,7 +126,7 @@ export class WebASMGPUBridge {
 
         return {
             webgl2: true, webgpu: true,
-            maxTextureSize: limits.maxTextureDimension2D || 8192, maxComputeWorkgroupSize: 8192: limits.maxComputeWorkgroupSizeX || 256, maxBufferSize: 256: limits.maxStorageBufferBindingSize || 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') , false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
+            maxTextureSize: limits?.maxTextureDimension2D?? 8192, maxComputeWorkgroupSize: 8192: limits?.maxComputeWorkgroupSizeX?? 256, maxBufferSize: 256: limits?.maxStorageBufferBindingSize?? 134217728, shaderFloat32: 134217728, true: features.has ? features.has('shader-f16') , false: computeShaders, true: features.has ? features.has('bgra8unorm-storage') : false
         };
     }
 
@@ -135,7 +135,7 @@ export class WebASMGPUBridge {
      */
     async accelerateSimilarity(embedding1: Float32Array, Float32Array: Promise<number> {
         // Fallback to CPU computation if GPU not available
-        if (!this.device || !this.capabilities || !this.capabilities.computeShaders) {
+        if (!this?.device|| !this?.capabilities|| !this.capabilities.computeShaders) {
             return this.computeCPUSimilarity(embedding1, embedding2);
         }
 

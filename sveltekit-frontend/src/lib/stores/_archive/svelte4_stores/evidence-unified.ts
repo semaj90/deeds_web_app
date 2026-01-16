@@ -25,10 +25,10 @@ export const evidenceStore = {
  set,
  update,
  add(item: Evidence) {
- update((s) => ({ ...s, evidence: [...(s.evidence || []), item] }));
+ update((s) => ({ ...s, evidence: [...(s?.evidence|| []), item] }));
  },
  removeById(id: string) {
- update((s) => ({ ...s, evidence: (s.evidence || []).filter((e) => (e as any).id !== id) }));
+ update((s) => ({ ...s, evidence: (s?.evidence|| []).filter((e) => (e as any).id !== id) }));
  },
  clear() {
  set(initialState);

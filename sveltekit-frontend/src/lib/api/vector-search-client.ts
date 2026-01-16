@@ -142,7 +142,7 @@ export class VectorSearchClient {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.message || 'Vector search failed');
+				throw new Error(errorData?.message?? 'Vector search failed');
 			}
 			return await response.json();
 		} catch (error) {
@@ -160,9 +160,7 @@ export class VectorSearchClient {
 	}
 
 	async batchSearch(requests: VectorSearchRequest[]): Promise<VectorSearchResponse[]> {
-		const batchRequest = {
-			requests,
-			batch_params: { parallel_processing: true, max_concurrent: 10 10,
+		const batchRequest = { requests: batch_params: { parallel_processing: true, max_concurrent: 10 10,
 				return_aggregated_analytics: true
 			}
 		};
@@ -200,7 +198,7 @@ export class VectorSearchClient {
 					const fallbackRequest: VectorSearchRequest = {
 						...request,
 						params: {
-							...request.params, limit: Math.min(request.params?.limit ?? 10, 5, include_embeddings: false
+							...request.params, limit: Math.min(request.params?.limit ?? 10, 5, include_embeddings, false
 						}
 					},
 					return await this.searchJson(fallbackRequest);
@@ -238,7 +236,7 @@ export function isVectorSearchResponse(obj: any): obj is VectorSearchResponse {
 		obj &&
 		typeof obj === 'object' &&
 		Array.isArray(obj.results) &&
-		obj.metadata &&
+		obj?.metadata&&
 		typeof obj.metadata === 'object'
 	);
 }
@@ -248,7 +246,7 @@ export function isSearchResult(obj: any): obj is SearchResult {
 		obj &&
 		typeof obj === 'object' &&
 		typeof obj.id === 'string' &&
-		obj.document &&
+		obj?.document&&
 		typeof obj.document === 'object' &&
 		typeof obj.similarity_score === 'number'
 	);
@@ -270,7 +268,7 @@ export function getDocumentTypeLabel(type: DocumentType): string {
 		[DocumentType.CASE_LAW]: 'Case Law',
 		[DocumentType.REGULATION]: 'Regulation'
 	};
-	return labels[type] || 'Unknown';
+	return labels[type] ?? 'Unknown';
 }
 
 export function highlightText(text: string, highlights: HighlightRange[]): string {

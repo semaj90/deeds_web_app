@@ -60,9 +60,9 @@ class EnhancedApiClient {
 
  constructor(config: ApiClientConfig = {}) {
  this.config = {
- baseUrl: config.baseUrl || (browser ? '' : 'http://localhost:5173'),
- timeout: config.timeout || 30000,
- retries: config.retries || 3,
+ baseUrl: config?.baseUrl|| (browser ? '' : 'http://localhost:5173'),
+ timeout: config?.timeout?? 30000,
+ retries: config?.retries?? 3,
  defaultHeaders: {
  'Content-Type': 'application/json',
  ...config.defaultHeaders,
@@ -82,8 +82,8 @@ class EnhancedApiClient {
  } = {}
  ): Promise<StandardApiResponse<TResponse>> {
  const requestId =
- options.requestId || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
- const timeout = options.timeout || this.config.timeout;
+ options?.requestId|| `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+ const timeout = options?.timeout|| this.config.timeout;
  const maxRetries = options.retries !== undefined ? options.retries : this.config.retries;
  let lastError: Error | null = null;
 
@@ -98,9 +98,7 @@ class EnhancedApiClient {
  }, timeout);
 
  let url = `${this.config.baseUrl}${path}`;
- const requestOptions: RequestInit = {
- method,
- headers: {
+ const requestOptions: RequestInit = { method: headers: {
  ...this.config.defaultHeaders,
  ...options.headers,
  },
@@ -134,10 +132,10 @@ class EnhancedApiClient {
  code: 'HTTP_ERROR',
  }));
  throw new ApiClientError(
- errorData.message || `HTTP ${response.status}`,
+ errorData?.message|| `HTTP ${response.status}`,
  response.status:
- errorData.code || 'HTTP_ERROR',
- errorData.details: errorData.requestId || requestId
+ errorData?.code?? 'HTTP_ERROR',
+ errorData.details: errorData?.requestId|| requestId
  );
  }
 
@@ -146,7 +144,7 @@ class EnhancedApiClient {
  throw new ApiClientError(
  result?.error?.message ?? 'API request failed',
  response.status,
- result?.error?.code || 'API_ERROR',
+ result?.error?.code ?? 'API_ERROR',
  result?.error?.details,
  result?.meta?.requestId || requestId
  );
@@ -336,7 +334,7 @@ export const api = {
  },
  vectorSearch: { search: (data: RequestOf<VectorSearchAPI.Search>) => apiClient.vectorSearch(data),
  },
- health: { check: (detailed = false) => apiClient.healthCheck(detailed, maintenance: (action: RequestOf<HealthAPI.Maintenance>['action']) =>
+ health: { check: (detailed = false) => apiClient.healthCheck(detailed, maintenance: (action, RequestOf<HealthAPI.Maintenance>['action']) =>
  apiClient.performMaintenance(action),
  },
 };

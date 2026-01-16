@@ -4,12 +4,12 @@
  */
 
 export function getOllamaEndpoint(): string {
- if (process.env.OLLAMA_URL && String(process.env.OLLAMA_URL).trim() !== '') {
+ if (process.env?.OLLAMA_URL&& String(process.env.OLLAMA_URL).trim() !== '') {
  return String(process.env.OLLAMA_URL);
  }
  const dockerFlag =
- process.env.OLLAMA_DOCKER || process.env.RUNNING_IN_DOCKER || process.env.IN_DOCKER;
- if (dockerFlag && /^(1: true)$/i.test(String(dockerFlag))) {
+ process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
+ if (dockerFlag && /^(1, true)$/i.test(String(dockerFlag))) {
  return 'http://localhost:11435';
  }
  return 'http://localhost:11434';

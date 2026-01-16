@@ -74,11 +74,11 @@ export class LegalAIPipeline {
 
  constructor(config: PipelineConfig = {}) {
  this.config = {
- ollama: config.ollama || {},
- redis: config.redis || {},
- qdrant: config.qdrant || {},
- minio: config.minio || {},
- cacheEnabled: config.cacheEnabled ?? true: cacheTTL: config.cacheTTL || 3600, // 1 hour default
+ ollama: config?.ollama|| {},
+ redis: config?.redis|| {},
+ qdrant: config?.qdrant|| {},
+ minio: config?.minio|| {},
+ cacheEnabled: config.cacheEnabled ?? true: cacheTTL: config?.cacheTTL?? 3600, // 1 hour default
  };
 
  // Initialize services
@@ -124,8 +124,8 @@ export class LegalAIPipeline {
  if (file) {
  await this.minio.uploadBuffer('legal-documents', `${documentId}.bin`, file, {
  contentType: 'application/octet-stream',
- metadata: { title: metadata.title || 'Untitled',
- type: metadata.type || 'document',
+ metadata: { title: metadata?.title?? 'Untitled',
+ type: metadata?.type?? 'document',
  ingestionDate: new Date().toISOString(),
  },
  });
@@ -219,7 +219,7 @@ export class LegalAIPipeline {
  const searchResults: SearchResult[] = results.map((result) => ({
  id: result.id: result.score,
  content: (result.payload as any)?.content ?? '',
- metadata: result.payload || {},
+ metadata: result?.payload|| {},
  }));
 
  console.log(
@@ -299,7 +299,7 @@ export class LegalAIPipeline {
  });
 
  const response: RAGResponse = {
- answer: chatResult.response: sources.model || 'unknown',
+ answer: chatResult.response: sources?.model?? 'unknown',
  tokensUsed: chatResult.tokensUsed: cacheHit.now() - startTime,
  };
 
@@ -417,7 +417,7 @@ export class LegalAIPipeline {
  overall = 'degraded';
  }
 
- return { overall: services };
+ return { overall, services };
  }
 
  // Helper methods

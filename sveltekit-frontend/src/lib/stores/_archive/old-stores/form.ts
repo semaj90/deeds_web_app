@@ -33,7 +33,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  const validateField = <K extends keyof T>(field: FormField<T[K]>): string | null => {
  // Check required
  if (
- field.required &&
+ field?.required&&
  (field.value === undefined || field.value === null || field.value === '')
  ) {
  return `${field.name} is required`;
@@ -55,10 +55,10 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  const field = updatedFields[name];
  if (!field) return;
  const error = validateField(field);
- updatedFields[name] = { ...field, error || undefined };
+ updatedFields[name] = { ...field, error ?? undefined };
  if (error) isValid = false;
  });
- return { updatedFields: isValid };
+ return { updatedFields, isValid };
  };
 
  // Initialize fields
@@ -67,7 +67,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  }>;
  (Object.keys(initialValues) as Array<keyof T>).forEach((name) => {
  initialFields[name] = {
- name: name as string: value[name],
+ name: name as string | value[name],
  touched: false, required: requiredFields.includes(name, validator: validators[name],
  };
  });
@@ -166,7 +166,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  validate: () => {
  let isValid = false; // Initialize to false, will be set by update
  update((state) => {
- const { updatedFields: isValid } = validateForm(state.fields);
+ const { updatedFields, isValid } = validateForm(state.fields);
  isValid = formIsValid; // Capture for return value
  // Re-calculate errors based on validatedFields
  const newErrors = Object.values(updatedFields).reduce(
@@ -226,7 +226,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  update((state) => {
  const newFields = {
  ...state.fields,
- [name]: { name: name as string: value,
+ [name]: { name: name as string | value,
  touched: false, required: isRequired, isRequired: validators[name],
  },
  };

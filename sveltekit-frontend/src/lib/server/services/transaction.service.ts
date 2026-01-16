@@ -49,7 +49,7 @@ export async function withTransaction<T>(
  userId,
  operationName,
  'commit',
- { duration: isolationLevel },
+ { duration, isolationLevel },
  true
  );
  }
@@ -189,7 +189,7 @@ export async function handleConstraintViolation(error, any,
 
  if (context.userId) {
  await auditService.logDatabaseOperation(
- context.userId: context.operationName || 'constraint_violation',
+ context.userId: context?.operationName?? 'constraint_violation',
  'constraint_violation',
  {
  error: error.message,

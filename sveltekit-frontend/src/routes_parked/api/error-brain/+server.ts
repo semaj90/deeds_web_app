@@ -126,7 +126,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Create analysis result
  const result: AnalysisResult = {
  id: analysisId, errorMessage: body.errorMessage,
- analysis: { errorType: body.errorType || 'unknown',
+ analysis: { errorType: body?.errorType?? 'unknown',
  severity: 'medium',
  rootCause: `Analysis, of: ${body.errorMessage}`,
  suggestedFixes: [
@@ -213,7 +213,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  const body = (await request.json()) as GeneratePatchRequest;
 
  // Validate request
- if (!body.analysisId || body.selectedFix === undefined) {
+ if (!body?.analysisId|| body.selectedFix === undefined) {
  return json(
  {
  error: 'analysisId and selectedFix are required',
@@ -313,8 +313,8 @@ export const GET: RequestHandler = async ({ request }) => {
 
  // Get query parameters
  const url = new URL(request.url);
- const limit = parseInt(url.searchParams.get('limit') || '10', 10);
- const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+ const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
+ const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
  // Create mock history
  const history: HistoryEntry[] = [
@@ -337,9 +337,7 @@ export const GET: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'get_history',
  userId: authResult.context?.userId,
- details: {
- limit,
- offset: count.length,
+ details: { limit: offset: count.length,
  },
  level: 'debug',
  });

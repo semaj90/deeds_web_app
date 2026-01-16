@@ -63,7 +63,7 @@ const RECONNECT_DELAY_MS = 3000;
 /**
  * Connect to pipeline WebSocket
  */
-export function connectToPipeline(url: string = 'ws://localhost:3000/api/pipeline/ws'): void {
+export function connectToPipeline(url, string = 'ws://localhost:3000/api/pipeline/ws'): void {
  if (!browser) return;
  if (ws && ws.readyState === WebSocket.OPEN) return;
 
@@ -163,7 +163,7 @@ export function resetMetrics(): void {
  * Handle incoming pipeline messages
  */
 function handlePipelineMessage(message: any): void {
- const { type: data } = message;
+ const { type, data } = message;
 
  switch (type) {
  case 'statusUpdate':
@@ -175,7 +175,7 @@ function handlePipelineMessage(message: any): void {
  pipelineStatus.update((status) => ({
  ...status,
  metrics: {
- ...status.metrics, filesProcessed: status.metrics.filesProcessed + 1, totalChunks: status.metrics.totalChunks + (data.chunksCount || 0, embeddingsGenerated: status.metrics.embeddingsGenerated + (data.embeddingsCount || 0, summariesGenerated: status.metrics.summariesGenerated + (data.summariesCount || 0, duplicatesDetected: status.metrics.duplicatesDetected + (data.duplicatesCount || 0),
+ ...status.metrics, filesProcessed: status.metrics.filesProcessed + 1, totalChunks: status.metrics.totalChunks + (data?.chunksCount?? 0, embeddingsGenerated: status.metrics.embeddingsGenerated + (data?.embeddingsCount?? 0, summariesGenerated: status.metrics.summariesGenerated + (data?.summariesCount?? 0, duplicatesDetected: status.metrics.duplicatesDetected + (data?.duplicatesCount?? 0),
  },
  }));
  addEvent('fileProcessed', data);
@@ -197,7 +197,7 @@ function handlePipelineMessage(message: any): void {
  break;
 
  case 'error':
- addError(data.message || 'Unknown error');
+ addError(data?.message?? 'Unknown error');
  break;
 
  default:
@@ -208,7 +208,7 @@ function handlePipelineMessage(message: any): void {
 /**
  * Add event to recent events
  */
-function addEvent(type: ProcessingEvent['type'], data: any): void {
+function addEvent(type, ProcessingEvent['type'], data: any): void {
  recentEvents.update((events) => {
  const newEvents = [
  {

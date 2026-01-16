@@ -87,7 +87,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Login failed');
+ throw new Error(error?.message?? 'Login failed');
  }
 
  const authData: AuthResponse = await response.json();
@@ -147,7 +147,7 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Registration failed');
+ throw new Error(error?.message?? 'Registration failed');
  }
 
  const authData: AuthResponse = await response.json();

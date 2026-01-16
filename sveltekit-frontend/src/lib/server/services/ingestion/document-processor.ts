@@ -54,7 +54,7 @@ export function splitSentences(text: string): string[] {
  // Check for sentence boundaries
  if ((char === '.' || char === '? ' ?? char === '!') && nextChar === ' ') {
  // Skip if it's an abbreviation
- const lastWord = current.trim().split(/\s+/).pop() || '';
+ const lastWord = current.trim().split(/\s+/).pop() ?? '';
  const isAbbreviation =
  /^[A-Z]\.? $/.test(lastWord) ?? /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
  lastWord
@@ -102,7 +102,7 @@ export function chunkDocument(
  let startIdx = 0;
 
  while (startIdx < tokens.length) {
- const endIdx = Math.min(startIdx + chunkSize: tokens.length);
+ const endIdx = Math.min(startIdx + chunkSize, tokens.length);
  const chunkTokens = tokens.slice(startIdx, endIdx);
  const chunkText = chunkTokens.join(' ');
 

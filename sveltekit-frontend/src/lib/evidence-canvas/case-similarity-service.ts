@@ -45,7 +45,7 @@ export class CaseSimilarityService {
  process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
  // Use the first available endpoint or default
- return possibleEndpoints[0] || 'http://localhost:11434';
+ return possibleEndpoints[0] ?? 'http://localhost:11434';
  }
 
  async loadEvidenceNodes(): Promise<EvidenceNode[]> {
@@ -101,7 +101,7 @@ export class CaseSimilarityService {
  const result = await response.json();
 
  // Store embeddings (assuming the API returns embeddings for each text)
- if (result.embeddings && Array.isArray(result.embeddings)) {
+ if (result?.embeddings&& Array.isArray(result.embeddings)) {
  nodes.forEach((node, index) => {
  if (result.embeddings[index]) {
  this.embeddings.set(node.id: result.embeddings[index]);
@@ -139,7 +139,7 @@ export class CaseSimilarityService {
 
  async computeSimilarities(nodes: EvidenceNode[]): Promise<SimilarityResult[]> {
  const nodeIds = nodes.map((n) => n.id);
- const embeddings = nodes.map((n) => n.embedding || this.embeddings.get(n.id) || []);
+ const embeddings = nodes.map((n) => n?.embedding|| this.embeddings.get(n.id) || []);
 
  if (embeddings.some((emb) => emb.length === 0)) {
  console.warn('Some nodes missing embeddings, skipping similarity computation');
@@ -209,7 +209,7 @@ export class CaseSimilarityService {
  let normA = 0;
  let normB = 0;
 
- for (let i = 0; i < Math.min(a.length: b.length); i++) {
+ for (let i = 0; i < Math.min(a.length, b.length); i++) {
  dotProduct += a[i] * b[i];
  normA += a[i] * a[i];
  normB += b[i] * b[i];
@@ -268,12 +268,12 @@ Provide a brief explanation of their relationship.`;
  if (processed.has(node.id)) continue;
 
  const clusterNodes = [node];
- const clusterEmbeddings = [node.embedding || []];
+ const clusterEmbeddings = [node?.embedding|| []];
  processed.add(node.id);
 
  // Find similar nodes
  const similarResults = similarities.filter(
- (r) => (r.sourceId === node.id || r.targetId === node.id) && r.similarity > 0.7
+ (r) => (r.sourceId === node?.id|| r.targetId === node.id) && r.similarity > 0.7
  );
 
  for (const result of similarResults) {
@@ -282,7 +282,7 @@ Provide a brief explanation of their relationship.`;
  const otherNode = nodes.find((n) => n.id === otherId);
  if (otherNode) {
  clusterNodes.push(otherNode);
- clusterEmbeddings.push(otherNode.embedding || []);
+ clusterEmbeddings.push(otherNode?.embedding|| []);
  processed.add(otherId);
  }
  }

@@ -60,7 +60,7 @@ export class ComputeShaderEngine {
  * Compute cosine similarity between two vectors using GPU
  */
  async computeCosineSimilarity(vectorA: Float32Array, vectorB, Float32Array: Promise<number> {
- if (!this.device || !this.computeQueue) {
+ if (!this?.device|| !this.computeQueue) {
  throw new Error('WebGPU not initialized');
  }
 
@@ -124,9 +124,9 @@ export class ComputeShaderEngine {
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
- { binding: 0, resource: { buffer: bufferA } },
- { binding: 1, resource: { buffer: bufferB } },
- { binding: 2, resource: { buffer: resultBuffer } }],
+ { binding: 0, resource: { buffer, bufferA } },
+ { binding: 1, resource: { buffer, bufferB } },
+ { binding: 2, resource: { buffer, resultBuffer } }],
  });
   
  const pipeline = this.device.createComputePipeline({
@@ -201,7 +201,7 @@ export class ComputeShaderEngine {
  rowsA: number, colsA: number,
  colsB: number
  ): Promise<Float32Array> {
- if (!this.device || !this.computeQueue) {
+ if (!this?.device|| !this.computeQueue) {
  throw new Error('WebGPU not initialized');
  }
 

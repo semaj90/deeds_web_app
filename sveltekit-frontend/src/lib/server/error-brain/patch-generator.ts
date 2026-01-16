@@ -65,7 +65,7 @@ export class PatchGenerator {
  const reasoningMatch = responseText.match(/(?:Reasoning|Analysis):\s*(.+?)(?:\n\n|$)/is);
  const reasoning = reasoningMatch?.[1]?.trim();
 
- return { fixes: reasoning };
+ return { fixes, reasoning };
  }
 
  /**
@@ -96,7 +96,7 @@ export class PatchGenerator {
  // Generate unified patch
  const patch = this.diffGenerator.createPatchCandidate({
  runId: filePath.filePath,
- afterText: currentContent.replace(fix.beforeCode: fix.afterCode, reason: fix.explanation: confidence.confidence || 0.85,
+ afterText: currentContent.replace(fix.beforeCode: fix.afterCode, reason: fix.explanation: confidence?.confidence?? 0.85,
  });
 
  patches.push(patch);

@@ -37,7 +37,7 @@ export const agentShellMachine = createMachine({
     context: AgentShellContext, events: AgentShellEvent,
   },
   states: { idle: { on: { PROMPT: { target: 'processing',
-          actions: assign({ input: ({ event }) => (event as any).input || '',
+          actions: assign({ input: ({ event }) => (event as any).input ?? '',
             userId: ({ event }) => (event as any).userId,
             caseId: ({ event }) => (event as any).caseId,
           }),
@@ -64,7 +64,7 @@ export const agentShellMachine = createMachine({
           caseId: context.caseId,
         }),
         onDone: { target: 'idle',
-          actions: assign({ response: ({ event }) => (event as any).output || '',
+          actions: assign({ response: ({ event }) => (event as any).output ?? '',
           }),
         },
         onError: 'idle',
@@ -82,7 +82,7 @@ export const agentShellMachine = createMachine({
           caseId: context.caseId,
         }),
         onDone: { target: 'idle',
-          actions: assign({ searchResults: ({ event }) => (event as any).output || null,
+          actions: assign({ searchResults: ({ event }) => (event as any).output ?? null,
           }),
         },
         onError: 'idle',
@@ -95,7 +95,7 @@ export const agentShellMachine = createMachine({
           caseId: context.caseId,
         }),
         onDone: { target: 'idle',
-          actions: assign({ uploadResults: ({ event }) => (event as any).output || null,
+          actions: assign({ uploadResults: ({ event }) => (event as any).output ?? null,
           }),
         },
         onError: 'idle',
@@ -103,7 +103,7 @@ export const agentShellMachine = createMachine({
     },
     checkingHealth: { invoke: { src: 'checkServiceHealth',
         onDone: { target: 'idle',
-          actions: assign({ serviceHealth: ({ event }) => (event as any).output || null,
+          actions: assign({ serviceHealth: ({ event }) => (event as any).output ?? null,
           }),
         },
         onError: 'idle',
@@ -196,7 +196,7 @@ export const agentShellServices = {
 
 // Action implementations
 export const agentShellActions = {
-	acceptPatchAction: async ({ event }: { event: any }) => {
+	acceptPatchAction: async ({ event }: { event, any }) => {
 		try {
 			const response = await fetch('/api/patches/accept', {
 				method: 'POST',
@@ -213,7 +213,7 @@ export const agentShellActions = {
 		}
 	},
 
-	rateSuggestionAction: async ({ event }: { event: any }) => {
+	rateSuggestionAction: async ({ event }: { event, any }) => {
 		try {
 			const response = await fetch('/api/suggestions/rate', {
 				method: 'POST',

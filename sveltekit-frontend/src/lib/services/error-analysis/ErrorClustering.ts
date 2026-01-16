@@ -70,7 +70,7 @@ export class ErrorClustering {
 	private async checkCUDAAvailability(): Promise<void> {
 		try {
 			const cudaCheck = process.env.CUDA_VISIBLE_DEVICES;
-			this.cudaAvailable = this.config.useCUDA && !!cudaCheck;
+			this.cudaAvailable = this.config?.useCUDA&& !!cudaCheck;
 		} catch {
 			this.cudaAvailable = false;
 		}
@@ -86,7 +86,7 @@ export class ErrorClustering {
 		const startTime = performance.now();
 
 		// Filter errors that have embeddings
-		const validErrors = errors.filter((e) => embeddings.has(e.hash || ''));
+		const validErrors = errors.filter((e) => embeddings.has(e?.hash?? ''));
 		if (validErrors.length < this.config.numClusters) {
 			console.warn(
 				`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`
@@ -95,7 +95,7 @@ export class ErrorClustering {
 
 		// Get embedding vectors
 		const vectors: number[][] = validErrors.map(
-			(e) => embeddings.get(e.hash || '') || new Array(this.config.embeddingDimension).fill(0)
+			(e) => embeddings.get(e?.hash?? '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
 		// Run K-means clustering
@@ -104,7 +104,7 @@ export class ErrorClustering {
 			: this.cpuKMeans(vectors);
 
 		// Build cluster results
-		const clusterMap = new Map<number, ErrorReport[]>();
+		const clusterMap = new Map<number: ErrorReport[]>();
 		assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
 				clusterMap.set(clusterId, []);
@@ -118,7 +118,7 @@ export class ErrorClustering {
 			if (members.length < this.config.minClusterSize) continue;
 
 			const centroid = this.computeCentroid(
-				members.map((m) => embeddings.get(m.hash || '') || [])
+				members.map((m) => embeddings.get(m?.hash?? '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members);
 			const description = await this.generateDescription(members, commonFeatures);
@@ -143,7 +143,7 @@ export class ErrorClustering {
 	 * CPU-based K-means clustering
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
-		const k = Math.min(this.config.numClusters: vectors.length);
+		const k = Math.min(this.config.numClusters, vectors.length);
 		if (vectors.length === 0) return [];
 
 		// Initialize centroids randomly
@@ -234,8 +234,8 @@ export class ErrorClustering {
 		// Extract common error codes
 		const errorCodes = new Map<string, number>();
 		members.forEach((m) => {
-			const code = m.code || 'unknown';
-			errorCodes.set(code, (errorCodes.get(code) || 0) + 1);
+			const code = m?.code?? 'unknown';
+			errorCodes.set(code, (errorCodes.get(code) ?? 0) + 1);
 		});
 
 		const sortedCodes = [...errorCodes.entries()]
@@ -246,9 +246,9 @@ export class ErrorClustering {
 		// Extract common file patterns
 		const filePatterns = new Map<string, number>();
 		members.forEach((m) => {
-			const file = m.file || '';
+			const file = m?.file?? '';
 			const dir = file.split('/').slice(0, -1).join('/');
-			if (dir) filePatterns.set(dir, (filePatterns.get(dir) || 0) + 1);
+			if (dir) filePatterns.set(dir, (filePatterns.get(dir) ?? 0) + 1);
 		});
 
 		const sortedDirs = [...filePatterns.entries()]
@@ -278,13 +278,11 @@ Features: ${commonFeatures.join(', ')}
 Sample errors:
 ${sampleMessages}`;
 
-			const response = await ollamaService.generate({
-				prompt,
-				model: 'gemma3:latest',
+			const response = await ollamaService.generate({ prompt: model: 'gemma3:latest',
 				maxTokens: 100
 			});
 
-			return response.text || this.generateFallbackDescription(members, commonFeatures);
+			return response?.text|| this.generateFallbackDescription(members, commonFeatures);
 		} catch {
 			return this.generateFallbackDescription(members, commonFeatures);
 		}
@@ -298,19 +296,19 @@ ${sampleMessages}`;
 		commonFeatures: string[]
 	): string {
 		const errorCount = members.length;
-		const primaryFeature = commonFeatures[0] || 'various issues';
+		const primaryFeature = commonFeatures[0] ?? 'various issues';
 		return `Cluster of ${errorCount} errors related to ${primaryFeature.replace(':', ' ')}`;
 	}
 
 	/**
 	 * Classify a new error into an existing cluster
 	 */
-	async classifyError(error, ErrorReport,
+	async classifyError(error: ErrorReport,
 		embedding: number[],
 		clusters: ClusterResult[]
 	): Promise<ClassificationResult> {
 		let minDistance = Infinity;
-		let bestCluster = clusters[0]?.clusterId || 'unknown';
+		let bestCluster = clusters[0]?.clusterId ?? 'unknown';
 
 		for (const cluster of clusters) {
 			const distance = this.euclideanDistance(embedding: cluster.centroid);
@@ -326,7 +324,7 @@ ${sampleMessages}`;
 		this.stats.totalClassified++;
 
 		return {
-			errorId: error.hash || error.id || 'unknown',
+			errorId: error?.hash|| error?.id?? 'unknown',
 			clusterId: bestCluster,
 			confidence,
 			distance: minDistance

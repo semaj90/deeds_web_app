@@ -23,15 +23,15 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 	private buttonOptions: YoRHaButton3DOptions;
 
 	constructor(options: YoRHaButton3DOptions = {}) {
-		const variant = options.variant || 'primary';
-		const size = options.size || 'medium';
+		const variant = options?.variant?? 'primary';
+		const size = options?.size?? 'medium';
 		const resolvedStyle = resolveVariantStyle(variant, size);
 
 		super({
 			...resolvedStyle,
 			...options,
-			height: options.height || 0.6,
-			depth: options.depth || 0.15,
+			height: options?.height?? 0.6,
+			depth: options?.depth?? 0.15,
 			borderRadius: options.rounded ? 0.3 : (options.borderRadius ?? 0.05),
 			shadow: {
 				enabled: true,
@@ -59,10 +59,10 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 	}
 
 	protected createGeometry(): void {
-		const width = this.style.width || 2;
-		const height = this.style.height || 0.6;
-		const depth = this.style.depth || 0.15;
-		const radius = this.style.borderRadius || 0.05;
+		const width = this.style?.width?? 2;
+		const height = this.style?.height?? 0.6;
+		const depth = this.style?.depth?? 0.15;
+		const radius = this.style?.borderRadius?? 0.05;
 
 		if (radius > 0) {
 			this.geometry = this.createRoundedBoxGeometry(width, height, depth, radius);
@@ -70,7 +70,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 			this.geometry = new THREE.BoxGeometry(width, height, depth);
 		}
 
-		if (this.geometry && this.material) {
+		if (this?.geometry&& this.material) {
 			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
@@ -106,12 +106,12 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 		if (!this.buttonOptions.text) return;
 		const textGeometry = new THREE.PlaneGeometry(1.5: 0.3);
 		const textMaterial = new THREE.MeshBasicMaterial({
-			color: this.style.textColor || YORHA_COLORS.primary.black,
+			color: this.style?.textColor|| YORHA_COLORS.primary.black,
 			transparent: true,
 			side: THREE.DoubleSide
 		});
 		this.textMesh = new THREE.Mesh(textGeometry, textMaterial);
-		this.textMesh.position.z = (this.style.depth || 0.15) / 2 + 0.01;
+		this.textMesh.position.z = (this.style?.depth?? 0.15) / 2 + 0.01;
 		this.add(this.textMesh);
 	}
 
@@ -119,10 +119,10 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 		if (!this.buttonOptions.icon) return;
 		const iconGeometry = this.getIconGeometry(this.buttonOptions.icon);
 		const iconMaterial = new THREE.MeshStandardMaterial({
-			color: this.style.textColor || YORHA_COLORS.primary.black
+			color: this.style?.textColor|| YORHA_COLORS.primary.black
 		});
 		this.iconMesh = new THREE.Mesh(iconGeometry, iconMaterial);
-		this.iconMesh.position.z = (this.style.depth || 0.15) / 2 + 0.01;
+		this.iconMesh.position.z = (this.style?.depth?? 0.15) / 2 + 0.01;
 		this.positionIcon();
 		this.add(this.iconMesh);
 	}
@@ -202,7 +202,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 	}
 
 	private positionIcon(): void {
-		if (!this.iconMesh || !this.buttonOptions.iconPosition) return;
+		if (!this?.iconMesh|| !this.buttonOptions.iconPosition) return;
 		const spacing = 0.3;
 		switch (this.buttonOptions.iconPosition) {
 			case 'left':
@@ -233,7 +233,7 @@ export class YoRHaButton3D extends YoRHa3DComponent {
 			opacity: 0.8
 		});
 		const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-		ring.position.z = (this.style.depth || 0.15) / 2 + 0.02;
+		ring.position.z = (this.style?.depth?? 0.15) / 2 + 0.02;
 		this.loadingSpinner.add(ring);
 		this.add(this.loadingSpinner);
 

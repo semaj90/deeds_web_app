@@ -43,7 +43,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  message: `Phase 78 detected a type mismatch inside ${route.path}`,
  tool: 'svelte-check',
  lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
- rawLogSnippet: 'Expected type `{ slug: string }` but received `{ id: number }`',
+ rawLogSnippet: 'Expected type `{ slug, string }` but received `{ id, number }`',
  };
 
  const suggestions: PatchSuggestion[] = [
@@ -52,9 +52,9 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  severity: 'warning',
  patch: [
  '--- a',
- route.file || 'src/routes/__unknown.svelte',
+ route?.file?? 'src/routes/__unknown.svelte',
  '+++ b',
- route.file || 'src/routes/__unknown.svelte',
+ route?.file?? 'src/routes/__unknown.svelte',
  '@@',
  '-const data = await load()',
  '+const data = await load() as PageData'].join('\n'), explanation:
@@ -75,18 +75,18 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  hints: [`Fallback, slug: ${fallbackSlug}`],
  }];
 
- return { cluster: suggestions };
+ return { cluster, suggestions };
 }
 
 function createFallbackSlug(path: string): string {
- return path.replace(/\W+/g, '-') || 'route';
+ return path.replace(/\W+/g, '-') ?? 'route';
 }
 
 export const routeErrorAssistantMachine = setup({
  types: { context: {} as RouteErrorAssistantContext,
  events: {} as RouteErrorAssistantEvent,
  },
- actors: { analyzeRoute: fromPromise(async ({ input }, { input: { route: RouteMeta } }) =>
+ actors: { analyzeRoute: fromPromise(async ({ input }, { input: { route, RouteMeta } }) =>
  simulateRouteAnalysis(input.route)
  ),
  },
@@ -104,7 +104,7 @@ export const routeErrorAssistantMachine = setup({
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
  assignAnalysisResult: assign(({ context, event }) => {
- const output = (event as { output: AnalyzeRouteOutput }).output;
+ const output = (event as { output, AnalyzeRouteOutput }).output;
  return {
  phase: 'suggesting' as const,
   cluster: output.cluster: output.suggestions: output.suggestions[0],
@@ -115,13 +115,13 @@ export const routeErrorAssistantMachine = setup({
  // @ts-expect-error - XState v5 typing noise for assign helpers
  assignAnalysisError: assign(({ context, event }) => ({
  phase: 'idle' as const,
- error: (event as { error: Error }).error?.message ?? 'Unable to analyze route',
+ error: (event as { error, Error }).error?.message ?? 'Unable to analyze route',
  retryCount: context.retryCount + 1,
  })),
  // @ts-expect-error - XState v5 typing noise for assign helpers
  assignSelectedSuggestion: assign(({ context, event }) => {
  const index = Math.min(
- Math.max((event as { index?: number }).index ?? 0, 0),
+ Math.max((event as { index?, number }).index ?? 0, 0),
  context.suggestions.length - 1
  );
  return {
@@ -132,7 +132,7 @@ export const routeErrorAssistantMachine = setup({
  // @ts-expect-error - XState v5 typing noise for assign helpers
  assignActiveSuggestion: assign(({ context, event }) => {
  const index = Math.min(
- Math.max((event as { index?: number }).index ?? 0, 0),
+ Math.max((event as { index?, number }).index ?? 0, 0),
  context.suggestions.length - 1
  );
  return {
@@ -151,7 +151,7 @@ export const routeErrorAssistantMachine = setup({
 }).createMachine({
  id: 'routeErrorAssistant',
  initial: 'idle',
- context: createInitialContext(states: { idle: { on: { ANALYZE_ROUTE: { target: 'analyzing',
+ context: createInitialContext(states, { idle: { on: { ANALYZE_ROUTE: { target: 'analyzing',
  actions: ['assignSelectedRoute'],
  },
  },

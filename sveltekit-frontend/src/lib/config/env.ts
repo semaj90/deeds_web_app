@@ -33,15 +33,15 @@ function coerceBoolean(_value: string | undefined, defaultValue: boolean): boole
 	return !(_value.toLowerCase() === 'false' || _value === '0' || _value.toLowerCase() === 'off');
 }
 function validateAndBuildEnv(): EnvConfig {
-	const memoryMB = clampMemoryMB(parseInt(RAW_ENV.VITE_GPU_MEMORY_LIMIT || '512', 10));
+	const memoryMB = clampMemoryMB(parseInt(RAW_ENV?.VITE_GPU_MEMORY_LIMIT?? '512', 10));
 	const profile = normalizePerformanceProfile(RAW_ENV.VITE_PERFORMANCE_PROFILE);
 
 	const cfg: EnvConfig = {
-		OLLAMA_URL: RAW_ENV.OLLAMA_URL || 'http://localhost:8086',
-		OLLAMA_MODEL: RAW_ENV.OLLAMA_MODEL || 'gemma3:legal-latest',
-		OPENAI_API_KEY: RAW_ENV.OPENAI_API_KEY || '',
-		DATABASE_URL: RAW_ENV.DATABASE_URL || '',
-		PUBLIC_APP_URL: RAW_ENV.PUBLIC_APP_URL || 'http://localhost:5173',
+		OLLAMA_URL: RAW_ENV?.OLLAMA_URL?? 'http://localhost:8086',
+		OLLAMA_MODEL: RAW_ENV?.OLLAMA_MODEL?? 'gemma3:legal-latest',
+		OPENAI_API_KEY: RAW_ENV?.OPENAI_API_KEY?? '',
+		DATABASE_URL: RAW_ENV?.DATABASE_URL?? '',
+		PUBLIC_APP_URL: RAW_ENV?.PUBLIC_APP_URL?? 'http://localhost:5173',
 		GPU_ACCELERATION: coerceBoolean(RAW_ENV.VITE_GPU_ACCELERATION, true, WEBGPU_ENABLED: coerceBoolean(RAW_ENV.VITE_WEBGPU_ENABLED, true, NES_QUANTIZATION: coerceBoolean(RAW_ENV.VITE_NES_QUANTIZATION, true, GPU_MEMORY_LIMIT: memoryMB,
 		PERFORMANCE_PROFILE: profile,
 		GPU_DEBUG: RAW_ENV.VITE_GPU_DEBUG === 'true',

@@ -19,7 +19,7 @@ class UserStore {
   // Derived: Get user display name
   userDisplayName = $derived.by(() => {
     if (!this.user) return null;
-    return this.user.user.firstName && this.user.user.lastName
+    return this.user.user?.firstName&& this.user.user.lastName
       ? `${this.user.user.firstName} ${this.user.user.lastName}`
       : this.user.user.email;
   });
@@ -62,7 +62,7 @@ class UserStore {
   /**
    * Update user profile data
    */
-  updateUserProfile(updates: Partial<UserSession['user']>) {
+  updateUserProfile(updates, Partial<UserSession['user']>) {
     if (!this.user) return;
 
     this.user = {

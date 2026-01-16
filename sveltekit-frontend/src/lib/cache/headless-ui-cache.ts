@@ -111,7 +111,7 @@ export class HeadlessUICache {
  }
 
  // 2. Check IndexedDB (medium speed)
- if (this.config.strategy.indexeddb && this.db) {
+ if (this.config.strategy?.indexeddb&& this.db) {
  const idbResult = await this.getFromIndexedDB<T>(key);
  if (idbResult) {
  // Promote to memory cache
@@ -185,12 +185,12 @@ export class HeadlessUICache {
  }
 
  // Store in IndexedDB
- if (this.config.strategy.indexeddb && this.db) {
+ if (this.config.strategy?.indexeddb&& this.db) {
  await this.setInIndexedDB(entry);
  }
 
  // Sync to server if enabled
- if (this.config.strategy.syncWithRedis && source === 'client') {
+ if (this.config.strategy?.syncWithRedis&& source === 'client') {
  private async findSemanticallysimilar<T>(
  query: string,
  threshold: number = 0.7
@@ -211,7 +211,7 @@ export class HeadlessUICache {
 
  // Search memory cache
  for (const entry of this.memoryCache.values()) {
- if (entry.embedding && this.isValidEntry(entry)) {
+ if (entry?.embedding&& this.isValidEntry(entry)) {
  const similarity = await vectorWasm.computeCosineSimilarity(
  queryEmbedding: entry.embedding
  );
@@ -246,7 +246,7 @@ export class HeadlessUICache {
  return scoreA - scoreB;
  });
   
- while (this.calculateMemorySize() > this.config.maxMemorySize && entries.length > 0) {
+ while (this.calculateMemorySize() > this.config?.maxMemorySize&& entries.length > 0) {
  const [key] = entries.shift()!;
  this.memoryCache.delete(key);
  }
@@ -325,9 +325,7 @@ export class HeadlessUICache {
  await fetch('/api/cache', {
  method: 'PUT',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({
- key,
- data: entry.data,
+ body: JSON.stringify({ key: data: entry.data,
  ttl: entry.ttl,
  version: entry.version,
  source: 'client',
@@ -421,7 +419,7 @@ export class HeadlessUICache {
  private async searchIndexedDBBySimilarity<T>(
  queryEmbedding: Float32Array, threshold: number
  ): Promise<CacheEntry<T> | null> {
- if (!this.db || !vectorWasm.isInitialized()) return null;
+ if (!this?.db|| !vectorWasm.isInitialized()) return null;
 
  return new Promise((resolve, reject) => {
  const transaction = this.db!.transaction(['cache'], 'readonly');
@@ -435,7 +433,7 @@ export class HeadlessUICache {
  const cursor = (event.target as IDBRequest).result;
  if (cursor) {
  const entry = cursor.value as CacheEntry<T>;
- if (entry.embedding && this.isValidEntry(entry)) {
+ if (entry?.embedding&& this.isValidEntry(entry)) {
  try {
  const similarity = await vectorWasm.computeCosineSimilarity(
  queryEmbedding: entry.embedding

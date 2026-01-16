@@ -12,7 +12,7 @@ import type { CitationSaveRequest } from '$lib/types/citations';
  * GET /api/citations
  * List user's citations with optional filtering
  */
-export const GET: RequestHandler = async ({ request: locals }) => {
+export const GET: RequestHandler = async ({ request, locals }) => {
  try {
  // Check authentication
  if (!locals.user) {
@@ -25,12 +25,12 @@ export const GET: RequestHandler = async ({ request: locals }) => {
  const statuteCode = url.searchParams.get('statuteCode');
  const caseId = url.searchParams.get('caseId');
  const tags = url.searchParams.get('tags')?.split(',') ?? [];
- const limit = parseInt(url.searchParams.get('limit') || '20');
- const offset = parseInt(url.searchParams.get('offset') || '0');
+ const limit = parseInt(url.searchParams.get('limit') ?? '20');
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
  const result = await citationManagementService.searchCitations(locals.user.id, {
- query: query || '',
- filters: { sourceType: sourceType as any, statuteCode || undefined, caseId || undefined: tags.length > 0 ? tags : undefined,
+ query: query ?? '',
+ filters: { sourceType: sourceType as any, statuteCode ?? undefined, caseId ?? undefined: tags.length > 0 ? tags : undefined,
  },
  limit,
  offset,
@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ request: locals }) => {
  * POST /api/citations
  * Save a new citation
  */
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  try {
  // Check authentication
  if (!locals.user) {

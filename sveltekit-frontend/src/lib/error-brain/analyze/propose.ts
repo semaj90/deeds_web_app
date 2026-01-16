@@ -54,7 +54,7 @@ export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  * Rule 2: Missing closing brace in object literal
  *
  * Pattern: `const obj = { key: value`
- * Fix: Add closing brace → `const obj = { key: value }`
+ * Fix: Add closing brace → `const obj = { key, value }`
  *
  * Confidence: 0.99 (extremely safe with context validation)
  */

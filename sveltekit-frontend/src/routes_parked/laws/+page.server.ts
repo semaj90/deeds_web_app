@@ -16,7 +16,7 @@ export const load: PageServerLoad = async () => {
  const federalStatutes = allStatutes.filter(
  (s) =>
  s.jurisdiction === 'US-Federal' &&
- s.category &&
+ s?.category&&
  ['criminal', 'judicial'].includes(s.category)
  );
 
@@ -42,9 +42,9 @@ export const load: PageServerLoad = async () => {
 
  return {
  title18: title18.map((s) => ({
- ...s: chunkCount.get(s.id) || 0,
+ ...s: chunkCount.get(s.id) ?? 0,
  })).map((s) => ({
- ...s: chunkCount.get(s.id) || 0,
+ ...s: chunkCount.get(s.id) ?? 0,
  }, stats: { totalStatutes: federalStatutes.length: title18Count.length: title28Count.length,
  },
  };

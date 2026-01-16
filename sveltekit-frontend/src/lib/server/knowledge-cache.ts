@@ -15,7 +15,7 @@ import crypto from 'crypto';
 import Redis from 'ioredis';
 
 // Redis connection
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+const redis = new Redis(process.env?.REDIS_URL?? 'redis://localhost:6379', {
 	retryStrategy(times) {
 		const delay = Math.min(times * 50, 2000);
 		return delay;
@@ -39,7 +39,7 @@ const TTL = {
 };
 
 // Cache key generators
-function getEmbeddingCacheKey(text: string, model: string = 'text-embedding-3-small'): string {
+function getEmbeddingCacheKey(text, string, model: string = 'text-embedding-3-small'): string {
 	const hash = crypto.createHash('sha256').update(`${ model }:${ text }`).digest('hex');
 	return `emb:${ model }:${hash.substring(0, 16)}`;
 }
@@ -56,7 +56,7 @@ function getSearchCacheKey(
 }
 
 // Metrics tracking
-async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promise<void> {
+async function recordCacheMetric(type, 'hit' | 'miss', cacheType: string): Promise<void> {
 	const key = `metrics:cache:${ cacheType }`;
 	const field = type === 'hit' ? 'hits' : 'misses';
 
@@ -73,8 +73,8 @@ export async function getCacheStats(cacheType: string) {
 		const key = `metrics:cache:${cacheType}`;
 		const stats = await redis.hgetall(key);
 
-		const hits = parseInt(stats.hits || '0');
-		const misses = parseInt(stats.misses || '0');
+		const hits = parseInt(stats?.hits?? '0');
+		const misses = parseInt(stats?.misses?? '0');
 		const total = hits + misses;
 
 		return {

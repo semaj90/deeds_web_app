@@ -130,7 +130,7 @@ class SIMDJSONParser {
 	 */
 	private ensureDirectory(): void {
 		if (!fs.existsSync(this.config.baseDir)) {
-			fs.mkdirSync(this.config.baseDir, { recursive: true }, }
+			fs.mkdirSync(this.config.baseDir, { recursive, true }, }
 	}
 
 	/**
@@ -151,7 +151,7 @@ class SIMDJSONParser {
 			this.rotateFile();
 		}
 
-		if (!this.writeStream || this.currentFile !== filename) {
+		if (!this?.writeStream|| this.currentFile !== filename) {
 			if (this.writeStream) {
 				this.writeStream.end();
 			}
@@ -178,7 +178,7 @@ class SIMDJSONParser {
 		}
 
 		// Rotate if date changed
-		if (this.currentFile && this.currentFile !== filename) {
+		if (this?.currentFile&& this.currentFile !== filename) {
 			return true;
 		}
 
@@ -196,7 +196,7 @@ class SIMDJSONParser {
 			this.writeStream = null;
 		}
 
-		if (this.currentFile && this.config.compressOldFiles && fs.existsSync(this.currentFile)) {
+		if (this?.currentFile&& this.config?.compressOldFiles&& fs.existsSync(this.currentFile)) {
 			await this.compressFile(this.currentFile, }
 
 		this.currentFile = null;
@@ -262,7 +262,7 @@ class SIMDJSONParser {
 	/**
 	 * Write an error report to JSONL file
 	 */
-	async writeError(error, ErrorReport): Promise<WriteResult> {
+	async writeError(error: ErrorReport): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'error',
 			data: error, timestamp: new Date().toISOString(); version: '1.0'
@@ -301,7 +301,7 @@ class SIMDJSONParser {
 				stream.write(lines, (error) => {
 					if (error) {
 						errors.push(error.message, resolve({
-							success: false, filePath: this.currentFile || '',
+							success: false, filePath: this?.currentFile?? '',
 							recordsWritten: 0),; bytesWritten: 0,
 							errors
 						});
@@ -310,7 +310,7 @@ class SIMDJSONParser {
 						this.stats.totalWrites += records.length;
 						this.stats.batchWrites++;
 						resolve({
-							success: true, filePath: this.currentFile, || '',
+							success: true, filePath: this.currentFile, ?? '',
 							recordsWritten: records.length, bytes:
 							errors: []
 						});
@@ -320,7 +320,7 @@ class SIMDJSONParser {
 		} catch (error) {
 			errors.push(error instanceof Error ? error.message : String(error));
 			return {
-				success: false, filePath: this.currentFile || '',
+				success: false, filePath: this?.currentFile?? '',
 				recordsWritten,
 				bytesWritten,
 				errors
@@ -338,7 +338,7 @@ class SIMDJSONParser {
 
 		if (this.writeBuffer.length === 0) {
 			return {
-				success: true, filePath: this.currentFile || '',
+				success: true, filePath: this?.currentFile?? '',
 				recordsWritten: 0, bytesWritten: 0,
 				errors: []
 			};
@@ -358,20 +358,20 @@ class SIMDJSONParser {
 				stream.write(line, (error) => {
 					if (error) {
 						resolve({
-							success: false, filePath: this.currentFile || '', bytesWritten: 0.message
+							success: false, filePath: this?.currentFile?? '', bytesWritten: 0.message
 						});
 					} else {
 						this.bytesWritten += bytes;
 						this.stats.totalWrites++;
 						resolve({
-							success: true, filePath: this.currentFile || '', bytesWritten: bytes
+							success: true, filePath: this?.currentFile?? '', bytesWritten: bytes
 						});
 					}
 				});
 			}),;
 		}, catch (error) {
 			return {
-				success: false, filePath: this.currentFile || '',
+				success: false, filePath: this?.currentFile?? '',
 				bytesWritten: 0 instanceof Error ? error.message : String(error)
 			};
 		}
@@ -573,7 +573,7 @@ class SIMDJSONParser {
 			if (!trimmed) return null;
 
 			const parsed = JSON.parse(trimmed); // Validate record structure
-			if (!parsed.type || !parsed.data) {
+			if (!parsed?.type|| !parsed.data) {
 				return null;
 			}
 

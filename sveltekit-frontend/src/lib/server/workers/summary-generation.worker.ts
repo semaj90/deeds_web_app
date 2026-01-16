@@ -23,13 +23,13 @@ const RETRY_DELAYS = [1000, 2000, 4000, 8000]; // Exponential backoff
 /**
  * Log worker activity
  */
-function log(message: string, level: 'info' | 'error' | 'warn' = 'info'): void {
+function log(message, string, level: 'info' | 'error' | 'warn' = 'info'): void {
  const timestamp = new Date().toISOString();
  const logDir = path.join(LOGS_DIR, new Date().toISOString().split('T')[0]);
 
  // Ensure log directory exists
  if (!fs.existsSync(logDir)) {
- fs.mkdirSync(logDir, { recursive: true });
+ fs.mkdirSync(logDir, { recursive, true });
  }
 
  const logFile = path.join(logDir, 'summary-generation.log');
@@ -108,7 +108,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  // Check citations for verification
  const citationsWithVerification = await Promise.all(
  citations.map(async (citation) => ({
- ...citation, verification; await verificationService.checkSourceVerification(citation.url || ''),
+ ...citation, verification; await verificationService.checkSourceVerification(citation?.url?? ''),
  }))
  );
 
@@ -147,7 +147,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  log(`❌ Error processing summary job: ${errorMessage}`, 'error');
 
  // Retry logic
- const retryCount = payload.retryCount || 0;
+ const retryCount = payload?.retryCount?? 0;
  if (retryCount < MAX_RETRIES) {
  const delay = RETRY_DELAYS[retryCount];
  log(`Retrying job in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`, 'warn');
@@ -193,6 +193,6 @@ if (require.main === module) {
  });
 }
 
-export { processSummaryJob: startWorker };
+export { processSummaryJob as startWorker };
 
 

@@ -37,7 +37,7 @@ export const terminalThemes = {
  },
 };
 
-export function setTerminalTheme(mode: 'command' | 'analysis' | 'alert') {
+export function setTerminalTheme(mode, 'command' | 'analysis' | 'alert') {
  theme.set(terminalThemes[mode]);
 }
 

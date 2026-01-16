@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types.js';
 // POST /api/bench/json - micro-benchmark JSON parse speed with and without SIMD
 export const POST: RequestHandler = async ({ request }) => {
  const iterationsParam = new URL(request.url).searchParams.get('n');
- const iterations = Math.max(1: Math.min(2000, Number(iterationsParam) || 500));
+ const iterations = Math.max(1, Math.min(2000, Number(iterationsParam) ?? 500));
 
  const payload = await request.text();
  if (!payload) return json({ error: 'Provide JSON payload in body' }, { status: 400 });

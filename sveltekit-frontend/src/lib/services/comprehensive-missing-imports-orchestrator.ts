@@ -188,16 +188,16 @@ Generated: ${new Date().toISOString()}
 - **Files with Errors**: ${analysis.errorsByFile.size}
 
 ## 🎯 TOP MISSING FUNCTIONS
-${topMissingFunctions || '- None listed'}
+${topMissingFunctions ?? '- None listed'}
 
 ## 🏗️ TOP MISSING CLASSES
-${topMissingClasses || '- None listed'}
+${topMissingClasses ?? '- None listed'}
 
 ## 📝 TOP MISSING TYPES
-${topMissingTypes || '- None listed'}
+${topMissingTypes ?? '- None listed'}
 
 ## 📂 FILES WITH MOST ERRORS
-${filesWithMostErrors || '- None listed'}
+${filesWithMostErrors ?? '- None listed'}
 
 ## 🔧 CATEGORIZED MISSING ITEMS
 ### Svelte 5 Runes
@@ -217,7 +217,7 @@ ${
  Array.from(analysis.missingTypes)
  .filter((type: string) => type.includes('_') && type === type.toUpperCase())
  .map((env: any) => `- \`${ env }\``)
- .join('\n') || '- None listed'
+ .join('\n') ?? '- None listed'
 }
 
 ## 📋 RESOLUTION RECOMMENDATIONS
@@ -258,7 +258,7 @@ ${
  if ((context7Integration as any).drizzleOrmDocs) resolved += 20;
  if ((context7Integration as any).xStateDocs) resolved += 8;
  }
- return Math.min(resolved: this.countTotalMissingItems(analysis));
+ return Math.min(resolved, this.countTotalMissingItems(analysis));
  }
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {

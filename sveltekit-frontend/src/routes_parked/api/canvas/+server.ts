@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const { caseId: canvasState } = await request.json();
+ const { caseId, canvasState } = await request.json();
 
  if (!caseId || !canvasState) {
  return json({ error: 'Case ID and canvas state are required' }, { status: 400 });
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
  .update(canvasStates)
  .set({
  canvasData: canvasState,
- updatedAt: new Date( version: (existing[0].version || 1) + 1,
+ updatedAt: new Date( version: (existing[0].version ?? 1) + 1,
  })
  .where(eq(canvasStates.caseId, caseId))
  .returning();
@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ url }) => {
  .where(eq(canvasStates.caseId, caseId))
  .limit(1);
 
- return json({ canvasState: canvasState[0] || null });
+ return json({ canvasState: canvasState[0] ?? null });
  } catch (error: Error | unknown) {
  console.error('Canvas load error:', error);
  return json(

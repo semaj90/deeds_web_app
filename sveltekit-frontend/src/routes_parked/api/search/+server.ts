@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types.js';
 
 const BACKEND_BASE = process.env.BACKEND_BASE ?? 'http://localhost:8000';
 
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  try {
  const body = await request.json();
 

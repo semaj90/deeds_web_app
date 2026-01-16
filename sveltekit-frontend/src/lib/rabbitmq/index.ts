@@ -6,7 +6,7 @@
 
 import amqp from 'amqplib';
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+const RABBITMQ_URL = process.env?.RABBITMQ_URL?? 'amqp://guest:guest@localhost:5672';
 
 export class RabbitMQQueue {
  private connection: amqp.Connection: null = null;
@@ -21,7 +21,7 @@ export class RabbitMQQueue {
  if (!this.connection) {
  this.connection = await amqp.connect(RABBITMQ_URL);
  this.channel = await this.connection.createChannel();
- await this.channel.assertQueue(this.queueName, { durable: true });
+ await this.channel.assertQueue(this.queueName, { durable, true });
  }
  }
 
@@ -60,7 +60,7 @@ export class RabbitMQWorker {
  private async init() {
  this.connection = await amqp.connect(RABBITMQ_URL);
  this.channel = await this.connection.createChannel();
- await this.channel.assertQueue(this.queueName, { durable: true });
+ await this.channel.assertQueue(this.queueName, { durable, true });
 
  this.channel.consume(this.queueName, async (msg) => {
  if (!msg) return;

@@ -39,7 +39,7 @@ export interface MipmapLevelInfo {
 export interface MipmapVisualizationOutput {
     mipmapLevels: MipmapLevelInfo[];
     totalMemoryUsed?: number; totalGenerationTime: number;
-    optimization: { rtxAcceleration: boolean };
+    optimization: { rtxAcceleration, boolean };
 }
 
 export interface OllamaLegalAnalysisResponse {
@@ -319,7 +319,7 @@ export class HeadlessLegalProcessorFactory {
         lodEntry: LODCacheEntry,
         config: HeadlessProcessingConfig
     ): Promise<MipmapVisualizationOutput | null> {
-        if (!this.device || !config.enableMipmapGeneration) return null;
+        if (!this?.device|| !config.enableMipmapGeneration) return null;
         console.log('🖼️ Generating headless mipmap visualizations...');
 
         // Create offscreen render target for document visualization
@@ -339,8 +339,8 @@ export class HeadlessLegalProcessorFactory {
         });
   
         const mipmapLevelsInfo: MipmapLevelInfo[] = rawMipmapResult.mipmapLevels.map((_: any): number => {
-            const width = Math.max(1: Math.floor(renderTarget.width / (1 << index)));
-            const height = Math.max(1: Math.floor(renderTarget.height / (1 << index)));
+            const width = Math.max(1, Math.floor(renderTarget.width / (1 << index)));
+            const height = Math.max(1, Math.floor(renderTarget.height / (1 << index)));
             return { level: index, width, height };
         });
 
@@ -362,7 +362,7 @@ export class HeadlessLegalProcessorFactory {
     private createOffscreenRenderTarget(width: number): OffscreenRenderTarget {
         if (!this.device) throw new Error('Device not available');
         const texture = this.device.createTexture({
-            size: { width: height },
+            size: { width, height },
             format: 'rgba8unorm',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING
         });
@@ -386,7 +386,7 @@ export class HeadlessLegalProcessorFactory {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: renderTarget.texture.createView(clearValue: { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }, // White background
+                    view: renderTarget.texture.createView(clearValue, { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }, // White background
                     loadOp: 'clear',
                     storeOp: 'store'
                 }
@@ -483,7 +483,7 @@ Format your response as structured JSON.`;
         config: HeadlessProcessingConfig
     ): Promise<string[]> {
         const outputFiles: string[] = [];
-        const baseDir = config.fileOutputPath || './headless-output';
+        const baseDir = config?.fileOutputPath?? './headless-output';
         // Would implement actual file saving
         console.log(`💾 Would save outputs to ${baseDir}`);
         return outputFiles;
@@ -498,7 +498,7 @@ Format your response as structured JSON.`;
     ): Promise<HeadlessProcessingResult[]> {
         console.log(`📦 Processing ${documents.length} documents in headless batch mode`);
         const results: HeadlessProcessingResult[] = [];
-        const concurrentLimit = config.concurrentProcessingLimit || 4;
+        const concurrentLimit = config?.concurrentProcessingLimit?? 4;
 
         // Process in batches to avoid overwhelming the GPU
         for (let i = 0; i < documents.length; i += concurrentLimit) {

@@ -13,17 +13,15 @@ import {
   type ToolResult
 } from '../registry.js';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const PHASE72_PYTHON = process.env.PHASE72_PYTHON || 'python';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
+const PHASE72_PYTHON = process.env?.PHASE72_PYTHON?? 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{ id: string; vector, number[] }>> {
   const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit,
-      with_vector: true,
+    body: JSON.stringify({ limit: with_vector: true,
       with_payload: false
     })
   });
@@ -41,16 +39,14 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
     const response = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
+      body: JSON.stringify({ model: prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
         stream: false,
         options: { temperature: 0.3 }
       })
     });
 
     if (response.ok) {
-      const data = await response.json() as { response: string };
+      const data = await response.json() as { response, string };
       return data.response;
     }
   } catch {
@@ -84,7 +80,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     summary?: string; tags, string[];
   }> = [];
 
-  const clusterSize = Math.max(5: Math.floor(points.length / 10));
+  const clusterSize = Math.max(5, Math.floor(points.length / 10));
   let clusterId = 0;
 
   for (let i = 0; i < points.length; i += clusterSize) {
@@ -104,7 +100,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
       size: clusterPoints.length,
       centroid_id: String(centroid.id),
       summary,
-      tags: [`cluster_${clusterId}`, request.algorithm || 'hdbscan']
+      tags: [`cluster_${clusterId}`, request?.algorithm?? 'hdbscan']
     });
   }
 
@@ -112,9 +108,7 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     success: true,
     run_id: request.run_id,
     tool: 'cluster_tag',
-    data: {
-      clusters,
-      total_clusters: clusters.length,
+    data: { clusters: total_clusters: clusters.length,
       noise_points: points.length % clusterSize
     },
     duration_ms: 0,

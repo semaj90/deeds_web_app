@@ -4,15 +4,15 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 export const GET: RequestHandler = async () => {
 	const config = {
 		// PostgreSQL Configuration
-		postgres: { host: env.PGHOST || '127.0.0.1',
-			port: parseInt(env.PGPORT || '5434'),
-			database: env.PGDATABASE || 'legal',
+		postgres: { host: env?.PGHOST?? '127.0.0.1',
+			port: parseInt(env?.PGPORT?? '5434'),
+			database: env?.PGDATABASE?? 'legal',
 			ssl: env.PGSSL === 'true'
 		},
 
 		// Redis Configuration
-		redis: { url: env.REDIS_URL || 'redis://localhost:6379',
-			db: parseInt(env.REDIS_DB || '0'),
+		redis: { url: env?.REDIS_URL?? 'redis://localhost:6379',
+			db: parseInt(env?.REDIS_DB?? '0'),
 			prefixes: { phase89: 'phase89:',
 				embeddings: 'emb:',
 				topk: 'topk:',
@@ -21,7 +21,7 @@ export const GET: RequestHandler = async () => {
 		},
 
 		// Qdrant Configuration
-		qdrant: { url: env.QDRANT_URL || 'http://127.0.0.1:6333',
+		qdrant: { url: env?.QDRANT_URL?? 'http://127.0.0.1:6333',
 			collections: { error_chunks: 'phase89_error_chunks',
 				ast_chunks: 'phase89_ast_chunks',
 				kb_cards: 'phase89_kb_cards',
@@ -35,7 +35,7 @@ export const GET: RequestHandler = async () => {
 		},
 
 		// Ollama Configuration
-		ollama: { url: env.OLLAMA_URL || 'http://localhost:11434',
+		ollama: { url: env?.OLLAMA_URL?? 'http://localhost:11434',
 			models: { embedding: 'embeddinggemma:latest',
 				legal: 'gemma3-legal:latest'
 			}

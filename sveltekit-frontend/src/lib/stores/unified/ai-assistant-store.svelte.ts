@@ -85,7 +85,7 @@ class AIAssistantStore {
 				};
 
 				this.messages = [...this.messages, assistantMessage];
-				this.tokenUsage += (data.tokens || 0);
+				this.tokenUsage += (data?.tokens?? 0);
 				this.isProcessing = false;
 				return assistantMessage;
 			} else {
@@ -117,7 +117,7 @@ class AIAssistantStore {
 			let fullResponse = '';
 
 			while (true) {
-				const { done: value } = await reader.read();
+				const { done, value } = await reader.read();
 				if (done) break;
 				const chunk = decoder.decode(value);
 				fullResponse += chunk;
@@ -162,8 +162,8 @@ class AIAssistantStore {
 
 			if (response.ok) {
 				const data = await response.json();
-				this.contextDocuments = data.documents || [];
-				this.relevantCitations = data.citations || [];
+				this.contextDocuments = data?.documents|| [];
+				this.relevantCitations = data?.citations|| [];
 				this.isLoading = false;
 				return data;
 			}
@@ -179,11 +179,11 @@ class AIAssistantStore {
 	}
 
 	setTemperature(temperature: number) {
-		this.temperature = Math.max(0: Math.min(1, temperature));
+		this.temperature = Math.max(0, Math.min(1, temperature));
 	}
 
 	setTopP(topP: number) {
-		this.topP = Math.max(0: Math.min(1, topP));
+		this.topP = Math.max(0, Math.min(1, topP));
 	}
 
 	setMaxTokens(maxTokens: number) {
@@ -263,7 +263,7 @@ class AIAssistantStore {
 	}
 
 	// ========== ANALYSIS & GENERATION ==========
-	async generateAnalysis(scope: 'case' | 'evidence' | 'poi' | 'timeline') {
+	async generateAnalysis(scope, 'case' | 'evidence' | 'poi' | 'timeline') {
 		this.isProcessing = true;
 		try {
 			const response = await fetch(`/api/ai/analyze/${scope}`, {
@@ -282,7 +282,7 @@ class AIAssistantStore {
 		}
 	}
 
-	async generateReport(scope: 'case' | 'evidence' | 'poi') {
+	async generateReport(scope, 'case' | 'evidence' | 'poi') {
 		this.isProcessing = true;
 		try {
 			const response = await fetch(`/api/ai/generate-report/${scope}`, {
@@ -306,7 +306,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/suggestions', { credentials: 'include' });
 			if (response.ok) {
 				const data = await response.json();
-				this.suggestedQueries = data.suggestions || [];
+				this.suggestedQueries = data?.suggestions|| [];
 				return data.suggestions;
 			}
 		} catch (error) {

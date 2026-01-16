@@ -31,7 +31,7 @@ export function createPubSubHelper(opts: PubSubHandlerOptions): PubSubController
     });
 
     (subscriber as any).on('message', (channel: string, message: string) => {
-        opts.onMessage({ channel, message: message });
+        opts.onMessage({ channel: message: message });
     });
 
     return {

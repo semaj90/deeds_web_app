@@ -14,7 +14,7 @@ declare module 'xstate' {
     assignment: Partial<T> | ((ctx: T, evt?: any) => Partial<T>)
   ): unknown;
 
-  export type DoneInvokeEvent<T = any> = { output: T };
+  export type DoneInvokeEvent<T = any> = { output, T };
   export type AnyEventObject = Record<string, unknown>;
   export type StateMachine<C = any, E = any> = any;
 

@@ -58,7 +58,7 @@ function extractKeywords(text: string, topK: number = 5): string[] {
  for (const word of words) {
  for (const term of legalTerms) {
  if (word.includes(term)) {
- keywordCounts.set(term, (keywordCounts.get(term) || 0) + 1);
+ keywordCounts.set(term, (keywordCounts.get(term) ?? 0) + 1);
  }
  }
  }
@@ -83,7 +83,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  }
 
  const statuteRecord = statute[0];
- const sectionText = statuteRecord.content || '';
+ const sectionText = statuteRecord?.content?? '';
 
  // Generate embedding for semantic search
  const embedding = await generateEmbedding(sectionText.substring(0, 1000));
@@ -100,8 +100,8 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const relatedStatutes = relatedStatutesRecords
  .filter((r) => r.length > 0)
  .map((r, index) => ({
- id: r[0].id: r[0].title || '',
- section: r[0].section || '',
+ id: r[0].id: r[0].title ?? '',
+ section: r[0].section ?? '',
  relevance: relatedChunks[index]?.similarity ?? 0,
  }));
 
@@ -109,9 +109,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const keywords = extractKeywords(sectionText);
 
  // Create prefetch context
- const context: PrefetchContext = {
-  sectionId,
-  sectionText: relatedStatutes, vectorContext: embedding, timestamp: Date.now(),
+ const context: PrefetchContext = { sectionId: sectionText: relatedStatutes, vectorContext: embedding, timestamp: Date.now(),
      ttl: 5 * 60 * 1000, // 5 minute TTL
   };
 

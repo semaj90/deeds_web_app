@@ -14,11 +14,11 @@ const ENHANCED_MEMORY_CACHING = {
 
 const GAMING_ERA_SPECS = {
  n64: { memoryMB: 4, // Placeholder value, adjust as needed
- dnnLodSystem: { enabled: true },
+ dnnLodSystem: { enabled, true },
  },
- '8bit': { memoryArchitecture: { autoEncoderCache: true },
+ '8bit': { memoryArchitecture: { autoEncoderCache, true },
  },
- '16bit': { memoryArchitecture: { lodScalingBuffer: true },
+ '16bit': { memoryArchitecture: { lodScalingBuffer, true },
  },
 };
 
@@ -219,7 +219,7 @@ export class OCRTensorProcessor {
  scope: `/api/tensor/`,
  });
  this.serviceWorkerRegistration = registration;
- const activeWorker = registration.active || registration.installing || registration.waiting;
+ const activeWorker = registration?.active|| registration?.installing|| registration.waiting;
  // keep reference to the underlying ServiceWorker (may be | undefined until activated)
  this.worker = activeWorker ?? undefined;
  console.log('âœ… SIMD Service Worker initialized');
@@ -258,7 +258,7 @@ export class OCRTensorProcessor {
  imageData: ImageData | HTMLCanvasElement | File,
  options: { language?: string }
  ): Promise<OCRResult> {
- if (!this.ocrInitialized || !window.Tesseract) {
+ if (!this?.ocrInitialized|| !window.Tesseract) {
  throw new Error('OCR.js not initialized');
  }
  // Update memory pressure before processing
@@ -274,7 +274,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  // Apply LOD-based OCR optimization
  const ocrOptions = this.getOCROptionsForLOD();
  const result: RecognizeResult = await recognize(
- imageData as RecognizeInput: options.language || 'eng',
+ imageData as RecognizeInput | options?.language?? 'eng',
  {
  // Type logger message
  logger: (m: LoggerMessage) => console.log(`OCR [${this.currentLODLevel}]: `, m),
@@ -349,9 +349,9 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  const statusData = await ollamaStatus.json();
 
  // Smart fallback to Gemma 270MB for OOM prevention and better UX
- const isGPUBusy = statusData.gpu_busy || statusData.models_loading > 0;
- const isGPURecognized = statusData.gpu_detected && statusData.gpu_memory_total > 0;
- const availableMemory = statusData.gpu_memory_available || 0;
+ const isGPUBusy = statusData?.gpu_busy|| statusData.models_loading > 0;
+ const isGPURecognized = statusData?.gpu_detected&& statusData.gpu_memory_total > 0;
+ const availableMemory = statusData?.gpu_memory_available?? 0;
 
  // Prioritize Gemma 270MB when GPU isn't recognized or is busy
  if (!isGPURecognized || isGPUBusy || availableMemory < 512) {
@@ -444,7 +444,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 const data: EmbeddingAPIResponse = await response.json(); // Type data as EmbeddingAPIResponse
  return {
  embeddings: new Float32Array(data.embedding),
- fromCache: data.fromCache || false,
+ fromCache: data?.fromCache|| false,
  model: data?.model ?? 'unknown'
  };
  } catch (error) {
@@ -456,8 +456,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  private async processTensors(embeddings: Float32Array): Promise<TensorData> {
  if (!this.webgpuDevice) {
  // Fallback to CPU processing
- return {
- embeddings, dimensions: embeddings.length,
+ return { embeddings: dimensions: embeddings.length,
  metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
@@ -499,7 +498,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  resultBuffer.unmap();
 
  return {
- embeddings: processedData.slice(dimensions: processedData.length,
+ embeddings: processedData.slice(dimensions, processedData.length,
  metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
@@ -508,8 +507,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  };
  } catch (error) {
  console.warn('WebGPU tensor processing failed, using CPU fallback: ', error);
- return {
- embeddings, dimensions: embeddings.length,
+ return { embeddings: dimensions: embeddings.length,
  metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
@@ -543,8 +541,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  const chunkSize = this.getOptimalChunkSize();
 
  // Create processing queue with priority scheduling
- const processingQueue: Array = images.map((image, index) => ({
- image, priority: this.calculateProcessingPriority(image, index),
+ const processingQueue: Array = images.map((image, index) => ({ image: priority: this.calculateProcessingPriority(image, index),
  }));
 
  // Sort by priority (higher priority first)
@@ -590,7 +587,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  options: OCRProcessOptions = {}
  ): Promise<ProcessingResult> {
  // Try Web Worker processing for better performance
- if (this.worker && 'transferControlToOffscreen' in HTMLCanvasElement.prototype) {
+ if (this?.worker&& 'transferControlToOffscreen' in HTMLCanvasElement.prototype) {
  try {
  return await this.processImageInWorker(imageData, options);
  } catch (error) {
@@ -607,7 +604,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  options: OCRProcessOptions
  ): Promise<ProcessingResult> {
  return new Promise((resolve, reject) => {
- if (!this.worker && !this.serviceWorkerRegistration) {
+ if (!this?.worker&& !this.serviceWorkerRegistration) {
  reject(new Error('Web Worker / Service Worker not available'));
  return;
  }
@@ -626,7 +623,7 @@ const handleMessage = (ev: MessageEvent) => {
 const cleanup = () => {
  // remove listeners for both possible listener types
  try {
- if (this.worker && 'removeEventListener' in this.worker) {
+ if (this?.worker&& 'removeEventListener' in this.worker) {
  (this.worker as Worker).removeEventListener('message', handleMessage);
  }
  } catch (err) {
@@ -645,7 +642,7 @@ const cleanup = () => {
 
  // Attach listener depending on type
  if (
- this.worker &&
+ this?.worker&&
  'postMessage' in (this.worker as Worker) &&
  'terminate' in (this.worker as Worker)
  ) {
@@ -771,7 +768,7 @@ const cleanup = () => {
 
  dispose(): void {
  // terminate dedicated worker if present
- if (this.worker && 'terminate' in (this.worker as Worker)) {
+ if (this?.worker&& 'terminate' in (this.worker as Worker)) {
  try {
  (this.worker as Worker).terminate();
  } catch (err) {

@@ -12,7 +12,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (action === 'cluster') {
 			// Spawn Python pipeline process
-			const pythonPath = process.env.PHASE72_PYTHON || 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
+			const pythonPath = process.env?.PHASE72_PYTHON?? 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe';
 			const scriptPath = 'scripts/phase89-enhanced-cuda-pipeline.py';
 
 			const args = ['--chunk-size', String(chunkSize)];

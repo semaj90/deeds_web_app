@@ -12,7 +12,7 @@ export interface IDiffStorage {
  saveDiff(diff: Diff): Promise<Diff>;
  getDiff(diffId: string): Promise<Diff | null>;
  getDiffsByError(errorId: string): Promise<Diff[]>;
- updateDiffStatus(diffId: string, status: Diff['status']): Promise<Diff>;
+ updateDiffStatus(diffId, string, status: Diff['status']): Promise<Diff>;
  deleteDiff(diffId: string): Promise<boolean>;
  listDiffs(filters?: DiffFilter): Promise<Diff[]>;
  getDiffHistory(diffId: string): Promise<DiffHistoryEntry[]>;
@@ -105,7 +105,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  /**
  * Update diff status
  */
- async updateDiffStatus(diffId: string, status: Diff['status']): Promise<Diff> {
+ async updateDiffStatus(diffId, string, status: Diff['status']): Promise<Diff> {
  this.validateInput(diffId, 'diffId');
  this.validateInput(status, 'status');
 
@@ -123,11 +123,11 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  // Record history
  if (status === 'applied') {
  diff.appliedAt = new Date();
- this.recordHistory(diffId, 'applied', { oldStatus: status });
+ this.recordHistory(diffId, 'applied', { oldStatus, status });
  } else if (status === 'validated') {
- this.recordHistory(diffId, 'validated', { oldStatus: status });
+ this.recordHistory(diffId, 'validated', { oldStatus, status });
  } else if (status === 'failed') {
- this.recordHistory(diffId, 'failed', { oldStatus: status });
+ this.recordHistory(diffId, 'failed', { oldStatus, status });
  }
 
  this.log('info', `Updated diff ${diffId} status from ${oldStatus} to ${ status }`);
@@ -186,8 +186,8 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  }
 
  // Apply pagination
- const offset = filters.offset || 0;
- const limit = filters.limit || 100;
+ const offset = filters?.offset?? 0;
+ const limit = filters?.limit?? 100;
  diffs = diffs.slice(offset, offset + limit);
  }
 
@@ -248,7 +248,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
 
  diffs.forEach((diff: any) => {
  byStatus[diff.status]++;
- byFile[diff.file] = (byFile[diff.file] || 0) + 1;
+ byFile[diff.file] = (byFile[diff.file] ?? 0) + 1;
  });
 
  const stats = {

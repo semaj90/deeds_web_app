@@ -69,13 +69,13 @@ export class ClientEmbeddingGemma {
  } = {}
  ): Promise<{ embeddings: number[][]; model: string; dimension: number; count, number;
  }> {
- if (!this.isInitialized || !this.session || !this.tokenizer) {
+ if (!this?.isInitialized|| !this?.session|| !this.tokenizer) {
  await this.initialize();
  }
 
  const { normalize = true, maxLength = 512 } = options;
 
- if (!this.session || !this.tokenizer) {
+ if (!this?.session|| !this.tokenizer) {
  throw new Error('ClientEmbeddingGemma not properly initialized');
  }
 
@@ -125,9 +125,7 @@ export class ClientEmbeddingGemma {
  embeddings.push(finalEmbedding);
  }
 
- return {
- embeddings,
- model: 'embeddinggemma_300m_onnx',
+ return { embeddings: model: 'embeddinggemma_300m_onnx',
  dimension: embeddings[0]?.length ?? 0,
  count: embeddings.length,
  };
@@ -183,7 +181,7 @@ export class ClientEmbeddingGemma {
  * Check if service is ready
  */
  isReady(): boolean {
- return this.isInitialized && this.session !== null && this.tokenizer !== null;
+ return this?.isInitialized&& this.session !== null && this.tokenizer !== null;
  }
 
  /**
@@ -220,7 +218,7 @@ class SimpleTokenizer {
  .split(/\s+/)
  .slice(0, maxLength - 2); // Leave room for BOS/EOS
 
- const tokens: number[] = [this.config.bos_token_id || 2]; // BOS
+ const tokens: number[] = [this.config?.bos_token_id?? 2]; // BOS
 
  for (const word of words) {
  // Simple hash-based tokenization
@@ -232,12 +230,12 @@ class SimpleTokenizer {
  tokens.push(tokenId);
  }
 
- tokens.push(this.config.eos_token_id || 1); // EOS
+ tokens.push(this.config?.eos_token_id?? 1); // EOS
 
  // Pad/truncate
  const attentionMask = new Array(tokens.length).fill(1);
  while (tokens.length < maxLength) {
- tokens.push(this.config.pad_token_id || 0);
+ tokens.push(this.config?.pad_token_id?? 0);
  attentionMask.push(0);
  }
 
@@ -289,9 +287,7 @@ export function findSimilar(
  embeddings: number[][],
  topK: number = 5
 ): { index: number; similarity, number }[] {
- const similarities = embeddings.map((emb, index) => ({
- index,
- similarity: cosineSimilarity(queryEmbedding, emb),
+ const similarities = embeddings.map((emb, index) => ({ index: similarity: cosineSimilarity(queryEmbedding, emb),
  }));
 
  return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);

@@ -9,7 +9,7 @@ const logsDir = join(process.cwd(), 'logs');
 /* * GET /api/v1/startup * Get current startup status and service health */
 export const GET: RequestHandler = async ({ url }) => {
  try {
- const action = url.searchParams.get('action') || 'status';
+ const action = url.searchParams.get('action') ?? 'status';
  switch (action) {
  case 'status':
  return json({
@@ -151,7 +151,7 @@ function calculateOverallHealth(summary: StartupServiceSummary): string {
  const totalServices = summary.totalServices;
  const readyServices = summary.readyServices;
  const criticalFailed = Object.values(summary.services).filter(
- (s) => !s.isOptional && s.status === 'failed'
+ (s) => !s?.isOptional&& s.status === 'failed'
  ).length;
  // Critical services failed = critical health
  if (criticalFailed > 0) {

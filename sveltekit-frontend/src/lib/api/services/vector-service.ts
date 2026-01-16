@@ -34,7 +34,7 @@ export async function searchVectors(options: VectorSearchOptions): Promise<Vecto
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to search vectors');
+ throw new Error(error?.message?? 'Failed to search vectors');
  }
 
  const results: VectorSearchResult[] = await response.json();
@@ -56,7 +56,7 @@ export async function upsertVectors(data: VectorUpsertData): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to upsert vectors');
+ throw new Error(error?.message?? 'Failed to upsert vectors');
  }
 
  console.log(`Upserted ${data.points.length} vectors to ${data.collection}`);
@@ -71,12 +71,12 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  const response = await fetch('/api/vector/delete', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ collection: ids }),
+ body: JSON.stringify({ collection, ids }),
  });
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete vectors');
+ throw new Error(error?.message?? 'Failed to delete vectors');
  }
 
  console.log(`Deleted ${ids.length} vectors from ${ collection }`);
@@ -99,7 +99,7 @@ export async function createCollection(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to create collection');
+ throw new Error(error?.message?? 'Failed to create collection');
  }
 
  console.log(`Created vector collection: ${ collection }`);
@@ -118,7 +118,7 @@ export async function deleteCollection(collection: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete collection');
+ throw new Error(error?.message?? 'Failed to delete collection');
  }
 
  console.log(`Deleted vector collection: ${ collection }`);
@@ -137,7 +137,7 @@ export async function getCollectionInfo(collection: string): Promise<any> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to get collection info');
+ throw new Error(error?.message?? 'Failed to get collection info');
  }
 
  const info = await response.json();

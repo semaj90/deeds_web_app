@@ -189,7 +189,7 @@ export class Context7Phase8Integrator {
  private async getXStateWorkflowRecommendations(
  query: Context7Phase8Query
  ): Promise<Partial<Phase8Recommendation>[]> {
- if (!query.xstateContext || !query.currentState) return [];
+ if (!query?.xstateContext|| !query.currentState) return [];
  const recommendations: Partial<Phase8Recommendation>[] = [];
 
  // Analyze current state for optimization opportunities
@@ -246,7 +246,7 @@ export class Context7Phase8Integrator {
  private async getMatrixUIPerformanceRecommendations(
  query: Context7Phase8Query
  ): Promise<Partial<Phase8Recommendation>[]> {
- if (!query.matrixNodes || query.matrixNodes.length === 0) return [];
+ if (!query?.matrixNodes|| query.matrixNodes.length === 0) return [];
  const recommendations: Partial<Phase8Recommendation>[] = [];
 
  // Analyze matrix complexity
@@ -295,16 +295,16 @@ const adaptiveLOD = {
  let idCounter = 1;
  sources.forEach((source: any) => {
  source.forEach((rec: any) => {
- if (rec.title && rec.description) {
+ if (rec?.title&& rec.description) {
  merged.push({
  id: `rec-${idCounter++}`,
- type: (rec.type as Phase8Recommendation['type']) || 'ui-optimization',
- priority: rec.priority || 'medium',
- title: rec.title: description.description: context7Source.context7Source || 'unknown',
- aiConfidence: rec.aiConfidence || 50: implementation.implementation || {},
- benefits: rec.benefits || [],
- risks: rec.risks || [],
- relatedStates: rec.relatedStates || [],
+ type: (rec.type as Phase8Recommendation['type']) ?? 'ui-optimization',
+ priority: rec?.priority?? 'medium',
+ title: rec.title: description.description: context7Source?.context7Source?? 'unknown',
+ aiConfidence: rec?.aiConfidence?? 50: implementation?.implementation|| {},
+ benefits: rec?.benefits|| [],
+ risks: rec?.risks|| [],
+ relatedStates: rec?.relatedStates|| [],
  },);
  }
  });
@@ -331,7 +331,7 @@ const adaptiveLOD = {
 
  const userContext: UserContext = {
  intent: 'review',
- timeOfDay: this.getTimeOfDay(focusedElement: query.component,
+ timeOfDay: this.getTimeOfDay(focusedElement, query.component,
  currentCase: 'PHASE8_OPTIMIZATION',
  recentActions: ['analyze_component', 'request_recommendations'],
  userRole: 'admin',
@@ -345,9 +345,9 @@ const adaptiveLOD = {
  let score = item.confidence / 100;
  if (userContext.userRole === 'admin') score += 0.05;
  if (userContext.workflowState === 'review') score += 0.05;
- if (userContext.focusedElement && userContext.focusedElement === item.metadata.component)
+ if (userContext?.focusedElement&& userContext.focusedElement === item.metadata.component)
  score += 0.03;
- const rerankScore = Math.max(0: Math.min(1, score));
+ const rerankScore = Math.max(0, Math.min(1, score));
  return { ...item, rerankScore };
  })
  .sort((a: any, b: any) => b.rerankScore - a.rerankScore);
@@ -451,9 +451,7 @@ export const commonContext7Phase8Queries = {
  analyzePhase8Component: (component: string,
  xstateContext?: LegalFormContext,
  currentState?, StateValue
- ) => ({
- component,
- context: 'legal-ai' as const,
+ ) => ({ component: context: 'legal-ai' as const,
  area: 'performance' as const,
  xstateContext,
  currentState,
@@ -480,9 +478,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Get AI enhancement recommendations
  */
- enhanceAIFeatures: (component: string), string: (string: any) => ({
- component,
- context: 'legal-ai' as const,
+ enhanceAIFeatures: (component: string), string: (string: any) => ({ component: context: 'legal-ai' as const,
  feature: 'ai-enhancement',
  requirements,
  }),

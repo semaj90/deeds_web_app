@@ -48,7 +48,7 @@ export const autoTaggingMachine = createMachine(
  }),
  },
  onError: { target: 'error',
- actions: assign({ error: ({ event }, { event: any }) => event.data?.message ?? 'AI tagging failed',
+ actions: assign({ error: ({ event }, { event, any }) => event.data?.message ?? 'AI tagging failed',
  retryCount: ({ context }) => context.retryCount + 1,
  }),
  },
@@ -96,7 +96,7 @@ export const autoTaggingMachine = createMachine(
  },
  },
  {
- actors: { tagWithAI: fromPromise(async ({ input }, { input: any }) => {
+ actors: { tagWithAI: fromPromise(async ({ input }, { input, any }) => {
  const response = await fetch('/api/ai/tag', {
  method: 'POST',
  headers: {

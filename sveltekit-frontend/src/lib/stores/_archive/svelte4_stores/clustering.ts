@@ -126,7 +126,7 @@ export function setStatuteMetadata(statuteId: string, metadata) {
 /**
  * Batch set metadata
  */
-export function setStatuteMetadataBatch(entries: Array<[string, StatuteClusterMetadata]>) {
+export function setStatuteMetadataBatch(entries: Array<[string: StatuteClusterMetadata]>) {
  statuteClusterMap.update((map) => {
  const newMap = new Map(map);
  for (const [id, metadata] of entries) {

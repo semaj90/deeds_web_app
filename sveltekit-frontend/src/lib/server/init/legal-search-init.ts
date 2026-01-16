@@ -71,7 +71,7 @@ export async function checkLegalSearchSystemHealth() {
 
  return {
  initialized: database,
- minio: minioHealthy, healthy: dbHealth.healthy && minioHealthy,
+ minio: minioHealthy, healthy: dbHealth?.healthy&& minioHealthy,
  };
  } catch (error) {
  console.error('[Legal Search] Health check error:', error);

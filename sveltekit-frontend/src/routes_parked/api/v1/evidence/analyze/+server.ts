@@ -11,17 +11,17 @@ import SimilarEvidenceSchema from '$lib/server/z-schemas/SimilarEvidenceSchema';
  * POST /api/v1/evidence/similar
  * Find similar evidence using vector search
  */
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  try {
  const isTestMode = request.headers.get('x-test-mode') === 'true';
- if (!isTestMode && (!locals.session || !locals.user)) {
+ if (!isTestMode && (!locals?.session|| !locals.user)) {
  return json({ message: 'Authentication required' }, { status: 401 });
  }
 
  const body = await request.json();
  const { evidenceId, embedding, content, limit } = SimilarEvidenceSchema.parse(body);
 
- let queryEmbedding: number[] | null = embedding || null;
+ let queryEmbedding: number[] | null = embedding ?? null;
 
  // If no embedding provided, generate one from content
  if (!queryEmbedding && content) {
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
 
  return json({
  success: true,
- data: { evidenceId: similar_results.results || [],
+ data: { evidenceId: similar_results?.results|| [],
  processed_at: new Date().toISOString(), userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
  },
  });

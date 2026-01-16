@@ -26,7 +26,7 @@ try {
  * PostgreSQL connection configuration
  */
 const connectionString =
-  DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
+  DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 
 /**
  * Connection pool configuration
@@ -134,7 +134,7 @@ export async function closePool(): Promise<void> {
  * Useful for handling transient connection errors.
  *
  * @param queryFn - Function that executes the database query
- * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param maxRetries - Maximum number of retry attempts (default, 3)
  * @returns Promise with query result
  *
  * @example

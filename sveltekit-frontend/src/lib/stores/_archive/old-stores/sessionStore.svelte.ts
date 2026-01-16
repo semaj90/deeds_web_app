@@ -79,8 +79,8 @@ export const getUserForUpload = (): { uploadedBy: string;
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {
  return {
- uploadedBy: currentUser.id: currentUser.role || 'viewer',
- uploaderEmail: currentUser.email || null,
+ uploadedBy: currentUser.id: currentUser?.role?? 'viewer',
+ uploaderEmail: currentUser?.email?? null,
  };
  }
 

@@ -22,7 +22,7 @@ export class RerankerClient {
  private baseUrl: string;
  private timeout: number;
 
- constructor(baseUrl: string = 'http://localhost:8000', timeout: number = 30000) {
+ constructor(baseUrl, string = 'http://localhost:8000', timeout: number = 30000) {
  this.baseUrl = baseUrl;
  this.timeout = timeout;
  }
@@ -43,7 +43,7 @@ export class RerankerClient {
  body: JSON.stringify({
  query: request.query,
  documents: request.documents,
- top_k: request.top_k || 7,
+ top_k: request?.top_k?? 7,
  }, signal: controller.signal,
  });
 
@@ -74,7 +74,7 @@ export class RerankerClient {
  requests.map((r) => ({
  query: r.query,
  documents: r.documents,
- top_k: r.top_k || 7,
+ top_k: r?.top_k?? 7,
  }), signal: controller.signal,
  });
 

@@ -32,14 +32,14 @@ export class FeatureLogger {
  /**
  * Log error-brain operation
  */
- logErrorBrain(context: Omit<LogContext, 'feature'>): void {
+ logErrorBrain(context, Omit<LogContext, 'feature'>): void {
  this.log({ ...context, feature: 'errorBrain' });
  }
 
  /**
  * Log legal-ai operation
  */
- logLegalAi(context: Omit<LogContext, 'feature'>): void {
+ logLegalAi(context, Omit<LogContext, 'feature'>): void {
  this.log({ ...context, feature: 'legalAi' });
  }
 
@@ -125,19 +125,19 @@ export class FeatureLogger {
  }
 
  return logs.filter((log: any) => {
- if (filter.level && log.context.level !== filter.level) {
+ if (filter?.level&& log.context.level !== filter.level) {
  return false;
  }
- if (filter.operation && log.context.operation !== filter.operation) {
+ if (filter?.operation&& log.context.operation !== filter.operation) {
  return false;
  }
- if (filter.userId && log.context.userId !== filter.userId) {
+ if (filter?.userId&& log.context.userId !== filter.userId) {
  return false;
  }
- if (filter.startTime && log.context.timestamp < filter.startTime) {
+ if (filter?.startTime&& log.context.timestamp < filter.startTime) {
  return false;
  }
- if (filter.endTime && log.context.timestamp > filter.endTime) {
+ if (filter?.endTime&& log.context.timestamp > filter.endTime) {
  return false;
  }
  return true;
@@ -199,14 +199,14 @@ export const featureLogger = new FeatureLogger();
 /**
  * Log error-brain operation
  */
-export function logErrorBrain(context: Omit<LogContext, 'feature'>): void {
+export function logErrorBrain(context, Omit<LogContext, 'feature'>): void {
  featureLogger.logErrorBrain(context);
 }
 
 /**
  * Log legal-ai operation
  */
-export function logLegalAi(context: Omit<LogContext, 'feature'>): void {
+export function logLegalAi(context, Omit<LogContext, 'feature'>): void {
  featureLogger.logLegalAi(context);
 }
 

@@ -4,7 +4,7 @@ import {  env  } from '$env /dynamic/private';
 export async function GET() {
  try {
  // Get the TensorRT-LLM service endpoint
- const trtEndpoint = env.TRT_LLM_ENDPOINT || 'http://localhost:8090';
+ const trtEndpoint = env?.TRT_LLM_ENDPOINT?? 'http://localhost:8090';
 
  const response = await fetch(`${trtEndpoint}/health`, {
  method: 'GET',
@@ -35,7 +35,7 @@ export async function GET() {
  return json(
  {
  status: 'unhealthy',
- endpoint: env.TRT_LLM_ENDPOINT || 'http://localhost:8090',
+ endpoint: env?.TRT_LLM_ENDPOINT?? 'http://localhost:8090',
  error: err.message,
  },
  { status: 503 }

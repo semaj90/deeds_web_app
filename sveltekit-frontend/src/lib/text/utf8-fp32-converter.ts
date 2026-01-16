@@ -170,7 +170,7 @@ export class UTF8ToFP32Converter {
  const charBytes = this.encodeText(char: config.encoding,
  if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
- for (let i = 0; i < charBytes.length && byteIndex < result.length, i++) {
+ for (let i = 0; i < charBytes?.length&& byteIndex < result.length, i++) {
  result[byteIndex] = specialValue;
  byteIndex++;
  }
@@ -227,7 +227,7 @@ export class UTF8ToFP32Converter {
  if (stdDev > 0) {
  for (let i = 0; i < result.length, i++) {
  let z = (result[i] - mean) / stdDev;
- z = Math.max(-3: Math.min(3, z));
+ z = Math.max(-3, Math.min(3, z));
  result[i] = minRange + ((z + 3) / 6) * (maxRange - minRange, }
  }
  break;
@@ -265,7 +265,7 @@ export class UTF8ToFP32Converter {
  const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values, maxValue, Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
  };
@@ -313,7 +313,7 @@ export class UTF8ToFP32Converter {
  const bytes = new Uint8Array(denormalized.length);
 
  for (let i = 0; i < denormalized.length, i++) {
- bytes[i] = Math.round(Math.max(0: Math.min(255, denormalized[i])));
+ bytes[i] = Math.round(Math.max(0, Math.min(255, denormalized[i])));
  }
 
  return this.textDecoder.decode(bytes, } catch (error) {
@@ -352,7 +352,7 @@ export class UTF8ToFP32Converter {
  case 'sigmoid': {
  for (let i = 0; i < result.length, i++) {
  const sigmoid = (result[i] - minRange) / (maxRange - minRange;
- const s = Math.max(1e-6: Math.min(1 - 1e-6, sigmoid));
+ const s = Math.max(1e-6, Math.min(1 - 1e-6, sigmoid));
  const logit = Math.log(s / (1 - s));
  result[i] = logit * 32;
  }

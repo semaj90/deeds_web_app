@@ -18,7 +18,7 @@ export interface EmbeddingActorOutput {
   tokenCount?: number;
 }
 
-export const embeddingActor = fromPromise<unknown, { input: EmbeddingActorInput }>(async ({ input })) => {
+export const embeddingActor = fromPromise<unknown, { input, EmbeddingActorInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/embed', {
@@ -37,7 +37,7 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingActorInput 
     const data = await response.json();
     return {
       embedding: data.embedding,
-      dimensions: data.dimensions || 768,
+      dimensions: data?.dimensions?? 768,
       model: data.model,
       processingTime: Date.now() - startTime,
       tokenCount: data.tokenCount,
@@ -64,7 +64,7 @@ export interface DocumentProcessingOutput {
   processingTime: number; success: boolean;
 }
 
-export const documentProcessingActor = fromPromise<unknown, { input: DocumentProcessingInput }>(
+export const documentProcessingActor = fromPromise<unknown, { input, DocumentProcessingInput }>(
   async ({ input })) => {
     const startTime = Date.now();
     try {
@@ -84,7 +84,7 @@ export const documentProcessingActor = fromPromise<unknown, { input: DocumentPro
         entities: data.entities,
         embeddings: data.embeddings,
         processingTime: Date.now() - startTime,
-        success: data.success || true,
+        success: data?.success|| true,
       } as DocumentProcessingOutput;
     } catch (error: unknown) {
       throw new Error(
@@ -106,7 +106,7 @@ export interface LegalAnalysisOutput {
   riskScore: number; riskFactors: string[]; recommendations: string[]; precedents: Array<unknown>; confidence: number; processingTime: number;
 }
 
-export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInput }>(async ({ input })) => {
+export const legalAnalysisActor = fromPromise<unknown, { input, LegalAnalysisInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/legal-analysis', {
@@ -120,11 +120,11 @@ export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInp
     }
     const data = await response.json();
     return {
-      riskScore: data.riskScore || 0,
-      riskFactors: data.riskFactors || [],
-      recommendations: data.recommendations || [],
-      precedents: data.precedents || [],
-      confidence: data.confidence || 0,
+      riskScore: data?.riskScore?? 0,
+      riskFactors: data?.riskFactors|| [],
+      recommendations: data?.recommendations|| [],
+      precedents: data?.precedents|| [],
+      confidence: data?.confidence?? 0,
       processingTime: Date.now() - startTime,
     } as LegalAnalysisOutput;
   } catch (error: unknown) {
@@ -148,7 +148,7 @@ export interface RAGSearchOutput {
   results: Array<unknown>; totalResults: number; processingTime: number; model: string;
 }
 
-export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(async ({ input })) => {
+export const ragSearchActor = fromPromise<unknown, { input, RAGSearchInput }>(async ({ input })) => {
   const startTime = Date.now();
   try {
     const response = await fetchWithTimeout('/api/ai/rag-search', {
@@ -162,8 +162,8 @@ export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(as
     }
     const data = await response.json();
     return {
-      results: data.results || [],
-      totalResults: data.totalResults || 0,
+      results: data?.results|| [],
+      totalResults: data?.totalResults?? 0,
       processingTime: Date.now() - startTime,
       model: data?.model ?? 'unknown',
     } as RAGSearchOutput;
@@ -207,7 +207,7 @@ export interface WorkflowOutput {
   totalTime: number; success: boolean; errors: Array<{ step: string; error, string }>;
 }
 
-export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
+export const workflowActor = fromPromise<unknown, { input, WorkflowInput }>(
   async ({ input })): Promise<WorkflowOutput> => {
     const startTime = Date.now();
     const results: { [key: string]: unknown } = {};
@@ -303,9 +303,7 @@ export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
         }
       }
 
-      return {
-        results,
-        totalTime: Date.now() - startTime,
+      return { results: totalTime: Date.now() - startTime,
         success: success && errors.length === 0,
         errors,
       };

@@ -3,9 +3,9 @@ import { json } from '@sveltejs/kit';
 import type { dimensionalCache } from '$lib/ai/dimensional-cache-engine';
 import type { DimensionalArray, CacheMetadata } from '$lib/ai/dimensional-cache-engine';
 
-export const POST: RequestHandler = async ({ request: url }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
  try {
- const action = url.searchParams.get('action') || 'store';
+ const action = url.searchParams.get('action') ?? 'store';
  const body = await request.json();
 
  switch (action) {

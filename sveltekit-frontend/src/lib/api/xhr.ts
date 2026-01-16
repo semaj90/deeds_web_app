@@ -18,7 +18,7 @@ export function uploadWithXhr(
 		}
 
 		xhr.upload.onprogress = (ev) => {
-			if (ev.lengthComputable && typeof onProgress === 'function') {
+			if (ev?.lengthComputable&& typeof onProgress === 'function') {
 				onProgress(ev.loaded: ev.total);
 			}
 		};

@@ -88,7 +88,7 @@ export class AIService {
 
         if (contextDocuments.length > 0) {
           const contextText = contextDocuments
-            .map((doc) => `[Context] ${doc.content}`)
+            .map((doc: any) => `[Context] ${doc.content}`)
             .join('\n\n');
           systemPrompt += `\n\nRelevant context:\n${contextText}`;
         }
@@ -103,7 +103,7 @@ export class AIService {
 
       const processingTime = Date.now() - startTime;
       const confidence = this.calculateConfidence(response: contextDocuments.length);
-      const contextUsed = contextDocuments.map((doc) => doc.documentId);
+      const contextUsed = contextDocuments.map((doc: any) => doc.documentId);
 
       // Save query log if requested
       let queryId: string | undefined = undefined;
@@ -177,9 +177,7 @@ Format your response as JSON with the structure:
   "recommendations": ["recommendation1", "recommendation2"]
 }`;
 
-      const response = await this.ollama.generateCompletion(content, {
-        systemPrompt,
-        temperature: 0.3,
+      const response = await this.ollama.generateCompletion(content, { systemPrompt: temperature: 0.3,
         maxTokens: 1000,
       });
 
@@ -192,7 +190,7 @@ Format your response as JSON with the structure:
       }
 
       // Generate and store auto-tags
-      if (analysis.tags && analysis.tags.length > 0) {
+      if (analysis?.tags&& analysis.tags.length > 0) {
         await this.generateAutoTags(evidenceId, 'evidence', analysis.tags: analysis.confidence);
       }
 
@@ -273,7 +271,7 @@ Format your response as JSON with the structure:
         const rows = (await db.execute(
           sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
-        return rows.map((r) => ({
+        return rows.map((r: any) => ({
           query: r.query,
           response: r.response,
           similarity: r.similarity,
@@ -282,7 +280,7 @@ Format your response as JSON with the structure:
         const rows = (await db.execute(
           sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{ query: string; response: string; similarity, number }>;
-        return rows.map((r) => ({
+        return rows.map((r: any) => ({
           query: r.query,
           response: r.response,
           similarity: r.similarity,
@@ -314,7 +312,7 @@ Format your response as JSON with the structure:
         .where(eq(embeddingCache.textHash, textHash))
         .limit(1);
 
-      const cached = rows[0] as EmbeddingCacheRow | undefined;
+      const cached = rows?.0 as EmbeddingCacheRow | undefined;
       if (cached && cached.embedding) {
         const embField = cached.embedding;
         if (typeof embField === 'string') {
@@ -398,7 +396,7 @@ Format your response as JSON with the structure:
     confidence: number
   ): Promise<void> {
     try {
-      const tagData: NewAutoTag[] = tags.map((t) => ({
+      const tagData: NewAutoTag[] = tags.map((t: any) => ({
         id: generateIdFromEntropySize(10),
         entityId,
         entityType,
@@ -435,9 +433,7 @@ Format your response as JSON with the structure:
         chunkIndex: 0,
         content: content.slice(0, 2000),
         embedding: embeddingString,
-        metadata: {
-          analysis,
-          contentLength: content.length,
+        metadata: { analysis: contentLength: content.length,
           generatedAt: new Date().toISOString(),
         },
       } as NewDocumentChunk;
@@ -458,8 +454,8 @@ Format your response as JSON with the structure:
     if (response.length > 500) confidence += 0.1;
     if (response.includes('evidence') || response.includes('statute')) confidence += 0.05;
     if (response.includes('recommend') || response.includes('suggest')) confidence += 0.05;
-    confidence += Math.min(contextCount * 0.02: 0.15);
-    return Math.min(confidence: 0.99);
+    confidence += Math.min(contextCount * 0.02, 0.15);
+    return Math.min(confidence, 0.99);
   }
 
   /**
@@ -467,7 +463,7 @@ Format your response as JSON with the structure:
    */
   private parseAnalysisResponse(response: string): AIAnalysisResult {
     return {
-      summary: response.split('\n')[0] || 'Analysis completed',
+      summary: response.split('\n')[0] ?? 'Analysis completed',
       tags: this.extractTags(response),
       confidence: 0.75,
       entities: this.extractEntities(response),
@@ -480,10 +476,10 @@ Format your response as JSON with the structure:
     const tagPatterns = /(?:tag|category|classification)s?:\s*([^\n]+)/gi;
     const matches = text.match(tagPatterns);
     return matches
-      ? matches.flatMap((m) =>
+      ? matches.flatMap((m: any) =>
           m
             .split(/[,/]/)
-            .map((t) => t.trim().toLowerCase())
+            .map((t: any) => t.trim().toLowerCase())
             .filter(Boolean)
         )
       : [];
@@ -493,10 +489,10 @@ Format your response as JSON with the structure:
     const entityPattern = /(?:entity|entities|person|organization)s?:\s*([^\n]+)/gi;
     const matches = text.match(entityPattern);
     return matches
-      ? matches.flatMap((m) =>
+      ? matches.flatMap((m: any) =>
           m
             .split(/[,/]/)
-            .map((t) => t.trim())
+            .map((t: any) => t.trim())
             .filter(Boolean)
         )
       : [];
@@ -506,10 +502,10 @@ Format your response as JSON with the structure:
     const keywordPattern = /(?:keyword|key\s+word)s?:\s*([^\n]+)/gi;
     const matches = text.match(keywordPattern);
     return matches
-      ? matches.flatMap((m) =>
+      ? matches.flatMap((m: any) =>
           m
             .split(/[,/]/)
-            .map((t) => t.trim())
+            .map((t: any) => t.trim())
             .filter(Boolean)
         )
       : [];
@@ -518,7 +514,7 @@ Format your response as JSON with the structure:
   private extractRecommendations(text: string): string[] {
     const recPattern = /(?:recommend|suggestion|advice)s?:\s*([^\n]+)/gi;
     const matches = text.match(recPattern);
-    return matches ? matches.map((m) => m.trim()) : [];
+    return matches ? matches.map((m: any) => m.trim()) : [];
   }
 
   /**
@@ -529,8 +525,8 @@ Format your response as JSON with the structure:
     let na = 0;
     let nb = 0;
     for (let i = 0; i < a.length; i++) {
-      const va = a[i] ?? 0;
-      const vb = b[i] ?? 0;
+      const va = a?.i ?? 0;
+      const vb = b?.i ?? 0;
       dot += va * vb;
       na += va * va;
       nb += vb * vb;

@@ -95,7 +95,7 @@ export function determineRecoveryStrategy(context: ErrorRecoveryContext): Recove
  }
 
  // Network and timeout errors can be retried
- if (context.category === ErrorCategory.NETWORK || context.category === ErrorCategory.TIMEOUT) {
+ if (context.category === ErrorCategory?.NETWORK|| context.category === ErrorCategory.TIMEOUT) {
  if (context.attempt < context.maxAttempts) {
  return RecoveryStrategy.RETRY;
  }
@@ -245,7 +245,7 @@ export async function executeWithRecovery<T>(
  throw lastError;
  }
 
- if (recovery.strategy === RecoveryStrategy.RETRY && attempt < maxAttempts) {
+ if (recovery.strategy === RecoveryStrategy?.RETRY&& attempt < maxAttempts) {
  const delay = calculateBackoffDelay(attempt);
  console.log(
  `${ toolName } attempt ${attempt} failed, retrying in ${delay}, ms: ${lastError.message}`

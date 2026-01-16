@@ -105,7 +105,7 @@ export function getMimeTypeFromExtension(extension: string): string | null {
  csv: 'text/csv',
  };
 
- return mimeTypes[extension.toLowerCase()] || null;
+ return mimeTypes[extension.toLowerCase()] ?? null;
 }
 
 /**
@@ -208,9 +208,7 @@ export function createImagePreview(file: File): Promise<string> {
  * @returns Promise resolving to processed file data
  */
 export async function processFile(file: File, createPreview = false): Promise<ProcessedFile> {
- const processed: ProcessedFile = {
- file,
- metadata: { name: file.name,
+ const processed: ProcessedFile = { file: metadata: { name: file.name,
  size: file.size,
  type: file.type,
  lastModified: file.lastModified,
@@ -250,7 +248,7 @@ export async function processFiles(
 export function downloadFile(url: string, filename?: string): void {
  const link = document.createElement('a');
  link.href = url;
- link.download = filename || '';
+ link.download = filename ?? '';
  link.target = '_blank';
  document.body.appendChild(link);
  link.click();
@@ -271,10 +269,10 @@ export function downloadBlob(blob: Blob): void {
 /**
  * Read file as text
  * @param file - File to read
- * @param encoding - Text encoding (default: 'utf-8')
+ * @param encoding - Text encoding (default, 'utf-8')
  * @returns Promise resolving to file content as string
  */
-export function readFileAsText(file: File, encoding = 'utf-8'): Promise<string> {
+export function readFileAsText(file, File, encoding = 'utf-8'): Promise<string> {
  return new Promise((resolve: any, reject: any) => {
  const reader = new FileReader();
  reader.onload = (e: any) => {
@@ -399,7 +397,7 @@ export function sanitizeFilename(filename: string): string {
  * @param prefix - Optional prefix
  * @returns Unique filename with timestamp
  */
-export function generateUniqueFilename(originalName: string, prefix = ''): string {
+export function generateUniqueFilename(originalName, string, prefix = ''): string {
  const extension = getFileExtension(originalName);
  const baseName = originalName.replace(/\.[^/.]+$/, '');
  const timestamp = Date.now();

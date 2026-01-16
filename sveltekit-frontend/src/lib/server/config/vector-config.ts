@@ -40,11 +40,11 @@ export const VECTOR_CONFIG = {
  KNOWLEDGE_BASE: 'knowledge_base_384',
  },
  // Docker Desktop URLs (production-ready)
- DOCKER_SERVICES: { QDRANT_URL: process.env.QDRANT_URL || 'http://localhost:6333',
+ DOCKER_SERVICES: { QDRANT_URL: process.env?.QDRANT_URL?? 'http://localhost:6333',
  POSTGRES_URL:
- process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
- OLLAMA_URL: process.env.OLLAMA_URL || 'http://localhost:11434',
- REDIS_URL: process.env.REDIS_URL || 'redis://:redis@localhost:6379/0',
+ process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
+ OLLAMA_URL: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+ REDIS_URL: process.env?.REDIS_URL?? 'redis://:redis@localhost:6379/0',
  },
  // Batch
  BATCH_SIZE: { EMBEDDING_GENERATION: 100, // Generate 100 embeddings at a
@@ -81,9 +81,9 @@ export function checkVectorEnvironment(): { postgres: boolean;
 } {
  return {
  postgres: !!process.env.DATABASE_URL,
- qdrant: !!process.env.QDRANT_URL || !!process.env.QDRANT_HOST,
+ qdrant: !!process.env?.QDRANT_URL|| !!process.env.QDRANT_HOST,
  ollama: !!process.env.OLLAMA_URL,
- redis: !!process.env.REDIS_URL || (!!process.env.REDIS_HOST && !!process.env.REDIS_PORT),
+ redis: !!process.env?.REDIS_URL|| (!!process.env?.REDIS_HOST&& !!process.env.REDIS_PORT),
  };
 }
 

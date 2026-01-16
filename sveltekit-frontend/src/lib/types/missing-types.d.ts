@@ -127,7 +127,7 @@ declare module 'ioredis' {
  export default class Redis {
  constructor(config?: unknown);
  get(_key: string): Promise<string | null>;
- set(_key: string, value: any, string: Promise<'OK'>,
+ set(_key, string, value: any, string: Promise<'OK'>,
  del: any(_key: string): Promise<number>;
  /** Set key with expire (seconds) */
  setex(_key: string, seconds: number, number, size: number): Promise<'OK'>;

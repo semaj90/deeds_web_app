@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  // Save file temporarily for Docling processing
- const tempDir = process.env.TEMP || '/tmp';
+ const tempDir = process.env?.TEMP?? '/tmp';
  const tempPath = path.join(tempDir, `docling-${Date.now()}-${file.name}`);
  const buffer = Buffer.from(await file.arrayBuffer());
  await fs.writeFile(tempPath, buffer);

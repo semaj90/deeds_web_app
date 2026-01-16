@@ -27,7 +27,7 @@ export interface ErrorBrainConfig {
  * Parse environment variables with safe defaults
  */
 function parseTransport(value | undefined): ErrorBrainTransport {
- const normalized = (value || 'none').toLowerCase();
+ const normalized = (value ?? 'none').toLowerCase();
  if (['none', 'sse', 'redis', 'both'].includes(normalized)) {
  return normalized as ErrorBrainTransport;
  }
@@ -36,7 +36,7 @@ function parseTransport(value | undefined): ErrorBrainTransport {
 }
 
 function parseApplyMode(value | undefined): ErrorBrainApplyMode {
- const normalized = (value || 'off').toLowerCase();
+ const normalized = (value ?? 'off').toLowerCase();
  if (['off', 'safe', 'full'].includes(normalized)) {
  return normalized as ErrorBrainApplyMode;
  }
@@ -53,8 +53,8 @@ export function loadErrorBrainConfig(): ErrorBrainConfig {
  const applyMode = parseApplyMode(env.ERROR_BRAIN_APPLY_MODE);
 
  // Safety defaults
- const maxPatchSize = parseInt(env.ERROR_BRAIN_MAX_PATCH_SIZE || '100', 10);
- const confidenceThreshold = parseFloat(env.ERROR_BRAIN_CONFIDENCE_MIN || '0.7');
+ const maxPatchSize = parseInt(env?.ERROR_BRAIN_MAX_PATCH_SIZE?? '100', 10);
+ const confidenceThreshold = parseFloat(env?.ERROR_BRAIN_CONFIDENCE_MIN?? '0.7');
  const dryRunDefault = env.ERROR_BRAIN_DRY_RUN !== 'false'; // Default to true for safety
 
  return {
@@ -132,7 +132,7 @@ export function isPatchSafe(
  };
  }
 
- return { safe: true };
+ return { safe, true };
 }
 
 

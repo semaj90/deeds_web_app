@@ -73,7 +73,7 @@ ${ narrative }
  throw new Error(`Gemma3 intake extraction failed: ${res.status} ${res.statusText}`);
  }
 
- const data = (await res.json()) as { response: string };
+ const data = (await res.json()) as { response, string };
 
  let parsed: IntakeExtractionResult;
  try {

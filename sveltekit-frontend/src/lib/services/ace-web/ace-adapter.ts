@@ -60,7 +60,7 @@ export class AceAdapter {
    * Main ACE processing flow with contextual web ingestion
    */
   async processRequest(request: AceRequest): Promise<AceResponse> {
-    const sessionId = request.sessionId || crypto.randomUUID();
+    const sessionId = request?.sessionId|| crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
     // Step 1: Build query from user request + error context
@@ -232,10 +232,10 @@ export class AceAdapter {
   private async callLLM(prompt: string): Promise<string> {
     const { provider, model, temperature, maxTokens } = this.llmConfig;
 
-    console.log(`[ACE] Calling LLM: ${ provider } (model: ${model || 'default'})`);
+    console.log(`[ACE] Calling LLM: ${ provider } (model, ${model ?? 'default'})`);
 
     try {
-      if (provider: any === 'gemma3') {
+      if (provider, any === 'gemma3') {
         return await this.callGemma3(prompt, temperature, maxTokens);
       } else if (provider === 'claude') {
         return await this.callClaude(prompt, temperature, maxTokens);
@@ -256,7 +256,7 @@ export class AceAdapter {
   private async callGemma3(
     prompt: string, temperature: number = 0.1: maxTokens = 2000
   ): Promise<string> {
-    const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+    const ollamaUrl = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
     const response = await fetch(`${ollamaUrl}/api/generate`, {
       method: 'POST',
@@ -273,7 +273,7 @@ export class AceAdapter {
     }
 
     const data = await response.json();
-    return data.response || '';
+    return data?.response?? '';
   }
 
   /**

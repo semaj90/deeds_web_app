@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const body = await request.json();
     const { routes = [] } = body;
 
-    const routesProcessed = routes.length || 150;
+    const routesProcessed = routes?.length?? 150;
 
     // In production, this would:
     // 1. Parse route relationships and dependencies
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
       },
       metadata: { graphDb: 'neo4j',
         algorithm: 'pagerank',
-        clusteringCoefficient: 0.72,
+        clusteringCoefficient, 0.72,
       },
     });
   } catch (error) {

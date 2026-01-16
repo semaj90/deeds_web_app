@@ -72,7 +72,7 @@ export const evidenceProcessingMachine = setup({
   actors: { documentProcessing: fromPromise<{
         jobId: string,
         extractedText?: string, processingTime: number;
-      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
+      }, { input, EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('document', {
@@ -96,12 +96,12 @@ export const evidenceProcessingMachine = setup({
     }),
     embeddingGeneration: fromPromise<{
         chunks: Array<{ text: string; embedding, number[] }>;
-      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
+      }, { input, EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('embeddings', {
         documentId: input.evidenceId,
-        text: input.extractedText || input.content,
+        text: input?.extractedText|| input.content,
         metadata: { caseId: input.caseId,
           evidenceId: input.evidenceId,
           ...input.metadata,
@@ -116,12 +116,12 @@ export const evidenceProcessingMachine = setup({
         summary: string; entities: unknown[]; sentiment: string; classification: string;
         riskAssessment?: string;
         recommendations?: string[];
-      }, { input: EvidenceProcessingContext }>(async ({ input }) => {
+      }, { input, EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
       const result = await callProcessingAPI('analysis', {
         documentId: input.evidenceId,
-        text: input.extractedText || input.content,
+        text: input?.extractedText|| input.content,
         analysisTypes: ['summary', 'entities', 'sentiment', 'classification', 'risk'],
       });
 
@@ -131,7 +131,7 @@ export const evidenceProcessingMachine = setup({
         recommendations?: string[];
       };
     }),
-    cacheResults: fromPromise<void, { input: EvidenceProcessingContext }>(async ({ input }) => {
+    cacheResults: fromPromise<void, { input, EvidenceProcessingContext }>(async ({ input }) => {
       console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
       const finalResult = {
@@ -184,7 +184,7 @@ export const evidenceProcessingMachine = setup({
             userId: ({ event }) => event.userId,
             filename: ({ event }) => event.filename,
             content: ({ event }) => event.content,
-            metadata: ({ event }) => event.metadata || {},
+            metadata: ({ event }) => event?.metadata|| {},
             progress: () => 0,
             stage: () => 'initializing',
             retryCount: () => 0,
@@ -207,7 +207,7 @@ export const evidenceProcessingMachine = setup({
     documentProcessing: { invoke: { src: 'documentProcessing',
         input: ({ context }) => context,
         onDone: { target: 'embeddingGeneration',
-          actions: assign({ extractedText: ({ event, context }) => event.output.extractedText || context.content,
+          actions: assign({ extractedText: ({ event, context }) => event.output?.extractedText|| context.content,
             documentProcessingJobId: ({ event }) => event.output.jobId,
             processingTimes: ({ context }) => ({
               ...context.processingTimes,

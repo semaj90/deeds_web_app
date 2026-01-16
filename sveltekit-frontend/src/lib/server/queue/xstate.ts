@@ -165,7 +165,7 @@ export class XStateQueueManager {
  return XStateQueueManager.instance;
  }
 
- addJob(job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'>) {
+ addJob(job, Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'>) {
  this.interpreter.send({ type: 'ADD_JOB', job });
  }
 

@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json();
 
  // Validate required fields
- if (!body.routeId || !body.path || !body.kind) {
+ if (!body?.routeId|| !body?.path|| !body.kind) {
  return json(
  {
  error: 'Missing required fields: routeId, path, kind',

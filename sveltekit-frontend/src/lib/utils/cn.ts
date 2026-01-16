@@ -28,7 +28,7 @@ export function confidenceClass(confidence: number): string {
 /**
  * Generate priority-based styling classes
  */
-export function priorityClass(priority: 'low' | 'medium' | 'high' | 'critical'): string {
+export function priorityClass(priority, 'low' | 'medium' | 'high' | 'critical'): string {
 	switch (priority) {
 		case 'critical':
 			return 'text-red-400 bg-red-500/20 border-red-500/40 ring-red-500/20';

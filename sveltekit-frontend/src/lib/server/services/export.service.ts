@@ -31,7 +31,7 @@ class ExportService {
  async exportToJSON(citations: any[], collectionName?: string): Promise<string> {
  try {
  const data = {
- collection: collectionName || 'Citations Export',
+ collection: collectionName ?? 'Citations Export',
  exportedAt: new Date().toISOString(), count: citations.length,
  citations,
  };

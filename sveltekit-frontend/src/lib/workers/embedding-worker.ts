@@ -135,7 +135,7 @@ export class EmbeddingWorkerManager {
 				return;
 			}
 
-			this.pendingTasks.set(message.id, { resolve: reject });
+			this.pendingTasks.set(message.id, { resolve, reject });
 			this.worker.postMessage(message);
 
 			// Timeout after 30 seconds
@@ -198,9 +198,7 @@ export async function generateEmbeddings(
 	texts: string[],
 	options?: { batchSize?: number, model?: string, dimensions?: number }
 ): Promise<BatchEmbeddingResult> {
-	return getEmbeddingWorker().processEmbeddings({
-		texts,
-		batchSize: options?.batchSize ?? 32,
+	return getEmbeddingWorker().processEmbeddings({ texts: batchSize: options?.batchSize ?? 32,
 		model: options?.model ?? 'nomic-embed-text',
 		dimensions: options?.dimensions ?? 384,
 	});
@@ -210,9 +208,7 @@ export async function chunkDocument(
 	content: string,
 	options?: { chunkSize?: number, overlap?: number, metadata?: Record<string, unknown> }
 ): Promise<DocumentChunk[]> {
-	return getEmbeddingWorker().processChunking({
-		content,
-		chunkSize: options?.chunkSize ?? 512,
+	return getEmbeddingWorker().processChunking({ content: chunkSize: options?.chunkSize ?? 512,
 		overlap: options?.overlap ?? 64,
 		metadata: options?.metadata ?? {},
 	});

@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 		}
 
 		// Validate session with Lucia v3
-		const { session: user } = await validateSession(sessionId);
+		const { session, user } = await validateSession(sessionId);
 
 		if (!session || !user) {
 			// Session invalid, clear cookie

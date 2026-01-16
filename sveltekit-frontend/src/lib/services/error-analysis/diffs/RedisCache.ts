@@ -127,7 +127,7 @@ export class RedisCache {
  /**
  * Cache diff proposal
  */
- async setDiffProposal(filePath: string, contentHash: string, string: Promise<void> {
+ async setDiffProposal(filePath, string, contentHash: string, string: Promise<void> {
  const key = this.key('proposal', `${ filePath }:${contentHash}`);
  const data = JSON.stringify({
  patch: new Date().toISOString(),

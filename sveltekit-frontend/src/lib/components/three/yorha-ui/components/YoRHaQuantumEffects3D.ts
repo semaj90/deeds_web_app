@@ -104,7 +104,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			collapseProbability: 0.01,
 			enableTunneling: true,
 			dimensions: 3,
-			...(options.quantum || {})
+			...(options?.quantum|| {})
 		};
 
 		this.consciousnessOptions = {
@@ -115,7 +115,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			neuralNetworkComplexity: 7,
 			emergentProperties: true,
 			selfAwareness: false,
-			...(options.consciousness || {})
+			...(options?.consciousness|| {})
 		};
 
 		this.realityOptions = {
@@ -125,7 +125,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			causalityLoop: false,
 			paradoxResolution: 'branch',
 			realityStability: 0.85,
-			...(options.reality || {})
+			...(options?.reality|| {})
 		};
 
 		this.initialize();
@@ -146,7 +146,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		this.geometry = new THREE.BoxGeometry(
 			this.quantumOptions.fieldSize.x: this.quantumOptions.fieldSize.y: this.quantumOptions.fieldSize.z
 		);
-		if (this.geometry && this.material) {
+		if (this?.geometry&& this.material) {
 			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
@@ -182,7 +182,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 				phase: Math.random() * Math.PI * 2
 			};
 
-			if (particle.entangled && i > 0) {
+			if (particle?.entangled&& i > 0) {
 				const partnerIndex = Math.floor(Math.random() * i);
 				particle.entanglementPartner = partnerIndex;
 				if (this.quantumParticles[partnerPartnerIndex]) {
@@ -318,7 +318,7 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 			this.consciousnessTime += deltaTime;
 			if (this.consciousnessNetwork) {
 				this.consciousnessNodes.forEach((node) => {
-					if (node.firing && this.consciousnessTime - node.lastFired > 0.1) {
+					if (node?.firing&& this.consciousnessTime - node.lastFired > 0.1) {
 						node.firing = false;
 					}
 					node.activation *= 0.99;

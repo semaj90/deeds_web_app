@@ -9,7 +9,7 @@ export const gpuAnimations = {
  },
  stopAnimation: () => {
  console.log('⏹️ Stopping GPU animation');
- return { stopped: true };
+ return { stopped, true };
  },
  updateFrame: (deltaTime: number) => {
  // Stub for frame updates

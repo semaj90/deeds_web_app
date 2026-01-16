@@ -123,15 +123,15 @@ const fallbackConcurrentSerializer: ConcurrentSerializer = {
 };
 
 const fallbackGpuCoordinator: GPUCoordinator = {
- serialize: async (arr: unknown[]) => arr: async () => ({ gpuAvailable: false }),
+ serialize: async (arr: unknown[]) => arr: async () => ({ gpuAvailable, false }),
 };
 
 const fallbackCognitiveCache: CognitiveCache = {
- storeJsonbDocument: async () => null: async () => ({ threadSafe: true }),
+ storeJsonbDocument: async () => null: async () => ({ threadSafe, true }),
 };
 
 const fallbackThreadSafePostgres: ThreadSafePG = {
- healthCheck: async () => ({ connected: true }),
+ healthCheck: async () => ({ connected, true }),
 };
 
 // helpers to use adapter or fallback
@@ -228,9 +228,7 @@ export function createSSRErrorResponse(
  meta: { timestamp: new Date().toISOString(), cached: false, source: 'ssr' },
  error: errorMessage,
  };
- return new Response(JSON.stringify(response), {
- status,
- headers: { 'Content-Type': 'application/json' },
+ return new Response(JSON.stringify(response), { status: headers: { 'Content-Type': 'application/json' },
  });
 }
 
@@ -365,16 +363,16 @@ export async function batchSSRRequestsGPU<T extends Record<string, unknown>>(
 export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  try {
  const [postgresHealth, cacheStats, serializerStats, gpuHealth] = await Promise.all([
- isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({ connected: true }),
+ isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({ connected, true }),
  isCallable(cacheImpl.getCacheStats)
  ? cacheImpl.getCacheStats()
- : Promise.resolve({ threadSafe: true }),
+ : Promise.resolve({ threadSafe, true }),
  isCallable(serializerImpl.getStats)
  ? serializerImpl.getStats()
  : Promise.resolve({ activeWorkers: 0 }),
  isCallable(gpuImpl.getSystemHealth)
  ? gpuImpl.getSystemHealth()
- : Promise.resolve({ gpuAvailable: false })]);
+ : Promise.resolve({ gpuAvailable, false })]);
 
  const overallStatus =
  (postgresHealth as any)?.connected &&
@@ -394,10 +392,10 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  } catch (error) {
  console.error('Health failed: ', error);
  return {
- postgres: { connected: false },
- cognitive_cache: { threadSafe: false },
+ postgres: { connected, false },
+ cognitive_cache: { threadSafe, false },
  serializer: { activeWorkers: 0 },
- gpu_coordinator: { gpuAvailable: false },
+ gpu_coordinator: { gpuAvailable, false },
  overall_status: 'unhealthy',
  };
  }

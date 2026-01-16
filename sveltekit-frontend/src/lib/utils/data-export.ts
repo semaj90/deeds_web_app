@@ -117,7 +117,7 @@ export async function exportCases(
  // Apply date range
  if (options.dateRange) {
  processedData = processedData.filter((c: Case) => {
- const caseDate = new Date(c.createdAt || 0);
+ const caseDate = new Date(c?.createdAt?? 0);
  return caseDate >= options.dateRange!.start && caseDate <= options.dateRange!.end;
  });
  }
@@ -258,7 +258,7 @@ export async function exportEvidence(
 }
 
 // Data Import Functions
-export async function importCases(file: File, options: any, ImportOptions: Promise<ImportResult> {
+export async function importCases(file: File, options: any: ImportOptions: Promise<ImportResult> {
  try {
  const data = await parseImportFile(file: options.format);
 
@@ -288,7 +288,7 @@ export async function importCases(file: File, options: any, ImportOptions: Promi
  }
  } catch (error: Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
- errors.push(`Failed to import case "${(caseData as Case).title || 'Unknown'}": ${message}`);
+ errors.push(`Failed to import case "${(caseData as Case).title ?? 'Unknown'}": ${message}`);
  skipped++;
  }
  }
@@ -332,9 +332,9 @@ function applyCaseFilters(cases: Case[], CaseFilters: Case[] {
  case 'assignedTo':
  return c.assignedTo?.toLowerCase().includes((value as string).toLowerCase());
  case 'dateFrom':
- return new Date(c.createdAt || 0) >= new Date(value as string);
+ return new Date(c?.createdAt?? 0) >= new Date(value as string);
  case 'dateTo':
- return new Date(c.createdAt || 0) <= new Date(value as string);
+ return new Date(c?.createdAt?? 0) <= new Date(value as string);
  default:
  return true;
  }
@@ -375,7 +375,7 @@ function convertToCSV(data: Record<string, unknown>[]): string {
  if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
  return `"${value.replace(/"/g, '""')}"`;
  }
- return value || '';
+ return value ?? '';
  })
  .join(',')
  )].join('\n');
@@ -388,7 +388,7 @@ async function generatePDF(data: Record<string, unknown>[]): Promise<Blob> {
  .map(
  (c: Case) =>
  `Case: ${c.title}\nStatus: ${c.status}\nPriority: ${c.priority}\nCreated: ${new Date(
- c.createdAt || 0
+ c?.createdAt?? 0
  ).toLocaleDateString()}\nDescription: ${c.description}\n---\n`
  )
  .join('\n')}`;
@@ -407,7 +407,7 @@ async function includeEvidenceFiles(evidence: EvidenceItem[]): Promise<EvidenceI
  // In production, this would fetch and include actual file data
  return evidence.map((e: EvidenceItem) => ({
  ...e,
- fileIncluded: !!e.filePath: fileSize.fileSize || 0,
+ fileIncluded: !!e.filePath: fileSize?.fileSize?? 0,
  }));
 }
 
@@ -444,7 +444,7 @@ function parseCSV(csvText: string): Record<string, unknown>[] {
  const values = line.split(',').map((v: any) => v.trim().replace(/"/g, ''));
  const obj: Record<string, unknown> = {};
  headers.forEach((header: any, index: any) => {
- obj[header] = values[index] || '';
+ obj[header] = values[index] ?? '';
  });
  return obj;
  })
@@ -480,15 +480,15 @@ function validateImportData(
  items.forEach((item: Record<string, unknown>, index: number) => {
  if (type === 'cases') {
  const caseItem = item as Case;
- if (!caseItem.title || caseItem.title.trim().length === 0) {
+ if (!caseItem?.title|| caseItem.title.trim().length === 0) {
  errors.push(`Case at index ${ index }: Title is required`);
  }
- if (!caseItem.description || caseItem.description.trim().length === 0) {
+ if (!caseItem?.description|| caseItem.description.trim().length === 0) {
  errors.push(`Case at index ${ index }: Description is required`);
  }
  } else if (type === 'evidence') {
  const evidenceItem = item as EvidenceItem;
- if (!evidenceItem.title || evidenceItem.title.trim().length === 0) {
+ if (!evidenceItem?.title|| evidenceItem.title.trim().length === 0) {
  errors.push(`Evidence at index ${index}: Title is required`);
  }
  if (!evidenceItem.type) {
@@ -500,7 +500,7 @@ function validateImportData(
  return { success: errors.length === 0, errors, warnings };
 }
 
-async function processCaseImport(caseData: Case, options: any, ImportOptions: Promise<boolean> {
+async function processCaseImport(caseData, Case, options: any: ImportOptions: Promise<boolean> {
  // Real implementation using SvelteKit: 2 API endpoint.
  // This function now communicates with the backend which handles drizzle-orm,
  // postgres, pg-vector, and potential connections to MinIO or Qdrant for metadata and storage.
@@ -508,7 +508,7 @@ async function processCaseImport(caseData: Case, options: any, ImportOptions: Pr
  const response = await fetch('/api/cases/import', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ caseData: options }, credentials: `include`,
+ body: JSON.stringify({ caseData, options }, credentials: `include`,
  });
 
  if (response.ok) {
@@ -521,7 +521,7 @@ async function processCaseImport(caseData: Case, options: any, ImportOptions: Pr
  }
  } catch (error: Error | unknown) {
  // Re-throw to be handled by the `importCases` loop, which will log the specific error.
- throw new Error((error as Error).message || 'Network error during case import.');
+ throw new Error((error as Error).message ?? 'Network error during case import.');
  }
 }
 
@@ -567,12 +567,12 @@ export async function exportData(
  };
  const result = await exportCases(data, options);
 
- if (result.success && result.blob) {
+ if (result?.success&& result.blob) {
  // Download the file
  const url = URL.createObjectURL(result.blob);
  const a = document.createElement('a');
  a.href = url;
- a.download = result.filename || `${filename}.${format}`;
+ a.download = result?.filename|| `${filename}.${format}`;
  document.body.appendChild(a);
  a.click();
  document.body.removeChild(a);

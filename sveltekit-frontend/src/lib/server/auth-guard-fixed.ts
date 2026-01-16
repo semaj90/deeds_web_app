@@ -21,8 +21,8 @@ export async function requireAuthentication(event: RequestEvent): Promise<Authen
 
 			if (devUserId || devUserEmail) {
 				return {
-					id: devUserId || 'dev-user-custom',
-					email: devUserEmail || 'dev-user@legal-ai.local',
+					id: devUserId ?? 'dev-user-custom',
+					email: devUserEmail ?? 'dev-user@legal-ai.local',
 					firstName: 'Dev',
 					lastName: 'User',
 					role: 'admin'
@@ -58,7 +58,7 @@ export function checkOwnership(
 		return true;
 	}
 
-	if (user.role && allowedRoles.includes(user.role)) {
+	if (user?.role&& allowedRoles.includes(user.role)) {
 		return true;
 	}
 

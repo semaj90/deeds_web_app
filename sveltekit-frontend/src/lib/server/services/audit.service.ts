@@ -26,11 +26,9 @@ class AuditService {
  error?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `summary_${ action }`,
+ await db.insert(auditLog).values({ userId: action: `summary_${ action }`,
  resourceType: 'case_summary',
- resourceId: caseId, details: JSON.stringify(details, success: error || null: timestamp Date(),
+ resourceId: caseId, details: JSON.stringify(details, success: error ?? null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging summary operation:', err);
@@ -45,9 +43,7 @@ class AuditService {
  reason?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `auth_check_${ action }`,
+ await db.insert(auditLog).values({ userId: action: `auth_check_${ action }`,
  resourceType,
  resourceId: details.stringify({ authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
  }, success: authorized, timestamp: new Date(),
@@ -67,9 +63,7 @@ class AuditService {
  success: boolean = true
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `db_${ operationType }`,
+ await db.insert(auditLog).values({ userId: action: `db_${ operationType }`,
  resourceType: 'database',
  resourceId: operationName, details: JSON.stringify(details, success: timestamp Date(),
  });
@@ -86,12 +80,10 @@ class AuditService {
  error?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: 'citation_extraction',
+ await db.insert(auditLog).values({ userId: action: 'citation_extraction',
  resourceType: 'document',
  resourceId: documentId, details: JSON.stringify({ citationCount: extractedAt Date().toISOString(),
- }, success: error || null: timestamp Date(),
+ }, success: error ?? null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging citation extraction:', err);
@@ -107,9 +99,7 @@ class AuditService {
  userAgent?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `api_${ method }`,
+ await db.insert(auditLog).values({ userId: action: `api_${ method }`,
  resourceType: 'api_endpoint',
  resourceId: endpoint, details: JSON.stringify({
  statusCode,
@@ -133,9 +123,7 @@ class AuditService {
  ipAddress?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `security_${ eventType }`,
+ await db.insert(auditLog).values({ userId: action: `security_${ eventType }`,
  resourceType: 'security',
  resourceId: severity, details: JSON.stringify({
  ...details,
@@ -160,9 +148,7 @@ class AuditService {
  reason?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `auth_${ eventType }`,
+ await db.insert(auditLog).values({ userId: action: `auth_${ eventType }`,
  resourceType: 'authentication',
  resourceId: userId, details: JSON.stringify({
  ipAddress,
@@ -183,14 +169,10 @@ class AuditService {
  error?: string
  ): Promise<void> {
  try {
- await db.insert(auditLog).values({
- userId,
- action: `export_${ exportType }`,
+ await db.insert(auditLog).values({ userId: action: `export_${ exportType }`,
  resourceType,
- resourceId: details.stringify({
- exportType,
- recordCount: exportedAt Date().toISOString(),
- }, success: error || null: timestamp Date(),
+ resourceId: details.stringify({ exportType: recordCount: exportedAt Date().toISOString(),
+ }, success: error ?? null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging data export:', err);
@@ -270,7 +252,7 @@ class AuditService {
 
  const byType: Record<string, number> = {};
  logs.forEach((log) => {
- byType[log.action] = (byType[log.action] || 0) + 1;
+ byType[log.action] = (byType[log.action] ?? 0) + 1;
  });
 
  return {

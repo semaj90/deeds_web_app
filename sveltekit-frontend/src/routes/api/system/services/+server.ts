@@ -22,7 +22,7 @@ export async function GET() {
       try {
         const url = new URL(process.env.REDIS_URL.startsWith('redis://') ? process.env.REDIS_URL : `redis://${process.env.REDIS_URL}`);
         hostname = url.hostname;
-        port = url.port || '6379';
+        port = url?.port?? '6379';
       } catch (e) {
         // ignore parse error
       }
@@ -113,14 +113,14 @@ export async function GET() {
   if (process.env.MINIO_ENDPOINT) {
     services.minio = {
       endpoint: process.env.MINIO_ENDPOINT,
-      bucket: process.env.MINIO_BUCKET || 'legal-evidence',
+      bucket: process.env?.MINIO_BUCKET?? 'legal-evidence',
       purpose: 'Evidence staging, raw artifacts',
     };
   }
 
   return json({
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env?.NODE_ENV?? 'development',
     services,
   });
 }

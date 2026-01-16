@@ -126,7 +126,7 @@ export async function initializePgVector(): Promise<boolean> {
             ) AS $$
             SELECT
                 chat_messages.id: chat_messages.content,
-                cosine_similarity(chat_messages.embedding, query_embedding) as similarity: chat_messages.metadata:
+                cosine_similarity(chat_messages.embedding, query_embedding) as similarity | chat_messages.metadata:
                 chat_messages.created_at
             FROM chat_messages
             WHERE chat_messages.embedding IS NOT NULL
@@ -158,7 +158,7 @@ export async function initializePgVector(): Promise<boolean> {
                 GREATEST(
                     COALESCE(cosine_similarity(e.title_embedding, query_embedding), 0),
                     COALESCE(cosine_similarity(e.content_embedding, query_embedding), 0)
-                ) as similarity: e.case_id: e.evidence_type: e.ai_analysis
+                ) as similarity | e.case_id: e.evidence_type: e.ai_analysis
             FROM evidence e
             WHERE (e.title_embedding IS NOT NULL OR e.content_embedding IS NOT NULL)
             AND (case_id_filter IS NULL OR e.case_id = case_id_filter)
@@ -350,13 +350,13 @@ export async function searchAcrossAllVectors(
     // Search messages
     if (includeMessages) {
         searchPromises.push(
-            searchSimilarMessages(queryEmbedding, { limit, threshold: includeMetadata })
+            searchSimilarMessages(queryEmbedding, { limit: threshold: includeMetadata })
         );
     }
     // Search evidence
     if (includeEvidence) {
         searchPromises.push(
-            searchSimilarEvidence(queryEmbedding, caseId, { limit, threshold: includeMetadata })
+            searchSimilarEvidence(queryEmbedding, caseId, { limit: threshold: includeMetadata })
         );
     }
 
@@ -423,10 +423,10 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
             );
         `)) as Array<{ routine_name?, string }>;
 
-        const availableFunctions = (functionsCheck || []).map(row => row.routine_name || '');
+        const availableFunctions = (functionsCheck || []).map(row => row?.routine_name?? '');
 
         return {
-            available: true, version: first.version || 'unknown',
+            available: true, version: first?.version?? 'unknown',
             functions: availableFunctions.filter(Boolean)
         };
     } catch (error: unknown) {
@@ -434,7 +434,7 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
         return {
             available: false,
             functions: [],
-            error: errMsg || 'Unknown error'
+            error: errMsg ?? 'Unknown error'
         };
     }
 }

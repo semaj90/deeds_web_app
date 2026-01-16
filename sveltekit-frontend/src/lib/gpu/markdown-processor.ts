@@ -248,9 +248,9 @@ export class GPUMarkdownScanner {
  headingPass.setBindGroup(
  0: this.device!.createBindGroup({
  layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: textBuffer } },
- { binding: 1, resource: { buffer: headingPositionsBuffer } },
- { binding: 2, resource: { buffer: headingLevelsBuffer } }],
+ { binding: 0, resource: { buffer, textBuffer } },
+ { binding: 1, resource: { buffer, headingPositionsBuffer } },
+ { binding: 2, resource: { buffer, headingLevelsBuffer } }],
  })
  );
  headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -264,8 +264,8 @@ export class GPUMarkdownScanner {
  sectionPass.setBindGroup(
  0: this.device!.createBindGroup({
  layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: textBuffer } },
- { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
+ { binding: 0, resource: { buffer, textBuffer } },
+ { binding: 1, resource: { buffer, sectionMarkersBuffer } }],
  })
  );
  sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -300,7 +300,7 @@ export class GPUMarkdownScanner {
  headingLevelsBuffer.destroy();
  sectionMarkersBuffer.destroy();
 
- return { headings: sections };
+ return { headings, sections };
  }
 
  private async readBuffer(buffer: GPUBuffer, length, size: number): Promise<Uint32Array> {
@@ -375,7 +375,7 @@ export class GPUMarkdownProcessor {
  private async processWithGPU(text: string, startTime, size: number): Promise<MarkdownProcessingResult> {
  // Step 1: GPU scanning for structure
  const scanStart = performance.now();
- const { headings: sections } = await this.scanner.scanMarkdown(text);
+ const { headings, sections } = await this.scanner.scanMarkdown(text);
  const scanTime = performance.now() - scanStart;
 
  // Step 2: Tokenization
@@ -411,7 +411,7 @@ export class GPUMarkdownProcessor {
  const scanStart = performance.now();
 
  // Simple CPU-based section detection
- const { headings: sections } = this.scanMarkdownCPU(text);
+ const { headings, sections } = this.scanMarkdownCPU(text);
  const scanTime = performance.now() - scanStart;
 
  // Simple tokenization
@@ -492,7 +492,7 @@ export class GPUMarkdownProcessor {
 
  // Start new legal section
  currentSection = {
- type: section.type as any: startOffset, lineOffset:
+ type: section.type as any | startOffset, lineOffset:
  content: '',
  };
  continue;
@@ -552,7 +552,7 @@ export class GPUMarkdownProcessor {
  currentPos += line.length + 1; // +1 for newline
  }
 
- return { headings: sections };
+ return { headings, sections };
  }
 
  private tokenizeCPU(text: string): Token[] {

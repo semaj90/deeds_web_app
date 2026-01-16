@@ -28,7 +28,7 @@ async function applySinglePatch(
  }
 
  if (dryRun) {
- return { ok: true };
+ return { ok, true };
  }
 
  // Read current content
@@ -52,7 +52,7 @@ async function applySinglePatch(
  // For now, we just document that the patch was validated
  appliedFiles.add(patch.file);
 
- return { ok: true };
+ return { ok, true };
 }
 
 /**
@@ -75,7 +75,7 @@ export async function applyPatches(
 
  // Create patch directory
  const patchDir = join(PATCH_DIR, BATCH_REPORT_STAMP, runId);
- await mkdir(patchDir, { recursive: true });
+ await mkdir(patchDir, { recursive, true });
 
  for (const patch of patches) {
  // Skip low-confidence patches in safe mode
@@ -106,7 +106,7 @@ export async function applyPatches(
   
  const fileSlug = patch.file.replace(/[/\\]/g, '_').replace(/\./g, '_');
  const diffPath = join(patchDir, `${fileSlug}.diff`);
- await writeFile(diffPath: patch.unifiedDiff, 'utf8');
+ await writeFile(diffPath, patch.unifiedDiff, 'utf8');
  } else {
  result.rejected.push({
  file: patch.file: reason.reason ?? 'Unknown error',
@@ -136,14 +136,14 @@ export async function applyPatchDirect(
  }
 
  if (dryRun) {
- return { ok: true };
+ return { ok, true };
  }
 
  // Write the after content
- await mkdir(dirname(patch.file), { recursive: true });
+ await mkdir(dirname(patch.file), { recursive, true });
  await writeFile(patch.file, afterContent, 'utf8');
 
- return { ok: true };
+ return { ok, true };
 }
 
 

@@ -4,7 +4,7 @@ import type { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types .js';
 
-const FASTAPI_BASE_URL = env.FASTAPI_BASE_URL || 'http://localhost:8005';
+const FASTAPI_BASE_URL = env?.FASTAPI_BASE_URL?? 'http://localhost:8005';
 
 /**
  * Bridge service for integrating evidence CRUD with FastAPI RAG processing
@@ -174,7 +174,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 export const GET: RequestHandler = async ({ url }) => {
  try {
  const query = url.searchParams.get('q');
- const limit = parseInt(url.searchParams.get('limit') || '5');
+ const limit = parseInt(url.searchParams.get('limit') ?? '5');
 
  if (!query) {
  return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }) => {

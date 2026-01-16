@@ -28,7 +28,7 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
 
 export async function handleRAGSearch(user: UserType, request: Request): RAGService {
  try {
- const { query: caseId } = await request.json();
+ const { query, caseId } = await request.json();
  if (!query) {
  return json({ success: false, error: 'Query is required' }, { status: 400 });
  }
@@ -36,9 +36,7 @@ export async function handleRAGSearch(user: UserType, request: Request): RAGServ
  // const results = await ragService.search(query: user.id, caseId);
  return json({
  success: true,
- data: {
- query,
- results: ['Placeholder RAG search result 1', 'Placeholder RAG search result 2'],
+ data: { query: results: ['Placeholder RAG search result 1', 'Placeholder RAG search result 2'],
  },
  });
  } catch (error) {
@@ -49,7 +47,7 @@ export async function handleRAGSearch(user: UserType, request: Request): RAGServ
 
 export async function handleRAGChat(user: UserType, request: Request): RAGService {
  try {
- const { sessionId: message } = await request.json();
+ const { sessionId, message } = await request.json();
  if (!message) {
  return json({ success: false, error: 'Message is required' }, { status: 400 });
  }

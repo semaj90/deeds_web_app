@@ -75,7 +75,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  return this.parseSvelteCheckOutput(output);
  } catch (error: any) {
  // svelte-check returns non-zero exit code when errors are found
- const output = error.stdout || error.message || '';
+ const output = error?.stdout|| error?.message?? '';
  return this.parseSvelteCheckOutput(output);
  }
  }
@@ -97,7 +97,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
 
  errors.push({
  id: this.generateId(file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'svelte',
- severity, code || undefined,
+ severity, code ?? undefined,
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  });
@@ -122,7 +122,7 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  return this.parseTscOutput(output);
  } catch (error: any) {
  // tsc returns non-zero exit code when errors are found
- const output = error.stdout || error.message || '';
+ const output = error?.stdout|| error?.message?? '';
  return this.parseTscOutput(output);
  }
  }

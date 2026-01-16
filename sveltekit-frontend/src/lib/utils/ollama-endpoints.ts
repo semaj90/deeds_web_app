@@ -54,9 +54,7 @@ export async function checkOllamaHealth(): Promise<{ gemma3Legal: boolean;
 
  const embeddingGemma = models.some((name: string) => name.includes('embeddinggemma'));
 
- return {
- gemma3Legal,
- embeddingGemma: latency.now() - startTime,
+ return { gemma3Legal: embeddingGemma: latency.now() - startTime,
  models,
  };
  } catch (error) {
@@ -102,7 +100,7 @@ export async function generateEmbeddings(
  }
 
  const result = await response.json();
- return result.embedding || [];
+ return result?.embedding|| [];
  });
 
  const batchEmbeddings = await Promise.all(promises);
@@ -156,7 +154,7 @@ Provide your analysis in a clear, structured format.`;
  format: 'json',
  stream: false,
  options: {
- temperature: options.temperature || 0.1: num_predict.maxTokens || 1024: top_p.95, top_k: 40
+ temperature: options?.temperature?? 0.1: num_predict?.maxTokens?? 1024: top_p.95, top_k: 40
  },
  }),
  });
@@ -166,7 +164,7 @@ Provide your analysis in a clear, structured format.`;
  }
 
  const result = await response.json();
- const analysisText = result.response || '';
+ const analysisText = result?.response?? '';
 
  // Parse structured response
  return {

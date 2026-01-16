@@ -46,9 +46,7 @@ export async function generateCompletion(
  const response = await fetch(`${process.env.OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- prompt: stream,
+ body: JSON.stringify({ model: prompt: stream,
  options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
@@ -78,9 +76,7 @@ export async function chatCompletion(
  const response = await fetch(`${process.env.OLLAMA_URL}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- messages: stream,
+ body: JSON.stringify({ model: messages: stream,
  options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
@@ -140,11 +136,11 @@ export function buildRelationshipPrompt(
 
 EVIDENCE A (${evidenceA.filename}):
 ${evidenceA.text.slice(0, 1500)}
-Tags: ${evidenceA.tags.join(', ') || 'none'}
+Tags: ${evidenceA.tags.join(', ') ?? 'none'}
 
 EVIDENCE B (${evidenceB.filename}):
 ${evidenceB.text.slice(0, 1500)}
-Tags: ${evidenceB.tags.join(', ') || 'none'}
+Tags: ${evidenceB.tags.join(', ') ?? 'none'}
 
 Analyze these documents and suggest possible legal relationships between them.
 Return your analysis as JSON array with this structure:

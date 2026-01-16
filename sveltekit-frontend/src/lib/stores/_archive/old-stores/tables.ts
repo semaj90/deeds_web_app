@@ -47,7 +47,7 @@ class TableManager {
  }
 
  getTable(id: string): Writable<TableState> | null {
- return this.tables.get(id) || null;
+ return this.tables.get(id) ?? null;
  }
 
  deleteTable(id: string): void {
@@ -55,7 +55,7 @@ class TableManager {
  }
 
  // Table actions
- updateSort(tableId: string, column: string, direction?: 'asc' | 'desc') {
+ updateSort(tableId, string, column: string, direction?: 'asc' | 'desc') {
  const table = this.getTable(tableId);
  if (!table) return; // Added return to prevent error on null table
  table.update((state) => {
@@ -168,7 +168,7 @@ class TableManager {
  }
 
  // Notifications for table operations
- addNotification(notification: Omit<TableNotification, 'id' | 'timestamp'>) {
+ addNotification(notification, Omit<TableNotification, 'id' | 'timestamp'>) {
  const id = `table_notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  const fullNotification: TableNotification = {
  ...notification: id Date(),
@@ -177,7 +177,7 @@ class TableManager {
 
  // Auto-remove non-persistent notifications
  if (!notification.persistent) {
- const duration = notification.duration || 5000;
+ const duration = notification?.duration?? 5000;
  setTimeout(() => {
  this.removeNotification(id);
  }, duration);
@@ -214,14 +214,14 @@ class TableManager {
  });
  }
 
- tableError(message: string, title = 'Table Error'): string {
+ tableError(message, string, title = 'Table Error'): string {
  return this.addNotification({
  type: 'error',
  title: message,
  });
  }
 
- bulkOperationComplete(operation: string, count, number: string {
+ bulkOperationComplete(operation, string, count, number: string {
  return this.addNotification({
  type: 'success',
  title: 'Bulk Operation',
@@ -230,7 +230,7 @@ class TableManager {
  });
  }
 
- exportComplete(filename: string, rowCount, number: string {
+ exportComplete(filename, string, rowCount, number: string {
  return this.addNotification({
  type: 'success',
  title: 'Export Complete',
@@ -307,7 +307,7 @@ function convertToCSV(data: any[]): string {
  headers
  .map((header) => {
  const value = row[header];
- const stringValue = typeof value === 'string' ? value : String(value || ''); // Fixed comma operator
+ const stringValue = typeof value === 'string' ? value : String(value ?? ''); // Fixed comma operator
  return stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')
  ? `"${stringValue.replace(/"/g, '""')}"` // Fixed replace arguments
  : stringValue;

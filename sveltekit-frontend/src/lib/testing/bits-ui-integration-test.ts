@@ -151,7 +151,7 @@ export class BitsUIIntegrationTester {
  }
  }
 
- private addResult(component: string, status: 'pass' | 'fail' | 'warning', message: string): void {
+ private addResult(component, string, status: 'pass' | 'fail' | 'warning', message: string): void {
  this.results.push({
  component,
  status,

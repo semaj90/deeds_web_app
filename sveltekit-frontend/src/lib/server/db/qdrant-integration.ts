@@ -67,8 +67,8 @@ export class QdrantPostgreSQLService {
 
 export const createQdrantService = () => {
     return new QdrantPostgreSQLService({
-        host: process.env.QDRANT_HOST || 'localhost',
-        port: Number(process.env.QDRANT_PORT) || 6333,
+        host: process.env?.QDRANT_HOST?? 'localhost',
+        port: Number(process.env.QDRANT_PORT) ?? 6333,
         apiKey: process.env.QDRANT_API_KEY
     });
 };

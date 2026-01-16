@@ -74,7 +74,7 @@ export class NamespaceRouter {
  * Validate namespace context
  */
  static validateContext(context: NamespaceContext): boolean {
- if (!context.feature || !context.path) {
+ if (!context?.feature|| !context.path) {
  return false;
  }
  if (typeof context.enabled !== 'boolean' || typeof context.authRequired !== 'boolean') {
@@ -147,10 +147,8 @@ export function getDisabledFeatureResponse(request: Request): Response | null {
  }
 
  if (!NamespaceRouter.isFeatureEnabled(feature)) {
- const { status: message } = NamespaceRouter.getDisabledFeatureResponse(feature);
- return new Response(JSON.stringify({ error: message }) => {
- status,
- headers: { 'Content-Type': 'application/json' },
+ const { status, message } = NamespaceRouter.getDisabledFeatureResponse(feature);
+ return new Response(JSON.stringify({ error, message }) => { status: headers: { 'Content-Type': 'application/json' },
  });
  }
 

@@ -2,17 +2,17 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { errorBrainAnalysisTable } from '$lib/server/db/schema/error_brain_analysis';
 
-export const POST: RequestHandler = async ({ request: params }) => {
+export const POST: RequestHandler = async ({ request, params }) => {
  try {
  const { routePath } = params;
  const body = await request.json();
 
  // Validate request body
- if (!body.suggestions || !Array.isArray(body.suggestions)) {
+ if (!body?.suggestions|| !Array.isArray(body.suggestions)) {
  return json({ error: 'Missing or invalid suggestions array' }, { status: 400 });
  }
 
- if (!body.phase || typeof body.phase !== 'string') {
+ if (!body?.phase|| typeof body.phase !== 'string') {
  return json({ error: 'Missing or invalid phase' }, { status: 400 });
  }
 

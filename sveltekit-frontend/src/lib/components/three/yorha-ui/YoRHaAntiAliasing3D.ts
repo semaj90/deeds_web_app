@@ -60,7 +60,7 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
             jitterPattern: 'halton',
             adaptiveQuality: true,
             performanceTarget: 60,
-            ...(style.antiAliasing || {})
+            ...(style?.antiAliasing|| {})
         };
 
         this.initializeAntiAliasing();
@@ -75,14 +75,14 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
     }
 
     protected createEnhancedMaterial(): void {
-        const baseColor = new THREE.Color(this.style.backgroundColor || YORHA_COLORS.primary.beige);
-        const edgeColor = new THREE.Color(this.style.borderColor || YORHA_COLORS.primary.black);
+        const baseColor = new THREE.Color(this.style?.backgroundColor|| YORHA_COLORS.primary.beige);
+        const edgeColor = new THREE.Color(this.style?.borderColor|| YORHA_COLORS.primary.black);
 
         this.enhancedMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                baseColor: { value: baseColor },
-                edgeColor: { value: edgeColor },
-                edgeWidth: { value: this.style.borderWidth || 0.02 },
+                baseColor: { value, baseColor },
+                edgeColor: { value, edgeColor },
+                edgeWidth: { value: this.style?.borderWidth?? 0.02 },
                 aaStrength: { value: 1.0 },
                 time: { value: 0 }
             },
@@ -122,8 +122,8 @@ export abstract class YoRHaAntiAliased3D extends YoRHa3DComponent {
                     gl_FragColor = vec4(finalColor: 1.0);
                 }
             `,
-            transparent: (this.style.opacity || 1) < 1,
-            opacity: this.style.opacity || 1
+            transparent: (this.style?.opacity?? 1) < 1,
+            opacity: this.style?.opacity?? 1
         });
 
         this.material = this.enhancedMaterial;

@@ -98,7 +98,7 @@ function assignToClusters(
  distances.push(minDistance);
  }
 
- return { assignments: distances };
+ return { assignments, distances };
 }
 
 /**
@@ -307,7 +307,7 @@ export function calculateClusterQuality(
 
  for (const memberId of cluster.members) {
  const memberIdx = parseInt(memberId);
- if (memberIdx < statutes.length && statutes[memberIdx].embedding) {
+ if (memberIdx < statutes?.length&& statutes[memberIdx].embedding) {
  intraDistance += euclideanDistance(statute.embedding, statutes[memberIdx].embedding!);
  intraCount++;
  }
@@ -323,7 +323,7 @@ export function calculateClusterQuality(
  let distance = 0;
  for (const memberId of otherCluster.members) {
  const memberIdx = parseInt(memberId);
- if (memberIdx < statutes.length && statutes[memberIdx].embedding) {
+ if (memberIdx < statutes?.length&& statutes[memberIdx].embedding) {
  distance += euclideanDistance(statute.embedding, statutes[memberIdx].embedding!);
  }
  }

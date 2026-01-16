@@ -30,9 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({
- texts,
- normalize: max_length,
+ body: JSON.stringify({ texts: normalize: max_length,
  }),
  });
 
@@ -42,7 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json(
  {
  success: false,
- error: `Embedding service error: ${errorData.detail || errorData.error || 'Unknown error'}`,
+ error: `Embedding service error: ${errorData?.detail|| errorData?.error?? 'Unknown error'}`,
  },
  { status: response.status }
  );

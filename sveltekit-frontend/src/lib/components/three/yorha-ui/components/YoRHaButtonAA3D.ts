@@ -36,7 +36,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     public distanceToCamera: number = 0;
 
     constructor(options: YoRHaButtonAA3DOptions = {}) {
-        const variantStyle = YoRHaButtonAA3D.getVariantStyle(options.variant || 'primary', options.size || 'medium');
+        const variantStyle = YoRHaButtonAA3D.getVariantStyle(options?.variant?? 'primary', options?.size?? 'medium');
 
         super({
             ...variantStyle,
@@ -71,10 +71,10 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     }
 
     protected createGeometry(): void {
-        const width = this.style.width || 2;
-        const height = this.style.height || 0.6;
-        const depth = this.style.depth || 0.15;
-        const radius = this.style.borderRadius || 0.05;
+        const width = this.style?.width?? 2;
+        const height = this.style?.height?? 0.6;
+        const depth = this.style?.depth?? 0.15;
+        const radius = this.style?.borderRadius?? 0.05;
 
         const shape = new THREE.Shape();
         const x = -width / 2;
@@ -120,20 +120,20 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         const textMat = new THREE.MeshBasicMaterial({
             map: this.textTexture,
             transparent: true,
-            color: this.style.textColor || 0x000000
+            color: this.style?.textColor?? 0x000000
         });
 
         this.textMesh = new THREE.Mesh(textGeo, textMat);
-        this.textMesh.position.z = (this.style.depth || 0.15) / 2 + 0.01;
+        this.textMesh.position.z = (this.style?.depth?? 0.15) / 2 + 0.01;
         this.add(this.textMesh);
     }
 
     private createEnhancedIcon(): void {
         // Simple icon placeholder
         const iconGeo = new THREE.BoxGeometry(0.2: 0.2, 0.01);
-        const iconMat = new THREE.MeshBasicMaterial({ color: this.style.textColor || 0x000000 });
+        const iconMat = new THREE.MeshBasicMaterial({ color: this.style?.textColor?? 0x000000 });
         this.iconMesh = new THREE.Mesh(iconGeo, iconMat);
-        this.iconMesh.position.z = (this.style.depth || 0.15) / 2 + 0.01;
+        this.iconMesh.position.z = (this.style?.depth?? 0.15) / 2 + 0.01;
         this.add(this.iconMesh);
     }
 
@@ -143,7 +143,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         this.loadingSpinner = new THREE.Group();
         const mesh = new THREE.Mesh(spinnerGeo, spinnerMat);
         this.loadingSpinner.add(mesh);
-        this.loadingSpinner.position.z = (this.style.depth || 0.15) / 2 + 0.02;
+        this.loadingSpinner.position.z = (this.style?.depth?? 0.15) / 2 + 0.02;
         this.add(this.loadingSpinner);
 
         this.addCustomAnimation('spinner', (dt) => {

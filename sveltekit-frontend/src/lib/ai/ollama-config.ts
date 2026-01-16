@@ -53,9 +53,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${endpoint}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        prompt: text,
+      body: JSON.stringify({ model: prompt: text,
       }),
     });
 
@@ -251,7 +249,7 @@ export async function* streamGenerateWithOllama(
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
+      buffer += decoder.decode(value, { stream, true });
       const lines = buffer.split('\n');
 
       for (let i = 0; i < lines.length - 1; i++) {

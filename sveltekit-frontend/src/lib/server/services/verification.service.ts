@@ -225,9 +225,7 @@ Use only for context, not charging authority.`;
  citationId: string, sourceVerificationId: string, string
  ): Promise<void> {
  try {
- await db.insert(citationMetadata).values({
- citationId,
- sourceVerificationId: disclaimerRequired,
+ await db.insert(citationMetadata).values({ citationId: sourceVerificationId: disclaimerRequired,
  prosecutorAcknowledged: true, acknowledgedBy: prosecutorId, new Date().toISOString(),
  });
  } catch (error) {
@@ -251,7 +249,7 @@ Use only for context, not charging authority.`;
  return false;
  }
 
- return metadata.disclaimerRequired && !metadata.prosecutorAcknowledged;
+ return metadata?.disclaimerRequired&& !metadata.prosecutorAcknowledged;
  } catch (error) {
  console.error('Error checking verification requirement:', error);
  return false;

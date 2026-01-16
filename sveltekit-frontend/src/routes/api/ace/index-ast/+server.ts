@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   try {
     const body = await request.json() as IndexRequest;
-    const targetPath = body.path || './src';
+    const targetPath = body?.path?? './src';
 
     indexingStatus = {
       isRunning: true,
@@ -49,9 +49,9 @@ export const POST: RequestHandler = async ({ request }) => {
     (async () => {
       try {
         const result = await indexCodebaseInCouchDB(targetPath, {
-          extensions: body.extensions || ['.ts', '.tsx', '.js', '.svelte'],
-          exclude: body.exclude || ['node_modules', '.git', 'dist', 'build', '.svelte-kit'],
-          maxFiles: body.maxFiles || 500
+          extensions: body?.extensions|| ['.ts', '.tsx', '.js', '.svelte'],
+          exclude: body?.exclude|| ['node_modules', '.git', 'dist', 'build', '.svelte-kit'],
+          maxFiles: body?.maxFiles?? 500
         });
 
         indexingStatus.indexed = result.indexed;

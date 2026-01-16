@@ -3,7 +3,7 @@ import { safeFetchJson } from '$lib/server/fetch-wrapper';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
-const VECTOR_BASE = process.env.VECTOR_SERVICE_URL || 'http://localhost:8095';
+const VECTOR_BASE = process.env?.VECTOR_SERVICE_URL?? 'http://localhost:8095';
 
 export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json().catch(() => ({}));
@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if (!upstream.ok) {
  return json(
  { error: 'Upstream error', detail: upstream.error },
- { status: upstream.status || 502 }
+ { status: upstream?.status?? 502 }
  );
  }
 

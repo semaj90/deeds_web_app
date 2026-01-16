@@ -4,10 +4,10 @@ export interface MultiLayerCache {
  evictionCount: number; avgAccessTime: number;
  layerStats: { memory: Record<string, unknown>;
  persistent: Record<string, unknown>;
- search: { queries: number };
+ search: { queries, number };
  };
  };
- clear(options: { type: string }): Promise<void>;
+ clear(options: { type, string }): Promise<void>;
 }
 
 export interface UserChatRecommendationEngine {

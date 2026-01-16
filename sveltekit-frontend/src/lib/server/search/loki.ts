@@ -38,7 +38,7 @@ export class LokiSearchService {
     private collections: Map<string, any> = new Map();
 
     constructor(filename?: string) {
-        this.db = new Loki(filename || 'legal-search.db', {
+        this.db = new Loki(filename ?? 'legal-search.db', {
             autoload: true,
             autosave: true,
             autosaveInterval: 4000,
@@ -103,9 +103,7 @@ export class LokiSearchService {
             .limit(limit)
             .data();
 
-        return {
-            data,
-            count: data.length,
+        return { data: count: data.length,
             total,
             page,
             limit,

@@ -28,8 +28,8 @@ export type LegalFormEvent =
 	| { type: 'SUBMIT' }
 	| { type: 'UPLOAD_EVIDENCE'; files: File[] }
 	| { type: 'UPDATE_CASE_DETAILS'; title: string; description: string }
-	| { type: 'SET_EVIDENCE_TYPE'; evidenceType: LegalFormContext['evidenceType'] }
-	| { type: 'SET_PRIORITY'; priority: LegalFormContext['priority'] }
+	| { type: 'SET_EVIDENCE_TYPE'; evidenceType: LegalFormContext?.evidenceType }
+	| { type: 'SET_PRIORITY'; priority: LegalFormContext?.priority }
 	| { type: 'AI_SUGGESTION'; suggestions: string[] }
 	| { type: 'VALIDATE_STEP' }
 	| { type: 'RESET_FORM' }
@@ -39,9 +39,9 @@ export type LegalFormEvent =
 /**
  * Async service for case submission
  */
-const submitCaseService = fromPromise(async ({ input }: { input: LegalFormContext }) => {
+const submitCaseService = fromPromise(async ({ input }: { input, LegalFormContext }) => {
 	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 2000));
+	await new Promise((resolve: any) => setTimeout(resolve, 2000));
 
 	// 90% success rate
 	const success = Math.random() > 0.1;
@@ -91,7 +91,7 @@ export const legalFormMachine = setup({
 			on: { UPLOAD_EVIDENCE: { actions: assign({ evidenceFiles: ({ event }) => event.files,
 						confidence: ({ context, event }) => {
 							const hasDigitalEvidence = event.files.some(
-								(f) =>
+								(f: any) =>
 									f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
 							);
 							return hasDigitalEvidence
@@ -143,7 +143,7 @@ export const legalFormMachine = setup({
 				suggestedHelp: 'Provide case details for proper categorization'
 			},
 			entry: assign({ aiRecommendations: ({ context }) => {
-					const recommendations: LegalFormContext['aiRecommendations'] = [];
+					const recommendations: LegalFormContext?.aiRecommendations = [];
 
 					if (context.evidenceType === 'forensic') {
 						recommendations.push({
@@ -248,7 +248,7 @@ export const legalFormMachine = setup({
 					return Math.min(confidence, 100);
 				},
 				aiRecommendations: ({ context }) => {
-					const recommendations: LegalFormContext['aiRecommendations'] = [];
+					const recommendations: LegalFormContext?.aiRecommendations = [];
 
 					if (context.confidence < 80) {
 						recommendations.push({
@@ -361,7 +361,7 @@ export function getStateDescription(state: StateValue): string {
 		success: 'Case submitted successfully',
 		error: 'Error occurred during submission'
 	};
-	return descriptions[String(state)] || 'Unknown state';
+	return descriptions[String(state)] ?? 'Unknown state';
 }
 
 export function getAISuggestions(context: LegalFormContext, state: StateValue): string[] {

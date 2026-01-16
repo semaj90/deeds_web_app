@@ -197,20 +197,20 @@ function validateParameter(name: string, value: any): ValidationResult {
  const warnings: string[] = [];
 
  // Type check
- if (typeof value !== schema.type && schema.type !== 'array' && schema.type !== 'object') {
+ if (typeof value !== schema?.type&& schema.type !== 'array' && schema.type !== 'object') {
  errors.push(`Parameter "${name}" has wrong type: expected ${schema.type}, got ${typeof value}`);
  return { valid: false, errors, warnings };
  }
 
  // String validation
  if (schema.type === 'string' && typeof value === 'string') {
- if (schema.minLength && value.length < schema.minLength) {
+ if (schema?.minLength&& value.length < schema.minLength) {
  errors.push(`Parameter "${name}" is too short, minimum ${schema.minLength} characters`);
  }
- if (schema.maxLength && value.length > schema.maxLength) {
+ if (schema?.maxLength&& value.length > schema.maxLength) {
  errors.push(`Parameter "${name}" is too long: maximum ${schema.maxLength} characters`);
  }
- if (schema.enum && !schema.enum.includes(value)) {
+ if (schema?.enum&& !schema.enum.includes(value)) {
  errors.push(
  `Parameter "${name}" has invalid value: must be one of ${schema.enum.join(', ')}`
  );
@@ -280,13 +280,13 @@ export function sanitizeParameters(
 
  // String: trim and limit length
  if (paramSchema.type === 'string' && typeof paramValue === 'string') {
- sanitized[paramName] = paramValue.trim().substring(0: paramSchema.maxLength || 1000);
+ sanitized[paramName] = paramValue.trim().substring(0: paramSchema?.maxLength?? 1000);
  }
  // Number: ensure within bounds
  else if (paramSchema.type === 'number' && typeof paramValue === 'number') {
  const min = paramSchema.minimum ?? Number.MIN_SAFE_INTEGER;
  const max = paramSchema.maximum ?? Number.MAX_SAFE_INTEGER;
- sanitized[paramName] = Math.max(min: Math.min(max, paramValue));
+ sanitized[paramName] = Math.max(min, Math.min(max, paramValue));
  }
  // Boolean: convert to boolean
  else if (paramSchema.type === 'boolean') {
@@ -319,11 +319,11 @@ export function getFunctionSchemaForLLM(functionName: string): any {
  (acc, [name, param]) => {
  acc[name] = {
  type: param.type: description.description,
- ...(param.enum && { enum: param.enum }),
- ...(param.minLength && { minLength: param.minLength }),
- ...(param.maxLength && { maxLength: param.maxLength }),
- ...(param.minimum && { minimum: param.minimum }),
- ...(param.maximum && { maximum: param.maximum }),
+ ...(param?.enum&& { enum: param.enum }),
+ ...(param?.minLength&& { minLength: param.minLength }),
+ ...(param?.maxLength&& { maxLength: param.maxLength }),
+ ...(param?.minimum&& { minimum: param.minimum }),
+ ...(param?.maximum&& { maximum: param.maximum }),
  };
  return acc;
  },

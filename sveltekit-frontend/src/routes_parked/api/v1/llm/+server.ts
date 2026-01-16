@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { callTRTFP16, callTRTFP8, callTRTINT8 } from '$lib/server/trt-router';
 
 export async function POST({ request }) {
- const { prompt: mode } = await request.json();
+ const { prompt, mode } = await request.json();
 
  try {
  if (mode === 'fp8') {

@@ -63,7 +63,7 @@ export function generateRunId(): string {
 function getRunsDir(): string {
  const dir = path.join(process.cwd(), 'reports', 'runs');
  if (!fs.existsSync(dir)) {
- fs.mkdirSync(dir, { recursive: true });
+ fs.mkdirSync(dir, { recursive, true });
  }
  return dir;
 }
@@ -165,7 +165,7 @@ export class RunTracker {
  failed: 100,
  };
 
- return stateProgress[this.metadata.state] || 0;
+ return stateProgress[this.metadata.state] ?? 0;
  }
 
  /**

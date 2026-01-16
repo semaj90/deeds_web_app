@@ -31,7 +31,7 @@ export const documentWorkflowMachine = setup({
 		}, setExtractedText: assign({ extractedText: ({ event }) => (event as any).text,
 			ocrConfidence: ({ event }) => (event as any).confidence
 		}, setEmbeddings: assign({ embeddings: ({ event }) => (event as any).embeddings
-		}, addError: assign({ processingErrors: ({ context, event }) => [...(context.processingErrors || []), (event as any).error]
+		}, addError: assign({ processingErrors: ({ context, event }) => [...(context?.processingErrors|| []), (event as any).error]
 		}, incrementRetry: assign({ retryCount: ({ context }) => context.retryCount + 1
 		}, resetRetries: assign({ retryCount: 0
 		})
@@ -233,7 +233,7 @@ export const ragWorkflowMachine = setup({
 		}, setGeneratedResponse: assign({ generatedResponse: ({ event }) => (event as any).response,
 			confidence: ({ event }) => (event as any).confidence,
 			tokens: ({ event }) => (event as any).tokens,
-			sources: ({ context }) => context.searchResults.map((r) => r.id || r.title).slice(0, 5, cached: false,
+			sources: ({ context }) => context.searchResults.map((r) => r?.id|| r.title).slice(0, 5, cached: false,
 			processingTime: ({ context }) => Date.now() - context.processingTime
 		})
 	},

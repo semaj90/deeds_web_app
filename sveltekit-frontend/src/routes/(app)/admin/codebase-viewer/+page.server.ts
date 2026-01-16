@@ -22,7 +22,7 @@ export const load: PageServerLoad = async () => {
 			const info = await qdrant.getCollection(col.name);
 			return {
 				name: col.name,
-				pointsCount: info.points_count || 0,
+				pointsCount: info?.points_count?? 0,
 				vectorSize: info.config?.params?.vectors?.size ?? 0,
 				status: info.status
 			};

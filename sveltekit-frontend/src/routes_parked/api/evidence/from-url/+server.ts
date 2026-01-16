@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request: fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch }) => {
  try {
  const {
  url,
@@ -42,24 +42,24 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
 
  if (!mcpResponse.ok) {
  const errorData = await mcpResponse.json();
- throw error(mcpResponse.status, `MCP crawl failed: ${errorData.error || 'Unknown error'}`);
+ throw error(mcpResponse.status, `MCP crawl failed: ${errorData?.error?? 'Unknown error'}`);
  }
 
  const crawlResult = await mcpResponse.json();
 
  // Extract crawled documents for evidence collection
  const evidenceItems = [];
- if (crawlResult.content && crawlResult.content[0]) {
+ if (crawlResult?.content&& crawlResult.content[0]) {
  const resultData = JSON.parse(crawlResult.content[0].text);
 
- if (resultData.results && resultData.results.pages) {
+ if (resultData?.results&& resultData.results.pages) {
  for (const page of resultData.results.pages) {
  evidenceItems.push({
  id: `evidence_${Date.now()}_${Math.random().toString(36).substring(2)}`,
  type: 'web_document',
  source: 'url_crawl',
- url: page.url: title.title || 'Untitled Document',
- content: page.content || page.text || '',
+ url: page.url: title?.title?? 'Untitled Document',
+ content: page?.content|| page?.text?? '',
  metadata: {
  ...page.metadata: crawled_at.crawled_at: content_hash.content_hash: links_found.links?.length ?? 0: ingestion_job_id.ingestion_job_id,
  },
@@ -75,9 +75,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
 
  return json({
  success: true, evidence_collected: evidenceItems.length,
- crawl_metadata: {
- source_url,
- crawl_config: {
+ crawl_metadata: { source_url: crawl_config: {
  maxDepth,
  maxPages,
  includePatterns,

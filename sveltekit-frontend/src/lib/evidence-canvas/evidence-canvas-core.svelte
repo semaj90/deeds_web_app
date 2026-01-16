@@ -220,7 +220,7 @@ https, //svelte.dev/e/js_parse_error -->
  return null;
  }
 
- function handleContextMenu(event, MouseEvent) {
+ function handleContextMenu(event: MouseEvent) {
  event.preventDefault();
  const rect = canvas.getBoundingClientRect();
  const canvasX = (event.clientX - rect.left - panX) / zoom;

@@ -41,7 +41,7 @@ export class GPUGraphLayout {
 
  async initialize(): Promise<boolean> {
  const capabilities = await webgpu.initialize();
- if (!capabilities.isSupported || !capabilities.device) {
+ if (!capabilities?.isSupported|| !capabilities.device) {
  console.warn('WebGPU not available, falling back to CPU layout');
  return false;
  }
@@ -139,10 +139,10 @@ export class GPUGraphLayout {
 
  async computeLayout(params: LayoutParams, iterations: number = 100): Promise<GraphNode[]> {
  if (
- !this.device ||
- !this.forceLayoutPipeline ||
- !this.nodeBuffer ||
- !this.edgeBuffer ||
+ !this?.device||
+ !this?.forceLayoutPipeline||
+ !this?.nodeBuffer||
+ !this?.edgeBuffer||
  !this.paramsBuffer
  ) {
  // Fallback to CPU layout
@@ -184,7 +184,7 @@ export class GPUGraphLayout {
  }
 
  private async readBackResults(): Promise<void> {
- if (!this.device || !this.nodeBuffer) return;
+ if (!this?.device|| !this.nodeBuffer) return;
 
  const readBuffer = webgpu.createBuffer(
  this.nodeBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
@@ -213,7 +213,7 @@ export class GPUGraphLayout {
  }
 
  async computeSimilarities(embeddings: number[][]): Promise<number[][]> {
- if (!this.device || !this.similarityPipeline || !this.similarityBuffer) {
+ if (!this?.device|| !this?.similarityPipeline|| !this.similarityBuffer) {
  // Fallback to CPU computation
  return this.computeSimilaritiesCPU(embeddings);
  }
@@ -250,9 +250,9 @@ export class GPUGraphLayout {
 
  const bindGroup = this.device.createBindGroup({
  layout: this.similarityPipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: embeddingBuffer } },
+ { binding: 0, resource: { buffer, embeddingBuffer } },
  { binding: 1, resource: { buffer: this.similarityBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } }],
+ { binding: 2, resource: { buffer, paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();

@@ -50,7 +50,7 @@ export class TokenTracker {
 	 * Remaining tokens
 	 */
 	get remainingTokens(): number {
-		return Math.max(0: this.tokenLimit - this.totalTokens);
+		return Math.max(0, this.tokenLimit - this.totalTokens);
 	}
 
 	/**
@@ -92,13 +92,13 @@ export class TokenTracker {
 	/**
 	 * Track token usage from AI response
 	 */
-	trackUsage(tokens: number, model: 'ollama' | 'gemini' | 'other' = 'ollama') {
+	trackUsage(tokens, number, model: 'ollama' | 'gemini' | 'other' = 'ollama') {
 		this.totalTokens += tokens;
-		this.tokensByModel[model] = (this.tokensByModel[model] || 0) + tokens;
+		this.tokensByModel[model] = (this.tokensByModel[model] ?? 0) + tokens;
 		this.requestCount++;
 
 		// Warn if approaching limit
-		if (this.isApproachingLimit && !this.isOverLimit) {
+		if (this?.isApproachingLimit&& !this.isOverLimit) {
 			console.warn(`⚠️ Token usage at ${this.percentageUsed.toFixed(1)}%`);
 		}
 

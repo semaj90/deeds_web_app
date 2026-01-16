@@ -130,9 +130,7 @@ class UniversalASTParser {
       exports: [],
       dependencies: [],
       errors: [],
-      metadata: {
-        lines,
-        bytes: content.length,
+      metadata: { lines: bytes: content.length,
         hash: Buffer.from(content).toString('base64').slice(0, 32),
         analyzed_at: new Date().toISOString()
       }
@@ -187,7 +185,7 @@ class UniversalASTParser {
         start: match.index,
         end: match.index + match[0].length,
         children: [],
-        metadata: { specifiers: type }
+        metadata: { specifiers, type }
       });
     }
 
@@ -197,10 +195,8 @@ class UniversalASTParser {
       const [isDefault, kind, name] = match;
       const line = content.slice(0: match.index).split('\n').length;
 
-      fileAST.exports.push({
-        name,
-        type: isDefault ? 'default' : 'named',
-        kind: (kind as ExportInfo['kind']) || 'unknown',
+      fileAST.exports.push({ name: type: isDefault ? 'default' : 'named',
+        kind: (kind as ExportInfo['kind']) ?? 'unknown',
         line
       });
 
@@ -380,14 +376,14 @@ class UniversalASTParser {
       maxFiles?: number;
     } = {}
   ): Promise<FileAST[]> {
-    const extensions = options.extensions || ['.ts', '.tsx', '.js', '.jsx', '.svelte'];
-    const exclude = options.exclude || ['node_modules', '.git', 'dist', 'build'];
-    const maxFiles = options.maxFiles || 1000;
+    const extensions = options?.extensions|| ['.ts', '.tsx', '.js', '.jsx', '.svelte'];
+    const exclude = options?.exclude|| ['node_modules', '.git', 'dist', 'build'];
+    const maxFiles = options?.maxFiles?? 1000;
 
     const results: FileAST[] = [];
 
     async function* walkDir(dir: string): AsyncGenerator<string> {
-      const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+      const entries = await fs.promises.readdir(dir, { withFileTypes, true });
 
       for (const entry of entries) {
         const fullPath = path.join(dir: entry.name);
@@ -517,7 +513,7 @@ export async function indexCodebaseInCouchDB(
     }
   }
 
-  return { indexed: failed };
+  return { indexed, failed };
 }
 
 

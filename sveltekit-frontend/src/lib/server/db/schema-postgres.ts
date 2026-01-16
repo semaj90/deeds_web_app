@@ -217,9 +217,9 @@ export const cases = pgTable(
  clientName: varchar('client_name', { length: 200 }),
  opposingParty: varchar('opposing_party', { length: 200 }),
  assignedAttorney: uuid('assigned_attorney'), // Foreign key to users.id
- filingDate: timestamp('filing_date', { withTimezone: true }),
- dueDate: timestamp('due_date', { withTimezone: true }),
- closedDate: timestamp('closed_date', { withTimezone: true }),
+ filingDate: timestamp('filing_date', { withTimezone, true }),
+ dueDate: timestamp('due_date', { withTimezone, true }),
+ closedDate: timestamp('closed_date', { withTimezone, true }),
  qdrantId: uuid('qdrant_id'),
  qdrantCollection: varchar('qdrant_collection', { length: 100 }),
  metadata: jsonb('metadata'),
@@ -306,6 +306,7 @@ export const evidence = pgTable('evidence', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'), // Foreign key to cases.id
+ userId: uuid('user_id'), // Foreign key to users.id - owner of the evidence
  title: varchar('title', { length: 255 }).notNull(),
  description: text('description'),
  // OLD COLUMNS (preserve existing data)
@@ -314,11 +315,11 @@ export const evidence = pgTable('evidence', {
  fileSize: integer('file_size'),
  hash: varchar('hash', { length: 255 }),
  source: varchar('source', { length: 255 }),
- dateObtained: timestamp('date_obtained', { withTimezone: true }),
+ dateObtained: timestamp('date_obtained', { withTimezone, true }),
  chainOfCustody: jsonb('chain_of_custody'),
  metadata: jsonb('metadata'),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  // NEW COLUMNS (for enhanced functionality - graceful fallback if null)
  criminalId: uuid('criminal_id'), // Foreign key to criminals.id
  evidenceType: evidenceTypeEnum('evidence_type'), // Optional enum
@@ -387,8 +388,8 @@ export const documents = pgTable('documents', {
  summary: text('summary'),
  embeddingId: varchar('embedding_id', { length: 255 }),
  metadata: jsonb('metadata'),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  status: varchar('status', { length: 50 }).default('pending'),
  // NEW COLUMNS (for S3/MinIO integration - graceful fallback if null)
  s3Key: text('s3_key'),
@@ -1004,7 +1005,7 @@ export const statuteChunks = pgTable(
  chunkIndex: integer('chunk_index').notNull(),
  content: text('content').notNull(),
  embedding: text('embedding'), // pgvector stored as text (768 dimensions)
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1330,10 +1331,10 @@ export const evidenceBoardConnections = pgTable(
  strength: real('strength').default(1.0), // 0.0 to 1.0 confidence
  isVisible: boolean('is_visible').default(true),
  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
+ updatedAt: timestamp('updated_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1364,10 +1365,10 @@ export const caseNotes = pgTable(
  isAI: boolean('is_ai').default(false),
  isPinned: boolean('is_pinned').default(false),
  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
+ updatedAt: timestamp('updated_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1393,7 +1394,7 @@ export const caseNoteEvidenceRefs = pgTable(
  evidenceId: uuid('evidence_id')
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1417,10 +1418,10 @@ export const workspaces = pgTable(
  description: text('description'),
  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }),
  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
+ updatedAt: timestamp('updated_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1444,7 +1445,7 @@ export const workspaceSessions = pgTable(
  sessionId: uuid('session_id')
  .notNull()
  .references(() => ragSessions.id, { onDelete: 'cascade' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1470,7 +1471,7 @@ export const workspaceEvidence = pgTable(
  .references(() => evidence.id, { onDelete: 'cascade' }),
  relevanceScore: real('relevance_score').default(0),
  addedBy: varchar('added_by', { length: 50 }).default('user'), // 'system', 'user'
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1495,7 +1496,7 @@ export const workspaceStatutes = pgTable(
  statuteText: text('statute_text'), // Fallback if statute not in DB
  relevanceScore: real('relevance_score').default(0),
  source: varchar('source', { length: 50 }).default('user'), // 'ai', 'user', 'citation'
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1520,10 +1521,10 @@ export const workspaceNotes = pgTable(
  isAI: boolean('is_ai').default(false),
  embedding: text('embedding'), // pgvector stored as text (768 dimensions)
  createdBy: integer('created_by').references(() => users.id, { onDelete: 'set null' }),
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true })
+ updatedAt: timestamp('updated_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1548,7 +1549,7 @@ export const workspaceCitations = pgTable(
  citationText: text('citation_text').notNull(), // e.g., "Penal Code 187(a)"
  citationURL: text('citation_url'),
  citationType: varchar('citation_type', { length: 50 }).default('statute'), // 'statute', 'case', 'regulation', 'precedent'
- createdAt: timestamp('created_at', { withTimezone: true })
+ createdAt: timestamp('created_at', { withTimezone, true })
  .default(sql`now()`)
  .notNull(),
  },
@@ -1739,13 +1740,13 @@ export const yorhaCases = pgTable(
  priority: varchar('priority', { length: 20 }).default('medium').notNull(),
  case_type: varchar('case_type', { length: 100 }),
  jurisdiction: varchar('jurisdiction', { length: 200 }),
- filed_date: timestamp('filed_date', { withTimezone: true }),
- closed_date: timestamp('closed_date', { withTimezone: true }),
+ filed_date: timestamp('filed_date', { withTimezone, true }),
+ closed_date: timestamp('closed_date', { withTimezone, true }),
  created_by: uuid('created_by').notNull(),
  assigned_to: uuid('assigned_to'),
  metadata: jsonb('metadata'),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_number_idx: index('yorha_cases_case_number_idx').on(table.case_number),
@@ -1770,7 +1771,7 @@ export const yorhaEvidenceNodes = pgTable(
  color: varchar('color', { length: 20 }).default('blue'),
  icon: varchar('icon', { length: 100 }),
  source: varchar('source', { length: 500 }),
- date_collected: timestamp('date_collected', { withTimezone: true }),
+ date_collected: timestamp('date_collected', { withTimezone, true }),
  relevance_score: integer('relevance_score').default(0),
  file_path: varchar('file_path', { length: 1000 }),
  file_type: varchar('file_type', { length: 100 }),
@@ -1780,8 +1781,8 @@ export const yorhaEvidenceNodes = pgTable(
  key_entities: jsonb('key_entities'),
  status: varchar('status', { length: 50 }).default('active').notNull(),
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_nodes_case_id_idx').on(table.case_id),
@@ -1806,8 +1807,8 @@ export const yorhaEvidenceConnections = pgTable(
  ai_reasoning: text('ai_reasoning'),
  confidence_score: integer('confidence_score').default(0),
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_connections_case_id_idx').on(table.case_id),
@@ -1831,9 +1832,9 @@ export const yorhaChatSessions = pgTable(
  context_id: uuid('context_id'),
  status: varchar('status', { length: 50 }).default('active').notNull(),
  message_count: integer('message_count').default(0),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- last_message_at: timestamp('last_message_at', { withTimezone: true }),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ last_message_at: timestamp('last_message_at', { withTimezone, true }),
  },
  (table) => ({
  case_id_idx: index('yorha_chat_sessions_case_id_idx').on(table.case_id),
@@ -1856,8 +1857,8 @@ export const yorhaChatMessages = pgTable(
  referenced_evidence: jsonb('referenced_evidence'),
  model_used: varchar('model_used', { length: 100 }),
  tokens_used: integer('tokens_used'),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  session_id_idx: index('yorha_chat_messages_session_id_idx').on(table.session_id),
@@ -1889,7 +1890,7 @@ export const yorhaSystemMetrics = pgTable(
  system_health: varchar('system_health', { length: 50 }).default('healthy'),
  active_cases: integer('active_cases').default(0),
  active_sessions: integer('active_sessions').default(0),
- recorded_at: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
+ recorded_at: timestamp('recorded_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  recorded_at_idx: index('yorha_system_metrics_recorded_at_idx').on(table.recorded_at),

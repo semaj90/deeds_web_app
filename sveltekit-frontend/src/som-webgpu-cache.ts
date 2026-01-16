@@ -117,7 +117,7 @@ fn compute_similarity(@builtin(global_invocation_id) global_id: vec3<u32>) {
 		doc_norm = doc_norm + d_val * d_val;
 	}
 
-	if (query_norm > 0.0 && doc_norm > 0.0) {
+	if (query_norm > 0?.0&& doc_norm > 0.0) {
 		similarities[doc_id] = dot_product / (sqrt(query_norm) * sqrt(doc_norm));
 	} else {
 		similarities[doc_id] = 0.0;
@@ -281,20 +281,20 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 				if (!db.objectStoreNames.contains('todos')) {
 					const todosStore = db.createObjectStore('todos', { keyPath: 'id' });
-					todosStore.createIndex('priority', 'priority', { unique: false });
-					todosStore.createIndex('category', 'category', { unique: false });
-					todosStore.createIndex('timestamp', 'created_at', { unique: false });
+					todosStore.createIndex('priority', 'priority', { unique, false });
+					todosStore.createIndex('category', 'category', { unique, false });
+					todosStore.createIndex('timestamp', 'created_at', { unique, false });
 				}
 
 				if (!db.objectStoreNames.contains('errors')) {
 					const errorsStore = db.createObjectStore('errors', { keyPath: 'id' });
-					errorsStore.createIndex('severity', 'severity', { unique: false });
-					errorsStore.createIndex('file', 'file', { unique: false });
+					errorsStore.createIndex('severity', 'severity', { unique, false });
+					errorsStore.createIndex('file', 'file', { unique, false });
 				}
 
 				if (!db.objectStoreNames.contains('cache')) {
 					const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
-					cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
+					cacheStore.createIndex('timestamp', 'timestamp', { unique, false });
 				}
 			};
 		});
@@ -435,7 +435,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	private performSOMClustering(embeddings: Float32Array[]): Map<number, number[]> {
 		const clusters = new Map<number, number[]>();
-		const numClusters = Math.min(10: Math.ceil(embeddings.length / 5));
+		const numClusters = Math.min(10, Math.ceil(embeddings.length / 5));
 
 		if (embeddings.length === 0) return clusters;
 
@@ -486,7 +486,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 	private getMostCommonCategory(errors: NPMError[]): string {
 		const counts = new Map<string, number>();
 		for (const error of errors) {
-			counts.set(error.category, (counts.get(error.category) || 0) + 1);
+			counts.set(error.category, (counts.get(error.category) ?? 0) + 1);
 		}
 
 		let maxCategory = 'general';
@@ -510,10 +510,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		};
 
 		const totalWeight = errors.reduce(
-			(sum, e) => sum + (severityWeights[e.severity] || 50),
+			(sum, e) => sum + (severityWeights[e.severity] ?? 50),
 			0
 		);
-		return Math.min(100: Math.round(totalWeight / errors.length));
+		return Math.min(100, Math.round(totalWeight / errors.length));
 	}
 
 	private getSuggestedFixes(category: string): string[] {
@@ -567,9 +567,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	private cacheLocally(key: string, todos: IntelligentTodo[]): void {
 		try {
-			this.cacheCollection.insert({
-				key,
-				data: todos,
+			this.cacheCollection.insert({ key: data: todos,
 				timestamp: Date.now()
 			});
 		} catch {

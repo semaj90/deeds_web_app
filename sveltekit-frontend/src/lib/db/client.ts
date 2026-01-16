@@ -19,11 +19,11 @@ function buildConnectionString() {
 
  if (!url) {
  // Build from individual components
- const host = pickEnv('DB_HOST', 'POSTGRES_HOST', 'PGHOST') || 'localhost';
- const port = pickEnv('DB_PORT', 'POSTGRES_PORT', 'PGPORT') || '5434';
- const user = pickEnv('DB_USER', 'POSTGRES_USER', 'PGUSER') || 'legal_admin';
- const pass = pickEnv('DB_PASSWORD', 'POSTGRES_PASSWORD', 'PGPASSWORD') || '123456';
- const name = pickEnv('DB_NAME', 'POSTGRES_DB', 'PGDATABASE') || 'legal_ai_db';
+ const host = pickEnv('DB_HOST', 'POSTGRES_HOST', 'PGHOST') ?? 'localhost';
+ const port = pickEnv('DB_PORT', 'POSTGRES_PORT', 'PGPORT') ?? '5434';
+ const user = pickEnv('DB_USER', 'POSTGRES_USER', 'PGUSER') ?? 'legal_admin';
+ const pass = pickEnv('DB_PASSWORD', 'POSTGRES_PASSWORD', 'PGPASSWORD') ?? '123456';
+ const name = pickEnv('DB_NAME', 'POSTGRES_DB', 'PGDATABASE') ?? 'legal_ai_db';
 
  url = `postgres://${user}:${pass}@${host}:${port}/${name}`;
  }

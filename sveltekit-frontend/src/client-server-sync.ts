@@ -118,7 +118,7 @@ export class ClientServerSyncService {
   get canSync() {
     return derived(
       this.syncStatus,
-      ($status) => $status.isOnline && $status.pendingOperations < 100
+      ($status) => $status?.isOnline&& $status.pendingOperations < 100
     );
   }
 
@@ -132,7 +132,7 @@ export class ClientServerSyncService {
   async performHybridVectorSearch(
     query: string, options: VectorSearchOptions = {}
   ): Promise<VectorSearchResult[]> {
-    const queryHash = LegalDBUtils.createHash(JSON.stringify({ query: options }));
+    const queryHash = LegalDBUtils.createHash(JSON.stringify({ query, options }));
 
     // Check client cache first
     if (this.config.enableClientSideCache) {
@@ -188,9 +188,7 @@ export class ClientServerSyncService {
     const response = await fetch('/api/vector/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query,
-        options: {
+      body: JSON.stringify({ query: options: {
           ...options,
           userId: this.clientId,
           includeEmbeddings: false
@@ -203,7 +201,7 @@ export class ClientServerSyncService {
     }
 
     const data = (await response.json()) as { results?: VectorSearchResult[] };
-    return data.results || [];
+    return data?.results|| [];
   }
 
   /**
@@ -243,7 +241,7 @@ export class ClientServerSyncService {
       result?: { processingTime?: number; memoryUsed?: number; vector?: number[] };
     };
 
-    if (data.success && data.result) {
+    if (data?.success&& data.result) {
       return this.convertCUDAResultsToVectorSearch(data.result, query, options);
     }
 
@@ -262,8 +260,8 @@ export class ClientServerSyncService {
         id: `cuda_result_${Date.now()}`,
         content: `GPU-accelerated legal analysis for: "${query}" - Enhanced RAG with RTX 3060 Ti acceleration`,
         metadata: { source: 'cuda_worker',
-          processingTime: cudaResult.processingTime || 0,
-          memoryUsed: cudaResult.memoryUsed || 0,
+          processingTime: cudaResult?.processingTime?? 0,
+          memoryUsed: cudaResult?.memoryUsed?? 0,
           gpu_accelerated: true,
           rtx_3060_ti: true,
           legal_domain: true,
@@ -274,18 +272,18 @@ export class ClientServerSyncService {
       }
     ];
 
-    if (cudaResult.vector && cudaResult.vector.length > 1) {
-      for (let i = 1; i < Math.min(5: cudaResult.vector.length / 10); i++) {
+    if (cudaResult?.vector&& cudaResult.vector.length > 1) {
+      for (let i = 1; i < Math.min(5, cudaResult.vector.length / 10); i++) {
         mockResults.push({
           id: `cuda_result_${Date.now()}_${i}`,
           content: `Related legal document ${i}: GPU-processed legal precedent analysis`,
           metadata: { source: 'cuda_worker',
-            confidence: 0.8 + (cudaResult.vector[i * 10] || 0) * 0.1,
+            confidence: 0.8 + (cudaResult.vector[i * 10] ?? 0) * 0.1,
             gpu_accelerated: true,
             rank: i + 1
           },
-          similarity: 0.8 + (cudaResult.vector[i * 10] || 0) * 0.1,
-          rank: cudaResult.vector[i * 10] || 0.9 - i * 0.1
+          similarity: 0.8 + (cudaResult.vector[i * 10] ?? 0) * 0.1,
+          rank: cudaResult.vector[i * 10] ?? 0.9 - i * 0.1
         });
       }
     }
@@ -317,9 +315,9 @@ export class ClientServerSyncService {
         },
         sourceType: 'document',
         chunkIndex: 0,
-        rank: options.lodLevel || 1
+        rank: options?.lodLevel?? 1
       }))
-      .slice(0: options.limit || 20);
+      .slice(0: options?.limit?? 20);
 
     return results;
   }
@@ -329,7 +327,7 @@ export class ClientServerSyncService {
    */
   private async getCachedVectorSearch(queryHash: string): Promise<VectorSearchCache | null> {
     try {
-      return (await legalDB.vectorSearchCache.where('queryHash').equals(queryHash).first()) || null;
+      return (await legalDB.vectorSearchCache.where('queryHash').equals(queryHash).first()) ?? null;
     } catch (error: Error | unknown) {
       console.warn('[Sync Service] Failed to get cached search, ', error);
       return null;
@@ -393,7 +391,7 @@ export class ClientServerSyncService {
       type: 'create',
       table: 'evidence',
       data: { title: doc.title,
-        description: doc.metadata.aiSummary || 'Document processed on client',
+        description: doc.metadata?.aiSummary?? 'Document processed on client',
         content: doc.content,
         file_type: doc.contentType,
         evidence_type: 'document',
@@ -442,7 +440,7 @@ export class ClientServerSyncService {
   /**
    * Process document from server
    */
-  private async processServerDocument(serverDoc, Record<string, unknown>): Promise<void> {
+  private async processServerDocument(serverDoc: Record<string, unknown>): Promise<void> {
     const existingDoc = await legalDB.documentCache
       .where('documentId')
       .equals(serverDoc.id as string)
@@ -458,8 +456,8 @@ export class ClientServerSyncService {
         documentId: serverDoc.id as string,
         hash: LegalDBUtils.createHash(JSON.stringify(serverDoc)),
         title: serverDoc.title as string,
-        content: (serverDoc.description as string) || '',
-        contentType: (serverDoc.file_type as string) || 'text',
+        content: (serverDoc.description as string) ?? '',
+        contentType: (serverDoc.file_type as string) ?? 'text',
         fileSize: (serverDoc.content as string)?.length ?? 0,
         lastAccessed: new Date(),
         metadata: { aiSummary: (serverDoc.ai_analysis as Record<string, unknown>)?.summary as string,
@@ -631,16 +629,16 @@ export class ClientServerSyncService {
    */
   private initializeEventListeners(), void {
     window.addEventListener('online', () => {
-      this.updateSyncStatus({ isOnline: true });
+      this.updateSyncStatus({ isOnline, true });
       this.processSyncQueue().catch(console.error);
     });
 
     window.addEventListener('offline', () => {
-      this.updateSyncStatus({ isOnline: false });
+      this.updateSyncStatus({ isOnline, false });
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && get(this.syncStatus).isOnline) {
+      if (!document?.hidden&& get(this.syncStatus).isOnline) {
         this.processSyncQueue().catch(console.error);
       }
     });
@@ -660,7 +658,7 @@ export class ClientServerSyncService {
   /**
    * Update sync status
    */
-  private updateSyncStatus(updates, Partial<SyncStatus>): void {
+  private updateSyncStatus(updates: Partial<SyncStatus>): void {
     this.syncStatus.update((status) => ({ ...status, ...updates }));
   }
 

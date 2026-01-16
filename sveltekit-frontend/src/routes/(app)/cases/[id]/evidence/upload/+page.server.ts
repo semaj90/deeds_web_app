@@ -4,7 +4,7 @@ import db from '$lib/server/db';
 import { yorhaCases } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params: locals }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
  if (!locals.user) {
  throw redirect(302, '/auth/login');
  }

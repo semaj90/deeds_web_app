@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  }
 
  // Validate required fields
- if (!body.tool || !body.code || !body.message || !body.severity) {
+ if (!body?.tool|| !body?.code|| !body?.message|| !body.severity) {
  return json(
  {
  error: 'Missing required fields: tool, code, message, severity',
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  // Update route status if changed
  if (route.status !== newStatus) {
- await updateRouteMetadata(routeId, { status: newStatus });
+ await updateRouteMetadata(routeId, { status, newStatus });
   
  await createHealthEvent({
  routeId: oldStatus: route.status,
@@ -113,12 +113,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
  }
 
  // Parse pagination parameters
- const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
- const offset = parseInt(url.searchParams.get('offset') || '0');
+ const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
  const resolved = url.searchParams.get('resolved');
 
  // Get error clusters
- const errors = await getErrorClusters(routeId, { limit: offset });
+ const errors = await getErrorClusters(routeId, { limit, offset });
   
  let filtered = errors;
  if (resolved === 'true') {

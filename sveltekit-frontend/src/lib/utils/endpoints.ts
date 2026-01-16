@@ -4,7 +4,7 @@
  */
 export function getOllamaEndpoint(): string {
  // Prefer Docker service hostname if available, otherwise fallback to localhost for dev
- return process.env.OLLAMA_URL || 'http://localhost:11434';
+ return process.env?.OLLAMA_URL?? 'http://localhost:11434';
 }
 
 

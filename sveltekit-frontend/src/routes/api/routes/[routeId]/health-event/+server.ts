@@ -56,21 +56,17 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Create health event
-    const healthEventData: NewRouteHealthEvent = {
-      routeId,
-      oldStatus: old_status || route.status || 'unknown',
-      newStatus: new_status || null,
+    const healthEventData: NewRouteHealthEvent = { routeId: oldStatus: old_status || route?.status?? 'unknown',
+      newStatus: new_status ?? null,
     };
 
     const healthEvent = await createHealthEvent(healthEventData);
 
     // Broadcast to all connected SSE clients (Task 10.2)
-    broadcastHealthChange({
-      routeId,
-      oldStatus: healthEventData.oldStatus,
+    broadcastHealthChange({ routeId: oldStatus: healthEventData.oldStatus,
       newStatus: healthEventData.newStatus,
       timestamp: new Date().toISOString(),
-      reason: healthEventData.reason || undefined,
+      reason: healthEventData?.reason?? undefined,
     });
 
     return json(healthEvent, { status: 201 });
@@ -98,8 +94,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
   try {
     // Parse query parameters
-    const limit = parseInt(url.searchParams.get('limit') || '50');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const limit = parseInt(url.searchParams.get('limit') ?? '50');
+    const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
     // Validate route exists
     const route = await getRouteMetadata(routeId);
@@ -110,7 +106,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
 
     // Get health events
-    const result = await getHealthEvents(routeId, { limit: offset });
+    const result = await getHealthEvents(routeId, { limit, offset });
 
     return json({
       events: result.events,

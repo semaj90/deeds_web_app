@@ -10,7 +10,7 @@ export async function POST({ request }) {
  }
 
  // Get the TensorRT-LLM service endpoint
- const trtEndpoint = env.TRT_LLM_ENDPOINT || 'http://localhost:8090';
+ const trtEndpoint = env?.TRT_LLM_ENDPOINT?? 'http://localhost:8090';
 
  // Create WebSocket connection for streaming
  const wsUrl = trtEndpoint.replace('http', 'ws') + '/generate/stream';
@@ -76,7 +76,7 @@ export async function POST({ request }) {
  });
  } catch (err) {
  console.error('TRT-LLM streaming API error:', err);
- throw error(500: err.message || 'Internal server error');
+ throw error(500, err?.message?? 'Internal server error');
  }
 }
 

@@ -52,7 +52,7 @@ type CaseManagementEvent =
 // Machine Services (MCP Tool Calls) - XState v5 pattern
 const caseManagementServices = {
 	loadCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const caseId = event.caseId ?? context.selectedCaseId;
 		if (!caseId) throw new Error('No case ID provided');
 		const response = await fetch('/api/v1/mcp/call', {
@@ -68,7 +68,7 @@ const caseManagementServices = {
 		return await response.json();
 	},
 	createCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -83,7 +83,7 @@ const caseManagementServices = {
 		return await response.json();
 	},
 	updateCase: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -97,7 +97,7 @@ const caseManagementServices = {
 		return await response.json();
 	},
 	addEvidence: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -111,12 +111,12 @@ const caseManagementServices = {
 		return await response.json();
 	},
 	searchCases: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ tool: 'cases.searchCases',
-				args: { query: event.query || context.searchQuery,
+				args: { query: event?.query|| context.searchQuery,
 					userId: context.userId,
 					filters: context.filters,
 				},
@@ -128,12 +128,12 @@ const caseManagementServices = {
 		return await response.json();
 	},
 	loadUserCases: async ({ input }: { input: { context: CaseManagementContext; event: any } }) => {
-		const { context: event } = input;
+		const { context, event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ tool: 'cases.getUserCases',
-				args: { userId: event.userId || context.userId,
+				args: { userId: event?.userId|| context.userId,
 					options: { limit: context.pagination.limit,
 						offset: (context.pagination.page - 1) * context.pagination.limit,
 						status: context.filters.status,
@@ -195,7 +195,7 @@ export const caseManagementMachine: any = setup({
 					}),
 				},
 				CLEAR_ERROR: { target: 'idle',
-					actions: assign({ error: null }),
+					actions: assign({ error, null }),
 				},
 			},
 		},
@@ -228,7 +228,7 @@ export const caseManagementMachine: any = setup({
 					},
 					{
 						target: 'idle',
-						actions: assign({ error: ({ event }) => event.output.error || 'Failed to create case',
+						actions: assign({ error: ({ event }) => event.output?.error?? 'Failed to create case',
 							isLoading: false,
 						}),
 					}],
@@ -251,7 +251,7 @@ export const caseManagementMachine: any = setup({
 					},
 					{
 						target: 'idle',
-						actions: assign({ error: ({ event }) => event.output.error || 'Failed to update case',
+						actions: assign({ error: ({ event }) => event.output?.error?? 'Failed to update case',
 							isLoading: false,
 						}),
 					}],
@@ -274,7 +274,7 @@ export const caseManagementMachine: any = setup({
 					},
 					{
 						target: 'idle',
-						actions: assign({ error: ({ event }) => event.output.error || 'Failed to add evidence',
+						actions: assign({ error: ({ event }) => event.output?.error?? 'Failed to add evidence',
 							isLoading: false,
 						}),
 					}],
@@ -288,15 +288,15 @@ export const caseManagementMachine: any = setup({
 		searchingCases: { entry: assign({
 				isLoading: true,
 				error: null,
-				searchQuery: ({ event }) => event.query || '',
+				searchQuery: ({ event }) => event?.query?? '',
 			}),
 			invoke: { src: 'searchCases',
 				input: ({ context, event }) => ({ context, event }),
 				onDone: { target: 'idle',
-					actions: assign({ searchResults: ({ event }) => event.output.cases || [],
+					actions: assign({ searchResults: ({ event }) => event.output?.cases|| [],
 						pagination: ({ context, event }) => ({
 							...context.pagination,
-							totalCount: event.output.totalCount || 0,
+							totalCount: event.output?.totalCount?? 0,
 						}),
 						isLoading: false,
 					}),
@@ -313,10 +313,10 @@ export const caseManagementMachine: any = setup({
 			invoke: { src: 'loadUserCases',
 				input: ({ context, event }) => ({ context, event }),
 				onDone: { target: 'idle',
-					actions: assign({ cases: ({ event }) => event.output.cases || [],
+					actions: assign({ cases: ({ event }) => event.output?.cases|| [],
 						pagination: ({ context, event }) => ({
 							...context.pagination,
-							totalCount: event.output.totalCount || 0,
+							totalCount: event.output?.totalCount?? 0,
 						}),
 						isLoading: false,
 					}),
@@ -332,7 +332,7 @@ export const caseManagementMachine: any = setup({
 		error: { on: {
 				RETRY: 'idle',
 				CLEAR_ERROR: { target: 'idle',
-					actions: assign({ error: null }),
+					actions: assign({ error, null }),
 				},
 			},
 		},

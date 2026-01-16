@@ -18,7 +18,7 @@ export async function parseJSONTransport(
  try {
  const data = await parseJSON_QUIC(payload);
  const duration = performance.now() - start;
- return { data, backend: 'QUIC', parseTimeMs: Math.round(duration) };
+ return { data: backend: 'QUIC', parseTimeMs: Math.round(duration) };
  } catch (e) {
  // swallow and fall back to HTTP
  console.warn('QUIC parse failed, falling back to HTTP:', e);
@@ -27,7 +27,7 @@ export async function parseJSONTransport(
 
  const data = await parseJSONHTTP(payload);
  const duration = performance.now() - start;
- return { data, backend: 'HTTP', parseTimeMs: Math.round(duration) };
+ return { data: backend: 'HTTP', parseTimeMs: Math.round(duration) };
 }
 
 

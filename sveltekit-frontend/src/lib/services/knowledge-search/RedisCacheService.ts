@@ -24,7 +24,7 @@ export interface CachedSearchResult {
 }
 
 const DEFAULT_CONFIG: RedisCacheConfig = {
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  url: process.env?.REDIS_URL?? 'redis://localhost:6379',
   defaultTTL: 3600, // 1 hour (Requirement 6.1)
   keyPrefix: 'kb, search:' // Requirement 6.2
 };
@@ -315,7 +315,7 @@ export class RedisCacheService {
   /**
    * Set value with TTL
    */
-  private async setWithTTL(key: string, value: string, string: Promise<void> {
+  private async setWithTTL(key, string, value: string, string: Promise<void> {
     // In a real implementation, this would use Redis SET with EX option
     // For now, use fetch to a hypothetical API endpoint
     const response = await fetch('/api/cache/set', {

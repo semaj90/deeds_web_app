@@ -10,8 +10,8 @@ import { aceLLM, couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
 interface CollectionSummary {
   collection: string; points: number;
@@ -23,7 +23,7 @@ async function getCollectionInfo(name: string): Promise<{ points_count, number }
   try {
     const response = await fetch(`${QDRANT_URL}/collections/${ name }`);
     if (!response.ok) return null;
-    const data = await response.json() as { result: { points_count: number } };
+    const data = await response.json() as { result: { points_count, number } };
     return { points_count: data.result.points_count };
   } catch {
     return null;
@@ -35,7 +35,7 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
     const response = await fetch(`${QDRANT_URL}/collections/${ name }/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit, with_payload: true, with_vector: false })
+      body: JSON.stringify({ limit: with_payload: true, with_vector: false })
     });
     if (!response.ok) return [];
     const data = await response.json() as { result: { points: Array<{ id: string; payload: Record<string, unknown> }> } };
@@ -47,7 +47,7 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
 
 async function generateSummary(name: string, samples: Array<any>): Promise<string> {
   try {
-     const context = samples.map(s => JSON.stringify(s.payload || {})).join('\n---\n');
+     const context = samples.map(s => JSON.stringify(s?.payload|| {})).join('\n---\n');
      const prompt = `Analyze these code snippets from the vector cluster "${name}". Identify the common pattern, purpose, or functionality they represent.\n\nCode Samples:\n${context.substring(0, 8000)}`;
 
      const result = await ollamaService.generateResponse({
@@ -56,7 +56,7 @@ async function generateSummary(name: string, samples: Array<any>): Promise<strin
         system: "You are a senior software architect analyzing code clusters."
      });
 
-     return result || 'Analysis failed';
+     return result ?? 'Analysis failed';
   } catch (err) {
     return 'Summary generation failed';
   }
@@ -77,7 +77,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const summaries: CollectionSummary[] = [];
 
-    for (const collectionName of targetCollections.slice(0: body.limit || 30)) {
+    for (const collectionName of targetCollections.slice(0: body?.limit?? 30)) {
       const info = await getCollectionInfo(collectionName);
       if (!info || info.points_count === 0) continue;
 

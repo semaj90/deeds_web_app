@@ -97,7 +97,7 @@ function buildBadges(route: Phase72RouteNode): RouteUiBadge[] {
  badges.push({ type: 'shield', label: 'Shield' });
  }
 
- if (route.errorCount && route.errorCount > 0) {
+ if (route?.errorCount&& route.errorCount > 0) {
  badges.push({ type: 'error', label: `${route.errorCount} errors` });
  }
 

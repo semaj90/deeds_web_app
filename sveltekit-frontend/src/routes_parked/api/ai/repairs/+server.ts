@@ -10,7 +10,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import type { QdrantClient } from '@qdrant/js-client-rest';
 
-const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const COLLECTION_NAME = 'ai_repair_suggestions';
 
 interface RepairSuggestion {
@@ -26,21 +26,19 @@ export const GET: RequestHandler = async ({ url }) => {
  try {
  const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
   
- const status = url.searchParams.get('status') || 'pending';
- const limit = parseInt(url.searchParams.get('limit') || '50', 10);
- const minConfidence = parseFloat(url.searchParams.get('min_confidence') || '0.5');
+ const status = url.searchParams.get('status') ?? 'pending';
+ const limit = parseInt(url.searchParams.get('limit') ?? '50', 10);
+ const minConfidence = parseFloat(url.searchParams.get('min_confidence') ?? '0.5');
 
  // Query Qdrant for repair suggestions
- const searchResult = await qdrant.scroll(COLLECTION_NAME, {
- limit,
- filter: { must: [
+ const searchResult = await qdrant.scroll(COLLECTION_NAME, { limit: filter: { must: [
  {
  key: 'status',
- match: { value: status },
+ match: { value, status },
  },
  {
  key: 'confidence',
- range: { gte: minConfidence },
+ range: { gte, minConfidence },
  }],
  },
  with_payload: true, with_vector: false, fromCache: false,

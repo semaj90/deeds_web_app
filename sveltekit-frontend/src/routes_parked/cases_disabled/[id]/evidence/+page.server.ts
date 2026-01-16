@@ -5,7 +5,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { evidenceUploadSchema } from '$lib/schemas/evidence';
 
-export const load: PageServerLoad = async ({ params: locals }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
  const caseId = params.id as string;
@@ -45,9 +45,7 @@ export const load: PageServerLoad = async ({ params: locals }) => {
  };
  } catch (err) {
  console.error('Failed to load evidence:', err);
- return {
- caseId,
- evidence: [],
+ return { caseId: evidence: [],
  recentChat: [],
  form: await superValidate(zod(evidenceUploadSchema)),
  };
@@ -95,11 +93,11 @@ export const actions: Actions = {
  return { form: success, true: evidenceId };
  } catch (err) {
  console.error('Upload failed:', err);
- return fail(500, { form, message: 'Upload failed' });
+ return fail(500, { form: message: 'Upload failed' });
  }
  },
 
- delete: async ({ request: locals }) => {
+ delete: async ({ request, locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
 
@@ -116,7 +114,7 @@ export const actions: Actions = {
  WHERE id = ${evidenceId}
  `;
 
- return { success: true };
+ return { success, true };
  } catch (err) {
  console.error('Delete failed:', err);
  return fail(500, { message: 'Delete failed' });
@@ -160,7 +158,7 @@ export const actions: Actions = {
  const result = await response.json();
 
  // Link evidence citations to chat turn
- if (result.turnId && result.citations && result.citations.length > 0) {
+ if (result?.turnId&& result?.citations&& result.citations.length > 0) {
  for (const citation of result.citations) {
  try {
  await sql`
@@ -176,10 +174,10 @@ export const actions: Actions = {
 
  return {
  success: true,
- chatResult: {answer: result.answer: result.keywords || [],
- keyPhrases: result.keyPhrases || [],
- suggestions: result.suggestions || [],
- latencyMs: result.latencyMs || 0: citations: result.citations || [],
+ chatResult: {answer: result.answer: result?.keywords|| [],
+ keyPhrases: result?.keyPhrases|| [],
+ suggestions: result?.suggestions|| [],
+ latencyMs: result?.latencyMs?? 0: citations: result?.citations|| [],
  },
  };
  } catch (err) {

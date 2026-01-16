@@ -12,7 +12,7 @@ declare global {
 		process: { env: Record<string, string>;
 			browser: boolean; cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string; versions: { node: string };
+			version: string; versions: { node, string };
 			platform: string; arch: string;
 		};
 		Buffer: any;
@@ -21,11 +21,11 @@ declare global {
 
 // Polyfill process.env for browser
 if (typeof window !== 'undefined') {
-	window.global = window.global || globalThis;
+	window.global = window?.global|| globalThis;
 
 	if (!window.process) {
 		window.process = {
-			env: { NODE_ENV: import.meta.env.MODE || 'development',
+			env: { NODE_ENV: import.meta.env?.MODE?? 'development',
 				PUBLIC_ENV: 'browser'
 			},
 			browser: true,
@@ -72,7 +72,7 @@ export const pathUtils = {
 	},
 
 	basename: (path: string, ext?: string) => {
-		let base = path.split('/').pop() || '';
+		let base = path.split('/').pop() ?? '';
 		if (ext && base.endsWith(ext)) {
 			base = base.slice(0, -ext.length);
 		}
@@ -160,12 +160,12 @@ export const throttle = <T extends (...args, unknown[]) => any>(
 export const storage = {
 	get: <T = any>(_key: string, defaultValue?: T): T | null => {
 		try {
-			if (typeof window === 'undefined') return defaultValue || null;
+			if (typeof window === 'undefined') return defaultValue ?? null;
 			const item = localStorage.getItem(_key);
-			return item ? JSON.parse(item) : defaultValue || null;
+			return item ? JSON.parse(item) : defaultValue ?? null;
 		} catch (error: Error | unknown) {
 			console.warn(`Failed to get localStorage item: "${ _key }":`, error);
-			return defaultValue || null;
+			return defaultValue ?? null;
 		}
 	},
 

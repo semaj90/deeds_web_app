@@ -326,7 +326,7 @@ export class LearningPipeline {
 		Object.assign(this.config, config);
 
 		// Restart if running and interval changed
-		if (this.status.running && config.updateIntervalMs) {
+		if (this.status?.running&& config.updateIntervalMs) {
 			this.stop();
 			this.start();
 		}

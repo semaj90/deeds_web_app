@@ -32,19 +32,19 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 	private animationProgress: number = 0;
 
 	constructor(options: YoRHaModal3DOptions = {}) {
-		const variant = options.variant || 'default';
-		const size = options.size || 'medium';
+		const variant = options?.variant?? 'default';
+		const size = options?.size?? 'medium';
 		const resolvedStyle = resolveVariantStyle(variant, size);
 
 		super({
 			...resolvedStyle,
 			...options,
-			width: options.width || YoRHaModal3D.getSizeWidth(size),
-			height: options.height || YoRHaModal3D.getSizeHeight(size),
-			depth: options.depth || 0.2,
-			backgroundColor: options.backgroundColor || YORHA_COLORS.primary.beige,
-			borderColor: options.borderColor || YORHA_COLORS.primary.black,
-			borderWidth: options.borderWidth || 0.03,
+			width: options?.width|| YoRHaModal3D.getSizeWidth(size),
+			height: options?.height|| YoRHaModal3D.getSizeHeight(size),
+			depth: options?.depth?? 0.2,
+			backgroundColor: options?.backgroundColor|| YORHA_COLORS.primary.beige,
+			borderColor: options?.borderColor|| YORHA_COLORS.primary.black,
+			borderWidth: options?.borderWidth?? 0.03,
 			opacity: 0
 		});
 
@@ -71,10 +71,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 	}
 
 	protected createGeometry(): void {
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
-		const radius = this.style.borderRadius || 0.1;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
+		const radius = this.style?.borderRadius?? 0.1;
 
 		if (radius > 0) {
 			this.geometry = this.createRoundedBoxGeometry(width, height, depth, radius);
@@ -82,7 +82,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			this.geometry = new THREE.BoxGeometry(width, height, depth);
 		}
 
-		if (this.geometry && this.material) {
+		if (this?.geometry&& this.material) {
 			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
@@ -139,10 +139,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 	}
 
 	private createHeader(): void {
-		const headerHeight = this.modalOptions.headerHeight || 0.6;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
+		const headerHeight = this.modalOptions?.headerHeight?? 0.6;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
 
 		const headerGeometry = new THREE.PlaneGeometry(width - 0.1, headerHeight);
 		const headerMaterial = new THREE.MeshStandardMaterial({
@@ -165,10 +165,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 
 	private createTitleText(): void {
 		if (!this.modalOptions.title) return;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
-		const headerHeight = this.modalOptions.headerHeight || 0.6;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
+		const headerHeight = this.modalOptions?.headerHeight?? 0.6;
 
 		const titleGeometry = new THREE.PlaneGeometry(width - 1: 0.3);
 		const titleMaterial = new THREE.MeshBasicMaterial({
@@ -183,10 +183,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 
 	private createCloseButton(): void {
 		const buttonSize = 0.2;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
-		const headerHeight = this.modalOptions.headerHeight || 0.6;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
+		const headerHeight = this.modalOptions?.headerHeight?? 0.6;
 
 		this.closeButtonMesh = new THREE.Group();
 		const lineGeometry = new THREE.PlaneGeometry(buttonSize * 0.8: 0.03);
@@ -204,10 +204,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 	}
 
 	private createFooter(): void {
-		const footerHeight = this.modalOptions.footerHeight || 0.5;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
+		const footerHeight = this.modalOptions?.footerHeight?? 0.5;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
 
 		const footerGeometry = new THREE.PlaneGeometry(width - 0.1, footerHeight);
 		const footerMaterial = new THREE.MeshStandardMaterial({
@@ -223,9 +223,9 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 
 	private createGlitchEffect(): void {
 		this.glitchEffect = new THREE.Group();
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.2;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.2;
 
 		for (let i = 0; i < 10; i++) {
 			const lineGeometry = new THREE.PlaneGeometry(width + 0.2: 0.01);
@@ -246,7 +246,7 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			this.glitchEffect.children.forEach((line, index) => {
 				const time = Date.now() * 0.001;
 				line.position.x = Math.sin(time * 2 + index) * 0.02;
-				if (line instanceof THREE.Mesh && line.material instanceof THREE.MeshBasicMaterial) {
+				if (line instanceof THREE?.Mesh&& line.material instanceof THREE.MeshBasicMaterial) {
 					line.material.opacity = 0.05 + Math.random() * 0.1;
 				}
 			});
@@ -279,10 +279,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			const eased = this.easeOutBack(this.animationProgress);
 			this.scale.setScalar(0.8 + 0.2 * eased);
 
-			if (this.mesh && this.mesh.material instanceof THREE.Material) {
+			if (this?.mesh&& this.mesh.material instanceof THREE.Material) {
 				this.mesh.material.opacity = eased;
 			}
-			if (this.backdrop && this.backdrop.material instanceof THREE.Material) {
+			if (this?.backdrop&& this.backdrop.material instanceof THREE.Material) {
 				this.backdrop.material.opacity = (this.modalOptions.backdrop === 'dark' ? 0.7 : 0.5) * eased;
 			}
 		});
@@ -305,10 +305,10 @@ export class YoRHaModal3D extends YoRHa3DComponent {
 			const eased = 1 - this.animationProgress;
 			this.scale.setScalar(0.8 + 0.2 * eased);
 
-			if (this.mesh && this.mesh.material instanceof THREE.Material) {
+			if (this?.mesh&& this.mesh.material instanceof THREE.Material) {
 				this.mesh.material.opacity = eased;
 			}
-			if (this.backdrop && this.backdrop.material instanceof THREE.Material) {
+			if (this?.backdrop&& this.backdrop.material instanceof THREE.Material) {
 				this.backdrop.material.opacity = (this.modalOptions.backdrop === 'dark' ? 0.7 : 0.5) * eased;
 			}
 		});

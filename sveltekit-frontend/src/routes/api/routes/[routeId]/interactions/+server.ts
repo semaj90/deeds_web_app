@@ -54,11 +54,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Create interaction log
-    const interactionData: NewRouteInteractionLog = {
-      routeId,
-      interactionType: interaction_type,
-      userId: user_id || null,
-      metadata: metadata || null,
+    const interactionData: NewRouteInteractionLog = { routeId: interactionType: interaction_type,
+      userId: user_id ?? null,
+      metadata: metadata ?? null,
     };
 
     const interaction = await logInteraction(interactionData);
@@ -94,8 +92,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
   try {
     // Parse query parameters
-    const limit = parseInt(url.searchParams.get('limit') || '50');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const limit = parseInt(url.searchParams.get('limit') ?? '50');
+    const offset = parseInt(url.searchParams.get('offset') ?? '0');
     const includeArchived = url.searchParams.get('archived') === 'true';
 
     // Validate route exists
@@ -113,7 +111,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       const { getCombinedInteractions } = await import(
         '$lib/db/queries/nes-command-center-archive.js'
       );
-      result = await getCombinedInteractions(routeId, { limit: offset });
+      result = await getCombinedInteractions(routeId, { limit, offset });
 
       return json({
         interactions: result.data,
@@ -126,7 +124,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       });
     } else {
       // Query only main table
-      result = await getInteractions(routeId, { limit: offset });
+      result = await getInteractions(routeId, { limit, offset });
 
       return json({
         interactions: result.interactions,

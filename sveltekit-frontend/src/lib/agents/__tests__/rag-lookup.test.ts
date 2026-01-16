@@ -138,7 +138,7 @@ describe('RAG Lookup Tool - Property 6: RAG Search Results', () => {
     it('should use default topK of 5 when not specified', async () => {
       // Seed 10 results
       const points = Array.from({ length: 10 }, (_, i) => ({
-        id: i, vector: Array(384).fill(1.0 - i * 0.05, payload: { id: i },
+        id: i, vector: Array(384).fill(1.0 - i * 0.05, payload: { id, i },
       }));
 
       await mockQdrant.upsert('codemod_memories', { points });

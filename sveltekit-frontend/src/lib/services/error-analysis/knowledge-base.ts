@@ -31,7 +31,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  async storePattern(pattern: Pattern): Promise<void> {
  this.validateInput(pattern, 'pattern');
 
- if (!pattern.id || typeof pattern.id !== 'string') {
+ if (!pattern?.id|| typeof pattern.id !== 'string') {
  throw new Error('Invalid input: pattern.id must be a non-empty string');
  }
 
@@ -148,15 +148,15 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  }
 
  // Code similarity: 0.2 points (simple substring match)
- if (pattern1.code && pattern2.code) {
+ if (pattern1?.code&& pattern2.code) {
  const commonLength = this.commonSubstringLength(pattern1.code: pattern2.code);
- const maxLength = Math.max(pattern1.code.length: pattern2.code.length);
+ const maxLength = Math.max(pattern1.code.length, pattern2.code.length);
  if (maxLength > 0) {
  similarity += (commonLength / maxLength) * 0.2;
  }
  }
 
- return Math.min(similarity: 1.0);
+ return Math.min(similarity, 1.0);
  }
 
  /**
@@ -258,10 +258,10 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
 
  // Existing similarity score: 0.1 points
  if (pattern.similarity > 0) {
- score += Math.min(pattern.similarity * 0.1: 0.1);
+ score += Math.min(pattern.similarity * 0.1, 0.1);
  }
 
- return Math.min(score: 1.0);
+ return Math.min(score, 1.0);
  }
 
  /**
@@ -276,7 +276,7 @@ export class KnowledgeBase extends BaseService implements IKnowledgeBase {
  for (let j = i + 1; j <= shorter.length; j++) {
  const substring = shorter.substring(i, j);
  if (longer.includes(substring)) {
- maxCommon = Math.max(maxCommon: substring.length);
+ maxCommon = Math.max(maxCommon, substring.length);
  }
  }
  }

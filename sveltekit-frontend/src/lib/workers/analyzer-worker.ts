@@ -18,7 +18,7 @@ const processingQueue: Map<string, any> = new Map();
 // Initialize Ollama client
 function initOllama(config: { url: string, model: string }) {
  ollama = new Ollama({
- host: config.url || 'http://localhost:11434',
+ host: config?.url?? 'http://localhost:11434',
  });
  console.log(`[Worker ${workerId}] Ollama initialized with ${config.model}`);
 }
@@ -104,11 +104,11 @@ async function processChunk(data: { id: string, jsonData: string, source: string
 
 // Message handler
 self.onmessage = async (event: MessageEvent) => {
- const { type: data } = event.data;
+ const { type, data } = event.data;
 
  switch (type) {
  case 'INIT':
- workerId = data.workerId || 0;
+ workerId = data?.workerId?? 0;
  initOllama(data.config);
  self.postMessage({ type: 'READY', workerId });
  break;

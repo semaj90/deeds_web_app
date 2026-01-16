@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if ((err as any).status) {
  throw err;
  }
- throw error(500, (err as Error).message || 'Failed to process RAG query');
+ throw error(500, (err as Error).message ?? 'Failed to process RAG query');
  }
 };
 
@@ -86,8 +86,8 @@ export const GET: RequestHandler = async ({ url }) => {
 
  // Parse query parameters
  const query = url.searchParams.get('query');
- const topK = parseInt(url.searchParams.get('topK') || '5', 10);
- const temperature = parseFloat(url.searchParams.get('temperature') || '0.7');
+ const topK = parseInt(url.searchParams.get('topK') ?? '5', 10);
+ const temperature = parseFloat(url.searchParams.get('temperature') ?? '0.7');
  const type = url.searchParams.get('type');
 
  if (!query) {
@@ -135,7 +135,7 @@ export const GET: RequestHandler = async ({ url }) => {
  if ((err as any).status) {
  throw err;
  }
- throw error(500, (err as Error).message || 'Failed to stream RAG response');
+ throw error(500, (err as Error).message ?? 'Failed to stream RAG response');
  }
 };
 

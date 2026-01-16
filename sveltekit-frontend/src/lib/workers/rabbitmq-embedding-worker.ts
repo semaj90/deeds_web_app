@@ -140,7 +140,7 @@ class RabbitMQEmbeddingWorker {
             console.log(`🔤 Processing ${payload.entity_type} embedding job ${message.id} for entity ${payload.entity_id}`);
 
             // Validate payload
-            if (!payload.entity_type || !payload.entity_id) {
+            if (!payload?.entity_type|| !payload.entity_id) {
                 throw new Error('Invalid payload, entity_type and entity_id are required');
             }
 
@@ -185,11 +185,11 @@ class RabbitMQEmbeddingWorker {
             const payload = message.payload as BulkEmbeddingJobPayload;
             console.log(`📦 Processing bulk embedding job ${message.id} for ${payload.entities.length} entities`);
 
-            if (!payload.entities || payload.entities.length === 0) {
+            if (!payload?.entities|| payload.entities.length === 0) {
                 throw new Error('Invalid payload, entities array is required and cannot be empty');
             }
 
-            const batchSize = payload.batch_size || 10;
+            const batchSize = payload?.batch_size?? 10;
             const results = [];
 
             // Process in batches to avoid overwhelming the system
@@ -294,7 +294,7 @@ class RabbitMQEmbeddingWorker {
                     textToEmbed = doc.title;
                     break;
                 case 'summary':
-                    textToEmbed = doc.ai_summary || doc.title;
+                    textToEmbed = doc?.ai_summary|| doc.title;
                     break;
                 default:
                     textToEmbed = doc.content;
@@ -343,9 +343,7 @@ class RabbitMQEmbeddingWorker {
 
         console.log(`✨ Generated ${embedding_type} embedding for document ${entity_id} (${embedding.length}D)`);
 
-        return {
-            entity_id,
-            entity_type: 'document',
+        return { entity_id: entity_type: 'document',
             embedding_type,
             dimensions: embedding.length,
             text_length: textToEmbed.length,
@@ -358,7 +356,7 @@ class RabbitMQEmbeddingWorker {
      * Process case embedding
      */
     private async processCaseEmbedding(payload: EmbeddingJobPayload): Promise<any> {
-        const { entity_id: text_content } = payload;
+        const { entity_id, text_content } = payload;
 
         // Get case from database if text not provided
         let textToEmbed = text_content;
@@ -370,8 +368,8 @@ class RabbitMQEmbeddingWorker {
             }
 
             // Combine title and description for comprehensive case embedding
-            const titleText = caseData.title || '';
-            const descText = caseData.description || '';
+            const titleText = caseData?.title?? '';
+            const descText = caseData?.description?? '';
             const jurisdictionText = caseData.jurisdiction ? `Jurisdiction: ${caseData.jurisdiction}` : '';
             const typeText = caseData.case_type ? `Case Type: ${caseData.case_type}` : '';
 
@@ -414,9 +412,7 @@ class RabbitMQEmbeddingWorker {
 
         console.log(`✨ Generated case embedding for ${entity_id} (${embedding.length}D)`);
 
-        return {
-            entity_id,
-            entity_type: 'case',
+        return { entity_id: entity_type: 'case',
             dimensions: embedding.length,
             text_length: textToEmbed.length,
             updated: !!updatedCase,
@@ -428,7 +424,7 @@ class RabbitMQEmbeddingWorker {
      * Process chunk embedding
      */
     private async processChunkEmbedding(payload: EmbeddingJobPayload): Promise<any> {
-        const { entity_id: text_content } = payload;
+        const { entity_id, text_content } = payload;
 
         // Get chunk from database if text not provided
         let textToEmbed = text_content;
@@ -460,9 +456,7 @@ class RabbitMQEmbeddingWorker {
 
         console.log(`✨ Generated chunk embedding for ${entity_id} (${embedding.length}D)`);
 
-        return {
-            entity_id,
-            entity_type: 'chunk',
+        return { entity_id: entity_type: 'chunk',
             dimensions: embedding.length,
             text_length: textToEmbed.length,
             updated: !!updatedChunk
@@ -478,7 +472,7 @@ class RabbitMQEmbeddingWorker {
                 entity_type: entity.entity_type,
                 entity_id: entity.entity_id,
                 text_content: entity.text_content,
-                embedding_type: entity.embedding_type || 'content'
+                embedding_type: entity?.embedding_type?? 'content'
             };
 
             let result;
@@ -544,7 +538,7 @@ class RabbitMQEmbeddingWorker {
     async healthCheck() {
         const stats = this.getStats();
         const rabbitHealth = await rabbitMQService.healthCheck();
-        const isHealthy = this.isRunning && rabbitHealth.connected && stats.successRate > 50;
+        const isHealthy = this?.isRunning&& rabbitHealth?.connected&& stats.successRate > 50;
 
         return {
             status: isHealthy ? 'healthy' : 'unhealthy',

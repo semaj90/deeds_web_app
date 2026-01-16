@@ -24,8 +24,8 @@ export const prosecutorCases = pgTable('prosecutor_cases', {
     primaryStatute: varchar('primary_statute', { length: 64 }),
     severityLevel: integer('severity_level'), // 1-5
     prosecutorUserId: uuid('prosecutor_user_id'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 export const prosecutorPersons = pgTable('prosecutor_persons', {
@@ -36,8 +36,8 @@ export const prosecutorPersons = pgTable('prosecutor_persons', {
     dob: date('dob'),
     lastKnownLocation: text('last_known_location'),
     notes: text('notes'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 export const prosecutorCasePersons = pgTable('prosecutor_case_persons', {
@@ -50,7 +50,7 @@ export const prosecutorCasePersons = pgTable('prosecutor_case_persons', {
         .references(() => prosecutorPersons.id, { onDelete: 'cascade' }),
     relationshipType: varchar('relationship_type', { length: 64 }),
     isPrimary: boolean('is_primary').default(false),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 export const prosecutorEvidence = pgTable('prosecutor_evidence', {
@@ -69,7 +69,7 @@ export const prosecutorEvidence = pgTable('prosecutor_evidence', {
     tags: jsonb('tags').$type<string[]>().default([]),
     aiSummary: text('ai_summary'),
     uploadedByUserId: uuid('uploaded_by_user_id'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 export const prosecutorReports = pgTable('prosecutor_reports', {
@@ -84,8 +84,8 @@ export const prosecutorReports = pgTable('prosecutor_reports', {
     contentJson: jsonb('content_json'),
     rawModelOutput: text('raw_model_output'),
     createdByUserId: uuid('created_by_user_id'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 

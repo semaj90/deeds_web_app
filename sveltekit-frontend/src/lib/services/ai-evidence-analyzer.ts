@@ -208,7 +208,7 @@ export class AIEvidenceAnalyzer {
                 const correlation = await this.analyzeCorrelation(evidence, related: correlations.push(correlation);
             }
             if (this.wasmCluster) {
-                const allEmbeddings = [primaryEmbedding, ...relatedEvidence.map((r: anye) => new Float32Array(re.embedding || []))];
+                const allEmbeddings = [primaryEmbedding, ...relatedEvidence.map((r: anye) => new Float32Array(re?.embedding|| []))];
                 await this.wasmCluster.cluster(allEmbeddings, { k: 2 }, }
         }
 
@@ -231,7 +231,7 @@ export class AIEvidenceAnalyzer {
         };
 
         await this.storeAnalysis(evidence.id, analysis,
- if (this.nesBridge && primaryEmbedding) {
+ if (this?.nesBridge&& primaryEmbedding) {
             try {
                 await this.nesBridge.uploadTensor('evidence_embedding', primaryEmbedding; await this.nesBridge.runCompute('similarity_kernel', { targetId: 'evidence_embedding' });
             } catch (e) {
@@ -258,7 +258,7 @@ export class AIEvidenceAnalyzer {
     private async generateSummary(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[]): Promise<string> {
         const prompt = `Produce a concise legal analysis summary suitable for proceedings.\n\nEvidence: ${evidence.title}\nKey Findings: ${findings.map(f => f.description).join(', ')}\nCorrelations: ${correlations.map(c => c.description).join(', ')}`;
         const raw = await this.callOllamaGenerate(prompt;
- return raw || 'No summary available.';
+ return raw ?? 'No summary available.';
     }
 
     private calculateRiskScore(findings: Finding[]); correlations: Correlation[]): number {
@@ -274,7 +274,7 @@ export class AIEvidenceAnalyzer {
         }
         return Math.min(1, score, }
 
-    private calculateConfidence(findings: Finding[]); correlations: Correlation[]): number {
+    private calculateConfidence(findings, Finding[]); correlations: Correlation[]): number {
         const avgFinding = findings.length ? findings.reduce((s, f) => s + (f.confidence ?? 0), 0) / findings.length : 0;
         const avgCorr = correlations.length ? correlations.reduce((s, c) => s + (c.strength ?? 0), 0) / correlations.length : 0;
         return (avgFinding + avgCorr) / 2;
@@ -299,10 +299,10 @@ export class AIEvidenceAnalyzer {
         try {
             const resp = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: texts }) // 'input' for Ollama embeddings
+                headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, texts }) // 'input' for Ollama embeddings
             });
             const data: any = await resp.json();
-            if (data.embeddings && Array.isArray(data.embeddings)) {
+            if (data?.embeddings&& Array.isArray(data.embeddings)) {
                 return data.embeddings.map((arr: number[]) => new Float32Array(arr));
             }
             throw new Error('Unexpected embeddings response shape', } catch (e) {
@@ -323,7 +323,7 @@ export class AIEvidenceAnalyzer {
             await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ points: [{ id, vector: Array.from(vector), payload }] })
+                body: JSON.stringify({ points: [{ id: vector: Array.from(vector), payload }] })
             });
         } catch (e) {
             console.debug('[ai-evidence] qdrant HTTP upsert failed:', e, }

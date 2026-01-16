@@ -39,7 +39,7 @@ export class QuicAuthClient {
     private baseUrl: string;
     private useHttp3: boolean;
 
-    constructor(baseUrl: string = 'https://localhost:4433', useHttp3: boolean = true) {
+    constructor(baseUrl, string = 'https://localhost:4433', useHttp3: boolean = true) {
         this.baseUrl = baseUrl;
         this.useHttp3 = useHttp3;
     }
@@ -62,7 +62,7 @@ export class QuicAuthClient {
         });
     }
 
-    async register(email: string, password: string, firstName: string, lastName: string, organization?: string, role: string = 'user'): Promise<AuthResponse> {
+    async register(email, string, password: string, firstName: string, lastName: string, organization?: string, role: string = 'user'): Promise<AuthResponse> {
         try {
             const response = await this.makeRequest('/auth/register', { email, password, firstName, lastName, organization, role });
             return await response.json();
@@ -94,7 +94,7 @@ export class QuicAuthClient {
             const response = await this.makeRequest('/auth/logout', { sessionId });
             return await response.json();
         } catch (error) {
-            return { success: false };
+            return { success, false };
         }
     }
 }
@@ -102,5 +102,5 @@ export class QuicAuthClient {
 export const quicAuthClient = new QuicAuthClient();
 
 export function getSessionFromCookies(event: RequestEvent): string | null {
-    return event.cookies.get('session_id') || event.cookies.get('session') || null;
+    return event.cookies.get('session_id') || event.cookies.get('session') ?? null;
 }

@@ -6,7 +6,7 @@ export const load: PageLoad = async ({ fetch }) => {
  try {
  const res = await fetch(`/api/timeline/${caseId}`);
  const { events } = await res.json();
- return { events: caseId };
+ return { events, caseId };
  } catch (error) {
  console.error('Failed to lead timeline:', error);
  return { events: [], caseId };

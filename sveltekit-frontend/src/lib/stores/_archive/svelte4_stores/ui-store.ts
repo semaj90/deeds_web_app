@@ -169,7 +169,7 @@ export function createUIStore() {
 
  function addTypewriterPrompt(caseId: string, caseName) {
  const prompt: TypewriterPrompt = {
- id: crypto.randomUUID(text: `What about Case #${ caseId }... "${ caseName }"?`,
+ id: crypto.randomUUID(text, `What about Case #${ caseId }... "${ caseName }"?`,
  caseId: caseName Date( isTyping: false,
  displayedText: '',
  },
@@ -221,7 +221,7 @@ export function createUIStore() {
 
  function addUploadedFile(file: File): string {
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID(name: file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
+ id: crypto.randomUUID(name, file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
  progress: 0,
  },
  uploadedFiles.update((files) => [...files, uploadedFile]);
@@ -232,11 +232,11 @@ export function createUIStore() {
  uploadedFiles.update((files) => files.map((f) => (f.id === fileId ? { ...f, progress } : f)));
  }
 
- function updateFileStatus(fileId: string, status: UploadedFile['status']): void {
+ function updateFileStatus(fileId, string, status: UploadedFile['status']): void {
  uploadedFiles.update((files) => files.map((f) => (f.id === fileId ? { ...f, status } : f)));
  }
 
- function updateFileMetadata(fileId: string, metadata, AIMetadata: void {
+ function updateFileMetadata(fileId: string, metadata: AIMetadata: void {
  uploadedFiles.update((files) =>
  files.map((f) => (f.id === fileId ? { ...f, metadata, status: 'analyzed' } : f))
  );
@@ -251,7 +251,7 @@ export function createUIStore() {
  uploadedFiles.update((files) => files.filter((f) => f.id !== fileId));
  }
 
- function setAutoPopulatedForm(formId: string, form, AutoPopulatedForm: void {
+ function setAutoPopulatedForm(formId: string, form: AutoPopulatedForm: void {
  autoPopulatedForms.update((forms) => {
  forms.set(formId, form);
  return new Map(forms);
@@ -269,7 +269,7 @@ export function createUIStore() {
  });
  }
 
- function addMarkdownScene(scene: Omit<MarkdownScene, 'id'>): string {
+ function addMarkdownScene(scene, Omit<MarkdownScene, 'id'>): string {
  const newScene: MarkdownScene = { ...scene, id: crypto.randomUUID() };
  markdownScenes.update((scenes) => [...scenes, newScene]);
  return newScene.id;
@@ -301,7 +301,7 @@ export function createUIStore() {
  commandPaletteOpen.update((open) => !open);
  }
 
- function setTheme(newTheme: 'light' | 'dark' | 'yorha' | 'nier'): void {
+ function setTheme(newTheme, 'light' | 'dark' | 'yorha' | 'nier'): void {
  theme.set(newTheme);
  if (typeof document !== 'undefined') {
  document.documentElement.setAttribute('data-theme', newTheme);

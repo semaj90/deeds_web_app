@@ -32,7 +32,7 @@ type AnalyzeArgs = {
  * Extracts text with layout awareness, OCR, and table detection
  */
 export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<DoclingResult> {
- const { fileBuffer: mimeType } = args;
+ const { fileBuffer, mimeType } = args;
  const id = randomUUID();
  const startTime = Date.now();
 
@@ -58,7 +58,7 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  proc.on('close', async (code) => {
  try {
  if (code !== 0) {
- return reject(new Error(`Docling exited with ${ code }: ${stderr || 'no stderr'}`));
+ return reject(new Error(`Docling exited with ${ code }: ${stderr ?? 'no stderr'}`));
  }
 
  const raw = await readFile(tmpOutput, 'utf8');
@@ -123,7 +123,7 @@ export async function analyzeDocumentsWithDocling(
  return null;
  }
  })
- .filter((r): r is DoclingResult & { filename: string } => r !== null);
+ .filter((r): r is DoclingResult & { filename, string } => r !== null);
 }
 
 /**
@@ -158,7 +158,7 @@ export function getBlockStatistics(blocks: DoclingBlock[]): { total: number;
  let maxPage = 0;
 
  blocks.forEach((block) => {
- byType[block.type] = (byType[block.type] || 0) + 1;
+ byType[block.type] = (byType[block.type] ?? 0) + 1;
  if (block.page > maxPage) maxPage = block.page;
  });
 
@@ -210,7 +210,7 @@ export async function processWithDocling(filePath: string): Promise<{ text: stri
  const mimeType = 'application/pdf'; // Assume PDF for now, could be detected
 
  // Use existing analyzeDocumentWithDocling function
- const result = await analyzeDocumentWithDocling({ fileBuffer: mimeType });
+ const result = await analyzeDocumentWithDocling({ fileBuffer, mimeType });
   
  const processingTime = Date.now() - startTime;
 

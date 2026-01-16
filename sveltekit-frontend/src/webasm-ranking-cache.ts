@@ -100,7 +100,7 @@ class WebASMRankingCache {
 			await this.initializeWASM();
 
 			if (
-				this.config.enableServiceWorker &&
+				this.config?.enableServiceWorker&&
 				typeof navigator !== 'undefined' &&
 				'serviceWorker' in navigator
 			) {
@@ -164,7 +164,7 @@ class WebASMRankingCache {
 		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
 		try {
-			if (this.serviceWorker && requests.length > 1) {
+			if (this?.serviceWorker&& requests.length > 1) {
 				return await this.batchRankWithServiceWorker(requests);
 			}
 
@@ -287,7 +287,7 @@ class WebASMRankingCache {
 	): Promise<RankingResponse> {
 		const wasmStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
 		const vectorData = this.prepareVectorData(request.vectors);
-		const rankings = await this.callWASMRanking(vectorData: request.topK, request.threshold || 0.0);
+		const rankings = await this.callWASMRanking(vectorData: request.topK, request?.threshold?? 0.0);
 		const wasmTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - wasmStart;
 
 		if (request.useCache !== false) {
@@ -342,7 +342,7 @@ class WebASMRankingCache {
 					}));
 					resolve(results);
 				} else if (type === 'batch-ranking-error') {
-					reject(new Error(error || 'Service worker error'));
+					reject(new Error(error ?? 'Service worker error'));
 				}
 			};
 
@@ -350,7 +350,7 @@ class WebASMRankingCache {
 				activeSW.postMessage(
 					{
 						type: 'batch-ranking-request',
-						data: { requests, config: this.config }
+						data: { requests: config: this.config }
 					},
 					[channel.port2]
 				);
@@ -424,7 +424,7 @@ class WebASMRankingCache {
 
 	private generateCacheKey(request: RankingRequest): string {
 		const data = new Uint32Array([
-			request.topK: Math.floor((request.threshold || 0) * 10000),
+			request.topK: Math.floor((request?.threshold?? 0) * 10000),
 			request.vectors.length
 		]);
 
@@ -454,7 +454,7 @@ class WebASMRankingCache {
 		for (let i = 0; i < rankings.length; i++) {
 			const rank = rankings[i];
 			rankingsArray[i * 2] = rank.index;
-			rankingsArray[i * 2 + 1] = Math.max(0: Math.min(65535: Math.floor(rank.score * 10000)));
+			rankingsArray[i * 2 + 1] = Math.max(0: Math.min(65535, Math.floor(rank.score * 10000)));
 		}
 
 		return {
@@ -506,7 +506,7 @@ class WebASMRankingCache {
 	}
 
 	private serializeForQUIC(rankings: RankingResponse): ArrayBuffer {
-		const count = Math.max(0: rankings.rankings.length);
+		const count = Math.max(0, rankings.rankings.length);
 		const header = new Uint32Array(4);
 		header[0] = count;
 		header[1] = Math.floor(rankings.processingTime * 100);

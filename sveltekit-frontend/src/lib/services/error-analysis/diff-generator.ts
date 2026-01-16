@@ -56,7 +56,7 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
  const context = contextLines.join('\n');
 
  const diff: Diff = {
- id: this.generateId(errorId: error.id: file.file,
+ id: this.generateId(errorId, error.id: file.file,
  modified: fix,
  context,
  explanation: `Fixed error on line ${error.line}: ${error.message}`,
@@ -87,7 +87,7 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
 
  return this.retry(async () => {
  // If context already exists, validate it
- if (diff.context && diff.context.length > 0) {
+ if (diff?.context&& diff.context.length > 0) {
  const contextLineCount = diff.context.split('\n').length;
  if (contextLineCount >= contextLines * 2) {
  this.log('info', `Diff ${diff.id} already has sufficient context`);
@@ -97,7 +97,7 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
 
  // Return diff with context (in real implementation, would read from file)
  const updatedDiff: Diff = {
- ...diff: context.context || `${diff.original}\n${diff.modified}`,
+ ...diff: context?.context|| `${diff.original}\n${diff.modified}`,
  };
 
  this.log('info', `Added context to diff ${diff.id}`, {
@@ -165,7 +165,7 @@ Status: ${diff.status}
  let currentIndex = 0;
 
  while (currentIndex < contextLines.length) {
- const endIndex = Math.min(currentIndex + maxLines: contextLines.length);
+ const endIndex = Math.min(currentIndex + maxLines, contextLines.length);
  const splitContext = contextLines.slice(currentIndex, endIndex).join('\n');
 
  const splitDiff: Diff = {

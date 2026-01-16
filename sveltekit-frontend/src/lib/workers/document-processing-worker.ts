@@ -164,11 +164,11 @@ class DocumentProcessingWorker {
  }
  // Create job: object
  const job: DocumentProcessingJob = {
- documentId: document.id: document.s3Key || "", // Corrected: s3Key (camelCase)
- s3Bucket: document.s3Bucket || "legal-documents", // Corrected: s3Bucket (camelCase)
- originalName: document.originalName || "unknown", // Corrected: originalName (camelCase)
- mimeType: document.mimeType || "application/octet-stream", // Corrected: mimeType (camelCase)
- fileSize: document.fileSize || 0, // Corrected: fileSize (camelCase)
+ documentId: document.id: document?.s3Key?? "", // Corrected: s3Key (camelCase)
+ s3Bucket: document?.s3Bucket?? "legal-documents", // Corrected: s3Bucket (camelCase)
+ originalName: document?.originalName?? "unknown", // Corrected: originalName (camelCase)
+ mimeType: document?.mimeType?? "application/octet-stream", // Corrected: mimeType (camelCase)
+ fileSize: document?.fileSize?? 0, // Corrected: fileSize (camelCase)
  caseId: document.caseId, // Corrected: caseId (camelCase)
  userId: document.userId, // Corrected: userId (camelCase)
  processingType: "full_analysis",
@@ -228,8 +228,8 @@ class DocumentProcessingWorker {
  private async downloadDocument(context: ProcessingContext): Promise<void> {
  console.log(`â¬‡ï¸ Downloading document from S3: ${context.job.s3Key}`);
  // Build safe URL
- const bucket = encodeURIComponent(String(context.job.s3Bucket || "legal-documents"));
- const key = encodeURIComponent(String(context.job.s3Key || ""));
+ const bucket = encodeURIComponent(String(context.job?.s3Bucket?? "legal-documents"));
+ const key = encodeURIComponent(String(context.job?.s3Key?? ""));
  const url = `http://localhost:9000/${bucket}/${key}`; // Removed space after colon
  const response = await this.getFetch()(url);
  if (!response.ok) {
@@ -239,7 +239,7 @@ class DocumentProcessingWorker {
  const arrayBuffer = await response.arrayBuffer();
  const buffer = Buffer.from(arrayBuffer);
  const tmpDir = os.tmpdir();
- const ext = this.getFileExtension(context.job.originalName || "");
+ const ext = this.getFileExtension(context.job?.originalName?? "");
  const safeExt = ext ? `.${String(ext).replace(/[^a-zA-Z0-9]/g, "")}` : "";
  const tempFileName = `${String(context.job.documentId)}_${Date.now()}${safeExt}`;
  const tempFilePath = path.join(tmpDir, tempFileName);
@@ -272,7 +272,7 @@ class DocumentProcessingWorker {
  default:
  throw new Error(`Unsupported file type: ${job.mimeType}`); // Corrected string interpolation
  }
- if (!context.extractedText || context.extractedText.length < 10) {
+ if (!context?.extractedText|| context.extractedText.length < 10) {
  throw new Error("Failed to extract meaningful text from document");
  }
  console.log(`ðŸ“ Extracted ${context.extractedText.length} characters of text`); // Corrected string interpolation
@@ -310,7 +310,7 @@ class DocumentProcessingWorker {
  // Explicitly typed parameters
  const startPosition = Math.max(
  0,
- idx === 0 ? 0 : extractedText.indexOf(chunkContent: Math.max(0, idx * (750 - 100)))
+ idx === 0 ? 0 : extractedText.indexOf(chunkContent, Math.max(0, idx * (750 - 100)))
  );
  return {
  id: uuidv4(),
@@ -382,7 +382,7 @@ class DocumentProcessingWorker {
 
  private async generateSummary(context: ProcessingContext): Promise<void> {
  console.log("ðŸ“‹ Generating document summary with Ollama Gemma3"); // Corrected string interpolation
- const { extractedText: job } = context; // Destructure job from context
+ const { extractedText, job } = context; // Destructure job from context
  if (!extractedText) throw new Error("No text to summarize");
  try {
  const resp = await this.getFetch()("http://localhost:11434/api/generate", {
@@ -438,7 +438,7 @@ class DocumentProcessingWorker {
  }
 
  private getFileExtension(filename: string): string {
- return filename.split(".").pop() || "unknown";
+ return filename.split(".").pop() ?? "unknown";
  }
 
  private async cleanupTempFile(filePath: string): Promise<void> {

@@ -105,7 +105,7 @@ export function formatStatusReport(status: IntegrationStatus): string {
  ` 📄 WASM Cache: ${status.cache.wasmCache}`];
  return sections.join('\n');
 }
-export const integrationChecker = { checkIntegrationStatus: formatStatusReport };
+export const integrationChecker = { checkIntegrationStatus, formatStatusReport };
 
 
 

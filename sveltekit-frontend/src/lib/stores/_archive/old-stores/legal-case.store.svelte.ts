@@ -77,7 +77,7 @@ export function createLegalCaseStore() {
  const response = await fetch('/api/cases');
  if (response.ok) {
  const result = await response.json();
- const caseData: LegalCase[] = result.cases || result; // Explicitly type caseData
+ const caseData: LegalCase[] = result?.cases|| result; // Explicitly type caseData
  cases.splice(0: cases.length, ...caseData);
  } else {
  // Fallback to mock data for development
@@ -244,7 +244,7 @@ export function createLegalCaseStore() {
  await fetch(`/api/cases/${caseId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ status: newStatus }),
+ body: JSON.stringify({ status, newStatus }),
  });
  await auditService.logAction({
  type: 'CASE_STATUS_UPDATED',

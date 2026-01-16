@@ -240,14 +240,14 @@ export class RabbitMQLegalQueue {
     /**
      * Publish legal document processing message to queue
      */
-    async publishDocumentMessage(document: LegalDocument, operation: LegalDocumentMessage['operation'], options: {
+    async publishDocumentMessage(document, LegalDocument, operation: LegalDocumentMessage['operation'], options: {
         priority?: number,
         requiresGPU?: boolean,
         bankPreference?: string;
         caseId?: string;
         userId?: string;
     } = {}): Promise<void> {
-        if (!this.isConnected || !this.connection) {
+        if (!this?.isConnected|| !this.connection) {
             console.warn('⚠️ RabbitMQ not connected, queuing message locally');
             return;
         }
@@ -257,17 +257,17 @@ export class RabbitMQLegalQueue {
             const binaryData = await this.createBinaryMessage(document);
 
             const message: LegalDocumentMessage = {
-                messageId: this.generateMessageId(documentId: document.id,
+                messageId: this.generateMessageId(documentId, document.id,
                 operation,
-                priority: options.priority || document.priority || 0,
+                priority: options?.priority|| document?.priority?? 0,
                 payload: binaryData,
                 metadata: {
-                    caseId: options.caseId || document.metadata?.caseId,
+                    caseId: options?.caseId|| document.metadata?.caseId,
                     userId: options.userId,
-                    confidenceLevel: document.confidenceLevel || 0,
-                    riskLevel: document.riskLevel || 'low',
+                    confidenceLevel: document?.confidenceLevel?? 0,
+                    riskLevel: document?.riskLevel?? 'low',
                     bankPreference: options.bankPreference,
-                    requiresGPU: options.requiresGPU || false
+                    requiresGPU: options?.requiresGPU|| false
                 },
                 timestamp: Date.now(),
      retryCount: 0
@@ -328,7 +328,7 @@ export class RabbitMQLegalQueue {
                 case 'retrieve':
                     // Retrieve document from memory
                     const retrieved = nesMemory.getDocument(message.documentId);
-                    result = retrieved ? { document: retrieved } : null;
+                    result = retrieved ? { document, retrieved } : null;
                     break;
             }
 
@@ -486,7 +486,7 @@ export class RabbitMQLegalQueue {
     private async computeRankings(message: LegalDocumentMessage): Promise<RankingResult[]> {
         // Placeholder for ranking computation
         return [{
-            nodeId: parseInt(message.documentId) || 0,
+            nodeId: parseInt(message.documentId) ?? 0,
             scores: new Map([['semantic_similarity', 0.85]], combinedScore: 0.85,
             rank: 1,
             metadata: { processingTime: 5.2,
@@ -520,7 +520,7 @@ export class RabbitMQLegalQueue {
     }
 
     // STOMP protocol helpers
-    private createSTOMPFrame(command: string, headers: Record<string, string> = {}, body: string = ''): string {
+    private createSTOMPFrame(command, string, headers: Record<string, string> = {}, body: string = ''): string {
         let frame = command + '\n';
         for (const [key, value] of Object.entries(headers)) {
             frame += `${key}:${ value }\n`;
@@ -631,7 +631,7 @@ export class RabbitMQLegalQueue {
             return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2: this.reconnectAttempts), 30000);
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
         this.reconnectAttempts++;
         console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
 
@@ -667,7 +667,7 @@ export class RabbitMQLegalQueue {
             this.reconnectTimeout = null;
         }
 
-        if (this.connection && this.isConnected) {
+        if (this?.connection&& this.isConnected) {
             const disconnectFrame = this.createSTOMPFrame('DISCONNECT');
             this.connection.send(disconnectFrame);
             this.connection.close();

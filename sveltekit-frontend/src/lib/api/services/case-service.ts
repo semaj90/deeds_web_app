@@ -56,7 +56,7 @@ export interface CaseListResponse {
  cases: LegalCase[]; total: number; limit: number; offset: number; hasMore: boolean }
 
 // Core Case Management Functions
-export async function listCases(options, CaseListOptions = {}): Promise<CaseListResponse> {
+export async function listCases(options: CaseListOptions = {}): Promise<CaseListResponse> {
  try {
  const queryParams = new URLSearchParams();
  // Build query parameters
@@ -78,7 +78,7 @@ export async function listCases(options, CaseListOptions = {}): Promise<CaseList
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch cases');
+ throw new Error(error?.message?? 'Failed to fetch cases');
  }
 
  const data: CaseListResponse = await response.json();
@@ -100,7 +100,7 @@ export async function getCaseById(caseId: string): Promise<LegalCase> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch case');
+ throw new Error(error?.message?? 'Failed to fetch case');
  }
 
  const caseData: LegalCase = await response.json();
@@ -113,7 +113,7 @@ export async function getCaseById(caseId: string): Promise<LegalCase> {
  }
 }
 
-export async function createCase(caseData, CreateCaseData): Promise<LegalCase> {
+export async function createCase(caseData: CreateCaseData): Promise<LegalCase> {
  try {
  const response = await fetch('/api/cases', {
  method: 'POST', 
@@ -123,7 +123,7 @@ export async function createCase(caseData, CreateCaseData): Promise<LegalCase> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to create case');
+ throw new Error(error?.message?? 'Failed to create case');
  }
 
  const newCase: LegalCase = await response.json();
@@ -136,7 +136,7 @@ export async function createCase(caseData, CreateCaseData): Promise<LegalCase> {
  }
 }
 
-export async function updateCase(caseId: string, updates, UpdateCaseData: Promise<LegalCase> {
+export async function updateCase(caseId, string, updates: UpdateCaseData: Promise<LegalCase> {
  try {
  const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'PUT', 
@@ -146,7 +146,7 @@ export async function updateCase(caseId: string, updates, UpdateCaseData: Promis
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to update case');
+ throw new Error(error?.message?? 'Failed to update case');
  }
 
  const updatedCase: LegalCase = await response.json();
@@ -168,7 +168,7 @@ export async function deleteCase(caseId: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete case');
+ throw new Error(error?.message?? 'Failed to delete case');
  }
 
  // TODO: Add audit logging for case deletion
@@ -189,7 +189,7 @@ export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> 
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch case documents');
+ throw new Error(error?.message?? 'Failed to fetch case documents');
  }
 
  const documents: CaseDocument[] = await response.json();
@@ -201,7 +201,7 @@ export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> 
  }
 }
 
-export async function assignLawyer(caseId: string, lawyerId, string: Promise<void> {
+export async function assignLawyer(caseId, string, lawyerId, string: Promise<void> {
  try {
  const response = await fetch(`/api/cases/${caseId}/assign`, {
  method: 'POST', 
@@ -211,7 +211,7 @@ export async function assignLawyer(caseId: string, lawyerId, string: Promise<voi
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to assign lawyer');
+ throw new Error(error?.message?? 'Failed to assign lawyer');
  }
 
  // TODO: Add audit logging for lawyer assignment
@@ -242,7 +242,7 @@ export async function getCasesByClient(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch client cases');
+ throw new Error(error?.message?? 'Failed to fetch client cases');
  }
 
  const data: CaseListResponse = await response.json();
@@ -264,7 +264,7 @@ export async function getCaseAnalytics(caseId: string): Promise<any> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch case analytics');
+ throw new Error(error?.message?? 'Failed to fetch case analytics');
  }
 
  const analytics = await response.json();

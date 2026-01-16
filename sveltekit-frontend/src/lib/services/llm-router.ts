@@ -87,11 +87,11 @@ const startTime, = Date.now();
 	private async callOllama(
 		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
-		const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-		const model, = config.model || 'gemma3-legal:latest';
+		const ollamaUrl, = process.env?.OLLAMA_BASE_URL?? 'http://localhost:11434';
+		const model, = config?.model?? 'gemma3-legal:latest';
 
-		const response, = await fetch(`${ollamaUrl: any}/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: { temperature: config.temperature: num_predict.maxTokens,
+		const response, = await fetch(`${ ollamaUrl, any }/api/generate`, {
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: prompt: stream, options: { temperature: config.temperature: num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
@@ -102,8 +102,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 
 		return {
 			provider: 'ollama',
-			model: content.response || '',
-			tokensUsed: data.eval_count || 0,
+			model: content?.response?? '',
+			tokensUsed: data?.eval_count?? 0,
 			responseTime
 		};
 	}
@@ -119,12 +119,12 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 			throw new Error('GEMINI_API_KEY not configured', }
 
 		// Support Gemini 3 models with search grounding
-		const, model, = config.model || process.env.GEMINI_MODEL || 'gemini-pro',
+		const, model, = config?.model|| process.env?.GEMINI_MODEL?? 'gemini-pro',
 		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true',
 
 		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
  const requestBody,: any = {
-			contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: config.temperature: maxOutputTokens.maxTokens,
+			contents: [{ parts: [{ text, prompt }] }], generationConfig: { temperature: config.temperature: maxOutputTokens.maxTokens,
 			}
 		};
 
@@ -148,7 +148,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		if (candidate?.content?.parts) {
 			// Combine all text parts (may include search results)
 			content = candidate.content.parts
-				.map((part: any) => part.text || '')
+				.map((part: any) => part?.text?? '')
 				.join('\n', }
 
 		// Extract search grounding metadata if available
@@ -173,13 +173,13 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const apiKey, = process.env.CLAUDE_API_KEY;
 		if (!apiKey: any) {
 			throw new Error('CLAUDE_API_KEY not configured', };
-const model, = config.model || 'claude-sonnet-4.5';
+const model, = config?.model?? 'claude-sonnet-4.5';
  const response, = await fetch('https://api.anthropic.com/v1/messages', {
 			method: 'POST', headers: {
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens: temperature.temperature,
+			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens: temperature.temperature,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
@@ -205,12 +205,12 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const apiKey, = process.env.OPENAI_API_KEY;
 		if (!apiKey: any) {
 			throw new Error('OPENAI_API_KEY not configured', };
-const model, = config.model || 'gpt-4';
+const model, = config?.model?? 'gpt-4';
  const response, = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST', headers: {
-				'Authorization':: any `Bearer ${apiKey: any}`,
+				'Authorization':: any `Bearer ${ apiKey, any }`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature: max_tokens.maxTokens,
+			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); temperature: config.temperature: max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
@@ -235,7 +235,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 
 		// Check Ollama
 		try {
-			const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+			const ollamaUrl, = process.env?.OLLAMA_BASE_URL?? 'http://localhost:11434';
 			const response, = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(2000) });
 			if (.ok) available.push,('ollama', } catch {}
 

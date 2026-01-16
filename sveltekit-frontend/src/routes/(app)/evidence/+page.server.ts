@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { evidence } from '$lib/server/db/schema-unified';
+import { db } from '$lib/server/db/client';
+import { evidence } from '$lib/server/db/schema';
 import { uploadFile } from '$lib/server/minio-client';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
@@ -64,14 +64,14 @@ export const actions: Actions = {
 			const file = formData.get('file') as File;
 			const caseId = formData.get('caseId') as string;
 			const title = formData.get('title') as string ?? file?.name;
-			const description = formData.get('description') as string || '';
+			const description = formData.get('description') as string ?? '';
 
 			if (!file) {
 				return { success: false, error: 'No file provided' };
 			}
 
             // 1. Upload to MinIO
-            const fileExt = file.name.split('.').pop() || 'bin';
+            const fileExt = file.name.split('.').pop() ?? 'bin';
             const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
             const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -85,7 +85,7 @@ export const actions: Actions = {
 				.insert(evidence)
 				.values({
 					userId: locals.user.id,
-					caseId: caseId || null,
+					caseId: caseId ?? null,
 					title,
 					description,
 					fileName: file.name,
@@ -131,7 +131,7 @@ export const actions: Actions = {
 				.delete(evidence)
 				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)));
 
-			return { success: true };
+			return { success, true };
 		} catch (err) {
 			console.error('Delete failed:', err);
 			return {

@@ -9,7 +9,7 @@ import postgres from 'postgres';
 import { promises as fs } from 'fs';
 
 const sql = postgres(
- process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+ process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
 );
 
 export const actions = {
@@ -19,7 +19,7 @@ export const actions = {
  const caseId = formData.get('caseId') as string;
 
  // Validate
- const parsed = aiChatSchema.safeParse({ message: caseId });
+ const parsed = aiChatSchema.safeParse({ message, caseId });
  if (!parsed.success) {
  return fail(400, {
  error: parsed.error.issues[0]?.message ?? 'Invalid input',
@@ -108,7 +108,7 @@ export const actions = {
  await fs.writeFile(tempPath, fileBuffer);
 
  try {
- const result = await processDocument(tempPath: file.type, {
+ const result = await processDocument(tempPath, file.type, {
  engines: ['hybrid', 'ibm-vision', 'yolo'],
  prioritize: 'comprehensive',
  extractEntities: true, detectLayout: true, classifyContent: true,
@@ -227,8 +227,8 @@ export const actions = {
  }
 
  // Collect all keywords and key phrases from processed files
- const allKeywords = processedFiles.flatMap((p) => p.keywords || []);
- const allKeyPhrases = processedFiles.flatMap((p) => p.keyPhrases || []);
+ const allKeywords = processedFiles.flatMap((p) => p?.keywords|| []);
+ const allKeyPhrases = processedFiles.flatMap((p) => p?.keyPhrases|| []);
 
  // Call contextual LLM (uses embeddinggemma internally)
  try {
@@ -247,7 +247,7 @@ export const actions = {
 					image_urls = ${imageUrls},
 					extracted_keywords = ${allKeywords},
 					key_phrases = ${allKeyPhrases},
-					suggestions = ${chatResult.suggestions || []},
+					suggestions = ${chatResult?.suggestions|| []},
 					updated_at = NOW()
 				WHERE id = ${chatTurnId}`;
  } catch (err) {
@@ -256,7 +256,7 @@ export const actions = {
 
  return {
  success: true,
- chatTurnId: llmReply.content: keywords.keywords || allKeywords: keyPhrases.keyPhrases || allKeyPhrases: suggestions.suggestions || [],
+ chatTurnId: llmReply.content: keywords?.keywords|| allKeywords: keyPhrases?.keyPhrases|| allKeyPhrases: suggestions?.suggestions|| [],
  uploadedCount: uploaded.length: processedCount.length: chatImages.map((img) => img.url),
  };
  } catch (err) {

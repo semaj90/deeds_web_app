@@ -185,7 +185,7 @@ export async function phase90_search_errors(
   // For now, use scroll with filter since we don't have embedding model in TS
   // In production, call Python embedding service
   const filter = clusterId !== undefined
-    ? { must: [{ key: 'cluster_id', match: { value: clusterId } }] }
+    ? { must: [{ key: 'cluster_id', match: { value, clusterId } }] }
      | undefined;
 
   const results = await client.scroll('phase90_cuda_embeddings', {
@@ -231,7 +231,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
     // Count errors in this cluster from main collection
     const errors = await client.scroll('phase90_cuda_embeddings', {
       limit: 1000,
-      filter: { must: [{ key: 'cluster_id', match: { value: clusterId } }] },
+      filter: { must: [{ key: 'cluster_id', match: { value, clusterId } }] },
       with_payload: true
     });
 
@@ -241,13 +241,11 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
     for (const e of errors.points) {
       const code = e.payload?.errorCode as string ?? 'UNKNOWN';
       const file = e.payload?.filePath as string ?? '';
-      codes[code] = (codes[code] || 0) + 1;
-      files[file] = (files[file] || 0) + 1;
+      codes[code] = (codes[code] ?? 0) + 1;
+      files[file] = (files[file] ?? 0) + 1;
     }
 
-    return {
-      clusterId,
-      errorCount: errors.points.length,
+    return { clusterId: errorCount: errors.points.length,
       topCodes: Object.entries(codes)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
@@ -258,9 +256,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
     };
   }
 
-  return {
-    clusterId,
-    errorCount: cluster.payload?.error_count as number ?? 0,
+  return { clusterId: errorCount: cluster.payload?.error_count as number ?? 0,
     topCodes: cluster.payload?.top_codes as string[] ?? [],
     topFiles: cluster.payload?.top_files as string[] ?? [],
     summary: cluster.payload?.summary as string
@@ -313,12 +309,12 @@ export async function phase90_query_glyphs(
         if (errorCode && parsed.errorCode !== errorCode) continue;
 
         glyphs.push({
-          errorCode: parsed.errorCode || 'UNKNOWN',
-          filePath: parsed.filePath || '',
-          line: parsed.line || 0,
-          message: parsed.message || '',
-          clusterId: parsed.cluster_id || -1,
-          tech: parsed.tech || []
+          errorCode: parsed?.errorCode?? 'UNKNOWN',
+          filePath: parsed?.filePath?? '',
+          line: parsed?.line?? 0,
+          message: parsed?.message?? '',
+          clusterId: parsed?.cluster_id|| -1,
+          tech: parsed?.tech|| []
         });
 
         if (glyphs.length >= limit) break;
@@ -353,13 +349,11 @@ export async function phase90_get_stats(): Promise<{ qdrant: { embeddings: numbe
 
   return {
     qdrant: {
-      embeddings: embeddings.points_count || 0,
-      clusters: clusters.points_count || 0,
-      recommendations: recs.points_count || 0
+      embeddings: embeddings?.points_count?? 0,
+      clusters: clusters?.points_count?? 0,
+      recommendations: recs?.points_count?? 0
     },
-    redis: {
-      totalKeys,
-      glyphKeys: glyphCount,
+    redis: { totalKeys: glyphKeys: glyphCount,
       embedKeys: embedCount
     }
   };
@@ -412,9 +406,7 @@ export async function phase90_get_fix_recommendation(clusterId: number): Promise
 
   if (!rec) return null;
 
-  return {
-    clusterId,
-    recommendation: rec.payload?.recommendation as string ?? rec.payload?.summary as string || '',
+  return { clusterId: recommendation: rec.payload?.recommendation as string ?? rec.payload?.summary as string ?? '',
     priority: rec.payload?.priority as string ?? 'medium',
     affectedFiles: rec.payload?.affected_files as string[] ?? []
   };
@@ -431,7 +423,7 @@ export async function executePhase90Tool(
   switch (toolName) {
     case 'phase90_search_errors':
       return phase90_search_errors(
-        params.query as string: params.topK as number: params.clusterId as number | undefined
+        params.query as string | params.topK as number | params.clusterId as number | undefined
       );
 
     case 'phase90_get_cluster':
@@ -450,7 +442,7 @@ export async function executePhase90Tool(
 
     case 'phase90_get_file_errors':
       return phase90_get_file_errors(
-        params.filePath as string: params.limit as number
+        params.filePath as string | params.limit as number
       );
 
     case 'phase90_get_fix_recommendation':

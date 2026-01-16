@@ -15,8 +15,8 @@ async function getOrchestrator() {
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-    const topologyType = url.searchParams.get('topologyType') || 'general';
-    const accuracyTarget = parseInt(url.searchParams.get('accuracyTarget') || '90');
+    const topologyType = url.searchParams.get('topologyType') ?? 'general';
+    const accuracyTarget = parseInt(url.searchParams.get('accuracyTarget') ?? '90');
     const streamBinary = url.searchParams.get('streamBinary') === 'true';
 
     const stream = new ReadableStream({
@@ -99,7 +99,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
                 const qloraResponse: any = {
                     prediction: { type: resultAny.prediction?.type ?? 'legal_document',
-                        confidence: resultAny.accuracy || 85,
+                        confidence: resultAny?.accuracy?? 85,
                         // Provide empty vectors if missing
                         vectors: resultAny.prediction?.vectors ?? [],
                         clusters: resultAny.prediction?.clusters ?? [0, 1, 2],
@@ -107,7 +107,7 @@ export const GET: RequestHandler = async ({ url }) => {
                             edges: resultAny.topology?.edges ?? 15,
                             connectivity: resultAny.topology?.connectivity ?? 0.75
                         },
-                        accuracy: resultAny.accuracy || 90
+                        accuracy: resultAny?.accuracy?? 90
                     },
                     topology: { structure: resultAny.topology?.structure ?? 'hierarchical',
                         complexity: resultAny.topology?.complexity ?? 0.68,
@@ -115,10 +115,10 @@ export const GET: RequestHandler = async ({ url }) => {
                     },
                     cacheHit: (resultAny.cacheMetrics?.totalCacheHitRate ?? 0) > 0,
                     processingTime,
-                    metrics: { hmmPredictionScore: metrics.hmmAccuracy || 0.8,
+                    metrics: { hmmPredictionScore: metrics?.hmmAccuracy?? 0.8,
                         somClusterScore: 0.9,
-                        webgpuOptimizationGain: metrics.webgpuSpeedup || 1.2,
-                        cacheEfficiency: cacheStats.hitRate || 0.5,
+                        webgpuOptimizationGain: metrics?.webgpuSpeedup?? 1.2,
+                        cacheEfficiency: cacheStats?.hitRate?? 0.5,
                         tensorOperations: 45000,
                         memoryUsage: 512,
                         gpuUtilization: metrics.webgpuEnabled ? 0.85 : 0
@@ -170,7 +170,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
             } catch (error: any) {
                 console.error('[SSE] QLoRA streaming error:', error);
-                sendEvent('error', { message: error.message || 'Unknown error' });
+                sendEvent('error', { message: error?.message?? 'Unknown error' });
                 controller.close();
             }
         }

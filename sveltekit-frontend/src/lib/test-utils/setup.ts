@@ -310,7 +310,7 @@ export async function cleanupTest(): Promise<void> {
 	vi.clearAllMocks();
 
 	// Restore fetch if it was mocked
-	if (global.fetch && vi.isMockFunction(global.fetch)) {
+	if (global?.fetch&& vi.isMockFunction(global.fetch)) {
 		vi.restoreAllMocks();
 	}
 }
@@ -385,7 +385,7 @@ export function createTestSearchResult(overrides: Partial<any> = {}): any {
  * Create test embedding vector
  */
 export function createTestEmbedding(dimension: number = 384): number[] {
-	return Array.from({ length: dimension }, () => Math.random());
+	return Array.from({ length, dimension }, () => Math.random());
 }
 
 // ═══════════════════════════════════════════════════════════════════════

@@ -31,7 +31,7 @@ export class AISuggestionsService {
  'http://127.0.0.1:11434',
  process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
- return possibleEndpoints[0] || 'http://localhost:11434';
+ return possibleEndpoints[0] ?? 'http://localhost:11434';
  }
 
  async generateSuggestions(
@@ -223,7 +223,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  digital: 'text messages, social media posts, or digital files',
  expert: 'expert witness reports or technical analysis',
  };
- return examples[type] || 'supporting documentation';
+ return examples[type] ?? 'supporting documentation';
  }
 
  private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{ type: string;

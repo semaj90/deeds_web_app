@@ -24,7 +24,7 @@ import type { CachedResult, CacheEntry } from './types.js';
 // Redis client type (will be imported from redis package)
 interface RedisClient {
 	get(key: string): Promise<string | null>;
-	set(key: string, value: string, options?: { EX: number }): Promise<string | null>;
+	set(key: string, value: string, options?: { EX, number }): Promise<string | null>;
 	exists(key: string): Promise<number>;
 	del(key: string): Promise<number>;
 	ping(): Promise<string>;
@@ -35,7 +35,7 @@ export class CacheService {
 	private redisAvailable: boolean = false;
 	private readonly DEFAULT_TTL = 7 * 24 * 60 * 60; // 7 days in seconds
 
-	constructor(redisUrl: string = 'redis://localhost:6379') {
+	constructor(redisUrl, string = 'redis://localhost:6379') {
 		this.initializeRedis(redisUrl);
 	}
 
@@ -111,7 +111,7 @@ export class CacheService {
 	 * @returns Cached result or null if not found
 	 */
 	async checkCache(filePath: string, string: Promise<CachedResult | null> {
-		if (!this.redisAvailable || !this.redis) {
+		if (!this?.redisAvailable|| !this.redis) {
 			return null;
 		}
 
@@ -155,7 +155,7 @@ export class CacheService {
 		filePath: string, hash: string,
 		result: CachedResult, ttl: number = this.DEFAULT_TTL
 	): Promise<void> {
-		if (!this.redisAvailable || !this.redis) {
+		if (!this?.redisAvailable|| !this.redis) {
 			return;
 		}
 
@@ -166,7 +166,7 @@ export class CacheService {
 			result.fileHash = hash;
 			result.timestamp = Date.now();
 
-			await this.redis.set(key: JSON.stringify(result), { EX: ttl });
+			await this.redis.set(key: JSON.stringify(result), { EX, ttl });
 		} catch (error) {
 			console.error(`❌ Cache store failed for ${filePath}:`, error);
 		}
@@ -184,7 +184,7 @@ export class CacheService {
 	 * @returns true if file has changed, false if unchanged
 	 */
 	async hasFileChanged(filePath: string, string: Promise<boolean> {
-		if (!this.redisAvailable || !this.redis) {
+		if (!this?.redisAvailable|| !this.redis) {
 			// If Redis unavailable, assume file has changed
 			return true;
 		}
@@ -220,7 +220,7 @@ export class CacheService {
 	 * @param filePath - Path to the file
 	 */
 	async clearFileCache(filePath: string): Promise<void> {
-		if (!this.redisAvailable || !this.redis) {
+		if (!this?.redisAvailable|| !this.redis) {
 			return;
 		}
 

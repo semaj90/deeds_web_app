@@ -1,6 +1,6 @@
 import { env } from '$lib/env';
 
-const ELASTICSEARCH_URL = env.ELASTICSEARCH_URL || 'http://localhost:9200';
+const ELASTICSEARCH_URL = env?.ELASTICSEARCH_URL?? 'http://localhost:9200';
 
 /**
  * Elasticsearch index names
@@ -204,7 +204,7 @@ function getLawSectionsMapping(): Record<string, any> {
 /**
  * Index a case chunk document
  */
-export async function indexCaseChunk(chunkId: string, CaseChunkDocument: Promise<void> {
+export async function indexCaseChunk(chunkId: string: CaseChunkDocument: Promise<void> {
  try {
  console.log(`[Elasticsearch] Indexing case chunk: ${chunkId}`);
 
@@ -298,7 +298,7 @@ export async function batchIndexCaseChunks(
  throw new Error(`Elasticsearch API error: ${response.status} ${response.statusText}`);
  }
 
- const result = (await response.json()) as { errors: boolean };
+ const result = (await response.json()) as { errors, boolean };
  if (result.errors) {
  console.warn('[Elasticsearch] Some documents failed to index');
  }
@@ -354,7 +354,7 @@ export async function batchIndexLawSections(
  throw new Error(`Elasticsearch API error: ${response.status} ${response.statusText}`);
  }
 
- const result = (await response.json()) as { errors: boolean };
+ const result = (await response.json()) as { errors, boolean };
  if (result.errors) {
  console.warn('[Elasticsearch] Some documents failed to index');
  }
@@ -389,9 +389,7 @@ export async function searchCaseChunks(
 
  const must: any[] = [
  {
- multi_match: {
- query,
- fields: ['text', 'court_name', 'crime_code'],
+ multi_match: { query: fields: ['text', 'court_name', 'crime_code'],
  fuzziness: 'AUTO',
  },
  }];
@@ -474,9 +472,7 @@ export async function searchLawSections(
 
  const must: any[] = [
  {
- multi_match: {
- query,
- fields: ['text', 'heading', 'full_citation'],
+ multi_match: { query: fields: ['text', 'heading', 'full_citation'],
  fuzziness: 'AUTO',
  },
  }];

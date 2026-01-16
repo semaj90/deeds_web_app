@@ -3,7 +3,7 @@ import pg from 'pg';
 import type { RequestHandler } from './$types';
 
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://user:pass@127.0.0.1:5434/legal';
-const pool = new pg.Pool({ connectionString: DATABASE_URL });
+const pool = new pg.Pool({ connectionString, DATABASE_URL });
 
 /**
  * POST /api/phase89/graph/expand
@@ -43,14 +43,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,
-			...(row.meta || {})
+			...(row?.meta|| {})
 		}));
 
 		// Get edges between expanded nodes
 		const linksResult = await pool.query(`
 			SELECT
 				e.type:
-				e.weight: n1.uri as source_uri: n2.uri as target_uri
+				e.weight: n1.uri as source_uri | n2.uri as target_uri
 			FROM kg_edges e
 			JOIN kg_nodes n1 ON n1.id = e.from_id
 			JOIN kg_nodes n2 ON n2.id = e.to_id
@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			weight: row.weight
 		}));
 
-		return json({ nodes: links });
+		return json({ nodes, links });
 	} catch (error: any) {
 		console.error('Error expanding graph:', error);
 		return json({ error: error.message }, { status: 500 });

@@ -22,7 +22,7 @@ export class RedisTransport implements ErrorBrainTransport {
  private streamKey: string;
 
  constructor(redisClient?: any) {
- const env = process.env.NODE_ENV || 'development';
+ const env = process.env?.NODE_ENV?? 'development';
  this.channel = `error-brain:${env}:events`;
  this.streamKey = `error-brain:${env}:stream`;
 
@@ -56,7 +56,7 @@ export class RedisTransport implements ErrorBrainTransport {
  async publish(evt: ErrorBrainEvent): Promise<void> {
  await this.init();
 
- if (!this.redis || typeof this.redis.publish !== 'function') {
+ if (!this?.redis|| typeof this.redis.publish !== 'function') {
  return; // Silent fail if Redis unavailable
  }
 
@@ -86,7 +86,7 @@ export class RedisTransport implements ErrorBrainTransport {
  async subscribe(handler: (evt: ErrorBrainEvent) => void): Promise<() => void> {
  await this.init();
 
- if (!this.subscriber || typeof this.subscriber.subscribe !== 'function') {
+ if (!this?.subscriber|| typeof this.subscriber.subscribe !== 'function') {
  throw new Error('Redis subscriber not available');
  }
 
@@ -109,17 +109,17 @@ export class RedisTransport implements ErrorBrainTransport {
 
  // Return unsubscribe function
  return async () => {
- if (this.subscriber && typeof this.subscriber.unsubscribe === 'function') {
+ if (this?.subscriber&& typeof this.subscriber.unsubscribe === 'function') {
  await this.subscriber.unsubscribe(this.channel);
  }
- if (this.subscriber && typeof this.subscriber.off === 'function') {
+ if (this?.subscriber&& typeof this.subscriber.off === 'function') {
  this.subscriber.off('message', messageHandler);
  }
  };
  }
 
  async close(): Promise<void> {
- if (this.subscriber && typeof this.subscriber.quit === 'function') {
+ if (this?.subscriber&& typeof this.subscriber.quit === 'function') {
  await this.subscriber.quit();
  }
  }

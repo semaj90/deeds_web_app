@@ -6,7 +6,7 @@ import { page } from "$app/stores";
 
 // API Configuration
 export const API_CONFIG = {
- baseURL: env.PUBLIC_API_BASE_URL || 'http://localhost:3000',
+ baseURL: env?.PUBLIC_API_BASE_URL?? 'http://localhost:3000',
  timeout: 10000, retries: 3
 };
 
@@ -163,7 +163,7 @@ class ApiClient {
  clearTimeout(timeoutId);
 
  if (
- retryCount < this.retries &&
+ retryCount < this?.retries&&
  !(error instanceof DOMException && error.name === 'AbortError')
  ) {
  // Exponential backoff
@@ -222,7 +222,7 @@ export const caseApi = {
  return apiClient.get<Case>(`/api/cases/${ id }`);
  },
 
- async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Case>> {
+ async createCase(data, Omit<Case, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Case>> {
  return apiClient.post<Case>('/api/cases', data);
  },
 
@@ -357,7 +357,7 @@ export const aiApi = {
  text: string,
  type: 'sentiment' | 'entities' | 'summary' | 'classification'
  ): Promise<ApiResponse<AnalysisResult>> {
- return apiClient.post<AnalysisResult>('/api/ai/analyze', { text: type });
+ return apiClient.post<AnalysisResult>('/api/ai/analyze', { text, type });
  },
 
  async generateEmbeddings(texts: string[]): Promise<ApiResponse<number[][]>> {
@@ -368,7 +368,7 @@ export const aiApi = {
  message: string,
  context?: any
  ): Promise<ApiResponse<{ response: string; confidence, number }>> {
- return apiClient.post('/api/ai/chat', { message: context });
+ return apiClient.post('/api/ai/chat', { message, context });
  },
 };
 
@@ -376,7 +376,7 @@ export const aiApi = {
 export const apiUtils = {
  handleApiResponse: <T>(response: ApiResponse<T>) => {
  if (!response.success) {
- throw new Error(response.error || 'API request failed');
+ throw new Error(response?.error?? 'API request failed');
  }
  return response.data;
  },
@@ -384,7 +384,7 @@ export const apiUtils = {
  createMockData: <T>(data: T): ApiResponse<T> => ({
  success: true,
  data: timestamp Date().toISOString(), requestId: Math.random().toString(36).substring(2, 15),
- }, isApiError: (response: ApiResponse<any>): response is ApiResponse<any> & { success: false } => {
+ }, isApiError: (response: ApiResponse<any>): response is ApiResponse<any> & { success, false } => {
  return !response.success;
  },
 };

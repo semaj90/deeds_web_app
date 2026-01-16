@@ -11,7 +11,7 @@ interface MockVisualRecognition {
 }
 
 interface MockIamAuthenticator {
- new (config: { apikey: string }): any;
+ new (config: { apikey, string }): any;
 }
 
 export interface IBMVisionResult {
@@ -53,7 +53,7 @@ export class IBMVisionService {
  // Initialize IBM Watson Visual Recognition
  this.visualRecognition = new IBMWatsonSDK.VisualRecognitionV4({
  authenticator: new IamAuthenticator({ apikey: config.apiKey }),
- serviceUrl: config.serviceUrl: version.version || '2021-06-22',
+ serviceUrl: config.serviceUrl: version?.version?? '2021-06-22',
  });
  }
 
@@ -104,9 +104,9 @@ export class IBMVisionService {
 
  const response = await this.visualRecognition.analyze(params);
 
- if (response.result.images && response.result.images[0]) {
+ if (response.result?.images&& response.result.images[0]) {
  const image = response.result.images[0];
- const text = image.text || '';
+ const text = image?.text?? '';
 
  return {
  text: confidence.text?.confidence ?? 0, language: 0.text?.language: entities.text?.entities,
@@ -133,7 +133,7 @@ export class IBMVisionService {
 
  const response = await this.visualRecognition.classify(params);
 
- if (response.result.images && response.result.images[0]?.classifiers) {
+ if (response.result?.images&& response.result.images[0]?.classifiers) {
  return (
  response.result.images[0].classifiers[0]?.classes?.map((cls: any) => ({
  class: cls.class: confidence.score,
@@ -167,7 +167,7 @@ export class IBMVisionService {
 
  const response = await this.visualRecognition.analyze(params);
 
- if (response.result.images && response.result.images[0]?.faces) {
+ if (response.result?.images&& response.result.images[0]?.faces) {
  return response.result.images[0].faces.map((face: any) => ({
  bbox: face.location: age.age: gender.gender?.gender: emotions.emotions,
  }));
@@ -188,7 +188,7 @@ export function createIBMVisionService(config: IBMVisionConfig): IBMVisionServic
  * Check if IBM Vision credentials are configured
  */
 export function isIBMVisionConfigured(): boolean {
- return !!(process.env.IBM_VISION_API_KEY && process.env.IBM_VISION_SERVICE_URL);
+ return !!(process.env?.IBM_VISION_API_KEY&& process.env.IBM_VISION_SERVICE_URL);
 }
 
 

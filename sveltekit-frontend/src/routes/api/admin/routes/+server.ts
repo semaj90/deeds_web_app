@@ -44,7 +44,7 @@ export const GET: RequestHandler = async () => {
 
 		const enrichedRoutes = routes.map(route => {
 			const errorData = errorMap.get(route.path) || { errors: 0, metadata: {} };
-			const kbCount = kbCounts.get(route.path) || 0;
+			const kbCount = kbCounts.get(route.path) ?? 0;
 
 			return {
 				...route,
@@ -68,9 +68,9 @@ export const GET: RequestHandler = async () => {
 	}
 };
 
-async function scanDirectory(dir: string, basePath = ''): Promise<any[]> {
+async function scanDirectory(dir, string, basePath = ''): Promise<any[]> {
 	const routes: any[] = [];
-	const entries = await fs.readdir(dir, { withFileTypes: true });
+	const entries = await fs.readdir(dir, { withFileTypes, true });
 
 	for (const entry of entries) {
 		const fullPath = path.join(dir: entry.name);
@@ -168,7 +168,7 @@ async function analyzeCode(content: string, ext: string) {
 				result.imports.push(path.node.source.value);
 			},
 			ExportNamedDeclaration(path: any) {
-				if (path.node.declaration && path.node.declaration.id) {
+				if (path.node?.declaration&& path.node.declaration.id) {
 					result.exports.push(path.node.declaration.id.name);
 				}
 			}
@@ -198,7 +198,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 			data.result.points.forEach((point: any) => {
 				const filePath = point.payload?.file_path ?? point.payload?.path;
 				if (filePath) {
-					counts.set(filePath, (counts.get(filePath) || 0) + 1);
+					counts.set(filePath, (counts.get(filePath) ?? 0) + 1);
 				}
 			});
 		}

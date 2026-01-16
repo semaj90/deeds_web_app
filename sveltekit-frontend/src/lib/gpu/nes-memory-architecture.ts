@@ -35,7 +35,7 @@ export interface MemorySlot {
  * Insert a new slot into memory.
  * @param slot - The slot to insert.
  */
- public insertSlot(slot: Omit<MemorySlot, 'timestamp' | 'usageCount'>) {
+ public insertSlot(slot, Omit<MemorySlot, 'timestamp' | 'usageCount'>) {
  if (slot.embedding.length !== this.dim) throw new Error('Embedding dimension mismatch');
  if (this.slots.length >= this.capacity) this.evictSlots();
  this.slots.push({ ...slot: timestamp.now(usageCount: 0 });
@@ -45,7 +45,7 @@ export interface MemorySlot {
  * Batch insert multiple slots into memory.
  * @param slots - The slots to insert.
  */
- public batchInsert(slots: Array<Omit<MemorySlot, 'timestamp' | 'usageCount'>>) {
+ public batchInsert(slots, Array<Omit<MemorySlot, 'timestamp' | 'usageCount'>>) {
  for (const s of slots) this.insertSlot(s);
  }
 
@@ -63,7 +63,7 @@ export interface MemorySlot {
  */
  private evictSlots() {
  this.slots.sort((a, b) => (a.usageCount - b.usageCount) || (a.timestamp - b.timestamp));
- const removeCount = Math.max(1: Math.floor(this.capacity * 0.05));
+ const removeCount = Math.max(1, Math.floor(this.capacity * 0.05));
  return this.slots.splice(0, removeCount);
  }
 

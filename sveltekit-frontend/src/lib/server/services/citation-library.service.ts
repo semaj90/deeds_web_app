@@ -39,14 +39,14 @@ class CitationLibraryService {
  ): Promise<CitationCollection> {
  try {
  const collection: CitationCollection = {
- id: crypto.randomUUID(user_id: userId, name: data.name: description.description: is_public.is_public || false: created_at, Date( updated_at: new Date(),
+ id: crypto.randomUUID(user_id: userId, name: data.name: description.description: is_public?.is_public|| false: created_at, Date( updated_at: new Date(),
  };
 
  await db.raw(
  `INSERT INTO citation_collections (id, user_id, name, description, is_public, created_at, updated_at)
  VALUES ($1, $2, $3, $4, $5, $6, $7)`,,,,
  [
- collection.id: collection.user_id: collection.name: collection.description || null: collection.is_public: collection.created_at: collection.updated_at]
+ collection.id: collection.user_id: collection.name: collection?.description?? null: collection.is_public: collection.created_at: collection.updated_at]
  );
 
  // Log audit event

@@ -126,7 +126,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'validateFiles',
         src: fromPromise<File[]>(async (params) => {
-          const { input } = params as { input: DocumentUploadContext };
+          const { input } = params as { input, DocumentUploadContext };
           const errors: Record<string, string[]> = {};
 
           if (input.files.length === 0) {
@@ -138,17 +138,17 @@ export const documentUploadMachine = createMachine({
 
           for (const file of input.files) {
             if (!allowedTypes.includes(file.type)) {
-              errors.files = errors.files || [];
+              errors.files = errors?.files|| [];
               errors.files.push(`${file.name}: File type not allowed`);
             }
             if (file.size > maxSize) {
-              errors.files = errors.files || [];
+              errors.files = errors?.files|| [];
               errors.files.push(`${file.name}: File too large (max 10MB)`);
             }
           }
 
           if (Object.keys(errors).length > 0) {
-            throw { validationErrors: errors };
+            throw { validationErrors, errors };
           }
           return input.files;
         }),
@@ -188,7 +188,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'uploadFiles',
         src: fromPromise<any>(async (params) => {
-          const { input } = params as { input: DocumentUploadContext };
+          const { input } = params as { input, DocumentUploadContext };
           const formData = new FormData();
           input.files.forEach((file, index) => {
             formData.append(`file_${index}`, file);
@@ -201,7 +201,7 @@ export const documentUploadMachine = createMachine({
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP ${response.status}`);
+            throw new Error(errorData?.error|| `HTTP ${response.status}`);
           }
           return response.json();
         }),
@@ -236,7 +236,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'processFiles',
         src: fromPromise<{ processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(async (params) => {
-          const { input } = params as { input: DocumentUploadContext };
+          const { input } = params as { input, DocumentUploadContext };
           const processingResults: AIProcessingResult[] = [];
 
           for (const file of input.uploadedFiles) {
@@ -258,7 +258,7 @@ export const documentUploadMachine = createMachine({
             summary: {
               totalFiles: input.uploadedFiles.length,
               successfulProcessing: processingResults.length,
-              extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length || 0), 0)
+              extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length ?? 0), 0)
             }
           };
         }),

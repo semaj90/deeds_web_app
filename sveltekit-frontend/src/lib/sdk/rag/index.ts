@@ -105,21 +105,19 @@ export class RAGClient {
 
 		const searchResult = await this.qdrant.search(this.config.collectionName, {
 			vector: queryEmbedding,
-			limit: query.topK || 5,
-			score_threshold: query.threshold || 0.7,
+			limit: query?.topK?? 5,
+			score_threshold: query?.threshold?? 0.7,
 			filter: query.filter
 		});
 
 		const documents: RAGDocument[] = searchResult.map(result => ({
 			id: result.id.toString(),
 			content: (result.payload?.content as string) ?? '',
-			metadata: result.payload || {},
+			metadata: result?.payload|| {},
 			score: result.score
 		}));
 
-		return {
-			documents,
-			query: query.query,
+		return { documents: query: query.query,
 			totalFound: documents.length,
 			processingTime: Date.now() - startTime
 		};

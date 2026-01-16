@@ -1,7 +1,7 @@
 import { SSE } from '$lib/server/sse';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ request: locals }) => {
+export const GET: RequestHandler = async ({ request, locals }) => {
     // 1. Initialize SSE helper
     const sse = new SSE();
 

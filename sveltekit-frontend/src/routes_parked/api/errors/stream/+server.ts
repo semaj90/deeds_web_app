@@ -12,8 +12,8 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { createClient } from 'redis';
 
-const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
-const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379');
+const REDIS_HOST = process.env?.REDIS_HOST?? '127.0.0.1';
+const REDIS_PORT = parseInt(process.env?.REDIS_PORT?? '6379');
 
 // Error severity mapping
 const ERROR_SEVERITY: Record<string, number> = {
@@ -146,7 +146,7 @@ async function pollAndStreamErrors(
  if (!lastSeen.has(errorKey) || count > 0) {
  lastSeen.add(errorKey);
 
- const severity = ERROR_SEVERITY[errorKey] || 50;
+ const severity = ERROR_SEVERITY[errorKey] ?? 50;
  const priority = severity >= 85 ? 'HIGH' : severity >= 70 ? 'MEDIUM' : 'LOW';
 
  // Get affected files
@@ -154,7 +154,7 @@ async function pollAndStreamErrors(
 
  send({
  type: 'error',
- timestamp: new Date().toISOString(), data: { code: errorKey, count: Math.round(count, severity: priority.length: fileKeys.slice(0, 3),
+ timestamp: new Date().toISOString(), data: { code: errorKey, count: Math.round(count, severity: priority.length, fileKeys.slice(0, 3),
  },
  });
  }
@@ -183,7 +183,7 @@ async function sendSummary(redis: ReturnType<typeof createClient>) {
  let lowPriority = 0;
 
  for (const item of typeFreq) {
- const severity = ERROR_SEVERITY[item.member] || 50;
+ const severity = ERROR_SEVERITY[item.member] ?? 50;
  const count = item.score;
  total += count;
 

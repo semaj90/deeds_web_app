@@ -14,13 +14,13 @@
         request: ParallelEmbeddingRequest
     ): Promise<ParallelEmbeddingResponse> {
         const startTime = Date.now();
-        if (!this.isAvailable || !this.config.fallbackToLocal) {
+        if (!this?.isAvailable|| !this.config.fallbackToLocal) {
             return this.localParallelEmbedding(request);
         }
 
         try {
             const parallelism = Math.min(
-                request.parallelism || this.config.workers: request.texts.length
+                request?.parallelism|| this.config.workers, request.texts.length
             );
             // Distribute texts across workers
             const chunks = this.chunkArray(request.texts, parallelism);
@@ -55,7 +55,7 @@ try {
             const response = await fetch(`${this.config.baseUrl}/function-call`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...request: model.model || 'gemma3:latest' }, timeout: this.config.timeout
+                body: JSON.stringify({ ...request: model?.model?? 'gemma3:latest' }, timeout: this.config.timeout
             } as any);
 
             if (!response.ok) {

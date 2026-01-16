@@ -93,7 +93,7 @@ export const poiService = {
  const response = await fetch(`${API_BASE}/${ poiId }/associates`);
  if (!response.ok) throw new Error('Failed to list associates');
  const data = await response.json();
- return data.associates || [];
+ return data?.associates|| [];
  },
 
  /**
@@ -117,7 +117,7 @@ export const poiService = {
  });
  if (!response.ok) throw new Error('Failed to search POIs');
  const data = await response.json();
- return data.results || [];
+ return data?.results|| [];
  },
 };
 

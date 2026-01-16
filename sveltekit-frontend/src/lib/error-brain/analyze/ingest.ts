@@ -50,7 +50,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
  return [];
  } catch (error: unknown) {
  // Parse stderr for error messages
- const stderr = (error as { stderr?: string }).stderr || '';
+ const stderr = (error as { stderr?: string }).stderr ?? '';
  const diagnostics = parseTSCOutput(stderr);
 
  if (filterCodes && filterCodes.length > 0) {
@@ -103,7 +103,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorReco
  const idx = diag.line - 1; // Convert to 0-indexed
 
  records.push({
- ...diag, originalLine: lines[idx] || '',
+ ...diag, originalLine: lines[idx] ?? '',
  lineBefore: idx > 0 ? lines[idx - 1] : undefined, idx < lines.length - 1 ? lines[idx + 1] : undefined,
  });
  } catch {

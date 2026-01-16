@@ -160,7 +160,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString() as 'enable' | 'disable',
- details: { flag: enabled },
+ details: { flag, enabled },
  status,
  errorMessage,
  };
@@ -205,8 +205,8 @@ export class AuditTrail extends BaseService {
  results.sort((a: any, b, any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
  // Apply pagination
- const offset = options.offset || 0;
- const limit = options.limit || 100;
+ const offset = options?.offset?? 0;
+ const limit = options?.limit?? 100;
 
  results = results.slice(offset, offset + limit);
 
@@ -254,7 +254,7 @@ export class AuditTrail extends BaseService {
  /**
  * Get entries by status
  */
- async getEntriesByStatus(status: 'success' | 'failure'): Promise<AuditEntry[]> {
+ async getEntriesByStatus(status, 'success' | 'failure'): Promise<AuditEntry[]> {
  this.validateInput(status, 'status');
 
  const results = this.entries.filter((e: any) => e.status === status);
@@ -294,7 +294,7 @@ export class AuditTrail extends BaseService {
 
  const operationCounts: Record<string, number> = {};
  for (const entry of this.entries) {
- operationCounts[entry.operation] = (operationCounts[entry.operation] || 0) + 1;
+ operationCounts[entry.operation] = (operationCounts[entry.operation] ?? 0) + 1;
  }
 
  this.log('info', 'Statistics retrieved', {

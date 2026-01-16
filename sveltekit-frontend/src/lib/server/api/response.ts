@@ -11,7 +11,7 @@ export async function withApiHandler(
  const result = await handler({ url, locals, request });
  return json(result);
  } catch (error: any) {
- return json({ error: error.message || 'Internal server error' }, { status: 500 });
+ return json({ error: error?.message?? 'Internal server error' }, { status: 500 });
  }
 }
 

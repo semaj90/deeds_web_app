@@ -22,7 +22,7 @@ class QueryLogger {
  // Ensure logs directory exists
  const logsDir = path.dirname(this.logFile);
  if (!fs.existsSync(logsDir)) {
- fs.mkdirSync(logsDir, { recursive: true });
+ fs.mkdirSync(logsDir, { recursive, true });
  }
  }
 

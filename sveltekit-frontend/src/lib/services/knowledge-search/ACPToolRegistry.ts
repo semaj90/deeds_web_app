@@ -30,15 +30,15 @@ import type { ACPTool, ToolResult } from './types.js';
 // ═══════════════════════════════════════════════════════════════════════
 
 const CONFIG = {
-	endpoints: { ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
-		qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
-		redis: process.env.REDIS_URL || 'http://localhost:6379',
-		knowledgeMcp: process.env.KNOWLEDGE_MCP_URL || 'http://localhost:3004',
-		a2aProtocol: process.env.A2A_URL || 'http://localhost:3005',
-		aceMcp: process.env.ACE_MCP_URL || 'http://localhost:3002'
+	endpoints: { ollama: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+		qdrant: process.env?.QDRANT_URL?? 'http://localhost:6333',
+		redis: process.env?.REDIS_URL?? 'http://localhost:6379',
+		knowledgeMcp: process.env?.KNOWLEDGE_MCP_URL?? 'http://localhost:3004',
+		a2aProtocol: process.env?.A2A_URL?? 'http://localhost:3005',
+		aceMcp: process.env?.ACE_MCP_URL?? 'http://localhost:3002'
 	},
-	models: { embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-		chat: process.env.OLLAMA_MODEL || 'gemma3-legal:latest'
+	models: { embedding: process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest',
+		chat: process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest'
 	},
 	timeouts: { default: 30000, llm: 120000,
 		crawl: 15000
@@ -770,7 +770,7 @@ Object.assign(handlers, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ functionName: 'code:analyze',
-					input: { filePath: tools }
+					input: { filePath, tools }
 				})
 			});
 
@@ -834,7 +834,7 @@ Object.assign(handlers, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ model: CONFIG.models.chat,
-					options: { temperature: maxTokens }
+					options: { temperature, maxTokens }
 				})
 			});
 
@@ -862,7 +862,7 @@ Object.assign(handlers, {
 			const response = await fetch(`${CONFIG.endpoints.ollama}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: text })
+				body: JSON.stringify({ model, text })
 			});
 
 			if (!response.ok) throw new Error(`Ollama embedding error: ${response.status}`);
@@ -919,7 +919,7 @@ Object.assign(handlers, {
 
 	async webSearch(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { query: siteFilter } = args as any;
+		const { query, siteFilter } = args as any;
 
 		// Use Gemini with Google Search grounding
 		try {
@@ -963,13 +963,13 @@ Object.assign(handlers, {
 	// Agent handlers
 	async agentDelegate(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { agentId: task } = args as any;
+		const { agentId, task } = args as any;
 
 		try {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/delegate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ agentId: task })
+				body: JSON.stringify({ agentId, task })
 			});
 
 			if (!response.ok) throw new Error(`A2A delegate error: ${response.status}`);
@@ -988,7 +988,7 @@ Object.assign(handlers, {
 
 	async agentDiscover(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { capability: type } = args as any;
+		const { capability, type } = args as any;
 
 		try {
 			const params = new URLSearchParams();
@@ -1012,13 +1012,13 @@ Object.assign(handlers, {
 
 	async agentBroadcast(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { task: filter } = args as any;
+		const { task, filter } = args as any;
 
 		try {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/broadcast`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ task: filter })
+				body: JSON.stringify({ task, filter })
 			});
 
 			if (!response.ok) throw new Error(`A2A broadcast error: ${response.status}`);
@@ -1063,7 +1063,7 @@ Object.assign(handlers, {
 
 	async fixSuggest(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { error: context } = args as any;
+		const { error, context } = args as any;
 
 		// Search knowledge base for similar errors and suggest fixes
 		try {
@@ -1106,9 +1106,9 @@ Object.assign(handlers, {
 			const { execSync } = await import('child_process');
 
 			// Get container name from env or use default
-			const containerName = process.env.POSTGRES_CONTAINER || 'legal-ai-postgres';
-			const dbName = process.env.DB_NAME || 'legal_ai_db';
-			const dbUser = process.env.DB_USER || 'postgres';
+			const containerName = process.env?.POSTGRES_CONTAINER?? 'legal-ai-postgres';
+			const dbName = process.env?.DB_NAME?? 'legal_ai_db';
+			const dbUser = process.env?.DB_USER?? 'postgres';
 
 			// Execute query via docker exec
 			const cmd = `docker exec ${containerName} psql -U ${dbUser} -d ${dbName} -t -A -F "," -c "${query.replace(/"/g, '\\"')}"`;
@@ -1125,7 +1125,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { rows, rowCount: rows.length },
+				data: { rows: rowCount: rows.length },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1143,9 +1143,9 @@ Object.assign(handlers, {
 		try {
 			const { execSync } = await import('child_process');
 
-			const containerName = process.env.POSTGRES_CONTAINER || 'legal-ai-postgres';
-			const dbName = process.env.DB_NAME || 'legal_ai_db';
-			const dbUser = process.env.DB_USER || 'postgres';
+			const containerName = process.env?.POSTGRES_CONTAINER?? 'legal-ai-postgres';
+			const dbName = process.env?.DB_NAME?? 'legal_ai_db';
+			const dbUser = process.env?.DB_USER?? 'postgres';
 
 			const query = `SELECT table_name FROM information_schema.tables WHERE table_schema='${schema}' ORDER BY table_name`;
 			const cmd = `docker exec ${containerName} psql -U ${dbUser} -d ${dbName} -t -A -c "${query}"`;
@@ -1179,7 +1179,7 @@ Object.assign(handlers, {
 		try {
 			const { execSync } = await import('child_process');
 
-			const containerName = process.env.REDIS_CONTAINER || 'legal-ai-redis';
+			const containerName = process.env?.REDIS_CONTAINER?? 'legal-ai-redis';
 
 			const cmd = `docker exec ${containerName} redis-cli GET "${key}"`;
 			const output = execSync(cmd, { encoding: 'utf-8', timeout: 5000 }).trim();
@@ -1203,7 +1203,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { value: true },
+				data: { value, true },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1221,7 +1221,7 @@ Object.assign(handlers, {
 		try {
 			const { execSync } = await import('child_process');
 
-			const containerName = process.env.REDIS_CONTAINER || 'legal-ai-redis';
+			const containerName = process.env?.REDIS_CONTAINER?? 'legal-ai-redis';
 
 			// Serialize value if needed
 			const serialized = typeof value === 'object' ? JSON.stringify(value) : String(value);
@@ -1232,7 +1232,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { success: true },
+				data: { success, true },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1249,7 +1249,7 @@ Object.assign(handlers, {
 		try {
 			const { execSync } = await import('child_process');
 
-			const containerName = process.env.REDIS_CONTAINER || 'legal-ai-redis';
+			const containerName = process.env?.REDIS_CONTAINER?? 'legal-ai-redis';
 
 			const cmd = `docker exec ${containerName} redis-cli INFO stats`;
 			const output = execSync(cmd, { encoding: 'utf-8', timeout: 5000 });
@@ -1268,8 +1268,8 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { keys: memory: stats.used_memory_human || 'unknown',
-					uptime: parseInt(stats.uptime_in_seconds || '0')
+				data: { keys: memory: stats?.used_memory_human?? 'unknown',
+					uptime: parseInt(stats?.uptime_in_seconds?? '0')
 				},
 				duration: Date.now() - startTime
 			};
@@ -1299,7 +1299,7 @@ Object.assign(handlers, {
 			const tmpFile = path.join(tmpDir, `minio-upload-${Date.now()}.tmp`);
 			fs.writeFileSync(tmpFile, content);
 
-			const containerName = process.env.MINIO_CONTAINER || 'legal-ai-minio';
+			const containerName = process.env?.MINIO_CONTAINER?? 'legal-ai-minio';
 			const minioAlias = 'local';
 
 			// Upload via docker exec with mc (MinIO Client)
@@ -1332,7 +1332,7 @@ Object.assign(handlers, {
 
 		try {
 			// Use MinIO HTTP API
-			const minioUrl = process.env.MINIO_URL || 'http://localhost:9000';
+			const minioUrl = process.env?.MINIO_URL?? 'http://localhost:9000';
 			const response = await fetch(`${minioUrl}/${bucket}?list-type=2&prefix=${ prefix }`, {
 				headers: {
 					'Authorization': 'Basic ' + Buffer.from('minioadmin:minioadmin').toString('base64')
@@ -1371,7 +1371,7 @@ Object.assign(handlers, {
 		try {
 			const { execSync } = await import('child_process');
 
-			const containerName = process.env.MINIO_CONTAINER || 'legal-ai-minio';
+			const containerName = process.env?.MINIO_CONTAINER?? 'legal-ai-minio';
 
 			// Get storage info via mc admin
 			const cmd = `docker exec ${containerName} mc admin info local --json`;
@@ -1406,7 +1406,7 @@ Object.assign(handlers, {
 			const data = await response.json();
 			return {
 				success: true,
-				data: { models: data.models || []
+				data: { models: data?.models|| []
 				},
 				duration: Date.now() - startTime
 			};
@@ -1445,7 +1445,7 @@ Object.assign(handlers, {
 		// Check PostgreSQL
 		try {
 			const { execSync } = await import('child_process');
-			const containerName = process.env.POSTGRES_CONTAINER || 'legal-ai-postgres';
+			const containerName = process.env?.POSTGRES_CONTAINER?? 'legal-ai-postgres';
 			execSync(`docker exec ${containerName} pg_isready`, { timeout: 3000 });
 			services.postgres = 'healthy';
 		} catch {
@@ -1455,7 +1455,7 @@ Object.assign(handlers, {
 		// Check Redis
 		try {
 			const { execSync } = await import('child_process');
-			const containerName = process.env.REDIS_CONTAINER || 'legal-ai-redis';
+			const containerName = process.env?.REDIS_CONTAINER?? 'legal-ai-redis';
 			execSync(`docker exec ${containerName} redis-cli PING`, { timeout: 3000 });
 			services.redis = 'healthy';
 		} catch {
@@ -1829,7 +1829,7 @@ export function getACPToolsByCategory(category: ToolCategory): ACPTool[] {
  * Get tool schema for MCP discovery
  */
 export function getACPToolSchema(toolName: string): ACPTool | null {
-	return TOOLS[toolName] || null;
+	return TOOLS[toolName] ?? null;
 }
 
 /**

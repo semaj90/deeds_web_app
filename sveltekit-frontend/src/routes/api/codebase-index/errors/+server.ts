@@ -9,19 +9,19 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 interface QdrantFilter {
 	must?: Array<{ key: string;
-		match?: { value: string } | { any, string[] };
+		match?: { value, string } | { any: string[] };
 	}>;
 }
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		const page = parseInt(url.searchParams.get('page') || '1');
-		const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
+		const page = parseInt(url.searchParams.get('page') ?? '1');
+		const pageSize = parseInt(url.searchParams.get('pageSize') ?? '50');
 		const search = url.searchParams.get('search');
 		const errorCode = url.searchParams.get('errorCode');
 		const surface = url.searchParams.get('surface');
@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const filter: QdrantFilter = { must: [] };
 
 		if (errorCode) {
-			filter.must!.push({ key: 'errorCode', match: { value: errorCode } });
+			filter.must!.push({ key: 'errorCode', match: { value, errorCode } });
 		}
 		if (surface) {
 			filter.must!.push({ key: 'surface', match: { any: [surface] } });
@@ -41,7 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			filter.must!.push({ key: 'tech', match: { any: [tech] } });
 		}
 		if (tool) {
-			filter.must!.push({ key: 'tool', match: { value: tool } });
+			filter.must!.push({ key: 'tool', match: { value, tool } });
 		}
 
 		// Query Qdrant

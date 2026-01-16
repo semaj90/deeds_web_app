@@ -3,8 +3,8 @@ import { env } from '$env/dynamic/private';
 import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
-const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';
-const LLM_MODEL = env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
+const process.env.OLLAMA_URL = env?.OLLAMA_URL?? 'http://localhost:11434';
+const LLM_MODEL = env?.OLLAMA_LLM_MODEL?? 'gemma3-legal:latest';
 
 /**
  * Scenario C: Clause-to-PDF Highlighting
@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const ctx: IntentContext = await request.json();
 
- console.log('[Highlight Clause] Finding clause for:', ctx.userQuestion || ctx.query);
+ console.log('[Highlight Clause] Finding clause for:', ctx?.userQuestion|| ctx.query);
 
  // TODO: Fetch statute text from database
  const additionalContext = {
@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const data = await response.json();
 
  // Parse response to extract clause
- const clause = data.response || '';
+ const clause = data?.response?? '';
 
  return json({
  clause: chunkId.statute?.id ?? 'unknown',

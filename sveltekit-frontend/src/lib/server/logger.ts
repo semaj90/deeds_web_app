@@ -2,7 +2,7 @@ import { RedisClientType } from 'redis';
 import { formatErrorResponse } from './errors.js';
 let _redis: null = null; // Changed type to RedisClientType
 // Redis client initialization removed - module not found
-export async function logStructuredError(payload: { source: string,
+export async function logStructuredError(payload, { source: string,
  level: 'error' | 'warn' | 'info',
  event: string; message: string;
  error?: unknown;
@@ -63,7 +63,7 @@ export async function captureAndFormat(error: any): Promise<any> {
 }
 const counters: Record<string, number> = {};
 export function incrementMetric(name: string, value = 1) {
- counters[name] = (counters[name] || 0) + value;
+ counters[name] = (counters[name] ?? 0) + value;
 }
 export function getMetricsSnapshot() {
  return { ...counters };
@@ -76,18 +76,18 @@ export class Logger {
  return Logger.instance;
  }
  info(message: string, meta?: unknown) {
- console.log(`[INFO] ${new Date().toISOString()}- ${ message }`, meta || '');
+ console.log(`[INFO] ${new Date().toISOString()}- ${ message }`, meta ?? '');
  }
  error(message: string, error?: unknown) {
- console.error(`[ERROR] ${new Date().toISOString()}- ${ message }`, error || '');
+ console.error(`[ERROR] ${new Date().toISOString()}- ${ message }`, error ?? '');
  }
  warn(message: string, meta?: unknown) {
- console.warn(`[WARN] ${new Date().toISOString()}- ${ message }`, meta || '');
+ console.warn(`[WARN] ${new Date().toISOString()}- ${ message }`, meta ?? '');
  }
  debug(message: string, meta?: unknown) {
  try {
  if (process.env.NODE_ENV === 'development') {
- console.debug(`[DEBUG] ${new Date().toISOString()}- ${message}`, meta || '');
+ console.debug(`[DEBUG] ${new Date().toISOString()}- ${message}`, meta ?? '');
  }
  } catch (e) {
  // ignore

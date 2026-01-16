@@ -26,12 +26,12 @@ export class FeatureFlagEnforcer {
 
  // Non-namespaced requests are always allowed
  if (!context) {
- return { allowed: true };
+ return { allowed, true };
  }
 
  // Check if feature is enabled
  if (!context.enabled) {
- const { status: message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
+ const { status, message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
 
  // Log the denied request
  this.logDeniedRequest(context, message);
@@ -58,8 +58,8 @@ export class FeatureFlagEnforcer {
  return new Response(null, { status: 200 });
  }
 
- const status = result.status || 403;
- const message = result.message || 'Feature is not available';
+ const status = result?.status?? 403;
+ const message = result?.message?? 'Feature is not available';
 
  return new Response(
  JSON.stringify({
@@ -67,9 +67,7 @@ export class FeatureFlagEnforcer {
  feature: result.context?.feature,
  timestamp: new Date().toISOString(),
  }),
- {
- status,
- headers: {
+ { status: headers: {
  'Content-Type': 'application/json',
  },
  }
@@ -150,14 +148,14 @@ export class FeatureFlagEnforcer {
  /**
  * Check if feature is enabled
  */
- static isFeatureEnabled(feature: 'errorBrain' | 'legalAi'): boolean {
+ static isFeatureEnabled(feature, 'errorBrain' | 'legalAi'): boolean {
  return featureFlagManager.isFeatureEnabled(feature);
  }
 
  /**
  * Get feature configuration
  */
- static getFeatureConfig(feature: 'errorBrain' | 'legalAi') {
+ static getFeatureConfig(feature, 'errorBrain' | 'legalAi') {
  return featureFlagManager.getFeatureConfig(feature);
  }
 
@@ -169,7 +167,7 @@ export class FeatureFlagEnforcer {
  return true;
  }
 
- if (!result.status || !result.message) {
+ if (!result?.status|| !result.message) {
  return false;
  }
 

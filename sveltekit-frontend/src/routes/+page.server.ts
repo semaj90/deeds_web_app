@@ -32,9 +32,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			db.select().from(auditLog).where(eq(auditLog.userId, user.id)).orderBy(desc(auditLog.createdAt)).limit(5)
 		]);
 
-		return {
-			user,
-			stats: { activeCases: casesCountResult[0]?.count ?? 0,
+		return { user: stats: { activeCases: casesCountResult[0]?.count ?? 0,
 				evidenceItems: evidenceCountResult[0]?.count ?? 0,
 				personsOfInterest: criminalsCountResult[0]?.count ?? 0,
 				recentActivity: recentActivityResult.length
@@ -44,9 +42,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		};
 	} catch (error) {
 		console.error('Error loading dashboard data:', error);
-		return {
-			user,
-			stats: { activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0
+		return { user: stats: { activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0
 			},
 			recentCases: [],
 			recentActivity: [],

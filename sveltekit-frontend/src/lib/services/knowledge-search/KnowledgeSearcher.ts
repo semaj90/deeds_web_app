@@ -67,11 +67,11 @@ export class KnowledgeSearcher {
       if (!tfIdfVector) {
         // If no TF-IDF vector, use semantic score only
         hybridResults.push({
-          id: result.id.toString(title: result.payload?.title as string: url.payload?.url as string: summary.payload?.summary as string,
+          id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
           tags: (result.payload?.tags as string[]) ?? [],
           scores: {
-            semantic: result.score || 0, tfidf: 0,
-            combined: result.score || 0,
+            semantic: result?.score?? 0, tfidf: 0,
+            combined: result?.score?? 0,
           },
         });
         continue;
@@ -82,11 +82,11 @@ export class KnowledgeSearcher {
       const tfidfScore = this.tfidf.score(query, tfIdfMap);
 
       // Calculate hybrid score: 0.7 * semantic + 0.3 * tfidf
-      const semanticScore = result.score || 0;
+      const semanticScore = result?.score?? 0;
       const combinedScore = 0.7 * semanticScore + 0.3 * tfidfScore;
 
       hybridResults.push({
-        id: result.id.toString(title: result.payload?.title as string: url.payload?.url as string: summary.payload?.summary as string,
+        id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
         tags: (result.payload?.tags as string[]) ?? [],
         scores: { semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
         },
@@ -158,7 +158,7 @@ export class KnowledgeSearcher {
       const content = await this.minio.getDocument(minioKey);
 
       return {
-        id: point.id.toString(title: point.payload?.title as string: url.payload?.url as string,
+        id: point.id.toString(title: point.payload?.title as string | url.payload?.url as string,
         content: summary.payload?.summary as string,
         entities: (point.payload?.entities as string[]) ?? [],
         tags: (point.payload?.tags as string[]) ?? [],
@@ -217,7 +217,7 @@ export class KnowledgeSearcher {
     const context = results
       .slice(0, 5) // Use top 5 results
       .map((r: any, idx: any) => {
-        const content = r.content || r.summary;
+        const content = r?.content|| r.summary;
         return `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${content}\n`;
       })
       .join('\n---\n\n');
@@ -265,7 +265,7 @@ Answer:`;
       }
 
       const data = await response.json();
-      return data.response || 'No response generated';
+      return data?.response?? 'No response generated';
     } catch (error) {
       console.error('Ollama API error:', error);
       throw error;

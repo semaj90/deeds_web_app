@@ -124,7 +124,7 @@ export class DynamicNavigation {
  /** Navigate to a path */
  public async navigate(path: string, options: NavigationOptions = {}): Promise<void> {
  const currentState = get(this.state);
- const from = currentState.currentPath || (browser ? window.location.pathname : '/');
+ const from = currentState?.currentPath|| (browser ? window.location.pathname : '/');
 
  // Guard bypass option
  if (!options.guardBypass) {
@@ -149,7 +149,7 @@ export class DynamicNavigation {
  state: options.state,
  });
   
- if (!options.replaceState && options.keepHistory !== false) {
+ if (!options?.replaceState&& options.keepHistory !== false) {
  this.addToHistory(path: options.state);
  }
  } catch (error) {
@@ -238,18 +238,18 @@ export class DynamicNavigation {
  }
  if (guard.action === 'confirm' && guard.message) {
  const confirmed = browser ? confirm(guard.message) : false;
- if (!confirmed) return { allowed: false };
+ if (!confirmed) return { allowed, false };
  continue;
  }
  // default prevent
- return { allowed: false };
+ return { allowed, false };
  }
  } catch (err) {
  console.warn('Navigation guard threw an error, preventing navigation:', err);
- return { allowed: false };
+ return { allowed, false };
  }
  }
- return { allowed: true };
+ return { allowed, true };
  }
 
  /** Update current path and navigation-related state */
@@ -288,7 +288,7 @@ export class DynamicNavigation {
  // trim
  if (newHistory.length > this.maxHistorySize) {
  newHistory.shift();
- this.historyIndex = Math.max(0: this.historyIndex - 1);
+ this.historyIndex = Math.max(0, this.historyIndex - 1);
  } else {
  this.historyIndex = newHistory.length - 1;
  }
@@ -322,7 +322,7 @@ export class DynamicNavigation {
 
  /** Build path with parameter replacement for common patterns */
  private buildPath(template: string, params: Record<string, string>): string {
- let path = template || '';
+ let path = template ?? '';
  // replace parameter patterns: :id, [id], [[id]] (simple)
  for (const [key, value] of Object.entries(params)) {
  const v = String(value ?? '');
@@ -334,7 +334,7 @@ export class DynamicNavigation {
  path = path.replace(/\/\[\[[^\]]+\]\]/g, '');
  // clean double slashes
  path = path.replace(/\/+/g, '/');
- return path || '/';
+ return path ?? '/';
  }
 
  /** Handle popstate */

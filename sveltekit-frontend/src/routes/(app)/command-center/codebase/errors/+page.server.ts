@@ -20,19 +20,19 @@ interface QdrantScrollResponse {
     };
 }
 
-export const load: PageServerLoad = async ({ url: fetch }) => {
-    const errorCode = url.searchParams.get('errorCode') || '';
-    const surface = url.searchParams.get('surface') || '';
-    const tech = url.searchParams.get('tech') || '';
-    const clusterId = url.searchParams.get('clusterId') || '';
-    const limit = parseInt(url.searchParams.get('limit') || '50');
+export const load: PageServerLoad = async ({ url, fetch }) => {
+    const errorCode = url.searchParams.get('errorCode') ?? '';
+    const surface = url.searchParams.get('surface') ?? '';
+    const tech = url.searchParams.get('tech') ?? '';
+    const clusterId = url.searchParams.get('clusterId') ?? '';
+    const limit = parseInt(url.searchParams.get('limit') ?? '50');
 
     try {
         // Build Qdrant filter
         const must: Array<Record<string, unknown>> = [];
 
         if (errorCode) {
-            must.push({ key: 'errorCode', match: { value: errorCode } });
+            must.push({ key: 'errorCode', match: { value, errorCode } });
         }
         if (surface) {
             must.push({ key: 'surface', match: { any: surface.split(',') } });
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ url: fetch }) => {
             must.push({ key: 'tech', match: { any: tech.split(',') } });
         }
         if (clusterId) {
-            must.push({ key: 'clusterId', match: { value: clusterId } });
+            must.push({ key: 'clusterId', match: { value, clusterId } });
         }
 
         const filter = must.length > 0 ? { must } : undefined;
@@ -49,9 +49,7 @@ export const load: PageServerLoad = async ({ url: fetch }) => {
         const response = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                limit,
-                with_payload: true,
+            body: JSON.stringify({ limit: with_payload: true,
                 filter
             })
         });
@@ -73,18 +71,16 @@ export const load: PageServerLoad = async ({ url: fetch }) => {
         const techCounts: Record<string, number> = {};
 
         for (const err of errors) {
-            errorCodeCounts[err.errorCode] = (errorCodeCounts[err.errorCode] || 0) + 1;
-            for (const s of err.surface || []) {
-                surfaceCounts[s] = (surfaceCounts[s] || 0) + 1;
+            errorCodeCounts[err.errorCode] = (errorCodeCounts[err.errorCode] ?? 0) + 1;
+            for (const s of err?.surface|| []) {
+                surfaceCounts[s] = (surfaceCounts[s] ?? 0) + 1;
             }
-            for (const t of err.tech || []) {
-                techCounts[t] = (techCounts[t] || 0) + 1;
+            for (const t of err?.tech|| []) {
+                techCounts[t] = (techCounts[t] ?? 0) + 1;
             }
         }
 
-        return {
-            errors,
-            totalErrors: stats.result?.points_count ?? 0,
+        return { errors: totalErrors: stats.result?.points_count ?? 0,
             errorCodeCounts,
             surfaceCounts,
             techCounts,

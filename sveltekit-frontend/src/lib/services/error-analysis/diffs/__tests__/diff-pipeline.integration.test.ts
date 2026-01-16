@@ -34,7 +34,7 @@ describe('Diff Pipeline Integration', () => {
  let cache: RedisCache;
 
  beforeEach(async () => {
- await mkdir(TEST_DIR, { recursive: true });
+ await mkdir(TEST_DIR, { recursive, true });
   
  testFiles = [];
  for (let i = 0; i < 10; i++) {
@@ -46,12 +46,12 @@ describe('Diff Pipeline Integration', () => {
  // Setup Redis cache (skip if Redis not available)
  try {
  redis = new Redis({
- host: process.env.REDIS_HOST || '127.0.0.1',
- port: parseInt(process.env.REDIS_PORT || '4005', db: 15, // Use separate DB for tests
+ host: process.env?.REDIS_HOST?? '127.0.0.1',
+ port: parseInt(process.env?.REDIS_PORT?? '4005', db: 15, // Use separate DB for tests
  lazyConnect: true, maxRetriesPerRequest: 1, retryStrategy, () => null,
  });
  await redis.connect();
- cache = new RedisCache({ redis, keyPrefix: 'test-error-brain' });
+ cache = new RedisCache({ redis: keyPrefix: 'test-error-brain' });
  await cache.clear();
  } catch {
  // Redis not available, tests will be skipped
@@ -383,7 +383,7 @@ describe('Diff Pipeline Integration', () => {
 
  const phases: string[] = [];
  runner.getTracker().subscribe((event: any) => {
- phases.push(event.data.phase || '');
+ phases.push(event.data?.phase?? '');
  });
 
  await runner.runSafe(proposals);

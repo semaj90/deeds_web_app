@@ -32,8 +32,8 @@ export const cases = pgTable(
  jurisdiction: varchar('jurisdiction', { length: 200 }),
 
  // Dates
- filed_date: timestamp('filed_date', { withTimezone: true }),
- closed_date: timestamp('closed_date', { withTimezone: true }),
+ filed_date: timestamp('filed_date', { withTimezone, true }),
+ closed_date: timestamp('closed_date', { withTimezone, true }),
 
  // Ownership and assignment
  created_by: uuid('created_by').notNull(),
@@ -43,8 +43,8 @@ export const cases = pgTable(
  metadata: jsonb('metadata'), // Store additional case data
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_number_idx: index('yorha_cases_case_number_idx').on(table.case_number),
@@ -75,7 +75,7 @@ export const evidence_nodes = pgTable(
 
  // Evidence metadata
  source: varchar('source', { length: 500 }), // where the evidence came from
- date_collected: timestamp('date_collected', { withTimezone: true }),
+ date_collected: timestamp('date_collected', { withTimezone, true }),
  relevance_score: integer('relevance_score').default(0), // 0-100
 
  // File storage
@@ -93,8 +93,8 @@ export const evidence_nodes = pgTable(
 
  // Audit fields
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_nodes_case_id_idx').on(table.case_id),
@@ -125,8 +125,8 @@ export const evidence_connections = pgTable(
 
  // Audit fields
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_connections_case_id_idx').on(table.case_id),
@@ -158,9 +158,9 @@ export const chat_sessions = pgTable(
  message_count: integer('message_count').default(0),
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- last_message_at: timestamp('last_message_at', { withTimezone: true }),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ last_message_at: timestamp('last_message_at', { withTimezone, true }),
  },
  (table) => ({
  case_id_idx: index('yorha_chat_sessions_case_id_idx').on(table.case_id),
@@ -193,8 +193,8 @@ export const chat_messages = pgTable(
  tokens_used: integer('tokens_used'),
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  session_id_idx: index('yorha_chat_messages_session_id_idx').on(table.session_id),
@@ -235,7 +235,7 @@ export const system_metrics = pgTable(
  active_sessions: integer('active_sessions').default(0),
 
  // Timestamp
- recorded_at: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
+ recorded_at: timestamp('recorded_at', { withTimezone, true }).defaultNow().notNull(),
  },
  (table) => ({
  recorded_at_idx: index('yorha_system_metrics_recorded_at_idx').on(table.recorded_at),
@@ -251,7 +251,7 @@ export const casesRelations = relations(cases, ({ many }) => ({
  chat_sessions: many(chat_sessions),
 }));
 
-export const evidence_nodesRelations = relations(evidence_nodes, ({ one: many }) => ({
+export const evidence_nodesRelations = relations(evidence_nodes, ({ one, many }) => ({
  case: one(cases, {
  fields: [evidence_nodes.case_id],
  references: [cases.id],
@@ -281,7 +281,7 @@ export const evidence_connectionsRelations = relations(evidence_connections, ({ 
  }),
 }));
 
-export const chat_sessionsRelations = relations(chat_sessions, ({ one: many }) => ({
+export const chat_sessionsRelations = relations(chat_sessions, ({ one, many }) => ({
  case: one(cases, {
  fields: [chat_sessions.case_id],
  references: [cases.id],

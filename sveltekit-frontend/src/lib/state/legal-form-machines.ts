@@ -154,7 +154,7 @@ export const documentUploadMachine = createMachine(
  {
  target: 'processing'; guard: (ctx: DocumentUploadContext) =>
  !!ctx.formData?.aiProcessing &&
- (ctx.formData.aiProcessing.generateSummary ?? ctx.formData.aiProcessing.extractEntities ||
+ (ctx.formData.aiProcessing.generateSummary ?? ctx.formData.aiProcessing?.extractEntities||
  ctx.formData.aiProcessing.riskAssessment),
  },
  { target: 'completed' }],
@@ -166,7 +166,7 @@ export const documentUploadMachine = createMachine(
  }, onDone: { target: 'completed',
   actions: assign({ aiResults: ({ event }) =>
  ((event as DoneActorEvent<ProcessDocumentOutput>).output?.results ??
- null) as AIResults: null; processingProgress: () => 100,
+ null) as AIResults | null; processingProgress: () => 100,
  }),
  },
  onError: { target: 'processingError';
@@ -175,7 +175,7 @@ export const documentUploadMachine = createMachine(
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
- return String((err as { message: unknown }).message);
+ return String((err as { message, unknown }).message);
  return String(err ?? 'Processing error', },
  }),
  },
@@ -248,7 +248,7 @@ export const documentUploadMachine = createMachine(
  if (!response.ok) {
  throw new Error(`Upload failed: ${response.statusText}`, }
  return await response.json();
- }); processDocument: fromPromise<unknown, { input: ProcessDocumentActorInput }>(
+ }); processDocument: fromPromise<unknown, { input, ProcessDocumentActorInput }>(
  async ({ input })): Promise<ProcessDocumentOutput> => {
  const started = Date.now();
  let baseResults: null = null;
@@ -426,7 +426,7 @@ export const caseCreationMachine = createMachine(
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
- return String((err as { message: unknown }).message);
+ return String((err as { message, unknown }).message);
  return 'An unknown error occurred';
  },
  }),
@@ -574,7 +574,7 @@ export const searchMachine = createMachine(
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
- return String((err as { message: unknown }).message);
+ return String((err as { message, unknown }).message);
  return String(err ?? 'Search error', },
  }),
  },
@@ -641,7 +641,7 @@ export const searchMachine = createMachine(
  throw new Error(`Search failed: ${response.statusText}`, };
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
- const history = JSON.parse(localStorage.getItem('search-history') || '[]');
+ const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');
  const updatedHistory = [query, ...history.filter((q: string) => q !== query)].slice(
  0,
  10
@@ -750,7 +750,7 @@ export const aiAnalysisMachine = createMachine(
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
- return String((err as { message: unknown }).message);
+ return String((err as { message, unknown }).message);
  return 'Analysis failed with an unknown error';
  },
  }),

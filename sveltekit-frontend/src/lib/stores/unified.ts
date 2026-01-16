@@ -54,7 +54,7 @@ function createEnhancedUploadStore() {
 						// Simulate upload progress
 						const uploadState: UploadState = {
 							...state,
-							files: event.files || [],
+							files: event?.files|| [],
 							caseId: event.caseId,
 							documentType: event.documentType,
 							status: 'uploading',
@@ -76,7 +76,7 @@ function createEnhancedUploadStore() {
 						return { ...state, status: 'completed', progress: 100, matches: state.matches };
 
 					case 'UPLOAD_ERROR':
-						return { ...state, status: 'error', error: event.error || 'Upload failed', matches: state.matches };
+						return { ...state, status: 'error', error: event?.error?? 'Upload failed', matches: state.matches };
 
 					case 'RESET':
 						return { ...initialState, matches: initialState.matches };

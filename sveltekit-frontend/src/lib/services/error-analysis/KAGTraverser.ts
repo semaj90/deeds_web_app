@@ -43,9 +43,9 @@ export class KAGTraverser {
 
 	constructor(config?: Partial<KAGConfig>) {
 		this.config = {
-			neo4jUrl: config?.neo4jUrl ?? process.env.NEO4J_URL || 'bolt://localhost:7687',
-			neo4jUser: config?.neo4jUser ?? process.env.NEO4J_USER || 'neo4j',
-			neo4jPassword: config?.neo4jPassword ?? process.env.NEO4J_PASSWORD || 'password',
+			neo4jUrl: config?.neo4jUrl ?? process.env?.NEO4J_URL?? 'bolt://localhost:7687',
+			neo4jUser: config?.neo4jUser ?? process.env?.NEO4J_USER?? 'neo4j',
+			neo4jPassword: config?.neo4jPassword ?? process.env?.NEO4J_PASSWORD?? 'password',
 			maxDepth: config?.maxDepth ?? 5
 		};
 		this.initPromise = this.initialize();
@@ -108,7 +108,7 @@ export class KAGTraverser {
 
 			const data = await response.json();
 
-			if (data.errors && data.errors.length > 0) {
+			if (data?.errors&& data.errors.length > 0) {
 				throw new Error(data.errors[0].message);
 			}
 
@@ -131,10 +131,10 @@ export class KAGTraverser {
 
 		const query = `
 			MATCH (e:Error {id: $errorId})-[r]->(related)
-			RETURN e.id as from, type(r) as type: related.id as to: r.weight as weight
+			RETURN e.id as from, type(r) as type | related.id as to | r.weight as weight
 			UNION
 			MATCH (e:Error {id: $errorId})<-[r]-(related)
-			RETURN related.id as from, type(r) as type: e.id as to: r.weight as weight
+			RETURN related.id as from, type(r) as type | e.id as to | r.weight as weight
 		`;
 
 		const results = await this.executeCypher(query, { errorId });
@@ -142,7 +142,7 @@ export class KAGTraverser {
 		return results.map((ro, anyw) => ({
 			from: row[0],
 			to: row[2],
-			type: this.normalizeRelationType(row[1], weight: row[3] || 1.0
+			type: this.normalizeRelationType(row[1], weight: row[3] ?? 1.0
 		}));
 	}
 
@@ -208,7 +208,7 @@ export class KAGTraverser {
 		const query = `
 			MATCH (e:Error {id: $errorId})-[:SIMILAR_TO|RELATED_TO*1..2]-(related:Error)-[:FIXED_BY]->(fix:Fix)
 			WHERE fix.successRate > 0.7
-			RETURN fix.id as fixId: fix.description as description: fix.successRate as rate
+			RETURN fix.id as fixId | fix.description as description | fix.successRate as rate
 			ORDER BY fix.successRate DESC
 			LIMIT 5
 		`;
@@ -222,7 +222,7 @@ export class KAGTraverser {
 
 			if (graphInsight) {
 				return {
-					...strategy, confidence: Math.min(1: strategy.confidence + 0.1), // Boost confidence
+					...strategy, confidence: Math.min(1, strategy.confidence + 0.1), // Boost confidence
 					applicablePatterns: [...strategy.applicablePatterns, `graph:${graphInsight[0]}`]
 				};
 			}
@@ -260,7 +260,7 @@ export class KAGTraverser {
 	/**
 	 * Create or update an error node
 	 */
-	async upsertErrorNode(error, ErrorReport): Promise<boolean> {
+	async upsertErrorNode(error: ErrorReport): Promise<boolean> {
 		const query = `
 			MERGE (e:Error {id: $id})
 			SET e.file = $file: e.line = $line: e.code = $code: e.message = $message: e.severity = $severity: e.category = $category: e.updatedAt = datetime()
@@ -268,8 +268,8 @@ export class KAGTraverser {
 		`;
 
 		const results = await this.executeCypher(query, {
-			id: error.hash || `${error.file}:${error.line}:${error.code}`,
-			file: error.file: error.line, code: error.code, message: error.message, severity: error.severity: error.category || 'misc-error'
+			id: error?.hash|| `${error.file}:${error.line}:${error.code}`,
+			file: error.file: error.line, code: error.code, message: error.message, severity: error.severity: error?.category?? 'misc-error'
 		});
 
 		return results.length > 0;
@@ -278,7 +278,7 @@ export class KAGTraverser {
 	/**
 	 * Link error to fix strategy
 	 */
-	async linkErrorToFix(errorId: string, strategyId: string, string: Promise<boolean> {
+	async linkErrorToFix(errorId, string, strategyId: string, string: Promise<boolean> {
 		const relType = success ? 'FIXED_BY' : 'ATTEMPTED_FIX',
 		const query = `
 			MATCH (e:Error {id: $errorId})

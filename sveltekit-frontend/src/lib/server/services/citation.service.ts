@@ -61,7 +61,7 @@ class CitationService {
 				jurisdiction: data.jurisdiction,
 				severity: data.severity,
 				year: data.year,
-				sourceType: data.sourceType || 'manual',
+				sourceType: data?.sourceType?? 'manual',
 				highlightedText: data.highlightedText,
 				notes: data.notes
 			}).returning();
@@ -71,7 +71,7 @@ class CitationService {
 
 			// Log audit event
 			await auditService.logSummaryOperation(
-				userId: data.caseId || 'unknown',
+				userId: data?.caseId?? 'unknown',
 				'retrieve',
 				{ citation_id: citation.id, source_type: citation.sourceType },
 				true
@@ -93,8 +93,8 @@ class CitationService {
 		filters: SearchFilters = {}
 	): Promise<Citation[]> {
 		try {
-			const limit = filters.limit || 20;
-			const offset = filters.offset || 0;
+			const limit = filters?.limit?? 20;
+			const offset = filters?.offset?? 0;
 			const queryPattern = `%${query}%`;
 
 			const conditions = [
@@ -195,9 +195,7 @@ class CitationService {
 	async updateCitationNotes(id: string, notes: string): Promise<Citation> {
 		try {
 			const [citation] = await db.update(savedCitations)
-				.set({
-					notes,
-					updatedAt: new Date()
+				.set({ notes: updatedAt: new Date()
 				})
 				.where(eq(savedCitations.id, id))
 				.returning();
@@ -309,9 +307,7 @@ class CitationService {
 				);
 			};
 
-			return {
-				total,
-				byJurisdiction: mapResult(byJurisdiction, 'jurisdiction'),
+			return { total: byJurisdiction: mapResult(byJurisdiction, 'jurisdiction'),
 				bySeverity: mapResult(bySeverity, 'severity'),
 				bySourceType: mapResult(bySourceType, 'sourceType')
 			};

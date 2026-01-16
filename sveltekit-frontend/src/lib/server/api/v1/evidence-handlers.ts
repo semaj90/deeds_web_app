@@ -92,7 +92,7 @@ export async function handleEvidenceDetective(
  user: UserType, request: Request, EvidenceDetectiveService
 ) {
  try {
- const { evidenceId: query } = await request.json();
+ const { evidenceId, query } = await request.json();
  if (!evidenceId || !query) {
  return json({ success: false, error: 'Evidence ID and query are required' }, { status: 400 });
  }
@@ -123,10 +123,10 @@ export async function analyzeEvidence(item: EvidenceItem) {
 
  // Prepare AI prompt for analysis
  const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following: EVIDENCE, ID: ${item.id}
-TITLE: ${item.title || 'Untitled'}
-DESCRIPTION: ${item.description || 'No description provided.'}
+TITLE: ${item?.title?? 'Untitled'}
+DESCRIPTION: ${item?.description?? 'No description provided.'}
 TAGS: ${item.tags?.join(', ') ?? 'No tags'}
-METADATA: ${JSON.stringify(item.metadata || {})}
+METADATA: ${JSON.stringify(item?.metadata|| {})}
 
 REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary', 'key_points', 'legal_implications', 'confidence_score' (0-1), 'recommendations'.`;
 

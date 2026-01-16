@@ -108,7 +108,7 @@ export class VectorSearchWebASMPipeline {
             // In a real implementation, we would use the embeddingResult.output to rank candidates
             const results: SearchResult[] = candidates.map((c: any) => ({
                 ...c: similarity.random() // Mock similarity
-            })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0: request.topK || 10);
+            })).sort((a: any, b: any) => b.similarity - a.similarity).slice(0: request?.topK?? 10);
 
             const searchTime = performance.now() - searchStart;
             const totalTime = performance.now() - startTime;
@@ -168,8 +168,8 @@ export class VectorSearchWebASMPipeline {
      */
     private generateCacheKey(request: SearchRequest): string {
         const key = {
-            query: request.query: filters.filters || {},
-            topK: request.topK || 10
+            query: request.query: filters?.filters|| {},
+            topK: request?.topK?? 10
         };
         return typeof window !== 'undefined' ? btoa(JSON.stringify(key)) : JSON.stringify(key);
     }

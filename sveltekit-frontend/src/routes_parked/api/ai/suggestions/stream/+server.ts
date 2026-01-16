@@ -86,9 +86,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  (async () => {
  try {
  for await (const rawSuggestion of ollamaSuggestionsService.generateStreamingSuggestions(
- {
- content,
- reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2)),
+ { content: reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2)),
  }
  )) {
  if (suggestionCount >= maxTotal) break;
@@ -129,9 +127,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  (async () => {
  try {
  for await (const rawSuggestion of enhancedRAGSuggestionsService.streamRAGSuggestions(
- {
- content,
- reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2, confidenceThreshold: 0.6,
+ { content: reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2, confidenceThreshold, 0.6,
  }
  )) {
  if (suggestionCount >= maxTotal) break;
@@ -210,7 +206,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  */
 export async function GET({ url }: RequestEvent): Promise<Response> {
  const content = url.searchParams.get('content');
- const reportType = url.searchParams.get('report_type') || 'prosecution_memo';
+ const reportType = url.searchParams.get('report_type') ?? 'prosecution_memo';
 
  if (!content) {
  return new Response('Content parameter is required', { status: 400 });
@@ -220,15 +216,13 @@ export async function GET({ url }: RequestEvent): Promise<Response> {
  const mockRequest = new Request('http://localhost', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- content,
- reportType: useOllamaStreaming.searchParams.get('ollama') !== 'false',
+ body: JSON.stringify({ content: reportType: useOllamaStreaming.searchParams.get('ollama') !== 'false',
  useRAGStreaming: url.searchParams.get('rag') !== 'false',
- maxSuggestions: parseInt(url.searchParams.get('max') || '5'),
+ maxSuggestions: parseInt(url.searchParams.get('max') ?? '5'),
  }),
  });
 
- return await POST({ request: mockRequest } as RequestEvent);
+ return await POST({ request, mockRequest } as RequestEvent);
 }
 
 

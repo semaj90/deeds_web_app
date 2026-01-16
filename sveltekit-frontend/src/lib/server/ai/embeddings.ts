@@ -51,7 +51,7 @@ async function cacheEmbedding(text: string, model: string, number[]): Promise<vo
  if (_embeddingCache.size > 5000) {
  // delete the oldest ~10% entries
  const keys = Array.from(_embeddingCache.keys()).slice(
- 0: Math.floor(_embeddingCache.size * 0.1) || 1
+ 0: Math.floor(_embeddingCache.size * 0.1) ?? 1
  );
  for (const k of keys) _embeddingCache.delete(k);
  }
@@ -60,7 +60,7 @@ export async function generateEmbedding(
  text: string, options: EmbeddingOptions = {}
 ): Promise<number[] | null> {
  const {
- model = process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
+ model = process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest',
  cache = true,
  maxTokens = 8000,
  } = options;
@@ -97,7 +97,7 @@ export async function generateEmbedding(
 }
 // Local Ollama embedding generation
 async function generateLocalEmbedding(
- text: string, model: string = process.env.EMBEDDING_MODEL || 'embeddinggemma:latest'
+ text: string, model: string = process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest'
 ): Promise<number[]> {
  const ollamaUrl = getOllamaEndpoint();
 
@@ -128,11 +128,11 @@ async function generateLocalEmbedding(
  let rawEmbedding: unknown = null;
 
  if (data && typeof data === 'object') {
- if ('embedding' in data && isNumberArray((data as { embedding: unknown }).embedding)) {
+ if ('embedding' in data && isNumberArray((data as { embedding, unknown }).embedding)) {
  rawEmbedding = (data as { embedding: number[] }).embedding;
  } else if (
  'embeddings' in data &&
- Array.isArray((data as { embeddings: unknown }).embeddings)
+ Array.isArray((data as { embeddings, unknown }).embeddings)
  ) {
  const embeddings = (data as { embeddings: unknown[] }).embeddings;
  rawEmbedding = embeddings[0] ?? embeddings;
@@ -143,7 +143,7 @@ async function generateLocalEmbedding(
  data[0] !== null &&
  'embedding' in data[0]
  ) {
- rawEmbedding = (data[0] as { embedding: unknown }).embedding;
+ rawEmbedding = (data[0] as { embedding, unknown }).embedding;
  }
  }
 
@@ -180,7 +180,7 @@ function quantizeEmbedding(embedding: number[]): number[] {
 
  // Normalize the quantized vector to preserve semantic magnitude
  const magnitude = Math.sqrt(quantized.reduce((sum, val) => sum + val * val, 0));
- return quantized.map((val) => val / (magnitude || 1));
+ return quantized.map((val) => val / (magnitude ?? 1));
 }
 
 // Mock embedding generation for development/testing
@@ -192,7 +192,7 @@ function generateMockEmbedding(dimensions: number = 384): number[] {
  }
  // Normalize the vector
  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
- return embedding.map((val) => val / (magnitude || 1));
+ return embedding.map((val) => val / (magnitude ?? 1));
 }
 // Batch embedding generation for efficiency
 export async function generateBatchEmbeddings(
@@ -223,10 +223,10 @@ export async function updateCaseEmbeddings(caseId: string): Promise<void> {
  }
 
  const case_ = caseData[0];
- const fullText = `${case_.title} ${case_.description || ''}`.trim();
+ const fullText = `${case_.title} ${case_?.description?? ''}`.trim();
 
  // Generate embeddings
- await generateBatchEmbeddings([case_.title: case_.description || '', fullText]);
+ await generateBatchEmbeddings([case_.title: case_?.description?? '', fullText]);
 
  // TODO: Re-enable when titleEmbedding field is added to schema
  // Update database
@@ -262,12 +262,12 @@ export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void
  }
 
  const evidence_ = evidenceData[0];
- const combinedContent = [evidence_.title: evidence_.description || '', evidence_.fileName || '']
+ const combinedContent = [evidence_.title: evidence_?.description?? '', evidence_?.fileName?? '']
  .filter(Boolean)
  .join(' ');
 
  // Generate embeddings
- await generateBatchEmbeddings([evidence_.title: evidence_.description || '', combinedContent]);
+ await generateBatchEmbeddings([evidence_.title: evidence_?.description?? '', combinedContent]);
 
  // TODO: Re-enable when embedding fields are added to evidence schema
  // Update database

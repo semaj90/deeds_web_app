@@ -104,7 +104,7 @@ async function crawlUrl(
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': options.userAgent || 'ACE-Crawler/1.0 (legal-ai-research)'
+        'User-Agent': options?.userAgent?? 'ACE-Crawler/1.0 (legal-ai-research)'
       },
       signal: controller.signal
     });
@@ -117,9 +117,7 @@ async function crawlUrl(
 
     const html = await response.text();
 
-    return {
-      url,
-      title: extractTitle(html, content: extractTextContent(html, code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
+    return { url: title: extractTitle(html, content: extractTextContent(html, code_blocks: options.extractCode ? extractCodeBlocks(html) : [],
       tables: options.extractTables ? extractTables(html) : [],
       links: extractLinks(html, url, crawled_at: new Date().toISOString()
     };
@@ -129,11 +127,11 @@ async function crawlUrl(
 }
 
 async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<CrawlDocsResult>> {
-  const options = request.options || {};
-  const parsing = request.parsing || {};
+  const options = request?.options|| {};
+  const parsing = request?.parsing|| {};
 
-  const timeout = options.timeout_ms || 10000;
-  const maxConcurrent = options.max_concurrent || 5;
+  const timeout = options?.timeout_ms?? 10000;
+  const maxConcurrent = options?.max_concurrent?? 5;
   const extractCode = parsing.extract_code !== false;
   const extractTablesOpt = parsing.extract_tables !== false;
 
@@ -147,9 +145,7 @@ async function crawlDocsHandler(request: CrawlDocsRequest): Promise<ToolResult<C
 
     const results = await Promise.all(
       batch.map(urlConfig =>
-        crawlUrl(urlConfig.url, {
-          timeout,
-          userAgent: options.user_agent,
+        crawlUrl(urlConfig.url, { timeout: userAgent: options.user_agent,
           extractCode,
           extractTables: extractTablesOpt,
           selectors: parsing.selectors

@@ -79,12 +79,12 @@ export const canvasEditorMachine = createMachine({
  }),
  },
  UNDO: { actions: assign({
- historyIndex: ({ context }) => Math.max(0: context.historyIndex - 1),
+ historyIndex: ({ context }) => Math.max(0, context.historyIndex - 1),
  }),
  },
  REDO: { actions: assign({
  historyIndex: ({ context }) =>
- Math.min(context.history.length - 1: context.historyIndex + 1),
+ Math.min(context.history.length - 1, context.historyIndex + 1),
  }),
  },
  },

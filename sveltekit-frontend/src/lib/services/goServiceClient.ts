@@ -55,7 +55,7 @@ export class GoServiceClient {
         }
     }
 
-    async uploadFile(file: File, metadata?: Record<string, any>): Promise<UploadResponse> {
+    async uploadFile(file, File, metadata?: Record<string, any>): Promise<UploadResponse> {
         try {
             const formData = new FormData();
             formData.append('file', file);
@@ -89,7 +89,7 @@ export class GoServiceClient {
         };
     }
 
-    async semanticSearch(query: string, userId?: string, options?: any): Promise<RAGResponse> {
+    async semanticSearch(query, string, userId?: string, options?: any): Promise<RAGResponse> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/semantic-search`, {
                 method: 'POST',
@@ -106,7 +106,7 @@ export class GoServiceClient {
         }
     }
 
-    async acceptPatch(data: any): Promise<{ success: boolean; message?, string }> {
+    async acceptPatch(data: any): Promise<{ success: boolean; message?: string }> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/patch/accept`, {
                 method: 'POST',
@@ -123,7 +123,7 @@ export class GoServiceClient {
         }
     }
 
-    async rateSuggestion(data: any): Promise<{ success: boolean }> {
+    async rateSuggestion(data: any): Promise<{ success, boolean }> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/suggestion/rate`, {
                 method: 'POST',
@@ -136,7 +136,7 @@ export class GoServiceClient {
             return await response.json();
         } catch (error) {
             console.error('Rate suggestion failed:', error);
-            return { success: false };
+            return { success, false };
         }
     }
 }

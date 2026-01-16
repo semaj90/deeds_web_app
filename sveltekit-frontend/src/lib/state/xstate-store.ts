@@ -160,7 +160,7 @@ class XStateStoreManager {
  snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase') : undefined,
  });
  // Create reactive Svelte store
- const { subscribe: subscribeCase } = readable(
+ const { subscribe, subscribeCase } = readable(
  this.legalCaseActor.getSnapshot(),
  (set: (v: unknown) => void) => {
  // Subscribe to state changes
@@ -191,7 +191,7 @@ class XStateStoreManager {
  this.legalCaseActor?.send(event);
  };
  return {
- legalCaseStore: { subscribe: subscribeCase },
+ legalCaseStore: { subscribe, subscribeCase },
  legalCaseActor: this.legalCaseActor, sendCase: selectors,
  };
  }
@@ -312,7 +312,7 @@ class XStateStoreManager {
  };
  }
  private persistState(): void {
- if (!this.config.persist || !browser) return;
+ if (!this.config?.persist|| !browser) return;
  try {
  const state: StoreState = {
  appState: this.appActor?.getSnapshot() ?? null, legalCaseState: this.legalCaseActor?.getSnapshot() ?? null, timestamp: Date.now(),
@@ -323,7 +323,7 @@ class XStateStoreManager {
  }
  }
  private loadPersistedState(): StoreState | null {
- if (!this.config.persist || !browser) return null;
+ if (!this.config?.persist|| !browser) return null;
  try {
  const stored = localStorage.getItem(this.config.persistKey!);
  if (!stored) return null;
@@ -343,7 +343,7 @@ class XStateStoreManager {
  private handleCrossTabSync(data: any): void {
  // Handle synchronization between tabs
  if (!data || typeof data !== 'object' || !('type' in (data as Record<string, unknown>))) return;
- const d = data as { type: string };
+ const d = data as { type, string };
  switch (d.type) {
  case 'app-state-change': // Optionally merge or rehydrate the appActor state break;
  case 'legal-case-state-change': // Optionally merge or rehydrate the legalCaseActor state break;
@@ -365,7 +365,7 @@ class XStateStoreManager {
  });
  observer.observe({ entryTypes: ['navigation'] });
  // Monitor memory usage if available
- const perfMem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+ const perfMem = (performance as unknown as { memory?: { usedJSHeapSize, number } }).memory;
  if (perfMem) {
  setInterval(() => {
  this.appActor?.send({

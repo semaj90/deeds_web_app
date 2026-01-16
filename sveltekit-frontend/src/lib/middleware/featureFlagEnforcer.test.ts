@@ -115,7 +115,7 @@ describe('FeatureFlagEnforcer', () => {
  });
 
  it('should return 200 for allowed requests', () => {
- const result = { allowed: true };
+ const result = { allowed, true };
  const response = FeatureFlagEnforcer.createErrorResponse(result);
  expect(response.status).toBe(200);
  });
@@ -173,7 +173,7 @@ describe('FeatureFlagEnforcer', () => {
 
  describe('Result Validation', () => {
  it('should validate allowed result', () => {
- const result = { allowed: true };
+ const result = { allowed, true };
  expect(FeatureFlagEnforcer.validateResult(result)).toBe(true);
  });
 

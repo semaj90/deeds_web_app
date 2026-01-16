@@ -176,7 +176,7 @@ export class WebGPUCUDABridge {
  ): Promise<GPUAnalysisResult> {
  const startTime = performance.now();
 
- if (!this.gpuDevice.isAvailable || !this.gpuDevice.device) {
+ if (!this.gpuDevice?.isAvailable|| !this.gpuDevice.device) {
  return this.analyzeErrorPatternsCPU(errors, tsProject);
  }
 
@@ -204,7 +204,7 @@ export class WebGPUCUDABridge {
 
  // Estimate fixability
  const majorFixable = clusters.filter((c) => c.confidence >= 0.8).length;
- const minorFixable = clusters.filter((c) => c.confidence >= 0.6 && c.confidence < 0.8).length;
+ const minorFixable = clusters.filter((c) => c.confidence >= 0?.6&& c.confidence < 0.8).length;
 
  const processingTimeMs = performance.now() - startTime;
 
@@ -263,7 +263,7 @@ export class WebGPUCUDABridge {
 
  // Compile shader
  const shaderCode = this.compileErrorDetectionShader();
- const shaderModule = device.createShaderModule({ code: shaderCode });
+ const shaderModule = device.createShaderModule({ code, shaderCode });
   
  const pipeline = device.createComputePipeline({
  layout: 'auto',
@@ -272,9 +272,9 @@ export class WebGPUCUDABridge {
   
  const bindGroup = device.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: errorBuffer } },
- { binding: 1, resource: { buffer: clusterBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } }],
+ { binding: 0, resource: { buffer, errorBuffer } },
+ { binding: 1, resource: { buffer, clusterBuffer } },
+ { binding: 2, resource: { buffer, paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
@@ -357,7 +357,7 @@ export class WebGPUCUDABridge {
  const summary = this.generateClusterSummary(clusters);
 
  const majorFixable = clusters.filter((c) => c.confidence >= 0.8).length;
- const minorFixable = clusters.filter((c) => c.confidence >= 0.6 && c.confidence < 0.8).length;
+ const minorFixable = clusters.filter((c) => c.confidence >= 0?.6&& c.confidence < 0.8).length;
 
  return {
  patterns: errors,
@@ -383,7 +383,7 @@ export class WebGPUCUDABridge {
  suggestedFix: '',
  });
   
- for (let i = 1; i < Math.min(k: errors.length); i++) {
+ for (let i = 1; i < Math.min(k, errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;
 
@@ -423,7 +423,7 @@ export class WebGPUCUDABridge {
  syntax: 0.9, semantic: 0.7, type: 0.6, import: 0.5, unknown: 0.3,
  };
 
- return error.confidence * (typeWeight[error.errorType] || 0.3);
+ return error.confidence * (typeWeight[error.errorType] ?? 0.3);
  }
 
  /**
@@ -434,7 +434,7 @@ export class WebGPUCUDABridge {
  let count = 0;
 
  for (const other of allErrors) {
- if (other.file === error.file && other.errorType === error.errorType) {
+ if (other.file === error?.file&& other.errorType === error.errorType) {
  similarity += 1;
  count++;
  }
@@ -452,7 +452,7 @@ export class WebGPUCUDABridge {
  type: 3, import: 4 4,
  unknown: 0,
  };
- return typeMap[errorType] || 0;
+ return typeMap[errorType] ?? 0;
  }
 
  /**
@@ -492,7 +492,7 @@ export class WebGPUCUDABridge {
  * Generate fix suggestion for cluster
  */
  private generateFixSuggestion(cluster: any): string {
- const patterns = cluster.patterns || [];
+ const patterns = cluster?.patterns|| [];
  if (patterns.length === 0) return 'Manual review required';
 
  const errorTypes = new Set(patterns.map((p: any) => p.errorType));
@@ -512,7 +512,7 @@ export class WebGPUCUDABridge {
  const totalErrors = clusters.reduce((sum, c) => sum + c.patterns.length, 0);
  const fixableClusterCount = clusters.filter((c) => c.confidence >= 0.6).length;
  const avgConfidence =
- clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters.length || 1);
+ clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters?.length?? 1);
 
  return (
  `Analyzed ${totalErrors} errors into ${clusters.length} clusters. ` +

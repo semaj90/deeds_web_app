@@ -48,20 +48,20 @@ export const documentChunks = pgTable(
 
  // Lifecycle (Phase 90 Core - Never Delete)
  isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }),
 
  // pgvector (Source of Truth)
  // Memory-optimized: 384 dimensions for legal documents
  embedding: vector('embedding', { dimensions: 384 }),
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
- embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
+ embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone, true }),
 
  // Qdrant Sync Tracking (Phase 90 Sync)
  qdrantPointId: text('qdrant_point_id'), // UUID stored in Qdrant
  qdrantCollection: text('qdrant_collection').default('legal_documents'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }),
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone, true }),
  qdrantSyncError: text('qdrant_sync_error'), // Last sync error if any
  },
  (table) => ({
@@ -101,19 +101,19 @@ export const legalDocuments = pgTable(
  contentHash: text('content_hash').notNull(),
 
  // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }),
 
  // Phase 90: pgvector (384d memory-optimized)
  embedding: vector('embedding', { dimensions: 384 }),
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
- embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
+ embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone, true }),
 
  // Phase 90: Qdrant sync
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_documents'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone, true }) },
  (table) => ({
  activeDocsIdx: index('legal_documents_active_idx').on(table.isActive: table.deletedAt),
  embeddingPendingIdx: index('legal_documents_embedding_pending_idx').on(
@@ -137,9 +137,9 @@ export const cases = pgTable(
  status: text('status').notNull().default('open'),
 
  // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }),
 
  // Ownership
  userId: uuid('user_id').notNull() },
@@ -171,19 +171,19 @@ export const evidence = pgTable(
  contentHash: text('content_hash'),
 
  // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }),
 
  // Phase 90: pgvector (384d)
  embedding: vector('embedding', { dimensions: 384 }),
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
- embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
+ embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone, true }),
 
  // Phase 90: Qdrant sync
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_evidence'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone, true }) },
  (table) => ({
  activeEvidenceIdx: index('evidence_active_idx').on(table.isActive: table.deletedAt),
  caseIdIdx: index('evidence_case_id_idx').on(table.caseId),
@@ -211,16 +211,16 @@ export const phase72ErrorVector = pgTable(
  // Phase 72: Higher precision for error clustering
  embedding: vector('embedding', { dimensions: 768 }),
  embeddingModel: text('embedding_model').default('embeddinggemma:latest'),
- embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone: true }),
+ embeddingUpdatedAt: timestamp('embedding_updated_at', { withTimezone, true }),
 
  // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }),
 
  // Phase 90: Qdrant sync (separate collection)
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('phase72_errors'),
- qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
+ qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone, true }) },
  (table) => ({
  errorIdIdx: index('phase72_error_vector_error_id_idx').on(table.errorId),
  activeVectorsIdx: index('phase72_error_vector_active_idx').on(table.isActive),
@@ -241,9 +241,9 @@ export const phase72Error = pgTable(
  severity: text('severity').notNull().default('error'),
 
  // Phase 90: Lifecycle, isActive: boolean('is_active').notNull().default(true),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
- deletedAt: timestamp('deleted_at', { withTimezone: true }) },
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ deletedAt: timestamp('deleted_at', { withTimezone, true }) },
  (table) => ({
  errorHashIdx: index('phase72_error_hash_idx').on(table.errorHash),
  activeErrorsIdx: index('phase72_error_active_idx').on(table.isActive) })

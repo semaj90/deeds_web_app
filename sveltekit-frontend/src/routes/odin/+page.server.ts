@@ -23,15 +23,13 @@ export const load: PageServerLoad = async ({ locals }) => {
   .limit(10);
 
   // Mock user for consistent UI if auth is bypassed
-  const user = locals.user || {
+  const user = locals?.user|| {
     id: 'mock-user-id',
     username: 'Investigator_Vance',
     role: 'ADMIN'
   };
 
-  return {
-    user,
-    caseId: 'ODIN-8842-XC',
+  return { user: caseId: 'ODIN-8842-XC',
     stats
   };
 };

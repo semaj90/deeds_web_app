@@ -52,7 +52,7 @@ async function getOpenAIEmbedding(
 }
 
 // Nomic embedding function
-async function getNomicEmbedding(text: string): Promise<{ embedding, number[] }> {
+async function getNomicEmbedding(text: string): Promise<{ embedding: number[] }> {
  if (!NOMIC_API_KEY) {
  throw new Error('Nomic API key not configured');
  }
@@ -92,10 +92,8 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  switch (model) {
  case 'openai': {
- const { embedding: tokens } = await getOpenAIEmbedding(text, dimensions);
- result = {
- embedding,
- model: 'text-embedding-3-small',
+ const { embedding, tokens } = await getOpenAIEmbedding(text, dimensions);
+ result = { embedding: model: 'text-embedding-3-small',
  dimensions: embedding.length,
  tokens,
  };
@@ -103,20 +101,18 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  }
  case 'nomic': {
  const { embedding } = await getNomicEmbedding(text);
- result = { embedding, model: 'nomic-embed-text-v1.5', dimensions: embedding.length };
+ result = { embedding: model: 'nomic-embed-text-v1.5', dimensions: embedding.length };
  break;
  }
  case 'mock': {
  // Mock embedding for testing - generate deterministic vector based on text
- const targetDim = dimensions || 768;
+ const targetDim = dimensions ?? 768;
  const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
  const embedding = Array.from(
- { length: targetDim },
+ { length, targetDim },
  (_, i) => Math.sin((hash + i) / 100) * 0.5
  );
- result = {
- embedding,
- model: 'mock-embeddings',
+ result = { embedding: model: 'mock-embeddings',
  dimensions: targetDim, tokens: text.split(' ').length,
  };
  break;

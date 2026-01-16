@@ -40,7 +40,7 @@ export class DocumentLoader {
  /**
  * Get documents from MinIO bucket
  */
- async getMinioDocuments(prefix: string = '', limit: number = 100): Promise<RawDocument[]> {
+ async getMinioDocuments(prefix, string = '', limit: number = 100): Promise<RawDocument[]> {
  return this.pdfLoader.loadMinioBatch(prefix, limit);
  }
 
@@ -81,7 +81,7 @@ export class DocumentLoader {
 
  for (const doc of documents) {
  try {
- if (!doc.text || doc.text.trim().length === 0) {
+ if (!doc?.text|| doc.text.trim().length === 0) {
  console.warn(`No text available for ${doc.id}`);
  continue;
  }

@@ -140,7 +140,7 @@ export function isValidEmail(email: string): boolean {
 // ===== CLIPBOARD UTILITIES =====
 export async function copyToClipboard(text: string): Promise<boolean> {
  try {
- if (navigator.clipboard && window.isSecureContext) {
+ if (navigator?.clipboard&& window.isSecureContext) {
  await navigator.clipboard.writeText(text);
  return true;
  } else {
@@ -221,9 +221,9 @@ export const storage = {
 export const theme = {
  get: (): 'light' | 'dark' => {
  if (!isBrowser) return 'light';
- return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+ return (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
  },
- set: (newTheme: 'light' | 'dark'): void => {
+ set: (newTheme, 'light' | 'dark'): void => {
  if (!isBrowser) return;
  localStorage.setItem('theme', newTheme);
  document.documentElement.classList.toggle('dark', newTheme === 'dark');

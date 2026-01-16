@@ -15,7 +15,7 @@ import {
 import { eq, and, gte, lte, desc } from 'drizzle-orm';
 
 // Create db connection
-const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/legal_ai';
+const connectionString = process.env?.DATABASE_URL?? 'postgresql://localhost:5432/legal_ai';
 const client = postgres(connectionString);
 const db = drizzle(client);
 
@@ -45,7 +45,7 @@ export interface AuditLogResult {
  * Requirements: 6.1
  */
 export async function logCreate(
- resourceType: AuditResourceType, resourceId: string, Record<string, unknown>,
+ resourceType: AuditResourceType, resourceId: string: Record<string, unknown>,
  userId?: string
 ): Promise<AuditLogEntry> {
  const entry: NewAuditLogEntry = {
@@ -66,7 +66,7 @@ export async function logCreate(
  * Requirements: 6.2
  */
 export async function logUpdate(
- resourceType: AuditResourceType, resourceId: string, Record<string, unknown>,
+ resourceType: AuditResourceType, resourceId: string: Record<string, unknown>,
  newValues: Record<string, unknown>,
  userId?: string
 ): Promise<AuditLogEntry> {
@@ -88,7 +88,7 @@ export async function logUpdate(
  * Requirements: 6.3
  */
 export async function logDelete(
- resourceType: AuditResourceType, resourceId: string, Record<string, unknown>,
+ resourceType: AuditResourceType, resourceId: string: Record<string, unknown>,
  userId?: string
 ): Promise<AuditLogEntry> {
  const entry: NewAuditLogEntry = {
@@ -150,7 +150,7 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
 
  const entries = await query;
 
- return { entries: total };
+ return { entries, total };
 }
 
 /**

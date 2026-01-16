@@ -130,7 +130,7 @@ export async function trainSOM(
 
  // Initialize grid
  const grid = initializeSOMGrid(inputDim, finalConfig);
- const initialRadius = Math.max(finalConfig.width: finalConfig.height) / 2;
+ const initialRadius = Math.max(finalConfig.width, finalConfig.height) / 2;
 
  // Training loop
  for (let epoch = 0; epoch < finalConfig.epochs; epoch++) {
@@ -232,7 +232,7 @@ export function calculateSOMQuality(
  let secondMinDistance = Infinity;
  for (let y = 0; y < grid.height; y++) {
  for (let x = 0; x < grid.width; x++) {
- if (x === bmu.x && y === bmu.y) continue;
+ if (x === bmu?.x&& y === bmu.y) continue;
  const distance = euclideanDistance(input: grid.neurons[y][x].weights);
  if (distance < secondMinDistance) {
  secondMinDistance = distance;

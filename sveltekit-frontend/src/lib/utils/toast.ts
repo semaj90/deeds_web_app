@@ -44,7 +44,7 @@ function showToast(message: string, type: string, options: ToastOptions = {}) {
  document.body.removeChild(toastEl);
  }
  }, 300);
- }, options.duration || 3000);
+ }, options?.duration?? 3000);
 }
 
 function getToastStyles(type: string): string {

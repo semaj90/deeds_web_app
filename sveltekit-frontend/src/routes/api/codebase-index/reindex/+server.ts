@@ -10,9 +10,9 @@ import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
+const FASTAPI_URL = env?.FASTAPI_URL?? 'http://localhost:8090';
 
-export const POST: RequestHandler = async ({ request: fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch }) => {
 	try {
 		// Parse request body for options
 		let options = { force: false, runClustering: true };
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
 			const data = await response.json();
 
 			// Optionally trigger clustering after reindex (Task 16.3)
-			if (options.runClustering && data.success) {
+			if (options?.runClustering&& data.success) {
 				try {
 					const clusterResponse = await fetch(`${FASTAPI_URL}/api/codebase/cluster`, {
 						method: 'POST',

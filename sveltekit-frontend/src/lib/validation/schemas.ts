@@ -119,9 +119,7 @@ export const createEvidenceSchema = z.object({
 	tags: z.array(z.string().max(50)).max(20).optional()
 });
 
-export const updateEvidenceSchema = createEvidenceSchema.partial().extend({
-	id: uuidSchema
-});
+export const updateEvidenceSchema = createEvidenceSchema.partial().extend({ id, uuidSchema });
 
 // ============================================================================
 // CHAT & MESSAGING
@@ -272,8 +270,7 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
 			total: z.number().int(),
 			totalPages: z.number().int()
 		}),
-		meta: z.object({ timestamp: timestampSchema
-		}).optional()
+		meta: z.object({ timestamp, timestampSchema }).optional()
 	});
 
 // ============================================================================

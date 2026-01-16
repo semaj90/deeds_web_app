@@ -8,8 +8,7 @@
 // Environment-based endpoint resolution
 const OLLAMA_HOST =
  import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
- (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ||
- 'http://localhost:11434';
+ (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ?? 'http://localhost:11434';
 
 const OLLAMA_DOCKER_HOST = 'http://ollama:11434';
 const OLLAMA_HOST_INTERNAL = 'http://host.docker.internal:11434';
@@ -19,7 +18,7 @@ const OLLAMA_HOST_INTERNAL = 'http://host.docker.internal:11434';
  * @param context - 'server' | 'client' | 'docker'
  * @returns Ollama base URL
  */
-export function getOllamaEndpoint(context: 'server' | 'client' | 'docker' = 'client'): string {
+export function getOllamaEndpoint(context, 'server' | 'client' | 'docker' = 'client'): string {
  // Docker internal services
  if (context === 'docker') {
  return OLLAMA_HOST_INTERNAL;
@@ -121,7 +120,7 @@ export async function ollamaGenerate(
  model,
  prompt,
  stream,
- options: { temperature, top_p: num_predict },
+ options: { temperature: top_p: num_predict },
  }),
  });
 }

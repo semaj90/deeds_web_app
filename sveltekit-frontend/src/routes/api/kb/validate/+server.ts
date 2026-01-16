@@ -9,7 +9,7 @@ import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 
 interface ValidateSourcesRequest {
   query_id: string;
@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json() as ValidateSourcesRequest;
 
-    if (!body.query_id || !body.selected_chunk_ids?.length) {
+    if (!body?.query_id|| !body.selected_chunk_ids?.length) {
       return json({
         success: false,
         error: 'query_id and selected_chunk_ids are required'
@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
           const data = await response.json() as { result: { payload: Record<string, unknown> } };
           selectedSources.push({
             chunk_id: chunkId,
-            content: String(data.result.payload.content || ''),
+            content: String(data.result.payload?.content?? ''),
             metadata: data.result.payload,
             selected: true
           });
@@ -67,9 +67,9 @@ export const POST: RequestHandler = async ({ request }) => {
       query_id: body.query_id,
       case_id: body.case_id,
       selected_chunk_ids: body.selected_chunk_ids,
-      rejected_chunk_ids: body.rejected_chunk_ids || [],
+      rejected_chunk_ids: body?.rejected_chunk_ids|| [],
       user_notes: body.user_notes,
-      pinned_to_canvas: body.pin_to_canvas || false,
+      pinned_to_canvas: body?.pin_to_canvas|| false,
       sources_count: selectedSources.length,
       validated_at: new Date().toISOString()
     };
@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     // If pinning to canvas, update case state
-    if (body.pin_to_canvas && body.case_id) {
+    if (body?.pin_to_canvas&& body.case_id) {
       try {
         const canvasUpdate = {
           _id: `canvas_pin_${body.case_id}_${Date.now()}`,

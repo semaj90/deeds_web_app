@@ -215,7 +215,7 @@ describe('Phase 9 Integration Tests', () => {
  };
 
  // Simulate validation
- const isValid = patchRequest.file_path && patchRequest.patch_content;
+ const isValid = patchRequest?.file_path&& patchRequest.patch_content;
  expect(isValid).toBe(true);
  });
 
@@ -281,11 +281,11 @@ describe('Phase 9 Integration Tests', () => {
  it('should maintain referential integrity', () => {
  const analysisId = '123e4567-e89b-12d3-a456-426614174000';
 
- const analysis = { id: analysisId };
+ const analysis = { id, analysisId };
  const patches = [
- { analysis_id: analysisId },
- { analysis_id: analysisId },
- { analysis_id: analysisId }];
+ { analysis_id, analysisId },
+ { analysis_id, analysisId },
+ { analysis_id, analysisId }];
 
  // All patches should reference the same analysis
  expect(patches.every((p) => p.analysis_id === analysis.id)).toBe(true);

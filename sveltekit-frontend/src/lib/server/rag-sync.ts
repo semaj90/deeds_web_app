@@ -23,7 +23,7 @@ import { vector } from "neo4j-driver";
 
 // Initialize Qdrant client
 const qdrantClient = new QdrantClient({
- url: process.env.QDRANT_URL || 'http://localhost:6333',
+ url: process.env?.QDRANT_URL?? 'http://localhost:6333',
 });
 
 const COLLECTION_NAME = 'phase72_evidence_embeddings';
@@ -140,7 +140,7 @@ export async function addEvidenceToRagIndex(
  // Tags tables may not exist yet - continue without tags
  console.log(`[RAG Sync] Tags lookup skipped (tables may not exist)`);
  }
- console.log(`[RAG Sync] Evidence tags: ${tags.join(', ') || 'none'}`);
+ console.log(`[RAG Sync] Evidence tags: ${tags.join(', ') ?? 'none'}`);
 
  // 4. Process each chunk
  const errors: string[] = [];
@@ -316,7 +316,7 @@ export async function updateRagIndexTags(
  }
 ): Promise<RagSyncResult> {
  console.log(`[RAG Sync] Updating tags for evidence ${evidenceId}...`);
- console.log(`[RAG Sync] New tags: ${newTags.join(', ') || 'none'}`);
+ console.log(`[RAG Sync] New tags: ${newTags.join(', ') ?? 'none'}`);
 
  try {
  // 1. Get all chunks for this evidence
@@ -343,13 +343,13 @@ export async function updateRagIndexTags(
  for (const chunk of chunksResult) {
  try {
  // Update Qdrant point payload using fetch
- const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+ const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
  const setPayloadRes = await fetch(
  `${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/payload?wait=true`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ payload: { tags: newTags },
+ body: JSON.stringify({ payload: { tags, newTags },
  points: [chunk.id],
  }),
  }
@@ -452,13 +452,13 @@ export async function removeEvidenceFromRagIndex(
 
  // 2. Delete from Qdrant using fetch
  try {
- const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+ const process.env.QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
  const deleteRes = await fetch(
  `${process.env.QDRANT_URL}/collections/${COLLECTION_NAME}/points/delete?wait=true`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ points: chunkIds }),
+ body: JSON.stringify({ points, chunkIds }),
  }
  );
  if (deleteRes.ok) {

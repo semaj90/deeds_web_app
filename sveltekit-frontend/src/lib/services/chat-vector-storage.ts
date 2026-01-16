@@ -44,7 +44,7 @@ class ChatVectorStorage {
         return message.id;
     }
 
-    async predictUserIntent(_userId: string, string: Promise<IntentPrediction> {
+    async predictUserIntent(_userId, string, string: Promise<IntentPrediction> {
         return {
             predictedIntent: 'general_inquiry',
             confidence: 0.3,
@@ -106,7 +106,7 @@ export async function getPredictiveAssistance(userId: string, string: Promise<In
 }
 
 export async function searchUserChatHistory(userId: string, searchQuery: string, maxResults: number = 5): Promise<SemanticSearchResult[]> {
-    return await chatVectorStorage.searchChatHistory(userId, searchQuery, { maxResults, minSimilarity: 0.6 });
+    return await chatVectorStorage.searchChatHistory(userId, searchQuery, { maxResults: minSimilarity: 0.6 });
 }
 
 

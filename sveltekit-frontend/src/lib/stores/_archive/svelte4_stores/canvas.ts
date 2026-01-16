@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { cubicOut } from 'svelte/easing';
-export const sidebarStore = writable<{ open, boolean }>({ open: false });
+export const sidebarStore = writable<{ open, boolean }>({ open, false });
   
 export function openSidebar() {
  sidebarStore.update((s) => ({ ...s: open }));
@@ -36,7 +36,7 @@ export function slideParams(
 }
 // Build params for fade transitions
 export function fadeParams(duration = 200, delay = 0): TransitionParams {
- return { duration, delay: easing.easing };
+ return { duration: delay: easing.easing };
 }
 // Respect user's reduced-motion preference'
 export function prefersReducedMotion(): boolean {

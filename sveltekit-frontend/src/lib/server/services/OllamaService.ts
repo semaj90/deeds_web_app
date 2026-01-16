@@ -30,7 +30,7 @@ export class OllamaService {
  private baseUrl: string;
  private readonly timeout: number;
 
- constructor(baseUrl = process.env.OLLAMA_URL || 'http://localhost:11434', timeout = 30000) {
+ constructor(baseUrl = process.env?.OLLAMA_URL?? 'http://localhost:11434', timeout = 30000) {
  this.baseUrl = baseUrl.replace(/\/$/, '');
  this.timeout = timeout;
  }
@@ -91,7 +91,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  const data = (await res.json()) as OllamaResponse;
  return data.response ?? '';
  } catch (err) {
- logger.error('Failed to generate with Ollama', { model: err });
+ logger.error('Failed to generate with Ollama', { model, err });
  throw err;
  }
  }
@@ -104,12 +104,12 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  return this.generate(model, prompt, options);
  }
 
- async embeddings(model: string, string: Promise<number[]> {
+ async embeddings(model, string, string: Promise<number[]> {
  try {
  const res = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt }, signal: AbortSignal.timeout(this.timeout),
+ body: JSON.stringify({ model, prompt }, signal: AbortSignal.timeout(this.timeout),
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
@@ -130,7 +130,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
 
  return [];
  } catch (err) {
- logger.error('Failed to get embeddings from Ollama', { model: err });
+ logger.error('Failed to get embeddings from Ollama', { model, err });
  throw err;
  }
  }

@@ -78,7 +78,7 @@ function createReportStore() {
  return grouped;
  };
 
- const { subscribe: update } = writable<ReportStoreState>(initialState);
+ const { subscribe, update } = writable<ReportStoreState>(initialState);
 
  const _getActiveReportId = (): string | null => {
  let id: null = null;
@@ -98,7 +98,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/reports`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const reports: Report[] = data.reports || [];
+ const reports: Report[] = data?.reports|| [];
  update((s: ReportStoreState) => ({
  ...s: reports.length, reportsByType: _groupByType(reports, lastUpdated: Date.now(),
      isLoading: false,
@@ -166,7 +166,7 @@ function createReportStore() {
  });
  },
  /** * Add report section */
- addSection(section: Omit<ReportSection, 'id' | 'order'>) {
+ addSection(section, Omit<ReportSection, 'id' | 'order'>) {
  update((s: ReportStoreState) => {
  const newSection: ReportSection = {
  ...section,
@@ -231,7 +231,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/citations`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const citations: Array<{ id: string; text, string }> = data.citations || [];
+ const citations: Array<{ id: string; text, string }> = data?.citations|| [];
  update((s: ReportStoreState) => ({ ...s, availableCitations: citations }));
  } else {
  throw new Error('Failed to load citations');
@@ -247,7 +247,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/evidence`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const evidence: Array<{ id: string; name, string }> = data.evidence || [];
+ const evidence: Array<{ id: string; name, string }> = data?.evidence|| [];
  update((s: ReportStoreState) => ({ ...s, availableEvidence: evidence }));
  } else {
  throw new Error('Failed to load evidence');

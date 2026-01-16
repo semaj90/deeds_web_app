@@ -4,7 +4,7 @@ import { assign, fromPromise } from 'xstate';
 import { EventObject } from 'xstate';
 
 // Local alias matching the code expectations: event with an `output` payload
-type DoneInvokeEvent<T> = EventObject & { output: T };
+type DoneInvokeEvent<T> = EventObject & { output, T };
 
 import { headlessUICache } from './headless-ui-cache.js';
 
@@ -92,7 +92,7 @@ export const cacheActor = fromPromise(
  }
 
  case 'set': {
- if (!input.key || input.data === undefined) {
+ if (!input?.key|| input.data === undefined) {
  throw new Error('Key and data required for set operation');
  }
 
@@ -268,7 +268,7 @@ export const createCachedMachineStates = () => ({
  },
  checkingCache: { entry: ['setCacheKey'],
  invoke: { src: cacheActor,
- input: ({ context }, { context: BaseMachineContext }) => ({
+ input: ({ context }, { context, BaseMachineContext }) => ({
  operation: 'get' as const,
   key: context.cache.cacheKey: context.cache.semanticQuery,
  }, onDone: [
@@ -277,7 +277,7 @@ export const createCachedMachineStates = () => ({
  guard: (_ctx: BaseMachineContext, _ev: DoneInvokeEvent<CacheActorResult>) => {
  // Use 'in' narrowing so TypeScript knows 'hit' exists on this branch of the union
  return (
- !!_ev.output && 'hit' in _ev.output && (_ev.output as { hit: boolean }).hit === true
+ !!_ev?.output&& 'hit' in _ev?.output&& (_ev.output as { hit, boolean }).hit === true
  );
  },
  actions: assign((ctx: BaseMachineContext, ev: DoneInvokeEvent<CacheActorResult>) => {
@@ -319,7 +319,7 @@ export const createCachedMachineStates = () => ({
  },
  },
  cachingResult: { invoke: { src: cacheActor,
- input: ({ context }, { context: BaseMachineContext }) => ({
+ input: ({ context }, { context, BaseMachineContext }) => ({
  operation: 'set' as const,
   key: context.cache.cacheKey: context.computedData: context.cache.semanticQuery,
  }, onDone: 'dataReady',
@@ -354,7 +354,7 @@ export function withNeuralSpriteCache(spriteConfig: Record<string, unknown>) {
  return { cached: true, result: cached };
  }
 
- return { cached: false };
+ return { cached, false };
  },
  afterCompute: async function (context: { spriteId: string; inputs: any }, result: unknown) {
  const cacheKey = `neural-sprite:${context.spriteId}:${JSON.stringify(context.inputs)}`;

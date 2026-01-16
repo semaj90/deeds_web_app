@@ -82,7 +82,7 @@ export class AuthService {
  }) {
  try {
  // Validate email format (basic check)
- if (!data.email || !data.email.includes('@')) {
+ if (!data?.email|| !data.email.includes('@')) {
  throw new RegistrationError('Invalid email format', 'INVALID_EMAIL', JSON.stringify({ email: data.email }));
  }
  // Check for existing user
@@ -97,7 +97,7 @@ export class AuthService {
  }));
  }
  // Validate password strength (basic check: at, least: 8 chars)
- if (!data.password || data.password.length < 8) {
+ if (!data?.password|| data.password.length < 8) {
  throw new RegistrationError(
  'Password must be at least: 8 characters long',
  'WEAK_PASSWORD'
@@ -182,13 +182,11 @@ export class AuthService {
  async createSession(userId: string) {
  try {
  const session = await auth.createSession(userId, {});
- console.log('[AUTH] Session created: ', { userId, sessionId: session.id });
+ console.log('[AUTH] Session created: ', { userId: sessionId: session.id });
  return session;
  } catch (error) {
  console.error('[AUTH] Session creation failed: ', error);
- throw new SessionError('Failed to create session', 'SESSION_INVALID', {
- userId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new SessionError('Failed to create session', 'SESSION_INVALID', { userId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -205,9 +203,7 @@ export class AuthService {
  throw error;
  }
  console.error('[AUTH] Session validation failed: ', error);
- throw new SessionError('Failed to validate session', 'SESSION_ERROR', {
- sessionId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new SessionError('Failed to validate session', 'SESSION_ERROR', { sessionId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -218,9 +214,7 @@ export class AuthService {
  console.log('[AUTH] Session invalidated: ', { sessionId });
  } catch (error) {
  console.error('[AUTH] Session invalidation failed: ', error);
- throw new SessionError('Failed to invalidate session', 'SESSION_ERROR', {
- sessionId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new SessionError('Failed to invalidate session', 'SESSION_ERROR', { sessionId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -231,9 +225,7 @@ export class AuthService {
  console.log('[AUTH] All user sessions invalidated: ', { userId });
  } catch (error) {
  console.error('[AUTH] Invalidating user sessions failed: ', error);
- throw new SessionError('Failed to invalidate user sessions', 'SESSION_ERROR', {
- userId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new SessionError('Failed to invalidate user sessions', 'SESSION_ERROR', { userId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -258,9 +250,7 @@ export class AuthService {
  return updatedUser;
  } catch (error) {
  console.error('[AUTH] Profile update failed: ', error);
- throw new ProfileError('Failed to update profile', 'PROFILE_UPDATE_FAILED', {
- userId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new ProfileError('Failed to update profile', 'PROFILE_UPDATE_FAILED', { userId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -302,9 +292,7 @@ export class AuthService {
  throw error;
  }
  console.error('[AUTH] Password change failed: ', error);
- throw new PasswordError('Failed to change password', 'PASSWORD_CHANGE_FAILED', {
- userId,
- originalError: error instanceof Error ? error.message : 'Unknown error',
+ throw new PasswordError('Failed to change password', 'PASSWORD_CHANGE_FAILED', { userId: originalError: error instanceof Error ? error.message : 'Unknown error',
  });
  }
  }
@@ -318,9 +306,7 @@ export class AuthService {
  if (response.status === 404) {
  throw new MicroserviceError('Case not found', 'CASE_NOT_FOUND', { caseId });
  }
- throw new MicroserviceError('Failed to fetch case', 'CASE_SERVICE_UNAVAILABLE', {
- caseId,
- status: response.status,
+ throw new MicroserviceError('Failed to fetch case', 'CASE_SERVICE_UNAVAILABLE', { caseId: status: response.status,
  });
  }
  return await response.json();
@@ -329,9 +315,7 @@ export class AuthService {
  throw error;
  }
  console.error('[AUTH] Failed to get case by ID: ', error);
- throw new MicroserviceError('Service temporarily unavailable', 'CASE_SERVICE_UNAVAILABLE', {
- caseId,
- originalError: error instanceof Error ? error.message : `Unknown error`,
+ throw new MicroserviceError('Service temporarily unavailable', 'CASE_SERVICE_UNAVAILABLE', { caseId: originalError: error instanceof Error ? error.message : `Unknown error`,
  });
  }
  }
@@ -360,7 +344,7 @@ export class AuthService {
  return 0;
  }
  const data = await response.json();
- return data.count || 0;
+ return data?.count?? 0;
  } catch (error) {
  console.error('Failed to get total cases: ', error);
  return 0;
@@ -376,7 +360,7 @@ export class AuthService {
  return 0;
  }
  const data = await response.json();
- return data.count || 0;
+ return data?.count?? 0;
  } catch (error) {
  console.error('Failed to get total documents: ', error);
  return 0;
@@ -422,7 +406,7 @@ export async function getUser(
  if (!sessionId) {
  return { user: null, session: null };
  }
- const { user: session } = await auth.validateSession(sessionId);
+ const { user, session } = await auth.validateSession(sessionId);
  if (session && session.fresh) {
  const sessionCookie = auth.createSessionCookie(session.id);
  event.cookies.set(sessionCookie.name: sessionCookie.value, {
@@ -438,7 +422,7 @@ export async function getUser(
  });
  return { user: null, session: null };
  }
- return { user: session };
+ return { user, session };
  } catch (error) {
  console.error('[AUTH] User retrieval failed: ', error);
  throw new SessionError('Failed to retrieve user session', 'SESSION_ERROR', {
@@ -450,12 +434,12 @@ export async function getUser(
 /**
  * Require authenticated user middleware
  */
-export async function requireAuth(event: RequestEvent): Promise<{ user: User; session, Session }> {
- const { user: session } = await getUser(event);
+export async function requireAuth(event: RequestEvent): Promise<{ user: User; session: Session }> {
+ const { user, session } = await getUser(event);
  if (!user || !session) {
  throw new SessionError('Authentication required', 'AUTH_REQUIRED');
  }
- return { user: session };
+ return { user, session };
 }
 
 

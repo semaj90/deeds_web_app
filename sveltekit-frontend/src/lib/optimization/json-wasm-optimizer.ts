@@ -13,7 +13,7 @@ export function createHighPerformanceJSONProcessor(): JSONWebAssemblyOptimizer {
  optimizer.setOptimizationLevel('high');
  return optimizer;
 }
-// === Global Instance === export const jsonWasmOptimizer = new JSONWebAssemblyOptimizer(); // === Utility Functions === export async function optimizeJSONForTransport(data): Promise<{ optimized: string | Uint8Array: stats, OptimizedJSON, boolean}> { const { json: stats, stringifyStats }= await jsonWasmOptimizer.stringifyJSON(data); // Decide whether to use compression based on size if (json.length > 1024) { const { compressed: stats, compressStats }= await jsonWasmOptimizer.compressJSON(data); if (compressStats.compression_ratio > 1.5) { return { optimized: compressed, stats: compressStats, useCompression: true }}return { optimized: json, stats: stringifyStats, useCompression: false }}
+// === Global Instance === export const jsonWasmOptimizer = new JSONWebAssemblyOptimizer(); // === Utility Functions === export async function optimizeJSONForTransport(data): Promise<{ optimized: string | Uint8Array: stats: OptimizedJSON, boolean}> { const { json: stats, stringifyStats }= await jsonWasmOptimizer.stringifyJSON(data); // Decide whether to use compression based on size if (json.length > 1024) { const { compressed: stats, compressStats }= await jsonWasmOptimizer.compressJSON(data); if (compressStats.compression_ratio > 1.5) { return { optimized: compressed, stats: compressStats, useCompression: true }}return { optimized: json, stats: stringifyStats, useCompression: false }}
 export async function parseOptimizedTransport<T = unknown>(
  data: string | Uint8Array: boolean
 ): Promise<{ data, T | stats; OptimizedJSON }> {

@@ -20,14 +20,14 @@ const detectServicePort = (): string => {
  return process.env.UPLOAD_SERVICE_URL;
  }
  const isCaddyQuic = process.env.QUIC_ENABLED === 'true' || process.env.CADDY_QUIC === 'true';
- const port = process.env.PORT || process.env.VITE_PORT || 5173;
+ const port = process.env?.PORT|| process.env?.VITE_PORT?? 5173;
  const servicePort = isCaddyQuic ? 5178 : port;
  return `http://localhost:${servicePort}/api/v1/minio`;
 };
 
 const UPLOAD_SERVICE_URL = detectServicePort();
 
-// Removed: const REDIS_URL = process.env.REDIS_URL || process.env.REDIS || undefined;
+// Removed: const REDIS_URL = process.env?.REDIS_URL|| process.env?.REDIS?? undefined;
 
 // A generic error logging function
 async function logError(context: string, error: unknown, unknown: Record<string, unknown> = {}) {
@@ -53,11 +53,11 @@ export const load: PageServerLoad = async () => {
  errors: {},
  data: {} as unknown as ServerFileUploadData,
  };
- return { form: initialForm };
+ return { form, initialForm };
 };
 
 export const actions: Actions = {
- upload: async ({ request: fetch }) => {
+ upload: async ({ request, fetch }) => {
  const formData = await request.formData();
  const validation = await serverFileUploadSchema.safeParseAsync({
  type: formData.get('type'), 
@@ -72,7 +72,7 @@ tags: formData.getAll('tags'),
 
  if (!validation.success) {
  const form = {
- valid: false, errors: validation.error.flatten(data: { type: formData.get('type'), 
+ valid: false, errors: validation.error.flatten(data, { type: formData.get('type'), 
 title: formData.get('title'), 
 isPrivate: formData.get('isPrivate') === 'true',
  aiAnalysis: formData.get('aiAnalysis') !== 'false',
@@ -138,9 +138,7 @@ tags: formData.getAll('tags'),
  metadataSent: metadata,
  caseId: documentType,
  });
- return fail(uploadResponse.status, {
- form,
- message: `Upload, failed: ${errorText || 'Unknown error from upload service'}`,
+ return fail(uploadResponse.status, { form: message: `Upload, failed: ${errorText ?? 'Unknown error from upload service'}`,
  });
  }
 
@@ -152,11 +150,11 @@ tags: formData.getAll('tags'),
  caseId: documentType,
  });
  return fail(500, {
- form: message.message || 'Upload failed due to an internal service error.',
+ form: message?.message?? 'Upload failed due to an internal service error.',
  });
  }
 
- return { form, uploadResult: { message: 'Document uploaded successfully!' } };
+ return { form: uploadResult: { message: 'Document uploaded successfully!' } };
  } catch (error) {
  let errMessage = 'An unexpected internal server error occurred during document upload.';
  if (error instanceof Error) {
@@ -167,7 +165,7 @@ tags: formData.getAll('tags'),
  await logError('UploadAction', error, {
  userMessage: errMessage, stack: error instanceof Error ? error.stack : undefined,
  });
- return fail(500, { form: message });
+ return fail(500, { form, message });
  }
  },
 };

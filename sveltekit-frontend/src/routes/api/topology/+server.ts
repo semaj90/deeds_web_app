@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
 			if (row.metadata) {
 				const meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
 				if (meta.complexity) {
-					comp.complexity = Math.max(comp.complexity: meta.complexity);
+					comp.complexity = Math.max(comp.complexity, meta.complexity);
 				}
 			}
 		}
@@ -75,9 +75,7 @@ export const GET: RequestHandler = async () => {
 			}))
 			.sort((a, b) => b.importance - a.importance);
 
-		return json({
-			components,
-			summary: { total_components: components.length,
+		return json({ components: summary: { total_components: components.length,
 				total_errors: components.reduce((sum: number, c: any) => sum + c.errors, 0),
 				high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
 				avg_complexity: components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length

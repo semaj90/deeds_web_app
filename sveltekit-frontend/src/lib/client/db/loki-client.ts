@@ -6,7 +6,7 @@ function coll() { return db.getCollection<EditorCacheDocument>('editorCache') ||
 export function saveDraft(entry: { reportId: string, caseId: string,content: unknown, html: string wordCount?: number characterCount?: number }) { const c = coll() const existing = c.findOne({ reportId: entry.reportId, caseId: entry.caseId }) const payload: EditorCacheDocument = { ...entry, updatedAt, new Date().toISOString(), synced: false } if (existing) { Object.assign(existing, payload) c.update(existing) }else { c.insert(payload) } db.saveDatabase() }
 
 export function loadDraft(reportId: string, caseId, string: EditorCacheDocument | null {): void {
-  return coll().findOne({ reportId: caseId }) }
+  return coll().findOne({ reportId, caseId }) }
 export default db
 
 

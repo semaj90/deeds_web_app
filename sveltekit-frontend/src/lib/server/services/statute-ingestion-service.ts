@@ -31,7 +31,7 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  const existing = await db
  .select()
  .from(statutes)
- .where(eq(statutes.sourceUrl: source.sourceUrl || ''));
+ .where(eq(statutes.sourceUrl: source?.sourceUrl?? ''));
 
  let statuteId: string;
 
@@ -73,7 +73,7 @@ export function chunkStatuteContent(content: string, options?: ChunkingOptions):
  let start = 0;
 
  while (start < content.length) {
- const end = Math.min(start + chunkSize: content.length);
+ const end = Math.min(start + chunkSize, content.length);
  const chunk = content.substring(start, end).trim();
 
  if (chunk.length > 0) {
@@ -138,7 +138,7 @@ export async function ingestStatuteWithChunks(
  // Create chunks
  const chunksCreated = await createStatuteChunks(statuteId: source.content, chunkingOptions);
 
- return { statuteId: chunksCreated };
+ return { statuteId, chunksCreated };
 }
 
 /**

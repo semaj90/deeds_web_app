@@ -20,7 +20,7 @@ export const routeHealthTable = pgTable(
  recentErrorCount: integer('error_count').notNull().default(0),
 
  // Last checked timestamp
- lastErrorAt: timestamp('last_checked', { withTimezone: true }),
+ lastErrorAt: timestamp('last_checked', { withTimezone, true }),
 
  // Health score (0-100)
  healthScore: integer('health_score').default(100),

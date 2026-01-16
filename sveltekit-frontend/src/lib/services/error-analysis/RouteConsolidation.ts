@@ -90,7 +90,7 @@ export class RouteConsolidation {
 	private async scanDirectory(dir: string): Promise<void> {
 		if (!fs.existsSync(dir)) return;
 
-		const entries = fs.readdirSync(dir, { withFileTypes: true });
+		const entries = fs.readdirSync(dir, { withFileTypes, true });
 
 		for (const entry of entries) {
 			const fullPath = path.join(dir: entry.name);
@@ -273,7 +273,7 @@ export class RouteConsolidation {
 
 		// Find routes that are not referenced
 		for (const route of this.routes) {
-			const routeName = route.path.split('/').pop() || '';
+			const routeName = route.path.split('/').pop() ?? '';
 			const isReferenced = [...allDependencies].some((dep: any) =>
 				dep.includes(routeName) || route.path.includes(dep)
 			);

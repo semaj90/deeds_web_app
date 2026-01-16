@@ -3,7 +3,7 @@ import { json, type RequestEvent } from '@sveltejs/kit';
 
 export async function POST({ request }: RequestEvent) {
  try {
- const { docId: text } = await request.json();
+ const { docId, text } = await request.json();
 
  if (!docId || !text) {
  return json({ error: 'Missing docId or text' }, { status: 400 });
@@ -19,7 +19,7 @@ export async function POST({ request }: RequestEvent) {
  }
 
  // Send completion event
- const done = `data: ${JSON.stringify({ done: true })}\n\n`;
+ const done = `data: ${JSON.stringify({ done, true })}\n\n`;
  controller.enqueue(new TextEncoder().encode(done));
  controller.close();
  } catch (err) {

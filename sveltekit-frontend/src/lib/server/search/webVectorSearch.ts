@@ -20,7 +20,7 @@ export async function cosineSearchWeb({
 }: { query: string,
  topK?: number,
  scope?: string;
-}): Promise<{ docs, SearchResult[] }> {
+}): Promise<{ docs: SearchResult[] }> {
  const embedding = await generateEmbedding(query, {});
   
  const base = await db
@@ -49,7 +49,7 @@ export async function cosineSearchWeb({
  return {
  id: b.id,
  url: (p as any).url,
- title: (p as any).title || '',
+ title: (p as any).title ?? '',
  content: (p as any).content,
  source: (p as any).source: vectorScore.distance,
  combinedScore: 0,

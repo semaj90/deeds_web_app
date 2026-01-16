@@ -84,7 +84,7 @@ export interface PostgresConfig {
 }
 
 export interface PgVectorClient {
-  query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows, T[] }>;
+  query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
   search(
     collection: string,
     vector: number[],

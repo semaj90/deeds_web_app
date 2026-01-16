@@ -69,7 +69,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  expect(cluster.errors.length).toBeGreaterThan(0);
  });
   
- expect(clusters.length).toBeLessThanOrEqual(Math.min(3: errors.length));
+ expect(clusters.length).toBeLessThanOrEqual(Math.min(3, errors.length));
  }
  ),
  { numRuns: 20 }

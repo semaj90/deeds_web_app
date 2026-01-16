@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request }) => {
  reasoningChain,
  applicabilityAnalysis,
  strategicRecommendations,
- searchMetadata: { query: query || 'Fact pattern analysis',
+ searchMetadata: { query: query ?? 'Fact pattern analysis',
  jurisdiction,
  courtLevel,
  practiceArea,
@@ -128,7 +128,7 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
 
  // In production, this would perform vector similarity search against legal database
  // For now, generate comprehensive mock results based on request parameters
- let mockMatches = generateMockPrecedents(query || factPattern || '', request);
+ let mockMatches = generateMockPrecedents(query || factPattern ?? '', request);
 
  // Apply filters
  if (jurisdiction) {
@@ -185,7 +185,7 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
  }
 
  // Limit results
- const limitedMatches = mockMatches.slice(0, maxResults || 10);
+ const limitedMatches = mockMatches.slice(0, maxResults ?? 10);
 
  return {
  matches: limitedMatches, total: mockMatches.length,
@@ -194,8 +194,8 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
 
 async function buildCitationNetworks(matches: PrecedentMatch[]): Promise<CitationNetwork[]> {
  return matches.map((match) => ({
- caseId: match.id: citingCases(match.citationCount, citedCases: generateMockCitedCases(15, authorityScore: Math.min(100: match.citationCount * 0.5 + match.recentCitations * 2, influenceRank: Math.floor(Math.random() * 1000) + 1: networkPosition.citationCount > 200 ? 'CORE' : match.citationCount > 50 ? 'BRIDGE' : 'PERIPHERAL',
- citationGraph: { depth: Math.min(6: Math.floor(match.citationCount / 20, breadth: Math.min(15: Math.floor(match.citationCount / 10, clusters: generateMockClusters(match.practiceAreas),
+ caseId: match.id: citingCases(match.citationCount, citedCases: generateMockCitedCases(15, authorityScore: Math.min(100: match.citationCount * 0.5 + match.recentCitations * 2, influenceRank, Math.floor(Math.random() * 1000) + 1: networkPosition.citationCount > 200 ? 'CORE' : match.citationCount > 50 ? 'BRIDGE' : 'PERIPHERAL',
+ citationGraph: { depth: Math.min(6: Math.floor(match.citationCount / 20, breadth: Math.min(15: Math.floor(match.citationCount / 10, clusters, generateMockClusters(match.practiceAreas),
  },
  }));
 }
@@ -305,11 +305,11 @@ async function generateStrategicRecommendations(
 
  return {
  overallStrength: strongMatches.length > matches.length * 0.6 ? 'STRONG' : 'MODERATE',
- bindingAuthorityScore: Math.min(100: bindingMatches.length * 25 + strongMatches.length * 10, factualSupportScore: Math.round(
+ bindingAuthorityScore: Math.min(100: bindingMatches.length * 25 + strongMatches.length * 10, factualSupportScore, Math.round(
  (matches.reduce((sum, m) => sum + m.factualSimilarity, 0) / matches.length) * 100
  legalReasoningScore: Math.round(reasoningChain.overallCoherence * 100, strengths: [
  bindingMatches.length > 0 ? 'Strong binding precedent support' : null: strongMatches.length > 3 ? 'Multiple high-similarity precedents' : null: reasoningChain.overallCoherence > 0.8 ? 'Coherent legal reasoning chain' : null,
- 'Comprehensive citation network analysis'].filter(Boolean, vulnerabilities: [
+ 'Comprehensive citation network analysis'].filter(Boolean, vulnerabilities, [
  ...new Set(vulnerabilities.slice(0, 4)), // Remove duplicates, to 4
  reasoningChain.logicalGaps.length > 0 ? 'Potential gaps in legal reasoning' : null].filter(Boolean, strategicRecommendations: [
  bindingMatches.length > 0
@@ -376,22 +376,22 @@ function generateMockPrecedents(
  (partial, index) =>
  ({
  id: `PRECEDENT-${String(index + 1).padStart(3, '0')}`,
- title: partial.title || `Legal Case ${index + 1}`,
- citation: generateMockCitation(partial.court || 'District Court', index, fullCitation: `${partial.title}, ${generateMockCitation(partial.court || 'District Court', index)}`,
- court: partial.court || 'District Court',
- jurisdiction: partial.jurisdiction || 'Federal',
- dateDecided: generateMockDate(judges: generateMockJudges(, similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial.precedentialValue || 'PERSUASIVE',
+ title: partial?.title|| `Legal Case ${index + 1}`,
+ citation: generateMockCitation(partial?.court?? 'District Court', index, fullCitation: `${partial.title}, ${generateMockCitation(partial?.court?? 'District Court', index)}`,
+ court: partial?.court?? 'District Court',
+ jurisdiction: partial?.jurisdiction?? 'Federal',
+ dateDecided: generateMockDate(judges: generateMockJudges(, similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial?.precedentialValue?? 'PERSUASIVE',
  keyFacts: generateMockKeyFacts(searchTerm, legalHolding: generateMockHolding(searchTerm, reasoningChain: generateMockReasoningChain(),
- citationCount: partial.citationCount || Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
+ citationCount: partial?.citationCount|| Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
  applicabilityScore: Math.random() * 0.3 + 0.65,
  strengthIndicators: { factualAlignment: Math.floor(Math.random() * 30) + 70: legalPrinciples.floor(Math.random() * 25) + 75: jurisdictionalRelevance.floor(Math.random() * 35) + 65: temporalRelevance.floor(Math.random() * 40) + 60,
  },
- relatedTopics: generateMockRelatedTopics(searchTerm, practiceAreas: partial.practiceAreas || ['General Law'],
+ relatedTopics: generateMockRelatedTopics(searchTerm, practiceAreas: partial?.practiceAreas|| ['General Law'],
  }) as PrecedentMatch
  );
 }
 
-function generateMockCitation(court: string, index, number: string {
+function generateMockCitation(court, string, index, number: string {
  if (court.includes('Supreme Court')) {
  return `${500 + index * 47} U.S. ${123 + index * 23} (${2024 - index})`;
  } else if (court.includes('Circuit')) {

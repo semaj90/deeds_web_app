@@ -11,9 +11,9 @@
 import Redis from 'ioredis';
 import { couchdb } from './couchdb-client.js';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const REDIS_URL = process.env?.REDIS_URL?? 'redis://localhost:6379';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
 // LLM Log Schema
 export interface LLMLog {
@@ -69,7 +69,7 @@ class LLMLogger {
   /**
    * Log an LLM interaction
    */
-  async log(log: Omit<LLMLog, 'log_id' | 'timestamp'>): Promise<string> {
+  async log(log, Omit<LLMLog, 'log_id' | 'timestamp'>): Promise<string> {
     const fullLog: LLMLog = {
       log_id: `llm_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
       timestamp: new Date().toISOString(),
@@ -83,7 +83,7 @@ class LLMLogger {
     await this.storeInCouchDB(fullLog);
 
     // 3. If successful, index in Qdrant for retrieval
-    if (log.evaluation.success && (log.evaluation.ace_score ?? 0) > 0.7) {
+    if (log.evaluation?.success&& (log.evaluation.ace_score ?? 0) > 0.7) {
       await this.indexInQdrant(fullLog);
     }
 
@@ -232,7 +232,7 @@ class LLMLogger {
         body: JSON.stringify({ vector: embedding,
           limit,
           with_payload: true,
-          filter: { must: [{ key: 'success', match: { value: true } }]
+          filter: { must: [{ key: 'success', match: { value, true } }]
           }
         })
       });
@@ -268,9 +268,7 @@ class LLMLogger {
       const { docs } = await couchdb.find<LLMLog>('ace_llm_logs', {
         'evaluation.success': true,
         'evaluation.ace_score': { $gte: minAceScore }
-      }, {
-        limit,
-        sort: [{ 'evaluation.ace_score': 'desc' }]
+      }, { limit: sort: [{ 'evaluation.ace_score': 'desc' }]
       });
 
       return docs.map((log: any) => ({
@@ -278,7 +276,7 @@ class LLMLogger {
         output: log.output.response,
         metadata: { source: log.log_id,
           task_type: log.task_type,
-          ace_score: log.evaluation.ace_score || 0,
+          ace_score: log.evaluation?.ace_score?? 0,
           model: log.model
         }
       }));
@@ -324,9 +322,9 @@ class LLMLogger {
 
       // Adjust ACE score based on feedback
       if (feedback === 'positive') {
-        log.evaluation.ace_score = Math.min(1, (log.evaluation.ace_score || 0.5) + 0.1);
+        log.evaluation.ace_score = Math.min(1, (log.evaluation?.ace_score?? 0.5) + 0.1);
       } else {
-        log.evaluation.ace_score = Math.max(0, (log.evaluation.ace_score || 0.5) - 0.2);
+        log.evaluation.ace_score = Math.max(0, (log.evaluation?.ace_score?? 0.5) - 0.2);
       }
 
       await couchdb.put('ace_llm_logs', log);
@@ -354,16 +352,10 @@ export async function logLLMCall(
   },
   contextChunks?: string[]
 ): Promise<string> {
-  return llmLogger.log({
-    model,
-    task_type: taskType,
-    input: {
-      prompt,
-      context_chunks: contextChunks
+  return llmLogger.log({ model: task_type: taskType,
+    input: { prompt: context_chunks: contextChunks
     },
-    output: {
-      response,
-      tokens_in: metrics.tokensIn,
+    output: { response: tokens_in: metrics.tokensIn,
       tokens_out: metrics.tokensOut,
       latency_ms: metrics.latencyMs
     },

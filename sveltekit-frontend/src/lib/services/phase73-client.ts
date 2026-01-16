@@ -42,7 +42,7 @@ export class Phase73Client {
  private retryAttempts = 3;
  private retryDelay = 1000; // ms
 
- constructor(baseUrl: string = 'http://localhost:8000', apiKey?: string) {
+ constructor(baseUrl, string = 'http://localhost:8000', apiKey?: string) {
  this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
  this.apiKey = apiKey;
  }
@@ -72,7 +72,7 @@ export class Phase73Client {
  async getClusters(query?: string): Promise<ClusterData[]> {
  const params = query ? `?query=${encodeURIComponent(query)}` : '';
  const response = await this.makeRequest(`/api/clusters${params}`, 'GET');
- return response.clusters || [];
+ return response?.clusters|| [];
  }
 
  /**
@@ -86,9 +86,9 @@ export class Phase73Client {
  * Re-rank results
  */
  async rerank(query: string, documentIds: string[]): Promise<RankingScore[]> {
- const payload = { query: documentIds };
+ const payload = { query, documentIds };
  const response = await this.makeRequest('/api/rerank', 'POST', payload);
- return response.scores || [];
+ return response?.scores|| [];
  }
 
  /**
@@ -224,7 +224,7 @@ export function getPhase73Client(baseUrl?: string, apiKey?: string): Phase73Clie
  * Initialize Phase 73 client with environment variables
  */
 export function initPhase73Client(): Phase73Client {
- const baseUrl = process.env.PHASE_73_BACKEND_URL || 'http://localhost:8000';
+ const baseUrl = process.env?.PHASE_73_BACKEND_URL?? 'http://localhost:8000';
  const apiKey = process.env.PHASE_73_API_KEY;
  return getPhase73Client(baseUrl, apiKey);
 }

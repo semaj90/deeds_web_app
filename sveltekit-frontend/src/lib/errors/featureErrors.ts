@@ -143,7 +143,7 @@ export class FeatureErrorHandler {
  userId?: string,
  table?: string
  ): FeatureErrorResponse {
- const message = `Access to ${table || 'data'} is denied for this feature`;
+ const message = `Access to ${table ?? 'data'} is denied for this feature`;
 
  // Log the error
  if (feature === 'errorBrain') {
@@ -216,7 +216,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'invalid_input',
  feature: status,
- timestamp: new Date().toISOString(), details: { field: reason },
+ timestamp: new Date().toISOString(), details: { field, reason },
  };
  }
 
@@ -254,7 +254,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'internal_error',
  feature: status,
- timestamp: new Date().toISOString(), details: { error: errorMessage },
+ timestamp: new Date().toISOString(), details: { error, errorMessage },
  };
  }
 
@@ -282,7 +282,7 @@ export class FeatureErrorHandler {
  * Validate error response
  */
  static validateErrorResponse(response: FeatureErrorResponse): boolean {
- if (!response.error || !response.errorType || response.status === undefined) {
+ if (!response?.error|| !response?.errorType|| response.status === undefined) {
  return false;
  }
 
@@ -296,7 +296,7 @@ export class FeatureErrorHandler {
  /**
  * Get error message for status code
  */
- static getErrorMessageForStatus(status: number, feature: 'errorBrain' | 'legalAi'): string {
+ static getErrorMessageForStatus(status, number, feature: 'errorBrain' | 'legalAi'): string {
  switch (status) {
  case 400:
  return 'Invalid request';
@@ -351,7 +351,7 @@ export function createFeatureError(
 /**
  * Handle feature error
  */
-export function handleFeatureError(error, FeatureError): Response {
+export function handleFeatureError(error: FeatureError): Response {
  return FeatureErrorHandler.handleAndRespond(error);
 }
 

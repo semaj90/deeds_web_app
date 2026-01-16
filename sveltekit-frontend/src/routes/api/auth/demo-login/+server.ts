@@ -10,7 +10,7 @@ import type { RequestHandler } from './$types.js';
  *
  * ⚠️ SECURITY: Only enabled when DEV_BYPASS_AUTH=true
  */
-export const POST: RequestHandler = async ({ request: cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
  try {
  // Check if demo login is enabled
  const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';
@@ -35,9 +35,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 		// Create demo user if it doesn't exist
 		const [newUser] = await db
 			.insert(users)
-			.values({
-				email,
-				firstName: email.split('@')[0],
+			.values({ email: firstName: email.split('@')[0],
 				lastName: 'Demo',
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',

@@ -92,7 +92,7 @@ export class FeedbackLoopService {
     /**
      * Collect user rating for unknown interaction with semantic vector analysis
      */
-    async collectRating(rating: Omit<UserRating, 'id' | 'timestamp'>): Promise<string> {
+    async collectRating(rating, Omit<UserRating, 'id' | 'timestamp'>): Promise<string> {
         try {
             const ratingId = `rating_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
@@ -131,7 +131,7 @@ export class FeedbackLoopService {
             await this.updateUserBehaviorPattern(ratingData.userId, ratingData);
 
             // Find similar low-rated interactions using vector similarity
-            if (ratingData.score < 3.0 && queryEmbedding) {
+            if (ratingData.score < 3?.0&& queryEmbedding) {
                 await this.findSimilarLowRatedInteractions(ratingData.userId, queryEmbedding);
             }
 
@@ -153,15 +153,15 @@ export class FeedbackLoopService {
      */
     private async processLowQualityInteraction(rating: UserRating) {
         try {
-            if (!rating.context.query || !rating.context.response) return;
+            if (!rating.context?.query|| !rating.context.response) return;
 
             const trainingPoint: TrainingDataPoint = {
                 input: rating.context.query,
-                expectedOutput: rating.feedback || '', // User correction/feedback
+                expectedOutput: rating?.feedback?? '', // User correction/feedback
                 actualOutput: rating.context.response,
                 userRating: rating.score,
                 corrections: rating.feedback,
-                contextTags: [rating.ratingType: rating.metadata.featureUsed || 'unknown'],
+                contextTags: [rating.ratingType: rating.metadata?.featureUsed?? 'unknown'],
                 difficultyLevel: this.assessDifficultyLevel(rating.context.query)
             };
 
@@ -238,12 +238,10 @@ export class FeedbackLoopService {
                 const user = userResult[0]; // Get the first user from the result array
                 const userRole = user?.role ?? 'user'; // Access role safely
 
-                pattern = {
-                    userId,
-                    commonQueries: [],
+                pattern = { userId: commonQueries: [],
                     preferredFeatures: [],
                     responseTimeThreshold: 2000, // Default 2 seconds
-                    qualityExpectations: this.adaptiveThresholds.get(userRole) || 3.5,
+                    qualityExpectations: this.adaptiveThresholds.get(userRole) ?? 3.5,
                     learningProgress: { initialAccuracy: rating.score,
                         currentAccuracy: rating.score,
                         improvementRate: 0,
@@ -254,7 +252,7 @@ export class FeedbackLoopService {
             }
 
             // Update common queries
-            if (rating.context.query && !pattern.commonQueries.includes(rating.context.query)) {
+            if (rating.context?.query&& !pattern.commonQueries.includes(rating.context.query)) {
                 pattern.commonQueries.push(rating.context.query);
                 // Keep only top 20 most recent queries
                 if (pattern.commonQueries.length > 20) {
@@ -273,7 +271,7 @@ export class FeedbackLoopService {
             // Update response time expectations
             if (rating.context.responseTime) {
                 pattern.responseTimeThreshold = Math.max(
-                    pattern.responseTimeThreshold * 0.9 + (rating.context.responseTime || 0) * 0.1,
+                    pattern.responseTimeThreshold * 0.9 + (rating.context?.responseTime?? 0) * 0.1,
                     500 // Minimum 500ms threshold
                 );
             }
@@ -285,11 +283,11 @@ export class FeedbackLoopService {
 
             // Update strong/weak areas
             if (rating.score >= 4) {
-                if (rating.metadata.featureUsed && !pattern.learningProgress.strongAreas.includes(rating.metadata.featureUsed)) {
+                if (rating.metadata?.featureUsed&& !pattern.learningProgress.strongAreas.includes(rating.metadata.featureUsed)) {
                     pattern.learningProgress.strongAreas.push(rating.metadata.featureUsed);
                 }
             } else if (rating.score <= 2) {
-                if (rating.metadata.featureUsed && !pattern.learningProgress.weakAreas.includes(rating.metadata.featureUsed)) {
+                if (rating.metadata?.featureUsed&& !pattern.learningProgress.weakAreas.includes(rating.metadata.featureUsed)) {
                     pattern.learningProgress.weakAreas.push(rating.metadata.featureUsed);
                 }
             }
@@ -507,7 +505,7 @@ export class FeedbackLoopService {
             const improvementTrends: { [area: string]: number } = {};
             for (const pattern of this.userPatterns.values()) {
                 for (const area of pattern.learningProgress.strongAreas) {
-                    improvementTrends[area] = (improvementTrends[area] || 0) + 1;
+                    improvementTrends[area] = (improvementTrends[area] ?? 0) + 1;
                 }
             }
 

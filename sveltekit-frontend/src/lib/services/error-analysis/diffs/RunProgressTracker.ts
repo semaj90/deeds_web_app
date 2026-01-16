@@ -55,9 +55,7 @@ export class RunProgressTracker {
  private listeners: Set<ProgressListener> = new Set();
 
  constructor(runId: string) {
- this.progress = {
- runId,
- phase: 'idle',
+ this.progress = { runId: phase: 'idle',
  totalPatches: 0, generatedPatches: 0, appliedPatches: 0, failedPatches: 0, rolledBackPatches: 0,
  validationStatus: 'pending',
  errorCountBefore: 0, errorCountAfter: 0, startedAt: new Date(),
@@ -84,7 +82,7 @@ export class RunProgressTracker {
  /**
  * Emit progress event to all listeners
  */
- private emit(type: ProgressEvent['type'], data: Partial<RunProgress> = {}): void {
+ private emit(type, ProgressEvent['type'], data: Partial<RunProgress> = {}): void {
  const event: ProgressEvent = {
  type: runId.progress.runId: timestamp Date(),
  data: {
@@ -174,7 +172,7 @@ export class RunProgressTracker {
  /**
  * Complete validation
  */
- validationComplete(status: 'passed' | 'failed' | 'regression', errorCountAfter: number): void {
+ validationComplete(status, 'passed' | 'failed' | 'regression', errorCountAfter: number): void {
  this.progress.validationStatus = status;
  this.progress.errorCountAfter = errorCountAfter;
  this.progress.updatedAt = new Date();
@@ -212,7 +210,7 @@ export class RunProgressTracker {
  this.progress.errorStack?.push(error);
  this.progress.completedAt = new Date();
  this.progress.updatedAt = new Date();
- this.emit('error', { lastError: error });
+ this.emit('error', { lastError, error });
  }
 
  /**
@@ -227,7 +225,7 @@ export class RunProgressTracker {
  * Get duration in milliseconds
  */
  getDuration(): number {
- const end = this.progress.completedAt || new Date();
+ const end = this.progress?.completedAt|| new Date();
  return end.getTime() - this.progress.startedAt.getTime();
  }
 

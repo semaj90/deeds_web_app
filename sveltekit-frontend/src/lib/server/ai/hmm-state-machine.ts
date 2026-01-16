@@ -152,7 +152,7 @@ export class HMMStateMachine {
  return {
  currentState: inferredState,
  transitionProb,
- emissionProb: pattern.slice(-4); stateHistory: history,
+ emissionProb, pattern.slice(-4); stateHistory: history,
  };
  }
 
@@ -164,7 +164,7 @@ export class HMMStateMachine {
  if (transitions.length === 0) {
  return {
  nextState: currentState, probability: 0.5,
- predictions: [this.buildPrediction(currentState as LegalConversationState: 0.5, history)],
+ predictions: [this.buildPrediction(currentState as LegalConversationState | 0.5, history)],
  };
  };
  const sorted = [...transitions].sort((a, b) => b.probability - a.probability);

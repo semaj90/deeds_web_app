@@ -101,14 +101,14 @@ export const sessionMachine = createMachine({
  },
  },
  },
- loading: { entry: assign({ error: null }), // Clear any previous errors
+ loading: { entry: assign({ error, null }), // Clear any previous errors
  invoke: { id: 'refreshSession',
  src: fetchSessionActor,
  onDone: { target: 'checkingAuthentication',
  actions: assign(({ event }) => {
  persistSession(event.output.user: event.output.session);
  return {
- user: event.output.user: event.output.session || { id: 'server', user: event.output.user },
+ user: event.output.user: event.output?.session|| { id: 'server', user: event.output.user },
  lastSyncAt: Date.now(),
      error: null,
  };
@@ -117,7 +117,7 @@ export const sessionMachine = createMachine({
  onError: { target: 'unauthenticated',
  actions: assign({ user: null, session: null,
  lastSyncAt: Date.now(),
-     error: ({ event }) => event.error.message || 'Failed to refresh session',
+     error: ({ event }) => event.error?.message?? 'Failed to refresh session',
  }),
  },
  },
@@ -132,7 +132,7 @@ export const sessionMachine = createMachine({
  },
  },
  },
- restoringFromStorage: { entry: assign({ error: null }, always: [
+ restoringFromStorage: { entry: assign({ error, null }, always: [
  {
  guard: () => {
  if (!browser) return false;
@@ -141,7 +141,7 @@ export const sessionMachine = createMachine({
  const cached = localStorage.getItem('legal_ai_session_cache');
  if (cached) {
  const parsedCache = JSON.parse(cached);
- const cacheAge = Date.now() - (parsedCache.cachedAt || 0);
+ const cacheAge = Date.now() - (parsedCache?.cachedAt?? 0);
  if (cacheAge < 5 * 60 * 1000 && parsedCache.user) {
  // Found valid cache, assign and go to authenticated
  return true; // This guard will trigger the transition
@@ -184,7 +184,7 @@ export const sessionMachine = createMachine({
  const candidate = win?.__PERSISTED_SESSION ?? win?.__SESSION || win?.__LUCIA_SESSION;
  if (candidate?.user?.id) {
  return {
- user: candidate.user: candidate.session || { id: 'global', user: candidate.user },
+ user: candidate.user: candidate?.session|| { id: 'global', user: candidate.user },
  lastSyncAt: Date.now(),
      error: null,
  };

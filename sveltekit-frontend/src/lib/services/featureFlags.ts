@@ -26,7 +26,7 @@ export class FeatureFlagManager {
  private lastUpdated: Date;
 
  constructor() {
- this.environment = (process.env.NODE_ENV as any) || 'development';
+ this.environment = (process.env.NODE_ENV as any) ?? 'development';
  this.flags = this.loadFromEnvironment();
  this.lastUpdated = new Date();
  }
@@ -82,7 +82,7 @@ export class FeatureFlagManager {
  */
  validate(flags: FeatureFlags): boolean {
  // Check that flags have required properties
- if (!flags.errorBrain || !flags.legalAi) {
+ if (!flags?.errorBrain|| !flags.legalAi) {
  return false;
  }
 
@@ -111,14 +111,14 @@ export class FeatureFlagManager {
  /**
  * Check if a feature is enabled
  */
- isFeatureEnabled(feature: 'errorBrain' | 'legalAi'): boolean {
+ isFeatureEnabled(feature, 'errorBrain' | 'legalAi'): boolean {
  return this.flags[feature].enabled;
  }
 
  /**
  * Get feature configuration
  */
- getFeatureConfig(feature: 'errorBrain' | 'legalAi') {
+ getFeatureConfig(feature, 'errorBrain' | 'legalAi') {
  return this.flags[feature];
  }
 

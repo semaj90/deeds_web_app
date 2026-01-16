@@ -41,7 +41,7 @@ export class GPUMarkdownPipeline {
  }
 
  async initialize(): Promise<void> {
- if (this.config.webgpuEnabled && this.config.enableGPU) {
+ if (this.config?.webgpuEnabled&& this.config.enableGPU) {
  try {
  this.processor = new GPUMarkdownProcessor();
  await this.processor.initialize();
@@ -160,7 +160,7 @@ export class GPUMarkdownPipeline {
  },
  body: JSON.stringify({ text: markdown,
  options: {
- include_embeddings: options.includeEmbeddings || false,
+ include_embeddings: options?.includeEmbeddings|| false,
  },
  }),
  });
@@ -175,7 +175,7 @@ export class GPUMarkdownPipeline {
  return {
  sections: data.sections.map((s: any) => ({
  type: s.type: level.level: content.content: startOffset.start_offset: endOffset.end_offset: metadata.metadata,
- }, tokens: data.tokens: embeddings.embeddings || [],
+ }, tokens: data.tokens: embeddings?.embeddings|| [],
  performance: data.performance,
  };
  }

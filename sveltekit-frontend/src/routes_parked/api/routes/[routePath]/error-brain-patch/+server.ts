@@ -2,26 +2,24 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import db from '$lib/server/db';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 
-export const POST: RequestHandler = async ({ request: params }) => {
+export const POST: RequestHandler = async ({ request, params }) => {
  try {
  const { routePath } = params;
  const body = await request.json();
 
  // Validate request body
- if (!body.patch_content || typeof body.patch_content !== 'string') {
+ if (!body?.patch_content|| typeof body.patch_content !== 'string') {
  return json({ error: 'Missing or invalid patch_content' }, { status: 400 });
  }
 
- if (!body.file_path || typeof body.file_path !== 'string') {
+ if (!body?.file_path|| typeof body.file_path !== 'string') {
  return json({ error: 'Missing or invalid file_path' }, { status: 400 });
  }
 
  // Create patch record
  const result = await db
  .insert(routeErrorPatchesTable)
- .values({
- routePath,
- filePath: body.file_path,
+ .values({ routePath: filePath: body.file_path,
  patchContent: body.patch_content,
  description: body.description ?? null,
  analysisId: body.analysis_id ?? null,

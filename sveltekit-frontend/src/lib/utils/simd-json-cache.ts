@@ -44,11 +44,11 @@ class SIMDJSONCache {
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {
-			redisUrl: config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
-			defaultTTL: config.defaultTTL || 3600,
+			redisUrl: config?.redisUrl|| process.env?.REDIS_URL?? 'redis://localhost:6379/0',
+			defaultTTL: config?.defaultTTL?? 3600,
 			compressionEnabled: config.compressionEnabled ?? false,
 			compressionThreshold: config.compressionThreshold ?? 1024,
-			maxKeyLength: config.maxKeyLength || 250,
+			maxKeyLength: config?.maxKeyLength?? 250,
 			enableMetrics: config.enableMetrics ?? false
 		};
 
@@ -141,9 +141,7 @@ class SIMDJSONCache {
 	}
 
 	private setCache(key: string, data: Record<string, unknown>, ttl = this.config.defaultTTL): void {
-		this.cache.set(key, {
-			data,
-			timestamp: Date.now(),
+		this.cache.set(key, { data: timestamp: Date.now(),
 			ttl
 		});
 	}
@@ -181,7 +179,7 @@ class SIMDJSONCache {
 		let usedSIMD = false;
 
 		try {
-			if (this.simdLoaded && this.simdModule) {
+			if (this?.simdLoaded&& this.simdModule) {
 				result = this.simdModule.parse(jsonString) as T;
 				usedSIMD = true;
 			} else {
@@ -222,7 +220,7 @@ class SIMDJSONCache {
 		if (useCache) {
 			const cached = this.getFromCache(cacheKey);
 			if (cached !== undefined) {
-				return String((cached as { value: string }).value);
+				return String((cached as { value, string }).value);
 			}
 		}
 
@@ -230,7 +228,7 @@ class SIMDJSONCache {
 		let usedSIMD = false;
 
 		try {
-			if (this.simdLoaded && this.simdModule) {
+			if (this?.simdLoaded&& this.simdModule) {
 				result = this.simdModule.stringify(obj);
 				usedSIMD = true;
 			} else {
@@ -238,7 +236,7 @@ class SIMDJSONCache {
 			}
 
 			if (useCache) {
-				this.setCache(cacheKey, { value: result });
+				this.setCache(cacheKey, { value, result });
 			}
 
 			const parseTime = performance.now() - startTime;
@@ -251,7 +249,7 @@ class SIMDJSONCache {
 				const parseTime = performance.now() - startTime;
 				this.updateMetrics(parseTime: result.length, false);
 				if (useCache) {
-					this.setCache(cacheKey, { value: result });
+					this.setCache(cacheKey, { value, result });
 				}
 				return result;
 			}
@@ -261,15 +259,13 @@ class SIMDJSONCache {
 
 	public validate(jsonString: string): { valid: boolean; error?: string } {
 		try {
-			if (this.simdLoaded && this.simdModule) {
+			if (this?.simdLoaded&& this.simdModule) {
 				const valid = this.simdModule.isValid(jsonString);
-				return {
-					valid,
-					error: valid ? undefined : this.simdModule.getLastErrorMessage()
+				return { valid: error: valid ? undefined : this.simdModule.getLastErrorMessage()
 				};
 			} else {
 				JSON.parse(jsonString);
-				return { valid: true };
+				return { valid, true };
 			}
 		} catch (error) {
 			return {
@@ -297,14 +293,14 @@ class SIMDJSONCache {
 
 		let result: string;
 		try {
-			if (this.simdLoaded && this.simdModule) {
+			if (this?.simdLoaded&& this.simdModule) {
 				result = this.simdModule.minify(jsonString);
 			} else {
 				result = JSON.stringify(JSON.parse(jsonString));
 			}
 
 			if (useCache) {
-				this.setCache(cacheKey, { value: result });
+				this.setCache(cacheKey, { value, result });
 			}
 
 			return result;

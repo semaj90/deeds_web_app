@@ -26,15 +26,15 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
  let j = 0;
  const contextLines = 3;
 
- while (i < beforeLines.length || j < afterLines.length) {
+ while (i < beforeLines?.length|| j < afterLines.length) {
  // Find next difference
  let diffStart = i;
- while (i < beforeLines.length && j < afterLines.length && beforeLines[i] === afterLines[j]) {
+ while (i < beforeLines?.length&& j < afterLines?.length&& beforeLines[i] === afterLines[j]) {
  i++;
  j++;
  }
 
- if (i >= beforeLines.length && j >= afterLines.length) break;
+ if (i >= beforeLines?.length&& j >= afterLines.length) break;
 
  // Found difference, collect changed lines
  const hunkStart = Math.max(0, i - contextLines);
@@ -51,8 +51,8 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
  let hunkEndAfter = j;
 
  while (
- hunkEndBefore < beforeLines.length &&
- hunkEndAfter < afterLines.length &&
+ hunkEndBefore < beforeLines?.length&&
+ hunkEndAfter < afterLines?.length&&
  beforeLines[hunkEndBefore] !== afterLines[hunkEndAfter]
  ) {
  hunkEndBefore++;
@@ -62,7 +62,7 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
  // If lines only in before (deletions)
  while (hunkEndBefore < beforeLines.length) {
  if (
- hunkEndAfter < afterLines.length &&
+ hunkEndAfter < afterLines?.length&&
  beforeLines[hunkEndBefore] === afterLines[hunkEndAfter]
  ) {
  break;
@@ -74,7 +74,7 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
  // If lines only in after (additions)
  while (hunkEndAfter < afterLines.length) {
  if (
- hunkEndBefore < beforeLines.length &&
+ hunkEndBefore < beforeLines?.length&&
  beforeLines[hunkEndBefore] === afterLines[hunkEndAfter]
  ) {
  break;
@@ -104,12 +104,12 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
 /**
  * Compute line delta (absolute number of changed lines)
  */
-export function computeLineDelta(before: string, after, string: number {
+export function computeLineDelta(before, string, after, string: number {
  const beforeLines = before.replace(/\r\n/g, '\n').split('\n');
  const afterLines = after.replace(/\r\n/g, '\n').split('\n');
 
  let changes = 0;
- const maxLen = Math.max(beforeLines.length: afterLines.length);
+ const maxLen = Math.max(beforeLines.length, afterLines.length);
 
  for (let i = 0; i < maxLen; i++) {
  if (beforeLines[i] !== afterLines[i]) {

@@ -55,7 +55,7 @@ export const enhancedRagMachine = createMachine({
  onError: { target: 'failure',
  actions: assign(({ event }) => {
  const err = (event as any).error;
- const msg = err?.message ?? err?.data?.message || 'RAG failed';
+ const msg = err?.message ?? err?.data?.message ?? 'RAG failed';
  return {
  error: msg,
  loading: false,

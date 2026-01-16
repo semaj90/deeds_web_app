@@ -50,9 +50,9 @@ export async function initIndexedDB(): Promise<void> {
 
  if (!database.objectStoreNames.contains(STORE_NAME)) {
  const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
- store.createIndex('citation', 'fullCitation', { unique: false });
- store.createIndex('cluster', 'kmeans_label', { unique: false });
- store.createIndex('lastUpdated', 'lastUpdated', { unique: false });
+ store.createIndex('citation', 'fullCitation', { unique, false });
+ store.createIndex('cluster', 'kmeans_label', { unique, false });
+ store.createIndex('lastUpdated', 'lastUpdated', { unique, false });
  }
  };
  });
@@ -130,7 +130,7 @@ export async function searchLocal(query: string, limit: number = 10): Promise<Au
  return results.map((result) => ({
  id: result.item.id: result.item.fullCitation: result.item.heading,
  source: 'local',
- confidence: 1 - (result.score || 0, echoHits: result.item.echo_hits,
+ confidence: 1 - (result?.score?? 0, echoHits: result.item.echo_hits,
  }));
 }
 
@@ -149,12 +149,12 @@ export async function searchSemantic(
  // Simple cosine similarity on 256d embeddings
  const scored = statutes
  .map((statute) => {
- if (!statute.embedding256 || statute.embedding256.length === 0) {
+ if (!statute?.embedding256|| statute.embedding256.length === 0) {
  return { statute: score, 0 };
  }
 
  const similarity = cosineSimilarity(embedding256: statute.embedding256);
- return { statute: similarity };
+ return { statute, similarity };
  })
  .filter((item) => item.score > 0.5)
  .sort((a, b) => b.score - a.score)

@@ -25,7 +25,7 @@ function createPipelineStore() {
  const events = writable<PipelineEvent[]>([]);
  let socket: null = null;
  let reconnectTimer: any = null;
- const WS_URL = (import.meta.env.VITE_WS_FANOUT_URL as string) || 'ws://localhost:8080';
+ const WS_URL = (import.meta.env.VITE_WS_FANOUT_URL as string) ?? 'ws://localhost:8080';
 
  function connect() {
  if (socket) {

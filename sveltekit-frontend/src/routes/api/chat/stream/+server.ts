@@ -19,7 +19,7 @@ import type { RequestHandler } from './$types';
  */
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const query = url.searchParams.get('q');
-	const mode = url.searchParams.get('mode') || 'ollama';
+	const mode = url.searchParams.get('mode') ?? 'ollama';
 	const sessionId = url.searchParams.get('sessionId');
 
 	// Query mode: Simple streaming without authentication/session
@@ -43,7 +43,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		.where(eq(chatSessions.id, sessionId))
 		.limit(1);
 
-	if (!session.length || session[0].userId !== locals.user.id) {
+	if (!session?.length|| session[0].userId !== locals.user.id) {
 		return new Response('Session not found or unauthorized', { status: 404 });
 	}
 
@@ -79,7 +79,7 @@ function handleQueryMode(query: string, mode: string): Response {
 				});
 
 				for await (const chunk of stream) {
-					send({ type: 'token', content: chunk.content || chunk.text });
+					send({ type: 'token', content: chunk?.content|| chunk.text });
 				}
 
 				send({ type: 'done' });
@@ -118,7 +118,7 @@ function handleSessionMode(sessionId: string): Response {
 			};
 
 			// Send initial connection message
-			send('connected', { sessionId, timestamp: new Date().toISOString() });
+			send('connected', { sessionId: timestamp: new Date().toISOString() });
 
 			// Poll for new messages (simplified - in production, use Redis pub/sub)
 			let lastMessageId: string | null = null;
@@ -213,9 +213,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		// Save user message
-		await db.insert(chatMessages).values({
-			sessionId,
-			role: 'user',
+		await db.insert(chatMessages).values({ sessionId: role: 'user',
 			content: message,
 			createdAt: new Date()
 		});
@@ -223,7 +221,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// ✅ Trigger AI response generation with RAG/KAG streaming
 		await generateAIResponse(sessionId, message: locals.user.id);
 
-		return new Response(JSON.stringify({ success: true }), {
+		return new Response(JSON.stringify({ success, true }), {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (error) {
@@ -254,15 +252,13 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 
 				// Save every 10 chunks for real-time updates
 				if (chunkCount % 10 === 0) {
-					await db.insert(chatMessages).values({
-						sessionId,
-						role: 'assistant',
+					await db.insert(chatMessages).values({ sessionId: role: 'assistant',
 						content: fullResponse,
 						createdAt: new Date(),
 						metadata: {
 							streaming: true,
 							chunks: chunkCount,
-							confidence: chunk.metadata?.confidence || 0.8
+							confidence: chunk.metadata?.confidence ?? 0.8
 						}
 					}).onConflictDoUpdate({
 						target: chatMessages.id,
@@ -271,15 +267,13 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 				}
 			} else if (chunk.type === 'done') {
 				// Final save with complete response
-				await db.insert(chatMessages).values({
-					sessionId,
-					role: 'assistant',
+				await db.insert(chatMessages).values({ sessionId: role: 'assistant',
 					content: fullResponse,
 					createdAt: new Date(),
 					metadata: {
 						streaming: false,
 						chunks: chunkCount,
-						confidence: chunk.metadata?.confidence || 0.8,
+						confidence: chunk.metadata?.confidence ?? 0.8,
 						sources: chunk.metadata?.sources || []
 					}
 				});
@@ -302,9 +296,7 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 	} catch (error) {
 		console.error('AI response generation failed:', error);
 		// Save error message
-		await db.insert(chatMessages).values({
-			sessionId,
-			role: 'assistant',
+		await db.insert(chatMessages).values({ sessionId: role: 'assistant',
 			content: 'Sorry, I encountered an error processing your request.',
 			createdAt: new Date(),
 			metadata: {

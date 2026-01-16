@@ -19,7 +19,7 @@ export const ENV = {
 // ============================================================================
 // SERVICE CONFIGURATION
 // ============================================================================
-const getEnv = (key: string, fallback: string = '') => {
+const getEnv = (key, string, fallback: string = '') => {
  if (ENV.isBrowser) {
  return (import.meta.env as any)[`VITE_${ key }`] || (import.meta.env as any)[key] || fallback;
  }
@@ -138,12 +138,12 @@ export const CONFIG = {
  // ========================================================================
  web: {
  // WebGPU
- webgpu: { enabled: ENV.isBrowser && 'gpu' in navigator,
+ webgpu: { enabled: ENV?.isBrowser&& 'gpu' in navigator,
  preferredBackend: 'webgpu' as const,
   fallbackToWasm: true,
  },
  // WebAssembly
- wasm: { enabled: ENV.isBrowser && typeof WebAssembly !== 'undefined',
+ wasm: { enabled: ENV?.isBrowser&& typeof WebAssembly !== 'undefined',
  simdEnabled: true, threadsEnabled: true
  },
  // Transformers.js v3, transformers: { device: 'webgpu' as const,
@@ -152,7 +152,7 @@ export const CONFIG = {
  useCache: true,
  },
  // IndexedDB
- indexedDB: { enabled: ENV.isBrowser && 'indexedDB' in window,
+ indexedDB: { enabled: ENV?.isBrowser&& 'indexedDB' in window,
  dbName: 'legal-ai-cache',
  version: 1,
  stores: ['embeddings', 'models', 'cache'],

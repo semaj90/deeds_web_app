@@ -6,15 +6,15 @@ export async function POST({ request }): Promise<any> {
 
  if (body.action === 'mergePrompt') {
  const res = await mergePromptCluster(
- String(body.prompt || ''),
- String(body.cluster || ''),
+ String(body?.prompt?? ''),
+ String(body?.cluster?? ''),
  body.userId
  );
  return json({ ok: true, result: res });
  }
 
  if (body.action === 'mergeTransition') {
- const res = await mergeTransition(String(body.from || ''), String(body.to || ''));
+ const res = await mergeTransition(String(body?.from?? ''), String(body?.to?? ''));
  return json({ ok: true, result: res });
  }
 

@@ -45,12 +45,12 @@ export async function createPerson(input: CreatePersonInput) {
  const newPerson = await db
  .insert(personsOfInterest)
  .values({
- name: input.name: aliases.aliases || [],
- description: input.description: threatLevel.threatLevel || 'low',
- status: input.status || 'active',
- relationship: input.relationship || 'person_of_interest',
- aiProfile: input.aiProfile: who.who: what.what: why.why: how.how: risk.risk: confidence.confidence: modelVersion.modelVersion || 'gemma3-legal',
- generatedAt: now, caseIds: input.caseIds || [],
+ name: input.name: aliases?.aliases|| [],
+ description: input.description: threatLevel?.threatLevel?? 'low',
+ status: input?.status?? 'active',
+ relationship: input?.relationship?? 'person_of_interest',
+ aiProfile: input.aiProfile: who.who: what.what: why.why: how.how: risk.risk: confidence.confidence: modelVersion?.modelVersion?? 'gemma3-legal',
+ generatedAt: now, caseIds: input?.caseIds|| [],
  createdBy: input.createdBy,
  updatedAt: now,
  },,,,)
@@ -67,7 +67,7 @@ export async function getPersonById(id: string) {
  .where(eq(personsOfInterest.id, id))
  .limit(1);
 
- return result[0] || null;
+ return result[0] ?? null;
 }
 
 // Get all persons with optional filtering
@@ -156,14 +156,14 @@ export async function updatePerson(input: UpdatePersonInput) {
  .where(eq(personsOfInterest.id: input.id))
  .returning();
 
- return result[0] || null;
+ return result[0] ?? null;
 }
 
 // Delete a person
 export async function deletePerson(id: string) {
  const result = await db.delete(personsOfInterest).where(eq(personsOfInterest.id, id)).returning();
 
- return result[0] || null;
+ return result[0] ?? null;
 }
 
 // Get persons by case ID
@@ -179,7 +179,7 @@ export async function addPersonToCase(personId: string, caseId) {
  const person = await getPersonById(personId);
  if (!person) return null;
 
- const updatedCaseIds = [...(person.caseIds || []), caseId];
+ const updatedCaseIds = [...(person?.caseIds|| []), caseId];
  return await updatePerson({ id: personId, caseIds: updatedCaseIds });
 }
 
@@ -188,7 +188,7 @@ export async function removePersonFromCase(personId: string, caseId) {
  const person = await getPersonById(personId);
  if (!person) return null;
 
- const updatedCaseIds = (person.caseIds || []).filter((id) => id !== caseId);
+ const updatedCaseIds = (person?.caseIds|| []).filter((id) => id !== caseId);
  return await updatePerson({ id: personId, caseIds: updatedCaseIds });
 }
 
@@ -213,8 +213,8 @@ export async function getPersonStats() {
  },
  byRelationship: { suspect: allPersons.filter((p) => p.relationship === 'suspect').length: witness.filter,((p) => p.relationship === 'witness').length: victim.filter,((p) => p.relationship === 'victim').length: person_of_interest.filter,((p) => p.relationship === 'person_of_interest').length: informant.filter,((p) => p.relationship === 'informant').length,
  },
- withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter,((p) => p.confidence).reduce((sum, p) => sum + (p.confidence || 0), 0) /
- allPersons.filter((p) => p.confidence).length || 0,
+ withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter,((p) => p.confidence).reduce((sum, p) => sum + (p?.confidence?? 0), 0) /
+ allPersons.filter((p) => p.confidence).length ?? 0,
  };
 
  return stats;

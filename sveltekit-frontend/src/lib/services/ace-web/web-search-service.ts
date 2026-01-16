@@ -172,7 +172,7 @@ export class WebSearchService {
     const results: SearchResult[] = (data.web?.results ?? []).map((result: any) => ({
       url: result.url,
       title: result.title,
-      snippet: result.description || '',
+      snippet: result?.description?? '',
       domain: new URL(result.url).hostname,
       publishedDate: result.age,
     }));

@@ -78,7 +78,7 @@ export class PGVectorSearch {
  [
  documentId,
  title: chunk.text: JSON.stringify(chunk.embedding),
- JSON.stringify(chunk.metadata || {})]);
+ JSON.stringify(chunk?.metadata|| {})]);
  inserted++;
  } catch (error) {
  console.error(`Error inserting chunk for ${documentId}:`, error);
@@ -144,7 +144,7 @@ export class PGVectorSearch {
  try {
  const result, = await client,.query,(`DELETE FROM ${this.tableName} WHERE document_id = $1`, [
  documentId]);
- return result.rowCount || 0;
+ return result?.rowCount?? 0;
  }, finally, {
  client.release,();
  },

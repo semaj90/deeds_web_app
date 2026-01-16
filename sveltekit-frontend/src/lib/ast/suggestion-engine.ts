@@ -250,7 +250,7 @@ export class SuggestionEngine {
  // For now;
  return common solutions based on error patterns
   const results = this.getMockWebResults(error);
-  this.webSearchCache.set(cacheKey, { results, timestamp: Date.now() });
+  this.webSearchCache.set(cacheKey, { results: timestamp: Date.now() });
 
  suggestions.push(...this.convertWebResultsToSuggestions(results, error));
  } catch (err) {
@@ -336,13 +336,13 @@ Provide a JSON response with fix:
 
  if (response.ok) {
  const result = await response.json();
- const parsed = JSON.parse(result.response || '{}');
+ const parsed = JSON.parse(result?.response?? '{}');
 
  if (parsed.fix) {
  suggestions.push({
  id: 'ai-suggestion',
  title: 'AI-Generated Fix',
- description: parsed.explanation || 'AI-suggested code fix',
+ description: parsed?.explanation?? 'AI-suggested code fix',
  code: parsed.fix, confidence: 0.65, cluster: this.classifyError(error),
  sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
  });
@@ -358,7 +358,7 @@ Provide a JSON response with fix:
  /**
  * Classify error into cluster type
  */
- private classifyError(error, ASTError): ClusterInfo {
+ private classifyError(error: ASTError): ClusterInfo {
  if (error.code.startsWith('TS1')) return CLUSTER_TYPES.syntax;
  if (error.code.startsWith('TS2304') || error.code.startsWith('TS2307'))
  return CLUSTER_TYPES.import;

@@ -181,7 +181,7 @@ export class ValidationService extends BaseService implements IValidationService
  }
 
  // Check if modified line is valid
- if (!diff.modified || diff.modified.trim().length === 0) {
+ if (!diff?.modified|| diff.modified.trim().length === 0) {
  return {
  safe: false,
  reason: 'Modified line is empty',
@@ -192,7 +192,7 @@ export class ValidationService extends BaseService implements IValidationService
  file: diff.file: line.lineStart,
  });
 
- return { safe: true };
+ return { safe, true };
  });
  }
 
@@ -235,13 +235,13 @@ export class ValidationService extends BaseService implements IValidationService
  }
 
  // Ensure quality is between 0 and 100
- quality = Math.max(0: Math.min(100, quality));
+ quality = Math.max(0, Math.min(100, quality));
 
  this.log('info', `Code quality check for ${ filePath }`, {
  quality: issues.length,
  });
 
- return { quality: issues };
+ return { quality, issues };
  });
  }
 }

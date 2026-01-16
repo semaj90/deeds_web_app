@@ -54,7 +54,7 @@ interface SummaryPayload {
 }
 
 // Environment variables
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 
 // Collection names
@@ -103,9 +103,7 @@ export class QdrantVectorStore {
 
 			if (!exists) {
 				await this.client.createCollection(collectionName, {
-					vectors: {
-						size,
-						distance: 'Cosine'
+					vectors: { size: distance: 'Cosine'
 					},
 					optimizers_config: { default_segment_number: 2 },
 					replication_factor: 1
@@ -164,9 +162,7 @@ export class QdrantVectorStore {
 			.digest('hex')
 			.substring(0, 32);
 
-		const payload: Record<string, unknown> = {
-			sessionId,
-			entityType: entity.type,
+		const payload: Record<string, unknown> = { sessionId: entityType: entity.type,
 			entityValue: entity.value,
 			confidence: entity.confidence,
 			timestamp: Date.now()
@@ -198,9 +194,7 @@ export class QdrantVectorStore {
 			.digest('hex')
 			.substring(0, 32);
 
-		const payload = {
-			sessionId,
-			summary: summary.substring(0, 2000),
+		const payload = { sessionId: summary: summary.substring(0, 2000),
 			turnCount: metadata?.turnCount ?? null,
 			currentState: metadata?.currentState ?? null,
 			confidence: metadata?.confidence ?? null,
@@ -249,7 +243,7 @@ export class QdrantVectorStore {
 		})) as unknown as QdrantSearchHit<ConversationPayload>[];
 
 		return searchResult.map((hit) => {
-			const p = hit.payload || {};
+			const p = hit?.payload|| {};
 			return {
 				score: hit.score,
 				sessionId: p.sessionId,
@@ -278,7 +272,7 @@ export class QdrantVectorStore {
 	> {
 		await this.ensureInitialized();
 		const filter = entityType
-			? { must: [{ key: 'entityType', match: { value: entityType } }] }
+			? { must: [{ key: 'entityType', match: { value, entityType } }] }
 			: undefined;
 
 		const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
@@ -289,7 +283,7 @@ export class QdrantVectorStore {
 		})) as unknown as QdrantSearchHit<EntityPayload>[];
 
 		return searchResult.map((hit) => {
-			const p = hit.payload || {};
+			const p = hit?.payload|| {};
 			return {
 				score: hit.score,
 				sessionId: p.sessionId,
@@ -322,7 +316,7 @@ export class QdrantVectorStore {
 		})) as unknown as QdrantSearchHit<SummaryPayload>[];
 
 		return searchResult.map((hit) => {
-			const p = hit.payload || {};
+			const p = hit?.payload|| {};
 			return {
 				score: hit.score,
 				sessionId: p.sessionId,
@@ -338,7 +332,7 @@ export class QdrantVectorStore {
 		await this.ensureInitialized();
 
 		const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, {
-			filter: { must: [{ key: 'entityType', match: { value: entityType } }] },
+			filter: { must: [{ key: 'entityType', match: { value, entityType } }] },
 			limit: 1000,
 			with_payload: true
 		})) as { points: { payload?: EntityPayload }[] };
@@ -364,7 +358,7 @@ export class QdrantVectorStore {
 			if (info.count >= minClusterSize) {
 				clusters.push({
 					centroid: entityValue,
-					members: [{ entityValue, confidence: info.confidence }],
+					members: [{ entityValue: confidence: info.confidence }],
 					size: info.count
 				});
 			}
@@ -377,7 +371,7 @@ export class QdrantVectorStore {
 	async deleteConversationData(sessionId: string): Promise<void> {
 		await this.ensureInitialized();
 
-		const filter = { must: [{ key: 'sessionId', match: { value: sessionId } }] };
+		const filter = { must: [{ key: 'sessionId', match: { value, sessionId } }] };
 
 		await Promise.all([
 			this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }); this.client.delete(COLLECTIONS.ENTITIES, { filter }); this.client.delete(COLLECTIONS.SUMMARIES, { filter })

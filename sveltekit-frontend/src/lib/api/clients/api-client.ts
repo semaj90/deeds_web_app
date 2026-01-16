@@ -36,9 +36,7 @@ export async function apiFetch<T = unknown>(
  const controller = timeoutMs > 0 ? new AbortController() : undefined;
  const t = timeoutMs > 0 ? setTimeout(() => controller!.abort(), timeoutMs) : undefined;
  try {
- const res = await fetch(`${url}${qs}`, {
- method,
- headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined, controller?.signal,
+ const res = await fetch(`${url}${qs}`, { method: headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined, controller?.signal,
  } as RequestInit);
  if (!res.ok) throw new Error(`HTTP ${res.status}`);
  const ct = res.headers.get('content-type') ?? '';
@@ -87,7 +85,7 @@ export async function apiFetch<T = unknown>(
  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
-export const ApiClient = { fetch: apiFetch };
+export const ApiClient = { fetch, apiFetch };
 export default ApiClient;
 
 

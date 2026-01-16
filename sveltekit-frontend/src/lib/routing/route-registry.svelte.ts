@@ -43,7 +43,7 @@ class RouteRegistry {
 
     private async initialize() {
         // Load persisted state
-        if (this.options.persistState && browser) {
+        if (this.options?.persistState&& browser) {
             this.loadPersistedState();
         }
 
@@ -71,8 +71,8 @@ class RouteRegistry {
         if (!rid && $page.url?.pathname) {
             // Find static route by path
             for (const route of this.routes.values()) {
-                const { path: href } = this.getPathHref(route);
-                if (path === $page.url.pathname || href === $page.url.pathname) {
+                const { path, href } = this.getPathHref(route);
+                if (path === $page.url?.pathname|| href === $page.url.pathname) {
                     rid = route.id;
                     break;
                 }
@@ -81,8 +81,8 @@ class RouteRegistry {
             // Find dynamic route by path
             if (!rid) {
                 for (const route of this.dynamicRoutes.values()) {
-                    const { path: href } = this.getPathHref(route);
-                    if (path === $page.url.pathname || href === $page.url.pathname) {
+                    const { path, href } = this.getPathHref(route);
+                    if (path === $page.url?.pathname|| href === $page.url.pathname) {
                         rid = route.id;
                         break;
                     }
@@ -116,7 +116,7 @@ class RouteRegistry {
         const categories: Record<string, number> = {};
         for (const route of this.allRoutes) {
             const category = this.getRouteCategory(route);
-            categories[category] = (categories[category] || 0) + 1;
+            categories[category] = (categories[category] ?? 0) + 1;
         }
         return {
             total: this.routes.size + this.dynamicRoutes.size, static: this.routes.size, dynamic: this.dynamicRoutes.size, favorites: this.favorites.size, recent: this.recentRoutes.length,
@@ -150,7 +150,7 @@ class RouteRegistry {
     }
 
     getRoute(id: string): RouteDefinition | GeneratedRoute | null {
-        return this.routes.get(id) || this.dynamicRoutes.get(id) || null;
+        return this.routes.get(id) || this.dynamicRoutes.get(id) ?? null;
     }
 
     getRoutesByCategory(category: string) {
@@ -263,7 +263,7 @@ class RouteRegistry {
 
     // Persistence
     private savePersistedState() {
-        if (!this.options.persistState || !browser) return;
+        if (!this.options?.persistState|| !browser) return;
         try {
             const persistedData = {
                 favorites: Array.from(this.favorites),

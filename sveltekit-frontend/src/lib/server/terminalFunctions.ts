@@ -91,9 +91,7 @@ export async function searchEvidence(
 export async function extractHoldings(evidenceId: string): Promise<ExtractHoldingsResult> {
  // Mock implementation - in production, would use Gemma to parse holdings
  const holdingsMap: Record<string, ExtractHoldingsResult> = {
- 'ev-001': {
- evidenceId,
- holdings: [
+ 'ev-001': { evidenceId: holdings: [
  {
  text: 'The defendant was present at the scene of the crime',
  confidence: 0.98,
@@ -110,9 +108,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  citations: ['State v. Williams (2018)'],
  }],
  },
- 'ev-002': {
- evidenceId,
- holdings: [
+ 'ev-002': { evidenceId: holdings: [
  {
  text: 'Video evidence corroborates witness testimony',
  confidence: 0.96,
@@ -124,9 +120,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  citations: ['USC 18-1519'],
  }],
  },
- 'ev-003': {
- evidenceId,
- holdings: [
+ 'ev-003': { evidenceId: holdings: [
  {
  text: 'Phone records establish communication with victim',
  confidence: 0.94,
@@ -141,9 +135,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  };
 
  return (
- holdingsMap[evidenceId] || {
- evidenceId,
- holdings: [
+ holdingsMap[evidenceId] || { evidenceId: holdings: [
  {
  text: 'Evidence supports investigation findings',
  confidence: 0.8,
@@ -159,9 +151,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
 export async function findCitations(evidenceId: string): Promise<FindCitationsResult> {
  // Mock implementation - in production, would use NLP to extract citations
  const citationsMap: Record<string, FindCitationsResult> = {
- 'ev-001': {
- evidenceId,
- citations: [
+ 'ev-001': { evidenceId: citations: [
  {
  type: 'statute',
  reference: 'USC 18-1001',
@@ -179,9 +169,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  title: 'Need for Personal Knowledge',
  }],
  },
- 'ev-002': {
- evidenceId,
- citations: [
+ 'ev-002': { evidenceId: citations: [
  {
  type: 'statute',
  reference: 'USC 18-1519',
@@ -199,9 +187,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  title: 'Authenticating or Identifying Evidence',
  }],
  },
- 'ev-003': {
- evidenceId,
- citations: [
+ 'ev-003': { evidenceId: citations: [
  {
  type: 'statute',
  reference: '18 USC 2703',
@@ -217,9 +203,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  };
 
  return (
- citationsMap[evidenceId] || {
- evidenceId,
- citations: [
+ citationsMap[evidenceId] || { evidenceId: citations: [
  {
  type: 'statute',
  reference: 'USC 18-1001',
@@ -273,9 +257,7 @@ export async function analyzeRelationships(
  */
 export async function generateSummary(caseId: string): Promise<GenerateSummaryResult> {
  // Mock implementation - in production, would compile from database
- return {
- caseId,
- summary: { title: 'Investigation Summary - Case ' + caseId,
+ return { caseId: summary: { title: 'Investigation Summary - Case ' + caseId,
  status: 'Active Investigation',
  totalEvidence: 12,
  keyFindings: [
@@ -311,7 +293,7 @@ export async function executeTerminalFunction(
  return await findCitations(args.evidenceId);
 
  case 'analyze_relationships':
- return await analyzeRelationships(args.evidenceIds || []);
+ return await analyzeRelationships(args?.evidenceIds|| []);
 
  case 'generate_summary':
  return await generateSummary(args.caseId);

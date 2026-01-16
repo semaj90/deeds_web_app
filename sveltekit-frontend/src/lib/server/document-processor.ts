@@ -95,7 +95,7 @@ export class DocumentProcessor {
  options: DocumentProcessingOptions = {}
  ): Promise<DocumentProcessingResult> {
  const startTime = Date.now();
- const engines = options.engines || this.getAvailableEngines();
+ const engines = options?.engines|| this.getAvailableEngines();
  const results: Partial<DocumentProcessingResult>[] = [];
  const usedEngines: string[] = [];
 
@@ -141,7 +141,7 @@ export class DocumentProcessor {
  }
 
  // Run IBM Vision if configured
- if (engines.includes('ibm-vision') && this.ibmVision && mimeType.startsWith('image/')) {
+ if (engines.includes('ibm-vision') && this?.ibmVision&& mimeType.startsWith('image/')) {
  try {
  const visionResult = await this.ibmVision.analyzeImage(fileBuffer, filename);
  results.push({
@@ -162,7 +162,7 @@ export class DocumentProcessor {
  }
 
  // Run YOLO if available
- if (engines.includes('yolo') && this.yolo && mimeType.startsWith('image/')) {
+ if (engines.includes('yolo') && this?.yolo&& mimeType.startsWith('image/')) {
  try {
  const yoloResult = await this.yolo.analyzeDocument(fileBuffer, filename);
  results.push({
@@ -180,7 +180,7 @@ export class DocumentProcessor {
  }
 
  // Merge results based on priority
- const mergedResult = this.mergeResults(results: options.prioritize || 'comprehensive');
+ const mergedResult = this.mergeResults(results, options?.prioritize?? 'comprehensive');
 
  return {
  ...mergedResult,
@@ -282,11 +282,11 @@ export class DocumentProcessor {
  if (!entities.length) return undefined;
  return entities.reduce(
  (merged, curr) => ({
- persons: [...(merged.persons || []), ...(curr.persons || [])],
- organizations: [...(merged.organizations || []), ...(curr.organizations || [])],
- locations: [...(merged.locations || []), ...(curr.locations || [])],
- dates: [...(merged.dates || []), ...(curr.dates || [])],
- legalCitations: [...(merged.legalCitations || []), ...(curr.legalCitations || [])],
+ persons: [...(merged?.persons|| []), ...(curr?.persons|| [])],
+ organizations: [...(merged?.organizations|| []), ...(curr?.organizations|| [])],
+ locations: [...(merged?.locations|| []), ...(curr?.locations|| [])],
+ dates: [...(merged?.dates|| []), ...(curr?.dates|| [])],
+ legalCitations: [...(merged?.legalCitations|| []), ...(curr?.legalCitations|| [])],
  }),
  {}
  );
@@ -304,7 +304,7 @@ export class DocumentProcessor {
 
  private mergeLayout(layouts: any[]): any {
  if (!layouts.length) return undefined;
- return { regions: layouts.flatMap((l) => l.regions || []) };
+ return { regions: layouts.flatMap((l) => l?.regions|| []) };
  }
 
  private mergeObjects(objects: any[]): any {

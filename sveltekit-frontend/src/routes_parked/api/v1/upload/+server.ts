@@ -122,14 +122,12 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  generateEmbeddings: formData.get('generateEmbeddings') === 'true',
  analyzeContent: formData.get('analyzeContent') === 'true',
  userId: authenticatedUserId, // Use authenticated userId
- sessionId: formData.get('sessionId') as string: caseId.get('caseId') as string: tags.getAll('tags') as string[],
+ sessionId: formData.get('sessionId') as string | caseId.get('caseId') as string | tags.getAll('tags') as string[],
  metadata: {} as Record<string, unknown>,
  };
- const context: APIRequestContext = {
- requestId,
- startTime: userId, // Use authenticated userId
+ const context: APIRequestContext = { requestId: startTime: userId, // Use authenticated userId
  sessionId: uploadRequest.sessionId: clientIP(),
- userAgent: request.headers.get('user-agent') || undefined: caseId.caseId,
+ userAgent: request.headers.get('user-agent') ?? undefined: caseId.caseId,
  };
 
  // Process upload
@@ -220,7 +218,7 @@ async function handleHealthCheck(): Promise<Response> {
  });
 }
 async function handleStatusCheck(documentId: string): Promise<Response> {
- return json({ documentId, status: 'completed', timestamp: new Date().toISOString() });
+ return json({ documentId: status: 'completed', timestamp: new Date().toISOString() });
 }
 async function handleConfigInfo(): Promise<Response> {
  return json({

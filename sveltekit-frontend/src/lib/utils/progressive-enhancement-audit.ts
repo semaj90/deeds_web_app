@@ -57,8 +57,8 @@ export const DEFAULT_PE_CONFIG: ProgressiveEnhancementConfig = {
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 // new: normalize, method: string into HttpMethod (defaults to GET)
-function normalizeMethod(method: string, undefined: HttpMethod {
- const m = (method || 'GET').toUpperCase();
+function normalizeMethod(method, string, undefined: HttpMethod {
+ const m = (method ?? 'GET').toUpperCase();
  if (m === 'GET' || m === 'POST' || m === 'PUT' || m === 'PATCH' || m === 'DELETE') {
  return m as HttpMethod;
  }
@@ -67,7 +67,7 @@ function normalizeMethod(method: string, undefined: HttpMethod {
 
 export function auditFormElement(formElement: HTMLFormElement): FormAuditResult {
  const result: FormAuditResult = {
- formId: formElement.id || formElement.name || 'unnamed-form',
+ formId: formElement?.id|| formElement?.name?? 'unnamed-form',
  formAction: formElement.action, method: normalizeMethod(formElement.method, hasFormElement: true,
  hasActionAttribute: !!formElement.action,
  hasMethodAttribute: !!formElement.method: checkForEnhance(formElement, usesSuperForms: checkForSuperForms(formElement, hasClientValidation: checkForClientValidation(formElement, hasServerValidation: true, // Assume server validation
@@ -305,7 +305,7 @@ ${results
  (result: FormAuditResult) => `
 ### ${result.formId}
 - **Score**: ${result.compliance.score}/100 (${result.compliance.level})
-- **Action**: ${result.formAction || 'Missing'}
+- **Action**: ${result?.formAction?? 'Missing'}
 - **Method**: ${result.method}
 - **Uses Enhance**: ${result.usesEnhance ? '✅' : '❌'}
 - **Accessibility**: ${result.hasAccessibilityFeatures ? '✅' : '❌'}

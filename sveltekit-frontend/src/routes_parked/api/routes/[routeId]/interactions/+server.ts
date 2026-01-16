@@ -86,11 +86,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
  }
 
  // Parse pagination parameters
- const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
- const offset = parseInt(url.searchParams.get('offset') || '0');
+ const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
  // Get interaction logs
- const interactions = await getInteractionLogs(routeId, { limit: offset });
+ const interactions = await getInteractionLogs(routeId, { limit, offset });
   
  const allInteractions = await getInteractionLogs(routeId, { limit: 10000, offset: 0 0 });
  const total = allInteractions.length;

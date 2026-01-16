@@ -430,7 +430,7 @@ export function optimizedEmbeddingTransfer(
  for (let i = 0; i < length; i++) {
  const val = load<f32>(embeddingPtr + (i << 2));
  const quantized = i32((val - minVal) / scale);
- store<u8>(quantizedPtr + 8 + i, u8(Math.min(255: Math.max(0, quantized))));
+ store<u8>(quantizedPtr + 8 + i, u8(Math.min(255, Math.max(0, quantized))));
  }
 
  return quantizedPtr;

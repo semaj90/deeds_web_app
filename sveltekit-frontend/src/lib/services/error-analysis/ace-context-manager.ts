@@ -40,9 +40,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  this.log('info', `Creating ACE context for session ${ sessionId }`);
 
  try {
- const context: ACEContext = {
- sessionId,
- errorAnalysis: [],
+ const context: ACEContext = { sessionId: errorAnalysis: [],
  fixesApplied: [],
  metrics: { totalErrors: 0, errorsFixed: 0,
  successRate: 0, averageConfidence: 0,
@@ -66,7 +64,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  async saveContext(context: ACEContext): Promise<ACEContext> {
  this.validateInput(context, 'context');
 
- if (!context.sessionId || typeof context.sessionId !== 'string') {
+ if (!context?.sessionId|| typeof context.sessionId !== 'string') {
  throw new Error('Invalid input: context.sessionId must be a non-empty string');
  }
 
@@ -98,7 +96,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  this.log('info', `Loading ACE context for session ${ sessionId }`);
 
  try {
- const context = this.contexts.get(sessionId) || null;
+ const context = this.contexts.get(sessionId) ?? null;
 
  if (context) {
  this.log('info', `ACE context loaded for session ${sessionId}`);
@@ -153,7 +151,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  /**
  * Add an analysis to the context
  */
- async addAnalysis(sessionId: string, Analysis: Promise<ACEContext> {
+ async addAnalysis(sessionId, string, Analysis: Promise<ACEContext> {
  if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
@@ -187,7 +185,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  /**
  * Add a fix (diff) to the context
  */
- async addFix(sessionId: string, Diff: Promise<ACEContext> {
+ async addFix(sessionId, string, Diff: Promise<ACEContext> {
  if (!sessionId: any || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }

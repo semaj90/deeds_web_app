@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const body = await request.json();
 
     // Validate required fields
-    if (!body.tool || !body.code || !body.message || !body.severity) {
+    if (!body?.tool|| !body?.code|| !body?.message|| !body.severity) {
       return error(400, {
         message: 'Missing required fields: tool, code, message, severity',
       });
@@ -59,15 +59,13 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Create error cluster
-    const errorClusterData: NewErrorCluster = {
-      routeId,
-      tool: body.tool,
+    const errorClusterData: NewErrorCluster = { routeId: tool: body.tool,
       code: body.code,
       message: body.message,
       severity: body.severity,
-      filePath: body.file_path || body.filePath,
-      rawLogSnippet: body.raw_log_snippet || body.rawLogSnippet,
-      count: body.count || 1,
+      filePath: body?.file_path|| body.filePath,
+      rawLogSnippet: body?.raw_log_snippet|| body.rawLogSnippet,
+      count: body?.count?? 1,
     };
 
     const errorCluster = await createErrorCluster(errorClusterData);
@@ -83,9 +81,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
     else if (hasWarnings) newStatus = 'flaky';
 
     // Update route status if changed
-    const oldStatus = route.status || 'healthy';
+    const oldStatus = route?.status?? 'healthy';
     if (oldStatus !== newStatus) {
-      await updateRouteMetadata(routeId, { status: newStatus });
+      await updateRouteMetadata(routeId, { status, newStatus });
 
       await createHealthEvent({
         routeId,
@@ -146,12 +144,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
 
     // Parse pagination parameters
-    const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 100);
+    const offset = parseInt(url.searchParams.get('offset') ?? '0');
     const resolved = url.searchParams.get('resolved');
 
     // Get error clusters
-    const errorsResult = await getErrorClusters(routeId, { limit: offset });
+    const errorsResult = await getErrorClusters(routeId, { limit, offset });
 
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {

@@ -92,9 +92,7 @@ export async function validateSession(sessionId: string): Promise<ValidationResu
   const { session, user } = await lucia.validateSession(sessionId);
 
   if (session && user) {
-    return {
-      session,
-      user: { id: user.id,
+    return { session: user: { id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,

@@ -10,9 +10,9 @@
 export function getOllamaEndpoint(): string | null {
  // Try multiple environment variable names
  const endpoint =
- process.env.OLLAMA_ENDPOINT ||
- process.env.VITE_OLLAMA_ENDPOINT ||
- process.env.PUBLIC_OLLAMA_ENDPOINT ||
+ process.env?.OLLAMA_ENDPOINT||
+ process.env?.VITE_OLLAMA_ENDPOINT||
+ process.env?.PUBLIC_OLLAMA_ENDPOINT||
  process.env.OLLAMA_HOST;
 
  if (!endpoint) {
@@ -28,14 +28,14 @@ export function getOllamaEndpoint(): string | null {
  * Get the embedding model name
  */
 export function getEmbeddingModel(): string {
- return process.env.EMBEDDING_MODEL || 'embeddinggemma:latest';
+ return process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest';
 }
 
 /**
  * Get the chat model name
  */
 export function getChatModel(): string {
- return process.env.CHAT_MODEL || 'gemma3-legal:latest';
+ return process.env?.CHAT_MODEL?? 'gemma3-legal:latest';
 }
 
 /**

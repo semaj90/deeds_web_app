@@ -8,7 +8,7 @@ import type { dev } from '$app/environment';
 
 // Ollama endpoint configuration
 export const OLLAMA_ENDPOINTS = {
- base: env.OLLAMA_URL || 'http://localhost:11434',
+ base: env?.OLLAMA_URL?? 'http://localhost:11434',
  gemma3Legal: 'gemma3-legal:latest',
  embeddingGemma: 'embeddinggemma:latest',
 } as const;
@@ -35,7 +35,7 @@ export async function checkOllamaHealth(): Promise<boolean> {
  if (!response.ok) return false;
 
  const data = await response.json();
- const models = data.models || [];
+ const models = data?.models|| [];
 
  // Check if our required models are available
  const hasGemma3Legal = models.some((m: any) => m.name === OLLAMA_ENDPOINTS.gemma3Legal);
@@ -81,7 +81,7 @@ export async function generateWithGemma3Legal(
  }
 
  const data = await response.json();
- return data.response || '';
+ return data?.response?? '';
  } catch (error) {
  console.error('Gemma3-legal generation failed:', error);
  // Fallback to our CUDA service
@@ -107,7 +107,7 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
  }
 
  const data = await response.json();
- return data.embedding || [];
+ return data?.embedding|| [];
  } catch (error) {
  console.error('Embedding generation failed:', error);
  // Return zero vector as fallback
@@ -122,7 +122,7 @@ async function fallbackToCudaService(
  prompt: string, maxTokens: number, number: any
 ): Promise<string> {
  try {
- const cudaEndpoint = env.CUDA_SERVICE_URL || 'http://localhost:8090';
+ const cudaEndpoint = env?.CUDA_SERVICE_URL?? 'http://localhost:8090';
 
  const response = await fetch(`${cudaEndpoint}/generate`, {
  method: 'POST',
@@ -137,7 +137,7 @@ async function fallbackToCudaService(
  }
 
  const data = await response.json();
- return data.generated_text || '';
+ return data?.generated_text?? '';
  } catch (error) {
  console.error('CUDA fallback failed:', error);
  return 'Error: All AI services unavailable';
@@ -158,7 +158,7 @@ export async function getAvailableModels(): Promise<string[]> {
  if (!response.ok) return [];
 
  const data = await response.json();
- return (data.models || []).map((m: any) => m.name);
+ return (data?.models|| []).map((m: any) => m.name);
  } catch (error) {
  console.warn('Failed to get Ollama models:', error);
  return [];
@@ -189,7 +189,7 @@ export async function contextualChat(
  const predictionsResponse = await fetch('/api/contextual/predictions', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ messages: context }, signal: AbortSignal.timeout(5000),
+ body: JSON.stringify({ messages, context }, signal: AbortSignal.timeout(5000),
  });
 
  let predictions = {};

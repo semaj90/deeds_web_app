@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const result = await escalation.createEscalation(
 			error,
 			attemptedStrategies || [],
-			confidence || 0,
+			confidence ?? 0,
 			toolResults || [],
 			context || { text: error.message, fileContent: '' }
 		);
@@ -131,11 +131,11 @@ export const PUT: RequestHandler = async ({ request }) => {
 					return json({ error: 'Missing assignee' }, { status: 400 });
 				}
 				const assigned = escalation.assignTicket(ticketId, assignee);
-				return json({ success: assigned });
+				return json({ success, assigned });
 
 			case 'close':
-				const closed = escalation.closeTicket(ticketId, resolution || 'Closed without resolution');
-				return json({ success: closed });
+				const closed = escalation.closeTicket(ticketId, resolution ?? 'Closed without resolution');
+				return json({ success, closed });
 
 			default:
 				return json({ error: 'Invalid action' }, { status: 400 });

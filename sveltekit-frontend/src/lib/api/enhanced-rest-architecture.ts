@@ -88,7 +88,7 @@ export class EnhancedRESTClient {
  }
 
  async cluster(data: number[][], config: ClusteringConfig): Promise<APIResponse<ClusterResult>> {
- return this.post('/clustering', { data: config });
+ return this.post('/clustering', { data, config });
  }
 }
 

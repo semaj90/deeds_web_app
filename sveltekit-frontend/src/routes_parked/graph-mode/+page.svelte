@@ -265,7 +265,7 @@
 		dragNode = null;
 	}
 
-	function handleWheel(e, WheelEvent) {
+	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? 0.9 : 1.1;
 		zoom *= delta;

@@ -9,11 +9,10 @@ interface IOllamaEmbeddingService {
 // Default endpoints (Docker/Prod fallback)
 // prefer Docker service hostnames first, then local dev
 const API_URL =
- process.env.OLLAMA_API_URL ||
- process.env.PUBLIC_OLLAMA_API_URL ||
- process.env.OLLAMA_URL ||
- 'http://localhost:11434';
-const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest';
+ process.env?.OLLAMA_API_URL||
+ process.env?.PUBLIC_OLLAMA_API_URL||
+ process.env?.OLLAMA_URL?? 'http://localhost:11434';
+const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL?? 'embeddinggemma:latest';
 
 export const OllamaEmbeddingService: IOllamaEmbeddingService = {
  async embedText(text: string) {
@@ -43,7 +42,7 @@ async function loadLocalOllamaClient(): Promise<IOllamaEmbeddingService | null> 
  }
 
  // 2) default export: export default { ... } or class instance
- if (mod && mod.default && typeof mod.default === 'object') {
+ if (mod && mod?.default&& typeof mod.default === 'object') {
  return mod.default as IOllamaEmbeddingService;
  }
 

@@ -15,8 +15,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	// Parse query parameters for filtering
-	const limit = Number(url.searchParams.get('limit')) || 50;
-	const offset = Number(url.searchParams.get('offset')) || 0;
+	const limit = Number(url.searchParams.get('limit')) ?? 50;
+	const offset = Number(url.searchParams.get('offset')) ?? 0;
 	const status = url.searchParams.get('status');
 	const priority = url.searchParams.get('priority');
 	const search = url.searchParams.get('search');
@@ -144,7 +144,7 @@ export const actions: Actions = {
 		const caseIds = formData.getAll('caseId').map(id => id.toString());
 		const newStatus = formData.get('status')?.toString() as typeof cases.status.enumValues[number];
 
-		if (!caseIds.length || !newStatus) {
+		if (!caseIds?.length|| !newStatus) {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 

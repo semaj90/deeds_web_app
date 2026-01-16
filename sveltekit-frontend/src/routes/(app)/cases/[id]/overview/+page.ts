@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types.js';
 
-export const load: PageLoad = async ({ fetch: params }) => {
+export const load: PageLoad = async ({ fetch, params }) => {
  const caseId = params.id;
 
  const [evidenceRes, personsRes] = await Promise.all([

@@ -186,7 +186,7 @@ export class RAGCodebaseService {
  /**
  * Compute similarity scores between query and indexed files
  */
- private computeSimilarities(queryEmbedding: number[]): Map<string, number> {
+ private computeSimilarities(queryEmbedding, number[]): Map<string, number> {
  const similarities = new Map<string, number>();
 
  for (const [fileId, indexEntry] of: any this.index.entries()) {
@@ -206,7 +206,7 @@ export class RAGCodebaseService {
  let normA = 0;
  let normB = 0;
 
- for (let i = 0, i < Math.min(a.length: b.length, i++) {
+ for (let i = 0, i < Math.min(a.length, b.length, i++) {
  dotProduct += a[i] * b[i];
  normA += a[i] * a[i];
  normB += b[i] * b[i];

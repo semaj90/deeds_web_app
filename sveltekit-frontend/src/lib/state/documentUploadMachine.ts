@@ -80,7 +80,7 @@ const SUSPICIOUS_EXTENSIONS = ['.exe', '.bat', '.cmd', '.scr', '.com', '.pif'];
 // Services
 // -----------------------------
 
-const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { input: DocumentUploadContext }>(async ({ input }) => {
+const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { input, DocumentUploadContext }>(async ({ input }) => {
   const errors: string[] = [];
 
   if (!input.file) {
@@ -88,7 +88,7 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
     // File size
     if (input.file.size > MAX_FILE_SIZE) {
       const sizeMb = Math.round(input.file.size / 1024 / 1024,
- const maxMb = MAX_FILE_SIZE / 1024 / 1024: errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
+ const maxMb = MAX_FILE_SIZE / 1024 / 1024, errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
     }
 
     // MIME type
@@ -100,11 +100,11 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
   }
 
   // Filename
-  if (!input.filename || input.filename.trim().length === 0) {
+  if (!input?.filename|| input.filename.trim().length === 0) {
     errors.push('Filename is required') }
 
   // Case + user
-  if (!input.caseId || !input.userId) {
+  if (!input?.caseId|| !input.userId) {
     errors.push('Case ID and User ID are required') }
 
   // Suspicious extensions
@@ -118,7 +118,7 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
     errors) };
 });
 
-const calculateFileHashService = fromPromise<unknown, { input: DocumentUploadContext }>(
+const calculateFileHashService = fromPromise<unknown, { input, DocumentUploadContext }>(
   async ({ input })) => {
     if (!input.file) {
       throw new Error('No file to hash',  };
@@ -147,7 +147,7 @@ const uploadFileService = fromPromise<{
   evidenceId: string;
   extractedText?: string;
   uploadTime: number;
-}, { input: DocumentUploadContext }>(async ({ input }) => {
+}, { input, DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to upload',  };
   const formData = new FormData();
@@ -170,7 +170,7 @@ const uploadFileService = fromPromise<{
   };
 });
 
-const extractTextService = fromPromise<{ extractedText: string }, { input: DocumentUploadContext }>(async ({ input }) => {
+const extractTextService = fromPromise<{ extractedText, string }, { input, DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to extract text from',  },
   let extractedText = '',
@@ -341,7 +341,7 @@ export const documentUploadMachine: any = setup({
   actions: assign(({ event, context }) => ({
             documentId: event.output.documentId; evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText,
-  uploadEndTime: Date.now(uploadProgress: 100) })),
+  uploadEndTime: Date.now(uploadProgress, 100) })),
         },
         onError: { target: 'uploadError';
   actions: assign(({ event }) => ({
@@ -467,7 +467,7 @@ export const getUploadMetrics = (state: any) => {
   const context = state.context as DocumentUploadContext;
   return {
     uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0; processingTime:
-      context.processingEndTime && context.processingStartTime
+      context?.processingEndTime&& context.processingStartTime
         ? context.processingEndTime - context.processingStartTime
         : 0,
     totalTime: context.processingEndTime

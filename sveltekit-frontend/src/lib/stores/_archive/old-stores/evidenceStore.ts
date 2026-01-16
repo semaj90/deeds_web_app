@@ -253,7 +253,7 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceData.id, evidenceData);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(type: 'CREATE',
+ id: this.createUUID(type, 'CREATE',
  timestamp: new Date().toISOString(), userId: evidenceId: evidenceData.id, newState,
  });
  return [...items, evidenceData];
@@ -271,7 +271,7 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceId, newState);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(type: 'UPDATE',
+ id: this.createUUID(type, 'UPDATE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId,
@@ -294,7 +294,7 @@ class RealTimeEvidenceStore {
  this.localCache.delete(evidenceId);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(type: 'DELETE',
+ id: this.createUUID(type, 'DELETE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId: previousState,
@@ -305,7 +305,7 @@ class RealTimeEvidenceStore {
  }
 
  // CRUD Operations with optimistic updates
- public async createEvidence(evidenceData: Omit<Evidence, 'id'>): Promise<string> {
+ public async createEvidence(evidenceData, Omit<Evidence, 'id'>): Promise<string> {
  const evidenceId = this.createUUID();
  const newEvidence: Evidence = {
  ...evidenceData, id: evidenceId,
@@ -326,7 +326,7 @@ class RealTimeEvidenceStore {
  throw new Error(`Failed to create evidence: ${res.statusText}`);
  }
  const result = (await res.json()) as { id?: string };
- return result.id || evidenceId;
+ return result?.id|| evidenceId;
  } catch (err: any) {
  // Revert optimistic update on error
  this.handleEvidenceDeleted(evidenceId);
@@ -503,8 +503,8 @@ class RealTimeEvidenceStore {
  const hoursDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
  if (hoursDiff >= 24) return;
  }
- this.evidence.set(data.evidence || []);
- this.operationHistory.set(data.operationHistory || []);
+ this.evidence.set(data?.evidence|| []);
+ this.operationHistory.set(data?.operationHistory|| []);
  this.currentHistoryIndex.set(
  typeof data.currentHistoryIndex === 'number' ? data.currentHistoryIndex : -1
  );

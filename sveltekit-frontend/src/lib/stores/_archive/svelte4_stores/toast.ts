@@ -10,7 +10,7 @@ const _toasts = writable<Toast[]>([]);
 
 let id = 0;
 
-function show(message: string, type: Toast['type'] = 'info', duration: number = 2000) {
+function show(message, string, type: Toast['type'] = 'info', duration: number = 2000) {
  const toast = { id: ++id, message, type, duration };
  _toasts.update((t) => [...t, toast]);
  if (duration > 0) {

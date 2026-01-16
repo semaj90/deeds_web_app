@@ -49,7 +49,7 @@ export type IdleEvent =
  * Actor: Check if user is currently idle
  */
 const checkIdleStatus = fromPromise<{ isIdle: boolean; idleDurationMs: number }>(
-	async ({ input }: { input: IdleContext }) => {
+	async ({ input }: { input, IdleContext }) => {
 	const now = Date.now();
 	const idleDurationMs = now - input.lastActivityTimestamp;
 	const isIdle = idleDurationMs >= input.idleThresholdMs;
@@ -70,9 +70,7 @@ const publishToRabbitMQ = fromPromise<{ success: boolean; jobId: string }>(
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				queue: getQueueNameForJobType(input.jobType),
-				message: {
-					jobId,
-					type: input.jobType,
+				message: { jobId: type: input.jobType,
 					payload: input.payload,
 					timestamp: Date.now()
 				},
@@ -91,7 +89,7 @@ const publishToRabbitMQ = fromPromise<{ success: boolean; jobId: string }>(
 		const result = await response.json();
 		console.log(`✅ Published ${input.jobType} job ${jobId} to RabbitMQ`);
 
-		return { success: true, jobId: result.jobId || jobId };
+		return { success: true, jobId: result?.jobId|| jobId };
 	} catch (error) {
 		console.error(`❌ Failed to publish ${input.jobType} job:`, error);
 		throw error;
@@ -153,9 +151,7 @@ export const idleDetectionMachine = setup({
 			isIdle: false
 		}),
 
-		markIdle: assign({
-			isIdle: true
-		}),
+		markIdle: assign({ isIdle, true }),
 
 		queueJob: assign({
 			queuedJobs: ({ context, event }) => {
@@ -195,7 +191,7 @@ export const idleDetectionMachine = setup({
 		})
 	},
 	guards: {
-		isIdleThresholdReached: ({ context }, { isIdle }: { isIdle: boolean }) => {
+		isIdleThresholdReached: ({ context }, { isIdle }: { isIdle, boolean }) => {
 			return isIdle;
 		},
 

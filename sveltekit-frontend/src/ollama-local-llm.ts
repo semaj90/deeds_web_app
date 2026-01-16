@@ -64,7 +64,7 @@ class OllamaLocalLLM {
 	private availableModels: Map<string, OllamaModel> = new Map();
 	private modelCache: Map<string, { loaded: boolean; lastUsed, number }> = new Map();
 
-	constructor(baseUrl: string = 'http://localhost:11434') {
+	constructor(baseUrl, string = 'http://localhost:11434') {
 		this.baseUrl = baseUrl;
 		this.initialize();
 	}
@@ -114,7 +114,7 @@ class OllamaLocalLLM {
 			const data = (await response.json()) as { models?: OllamaModel[] };
 			this.availableModels.clear();
 
-			for (const model of data.models || []) {
+			for (const model of data?.models|| []) {
 				this.availableModels.set(model.name, model);
 				console.log(`[OllamaLLM] Found model: ${model.name} (${model.size})`);
 			}
@@ -302,7 +302,7 @@ PARAMETER num_ctx 4096`;
 	 */
 	async generateEmbeddings(text: string, model?: string): Promise<number[] | null> {
 		try {
-			const embeddingModel = model || 'nomic-embed-text';
+			const embeddingModel = model ?? 'nomic-embed-text';
 
 			const response = await fetch(`${this.baseUrl}/api/embeddings`, {
 				method: 'POST',

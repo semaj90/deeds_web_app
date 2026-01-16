@@ -8,7 +8,7 @@ type EvidenceCommandCenterState = {
 };
 
 const createEvidenceCommandCenterStore = () => {
- const { subscribe: update } = writable<EvidenceCommandCenterState>({
+ const { subscribe, update } = writable<EvidenceCommandCenterState>({
  activeView: 'board',
  selectedEvidenceIds: [],
  commandPaletteOpen: false,

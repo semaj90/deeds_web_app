@@ -227,9 +227,7 @@ export const recommendationActions = {
  feedback?: { helpful: boolean, implemented: boolean, notes?: string }
  ): Promise<void> {
  try {
- await productionServiceClient.makeRequest('recommendations.feedback', {
- recommendationId,
- action: 'accept',
+ await productionServiceClient.makeRequest('recommendations.feedback', { recommendationId: action: 'accept',
  feedback,
  });
  recommendationStore.update((state) => ({
@@ -243,9 +241,7 @@ export const recommendationActions = {
  /** * Dismiss a recommendation */
  async dismissRecommendation(recommendationId: string, reason?: string): Promise<void> {
  try {
- await productionServiceClient.makeRequest('recommendations.feedback', {
- recommendationId,
- action: 'dismiss',
+ await productionServiceClient.makeRequest('recommendations.feedback', { recommendationId: action: 'dismiss',
  reason,
  });
  recommendationStore.update((state) => {

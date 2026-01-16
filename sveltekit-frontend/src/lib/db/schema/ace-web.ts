@@ -17,8 +17,8 @@ export const aceSources = pgTable(
     canonicalUrl: text('canonical_url').notNull(),
     title: text('title'),
     domain: text('domain'),
-    firstSeen: timestamp('first_seen', { withTimezone: true }).defaultNow(),
-    lastCrawled: timestamp('last_crawled', { withTimezone: true }),
+    firstSeen: timestamp('first_seen', { withTimezone, true }).defaultNow(),
+    lastCrawled: timestamp('last_crawled', { withTimezone, true }),
     crawlStatus: text('crawl_status').default('new'), // 'new', 'ok', 'error', 'blocked'
     etag: text('etag'),
     contentHash: text('content_hash'),
@@ -38,14 +38,14 @@ export const aceDocs = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     sourceId: uuid('source_id').references(() => aceSources.id),
-    fetchedAt: timestamp('fetched_at', { withTimezone: true }).defaultNow(),
+    fetchedAt: timestamp('fetched_at', { withTimezone, true }).defaultNow(),
     contentType: text('content_type'), // 'text/html', 'application/pdf', etc.
     minioRawKey: text('minio_raw_key').notNull(),
     minioCleanKey: text('minio_clean_key'),
     tokens: integer('tokens'),
     lang: text('lang'),
     summary: text('summary'),
-    summaryUpdatedAt: timestamp('summary_updated_at', { withTimezone: true }),
+    summaryUpdatedAt: timestamp('summary_updated_at', { withTimezone, true }),
   },
   (table) => ({
     sourceIdx: index('ace_docs_source_idx').on(table.sourceId),

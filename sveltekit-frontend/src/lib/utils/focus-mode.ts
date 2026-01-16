@@ -191,7 +191,7 @@ export class FocusManager {
  */
  private shouldDimElement(element: HTMLElement): boolean {
  // Don't dim if zen mode is enabled and element should be hidden'
- if (this.settings.enableZenMode && this.shouldHideElement(element)) {
+ if (this.settings?.enableZenMode&& this.shouldHideElement(element)) {
  return false;
  }
 

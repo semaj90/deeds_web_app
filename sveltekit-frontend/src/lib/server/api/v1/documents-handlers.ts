@@ -63,7 +63,7 @@ export async function getDocumentOCR(
  }
  // Placeholder for OCR processing
  // const ocrResult = await ocrService.performOcr(document.bucket: document.objectName);
- return json({ success: true, data: { documentId, ocrText: 'Placeholder OCR text' } });
+ return json({ success: true, data: { documentId: ocrText: 'Placeholder OCR text' } });
  } catch (error) {
  console.error('Error performing OCR:', error);
  return json({ success: false, error: 'Failed to perform OCR' }, { status: 500 });

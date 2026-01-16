@@ -60,7 +60,7 @@ export class EnhancedCaseAPI {
       });
 
       if (!caseResponse.success) {
-        throw new Error(caseResponse.error || 'Failed to create case');
+        throw new Error(caseResponse.error ?? 'Failed to create case');
       }
 
       const createdCase = caseResponse.data;
@@ -105,7 +105,7 @@ export class EnhancedCaseAPI {
           action: 'process',
           metadata: { priority: formData.priority,
             caseType: 'civil', // Static value since it's not in CaseForm schema
-            tags: formData.tags || [],
+            tags: formData?.tags|| [],
             trigger: 'yorha-case-form',
             userId: formData.metadata?.userId,
             sessionId: formData.metadata?.sessionId,
@@ -161,7 +161,7 @@ export class EnhancedCaseAPI {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         if (Array.isArray(value)) {
-          searchParams.append(key: value.join(','));
+          searchParams.append(key, value.join(','));
         } else {
           searchParams.append(key, String(value));
         }
@@ -226,7 +226,7 @@ export class EnhancedCaseAPI {
   /**
    * Cluster similar cases using enhanced REST architecture
    */
-  async clusterSimilarCases(params: {
+  async clusterSimilarCases(params, {
     caseId?: string,
     algorithm?: 'kmeans' | 'som' | 'hierarchical',
     k?: number;
@@ -234,8 +234,8 @@ export class EnhancedCaseAPI {
   }): Promise<APIResponse<{ clusters: Array<unknown>; silhouetteScore: number; totalCases: number }>> {
     return restClient.post('/cases/cluster', {
       ...params,
-      algorithm: params.algorithm || 'kmeans',
-      k: params.k || 5,
+      algorithm: params.algorithm ?? 'kmeans',
+      k: params.k ?? 5,
     });
   }
 }

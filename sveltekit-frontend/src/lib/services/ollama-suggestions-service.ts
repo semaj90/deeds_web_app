@@ -270,7 +270,7 @@ export class OllamaSuggestionsService {
 					const { done, value } = await reader.read();
 					if (done) break;
 
-					buffer += decoder.decode(value, { stream: true });
+					buffer += decoder.decode(value, { stream, true });
 
 					// Split by newlines (SSE/stream convention)
 					const lines = buffer.split(/\r?\n/);
@@ -285,7 +285,7 @@ export class OllamaSuggestionsService {
 							yield chunk;
 						} catch {
 							// If not JSON, wrap as response text
-							yield { response: trimmed };
+							yield { response, trimmed };
 						}
 					}
 				}
@@ -296,7 +296,7 @@ export class OllamaSuggestionsService {
 						const finalChunk = JSON.parse(buffer) as OllamaResponse;
 						yield finalChunk;
 					} catch {
-						yield { response: buffer };
+						yield { response, buffer };
 					}
 				}
 			} finally {
@@ -336,7 +336,7 @@ export class OllamaSuggestionsService {
 				.map((item, index) => {
 					const obj = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};
 
-					const getString = (k: string, fallback = ''): string =>
+					const getString = (k, string, fallback = ''): string =>
 						typeof obj[k] === 'string' ? (obj[k] as string) : fallback;
 
 					const getNumber = (k: string, fallback = 0): number => {
@@ -406,7 +406,7 @@ export class OllamaSuggestionsService {
 			.map((p) => p.trim())
 			.filter(Boolean);
 
-		for (let i = 0; i < parts.length && suggestions.length < maxSuggestions; i++) {
+		for (let i = 0; i < parts?.length&& suggestions.length < maxSuggestions; i++) {
 			const part = parts[i];
 			if (part.length < 20) continue;
 

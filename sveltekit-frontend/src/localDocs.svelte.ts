@@ -82,9 +82,7 @@ export class LocalLegalStore {
 		return new Promise((resolve, reject) => {
 			try {
 				const adapter = new LokiIndexedAdapter('legal-ai-db');
-				this.db = new loki('legal-documents.db', {
-					adapter,
-					autoload: true,
+				this.db = new loki('legal-documents.db', { adapter: autoload: true,
 					autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
@@ -128,7 +126,7 @@ export class LocalLegalStore {
 	/**
 	 * Add a new document
 	 */
-	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
+	addDocument(doc, Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
 			...doc,
 			id: this.generateId(),
@@ -191,7 +189,7 @@ export class LocalLegalStore {
 	/**
 	 * Bulk insert documents
 	 */
-	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
+	bulkInsert(docs, Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs = docs.map((doc) => ({
 			...doc,
 			id: this.generateId(),
@@ -233,7 +231,7 @@ export class LocalLegalStore {
 	/**
 	 * Filter by type
 	 */
-	filterByType(type: LegalDoc['type']): void {
+	filterByType(type, LegalDoc['type']): void {
 		this.results = this.documents.find({ type });
 	}
 
@@ -287,7 +285,7 @@ export class LocalLegalStore {
 				throw new Error(`Sync failed: ${response.statusText}`);
 			}
 
-			const { documents: deletedIds } = (await response.json()) as {
+			const { documents, deletedIds } = (await response.json()) as {
 				documents?: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[];
 				deletedIds?: string[];
 			};

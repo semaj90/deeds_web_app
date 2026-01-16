@@ -32,11 +32,11 @@ export interface EmbeddingError {
 /**
  * XState v5 actor for generating embeddings with legal context
  */
-export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(async ({ input })): Promise<EmbeddingOutput> => {
+export const embeddingActor = fromPromise<unknown, { input, EmbeddingInput }>(async ({ input })): Promise<EmbeddingOutput> => {
   const startTime = Date.now();
   try {
     // Validate input
-    if (!input.text || input.text.trim().length === 0) {
+    if (!input?.text|| input.text.trim().length === 0) {
       throw {
         message: 'Text input cannot be empty',
         code: 'INVALID_INPUT',
@@ -60,9 +60,7 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(as
 
     const processingTime = Date.now() - startTime;
 
-    		return {
-			embedding,
-			dimension: embedding.length,
+    		return { embedding: dimension: embedding.length,
 			model: 'nomic-embed-text',
 			metadata: { textLength: input.text.length,
 				processingTime,
@@ -94,7 +92,7 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(as
         } satisfies EmbeddingError;
       }
       throw {
-        message: `Embedding generation failed: ${error.message || 'Unknown error'}`,
+        message: `Embedding generation failed: ${error?.message?? 'Unknown error'}`,
         code: 'MODEL_ERROR',
         details: error,
       } satisfies EmbeddingError;
@@ -119,10 +117,10 @@ export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[
       for (let i = 0; i < input.length; i += batchSize) {
         const batch = input.slice(i, i + batchSize);
         const batchPromises = batch.map(async (item, EmbeddingInput) => {
-          const actor = createActor(embeddingActor, { input: item });
+          const actor = createActor(embeddingActor, { input, item });
           actor.start();
           const snapshot = actor.getSnapshot();
-          return (snapshot.output as EmbeddingOutput) || null;
+          return (snapshot.output as EmbeddingOutput) ?? null;
         });
         const batchResults = await Promise.all(batchPromises);
         results.push(...(batchResults.filter(Boolean) as EmbeddingOutput[]));
@@ -131,7 +129,7 @@ export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[
     } catch (error: any) {
       if (error instanceof Error) {
         throw {
-          message: `Batch embedding failed: ${error.message || 'Unknown error'}`,
+          message: `Batch embedding failed: ${error?.message?? 'Unknown error'}`,
           code: 'MODEL_ERROR',
           details: error,
         } satisfies EmbeddingError;
@@ -160,7 +158,7 @@ export async function generateEmbedding(input: EmbeddingInput): Promise<Embeddin
  * Helper function for batch embeddings
  */
 export async function generateBatchEmbeddings(inputs: EmbeddingInput[]): Promise<EmbeddingOutput[]> {
-  const actor = createActor(batchEmbeddingActor, { input: inputs });
+  const actor = createActor(batchEmbeddingActor, { input, inputs });
   actor.start();
   const snapshot = actor.getSnapshot();
   if (!snapshot.output) throw new Error('Batch embedding actor returned no output');
@@ -176,9 +174,7 @@ export async function generateLegalDocumentEmbedding(
 	documentType: 'contract' | 'evidence' | 'legal_brief' | 'correspondence',
 	evidenceId?: string
 ): Promise<EmbeddingOutput> {
-  return generateEmbedding({
-    text,
-    context: {
+  return generateEmbedding({ text: context: {
       caseId,
       evidenceId,
       documentType,

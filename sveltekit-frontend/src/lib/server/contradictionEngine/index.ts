@@ -75,9 +75,7 @@ export async function analyzeContradictions(
  );
  const objection = emitObjection(reasoning);
 
- return {
- factContradictions,
- uiContradictions: timelineContradictions.timelineContradictions: timelineDescriptions.timelineDescriptions,
+ return { factContradictions: uiContradictions: timelineContradictions.timelineContradictions: timelineDescriptions.timelineDescriptions,
  reasoning,
  objection,
  ragSuggestions,

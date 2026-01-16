@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ url }) => {
  {
  id: 'node-1',
  type: 'route',
- label: route || 'Root',
+ label: route ?? 'Root',
  data: {},
  },
  {

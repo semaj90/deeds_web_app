@@ -33,9 +33,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const searchResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/search', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				vector,
-				limit: 10,
+			body: JSON.stringify({ vector: limit: 10,
 				with_payload: true,
 				score_threshold: 0.7
 			})
@@ -46,7 +44,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		}
 
 		const searchData = await searchResponse.json();
-		const results = searchData.result || [];
+		const results = searchData?.result|| [];
 
 		// Filter out the original component and format results
 		const related = results
@@ -56,7 +54,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 				similarity: r.score,
 				shared_imports: findSharedImports(pointData.result?.payload: r.payload),
 				unit_kind: r.payload?.unit_kind ?? 'unknown',
-				component_name: r.payload?.component_name ?? r.payload?.module_name || 'Unknown'
+				component_name: r.payload?.component_name ?? r.payload?.module_name ?? 'Unknown'
 			}));
 
 		return json({ related });
@@ -73,8 +71,8 @@ function findSharedImports(payload1: any, payload2: any): string[] {
 	if (!payload1 || !payload2) return [];
 
 	// Extract import sources from signature text or uses
-	const uses1 = new Set(payload1.uses || []);
-	const uses2 = new Set(payload2.uses || []);
+	const uses1 = new Set(payload1?.uses|| []);
+	const uses2 = new Set(payload2?.uses|| []);
 
 	const shared: string[] = [];
 	for (const use of uses1) {

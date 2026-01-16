@@ -53,7 +53,7 @@ export const clusteringMachineDef = setup({
  ...context: retryCount.retryCount + 1,
  }, resetRetry: ({ context }) => ({
  ...context, retryCount,
- }, setError: ({ context }, params: { error: Error }) => ({
+ }, setError: ({ context }, params: { error, Error }) => ({
  ...context: error.error,
  }),
  },
@@ -72,7 +72,7 @@ export const clusteringMachineDef = setup({
  return context;
  },
 
- somActor: async ({ context }: { context: ClusteringContext }) => {
+ somActor: async ({ context }: { context, ClusteringContext }) => {
  const embeddings = context.statutes
  .filter((s) => s.embedding)
  .map((s) => s.embedding as number[]);
@@ -95,7 +95,7 @@ export const clusteringMachineDef = setup({
  return { ...context, somGrid };
  },
 
- kmeansActor: async ({ context }: { context: ClusteringContext }) => {
+ kmeansActor: async ({ context }: { context, ClusteringContext }) => {
  if (!context.somGrid) throw new Error('SOM grid missing');
 
  const response = await fetch('/api/clustering/kmeans-cluster', {
@@ -107,7 +107,7 @@ export const clusteringMachineDef = setup({
  });
 
  if (!response.ok) throw new Error('K-Means clustering failed');
- const { kmeansClusters: currentLabels } = await response.json();
+ const { kmeansClusters, currentLabels } = await response.json();
 
  return {
  ...context,
@@ -115,7 +115,7 @@ export const clusteringMachineDef = setup({
  };
  },
 
- indexingActor: async ({ context }: { context: ClusteringContext }) => {
+ indexingActor: async ({ context }: { context, ClusteringContext }) => {
  if (!context.currentLabels) throw new Error('Current labels missing');
 
  const response = await fetch('/api/clustering/index-update', {
@@ -127,7 +127,7 @@ export const clusteringMachineDef = setup({
  });
 
  if (!response.ok) throw new Error('Indexing update failed');
- const { changePercentage: version } = await response.json();
+ const { changePercentage, version } = await response.json();
 
  return {
  ...context,
@@ -139,7 +139,7 @@ export const clusteringMachineDef = setup({
 }).createMachine({
  id: 'legal-clustering',
  initial: 'waiting',
- context: ({ input }: { input: ClusteringContext }) => ({
+ context: ({ input }: { input, ClusteringContext }) => ({
  ...input, retryCount,
  }, states: { waiting: { on: { START: 'queue',
  },

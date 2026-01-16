@@ -184,9 +184,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  }
  });
 
- return {
- enabled,
- disabled: total.length + disabled.length,
+ return { enabled: disabled: total.length + disabled.length,
  };
  }
 }

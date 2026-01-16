@@ -89,9 +89,7 @@ export class DAGClient {
 
 			const data = await dbQuery;
 
-			return {
-				data,
-				totalRows: data.length,
+			return { data: totalRows: data.length,
 				query,
 				processingTime: Date.now() - startTime
 			};
@@ -129,7 +127,7 @@ export class DAGClient {
 		// Rows
 		for (const row of result.data.slice(0, 10)) {
 			// Limit to 10 rows for context
-			lines.push(columns.map(col => String(row[col] || '')).join(' | '));
+			lines.push(columns.map(col => String(row[col] ?? '')).join(' | '));
 		}
 
 		if (result.data.length > 10) {

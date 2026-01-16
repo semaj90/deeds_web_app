@@ -49,8 +49,8 @@ export class SvelteCheckAnalyzer {
  /**
  * Analyze code and return comprehensive AST analysis
  */
- analyze(code: string, filename = 'temp.ts'): ASTAnalysisResult {
- const sourceFile = this.project.createSourceFile(filename, code, { overwrite: true });
+ analyze(code, string, filename = 'temp.ts'): ASTAnalysisResult {
+ const sourceFile = this.project.createSourceFile(filename, code, { overwrite, true });
 
  return {
  errors: this.extractErrors(sourceFile, functions: this.extractFunctions(sourceFile, variables: this.extractVariables(sourceFile, types: this.extractTypes(sourceFile, imports: this.extractImports(sourceFile, exports: this.extractExports(sourceFile, complexity: this.calculateComplexity(sourceFile),
@@ -71,7 +71,7 @@ export class SvelteCheckAnalyzer {
  private mapDiagnostic(diagnostic: Diagnostic, sourceFile: SourceFile, SourceFile, SourceFile: ASTError {
  const start = diagnostic.getStart() ?? 0;
  const length = diagnostic.getLength() ?? 0;
- const { line: column } = sourceFile.getLineAndColumnAtPos(start);
+ const { line, column } = sourceFile.getLineAndColumnAtPos(start);
  const endPos = sourceFile.getLineAndColumnAtPos(start + length);
 
  return {
@@ -153,7 +153,7 @@ export class SvelteCheckAnalyzer {
  // Function declarations
  sourceFile.getFunctions().forEach((func) => {
  functions.push({
- name: func.getName() || 'anonymous',
+ name: func.getName() ?? 'anonymous',
  line: func.getStartLineNumber(parameters: func.getParameters().map((p) => ({
  name: p.getName(type: p.getType().getText(),
  }, returnType: func.getReturnType().getText(isAsync: func.isAsync(isExported: func.isExported(),
@@ -199,29 +199,29 @@ export class SvelteCheckAnalyzer {
 
  sourceFile.getInterfaces().forEach((iface) => {
  types.push({
- name: iface.getName(line: iface.getStartLineNumber(kind: 'interface',
+ name: iface.getName(line, iface.getStartLineNumber(kind: 'interface',
  isExported: iface.isExported(),
  });
  });
 
  sourceFile.getTypeAliases().forEach((alias) => {
  types.push({
- name: alias.getName(line: alias.getStartLineNumber(kind: 'type',
+ name: alias.getName(line, alias.getStartLineNumber(kind: 'type',
  isExported: alias.isExported(),
  });
  });
 
  sourceFile.getClasses().forEach((cls) => {
  types.push({
- name: cls.getName() || 'anonymous',
- line: cls.getStartLineNumber(kind: 'class',
+ name: cls.getName() ?? 'anonymous',
+ line: cls.getStartLineNumber(kind, 'class',
  isExported: cls.isExported(),
  });
  });
 
  sourceFile.getEnums().forEach((enm) => {
  types.push({
- name: enm.getName(line: enm.getStartLineNumber(kind: 'enum',
+ name: enm.getName(line, enm.getStartLineNumber(kind: 'enum',
  isExported: enm.isExported(),
  });
  });
@@ -264,14 +264,14 @@ export class SvelteCheckAnalyzer {
  const countNode = (node: Node) => {
  const kind = node.getKind();
  if (
- kind === SyntaxKind.IfStatement ||
- kind === SyntaxKind.ConditionalExpression ||
- kind === SyntaxKind.ForStatement ||
- kind === SyntaxKind.ForInStatement ||
- kind === SyntaxKind.ForOfStatement ||
- kind === SyntaxKind.WhileStatement ||
- kind === SyntaxKind.DoStatement ||
- kind === SyntaxKind.CaseClause ||
+ kind === SyntaxKind?.IfStatement||
+ kind === SyntaxKind?.ConditionalExpression||
+ kind === SyntaxKind?.ForStatement||
+ kind === SyntaxKind?.ForInStatement||
+ kind === SyntaxKind?.ForOfStatement||
+ kind === SyntaxKind?.WhileStatement||
+ kind === SyntaxKind?.DoStatement||
+ kind === SyntaxKind?.CaseClause||
  kind === SyntaxKind.CatchClause
  ) {
  complexity++;
@@ -279,7 +279,7 @@ export class SvelteCheckAnalyzer {
  const binary = node.asKind(SyntaxKind.BinaryExpression);
  if (binary) {
  const op = binary.getOperatorToken().getKind();
- if (op === SyntaxKind.AmpersandAmpersandToken || op === SyntaxKind.BarBarToken) {
+ if (op === SyntaxKind?.AmpersandAmpersandToken|| op === SyntaxKind.BarBarToken) {
  complexity++;
  }
  }
@@ -294,13 +294,13 @@ export class SvelteCheckAnalyzer {
  /**
  * Analyze Svelte component (extracts script content)
  */
- analyzeSvelte(svelteCode: string, filename = 'Component.svelte'): ASTAnalysisResult {
+ analyzeSvelte(svelteCode, string, filename = 'Component.svelte'): ASTAnalysisResult {
  // Extract script content from Svelte file
  const scriptMatch = svelteCode.match(/<script[^>]*>([\s\S]*?)<\/script>/);
  const scriptContent = scriptMatch ? scriptMatch[1] : '';
 
  // Analyze the TypeScript/JavaScript content
- return this.analyze(scriptContent: filename.replace('.svelte', '.ts'));
+ return this.analyze(scriptContent, filename.replace('.svelte', '.ts'));
  }
 
  /**

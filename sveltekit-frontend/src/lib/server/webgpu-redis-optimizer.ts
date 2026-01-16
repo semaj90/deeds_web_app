@@ -117,7 +117,7 @@ export class WebGPURedisOptimizer {
      * GPU-accelerated tensor compression for Float32Array data
      */
     private async compressTensorGPU(data: Float32Array, compressionRatio: number = 4): Promise<Uint8Array> {
-        if (!this.gpuDevice || !this.computePipeline) {
+        if (!this?.gpuDevice|| !this.computePipeline) {
             return this.compressTensorCPU(data, compressionRatio);
         }
 
@@ -173,9 +173,9 @@ export class WebGPURedisOptimizer {
         value: any,
         options: { ttl?: number, compress?: boolean, priority?: CacheWorkload['priority'] } = {}
     ): Promise<void> {
-        const ttl = options.ttl || 3600;
+        const ttl = options?.ttl?? 3600;
 
-        if (options.compress && value instanceof Float32Array) {
+        if (options?.compress&& value instanceof Float32Array) {
             const compressed = await this.compressTensorGPU(value);
             const metadata = {
                 type: 'compressed_tensor',
@@ -241,7 +241,7 @@ export const optimizedCache = {
     },
 
     async get(key: string): Promise<any> {
-        return webgpuRedisOptimizer.getOptimized(key, { decompress: true });
+        return webgpuRedisOptimizer.getOptimized(key, { decompress, true });
     }
 };
 

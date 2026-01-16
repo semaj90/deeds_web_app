@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
         const ollamaResp = await fetch(`${OLLAMA_URL}/api/tags`);
         if (ollamaResp.ok) {
             const data = await ollamaResp.json();
-            const models = (data.models || []).map((m: { name: string }) => m.name);
+            const models = (data?.models|| []).map((m: { name, string }) => m.name);
             const hasEmbedding = models.some((m: string) => m.includes('embeddinggemma'));
 
             stats.services = {
@@ -82,9 +82,9 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
     stats.summary = {
         totalQdrantPoints: Object.values(collections).reduce((a, b) => a + b, 0),
-        phase90ErrorCards: collections['phase90_error_cards'] || 0,
-        phase90Clusters: collections['phase90_error_clusters'] || 0,
-        fileProfiles: collections['fastmcp_file_profiles'] || 0,
+        phase90ErrorCards: collections['phase90_error_cards'] ?? 0,
+        phase90Clusters: collections['phase90_error_clusters'] ?? 0,
+        fileProfiles: collections['fastmcp_file_profiles'] ?? 0,
         ready: true
     };
 
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 };
 
 // POST: Semantic search across RAG collections
-export const POST: RequestHandler = async ({ request: fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch }) => {
     try {
         const body: SearchRequest = await request.json();
         const { query, collection = 'fastmcp_file_profiles', limit = 10, filter } = body;
@@ -144,7 +144,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
         }
 
         const searchData = await searchResp.json();
-        const results: QdrantSearchResult[] = searchData.result || [];
+        const results: QdrantSearchResult[] = searchData?.result|| [];
 
         return json({
             query,

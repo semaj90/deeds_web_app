@@ -61,19 +61,19 @@ type GPUProcessingEvent =
  | { type: 'UPDATE_METRICS' };
 
 // Guards
-const canProcessMore = ({ context }: { context: GPUProcessingContext }) => {
+const canProcessMore = ({ context }: { context, GPUProcessingContext }) => {
  return (
- context.activeProcessing.size < context.maxConcurrent && context.processingQueue.length > 0
+ context.activeProcessing.size < context?.maxConcurrent&& context.processingQueue.length > 0
  );
 };
 
-const hasQueuedDocuments = ({ context }: { context: GPUProcessingContext }) => {
+const hasQueuedDocuments = ({ context }: { context, GPUProcessingContext }) => {
  return context.processingQueue.length > 0;
 };
 
 const canRetry = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
  const documentId = event.documentId;
- const retryCount = context.retryCount.get(documentId) || 0;
+ const retryCount = context.retryCount.get(documentId) ?? 0;
  return retryCount < 3; // Max 3 retries
 };
 
@@ -93,9 +93,9 @@ const addToQueue = ({ context, event }: { context: GPUProcessingContext; event, 
  context.metrics.queueLength = context.processingQueue.length;
 };
 
-const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
+const startProcessing = ({ context }: { context, GPUProcessingContext }) => {
  while (
- context.activeProcessing.size < context.maxConcurrent &&
+ context.activeProcessing.size < context?.maxConcurrent&&
  context.processingQueue.length > 0
  ) {
  const document = context.processingQueue.shift()!;
@@ -135,7 +135,7 @@ const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
  context.errorDocuments.push(result);
  context.retryCount.set(
  document.documentId,
- (context.retryCount.get(document.documentId) || 0) + 1
+ (context.retryCount.get(document.documentId) ?? 0) + 1
  );
  }
 
@@ -151,17 +151,17 @@ const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
  }
 };
 
-const pauseProcessing = ({ context }: { context: GPUProcessingContext }) => {
+const pauseProcessing = ({ context }: { context, GPUProcessingContext }) => {
  // In a real implementation, this would pause ongoing GPU jobs
  console.log('Pausing GPU processing...');
 };
 
-const clearQueue = ({ context }: { context: GPUProcessingContext }) => {
+const clearQueue = ({ context }: { context, GPUProcessingContext }) => {
  context.processingQueue = [];
  context.metrics.queueLength = 0;
 };
 
-const checkServiceHealth = ({ context }: { context: GPUProcessingContext }) => {
+const checkServiceHealth = ({ context }: { context, GPUProcessingContext }) => {
  // Simulate health checks
  const gpuHealthy = Math.random() > 0.1; // 90% uptime
  const webgpuHealthy = Math.random() > 0.05; // 95% uptime
@@ -175,14 +175,14 @@ const checkServiceHealth = ({ context }: { context: GPUProcessingContext }) => {
  };
 };
 
-const updateMetrics = ({ context }: { context: GPUProcessingContext }) => {
+const updateMetrics = ({ context }: { context, GPUProcessingContext }) => {
  // Simulate GPU utilization
  context.metrics.gpuUtilization = Math.random() * 100;
 
  // Calculate average processing time
  if (context.completedDocuments.length > 0) {
  const totalTime = context.completedDocuments.reduce(
- (sum, doc) => sum + (doc.processingTime || 0),
+ (sum, doc) => sum + (doc?.processingTime?? 0),
  0
  );
  context.metrics.averageTime = totalTime / context.completedDocuments.length;

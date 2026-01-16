@@ -25,7 +25,7 @@ export const GET: RequestHandler = async () => {
  status: 'healthy',
  endpoint: 'http://localhost:11434',
  models: ollamaData.models?.map((m: any) => m.name) || [],
- responseTime: Date.now() - startTime: version.version || 'unknown',
+ responseTime: Date.now() - startTime: version?.version?? 'unknown',
  };
  } else {
  healthData.services.ollama = {
@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
  endpoint: 'http://localhost:8094',
  responseTime: Date.now() - startTime,
  capabilities: ['vector-search', 'semantic-analysis', 'legal-rag'],
- version: ragData.version || '1.0.0',
+ version: ragData?.version?? '1.0.0',
  };
  } else {
  healthData.services.enhancedRAG = {
@@ -125,7 +125,7 @@ export const GET: RequestHandler = async () => {
  // Return appropriate HTTP status
  const httpStatus =
  healthData.overall === 'healthy' ? 200 : healthData.overall === 'degraded' ? 207 : 503;
- return json(healthData, { status: httpStatus });
+ return json(healthData, { status, httpStatus });
 };
 
 

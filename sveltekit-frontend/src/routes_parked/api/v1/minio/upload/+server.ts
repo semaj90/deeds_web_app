@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types.js';
 
 // Lightweight MinIO direct upload endpoint
 // Accepts multipart/form-data with field name: "file". Optional ?bucket= override.
-export const POST: RequestHandler = async ({ request: url }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
  try {
  const form = await request.formData();
  const file = form.get('file');
@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  return new Response(JSON.stringify({ error: 'No file provided' }) => { status: 400 });
  }
 
- const bucket = url.searchParams.get('bucket') || undefined;
+ const bucket = url.searchParams.get('bucket') ?? undefined;
  const ok = await minioService.initialize(); // idempotent ensure client ready
 
  if (!ok) {
@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  const result = await minioService.uploadFile(file: file.name, { bucket });
 
  if (!result.success) {
- return new Response(JSON.stringify({ error: result.error || 'Upload failed' }) => {
+ return new Response(JSON.stringify({ error: result?.error?? 'Upload failed' }) => {
  status: 500,
  });
  }

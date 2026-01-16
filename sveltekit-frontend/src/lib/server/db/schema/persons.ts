@@ -9,8 +9,8 @@ export const personsOfInterest = pgTable('persons_of_interest', {
     dob: date('dob'),
     lastKnownLocation: text('last_known_location'),
     notes: text('notes'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 export const casePersons = pgTable('case_persons', {
@@ -23,7 +23,7 @@ export const casePersons = pgTable('case_persons', {
         .references(() => personsOfInterest.id, { onDelete: 'cascade' }),
     relationshipType: varchar('relationship_type', { length: 64 }), // defendant, co-defendant, witness, etc.
     isPrimary: varchar('is_primary', { length: 5 }).default('false'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 });
 
 

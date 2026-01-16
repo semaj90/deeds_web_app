@@ -18,7 +18,7 @@ export async function GET() {
 			AUTH_COOKIE_NAME: !!process.env.AUTH_COOKIE_NAME,
 			JWT_SECRET: !!process.env.JWT_SECRET,
 		},
-		environment: process.env.NODE_ENV || 'development',
+		environment: process.env?.NODE_ENV?? 'development',
 		nodeVersion: process.version,
 	};
 

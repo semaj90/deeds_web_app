@@ -16,20 +16,20 @@ import type { Document as LangChainDocument } from '@langchain/core/documents';
 /* -------------------- CONFIG -------------------- */
 
 function getOllamaEndpoint(): string {
-	return (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '');
+	return (process.env?.OLLAMA_URL?? 'http://localhost:11434').replace(/\/$/, '');
 }
 
-const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest';
-const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
+const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL?? 'embeddinggemma:latest';
+const LLM_MODEL = process.env?.OLLAMA_LLM_MODEL?? 'gemma3-legal:latest';
 const OLLAMA_BASE_URL = getOllamaEndpoint();
 
 const DATABASE_URL =
-	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+	process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const sql = postgres(DATABASE_URL, { max: 20, idle_timeout: 10, prepare: true });
 const db = drizzle(sql, { schema });
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://:redis@localhost:6379/0', {
+const redis = new Redis(process.env?.REDIS_URL?? 'redis://:redis@localhost:6379/0', {
 	maxRetriesPerRequest: 3,
 	enableReadyCheck: true,
 	lazyConnect: false,
@@ -50,9 +50,9 @@ class OllamaEmbeddingsClient {
 	private requestOptions: Record<string, unknown>;
 
 	constructor(opts: OllamaEmbeddingsOptions) {
-		this.baseUrl = (opts.baseUrl || OLLAMA_BASE_URL).replace(/\/$/, '');
+		this.baseUrl = (opts?.baseUrl|| OLLAMA_BASE_URL).replace(/\/$/, '');
 		this.model = opts.model;
-		this.requestOptions = opts.requestOptions || {};
+		this.requestOptions = opts?.requestOptions|| {};
 	}
 
 	async embedQuery(input: string): Promise<number[]> {
@@ -144,9 +144,7 @@ export class LegalRAGPipeline {
 		const { title, content, documentType, metadata = {}, caseId, userId } = params;
 		const chunks = await this.smartLegalChunking(content);
 		const chunksData = await Promise.all(
-			chunks.map(async (text) => ({
-				text,
-				embedding: await this.generateEmbedding(text)
+			chunks.map(async (text) => ({ text: embedding: await this.generateEmbedding(text)
 			}))
 		);
 
@@ -224,9 +222,7 @@ Answer:
 			console.warn('[RAG] userAiQueries insert failed:', e);
 		}
 
-		return {
-			answer,
-			sources: relevantDocs.map((d) => ({
+		return { answer: sources: relevantDocs.map((d) => ({
 				id: (d.metadata as Record<string, unknown>)?.documentId as string | undefined,
 				score: (d.metadata as Record<string, unknown>)?.score as number | undefined
 			})),
@@ -246,9 +242,9 @@ Answer:
 		const qdrantUrl = process.env.QDRANT_URL;
 		if (qdrantUrl) {
 			try {
-				const collection = process.env.QDRANT_COLLECTION || 'documents';
+				const collection = process.env?.QDRANT_COLLECTION?? 'documents';
 				const filter = caseId
-					? { must: [{ key: 'caseId', match: { value: caseId } }] }
+					? { must: [{ key: 'caseId', match: { value, caseId } }] }
 					: undefined;
 
 				const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
@@ -266,7 +262,7 @@ Answer:
 				if (res.ok) {
 					type QdrantHit = { id?: string; payload?: Record<string, unknown>; score?: number };
 					const json = (await res.json()) as { result?: QdrantHit[] };
-					return (json.result || []).map((h) => {
+					return (json?.result|| []).map((h) => {
 						const payload = h.payload ?? {};
 						const text =
 							typeof payload['text'] === 'string'
@@ -275,7 +271,7 @@ Answer:
 									? payload['content']
 									: '';
 						return {
-							pageContent: String(text || ''),
+							pageContent: String(text ?? ''),
 							metadata: { documentId: h.id, score: h.score }
 						} as LangChainDocument;
 					});
@@ -340,11 +336,11 @@ Answer:
 		if (!sources.length) return { confidence: 0, keyPoints: [] };
 		const avgScore =
 			sources.reduce(
-				(s, d) => s + (Number((d.metadata as { score?: number })?.score ?? 0) || 0),
+				(s, d) => s + (Number((d.metadata as { score?: number })?.score ?? 0) ?? 0),
 				0
 			) / sources.length;
 		const confidence = Math.min(0.95, avgScore);
-		const keyPoints = (answer || '')
+		const keyPoints = (answer ?? '')
 			.split(/\r?\n/)
 			.map((l) => l.replace(/^[\d.\-\s•*]+/, '').trim())
 			.filter(Boolean)
@@ -376,4 +372,4 @@ Answer:
 export const ragPipeline: LegalRAGPipeline =
 	(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
 	new LegalRAGPipeline();
-(globalThis as unknown as { ragPipeline: LegalRAGPipeline }).ragPipeline = ragPipeline;
+(globalThis as unknown as { ragPipeline, LegalRAGPipeline }).ragPipeline = ragPipeline;

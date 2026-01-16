@@ -86,7 +86,7 @@ export class WebGPUSimilarityEngine {
  queryEmbedding: QuantizedEmbedding, documentEmbeddings: QuantizedEmbedding[],
  topK: number = 10
  ): Promise<SimilarityResult[]> {
- if (!this.device || !this.pipeline || !this.bindGroupLayout) {
+ if (!this?.device|| !this?.pipeline|| !this.bindGroupLayout) {
  throw new Error('WebGPU not initialized');
  }
 
@@ -142,10 +142,10 @@ export class WebGPUSimilarityEngine {
  const bindGroup = this.device.createBindGroup({
  layout: this.bindGroupLayout,
  entries: [
- { binding: 0, resource: { buffer: queryBuffer } },
- { binding: 1, resource: { buffer: docsBuffer } },
- { binding: 2, resource: { buffer: scaleOffsetBuffer } },
- { binding: 3, resource: { buffer: outputBuffer } }],
+ { binding: 0, resource: { buffer, queryBuffer } },
+ { binding: 1, resource: { buffer, docsBuffer } },
+ { binding: 2, resource: { buffer, scaleOffsetBuffer } },
+ { binding: 3, resource: { buffer, outputBuffer } }],
  });
   
  const commandEncoder = this.device.createCommandEncoder();

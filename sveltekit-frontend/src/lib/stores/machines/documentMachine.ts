@@ -75,14 +75,14 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  },
  uploaded: { entry: assign({
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Document ready for processing'],
  processingProgress: () => 10,
  }, on: { START_PROCESSING: {
  target: 'processing',
  actions: assign({ currentStep: () => 'starting_processing',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Starting AI processing'],
  }),
  },
@@ -95,19 +95,19 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  }, states: { extractingText: {
  entry: assign({ currentStep: () => 'extracting_text',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Extracting text content'],
  }, on: { EXTRACT_TEXT: {
  target: 'analyzingWithAI',
  actions: assign({ extractedText: (_ctx, event) => (event as any).text,
  processingProgress: () => 40,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Text extracted successfully'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -115,19 +115,19 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  analyzingWithAI: { entry: assign({
  currentStep: () => 'analyzing_ai',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Running AI analysis'],
  }, on: { ANALYZE_AI: {
  target: 'generatingEmbedding',
  actions: assign({ aiAnalysis: (_ctx, event) => (event as any).analysis,
  processingProgress: () => 60,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'AI analysis completed'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -135,19 +135,19 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  generatingEmbedding: { entry: assign({
  currentStep: () => 'generating_embedding',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Generating vector embeddings'],
  }, on: { GENERATE_EMBEDDING: {
  target: 'extractingEntities',
  actions: assign({ embedding: (_ctx, event) => (event as any).embedding,
  processingProgress: () => 75,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Embeddings generated'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -155,19 +155,19 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  extractingEntities: { entry: assign({
  currentStep: () => 'extracting_entities',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Extracting legal entities'],
  }, on: { EXTRACT_ENTITIES: {
  target: 'calculatingRisk',
  actions: assign({ entities: (_ctx, event) => (event as any).entities,
  processingProgress: () => 85,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Entities extracted'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -175,7 +175,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  calculatingRisk: { entry: assign({
  currentStep: () => 'calculating_risk',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Calculating risk assessment'],
  }, on: { CALCULATE_RISK: {
  target: 'completing',
@@ -183,12 +183,12 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  confidence: (_ctx, event) => (event as any).confidence,
  processingProgress: () => 95,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Risk assessment completed'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -196,19 +196,19 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  completing: { entry: assign({
  currentStep: () => 'completing',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Finalizing processing'],
  }, on: { PROCESSING_COMPLETE: {
  target: '#documentProcessor.completed',
  actions: assign({ processingProgress: () => 100,
  processedAt: () => new Date( currentStep: () => 'completed',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Processing completed successfully'],
  }),
  },
  ERROR: { target: '#documentProcessor.error',
- actions: assign({ errors: (context, event) => [...(context.errors || []), (event as any).error],
+ actions: assign({ errors: (context, event) => [...(context?.errors|| []), (event as any).error],
  }),
  },
  },
@@ -241,7 +241,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  actions: assign({ processingProgress: () => 20,
  errors: () => [],
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Reprocessing started'],
  currentStep: () => 'starting_processing',
  }),
@@ -255,7 +255,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  actions: assign({ errors: () => [],
  processingProgress: () => 20,
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Retrying processing'],
  currentStep: () => 'starting_processing',
  }),
@@ -281,7 +281,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  cancelled: { entry: assign({
  currentStep: () => 'cancelled',
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Processing cancelled'],
  }, on: { RESET: {
  target: 'idle',
@@ -304,7 +304,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  actions: assign({ processingProgress: () => 20,
  errors: () => [],
  processingSteps: (context) => [
- ...(context.processingSteps || []),
+ ...(context?.processingSteps|| []),
  'Processing restarted'],
  currentStep: () => 'starting_processing',
  }),
@@ -344,19 +344,19 @@ export function isCompletedState(state: any): boolean {
 }
 
 export function hasErrors(context: DocumentContext): boolean {
- return context.errors && context.errors.length > 0;
+ return context?.errors&& context.errors.length > 0;
 }
 
 export function getProcessingProgress(context: DocumentContext): number {
- return context.processingProgress || 0;
+ return context?.processingProgress?? 0;
 }
 
 export function getCurrentStep(context: DocumentContext): string {
- return context.currentStep || 'idle';
+ return context?.currentStep?? 'idle';
 }
 
 export function getProcessingSteps(context: DocumentContext): string[] {
- return context.processingSteps || [];
+ return context?.processingSteps|| [];
 }
 
 

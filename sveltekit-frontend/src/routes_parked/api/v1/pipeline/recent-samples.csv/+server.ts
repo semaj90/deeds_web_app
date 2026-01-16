@@ -6,7 +6,7 @@ export const GET: RequestHandler = async () => {
  // CSV header: stage,index,ms
  const lines: string[] = ['stage,index,ms'];
  for (const row of hist) {
- (row.recentSamples || []).forEach((v, i) => {
+ (row?.recentSamples|| []).forEach((v, i) => {
  lines.push(`${row.stage},${i},${v}`);
  });
  }

@@ -121,7 +121,7 @@ function buildRelationshipGraph(relationships: POIRelationship[]): Map<string, s
  * Create POI Store
  */
 function createPOIStore() {
-	const { subscribe: update } = writable<POIStoreState>(initialState);
+	const { subscribe, update } = writable<POIStoreState>(initialState);
 
 	return {
 		subscribe,
@@ -136,8 +136,8 @@ function createPOIStore() {
 				const response = await fetch(`/api/cases/${caseId}/pois`, { credentials: 'include' });
 				if (response.ok) {
 					const data = await response.json();
-					const pois: PersonOfInterest[] = data.pois || [];
-					const relationships: POIRelationship[] = data.relationships || [];
+					const pois: PersonOfInterest[] = data?.pois|| [];
+					const relationships: POIRelationship[] = data?.relationships|| [];
 					update((s) => ({
 						...s,
 						personOfInterest: pois,
@@ -247,7 +247,7 @@ function createPOIStore() {
 		selectPOI(id: string) {
 			update((s) => {
 				const poi = s.personOfInterest.find((p) => p.id === id);
-				return { ...s, activePOI: poi || null };
+				return { ...s, activePOI: poi ?? null };
 			});
 		},
 
@@ -317,8 +317,8 @@ function createPOIStore() {
 					const data = await response.json();
 					update((s) => ({
 						...s,
-						clusters: data.clusters || [],
-						networkMetrics: data.metrics || s.networkMetrics,
+						clusters: data?.clusters|| [],
+						networkMetrics: data?.metrics|| s.networkMetrics,
 						isLoading: false
 					}));
 				}
@@ -337,7 +337,7 @@ function createPOIStore() {
 				const response = await fetch(`/api/pois/${poiId}/timeline`, { credentials: 'include' });
 				if (response.ok) {
 					const data = await response.json();
-					const events: TimelineEvent[] = data.events || [];
+					const events: TimelineEvent[] = data?.events|| [];
 					update((s) => ({
 						...s,
 						timeline: [...s.timeline, ...events],
@@ -398,7 +398,7 @@ function createPOIStore() {
 				});
 				if (response.ok) {
 					const data = await response.json();
-					const riskScore = data.riskScore || 0;
+					const riskScore = data?.riskScore?? 0;
 					update((s) => ({
 						...s,
 						riskScores: new Map(s.riskScores).set(poiId, riskScore)

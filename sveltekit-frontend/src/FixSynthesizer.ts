@@ -10,7 +10,6 @@
  */
 
 import { getOllamaService } from './OllamaService.js';
-import type { ErrorReport, FixStrategy, SimilarError, ValidationRule } from './types.js';
 
 export interface FixSynthesizerConfig {
   maxRetries: number; validationTimeout: number; backupDir: string;
@@ -51,7 +50,7 @@ export class FixSynthesizer {
    * Property 28: For any error pattern, the system SHALL generate fixes
    * from similar examples using Gemma3.
    */
-  async synthesizeFix(error, ErrorReport, similarErrors: SimilarError[]): Promise<FixResult> {
+  async synthesizeFix(error: ErrorReport, similarErrors: SimilarError[]): Promise<FixResult> {
     try {
       const ollama = getOllamaService();
       await ollama.waitForInit();
@@ -71,11 +70,11 @@ export class FixSynthesizer {
         .slice(0, 3);
 
       // Generate fix using Gemma3
-      const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map((f) => ({
+      const fixSuggestion = await ollama.generateFixSuggestion({ error: context: successfulFixes.map((f) => ({
           message: error.message,
           code: f.code,
         }))
-      );
+      });
 
       if (!fixSuggestion) {
         return {
@@ -131,7 +130,7 @@ export class FixSynthesizer {
   /**
    * Generate validation rules based on error type
    */
-  private generateValidationRules(error, ErrorReport): ValidationRule[] {
+  private generateValidationRules(error: ErrorReport): ValidationRule[] {
     const rules: ValidationRule[] = [];
 
     // Always check syntax
@@ -204,11 +203,11 @@ export class FixSynthesizer {
   ): Promise<boolean> {
     switch (rule.type) {
       case 'syntax':
-        return this.validateSyntax(strategy.code: error.file);
+        return this.validateSyntax(strategy.code, error.file);
       case 'type':
-        return this.validateTypes(strategy.code: error.file);
+        return this.validateTypes(strategy.code, error.file);
       case 'ast':
-        return this.validateAST(strategy.code: error.file);
+        return this.validateAST(strategy.code, error.file);
       default:
         return true;
     }

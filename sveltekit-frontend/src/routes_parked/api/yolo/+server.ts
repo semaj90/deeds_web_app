@@ -7,7 +7,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const options = JSON.parse((formData.get('options') as string) || '{}');
+ const options = JSON.parse((formData.get('options') as string) ?? '{}');
 
  if (!file) {
  return json({ success: false, error: 'No file provided' }, { status: 400 });

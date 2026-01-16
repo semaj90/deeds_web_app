@@ -9,7 +9,7 @@ export async function loadSession(): Promise<any> {
  const res = await fetch('/api/auth/session');
  if (res.ok) {
  const data = await res.json();
- user.set(data.user || null);
+ user.set(data?.user?? null);
  } else {
  user.set(null);
  }

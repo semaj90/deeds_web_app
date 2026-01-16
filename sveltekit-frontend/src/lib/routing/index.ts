@@ -364,9 +364,9 @@ export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dyna
  return {
  id: String(rr['id'] ?? '', path: , String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
   category: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['category'] as string : undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['category'] as string | undefined)
   | undefined: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['status'] as string : undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['status'] as string | undefined)
   | undefined,
  };
  })];

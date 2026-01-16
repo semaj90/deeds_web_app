@@ -17,7 +17,7 @@ self.onmessage = async (e: MessageEvent) => {
 			Array.isArray(arr) ? arr.flatMap(flatten) : typeof arr === 'number' ? [arr] : [];
 
 		const flat = flatten(out);
-		self.postMessage({ embedding: flat });
+		self.postMessage({ embedding, flat });
 	} catch (err) {
 		self.postMessage({ error: String(err) });
 	}

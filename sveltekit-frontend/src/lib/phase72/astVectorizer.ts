@@ -83,14 +83,14 @@ export function createNativeVectorizer(modelPath: string): NativeVectorizer | nu
  * Ollama fallback for embedding generation using embeddinggemma.
  */
 async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
- const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
- const model = process.env.EMBEDDING_MODEL || 'embeddinggemma:latest';
+ const ollamaUrl = process.env?.OLLAMA_URL?? 'http://localhost:11434';
+ const model = process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest';
 
  try {
  const response = await fetch(`${ollamaUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model, prompt: text }),
+ body: JSON.stringify({ model: prompt: text }),
  });
 
  if (!response.ok) {
@@ -98,7 +98,7 @@ async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
  }
 
  const data = await response.json();
- return data.embedding || [];
+ return data?.embedding|| [];
  } catch (error) {
  console.error('[Phase72] Ollama embedding failed:', error);
  return [];
@@ -116,7 +116,7 @@ export class Phase72Vectorizer {
  constructor(options: { modelPath?: string, forceOllama?: boolean } = {}) {
  this.useNative = !options.forceOllama;
 
- if (this.useNative && options.modelPath) {
+ if (this?.useNative&& options.modelPath) {
  this.nativeInstance = createNativeVectorizer(options.modelPath);
  }
 
@@ -189,7 +189,7 @@ export function getPhase72Vectorizer(): Phase72Vectorizer {
  if (!_defaultVectorizer) {
  // Try to load model from standard location (optional)
  const modelPath =
- process.env.PHASE72_MODEL_PATH ||
+ process.env?.PHASE72_MODEL_PATH||
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({

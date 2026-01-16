@@ -28,7 +28,7 @@ export class ValidationService {
  }
  );
  if (p.exitCode === 0) return { ok: true, tscErrors: 0, svelteErrors: 0 };
- return { ok: false, code: 'TSC_FAILED', message: p.stderr || p.stdout || 'tsc failed' };
+ return { ok: false, code: 'TSC_FAILED', message: p?.stderr|| p?.stdout?? 'tsc failed' };
  } catch (e: any) {
  return { ok: false, code: 'TSC_FAILED', message: String(e?.message ?? e) };
  }
@@ -43,7 +43,7 @@ export class ValidationService {
  return {
  ok: false,
  code: 'SVELTE_CHECK_FAILED',
- message: p.stderr || p.stdout || 'svelte-check failed',
+ message: p?.stderr|| p?.stdout?? 'svelte-check failed',
  };
  } catch (e: any) {
  return { ok: false, code: 'SVELTE_CHECK_FAILED', message: String(e?.message ?? e) };

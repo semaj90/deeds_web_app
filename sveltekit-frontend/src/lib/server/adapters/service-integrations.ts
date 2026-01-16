@@ -39,70 +39,69 @@ import type {
 export function loadServiceEnvironment(): ServiceEnvironment {
   // Parse process.env.DATABASE_URL or construct from components
   const databaseUrl =
-    process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+    process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
   const dbUrl = new URL(databaseUrl.replace('postgres://', 'postgresql://'));
 
   return {
     // Database
     databaseUrl,
-    postgresConfig: { host: dbUrl.hostname || 'localhost',
-      port: parseInt(dbUrl.port || '5432', 10),
-      database: dbUrl.pathname.slice(1) || 'legal_ai_db',
-      user: dbUrl.username || process.env.POSTGRES_USER || 'legal_admin',
-      password: dbUrl.password || process.env.POSTGRES_PASSWORD || '123456',
+    postgresConfig: { host: dbUrl?.hostname?? 'localhost',
+      port: parseInt(dbUrl?.port?? '5432', 10),
+      database: dbUrl.pathname.slice(1) ?? 'legal_ai_db',
+      user: dbUrl?.username|| process.env?.POSTGRES_USER?? 'legal_admin',
+      password: dbUrl?.password|| process.env?.POSTGRES_PASSWORD?? '123456',
       ssl: process.env.NODE_ENV === 'production',
       max: 20,
       idleTimeoutMillis: 30000,
       // Fallback to superuser if legal_admin fails
       fallbackUser: 'postgres',
-      fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
+      fallbackPassword: process.env?.POSTGRES_SUPERUSER_PASSWORD?? 'postgres'
     },
     // Redis
-    redisConfig: { url: process.env.REDIS_URL || 'redis://localhost:6379/0',
-      password: process.env.REDIS_PASSWORD || undefined,
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    redisConfig: { url: process.env?.REDIS_URL?? 'redis://localhost:6379/0',
+      password: process.env?.REDIS_PASSWORD?? undefined,
+      host: process.env?.REDIS_HOST?? 'localhost',
+      port: parseInt(process.env?.REDIS_PORT?? '6379', 10),
       db: 0,
       maxRetriesPerRequest: 3,
       enableReadyCheck: true
     },
     // Qdrant
-    qdrantConfig: { host: process.env.QDRANT_HOST || 'localhost',
-      port: parseInt(process.env.QDRANT_PORT || '6333', 10),
+    qdrantConfig: { host: process.env?.QDRANT_HOST?? 'localhost',
+      port: parseInt(process.env?.QDRANT_PORT?? '6333', 10),
       apiKey: process.env.QDRANT_API_KEY,
       timeout: 30000
     },
     // Ollama
-    ollamaConfig: { baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-      embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-      chatModel: process.env.CHAT_MODEL || 'gemma3:legal-latest',
-      gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10),
+    ollamaConfig: { baseUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+      embeddingModel: process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest',
+      chatModel: process.env?.CHAT_MODEL?? 'gemma3:legal-latest',
+      gpuLayers: parseInt(process.env?.OLLAMA_GPU_LAYERS?? '30', 10),
       timeout: 60000
     },
     // MinIO
-    minioConfig: { endPoint: (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[0],
+    minioConfig: { endPoint: (process.env?.MINIO_ENDPOINT?? 'localhost:9000').split(':')[0],
       port: parseInt(
-        (process.env.MINIO_ENDPOINT || 'localhost:9000').split(':')[1] ||
-          process.env.MINIO_PORT ||
-          '9000',
+        (process.env?.MINIO_ENDPOINT?? 'localhost:9000').split(':')[1] ||
+          process.env?.MINIO_PORT?? '9000',
         10
       ),
-      accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-      secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin123',
+      accessKey: process.env?.MINIO_ACCESS_KEY?? 'minioadmin',
+      secretKey: process.env?.MINIO_SECRET_KEY?? 'minioadmin123',
       useSSL: process.env.MINIO_USE_SSL === 'true',
       region: 'us-east-1'
     },
     // Neo4j
-    neo4jConfig: { uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
-      user: process.env.NEO4J_USER || 'neo4j',
-      password: process.env.NEO4J_PASSWORD || 'password',
-      database: process.env.NEO4J_DATABASE || 'neo4j',
+    neo4jConfig: { uri: process.env?.NEO4J_URI?? 'bolt://localhost:7687',
+      user: process.env?.NEO4J_USER?? 'neo4j',
+      password: process.env?.NEO4J_PASSWORD?? 'password',
+      database: process.env?.NEO4J_DATABASE?? 'neo4j',
       maxConnectionPoolSize: 50
     },
     // Development
-    nodeEnv: (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test',
+    nodeEnv: (process.env?.NODE_ENV?? 'development') as 'development' | 'production' | 'test',
     devBypassAuth: process.env.DEV_BYPASS_AUTH === 'true',
-    logLevel: (process.env.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug'
+    logLevel: (process.env?.LOG_LEVEL?? 'info') as 'error' | 'warn' | 'info' | 'debug'
   };
 }
 
@@ -116,8 +115,8 @@ export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
     redis: env.redisConfig.url,
     qdrant: `http://${env.qdrantConfig.host}:${env.qdrantConfig.port}`,
     // AI Services
-    ollama: env.ollamaConfig.baseUrl || env.ollamaConfig.host || 'http://localhost:11434',
-    ollamaEmbeddings: `${env.ollamaConfig.baseUrl || env.ollamaConfig.host || 'http://localhost:11434'}/api/embeddings`,
+    ollama: env.ollamaConfig?.baseUrl|| env.ollamaConfig?.host?? 'http://localhost:11434',
+    ollamaEmbeddings: `${env.ollamaConfig?.baseUrl|| env.ollamaConfig?.host?? 'http://localhost:11434'}/api/embeddings`,
     // Storage & Processing
     minio: `${env.minioConfig.useSSL ? 'https' : 'http'}://${env.minioConfig.endPoint}:${env.minioConfig.port}`,
     minioConsole: `${env.minioConfig.useSSL ? 'https' : 'http'}://${env.minioConfig.endPoint}:${env.minioConfig.port + 1}`,
@@ -144,8 +143,8 @@ export class OllamaAdapter implements OllamaClient {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, prompt: text }),
-      signal: AbortSignal.timeout(this.config.timeout || 60000)
+      body: JSON.stringify({ model: prompt: text }),
+      signal: AbortSignal.timeout(this.config?.timeout?? 60000)
     });
 
     if (!response.ok) {
@@ -160,8 +159,8 @@ export class OllamaAdapter implements OllamaClient {
     prompt: string,
     opts?: { model?: string, maxTokens?: number }
   ): Promise<string> {
-    const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
-    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/generate`;
+    const model = opts?.model ?? this.config?.chatModel?? 'gemma3:legal-latest';
+    const url = `${this.config?.baseUrl?? 'http://localhost:11434'}/api/generate`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -170,7 +169,7 @@ export class OllamaAdapter implements OllamaClient {
         prompt,
         options: { num_predict: opts?.maxTokens ?? 512 }
       }),
-      signal: AbortSignal.timeout(this.config.timeout || 60000)
+      signal: AbortSignal.timeout(this.config?.timeout?? 60000)
     });
 
     if (!response.ok) {
@@ -185,8 +184,8 @@ export class OllamaAdapter implements OllamaClient {
     messages: Array<{ role: string, content, string }>,
     opts?: { model?: string, stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
-    const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
-    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/chat`;
+    const model = opts?.model ?? this.config?.chatModel?? 'gemma3:legal-latest';
+    const url = `${this.config?.baseUrl?? 'http://localhost:11434'}/api/chat`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -232,13 +231,13 @@ export class OllamaAdapter implements OllamaClient {
   }
 
   async listModels(): Promise<string[]> {
-    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/tags`;
+    const url = `${this.config?.baseUrl?? 'http://localhost:11434'}/api/tags`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Ollama listModels failed: ${response.statusText}`);
     }
     const data = await response.json();
-    return data.models?.map((m: { name: string }) => m.name) || [];
+    return data.models?.map((m: { name, string }) => m.name) || [];
   }
 }
 
@@ -256,7 +255,7 @@ export class RedisAdapter implements RedisCacheService {
     this.client = new Redis({
       ...this.parseRedisUrl(this.config.url),
       password: this.config.password,
-      maxRetriesPerRequest: this.config.maxRetriesPerRequest || 3,
+      maxRetriesPerRequest: this.config?.maxRetriesPerRequest?? 3,
       enableReadyCheck: this.config.enableReadyCheck !== false,
       lazyConnect: true
     });
@@ -269,8 +268,8 @@ export class RedisAdapter implements RedisCacheService {
       const parsed = new URL(url);
       return {
         host: parsed.hostname,
-        port: parseInt(parsed.port || '6379'),
-        password: parsed.password || undefined
+        port: parseInt(parsed?.port?? '6379'),
+        password: parsed?.password?? undefined
       };
     } catch {
       return { host: 'localhost', port: 6379 };
@@ -334,11 +333,11 @@ export class QdrantAdapter implements QdrantClient {
 
   private async ensureClient() {
     if (this.client) return;
-    const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest');
+    const { QdrantClient, QdrantClientLib } = await import('@qdrant/js-client-rest');
     this.client = new QdrantClientLib({
       url: `http://${this.config.host}:${this.config.port}`,
       apiKey: this.config.apiKey,
-      timeout: this.config.timeout || 30000
+      timeout: this.config?.timeout?? 30000
     });
   }
 
@@ -354,7 +353,7 @@ export class QdrantAdapter implements QdrantClient {
     const points = vectors.map((v) => ({
       id: v.id,
       vector: v.vector,
-      payload: v.payload || {}
+      payload: v?.payload|| {}
     }));
     await this.client.upsert(name, { points });
   }
@@ -365,9 +364,7 @@ export class QdrantAdapter implements QdrantClient {
     limit?: number
   ): Promise<QdrantSearchResult<T>[]> {
     await this.ensureClient();
-    const results = await this.client.search(collection, {
-      vector,
-      limit: limit || 10,
+    const results = await this.client.search(collection, { vector: limit: limit ?? 10,
       with_payload: true,
       with_vector: false
     });
@@ -392,7 +389,7 @@ export class QdrantAdapter implements QdrantClient {
   async getCollections(): Promise<string[]> {
     await this.ensureClient();
     const result = await this.client.getCollections();
-    return result.collections?.map((c: { name: string }) => c.name) || [];
+    return result.collections?.map((c: { name, string }) => c.name) || [];
   }
 }
 
@@ -411,13 +408,13 @@ export class PgVectorAdapter implements PgVectorClient {
       database: this.config.database,
       user: this.config.user,
       password: this.config.password,
-      ssl: this.config.ssl ? { rejectUnauthorized: false } : false,
-      max: this.config.max || 20,
-      idleTimeoutMillis: this.config.idleTimeoutMillis || 30000
+      ssl: this.config.ssl ? { rejectUnauthorized, false } : false,
+      max: this.config?.max?? 20,
+      idleTimeoutMillis: this.config?.idleTimeoutMillis?? 30000
     });
   }
 
-  async query(sql: string, params?: unknown[]): Promise<{ rows, any[] }> {
+  async query(sql: string, params?: unknown[]): Promise<{ rows: any[] }> {
     await this.ensurePool();
     return this.pool.query(sql, params);
   }
@@ -438,7 +435,7 @@ export class PgVectorAdapter implements PgVectorClient {
       ORDER BY embedding <=> $1::vector
       LIMIT $2
     `;
-    const result = await this.query(sql, [vectorStr, limit || 10]);
+    const result = await this.query(sql, [vectorStr, limit ?? 10]);
     return result.rows;
   }
 
@@ -451,7 +448,7 @@ export class PgVectorAdapter implements PgVectorClient {
       .join(',');
     const params: unknown[] = [];
     vectors.forEach((v) => {
-      params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v.metadata || {}));
+      params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v?.metadata|| {}));
     });
 
     const sql = `
@@ -502,7 +499,7 @@ export class MinIOAdapter implements MinIOClient {
 
   async makeBucket(bucket: string, region?: string): Promise<void> {
     await this.ensureClient();
-    await this.client.makeBucket(bucket, region || this.config.region || 'us-east-1');
+    await this.client.makeBucket(bucket, region || this.config?.region?? 'us-east-1');
   }
 
   async bucketExists(bucket: string): Promise<boolean> {
@@ -567,7 +564,7 @@ export class Neo4jAdapter implements Neo4jClient {
     this.driver = driver(
       this.config.uri: auth.basic(this.config.user: this.config.password)
     );
-    this.session = this.driver.session({ database: this.config.database || 'neo4j' });
+    this.session = this.driver.session({ database: this.config?.database?? 'neo4j' });
   }
   async run(
     cypher: string,

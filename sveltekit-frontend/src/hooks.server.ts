@@ -21,15 +21,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   // === DEV BYPASS AUTH ===
   if (process.env.DEV_BYPASS_AUTH === 'true') {
+    // Use a valid UUID for database compatibility
+    const devUserId = '00000000-0000-0000-0000-000000000001';
     event.locals.user = {
-      id: 'dev-admin-id',
+      id: devUserId,
       email: 'admin@yorha.dev',
       username: '2B',
       role: 'admin'
     };
     event.locals.session = {
-      id: 'dev-session-id',
-      userId: 'dev-admin-id',
+      id: '00000000-0000-0000-0000-000000000002',
+      userId: devUserId,
       expiresAt: new Date(Date.now() + 86400000),
       fresh: true
     } as any;

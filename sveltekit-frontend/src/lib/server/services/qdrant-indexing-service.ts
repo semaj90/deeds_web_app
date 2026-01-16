@@ -1,7 +1,7 @@
 import { env } from '$lib/env';
 
-const process.env.QDRANT_URL = env.QDRANT_URL || 'http://localhost:6333';
-const QDRANT_API_KEY = env.QDRANT_API_KEY || '';
+const process.env.QDRANT_URL = env?.QDRANT_URL?? 'http://localhost:6333';
+const QDRANT_API_KEY = env?.QDRANT_API_KEY?? '';
 
 /**
  * Qdrant collection names

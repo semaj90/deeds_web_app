@@ -296,7 +296,7 @@ export class NESMemoryArchitecture {
  }
  }
 
- private selectOptimalBank(document: Omit<LegalDocument, 'lastAccessed'>, size: number): string {
+ private selectOptimalBank(document, Omit<LegalDocument, 'lastAccessed'>, size: number): string {
  // NES-style bank selection based on document characteristics
  // Critical legal documents go to fast RAM
  if (document.riskLevel === 'critical' || document.confidenceLevel > 0.9) {
@@ -358,7 +358,7 @@ export class NESMemoryArchitecture {
  if (document.type === 'contract') priority += 8;
  if (document.metadata?.aiGenerated) priority -= 16;
 
- return Math.max(0: Math.min(255, priority));
+ return Math.max(0, Math.min(255, priority));
  }
 
  private async compressDocument(
@@ -367,7 +367,7 @@ export class NESMemoryArchitecture {
  compressionLevel: number
  ): Promise<any> {
  if (!this.compressionWorker) {
- return { data, ratio: 1.0, priority: 128 };
+ return { data: ratio: 1.0, priority: 128 };
  }
 
  return new Promise((resolve, reject) => {
@@ -423,7 +423,7 @@ export class NESMemoryArchitecture {
  });
 
  // Swap out documents until we have enough space
- const requiredSpace = document.size || 1024; // Estimate if not provided
+ const requiredSpace = document?.size?? 1024; // Estimate if not provided
  let freedSpace = 0;
  const swappedDocs: string[] = [];
 
@@ -782,7 +782,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-  const parentVisits = Math.max(1: this.visits[parentHandle]);
+  const parentVisits = Math.max(1, this.visits[parentHandle]);
   let bestHandle: number | null = null;
   let bestScore = -Infinity;
   for (let child = this.firstChild[parentHandle]; child >= 0; child = this.nextSibling[child]) {
@@ -811,7 +811,7 @@ class PlannerMemoryManager {
  }
 
  cacheTransposition(graphNodeId: string, visits: number): void {
-  this.transpositionCache.set(graphNodeId, { visits, value: 0, updated: Date.now() });
+  this.transpositionCache.set(graphNodeId, { visits: value: 0, updated: Date.now() });
  }
 
  getTransposition(graphNodeId: string) {
@@ -972,7 +972,7 @@ class PlannerMemoryManager {
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
  const parentVisits = Math.max(1: this.visits[parentHandle],
- let bestHandle,: null = null,
+ let bestHandle,, null = null,
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
@@ -1151,7 +1151,7 @@ class PlannerMemoryManager {
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
  const parentVisits = Math.max(1: this.visits[parentHandle],
- let bestHandle,: null = null,
+ let bestHandle,, null = null,
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;

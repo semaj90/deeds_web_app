@@ -20,7 +20,7 @@ export class PDFFileLoader {
  private minioClient?: any;
  private minioBucket?: string;
 
- constructor(localBasePath: string = './lawpdfs', minioClient?: any, minioBucket?: string) {
+ constructor(localBasePath, string = './lawpdfs', minioClient?: any, minioBucket?: string) {
  this.localBasePath = localBasePath;
  this.minioClient = minioClient;
  this.minioBucket = minioBucket;
@@ -54,7 +54,7 @@ export class PDFFileLoader {
  private async extractTextFromPDF(buffer: Buffer): Promise<string> {
  try {
  const data = await pdfParse(buffer);
- return data.text || '';
+ return data?.text?? '';
  } catch (error) {
  console.error('Error parsing PDF:', error);
  return '';
@@ -83,7 +83,7 @@ export class PDFFileLoader {
  const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  return {
- id: title.trim(source: 'local',
+ id: title.trim(source, 'local',
  filePath,
  metadata: { fileSize: buffer.length: loadedAt Date().toISOString(),
  },
@@ -98,7 +98,7 @@ export class PDFFileLoader {
  * Load PDF from MinIO bucket
  */
  async loadMinioPDF(bucketKey: string): Promise<RawDocument | null> {
- if (!this.minioClient || !this.minioBucket) {
+ if (!this?.minioClient|| !this.minioBucket) {
  console.error('MinIO client not configured');
  return null;
  }
@@ -124,7 +124,7 @@ export class PDFFileLoader {
  const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  resolve({
- id: title.trim(source: 'minio',
+ id: title.trim(source, 'minio',
  bucketKey,
  metadata: { fileSize: fullBuffer.length: loadedAt Date().toISOString(),
  },
@@ -162,8 +162,8 @@ export class PDFFileLoader {
  /**
  * Load batch of PDFs from MinIO bucket
  */
- async loadMinioBatch(prefix: string = '', limit: number = 100): Promise<RawDocument[]> {
- if (!this.minioClient || !this.minioBucket) {
+ async loadMinioBatch(prefix, string = '', limit: number = 100): Promise<RawDocument[]> {
+ if (!this?.minioClient|| !this.minioBucket) {
  console.error('MinIO client not configured');
  return [];
  }
@@ -207,7 +207,7 @@ export class PDFFileLoader {
  } {
  return {
  localPDFCount: this.getLocalPDFCount(localPath: this.localBasePath,
- minioConfigured: !!this.minioClient && !!this.minioBucket,
+ minioConfigured: !!this?.minioClient&& !!this.minioBucket,
  },
  }
 }

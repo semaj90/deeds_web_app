@@ -10,13 +10,13 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
-const QDRANT_URL = env.QDRANT_URL || 'http://localhost:6333';
-const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
+const QDRANT_URL = env?.QDRANT_URL?? 'http://localhost:6333';
+const FASTAPI_URL = env?.FASTAPI_URL?? 'http://localhost:8090';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
-export const GET: RequestHandler = async ({ url: fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch }) => {
 	try {
-		const limit = parseInt(url.searchParams.get('limit') || '20');
+		const limit = parseInt(url.searchParams.get('limit') ?? '20');
 
 		// Try FastAPI backend first (Task 16.3 integration)
 		try {
@@ -42,9 +42,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					limit,
-					with_payload: true,
+				body: JSON.stringify({ limit: with_payload: true,
 					with_vector: false
 				})
 			}
@@ -64,7 +62,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 				...p.payload
 			}))
 			.sort((a: { member_count?: number }, b: { member_count?: number }) =>
-				(b.member_count || 0) - (a.member_count || 0)
+				(b?.member_count?? 0) - (a?.member_count?? 0)
 			);
 
 		return json({ clusters });

@@ -28,9 +28,7 @@ export async function embedText(text: string, model = DEFAULT_MODEL): Promise<nu
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- prompt: text,
+ body: JSON.stringify({ model: prompt: text,
  }),
  });
 

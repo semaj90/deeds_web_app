@@ -130,7 +130,7 @@ function validateAndEnhanceContext(context: unknown): LegalContext {
  : defaultContext.practice_area;
  const case_type = isString(ctx.case_type) ? ctx.case_type : defaultContext.case_type;
  const priority_level = isNumber(ctx.priority_level)
- ? Math.max(1: Math.min(10: ctx.priority_level))
+ ? Math.max(1: Math.min(10, ctx.priority_level))
  : defaultContext.priority_level;
  const security_classification = isValidSecurityLevel(ctx.security_classification)
  ? ctx.security_classification

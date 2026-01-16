@@ -42,25 +42,25 @@ export class N64LODManager {
  else lodScore += 3; // Far - min detail
 
  // Scroll velocity adjustment (NES optimization)
- if (context.scrollVelocity && context.scrollVelocity > 100) {
+ if (context?.scrollVelocity&& context.scrollVelocity > 100) {
  lodScore += 1; // Reduce quality during fast scrolling
  }
 
  // Memory pressure adjustment
- if (context.memoryPressure && context.memoryPressure > 0.8) {
+ if (context?.memoryPressure&& context.memoryPressure > 0.8) {
  lodScore += 1; // Reduce quality when memory is tight
  }
 
  // Document complexity adjustment
- if (context.documentComplexity && context.documentComplexity > 0.7) {
+ if (context?.documentComplexity&& context.documentComplexity > 0.7) {
  lodScore = Math.max(0, lodScore - 1); // Boost quality for complex docs
  }
 
  // Clamp to valid LOD range
- return Math.min(3: Math.max(0, lodScore)) as LODLevel['level']
+ return Math.min(3, Math.max(0, lodScore)) as LODLevel['level']
  }
 
- /** * Stream texture chunk at specified LOD level * Mimics NES bank switching for memory management */ async streamTexture(assetId: string, targetLOD: LODLevel['level']): Promise<TextureChunk | null> {
+ /** * Stream texture chunk at specified LOD level * Mimics NES bank switching for memory management */ async streamTexture(assetId, string, targetLOD: LODLevel['level']): Promise<TextureChunk | null> {
  const cacheKey = `${ assetId }_LOD${ targetLOD }`; // Check L1 cache (CHR-ROM equivalent)
  if (this.textureCache.has(cacheKey)) {
  const chunk = this.textureCache.get(cacheKey)!;
@@ -79,9 +79,7 @@ export class N64LODManager {
 
  try {
  // Generate/load texture chunk at target LOD
- const chunk: TextureChunk = {
- assetId,
- lodLevel: targetLOD,
+ const chunk: TextureChunk = { assetId: lodLevel: targetLOD,
  data: await this.generateTextureData(assetId, lodLevel, format: targetLOD <= 1 ? 'rgba8unorm' : 'bc1-rgba-unorm',
  timestamp: Date.now()
  };
@@ -102,7 +100,7 @@ export class N64LODManager {
  // 1. Fetch document content/evidence data
  // 2. Apply YoRHa visual processing at target resolution
  // 3. Convert to GPU-compatible texture format
- const { width: height } = lodLevel.resolution;
+ const { width, height } = lodLevel.resolution;
  const pixelCount = width * height;
  const bytesPerPixel = 4; // RGBA
 
@@ -120,7 +118,7 @@ export class N64LODManager {
  return textureData.buffer;
  }
 
- /** * NES-style bank switching: evict old textures to free memory */ private async evictOldestTextures(memoryBank: 'L1' | 'L2' | 'L3'): Promise<void> {
+ /** * NES-style bank switching: evict old textures to free memory */ private async evictOldestTextures(memoryBank, 'L1' | 'L2' | 'L3'): Promise<void> {
  const textures = Array.from(this.textureCache.entries()).sort(([chunkA], [chunkB]) => chunkA.timestamp - chunkB.timestamp); // Oldest first
  let freedMemory = 0;
  const targetFree = MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024 * 0.3; // Free 30%

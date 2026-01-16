@@ -117,7 +117,7 @@ export class ClientEmbeddingService {
  );
 
  // Run inference
- const feeds = { input_ids: inputTensor };
+ const feeds = { input_ids, inputTensor };
  const results = await this.session.run(feeds);
 
  // Extract embeddings (assuming output is 'last_hidden_state' or similar)
@@ -158,9 +158,7 @@ export class ClientEmbeddingService {
  }
  }
 
- return {
- embeddings,
- model: 'embeddinggemma_300m_onnx',
+ return { embeddings: model: 'embeddinggemma_300m_onnx',
  dimension: embeddings[0]?.length ?? 0,
  count: embeddings.length,
  };
@@ -202,9 +200,7 @@ export class ClientEmbeddingService {
  embeddings: number[][],
  topK: number = 5
  ): { index: number; similarity, number }[] {
- const similarities = embeddings.map((emb, index) => ({
- index,
- similarity: this.cosineSimilarity(queryEmbedding, emb),
+ const similarities = embeddings.map((emb, index) => ({ index: similarity: this.cosineSimilarity(queryEmbedding, emb),
  }));
 
  return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
@@ -214,7 +210,7 @@ export class ClientEmbeddingService {
  * Check if the service is ready
  */
  isReady(): boolean {
- return this.isInitialized && this.session !== null;
+ return this?.isInitialized&& this.session !== null;
  }
 
  /**

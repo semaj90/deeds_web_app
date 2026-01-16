@@ -13,11 +13,11 @@ interface LoginRequest {
 	email: string; password: string;
 }
 
-export const POST: RequestHandler = async ({ request: cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
 		const body = (await request.json()) as LoginRequest;
 
-		if (!body.email || !body.password) {
+		if (!body?.email|| !body.password) {
 			return json({ error: 'Email and password required' }, { status: 400 });
 		}
 

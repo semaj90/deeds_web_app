@@ -143,7 +143,7 @@ class AuthSessionStore {
 		}
 	}
 
-	setTheme(theme: UIPreferences['theme']) {
+	setTheme(theme, UIPreferences['theme']) {
 		this._uiPrefs.theme = theme;
 		this.saveUIPreferences();
 	}
@@ -183,19 +183,19 @@ class AuthSessionStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: password }, credentials: 'include' // Important: include cookies
+				body: JSON.stringify({ email, password }, credentials: 'include' // Important: include cookies
 			});
 
 			if (!response.ok) {
 				const data = await response.json();
-				throw new Error(data.message || 'Login failed');
+				throw new Error(data?.message?? 'Login failed');
 			}
 
 			const data = await response.json();
 			this.user = data.user;
 			this.session = data.session;
 
-			return { success: true };
+			return { success, true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Login failed';
 			return { success: false, error: this.error };
@@ -225,7 +225,7 @@ class AuthSessionStore {
 			this.user = null;
 			this.session = null;
 
-			return { success: true };
+			return { success, true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Logout failed';
 			return { success: false, error: this.error };
@@ -252,7 +252,7 @@ class AuthSessionStore {
 			this.user = data.user;
 			this.session = data.session;
 
-			return { success: true };
+			return { success, true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Session refresh failed';
 			this.user = null;
@@ -277,13 +277,13 @@ class AuthSessionStore {
 
 			if (!response.ok) {
 				const data = await response.json();
-				throw new Error(data.message || 'Profile update failed');
+				throw new Error(data?.message?? 'Profile update failed');
 			}
 
 			const data = await response.json();
 			this.user = data.user;
 
-			return { success: true };
+			return { success, true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Profile update failed';
 			return { success: false, error: this.error };

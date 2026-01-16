@@ -42,9 +42,9 @@ export const shaderCacheEntries = pgTable('shader_cache_entries', {
  // Version and lifecycle
  version: integer('version').default(1),
  deprecated: boolean('deprecated').default(false),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
- lastAccessedAt: timestamp('last_accessed_at', { withTimezone: true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow(),
+ lastAccessedAt: timestamp('last_accessed_at', { withTimezone, true }),
  // MinIO integration for large assets
  minioPath: text('minio_path'), // Optional path for large shader assets
  assetBundle: jsonb('asset_bundle').$type<Record<string, unknown> | null>(),
@@ -56,7 +56,7 @@ export const shaderUserPatterns = pgTable('shader_user_patterns', {
  shaderId: uuid('shader_id').references(() => shaderCacheEntries.id, { onDelete: 'cascade' }), // fixed .references usage
  userId: text('user_id').notNull(),
  sessionId: text('session_id'),
- accessTimestamp: timestamp('access_timestamp', { withTimezone: true }).defaultNow(),
+ accessTimestamp: timestamp('access_timestamp', { withTimezone, true }).defaultNow(),
  timeOfDay: integer('time_of_day'), // hour of day (0-23)
  workflowStep: text('workflow_step'),
  loadLatencyMs: integer('load_latency_ms'),
@@ -70,7 +70,7 @@ export const shaderUserPatterns = pgTable('shader_user_patterns', {
  actionVector: vector('action_vector', { dimensions: 32 }), // Action embedding
  reward: real('reward'), // Computed reward for this access
  reinforcement_data: jsonb('reinforcement_data').$type<Record<string, unknown> | null>(),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow(),
 });
 
 export const shaderPreloadRules = pgTable('shader_preload_rules', {
@@ -94,9 +94,9 @@ export const shaderPreloadRules = pgTable('shader_preload_rules', {
  // Lifecycle
  active: boolean('active').default(true),
  learningRate: real('learning_rate').default(0.01),
- lastTriggered: timestamp('last_triggered', { withTimezone: true }),
- lastUpdated: timestamp('last_updated', { withTimezone: true }).defaultNow(),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+ lastTriggered: timestamp('last_triggered', { withTimezone, true }),
+ lastUpdated: timestamp('last_updated', { withTimezone, true }).defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow(),
 });
 
 export const shaderDependencies = pgTable('shader_dependencies', {
@@ -116,9 +116,9 @@ export const shaderDependencies = pgTable('shader_dependencies', {
  loadLatencyImpactMs: integer('load_latency_impact_ms'),
  // Usage statistics
  coUsageFrequency: real('co_usage_frequency'), // 0-1 how often used together
- lastCoUsed: timestamp('last_co_used', { withTimezone: true }),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+ lastCoUsed: timestamp('last_co_used', { withTimezone, true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow(),
 });
 
 // Define valid status values as a union type
@@ -150,16 +150,16 @@ export const shaderCompilationQueue = pgTable('shader_compilation_queue', {
  sessionId: text('session_id'),
  workflowContext: jsonb('workflow_context').$type<Record<string, unknown> | null>(),
  // Queue timing
- queuedAt: timestamp('queued_at', { withTimezone: true }).defaultNow(),
- startedAt: timestamp('started_at', { withTimezone: true }),
- completedAt: timestamp('completed_at', { withTimezone: true }),
+ queuedAt: timestamp('queued_at', { withTimezone, true }).defaultNow(),
+ startedAt: timestamp('started_at', { withTimezone, true }),
+ completedAt: timestamp('completed_at', { withTimezone, true }),
  // Processing results
  compilationResult: jsonb('compilation_result').$type<Record<string, unknown> | null>(),
  // Retry logic
  retryCount: integer('retry_count').default(0),
  maxRetries: integer('max_retries').default(3),
- nextRetryAt: timestamp('next_retry_at', { withTimezone: true }),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+ nextRetryAt: timestamp('next_retry_at', { withTimezone, true }),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow(),
 });
 
 /**
@@ -175,8 +175,8 @@ export const shaderRecommendationsView = pgTable('shader_recommendations_view', 
  baseContext: jsonb('base_context').$type<Record<string, unknown> | null>(), // Context that triggered this recommendation
  expectedBenefit: real('expected_benefit'), // Expected performance/satisfaction improvement
  // Metadata
- computedAt: timestamp('computed_at', { withTimezone: true }).defaultNow(),
- validUntil: timestamp('valid_until', { withTimezone: true }),
+ computedAt: timestamp('computed_at', { withTimezone, true }).defaultNow(),
+ validUntil: timestamp('valid_until', { withTimezone, true }),
  // Performance tracking
  timesRecommended: integer('times_recommended').default(0),
  timesAccepted: integer('times_accepted').default(0),

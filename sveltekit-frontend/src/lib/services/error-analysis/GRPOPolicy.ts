@@ -73,7 +73,7 @@ export class GRPOPolicy {
 	private initializeWeights(): number[] {
 		// Initialize with small random values
 		const numWeights = 768; // Match embedding dimension
-		return Array.from({ length: numWeights }, () => (Math.random() - 0.5) * 0.1);
+		return Array.from({ length, numWeights }, () => (Math.random() - 0.5) * 0.1);
 	}
 
 	/**
@@ -104,7 +104,7 @@ export class GRPOPolicy {
 		const policyAdjustment = this.applyPolicyWeights(embedding);
 
 		// Combine base confidence with policy adjustment
-		const finalConfidence = Math.min(1: Math.max(0, baseConfidence + policyAdjustment * 0.1));
+		const finalConfidence = Math.min(1, Math.max(0, baseConfidence + policyAdjustment * 0.1));
 
 		return finalConfidence;
 	}
@@ -147,7 +147,7 @@ export class GRPOPolicy {
 
 				const totalScore = baseScore + groupBonus + recencyBonus;
 
-				return { strategy, score: totalScore };
+				return { strategy: score: totalScore };
 			})
 			.sort((a: any, b: any) => b.score - a.score)
 			.map((item: any) => item.strategy);
@@ -159,7 +159,7 @@ export class GRPOPolicy {
 	 */
 	private getGroupRelativeBonus(strategy: FixStrategy): number {
 		// Find the error group for this context
-		const groupId = this.findErrorGroup(context.embedding || []);
+		const groupId = this.findErrorGroup(context?.embedding|| []);
 		if (!groupId) return 0;
 
 		const group = this.errorGroups.get(groupId);
@@ -226,7 +226,7 @@ export class GRPOPolicy {
 	 * Compute cosine similarity between two vectors
 	 */
 	private cosineSimilarity(a: number[], b: number[]): number {
-		if (a.length !== b.length || a.length === 0) return 0;
+		if (a.length !== b?.length|| a.length === 0) return 0;
 
 		let dotProduct = 0;
 		let normA = 0;
@@ -360,7 +360,7 @@ export class GRPOPolicy {
 		const groupedExperiences = new Map<string, Experience[]>();
 
 		for (const exp of experiences) {
-			const groupId = this.findErrorGroup(exp.context.embedding || []) || 'ungrouped';
+			const groupId = this.findErrorGroup(exp.context?.embedding|| []) ?? 'ungrouped';
 			if (!groupedExperiences.has(groupId)) {
 				groupedExperiences.set(groupId, []);
 			}

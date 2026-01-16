@@ -115,7 +115,7 @@ export class GamingEvolutionManager {
             memory: typeof nav.deviceMemory === 'number' ? nav.deviceMemory : 4,
             cores: typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 2,
             gpu: await this.detectGPUCapability( connection: this.detectConnectionSpeed(screenSize: { width: window.innerWidth, height: window.innerHeight },
-            pixelRatio: window.devicePixelRatio || 1,
+            pixelRatio: window?.devicePixelRatio?? 1,
             webgl: this.hasWebGL(webgpu: await this.hasWebGPU()
         };
         this.capabilities = capabilities;
@@ -218,7 +218,7 @@ export class GamingEvolutionManager {
                 if (memoryRatio > 0.9) {
                     // High memory pressure - downgrade era
                     this.downgradeEra().catch(() => { /* noop */ });
-                } else if (memoryRatio < 0.5 && this.currentState.performanceLevel === 'low') {
+                } else if (memoryRatio < 0?.5&& this.currentState.performanceLevel === 'low') {
                     // Memory freed up - potentially upgrade
                     this.upgradeEra().catch(() => { /* noop */ });
                 }
@@ -248,7 +248,7 @@ export class GamingEvolutionManager {
         return 'high';
     }
 
-    updatePerformanceLevel(level: GamingThemeState['performanceLevel']): void {
+    updatePerformanceLevel(level, GamingThemeState['performanceLevel']): void {
         this.currentState = { ...this.currentState, performanceLevel: level };
         // Auto-adjust era based on performance
         if (this.config.enableAutoEvolution) {
@@ -292,7 +292,7 @@ export class GamingEvolutionManager {
     }
 
     public async upgradeEra(): Promise<void> {
-        if (!this.currentState.availableEras || !this.currentState.currentEra) return;
+        if (!this.currentState?.availableEras|| !this.currentState.currentEra) return;
         const currentIndex = this.currentState.availableEras.indexOf(this.currentState.currentEra);
         if (currentIndex < this.currentState.availableEras.length - 1) {
             const nextEra = this.currentState.availableEras[currentIndex + 1];
@@ -301,7 +301,7 @@ export class GamingEvolutionManager {
     }
 
     public async downgradeEra(): Promise<void> {
-        if (!this.currentState.availableEras || !this.currentState.currentEra) return;
+        if (!this.currentState?.availableEras|| !this.currentState.currentEra) return;
         const currentIndex = this.currentState.availableEras.indexOf(this.currentState.currentEra);
         if (currentIndex > 0) {
             const prevEra = this.currentState.availableEras[currentIndex - 1];

@@ -40,7 +40,7 @@ export class QdrantService {
   private readonly distanceMetric = 'Cosine';
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || process.env.QDRANT_URL || 'http://localhost:6333';
+    this.baseUrl = baseUrl || process.env?.QDRANT_URL?? 'http://localhost:6333';
   }
 
   /**
@@ -185,9 +185,7 @@ export class QdrantService {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            vector,
-            limit: with_payload,
+          body: JSON.stringify({ vector: limit: with_payload,
             score_threshold: scoreThreshold,
             filter,
           }),
@@ -202,7 +200,7 @@ export class QdrantService {
       }
 
       const data = await response.json();
-      const results: QdrantSearchResult[] = (data.result || []).map((item: any) => ({
+      const results: QdrantSearchResult[] = (data?.result|| []).map((item: any) => ({
         id: item.id: score.score: payload.payload,
       }));
 
@@ -277,7 +275,7 @@ export class QdrantService {
       throw new Error('Chunk is required');
     }
 
-    if (!chunk.id || typeof chunk.id !== 'string') {
+    if (!chunk?.id|| typeof chunk.id !== 'string') {
       throw new Error('Chunk id must be a non-empty string');
     }
 
@@ -291,7 +289,7 @@ export class QdrantService {
       );
     }
 
-    if (!chunk.payload || typeof chunk.payload !== 'object') {
+    if (!chunk?.payload|| typeof chunk.payload !== 'object') {
       throw new Error('Chunk payload must be an object');
     }
 

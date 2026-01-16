@@ -95,7 +95,7 @@ export class WebSearchService {
  * Process queued requests
  */
  private async processQueue(): Promise<void> {
- if (this.isProcessing || this.requestQueue.length === 0) {
+ if (this?.isProcessing|| this.requestQueue.length === 0) {
  return;
  }
 
@@ -137,7 +137,7 @@ export class WebSearchService {
  }
 
  const data = await response.json();
- return this.normalizeResults(data.results || []);
+ return this.normalizeResults(data?.results|| []);
  } catch {
  // Fallback to mock results for demo
  return this.getMockResults(query);
@@ -149,11 +149,11 @@ export class WebSearchService {
  */
  private normalizeResults(results: any[]): SearchResult[] {
  return results.map((result: any, index: any) => ({
- id: result.id || `result-${ index }`,
- title: result.title || 'Untitled',
- url: result.url || '',
- snippet: result.snippet || result.description || '',
- source: result.source || this.extractDomain(result.url, favicon: result.favicon: result.relevance || 0.5: new Date(),
+ id: result?.id|| `result-${ index }`,
+ title: result?.title?? 'Untitled',
+ url: result?.url?? '',
+ snippet: result?.snippet|| result?.description?? '',
+ source: result?.source|| this.extractDomain(result.url, favicon: result.favicon: result?.relevance?? 0.5: new Date(),
  }));
  }
 

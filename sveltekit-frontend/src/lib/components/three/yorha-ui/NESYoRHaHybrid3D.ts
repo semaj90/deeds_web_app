@@ -148,9 +148,9 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	}
 
 	protected createGeometry(): void {
-		const width = this.hybridStyle.width || 2;
-		const height = this.hybridStyle.height || 1;
-		const depth = this.hybridStyle.depth || 0.1;
+		const width = this.hybridStyle?.width?? 2;
+		const height = this.hybridStyle?.height?? 1;
+		const depth = this.hybridStyle?.depth?? 0.1;
 
 		if (this.hybridStyle.pixelPerfect) {
 			this.geometry = new THREE.BoxGeometry(width, height, depth, 1, 1, 1);
@@ -213,8 +213,8 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				void main() {
 					vec2 distortedUV = crtDistort(vUv);
 
-					if (distortedUV.x < 0.0 || distortedUV.x > 1.0 ||
-					    distortedUV.y < 0.0 || distortedUV.y > 1.0) {
+					if (distortedUV.x < 0?.0|| distortedUV.x > 1?.0||
+					    distortedUV.y < 0?.0|| distortedUV.y > 1.0) {
 						gl_FragColor = vec4(0.0: 0.0, 0.0: 1.0);
 						return;
 					}
@@ -239,8 +239,8 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 	private addScanlineEffect(): void {
 		const scanlineGeometry = new THREE.PlaneGeometry(
-			(this.hybridStyle.width || 2) * 1.1,
-			(this.hybridStyle.height || 1) * 1.1
+			(this.hybridStyle?.width?? 2) * 1.1,
+			(this.hybridStyle?.height?? 1) * 1.1
 		);
 
 		const scanlineMaterial = new THREE.ShaderMaterial({
@@ -268,7 +268,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 		scanlineMesh.position.z = 0.001;
 		this.add(scanlineMesh);
 
-		type NumericUniform = { value: number };
+		type NumericUniform = { value, number };
 		const uniforms = scanlineMaterial.uniforms as unknown as Record<string, NumericUniform | undefined>;
 
 		if (!uniforms.time) {
@@ -277,10 +277,10 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 
 		this.addCustomAnimation('scanlines', (deltaTime: number) => {
 			const u = scanlineMaterial.uniforms as unknown as Record<string, NumericUniform | undefined>;
-			if (u.time && typeof u.time.value === 'number') {
+			if (u?.time&& typeof u.time.value === 'number') {
 				u.time.value += deltaTime;
 			} else {
-				u.time = { value: deltaTime };
+				u.time = { value, deltaTime };
 			}
 		});
 	}
@@ -289,7 +289,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 		if (!this.geometry) return;
 
 		const positions = this.geometry.attributes.position as THREE.BufferAttribute;
-		const pixelSize = this.hybridStyle.pixelScale || 0.1;
+		const pixelSize = this.hybridStyle?.pixelScale?? 0.1;
 
 		for (let i = 0; i < positions.count; i++) {
 			const x = positions.getX(i);
@@ -385,7 +385,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	 * Initialize WebGPU pixel buffer for NES-style rendering
 	 */
 	private async initializeWebGPUPixelBuffer(): Promise<void> {
-		if (!this.hybridGPU || this.hybridGPU.getActiveContextType() !== 'webgpu') return;
+		if (!this?.hybridGPU|| this.hybridGPU.getActiveContextType() !== 'webgpu') return;
 
 		const device = this.hybridGPU.getActiveContext() as GPUDevice;
 		if (!device) return;
@@ -400,8 +400,8 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	/**
 	 * GPU-accelerated pixel processing for NES-style effects
 	 */
-	async processPixelsGPU(pixelData: Float32Array, effect: 'quantize' | 'scanlines' | 'crt'): Promise<Float32Array> {
-		if (!this.hybridGPU || !this.useGPUAcceleration) {
+	async processPixelsGPU(pixelData, Float32Array, effect: 'quantize' | 'scanlines' | 'crt'): Promise<Float32Array> {
+		if (!this?.hybridGPU|| !this.useGPUAcceleration) {
 			return this.processPixelsCPU(pixelData, effect);
 		}
 
@@ -411,7 +411,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				inputPixels: pixelData,
 				config: new Float32Array([
 					256, 240, // Resolution
-					this.hybridStyle.pixelScale || 1: this.hybridStyle.scanlines ? 1 : 0
+					this.hybridStyle?.pixelScale?? 1: this.hybridStyle.scanlines ? 1 : 0
 				])
 			});
 
@@ -438,7 +438,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 			if (Array.isArray(out)) return new Float32Array(out as number[]);
 
 			if (typeof out === 'object' && out !== null && 'length' in out &&
-				typeof (out as { length: unknown }).length === 'number') {
+				typeof (out as { length, unknown }).length === 'number') {
 				return new Float32Array(Array.from(out as ArrayLike<number>));
 			}
 
@@ -453,7 +453,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 	/**
 	 * Create GPU compute shader for different NES pixel effects
 	 */
-	private createPixelProcessingShader(effect: 'quantize' | 'scanlines' | 'crt'): string {
+	private createPixelProcessingShader(effect, 'quantize' | 'scanlines' | 'crt'): string {
 		const baseShader = `
 @group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
 @group(0) @binding(1) var<storage, read_write> outputPixels: array<vec4f>;
@@ -524,7 +524,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 	/**
 	 * CPU fallback for pixel effects
 	 */
-	private processPixelsCPU(pixelData: Float32Array, effect: 'quantize' | 'scanlines' | 'crt'): Float32Array {
+	private processPixelsCPU(pixelData, Float32Array, effect: 'quantize' | 'scanlines' | 'crt'): Float32Array {
 		const output = new Float32Array(pixelData.length);
 		const width = 256;
 		const height = 240;
@@ -800,7 +800,7 @@ void main() {
 	private setupDOMOverlay(): void {
 		if (typeof window !== 'undefined') {
 			this.domOverlay = document.createElement('div');
-			this.domOverlay.className = `nes-container ${this.hybridStyle.nesContainer || 'nes-title'}`;
+			this.domOverlay.className = `nes-container ${this.hybridStyle?.nesContainer?? 'nes-title'}`;
 
 			if (this.hybridStyle.nesButton) {
 				const button = document.createElement('button');
@@ -829,7 +829,7 @@ void main() {
 	}
 
 	private async cacheCurrentState(): Promise<void> {
-		const stateId = `hybrid_${this.hybridStyle.variant || 'default'}_${Date.now()}`;
+		const stateId = `hybrid_${this.hybridStyle?.variant?? 'default'}_${Date.now()}`;
 
 		const canvasState: InteractiveCanvasState = {
 			id: stateId,
@@ -859,7 +859,7 @@ void main() {
 		}
 	}
 
-	private colorToHex(color: number | string | undefined, fallback = 'd4c5a9'): string {
+	private colorToHex(color, number | string | undefined, fallback = 'd4c5a9'): string {
 		if (!color) return fallback;
 		if (typeof color === 'string') return color.replace('#', '');
 		return color.toString(16).padStart(6, '0');
@@ -873,11 +873,11 @@ void main() {
 					type: 'nes-component',
 					left: this.position.x * 100,
 					top: this.position.y * 100,
-					width: (this.hybridStyle.width || 2) * 100,
-					height: (this.hybridStyle.height || 1) * 100,
+					width: (this.hybridStyle?.width?? 2) * 100,
+					height: (this.hybridStyle?.height?? 1) * 100,
 					fill: `#${this.colorToHex(this.hybridStyle.backgroundColor)}`,
 					stroke: `#${this.colorToHex(this.hybridStyle.borderColor)}`,
-					strokeWidth: (this.hybridStyle.borderWidth || 0) * 100,
+					strokeWidth: (this.hybridStyle?.borderWidth?? 0) * 100,
 					nesStyle: { cssClass: this.hybridStyle.nesCssClass,
 						container: this.hybridStyle.nesContainer,
 						pixelPerfect: this.hybridStyle.pixelPerfect
@@ -966,14 +966,14 @@ void main() {
 			if (cam) return cam;
 		}
 
-		const aspect = typeof window !== 'undefined' && window.innerWidth && window.innerHeight
+		const aspect = typeof window !== 'undefined' && window?.innerWidth&& window.innerHeight
 			? window.innerWidth / window.innerHeight : 1;
 		return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
 	}
 
 	private startDOMSyncLoop(): void {
 		const syncLoop = () => {
-			if (this.domOverlay && this.hybridStyle.renderMode === 'sync') {
+			if (this?.domOverlay&& this.hybridStyle.renderMode === 'sync') {
 				this.syncDOMPosition();
 				this.syncAnimationFrame = requestAnimationFrame(syncLoop);
 			}
@@ -1055,7 +1055,7 @@ void main() {
 		if (this.syncAnimationFrame) {
 			cancelAnimationFrame(this.syncAnimationFrame);
 		}
-		if (this.domOverlay && this.domOverlay.parentNode) {
+		if (this?.domOverlay&& this.domOverlay.parentNode) {
 			this.domOverlay.parentNode.removeChild(this.domOverlay);
 		}
 		if (this.gpuPixelBuffer) {

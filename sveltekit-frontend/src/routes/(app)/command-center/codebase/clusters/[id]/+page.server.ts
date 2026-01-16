@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
             body: JSON.stringify({limit: 200,
                 with_payload: true,
                 filter: {must: [
-                        { key: 'cluster_id', match: {value: clusterId } }
+                        { key: 'cluster_id', match: { value, clusterId } }
                     ]
                 }
             })
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
             body: JSON.stringify({limit: 100,
                 with_payload: true,
                 filter: {must: [
-                        { key: 'clusterId', match: {value: clusterId } }
+                        { key: 'clusterId', match: { value, clusterId } }
                     ]
                 }
             })

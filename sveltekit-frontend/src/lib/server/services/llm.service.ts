@@ -24,7 +24,7 @@ export class LLMService {
  private model: string = 'gemma3-legal:latest';
 
  constructor() {
- this.ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+ this.ollamaUrl = process.env?.OLLAMA_URL?? 'http://localhost:11434';
  }
 
  /**
@@ -160,7 +160,7 @@ Return only valid JSON.`;
  }
 
  const data = await response.json();
- return data.response || '';
+ return data?.response?? '';
  } catch (error) {
  console.error('Error calling Ollama:', error);
  throw error;
@@ -188,12 +188,12 @@ Return only valid JSON.`;
  const parsed = JSON.parse(jsonMatch[0]);
 
  return {
- overview: parsed.overview || '',
- issueStatement: parsed.issueStatement || '',
- holding: parsed.holding || '',
- ruleExtraction: parsed.ruleExtraction || '',
- keyTerms: parsed.keyTerms || [],
- citations: parsed.citations || [],
+ overview: parsed?.overview?? '',
+ issueStatement: parsed?.issueStatement?? '',
+ holding: parsed?.holding?? '',
+ ruleExtraction: parsed?.ruleExtraction?? '',
+ keyTerms: parsed?.keyTerms|| [],
+ citations: parsed?.citations|| [],
  };
  } catch (error) {
  console.error('Error parsing summary response:', error);

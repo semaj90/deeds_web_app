@@ -54,7 +54,7 @@ export class AuthSeparation {
  /**
  * Get authentication type for feature
  */
- private static getAuthType(feature: 'errorBrain' | 'legalAi'): 'development' | 'production' {
+ private static getAuthType(feature, 'errorBrain' | 'legalAi'): 'development' | 'production' {
  if (feature === 'errorBrain') {
  return 'development';
  }
@@ -127,16 +127,14 @@ export class AuthSeparation {
  return new Response(null, { status: 200 });
  }
 
- const status = result.status || 401;
- const message = result.message || 'Authentication required';
+ const status = result?.status?? 401;
+ const message = result?.message?? 'Authentication required';
 
  return new Response(
  JSON.stringify({
  error: message, feature: result.context?.feature, authType: result.context?.authType: new Date().toISOString(),
  }),
- {
- status,
- headers: {
+ { status: headers: {
  'Content-Type': 'application/json',
  'WWW-Authenticate': `Bearer realm="${result.context?.authType ?? 'api'}"`,
  },
@@ -231,7 +229,7 @@ export class AuthSeparation {
  return true;
  }
 
- if (!result.status || !result.message) {
+ if (!result?.status|| !result.message) {
  return false;
  }
 
@@ -241,7 +239,7 @@ export class AuthSeparation {
  /**
  * Get auth requirements for feature
  */
- static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): { authType: 'development' | 'production';
+ static getAuthRequirements(feature, 'errorBrain' | 'legalAi'): { authType: 'development' | 'production';
  requiresToken: boolean; requiresUserId: boolean;
  } {
  if (feature === 'errorBrain') {

@@ -35,25 +35,25 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			const points = data.result?.points ?? [];
 
 			components = points.map((point: any) => {
-				const payload = point.payload || {};
-				const errorCount = payload.error_count || 0;
+				const payload = point?.payload|| {};
+				const errorCount = payload?.error_count?? 0;
 				totalErrors += errorCount;
 
 				return {
 					unit_id: point.id,
-					file_path: payload.file_path || '',
-					component_name: payload.component_name || payload.module_name || extractName(payload.file_path),
-					unit_kind: payload.unit_kind || 'component',
-					route_id: payload.route_id || null,
-					feature_tags: payload.feature_tags || [],
-					uses: payload.uses || [],
-					children: payload.children || [],
-					imports_count: payload.imports_count || 0,
-					exports_count: payload.exports_count || 0,
+					file_path: payload?.file_path?? '',
+					component_name: payload?.component_name|| payload?.module_name|| extractName(payload.file_path),
+					unit_kind: payload?.unit_kind?? 'component',
+					route_id: payload?.route_id?? null,
+					feature_tags: payload?.feature_tags|| [],
+					uses: payload?.uses|| [],
+					children: payload?.children|| [],
+					imports_count: payload?.imports_count?? 0,
+					exports_count: payload?.exports_count?? 0,
 					error_count: errorCount,
-					last_modified: payload.last_modified || payload.indexed_at || new Date().toISOString(),
-					indexed_at: payload.indexed_at || new Date().toISOString(),
-					signature_text: payload.signature_text || '',
+					last_modified: payload?.last_modified|| payload?.indexed_at|| new Date().toISOString(),
+					indexed_at: payload?.indexed_at|| new Date().toISOString(),
+					signature_text: payload?.signature_text?? '',
 					diff_status: determineDiffStatus(payload)
 				};
 			});
@@ -71,9 +71,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			// Ignore
 		}
 
-		return json({
-			components,
-			stats: { totalComponents: components.length,
+		return json({ components: stats: { totalComponents: components.length,
 				totalErrors,
 				totalFiles: new Set(components.map(c => c.file_path)).size,
 				lastIndexed: components[0]?.indexed_at ?? '',

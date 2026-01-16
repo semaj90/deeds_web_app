@@ -234,7 +234,7 @@ export class OptimizedGPUMarkdownProcessor {
  }
  }
 
- async processWithOptimization(markdown: string, operation: string = 'process'): Promise<any> {
+ async processWithOptimization(markdown, string, operation: string = 'process'): Promise<any> {
  this.monitor.startOperation(operation);
 
  try {

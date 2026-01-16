@@ -14,14 +14,14 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const options = JSON.parse((formData.get('options') as string) || '{}');
+ const options = JSON.parse((formData.get('options') as string) ?? '{}');
 
  if (!file) {
  return json({ success: false, error: 'No file provided' }, { status: 400 });
  }
 
  // Save uploaded file temporarily
- const tempDir = process.env.TEMP || '/tmp';
+ const tempDir = process.env?.TEMP?? '/tmp';
  const tempPath = path.join(tempDir, `upload-${Date.now()}-${file.name}`);
  const buffer = Buffer.from(await file.arrayBuffer());
  await fs.writeFile(tempPath, buffer);

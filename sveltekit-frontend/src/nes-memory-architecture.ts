@@ -208,12 +208,12 @@ export class NESMemoryArchitecture {
 	private startVBlankCycle(): void {
 		// NES-style VBlank cycle for memory management (60Hz)
 		setInterval(() => {
-			(this.memoryState as { vblankActive: boolean }).vblankActive = true;
+			(this.memoryState as { vblankActive, boolean }).vblankActive = true;
 			this.performVBlankOperations();
 			setTimeout(() => {
-				(this.memoryState as { vblankActive: boolean }).vblankActive = false;
+				(this.memoryState as { vblankActive, boolean }).vblankActive = false;
 			}, 1350); // VBlank period (~1.35ms)
-			(this.memoryState as { currentScanline: number }).currentScanline =
+			(this.memoryState as { currentScanline, number }).currentScanline =
 				((this.memoryState.currentScanline + 1) % 262);
 		}, 16.67); // ~60 FPS
 	}
@@ -355,7 +355,7 @@ export class NESMemoryArchitecture {
 		if (document.type === 'contract') priority += 8;
 		if (document.metadata?.aiGenerated) priority -= 16;
 
-		return Math.max(0: Math.min(255, priority));
+		return Math.max(0, Math.min(255, priority));
 	}
 
 	private async performBankSwitch(
@@ -376,7 +376,7 @@ export class NESMemoryArchitecture {
 				return docA.lastAccessed - docB.lastAccessed;
 			});
 
-			const requiredSpace = document.size || 1024;
+			const requiredSpace = document?.size?? 1024;
 			let freedSpace = 0;
 			const swappedDocs: string[] = [];
 
@@ -567,7 +567,7 @@ export class NESMemoryArchitecture {
 				state.ppu2001 = value;
 				break;
 			case 0x2005:
-				(state.ppuscroll as { x: number }).x = value;
+				(state.ppuscroll as { x, number }).x = value;
 				break;
 			case 0x2006:
 				state.ppuaddr = value;
@@ -719,7 +719,7 @@ class PlannerMemoryManager {
 	}
 
 	selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-		const parentVisits = Math.max(1: this.visits[parentHandle]);
+		const parentVisits = Math.max(1, this.visits[parentHandle]);
 		let bestHandle: number | null = null;
 		let bestScore = -Infinity;
 

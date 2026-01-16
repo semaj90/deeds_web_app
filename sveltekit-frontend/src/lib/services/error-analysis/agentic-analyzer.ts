@@ -164,8 +164,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const data = await res.json();
 
  return {
- text: data.response || '',
- tokens: data.eval_count || 0,
+ text: data?.response?? '',
+ tokens: data?.eval_count?? 0,
  model: this.llmModel,
  timestamp: new Date(),
  };

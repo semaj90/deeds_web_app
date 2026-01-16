@@ -188,7 +188,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  global.fetch = async (url: string, options?: any) => {
  if (url.includes('mcp/json-validation')) {
  fetchCalled = true;
- return { ok: true } as Response;
+ return { ok, true } as Response;
  }
  return originalFetch(url, options);
  };

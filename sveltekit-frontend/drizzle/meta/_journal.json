@@ -36,6 +36,13 @@
       "when": 1768445668282,
       "tag": "0004_strong_mindworm",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1768536520418,
+      "tag": "0005_dapper_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

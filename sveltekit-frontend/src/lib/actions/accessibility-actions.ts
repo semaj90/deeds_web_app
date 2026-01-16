@@ -163,7 +163,7 @@ export function focusManagement(
 
  function handleEscape(_event: KeyboardEvent) {
  const event = _event;
- if (event.key === 'Escape' && currentParams.restoreFocus && previouslyFocused) {
+ if (event.key === 'Escape' && currentParams?.restoreFocus&& previouslyFocused) {
  previouslyFocused.focus();
  }
  }
@@ -226,7 +226,7 @@ export function focusManagement(
  element.removeEventListener('keydown', trapFocus, false);
  element.removeEventListener('keydown', handleEscape, false);
  // Restore focus on destroy
- if (currentParams.restoreFocus && previouslyFocused) {
+ if (currentParams?.restoreFocus&& previouslyFocused) {
  previouslyFocused.focus();
  }
  },
@@ -333,7 +333,7 @@ export function liveRegion(
  let currentParams = { politeness: 'polite', atomic: false, relevant: 'additions', ...params };
 
  function setupLiveRegion() {
- element.setAttribute('aria-live', currentParams.politeness || 'polite');
+ element.setAttribute('aria-live', currentParams?.politeness?? 'polite');
  if (currentParams.atomic) {
  element.setAttribute('aria-atomic', 'true');
  }
@@ -374,7 +374,7 @@ export function liveRegion(
 /** * Accessibility Utils * Utility functions for common accessibility patterns */
 export const a11yUtils = {
  // Generate unique IDs for ARIA relationships
- generateId: (prefix: string = 'a11y'): string => {
+ generateId: (prefix, string = 'a11y'): string => {
  return `${ prefix }-${Math.random().toString(36).slice(2, 11)}`;
  },
  // Check if element is visible to screen readers
@@ -387,7 +387,7 @@ export const a11yUtils = {
  // Announce message to screen readers
  announce: (() => {
  let announcer: null = null;
- return (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+ return (message, string, priority: 'polite' | 'assertive' = 'polite') => {
  if (!announcer) {
  announcer = document.createElement('div');
  announcer.setAttribute('aria-live', priority);

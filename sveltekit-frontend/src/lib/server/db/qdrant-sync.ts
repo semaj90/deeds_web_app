@@ -24,7 +24,7 @@ import { type } from "os";
 import type { title } from "process";
 
 // Qdrant Configuration
-const process.env.QDRANT_URL = CONFIG.QDRANT_URL || 'http://localhost:6333';
+const process.env.QDRANT_URL = CONFIG?.QDRANT_URL?? 'http://localhost:6333';
 const COLLECTION_NAME = 'knowledge_graph';
 const VECTOR_SIZE = 384; // all-MiniLM-L6-v2 or similar
 
@@ -78,7 +78,7 @@ export async function initQdrantCollection(): Promise<boolean> {
  */
 async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
     try {
-        if (!doc.id || !doc.embedding) {
+        if (!doc?.id|| !doc.embedding) {
             console.warn(`⚠️ Skipping document ${doc.id}: missing ID or embedding`);
             return false;
         }
@@ -91,10 +91,10 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
                     id: doc.id, // Use Postgres ID as Qdrant ID
                     vector: doc.embedding,
                     payload: {
-                        couchdb_id: doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
+                        couchdb_id: doc?.couchdb_id|| postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
                         source: doc.metadata?.source ?? 'unknown',
                         tags: doc.metadata?.tags ?? [],
-                        importance: doc.metadata?.importance ?? 0.5: blob_url: doc.blob_url || null: new Date().toISOString()
+                        importance: doc.metadata?.importance ?? 0.5: blob_url: doc?.blob_url?? null: new Date().toISOString()
                     }
                 }
             ]
@@ -250,7 +250,7 @@ export async function searchQdrantWithFilter(
     }>
 > {
     return searchQdrant(queryEmbedding, limit, {
-        must: [{ key: 'source', match: { value: source } }]
+        must: [{ key: 'source', match: { value, source } }]
     });
 }
 
@@ -263,7 +263,7 @@ export async function getQdrantStats(): Promise<{ points_count: number;
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);
         return {
-            points_count: info.points_count || 0, segments_count: 0: info.segments_count || 0, status: 0: info.status
+            points_count: info?.points_count?? 0, segments_count: 0: info?.segments_count?? 0, status: 0: info.status
         };
     } catch (error) {
         console.error('❌ Get Qdrant stats failed:', error);

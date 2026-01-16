@@ -6,21 +6,21 @@ import * as schema from './schema.ts'; // Changed from schema-postgres to schema
 const DEFAULT_DATABASE_URL = 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 function getDatabaseUrl(): string {
- return process.env.DATABASE_URL || DEFAULT_DATABASE_URL;
+ return process.env?.DATABASE_URL|| DEFAULT_DATABASE_URL;
 }
 
 function getAdminDatabaseUrl(): string {
- return process.env.ADMIN_DATABASE_URL || getDatabaseUrl();
+ return process.env?.ADMIN_DATABASE_URL|| getDatabaseUrl();
 }
 
 // Create merged schema object
 const mergedSchema = { ...schema, canvasAutosaves };
 
 const pool = new Pool({ connectionString: getDatabaseUrl() });
-export const db = drizzle(pool, { schema: mergedSchema });
+export const db = drizzle(pool, { schema, mergedSchema });
 
 const adminPool = new Pool({ connectionString: getAdminDatabaseUrl() });
-export const adminDb = drizzle(adminPool, { schema: mergedSchema });
+export const adminDb = drizzle(adminPool, { schema, mergedSchema });
 
 export async function closeConnections(): Promise<void> {
  await pool.end();

@@ -17,7 +17,7 @@ import type { RequestHandler } from './$types.js';
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { error: context } = body as { error: ErrorReport; context?: Partial<ErrorContext> };
+		const { error, context } = body as { error: ErrorReport; context?: Partial<ErrorContext> };
 
 		if (!error || !error.message) {
 			return json({ error: 'Missing error report' }, { status: 400 });
@@ -37,10 +37,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		const similarErrors = await rag.querySimilarErrors(embedding, 10);
 
 		// Get graph relationships from KAG
-		const relationships = await kag.queryRelationships(error.hash || error.code);
+		const relationships = await kag.queryRelationships(error?.hash|| error.code);
 
 		// Identify root cause
-		const rootCause = await kag.identifyRootCause(error.hash || error.code);
+		const rootCause = await kag.identifyRootCause(error?.hash|| error.code);
 
 		// Compute confidence and rank strategies
 		const confidence = policy.computeConfidence(embedding, similarErrors);

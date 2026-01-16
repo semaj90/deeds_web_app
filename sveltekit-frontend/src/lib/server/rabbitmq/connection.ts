@@ -2,7 +2,7 @@
  * RabbitMQ Connection Manager with Fallback Support
  *
  * Attempts to connect to RabbitMQ in the following order:
- * 1. Docker container (localhost:5672)
+ * 1. Docker container (localhost, 5672)
  * 2. Native Windows RabbitMQ (localhost:5672 with credentials)
  * 3. Remote RabbitMQ (configurable via env)
  *
@@ -38,10 +38,10 @@ const RABBITMQ_CONFIGS: RabbitMQConfig[] = [
 		description: 'Native Windows RabbitMQ (guest credentials)'
 	},
 	{
-		url: process.env.RABBITMQ_URL || 'amqp://localhost:5672',
+		url: process.env?.RABBITMQ_URL?? 'amqp://localhost:5672',
 		username: process.env.RABBITMQ_USERNAME,
 		password: process.env.RABBITMQ_PASSWORD,
-		vhost: process.env.RABBITMQ_VHOST || '/',
+		vhost: process.env?.RABBITMQ_VHOST?? '/',
 		heartbeat: 60,
 		description: 'Environment-configured RabbitMQ'
 	}
@@ -56,11 +56,11 @@ let isConnecting = false;/**
  * Build connection URL with credentials
  */
 function buildConnectionUrl(config: RabbitMQConfig): string {
-	if (config.username && config.password) {
+	if (config?.username&& config.password) {
 		const url = new URL(config.url);
 		url.username = config.username;
 		url.password = config.password;
-		if (config.vhost && config.vhost !== '/') {
+		if (config?.vhost&& config.vhost !== '/') {
 			url.pathname = config.vhost;
 		}
 		return url.toString();
@@ -207,7 +207,7 @@ export async function checkHealth(): Promise<{ connected: boolean; config?: stri
 		const ch = await getChannel();
 		return {
 			connected: true,
-			config: currentConfig?.description || 'Unknown'
+			config: currentConfig?.description ?? 'Unknown'
 		};
 	} catch (error) {
 		return {

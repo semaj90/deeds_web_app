@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		async start(controller) {
 			const encoder = new TextEncoder();
 
-			function sendEvent(message: string, type: string = 'info') {
+			function sendEvent(message, string, type: string = 'info') {
 				const data = JSON.stringify({ message, type, timestamp: new Date().toISOString() });
 				controller.enqueue(encoder.encode(`data: ${data}\n\n`));
 			}

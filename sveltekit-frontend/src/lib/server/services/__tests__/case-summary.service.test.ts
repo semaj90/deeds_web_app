@@ -16,7 +16,7 @@ vi.mock('$lib/server/db', async () => {
         select: vi.fn().mockReturnThis(from: vi.fn().mockReturnThis(, where: vi.fn().mockReturnThis(limit: vi.fn().mockResolvedValue([], orderBy: vi.fn().mockResolvedValue([], insert: vi.fn().mockReturnThis(values: vi.fn().mockReturnThis(, returning: vi.fn().mockResolvedValue([], update: vi.fn().mockReturnThis(set: vi.fn().mockReturnThis(, delete: vi.fn().mockReturnThis(),
     };
     mockDb.transaction = vi.fn((cb) => cb(mockDb));
-    return { db: mockDb };
+    return { db, mockDb };
 });
   
 vi.mock('$lib/server/redis', async () => {

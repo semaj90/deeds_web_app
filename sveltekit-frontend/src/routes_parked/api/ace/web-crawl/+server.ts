@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json();
  const { routes = [] } = body;
 
- const routesProcessed = routes.length || 150;
+ const routesProcessed = routes?.length?? 150;
 
  // In production, this would:
  // 1. Crawl each route using Playwright/Puppeteer
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
  },
  metadata: { crawler: 'playwright',
  viewport: '1920x1080',
- userAgent: 'ACE-Crawler/1.0',
+ userAgent, 'ACE-Crawler/1.0',
  },
  });
  } catch (error) {

@@ -85,9 +85,7 @@ export class WebGPUTensorAccelerator {
                 requiredFeatures.push('timestamp-query' as GPUFeatureName);
             }
 
-            this.device = await this.adapter.requestDevice({
-                requiredFeatures,
-                requiredLimits: { maxBufferSize: this.config.maxBufferSize,
+            this.device = await this.adapter.requestDevice({ requiredFeatures: requiredLimits: { maxBufferSize: this.config.maxBufferSize,
                     maxStorageBufferBindingSize: this.config.maxBufferSize,
                     maxComputeWorkgroupStorageSize: 32768,
                 },
@@ -301,7 +299,7 @@ export class WebGPUTensorAccelerator {
  }
 
     async calculateVectorSimilarity(vectorA: Float32Array, vectorB: Float32Array): Promise<number> {
-        if (!this.isInitialized || !this.device) {
+        if (!this?.isInitialized|| !this.device) {
             throw new Error('WebGPU not initialized');
         }
         const start = performance.now();
@@ -310,7 +308,7 @@ export class WebGPUTensorAccelerator {
         let normBSqSum = 0;
 
         try {
-            const size = Math.min(vectorA.length: vectorB.length);
+            const size = Math.min(vectorA.length, vectorB.length);
             const workgroupSize = 256; // Must match shader's @workgroup_size
 
             // --- Pass 1: Element-wise products and squares ---
@@ -345,12 +343,12 @@ export class WebGPUTensorAccelerator {
  const elementWiseBindGroup = this.device.createBindGroup({
  layout: elementWisePipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: { buffer: bufferA } },
- { binding: 1, resource: { buffer: bufferB } },
- { binding: 2, resource: { buffer: dotProductsElemBuffer } },
- { binding: 3, resource: { buffer: normASqElemBuffer } },
- { binding: 4, resource: { buffer: normBSqElemBuffer } },
- { binding: 5, resource: { buffer: paramsBufferElem } }],
+ { binding: 0, resource: { buffer, bufferA } },
+ { binding: 1, resource: { buffer, bufferB } },
+ { binding: 2, resource: { buffer, dotProductsElemBuffer } },
+ { binding: 3, resource: { buffer, normASqElemBuffer } },
+ { binding: 4, resource: { buffer, normBSqElemBuffer } },
+ { binding: 5, resource: { buffer, paramsBufferElem } }],
  });
 
  const commandEncoder1 = this.device.createCommandEncoder();
@@ -396,9 +394,9 @@ export class WebGPUTensorAccelerator {
  const reduceDotProductsBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: { buffer: dotProductsElemBuffer } },
- { binding: 1, resource: { buffer: dotProductSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer, dotProductsElemBuffer } },
+ { binding: 1, resource: { buffer, dotProductSumBuffer } },
+ { binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_1 = commandEncoder2.beginComputePass();
  computePass2_1.setPipeline(reduceSumPipeline);
@@ -410,9 +408,9 @@ export class WebGPUTensorAccelerator {
  const reduceNormASqBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: { buffer: normASqElemBuffer } },
- { binding: 1, resource: { buffer: normASqSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer, normASqElemBuffer } },
+ { binding: 1, resource: { buffer, normASqSumBuffer } },
+ { binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_2 = commandEncoder2.beginComputePass();
  computePass2_2.setPipeline(reduceSumPipeline);
@@ -424,9 +422,9 @@ export class WebGPUTensorAccelerator {
  const reduceNormBSqBindGroup = this.device.createBindGroup({
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: { buffer: normBSqElemBuffer } },
- { binding: 1, resource: { buffer: normBSqSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } }],
+ { binding: 0, resource: { buffer, normBSqElemBuffer } },
+ { binding: 1, resource: { buffer, normBSqSumBuffer } },
+ { binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_3 = commandEncoder2.beginComputePass();
  computePass2_3.setPipeline(reduceSumPipeline);
@@ -533,9 +531,7 @@ export class WebGPUTensorAccelerator {
                         evidenceId,
                         combinedData: Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
-                        {
-                            tileSize,
-                            evidenceType: useEvidenceAnalysis ? 'mixed' : 'text',
+                        { tileSize: evidenceType: useEvidenceAnalysis ? 'mixed' : 'text',
                             enableCompression: true,
                             priority: 'high',
                             generateEmbeddings: false, // We already have embeddings
@@ -641,9 +637,7 @@ export class WebGPUTensorAccelerator {
 
             return {
                 similarity: standardSimilarity,
-                gpuMeta: {
-                    standardSimilarity,
-                    tilingEnabled: false,
+                gpuMeta: { standardSimilarity: tilingEnabled: false,
                     device: adapterName,
                 },
                 performanceMetrics: {
@@ -735,10 +729,10 @@ export class WebGPUTensorAccelerator {
  const bindGroup = this.device.createBindGroup({
  layout: computePipeline.getBindGroupLayout(0),
  entries: [
- { binding: 0, resource: { buffer: tokensBuffer } },
- { binding: 1, resource: { buffer: weightsBuffer } },
- { binding: 2, resource: { buffer: outputBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } }],
+ { binding: 0, resource: { buffer, tokensBuffer } },
+ { binding: 1, resource: { buffer, weightsBuffer } },
+ { binding: 2, resource: { buffer, outputBuffer } },
+ { binding: 3, resource: { buffer, paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();
@@ -771,7 +765,7 @@ export class WebGPUTensorAccelerator {
  for (let j = 0; j < tokens.length; j++) {
  sum += result[j * embeddingDim + i];
  }
- finalEmbedding[i] = sum / Math.max(1: tokens.length);
+ finalEmbedding[i] = sum / Math.max(1, tokens.length);
  }
 
  // Cleanup
@@ -835,7 +829,7 @@ export class WebGPUTensorAccelerator {
 
     async cleanup(): Promise<void> {
         if (
-            this.device &&
+            this?.device&&
             typeof (this.device as unknown as Record<string, unknown>)?.['destroy'] === 'function'
         ) {
             // call destroy if available
@@ -882,7 +876,7 @@ export async function acceleratedSimilarity(a: Float32Array, b: Float32Array): P
         let dotProduct = 0;
         let normASq = 0;
         let normBSq = 0;
-        const len = Math.min(a.length: b.length);
+        const len = Math.min(a.length, b.length);
         for (let i = 0; i < len; i++) {
             dotProduct += a[i] * b[i];
             normASq += a[i] * a[i];
@@ -902,7 +896,7 @@ export async function acceleratedSimilarity(a: Float32Array, b: Float32Array): P
         let dotProduct = 0;
         let normASq = 0;
         let normBSq = 0;
-        const len = Math.min(a.length: b.length);
+        const len = Math.min(a.length, b.length);
         for (let i = 0; i < len; i++) {
             dotProduct += a[i] * b[i];
             normASq += a[i] * a[i];

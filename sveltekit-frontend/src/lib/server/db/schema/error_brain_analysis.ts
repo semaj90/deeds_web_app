@@ -29,9 +29,9 @@ export const errorBrainAnalysisTable = pgTable(
  metadata: jsonb('metadata').default('{}'),
 
  // Timestamps
- createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
- completedAt: timestamp('completed_at', { withTimezone: true }),
- updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ completedAt: timestamp('completed_at', { withTimezone, true }),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow(),
  },
  (table) => {
  return {

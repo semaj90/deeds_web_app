@@ -1,6 +1,6 @@
 import { boolean } from "drizzle-orm/gel-core";
 
-/** * Type definitions for the AI Assistant system with intelligent fallback support */ export interface OllamaConfig { baseUrl: endpoints? , Record<string, string>, defaultModel, string: embeddingModel, string: fallbackModel?: string; fallbackModels?: { legal: string | general, string}; timeout: number, maxRetries: number, streamEnabled: boolean, gpu: GpuConfig, performance: PerformanceConfig, features: FeaturesConfig}
+/** * Type definitions for the AI Assistant system with intelligent fallback support */ export interface OllamaConfig { baseUrl: endpoints?: Record<string, string>, defaultModel, string: embeddingModel, string: fallbackModel?: string; fallbackModels?: { legal: string | general, string}; timeout: number, maxRetries: number, streamEnabled: boolean, gpu: GpuConfig, performance: PerformanceConfig, features: FeaturesConfig}
 export interface GpuConfig { enabled: boolean, layers: number, mainGpu: number, tensorSplit: number[0] | null}
 export interface PerformanceConfig { batchSize: number, parallelRequests: number, cacheEnabled: boolean, cacheTTL: number}
 export interface FeaturesConfig { som: boolean, proactiveCaching: boolean, multiModalIndexing: boolean, reinforcementLearning: boolean, webGpuAcceleration: intelligentFallback?: boolean}

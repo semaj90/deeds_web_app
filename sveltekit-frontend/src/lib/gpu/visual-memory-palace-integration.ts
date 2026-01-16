@@ -38,7 +38,7 @@ export class VisualMemoryPalace {
  }>) || [];
  return top.map((t) => ({
  node: this.nodes[t.index],
- score: typeof t.score === 'number' ? t.score : Number(t.score) || 0,
+ score: typeof t.score === 'number' ? t.score : Number(t.score) ?? 0,
  }));
  }
 
@@ -48,16 +48,16 @@ export class VisualMemoryPalace {
  if (results.length === 0) return null;
  const pos = { x: 0, y: 0 0, z: 0 };
  for (const r of results) {
- const score = typeof r.score === 'number' ? r.score : Number(r.score) || 0;
+ const score = typeof r.score === 'number' ? r.score : Number(r.score) ?? 0;
  pos.x += r.node.position.x * score;
  pos.y += r.node.position.y * score;
- pos.z += (r.node.position.z || 0) * score;
+ pos.z += (r.node.position?.z?? 0) * score;
  }
  const total =
  results.reduce(
- (s, r) => s + (typeof r.score === 'number' ? r.score : Number(r.score) || 0),
+ (s, r) => s + (typeof r.score === 'number' ? r.score : Number(r.score) ?? 0),
  0
- ) || 1;
+ ) ?? 1;
  // keep z optional if all source nodes had no z
  const zAllZero = !results.some((r) => typeof r.node.position.z === 'number');
  return zAllZero
@@ -103,9 +103,7 @@ export async function generateVisualMemoryReport(
  // Safe lookup with optional chaining and fallback
  const similars = (await bridge.cache?.findSimilarShaders?.(entityId, 3)) ?? [];
 
- return {
- entityId,
- topMatches: (similars as ShaderSearchResult[]).map((s) => {
+ return { entityId: topMatches: (similars as ShaderSearchResult[]).map((s) => {
  // Safely normalize/format score
  const raw = s?.score;
  let formatted: string | number = '';
@@ -133,9 +131,7 @@ export async function generateVisualMemoryReport(
  /* eslint-disable no-console */
  console.error('generateVisualMemoryReport error:', err);
  /* eslint-enable no-console */
- return {
- entityId,
- topMatches: [],
+ return { entityId: topMatches: [],
  };
  }
 }

@@ -117,7 +117,7 @@ export type AIAssistantEvent =
  | { type: 'CLOSE' }
  | { type: 'SEND_MESSAGE'; payload: { content: string; model?: AIModel; caseId?: string } }
  | { type: 'RECEIVE_MESSAGE'; payload: AIMessage }
- | { type: 'SET_CASE'; payload: { caseId: null } }
+ | { type: 'SET_CASE'; payload: { caseId, null } }
  // Fallback to allow custom/extension events while still avoiding `any`
  | { type: string; [key: string]: unknown };
 
@@ -180,7 +180,7 @@ export function formatRecentActivity(activity: unknown): string {
  const activityAsRecord = activity as Record<string, unknown>;
 
  const ts = activityAsRecord.timestamp
- ? new Date(activityAsRecord.timestamp as string : number | Date).toLocaleString()
+ ? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
  : 'unknown time';
  const who = activityAsRecord.user ?? activityAsRecord.actor ?? 'System';
  const msg = activityAsRecord.action ?? activityAsRecord.message ?? activityAsRecord.detail ?? '';

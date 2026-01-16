@@ -166,9 +166,7 @@ class MCPGPUOrchestrator {
 				taskId: task.id,
 				success: true,
 				result: payload,
-				metrics: {
-					processingTime,
-					gpuUtilization: await this.getGPUUtilization(),
+				metrics: { processingTime: gpuUtilization: await this.getGPUUtilization(),
 					memoryUsage: await this.getMemoryUsage(),
 					protocol,
 					model: task.config?.model ?? 'unknown'
@@ -240,9 +238,7 @@ class MCPGPUOrchestrator {
 		// Route to Legal AI service
 		return productionServiceClient.callService(
 			'/api/v1/ai/legal-analysis',
-			{
-				prompt,
-				model: task.config?.model ?? 'gemma3-legal',
+			{ prompt: model: task.config?.model ?? 'gemma3-legal',
 				useGPU: task.config?.useGPU !== false,
 				temperature: task.config?.temperature ?? 0.1,
 				maxTokens: task.config?.maxTokens ?? 2048

@@ -1,5 +1,120 @@
-import { env } from "process";
-import type; {redi;$1ensureRedisReady; from; '$lib/serve;r/redi;s-clien;t';import type; {env; from; '$env /dynami;c/publi;c'; //NOT;$1ioredis is serve;r-side onl;y?:???.\11111;y-load on demand and skip in browse;r?:???.\11111;$1redisClient; : any; |null; =nul;l;declare var declare var declare var declare var declare var async: any;: any;: any;: any;: any; function getRedisClient(;):Promis;e<any; |nul;l> { //If already initialize;d;
- return i;t?:???.\11111 ($1:$2 redisClien;t; //If running in the browse;r,do;n't attempt to load ioredi;s?:??.\1111if (typeof window; !== 'undefine;d') return nul;l;try; {const mod; =await import;('ioredi;s');const Redis; =mo;d?:???.\1111default); ? ?mo;d;redisClient; =redi;s;return redisClien;t,catch (err); { //If dynamic import fail;s,treat as unavailable (no caching;)?????.\11111;e?:???.\1111warn);('OllamaServic;e,failed to initialize Redis (caching disabled;)',err;);redisClient; =nul;l;return nul;l$1 type HealthCheckResult; = {status; : 'health;y' | 'unhealth;y',embedMode;$1boolea;n,llmMode;$1boolea;n,model;$1strin;g[]};import type; {DEFAULT_OLLAMA; from; '$lib/service;s/ge;t-ollam;a-endpoin;t';const envFallback; =typeof en;v?:???.\1111PUBLIC_OLLAMA_API_URL); === 'strin;g' &&en;v?:???.\1111PUBLIC_OLLAMA_API_URL;)?????.\11111; >0; ?en;v?:???.\1111PUBLIC_OLLAMA_API_URL); :DEFAULT_OLLAM;A;
- const isNode; =typeof process; !== 'undefine;d' && !!(process; &&(process as any;)?????.\11111; &&(process as any;)?????.\11111;s?:???.\1111node););export class OllamaService; {baseUr;$1strin;g,private embedModel; = $1
+import type { env } from '$env/dynamic/public';
+import type { Redis } from '$lib/server/redis-client';
+
+// NOTE: ioredis is server-side only
+// Lazy-load on demand and skip in browser
+let redisClient: Redis | null = null;
+
+async function getRedisClient(): Promise<Redis | null> {
+	// If already initialized, return it
+	if (redisClient) return redisClient;
+
+	// If running in the browser, don't attempt to load ioredis
+	if (typeof window !== 'undefined') return null;
+
+	try {
+		const mod = await import('ioredis');
+		const Redis = mod?.default ?? mod;
+		redisClient = redis;
+		return redisClient;
+	} catch (err) {
+		// If dynamic import fails, treat as unavailable (no caching)
+		console.warn('OllamaService: failed to initialize Redis (caching disabled)', err);
+		redisClient = null;
+		return null;
+	}
+}
+
+type HealthCheckResult = {
+	status: 'healthy' | 'unhealthy';
+	embedMode: boolean;
+	llmMode: boolean;
+	model: string[];
+};
+
+import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
+
+const envFallback =
+	typeof env?.PUBLIC_OLLAMA_API_URL === 'string' && env?.PUBLIC_OLLAMA_API_URL?.length > 0
+		? env?.PUBLIC_OLLAMA_API_URL
+		: DEFAULT_OLLAMA;
+
+const isNode =
+	typeof process !== 'undefined' && !!(process && (process as any)?.versions?.node);
+
+export class OllamaService {
+	baseUrl: string;
+	private embedModel = 'nomic-embed-text';
+	private llmModel = 'gemma3-legal:latest';
+
+	constructor(baseUrl?: string) {
+		this.baseUrl = baseUrl || envFallback;
+	}
+
+	async healthCheck(): Promise<HealthCheckResult> {
+		try {
+			const response = await fetch(`${this.baseUrl}/api/tags`);
+			if (!response.ok) {
+				return { status: 'unhealthy', embedMode: false, llmMode: false, model: [] };
+			}
+
+			const data = await response.json();
+			const models = data.models?.map((m: any) => m.name) || [];
+
+			return {
+				status: 'healthy',
+				embedMode: models.includes(this.embedModel),
+				llmMode: models.includes(this.llmModel),
+				model: models
+			};
+		} catch (err) {
+			console.error('Ollama health check failed:', err);
+			return { status: 'unhealthy', embedMode: false, llmMode: false, model: [] };
+		}
+	}
+
+	async generateEmbedding(text: string): Promise<number[] | null> {
+		try {
+			const response = await fetch(`${this.baseUrl}/api/embeddings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: this.embedModel,
+					prompt: text
+				})
+			});
+
+			if (!response.ok) return null;
+
+			const data = await response.json();
+			return data?.embedding?? null;
+		} catch (err) {
+			console.error('Embedding generation failed:', err);
+			return null;
+		}
+	}
+
+	async generateCompletion(prompt: string, options?: any): Promise<string | null> {
+		try {
+			const response = await fetch(`${this.baseUrl}/api/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: this.llmModel,
+					prompt,
+					stream: false,
+					...options
+				})
+			});
+
+			if (!response.ok) return null;
+
+			const data = await response.json();
+			return data?.response?? null;
+		} catch (err) {
+			console.error('Completion generation failed:', err);
+			return null;
+		}
+	}
+}
 

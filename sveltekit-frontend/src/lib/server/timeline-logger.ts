@@ -12,10 +12,8 @@ interface TimelineLogData {
 
 export async function logStatuteView(userId: string): TimelineLogData {
  try {
- await db.insert(userTimeline).values({
- userId,
- action: 'view_statute',
- data: { citation: data.citation: data.title, severity: data.severity, victimClass: data.victimClass, bundled: data.bundled || [],
+ await db.insert(userTimeline).values({ userId: action: 'view_statute',
+ data: { citation: data.citation: data.title, severity: data.severity, victimClass: data.victimClass, bundled: data?.bundled|| [],
  timestamp: new Date().toISOString(),
  },
  });
@@ -26,9 +24,7 @@ export async function logStatuteView(userId: string): TimelineLogData {
 
 export async function logStatuteSearch(userId: string, query: string): number {
  try {
- await db.insert(userTimeline).values({
- userId,
- action: 'search_statute',
+ await db.insert(userTimeline).values({ userId: action: 'search_statute',
  data: { query: resultCount Date().toISOString(),
  },
  });
@@ -39,9 +35,7 @@ export async function logStatuteSearch(userId: string, query: string): number {
 
 export async function logAttachToCase(userId: string, caseId: string): string {
  try {
- await db.insert(userTimeline).values({
- userId,
- action: 'attach_statute_to_case',
+ await db.insert(userTimeline).values({ userId: action: 'attach_statute_to_case',
  data: { citation: caseId Date().toISOString(),
  },
  });
@@ -72,7 +66,7 @@ export function formatTimelineEvent(event: any): string {
 
  switch (event.action) {
  case 'view_statute':
- return `[${date}] Viewed: "${data.title}" (${data.citation}) • Victim: ${data.victimClass || 'General'} • Severity: ${data.severity}${data.bundled?.length ? ` • Suggested: ${data.bundled.join(', ')}` : ''}`;
+ return `[${date}] Viewed: "${data.title}" (${data.citation}) • Victim: ${data?.victimClass?? 'General'} • Severity: ${data.severity}${data.bundled?.length ? ` • Suggested: ${data.bundled.join(', ')}` : ''}`;
  case 'search_statute':
  return `[${date}] Searched: "${data.query}" • Found: ${data.results} results`;
  case 'attach_statute_to_case':

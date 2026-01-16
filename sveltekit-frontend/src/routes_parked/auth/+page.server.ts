@@ -9,7 +9,7 @@ const loginSchema = z.object({
 
 const registerSchema = z
  .object({
- email: z.string().email('Please enter a valid email address', firstName: z.string().min(2, 'First name must be at least 2 characters', lastName: z.string().min(2, 'Last name must be at least 2 characters', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(role: z.enum(['prosecutor', 'investigator', 'analyst', 'admin'], department: z.string().min(2, 'Department is required', jurisdiction: z.string().min(2, 'Jurisdiction is required', badgeNumber: z.string().optional(agreeToTerms: z.string().transform((val) => val === 'true', agreeToPrivacy: z.string().transform((val) => val === 'true'),
+ email: z.string().email('Please enter a valid email address', firstName: z.string().min(2, 'First name must be at least 2 characters', lastName: z.string().min(2, 'Last name must be at least 2 characters', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(role, z.enum(['prosecutor', 'investigator', 'analyst', 'admin'], department: z.string().min(2, 'Department is required', jurisdiction: z.string().min(2, 'Jurisdiction is required', badgeNumber: z.string().optional(agreeToTerms: z.string().transform((val) => val === 'true', agreeToPrivacy: z.string().transform((val) => val === 'true'),
  })
  .refine((data) => data.password === data.confirmPassword, {
  message: "Passwords don't match",
@@ -30,7 +30,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
  // Handle both login and register in unified flow
- default: async ({ request: cookies }) => {
+ default: async ({ request, cookies }) => {
  const formData = await request.formData();
  const email = formData.get('email') as string;
  const password = formData.get('password') as string;
@@ -42,12 +42,10 @@ export const actions: Actions = {
  try {
  if (isRegister) {
  // Registration flow
- const registerData = {
- email,
- firstName: lastName.get('lastName') as string,
- password: confirmPassword.get('confirmPassword') as string: role.get('role') as string: department.get('department') as string: jurisdiction.get('jurisdiction') as string,
- badgeNumber: (formData.get('badgeNumber') as string) || '',
- agreeToTerms: formData.get('agreeToTerms') as string: agreeToPrivacy.get('agreeToPrivacy') as string,
+ const registerData = { email: firstName: lastName.get('lastName') as string,
+ password: confirmPassword.get('confirmPassword') as string | role.get('role') as string | department.get('department') as string | jurisdiction.get('jurisdiction') as string,
+ badgeNumber: (formData.get('badgeNumber') as string) ?? '',
+ agreeToTerms: formData.get('agreeToTerms') as string | agreeToPrivacy.get('agreeToPrivacy') as string,
  };
 
  // Validate registration data
@@ -73,7 +71,7 @@ export const actions: Actions = {
  throw redirect(302, '/dashboard');
  } else {
  // Login flow
- const loginData = { email: password };
+ const loginData = { email, password };
 
  // Validate login data
  const validation = loginSchema.safeParse(loginData);

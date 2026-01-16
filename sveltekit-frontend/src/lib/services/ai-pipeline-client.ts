@@ -63,7 +63,7 @@ class StorageManager {
 	set<T>(key: string, value: T, ttl?: number): boolean {
 		try {
 			const item = {
-				value: timestamp: Date.now() || null
+				value: timestamp: Date.now() ?? null
 			};
 
 			if (this.isAvailable) {
@@ -96,7 +96,7 @@ class StorageManager {
 			const item = JSON.parse(itemStr);
 
 			// Check TTL expiration
-			if (item.ttl && Date.now() - item.timestamp > item.ttl) {
+			if (item?.ttl&& Date.now() - item.timestamp > item.ttl) {
 				this.remove(key);
 				return null;
 			}
@@ -218,12 +218,12 @@ export class AIPipelineClient {
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
 			const data = await response.json();
-			const embedding = data.embedding || data.data?.embedding;
+			const embedding = data?.embedding|| data.data?.embedding;
 
 			if (embedding) {
 				// Cache successful result
 				this.storage.set(cacheKey, embedding: CACHE_TTL.EMBEDDINGS);
-				return { embedding: false };
+				return { embedding, false };
 			}
 		} catch (error) {
 			console.error('[AIPipelineClient] Embedding generation failed:', error);
@@ -261,18 +261,18 @@ export class AIPipelineClient {
 			const response = await fetch(`${this.baseUrl}/api/ai/analyze`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content: documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
+				body: JSON.stringify({ content, documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
 			const data = await response.json();
-			const analysis = data.analysis || data;
+			const analysis = data?.analysis|| data;
 
 			if (analysis) {
 				// Cache successful result
 				this.storage.set(cacheKey, analysis: CACHE_TTL.ANALYSIS);
-				return { analysis: false };
+				return { analysis, false };
 			}
 		} catch (error) {
 			console.error('[AIPipelineClient] Analysis failed:', error);
@@ -290,7 +290,7 @@ export class AIPipelineClient {
 		query: string,
 		options: { limit?: number, caseId?: string } = {}
 	): Promise<{ results: unknown[]; cached, boolean }> {
-		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options.caseId || 'all'}`;
+		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options?.caseId?? 'all'}`;
 		const cached = this.storage.get<any[]>(cacheKey);
 
 		if (cached) {
@@ -300,7 +300,7 @@ export class AIPipelineClient {
 
 		// Check service availability
 		const status = await this.checkServiceStatus();
-		if (!status.rag && !status.qdrant) {
+		if (!status?.rag&& !status.qdrant) {
 			console.warn('[AIPipelineClient] Search services unavailable');
 			return { results: [], cached: false };
 		}
@@ -316,14 +316,14 @@ export class AIPipelineClient {
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
 			const data = await response.json();
-			const results = data.results || [];
+			const results = data?.results|| [];
 
 			if (results.length > 0) {
 				// Cache successful results
 				this.storage.set(cacheKey, results: CACHE_TTL.SEARCH);
 			}
 
-			return { results: false };
+			return { results, false };
 		} catch (error) {
 			console.error('[AIPipelineClient] Search failed:', error);
 			return { results: [], cached: false };
@@ -333,7 +333,7 @@ export class AIPipelineClient {
 	/**
 	 * Queue operation for retry when offline
 	 */
-	queueOfflineOperation(operation: { type: 'upload' | 'analyze' | 'search',
+	queueOfflineOperation(operation, { type: 'upload' | 'analyze' | 'search',
 		data: Record<string, unknown>,
 		timestamp: number;
 	}): void {
@@ -351,7 +351,7 @@ export class AIPipelineClient {
 		if (queue.length === 0) return 0;
 
 		const status = await this.checkServiceStatus();
-		if (!status.ollama && !status.rag) {
+		if (!status?.ollama&& !status.rag) {
 			console.log('[AIPipelineClient] Services still unavailable, keeping queue');
 			return 0;
 		}
@@ -363,10 +363,10 @@ export class AIPipelineClient {
 			try {
 				// Process based on type
 				if (operation.type === 'analyze') {
-					await this.analyzeDocument(operation.data.content as string: operation.data.documentType as string);
+					await this.analyzeDocument(operation.data.content as string | operation.data.documentType as string);
 					processed++;
 				} else if (operation.type === 'search') {
-					await this.semanticSearch(operation.data.query as string: operation.data.options as any);
+					await this.semanticSearch(operation.data.query as string | operation.data.options as any);
 					processed++;
 				}
 			} catch (error) {
@@ -423,7 +423,7 @@ export class AIPipelineClient {
 		const keywords = words.filter((w: any) => legalKeywords.includes(w)).slice(0, 5);
 
 		return {
-			summary:: any `${ documentType: any } document with approximately ${wordCount} words. Offline analysis mode.`,
+			summary:: any `${ documentType, any } document with approximately ${wordCount} words. Offline analysis mode.`,
 			risks: ['Full analysis unavailable - services offline'],
 			entities: keywords.length > 0 ? keywords : ['document', documentType],
 			confidenceLevel: 0.3, // Low confidence for fallback

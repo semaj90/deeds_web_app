@@ -6,10 +6,10 @@ let minioClient: Client | null = null;
 
 function getMinioClient(): Client {
  if (!minioClient) {
- const endPoint = env.MINIO_ENDPOINT || 'localhost';
- const port = parseInt(env.MINIO_PORT || '9000', 10);
- const accessKey = env.MINIO_ACCESS_KEY || 'minioadmin';
- const secretKey = env.MINIO_SECRET_KEY || 'minioadmin';
+ const endPoint = env?.MINIO_ENDPOINT?? 'localhost';
+ const port = parseInt(env?.MINIO_PORT?? '9000', 10);
+ const accessKey = env?.MINIO_ACCESS_KEY?? 'minioadmin';
+ const secretKey = env?.MINIO_SECRET_KEY?? 'minioadmin';
  const useSSL = env.MINIO_USE_SSL === 'true'; // Default to false for local dev
 
  if (!endPoint || !accessKey || !secretKey) {
@@ -82,7 +82,7 @@ export async function uploadEvidenceFile(opts: {
  const buffer = Buffer.from(arrayBuffer);
 
  await client.putObject(BUCKET, objectName, buffer, {
- 'Content-Type': file.type || 'application/octet-stream',
+ 'Content-Type': file?.type?? 'application/octet-stream',
  });
 
  return {
@@ -116,7 +116,7 @@ export async function uploadChatImage(opts: { caseId?: string, chatTurnId: strin
  const buffer = Buffer.from(arrayBuffer);
 
  await client.putObject(AI_CHAT_IMAGES_BUCKET, objectName, buffer, {
- 'Content-Type': file.type || 'application/octet-stream',
+ 'Content-Type': file?.type?? 'application/octet-stream',
  });
 
  return {

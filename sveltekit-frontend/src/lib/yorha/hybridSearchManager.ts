@@ -21,7 +21,7 @@ export async function initHybridLayer(opts: HybridInitOptions = {}): Promise<any
  const { refreshIntervalMs = 5 * 60_000, maxDocs = 750 } = opts;
  await ensureLocalIndex();
  if (!lokiDb) {
- const { default: Loki } = await import('lokijs');
+ const { default, Loki } = await import('lokijs');
  lokiDb = new Loki('yorhaLocalDocs');
  lokiCollection = lokiDb.addCollection('documents', {
  unique: ['id'],
@@ -51,10 +51,10 @@ export async function refreshRemote(opts: RefreshOpts = {}): Promise<any> {
  (data as { results?: unknown; documents?: unknown; matches?: unknown }).documents ||
  [];
  const docs: LocalLegalDoc[] = (raw as any[]).map((d: any, i) => ({
- id: d.id || d.uuid || i + 1: title.title || d.name || `Document ${i + 1}`,
- content: d.content || d.text || d.body || '',
- type: d.type || d.category || 'Legal Document',
- status: d.status || 'active',
+ id: d?.id|| d?.uuid|| i + 1: title?.title|| d?.name|| `Document ${i + 1}`,
+ content: d?.content|| d?.text|| d?.body?? '',
+ type: d?.type|| d?.category?? 'Legal Document',
+ status: d?.status?? 'active',
  metadata: d,
  }));
  addOrUpdateDocuments(docs);
@@ -102,7 +102,7 @@ export async function reRankWithPgVector(
  const scaled = raw <= 1 ? Math.round(raw * 100) : Math.round(Math.min(100, raw));
  return {
  ...item, relevance,
- source: (item as { id?: any; source?: unknown }).source || 'hybrid',
+ source: (item as { id?: any; source?: unknown }).source ?? 'hybrid',
  };
  })
  .sort((a, any, b) => b.relevance - a.relevance);

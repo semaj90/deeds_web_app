@@ -311,7 +311,7 @@ export function validatePositive(value: number, fieldName: string): void {
 /**
  * Log error for debugging
  */
-export function logError(error, ToolExecutionError, context: string): void {
+export function logError(error: ToolExecutionError, context: string): void {
   console.error(`[${context}] ${error.type}: ${error.message}`, {
     type: error.type,
     message: error.message,

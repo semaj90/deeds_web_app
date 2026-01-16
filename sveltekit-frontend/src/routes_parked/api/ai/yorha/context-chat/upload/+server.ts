@@ -28,7 +28,7 @@ interface UploadResponse {
  * POST /api/ai/yorha/context-chat/upload
  * Upload document for contextual chat with Docling OCR processing
  */
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  const startTime = Date.now();
 
  try {
@@ -58,7 +58,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
 
  // Convert file to buffer
  const fileBuffer = Buffer.from(await file.arrayBuffer());
- const mimeType = file.type || 'application/octet-stream';
+ const mimeType = file?.type?? 'application/octet-stream';
 
  // 1. Process with Docling
  console.log('🔍 Running Docling OCR analysis...');
@@ -80,7 +80,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  const keywordResult = await extractKeywords(doclingResult.fullText, 'document');
  keywords = keywordResult.keywords;
  keyPhrases = keywordResult.keyPhrases;
- suggestions = keywordResult.suggestions || [];
+ suggestions = keywordResult?.suggestions|| [];
  console.log(`🔍 Extracted ${keywords.length} keywords, ${keyPhrases.length} key phrases`);
  } catch (err) {
  console.warn('⚠️ Keyword extraction failed:', err);
@@ -88,14 +88,14 @@ export const POST: RequestHandler = async ({ request: locals }) => {
 
  // 3. Store in MinIO ai_chat_images bucket
  const uploadId = uuidv4();
- const minioKey = `uploads/${userId}/${caseId || 'no-case'}/${uploadId}/${fileName}`;
+ const minioKey = `uploads/${userId}/${caseId ?? 'no-case'}/${uploadId}/${fileName}`;
 
  console.log('🗄️ Storing in MinIO ai_chat_images bucket...');
  await ensureBucket('ai_chat_images');
  const etag = await putObject('ai_chat_images', minioKey, fileBuffer, {
  'content-type': mimeType,
  'x-amz-meta-user-id': userId,
- 'x-amz-meta-case-id': caseId || '',
+ 'x-amz-meta-case-id': caseId ?? '',
  'x-amz-meta-upload-id': uploadId,
  'x-amz-meta-docling-processed': 'true',
  'x-amz-meta-page-count': doclingResult.pageCount.toString(),
@@ -108,7 +108,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  await sql`
  INSERT INTO chat_uploads (id, user_id, case_id, filename, mime_type, minio_url, docling_result, extracted_keywords, key_phrases, suggestions, file_size_bytes, processing_time_ms)
- VALUES (${uploadId}, ${userId}, ${caseId || null}, ${fileName}, ${mimeType}, ${minioUrl}, ${JSON.stringify(doclingResult)}, ${JSON.stringify(keywords)}, ${JSON.stringify(keyPhrases)}, ${JSON.stringify(suggestions)}, ${file.size}, ${doclingResult.processingTimeMs})
+ VALUES (${uploadId}, ${userId}, ${caseId ?? null}, ${fileName}, ${mimeType}, ${minioUrl}, ${JSON.stringify(doclingResult)}, ${JSON.stringify(keywords)}, ${JSON.stringify(keyPhrases)}, ${JSON.stringify(suggestions)}, ${file.size}, ${doclingResult.processingTimeMs})
  `;
  console.log('💾 Upload metadata saved to database');
  } catch (err) {

@@ -32,8 +32,8 @@ export class AnalyzerWorkerPool {
  private listeners: Map<string, (result, ProcessResult) => void> = new Map();
 
  constructor(private config: WorkerPoolConfig = {}) {
- this.config.workerCount = config.workerCount || navigator.hardwareConcurrency || 8;
- this.config.batchSize = config.batchSize || 10;
+ this.config.workerCount = config?.workerCount|| navigator?.hardwareConcurrency?? 8;
+ this.config.batchSize = config?.batchSize?? 10;
  }
 
  /**
@@ -71,8 +71,8 @@ export class AnalyzerWorkerPool {
  worker.postMessage({
  type: 'INIT',
  data: { workerId: i,
- config: { url: this.config.ollamaUrl || 'http://localhost:11434',
- model: this.config.model || 'gemma3-legal:latest',
+ config: { url: this.config?.ollamaUrl?? 'http://localhost:11434',
+ model: this.config?.model?? 'gemma3-legal:latest',
  },
  },
  });
@@ -149,7 +149,7 @@ export class AnalyzerWorkerPool {
  this.workers[workerId].addEventListener('message', handler);
  this.workers[workerId].postMessage({
  type: 'PROCESS_BATCH',
- data: { batchId: chunks },
+ data: { batchId, chunks },
  });
 
  setTimeout(() => reject(new Error('Batch timeout')), 60000);
@@ -225,10 +225,8 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: {
- workerId,
- config: { url: this.config.ollamaUrl || 'http://localhost:11434',
- model: this.config.model || 'gemma3-legal:latest',
+ data: { workerId: config: { url: this.config?.ollamaUrl?? 'http://localhost:11434',
+ model: this.config?.model?? 'gemma3-legal:latest',
  },
  },
  });

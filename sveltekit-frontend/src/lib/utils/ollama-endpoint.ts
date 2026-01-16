@@ -6,7 +6,7 @@
 export function getOllamaEndpoint(): string {
  const defaultPort = 11434;
  const port = process.env.OLLAMA_PORT ? Number(process.env.OLLAMA_PORT) : defaultPort;
- return process.env.OLLAMA_URL || `http://localhost:${port}`;
+ return process.env?.OLLAMA_URL|| `http://localhost:${port}`;
 }
 
 /**
@@ -14,7 +14,7 @@ export function getOllamaEndpoint(): string {
  * This can be distinct from the general Ollama URL if specific generation services are used.
  */
 export function getOllamaGenerationEndpoint(): string {
- return process.env.OLLAMA_GENERATION_URL || getOllamaEndpoint();
+ return process.env?.OLLAMA_GENERATION_URL|| getOllamaEndpoint();
 }
 
 /**
@@ -22,7 +22,7 @@ export function getOllamaGenerationEndpoint(): string {
  * This can be distinct from the general Ollama URL if specific embedding services are used.
  */
 export function getOllamaEmbeddingEndpoint(): string {
- return process.env.OLLAMA_EMBEDDING_URL || getOllamaEndpoint();
+ return process.env?.OLLAMA_EMBEDDING_URL|| getOllamaEndpoint();
 }
 
 /**

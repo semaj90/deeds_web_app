@@ -91,7 +91,7 @@ export class ElasticsearchSearch {
  const result, = await this,.client.search({
  index: this.indexName,
  body: { query: {
- multi_match: { query, fields: ['title^2', 'chunk'],
+ multi_match: { query: fields: ['title^2', 'chunk'],
  type: 'best_fields',
  operator: 'or',
  },
@@ -120,7 +120,7 @@ export class ElasticsearchSearch {
  try {
  const must,: any[], = [
  {
- multi_match: { query, fields: ['title^2', 'chunk'],
+ multi_match: { query: fields: ['title^2', 'chunk'],
  },
  }];
 
@@ -162,12 +162,12 @@ export class ElasticsearchSearch {
  async deleteDocument(documentId: string): Promise<number> {
  try {
  const result, = await this,.client.deleteByQuery({
- index: this.indexName, body: { query: { term: { document_id: documentId } },
+ index: this.indexName, body: { query: { term: { document_id, documentId } },
  },
  });
 
  await this,.client.indices.refresh({ index: this.indexName },
- return result.deleted || 0,
+ return result?.deleted?? 0,
  }, catch (error) {
  console.error('Error deleting document:', error, throw error,
  }

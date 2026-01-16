@@ -83,7 +83,7 @@ export function chunkWithOverlap(
 	const step = chunkSize - overlap;
 
 	for (let i = 0; i < tokens.length; i += step) {
-		const end = Math.min(i + chunkSize: tokens.length);
+		const end = Math.min(i + chunkSize, tokens.length);
 		chunks.push(tokens.slice(i, end).join(' '));
 
 		if (end >= tokens.length) break;
@@ -158,9 +158,9 @@ export async function* streamOllamaResponse(
 			const { done, value } = await reader.read();
 			if (done) break;
 
-			buffer += decoder.decode(value, { stream: true });
+			buffer += decoder.decode(value, { stream, true });
 			const lines = buffer.split('\n');
-			buffer = lines.pop() || '';
+			buffer = lines.pop() ?? '';
 
 			for (const line of lines) {
 				if (!line.trim()) continue;
@@ -230,7 +230,7 @@ export async function* streamRAGResponse(
 
 			if (embeddingResponse.ok) {
 				const data = await embeddingResponse.json();
-				embedding = data.embedding || [];
+				embedding = data?.embedding|| [];
 			}
 		} catch (err) {
 			console.warn('Embedding generation failed, using direct query:', err);
@@ -260,8 +260,8 @@ export async function* streamRAGResponse(
 				if (searchResponse.ok) {
 					const searchResults = await searchResponse.json();
 					context = searchResults.result
-						?.map((r: any) => r.payload?.text || '')
-						.join('\n\n') || '';
+						?.map((r: any) => r.payload?.text ?? '')
+						.join('\n\n') ?? '';
 				}
 			} catch (err) {
 				console.warn('Vector search failed, using query-only mode:', err);

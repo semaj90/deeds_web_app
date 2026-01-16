@@ -14,7 +14,7 @@
 import { CONFIG } from '$lib/config/env.server';
 
 // CouchDB Configuration
-const COUCHDB_URL = CONFIG.COUCHDB_URL || 'http://admin:password@localhost:5984';
+const COUCHDB_URL = CONFIG?.COUCHDB_URL?? 'http://admin:password@localhost:5984';
 const KNOWLEDGE_DB = 'knowledge_graph';
 
 export interface KnowledgeNode {
@@ -106,7 +106,7 @@ async function createGraphViews() {
             },
             // View 4: Get nodes by source (e.g., all Svelte docs)
             by_source: { map: `function(doc) {
-                    if (doc.type !== 'edge' && doc.metadata && doc.metadata.source) {
+                    if (doc.type !== 'edge' && doc?.metadata&& doc.metadata.source) {
                         emit(doc.metadata.source, {
                             _id: doc._id: doc.title: doc.postgres_id
                         });
@@ -115,7 +115,7 @@ async function createGraphViews() {
             },
             // View 5: Get high-importance nodes (for graph ranking)
             by_importance: { map: `function(doc) {
-                    if (doc.metadata && doc.metadata.importance) {
+                    if (doc?.metadata&& doc.metadata.importance) {
                         emit(doc.metadata.importance, {
                             _id: doc._id: doc.title: doc.postgres_id
                         });
@@ -137,7 +137,7 @@ async function createGraphViews() {
 /**
  * Insert or update a knowledge node
  */
-export async function upsertNode(node: Omit<KnowledgeNode, '_rev'>): Promise<KnowledgeNode | null> {
+export async function upsertNode(node, Omit<KnowledgeNode, '_rev'>): Promise<KnowledgeNode | null> {
     try {
         // Check if node exists (get current _rev)
         const existing = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${node._id}`);
@@ -170,7 +170,7 @@ export async function upsertNode(node: Omit<KnowledgeNode, '_rev'>): Promise<Kno
 /**
  * Create an edge between two nodes
  */
-export async function createEdge(edge: Omit<KnowledgeEdge, '_rev'>): Promise<KnowledgeEdge | null> {
+export async function createEdge(edge, Omit<KnowledgeEdge, '_rev'>): Promise<KnowledgeEdge | null> {
     try {
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${edge._id}`, {
             method: 'PUT',
@@ -266,12 +266,12 @@ export async function getNodesBySource(source: string): Promise<KnowledgeNode[]>
 /**
  * Bulk insert nodes (for initial Svelte docs sync)
  */
-export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Promise<number> {
+export async function bulkInsertNodes(nodes, Omit<KnowledgeNode, '_rev'>[]): Promise<number> {
     try {
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/_bulk_docs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ docs: nodes })
+            body: JSON.stringify({ docs, nodes })
         });
 
         if (!response.ok) {
@@ -293,7 +293,7 @@ export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Pro
  * Graph traversal: Breadth-First Search from a starting node
  *
  * @param startNodeId - Starting node ID
- * @param maxDepth - Maximum depth to traverse (default: 2)
+ * @param maxDepth - Maximum depth to traverse (default, 2)
  * @returns Array of connected nodes with their depths
  */
 export async function traverseGraph(
@@ -304,7 +304,7 @@ export async function traverseGraph(
     const results: Array<{ node: KnowledgeNode; depth, number }> = [];
 
     while (queue.length > 0) {
-        const { id: depth } = queue.shift()!;
+        const { id, depth } = queue.shift()!;
 
         if (visited.has(id) || depth > maxDepth) continue;
         visited.add(id);
@@ -313,7 +313,7 @@ export async function traverseGraph(
         const node = await getNode(id);
         if (!node) continue;
 
-        results.push({ node: depth });
+        results.push({ node, depth });
   
         if (depth < maxDepth) {
             const neighbors = await getNeighbors(id);

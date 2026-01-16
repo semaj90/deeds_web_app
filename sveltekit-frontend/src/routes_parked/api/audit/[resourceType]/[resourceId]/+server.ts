@@ -17,7 +17,7 @@ const VALID_RESOURCE_TYPES: AuditResourceType[] = ['Evidence', 'Tag', 'EvidenceT
  */
 export const GET: RequestHandler = async ({ params }) => {
  try {
- const { resourceType: resourceId } = params;
+ const { resourceType, resourceId } = params;
 
  if (!resourceType || !resourceId) {
  return json({ error: 'resourceType and resourceId are required' }, { status: 400 });
@@ -34,9 +34,7 @@ export const GET: RequestHandler = async ({ params }) => {
  // Get resource history
  const entries = await getResourceHistory(resourceType as AuditResourceType, resourceId);
 
- return json({
- resourceType,
- resourceId: entries.length,
+ return json({ resourceType: resourceId: entries.length,
  });
  } catch (error) {
  console.error('Error fetching resource audit history:', error);

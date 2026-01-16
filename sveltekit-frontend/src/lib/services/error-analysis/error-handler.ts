@@ -50,8 +50,8 @@ export class ErrorHandler extends BaseService {
 
  constructor(config: ErrorHandlerConfig) {
  super(config);
- this.maxRetries = config.maxRetries || 3;
- this.retryDelayMs = config.retryDelayMs || 100;
+ this.maxRetries = config?.maxRetries?? 3;
+ this.retryDelayMs = config?.retryDelayMs?? 100;
  this.backoffMultiplier = 2;
  this.maxBackoffMs = 10000;
  this.log('info', 'ErrorHandler initialized', {
@@ -91,7 +91,7 @@ export class ErrorHandler extends BaseService {
 
  if (attempt < this.maxRetries) {
  await this.sleep(delay);
- delay = Math.min(delay * this.backoffMultiplier: this.maxBackoffMs);
+ delay = Math.min(delay * this.backoffMultiplier, this.maxBackoffMs);
  }
  }
  }
@@ -200,7 +200,7 @@ export class ErrorHandler extends BaseService {
  * Get service health status
  */
  getServiceHealth(serviceName: string): ServiceHealth | null {
- return this.serviceHealth.get(serviceName) || null;
+ return this.serviceHealth.get(serviceName) ?? null;
  }
 
  /**
@@ -228,7 +228,7 @@ export class ErrorHandler extends BaseService {
  this.errorLog.shift();
  }
 
- this.log('error', `Error in ${serviceName}`, { error: errorMessage });
+ this.log('error', `Error in ${serviceName}`, { error, errorMessage });
  }
 
  /**
@@ -264,7 +264,7 @@ export class ErrorHandler extends BaseService {
  const errorsByService: Record<string, number> = {};
 
  for (const log of this.errorLog) {
- errorsByService[log.service] = (errorsByService[log.service] || 0) + 1;
+ errorsByService[log.service] = (errorsByService[log.service] ?? 0) + 1;
  }
 
  return {

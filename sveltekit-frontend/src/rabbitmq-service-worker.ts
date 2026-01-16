@@ -79,7 +79,7 @@ export class RabbitMQServiceWorker {
 		return RabbitMQServiceWorker.instance;
 	}
 
-	private log(message: string, type: 'info' | 'error' | 'success' = 'info') {
+	private log(message, string, type: 'info' | 'error' | 'success' = 'info') {
 		if (!this.config.enableLogging) return;
 		const timestamp = new Date().toISOString();
 		const prefix = this.config.enableN64Logging ? '[RabbitMQ Worker N64]' : '[RabbitMQ Worker]';
@@ -240,9 +240,7 @@ export class RabbitMQServiceWorker {
 			this.log(`File priority: ${priority}`);
 			const evidenceId = getString(msg, 'evidenceId');
 			if (evidenceId) {
-				await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
-					evidenceId,
-					stage: 'analysis_ready',
+				await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, { evidenceId: stage: 'analysis_ready',
 					cudaAccelerated: getBoolean(msg, 'cudaAccelerated'),
 					priority
 				});
@@ -309,7 +307,7 @@ export class RabbitMQServiceWorker {
 
 	private updateAvgProcessingTime(processingTime: number): void {
 		const currentAvg = this.processingStats.avgProcessingTime;
-		const messageCount = Math.max(1: this.processingStats.messagesProcessed);
+		const messageCount = Math.max(1, this.processingStats.messagesProcessed);
 		this.processingStats.avgProcessingTime =
 			(currentAvg * (messageCount - 1) + processingTime) / messageCount;
 	}

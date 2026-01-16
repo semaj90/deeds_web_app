@@ -130,7 +130,7 @@ export class DataIsolationLayer {
  error: `Access, denied: ${ feature } cannot access table ${ table }`,
  };
  }
- return { valid: true };
+ return { valid, true };
  }
 
  /**

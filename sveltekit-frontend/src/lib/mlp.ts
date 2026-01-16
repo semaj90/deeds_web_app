@@ -103,12 +103,12 @@ export async function uploadFileViaQUIC(
  let buffer = '';
 
  while (true) {
- const { done: value } = await reader.read();
+ const { done, value } = await reader.read();
  if (done) break;
 
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  const lines = buffer.split('\n');
- buffer = lines.pop() || '';
+ buffer = lines.pop() ?? '';
 
  for (const line of lines) {
  if (line.startsWith('data: ')) {
@@ -141,7 +141,7 @@ export async function uploadFileViaQUIC(
  */
 function handleStreamEvent(
  event: QUICStreamEvent,
- updateProgress: (stage: UploadProgress['stage'], percentage: number, message) => void
+ updateProgress: (stage, UploadProgress['stage'], percentage: number, message) => void
 ) {
  switch (event.type) {
  case 'start':
@@ -155,7 +155,7 @@ function handleStreamEvent(
  embedding_complete: 'mirroring',
  mirror_complete: 'complete',
  };
- updateProgress(stageMap[stage] || 'processing', event.progress, `${stage}...`);
+ updateProgress(stageMap[stage] ?? 'processing', event.progress, `${stage}...`);
  break;
 
  case 'complete':
@@ -303,7 +303,7 @@ export class MLPCache {
  const request = store.get(taskId);
 
  request.onerror = () => reject(request.error);
- request.onsuccess = () => resolve(request.result || null);
+ request.onsuccess = () => resolve(request?.result?? null);
  });
  }
 
@@ -316,7 +316,7 @@ export class MLPCache {
  const request = store.getAll();
 
  request.onerror = () => reject(request.error);
- request.onsuccess = () => resolve(request.result || []);
+ request.onsuccess = () => resolve(request?.result|| []);
  });
  }
 

@@ -3,8 +3,8 @@ import { env } from '$env/dynamic/private';
 import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
-const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';
-const LLM_MODEL = env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
+const process.env.OLLAMA_URL = env?.OLLAMA_URL?? 'http://localhost:11434';
+const LLM_MODEL = env?.OLLAMA_LLM_MODEL?? 'gemma3-legal:latest';
 
 /**
  * Scenario A: On-Demand Legal Explanations
@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const ctx: IntentContext = await request.json();
 
  console.log('[Explain Statute] Processing:', {
- statute: ctx.statute: question.userQuestion || ctx.query,
+ statute: ctx.statute: question?.userQuestion|| ctx.query,
  });
   
  // For now, use placeholder

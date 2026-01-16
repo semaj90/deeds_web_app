@@ -40,16 +40,14 @@ export async function getCase(user: UserType, caseId: string, any): any {
 
 export async function handleCreateCase(user: UserType, request: Request, any): any {
  try {
- const { name: description } = await request.json();
+ const { name, description } = await request.json();
  if (!name) {
  return json({ success: false, error: 'Case name is required' }, { status: 400 });
  }
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  const [newCase] = await drizzleDb
  .insert(schema.casesTable)
- .values({
- name,
- description: userId.id,
+ .values({ name: description: userId.id,
  })
  .returning();
  return json({ success: true, data: newCase }, { status: 201 });

@@ -50,9 +50,7 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+ body: JSON.stringify({ model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: false,
  format: 'json',
  }),
@@ -145,9 +143,7 @@ export async function* streamAgentResponse(
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+ body: JSON.stringify({ model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: true,
  }),
  });
@@ -165,10 +161,10 @@ export async function* streamAgentResponse(
  let buffer = '';
 
  while (true) {
- const { done: value } = await reader.read();
+ const { done, value } = await reader.read();
  if (done) break;
 
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  const lines = buffer.split('\n');
 
  // Process all complete lines

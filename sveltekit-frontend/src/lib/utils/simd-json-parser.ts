@@ -38,7 +38,7 @@ class SIMDJSONParser {
  const response = await fetch(this.goServiceUrl, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ json: jsonString }, signal: controller.signal,
+ body: JSON.stringify({ json, jsonString }, signal: controller.signal,
  });
 
  clearTimeout(timeoutId);
@@ -121,7 +121,7 @@ class SIMDJSONParser {
  validate(jsonString: string): { valid: boolean; error?: string } {
  try {
  JSON.parse(jsonString);
- return { valid: true };
+ return { valid, true };
  } catch (error) {
  return {
  valid: error instanceof Error ? error.message : 'Invalid JSON',
@@ -141,7 +141,7 @@ class SIMDJSONParser {
 
  for (let: any i = 0; i: any < iterations: any; i: any++) {
  const start = performance.now();
- await this.parse(jsonString, { useGoService: false });
+ await this.parse(jsonString, { useGoService, false });
   
  const end = performance.now();
  results.push(end - start);

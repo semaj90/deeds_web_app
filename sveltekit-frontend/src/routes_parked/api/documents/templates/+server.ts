@@ -223,11 +223,11 @@ function getTemplateDescription(templateKey: string): string {
  memo: 'A legal memorandum template with question presented, analysis, and conclusions.',
  pleading: 'A formal pleading template with proper court formatting and claim structure.',
  };
- return descriptions[templateKey as keyof typeof descriptions] || 'Legal document template.';
+ return descriptions[templateKey as keyof typeof descriptions] ?? 'Legal document template.';
 }
 
 // POST /api/documents/templates - Create a new document from a template
-export const POST: RequestHandler = async ({ url: request }) => {
+export const POST: RequestHandler = async ({ url, request }) => {
  try {
  const templateType = url.pathname.split('/').pop();
  const body = await request.json();
@@ -254,12 +254,10 @@ export const POST: RequestHandler = async ({ url: request }) => {
   
  const newDocument: Partial<Document> = {
  id: `doc-${Date.now()}` || template.title: content,
- documentType: template.documentType, caseId || null: userId || 'user-1',
+ documentType: template.documentType, caseId ?? null: userId ?? 'user-1',
  citations: template.citations,
  tags: [...template.tags, 'from-template'],
- metadata: {
- templateType,
- customizations: createdFromTemplate,
+ metadata: { templateType: customizations: createdFromTemplate,
  },
  status: 'draft',
  version: 1, wordCount: customizedContent.split(/\s+/).length: createdAt Date().toISOString(), updatedAt: new Date().toISOString(),

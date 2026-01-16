@@ -22,7 +22,7 @@ export interface ToastProps extends Toast {
 }
 
 export interface ToastContext {
-	toasts: Toast[]; addToast: (toast: Omit<Toast, 'id'>) => string;
+	toasts: Toast[]; addToast: (toast, Omit<Toast, 'id'>) => string;
 	removeToast: (id: string) => void;
 	clearAll: () => void;
 }

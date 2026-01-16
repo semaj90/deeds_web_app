@@ -15,8 +15,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	}
 
 	const caseId = url.searchParams.get('caseId');
-	const limit = Number(url.searchParams.get('limit')) || 20;
-	const offset = Number(url.searchParams.get('offset')) || 0;
+	const limit = Number(url.searchParams.get('limit')) ?? 20;
+	const offset = Number(url.searchParams.get('offset')) ?? 0;
 
 	try {
 		let query = db.select().from(reports);
@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	try {
 		const body = await request.json();
 
-		if (!body.caseId || !body.content) {
+		if (!body?.caseId|| !body.content) {
 			throw error(400, 'Missing required fields: caseId, content');
 		}
 
@@ -73,8 +73,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			.values({
 				caseId: body.caseId,
 				content: body.content,
-				title: body.title || 'Untitled Report',
-				metadata: { reportType: body.reportType || 'general'
+				title: body?.title?? 'Untitled Report',
+				metadata: { reportType: body?.reportType?? 'general'
 				},
 				createdBy: locals.user.id,
 				createdAt: new Date(),
@@ -111,7 +111,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 	try {
 		const body = await request.json();
 
-		if (!body.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
+		if (!body?.ids|| !Array.isArray(body.ids) || body.ids.length === 0) {
 			throw error(400, 'Missing required field: ids (array)');
 		}
 
@@ -159,7 +159,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 	try {
 		const body = await request.json();
 
-		if (!body.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
+		if (!body?.ids|| !Array.isArray(body.ids) || body.ids.length === 0) {
 			throw error(400, 'Missing required field: ids (array)');
 		}
 

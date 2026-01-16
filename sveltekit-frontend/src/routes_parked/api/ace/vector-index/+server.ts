@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json();
  const { routes = [] } = body;
 
- const routesProcessed = routes.length || 150;
+ const routesProcessed = routes?.length?? 150;
 
  // In production, this would:
  // 1. Generate embeddings using Ollama/Gemma

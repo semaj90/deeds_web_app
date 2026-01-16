@@ -62,7 +62,7 @@ export class WebGPUSimilarityService {
  let results: SimilarityResult[];
  let method: 'webgpu' | 'cpu';
 
- if (this.isInitialized && config.useWebGPU && documentEmbeddings.length > 10) {
+ if (this?.isInitialized&& config?.useWebGPU&& documentEmbeddings.length > 10) {
  // Use WebGPU for larger batches
  try {
  results = await this.engine!.computeSimilarityBatch(

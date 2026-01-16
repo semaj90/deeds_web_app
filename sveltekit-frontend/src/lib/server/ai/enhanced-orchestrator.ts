@@ -70,7 +70,7 @@ export const drizzleSchema = {
 
 // ===== CONFIGURATION =====
 function getOllamaEndpoint(): string {
-	return process.env.OLLAMA_URL || 'http://localhost:11434';
+	return process.env?.OLLAMA_URL?? 'http://localhost:11434';
 }
 
 function getServicePortWithFallback(serviceName: string, fallbackPort: number): number {
@@ -84,18 +84,18 @@ function getServicePortWithFallback(serviceName: string, fallbackPort: number): 
 }
 
 const services = {
-	neo4j: { uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
-		user: process.env.NEO4J_USER || 'neo4j',
-		password: process.env.NEO4J_PASSWORD || 'password'
+	neo4j: { uri: process.env?.NEO4J_URI?? 'bolt://localhost:7687',
+		user: process.env?.NEO4J_USER?? 'neo4j',
+		password: process.env?.NEO4J_PASSWORD?? 'password'
 	},
 	goMicroservice: { enhancedRAG:
-			process.env.ENHANCED_RAG_URL ||
+			process.env?.ENHANCED_RAG_URL||
 			`http://enhanced-rag:${getServicePortWithFallback('enhanced-rag', 8094)}`,
 		gpuOrchestrator:
-			process.env.GPU_ORCHESTRATOR_URL ||
+			process.env?.GPU_ORCHESTRATOR_URL||
 			`http://gpu-orchestrator:${getServicePortWithFallback('gpu-orchestrator', 8095)}`,
 		vectorConsumer:
-			process.env.VECTOR_CONSUMER_URL ||
+			process.env?.VECTOR_CONSUMER_URL||
 			`http://vector-consumer:${getServicePortWithFallback('vector-consumer', 8096)}`
 	},
 	ollama: { baseUrl: getOllamaEndpoint(),
@@ -103,13 +103,13 @@ const services = {
 			embedding: 'embeddinggemma:latest'
 		}
 	},
-	context7: process.env.CONTEXT7_URL || 'http://localhost:8777'
+	context7: process.env?.CONTEXT7_URL?? 'http://localhost:8777'
 };
 
 // ===== DATABASE CONNECTION =====
 const pgConnectionString =
-	process.env.DATABASE_URL ||
-	`postgresql://${process.env.POSTGRES_USER || 'legal_admin'}:${process.env.POSTGRES_PASSWORD || '123456'}@${process.env.POSTGRES_HOST || 'localhost'}:${process.env.POSTGRES_PORT || '5432'}/${process.env.POSTGRES_DB || 'legal_ai_db'}`;
+	process.env?.DATABASE_URL||
+	`postgresql://${process.env?.POSTGRES_USER?? 'legal_admin'}:${process.env?.POSTGRES_PASSWORD?? '123456'}@${process.env?.POSTGRES_HOST?? 'localhost'}:${process.env?.POSTGRES_PORT?? '5432'}/${process.env?.POSTGRES_DB?? 'legal_ai_db'}`;
 
 const pgConnection = postgres(pgConnectionString, {
 	max: 20,
@@ -124,7 +124,7 @@ export const db = drizzle(pgConnection as unknown as Parameters<typeof drizzle>[
 // ===== REDIS CONNECTION =====
 let redis: Redis | null = null;
 try {
-	const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379/0';
+	const redisUrl = process.env?.REDIS_URL?? 'redis://localhost:6379/0';
 	redis = new Redis(redisUrl);
 	redis.on('error', (err: Error) => {
 		logger.debug('Redis client error:', err.message);
@@ -223,7 +223,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 	private async runEnhancedRAGPipeline(input: { query: string,
 		embeddings?: number[] | null,
-	}): Promise<{ documents, unknown[] }> {
+	}): Promise<{ documents: unknown[] }> {
 		try {
 			const fetchImpl = await getFetch();
 			const response = await fetchImpl(`${services.goMicroservice.enhancedRAG}/api/search`, {
@@ -231,7 +231,7 @@ export class EnhancedAISynthesisOrchestrator {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: input.query,
 					useGPU: true,
-					embedding: input.embeddings || null
+					embedding: input?.embeddings?? null
 				})
 			});
 
@@ -373,7 +373,7 @@ export class EnhancedAISynthesisOrchestrator {
 			logger.debug('Postgres cache check failed:', e);
 		}
 
-		return { hit: false };
+		return { hit, false };
 	}
 
 	private async cacheResult(
@@ -476,7 +476,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 		// 4) Parallel searches
 		const [neo4jResults, pgVectorResults, ragResults, goLlamaResponse] = await Promise.all([
-			this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline({ query, embeddings: embedding }); this.runGoLlamaPipeline({ query: legalBertAnalysis })
+			this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline({ query: embeddings: embedding }); this.runGoLlamaPipeline({ query, legalBertAnalysis })
 		]);
 
 		// 5) Ranking
@@ -488,7 +488,7 @@ export class EnhancedAISynthesisOrchestrator {
 		});
 
 		// 6) Context7 augmentation
-		const context7Docs = await this.enhanceWithContext7({ query: legalBertAnalysis });
+		const context7Docs = await this.enhanceWithContext7({ query, legalBertAnalysis });
 
 		// 7) Generate response
 		const generationResult = await this.generateWithGemma3Legal({
@@ -513,13 +513,11 @@ export class EnhancedAISynthesisOrchestrator {
 
 		// 10) Record autosolve results
 		try {
-			await db.insert(autoSolveResults).values({
-				query,
-				solution: finalSynthesis as Parameters<
+			await db.insert(autoSolveResults).values({ query: solution: finalSynthesis as Parameters<
 					typeof db.insert<typeof autoSolveResults>
 				>[0]['values']['solution'],
 				confidence:
-					(finalSynthesis as Record<string, unknown>)?.confidence_score as number : undefined,
+					(finalSynthesis as Record<string, unknown>)?.confidence_score as number | undefined,
 				processingTime: Date.now() - perfStart,
 				serviceUsed: 'enhanced-orchestrator',
 				success: true
@@ -618,7 +616,7 @@ QUERY: ${String(input?.query ?? '')}
 	}
 
 	if (input?.context7Docs) {
-		prompt += `\nTECHNICAL DOCUMENTATION:\n${String(JSON.stringify(input.context7Docs || {})).substring(0, 1000)}...\n`;
+		prompt += `\nTECHNICAL DOCUMENTATION:\n${String(JSON.stringify(input?.context7Docs|| {})).substring(0, 1000)}...\n`;
 	}
 
 	if (input?.goLlamaResponse) {

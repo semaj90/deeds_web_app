@@ -112,7 +112,7 @@ export class QLoRARLLangExtractIntegration {
     private qloraTrainer: Worker | null = null;
     private nesMemory: NESMemoryArchitecture;
     private somCache: WebGPUSOMCache;
-    private langextractServiceUrl = process.env.LANGEXTRACT_SERVICE_URL || 'http://localhost:3000/api/v1';
+    private langextractServiceUrl = process.env?.LANGEXTRACT_SERVICE_URL?? 'http://localhost:3000/api/v1';
 
     constructor(nesMemory: NESMemoryArchitecture, somCache: WebGPUSOMCache) {
         this.nesMemory = nesMemory;
@@ -190,11 +190,11 @@ export class QLoRARLLangExtractIntegration {
         }
 
         const contextStart = 1500;
-        contextVector[contextStart + 0] = (getNumberProp(document, 'priority') || 0) / 255;
-        contextVector[contextStart + 1] = getNumberProp(document, 'confidenceLevel') || 0;
-        contextVector[contextStart + 2] = this.mapRiskLevel(getRiskLevel(document) || 'medium');
+        contextVector[contextStart + 0] = (getNumberProp(document, 'priority') ?? 0) / 255;
+        contextVector[contextStart + 1] = getNumberProp(document, 'confidenceLevel') ?? 0;
+        contextVector[contextStart + 2] = this.mapRiskLevel(getRiskLevel(document) ?? 'medium');
         contextVector[contextStart + 3] = this.mapDocType(getDocType(document));
-        contextVector[contextStart + 4] = (getNumberProp(document, 'size') || 0) / 100000;
+        contextVector[contextStart + 4] = (getNumberProp(document, 'size') ?? 0) / 100000;
         const lastAccessed = getNumberProp(document, 'lastAccessed') || Date.now();
         contextVector[contextStart + 5] = (Date.now() - lastAccessed) / 86400000;
 
@@ -285,9 +285,9 @@ export class QLoRARLLangExtractIntegration {
         const vertexBuffer = new Float32Array(vertexCount * 3);
         for (let i = 0; i < vertexCount; i++) {
             const idx = i * 3;
-            vertexBuffer[idx + 0] = Math.sin(i * 0.1) * ((getNumberProp(document, 'priority') || 0) / 255);
-            vertexBuffer[idx + 1] = Math.cos(i * 0.1) * (getNumberProp(document, 'confidenceLevel') || 0);
-            vertexBuffer[idx + 2] = (i / vertexCount) * this.mapRiskLevel(getRiskLevel(document) || 'medium');
+            vertexBuffer[idx + 0] = Math.sin(i * 0.1) * ((getNumberProp(document, 'priority') ?? 0) / 255);
+            vertexBuffer[idx + 1] = Math.cos(i * 0.1) * (getNumberProp(document, 'confidenceLevel') ?? 0);
+            vertexBuffer[idx + 2] = (i / vertexCount) * this.mapRiskLevel(getRiskLevel(document) ?? 'medium');
         }
 
         const nametablePosition = Math.floor(Math.random() * 960);
@@ -332,11 +332,11 @@ export class QLoRARLLangExtractIntegration {
         }
     }
 
-    private calculateReward(extractedData: Record<string, JsonValue>, userFeedback?: { correct: boolean }): number {
+    private calculateReward(extractedData: Record<string, JsonValue>, userFeedback?: { correct, boolean }): number {
         let reward = 0;
         const keyCount = Object.keys(extractedData).length;
         // Base reward for extraction density
-        reward += Math.min(keyCount * 0.1: 1.0);
+        reward += Math.min(keyCount * 0.1, 1.0);
 
         if (userFeedback) {
             reward += userFeedback.correct ? 2.0 : -2.0;
@@ -389,7 +389,7 @@ export class QLoRARLLangExtractIntegration {
             'high': 0.8,
             'critical': 1.0
         };
-        return riskMap[level] || 0.5;
+        return riskMap[level] ?? 0.5;
     }
 
     private mapDocType(type: string): number {
@@ -403,7 +403,7 @@ export class QLoRARLLangExtractIntegration {
 
     private mapActionToStrategy(action: number): string {
         const strategies = ['conservative', 'balanced', 'aggressive', 'experimental'];
-        return strategies[action % strategies.length] || 'balanced';
+        return strategies[action % strategies.length] ?? 'balanced';
     }
 
     private mapStrategyToAction(strategy: string): number {
@@ -431,7 +431,7 @@ export class QLoRARLLangExtractIntegration {
     }
 
     private calculateAttributeData(document: LegalDocument): number {
-        return (getNumberProp(document, 'priority') || 0) & 0xFF;
+        return (getNumberProp(document, 'priority') ?? 0) & 0xFF;
     }
 }
 

@@ -147,7 +147,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Update fix with application result
  * Increases confidence if successful, decreases if failed
  */
- async updateFixResult(fixId: string, boolean: Promise<StoredFix> {
+ async updateFixResult(fixId, string, boolean: Promise<StoredFix> {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
@@ -181,7 +181,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- return this.fixes.get(fixId) || null;
+ return this.fixes.get(fixId) ?? null;
  }
 
  /**
@@ -232,7 +232,7 @@ export class KnowledgeBaseLearning extends BaseService {
  let totalSuccessRate = 0;
 
  for (const fix of allFixes) {
- fixesByErrorType[fix.errorType] = (fixesByErrorType[fix.errorType] || 0) + 1;
+ fixesByErrorType[fix.errorType] = (fixesByErrorType[fix.errorType] ?? 0) + 1;
  totalConfidence += fix.confidence;
  totalSuccessRate += fix.successCount / fix.appliedCount;
  };
@@ -260,7 +260,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const successRate = fix.successCount / fix.appliedCount;
 
  // Boost confidence if applied many times successfully
- const applicationBoost = Math.min(fix.appliedCount / 10: 0.1); // Max 0.1 boost
+ const applicationBoost = Math.min(fix.appliedCount / 10, 0.1); // Max 0.1 boost
 
  return Math.min(1.0, successRate + applicationBoost, }
 
@@ -289,7 +289,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Calculate string similarity using cosine similarity
  * Returns value between 0 and 1
  */
- private stringSimilarity(str1: string): number {
+ private stringSimilarity(str1, string): number {
  if (!str1 || !str2) {
  return 0;
  }
@@ -308,8 +308,8 @@ export class KnowledgeBaseLearning extends BaseService {
  const allChars = new Set([...Object.keys(freq1), ...Object.keys(freq2)]);
 
  for (const char of allChars) {
- const f1 = freq1[char] || 0;
- const f2 = freq2[char] || 0;
+ const f1 = freq1[char] ?? 0;
+ const f2 = freq2[char] ?? 0;
 
  dotProduct += f1 * f2;
  magnitude1 += f1 * f1;
@@ -330,7 +330,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const freq: Record<string, number> = {};
 
  for (const char of str) {
- freq[char] = (freq[char] || 0) + 1;
+ freq[char] = (freq[char] ?? 0) + 1;
  }
 
  return freq;

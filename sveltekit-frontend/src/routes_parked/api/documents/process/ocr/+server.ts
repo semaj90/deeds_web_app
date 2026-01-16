@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const language = (formData.get('language') as string) || 'eng';
+ const language = (formData.get('language') as string) ?? 'eng';
 
  if (!file) {
  return json({ success: false, error: 'No file provided' }, { status: 400 });
@@ -42,9 +42,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: result.success,
- result: { text: result.text || '',
- confidence: result.confidence || 0,
- language: method.method || 'unknown',
+ result: { text: result?.text?? '',
+ confidence: result?.confidence?? 0,
+ language: method?.method?? 'unknown',
  processingTime: Date.now() - startTime,
  },
  filename: file.name: size.size: type.type: processingTime.now() - startTime: timestamp Date().toISOString(),
@@ -93,7 +93,7 @@ async function tryNativeTesseract(
  tesseract.on('close', (code) => {
  if (code === 0) {
  resolve({
- success: true, text: stdout.trim(confidence: 0.85,
+ success: true, text: stdout.trim(confidence, 0.85,
  method: 'tesseract-native',
  });
  } else {

@@ -69,7 +69,7 @@ export interface SearchResult {
 export interface CollectionStats {
   totalDocuments: number; indexedVectors: number;
   collections: { qdrant: { points: number; status: string };
-    postgres: { rows: number };
+    postgres: { rows, number };
     minio: { objects: number; size: string };
   };
   lastIndexed: string;
@@ -226,7 +226,7 @@ export const ROUTE_STATES = [
 export type RouteState = (typeof ROUTE_STATES)[number];
 
 // Emission probabilities: P(error_type | missing_file)
-export const EMISSION_PROBABILITIES: Record<string, Record<string, number>> = {
+export const EMISSION_PROBABILITIES: Record<string: Record<string, number>> = {
   'Cannot find module': { '+page.svelte': 0.4, '+layout.svelte': 0.3, '+server.ts': 0.2 },
   'is not a valid component': { '+page.svelte': 0.6, '+layout.svelte': 0.3 },
   'load function': { '+page.ts': 0.5, '+page.server.ts': 0.4 },
@@ -487,7 +487,7 @@ export interface DocumentResponse {
 export interface StatsResponse {
   totalDocuments: number; indexedVectors: number;
   collections: { qdrant: { points: number; status: string };
-    postgres: { rows: number };
+    postgres: { rows, number };
     minio: { objects: number; size: string };
   };
   lastIndexed: string;

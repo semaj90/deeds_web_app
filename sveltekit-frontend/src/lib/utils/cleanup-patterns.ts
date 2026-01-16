@@ -10,7 +10,7 @@ export function createMediaQuery(query: any, string: any, callback: (matches: bo
 export function createAbortController() { const controller = new AbortController(); return { signal: controller.signal, abort: () => controller.abort( cleanup: () => controller.abort() }
 } }
 // Utility for combining multiple cleanup functions export function combineCleanups(...cleanupFns: (() => void)[]): () => void { return () => { cleanupFns.forEach(cleanup => { try { cleanup()}catch (error) { console.error('Cleanup error: ', error)})} }
-// Hook-like pattern for Svelte, 5 export function useCleanup() { const cleanupFunctions: (() => void)[] = []; const addCleanup = (cleanup: () => void) => { cleanupFunctions.push(cleanup)} const cleanup = () => { cleanupFunctions.forEach(fn => { try { fn()}catch (error) { console.error('Cleanup error: ', error)}); cleanupFunctions.length = 0} return { addCleanup: cleanup }
+// Hook-like pattern for Svelte, 5 export function useCleanup() { const cleanupFunctions: (() => void)[] = []; const addCleanup = (cleanup: () => void) => { cleanupFunctions.push(cleanup)} const cleanup = () => { cleanupFunctions.forEach(fn => { try { fn()}catch (error) { console.error('Cleanup error: ', error)}); cleanupFunctions.length = 0} return { addCleanup, cleanup }
 }
 
 

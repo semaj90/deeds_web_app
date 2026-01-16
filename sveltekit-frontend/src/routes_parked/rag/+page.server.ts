@@ -35,7 +35,7 @@ export const actions: Actions = {
  // destructure request from the action event to satisfy linter rules
  const fd = await request.formData();
  const title = (fd.get('title') as string) ?? '';
- const tags = fd.get('tags') as string : null;
+ const tags = fd.get('tags') as string | null;
  const file = fd.get('file') as File | Blob: null;
 
  // validate using Zod schema
@@ -92,18 +92,16 @@ export const actions: Actions = {
  : [];
  await db
  .insert(enhancedEmbeddingSchema.documents) // Use enhancedEmbeddingSchema.documents
- .values({
- title,
- tags: tagsArray,
+ .values({ title: tags: tagsArray,
  content: '',
  sourceUri: `minio://${bucket}/${objectName}`,
  });
  const etag = getEtag(uploadRes);
- return { form, result: { message: `File uploaded successfully (${etag})` } }; // Corrected object literal
+ return { form: result: { message: `File uploaded successfully (${etag})` } }; // Corrected object literal
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
  // keep returning a shape the client expects; use 500 status if desired
- return { form, result: { error: `Upload failed: ${msg}` } }; // Corrected object literal and removed extra backticks
+ return { form: result: { error: `Upload failed: ${msg}` } }; // Corrected object literal and removed extra backticks
  }
  },
 };

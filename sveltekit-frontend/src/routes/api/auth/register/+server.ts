@@ -22,7 +22,7 @@ interface RegisterRequest {
 	firstName: string; lastName: string;
 }
 
-export const POST: RequestHandler = async ({ request: cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
 	console.log('[Auth] Register POST received');
 	try {
 		const rawBody = await request.text();

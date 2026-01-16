@@ -87,9 +87,7 @@ export class SearchOrchestrator {
  */
  private async _rerank(query: string, documents: string[]): Promise<any[]> {
  try {
- const response = await this.reranker.rerank({
- query,
- documents: top_k,
+ const response = await this.reranker.rerank({ query: documents: top_k,
  });
 
  return response.results;

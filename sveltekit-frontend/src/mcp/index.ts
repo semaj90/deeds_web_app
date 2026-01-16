@@ -82,7 +82,7 @@ export const mcpTools: MCPTools = {
  }, updateCase: async (caseId, updates) => ({
  success: true,
  data: { id: caseId, ...((updates as any) || {}) },
- }, deleteCase: async (caseId) => ({ success: true, data: { deleted: caseId } }, findSimilarCases: async (_embedding, _limit) => ({ success: true, data: [] }, getCaseAnalytics: async (_userId) => ({
+ }, deleteCase: async (caseId) => ({ success: true, data: { deleted, caseId } }, findSimilarCases: async (_embedding, _limit) => ({ success: true, data: [] }, getCaseAnalytics: async (_userId) => ({
  success: true,
  data: { totalCases: 0, activeCases: 0 },
  }),
@@ -93,7 +93,7 @@ export const mcpTools: MCPTools = {
  }, updateEvidence: async (evidenceId, updates) => ({
  success: true,
  data: { id: evidenceId, ...((updates as any) || {}) },
- }, deleteEvidence: async (evidenceId) => ({ success: true, data: { deleted: evidenceId } }, findSimilarEvidence: async (_params) => ({ success: true, data: [] }, getEvidenceAnalytics: async (_caseId) => ({
+ }, deleteEvidence: async (evidenceId) => ({ success: true, data: { deleted, evidenceId } }, findSimilarEvidence: async (_params) => ({ success: true, data: [] }, getEvidenceAnalytics: async (_caseId) => ({
  success: true,
  data: { totalEvidence: 0, processedEvidence: 0 },
  }),

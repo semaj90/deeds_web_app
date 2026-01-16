@@ -18,7 +18,7 @@ import { getOllamaEndpoint } from '$lib/utils/ollama-config';
 export const POST: RequestHandler = async ({ request }) => {
  try {
  const body = await request.json();
- const { text: noteId } = body as {
+ const { text, noteId } = body as {
  text?: string;
  noteId?: string;
  };
@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Generate embedding for text
  if (text) {
  const embedding = await generateEmbedding(text);
- return json({ embedding, model: 'embeddinggemma:latest' });
+ return json({ embedding: model: 'embeddinggemma:latest' });
  }
 
  // Generate and store embedding for a note
@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ url }) => {
  try {
  const workspaceId = url.searchParams.get('workspaceId');
  const query = url.searchParams.get('query');
- const topK = parseInt(url.searchParams.get('topK') || '5', 10);
+ const topK = parseInt(url.searchParams.get('topK') ?? '5', 10);
 
  if (!workspaceId || !query) {
  return json({ error: 'Missing required parameters: workspaceId, query' }, { status: 400 });

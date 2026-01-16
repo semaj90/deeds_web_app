@@ -6,7 +6,7 @@
 export function getOllamaEndpoint(): string {
  // In a Docker environment, this will point to the 'ollama' service.
  // For local dev, it falls back to localhost.
- return process.env.OLLAMA_URL || 'http://localhost:11434';
+ return process.env?.OLLAMA_URL?? 'http://localhost:11434';
 }
 
 /**
@@ -14,7 +14,7 @@ export function getOllamaEndpoint(): string {
  */
 export function getEnvUrl(envName: string, dockerHost: string, localFallback?: string): string {
  // prefer process.env, then docker host, then optional local fallback
- return process.env[envName] || dockerHost || localFallback || '';
+ return process.env[envName] || dockerHost || localFallback ?? '';
 }
 
 export function getEnhancedRagEndpoint(): string {

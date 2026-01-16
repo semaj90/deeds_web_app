@@ -321,7 +321,7 @@ export async function buildKagGraph(
  }
  }
 
- return { nodes: edges };
+ return { nodes, edges };
 }
 
 // ============================================================================

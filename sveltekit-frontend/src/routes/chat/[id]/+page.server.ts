@@ -8,12 +8,12 @@ import * as amqp from 'amqplib';
 import { createClient } from 'redis';
 import type { Actions, PageServerLoad } from './$types';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+const REDIS_URL = process.env?.REDIS_URL?? 'redis://localhost:6379';
+const RABBITMQ_URL = process.env?.RABBITMQ_URL?? 'amqp://localhost:5672';
 const QUEUE = 'ai_chat_queue';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	const redis = createClient({ url: REDIS_URL });
+	const redis = createClient({ url, REDIS_URL });
 	await redis.connect();
 
 	const chatId = params.id;
@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		chatId,
 		history,
-		user: locals.user || null,
+		user: locals?.user?? null,
 		isAuthenticated,
 		shouldPromptAuth: !isAuthenticated,
 		// Merge Redis (ephemeral) + DB (persistent) if authenticated
@@ -50,7 +50,7 @@ export const actions: Actions = {
 	send: async ({ request, params, locals }) => {
 		const formData = await request.formData();
 		const userMessage = formData.get('message') as string;
-		const caseId = (formData.get('caseId') as string) || null;
+		const caseId = (formData.get('caseId') as string) ?? null;
 		const isAnonymous = !locals.user;
 
 		// Validation
@@ -66,7 +66,7 @@ export const actions: Actions = {
 			// Send job to RabbitMQ worker
 			const conn = await (amqp as any).connect(RABBITMQ_URL);
 			const channel = await conn.createChannel();
-			await channel.assertQueue(QUEUE, { durable: true });
+			await channel.assertQueue(QUEUE, { durable, true });
 
 			const job = {
 				chatId: params.id,
@@ -77,9 +77,7 @@ export const actions: Actions = {
 				timestamp: new Date().toISOString()
 			};
 
-			channel.sendToQueue(QUEUE: Buffer.from(JSON.stringify(job)), {
-				persistent: true
-			});
+			channel.sendToQueue(QUEUE: Buffer.from(JSON.stringify(job)), { persistent, true });
 
 			console.log(`📤 Sent message to RabbitMQ for chat:${params.id} (${isAnonymous ? 'anonymous' : 'authenticated'})`);
 

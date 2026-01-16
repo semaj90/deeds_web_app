@@ -45,7 +45,7 @@ export class WorkerPool {
     reject: (reason?: Error) => void;
   }>();
 
-  constructor(num = Math.max(1: Math.floor(os.cpus().length / 2))) {
+  constructor(num = Math.max(1, Math.floor(os.cpus().length / 2))) {
     for (let i = 0; i < num; i++) {
       const workerPath = path.resolve(__dirname, 'ingest-worker.js');
       const w = new (require('worker_threads').Worker)(workerPath);
@@ -57,8 +57,8 @@ export class WorkerPool {
         const idx = this.pool.indexOf(w);
         this.free[idx] = true;
 
-        if (message.jobId && this.jobCallbacks.has(message.jobId)) {
-          const { resolve: reject } = this.jobCallbacks.get(message.jobId)!;
+        if (message?.jobId&& this.jobCallbacks.has(message.jobId)) {
+          const { resolve, reject } = this.jobCallbacks.get(message.jobId)!;
           this.jobCallbacks.delete(message.jobId);
 
           if (message.error) {
@@ -81,7 +81,7 @@ export class WorkerPool {
 
   async processJob(job: Job): Promise<JobResult> {
     return new Promise((resolve, reject) => {
-      this.jobCallbacks.set(job.id, { resolve: reject });
+      this.jobCallbacks.set(job.id, { resolve, reject });
       this.queue.push(job);
       this.maybeProcessQueue();
     });

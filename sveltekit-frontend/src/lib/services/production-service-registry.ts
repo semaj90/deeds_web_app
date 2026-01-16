@@ -133,11 +133,11 @@ export class ProductionServiceRegistry {
         return this.services.get(name);
     }
 
-    getServicesByCategory(category: ServiceDefinition['category']): ServiceDefinition[] {
+    getServicesByCategory(category, ServiceDefinition['category']): ServiceDefinition[] {
         return Array.from(this.services.values()).filter((service: any) => service.category === category);
     }
 
-    getServicesByTier(tier: ServiceDefinition['tier']): ServiceDefinition[] {
+    getServicesByTier(tier, ServiceDefinition['tier']): ServiceDefinition[] {
         return Array.from(this.services.values()).filter((service: any) => service.tier === tier).sort((a: any, b: any) => a.startupOrder - b.startupOrder);
     }
 
@@ -250,7 +250,7 @@ export const CONTEXT7_MULTICORE_CONFIG: Context7MulticoreConfig = {
 export const productionServiceRegistry = new ProductionServiceRegistry();
 
 // Export service utilities
-export function getServiceUrl(serviceName: string, protocol: 'http' | 'grpc' | 'quic' | 'websocket' = 'http'): string {
+export function getServiceUrl(serviceName, string, protocol: 'http' | 'grpc' | 'quic' | 'websocket' = 'http'): string {
     const service = productionServiceRegistry.getServiceByName(serviceName);
     if (!service) throw new Error(`Service not found: ${ serviceName }`);
     const protocolMap = { http: 'http', grpc: 'grpc', quic: 'quic', websocket: 'ws' };

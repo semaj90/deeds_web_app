@@ -33,7 +33,7 @@ export const GET: RequestHandler = async () => {
  const usersSameRef = globalThis.__users_ref ? globalThis.__users_ref === users : true;
  const sessionsSameRef = globalThis.__sessions_ref ? globalThis.__sessions_ref === sessions : true;
  const luciaInstanceReused =
- !!globalThis.__lucia_instance && globalThis.__lucia_instance === lucia;
+ !!globalThis?.__lucia_instance&& globalThis.__lucia_instance === lucia;
 
  if (!usersSameRef || !sessionsSameRef) {
  status = 'degraded';
@@ -63,10 +63,10 @@ export const GET: RequestHandler = async () => {
  let countsError: string | null = null;
 
  try {
- const [{ count: uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);
+ const [{ count, uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);
  userCount = Number(uCount);
 
- const [{ count: sCount }] = await db.select({ count: sql<number>`count(*)` }).from(sessions);
+ const [{ count, sCount }] = await db.select({ count: sql<number>`count(*)` }).from(sessions);
  sessionCount = Number(sCount);
 
  recentSessions = await db

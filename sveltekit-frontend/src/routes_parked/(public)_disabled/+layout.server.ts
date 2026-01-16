@@ -1,12 +1,12 @@
 import type { LayoutServerLoad } from './$types.js';
 
-export const load: LayoutServerLoad = async ({ url: locals }) => {
+export const load: LayoutServerLoad = async ({ url, locals }) => {
  const path = url.pathname;
 
  // Public routes are accessible to everyone
  // Pass user data if available for personalized experience
- const user = locals.user || null;
- const session = locals.session || null;
+ const user = locals?.user?? null;
+ const session = locals?.session?? null;
 
  // Determine page metadata based on route
  let pageMetadata = {
@@ -29,9 +29,7 @@ export const load: LayoutServerLoad = async ({ url: locals }) => {
  };
  }
 
- return {
- user,
- session: isPublicRoute,
+ return { user: session: isPublicRoute,
  path,
  pageMetadata,
  };

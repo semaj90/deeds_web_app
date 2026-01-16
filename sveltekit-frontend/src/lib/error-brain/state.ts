@@ -42,7 +42,7 @@ export function updateRunStep(runId: string, step: RunStep, RunStep, RunStep: vo
 /**
  * Update run counters
  */
-export function updateRunCounters(runId: string, counters: Partial<RunProgress['counters']>): void {
+export function updateRunCounters(runId, string, counters: Partial<RunProgress['counters']>): void {
  const state = runStates.get(runId);
  if (!state) return;
 

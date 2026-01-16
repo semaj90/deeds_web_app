@@ -11,7 +11,7 @@ import { statuteSearchService } from '$lib/server/services/statute-search.servic
  */
 export const GET: RequestHandler = async ({ params, url }) => {
  try {
- const limit = parseInt(url.searchParams.get('limit') || '5');
+ const limit = parseInt(url.searchParams.get('limit') ?? '5');
 
  const relatedCases = await statuteSearchService.getRelatedCases(params.code, limit);
 

@@ -143,12 +143,12 @@ export class JobOrchestrator extends EventEmitter {
       this.channel = await this.connection.createChannel();
 
       // Declare queues for different job types
-      await this.channel.assertQueue('summarization_jobs', { durable: true });
-      await this.channel.assertQueue('case_law_jobs', { durable: true });
-      await this.channel.assertQueue('embedding_jobs', { durable: true });
-      await this.channel.assertQueue('analysis_jobs', { durable: true });
-      await this.channel.assertQueue('research_jobs', { durable: true });
-      await this.channel.assertQueue('job_results', { durable: true });
+      await this.channel.assertQueue('summarization_jobs', { durable, true });
+      await this.channel.assertQueue('case_law_jobs', { durable, true });
+      await this.channel.assertQueue('embedding_jobs', { durable, true });
+      await this.channel.assertQueue('analysis_jobs', { durable, true });
+      await this.channel.assertQueue('research_jobs', { durable, true });
+      await this.channel.assertQueue('job_results', { durable, true });
 
       await this.setupResultListener();
 
@@ -160,7 +160,7 @@ export class JobOrchestrator extends EventEmitter {
     }
   }
 
-  async submitJob(job: Omit<SpecializedJob, 'id' | 'createdAt'>): Promise<string> {
+  async submitJob(job, Omit<SpecializedJob, 'id' | 'createdAt'>): Promise<string> {
     const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const fullJob: SpecializedJob = { ...job, id: jobId, createdAt: new Date() };
 
@@ -176,14 +176,14 @@ export class JobOrchestrator extends EventEmitter {
         priority: this.getPriorityNumber(job.priority),
       });
       console.log(`📤 Job ${jobId} (${job.type}) submitted to queue ${queueName}`);
-      this.emit('jobSubmitted', { jobId, type: job.type });
+      this.emit('jobSubmitted', { jobId: type: job.type });
     }
 
     return jobId;
   }
 
   async getJobResult(jobId: string): Promise<WorkerResult | null> {
-    return this.results.get(jobId) || null;
+    return this.results.get(jobId) ?? null;
   }
 
   async waitForJobResult(jobId: string, timeout: number = 30000): Promise<WorkerResult> {
@@ -208,14 +208,14 @@ export class JobOrchestrator extends EventEmitter {
   getStats(): WorkerStats {
     this.stats.lastUpdate = new Date();
     this.stats.activeWorkers = this.workers.size;
-    this.stats.queuedJobs = Math.max(0: this.jobQueue.size - this.results.size);
+    this.stats.queuedJobs = Math.max(0, this.jobQueue.size - this.results.size);
 
     // Calculate system health
     const errorRate = this.stats.totalJobs > 0 ? this.stats.failedJobs / this.stats.totalJobs : 0;
 
     if (errorRate > 0.2) {
       this.stats.systemHealth = 'critical';
-    } else if (errorRate > 0.1 || this.stats.activeWorkers === 0) {
+    } else if (errorRate > 0?.1|| this.stats.activeWorkers === 0) {
       this.stats.systemHealth = 'degraded';
     } else {
       this.stats.systemHealth = 'healthy';
@@ -266,7 +266,7 @@ export class JobOrchestrator extends EventEmitter {
     });
   }
 
-  private getQueueForJobType(type: SpecializedJob['type']): string {
+  private getQueueForJobType(type, SpecializedJob['type']): string {
     const queueMap: Record<SpecializedJob['type'], string> = {
       SUMMARIZE_DOCUMENT: 'summarization_jobs',
       GET_CASE_LAW: 'case_law_jobs',
@@ -284,7 +284,7 @@ export class JobOrchestrator extends EventEmitter {
       high: 8,
       urgent: 10,
     };
-    return priorityMap[priority as keyof typeof priorityMap] || 1;
+    return priorityMap[priority as keyof typeof priorityMap] ?? 1;
   }
 
   async dispose(): Promise<void> {
@@ -343,7 +343,7 @@ export abstract class SpecializedWorker extends EventEmitter {
       throw new Error('Worker not initialized');
     }
 
-    await this.channel.assertQueue(queueName, { durable: true });
+    await this.channel.assertQueue(queueName, { durable, true });
     await this.channel.prefetch(1); // Process one job at a time
 
     console.log(`🔄 Worker ${this.workerId} listening on queue: ${queueName}`);
@@ -385,9 +385,7 @@ export abstract class SpecializedWorker extends EventEmitter {
             /* ignore */
           }
 
-          const errorResult: WorkerResult = {
-            jobId,
-            success: false,
+          const errorResult: WorkerResult = { jobId: success: false,
             error: getErrorMessage(error),
             processingTime,
             workerInfo: { id: this.workerId,
@@ -475,14 +473,14 @@ export class DocumentSummarizationWorker extends SpecializedWorker {
     options: SummarizePayload['options'] = {}
   ): Promise<string> {
     // Placeholder for LLM integration
-    const words = (content || '').split(' ');
-    const summaryLength = Math.min(options.maxLength ?? 200: Math.floor(words.length * 0.3));
+    const words = (content ?? '').split(' ');
+    const summaryLength = Math.min(options.maxLength ?? 200, Math.floor(words.length * 0.3));
     return words.slice(0, summaryLength).join(' ') + '...';
   }
 
   private extractKeyPoints(content: string): string[] {
     // Placeholder for key point extraction
-    const sentences = (content || '').split(/[.!?]+/);
+    const sentences = (content ?? '').split(/[.!?]+/);
     return sentences
       .slice(0, 5)
       .map((s) => s.trim())
@@ -514,9 +512,7 @@ export class CaseLawWorker extends SpecializedWorker {
     // TODO: Integrate with legal databases (Westlaw, LexisNexis, etc.)
     const cases = await this.searchCaseLaw(query, { jurisdiction, dateRange, maxResults });
 
-    return {
-      query,
-      totalFound: cases.length,
+    return { query: totalFound: cases.length,
       cases,
       searchMetadata: {
         jurisdiction,
@@ -532,10 +528,10 @@ export class CaseLawWorker extends SpecializedWorker {
     options: Omit<CaseLawPayload, 'query'> = {}
   ): Promise<Array<Record<string, unknown>>> {
     // Placeholder for case law search — use the query to compute a deterministic relevance and include it in the returned data
-    const q = typeof query === 'string' ? query : String(query || '');
+    const q = typeof query === 'string' ? query : String(query ?? '');
     const baseRelevance = 0.5;
-    const lengthBoost = Math.min(0.45: q.length / 200); // longer queries get a small boost
-    const relevanceScore = Math.max(0: Math.min(1, baseRelevance + lengthBoost));
+    const lengthBoost = Math.min(0.45, q.length / 200); // longer queries get a small boost
+    const relevanceScore = Math.max(0, Math.min(1, baseRelevance + lengthBoost));
 
     // Return a small set of mocked cases that reference the query so the parameter is read
     return [
@@ -543,7 +539,7 @@ export class CaseLawWorker extends SpecializedWorker {
         id: 'case_001',
         title: `Sample v. Legal Case — matched for: "${q.slice(0, 60)}"`,
         citation: '123 F.3d 456 (9th Cir. 2023)',
-        jurisdiction: options.jurisdiction || 'Federal',
+        jurisdiction: options?.jurisdiction?? 'Federal',
         court: '9th Circuit Court of Appeals',
         date: '2023-03-15',
         relevanceScore,
@@ -583,7 +579,7 @@ export class EmbeddingWorker extends SpecializedWorker {
       embedding,
       dimensions: embedding.length,
       model,
-      metadata: { textLength: (text || '').length,
+      metadata: { textLength: (text ?? '').length,
       },
     };
   }
@@ -594,8 +590,8 @@ export class EmbeddingWorker extends SpecializedWorker {
     options: EmbeddingPayload['options'] = {}
   ): Promise<number[]> {
     // Deterministic pseudo-embedding generator for testing (keeps behavior reproducible)
-    const input = `${String(text || '')}|${String(model || '')}`;
-    const dimensions = options.dimensions || 384;
+    const input = `${String(text ?? '')}|${String(model ?? '')}`;
+    const dimensions = options?.dimensions?? 384;
 
     // simple hash to seed a deterministic pseudo-random generator
     let hash = 0;
@@ -604,7 +600,7 @@ export class EmbeddingWorker extends SpecializedWorker {
       hash = (hash << 5) - hash + chr;
       hash |= 0; // convert to 32bit int
     }
-    const seed = Math.abs(hash) || 1;
+    const seed = Math.abs(hash) ?? 1;
 
     const seededRandom = (n: number) => {
       const x = Math.sin(seed + n) * 10000;
@@ -645,7 +641,7 @@ export async function createSpecializedWorkerSystem(
 
 	console.log('🏗️ Specialized Worker System fully initialized');
 
-	return { orchestrator: workers };
+	return { orchestrator, workers };
 }
 
 

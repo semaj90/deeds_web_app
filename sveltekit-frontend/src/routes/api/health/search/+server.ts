@@ -1,7 +1,7 @@
 import { env } from '$lib/env';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const GO_MICROSERVICE_URL = env.GO_MICROSERVICE_URL || 'http://localhost:8080';
+const GO_MICROSERVICE_URL = env?.GO_MICROSERVICE_URL?? 'http://localhost:8080';
 
 /**
  * Health check endpoint for search service

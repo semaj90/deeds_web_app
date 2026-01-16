@@ -199,8 +199,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /** * Download content as file */
-export function downloadFile(content: string, filename: string, mimeType: string = 'text/plain') {
- const blob = new Blob([content], { type: mimeType });
+export function downloadFile(content, string, filename: string, mimeType: string = 'text/plain') {
+ const blob = new Blob([content], { type, mimeType });
  const url = URL.createObjectURL(blob);
  const a = document.createElement('a');
  a.href = url;

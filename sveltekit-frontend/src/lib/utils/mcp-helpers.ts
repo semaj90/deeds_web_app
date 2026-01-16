@@ -199,9 +199,9 @@ export async function copilotOrchestrator(
  results.directory = await mcpReadDirectory(options.directoryPath);
  }
  // Step 6: Multi-Agent Orchestration (dynamic agent registry)
- if (options.useMultiAgent || (options.agents && options.agents.length > 0)) {
+ if (options?.useMultiAgent|| (options?.agents&& options.agents.length > 0)) {
  const agentsToRun =
- options.agents && options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
+ options?.agents&& options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
  results.agentResults = [] as AgentOutcome[];
  for (const agent of agentsToRun) {
  if (agentRegistry[agent]) {
@@ -212,11 +212,11 @@ export async function copilotOrchestrator(
   
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
- results.agentResults.push({ agent: msg });
+ results.agentResults.push({ agent, msg });
   
  }
  } else {
- results.agentResults.push({ agent, error: `Agent not registered` });
+ results.agentResults.push({ agent: error: `Agent not registered` });
  }
  }
  }
@@ -373,13 +373,13 @@ export function validateMCPRequest(request: MCPToolRequest): { valid: boolean; e
  switch (request.tool) {
  case 'analyze-stack':
  if (!request.component) errors.push('Component is required for analyze-stack');
- if (request.context && !['legal-ai', 'gaming-ui', 'performance'].includes(request.context)) {
+ if (request?.context&& !['legal-ai', 'gaming-ui', 'performance'].includes(request.context)) {
  errors.push('Context must be one of: legal-ai, gaming-ui, performance'); // Corrected string
  }
  break;
  case 'generate-best-practices':
  if (!request.area) errors.push('Area is required for generate-best-practices');
- if (request.area && !['performance', 'security', 'ui-ux'].includes(request.area)) {
+ if (request?.area&& !['performance', 'security', 'ui-ux'].includes(request.area)) {
  errors.push('Area must be one of: performance, security, ui-ux'); // Corrected string
  }
  break;
@@ -394,10 +394,10 @@ export function validateMCPRequest(request: MCPToolRequest): { valid: boolean; e
  break;
  case 'rag-query':
  if (!request.query) errors.push('Query is required for rag-query');
- if (request.maxResults && (request.maxResults < 1 || request.maxResults > 50))
+ if (request?.maxResults&& (request.maxResults < 1 || request.maxResults > 50))
  errors.push('Max results must be between 1 and 50'); // Corrected string
  if (
- request.confidenceThreshold &&
+ request?.confidenceThreshold&&
  (request.confidenceThreshold < 0 || request.confidenceThreshold > 1)
  )
  errors.push('Confidence threshold must be between 0 and 1'); // Corrected string
@@ -416,7 +416,7 @@ export function validateMCPRequest(request: MCPToolRequest): { valid: boolean; e
  if (!request.integrationType)
  errors.push('Integration type is required for rag-integration-guide');
  if (
- request.integrationType &&
+ request?.integrationType&&
  !['api-integration', 'component-integration', 'search-ui', 'document-upload'].includes(
  request.integrationType
  )
@@ -610,7 +610,7 @@ export async function semanticSearch(query: string): Promise<unknown[]> {
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  console.error('semanticSearch error: ', msg);
- return [{ error: msg } as unknown];
+ return [{ error, msg } as unknown];
  }
 }
 // Production: Integrate with MCP memory server
@@ -624,7 +624,7 @@ export async function mcpMemoryReadGraph(): Promise<unknown[]> {
  }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
- return [{ error: msg } as unknown];
+ return [{ error, msg } as unknown];
  }
 }
 // Enhanced Context7 MCP codebase analysis
@@ -643,7 +643,7 @@ export async function mcpCodebaseAnalyze(prompt: string): Promise<unknown[]> {
  }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
- return [{ error: msg } as unknown];
+ return [{ error, msg } as unknown];
  }
 }
 // Production: Integrate with MCP get_changed_files
@@ -692,7 +692,7 @@ export async function mcpReadErrorLog(): Promise<unknown[]> {
  }]; // Corrected syntax
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
- return [{ error: msg }];
+ return [{ error, msg }];
  }
 }
 export async function mcpRankErrors(errorLog: any): Promise<unknown[]> {
@@ -710,7 +710,7 @@ export async function mcpRankErrors(errorLog: any): Promise<unknown[]> {
  return [errorLog];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
- return [{ error: msg }];
+ return [{ error, msg }];
  }
 }
 export function synthesizeLLMOutputs(results: any): string {

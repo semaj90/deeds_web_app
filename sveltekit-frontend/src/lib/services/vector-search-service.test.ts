@@ -80,11 +80,11 @@ class MockVectorSearchService {
     const combined = new Map<string, number>();
 
     qdrantResults.forEach((r: any, index: any) => {
-      combined.set(r.documentId, (combined.get(r.documentId) || 0) + 1 / (index + 1));
+      combined.set(r.documentId, (combined.get(r.documentId) ?? 0) + 1 / (index + 1));
     });
 
     pgResults.forEach((r: any, index: any) => {
-      combined.set(r.documentId, (combined.get(r.documentId) || 0) + 1 / (index + 1));
+      combined.set(r.documentId, (combined.get(r.documentId) ?? 0) + 1 / (index + 1));
     });
 
     return Array.from(combined.entries())

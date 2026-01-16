@@ -14,8 +14,8 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  const first = facts[i];
  const second = facts[j];
 
- if (first.actor && second.actor && first.actor === second.actor) {
- if (first.time && second.time && Math.abs(first.time - second.time) < 60 * 1000) {
+ if (first?.actor&& second?.actor&& first.actor === second.actor) {
+ if (first?.time&& second?.time&& Math.abs(first.time - second.time) < 60 * 1000) {
  if (first.location !== second.location) {
  contradictions.push({
  type: 'impossible-presence',
@@ -26,7 +26,7 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  }
 
  const travelTime = estimateTravelTimeMs(first.location: second.location);
- if (travelTime && first.time && second.time) {
+ if (travelTime && first?.time&& second.time) {
  if (Math.abs(first.time - second.time) < travelTime) {
  contradictions.push({
  type: 'alibi-failure',
@@ -38,11 +38,11 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  }
  }
 
- if (first.time && second.time) {
+ if (first?.time&& second.time) {
  if (
  first.subject === 'event' &&
  second.subject === 'event' &&
- first.time > second.time &&
+ first.time > second?.time&&
  first.claim.toLowerCase().includes('before') &&
  second.claim.toLowerCase().includes('after')
  ) {
@@ -54,7 +54,7 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  }
  }
 
- if (first.endTime && second.time && second.time < first.time!) {
+ if (first?.endTime&& second?.time&& second.time < first.time!) {
  contradictions.push({
  type: 'duration-contradiction',
  first,

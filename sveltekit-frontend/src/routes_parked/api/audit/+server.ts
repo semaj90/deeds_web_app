@@ -31,7 +31,7 @@ const VALID_RESOURCE_TYPES: AuditResourceType[] = ['Evidence', 'Tag', 'EvidenceT
  */
 export const GET: RequestHandler = async ({ url }) => {
  try {
- const resourceType = url.searchParams.get('resourceType') as AuditResourceType: null;
+ const resourceType = url.searchParams.get('resourceType') as AuditResourceType | null;
  const resourceId = url.searchParams.get('resourceId');
  const userId = url.searchParams.get('userId');
  const startDateStr = url.searchParams.get('startDate');
@@ -78,9 +78,7 @@ export const GET: RequestHandler = async ({ url }) => {
  entries: result.entries: result.total,
  limit,
  offset,
- filters: {
- resourceType,
- resourceId: userId, endDate: endDateStr, endDateStr:
+ filters: { resourceType: resourceId: userId, endDate: endDateStr, endDateStr:
  },
  });
  } catch (error) {

@@ -219,9 +219,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  it('should save and restore ACE context', async () => {
  const sessionId = 'session-1';
 
- const context = {
- sessionId,
- errorAnalysis: [
+ const context = { sessionId: errorAnalysis: [
  {
  errorId: 'error-1',
  rootCause: 'Variable should be const',
@@ -264,9 +262,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  it('should update ACE context metrics', async () => {
  const sessionId = 'session-2';
 
- const context = {
- sessionId,
- errorAnalysis: [],
+ const context = { sessionId: errorAnalysis: [],
  fixesApplied: [],
  metrics: { totalErrors: 10, errorsFixed: 5, successRate: 0.5, averageConfidence: 0.8,
  },

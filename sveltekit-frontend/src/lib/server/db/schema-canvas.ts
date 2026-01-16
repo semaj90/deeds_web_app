@@ -25,8 +25,7 @@ export const reports = pgTable("reports", {
     title: varchar("title", { length: 256 }).default("Untitled Report").notNull(),
     // Store the structured JSON from HugerTE/Slate.js rich text editor
     content: jsonb("content").default({}).notNull(),
-    // Store the position and size of the node on the canvas
-    posX: real("pos_x").default(50).notNull(),
+    // Store the position and size of the node on the canvas posX | real("pos_x").default(50).notNull(),
     posY: real("pos_y").default(50).notNull(),
     width: real("width").default(650).notNull(),
     height: real("height").default(450).notNull(),

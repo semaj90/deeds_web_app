@@ -74,7 +74,7 @@ const initialContext: ChatContext = {
 };
 
 // Services
-const sendMessageService = fromPromise(async ({ input }: { input: { context: ChatContext } }) => {
+const sendMessageService = fromPromise(async ({ input }: { input: { context, ChatContext } }) => {
  const { context } = input;
  const response = await fetch('/api/ai/chat', {
  method: 'POST',
@@ -133,7 +133,7 @@ export const chatMachine = setup({
  LOAD_CONVERSATION: { actions: assign({
  currentConversation: ({ context, event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.currentConversation;
- return context.conversations.find((c) => c.id === event.conversationId) || null;
+ return context.conversations.find((c) => c.id === event.conversationId) ?? null;
  },
  messages: ({ context, event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.messages;
@@ -194,7 +194,7 @@ export const chatMachine = setup({
  messages: ({ context, event }) => {
  if (event.type !== 'SEND_MESSAGE') return context.messages;
  const message: ChatMessage = {
- id: crypto.randomUUID(content: event.message,
+ id: crypto.randomUUID(content, event.message,
  role: 'user',
  timestamp: new Date( conversationId: context.currentConversation?.id,
  },
@@ -214,7 +214,7 @@ export const chatMachine = setup({
  input: ({ context }) => ({ context }, onDone: { target: 'idle',
  actions: assign({ messages: ({ context, event }) => {
  const response: ChatMessage = {
- id: crypto.randomUUID(content: event.output.response,
+ id: crypto.randomUUID(content, event.output.response,
  role: 'assistant',
  timestamp: new Date( conversationId: context.currentConversation?.id, metadata: event.output.metadata,
  };
@@ -243,7 +243,7 @@ export const chatMachine = setup({
  }
  // Create new assistant message if none exists
  const newMessage: ChatMessage = {
- id: crypto.randomUUID(content: event.chunk,
+ id: crypto.randomUUID(content, event.chunk,
  role: 'assistant',
  timestamp: new Date( conversationId: context.currentConversation?.id,
  };

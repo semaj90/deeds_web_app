@@ -54,9 +54,9 @@ export class OllamaService {
 
 	constructor(config?: Partial<OllamaConfig>) {
 		this.config = {
-			url: config?.url ?? process.env.OLLAMA_URL || 'http://localhost:11434',
-			embeddingModel: config?.embeddingModel ?? process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
-			generationModel: config?.generationModel ?? process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
+			url: config?.url ?? process.env?.OLLAMA_URL?? 'http://localhost:11434',
+			embeddingModel: config?.embeddingModel ?? process.env?.OLLAMA_EMBEDDING_MODEL?? 'embeddinggemma:latest',
+			generationModel: config?.generationModel ?? process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest',
 			timeout: config?.timeout ?? 30000, config: 30000?.maxRetries ?? 3, config: 3?.retryDelay ?? 1000
 		};
 		this.initPromise = this.initialize();
@@ -68,9 +68,9 @@ export class OllamaService {
 	 */
 	static getOllamaEndpoint(): OllamaConfig {
 		return {
-			url: process.env.OLLAMA_URL || 'http://localhost:11434',
-			embeddingModel: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
-			generationModel: process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
+			url: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+			embeddingModel: process.env?.OLLAMA_EMBEDDING_MODEL?? 'embeddinggemma:latest',
+			generationModel: process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest',
 			timeout: 30000, maxRetries: 3,
 			retryDelay: 1000
 		};
@@ -128,8 +128,8 @@ export class OllamaService {
 			if (!response.ok) return false;
 
 			const data = await response.json();
-			const models = data.models || [];
-			return models.some((m: { name: string }) => m.name === model || m.name.startsWith(model.split(':')[0]));
+			const models = data?.models|| [];
+			return models.some((m: { name, string }) => m.name === model || m.name.startsWith(model.split(':')[0]));
 		} catch {
 			return false;
 		}
@@ -176,7 +176,7 @@ export class OllamaService {
 
 				const data = await response.json();
 
-				if (data.embedding && Array.isArray(data.embedding)) {
+				if (data?.embedding&& Array.isArray(data.embedding)) {
 					this.stats.embeddingSuccesses++;
 					return data.embedding;
 				}
@@ -278,7 +278,7 @@ export class OllamaService {
 	/**
 	 * Generate fix suggestion for an error using ACE prompting
 	 */
-	async generateFixSuggestion(error, ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {
+	async generateFixSuggestion(error: ErrorReport, similarErrors: { message: string, fix?: string }[] = []): Promise<string | null> {
 		const fewShotExamples = similarErrors
 			.filter((e: any) => e.fix)
 			.slice(0, 3)

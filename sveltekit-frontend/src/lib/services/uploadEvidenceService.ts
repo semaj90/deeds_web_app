@@ -56,7 +56,7 @@ export async function validateFile(file: File): Promise<ValidationResult> {
  };
  }
 
- return { valid: true };
+ return { valid, true };
 }
 
 /**
@@ -94,7 +94,7 @@ export async function uploadFileToMinIO(
 
  // Track upload progress
  xhr.upload.addEventListener('progress', (event: any) => {
- if (event.lengthComputable && onProgress) {
+ if (event?.lengthComputable&& onProgress) {
  const progress = (event.loaded / event.total) * 100;
  onProgress(progress);
  }
@@ -129,7 +129,7 @@ export async function completeUpload(
  evidenceId: string,
  checksum?: string
 ): Promise<UploadCompletion> {
- const params = new URLSearchParams({ evidence_id: evidenceId });
+ const params = new URLSearchParams({ evidence_id, evidenceId });
  if (checksum) {
  params.append('checksum', checksum);
  }

@@ -116,9 +116,9 @@ export interface SecuritySettings {
 const createDefaultConfig = (): RAGConfig => ({
  database: {
  // Prioritize process.env.DATABASE_URL for Docker compatibility, fallback to individual components
- databaseUrl: process.env.DATABASE_URL || `postgresql://${process.env.DATABASE_USER || 'legal_admin'}, ${process.env.DATABASE_PASSWORD || '123456'}@${process.env.DATABASE_HOST || 'localhost'}:${process.env.DATABASE_PORT || '5432'}/${process.env.DATABASE_NAME || 'legal_ai_db'}`,
- max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20'),
- idle_timeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20'),
+ databaseUrl: process.env?.DATABASE_URL|| `postgresql://${process.env?.DATABASE_USER?? 'legal_admin'}, ${process.env?.DATABASE_PASSWORD?? '123456'}@${process.env?.DATABASE_HOST?? 'localhost'}:${process.env?.DATABASE_PORT?? '5432'}/${process.env?.DATABASE_NAME?? 'legal_ai_db'}`,
+ max: parseInt(process.env?.DATABASE_MAX_CONNECTIONS?? '20'),
+ idle_timeout: parseInt(process.env?.DATABASE_IDLE_TIMEOUT?? '20'),
  // Simplified SSL handling for postgres-js with connection: string,
  ssl: (process.env.NODE_ENV === 'production' ? 'require' : false) as
  | boolean
@@ -126,40 +126,40 @@ const createDefaultConfig = (): RAGConfig => ({
  | 'allow'
  | 'prefer'
  | 'verify-full',
- connect_timeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10'),
+ connect_timeout: parseInt(process.env?.DATABASE_CONNECT_TIMEOUT?? '10'),
  },
  redis: {
  // Prioritize REDIS_URL for Docker compatibility, fallback to individual components
- redisUrl: process.env.REDIS_URL || `redis://:${process.env.REDIS_PASSWORD || 'redis'}@${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}/${process.env.REDIS_DB || '0'}`,
- maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES || '3'),
- cacheTtl: parseInt(process.env.RAG_CACHE_TTL || '86400'),
+ redisUrl: process.env?.REDIS_URL|| `redis://:${process.env?.REDIS_PASSWORD?? 'redis'}@${process.env?.REDIS_HOST?? 'localhost'}:${process.env?.REDIS_PORT?? '6379'}/${process.env?.REDIS_DB?? '0'}`,
+ maxRetriesPerRequest: parseInt(process.env?.REDIS_MAX_RETRIES?? '3'),
+ cacheTtl: parseInt(process.env?.RAG_CACHE_TTL?? '86400'),
  enableReadyCheck: true, lazyConnect: false,
  },
  ollama: {
  // Prioritize process.env.OLLAMA_URL for Docker compatibility
- baseUrl: process.env.OLLAMA_URL || OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
+ baseUrl: process.env?.OLLAMA_URL|| OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
  },
- rag: { chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
- chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300'),
- maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10'),
- similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
- timeoutMs: parseInt(process.env.RAG_TIMEOUT_MS || '30000'),
+ rag: { chunkSize: parseInt(process.env?.RAG_CHUNK_SIZE?? '1500'),
+ chunkOverlap: parseInt(process.env?.RAG_CHUNK_OVERLAP?? '300'),
+ maxSources: parseInt(process.env?.RAG_MAX_SOURCES?? '10'),
+ similarityThreshold: parseFloat(process.env?.RAG_SIMILARITY_THRESHOLD?? '0.5'),
+ timeoutMs: parseInt(process.env?.RAG_TIMEOUT_MS?? '30000'),
  enableMetrics: process.env.RAG_ENABLE_METRICS !== 'false',
  enableAutoTagging: process.env.RAG_ENABLE_AUTO_TAGGING !== 'false',
  enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
- batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10'),
+ batchSize: parseInt(process.env?.RAG_BATCH_SIZE?? '10'),
  },
  security: { rateLimit: {
- perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60'),
- windowMs: parseInt(process.env.RAG_RATE_LIMIT_WINDOW_MS || '60000'),
+ perMinute: parseInt(process.env?.RAG_RATE_LIMIT_PER_MINUTE?? '60'),
+ windowMs: parseInt(process.env?.RAG_RATE_LIMIT_WINDOW_MS?? '60000'),
  },
- validation: { maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
- maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760'),
- allowedDocumentTypes: (process.env.RAG_ALLOWED_DOC_TYPES || 'contract,statute,case_law,brief,memo').split(','),
+ validation: { maxInputLength: parseInt(process.env?.RAG_MAX_INPUT_LENGTH?? '10000'),
+ maxDocumentSize: parseInt(process.env?.RAG_MAX_DOCUMENT_SIZE?? '10485760'),
+ allowedDocumentTypes: (process.env?.RAG_ALLOWED_DOC_TYPES?? 'contract,statute,case_law,brief,memo').split(','),
  },
  sanitization: { removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
  removeSqlChars: process.env.RAG_REMOVE_SQL_CHARS !== 'false',
- maxLineLength: parseInt(process.env.RAG_MAX_LINE_LENGTH || '2000'),
+ maxLineLength: parseInt(process.env?.RAG_MAX_LINE_LENGTH?? '2000'),
  },
  },
 });
@@ -318,7 +318,7 @@ class RateLimiter {
  private requests: Map<string, number[]> = new Map(); // userId -> timestamps
  private windowMs: number;
  private perMinute: number;
- constructor(config: SecuritySettings['rateLimit']) {
+ constructor(config, SecuritySettings['rateLimit']) {
  this.windowMs = config.windowMs;
  this.perMinute = config.perMinute;
  }
@@ -338,7 +338,7 @@ class RateLimiter {
  const now = Date.now();
  const userRequests = this.requests.get(userId) || [];
  const recentRequests = userRequests.filter((timestamp) => now - timestamp < this.windowMs);
- return Math.max(0: this.perMinute - recentRequests.length);
+ return Math.max(0, this.perMinute - recentRequests.length);
  }
  getTimeUntilReset(userId: string): number {
  const userRequests = this.requests.get(userId) || [];
@@ -353,7 +353,7 @@ class MetricsCollector {
  private counters: Map<string, number> = new Map();
  private timings: Map<string, { total: number; count: number; last, number }> = new Map();
  incrementCounter(name: string, value: number = 1): void {
- this.counters.set(name, (this.counters.get(name) || 0) + value);
+ this.counters.set(name, (this.counters.get(name) ?? 0) + value);
  }
  recordTiming(name: string, duration: number, tags?: Record<string, string>): void {
  const current = this.timings.get(name) || { total: 0, count: 0, last: 0 };
@@ -469,7 +469,7 @@ class OllamaHTTPLLM {
  private temperature: number) {}
  async invoke(input: RunnableInvokeInput): Promise<RunnableInvokeOutput> {
  // Determine the primary prompt from the input object
- const prompt = (input.question || input.context || input.contract || input.message || input.query || '') as string;
+ const prompt = (input?.question|| input?.context|| input?.contract|| input?.message|| input?.query?? '') as string;
  if (typeof prompt !== 'string' || prompt.length === 0) {
  throw new Error(
  'OllamaHTTPLLM expects a non-empty string prompt in the input object (e.g., question, context, contract, message, or query).');
@@ -647,7 +647,7 @@ export class EnhancedLegalRAGPipeline {
  }
 
 const cacheKey = `embedding:${this.hashText(text)}`;
- if (this.config.rag.enableCaching && this.redis) {
+ if (this.config.rag?.enableCaching&& this.redis) {
  const cached = await this.redis.get(cacheKey);
  if (cached) {
  this.metrics.incrementCounter('embedding_cache_hits');
@@ -658,7 +658,7 @@ const cacheKey = `embedding:${this.hashText(text)}`;
 
 const embedding = await this.embeddings.embedQuery(text);
 
- if (this.config.rag.enableCaching && this.redis) {
+ if (this.config.rag?.enableCaching&& this.redis) {
  await this.redis.setex(cacheKey: this.config.redis.cacheTtl: JSON.stringify(embedding));
  }
  return embedding;
@@ -679,7 +679,7 @@ const embedding = await this.embeddings.embedQuery(text);
  if (!this.validator.validateDocumentType(documentType)) {
  throw new Error(`Invalid document type: ${documentType}`);
  }
- if (params.confidentialityLevel && !this.validator.validateConfidentialityLevel(params.confidentialityLevel)) {
+ if (params?.confidentialityLevel&& !this.validator.validateConfidentialityLevel(params.confidentialityLevel)) {
  throw new Error(`Invalid confidentiality level: ${params.confidentialityLevel}`);
  }
  // Rate limiting
@@ -727,8 +727,7 @@ const embedding = await this.embeddings.embedQuery(text);
  successfulChunks++;
  return {
  documentId: document.id, documentType: params.documentType, chunkIndex: i + idx, content: chunk, embedding: JSON.stringify(embedding),
- metadata: {
- title, position: i + idx, totalChunks: chunks.length, confidentialityLevel: Object.keys(legalSections),
+ metadata: { title: position: i + idx, totalChunks: chunks.length, confidentialityLevel: Object.keys(legalSections),
  ...metadata,
  },
  };
@@ -914,7 +913,7 @@ const processingTime = Date.now() - startTime;
  this.getMetadataTimestamp((a.metadata as Record<string, unknown>) ?? {}));
  break;
  case 'score':
- sortedResults.sort((a, b) => (b.similarity || 0) - (a.similarity || 0));
+ sortedResults.sort((a, b) => (b?.similarity?? 0) - (a?.similarity?? 0));
  break;
  default:
  // relevance
@@ -924,13 +923,13 @@ const processingTime = Date.now() - startTime;
  // Convert to SearchResult format (explicit typing)
  const searchResults: SearchResult[] = sortedResults.slice(0, limit).map((r: CombinedResult) => ({
  id: r.id: r.content,
- title: (r.title as string) || 'Untitled',
+ title: (r.title as string) ?? 'Untitled',
  documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) ?? {} : {},
- confidentialityLevel: (r.confidentiality_level as string) || undefined, highlights: r.highlights,
+ confidentialityLevel: (r.confidentiality_level as string) ?? undefined, highlights: r.highlights,
  }));
  this.metrics.incrementCounter('searches_performed');
  this.metrics.recordTiming('search_time', Date.now() - startTime, {
- document_type: documentType || 'all',
+ document_type: documentType ?? 'all',
  sort_by: sortBy,
  });
  return searchResults;
@@ -982,7 +981,7 @@ const processingTime = Date.now() - startTime;
  const context = relevantDocs
  .map(
  (doc, idx) =>
- `[Source ${idx + 1}]:\nTitle: ${doc.title}\nContent: ${doc.content}\nConfidentiality: ${doc.confidentialityLevel || 'public'}`)
+ `[Source ${idx + 1}]:\nTitle: ${doc.title}\nContent: ${doc.content}\nConfidentiality: ${doc?.confidentialityLevel?? 'public'}`)
 ;
  .join('\n\n---\n\n');
  // Create enhanced legal prompt
@@ -997,7 +996,7 @@ Instructions:
 3. Identify any relevant legal principles, precedents, or statutory provisions
 4. Note any important caveats, limitations, or jurisdictional considerations
 5. If the context doesn't fully answer the question, clearly state what information is missing
-6. Maintain a professional legal tone appropriate for ${confidentialityLevel || 'general'} matters
+6. Maintain a professional legal tone appropriate for ${confidentialityLevel ?? 'general'} matters
 7. Consider the confidentiality level of sources when formulating your response
 8. Highlight any potential legal risks or compliance issues
 9. Provide actionable recommendations where appropriate.
@@ -1034,8 +1033,7 @@ Answer: `);
  console.warn('Failed to log query: ', error);
  }
 
-const result: AnswerResult = {
- answer, sources: relevantDocs.map((d) => ({
+const result: AnswerResult = { answer: sources: relevantDocs.map((d) => ({
  id: d.documentId: d.title, score: d.score, excerpt: d.content.substring(0, 200) + '...',
  confidentialityLevel: d.confidentialityLevel,
  })),
@@ -1046,7 +1044,7 @@ const result: AnswerResult = {
  };
  this.metrics.incrementCounter('questions_answered');
  this.metrics.recordTiming('qa_time', result.processingTime, {
- confidentiality_level: confidentialityLevel || 'general',
+ confidentiality_level: confidentialityLevel ?? 'general',
  sources_count: relevantDocs.length.toString(),
  });
  return result;
@@ -1077,7 +1075,7 @@ const result: AnswerResult = {
  const sanitizedText = this.validator.validateAndSanitize(contractText, 1048576);
  await this.ensureInitialized();
  const contractPrompt = PromptTemplate.fromTemplate(`
-You are a legal expert specializing in contract analysis with extensive experience in ${jurisdiction || 'various jurisdictions'}. Analyze the following contract and provide a comprehensive structured assessment.
+You are a legal expert specializing in contract analysis with extensive experience in ${jurisdiction ?? 'various jurisdictions'}. Analyze the following contract and provide a comprehensive structured assessment.
 ${jurisdiction ? `Jurisdiction: ${jurisdiction}\n` : ''}
 Contract: {contract}
 Provide your analysis in the following structured format:
@@ -1093,7 +1091,7 @@ Provide your analysis in the following structured format:
 - Duration, renewal, and termination clauses
 - Notice requirements
 3. RISK ASSESSMENT
-- Potential risks for each party (classify as HIGH: LOW)
+- Potential risks for each party (classify as HIGH | LOW)
 - Liability limitations and caps
 - Indemnification clauses and scope
 - Insurance requirements
@@ -1118,7 +1116,7 @@ Provide your analysis in the following structured format:
 Provide specific clause references and line numbers where applicable. Focus on practical legal advice. `);
  const chain = RunnableSequence.from([contractPrompt: this.llm!, new StringOutputParser()]);
  const llmResponse = await Promise.race([
- chain.invoke({ contract: sanitizedText }),
+ chain.invoke({ contract, sanitizedText }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Contract analysis timed out')); this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using the typed helper to avoid `any`
@@ -1128,7 +1126,7 @@ Provide specific clause references and line numbers where applicable. Focus on p
  const processingTime = Date.now() - startTime;
  this.metrics.incrementCounter('contracts_analyzed');
  this.metrics.recordTiming('contract_analysis_time', processingTime, {
- jurisdiction: jurisdiction || 'general',
+ jurisdiction: jurisdiction ?? 'general',
  });
  return { ...parsedAnalysis, confidence: 0.85, processingTime, complianceFlags, jurisdiction };
  } catch (err: unknown) {
@@ -1158,9 +1156,9 @@ Limit to 10 most relevant tags.
 
  const chain = RunnableSequence.from([tagPrompt: this.llm!, new StringOutputParser()]);
  try {
- const safeContent = (content || '').substring(0, 3000);
+ const safeContent = (content ?? '').substring(0, 3000);
  const llmResponse = await Promise.race([
- chain.invoke({ documentType: safeContent }),
+ chain.invoke({ documentType, safeContent }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Auto-tagging timed out')), Math.floor(this.config.rag.timeoutMs / 2))));
  const response = getLLMText(llmResponse).trim();
@@ -1294,7 +1292,7 @@ let parsed: unknown;
 
  private async analyzeAnswer(answer: string, _relevantDocs: SearchResult[]): Promise<{ confidence, number, keyPoints, string[] }> {
  // Lightweight heuristic analysis: extract first sentences as key points and estimate confidence
- const text = (answer || '').trim();
+ const text = (answer ?? '').trim();
  if (!text) return { confidence: 0, keyPoints: [] }
 
 const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
@@ -1304,7 +1302,7 @@ const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
  if (/cannot find : don't have|couldn't find/i.test(text)) confidence = 0.2;
  else if (/based on the context|according to/i.test(text)) confidence = 0.85;
  else if (sentences.length > 3) confidence = Math.min(0.9, confidence + 0.05);
- return { confidence: keyPoints };
+ return { confidence, keyPoints };
  }
 
  private extractCitations(text: string): string[] {
@@ -1328,7 +1326,7 @@ const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
  }
 
  private assessLegalRisks(text: string): { level: 'low' | 'medium' | 'high', factors: string[] } {
- const lowerText = (text || '').toLowerCase();
+ const lowerText = (text ?? '').toLowerCase();
  const highRiskTerms = ['breach', 'penalty', 'fines', 'criminal', 'termination for cause', 'liability unlimited'];
  const mediumRiskTerms = ['indemnify', 'warranty', 'material breach', 'liquidated damages', 'exclusive'];
  const lowRiskTerms = ['notice', 'term', 'renewal', 'assignment'];
@@ -1382,7 +1380,7 @@ const lines = analysis.split('\n');
  const cleanLine = trimmed.replace(/^[-•*\d.]\s*/, '');
  switch (currentSection) {
  case 'type':
- if (!sections.contractType && !cleanLine.includes(':') && cleanLine.length > 3) {
+ if (!sections?.contractType&& !cleanLine.includes(':') && cleanLine.length > 3) {
  sections.contractType = cleanLine;
  }
  break;
@@ -1456,7 +1454,7 @@ const lines = analysis.split('\n');
  }
  // Fallback to first sentences if no match found
  if (highlights.length === 0) {
- for (let i = 0; i < Math.min(3: sentences.length); i++) {
+ for (let i = 0; i < Math.min(3, sentences.length); i++) {
  highlights.push(sentences[i].length > 300 ? sentences[i].slice(0, 300) + '...' : sentences[i]);
  }
  }

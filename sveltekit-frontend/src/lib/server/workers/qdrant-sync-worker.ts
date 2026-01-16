@@ -25,7 +25,7 @@ interface QdrantSyncConfig {
 }
 
 const DEFAULT_CONFIG: QdrantSyncConfig = {
- qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
+ qdrantUrl: process.env?.QDRANT_URL?? 'http://localhost:6333',
  batchSize: 50, pollIntervalMs: 5000 // 5 seconds
  retryAttempts: 3,
 };
@@ -73,7 +73,7 @@ export class QdrantSyncWorker {
  { name: 'legal_evidence', dimension: 384 },
  { name: 'phase72_errors', dimension: 768 }];
 
- for (const { name: dimension } of collections) {
+ for (const { name, dimension } of collections) {
  try {
  await this.qdrant.getCollection(name);
  console.log(`✅ Collection "${name}" exists`);
@@ -98,8 +98,8 @@ export class QdrantSyncWorker {
  throw new Error(`Chunk ${chunk.id} has no embedding`);
  }
 
- const collection = chunk.qdrantCollection || 'legal_documents';
- const pointId = chunk.qdrantPointId || chunk.id;
+ const collection = chunk?.qdrantCollection?? 'legal_documents';
+ const pointId = chunk?.qdrantPointId|| chunk.id;
 
  // Prepare Qdrant point
  const point = {
@@ -143,7 +143,7 @@ export class QdrantSyncWorker {
  let attempts = 0;
  let success = false;
 
- while (attempts < this.config.retryAttempts && !success) {
+ while (attempts < this.config?.retryAttempts&& !success) {
  try {
  await this.syncChunk(chunk);
  synced++;
@@ -174,7 +174,7 @@ export class QdrantSyncWorker {
 
  console.log(`✅ Batch complete: ${synced} synced, ${errors} errors (${duration}ms)`);
 
- return { synced: errors };
+ return { synced, errors };
  }
 
  /**
@@ -233,7 +233,7 @@ export class QdrantSyncWorker {
  let totalErrors = 0;
 
  while (true) {
- const { synced: errors } = await this.processBatch();
+ const { synced, errors } = await this.processBatch();
 
  totalSynced += synced;
  totalErrors += errors;
@@ -261,7 +261,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  // Run once and exit
  worker
  .syncAll()
- .then(({ synced: errors }) => {
+ .then(({ synced, errors }) => {
  console.log(`\n📊 Final stats: ${synced} synced, ${errors} errors`);
  process.exit(errors > 0 ? 1 : 0);
  })

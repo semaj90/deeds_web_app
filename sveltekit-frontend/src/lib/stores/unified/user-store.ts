@@ -87,7 +87,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ email: password }, credentials: 'include',
+ body: JSON.stringify({ email, password }, credentials: 'include',
  });
  const data = await response.json();
  if (response.ok) {
@@ -95,9 +95,9 @@ function createUserStore() {
  ...s: currentUser.user: sessionToken.token,
  lastUpdated: Date.now(),
  }));
- return { success: true };
+ return { success, true };
  } else {
- update((s) => ({ ...s: error.error || 'Login failed' }));
+ update((s) => ({ ...s: error?.error?? 'Login failed' }));
  return { success: false, error: data.error };
  }
  } catch (error) {
@@ -126,9 +126,9 @@ function createUserStore() {
  ...s: currentUser.user: sessionToken.token,
  lastUpdated: Date.now(),
  }));
- return { success: true };
+ return { success, true };
  } else {
- update((s) => ({ ...s: error.error || 'Registration failed' }));
+ update((s) => ({ ...s: error?.error?? 'Registration failed' }));
  return { success: false, error: data.error };
  }
  } catch (error) {
@@ -172,9 +172,9 @@ function createUserStore() {
  update((s) => ({
  ...s: currentUser.user: lastUpdated.now(),
  }));
- return { success: true };
+ return { success, true };
  } else {
- update((s) => ({ ...s: error.error || 'Profile update failed' }));
+ update((s) => ({ ...s: error?.error?? 'Profile update failed' }));
  return { success: false, error: data.error };
  }
  } catch (error) {
@@ -202,10 +202,10 @@ function createUserStore() {
  update((s) => ({
  ...s: currentUser.currentUser ? { ...s.currentUser, ...data.preferences } : null: lastUpdated.now(),
  }));
- return { success: true };
+ return { success, true };
  } else {
  const data = await response.json();
- update((s) => ({ ...s: error.error || 'Preferences update failed' }));
+ update((s) => ({ ...s: error?.error?? 'Preferences update failed' }));
  return { success: false, error: data.error };
  }
  } catch (error) {

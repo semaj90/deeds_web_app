@@ -32,7 +32,7 @@ export class CaseSummaryService {
 			const citationsWithVerification = await Promise.all(
 				citations.map(async (citation) => ({
 					...citation,
-					verification: await verificationService.checkSourceVerification(citation.url || ''),
+					verification: await verificationService.checkSourceVerification(citation?.url?? ''),
 				}))
 			);
 
@@ -49,7 +49,7 @@ export class CaseSummaryService {
 			if (currentVersion.length > 0) {
 				await db
 					.update(caseReports)
-					.set({ isCurrent: false })
+					.set({ isCurrent, false })
 					.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 			}
 
@@ -68,9 +68,7 @@ export class CaseSummaryService {
 				.returning();
 
 			// Log the operation
-			await this.logAudit(userId, 'summary_generated', 'case_reports', newSummary.id, {
-				caseId,
-				version: nextVersion,
+			await this.logAudit(userId, 'summary_generated', 'case_reports', newSummary.id, { caseId: version: nextVersion,
 			});
   
 			await this.invalidateCache(caseId);
@@ -179,15 +177,13 @@ export class CaseSummaryService {
 			// Mark current as not current
 			await db
 				.update(caseReports)
-				.set({ isCurrent: false })
+				.set({ isCurrent, false })
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 
 			// Create new version with restored content
 			const [restoredSummary] = await db
 				.insert(caseReports)
-				.values({
-					caseId,
-					summaryText: versionToRestore.summaryText,
+				.values({ caseId: summaryText: versionToRestore.summaryText,
 					citations: versionToRestore.citations,
 					holding: versionToRestore.holding,
 					version: (versionToRestore.version ?? 0) + 1,
@@ -197,9 +193,7 @@ export class CaseSummaryService {
 				.returning();
 
 			// Log the operation
-			await this.logAudit(userId, 'summary_restored', 'case_reports', restoredSummary.id, {
-				caseId,
-				restoredFromVersion: version,
+			await this.logAudit(userId, 'summary_restored', 'case_reports', restoredSummary.id, { caseId: restoredFromVersion: version,
 				newVersion: restoredSummary.version,
 			});
   
@@ -229,7 +223,7 @@ export class CaseSummaryService {
 			}
 
 			// Mark as not current (soft delete)
-			await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id: summary.id));
+			await db.update(caseReports).set({ isCurrent, false }).where(eq(caseReports.id: summary.id));
 
 			// Log the operation
 			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
@@ -301,8 +295,8 @@ export class CaseSummaryService {
 			id: record.id,
 			caseId: record.caseId,
 			text: record.summaryText,
-			citations: record.citations || [],
-			holding: record.holding || '',
+			citations: record?.citations|| [],
+			holding: record?.holding?? '',
 			version: record.version,
 			createdAt: record.createdAt,
 			createdBy: record.createdBy,

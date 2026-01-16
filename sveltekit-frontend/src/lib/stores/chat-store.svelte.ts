@@ -57,13 +57,13 @@ export class ChatStore {
 
     // Derived
     messageCount = $derived(this.messages.length);
-    lastUserMessage = $derived(this.messages.filter(item => item.role === 'user').slice(-1)[0] || null);
-    lastAIResponse = $derived(this.messages.filter(item => item.role === 'assistant').slice(-1)[0] || null);
+    lastUserMessage = $derived(this.messages.filter(item => item.role === 'user').slice(-1)[0] ?? null);
+    lastAIResponse = $derived(this.messages.filter(item => item.role === 'assistant').slice(-1)[0] ?? null);
 
     conversationSummary = $derived.by(() => {
         const userMessages = this.messages.filter(item => item.role === 'user');
         const aiMessages = this.messages.filter(item => item.role === 'assistant');
-        const totalTokens = this.messages.reduce((sum, m) => sum + (m.token_count || 0), 0);
+        const totalTokens = this.messages.reduce((sum, m) => sum + (m?.token_count?? 0), 0);
         return {
             totalMessages: this.messages.length,
             totalTokens,
@@ -81,7 +81,7 @@ export class ChatStore {
 
         return {
             messageCount: sessionMessages.length,
-            tokensUsed: sessionMessages.reduce((sum, m) => sum + (m.token_count || 0), 0),
+            tokensUsed: sessionMessages.reduce((sum, m) => sum + (m?.token_count?? 0), 0),
             duration,
             lastActivity: this.session!.last_activity
         };
@@ -91,7 +91,7 @@ export class ChatStore {
     hasAnalysis = $derived(this.currentAnalysis !== null);
 
     attentionScore = $derived.by(() => {
-        const timeSinceActivity = Date.now() - (this.userAttention.lastActivity || 0);
+        const timeSinceActivity = Date.now() - (this.userAttention?.lastActivity?? 0);
         const maxInactiveTime = 60000; // 1 minute
         if (!this.userAttention.focused) return 0;
         if (timeSinceActivity > maxInactiveTime) return 0.1;
@@ -140,7 +140,7 @@ export class ChatStore {
             // Load chat history
             await this.loadHistory(sessionId);
         } catch (error: any) {
-            this.addError('Failed to load session', { sessionId: error });
+            this.addError('Failed to load session', { sessionId, error });
             throw error;
         }
     }
@@ -165,9 +165,9 @@ export class ChatStore {
             const response = await fetch(`/api/chat/history/${ sessionId }`);
             if (!response.ok) { throw new Error('Failed to load history'); }
             const history = await response.json();
-            this.messages = history.messages || [];
+            this.messages = history?.messages|| [];
         } catch (error: any) {
-            this.addError('Failed to load chat history', { sessionId: error });
+            this.addError('Failed to load chat history', { sessionId, error });
         }
     }
 
@@ -218,7 +218,7 @@ export class ChatStore {
 
     setRAGContext(context: RAGContext): void {
         this.ragContext = context;
-        this.recommendations = context.recommendations || [];
+        this.recommendations = context?.recommendations|| [];
         this.didYouMean = Array.isArray(context.did_you_mean) ? context.did_you_mean : [];
     }
 
@@ -236,7 +236,7 @@ export class ChatStore {
         // Update attention data
         this.userAttention = {
             ...this.userAttention, lastActivity: Date.now(),
-            interactionCount: (this.userAttention.interactionCount || 0) + 1
+            interactionCount: (this.userAttention?.interactionCount?? 0) + 1
         };
     }
 

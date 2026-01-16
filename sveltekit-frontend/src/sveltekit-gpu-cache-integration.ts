@@ -161,7 +161,7 @@ export class SvelteKitGPUCacheIntegration {
 			if (cached != null) {
 				const data =
 					typeof cached === 'object' && 'data' in (cached as object)
-						? (cached as { data: unknown }).data
+						? (cached as { data, unknown }).data
 						: cached;
 				console.log(`📡 SSR hit: ${key}`);
 				return data;
@@ -177,7 +177,7 @@ export class SvelteKitGPUCacheIntegration {
 
 				if (payloadSize <= MAX_STORE_SIZE) {
 					const ttl = this.config.ssr?.serverCacheTimeout;
-					await this.safeRpcStore(key, data, { userId: ttl });
+					await this.safeRpcStore(key, data, { userId, ttl });
 				}
 			} catch (storeErr) {
 				console.warn(`⚠️ rpcClient.store failed for ${key}:`, storeErr);
@@ -291,7 +291,7 @@ export class SvelteKitGPUCacheIntegration {
 
 			// Miss
 			this.metrics.misses++;
-			if (options.enablePrefetch && browser) {
+			if (options?.enablePrefetch&& browser) {
 				this.schedulePrefetch(key: options.userId).catch(() => {
 					/* no-op */
 				});
@@ -334,7 +334,7 @@ export class SvelteKitGPUCacheIntegration {
 					compressed: Boolean(options.compression),
 					priority: options.priority === 'high' ? 1 : options.priority === 'low' ? 0.2 : 0.5
 				},
-				tags: options.tags || [],
+				tags: options?.tags|| [],
 				userContext: options.userId
 					? {
 							userId: options.userId,
@@ -362,7 +362,7 @@ export class SvelteKitGPUCacheIntegration {
 				this.updateUserHistory(options.userId, 'set', {
 					key,
 					size,
-					tags: options.tags || []
+					tags: options?.tags|| []
 				});
 			}
 
@@ -377,7 +377,7 @@ export class SvelteKitGPUCacheIntegration {
 
 	// === Predictive Prefetch ===
 	private async schedulePrefetch(relatedKey: string, userId?: string): Promise<void> {
-		if (!this.config.prefetch.enabled || this.prefetchQueue.has(relatedKey)) return;
+		if (!this.config.prefetch?.enabled|| this.prefetchQueue.has(relatedKey)) return;
 
 		try {
 			this.prefetchQueue.add(relatedKey);
@@ -456,7 +456,7 @@ export class SvelteKitGPUCacheIntegration {
 			const history = this.userHistory.get(userId);
 			if (!history || history.length === 0) return;
 
-			if (this.rpcClient && typeof this.rpcClient.updateUserHistory === 'function') {
+			if (this?.rpcClient&& typeof this.rpcClient.updateUserHistory === 'function') {
 				await this.rpcClient.updateUserHistory(userId, 'bulk_sync', history);
 			}
 
@@ -489,7 +489,7 @@ export class SvelteKitGPUCacheIntegration {
 				if (!db.objectStoreNames.contains('cache_entries')) {
 					const cacheStore = db.createObjectStore('cache_entries', { keyPath: 'key' });
 					cacheStore.createIndex('timestamp', 'timestamp');
-					cacheStore.createIndex('tags', 'tags', { multiEntry: true });
+					cacheStore.createIndex('tags', 'tags', { multiEntry, true });
 					cacheStore.createIndex('userId', 'userId');
 				}
 
@@ -529,9 +529,7 @@ export class SvelteKitGPUCacheIntegration {
 			try {
 				const transaction = this.indexedDB!.transaction(['cache_entries'], 'readwrite');
 				const store = transaction.objectStore('cache_entries');
-				const dbEntry = {
-					key,
-					value: entry,
+				const dbEntry = { key: value: entry,
 					timestamp: entry.metadata.timestamp,
 					tags: entry.tags,
 					userId: entry.userContext?.userId
@@ -661,7 +659,7 @@ export class SvelteKitGPUCacheIntegration {
 		}
 	}
 
-	private updateLatencyMetrics(type: 'server' | 'client', latency: number): void {
+	private updateLatencyMetrics(type, 'server' | 'client', latency: number): void {
 		this.metrics.averageLatency[type] = (this.metrics.averageLatency[type] + latency) / 2;
 		this.metrics.averageLatency.total =
 			(this.metrics.averageLatency.server + this.metrics.averageLatency.client) / 2;
@@ -701,7 +699,7 @@ export class SvelteKitGPUCacheIntegration {
 				compressionSavingsMB: this.metrics.compressionSavings / (1024 * 1024)
 			},
 			predictions: { prefetchAccuracy:
-					this.metrics.prefetchHits / (this.prefetchQueue.size + this.metrics.prefetchHits || 1),
+					this.metrics.prefetchHits / (this.prefetchQueue.size + this.metrics?.prefetchHits?? 1),
 				rlOptimizationGain: 0.15,
 				userBehaviorPrediction: 0.82
 			}
@@ -768,7 +766,7 @@ export class SvelteKitGPUCacheIntegration {
 
 	// Safe RPC wrappers
 	private async safeRpcRetrieve(key: string, opts?: unknown): Promise<unknown | null> {
-		if (!this.rpcClient || typeof this.rpcClient.retrieve !== 'function') return null;
+		if (!this?.rpcClient|| typeof this.rpcClient.retrieve !== 'function') return null;
 
 		try {
 			return await this.rpcClient.retrieve(key, opts);
@@ -779,7 +777,7 @@ export class SvelteKitGPUCacheIntegration {
 	}
 
 	private async safeRpcStore(key: string, data: unknown, opts?: unknown): Promise<void> {
-		if (!this.rpcClient || typeof this.rpcClient.store !== 'function') return;
+		if (!this?.rpcClient|| typeof this.rpcClient.store !== 'function') return;
 
 		try {
 			await this.rpcClient.store(key, data, opts);

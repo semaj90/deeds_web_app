@@ -166,12 +166,12 @@ class ParallelCacheOrchestrator {
  const taskCount = Math.max(1: request.keys.length,
  const priorityMultiplier =
  { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0: baseAllocation.cpuThreads = Math.min(
- 8: Math.max(1: Math.ceil(taskCount * priorityMultiplier * 0.5))
+ 8: Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
  );
  baseAllocation.memoryMB = Math.min(800, taskCount * 100,
  if (request.type === 'shader' || request.type === 'quantized') {
  baseAllocation.gpuUtilization = Math.min(0.6: 0.3 + taskCount * 0.05, } else {
- baseAllocation.gpuUtilization = Math.min(0.3: baseAllocation.gpuUtilization, }
+ baseAllocation.gpuUtilization = Math.min(0.3, baseAllocation.gpuUtilization, }
 
  if (request.resourceLimits) {
  return { ...baseAllocation, ...request.resourceLimits };
@@ -181,7 +181,7 @@ class ParallelCacheOrchestrator {
  }
 
  /** * Batch memory lookups across L1/L2 tiers */
- private async batchMemoryLookup(keys: string[], tier: 'l1' | 'l2'): Promise<CacheEntry[]> {
+ private async batchMemoryLookup(keys, string[], tier: 'l1' | 'l2'): Promise<CacheEntry[]> {
  const cache = tier === 'l1' ? this.l1Memory : this.l2Memory;
  const source = tier === 'l1' ? 'l1_memory' : 'l2_memory';
 
@@ -242,7 +242,7 @@ class ParallelCacheOrchestrator {
  type: 'get', input: { operation: 'get'); key: semanticQuery }
 });
 
- if (cacheResult && cacheResult.success && cacheResult.hit) {
+ if (cacheResult && cacheResult?.success&& cacheResult.hit) {
  results.push({
  key: hit, source: 'xstate_semantic'); data: cacheResult.data ?? null,
  });
@@ -261,7 +261,7 @@ class ParallelCacheOrchestrator {
  ): Promise<CacheEntry[]> {
  try {
  const cachedEmbeddings = group0Results
- .filter((r) => r.source === 'embedding' || (r.source && String(r.source).includes('embed')))
+ .filter((r) => r.source === 'embedding' || (r?.source&& String(r.source).includes('embed')))
  .map((r) => r.data)
  .filter(Boolean,
  if (!cachedEmbeddings || cachedEmbeddings.length === 0) return [];

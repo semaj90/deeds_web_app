@@ -308,7 +308,7 @@ export const legalAIMachine = createMachine(
           const clusterResp = clusterStatusResponse as ServiceResponse<LooseObject>;
           const serviceResp = serviceHealthResponse as ServiceResponse<LooseObject[]>;
 
-          if (!clusterResp.success || !serviceResp.success) {
+          if (!clusterResp?.success|| !serviceResp.success) {
             throw new Error('Failed to fetch system status');
           }
 
@@ -347,7 +347,7 @@ export const legalAIMachine = createMachine(
             },
             metrics: {
               errorCount: serviceHealth.reduce(
-                (acc: number, s) => acc + ((s.errorCount as number) || 0),
+                (acc: number, s) => acc + ((s.errorCount as number) ?? 0),
                 0
               ),
               performanceScore: performanceScore,
@@ -381,13 +381,13 @@ export const legalAIMachine = createMachine(
               body: input.credentials,
             })) as ServiceResponse<LooseObject>;
 
-            if (response.success && response.data) {
+            if (response?.success&& response.data) {
               const data = response.data as LooseObject;
               const userObj = (data.user as LooseObject | undefined) ?? {};
               return {
-                id: (data.id as string) || (userObj.id as string) || '',
+                id: (data.id as string) || (userObj.id as string) ?? '',
                 email: (data.email as string) || input.credentials.email,
-                role: (data.role as string) || 'legal_professional',
+                role: (data.role as string) ?? 'legal_professional',
                 permissions: ((data.permissions as string[]) ?? [
                   'read: cases',
                   'write: cases',
@@ -395,7 +395,7 @@ export const legalAIMachine = createMachine(
                 ]) as string[],
               };
             } else {
-              throw new Error(response.error || 'Authentication failed');
+              throw new Error(response?.error?? 'Authentication failed');
             }
           } catch (error: unknown) {
             console.error('Authentication error: ', error);
@@ -413,7 +413,7 @@ export const legalAIMachine = createMachine(
               body: input?.filters ?? {},
             })) as ServiceResponse<LooseObject[] | { cases?: LooseObject[] }>;
 
-            if (response.success && response.data) {
+            if (response?.success&& response.data) {
               const data = response.data as LooseObject[] | { cases?: LooseObject[] };
               const casesArray = Array.isArray(data) ? (data as LooseObject[]) : (data.cases ?? []);
               return casesArray.map((caseData) => ({
@@ -443,27 +443,27 @@ export const legalAIMachine = createMachine(
 
       processAIQuery: fromPromise<AIResponse>(
         async (params) => {
-          const { input } = params as { input: { prompt: string } };
+          const { input } = params as { input: { prompt, string } };
           try {
             const response = (await productionServiceClient.makeRequest('/api/ai/query', {
               method: 'POST',
               body: input,
             })) as ServiceResponse<LooseObject>;
 
-            if (response.success && response.data) {
+            if (response?.success&& response.data) {
               const data = response.data as LooseObject;
               return {
-                response: (data.response as string) || (data.answer as string) || '',
+                response: (data.response as string) || (data.answer as string) ?? '',
                 confidence: (data.confidence as number) ?? 0.85,
                 sources: ((data.sources as Source[]) ??
                   (data.references as Source[]) ??
                   []) as Source[],
                 timestamp: new Date().toISOString(),
-                model: (data.model as string) || 'unknown',
+                model: (data.model as string) ?? 'unknown',
                 metadata: (data.metadata as Record<string, unknown>) || {},
               };
             } else {
-              throw new Error(response.error || 'AI query failed');
+              throw new Error(response?.error?? 'AI query failed');
             }
           } catch (error: unknown) {
             console.error('AI query error: ', error);

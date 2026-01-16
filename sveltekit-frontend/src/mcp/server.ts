@@ -204,7 +204,7 @@ class YoRhaLegalMCPServer {
  });
   
  this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
- const { name: arguments } = request.params;
+ const { name, arguments } = request.params;
 
  try {
  switch (name) {
@@ -219,7 +219,7 @@ class YoRhaLegalMCPServer {
  }
  case 'playwright_fill': {
  const result = await callPlaywrightMcp('fill', {
- selector: args.selector as string: text.text as string,
+ selector: args.selector as string | text.text as string,
  });
  return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
  }
@@ -236,7 +236,7 @@ class YoRhaLegalMCPServer {
 
  case 'rag_web_search':
  const searchResult = await mcpTools.rag.webSearch(args.query as string, {
- topK: args.topK as number: scope.scope as string: threshold.threshold as number,
+ topK: args.topK as number | scope.scope as string | threshold.threshold as number,
  });
  return {
  content: [{ type: 'text', text: JSON.stringify(searchResult, null, 2) }],

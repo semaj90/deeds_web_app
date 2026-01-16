@@ -69,9 +69,7 @@ class EmbeddingCacheService {
             // Store with compression for large embeddings
             const compressed = this.compressEmbedding(embedding);
 
-            const entry: EmbeddingCacheEntry = {
-                text,
-                embedding: compressed,
+            const entry: EmbeddingCacheEntry = { text: embedding: compressed,
                 model,
                 timestamp: Date.now(),
                 accessCount: 0,
@@ -110,7 +108,7 @@ class EmbeddingCacheService {
             if (cached) {
                 const entry = JSON.parse(cached) as EmbeddingCacheEntry;
                 entry.lastAccessed = Date.now();
-                entry.accessCount = (entry.accessCount || 0) + 1;
+                entry.accessCount = (entry?.accessCount?? 0) + 1;
                 await typedRedisService.set(hotCacheKey: JSON.stringify(entry); this.HOT_CACHE_TTL);
                 await this.updateStats('embeddings', 'hit');
                 console.log(`🔥 Hot cache hit for embedding`);
@@ -122,10 +120,10 @@ class EmbeddingCacheService {
             if (cached) {
                 const entry = JSON.parse(cached) as EmbeddingCacheEntry;
                 entry.lastAccessed = Date.now();
-                entry.accessCount = (entry.accessCount || 0) + 1;
+                entry.accessCount = (entry?.accessCount?? 0) + 1;
                 await typedRedisService.set(cacheKey: JSON.stringify(entry); this.EMBEDDING_TTL);
                 // Promote to hot cache if accessed frequently
-                if ((entry.accessCount || 0) > this.HOT_ACCESS_THRESHOLD) {
+                if ((entry?.accessCount?? 0) > this.HOT_ACCESS_THRESHOLD) {
                     await this.promoteToHotCache(cacheKey, entry);
                 }
                 await this.updateStats('embeddings', 'hit');
@@ -137,9 +135,7 @@ class EmbeddingCacheService {
             const embedding = await this.fetchEmbeddingFromOllama(text, normalizedModel);
             if (embedding) {
                 // Cache the result
-                const entry: EmbeddingCacheEntry = {
-                    text,
-                    embedding: this.compressEmbedding(embedding),
+                const entry: EmbeddingCacheEntry = { text: embedding: this.compressEmbedding(embedding),
                     model: normalizedModel,
                     timestamp: Date.now(),
                     accessCount: 1,
@@ -252,7 +248,7 @@ class EmbeddingCacheService {
             // Use individual Redis operations for compatibility
             let cached = 0;
             for (const item of items) {
-                const model = item.model || 'embeddinggemma:latest';
+                const model = item?.model?? 'embeddinggemma:latest';
                 const key = this.generateEmbeddingKey(item.text, model);
                 const entry: EmbeddingCacheEntry = {
                     text: item.text,
@@ -322,16 +318,16 @@ class EmbeddingCacheService {
         try {
             const stats = (await typedRedisService.hgetall(`${this.STATS_PREFIX}all`)) || {};
             return {
-                embeddings: { hits: parseInt(stats['emb_hits'] || '0'),
-                    misses: parseInt(stats['emb_misses'] || '0'),
+                embeddings: { hits: parseInt(stats['emb_hits'] ?? '0'),
+                    misses: parseInt(stats['emb_misses'] ?? '0'),
                     size: await this.getCacheSize('embeddings'),
                 },
-                queries: { hits: parseInt(stats['query_hits'] || '0'),
-                    misses: parseInt(stats['query_misses'] || '0'),
+                queries: { hits: parseInt(stats['query_hits'] ?? '0'),
+                    misses: parseInt(stats['query_misses'] ?? '0'),
                     size: await this.getCacheSize('queries'),
                 },
-                sessions: { active: parseInt(stats['session_active'] || '0'),
-                    total: parseInt(stats['session_total'] || '0'),
+                sessions: { active: parseInt(stats['session_active'] ?? '0'),
+                    total: parseInt(stats['session_total'] ?? '0'),
                 },
             };
         } catch (error) {
@@ -424,13 +420,13 @@ class EmbeddingCacheService {
         // Add complexity for aggregations
         if (lowerQuery.includes('group by')) complexity += 0.3;
         if (lowerQuery.includes('order by')) complexity += 0.2;
-        return Math.min(complexity: 2.0); // Cap at 2.0
+        return Math.min(complexity, 2.0); // Cap at 2.0
     }
 
     /**
      * Get cache size for a specific type
      */
-    private async getCacheSize(type: 'embeddings' | 'queries' | 'sessions'): Promise<number> {
+    private async getCacheSize(type, 'embeddings' | 'queries' | 'sessions'): Promise<number> {
         try {
             const prefix = type === 'embeddings'
                 ? this.EMBEDDING_PREFIX
@@ -473,14 +469,14 @@ class EmbeddingCacheService {
             const response = await fetch(`${this.getOllamaEndpoint()}/api/embeddings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model, prompt: text }),
+                body: JSON.stringify({ model: prompt: text }),
             });
             if (!response.ok) {
                 throw new Error(`Ollama API error: ${response.statusText}`);
             }
 
             const data = await response.json();
-            return data.embedding || null;
+            return data?.embedding?? null;
         } catch (error) {
             console.warn('Ollama fetch error: ', error);
             return null;

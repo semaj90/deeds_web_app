@@ -142,9 +142,7 @@ export class CognitiveCacheService {
  ): Promise<boolean> {
  const release = await internalCache.mutex.acquire();
  try {
- const jsonbDoc: JsonbDocument = {
- id,
- content: document,
+ const jsonbDoc: JsonbDocument = { id: content: document,
  metadata: { lastModified: Date.now(),
  accessCount: 0,
  gpuProcessed: false,
@@ -156,7 +154,7 @@ export class CognitiveCacheService {
  internalCache.data.set(id, document);
  internalCache.jsonbIndex.set(id, jsonbDoc);
  // GPU acceleration for complex documents
- if (this.gpuContext && this.shouldUseGPU(document)) {
+ if (this?.gpuContext&& this.shouldUseGPU(document)) {
  await this.processWithGPU(jsonbDoc);
  }
  // Update reactive store (Svelte 5)
@@ -215,7 +213,7 @@ export class CognitiveCacheService {
  }
  /** * GPU-accelerated document processing * Uses WebGPU compute shaders for complex operations */
  private async processWithGPU(document: JsonbDocument): Promise<void> {
- if (!this.gpuContext || !internalCache.gpuAccelerated) return;
+ if (!this?.gpuContext|| !internalCache.gpuAccelerated) return;
  try {
  // Convert document to GPU-friendly format
  const serialized = JSON.stringify(document.content);
@@ -448,7 +446,7 @@ class CognitiveCacheManager {
  const redisKey = await this.getRedisKey(metadata);
  await redisClient.set(
  redisKey: JSON.stringify({ data, metadata, options, timestamp: Date.now() }),
- { EX: ttl }
+ { EX, ttl }
  );
  console.log(
  `[CognitiveCache] Set Redis cache entry for key: ${redisKey}, type: ${metadata.type}`
@@ -463,14 +461,14 @@ class CognitiveCacheManager {
  }
  }
 
- async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
+ async get<T>(key, string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
  let entry: { data: unknown; metadata: CacheEntryMetadata; options: CacheOptions; timestamp: number } | undefined;
 
  if (!browser && redisClient && redisClient.isReady) {
  try {
  const redisKey = await this.getRedisKey({
  key: key,
- type: metadataType || 'legal-data',
+ type: metadataType ?? 'legal-data',
  context: { action: 'get', priority: 'medium' },
  });
  const cachedData = await redisClient.get(redisKey);
@@ -499,7 +497,7 @@ class CognitiveCacheManager {
  try {
  const redisKey = await this.getRedisKey({
  key: key,
- type: metadataType || 'legal-data',
+ type: metadataType ?? 'legal-data',
  context: { action: 'get', priority: 'medium' },
  });
  await redisClient.del(redisKey);
@@ -512,12 +510,10 @@ class CognitiveCacheManager {
  return null;
  }
 
- async invalidate(key: string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
+ async invalidate(key, string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
  if (!browser && redisClient && redisClient.isReady) {
  try {
- const redisKey = await this.getRedisKey({
- key,
- type: metadataType || 'legal-data',
+ const redisKey = await this.getRedisKey({ key: type: metadataType ?? 'legal-data',
  context: { action: 'invalidate', priority: 'medium' },
  });
  await redisClient.del(redisKey);

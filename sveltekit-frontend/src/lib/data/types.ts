@@ -29,7 +29,7 @@ export function extendUser(user: UserType): ExtendedUser {
  return {
  ...user,
  username:
- user.name ||
+ user?.name||
  (user as any).email ||
  `${(user as any).firstName} ${(user as any).lastName}`.trim(),
  };

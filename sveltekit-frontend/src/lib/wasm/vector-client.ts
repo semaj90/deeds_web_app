@@ -49,7 +49,7 @@ class VectorWasmClient {
         algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan' = 'cosine',
         forceServer = false
     ): Promise<{ result: number, usedServer: boolean, processingTime, number }> {
-        if (!this.isInitialized || !this.wasmModule) {
+        if (!this?.isInitialized|| !this.wasmModule) {
             throw new Error('WASM module not initialized');
         }
         const startTime = performance.now();
@@ -88,7 +88,7 @@ class VectorWasmClient {
         algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan' = 'cosine',
         chunkSize = 50
     ): Promise<{ results: number[], usedServer: boolean, processingTime: number, chunksProcessed, number }> {
-        if (!this.isInitialized || !this.wasmModule) {
+        if (!this?.isInitialized|| !this.wasmModule) {
             throw new Error('WASM module not initialized');
         }
         const startTime = performance.now();
@@ -144,7 +144,7 @@ class VectorWasmClient {
         }
 
         const processingTime = performance.now() - startTime;
-        return { results, usedServer: shouldUseServer, processingTime, chunksProcessed };
+        return { results: usedServer: shouldUseServer, processingTime, chunksProcessed };
     }
 
     /**
@@ -158,10 +158,8 @@ class VectorWasmClient {
         const response = await fetch('/api/v1/vector/embeddings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                texts,
-                model: options.model || 'embedding-gemma:latest',
-                chunkSize: options.chunkSize || 512,
+            body: JSON.stringify({ texts: model: options?.model?? 'embedding-gemma:latest',
+                chunkSize: options?.chunkSize?? 512,
                 normalize: options.normalize !== false
             })
         });
@@ -210,7 +208,7 @@ class VectorWasmClient {
         return {
             result: data.result,
             processingTime: data.metadata.processingTime,
-            flops: data.metadata.flops || 0
+            flops: data.metadata?.flops?? 0
         };
     }
 
@@ -224,11 +222,9 @@ class VectorWasmClient {
         const response = await fetch('/api/v1/vector/search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query,
-                limit: options.limit ?? 100,
+            body: JSON.stringify({ query: limit: options.limit ?? 100,
                 threshold: options.threshold ?? 0.7,
-                filters: options.filters || {},
+                filters: options?.filters|| {},
                 useCUDA: options.useCUDA !== false
             })
         });
@@ -312,7 +308,7 @@ class VectorWasmClient {
         return data.result ?? data.similarity ?? 0;
     }
 
-    private algorithmToNumber(algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan'): number {
+    private algorithmToNumber(algorithm, 'cosine' | 'euclidean' | 'dot' | 'manhattan'): number {
         switch (algorithm) {
             case 'cosine': return 0;
             case 'euclidean': return 1;

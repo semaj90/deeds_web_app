@@ -32,7 +32,7 @@ export interface NoteListResponse {
  notes: Note[]; total: number; limit: number; offset: number; hasMore: boolean }
 
 // Core Note Management Functions
-export async function listNotes(options, NoteListOptions = {}): Promise<NoteListResponse> {
+export async function listNotes(options: NoteListOptions = {}): Promise<NoteListResponse> {
  try {
  const queryParams = new URLSearchParams();
  if (options.caseId) queryParams.append('caseId', options.caseId);
@@ -50,7 +50,7 @@ export async function listNotes(options, NoteListOptions = {}): Promise<NoteList
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch notes');
+ throw new Error(error?.message?? 'Failed to fetch notes');
  }
 
  const data: NoteListResponse = await response.json();
@@ -71,7 +71,7 @@ export async function getNoteById(noteId: string): Promise<Note> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch note');
+ throw new Error(error?.message?? 'Failed to fetch note');
  }
 
  const note: Note = await response.json();
@@ -82,7 +82,7 @@ export async function getNoteById(noteId: string): Promise<Note> {
  }
 }
 
-export async function createNote(noteData, CreateNoteData): Promise<Note> {
+export async function createNote(noteData: CreateNoteData): Promise<Note> {
  try {
  const response = await fetch('/api/notes', {
  method: 'POST', 
@@ -92,7 +92,7 @@ export async function createNote(noteData, CreateNoteData): Promise<Note> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to create note');
+ throw new Error(error?.message?? 'Failed to create note');
  }
 
  const newNote: Note = await response.json();
@@ -104,7 +104,7 @@ export async function createNote(noteData, CreateNoteData): Promise<Note> {
  }
 }
 
-export async function updateNote(noteId: string, updates, UpdateNoteData: Promise<Note> {
+export async function updateNote(noteId, string, updates: UpdateNoteData: Promise<Note> {
  try {
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'PUT', 
@@ -114,7 +114,7 @@ export async function updateNote(noteId: string, updates, UpdateNoteData: Promis
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to update note');
+ throw new Error(error?.message?? 'Failed to update note');
  }
 
  const updatedNote: Note = await response.json();
@@ -135,7 +135,7 @@ export async function deleteNote(noteId: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete note');
+ throw new Error(error?.message?? 'Failed to delete note');
  }
 
  console.log(`Deleted note: ${noteId}`);

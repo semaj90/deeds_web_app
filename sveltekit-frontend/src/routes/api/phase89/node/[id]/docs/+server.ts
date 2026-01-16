@@ -7,8 +7,8 @@ import { json } from '@sveltejs/kit';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 
-const sql = postgres(process.env.DATABASE_URL || 'postgresql://user:pass@127.0.0.1:5434/legal');
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const sql = postgres(process.env?.DATABASE_URL?? 'postgresql://user:pass@127.0.0.1:5434/legal');
+const QDRANT_URL = process.env?.QDRANT_URL?? 'http://127.0.0.1:6333';
 const KNOWLEDGE_COLLECTION = 'phase76_knowledge_base';
 
 async function generateEmbedding(text: string): Promise<number[]> {
@@ -39,8 +39,8 @@ export const GET: RequestHandler = async ({ params }) => {
     // Generate query based on node type
     let query = '';
     if (node.kind === 'error') {
-      const code = node.meta.code || '';
-      const message = node.meta.message || '';
+      const code = node.meta?.code?? '';
+      const message = node.meta?.message?? '';
       query = `Fix TypeScript error ${code}: ${message}`;
     } else if (node.kind === 'file') {
       query = `Code examples for ${node.label}`;
@@ -63,14 +63,14 @@ export const GET: RequestHandler = async ({ params }) => {
 
     const searchResults = await response.json();
 
-    const results = (searchResults.result || []).map((hit: any) => ({
-      title: hit.payload?.title ?? hit.payload?.source || 'Unknown',
-      snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) || '',
+    const results = (searchResults?.result|| []).map((hit: any) => ({
+      title: hit.payload?.title ?? hit.payload?.source ?? 'Unknown',
+      snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) ?? '',
       score: hit.score,
       tags: hit.payload?.tags ?? [],
     }));
 
-    return json({ results: query });
+    return json({ results, query });
   } catch (error) {
     console.error('Error retrieving docs:', error);
     return json({ error: error.message }, { status: 500 });

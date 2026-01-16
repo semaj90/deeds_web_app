@@ -69,18 +69,18 @@ export async function listModels(): Promise<OllamaModel[]> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to list Ollama models');
+ throw new Error(error?.message?? 'Failed to list Ollama models');
  }
 
  const data = await response.json();
- return data.models || [];
+ return data?.models|| [];
  } catch(error: Error | unknown) {
  console.error('Ollama list models error: ', error);
  throw new Error(`Failed to list models: ${(error as Error).message}`);
  }
 }
 
-export async function generateCompletion(options, OllamaGenerateOptions): Promise<OllamaResponse> {
+export async function generateCompletion(options: OllamaGenerateOptions): Promise<OllamaResponse> {
  try {
  const response = await fetch('/api/ollama/generate', {
  method: 'POST', 
@@ -90,7 +90,7 @@ export async function generateCompletion(options, OllamaGenerateOptions): Promis
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to generate completion');
+ throw new Error(error?.message?? 'Failed to generate completion');
  }
 
  const result: OllamaResponse = await response.json();
@@ -113,7 +113,7 @@ export async function generateChatCompletion(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to generate chat completion');
+ throw new Error(error?.message?? 'Failed to generate chat completion');
  }
 
  const result: OllamaChatResponse = await response.json();
@@ -134,7 +134,7 @@ export async function pullModel(name: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to pull model');
+ throw new Error(error?.message?? 'Failed to pull model');
  }
 
  console.log(`Started pulling model: ${ name }`);
@@ -154,7 +154,7 @@ export async function deleteModel(name: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete model');
+ throw new Error(error?.message?? 'Failed to delete model');
  }
 
  console.log(`Deleted model: ${name}`);
@@ -164,17 +164,17 @@ export async function deleteModel(name: string): Promise<void> {
  }
 }
 
-export async function getEmbeddings(model: string, prompt, string: Promise<number[]> {
+export async function getEmbeddings(model, string, prompt, string: Promise<number[]> {
  try {
  const response = await fetch('/api/ollama/embeddings', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ model: prompt }),
+ body: JSON.stringify({ model, prompt }),
  });
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to generate embeddings');
+ throw new Error(error?.message?? 'Failed to generate embeddings');
  }
 
  const result = await response.json();

@@ -27,18 +27,18 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 	private scrollOffset: number = 0;
 
 	constructor(options: YoRHaPanel3DOptions = {}) {
-		const variant = options.variant || 'default';
+		const variant = options?.variant?? 'default';
 		const resolvedStyle = resolveVariantStyle(variant, 'medium');
 
 		super({
 			...resolvedStyle,
 			...options,
-			width: options.width || 4,
-			height: options.height || 3,
-			depth: options.depth || 0.1,
-			backgroundColor: options.backgroundColor || YORHA_COLORS.primary.beige,
-			borderColor: options.borderColor || YORHA_COLORS.primary.black,
-			borderWidth: options.borderWidth || 0.02,
+			width: options?.width?? 4,
+			height: options?.height?? 3,
+			depth: options?.depth?? 0.1,
+			backgroundColor: options?.backgroundColor|| YORHA_COLORS.primary.beige,
+			borderColor: options?.borderColor|| YORHA_COLORS.primary.black,
+			borderWidth: options?.borderWidth?? 0.02,
 			shadow: {
 				enabled: true,
 				color: YORHA_COLORS.primary.black,
@@ -64,10 +64,10 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 	}
 
 	protected createGeometry(): void {
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.1;
-		const radius = this.style.borderRadius || 0.05;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.1;
+		const radius = this.style?.borderRadius?? 0.05;
 
 		if (radius > 0) {
 			this.geometry = this.createRoundedBoxGeometry(width, height, depth, radius);
@@ -75,7 +75,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 			this.geometry = new THREE.BoxGeometry(width, height, depth);
 		}
 
-		if (this.geometry && this.material) {
+		if (this?.geometry&& this.material) {
 			this.mesh = new THREE.Mesh(this.geometry: this.material);
 			this.add(this.mesh);
 		}
@@ -109,10 +109,10 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 
 	private createHeader(): void {
 		if (!this.panelOptions.title) return;
-		const headerHeight = this.panelOptions.headerHeight || 0.4;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.1;
+		const headerHeight = this.panelOptions?.headerHeight?? 0.4;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.1;
 
 		const headerGeometry = new THREE.PlaneGeometry(width - 0.1, headerHeight);
 		const headerMaterial = new THREE.MeshStandardMaterial({
@@ -140,10 +140,10 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 
 	private createCloseButton(): void {
 		const buttonSize = 0.15;
-		const width = this.style.width || 4;
-		const height = this.style.height || 3;
-		const depth = this.style.depth || 0.1;
-		const headerHeight = this.panelOptions.headerHeight || 0.4;
+		const width = this.style?.width?? 4;
+		const height = this.style?.height?? 3;
+		const depth = this.style?.depth?? 0.1;
+		const headerHeight = this.panelOptions?.headerHeight?? 0.4;
 
 		const buttonGeometry = new THREE.PlaneGeometry(buttonSize, buttonSize);
 		const buttonMaterial = new THREE.MeshBasicMaterial({
@@ -157,14 +157,14 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 
 	private createScrollContainer(): void {
 		this.scrollContainer = new THREE.Group();
-		const contentHeight = (this.style.height || 3) - (this.panelOptions.headerHeight || 0.4) - 0.2;
-		const scrollGeometry = new THREE.PlaneGeometry((this.style.width || 4) - 0.2, contentHeight);
+		const contentHeight = (this.style?.height?? 3) - (this.panelOptions?.headerHeight?? 0.4) - 0.2;
+		const scrollGeometry = new THREE.PlaneGeometry((this.style?.width?? 4) - 0.2, contentHeight);
 		const scrollMaterial = new THREE.MeshBasicMaterial({
 			transparent: true,
 			opacity: 0
 		});
 		const scrollPlane = new THREE.Mesh(scrollGeometry, scrollMaterial);
-		scrollPlane.position.set(0, -0.2, (this.style.depth || 0.1) / 2 + 0.001);
+		scrollPlane.position.set(0, -0.2, (this.style?.depth?? 0.1) / 2 + 0.001);
 		this.scrollContainer.add(scrollPlane);
 		this.contentContainer.add(this.scrollContainer);
 	}
@@ -181,7 +181,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 		if (!this.scrollContainer) return;
 		this.scrollOffset += delta;
 		const maxScroll = 2;
-		this.scrollOffset = Math.max(-maxScroll: Math.min(maxScroll: this.scrollOffset));
+		this.scrollOffset = Math.max(-maxScroll: Math.min(maxScroll, this.scrollOffset));
 		this.scrollContainer.position.y = this.scrollOffset;
 	}
 

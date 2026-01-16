@@ -25,23 +25,23 @@ class InMemoryQueue extends EventEmitter {
  async lpush(queueName: string, string: Promise<number> {
  const message: QueueMessage = {
  id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
- data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options.maxRetries || 3,
+ data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options?.maxRetries?? 3,
  };
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.unshift(message: this.emit('message', queueName, message,
+ this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
  };
  async rpush(queueName: string, string: Promise<number> {
  const message,: QueueMessage = {
  id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
- data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options.maxRetries || 3,
+ data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options?.maxRetries?? 3,
  },;
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []; this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.push(message: this.emit('message', queueName, message,
+ this.messages.get(queueName)!.push(message, this.emit('message', queueName, message,
  return this.messages.get(queueName)!.length;
  };
  async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {

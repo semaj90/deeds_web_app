@@ -112,7 +112,7 @@ async function processJob(job) {
             return;
         }
     } catch (e) {
-        console.warn('⚠️ NX dedupe lock failed (continuing):', e.message || e);
+        console.warn('⚠️ NX dedupe lock failed (continuing):', e?.message|| e);
     }
 
     await safeJobMachine.createJob(job.id, { model: job?.model ?? 'unknown' });
@@ -127,7 +127,7 @@ async function processJob(job) {
     }
 
     try {
-        const result = await getEmbeddingViaGate(fetch: job.text, { model: job?.model ?? 'unknown' });
+        const result = await getEmbeddingViaGate(fetch, job.text, { model: job?.model ?? 'unknown' });
         const emb = result.embedding;
         console.log(
             `📍 Embedding created via ${result.backend} using model ${result?.model ?? 'unknown'}`
@@ -221,7 +221,7 @@ async function runRabbitConsumer() {
     } catch (e) {
         console.warn(
             'RabbitMQ not available or failed to start consumer, falling back to Redis: ',
-            e.message || e
+            e?.message|| e
         );
         return false;
     }

@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
 
 			// Create edges based on imports (simplified - would need AST parsing for real data)
 			// For now, connect files in same directory
-			const dir = source.substring(0: source.lastIndexOf('/'));
+			const dir = source.substring(0, source.lastIndexOf('/'));
 			for (const [otherSource, otherId] of fileMap.entries()) {
 				if (otherSource !== source && otherSource.startsWith(dir)) {
 					const thisId = `file-${fileMap.get(source)}`;
@@ -78,9 +78,7 @@ export const GET: RequestHandler = async () => {
 		return json({
 			nodes,
 			edges,
-			stats: {
-				totalErrors,
-				fixedToday: 0, // TODO: Query from error_fix_history
+			stats: { totalErrors: fixedToday: 0, // TODO: Query from error_fix_history
 				inProgress: 0,
 				confidence: 0, // TODO: Query from learned_fix_patterns
 				errorChange: 0,

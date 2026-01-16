@@ -116,14 +116,14 @@ class ProductionServiceClient {
  if (host) return host;
  // fallback to pathname
  const p = u.pathname.split('/').filter(Boolean);
- return p[0] ?? 'unknown';
+ return p?.0 ?? 'unknown';
  }
  // path-style endpoint: return first segment
  const parts = endpoint.split('/').filter(Boolean);
- return parts[0] ?? 'unknown';
+ return parts?.0 ?? 'unknown';
  } catch {
  const parts = endpoint.split('/').filter(Boolean);
- return parts[0] ?? 'unknown';
+ return parts?.0 ?? 'unknown';
  }
  }
 
@@ -161,7 +161,7 @@ class ProductionServiceClient {
  }
 
  // Health checks
- async checkServiceHealth(servicePath: string, healthPath: string = '/health'): Promise<boolean> {
+ async checkServiceHealth(servicePath, string, healthPath: string = '/health'): Promise<boolean> {
  try {
  // Normalize and avoid duplicate slashes; do not assume caller included baseUrl
  const cleaned = servicePath;
@@ -181,8 +181,8 @@ class ProductionServiceClient {
  async checkServicesHealth(services: string[]): Promise<Record<string, boolean>> {
  const results: Record<string, boolean> = {};
  await Promise.all(
- services.map(async (service) => {
- results[service] = await this.checkServiceHealth(`/${service}`, '/health');
+ services.map(async (service: any) => {
+ results?.service = await this.checkServiceHealth(`/${service}`, '/health');
  })
  );
  return results;
@@ -203,11 +203,11 @@ class ProductionServiceClient {
  const status = res.status ?? 0;
  if (status >= 200 && status < 300) successCount++;
  }
- const latencies = results.map((r) => (r.latency ?? 0) as number);
+ const latencies = results.map((r: any) => (r.latency ?? 0) as number);
  const count = latencies.length ?? 1;
  const avg = latencies.reduce((s, l) => s + l, 0) / count;
  return {
- averageLatency: avg, minLatency: Math.min(...latencies, maxLatency: Math.max(...latencies, successRate: successCount / iterations,
+ averageLatency: avg, minLatency: Math.min(...latencies, maxLatency, Math.max(...latencies, successRate, successCount / iterations,
  results,
  },
  }
@@ -230,7 +230,7 @@ function extractProtocolFromResponse(response: Response): string {
  // Node/fetch won't expose HTTP version consistently; try to infer
  // Keep as best-effort: if connection header mentions HTTP/2, etc., otherwise fallback
  try {
- const conn = response.headers.get('x-http-version') || response.headers.get('via') || '';
+ const conn = response.headers.get('x-http-version') || response.headers.get('via') ?? '';
  if (conn.includes('HTTP/2') || conn.includes('h2')) return 'HTTP/2';
  return 'HTTP/1.1';
  } catch {

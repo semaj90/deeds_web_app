@@ -218,7 +218,7 @@ import type { Message } from '$lib/types';
 		return parseFloat(((estimatedTokens / (inferenceTime / 1000))).toFixed(2))}
 
 	// Simulated WASM module functions (typed params)
-	async function simulateInference(params, Record<string, string>): Promise<any> {
+	async function simulateInference(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		return {
 			generatedText: `AI response, to: ${String(params?.text ?? '').substring(0, 30)}...`,

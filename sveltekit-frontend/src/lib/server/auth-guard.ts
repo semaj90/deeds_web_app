@@ -26,9 +26,9 @@ return null;
 }
 }
 
-export function checkOwnership(user: AuthenticatedUser, resourceOwnerId: string, allowedRoles: string[] = ['admin', 'system']): boolean {
+export function checkOwnership(user, AuthenticatedUser, resourceOwnerId: string, allowedRoles: string[] = ['admin', 'system']): boolean {
 if (user.id === resourceOwnerId) return true;
-if (user.role && allowedRoles.includes(user.role)) return true;
+if (user?.role&& allowedRoles.includes(user.role)) return true;
 return false;
 }
 

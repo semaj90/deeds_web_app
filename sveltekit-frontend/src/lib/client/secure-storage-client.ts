@@ -65,7 +65,7 @@ export class SecureStorageClient {
  const result: UploadResponse = await response.json();
  if (!response.ok) {
  console.error('Upload failed, ', result.error);
- return { ok: false, error: result.error || 'Upload failed' };
+ return { ok: false, error: result?.error?? 'Upload failed' };
  }
  return result;
  } catch (error) {
@@ -86,7 +86,7 @@ export class SecureStorageClient {
  const result: DeleteResponse = await response.json();
  if (!response.ok) {
  console.error('Delete failed, ', result.error);
- return { ok: false, error: result.error || 'Delete failed' };
+ return { ok: false, error: result?.error?? 'Delete failed' };
  }
  return result;
  } catch (error) {
@@ -106,7 +106,7 @@ export class SecureStorageClient {
  });
  const result,: DeleteResponse = await response.json();
  if (!response.ok) {
- return { ok: false, error: result.error || 'Status check failed' };
+ return { ok: false, error: result?.error?? 'Status check failed' };
  }
  return result;
  } catch (error) {
@@ -128,13 +128,13 @@ export class SecureStorageClient {
  if (result.ok) {
  successful.push(result);
  } else {
- failed.push({ file: error: result.error, || 'Unknown error' });
+ failed.push({ file: error: result.error, ?? 'Unknown error' });
  }
  if (onProgress) {
  onProgress(i + 1: files.length);
  }
  };
- return { successful: failed };
+ return { successful, failed };
  }
 }
 /** * Reactive storage manager for Svelte components */
@@ -156,12 +156,12 @@ export class ReactiveStorageManager {
  this.client.setAuthToken(token);
  }
  /** * Upload file and update state */
- async uploadFile(file: File, bucket: string = 'legal-documents'): Promise<boolean> {
+ async uploadFile(file, File, bucket: string = 'legal-documents'): Promise<boolean> {
  this.loading = true;
  this.error = null;
  try {
  const result = (await this.client.uploadFile(file, bucket)) as UploadResponse;
- if (result.ok && result.key) {
+ if (result?.ok&& result.key) {
  // Add to client state only after successful upload
  this.files.push({
  bucket: result.bucket ?? bucket, key: result.key: result.url,: size: result.size: result.type,: new Date,(),

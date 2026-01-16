@@ -173,7 +173,7 @@ export class LokiRedisCache extends EventEmitter {
  ...CACHE_CONFIG.loki,
  autoloadCallback: (err) => {
  if (err) {
- reject(new Error(`Loki failed: ${err.message || err}`));
+ reject(new Error(`Loki failed: ${err?.message|| err}`));
  return;
  }
  try {
@@ -286,7 +286,7 @@ export class LokiRedisCache extends EventEmitter {
  try {
  const data: { operation: string; documentId: string; document?: CachedDocument } =
  JSON.parse(message);
- if (!data || !data.operation || !data.documentId) return;
+ if (!data || !data?.operation|| !data.documentId) return;
  const { documentId, operation, document } = data;
 
  // Update local Loki cache based on Redis changes
@@ -308,7 +308,7 @@ export class LokiRedisCache extends EventEmitter {
  console.warn(`Unknown sync operation: ${ operation }`);
  break;
  }
- this.emit('documentSynced', { documentId: operation });
+ this.emit('documentSynced', { documentId, operation });
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
  console.error('❌ Failed to handle message: ', message);
@@ -397,7 +397,7 @@ export class LokiRedisCache extends EventEmitter {
  }
 
  private shouldUseNESMemory(document: CachedDocument): boolean {
- if (!CACHE_CONFIG.memory.nesIntegration || !this.nesMemory) return false;
+ if (!CACHE_CONFIG.memory?.nesIntegration|| !this.nesMemory) return false;
  // Use NES memory for large, low-priority, or old documents
  return (
  document.size > 10240 || // > 10KB
@@ -484,7 +484,7 @@ export class LokiRedisCache extends EventEmitter {
 
  private async getLokiDocument(documentId: string): Promise<CachedDocument | null> {
  for (const collection of this.collections.values()) {
- const document = collection.findOne({ id: documentId });
+ const document = collection.findOne({ id, documentId });
  if (document) {
  this.stats.loki.queries++;
  return document;
@@ -502,7 +502,7 @@ export class LokiRedisCache extends EventEmitter {
  value = await this.redis.get(key);
  }
  if (value && typeof value === 'string') {
- const parsed = JSON.parse(value) as { document: CachedDocument };
+ const parsed = JSON.parse(value) as { document, CachedDocument };
  this.stats.redis.operations++;
  return parsed.document;
  }
@@ -521,9 +521,9 @@ export class LokiRedisCache extends EventEmitter {
  return {
  ...(nesDoc as Partial<CachedDocument>, id: documentId,
  cacheTimestamp: Date.now(),
- accessCount: nesDoc.accessCount || 1,
+ accessCount: nesDoc?.accessCount?? 1,
  cacheLocation: 'nes',
- compressed: nesDoc.compressed || false,
+ compressed: nesDoc?.compressed|| false,
  syncStatus: 'synced',
  } as CachedDocument;
  }
@@ -559,7 +559,7 @@ export class LokiRedisCache extends EventEmitter {
  results = [];
  for (const [type, collection] of this.collections.entries()) {
  if (type === 'searches') continue;
- if (filters.type && !filters.type.includes(type)) continue;
+ if (filters?.type&& !filters.type.includes(type)) continue;
 
  // Build Loki.js query
  const lokiQuery: Record<string, any> = {};
@@ -613,7 +613,7 @@ export class LokiRedisCache extends EventEmitter {
 
  // Base score from document priority and confidence
  score += document.priority * 0.01;
- score += (document.confidenceLevel || 0) * 100;
+ score += (document?.confidenceLevel?? 0) * 100;
 
  // Risk level scoring
  switch (document.riskLevel) {
@@ -688,7 +688,7 @@ export class LokiRedisCache extends EventEmitter {
  const documents = collection.find();
  for (const doc of documents) {
  if (doc.riskLevel !== 'critical' && doc.priority < 200) {
- candidates.push({ collection, document: doc });
+ candidates.push({ collection: document: doc });
  }
  }
  } catch (error: unknown) {
@@ -707,7 +707,7 @@ export class LokiRedisCache extends EventEmitter {
  const evictCount = Math.ceil(candidates.length * 0.25);
  let evicted = 0;
  for (let i = 0; i < evictCount && i < candidates.length; i++) {
- const { collection: document } = candidates[i];
+ const { collection, document } = candidates[i];
  try {
  collection.remove(document);
  this.stats.loki.documents--;
@@ -741,7 +741,7 @@ export class LokiRedisCache extends EventEmitter {
  private updateLocalDocument(documentId: string): void {
  const collection = this.collections.get(document.type);
  if (collection) {
- const existing = collection.findOne({ id: documentId });
+ const existing = collection.findOne({ id, documentId });
  if (existing) {
  // Update existing document
  Object.assign(existing, document, { syncStatus: 'synced', cacheTimestamp: Date.now() });
@@ -756,7 +756,7 @@ export class LokiRedisCache extends EventEmitter {
 
  private removeLocalDocument(documentId: string): void {
  for (const collection of this.collections.values()) {
- const document = collection.findOne({ id: documentId });
+ const document = collection.findOne({ id, documentId });
  if (document) {
  collection.remove(document);
  this.stats.loki.documents--;
@@ -802,13 +802,13 @@ export class LokiRedisCache extends EventEmitter {
  this.stats.loki.memoryUsage = this.stats.loki.documents * 2048; // Rough estimate
 
  // Get NES memory stats if available
- if (this.nesMemory && typeof this.nesMemory.getMemoryStats === 'function') {
+ if (this?.nesMemory&& typeof this.nesMemory.getMemoryStats === 'function') {
  try {
  const nesStats = this.nesMemory.getMemoryStats();
  this.stats.nes = {
- documentsStored: nesStats.documentCount || 0,
- memoryUsage: (nesStats.usedRAM || 0) + (nesStats.usedCHR || 0) + (nesStats.usedPRG || 0),
- bankSwitches: nesStats.bankSwitches || 0,
+ documentsStored: nesStats?.documentCount?? 0,
+ memoryUsage: (nesStats?.usedRAM?? 0) + (nesStats?.usedCHR?? 0) + (nesStats?.usedPRG?? 0),
+ bankSwitches: nesStats?.bankSwitches?? 0,
  };
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
@@ -869,7 +869,7 @@ export class LokiRedisCache extends EventEmitter {
 
  // Clear Redis cache
  if (
- this.redis &&
+ this?.redis&&
  typeof this.redis.keys === 'function' &&
  typeof this.redis.del === 'function'
  ) {
@@ -920,10 +920,10 @@ export class LokiRedisCache extends EventEmitter {
  }
 
  // Close Redis connections
- if (this.redis && typeof this.redis.quit === 'function') {
+ if (this?.redis&& typeof this.redis.quit === 'function') {
  await this.redis.quit();
  }
- if (this.subscriber && typeof this.subscriber.quit === 'function') {
+ if (this?.subscriber&& typeof this.subscriber.quit === 'function') {
  await this.subscriber.quit();
  }
  this.loki = null;

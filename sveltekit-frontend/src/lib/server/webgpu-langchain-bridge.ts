@@ -36,11 +36,11 @@ export class WebGPULangChainBridge {
  constructor(config: Partial<LangChainWebGPUConfig> = {}) {
  this.config = {
  useWebGPUCache: config.useWebGPUCache ?? true,
- batchSize: config.batchSize || 128,
+ batchSize: config?.batchSize?? 128,
  cacheEmbeddings: config.cacheEmbeddings ?? true,
  compressVectors: config.compressVectors ?? true,
- practiceArea: config.practiceArea || 'general',
- documentType: config.documentType || 'general',
+ practiceArea: config?.practiceArea?? 'general',
+ documentType: config?.documentType?? 'general',
  };
  }
 
@@ -58,7 +58,7 @@ export class WebGPULangChainBridge {
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
- performance: { totalTime, extractionTime: extractionResult.processingTime,
+ performance: { totalTime: extractionTime: extractionResult.processingTime,
  embeddingTime: embeddingResult.processingTime,
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second
@@ -277,7 +277,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  // Count occurrences of legal terms
  words.forEach((word) => {
  if (legalTerms.includes(word)) {
- wordCount.set(word, (wordCount.get(word) || 0) + 1);
+ wordCount.set(word, (wordCount.get(word) ?? 0) + 1);
  }
  });
  // Return top terms by frequency

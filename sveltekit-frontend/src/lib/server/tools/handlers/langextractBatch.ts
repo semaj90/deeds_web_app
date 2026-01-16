@@ -13,8 +13,8 @@ import {
   type ToolResult
 } from '../registry.js';
 
-const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://localhost:8095';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL?? 'http://localhost:8095';
+const OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
 
 interface ExtractedEntity {
   type: string; name: string;
@@ -41,9 +41,7 @@ async function extractFromDocument(
     const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content,
-        entity_types: entityTypes,
+      body: JSON.stringify({ content: entity_types: entityTypes,
         relation_types: relationTypes,
         model
       }, signal: controller.signal
@@ -79,12 +77,12 @@ JSON:`;
     });
 
     if (response.ok) {
-      const data = await response.json() as { response: string };
+      const data = await response.json() as { response, string };
       try {
         const parsed = JSON.parse(data.response);
         return {
-          entities: parsed.entities || [],
-          relations: parsed.relations || []
+          entities: parsed?.entities|| [],
+          relations: parsed?.relations|| []
         };
       } catch {
         // Parse failed
@@ -111,9 +109,9 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {
-  const options = request.options || {};
-  const model = options.model || 'gemma3-legal:latest';
-  const timeout = options.timeout_ms || 30000;
+  const options = request?.options|| {};
+  const model = options?.model?? 'gemma3-legal:latest';
+  const timeout = options?.timeout_ms?? 30000;
 
   const extractions: Array<{ doc_url: string;
     entities: ExtractedEntity[]; relations, ExtractedRelation[];
@@ -154,9 +152,7 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
     success: true,
     run_id: request.run_id,
     tool: 'langextract_batch',
-    data: {
-      extractions,
-      total_entities: totalEntities,
+    data: { extractions: total_entities: totalEntities,
       total_relations: totalRelations
     },
     duration_ms: 0,

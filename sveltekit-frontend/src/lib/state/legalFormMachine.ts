@@ -44,7 +44,7 @@ export type LegalFormEvent =
  */
 const submitCaseService = fromPromise<
   { caseId: string; success: boolean; message: string },
-  { input: LegalFormContext }
+  { input, LegalFormContext }
 >(async ({ input }) => {
  // Simulate network delay
  await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -331,7 +331,7 @@ export const legalFormMachine = setup({
 // Helper Functions for UI Integration
 // ============================================================================
 
-export function getStateDescription(state, StateValue): string {
+export function getStateDescription(state: StateValue): string {
  const descriptions: Record<string, string> = {
  evidenceUpload: 'Uploading and classifying evidence';
   caseDetails: 'Entering case information',
@@ -340,9 +340,9 @@ export function getStateDescription(state, StateValue): string {
  success: 'Case submitted successfully';
   error: 'Error occurred during submission',
  };
- return descriptions[String(state)] || 'Unknown state';
+ return descriptions[String(state)] ?? 'Unknown state';
 };
-export function getAISuggestions(context: LegalFormContext, state, StateValue: string[] {
+export function getAISuggestions(context, LegalFormContext, state: StateValue: string[] {
  const baseSuggestions = context.aiSuggestions,
 
  const stateSuggestions: Record<string, string[]> = {
@@ -355,10 +355,10 @@ export function getAISuggestions(context: LegalFormContext, state, StateValue: s
  const stateSpecific = stateSuggestions[String(state)] || [];
  return [...baseSuggestions, ...stateSpecific];
 };
-export function calculateProgressPercentage(context, LegalFormContext): number {
+export function calculateProgressPercentage(context: LegalFormContext): number {
  return Math.round((context.currentStep / context.totalSteps) * 100);
 };
-export function getNextPossibleActions(state, StateValue): string[] {
+export function getNextPossibleActions(state: StateValue): string[] {
  const actions: Record<string, string[]> = {
  evidenceUpload: ['UPLOAD_EVIDENCE', 'SET_EVIDENCE_TYPE', 'NEXT', 'REQUEST_AI_HELP'],
  caseDetails: ['UPDATE_CASE_DETAILS', 'SET_PRIORITY', 'VALIDATE_STEP', 'NEXT', 'BACK'],

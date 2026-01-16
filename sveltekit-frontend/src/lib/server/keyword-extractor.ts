@@ -27,7 +27,7 @@ export async function extractKeywords(
  const startTime = Date.now();
 
  try {
- console.log(`🔍 Extracting keywords from ${documentType || 'document'}...`);
+ console.log(`🔍 Extracting keywords from ${documentType ?? 'document'}...`);
 
  // Build extraction prompt
  const systemPrompt = getSystemPrompt(documentType);
@@ -66,11 +66,11 @@ export async function extractKeywordsFromImage(
  const startTime = Date.now();
 
  try {
- console.log(`📸 Extracting keywords from image (${documentType || 'document'})...`);
+ console.log(`📸 Extracting keywords from image (${documentType ?? 'document'})...`);
 
  // For now, we'll use the vision analysis to get text first
  // Then extract keywords from that text
- const visionPrompt = `Analyze this ${documentType || 'document'} image and extract:
+ const visionPrompt = `Analyze this ${documentType ?? 'document'} image and extract:
 1. All visible text
 2. Key terms and phrases
 3. Named entities (people, organizations, locations, dates, amounts)
@@ -121,7 +121,7 @@ function extractKeywordsFallback(content: string, documentType?: string): Keywor
 
  const wordFreq = new Map<string, number>();
  words.forEach((w) => {
- wordFreq.set(w, (wordFreq.get(w) || 0) + 1);
+ wordFreq.set(w, (wordFreq.get(w) ?? 0) + 1);
  });
 
  const keywords = Array.from(wordFreq.entries())
@@ -144,7 +144,7 @@ function extractKeywordsFallback(content: string, documentType?: string): Keywor
  keywords: keyPhrases,
  entities,
  topics,
- summary: `Extracted ${keywords.length} keywords from ${documentType || 'document'}`,
+ summary: `Extracted ${keywords.length} keywords from ${documentType ?? 'document'}`,
  confidence: 0.6,
  method: 'fallback',
  processingTimeMs: processingTime,
@@ -157,7 +157,7 @@ function extractKeywordsFallback(content: string, documentType?: string): Keywor
 function buildExtractionPrompt(content: string, documentType?: string): string {
  const truncated = content.substring(0, 2000); // Limit to first 2000 chars
 
- return `Extract keywords and key information from this ${documentType || 'legal document'}:
+ return `Extract keywords and key information from this ${documentType ?? 'legal document'}:
 
 ${truncated}
 
@@ -214,7 +214,7 @@ Be precise and focus on legally significant terms.`;
 - Holding and reasoning`,
  };
 
- return basePrompt + (typeSpecific[documentType || ''] || '');
+ return basePrompt + (typeSpecific[documentType ?? ''] ?? '');
 }
 
 /**
@@ -258,15 +258,15 @@ function parseExtractionResponse(
  }
 
  return {
- keywords: parsed.keywords || [],
- keyPhrases: parsed.keyPhrases || [],
- entities: (parsed.entities || []).map((e: any) => ({
- text: e.text || '',
- type: e.type || 'OTHER',
- confidence: e.confidence || 0.8,
- }, topics: parsed.topics || [],
- summary: parsed.summary || '',
- confidence: parsed.confidence || 0.8,
+ keywords: parsed?.keywords|| [],
+ keyPhrases: parsed?.keyPhrases|| [],
+ entities: (parsed?.entities|| []).map((e: any) => ({
+ text: e?.text?? '',
+ type: e?.type?? 'OTHER',
+ confidence: e?.confidence?? 0.8,
+ }, topics: parsed?.topics|| [],
+ summary: parsed?.summary?? '',
+ confidence: parsed?.confidence?? 0.8,
  };
  } catch (err) {
  console.warn('Failed to parse extraction response:', err);
@@ -300,7 +300,7 @@ function extractPhrases(content: string): string[] {
   
  const phraseFreq = new Map<string, number>();
  phrases.forEach((p) => {
- phraseFreq.set(p, (phraseFreq.get(p) || 0) + 1);
+ phraseFreq.set(p, (phraseFreq.get(p) ?? 0) + 1);
  });
 
  return Array.from(phraseFreq.entries())

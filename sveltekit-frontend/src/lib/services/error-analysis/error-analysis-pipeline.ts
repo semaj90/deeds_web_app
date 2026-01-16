@@ -112,7 +112,7 @@ export class ErrorAnalysisPipeline extends BaseService implements IErrorAnalysis
  * Analyze a single error
  * Orchestrates the complete analysis workflow for one error
  */
- async analyzeError(sessionId: string, Error: Promise<Analysis> {
+ async analyzeError(sessionId, string, Error: Promise<Analysis> {
  if (!sessionId || typeof sessionId !== 'string') {
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }

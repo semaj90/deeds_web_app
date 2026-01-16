@@ -67,7 +67,7 @@ export class MultiLayerCacheSystem {
  private layerConfigs: CacheLayer[];
  private currentSize = new Map<string, number>();
 
- constructor(consoleName: keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
+ constructor(consoleName, keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
  this.layerConfigs = CONSOLE_CACHE_LAYERS[consoleName];
  this.initializeLayers();
  }
@@ -225,7 +225,7 @@ export class MultiLayerCacheSystem {
 
  // Select layer based on size and available space
  for (const config of this.layerConfigs) {
- const currentSize = this.currentSize.get(config.name) || 0;
+ const currentSize = this.currentSize.get(config.name) ?? 0;
  if (currentSize + size <= config.maxSize) {
  return config.name;
  }
@@ -251,7 +251,7 @@ export class MultiLayerCacheSystem {
  return 1024; // Default estimate
  }
  }
- private getPriorityValue(priority: CacheLayer['priority']): number {
+ private getPriorityValue(priority, CacheLayer['priority']): number {
  switch (priority) {
  case 'high':
  return 3;
@@ -270,7 +270,7 @@ export class MultiLayerCacheSystem {
 
  for (const config of this.layerConfigs) {
  const layer = this.layers.get(config.name);
- const currentSize = this.currentSize.get(config.name) || 0;
+ const currentSize = this.currentSize.get(config.name) ?? 0;
  stats[config.name] = {
  entries: layer?.size ?? 0,
  currentSize,
@@ -294,11 +294,11 @@ export class MultiLayerCacheSystem {
  }
 
  // Gaming-specific cache operations
- async cacheEmbedding(documentId: string, Float32Array: Promise<boolean> {
+ async cacheEmbedding(documentId, string, Float32Array: Promise<boolean> {
  return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', },
  async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', };
- async cacheDocument(id: string, unknown: Promise<boolean> {
+ async cacheDocument(id, string, unknown: Promise<boolean> {
  return this.set(`doc:${ id }`, document, 'DOCUMENTS', },
  async getCachedDocument(id: string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');

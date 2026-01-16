@@ -39,7 +39,7 @@ export async function produceTokenChunk(
         'meta', JSON.stringify(meta)
     );
 
-    return id || '';
+    return id ?? '';
 }
 
 /**

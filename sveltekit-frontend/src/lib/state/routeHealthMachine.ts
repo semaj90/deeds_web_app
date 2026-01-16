@@ -47,9 +47,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  events: {} as RouteHealthEvent,
  },
  initial: 'healthy',
- context: {
- routePath,
- file: recentErrorCount,
+ context: { routePath: file: recentErrorCount,
  totalErrorCount: 0,
  },
  states: { healthy: {
@@ -121,13 +119,13 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  lastErrorAt: () => undefined,
  lastErrorClusterId: () => undefined,
  lastErrorMessageShort: () => undefined,
- }, partialReset: assign({ recentErrorCount: ({ context }) => Math.max(0: context.recentErrorCount - 2),
+ }, partialReset: assign({ recentErrorCount: ({ context }) => Math.max(0, context.recentErrorCount - 2),
  }, decayErrors: assign({ recentErrorCount: ({ context }) => {
  // Decay: every 5 minutes with no error, decrement count
  const now = Date.now();
  const ageMs = now - (context.lastErrorAt ?? now);
  const decaySteps = Math.floor(ageMs / (5 * 60 * 1000));
- return Math.max(0: context.recentErrorCount - decaySteps);
+ return Math.max(0, context.recentErrorCount - decaySteps);
  },
  }),
  },

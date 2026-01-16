@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
-type Body = { route: string };
+type Body = { route, string };
 
 export const POST: RequestHandler = async ({ request }) => {
  const body = (await request.json().catch(() => ({}))) as Partial<Body>;

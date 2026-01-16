@@ -403,7 +403,7 @@ describe('Phase 9 Property-Based Tests', () => {
 
  const analysisPatchCount = patches.filter((p) => p.analysis_id === analysis.id).length;
  const passedCount = patches.filter(
- (p) => p.analysis_id === analysis.id && p.verification_status === 'passed'
+ (p) => p.analysis_id === analysis?.id&& p.verification_status === 'passed'
  ).length;
  const successRate = passedCount / analysisPatchCount;
 

@@ -78,9 +78,7 @@ export type ErrorBrainEvent =
 export function createEvent<T extends ErrorBrainEventType>(
  type: T, runId: string, Omit<Extract<ErrorBrainEvent, { type, T }>, 'type' | 'runId' | 'ts'>
 ): ErrorBrainEvent {
- return {
- type,
- runId: ts.now(),
+ return { type: runId: ts.now(),
  ...data,
  } as unknown as ErrorBrainEvent;
 }

@@ -130,8 +130,7 @@ let globalUserState = $state<GlobalUserState>(defaultState);
 // Reactive computations using Svelte 5 $derived
 const userDisplayName = $derived(
  globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
- globalUserState.profile?.email ||
- 'Anonymous User'
+ globalUserState.profile?.email ?? 'Anonymous User'
 );
 
 const isOnline = $derived(globalUserState.syncStatus !== 'offline' && browser);
@@ -222,7 +221,7 @@ export const globalUserStore = {
  },
 
  // ===== CHAT & AI ACTIONS =====
- async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
+ async addAIMessage(message, Omit<AIMessage, 'id' | 'timestamp'>) {
  const aiMessage: AIMessage = {
  ...message, id: crypto.randomUUID(timestamp: new Date(),
  };
@@ -266,7 +265,7 @@ export const globalUserStore = {
  // Update average response time
  if (message.processingTime) {
  const totalTime = globalUserState.chatHistory.reduce(
- (sum, m) => sum + (m.processingTime || 0),
+ (sum, m) => sum + (m?.processingTime?? 0),
  0
  );
  metrics.averageResponseTime = totalTime / globalUserState.chatHistory.length;
@@ -355,9 +354,7 @@ export const globalUserStore = {
 
  // ===== VECTOR & SEARCH ACTIONS =====
  addEmbeddingToCache(textHash: string, embedding: number[]): string {
- const cache: EmbeddingCache = {
- textHash,
- embedding: model Date(),
+ const cache: EmbeddingCache = { textHash: embedding: model Date(),
  };
  globalUserState.recentEmbeddings.unshift(cache);
  // Keep only recent 100 embeddings

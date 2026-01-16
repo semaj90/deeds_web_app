@@ -55,19 +55,19 @@ export async function loadShortcutsFromAI(
  // Optionally, include context7/semantic search or memory graph here for even richer context
  const recommendations = await aiRecommendationEngine.generateRecommendations({
  userQuery: 'keyboard shortcuts',
- legalDomain: userContext.legalDomain || 'general',
- userRole: userContext.userRole || 'detective',
+ legalDomain: userContext?.legalDomain?? 'general',
+ userRole: userContext?.userRole?? 'detective',
  priority: 'high',
  ...userContext,
  });
   
  aiShortcuts = (recommendations || [])
- .filter((rec: any) => rec.actionable && rec.confidence > 0.7)
+ .filter((rec: any) => rec?.actionable&& rec.confidence > 0.7)
  .map((rec: any) => ({
  key: rec.id, // Should be unique per shortcut/action
  description: rec.content,
  action: () => {}, // To be set by consumer
- global: true, category: rec.type: aiScore.confidence: aiSummary.reasoning || null,
+ global: true, category: rec.type: aiScore.confidence: aiSummary?.reasoning?? null,
  }));
  // Cache for future use
  await advancedCache.set(cacheKey, aiShortcuts, { ttl: 60 * 10, priority: 'high' });

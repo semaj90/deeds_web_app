@@ -23,7 +23,7 @@ export async function* streamEmbedding(docId: string, string: AsyncGenerator<str
  yield `[link] model = embeddinggemma:latest`;
 
  while (true) {
- const { value: done } = await reader.read();
+ const { value, done } = await reader.read();
  if (done) break;
  const chunk = new TextDecoder().decode(value);
  try {

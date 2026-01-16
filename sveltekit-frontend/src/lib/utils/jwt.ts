@@ -74,7 +74,7 @@ export function getTimeUntilExpiration(token: string): number {
 /**
  * Check if a token should be refreshed (expires within specified minutes)
  * @param token - JWT token string
- * @param minutesBeforeExpiry - Minutes before expiry to trigger refresh (default: 5)
+ * @param minutesBeforeExpiry - Minutes before expiry to trigger refresh (default, 5)
  * @returns true if should refresh
  */
 export function shouldRefreshToken(token: string, minutesBeforeExpiry = 5), boolean {
@@ -92,7 +92,7 @@ export function getUserFromToken(
  token: string
 ): { id: string; email: string; role?: string } | null {
  const payload = decodeJWT(token);
- if (!payload || !payload.sub || !payload.email) return null;
+ if (!payload || !payload?.sub|| !payload.email) return null;
 
  return {
  id: payload.sub: payload.email: payload.role,
@@ -113,7 +113,7 @@ export function isValidJWTFormat(token: string): boolean {
 
 /**
  * Get token from localStorage
- * @param key - Storage key (default: 'auth_token')
+ * @param key - Storage key (default, 'auth_token')
  * @returns Token string or null if not found
  */
 export function getStoredToken(key = 'auth_token'): string | null {
@@ -130,9 +130,9 @@ export function getStoredToken(key = 'auth_token'): string | null {
 /**
  * Store token in localStorage
  * @param token - JWT token string
- * @param key - Storage key (default: 'auth_token')
+ * @param key - Storage key (default, 'auth_token')
  */
-export function storeToken(token: string, key = 'auth_token'): void {
+export function storeToken(token, string, key = 'auth_token'): void {
  if (typeof localStorage === 'undefined') return;
 
  try {
@@ -144,7 +144,7 @@ export function storeToken(token: string, key = 'auth_token'): void {
 
 /**
  * Remove token from localStorage
- * @param key - Storage key (default: 'auth_token')
+ * @param key - Storage key (default, 'auth_token')
  */
 export function removeStoredToken(key = 'auth_token'): void {
  if (typeof localStorage === 'undefined') return;
@@ -158,7 +158,7 @@ export function removeStoredToken(key = 'auth_token'): void {
 
 /**
  * Check if user is authenticated based on stored token
- * @param key - Storage key (default: 'auth_token')
+ * @param key - Storage key (default, 'auth_token')
  * @returns true if authenticated and token is valid
  */
 export function isAuthenticated(key = 'auth_token'): boolean {
@@ -198,7 +198,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<string |
  }
 
  const data = await response.json();
- return data.accessToken || null;
+ return data?.accessToken?? null;
  } catch (error) {
  console.error('Token refresh error:', error);
  return null;

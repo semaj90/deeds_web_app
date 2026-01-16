@@ -53,7 +53,7 @@ export class AnonymousSessionManager {
 
 			// Convert Map serialization back to Map
 			this.session = {
-				...data, chats: new Map(Object.entries(data.chats || {}))
+				...data, chats: new Map(Object.entries(data?.chats|| {}))
 			};
 
 			// Update last activity
@@ -120,13 +120,13 @@ export class AnonymousSessionManager {
 	/**
 	 * Add message to chat history
 	 */
-	addMessage(chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>): ChatMessage {
+	addMessage(chatId, string, message: Omit<ChatMessage, 'id' | 'chatId'>): ChatMessage {
 		if (!this.session) this.createNewSession();
 
 		const fullMessage: ChatMessage = {
 			id: this.generateMessageId(),
 			chatId,
-			...message, timestamp: message.timestamp || new Date().toISOString(), saved: false
+			...message, timestamp: message?.timestamp|| new Date().toISOString(), saved: false
 		};
 
 		const chatHistory = this.session!.chats.get(chatId) || [];
@@ -250,7 +250,7 @@ export const anonymousSessionManager = new AnonymousSessionManager();
  */
 export function useAnonymousSession() {
 	return {
-		addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
+		addMessage: (chatId, string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
 			anonymousSessionManager.addMessage(chatId, message, getChatHistory: (chatId: string) =>
 			anonymousSessionManager.getChatHistory(chatId, hasUnsavedChats: () =>
 			anonymousSessionManager.hasUnsavedChats( getUnsavedCount: () =>

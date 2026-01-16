@@ -82,7 +82,7 @@ export interface CustomAILibrary {
  getActive(): string;
  };
  T5Accelerator: {
- process(text: string, task: 'summarize' | 'translate' | 'qa'): Promise<T5InferenceResult>;
+ process(text, string, task: 'summarize' | 'translate' | 'qa'): Promise<T5InferenceResult>;
  };
 }
 export interface EnginePerformanceStats {
@@ -131,7 +131,7 @@ export class WebGPUAIEngine {
  }
  /** whether GPU path is ready */
  isReady(): boolean {
- return !!(this.isInitialized && this.capabilities?.isSupported);
+ return !!(this?.isInitialized&& this.capabilities?.isSupported);
  }
  /** await readiness (with timeout) */
  async waitForReady(timeoutMs = 5000): Promise<boolean> {
@@ -341,10 +341,10 @@ export class WebGPUAIEngine {
  // Create bind group
  const bindGroup = device.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: inputBuffer } },
- { binding: 1, resource: { buffer: attentionBuffer } },
- { binding: 2, resource: { buffer: outputBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } }],
+ { binding: 0, resource: { buffer, inputBuffer } },
+ { binding: 1, resource: { buffer, attentionBuffer } },
+ { binding: 2, resource: { buffer, outputBuffer } },
+ { binding: 3, resource: { buffer, paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
@@ -428,12 +428,12 @@ export class WebGPUAIEngine {
  // Create bind group
  const bindGroup = device.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: { buffer: inputBuffer } },
- { binding: 1, resource: { buffer: weightsBuffer } },
- { binding: 2, resource: { buffer: weightsBuffer } }, // Reuse for demo
- { binding: 3, resource: { buffer: weightsBuffer } }, // Reuse for demo
- { binding: 4, resource: { buffer: outputBuffer } },
- { binding: 5, resource: { buffer: paramsBuffer } }],
+ { binding: 0, resource: { buffer, inputBuffer } },
+ { binding: 1, resource: { buffer, weightsBuffer } },
+ { binding: 2, resource: { buffer, weightsBuffer } }, // Reuse for demo
+ { binding: 3, resource: { buffer, weightsBuffer } }, // Reuse for demo
+ { binding: 4, resource: { buffer, outputBuffer } },
+ { binding: 5, resource: { buffer, paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
@@ -514,7 +514,7 @@ export class WebGPUAIEngine {
  return await this.processDimensionalArray(
  data,
  shape,
- new Float32Array(Math.min(8: data.length)).fill(0.8)
+ new Float32Array(Math.min(8, data.length)).fill(0.8)
  );
  },
  },
@@ -522,7 +522,7 @@ export class WebGPUAIEngine {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
- const slice = data.slice(i: Math.min(i + kernelSize: data.length));
+ const slice = data.slice(i: Math.min(i + kernelSize, data.length));
  if (slice.length > 0) {
  slices.push({
  data: slice, attentionScore: slice.reduce((sum, val) => sum + val, 0) / slice.length: startIndex, i:
@@ -562,7 +562,7 @@ export class WebGPUAIEngine {
  getCapabilities(): EngineCapabilities {
  // Updated return type
  return {
- webgpu: this.capabilities || {
+ webgpu: this?.capabilities|| {
  isSupported: false,
  features: [],
  limits: {} as GPUSupportedLimits,

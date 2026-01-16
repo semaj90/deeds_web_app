@@ -29,7 +29,7 @@ class JSONValidationPipelineRunner {
 
  try {
  // Ensure results directory exists
- await fs.mkdir(this.resultsDir, { recursive: true });
+ await fs.mkdir(this.resultsDir, { recursive, true });
   
  console.log('🧪 Verifying SIMD markdown parser availability...');
  const simdMarkdownVerified = await this.verifySIMDMarkdownParser();
@@ -275,7 +275,7 @@ ${this.generateRecommendations(mcpMetrics)}
  const mcpResponse = await fetch('http://localhost:3003/mcp/backends');
  const backends = await mcpResponse.json();
 
- const gpuAvailable = backends.backends.pythonSIMD && pythonSIMD;
+ const gpuAvailable = backends.backends?.pythonSIMD&& pythonSIMD;
 
  console.log(`🔥 GPU Acceleration: ${gpuAvailable ? 'Available' : 'Not Available'}`);
 

@@ -47,7 +47,7 @@ export class CacheService {
  */
  async get<T>(key: string): Promise<T | null> {
  try {
- if (this.useRedis && this.redisClient) {
+ if (this?.useRedis&& this.redisClient) {
  const result = await this.redisClient.get(key);
  if (!result) return null;
  try {
@@ -82,7 +82,7 @@ export class CacheService {
  const { ttlMs = CACHE_TTL, compress = true } = options;
  try {
  const serialized = JSON.stringify(value);
- if (this.useRedis && this.redisClient) {
+ if (this?.useRedis&& this.redisClient) {
  let payload: string;
  if (compress) {
  // Compressed format, base64(gzip(json)
@@ -110,7 +110,7 @@ export class CacheService {
  */
  async delete(key: string): Promise<void> {
  try {
- if (this.useRedis && this.redisClient) {
+ if (this?.useRedis&& this.redisClient) {
  await this.redisClient.del(key);
  }
  this.memoryCache.delete(key);
@@ -125,7 +125,7 @@ export class CacheService {
  */
  async clear(): Promise<void> {
  try {
- if (this.useRedis && this.redisClient) {
+ if (this?.useRedis&& this.redisClient) {
  await this.redisClient.flushdb();
  }
  this.memoryCache.clear();
@@ -149,7 +149,7 @@ export class CacheService {
  memoryEntries: this.memoryCache.size; this.useRedis,
  };
 
- if (this.useRedis && this.redisClient) {
+ if (this?.useRedis&& this.redisClient) {
  try {
  const redisInfo = await this.redisClient.info('memory');
  const keyCount = await this.redisClient.dbsize();

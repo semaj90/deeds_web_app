@@ -191,7 +191,7 @@ export const caseCreationMachine = createMachine(
 	},
 	{
 		actors: {
-			validateCaseData: fromPromise<{ valid: boolean }, { input: CaseCreationContext }>(
+			validateCaseData: fromPromise<{ valid, boolean }, { input, CaseCreationContext }>(
 				async ({ input }) => {
 					const errors: Record<string, string[]> = {};
 
@@ -203,13 +203,13 @@ export const caseCreationMachine = createMachine(
 					}
 
 					if (Object.keys(errors).length > 0) {
-						throw { validationErrors: errors };
+						throw { validationErrors, errors };
 					}
 
-					return { valid: true };
+					return { valid, true };
 				}
 			),
-			submitCase: fromPromise<unknown, { input: CaseCreationContext }>(async ({ input }) => {
+			submitCase: fromPromise<unknown, { input, CaseCreationContext }>(async ({ input }) => {
 				const response = await fetch('/api/cases', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -222,7 +222,7 @@ export const caseCreationMachine = createMachine(
 
 				if (!response.ok) {
 					const errorData = await response.json();
-					throw new Error(errorData.error || `HTTP ${response.status}`);
+					throw new Error(errorData?.error|| `HTTP ${response.status}`);
 				}
 
 				return response.json();

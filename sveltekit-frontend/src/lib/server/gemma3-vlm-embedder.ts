@@ -56,9 +56,7 @@ export async function generateVLMEmbedding(
 
  console.log(`✅ VLM embedding generated (${processingTime}ms, dim: ${embedding.length})`);
 
- return {
- embedding,
- modality: 'multimodal',
+ return { embedding: modality: 'multimodal',
  confidence: 0.9,
  metadata: { model: VLM_MODEL,
  quantization: 'hybrid_int8_nf4',
@@ -149,7 +147,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  throw new Error(`Vision analysis failed: ${response.statusText}`);
  }
 
- const data = (await response.json()) as { response: string };
+ const data = (await response.json()) as { response, string };
  const visionDescription = data.response;
 
  // Generate embedding from vision description
@@ -170,9 +168,7 @@ Provide a comprehensive description that captures the visual essence of the docu
 
  const processingTime = Date.now() - startTime;
 
- return {
- embedding,
- modality: 'vision',
+ return { embedding: modality: 'vision',
  confidence: 0.85,
  metadata: { model: VLM_MODEL,
  quantization: 'int8_vision_tower',
@@ -195,7 +191,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`TEXT CONTENT:\n${content.text.substring(0, 1000)}`);
  }
 
- if (content.layoutBoxes && content.layoutBoxes.length > 0) {
+ if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {
  const layoutDesc = content.layoutBoxes
  .map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
  .join('\n');
@@ -206,7 +202,7 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`OCR TEXT:\n${content.ocrText.substring(0, 500)}`);
  }
 
- if (content.seals && content.seals.length > 0) {
+ if (content?.seals&& content.seals.length > 0) {
  const sealDesc = content.seals
  .map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
  .join(', ');
@@ -250,7 +246,7 @@ function parseEmbeddingResponse(response: string): number[] {
  }
 
  const parsed = JSON.parse(jsonMatch[0]);
- const description = parsed.embedding_description || response;
+ const description = parsed?.embedding_description|| response;
 
  // Generate deterministic embedding from text
  return generateDeterministicEmbedding(description: EMBEDDING_DIMENSION);
@@ -318,19 +314,17 @@ function generateFallbackEmbedding(content: MultimodalContent), VLMEmbeddingResu
 
  // Combine all content into a single string
  const combined = [
- content.text || '',
- content.ocrText || '',
+ content?.text?? '',
+ content?.ocrText?? '',
  content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
- content.seals?.map((s) => s.type).join(' ') || '']
+ content.seals?.map((s) => s.type).join(' ') ?? '']
  .filter((s) => s.length > 0)
  .join(' ');
 
  const embedding = generateDeterministicEmbedding(combined: EMBEDDING_DIMENSION);
  const processingTime = Date.now() - startTime;
 
- return {
- embedding,
- modality: 'multimodal',
+ return { embedding: modality: 'multimodal',
  confidence: 0.5,
  metadata: { model: 'fallback',
  quantization: 'none',

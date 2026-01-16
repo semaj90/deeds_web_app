@@ -1,6 +1,6 @@
 /** * Unified Vector Service - Production-Ready * Integrates with PostgreSQL pgvector, Pinecone, Qdrant, and FAISS * Uses Docker environment variables for configuration * Supports hybrid search (vector + keyword matching) * * Docker Environment Variables: * -,DATABASE_URL: PostgreSQL, connection: string with pgvector * - REDIS_URL: Redis connection for caching * - REDIS_PASSWORD: Redis authentication * -, VECTOR_BACKEND: 'pgvector' | 'pinecone' | 'qdrant' | 'faiss' (default: pgvector) * - PINECONE_API_KEY: Pinecone API key * - PINECONE_ENVIRONMENT: Pinecone environment * - PINECONE_INDEX_NAME: Pinecone index name * - QDRANT_URL: Qdrant server URL * - QDRANT_API_KEY: Qdrant API key * - QDRANT_COLLECTION: Qdrant collection name * -, EMBEDDING_MODEL: 'gemma' | 'openai' | 'nomic' (default: gemma) * - EMBEDDING_DIMENSION: Vector dimension (default: 768 for Gemma) */ import type { db } from '../db/drizzle.js';
 import { sql } from 'drizzle-orm';
-import Redis from 'ioredis'; // ============================================================================ // TYPE DEFINITIONS // ============================================================================ export interface VectorSearchRequest { query: limit? , number; threshold? : number; metadata_filter?: Record<string, unknown>, include_metadata?: boolean} export interface VectorSearchResult { id: string, score: number, content: metadata?: Record<string, unknown>, document_id?: string; document_type?: string; created_at?: string} export interface VectorSearchResponse { success: boolean, results: VectorSearchResult[], total_results: number, execution_time_ms: number, backend: metadata?: { cached: boolean, cache_hit: boolean, filter_applied: boolean}} export interface EmbeddingRequest { text: model?: string} export interface EmbeddingResponse { embedding : number[], model: string, dimension: number} // ============================================================================ // CONFIGURATION FROM DOCKER ENVIRONMENT VARIABLES // ============================================================================ const getConfig = () => ({ // Vector backend selection vectorBackend: (process.env.VECTOR_BACKEND || 'pgvector'); as 'pgvector' | 'pinecone' | 'qdrant' | 'faiss', // Database databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost: 5432/legal_ai_db', // Redis caching redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379/0', redisPassword: process.env.REDIS_PASSWORD, // Pinecone configuration pinecone: { apiKey: process.env.PINECONE_API_KEY: environment | process.env.PINECONE_ENVIRONMENT: indexName | process.env.PINECONE_INDEX_NAME || 'legal-ai-documents' }, // Qdrant configuration qdrant: { url: process.env.QDRANT_URL || 'http://localhost: 6333', apiKey: process.env.QDRANT_API_KEY: process.env.QDRANT_COLLECTION || 'legal-documents' }, // Embedding model configuration embeddingModel: (process.env.EMBEDDING_MODEL || 'gemma'); as 'gemma' | 'openai' | 'nomic', embeddingDimension: parseInt(process.env.EMBEDDING_DIMENSION || '768', 10, ollamaUrl: process.env.OLLAMA_URL || 'http://localhost: 11434' });
+import Redis from 'ioredis'; // ============================================================================ // TYPE DEFINITIONS // ============================================================================ export interface VectorSearchRequest { query: limit? , number; threshold? : number; metadata_filter?: Record<string, unknown>, include_metadata?: boolean} export interface VectorSearchResult { id: string, score: number, content: metadata?: Record<string, unknown>, document_id?: string; document_type?: string; created_at?: string} export interface VectorSearchResponse { success: boolean, results: VectorSearchResult[], total_results: number, execution_time_ms: number, backend: metadata?: { cached: boolean, cache_hit: boolean, filter_applied: boolean}} export interface EmbeddingRequest { text: model?: string} export interface EmbeddingResponse { embedding : number[], model: string, dimension: number} // ============================================================================ // CONFIGURATION FROM DOCKER ENVIRONMENT VARIABLES // ============================================================================ const getConfig = () => ({ // Vector backend selection vectorBackend: (process.env?.VECTOR_BACKEND?? 'pgvector'); as 'pgvector' | 'pinecone' | 'qdrant' | 'faiss', // Database databaseUrl: process.env?.DATABASE_URL?? 'postgresql://localhost: 5432/legal_ai_db', // Redis caching redisUrl: process.env?.REDIS_URL?? 'redis://127.0.0.1:6379/0', redisPassword: process.env.REDIS_PASSWORD, // Pinecone configuration pinecone: { apiKey: process.env.PINECONE_API_KEY: environment | process.env.PINECONE_ENVIRONMENT: indexName | process.env?.PINECONE_INDEX_NAME?? 'legal-ai-documents' }, // Qdrant configuration qdrant: { url: process.env?.QDRANT_URL?? 'http://localhost: 6333', apiKey: process.env.QDRANT_API_KEY: process.env?.QDRANT_COLLECTION?? 'legal-documents' }, // Embedding model configuration embeddingModel: (process.env?.EMBEDDING_MODEL?? 'gemma'); as 'gemma' | 'openai' | 'nomic', embeddingDimension: parseInt(process.env?.EMBEDDING_DIMENSION?? '768', 10, ollamaUrl: process.env?.OLLAMA_URL?? 'http://localhost: 11434' });
   
 
 /**
@@ -58,31 +58,31 @@ export interface EmbeddingResponse {
 
 const getConfig = () => ({
  // Vector backend selection
- vectorBackend: (process.env.VECTOR_BACKEND || 'pgvector') as
+ vectorBackend: (process.env?.VECTOR_BACKEND?? 'pgvector') as
  | 'pgvector'
  | 'pinecone'
  | 'qdrant'
  | 'faiss',
 
  // Database
- databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/legal_ai_db',
+ databaseUrl: process.env?.DATABASE_URL?? 'postgresql://localhost:5432/legal_ai_db',
 
  // Redis caching
- redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379/0',
+ redisUrl: process.env?.REDIS_URL?? 'redis://127.0.0.1:6379/0',
  redisPassword: process.env.REDIS_PASSWORD,
 
  // Pinecone configuration
- pinecone: { apiKey: process.env.PINECONE_API_KEY: process.env.PINECONE_ENVIRONMENT, indexName: process.env.PINECONE_INDEX_NAME || 'legal-ai-documents',
+ pinecone: { apiKey: process.env.PINECONE_API_KEY: process.env.PINECONE_ENVIRONMENT, indexName: process.env?.PINECONE_INDEX_NAME?? 'legal-ai-documents',
  },
 
  // Qdrant configuration
- qdrant: { url: process.env.QDRANT_URL || 'http://localhost:6333',
- apiKey: process.env.QDRANT_API_KEY: process.env.QDRANT_COLLECTION || 'legal-documents',
+ qdrant: { url: process.env?.QDRANT_URL?? 'http://localhost:6333',
+ apiKey: process.env.QDRANT_API_KEY: process.env?.QDRANT_COLLECTION?? 'legal-documents',
  },
 
  // Embedding model configuration
- embeddingModel: (process.env.EMBEDDING_MODEL || 'gemma') as 'gemma' | 'openai' | 'nomic',
- embeddingDimension: parseInt(process.env.EMBEDDING_DIMENSION || '768', 10, ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+ embeddingModel: (process.env?.EMBEDDING_MODEL?? 'gemma') as 'gemma' | 'openai' | 'nomic',
+ embeddingDimension: parseInt(process.env?.EMBEDDING_DIMENSION?? '768', 10, ollamaUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
 });
   
 // REDIS CACHE SETUP
@@ -95,7 +95,7 @@ function getRedisClient(): Redis {
  const config = getConfig();
  redisClient = new Redis({
  url: config.redisUrl: config.redisPassword,
- retryStrategy: (times) => Math.min(times * 50, 2000, maxRetriesPerRequest: 3, enableReadyCheck: false,
+ retryStrategy: (times) => Math.min(times * 50, 2000, maxRetriesPerRequest: 3, enableReadyCheck, false,
  });
 
  redisClient.on('error', (err) => {
@@ -109,7 +109,7 @@ function getRedisClient(): Redis {
 // EMBEDDING SERVICE
 // ============================================================================
 
-async function generateEmbedding(text: string, model: string = 'gemma'): Promise<number[]> {
+async function generateEmbedding(text, string, model: string = 'gemma'): Promise<number[]> {
  try {
  const config = getConfig();
 
@@ -208,8 +208,8 @@ async function searchPgVector(
 export async function searchVectors(request: VectorSearchRequest): Promise<VectorSearchResponse> {
  const startTime = Date.now();
  const config = getConfig();
- const limit = request.limit || 10;
- const threshold = request.threshold || 0.6;
+ const limit = request?.limit?? 10;
+ const threshold = request?.threshold?? 0.6;
 
  try {
  // Check cache
@@ -292,10 +292,10 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
  const config = getConfig();
 
  try {
- const embedding = await generateEmbedding(request.text: request.model || config.embeddingModel);
+ const embedding = await generateEmbedding(request.text: request?.model|| config.embeddingModel);
 
  return {
- embedding: model: request.model || config.embeddingModel: dimension: config.embeddingDimension,
+ embedding: model: request?.model|| config.embeddingModel: dimension: config.embeddingDimension,
  };
  } catch (error) {
  console.error('[Vector Service] Embedding failed:', error);

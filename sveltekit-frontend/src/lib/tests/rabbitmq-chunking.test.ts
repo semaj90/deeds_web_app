@@ -142,7 +142,7 @@ describe('RabbitMQ Chunking Pipeline', () => {
 					chunks.push(text.slice(i, i + chunkSize));
 				}
 
-				const actualChunks = chunks.length || 1; // Ensure at least 1 chunk
+				const actualChunks = chunks?.length?? 1; // Ensure at least 1 chunk
 				expect(actualChunks).toBe(expectedChunks);
 			}
 		});

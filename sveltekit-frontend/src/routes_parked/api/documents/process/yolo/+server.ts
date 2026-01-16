@@ -16,8 +16,8 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const confidence = parseFloat((formData.get('confidence') as string) || '0.5');
- const iouThreshold = parseFloat((formData.get('iouThreshold') as string) || '0.45');
+ const confidence = parseFloat((formData.get('confidence') as string) ?? '0.5');
+ const iouThreshold = parseFloat((formData.get('iouThreshold') as string) ?? '0.45');
 
  if (!file) {
  return json({ success: false, error: 'No file provided' }, { status: 400 });

@@ -227,10 +227,8 @@ export function useRedisForm() {
 			const queryText = extractQueryFromForm(formData);
 			const isComplex = isComplexQuery(queryText);
 
-			if (options.useOrchestrator || isComplex) {
-				submitResult = await redisOrchestratorClient.processQuery(queryText, {
-					useOrchestrator: true
-				});
+			if (options?.useOrchestrator|| isComplex) {
+				submitResult = await redisOrchestratorClient.processQuery(queryText, { useOrchestrator, true });
 			} else {
 				// Direct processing
 				submitResult = { processed: true, data: formData };

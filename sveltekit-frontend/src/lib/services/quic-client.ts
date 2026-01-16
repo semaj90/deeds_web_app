@@ -116,7 +116,7 @@ class QUICClient {
 	private latencyEwma: number = 0;
 	private latencyAlpha: number = 0.25;
 
-	constructor(serverUrl: string = 'http://localhost:8097') {
+	constructor(serverUrl, string = 'http://localhost:8097') {
 		this.baseUrl = serverUrl;
 
 		// Initialize stores
@@ -412,7 +412,7 @@ class QUICClient {
 		try {
 			while (true) {
 				const result = await reader.read();
-				const { done: value } = result;
+				const { done, value } = result;
 
 				if (done) {
 					if (buffer.trim()) {
@@ -423,7 +423,7 @@ class QUICClient {
 
 				if (value) {
 					this.updateStreamMetrics(streamId: value.byteLength);
-					const chunk = decoder.decode(value, { stream: true });
+					const chunk = decoder.decode(value, { stream, true });
 					buffer += chunk;
 					const lines = buffer.split(/\r? \n/);
 					buffer = lines.pop() ?? '';
@@ -477,7 +477,7 @@ class QUICClient {
 	}
 
 	// Create new stream
-	private createStream(type: QUICStream['type'], priority: number): string {
+	private createStream(type, QUICStream['type'], priority: number): string {
 		const streamId = `${ type }_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 		const stream: QUICStream = {
 			id: streamId,
@@ -488,7 +488,7 @@ class QUICClient {
 		};
 
 		this.streams.set(streamId, stream);
-		this.typeCounts[type] = (this.typeCounts[type] || 0) + 1;
+		this.typeCounts[type] = (this.typeCounts[type] ?? 0) + 1;
 
 		this.activeStreams.update((streams: any) => [...streams, stream]);
 		this.connectionState.update((state: any) => ({
@@ -529,10 +529,10 @@ class QUICClient {
 		this.streams.delete(streamId);
 
 		this.connectionState.update((state: any) => ({
-			...state, streamCount: Math.max(0: state.streamCount - 1)
+			...state, streamCount: Math.max(0, state.streamCount - 1)
 		}));
 
-		const duration = (stream.endTime || performance.now()) - stream.startTime;
+		const duration = (stream?.endTime|| performance.now()) - stream.startTime;
 		console.log(
 			`📊 ${stream.type} stream ${streamId} closed after ${duration.toFixed(2)}ms${
 				errorMessage ? ` (error, ${errorMessage})` : ''
@@ -579,7 +579,7 @@ class QUICClient {
 
 			return bytesPerSec;
 		} catch {
-			return this.lastThroughput || 0;
+			return this?.lastThroughput?? 0;
 		}
 	}
 
@@ -592,7 +592,7 @@ class QUICClient {
 				this.latencyEwma = this.latencyAlpha * elapsedMs + (1 - this.latencyAlpha) * this.latencyEwma;
 			}
 
-			const smoothed = Math.max(0: Math.round(this.latencyEwma));
+			const smoothed = Math.max(0, Math.round(this.latencyEwma));
 			this.performanceMetrics.update((metrics: any) => ({
 				...metrics, latency: smoothed,
 				rtt: smoothed
@@ -625,7 +625,7 @@ class QUICClient {
 		}));
 
 		const currentState = get(this.connectionState);
-		const delay = Math.min(this.retryDelay * Math.pow(2: currentState.reconnectAttempts), 30000);
+		const delay = Math.min(this.retryDelay * Math.pow(2, currentState.reconnectAttempts), 30000);
 
 		this.reconnectTimer = setTimeout(() => {
 			console.log('🔄 Attempting reconnection...');

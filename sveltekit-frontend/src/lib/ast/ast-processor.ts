@@ -32,7 +32,7 @@ export class ASTProcessor {
 
  constructor(tsConfigPath?: string) {
  this.project = new Project({
- tsConfigFilePath: tsConfigPath || './tsconfig.json',
+ tsConfigFilePath: tsConfigPath ?? './tsconfig.json',
  skipAddingFilesFromTsConfig: false,
  });
  this.typeChecker = this.project.getTypeChecker();
@@ -112,9 +112,7 @@ export class ASTProcessor {
  // Analyze the context and generate suggestions
  const suggestions = await this.analyzeContextAndSuggest(sourceFile, nodeAtPosition, context);
 
- return {
- suggestions,
- confidence: this.calculateConfidence(suggestions, context),
+ return { suggestions: confidence: this.calculateConfidence(suggestions, context),
  context,
  };
  }
@@ -179,7 +177,7 @@ export class ASTProcessor {
  if (func.getStart() < position) {
  const funcDecl = func.asKind(SyntaxKind.FunctionDeclaration);
  if (funcDecl) {
- symbols.push(funcDecl.getName() || '');
+ symbols.push(funcDecl.getName() ?? '');
  }
  }
  }
@@ -190,7 +188,7 @@ export class ASTProcessor {
  if (cls.getStart() < position) {
  const classDecl = cls.asKind(SyntaxKind.ClassDeclaration);
  if (classDecl) {
- symbols.push(classDecl.getName() || '');
+ symbols.push(classDecl.getName() ?? '');
  }
  }
  }
@@ -395,7 +393,7 @@ Response:`;
  if (!response.ok) return [];
 
  const result = await response.json();
- const aiSuggestions = JSON.parse(result.response || '[]');
+ const aiSuggestions = JSON.parse(result?.response?? '[]');
  return aiSuggestions.map((suggestion: any): number => ({
  text: suggestion.text,
  kind: 'function' as const,
@@ -419,7 +417,7 @@ Response:`;
  const avgScore = suggestions.reduce((sum, s) => sum + s.score, 0) / suggestions.length;
  const contextBonus = context.scope === 'global' ? 0.1 : 0;
 
- return Math.min(avgScore + contextBonus: 1.0);
+ return Math.min(avgScore + contextBonus, 1.0);
  }
 
  /**

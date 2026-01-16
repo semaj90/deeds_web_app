@@ -16,7 +16,7 @@ export async function POST({ request }) {
  }
 
  // Get the TensorRT-LLM service endpoint
- const trtEndpoint = env.TRT_LLM_ENDPOINT || 'http://localhost:8090';
+ const trtEndpoint = env?.TRT_LLM_ENDPOINT?? 'http://localhost:8090';
 
  const response = await fetch(`${trtEndpoint}/generate`, {
  method: 'POST',
@@ -41,7 +41,7 @@ export async function POST({ request }) {
  return json(result);
  } catch (err) {
  console.error('TRT-LLM API error:', err);
- throw error(500: err.message || 'Internal server error');
+ throw error(500, err?.message?? 'Internal server error');
  }
 }
 

@@ -148,7 +148,7 @@ export abstract class YoRHa3DComponent extends THREE.Group {
 
 	public dispose(): void {
 		if (this.geometry) this.geometry.dispose();
-		if (this.material && 'dispose' in this.material) {
+		if (this?.material&& 'dispose' in this.material) {
 			(this.material as any).dispose();
 		}
 		this.customAnimations.clear();

@@ -16,7 +16,7 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');
-	const mode = url.searchParams.get('mode') || 'ollama';
+	const mode = url.searchParams.get('mode') ?? 'ollama';
 
 	if (!query) {
 		return new Response('Missing query parameter', { status: 400 });

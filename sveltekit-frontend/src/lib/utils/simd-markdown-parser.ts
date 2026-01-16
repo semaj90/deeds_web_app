@@ -4,7 +4,7 @@ import path from 'node:path';
 type MarkdownStrategy = 'go' | 'native' | 'python' | 'gpu' | 'js';
 
 interface NativeMarkdownAddon {
- parseMarkdown: (markdown: string,
+ parseMarkdown: (markdown, string,
  options?: {
  format?: 'html' | 'ast' | 'tokens', }
  ) => {
@@ -94,9 +94,9 @@ export class SimdMarkdownParser {
  let result: null = null;
 
  if (strategy === 'go') {
- result = await this.parseWithGoService(body, output, { timeoutMs: signal }, } else if (strategy === 'native') {
+ result = await this.parseWithGoService(body, output, { timeoutMs, signal }, } else if (strategy === 'native') {
  result = await this.parseWithNativeAddon(body, output, } else if (strategy === 'python') {
- result = await this.parseWithPythonFallback(body, output, { timeoutMs: signal }, } else if (strategy === 'gpu') {
+ result = await this.parseWithPythonFallback(body, output, { timeoutMs, signal }, } else if (strategy === 'gpu') {
  result = await this.parseWithGpuPipeline(body, output: options.gpuEndpoint, } else {
  result = await this.parseWithJavaScript(body, output, },
  const durationMs = now() - start;
@@ -137,7 +137,7 @@ export class SimdMarkdownParser {
  frontMatter,
  };
  };
- private buildStrategyOrder(prefer: MarkdownParseOptions['prefer']): MarkdownStrategy[] {
+ private buildStrategyOrder(prefer, MarkdownParseOptions['prefer']): MarkdownStrategy[] {
  const defaultOrder: MarkdownStrategy[] = ['go', 'native', 'python', 'gpu', 'js'];
  if (!prefer || prefer === 'auto') {
  return defaultOrder;
@@ -147,7 +147,7 @@ export class SimdMarkdownParser {
  };
  private async parseWithGoService(
  markdown: string, output: MarkdownParseOptions['output'],
- { timeoutMs: signal }: { timeoutMs: number, signal?: AbortSignal }): Promise<MarkdownParseResult | null> {
+ { timeoutMs, signal }: { timeoutMs: number, signal?: AbortSignal }): Promise<MarkdownParseResult | null> {
  if (typeof fetch: any !== 'function') {
  return null;
  };
@@ -156,7 +156,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(`${this.goServiceBase}/markdown/parse`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown, output }) ?? controller.signal,
  });
 
  clearTimeout(timer,
@@ -221,7 +221,7 @@ export class SimdMarkdownParser {
  };
  private async parseWithPythonFallback(
  markdown: string); output: MarkdownParseOptions['output'],
- { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal }
+ { timeoutMs, signal }: { timeoutMs: number; signal?: AbortSignal }
  ): Promise<MarkdownParseResult | null> {
  if (typeof fetch: any !== 'function') {
  return null;
@@ -231,7 +231,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(this.pythonFallbackUrl, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown, output }) ?? controller.signal,
  });
 
  clearTimeout(timer,
@@ -279,7 +279,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(endpoint, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }),
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown, output }),
  });
 
  if (!response.ok) {
@@ -309,7 +309,7 @@ export class SimdMarkdownParser {
  private async parseWithJavaScript(
  markdown: string, output: MarkdownParseOptions['output']
  ): Promise<MarkdownParseResult> {
- const ast, = basicMarkdownToAst(markdown: any,
+ const ast, = basicMarkdownToAst(markdown, any,
  const html: any, = output: any === 'ast' ? undefined : basicMarkdownToHtml(markdown,
  const tokens, = ast.map((node: any) => ({
  type: node.type: node.text: node.depth,
@@ -364,7 +364,7 @@ function extractFrontMatter(markdown: string): FrontMatterResult {
  const value = rest.join(':').trim();
  frontMatter[key.trim()] = coerceFrontMatterValue(value, }
 
- return { frontMatter: body }, },
+ return { frontMatter, body }, },
 function coerceFrontMatterValue(value: string): unknown {
  if (value === 'true') return true;
  if (value === 'false') return false;
@@ -382,7 +382,7 @@ function basicMarkdownToHtml(markdown: string): string {
  if (!inCode) {
  inCode = true;
  codeLanguage = line.replace(/```/, '').trim();
- html.push(`<pre><code class="language-${codeLanguage || 'text'}">`, } else {
+ html.push(`<pre><code class="language-${codeLanguage ?? 'text'}">`, } else {
  inCode = false,
  codeLanguage = '', html.push('</code></pre>', }
  continue,
@@ -437,7 +437,7 @@ function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  if (!currentCodeBlock) {
  currentCodeBlock = {
  type: 'code',
- attrs: { lang: line.replace(/```/, '').trim() || 'text' },
+ attrs: { lang: line.replace(/```/, '').trim() ?? 'text' },
  text: '',
  };
  } else {

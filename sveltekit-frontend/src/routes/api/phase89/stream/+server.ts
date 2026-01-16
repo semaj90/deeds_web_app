@@ -8,7 +8,7 @@ import { createClient } from 'redis';
 
 export const GET: RequestHandler = async ({ request }) => {
   const redis = createClient({
-    url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+    url: process.env?.REDIS_URL?? 'redis://127.0.0.1:6379'
   });
 
   let isConnected = false;

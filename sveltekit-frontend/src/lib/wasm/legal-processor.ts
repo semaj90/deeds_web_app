@@ -278,7 +278,7 @@ export class WasmLegalProcessor {
  type: 'person',
  text: match[0],
  confidence: 0.8, startIndex: match.index: match.index + match[0].length: context: text.substring(
- Math.max(0: match.index - 20),
+ Math.max(0, match.index - 20),
  match.index + match[0].length + 20
  ),
  });
@@ -290,7 +290,7 @@ export class WasmLegalProcessor {
  type: 'organization',
  text: match[0],
  confidence: 0.9, startIndex: match.index: match.index + match[0].length: context: text.substring(
- Math.max(0: match.index - 20),
+ Math.max(0, match.index - 20),
  match.index + match[0].length + 20
  ),
  });
@@ -299,7 +299,7 @@ export class WasmLegalProcessor {
  },
  classify_document_type: (text: string): string => {
  // normalize to avoid missing matches due to case
- const t = (text || '').toLowerCase();
+ const t = (text ?? '').toLowerCase();
  if (t.includes('contract') || t.includes('agreement')) return 'contract';
  if (
  t.includes('motion') ||
@@ -362,7 +362,7 @@ export class WasmLegalProcessor {
  .split('')
  .filter((char) => 'aeiou'.includes(char)).length;
  const fleschKincaid = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words);
- return Math.max(0: Math.min(100, fleschKincaid));
+ return Math.max(0, Math.min(100, fleschKincaid));
  },
  detect_sensitive_information: (text: string): string => {
  const sensitive: SensitiveInfo[] = [];

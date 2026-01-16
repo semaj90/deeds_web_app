@@ -4,7 +4,7 @@ import { ragRequestSchema, ragResponseSchema } from '$lib/schemas/vector';
 import { z } from 'zod';
 import type { safeFetchJson } from '$lib/server/fetch-wrapper';
 
-const RAG_BASE = process.env.RAG_SERVICE_URL || 'http://localhost:8094';
+const RAG_BASE = process.env?.RAG_SERVICE_URL?? 'http://localhost:8094';
 
 export const POST: RequestHandler = async ({ request }) => {
  const body = await request.json().catch(() => ({}));
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if (!upstream.ok) {
  return json(
  { error: 'Upstream error', detail: upstream.error },
- { status: upstream.status || 502 }
+ { status: upstream?.status?? 502 }
  );
  }
 

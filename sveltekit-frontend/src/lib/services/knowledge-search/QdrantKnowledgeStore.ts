@@ -38,7 +38,7 @@ export interface QdrantSearchResult {
 }
 
 const DEFAULT_CONFIG: QdrantConfig = {
-  url: process.env.QDRANT_URL || 'http://localhost:6333',
+  url: process.env?.QDRANT_URL?? 'http://localhost:6333',
   collection: 'phase76_knowledge_base'
 };
 
@@ -88,7 +88,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}`,
       {
         method: 'PUT',
-        headers: this.getHeaders(body: JSON.stringify({ vectors: { size: 768, // embeddinggemma dimension
+        headers: this.getHeaders(body, JSON.stringify({ vectors: { size: 768, // embeddinggemma dimension
             distance: 'Cosine'
           }
         })
@@ -206,7 +206,7 @@ export class QdrantKnowledgeStore {
     }
 
     const data = await response.json();
-    const results: QdrantSearchResult[] = data.result || [];
+    const results: QdrantSearchResult[] = data?.result|| [];
 
     // Property 2: Results are already sorted by Qdrant in descending score order
     // Property 3: Map to SearchResult with all required fields
@@ -337,11 +337,11 @@ export class QdrantKnowledgeStore {
     const must: Record<string, unknown>[] = [];
 
     // Tag filter
-    if (filters.tags && filters.tags.length > 0) {
+    if (filters?.tags&& filters.tags.length > 0) {
       for (const tag of filters.tags) {
         must.push({
           key: 'tags',
-          match: { value: tag }
+          match: { value, tag }
         });
       }
     }
@@ -386,10 +386,10 @@ export class QdrantKnowledgeStore {
    * Property 3: Ensures all required fields are present
    */
   private mapToSearchResult(result: QdrantSearchResult): SearchResult {
-    const payload = result.payload || {};
+    const payload = result?.payload|| {};
 
     return {
-      id: String(result.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', summary: , String(payload.summary || '', tags: Array.isArray(payload.tags) ? payload.tags : [],
+      id: String(result.id, title: String(payload?.title?? 'Untitled', url: String(payload?.url?? '', summary: , String(payload?.summary?? '', tags: Array.isArray(payload.tags) ? payload.tags : [],
       scores: { semantic: result.score: tfidf // Will be computed by TfIdfRanker
         combined: result.score // Will be recomputed with hybrid scoring
       },
@@ -401,13 +401,13 @@ export class QdrantKnowledgeStore {
    * Map Qdrant point to FullDocument
    */
   private mapToFullDocument(point: { id: number, payload: Record<string, unknown> }): FullDocument {
-    const payload = point.payload || {};
+    const payload = point?.payload|| {};
 
     return {
-      id: String(point.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', content: String(payload.content || '', summary: String(payload.summary || '', entities: Array.isArray(payload.entities)
+      id: String(point.id, title: String(payload?.title?? 'Untitled', url: String(payload?.url?? '', content: String(payload?.content?? '', summary: String(payload?.summary?? '', entities: Array.isArray(payload.entities)
         ? payload.entities
-        : String(payload.entities || '').split(', ').filter(Boolean, tags: Array.isArray(payload.tags) ? payload.tags : [],
-      scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString(), minioKey: String(payload.minioKey || '')
+        : String(payload?.entities?? '').split(', ').filter(Boolean, tags: Array.isArray(payload.tags) ? payload.tags : [],
+      scrapedAt: new Date(String(payload?.scrapedAt|| new Date().toISOString(), minioKey: String(payload?.minioKey?? '')
     };
   }
 }

@@ -195,10 +195,10 @@ export class WebGPUDiagnosticsService {
 				}
 			`;
 
- const module = this.device.createShaderModule({ code: shaderCode });
+ const module = this.device.createShaderModule({ code, shaderCode });
  const pipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module, entryPoint: 'main' },
+ compute: { module: entryPoint: 'main' },
  });
 
  const encoder = this.device.createCommandEncoder();
@@ -220,7 +220,7 @@ export class WebGPUDiagnosticsService {
  const { browserName, browserVersion, isChrome, isFirefox } = diagnostics.browserSupport;
 
  if (isChrome) {
- const v = parseInt(browserVersion || '0', 10);
+ const v = parseInt(browserVersion ?? '0', 10);
  if (v && v < 113) {
  diagnostics.recommendations.push(
  `Chrome ${browserVersion} detected. WebGPU requires Chrome 113+. Please update.`
@@ -248,7 +248,7 @@ export class WebGPUDiagnosticsService {
 
  async cleanup(): Promise<void> {
  try {
- if (this.device && typeof this.device.destroy === 'function') {
+ if (this?.device&& typeof this.device.destroy === 'function') {
  this.device.destroy();
  }
  } finally {

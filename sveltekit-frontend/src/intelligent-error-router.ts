@@ -79,7 +79,7 @@ export class IntelligentErrorRouter {
 
 		// Determine tier and priority based on confidence and error characteristics
 		let tier: ErrorTier;
-		let priority: RoutedError['priority'];
+		let priority: RoutedError?.priority;
 		let routingReason: string;
 		let estimatedFixTime: number;
 
@@ -141,7 +141,7 @@ export class IntelligentErrorRouter {
 		];
 
 		return (
-			criticalMessages.some((msg) => error.message.includes(msg)) &&
+			criticalMessages.some((msg: any) => error.message.includes(msg)) &&
 			error.errorType === 'syntax' &&
 			error.confidence > 0.7
 		);
@@ -180,8 +180,8 @@ export class IntelligentErrorRouter {
 	 * Compute distance between error and cluster
 	 */
 	private computeClusterDistance(error, GPUErrorPattern, cluster: ErrorCluster): number {
-		const lineDiff = error.line - cluster.centroid[0];
-		const colDiff = error.col - cluster.centroid[1];
+		const lineDiff = error.line - cluster.centroid?.0;
+		const colDiff = error.col - cluster.centroid?.1;
 		const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff);
 
 		// Weight by error type and confidence
@@ -244,7 +244,7 @@ export class IntelligentErrorRouter {
 	 * Get errors by tier
 	 */
 	getErrorsByTier(routedErrors: RoutedError[], tier: ErrorTier): RoutedError[] {
-		return routedErrors.filter((e) => e.tier === tier);
+		return routedErrors.filter((e: any) => e.tier === tier);
 	}
 
 	/**
@@ -252,9 +252,9 @@ export class IntelligentErrorRouter {
 	 */
 	getErrorsByPriority(
 		routedErrors: RoutedError[],
-		priority: RoutedError['priority']
+		priority: RoutedError?.priority
 	): RoutedError[] {
-		return routedErrors.filter((e) => e.priority === priority);
+		return routedErrors.filter((e: any) => e.priority === priority);
 	}
 
 	/**
@@ -266,10 +266,10 @@ export class IntelligentErrorRouter {
 		try {
 			// Group by tier for efficient querying
 			const byTier = {
-				tier1: routedErrors.filter((e) => e.tier === 'tier1'),
-				tier2: routedErrors.filter((e) => e.tier === 'tier2'),
-				tier3: routedErrors.filter((e) => e.tier === 'tier3'),
-				manual: routedErrors.filter((e) => e.tier === 'manual')
+				tier1: routedErrors.filter((e: any) => e.tier === 'tier1'),
+				tier2: routedErrors.filter((e: any) => e.tier === 'tier2'),
+				tier3: routedErrors.filter((e: any) => e.tier === 'tier3'),
+				manual: routedErrors.filter((e: any) => e.tier === 'manual')
 			};
 
 			// Store in Redis with compression

@@ -18,7 +18,7 @@ export class DocumentProcessingAPI {
  private token?: string;
 
  constructor(
- baseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+ baseUrl: string = import.meta.env?.VITE_API_BASE_URL?? 'http://localhost:3000',
  token?: string
  ) {
  this.baseUrl = baseUrl;
@@ -41,7 +41,7 @@ export class DocumentProcessingAPI {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
- ...(this.token && { Authorization: `Bearer ${this.token}` }),
+ ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
  },
  body: JSON.stringify(command),
  });
@@ -119,7 +119,7 @@ export class DocumentProcessingAPI {
  try {
  const response = await fetch(`${this.baseUrl}/api/document-processing/status/${documentId}`, {
  headers: {
- ...(this.token && { Authorization: `Bearer ${this.token}` }),
+ ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
  },
  });
 
@@ -149,7 +149,7 @@ export class DocumentProcessingAPI {
  `${this.baseUrl}/api/document-processing/history/${documentId}`,
  {
  headers: {
- ...(this.token && { Authorization: `Bearer ${this.token}` }),
+ ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
  },
  }
  );
@@ -186,7 +186,7 @@ export class DocumentProcessingAPI {
  const response = await fetch(`${this.baseUrl}/api/document-processing/upload`, {
  method: 'POST',
  headers: {
- ...(this.token && { Authorization: `Bearer ${this.token}` }),
+ ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
  },
  body: formData,
  });
@@ -219,7 +219,7 @@ export class DocumentProcessingAPI {
  `${this.baseUrl}/api/document-processing/results/${documentId}`,
  {
  headers: {
- ...(this.token && { Authorization: `Bearer ${this.token}` }),
+ ...(this?.token&& { Authorization: `Bearer ${this.token}` }),
  },
  }
  );

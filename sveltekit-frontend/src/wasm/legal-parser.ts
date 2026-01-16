@@ -29,7 +29,7 @@ function loadByte(ptr: usize): number {
  return g.load8_u(ptr);
  }
  if (g.__wasm_memory_bytes__ instanceof Uint8Array) {
- return g.__wasm_memory_bytes__[ptr] || 0;
+ return g.__wasm_memory_bytes__[ptr] ?? 0;
  }
  return 0;
 }

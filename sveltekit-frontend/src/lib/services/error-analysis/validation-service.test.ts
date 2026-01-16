@@ -36,7 +36,7 @@ describe('ValidationService', () => {
  it('should validate clean code', async () => {
  const fileContent = `const x: number = 123;
 const y: string = "hello";
-export default { x: y };`;
+export default { x, y };`;
 
  const errors = await validator.validateCode(fileContent, 'test.ts');
 

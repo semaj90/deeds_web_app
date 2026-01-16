@@ -92,14 +92,14 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
             // Seed Qdrant with test patterns
             const mockPatterns = Array.from({ length: 3 }, (_: any, i: any) => ({
               id: `p${i}`,
-              vector: Array(384).fill(Math.random(payload: { filePath: `file${i}.ts`,
+              vector: Array(384).fill(Math.random(payload, { filePath: `file${i}.ts`,
                 lineNumber: i * 10,
                 code: `code${i}`,
                 errorType: 'TypeError',
               },
             }));
 
-            await mockQdrant.upsert('error_patterns', { points: mockPatterns });
+            await mockQdrant.upsert('error_patterns', { points, mockPatterns });
 
             const patterns = await retriever.queryPatterns(error, 5);
 
@@ -136,7 +136,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         },
       }));
 
-      await mockQdrant.upsert('error_patterns', { points: mockPatterns });
+      await mockQdrant.upsert('error_patterns', { points, mockPatterns });
 
       const patterns = await retriever.queryPatterns(error, 3);
 

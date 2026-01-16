@@ -8,8 +8,8 @@ export interface OllamaConfig {
  timeout: number;
 }
 
-const DEFAULT_OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const DEFAULT_MODEL = process.env.OLLAMA_MODEL || 'gemma:7b';
+const DEFAULT_OLLAMA_URL = process.env?.OLLAMA_URL?? 'http://localhost:11434';
+const DEFAULT_MODEL = process.env?.OLLAMA_MODEL?? 'gemma:7b';
 const DEFAULT_TIMEOUT = 30000;
 
 /**
@@ -24,7 +24,7 @@ export function getOllamaEndpoint(): OllamaConfig {
 /**
  * Get Ollama API URL
  */
-export function getOllamaUrl(endpoint: string = '/api/generate'): string {
+export function getOllamaUrl(endpoint, string = '/api/generate'): string {
  const config = getOllamaEndpoint();
  return `${config.baseUrl}${ endpoint }`;
 }
@@ -141,10 +141,10 @@ export async function* streamText(
  let buffer = '';
 
  while (true) {
- const { done: value } = await reader.read();
+ const { done, value } = await reader.read();
  if (done) break;
 
- buffer += decoder.decode(value, { stream: true });
+ buffer += decoder.decode(value, { stream, true });
  const lines = buffer.split('\n');
 
  for (let i = 0; i < lines.length - 1; i++) {

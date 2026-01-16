@@ -39,23 +39,21 @@ export class EmbeddingGemmaService {
  return {
  embedding: cached,
  model,
- dimensions: cached.length || DEFAULT_DIMENSIONS,
+ dimensions: cached?.length|| DEFAULT_DIMENSIONS,
  cached: true,
  processingTimeMs: Date.now() - start,
  };
  }
  }
 
- const response = await requestEmbedding({ text: model });
+ const response = await requestEmbedding({ text, model });
  const embedding = response.embedding;
 
  if (useCache) {
  await cognitiveCache.storeJsonbDocument(cacheKey, embedding, ttlSeconds);
  }
 
- return {
- embedding,
- model: response.model ?? model,
+ return { embedding: model: response.model ?? model,
  dimensions: embedding.length ?? DEFAULT_DIMENSIONS,
  cached: false,
  processingTimeMs: Date.now() - start,

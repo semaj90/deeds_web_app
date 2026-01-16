@@ -12,7 +12,7 @@ let redis: ReturnType<typeof createClient> | null = null;
 async function getRedis() {
   if (!redis) {
     redis = createClient({
-      url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+      url: process.env?.REDIS_URL?? 'redis://127.0.0.1:6379'
     });
     await redis.connect().catch(() => null);
   }
@@ -50,7 +50,7 @@ export const GET: RequestHandler = async () => {
             id: key,
             type: 'fix',
             message: `Fix suggested for: ${parsed.error?.substring(0, 50)}...`,
-            timestamp: new Date(parsed.timestamp || Date.now()).toISOString(),
+            timestamp: new Date(parsed?.timestamp|| Date.now()).toISOString(),
             data: parsed
           });
         }

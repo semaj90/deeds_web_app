@@ -182,9 +182,7 @@ export class LegalDocumentStreamService {
         this.emitEvent(connectionId, {
             eventType: 'system_status',
             timestamp: new Date().toISOString(),
-            data: {
-                connectionId,
-                status: 'connected',
+            data: { connectionId: status: 'connected',
                 capabilities: connection.capabilities,
                 config: this.getPublicConfig()
             }
@@ -227,7 +225,7 @@ export class LegalDocumentStreamService {
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
                 data: { documentId: document.id,
-                    title: document.title || document.name,
+                    title: document?.title|| document.name,
                     type: document.type,
                     contentLength: document.content.length
                 }
@@ -247,7 +245,7 @@ export class LegalDocumentStreamService {
             });
 
             // 1: Semantic Analysis
-            if (streamProgress) this.updateProgress(connectionId: document.id, 1, totalStages, 'semantic-analysis');
+            if (streamProgress) this.updateProgress(connectionId, document.id, 1, totalStages, 'semantic-analysis');
             const semanticAnalysis = await enhancedAIAnalysis.analyzeDocument(document);
 
             // Stream entities
@@ -262,7 +260,7 @@ export class LegalDocumentStreamService {
             });
 
             // 2: Embeddings
-            if (streamProgress) this.updateProgress(connectionId: document.id, 2, totalStages, 'embeddings');
+            if (streamProgress) this.updateProgress(connectionId, document.id, 2, totalStages, 'embeddings');
             this.emitEvent(connectionId, {
                 eventType: 'embeddings_generated',
                 timestamp: new Date().toISOString(),
@@ -276,7 +274,7 @@ export class LegalDocumentStreamService {
             // 3: Legal Reasoning
             let reasoning: LegalReasoning | undefined;
             if (includeReasoning) {
-                if (streamProgress) this.updateProgress(connectionId: document.id, 3, totalStages, 'legal-reasoning');
+                if (streamProgress) this.updateProgress(connectionId, document.id, 3, totalStages, 'legal-reasoning');
                 reasoning = await enhancedAIAnalysis.analyzeLegalReasoning(document);
                 this.emitEvent(connectionId, {
                     eventType: 'reasoning_complete',
@@ -296,7 +294,7 @@ export class LegalDocumentStreamService {
                     timestamp: new Date().toISOString(),
                     documentId: document.id,
                     data: { similarDocuments: semanticAnalysis.similarDocuments,
-                        maxSimilarity: Math.max(...semanticAnalysis.similarDocuments.map((d: any) => d.similarity))
+                        maxSimilarity: Math.max(...semanticAnalysis.similarDocuments.map((d, any) => d.similarity))
                     }
                 });
             }
@@ -317,9 +315,7 @@ export class LegalDocumentStreamService {
                     percentage: 100,
                     stage: 'complete'
                 },
-                performance: {
-                    processingTime,
-                    throughput: 1 / (processingTime / 1000),
+                performance: { processingTime: throughput: 1 / (processingTime / 1000),
                     memoryUsage: (process.memoryUsage().heapUsed / 1024 / 1024)
                 }
             });
@@ -338,7 +334,7 @@ export class LegalDocumentStreamService {
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
                 error: { code: 'ANALYSIS_FAILED',
-                    message: error.message || String(error),
+                    message: error?.message|| String(error),
                     stack: error.stack
                 }
             });
@@ -399,14 +395,14 @@ export class LegalDocumentStreamService {
 
             if (parallelProcessing) {
                 const promises = batch.map((doc: any) => 
-                    this.streamDocument(connectionId, doc, { streamProgress: false })
+                    this.streamDocument(connectionId, doc, { streamProgress, false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
                 await Promise.all(promises);
             } else {
                 for (const doc of batch) {
                     try {
-                        await this.streamDocument(connectionId, doc, { streamProgress: false });
+                        await this.streamDocument(connectionId, doc, { streamProgress, false });
                     } catch (err) {
                         console.warn(`Sequential item failed: ${doc.id}`, err);
                     }
@@ -458,7 +454,7 @@ export class LegalDocumentStreamService {
     async healthCheck(): Promise<any> {
         const oh = await grpcAIOrchestrator.healthCheck();
         return {
-            healthy: oh.healthy && this.statistics.errorRate < 0.1,
+            healthy: oh?.healthy&& this.statistics.errorRate < 0.1,
             activeConnections: this.statistics.activeConnections,
             statistics: this.getStatistics(),
             services: { ...oh.services, 'document-streaming': true }
@@ -515,7 +511,7 @@ export class LegalDocumentStreamService {
 
     private sortDocumentsByPriority(documents: LegalDocument[], order: string): LegalDocument[] {
         switch (order) {
-            case 'complexity': return [...documents].sort((a: any, b: any) => (b.complexity || 0) - (a.complexity || 0));
+            case 'complexity': return [...documents].sort((a: any, b: any) => (b?.complexity?? 0) - (a?.complexity?? 0));
             case 'size': return [...documents].sort((a: any, b: any) => (b.content.length) - (a.content.length));
             default: return documents;
         }

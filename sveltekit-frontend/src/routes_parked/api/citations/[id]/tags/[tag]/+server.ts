@@ -10,7 +10,7 @@ import { citationLibraryService } from '$lib/server/services/citation-library.se
 /**
  * DELETE: Remove tag from citation
  */
-export const DELETE: RequestHandler = async ({ params: locals }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {

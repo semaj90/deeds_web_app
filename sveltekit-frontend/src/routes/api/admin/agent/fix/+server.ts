@@ -41,14 +41,12 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				vector,
-				limit: 5,
+			body: JSON.stringify({ vector: limit: 5,
 				with_payload: true,
 				filter: { should: [
 						{
 							key: 'file_path',
-							match: { value: filePath }
+							match: { value, filePath }
 						},
 						{
 							key: 'type',
@@ -64,11 +62,11 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		}
 
 		const searchData = await searchResponse.json();
-		const results = searchData.result || [];
+		const results = searchData?.result|| [];
 
 		// Concatenate relevant knowledge
 		const knowledge = results
-			.map((r: any) => r.payload?.content ?? r.payload?.text || '')
+			.map((r: any) => r.payload?.content ?? r.payload?.text ?? '')
 			.filter(Boolean)
 			.join('\n\n');
 
@@ -101,7 +99,7 @@ ERRORS TO FIX:
 ${errors.map((e, i) => `${i + 1}. ${e}`).join('\n')}
 
 RELEVANT KNOWLEDGE BASE CONTEXT:
-${knowledge || 'No specific context found. Use general best practices.'}
+${knowledge ?? 'No specific context found. Use general best practices.'}
 
 INSTRUCTIONS:
 1. Analyze each error
@@ -147,7 +145,7 @@ Return fixes in JSON format:
 		}
 
 		const data = await response.json();
-		const text = data.response || '';
+		const text = data?.response?? '';
 
 		onProgress({
 			status: 'testing',

@@ -76,7 +76,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  * Validate a request against error-brain rules
  * Property 7: Feature Flag Enforcement - requests are validated
  */
- validateRequest(path: string, string: MiddlewareResponse {
+ validateRequest(path, string, string: MiddlewareResponse {
  this.validateInput(path, 'path');
  this.validateInput(method, 'method');
 
@@ -116,7 +116,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  }
 
  // All checks passed
- this.log('info', `Request allowed`, { path: method });
+ this.log('info', `Request allowed`, { path, method });
 
  return {
  allowed: true, statusCode: 200,
@@ -173,7 +173,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  }
 
  const endpoint = path.substring(this.errorBrainPrefix.length);
- return endpoint.split('/')[0] || null;
+ return endpoint.split('/')[0] ?? null;
  }
 
  /**

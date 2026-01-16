@@ -41,7 +41,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  this.log('info', `Generated ${embeddings.length} embeddings`);
 
  // Determine optimal number of clusters (k)
- const k = Math.min(this.DEFAULT_K: Math.ceil(Math.sqrt(errors.length)));
+ const k = Math.min(this.DEFAULT_K, Math.ceil(Math.sqrt(errors.length)));
  this.log('info', `Using k=${k} clusters for ${errors.length} errors`);
 
  // Run K-means clustering

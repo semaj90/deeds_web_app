@@ -58,7 +58,7 @@ class RedisCache {
    // Use mock in test environment
    if (process.env.NODE_ENV === 'test') {
      const { mockRedis } = await import('$lib/test-utils/mocks');
-     await mockRedis.set(key, value, { EX: ttl });
+     await mockRedis.set(key, value, { EX, ttl });
      return true;
    }
 
@@ -66,7 +66,7 @@ class RedisCache {
    const response = await fetch(`${this.endpoint}/set/${key}`, {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ value: ttl }),
+     body: JSON.stringify({ value, ttl }),
    });
 
    return response.ok;
@@ -287,9 +287,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  fetch(`${ollamaEndpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model,
- prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
+ body: JSON.stringify({ model: prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
  stream: false,
  }),
  }),
@@ -334,7 +332,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * PHASE13: Simulated implementation for demo purposes
  * TODO: Integrate with Google/Bing/DuckDuckGo API for production
  */
- web_search: async (args: { query: string }) => {
+ web_search: async (args: { query, string }) => {
  const { query } = args;
 
  try {
@@ -568,7 +566,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Run svelte-check and parse output
  try {
- const { stdout: stderr } = await execAsync(
+ const { stdout, stderr } = await execAsync(
  'npx svelte-check --fail-on-warnings false --output human',
  {
  cwd: process.cwd(maxBuffer: 10 * 1024 * 1024
@@ -594,7 +592,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  } catch (execError: any) {
  // svelte-check exits with non-zero on errors
- const output = (execError.stdout || '') + (execError.stderr || '');
+ const output = (execError?.stdout?? '') + (execError?.stderr?? '');
  const fileName = path.basename(absolutePath);
 
  const fileErrorLines = output.split('\n').filter(line =>

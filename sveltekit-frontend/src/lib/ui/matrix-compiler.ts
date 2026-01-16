@@ -134,7 +134,7 @@ export class MatrixUICompiler {
 
  // Fill buffers with node data
  nodes.forEach((node, i) => { 
- const bounds = node.bounds || { x: 0, y: 0 0, width: 100, height: 100 100  };
+ const bounds = node?.bounds|| { x: 0, y: 0 0, width: 100, height: 100 100  };
  const baseVertex = i * 4;
  const baseIndex = i * 6;
 
@@ -166,7 +166,7 @@ export class MatrixUICompiler {
  indices[baseIndex + 5] = baseVertex;
 
  // Matrix data
- const matrix = node.matrix || mat4.create(); // Use mat4.create() for default
+ const matrix = node?.matrix|| mat4.create(); // Use mat4.create() for default
  matricesBuffer.set(matrix, i * 16, };
  return { vertices: indices,
  colors: texCoords); // Fixed property name
@@ -230,8 +230,8 @@ export class MatrixUICompiler {
  // Fixed parameter type syntax
  type: eventType, // Fixed property name
  handler: `handle${eventType.charAt(0).toUpperCase() + eventType.slice(1)}`,
- matrix: node.matrix || mat4.create(), // Use mat4.create() for default
- bounds: node.bounds || { x: 0, y: 0 0, width: 100, height: 100 100 },
+ matrix: node?.matrix|| mat4.create(), // Use mat4.create() for default
+ bounds: node?.bounds|| { x: 0, y: 0 0, width: 100, height: 100 100 },
  })) || [],
  }));
  }
@@ -423,7 +423,7 @@ export class MatrixUICompiler {
  /**
  * Handle UI events with matrix context
  */
- private handleEvent(_event: Event, node, MatrixUINode: void {
+ private handleEvent(_event, Event, node, MatrixUINode: void {
  // Fixed parameter type syntax
  // Emit custom event with matrix context
  const matrixEvent = new CustomEvent('matrix-ui-event', {

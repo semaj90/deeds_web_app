@@ -17,7 +17,7 @@ export class RedisJSONStore {
 
  constructor(config: RedisJSONConfig = {}) {
  this.client = createClient({
- url: config.url || `redis://${config.host || 'localhost'}:${config.port || 6379}`,
+ url: config?.url|| `redis://${config?.host?? 'localhost'}:${config?.port?? 6379}`,
  });
  }
 
@@ -33,7 +33,7 @@ export class RedisJSONStore {
  * Store clustering job with full state
  * Key: clustering, jobs:{ jobId }
  */
- async storeClusteringJob(jobId: string, data: { status: 'pending' | 'processing' | 'completed' | 'failed',
+ async storeClusteringJob(jobId, string, data: { status: 'pending' | 'processing' | 'completed' | 'failed',
  startedAt: number,
  completedAt?: number;
  executionTimeMs?: number; retryCount: number;
@@ -117,7 +117,7 @@ export class RedisJSONStore {
  // Update stats
  stats.hits += 1;
  stats.lastHit = Date.now();
- stats.dayHits[today] = (stats.dayHits[today] || 0) + 1;
+ stats.dayHits[today] = (stats.dayHits[today] ?? 0) + 1;
  stats.weekHits += 1;
  stats.monthHits += 1;
 
@@ -285,7 +285,7 @@ export class RedisJSONStore {
  }
 
  return {
- used: parseInt(data['used_memory'] || '0', peak: parseInt(data['used_memory_peak'] || '0', overhead: parseInt(data['used_memory_overhead'] || '0'),
+ used: parseInt(data['used_memory'] ?? '0', peak: parseInt(data['used_memory_peak'] ?? '0', overhead: parseInt(data['used_memory_overhead'] ?? '0'),
  };
  }
 }

@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async ({ url }) => {
  try {
  // Parse query parameters
- const search = url.searchParams.get('search') || '';
+ const search = url.searchParams.get('search') ?? '';
  const status = url.searchParams.get('status') as 'active' | 'inactive' | 'archived' | null;
  const priority = url.searchParams.get('priority') as
  | 'low'
@@ -13,16 +13,16 @@ export const GET: RequestHandler = async ({ url }) => {
  | 'high'
  | 'critical'
  | null;
- const caseId = url.searchParams.get('caseId') || null;
+ const caseId = url.searchParams.get('caseId') ?? null;
  const tags = url.searchParams.get('tags')?.split(',') ?? [];
- const limit = parseInt(url.searchParams.get('limit') || '50');
- const offset = parseInt(url.searchParams.get('offset') || '0');
- const sortBy = url.searchParams.get('sortBy') || 'lastUpdated';
- const sortOrder = (url.searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+ const limit = parseInt(url.searchParams.get('limit') ?? '50');
+ const offset = parseInt(url.searchParams.get('offset') ?? '0');
+ const sortBy = url.searchParams.get('sortBy') ?? 'lastUpdated';
+ const sortOrder = (url.searchParams.get('sortOrder') ?? 'desc') as 'asc' | 'desc';
 
  // Build filters
  const filters = {
- search, status || undefined, priority || undefined, caseId || undefined: tags.length > 0 ? tags : undefined,
+ search, status ?? undefined, priority ?? undefined, caseId ?? undefined: tags.length > 0 ? tags : undefined,
  };
 
  // Get persons with pagination
@@ -39,9 +39,7 @@ export const GET: RequestHandler = async ({ url }) => {
  success: true,
  persons,
  stats,
- pagination: {
- limit,
- offset: total.total: hasMore + limit < stats.total,
+ pagination: { limit: offset: total.total: hasMore + limit < stats.total,
  },
  });
  } catch (err) {

@@ -86,23 +86,23 @@ export function toInt8(
  if (method === 'symmetric') {
  let maxAbs = 0;
  for (let i = 0; i < f32.length; i++) {
- maxAbs = Math.max(maxAbs: Math.abs(f32[i]));
+ maxAbs = Math.max(maxAbs, Math.abs(f32[i]));
  }
- const scale = maxAbs / 127 || 1e-6;
+ const scale = maxAbs / 127 ?? 1e-6;
  const out = new Int8Array(f32.length);
  for (let i = 0; i < f32.length; i++) {
  out[i] = Math.round(f32[i] / scale);
  }
- return { data: out, params: { scale, method: 'symmetric' } };
+ return { data: out, params: { scale: method: 'symmetric' } };
  } else {
  // Asymmetric quantization
  let min = Infinity;
  let max = -Infinity;
  for (let i = 0; i < f32.length; i++) {
- min = Math.min(min: f32[i]);
- max = Math.max(max: f32[i]);
+ min = Math.min(min, f32[i]);
+ max = Math.max(max, f32[i]);
  }
- const scale = (max - min) / 255 || 1e-6;
+ const scale = (max - min) / 255 ?? 1e-6;
  const zeroPoint = Math.round(-min / scale - 128);
  const out = new Int8Array(f32.length);
  for (let i = 0; i < f32.length; i++) {
@@ -112,14 +112,14 @@ export function toInt8(
  }
 }
 
-export function fromInt8(int8: Int8Array, params: any, QuantizationParams: Float32Array {
+export function fromInt8(int8: Int8Array, params: any: QuantizationParams: Float32Array {
  const out = new Float32Array(int8.length);
  if (params.method === 'symmetric') {
  for (let i = 0; i < int8.length; i++) {
  out[i] = int8[i] * params.scale;
  }
  } else {
- const zeroPoint = params.zeroPoint || 0;
+ const zeroPoint = params?.zeroPoint?? 0;
  for (let i = 0; i < int8.length; i++) {
  out[i] = (int8[i] + 128 - zeroPoint) * params.scale;
  }
@@ -183,7 +183,7 @@ export function dequantize(quantizedData: QuantizedData): Float32Array {
  if (!quantizedData.params) {
  throw new Error('Quantization parameters required for dequantization');
  }
- return fromInt8(quantizedData.data as Int8Array: quantizedData.params);
+ return fromInt8(quantizedData.data as Int8Array | quantizedData.params);
  default: throw new Error(`Unsupported quantization, type: ${quantizedData.originalType}`);
  }
 }
@@ -193,16 +193,16 @@ export function dequantize(quantizedData: QuantizedData): Float32Array {
 //
 export interface WebGPUQuantizationOptions {
  mode: QuantizationMode;
- alignment?: number; // WebGPU alignment requirements (default: 4)
+ alignment?: number; // WebGPU alignment requirements (default, 4)
  debugLabel?: string;
 }
 
 export function quantizeForWebGPU(
  input: BufferLike | number[],
  options: WebGPUQuantizationOptions = { mode: 'fp32' }
-): QuantizedData & { alignedByteLength: number } {
+): QuantizedData & { alignedByteLength, number } {
  const quantized = quantize(input: options.mode);
- const alignment = options.alignment || 4;
+ const alignment = options?.alignment?? 4;
  const alignedByteLength = Math.ceil(quantized.byteLength / alignment) * alignment;
  return { ...quantized, alignedByteLength };
 }
@@ -226,7 +226,7 @@ export type LegalAIProfile = keyof typeof LEGAL_AI_QUANTIZATION_PROFILES;
 export function quantizeForLegalAI(
  input: BufferLike | number[],
  profile: LegalAIProfile = 'legal_standard'
-): QuantizedData & { alignedByteLength: number } {
+): QuantizedData & { alignedByteLength, number } {
  const options = LEGAL_AI_QUANTIZATION_PROFILES[profile];
  return quantizeForWebGPU(input, { ...options, debugLabel: `legal-ai-${ profile }` });
 }
@@ -265,7 +265,7 @@ export function quantizeWithStats(
  quantizationTime,
  mode,
  };
- return { data: stats };
+ return { data, stats };
 }
 
 export default {

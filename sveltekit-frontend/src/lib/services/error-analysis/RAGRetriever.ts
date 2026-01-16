@@ -43,10 +43,10 @@ export class RAGRetriever {
 
 	constructor(config?: Partial<RAGConfig>) {
 		this.config = {
-			qdrantUrl: config?.qdrantUrl ?? process.env.QDRANT_URL || 'http://localhost:6333',
-			qdrantCollection: config?.qdrantCollection ?? process.env.QDRANT_COLLECTION || 'phase72_error_patterns',
+			qdrantUrl: config?.qdrantUrl ?? process.env?.QDRANT_URL?? 'http://localhost:6333',
+			qdrantCollection: config?.qdrantCollection ?? process.env?.QDRANT_COLLECTION?? 'phase72_error_patterns',
 			pgvectorUrl: config?.pgvectorUrl ?? process.env.DATABASE_URL,
-			redisUrl: config?.redisUrl ?? process.env.REDIS_URL || 'redis://localhost:6379',
+			redisUrl: config?.redisUrl ?? process.env?.REDIS_URL?? 'redis://localhost:6379',
 			topK: config?.topK ?? 5,
 			similarityThreshold: config?.similarityThreshold ?? 0.7
 		};
@@ -152,10 +152,10 @@ export class RAGRetriever {
 		}
 
 		const data = await response.json();
-		return (data.result || []).map((r: any) => ({
+		return (data?.result|| []).map((r: any) => ({
 			id: r.id,
 			score: r.score,
-			payload: r.payload || {}
+			payload: r?.payload|| {}
 		}));
 	}
 
@@ -180,16 +180,16 @@ export class RAGRetriever {
 			id: String(r.id, embedding: [], // Not returned from search
 			similarity: r.score,
 			fixStrategies: [], // Will be populated from cache
-			successRate: (r.payload.success_rate as number) || 0,
+			successRate: (r.payload.success_rate as number) ?? 0,
 			timestamp: Date.now(),
-     errorReport: { file: (r.payload.file as string) || '',
-				line: (r.payload.line as number) || 0,
-				column: (r.payload.column as number) || 0,
-				code: (r.payload.error_code as string) || '',
-				message: (r.payload.message as string) || '',
-				severity: (r.payload.severity as 'error' | 'warning' | 'hint') || 'error',
-				source: (r.payload.tool as any) || 'tsc',
-				category: (r.payload.category as string) || 'misc-error'
+     errorReport: { file: (r.payload.file as string) ?? '',
+				line: (r.payload.line as number) ?? 0,
+				column: (r.payload.column as number) ?? 0,
+				code: (r.payload.error_code as string) ?? '',
+				message: (r.payload.message as string) ?? '',
+				severity: (r.payload.severity as 'error' | 'warning' | 'hint') ?? 'error',
+				source: (r.payload.tool as any) ?? 'tsc',
+				category: (r.payload.category as string) ?? 'misc-error'
 			}
 		}));
 	}
@@ -230,7 +230,7 @@ export class RAGRetriever {
 
 		try {
 			const cacheKey = `fix-strategies:${ errorId }`;
-			await this.redisClient.set(cacheKey: JSON.stringify(strategies), { EX: ttl });
+			await this.redisClient.set(cacheKey: JSON.stringify(strategies), { EX, ttl });
 		} catch (error) {
 			console.warn(`⚠️  Failed to cache fix strategies: ${error instanceof Error ? error.message : String(error)}`);
 		}

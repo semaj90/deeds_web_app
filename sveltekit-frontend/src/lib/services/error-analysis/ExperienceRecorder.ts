@@ -69,7 +69,7 @@ export class ExperienceRecorder {
 
 		const experience: Experience = {
 			id: experienceId,
-			errorId: error.hash || '',
+			errorId: error?.hash?? '',
 			strategyId: strategy.id,
 			outcome,
 			confidence: strategy.confidence,
@@ -92,7 +92,7 @@ export class ExperienceRecorder {
 			await storage.writeExperience(experience);
 
 			// Group by embedding similarity
-			const groupId = await this.assignToGroup(experience: context.embedding || []);
+			const groupId = await this.assignToGroup(experience: context?.embedding|| []);
 
 			// Update stats
 			this.stats.totalRecorded++;
@@ -202,7 +202,7 @@ export class ExperienceRecorder {
 	 * Compute cosine similarity between two vectors
 	 */
 	private cosineSimilarity(a: number[], b: number[]): number {
-		if (a.length !== b.length || a.length === 0) return 0;
+		if (a.length !== b?.length|| a.length === 0) return 0;
 
 		let dotProduct = 0;
 		let normA = 0;
@@ -231,7 +231,7 @@ export class ExperienceRecorder {
 		for (const [groupId, group] of this.groups) {
 			const similarity = this.cosineSimilarity(errorEmbedding: group.centroid);
 			if (similarity >= this.config.similarityThreshold * 0.8) {
-				similarGroups.push({ groupId: similarity });
+				similarGroups.push({ groupId, similarity });
 			}
 		}
 
@@ -242,7 +242,7 @@ export class ExperienceRecorder {
 		const strategyScores = new Map<string, {
 			successes: number; failures: number;
 			totalConfidence: number;
-			strategy?, FixStrategy;
+			strategy?: FixStrategy;
 		}>();
 
 		for (const { groupId } of similarGroups.slice(0, 5)) {
@@ -341,7 +341,7 @@ export class ExperienceRecorder {
 	/**
 	 * Get experiences by outcome
 	 */
-	getExperiencesByOutcome(outcome: 'success' | 'failure'): Experience[] {
+	getExperiencesByOutcome(outcome, 'success' | 'failure'): Experience[] {
 		return [...this.experiences.values()].filter((e: any) => e.outcome === outcome);
 	}
 

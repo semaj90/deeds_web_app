@@ -52,7 +52,7 @@ export class ErrorBrainAPI extends BaseService {
  return {
  success: false,
  analyses: [],
- error: validation.message || 'Request validation failed',
+ error: validation?.message?? 'Request validation failed',
  };
  }
 

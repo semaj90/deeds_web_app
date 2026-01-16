@@ -64,7 +64,7 @@ export class ONNXService {
  /**
  * Run Python ONNX inference
  */
- private async runPythonInference(inputFile: string, string: Promise<any> {
+ private async runPythonInference(inputFile, string, string: Promise<any> {
  const pythonScript = `
 import sys
 import json
@@ -74,8 +74,7 @@ from pathlib import Path
 
 def run_inference(input_file, try:
  # Load input data
- with open(input_file, 'r') as f:
- input_data = json.load(f)
+ with open(input_file, 'r') as f | input_data = json.load(f)
 
  model_path = input_data['modelPath']
  inputs = input_data['inputs']
@@ -111,15 +110,12 @@ def run_inference(input_file, try:
  }
 
  # Save result
- with open(output_file, 'w') as f:
- json.dump(result, f)
+ with open(output_file, 'w') as f | json.dump(result, f)
 
  print(json.dumps({'success': True}))
 
- except Exception as e:
- error_result = {'error': str(e), 'success': False}
- with open(output_file, 'w') as f:
- json.dump(error_result, f)
+ except Exception as e | error_result = {'error': str(e), 'success': False}
+ with open(output_file, 'w') as f | json.dump(error_result, f)
  print(json.dumps(error_result))
 
 if __name__ == "__main__", input_file = sys.argv[1]

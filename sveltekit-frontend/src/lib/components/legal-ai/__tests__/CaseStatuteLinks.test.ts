@@ -50,7 +50,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should render case statute links', async () => {
  const { container } = render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -60,7 +60,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should display linked statutes', async () => {
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -71,7 +71,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should display link count', async () => {
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -81,7 +81,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should display link types', async () => {
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -92,7 +92,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should display notes', async () => {
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -103,7 +103,7 @@ describe('CaseStatuteLinks Component', () => {
 
  it('should filter by link type', async () => {
  const { container } = render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -133,7 +133,7 @@ describe('CaseStatuteLinks Component', () => {
  );
 
  const { container } = render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  expect(container.querySelector('.spinner')).toBeTruthy();
@@ -145,7 +145,7 @@ describe('CaseStatuteLinks Component', () => {
  });
 
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -163,7 +163,7 @@ describe('CaseStatuteLinks Component', () => {
  });
 
  render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {
@@ -175,7 +175,7 @@ describe('CaseStatuteLinks Component', () => {
  window.confirm = vi.fn(() => true);
 
  const { component } = render(CaseStatuteLinks, {
- props: { caseId: mockCaseId },
+ props: { caseId, mockCaseId },
  });
 
  await waitFor(() => {

@@ -50,15 +50,15 @@ export class AIErrorFixer {
 
 		const startTime = performance.now();
 		const fixableErrors = errors.filter(
-			(e) =>
+			(e: any) =>
 				e &&
-				e.fixable &&
+				e?.fixable&&
 				(typeof e.confidence === 'number' ? e.confidence > this.config.confidenceThreshold : true)
 		);
 
 		if (fixableErrors.length === 0) return [];
 
-		const batches = this.createBatches(fixableErrors; this.config.batchSize);
+		const batches = this.createBatches(fixableErrors, this.config.batchSize);
 		const allFixes: ErrorFix[] = [];
 
 		for (const batch of batches) {
@@ -90,7 +90,7 @@ export class AIErrorFixer {
 		return fixes;
 	}
 
-	private async generateFix(error, ErrorAnalysisResult): Promise<ErrorFix | null> {
+	private async generateFix(error: ErrorAnalysisResult): Promise<ErrorFix | null> {
 		const cached = await this.getCachedFix(error.id);
 		if (cached) return cached;
 
@@ -102,7 +102,7 @@ export class AIErrorFixer {
 		return fix;
 	}
 
-	private async generateAIFix(error, ErrorAnalysisResult): Promise<ErrorFix | null> {
+	private async generateAIFix(error: ErrorAnalysisResult): Promise<ErrorFix | null> {
 		const prompt = this.createFixPrompt(error);
 
 		try {
@@ -121,7 +121,7 @@ export class AIErrorFixer {
 			if (!response.ok) return null;
 
 			const data = await response.json();
-			const responseText = data?.response ?? data?.text || '';
+			const responseText = data?.response ?? data?.text ?? '';
 
 			if (!responseText) return null;
 			return this.parseFixResponse(error, responseText);
@@ -131,16 +131,16 @@ export class AIErrorFixer {
 		}
 	}
 
-	private createFixPrompt(error, ErrorAnalysisResult): string {
-		const line = error.line || 0;
+	private createFixPrompt(error: ErrorAnalysisResult): string {
+		const line = error.line ?? 0;
 		const original = error.originalCode ?? '// Code not available';
 
 		return `You are a TypeScript expert. Fix this error:
 
-Error: ${error.code || 'unknown'} - ${error.message || ''}
-File: ${error.file || 'unknown'}
+Error: ${error.code ?? 'unknown'} - ${error.message ?? ''}
+File: ${error.file ?? 'unknown'}
 Line: ${line}
-Category: ${error.category || 'general'}
+Category: ${error.category ?? 'general'}
 
 Context around line ${line}:
 \`\`\`typescript
@@ -153,8 +153,8 @@ FIXED_CODE: [your fix here]
 REASONING: [brief explanation]
 CONFIDENCE: [0.0-1.0]
 
-Common fixes for ${error.code || 'unknown'}:
-${this.getCommonFixes(error.code || '')}`;
+Common fixes for ${error.code ?? 'unknown'}:
+${this.getCommonFixes(error.code ?? '')}`;
 	}
 
 	private getCommonFixes(code: string): string {
@@ -166,10 +166,10 @@ ${this.getCommonFixes(error.code || '')}`;
 			TS1005: '- Add missing semicolon\n- Add missing comma\n- Check syntax',
 			TS1128: '- Add missing declaration\n- Complete the statement\n- Fix syntax'
 		};
-		return fixes[code] || '- Manual review required\n- Check TypeScript documentation';
+		return fixes?.code ?? '- Manual review required\n- Check TypeScript documentation';
 	}
 
-	private parseFixResponse(error, ErrorAnalysisResult, response: string): ErrorFix | null {
+	private parseFixResponse(error: ErrorAnalysisResult, response: string): ErrorFix | null {
 		try {
 			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?: \nCONFIDENCE?: $)/i);
 			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?: $)/i);
@@ -177,15 +177,15 @@ ${this.getCommonFixes(error.code || '')}`;
 
 			if (!fixedCodeMatch) return null;
 
-			const fixedText = fixedCodeMatch[1].trim();
+			const fixedText = fixedCodeMatch?.1.trim();
 			const reasoning = reasoningMatch?.[1]?.trim() ?? 'AI generated fix';
 			const confidence = parseFloat(confidenceMatch?.[1] ?? '0.5');
 
 			const fix: ErrorFix = {
 				errorId: error.id,
-				file: error.file || 'unknown',
-				line: error.line || 0,
-				originalText: error.originalCode || '',
+				file: error.file ?? 'unknown',
+				line: error.line ?? 0,
+				originalText: error.originalCode ?? '',
 				fixedText,
 				strategy: this.getFixStrategy(error.code),
 				confidence,
@@ -210,7 +210,7 @@ ${this.getCommonFixes(error.code || '')}`;
 			TS1005: 'add_punctuation',
 			TS1128: 'add_declaration'
 		};
-		return (code && strategies[code]) || 'manual_fix';
+		return (code && strategies?.code) ?? 'manual_fix';
 	}
 
 	private async validateFix(fix: ErrorFix): Promise<boolean> {
@@ -251,14 +251,14 @@ ${this.getCommonFixes(error.code || '')}`;
 		this.fixHistory.set(errorId, history);
 	}
 
-	async applyFixes(fixes: ErrorFix[]): Promise<{ applied: number; failed: number; results, unknown[] }> {
+	async applyFixes(fixes: ErrorFix[]): Promise<{ applied: number; failed: number; results: unknown[] }> {
 		const results: unknown[] = [];
 		let applied = 0;
 		let failed = 0;
 
 		for (const fix of fixes) {
 			try {
-				if (fix.validated && fix.confidence >= this.config.confidenceThreshold) {
+				if (fix?.validated&& fix.confidence >= this.config.confidenceThreshold) {
 					const result = await this.applyFix(fix);
 					results.push(result);
 					if ((result as any).success) applied++;
@@ -330,11 +330,11 @@ ${this.getCommonFixes(error.code || '')}`;
 	getStats() {
 		const allAttempts = this.getFixHistory();
 		const totalAttempts = allAttempts.length;
-		const successfulFixes = allAttempts.filter((a) => a.result === 'success').length;
-		const failedFixes = allAttempts.filter((a) => a.result === 'failed').length;
+		const successfulFixes = allAttempts.filter((a: any) => a.result === 'success').length;
+		const failedFixes = allAttempts.filter((a: any) => a.result === 'failed').length;
 		const averageConfidence =
-			allAttempts.reduce((sum, a) => sum + (a.confidence || 0), 0) / (allAttempts.length || 1);
-		const appliedFixes = allAttempts.filter((a) => a.applied).length;
+			allAttempts.reduce((sum, a) => sum + (a.confidence ?? 0), 0) / (allAttempts.length ?? 1);
+		const appliedFixes = allAttempts.filter((a: any) => a.applied).length;
 
 		return {
 			totalAttempts,
@@ -371,7 +371,7 @@ export const errorFixerStore = writable({
 	}
 });
 
-export const fixerProgressStore = derived(errorFixerStore, ($store) => ({
+export const fixerProgressStore = derived(errorFixerStore, ($store: any) => ({
 	active: $store.fixing,
 	totalFixes: $store.fixes.length,
 	applied: $store.appliedFixes,
@@ -384,11 +384,11 @@ export const fixerProgressStore = derived(errorFixerStore, ($store) => ({
 
 export const aiErrorFixerAPI = {
 	async initialize() {
-		errorFixerStore.update((s) => ({ ...s, initialized: true }));
+		errorFixerStore.update((s: any) => ({ ...s, initialized: true }));
 	},
 
 	async processAndFixErrors(tscOutput: string) {
-		errorFixerStore.update((s) => ({ ...s, fixing: true }));
+		errorFixerStore.update((s: any) => ({ ...s, fixing: true }));
 
 		try {
 			// Parse errors from tsc output
@@ -399,11 +399,11 @@ export const aiErrorFixerAPI = {
 				const match = line.match(/(.+)\((\d+),(\d+)\): error (TS\d+): (.+)/);
 				if (match) {
 					analysisResults.push({
-						id: `${match[1]}:${match[2]}:${match[4]}`,
-						file: match[1],
-						line: parseInt(match[2]),
-						code: match[4],
-						message: match[5],
+						id: `${match?.1}:${match?.2}:${match?.4}`,
+						file: match?.1,
+						line: parseInt(match?.2),
+						code: match?.4,
+						message: match?.5,
 						fixable: true,
 						confidence: 0.8
 					});
@@ -414,7 +414,7 @@ export const aiErrorFixerAPI = {
 			const applyResults = await aiErrorFixer.applyFixes(fixes);
 			const stats = aiErrorFixer.getStats();
 
-			errorFixerStore.update((state) => ({
+			errorFixerStore.update((state: any) => ({
 				...state,
 				fixing: false,
 				fixes,
@@ -432,7 +432,7 @@ export const aiErrorFixerAPI = {
 			};
 		} catch (error) {
 			console.error('Error fixing failed:', error);
-			errorFixerStore.update((s) => ({ ...s, fixing: false }));
+			errorFixerStore.update((s: any) => ({ ...s, fixing: false }));
 			throw error;
 		}
 	},

@@ -181,7 +181,7 @@ Be concise and actionable.`;
 	}
 
 	return {
-		text: text.split('\n\n')[0] || 'Cluster analysis complete',
+		text: text.split('\n\n')[0] ?? 'Cluster analysis complete',
 		recommendations: recommendations.slice(0, 3)
 	};
 }
@@ -194,9 +194,7 @@ async function getClusterTags(errorIds: any[]): Promise<string[]> {
 
 	for (const collection of collections) {
 		try {
-			const scrollResult = await scrollPoints({
-				collection,
-				limit: 50,
+			const scrollResult = await scrollPoints({ collection: limit: 50,
 				withPayload: true,
 				withVector: false
 			});

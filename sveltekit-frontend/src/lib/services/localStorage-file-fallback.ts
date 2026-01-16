@@ -124,14 +124,14 @@ class LocalStorageFiles {
 		const allFiles = this.getAllFiles();
 
 		return allFiles.filter((file: any) => {
-			if (criteria.caseId && file.caseId !== criteria.caseId) return false;
+			if (criteria?.caseId&& file.caseId !== criteria.caseId) return false;
 			if (
-				criteria.fileName &&
+				criteria?.fileName&&
 				!file.fileName.toLowerCase().includes(criteria.fileName.toLowerCase())
 			)
 				return false;
-			if (criteria.type && file.type !== criteria.type) return false;
-			if (criteria.tags && !criteria.tags.some((tag: any) => file.tags.includes(tag))) return false;
+			if (criteria?.type&& file.type !== criteria.type) return false;
+			if (criteria?.tags&& !criteria.tags.some((tag: any) => file.tags.includes(tag))) return false;
 			return true;
 		});
 	}
@@ -232,7 +232,7 @@ class LocalStorageFiles {
 			failed = 1;
 		}
 
-		return { success: failed };
+		return { success, failed };
 	}
 
 	/**

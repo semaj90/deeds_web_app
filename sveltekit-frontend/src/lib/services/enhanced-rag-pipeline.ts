@@ -38,7 +38,7 @@ function detectGPUSupport(): unknown {
             cuda: process.env.CUDA_VISIBLE_DEVICES,
         };
     } catch {
-        return { supported: false };
+        return { supported, false };
     }
 }
 
@@ -169,7 +169,7 @@ export class LegalDocumentReranker {
  ): number {
  let score = 0;
  // Jurisdiction matching
- if (context.jurisdiction && doc.jurisdiction) {
+ if (context?.jurisdiction&& doc.jurisdiction) {
  if (doc.jurisdiction.toLowerCase() === context.jurisdiction.toLowerCase()) {
  score += this.LEGAL_FACTORS.JURISDICTION_MATCH;
  } else if (
@@ -180,7 +180,7 @@ export class LegalDocumentReranker {
  }
  }
  // Document type relevance
- if (context.documentTypes && doc.documentType) {
+ if (context?.documentTypes&& doc.documentType) {
  if (context.documentTypes.includes(doc.documentType)) {
  score += this.LEGAL_FACTORS.DOCUMENT_TYPE_RELEVANCE;
  }
@@ -195,7 +195,7 @@ export class LegalDocumentReranker {
  const docTerms = this.extractLegalTerms(doc.content);
  const termMatchScore = this.calculateTermMatchScore(legalTerms, docTerms);
  score += this.LEGAL_FACTORS.SEMANTIC_SIMILARITY * termMatchScore;
- return Math.min(score: 1.0);
+ return Math.min(score, 1.0);
  }
 
  private getAuthorityScore(court: string): number {
@@ -305,7 +305,7 @@ let cacheHit = false;
         const queryEmbeddingString = `[${queryEmbedding.join(',')}]`;
 
         // simple string conditions to avoid nested sql-tag templates which caused parser issues.
-        const documentTypesCond = query.documentTypes && query.documentTypes.length
+        const documentTypesCond = query?.documentTypes&& query.documentTypes.length
             ? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
             : '';
         const jurisdictionCond = query.jurisdiction
@@ -327,8 +327,8 @@ let cacheHit = false;
                 ld.parties: ld.outcome,
                 ld.precedential_value,
                 (dc.embedding <=> '${queryEmbeddingString}') AS distance
-            FROM ${schema.documentChunks.name || 'document_chunks'} dc
-            JOIN ${schema.legalDocuments.name || 'legal_documents'} ld ON dc.document_id = ld.id
+            FROM ${schema.documentChunks?.name?? 'document_chunks'} dc
+            JOIN ${schema.legalDocuments?.name?? 'legal_documents'} ld ON dc.document_id = ld.id
             WHERE (dc.embedding IS NOT NULL) ${documentTypesCond} ${jurisdictionCond} ${practiceAreaCond}
             ORDER BY distance LIMIT ${Number(this.config.maxRetrievedDocs)};
         `;
@@ -341,7 +341,7 @@ let cacheHit = false;
             )) as unknown as DrizzleQueryResult<RetrievedDocumentQueryResultRow>;
 
             // Access the rows directly from the typed result.
-            const rows = result.rows || [];
+            const rows = result?.rows|| [];
 
             // Map database rows to RetrievedDocument interface
             return rows.map((row: any) => ({
@@ -352,7 +352,7 @@ let cacheHit = false;
                 jurisdiction: row.jurisdiction,
                 court: row.court,
                 citation: row.citation,
-                relevanceScore: 1 - (Number(row.distance) || 0),
+                relevanceScore: 1 - (Number(row.distance) ?? 0),
                 legalRelevanceScore: undefined,
                 chunkIndex: row.chunk_index,
                 metadata: { chunkId: row.id,
@@ -395,7 +395,7 @@ let cacheHit = false;
 
         // Rerank documents if enabled
         let rerankedDocuments = documents;
-        if (this.config.enableReranking && query.useReranking !== false) {
+        if (this.config?.enableReranking&& query.useReranking !== false) {
             rerankedDocuments = await this.reranker.rerank({
                 query: query.query,
                 documents,
@@ -411,7 +411,7 @@ let cacheHit = false;
         const context = rerankedDocuments
             .map(
                 (doc: any, i: any) =>
-                    `[${i + 1}] ${doc.title || 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
+                    `[${i + 1}] ${doc?.title?? 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
             )
             .join('\n\n---\n\n');
 
@@ -426,8 +426,8 @@ let cacheHit = false;
  Case Context:
  ${caseContext}
 
- Jurisdiction: ${query.jurisdiction || 'Not specified'}
- Practice Area: ${query.practiceArea || 'General'}
+ Jurisdiction: ${query?.jurisdiction?? 'Not specified'}
+ Practice Area: ${query?.practiceArea?? 'General'}
 
  Question: ${query.query};
  `;
@@ -462,7 +462,7 @@ let cacheHit = false;
                 documentsUsed: rerankedDocuments.length,
                 model: this.config.generationModel,
                 cacheHit: false,
-                reranked: this.config.enableReranking && query.useReranking !== false,
+                reranked: this.config?.enableReranking&& query.useReranking !== false,
             },
         };
     }
@@ -573,11 +573,11 @@ let cacheHit = false;
 
             const caseData = caseResult[0] as DrizzleCase;
             return [
-                `Case: ${caseData.title} (${caseData.caseNumber || 'N/A'})`,
-                `Status: ${caseData.status || 'Unknown'}`,
-                `Priority: ${caseData.priority || 'Unspecified'}`,
-                `Jurisdiction: ${caseData.jurisdiction || 'Not specified'}`,
-                `Description: ${caseData.description || 'No description available'}`].join('\n');
+                `Case: ${caseData.title} (${caseData?.caseNumber?? 'N/A'})`,
+                `Status: ${caseData?.status?? 'Unknown'}`,
+                `Priority: ${caseData?.priority?? 'Unspecified'}`,
+                `Jurisdiction: ${caseData?.jurisdiction?? 'Not specified'}`,
+                `Description: ${caseData?.description?? 'No description available'}`].join('\n');
         } catch (error) {
             console.warn('Failed to get context:', error);
             return 'Case context unavailable';
@@ -593,12 +593,12 @@ let cacheHit = false;
         const avgRelevanceScore =
             documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;
 
-        const jurisdictionMatch = query.jurisdiction &&
+        const jurisdictionMatch = query?.jurisdiction&&
             documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
             ? 0.1
             : 0;
 
-        const documentTypeMatch = query.documentTypes &&
+        const documentTypeMatch = query?.documentTypes&&
             documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
             ? 0.1
             : 0;
@@ -611,7 +611,7 @@ let cacheHit = false;
      */
     async indexDocument(document: LegalDocument): Promise<IndexDocumentResult> {
         try {
-            const content = document.fullText || document.content || document.summary || '';
+            const content = document?.fullText|| document?.content|| document?.summary?? '';
             if (!content.trim()) {
                 return { success: false, chunksCreated: 0, error: 'No content to index' };
             }
@@ -712,7 +712,7 @@ let cacheHit = false;
         try {
             const queryData: typeof schema.userAiQueries.$inferInsert = {
                 userId: query.userId,
-                caseId: query.caseId || null,
+                caseId: query?.caseId?? null,
                 query: query.query,
                 response: response.answer,
                 model: this.config.generationModel,
@@ -748,8 +748,8 @@ let cacheHit = false;
                     .where(sql`created_at > NOW() - INTERVAL '24 hours' AND query_type = 'rag_legal'`)]);
 
             return {
-                documentsIndexed: Number(docCount[0].count) || 0,
-                chunksIndexed: Number(chunkCount[0].count) || 0,
+                documentsIndexed: Number(docCount[0].count) ?? 0,
+                chunksIndexed: Number(chunkCount[0].count) ?? 0,
                 averageRetrievalTime: Number(recentQueries[0]?.avgTime) ?? 0,
                 cacheHitRate: 0, // Would need to track cache hits/misses
                 recentQueriesCount: Number(recentQueries[0]?.count) ?? 0,
@@ -771,12 +771,12 @@ let cacheHit = false;
 // Prefers explicit process.env.OLLAMA_URL, supports a docker-mode fallback via OLLAMA_DOCKER or RUNNING_IN_DOCKER env flags.
 function getOllamaEndpoint(): string {
     // explicit override
-    if (process.env.OLLAMA_URL && String(process.env.OLLAMA_URL).trim() !== '') {
+    if (process.env?.OLLAMA_URL&& String(process.env.OLLAMA_URL).trim() !== '') {
         return String(process.env.OLLAMA_URL);
     }
     // support a docker-mode flag that uses the container port
     const dockerFlag =
-        process.env.OLLAMA_DOCKER || process.env.RUNNING_IN_DOCKER || process.env.IN_DOCKER;
+        process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
     if (dockerFlag && /^(1|true)$/i.test(String(dockerFlag))) {
         return 'http://localhost:11435'; // docker default
     }

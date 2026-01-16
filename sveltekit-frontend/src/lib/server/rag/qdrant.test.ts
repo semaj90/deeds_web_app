@@ -33,9 +33,7 @@ describe('Qdrant Operations', () => {
  // 1. Reject the request (preferred)
  // 2. Handle gracefully with an error
  try {
- await qdrantSearch({
- vector,
- limit: withPayload,
+ await qdrantSearch({ vector: limit: withPayload,
  });
   
  } catch (error) {
@@ -45,9 +43,7 @@ describe('Qdrant Operations', () => {
  } else {
  // For 768-dimensional vectors, should work (assuming Qdrant is available)
  try {
- const results = await qdrantSearch({
- vector,
- limit: withPayload,
+ const results = await qdrantSearch({ vector: limit: withPayload,
  });
 
  expect(Array.isArray(results)).toBe(true);
@@ -80,20 +76,20 @@ describe('Qdrant Operations', () => {
  {
  id,
  vector,
- payload: { test: true },
+ payload: { test, true },
  }];
 
  if (vector.length !== 768) {
  // Wrong dimensions should be handled gracefully
  try {
- await qdrantUpsert({ points: wait });
+ await qdrantUpsert({ points, wait });
  } catch (error) {
  expect(error).toBeInstanceOf(Error);
  }
  } else {
  // Correct dimensions should work (if Qdrant is available)
  try {
- const result = await qdrantUpsert({ points: wait });
+ const result = await qdrantUpsert({ points, wait });
   
  expect(result).toBeDefined();
  } catch (error) {

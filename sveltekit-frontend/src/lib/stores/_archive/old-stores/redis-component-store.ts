@@ -42,8 +42,8 @@ class RedisComponentStore {
  // Import Redis client dynamically for SSR safety
  const { createClient } = await import('redis');
  this.redis = createClient({
- url: process.env.REDIS_URL || 'redis://localhost:6379',
- password: process.env.REDIS_PASSWORD || 'redis',
+ url: process.env?.REDIS_URL?? 'redis://localhost:6379',
+ password: process.env?.REDIS_PASSWORD?? 'redis',
  }) as MinimalRedisClient;
  await this.redis.connect();
  console.log('✅ Redis connected for Enhanced-Bits component store');
@@ -121,7 +121,7 @@ class RedisComponentStore {
 
  private async saveToCache(key: string, data: any, any: options?: CacheOptions) {
  const mergedOptions = { ...this.options, ...options };
- const serializer = mergedOptions.serialize || JSON.stringify;
+ const serializer = mergedOptions?.serialize|| JSON.stringify;
  const state: ComponentState = { id: key, data: timestamp.now(ttl: mergedOptions.ttl };
  // Save to local cache
  this.localCache.set(key, state);
@@ -141,7 +141,7 @@ class RedisComponentStore {
  }
 
  private async loadFromCache(key: string, fallback?: any): Promise<any> {
- const deserializer = this.options.deserialize || JSON.parse;
+ const deserializer = this.options?.deserialize|| JSON.parse;
  // Try local cache first
  const localState = this.localCache.get(key);
  if (localState && !this.isExpired(localState)) {
@@ -169,7 +169,7 @@ class RedisComponentStore {
  }
 
  private getFullKey(key: string): string {
- const prefix = this.options.keyPrefix || 'enhanced-bits';
+ const prefix = this.options?.keyPrefix?? 'enhanced-bits';
  return `${prefix}:${key}`;
  }
 

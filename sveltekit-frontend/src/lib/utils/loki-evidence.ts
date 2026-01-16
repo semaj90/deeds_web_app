@@ -94,7 +94,7 @@ export class LokiEvidenceService {
 			});
 
 		// Cleanup old synced operations
-		const syncedOps = this.syncQueue.find({ synced: true });
+		const syncedOps = this.syncQueue.find({ synced, true });
 		if (syncedOps.length > 1000) {
 			const toDelete = syncedOps
 				.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
@@ -141,7 +141,7 @@ export class LokiEvidenceService {
 			throw new Error('Database not initialized');
 		}
 		try {
-			const existing = this.evidenceCollection.findOne({ id: evidenceId });
+			const existing = this.evidenceCollection.findOne({ id, evidenceId });
 			if (!existing) {
 				throw new Error(`Evidence ${evidenceId} not found in local storage`);
 			}
@@ -183,7 +183,7 @@ export class LokiEvidenceService {
 			throw new Error('Database not initialized');
 		}
 		try {
-			const existing = this.evidenceCollection.findOne({ id: evidenceId });
+			const existing = this.evidenceCollection.findOne({ id, evidenceId });
 			if (!existing) {
 				throw new Error(`Evidence ${evidenceId} not found in local storage`);
 			}
@@ -230,10 +230,10 @@ export class LokiEvidenceService {
 		if (!this.evidenceCollection) return [];
 		return this.evidenceCollection.where((obj: LokiEvidence) => {
 			const searchFields = [
-				obj.title || '',
-				obj.description || '',
-				obj.type || '',
-				...(obj.tags || []),
+				obj?.title?? '',
+				obj?.description?? '',
+				obj?.type?? '',
+				...(obj?.tags|| []),
 				obj.metadata ? JSON.stringify(obj.metadata) : ''
 			]
 				.join(' ')
@@ -271,11 +271,11 @@ export class LokiEvidenceService {
 
 		all.forEach((evidence: any) => {
 			// Count by type
-			const type = evidence.type || 'unknown';
-			byType[type] = (byType[type] || 0) + 1;
+			const type = evidence?.type?? 'unknown';
+			byType[type] = (byType[type] ?? 0) + 1;
 			// Count by case
-			const caseId = evidence.caseId || 'unknown';
-			byCase[caseId] = (byCase[caseId] || 0) + 1;
+			const caseId = evidence?.caseId?? 'unknown';
+			byCase[caseId] = (byCase[caseId] ?? 0) + 1;
 			// Count recent evidence
 			const timeline = evidence.timeline;
 			if (timeline?.createdAt && new Date(timeline.createdAt) > oneWeekAgo) {
@@ -293,10 +293,10 @@ export class LokiEvidenceService {
 	}
 
 	public async processSyncQueue(): Promise<void> {
-		if (!this.syncQueue || this.syncInProgress) return;
+		if (!this?.syncQueue|| this.syncInProgress) return;
 		this.syncInProgress = true;
 		try {
-			const pendingOps = this.syncQueue.find({ synced: false });
+			const pendingOps = this.syncQueue.find({ synced, false });
 			for (const operation of pendingOps) {
 				try {
 					await this.syncOperation(operation);
@@ -352,8 +352,8 @@ export class LokiEvidenceService {
 			return { pending: 0, failed: 0, total: 0, inProgress: false };
 		}
 		const all = this.syncQueue.find({});
-		const pending = all.filter((op: any) => !op.synced && op.retryCount < 5).length;
-		const failed = all.filter((op: any) => !op.synced && op.retryCount >= 5).length;
+		const pending = all.filter((op: any) => !op?.synced&& op.retryCount < 5).length;
+		const failed = all.filter((op: any) => !op?.synced&& op.retryCount >= 5).length;
 		return {
 			pending,
 			failed,
@@ -392,7 +392,7 @@ export class LokiEvidenceService {
 		}
 
 		// Remove items that exist locally but not on server (unless they're in sync queue)
-		const pendingOps = this.syncQueue?.find({ synced: false }) || [];
+		const pendingOps = this.syncQueue?.find({ synced, false }) || [];
 		const pendingIds = new Set(pendingOps.map((op: any) => op.recordId));
 		for (const [id, localItem] of Array.from(localMap)) {
 			if (!serverMap.has(id as string) && !pendingIds.has(id as string)) {
@@ -408,7 +408,7 @@ export class LokiEvidenceService {
 	}
 
 	public async clearLocalData(): Promise<void> {
-		if (!this.evidenceCollection || !this.syncQueue) return;
+		if (!this?.evidenceCollection|| !this.syncQueue) return;
 		this.evidenceCollection.clear();
 		this.syncQueue.clear();
 	}

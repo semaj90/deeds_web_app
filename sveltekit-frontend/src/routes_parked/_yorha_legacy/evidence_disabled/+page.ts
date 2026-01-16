@@ -6,7 +6,7 @@ export const load: PageLoad = async ({ fetch }) => {
 
  try {
  const res = await fetch(`/api/evidence/${caseId}`);
- const { items: connections } = await res.json();
+ const { items, connections } = await res.json();
 
  return {
  items,

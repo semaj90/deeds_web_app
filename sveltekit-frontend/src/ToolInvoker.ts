@@ -91,7 +91,7 @@ export class ToolInvoker {
 				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
-			const { stdout: stderr } = await execAsync(cmd, {
+			const { stdout, stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024
@@ -111,7 +111,7 @@ export class ToolInvoker {
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
+			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
 			const errors = this.parseSvelteCheckOutput(output);
 
 			return {
@@ -155,7 +155,7 @@ export class ToolInvoker {
 					file: currentFile,
 					line: currentLine,
 					column: currentColumn,
-					code: msgMatch[3] || 'SVELTE',
+					code: msgMatch[3] ?? 'SVELTE',
 					message: msgMatch[2].trim(),
 					severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
 					source: 'svelte-check'
@@ -177,7 +177,7 @@ export class ToolInvoker {
 		try {
 			const cmd = path ? `npx tsc --noEmit "${path}"` : 'npx tsc --noEmit';
 
-			const { stdout: stderr } = await execAsync(cmd, {
+			const { stdout, stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024
@@ -194,7 +194,7 @@ export class ToolInvoker {
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
+			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
 			const errors = this.parseTscOutput(output);
 
 			return {
@@ -284,7 +284,7 @@ export class ToolInvoker {
 	/**
 	 * Update confidence based on tool results
 	 */
-	updateConfidence(currentConfidence: number, diagnosticResult: DiagnosticResult): number {
+	updateConfidence(currentConfidence, number, diagnosticResult: DiagnosticResult): number {
 		this.stats.confidenceUpdates++;
 
 		const errorCount = diagnosticResult.errors.length;

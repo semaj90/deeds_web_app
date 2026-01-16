@@ -116,7 +116,7 @@ export const userWorkflowMachine = createMachine({
                 }),
                 currentStep: 'workflow_started',
                 progress: 0,
-                data: ({ event }) => event.data || {}
+                data: ({ event }) => event?.data|| {}
               })
             },
             SET_ACTIVE_CASE: { actions: assign({
@@ -142,7 +142,7 @@ export const userWorkflowMachine = createMachine({
           }
         },
         workflowActive: { initial: 'executingStep',
-          entry: assign({ currentStep: ({ context }) => context.workflow.steps[context.workflow.currentStepIndex] || 'unknown'
+          entry: assign({ currentStep: ({ context }) => context.workflow.steps[context.workflow.currentStepIndex] ?? 'unknown'
           }),
           states: { executingStep: {
               on: { COMPLETE_STEP: {
@@ -178,7 +178,7 @@ export const userWorkflowMachine = createMachine({
                     }),
                     currentStep: ({ context }) => {
                       const nextIndex = context.workflow.currentStepIndex + 1;
-                      return context.workflow.steps[nextIndex] || 'unknown';
+                      return context.workflow.steps[nextIndex] ?? 'unknown';
                     }
                   })
                 }
@@ -192,12 +192,12 @@ export const userWorkflowMachine = createMachine({
                 NEXT_STEP: { target: 'executingStep',
                   actions: assign({ workflow: ({ context }) => ({
                       ...context.workflow,
-                      currentStepIndex: Math.min(context.workflow.currentStepIndex + 1: context.workflow.totalSteps - 1)
+                      currentStepIndex: Math.min(context.workflow.currentStepIndex + 1, context.workflow.totalSteps - 1)
                     }),
                     errors: [],
                     currentStep: ({ context }) => {
-                      const nextIndex = Math.min(context.workflow.currentStepIndex + 1: context.workflow.totalSteps - 1);
-                      return context.workflow.steps[nextIndex] || 'unknown';
+                      const nextIndex = Math.min(context.workflow.currentStepIndex + 1, context.workflow.totalSteps - 1);
+                      return context.workflow.steps[nextIndex] ?? 'unknown';
                     }
                   })
                 },
@@ -210,7 +210,7 @@ export const userWorkflowMachine = createMachine({
                     errors: [],
                     currentStep: ({ context }) => {
                       const prevIndex = Math.max(context.workflow.currentStepIndex - 1, 0);
-                      return context.workflow.steps[prevIndex] || 'unknown';
+                      return context.workflow.steps[prevIndex] ?? 'unknown';
                     }
                   })
                 }
@@ -244,7 +244,7 @@ export const userWorkflowMachine = createMachine({
                 currentStep: 'workflow_started',
                 progress: 0,
                 errors: [],
-                data: ({ event }) => event.data || {}
+                data: ({ event }) => event?.data|| {}
               })
             },
             RESET: { target: 'ready',
@@ -279,7 +279,7 @@ export const userWorkflowMachine = createMachine({
                 currentStep: 'workflow_started',
                 progress: 0,
                 errors: [],
-                data: ({ event }) => event.data || {}
+                data: ({ event }) => event?.data|| {}
               })
             },
             RESET: { target: 'ready',
@@ -352,7 +352,7 @@ export const userWorkflowMachine = createMachine({
 });
 
 // Workflow step definitions
-function getWorkflowSteps(workflowType: UserWorkflowContext['workflow']['type']): string[] {
+function getWorkflowSteps(workflowType, UserWorkflowContext['workflow']['type']): string[] {
   const workflowSteps = {
     case_creation: [
       'gather_case_information',
@@ -410,7 +410,7 @@ export function isWorkflowCompleted(state: any): boolean {
 }
 
 export function getCurrentWorkflowStep(context: UserWorkflowContext): string {
-  return context.workflow.steps[context.workflow.currentStepIndex] || 'unknown';
+  return context.workflow.steps[context.workflow.currentStepIndex] ?? 'unknown';
 }
 
 export function getWorkflowProgress(context: UserWorkflowContext): number {

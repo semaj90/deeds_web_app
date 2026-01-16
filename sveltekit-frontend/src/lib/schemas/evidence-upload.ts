@@ -240,7 +240,7 @@ export function getFileTypeFromMime(mimeType: string): string {
 
 // Add helper to derive image format from mime type (safe union, no casts)
 function getImageFormatFromMime(mime: string): 'jpeg' | 'png' | 'gif' | 'webp' | 'unknown' {
-	const subtype = (mime.split('/')[1] || '').toLowerCase();
+	const subtype = (mime.split('/')[1] ?? '').toLowerCase();
 	if (subtype === 'jpeg' || subtype === 'jpg') return 'jpeg';
 	if (subtype === 'png') return 'png';
 	if (subtype === 'gif') return 'gif';
@@ -295,8 +295,8 @@ export async function generateMetadataFromFile(
 				video.onloadedmetadata = () => {
 					resolve({
 						kind: 'VIDEO',
-						durationSeconds: video.duration || 0,
-						resolution: { width: video.videoWidth || 0, height: video.videoHeight || 0 },
+						durationSeconds: video?.duration?? 0,
+						resolution: { width: video?.videoWidth?? 0, height: video?.videoHeight?? 0 },
 						codec: 'unknown', // Will be determined by server-side processing
 						frameRate: 0, // Will be determined by server-side processing
 						...baseMetadata
@@ -319,7 +319,7 @@ export async function generateMetadataFromFile(
 				audio.onloadedmetadata = () => {
 					resolve({
 						kind: 'AUDIO',
-						durationSeconds: audio.duration || 0,
+						durationSeconds: audio?.duration?? 0,
 						codec: 'unknown', // Will be determined by server-side processing
 						sampleRate: 44100, // Default, will be determined by server-side processing
 						channels: 2, // Default, will be determined by server-side processing

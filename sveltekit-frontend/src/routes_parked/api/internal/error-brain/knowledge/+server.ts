@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const context: LearningContext = await request.json();
 
- if (!context.errorMessage || !context.filePath) {
+ if (!context?.errorMessage|| !context.filePath) {
  return json({ error: 'errorMessage and filePath are required' }, { status: 400 });
  }
 

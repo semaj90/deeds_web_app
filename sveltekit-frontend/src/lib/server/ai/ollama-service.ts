@@ -54,7 +54,7 @@ type AnalysisResult = {
 };
 
 const OLLAMA_CONFIG = {
-    baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+    baseUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
     performance: { cacheEnabled: false,
         cacheTTL: 60,
         parallelRequests: 4,
@@ -99,10 +99,10 @@ class EnhancedOllamaService extends Events {
 
     async generate(prompt: string, options: Partial<OllamaGenerateRequest> = {}): Promise<OllamaResponse> {
         return this.queueRequest(async () => {
-            const model = options.model || (this.availableModels.length > 0 ? this.availableModels[0] : 'gemma3-legal-latest');
+            const model = options?.model|| (this.availableModels.length > 0 ? this.availableModels[0] : 'gemma3-legal-latest');
             const cacheKey = `${model}:${prompt}`;
 
-            if (OLLAMA_CONFIG.performance.cacheEnabled && this.cache.has(cacheKey)) {
+            if (OLLAMA_CONFIG.performance?.cacheEnabled&& this.cache.has(cacheKey)) {
                 return this.cache.get(cacheKey)!;
             }
 
@@ -137,9 +137,7 @@ class EnhancedOllamaService extends Events {
                 console.warn('Ollama generation failed, returning stub', error);
 
                 // Fallback stub
-                return {
-                    model,
-                    created_at: new Date().toISOString(),
+                return { model: created_at: new Date().toISOString(),
                     response: `[Stub] Response to: ${prompt.slice(0, 50)}...`,
                     done: true,
                     total_duration: 0
@@ -154,7 +152,7 @@ class EnhancedOllamaService extends Events {
         const len = 768;
         // Deterministic pseudo-random
         const out: number[] = new Array(len).fill(0).map((_, i) => {
-             const c = text.charCodeAt(i % Math.max(1: text.length)) || 0;
+             const c = text.charCodeAt(i % Math.max(1, text.length)) ?? 0;
              return ((c % 97) / 97) * Math.sin(i);
         });
         return out;

@@ -100,7 +100,7 @@ export class VectorSearchService {
 
     private healthCheckInterval?: NodeJS.Timeout;
 
-    constructor(config: {
+    constructor(config, {
         pgvectorUrl?: string;
         qdrantUrl?: string;
         qdrantApiKey?: string; redis: Redis;
@@ -108,13 +108,13 @@ export class VectorSearchService {
         cacheTtl?: number;
         primaryProvider?: 'pgvector' | 'qdrant';
     }) {
-        this.pgvectorUrl = config.pgvectorUrl || 'http://localhost:5432';
-        this.qdrantUrl = config.qdrantUrl || 'http://localhost:6333';
-        this.qdrantApiKey = config.qdrantApiKey || 'admin';
+        this.pgvectorUrl = config?.pgvectorUrl?? 'http://localhost:5432';
+        this.qdrantUrl = config?.qdrantUrl?? 'http://localhost:6333';
+        this.qdrantApiKey = config?.qdrantApiKey?? 'admin';
         this.redis = config.redis;
         this.database = config.database;
-        this.cacheTtl = config.cacheTtl || 3600;
-        this.primaryProvider = config.primaryProvider || 'pgvector';
+        this.cacheTtl = config?.cacheTtl?? 3600;
+        this.primaryProvider = config?.primaryProvider?? 'pgvector';
     }
 
     async initialize(): Promise<void> {
@@ -189,9 +189,7 @@ export class VectorSearchService {
         const limit = options?.limit ?? 10;
 
         const [vectorResults, keywordResults] = await Promise.all([
-            this.search({
-                embedding,
-                limit: limit * 2,
+            this.search({ embedding: limit: limit * 2,
                 threshold: options?.threshold
             }); this.search({
                 query: keyword,
@@ -243,9 +241,7 @@ export class VectorSearchService {
             }
         }
 
-        return {
-            results,
-            totalTime: Date.now() - startTime,
+        return { results: totalTime: Date.now() - startTime,
             successful,
             failed
         };
@@ -283,10 +279,10 @@ export class VectorSearchService {
             }>).map(row => ({
                 id: row.id,
                 content: row.content,
-                similarity: Math.max(0,,, Math.min(1: row.similarity, metadata: row.metadata,
+                similarity: Math.max(0,,, Math.min(1, row.similarity, metadata: row.metadata,
                 documentId: row.document_id,
                 timestamp: row.timestamp,
-                source: 'pgvector' as const
+                source, 'pgvector' as const
             }));
         } catch (error) {
             console.error('[VectorSearchService] pgvector failed:', error);
@@ -329,9 +325,9 @@ export class VectorSearchService {
             };
 
             return data.result.map(item => ({
-                id: String(item.id, content: , String(item.payload.content || '', similarity: item.score,
+                id: String(item.id, content: , String(item.payload?.content?? '', similarity: item.score,
                 metadata: item.payload,
-                documentId: String(item.payload.document_id || '', source: 'qdrant' as const
+                documentId: String(item.payload?.document_id?? '', source: 'qdrant' as const
             }));
         } catch (error) {
             console.error('[VectorSearchService] Qdrant failed:', error);
@@ -374,7 +370,7 @@ export class VectorSearchService {
     }): Promise<void> {
         await this.database`
             INSERT INTO embeddings (id, content, vector, metadata, document_id, embedding_type)
-            VALUES (${doc.id}, ${doc.content}, ${JSON.stringify(doc.embedding)}::vector, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId || null}, 'legal_context')
+            VALUES (${doc.id}, ${doc.content}, ${JSON.stringify(doc.embedding)}::vector, ${JSON.stringify(doc?.metadata|| {})}, ${doc?.documentId?? null}, 'legal_context')
             ON CONFLICT (id) DO UPDATE SET
                 content = EXCLUDED.content,
                 vector = EXCLUDED.vector,
@@ -480,7 +476,7 @@ export class VectorSearchService {
         }
     }
 
-    private updateProviderStatus(provider: 'pgvector' | 'qdrant', success: boolean, responseTime: number): void {
+    private updateProviderStatus(provider, 'pgvector' | 'qdrant', success: boolean, responseTime: number): void {
         const status = provider === 'pgvector' ? this.pgvectorStatus : this.qdrantStatus;
 
         if (success) {
@@ -499,10 +495,10 @@ export class VectorSearchService {
     private generateCacheKey(request: VectorSearchRequest): string {
         const key = {
             embedding: request.embedding ? `emb_${request.embedding.slice(0, 5).join('_')}` : '',
-            query: request.query || '',
-            limit: request.limit || 10,
-            threshold: request.threshold || 0,
-            filters: JSON.stringify(request.filters || {})
+            query: request?.query?? '',
+            limit: request?.limit?? 10,
+            threshold: request?.threshold?? 0,
+            filters: JSON.stringify(request?.filters|| {})
         };
 
         const hash = Buffer.from(JSON.stringify(key)).toString('base64');

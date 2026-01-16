@@ -33,7 +33,7 @@ export class JobQueueService {
  };
 
  constructor() {
- this.rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+ this.rabbitmqUrl = process.env?.RABBITMQ_URL?? 'amqp://guest:guest@localhost:5672';
  }
 
  /**
@@ -45,10 +45,10 @@ export class JobQueueService {
  this.channel = await this.connection.createChannel();
 
  // Declare queues
- await this.channel.assertQueue(this.queues.summary, { durable: true });
- await this.channel.assertQueue(this.queues.ocr, { durable: true });
- await this.channel.assertQueue(this.queues.embedding, { durable: true });
- await this.channel.assertQueue(this.queues.citations, { durable: true });
+ await this.channel.assertQueue(this.queues.summary, { durable, true });
+ await this.channel.assertQueue(this.queues.ocr, { durable, true });
+ await this.channel.assertQueue(this.queues.embedding, { durable, true });
+ await this.channel.assertQueue(this.queues.citations, { durable, true });
 
  console.log('✅ Connected to RabbitMQ');
  } catch (error) {
@@ -132,9 +132,7 @@ export class JobQueueService {
  .limit(1);
 
  if (!job) {
- return {
- jobId,
- status: 'pending',
+ return { jobId: status: 'pending',
  error: 'Job not found',
  };
  }

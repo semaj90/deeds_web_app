@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 };
 
-function generateSearchReportHTML(caseId: string, result, PhoenixWrightSearchResult: string {
+function generateSearchReportHTML(caseId: string, result: PhoenixWrightSearchResult: string {
 ): void {
   return `
  <!DOCTYPE html>
@@ -102,7 +102,7 @@ function generateSearchReportHTML(caseId: string, result, PhoenixWrightSearchRes
 
  <div class="case-info">
  <h2>Search Summary</h2>
- <p><strong>Query:</strong> ${result.query || 'N/A'}</p>
+ <p><strong>Query:</strong> ${result?.query?? 'N/A'}</p>
  <p><strong>Confidence Score:</strong> <span class="confidence">${(result.confidence * 100).toFixed(1)}%</span></p>
  <p><strong>Precedents Found:</strong> ${result.precedents.length}</p>
  <p><strong>Contradictions Detected:</strong> ${result.contradictions.length}</p>

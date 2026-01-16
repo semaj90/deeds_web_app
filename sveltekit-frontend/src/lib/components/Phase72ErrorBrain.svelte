@@ -119,7 +119,7 @@
 		}
 	}
 
-	function selectError(error, Phase72Error) {
+	function selectError(error: Phase72Error) {
 		selectedError = error;
 		showSimilar = false;
 		aiSuggestion = '';

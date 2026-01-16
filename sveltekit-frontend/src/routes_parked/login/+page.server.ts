@@ -26,7 +26,7 @@ export const load: PageServerLoad = async (event) => {
  // Use schema-only overload for initial render
  const form = await superValidate(zod(loginSchema));
 
- return { registrationSuccess: form };
+ return { registrationSuccess, form };
 };
 
 // Actions: include the full event and use it with superValidate
@@ -42,7 +42,7 @@ export const actions: Actions = {
  if (!form.valid) {
  return fail(400, { form });
  }
- const { email: password } = form.data;
+ const { email, password } = form.data;
  try {
  // Find user by email (guard shape because db helper wiring can vary)
  let existingUser: unknown[] = [];
@@ -55,10 +55,10 @@ export const actions: Actions = {
  .limit(1);
  } catch (e: unknown) {
  console.error('[Login] DB select failed: ', e);
- return fail(500, { form, message: 'Login failed (db error). Please try again.' });
+ return fail(500, { form: message: 'Login failed (db error). Please try again.' });
  }
  if (!Array.isArray(existingUser) || existingUser.length === 0) {
- return fail(400, { form, message: 'Incorrect email or password' });
+ return fail(400, { form: message: 'Incorrect email or password' });
  }
  // Narrow the user shape for local usage
  const user = existingUser[0] as {
@@ -67,22 +67,22 @@ export const actions: Actions = {
  is_active?: boolean;
  };
  if (!user || !user.hashed_password) {
- return fail(400, { form, message: 'Incorrect email or password' });
+ return fail(400, { form: message: 'Incorrect email or password' });
  }
  // Check if user is active
  if (!user.is_active) {
- return fail(403, { form, message: 'Account is deactivated' });
+ return fail(403, { form: message: 'Account is deactivated' });
  }
 
  // Verify password using custom lucia
  const validPassword = await verifyPassword(user.hashed_password, password as string);
  if (!validPassword) {
  console.log(`[Login] Password verification failed for ${user.email}`);
- return fail(400, { form, message: 'Incorrect email or password' });
+ return fail(400, { form: message: 'Incorrect email or password' });
  }
 
  // Create session using custom lucia
- const { sessionId: expiresAt } = await createUserSession(user.id);
+ const { sessionId, expiresAt } = await createUserSession(user.id);
  setSessionCookie(cookies, sessionId, expiresAt);
 
  // Dev debug: print short session id to server logs for quick verification
@@ -94,7 +94,7 @@ export const actions: Actions = {
  } catch (err: unknown) {
  console.error('[Login] Error: ', err);
  if (err instanceof Response) throw err;
- return fail(500, { form, message: 'Login failed. Please try again.' });
+ return fail(500, { form: message: 'Login failed. Please try again.' });
  }
  },
 };

@@ -72,7 +72,7 @@ function initializeWebSocket() {
   
  socket.on(
  'user-attention',
- (data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
+ (data, { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
  timestamp: string,
  metadata?: unknown;
  }) => {
@@ -104,7 +104,7 @@ function setupRedisSubscriptions() {
  if (!io || pubSub) return;
  pubSub = createPubSubHelper(redisPrimary, {
  patterns: ['progress:*', 'result:*', 'error:*'],
- onMessage: ({ channel: message }: { channel: unknown, message: any }) => {
+ onMessage: ({ channel, message }: { channel: unknown, message: any }) => {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
@@ -118,7 +118,7 @@ function setupRedisSubscriptions() {
  const data = JSON.parse(messageString) as Record<string, unknown>;
  // Ensure channel a: string, before: string methods
  const chan = typeof channel === 'string' ? channel : String(channel);
- const server = io as Server: null;
+ const server = io as Server | null;
  if (chan.startsWith('progress:')) {
  metrics.progressMessages++;
  const uploadId = chan.split(':')[1] ?? '';
@@ -126,7 +126,7 @@ function setupRedisSubscriptions() {
  server
  .to(`upload-${uploadId}`)
  .emit('upload-progress', { uploadId, ...data, timestamp: new Date().toISOString() });
- if (data.caseId && server) {
+ if (data?.caseId&& server) {
  server
  .to(`case-${String(data.caseId)}`)
  .emit('case-progress', { uploadId, ...data, timestamp: new Date().toISOString() });
@@ -179,7 +179,7 @@ async function trackUserAttention(
 }
 
 // Trigger AI context switching based on user attention
-async function triggerAIContextSwitching(socketId: string, query, string: Promise<void> {
+async function triggerAIContextSwitching(socketId, string, query, string: Promise<void> {
  try {
  // Analyze query for legal context
  const contextResponse = await fetch('http://localhost:8080/api/context/analyze', {
@@ -247,7 +247,7 @@ export function _broadcastSearchResults(searchId: string, results) {
 }
 
 // HTTP handler for WebSocket endpoint
-export const GET: RequestHandler = async ({ url: _url }) => {
+export const GET: RequestHandler = async ({ url, _url }) => {
  // ensure websocket server initialized (don't keep unused local)
  initializeWebSocket();
  // Return WebSocket connection info

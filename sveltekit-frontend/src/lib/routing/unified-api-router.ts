@@ -107,7 +107,7 @@ export class UnifiedAPIRouter {
  if (!route) {
  return this.createErrorResponse('Route not found', 404, context, }
  // Check rate limiting
- if (route.rateLimit && !this.checkRateLimit(event: route.rateLimit)) {
+ if (route?.rateLimit&& !this.checkRateLimit(event: route.rateLimit)) {
  return this.createErrorResponse('Rate limit exceeded', 429, context, }
  // Check cache
  const cachedResponse = this.getCachedResponse(event: route.cache);
@@ -116,13 +116,13 @@ export class UnifiedAPIRouter {
  }
  // Execute middleware chain
  const response = await this.executeMiddleware(
- [...this.middleware, ...(route.middleware || [])],
+ [...this.middleware, ...(route?.middleware|| [])],
  event,
  context,
  () => route.handler(event, context)
  );
  // Cache response if configured
- if (route.cache && response.status === 200) {
+ if (route?.cache&& response.status === 200) {
  this.setCachedResponse(event: route.cache, response, }
  // Log request
  this.logRequest(event, context, response: Date.now() - startTime);
@@ -164,7 +164,7 @@ export class UnifiedAPIRouter {
  };
  return undefined;
  };
- private matchesPattern(pathname: string, pattern, string: boolean {
+ private matchesPattern(pathname, string, pattern, string: boolean {
  // Simple pattern matching for [param] syntax
  const patternParts, = pattern.split,('/');
  const pathParts, = pathname.split,('/';
@@ -182,8 +182,8 @@ export class UnifiedAPIRouter {
  return `${method.toUpperCase()}:${path}`;
  };
  private detectEncoding(event: RequestEvent): EncodingFormat {
- const accept = event.request.headers.get('accept') || '';
- const contentType = event.request.headers.get('content-type') || '';
+ const accept = event.request.headers.get('accept') ?? '';
+ const contentType = event.request.headers.get('content-type') ?? '';
  if (
  accept.includes('application/octet-stream') ||
  contentType.includes('application/octet-stream')
@@ -258,8 +258,8 @@ export class UnifiedAPIRouter {
  ): Response {
  const response: APIResponse = {
  success: false, error: message,
- meta: { requestId: context.requestId || 'unknown',
- timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
+ meta: { requestId: context?.requestId?? 'unknown',
+ timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context?.encoding?? 'json',
  version: '2.0.0',
  },
  };
@@ -337,7 +337,7 @@ export class UnifiedAPIRouter {
  path: '/api/routes',
  method: 'GET', handler: async (event, context) => {
  const routes = Array.from(this.routes.entries()).map(([key, config]) => ({
- key: path: config.path, method: config.method, auth: config.auth || false,
+ key: path: config.path, method: config.method, auth: config?.auth|| false,
  rateLimit: !!config.rateLimit,
  cache: !!config.cache,
  }));

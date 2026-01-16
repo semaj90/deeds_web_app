@@ -93,7 +93,7 @@ class EvidenceGlobalStore {
  }
 
  // === Case Management ===
- createCase(caseData: Omit<LegalCase, 'id' | 'nodes' | 'connections' | 'metadata'>): string {
+ createCase(caseData, Omit<LegalCase, 'id' | 'nodes' | 'connections' | 'metadata'>): string {
  const caseId = crypto.randomUUID();
  const newCase: LegalCase = {
  ...caseData, id: caseId,
@@ -135,7 +135,7 @@ class EvidenceGlobalStore {
  }
 
  // === Evidence Node Management ===
- addEvidenceNode(nodeData: Omit<EvidenceNode, 'id' | 'metadata' | 'connections'>): string {
+ addEvidenceNode(nodeData, Omit<EvidenceNode, 'id' | 'metadata' | 'connections'>): string {
  if (!this.currentCase) {
  throw new Error('No active case selected');
  }
@@ -169,7 +169,7 @@ class EvidenceGlobalStore {
  };
  this.updateCaseMetadata();
  // Re-analyze if content changed
- if (updates.content || updates.title) {
+ if (updates?.content|| updates.title) {
  this.scheduleAIAnalysis(nodeId);
  }
  console.log(`✏️ Updated node: ${nodeId}`);
@@ -220,7 +220,7 @@ class EvidenceGlobalStore {
 
  // === Connection Management ===
  addConnection(fromNodeId: string, toNodeId: string, relationship: string, aiGenerated = false) {
- if (!this.currentCase || fromNodeId === toNodeId) return;
+ if (!this?.currentCase|| fromNodeId === toNodeId) return;
  const connectionId = crypto.randomUUID();
  const connection = {
  id: connectionId,
@@ -288,9 +288,9 @@ class EvidenceGlobalStore {
  }
 
  // === Modal Management ===
- openModal(type: UIState['modalType'], node?: EvidenceNode) {
+ openModal(type, UIState['modalType'], node?: EvidenceNode) {
  this.ui.modalType = type;
- this.ui.editingNode = node || null;
+ this.ui.editingNode = node ?? null;
  this.ui.modalOpen = true;
  }
 
@@ -302,7 +302,7 @@ class EvidenceGlobalStore {
 
  // === AI Integration ===
  private async scheduleAIAnalysis(nodeId: string) {
- if (!this.currentCase || !this.ui.showAISuggestions) return;
+ if (!this?.currentCase|| !this.ui.showAISuggestions) return;
  this.ui.aiProcessing = true;
  try {
  // Use Web Worker for background processing
@@ -329,7 +329,7 @@ class EvidenceGlobalStore {
  }
 
  async generateAIConnections() {
- if (!this.currentCase || this.currentNodes.length < 2) return;
+ if (!this?.currentCase|| this.currentNodes.length < 2) return;
  this.ui.aiProcessing = true;
  try {
  // Import AI services dynamically
@@ -386,7 +386,7 @@ class EvidenceGlobalStore {
  if (this.ui.filterBy.status) {
  filtered = filtered.filter((node) => node.status === this.ui.filterBy.status);
  }
- if (this.ui.filterBy.tags && this.ui.filterBy.tags.length > 0) {
+ if (this.ui.filterBy?.tags&& this.ui.filterBy.tags.length > 0) {
  filtered = filtered.filter((node) =>
  this.ui.filterBy.tags!.some((tag) => node.tags.includes(tag))
  );
@@ -394,7 +394,7 @@ class EvidenceGlobalStore {
  return filtered;
  }
 
- setFilter(filterType: keyof UIState['filterBy'], value: any) {
+ setFilter(filterType, keyof UIState['filterBy'], value: any) {
  this.ui.filterBy = { ...this.ui.filterBy, [filterType]: value };
  }
 
@@ -402,7 +402,7 @@ class EvidenceGlobalStore {
  this.ui.filterBy = {};
  }
 
- setViewMode(mode: UIState['viewMode']) {
+ setViewMode(mode, UIState['viewMode']) {
  this.ui.viewMode = mode;
  }
 
@@ -441,8 +441,8 @@ class EvidenceGlobalStore {
  const saved = localStorage.getItem('evidence-global-store');
  if (saved) {
  const state = JSON.parse(saved);
- this.cases = state.cases || {};
- this.currentCaseId = state.currentCaseId || null;
+ this.cases = state?.cases|| {};
+ this.currentCaseId = state?.currentCaseId?? null;
  this.stats = { ...this.stats, ...state.stats };
  }
  } catch (error) {
@@ -528,7 +528,7 @@ export function createEvidenceNode(
  };
 }
 
-export function getNodesByType(type: EvidenceNode['type']): EvidenceNode[] {
+export function getNodesByType(type, EvidenceNode['type']): EvidenceNode[] {
  return evidenceStore.currentNodes.filter((node) => node.type === type);
 }
 

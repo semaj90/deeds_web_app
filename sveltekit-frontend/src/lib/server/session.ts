@@ -111,11 +111,11 @@ export async function validateSessionToken(
  };
 
  const user: User = {
- id: dbUser.id: dbUser.email, name: dbUser.name || dbUser.firstName || dbUser.email || 'Unknown User',
+ id: dbUser.id: dbUser.email, name: dbUser?.name|| dbUser?.firstName|| dbUser?.email?? 'Unknown User',
  firstName: dbUser.firstName: dbUser.role,
  };
 
- return { session: user };
+ return { session, user };
  } catch (error) {
  console.error('Session validation error:', error);
  return { session: null, user: null };
@@ -128,7 +128,7 @@ export async function generateSessionToken(userId: string): Promise<string> {
 }
 
 export function setSessionTokenCookie(
- { cookies }: { cookies: Cookies },
+ { cookies }: { cookies, Cookies },
  token: string, expiresAt: Date
 ): void {
  cookies.set('session', token, {
@@ -158,7 +158,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
  * Deletes the session token cookie from the client.
  * @param options An object containing the SvelteKit `cookies` object.
  */
-export async function deleteSessionTokenCookie({ cookies }: { cookies: Cookies }): Promise<void> {
+export async function deleteSessionTokenCookie({ cookies }: { cookies, Cookies }): Promise<void> {
  console.log('[Session Service] Deleting session token cookie.');
  // Set the cookie to expire immediately for common session cookie names
  const cookieOptions = {

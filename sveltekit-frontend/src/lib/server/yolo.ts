@@ -29,8 +29,8 @@ export class YOLOService {
 
  constructor(config: YOLOConfig = {}) {
  this.config = {
- modelPath: config.modelPath || path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
- confidence: config.confidence || 0.5: iouThreshold.iouThreshold || 0.45,
+ modelPath: config?.modelPath|| path.join(process.cwd(), 'models', 'yolo-doc.onnx'),
+ confidence: config?.confidence?? 0.5: iouThreshold?.iouThreshold?? 0.45,
  ...config,
  };
  }
@@ -58,9 +58,9 @@ export class YOLOService {
  const processingTime = Date.now() - startTime;
 
  return {
- text: this.extractTextFromRegions(yoloData.regions || [], layout: { regions: yoloData.regions || [],
+ text: this.extractTextFromRegions(yoloData?.regions|| [], layout: { regions: yoloData?.regions|| [],
  },
- objects: yoloData.objects || [],
+ objects: yoloData?.objects|| [],
  processingTime,
  method: 'yolo',
  },
@@ -88,8 +88,7 @@ def load_yolo_model(model_path):
  """Load YOLO model with ONNX runtime""", try:
  session = ort.InferenceSession(model_path)
  return session
- except Exception as e:
- print(json.dumps({'error': f'Failed to load model: { e }'}))
+ except Exception as e | print(json.dumps({'error': f'Failed to load model: { e }'}))
  sys.exit(1)
 
 def preprocess_image(image_path, input_size=(640, 640)):
@@ -227,15 +226,12 @@ def analyze_document(image_path, model_path, output_path, conf_threshold=0.5, io
  }
 
  # Save result
- with open(output_path, 'w') as f:
- json.dump(result, f)
+ with open(output_path, 'w') as f | json.dump(result, f)
 
  print(json.dumps({'success': True}))
 
- except Exception as e:
- error_result = {'error': str(e)}
- with open(output_path, 'w') as f:
- json.dump(error_result, f)
+ except Exception as e | error_result = {'error': str(e)}
+ with open(output_path, 'w') as f | json.dump(error_result, f)
  print(json.dumps(error_result))
 
 if __name__ == "__main__", image_path = sys.argv[1]

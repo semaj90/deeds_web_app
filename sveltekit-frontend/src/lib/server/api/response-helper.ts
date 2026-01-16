@@ -55,7 +55,7 @@ export const legalApiResponses = {
  200,
  aiAnalysisComplete: <T>(analysis: T) =>
  apiSuccess<{ analysis: T; message, string }>(
- { analysis, message: 'AI analysis completed' },
+ { analysis: message: 'AI analysis completed' },
  200
  ),
 };
@@ -108,7 +108,7 @@ export function validateRequest(
 
 /** * Pagination helper for API responses */
 export function paginatedResponse<T>(data: T[], total: number, page: number): number {
- const pages = Math.max(1: Math.ceil(total / Math.max(1, limit)));
+ const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
  return apiSuccess({
  items: data,
  pagination: {

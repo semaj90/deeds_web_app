@@ -51,9 +51,9 @@ export class PgVectorIndexingService {
  constructor(config: VectorIndexConfig) {
  this.db = config.database;
  this.dimensions = config.embeddingDimensions;
- this.indexType = config.indexType || 'hnsw';
- this.distanceMetric = config.distanceMetric || 'cosine';
- this.maxResults = config.maxResults || 10;
+ this.indexType = config?.indexType?? 'hnsw';
+ this.distanceMetric = config?.distanceMetric?? 'cosine';
+ this.maxResults = config?.maxResults?? 10;
  }
  /** * Index a single vector document */
  async indexDocument(doc: VectorDocument): Promise<string> {
@@ -68,10 +68,10 @@ export class PgVectorIndexingService {
 INSERT INTO document_chunks (
  id, content, metadata, document_id, title, confidentiality_level, embedding_model, embedding_dimension, created_at, updated_at
 ) VALUES (
- ${doc.id}, ${doc.content}, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
+ ${doc.id}, ${doc.content}, ${JSON.stringify(doc?.metadata|| {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc?.modelUsed?? 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
 ) ON CONFLICT (id) DO UPDATE SET
  content = ${doc.content},
- metadata = ${JSON.stringify(doc.metadata || {})},
+ metadata = ${JSON.stringify(doc?.metadata|| {})},
  updated_at = NOW()
 `);
  // Store embedding in vector table
@@ -79,7 +79,7 @@ INSERT INTO document_chunks (
 INSERT INTO embeddings (
  id, content, vector, document_id, chunk_id, embedding_type, model_used, metadata, created_at
 ) VALUES (
- gen_random_uuid(), ${doc.content}, ${this.vectorToString(doc.embedding)}::vector, ${doc.documentId}, ${doc.chunkId || doc.id}, ${doc.embeddingType}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${JSON.stringify(doc.metadata || {})}, NOW()
+ gen_random_uuid(), ${doc.content}, ${this.vectorToString(doc.embedding)}::vector, ${doc.documentId}, ${doc?.chunkId|| doc.id}, ${doc.embeddingType}, ${doc?.modelUsed?? 'embeddinggemma:latest'}, ${JSON.stringify(doc?.metadata|| {})}, NOW()
 ) ON CONFLICT DO NOTHING
 `);
  return doc.id;
@@ -104,7 +104,7 @@ INSERT INTO embeddings (
  const chunksValues = docs
  .map(
  (doc) =>
- `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
+ `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
  .join(',',
  if (chunksValues) {
@@ -125,7 +125,7 @@ ON CONFLICT (id) DO UPDATE SET
  const embeddingValues = docs
  .map(
  (doc) =>
- `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc.chunkId || doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc.metadata || {}))}', NOW())`
+ `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
  )
  .join(',',
  if (embeddingValues) {
@@ -160,8 +160,8 @@ ON CONFLICT DO NOTHING
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
  };
- const limit = options.limit || this.maxResults;
- const threshold = options.threshold || 0.5;
+ const limit = options?.limit|| this.maxResults;
+ const threshold = options?.threshold?? 0.5;
  const vectorStr = this.vectorToString(embedding);
  let query = `
 SELECT
@@ -169,7 +169,7 @@ SELECT
  e.chunk_id as "chunkId",
  (1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
  (e.vector <-> '${vectorStr}'::vector) as distance,
- ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank: e.metadata:
+ ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank | e.metadata:
  e.embedding_type as "embeddingType"
 FROM embeddings e
 WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
@@ -200,9 +200,9 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  keyword?: string, options: { limit?: number, vectorWeight?: number, keywordWeight?: number } = {}
  ): Promise<VectorSearchResult[]> {
  try {
- const limit = options.limit || this.maxResults;
- const vectorWeight = options.vectorWeight || 0.7;
- const keywordWeight = options.keywordWeight || 0.3;
+ const limit = options?.limit|| this.maxResults;
+ const vectorWeight = options?.vectorWeight?? 0.7;
+ const keywordWeight = options?.keywordWeight?? 0.3;
 
  if (embedding.length !== this.dimensions) {
  throw new Error(
@@ -218,7 +218,7 @@ SELECT
  ${vectorWeight} * (1 - (e.vector <-> '${vectorStr}'::vector)) +
  ${keywordWeight} * (CASE WHEN e.content ILIKE '%${keyword ? this.escape(keyword) : ''}%' THEN 1.0 ELSE 0.0 END)
  ) as similarity,
- (e.vector <-> '${vectorStr}'::vector) as distance: e.metadata:
+ (e.vector <-> '${vectorStr}'::vector) as distance | e.metadata:
  e.embedding_type as "embeddingType"
 FROM embeddings e
 WHERE 1=1

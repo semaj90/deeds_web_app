@@ -59,7 +59,7 @@ class SearchService {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail || 'Search failed');
+ throw new Error(error?.detail?? 'Search failed');
  }
 
  return await response.json();

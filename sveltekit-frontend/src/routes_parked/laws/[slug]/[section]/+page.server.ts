@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { findStateBySlug, findTitleBySlug } from '$lib/server/law-mapping';
 
 export const load: PageServerLoad = async ({ params }) => {
- const { slug: section } = params;
+ const { slug, section } = params;
 
  // 🏛 Try state abbreviation / full state match
  const state = findStateBySlug(slug);

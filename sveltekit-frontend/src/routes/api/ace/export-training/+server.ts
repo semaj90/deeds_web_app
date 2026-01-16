@@ -9,9 +9,9 @@ import type { RequestHandler } from './$types';
 import { llmLogger } from '$lib/services/llm-logger.js';
 
 export const GET: RequestHandler = async ({ url }) => {
-  const minScore = parseFloat(url.searchParams.get('min_score') || '0.8');
-  const limit = parseInt(url.searchParams.get('limit') || '1000', 10);
-  const format = url.searchParams.get('format') || 'json'; // json or jsonl
+  const minScore = parseFloat(url.searchParams.get('min_score') ?? '0.8');
+  const limit = parseInt(url.searchParams.get('limit') ?? '1000', 10);
+  const format = url.searchParams.get('format') ?? 'json'; // json or jsonl
 
   try {
     const samples = await llmLogger.exportForInstructionTuning(minScore, limit);

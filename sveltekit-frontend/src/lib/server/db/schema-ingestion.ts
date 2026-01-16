@@ -62,7 +62,7 @@ export const ingestedDocuments = pgTable('ingested_documents', {
  // OCR & Processing
  needsOcr: boolean('needs_ocr').default(false).notNull(),
  ocrStatus: processingStatusEnum('ocr_status').default('pending'),
- ocrCompletedAt: timestamp('ocr_completed_at', { withTimezone: true }),
+ ocrCompletedAt: timestamp('ocr_completed_at', { withTimezone, true }),
  ocrMetadata: jsonb('ocr_metadata'),
 
  // Content
@@ -72,12 +72,12 @@ export const ingestedDocuments = pgTable('ingested_documents', {
  // Embeddings
  embeddingStatus: processingStatusEnum('embedding_status').default('pending'),
  embeddingModel: varchar('embedding_model', { length: 100 }),
- embeddingCompletedAt: timestamp('embedding_completed_at', { withTimezone: true }),
+ embeddingCompletedAt: timestamp('embedding_completed_at', { withTimezone, true }),
 
  // Qdrant mirror
  qdrantId: uuid('qdrant_id'),
  qdrantCollection: varchar('qdrant_collection', { length: 100 }).default('legal_documents'),
- lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone: true }),
+ lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone, true }),
 
  // References
  caseId: uuid('case_id'),
@@ -88,9 +88,9 @@ export const ingestedDocuments = pgTable('ingested_documents', {
  processingErrors: jsonb('processing_errors').default([]).$type<string[]>(),
 
  // Timestamps
- processedAt: timestamp('processed_at', { withTimezone: true }),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
- updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ processedAt: timestamp('processed_at', { withTimezone, true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+ updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
 }, (table) => ({
  indexes: [
  index('idx_ingested_docs_content_hash').on(table.contentHash),
@@ -142,7 +142,7 @@ export const documentChunks = pgTable('document_chunks', {
  metadata: jsonb('metadata').default({}).notNull(),
 
  // Timestamps
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 }, (table) => ({
  indexes: [
  index('idx_document_chunks_document_id').on(table.documentId),
@@ -169,8 +169,8 @@ export const embeddingCacheTable = pgTable('embedding_cache_enhanced', {
  model: varchar('model', { length: 100 }).notNull(),
  dimensions: integer('dimensions').notNull().default(384),
  hitCount: integer('hit_count').default(0).notNull(),
- lastUsedAt: timestamp('last_used_at', { withTimezone: true }).defaultNow().notNull(),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ lastUsedAt: timestamp('last_used_at', { withTimezone, true }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 }, (table) => ({
  indexes: [
  index('idx_embedding_cache_text_hash').on(table.textHash),
@@ -190,9 +190,9 @@ export const ocrProcessingQueue = pgTable('ocr_processing_queue', {
  maxAttempts: integer('max_attempts').default(3).notNull(),
  error: text('error'),
  result: jsonb('result'),
- processingStartedAt: timestamp('processing_started_at', { withTimezone: true }),
- processingCompletedAt: timestamp('processing_completed_at', { withTimezone: true }),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ processingStartedAt: timestamp('processing_started_at', { withTimezone, true }),
+ processingCompletedAt: timestamp('processing_completed_at', { withTimezone, true }),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 }, (table) => ({
  indexes: [
  index('idx_ocr_queue_document_id').on(table.documentId),
@@ -220,7 +220,7 @@ export const vectorSearchLogs = pgTable('vector_search_logs', {
  topSimilarity: real('top_similarity'),
  searchDurationMs: integer('search_duration_ms'),
  metadata: jsonb('metadata').default({}).notNull(),
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
 }, (table) => ({
  indexes: [
  index('idx_vector_search_logs_user_id').on(table.userId),
@@ -243,7 +243,7 @@ export const documentSummaries = pgTable('document_summaries', {
  keyPoints: jsonb('key_points').default([]).$type<string[]>(),
  model: varchar('model', { length: 100 }).notNull(),
  confidence: real('confidence'),
- generatedAt: timestamp('generated_at', { withTimezone: true }).defaultNow().not Null(),
+ generatedAt: timestamp('generated_at', { withTimezone, true }).defaultNow().not Null(),
 }, (table) => ({
  indexes: [
  index('idx_document_summaries_document_id').on(table.documentId),

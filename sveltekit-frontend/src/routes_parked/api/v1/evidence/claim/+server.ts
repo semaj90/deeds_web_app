@@ -4,7 +4,7 @@ import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  // Only authenticated users can claim
  const session = locals.session;
  const userId = session?.user?.id;
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  // Reassign evidence rows that were uploaded by the anonId to the authenticated user
  const updated = await db
  .update(evidence)
- .set({ uploadedBy: userId })
+ .set({ uploadedBy, userId })
  .where(eq(evidence.uploadedBy, anonId))
  .returning();
 
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  // non-fatal
  }
 
- return json({ success: true, claimed: (updated && updated.length) || 0 }, { status: 200 });
+ return json({ success: true, claimed: (updated && updated.length) ?? 0 }, { status: 200 });
 };
 
 

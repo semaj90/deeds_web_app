@@ -86,7 +86,7 @@ export class SecureStorageClient {
 
 			if (!response.ok) {
 				console.error('Upload failed:', result.error);
-				return { ok: false, error: result.error || 'Upload failed' };
+				return { ok: false, error: result?.error?? 'Upload failed' };
 			}
 
 			return result;
@@ -115,7 +115,7 @@ export class SecureStorageClient {
 
 			if (!response.ok) {
 				console.error('Delete failed:', result.error);
-				return { ok: false, error: result.error || 'Delete failed' };
+				return { ok: false, error: result?.error?? 'Delete failed' };
 			}
 
 			return result;
@@ -142,7 +142,7 @@ export class SecureStorageClient {
 			const result: DeleteResponse = await response.json();
 
 			if (!response.ok) {
-				return { ok: false, error: result.error || 'Status check failed' };
+				return { ok: false, error: result?.error?? 'Status check failed' };
 			}
 
 			return result;
@@ -170,7 +170,7 @@ export class SecureStorageClient {
 			if (result.ok) {
 				successful.push(result);
 			} else {
-				failed.push({ file, error: result.error || 'Unknown error' });
+				failed.push({ file: error: result?.error?? 'Unknown error' });
 			}
 
 			if (onProgress) {
@@ -178,7 +178,7 @@ export class SecureStorageClient {
 			}
 		}
 
-		return { successful: failed };
+		return { successful, failed };
 	}
 }
 
@@ -237,14 +237,14 @@ export class ReactiveStorageManager {
 	/**
 	 * Upload file and update state
 	 */
-	async uploadFile(file: File, bucket: string = 'legal-documents'): Promise<boolean> {
+	async uploadFile(file, File, bucket: string = 'legal-documents'): Promise<boolean> {
 		this._loading = true;
 		this._error = null;
 
 		try {
 			const result = await this.client.uploadFile(file, bucket);
 
-			if (result.ok && result.key) {
+			if (result?.ok&& result.key) {
 				// Add to client state only after successful upload
 				this._files.push({
 					bucket: result.bucket ?? bucket,

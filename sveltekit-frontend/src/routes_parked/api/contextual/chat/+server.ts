@@ -52,7 +52,7 @@ async function transcribeAudioStub(audioBase64: string): Promise<string | null> 
  }
 }
 
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  const start = Date.now();
 
  try {

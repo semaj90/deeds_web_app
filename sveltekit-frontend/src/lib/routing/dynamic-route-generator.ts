@@ -103,7 +103,7 @@ export class DynamicRouteGenerator {
  private createRouteFromConfig(routeConfig: RouteDefinition): GeneratedRoute {
  const patternKey = this.findMatchingPattern(routeConfig);
  const cfg = patternKey ? this.patterns.get(patternKey) : undefined;
- const path = routeConfig.route || '/';
+ const path = routeConfig?.route?? '/';
  const component = cfg?.component ?? routeConfig.component ?? this.inferComponentPath(path);
  const layout = cfg?.layout ?? routeConfig.layout;
  const params = this.extractParams(path);
@@ -126,7 +126,7 @@ export class DynamicRouteGenerator {
  }
 
  private findMatchingPattern(routeConfig: RouteDefinition): string | null {
- const path = routeConfig.route || '';
+ const path = routeConfig?.route?? '';
  if (path.startsWith('/demo/')) return 'demo';
  if (path.startsWith('/ai/') || routeConfig.category === 'ai') return 'ai';
  if (path.startsWith('/legal/') || routeConfig.category === 'legal') return 'legal';
@@ -136,7 +136,7 @@ export class DynamicRouteGenerator {
  }
 
  private inferComponentPath(routePath: string): string {
- let p = String(routePath || '').replace(/^\//, '');
+ let p = String(routePath ?? '').replace(/^\//, '');
  if (!p) return 'routes/+page.svelte';
  p = p.replace(/\/+$/g, ''); // normalize trailing slash
  return `routes/${p}/+page.svelte`;

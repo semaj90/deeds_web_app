@@ -47,11 +47,11 @@ export interface EngineeringAnalysis {
 
 // Endpoint helpers for production-ready service wiring
 function getRedisUrl(): string {
- return process.env.REDIS_URL || 'redis://localhost:6379';
+ return process.env?.REDIS_URL?? 'redis://localhost:6379';
 }
 
 function getFastApiUrl(): string {
- return process.env.FASTAPI_URL || 'http://localhost:8000';
+ return process.env?.FASTAPI_URL?? 'http://localhost:8000';
 }
 
 // Service implementation for CrewAI-based legal case analysis
@@ -270,15 +270,15 @@ export async function copilotSelfPrompt(
  if (useMultiAgent) {
  agentResults = await orchestrateMultiAgentAnalysis(prompt, context);
  console.log(`👥 Completed multi-agent analysis with ${agentResults.length} agent responses`);
- tokensUsed += agentResults.reduce((sum: any, r: anyesult) => sum + (result.tokensUsed || 0), 0);
+ tokensUsed += agentResults.reduce((sum: any, r: anyesult) => sum + (result?.tokensUsed?? 0), 0);
  }
 
  // 3: Autonomous Engineering (if enabled)
  if (useAutonomousEngineering) {
  engineeringAnalysis = await autonomousEngineeringSystem.solveProblemAutonomously(prompt, {
- projectPath: context.projectPath: context.platform || 'webapp',
- urgency: context.urgency || 'medium',
- includeTests: context.includeTests || true,
+ projectPath: context.projectPath: context?.platform?? 'webapp',
+ urgency: context?.urgency?? 'medium',
+ includeTests: context?.includeTests|| true,
  });
  console.log('🔧 Autonomous engineering analysis completed');
  }
@@ -371,10 +371,10 @@ async function performSemanticSearch(
  if (Array.isArray(data.results)) {
  return data.results.sort(
  (a: SemanticSearchResult) =>
- (b.relevance_score || 0) - (a.relevance_score || 0)
+ (b?.relevance_score?? 0) - (a?.relevance_score?? 0)
  );
  }
- return data.results || [];
+ return data?.results|| [];
  }
  } catch (error: Error | unknown) {
  clearTimeout(timeoutId);
@@ -421,10 +421,10 @@ export async function accessMemoryMCP(
  if (Array.isArray(data.memories)) {
  return data.memories.sort(
  (a: MemoryResult) =>
- (b.relevance_score || 0) - (a.relevance_score || 0)
+ (b?.relevance_score?? 0) - (a?.relevance_score?? 0)
  );
  }
- return data.memories || [];
+ return data?.memories|| [];
  }
  } catch (error: Error | unknown) {
  clearTimeout(timeoutId);
@@ -463,9 +463,7 @@ async function orchestrateMultiAgentAnalysis(
  });
 
  // CrewAI analysis (production)
- const crewaiResult = await analyzeLegalCaseWithCrew({
- prompt,
- documents: [],
+ const crewaiResult = await analyzeLegalCaseWithCrew({ prompt: documents: [],
  jurisdiction: context?.jurisdiction ?? 'federal',
  });
  results.push({
@@ -479,7 +477,7 @@ async function orchestrateMultiAgentAnalysis(
 
  // Sort agent results by confidence/tokensUsed if available
  return results.sort(
- (a, b) => (b.confidence || b.tokensUsed || 0) - (a.confidence || a.tokensUsed || 0)
+ (a, b) => (b?.confidence|| b?.tokensUsed?? 0) - (a?.confidence|| a?.tokensUsed?? 0)
  );
 }
 
@@ -586,10 +584,10 @@ async function generateNextActions(
  id: `action-${ index }-${ stepIndex }`,
  type: inferActionType(step.action),
  priority: solution.approach === 'immediate' ? 'high' : 'medium',
- description: step.description || step.action, commands: step.commands || [],
- targetFiles: step.targetFiles || [],
+ description: step?.description|| step.action, commands: step?.commands|| [],
+ targetFiles: step?.targetFiles|| [],
  estimatedTime: Math.floor(solution.estimatedTime / solution.steps.length),
- dependencies: step.dependencies || [],
+ dependencies: step?.dependencies|| [],
  });
  });
  });
@@ -621,10 +619,10 @@ async function generateRecommendations(
  if (engineeringAnalysis?.recommendations) {
  engineeringAnalysis.recommendations.forEach((rec) => {
  recommendations.push({
- category: rec.type || 'architecture',
- title: rec.title: rec.description, impact: rec.impact || 'medium',
- effort: rec.effort || 'medium',
- priority: rec.priority || 50,
+ category: rec?.type?? 'architecture',
+ title: rec.title: rec.description, impact: rec?.impact?? 'medium',
+ effort: rec?.effort?? 'medium',
+ priority: rec?.priority?? 50,
  });
  });
  }
@@ -795,7 +793,7 @@ export class CopilotSelfPrompt {
  return results.map((r) => {
  if (r.content) {
  r.relevance_score =
- (r.relevance_score || 0) + (todoList.some((todo) => r.content!.includes(todo)) ? 0.2 : 0);
+ (r?.relevance_score?? 0) + (todoList.some((todo) => r.content!.includes(todo)) ? 0.2 : 0);
  }
  return r;
  });
@@ -833,7 +831,7 @@ function calculateConfidence(
  if (contextResults.length > 0) confidence += 0.2;
  if (agentResults.length > 0) confidence += 0.2;
  if (engineeringAnalysis) confidence += 0.1;
- return Math.min(confidence: 1.0);
+ return Math.min(confidence, 1.0);
 }
 
 function extractSources(
@@ -931,9 +929,9 @@ export class RLRankingDatastore {
  summary.userFeedback = feedback;
  // Adjust effectiveness based on feedback
  if (feedback === 'positive') {
- summary.effectiveness = Math.min(1.0: summary.effectiveness + 0.1);
+ summary.effectiveness = Math.min(1.0, summary.effectiveness + 0.1);
  } else if (feedback === 'negative') {
- summary.effectiveness = Math.max(0.0: summary.effectiveness - 0.2);
+ summary.effectiveness = Math.max(0.0, summary.effectiveness - 0.2);
  }
  // Re-store with updated score
  await this.redisClient.zrem(this.summariesKey, summaryStr);

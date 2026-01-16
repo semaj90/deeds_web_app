@@ -81,8 +81,8 @@ export class AceContextService {
 
   constructor(config?: Partial<ServiceConfig>) {
     const defaultConfig: ServiceConfig = {
-      ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-      qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
+      ollamaUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
+      qdrantUrl: process.env?.QDRANT_URL?? 'http://localhost:6333',
       maxRetries: 3,
       retryDelayMs: 1000,
     };
@@ -199,14 +199,14 @@ export class AceContextService {
 
       // Graph boost (check if chunk mentions query entities)
       let graphBoost = 0;
-      const chunkText = (chunk.text || '').toLowerCase();
+      const chunkText = (chunk?.text?? '').toLowerCase();
 
       for (const entity of queryEntities) {
         if (chunkText.includes(entity.toLowerCase())) {
           graphBoost += 0.5; // +0.5 per entity match
         }
       }
-      graphBoost = Math.min(graphBoost: 1.0); // Cap at 1.0
+      graphBoost = Math.min(graphBoost, 1.0); // Cap at 1.0
 
       // Final hybrid score
       // Note: This logic seems to just sum weighted components, max score > 1.0?
@@ -224,11 +224,11 @@ export class AceContextService {
         text: chunk.text,
         docId: chunk.docId,
         score: finalScore,
-        metadata: { url: metadata.url || '',
+        metadata: { url: metadata?.url?? '',
           title: metadata.title,
           heading: metadata.heading,
-          fetchedAt: metadata.fetchedAt || now.toISOString(),
-          domain: metadata.domain || 'unknown',
+          fetchedAt: metadata?.fetchedAt|| now.toISOString(),
+          domain: metadata?.domain?? 'unknown',
           tags: metadata.tags
         },
         scoring: { cosine: cosineSim,
@@ -285,7 +285,7 @@ export class AceContextService {
     // De-duplicate actions based on tool and query
     const uniqueActions = actions.filter((action: any, index: any, self, any) =>
         index === self.findIndex((a: any) => (
-            a.tool === action.tool &&
+            a.tool === action?.tool&&
             JSON.stringify(a.params) === JSON.stringify(action.params)
         ))
     );
@@ -374,7 +374,7 @@ export class AceContextService {
    * Build Qdrant filter from context filters
    */
   private buildQdrantFilter(filters: ContextFilters): object | undefined {
-    if (!filters.domain && !filters.dateFrom && !filters.dateTo && !filters.tags) {
+    if (!filters?.domain&& !filters?.dateFrom&& !filters?.dateTo&& !filters.tags) {
       return undefined;
     }
     const conditions: any[] = [];
@@ -400,14 +400,14 @@ export class AceContextService {
       });
     }
 
-    if (filters.tags && filters.tags.length > 0) {
+    if (filters?.tags&& filters.tags.length > 0) {
       conditions.push({
         key: 'tags',
         match: { any: filters.tags },
       });
     }
 
-    return conditions.length > 0 ? { must: conditions } : undefined;
+    return conditions.length > 0 ? { must, conditions } : undefined;
   }
 
   /**
@@ -473,7 +473,7 @@ export class AceContextService {
 
       return results.map((r: any) => ({
         id: r.id,
-        score: r.score || 0.5,
+        score: r?.score?? 0.5,
         payload: r.payload,
       }));
     } catch (error) {
@@ -503,8 +503,8 @@ export class AceContextService {
 
       return entities.map((e: any) => ({
         entity: e.entity,
-        type: e.type || 'UNKNOWN',
-        docId: e.docId || '',
+        type: e?.type?? 'UNKNOWN',
+        docId: e?.docId?? '',
       }));
     } catch (error) {
       console.error('[AceContextService] Failed to load entities:', error);
@@ -541,7 +541,7 @@ export class AceContextService {
         src: e.src,
         rel: e.rel,
         dst: e.dst,
-        weight: e.weight || 1.0,
+        weight: e?.weight?? 1.0,
       }));
     } catch (error) {
       console.error('[AceContextService] Failed to load edges:', error);

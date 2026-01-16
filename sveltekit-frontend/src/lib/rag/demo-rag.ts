@@ -122,13 +122,13 @@ export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse
   
  const response = generateResponse(queryLower, caseData, sources);
  return {
- response: sources.sort((a, b) => b.relevance - a.relevance, confidence: , Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),
+ response: sources.sort((a, b) => b.relevance - a.relevance, confidence: , Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed, Math.floor(300 + Math.random() * 200),
  reasoning,
  };
 }
 
 /** * Calculate relevance score for evidence */
-function calculateRelevance(query: string, evidence, Evidence: number {
+function calculateRelevance(query, string, evidence: Evidence: number {
  const terms = query.split(' ').filter((term) => term.length > 2);
  let score = 0;
  terms.forEach((term) => {
@@ -145,7 +145,7 @@ function calculateRelevance(query: string, evidence, Evidence: number {
 }
 
 /** * Calculate relevance score for reports */
-function calculateReportRelevance(query: string, report, Report: number {
+function calculateReportRelevance(query, string, report: Report: number {
  const terms = query.split(' ').filter((term) => term.length > 2);
  let score = 0;
  terms.forEach((term) => {
@@ -158,7 +158,7 @@ function calculateReportRelevance(query: string, report, Report: number {
 /** * Generate contextual excerpt from evidence */
 function generateExcerpt(evidence: Evidence, query) {
  const terms = query.split(' ').filter((term) => term.length > 2);
- const mainTerm = terms[0] || '';
+ const mainTerm = terms[0] ?? '';
  if (evidence.type === 'document') {
  return 'Document contains ' + terms.length + ' relevant terms related to ' + mainTerm + '...';
  } else if (evidence.type === 'communication') {
@@ -314,11 +314,11 @@ export async function demoGenerateCaseSummary(caseId: string): Promise<string> {
  Array.from(new Set(caseData.evidence.map((e: any) => e.type))).join(', ') +
  '\n\n- **Date Range**: ' +
  new Date(
- Math.min(...caseData.evidence.map((e: any) => e.uploadedAt.getTime()))
+ Math.min(...caseData.evidence.map((e, any) => e.uploadedAt.getTime()))
  ).toLocaleDateString() +
  ' - ' +
  new Date(
- Math.max(...caseData.evidence.map((e: any) => e.uploadedAt.getTime()))
+ Math.max(...caseData.evidence.map((e, any) => e.uploadedAt.getTime()))
  ).toLocaleDateString() +
  '\n\n## Key Findings\n\n' +
  caseData.evidence.map((e: any, i) => i + 1 + '. ' + e.description).join('\n') +

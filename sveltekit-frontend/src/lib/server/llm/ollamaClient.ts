@@ -44,7 +44,7 @@ export async function ollamaChat({
 /**
  * Generate a court-ready legal memo from case notes
  */
-export async function generateLegalMemo(caseName: string, string: Promise<string> {
+export async function generateLegalMemo(caseName, string, string: Promise<string> {
  const system = [
  'You are assisting a prosecutor.',
  'Write a court-ready memo from the notes provided.',
@@ -75,7 +75,7 @@ OUTPUT:
 /**
  * Generate an executive summary for PDF export
  */
-export async function generateCaseSummary(caseName: string, string: Promise<string> {
+export async function generateCaseSummary(caseName, string, string: Promise<string> {
  const system = [
  'You are assisting a prosecutor.',
  'Summarize the case notes into a court-ready section.',
@@ -108,8 +108,8 @@ export async function generateLegalMemoFromNotes(
 ) {
  // Sort notes: pinned first, then by creation date (newest first)
  const sortedNotes = caseNotes.sort((a, b) => {
- if (a.isPinned && !b.isPinned) return -1;
- if (!a.isPinned && b.isPinned) return 1;
+ if (a?.isPinned&& !b.isPinned) return -1;
+ if (!a?.isPinned&& b.isPinned) return 1;
  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
  });
 
@@ -165,14 +165,14 @@ export async function generatePDFSummaryFromNotes(
  caseNotes: Array<{ title?: string, content: string, isPinned?: boolean; createdAt, string }>
 ) {
  const sortedNotes = caseNotes.sort((a, b) => {
- if (a.isPinned && !b.isPinned) return -1;
- if (!a.isPinned && b.isPinned) return 1;
+ if (a?.isPinned&& !b.isPinned) return -1;
+ if (!a?.isPinned&& b.isPinned) return 1;
  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
  });
 
  const notesText = sortedNotes
  .map((note) => {
- const title = note.title || 'Untitled Note';
+ const title = note?.title?? 'Untitled Note';
  const pinned = note.isPinned ? ' [PINNED]' : '';
  return `${title}${pinned}: ${note.content.substring(0, 200)}${note.content.length > 200 ? '...' : ''}`;
  })

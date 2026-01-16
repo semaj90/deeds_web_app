@@ -94,7 +94,7 @@ export class EnhancedSentenceSplitter {
  private customAbbrevs: Set<string>;
  constructor(options: SplitterOptions = {}) {
  this.options = options;
- this.customAbbrevs = new Set(options.customAbbreviations || []);
+ this.customAbbrevs = new Set(options?.customAbbreviations|| []);
  }
  addAbbreviations(abbrevs: string[]) {
  for (const a of abbrevs) this.customAbbrevs.add(a);

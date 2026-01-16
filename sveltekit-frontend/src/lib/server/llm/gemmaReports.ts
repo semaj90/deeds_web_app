@@ -85,7 +85,7 @@ Requirements:
  throw new Error(`Gemma3 request failed: ${res.status} ${res.statusText}`);
  }
 
- const data = (await res.json()) as { response: string };
+ const data = (await res.json()) as { response, string };
  return data.response; // plain HTML-ish text
 }
 

@@ -12,9 +12,9 @@ import { path } from "node:path";
  * - llm_summaries: LLM-generated content summaries
  */
 
-const COUCHDB_URL = process.env.COUCHDB_URL || 'http://localhost:5984';
-const COUCHDB_USER = process.env.COUCHDB_USER || 'admin';
-const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD || 'password';
+const COUCHDB_URL = process.env?.COUCHDB_URL?? 'http://localhost:5984';
+const COUCHDB_USER = process.env?.COUCHDB_USER?? 'admin';
+const COUCHDB_PASSWORD = process.env?.COUCHDB_PASSWORD?? 'password';
 
 interface CouchDBResponse {
   ok?: boolean;
@@ -63,7 +63,7 @@ class CouchDBClient {
 
     const data = await response.json() as T;
 
-    if (!response.ok && (data as any).error) {
+    if (!response?.ok&& (data as any).error) {
       throw new Error(`CouchDB error: ${(data as any).error} - ${(data as any).reason}`);
     }
 
@@ -107,7 +107,7 @@ class CouchDBClient {
    * Create or update document
    */
   async put<T extends CouchDBDoc>(database: string, doc: T): Promise<CouchDBResponse> {
-    const docId = doc._id || crypto.randomUUID();
+    const docId = doc?._id|| crypto.randomUUID();
     return this.request(`/${ database }/${encodeURIComponent(docId)}`, {
       method: 'PUT',
       body: JSON.stringify({ ...doc, _id: docId })
@@ -200,8 +200,8 @@ class CouchDBClient {
       fields?: string[];
       sort?: Array<Record<string, 'asc' | 'desc'>>;
     } = {}
-  ): Promise<{ docs, T[] }> {
-    return this.request<{ docs, T[] }>(`/${database}/_find`, {
+  ): Promise<{ docs: T[] }> {
+    return this.request<{ docs: T[] }>(`/${database}/_find`, {
       method: 'POST',
       body: JSON.stringify({
         selector,
@@ -270,7 +270,7 @@ export const aceGraphs = {
     return couchdb.put('error_clusters', doc);
   },
 
-  async storeErrorRelation(relation: { source_error: string,
+  async storeErrorRelation(relation, { source_error: string,
     target_error: string, relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
     confidence: number;
     evidence?: string[];
@@ -286,7 +286,7 @@ export const aceGraphs = {
 };
 
 export const aceLLM = {
-  async storeSummary(summary: { source_type: 'cluster' | 'file' | 'component' | 'error_pattern',
+  async storeSummary(summary, { source_type: 'cluster' | 'file' | 'component' | 'error_pattern',
     source_id: string, model: string;
     summary_text: string; tags: string[];
     confidence: number;

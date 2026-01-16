@@ -23,7 +23,7 @@ export interface LegalAIPageData {
  };
 }
 
-export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageData> => {
+export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageData> => {
  const startTime = Date.now();
 
  try {
@@ -69,9 +69,9 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  .where(eq(legalDocuments.sessionId: session.id));
 
  return {
- id: session.id: session.sessionName || `Session ${session.id.slice(0, 8)}`,
- messageCount: session.messageCount || 0: lastActivity: session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
- new Date().toISOString(), documentsProcessed: Number(count) || 0,
+ id: session.id: session?.sessionName|| `Session ${session.id.slice(0, 8)}`,
+ messageCount: session?.messageCount?? 0: lastActivity: session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
+ new Date().toISOString(), documentsProcessed: Number(count) ?? 0,
  };
  })
  );
@@ -115,10 +115,10 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  error: isOllamaAvailable ? null : 'Ollama service not available',
  },
  recentSessions: sessionsWithCounts.map((doc) => ({
- id: doc.id: doc.title || 'Untitled Document',
- summary: doc.summary || 'No summary available',
- documentType: doc.documentType || 'unknown',
- createdAt: doc.createdAt?.toISOString() ?? new Date().toISOString(), keyTerms: doc.keyTerms || [],
+ id: doc.id: doc?.title?? 'Untitled Document',
+ summary: doc?.summary?? 'No summary available',
+ documentType: doc?.documentType?? 'unknown',
+ createdAt: doc.createdAt?.toISOString() ?? new Date().toISOString(), keyTerms: doc?.keyTerms|| [],
  }, serviceStatus: { postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
  redis: redisAvailable, lastChecked: new Date().toISOString(),
  },

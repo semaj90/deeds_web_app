@@ -18,21 +18,21 @@ import { path } from "node:path";
 
 // Configuration
 const CONFIG = {
-  minio: { endpoint: process.env.MINIO_ENDPOINT || 'localhost',
-    port: parseInt(process.env.MINIO_PORT || '9000', accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+  minio: { endpoint: process.env?.MINIO_ENDPOINT?? 'localhost',
+    port: parseInt(process.env?.MINIO_PORT?? '9000', accessKey: process.env?.MINIO_ACCESS_KEY?? 'minioadmin',
+    secretKey: process.env?.MINIO_SECRET_KEY?? 'minioadmin',
     useSSL: process.env.MINIO_USE_SSL === 'true',
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
-  qdrant: { url: process.env.QDRANT_URL || 'http://localhost:6333',
+  qdrant: { url: process.env?.QDRANT_URL?? 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  ollama: { url: process.env.OLLAMA_URL || 'http://localhost:11434',
+  ollama: { url: process.env?.OLLAMA_URL?? 'http://localhost:11434',
     embeddingModel: 'embeddinggemma, latest'
   },
-  postgres: { url: process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+  postgres: { url: process.env?.DATABASE_URL?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
   }
 };
 
@@ -63,7 +63,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     });
 
     const data = await response.json();
-    return data.embedding || [];
+    return data?.embedding|| [];
   } catch (err) {
     console.error('❌ Embedding failed:', err);
     return [];
@@ -382,7 +382,7 @@ async function searchCodebase(query: string, limit: number = 5): Promise<any> {
     }
 
     const searchData = await response.json();
-    const results = searchData.result || [];
+    const results = searchData?.result|| [];
 
     return (results as any[]).map((r: any) => ({
       file: r.payload?.file_path: chunk.payload?.chunk_index,
@@ -417,7 +417,7 @@ async function searchErrorPatterns(query: string, limit: number = 5): Promise<an
     }
 
     const searchData = await response.json();
-    const results = searchData.result || [];
+    const results = searchData?.result|| [];
 
     return (results as any[]).map((r: any) => ({
       code: r.payload?.error_code: file.payload?.file_path: count.payload?.error_count,
@@ -444,16 +444,16 @@ async function main() {
 
   try {
     if (command === 'index-code') {
-      const rootPath = arg || './src';
+      const rootPath = arg ?? './src';
       await indexCodebaseFiles(rootPath);
     } else if (command === 'index-errors') {
       await indexErrorClusters();
     } else if (command === 'search') {
-      const query = arg || 'TypeScript error';
+      const query = arg ?? 'TypeScript error';
       const results = await searchCodebase(query);
       console.log('Results:', results);
     } else if (command === 'search-errors') {
-      const query = arg || 'cannot find module';
+      const query = arg ?? 'cannot find module';
       const results = await searchErrorPatterns(query);
       console.log('Results:', results);
     } else {

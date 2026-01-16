@@ -7,7 +7,7 @@
 import { createClient } from 'redis';
 import type { RequestHandler } from './$types';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = process.env?.REDIS_URL?? 'redis://localhost:6379';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const chatId = params.id;
@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		return new Response('Chat ID required', { status: 400 });
 	}
 
-	const redisSubscriber = createClient({ url: REDIS_URL });
+	const redisSubscriber = createClient({ url, REDIS_URL });
 	await redisSubscriber.connect();
 
 	console.log(`📡 SSE connection established for chat:${chatId}`);

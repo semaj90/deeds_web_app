@@ -98,7 +98,7 @@ export async function listEvidence(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch evidence');
+ throw new Error(error?.message?? 'Failed to fetch evidence');
  }
 
  const data: EvidenceListResponse = await response.json();
@@ -120,7 +120,7 @@ export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch evidence');
+ throw new Error(error?.message?? 'Failed to fetch evidence');
  }
 
  const evidence: Evidence = await response.json();
@@ -143,7 +143,7 @@ export async function createEvidence(evidenceData: CreateEvidenceData): Promise<
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to create evidence');
+ throw new Error(error?.message?? 'Failed to create evidence');
  }
 
  const newEvidence: Evidence = await response.json();
@@ -168,7 +168,7 @@ export async function updateEvidence(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to update evidence');
+ throw new Error(error?.message?? 'Failed to update evidence');
  }
 
  const updatedEvidence: Evidence = await response.json();
@@ -190,7 +190,7 @@ export async function deleteEvidence(evidenceId: string): Promise<void> {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to delete evidence');
+ throw new Error(error?.message?? 'Failed to delete evidence');
  }
 
  // TODO: Add audit logging for evidence deletion (critical for legal compliance)
@@ -214,7 +214,7 @@ export async function addChainOfCustodyEntry(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to add chain of custody entry');
+ throw new Error(error?.message?? 'Failed to add chain of custody entry');
  }
 
  const newEntry: ChainOfCustodyEntry = await response.json();
@@ -236,7 +236,7 @@ export async function getChainOfCustody(evidenceId: string): Promise<ChainOfCust
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch chain of custody');
+ throw new Error(error?.message?? 'Failed to fetch chain of custody');
  }
 
  const chainOfCustody: ChainOfCustodyEntry[] = await response.json();
@@ -260,7 +260,7 @@ export async function requestEvidenceAnalysis(evidenceId: string): Promise<any> 
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to request analysis');
+ throw new Error(error?.message?? 'Failed to request analysis');
  }
 
  const result = await response.json();
@@ -286,7 +286,7 @@ export async function getEvidenceAnalysis(evidenceId: string): Promise<EvidenceA
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to fetch analysis');
+ throw new Error(error?.message?? 'Failed to fetch analysis');
  }
 
  const analysis: EvidenceAnalysis = await response.json();
@@ -321,7 +321,7 @@ export async function verifyEvidenceAuthenticity(evidenceId: string): Promise<an
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.message || 'Failed to verify evidence');
+ throw new Error(error?.message?? 'Failed to verify evidence');
  }
 
  const verification = await response.json();
@@ -347,7 +347,7 @@ export async function uploadEvidenceAttachment(
 
  return new Promise((resolve, reject) => {
  xhr.upload.onprogress = (event) => {
- if (event.lengthComputable && progressCallback) {
+ if (event?.lengthComputable&& progressCallback) {
  const progress = (event.loaded / event.total) * 100;
  progressCallback(progress);
  }
@@ -360,7 +360,7 @@ export async function uploadEvidenceAttachment(
  resolve(attachment);
  } else {
  const error = JSON.parse(xhr.responseText);
- reject(new Error(error.message || 'Upload failed'));
+ reject(new Error(error?.message?? 'Upload failed'));
  }
  };
 

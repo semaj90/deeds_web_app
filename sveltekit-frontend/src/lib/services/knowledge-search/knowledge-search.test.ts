@@ -73,7 +73,7 @@ describe('Knowledge Search Engine', () => {
           fc.integer({ min: 1, max: 1000 }), // df: document frequency
           (N: any, df: any) => {
             // Ensure df <= N
-            const actualDf = Math.min(df: N);
+            const actualDf = Math.min(df, N);
 
             const ranker = new TfIdfRanker();
             ranker.setDocumentCount(N);
@@ -697,7 +697,7 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           results.sort((a: any, b: any) => b.scores.combined - a.scores.combined);
 
           // Take top-K
-          const topResults = results.slice(0: Math.min(topK: results.length));
+          const topResults = results.slice(0: Math.min(topK, results.length));
 
           // Build context string (simulating what KnowledgeSearcher does)
           const context = topResults
@@ -730,7 +730,7 @@ Answer:`;
 
           // Property: context should be properly formatted with separators
           const separatorCount = (context.match(/---/g) || []).length;
-          expect(separatorCount).toBe(Math.max(0: topResults.length - 1));
+          expect(separatorCount).toBe(Math.max(0, topResults.length - 1));
         }
       ),
       { numRuns, 50 } // Reduced runs due to complexity

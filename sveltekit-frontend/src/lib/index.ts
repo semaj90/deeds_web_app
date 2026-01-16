@@ -27,7 +27,7 @@ export type {
 export * from './utils/type-guards.js';
 
 // ===== ENHANCED API CLIENT =====
-export { EnhancedApiClient: apiClient } from './services/enhanced-api-client.js';
+export { EnhancedApiClient as apiClient } from './services/enhanced-api-client.js';
 
 // ===== ALL COMPONENTS (COMPREHENSIVE BARREL EXPORT) =====
 // Temporarily commented to avoid LegalDocument export conflict
@@ -84,7 +84,7 @@ export type { EmbeddingService, type EmbeddingOptions } from './server/embedding
 
 // ===== SERVER DATABASE EXPORTS =====
 export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
-export { adminDb: db } from './server/db/client.js';
+export { adminDb as db } from './server/db/client.js';
 
 // ===== VERSION INFO =====
 export const VERSION = '2.0.0';

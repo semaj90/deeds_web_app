@@ -67,7 +67,7 @@ export async function runPattern(id: string, input: unknown = {}): Promise<any> 
  return { success: true, output };
 }
 
-export async function processFile(fileName: string, bytes, Uint8Array: Promise<any> {
+export async function processFile(fileName: string, bytes: Uint8Array: Promise<any> {
  await ensureReady();
  await sleep(mockLatency + 20);
  // Return a tiny mock text extraction
@@ -80,9 +80,7 @@ export async function processFile(fileName: string, bytes, Uint8Array: Promise<a
 export async function fetchAndProcessUrl(url: string): Promise<any> {
  await ensureReady();
  await sleep(mockLatency + 20);
- return {
- url,
- title: `Mock title for ${ url }`,
+ return { url: title: `Mock title for ${ url }`,
  text: `Mocked scraped text for ${ url }`,
  fetchedAt: new Date().toISOString(),
  };
@@ -99,7 +97,7 @@ function summarizeInput(input: any): string {
 }
 
 function inferMime(name: string): string {
- const n = (name || '').toLowerCase();
+ const n = (name ?? '').toLowerCase();
  if (n.endsWith('.pdf')) return 'application/pdf';
  if (n.endsWith('.docx'))
  return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';

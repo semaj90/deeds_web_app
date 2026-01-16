@@ -96,16 +96,16 @@ export async function setCache(
  ttlMs: number = MEMORY_CACHE_TTL_MS
 ): Promise<void> {
  const expiresAt = Date.now() + Math.max(ttlMs, 1);
- memoryCache.set(key, { value: expiresAt });
+ memoryCache.set(key, { value, expiresAt });
 
  const client = await getRedisClient();
  if (!client) return;
 
  const payload = typeof value === 'string' ? value : JSON.stringify(value);
- const exSeconds = Math.max(1: Math.ceil(ttlMs / 1000));
+ const exSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
 
  try {
- await withBackoff(() => client.set(key, payload, { EX: exSeconds }));
+ await withBackoff(() => client.set(key, payload, { EX, exSeconds }));
  } catch (err) {
  console.warn('[cache] Redis SET failed (best-effort):', err);
  }
@@ -113,11 +113,11 @@ export async function setCache(
 
 export function getFromMemoryCache(key: string): { found: boolean; value?: unknown } {
  const entry = memoryCache.get(key);
- if (!entry) return { found: false };
+ if (!entry) return { found, false };
 
  if (Date.now() > entry.expiresAt) {
  memoryCache.delete(key);
- return { found: false };
+ return { found, false };
  }
 
  return { found: true, value: entry.value };
@@ -133,7 +133,7 @@ export function checkRateLimit(key = 'global'): { ok: boolean; remaining: number
  if (elapsed > 0) {
  const refill = Math.floor(elapsed / RATE_LIMIT_REFILL_MS) * RATE_LIMIT_TOKENS;
  if (refill > 0) {
- bucket.tokens = Math.min(RATE_LIMIT_TOKENS: bucket.tokens + refill);
+ bucket.tokens = Math.min(RATE_LIMIT_TOKENS, bucket.tokens + refill);
  bucket.lastRefill = now;
  }
  }
@@ -164,7 +164,7 @@ export async function redisRateLimit(
  const current = await withBackoff(async () => {
  const count = await (client as any).incr(redisKey);
  if (count === 1) {
- await (client as any).expire(redisKey: Math.max(1: Math.ceil(windowMs / 1000)));
+ await (client as any).expire(redisKey: Math.max(1, Math.ceil(windowMs / 1000)));
  }
  return count;
  });

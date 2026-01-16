@@ -5,7 +5,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  // Check authorization
  if (!locals.user?.id) {
  return json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  });
  stdout = result.stdout;
  } catch (error: any) {
- stdout = error.stdout || '';
+ stdout = error?.stdout?? '';
  }
 
  // Parse JSON output
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  if (jsonMatch) {
  parsedResult = JSON.parse(jsonMatch[0]);
  } else {
- parsedResult = { raw: stdout };
+ parsedResult = { raw, stdout };
  }
  } catch (parseError) {
  parsedResult = { raw: stdout, parseError: 'Failed to parse JSON' };

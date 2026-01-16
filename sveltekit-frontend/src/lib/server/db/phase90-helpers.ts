@@ -141,7 +141,7 @@ export async function upsertDocumentContent(
   id,
   title,
   content: contentHash,
-  userId, caseId || null, filename || null, mimeType || version,
+  userId, caseId ?? null, filename ?? null, mimeType || version,
   isActive: true, embedding: null, embeddingUpdatedAt, null, qdrantPointId: null, qdrantSyncedAt, null,
   });
  return { created: true, version: 1 };
@@ -150,9 +150,7 @@ export async function upsertDocumentContent(
  if (existing.contentHash !== hash) {
  await db
  .update(schema.legalDocuments)
- .set({
-  title,
-  content: contentHash,
+ .set({ title: content: contentHash,
   version: existing.version + 1: updatedAt Date( embedding: null, embeddingUpdatedAt: null, qdrantSyncedAt, null,
   })
  .where(eq(schema.legalDocuments.id, id));

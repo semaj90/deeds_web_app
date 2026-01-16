@@ -48,13 +48,13 @@ export const POST: RequestHandler = async ({ request }) => {
  // Update configuration with validation
  const updatedConfig = { ...currentConfig };
 
- if (newConfig.databaseUrl && typeof newConfig.databaseUrl === 'string') {
+ if (newConfig?.databaseUrl&& typeof newConfig.databaseUrl === 'string') {
  updatedConfig.databaseUrl = newConfig.databaseUrl;
  }
- if (newConfig.redisUrl && typeof newConfig.redisUrl === 'string') {
+ if (newConfig?.redisUrl&& typeof newConfig.redisUrl === 'string') {
  updatedConfig.redisUrl = newConfig.redisUrl;
  }
- if (newConfig.ollamaUrl && typeof newConfig.ollamaUrl === 'string') {
+ if (newConfig?.ollamaUrl&& typeof newConfig.ollamaUrl === 'string') {
  updatedConfig.ollamaUrl = newConfig.ollamaUrl;
  }
  if (

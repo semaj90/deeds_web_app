@@ -126,7 +126,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const shaderModule = this.device.createShaderModule({
- code: this.generateShaderCode(label: 'text-tile-shaders',
+ code: this.generateShaderCode(label, 'text-tile-shaders',
  });
  this.renderPipeline = this.device.createRenderPipeline({
  vertex: { module: shaderModule,
@@ -157,7 +157,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const computeModule = this.device.createShaderModule({
- code: this.generateComputeShaderCode(label: 'text-tile-compute',
+ code: this.generateComputeShaderCode(label, 'text-tile-compute',
  });
  this.computePipeline = this.device.createComputePipeline({
  compute: { module: computeModule, entryPoint: 'cs_main' },
@@ -339,7 +339,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  this.device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
 
  // Process tiles in batches for optimal GPU utilization
- const batchSize = Math.min(this.config.maxConcurrentTiles: compressedTiles.length);
+ const batchSize = Math.min(this.config.maxConcurrentTiles, compressedTiles.length);
  for (let i = 0; i < compressedTiles.length; i += batchSize) {
  const batch = compressedTiles.slice(i, i + batchSize);
 

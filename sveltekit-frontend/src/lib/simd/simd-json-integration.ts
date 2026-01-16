@@ -149,7 +149,7 @@ export function benchmarkJSONParsing(sampleSizeKB = 100, iterations = 1000) {
     items: Array.from({ length: Math.floor((sampleSizeKB * 1024) / 100) }, (_, i) => ({
       id: i,
       name: `Item ${i}`,
-      value: Math.random(tags: ['tag1', 'tag2', 'tag3'],
+      value: Math.random(tags, ['tag1', 'tag2', 'tag3'],
       metadata: { created: new Date().toISOString(), active: true }
     }))
   };

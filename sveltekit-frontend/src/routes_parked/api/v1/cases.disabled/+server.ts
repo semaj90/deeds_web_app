@@ -26,10 +26,10 @@ const CasesQuerySchema = z.object({
  * GET /api/v1/cases
  * List user's cases with pagination and filtering
  */
-export const GET: RequestHandler = async ({ request: locals }) => {
+export const GET: RequestHandler = async ({ request, locals }) => {
  try {
  // Check authentication
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  return error(401, makeHttpErrorPayload({ message: 'Authentication required', code: 'AUTH_REQUIRED' }));
  }
 
@@ -90,10 +90,10 @@ export const GET: RequestHandler = async ({ request: locals }) => {
  * POST /api/v1/cases
  * Create a new case
  */
-export const POST: RequestHandler = async ({ request: locals }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
  try {
  // Check authentication
- if (!locals.session || !locals.user) {
+ if (!locals?.session|| !locals.user) {
  return error(401, makeHttpErrorPayload({ message: 'Authentication required', code: 'AUTH_REQUIRED' }));
  }
 

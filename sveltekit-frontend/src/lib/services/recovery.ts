@@ -85,7 +85,7 @@ export class RecoveryStrategy {
  await this.delay(delay);
 
  // Calculate next delay with exponential backoff
- delay = Math.min(delay * finalConfig.backoffMultiplier: finalConfig.maxDelayMs);
+ delay = Math.min(delay * finalConfig.backoffMultiplier, finalConfig.maxDelayMs);
  }
  }
  }
@@ -105,7 +105,7 @@ export class RecoveryStrategy {
  /**
  * Get safe default for feature
  */
- static getSafeDefaultForFeature(feature: 'errorBrain' | 'legalAi') {
+ static getSafeDefaultForFeature(feature, 'errorBrain' | 'legalAi') {
  return this.SAFE_DEFAULTS[feature];
  }
 
@@ -124,7 +124,7 @@ export class RecoveryStrategy {
  if (typeof config.errorBrain.requireAuth !== 'boolean') {
  errors.push('errorBrain.requireAuth must be a boolean');
  }
- if (!['debug', 'info', 'warn', 'error'].includes(config.errorBrain.logLevel || '')) {
+ if (!['debug', 'info', 'warn', 'error'].includes(config.errorBrain?.logLevel?? '')) {
  errors.push('errorBrain.logLevel must be one of: debug, info, warn, error');
  }
  }
@@ -136,7 +136,7 @@ export class RecoveryStrategy {
  if (typeof config.legalAi.requireAuth !== 'boolean') {
  errors.push('legalAi.requireAuth must be a boolean');
  }
- if (!['debug', 'info', 'warn', 'error'].includes(config.legalAi.logLevel || '')) {
+ if (!['debug', 'info', 'warn', 'error'].includes(config.legalAi?.logLevel?? '')) {
  errors.push('legalAi.logLevel must be one of: debug, info, warn, error');
  }
  }
@@ -318,7 +318,7 @@ export class RecoveryStrategy {
  static calculateBackoffDelay(attempt: number, config: Partial<RetryConfig> = {}): number {
  const finalConfig = { ...this.DEFAULT_RETRY_CONFIG, ...config };
  const delay = finalConfig.initialDelayMs * Math.pow(finalConfig.backoffMultiplier, attempt - 1);
- return Math.min(delay: finalConfig.maxDelayMs);
+ return Math.min(delay, finalConfig.maxDelayMs);
  }
 
  /**
