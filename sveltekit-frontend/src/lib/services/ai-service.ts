@@ -1,7 +1,7 @@
+import OllamaService from '$lib/services/ollamaService.js';
+import crypto from 'crypto';
 import { sql } from 'drizzle-orm';
 import { generateIdFromEntropySize } from 'lucia';
-import crypto from 'crypto';
-import { OllamaService } from '$lib/services/ollamaService.js';
 
 type DbClient = {
   execute: (query: unknown) => Promise<unknown>;
@@ -62,17 +62,17 @@ export interface VectorSearchResult {
 }
 
 type QueryLogInput = {
-  userId?: string;
-  caseId?: string;
+  userId?: string | undefined;
+  caseId?: string | undefined;
   query: string;
   response: string;
   model: string;
   confidence: number;
   processingTime: number;
   contextUsed: string[];
-  embedding?: number[];
-  isSuccessful?: boolean;
-  errorMessage?: string;
+  embedding?: number[] | undefined;
+  isSuccessful?: boolean | undefined;
+  errorMessage?: string | undefined;
 };
 
 export class AIService {
@@ -87,7 +87,7 @@ export class AIService {
     userId?: string,
     caseId?: string,
     options: AIQueryOptions = {}
-  ): Promise<{ response: string; confidence: number; contextUsed: string[]; queryId?: string }> {
+  ): Promise<{ response: string; confidence: number; contextUsed: string[]; queryId?: string | undefined }> {
     const startTime = Date.now();
     const {
       model = 'gemma3-legal:latest',

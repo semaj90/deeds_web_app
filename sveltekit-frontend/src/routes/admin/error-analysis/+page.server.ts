@@ -10,10 +10,10 @@ import type { PageServerLoad } from './$types';
 
 const { Pool } = pg;
 
-const QDRANT_URL = process.env?.QDRANT_URL?? 'http://127.0.0.1:6333';
+const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://127.0.0.1:6333';
 
 export const load: PageServerLoad = async () => {
-	const qdrant = new QdrantClient({ url, QDRANT_URL });
+	const qdrant = new QdrantClient({ url: QDRANT_URL });
 
 	const aiPool = new Pool({
 		host: '127.0.0.1',
@@ -29,8 +29,13 @@ export const load: PageServerLoad = async () => {
 			limit: 50,
 			with_payload: true,
 			with_vector: false
-		});clusters.points.map(async (point) => {
-				const payload = point.payload as any;SELECT
+		});
+
+		const enrichedClusters = await Promise.all(
+			clusters.points.map(async (point) => {
+				const payload = point.payload as any;
+				const result = await aiPool.query(
+					`SELECT
 						c.cluster_id,
 						COUNT(*) as error_count,
 						STRING_AGG(DISTINCT i.source, ', ') as files,
@@ -38,19 +43,20 @@ export const load: PageServerLoad = async () => {
 					FROM phase89_error_clusters c
 					JOIN phase89_error_instances i ON c.error_instance_id = i.id
 					WHERE c.cluster_id = $1
-					GROUP BY c.cluster_id
-				`, [payload.cluster_id]);
+					GROUP BY c.cluster_id`,
+					[payload.cluster_id]
+				);
 
 				const data = result.rows[0] || {};
 
 				return {
 					id: point.id,
 					cluster_id: payload.cluster_id,
-					pattern: payload?.pattern?? 'Unknown',
-					error_count: parseInt(data.error_count) ?? 0,
-					files: data?.files?? '',
-					tags: data?.tags|| [],
-					payload_tags: payload?.tags|| []
+					pattern: payload?.pattern ?? 'Unknown',
+					error_count: Number.parseInt(String(data.error_count ?? '0'), 10) || 0,
+					files: data?.files ?? '',
+					tags: data?.tags ?? [],
+					payload_tags: payload?.tags ?? []
 				};
 			})
 		);

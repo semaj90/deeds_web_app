@@ -61,10 +61,10 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
 ### Current Progress
 - **Target**: Top 10 high-error files
 - **Results**:
-  - `user-recommendation-service.ts`: ✅ Fixed (-4 errors)
-  - `nes-memory-architecture.ts`: ⚠️ Neutral (Syntax fixed, count stable)
-  - `rag-pipeline-enhanced.ts`: ❌ Reverted (Cascade detected)
-  - `sveltekit-gpu-cache-integration.ts`: ✅ Fixed (-1 error)
+  - `user-recommendation-service.ts`: ✅ Fixed (Manual rewrite of corrupted header)
+  - `sveltekit-gpu-cache-integration.ts`: ✅ Fixed (Manual logic repair)
+  - `simd-json-parser.ts`: ✅ Fixed (Manual rewrite)
+  - `nes-memory-architecture.ts`: ⚠️ Neutral
 
 ### Next Actions
 1. Complete top 10 file dry-run

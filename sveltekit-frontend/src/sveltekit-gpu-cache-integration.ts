@@ -159,9 +159,9 @@ export class SvelteKitGPUCacheIntegration {
 			const cached = await this.safeRpcRetrieve(key, { userId });
 
 			if (cached != null) {
-typeof cached === 'object' && 'data' in (cached as object)
-						? (cached as { data, unknown }).data
-						: cached;
+				const data = typeof cached === 'object' && 'data' in (cached as object)
+					? (cached as { data: unknown }).data
+					: cached;
 				console.log(`📡 SSR hit: ${key}`);
 				return data;
 			}

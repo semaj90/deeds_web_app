@@ -2,6 +2,42 @@
 
 ---
 
+## ✅ January 19, 2026 – ai-service.ts Rebuild + Contextual Chat Verification
+
+### ai-service.ts Rebuilt
+- **Ollama-driven analysis:** Uses `OllamaService` for embeddings and completions
+- **Dynamic DB import:** Lazy-loads drizzle to avoid crashes when DB unavailable
+- **Async flow fixed:** Proper handling for embeddings, auto-tags, document chunks
+- **Models:** `gemma3-legal:latest` for LLM, `embeddinggemma:latest` for embeddings
+
+### Contextual Chat System Verified
+- **chat-store.svelte.ts:** Clean Svelte 5 runes (`$state`, `$derived`, `$derived.by`)
+- **ChatSession.svelte.ts:** SSE-based real-time chat with reconnection logic
+- **OllamaService:** Proper endpoint configuration via `get-ollama-endpoint.ts`
+
+### Core Files Status (All Clean)
+- `sveltekit-frontend/src/lib/services/ai-service.ts` ✅
+- `sveltekit-frontend/src/lib/services/ollamaService.ts` ✅
+- `sveltekit-frontend/src/lib/stores/chat-store.svelte.ts` ✅
+- `sveltekit-frontend/src/lib/models/ChatSession.svelte.ts` ✅
+- `sveltekit-frontend/src/routes/chat/+page.svelte` ✅
+- `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` ✅
+
+### Stack Configuration
+- **Drizzle ORM:** 0.44 with PostgreSQL + pgvector
+- **Client Caching:** LokiJS + IndexedDB
+- **Server Caching:** Redis + Qdrant
+- **Message Queue:** RabbitMQ
+- **State Machines:** XState v5
+- **Styling:** UnoCSS + bits-ui (Svelte 5 API)
+
+### Known Issues
+- Full `svelte-check` and `tsc` commands timeout due to thousands of errors in backup files
+- Use `getDiagnostics` on specific files instead of full codebase checks
+- Errors concentrated in `.mojibake-backup`, `.phase79.bak`, and parked routes
+
+---
+
 ## ✅ January 19, 2026 – Svelte 5 Route Fixes
 
 ### Key Fixes Applied

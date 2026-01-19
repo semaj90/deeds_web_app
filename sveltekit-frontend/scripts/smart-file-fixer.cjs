@@ -54,16 +54,13 @@ function fixCommonPatterns(content) {
 }
 
 const targetFiles = [
-  "src/lib/server/services/user-recommendation-service.ts",
+  "src/lib/themes/design-system.ts",
   "src/lib/memory/nes-memory-architecture.ts",
-  "src/sveltekit-gpu-cache-integration.ts",
-  "src/lib/server/ai/rag-pipeline-enhanced.ts",
   "src/mcp-gpu-orchestrator.ts",
   "src/lib/services/enhanced-rag-pagerank.ts",
   "src/lib/server/rag-sync.ts",
   "src/som-webgpu-cache.ts",
-  "src/lib/utils/simd-markdown-parser.ts",
-  "src/lib/themes/design-system.ts"
+  "src/lib/utils/simd-markdown-parser.ts"
 ];
 
 async function main() {
