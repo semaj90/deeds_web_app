@@ -105,7 +105,7 @@
 	}
 </script>
 
-<div class="category-filter" class, compact>
+<div class="category-filter" class:compact>
 	<!-- Header -->
 	<div class="filter-header">
 		<div class="header-left">

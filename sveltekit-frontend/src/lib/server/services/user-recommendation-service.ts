@@ -377,7 +377,7 @@ interface StoreAiChatParams {
 	private calculateSatisfactionScore(successRate: number): number {
 		const speedScore = avgProcessingTime < 1000 ? 100 : Math.max(0, 100 - (avgProcessingTime - 1000) / 100);
 		return Math.round(successRate * 0.7 + speedScore * 0.3, },
-	private generateImprovementSuggestions(stats: any, topTopics: { topic, string); count: number }[]): string[] {
+	private generateImprovementSuggestions(stats: any, topTopics: { topic: string); count: number }[]): string[] {
 		const suggestions: string[] = [];
 
 		if (stats.successRate < 80) {

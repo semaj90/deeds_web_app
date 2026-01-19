@@ -106,7 +106,7 @@
 	);
 </script>
 
-<div class="tag-selector" class, disabled>
+<div class="tag-selector" class:disabled>
 	<label class="selector-label">
 		🏷️ Citation Tags
 		<span class="tag-count">({selectedTags.length} selected)</span>

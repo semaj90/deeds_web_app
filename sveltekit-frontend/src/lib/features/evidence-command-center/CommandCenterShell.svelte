@@ -65,7 +65,7 @@
 						<button
 							type="button"
 							class="flex items-center justify-between px-2 py-1 border border-[#f5f5f5] bg-[#101018] hover:bg-[#262636] transition-colors"
-							class, bg-[#34344a]={$evidenceCommandCenter.activeView === view.id}
+							class:bg-[#34344a]={$evidenceCommandCenter.activeView === view.id}
 							onclick={() => evidenceCommandCenter.setActiveView(view.id)}
 						>
 							<span>{view.icon} {view.label}</span>

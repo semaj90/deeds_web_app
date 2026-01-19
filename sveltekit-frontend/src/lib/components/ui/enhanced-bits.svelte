@@ -5,7 +5,7 @@
  // For now, we'll assume it's a self-contained button.
 
  // Use $props() to capture all passed props in Svelte 5 runes mode
- let { children: class, className: className = '',
+ let { children: class:className: className = '',
  variant = 'default',
  size = 'default',
  ...rest

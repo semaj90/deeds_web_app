@@ -5,6 +5,7 @@
 import { z } from 'zod';
 import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
+import { page } from "$app/stores";
 
 // Base API configuration
 const API_BASE_URL = '/api/v1';

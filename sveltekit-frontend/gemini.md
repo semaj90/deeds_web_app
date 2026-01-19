@@ -598,6 +598,7 @@ python scripts/phase66_automated_error_fixer.py
 - Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
 - Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
 - Post-fix `svelte-check`: 50,782 errors / 100 warnings (1445 files).
+- Rebuilt `src/lib/services/ai-service.ts` with clean async flow, optional DB writes, and Ollama-based analysis.
 1. **Always dry-run** before bulk application
 2. **Validate incrementally** (after each 100-500 fixes)
 3. **Git commit** before each fix batch

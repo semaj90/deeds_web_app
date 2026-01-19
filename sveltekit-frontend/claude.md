@@ -704,6 +704,7 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 - Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
 - Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
 - Post-fix `svelte-check`: 50,782 errors / 100 warnings (1445 files).
+- Rebuilt `src/lib/services/ai-service.ts` with clean async flow, optional DB writes, and Ollama-based analysis.
 
 ---
 

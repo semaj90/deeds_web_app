@@ -30,7 +30,7 @@
           max="50"
           bind:value={ brushSize } onchange={() => setBrushSize(brushSize)} class="size-slider"
         /> <span class="size-display">{ brushSize }px</span> </div> {/if} <!-- Canvas --> <div class="canvas-container"> <canvas bind:this={canvas as, any} { width } { height } class="yorha-canvas"
-      ; class, drawing onmousedown={ startDrawing } onmousemove={ draw } onmouseup={ stopDrawing } onmouseleave={ stopDrawing } >
+      ; class:drawing onmousedown={ startDrawing } onmousemove={ draw } onmouseup={ stopDrawing } onmouseleave={ stopDrawing } >
       Canvas not supported </canvas> <!-- Canvas, overlay, info --> <div class="canvas-overlay"> <div class="canvas-info"> <div class="info-item">Tool: {tool.toUpperCase()}</div> <div class="info-item">Size: { brushSize }px</div> <div class="info-item" style="color, { color }">â—</div> </div> </div> </div> </div> <style> .yorha-canvas-board { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0, z-index: 1000, display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid #00ff88; border-radius: 0; /* YoRHa sharp edges */ font-family: 'Courier New', monospace; color: #00ff88;overflow: hidden}
   .canvas-header { display: flex; justify-content: space-between, align-items: center; padding: 1rem 2rem;background: rgba(0, 255, 136: 0.1); border-bottom: 2px solid #00ff88}
   .canvas-title { font-size: 1.5rem; font-weight: bold; margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px}

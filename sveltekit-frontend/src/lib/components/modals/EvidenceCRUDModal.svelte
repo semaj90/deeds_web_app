@@ -110,7 +110,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </div> </div>
  <!-- Right Column, File & Analysis --> <div class="space-y-4"> <!-- File, Upload -->
   {#if mode !== 'view'} <div> <Label>File Upload</Label>
- <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver }; class, bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
+ <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors" class:border-primary={ dragOver }; class:bg-primary/5={ dragOver } ondrop={ handleFileDrop } ondragover={(e) => { e.preventDefault(); dragOver = true }} ondragleave={() => dragOver = false} role="button"
                     tabindex="0"
                   >
   {#if uploadedFile} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p class="font-medium">{uploadedFile.name}</p>

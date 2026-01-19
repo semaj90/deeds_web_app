@@ -26,7 +26,7 @@
  modified = '',
  language = 'typescript',
  onApply,
- onReject: class, className: className = ''
+ onReject: class:className: className = ''
  }: Props = $props();
 
  // Simple diff algorithm

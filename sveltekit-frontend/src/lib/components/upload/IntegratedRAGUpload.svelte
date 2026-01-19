@@ -11,7 +11,7 @@ import type { Document } from '$lib/types'; /** * Integrated RAG Upload Componen
   }
   function handleClick() { fileInput?.click()}
 </script> <div class="integrated-rag-upload"> <div class="upload-section"> <h3>ðŸ“¤ Upload Document</h3> <div class="drop-zone"
-      class, uploading role="button"
+      class:uploading role="button"
       tabindex="0"
       aria-label="Upload area - click or drag files to upload"
       ondragover={ handleDragOver } ondrop={ handleDrop } onclick={ handleClick } onkeydown={e => { if (e.key === 'Enter' ?? e.key === ' ') { e.preventDefault(); handleClick()}

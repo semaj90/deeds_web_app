@@ -184,7 +184,7 @@ import { X } from "lucide-svelte";
 
  <button
  class="btn confirm-btn"
- class, loading
+ class:loading
  onclick={handleConfirm}
  disabled={loading}
  type="button"

@@ -24,7 +24,7 @@
  multiple = true,
  maxSize = 100,
  onUpload,
- onAnalyze: class, className: className = '',
+ onAnalyze: class:className: className = '',
  analyzeEndpoint = '/api/ai/analyze'
  }: Props = $props();
 

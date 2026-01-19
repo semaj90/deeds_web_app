@@ -563,6 +563,7 @@ npx svelte-check --threshold error
 - Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
 - Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
 - Post-fix `svelte-check`: 50,782 errors / 100 warnings (1445 files).
+- Rebuilt `src/lib/services/ai-service.ts` with clean async flow, optional DB writes, and Ollama-based analysis.
 
 
 ## Phase 89: ACE Analysis - 1/11/2026, 4:51:25 PM

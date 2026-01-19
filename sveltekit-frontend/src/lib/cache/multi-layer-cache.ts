@@ -298,7 +298,7 @@ export class MultiLayerCacheSystem {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', };
  async cacheDocument(id, string, unknown: Promise<boolean> {
  return this.set(`doc, ${ id }`, document, 'DOCUMENTS', },
- async getCachedDocument(id, string): Promise<any> {
+ async getCachedDocument(id: string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');
  }
 }
