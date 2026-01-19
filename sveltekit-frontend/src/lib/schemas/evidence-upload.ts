@@ -57,17 +57,21 @@ const EVIDENCE_TYPE_MAPPINGS = {
 	]
 };
 
-// Additional types from existing file-upload.ts for compatibility'physical_evidence',
-	'digital_evidence',
-	'witness_testimony',
-	'expert_opinion',
-	'documents',
-	'photographs',
-	'video_recording',
-	'audio_recording',
-	'forensic_analysis',
-	'chain_of_custody'
-]);
+// Legacy evidence types for compatibility
+export const LEGACY_EVIDENCE_TYPES = [
+    'physical_evidence',
+    'digital_evidence',
+    'witness_testimony',
+    'expert_opinion',
+    'documents',
+    'photographs',
+    'video_recording',
+    'audio_recording',
+    'forensic_analysis',
+    'chain_of_custody'
+] as const;
+
+export const legacyEvidenceTypeEnum = z.enum(LEGACY_EVIDENCE_TYPES);
 
 // Chain of custody entry schema (from file-upload.ts)
 export const chainOfCustodyEntrySchema = z.object({
@@ -201,12 +205,15 @@ export const linkMetadataSchema = z.object({
 	status: z.enum(['active', 'broken', 'unknown']).default('unknown')
 });
 
-// Union schema for all metadata typespdfMetadataSchema,
-	imageMetadataSchema,
-	videoMetadataSchema,
-	audioMetadataSchema,
-	textMetadataSchema,
-	linkMetadataSchema: z.object({ kind: z.literal('UNKNOWN') })
+// Union schema for all metadata types
+export const evidenceMetadataSchema = z.discriminatedUnion('kind', [
+    pdfMetadataSchema,
+    imageMetadataSchema,
+    videoMetadataSchema,
+    audioMetadataSchema,
+    textMetadataSchema,
+    linkMetadataSchema,
+    z.object({ kind: z.literal('UNKNOWN') }).passthrough()
 ]);
 
 // Enhanced evidence upload schema with typed metadata
@@ -215,7 +222,7 @@ export const enhancedEvidenceUploadSchema = evidenceUploadSchema.extend({
 });
 
 // File validation functions
-export function validateFileType(file: File, evidenceType), string: boolean {
+export function validateFileType(file: File, evidenceType: string): boolean {
 	const allowedTypes = EVIDENCE_TYPE_MAPPINGS[evidenceType as keyof typeof EVIDENCE_TYPE_MAPPINGS];
 	if (!allowedTypes || allowedTypes.length === 0) return true; // Allow all types for LINK/UNKNOWN
 	return allowedTypes.includes(file.type);
@@ -267,7 +274,7 @@ export async function generateMetadataFromFile(
 				img.onload = () => {
 					resolve({
 						kind: 'IMAGE',
-						resolution: { width: img.width: img.height },
+						resolution: { width: img.width, height: img.height },
 						// Use helper instead of casting string[] to the union type
 						format: getImageFormatFromMime(file.type),
 						hasAlphaChannel: file.type === 'image/png' || file.type === 'image/gif',
@@ -277,7 +284,7 @@ export async function generateMetadataFromFile(
 				img.onerror = () => {
 					resolve({
 						kind: 'IMAGE',
-						resolution: { width: 0, height: 0 0 },
+						resolution: { width: 0, height: 0 },
 						format: 'unknown',
 						hasAlphaChannel: false,
 						...baseMetadata
@@ -327,7 +334,7 @@ export async function generateMetadataFromFile(
 						kind: 'AUDIO',
 						durationSeconds: 0,
 						codec: 'unknown',
-						sampleRate: 44100, channels: 2 2,
+						sampleRate: 44100, channels: 2,
 						...baseMetadata
 					} as EvidenceMetadata);
 				};
@@ -353,7 +360,7 @@ export async function generateMetadataFromFile(
 				reader.onerror = () => {
 					resolve({
 						kind: 'TEXT',
-						wordCount: 0, characterCount: 0 0,
+						wordCount: 0, characterCount: 0,
 						...baseMetadata
 					} as EvidenceMetadata);
 				};

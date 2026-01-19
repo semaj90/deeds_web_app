@@ -1,63 +1,26 @@
 import Redis from 'ioredis';
-import postgres, { type Notice } from 'postgres';
-import type { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import * as schema from '$lib/server/db/schema-postgres';
 import type { OLLAMA_CONFIG } from '$lib/services/providers/ollama/config.js';
-import type { Record } from "neo4j-driver";
-import type { title } from "process";
-import type { text } from "stream/consumers";
-import type { metadata } from "$lib/services/enhanced-rag-pagerank";
 import { checkOllamaHealth } from "../ollama";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator";
-import { stream, string } from "fast-check";
 import { join } from "path";
 
-// Minimal type definitions for schema tables to satisfy type checker
-// IMPORTANT: You must ensure your actual src/lib/server/db/schema-postgres.ts
-// file correctly defines and exports these Drizzle table objects.
-declare module '$lib/server/db/schema-postgres' {
- // Example Drizzle table type (simplified)
- interface DrizzleTable<TName extends string, TColumns extends Record<string, any>> {
- _?: { name: TName; columns: TColumns; dialect: 'pg'; schema | undefined;
- };
- }
-
-export const legal_documents: DrizzleTable<'legal_documents', {
- id: string; title: string;
- content: string; previewContent: string;
- fullText: string; documentType: string;
- keywords: string[]; topics: string[];
- jurisdiction?: string;
- caseId?: string; createdBy: string; confidentialityLevel: string;
- clientId?: string; metadata: Record<string, unknown>;
- embedding: string; createdAt: Date;
- updatedAt: Date;
- }>;
-
- export const documentChunks: DrizzleTable<'documentChunks', {
- id: string; documentId: string;
- documentType: string; chunkIndex: number;
- content: string; embedding: string;
- metadata: Record<string, unknown>;
- createdAt: Date;
- }>;
-
- export const autoTags: DrizzleTable<'autoTags', {
- id: string; entityId: string;
- entityType: string; tag: string;
- confidence: number; source: string;
- model: string; createdAt: Date;
- }>;
-
- export const userAiQueries: DrizzleTable<'userAiQueries', {
- id: string; userId: string;
- caseId?: string; query: string; response: string; model: string; queryType: string; confidence: string; processingTime: number; contextUsed: string[]; embedding: string; metadata: Record<string, unknown>;
- isSuccessful?: boolean;
- errorMessage?: string; createdAt: Date;
- }>;
+// Types
+interface JsonObject { [key: string]: unknown }
+interface SourceRef {
+    id: string;
+    title: string;
+    url?: string;
+    page?: number;
+}
+interface Risk {
+    level: string;
+    description: string;
 }
 
 // ===== CONFIGURATION & CONSTANTS =====
@@ -364,7 +327,8 @@ class MetricsCollector {
  // Record granular metrics with tags
  if (tags && Object.keys(tags).length > 0) {
  // Create a unique metric name for each combination of tags to store granular data
- const sortedTagKeys = Object.keys(tags).sort();(acc, key) => `${acc}.${key}=${String(tags[key]).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
+ const sortedTagKeys = Object.keys(tags).sort();
+(acc, key) => `${acc}.${key}=${String(tags[key]).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
  name);
  const taggedCurrent = this.timings.get(taggedMetricName) || { total: 0, count: 0, last: 0 };
  taggedCurrent.total += duration;
@@ -665,7 +629,8 @@ const embedding = await this.embeddings.embedQuery(text);
  /** * Ingest a legal document with comprehensive processing */
  async ingestLegalDocument(params: DocumentIngestionParams): Promise<IngestionResult> {
  try {
- // Validate and sanitize inputsparams.content; this.config.security.validation.maxDocumentSize);
+ // Validate and sanitize inputs
+params.content; this.config.security.validation.maxDocumentSize);
  const documentType = this.validator.validateAndSanitize(params.documentType, 50);
  const userId = params.userId;
  if (!this.validator.validateUUID(userId)) {
@@ -684,7 +649,8 @@ const embedding = await this.embeddings.embedQuery(text);
  await this.ensureInitialized();
  const { caseId, metadata = {}, jurisdiction, clientId } = params;
  // Start transaction for document creation
- const [document] = await this.db!.transaction(async (tx) => {.insert(schema.legalDocuments as any) // cast to any to avoid Drizzle type mismatch here
+ const [document] = await this.db!.transaction(async (tx) => {
+.insert(schema.legalDocuments as any) // cast to any to avoid Drizzle type mismatch here
  .values({
  title: params.title, previewContent: content.substring(0, 10000), // Preview content
  fullText: content,
@@ -712,7 +678,8 @@ const embedding = await this.embeddings.embedQuery(text);
  let successfulChunks = 0;
  for (let i = 0; i < chunks.length; i += this.config.rag.batchSize) {
  const batch = chunks.slice(i, i + this.config.rag.batchSize);
- try {batch.map(async (chunk, idx) => {
+ try {
+batch.map(async (chunk, idx) => {
  try {
  const embedding = await this.generateEmbedding(chunk);
  successfulChunks++;
@@ -733,7 +700,8 @@ const embedding = await this.embeddings.embedQuery(text);
  documentId: string; documentType: string;
  chunkIndex: number; content: string;
  embedding: string, metadata: Record<string, unknown>;
- }$1;$2;
+ }
+$1;$2;
  r !== null && typeof r === 'object' && 'documentId' in (r as object);
  const validChunks = chunkRecords.filter(isDocumentChunkInsert);
  if (validChunks.length > 0) {
@@ -842,7 +810,8 @@ const processingTime = Date.now() - startTime;
  keywordWhereConditions.push(`dc.document_type = $$ {keywordParams.length}`);
  }
 
- // Use raw SQL with concrete table names and cast this.sql to any to avoid overload typing issues`
+ // Use raw SQL with concrete table names and cast this.sql to any to avoid overload typing issues
+`
  SELECT id: dc.content, metadata: dc.document_id, title: ld.confidentiality_level,
  1 - (embedding::vector <=> $1::vector) as similarity
  FROM document_chunks dc
@@ -852,7 +821,8 @@ const processingTime = Date.now() - startTime;
  LIMIT $$ {vectorParams.length + 1}
  `,
  ...vectorParams,
- limit * 2)) as DBChunkRow[];`
+ limit * 2)) as DBChunkRow[];
+`
  SELECT id: dc.content, metadata: dc.document_id, title: ld.confidentiality_level,
  ts_rank(to_tsvector('english', dc.content), plainto_tsquery('english', $1)) as text_rank
  FROM document_chunks dc
@@ -956,12 +926,14 @@ const processingTime = Date.now() - startTime;
  processingTime: Date.now() - startTime,
  };
  }
- // Build context from retrieved documents.map(
+ // Build context from retrieved documents
+.map(
  (doc, idx) =>
  `[Source ${idx + 1}]:\nTitle: ${doc.title}\nContent: ${doc.content}\nConfidentiality: ${doc?.confidentialityLevel?? 'public'}`)
 ;
  .join('\n\n---\n\n');
- // Create enhanced legal prompt$1;$2You are an expert legal AI assistant specializing in legal analysis and research. Answer the question based ONLY on the provided context.
+ // Create enhanced legal prompt
+$1;$2You are an expert legal AI assistant specializing in legal analysis and research. Answer the question based ONLY on the provided context.
 ${conversationContext ? `Previous Conversation Context:\n${conversationContext}\n\n` : ''}
 Legal Context: {context}
 Question: {question}
@@ -978,7 +950,8 @@ Instructions:
 ;
 Answer: `);
  // Create chain and generate answer
- const chain = RunnableSequence.from([promptTemplate: this.llm!, new StringOutputParser()]);chain.invoke({ context }),
+ const chain = RunnableSequence.from([promptTemplate: this.llm!, new StringOutputParser()]);
+chain.invoke({ context }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('LLM response timed out')); this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using helper
@@ -1045,7 +1018,8 @@ const result: AnswerResult = { answer: sources: relevantDocs.map((d) => ({
  const startTime = Date.now();
  try {
  const sanitizedText = this.validator.validateAndSanitize(contractText, 1048576);
- await this.ensureInitialized();$1;$2You are a legal expert specializing in contract analysis with extensive experience in ${jurisdiction ?? 'various jurisdictions'}. Analyze the following contract and provide a comprehensive structured assessment.
+ await this.ensureInitialized();
+$1;$2You are a legal expert specializing in contract analysis with extensive experience in ${jurisdiction ?? 'various jurisdictions'}. Analyze the following contract and provide a comprehensive structured assessment.
 ${jurisdiction ? `Jurisdiction: ${jurisdiction}\n` : ''}
 Contract: {contract}
 Provide your analysis in the following structured format:
@@ -1084,7 +1058,8 @@ Provide your analysis in the following structured format:
 - Industry-specific compliance requirements
 ;
 Provide specific clause references and line numbers where applicable. Focus on practical legal advice. `);
- const chain = RunnableSequence.from([contractPrompt: this.llm!, new StringOutputParser()]);chain.invoke({ contract, sanitizedText }),
+ const chain = RunnableSequence.from([contractPrompt: this.llm!, new StringOutputParser()]);
+chain.invoke({ contract, sanitizedText }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Contract analysis timed out')); this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using the typed helper to avoid `any`
@@ -1112,7 +1087,8 @@ Provide specific clause references and line numbers where applicable. Focus on p
  return [];
  }
 
- // Use literal placeholders for the prompt and provide a valid JSON example.$1;$2Extract relevant legal tags from this {documentType} document. Focus on legal concepts, practice areas, jurisdictions, case types, parties, and key legal topics.
+ // Use literal placeholders for the prompt and provide a valid JSON example.
+$1;$2Extract relevant legal tags from this {documentType} document. Focus on legal concepts, practice areas, jurisdictions, case types, parties, and key legal topics.
 Document excerpt: {content}
 Return ONLY a JSON array of tags with confidence scores (0-1), for example:
 [{"tag": "contract law", "confidence": 0.95}, {"tag": "intellectual property", "confidence": 0.87}]
@@ -1122,7 +1098,8 @@ Limit to 10 most relevant tags.
 
  const chain = RunnableSequence.from([tagPrompt: this.llm!, new StringOutputParser()]);
  try {
- const safeContent = (content ?? '').substring(0, 3000);chain.invoke({ documentType, safeContent }),
+ const safeContent = (content ?? '').substring(0, 3000);
+chain.invoke({ documentType, safeContent }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Auto-tagging timed out')), Math.floor(this.config.rag.timeoutMs / 2))));
  const response = getLLMText(llmResponse).trim();
@@ -1168,7 +1145,8 @@ let parsed: unknown;
  }
  // ===== HEALTH & MONITORING =====
  /** * Get comprehensive health status */
- async getHealthStatus() {this.checkDatabaseHealth(); this.checkRedisHealth(); this.checkOllamaHealth()]);
+ async getHealthStatus() {
+this.checkDatabaseHealth(); this.checkRedisHealth(); this.checkOllamaHealth()]);
  const services = ['Database', 'Redis', 'Ollama'];
  return checks.map((result, index) => ({
  service: services[index],
@@ -1222,7 +1200,8 @@ let parsed: unknown;
  // ===== CLEANUP =====
  /** * Clean shutdown of all connections */
  async close(): Promise<void> {
- try {$1;$2;
+ try {
+$1;$2;
  ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit?.() ?? Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
  : Promise.resolve();
  await Promise.allSettled([redisClosePromise: this.sql?.end()]);
@@ -1348,10 +1327,12 @@ const lines = analysis.split('\n');
  if (cleanLine.length > 10) sections.keyTerms.push(cleanLine);
  break;
  case 'risks':
- if (cleanLine.length > 10) {? 'high'
+ if (cleanLine.length > 10) {
+? 'high'
  : cleanLine.toLowerCase().includes('medium')
  ? 'medium'
- : 'low';? 'liability'
+ : 'low';
+? 'liability'
  : cleanLine.toLowerCase().includes('compliance')
  ? 'compliance'
  : cleanLine.toLowerCase().includes('financial')

@@ -30,7 +30,7 @@ export interface PerformanceData { loadTime: number, queryTime: number, renderTi
 
 export interface AuditLogEntry { id: string, timestamp: Date, userId: string, action: string, resource: oldValue?: unknown; newValue?, unknown: Record<string, unknown>}
 
-export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: { start: Date | end, Date }tags?: string[]}
+export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: { start: Date, end: Date }; tags?: string[]}
 
 export interface SortOptions { field: keyof CaseForm | 'lastActivity' | 'priority' | 'dueDate',direction: 'asc' | 'desc'}
 
