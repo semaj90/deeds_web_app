@@ -4,7 +4,7 @@
  class?: string;
  }
 
- let { children, title: class, className: className = '' }: Props = $props();
+ let { children, title, className = '' }: Props = $props();
 </script>
 
 <div class="evidence-board-layout { className }">
