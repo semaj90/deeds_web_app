@@ -39,7 +39,7 @@ $effect(() => {
 		searchQuery = initialQuery;
 	}
 });
-let searchResults = $state<KBSearchResult[]>([]);
+let searchResults = $state<RetrievedChunk[]>([]);
 let isSearching = $state(false);
 let searchError = $state<string | null>(null);
 

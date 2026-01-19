@@ -14,17 +14,25 @@
 
 // =============================================================================
 // Enums
-// =============================================================================| 'document'
+// =============================================================================
+export type SourceType =
+  | 'document'
   | 'statute'
   | 'case_law'
   | 'regulation'
   | 'contract'
   | 'evidence'
   | 'precedent'
-  | 'expert_opinion';| 'pending'
+  | 'expert_opinion';
+
+export type ValidationStatus =
+  | 'pending'
   | 'approved'
   | 'rejected'
-  | 'needs_review';| 'high'    // score >= 0.85
+  | 'needs_review';
+
+export type ConfidenceLevel =
+  | 'high'    // score >= 0.85
   | 'medium'  // score >= 0.70
   | 'low'     // score >= 0.50
   | 'marginal'; // score < 0.50
@@ -354,7 +362,7 @@ export async function ragWithSourceValidation(
     use_hybrid: true,
     use_rerank: true,
   });
-  
+
   const approvedIds = await onCandidates(searchResult.chunks);
 
   const validations = searchResult.chunks.map((chunk: any) => ({
@@ -368,7 +376,7 @@ export async function ragWithSourceValidation(
     validations,
     user_id: userId,
   });
-  
+
   const answer = await generateAnswer({
     context_id: context.context_id,
     query,
@@ -376,7 +384,7 @@ export async function ragWithSourceValidation(
     include_citations: true,
     include_todos: true,
   });
-  
+
   updateKnowledgeGraph(answer.answer_id).catch(console.error);
 
   return answer;

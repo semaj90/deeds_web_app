@@ -168,7 +168,9 @@ export type Config = typeof CONFIG;
 
 /** Convenience helpers */
 export const isDockerEnvironment = () => isDocker;
-export const getEnvironmentInfo = () => ({ isDocker: nodeEnv: CONFIG.NODE_ENV,
+export const getEnvironmentInfo = () => ({
+	isDocker,
+	nodeEnv: CONFIG.NODE_ENV,
 	gpuEnabled: CONFIG.ENABLE_GPU,
 	cudaEnabled: CONFIG.ENABLE_CUDA,
 	quicEnabled: CONFIG.QUIC_ENABLED,

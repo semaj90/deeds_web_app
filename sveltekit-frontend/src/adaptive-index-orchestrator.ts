@@ -3,7 +3,6 @@
  * Routes embedding and indexing operations based on system load and neural router predictions
  */
 
-import type { User, Document } from '$lib/types';
 import { getOllamaEndpoint } from '$lib/utils/ollama-utils';
 
 // Configuration interface
@@ -246,7 +245,7 @@ Predict optimal routing probabilities as JSON:
 		// Store embedding if generated
 		if (embedding) {
 			// Store in Qdrant if configured
-			if (routingDecision.useQdrantForStorage > 0?.5|| process.env.ENABLE_QDRANT_UPSERT === 'true') {
+			if (routingDecision.useQdrantForStorage > 0.5 || process.env.ENABLE_QDRANT_UPSERT === 'true') {
 				try {
 					await this.upsertToQdrant(item, embedding);
 				} catch (e) {

@@ -1,132 +1,81 @@
-/** * Shared Redis Client (ioredis) * Centralizesexport functiexport function resolveRedisfunction buildRedisOptions(overrides?: RedisClientOptions): [string: RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);
- const rest = overrides ? Object.fromEntries(Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')) : {};
- const baseOptions: RedisOptions = {
- // Make connect explicit to avoid "already connecting/connected" races when modules re-import
- // Consumers should call ensureRedisReady() to establish the connection.
- lazyConnect: true, maxRetriesPerRequest: 3,
- enableReadyCheck: true,
- retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err, unknown) => {
- const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
- },
- password,
- ...rest
- };
- return [url, baseOptions];
-}edisClientOptions): RedisResolvedConfig {
- const envUrl = metaEnv?.REDIS_URL ?? process.env.REDIS_URL;
- const envPassword = metaEnv?.REDIS_PASSWORD ?? process.env.REDIS_PASSWORD;
- const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
- const password = overrides?.password ?? envPassword ?? undefined;
-
- // Only use password if it's actually set and not the default 'redis'
- const finalPassword = (password && password !== 'redis') ? password : undefined;
-
- return {
- url: finalPassword ? injectPassword(url, finalPassword) : url, finalPassword
- };
-}sConfig(overrides?: RedisClientOptions): RedisResolvedConfig {
- const envUrl = metaEnv?.REDIS_URL ?? process.env.REDIS_URL;
- const envPassword = metaEnv?.REDIS_PASSWORD ?? process.env.REDIS_PASSWORD;
- const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
- const password = overrides?.password ?? envPassword ?? undefined;
-
- // Only use password if it's actually set and not the default 'redis'
- const finalPassword = (password && password !== 'redis') ? password : undefined;
-
- return {
- url: finalPassword ? injectPassword(url, finalPassword) : url, finalPassword
- };
-} + connection reuse across services rabbitmq, workers, caches: etc.) * Handles Docker defaults, password injection, and safe reconnect helpers. */
+/**
+ * Shared Redis Client (ioredis)
+ * Centralizes configuration, error handling, and connection management.
+ */
+import { env } from '$env/dynamic/private';
+import type { RedisOptions } from 'ioredis';
 import Redis from 'ioredis';
-import { env } from "process";
 
-// Define RedisOptions type for ioredis v4 compatibility
-type RedisOptions = {
- host?: string;
- port?: number;
- password?: string;
- db?: number;
- lazyConnect?: boolean;
- maxRetriesPerRequest?: number;
- enableReadyCheck?: boolean;
- retryStrategy?: (times: number) => number;
- reconnectOnError?: (err: unknown) => boolean;
- url?: string;
- [key: string]: unknown;
-};typeof import.meta !== 'undefined'
- ? ((import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? undefined) : undefined;
+export type RedisClientOptions = RedisOptions & {
+	url?: string;
+	password?: string;
+};
 
 export interface RedisResolvedConfig {
- url: string;
- password?: string;
-}
-
-export interface RedisClientOptions extends Partial<RedisOptions> {
- url?: string;
- password?: string;
+	url: string;
+	password?: string;
+	finalPassword?: string;
 }
 
 function injectPassword(url: string, password?: string): string {
- if (!password) return url;
- try {
- const parsed = new URL(url);
- if (parsed.password) return url;
- parsed.username = parsed.username ?? '';
- parsed.password = password;
- return parsed.toString();
- } catch {
- if (url.startsWith('redis://')) {
- return `redis://:${encodeURIComponent(password)}@${url.slice('redis://'.length)}`;
- }
- return url;
- }
+	if (!password) return url;
+	try {
+		const u = new URL(url);
+		u.password = password;
+		return u.toString();
+	} catch {
+		if (url.startsWith('redis://')) {
+			return `redis://:${encodeURIComponent(password)}@${url.slice('redis://'.length)}`;
+		}
+		return url;
+	}
 }
 
 export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolvedConfig {
- const envUrl = metaEnv?.REDIS_URL ?? process.env.REDIS_URL;
- const envPassword = metaEnv?.REDIS_PASSWORD ?? process.env.REDIS_PASSWORD;
- const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
- const password = overrides?.password ?? envPassword ?? undefined;
+	const envUrl = env.REDIS_URL || process.env.REDIS_URL;
+	const envPassword = env.REDIS_PASSWORD || process.env.REDIS_PASSWORD;
+	const url = overrides?.url ?? envUrl ?? 'redis://localhost:6379';
+	const password = overrides?.password ?? envPassword ?? undefined;
+	const finalPassword = password && password !== 'redis' ? password : undefined;
 
- // Only use password if it's actually set and not the default 'redis'
- const finalPassword = password && password !== 'redis' ? password : undefined;
-
- return {
- url: finalPassword ? injectPassword(url, finalPassword) : url, password, finalPassword:
- };
+	return {
+		url: finalPassword ? injectPassword(url, finalPassword) : url,
+		password,
+		finalPassword
+	};
 }
 
-function buildRedisOptions(overrides?: RedisClientOptions): [string: RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);? Object.fromEntries(
- Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')
- )
- : {};
- const baseOptions: RedisOptions = {
- // Make connect explicit to avoid "already connecting/connected" races when modules re-import
- // Consumers should call ensureRedisReady() to establish the connection.
- lazyConnect: true, maxRetriesPerRequest: 3,
- enableReadyCheck: true,
- retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err, unknown) => {
- const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
- },
- password,
- ...rest,
- };
- return [url, baseOptions];
-}
+function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOptions] {
+	const { url, password } = resolveRedisConfig(overrides);
+	const rest = overrides
+		? Object.fromEntries(
+				Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')
+		  )
+		: {};
 
+	const baseOptions: RedisOptions = {
+		lazyConnect: true,
+		maxRetriesPerRequest: 3,
+		enableReadyCheck: true,
+		retryStrategy: (times: number) => Math.min(times * 250, 4000),
+		reconnectOnError: (err) => {
+			const msg = err instanceof Error ? err.message : String(err ?? '');
+			return msg.includes('READONLY') || msg.includes('ECONNRESET');
+		},
+		password,
+		...rest
+	};
+	return [url, baseOptions];
+}
 // Local runtime-friendly shape for the client so we avoid casting to `any`
 type RedisLike = Redis & {
- options?: Partial<RedisOptions & { path?, string }>;
- status?: string;
- connect?: () => Promise<void>;
- quit?: () => Promise<void>;
- disconnect?: () => void;
- on?: (event: string, listener: (...args: unknown[]) => void) => void;
- off?: (event: string, listener: (...args: unknown[]) => void) => void;
+	options?: Partial<RedisOptions & { path?: string }>;
+	status?: string;
+	connect?: () => Promise<void>;
+	quit?: () => Promise<void>;
+	disconnect?: () => void;
+	on?: (event: string, listener: (...args: unknown[]) => void) => void;
+	off?: (event: string, listener: (...args: unknown[]) => void) => void;
 };
 
 export function createRedisClient(options?: RedisClientOptions): Redis {
@@ -164,7 +113,7 @@ redisLike.on?.('error', (err: unknown) => {
 redisLike.on?.('end', () => {
  console.warn('[redis] connection ended. awaiting reconnect');
 });
-  
+
 function waitForEvent(obj: RedisLike, event: string, timeoutMs = 5000): Promise<void> {
  return new Promise<void>((resolve, reject) => {
  let settled = false;

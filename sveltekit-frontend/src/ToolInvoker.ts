@@ -86,7 +86,9 @@ export class ToolInvoker {
 		this.stats.toolInvocations++;
 		this.stats.svelteCheckRuns++;
 
-		try {? `npx svelte-check --threshold warning --filter "${path}"`
+		try {
+			const cmd = path
+				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
 			const { stdout, stderr } = await execAsync(cmd, {
@@ -95,7 +97,8 @@ export class ToolInvoker {
 				maxBuffer: 50 * 1024 * 1024
 			});
 
-			const { stdout: svelteStdout, stderr: svelteStderr } = result;
+			const svelteStdout = stdout;
+			const svelteStderr = stderr;
 			const errors = this.parseSvelteCheckOutput(svelteStdout + svelteStderr);
 
 			return {
@@ -181,7 +184,8 @@ export class ToolInvoker {
 				maxBuffer: 50 * 1024 * 1024
 			});
 
-			const { stdout: tscStdout, stderr: tscStderr } = result;
+			const tscStdout = stdout;
+			const tscStderr = stderr;
 			return {
 				tool: 'tsc',
 				success: true,
@@ -281,10 +285,10 @@ export class ToolInvoker {
 
 	/**
 	 * Update confidence based on tool results
-	 */
-	updateConfidence(currentConfidence, number, diagnosticResult: DiagnosticResult): number {
+	updateConfidence(currentConfidence: number, diagnosticResult: DiagnosticResult): number {
 		this.stats.confidenceUpdates++;
 
+		const errorCount = diagnosticResult.errors.length;
 		const errorCount = diagnosticResult.errors.length;
 		const warningCount = diagnosticResult.warnings.length;
 

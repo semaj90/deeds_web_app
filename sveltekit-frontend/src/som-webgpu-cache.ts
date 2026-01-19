@@ -10,21 +10,30 @@ import Loki from 'lokijs';
 type Collection<T> = ReturnType<Loki['addCollection']>;
 
 export interface NPMError {
-	message: string; file: string;
-	line: number; severity: 'low' | 'medium' | 'high' | 'critical';
-	category: string; type: string;
+	message: string;
+	file: string;
+	line: number;
+	severity: 'low' | 'medium' | 'high' | 'critical';
+	category: string;
+	type: string;
 	timestamp: string;
 	context?: string[];
 	dependencies?: string[];
 }
 
 export interface IntelligentTodo {
-	id: string; priority: number;
-	category: string; title: string;
-	description: string; estimated_effort: number; // nanoseconds
-	dependencies: string[]; suggested_fixes: string[];
-	related_errors: NPMError[]; confidence: number;
-	tags: string[]; created_at: string;
+	id: string;
+	priority: number;
+	category: string;
+	title: string;
+	description: string;
+	estimated_effort: number; // nanoseconds
+	dependencies: string[];
+	suggested_fixes: string[];
+	related_errors: NPMError[];
+	confidence: number;
+	tags: string[];
+	created_at: string;
 	metadata: Record<string, unknown>;
 }
 
@@ -43,7 +52,8 @@ const _ENABLE_GPU = (() => {
 	// Fallback to Node/process env (SSR/dev tools)
 	try {
 		if (typeof process !== 'undefined') {
-			const v = (process as unknown as { env?: Record<string, unknown> })?.env?.ENABLE_GPU as : string
+			const v = (process as unknown as { env?: Record<string, unknown> })?.env?.ENABLE_GPU as
+				| string
 				| boolean
 				| undefined;
 			if (typeof v === 'string') return v.toLowerCase() !== 'false' && v !== '0';
@@ -51,15 +61,6 @@ const _ENABLE_GPU = (() => {
 		}
 	} catch {
 		// ignore: process may be undefined in browser
-	}
-
-	// Global override (e.g., set on window/globalThis)
-	try {| boolean
-			| undefined;
-		if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';
-		if (typeof gv === 'boolean') return gv;
-	} catch {
-		// ignore
 	}
 
 	return true;
@@ -115,7 +116,7 @@ fn compute_similarity(@builtin(global_invocation_id) global_id: vec3<u32>) {
 		doc_norm = doc_norm + d_val * d_val;
 	}
 
-	if (query_norm > 0?.0&& doc_norm > 0.0) {
+	if (query_norm > 0.0 && doc_norm > 0.0) {
 		similarities[doc_id] = dot_product / (sqrt(query_norm) * sqrt(doc_norm));
 	} else {
 		similarities[doc_id] = 0.0;
@@ -199,7 +200,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 	constructor() {
 		this.lokiDB = new Loki('som-cache.db', {
 			autoload: true,
-			autoloadCallback, () => this.initializeCollections(),
+			autoloadCallback: () => this.initializeCollections(),
 			autosave: true,
 			autosaveInterval: 4000
 		});
@@ -247,7 +248,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 			this.device = await adapter.requestDevice({
 				requiredFeatures: ['shader-f16'] as GPUFeatureName[],
-				requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
+				requiredLimits: {
+					maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
 				}
 			});
 
@@ -261,6 +263,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	async initializeIndexDB(): Promise<boolean> {
 		return new Promise((resolve) => {
+			if (typeof indexedDB === 'undefined') {
+				resolve(false);
+				return;
+			}
 			const request = indexedDB.open('SOMSemanticCache', 1);
 
 			request.onerror = () => {
@@ -279,20 +285,20 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 				if (!db.objectStoreNames.contains('todos')) {
 					const todosStore = db.createObjectStore('todos', { keyPath: 'id' });
-					todosStore.createIndex('priority', 'priority', { unique, false });
-					todosStore.createIndex('category', 'category', { unique, false });
-					todosStore.createIndex('timestamp', 'created_at', { unique, false });
+					todosStore.createIndex('priority', 'priority', { unique: false });
+					todosStore.createIndex('category', 'category', { unique: false });
+					todosStore.createIndex('timestamp', 'created_at', { unique: false });
 				}
 
 				if (!db.objectStoreNames.contains('errors')) {
 					const errorsStore = db.createObjectStore('errors', { keyPath: 'id' });
-					errorsStore.createIndex('severity', 'severity', { unique, false });
-					errorsStore.createIndex('file', 'file', { unique, false });
+					errorsStore.createIndex('severity', 'severity', { unique: false });
+					errorsStore.createIndex('file', 'file', { unique: false });
 				}
 
 				if (!db.objectStoreNames.contains('cache')) {
 					const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
-					cacheStore.createIndex('timestamp', 'timestamp', { unique, false });
+					cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
 				}
 			};
 		});
@@ -318,7 +324,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			return cached;
 		}
 
-		const errors = this.parseNPMErrors(npmOutput);? await this.computeErrorEmbeddingsGPU(errors)
+		const errors = this.parseNPMErrors(npmOutput);
+		const embeddings = this.device
+			? await this.computeErrorEmbeddingsGPU(errors)
 			: this.computeErrorEmbeddingsCPU(errors);
 
 		const clusters = this.performSOMClustering(embeddings);
@@ -376,8 +384,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const embeddings: Float32Array[] = [];
 		const embeddingDim = 128;
 
-		for (const error of errors) {error.message.split('').map((c) => c.charCodeAt(0))
-			);
+		for (const error of errors) {
+			const textBuffer = error.message.split('').map((c) => c.charCodeAt(0));
 			const embedding = new Float32Array(embeddingDim);
 
 			// Simple hash-based embedding as fallback
@@ -401,7 +409,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 	}
 
 	private computeErrorEmbeddingsCPU(errors: NPMError[]): Float32Array[] {
-		const embeddings, Float32Array[] = [];
+		const embeddings: Float32Array[] = [];
 		const embeddingDim = 128;
 
 		for (const error of errors) {
@@ -429,9 +437,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	private performSOMClustering(embeddings: Float32Array[]): Map<number, number[]> {
 		const clusters = new Map<number, number[]>();
-		const numClusters = Math.min(10, Math.ceil(embeddings.length / 5));
-
 		if (embeddings.length === 0) return clusters;
+
+		const numClusters = Math.min(10, Math.ceil(embeddings.length / 5));
 
 		// Simple k-means-like clustering
 		for (let i = 0; i < embeddings.length; i++) {
@@ -468,7 +476,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 				confidence: 0.8,
 				tags: [primaryCategory, `cluster-${clusterId}`],
 				created_at: new Date().toISOString(),
-				metadata: { clusterSize: clusterErrors.length,
+				metadata: {
+					clusterSize: clusterErrors.length,
 					files: [...new Set(clusterErrors.map((e) => e.file))]
 				}
 			});
@@ -501,7 +510,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			high: 75,
 			medium: 50,
 			low: 25
-		};(sum, e) => sum + (severityWeights[e.severity] ?? 50),
+		};
+		const totalWeight = errors.reduce(
+			(sum, e) => sum + (severityWeights[e.severity] ?? 50),
 			0
 		);
 		return Math.min(100, Math.round(totalWeight / errors.length));
@@ -547,8 +558,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 	private getLocalCachedTodos(key: string): IntelligentTodo[] | null {
 		try {
 			const cached = this.cacheCollection.findOne({ key });
-			if (cached && Date.now() - cached.timestamp < 300000) {
-				return cached.data as IntelligentTodo[];
+			if (cached && Date.now() - (cached as any).timestamp < 300000) {
+				return (cached as any).data as IntelligentTodo[];
 			}
 		} catch {
 			// Cache miss
@@ -558,7 +569,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 	private cacheLocally(key: string, todos: IntelligentTodo[]): void {
 		try {
-			this.cacheCollection.insert({ key: data: todos,
+			this.cacheCollection.insert({
+				key: key,
+				data: todos,
 				timestamp: Date.now()
 			});
 		} catch {
@@ -594,7 +607,3 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 // Singleton instance
 export const somCache = new WebGPUSOMCache();
-
-
-
-

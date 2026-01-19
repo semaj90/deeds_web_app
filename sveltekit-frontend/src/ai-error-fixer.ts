@@ -48,10 +48,8 @@ export class AIErrorFixer {
 	async fixErrors(errors: ErrorAnalysisResult[]): Promise<ErrorFix[]> {
 		if (!errors || errors.length === 0) return [];
 
-		const startTime = performance.now();(e: any) =>
-				e?.fixable&&
-				(typeof e.confidence === 'number' ? e.confidence > this.config.confidenceThreshold : true)
-		);
+		const startTime = performance.now();
+		const fixableErrors = errors.filter((e) => e?.fixable && (typeof e.confidence === 'number' ? e.confidence > this.config.confidenceThreshold : true));
 
 		if (fixableErrors.length === 0) return [];
 
@@ -168,13 +166,13 @@ ${this.getCommonFixes(error.code ?? '')}`;
 
 	private parseFixResponse(error: ErrorAnalysisResult, response: string): ErrorFix | null {
 		try {
-			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?: \nCONFIDENCE?: $)/i);
-			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?: $)/i);
+			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING|CONFIDENCE|$)/i);
+			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE|$)/i);
 			const confidenceMatch = response.match(/CONFIDENCE:\s*([\d.]+)/i);
 
 			if (!fixedCodeMatch) return null;
 
-			const fixedText = fixedCodeMatch?.1.trim();
+			const fixedText = fixedCodeMatch[1]?.trim();
 			const reasoning = reasoningMatch?.[1]?.trim() ?? 'AI generated fix';
 			const confidence = parseFloat(confidenceMatch?.[1] ?? '0.5');
 
@@ -207,7 +205,7 @@ ${this.getCommonFixes(error.code ?? '')}`;
 			TS1005: 'add_punctuation',
 			TS1128: 'add_declaration'
 		};
-		return (code && strategies?.code) ?? 'manual_fix';
+		return (code && strategies[code]) ?? 'manual_fix';
 	}
 
 	private async validateFix(fix: ErrorFix): Promise<boolean> {
@@ -278,7 +276,7 @@ ${this.getCommonFixes(error.code ?? '')}`;
 		return { applied, failed, results };
 	}
 
-	private async applyFix(fix: ErrorFix): Promise<{ errorId: string; success: boolean; reason?, string }> {
+	private async applyFix(fix: ErrorFix): Promise<{ errorId: string; success: boolean; reason?: string }> {
 		try {
 			const resp = await fetch('/api/files/read', {
 				method: 'POST',
@@ -328,7 +326,8 @@ ${this.getCommonFixes(error.code ?? '')}`;
 		const allAttempts = this.getFixHistory();
 		const totalAttempts = allAttempts.length;
 		const successfulFixes = allAttempts.filter((a: any) => a.result === 'success').length;
-		const failedFixes = allAttempts.filter((a: any) => a.result === 'failed').length;allAttempts.reduce((sum, a) => sum + (a.confidence ?? 0), 0) / (allAttempts.length ?? 1);
+		const failedFixes = allAttempts.filter((a: any) => a.result === 'failed').length;
+		const averageConfidence = allAttempts.reduce((sum, a) => sum + (a.confidence ?? 0), 0) / (allAttempts.length || 1);
 		const appliedFixes = allAttempts.filter((a: any) => a.applied).length;
 
 		return {
@@ -362,7 +361,7 @@ export const errorFixerStore = writable({
 		successfulFixes: 0,
 		failedFixes: 0,
 		averageConfidence: 0,
-		appliedFixes, 0
+		appliedFixes: 0
 	}
 });
 

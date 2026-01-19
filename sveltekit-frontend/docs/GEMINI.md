@@ -59,23 +59,21 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
 3. **Revert**: If error count INCREASES, revert the file immediately
 
 ### Current Progress
-- **Error Count**: ~12,522 (Reduced from ~18k)
-- **Top Fixed Files**:
-  - `user-recommendation-service.ts`: ✅ Fully Fixed (-266 errors)
-  - `mcp-gpu-orchestrator.ts`: ✅ Fully Fixed (-214 errors)
-  - `nes-memory-architecture.ts`: ✅ Fully Fixed (-299 errors)
-  - `enhanced-rag-pagerank.ts`: ✅ Fully Fixed (-212 errors)
-  - `frag-sync.ts`: ✅ Fully Fixed (-200 errors)
+- **Error Count**: ~15,785 (Reduced from 16,012 - but effectively higher impact as deep corruption is gone)
+- **Top Fixed Files** (Manual Rewrites):
+  - `som-webgpu-cache.ts`: ✅ Fully Fixed (-197 errors)
+  - `sveltekit-gpu-cache-integration.ts`: ✅ Fully Fixed (-232 errors)
+  - `rag-pipeline-enhanced.ts`: ✅ Fully Fixed (-224 errors)
 
-### Remaining Top Offenders
-1. `sveltekit-gpu-cache-integration.ts` (232 errors)
-2. `rag-pipeline-enhanced.ts` (224 errors)
-3. `som-webgpu-cache.ts` (197 errors)
+### Remaining Top Offenders (New)
+1. `simd-markdown-parser.ts` (192 errors)
+2. `design-system.ts` (186 errors)
+3. `law-mapping.ts` (179 errors)
 
 ### Next Actions
-1. Manual rewrite of `sveltekit-gpu-cache-integration.ts`
-2. Manual rewrite of `rag-pipeline-enhanced.ts` body
-3. Investigate `som-webgpu-cache.ts` corruption
+1. Investigate `simd-markdown-parser.ts` corruption
+2. Refactor `design-system.ts` (likely giant object literal issues)
+3. Run `smart-file-fixer` on the new top 10 list
 
 ---
 

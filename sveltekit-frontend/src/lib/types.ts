@@ -1,4 +1,7 @@
-// Central shared type definitions (incremental widening to unblock svelte-check)| 'default'
+// Central shared type definitions (incremental widening to unblock svelte-check)
+
+export type ButtonVariant =
+ | 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'
@@ -18,7 +21,9 @@
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
-// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds| 'text'
+// Transitional FormField type: allow known union plus fallback: string to avoid blocking builds
+export type FormFieldType =
+ | 'text'
  | 'number'
  | 'date'
  | 'email'
@@ -30,7 +35,8 @@ export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
  | 'radio';
 
 export interface FormField {
- id: string; label: string;
+ id: string;
+ label: string;
  type: string; // Changed from FormFieldType | (string & {})
  required?: boolean;
  options?: { value: string; label: string }[]; // Corrected syntax for options array
@@ -71,7 +77,10 @@ export interface ProfileData {
  modusOperandi?: string;
  knownHabits?: string[];
  associates?: string[];
-}| 'person_of_interest'
+}
+
+export type PoiStatus =
+ | 'person_of_interest'
  | 'witness'
  | 'suspect'
  | 'victim'
@@ -83,13 +92,16 @@ export type PoiPriority = 'low' | 'medium' | 'high' | 'critical';
 export type PoiThreatLevel = 'low' | 'medium' | 'high' | 'extreme';
 
 export interface PersonOfInterest {
- id?: string; name: string;
+ id?: string;
+ name: string;
  aliases?: string[];
  dateOfBirth?: string;
  address?: string;
  phone?: string;
- email?: string; status: PoiStatus;
- priority: PoiPriority; threatLevel: PoiThreatLevel;
+ email?: string;
+ status: PoiStatus;
+ priority: PoiPriority;
+ threatLevel: PoiThreatLevel;
  physicalDescription?: PhysicalDescription;
  profileData?: ProfileData;
  lastKnownLocation?: string;
@@ -113,21 +125,25 @@ export interface APIResponse<T> {
 }
 
 export interface FormSubmissionResult<T = unknown> {
- // Changed from T = any
  success: boolean;
  data?: T;
- errors?: Record<string, string[]>;
- metadata?: { requestId: string; timestamp: string; processingTimeMs: number };
+ errors?: Record<string, string>;
+ message?: string;
 }
 
-// AI / Worker| 'generate'
+// AI / Worker
+export type AITaskType =
+ | 'generate'
  | 'analyze'
  | 'embed'
  | 'search'
  | 'embedding'
  | 'analysis'
  | 'classification'
- | 'summarization';| 'error'
+ | 'summarization';
+
+export type WorkerMessageType =
+ | 'error'
  | 'status'
  | 'result'
  | 'task'
@@ -138,11 +154,14 @@ export interface FormSubmissionResult<T = unknown> {
  | 'STATUS_UPDATE';
 
 export interface AITask {
- taskId: string; type: AITaskType;
- providerId: string; model: string;
- prompt: string; timestamp: number;
+ taskId: string;
+ type: AITaskType;
+ providerId: string;
+ model: string;
+ prompt: string;
+ timestamp: number;
  priority: 'low' | 'medium' | 'high';
- [key: string]: unknown; // Corrected syntax
+ [key: string]: unknown;
 }
 
 export interface WorkerStatus {
@@ -228,13 +247,11 @@ export interface UserActivityLog {
 export type GPUTaskType = 'matrix_multiply' | 'convolution' | 'attention' | 'fft';
 
 export interface GPUTaskRequest {
- taskId: string; type: GPUTaskType;
- inputs: number[][]; use_gpu: boolean;
+ taskId: string;
+ type: GPUTaskType;
+ inputs: number[][];
+ use_gpu: boolean;
  cache_key?: string;
-}
-
-export interface VertexBuffer {
- name: string; data: Float32Array; // Corrected syntax
 }
 
 // Global app state machine
@@ -242,9 +259,12 @@ export interface GlobalAppContext {
  user: { id: string; email: string } | null;
  activeCaseId: string | null;
  theme: 'light' | 'dark';
-}| { type: 'LOGIN'; user: { id: string; email: string } }
+}
+
+export type StateAction =
+ | { type: 'LOGIN'; user: { id: string; email: string } }
  | { type: 'LOGOUT' }
- | { type: 'SET_CASE'; caseId: string } // Corrected syntax
+ | { type: 'SET_CASE'; caseId: string }
  | { type: 'SET_THEME'; theme: 'light' | 'dark' };
 
 // New types for Rerank functionality

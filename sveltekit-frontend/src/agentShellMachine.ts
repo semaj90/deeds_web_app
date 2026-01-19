@@ -1,8 +1,8 @@
 /**
  * XState Machine for AI Agent Shell with Production Go Services Integration
  */
-import { createMachine, assign } from 'xstate';
 import type { RAGResponse, UploadResponse } from '$lib/services/goServiceClient.js';
+import { assign, createMachine } from 'xstate';
 
 // Define context and event types
 export interface AgentShellContext {
@@ -16,7 +16,10 @@ export interface AgentShellContext {
   caseId?: string;
   serviceHealth?: { enhancedRAG: boolean; uploadService: boolean; kratosServer: boolean;
   };
-}| { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
+}
+
+export type AgentShellEvent =
+| { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
   | { type: 'xstate.done.actor.callAgent'; data: string }
   | { type: 'ACCEPT_PATCH'; jobId: string; userId: string; patchContent: string }
   | { type: 'RATE_SUGGESTION'; jobId: string; rating: number; userId: string; feedback?: string }

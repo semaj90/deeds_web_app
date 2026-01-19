@@ -1,5 +1,5 @@
-import type { env } from '$env/dynamic/public';
-import type { Redis } from '$lib/server/redis-client';
+import { env } from '$env/dynamic/public';
+import type { Redis } from 'ioredis';
 
 // NOTE: ioredis is server-side only
 // Lazy-load on demand and skip in browser
@@ -13,8 +13,8 @@ async function getRedisClient(): Promise<Redis | null> {
 	if (typeof window !== 'undefined') return null;
 
 	try {
-		const mod = await import('ioredis');
-		const Redis = mod?.default ?? mod;
+        // Dynamically import the shared redis client from server modules
+		const { redis } = await import('$lib/server/redis-client');
 		redisClient = redis;
 		return redisClient;
 	} catch (err) {
@@ -32,7 +32,7 @@ type HealthCheckResult = {
 	model: string[];
 };
 
-import type { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
+import { DEFAULT_OLLAMA } from '$lib/services/get-ollama-endpoint';
 
 /**
  * TODO: Phase 103.1+ - Migrate to TensorRT-LLM + Triton Inference Server

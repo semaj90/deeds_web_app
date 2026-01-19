@@ -27,7 +27,7 @@ export async function searchKnowledgeBase(
     query: string,
     options: Partial<RetrieveCandidatesRequest> = {}
 ): Promise<RetrieveCandidatesResponse> {
-    const request: RetrieveCandidatesRequest = { query: top_k: options.top_k ?? 10,
+    const request: RetrieveCandidatesRequest = { query, top_k: options.top_k ?? 10,
         min_score: options.min_score ?? 0.5,
         case_id: options.case_id,
         source_types: options.source_types

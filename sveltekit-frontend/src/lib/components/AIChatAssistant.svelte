@@ -1,9 +1,9 @@
 <script lang="ts">
  let { caseId, initialContext } = $props<{
- caseId: string; initialContext, string;
+ caseId: string; initialContext: string;
  }>();
 
- let messages = $state <{ sender: 'user' | 'ai'; text, string }[]>([
+ let messages = $state <{ sender: 'user' | 'ai'; text: string }[]>([
  {
  sender: 'ai',
  text: `Hello! I'm your AI Legal Assistant for Case ID: ${ caseId }. How can I help you today?`,
