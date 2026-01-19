@@ -274,7 +274,7 @@
 	</div>
 
 	<!-- Cluster Details Dialog -->
-	<DialogRoot bind, open={dialogOpen}>
+	<DialogRoot bind:open={dialogOpen}>
 		<DialogPortal>
 			<DialogOverlay class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
 			<DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-2xl shadow-2xl border border-purple-500/30 p-8">

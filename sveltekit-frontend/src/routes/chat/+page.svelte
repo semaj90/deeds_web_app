@@ -22,7 +22,7 @@
     {/if}
 </div>
 
-<form method="POST" action="?/send" use, enhance={() => {
+<form method="POST" action="?/send" use:enhance={() => {
     // Optimistic Update before server response
     const input = document.querySelector('input[name="message"]') as HTMLInputElement;
     if (input.value) {

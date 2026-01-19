@@ -237,7 +237,7 @@ const tabs = [
 	</main>
 
 	<!-- Dialog -->
-	<Dialog bind, open={showDialog} title="Confirm Action" description="Are you sure you want to proceed?">
+	<Dialog bind:open={showDialog} title="Confirm Action" description="Are you sure you want to proceed?">
 		<p class="text-slate-300 mb-4">
 			This action will process the document with the following settings:
 		</p>

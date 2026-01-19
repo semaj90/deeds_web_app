@@ -560,6 +560,8 @@ npx svelte-check --threshold error
 - Fixed `src/routes/(app)/phase78/routes/[routePath]/+page.server.ts` malformed summary object.
 - Fixed `src/lib/services/enhanced-api-client.ts` request flow, imports, and upload response parsing.
 - Dry-run batch (8 files) reduced `svelte-check` to 50,785 errors / 100 warnings (1446 files).
+- Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
+- Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
 
 
 ## Phase 89: ACE Analysis - 1/11/2026, 4:51:25 PM

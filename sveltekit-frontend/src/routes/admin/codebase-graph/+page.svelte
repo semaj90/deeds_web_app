@@ -330,7 +330,7 @@
 		</div>
 
 		<!-- Cluster Details Dialog -->
-		<DialogRoot bind, open={detailsOpen}>
+		<DialogRoot bind:open={detailsOpen}>
 			<DialogPortal>
 				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 				<DialogContent
@@ -430,7 +430,7 @@
 		</DialogRoot>
 
 		<!-- Agentic Fix Status Dialog -->
-		<DialogRoot bind, open={fixDialogOpen}>
+		<DialogRoot bind:open={fixDialogOpen}>
 			<DialogPortal>
 				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
 				<DialogContent

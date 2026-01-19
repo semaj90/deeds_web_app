@@ -58,15 +58,29 @@ function fixOrphanedUnions(content, filename) {
     const nextLine = i + 1 < lines.length ? lines[i + 1] : '';
     const nextTrimmed = nextLine.trim();
 
-    // Check if current line is just } and next line starts with | { type:
-    if (trimmed === '}' && nextTrimmed.match(/^\|\s*\{\s*type:/)) {
+    // Check if current line is just } (closing interface) and next line starts with | { type:
+    // Also check for }; pattern (closing nested object then interface)
+    const isClosingBrace = trimmed === '}' || trimmed === '};';
+    const nextIsOrphanedUnion = nextTrimmed.match(/^\|\s*\{\s*type:/);
+
+    if (VERBOSE && isClosingBrace && i < 25) {
+      console.log(`    DEBUG: Line ${i+1} = "${trimmed}", next = "${nextTrimmed.substring(0,40)}..."`);
+    }
+
+    if (isClosingBrace && nextIsOrphanedUnion) {
       // Look back to find the interface name
       let interfaceName = 'GeneratedEvent';
       for (let j = i - 1; j >= 0 && j > i - 30; j--) {
         const prevLine = lines[j];
-        const match = prevLine.match(/interface\s+(\w+)Context/);
-        if (match) {
-          interfaceName = match[1] + 'Event';
+        // Match interface name (Context suffix or any interface)
+        const contextMatch = prevLine.match(/interface\s+(\w+)Context/);
+        if (contextMatch) {
+          interfaceName = contextMatch[1] + 'Event';
+          break;
+        }
+        const interfaceMatch = prevLine.match(/export\s+interface\s+(\w+)/);
+        if (interfaceMatch) {
+          interfaceName = interfaceMatch[1] + 'Event';
           break;
         }
       }
@@ -77,6 +91,9 @@ function fixOrphanedUnions(content, filename) {
       fixedLines.push(`export type ${interfaceName} =`);
       changes++;
       fixStats.orphanedUnionFixed++;
+      if (VERBOSE) {
+        console.log(`    FIXING: Adding "export type ${interfaceName} =" after line ${i + 1}`);
+      }
       i++;
       continue;
     }
