@@ -12,7 +12,7 @@ export interface WorkerResponse {
 
 export class EmbeddingService {
   async generate(texts: string[], dimension = 384) {
-    return texts.map((text) => ({ text: embedding: this.generateVector(text, dimension),
+    return texts.map((text) => ({ text, embedding: this.generateVector(text, dimension)
     }));
   }
 
