@@ -24,14 +24,14 @@
 	const viewMode = writable<'tree' | 'graph' | 'list'>('tree');
 	const filterType = writable<string>('all');
 	const loading = writable(true);
-	const agentStatus = writable<{ active: boolean; current_file: string; progress, number }>({
+	const agentStatus = writable<{ active: boolean; current_file: string; progress: number }>({
 		active: false,
 		current_file: '',
 		progress: 0
 	});
 
-	let searchQuery = '';
-	let expandedPaths = new Set<string>();
+	let searchQuery = $state('');
+	let expandedPaths = $state(new Set<string>());
 
 	onMount(async () => {
 		await loadRoutes();

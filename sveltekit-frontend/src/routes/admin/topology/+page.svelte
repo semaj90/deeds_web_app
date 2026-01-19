@@ -16,7 +16,7 @@
 		type: 'import' | 'error' | 'dependency';
 	}
 
-	const topology = writable<{ nodes: TopologyNode[], edges, Edge[] }>({ nodes: [], edges: [] });
+	const topology = writable<{ nodes: TopologyNode[]; edges: Edge[] }>({ nodes: [], edges: [] });
 	const selectedNode = writable<TopologyNode | null>(null);
 	const filterTag = writable<string>('all');
 	const filterAction = writable<string>('all');

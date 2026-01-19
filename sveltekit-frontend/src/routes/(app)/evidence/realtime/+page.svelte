@@ -1,7 +1,7 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
- import type { appActions, appStore } from '$lib/stores/app-store';
+ import { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
+ import { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 
  // YoRHaModalComponent is being replaced by bits-ui Dialog
@@ -22,15 +22,22 @@
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
- { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
+ { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }
+ ]);
 
  let evidenceInsights = $state<any[]>([]);
  let recentCases = $state<any[]>([]);
 
+ type AppState = { cases?: any[]; evidence?: any[] };
+ const actions = appActions as unknown as {
+ 	loadCases?: () => Promise<void>;
+ 	loadEvidence?: () => Promise<void>;
+ };
+
  // Subscribe to store
- let appState = $state({});
+ let appState = $state<AppState>({});
  $effect(() => {
- const unsubscribe = appStore.subscribe(state => {
+ const unsubscribe = appStore.subscribe((state) => {
  appState = state;
  });
  return unsubscribe;
@@ -42,12 +49,12 @@
  error = null;
 
  // Load cases from API
- await appActions.loadCases();
+ await actions.loadCases?.();
 
  // Get cases from store and filter for recent ones
  const allCases = appState?.cases ?? [];
  recentCases = allCases
- .sort((a: any, b): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
+ .sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
  .map((caseItem: any) => ({
  id: caseItem.id || caseItem.caseId,
@@ -56,7 +63,8 @@
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
- createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
+ createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(),
+ status: caseItem.status || 'active'
  }));
 
  } catch (err) {
@@ -92,7 +100,7 @@
  async function loadEvidenceInsights() {
  try {
  // Load evidence from API
- await appActions.loadEvidence();
+ await actions.loadEvidence?.();
 
  const evidence = appState?.evidence ?? [];
 
@@ -100,7 +108,7 @@
  evidenceInsights = evidence
  .filter((item: any) => item.analysis || item.aiAnalyzed)
  .slice(0, 5)
- .map((item: any, index): number => ({
+ .map((item: any, index: number) => ({
  id: `insight-${item.id || index}`,
  label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
  summary: item.analysis || item.summary || 'AI analysis completed'
@@ -176,7 +184,7 @@
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${ caseId }`);
+ await goto(`/cases/${caseId}`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -227,8 +235,7 @@
  <section class="grid grid-cols-2 gap-4">
  {#each sections as section (section.id)}
  <button
- class="rounded-lg border border-slate-700 bg-black/60 p-4 transition-all hover:border-amber-400
- {selectedSection === section.id ? 'border-amber-400' , ''}"
+ class={`rounded-lg border border-slate-700 bg-black/60 p-4 transition-all hover:border-amber-400 ${selectedSection === section.id ? 'border-amber-400' : ''}`}
  onclick={() => setSelectedSection(section.id)}
  aria-pressed={selectedSection === section.id}
  >
@@ -264,7 +271,7 @@
  <p class="mt-3 text-sm">No recent cases found. Create one to get started.</p>
  {:else}
  <ul class="mt-4 space-y-3">
- {#each Array.isArray(recentCases) ? recentCases : [] as caseItem (caseItem.id)}
+ {#each (Array.isArray(recentCases) ? recentCases : []) as caseItem (caseItem.id)}
  <li class="rounded border border-slate-700/60 bg-black/40 px-3 py-2">
  <div class="flex items-center justify-between">
  <div>
@@ -305,7 +312,7 @@
  <p class="mt-3 text-sm">No embeddings or AI summaries are available yet.</p>
  {:else}
  <ul class="mt-4 space-y-3">
- {#each Array.isArray(evidenceInsights) ? evidenceInsights : [] as insight (insight.id)}
+ {#each (Array.isArray(evidenceInsights) ? evidenceInsights : []) as insight (insight.id)}
  <li class="rounded border border-slate-700/60 bg-black/40 px-3 py-2">
  <p class="font-medium">{insight.label}</p>
  <p class="text-xs">{insight.summary}</p>
@@ -332,7 +339,7 @@
  <Root bind:open={showNewCaseModal}>
  <Overlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
- data-[state=closed]:fade-out-0 data-[state=open], fade-in-0"
+ data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
  />
  <Content
  class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4
@@ -340,7 +347,7 @@
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md, w-full"
+ data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -392,7 +399,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={ cancelNewCase }
+ onclick={cancelNewCase}
  >
  Cancel
  </button>
@@ -405,10 +412,10 @@
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open], text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
- xmlns="http, //www.w3.org/2000/svg"
+ xmlns="http://www.w3.org/2000/svg"
  width="24"
  height="24"
  viewBox="0 0 24 24"
