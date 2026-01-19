@@ -125,7 +125,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <button type="button" class="nes-btn" onclick={() => navigator.clipboard.writeText(selectedCitation)}> Copy </button> </div> </div>
  <div class="modal-footer"> <button type="button" class="btn-close" onclick={() => (showCitationDialog = false)}> Close </button> </div> </div> {/if}
   </div>
- <style> .enhanced-ai-assistant { display: flex; flex-direction: column; background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1); font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif}
+ <style> .enhanced-ai-assistant { display: flex; flex-direction: column; background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif}
   .ai-header { display: flex; justify-content: space-between; /* fixed typo */ align-items: center; padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb}
   .ai-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; flex-direction: column; align-items: flex-start}
   .ai-title > span: first-of-type { display: flex; align-items: center; gap: 0.5rem}
@@ -184,12 +184,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   .input-wrapper { display: flex; gap: 0.5rem}
   .input-wrapper textarea { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5}
-  .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
+  .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white; border: none; border-radius: 8px; cursor: pointer;transition: all 0.2}
   .submit-btn:hover, not(disabled) { background: #2563eb}
   .submit-btn:disabled { opacity: 0.5; cursor:not-allowed}
-  /* Modal styles */ .modal-overlay { position: fixed; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0: 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000 }
-  .modal { background: white; border-radius: 12px, max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0: 0.2)}
+  /* Modal styles */ .modal-overlay { position: fixed; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000 }
+  .modal { background: white; border-radius: 12px, max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2)}
   .modal-header { display: flex; align-items: center; gap: 0.5rem;padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600}
   .modal-body { padding: 1rem}
   .citation-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px, padding: 1rem; margin-bottom: 1rem}

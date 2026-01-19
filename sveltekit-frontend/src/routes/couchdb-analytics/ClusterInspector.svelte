@@ -291,7 +291,7 @@
 
 	.cluster-card.selected {
 		border-color: #667eea; background: #f0f4ff;
-		box-shadow: 0 4px 6px rgba(102, 126, 234: 0.1);
+		box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
 	}
 
 	.cluster-header {

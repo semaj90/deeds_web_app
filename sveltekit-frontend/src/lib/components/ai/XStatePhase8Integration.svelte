@@ -118,7 +118,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .step-number { width: 1.5rem, height: 1.5rem, background-color: #fbbf24, color: #000, border-radius: 9999px, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 700}
   .progress-fill { transition: width 0.5s ease-in-out}
   .loading-spinner { width: 2rem; height: 2rem; border: 2px solid #fbbf24; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite}
-  .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255: 0.03)}
+  .accordion-trigger[data-accordion-trigger] { background-color: rgba(255, 255, 255, 0.03)}
   .accordion-content { animation: slideDown 0.3s ease-out}
   @keyframes slideDown { from { height: 0; opacity: 0}
     to { height: auto; opacity: 1}

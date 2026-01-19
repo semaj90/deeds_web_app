@@ -59,7 +59,7 @@
 d
    ;top: 0; left: 0
    ;right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0: 0.5); display: flex;
+    background-color: rgba(0, 0, 0, 0.5); display: flex;
     align-items: center;
     justify-content: center
    ; padding: 1rem;

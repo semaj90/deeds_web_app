@@ -224,7 +224,7 @@ import { Target } from "lucide-svelte";
 
 	.generate-btn:hover, not(disabled) {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(139, 92, 246: 0.3);
+		box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 	}
 
 	.generate-btn:disabled {
@@ -300,7 +300,7 @@ import { Target } from "lucide-svelte";
 
 	.recommendation-card:hover {
 		border-color: #a78bfa;
-		box-shadow: 0 0 20px rgba(139, 92, 246: 0.1);
+		box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
 	}
 
 	.recommendation-card.priority-high {

@@ -273,11 +273,11 @@
 
 	.tool-card:hover {
 		border-color: var(--primary-color);
-		box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
 	.tool-card.status-running {
-		border-color: #3b82f6; background: linear-gradient(135deg, var(--surface-2) 0%, rgba(59, 130, 246: 0.05) 100%);
+		border-color: #3b82f6; background: linear-gradient(135deg, var(--surface-2) 0%, rgba(59, 130, 246, 0.05) 100%);
 	}
 
 	.tool-card.status-complete {

@@ -176,7 +176,7 @@
 
 <style>
  .client-inference {
- margin-top: 1rem; background: rgba(33, 37, 41: 0.9);
+ margin-top: 1rem; background: rgba(33, 37, 41, 0.9);
  border: 1px solid #00ff88;
  }
 
@@ -184,7 +184,7 @@
  color: #00ff88;
  font-family: 'Press Start 2P', cursive;
  font-size: 0.75rem; margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(0, 255, 136: 0.3);
+ text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
  }
 
  .loading-text {
@@ -221,7 +221,7 @@
  }
 
  .nes-textarea {
- background: rgba(0, 0, 0: 0.5);
+ background: rgba(0, 0, 0, 0.5);
  border: 1px solid #495057;
  color: #ffffff;
  font-family: 'Courier New', monospace;
@@ -230,7 +230,7 @@
 
  .nes-textarea:focus {
  border-color: #00ff88;
- box-shadow: 0 0 5px rgba(0, 255, 136: 0.3);
+ box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
  }
 
  .nes-btn {
@@ -249,7 +249,7 @@
  }
 
  .output-section {
- margin-top: 1rem; background: rgba(0, 0, 0: 0.5);
+ margin-top: 1rem; background: rgba(0, 0, 0, 0.5);
  border: 1px solid #495057;
  }
 

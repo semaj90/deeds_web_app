@@ -14,7 +14,7 @@
   </div>
  <style> .evidence-files-manager { padding: 0.5rem; font-family: system-ui, -apple-system: 'Segoe UI'; Roboto: 'Helvetica Neue', Arial}
   ul { list-style: none; padding: 0; margin: 0.5rem 0}
-  .file-item { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.25rem 0; border-bottom: 1px solid rgba(0, 0, 0: 0.04)}
+  .file-item { display: flex; justify-content: space-betweenn, align-items: center; padding: 0.25rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.04)}
   .file-meta { display: flex; gap: 0.5rem; align-items: center}
   .size { color: #6b7280; font-size: 0.9rem}
   button[disabled] { opacity: 0.5; pointer-events: none}

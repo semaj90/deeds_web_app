@@ -249,7 +249,7 @@
 
  .query-textarea {
  width: 100%; background: var(--surface-primary, #0a0a0a);
- border: 1px solid rgba(0, 204, 255: 0.3);
+ border: 1px solid rgba(0, 204, 255, 0.3);
  border-radius: 4px; padding: 1rem;
  color: var(--text-primary, #ffffff);
  font-family: inherit; resize: vertical;
@@ -271,7 +271,7 @@
  .query-textarea:focus {
  outline: none;
  border-color: var(--text-primary, #00ccff);
- box-shadow: 0 0 15px rgba(0, 204, 255: 0.3);
+ box-shadow: 0 0 15px rgba(0, 204, 255, 0.3);
  }
 
  .search-options {
@@ -295,7 +295,7 @@
  .search-type-select,
  .limit-input {
  background: var(--surface-primary, #0a0a0a);
- border: 1px solid rgba(0, 204, 255: 0.3);
+ border: 1px solid rgba(0, 204, 255, 0.3);
  border-radius: 4px; padding: 0.5rem;
  color: var(--text-primary, #ffffff);
  }
@@ -322,7 +322,7 @@
 
  .loading-spinner {
  width: 40px; height: 40px;
- border: 3px solid rgba(0, 204, 255: 0.3);
+ border: 3px solid rgba(0, 204, 255, 0.3);
  border-top: 3px solid var(--text-primary, #00ccff);
  border-radius: 50%; animation: spin 1s linear infinite;
  margin: 0 auto 1rem;
@@ -346,7 +346,7 @@
  align-items: center;
  margin-bottom: 1.5rem;
  padding-bottom: 0.5rem;
- border-bottom: 1px solid rgba(0, 204, 255: 0.3);
+ border-bottom: 1px solid rgba(0, 204, 255, 0.3);
  }
 
  .results-header h3 {
@@ -373,7 +373,7 @@
  }
  :global(.result-card:hover) {
  transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(0, 204, 255: 0.2);
+ box-shadow: 0 4px 12px rgba(0, 204, 255, 0.2);
  }
  :global(.result-title) {
  color: var(--text-primary, #00ccff);
@@ -382,7 +382,7 @@
  }
 
  .content-type-badge {
- background: rgba(0, 204, 255: 0.2);
+ background: rgba(0, 204, 255, 0.2);
  padding: 0.2rem 0.4rem;
  border-radius: 3px;
  font-size: 0.7rem;
@@ -398,7 +398,7 @@
  color: var(--text-primary, #ffffff);
  line-height: 1.4;
  margin-bottom: 1rem; padding: 0.75rem;
- background: rgba(0, 204, 255: 0.05);
+ background: rgba(0, 204, 255, 0.05);
  border-radius: 4px;
  }
 
@@ -407,7 +407,7 @@
  }
 
  .metadata-content {
- background: rgba(0, 0, 0: 0.3);
+ background: rgba(0, 0, 0, 0.3);
  padding: 0.5rem;
  border-radius: 4px;
  font-family: monospace;
@@ -420,7 +420,7 @@
  display: flex;
  justify-content: space-between;
  align-items: center;
- border-top: 1px solid rgba(0, 204, 255: 0.2);
+ border-top: 1px solid rgba(0, 204, 255, 0.2);
  padding-top: 0.75rem;
  }
 

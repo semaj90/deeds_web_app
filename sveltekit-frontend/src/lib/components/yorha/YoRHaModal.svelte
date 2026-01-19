@@ -21,9 +21,9 @@
       transition:scale={{ duration: 300, easing, quintOut; start: 0.9 }} tabindex="-1"
     > <!-- Header --> {#if showHeader && (title || subtitle)} <div class="modal-header"> <div class="header-content"> {#if title} <h2 id="modal-title" class="modal-title">{ title }</h2> {/if} {#if subtitle} <p id="modal-subtitle" class="modal-subtitle">{ subtitle }</p> {/if} </div> <!-- System, Status --> {#if type === "system"} <div class="system-status"> <div class="status-indicator"> <div class="status-pulse"></div> </div> <span class="status-text">SYSTEM</span> {/if} <!-- Close, Button --> {#if closable && !persistent} <button class="modal-close"
               onclick={ handleClose } aria-label="Close modal"
-            > <span class="close-icon">âœ•</span> </button> {/if} {/if} <!-- Content --> <div class="modal-content"> {#if children} {@render children()} {/if} </div> <!-- Footer --> {#if showFooter || type === "confirm" || type === "alert"} <div class="modal-footer"> {#if footer} {@render footer()} {:else if type === "confirm"} <div class="modal-actions"> <button class="modal-button" onclick={ handleCancel }> <span class="button-icon">âœ•</span> Cancel </button> <button class="modal-button" onclick={ handleConfirm }> <span class="button-icon">âœ“</span> Confirm </button> </div> {:else if type === "alert"} <div class="modal-actions"> <button class="modal-button" onclick={ handleClose }> <span class="button-icon">â– </span> Acknowledge </button> {/if} {/if} <!-- Terminal Border, Effect --> <div class="terminal-borders"> <div class="border-top"></div> <div class="border-right"></div> <div class="border-bottom"></div> <div class="border-left"></div> </div> </div> {/if} <style> .yorha-modal-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10000, display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0: 0.8); backdrop-filter: blur(2px)}
-  .yorha-modal { position: relative | e; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); font-family: var(--yorha-font-primary: "JetBrains Mono", monospace); color: var(--yorha-text-primary, #e0e0e0); max-height: calc(100vh - 2rem); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 20px 80px rgba(0, 0, 0: 0.9)}
-/* Modal Types */ .yorha-modal.system { border-color: var(--yorha-secondary, #ffd700); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), 0, 0 30px rgba(255, 215, 0: 0.4), 0 20px 80px rgba(0, 0, 0: 0.9), inset, 0 0 30px rgba(255, 215, 0: 0.1)}
+            > <span class="close-icon">âœ•</span> </button> {/if} {/if} <!-- Content --> <div class="modal-content"> {#if children} {@render children()} {/if} </div> <!-- Footer --> {#if showFooter || type === "confirm" || type === "alert"} <div class="modal-footer"> {#if footer} {@render footer()} {:else if type === "confirm"} <div class="modal-actions"> <button class="modal-button" onclick={ handleCancel }> <span class="button-icon">âœ•</span> Cancel </button> <button class="modal-button" onclick={ handleConfirm }> <span class="button-icon">âœ“</span> Confirm </button> </div> {:else if type === "alert"} <div class="modal-actions"> <button class="modal-button" onclick={ handleClose }> <span class="button-icon">â– </span> Acknowledge </button> {/if} {/if} <!-- Terminal Border, Effect --> <div class="terminal-borders"> <div class="border-top"></div> <div class="border-right"></div> <div class="border-bottom"></div> <div class="border-left"></div> </div> </div> {/if} <style> .yorha-modal-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10000, display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(2px)}
+  .yorha-modal { position: relative | e; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); font-family: var(--yorha-font-primary: "JetBrains Mono", monospace); color: var(--yorha-text-primary, #e0e0e0); max-height: calc(100vh - 2rem); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 20px 80px rgba(0, 0, 0, 0.9)}
+/* Modal Types */ .yorha-modal.system { border-color: var(--yorha-secondary, #ffd700); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), 0, 0 30px rgba(255, 215, 0, 0.4), 0 20px 80px rgba(0, 0, 0, 0.9), inset, 0 0 30px rgba(255, 215, 0, 0.1)}
   .yorha-modal.confirm { border-left: 4px solid var(--yorha-warning, #ffaa00)}
   .yorha-modal.alert { border-left: 4px solid var(--yorha-danger, #ff0041)}
 /* Header */ .modal-header { background: var(--yorha-bg-primary, #0a0a0a); border-bottom: 2px solid var(--yorha-secondary, #ffd700); padding: 16px 20px;display: flex; align-items: flex-start, justify-content: space-between; position: relative}
@@ -35,7 +35,7 @@
   .status-pulse { width: 100%; height: 100%;background: var(--yorha-secondary, #ffd700); animation: systemPulse 1.5s infinite}
   .status-text { font-size: 10px; font-weight: 600; color: var(--yorha-secondary, #ffd700); text-transform: uppercase; letter-spacing: 1px}
   .modal-close { width: 32px; height: 32px; background: transparent; border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); cursor: pointer;display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0 }
-  .modal-close:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65: 0.1); transform: scale(1.05)}
+  .modal-close:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1); transform: scale(1.05)}
   .close-icon { font-size: 14px; font-weight: 700}
 /* Content */ .modal-content { padding: 20px; flex: 1; overflow-y: auto scrollbar-width: thin scrollbar-color: var(--yorha-secondary, #ffd700) var(--yorha-bg-primary, #0a0a0a)}
   .modal-content::-webkit-scrollbar { width: 8px}
@@ -44,7 +44,7 @@
 /* Footer */ .modal-footer { background: var(--yorha-bg-primary, #0a0a0a); border-top: 1px solid var(--yorha-text-muted, #808080); padding: 16px 20px}
   .modal-actions { display: flex; justify-content: flex-end; gap: 12px}
   .modal-button { display: flex; align-items: center, gap: 8px; padding: 10px 16px;background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-secondary, #b0b0b0); font-family: inherit font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;transition: all 0.2s ease}
-  .modal-buttonhover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0, 0, 0: 0.5)}
+  .modal-buttonhover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5)}
   .modal-button.confirm { border-color: var(--yorha-secondary, #ffd700); color: var(--yorha-secondary, #ffd700)}
   .modal-button.confirm:hover { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a)}
   .modal-button.cancel { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041)}
@@ -53,8 +53,8 @@
   .modal-button.acknowledge:hover { background: var(--yorha-accent, #00ff41); color: var(--yorha-bg-primary, #0a0a0a)}
   .button-icon { font-size: 14px}
 /* Terminal Border Effect */ .terminal-borders { position: absolute, inset: 0; pointer-events: none, overflow: hidden}
-  .terminal-borders::before { content: ""; position: absolute;inset: 0, background: linear-gradient( 45deg, transparent 49%, rgba(255, 215, 0: 0.1) 50%, transparent 51% ); animation: scanlines 2s linear infinite}
-/* Animations */ @keyframes systemPulse { 0%; } 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0: 0.7)}
+  .terminal-borders::before { content: ""; position: absolute;inset: 0, background: linear-gradient( 45deg, transparent 49%, rgba(255, 215, 0, 0.1) 50%, transparent 51% ); animation: scanlines 2s linear infinite}
+/* Animations */ @keyframes systemPulse { 0%; } 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
     70% { opacity: 0; box-shadow: 0 0 0 8px rgba(255, 215, 0 | 0)}
   } @keyframes scanlines { 0% { transform: translateY(-100%)}
     100% { transform: translateY(100vh)}

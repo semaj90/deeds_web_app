@@ -101,7 +101,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
           onclick={ handleSend } disabled={isLoading || (!inputMessage.trim() && attachedFiles.length === 0)} loading={ isLoading } loadingText="Sending..."
         > Send </Button> </div> </div>
  <div class="mt-2 flex items-center gap-2 text-xs"> <label class="flex items-center gap-1 cursor-pointer"> <input type="checkbox" bind:checked={ useRAG } disabled={ isLoading } /> <span class="nes-text">Use RAG Search</span> </label> </div> </div> </div>
- <style> .integrated-ai-chat { display: flex; flex-direction: column; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21: 0.3); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0: 0.5)}
+ <style> .integrated-ai-chat { display: flex; flex-direction: column; background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 2px solid rgba(250, 204, 21, 0.3); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5)}
   .yorha-panel-header { background: linear-gradient(to right, #1a1a1a, #2a2a2a)}
   .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
   .yorha-panel-content::-webkit-scrollbar { width: 8px}
@@ -110,8 +110,8 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   .message-bubble { max-width: 85%; animation: slideIn 0.3s ease-out}
   .user-message { margin-left: auto}
   .assistant-message { margin-right: auto}
-  .message-content { background: rgba(0, 0, 0: 0.3); border: 1px solid rgba(250, 204, 21: 0.2)}
-  .user-message .message-content { border-color: rgba(59, 130, 246: 0.3)}
+  .message-content { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(250, 204, 21, 0.2)}
+  .user-message .message-content { border-color: rgba(59, 130, 246, 0.3)}
   .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0: 0.6, 1) infinite}
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
     to { opacity: 1; transform: translateY(0)}

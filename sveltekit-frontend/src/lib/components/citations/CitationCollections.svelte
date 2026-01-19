@@ -253,7 +253,7 @@
  .form-group input:focus {
  outline: none;
  border-color: var(--color-burgundy);
- box-shadow: 0 0 0 3px rgba(139, 35, 50: 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
  }
 
  .color-picker {
@@ -344,7 +344,7 @@
 
  .collection-button:hover {
  border-color: var(--color-burgundy);
- box-shadow: 0 2px 6px rgba(139, 35, 50: 0.1);
+ box-shadow: 0 2px 6px rgba(139, 35, 50, 0.1);
  }
 
  .collection-color {

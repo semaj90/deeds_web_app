@@ -191,7 +191,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .status-section {
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border-radius: 8px; padding: 1rem;
  margin-bottom: 1rem;
  }

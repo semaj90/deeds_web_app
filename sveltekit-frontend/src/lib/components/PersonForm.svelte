@@ -187,7 +187,7 @@
  .person-form-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0: 0.8);
+ bottom: 0; background: rgba(0, 0, 0, 0.8);
  backdrop-filter: blur(5px); display: flex;
  align-items: center;
  justify-content: center;
@@ -201,12 +201,12 @@
  max-width: 600px;
  max-height: 90vh;
  overflow-y: auto;
- box-shadow: 0 20px 60px rgba(0, 0, 0: 0.5);
+ box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
  }
 
  .form-header {
  padding: 2rem 2rem 1rem 2rem;
- border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  display: flex;
  align-items: flex-start;
  justify-content: space-between;
@@ -234,13 +234,13 @@
  }
 
  .close-btn:hover {
- background: rgba(255, 255, 255: 0.1);
+ background: rgba(255, 255, 255, 0.1);
  color: #e0e0e0;
  }
 
  .ai-status-section {
  padding: 1rem 2rem;
- border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  }
 
  .status-indicator {
@@ -272,7 +272,7 @@
  }
 
  .error-message {
- background: rgba(255, 107, 107: 0.1);
+ background: rgba(255, 107, 107, 0.1);
  border: 1px solid #ff6b6b;
  border-radius: 8px; padding: 1rem;
  display: flex;
@@ -299,7 +299,7 @@
 
  .form-input, .form-textarea {
  width: 100%; padding: 0.75rem;
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
  border-radius: 8px; color: #e0e0e0;
  font-size: 0.9rem; transition: all 0.2s ease;
@@ -308,7 +308,7 @@
  .form-input:focus, .form-textarea:focus {
  outline: none;
  border-color: #00d4ff;
- box-shadow: 0 0 0 2px rgba(0, 212, 255: 0.2);
+ box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
  }
 
  .form-textarea {
@@ -317,8 +317,8 @@
  }
 
  .preview-section {
- background: rgba(0, 212, 255: 0.05);
- border: 1px solid rgba(0, 212, 255: 0.2);
+ background: rgba(0, 212, 255, 0.05);
+ border: 1px solid rgba(0, 212, 255, 0.2);
  border-radius: 8px; padding: 1rem;
  margin-top: 1.5rem;
  }
@@ -346,7 +346,7 @@
 
  .form-actions {
  padding: 1.5rem 2rem 2rem 2rem;
- border-top: 1px solid rgba(255, 255, 255: 0.1);
+ border-top: 1px solid rgba(255, 255, 255, 0.1);
  display: flex; gap: 1rem;
  justify-content: flex-end;
  }
@@ -362,12 +362,12 @@
  }
 
  .cancel-btn {
- background: rgba(255, 255, 255: 0.1);
+ background: rgba(255, 255, 255, 0.1);
  color: #b0b0b0;
  }
 
  .cancel-btn:hover, not(disabled) {
- background: rgba(255, 255, 255: 0.2);
+ background: rgba(255, 255, 255, 0.2);
  color: #e0e0e0;
  }
 
@@ -378,7 +378,7 @@
 
  .submit-btn:hover, not(disabled) {
  transform: translateY(-1px);
- box-shadow: 0 4px 15px rgba(0, 212, 255: 0.3);
+ box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
  }
 
  .submit-btn:disabled {
@@ -388,7 +388,7 @@
 
  .spinner {
  width: 16px; height: 16px;
- border: 2px solid rgba(255, 255, 255: 0.3);
+ border: 2px solid rgba(255, 255, 255, 0.3);
  border-top: 2px solid white;
  border-radius: 50%; animation: spin 1s linear infinite;
  }

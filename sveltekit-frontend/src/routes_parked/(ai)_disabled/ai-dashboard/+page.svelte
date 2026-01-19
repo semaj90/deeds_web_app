@@ -218,8 +218,8 @@ let aiStats = $state({);
  }
 
  :global(.user-card) {
- width: 100%; background: linear-gradient(135deg, rgba(102, 126, 234: 0.1) 0%, rgba(118, 75, 162: 0.1) 100%);
- border: 1px solid rgba(102, 126, 234: 0.2);
+ width: 100%; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+ border: 1px solid rgba(102, 126, 234, 0.2);
  }
 
  :global(.user-card-content) {
@@ -239,7 +239,7 @@ let aiStats = $state({);
  justify-content: center;
  font-size: 1.5rem;
  font-weight: bold;
- box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
  }
 
  .user-info {
@@ -314,32 +314,32 @@ let aiStats = $state({);
  }
 
  :global(.status-online) {
- background: rgba(34, 197, 94: 0.1);
+ background: rgba(34, 197, 94, 0.1);
  color: rgb(34, 197, 94);
  }
 
  :global(.status-offline) {
- background: rgba(248, 113, 113: 0.1);
+ background: rgba(248, 113, 113, 0.1);
  color: rgb(248, 113, 113);
  }
 
  :global(.status-active) {
- background: rgba(14, 165, 233: 0.1);
+ background: rgba(14, 165, 233, 0.1);
  color: rgb(14, 165, 233);
  }
 
  :global(.status-inactive) {
- background: rgba(148, 163, 184: 0.1);
+ background: rgba(148, 163, 184, 0.1);
  color: rgb(100, 116, 139);
  }
 
  :global(.status-healthy) {
- background: rgba(132, 204, 22: 0.1);
+ background: rgba(132, 204, 22, 0.1);
  color: rgb(132, 204, 22);
  }
 
  :global(.status-degraded) {
- background: rgba(251, 191, 36: 0.1);
+ background: rgba(251, 191, 36, 0.1);
  color: rgb(251, 191, 36);
  }
 
@@ -496,7 +496,7 @@ let aiStats = $state({);
  background: #0f172a !important
  ;
  transform: translateY(-3px);
- box-shadow: 0 0 0 2px #d4af37 0 4px 12px rgba(212, 175, 55: 0.3);
+ box-shadow: 0 0 0 2px #d4af37 0 4px 12px rgba(212, 175, 55, 0.3);
  }
 
  .case-card-inner {

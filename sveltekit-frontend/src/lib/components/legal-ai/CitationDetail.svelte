@@ -397,7 +397,7 @@
  .notes-editor textarea:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
  }
 
  .notes-editor textarea:disabled {

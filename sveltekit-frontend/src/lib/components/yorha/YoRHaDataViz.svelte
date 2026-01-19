@@ -50,7 +50,7 @@
   .progress-bar { position: relative; height: 12px;background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid var(--yorha-text-muted, #808080); overflow: hidden}
   .progress-fill { height: 100%; position: relative; transition: width 0.3s ease}
   .progress-fill.animated { animation: progressFill 1s ease-out}
-  .progress-glow { position: absolute; top: 0;right: -10px; width: 20px;height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 215, 0: 0.8))}
+  .progress-glow { position: absolute; top: 0;right: -10px; width: 20px;height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8))}
   /* Status Chart */ .status-chart { display: flex; flex-direction: column; gap: 12px;padding: 16px}
   .status-item { display: flex; align-items: center; gap: 12px;padding: 12px; background: var(--yorha-bg-primary, #0a0a0a); border: 1px solid var(--yorha-text-muted, #808080); transition: all 0.3s ease}
   .status-.animated { animation: slideIn 0.6s ease-out}

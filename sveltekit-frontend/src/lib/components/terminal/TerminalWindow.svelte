@@ -52,7 +52,7 @@
  <div
  bind:this={outputContainer}
  class="flex-1 overflow-y-auto p-4 font-mono text-sm text-[#00FF00] bg-black"
- style="background-image: repeating-linear-gradient(0deg, rgba(0, 255, 0: 0.03) 1px, transparent 1px); background-size, 100% 2px;"
+ style="background-image: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px); background-size, 100% 2px;"
  >
  {#if queryHistory.length === 0}
  <div class="text-[#00AA00]">

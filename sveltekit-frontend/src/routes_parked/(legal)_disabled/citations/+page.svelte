@@ -73,7 +73,7 @@ import type { Case } from '$lib/types';
  .search-field,
  .citation-type-select {
  background: var(--surface-primary, #0a0a0a);
- border: 1px solid rgba(0, 255, 0: 0.3);
+ border: 1px solid rgba(0, 255, 0, 0.3);
  border-radius: 4px; padding: 0.75rem;
  color: var(--text-primary, #ffffff);
  font-family: inherit;
@@ -83,7 +83,7 @@ import type { Case } from '$lib/types';
  .citation-type-select:focus {
  outline: none;
  border-color: var(--text-primary, #00ff00);
- box-shadow: 0 0 10px rgba(0, 255, 0: 0.3);
+ box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
  }
 
  .loading-state,
@@ -94,7 +94,7 @@ import type { Case } from '$lib/types';
 
  .loading-spinner {
  width: 40px; height: 40px;
- border: 3px solid rgba(0, 255, 0: 0.3);
+ border: 3px solid rgba(0, 255, 0, 0.3);
  border-top: 3px solid var(--text-primary, #00ff00);
  border-radius: 50%; animation: spin 1s linear infinite;
  margin: 0 auto 1rem;
@@ -128,7 +128,7 @@ import type { Case } from '$lib/types';
 
  .citation-card:hover {
  transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(0, 255, 0: 0.2);
+ box-shadow: 0 4px 12px rgba(0, 255, 0, 0.2);
  }
 
  .citation-type {
@@ -149,14 +149,14 @@ import type { Case } from '$lib/types';
  font-family: 'Times New Roman', serif;
  font-style: italic; color: var(--text-primary, #ffffff);
  margin-bottom: 1rem; padding: 0.75rem;
- background: rgba(0, 255, 0: 0.05);
+ background: rgba(0, 255, 0, 0.05);
  border-left: 3px solid var(--text-primary, #00ff00);
  }
 
  .quoted-text {
  font-style: italic; color: var(--text-secondary, #cccccc);
  margin: 1rem 0;
- padding: 0.75rem; background: rgba(0, 0, 0: 0.3);
+ padding: 0.75rem; background: rgba(0, 0, 0, 0.3);
  border-left: 3px solid var(--text-secondary, #888888);
  }
 
@@ -170,7 +170,7 @@ import type { Case } from '$lib/types';
  display: flex;
  justify-content: space-betweennn;
  align-items: center;
- border-top: 1px solid rgba(0, 255, 0: 0.2);
+ border-top: 1px solid rgba(0, 255, 0, 0.2);
  padding-top: 0.75rem;
  }
 

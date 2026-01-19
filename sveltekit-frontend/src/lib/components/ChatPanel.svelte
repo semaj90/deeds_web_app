@@ -151,7 +151,7 @@ import { Send } from "lucide-svelte";
 <style>
  .ai { border-color: #46ff9b; }
  .user { border-color: #9b9b9b; }
- .system { border-color: #ff6b6b; background: rgba(255, 107, 107: 0.1); }
+ .system { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
 </style>
 
 

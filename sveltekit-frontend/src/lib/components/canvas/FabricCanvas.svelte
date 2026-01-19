@@ -58,7 +58,7 @@ https, //svelte.dev/e/js_parse_error -->
  align-items: center; color: #666;
  margin-top: 20px;
  border-radius: 8px;
- box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
  }
  canvas {
  border: 1px dashed #aaa;

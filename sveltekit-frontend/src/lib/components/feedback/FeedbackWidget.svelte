@@ -28,8 +28,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 bind:value={ feedback } class="feedback-textarea"
                 placeholder="Tell us more about your experience..."
                 rows="3"
-              ></textarea> </div> <div class="feedback-actions"> <button class="submit-button" onclick={ submitFeedback } disabled={ isSubmitting } type="button"> {#if isSubmitting} Submitting... {:else} Submit Feedback {/if} </button> {/if} </div> {:else} <div class="feedback-success"> <div class="success-icon">âœ“</div> <h3 class="success-title">Thank you!</h3> <p class="success-message">Your feedback helps us improve.</p> {/if} </div> {/if} <style> .feedback-overlay { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0: 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px)}
-  .feedback-widget { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0: 0.15); max-width: 400px, width: 90%; max-height: 80vh; overflow-y: auto}
+              ></textarea> </div> <div class="feedback-actions"> <button class="submit-button" onclick={ submitFeedback } disabled={ isSubmitting } type="button"> {#if isSubmitting} Submitting... {:else} Submit Feedback {/if} </button> {/if} </div> {:else} <div class="feedback-success"> <div class="success-icon">âœ“</div> <h3 class="success-title">Thank you!</h3> <p class="success-message">Your feedback helps us improve.</p> {/if} </div> {/if} <style> .feedback-overlay { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px)}
+  .feedback-widget { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); max-width: 400px, width: 90%; max-height: 80vh; overflow-y: auto}
   .feedback-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 20px}
   .feedback-title { margin: 0; color: #333; font-size: 18px; font-weight: 600}
   .close-button { background: none, border: none, font-size: 24px; color: #999; cursor: pointer, padding: 4px, border-radius: 4px; transition: color 0.2s, background-color 0.2}
@@ -44,7 +44,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .feedback-section { display: flex; flex-direction: column; gap: 8px}
   .feedback-textarea-label { color: #555; font-size: 14px; font-weight: 500}
   .feedback-textarea { border: 2px solid #e1e1e1; border-radius: 8px; padding: 12px; font-size: 14px; font-family: inherit; resize: vertical;transition: border-color 0.2}
-  .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229: 0.1)}
+  .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1)}
   .feedback-actions { display: flex; justify-content: flex-end}
   .submit-button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px, font-weight: 600; cursor: pointer;transition: background-color 0.2s, transform 0.1}
   .submit-buttonhover:not(disabled) { background: #4338ca; transform: translateY(-1px)}

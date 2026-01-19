@@ -63,7 +63,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .step {
- background: rgba(255, 255, 255: 0.2);
+ background: rgba(255, 255, 255, 0.2);
  padding: 1rem 1.5rem;
  border-radius: 8px;
  white-space: nowrap;
@@ -125,7 +125,7 @@ https, //svelte.dev/e/js_parse_error -->
  align-items: flex-start; background: white;
  padding: 1.5rem;
  border-radius: 8px;
- box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  }
 
  .status-icon {

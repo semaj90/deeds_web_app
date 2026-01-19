@@ -446,7 +446,7 @@ if (!browser || !enableWebGPU) return
     gap: 1rem
     align-items: center
     margin-bottom: 1rem, padding: 1rem
-   ;background: rgba(0, 0, 0: 0.3);
+   ;background: rgba(0, 0, 0, 0.3);
     border-radius: 4px}
   .navigation-controls {
     display: flex
@@ -457,7 +457,7 @@ if (!browser || !enableWebGPU) return
     justify-self: center}
   .zoom-info {
     padding: 0.25rem 0.5rem
-   ;background: rgba(255, 255, 255: 0.1);
+   ;background: rgba(255, 255, 255, 0.1);
     border-radius: 4px
     font-size: 0.875rem
     min-width: 60px
@@ -478,11 +478,11 @@ if (!browser || !enableWebGPU) return
     position: absolute
    ;top: 0; left: 0
    ;right: 0; bottom: 0
-   ;background: rgba(0, 0, 0: 0.8); display: flex
+   ;background: rgba(0, 0, 0, 0.8); display: flex
     flex-direction: column
     justify-content: center
     align-items: center, gap: 1rem}
-  .lod-stats { background: rgba(0, 0, 0: 0.4)}
+  .lod-stats { background: rgba(0, 0, 0, 0.4)}
   .stats-grid {
     display: grid
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem

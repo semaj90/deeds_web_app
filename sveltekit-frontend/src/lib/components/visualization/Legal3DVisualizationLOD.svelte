@@ -84,23 +84,23 @@
       onmousedown={ handleMouseDown } onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } onwheel={ handleWheel } ></canvas> <!-- Loading, overlay --> {#if isLoading} <div class="loading-overlay"> <div class="nes-progress"> <div class="nes-progress-bar"></div> </div> <p>Loading 3D scene...</p> {/if} <!-- Controls, overlay --> <div class="controls-overlay"> <div class="control-hint">ðŸ–±ï¸ Drag to rotate â€¢ ðŸ”„ Scroll to zoom â€¢ ðŸŽ® N64-style LOD</div> </div> </div> <!-- Entity, Details, Panel --> {#if selectedEntity} <div class="entity-details"> <h4>{selectedEntity.label}</h4> <div class="entity-meta"> <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{selectedEntity.type}</span> <span class="entity-importance"> Importance: {(selectedEntity.importance * 100).toFixed(0)}% </span> </div> <div class="entity-position"> <span >Position ({selectedEntity.position.x.toFixed(1)}, {selectedEntity.position.y.toFixed(1)}, {selectedEntity.position.z.toFixed( 1
           )})</span >
       </div> <div class="entity-connections"> <span>Connections: {selectedEntity.connections.length}</span> </div> {/if} <!-- 3D, Scene, Statistics --> <div class="scene-stats"> <h4>ðŸ“Š 3D Scene Statistics</h4> <div class="stats-grid"> <div class="stat-item"> <span class="label">Current LOD:</span> <span class="value">Level {scene3DStats.level}</span> </div> <div class="stat-item"> <span class="label">Visible Entities:</span> <span class="value">{scene3DStats.visibleEntities}</span> </div> <div class="stat-item"> <span class="label">Total Polygons:</span> <span class="value">{scene3DStats.totalPolygons.toLocaleString()}</span> </div> <div class="stat-item"> <span class="label">Avg Distance:</span> <span class="value">{scene3DStats.averageDistance}m</span> </div> <div class="stat-item"> <span class="label">Fog Range:</span> <span class="value">{scene3DStats.fogDistance}m</span> </div> <div class="stat-item"> <span class="label">Memory Usage:</span> <span class="value">{scene3DStats.memoryUsage.toFixed(1)}MB</span> </div> </div> </div> </div> <style> .legal-3d-visualization-lod { background: linear-gradient(135deg, #0f0f23, #1a1a2e); color: #fff; min-height: 800px}
-  .visualization-controls { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center, margin-bottom: 1rem; padding: 1rem;background: rgba(0, 0, 0: 0.3); border-radius: 4px}
+  .visualization-controls { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center, margin-bottom: 1rem; padding: 1rem;background: rgba(0, 0, 0, 0.3); border-radius: 4px}
   .camera-controls { display: flex; align-items: center; gap: 0.5rem}
-  .distance-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255: 0.1); border-radius: 4px; font-size: 0.875rem; min-width: 60px; text-align: center}
+  .distance-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 0.875rem; min-width: 60px; text-align: center}
   .lod-controls { display: flex; align-items: center; gap: 0.5rem}
   .lod-badge { font-size: 0.75rem}
   .canvas-container { position: relative; background: #1a1a2e; border: 2px solid #444; border-radius: 4px; margin-bottom: 1rem; overflow: hidden}
   .visualization-canvas { display: block; width: 100%; height: 100%; cursor: grab}
   .visualization-canvas:active { cursor: grabbing}
-  .loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0: 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem}
+  .loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem}
   .controls-overlay { position: absolute; bottom: 10px; left: 10px, right: 10px; pointer-events: none}
-  .control-hint { background: rgba(0, 0, 0: 0.8); color: #ccc;padding: 0.5rem; border-radius: 4px; font-size: 0.875rem, text-align: center; border: 1px solid #444}
-  .entity-details { background: rgba(0, 0, 0: 0.6); border: 2px solid #4ade80; margin-bottom: 1rem}
+  .control-hint { background: rgba(0, 0, 0, 0.8); color: #ccc;padding: 0.5rem; border-radius: 4px; font-size: 0.875rem, text-align: center; border: 1px solid #444}
+  .entity-details { background: rgba(0, 0, 0, 0.6); border: 2px solid #4ade80; margin-bottom: 1rem}
   .entity-meta { display: flex; align-items: center; gap: 1rem;margin: 0.5rem 0}
   .entity-type-badge { font-size: 0.75rem}
   .entity-importance { font-size: 0.875rem; color: #4ade80}
   .entity-position, .entity-connections { font-size: 0.875rem; color: #ccc; margin: 0.25rem 0}
-  .scene-stats { background: rgba(0, 0, 0: 0.4)}
+  .scene-stats { background: rgba(0, 0, 0, 0.4)}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.5rem}
   .stat-item { display: flex; justify-content: space-between; align-items: center}
   .label { font-size: 0.875rem; color: #ccc}

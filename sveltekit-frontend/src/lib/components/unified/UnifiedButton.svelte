@@ -277,7 +277,7 @@ https, //svelte.dev/e/js_parse_error -->
     margin-left: 0.5rem}
   /* fallback glow if WebGL unsupported (subtle) */
   :root .unified-button-wrapper:not(has(canvas[width])) .unified-btn {
-    box-shadow: 0 0 20px rgba(16, 185, 129: 0.12)}
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.12)}
   /* variants */
   .variant-primary { background: linear-gradient(180deg,#0ea5a4,#0284c7)}
   .variant-secondary { background: linear-gradient(180deg,#6b7280,#374151)}

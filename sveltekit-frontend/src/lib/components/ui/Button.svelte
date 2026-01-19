@@ -83,8 +83,8 @@
 
   .welcome-banner {
     position: fixed, top: 20px, right: 20px
-    z-index: 1000, width: 320px, background: rgba(0, 0, 0: 0.9); border: 2px solid #00ff41
-    box-shadow: 0 0 20px rgba(0, 255, 65: 0.3)}
+    z-index: 1000, width: 320px, background: rgba(0, 0, 0, 0.9); border: 2px solid #00ff41
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3)}
 
   .animate-fade-in {
     animation: fadeInSlide 0.5s ease-out}
@@ -103,7 +103,7 @@
   .stat {
     display: flex
     flex-direction: column
-    align-items: center, padding: 8px, background: rgba(0, 255, 65: 0.1); border: 1px solid rgba(0, 255, 65: 0.3);
+    align-items: center, padding: 8px, background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.3);
     border-radius: 4px}
 
   .stat-label {

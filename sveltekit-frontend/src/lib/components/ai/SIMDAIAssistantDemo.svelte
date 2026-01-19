@@ -160,7 +160,7 @@
   @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite}
   .live-component { transition: all 0.3s ease-in-out}
-  .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246: 0.1)}
+  .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246, 0.1)}
   /* Use global selectors for scrollbar pseudo-elements so Svelte's scoping doesn't break them */:global(.bg-black)::-webkit-scrollbar { width: 8px}:global(.bg-black)::-webkit-scrollbar-track { background: #000}:global(.bg-black)::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px}:global(.tile-nes) { filter: contrast(1.2) saturate(1.3)}:global(.tile-snes) { filter: contrast(1.1) saturate(1.1)}:global(.tile-n64) { filter: contrast(1.0) saturate(1.0)}
 </style> filter: contrast(1.0) saturate(1.0); </style>
 

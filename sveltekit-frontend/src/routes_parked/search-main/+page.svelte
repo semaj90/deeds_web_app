@@ -219,7 +219,7 @@
 	.search-bar input:focus {
 		outline: none;
 		border-color: #8b3a3a;
-		box-shadow: 0 0 0 2px rgba(139, 58, 58: 0.1);
+		box-shadow: 0 0 0 2px rgba(139, 58, 58, 0.1);
 	}
 
 	.search-bar button {

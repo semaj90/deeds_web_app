@@ -425,7 +425,7 @@
 		align-items: center;
 		margin-bottom: 1.5rem;
 		padding-bottom: 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.header h1 {
@@ -446,8 +446,8 @@
 	}
 
 	.stat-badge {
-		background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 0.5rem 1rem;
 		display: flex;
 		flex-direction: column;
@@ -455,12 +455,12 @@
 	}
 
 	.stat-badge.error {
-		border-color: rgba(255, 100, 100: 0.3);
+		border-color: rgba(255, 100, 100, 0.3);
 	}
 
 	.stat-badge.cuda-enabled {
-		border-color: rgba(0, 212, 255: 0.3);
-		background: rgba(0, 212, 255: 0.1);
+		border-color: rgba(0, 212, 255, 0.3);
+		background: rgba(0, 212, 255, 0.1);
 	}
 
 	.stat-value {
@@ -479,8 +479,8 @@
 
 	.search-input {
 		flex: 1; padding: 0.75rem 1rem;
-		border-radius: 8px; border: 1px solid rgba(255, 255, 255: 0.1);
-		background: rgba(255, 255, 255: 0.05);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		font-size: 0.875rem;
 	}
@@ -492,8 +492,8 @@
 
 	.filter-select {
 		padding: 0.75rem 1rem;
-		border-radius: 8px; border: 1px solid rgba(255, 255, 255: 0.1);
-		background: rgba(255, 255, 255: 0.05);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		font-size: 0.875rem;
 	}
@@ -509,7 +509,7 @@
 
 	.action-btn:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 20px rgba(124, 58, 237: 0.4);
+		box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
 	}
 
 	.main-content {
@@ -524,20 +524,20 @@
 	}
 
 	.component-card {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1rem;
 		cursor: pointer; transition: all 0.2s;
 		text-align: left; color: inherit;
 	}
 
 	.component-card:hover {
-		background: rgba(255, 255, 255: 0.08);
-		border-color: rgba(255, 255, 255: 0.2);
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.component-card.selected {
-		border-color: #00d4ff; background: rgba(0, 212, 255: 0.1);
+		border-color: #00d4ff; background: rgba(0, 212, 255, 0.1);
 	}
 
 	.component-card.has-errors {
@@ -562,7 +562,7 @@
 
 	.kind-badge {
 		font-size: 0.625rem; padding: 0.125rem 0.5rem;
-		background: rgba(124, 58, 237: 0.3);
+		background: rgba(124, 58, 237, 0.3);
 		border-radius: 4px;
 		text-transform: uppercase;
 	}
@@ -601,7 +601,7 @@
 
 	.tag {
 		font-size: 0.625rem; padding: 0.125rem 0.375rem;
-		background: rgba(0, 212, 255: 0.2);
+		background: rgba(0, 212, 255, 0.2);
 		border-radius: 4px; color: #00d4ff;
 	}
 
@@ -610,8 +610,8 @@
 	}
 
 	.detail-panel {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1.5rem;
 		overflow-y: auto;
 	}
@@ -622,7 +622,7 @@
 		align-items: center;
 		margin-bottom: 1.5rem;
 		padding-bottom: 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.detail-header h2 {
@@ -647,7 +647,7 @@
 	}
 
 	.edit-btn {
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		color: #fff;
 	}
 
@@ -688,14 +688,14 @@
 
 	.use-badge {
 		padding: 0.25rem 0.5rem;
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border-radius: 4px;
 		font-size: 0.75rem;
 		font-family: monospace;
 	}
 
 	.use-badge.rune {
-		background: rgba(124, 58, 237: 0.3);
+		background: rgba(124, 58, 237, 0.3);
 		color: #c084fc;
 	}
 
@@ -706,15 +706,15 @@
 
 	.child-link {
 		padding: 0.25rem 0.5rem;
-		background: rgba(0, 212, 255: 0.1);
-		border: 1px solid rgba(0, 212, 255: 0.3);
+		background: rgba(0, 212, 255, 0.1);
+		border: 1px solid rgba(0, 212, 255, 0.3);
 		border-radius: 4px; color: #00d4ff;
 		cursor: pointer;
 		font-size: 0.75rem;
 	}
 
 	.child-link:hover {
-		background: rgba(0, 212, 255: 0.2);
+		background: rgba(0, 212, 255, 0.2);
 	}
 
 	.tag-list {
@@ -723,7 +723,7 @@
 	}
 
 	.signature-preview {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		padding: 1rem;
 		border-radius: 8px;
 		font-size: 0.75rem;
@@ -741,8 +741,8 @@
 	}
 
 	.activity-panel {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1rem;
 		overflow-y: auto;
 	}
@@ -758,7 +758,7 @@
 	}
 
 	.activity-item {
-		padding: 0.5rem; background: rgba(255, 255, 255: 0.05);
+		padding: 0.5rem; background: rgba(255, 255, 255, 0.05);
 		border-radius: 6px;
 		font-size: 0.75rem; display: flex;
 		gap: 0.5rem;
@@ -797,7 +797,7 @@
 
 	.spinner {
 		width: 40px; height: 40px;
-		border: 3px solid rgba(255, 255, 255: 0.1);
+		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%; animation: spin 1s linear infinite;
 	}

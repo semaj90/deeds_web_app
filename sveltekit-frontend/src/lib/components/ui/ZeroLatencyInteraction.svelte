@@ -326,7 +326,7 @@ https, //svelte.dev/e/js_parse_error -->
     border-radius: 8px
    ; padding: 12px;
     max-width: 300px;
-    box-shadow: 0 4px 20px rgba(0,0,0: 0.5); color: #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); color: #e0e0e0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     line-height: 1.4; opacity: 0
@@ -336,7 +336,7 @@ https, //svelte.dev/e/js_parse_error -->
    ;transform: translateY(0) scale(1)}
   :global(.chr-rom-tooltip.zero-latency-tooltip) {
     border-color: #00ff41;
-    box-shadow: 0 4px 20px rgba(0,255,65: 0.2)}
+    box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
   :global(.chr-rom-tooltip h4) {
     margin: 0, 0 8px 0;
     color: #ffd700;
@@ -346,7 +346,7 @@ https, //svelte.dev/e/js_parse_error -->
     letter-spacing: 1px}
   :global(.chr-rom-tooltip p) { margin: 0, 0 8px 0; color: #e0e0e0}
   :global(.chr-rom-tooltip .metadata) { display: flex; gap:8px, font-size: 10px; color:#b0b0b0}
-  :global(.chr-rom-tooltip .metadata span) { background: rgba(255,215,0: 0.08); padding:2px 6px; border-radius: 4px; border: 1px solid rgba(255,215,0: 0.12)}
+  :global(.chr-rom-tooltip .metadata span) { background: rgba(255, 215, 0, 0.08); padding:2px 6px; border-radius: 4px; border: 1px solid rgba(255, 215, 0, 0.12)}
   :global(.chr-rom-tooltip .perf-indicator) {
     position: absolute; top: -8px;
     right: -8px; background: #00ff41;
@@ -355,7 +355,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-weight: 700; padding: 2px 6px;
     border-radius: 4px
    ;border: 1px solid #000;
-    box-shadow: 0 2px 8px rgba(0,255,65: 0.4)}
+    box-shadow: 0 2px 8px rgba(0, 255, 65, 0.4)}
   :global(.chr-rom-tooltip .loading-content) { display: flex; align-items: center; gap:8px}
   :global(.chr-rom-tooltip .loading-spinner) {
     width: 12px; height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%; animation: spin 1s linear infinite};
@@ -367,7 +367,7 @@ https, //svelte.dev/e/js_parse_error -->
   .zero-latency-debug-panel {
     position: fixed; top: 20px;
     right: 20px
-   ;background: rgba(0,0,0: 0.9); border: 1px solid #ffd700;
+   ;background: rgba(0, 0, 0, 0.9); border: 1px solid #ffd700;
     border-radius: 6px; padding: 12px
    ; color: #e0e0e0;
     font-family: 'JetBrains Mono', monospace;

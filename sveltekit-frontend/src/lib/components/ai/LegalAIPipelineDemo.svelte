@@ -28,7 +28,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .status-ready { background: #dcfce7, color: #166534 } .status-initializing { background: #fef3c7, color: #92400e } .status-processing { background: #dbeafe, color: #1d4ed8 } .status-error { background: #fecaca, color: #dc2626 } .progress-bar { width: 200px; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden}
   .progress-fill { height: 100%; background: #3b82f6; transition: width 0.3s ease}
   .demo-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px}
-  .panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .panel h3 { margin: 0, 0 15px 0; color: #1f2937; font-size: 18px}
   .capabilities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px}
   .capability { display: flex; align-items: center; gap: 8px;padding: 8px, border-radius: 6px; background: #f9fafb}

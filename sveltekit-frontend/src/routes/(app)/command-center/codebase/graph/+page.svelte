@@ -348,7 +348,7 @@
 	.back-link {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		text-decoration: none;
 		font-size: 0.875rem; transition: color 0.2s ease;
 	}
@@ -377,30 +377,30 @@
 
 	.search-icon {
 		position: absolute; left: 0.75rem;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.search-input {
-		background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px; padding: 0.5rem 2rem 0.5rem 2.5rem;
 		color: white; width: 250px;
 		font-size: 0.875rem;
 	}
 
 	.search-input::placeholder {
-		color: rgba(255, 255, 255: 0.4);
+		color: rgba(255, 255, 255, 0.4);
 	}
 
 	.search-input:focus {
 		outline: none;
-		border-color: rgba(0, 212, 255: 0.5);
+		border-color: rgba(0, 212, 255, 0.5);
 	}
 
 	.clear-search {
 		position: absolute; right: 0.5rem;
 		background: transparent; border: none;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		cursor: pointer; padding: 0.25rem;
 	}
 
@@ -413,8 +413,8 @@
 	}
 
 	.filter-panel {
-		background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 	}
 
@@ -430,7 +430,7 @@
 
 	.filter-label {
 		font-size: 0.75rem;
-		font-weight: 500; color: rgba(255, 255, 255: 0.5);
+		font-weight: 500; color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
@@ -458,7 +458,7 @@
 	.checkbox-label {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		font-size: 0.875rem; color: rgba(255, 255, 255: 0.8);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);
 		cursor: pointer;
 	}
 
@@ -467,8 +467,8 @@
 	}
 
 	.filter-select {
-		background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 6px; padding: 0.5rem;
 		color: white;
 		font-size: 0.875rem;
@@ -482,7 +482,7 @@
 	.stats-bar {
 		display: flex; gap: 2rem;
 		padding: 0.75rem 1rem;
-		background: rgba(255, 255, 255: 0.03);
+		background: rgba(255, 255, 255, 0.03);
 		border-radius: 8px;
 	}
 
@@ -497,12 +497,12 @@
 	}
 
 	.stat-label {
-		font-size: 0.875rem; color: rgba(255, 255, 255: 0.5);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.5);
 	}
 
 	.graph-container {
 		flex: 1; position: relative;
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px; overflow: hidden;
 	}
 
@@ -512,7 +512,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center; gap: 1rem;
-		color: rgba(255, 255, 255: 0.6);
+		color: rgba(255, 255, 255, 0.6);
 	}
 
 	.detail-panel-container {
@@ -524,8 +524,8 @@
 	.hover-tooltip {
 		position: absolute; bottom: 1rem;
 		left: 50%; transform: translateX(-50%);
-		background: rgba(0, 0, 0: 0.9);
-		border: 1px solid rgba(255, 255, 255: 0.2);
+		background: rgba(0, 0, 0, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 8px; padding: 0.75rem 1rem;
 		z-index: 15;
 		min-width: 200px;
@@ -551,7 +551,7 @@
 	.tooltip-path {
 		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
-		color: rgba(255, 255, 255: 0.6);
+		color: rgba(255, 255, 255, 0.6);
 		margin-bottom: 0.25rem;
 	}
 

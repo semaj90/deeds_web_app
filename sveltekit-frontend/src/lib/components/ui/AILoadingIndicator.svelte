@@ -115,7 +115,7 @@
   @keyframes shimmer { 0% { transform: translateX(-100%)}
     100% { transform: translateX(100%)}
   } .loading-shimmer { position: relative; overflow: hidden}
-  .loading-shimmer: after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255: 0.2), transparent); animation: shimmer 2s infinite;content: ''}
+  .loading-shimmer: after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
 </style>
 
 

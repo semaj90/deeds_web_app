@@ -38,7 +38,7 @@
  font-size: 0.9rem;
  }
  .placeholder-card {
- border: 1px dashed rgba(0, 0, 0: 0.08);
+ border: 1px dashed rgba(0, 0, 0, 0.08);
  padding: 1.25rem;
  border-radius: 6px; color: #444;
  }

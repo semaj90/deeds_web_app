@@ -394,7 +394,7 @@ import type { Case } from '$lib/types';
     margin: 0.5rem 0
     padding-left: 1.5rem}
   :global(.message-content code) {
-    background: rgba(0, 0, 0: 0.1); padding: 0.125rem 0.25rem
+    background: rgba(0, 0, 0, 0.1); padding: 0.125rem 0.25rem
     border-radius: 0.25rem
     font-family: "Courier New", monospace}
   :global(.message-content h1, .message-content h2, .message-content h3) {

@@ -193,7 +193,7 @@
 
 	.controls {
 		display: flex; gap: 1rem;
-		padding: 0.5rem; background: rgba(0, 0, 0: 0.3);
+		padding: 0.5rem; background: rgba(0, 0, 0, 0.3);
 		align-items: center;
 	}
 

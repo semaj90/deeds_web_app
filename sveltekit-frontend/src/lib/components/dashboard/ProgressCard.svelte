@@ -228,7 +228,7 @@
  display: flex;
  align-items: center; gap: var(--space-sm);
  margin-top: var(--space-lg); padding: var(--space-md);
- background: rgba(74, 124, 89: 0.1);
+ background: rgba(74, 124, 89, 0.1);
  border: var(--border-width) solid #4a7c59;
  border-radius: var(--border-radius); color: #4a7c59;
  font-weight: 600;

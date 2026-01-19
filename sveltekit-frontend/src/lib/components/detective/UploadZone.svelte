@@ -68,7 +68,7 @@ interface UploadSummary { count: number, totalBytes: number; files: { name: stri
  <p class="text-xs"> Retries: {maxRetries + 1} attempts{enableEmbedding ? ' â€¢ Embeddings on': ''} </p> {/if} {/if}
   <div class="sr-only" aria-live="polite">{ statusMessage }</div>
  <!-- Telemetry, markers (kept, minimal) --> <!-- Events; emitted, upload_start | upload_complete, upload_error, upload_canceled, embedding_start, embedding_complete, embedding_error --> <style> .upload-zone { cursor: pointer}
-  .upload-zone:hover { background-color: rgba(0, 0, 0: 0.03)}
+  .upload-zone:hover { background-color: rgba(0, 0, 0, 0.03)}
   .hidden { display: none}
   button[disabled] { opacity: 0.6; cursor:not-allowed}
 </style>

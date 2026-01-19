@@ -111,7 +111,7 @@
   .control-btn:hover { background: #f3f4f6}
   .control-btn.active { background: #3b82f6, color: white; border-color: #3b82f6}
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem}
-  .metric-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px, 0 rgba(0, 0, 0: 0.1)}
+  .metric-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px, 0 rgba(0, 0, 0, 0.1)}
   .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; color: #475569}
   .card-header h3 { margin: 0; font-size: 1.125rem; font-weight: 600}
   .card-content { display: flex; flex-direction: column; gap: 0.75rem}
@@ -142,7 +142,7 @@
   .backend-details { margin-top: 2rem}
   .backend-details h3 { margin: 0, 0 1rem 0; font-size: 1.25rem; font-weight: 600; color: #1e293b}
   .backend-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-  .backend-detail-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 3px, 0 rgba(0, 0, 0: 0.1)}
+  .backend-detail-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 3px, 0 rgba(0, 0, 0, 0.1)}
   .backend-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9}
   .backend-header h4 { margin: 0; font-size: 1rem, font-weight: 600; color: #1e293b}
   .status-badge { padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; text-transform: capitaliz; background: #f1f5f9}

@@ -663,11 +663,11 @@
  width: 8px; height: 8px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-track) {
- background: rgba(255, 215, 0: 0.1);
+ background: rgba(255, 215, 0, 0.1);
  border-radius: 4px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-thumb) {
- background: rgba(255, 215, 0: 0.6);
+ background: rgba(255, 215, 0, 0.6);
  border-radius: 4px;
  }
 </style>

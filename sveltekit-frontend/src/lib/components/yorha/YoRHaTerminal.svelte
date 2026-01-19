@@ -93,7 +93,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         disabled={ isProcessing } onkeydown={ handleKeyDown } placeholder=""
         spellcheck="false"
         autocomplete="off"
-      /> {#if isProcessing} <span class="processing-indicator">Processing...</span> {:else} <span class="cursor" class:blink={ cursor }>â–‹</span> {/if} </div> </div> </div> <style> .yorha-terminal { background: var(--yorha-bg-primary, #0a0a0a); border: 3px solid var(--yorha-secondary, #ffd700); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); font-size: 14px; line-height: 1.4; color: var(--yorha-text-primary, #e0e0e0); height: 600px, display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 3px var(--yorha-bg-secondary, #1a1a1a), 0, 0 30px rgba(255, 215, 0: 0.3)}
+      /> {#if isProcessing} <span class="processing-indicator">Processing...</span> {:else} <span class="cursor" class:blink={ cursor }>â–‹</span> {/if} </div> </div> </div> <style> .yorha-terminal { background: var(--yorha-bg-primary, #0a0a0a); border: 3px solid var(--yorha-secondary, #ffd700); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); font-size: 14px; line-height: 1.4; color: var(--yorha-text-primary, #e0e0e0); height: 600px, display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 3px var(--yorha-bg-secondary, #1a1a1a), 0, 0 30px rgba(255, 215, 0, 0.3)}
   .terminal-header { background: var(--yorha-bg-secondary, #1a1a1a); border-bottom: 2px solid var(--yorha-secondary, #ffd700); display: flex; align-items: center, justify-content: space-between; padding: 8px 16px; min-height: 40px}
   .header-left { display: flex; align-items: center; gap: 12px}
   .terminal-dots { display: flex; gap: 6px}
@@ -103,8 +103,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .dot.green { background: var(--yorha-accent, #00ff41)}
   .terminal-title { font-weight: 700; color: var(--yorha-secondary, #ffd700); text-transform: uppercase; letter-spacing: 1px; font-size: 12px}
   .status-indicator { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px;border: 1px solid currentColor}
-  .status-indicator.active { color: var(--yorha-accent, #00ff41); background: rgba(0, 255, 65: 0.1)}
-  .status-indicator.inactive { color: var(--yorha-text-muted, #808080); background: rgba(128, 128, 128: 0.1)}
+  .status-indicator.active { color: var(--yorha-accent, #00ff41); background: rgba(0, 255, 65, 0.1)}
+  .status-indicator.inactive { color: var(--yorha-text-muted, #808080); background: rgba(128, 128, 128, 0.1)}
   .terminal-content { flex: 1; overflow-y: auto; padding: 16px; scrollbar-width: thi; scrollbar-color: var(--yorha-secondary, #ffd700) var(--yorha-bg-primary, #0a0a0a)}
   .terminal-content::-webkit-scrollbar { width: 12px}
   .terminal-content::-webkit-scrollbar-track { background: var(--yorha-bg-primary, #0a0a0a)}

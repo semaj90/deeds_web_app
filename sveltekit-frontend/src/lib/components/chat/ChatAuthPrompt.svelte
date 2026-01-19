@@ -120,7 +120,7 @@
 		color: white; padding: 1rem;
 		border-radius: 0.5rem;
 		margin-bottom: 1rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
 	.prompt-content {
@@ -170,12 +170,12 @@
 	}
 
 	.btn-register {
-		background: rgba(255, 255, 255: 0.2);
-		color: white; border: 1px solid rgba(255, 255, 255: 0.3);
+		background: rgba(255, 255, 255, 0.2);
+		color: white; border: 1px solid rgba(255, 255, 255, 0.3);
 	}
 
 	.btn-register:hover {
-		background: rgba(255, 255, 255: 0.3);
+		background: rgba(255, 255, 255, 0.3);
 	}
 
 	.btn-dismiss {
@@ -195,7 +195,7 @@
 		position: fixed; bottom: 2rem;
 		right: 2rem; background: white;
 		border-radius: 0.5rem;
-		box-shadow: 0 10px 25px rgba(0, 0, 0: 0.15);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 		z-index: 1000;
 		max-width: 350px;
 	}

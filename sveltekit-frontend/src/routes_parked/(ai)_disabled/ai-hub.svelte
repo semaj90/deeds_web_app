@@ -36,8 +36,8 @@ import type { Document } from '$lib/types'; import Card, CardContent, CardHeader
  margin-bottom: 3rem;
  }
  :global(.stat-card) {
- background: rgba(0, 212, 170: 0.1);
- border: 1px solid rgba(0, 212, 170: 0.3);
+ background: rgba(0, 212, 170, 0.1);
+ border: 1px solid rgba(0, 212, 170, 0.3);
  }
 
  .stat-value {
@@ -65,13 +65,13 @@ import type { Document } from '$lib/types'; import Card, CardContent, CardHeader
  gap: 1.5rem;
  }
  :global(.service-card) {
- background: rgba(255, 255, 255: 0.05);
- border: 1px solid rgba(255, 255, 255: 0.1);
+ background: rgba(255, 255, 255, 0.05);
+ border: 1px solid rgba(255, 255, 255, 0.1);
  transition: all 0.3s ease;
  }
  :global(.service-card:hover) {
- background: rgba(0, 212, 170: 0.1);
- border-color: rgba(0, 212, 170: 0.3);
+ background: rgba(0, 212, 170, 0.1);
+ border-color: rgba(0, 212, 170, 0.3);
  transform: translateY(-2px);
  }
 
@@ -104,8 +104,8 @@ import type { Document } from '$lib/types'; import Card, CardContent, CardHeader
  display: grid; gap: 1rem;
  }
  :global(.activity-card) {
- background: rgba(255, 255, 255: 0.03);
- border: 1px solid rgba(255, 255, 255: 0.1);
+ background: rgba(255, 255, 255, 0.03);
+ border: 1px solid rgba(255, 255, 255, 0.1);
  }
 
  .activity-type {

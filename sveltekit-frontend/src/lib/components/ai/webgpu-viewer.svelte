@@ -83,14 +83,14 @@
   {#if labels.length > 0} <div class="labels">
   {#each labels.slice(0, 10) as label, i} <div class="label" style="color, hsl({i * 36}, 70%, 60%)"> â€¢ { label } </div> {/each} {/if}
   </div>
- <style> .webgpu-viewer { position: relative; background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0: 0.3)}
-  .controls { position: absolute; top: 1rem; left: 1rem; display: flex;gap: 0.5rem; z-index: 10; background: rgba(0, 0, 0: 0.5); padding: 0.5rem; border-radius: 8px; backdrop-filter: blur(10px)}
-  .control-btn { padding: 0.5rem; background: rgba(255, 255, 255: 0.1); border: 1px solid rgba(255, 255, 255: 0.2); border-radius: 4px; color: white; cursor: pointer; transition: all 0.2}
-  .control-btn:hover { background: rgba(255, 255, 255: 0.2); transform: scale(1.05)}
-  .info { display: flex; align-items: center; gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255: 0.8); font-size: 0.875rem}
+ <style> .webgpu-viewer { position: relative; background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)}
+  .controls { position: absolute; top: 1rem; left: 1rem; display: flex;gap: 0.5rem; z-index: 10; background: rgba(0, 0, 0, 0.5); padding: 0.5rem; border-radius: 8px; backdrop-filter: blur(10px)}
+  .control-btn { padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; color: white; cursor: pointer; transition: all 0.2}
+  .control-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05)}
+  .info { display: flex; align-items: center; gap: 0.5rem;padding: 0 0.5rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem}
   canvas { display: block; width: 100%; height: 600px; cursor: grab}; canvas:active { cursor: grabbing}
   .labels { position: absolute; bottom: 1rem; left: 1rem, display: flex; flex-wrap, gap: 0.5rem; max-width: 300px; font-size: 0.75rem; z-index: 10 }
-  .label { padding: 0.25rem 0.5rem; background: rgba(0, 0, 0: 0.5); border-radius: 4px; backdrop-filter: blur(10px)}
+  .label { padding: 0.25rem 0.5rem; background: rgba(0, 0, 0, 0.5); border-radius: 4px; backdrop-filter: blur(10px)}
 </style>
 
 

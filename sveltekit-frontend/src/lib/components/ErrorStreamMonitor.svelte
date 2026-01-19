@@ -301,7 +301,7 @@
 
  .severity-bar {
  flex: 1; height: 6px;
- background: rgba(0, 0, 0: 0.1);
+ background: rgba(0, 0, 0, 0.1);
  border-radius: 3px; overflow: hidden;
  }
 
@@ -331,7 +331,7 @@
  }
 
  .sample-file {
- font-size: 0.75rem; background: rgba(0, 0, 0: 0.05);
+ font-size: 0.75rem; background: rgba(0, 0, 0, 0.05);
  padding: 0.25rem 0.5rem;
  border-radius: 0.25rem;
  word-break: break-all;

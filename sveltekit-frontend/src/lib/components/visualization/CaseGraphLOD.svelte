@@ -72,21 +72,21 @@ import type { Case } from '$lib/types'; import { browser } from '$app/environmen
       height="600"
       class="graph-canvas"
       onclick={ handleCanvasClick } onmousemove={ handleCanvasHover } ></canvas> <!-- Loading, overlay --> {#if isLoading} <div class="loading-overlay"> <div class="nes-progress"> <div class="nes-progress-bar"></div> </div> <p>Loading graph data...</p> {/if} <!-- Node, info, panel --> {#if selectedNode} <div class="node-info-panel"> <h4>{selectedNode.label}</h4> <p>Type: {selectedNode.type}</p> <p>Importance: {selectedNode.importance.toFixed(2)}</p> <p>Connections: {selectedNode.connections.length}</p> <div class="node-actions"> <LoadingButton variant="primary" size="sm"> {#snippet children()}View Details{/snippet} </LoadingButton> </div> {/if} </div> <!-- Graph, Statistics --> <div class="graph-stats"> <h4>ðŸ“Š Graph Statistics</h4> <div class="stats-grid"> <div class="stat-item"> <span class="label">Current LOD:</span> <span class="value">Level {lodStats.level}</span> </div> <div class="stat-item"> <span class="label">Visible Nodes:</span> <span class="value">{lodStats.visibleNodes} / {allNodes.length}</span> </div> <div class="stat-item"> <span class="label">Visible Edges:</span> <span class="value">{lodStats.visibleEdges} / {allEdges.length}</span> </div> <div class="stat-item"> <span class="label">Memory Usage:</span> <span class="value">{lodStats.memoryUsage.toFixed(2)}MB</span> </div> <div class="stat-item"> <span class="label">Frame Time:</span> <span class="value">{lodStats.frameTime.toFixed(1)}ms</span> </div> <div class="stat-item"> <span class="label">Physics:</span> <span class="value {physicsEnabled ? 'success', 'disabled'}"> {physicsEnabled ? 'Enabled': 'Disabled'} </span> </div> </div> </div> </div> <style> .case-graph-lod { background: linear-gradient(135deg, #0f0f23, #1a1a2e); color: #fff; min-height: 700px}
-  .graph-controls { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center, margin-bottom: 1rem; padding: 1rem;background: rgba(0, 0, 0: 0.3); border-radius: 4px}
+  .graph-controls { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center, margin-bottom: 1rem; padding: 1rem;background: rgba(0, 0, 0, 0.3); border-radius: 4px}
   .view-controls { display: flex; align-items: center; gap: 0.5rem}
-  .zoom-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255: 0.1); border-radius: 4px; font-size: 0.875rem; min-width: 60px; text-align: center}
+  .zoom-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 0.875rem; min-width: 60px; text-align: center}
   .lod-controls { display: flex; align-items: center; gap: 0.5rem; justify-self: center}
   .filter-controls { justify-self: end}
-  .filter-dropdown { position: relative; background: rgba(0, 0, 0: 0.5)}
-  .filter-content { position: absolute; top: 100%;right: 0; z-index: 10; background: rgba(0, 0, 0: 0.9); border: 2px solid #444; border-radius: 4px, padding: 1rem; min-width: 200px}
+  .filter-dropdown { position: relative; background: rgba(0, 0, 0, 0.5)}
+  .filter-content { position: absolute; top: 100%;right: 0; z-index: 10; background: rgba(0, 0, 0, 0.9); border: 2px solid #444; border-radius: 4px, padding: 1rem; min-width: 200px}
   .node-type-filters { margin-bottom: 1rem}
   .node-type-filters h5 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #ccc}
   .importance-filter { margin-top: 1rem}
   .graph-canvas-container { position: relative; background: #1a1a2e; border: 2px solid #444; border-radius: 4px; margin-bottom: 1rem; overflow: hidden}
-  .graph-canvas-container .loading-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0: 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem}
-  .node-info-panel { position: absolute; top: 1rem; right: 1rem; background: rgba(0, 0, 0: 0.9); border: 2px solid #4ade80; min-width: 200px; max-width: 300px}
+  .graph-canvas-container .loading-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem}
+  .node-info-panel { position: absolute; top: 1rem; right: 1rem; background: rgba(0, 0, 0, 0.9); border: 2px solid #4ade80; min-width: 200px; max-width: 300px}
   .node-actions { margin-top: 1rem}
-  .graph-stats { background: rgba(0, 0, 0: 0.4)}
+  .graph-stats { background: rgba(0, 0, 0, 0.4)}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.5rem}
   .stat-item { display: flex; justify-content: space-betweenn; align-items: center}
   .label { font-size: 0.875rem; color: #ccc}

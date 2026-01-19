@@ -301,7 +301,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
  .debug-info {
  position: fixed; top: 10px;
- right: 10px; background: rgba(0, 0, 0: 0.8);
+ right: 10px; background: rgba(0, 0, 0, 0.8);
  color: var(--yorha-white); padding: 0.5rem;
  border-radius: 4px;
  font-family: 'Courier New', monospace;

@@ -139,7 +139,7 @@
 {#if open && route}
 <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
 	<div
-		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0,0,0: 0.35)] rounded-xl overflow-hidden"
+		class="w-[960px] max-w-[96vw] bg-[#f3eddc] text-[#111] border-[3px] border-[#262017] shadow-[0_0_0_2px_rgba(0, 0, 0, 0.35)] rounded-xl overflow-hidden"
 	>
 		<!-- Header -->
 		<header

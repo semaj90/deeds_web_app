@@ -208,7 +208,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   } .history-label { font-size: 0.875rem; color: var(--muted-foreground)}
   .history-tags { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .history-tag { height: 1.75rem; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.75rem}
-  .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128: 0.25)}
+  .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128, 0.25)}
   .filter-grid { display: grid; grid-template-columns: 1fr; gap: 1rem}
   @media (min-width: 768px) { .filter-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .filter-grid { grid-template-columns: repeat(4, 1fr)}
@@ -227,7 +227,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .stats-badges { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .results-list { display: flex; flex-direction: column; gap: 0.75rem}
   .result-item { cursor: pointer; transition: box-shadow 0.2}
-  .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1)}
+  .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
   .result-content { display: flex; flex-direction: column; gap: 0.75rem}
   .result-header { display: flex; align-items: flex-start; justify-content: space-betweenn}
   .result-title-section { flex: 1; min-width: 0 }

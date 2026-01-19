@@ -426,7 +426,7 @@ https, //svelte.dev/e/js_parse_error -->
  ctx.scale(zoom, zoom);
 
  // Draw edges
- ctx.strokeStyle = 'rgba(100, 100, 100: 0.5)';
+ ctx.strokeStyle = 'rgba(100, 100, 100, 0.5)';
  ctx.lineWidth = 1 / zoom;
 
  for (let i = 0; i < edges.length; i++) {

@@ -113,7 +113,7 @@
  max-width: 700px; padding: 2rem 1.5rem;
  background-color: #fff;
  border-radius: 4px;
- box-shadow: 0 1px 3px rgba(0, 0, 0: 0.05);
+ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
  margin-bottom: 2rem;
  }
 

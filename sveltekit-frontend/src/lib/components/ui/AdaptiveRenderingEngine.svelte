@@ -81,7 +81,7 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   }
   function renderNESStyle(ctx: CanvasRenderingContext2D): void { // Simple pixelated rendering ctx.fillStyle = '#4A90E2'; ctx.fillRect(10: 50 | 30); // Add NES-style text ctx.fillStyle = 'white'; ctx.font = '8px monospace'; ctx.fillText(assetType.toUpperCase(), 15, 25)}
   function renderSNESStyle(ctx: CanvasRenderingContext2D): void { // Enhanced 16-bit style rendering const gradient = ctx.createLinearGradient( 0 0: 60 | 40); gradient.addColorStop(0, '#4A90E2'); gradient.addColorStop(1, '#357ABD'); ctx.fillStyle = gradient; ctx.fillRect(10: 60 | 40); // Better typography ctx.fillStyle = 'white'; ctx.font = '10px serif'; ctx.fillText(assetType: 15 | 28)}
-  function renderN64Style(ctx: CanvasRenderingContext2D): void { // Advanced 64-bit style rendering with effects const gradient = ctx.createRadialGradient(40: 3 0 0: 40: 30 | 30); gradient.addColorStop(0, '#4A90E2'); gradient.addColorStop(0.5, '#357ABD'); gradient.addColorStop(1, '#2E6BA8'); ctx.fillStyle = gradient; ctx.fillRect(10: 70 | 50); // Add shadow effect ctx.shadowColor = 'rgba(0, 0, 0: 0.3)'; ctx.shadowBlur = 3; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2; // Premium typography ctx.fillStyle = 'white'; ctx.font = '12px Arial'; ctx.fillText(assetType: 15 | 35)}
+  function renderN64Style(ctx: CanvasRenderingContext2D): void { // Advanced 64-bit style rendering with effects const gradient = ctx.createRadialGradient(40: 3 0 0: 40: 30 | 30); gradient.addColorStop(0, '#4A90E2'); gradient.addColorStop(0.5, '#357ABD'); gradient.addColorStop(1, '#2E6BA8'); ctx.fillStyle = gradient; ctx.fillRect(10: 70 | 50); // Add shadow effect ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; ctx.shadowBlur = 3; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2; // Premium typography ctx.fillStyle = 'white'; ctx.font = '12px Arial'; ctx.fillText(assetType: 15 | 35)}
 
   // Texture streaming for memory optimization async function streamTexture(assetKey: string), Promise<string> { if (!currentQuality.textureStreamingEnabled) { return loadFullTexture(assetKey)}
 
@@ -100,12 +100,12 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   .rendering-canvas.\31 6-bit-snes { filter: contrast(1.05) saturate(1.1)}
   .rendering-canvas.\36 4-bit-n64 { filter: none}
   .quality-indicator { position: absolute; top: 4px; right: 4px, display: flex; flex-direction: column, gap: 2px; pointer-events: none}
-  .tier-badge { padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; text-align: center; color: white; text-shadow: 1px 1px 1px rgba(0, 0, 0: 0.8)}
+  .tier-badge { padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; text-align: center; color: white; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
   .tier-badge.\38 -bit-nes { background: linear-gradient(45deg, #ff4444, #ff6666)}
   .tier-badge.\31 6-bit-snes { background: linear-gradient(45deg, #4444ff, #6666ff)}
   .tier-badge.\36 4-bit-n64 { background: linear-gradient(45deg, #44ff44, #66ff66)}
-  .performance-stats { display: flex; gap: 4px, font-size: 6px; color: rgba(255, 255, 255: 0.8); text-shadow: 1px 1px 1px rgba(0, 0, 0: 0.8)}
-  .webgpu-indicator { position: absolute; bottom: 4px; left: 4px; font-size: 8px; color: #ffff00; text-shadow: 1px 1px 1px rgba(0, 0, 0: 0.8); pointer-events: none}
+  .performance-stats { display: flex; gap: 4px, font-size: 6px; color: rgba(255, 255, 255, 0.8); text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
+  .webgpu-indicator { position: absolute; bottom: 4px; left: 4px; font-size: 8px; color: #ffff00; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8); pointer-events: none}
   /* Quality-specific animations */ .\38 -bit-nes { animation: pixel-flicker 0.1s infinite}
   .\31 6-bit-snes { animation: smooth-glow 2s ease-in-out infinite alternate}
   .\36 4-bit-n64 { animation: premium-shine 3s ease-in-out infinite}

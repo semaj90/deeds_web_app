@@ -59,16 +59,16 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
   .refresh-button.spinning:global(svg) { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .overall-status { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500}
-  .overall-status.healthy { background: rgba(25, 135, 84: 0.1); color: #198754;border: 1px solid rgba(25, 135, 84: 0.3)}
-  .overall-status.degraded { background: rgba(255, 193, 7: 0.1); color: #ffc107;border: 1px solid rgba(255, 193, 7: 0.3)}
-  .overall-status.offline { background: rgba(220, 53, 69: 0.1); color: #dc3545;border: 1px solid rgba(220, 53, 69: 0.3)}
+  .overall-status.healthy { background: rgba(25, 135, 84, 0.1); color: #198754;border: 1px solid rgba(25, 135, 84, 0.3)}
+  .overall-status.degraded { background: rgba(255, 193, 7, 0.1); color: #ffc107;border: 1px solid rgba(255, 193, 7, 0.3)}
+  .overall-status.offline { background: rgba(220, 53, 69, 0.1); color: #dc3545;border: 1px solid rgba(220, 53, 69, 0.3)}
   .service-list { display: flex; flex-direction: column; gap: 1rem}
   .service-item { display: flex; align-items: center; gap: 1rem;padding: 0.75rem; background: var(--bg-primary, #ffffff); border: 1px solid var(--border-color, #dee2e6); border-radius: 6px}
   .service-info { flex: 1 }
   .service-name { font-weight: 600; color: var(--text-primary, #212529); font-size: 0.875rem}
   .service-desc { font-size: 0.75rem; color: var(--text-secondary, #6c757d); margin-top: 0.125rem}
-  .fallback-badge { padding: 0.25rem 0.5rem; background: rgba(255, 193, 7: 0.2); color: #856404; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
-  .offline-queue { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem; background: rgba(255, 193, 7: 0.1); border-left: 3px solid #ffc107; border-radius: 4px; margin-top: 1rem; font-size: 0.875rem}
+  .fallback-badge { padding: 0.25rem 0.5rem; background: rgba(255, 193, 7, 0.2); color: #856404; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
+  .offline-queue { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px; margin-top: 1rem; font-size: 0.875rem}
   .auto-refresh-toggle { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary, #6c757d); cursor: pointer}
   .auto-refresh-toggle input[type="checkbox"] { cursor: pointer}
 </style>

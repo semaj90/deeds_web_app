@@ -81,7 +81,7 @@
     max-width: 500px; padding: 3rem;
     background: hsl(var(--b1));
     border-radius: 1rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0: 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   }
 
   .error-icon {

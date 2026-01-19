@@ -32,7 +32,7 @@
   .sidebar-toggle:hover { background: var(--pico-primary-hover, #2563eb); transform: translateY(-50%) scale(1.1)}
   .sidebar-toggle.left { right: -1rem}
   .sidebar-toggle.right { left: -1rem}
-  .collapsed .sidebar-toggle { background: var(--pico-card-background-color, #ffffff); color: var(--pico-primary, #3b82f6); border: 1px solid var(--pico-border-color, #e2e8f0); box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1)}
+  .collapsed .sidebar-toggle { background: var(--pico-card-background-color, #ffffff); color: var(--pico-primary, #3b82f6); border: 1px solid var(--pico-border-color, #e2e8f0); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)}
   .collapsed .sidebar-toggle:hover { background: var(--pico-primary-background, #f3f4f6)}
 /* Responsive design */ @media (max-width: 768px) { .golden-layout { flex-direction: column}
     .sidebar { order: 2; min-width: 100% !important; max-width: 100% !important; margin: 0 !important; margin-top: 1rem !important}

@@ -140,7 +140,7 @@
     .control-group buttonhover { background: #f3f4f6}
     .control-group button.active { background: #3b82f6, color: white; border-color: #3b82f6}
     .metrics-display { display: flex; gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-left: auto}
-  .processing-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(255, 255, 255: 0.9); display: flex; align-items: center; justify-content: center; z-index: 10 }
+  .processing-overlay { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(255, 255, 255, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10 }
   .processing-content { text-align: center; padding: 2rem}
   .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;margin: 0 auto 1rem}
   @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }

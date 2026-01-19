@@ -403,25 +403,25 @@
  top: 0; left: 0;
  width: 100%; height: 100%;
  background:
- linear-gradient(90deg, rgba(16, 185, 129: 0.1) 1px, transparent 1px),
- linear-gradient(rgba(16, 185, 129: 0.1) 1px, transparent 1px);
+ linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
+ linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
  background-size: 20px 20px;
  pointer-events: none;
  z-index: -1;
  }
 
  .search-header {
- background: rgba(0, 0, 0: 0.8);
+ background: rgba(0, 0, 0, 0.8);
  border-bottom: 2px solid #10b981;
  padding: 1rem 2rem;
- box-shadow: 0 2px 10px rgba(16, 185, 129: 0.2);
+ box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
  }
 
  .header-title h1 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 2rem; margin: 0;
- text-shadow: 0 0 10px rgba(16, 185, 129: 0.5);
+ text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
  }
 
  .search-status {
@@ -437,7 +437,7 @@
 
  .status-indicator.active {
  background: #10b981; color: #0d1117;
- box-shadow: 0 0 10px rgba(16, 185, 129: 0.3);
+ box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
  }
 
  .status-indicator.inactive {
@@ -456,7 +456,7 @@
  display: flex;
  align-items: center; gap: 0.5rem;
  padding: 0.75rem 1rem;
- background: rgba(30, 41, 59: 0.8);
+ background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
  border-radius: 8px; cursor: pointer;
@@ -465,9 +465,9 @@
 
  .scope-btn:hover,
  .scope-btn.active {
- background: rgba(16, 185, 129: 0.2);
+ background: rgba(16, 185, 129, 0.2);
  border-color: #10b981;
- box-shadow: 0 0 15px rgba(16, 185, 129: 0.4);
+ box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
  }
 
  .scope-icon {
@@ -484,10 +484,10 @@
  .search-panel,
  .results-panel,
  .detail-panel {
- background: rgba(13, 17, 23: 0.9);
+ background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
  border-radius: 8px; padding: 1rem;
- box-shadow: 0 4px 20px rgba(16, 185, 129: 0.1);
+ box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  }
 
  .search-input-section {
@@ -500,7 +500,7 @@
 
  .search-input {
  flex: 1; padding: 0.75rem;
- background: rgba(30, 41, 59: 0.8);
+ background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  border-radius: 4px; color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
@@ -510,7 +510,7 @@
  .search-input:focus {
  outline: none;
  border-color: #10b981;
- box-shadow: 0 0 10px rgba(16, 185, 129: 0.2);
+ box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
  }
 
  .search-btn {
@@ -524,7 +524,7 @@
 
  .search-btn:hover, not(disabled) {
  filter: brightness(0.95);
- box-shadow: 0 0 15px rgba(16, 185, 129: 0.3);
+ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
  }
 
  .search-btn:disabled {
@@ -551,7 +551,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 0.875rem; margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .filter-grid {
@@ -579,7 +579,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 1rem; margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .results-count {
@@ -594,7 +594,7 @@
 
  .result-item {
  display: flex; gap: 1rem;
- padding: 1rem; background: rgba(30, 41, 59: 0.5);
+ padding: 1rem; background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
  border-radius: 8px;
  margin-bottom: 0.75rem; cursor: pointer;
@@ -604,14 +604,14 @@
  .result-item:hover,
  .result-item.selected {
  border-color: #10b981;
- box-shadow: 0 0 15px rgba(16, 185, 129: 0.3);
+ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
  }
 
  .result-icon {
  display: flex;
  align-items: center;
  justify-content: center; width: 40px;
- height: 40px; background: rgba(16, 185, 129: 0.2);
+ height: 40px; background: rgba(16, 185, 129, 0.2);
  border-radius: 8px;
  }
 
@@ -690,7 +690,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 1rem; margin: 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .detail-actions {
@@ -717,7 +717,7 @@
 
  .action-btn.ghost {
  background: transparent; color: #10b981;
- border: 1px dashed rgba(16, 185, 129: 0.25);
+ border: 1px dashed rgba(16, 185, 129, 0.25);
  }
 
  .action-btn:hover {
@@ -737,7 +737,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 0.75rem; margin: 0 0 0.75rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .detail-grid {
@@ -765,7 +765,7 @@
  .content-preview {
  color: #e5e7eb;
  font-size: 0.875rem;
- line-height: 1.5; background: rgba(30, 41, 59: 0.5);
+ line-height: 1.5; background: rgba(30, 41, 59, 0.5);
  padding: 0.75rem;
  border-radius: 4px;
  }

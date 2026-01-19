@@ -134,14 +134,14 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .footer-info p {
- margin: 0; color: rgba(255, 255, 255: 0.8);
+ margin: 0; color: rgba(255, 255, 255, 0.8);
  font-size: 0.9rem;
  }
 
  .footer-subtitle {
  font-size: 0.8rem !important
  ;
- color: rgba(255, 255, 255: 0.6) !important;
+ color: rgba(255, 255, 255, 0.6) !important;
  margin-top: 0.25rem;
  font-style: italic;
  }

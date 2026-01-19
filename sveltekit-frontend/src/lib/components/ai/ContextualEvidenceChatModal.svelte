@@ -611,7 +611,7 @@
 
 <style>
  .chat-modal-overlay {
- position: fixed; inset: 0; background: rgba(4, 6, 10: 0.85);
+ position: fixed; inset: 0; background: rgba(4, 6, 10, 0.85);
  backdrop-filter: blur(6px); display: flex;
  align-items: stretch;
  justify-content: center; padding: 2rem;
@@ -622,13 +622,13 @@
  border-radius: 18px; width: min(1200px, 100%);
  max-height: 100%; display: flex;
  flex-direction: column; color: #eef2ff;
- box-shadow: 0 30px 80px rgba(0, 0, 0: 0.45);
+ box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
  }
  .modal-header {
  display: flex;
  align-items: center;
  justify-content: space-between; padding: 1.5rem 1.75rem 1rem;
- border-bottom: 1px solid rgba(255, 255, 255: 0.08);
+ border-bottom: 1px solid rgba(255, 255, 255, 0.08);
  }
  .modal-eyebrow {
  text-transform: uppercase;
@@ -641,7 +641,7 @@
  font-size: 1.6rem;
  }
  .icon-button {
- border: 1px solid rgba(255, 255, 255: 0.3);
+ border: 1px solid rgba(255, 255, 255, 0.3);
  background: transparent; color: inherit;
  border-radius: 50%; width: 40px; height: 40px; cursor: pointer;
  }
@@ -650,7 +650,7 @@
  flex-wrap: wrap;
  }
  .action-tabs button {
- border: 1px solid rgba(255, 255, 255: 0.2);
+ border: 1px solid rgba(255, 255, 255, 0.2);
  background: transparent; color: inherit; padding: 0.4rem 1rem;
  border-radius: 999px; cursor: pointer;
  font-size: 0.85rem;
@@ -666,34 +666,34 @@
  }
  .chat-panel,
  .action-panel {
- background: rgba(11, 17, 28: 0.8);
- border: 1px solid rgba(255, 255, 255: 0.05);
+ background: rgba(11, 17, 28, 0.8);
+ border: 1px solid rgba(255, 255, 255, 0.05);
  border-radius: 14px; padding: 1rem; display: flex;
  flex-direction: column; gap: 1rem;
  }
  .drop-zone {
- border: 1px dashed rgba(255, 255, 255: 0.3);
+ border: 1px dashed rgba(255, 255, 255, 0.3);
  border-radius: 12px; padding: 1rem;
  text-align: center;
- font-size: 0.9rem; color: rgba(255, 255, 255: 0.8);
+ font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);
  position: relative;
  }
  .drop-zone input[type='file'] {
  position: absolute; inset: 0; opacity: 0; cursor: pointer;
  }
  .drop-zone.drop-active {
- border-color: #60f1b8; background: rgba(96, 241, 184: 0.06);
+ border-color: #60f1b8; background: rgba(96, 241, 184, 0.06);
  }
  .drop-zone.secondary {
- border-color: rgba(148, 163, 184: 0.4);
- background: rgba(255, 255, 255: 0.02);
+ border-color: rgba(148, 163, 184, 0.4);
+ background: rgba(255, 255, 255, 0.02);
  }
  .attachment-strip {
  display: flex;
  flex-wrap: wrap; gap: 0.5rem;
  }
  .attachment-pill {
- border: 1px solid rgba(255, 255, 255: 0.2);
+ border: 1px solid rgba(255, 255, 255, 0.2);
  border-radius: 10px; padding: 0.35rem 0.6rem;
  font-size: 0.8rem; display: inline-flex;
  flex-direction: column; gap: 0.1rem;
@@ -711,18 +711,18 @@
  padding-right: 0.5rem;
  }
  .message {
- border: 1px solid rgba(255, 255, 255: 0.08);
+ border: 1px solid rgba(255, 255, 255, 0.08);
  border-radius: 12px; padding: 0.85rem;
- font-size: 0.95rem; background: rgba(15, 23, 43: 0.7);
+ font-size: 0.95rem; background: rgba(15, 23, 43, 0.7);
  }
  .message[data-role='assistant'] {
- border-color: rgba(94, 243, 180: 0.4);
+ border-color: rgba(94, 243, 180, 0.4);
  }
  .message header {
  display: flex;
  justify-content: space-between;
  font-size: 0.8rem;
- margin-bottom: 0.35rem; color: rgba(255, 255, 255: 0.6);
+ margin-bottom: 0.35rem; color: rgba(255, 255, 255, 0.6);
  }
  .inline-attachments {
  margin-top: 0.35rem; display: flex; gap: 0.4rem;
@@ -731,8 +731,8 @@
  }
  .chat-input textarea {
  width: 100%;
- border-radius: 12px; border: 1px solid rgba(255, 255, 255: 0.15);
- background: rgba(4, 10, 18: 0.8);
+ border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+ background: rgba(4, 10, 18, 0.8);
  color: inherit; padding: 0.75rem;
  font-size: 0.95rem;
  }
@@ -766,12 +766,12 @@
  input,
  select,
  textarea {
- border-radius: 10px; border: 1px solid rgba(255, 255, 255: 0.15);
- background: rgba(6, 12, 22: 0.8);
+ border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15);
+ background: rgba(6, 12, 22, 0.8);
  color: inherit; padding: 0.5rem 0.65rem;
  }
  fieldset {
- border: 1px solid rgba(255, 255, 255: 0.1);
+ border: 1px solid rgba(255, 255, 255, 0.1);
  border-radius: 10px; padding: 0.65rem; display: flex;
  flex-wrap: wrap; gap: 0.35rem 0.75rem;
  }
@@ -779,7 +779,7 @@
  padding: 0 0.35rem;
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.2em; color: rgba(255, 255, 255: 0.7);
+ letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.7);
  }
  .checkbox {
  flex-direction: row;
@@ -794,11 +794,11 @@
  }
  .tips {
  list-style: disc;
- padding-left: 1.25rem; color: rgba(255, 255, 255: 0.8);
+ padding-left: 1.25rem; color: rgba(255, 255, 255, 0.8);
  font-size: 0.85rem;
  }
  .placeholder {
- color: rgba(255, 255, 255: 0.4);
+ color: rgba(255, 255, 255, 0.4);
  }
  .error-text {
  color: #fda4af;

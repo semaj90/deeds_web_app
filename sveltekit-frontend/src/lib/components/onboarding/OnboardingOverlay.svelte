@@ -114,10 +114,10 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   {#if currentStep === steps.length - 1} <Check class="w-4" /> Complete {:else} Next <ArrowRight class="w-4" /> {/if}
   </Button> </div> </div> </div> {/if}
   <style> /* @unocss-include */ .onboarding-overlay { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0; z-index: 10000; pointer-events: auto}
-  .overlay-backdrop { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0: 0.6); backdrop-filter: blur(2px)}
-  .highlight-box { position: absolute; border: 3px solid #3b82f6; border-radius: 8px; box-shadow: 0 0 0 4px rgba(59, 130, 246: 0.2), 0, 0 20px rgba(59, 130, 246: 0.3); background: rgba(255, 255, 255: 0.1); pointer-events: none; animation: highlight-pulse 2s infinite; z-index: 10001 }
-  @keyframes highlight-pulse { 0%; } 100% { box-shadow: 0 0 0 4px rgba(59, 130, 246: 0.2), 0, 0 20px rgba(59, 130, 246: 0.3)}
-    50% { box-shadow: 0 0 0 8px rgba(59, 130, 246: 0.3), 0, 0 30px rgba(59, 130, 246: 0.5)}} .onboarding-tooltip { position: absolute; background: white; border-radius: 12px, box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.1), 0 10px 10px -5px rgba(0, 0, 0: 0.04); border: 1px solid rgba(0, 0, 0: 0.05); max-width: 400px; min-width: 320px, z-index: 10002; animation: tooltip-appear 0.3s ease-out}
+  .overlay-backdrop { position: absolute; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px)}
+  .highlight-box { position: absolute; border: 3px solid #3b82f6; border-radius: 8px; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0, 0 20px rgba(59, 130, 246, 0.3); background: rgba(255, 255, 255, 0.1); pointer-events: none; animation: highlight-pulse 2s infinite; z-index: 10001 }
+  @keyframes highlight-pulse { 0%; } 100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0, 0 20px rgba(59, 130, 246, 0.3)}
+    50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.3), 0, 0 30px rgba(59, 130, 246, 0.5)}} .onboarding-tooltip { position: absolute; background: white; border-radius: 12px, box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid rgba(0, 0, 0, 0.05); max-width: 400px; min-width: 320px, z-index: 10002; animation: tooltip-appear 0.3s ease-out}
   @keyframes tooltip-appear { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9)}
     to { opacity: 1; transform: translate(-50%, -50%) scale(1)}} .tooltip-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 1rem 1rem 0}
   .step-indicator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6b7280}

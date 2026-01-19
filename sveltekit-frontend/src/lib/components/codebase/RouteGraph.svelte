@@ -338,7 +338,7 @@
 <style>
 	.route-graph {
 		position: relative; width: 100%;
-		height: 100%; background: rgba(0, 0, 0: 0.3);
+		height: 100%; background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px; overflow: hidden;
 	}
 
@@ -354,12 +354,12 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center; gap: 1rem;
-		color: rgba(255, 255, 255: 0.6);
+		color: rgba(255, 255, 255, 0.6);
 	}
 
 	.spinner {
 		width: 40px; height: 40px;
-		border: 3px solid rgba(255, 255, 255: 0.1);
+		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
 		border-radius: 50%; animation: spin 1s linear infinite;
 	}
@@ -370,11 +370,11 @@
 
 	.empty-icon {
 		width: 48px; height: 48px;
-		color: rgba(255, 255, 255: 0.3);
+		color: rgba(255, 255, 255, 0.3);
 	}
 
 	.empty-state span {
-		font-size: 0.875rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.4);
 	}
 
 	.zoom-controls {
@@ -386,8 +386,8 @@
 
 	.zoom-controls button {
 		width: 32px; height: 32px;
-		background: rgba(0, 0, 0: 0.6);
-		border: 1px solid rgba(255, 255, 255: 0.2);
+		background: rgba(0, 0, 0, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 6px; color: white;
 		font-size: 1.25rem; cursor: pointer;
 		display: flex;
@@ -396,21 +396,21 @@
 	}
 
 	.zoom-controls button:hover {
-		background: rgba(0, 212, 255: 0.2);
-		border-color: rgba(0, 212, 255: 0.5);
+		background: rgba(0, 212, 255, 0.2);
+		border-color: rgba(0, 212, 255, 0.5);
 	}
 
 	.legend {
 		position: absolute; bottom: 1rem;
-		left: 1rem; background: rgba(0, 0, 0: 0.7);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		left: 1rem; background: rgba(0, 0, 0, 0.7);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px; padding: 0.75rem;
 		z-index: 10;
 	}
 
 	.legend-title {
 		font-size: 0.75rem;
-		font-weight: 600; color: rgba(255, 255, 255: 0.7);
+		font-weight: 600; color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -428,16 +428,16 @@
 	}
 
 	.legend-label {
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.6);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 		text-transform: capitalize;
 	}
 
 	.zoom-indicator {
 		position: absolute; bottom: 1rem;
-		right: 1rem; background: rgba(0, 0, 0: 0.6);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		right: 1rem; background: rgba(0, 0, 0, 0.6);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 4px; padding: 0.25rem 0.5rem;
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.6);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 		font-family: 'JetBrains Mono', monospace;
 	}
 

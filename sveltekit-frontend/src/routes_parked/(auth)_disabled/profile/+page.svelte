@@ -411,14 +411,14 @@
  background: #ffffff; border: 1px solid #e5e7eb;
  border-radius: 12px; padding: 16px;
  text-align: center;
- box-shadow: 0 4px 12px rgba(15, 23, 42: 0.08);
+ box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
  transition:
  transform 0.2s ease,
  box-shadow 0.2s ease;
  }
  .stat-card:hover {
  transform: translateY(-2px);
- box-shadow: 0 10px 24px rgba(15, 23, 42: 0.12);
+ box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
  }
  .stat-value {
  font-size: 1.6rem;
@@ -431,8 +431,8 @@
  letter-spacing: 0.08em; color: #6b7280;
  }
  .rag-stat {
- background: rgba(3, 105, 161: 0.08);
- border: 1px solid rgba(3, 105, 161: 0.2);
+ background: rgba(3, 105, 161, 0.08);
+ border: 1px solid rgba(3, 105, 161, 0.2);
  border-radius: 10px; padding: 16px;
  text-align: center;
  }
@@ -447,28 +447,28 @@
  }
  @media (prefers-color-scheme: dark) {
  .stat-card {
- background: rgba(15, 23, 42: 0.8);
- border-color: rgba(148, 163, 184: 0.35);
- box-shadow: 0 4px 12px rgba(0, 0, 0: 0.35);
+ background: rgba(15, 23, 42, 0.8);
+ border-color: rgba(148, 163, 184, 0.35);
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
  }
  .stat-card:hover {
- box-shadow: 0 10px 28px rgba(0, 0, 0: 0.45);
+ box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
  }
  .stat-value {
  color: #f8fafc;
  }
  .stat-label {
- color: rgba(226, 232, 240: 0.7);
+ color: rgba(226, 232, 240, 0.7);
  }
  .rag-stat {
- background: rgba(2, 132, 199: 0.12);
- border-color: rgba(56, 189, 248: 0.3);
+ background: rgba(2, 132, 199, 0.12);
+ border-color: rgba(56, 189, 248, 0.3);
  }
  .rag-stat .stat-value {
  color: #bae6fd;
  }
  .rag-stat .stat-label {
- color: rgba(191, 219, 254: 0.85);
+ color: rgba(191, 219, 254, 0.85);
  }
  }
 </style>

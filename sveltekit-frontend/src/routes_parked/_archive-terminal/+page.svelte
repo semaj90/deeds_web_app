@@ -329,14 +329,14 @@
 		display: flex;
 		flex-direction: column; height: calc(100vh - 8rem);
 		background: linear-gradient(180deg, #0a0e17 0%, #1a1f2e 100%);
-		border: 2px solid rgba(34, 211, 238: 0.3);
+		border: 2px solid rgba(34, 211, 238, 0.3);
 		border-radius: 4px;
 		font-family: 'Courier New', monospace;
 	}
 
 	.terminal-header {
-		background: rgba(15, 23, 42: 0.95);
-		border-bottom: 1px solid rgba(34, 211, 238: 0.5);
+		background: rgba(15, 23, 42, 0.95);
+		border-bottom: 1px solid rgba(34, 211, 238, 0.5);
 		padding: 0.75rem 1.5rem;
 	}
 
@@ -441,14 +441,14 @@
 	}
 
 	.message-content {
-		background: rgba(30, 41, 59: 0.5);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.5);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 4px; padding: 1rem;
 	}
 
 	.message-user .message-content {
-		background: rgba(34, 211, 238: 0.1);
-		border-color: rgba(34, 211, 238: 0.3);
+		background: rgba(34, 211, 238, 0.1);
+		border-color: rgba(34, 211, 238, 0.3);
 	}
 
 	.message-content pre {
@@ -460,8 +460,8 @@
 	}
 
 	.chat-input-form {
-		background: rgba(15, 23, 42: 0.95);
-		border-top: 1px solid rgba(34, 211, 238: 0.5);
+		background: rgba(15, 23, 42, 0.95);
+		border-top: 1px solid rgba(34, 211, 238, 0.5);
 		padding: 1.5rem; display: flex;
 		flex-direction: column; gap: 1rem;
 	}
@@ -471,8 +471,8 @@
 	}
 
 	.message-input {
-		width: 100%; background: rgba(30, 41, 59: 0.7);
-		border: 1px solid rgba(148, 163, 184: 0.3);
+		width: 100%; background: rgba(30, 41, 59, 0.7);
+		border: 1px solid rgba(148, 163, 184, 0.3);
 		border-radius: 4px; padding: 0.75rem;
 		color: #e2e8f0;
 		font-family: 'Courier New', monospace;
@@ -482,7 +482,7 @@
 	.message-input:focus {
 		outline: none;
 		border-color: #22d3ee;
-		box-shadow: 0 0 0 2px rgba(34, 211, 238: 0.1);
+		box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.1);
 	}
 
 	.meta-row {
@@ -505,8 +505,8 @@
 
 	.case-input,
 	.file-input {
-		background: rgba(30, 41, 59: 0.7);
-		border: 1px solid rgba(148, 163, 184: 0.3);
+		background: rgba(30, 41, 59, 0.7);
+		border: 1px solid rgba(148, 163, 184, 0.3);
 		border-radius: 4px; padding: 0.5rem;
 		color: #e2e8f0;
 		font-family: 'Courier New', monospace;
@@ -531,9 +531,9 @@
 
 	.image-preview {
 		position: relative; display: inline-block;
-		border: 1px solid rgba(34, 211, 238: 0.3);
+		border: 1px solid rgba(34, 211, 238, 0.3);
 		border-radius: 4px; overflow: hidden;
-		background: rgba(30, 41, 59: 0.5);
+		background: rgba(30, 41, 59, 0.5);
 	}
 
 	.image-preview img {
@@ -560,8 +560,8 @@
 	}
 
 	.file-tag {
-		background: rgba(34, 211, 238: 0.2);
-		border: 1px solid rgba(34, 211, 238: 0.4);
+		background: rgba(34, 211, 238, 0.2);
+		border: 1px solid rgba(34, 211, 238, 0.4);
 		border-radius: 4px; padding: 0.5rem;
 		font-size: 0.75rem; color: #22d3ee;
 		display: inline-flex;
@@ -590,7 +590,7 @@
 
 	.send-button:hover {
 		background: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
-		box-shadow: 0 0 20px rgba(34, 211, 238: 0.4);
+		box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
 		transform: translateY(-1px);
 	}
 
@@ -618,16 +618,16 @@
 	}
 
 	.chat-log::-webkit-scrollbar-track {
-		background: rgba(30, 41, 59: 0.5);
+		background: rgba(30, 41, 59, 0.5);
 	}
 
 	.chat-log::-webkit-scrollbar-thumb {
-		background: rgba(34, 211, 238: 0.5);
+		background: rgba(34, 211, 238, 0.5);
 		border-radius: 4px;
 	}
 
 	.chat-log::-webkit-scrollbar-thumb:hover {
-		background: rgba(34, 211, 238: 0.7);
+		background: rgba(34, 211, 238, 0.7);
 	}
 
 	/* Keyword chips and suggestions */
@@ -636,12 +636,12 @@
 		flex-wrap: wrap; gap: 0.5rem;
 		margin-top: 0.75rem;
 		padding-top: 0.5rem;
-		border-top: 1px solid rgba(34, 211, 238: 0.2);
+		border-top: 1px solid rgba(34, 211, 238, 0.2);
 	}
 
 	.keyword-chip {
-		background: rgba(34, 211, 238: 0.1);
-		border: 1px solid rgba(34, 211, 238: 0.4);
+		background: rgba(34, 211, 238, 0.1);
+		border: 1px solid rgba(34, 211, 238, 0.4);
 		color: #22d3ee;
 		font-size: 0.75rem;
 		font-family: 'Courier New', monospace;
@@ -652,9 +652,9 @@
 	}
 
 	.keyword-chip:hover {
-		background: rgba(34, 211, 238: 0.2);
-		border-color: rgba(34, 211, 238: 0.6);
-		box-shadow: 0 0 8px rgba(34, 211, 238: 0.3);
+		background: rgba(34, 211, 238, 0.2);
+		border-color: rgba(34, 211, 238, 0.6);
+		box-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
 	}
 
 	.suggestion-buttons {
@@ -664,8 +664,8 @@
 	}
 
 	.suggestion-button {
-		background: rgba(16, 185, 129: 0.1);
-		border: 1px solid rgba(16, 185, 129: 0.4);
+		background: rgba(16, 185, 129, 0.1);
+		border: 1px solid rgba(16, 185, 129, 0.4);
 		color: #10b981;
 		font-size: 0.75rem;
 		font-family: 'Courier New', monospace;
@@ -679,9 +679,9 @@
 	}
 
 	.suggestion-button:hover {
-		background: rgba(16, 185, 129: 0.2);
-		border-color: rgba(16, 185, 129: 0.6);
-		box-shadow: 0 0 8px rgba(16, 185, 129: 0.3);
+		background: rgba(16, 185, 129, 0.2);
+		border-color: rgba(16, 185, 129, 0.6);
+		box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 	}
 
 </style>

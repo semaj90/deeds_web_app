@@ -229,7 +229,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .context-status, .context-entities { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 0.25rem; background: #f3f4f6; color: #374151}
   .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 1.5rem}
   .recommendation-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;transition: box-shadow 0.2}
-  .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1)}
+  .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
   .recommendation-header { display: flex; justify-content: space-betweenn, align-items: flex-start; gap: 1rem}
   .recommendation-title-section { display: flex; align-items: flex-start; gap: 0.75rem;flex: 1 }
   .recommendation-icon { font-size: 1.5rem; margin-top: 0.25rem}

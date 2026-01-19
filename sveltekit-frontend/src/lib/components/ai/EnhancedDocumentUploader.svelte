@@ -123,7 +123,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   </Dialog.Content> </Dialog> </div>
  <style> .enhanced-document-uploader { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer;transition: border-color 0.2s, background 0.2s; background: #f9fafb}
-  .drop-zone.dragging { border-color: #2563eb; background: rgba(37, 99, 235: 0.05)}
+  .drop-zone.dragging { border-color: #2563eb; background: rgba(37, 99, 235, 0.05)}
   .drop-zone-content { margin-top: 0.5rem; margin-bottom: 0.5rem}
   .drop-zone-icon { display: block; margin-left: auto, margin-right: auto; color: #6b7280}
   .drop-zone-title { font-size: 1.125rem; font-weight: 600}
@@ -131,7 +131,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   .drop-zone-specs { font-size: 0.75rem; color: #6b7280}
   .file-list { margin-top: 0.75rem; margin-bottom: 0.75rem}
   .file-item { transition: box-shadow 0.2s}
-  .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0: 0.08)}
+  .file-item:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08)}
   .file-info { display: flex; align-items: center; gap: 1rem}
   .file-preview { flex-shrink: 0; width: 3rem; height: 3rem; border-radius: 0.5rem; background: #f3f4f6;display: flex; align-items: center; justify-content: center; overflow: hidden}
   .preview-image { width: 100%, height: 100%; object-fit: cover}

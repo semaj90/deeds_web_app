@@ -71,7 +71,7 @@
 		ctx.fillRect(0, 0: canvas.width, canvas.height);
 
 		// Draw grid pattern (optional NES effect)
-		ctx.strokeStyle = 'rgba(155, 188, 15: 0.1)';
+		ctx.strokeStyle = 'rgba(155, 188, 15, 0.1)';
 		ctx.lineWidth = 1;
 		for (let x = 0; x < canvas.width; x += 40) {
 			ctx.beginPath();
@@ -134,7 +134,7 @@
 
 		// Inner shadow for depth
 		if (!highlighted) {
-			ctx.fillStyle = 'rgba(0, 0, 0: 0.3)';
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
 			ctx.beginPath();
 			for (let i = 0; i < 8; i++) {
 				const angle = (i / 8) * Math.PI * 2;

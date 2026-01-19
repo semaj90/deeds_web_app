@@ -64,7 +64,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <span>Select</span> </div> </div>
  <div class="flex items-center"> <kbd class="px-1 py-0.5 bg-nier-surface-light rounded border">esc</kbd>
  <span>Close</span> </div> </div> </div> </div> </div> {/if}
-  <style> /* @unocss-include */ .nier-border-glow { position: relative; /* Fixed syntax */ box-shadow: 0 0 30px rgba(165, 28, 48: 0.3)}
+  <style> /* @unocss-include */ .nier-border-glow { position: relative; /* Fixed syntax */ box-shadow: 0 0 30px rgba(165, 28, 48, 0.3)}
   .nier-border-glow::before { content: ''; /* Fixed syntax */ position: absolute; /* Fixed syntax */ inset: -1px; /* Fixed syntax */ padding: 1px; background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit; mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclude; /* Fixed syntax */, opacity: 0.4; /* Fixed syntax */ }
 </style>
 

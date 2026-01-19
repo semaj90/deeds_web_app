@@ -182,7 +182,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  .error-modal-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(26, 26, 26: 0.8);
+ bottom: 0; background: rgba(26, 26, 26, 0.8);
  display: flex;
  align-items: center;
  justify-content: center;

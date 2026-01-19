@@ -91,7 +91,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> </section> {/if}
   </main> {/if}
   </div>
- <style> .feedback-analytics-dashboard { min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 2rem; .dashboard-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1); .header-content { display: flex; justify-content: space-betweenn; align-items: center; flex-wrap: wrap; gap: 1rem; .header-title { display: flex; align-items: center; gap: 1rem; .header-actions { display: flex; align-items: center; gap: 1rem; flex-wrap}
+ <style> .feedback-analytics-dashboard { min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 2rem; .dashboard-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); .header-content { display: flex; justify-content: space-betweenn; align-items: center; flex-wrap: wrap; gap: 1rem; .header-title { display: flex; align-items: center; gap: 1rem; .header-actions { display: flex; align-items: center; gap: 1rem; flex-wrap}
   .filters { display: flex; gap: 0.5rem}
   .filter-select { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.875rem}
   .action-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500, font-size: 0.875rem; transition: all 0.2}
@@ -105,7 +105,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .loading-spinner { width: 2rem; height: 2rem; border: 3px solid #e5e7eb; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem}
   @keyframes spin { to { transform: rotate(360deg) } }
   .dashboard-main { display: flex; flex-direction: column; gap: 2rem}
-  .overview-section { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1)}
+  .overview-section { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
   .overview-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem}
   .metric-card { padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 8px; background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)}
   .metric-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem}
@@ -118,7 +118,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .progress-bar { width: 100%; height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden}
   .progress-fill { height: 100%; background: linear-gradient(90deg, #10b981 0%, #059669 100%); transition: width 0.3s ease}
   .section-title { display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem, font-weight: bold; color: #1f2937; margin-bottom: 1.5rem}
-  .breakdown-section, .insights-section, .issues-section { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1)}
+  .breakdown-section, .insights-section, .issues-section { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
   .breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem}
   .breakdown-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; background: #fafafa}
   .breakdown-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 1rem}

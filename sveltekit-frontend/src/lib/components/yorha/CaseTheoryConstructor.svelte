@@ -478,7 +478,7 @@ import { createEventDispatcher } from 'svelte';
 
  .card {
  border-radius: 1rem; padding: 1.25rem;
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  display: flex;
  flex-direction: column; gap: 1rem;
  }
@@ -495,8 +495,8 @@ import { createEventDispatcher } from 'svelte';
 
  textarea,
  input {
- background: rgba(15, 23, 42: 0.8);
- border-color: rgba(148, 163, 184: 0.35);
+ background: rgba(15, 23, 42, 0.8);
+ border-color: rgba(148, 163, 184, 0.35);
  color: #f8fafc;
  }
 
@@ -515,16 +515,16 @@ import { createEventDispatcher } from 'svelte';
  display: inline-flex;
  align-items: center; gap: 0.5rem;
  padding: 0.4rem 0.8rem;
- background: rgba(255, 255, 255: 0.05);
- border-radius: 999px; border: 1px dashed rgba(148, 163, 184: 0.4);
+ background: rgba(255, 255, 255, 0.05);
+ border-radius: 999px; border: 1px dashed rgba(148, 163, 184, 0.4);
  cursor: pointer;
  font-size: 0.85rem;
  }
 
  .results {
  border-radius: 1rem; padding: 1.25rem;
- border: 1px solid rgba(59, 130, 246: 0.35);
- background: rgba(2, 6, 23: 0.85);
+ border: 1px solid rgba(59, 130, 246, 0.35);
+ background: rgba(2, 6, 23, 0.85);
  }
 
  .results-stack {
@@ -540,8 +540,8 @@ import { createEventDispatcher } from 'svelte';
 
  .frame {
  margin-top: 0.5rem; padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42: 0.7);
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.7);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillars {
@@ -551,8 +551,8 @@ import { createEventDispatcher } from 'svelte';
 
  .pillar {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42: 0.8);
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillar .label {
@@ -572,8 +572,8 @@ import { createEventDispatcher } from 'svelte';
 
  .chips span {
  padding: 0.25rem 0.75rem;
- border-radius: 999px; background: rgba(14, 165, 233: 0.12);
- border: 1px solid rgba(14, 165, 233: 0.35);
+ border-radius: 999px; background: rgba(14, 165, 233, 0.12);
+ border: 1px solid rgba(14, 165, 233, 0.35);
  font-size: 0.8rem;
  }
 
@@ -584,8 +584,8 @@ import { createEventDispatcher } from 'svelte';
 
  .beat {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42: 0.8);
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .beat .label {
@@ -611,8 +611,8 @@ import { createEventDispatcher } from 'svelte';
  .row {
  display: flex; gap: 0.75rem;
  padding: 0.65rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42: 0.85);
- border: 1px solid rgba(148, 163, 184: 0.2);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.85);
+ border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .row span {
@@ -654,8 +654,8 @@ import { createEventDispatcher } from 'svelte';
 
  .deliverable-output article {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42: 0.8);
- border: 1px solid rgba(148, 163, 184: 0.2);
+ border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .deliverable-output .label {
@@ -672,9 +672,9 @@ import { createEventDispatcher } from 'svelte';
 
  .results pre {
  max-height: 220px;
- overflow-y: auto; background: rgba(15, 23, 42: 0.8);
+ overflow-y: auto; background: rgba(15, 23, 42, 0.8);
  padding: 0.75rem;
- border-radius: 0.75rem; border: 1px solid rgba(148, 163, 184: 0.25);
+ border-radius: 0.75rem; border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .placeholder {

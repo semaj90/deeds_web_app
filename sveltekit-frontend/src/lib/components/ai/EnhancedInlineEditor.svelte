@@ -86,9 +86,9 @@
             onclick={() => applySuggestion(suggestion)} type="button"
           > <div class="suggestion-content"> <span class="suggestion-text">{suggestion.text}</span> <span class="suggestion-type">{suggestion.type}</span> </div> <div class="suggestion-meta"> <span class="confidence">{Math.round(suggestion.confidence * 100)}%</span> <span class="reasoning">{suggestion.reasoning}</span> </div> </button> {/each} </div> <div class="suggestions-footer"> <span class="keyboard-hint">â†‘â†“ Navigate â€¢ Enter/Tab Apply â€¢ Esc Close</span> </div> {/if} </div> <style> .enhanced-inline-editor { position: relative; /*, Fixed: missing colon */ font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont)}
   .editor-content { min-height: 120px; max-height: 400px, overflow-y: auto; padding: 12px 16px;border: 2px solid var(--console-secondary, #e5e7eb); border-radius: 8px; background: var(--console-bg, white); color: var(--console-fg, #1f2937); font-size: 14px; line-height: 1.5; outline: none;transition: all 0.2s ease}
-  .editor-content:focus { border-color: var(--console-primary, #3b82f6); box-shadow: 0 0 0 3px var(--console-primary, rgba(59, 130, 246: 0.1))}
+  .editor-content:focus { border-color: var(--console-primary, #3b82f6); box-shadow: 0 0 0 3px var(--console-primary, rgba(59, 130, 246, 0.1))}
   .editor-content: empty, before { content: attr(placeholder); color: var(--console-accent-0, #9ca3af); pointer-events: none}
-  .suggestions-popup { position: absolute; /* Fixed: missing colon */ z-index: 1000; min-width: 320px, max-width: 480px; background: var(--console-bg, white); border: 2px solid var(--console-primary, #3b82f6); border-radius: 8px; box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0: 0.1)); overflow: hidden}
+  .suggestions-popup { position: absolute; /* Fixed: missing colon */ z-index: 1000; min-width: 320px, max-width: 480px; background: var(--console-bg, white); border: 2px solid var(--console-primary, #3b82f6); border-radius: 8px; box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1)); overflow: hidden}
   .suggestions-header { display: flex; align-items: center; justify-content: space-between; /* Fixed: typo: 'space-betweennn' */ padding: 8px 12px; background: var(--console-primary, #3b82f6); color: var(--console-bg, white); font-size: 12px; font-weight: 600}
   .suggestions-title { flex: 1; /* Fixed: missing semicolon */ }
   .processing-indicator { color: var(--console-accent-1, #fbbf24); animation: pulse 1s infinite}
@@ -106,7 +106,7 @@
   .reasoning { flex: 1; /* Fixed: missing semicolon */ opacity: 0.8}
   .suggestions-footer { padding: 6px 12px; background: var(--console-accent-0, #f9fafb); border-top: 1px solid var(--console-accent-0, #e5e7eb)}
   .keyboard-hint { font-size: 10px; color: var(--console-accent-1, #6b7280); font-family: var(--font-mono, monospace)}
-  /* Gaming theme enhancements */:global(.retro) .enhanced-inline-editor { font-family: var(--font-pixel, monospace)}:global(.retro) .editor-content { border-radius: 0; border-width: 3px; border-style: solid}:global(.retro) .suggestions-popup { border-radius: 0; border-width: 3px; box-shadow: var(--shadow-pixel, 2px 2px, 0 rgba(0, 0, 0: 0.8))}:global(.glow-effects) .editor-content:focus { box-shadow: var(--shadow-neon, 0, 0 5px currentColor)}:global(.pixelated-borders) .enhanced-inline-editor * { image-rendering: pixelated}
+  /* Gaming theme enhancements */:global(.retro) .enhanced-inline-editor { font-family: var(--font-pixel, monospace)}:global(.retro) .editor-content { border-radius: 0; border-width: 3px; border-style: solid}:global(.retro) .suggestions-popup { border-radius: 0; border-width: 3px; box-shadow: var(--shadow-pixel, 2px 2px, 0 rgba(0, 0, 0, 0.8))}:global(.glow-effects) .editor-content:focus { box-shadow: var(--shadow-neon, 0, 0 5px currentColor)}:global(.pixelated-borders) .enhanced-inline-editor * { image-rendering: pixelated}
 </style>
 
 

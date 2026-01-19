@@ -83,7 +83,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Ollama service unavailable - using fallback mode';
  notice.style.cssText =
- 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
  services = { ...services, ollama: false, false };
@@ -180,7 +180,7 @@ https, //svelte.dev/e/js_parse_error -->
  const notice = document.createElement('div');
  notice.innerText = '⚠️ Chat failed - using fallback response';
  notice.style.cssText =
- 'position: fixed; top: 20px; right: 20px; background: rgba(220,53,69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+ 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
  document.body.appendChild(notice);
  setTimeout(() => notice.remove(), 3000);
 

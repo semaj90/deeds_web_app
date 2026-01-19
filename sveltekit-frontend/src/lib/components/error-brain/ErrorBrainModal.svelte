@@ -438,7 +438,7 @@
 	.modal-backdrop {
 		position: absolute; top: 0;
 		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0: 0.8);
+		bottom: 0; background: rgba(0, 0, 0, 0.8);
 	}
 
 	.modal-content {
@@ -468,12 +468,12 @@
 
 	.route-info {
 		margin-bottom: 1rem; padding: 0.5rem;
-		background: rgba(249, 168, 37: 0.1);
+		background: rgba(249, 168, 37, 0.1);
 		border-radius: 4px;
 	}
 
 	.route-info code {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
 	}
@@ -481,20 +481,20 @@
 	.phase-indicator {
 		display: flex; gap: 0.5rem;
 		margin-bottom: 1rem; padding: 0.5rem;
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
 	}
 
 	.phase-badge {
 		padding: 0.5rem 1rem;
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border: 2px solid #444;
 		border-radius: 4px;
 		font-size: 0.9rem; transition: all 0.2s;
 	}
 
 	.phase-badge.active {
-		background: rgba(0, 200, 83: 0.3);
+		background: rgba(0, 200, 83, 0.3);
 		border-color: #00c853; color: #00c853;
 	}
 
@@ -517,18 +517,18 @@
 	.analysis-item {
 		width: 100%;
 		text-align: left; padding: 0.75rem;
-		background: rgba(255, 255, 255: 0.05);
+		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
 		cursor: pointer; transition: all 0.2s;
 	}
 
 	.analysis-item:hover {
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border-color: #fff; transform: translateX(4px);
 	}
 
 	.analysis-item.selected {
-		background: rgba(0, 120, 215: 0.2);
+		background: rgba(0, 120, 215, 0.2);
 		border-color: #0078d7;
 	}
 
@@ -540,7 +540,7 @@
 	}
 
 	.phase-label {
-		background: rgba(0, 200, 83: 0.3);
+		background: rgba(0, 200, 83, 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-size: 0.8rem;
@@ -570,17 +570,17 @@
 	}
 
 	.patch-status.passed {
-		background: rgba(0, 200, 83: 0.3);
+		background: rgba(0, 200, 83, 0.3);
 		color: #00c853;
 	}
 
 	.patch-status.failed {
-		background: rgba(231, 72, 86: 0.3);
+		background: rgba(231, 72, 86, 0.3);
 		color: #e74856;
 	}
 
 	.patch-status.pending {
-		background: rgba(249, 168, 37: 0.3);
+		background: rgba(249, 168, 37, 0.3);
 		color: #f9a825;
 	}
 
@@ -604,7 +604,7 @@
 
 	.suggestion-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem; background: rgba(0, 120, 215: 0.1);
+		padding: 0.75rem; background: rgba(0, 120, 215, 0.1);
 	}
 
 	.suggestion-title {
@@ -615,7 +615,7 @@
 	}
 
 	.selected-badge {
-		background: rgba(0, 200, 83: 0.3);
+		background: rgba(0, 200, 83, 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-size: 0.8rem; color: #00c853;
@@ -627,7 +627,7 @@
 	}
 
 	.suggestion-code {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		padding: 0.5rem;
 		border-radius: 4px; margin: 0.5rem 0;
 		overflow-x: auto;
@@ -640,7 +640,7 @@
 
 	.patch-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem; background: rgba(249, 168, 37: 0.1);
+		padding: 0.75rem; background: rgba(249, 168, 37, 0.1);
 	}
 
 	.patch-header {
@@ -664,22 +664,22 @@
 	}
 
 	.verification-badge.passed {
-		background: rgba(0, 200, 83: 0.3);
+		background: rgba(0, 200, 83, 0.3);
 		color: #00c853;
 	}
 
 	.verification-badge.failed {
-		background: rgba(231, 72, 86: 0.3);
+		background: rgba(231, 72, 86, 0.3);
 		color: #e74856;
 	}
 
 	.verification-badge.pending {
-		background: rgba(249, 168, 37: 0.3);
+		background: rgba(249, 168, 37, 0.3);
 		color: #f9a825;
 	}
 
 	.patch-content {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		padding: 0.5rem;
 		border-radius: 4px; margin: 0.5rem 0;
 		overflow-x: auto;
@@ -699,7 +699,7 @@
 
 	.verification-form {
 		margin-top: 1rem; padding: 1rem;
-		background: rgba(0, 200, 83: 0.1);
+		background: rgba(0, 200, 83, 0.1);
 		border: 2px solid #00c853;
 	}
 
@@ -734,7 +734,7 @@
 
 	.analysis-list::-webkit-scrollbar-track,
 	.analysis-details::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 	}
 
 	.analysis-list::-webkit-scrollbar-thumb,

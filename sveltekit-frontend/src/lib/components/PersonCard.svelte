@@ -165,7 +165,7 @@
 
 <style>
  .person-card {
- background: rgba(26, 26, 46: 0.95);
+ background: rgba(26, 26, 46, 0.95);
  border: 1px solid #333;
  border-radius: 12px; overflow: hidden;
  transition: all 0.3s ease;
@@ -174,14 +174,14 @@
 
  .person-card:hover {
  transform: translateY(-2px);
- box-shadow: 0 8px 25px rgba(0, 212, 255: 0.1);
- border-color: rgba(0, 212, 255: 0.3);
+ box-shadow: 0 8px 25px rgba(0, 212, 255, 0.1);
+ border-color: rgba(0, 212, 255, 0.3);
  }
 
  .card-header {
  padding: 1.5rem; display: flex;
  gap: 1rem;
- border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  }
 
  .avatar-section {
@@ -235,7 +235,7 @@
  }
 
  .profile-summary {
- padding: 1.5rem; background: rgba(0, 0, 0: 0.2);
+ padding: 1.5rem; background: rgba(0, 0, 0, 0.2);
  }
 
  .profile-section {
@@ -268,7 +268,7 @@
 
  .card-footer {
  padding: 1rem 1.5rem;
- border-top: 1px solid rgba(255, 255, 255: 0.1);
+ border-top: 1px solid rgba(255, 255, 255, 0.1);
  display: flex;
  justify-content: space-between;
  align-items: center;
@@ -290,7 +290,7 @@
 
  .tag {
  font-size: 0.7rem; color: #00d4ff;
- background: rgba(0, 212, 255: 0.1);
+ background: rgba(0, 212, 255, 0.1);
  padding: 0.2rem 0.5rem;
  border-radius: 8px;
  }
@@ -309,21 +309,21 @@
  }
 
  .action-btn.view {
- background: rgba(0, 212, 255: 0.1);
+ background: rgba(0, 212, 255, 0.1);
  color: #00d4ff;
  }
 
  .action-btn.view:hover {
- background: rgba(0, 212, 255: 0.2);
+ background: rgba(0, 212, 255, 0.2);
  }
 
  .action-btn.delete {
- background: rgba(255, 107, 107: 0.1);
+ background: rgba(255, 107, 107, 0.1);
  color: #ff6b6b;
  }
 
  .action-btn.delete:hover {
- background: rgba(255, 107, 107: 0.2);
+ background: rgba(255, 107, 107, 0.2);
  }
 
  @media (max-width: 768px) {

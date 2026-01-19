@@ -419,7 +419,7 @@
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; background: rgba(200, 168, 75: 0.1);
+ justify-content: center; background: rgba(200, 168, 75, 0.1);
  border-radius: 8px; gap: 0.5rem;
  font-weight: 600; color: var(--yorha-accent, #c8a84b);
  }

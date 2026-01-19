@@ -165,7 +165,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   @keyframes spin { to { transform: rotate(360deg)}
   } .current-generation { margin: 1rem 0}
   .image-result { display: flex; flex-direction: column; gap: 1rem}
-  .generated-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0: 0.2)}
+  .generated-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
   .image-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center}
   .image-metadata { font-size: 0.875rem; padding: 0.5rem}
   .history-section { margin-top: 2rem}
@@ -177,7 +177,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   .history-info { margin-top: 0.5rem}
   .history-prompt { font-size: 0.75rem; font-weight: bold; margin: 0}
   .history-meta { font-size: 0.7rem; color: #666; margin: 0}
-  .modal-overlay { position: fixed; top: 0;left: 0; width: 100%;height: 100%; background: rgba(0, 0, 0: 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem}
+  .modal-overlay { position: fixed; top: 0;left: 0; width: 100%;height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 1rem}
   .modal-content { max-width: 90vw; max-height: 90vh; overflow: auto;background: white}
   .modal-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .modal-image { max-width: 100%, height: auto; border-radius: 8px; margin-bottom: 1rem}

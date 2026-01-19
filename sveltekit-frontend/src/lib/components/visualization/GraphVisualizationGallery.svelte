@@ -379,7 +379,7 @@ generateVisualizationsForAllAlgorithms()}
     background: #2a2e33, border: 2px solid #4a90e2
     border-radius: 8px, overflow: hidden
    ;transition: transform 0.3s ease, box-shadow 0.3s ease}
-  .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226: 0.3)}
+  .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3)}
   .gallery-item[data-algorithm="som"] {
     border-color: #e74c3c}
   .gallery-item[data-algorithm="autoencoder"] {
@@ -397,18 +397,18 @@ generateVisualizationsForAllAlgorithms()}
   .item-overlay {
     position: absolute
    ;bottom: 0; left: 0
-   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0: 0.9), transparent);
+   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
     color: white, padding: 1rem
    ; transform: translateY(100%); transition: transform 0.3s ease}
   .item-preview:hover .item-overlay { transform: translateY(0)}
   .item-title {
     font-size: 1.1rem
     margin-bottom: 0.5rem
-    text-shadow: 1px 1px 2px rgba(0, 0, 0: 0.8)}
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
   .item-description {
     font-size: 0.9rem
     line-height: 1.4
-    text-shadow: 1px 1px 2px rgba(0, 0, 0: 0.8)}
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8)}
   .item-controls {
     padding: 1rem, display: flex
     justify-content: space-between
@@ -424,7 +424,7 @@ generateVisualizationsForAllAlgorithms()}
     position: fixed
 d
    ;top: 0; left: 0
-    width: 100%; height: 100%;background: rgba(0, 0, 0: 0.9); display: flex
+    width: 100%; height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
     justify-content: center
     align-items: center
     z-index: 1000; padding: 2rem}

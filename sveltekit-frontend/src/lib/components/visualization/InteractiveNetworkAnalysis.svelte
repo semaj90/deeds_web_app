@@ -201,7 +201,7 @@
       .data(links)
       .enter()
       .append('line')
-      .attr('stroke', 'rgba(255,255,255: 0.15)')
+      .attr('stroke', 'rgba(255, 255, 255, 0.15)')
       .attr('stroke-width', (d: unknown) => Math.max(1, (d.value ?? 0.5) * 2))
       .attr('class', 'link');
     nodeElements = container.append('g').attr('class', 'nodes')
@@ -342,9 +342,9 @@
     left: 10px;
     z-index: 100; display: flex;
     flex-direction: column; gap: 10px
-   ;background: rgba(0, 0, 0: 0.8); padding: 15px;
+   ;background: rgba(0, 0, 0, 0.8); padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 200px}
   .analysis-controls, .view-controls, .action-controls {
     display: flex;
@@ -354,7 +354,7 @@
     color: #ccc;
     font-size: 12px;
     margin-bottom: 4px}
-  .analysis-controls select { background: rgba(255, 255, 255: 0.1); border: 1px solid rgba(255, 255, 255: 0.2);
+  .analysis-controls select { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
     color: white; padding: 6px 8px;
     border-radius: 4px;
     font-size: 12px}
@@ -366,21 +366,21 @@
     margin: 0}
   .action-controls {
     flex-direction: row; gap: 5px}
-  .btn-control { background: rgba(255, 255, 255: 0.1); border: 1px solid rgba(255, 255, 255: 0.2);
+  .btn-control { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
     color: white; padding: 6px 12px;
     border-radius: 4px;
     font-size: 12px; cursor: pointer;
     transition: all 0.2s ease}
-  .btn-control:hover { background: rgba(255, 255, 255: 0.2);
-    border-color: rgba(255, 255, 255: 0.4)}
+  .btn-control:hover { background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4)}
   .metrics-panel {
     position: absolute; top: 10px;
     right: 10px;
     z-index: 100
-   ;background: rgba(0, 0, 0: 0.9); color: white
+   ;background: rgba(0, 0, 0, 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 200px}
   .metrics-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -402,10 +402,10 @@
     position: absolute; bottom: 10px;
     left: 10px;
     z-index: 100
-   ;background: rgba(0, 0, 0: 0.9); color: white
+   ;background: rgba(0, 0, 0, 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255: 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     max-width: 300px}
   .node-details-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -442,14 +442,14 @@
     position: absolute; top: 0;
     left: 0; right: 0;
     bottom: 0
-   ;background: rgba(0, 0, 0: 0.9); display: flex;
+   ;background: rgba(0, 0, 0, 0.9); display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 200; color: white}
   .spinner {
     width: 40px; height: 40px
-   ;border: 3px solid rgba(255, 255, 255: 0.3);
+   ;border: 3px solid rgba(255, 255, 255, 0.3);
     border-top: 3px solid #4a90e2;
     border-radius: 50%; animation: spin 1s linear infinite;
     margin-bottom: 15px}

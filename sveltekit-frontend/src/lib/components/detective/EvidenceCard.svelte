@@ -28,9 +28,9 @@
           ></i> <p class="text-xs nes-text is-disabled"> {item.evidenceType || item.type || 'document'} </p> </div> {/if} <!-- AI Summary, Preview --> {#if item.aiSummary || item.analysis?.aiSummary} <div class="bg-muted/50 rounded-md p-3"> <div class="flex items-center"> <i class="i-lucide-brain w-4 h-4" aria-hidden="true"></i> <span class="text-xs font-medium">AI Summary</span> </div> <p class="text-xs nes-text is-disabled"> {item.aiSummary ?? item.analysis?.aiSummary} </p> {/if} <!-- Metadata --> <div class="space-y-3"> <!-- Tags --> {#if item.tags && item.tags.length > 0} <div class="flex flex-wrap"> {#each Array.isArray(item.tags.slice(0, 3)) ? item.tags.slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{ tag }</span> {/each} {#if item.tags.length > 3} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
               >+{item.tags.length - 3}</span >
           {/if} {/if} <!-- File, Info --> <div class="flex items-center justify-between text-xs nes-text"> <span>{formatFileSize(item.fileSize || 0)}</span> <span>{formatDate(item.createdAt || item.timeline?.createdAt ?? new Date())}</span> </div> <!-- Hash, Verification --> {#if item.hash} <div class="flex items-center"> <i class="i-lucide-shield-check w-4 h-4" aria-hidden="true"></i> <span class="text-xs text-green-600">Verified</span> {/if} </div> </div> </Card> <style> /* Modern CSS line clamping with fallback */ .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-height: calc(1.2em * 2); line-height: 1.2em; line-clamp: 2 }
-  /* Enhanced NES styling for better legal UI */ .yorha-panel-header { border-bottom: 1px solid rgba(0, 0, 0: 0.1)}
+  /* Enhanced NES styling for better legal UI */ .yorha-panel-header { border-bottom: 1px solid rgba(0, 0, 0, 0.1)}
   .yorha-panel-content { padding-top: 0.75rem}
-  /* Improved hover effects */ .group:hover .yorha-panel-header { background: rgba(0, 0, 0: 0.02)}
+  /* Improved hover effects */ .group:hover .yorha-panel-header { background: rgba(0, 0, 0, 0.02)}
   /* Better accessibility focus styles */ .group:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
 </style>
 

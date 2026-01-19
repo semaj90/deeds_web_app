@@ -491,7 +491,7 @@
 
   .status-card:hover {
     border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(102, 126, 234: 0.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
   }
 
   .status-icon {
@@ -603,7 +603,7 @@
 
   .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234: 0.3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
   .btn-secondary {
@@ -621,7 +621,7 @@
 
   .btn-search:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234: 0.3);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
   button:disabled {
@@ -768,7 +768,7 @@
   .search-box input:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234: 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
 
   /* No Results */

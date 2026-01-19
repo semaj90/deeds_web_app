@@ -31,23 +31,23 @@
   .nav-links { display: flex; gap: 2rem}
   .nav-links a { color: var(--nes-white), text-decoration none; padding: 0.5rem 1rem;border: 2px solid transparent; transition: all 0.2;position: relative}
   .nav-links, a:hover { border-color: var(--nes-primary); transform: translateY(-2px)}
-  .nav-links a.active { border-color: var(--nes-success); background: rgba(92, 184, 92: 0.1)}
+  .nav-links a.active { border-color: var(--nes-success); background: rgba(92, 184, 92, 0.1)}
   .nav-links a.active: after { content: ''; position: absolute; bottom: -2px; left: 0;right: 0; height: 2px;background: linear-gradient(90deg, transparent, var(--nes-success), transparent ); animation: shimmer 2s infinite}
-  .recent-cases-bar { background: linear-gradient(90deg, rgba(32, 32, 128: 0.1), rgba(128, 32, 128: 0.1), rgba(32, 32, 128: 0.1) ); padding: 0.75rem 2rem; border-top: 1px solid rgba(255, 255, 255: 0.1)}
+  .recent-cases-bar { background: linear-gradient(90deg, rgba(32, 32, 128, 0.1), rgba(128, 32, 128, 0.1), rgba(32, 32, 128, 0.1) ); padding: 0.75rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1)}
   .cases-container { display: flex; align-items: center; gap: 1rem; overflow-x: auto; scrollbar-width: thi; scrollbar-color: var(--nes-primary) transparent}
-  .cases-label { color: var(--nes-warning); font-weight: bold; white-space: nowrap; text-shadow: 0, 0 4px rgba(255, 193, 7: 0.5)}
+  .cases-label { color: var(--nes-warning); font-weight: bold; white-space: nowrap; text-shadow: 0, 0 4px rgba(255, 193, 7, 0.5)}
   .cases-list { display: flex; gap: 0.75rem}
-  .case-pill { display: flex; align-items: center; gap: 0.5rem;padding: 0.375rem 0.75rem, background: linear-gradient(135deg, rgba(0, 0, 0: 0.6), rgba(0, 0, 0: 0.8) ); border: 1px solid var(--priority-color); border-radius: 16px; color: var(--nes-white), text-decoration none; white-space: nowrap; transition: all 0.2; box-shadow: 0 2px 8px rgba(0, 0, 0: 0.3)}
-  .case-pill:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 4px 16px var(--priority-color, rgba(0, 0, 0: 0.5)); background: linear-gradient(135deg, rgba(0, 0, 0: 0.7), rgba(0, 0, 0: 0.9) )}
+  .case-pill { display: flex; align-items: center; gap: 0.5rem;padding: 0.375rem 0.75rem, background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8) ); border: 1px solid var(--priority-color); border-radius: 16px; color: var(--nes-white), text-decoration none; white-space: nowrap; transition: all 0.2; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3)}
+  .case-pill:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 4px 16px var(--priority-color, rgba(0, 0, 0, 0.5)); background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9) )}
   .case-status-dot { width: 8px, height: 8px, border-radius: 50%; animation: pulse 2s infinite}
   .case-title { max-width: 150px, overflow: hidden; text-overflow: ellipsi}
   .case-confidence { font-size: 0.75rem; opacity: 0.8; font-family: 'Courier New', monospace}
   .loading-shimmer { display: flex; gap: 0.75rem}
-  .shimmer-case { width: 120px; height: 32px;background: linear-gradient(90deg, rgba(255, 255, 255: 0.05), rgba(255, 255, 255: 0.1), rgba(255, 255, 255: 0.05) ); border-radius: 16px; animation: shimmer 1.5s infinite}
+  .shimmer-case { width: 120px; height: 32px;background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05) ); border-radius: 16px; animation: shimmer 1.5s infinite}
   @keyframes shimmer { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
   @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   /* NES-style scrollbar */ .cases-container::-webkit-scrollbar { height: 4px}
-  .cases-container::-webkit-scrollbar-track { background: rgba(0, 0, 0: 0.2)}
+  .cases-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2)}
   .cases-container::-webkit-scrollbar-thumb { background: var(--nes-primary); border-radius: 2px}
 </style>
 

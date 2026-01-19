@@ -42,7 +42,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
     border: 1px solid #00ff00;
     box-shadow:
       0,
-      0 20px rgba(0, 255, 0: 0.3);
+      0 20px rgba(0, 255, 0, 0.3);
   }
   .messages {
     scrollbar-width: thin;

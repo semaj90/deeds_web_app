@@ -263,8 +263,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes messageSlideIn { from { opacity: 0; transform: translateY(20px)}
     to { opacity: 1; transform: translateY(0)}
   } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase, letter-spacing: 0.05em; animation: streamingPulse 2s infinite}
-  @keyframes streamingPulse { 0%; } 100% { box-shadow 0 0, 0 rgba(59, 130, 246: 0.4)}
-    50% { box-shadow: 0 0 0 4px rgba(59, 130, 246: 0.1)}
+  @keyframes streamingPulse { 0%; } 100% { box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
+    50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1)}
   } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563}
 </style>
 

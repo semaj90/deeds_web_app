@@ -335,7 +335,7 @@
     background: white
     border-radius: 8px
    ;padding: 2rem
-    box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1)}
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)}
   .form-grid {
     display: grid, gap: 2rem}
   .form-section h3 { margin: 0, 0 1rem 0
@@ -367,7 +367,7 @@
    ;transition: border-color 0.2s, box-shadow 0.2s}; input: focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
-    box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   input.error {
     border-color: #ef4444}
   .field-error {

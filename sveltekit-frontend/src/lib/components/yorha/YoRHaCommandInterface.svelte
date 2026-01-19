@@ -64,7 +64,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             disabled={ isProcessingCommand } /> {#if isProcessingCommand} <div class="hologram-text text-sm">PROCESSING...{/if} </div> <!-- Command, history --> <div class="flex-1 overflow-y-auto"> {#each Array.isArray($commandHistory) ? $commandHistory: [] as result} <div class="border-b border-cyan-900"> <div class="flex justify-between items-center"> <span class="text-cyan-300">$ {result.command}</span> <span class="text-xs px-2 py-1"
                   class:bg-green-900={result.status === 'SUCCESS'} class:bg-red-900={result.status === 'ERROR'} class:bg-yellow-900={result.status === 'PROCESSING'} class:text-green-300={result.status === 'SUCCESS'} class:text-red-300={result.status === 'ERROR'}; class:text-yellow-300={result.status === 'PROCESSING'} >
                   {result.status} </span> </div> <div class="text-white text-sm">{result.output}</div> <div class="text-xs text-gray-500"> [{result.module}] {new Date(result.timestamp).toLocaleTimeString()} </div> </div> {/each} </div> </div> </div> <!-- Footer --> <footer class="mt-4 text-center text-cyan-400"> <div>YoRHa Legal AI Interface v2.0 â€¢ Bunker Operations â€¢ Quantum Security Enabled</div> <div class="mt-1"> Neural Activity: {$metrics.neural_activity.toFixed(1)}% â€¢ Security Level: {$metrics.security_level} </div> </footer> </div> </div> <!-- YoRHa, Interface, Styles --> <style> /* @apply min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900; */ .yorha-container { font-family: 'Courier New', 'Monaco', monospace; overflow: hidden;position: relative}
-  .scanlines { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(transparent 50%, rgba(0, 255, 136: 0.03) 50%); background-size: 100% 2px; animation: scanline-scroll 0.1s linear infinite; pointer-events: none; z-index: 1}
+  .scanlines { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(transparent 50%, rgba(0, 255, 136, 0.03) 50%); background-size: 100% 2px; animation: scanline-scroll 0.1s linear infinite; pointer-events: none; z-index: 1}
   @keyframes scanline-scroll { 0% { transform: translateY(0)}
     100% { transform: translateY(2px)}
   } .glitch-effect { animation: glitch 0.2s ease-in-out}
@@ -74,16 +74,16 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     60% { transform: translateX(-1px); filter: hue-rotate(270deg)}
     80% { transform: translateX(1px); filter: hue-rotate(360deg)}
     100% { transform: translateX(0); filter: hue-rotate(0deg)}
-  } .cyber-border { border: 1px solid #00ff88; box-shadow: 0 0 5px rgba(0, 255, 136: 0.3), inset, 0 0 5px rgba(0, 255, 136: 0.1)}
+  } .cyber-border { border: 1px solid #00ff88; box-shadow: 0 0 5px rgba(0, 255, 136, 0.3), inset, 0 0 5px rgba(0, 255, 136, 0.1)}
   .hologram-text { color: #00ff88; text-shadow: 0, 0 10px currentColor; animation: hologram-flicker 2s ease-in-out infinite alternate}
   @keyframes hologram-flicker { 0% { opacity: 0.8}
     50% { opacity: 1}
     100% { opacity: 0.9}
-  } .module-panel { background: rgba(0, 20, 40: 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 255, 136: 0.3); transition: all 0.3s ease}
-  .module-panel:hover { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136: 0.2); transform: translateY(-2px)}
-  .command-terminal { background: rgba(0, 0, 0: 0.8); border: 1px solid #00ff88; font-family: 'Courier New', monospace}
+  } .module-panel { background: rgba(0, 20, 40, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 255, 136, 0.3); transition: all 0.3s ease}
+  .module-panel:hover { border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); transform: translateY(-2px)}
+  .command-terminal { background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; font-family: 'Courier New', monospace}
   .command-input { background: transparent; border: none; color: #00ff88; font-family: inherit; outline: none;width: 100%}
-  .command-input::placeholder { color: rgba(0, 255, 136: 0.5)}
+  .command-input::placeholder { color: rgba(0, 255, 136, 0.5)}
   .status-indicator { width: 8px, height: 8px, border-radius: 50%; animation: status-pulse 2s ease-in-out infinite}
   @keyframes status-pulse { 0% { opacity: 1}
     50% { opacity: 0.5}

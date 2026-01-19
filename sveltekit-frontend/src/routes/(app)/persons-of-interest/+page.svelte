@@ -260,7 +260,7 @@
 
  .poi-card:hover {
  border-color: #dc2626;
- box-shadow: 0 0 20px rgba(220, 38, 38: 0.2);
+ box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
  }
 
  .card-header {

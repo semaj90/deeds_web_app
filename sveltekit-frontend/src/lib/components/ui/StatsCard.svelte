@@ -22,7 +22,7 @@
     padding: 1rem
     border-radius: 8px
    ;background: var(--nes-container, #fefefe);
-    box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1)}
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)}
   .title {
     font-size: 0.9rem
     font-weight: bold

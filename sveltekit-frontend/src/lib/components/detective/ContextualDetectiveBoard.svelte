@@ -104,7 +104,7 @@
   </div> </section> {/if}
   </main> </div>
  <style> .contextual-detective-board { display: flex; flex-direction: column; height: 100vh;background: #f8fafc; font-family: system-ui, -apple-system, sans-serif}
-  .board-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 1rem 2rem;background: white; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .board-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 1rem 2rem;background: white; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .case-info h1 { margin: 0; font-size: 1.5rem; color: #1e293b}
   .case-id { margin: 0.25rem, 0 0 0; color: #64748b; font-size: 0.875rem}
   .analytics-panel { display: flex; gap: 1.5rem}
@@ -114,13 +114,13 @@
   .value.state-typing { color: #059669 } .value.state-waiting_user { color: #d97706 } .value.state-idle { color: #64748b } .value.engagement-high { color: #dc2626 } .value.engagement-medium { color: #d97706 } .value.engagement-low { color: #64748b } .metric.collaboration-active .value { color: #059669 } .metric.typing-indicator .value { color: #059669; animation: pulse 1.5s ease-in-out infinite}
   @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   .analysis-area { flex: 1, padding: 2rem, overflow-y: auto, display: flex; flex-direction: column; gap: 2rem}
-  .input-section { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .input-section { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .input-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 1rem}
   .input-header h2 { margin: 0; font-size: 1.25rem; color: #1e293b}
   .typing-indicator { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem, font-weight: 500; color: #64748b; background: #f1f5f9; transition: all 0.2}
   .typing-indicator.active { color: #059669; background: #dcfce7}
   .analysis-input { width: 100%; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem, line-height: 1.5, resize: vertical; font-family: inherit}
-  .analysis-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1)}
+  .analysis-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .input-actions { display: flex; gap: 1rem; margin-top: 1rem}
   .input-actions button { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem, font-weight: 500; cursor: pointer; transition: all 0.2}
   .input-actions buttonfirst-child { background: #3b82f6; color: white}
@@ -128,12 +128,12 @@
   .input-actions buttonfirst-child:disabled { background: #9ca3af; cursor:not-allowed}
   .input-actions buttonlast-child { background: #f3f4f6; color: #374151}
   .input-actions buttonlast-child:hover { background: #e5e7eb}
-  .contextual-prompts { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .contextual-prompts { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .contextual-prompts h3 { margin: 0, 0 1rem 0; font-size: 1.125rem; color: #1e293b}
   .prompts-list { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .prompt-button { padding: 0.5rem 1rem; background: #f0f9ff;color: #0369a1; border: 1px solid #0ea5e9; border-radius: 1rem; font-size: 0.875rem; cursor: pointer;transition: all 0.2}
   .prompt-buttonhover { background: #0ea5e9; color: white}
-  .connection-map, .detective-analysis { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .connection-map, .detective-analysis { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .connection-map h3, .detective-analysis h3 { margin: 0, 0 1rem 0; font-size: 1.125rem; color: #1e293b}
   .map-stats { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.875rem; color: #64748b}
   .nodes-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem}

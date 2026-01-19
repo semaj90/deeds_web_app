@@ -122,20 +122,20 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center"> <div class="flex items-center"> <Calendar class="w-3" /> <span class="font-mono font-medium">{formatTime(currentTime)}</span> </div>
  <Zap class="w-3 h-3" /> </div> </div> </footer> </div> </div>
  <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42: 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11: 0.6), rgba(217, 119, 6: 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42: 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11: 0.8), rgba(217, 119, 6: 0.8))}
+  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
   /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
-  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11: 0.1)}
-    50% { box-shadow: 0 0 30px rgba(245, 158, 11: 0.2)}
+  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
+    50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}
   } /* Enhanced backdrop blur effects */ .backdrop-blur-md { backdrop-filter: blur(12px) saturate(180%)}
   /* Professional responsive typography */ @media (max-width: 768px) { .yorha-production-layout { font-size: 15px}
   } @media (max-width: 640px) { .yorha-production-layout { font-size: 14px}
   } /* Professional smooth transitions */:global(*) { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease}
 </style> </div> </div> </footer> </div> </div>
  <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42: 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11: 0.6), rgba(217, 119, 6: 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42: 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11: 0.8), rgba(217, 119, 6: 0.8))}
+  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
   /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
-  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11: 0.1)}
-    50% { box-shadow: 0 0 30px rgba(245, 158, 11: 0.2)}
+  @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
+    50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}
   } /* Enhanced backdrop blur effects */ .backdrop-blur-md { backdrop-filter: blur(12px) saturate(180%)}
   /* Professional responsive typography */ @media (max-width: 768px) { .yorha-production-layout { font-size: 15px}
   } @media (max-width: 640px) { .yorha-production-layout { font-size: 14px}

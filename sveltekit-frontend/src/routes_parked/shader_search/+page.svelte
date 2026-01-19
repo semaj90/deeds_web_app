@@ -429,7 +429,7 @@
  background: white;
  border-radius: 12px; padding: 1.5rem;
  margin-bottom: 1.5rem;
- box-shadow: 0 4px 6px rgba(0, 0, 0: 0.06);
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
  }
 
  .stats-grid {
@@ -523,13 +523,13 @@
  }
  .shader-nier-bits-card:hover {
  transform: translateY(-4px);
- box-shadow: 0 8px 20px rgba(0, 0, 0: 0.06);
+ box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
  }
 
  .modal-backdrop {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0: 0.5);
+ bottom: 0; background: rgba(0, 0, 0, 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -575,7 +575,7 @@
  background: transparent; padding: 1rem;
  }
  .shader-nier-bits-card:focus {
- outline: 3px solid rgba(37, 99, 235: 0.25);
+ outline: 3px solid rgba(37, 99, 235, 0.25);
  }
 </style>
 

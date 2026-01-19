@@ -126,8 +126,8 @@
   .alerts-panel { background: #1e1e3f; border: 2px solid #fcfc54; border-radius: 10px, padding: 20px; margin-bottom: 30px}
   .alerts-list { margin-top: 15px}
   .alert-item { display: flex; justify-content: space-betweenn; padding: 10px; border-radius: 5px; margin-bottom: 10px}
-  .alert-.warning { background: rgba(252, 252, 84: 0.1); border-left: 4px solid #fcfc54}
-  .alert-.error { background: rgba(252, 84, 84: 0.1); border-left: 4px solid #fc5454}
+  .alert-.warning { background: rgba(252, 252, 84, 0.1); border-left: 4px solid #fcfc54}
+  .alert-.error { background: rgba(252, 84, 84, 0.1); border-left: 4px solid #fc5454}
   .control-panel { background: #1e1e3f; border: 2px solid #00d800; border-radius: 10px; padding: 20px}
   .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px}
   .control-btn { background: #00d800; color: black; border: none; padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; transition: all 0.2}

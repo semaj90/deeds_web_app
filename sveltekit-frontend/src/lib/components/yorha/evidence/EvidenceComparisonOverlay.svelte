@@ -53,7 +53,7 @@ import { createEventDispatcher } from 'svelte';
 
 <style>
  .nes-container {
- background: rgba(30, 41, 59: 0.95);
+ background: rgba(30, 41, 59, 0.95);
  border: 2px solid #475569;
  border-radius: 8px;
  }

@@ -253,7 +253,7 @@
  .control-group input:focus {
  outline: none;
  border-color: #2563eb;
- box-shadow: 0 0 0 3px rgba(37, 99, 235: 0.1);
+ box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
  }
 
  .relevance-value {
@@ -319,7 +319,7 @@
 
  .case-card:hover {
  border-color: #2563eb;
- box-shadow: 0 4px 12px rgba(37, 99, 235: 0.1);
+ box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
  }
 
  .card-header {

@@ -143,7 +143,7 @@
  background: white; border: 1px solid #e5e7eb;
  border-radius: 8px; padding: 16px;
  margin: 16px 0;
- box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
  }
 
  .progress-card.error {

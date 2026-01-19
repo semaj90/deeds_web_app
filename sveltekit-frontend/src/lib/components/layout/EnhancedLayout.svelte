@@ -39,8 +39,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .header-actions { display: flex; align-items: center; gap: 1rem}
   .user-greeting { font-size: 0.9rem; font-weight: 500}
   .nav-item { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; text-decoration: none, color: inherit, border-radius: 4px; transition: all 0.2s ease}
-  .nav-item:hover { background: rgba(0, 0, 0: 0.1)}
-  .enhanced-layout[data-variant='yorha'] .nav-item:hover { background: rgba(255, 215, 0: 0.2); color: #ffd700}
+  .nav-item:hover { background: rgba(0, 0, 0, 0.1)}
+  .enhanced-layout[data-variant='yorha'] .nav-item:hover { background: rgba(255, 215, 0, 0.2); color: #ffd700}
   .nav-item.active { background: var(--nes-primary-color, #000); color: #fff}
   .enhanced-layout[data-variant='yorha'] .nav-item.active { background: #ffd700; color: #000}
   .nav-icon { font-size: 1rem}
@@ -55,7 +55,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .main-content { max-width: 1200px; margin: 0 auto;width: 100%}
   .full-width .main-content { max-width: none}
   .loading-container { display: flex; justify-content: center; align-items: center; min-height: 200px}
-  /* YoRHa scan lines effect */ .yorha-scan-lines { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient( transparent 50%, rgba(255, 215, 0: 0.03) 51%, rgba(255, 215, 0: 0.03) 52%, transparent 53% ); background-size: 100% 4px; pointer-events: none; z-index: 1}
+  /* YoRHa scan lines effect */ .yorha-scan-lines { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient( transparent 50%, rgba(255, 215, 0, 0.03) 51%, rgba(255, 215, 0, 0.03) 52%, transparent 53% ); background-size: 100% 4px; pointer-events: none; z-index: 1}
   /* Responsive design */ @media (max-width: 768px) { .header-nav { display: none}
     .sidebar-toggle { display: block}
     .layout-main { padding: 1rem}

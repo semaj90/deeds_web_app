@@ -291,8 +291,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  background-color: #000; color: #f59e0b; /* amber-400 */;
  font-family: 'Courier New', monospace;
  background-image:
- radial-gradient(circle at 20% 50%, rgba(255, 191, 0: 0.03) 0%, transparent 50%),
- radial-gradient(circle at 80% 20%, rgba(255, 191, 0: 0.03) 0%, transparent 50%);
+ radial-gradient(circle at 20% 50%, rgba(255, 191, 0, 0.03) 0%, transparent 50%),
+ radial-gradient(circle at 80% 20%, rgba(255, 191, 0, 0.03) 0%, transparent 50%);
  }
 
  /* Header */
@@ -303,8 +303,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  align-items: center;
  justify-content: space-between; /* fixed typo */;
  padding: 1rem 1.5rem;
- z-index: 40; background: linear-gradient(180deg, rgba(0, 0, 0: 0.6), rgba(0, 0, 0: 0.2));
- border-bottom: 1px solid rgba(245, 158, 11: 0.06);
+ z-index: 40; background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+ border-bottom: 1px solid rgba(245, 158, 11, 0.06);
  }
 
  /* Added: header content wrapper used in template */
@@ -322,7 +322,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  :global(.yorha-menu-toggle) {
  padding: 0.5rem; color: #f59e0b;
- background: transparent; border: 1px solid rgba(245, 158, 11: 0.3);
+ background: transparent; border: 1px solid rgba(245, 158, 11, 0.3);
  transition:
  color 0.15s ease,
  border-color 0.15s ease;
@@ -330,7 +330,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  :global(.yorha-menu-toggle:hover) {
  color: #fbbf24; /* amber-300 */;
- border-color: rgba(245, 158, 11: 0.6);
+ border-color: rgba(245, 158, 11, 0.6);
  }
  :global(.yorha-brand-title) {
  font-size: 1.125rem;
@@ -400,8 +400,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  position: fixed; top: 73px;
  left: 0; bottom: 0;
  width: 20rem; /* w-80 */;
- background: linear-gradient(135deg, rgba(0, 0, 0: 0.95) 0%, rgba(255, 191, 0: 0.05) 100%);
- border-right: 1px solid rgba(245, 158, 11: 0.3);
+ background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(255, 191, 0, 0.05) 100%);
+ border-right: 1px solid rgba(245, 158, 11, 0.3);
  transform: translateX(-100%); transition: transform 0.3s ease;
  z-index: 30; overflow: auto;
  }
@@ -417,7 +417,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  align-items: center;
  justify-content: space-between; /* fixed typo */;
  padding: 1.5rem;
- border-bottom: 1px solid rgba(245, 158, 11: 0.3);
+ border-bottom: 1px solid rgba(245, 158, 11, 0.3);
  }
  :global(.yorha-nav-header h2) {
  font-size: 1rem;
@@ -435,7 +435,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  list-style: none;
  }
  :global(.yorha-nav-item) {
- border-bottom: 1px solid rgba(245, 158, 11: 0.1);
+ border-bottom: 1px solid rgba(245, 158, 11, 0.1);
  }
  :global(.yorha-nav-link) {
  width: 100%; padding: 1rem;
@@ -448,11 +448,11 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  color 0.15s ease;
  }
  :global(.yorha-nav-link:hover) {
- background: rgba(245, 158, 11: 0.1);
+ background: rgba(245, 158, 11, 0.1);
  color: #fbbf24;
  }
  :global(.yorha-nav-active) {
- background: rgba(245, 158, 11: 0.2);
+ background: rgba(245, 158, 11, 0.2);
  color: #f59e0b;
  border-right: 2px solid #f59e0b;
  }
@@ -491,7 +491,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  /* Added: overlay base style so overlay works at all sizes (not only inside media query) */
  :global(.yorha-overlay) {
  position: fixed; inset: 0;
- background: rgba(0, 0, 0: 0.45);
+ background: rgba(0, 0, 0, 0.45);
  z-index: 20; display: block;
  }
 
@@ -514,7 +514,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  :global(.yorha-overlay) {
  /* stronger overlay on small screens */
- background: rgba(0, 0, 0: 0.6);
+ background: rgba(0, 0, 0, 0.6);
  z-index: 20;
  }
  }

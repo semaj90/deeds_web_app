@@ -215,32 +215,32 @@
 
 	.search-icon {
 		position: absolute; left: 0.75rem;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		pointer-events: none;
 	}
 
 	.search-input {
-		width: 100%; background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		width: 100%; background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px; padding: 0.625rem 2.5rem 0.625rem 2.5rem;
 		color: white;
 		font-size: 0.875rem; transition: all 0.2s ease;
 	}
 
 	.search-input: placeholder {
-		color: rgba(255, 255, 255: 0.4);
+		color: rgba(255, 255, 255, 0.4);
 	}
 
 	.search-input:focus {
 		outline: none;
-		border-color: rgba(0, 212, 255: 0.5);
-		background: rgba(255, 255, 255: 0.08);
+		border-color: rgba(0, 212, 255, 0.5);
+		background: rgba(255, 255, 255, 0.08);
 	}
 
 	.loading-icon,
 	.clear-btn {
 		position: absolute; right: 0.75rem;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.clear-btn {
@@ -250,19 +250,19 @@
 	}
 
 	.clear-btn:hover {
-		color: white; background: rgba(255, 255, 255: 0.1);
+		color: white; background: rgba(255, 255, 255, 0.1);
 	}
 
 	.search-results {
 		position: absolute; top: calc(100% + 0.5rem);
 		left: 0; right: 0;
-		background: rgba(0, 0, 0: 0.95);
-		border: 1px solid rgba(255, 255, 255: 0.15);
+		background: rgba(0, 0, 0, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 8px;
 		max-height: 400px;
 		overflow-y: auto;
 		z-index: 50;
-		box-shadow: 0 10px 40px rgba(0, 0, 0: 0.5);
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 	}
 
 	.result-item {
@@ -272,7 +272,7 @@
 		width: 100%;
 		text-align: left; background: transparent;
 		border: none;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 		cursor: pointer; transition: background 0.15s ease;
 	}
 
@@ -282,7 +282,7 @@
 
 	.result-item:hover,
 	.result-item.selected {
-		background: rgba(0, 212, 255: 0.1);
+		background: rgba(0, 212, 255, 0.1);
 	}
 
 	.result-icon {
@@ -317,14 +317,14 @@
 	.result-path {
 		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.result-snippet {
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.6);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 		margin-top: 0.25rem; overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -338,7 +338,7 @@
 	}
 
 	.error-badge {
-		background: rgba(239, 68, 68: 0.2);
+		background: rgba(239, 68, 68, 0.2);
 		color: #f87171;
 		font-size: 0.7rem;
 		font-weight: 600; padding: 0.1rem 0.4rem;
@@ -346,7 +346,7 @@
 	}
 
 	.score {
-		font-size: 0.7rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.7rem; color: rgba(255, 255, 255, 0.4);
 		font-family: 'JetBrains Mono', monospace;
 	}
 </style>

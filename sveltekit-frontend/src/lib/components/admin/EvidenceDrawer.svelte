@@ -288,7 +288,7 @@
 
 <style>
 	.drawer-overlay {
-		position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0: 0.5);
+		position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0, 0, 0, 0.5);
 		opacity: 0;
 		pointer-events: none; transition: opacity 0.3s ease;
 		z-index: 1000;
@@ -305,7 +305,7 @@
 		display: flex;
 		flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease;
 		z-index: 1001;
-		box-shadow: -4px 0 16px rgba(0, 0, 0: 0.5);
+		box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
 	}
 
 	.drawer.open {
@@ -448,7 +448,7 @@
 	.form-textarea:focus {
 		outline: none;
 		border-color: #9df;
-		box-shadow: 0 0 0 2px rgba(153, 221, 255: 0.1);
+		box-shadow: 0 0 0 2px rgba(153, 221, 255, 0.1);
 	}
 
 	.form-input:disabled,
@@ -506,7 +506,7 @@
 
 	.btn-primary:hover, not(disabled) {
 		background: #7ce;
-		box-shadow: 0 0 8px rgba(153, 221, 255: 0.3);
+		box-shadow: 0 0 8px rgba(153, 221, 255, 0.3);
 	}
 
 	.btn-secondary {
@@ -531,7 +531,7 @@
 
 	/* Modal */
 	.modal-overlay {
-		position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0: 0.7);
+		position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -542,7 +542,7 @@
 		background: #111; border: 1px solid #333;
 		border-radius: 8px; padding: 2rem;
 		max-width: 400px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0: 0.8);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
 	}
 
 	.modal h3 {

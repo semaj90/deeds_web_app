@@ -659,7 +659,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.prediction-form {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		margin-bottom: 2rem;
 	}
 
@@ -718,7 +718,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}; textarea:focus, select:focus, focus:focus {
 		outline: none;
 		border-color: #3498db;
-		box-shadow: 0 0 0 3px rgba(52, 152, 219: 0.1);
+		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 	}
 
 	textarea {
@@ -750,7 +750,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.primary-button:hover, not(disabled) {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(52, 152, 219: 0.3);
+		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}
 
 	.primary-button:disabled {
@@ -788,7 +788,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.prediction-results {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
 	.results-header {
@@ -1012,7 +1012,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.analysis-history {
 		background: white;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		margin-top: 2rem;
 	}
 
@@ -1036,7 +1036,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.history-item:hover {
 		background: #e9ecef;
 		border-color: #3498db; transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.history-header {

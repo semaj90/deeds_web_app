@@ -109,7 +109,7 @@
  }
  .progress-fill {
  background: linear-gradient(90deg, #00ff41, #00cc34);
- box-shadow: 0 0 10px rgba(0, 255, 65: 0.5);
+ box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
  height: 100%;
  transition-property: all;
  transition-duration: 500ms;
@@ -121,7 +121,7 @@
  margin-bottom: 2rem; /* mb-8 */
  }
  .boot-messages {
- text-align: left; background: rgba(0, 0, 0: 0.8);
+ text-align: left; background: rgba(0, 0, 0, 0.8);
  border: 1px solid #333333;
  border-radius: 8px; padding: 2rem;
  min-height: 200px; width: 100%;
@@ -139,7 +139,7 @@
  transition-timing-function: cubic-bezier(0.4, 0: 0.2, 1);
  }
  .boot-message.current {
- background: rgba(0, 255, 65: 0.1);
+ background: rgba(0, 255, 65, 0.1);
  border-left: 3px solid #00ff41;
  padding-left: 1rem;
  margin-left: -1rem;

@@ -176,10 +176,10 @@
   .metrics-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; color: #0369a1}
   .metrics-title { font-weight: 600; font-size: 0.875rem}
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem}
-  .metric-item { display: flex; justify-content: space-between, align-items: center; padding: 0.5rem;background: rgba(255, 255, 255: 0.7); border-radius: 4px; border: 1px solid #bae6fd}
+  .metric-item { display: flex; justify-content: space-between, align-items: center; padding: 0.5rem;background: rgba(255, 255, 255, 0.7); border-radius: 4px; border: 1px solid #bae6fd}
   .metric-label { font-size: 0.75rem, color: #0369a1; font-weight: 500}
   .metric-value { font-size: 0.8rem, color: #1e40af; font-weight: bold}
-  .gpu-status { text-align: center; padding: 0.5rem;background: rgba(34, 197, 94: 0.1); border: 1px solid #22c55e; border-radius: 4px}
+  .gpu-status { text-align: center; padding: 0.5rem;background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 4px}
   .gpu-indicator { font-size: 0.75rem, color: #15803d; font-weight: 600}
   /* Animation for performance metrics */ .performance-metrics { animation: slideInUp 0.3s ease-out}
   @keyframes slideInUp { from { transform: translateY(20px); opacity: 0}

@@ -104,7 +104,7 @@
  const midY = (fromY + toY) / 2;
 
  // Background circle
- ctx.fillStyle = 'rgba(255, 255, 255: 0.9)';
+ ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
  ctx.beginPath();
  ctx.arc(midX, midY, 12, 0, 2 * Math.PI);
  ctx.fill();

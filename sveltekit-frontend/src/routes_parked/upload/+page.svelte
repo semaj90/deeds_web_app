@@ -215,7 +215,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 	.config-section input:focus {
 		outline: none;
 		border-color: #8b3a3a;
-		box-shadow: 0 0 0 2px rgba(139, 58, 58: 0.1);
+		box-shadow: 0 0 0 2px rgba(139, 58, 58, 0.1);
 	}
 
 	.config-section input:disabled {
@@ -233,7 +233,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 	}
 
 	.upload-area.dragging {
-		border-color: #8b3a3a; background: rgba(139, 58, 58: 0.05);
+		border-color: #8b3a3a; background: rgba(139, 58, 58, 0.05);
 	}
 
 	.upload-content {

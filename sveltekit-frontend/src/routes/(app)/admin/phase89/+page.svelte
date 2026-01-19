@@ -491,7 +491,7 @@
 	.tabs {
 		display: flex; gap: 0.5rem;
 		margin-bottom: 1.5rem;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding-bottom: 0.5rem;
 	}
 
@@ -504,17 +504,17 @@
 	}
 
 	.tab:hover {
-		color: #fff; background: rgba(255, 255, 255: 0.05);
+		color: #fff; background: rgba(255, 255, 255, 0.05);
 	}
 
 	.tab.active {
-		color: #00d4ff; background: rgba(0, 212, 255: 0.1);
+		color: #00d4ff; background: rgba(0, 212, 255, 0.1);
 		border-bottom: 2px solid #00d4ff;
 	}
 
 	.main-content {
-		background: rgba(255, 255, 255: 0.02);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1.5rem;
 		min-height: 60vh;
 	}
@@ -527,8 +527,8 @@
 
 	.search-input {
 		flex: 1; padding: 1rem 1.5rem;
-		background: rgba(0, 0, 0: 0.3);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; color: #fff;
 		font-size: 1rem;
 	}
@@ -553,8 +553,8 @@
 	}
 
 	.result-card {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1rem;
 		border-left: 3px solid hsl(calc(var(--score: 0.5) * 120), 70%, 50%);
 	}
@@ -587,7 +587,7 @@
 
 	.tag {
 		padding: 0.125rem 0.5rem;
-		background: rgba(0, 212, 255: 0.2);
+		background: rgba(0, 212, 255, 0.2);
 		border-radius: 4px;
 		font-size: 0.625rem; color: #00d4ff;
 	}
@@ -612,8 +612,8 @@
 	}
 
 	.cluster-card {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1rem;
 		cursor: pointer;
 		text-align: left; transition: all 0.2s;
@@ -621,7 +621,7 @@
 	}
 
 	.cluster-card:hover {
-		background: rgba(255, 255, 255: 0.08);
+		background: rgba(255, 255, 255, 0.08);
 	}
 
 	.cluster-card.selected {
@@ -657,8 +657,8 @@
 	}
 
 	.cluster-detail {
-		background: rgba(255, 255, 255: 0.03);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; padding: 1.5rem;
 	}
 
@@ -702,7 +702,7 @@
 	}
 
 	.stat {
-		background: rgba(255, 255, 255: 0.05);
+		background: rgba(255, 255, 255, 0.05);
 		padding: 1rem 2rem;
 		border-radius: 8px;
 		text-align: center;
@@ -718,7 +718,7 @@
 	}
 
 	.graph-container {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px;
 		min-height: 400px; display: flex;
 		align-items: center;
@@ -738,7 +738,7 @@
 	}
 
 	.node-list {
-		background: rgba(255, 255, 255: 0.03);
+		background: rgba(255, 255, 255, 0.03);
 		border-radius: 12px; padding: 1rem;
 	}
 
@@ -749,7 +749,7 @@
 	.node-item {
 		display: flex; gap: 0.5rem;
 		align-items: center; padding: 0.5rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
 	.node-type {
@@ -758,10 +758,10 @@
 		font-size: 0.625rem;
 	}
 
-	.type-component { background: rgba(124, 58, 237: 0.3); }
-	.type-module { background: rgba(0, 212, 255: 0.3); }
-	.type-route { background: rgba(16, 185, 129: 0.3); }
-	.type-error { background: rgba(255, 107, 107: 0.3); }
+	.type-component { background: rgba(124, 58, 237, 0.3); }
+	.type-module { background: rgba(0, 212, 255, 0.3); }
+	.type-route { background: rgba(16, 185, 129, 0.3); }
+	.type-error { background: rgba(255, 107, 107, 0.3); }
 
 	.node-label {
 		flex: 1;
@@ -789,14 +789,14 @@
 
 	.refresh-btn {
 		padding: 1rem 2rem;
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border: none;
 		border-radius: 12px; color: #fff;
 		cursor: pointer;
 	}
 
 	.progress-bar {
-		height: 24px; background: rgba(255, 255, 255: 0.1);
+		height: 24px; background: rgba(255, 255, 255, 0.1);
 		border-radius: 12px; overflow: hidden;
 		position: relative;
 		margin-bottom: 1.5rem;
@@ -815,7 +815,7 @@
 	}
 
 	.pipeline-logs {
-		background: rgba(0, 0, 0: 0.3);
+		background: rgba(0, 0, 0, 0.3);
 		border-radius: 12px; padding: 1rem;
 		margin-bottom: 1.5rem;
 	}
@@ -829,11 +829,11 @@
 
 	.log-line {
 		padding: 0.25rem 0;
-		border-bottom: 1px solid rgba(255, 255, 255: 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
 	.pipeline-info {
-		background: rgba(255, 255, 255: 0.03);
+		background: rgba(255, 255, 255, 0.03);
 		border-radius: 12px; padding: 1rem;
 	}
 

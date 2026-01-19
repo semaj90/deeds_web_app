@@ -245,7 +245,7 @@
  textarea:focus {
  outline: none;
  border-color: #dc2626;
- box-shadow: 0 0 0 3px rgba(220, 38, 38: 0.1);
+ box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
  }
 
  input.error:

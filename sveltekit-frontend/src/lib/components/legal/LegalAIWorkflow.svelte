@@ -376,7 +376,7 @@
         background: white
        ;padding: 2rem
         border-radius: 1rem
-        box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
     .file-input-wrapper {
         margin-bottom: 2rem}
     .file-input {
@@ -422,7 +422,7 @@
         background: white
        ;padding: 2rem
         border-radius: 1rem
-        box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1); margin: 2rem 0}
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin: 2rem 0}
     .result-summary,
     .recommendations-summary {
         display: grid
@@ -480,7 +480,7 @@
         border-radius: 0.75rem, padding: 1.5rem
        ;transition: box-shadow 0.2}
     .recommendation-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1)}
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)}
     .recommendation-header {
         display: flex
         justify-content: space-betweenn

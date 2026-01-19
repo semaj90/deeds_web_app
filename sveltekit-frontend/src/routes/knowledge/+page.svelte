@@ -350,7 +350,7 @@
 	}
 
 	.result-card:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0: 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 
 	.result-header {
@@ -442,7 +442,7 @@
 	.web-sources {
 		margin-top: 1.5rem;
 		padding-top: 1rem;
-		border-top: 1px solid rgba(102, 126, 234: 0.2);
+		border-top: 1px solid rgba(102, 126, 234, 0.2);
 	}
 
 	.web-sources h3 {
@@ -457,7 +457,7 @@
 
 	.web-sources li {
 		padding: 0.5rem 0;
-		border-bottom: 1px solid rgba(0, 0, 0: 0.05);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 	}
 
 	.web-sources li:last-child {

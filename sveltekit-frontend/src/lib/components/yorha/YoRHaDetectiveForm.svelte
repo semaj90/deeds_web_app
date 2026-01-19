@@ -154,7 +154,7 @@
     border-radius: 0, width: 100%; box-sizing: border-box}
   .form-input:focus { outline: none;
     border-color: #3d3d3d;
-    box-shadow: 0 0 0 3px rgba(61, 61, 61: 0.2)}
+    box-shadow: 0 0 0 3px rgba(61, 61, 61, 0.2)}
   .form-input::placeholder {
     color: #999; opacity: 1}
   textarea.form-input {
@@ -184,10 +184,10 @@
     opacity: 0.6
    ;cursor:not-allowed}
   .submit-btn.yorha-btn-success {
-    background-color: rgba(16, 185, 129: 0.1); color: #059669;
-    border-color: rgba(16, 185, 129: 0.5)}
+    background-color: rgba(16, 185, 129, 0.1); color: #059669;
+    border-color: rgba(16, 185, 129, 0.5)}
   .submit-btn.yorha-btn-success:hover, not(disabled) {
-    background-color: rgba(16, 185, 129: 0.2)}
+    background-color: rgba(16, 185, 129, 0.2)}
   /* Responsive */
   @media (max-width: 640px) {
     .form-fields {

@@ -172,8 +172,8 @@
     flex-direction: column;
     gap: 1rem;
     background-image:
-      linear-gradient(rgba(69, 65, 56: 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(69, 65, 56: 0.05) 1px, transparent 1px);
+      linear-gradient(rgba(69, 65, 56, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(69, 65, 56, 0.05) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
@@ -181,14 +181,14 @@
     max-width: 85%;
     padding: 0.5rem;
     border-left: 4px solid #57544a;
-    background: rgba(87, 84, 74: 0.05);
+    background: rgba(87, 84, 74, 0.05);
   }
 
   .message-wrapper.user {
     align-self: flex-end;
     border-left: none;
     border-right: 4px solid #454138;
-    background: rgba(69, 65, 56: 0.1);
+    background: rgba(69, 65, 56, 0.1);
   }
 
   .message-wrapper.assistant {
@@ -237,7 +237,7 @@
 
   textarea:focus {
     outline: none;
-    background: rgba(255, 255, 255: 0.2);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   .controls {
@@ -257,7 +257,7 @@
   }
 
   .error-panel {
-    background: rgba(231, 76, 60: 0.1);
+    background: rgba(231, 76, 60, 0.1);
     border: 1px solid #e74c3c;
     padding: 1rem;
     margin-top: 1rem;

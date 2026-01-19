@@ -221,7 +221,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.demo-header h1 {
 		color: #10b981;
 		font-size: 2.5rem; margin: 0 0 1rem 0;
-		text-shadow: 0 0 20px rgba(16, 185, 129: 0.3);
+		text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 	}
 
 	.health-indicator {
@@ -255,22 +255,22 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 
 	.input-section,
 	.output-section {
-		background: rgba(13, 17, 23: 0.9);
+		background: rgba(13, 17, 23, 0.9);
 		border: 2px solid #10b981;
 		border-radius: 12px; padding: 2rem;
-		box-shadow: 0 8px 32px rgba(16, 185, 129: 0.1);
+		box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
 	}
 
 	.input-section h2,
 	.output-section h2 {
 		color: #10b981; margin: 0 0 1.5rem 0;
 		font-size: 1.5rem;
-		text-shadow: 0 0 10px rgba(16, 185, 129: 0.3);
+		text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 	}
 
 	.prompt-input {
 		width: 100%; padding: 1rem;
-		background: rgba(30, 41, 59: 0.8);
+		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid #6b7280;
 		border-radius: 8px; color: #f0f6fc;
 		font-family: inherit;
@@ -281,7 +281,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.prompt-input:focus {
 		outline: none;
 		border-color: #10b981;
-		box-shadow: 0 0 15px rgba(16, 185, 129: 0.2);
+		box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 	}
 
 	.action-buttons {
@@ -320,7 +320,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.stream-btn:hover, not(disabled),
 	.legal-btn:hover, not(disabled) {
 		filter: brightness(0.95);
-		box-shadow: 0 0 20px rgba(16, 185, 129: 0.3);
+		box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 	}
 
 	.generate-btn:disabled,
@@ -331,7 +331,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 
 	.streaming-output,
 	.final-output {
-		background: rgba(30, 41, 59: 0.8);
+		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid #6b7280;
 		border-radius: 8px; padding: 1.5rem;
 	}

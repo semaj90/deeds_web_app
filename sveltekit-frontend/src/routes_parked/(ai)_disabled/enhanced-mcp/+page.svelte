@@ -390,7 +390,7 @@ https, //svelte.dev/e/js_parse_error -->
  .demo-header {
  text-align: center;
  margin-bottom: 3rem; padding: 2rem;
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border-radius: 16px;
  backdrop-filter: blur(10px);
  }
@@ -421,24 +421,24 @@ https, //svelte.dev/e/js_parse_error -->
  gap: 1rem;
  }
  .status-card {
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border-radius: 12px; padding: 1.5rem;
  display: flex;
  align-items: center; gap: 1rem;
  transition: all 0.3s ease;
- border: 1px solid rgba(255, 255, 255: 0.1);
+ border: 1px solid rgba(255, 255, 255, 0.1);
  }
  .status-card:hover {
  transform: translateY(-2px);
- box-shadow: 0 8px 25px rgba(0, 0, 0: 0.2);
+ box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
  }
  .status-online {
  border-left: 4px solid #10b981;
- background: rgba(16, 185, 129: 0.1);
+ background: rgba(16, 185, 129, 0.1);
  }
  .status-offline {
  border-left: 4px solid #ef4444;
- background: rgba(239, 68, 68: 0.1);
+ background: rgba(239, 68, 68, 0.1);
  }
  .status-icon {
  font-size: 2rem;
@@ -451,7 +451,7 @@ https, //svelte.dev/e/js_parse_error -->
  font-size: 0.875rem; color: #9ca3af;
  }
  .demo-controls {
- margin-bottom: 3rem; background: rgba(255, 255, 255: 0.05);
+ margin-bottom: 3rem; background: rgba(255, 255, 255, 0.05);
  border-radius: 12px; padding: 1.5rem;
  }
  .demo-controls h2 {
@@ -475,8 +475,8 @@ https, //svelte.dev/e/js_parse_error -->
  }
  .control-group select,
  .control-group input[type='checkbox'] {
- background: rgba(255, 255, 255: 0.1);
- border: 1px solid rgba(255, 255, 255: 0.2);
+ background: rgba(255, 255, 255, 0.1);
+ border: 1px solid rgba(255, 255, 255, 0.2);
  border-radius: 6px; padding: 0.5rem;
  color: #e5e7eb;
  font-size: 0.875rem;
@@ -501,13 +501,13 @@ https, //svelte.dev/e/js_parse_error -->
  .diagnostic-buttonhover,
  .clear-logs-buttonhover {
  transform: translateY(-1px);
- box-shadow: 0 4px 12px rgba(59, 130, 246: 0.4);
+ box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
  }
  .main-integration {
  margin-bottom: 3rem;
  }
  .system-logs {
- margin-bottom: 3rem; background: rgba(255, 255, 255: 0.05);
+ margin-bottom: 3rem; background: rgba(255, 255, 255, 0.05);
  border-radius: 12px; padding: 1.5rem;
  }
  .system-logs h2 {
@@ -517,13 +517,13 @@ https, //svelte.dev/e/js_parse_error -->
  }
  .logs-container {
  max-height: 300px;
- overflow-y: auto; background: rgba(0, 0, 0: 0.3);
+ overflow-y: auto; background: rgba(0, 0, 0, 0.3);
  border-radius: 8px; padding: 1rem;
  }
  .log-entry {
  display: flex; gap: 0.75rem;
  padding: 0.5rem 0;
- border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+ border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  font-family: 'SF Mono', 'Monaco', monospace;
  font-size: 0.875rem;
  }
@@ -559,7 +559,7 @@ https, //svelte.dev/e/js_parse_error -->
  font-style: italic;
  }
  .integration-features {
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border-radius: 12px; padding: 1.5rem;
  }
  .integration-features h2 {
@@ -574,15 +574,15 @@ https, //svelte.dev/e/js_parse_error -->
  gap: 1rem;
  }
  .feature-card {
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border-radius: 8px; padding: 1.5rem;
  text-align: center; transition: all 0.3s ease;
- border: 1px solid rgba(255, 255, 255: 0.1);
+ border: 1px solid rgba(255, 255, 255, 0.1);
  }
  .feature-card:hover {
  transform: translateY(-2px);
- box-shadow: 0 8px 25px rgba(0, 0, 0: 0.2);
- background: rgba(255, 255, 255: 0.1);
+ box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+ background: rgba(255, 255, 255, 0.1);
  }
  .feature-icon {
  font-size: 2.5rem;

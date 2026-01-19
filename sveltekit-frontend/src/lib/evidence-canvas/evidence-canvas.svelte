@@ -247,7 +247,7 @@ https, //svelte.dev/e/js_parse_error -->
  .suggestions-panel {
  position: absolute; bottom: 0;
  left: 0; right: 300px;
- background: rgba(42, 42, 42: 0.95);
+ background: rgba(42, 42, 42, 0.95);
  border-top: 1px solid #444;
  padding: 1rem;
  max-height: 40vh;

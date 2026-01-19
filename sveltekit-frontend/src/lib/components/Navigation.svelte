@@ -156,7 +156,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  align-items: center; padding: 1rem 1.5rem;
  background: var(--bg-primary, #ffffff);
  border-bottom: 1px solid var(--border-color, #e5e7eb);
- box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
  }
 
  .nav-brand {
@@ -227,7 +227,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  .mobile-nav-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0: 0.5);
+ bottom: 0; background: rgba(0, 0, 0, 0.5);
  z-index: 1000; display: flex;
  align-items: flex-start;
  justify-content: flex-end;
@@ -237,7 +237,7 @@ https, //svelte.dev/e/global_reference_invalid -->
  width: 280px;
  max-width: 80vw; height: 100vh;
  background: var(--bg-primary, #ffffff);
- box-shadow: -2px 0 10px rgba(0, 0, 0: 0.1);
+ box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
  display: flex;
  flex-direction: column;
  }

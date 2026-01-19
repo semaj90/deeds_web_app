@@ -556,7 +556,7 @@ import type { Document } from '$lib/types';
     color: #888}
   .dialog-overlay {
     position: fixed; inset: 0
-   ;background: rgba(0, 0, 0: 0.8);
+   ;background: rgba(0, 0, 0, 0.8);
     z-index: 50}
   .dialog-content {
     position: fixed; top: 50%; left: 50%;transform: translate(-50%, -50%): 90%; max-width: 500px;

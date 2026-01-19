@@ -175,25 +175,25 @@
  max-width: 300px; background: white;
  border: 2px solid var(--node-color);
  border-radius: 8px;
- box-shadow: 0 2px 8px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
  cursor: move;
  user-select: none; transition: all 0.2s ease;
  z-index: 10;
  }
 
  .evidence-node:hover {
- box-shadow: 0 4px 16px rgba(0, 0, 0: 0.15);
+ box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
  transform: translateY(-2px);
  }
 
  .evidence-node.selected {
  border-color: #2563eb;
- box-shadow: 0 0 0 3px rgba(37, 99, 235: 0.2);
+ box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
  }
 
  .evidence-node.pending-link-source {
  border-color: #dc2626;
- box-shadow: 0 0 0 3px rgba(220, 38, 38: 0.3);
+ box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
  animation: pulse 2s infinite;
  }
 
@@ -226,19 +226,19 @@
  padding: 0.2rem 0.4rem;
  border-radius: 4px;
  font-size: 0.7rem;
- font-weight: 600; background: rgba(255, 255, 255: 0.2);
+ font-weight: 600; background: rgba(255, 255, 255, 0.2);
  }
 
  .confidence-badge.low {
- background: rgba(239, 68, 68: 0.8);
+ background: rgba(239, 68, 68, 0.8);
  }
 
  .confidence-badge.medium {
- background: rgba(245, 158, 11: 0.8);
+ background: rgba(245, 158, 11, 0.8);
  }
 
  .confidence-badge.high {
- background: rgba(16, 185, 129: 0.8);
+ background: rgba(16, 185, 129, 0.8);
  }
 
  .node-content {

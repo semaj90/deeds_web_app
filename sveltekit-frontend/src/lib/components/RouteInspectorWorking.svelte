@@ -258,7 +258,7 @@
 	.route-modal-overlay {
 		position: fixed; top: 0;
 		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0: 0.6);
+		bottom: 0; background: rgba(0, 0, 0, 0.6);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -272,7 +272,7 @@
 		font-family: var(--yorha-font, 'Courier New', monospace);
 		border: 3px solid var(--yorha-ink, #111);
 		border-radius: 0;
-		box-shadow: 0 8px 32px rgba(0, 0, 0: 0.3), inset 0 1px 0 rgba(255, 255, 255: 0.3);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 		width: 90%;
 		max-width: 900px;
 		max-height: 85vh; display: flex;
@@ -330,7 +330,7 @@
 		font-weight: bold;
 		text-transform: uppercase;
 		letter-spacing: 1px; color: white;
-		border: 1px solid rgba(0, 0, 0: 0.2);
+		border: 1px solid rgba(0, 0, 0, 0.2);
 	}
 
 	.badge--status.badge--healthy {
@@ -510,11 +510,11 @@
 	.btn--neon {
 		background: #00ff00; color: #000;
 		border-color: #00ff00;
-		box-shadow: 0 0 10px rgba(0, 255, 0: 0.3);
+		box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 	}
 
 	.btn--neon:hover, not(disabled) {
-		box-shadow: 0 0 20px rgba(0, 255, 0: 0.6);
+		box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
 	}
 
 	.btn--warning {

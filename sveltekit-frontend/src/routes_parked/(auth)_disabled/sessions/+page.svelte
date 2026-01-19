@@ -173,7 +173,7 @@ import { Monitor } from "lucide-svelte";
  display: flex;
  align-items: center; gap: 0.75rem;
  padding: 0.5rem 0;
- border-bottom: 1px solid rgba(0, 0, 0: 0.04);
+ border-bottom: 1px solid rgba(0, 0, 0, 0.04);
  }
  .device-icon {
  width: 28px; height: 28px;

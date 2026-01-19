@@ -107,13 +107,13 @@
 
 	.jurisdiction-select:hover, not(disabled) {
 		border-color: #9df;
-		box-shadow: 0 0 0 2px rgba(153, 221, 255: 0.1);
+		box-shadow: 0 0 0 2px rgba(153, 221, 255, 0.1);
 	}
 
 	.jurisdiction-select:focus {
 		outline: none;
 		border-color: #9df;
-		box-shadow: 0 0 0 3px rgba(153, 221, 255: 0.2);
+		box-shadow: 0 0 0 3px rgba(153, 221, 255, 0.2);
 	}
 
 	.jurisdiction-select:disabled {
@@ -127,8 +127,8 @@
 
 	.warning-message {
 		padding: 0.75rem 1rem;
-		background: rgba(255, 68, 68: 0.1);
-		border: 1px solid rgba(255, 68, 68: 0.3);
+		background: rgba(255, 68, 68, 0.1);
+		border: 1px solid rgba(255, 68, 68, 0.3);
 		border-radius: 4px; color: #f88;
 		font-size: 0.9rem; display: flex;
 		align-items: center; gap: 0.5rem;

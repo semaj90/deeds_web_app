@@ -271,7 +271,7 @@
   .yorha-table-container {
     /* @apply bg-black border border-amber-400 relative overflow-hidden; */;
     font-family: 'Courier New', monospace;
-    box-shadow: 0 0 20px rgba(255, 191, 0: 0.3)}
+    box-shadow: 0 0 20px rgba(255, 191, 0, 0.3)}
   .yorha-table-container::before {
     content: ''; position: absolute;
     top: 0; left: 0;

@@ -19,7 +19,7 @@
  .stats-card {
  padding: 0.75rem 1rem;
  border-radius: 8px; background: var(--card-bg, #fff);
- box-shadow: 0 1px 2px rgba(0, 0, 0: 0.04);
+ box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
  display: flex;
  flex-direction: column; gap: 0.25rem;
  }

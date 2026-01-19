@@ -78,7 +78,7 @@
     align-items: center}
   .dropdown-menu { background: var(--dropdown-bg, #fff);
     border-radius: 0.5rem
-    box-shadow: 0 10px 20px rgba(0, 0, 0: 0.08); padding: 0.35rem
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); padding: 0.35rem
    ; border: 1px solid #e6edf3
     min-width: 12rem}
 </style>

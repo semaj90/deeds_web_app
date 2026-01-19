@@ -105,7 +105,7 @@
 	.modal-overlay {
 		position: fixed; top: 0;
 		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0: 0.5);
+		bottom: 0; background: rgba(0, 0, 0, 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -118,7 +118,7 @@
 		max-width: 600px; width: 90%;
 		max-height: 80vh;
 		overflow-y: auto;
-		box-shadow: 0 4px 12px rgba(0, 0, 0: 0.3);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 	}
 
 	.modal-header {
@@ -146,7 +146,7 @@
 	}
 
 	.close-btn:hover {
-		background: rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border-radius: 3px;
 	}
 
@@ -241,7 +241,7 @@
 	.notes-section textarea:focus {
 		outline: none;
 		border-color: var(--yorha-crimson);
-		box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
+		box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
 	}
 
 	.modal-footer {

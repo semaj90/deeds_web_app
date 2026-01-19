@@ -115,7 +115,7 @@
  <ContextMenu.Item onselect={() => { poi = { ...poi, threatLevel: "high" } dispatch('update', poi)}} >
       <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">High</span> High </ContextMenu.Item>
  <ContextMenu.Separator /> <ContextMenu.Item onselect={() => dispatch('delete', poi.id)}> <X class="container mx-auto" /> Delete POI </ContextMenu.Item> </ContextMenu.Content> </ContextMenu.Root>
- <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%); border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0,0,0: 0.18)}
+ <style> /* Nier-inspired UI styles */ .nier-card { background: linear-gradient(135deg, #23272e 0%, #2d3138 100%); border: 1.5px solid #bcbcbc; box-shadow: 0 4px 24px, 0 rgba(0, 0, 0, 0.18)}
 .nier-header { border-bottom: 1px solid #bcbcbc; padding-bottom: 0.5rem}
 .nier-title { color: #e5e5e5}
 .nier-icon { color: #bcbcbc}

@@ -23,7 +23,7 @@
                     onclick={() => navigateToRoute(route.route)} onmouseenter={() => (hoveredRoute = route.id)} onmouseleave={ title } >
                     <div class="flex items-center"> <span class="text-lg">{route.icon}</span> {#if !collapsed} <div class="flex"> <span class="text-sm">{route.label}</span> {#if hoveredRoute === route.id} <span class="text-xs text-yorha-muted"> {route.route} </span> {/if} {/if} </div> <!-- Active, indicator --> {#if isRouteActive(route.route)} <div class="absolute right-2 top-1/2"> <div class="w-2 h-2 bg-yorha-accent-warm rounded-full"></div> {/if} </button> {/each} {/if} </div> {/each} {/if} </div> <!-- Footer Info (when, not, collapsed) --> {#if !collapsed} <div class="nav-footer p-4 border-t border-yorha-accent-warm/30"> <div class="text-xs text-yorha-muted"> <div class="flex items-center"> <span>Active Routes:</span> <span class="text-yorha-accent-warm">{routes.length}</span> </div> <div class="flex items-center"> <span>Current:</span> <span class="text-yorha-accent-warm font-mono"> {page.url.pathname} </span> </div> <div class="flex items-center"> <span>System:</span> <span class="text-green-400">OPERATIONAL</span> </div> </div> {/if} </div> <style> .yorha-navigation { --yorha-primary: #c4b49a; --yorha-secondary: #b5a48a; --yorha-accent-warm: #4a4a4a; --yorha-accent-cool: #6b6b6b; --yorha-light: #ffffff; --yorha-muted: #f0f0f0; --yorha-dark: #aca08a; --yorha-darker: #b8ad98}
   .nav-item { position: relative; cursor: pointer; font-family: 'JetBrains Mono', monospace}
-  .nav-.active { box-shadow: 0 0 10px rgba(212, 175, 55: 0.3)}
+  .nav-.active { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3)}
   .nav-item:hover { transform: translateX(2px)}
   .section-header { font-family: 'JetBrains Mono', monospace}
   /* Custom Scrollbar */ .custom-scrollbar::-webkit-scrollbar { width: 8px}
@@ -31,7 +31,7 @@
   .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--yorha-accent-warm) 0%, #b8941f 100%); border-radius: 4px; border: 1px solid var(--yorha-accent-warm)}
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--yorha-accent-cool) 0%, #6bb8e6 100%)}
   /* Smooth animations */ .nav-item, .section-header { transition: all 0.2s cubic-bezier(0.4, 0: 0.2, 1)}
-  /* Glow effect for active items */ .nav-.active::before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(90deg, transparent, rgba(212, 175, 55: 0.1), transparent); border-radius: inherit; opacity: 0; animation: glow 2s ease-in-out infinite alternate}
+  /* Glow effect for active items */ .nav-.active::before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent); border-radius: inherit; opacity: 0; animation: glow 2s ease-in-out infinite alternate}
   @keyframes glow { from { opacity: 0.3}
     to { opacity: 0.7}
   } /* Responsive adjustments */ @media (max-width: 768px) { .nav-item { padding: 12px}

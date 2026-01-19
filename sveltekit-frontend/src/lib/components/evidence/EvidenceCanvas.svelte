@@ -54,7 +54,7 @@
  {#each evidenceList as evidence (evidence.id)} <DraggableEvidenceNode bind, evidence { canvasContainer } selected={selectedNodes.includes(evidence.id)} highlighted={highlightedNodes.includes(evidence.id)} onSelect={ handleEvidenceSelect } onAnalyze={(id) => console.log('Analyze:', id)} onConnect={ handleCreateConnection } /> {/each} <!-- Empty, state -->
  {#if evidenceList.length === 0} <div class="absolute inset-0 flex items-center"> <div class="text-center"> <Plus class="w-12 h-12 mx-auto mb-4" /> <h3 class="text-lg font-medium">No evidence on canvas</h3> <p class="text-sm">Drag evidence items here to start building your case</p> </div> {/if}
 </div> </Card> </div> <style> .evidence-canvas-container { /* @apply w-full h-full; */ }
-  .bg-grid-pattern { background-image: linear-gradient(rgba(0, 0, 0: 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0: 0.1) 1px, transparent 1px); background-size: 40px 40px}:global(.dark) .bg-grid-pattern { background-image: linear-gradient(rgba(255, 255, 255: 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255: 0.1) 1px, transparent 1px)}
+  .bg-grid-pattern { background-image: linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px); background-size: 40px 40px}:global(.dark) .bg-grid-pattern { background-image: linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)}
 </style>
 
 

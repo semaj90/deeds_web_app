@@ -77,8 +77,8 @@ https, //svelte.dev/e/js_parse_error -->
  top: 0; left: 0;
  right: 0; bottom: 0;
  background-image:
- linear-gradient(rgba(204, 153, 255: 0.05) 1px, transparent 1px),
- linear-gradient(90deg, rgba(204, 153, 255: 0.05) 1px, transparent 1px);
+ linear-gradient(rgba(204, 153, 255, 0.05) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(204, 153, 255, 0.05) 1px, transparent 1px);
  background-size: 20px 20px;
  pointer-events: none;
  z-index: 0;

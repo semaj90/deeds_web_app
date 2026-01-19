@@ -141,7 +141,7 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69: 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results
@@ -333,10 +333,10 @@
 	/* Custom animations for progress indicators */
 	@keyframes pulse-glow {
 		0%; } 100% {
-			box-shadow: 0 0 5px rgba(59, 130, 246: 0.3);
+			box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
 		}
 		50% {
-			box-shadow: 0 0 20px rgba(59, 130, 246: 0.6);
+			box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
 		}
 	}
 	.animate-pulse-glow {

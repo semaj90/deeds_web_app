@@ -474,26 +474,26 @@
 <style>
  .risk-wrapper {
  display: flex; gap: 1.25rem;
- padding: 1.5rem; background: rgba(2, 6, 23: 0.7);
- border-bottom: 1px solid rgba(15, 118, 110: 0.2);
+ padding: 1.5rem; background: rgba(2, 6, 23, 0.7);
+ border-bottom: 1px solid rgba(15, 118, 110, 0.2);
  }
 
  .risk-meter {
- flex: 1; background: rgba(12, 17, 32: 0.9);
+ flex: 1; background: rgba(12, 17, 32, 0.9);
  border-radius: 1rem; padding: 1.25rem;
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .risk-meter.critical {
- border-color: rgba(248, 113, 113: 0.6);
+ border-color: rgba(248, 113, 113, 0.6);
  }
 
  .risk-meter.elevated {
- border-color: rgba(250, 204, 21: 0.5);
+ border-color: rgba(250, 204, 21, 0.5);
  }
 
  .risk-meter.stable {
- border-color: rgba(45, 212, 191: 0.4);
+ border-color: rgba(45, 212, 191, 0.4);
  }
 
  .risk-score {
@@ -541,7 +541,7 @@
 
  .risk-bar {
  width: 100%; height: 10px;
- background: rgba(15, 23, 42: 0.8);
+ background: rgba(15, 23, 42, 0.8);
  border-radius: 999px; overflow: hidden;
  margin-bottom: 0.75rem;
  }
@@ -572,9 +572,9 @@
  }
 
  .risk-insights-panel {
- width: 320px; background: rgba(12, 17, 32: 0.9);
+ width: 320px; background: rgba(12, 17, 32, 0.9);
  border-radius: 1rem; padding: 1.25rem;
- border: 1px solid rgba(148, 163, 184: 0.25);
+ border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .risk-insights-header {

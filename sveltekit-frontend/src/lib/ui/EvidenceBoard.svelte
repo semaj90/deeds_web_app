@@ -288,9 +288,9 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  .evidence-grid {
  background-color: #d4c7a3;
- background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0: 0.25) 1px, transparent 0);
+ background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.25) 1px, transparent 0);
  background-size: 24px 24px;
- border: 1px solid rgba(0, 0, 0: 0.6);
+ border: 1px solid rgba(0, 0, 0, 0.6);
  box-shadow: 0 0 0 2px #000;
  }
 

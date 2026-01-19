@@ -168,7 +168,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  .search-input:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
  }
 
  .search-input:disabled {
@@ -207,7 +207,7 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  margin-top: 0.5rem;
  background-color: white; border: 2px solid #d4a574;
  border-radius: 6px;
- box-shadow: 0 4px 12px rgba(0, 0, 0: 0.15);
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
  z-index: 1000;
  max-height: 400px;
  overflow-y: auto;

@@ -410,7 +410,7 @@ import type { Document } from '$lib/types';
     font-family: inherit
     font-size: 0.875rem}; textarea:focus { outline: none
     border-color: var(--primary, #3b82f6);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246: 0.1)}; textarea:disabled {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1)}; textarea:disabled {
     opacity: 0.5, cursor:not-allowed}
   .input-controls {
     display: flex

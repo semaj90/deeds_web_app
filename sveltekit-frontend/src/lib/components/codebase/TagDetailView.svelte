@@ -251,8 +251,8 @@
 	.tag-detail-view {
 		display: flex;
 		flex-direction: column; height: 100%;
-		background: rgba(0, 0, 0: 0.9);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(0, 0, 0, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; overflow: hidden;
 	}
 
@@ -260,8 +260,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start; padding: 1.25rem;
-		background: rgba(255, 255, 255: 0.03);
-		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.header-content {
@@ -273,8 +273,8 @@
 		width: 40px; height: 40px;
 		display: flex;
 		align-items: center;
-		justify-content: center; background: rgba(0, 212, 255: 0.1);
-		border: 1px solid rgba(0, 212, 255: 0.3);
+		justify-content: center; background: rgba(0, 212, 255, 0.1);
+		border: 1px solid rgba(0, 212, 255, 0.3);
 		border-radius: 10px; color: #00d4ff;
 	}
 
@@ -299,13 +299,13 @@
 
 	.close-btn {
 		background: transparent; border: none;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		cursor: pointer; padding: 0.25rem;
 		border-radius: 6px; transition: all 0.2s ease;
 	}
 
 	.close-btn:hover {
-		color: white; background: rgba(255, 255, 255: 0.1);
+		color: white; background: rgba(255, 255, 255, 0.1);
 	}
 
 	.detail-content {
@@ -324,22 +324,22 @@
 		display: flex;
 		align-items: center; gap: 0.5rem;
 		font-size: 0.75rem;
-		font-weight: 500; color: rgba(255, 255, 255: 0.5);
+		font-weight: 500; color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em; margin: 0;
 	}
 
 	.file-path {
 		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.8rem; color: rgba(255, 255, 255: 0.8);
-		background: rgba(255, 255, 255: 0.05);
+		font-size: 0.8rem; color: rgba(255, 255, 255, 0.8);
+		background: rgba(255, 255, 255, 0.05);
 		padding: 0.5rem 0.75rem;
 		border-radius: 6px;
 		word-break: break-all;
 	}
 
 	.summary-text {
-		font-size: 0.875rem; color: rgba(255, 255, 255: 0.8);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);
 		line-height: 1.5; margin: 0;
 	}
 
@@ -347,8 +347,8 @@
 		display: inline-flex;
 		align-items: center; gap: 0.5rem;
 		padding: 0.5rem 0.75rem;
-		background: rgba(239, 68, 68: 0.1);
-		border: 1px solid rgba(239, 68, 68: 0.3);
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.3);
 		border-radius: 6px; color: #f87171;
 		font-size: 0.875rem; width: fit-content;
 	}
@@ -357,14 +357,14 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center; padding: 0.75rem;
-		background: rgba(168, 85, 247: 0.1);
-		border: 1px solid rgba(168, 85, 247: 0.3);
+		background: rgba(168, 85, 247, 0.1);
+		border: 1px solid rgba(168, 85, 247, 0.3);
 		border-radius: 8px; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
 	.cluster-card:hover {
-		background: rgba(168, 85, 247: 0.2);
+		background: rgba(168, 85, 247, 0.2);
 	}
 
 	.cluster-name {
@@ -372,7 +372,7 @@
 	}
 
 	.cluster-members {
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
 	}
 
 	.code-list {
@@ -383,27 +383,27 @@
 	.code-item {
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.75rem; padding: 0.25rem 0.5rem;
-		background: rgba(255, 255, 255: 0.05);
-		border-radius: 4px; color: rgba(255, 255, 255: 0.7);
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 4px; color: rgba(255, 255, 255, 0.7);
 	}
 
 	.code-item.export {
-		color: #4ade80; background: rgba(74, 222, 128: 0.1);
+		color: #4ade80; background: rgba(74, 222, 128, 0.1);
 	}
 
 	.code-item.function {
-		color: #60a5fa; background: rgba(96, 165, 250: 0.1);
+		color: #60a5fa; background: rgba(96, 165, 250, 0.1);
 	}
 
 	.more-items {
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.4);
 		padding: 0.25rem 0.5rem;
 	}
 
 	.embedding-viz {
 		display: flex;
 		flex-wrap: wrap; gap: 2px;
-		padding: 0.5rem; background: rgba(0, 0, 0: 0.3);
+		padding: 0.5rem; background: rgba(0, 0, 0, 0.3);
 		border-radius: 6px;
 	}
 
@@ -415,28 +415,28 @@
 	.embedding-more {
 		display: flex;
 		align-items: center;
-		font-size: 0.7rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.7rem; color: rgba(255, 255, 255, 0.4);
 		padding-left: 0.5rem;
 	}
 
 	.timestamps {
 		flex-direction: row; gap: 1.5rem;
 		padding-top: 0.75rem;
-		border-top: 1px solid rgba(255, 255, 255: 0.05);
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
 	.timestamp {
 		display: flex;
 		align-items: center; gap: 0.375rem;
-		font-size: 0.7rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.7rem; color: rgba(255, 255, 255, 0.4);
 	}
 
 	.detail-footer {
 		display: flex;
 		justify-content: flex-end; gap: 0.75rem;
 		padding: 1rem 1.25rem;
-		background: rgba(255, 255, 255: 0.03);
-		border-top: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.action-btn {
@@ -448,23 +448,23 @@
 	}
 
 	.action-btn.secondary {
-		background: transparent; border: 1px solid rgba(255, 255, 255: 0.2);
-		color: rgba(255, 255, 255: 0.7);
+		background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);
+		color: rgba(255, 255, 255, 0.7);
 	}
 
 	.action-btn.secondary:hover {
-		background: rgba(255, 255, 255: 0.05);
-		border-color: rgba(255, 255, 255: 0.3);
+		background: rgba(255, 255, 255, 0.05);
+		border-color: rgba(255, 255, 255, 0.3);
 	}
 
 	.action-btn.primary {
-		background: rgba(0, 212, 255: 0.2);
-		border: 1px solid rgba(0, 212, 255: 0.4);
+		background: rgba(0, 212, 255, 0.2);
+		border: 1px solid rgba(0, 212, 255, 0.4);
 		color: #00d4ff;
 	}
 
 	.action-btn.primary:hover {
-		background: rgba(0, 212, 255: 0.3);
+		background: rgba(0, 212, 255, 0.3);
 	}
 </style>
 

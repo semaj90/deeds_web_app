@@ -326,7 +326,7 @@
  .narrative-box:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
  }
 
  .title-input {
@@ -341,7 +341,7 @@
  .title-input:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
  }
 
  .file-drop-zone {
@@ -425,7 +425,7 @@
  .prompt-group input:focus {
  outline: none;
  border-color: var(--yorha-crimson);
- box-shadow: 0 0 0 2px rgba(255, 0, 0: 0.1);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
  }
 
  .error-message {
@@ -452,7 +452,7 @@
 
  .btn-submit:hover, not(disabled) {
  background: #d32f2f;
- box-shadow: 0 2px 8px rgba(0, 0, 0: 0.2);
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
  }
 
  .btn-submit:disabled {

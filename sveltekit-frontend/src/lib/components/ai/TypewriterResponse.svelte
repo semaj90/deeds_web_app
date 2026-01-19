@@ -82,20 +82,20 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   .typewriter-cursor.blinking { animation: blink 1.06s infinite}
   @keyframes blink { 0%; } 50% { opacity: 1}
     51%; } 100% { opacity: 0}
-  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0: 0.05); border: 1px solid rgba(0, 255, 0: 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
+  } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
   .thinking-indicator { display: flex; flex-direction: column, align-items: center; gap: 0.5rem}
   .thinking-dots { display: flex; gap: 0.25rem}
   .dot { width: 0.5rem; height: 0.5rem; background: #00ff00; border-radius: 50%; display: inline-block}
   .thinking-text { font-size: 0.875rem, color: #00ff00; text-align: center; font-style: italic}
-  .thinking-progress { width: 100%; height: 0.25rem;background: rgba(0, 255, 0: 0.1); border-radius: 0.125rem; overflow: hidden}
+  .thinking-progress { width: 100%; height: 0.25rem;background: rgba(0, 255, 0, 0.1); border-radius: 0.125rem; overflow: hidden}
   .progress-bar { height: 100%; background: linear-gradient(90deg, #00ff00, #00ff88); transition: width 0.3s ease}
-  /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0: 0.1); border: 1px solid rgba(255, 165, 0: 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
+  /* Activity Replay Styles */ .activity-replay-indicator { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem, background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 0.25rem; margin-bottom: 0.5rem; font-size: 0.875rem}
   .replay-icon { color: #ffa500; font-size: 1rem}
   .replay-text { color: #ffa500; flex: 1 }
-  .replay-progress { width: 4rem; height: 0.25rem;background: rgba(255, 165, 0: 0.2); border-radius: 0.125rem; overflow: hidden}
-  /* Development Controls */ .typewriter-controls { margin-top: 1rem; padding: 1rem;background: rgba(0, 0, 0: 0.1); border-radius: 0.5rem; font-size: 0.875rem}
+  .replay-progress { width: 4rem; height: 0.25rem;background: rgba(255, 165, 0, 0.2); border-radius: 0.125rem; overflow: hidden}
+  /* Development Controls */ .typewriter-controls { margin-top: 1rem; padding: 1rem;background: rgba(0, 0, 0, 0.1); border-radius: 0.5rem; font-size: 0.875rem}
   .typewriter-controls button { margin-right: 0.5rem; padding: 0.25rem 0.5rem;background: #333; color: #00ff00; border: 1px solid #00ff00; border-radius: 0.25rem; cursor: pointer}
-  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0: 0.1)}
+  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0, 0.1)}
   .typewriter-controls buttondisabled { opacity: 0.5; cursor:not-allowed}
   .speed-controls { margin-top: 0.5rem; display: flex; gap: 1rem}
   .speed-controls label { display: flex; align-items: center; gap: 0.5rem;color: #00ff00}

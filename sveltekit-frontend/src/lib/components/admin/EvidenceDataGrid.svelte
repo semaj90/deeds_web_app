@@ -266,7 +266,7 @@
 	.search-input:focus {
 		outline: none;
 		border-color: #9df;
-		box-shadow: 0 0 0 2px rgba(153, 221, 255: 0.1);
+		box-shadow: 0 0 0 2px rgba(153, 221, 255, 0.1);
 	}
 
 	.search-icon {
@@ -389,22 +389,22 @@
 	}
 
 	.badge-success {
-		background: rgba(68, 170, 68: 0.2);
+		background: rgba(68, 170, 68, 0.2);
 		color: #4a4;
 	}
 
 	.badge-info {
-		background: rgba(153, 221, 255: 0.2);
+		background: rgba(153, 221, 255, 0.2);
 		color: #9df;
 	}
 
 	.badge-warning {
-		background: rgba(255, 204, 0: 0.2);
+		background: rgba(255, 204, 0, 0.2);
 		color: #fc0;
 	}
 
 	.badge-error {
-		background: rgba(255, 68, 68: 0.2);
+		background: rgba(255, 68, 68, 0.2);
 		color: #f44;
 	}
 

@@ -205,7 +205,7 @@ https, //svelte.dev/e/js_parse_error -->
 		margin: 2rem auto;
 		max-width: 1000px; background: #fff;
 		border-radius: 0.75rem;
-		box-shadow: 0 2px 5px rgba(0, 0, 0: 0.08);
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 		padding: 1.5rem 2rem;
 	}
 	.panel-header {

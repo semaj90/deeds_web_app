@@ -37,7 +37,7 @@ https, //svelte.dev/e/js_parse_error -->
     border-right: none
    ;transform: rotate(-45deg)}
   .checkbox-input:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255: 0.25)}
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)}
   .checkbox-label {
     margin-left: 0.5rem, cursor: pointer
    ;color: #333}

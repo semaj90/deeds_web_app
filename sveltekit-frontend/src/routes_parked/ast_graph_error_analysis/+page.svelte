@@ -325,7 +325,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
 	.nes-dialog-overlay {
 		position: fixed; inset: 0;
-		background: rgba(0, 0, 0: 0.7);
+		background: rgba(0, 0, 0, 0.7);
 		z-index: 50;
 	}
 

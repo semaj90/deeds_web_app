@@ -154,8 +154,8 @@
 
 <style>
 	.node-detail-panel {
-		background: rgba(0, 0, 0: 0.85);
-		border: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(0, 0, 0, 0.85);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px; overflow: hidden;
 		min-width: 280px;
 		max-width: 350px;
@@ -165,8 +165,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start; padding: 1rem;
-		background: rgba(255, 255, 255: 0.03);
-		border-bottom: 1px solid rgba(255, 255, 255: 0.1);
+		background: rgba(255, 255, 255, 0.03);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.header-content {
@@ -190,13 +190,13 @@
 
 	.close-btn {
 		background: transparent; border: none;
-		color: rgba(255, 255, 255: 0.5);
+		color: rgba(255, 255, 255, 0.5);
 		cursor: pointer; padding: 0.25rem;
 		border-radius: 4px; transition: all 0.2s ease;
 	}
 
 	.close-btn:hover {
-		color: white; background: rgba(255, 255, 255: 0.1);
+		color: white; background: rgba(255, 255, 255, 0.1);
 	}
 
 	.panel-content {
@@ -211,7 +211,7 @@
 
 	.section-label {
 		font-size: 0.7rem;
-		font-weight: 500; color: rgba(255, 255, 255: 0.5);
+		font-weight: 500; color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
@@ -219,9 +219,9 @@
 	.file-path {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		padding: 0.5rem; background: rgba(255, 255, 255: 0.05);
-		border: 1px solid rgba(255, 255, 255: 0.1);
-		border-radius: 6px; color: rgba(255, 255, 255: 0.8);
+		padding: 0.5rem; background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 6px; color: rgba(255, 255, 255, 0.8);
 		font-size: 0.8rem;
 		font-family: 'JetBrains Mono', monospace;
 		cursor: pointer; transition: all 0.2s ease;
@@ -229,8 +229,8 @@
 	}
 
 	.file-path:hover {
-		background: rgba(0, 212, 255: 0.1);
-		border-color: rgba(0, 212, 255: 0.3);
+		background: rgba(0, 212, 255, 0.1);
+		border-color: rgba(0, 212, 255, 0.3);
 	}
 
 	.file-path span {
@@ -242,27 +242,27 @@
 	.error-badge {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		padding: 0.5rem; background: rgba(239, 68, 68: 0.1);
-		border: 1px solid rgba(239, 68, 68: 0.3);
+		padding: 0.5rem; background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.3);
 		border-radius: 6px; color: #f87171;
 		font-size: 0.875rem; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
 	.error-badge:hover {
-		background: rgba(239, 68, 68: 0.2);
+		background: rgba(239, 68, 68, 0.2);
 	}
 
 	.view-link {
 		margin-left: auto;
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.5);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
 	}
 
 	.cluster-badge {
 		display: flex;
 		align-items: center; gap: 0.5rem;
-		padding: 0.5rem; background: rgba(168, 85, 247: 0.1);
-		border: 1px solid rgba(168, 85, 247: 0.3);
+		padding: 0.5rem; background: rgba(168, 85, 247, 0.1);
+		border: 1px solid rgba(168, 85, 247, 0.3);
 		border-radius: 6px; color: #c084fc;
 		font-size: 0.875rem;
 	}
@@ -275,9 +275,9 @@
 	.list-item {
 		font-size: 0.8rem;
 		font-family: 'JetBrains Mono', monospace;
-		color: rgba(255, 255, 255: 0.7);
+		color: rgba(255, 255, 255, 0.7);
 		padding: 0.25rem 0.5rem;
-		background: rgba(255, 255, 255: 0.03);
+		background: rgba(255, 255, 255, 0.03);
 		border-radius: 4px; overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -292,7 +292,7 @@
 	}
 
 	.list-more {
-		font-size: 0.75rem; color: rgba(255, 255, 255: 0.4);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.4);
 		padding: 0.25rem 0.5rem;
 	}
 </style>

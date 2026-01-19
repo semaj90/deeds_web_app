@@ -73,7 +73,7 @@
 
  .collection-card:hover {
  border-color: #d4a574;
- box-shadow: 0 4px 12px rgba(139, 69, 19: 0.1);
+ box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
  }
 
  .card-content {

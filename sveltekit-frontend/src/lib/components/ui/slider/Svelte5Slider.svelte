@@ -197,7 +197,7 @@ function handleChange(e: Event) {
 	}
 
 	input[type="range"]:focus::-webkit-slider-thumb {
-		box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.3);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 	}
 </style>
 

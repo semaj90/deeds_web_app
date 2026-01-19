@@ -443,11 +443,11 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  justify-content: center; gap: 0.5rem;
  }
  .tab:hover, not(disabled) {
- background: rgba(59, 130, 246: 0.1);
+ background: rgba(59, 130, 246, 0.1);
  }
  .tab.active {
  background: white;
- box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
  font-weight: 600;
  }
  .tab:disabled {
@@ -468,7 +468,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .content-area {
  background: white;
  border-radius: 0.5rem;
- box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
  padding: 1.5rem;
  min-height: 600px;
  }
@@ -515,7 +515,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  #document-input:focus {
  outline: none;
  border-color: #3b82f6;
- box-shadow: 0 0 0 3px rgba(59, 130, 246: 0.1);
+ box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
  }
  .input-footer {
  margin-top: 1rem;

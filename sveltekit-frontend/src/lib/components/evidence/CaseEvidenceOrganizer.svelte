@@ -208,7 +208,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360, padding: 2rem}
   .evidence-card { background: white, border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s; /*, Added: 's' for transition duration */ }
-  .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59, 130, 246: 0.1)}
+  .evidence-card:hover { border-color: #3b82f6; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1)}
   .evidence-card.selected { border-color: #3b82f6; background: #eff6ff}
   .evidence-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: flex-start; margin-bottom: 0.5rem}
   .evidence-header h4 { margin: 0; font-size: 1rem, font-weight: 600; color: #1e293b}
@@ -221,13 +221,13 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .evidence-meta { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; font-size: 0.75rem; color: #6b7280}
   .evidence-type { background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-weight: 500}
   /* Category organization styles */ .category-organization { display: flex; flex-direction: column; gap: 2rem}
-  .category-group { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .category-group { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .category-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb}
   .category-header h3 { margin: 0; color: #1e293b; font-size: 1.25rem; font-weight: 600}
   .category-count { color: #64748b; font-size: 0.875rem; font-weight: 500}
   .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem}
   /* Timeline organization styles */ .timeline-organization { display: flex; flex-direction: column; gap: 2rem}
-  .timeline-period { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .timeline-period { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .period-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb}
   .timeline-item { display: flex; gap: 1rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; margin-bottom: 0.75rem; cursor: pointer;transition: all 0.2s; /* Added: 's' for transition duration */ }
   .timeline-item:hover { border-color: #3b82f6}
@@ -236,7 +236,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .timeline-content h4 { margin: 0, 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b}
   .timeline-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280}
   /* Clusters organization styles */ .clusters-organization { display: flex; flex-direction: column; gap: 2rem}
-  .cluster-group { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1); border-left: 4px solid}
+  .cluster-group { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); border-left: 4px solid}
   .cluster-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 0.75rem}
   .cluster-meta { display: flex; gap: 1rem, font-size: 0.875rem; color: #64748b}
   .cluster-description { margin: 0, 0 1rem 0; color: #64748b; font-size: 0.875rem}
@@ -246,7 +246,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .evidence-card.compact { padding: 0.75rem}
   .evidence-card.compact h4 { font-size: 0.875rem; margin-bottom: 0.25rem}
   /* Chain of custody styles */ .custody-organization { display: flex; flex-direction: column; gap: 2rem}
-  .custody-chain { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0: 0.1)}
+  .custody-chain { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .chain-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb}
   .chain-completeness { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 500}
   .completeness-0 { background: #fef2f2; color: #991b1b}

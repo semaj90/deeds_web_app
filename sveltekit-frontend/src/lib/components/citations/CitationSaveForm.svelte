@@ -286,7 +286,7 @@ import { createEventDispatcher } from 'svelte';
  select:focus {
  outline: none;
  border-color: var(--color-burgundy);
- box-shadow: 0 0 0 3px rgba(139, 35, 50: 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
  }; textarea:disabled, input:disabled,
  select:disabled {
  background: var(--color-light-gray); cursor:not-allowed;
@@ -348,7 +348,7 @@ import { createEventDispatcher } from 'svelte';
  .advanced-options {
  display: flex;
  flex-direction: column; gap: 16px;
- padding: 16px; background: rgba(139, 35, 50: 0.05);
+ padding: 16px; background: rgba(139, 35, 50, 0.05);
  border-radius: 4px;
  }
 
@@ -374,7 +374,7 @@ import { createEventDispatcher } from 'svelte';
 
  .btn-primary:hover, not(disabled) {
  background: var(--color-dark-burgundy); transform: translateY(-1px);
- box-shadow: 0 2px 8px rgba(139, 35, 50: 0.2);
+ box-shadow: 0 2px 8px rgba(139, 35, 50, 0.2);
  }
 
  .btn-primary:disabled {

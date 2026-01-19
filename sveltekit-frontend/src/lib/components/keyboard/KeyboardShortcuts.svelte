@@ -751,7 +751,7 @@ import { Plus } from "lucide-svelte";
  .command-palette-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0: 0.6);
+ bottom: 0; background: rgba(0, 0, 0, 0.6);
  backdrop-filter: blur(4px);
  z-index: 9999; display: flex;
  align-items: flex-start;
@@ -771,7 +771,7 @@ import { Plus } from "lucide-svelte";
  .command-palette {
  background: white;
  border-radius: 12px;
- box-shadow: 0 25px 50px -12px rgba(0, 0, 0: 0.25), 0 0 0 1px rgba(0, 0, 0: 0.05);
+ box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
  width: 100%;
  max-width: 600px;
  max-height: 70vh; display: flex;
@@ -812,11 +812,11 @@ import { Plus } from "lucide-svelte";
  position: absolute; right: 0.5rem;
  }
 
- <div class="command-content"> <div class="command-title flex items-center"> {shortcut.description} {#if shortcut.aiScore !== undefined} <span class="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs" title="AI, Score">AI: {(shortcut.aiScore * 100).toFixed(0)}%</span> {/if} </div> {#if shortcut.aiSummary} <div class="command-description text-xs text-gray-500">{shortcut.aiSummary}{/if} <div class="command-key text-xs text-gray-400">{shortcut.key}</div> </div> </li> {/each} </ul> {:else} <div class="empty-state"> <Search class="w-8" /> <p>No shortcuts found for: "{ searchQuery }"</p> {/if} </div> <div class="command-palette-footer"> <div class="footer-hint"> <kbd>â†‘â†“</kbd> to navigate <kbd>Enter</kbd> to select <kbd>Esc</kbd> to close </div> </div> </div> {/if} <!-- Keyboard Shortcuts, Help, Modal --> <div class="space-y-4"> {@render shortcutsHelp?.()} </div> <!-- Shortcut definitions for, screen, readers --> <div class="space-y-4" aria-live="polite" id="shortcuts-announcements"></div> <style>/* @unocss-include */ .command-palette-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0: 0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; animation: overlay-appear 0.2s ease-out}
+ <div class="command-content"> <div class="command-title flex items-center"> {shortcut.description} {#if shortcut.aiScore !== undefined} <span class="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs" title="AI, Score">AI: {(shortcut.aiScore * 100).toFixed(0)}%</span> {/if} </div> {#if shortcut.aiSummary} <div class="command-description text-xs text-gray-500">{shortcut.aiSummary}{/if} <div class="command-key text-xs text-gray-400">{shortcut.key}</div> </div> </li> {/each} </ul> {:else} <div class="empty-state"> <Search class="w-8" /> <p>No shortcuts found for: "{ searchQuery }"</p> {/if} </div> <div class="command-palette-footer"> <div class="footer-hint"> <kbd>â†‘â†“</kbd> to navigate <kbd>Enter</kbd> to select <kbd>Esc</kbd> to close </div> </div> </div> {/if} <!-- Keyboard Shortcuts, Help, Modal --> <div class="space-y-4"> {@render shortcutsHelp?.()} </div> <!-- Shortcut definitions for, screen, readers --> <div class="space-y-4" aria-live="polite" id="shortcuts-announcements"></div> <style>/* @unocss-include */ .command-palette-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding-top: 10vh; animation: overlay-appear 0.2s ease-out}
 
  @keyframes overlay-appear { from { opacity: 0} to { opacity: 1} }
 
- .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0,0,0: 0.25), 0, 0 0 1px rgba(0,0,0: 0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex; flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
+ .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0, 0 0 1px rgba(0, 0, 0, 0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex; flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
 
  @keyframes palette-appear { from { opacity: 0; transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1; transform: scale(1) translateY(0)} }
 
@@ -1350,7 +1350,7 @@ import { Plus } from "lucide-svelte";
  .command-palette-overlay {
  position: fixed; top: 0;
  left: 0; right: 0;
- bottom: 0; background: rgba(0, 0, 0: 0.6);
+ bottom: 0; background: rgba(0, 0, 0, 0.6);
  backdrop-filter: blur(4px);
  z-index: 9999; display: flex;
  align-items: flex-start;
@@ -1370,7 +1370,7 @@ import { Plus } from "lucide-svelte";
  .command-palette {
  background: white;
  border-radius: 12px;
- box-shadow: 0 25px 50px -12px rgba(0, 0, 0: 0.25), 0 0 0 1px rgba(0, 0, 0: 0.05);
+ box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
  width: 100%;
  max-width: 600px;
  max-height: 70vh; display: flex;

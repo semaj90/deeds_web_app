@@ -196,7 +196,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  position: fixed; top: 0;
  left: 0; right: 0;
  bottom: 0;
- background-color: rgba(0, 0, 0: 0.5);
+ background-color: rgba(0, 0, 0, 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -206,7 +206,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  .modal-content {
  background-color: white;
  border-radius: 8px;
- box-shadow: 0 4px 20px rgba(0, 0, 0: 0.15);
+ box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
  max-width: 500px; width: 90%;
  max-height: 90vh;
  overflow-y: auto;
@@ -295,7 +295,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  .form-group textarea:focus {
  outline: none;
  border-color: #8b4513;
- box-shadow: 0 0 0 3px rgba(139, 69, 19: 0.1);
+ box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
  }
 
  .form-group select:disabled,

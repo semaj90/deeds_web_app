@@ -86,7 +86,7 @@
  }
 
  dialog::backdrop {
- backdrop-filter: blur(4px); background: rgba(0, 0, 0: 0.7);
+ backdrop-filter: blur(4px); background: rgba(0, 0, 0, 0.7);
  }
 
  .nes-grid-3 {
@@ -143,7 +143,7 @@
 
  .celebration-text {
  font-size: 1.2rem;
- text-shadow: 2px 2px 0px rgba(0, 0, 0: 0.2);
+ text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
  }
 
  @keyframes pulse {

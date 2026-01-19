@@ -406,11 +406,11 @@
 
   .connection-status {
     font-size: 0.75rem; padding: 0.25rem 0.5rem;
-    border-radius: 4px; background: rgba(239, 68, 68: 0.2);
+    border-radius: 4px; background: rgba(239, 68, 68, 0.2);
   }
 
   .connection-status.connected {
-    background: rgba(34, 197, 94: 0.2);
+    background: rgba(34, 197, 94, 0.2);
   }
 
   .header-controls {

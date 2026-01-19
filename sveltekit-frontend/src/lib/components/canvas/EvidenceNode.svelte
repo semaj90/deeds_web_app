@@ -122,7 +122,7 @@
 </section>
 
 <style>
- /* @unocss-include */ /* Evidence Node Styles */ .evidence-node { position: absolute; border: 2px solid #e2e8f0; border-radius: 8px; background: white; box-shadow: 0 4px 6px rgba(0, 0, 0: 0.1); min-width: 200px; min-height: 150px}
+ /* @unocss-include */ /* Evidence Node Styles */ .evidence-node { position: absolute; border: 2px solid #e2e8f0; border-radius: 8px; background: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); min-width: 200px; min-height: 150px}
   .node-header { display: flex; justify-content: space-betweenn, align-items: center; padding: 8px 12px;background: #f8fafc; border-bottom: 1px solid #e2e8f0; border-radius: 6px 6px, 0 0}
   .node-title { flex: 1 }
   .title-text { font-weight: 600; color: #374151; font-size: 14px}

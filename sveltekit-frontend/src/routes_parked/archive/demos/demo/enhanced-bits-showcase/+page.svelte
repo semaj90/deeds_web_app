@@ -17,7 +17,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  margin-bottom: 2rem; padding: 2rem;
  background: var(--color-surface, #ffffff);
  border-radius: 1rem;
- box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
  }
  .header-content {
  display: flex;
@@ -49,7 +49,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  display: flex; gap: 0.5rem;
  padding: 0.5rem; background: var(--color-surface, #ffffff);
  border-radius: 1rem;
- box-shadow: 0 2px 4px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
  overflow-x: auto;
  }
  .tab-trigger {
@@ -70,7 +70,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  .tab-trigger.active {
  background: var(--color-primary, #4a90e2);
  color: white;
- box-shadow: 0 2px 4px rgba(74, 144, 226: 0.4);
+ box-shadow: 0 2px 4px rgba(74, 144, 226, 0.4);
  }
  .tab-icon {
  font-size: 1.125rem;
@@ -82,7 +82,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  .demo-card {
  background: var(--color-surface, #ffffff);
  border-radius: 1rem; padding: 2rem;
- box-shadow: 0 4px 6px -1px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
  }
  /* Overview Section */
  .features-grid {
@@ -97,7 +97,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  .feature-item:hover {
  border-color: var(--color-primary, #4a90e2);
  transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(74, 144, 226: 0.15);
+ box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
  }
  .feature-item h3 {
  margin:
@@ -123,14 +123,14 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  gap: 1.5rem;
  }
  .elevated-card {
- box-shadow: 0 10px 15px -3px rgba(0, 0, 0: 0.1);
+ box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
  }
  .interactive-card {
  cursor: pointer; transition: all 0.2s ease;
  }
  .interactive-card:hover {
  transform: translateY(-4px);
- box-shadow: 0 12px 20px -5px rgba(0, 0, 0: 0.15);
+ box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
  }
  /* Search Demo */
  .search-container {
@@ -186,11 +186,11 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  font-size: 0.875rem;
  }
  .status-item.online {
- background: rgba(0, 255, 65: 0.1);
+ background: rgba(0, 255, 65, 0.1);
  border-color: #00ff41; color: #00ff41;
  }
  .status-item.processing {
- background: rgba(255, 170, 0: 0.1);
+ background: rgba(255, 170, 0, 0.1);
  border-color: #ffaa00; color: #ffaa00;
  }
  .operation-buttons {
@@ -226,7 +226,7 @@ import type { Document } from '$lib/types'; import Button, LinkButton, YoRHaSear
  }
  .modal-stats,
  .system-readout {
- padding: 1rem; background: rgba(0, 0, 0: 0.1);
+ padding: 1rem; background: rgba(0, 0, 0, 0.1);
  border-radius: 0.5rem;
  font-family: monospace;
  font-size: 0.875rem;

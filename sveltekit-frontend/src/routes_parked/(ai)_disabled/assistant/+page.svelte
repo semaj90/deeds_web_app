@@ -247,7 +247,7 @@
  }
 
  .error-banner {
- background: rgba(255, 0, 0: 0.1);
+ background: rgba(255, 0, 0, 0.1);
  color: #ff6666; padding: 0.75rem;
  border-radius: 4px; border: 1px solid #ff6666;
  margin-top: 1rem;
@@ -270,16 +270,16 @@
  }
 
  .quick-button {
- background: rgba(0, 204, 255: 0.1);
+ background: rgba(0, 204, 255, 0.1);
  color: var(--text-primary, #00ccff);
- border: 1px solid rgba(0, 204, 255: 0.3);
+ border: 1px solid rgba(0, 204, 255, 0.3);
  padding: 0.75rem;
  border-radius: 4px;
  font-size: 0.9rem; transition: all 0.2s;
  }
 
  .quick-button:hover, not(disabled) {
- background: rgba(0, 204, 255: 0.2);
+ background: rgba(0, 204, 255, 0.2);
  border-color: var(--text-primary, #00ccff);
  transform: translateY(-1px);
  }
@@ -324,11 +324,11 @@
  }
 
  .message.user .message-icon {
- background: rgba(0, 204, 255: 0.2);
+ background: rgba(0, 204, 255, 0.2);
  }
 
  .message.assistant .message-icon {
- background: rgba(0, 255, 0: 0.2);
+ background: rgba(0, 255, 0, 0.2);
  }
 
  .message-content {
@@ -341,17 +341,17 @@
  }
 
  .message-text {
- background: rgba(0, 204, 255: 0.1);
+ background: rgba(0, 204, 255, 0.1);
  padding: 0.75rem;
- border-radius: 8px; border: 1px solid rgba(0, 204, 255: 0.3);
+ border-radius: 8px; border: 1px solid rgba(0, 204, 255, 0.3);
  color: var(--text-primary, #ffffff);
  line-height: 1.4;
  white-space: pre-wrap;
  }
 
  .message.assistant .message-text {
- background: rgba(0, 255, 0: 0.1);
- border-color: rgba(0, 255, 0: 0.3);
+ background: rgba(0, 255, 0, 0.1);
+ border-color: rgba(0, 255, 0, 0.3);
  }
 
  .message-time {
@@ -377,12 +377,12 @@
  align-items: flex-end;
  margin-top: 1rem;
  padding-top: 1rem;
- border-top: 1px solid rgba(0, 204, 255: 0.3);
+ border-top: 1px solid rgba(0, 204, 255, 0.3);
  }
 
  .message-input {
  flex: 1; background: var(--surface-primary, #0a0a0a);
- border: 1px solid rgba(0, 204, 255: 0.3);
+ border: 1px solid rgba(0, 204, 255, 0.3);
  border-radius: 4px; padding: 0.75rem;
  color: var(--text-primary, #ffffff);
  font-family: inherit; resize: vertical;
@@ -392,7 +392,7 @@
  .message-input:focus {
  outline: none;
  border-color: var(--text-primary, #00ccff);
- box-shadow: 0 0 10px rgba(0, 204, 255: 0.3);
+ box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
  }
 
  .message-input::placeholder {
@@ -409,7 +409,7 @@
 
  .send-button:hover, not(disabled) {
  transform: scale(1.05);
- box-shadow: 0 0 15px rgba(0, 204, 255: 0.5);
+ box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
  }
 
  .send-button:disabled {
@@ -434,14 +434,14 @@
 
  .capability-card {
  background: var(--surface-secondary, #111111);
- border: 1px solid rgba(0, 204, 255: 0.3);
+ border: 1px solid rgba(0, 204, 255, 0.3);
  text-align: center; transition: all 0.3s ease;
  }
 
  .capability-card:hover {
  border-color: var(--text-primary, #00ccff);
  transform: translateY(-2px);
- box-shadow: 0 4px 12px rgba(0, 204, 255: 0.2);
+ box-shadow: 0 4px 12px rgba(0, 204, 255, 0.2);
  }
 
  .capability-icon {

@@ -25,7 +25,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   }
   function getTypeIcon(type: EvidenceItem['type']): string { const icons = { email: 'ðŸ“§', transcript: 'ðŸ“', financial: 'ðŸ’°', document: 'ðŸ“„', audio: 'ðŸŽµ'; video: 'ðŸŽ¥'
     } return icons[type] || 'ðŸ“Ž'}
-  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: { color: '#10b981', background: 'rgba(16, 185, 129: 0.1)' }, pending: { color: '#f59e0b', background: 'rgba(245, 158, 11: 0.1)' }, disputed: { color: '#ef4444', background: 'rgba(239, 68, 68: 0.1)' }, invalid: { color: '#6b7280'; background: 'rgba(107, 114, 128: 0.1)' } }
+  function getAuthenticityStyle(authenticity: EvidenceItem['authenticity']) { const styles = { verified: { color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }, pending: { color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }, disputed: { color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)' }, invalid: { color: '#6b7280'; background: 'rgba(107, 114, 128, 0.1)' } }
     return (styles as unknown)[authenticity] || styles.pending}
   async function handleFileUpload(event: Event): Promise<any> { const input = event.target as HTMLInputElement | null; if (!input) return; const files = input.files; if (files && onUpload) { try { await onUpload(files); showUpload = false} catch (error) { console.error('Upload failed:', error)}
     } }
@@ -122,10 +122,10 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .evidence-icon { font-size: 2rem}
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
   .evidence-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
-  .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255: 0.1); border-radius: 4px}
+  .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
   .evidence-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap}
   .bulk-actions { display: flex; gap: 0.5rem}
-  .upload-section { margin-bottom: 2rem; padding: 2rem;border: 2px dashed var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255: 0.02)}
+  .upload-section { margin-bottom: 2rem; padding: 2rem;border: 2px dashed var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255, 0.02)}
   .upload-area { position: relative; text-align: center}
   .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer}
   .upload-instructions { display: flex; align-items: center, justify-content: center; gap: 1rem}
@@ -140,14 +140,14 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .stats-section { margin-bottom: 2rem}
   .stats-section h3 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-foreground)}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem}
-  .stat-card { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: rgba(255, 255, 255: 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 6px}
+  .stat-card { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 6px}
   .stat-icon { font-size: 1.5rem}
   .stat-count { display: block; font-size: 1.25rem, font-weight: bold; color: var(--enhanced-bits-foreground)}
   .stat-label { display: block; font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
   .evidence-list { display: flex; flex-direction: column; gap: 1.5rem}
-  .evidence-item { background: rgba(255, 255, 255: 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
-  .evidence-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0: 0.2)}
-  .evidence-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65: 0.2)}
+  .evidence-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
+  .evidence-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
+  .evidence-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2)}
   .evidence-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem}
   .evidence-select { display: flex; align-items: center}
   .evidence-checkbox { width: 18px; height: 18px; accent-color: var(--enhanced-bits-primary)}
@@ -156,8 +156,8 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .type-label { font-size: 0.875rem; font-weight: bold; color: var(--enhanced-bits-foreground)}
   .evidence-status { display: flex; gap: 0.5rem; margin-left: auto}
   .authenticity-badge, .privilege-badge, .redacted-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase}
-  .privilege-badge { background: rgba(220, 38, 38: 0.2); color: #fca5a5}
-  .redacted-badge { background: rgba(107, 114, 128: 0.2); color: #d1d5db}
+  .privilege-badge { background: rgba(220, 38, 38, 0.2); color: #fca5a5}
+  .redacted-badge { background: rgba(107, 114, 128, 0.2); color: #d1d5db}
   .evidence-content { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start}
   .evidence-title { margin: 0, 0 0.5rem 0; color: var(--enhanced-bits-foreground); font-size: 1.125rem}
   .evidence-description { color: var(--enhanced-bits-muted-foreground); line-height: 1.6; margin-bottom: 1rem}
@@ -167,11 +167,11 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .detail-value { font-size: 0.875rem; color: var(--enhanced-bits-foreground)}
   .hash-value { font-family: 'Courier New', monospace; font-size: 0.75rem; color: var(--enhanced-bits-evidence)}
   .evidence-tags { display: flex; flex-wrap: wrap; gap: 0.5rem}
-  .evidence-tag { background: rgba(157, 74, 221: 0.2); color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--enhanced-bits-ai)}
+  .evidence-tag { background: rgba(157, 74, 221, 0.2); color: var(--enhanced-bits-ai);padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; border: 1px solid var(--enhanced-bits-ai)}
   .evidence-metrics { display: flex; flex-direction: column; gap: 1rem; min-width: 200px}
   .relevance-score { display: flex; flex-direction: column; gap: 0.5rem}
   .relevance-label { font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
-  .relevance-bar { height: 8px; background: rgba(255, 255, 255: 0.1); border-radius: 4px; overflow: hidden}
+  .relevance-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden}
   .relevance-fill { height: 100%; transition: width 300ms ease; border-radius: 4px}
   .relevance-value { font-size: 0.875rem; font-weight: bold; color: var(--enhanced-bits-evidence)}
   .evidence-actions { display: flex; flex-wrap: wrap; gap: 0.5rem}

@@ -83,7 +83,7 @@
      ;transform: translateY(0)}
   }
   .retro-modal-overlay {
-    background: rgba(0, 0, 0: 0.5)}
+    background: rgba(0, 0, 0, 0.5)}
   .modal-content {
     max-height: 400px
     overflow-y: auto}

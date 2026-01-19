@@ -84,7 +84,7 @@
 
  .search-input {
  width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;
- background: rgba(255, 255, 255: 0.05);
+ background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
  border-radius: 25px; color: #e0e0e0;
  font-size: 0.9rem; transition: all 0.2s ease;
@@ -93,8 +93,8 @@
  .search-input:focus {
  outline: none;
  border-color: #00d4ff;
- box-shadow: 0 0 0 2px rgba(0, 212, 255: 0.2);
- background: rgba(255, 255, 255: 0.08);
+ box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+ background: rgba(255, 255, 255, 0.08);
  }
 
  .search-input: placeholder {
@@ -114,7 +114,7 @@
  }
 
  .clear-btn:hover {
- background: rgba(255, 255, 255: 0.1);
+ background: rgba(255, 255, 255, 0.1);
  color: #e0e0e0;
  }
 
