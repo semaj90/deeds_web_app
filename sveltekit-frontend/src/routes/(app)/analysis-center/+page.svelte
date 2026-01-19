@@ -101,7 +101,7 @@
  <form
  method="post"
  action="?/analyze"
- use, enhance={({ formData }) => {
+ use:enhance={({ formData }) => {
  isAnalyzing = true;
  return async ({ result }) => {
  isAnalyzing = false;

@@ -2,6 +2,22 @@
 
 ---
 
+## ✅ January 19, 2026 – Svelte 5 Route Fixes
+
+### Key Fixes Applied
+- **Svelte 5 event attributes:** Use `onclick`/`onchange` instead of `on:click`/`on:change`.
+- **Case routes repaired:** `cases/[id]` overview + board pages now use valid class syntax and fetch payloads.
+- **Evidence upload (case scoped):** Fixed `allowedTypes`, return payload, and case title mapping.
+- **Component repairs:**
+  - `ContextualChatModal.svelte` payload mapping and CSS `rgba()` fixes
+  - `CaseNotesEditor.svelte` function boundaries, handlers, and CSS fixes
+  - `NesModal.svelte` supports `children?: Snippet`
+
+### Notes
+- Svelte 5 runes are in use (`$props`, `$state`, `$derived`).
+- bits-ui uses component-level imports for Svelte 5 (no barrel exports).
+- Prefer SSR-safe patterns and Drizzle ORM 0.44 queries.
+
 ## 🚨 **CRITICAL: Database Migration Safety Protocol**
 
 ### ⛔ **DO NOT PROCEED WITH THIS PUSH**

@@ -25,7 +25,9 @@
  const res = await fetch('/api/legal/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({caseId: id, message: messageText, messageText,
+ body: JSON.stringify({
+ caseId: id,
+ message: messageText,
  context: 'case_analysis'
  })
  });

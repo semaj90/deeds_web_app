@@ -2,49 +2,50 @@
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
- timestamp: string; summary: {
- totalErrors: number; totalRoutes: number;
- totalClusters: number; totalSuggestions: number;
+ timestamp: string;
+ summary: {
+ totalErrors: number;
+ totalRoutes: number;
+ totalClusters: number;
+ totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: { bySeverity: Array<{ severity: string; count, number }>;
- };
- routes: { byHealth: Array<{ state: string; count, number }>;
- top: Array<{ routePath: string;
- errorState: string; recentErrorCount: number;
- lastErrorAt, string;
+ errors: { bySeverity: Array<{ severity: string; count: number }> };
+ routes: {
+ byHealth: Array<{ state: string; count: number }>;
+ top: Array<{
+ routePath: string;
+ errorState: string;
+ recentErrorCount: number;
+ lastErrorAt: string;
  }>;
  };
-	suggestions: { byRisk: Array<{ level: string; count: number }>;
-		applied: number; effectiveness: number;
-	};
-	topErrors: Array<{ tsCode: string;
-		count: number; messages: string[];
-	}>;
-	errorVelocity: Array<{ date: string;
-		count: number;
-	}>;
-	}	let stats = $state<MonitoringStats | null>(null);
+ suggestions: { byRisk: Array<{ level: string; count: number }>; applied: number; effectiveness: number };
+ topErrors: Array<{ tsCode: string; count: number; messages: string[] }>;
+ errorVelocity: Array<{ date: string; count: number }>;
+ }
+
+	let stats = $state<MonitoringStats | null>(null);
 	let isLoading = $state(true);
 	let error = $state<string | null>(null);
 	let lastUpdated = $state<Date | null>(null);
 
 	async function loadStats() {
 		isLoading = true;
- error = null;
- try {
- const response = await fetch('/api/phase78/monitor');
- if (!response.ok) {
- throw new Error(`HTTP ${response.status}`);
- }
- stats = await response.json();
- lastUpdated = new Date();
- } catch (err) {
- console.error('Failed to load monitoring stats:', err);
- error = `Failed to load statistics: ${err instanceof Error ? err.message : 'Unknown error'}`;
- } finally {
- isLoading = false;
- }
+		error = null;
+		try {
+			const response = await fetch('/api/phase78/monitor');
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}`);
+			}
+			stats = await response.json();
+			lastUpdated = new Date();
+		} catch (err) {
+			console.error('Failed to load monitoring stats:', err);
+			error = `Failed to load statistics: ${err instanceof Error ? err.message : 'Unknown error'}`;
+		} finally {
+			isLoading = false;
+		}
  }
 
  // Auto-refresh every 30 seconds
@@ -103,9 +104,9 @@
  </div>
 
  <button
- onclick={ loadStats }
+ onclick={loadStats}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled, bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>
@@ -133,7 +134,7 @@
  </div>
  {:else if stats}
  <!-- Summary Cards -->
- <div class="grid grid-cols-1 md, grid-cols-5 gap-6 mb-8">
+ <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
  <div class="bg-white rounded-lg border border-gray-200 p-6">
  <div class="text-sm font-semibold text-gray-600 uppercase">Total Errors</div>
  <div class="text-3xl font-bold text-gray-900 mt-2">{stats.summary.totalErrors}</div>
@@ -166,7 +167,7 @@
  </div>
 
  <!-- Two Column Layout -->
- <div class="grid grid-cols-1 lg, grid-cols-2 gap-8 mb-8">
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
  <!-- Error Severity Distribution -->
  <div class="bg-white rounded-lg border border-gray-200 p-6">
  <h2 class="text-lg font-semibold text-gray-900 mb-6">🔴 Errors by Severity</h2>

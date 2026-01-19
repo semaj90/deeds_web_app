@@ -81,7 +81,7 @@
 	<!-- Search Tab -->
 	{#if activeTab === 'search'}
 		<div class="search-panel">
-			<form method="POST" action="?/vectorSearch" use, enhance={handleEnhance} class="search-controls">
+			<form method="POST" action="?/vectorSearch" use:enhance={handleEnhance} class="search-controls">
 				<input
 					type="text"
 					name="query"
@@ -119,7 +119,7 @@
 							{/if}
 
 							{#if result.payload?.file_path}
-								<form method="POST" action="?/analyzeFile" use, enhance={handleAnalyze}>
+								<form method="POST" action="?/analyzeFile" use:enhance={handleAnalyze}>
 									<input type="hidden" name="filePath" value={result.payload.file_path} />
 									<button type="submit" class="file-link">
 										📄 {result.payload.file_path}
@@ -147,7 +147,7 @@
 	<!-- Other tabs (placeholders for now) -->
 	{#if activeTab === 'tags'}
 		<div class="tags-panel">
-			<form method="POST" action="?/enhanceTags" use, enhance>
+			<form method="POST" action="?/enhanceTags" use:enhance>
 				<button type="submit" class="btn-primary">🚀 Enhance Tags with AI</button>
 			</form>
 			<p class="mt-4 text-gray-500">Tag enhancement results will appear here.</p>
@@ -156,7 +156,7 @@
 
 	{#if activeTab === 'graph'}
 		<div class="graph-panel">
-			<form method="POST" action="?/loadGraph" use, enhance>
+			<form method="POST" action="?/loadGraph" use:enhance>
 				<button type="submit" class="btn-secondary">Reload Graph</button>
 			</form>
 			<div class="graph-placeholder mt-4 p-8 border rounded-lg bg-gray-50 text-center">
@@ -173,7 +173,7 @@
 
 	{#if activeTab === 'clusters'}
 		<div class="clusters-panel">
-			<form method="POST" action="?/generateClusterSummaries" use, enhance>
+			<form method="POST" action="?/generateClusterSummaries" use:enhance>
 				<button type="submit" class="btn-secondary">Generate Summaries</button>
 			</form>
 			<p class="mt-4 text-gray-500">Cluster summaries will appear here.</p>

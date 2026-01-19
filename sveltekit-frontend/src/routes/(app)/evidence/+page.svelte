@@ -85,7 +85,7 @@
 		<form
 			method="POST"
 			action="?/upload"
-			use, enhance={() => {
+			use:enhance={() => {
 				isUploading = true;
 				return async ({ result }) => {
 					isUploading = false;
