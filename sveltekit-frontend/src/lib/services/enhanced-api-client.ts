@@ -448,10 +448,10 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  */
  async uploadFile(
  file: File,
- onProgress?: () => void,
+ onProgress?: (progress: number) => void,
  signal?: AbortSignal
- ): Promise<{ fileUrl: string, fileName: string; fileSize: number, mimeType: string; hash: string;
- }> {
+ ): Promise<{ fileUrl: string; fileName: string; fileSize: number; mimeType: string; hash: string }>
+ {
  const formData = new FormData();
  formData.append('file', file);
 
@@ -466,8 +466,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  signal.addEventListener('abort', onAbort, { once, true });
  }
 
- xhr.upload.addEventListener('progress', (event: any) => {
- if (event?.lengthComputable&& onProgress) {
+ xhr.upload.addEventListener('progress', (event: ProgressEvent) => {
+ if (event.lengthComputable && onProgress) {
  const progress = (event.loaded / event.total) * 100;
  onProgress(progress);
  }
@@ -481,10 +481,10 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  if (status >= 200 && status < 300) {
  const parsed = text ? JSON.parse(text) : {};
  // Expect server to return ApiResponse-like payload
- if ($1?.$2) {
- resolve(parsed.data);
+ if ((parsed as ApiResponse<unknown>)?.success) {
+ 	resolve((parsed as ApiResponse<{ fileUrl: string; fileName: string; fileSize: number; mimeType: string; hash: string }>).data ?? (parsed as any));
  } else {
- resolve(parsed);
+ 	resolve(parsed as any);
  }
  } else {
  let parsed = {};
