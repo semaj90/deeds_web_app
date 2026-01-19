@@ -593,6 +593,8 @@ python scripts/phase66_automated_error_fixer.py
 - Dry-run batch (5 files) reduced `svelte-check` to 51,398 errors / 94 warnings (1455 files).
 - Fixed `src/routes/(app)/codebase-index/+page.server.ts` bad `console.error` formatting.
 - Fixed `src/routes/(app)/phase78/routes/[routePath]/+page.server.ts` malformed summary object.
+- Fixed `src/lib/services/enhanced-api-client.ts` request flow, imports, and upload response parsing.
+- Dry-run batch (8 files) reduced `svelte-check` to 50,785 errors / 100 warnings (1446 files).
 1. **Always dry-run** before bulk application
 2. **Validate incrementally** (after each 100-500 fixes)
 3. **Git commit** before each fix batch

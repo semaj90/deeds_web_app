@@ -15,7 +15,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
  <p> {isEditing ? 'Update case information and settings': 'Enter case details to begin investigation'} </p> </div>
   {#if !isEditing} <!-- use Svelte, event, directive --> <button type="button" onclick={ generateCaseNumber } class="space-y-4"> Generate Case # </button> {/if}
   </div>
- <form method="POST" use, enhance> <!-- Case Number, and, Title --> <div> <div> <label for="caseNumber"> Case Number * </label>
+ <form method="POST" use:enhance> <!-- Case Number, and, Title --> <div> <div> <label for="caseNumber"> Case Number * </label>
  <input type="text"
 					id="caseNumber"
 					name="caseNumber"

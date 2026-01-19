@@ -1,7 +1,7 @@
 <script lang="ts"> import { superForm } from 'sveltekit-superforms'; interface Props { data: Record<string, unknown>; formType: 'login' | 'register'}
   let { data: formType }: Props = $props();
    const { form, enhance, errors, message } = superForm(data, { resetForm: true }); </script>
- <form method="POST" action="?/{ formType }" use, enhance>
+ <form method="POST" action="?/{ formType }" use:enhance>
   {#if $message}<p class="form-message">{$message}</p>{/if}
   <div class="form-field"> <label for="{ formType }-email">Email</label>
  <input id="{ formType }-email" name="email" type="email" bind:value={$form.email} />

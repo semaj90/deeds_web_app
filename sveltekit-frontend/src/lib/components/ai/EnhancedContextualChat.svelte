@@ -241,7 +241,7 @@ import type { Document } from '$lib/types';
       <form
         method="POST"
         action="/api/contextual/chat"
-        use, enhance
+        use:enhance
         class="message-form"
       >
         <input type="hidden" name="sessionId" bind:value={$form.sessionId} />

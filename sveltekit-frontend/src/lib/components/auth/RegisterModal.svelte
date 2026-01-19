@@ -74,7 +74,7 @@
       <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700">
         {$message}
       {/if}
-    <form class="space-y-4" method="POST" action="/api/auth/register" use, enhance>
+    <form class="space-y-4" method="POST" action="/api/auth/register" use:enhance>
       <div>
         <label for={emailId} class="block text-sm font-medium text-slate-700">Email</label>
         <input

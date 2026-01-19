@@ -5,7 +5,7 @@
   ); function closeModal() { open = false}
 </script> <Dialog.Root bind, open> <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 bg-black/80" /> <Dialog.Content class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-slate-200 bg-white p-6"
     > <div class="flex items-center justify-between"> <Dialog.Title class="text-xl font-bold">Sign In</Dialog.Title> <Dialog.Close asChild> <button class="p-1 hover:bg-slate-100"> <X class="w-5" /> </button> </Dialog.Close> </div>
- {#if $message} <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700"> {$message} {/if} <form class="space-y-4" method="POST" action="/api/auth/login" use, enhance> <div> <label for="email" class="block text-sm font-medium text-slate-700">Email</label> <input id="email"
+ {#if $message} <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700"> {$message} {/if} <form class="space-y-4" method="POST" action="/api/auth/login" use:enhance> <div> <label for="email" class="block text-sm font-medium text-slate-700">Email</label> <input id="email"
             type="email"
             name="email"
             bind:value={$form.email} class="w-full px-3 py-2 border {$errors.email ? 'border-red-500': 'border-slate-300'} rounded-md focus:outline-none focus:ring-2"

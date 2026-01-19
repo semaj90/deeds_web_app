@@ -80,7 +80,7 @@
 <style>
   /* Minimal modal styles; keep project-wide theming elsewhere */
   :global(body) {
-    --modal-bg: rgba(0,0,0: 0.5)}
+    --modal-bg: rgba(0,0,0, 0.5)}
 </style>
 
 

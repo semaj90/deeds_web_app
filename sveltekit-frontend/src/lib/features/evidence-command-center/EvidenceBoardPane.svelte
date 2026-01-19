@@ -43,7 +43,7 @@
 
 		<form
 			method="POST"
-			use, enhance
+			use:enhance
 			action="?/askAi"
 			class="flex flex-col gap-2 overflow-hidden"
 		>
@@ -213,7 +213,7 @@
 		<div class="text-[10px] uppercase tracking-[0.15em] text-[#ffdf6b] mb-1">
 			Add evidence
 		</div>
-		<form method="POST" action="?/createEvidence" use, enhance class="flex flex-col gap-1">
+		<form method="POST" action="?/createEvidence" use:enhance class="flex flex-col gap-1">
 			<input type="hidden" name="caseId" value={ caseId } />
 
 			<div class="flex gap-1">

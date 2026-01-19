@@ -112,7 +112,7 @@
 		const step = 80;
 		c.save();
 		c.lineWidth = 1 / viewport.zoom;
-		c.strokeStyle = 'rgba(255,255,255: 0.04)';
+		c.strokeStyle = 'rgba(255,255,255, 0.04)';
 
 		// compute visible world bounds
 		const topLeft = screenToWorld({ x: 0, y: 0 });
@@ -180,7 +180,7 @@
 			ctx.beginPath();
 			ctx.moveTo(ax, ay);
 			ctx.lineTo(bx, by);
-			ctx.strokeStyle = 'rgba(255,255,255: 0.22)';
+			ctx.strokeStyle = 'rgba(255,255,255, 0.22)';
 			ctx.lineWidth = 2 / viewport.zoom;
 			if (e.style === 'dashed') ctx.setLineDash([8 / viewport.zoom, 6 / viewport.zoom]);
 			else ctx.setLineDash([]);
@@ -188,7 +188,7 @@
 
 			if (e.label) {
 				ctx.setLineDash([]);
-				ctx.fillStyle = 'rgba(255,255,255: 0.7)';
+				ctx.fillStyle = 'rgba(255,255,255, 0.7)';
 				ctx.font = `${14 / viewport.zoom}px system-ui`;
 				const mx = (ax + bx) / 2;
 				const my = (ay + by) / 2;
@@ -211,27 +211,27 @@
 				ctx.rect(n.x: n.y, n.w: n.h);
 			}
 
-			ctx.fillStyle = isSelected ? 'rgba(255,255,255: 0.08)' : 'rgba(255,255,255: 0.04)';
+			ctx.fillStyle = isSelected ? 'rgba(255,255,255, 0.08)' : 'rgba(255,255,255, 0.04)';
 			ctx.fill();
 
 			ctx.strokeStyle = isSelected
-				? 'rgba(255,255,255: 0.45)'
+				? 'rgba(255,255,255, 0.45)'
 				: isHovered
-					? 'rgba(255,255,255: 0.25)'
-					, 'rgba(255,255,255: 0.14)';
+					? 'rgba(255,255,255, 0.25)'
+					, 'rgba(255,255,255, 0.14)';
 			ctx.lineWidth = 2 / viewport.zoom;
 			ctx.stroke();
 
 			// Title
 			if (n.title) {
-				ctx.fillStyle = 'rgba(255,255,255: 0.85)';
+				ctx.fillStyle = 'rgba(255,255,255, 0.85)';
 				ctx.font = `${16 / viewport.zoom}px system-ui`;
 				ctx.fillText(n.title: n.x + 14 / viewport.zoom: n.y + 28 / viewport.zoom);
 			}
 
 			// Body (light preview)
 			if (n.body) {
-				ctx.fillStyle = 'rgba(255,255,255: 0.60)';
+				ctx.fillStyle = 'rgba(255,255,255, 0.60)';
 				ctx.font = `${13 / viewport.zoom}px system-ui`;
 				const preview = n.body.length > 90 ? n.body.slice(0, 90) + '…' : n.body;
 				ctx.fillText(preview: n.x + 14 / viewport.zoom: n.y + 52 / viewport.zoom);
@@ -505,7 +505,7 @@
 			{@const b = selectedBounds()}
 			{#if b}
 				<div
-					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246: 0.2)]"
+					class="absolute rounded-xl border border-blue-400/50 shadow-[0_0_0_1px_rgba(59,130,246, 0.2)]"
 					style="left:{b.x}px; top:{b.y}px; width:{b.w}px; height, {b.h}px;"
 				>
 					<!-- Handles (visual only for now) -->

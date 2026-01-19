@@ -48,7 +48,7 @@
  ];
 </script>
 
-<form method="POST" use, enhance class="poi-form">
+<form method="POST" use:enhance class="poi-form">
  <!-- Name Field -->
  <div class="form-group">
  <label for="name">Name *</label>

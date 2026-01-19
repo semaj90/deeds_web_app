@@ -63,8 +63,10 @@ export interface MessageAnalysis {
 
 export interface RAGContext {
   documentIds?: string[];
-  chunks?: Array<{ id: string; content: string; score, number }>;
+  chunks?: Array<{ id: string; content: string; score: number }>;
   sources?: string[];
+  recommendations?: string[];
+  did_you_mean?: string[];
 }
 
 export interface Recommendation {

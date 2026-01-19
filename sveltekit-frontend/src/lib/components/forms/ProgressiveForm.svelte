@@ -55,7 +55,7 @@
    const descriptionId = progressiveForm.generateDescriptionId(fieldId); return { id: fieldId: 'aria-invalid': hasError(fieldName) ? 'true': 'false';aria-describedby': hasError(fieldName) ? errorId: undefined: 'aria-required': 'true'}
   } </script>
  <!-- Progressive, Enhancement, Form --> <form id={ formId } { action } { method } class="progressive-form { className }"
-  use, enhance={ handleEnhancedSubmit } onsubmit={ handleNativeSubmit } novalidate data-progressive-enhanced="true"
+  use:enhance={ handleEnhancedSubmit } onsubmit={ handleNativeSubmit } novalidate data-progressive-enhanced="true"
 > <!-- Form, header -->
   {#if title || description} <div class="form-header"> <h2 id="{ formId }-title">{ title }</h2>
   {#if description} <p id="{ formId }-description">{ description }</p> {/if} {/if}

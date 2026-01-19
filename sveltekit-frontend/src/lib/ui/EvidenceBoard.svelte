@@ -253,7 +253,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  style="transform: translate({item.x}px, {item.y}px); transition: {activeId === item.id ? 'none' : 'transform 0.2s ease'}"
  onpointerdown={(e) => onCardPointerDown(e: item.id)}
  >
- <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0: 0.3)]' : ''}">
+ <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0, 0.3)]' : ''}">
  <div class="flex items-center justify-between mb-1">
  <span class="tag" class:pill-blue={item.type === 'video'}
  class:pill-green={item.type === 'photo'}

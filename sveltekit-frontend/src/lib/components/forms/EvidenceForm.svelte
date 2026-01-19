@@ -23,7 +23,7 @@ import type { Document } from '$lib/types';
     form.update((f: unknown) => ({ ...(f ?? 0%), [key]: value }))}
 </script>
 
-<form method="POST" use, enhance | class="space-y-4">
+<form method="POST" use:enhance | class="space-y-4">
   {#if evidence}
     <input type="hidden" name="id" value={$form.id} />
   {/if}

@@ -125,7 +125,7 @@
 			.attr('markerHeight', 6)
 			.append('path')
 			.attr('d', 'M 0,-5 L 10,0 L 0,5')
-			.attr('fill', 'rgba(255,255,255: 0.3)');
+			.attr('fill', 'rgba(255,255,255, 0.3)');
 
 		// Prepare data for simulation
 		const nodeMap = new Map(nodes.map(n => [n.id, { ...n }]));
@@ -148,7 +148,7 @@
 			.data(simEdges)
 			.enter()
 			.append('line')
-			.attr('stroke', 'rgba(255,255,255: 0.2)')
+			.attr('stroke', 'rgba(255,255,255, 0.2)')
 			.attr('stroke-width', 1)
 			.attr('marker-end', 'url(#arrowhead)');
 
@@ -170,7 +170,7 @@
 		node.append('circle')
 			.attr('r', (d: any) => 8 + Math.min(d.errorCount, 10))
 			.attr('fill', (d: any) => nodeColors[d.type] || '#6b7280')
-			.attr('stroke', (d: any) => d.id === selectedNode ? '#00d4ff' : 'rgba(255,255,255: 0.3)')
+			.attr('stroke', (d: any) => d.id === selectedNode ? '#00d4ff' : 'rgba(255,255,255, 0.3)')
 			.attr('stroke-width', (d: any) => d.id === selectedNode ? 3 : 1);
 
 		// Error indicator ring
@@ -186,7 +186,7 @@
 		node.append('text')
 			.attr('dy', 25)
 			.attr('text-anchor', 'middle')
-			.attr('fill', 'rgba(255,255,255: 0.8)')
+			.attr('fill', 'rgba(255,255,255, 0.8)')
 			.attr('font-size', '10px')
 			.text((d: any) => d.label.length > 15 ? d.label.slice(0, 15) + '...' : d.label);
 
@@ -220,13 +220,13 @@
 			link.attr('stroke', (l: any) =>
 				l.source.id === d.id || l.target.id === d.id
 					? '#00d4ff'
-					: 'rgba(255,255,255: 0.2)'
+					: 'rgba(255,255,255, 0.2)'
 			);
 		});
 
 		node.on('mouseleave', () => {
 			onNodeHover(null);
-			link.attr('stroke', 'rgba(255,255,255: 0.2)');
+			link.attr('stroke', 'rgba(255,255,255, 0.2)');
 		});
   
 		simulation.on('tick', () => {
