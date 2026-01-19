@@ -1,9 +1,7 @@
-import type { FeedbackRecommendation, UserFeedbackContext } from '$lib/types/feedback';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { PromptTemplate } from '@langchain/core/prompts';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
-// TODO: Verify these imports exist in your project or install @langchain/community
 import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 
@@ -13,14 +11,14 @@ const advancedCache = {
 };
 const RECOMMENDATION_WORKER_PATH = '/workers/recommendation-worker.js'; // TODO: Confirm path
 
-interface RecommendationContext {
+export interface RecommendationContext {
     userQuery: string;
     legalDomain: string;
     userRole: string;
     priority: string;
 }
 
-interface Recommendation {
+export interface Recommendation {
     id: string;
     title: string;
     description: string;
@@ -241,10 +239,10 @@ export class AIRecommendationEngine {
      * Enhanced recommendation generation using all integrated technologies
      */
     async generateEnhancedRecommendations(
-        userContext: UserFeedbackContext,
+        userContext: RecommendationContext,
         query: string,
         legalDomain: string = 'general'
-    ): Promise<FeedbackRecommendation[]> {
+    ): Promise<Recommendation[]> {
         // Update XState machine context
         this.interpreter.send({ type: 'UPDATE_USER_CONTEXT', data: { userContext, query, legalDomain } });
 
@@ -254,7 +252,7 @@ export class AIRecommendationEngine {
         // 3. Process with Worker
         // 4. Update stores
 
-        return get(this.recommendations) as FeedbackRecommendation[];
+        return get(this.recommendations);
     }
 }
 
