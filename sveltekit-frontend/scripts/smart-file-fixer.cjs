@@ -36,7 +36,6 @@ function fixCommonPatterns(content) {
   fixed = fixed.replace(/\.\.\.(\w+):\s+(\w+),\s+/g, '...$1, $2: ');
 
   // Pattern 4: Object literal property corruption (prop, value -> prop: value)
-  // Very careful regex to avoid false positives in function calls
   fixed = fixed.replace(/(\t|\n\s+)(\w+),\s+(\w+)(,|\s*\})/g, '$1$2: $3$4');
   fixed = fixed.replace(/(\t|\n\s+)(\w+),\s+(true|false|null|\d+|'[^']+'|"[^"]+")/g, '$1$2: $3');
 
@@ -45,6 +44,11 @@ function fixCommonPatterns(content) {
 
   // Pattern 6: Fix {, prop: -> { prop:
   fixed = fixed.replace(/\{\s*,\s+(\w+):/g, '{ $1:');
+
+  // Pattern 7: Fix let: any loop corruption
+  fixed = fixed.replace(/let:\s*any\s+(\w+)\s*=/g, 'let $1 =');
+  fixed = fixed.replace(/(\w+):\s*any\s*(<|<=|>=|>|===|!==)\s*/g, '$1 $2 ');
+  fixed = fixed.replace(/(\w+):\s*any\+\+/g, '$1++');
 
   return fixed;
 }
@@ -56,10 +60,10 @@ const targetFiles = [
   "src/lib/server/ai/rag-pipeline-enhanced.ts",
   "src/mcp-gpu-orchestrator.ts",
   "src/lib/services/enhanced-rag-pagerank.ts",
-  "src/lib/services/enhanced-api-client.ts",
   "src/lib/server/rag-sync.ts",
   "src/som-webgpu-cache.ts",
-  "src/lib/utils/simd-markdown-parser.ts"
+  "src/lib/utils/simd-markdown-parser.ts",
+  "src/lib/themes/design-system.ts"
 ];
 
 async function main() {
@@ -69,7 +73,6 @@ async function main() {
 
   let currentErrors = baseline;
 
-  // Try to fix each file, validate, and revert if it increases errors
   for (const filePath of targetFiles) {
     if (!fs.existsSync(filePath)) {
       console.log(`Skipping missing file: ${filePath}`);
@@ -97,7 +100,6 @@ async function main() {
       currentErrors = newCount;
     } else if (newCount === currentErrors) {
        console.log(`  ⚠️ NEUTRAL - No error reduction, keeping fix as syntax cleanup`);
-       // Often syntax fixes don't reduce TSC errors until types align, but valid syntax is better
     } else {
       console.log(`  ❌ REVERTED - Would increase errors by ${newCount - currentErrors} (Cascade effect)`);
       fs.writeFileSync(filePath, originalContent);

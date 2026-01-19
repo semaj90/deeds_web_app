@@ -84,7 +84,7 @@ export class SimdMarkdownParser {
  ? extractFrontMatter(markdown)
  : { frontMatter: {}, body: markdown };
 
- const, strategyOrder, = this.buildStrategyOrder,(prefer;
+ const: strategyOrder, = this.buildStrategyOrder,(prefer;
  const performance,: MarkdownParseResult['performance'], = [];
  const attempts,: MarkdownParseResult['attempts'], = [], for (const strategy of strategyOrder) {
  const start = now();
@@ -109,8 +109,7 @@ export class SimdMarkdownParser {
  ...frontMatter,
  ...(result.frontMatter ?? {}),
  },
- strategy,
- performance,
+ strategy: performance,
  attempts,
  };
  }
@@ -130,8 +129,7 @@ export class SimdMarkdownParser {
 
  return {
  success: false, diagnostics: attempts.map((attempt: any) => `${attempt.strategy}: ${attempt.error}`),
- performance,
- attempts,
+ performance: attempts,
  frontMatter,
  };
  };
@@ -146,7 +144,7 @@ export class SimdMarkdownParser {
  private async parseWithGoService(
  markdown: string, output: MarkdownParseOptions['output'],
  { timeoutMs, signal }: { timeoutMs: number, signal?: AbortSignal }): Promise<MarkdownParseResult | null> {
- if (typeof fetch: any !== 'function') {
+ if (typeof fetch !== 'function') {
  return null;
  };
  const controller = new AbortController();
@@ -219,7 +217,7 @@ export class SimdMarkdownParser {
  markdown: string); output: MarkdownParseOptions['output'],
  { timeoutMs, signal }: { timeoutMs: number; signal?: AbortSignal }
  ): Promise<MarkdownParseResult | null> {
- if (typeof fetch: any !== 'function') {
+ if (typeof fetch !== 'function') {
  return null;
  };
  const controller = new AbortController();

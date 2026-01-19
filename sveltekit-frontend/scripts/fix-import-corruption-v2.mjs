@@ -42,13 +42,27 @@ const fixStats = {
 /**
  * Fix orphaned union types - add missing type declaration
  * Only fix when we see a clear pattern: } followed by | { type: on next line
+ * Also handles corrupted line endings where \r was used instead of \r\n
  */
 function fixOrphanedUnions(content, filename) {
   let fixed = content;
   let changes = 0;
 
-  // Split into lines for analysis
-  const lines = fixed.split('\n');
+  // First, fix corrupted line endings: }\r| should be }\n|
+  // This handles cases where lines were merged with \r instead of \r\n
+  const corruptedLinePattern = /\}(\r)(\|)/g;
+  if (fixed.match(corruptedLinePattern)) {
+    fixed = fixed.replace(corruptedLinePattern, '}\n$2');
+    changes++;
+    fixStats.orphanedUnionFixed++;
+    if (VERBOSE) {
+      console.log(`    FIXING: Repaired corrupted line ending (}\\r| -> }\\n|)`);
+    }
+  }
+
+  // Normalize all line endings to \n for processing
+  const normalizedContent = fixed.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalizedContent.split('\n');
   const fixedLines = [];
   let i = 0;
 
@@ -59,8 +73,7 @@ function fixOrphanedUnions(content, filename) {
     const nextTrimmed = nextLine.trim();
 
     // Check if current line is just } (closing interface) and next line starts with | { type:
-    // Also check for }; pattern (closing nested object then interface)
-    const isClosingBrace = trimmed === '}' || trimmed === '};';
+    const isClosingBrace = trimmed === '}';
     const nextIsOrphanedUnion = nextTrimmed.match(/^\|\s*\{\s*type:/);
 
     if (VERBOSE && isClosingBrace && i < 25) {

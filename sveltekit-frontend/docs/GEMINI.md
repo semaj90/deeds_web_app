@@ -112,6 +112,7 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
 |---------|---------|-------|
 | `index_signature` | `[key, string]` → `[key: string]` | ~10 |
 | `interface_property` | `prop, Type;` → `prop: Type;` | ~10 |
+| `loop_corruption` | `let: any i = 0` → `let i = 0` | ~5 |
 
 **⚠️ UNSAFE Patterns (Causes Regressions):**
 | Pattern | Example | Impact |

@@ -562,6 +562,7 @@ npx svelte-check --threshold error
 - Dry-run batch (8 files) reduced `svelte-check` to 50,785 errors / 100 warnings (1446 files).
 - Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
 - Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
+- Post-fix `svelte-check`: 50,782 errors / 100 warnings (1445 files).
 
 
 ## Phase 89: ACE Analysis - 1/11/2026, 4:51:25 PM

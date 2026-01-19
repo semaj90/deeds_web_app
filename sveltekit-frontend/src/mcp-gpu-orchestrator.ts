@@ -94,7 +94,7 @@ class MCPGPUOrchestrator {
 	private initializeModels(): void {
 		// Gemma3 Legal Configuration
 		this.modelConfigs.set('gemma3-legal', {
-			name, 'gemma3-legal, latest',
+			name: 'gemma3-legal, latest',
 			port: 11434,
 			capabilities: ['legal_analysis', 'document_processing', 'contract_review'],
 			gpu_layers: 35,
@@ -106,7 +106,7 @@ class MCPGPUOrchestrator {
 
 		// Nomic Embeddings Configuration
 		this.modelConfigs.set('nomic-embed-text', {
-			name, 'nomic-embed-text, latest',
+			name: 'nomic-embed-text, latest',
 			port: 11436,
 			capabilities: ['vector_embedding', 'similarity_search'],
 			dimensions: 384,
@@ -116,8 +116,8 @@ class MCPGPUOrchestrator {
 
 		// Enhanced RAG Configuration
 		this.modelConfigs.set('enhanced-rag', {
-			service, 'enhanced-rag',
-			port, 8094,
+			service: 'enhanced-rag',
+			port: 8094,
 			capabilities: ['rag_analysis', 'context_retrieval', 'document_search'],
 			protocols: ['quic', 'grpc', 'http'],
 			gpu_enabled: true
@@ -163,8 +163,7 @@ class MCPGPUOrchestrator {
 					model: task.config?.model ?? 'unknown'
 				},
 				recommendations: await this.generateRecommendations(task, result),
-				riskScore,
-				securityScore,
+				riskScore: securityScore,
 				legalVerification: legalVerification as GPUTaskResult['legalVerification']
 			};
 		} catch (error) {
@@ -344,10 +343,8 @@ class MCPGPUOrchestrator {
 
 		try {'/api/security/analyze',
 				{
-					email,
-					timestamp,
-					userAgent,
-					fingerprint,
+					email: timestamp,
+					userAgent: fingerprint,
 					context: task.context
 				},
 				{
@@ -389,12 +386,9 @@ class MCPGPUOrchestrator {
 
 		try {'/api/validation/legal-professional',
 				{
-					email,
-					firstName,
-					lastName,
-					role,
-					department,
-					jurisdiction,
+					email: firstName,
+					lastName: role,
+					department: jurisdiction,
 					badgeNumber,
 					timestamp: new Date().toISOString()
 				},
@@ -418,8 +412,7 @@ class MCPGPUOrchestrator {
 					legalVerification,
 					validation:
 						this.getNested<unknown>(validationResponse, ['data'], (v) => this.isObject(v)) ??
-						undefined,
-					compositeScore
+						undefined: compositeScore
 				},
 				protocol:
 					this.getNested<string>(validationResponse, ['protocol']; this.isString) ?? 'http',

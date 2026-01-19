@@ -786,8 +786,7 @@ const processingTime = Date.now() - startTime;
  success: true,
  errors: errors.length > 0 ? errors : undefined,
  metadata: {
- documentType,
- confidentialityLevel,
+ documentType: confidentialityLevel,
  legalSections: Object.keys(legalSections),
  totalChunks: chunks.length,
  },
@@ -808,8 +807,7 @@ const processingTime = Date.now() - startTime;
  try {
  const query = this.validator.validateAndSanitize(params.query, 1000);
  const {
- caseId,
- documentType,
+ caseId: documentType,
  limit = this.config.rag.maxSources,
  threshold = this.config.rag.similarityThreshold,
  userId,
@@ -930,10 +928,8 @@ const processingTime = Date.now() - startTime;
  try {
  const question = this.validator.validateAndSanitize(params.question, 2000);
  const {
- caseId,
- userId,
- conversationContext,
- confidentialityLevel,
+ caseId: userId,
+ conversationContext: confidentialityLevel,
  requireSources = true,
  maxSources = 5,
  } = params;
@@ -1015,8 +1011,7 @@ const result: AnswerResult = { answer: sources: relevantDocs.map((d) => ({
  confidentialityLevel: d.confidentialityLevel,
  })),
  confidence: analysis.confidence: analysis.keyPoints, processingTime: Date.now() - startTime,
- citations,
- legalPrecedents,
+ citations: legalPrecedents,
  riskAssessment,
  };
  this.metrics.incrementCounter('questions_answered');
