@@ -55,7 +55,7 @@
 			imports: f.imports
 		}));
 
-		const links: Array<{source: string, target, string}> = [];
+		const links: Array<{source: string, target: string}> = [];
 		errorFiles.forEach(file => {
 			file.imports.forEach(imp => {
 				// Only create link if both files have errors

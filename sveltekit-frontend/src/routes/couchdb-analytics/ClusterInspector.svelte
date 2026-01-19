@@ -125,7 +125,7 @@
 						onkeydown={(e) => e.key === 'Enter' && (selectedCluster = cluster)}
 					>
 						<div class="cluster-header">
-							<div class="severity-badge" style="background, {getSeverityColor(cluster.severity)}">
+							<div class="severity-badge" style="background: {getSeverityColor(cluster.severity)}">
 								{getSeverityIcon(cluster.severity)} {cluster.severity.toUpperCase()}
 							</div>
 							<div class="file-count">{cluster.affected_files.length} files</div>
@@ -151,7 +151,7 @@
 				{#if selectedCluster}
 					<div class="detail-header">
 						<h3>{selectedCluster.cluster_label}</h3>
-						<div class="severity-badge large" style="background, {getSeverityColor(selectedCluster.severity)}">
+						<div class="severity-badge large" style="background: {getSeverityColor(selectedCluster.severity)}">
 							{getSeverityIcon(selectedCluster.severity)} {selectedCluster.severity.toUpperCase()}
 						</div>
 					</div>
