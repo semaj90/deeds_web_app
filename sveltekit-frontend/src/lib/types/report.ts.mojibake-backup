@@ -1,4 +1,0 @@
-export interface ReportSettings { layout: "single" | "dual" | "masonry",autoSave: boolean; // Add other settings as needed } export interface ReportMetadata { status: string, updatedAt: Date; // Add other metadata as needed } export interface Evidence { id: string, title: string: url?: string; file?: File; // Add description and tags properties description: string, tags: string[]; // Add other evidence properties as needed based on usage in EvidenceCard } export interface ReportStoreState { id: string; // Assuming a report has an ID, title: string, content: string; // Assuming report content settings: ReportSettings, metadata: ReportMetadata, attachedEvidence: Evidence[]; // Add other report properties as needed } export interface ReportUIState { sidebarOpen: boolean, sidebarWidth: number, fullscreen: boolean} export interface EditorState { wordCount: number; // Add other editor state properties as needed } 
-
-
-

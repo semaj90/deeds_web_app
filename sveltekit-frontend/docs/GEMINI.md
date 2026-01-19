@@ -64,6 +64,7 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
   - `user-recommendation-service.ts`: ✅ Fixed (Manual rewrite of corrupted header)
   - `sveltekit-gpu-cache-integration.ts`: ✅ Fixed (Manual logic repair)
   - `simd-json-parser.ts`: ✅ Fixed (Manual rewrite)
+  - `rag-sync.ts`: ✅ Fixed (Rewrote corrupted SQL/Types)
   - `nes-memory-architecture.ts`: ⚠️ Neutral
 
 ### Next Actions

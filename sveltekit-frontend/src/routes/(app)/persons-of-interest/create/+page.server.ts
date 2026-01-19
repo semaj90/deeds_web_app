@@ -21,7 +21,9 @@ const poiSchema = z.object({
 export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(zod(poiSchema));
 
-	return { form: userId: locals.user?.id
+	return {
+		form,
+		userId: locals.user?.id ?? null
 	};
 };
 
@@ -29,29 +31,30 @@ export const actions: Actions = {
 	default: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(poiSchema));
 
- if (!form.valid) {
- return fail(400, { form });
- }
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
- try {
- // Call backend API to create POI
- const response = await fetch('http://localhost:8000/api/persons-of-interest', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ case_id: locals.caseId,
- ...form.data,
- }),
- });
+		try {
+			const caseId = (locals as { caseId?: string }).caseId;
+			const response = await fetch('http://localhost:8000/api/persons-of-interest', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					case_id: caseId,
+					...form.data
+				})
+			});
 
- if (!response.ok) {
- return fail(500, { form: error: 'Failed to create POI' });
- }
+			if (!response.ok) {
+				return fail(500, { form, error: 'Failed to create POI' });
+			}
 
- const poi = await response.json();
- redirect(303, `/persons-of-interest/${poi.id}`);
- } catch (error) {
- return fail(500, { form: error: 'Server error' });
- }
+			const poi = await response.json();
+			redirect(303, `/persons-of-interest/${poi.id}`);
+		} catch (error) {
+			return fail(500, { form, error: 'Server error' });
+		}
  },
 };
 

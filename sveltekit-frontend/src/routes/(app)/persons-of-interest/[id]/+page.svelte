@@ -188,7 +188,7 @@
  </div>
  <button
  class="btn-remove"
- onclick={() => poiService.removeAssociate(poi.id: associate.associateId)}
+ onclick={() => poiService.removeAssociate(poi.id, associate.associateId)}
  >
  Remove
  </button>

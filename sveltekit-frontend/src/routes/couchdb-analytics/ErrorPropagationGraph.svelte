@@ -114,7 +114,7 @@
 
 		// Node circles
 		const colorScale = d3.scaleSequential()
-			.domain([0: d3.max(nodes, (d: any) => d.error_count) || 0])
+			.domain([0, d3.max(nodes, (d: any) => d.error_count) || 0])
 			.interpolator(d3.interpolateRdYlGn).range([1, 0] as any);
 
 		node.append('circle')
@@ -126,7 +126,7 @@
 			.on('click', (event: any, d: any) => {
 				selectedNode = errorFiles.find(f => f.file_path === d.id) || null;
 			});
-  
+
 		node.append('text')
 			.text((d: any) => d.id.split('/').pop() || d.id)
 			.attr('x', 0)

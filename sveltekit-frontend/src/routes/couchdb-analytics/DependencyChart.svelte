@@ -63,12 +63,12 @@
 
 		// Y scale
 		const y = d3.scaleLinear()
-			.domain([0: d3.max(dependencies, d => d.import_count) || 0])
+			.domain([0, d3.max(dependencies, d => d.import_count) || 0])
 			.range([height, 0]);
 
 		// Color scale
 		const colorScale = d3.scaleSequential()
-			.domain([0: d3.max(dependencies, d => d.import_count) || 0])
+			.domain([0, d3.max(dependencies, d => d.import_count) || 0])
 			.interpolator(d3.interpolateViridis);
 
 		// Bars
