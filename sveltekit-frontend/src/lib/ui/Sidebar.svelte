@@ -31,7 +31,7 @@ let currentPath = $state(page.url.pathname);
  href={item.href}
  class="flex items-center justify-between px-4 py-2 text-xs font-mono tracking-[0.16em]
  uppercase border-b border-black/20 hover: bg-panelSoft, hover:text-sand
- {currentPath === item.href ? 'bg-panel text-accent' , 'text-black'}"
+ {currentPath === item.href ? 'bg-panel text-accent' : 'text-black'}"
  >
  <span>{item.label}</span>
  </a>

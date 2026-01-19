@@ -148,7 +148,7 @@
 				/>
 			</div>
 			<Button class="bits-btn" variant="outline" onclick={triggerReindex} disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' , ''}`} />
+				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Reindex
 			</Button>
 		</div>

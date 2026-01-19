@@ -578,6 +578,21 @@ python scripts/phase66_automated_error_fixer.py
 3. **One-pass fixes** - Need iterative validation
 
 ### Recommendations
+
+---
+
+## Phase 107 Fix Notes (2026-01-19)
+
+- Repaired corrupted unions in `src/lib/types/evidence.ts` (added `WorkflowEvent`, `EvidenceWebSocketMessage`, `EvidenceSnapshot`).
+- Fixed `AIAgentTool` param typing (`required?: boolean`) to restore TS parsing.
+- Fixed `src/ToolInvoker.ts` diagnostics flow (restored `cmd`, removed undefined `result`, corrected `updateConfidence` signature).
+- Fixed `src/lib/services/goServiceClient.ts` type signatures and health check flow (restored `Promise.allSettled`, corrected param types).
+- Fixed `src/agentic-stream.ts` stream typing and export issues (callback types, decoder options, export list).
+- Fixed `src/routes/(app)/codebase-index/[fileId]/+page.server.ts` broken comment/return line.
+- Fixed `src/routes/+page.server.ts` Promise.all destructuring and response shape.
+- Dry-run batch (5 files) reduced `svelte-check` to 51,398 errors / 94 warnings (1455 files).
+- Fixed `src/routes/(app)/codebase-index/+page.server.ts` bad `console.error` formatting.
+- Fixed `src/routes/(app)/phase78/routes/[routePath]/+page.server.ts` malformed summary object.
 1. **Always dry-run** before bulk application
 2. **Validate incrementally** (after each 100-500 fixes)
 3. **Git commit** before each fix batch

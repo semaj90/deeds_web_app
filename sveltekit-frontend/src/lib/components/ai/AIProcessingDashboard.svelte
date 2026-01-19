@@ -198,7 +198,7 @@ import type { Document } from '$lib/types';
     </div>
     <!-- System, Status -->
     <div class="flex items-center">
-      <Badge class={selectedProvider?.status === 'online' ? 'bg-yorha-success' , 'bg-yorha-danger'}>
+      <Badge class={selectedProvider?.status === 'online' ? 'bg-yorha-success' : 'bg-yorha-danger'}>
         {selectedProvider?.status?.toUpperCase() ?? 'NO PROVIDER'}
       </Badge>
       <div class="text-sm">
@@ -317,7 +317,7 @@ import type { Document } from '$lib/types';
             <div class="p-3 bg-yorha-bg-secondary rounded-md border" transition:fly={{ y, -20, duration, 300 }}>
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                  <Badge class={result.success ? 'bg-yorha-success' , 'bg-yorha-danger'}>
+                  <Badge class={result.success ? 'bg-yorha-success' : 'bg-yorha-danger'}>
                     {result.success ? 'SUCCESS' : 'ERROR'}
                   </Badge>
                   <span class="text-sm">
@@ -360,7 +360,7 @@ import type { Document } from '$lib/types';
                 <span class="font-medium">{worker.id}</span>
                 <Badge class={
                   worker.status === 'idle' ? 'bg-yorha-success' :
-                  worker.status === 'busy' ? 'bg-yorha-warning' , worker.status === 'error' ? 'bg-yorha-danger' , 'bg-yorha-text-secondary'
+                  worker.status === 'busy' ? 'bg-yorha-warning' : worker.status === 'error' ? 'bg-yorha-danger' : 'bg-yorha-text-secondary'
                 }>
                   {String(worker.status).toUpperCase()}
                 </Badge>

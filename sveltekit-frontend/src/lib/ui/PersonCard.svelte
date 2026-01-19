@@ -64,7 +64,7 @@
  <div class="absolute -top-1 -right-1">
  <span class={
  riskLevel === 'high' ? 'pill-red' :
- riskLevel === 'medium' ? 'pill-yellow' , 'pill-green'
+ riskLevel === 'medium' ? 'pill-yellow' : 'pill-green'
  }>
  { riskLevel }
  </span>

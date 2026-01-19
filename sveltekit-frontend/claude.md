@@ -578,6 +578,14 @@ git reset --hard HEAD
 ## 🔧 Recommended Fix Order
 
 | Priority | Pattern | Tool | Est. Reduction | Reason |
+
+---
+
+## Phase 107 Fix Notes (2026-01-19)
+
+- Repaired corrupted unions in `src/lib/types/evidence.ts` (added `WorkflowEvent`, `EvidenceWebSocketMessage`, `EvidenceSnapshot`).
+- Fixed `AIAgentTool` param typing (`required?: boolean`) to restore TS parsing.
+- Fixed `src/ToolInvoker.ts` diagnostics flow (restored `cmd`, removed undefined `result`, corrected `updateConfidence` signature).
 |----------|---------|------|----------------|--------|
 | **1** | CSS selectors | `fix-css-selectors.mjs` | -1,000 | Safe, high impact |
 | **2** | Type imports (re-run) | `fix-type-imports.mjs` | -500 | Catch edge cases |
@@ -676,6 +684,21 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 - `src/routes/(app)/admin/knowledge-search/` - ✅ Migrated to SSR
 - `src/lib/server/embeddings/ollama.ts` - ✅ Regenerated (clean)
 - `src/lib/server/db/qdrant-integration.ts` - ✅ Regenerated (clean)
+
+---
+
+## Phase 107 Fix Notes (2026-01-19)
+
+- Repaired corrupted unions in `src/lib/types/evidence.ts` (added `WorkflowEvent`, `EvidenceWebSocketMessage`, `EvidenceSnapshot`).
+- Fixed `AIAgentTool` param typing (`required?: boolean`) to restore TS parsing.
+- Fixed `src/ToolInvoker.ts` diagnostics flow (restored `cmd`, removed undefined `result`, corrected `updateConfidence` signature).
+- Fixed `src/lib/services/goServiceClient.ts` type signatures and health check flow (restored `Promise.allSettled`, corrected param types).
+- Fixed `src/agentic-stream.ts` stream typing and export issues (callback types, decoder options, export list).
+- Fixed `src/routes/(app)/codebase-index/[fileId]/+page.server.ts` broken comment/return line.
+- Fixed `src/routes/+page.server.ts` Promise.all destructuring and response shape.
+- Dry-run batch (5 files) reduced `svelte-check` to 51,398 errors / 94 warnings (1455 files).
+- Fixed `src/routes/(app)/codebase-index/+page.server.ts` bad `console.error` formatting.
+- Fixed `src/routes/(app)/phase78/routes/[routePath]/+page.server.ts` malformed summary object.
 
 ---
 

@@ -358,8 +358,7 @@ export class SvelteKitGPUCacheIntegration {
 
 			if (options.userId) {
 				this.updateUserHistory(options.userId, 'set', {
-					key,
-					size,
+					key: size,
 					tags: options?.tags|| []
 				});
 			}
@@ -432,8 +431,7 @@ export class SvelteKitGPUCacheIntegration {
 
 		const history = this.userHistory.get(userId)!;
 		history.push({
-			action,
-			data,
+			action: data,
 			timestamp: Date.now(),
 			sessionId: this.generateSessionId()
 		});

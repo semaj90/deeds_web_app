@@ -166,29 +166,29 @@
 
  <!-- Text Formatting -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
- <button type="button" onclick={ toggleBold } class="toolbar-btn {isBold ? 'active' , ''}" title="Bold (Ctrl+B)">
+ <button type="button" onclick={ toggleBold } class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
  <span class="i-lucide-bold"></span>
  </button>
- <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' , ''}" title="Italic (Ctrl+I)">
+ <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' : ''}" title="Italic (Ctrl+I)">
  <span class="i-lucide-italic"></span>
  </button>
- <button type="button" onclick={toggleUnderline} class="toolbar-btn {isUnderline ? 'active' , ''}" title="Underline (Ctrl+U)">
+ <button type="button" onclick={toggleUnderline} class="toolbar-btn {isUnderline ? 'active' : ''}" title="Underline (Ctrl+U)">
  <span class="i-lucide-underline"></span>
  </button>
- <button type="button" onclick={toggleStrike} class="toolbar-btn {isStrike ? 'active' , ''}" title="Strikethrough">
+ <button type="button" onclick={toggleStrike} class="toolbar-btn {isStrike ? 'active' : ''}" title="Strikethrough">
  <span class="i-lucide-strikethrough"></span>
  </button>
  </div>
 
  <!-- Lists -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark, border-gray-600">
- <button type="button" onclick={ toggleBulletList } class="toolbar-btn {isBulletList ? 'active' , ''}" title="Bullet List">
+ <button type="button" onclick={ toggleBulletList } class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
  <span class="i-lucide-list"></span>
  </button>
- <button type="button" onclick={ toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' , ''}" title="Numbered List">
+ <button type="button" onclick={ toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
  <span class="i-lucide-list-ordered"></span>
  </button>
- <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' , ''}" title="Quote">
+ <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' : ''}" title="Quote">
  <span class="i-lucide-quote"></span>
  </button>
  </div>

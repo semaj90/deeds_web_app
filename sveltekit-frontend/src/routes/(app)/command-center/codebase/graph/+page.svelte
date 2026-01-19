@@ -211,7 +211,7 @@
 				{/if}
 			</Button>
 			<Button class="bits-btn" variant="outline" onclick={ loadGraphData } disabled={isLoading}>
-				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' , ''}`} />
+				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Refresh
 			</Button>
 		</div>
@@ -226,7 +226,7 @@
 					<div class="filter-chips">
 						{#each availableTypes as type}
 							<button
-								class={`filter-chip ${filters.types.includes(type) ? 'active' , ''} ${getTypeColor(type)}`}
+								class={`filter-chip ${filters.types.includes(type) ? 'active' : ''} ${getTypeColor(type)}`}
 								onclick={() => toggleTypeFilter(type)}
 							>
 								{ type }

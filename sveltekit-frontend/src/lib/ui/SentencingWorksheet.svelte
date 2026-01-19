@@ -101,11 +101,11 @@
  {#each aggravatingFactors as factor}
  <button
  class="text-left panel-soft px-3 py-2 flex items-center gap-3 cursor-pointer
- hover:bg-panel {factor.selected ? 'ring-2 ring-danger/50' , ''}"
+ hover:bg-panel {factor.selected ? 'ring-2 ring-danger/50' : ''}"
  onclick={() => toggleAggravating(factor.id)}
  >
  <div class="w-4 h-4 rounded border border-black/60 flex items-center justify-center
- {factor.selected ? 'bg-danger' , 'bg-sandDark'}">
+ {factor.selected ? 'bg-danger' : 'bg-sandDark'}">
  {#if factor.selected}
  <span class="i-heroicons-check text-white text-xs" ></span>
  {/if}
@@ -129,11 +129,11 @@
  {#each mitigatingFactors as factor}
  <button
  class="text-left panel-soft px-3 py-2 flex items-center gap-3 cursor-pointer
- hover:bg-panel {factor.selected ? 'ring-2 ring-accent/50' , ''}"
+ hover:bg-panel {factor.selected ? 'ring-2 ring-accent/50' : ''}"
  onclick={() => toggleMitigating(factor.id)}
  >
  <div class="w-4 h-4 rounded border border-black/60 flex items-center justify-center
- {factor.selected ? 'bg-accent' , 'bg-sandDark'}">
+ {factor.selected ? 'bg-accent' : 'bg-sandDark'}">
  {#if factor.selected}
  <span class="i-heroicons-check text-black text-xs" ></span>
  {/if}

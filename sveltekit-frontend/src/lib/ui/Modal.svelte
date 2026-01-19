@@ -131,7 +131,7 @@ import { X } from "lucide-svelte";
  role="dialog"
  aria-modal="true"
  aria-labelledby={title ? 'modal-title' : undefined}
- aria-describedby={description ? 'modal-description' , undefined}
+ aria-describedby={description ? 'modal-description' : undefined}
  tabindex="-1"
  >
  <div class="modal-content" role="document">

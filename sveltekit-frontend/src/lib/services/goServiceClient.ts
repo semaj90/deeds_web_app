@@ -55,7 +55,7 @@ export class GoServiceClient {
         }
     }
 
-    async uploadFile(file, File, metadata?: Record<string, any>): Promise<UploadResponse> {
+    async uploadFile(file: File, metadata?: Record<string, unknown>): Promise<UploadResponse> {
         try {
             const formData = new FormData();
             formData.append('file', file);
@@ -75,7 +75,9 @@ export class GoServiceClient {
         }
     }
 
-    async checkHealth(): Promise<{ rag: boolean; upload: boolean; kratos: boolean }> {fetch(`${this.config.enhancedRagUrl}/health`, { signal: AbortSignal.timeout(5000) }),
+    async checkHealth(): Promise<{ rag: boolean; upload: boolean; kratos: boolean }> {
+        const results = await Promise.allSettled([
+            fetch(`${this.config.enhancedRagUrl}/health`, { signal: AbortSignal.timeout(5000) }),
             fetch(`${this.config.uploadServiceUrl}/health`, { signal: AbortSignal.timeout(5000) }),
             fetch(`${this.config.kratosServerUrl}/health`, { signal: AbortSignal.timeout(5000) })
         ]);
@@ -87,7 +89,7 @@ export class GoServiceClient {
         };
     }
 
-    async semanticSearch(query, string, userId?: string, options?: any): Promise<RAGResponse> {
+    async semanticSearch(query: string, userId?: string, options?: Record<string, unknown>): Promise<RAGResponse> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/semantic-search`, {
                 method: 'POST',
@@ -121,7 +123,7 @@ export class GoServiceClient {
         }
     }
 
-    async rateSuggestion(data: any): Promise<{ success, boolean }> {
+    async rateSuggestion(data: Record<string, unknown>): Promise<{ success: boolean; message?: string }> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/suggestion/rate`, {
                 method: 'POST',
@@ -134,7 +136,7 @@ export class GoServiceClient {
             return await response.json();
         } catch (error) {
             console.error('Rate suggestion failed:', error);
-            return { success, false };
+            return { success: false, message: error instanceof Error ? error.message : 'Unknown error' };
         }
     }
 }

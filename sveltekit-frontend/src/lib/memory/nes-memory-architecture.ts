@@ -574,10 +574,8 @@ export class NESMemoryArchitecture {
  }
 
  return { totalRAM: usedRAM,
- totalCHR,
-   usedCHR,
-   totalPRG,
-   usedPRG,
+ totalCHR: usedCHR,
+   totalPRG: usedPRG,
    bankSwitches: this.bankSwitchCount,
    garbageCollections: this.gcCount,
    compressionSavings: this.calculateCompressionSavings(),

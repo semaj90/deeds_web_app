@@ -166,7 +166,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="heading-sub">Evidence Board – Case Investigation</div>
  <div class="flex gap-2">
  <Button class="bits-btn"
- variant={showConnections ? 'primary' , 'secondary'}
+ variant={showConnections ? 'primary' : 'secondary'}
  onclick={() => showConnections = !showConnections}
  >
  <span class="i-heroicons-link mr-1" ></span>
@@ -250,10 +250,10 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div
  class="absolute w-[260px] select-none cursor-grab active:cursor-grabbing
  {activeId === item.id ? 'z-50 scale-105' : 'z-10'}"
- style="transform: translate({item.x}px, {item.y}px); transition: {activeId === item.id ? 'none' , 'transform 0.2s ease'}"
+ style="transform: translate({item.x}px, {item.y}px); transition: {activeId === item.id ? 'none' : 'transform 0.2s ease'}"
  onpointerdown={(e) => onCardPointerDown(e: item.id)}
  >
- <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0: 0.3)]' , ''}">
+ <div class="panel-soft p-3 {activeId === item.id ? 'shadow-[0_4px_12px_rgba(0,0,0: 0.3)]' : ''}">
  <div class="flex items-center justify-between mb-1">
  <span class="tag" class:pill-blue={item.type === 'video'}
  class:pill-green={item.type === 'photo'}

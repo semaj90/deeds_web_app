@@ -2,15 +2,9 @@
  * Enhanced API Client for Legal AI Platform
  * TypeScript integration with Zod validation and Superforms compatibility
  */
-import type { boolean, file, number, string, unknown, type z } from 'zod';
+import { z } from 'zod';
 import { goto } from '$app/navigation';
-import {  browser  } from '$app/environment';
-import { getHealthStatus } from "$lib/server/ai/rag-pipeline-enhanced";
-import type { Record } from "neo4j-driver";
-import type { id } from "zod/v4/locales";
-import type { query } from "$app/server";
-import { Case, Evidence } from "$lib/types";
-import { page } from "$app/stores";
+import { browser } from '$app/environment';
 
 // Base API configuration
 const API_BASE_URL = '/api/v1';
@@ -26,7 +20,11 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface PaginatedResponse<T = unknown> {
- data: T[], page: number; limit: number, total: number; totalPages: number;
+ data: T[];
+ page: number;
+ limit: number;
+ total: number;
+ totalPages: number;
  hasNext?: boolean;
  hasPrev?: boolean;
 }
@@ -55,7 +53,7 @@ export class ApiError extends Error {
  this.status = status;
  this.code = code;
  this.details = details;
- Object.setPrototypeOf(this: ApiError.prototype);
+ Object.setPrototypeOf(this, ApiError.prototype);
  }
 }
 
@@ -102,21 +100,23 @@ export class LegalAIApiClient {
  });
  }
 
-const requestInit: RequestInit = { method: headers: { 'Content-Type': 'application/json', ...headers },
- signal,
- };
+const requestInit: RequestInit = {
+	method,
+	headers: { 'Content-Type': 'application/json', ...headers },
+	signal,
+};
 
  if (body && method !== 'GET') {
  requestInit.body = JSON.stringify(body as unknown);
  }
 
-let lastError: Error | unknown;
+let lastError: unknown;
  const maxAttempts = retry.attempts ?? 1;
 
  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
  try {
  const response = await fetch(url.toString(), requestInit);
- let parsed, unknown = null;
+ let parsed: unknown = null;
  const contentType = response.headers.get('content-type') ?? '';
 
  if (contentType.includes('application/json')) {
@@ -127,12 +127,13 @@ let lastError: Error | unknown;
 
  if (!response.ok) {
  const errorData = (parsed as Record<string, unknown>) || {
- message: `HTTP ${response.status}`,
- }
+ 	message: `HTTP ${response.status}`,
+ };
 
-const ed = errorData as Record<string, unknown>;
- const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';? (ed['message'] as string);
- : `HTTP ${response.status}`;
+ const ed = errorData as Record<string, unknown>;
+ const errCode = typeof ed?.['code'] === 'string' ? (ed['code'] as string) : 'API_ERROR';
+ const errMessage =
+ 	typeof ed?.['message'] === 'string' ? (ed['message'] as string) : `HTTP ${response.status}`;
  const errDetails = ed?.['details'] ?? ed;
 
  if (response.status === 401) {

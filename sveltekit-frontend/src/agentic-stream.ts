@@ -4,10 +4,10 @@
 import type { AIResponse, ChatMessage } from '$lib/types/evidence';
 
 // Environment configuration
-const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL?? 'http://localhost:8000';
-const MODEL_NAME = process.env?.AI_MODEL?? 'gemma3-legal:latest';
+const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';
+const MODEL_NAME = process.env?.AI_MODEL ?? 'gemma3-legal:latest';
 
-type StreamCallback = (token, string, fullText: string) => void | Promise<void>;
+type StreamCallback = (token: string, fullText: string) => void | Promise<void>;
 
 interface OllamaStreamResponse {
   model: string; created_at: string; response: string; done: boolean;
@@ -15,13 +15,13 @@ interface OllamaStreamResponse {
 
 interface TensorRTRequest {
   model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
-  outputs: Array<{ name, string }>;
+  outputs: Array<{ name: string }>;
 }
 
 // Main streaming function with Ollama primary + TensorRT fallback
 export async function runAIAgentStream(
   prompt: string,
-  onToken: (token, string, fullText: string) => Promise<void>,
+  onToken: (token: string, fullText: string) => Promise<void>,
   options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
   console.log(`[AI Agent Stream] Running for prompt: ${prompt}`);
@@ -44,7 +44,7 @@ export async function runAIAgentStream(
 async function streamFromOllama(
   prompt: string,
   onChunk: StreamCallback,
-  options?: { model?: string, temperature?: number, maxTokens?: number; systemPrompt?: string }
+  options?: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }
 ): Promise<AIResponse> {
   const startTime = Date.now();
   let fullText = '';
@@ -86,7 +86,7 @@ async function streamFromOllama(
             });
             return;
           }
-          const chunk = decoder.decode(value, { stream, true });
+          const chunk = decoder.decode(value, { stream: true });
           const lines = chunk.split('\n').filter((line) => line.trim());
 
           for (const line of lines) {
@@ -114,7 +114,7 @@ async function streamFromOllama(
 async function streamFromTensorRT(
   prompt: string,
   onChunk: StreamCallback,
-  options?: { model?: string, temperature?: number, maxTokens?: number; systemPrompt?: string }
+  options?: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }
 ): Promise<AIResponse> {
   const startTime = Date.now();
 
@@ -250,13 +250,14 @@ export function getOllamaEndpoint(): string {
   // 3. Docker service host (when running in compose)
   // 4. Localhost fallback for single-machine dev
   return (
-    process.env?.OLLAMA_URL||
-    process.env?.OLLAMA_BASE_URL?? 'http://ollama:11434' ?? 'http://localhost:11434'
+    process.env?.OLLAMA_URL ??
+    process.env?.OLLAMA_BASE_URL ??
+    'http://localhost:11434'
   );
 }
 
 // Export streaming functions
-export { streamFromOllama as streamFromTensorRT };
+export { streamFromOllama, streamFromTensorRT };
 
 
 

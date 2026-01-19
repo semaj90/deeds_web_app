@@ -10,7 +10,7 @@
  <h3 class="font-serif text-xl text-ink">{title}</h3>
  <span class="px-2 py-1 rounded text-xs font-mono
  {status === 'open' ? 'bg-green-500/20 text-green-700 border border-green-500/50' :
- status === 'closed' ? 'bg-gray-500/20 text-gray-700 border border-gray-500/50' , 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/50'}">
+ status === 'closed' ? 'bg-gray-500/20 text-gray-700 border border-gray-500/50' : 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/50'}">
  {status.toUpperCase()}
  </span>
  </div>

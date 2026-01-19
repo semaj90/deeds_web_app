@@ -199,7 +199,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="text-white text-xl mb-0.5
  {node.type === 'person' ? 'i-heroicons-user' :
  node.type === 'evidence' ? 'i-heroicons-document-text' :
- node.type === 'location' ? 'i-heroicons-map-pin' , 'i-heroicons-folder-open'}" ></span>
+ node.type === 'location' ? 'i-heroicons-map-pin' : 'i-heroicons-folder-open'}" ></span>
 
  <!-- ID -->
  <div class="text-[8px] font-mono text-white uppercase tracking-wider">
