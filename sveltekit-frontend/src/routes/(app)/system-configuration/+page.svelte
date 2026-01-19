@@ -194,7 +194,7 @@
  <nav class="config-tabs">
  {#each tabs as tab}
  <button
- class="tab-btn {activeTab === tab.id ? 'active' : ''}"
+ class={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
  onclick={() => activeTab = tab.id}
  >
  <span class="tab-icon">{tab.icon}</span>
@@ -304,7 +304,7 @@
  type="url"
  class="setting-input"
  bind:value={config.ai.ollamaEndpoint}
- placeholder="http://localhost, 11434"
+ placeholder="http://localhost:11434"
  />
  </div>
  <div class="setting-group">
@@ -400,7 +400,7 @@
  <div class="gpu-status">
  <div class="status-card">
  <h3>WebGPU Status</h3>
- <span class="status {webgpuCapabilities?.hasWebGPU ? 'active' : 'inactive'}">
+ <span class={`status ${webgpuCapabilities?.hasWebGPU ? 'active' : 'inactive'}`}>
  {webgpuCapabilities?.hasWebGPU ? 'ENABLED' : 'DISABLED'}
  </span>
  </div>
@@ -525,7 +525,7 @@
  <span class="metric-label">CPU Usage</span>
  <span class="metric-value">{systemInfo.cpu.usage}%</span>
  <div class="metric-bar">
- <div class="metric-fill cpu" style="width: {systemInfo.cpu.usage}%"></div>
+ <div class="metric-fill cpu" style={`width: ${systemInfo.cpu.usage}%`}></div>
  </div>
  </div>
 
@@ -533,7 +533,7 @@
  <span class="metric-label">Memory</span>
  <span class="metric-value">{systemInfo.memory.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill memory" style="width: {systemInfo.memory.percentage}%"></div>
+ <div class="metric-fill memory" style={`width: ${systemInfo.memory.percentage}%`}></div>
  </div>
  </div>
 
@@ -541,7 +541,7 @@
  <span class="metric-label">Disk Usage</span>
  <span class="metric-value">{systemInfo.disk.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill disk" style="width: {systemInfo.disk.percentage}%"></div>
+ <div class="metric-fill disk" style={`width: ${systemInfo.disk.percentage}%`}></div>
  </div>
  </div>
 
@@ -745,12 +745,6 @@
  font-family: 'JetBrains Mono', monospace;
  }
 
- .setting-slider {
- -webkit-appearance: none; appearance: none;
- height: 6px;
- border-radius: 3px; background: rgba(107, 114, 128, 0.5);
- outline: none;
- }
  .setting-slider {
  -webkit-appearance: none; appearance: none;
  height: 6px;

@@ -67,7 +67,7 @@ export type EvidenceAnalysisResult = {
 // ==================== AI Agent Types ====================
 export type AIAgentTool = {
  name: string; description: string;
- parameters: Record<string, { type: string; description: string; required?, boolean }>;
+ parameters: Record<string, { type: string; description: string; required?: boolean }>;
  execute: (params: Record<string, unknown>) => Promise<unknown>;
 };
 
@@ -115,7 +115,9 @@ export type WorkflowContext = {
  error?: string; progress: number;
  stage: 'upload' | 'ocr' | 'embedding' | 'analysis' | 'storage' | 'complete';
  retryCount: number;
-};| { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
+};
+export type WorkflowEvent =
+ | { type: 'PROCESS_EVIDENCE'; data: Evidence } // Updated to use the unified Evidence interface
  | { type: 'OCR_COMPLETE'; text: string }
  | { type: 'EMBEDDING_COMPLETE'; embedding: number[] }
  | { type: 'ANALYSIS_COMPLETE'; result: EvidenceAnalysisResult }
@@ -154,7 +156,9 @@ export type SearchResponse = APIResponse<{
  queryTimeMs: number;
 }>;
 
-// ==================== WebSocket Message Types ====================| { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
+// ==================== WebSocket Message Types ====================
+export type EvidenceWebSocketMessage =
+ | { type: 'PROCESSING_UPDATE'; fileId: string; stage: string; progress: number }
  | { type: 'ANALYSIS_COMPLETE'; fileId: string; result: EvidenceAnalysisResult }
  | { type: 'ERROR'; fileId: string; error: string }
  | { type: 'CHAT_MESSAGE'; message: ChatMessage }
@@ -171,7 +175,9 @@ type BaseSnapshotProperties = {
  children?: Record<string, ActorRef<any, any>>;
 };
 
-// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>| (BaseSnapshotProperties & {
+// Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>
+export type EvidenceSnapshot =
+ | (BaseSnapshotProperties & {
  status: 'active';
  output?: unknown;
  error?: unknown;
