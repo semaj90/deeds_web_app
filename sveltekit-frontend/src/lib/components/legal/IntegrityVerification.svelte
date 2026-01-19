@@ -157,7 +157,7 @@ Displays detailed integrity verification results with AI analysis
               this={getVerificationIcon(verificationResults.hashMatch)}
               class={`w-4 h-4 ${getVerificationColor(verificationResults.hashMatch)}`}
             />
-            <svelte, component | this={BadgeComponent} variant={verificationResults.hashMatch ? 'success' , 'destructive'}>
+            <svelte, component | this={BadgeComponent} variant={verificationResults.hashMatch ? 'success' : 'destructive'}>
               {verificationResults.hashMatch ? 'Pass' : 'Fail'}
             </svelte:component>
           </div>
@@ -172,7 +172,7 @@ Displays detailed integrity verification results with AI analysis
             />
             <svelte, component
               this={BadgeComponent}
-              variant={verificationResults.metadataIntact ? 'success' , 'destructive'}
+              variant={verificationResults.metadataIntact ? 'success' : 'destructive'}
             >
               {verificationResults.metadataIntact ? 'Pass' : 'Fail'}
             </svelte:component>
@@ -188,7 +188,7 @@ Displays detailed integrity verification results with AI analysis
             />
             <svelte, component
               this={BadgeComponent}
-              variant={verificationResults.timestampValid ? 'success' , 'destructive'}
+              variant={verificationResults.timestampValid ? 'success' : 'destructive'}
             >
               {verificationResults.timestampValid ? 'Pass' : 'Fail'}
             </svelte:component>
@@ -204,7 +204,7 @@ Displays detailed integrity verification results with AI analysis
             />
             <svelte, component
               this={BadgeComponent}
-              variant={verificationResults.digitalSignatureValid ? 'success' , 'destructive'}
+              variant={verificationResults.digitalSignatureValid ? 'success' : 'destructive'}
             >
               {verificationResults.digitalSignatureValid ? 'Pass' : 'Fail'}
             </svelte:component>

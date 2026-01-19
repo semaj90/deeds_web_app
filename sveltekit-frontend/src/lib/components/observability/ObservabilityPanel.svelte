@@ -134,7 +134,7 @@ await loadState();
     <h3>ðŸ” Observability Dashboard</h3>
     <div class="header-controls">
       <div class="connection-status">
-        <span class="status-indicator {isConnected ? 'connected' , 'disconnected'}"></span>
+        <span class="status-indicator {isConnected ? 'connected' : 'disconnected'}"></span>
         {isConnected ? 'Live' : 'Disconnected'}
       </div>
       <button class="btn-toggle" onclick={() => (showDetails = !showDetails)}>

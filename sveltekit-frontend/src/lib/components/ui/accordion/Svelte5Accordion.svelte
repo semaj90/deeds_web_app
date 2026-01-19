@@ -84,7 +84,7 @@ let variantClasses = $derived({
 	{@const ctx = getContext<{ isOpen: (id: string) => boolean; toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 
-	<div class="w-full" data-state={isOpen ? 'open' , 'closed'}>
+	<div class="w-full" data-state={isOpen ? 'open' : 'closed'}>
 		<button
 			type="button"
 			class="flex w-full items-center justify-between px-4 py-3 text-left

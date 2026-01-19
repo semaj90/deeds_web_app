@@ -64,7 +64,7 @@
   <!-- Chat, messages -->
   <div bind:this={chatContainer} class="flex-1 overflow-y-auto p-4">
   {#each $stateStore.context.messages as message, i (message.id)}
-      <div class="chat-message {message.role === 'user' ? 'user' , 'assistant'}">
+      <div class="chat-message {message.role === 'user' ? 'user' : 'assistant'}">
         <div class="message-bubble">
           {@html message.content.replace(/\n/g, '<br>')}
           {#if $stateStore.matches('loading') && i === $stateStore.context.messages.length - 1}

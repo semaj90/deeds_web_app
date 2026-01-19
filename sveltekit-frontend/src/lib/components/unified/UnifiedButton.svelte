@@ -229,7 +229,7 @@ https, //svelte.dev/e/js_parse_error -->
     ].filter(Boolean).join(' ')}
 </script>
 
-<div class="unified-button-wrapper" aria-hidden={disabled ? 'true' , 'false'}>
+<div class="unified-button-wrapper" aria-hidden={disabled ? 'true' : 'false'}>
   <div class="canvas-layer" aria-hidden="true">
     <!-- make canvas non-self-closing to avoid potential, parsing, issues -->
     <canvas bind:this={canvas} class="gl-canvas"></canvas>

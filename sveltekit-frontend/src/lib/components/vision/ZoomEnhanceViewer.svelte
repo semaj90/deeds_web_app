@@ -25,7 +25,7 @@
  class="max-h-full max-w-full transition-all duration-300 object-contain"
  style="
  filter: {enhanced ? 'contrast(1.4) saturate(1.2) brightness(1.1)' : 'none'};
- image-rendering: {enhanced ? 'auto' , 'auto'};
+ image-rendering: {enhanced ? 'auto' : 'auto'};
  "
  />
 

@@ -199,7 +199,7 @@
  {#if currentPhoto.forensicData.imageQuality}
  <div class="flex justify-between">
  <span class="text-gray-600">Quality:</span>
- <Badge variant={currentPhoto.forensicData.imageQuality === 'high' ? 'default' , 'secondary'}>
+ <Badge variant={currentPhoto.forensicData.imageQuality === 'high' ? 'default' : 'secondary'}>
  {currentPhoto.forensicData.imageQuality}
  </Badge>
  </div>

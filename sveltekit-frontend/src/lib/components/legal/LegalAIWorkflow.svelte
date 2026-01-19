@@ -87,10 +87,10 @@
     <!-- Services, Status -->
     <div class="services-status">
       <span class="status-label">Services:</span>
-      <span class="status-indicator {servicesHealth?.quicServer ? 'online' , 'offline'}">
+      <span class="status-indicator {servicesHealth?.quicServer ? 'online' : 'offline'}">
         QUIC Server {servicesHealth?.quicServer ? 'ðŸŸ¢' : 'ðŸ”´'}
       </span>
-      <span class="status-indicator {servicesHealth?.recommendationEngine ? 'online' , 'offline'}">
+      <span class="status-indicator {servicesHealth?.recommendationEngine ? 'online' : 'offline'}">
         Recommendation Engine {servicesHealth?.recommendationEngine ? 'ðŸŸ¢' : 'ðŸ”´'}
       </span>
       <button onclick={checkServicesHealth} class="refresh-btn">ðŸ”„</button>

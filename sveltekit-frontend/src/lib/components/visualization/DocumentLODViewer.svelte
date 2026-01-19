@@ -429,7 +429,7 @@ if (!browser || !enableWebGPU) return
       </div>
       <div class="stat-item">
         <span class="label">WebGPU:</span>
-        <span class="value {isWebGPUReady ? 'success' , 'warning'}">
+        <span class="value {isWebGPUReady ? 'success' : 'warning'}">
           {isWebGPUReady ? 'Ready' : 'Fallback'}
         </span>
       </div>
