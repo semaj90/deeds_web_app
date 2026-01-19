@@ -179,13 +179,13 @@
 
 				<div class="space-y-3">
 					{#each analysisData.agentic_recommendations as rec}
-						<div class="p-4 bg-gray-800/50 rounded-lg border border-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' , 'gray'}-500/30">
+						<div class="p-4 bg-gray-800/50 rounded-lg border border-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/30">
 							<div class="flex items-center justify-between mb-2">
 								<div class="flex items-center gap-2">
-									<span class="px-2 py-1 bg-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-500/20 text-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' , 'yellow'}-300 rounded text-xs font-semibold uppercase">
+									<span class="px-2 py-1 bg-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-500/20 text-{rec.type === 'merge' ? 'blue' : rec.type === 'fix' ? 'green' : 'yellow'}-300 rounded text-xs font-semibold uppercase">
 										{rec.type}
 									</span>
-									<span class="px-2 py-1 bg-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' , 'gray'}-300 rounded text-xs">
+									<span class="px-2 py-1 bg-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{rec.priority === 'High' ? 'red' : rec.priority === 'Medium' ? 'yellow' : 'gray'}-300 rounded text-xs">
 										{rec.priority} Priority
 									</span>
 								</div>
@@ -240,7 +240,7 @@
 					>
 						<div class="flex items-center justify-between mb-3">
 							<span class="text-lg font-bold text-white">Cluster #{cluster.cluster_id}</span>
-							<span class="px-2 py-1 bg-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' , 'gray'}-300 rounded text-xs font-semibold">
+							<span class="px-2 py-1 bg-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-500/20 text-{cluster.priority === 'High' ? 'red' : cluster.priority === 'Medium' ? 'yellow' : 'gray'}-300 rounded text-xs font-semibold">
 								{cluster.priority}
 							</span>
 						</div>

@@ -184,7 +184,7 @@
  <div class="header-title">
  <h1>GLOBAL SEARCH</h1>
  <div class="search-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? 'active' , 'inactive'}">
+ <span class="status-indicator {webgpuCapabilities?.hasWebGPU : '' : 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'SEMANTIC SEARCH' : 'TEXT SEARCH'}
  </span>
  </div>
@@ -193,7 +193,7 @@
  <div class="scope-selector">
  {#each searchScopes as scope}
  <button
- class="scope-btn {searchScope === scope.id ? 'active' , ''}"
+ class="scope-btn {searchScope === scope.id : '' : ''}"
  onclick={() => searchScope = scope.id}
  >
  <span class="scope-icon">{scope.icon}</span>
@@ -218,7 +218,7 @@
  onkeydown={(e) => e.key === 'Enter' && performSearch()}
  />
  <button
- class="search-btn {isSearching ? 'searching' , ''}"
+ class="search-btn {isSearching : '' : ''}"
  onclick={ performSearch }
  disabled={isSearching || !searchQuery.trim()}
  >
@@ -270,7 +270,7 @@
  <div class="results-list">
  {#each searchResults as result}
  <div
- class="result-item {selectedResult?.id === result.id ? 'selected' , ''}"
+ class="result-item {selectedResult?.id === result.id : '' : ''}"
  onclick={() => selectedResult = result}
  >
  <div class="result-icon">

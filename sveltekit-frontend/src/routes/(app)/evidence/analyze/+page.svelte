@@ -257,7 +257,7 @@
 				<Progress value={progress} class="mb-4" />
 				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 					{#each steps as step, index}
-						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' , ''}">
+						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
 							<span class="text-lg">{step.icon}</span>
 							<div>
 								<p class="font-semibold">{step.name}</p>

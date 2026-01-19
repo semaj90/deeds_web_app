@@ -149,7 +149,7 @@
       <div class="grid grid-cols-5 gap-2">
         {#each ['overview', 'evidence', 'intercepts', 'terminal', 'ingest'] as tab}
           <button
-            class="nes-btn {activeTab === tab ? 'nes-btn-primary' , 'nes-btn-ghost'} uppercase"
+            class="nes-btn {activeTab === tab ? 'nes-btn-primary' : 'nes-btn-ghost'} uppercase"
             onclick={() => activeTab = tab}
           >
             { tab }

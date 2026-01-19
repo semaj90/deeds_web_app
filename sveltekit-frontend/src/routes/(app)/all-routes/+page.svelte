@@ -18,7 +18,7 @@
 			routes = data.routes;
 		}
 	});
-  
+
 	// Phase 10: Real-Time Updates (SSE)
 	// ─────────────────────────────────────
 
@@ -172,7 +172,7 @@
 	 */
 	function handleRouteNavigate(routeId: string, path: string): void {
 		logInteraction(routeId, 'navigate', { path });
-  
+
 		window.location.href = path;
 	}
 
@@ -234,12 +234,12 @@
 						</button>
 						<div class="route-actions">
 							{#if route.errorCount}
-								<span class="error-badge" title={`${route.errorCount} error${route.errorCount !== 1 ? 's' , ''}`}>
+								<span class="error-badge" title={`${route.errorCount} error${route.errorCount !== 1 ? 's' : ''}`}>
 									{route.errorCount} error{route.errorCount !== 1 ? 's' : ''}
 								</span>
 							{/if}
 							{#if route.warningCount}
-								<span class="warning-badge" title={`${route.warningCount} warning${route.warningCount !== 1 ? 's' , ''}`}>
+								<span class="warning-badge" title={`${route.warningCount} warning${route.warningCount !== 1 ? 's' : ''}`}>
 									{route.warningCount} warning{route.warningCount !== 1 ? 's' : ''}
 								</span>
 							{/if}

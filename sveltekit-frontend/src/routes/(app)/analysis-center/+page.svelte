@@ -71,7 +71,7 @@
  <div class="header-title">
  <h1>ANALYSIS CENTER</h1>
  <div class="system-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? 'active' , 'inactive'}">
+ <span class="status-indicator {webgpuCapabilities?.hasWebGPU : '' : 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'GPU ACCELERATED' : 'CPU MODE'}
  </span>
  </div>
@@ -80,7 +80,7 @@
  <div class="mode-selector">
  {#each analysisModes as mode}
  <button
- class="mode-btn {analysisMode === mode.id ? 'active' , ''}"
+ class="mode-btn {analysisMode === mode.id : '' : ''}"
  onclick={() => analysisMode = mode.id}
  >
  <span class="mode-icon">{mode.icon}</span>
@@ -122,7 +122,7 @@
  <input type="hidden" name="mode" value={analysisMode} />
  <button
  type="submit"
- class="analyze-btn {isAnalyzing ? 'analyzing' , ''}"
+ class="analyze-btn {isAnalyzing : '' : ''}"
  disabled={isAnalyzing || !analysisQuery.trim()}
  >
  {#if isAnalyzing}
@@ -190,7 +190,7 @@
 
  <div class="evidence-list">
  {#each evidencePool as evidence}
- <div class="evidence-item {selectedEvidence?.id === evidence.id ? 'selected' , ''}">
+ <div class="evidence-item {selectedEvidence?.id === evidence.id : '' : ''}">
  <div class="evidence-meta">
  <span class="evidence-type">{evidence.type.toUpperCase()}</span>
  <span class="evidence-confidence">CONF: {(evidence.confidence * 100).toFixed(0)}%</span>

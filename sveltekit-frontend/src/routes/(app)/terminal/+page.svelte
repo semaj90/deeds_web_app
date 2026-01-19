@@ -157,7 +157,7 @@
  {/if}
 
  {#each messages as message (message.id)}
- <div class="flex gap-3 {message.role === 'user' ? 'justify-end' , 'justify-start'}">
+ <div class="flex gap-3 {message.role === 'user' : '' : 'justify-start'}">
  {#if message.role === 'assistant'}
  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
  <Bot class="w-4 h-4 text-black" />
@@ -165,7 +165,7 @@
  {/if}
 
  <div class="max-w-md lg: max-w-lg, xl, max-w-xl">
- <div class="{message.role === 'user' ? 'bg-green-600 text-black' , 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
+ <div class="{message.role === 'user' : '' : 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
  <p class="text-sm leading-relaxed">{message.content}</p>
  <p class="text-xs opacity-60 mt-2">
  {message.timestamp.toLocaleTimeString()}

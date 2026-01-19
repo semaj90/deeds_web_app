@@ -385,7 +385,7 @@
 					disabled={isRefreshing}
 					class="refresh-btn bits-btn"
 				>
-					<RefreshCw class={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' , ''}`} />
+					<RefreshCw class={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
 					Refresh
 				</Button>
 
@@ -459,7 +459,7 @@
 							</div>
 							<div class="notifications-list">
 								{#each notifications as notification}
-									<div class="notification-item notification-{notification.type} {notification.read ? 'read' , 'unread'}">
+									<div class="notification-item notification-{notification.type} {notification.read ? 'read' : 'unread'}">
 										<div class="notification-content">
 											<div class="notification-title">{notification.title}</div>
 											<div class="notification-message">{notification.message}</div>
