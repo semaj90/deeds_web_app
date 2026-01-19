@@ -218,7 +218,7 @@
  onkeydown={(e) => e.key === 'Enter' && performSearch()}
  />
  <button
- class="search-btn {isSearching : '' : ''}"
+ class="search-btn {isSearching ? '' : ''}"
  onclick={ performSearch }
  disabled={isSearching || !searchQuery.trim()}
  >

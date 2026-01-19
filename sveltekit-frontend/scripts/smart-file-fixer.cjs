@@ -54,8 +54,14 @@ function fixCommonPatterns(content) {
 }
 
 const targetFiles = [
-  "src/webgpu-langchain-bridge.ts",
+  "src/lib/phase72/command-center-restructure-tasks.ts",
+  "src/lib/server/integrations/pipeline.ts",
+  "src/lib/services/ollama-integration-layer.ts",
+  "src/legal-ai-integration.ts",
+  "src/lib/server/services/QdrantService.ts"
 ];
+
+const DRY_RUN = true;
 
 async function main() {
   console.log('Gets baseline error count...');
@@ -87,17 +93,25 @@ async function main() {
     console.log(`  Errors after fix: ${newCount}`);
 
     if (newCount < currentErrors) {
-      console.log(`  ✅ KEPT - Reduced errors by ${currentErrors - newCount}`);
-      currentErrors = newCount;
+      console.log(`  ✅ IMPROVEMENT - Reduced errors by ${currentErrors - newCount}`);
+      // currentErrors = newCount; // Don't update baseline in dry run if we revert
     } else if (newCount === currentErrors) {
-       console.log(`  ⚠️ NEUTRAL - No error reduction, keeping fix as syntax cleanup`);
+       console.log(`  ⚠️ NEUTRAL - No error reduction`);
     } else {
-      console.log(`  ❌ REVERTED - Would increase errors by ${newCount - currentErrors} (Cascade effect)`);
-      fs.writeFileSync(filePath, originalContent);
+      console.log(`  ❌ REGRESSION - Would increase errors by ${newCount - currentErrors} (Cascade effect)`);
+    }
+
+    // In DRY_RUN, always revert
+    if (DRY_RUN || newCount >= currentErrors) {
+        console.log(`  🔄 REVERTING (Dry Run or Regression)`);
+        fs.writeFileSync(filePath, originalContent);
+    } else {
+        // Not reached in DRY_RUN
+        currentErrors = newCount;
     }
   }
 
-  console.log(`\nFinal error count: ${currentErrors} (started at ${baseline})`);
+  console.log(`\nFinal error count (simulated): ${currentErrors} (started at ${baseline})`);
 }
 
 main().catch(console.error);

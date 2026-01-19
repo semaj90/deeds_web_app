@@ -165,7 +165,7 @@
  {/if}
 
  <div class="max-w-md lg: max-w-lg, xl, max-w-xl">
- <div class="{message.role === 'user' : '' : 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
+ <div class="{message.role === 'user' ? '' : 'bg-gray-800 border border-green-500 text-green-400'} rounded-lg p-3">
  <p class="text-sm leading-relaxed">{message.content}</p>
  <p class="text-xs opacity-60 mt-2">
  {message.timestamp.toLocaleTimeString()}

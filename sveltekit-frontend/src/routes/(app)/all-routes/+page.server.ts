@@ -120,7 +120,7 @@ async function loadRouteMetadataFromDatabase(): Promise<Map<string, Record<strin
  */
 function mergeRoutesWithDatabase(
 	astRoutes: RouteNode[],
-	dbMetadata: Map<string: Record<string, unknown>>
+	dbMetadata: Map<string, Record<string, unknown>>
 ): RouteNode[] {
 	return astRoutes.map((route) => {
 		const dbMeta = dbMetadata.get(route.id) || dbMetadata.get(route.path);

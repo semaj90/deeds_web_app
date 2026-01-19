@@ -23,16 +23,21 @@ export interface IntegratedChatRequest {
   caseId?: string;
   useRAG?: boolean;
   stream?: boolean;
-  documentContext?: { type: 'document' | 'case' | 'evidence' | 'legal-brief' | 'contract';
+  documentContext?: {
+    type: 'document' | 'case' | 'evidence' | 'legal-brief' | 'contract';
     content?: string;
     metadata?: Record<string, unknown>;
   };
-  summaryOptions?: { includeSummary: boolean;
-    includeKeyPoints: boolean; includeLegalAnalysis: boolean;
+  summaryOptions?: {
+    includeSummary: boolean;
+    includeKeyPoints: boolean;
+    includeLegalAnalysis: boolean;
     includeEmbeddings: boolean;
   };
-  advancedOptions?: { useGPU: boolean;
-    enableStreaming: boolean; enableCaching: boolean;
+  advancedOptions?: {
+    useGPU: boolean;
+    enableStreaming: boolean;
+    enableCaching: boolean;
     fallbackModel?: string;
   };
 }
@@ -40,19 +45,24 @@ export interface IntegratedChatRequest {
 export interface IntegratedChatResponse {
   response?: string;
   streaming?: boolean;
-  summary?: { summary: string;
+  summary?: {
+    summary: string;
     keyPoints: string[];
     processingTime?: number;
   };
-  integration?: { servicesUsed: string[];
-    processingPath: string; performance: {
+  integration?: {
+    servicesUsed: string[];
+    processingPath: string;
+    performance: {
       totalTime: number;
       summaryTime?: number;
       chatTime?: number;
     };
   };
-  performance?: { duration: number;
-    tokens: number; tokensPerSecond: number;
+  performance?: {
+    duration: number;
+    tokens: number;
+    tokensPerSecond: number;
     model: string;
   };
   relatedCases?: string[];
@@ -69,12 +79,14 @@ export interface OllamaServiceStatus {
 }
 
 export interface SummarizerStats {
-  services: { cuda: { status, string };
-    gemma3: { status, string };
+  services: {
+    cuda: { status: string };
+    gemma3: { status: string };
     cluster: { status: string; nodes: number };
     streaming: { status: string; activeStreams: number };
   };
-  models: { loaded: string[];
+  models: {
+    loaded: string[];
   };
 }
 
@@ -133,7 +145,7 @@ class OllamaIntegrationLayer {
     try {
       // Mock status update - in production, would query actual services
       this.serviceStatus.set({
-        comprehensive, { status, 'healthy', health: 100 },
+        comprehensive: { status: 'healthy', health: 100 },
         langchain: { status: 'healthy', connected: true },
         cuda: { status: 'healthy', available: true },
         gemma3: { status: 'healthy', model: 'gemma3-legal:latest' },
@@ -156,7 +168,7 @@ class OllamaIntegrationLayer {
 
     const startTime = Date.now();
     this._requestCounter++;
-    this.activeRequests.update((n: any) => n + 1);
+    this.activeRequests.update((n) => n + 1);
 
     try {
       // Determine processing strategy
@@ -182,7 +194,8 @@ class OllamaIntegrationLayer {
       response.integration = {
         servicesUsed: this.getServicesUsed(strategy),
         processingPath: strategy,
-        performance: { totalTime: Date.now() - startTime,
+        performance: {
+          totalTime: Date.now() - startTime,
           summaryTime: response.summary?.processingTime,
           chatTime: Date.now() - startTime - (response.summary?.processingTime ?? 0),
         },
@@ -190,18 +203,18 @@ class OllamaIntegrationLayer {
 
       return response;
     } finally {
-      this.activeRequests.update((n: any) => n - 1);
+      this.activeRequests.update((n) => n - 1);
     }
   }
 
   private determineProcessingStrategy(request: IntegratedChatRequest): string {
-    if (request?.documentContext&& request.summaryOptions?.includeSummary) {
+    if (request?.documentContext && request.summaryOptions?.includeSummary) {
       return 'comprehensive-with-summary';
     }
-    if (request?.useRAG&& request?.message&& request.message.length > 100) {
+    if (request?.useRAG && request?.message && request.message.length > 100) {
       return 'langchain-rag';
     }
-    if (request?.stream&& request.advancedOptions?.enableStreaming) {
+    if (request?.stream && request.advancedOptions?.enableStreaming) {
       return 'streaming-enhanced';
     }
     return 'standard-chat';
@@ -223,7 +236,7 @@ class OllamaIntegrationLayer {
     }
 
     // Then process the chat with summary context
-    const enhancedMessage = this.enhanceMessageWithSummary(request?.message?? '', summary);
+    const enhancedMessage = this.enhanceMessageWithSummary(request?.message ?? '', summary);
     const chatResponse = await this.callChatAPI({
       ...request,
       message: enhancedMessage,
@@ -232,18 +245,21 @@ class OllamaIntegrationLayer {
     return { ...chatResponse, summary };
   }
 
-  private async processLangChainRAG(request: IntegratedChatRequest): Promise<IntegratedChatResponse> {
+  private async processLangChainRAG(
+    request: IntegratedChatRequest
+  ): Promise<IntegratedChatResponse> {
     try {
       // Mock RAG processing
       return {
         response: `RAG-enhanced response for: ${request.message}`,
-        performance: { duration: 200,
+        performance: {
+          duration: 200,
           tokens: 150,
           tokensPerSecond: 750,
-          model: request?.model?? 'langchain-ollama',
+          model: request?.model ?? 'langchain-ollama',
         },
         relatedCases: ['Case A', 'Case B'],
-        suggestions: this.extractSuggestions(request?.message?? ''),
+        suggestions: this.extractSuggestions(request?.message ?? ''),
       };
     } catch (error) {
       console.warn('LangChain RAG failed, falling back to standard chat:', error);
@@ -251,7 +267,9 @@ class OllamaIntegrationLayer {
     }
   }
 
-  private async processStreamingEnhanced(request: IntegratedChatRequest): Promise<IntegratedChatResponse> {
+  private async processStreamingEnhanced(
+    request: IntegratedChatRequest
+  ): Promise<IntegratedChatResponse> {
     const response = await this.processStandardChat(request);
     return {
       ...response,
@@ -259,7 +277,9 @@ class OllamaIntegrationLayer {
     };
   }
 
-  private async processStandardChat(request: IntegratedChatRequest): Promise<IntegratedChatResponse> {
+  private async processStandardChat(
+    request: IntegratedChatRequest
+  ): Promise<IntegratedChatResponse> {
     return await this.callChatAPI(request);
   }
 
@@ -272,7 +292,7 @@ class OllamaIntegrationLayer {
       });
 
       if (!response.ok) {
-        throw new Error(`Chat API failed, ${response.status}`);
+        throw new Error(`Chat API failed: ${response.status}`);
       }
 
       return await response.json();
@@ -305,17 +325,13 @@ User Question: ${originalMessage}
 Please answer the question using the provided context.`;
   }
 
-  private extractSuggestions(response: string): string[] {.split(/[.!? ]+/)
-      .filter((s: any) => s.length > 10);
+  private extractSuggestions(response: string): string[] {
+    const sentences = response.split(/[.!?]+/).filter((s) => s.length > 10);
 
     return sentences
-      .filter(
-        (s: any) =>
-          s.includes('consider') ?? s.includes('recommend') ||
-          s.includes('suggest')
-      )
+      .filter((s) => s.includes('consider') || s.includes('recommend') || s.includes('suggest'))
       .slice(0, 3)
-      .map((s: any) => s.trim());
+      .map((s) => s.trim());
   }
 
   private getServicesUsed(strategy: string): string[] {
@@ -334,8 +350,8 @@ Please answer the question using the provided context.`;
 
   async getServiceHealth(): Promise<OllamaServiceStatus> {
     await this.updateServiceStatus();
-    return new Promise((resolve, any) => {
-      this.serviceStatus.subscribe((status: any) => resolve(status))();
+    return new Promise((resolve) => {
+      this.serviceStatus.subscribe((status) => resolve(status))();
     });
   }
 
@@ -367,7 +383,3 @@ Please answer the question using the provided context.`;
 // ============================================================================
 
 export const ollamaIntegrationLayer = new OllamaIntegrationLayer();
-
-
-
-
