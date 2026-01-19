@@ -128,7 +128,8 @@ import type { Case } from '$lib/types';
 		columns = columns.map((col) => (col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col))}
 
 	function handleUploadError(error, string, _columnId: string) {
-		console.error('Upload error:', error);'
+		console.error('Upload error:', error);
+'
 	}
 
 	function handleDndConsider(e: CustomEvent, _columnId: string): void {
@@ -350,7 +351,7 @@ import type { Case } from '$lib/types';
 
 						<Tooltip.Root>
 							<Tooltip.Trigger, asChild>
-								<Button class="bits-btn" variant={showAIAssistant ? 'default' , 'ghost'} onclick={toggleAIAssistant} aria-pressed={showAIAssistant} size="sm">
+								<Button class="bits-btn" variant={showAIAssistant ? 'default' : 'ghost'} onclick={toggleAIAssistant} aria-pressed={showAIAssistant} size="sm">
 									AI Assistant
 								</Button>
 							</Tooltip.Trigger>
@@ -434,7 +435,8 @@ import type { Case } from '$lib/types';
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
 										<div class="relative">
 											<div
-												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class:highlighted={aiHighlightedEvidence.includes(item.id)}
+												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2"
+ class:highlighted={aiHighlightedEvidence.includes(item.id)}
 												class:selected={selectedEvidenceIds.includes(item.id)}
 												onclick={() => handleEvidenceSelect(item.id)}
 												onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEvidenceSelect(item.id)} }}

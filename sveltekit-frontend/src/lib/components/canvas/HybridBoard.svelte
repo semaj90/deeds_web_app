@@ -252,7 +252,7 @@
 		nodes; edges; viewport;
 		if (!readonly) setDirty(true);
 	});
-  
+
 	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;
@@ -490,7 +490,7 @@
 	<canvas
 		bind:this={canvasEl}
 		class="absolute inset-0 w-full h-full cursor-crosshair"
-		style:cursor={isPanning || spaceDown ? 'grab' , 'default'}
+		style:cursor={isPanning || spaceDown ? 'grab' : 'default'}
 		onpointerdown={ onPointerDown }
 		onpointermove={ onPointerMove }
 		onpointerup={ onPointerUp }

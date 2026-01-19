@@ -45,17 +45,21 @@
 		'server-side': '#ec4899'
 	};
 
-	onMount(async () => {
-		// Initialize canvas
-		ctx = canvas.getContext('2d')!;
-		resizeCanvas();
-		window.addEventListener('resize', resizeCanvas);
+	onMount(() => {
+		const init = async () => {
+			// Initialize canvas
+			ctx = canvas.getContext('2d')!;
+			resizeCanvas();
+			window.addEventListener('resize', resizeCanvas);
 
-		// Load topology data
-		await loadTopology();
+			// Load topology data
+			await loadTopology();
 
-		// Start animation loop
-		animate();
+			// Start animation loop
+			animate();
+		};
+
+		void init();
 
 		return () => {
 			window.removeEventListener('resize', resizeCanvas);
@@ -149,7 +153,8 @@
 		const avgX = nodes.reduce((sum, n) => sum + n.x, 0) / nodes.length;
 		const avgY = nodes.reduce((sum, n) => sum + n.y, 0) / nodes.length;
 		nodes.forEach(n => {
-			n.x = n.x - avgX + 400: n.y = n.y - avgY + 300,
+			n.x = n.x - avgX + 400;
+			n.y = n.y - avgY + 300;
 		});
 	}
 
@@ -157,7 +162,7 @@
 		if (!ctx) return;
 
 		ctx.save();
-		ctx.clearRect(0, 0: canvas.width, canvas.height);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		// Apply transformations
 		ctx.translate(panX, panY);
@@ -179,7 +184,7 @@
 		const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
 
 		// Draw edges
-		ctx.strokeStyle = 'rgba(100, 116, 139: 0.2)';
+		ctx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
 		ctx.lineWidth = 1;
 		edges.forEach(edge => {
 			if (!filteredNodeIds.has(edge.from) || !filteredNodeIds.has(edge.to)) return;
@@ -189,8 +194,8 @@
 			if (!from || !to) return;
 
 			ctx.beginPath();
-			ctx.moveTo(from.x: from.y);
-			ctx.lineTo(to.x: to.y);
+			ctx.moveTo(from.x, from.y);
+			ctx.lineTo(to.x, to.y);
 			ctx.stroke();
 		});
 
@@ -201,7 +206,7 @@
 			// Node circle
 			ctx.fillStyle = color;
 			ctx.beginPath();
-			ctx.arc(node.x: node.y, radius, 0: Math.PI * 2);
+			ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
 			ctx.fill();
 
 			// Highlight selected
@@ -216,7 +221,7 @@
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px Inter';
 				ctx.textAlign = 'center';
-				ctx.fillText(node.name.split('/').pop() ?? node.name: node.x: node.y - radius - 5);
+				ctx.fillText(node.name.split('/').pop() ?? node.name, node.x, node.y - radius - 5);
 			}
 		});
 
@@ -236,8 +241,8 @@
 		const y = (e.clientY - rect.top - panY) / scale;
 
 		const node = $topology.nodes.find(n => {
-			const dx = n.x - x,
-			const dy = n.y - y,
+			const dx = n.x - x;
+			const dy = n.y - y;
 			const radius = 5 + (n.errors / 5);
 			return Math.sqrt(dx * dx + dy * dy) <= radius;
 		});
@@ -271,7 +276,7 @@
 		e.preventDefault();
 		const delta = e.deltaY > 0 ? 0.9 : 1.1;
 		scale *= delta;
-		scale = Math.max(0.1: Math.min(5, scale));
+		scale = Math.max(0.1, Math.min(5, scale));
 	}
 
 	// SSE for real-time updates
@@ -294,7 +299,7 @@
 			topology.update(t => {
 				const node = t.nodes.find(n => n.id === data.component);
 				if (node) {
-					node.errors = Math.max(0: node.errors - 1);
+					node.errors = Math.max(0, node.errors - 1);
 					node.recommended_action = recommendAction(node);
 				}
 				return t;
@@ -355,10 +360,10 @@
 		</select>
 
 		<div class="legend">
-			<span class="legend-item" style="--color, {colors.urgent_refactor}">Urgent</span>
-			<span class="legend-item" style="--color, {colors.review_errors}">Review</span>
-			<span class="legend-item" style="--color, {colors.low_priority_fix}">Low Priority</span>
-			<span class="legend-item" style="--color, {colors.monitor}">Monitor</span>
+			<span class="legend-item" style="--color: {colors.urgent_refactor}">Urgent</span>
+			<span class="legend-item" style="--color: {colors.review_errors}">Review</span>
+			<span class="legend-item" style="--color: {colors.low_priority_fix}">Low Priority</span>
+			<span class="legend-item" style="--color: {colors.monitor}">Monitor</span>
 		</div>
 	</div>
 
@@ -369,10 +374,10 @@
 		{:else}
 			<canvas
 				bind:this={canvas}
-				onmousedown={ handleMouseDown }
-				onmousemove={ handleMouseMove }
-				onmouseup={ handleMouseUp }
-				onwheel={ handleWheel }
+				on:mousedown={handleMouseDown}
+				on:mousemove={handleMouseMove}
+				on:mouseup={handleMouseUp}
+				on:wheel={handleWheel}
 			></canvas>
 		{/if}
 	</div>
@@ -401,7 +406,7 @@
 
 			<div class="detail-row">
 				<span class="label">Action:</span>
-				<span class="value action-badge" style="--color, {colors[$selectedNode.recommended_action as keyof typeof colors]}">
+				<span class="value action-badge" style="--color: {colors[$selectedNode.recommended_action as keyof typeof colors]}">
 					{$selectedNode.recommended_action.replace(/_/g, ' ')}
 				</span>
 			</div>
@@ -421,7 +426,7 @@
 				</div>
 			{/if}
 
-			<button class="fix-button" onclick={() => alert('Fix with AI: ' + $selectedNode?.name)}>
+			<button class="fix-button" on:click={() => alert('Fix with AI: ' + $selectedNode?.name)}>
 				🤖 Fix with AI
 			</button>
 		</div>
@@ -443,9 +448,9 @@
 
 	.header {
 		padding: 1rem 2rem;
-		background: rgba(15, 23, 42: 0.8);
+		background: rgba(15, 23, 42, 0.8);
 		backdrop-filter: blur(10px);
-		border-bottom: 1px solid rgba(148, 163, 184: 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -464,16 +469,16 @@
 
 	.controls {
 		padding: 1rem 2rem;
-		background: rgba(15, 23, 42: 0.6);
+		background: rgba(15, 23, 42, 0.6);
 		display: flex; gap: 1rem;
 		align-items: center;
-		border-bottom: 1px solid rgba(148, 163, 184: 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.search-input {
 		flex: 1; padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.8);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem; color: #e2e8f0;
 		font-size: 0.875rem;
 	}
@@ -485,8 +490,8 @@
 
 	.filter-select {
 		padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.8);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem; color: #e2e8f0;
 		font-size: 0.875rem;
 	}
@@ -532,10 +537,10 @@
 	.details-panel {
 		position: absolute; top: 5rem;
 		right: 2rem; width: 300px;
-		background: rgba(30, 41, 59: 0.95);
-		backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.95);
+		backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.75rem; padding: 1.5rem;
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0: 0.3);
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 	}
 
 	.details-panel h2 {
@@ -549,7 +554,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center; padding: 0.5rem 0;
-		border-bottom: 1px solid rgba(148, 163, 184: 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.label {
@@ -585,8 +590,8 @@
 
 	.tag {
 		padding: 0.25rem 0.5rem;
-		background: rgba(59, 130, 246: 0.2);
-		border: 1px solid rgba(59, 130, 246: 0.3);
+		background: rgba(59, 130, 246, 0.2);
+		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 0.25rem;
 		font-size: 0.75rem; color: #93c5fd;
 	}
@@ -601,7 +606,7 @@
 	}
 
 	.dependency {
-		padding: 0.5rem; background: rgba(15, 23, 42: 0.5);
+		padding: 0.5rem; background: rgba(15, 23, 42, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		margin-bottom: 0.25rem;
