@@ -2,6 +2,45 @@
 
 ---
 
+## ✅ January 19, 2026 – Backup Consolidation Spec Complete
+
+### Spec Location
+`.kiro/specs/backup-consolidation/`
+
+### Purpose
+Safe, automated tool to discover, analyze, and clean up thousands of backup files causing svelte-check/tsc timeouts.
+
+### Backup Patterns Targeted
+- `.bak`, `.backup`, `.mojibake-backup`, `.any-backup`
+- `.batch*-backup`, `.css-bak`, `.bak-ast`
+- `.svelte4.backup`, `.phase*.bak`
+- `src.backup*` directories
+
+### Key Features
+1. **Ripgrep-based scanning** for fast discovery
+2. **Git diff comparison** to determine if live file equals/supersedes backup
+3. **Safety validation** - never delete if live file missing or backup has unique content
+4. **Dry-run mode** (default) - preview all actions before execution
+5. **Quarantine** for non-git files instead of deletion
+6. **Audit logging** with restore script generation
+
+### Tasks Summary (All Required)
+- Task 1: Project setup + dependencies
+- Task 2: BackupScanner with pattern matching + property tests
+- Task 3: ComparisonEngine with hash/diff analysis + property tests
+- Task 4: Checkpoint - verify scanner/comparison
+- Task 5: ManifestGenerator with safety analysis + property tests
+- Task 6: CleanupExecutor with dry-run/execute modes + property tests
+- Task 7: Checkpoint - verify manifest/executor
+- Task 8: Rollback support with git restore + quarantine
+- Task 9: CLI interface
+- Task 10: Final integration test
+
+### Property-Based Tests (20 properties)
+Using fast-check with 100+ iterations per property for comprehensive validation.
+
+---
+
 ## ✅ January 19, 2026 – ai-service.ts Rebuild + Contextual Chat Verification
 
 ### ai-service.ts Rebuilt
