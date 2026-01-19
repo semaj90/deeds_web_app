@@ -1,8 +1,8 @@
-import { redirect, error, fail } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { and, desc, eq, like } from 'drizzle-orm';
+import type { Actions, PageServerLoad } from './$types';
 
 /**
  * SSR Load Function - Server-side data fetching for cases
@@ -35,7 +35,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 		if (search) {
 			filters.push(like(cases.title, `%${search}%`));
-		}.select()
+		}
+		const userCases = await db
+			.select()
 			.from(cases)
 			.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
@@ -97,7 +99,9 @@ export const actions: Actions = {
 			});
 		}
 
-		try {.insert(cases)
+		try {
+			const newCase = await db
+				.insert(cases)
 				.values({
 					title: title.trim(),
 					description: description.trim(),
@@ -113,9 +117,9 @@ export const actions: Actions = {
 				.returning();
 
 			// Redirect to the new case detail page
-			throw redirect(303, `/cases/${newCase.id}`);
+			throw redirect(303, `/cases/${newCase[0]?.id}`);
 		} catch (err) {
-			if (err instanceof Error && 'status' in $1?.$2 === 303) {
+			if (err instanceof Error && 'status' in err && (err as { status?: number }).status === 303) {
 				throw err; // Re-throw redirect
 			}
 			console.error('Error creating case:', err);
@@ -139,14 +143,16 @@ export const actions: Actions = {
 		const caseIds = formData.getAll('caseId').map(id => id.toString());
 		const newStatus = formData.get('status')?.toString() as typeof cases.status.enumValues[number];
 
-		if (!caseIds?.length|| !newStatus) {
+		if (!caseIds?.length || !newStatus) {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 
-		try {.update(cases)
+		try {
+			const updated = await db
+				.update(cases)
 				.set({
-					status, newStatus,
-					updatedAt, new Date().toISOString()
+					status: newStatus,
+					updatedAt: new Date().toISOString()
 				})
 				.where(
 					and(
@@ -184,10 +190,12 @@ export const actions: Actions = {
 			return fail(400, { error: 'No case IDs provided' });
 		}
 
-		try {.update(cases)
+		try {
+			const archived = await db
+				.update(cases)
 				.set({
-					status, 'archived',
-					updatedAt, new Date().toISOString()
+					status: 'archived',
+					updatedAt: new Date().toISOString()
 				})
 				.where(
 					and(

@@ -308,8 +308,8 @@
 				<h2 class="text-xl font-bold">Create New Case</h2>
 			</div>
 
-			<!-- Progressive Enhancement, Form with SSR fallback -->
-			<form method="POST" action="?/create" use, enhance class="p-6 space-y-4">
+		<!-- Progressive Enhancement, Form with SSR fallback -->
+		<form method="POST" action="?/create" use:enhance class="p-6 space-y-4">
 				{#if form?.error}
 					<div class="rounded border border-red-500 bg-red-500/10 p-4 text-red-100">
 						❌ {form.error}

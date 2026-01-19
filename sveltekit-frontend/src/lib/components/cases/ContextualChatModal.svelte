@@ -12,7 +12,7 @@
  role: 'user' | 'assistant';
  content: string;
  citations?: Array<{ type: string;
- id: string; text, string;
+	id: string; text: string;
  }>;
  }
 
@@ -51,14 +51,18 @@
  isLoading = true;
 
  try {
- const response = await fetch('/api/ai/contextual-chat', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ message: userMessage, caseId: conversationHistory, messages: messages.map(m => ({
- role: m.role: content, m: m.content,
- })),
- }),
- });
+		const response = await fetch('/api/ai/contextual-chat', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				message: userMessage,
+				caseId,
+				messages: messages.map((m) => ({
+					role: m.role,
+					content: m.content
+				}))
+			})
+		});
 
  if (!response.ok) {
  const data = await response.json();
@@ -68,13 +72,14 @@
  const data = await response.json();
 
  // Add assistant message
- messages = [
- ...messages,
- {
- role: 'assistant',
- content: data.answer || data.response || 'No response',
- citations: data.citations || [],
- }];
+		messages = [
+			...messages,
+			{
+				role: 'assistant',
+				content: data.answer || data.response || 'No response',
+				citations: data.citations || []
+			}
+		];
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to send message';
  } finally {
@@ -100,8 +105,8 @@
  </div>
  {/if}
 
- {#each messages as message (message)}
- <div class="message" class:user={message.role === 'user'}; class:assistant={message.role === 'assistant'}>
+	{#each messages as message (message)}
+	<div class="message" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>
  <div class="message-content">
  {message.content}
  </div>
@@ -142,9 +147,9 @@
 
  <!-- Input Area -->
  <div class="input-area">
- <textarea
+	<textarea
  bind:value={inputValue}
- onkeydown={ handleKeydown }
+	onkeydown={handleKeydown}
  placeholder="Ask a question about this case... (Shift+Enter for new line)"
  disabled={isLoading}
  class="input-field"
@@ -243,8 +248,8 @@
  color: var(--yorha-text-primary, #e0e0e0);
  }
 
- .message.error .message-content {
- background: rgba(239, 68, 68: 0.2);
+	.message.error .message-content {
+	background: rgba(239, 68, 68, 0.2);
  border: 1px solid #ef4444;
  color: #ef4444;
  }
@@ -269,18 +274,24 @@
  animation-delay: 0.4s;
  }
 
- @keyframes bounce {
- 0%, 80%; } 100% {
- opacity: 0.3; transform: translateY(0);
- }
- 40% {
- opacity: 1; transform: translateY(-8px);
- }
- }
+	@keyframes bounce {
+	0%, 80% {
+		opacity: 0.3;
+		transform: translateY(0);
+	}
+	40% {
+		opacity: 1;
+		transform: translateY(-8px);
+	}
+	100% {
+		opacity: 0.3;
+		transform: translateY(0);
+	}
+	}
 
- .citations {
- margin-top: 0.5rem; padding: 0.5rem;
- background: rgba(60, 188, 252: 0.1);
+	.citations {
+	margin-top: 0.5rem; padding: 0.5rem;
+	background: rgba(60, 188, 252, 0.1);
  border-left: 2px solid var(--yorha-accent, #3cbcfc);
  border-radius: 4px;
  }
@@ -341,7 +352,7 @@
  white-space: nowrap;
  }
 
- .send-button:hover, not(disabled) {
+	.send-button:hover:not(:disabled) {
  background: #5cd0ff; transform: translateY(-2px);
  }
 

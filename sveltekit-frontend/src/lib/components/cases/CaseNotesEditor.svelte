@@ -74,11 +74,13 @@
 		} finally {
 			searching = false;
 		}
-	} function onSearchInput(e: Event) {
- searchQuery = (e.target as HTMLInputElement).value;
- if (_searchTimer) clearTimeout(_searchTimer);
- _searchTimer = setTimeout(() => runSearch(searchQuery), 200);
- }
+	}
+
+	function onSearchInput(e: Event) {
+		searchQuery = (e.target as HTMLInputElement).value;
+		if (_searchTimer) clearTimeout(_searchTimer);
+		_searchTimer = setTimeout(() => runSearch(searchQuery), 200);
+	}
 
 	async function onSelectHit(hit: NoteHit) {
 		const existing = notes.find((n) => n.id === hit.id);
@@ -105,11 +107,13 @@
 			searchHits = [];
 			searchError = null;
 		}
-	} let notes = $state<CaseNote[]>([]);
- let selectedNote = $state<CaseNote , null>(null);
- let isLoading = $state(true);
- let isSaving = $state(false);
- let error = $state<string | null>(null);
+	}
+
+	let notes = $state<CaseNote[]>([]);
+	let selectedNote = $state<CaseNote | null>(null);
+	let isLoading = $state(true);
+	let isSaving = $state(false);
+	let error = $state<string | null>(null);
 
  // Evidence references state
  let evidenceRefs = $state<EvidenceRef[]>([]);
@@ -178,26 +182,28 @@
 		} finally {
 			isLoading = false;
 		}
-	} function selectNote(note: CaseNote) {
- selectedNote = note;
- noteTitle = note.title || '';
- noteContent = note.content;
- isNewNote = false;
+	}
 
- // Set baselines to prevent autosave on select
- lastSavedTitle = note.title || '';
- lastSavedContent = note.content;
+	function selectNote(note: CaseNote) {
+		selectedNote = note;
+		noteTitle = note.title || '';
+		noteContent = note.content;
+		isNewNote = false;
 
- // Load evidence references for this note
- loadEvidenceRefs(note.id);
- }
+		// Set baselines to prevent autosave on select
+		lastSavedTitle = note.title || '';
+		lastSavedContent = note.content;
 
- function startNewNote() {
- selectedNote = null;
- noteTitle = '';
- noteContent = '';
- isNewNote = true;
- }
+		// Load evidence references for this note
+		loadEvidenceRefs(note.id);
+	}
+
+	function startNewNote() {
+		selectedNote = null;
+		noteTitle = '';
+		noteContent = '';
+		isNewNote = true;
+	}
 
 	async function saveNote() {
 		if (!noteContent.trim()) {
@@ -252,6 +258,8 @@
 		} finally {
 			isSaving = false;
 		}
+	}
+
 	async function deleteNote(noteId: string) {
 		if (!confirm('Are you sure you want to delete this note?')) return;
 
@@ -273,21 +281,21 @@
 		}
 	}
 
- async function togglePin(note: CaseNote) {
- try {
- const response = await fetch(`/api/cases/${caseId}/notes/${note.id}`, {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ isPinned: !note.isPinned }),
- });
+	async function togglePin(note: CaseNote) {
+		try {
+			const response = await fetch(`/api/cases/${caseId}/notes/${note.id}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ isPinned: !note.isPinned })
+			});
 
- if (!response.ok) throw new Error('Failed to update note');
- const data = await response.json();
- notes = sortNotes(notes.map(n => n.id === data.note.id ? data.note : n));
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to pin note';
- }
- }
+			if (!response.ok) throw new Error('Failed to update note');
+			const data = await response.json();
+			notes = sortNotes(notes.map(n => n.id === data.note.id ? data.note : n));
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to pin note';
+		}
+	}
 
 	// Evidence references functions
 	async function loadEvidenceRefs(noteId: string) {
@@ -316,8 +324,10 @@
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to remove evidence reference';
 		}
-	} // Export functions
- async function exportAIMemo() {
+	}
+
+	// Export functions
+	async function exportAIMemo() {
  if (notes.length === 0) {
  error = 'No notes to export';
  return;
@@ -506,7 +516,7 @@
  {#each searchHits as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class:pinned={note.pinned}
+				class:selected={selectedNote?.id === note.id} class:pinned={note.pinned}
  role="button"
  tabindex="0"
  onclick={() => onSelectHit(note)}
@@ -533,7 +543,7 @@
  {#each notes as note (note.id)}
  <div
  class="note-item"
- class:selected={selectedNote?.id === note.id}; class:pinned={note.isPinned}
+				class:selected={selectedNote?.id === note.id} class:pinned={note.isPinned}
  role="button"
  tabindex="0"
  onclick={() => selectNote(note)}
@@ -626,7 +636,7 @@
  </div>
  <button
  class="ref-remove"
- onclick={() => removeEvidenceRef(selectedNote.id: ref.evidenceId)}
+	onclick={() => removeEvidenceRef(selectedNote.id, ref.evidenceId)}
  title="Remove link"
  >
  ✕
@@ -692,7 +702,7 @@
  font-weight: 500; transition: all 0.2s;
  }
 
- .btn-export:hover, not(disabled) {
+.btn-export:hover:not(:disabled) {
  background: var(--yorha-accent, #3cbcfc);
  color: #000;
  border-color: var(--yorha-accent, #3cbcfc);
@@ -709,9 +719,9 @@
  border-radius: 4px; cursor: pointer;
  }
 
- .error-banner {
+.error-banner {
  padding: 0.75rem 1rem;
- background: rgba(239, 68, 68: 0.2);
+ background: rgba(239, 68, 68, 0.2);
  color: #ef4444;
  border-bottom: 1px solid #ef4444;
  }
@@ -729,14 +739,14 @@
  flex-direction: column;
  }
 
- .search-container {
+:global(.search-container) {
  position: relative; padding: 0.75rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
  background: var(--yorha-bg-secondary, #1a1a1a);
  flex-shrink: 0;
  }
 
- .search-input {
+:global(.search-input) {
  width: 100%; padding: 0.5rem;
  background: var(--yorha-bg-primary, #0a0a0a);
  border: 1px solid var(--yorha-border, #606060);
@@ -744,12 +754,12 @@
  font-size: 0.85rem;
  }
 
- .search-input:focus {
+:global(.search-input:focus) {
  outline: none;
  border-color: var(--yorha-accent, #3cbcfc);
  }
 
- .search-spinner {
+:global(.search-spinner) {
  position: absolute; right: 1rem;
  top: 50%; transform: translateY(-50%);
  animation: spin 1s linear infinite;
@@ -761,21 +771,21 @@
  to { transform: translateY(-50%) rotate(360deg); }
  }
 
- .search-results-header {
+:global(.search-results-header) {
  display: flex;
  justify-content: space-between;
  align-items: center; padding: 0.5rem 1rem;
- background: rgba(60, 188, 252: 0.1);
+ background: rgba(60, 188, 252, 0.1);
  border-bottom: 1px solid var(--yorha-border, #606060);
  font-size: 0.8rem; color: var(--yorha-text-secondary, #a0a0a0);
  flex-shrink: 0;
  }
 
- .results-count {
+:global(.results-count) {
  font-weight: 500;
  }
 
- .clear-search {
+:global(.clear-search) {
  padding: 0.25rem 0.5rem;
  background: transparent; border: 1px solid var(--yorha-border, #606060);
  border-radius: 3px; cursor: pointer;
@@ -783,8 +793,8 @@
  font-size: 0.75rem;
  }
 
- .clear-search:hover {
- background: rgba(60, 188, 252: 0.1);
+:global(.clear-search:hover) {
+ background: rgba(60, 188, 252, 0.1);
  border-color: var(--yorha-accent, #3cbcfc);
  }
 
@@ -816,17 +826,17 @@
  transition: background 0.2s;
  }
 
- .note-item:hover {
- background: rgba(60, 188, 252: 0.1);
+.note-item:hover {
+ background: rgba(60, 188, 252, 0.1);
  }
 
- .note-item.selected {
- background: rgba(60, 188, 252: 0.2);
+.note-item.selected {
+ background: rgba(60, 188, 252, 0.2);
  border-left: 3px solid var(--yorha-accent, #3cbcfc);
  }
 
- .note-item.pinned {
- background: rgba(245, 158, 11: 0.1);
+.note-item.pinned {
+ background: rgba(245, 158, 11, 0.1);
  }
 
  .note-item-header {
@@ -927,8 +937,8 @@
  border-radius: 4px; cursor: pointer;
  }
 
- .btn-delete:hover {
- background: rgba(239, 68, 68: 0.2);
+.btn-delete:hover {
+ background: rgba(239, 68, 68, 0.2);
  }
 
  .editor-body {
@@ -970,16 +980,16 @@
  overflow-y: auto;
  }
 
- .ref-item {
+.ref-item {
  display: flex;
  justify-content: space-between;
  align-items: center; padding: 0.75rem 1rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
- background: rgba(60, 188, 252: 0.05);
+ background: rgba(60, 188, 252, 0.05);
  }
 
- .ref-item:hover {
- background: rgba(60, 188, 252: 0.1);
+.ref-item:hover {
+ background: rgba(60, 188, 252, 0.1);
  }
 
  .ref-info {
@@ -1011,8 +1021,8 @@
  font-size: 0.8rem; transition: all 0.2s;
  }
 
- .ref-remove:hover {
- background: rgba(239, 68, 68: 0.2);
+.ref-remove:hover {
+ background: rgba(239, 68, 68, 0.2);
  }
 </style>
 

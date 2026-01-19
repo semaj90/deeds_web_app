@@ -95,16 +95,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const user = locals.user;
 
-	// If no user;
- return empty cases (client will handle fallback)
+	// If no user, return empty cases (client will handle fallback)
 	if (!user) {
-		return { form: cases: [],
-			user: null
-		};
+		return { form, cases: [], user: null };
 	}
 
 	// Get available cases for the current user
-	try {.select({
+	try {
+		const userCases = await db
+			.select({
 				id: cases.id,
 				title: cases.title,
 				case_number: cases.case_number,
@@ -114,18 +113,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 			.where(eq(cases.status, 'open'))
 			.orderBy(cases.createdAt);
 
-		return { form: cases: userCases: user };
+		return { form, cases: userCases, user };
 	} catch (error) {
 		console.error('Error fetching cases:', error);
-		return { form: cases: [],
-			user
-		};
+		return { form, cases: [], user };
 	}
 };
 
 export const actions: Actions = {
 	upload: async ({ request, locals }) => {
 		try {
+			if (!locals.user) {
+				return fail(401, { form: { errors: { _global: ['Unauthorized'] } } });
+			}
 			// 1) Parse incoming form data
 			const formData = await request.formData();
 
@@ -152,10 +152,12 @@ export const actions: Actions = {
 			const caseId = (formData.get('case_id') ?? '')?.toString() ?? null;
 			const title = (formData.get('title') ?? '').toString();
 			const description = (formData.get('description') ?? '').toString();
-			const evidenceType = (formData.get('evidenceType') ?? 'UNKNOWN').toString().toUpperCase();(formData.get('enableOcr') ?? '').toString()
-			);
+			const evidenceType = (formData.get('evidenceType') ?? 'UNKNOWN').toString().toUpperCase();
+			const enableOcrFlag = (formData.get('enableOcr') ?? '').toString() === 'true';
 
-			// parse tags (allow multiple).getAll('tags')
+			// parse tags (allow multiple)
+			const tags = formData
+				.getAll('tags')
 				.map((t) => t.toString())
 				.filter(Boolean);
 
@@ -188,12 +190,14 @@ export const actions: Actions = {
 			// 6) Optional OCR (fail-soft)
 			let ocrResult: OcrResultData | null = null;
 			if (enableOcrFlag && (evidenceType === 'PDF' || evidenceType === 'IMAGE')) {
-				try {(metaEnv as any).OCR_BASE_URL ??
+				try {
+					const ocrBase =
+						(metaEnv as any).OCR_BASE_URL ??
 						(metaEnv as any).BASE_URL ??
 						(dev ? 'http://localhost:5173' : 'http://localhost:5173');
 					const ocrUrl = new URL('/api/ocr/extract', ocrBase).toString();
 					const ocrForm = new FormData();
-					ocrForm.append('file', new Blob([fileBuffer], { type, fileType }), fileName);
+					ocrForm.append('file', new Blob([fileBuffer], { type: fileType }), fileName);
 					const ocrResponse = await fetch(ocrUrl, { method: 'POST', body: ocrForm });
 
 					if (ocrResponse.ok) {
@@ -303,7 +307,9 @@ export const actions: Actions = {
 			};
 
 			// 10) Insert evidence record into DB (write to BOTH old and new columns for graceful migration)
-			const secureUserId = locals.user?.id;.insert(evidence)
+			const secureUserId = locals.user?.id;
+			const inserted = await db
+				.insert(evidence)
 				.values({
 					// Core fields
 					caseId: caseId ?? null,

@@ -15,18 +15,16 @@
  lastErrorAt, string;
  }>;
  };
- suggestions: { byRisk: Array<{ level: string; count, number }>;
- applied: number; effectiveness: number;
- };
- topErrors: Array<{ tsCode: string;
- count: number; messages, string[];
- }>;
- errorVelocity: Array<{ date: string;
- count, number;
- }>;
- }
-
-	let stats = $state<MonitoringStats | null>(null);
+	suggestions: { byRisk: Array<{ level: string; count: number }>;
+		applied: number; effectiveness: number;
+	};
+	topErrors: Array<{ tsCode: string;
+		count: number; messages: string[];
+	}>;
+	errorVelocity: Array<{ date: string;
+		count: number;
+	}>;
+	}	let stats = $state<MonitoringStats | null>(null);
 	let isLoading = $state(true);
 	let error = $state<string | null>(null);
 	let lastUpdated = $state<Date | null>(null);
@@ -184,7 +182,7 @@
  <div
  class="h-2 rounded-full transition-all"
  style={`width: ${(item.count / stats.summary.totalErrors) * 100}%;
- background-color: ${item.severity === 'fatal' ? '#dc2626' : item.severity === 'error' ? '#f97316' : item.severity === 'warn' ? '#eab308' , '#3b82f6'}`}
+							background-color: ${item.severity === 'fatal' ? '#dc2626' : item.severity === 'error' ? '#f97316' : item.severity === 'warn' ? '#eab308' : '#3b82f6'}`}
  ></div>
  </div>
  <span class="font-semibold text-gray-900 w-12 text-right">{item.count}</span>
@@ -209,7 +207,7 @@
  <div
  class="h-2 rounded-full transition-all"
  style={`width: ${(item.count / stats.summary.totalRoutes) * 100}%;
- background-color: ${item.state === 'healthy' ? '#22c55e' : item.state === 'flaky' ? '#f59e0b' , '#ef4444'}`}
+ background-color: ${item.state === 'healthy' ? '#22c55e' : item.state === 'flaky' ? '#f59e0b' : '#ef4444'}`}
  ></div>
  </div>
  <span class="font-semibold text-gray-900 w-12 text-right">{item.count}</span>

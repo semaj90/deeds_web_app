@@ -1,8 +1,8 @@
-import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types.js';
 import db from '$lib/server/db';
 import { yorhaCases } from '$lib/server/db/schema-postgres';
+import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
  if (!locals.user) {
@@ -22,9 +22,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  throw error(403, 'You do not have access to this case');
  }
 
- return {
- caseId: caseName[0].title,
- };
+	return {
+		caseId,
+		caseTitle: caseRecord[0].title
+	};
 };
 
 export const actions: Actions = {
@@ -41,12 +42,15 @@ export const actions: Actions = {
  throw error(400, 'No file provided');
  }
 
- // Validate file
- const maxSize = 50 * 1024 * 1024; // 50MB'application/pdf',
- 'image/png',
- 'image/jpeg',
- 'image/tiff',
- 'application/x-tiff'];
+	// Validate file
+	const maxSize = 50 * 1024 * 1024; // 50MB
+	const allowedTypes = [
+		'application/pdf',
+		'image/png',
+		'image/jpeg',
+		'image/tiff',
+		'application/x-tiff'
+	];
 
  if (file.size > maxSize) {
  throw error(400, 'File size exceeds 50MB limit');
@@ -61,11 +65,11 @@ export const actions: Actions = {
  // TODO: Create rag_documents record
  // TODO: Publish RabbitMQ message
 
- return {
- success: true,
- message: 'File uploaded successfully',
- documentId: 'placeholder-id',
- };
+	return {
+		success: true,
+		message: 'File uploaded successfully',
+		documentId: 'placeholder-id'
+	};
  } catch (err) {
  console.error('Upload error:', err);
  throw error(500, 'Upload failed');

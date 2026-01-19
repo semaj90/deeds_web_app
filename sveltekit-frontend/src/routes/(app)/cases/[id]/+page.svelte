@@ -5,7 +5,9 @@
  import ContextualChatModal from '$lib/components/cases/ContextualChatModal.svelte';
 // Evidence components temporarily disabled for core build
  // TODO: Re-enable after de-minification tool runs
- // import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
+import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
+import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
+// import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
  // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
  import { onMount } from 'svelte';
@@ -211,14 +213,14 @@
  </a>
  <div class="flex gap-2">
  <button
- onclick={() => showNotesPanel = !showNotesPanel}
+ onclick={() => (showNotesPanel = !showNotesPanel)}
  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
  title="Open case notes editor"
  >
  📝 {showNotesPanel ? 'Hide Notes' : 'Case Notes'}
  </button>
  <button
- onclick={() => showChatModal = true}
+ onclick={() => (showChatModal = true)}
  class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
  title="Open AI chat with case context"
  >
@@ -227,7 +229,7 @@
  <button
  onclick={handleExportPacket}
  disabled={isExportingPacket}
- class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled, opacity-50"
+ class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50"
  title="Export case packet as PDF"
  >
  📄 {isExportingPacket ? 'Exporting...' : 'Export Packet'}
@@ -245,7 +247,7 @@
  </div>
  <button
  class="fixed inset-0 bg-black/50 z-40"
- onclick={() => showNotesPanel = false}
+ onclick={() => (showNotesPanel = false)}
  aria-label="Close notes panel"
  ></button>
  {/if}
@@ -275,9 +277,9 @@
  </div>
  {/if}
 
- <div class="grid grid-cols-1 lg, grid-cols-3 gap-8">
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
  <!-- Left, Upload & Evidence List -->
- <div class="lg, col-span-2 space-y-6">
+ <div class="lg:col-span-2 space-y-6">
  <!-- Upload Section -->
  <div class="bg-white rounded-lg shadow p-6">
  <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Evidence</h2>
@@ -317,7 +319,7 @@
  class={`w-full text-left p-4 rounded-lg border-2 transition ${
  selectedEvidence?.id === item.id
  ? 'border-blue-500 bg-blue-50'
- : 'border-gray-200, hover:border-gray-300'
+  : 'border-gray-200 hover:border-gray-300'
  }`}
  >
  <div class="flex items-start justify-between">
@@ -333,7 +335,7 @@
  ? 'bg-yellow-100 text-yellow-800'
  : item.status === 'approved'
  ? 'bg-green-100 text-green-800'
- , 'bg-red-100 text-red-800'
+ : 'bg-red-100 text-red-800'
  }`}
  >
  {item.status}

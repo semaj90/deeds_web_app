@@ -1,4 +1,270 @@
-import type { Message } from '$lib/types';
+import { EventEmitter } from 'events';
+
+interface QueueMessage {
+	id: string;
+	data: Record<string, unknown>;
+	timestamp: number;
+	attempts: number;
+	maxAttempts: number;
+}
+
+interface QueueOptions {
+	maxRetries?: number;
+	retryDelay?: number;
+	concurrency?: number;
+}
+
+class InMemoryQueue extends EventEmitter {
+	private messages: Map<string, QueueMessage[]> = new Map();
+	private deadLetter: Map<string, QueueMessage[]> = new Map();
+	private stats: Map<string, { processed: number; failed: number }> = new Map();
+
+	constructor(private options: QueueOptions = {}) {
+		super();
+		this.options = { maxRetries: 3, retryDelay: 1000, concurrency: 5, ...options };
+	}
+
+	private ensureQueue(queueName: string): QueueMessage[] {
+		if (!this.messages.has(queueName)) {
+			this.messages.set(queueName, []);
+			this.stats.set(queueName, { processed: 0, failed: 0 });
+		}
+		return this.messages.get(queueName)!;
+	}
+
+	private createMessage(rawData: string): QueueMessage {
+		return {
+			id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+			data: JSON.parse(rawData),
+			timestamp: Date.now(),
+			attempts: 0,
+			maxAttempts: this.options.maxRetries ?? 3
+		};
+	}
+
+	// Redis-compatible methods
+	async lpush(queueName: string, data: string): Promise<number> {
+		const message = this.createMessage(data);
+		const queue = this.ensureQueue(queueName);
+		queue.unshift(message);
+		this.emit('message', queueName, message);
+		return queue.length;
+	}
+
+	async rpush(queueName: string, data: string): Promise<number> {
+		const message = this.createMessage(data);
+		const queue = this.ensureQueue(queueName);
+		queue.push(message);
+		this.emit('message', queueName, message);
+		return queue.length;
+	}
+
+	async blpop(queueName: string, timeout = 0): Promise<[string, string] | null> {
+		return new Promise((resolve) => {
+			const tryPop = () => {
+				const queue = this.messages.get(queueName);
+				if (queue && queue.length > 0) {
+					const message = queue.shift()!;
+					resolve([queueName, JSON.stringify(message)]);
+					return;
+				}
+
+				if (timeout === 0) {
+					this.once('message', (name: string) => {
+						if (name === queueName) {
+							tryPop();
+						}
+					});
+				} else {
+					setTimeout(() => resolve(null), timeout * 1000);
+				}
+			};
+
+			tryPop();
+		});
+	}
+
+	async llen(queueName: string): Promise<number> {
+		return this.messages.get(queueName)?.length ?? 0;
+	}
+
+	// RabbitMQ-compatible methods
+	async publish(exchange: string, routingKey: string, content: Record<string, unknown> = {}): Promise<boolean> {
+		const queueName = `${exchange}:${routingKey}`;
+		await this.rpush(queueName, JSON.stringify(content));
+		return true;
+	}
+
+	async consume(
+		queueName: string,
+		callback: (msg: {
+			content: Buffer;
+			fields: { deliveryTag: number };
+			properties: Record<string, unknown>;
+			ack: () => void;
+			nack: () => void;
+		}) => Promise<void>
+	): Promise<void> {
+		const processMessage = async () => {
+			try {
+				const result = await this.blpop(queueName, 1);
+				if (result) {
+					const [, raw] = result;
+					const message = JSON.parse(raw) as QueueMessage;
+					try {
+						await callback({
+							content: Buffer.from(JSON.stringify(message.data)),
+							fields: { deliveryTag: Date.now() },
+							properties: {},
+							ack: () => this.ack(queueName, message),
+							nack: () => this.nack(queueName, message)
+						});
+						const stats = this.stats.get(queueName)!;
+						stats.processed++;
+					} catch (error) {
+						await this.nack(queueName, message);
+						console.error('❌ Message processing failed:', error);
+					}
+				}
+			} catch (error) {
+				console.error('❌ Consumer error:', error);
+			}
+			setImmediate(processMessage);
+		};
+
+		processMessage();
+	}
+
+	private ack(queueName: string, _message: QueueMessage): void {
+		const stats = this.stats.get(queueName);
+		if (stats) {
+			stats.processed++;
+		}
+	}
+
+	private async nack(queueName: string, message: QueueMessage): Promise<void> {
+		const stats = this.stats.get(queueName);
+		if (stats) {
+			stats.failed++;
+		}
+
+		if (message.attempts < message.maxAttempts) {
+			message.attempts++;
+			setTimeout(() => {
+				this.ensureQueue(queueName).push(message);
+				this.emit('message', queueName, message);
+			}, this.options.retryDelay);
+			return;
+		}
+
+		if (!this.deadLetter.has(queueName)) {
+			this.deadLetter.set(queueName, []);
+		}
+		this.deadLetter.get(queueName)!.push(message);
+		console.log(`🗑️ Message moved to dead letter queue: ${queueName}`);
+	}
+
+	getStats(queueName?: string): unknown {
+		if (queueName) {
+			return {
+				queue: queueName,
+				pending: this.messages.get(queueName)?.length ?? 0,
+				deadLetter: this.deadLetter.get(queueName)?.length ?? 0,
+				stats: this.stats.get(queueName) ?? { processed: 0, failed: 0 }
+			};
+		}
+
+		const allStats: Record<string, unknown> = {};
+		for (const name of this.messages.keys()) {
+			allStats[name] = this.getStats(name);
+		}
+		return allStats;
+	}
+
+	async close(): Promise<void> {
+		this.removeAllListeners();
+		this.messages.clear();
+		this.deadLetter.clear();
+		this.stats.clear();
+	}
+}
+
+const messageQueue = new InMemoryQueue({ maxRetries: 3, retryDelay: 2000, concurrency: 10 });
+
+export const cache = {
+	async set(_key: string, value: unknown, ttlSeconds?: number): Promise<string> {
+		void value;
+		console.log(`💾 Cache SET: ${_key} (TTL: ${ttlSeconds ?? 'none'}s)`);
+		return 'OK';
+	},
+	async get(_key: string): Promise<unknown> {
+		console.log(`📚 Cache GET: ${_key}`);
+		return null;
+	},
+	lpush: messageQueue.lpush.bind(messageQueue),
+	rpush: messageQueue.rpush.bind(messageQueue),
+	blpop: messageQueue.blpop.bind(messageQueue),
+	llen: messageQueue.llen.bind(messageQueue),
+	async close(): Promise<void> {
+		await messageQueue.close();
+	}
+};
+
+export const rabbit = {
+	async connect(): Promise<{ createChannel: () => { publish: typeof messageQueue.publish; consume: typeof messageQueue.consume } }> {
+		console.log('🐇 RabbitMQ (in-memory) connected');
+		return {
+			createChannel: () => ({
+				publish: messageQueue.publish.bind(messageQueue),
+				consume: messageQueue.consume.bind(messageQueue)
+			})
+		};
+	},
+	publish: messageQueue.publish.bind(messageQueue),
+	consume: messageQueue.consume.bind(messageQueue),
+	async close(): Promise<void> {
+		await messageQueue.close();
+	}
+};
+
+export class WorkflowQueue extends InMemoryQueue {
+	private workflows: Map<string, { id: string; state: unknown; history: Array<{ state: unknown; timestamp: number }>; status: 'active' | 'completed' | 'failed' }> = new Map();
+
+	async startWorkflow(workflowId: string, initialState: unknown): Promise<void> {
+		this.workflows.set(workflowId, {
+			id: workflowId,
+			state: initialState,
+			history: [{ state: initialState, timestamp: Date.now() }],
+			status: 'active'
+		});
+		await this.rpush(
+			'workflow_queue',
+			JSON.stringify({ type: 'workflow_start', workflowId, state: initialState })
+		);
+	}
+
+	async updateWorkflow(workflowId: string, newState: unknown): Promise<void> {
+		const workflow = this.workflows.get(workflowId);
+		if (!workflow) return;
+		workflow.state = newState;
+		workflow.history.push({ state: newState, timestamp: Date.now() });
+		await this.rpush(
+			'workflow_queue',
+			JSON.stringify({ type: 'workflow_update', workflowId, state: newState })
+		);
+	}
+
+	getWorkflow(workflowId: string): unknown {
+		return this.workflows.get(workflowId);
+	}
+
+	getAllWorkflows(): unknown[] {
+		return Array.from(this.workflows.values());
+	}
+}
+
+export const workflowQueue = new WorkflowQueue();
+export default messageQueue;import type { Message } from '$lib/types';
 import type { EventEmitter } from 'events'; // Added missing import
 interface QueueMessage {
  id: string, data: Record<string, unknown>;
@@ -46,7 +312,8 @@ class InMemoryQueue extends EventEmitter {
  };
  async blpop(queueName: string, timeout: number = 0): Promise<[string: string] | null> {
  return new Promise((resolve) => {
- const tryPop = () => {if ($1?.$2 > 0) {
+ const tryPop = () => {
+if ($1?.$2 > 0) {
  const message = queue.shift()!;
  resolve([queueName: JSON.stringify(message.data)]);
  return;
@@ -66,7 +333,8 @@ class InMemoryQueue extends EventEmitter {
  tryPop();
  }),;
  };
- async llen(queueName: string): Promise<number> {return queue, ? queue.length, : 0, }
+ async llen(queueName: string): Promise<number> {
+return queue, ? queue.length, : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
@@ -80,8 +348,9 @@ class InMemoryQueue extends EventEmitter {
  queueName: string, callback: (msg: unknown) => Promise<void>,
  options: unknown = {}
  ): Promise<void> {
- const processMessage, = async () => { 
- try {if (result) {
+ const processMessage, = async () => {
+ try {
+if (result) {
  const [messageData] = result;
  const message: QueueMessage = JSON.parse(messageData) as QueueMessage; // Cast to QueueMessage
  try {
@@ -112,7 +381,7 @@ class InMemoryQueue extends EventEmitter {
  if (message.attempts, < message.maxAttempts) {
  message.attempts++;
  // Requeue with delay
- setTimeout(() => { 
+ setTimeout(() => {
  this.messages.get(queueName)!.push(message; this.emit('message', queueName, message,  }; this.options.retryDelay);
  } else {
  // Move to dead letter queue

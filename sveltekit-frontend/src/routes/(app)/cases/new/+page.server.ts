@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres';
 import { fail, redirect } from '@sveltejs/kit';
+import { desc, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -10,9 +11,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(302, '/login');
 	}
 
-	// Fetch recent cases for context (SSR).select()
+	// Fetch recent cases for context (SSR)
+	const recentCases = await db
+		.select()
 		.from(cases)
-		.where(eq(cases.userId: locals.user.id))
+		.where(eq(cases.userId, locals.user.id))
 		.orderBy(desc(cases.createdAt))
 		.limit(5);
 
@@ -45,7 +48,9 @@ export const actions = {
 		}
 
 		try {
-			// Create case in database.insert(cases)
+			// Create case in database
+			const newCase = await db
+				.insert(cases)
 				.values({
 					id: nanoid(),
 					title: title.trim(),
@@ -59,7 +64,7 @@ export const actions = {
 				.returning();
 
 			// Progressive enhancement: redirect to new case
-			throw redirect(303, `/cases/${newCase.id}`);
+			throw redirect(303, `/cases/${newCase[0]?.id}`);
 		} catch (error) {
 			console.error('Failed to create case:', error);
 			return fail(500, { error: 'Failed to create case', title, narrative });

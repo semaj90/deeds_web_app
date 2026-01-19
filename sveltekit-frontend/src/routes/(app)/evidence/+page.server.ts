@@ -1,11 +1,11 @@
-import { error, redirect } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
 import { uploadFile } from '$lib/server/minio-client';
+import { error, redirect } from '@sveltejs/kit';
+import { and, eq } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
 	// Phase 96: SSR Authentication Guard
@@ -63,8 +63,8 @@ export const actions: Actions = {
 			const formData = await request.formData();
 			const file = formData.get('file') as File;
 			const caseId = formData.get('caseId') as string;
-			const title = formData.get('title') as string ?? file?.name;
-			const description = formData.get('description') as string ?? '';
+			const title = (formData.get('title') as string) ?? file?.name ?? '';
+			const description = (formData.get('description') as string) ?? '';
 
 			if (!file) {
 				return { success: false, error: 'No file provided' };
@@ -80,7 +80,9 @@ export const actions: Actions = {
                 'Original-Filename': file.name
             });
 
-			// 2. Create DB Record.insert(evidence)
+			// 2. Create DB Record
+			const newEvidence = await db
+				.insert(evidence)
 				.values({
 					userId: locals.user.id,
 					caseId: caseId ?? null,
@@ -89,8 +91,8 @@ export const actions: Actions = {
 					fileName: file.name,
 					fileSize: file.size,
 					mimeType: file.type,
-                    // Use storagePath if schema supports it, otherwise rely on objectName convention
-                    // storagePath: objectName,
+					// Use storagePath if schema supports it, otherwise rely on objectName convention
+					// storagePath: objectName,
 					status: 'pending',
 					createdAt: new Date(),
 					updatedAt: new Date()
@@ -99,7 +101,7 @@ export const actions: Actions = {
 
 			return {
 				success: true,
-				evidence: newEvidence
+				evidence: newEvidence?.[0] ?? null
 			};
 		} catch (err) {
 			console.error('Upload failed:', err);
@@ -129,7 +131,7 @@ export const actions: Actions = {
 				.delete(evidence)
 				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)));
 
-			return { success, true };
+			return { success: true };
 		} catch (err) {
 			console.error('Delete failed:', err);
 			return {
@@ -153,7 +155,9 @@ export const actions: Actions = {
 
 			if (!evidenceId) {
 				return { success: false, error: 'No evidence ID provided' };
-			}.update(evidence)
+			}
+			const updated = await db
+				.update(evidence)
 				.set({
 					title,
 					description,
@@ -164,7 +168,7 @@ export const actions: Actions = {
 
 			return {
 				success: true,
-				evidence: updated
+				evidence: updated?.[0] ?? null
 			};
 		} catch (err) {
 			console.error('Update failed:', err);

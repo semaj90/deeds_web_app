@@ -160,7 +160,7 @@
 		<section class="grid grid-cols-2 gap-4 mb-6">
 			{#each sections as section (section.id)}
 				<button
-					class="rounded-lg border border-slate-700 bg-black/60 p-4 text-left transition-all hover:border-amber-400 {selectedSection === section.id ? 'border-amber-400' , ''}"
+					class="rounded-lg border border-slate-700 bg-black/60 p-4 text-left transition-all hover:border-amber-400 {selectedSection === section.id ? 'border-amber-400' : ''}"
 					onclick={() => selectedSection = section.id}
 					aria-pressed={selectedSection === section.id}
 				>

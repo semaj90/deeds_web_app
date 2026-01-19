@@ -38,7 +38,7 @@
  backupFrequency: 'daily'
  }
  });
-  
+
  let systemInfo = $state({
  version: '2.0.0',
  uptime: '0d 0h 0m',
@@ -194,7 +194,7 @@
  <nav class="config-tabs">
  {#each tabs as tab}
  <button
- class="tab-btn {activeTab === tab.id ? 'active' , ''}"
+ class="tab-btn {activeTab === tab.id ? 'active' : ''}"
  onclick={() => activeTab = tab.id}
  >
  <span class="tab-icon">{tab.icon}</span>
@@ -400,7 +400,7 @@
  <div class="gpu-status">
  <div class="status-card">
  <h3>WebGPU Status</h3>
- <span class="status {webgpuCapabilities?.hasWebGPU ? 'active' , 'inactive'}">
+ <span class="status {webgpuCapabilities?.hasWebGPU ? 'active' : 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'ENABLED' : 'DISABLED'}
  </span>
  </div>
@@ -525,7 +525,7 @@
  <span class="metric-label">CPU Usage</span>
  <span class="metric-value">{systemInfo.cpu.usage}%</span>
  <div class="metric-bar">
- <div class="metric-fill cpu" style="width, {systemInfo.cpu.usage}%"></div>
+ <div class="metric-fill cpu" style="width: {systemInfo.cpu.usage}%"></div>
  </div>
  </div>
 
@@ -533,7 +533,7 @@
  <span class="metric-label">Memory</span>
  <span class="metric-value">{systemInfo.memory.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill memory" style="width, {systemInfo.memory.percentage}%"></div>
+ <div class="metric-fill memory" style="width: {systemInfo.memory.percentage}%"></div>
  </div>
  </div>
 
@@ -541,7 +541,7 @@
  <span class="metric-label">Disk Usage</span>
  <span class="metric-value">{systemInfo.disk.percentage}%</span>
  <div class="metric-bar">
- <div class="metric-fill disk" style="width, {systemInfo.disk.percentage}%"></div>
+ <div class="metric-fill disk" style="width: {systemInfo.disk.percentage}%"></div>
  </div>
  </div>
 
@@ -566,7 +566,7 @@
  <h3>QUICK ACTIONS</h3>
         <label class="quick-action file-input" for="import-config">
           📥 IMPORT CONFIG
-          <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display, none;" />
+          <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display: none;" />
         </label>
         <button class="quick-action" onclick={ exportConfig }>
           📤 EXPORT CONFIG
@@ -595,18 +595,18 @@
  top: 0; left: 0;
  width: 100%; height: 100%;
  background:
- linear-gradient(90deg, rgba(16, 185, 129: 0.1) 1px, transparent 1px),
- linear-gradient(rgba(16, 185, 129: 0.1) 1px, transparent 1px);
+ linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
+ linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
  background-size: 20px 20px;
  pointer-events: none;
  z-index: -1;
  }
 
  .config-header {
- background: rgba(0, 0, 0: 0.8);
+ background: rgba(0, 0, 0, 0.8);
  border-bottom: 2px solid #10b981;
  padding: 1rem 2rem;
- box-shadow: 0 2px 10px rgba(16, 185, 129: 0.2);
+ box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
  display: flex;
  justify-content: space-between;
  align-items: center;
@@ -616,7 +616,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 2rem; margin: 0;
- text-shadow: 0 0 10px rgba(16, 185, 129: 0.5);
+ text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
  }
 
  .system-info {
@@ -633,12 +633,12 @@
  }
 
  .version {
- background: rgba(16, 185, 129: 0.2);
+ background: rgba(16, 185, 129, 0.2);
  color: #10b981; border: 1px solid #10b981;
  }
 
  .uptime {
- background: rgba(6, 182, 212: 0.2);
+ background: rgba(6, 182, 212, 0.2);
  color: #06b6d4; border: 1px solid #06b6d4;
  }
 
@@ -685,7 +685,7 @@
  flex-direction: column;
  align-items: center; gap: 0.25rem;
  padding: 1rem 0.5rem;
- background: rgba(30, 41, 59: 0.8);
+ background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
  border-radius: 8px; cursor: pointer;
@@ -696,9 +696,9 @@
 
  .tab-btn:hover,
  .tab-btn.active {
- background: rgba(16, 185, 129: 0.2);
+ background: rgba(16, 185, 129, 0.2);
  border-color: #10b981;
- box-shadow: 0 0 15px rgba(16, 185, 129: 0.4);
+ box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
  }
 
  .tab-icon {
@@ -706,10 +706,10 @@
  }
 
  .config-content {
- background: rgba(13, 17, 23: 0.9);
+ background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
  border-radius: 8px; padding: 1.5rem;
- box-shadow: 0 4px 20px rgba(16, 185, 129: 0.1);
+ box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  overflow-y: auto;
  }
 
@@ -717,7 +717,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 1.25rem; margin: 0 0 1.5rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .settings-grid {
@@ -739,7 +739,7 @@
 
  .setting-input,
  .setting-slider {
- padding: 0.5rem; background: rgba(30, 41, 59: 0.8);
+ padding: 0.5rem; background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  border-radius: 4px; color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
@@ -748,13 +748,13 @@
  .setting-slider {
  -webkit-appearance: none; appearance: none;
  height: 6px;
- border-radius: 3px; background: rgba(107, 114, 128: 0.5);
+ border-radius: 3px; background: rgba(107, 114, 128, 0.5);
  outline: none;
  }
  .setting-slider {
  -webkit-appearance: none; appearance: none;
  height: 6px;
- border-radius: 3px; background: rgba(107, 114, 128: 0.5);
+ border-radius: 3px; background: rgba(107, 114, 128, 0.5);
  outline: none;
  }
 
@@ -763,7 +763,7 @@
  height: 16px;
  border-radius: 50%; background: #10b981;
  cursor: pointer;
- box-shadow: 0 0 10px rgba(16, 185, 129: 0.3);
+ box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
  }
 
  .slider-value {
@@ -787,7 +787,7 @@
  position: absolute; cursor: pointer;
  top: 0; left: 0;
  right: 0; bottom: 0;
- background: rgba(107, 114, 128: 0.5);
+ background: rgba(107, 114, 128, 0.5);
  border-radius: 24px; transition: 0.3s;
  }
 
@@ -815,7 +815,7 @@
  }
 
  .status-card {
- background: rgba(30, 41, 59: 0.5);
+ background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
  border-radius: 8px; padding: 1rem;
  text-align: center;
@@ -837,10 +837,10 @@
  }
 
  .system-panel {
- background: rgba(13, 17, 23: 0.9);
+ background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
  border-radius: 8px; padding: 1rem;
- box-shadow: 0 4px 20px rgba(16, 185, 129: 0.1);
+ box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  overflow-y: auto;
  }
 
@@ -852,7 +852,7 @@
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
  font-size: 0.875rem; margin: 0 0 1rem 0;
- text-shadow: 0 0 5px rgba(16, 185, 129: 0.3);
+ text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .metrics-grid {
@@ -860,7 +860,7 @@
  }
 
  .metric-card {
- background: rgba(30, 41, 59: 0.5);
+ background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
  border-radius: 8px; padding: 1rem;
  }
@@ -880,7 +880,7 @@
 
  .metric-bar {
  width: 100%; height: 8px;
- background: rgba(107, 114, 128: 0.3);
+ background: rgba(107, 114, 128, 0.3);
  border-radius: 4px; overflow: hidden;
  }
 
@@ -902,7 +902,7 @@
  }
 
  .quick-action {
- padding: 0.75rem; background: rgba(30, 41, 59: 0.8);
+ padding: 0.75rem; background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
  border-radius: 4px; cursor: pointer;
@@ -912,7 +912,7 @@
  }
 
  .quick-action:hover {
- background: rgba(16, 185, 129: 0.2);
+ background: rgba(16, 185, 129, 0.2);
  border-color: #10b981;
  }
 

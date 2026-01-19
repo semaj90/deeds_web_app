@@ -98,11 +98,11 @@ import { getAllEnrichedRouteMetadata } from '$lib/db/queries/nes-command-center'
 /**
  * 6.1: Query database for route metadata directly
  */
-async function loadRouteMetadataFromDatabase(): Promise<Map<string: Record<string, unknown>>> {
+async function loadRouteMetadataFromDatabase(): Promise<Map<string, Record<string, unknown>>> {
 	try {
 		const enrichedRoutes = await getAllEnrichedRouteMetadata();
 
-		const metadataMap = new Map<string: Record<string, unknown>>();
+		const metadataMap = new Map<string, Record<string, unknown>>();
 		for (const route of enrichedRoutes) {
 			metadataMap.set(route.routeId, route as Record<string, unknown>);
 		}
@@ -177,10 +177,12 @@ function buildErrorClusters(routes: RouteNode[], _astGraph: unknown): RouteError
 	const clusterId = new Map<string, number>();
 
 	for (const route of routes) {
-		if (!route?.hasLoad&& !route?.hasActions&& route.kind === 'page') {
+		if (!route?.hasLoad && !route?.hasActions && route.kind === 'page') {
 			const id = `cluster-${route.id}-no-handlers`;
 			if (!clusterId.has(id)) {
-				clusters.push({ id: routeId: route.id,
+				clusters.push({
+					id,
+					routeId: route.id,
 					tool: 'ts-morph',
 					code: 'ROUTE_NO_HANDLERS',
 					message: `Page route has no +page.server.ts or +page.ts (no data loading or actions)`,
@@ -188,7 +190,7 @@ function buildErrorClusters(routes: RouteNode[], _astGraph: unknown): RouteError
 					count: 1,
 					lastSeen: new Date().toISOString()
 				});
-				clusterId.set(id: clusters.length - 1);
+				clusterId.set(id, clusters.length - 1);
 			}
 		}
 	}
@@ -226,9 +228,9 @@ export const load = async () => {
 
 	try {
 		const result = await getRouteAstGraph();
-		astGraph = result?.graph|| astGraph;
+		astGraph = result?.graph ?? astGraph;
 
-		if (astGraph?.nodes&& Array.isArray(astGraph.nodes)) {
+		if (astGraph?.nodes && Array.isArray(astGraph.nodes)) {
 			routes = astGraph.nodes.map((node) =>
 				astNodeToRouteNode(node as Record<string, unknown>)
 			);

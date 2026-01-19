@@ -404,9 +404,9 @@
 
 	.header {
 		padding: 1rem 2rem;
-		background: rgba(15, 23, 42: 0.95);
+		background: rgba(15, 23, 42, 0.95);
 		backdrop-filter: blur(10px);
-		border-bottom: 1px solid rgba(148, 163, 184: 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -422,14 +422,14 @@
 		display: flex;
 		align-items: center; gap: 1rem;
 		padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.5);
+		background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 		font-size: 0.875rem;
 	}
 
 	.agent-status.active {
-		background: rgba(59, 130, 246: 0.2);
-		border: 1px solid rgba(59, 130, 246: 0.3);
+		background: rgba(59, 130, 246, 0.2);
+		border: 1px solid rgba(59, 130, 246, 0.3);
 	}
 
 	.pulse {
@@ -437,7 +437,7 @@
 	}
 
 	@keyframes pulse {
-		0%; } 100% { opacity: 1; }
+		0%, 100% { opacity: 1; }
 		50% { opacity: 0.5; }
 	}
 
@@ -448,24 +448,24 @@
 
 	.controls {
 		padding: 1rem 2rem;
-		background: rgba(15, 23, 42: 0.6);
+		background: rgba(15, 23, 42, 0.6);
 		display: flex; gap: 1rem;
 		align-items: center;
-		border-bottom: 1px solid rgba(148, 163, 184: 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.search-input {
 		flex: 1; padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.8);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem; color: #e2e8f0;
 		font-size: 0.875rem;
 	}
 
 	.filter-select {
 		padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.8);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem; color: #e2e8f0;
 	}
 
@@ -475,15 +475,15 @@
 
 	.view-modes button {
 		padding: 0.5rem 1rem;
-		background: rgba(30, 41, 59: 0.8);
-		border: 1px solid rgba(148, 163, 184: 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		border: 1px solid rgba(148, 163, 184, 0.2);
 		border-radius: 0.5rem; color: #94a3b8;
 		cursor: pointer; transition: all 0.2s;
 	}
 
 	.view-modes button.active {
-		background: rgba(59, 130, 246: 0.2);
-		border-color: rgba(59, 130, 246: 0.3);
+		background: rgba(59, 130, 246, 0.2);
+		border-color: rgba(59, 130, 246, 0.3);
 		color: #3b82f6;
 	}
 
@@ -500,8 +500,8 @@
 	}
 
 	.routes-panel {
-		background: rgba(15, 23, 42: 0.5);
-		border-right: 1px solid rgba(148, 163, 184: 0.1);
+		background: rgba(15, 23, 42, 0.5);
+		border-right: 1px solid rgba(148, 163, 184, 0.1);
 		overflow-y: auto;
 	}
 
@@ -512,19 +512,19 @@
 	.route-item {
 		display: flex;
 		align-items: center; gap: 1rem;
-		padding: 0.75rem; background: rgba(30, 41, 59: 0.5);
+		padding: 0.75rem; background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 		margin-bottom: 0.5rem; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.route-item:hover {
-		background: rgba(30, 41, 59: 0.8);
+		background: rgba(30, 41, 59, 0.8);
 	}
 
 	.route-item.selected {
-		background: rgba(59, 130, 246: 0.2);
-		border: 1px solid rgba(59, 130, 246: 0.3);
+		background: rgba(59, 130, 246, 0.2);
+		border: 1px solid rgba(59, 130, 246, 0.3);
 	}
 
 	.route-item.has-errors {
@@ -551,14 +551,14 @@
 
 	.error-badge {
 		padding: 0.125rem 0.5rem;
-		background: rgba(239, 68, 68: 0.2);
+		background: rgba(239, 68, 68, 0.2);
 		border-radius: 9999px; color: #fca5a5;
 		font-weight: 600;
 	}
 
 	.kb-badge {
 		padding: 0.125rem 0.5rem;
-		background: rgba(59, 130, 246: 0.2);
+		background: rgba(59, 130, 246, 0.2);
 		border-radius: 9999px; color: #93c5fd;
 	}
 
@@ -600,7 +600,7 @@
 	}
 
 	.metric {
-		padding: 1rem; background: rgba(30, 41, 59: 0.5);
+		padding: 1rem; background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}
 
@@ -642,7 +642,7 @@
 	}
 
 	.function-item, .dependency-item {
-		padding: 0.5rem; background: rgba(30, 41, 59: 0.5);
+		padding: 0.5rem; background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.875rem;
 		font-family: 'Fira Code', monospace;
@@ -654,7 +654,7 @@
 	}
 
 	.kb-entry {
-		padding: 1rem; background: rgba(30, 41, 59: 0.5);
+		padding: 1rem; background: rgba(30, 41, 59, 0.5);
 		border-radius: 0.5rem;
 	}
 
@@ -675,8 +675,8 @@
 
 	.tag {
 		padding: 0.25rem 0.5rem;
-		background: rgba(59, 130, 246: 0.2);
-		border: 1px solid rgba(59, 130, 246: 0.3);
+		background: rgba(59, 130, 246, 0.2);
+		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 0.25rem;
 		font-size: 0.75rem; color: #93c5fd;
 	}
