@@ -247,7 +247,7 @@ export async function createErrorCluster(data: NewErrorCluster) {
  */
 export async function resolveErrorCluster(clusterId: string) {
   const db = getDb();
-.update(errorCluster)
+  const result = await db.update(errorCluster)
     .set({
       resolvedAt: new Date(),
     })
@@ -265,7 +265,7 @@ export async function resolveErrorCluster(clusterId: string) {
  */
 export async function getUnresolvedErrorCount(routeId: string): Promise<number> {
   const db = getDb();
-.select({ count: sql<number>`count(*)` })
+  const result = await db.select({ count: sql<number>`count(*)` })
     .from(errorCluster)
     .where(
       and(
@@ -286,7 +286,7 @@ export async function getUnresolvedErrorCount(routeId: string): Promise<number> 
  */
 export async function getLastError(routeId: string) {
   const db = getDb();
-.select()
+  const result = await db.select()
     .from(errorCluster)
     .where(
       and(
@@ -321,13 +321,15 @@ export async function getHealthEvents(
 ) {
   const db = getDb();
   const { limit = 50, offset = 0 } = options;
-.select()
+
+  const events = await db.select()
     .from(routeHealthEvent)
     .where(eq(routeHealthEvent.routeId, routeId))
     .orderBy(desc(routeHealthEvent.createdAt))
     .limit(limit)
     .offset(offset);
-.select({ count: sql<number>`count(*)` })
+
+  const countResult = await db.select({ count: sql<number>`count(*)` })
     .from(routeHealthEvent)
     .where(eq(routeHealthEvent.routeId, routeId));
 
@@ -358,16 +360,16 @@ export async function createHealthEvent(data: NewRouteHealthEvent) {
  * Get most recent health status for a route
  *
  * @param routeId - Route identifier
- * @returns Most recent health event or null
- */
 export async function getMostRecentHealthStatus(routeId: string) {
   const db = getDb();
-.select()
+  const result = await db.select()
     .from(routeHealthEvent)
     .where(eq(routeHealthEvent.routeId, routeId))
     .orderBy(desc(routeHealthEvent.createdAt))
     .limit(1);
 
+  return result[0] ?? null;
+}
   return result[0] ?? null;
 }
 
@@ -407,14 +409,14 @@ export async function createErrorBrainAnalysis(data: NewErrorBrainAnalysis) {
  * Get suggestion count for a route
  *
  * @param routeId - Route identifier
- * @returns Count of analyses
- */
 export async function getSuggestionCount(routeId: string): Promise<number> {
   const db = getDb();
-.select({ count: sql<number>`count(*)` })
+  const result = await db.select({ count: sql<number>`count(*)` })
     .from(errorBrainAnalysis)
     .where(eq(errorBrainAnalysis.routeId, routeId));
 
+  return Number(result[0]?.count ?? 0);
+}
   return Number(result[0]?.count ?? 0);
 }
 
@@ -449,10 +451,11 @@ export async function updatePatchVerificationStatus(
   message?: string
 ) {
   const db = getDb();
-.update(errorBrainPatch)
+  const result = await db.update(errorBrainPatch)
     .set({
-      verificationStatus, status,
-      verificationTimestamp, new Date( verificationMessage: message,
+      verificationStatus: status,
+      verificationTimestamp: new Date(),
+      verificationMessage: message,
     })
     .where(eq(errorBrainPatch.id, patchId))
     .returning();
@@ -483,7 +486,6 @@ export async function logInteraction(data: NewRouteInteractionLog) {
  * @param routeId - Route identifier
  * @param options - Query options (limit, offset)
  * @returns Array of interactions with total count
- */
 export async function getInteractions(
   routeId: string,
   options: {
@@ -493,13 +495,15 @@ export async function getInteractions(
 ) {
   const db = getDb();
   const { limit = 50, offset = 0 } = options;
-.select()
+  
+  const interactions = await db.select()
     .from(routeInteractionLog)
     .where(eq(routeInteractionLog.routeId, routeId))
     .orderBy(desc(routeInteractionLog.createdAt))
     .limit(limit)
     .offset(offset);
-.select({ count: sql<number>`count(*)` })
+
+  const countResult = await db.select({ count: sql<number>`count(*)` })
     .from(routeInteractionLog)
     .where(eq(routeInteractionLog.routeId, routeId));
 
@@ -507,6 +511,7 @@ export async function getInteractions(
 
   return {
     interactions,
+    total,ctions,
     total,
     limit,
     offset,
@@ -564,14 +569,4 @@ export async function getAllEnrichedRouteMetadata() {
       return {
         ...route,
         errorCount,
-        healthStatus: recentHealth?.newStatus ?? route.status,
-        suggestionCount,
-        lastHealthChange: recentHealth?.createdAt,
-        lastErrorMessage: lastError?.message,
-        lastErrorAt: lastError?.createdAt,
-      };
-    })
-  );
-}
-
-
+        healthStatus: recentHealth?.newStatus ?? ro

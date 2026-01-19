@@ -1,0 +1,152 @@
+[
+  {
+    "Name": "src/lib/server/services/qdrant-client.ts"
+  },
+  {
+    "Name": "src/lib/server/services/llm.service.ts"
+  },
+  {
+    "Name": "src/lib/server/services/integrated-rag-service.ts"
+  },
+  {
+    "Name": "src/lib/services/featureLogger.ts"
+  },
+  {
+    "Name": "src/lib/server/services/adaptive-index-orchestrator.ts"
+  },
+  {
+    "Name": "src/lib/server/adapters/service-integrations.ts"
+  },
+  {
+    "Name": "src/lib/server/services/ingestion/ingestion-orchestrator.ts"
+  },
+  {
+    "Name": "src/lib/server/integrations/redis.ts"
+  },
+  {
+    "Name": "src/lib/server/onnx.ts"
+  },
+  {
+    "Name": "src/lib/server/ibm-vision.ts"
+  },
+  {
+    "Name": "src/lib/server/db/pgvector-service.ts"
+  },
+  {
+    "Name": "src/lib/server/ai/agentic-stream.ts"
+  },
+  {
+    "Name": "src/lib/testing/gpu-markdown.test.ts"
+  },
+  {
+    "Name": "src/lib/webgpu/som-webgpu-cache.ts"
+  },
+  {
+    "Name": "src/lib/server/pgvector-cache.ts"
+  },
+  {
+    "Name": "src/localDocs.svelte.ts"
+  },
+  {
+    "Name": "src/lib/server/acp/phase90-tools.ts"
+  },
+  {
+    "Name": "src/lib/server/queue/xstate.ts"
+  },
+  {
+    "Name": "src/lib/storage/unified-dimensional-store.ts"
+  },
+  {
+    "Name": "src/lib/server/services/CaseRankingService.ts"
+  },
+  {
+    "Name": "src/lib/server/llm/gemmaReports.ts"
+  },
+  {
+    "Name": "src/lib/gpu/markdown-pipeline.ts"
+  },
+  {
+    "Name": "src/lib/cache/chr-rom-pattern-cache.ts"
+  },
+  {
+    "Name": "src/legalFormMachine.ts"
+  },
+  {
+    "Name": "src/lib/server/vector/qdrant-optimized.ts"
+  },
+  {
+    "Name": "src/lib/server/llm/gemmaIntake.ts"
+  },
+  {
+    "Name": "src/lib/server/services/grpoThinkingService.ts"
+  },
+  {
+    "Name": "src/lib/server/keyword-extractor.ts"
+  },
+  {
+    "Name": "src/lib/server/error-brain/run-tracker.ts"
+  },
+  {
+    "Name": "src/lib/storage/integrated-search-engine.ts"
+  },
+  {
+    "Name": "src/lib/server/config.ts"
+  },
+  {
+    "Name": "src/lib/server/services/unified-vector-service.ts"
+  },
+  {
+    "Name": "src/lib/server/terminalFunctions.ts"
+  },
+  {
+    "Name": "src/lib/text/base64-fp32-quantizer.ts"
+  },
+  {
+    "Name": "src/lib/server/db/pgvector-utils.temp.ts"
+  },
+  {
+    "Name": "src/lib/gpu/runtime-optimizations.ts"
+  },
+  {
+    "Name": "src/lib/server/db/jsonb-legal-schema.ts"
+  },
+  {
+    "Name": "src/lib/server/error-brain/patch-generator.ts"
+  },
+  {
+    "Name": "src/lib/server/services/statute-search.service.ts"
+  },
+  {
+    "Name": "src/lib/server/context/contextual.ts"
+  },
+  {
+    "Name": "src/lib/server/llm/ollamaClient.ts"
+  },
+  {
+    "Name": "src/lib/server/db/schema-phase78.ts"
+  },
+  {
+    "Name": "src/lib/server/chrrom/patterns.ts"
+  },
+  {
+    "Name": "src/lib/testing/gpu-markdown-benchmark.ts"
+  },
+  {
+    "Name": "src/lib/server/db/vector-operations.ts"
+  },
+  {
+    "Name": "src/lib/storage/rag-storage.ts"
+  },
+  {
+    "Name": "src/lib/server/services/advanced-search.ts"
+  },
+  {
+    "Name": "src/lib/server/logging/production-logger.ts"
+  },
+  {
+    "Name": "src/lib/server/services/vector.service.ts"
+  },
+  {
+    "Name": "src/lib/server/tensor-acceleration.ts"
+  }
+]
