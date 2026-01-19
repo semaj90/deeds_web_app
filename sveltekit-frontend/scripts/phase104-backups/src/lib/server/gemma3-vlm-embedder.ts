@@ -4,7 +4,7 @@
  * Supports hybrid quantization: INT8 vision tower + NF4 text tower
  */
 
-import { generateText } from './ollama-service.js';
+import { generateText } from './ollama-service';
 
 export interface VLMEmbeddingResult {
  embedding: number[]; modality: 'text' | 'vision' | 'layout' | 'multimodal';
@@ -17,17 +17,22 @@ export interface VLMEmbeddingResult {
 export interface MultimodalContent {
  text?: string;
  imageBase64?: string;
- layoutBoxes?: Array<{ type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
- content: string;
+ layoutBoxes?: Array<{
+    type: string; // 'header', 'body', 'table', 'figure', 'footer'
+    bbox: [number, number, number, number]; // [x1, y1, x2, y2]
+    content: string;
  }>;
  ocrText?: string;
- seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox, [number, number, number, number];
+ seals?: Array<{
+    type: string; // 'notary', 'signature', 'stamp'
+    confidence: number;
+    bbox: [number, number, number, number];
  }>;
 }
 
 const OLLAMA_ENDPOINT = process.env.OLLAMA_ENDPOINT ?? 'http://localhost:11434';
 const VLM_MODEL = 'gemma-3-2b-it-v';
-const EMBEDDING_DIMENSION = 1024;
+const EMBEDDING_DIMENSION = 768;
 
 /**
  * Generate multimodal embedding using Gemma-3 VLM
@@ -49,20 +54,24 @@ export async function generateVLMEmbedding(
  temperature: 0.1, // Very low for consistent embeddings
  top_k: 40, top_p: 0.9,
  });
-  
+
  const embedding = parseEmbeddingResponse(response);
 
  const processingTime = Date.now() - startTime;
 
  console.log(`✅ VLM embedding generated (${processingTime}ms, dim: ${embedding.length})`);
 
- return { embedding: modality: 'multimodal',
- confidence: 0.9,
- metadata: { model: VLM_MODEL,
- quantization: 'hybrid_int8_nf4',
- dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
- },
- };
+ return {
+   embedding,
+   modality: 'multimodal',
+   confidence: 0.9,
+   metadata: {
+    model: VLM_MODEL,
+    quantization: 'hybrid_int8_nf4',
+    dimension: EMBEDDING_DIMENSION,
+    processingTimeMs: processingTime,
+   },
+  };
  } catch (err) {
  console.warn('⚠️ VLM embedding failed:', err);
  return generateFallbackEmbedding(content);
@@ -80,12 +89,14 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
 
  // Use Ollama embeddings endpoint for faster text-only
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'embeddinggemma:latest',
- prompt: text,
- }, signal: AbortSignal.timeout(30000),
- });
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({
+    model: 'embeddinggemma:latest',
+    prompt: text,
+   }),
+   signal: AbortSignal.timeout(30000),
+  });
 
  if (!response.ok) {
  throw new Error(`Embedding failed: ${response.statusText}`);
@@ -94,8 +105,8 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  const data = (await response.json()) as { embedding: number[] };
  const embedding = data.embedding;
 
- // Pad or truncate to 1024 dimensions
- const paddedEmbedding = padEmbedding(embedding: EMBEDDING_DIMENSION);
+ // Pad or truncate to 768 dimensions
+ const paddedEmbedding = padEmbedding(embedding, EMBEDDING_DIMENSION);
 
  const processingTime = Date.now() - startTime;
 
@@ -121,7 +132,8 @@ export async function generateVisionEmbedding(imageBase64: string): Promise<VLME
  const startTime = Date.now();
 
  try {
- console.log(`📸 Generating vision embedding...`);$1;$21. Document type and layout
+ console.log(`📸 Generating vision embedding...`);
+ const prompt = `1. Document type and layout
 2. Key visual elements
 3. Text content (if visible)
 4. Seals, signatures, or stamps
@@ -137,14 +149,15 @@ Provide a comprehensive description that captures the visual essence of the docu
  prompt,
  images: [imageBase64],
  stream: false,
- }, signal: AbortSignal.timeout(60000),
+ }),
+ signal: AbortSignal.timeout(60000),
  });
 
  if (!response.ok) {
  throw new Error(`Vision analysis failed: ${response.statusText}`);
  }
 
- const data = (await response.json()) as { response, string };
+ const data = (await response.json()) as { response: string };
  const visionDescription = data.response;
 
  // Generate embedding from vision description
@@ -153,7 +166,8 @@ Provide a comprehensive description that captures the visual essence of the docu
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ model: 'embeddinggemma:latest',
  prompt: visionDescription,
- }, signal: AbortSignal.timeout(30000),
+ }),
+ signal: AbortSignal.timeout(30000),
  });
 
  if (!embeddingResponse.ok) {
@@ -165,12 +179,16 @@ Provide a comprehensive description that captures the visual essence of the docu
 
  const processingTime = Date.now() - startTime;
 
- return { embedding: modality: 'vision',
- confidence: 0.85,
- metadata: { model: VLM_MODEL,
- quantization: 'int8_vision_tower',
- dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
- },
+ return {
+    embedding,
+    modality: 'vision',
+    confidence: 0.85,
+    metadata: {
+        model: VLM_MODEL,
+        quantization: 'int8_vision_tower',
+        dimension: EMBEDDING_DIMENSION,
+        processingTimeMs: processingTime,
+    },
  };
  } catch (err) {
  console.warn('⚠️ Vision embedding failed:', err);
@@ -188,18 +206,22 @@ function buildMultimodalPrompt(content: MultimodalContent): string {
  parts.push(`TEXT CONTENT:\n${content.text.substring(0, 1000)}`);
  }
 
- if (content?.layoutBoxes&& content.layoutBoxes.length > 0) {.map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
- .join('\n');
- parts.push(`LAYOUT STRUCTURE:\n${layoutDesc}`);
+ if (content?.layoutBoxes && content.layoutBoxes.length > 0) {
+    const layoutDesc = content.layoutBoxes
+        .map((box) => `${box.type}: ${box.content.substring(0, 100)}`)
+        .join('\n');
+    parts.push(`LAYOUT STRUCTURE:\n${layoutDesc}`);
  }
 
  if (content.ocrText) {
  parts.push(`OCR TEXT:\n${content.ocrText.substring(0, 500)}`);
  }
 
- if (content?.seals&& content.seals.length > 0) {.map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
- .join(', ');
- parts.push(`DETECTED SEALS/SIGNATURES: ${sealDesc}`);
+ if (content?.seals && content.seals.length > 0) {
+    const sealDesc = content.seals
+        .map((s) => `${s.type} (confidence: ${s.confidence.toFixed(2)})`)
+        .join(', ');
+    parts.push(`DETECTED SEALS/SIGNATURES: ${sealDesc}`);
  }
 
  return `Generate an embedding representation for this multimodal legal document:
@@ -242,10 +264,10 @@ function parseEmbeddingResponse(response: string): number[] {
  const description = parsed?.embedding_description|| response;
 
  // Generate deterministic embedding from text
- return generateDeterministicEmbedding(description: EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(description, EMBEDDING_DIMENSION);
  } catch (err) {
  console.warn('Failed to parse embedding response:', err);
- return generateDeterministicEmbedding(response: EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(response, EMBEDDING_DIMENSION);
  }
 }
 
@@ -253,7 +275,7 @@ function parseEmbeddingResponse(response: string): number[] {
  * Generate deterministic embedding from text using hash-based approach
  * This is a placeholder - in production, you'd use actual model embeddings
  */
-function generateDeterministicEmbedding(text: string)[] {
+function generateDeterministicEmbedding(text: string, dimension: number): number[] {
  const embedding: number[] = [];
 
  // Simple hash-based embedding generation
@@ -280,7 +302,7 @@ function generateDeterministicEmbedding(text: string)[] {
 /**
  * Pad or truncate embedding to target dimension
  */
-function padEmbedding(embedding: number[]): number[] {
+function padEmbedding(embedding: number[], targetDim: number): number[] {
  if (embedding.length === targetDim) {
  return embedding;
  }
@@ -302,25 +324,32 @@ function padEmbedding(embedding: number[]): number[] {
 /**
  * Generate fallback embedding (simple hash-based)
  */
-function generateFallbackEmbedding(content: MultimodalContent), VLMEmbeddingResult {
+function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResult {
  const startTime = Date.now();
 
- // Combine all content into a single stringcontent?.text?? '',
- content?.ocrText?? '',
- content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
- content.seals?.map((s) => s.type).join(' ') ?? '']
+ // Combine all content into a single string
+ const combined = [
+    content?.text ?? '',
+    content?.ocrText ?? '',
+    content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
+    content.seals?.map((s) => s.type).join(' ') ?? ''
+ ]
  .filter((s) => s.length > 0)
  .join(' ');
 
- const embedding = generateDeterministicEmbedding(combined: EMBEDDING_DIMENSION);
+ const embedding = generateDeterministicEmbedding(combined, EMBEDDING_DIMENSION);
  const processingTime = Date.now() - startTime;
 
- return { embedding: modality: 'multimodal',
- confidence: 0.5,
- metadata: { model: 'fallback',
- quantization: 'none',
- dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
- },
+ return {
+    embedding,
+    modality: 'multimodal',
+    confidence: 0.5,
+    metadata: {
+        model: 'fallback',
+        quantization: 'none',
+        dimension: EMBEDDING_DIMENSION,
+        processingTimeMs: processingTime,
+    },
  };
 }
 

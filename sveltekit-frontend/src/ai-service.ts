@@ -1,10 +1,15 @@
-import type { OllamaService } from '$lib/services/ollamaService.js';
-import { userAiQueries, autoTags, documentChunks, embeddingCache } from '../db/schema-postgres.js';
-import { eq, sql } from 'drizzle-orm';
-import type { NewUserAiQuery, NewAutoTag, NewDocumentChunk } from '../db/schema-postgres.js';
-import { generateIdFromEntropySize } from 'lucia';
+import db from '$lib/server/database';
+import { autoTags, documentChunks, embeddingCache, userAiQueries } from '$lib/server/db/schema-postgres';
+import { OllamaService } from '$lib/services/ollamaService';
 import crypto from 'crypto';
-import { db } from '../database/index.js';
+import type { InferInsertModel } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
+import { generateIdFromEntropySize } from 'lucia';
+
+// Infer types from schema
+type NewUserAiQuery = InferInsertModel<typeof userAiQueries>;
+type NewAutoTag = InferInsertModel<typeof autoTags>;
+type NewDocumentChunk = InferInsertModel<typeof documentChunks>;
 
 /**
  * Minimal local type for the Ollama client shape we expect
@@ -18,7 +23,9 @@ type OllamaClient = {
 };
 
 export interface AIAnalysisResult {
-  summary: string; tags: string[]; confidence: number;
+  summary: string;
+  tags: string[];
+  confidence: number;
   entities?: string[];
   keywords?: string[];
   recommendations?: string[];
@@ -33,19 +40,27 @@ export interface AIQueryOptions {
 }
 
 export interface VectorSearchResult {
-  content: string; similarity: number; metadata: Record<string, unknown>;
+  content: string;
+  similarity: number;
+  metadata: Record<string, unknown>;
   documentId: string;
 }
 
 // Local types for embedding cache
 type EmbeddingCacheRow = {
-  id: string; textHash: string; embedding: string | number[] | null;
+  id: string;
+  textHash: string;
+  embedding: string | number[] | null;
   model?: string | null;
   createdAt?: string | null;
 };
 
 type NewEmbeddingCache = {
-  id: string; textHash: string; embedding: string; model: string; createdAt: string;
+  id: string;
+  textHash: string;
+  embedding: string;
+  model: string;
+  createdAt: string;
 };
 
 export class AIService {
@@ -59,12 +74,11 @@ export class AIService {
   /**
    * Process AI query with context and logging
    */
-  async processQuery(
-    query: string,
-    userId: string,
-    caseId?: string,
-    options: AIQueryOptions = {}
-  ): Promise<{ response: string; confidence: number; contextUsed: string[];
+  async processQuery(query: string, userId: string,
+    caseId?: string, options: AIQueryOptions = {}
+  ): Promise<{
+  response: string;
+  confidence: number; contextUsed: string[];
     queryId?: string;
   }> {
     const startTime = Date.now();
@@ -73,7 +87,7 @@ export class AIService {
       temperature = 0.7,
       maxTokens = 2000,
       includeContext = true,
-      saveQuery = true,
+      saveQuery = true
     } = options;
 
     try {
@@ -87,7 +101,7 @@ export class AIService {
 
         if (contextDocuments.length > 0) {
           const contextText = contextDocuments
-            .map((doc: any) => `[Context] ${doc.content}`)
+            .map((doc) => `[Context] ${doc.content}`)
             .join('\n\n');
           systemPrompt += `\n\nRelevant context:\n${contextText}`;
         }
@@ -97,12 +111,11 @@ export class AIService {
       const response = await this.ollama.generateCompletion(query, {
         systemPrompt,
         temperature,
-        maxTokens,
+        maxTokens
       });
 
-      const processingTime = Date.now() - startTime;
-      const confidence = this.calculateConfidence(response: contextDocuments.length);
-      const contextUsed = contextDocuments.map((doc: any) => doc.documentId);
+      const confidence = this.calculateConfidence(response, contextDocuments.length);
+      const contextUsed = contextDocuments.map((doc) => doc.documentId);
 
       // Save query log if requested
       let queryId: string | undefined = undefined;
@@ -114,16 +127,16 @@ export class AIService {
           response,
           model,
           confidence,
-          processingTime,
+          processingTime: Date.now() - startTime,
           contextUsed,
-          embedding: await this.ollama.generateEmbedding(query),
+          embedding: await this.ollama.generateEmbedding(query)
         });
       }
 
       return { response, confidence, contextUsed, queryId };
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('AI query failed:', msg);
+      console.error('AI query failed, ', msg);
 
       // Log failed query
       if (saveQuery) {
@@ -138,11 +151,11 @@ export class AIService {
             processingTime: Date.now() - startTime,
             contextUsed: [],
             isSuccessful: false,
-            errorMessage: msg,
+            errorMessage: msg
           });
         } catch (logErr: unknown) {
           const lmsg = logErr instanceof Error ? logErr.message : String(logErr);
-          console.error('Failed to log failed query:', lmsg);
+          console.error('Failed to log failed query, ', lmsg);
         }
       }
       throw error;
@@ -152,13 +165,10 @@ export class AIService {
   /**
    * Analyze evidence and generate auto-tags
    */
-  async analyzeEvidence(
-    evidenceId: string,
-    content: string,
-    evidenceType: string
+  async analyzeEvidence(evidenceId: string, content: string, evidenceType: string
   ): Promise<AIAnalysisResult> {
     try {
-$1;$2Analyze the following ${evidenceType} evidence and provide:
+      const systemPrompt = `Analyze the following ${evidenceType} evidence and provide:
 1. A concise summary (2-3 sentences)
 2. Relevant tags for legal categorization
 3. Key entities mentioned
@@ -175,8 +185,10 @@ Format your response as JSON with the structure:
   "recommendations": ["recommendation1", "recommendation2"]
 }`;
 
-      const response = await this.ollama.generateCompletion(content, { systemPrompt: temperature: 0.3,
-        maxTokens: 1000,
+      const response = await this.ollama.generateCompletion(content, {
+        systemPrompt,
+        temperature: 0.3,
+        maxTokens: 1000
       });
 
       // Parse AI response
@@ -188,8 +200,8 @@ Format your response as JSON with the structure:
       }
 
       // Generate and store auto-tags
-      if (analysis?.tags&& analysis.tags.length > 0) {
-        await this.generateAutoTags(evidenceId, 'evidence', analysis.tags: analysis.confidence);
+      if (analysis?.tags && analysis.tags.length > 0) {
+        await this.generateAutoTags(evidenceId, 'evidence', analysis.tags, analysis.confidence);
       }
 
       // Store document chunk for vector search
@@ -198,7 +210,7 @@ Format your response as JSON with the structure:
       return analysis;
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Evidence analysis failed:', msg);
+      console.error('Evidence analysis failed, ', msg);
       throw error;
     }
   }
@@ -206,16 +218,17 @@ Format your response as JSON with the structure:
   /**
    * Find similar documents using vector search
    */
-  async findSimilarDocuments(
-    queryEmbedding: number[],
+  async findSimilarDocuments(queryEmbedding: number[],
     limit = 10,
     threshold = 0.7
   ): Promise<VectorSearchResult[]> {
     try {
-sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
+      const rows = (await (db as any).execute(
+        sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
       )) as Array<{
-        id: string; document_id: string; content: string; metadata: Record<string, unknown>;
-        embedding: string | number[] | null;
+  id: string;
+  document_id: string; content: string; metadata: Record<string, unknown>;
+  embedding: string | number[] | null;
       }>;
 
       const results: VectorSearchResult[] = [];
@@ -238,7 +251,7 @@ sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LI
               content: row.content,
               similarity: sim,
               metadata: row.metadata ?? {},
-              documentId: row.document_id,
+              documentId: row.document_id
             });
           }
         } catch {
@@ -250,7 +263,7 @@ sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LI
       return results.slice(0, limit);
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Vector search failed:', msg);
+      console.error('Vector search failed, ', msg);
       return [];
     }
   }
@@ -258,32 +271,37 @@ sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LI
   /**
    * Find similar queries for smart suggestions
    */
-  async findSimilarQueries(
-    queryEmbedding: number[],
+  async findSimilarQueries(_queryEmbedding: number[],
     userId?: string,
     limit = 5
-  ): Promise<Array<{ query: string; response: string; similarity, number }>> {
+  ): Promise<Array<{
+  query: string;
+  response: string; similarity: number }>> {
     try {
       if (userId) {
-sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
-        )) as Array<{ query: string; response: string; similarity, number }>;
-        return rows.map((r: any) => ({
-          query: r.query,
-          response: r.response,
-          similarity: r.similarity,
+        const rows = (await (db as any).execute(
+          sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
+        )) as Array<{
+          query: string;
+          response: string;
+          similarity: number;
+        }>;
+        return rows.map((r) => ({ query: r.query, response: r.response, similarity: r.similarity
         }));
       } else {
-sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
-        )) as Array<{ query: string; response: string; similarity, number }>;
-        return rows.map((r: any) => ({
-          query: r.query,
-          response: r.response,
-          similarity: r.similarity,
+        const rows = (await (db as any).execute(
+          sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
+        )) as Array<{
+          query: string;
+          response: string;
+          similarity: number;
+        }>;
+        return rows.map((r) => ({ query: r.query, response: r.response, similarity: r.similarity
         }));
       }
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Similar query search failed:', msg);
+      console.error('Similar query search failed, ', msg);
       return [];
     }
   }
@@ -295,19 +313,20 @@ sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY crea
     const textHash = crypto.createHash('sha256').update(text).digest('hex');
 
     try {
-.select({
+      const rows = await (db as any)
+        .select({
           id: embeddingCache.id,
           textHash: embeddingCache.textHash,
           embedding: embeddingCache.embedding,
           model: embeddingCache.model,
-          createdAt: embeddingCache.createdAt,
+          createdAt: embeddingCache.createdAt
         })
         .from(embeddingCache)
-        .where(eq(embeddingCache.textHash, textHash))
+        .where(sql`${embeddingCache.textHash} = ${textHash}`)
         .limit(1);
 
-      const cached = rows?.0 as EmbeddingCacheRow | undefined;
-      if ($1?.$2) {
+      const cached = rows?.[0] as EmbeddingCacheRow | undefined;
+      if (cached?.embedding) {
         const embField = cached.embedding;
         if (typeof embField === 'string') {
           return JSON.parse(embField) as number[];
@@ -324,14 +343,14 @@ sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY crea
         textHash,
         embedding: JSON.stringify(embedding),
         model: 'gemma-embedding:latest',
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       };
-      await db.insert(embeddingCache).values(insertData);
+      await (db as any).insert(embeddingCache).values(insertData);
 
       return embedding;
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Embedding cache failed:', msg);
+      console.error('Embedding cache failed, ', msg);
       throw error;
     }
   }
@@ -339,8 +358,15 @@ sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY crea
   /**
    * Log AI query to database
    */
-  private async logQuery(data: { userId: string,
-    caseId?: string, query: string; response: string; model: string; confidence: number; processingTime: number; contextUsed: string[];
+  private async logQuery(data: {
+    userId: string;
+    caseId?: string;
+    query: string;
+    response: string;
+    model: string;
+    confidence: number;
+    processingTime: number;
+    contextUsed: string[];
     embedding?: number[];
     isSuccessful?: boolean;
     errorMessage?: string;
@@ -348,9 +374,10 @@ sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY crea
     try {
       const queryData: NewUserAiQuery = {
         id: generateIdFromEntropySize(10),
-        userId: data.userId,
+        userId: Number(data.userId),
         caseId: data.caseId ?? null,
         query: data.query,
+        queryType: 'chat',
         response: data.response,
         model: data.model ?? 'unknown',
         confidence: String(data.confidence),
@@ -359,12 +386,11 @@ sql`SELECT query, response: 0.0 as similarity FROM user_ai_queries ORDER BY crea
         embedding: data.embedding ? JSON.stringify(data.embedding) : null,
         isSuccessful: data.isSuccessful !== false,
         errorMessage: data.errorMessage ?? null,
-        createdAt: new Date().toISOString(),
-      } as NewUserAiQuery;
+        createdAt: new Date().toISOString()
+      } as unknown as NewUserAiQuery;
 
       const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);
-Pick<NewUserAiQuery, 'id'>
-      >;
+      const inserted = (await (db as any).insert(userAiQueries).values(queryData).returning({ id: userAiQueries.id }))?.[0] as Pick<NewUserAiQuery, 'id'> | undefined;
 
       const insertedId = inserted?.id;
       if (typeof insertedId === 'string' && insertedId.length > 0) {
@@ -373,7 +399,7 @@ Pick<NewUserAiQuery, 'id'>
       return generatedId;
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Query logging failed:', msg);
+      console.error('Query logging failed, ', msg);
       throw error;
     }
   }
@@ -381,26 +407,23 @@ Pick<NewUserAiQuery, 'id'>
   /**
    * Generate and store auto-tags
    */
-  private async generateAutoTags(
-    entityId: string,
-    entityType: string,
-    tags: string[],
+  private async generateAutoTags(entityId: string, entityType: string, tags: string[],
     confidence: number
   ): Promise<void> {
     try {
-      const tagData: NewAutoTag[] = tags.map((t: any) => ({
+      const tagData: NewAutoTag[] = tags.map((t) => ({
         id: generateIdFromEntropySize(10),
         entityId,
         entityType,
         tag: t,
-        confidence: String(confidence),
+        confidence: confidence,
         source: 'ai_analysis',
-        model: 'gemma3-legal:latest',
+        model: 'gemma3-legal:latest'
       }));
-      await db.insert(autoTags).values(tagData);
+      await (db as any).insert(autoTags).values(tagData);
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Auto-tag generation failed:', msg);
+      console.error('Auto-tag generation failed, ', msg);
       throw error;
     }
   }
@@ -408,11 +431,7 @@ Pick<NewUserAiQuery, 'id'>
   /**
    * Store document chunk for vector search
    */
-  private async storeDocumentChunk(
-    documentId: string,
-    documentType: string,
-    content: string,
-    analysis: AIAnalysisResult
+  private async storeDocumentChunk(documentId: string, documentType: string, content: string, analysis: AIAnalysisResult
   ): Promise<void> {
     try {
       const embedding = await this.ollama.generateEmbedding(content);
@@ -425,15 +444,17 @@ Pick<NewUserAiQuery, 'id'>
         chunkIndex: 0,
         content: content.slice(0, 2000),
         embedding: embeddingString,
-        metadata: { analysis: contentLength: content.length,
-          generatedAt: new Date().toISOString(),
-        },
+        metadata: {
+          analysis,
+          contentLength: content.length,
+          generatedAt: new Date().toISOString()
+        }
       } as NewDocumentChunk;
 
-      await db.insert(documentChunks).values(chunkData);
+      await (db as any).insert(documentChunks).values(chunkData);
     } catch (error: Error | unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Document chunk storage failed:', msg);
+      console.error('Document chunk storage failed, ', msg);
       throw error;
     }
   }
@@ -460,7 +481,7 @@ Pick<NewUserAiQuery, 'id'>
       confidence: 0.75,
       entities: this.extractEntities(response),
       keywords: this.extractKeywords(response),
-      recommendations: this.extractRecommendations(response),
+      recommendations: this.extractRecommendations(response)
     };
   }
 
@@ -468,10 +489,10 @@ Pick<NewUserAiQuery, 'id'>
     const tagPatterns = /(?:tag|category|classification)s?:\s*([^\n]+)/gi;
     const matches = text.match(tagPatterns);
     return matches
-      ? matches.flatMap((m: any) =>
+      ? matches.flatMap((m) =>
           m
             .split(/[,/]/)
-            .map((t: any) => t.trim().toLowerCase())
+            .map((t) => t.trim().toLowerCase())
             .filter(Boolean)
         )
       : [];
@@ -481,10 +502,10 @@ Pick<NewUserAiQuery, 'id'>
     const entityPattern = /(?:entity|entities|person|organization)s?:\s*([^\n]+)/gi;
     const matches = text.match(entityPattern);
     return matches
-      ? matches.flatMap((m: any) =>
+      ? matches.flatMap((m) =>
           m
             .split(/[,/]/)
-            .map((t: any) => t.trim())
+            .map((t) => t.trim())
             .filter(Boolean)
         )
       : [];
@@ -494,10 +515,10 @@ Pick<NewUserAiQuery, 'id'>
     const keywordPattern = /(?:keyword|key\s+word)s?:\s*([^\n]+)/gi;
     const matches = text.match(keywordPattern);
     return matches
-      ? matches.flatMap((m: any) =>
+      ? matches.flatMap((m) =>
           m
             .split(/[,/]/)
-            .map((t: any) => t.trim())
+            .map((t) => t.trim())
             .filter(Boolean)
         )
       : [];
@@ -506,7 +527,7 @@ Pick<NewUserAiQuery, 'id'>
   private extractRecommendations(text: string): string[] {
     const recPattern = /(?:recommend|suggestion|advice)s?:\s*([^\n]+)/gi;
     const matches = text.match(recPattern);
-    return matches ? matches.map((m: any) => m.trim()) : [];
+    return matches ? matches.map((m) => m.trim()) : [];
   }
 
   /**
@@ -517,8 +538,8 @@ Pick<NewUserAiQuery, 'id'>
     let na = 0;
     let nb = 0;
     for (let i = 0; i < a.length; i++) {
-      const va = a?.i ?? 0;
-      const vb = b?.i ?? 0;
+      const va = a?.[i] ?? 0;
+      const vb = b?.[i] ?? 0;
       dot += va * vb;
       na += va * va;
       nb += vb * vb;

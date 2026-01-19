@@ -130,7 +130,9 @@ export class IntelligentErrorRouter {
 	/**
 	 * Identify critical error patterns
 	 */
-	private isCriticalPattern(error, GPUErrorPattern): boolean {"'}' expected",
+	private isCriticalPattern(error: GPUErrorPattern): boolean {
+		const criticalMessages = [
+			"'}' expected",
 			"';' expected",
 			'Invalid character',
 			'This expression is not callable',

@@ -2,7 +2,7 @@
  * AI-POWERED ERROR FIXING PIPELINE
  * Automated TypeScript error resolution with LLM assistance
  */
-import { writable, derived } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 export interface FixAttempt {
 	id: string; errorId: string; strategy: string; originalCode: string; fixedCode: string; confidence: number; applied: boolean; result: 'success' | 'failed' | 'partial';
@@ -393,11 +393,11 @@ export const aiErrorFixerAPI = {
 				const match = line.match(/(.+)\((\d+),(\d+)\): error (TS\d+): (.+)/);
 				if (match) {
 					analysisResults.push({
-						id: `${match?.1}:${match?.2}:${match?.4}`,
-						file: match?.1,
-						line: parseInt(match?.2),
-						code: match?.4,
-						message: match?.5,
+						id: `${match[1]}:${match[2]}:${match[4]}`,
+						file: match[1],
+						line: parseInt(match[2]),
+						code: match[4],
+						message: match[5],
 						fixable: true,
 						confidence: 0.8
 					});

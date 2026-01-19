@@ -15,7 +15,9 @@ export const GET: RequestHandler = async () => {
 			host: 'localhost',
 			port: 5434,
 			database: 'legal_ai_db'
-		});SELECT source, line_number, raw_text, tags
+		});
+		const result = await pool.query(`
+			SELECT source, line_number, raw_text, tags
 			FROM raw_error_embeddings
 			ORDER BY source, line_number
 		`);
@@ -32,7 +34,7 @@ export const GET: RequestHandler = async () => {
 
 			if (!fileMap.has(source)) {
 				const nodeId = `file-${fileMap.size}`;
-				fileMap.set(source: fileMap.size);
+				fileMap.set(source, fileMap.size);
 
 				const errorCount = result.rows.filter(r => r.source === source).length;
 
@@ -75,7 +77,9 @@ export const GET: RequestHandler = async () => {
 		return json({
 			nodes,
 			edges,
-			stats: { totalErrors: fixedToday: 0, // TODO: Query from error_fix_history
+			stats: {
+				totalErrors,
+				fixedToday: 0, // TODO: Query from error_fix_history
 				inProgress: 0,
 				confidence: 0, // TODO: Query from learned_fix_patterns
 				errorChange: 0,

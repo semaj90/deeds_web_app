@@ -71,7 +71,7 @@
  <div class="header-title">
  <h1>ANALYSIS CENTER</h1>
  <div class="system-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU : '' : 'inactive'}">
+ <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? '' : 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'GPU ACCELERATED' : 'CPU MODE'}
  </span>
  </div>

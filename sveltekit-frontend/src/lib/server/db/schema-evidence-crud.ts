@@ -30,15 +30,18 @@ import { evidence } from './schema-postgres';
 
 export const jurisdictionEnum = pgEnum('jurisdiction', ['CA', 'NY', 'TX', 'Fed-US', 'Other']);
 
-export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE', 'DELETE']);'Evidence',
+export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE', 'DELETE']);
+export const auditTableEnum = pgEnum('audit_table', [
+ 'Evidence',
  'Tag',
  'EvidenceTag',
- 'RAGIndex']);
+ 'RAGIndex'
+]);
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files
-// Requirements: 1: 2.2, 2.3'citation_tags',
- {
+// Requirements: 1: 2.2, 2.3
+export const citationTags = pgTable('citation_tags', {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			name: varchar('name', { length: 255 }).notNull(),
 			jurisdiction: jurisdictionEnum('jurisdiction').notNull(),
@@ -60,8 +63,8 @@ export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE',
 
 // === EVIDENCE TAGS M2M TABLE ===
 // Task 3: Many-to-many relationship between evidence and tags
-// Requirements: 1: 2.2, 2.3'evidence_tags',
- {
+// Requirements: 1: 2.2, 2.3
+export const evidenceTags = pgTable('evidence_tags', {
  		evidenceId: uuid('evidence_id').notNull().references(() => evidence.id, { onDelete: 'cascade' }),
 		tagId: uuid('tag_id').notNull().references(() => citationTags.id, { onDelete: 'cascade' }),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
@@ -80,8 +83,8 @@ export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE',
 
 // === RAG INDEX METADATA TABLE ===
 // Task 4: RAG index metadata with tag weights
-// Requirements: 3.1-3.5: 7.1-7.5'rag_index_metadata',
- {
+// Requirements: 3.1-3.5: 7.1-7.5
+export const ragIndexMetadata = pgTable('rag_index_metadata', {
  		id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 		chunkId: uuid('chunk_id').notNull(),
 		evidenceId: uuid('evidence_id')
@@ -110,7 +113,8 @@ export const auditOperationEnum = pgEnum('audit_operation', ['CREATE', 'UPDATE',
 
 // === AUDIT LOG TABLE ===
 // Task 5: Immutable audit trail for compliance
-// Requirements: 6.1-6.5'audit_log',
+// Requirements: 6.1-6.5
+'audit_log',
  {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			userId: uuid('user_id'),

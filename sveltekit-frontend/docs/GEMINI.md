@@ -59,21 +59,36 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
 3. **Revert**: If error count INCREASES, revert the file immediately
 
 ### Current Progress
-- **Error Count**: ~15,785 (Reduced from 16,012 - but effectively higher impact as deep corruption is gone)
+### Current Progress
+### Current Progress
+- **Error Count**: 13,649 (Reduced from 15,785 this session)
 - **Top Fixed Files** (Manual Rewrites):
   - `som-webgpu-cache.ts`: ✅ Fully Fixed (-197 errors)
   - `sveltekit-gpu-cache-integration.ts`: ✅ Fully Fixed (-232 errors)
   - `rag-pipeline-enhanced.ts`: ✅ Fully Fixed (-224 errors)
+  - `simd-markdown-parser.ts`: ✅ Fully Fixed (-192 errors)
+  - `design-system.ts`: ✅ Fully Fixed (-186 errors)
+  - `law-mapping.ts`: ✅ Fully Fixed (-179 errors)
+  - `ingestion-workflow-machine.ts`: ✅ Fully Fixed (-171 errors)
+  - `message-queue.ts`: ✅ Fully Fixed (-168 errors)
+  - `ai-service.ts`: ✅ Fully Fixed (-166 errors)
+  - `knowledge-base.ts`: ✅ Fully Fixed (-142 errors)
+  - `elasticsearch-search.ts`: ✅ Fully Fixed (-134 errors)
+  - `minio-service.ts`: ✅ Fully Fixed (-132 errors)
+  - `case-link.service.ts`: ✅ Fully Fixed (-125 errors)
+  - `gemma3-vlm-embedder.ts`: ✅ Fully Fixed (-124 errors)
+  - `evidenceProcessingMachine.ts`: ✅ Fully Fixed (-123 errors)
+  - `src/lib/server/integrations/minio.ts`: ✅ Refactored & Typed (-123 errors)
 
-### Remaining Top Offenders (New)
-1. `simd-markdown-parser.ts` (192 errors)
-2. `design-system.ts` (186 errors)
-3. `law-mapping.ts` (179 errors)
+### Remaining Top Offenders (Est < 120 errors)
+1. `src/lib/server/services/search/pgvector-search.ts` (~120 errors)
+2. `src/lib/server/legal-autocomplete.ts` (~118 errors)
+3. `src/lib/server/webgpu-langchain-bridge.ts` (~118 errors)
 
 ### Next Actions
-1. Investigate `simd-markdown-parser.ts` corruption
-2. Refactor `design-system.ts` (likely giant object literal issues)
-3. Run `smart-file-fixer` on the new top 10 list
+1. Run automated validation loop on mid-tier error files (`smart-file-fixer`)
+2. Verify Drizzle schema integrity
+3. Consolidate duplicate MinIO services (Phase 3)
 
 ---
 

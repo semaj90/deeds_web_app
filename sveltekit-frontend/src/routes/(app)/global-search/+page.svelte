@@ -193,7 +193,7 @@
  <div class="scope-selector">
  {#each searchScopes as scope}
  <button
- class="scope-btn {searchScope === scope.id : '' : ''}"
+ class="scope-btn {searchScope === scope.id ? '' : ''}"
  onclick={() => searchScope = scope.id}
  >
  <span class="scope-icon">{scope.icon}</span>

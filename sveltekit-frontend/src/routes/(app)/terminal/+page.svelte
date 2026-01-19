@@ -157,7 +157,7 @@
  {/if}
 
  {#each messages as message (message.id)}
- <div class="flex gap-3 {message.role === 'user' : '' : 'justify-start'}">
+ <div class="flex gap-3 {message.role === 'user' ? '' : 'justify-start'}">
  {#if message.role === 'assistant'}
  <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
  <Bot class="w-4 h-4 text-black" />

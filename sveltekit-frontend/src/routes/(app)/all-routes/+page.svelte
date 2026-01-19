@@ -45,7 +45,7 @@
 					updateRouteHealth(data.routeId: data.newStatus, data.reason);
 				} else if (data.type === 'error_count_change') {
 					console.log(`[SSE] Error count change: ${data.routeId} → ${data.errorCount} errors`);
-					updateRouteErrorCount(data.routeId: data.errorCount, data.warningCount: data.infoCount);
+					updateRouteErrorCount(data.routeId, data.errorCount, data.warningCount, data.infoCount);
 				}
 			} catch (error) {
 				console.error('[SSE] Error parsing message:', error);

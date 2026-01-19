@@ -80,7 +80,7 @@
         let currentPath = '';
         for (let i = 0; i < parts.length - 1; i++) {
           const parent = currentPath || 'root';
-          currentPath = currentPath ? `${currentPath}/${parts[i]}` , parts[i];
+          currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
           if (!fileTree.has(parent)) {
             fileTree.set(parent, new Set());
           }
@@ -109,27 +109,27 @@
       // Fix proposed
       eventSource.addEventListener('fix_proposed', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('fixing', 'Fix Proposed', data.description: data.file);
+        addActivity('fixing', 'Fix Proposed', data.description, data.file);
         updateNodeStatus(data.nodeId, 'fixing');
       });
-  
+
       eventSource.addEventListener('fix_applied', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('fixed', 'Fix Applied', data.description: data.file);
+        addActivity('fixed', 'Fix Applied', data.description, data.file);
         updateNodeStatus(data.nodeId, 'fixed');
         stats.fixedToday++;
         stats.totalErrors--;
       });
-  
+
       eventSource.addEventListener('pattern_learned', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         addActivity('learning', 'Pattern Learned', data.pattern, undefined);
         stats.confidence = data.confidence;
       });
-  
+
       eventSource.addEventListener('error_detected', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
-        addActivity('detecting', 'Error Detected', data.description: data.file);
+        addActivity('detecting', 'Error Detected', data.description, data.file);
         updateNodeStatus(data.nodeId, 'error');
         stats.totalErrors++;
       });
@@ -189,11 +189,11 @@
 
   // Filter nodes
   let filteredNodes = $derived(topologyData.nodes.filter(node => {
-    if (filterSource !== 'all' && !node.id.includes(filterSource)) return false);
+    if (filterSource !== 'all' && !node.id.includes(filterSource)) return false;
     if (searchQuery && !node.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
-  
+
   function getStatusColor(status: string): string {
     switch (status) {
       case 'clean': return 'var(--color-success, #22c55e)';

@@ -101,13 +101,17 @@ export const agentShellMachine = createMachine({
         onError: 'idle',
       },
     },
-    checkingHealth: { invoke: { src: 'checkServiceHealth',
-        onDone: { target: 'idle',
-          actions: assign({ serviceHealth: ({ event }) => (event as any).output ?? null,
-          }),
+    checkingHealth: {
+      invoke: {
+        src: 'checkServiceHealth',
+        onDone: {
+          target: 'idle',
+          actions: assign({
+            serviceHealth: ({ event }) => (event as any).output ?? null
+          })
         },
-        onError: 'idle',
-      },
+        onError: 'idle'
+      }
     },
   },
 });
