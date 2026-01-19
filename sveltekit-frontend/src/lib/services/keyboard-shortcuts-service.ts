@@ -1,11 +1,10 @@
-import type { Case } from '$lib/types';
 /**
  * Remote Control Keyboard Shortcuts Service
  * Advanced keyboard shortcut system with remote control capabilities
  * Supports global shortcuts, contextual shortcuts, and remote command execution
  */
-import { writable, type Writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import { writable, type Writable } from 'svelte/store';
 
 export interface KeyboardShortcut {
     id: string;
@@ -379,7 +378,24 @@ class KeyboardShortcutsService {
 
     public enableShortcut(id: string) {
         const shortcut = this.shortcuts.get(id);
-        if
+        if (shortcut) {
+            shortcut.enabled = true;
+            this.shortcuts.set(id, shortcut);
+            this.updateStores();
+        }
+    }
+
+    public disableShortcut(id: string) {
+        const shortcut = this.shortcuts.get(id);
+        if (shortcut) {
+            shortcut.enabled = false;
+            this.shortcuts.set(id, shortcut);
+            this.updateStores();
+        }
+    }
+}
+
+export const keyboardShortcuts = new KeyboardShortcutsService();
 
 
 
