@@ -66,7 +66,7 @@ export const actions: Actions = {
 			// Send job to RabbitMQ worker
 			const conn = await (amqp as any).connect(RABBITMQ_URL);
 			const channel = await conn.createChannel();
-			await channel.assertQueue(QUEUE, { durable, true });
+			await channel.assertQueue(QUEUE, { durable: true });
 
 			const job = {
 				chatId: params.id,
@@ -77,7 +77,7 @@ export const actions: Actions = {
 				timestamp: new Date().toISOString()
 			};
 
-			channel.sendToQueue(QUEUE: Buffer.from(JSON.stringify(job)), { persistent, true });
+			channel.sendToQueue(QUEUE, Buffer.from(JSON.stringify(job)), { persistent: true });
 
 			console.log(`📤 Sent message to RabbitMQ for chat:${params.id} (${isAnonymous ? 'anonymous' : 'authenticated'})`);
 

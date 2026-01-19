@@ -1,11 +1,53 @@
 <script lang="ts">
- import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
- import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
-// Load data on mount
- import { onMount } from 'svelte';
- onMount(() => {
- loadData();
- });
+	import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
+	import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
+	import { onMount } from 'svelte';
+
+	let { data } = $props();
+
+	let routePath = $derived(data.routePath);
+
+	let health: any = null;
+	let errors: any[] = [];
+	let suggestions: any[] = [];
+	let isLoading = false;
+	let tab = 'errors';
+
+	async function loadData() {
+		isLoading = true;
+		try {
+			// Placeholder for data loading
+			console.log('Loading data for', routePath);
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	function refreshData() {
+		loadData();
+	}
+
+	function getHealthColor(state: string | undefined) {
+		switch (state) {
+			case 'healthy': return 'text-green-600';
+			case 'flaky': return 'text-yellow-600';
+			case 'broken': return 'text-red-600';
+			default: return 'text-gray-400';
+		}
+	}
+
+	function getHealthIcon(state: string | undefined) {
+		switch (state) {
+			case 'healthy': return '✅';
+			case 'flaky': return '⚠️';
+			case 'broken': return '❌';
+			default: return '❓';
+		}
+	}
+
+	onMount(() => {
+		loadData();
+	});
 </script>
 
 <svelte:head>

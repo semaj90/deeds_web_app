@@ -176,7 +176,7 @@ export const actions: Actions = {
 			const storageKey = `evidence/${caseId ?? 'default'}/${timestamp}-${randomSuffix}${fileExtension}`;
 
 			const uploadDir = path.join(process.cwd(), 'uploads', 'evidence', caseId ?? 'default');
-			await mkdir(uploadDir, { recursive, true });
+			await mkdir(uploadDir, { recursive: true });
 
 			const filePath = path.join(uploadDir, `${timestamp}-${randomSuffix}${fileExtension}`);
 			await writeFile(filePath, fileBuffer);

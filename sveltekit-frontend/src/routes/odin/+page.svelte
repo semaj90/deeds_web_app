@@ -132,11 +132,11 @@
           <div>> VERIFYING HASH... OK</div>
           <div>> LOADING MODULES... 100%</div>
           {#if isScanning}
-            <div in, fade>> ENCRYPTING DATA STREAM...</div>
-            <div in, fade class="animate-pulse">> UPLOADING TO AI CORE...</div>
+            <div in:fade>> ENCRYPTING DATA STREAM...</div>
+            <div in:fade class="animate-pulse">> UPLOADING TO AI CORE...</div>
           {/if}
           {#each processingLog as log}
-            <div in, fade>{log}</div>
+            <div in:fade>{log}</div>
           {/each}
         </div>
       </div>

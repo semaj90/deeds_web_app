@@ -5,7 +5,7 @@
 	let searchResults = $state <any[]>([]);
 	let isSearching = $state (false);
 	let webgpuCapabilities = $state({ hasWebGPU: false });
-  
+
  let searchFilters = $state ({
  cases: true, evidence: true, persons: true, documents: true, communications: true
  });
@@ -99,14 +99,14 @@
 
  switch (searchScope) {
  case 'recent': return daysDiff <= 7;
- case 'archived', return daysDiff > 30;
+ case 'archived': return daysDiff > 30;
  default: return true;
  }
  })();
 
  return typeMatch && scopeMatch;
  });
-  
+
 		// const endpoint = await getOllamaEndpoint(); // Server-side only
 		const endpoint = 'http://localhost:11434'; // Fallback for client-side
 		const semanticResults = await Promise.all(
@@ -184,7 +184,7 @@
  <div class="header-title">
  <h1>GLOBAL SEARCH</h1>
  <div class="search-status">
- <span class="status-indicator {webgpuCapabilities?.hasWebGPU : '' : 'inactive'}">
+ <span class="status-indicator {webgpuCapabilities?.hasWebGPU ? '' : 'inactive'}">
  {webgpuCapabilities?.hasWebGPU ? 'SEMANTIC SEARCH' : 'TEXT SEARCH'}
  </span>
  </div>
@@ -522,7 +522,7 @@
  transition: all 0.3s ease;
  }
 
- .search-btn:hover, not(disabled) {
+ .search-btn:not(:disabled):hover {
  filter: brightness(0.95);
  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
  }

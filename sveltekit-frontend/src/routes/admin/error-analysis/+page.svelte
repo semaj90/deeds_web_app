@@ -64,7 +64,7 @@
 					if (line.startsWith('data: ')) {
 						const data = JSON.parse(line.slice(6));
 						if (data.log) {
-							agenticLogs = [...agenticLogs: data.log];
+							agenticLogs = [...agenticLogs, data.log];
 						}
 					}
 				}
@@ -127,10 +127,10 @@
 						RAG+KAG powered analysis • Agentic recommendations • Duplicate detection
 					</p>
 				</div>
-				<Button class="bits-btn"
+				<Button
 					onclick={() => loadAnalysis()}
 					disabled={loading}
-					class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover: from-purple-700, hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
+					class="bits-btn px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
 				>
 					<i class="i-carbon-renew mr-2"></i>
 					{loading ? 'Loading...' : 'Refresh Analysis'}

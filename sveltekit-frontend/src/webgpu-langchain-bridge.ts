@@ -273,8 +273,7 @@ export class WebGPULangChainBridge {
 					data: { documentEmbedding: sectionEmbeddings: embeddings,
 						compressionRatio: config.compressVectors ? 4.2 : 1.0,
 						processingTime: Date.now() - startTime,
-						cacheHit,
-						webgpuUtilized
+						cacheHit: webgpuUtilized
 					}
 				};
 			} else if (getLegalEmbedding) {
@@ -292,8 +291,7 @@ export class WebGPULangChainBridge {
 						sectionEmbeddings: undefined,
 						compressionRatio: 1.0,
 						processingTime: Date.now() - startTime,
-						cacheHit,
-						webgpuUtilized
+						cacheHit: webgpuUtilized
 					}
 				};
 			}

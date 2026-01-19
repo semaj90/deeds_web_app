@@ -1,8 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/stores';
 
-    export let form: { error?: string };
+    let { form }: { form: { error?: string } } = $props();
 </script>
 
 <div class="login-container min-h-screen flex items-center justify-center bg-gray-900 text-white">

@@ -54,13 +54,7 @@ function fixCommonPatterns(content) {
 }
 
 const targetFiles = [
-  "src/lib/themes/design-system.ts",
-  "src/lib/memory/nes-memory-architecture.ts",
-  "src/mcp-gpu-orchestrator.ts",
-  "src/lib/services/enhanced-rag-pagerank.ts",
-  "src/lib/server/rag-sync.ts",
-  "src/som-webgpu-cache.ts",
-  "src/lib/utils/simd-markdown-parser.ts"
+  "src/webgpu-langchain-bridge.ts",
 ];
 
 async function main() {
