@@ -178,8 +178,7 @@ export class GPUMemoryManager {
 
  // Create new buffer
  const buffer = device.createBuffer({
- size,
- usage,
+ size: usage,
  });
 
  this.allocatedBuffers.push(buffer);

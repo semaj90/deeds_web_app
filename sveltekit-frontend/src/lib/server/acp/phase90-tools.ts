@@ -380,7 +380,7 @@ export async function phase90_get_file_errors(
 
 export async function phase90_get_fix_recommendation(clusterId: number): Promise<{ clusterId: number;
   recommendation: string; priority: string;
-  affectedFiles, string[];
+  affectedFiles: string[];
 } | null> {
   const client = await getQdrant();
 

@@ -103,7 +103,8 @@ export class WebGPULangChainBridge {
 
 		console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`);
 
-		// Parallel LangChain extraction and embedding generationthis.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig)
+		// Parallel LangChain extraction and embedding generation
+this.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig)
 		]);
 
 		const totalTime = Date.now() - startTime;
@@ -148,7 +149,8 @@ export class WebGPULangChainBridge {
 		for (let i = 0; i < documents.length; i += batchSize) {
 			const batch = documents.slice(i, i + batchSize);
 
-			// Process batch in parallelbatch.map((doc) => this.processLegalDocument(doc.content, mergedConfig))
+			// Process batch in parallel
+batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig))
 			);
 
 			results.push(...batchResults);
@@ -191,13 +193,15 @@ export class WebGPULangChainBridge {
 				throw new Error('Ollama service not available');
 			}
 
-			// Determine document type for extractionconfig.documentType === 'general'
+			// Determine document type for extraction
+config.documentType === 'general'
 					? 'evidence'
 					: config.documentType === 'case'
 						? 'case_law'
 						: config.documentType;
 
-			// Parallel extraction of different legal elementslangExtractService.generateLegalSummary(text, docType).catch(() => null),
+			// Parallel extraction of different legal elements
+langExtractService.generateLegalSummary(text, docType).catch(() => null),
 				config.documentType === 'contract'
 					? langExtractService.extractContractTerms(text).catch(() => null)
 					: Promise.resolve(null),
@@ -260,7 +264,8 @@ export class WebGPULangChainBridge {
 			const sections = this.splitIntoSections(text);
 
 			if (config?.useWebGPUCache&& getBatchLegalEmbeddings) {
-				// Use WebGPU-optimized batch embeddingssections.map((section) => ({
+				// Use WebGPU-optimized batch embeddings
+sections.map((section) => ({
 						text: section,
 						documentType: config.documentType === 'general' ? 'case' : config.documentType,
 						practiceArea: config.practiceArea
@@ -351,7 +356,9 @@ export class WebGPULangChainBridge {
 	/**
 	 * Fallback key term extraction using simple text analysis
 	 */
-	private extractKeyTermsFallback(text: string): string[] {'contract',
+	private extractKeyTermsFallback(text: string): string[] {
+		const legalKeywords = [
+			'contract',
 			'agreement',
 			'party',
 			'parties',
@@ -398,7 +405,8 @@ export class WebGPULangChainBridge {
 	async getProcessingStats(): Promise<{ webgpuOptimizer: unknown;
 		embeddingCache: unknown; langchainService: { available: boolean; models, string[] };
 	}> {
-		await loadServices();webgpuRedisOptimizer?.getOptimizationStats?.() ?? Promise.resolve({}),
+		await loadServices();
+webgpuRedisOptimizer?.getOptimizationStats?.() ?? Promise.resolve({}),
 			(embeddingCache as { getCacheStats?: () => Promise<unknown> })?.getCacheStats?.() ??
 				Promise.resolve({}),
 			langExtractService?.isOllamaAvailable?.() ?? Promise.resolve(false)

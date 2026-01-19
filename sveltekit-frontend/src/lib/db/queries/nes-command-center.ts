@@ -17,7 +17,7 @@ import {
   errorBrainAnalysis,
   errorBrainPatch,
   routeInteractionLog,
-$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2} from '../schema/nes-command-center.js';
+} from '../schema/nes-command-center.js';
 
 // ============================================================================
 // Route Metadata Queries
@@ -495,7 +495,7 @@ export async function getInteractions(
 ) {
   const db = getDb();
   const { limit = 50, offset = 0 } = options;
-  
+
   const interactions = await db.select()
     .from(routeInteractionLog)
     .where(eq(routeInteractionLog.routeId, routeId))
@@ -569,4 +569,14 @@ export async function getAllEnrichedRouteMetadata() {
       return {
         ...route,
         errorCount,
-        healthStatus: recentHealth?.newStatus ?? ro
+        healthStatus: recentHealth?.newStatus ?? route.status,
+        suggestionCount,
+        lastHealthChange: recentHealth?.createdAt,
+        lastErrorMessage: lastError?.message,
+        lastErrorAt: lastError?.createdAt,
+      };
+    })
+  );
+}
+
+

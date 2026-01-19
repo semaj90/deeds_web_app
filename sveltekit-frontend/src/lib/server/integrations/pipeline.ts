@@ -171,8 +171,7 @@ export class LegalAIPipeline {
         await this.redis.set(
           `doc:${documentId}`,
           {
-            content,
-            metadata,
+            content: metadata,
             embedding: Array.from(embedding),
           },
           { ttlSeconds: this.config.cacheTTL, tags: ['document'] }
@@ -183,10 +182,8 @@ export class LegalAIPipeline {
 
       return {
         id: documentId,
-        content,
-        embedding,
-        metadata,
-        cached,
+        content: embedding,
+        metadata: cached,
       };
     } catch (error) {
       console.error('Document ingestion failed:', error);

@@ -127,8 +127,8 @@
 					const relevance = Math.random() * 0.3 + 0.7;
 					return { ...record, relevance };
 				} catch (error) {
- return { ...record, relevance, Math: Math.random() * 0.5 + 0.5 };
- }
+					return { ...record, relevance: Math.random() * 0.5 + 0.5 };
+				}
  })
  );
 
@@ -268,11 +268,11 @@
  </div>
 
  <div class="results-list">
- {#each searchResults as result}
- <div
- class="result-item {selectedResult?.id === result.id : '' : ''}"
- onclick={() => selectedResult = result}
- >
+				{#each searchResults as result}
+					<div
+						class="result-item {selectedResult?.id === result.id ? 'selected' : ''}"
+						onclick={() => selectedResult = result}
+					>
  <div class="result-icon">
  <span class="type-icon">{getTypeIcon(result.type)}</span>
  </div>

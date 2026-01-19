@@ -8,8 +8,8 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_sources: Tracks discovered URLs from web search
- */'ace_sources',
-  {
+ */
+export const aceSources = pgTable('ace_sources', {
     id: uuid('id').primaryKey().defaultRandom(),
     sourceType: text('source_type').notNull().default('web'), // 'web', 'api', 'file'
     canonicalUrl: text('canonical_url').notNull(),
@@ -30,8 +30,8 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_docs: Stores document metadata and MinIO pointers
- */'ace_docs',
-  {
+ */
+export const aceDocs = pgTable('ace_docs', {
     id: uuid('id').primaryKey().defaultRandom(),
     sourceId: uuid('source_id').references(() => aceSources.id),
     fetchedAt: timestamp('fetched_at', { withTimezone, true }).defaultNow(),
@@ -51,8 +51,8 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_chunks: Text chunks with embeddings for RAG
- */'ace_chunks',
-  {
+ */
+export const aceChunks = pgTable('ace_chunks', {
     id: uuid('id').primaryKey().defaultRandom(),
     docId: uuid('doc_id').references(() => aceDocs.id, { onDelete: 'cascade' }),
     chunkIndex: integer('chunk_index').notNull(),
@@ -81,8 +81,8 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_entities: Extracted entities for KAG
- */'ace_entities',
-  {
+ */
+export const aceEntities = pgTable('ace_entities', {
     id: uuid('id').primaryKey().defaultRandom(),
     docId: uuid('doc_id').references(() => aceDocs.id, { onDelete: 'cascade' }),
     entity: text('entity').notNull(),
@@ -98,8 +98,8 @@ import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } f
 
 /**
  * ace_edges: Entity relationships for KAG graph
- */'ace_edges',
-  {
+ */
+export const aceEdges = pgTable('ace_edges', {
     id: uuid('id').primaryKey().defaultRandom(),
     srcEntity: text('src_entity').notNull(),
     rel: text('rel').notNull(),

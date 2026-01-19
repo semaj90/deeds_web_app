@@ -137,8 +137,7 @@ function extractKeywordsFallback(content: string, documentType?: string): Keywor
 
  return {
  keywords: keyPhrases,
- entities,
- topics,
+ entities: topics,
  summary: `Extracted ${keywords.length} keywords from ${documentType ?? 'document'}`,
  confidence: 0.6,
  method: 'fallback',

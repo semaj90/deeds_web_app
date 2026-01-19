@@ -32,7 +32,7 @@ export async function getRouteAstGraph(): Promise<{
 }> {
 	const graph = graphJson;
 
-	return { graph: stats: {
+	return { graph, stats: {
 			totalRoutes: graph.nodes?.length ?? 0,
 			totalEdges: graph.edges?.length ?? 0
 		}

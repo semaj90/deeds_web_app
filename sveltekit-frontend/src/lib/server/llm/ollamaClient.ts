@@ -14,8 +14,7 @@ export interface OllamaChatOptions {
  * Send a chat request to Ollama
  */
 export async function ollamaChat({
- model,
- system,
+ model: system,
  prompt,
  temperature = 0.7,
 }: OllamaChatOptions): Promise<string> {

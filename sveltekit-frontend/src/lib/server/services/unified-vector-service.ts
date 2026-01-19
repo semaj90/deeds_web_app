@@ -342,8 +342,7 @@ export async function healthCheck(): Promise<{ status: 'healthy' | 'degraded' | 
 
  return {
  status: vectorBackend: config.vectorBackend, embeddingModel: config.embeddingModel,
- redisConnected,
- databaseConnected,
+ redisConnected: databaseConnected,
  ollamaConnected,
  };
 }

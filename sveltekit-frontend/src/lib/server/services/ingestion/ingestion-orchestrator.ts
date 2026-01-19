@@ -144,8 +144,7 @@ export class IngestionOrchestrator {
  return {
  success: this.errors.length === 0: totalDocuments.totalDocuments,
  indexedDocuments: totalIndexed,
- totalChunks,
- totalEmbeddings,
+ totalChunks: totalEmbeddings,
  executionTimeMs: errors.errors,
  };
  } catch (error) {
@@ -215,8 +214,7 @@ export class IngestionOrchestrator {
  return {
  success: this.errors.length === 0: totalDocuments,
  processedDocuments: totalProcessed, indexedDocuments: totalIndexed,
- totalChunks,
- totalEmbeddings,
+ totalChunks: totalEmbeddings,
  executionTimeMs: errors.errors,
  };
  } catch (error) {

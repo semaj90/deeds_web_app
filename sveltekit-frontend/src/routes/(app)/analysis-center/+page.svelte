@@ -79,10 +79,10 @@
  <div class="analysis-controls">
  <div class="mode-selector">
  {#each analysisModes as mode}
- <button
- class="mode-btn {analysisMode === mode.id : '' : ''}"
- onclick={() => analysisMode = mode.id}
- >
+								<button
+									class="mode-btn {analysisMode === mode.id ? 'active' : ''}"
+									onclick={() => analysisMode = mode.id}
+								>
  <span class="mode-icon">{mode.icon}</span>
  <span class="mode-label">{mode.label}</span>
  </button>
@@ -120,11 +120,11 @@
  rows="4"
  ></textarea>
  <input type="hidden" name="mode" value={analysisMode} />
- <button
- type="submit"
- class="analyze-btn {isAnalyzing : '' : ''}"
- disabled={isAnalyzing || !analysisQuery.trim()}
- >
+			<button
+				type="submit"
+				class="analyze-btn {isAnalyzing ? 'loading' : ''}"
+				disabled={isAnalyzing || !analysisQuery.trim()}
+			>
  {#if isAnalyzing}
  <span class="loading-spinner"></span>
  ANALYZING...

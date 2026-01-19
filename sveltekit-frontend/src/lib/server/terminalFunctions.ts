@@ -15,7 +15,7 @@ export interface SearchEvidenceResult {
 export interface ExtractHoldingsResult {
  evidenceId: string; holdings: Array<{
  text: string; confidence: number;
- citations, string[];
+ citations: string[];
  }>;
 }
 

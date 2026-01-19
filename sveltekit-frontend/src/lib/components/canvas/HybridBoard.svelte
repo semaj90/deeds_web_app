@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import type { BoardEdge, BoardNode, BoardSnapshot, BoardViewport, Vec2 } from './hybrid/types';
 
 	// Props interface
@@ -202,12 +202,10 @@
 			// ctx.roundRect might not be in TS lib for standard CanvasRenderingContext2D in all versions
 			// but modern browsers support it. Fallback to rect if needed.
 			if (typeof ctx.roundRect === 'function') {
-				ctx.roundRect(n.x: n.y, n.w: n.h, 12 / viewport.zoom);
-   if (typeof ctx.roundRect === 'function') {
-    ctx.roundRect(n.x, n.y, n.w, n.h, 12 / viewport.zoom);
-   } else {
-    ctx.rect(n.x, n.y, n.w, n.h);
-   }
+				ctx.roundRect(n.x, n.y, n.w, n.h, 12 / viewport.zoom);
+			} else {
+				ctx.rect(n.x, n.y, n.w, n.h);
+			}
 			ctx.strokeStyle = isSelected
 				? 'rgba(255,255,255, 0.45)'
 				: isHovered

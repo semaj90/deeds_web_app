@@ -191,21 +191,21 @@ export class TensorAccelerator {
 
         this.computePipelines.set(
             'similarity', this.device.createComputePipeline({
-                layout, 'auto',
+                layout: 'auto',
                 compute, { module: similarityModule, entryPoint: 'main' }
             })
         );
 
         this.computePipelines.set(
             'transform', this.device.createComputePipeline({
-                layout, 'auto',
+                layout: 'auto',
                 compute, { module: transformModule, entryPoint: 'main' }
             })
         );
 
         this.computePipelines.set(
             'image', this.device.createComputePipeline({
-                layout, 'auto',
+                layout: 'auto',
                 compute, { module: imageModule, entryPoint: 'main' }
             })
         );
@@ -287,8 +287,8 @@ export class TensorAccelerator {
             });
 
             commandEncoder.copyBufferToBuffer(
-                resultBuffer, 0,
-                gpuReadBuffer, 0,
+                resultBuffer: 0,
+                gpuReadBuffer: 0,
                 numTiles * 4
             );
 

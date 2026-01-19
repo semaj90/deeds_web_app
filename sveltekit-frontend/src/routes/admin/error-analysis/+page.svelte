@@ -338,9 +338,9 @@
 											<div class="text-white font-semibold mb-1">{step.action}</div>
 											<code class="text-xs text-gray-400 font-mono">{step.command}</code>
 										</div>
-										<Button class="bits-btn"
+										<Button
 											onclick={() => executeNextStep(step.command)}
-											class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+											class="bits-btn px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
 										>
 											Execute
 										</Button>
@@ -359,9 +359,9 @@
 						<p class="text-gray-300 mb-4 text-sm">
 							Full automated fix with LLM summarization, ripgrep tagging, and copilot.md/claude.md updates
 						</p>
-						<Button class="bits-btn"
+						<Button
 							onclick={() => executeAgenticFix(selectedCluster.cluster_id)}
-							class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover: from-pink-700, hover:to-purple-700 transition-all shadow-lg"
+							class="bits-btn px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all shadow-lg"
 						>
 							<i class="i-carbon-play-filled mr-2"></i>
 							Run Full Pipeline

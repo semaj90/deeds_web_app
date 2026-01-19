@@ -18,18 +18,12 @@ export async function generateReportWithGemma(opts: { caseTitle: string,
  evidence: Array<{ title: string; kind, string }>;
 }): Promise<string> {
  const {
- caseTitle,
- caseId,
- template,
- narrative,
- who,
- what,
- when,
- where,
- why,
- how,
- persons,
- evidence,
+ caseTitle: caseId,
+ template: narrative,
+ who: what,
+ when: where,
+ why: how,
+ persons: evidence,
  } = opts;template === 'charging_memo'
  ? 'Charging Memorandum for Prosecutor'
  : 'Intake Summary for Prosecutor';$1;$2You are a prosecutor-assistant legal AI.
