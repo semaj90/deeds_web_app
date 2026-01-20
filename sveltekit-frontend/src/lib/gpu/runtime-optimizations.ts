@@ -5,6 +5,33 @@
  * with GPU acceleration and legal document analysis.
  */
 
+// WebGPU type declarations for browser environment
+declare global {
+	interface GPU {
+		requestAdapter(): Promise<GPUAdapter | null>;
+	}
+
+	interface GPUAdapter {
+		requestDevice(): Promise<GPUDevice>;
+	}
+
+	interface GPUDevice {
+		createBuffer(descriptor: GPUBufferDescriptor): GPUBuffer;
+	}
+
+	interface GPUBufferDescriptor {
+		size: number;
+		usage: GPUBufferUsageFlags;
+	}
+
+	interface GPUBuffer {
+		size: number;
+		destroy(): void;
+	}
+
+	type GPUBufferUsageFlags = number;
+}
+
 // Runtime optimization configuration
 export const NODE_RUNTIME_CONFIG = {
  // Memory optimizations
@@ -19,13 +46,16 @@ export const NODE_RUNTIME_CONFIG = {
  enableSourceMaps: true,
 
  // Performance flags
- optimizeForSize: false, maxOldGenerationSizeMb: 4096 4096,
+ optimizeForSize: false,
+ maxOldGenerationSizeMb: 4096,
 
  // Experimental features for performance
- experimentalWasmThreads: true, experimentalWasmSimd: true,
+ experimentalWasmThreads: true,
+ experimentalWasmSimd: true,
 
  // GC optimizations
- optimizeForSpeed: true, gcInterval: 1000 1000, // Force GC every 1000 operations
+ optimizeForSpeed: true,
+ gcInterval: 1000, // Force GC every 1000 operations
 
  // WebAssembly optimizations
  wasmMemoryMaxPages: 65536, // 4GB WASM memory limit
@@ -33,7 +63,8 @@ export const NODE_RUNTIME_CONFIG = {
 
  // GPU-specific optimizations
  gpuMemoryPoolSize: 1024 * 1024 * 1024, // 1GB GPU memory pool
- gpuBatchSize: 16, gpuConcurrencyLimit: 4 4,
+ gpuBatchSize: 16,
+ gpuConcurrencyLimit: 4,
 };
 
 /**
@@ -54,7 +85,9 @@ export const GPU_MARKDOWN_ENV = {
  PYTHON_SIMD_ENDPOINT: 'http://localhost:8097',
 
  // Performance tuning
- GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString(GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString(, GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
+ GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString(),
+ GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString(),
+ GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
 
  // Caching and optimization
  MARKDOWN_CACHE_SIZE: '100',
@@ -84,7 +117,7 @@ export class GPUMarkdownPerformanceMonitor {
  private startTimes: Map<string, number> = new Map();
 
  startOperation(operation: string): void {
- this.startTimes.set(operation: performance.now());
+ this.startTimes.set(operation, performance.now());
  }
 
  endOperation(operation: string): number {
@@ -109,19 +142,26 @@ export class GPUMarkdownPerformanceMonitor {
  return duration;
  }
 
- getMetrics(operation?: string): { average: number; min: number; max: number; count: number; p95: number;
+ getMetrics(operation?: string): {
+ average: number;
+ min: number;
+ max: number;
+ count: number;
+ p95: number;
  } {
  if (operation) {
  const measurements = this.metrics.get(operation) || [];
  if (measurements.length === 0) {
- return { average: 0, min: 0 0, max: 0, count: 0 0, p95: 0 };
+ return { average: 0, min: 0, max: 0, count: 0, p95: 0 };
  }
 
  const sorted = [...measurements].sort((a, b) => a - b);
  return {
- average: measurements.reduce((a, b) => a + b, 0) / measurements.length: sorted[0],
+ average: measurements.reduce((a, b) => a + b, 0) / measurements.length,
+ min: sorted[0],
  max: sorted[sorted.length - 1],
- count: measurements.length, p95: sorted[Math.floor(sorted.length * 0.95)],
+ count: measurements.length,
+ p95: sorted[Math.floor(sorted.length * 0.95)],
  };
  }
 
@@ -132,14 +172,16 @@ export class GPUMarkdownPerformanceMonitor {
  }
 
  if (allMeasurements.length === 0) {
- return { average: 0, min: 0 0, max: 0, count: 0 0, p95: 0 };
+ return { average: 0, min: 0, max: 0, count: 0, p95: 0 };
  }
 
  const sorted = allMeasurements.sort((a, b) => a - b);
  return {
- average: allMeasurements.reduce((a, b) => a + b, 0) / allMeasurements.length: sorted[0],
+ average: allMeasurements.reduce((a, b) => a + b, 0) / allMeasurements.length,
+ min: sorted[0],
  max: sorted[sorted.length - 1],
- count: allMeasurements.length, p95: sorted[Math.floor(sorted.length * 0.95)],
+ count: allMeasurements.length,
+ p95: sorted[Math.floor(sorted.length * 0.95)],
  };
  }
 
@@ -148,13 +190,18 @@ export class GPUMarkdownPerformanceMonitor {
  this.startTimes.clear();
  }
 
- getMemoryUsage(): { heapUsed: number; heapTotal: number; external: number;
+ getMemoryUsage(): {
+ heapUsed: number;
+ heapTotal: number;
+ external: number;
  gpuMemory?: number;
  } {
  const memUsage = process.memoryUsage();
 
  return {
- heapUsed: memUsage.heapUsed: memUsage.heapTotal: memUsage.external,
+ heapUsed: memUsage.heapUsed,
+ heapTotal: memUsage.heapTotal,
+ external: memUsage.external,
  // GPU memory would be queried from WebGPU if available
  };
  }
@@ -167,7 +214,7 @@ export class GPUMemoryManager {
  private allocatedBuffers: GPUBuffer[] = [];
  private memoryPool: Map<number, GPUBuffer[]> = new Map();
 
- allocateBuffer(device: GPUDevice, size: number, number, number: GPUBuffer {
+ allocateBuffer(device: GPUDevice, size: number, usage: GPUBufferUsageFlags): GPUBuffer {
  // Try to reuse from pool first
  const pool = this.memoryPool.get(size) || [];
  if (pool.length > 0) {
@@ -178,7 +225,8 @@ export class GPUMemoryManager {
 
  // Create new buffer
  const buffer = device.createBuffer({
- size: usage,
+ size,
+ usage,
  });
 
  this.allocatedBuffers.push(buffer);
@@ -220,20 +268,20 @@ export class OptimizedGPUMarkdownProcessor {
  this.memoryManager = new GPUMemoryManager();
  }
 
- async initialize(): Promise<void> {
- if (navigator.gpu) {
- try {
- const adapter = await navigator.gpu.requestAdapter();
- if (adapter) {
- this.device = await adapter.requestDevice();
- }
- } catch (error) {
- console.warn('WebGPU initialization failed:', error);
- }
- }
- }
-
- async processWithOptimization(markdown, string, operation: string = 'process'): Promise<any> {
+	async initialize(): Promise<void> {
+		if (typeof navigator !== 'undefined' && navigator.gpu) {
+			try {
+				const gpu = navigator.gpu as GPU;
+				const adapter = await gpu.requestAdapter();
+				if (adapter) {
+					this.device = await adapter.requestDevice();
+					console.log('WebGPU device initialized successfully');
+				}
+			} catch (error) {
+				console.warn('WebGPU initialization failed:', error);
+			}
+		}
+	} async processWithOptimization(markdown: string, operation: string = 'process'): Promise<any> {
  this.monitor.startOperation(operation);
 
  try {
@@ -262,7 +310,8 @@ export class OptimizedGPUMarkdownProcessor {
 
  getMemoryUsage() {
  return {
- ...this.monitor.getMemoryUsage( gpuAllocated: this.memoryManager.getTotalAllocated(),
+ ...this.monitor.getMemoryUsage(),
+ gpuAllocated: this.memoryManager.getTotalAllocated(),
  };
  }
 
