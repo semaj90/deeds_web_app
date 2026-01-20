@@ -12,14 +12,20 @@ export interface QueueState {
 export interface QueueContext {
  jobs: Map<string, QueueState>; activeJobs: Set<string>;
  maxConcurrency: number; retryDelay: number;
-}| { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
+}
+
+export type QueueEvent =
+ | { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
  | { type: 'START_JOB'; jobId: string }
  | { type: 'COMPLETE_JOB'; jobId: string; result?: any }
  | { type: 'FAIL_JOB'; jobId: string; error: string }
  | { type: 'RETRY_JOB'; jobId: string }
  | { type: 'CANCEL_JOB'; jobId: string }
  | { type: 'PROCESS_QUEUE' }
- | { type: 'SET_CONCURRENCY'; maxConcurrency: number };{
+ | { type: 'SET_CONCURRENCY'; maxConcurrency: number };
+
+const queueMachine = createMachine<QueueContext, QueueEvent>(
+ {
  id: 'queue',
  initial: 'idle',
  context: { jobs: new Map(),
@@ -101,7 +107,7 @@ export interface QueueContext {
  if (event.type !== 'RETRY_JOB') return context;
 
  const job = context.jobs.get(event.jobId);
- if ($1?.$2 < job.maxRetries) {
+ if (job && job.retryCount < job.maxRetries) {
  job.status = 'idle';
  job.retryCount++;
  job.updatedAt = new Date();
@@ -120,7 +126,9 @@ export interface QueueContext {
  context.maxConcurrency = event.maxConcurrency;
  return context;
  }, processQueue: (context) => {
- // Find idle jobs that can be started.filter((job) => job.status === 'idle')
+ // Find idle jobs that can be started
+ const idleJobs = Array.from(context.jobs.values())
+ .filter((job) => job.status === 'idle')
  .sort((a, b) => {
  // Sort by priority first, then by creation time
  const priorityOrder = { urgent: 4, high: 3, normal: 2, low: 1 };
@@ -157,7 +165,7 @@ export class XStateQueueManager {
  return XStateQueueManager.instance;
  }
 
- addJob(job, Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'>) {
+ addJob(job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'>) {
  this.interpreter.send({ type: 'ADD_JOB', job });
  }
 

@@ -5,8 +5,8 @@ export type ReportTemplate = 'charging_memo' | 'intake_summary';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
-export async function generateReportWithGemma(opts: { caseTitle: string,
- caseId: string, template: ReportTemplate;
+export async function generateReportWithGemma(opts: { caseTitle: string;
+ caseId: string; template: ReportTemplate;
  narrative?: string | null;
  who?: string | null;
  what?: string | null;
@@ -18,15 +18,27 @@ export async function generateReportWithGemma(opts: { caseTitle: string,
  evidence: Array<{ title: string; kind, string }>;
 }): Promise<string> {
  const {
- caseTitle: caseId,
- template: narrative,
- who: what,
- when: where,
- why: how,
- persons: evidence,
- } = opts;template === 'charging_memo'
+ caseTitle,
+ caseId,
+ template,
+ narrative,
+ who,
+ what,
+ when,
+ where,
+ why,
+ how,
+ persons,
+ evidence,
+ } = opts;
+
+ const templateLabel =
+ template === 'charging_memo'
  ? 'Charging Memorandum for Prosecutor'
- : 'Intake Summary for Prosecutor';$1;$2You are a prosecutor-assistant legal AI.
+ : 'Intake Summary for Prosecutor';
+
+ const prompt = `
+You are a prosecutor-assistant legal AI.
 
 Write a ${templateLabel} in HTML suitable for rendering in a rich text editor (TipTap). Use headings (<h2>), paragraphs, and bullet lists. Do NOT include <html>, <head>, or <body> tags.
 
@@ -46,7 +58,7 @@ Persons of Interest:
 ${persons
  .map(
  (p, i) =>
- `${i + 1}. ${p.fullName} — role: ${p.role ?? 'unknown'}, risk: ${p.riskLevel ?? 'unknown'}`
+ `${i + 1}. ${p.fullName} ΓÇö role: ${p.role ?? 'unknown'}, risk: ${p.riskLevel ?? 'unknown'}`
  )
  .join('\n')}
 
@@ -73,7 +85,7 @@ Requirements:
  throw new Error(`Gemma3 request failed: ${res.status} ${res.statusText}`);
  }
 
- const data = (await res.json()) as { response, string };
+ const data = (await res.json()) as { response: string };
  return data.response; // plain HTML-ish text
 }
 
