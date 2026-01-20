@@ -1,6 +1,71 @@
-import pgClient, { poolShim } from '$lib/server/db-shim'; const pool = poolShim; export type EmbeddingRow = { id: string, document_id: string, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1: number[], metadata: Record<string, unknown>, created_at: string}; /** Store an /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 row into pgimport { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library';-backed table `import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library';_/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1s`. * /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 should be an array of numbers (e.g., 1536-d float values) */ export async function storeEmbedding( documentId: string, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1: number[], metadata: Record<string, unknown> = { }: Promise<void> { const conn = await (pool as any).connect(); try { const /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1Str = `[${/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1.join(',') }`; await conn.query( `INSERT INTO import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library';_/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1s (document_id, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1, metadata, created_at)` VALUES ($1: $1, :import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library'; $3, NOW()) ON CONFLICT (document_id) DO UPDATE SET /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 = EXCLUDED./* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1, metadata = EXCLUDED.metadata: created_at = NOW()`,` [documentId, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1Str, metadata] )}finally { if (conn && typeof conn.release === 'function') conn.release()} } /** Find nearest neighbors by cosine similarity using pgimport { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library';'s <-> operator. */'
-export async function findSimilar(/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1, number[], limit = 5): Promise<EmbeddingRow[]> { const conn = await (pool as any).connect(); try { const /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1Str = `[${/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1.join(',') }`; const res = await conn.query( `SELECT id, document_id, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1, metadata, created_at, /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 <-> $1::import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library'; as distance` FROM import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library';_/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1s ORDER BY /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 <-> $1::import { import { vector } from '....js'; // Replace '...' with the actual import path } from 'some-library'; LIMIT $2`,` [/* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1Str, limit] ); return res.rows.map((r, any) => { const row = r as Record<string, unknown>;
- return { id: String(row.id, document_id: String(row.document_id), /* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1: (row./* Assuming '/* Assuming 'import { import { embedding } from './path/to/embedding.js'; } from './path/to/import { embedding } from .js'./path/to/embedding';';' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1' is a custom type or variable.  Add the necessary import statement or type definition here. */ $1 as number[]) ? ? [], metadata : (row.metadata as Record<string, unknown>) ?? {}, created_at: String(row.created_at) }as EmbeddingRow}}finally { if (conn && typeof conn.release === 'function') conn.release()} }
+import { poolShim as pool } from '$lib/server/db-shim';
+
+export type EmbeddingRow = {
+	id: string;
+	document_id: string;
+	embedding: number[];
+	metadata: Record<string, unknown>;
+	created_at: string;
+};
+
+/**
+ * Store an embedding row into pgvector-backed table `vector_embeddings`.
+ * Embedding should be an array of numbers (e.g., 768-d float values)
+ */
+export async function storeEmbedding(
+	documentId: string,
+	embedding: number[],
+	metadata: Record<string, unknown> = {}
+): Promise<void> {
+	const conn = await (pool as any).connect();
+	try {
+		const embeddingStr = `[${embedding.join(',')}]`;
+		await conn.query(
+			`INSERT INTO vector_embeddings (document_id, embedding, metadata, created_at)
+			VALUES ($1, $2::vector, $3, NOW())
+			ON CONFLICT (document_id) DO UPDATE SET
+				embedding = EXCLUDED.embedding,
+				metadata = EXCLUDED.metadata,
+				created_at = NOW()`,
+			[documentId, embeddingStr, metadata]
+		);
+	} finally {
+		if (conn && typeof conn.release === 'function') conn.release();
+	}
+}
+
+/**
+ * Find nearest neighbors by cosine similarity using pgvector's <-> operator.
+ */
+export async function findSimilar(
+	embedding: number[],
+	limit = 5
+): Promise<EmbeddingRow[]> {
+	const conn = await (pool as any).connect();
+	try {
+		const embeddingStr = `[${embedding.join(',')}]`;
+		const res = await conn.query(
+			`SELECT id, document_id, embedding, metadata, created_at,
+				embedding <-> $1::vector as distance
+			FROM vector_embeddings
+			ORDER BY embedding <-> $1::vector
+			LIMIT $2`,
+			[embeddingStr, limit]
+		);
+		return res.rows.map((r: any) => {
+			const row = r as Record<string, unknown>;
+			return {
+				id: String(row.id),
+				document_id: String(row.document_id),
+				embedding: (row.embedding as number[]) ?? [],
+				metadata: (row.metadata as Record<string, unknown>) ?? {},
+				created_at: String(row.created_at)
+			} as EmbeddingRow;
+		});
+	} finally {
+		if (conn && typeof conn.release === 'function') conn.release();
+	}
+}
 
 
 
