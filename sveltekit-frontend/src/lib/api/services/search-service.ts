@@ -1,4 +1,4 @@
-import type { apiFetch } from '../clients/api-client.js';
+import { apiFetch } from '../clients/api-client.js';
 export interface SemanticQuery {
   query: string;
   limit?: number;
