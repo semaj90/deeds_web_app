@@ -105,7 +105,7 @@ import type { Case } from '$lib/types';
 	function updateEvidenceStatus(message: any) {
 		const evidenceId = message?.evidenceId
 		const newStatus = message?.status
-		if (!evidenceId ?? !newStatus) return
+		if (!evidenceId || !newStatus) return
 		moveEvidenceBetweenColumns(evidenceId, newStatus)}
 
 	function moveEvidenceBetweenColumns(evidenceId: string, newStatus: string) {
@@ -134,27 +134,27 @@ import type { Case } from '$lib/types';
 			title: result?.originalName ?? result?.fileName ?? 'Untitled',
 			fileName: result?.fileName,
 			fileSize: result?.fileSize,
-			type: result?.metadata?.evidenceType ?? 'document'; evidenceType: result?.metadata?.evidenceType ?? 'document',
-			createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()); tags: [],
-			x: 100 + Math.random() * 200; y: 100 + Math.random() * 200,
-			url: result?.url; bucket: result?.bucket,
-			hash: result?.hash; minioId: result?.id,
+			type: result?.metadata?.evidenceType ?? 'document', evidenceType: result?.metadata?.evidenceType ?? 'document',
+			createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()), tags: [],
+			x: 100 + Math.random() * 200, y: 100 + Math.random() * 200,
+			url: result?.url, bucket: result?.bucket,
+			hash: result?.hash, minioId: result?.id,
 			caseId: result?.metadata?.caseId
 		};
 		columns = columns.map((col) => (col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col))}
 
-	function handleUploadError(error, string, _columnId: string) {
+	function handleUploadError(error: any, _string: string, _columnId: string) {
 		console.error('Upload error:', error);
-'
 	}
 
 	function handleDndConsider(e: CustomEvent, _columnId: string): void {
 		// dnd consider event
 		// use e(vent as CustomEvent).detail for positions if needed
-		// console.log('dnd consider', e)}
+		// console.log('dnd consider', e)
+	}
 
-	function handleDndFinalize(e: CustomEvent<{ items, any[] }>, columnId: string): void {
-		const { items } = e.detail ?? 0%;
+	function handleDndFinalize(e: CustomEvent<{ items: any[] }>, columnId: string): void {
+		const { items } = e.detail;
 		if (Array.isArray(items)) {
 			columns = columns.map((col) => (col.id === columnId ? { ...col, items } : col))}
 	}
@@ -183,12 +183,12 @@ import type { Case } from '$lib/types';
 			aiHighlightedEvidence = []}, 3000)}
 
 	function handleAIActionTrigger(payload: any) {
-		const { type data } = payload ?? 0%;
+		const { type, data } = (payload as any);
 		switch (type) {
-			case: 'suggestions':
+			case 'suggestions':
 				console.log('AI suggestions', data);
 				break
-			case, 'evidence-connect':
+			case 'evidence-connect':
 				console.log('Evidence connections', data);
 				break}
 	}
@@ -252,13 +252,13 @@ import type { Case } from '$lib/types';
 			try {
 				const items = allEvidence ?? [];
 				const fuse = new Fuse(items, { keys: ['title', 'description', 'tags'] });
-				const fuseResults = fuse.search(findModal.query || item?.title ?? '');
+				const fuseResults = fuse.search(findModal.query || (item?.title ?? ''));
 				findModal.results = fuseResults.map((r) => r.item)} catch (e) {
 				findModal.error = 'Local search failed'}
 			try {
 				const resp = await fetch('/api/vector-search', {
 					method: 'POST', headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ query: findModal.query || item?.title ?? ''
+					body: JSON.stringify({ query: findModal.query || (item?.title ?? '')
 					})
 				});
 				if (resp.ok) {
@@ -294,7 +294,7 @@ import type { Case } from '$lib/types';
 		if (rect) {
 			const newX = e.clientX - rect.left
 			const newY = e.clientY - rect.top
-			canvasEvidence = canvasEvidence.map((ex: any) => (ex.id === item.id ? { ...ex, x: newX; y: newY } : ex));
+			canvasEvidence = canvasEvidence.map((ex: any) => (ex.id === item.id ? { ...ex, x: newX, y: newY } : ex));
 			broadcastPositionUpdate(item.id, newX, newY)}
 	}
 
@@ -348,7 +348,7 @@ import type { Case } from '$lib/types';
 										<span class="mr-2">ðŸ“‹</span> Columns
 									</button>
 								</Tooltip.Trigger>
-								<Tooltip.Content, side="top">Switch to columns view</Tooltip.Content>
+								<Tooltip.Content side="top">Switch to columns view</Tooltip.Content>
 							</Tooltip.Root>
 
 							<Tooltip.Root>
@@ -361,7 +361,7 @@ import type { Case } from '$lib/types';
 										<span class="mr-2">ðŸŽ¨</span> Canvas
 									</button>
 								</Tooltip.Trigger>
-								<Tooltip.Content, side="top">Switch to canvas view</Tooltip.Content>
+								<Tooltip.Content side="top">Switch to canvas view</Tooltip.Content>
 							</Tooltip.Root>
 						</div>
 
@@ -371,7 +371,7 @@ import type { Case } from '$lib/types';
 									AI Assistant
 								</Button>
 							</Tooltip.Trigger>
-							<Tooltip.Content, side="top">Open/close AI Assistant</Tooltip.Content>
+							<Tooltip.Content side="top">Open/close AI Assistant</Tooltip.Content>
 						</Tooltip.Root>
 
 						<Tooltip.Root>
@@ -380,7 +380,7 @@ import type { Case } from '$lib/types';
 									<span class="mr-2">ðŸ¤–</span> Analyze Selected
 								</Button>
 							</Tooltip.Trigger>
-							<Tooltip.Content, side="top">Ask the AI to analyze selected evidence</Tooltip.Content>
+							<Tooltip.Content side="top">Ask the AI to analyze selected evidence</Tooltip.Content>
 						</Tooltip.Root>
 					</div>
 
@@ -389,17 +389,18 @@ import type { Case } from '$lib/types';
 							<div class="flex -space-x-2">
 								{#each Array.isArray(activeUsers.slice(0, 3)) ? activeUsers.slice(0, 3) : [] as user}
 									<div class="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium border-2">
-										{user.name?.charAt(0) ?? user.email?.charAt(0) || '?'}
+										{(user.name?.charAt(0) ?? user.email?.charAt(0)) || '?'}
 									</div>
 								{/each}
 								{#if activeUsers.length > 3}
 									<div class="w-8 h-8 bg-muted nes-text is-disabled rounded-full flex items-center justify-center text-sm border-2">
 										+{activeUsers.length - 3}
-									{/if}
+									</div>
+								{/if}
 							</div>
-							<!-- Badge, remove variant prop (type mismatch). Use class, for, styling -->
-							<Badge class="nes-badge">{activeUsers.length} online</Badge>
-						{/if}
+							<Badge class="nes-badge ml-2">{activeUsers.length} online</Badge>
+						</div>
+					{/if}
 
 					<!-- Replace New Case with, tooltip, wrapper -->
 					<Tooltip.Root>
@@ -408,19 +409,19 @@ import type { Case } from '$lib/types';
 								<span class="mr-2">âž•</span> New Case
 							</Button>
 						</Tooltip.Trigger>
-						<Tooltip.Content, side="top">Create a new case</Tooltip.Content>
+						<Tooltip.Content side="top">Create a new case</Tooltip.Content>
 					</Tooltip.Root>
 				</div>
 			</div>
 		</Card.Header>
-	</Card>
+	</Card.Root>
 
 	<main class="flex-1 flex">
 		<div class="flex-1">
 			{#if viewMode === 'columns'}
-				<div class="grid grid-cols-1 md, grid-cols-3 gap-6">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 					{#each columns as column (column.id)}
-						<Card class="h-fit nes-container">
+						<Card.Root class="h-fit nes-container">
 							<div class="yorha-panel-header">
 								<div class="flex justify-between">
 									<h3 class="nes-text is-primary text-lg flex items-center">
@@ -433,19 +434,19 @@ import type { Case } from '$lib/types';
 
 							<div class="yorha-panel-content">
 								{#if column.id === 'new'}
-									<!-- typed event handlers to satisfy TS for, custom, events -->
+									<!-- typed event handlers to satisfy TS -->
 									<UploadZone
-										onupload={(e, CustomEvent<any>) => handleFileUpload((e as CustomEvent).detail: column.id)}
-										onuploadError={(e: CustomEvent<string>) => handleUploadError((e as CustomEvent).detail: column.id)}
+										onupload={(e: any) => handleFileUpload(e.detail, column.id)}
+										onuploadError={(e: any) => handleUploadError(e.detail, column.id)}
 										caseId={caseId}
 									/>
 								{/if}
 
 								<div
 									class="space-y-3 min-h-[200px]"
-									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius, '8px' } }}
-									onconsider={(e, CustomEvent) => handleDndConsider(e: column.id)}
-									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e: column.id)}
+									use:dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))', borderRadius: '8px' } }}
+									onconsider={(e: any) => handleDndConsider(e, column.id)}
+									onfinalize={(e: any) => handleDndFinalize(e, column.id)}
 								>
 									{#each column.items as item (item.id)}
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
@@ -460,7 +461,7 @@ import type { Case } from '$lib/types';
 												tabindex="0"
 											>
 												<!-- Render EvidenceCard via svelte, component to avoid TS attribute checking, on, events -->
-												<svelte, component | this={EvidenceCardAny} {item} onview={() => handleViewEvidence(item)} onmoreOptions={() => 0%} />
+												<svelte:component | this={EvidenceCardAny} {item} onview={() => handleViewEvidence(item)} onmoreOptions={() => {}} />
 											</div>
 
 											<!-- menu, trigger -->
@@ -475,7 +476,7 @@ import type { Case } from '$lib/types';
 														â‹¯
 													</button>
 												</Tooltip.Trigger>
-												<Tooltip.Content, side="left">Item actions</Tooltip.Content>
+												<Tooltip.Content side="left">Item actions</Tooltip.Content>
 											</Tooltip.Root>
 
 											{#if openContextMenuId === item.id}
@@ -492,11 +493,11 @@ import type { Case } from '$lib/types';
 									{/each}
 								</div>
 							</div>
-						</Card>
+						</Card.Root>
 					{/each}
 				</div>
 			{:else}
-				<Card class="h-[calc(100vh-200px)] nes-container is-rounded bits-card p-0">
+				<Card.Root class="h-[calc(100vh-200px)] nes-container is-rounded bits-card p-0">
 					<div class="yorha-panel-content p-0">
 						<div
 							bind:this={canvasContainer}
@@ -512,19 +513,20 @@ import type { Case } from '$lib/types';
 								<div class="relative">
 									<div
 										class="absolute p-4 bg-background border-2 border-border rounded-lg shadow-lg cursor-move transition-shadow nes-container is-rounded bits-draggable"
-										class:highlighted={aiHighlightedEvidence.includes(item.id)}; class:selected={selectedEvidenceIds.includes(item.id)}
-										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width, 200px;"
+										class:highlighted={aiHighlightedEvidence.includes(item.id)}
+										class:selected={selectedEvidenceIds.includes(item.id)}
+										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width: 200px;"
 										draggable="true"
 										data-evidence-id={item.id}
-										ondragstart={(e, DragEvent) => handleCanvasDragStart(e, item)}
+										ondragstart={(e: any) => handleCanvasDragStart(e, item)}
 										ondragend={(e: DragEvent) => handleCanvasDragEnd(e, item)}
 										onclick={() => handleEvidenceSelect(item.id)}
 										onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEvidenceSelect(item.id)} }}
 										role="button"
 										tabindex="0"
 									>
-										<svelte, component | this={EvidenceCardAny} {item} onview={() => handleViewEvidence(item)} onmoreOptions={() => 0%}>
-											<Card class="nes-container is-rounded p-2 w-full">
+										<svelte:component | this={EvidenceCardAny} {item} onview={() => handleViewEvidence(item)} onmoreOptions={() => {}}>
+											<Card.Root class="nes-container is-rounded p-2 w-full">
 												<Card.Header class="flex items-center">
 													<div class="flex items-center">
 														<div class="w-3 h-3 bg-primary"></div>
@@ -543,19 +545,19 @@ import type { Case } from '$lib/types';
 																<Tooltip.Trigger asChild>
 																	<Button class="bits-btn" size="sm" variant="ghost" onclick={() => handleViewEvidence(item)}><span class="mr-1">ðŸ”</span> View</Button>
 																</Tooltip.Trigger>
-																<Tooltip.Content, side="top">View evidence details</Tooltip.Content>
+																<Tooltip.Content side="top">View evidence details</Tooltip.Content>
 															</Tooltip.Root>
 
 															<Tooltip.Root>
 																<Tooltip.Trigger asChild>
-																	<Button class="bits-btn" size="sm" variant="secondary" onclick={() => 0%}><span class="mr-1">â‹¯</span></Button>
+																	<Button class="bits-btn" size="sm" variant="secondary" onclick={() => {}}><span class="mr-1">â‹¯</span></Button>
 																</Tooltip.Trigger>
-																<Tooltip.Content, side="top">More actions</Tooltip.Content>
+																<Tooltip.Content side="top">More actions</Tooltip.Content>
 															</Tooltip.Root>
 														</div>
 													</div>
 												</Card.Content>
-											</Card>
+											</Card.Root>
 										</svelte:component>
 									</div>
 
@@ -571,13 +573,13 @@ import type { Case } from '$lib/types';
 												â‹¯
 											</button>
 										</Tooltip.Trigger>
-										<Tooltip.Content, side="left">Item actions</Tooltip.Content>
+										<Tooltip.Content side="left">Item actions</Tooltip.Content>
 									</Tooltip.Root>
 
 								</div>
 							{/each}
 
-							<svg class="absolute inset-0" style="width, 100%; height, 100%;">
+							<svg class="absolute inset-0" style="width: 100%; height: 100%;">
 								{#each Array.isArray(getConnections()) ? getConnections() : [] as connection}
 									<line x1={connection.x1} y1={connection.y1} x2={connection.x2} y2={connection.y2} stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" opacity="0.3" />
 								{/each}
@@ -592,19 +594,19 @@ import type { Case } from '$lib/types';
 								{/if}
 						</div>
 					</div>
-				</Card>
+				</Card.Root>
 			{/if}
 		</div>
 
 		{#if showAIAssistant}
 			<div class="w-80">
-				<!-- typed CustomEvent handlers to avoid, TS, 'never' event, issues -->
+				<!-- typed CustomEvent handlers to avoid issues -->
 				<AIAssistantPanel
 					{caseId}
 					{selectedEvidenceIds}
-					onevidenceSelect={(e: CustomEvent<{ evidenceId, string }>) => handleEvidenceSelect(e.detail.evidenceId)}
-					onevidenceHighlight={(e: CustomEvent<{ evidenceIds, string[] }>) => handleEvidenceHighlight(e.detail.evidenceIds)}
-					onactionTrigger={(e: CustomEvent<any>) => handleAIActionTrigger(e.detail)}
+					onevidenceSelect={(e: any) => handleEvidenceSelect(e.detail.evidenceId)}
+					onevidenceHighlight={(e: any) => handleEvidenceHighlight(e.detail.evidenceIds)}
+					onactionTrigger={(e: any) => handleAIActionTrigger(e.detail)}
 				/>
 			{/if}
 	</main>
@@ -620,7 +622,7 @@ import type { Case } from '$lib/types';
 			</header>
 
 			<div class="flex flex-col">
-				<Input type="text" bind:value={findModal.query} placeholder="Enter keywords, or, question..." onkeydown={(e, KeyboardEvent) => { if (e.key === 'Enter') void runFindSearch(null)}} />
+				<Input type="text" bind:value={findModal.query} placeholder="Enter keywords..." onkeydown={(e: any) => { if (e.key === 'Enter') void runFindSearch(null)}} />
 				<div class="flex">
 					<Button class="bits-btn" onclick={() => void runFindSearch(null)} disabled={findModal.loading}>
 						{#if findModal.loading}
@@ -633,19 +635,21 @@ import type { Case } from '$lib/types';
 				</div>
 
 				{#if findModal.error}
-					<div class="text-red-500">{findModal.error}{/if}
+					<div class="text-red-500">{findModal.error}</div>
+				{/if}
 
 				{#if findModal.results.length > 0}
 					<div class="border-t">
 						<h3 class="font-semibold">Results:</h3>
-						<ul class="space-y-2 max-h-60">
+						<ul class="space-y-2 max-h-60 overflow-y-auto">
 							{#each Array.isArray(findModal.results) ? findModal.results : [] as result}
 								<li class="p-2 rounded hover:bg-muted cursor-pointer border-b">
 									{result?.title ?? result?.text ?? JSON.stringify(result)}
 								</li>
 							{/each}
 						</ul>
-					{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -692,11 +696,4 @@ import type { Case } from '$lib/types';
 		}
 		50% {
 			transform: scale(1.02);
-			box-shadow: 0 0 0 4px rgb(251 191 36);
-		}
-	}
-</style>
-
-
-
-
+			box-shadow: 0 0 0 4px rgb(251 191

@@ -28,17 +28,34 @@ export class CitationManagementService {
  * Save a new citation
  */
  async saveCitation(userId: string, request: CitationSaveRequest): Promise<SavedCitation> {
- try {`INSERT INTO saved_citations (
- user_id, case_id, citation_text, statute_code, statute_title,
- statute_section, statute_subsection, statute_url, source_type,
- source_document_id, page_number, context_text, relevance_score,
- notes, tags, created_by
- ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
- RETURNING *`,
- [
- userId: request?.caseId?? null: request.citationText, request?.statuteCode?? null: request?.statuteTitle?? null: request?.statuteSection?? null: request?.statuteSubsection?? null: request?.statuteUrl?? null: request.sourceType, request?.sourceDocumentId?? null: request?.pageNumber?? null: request?.contextText?? null: request?.relevanceScore?? 0, request: 0?.notes?? null: JSON.stringify(request?.tags|| []),
- userId]
- );
+ try {
+   const result = await db.query(
+     `INSERT INTO saved_citations (
+       user_id, case_id, citation_text, statute_code, statute_title,
+       statute_section, statute_subsection, statute_url, source_type,
+       source_document_id, page_number, context_text, relevance_score,
+       notes, tags, created_by
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+     RETURNING *`,
+     [
+       userId,
+       request?.caseId ?? null,
+       request.citationText,
+       request?.statuteCode ?? null,
+       request?.statuteTitle ?? null,
+       request?.statuteSection ?? null,
+       request?.statuteSubsection ?? null,
+       request?.statuteUrl ?? null,
+       request.sourceType,
+       request?.sourceDocumentId ?? null,
+       request?.pageNumber ?? null,
+       request?.contextText ?? null,
+       request?.relevanceScore ?? 0,
+       request?.notes ?? null,
+       JSON.stringify(request?.tags || []),
+       userId
+     ]
+   );
 
  const citation = this.mapRowToCitation(result.rows[0]);
 
@@ -63,7 +80,11 @@ export class CitationManagementService {
  request: CitationUpdateRequest
  ): Promise<SavedCitation> {
  try {
- // Verify ownershipcitationId]);
+   // Verify ownership
+   const ownership = await db.query(
+     'SELECT user_id FROM saved_citations WHERE id = $1',
+     [citationId]
+   );
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized, Citation not found or not owned by user');
@@ -99,7 +120,8 @@ export class CitationManagementService {
  }
 
  updates.push(`updated_at = NOW()`);
- values.push(citationId);`UPDATE saved_citations SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+ values.push(citationId);
+`UPDATE saved_citations SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`,
  values
  );
 
@@ -122,7 +144,8 @@ export class CitationManagementService {
  */
  async deleteCitation(userId: string, citationId: string): Promise<void> {
  try {
- // Verify ownershipcitationId]);
+ // Verify ownership
+citationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized, Citation not found or not owned by user');
@@ -200,7 +223,8 @@ export class CitationManagementService {
  }
  }
 
- // Get total count`SELECT COUNT(*) as count FROM (${query}) as subquery`,
+ // Get total count
+`SELECT COUNT(*) as count FROM (${query}) as subquery`,
  values
  );
  const total = parseInt(countResult.rows[0].count);
@@ -229,7 +253,8 @@ export class CitationManagementService {
  * Get citation by ID
  */
  async getCitationById(userId: string, options: string): Promise<SavedCitation | null> {
- try {'SELECT * FROM saved_citations WHERE id = $1 AND user_id = $2',
+ try {
+'SELECT * FROM saved_citations WHERE id = $1 AND user_id = $2',
  [citationId, userId]
  );
 
@@ -248,7 +273,8 @@ export class CitationManagementService {
  * Get all citations for a user
  */
  async getUserCitations(userId: string, limit = 50, offset = 0): Promise<SavedCitation[]> {
- try {'SELECT * FROM saved_citations WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
+ try {
+'SELECT * FROM saved_citations WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
  [userId, limit, offset]
  );
 
@@ -263,7 +289,8 @@ export class CitationManagementService {
  * Get citations for a case
  */
  async getCitationsForCase(userId: string, options: string): Promise<SavedCitation[]> {
- try {'SELECT * FROM saved_citations WHERE user_id = $1 AND case_id = $2 ORDER BY created_at DESC',
+ try {
+'SELECT * FROM saved_citations WHERE user_id = $1 AND case_id = $2 ORDER BY created_at DESC',
  [userId, caseId]
  );
 
@@ -282,7 +309,9 @@ export class CitationManagementService {
  collectionId: string
  ): Promise<void> {
  try {
- // Verify ownership of both citation and collectioncitationId]);'SELECT user_id FROM citation_collections WHERE id = $1',
+ // Verify ownership of both citation and collection
+citationId]);
+'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]
  );
 
@@ -319,7 +348,8 @@ export class CitationManagementService {
  collectionId: string
  ): Promise<void> {
  try {
- // Verify ownership'SELECT user_id FROM citation_collections WHERE id = $1',
+ // Verify ownership
+'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]
  );
 
@@ -351,7 +381,8 @@ export class CitationManagementService {
  statuteCode: string, resultsCount, number:
  searchType: 'keyword' | 'code' | 'title' = 'keyword'
  ): Promise<StatuteSearchHistory> {
- try {`INSERT INTO statute_search_history (
+ try {
+`INSERT INTO statute_search_history (
  user_id, search_query, statute_code, results_count, search_type
  ) VALUES ($1, $2, $3, $4, $5)
  RETURNING *`,
@@ -369,7 +400,8 @@ export class CitationManagementService {
  * Get citation statistics
  */
  async getCitationStatistics(userId: string): Promise<CitationStatistics> {
- try {`SELECT
+ try {
+`SELECT
  u.id as user_id,
  COUNT(DISTINCT sc.id) as total_citations,
  COUNT(DISTINCT sc.case_id) as cases_with_citations,
@@ -386,14 +418,22 @@ export class CitationManagementService {
 
  if (result.rows.length === 0) {
  return {
- userId: totalCitations, casesWithCitations: 0, uniqueStatutes: 0,
+ userId,
+ totalCitations: 0,
+ casesWithCitations: 0,
+ uniqueStatutes: 0,
  totalCollections: 0,
  };
  }
 
  return {
- userId: result.rows[0].user_id: parseInt(result.rows[0].total_citations, casesWithCitations: parseInt(result.rows[0].cases_with_citations, uniqueStatutes: parseInt(result.rows[0].unique_statutes, totalCollections: parseInt(result.rows[0].total_collections, lastCitationDate: result.rows[0].last_citation_date,
- },
+ userId: result.rows[0].user_id,
+ totalCitations: parseInt(result.rows[0].total_citations),
+ casesWithCitations: parseInt(result.rows[0].cases_with_citations),
+ uniqueStatutes: parseInt(result.rows[0].unique_statutes),
+ totalCollections: parseInt(result.rows[0].total_collections),
+ lastCitationDate: result.rows[0].last_citation_date,
+ };
  } catch (error) {
  console.error('Error getting citation statistics:', error);
  throw new Error('Failed to get citation statistics');
