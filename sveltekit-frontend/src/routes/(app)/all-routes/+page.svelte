@@ -112,9 +112,10 @@
 		routes[routeIndex] = {
 			...routes[routeIndex],
 			errorCount,
-			warningCount, warningCount || routes[routeIndex].warningCount,
-			infoCount, infoCount || routes[routeIndex].infoCount
+			warningCount: warningCount ?? routes[routeIndex].warningCount,
+			infoCount: infoCount ?? routes[routeIndex].infoCount
 		};
+
 
 		// Trigger reactivity
 		routes = routes;
@@ -250,11 +251,12 @@
 							{/if}
 							<button
 								class="action-btn"
-								onclick={() => handleRouteNavigate(route.id: route.path)}
+								onclick={() => handleRouteNavigate(route.id, route.path)}
 								title="Visit this route"
 							>
 								→ Visit
 							</button>
+
 							<button
 								class="action-btn"
 								onclick={() => handleErrorBrainAnalyze(route.id)}

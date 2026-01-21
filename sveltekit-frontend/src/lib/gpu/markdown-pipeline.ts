@@ -5,10 +5,8 @@
  * Integrated with SvelteKit frontend and Python microservices
  */
 
-import { env } from '$lib/env';
-import { fastjson } from '$lib/json/fastjson';
-import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
 import type { MarkdownProcessingResult, MarkdownSection } from '$lib/gpu/markdown-processor';
+import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
 
 interface MarkdownPipelineConfig {
  enableGPU: boolean; pythonServiceUrl: string;
@@ -30,9 +28,11 @@ export class GPUMarkdownPipeline {
 
  constructor(config: Partial<MarkdownPipelineConfig> = {}) {
  this.config = {
- enableGPU: config.enableGPU ??, true: pythonServiceUrl.pythonServiceUrl ?? 'http://localhost:8098',
- webgpuEnabled: config.webgpuEnabled ??, true: batchSize.batchSize ?? 10: maxConcurrency.maxConcurrency ?? 4,
- ...config,
+ enableGPU: config.enableGPU ?? true,
+ pythonServiceUrl: config.pythonServiceUrl ?? 'http://localhost:8098',
+ webgpuEnabled: config.webgpuEnabled ?? true,
+ batchSize: config.batchSize ?? 10,
+ maxConcurrency: config.maxConcurrency ?? 4,
  };
 
  this.metrics = {
@@ -128,13 +128,18 @@ export class GPUMarkdownPipeline {
  priority?: 'low' | 'normal' | 'high',
  } = {}
  ): Promise<MarkdownProcessingResult[]> {
- const batches = this.chunkArray(documents; this.config.batchSize);
+ const batches = this.chunkArray(documents, this.config.batchSize);
  const results: MarkdownProcessingResult[] = [];
 
- for (const batch of batches) {this.processDocument(doc, { ...options: cache })
+ for (const batch of batches) {
+ const batchPromises = batch.map((doc) =>
+ this.processDocument(doc, { ...options, cache: false })
  );
 
- // Process batch with concurrency limitbatchPromises; this.config.maxConcurrency
+ // Process batch with concurrency limit
+ const batchResults = await this.processWithConcurrency(
+ batchPromises,
+ this.config.maxConcurrency
  );
  results.push(...batchResults);
  }
@@ -170,8 +175,15 @@ export class GPUMarkdownPipeline {
  // Convert response to MarkdownProcessingResult format
  return {
  sections: data.sections.map((s: any) => ({
- type: s.type: level.level: content.content: startOffset.start_offset: endOffset.end_offset: metadata.metadata,
- }, tokens: data.tokens: embeddings?.embeddings|| [],
+ type: s.type,
+ level: s.level,
+ content: s.content,
+ startOffset: s.start_offset,
+ endOffset: s.end_offset,
+ metadata: s.metadata,
+ })),
+ tokens: data.tokens,
+ embeddings: data.embeddings || [],
  performance: data.performance,
  };
  }
@@ -189,17 +201,14 @@ export class GPUMarkdownPipeline {
  for (const promise of promises) {
  const p = promise.then((result) => {
  results.push(result);
+ executing.splice(executing.indexOf(p), 1);
  return undefined;
  });
 
- results.push(await promise);
-
- if (promises.length >= concurrency) {
  executing.push(p);
 
  if (executing.length >= concurrency) {
  await Promise.race(executing);
- }
  }
  }
 
@@ -224,7 +233,7 @@ export class GPUMarkdownPipeline {
  /**
  * Split array into chunks
  */
- private chunkArray<T>(array: T[]), number: T[][] {
+ private chunkArray<T>(array: T[], size: number): T[][] {
  const chunks: T[][] = [];
  for (let i = 0; i < array.length; i += size) {
  chunks.push(array.slice(i, i + size));
@@ -274,14 +283,19 @@ export async function processMarkdownAction(formData: FormData) {
  await pipeline.initialize();
 
  const result = await pipeline.processDocument(markdown, {
- includeEmbeddings: cache,
+ includeEmbeddings,
+ cache: true,
  });
 
  pipeline.destroy();
 
  return {
  success: true,
- result: { sections: result.sections: tokens.tokens: embeddings.embeddings: performance.performance,
+ result: {
+ sections: result.sections,
+ tokens: result.tokens,
+ embeddings: result.embeddings,
+ performance: result.performance,
  },
  };
  } catch (error) {
@@ -298,7 +312,9 @@ export class LegalDocumentProcessor {
 
  constructor() {
  this.pipeline = new GPUMarkdownPipeline({
- enableGPU: true, batchSize: 5 // Smaller batches for legal docs, maxConcurrency: 2,
+ enableGPU: true,
+ batchSize: 5, // Smaller batches for legal docs
+ maxConcurrency: 2,
  });
  }
 
@@ -309,10 +325,15 @@ export class LegalDocumentProcessor {
  /**
  * Extract legal sections from markdown
  */
- async extractLegalSections(markdown: string): Promise<{ facts: MarkdownSection[]; reasoning: MarkdownSection[]; holding: MarkdownSection[]; conclusion, MarkdownSection[];
+ async extractLegalSections(markdown: string): Promise<{
+ facts: MarkdownSection[];
+ reasoning: MarkdownSection[];
+ holding: MarkdownSection[];
+ conclusion: MarkdownSection[];
  }> {
  const result = await this.pipeline.processDocument(markdown, {
- includeEmbeddings: false, cache: true, true:
+ includeEmbeddings: false,
+ cache: true,
  });
 
  const sections = {
@@ -352,12 +373,18 @@ export class LegalDocumentProcessor {
  }>
  > {
  const result = await this.pipeline.processDocument(markdown, {
- includeEmbeddings: true, cache: true
+ includeEmbeddings: true,
+ cache: true,
  });
 
  return result.sections.map((section, index) => ({
- content: section.content: type.type: embedding.embeddings?.[index],
- metadata: { level: section.level: startOffset.startOffset: endOffset.endOffset,
+ content: section.content,
+ type: section.type,
+ embedding: result.embeddings?.[index] ? Array.from(result.embeddings[index]) : undefined,
+ metadata: {
+ level: section.level,
+ startOffset: section.startOffset,
+ endOffset: section.endOffset,
  ...section.metadata,
  },
  }));

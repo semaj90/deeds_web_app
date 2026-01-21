@@ -17,12 +17,12 @@
 	let bulkStatus = $state<string>('');
 	let showBulkActions = $derived(selectedCases.size > 0);
 
-	// Auto-open modal if ? create=true (for /cases/create and /cases/new redirects)
+	// Auto-open modal if ?create=true (for /cases/create and /cases/new redirects)
 	onMount(() => {
 		// Initialize filters from URL on mount
-		statusFilter = data.filters.status ?? 'all';
-		priorityFilter = data.filters.priority || '';
-		searchQuery = data.filters.search || '';
+		statusFilter = data.filters?.status ?? 'all';
+		priorityFilter = data.filters?.priority || '';
+		searchQuery = data.filters?.search || '';
 
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('create') === 'true') {
@@ -68,11 +68,10 @@
 		} else {
 			selectedCases.add(caseId);
 		}
-		selectedCases = selectedCases; // Trigger reactivity
 	}
 
 	function clearSelection() {
-		selectedCases = new Set();
+		selectedCases.clear();
 	}
 
 	function applyFilters() {
@@ -118,13 +117,13 @@
 					placeholder="Search cases..."
 					bind:value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && applyFilters()}
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 				/>
 			</div>
 			<select
 				bind:value={statusFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 			>
 				<option value="all">All Status</option>
 				<option value="open">Open</option>
@@ -136,7 +135,7 @@
 			<select
 				bind:value={priorityFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
 			>
 				<option value="">All Priorities</option>
 				<option value="critical">Critical</option>
@@ -163,7 +162,7 @@
 				</span>
 				<form method="POST" action="?/updateStatus" use:enhance class="flex gap-2">
 					{#each Array.from(selectedCases) as caseId}
-						<input type="hidden" name="caseId" value={caseId} />
+						<input type="hidden" name="caseIds" value={caseId} />
 					{/each}
 					<select
 						name="status"
@@ -204,7 +203,7 @@
 				</div>
 			{/if}
 
-			{#if data.cases.length === 0}
+			{#if !data.cases || data.cases.length === 0}
 				<div class="flex flex-col items-center justify-center py-20 text-center">
 					<div class="text-6xl mb-4">📂</div>
 					<h2 class="text-xl font-semibold mb-2">No Cases Found</h2>
@@ -258,10 +257,10 @@
 								<!-- Badges -->
 								<div class="flex flex-wrap gap-2 mb-4">
 									<span class="rounded border px-2 py-1 text-xs font-medium {statusBadge(caseItem.status)}">
-										{caseItem.status.replace('_', ' ')}
+										{caseItem.status ? caseItem.status.replace('_', ' ') : 'unknown'}
 									</span>
 									<span class="rounded border px-2 py-1 text-xs font-medium {priorityBadge(caseItem.priority)}">
-										{caseItem.priority}
+										{caseItem.priority || 'normal'}
 									</span>
 								</div>
 
@@ -285,7 +284,7 @@
 				</div>
 
 				<!-- Pagination -->
-				{#if data.pagination.hasMore}
+				{#if data.pagination && data.pagination.hasMore}
 					<div class="mt-8 text-center">
 						<a
 							href="/cases?offset={data.pagination.offset + data.pagination.limit}&status={statusFilter}&priority={priorityFilter}&search={searchQuery}"
@@ -325,7 +324,7 @@
 						id="title"
 						name="title"
 						required
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., State v. Smith"
 					/>
 				</div>
@@ -339,7 +338,7 @@
 					name="description"
 					required
 					rows="4"
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none resize-none"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none resize-none"
 					placeholder="Brief overview of the case..."
 				></textarea>
 				</div>
@@ -350,7 +349,7 @@
 					<select
 						id="priority"
 						name="priority"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 					>
 							<option value="low">Low</option>
 							<option value="medium">Medium</option>
@@ -366,7 +365,7 @@
 						type="text"
 						id="caseNumber"
 						name="caseNumber"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., 2026-CR-0042"
 					/>
 					</div>
@@ -379,7 +378,7 @@
 						type="text"
 						id="practiceArea"
 						name="practiceArea"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., Criminal Law"
 					/>
 					</div>
@@ -390,7 +389,7 @@
 						type="text"
 						id="jurisdiction"
 						name="jurisdiction"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
 						placeholder="e.g., Federal District Court"
 					/>
 					</div>

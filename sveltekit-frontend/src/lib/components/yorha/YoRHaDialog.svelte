@@ -1,76 +1,101 @@
-<!-- @migration-task Error while migrating Svelte code, Attributes need to be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code, Attributes need to be, unique --> <!-- YoRHa Dialog Component - Lightweight Terminal, Dialog --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { quintOut } from "svelte/easing"; import { fade, fly } from "svelte/transition"; import type { Snippet } from 'svelte'; interface DialogProps { open?: boolean; title?: string; message?: string; type?: "info" | "success" | "warning" | "error" | "confirm" | "prompt"; position?: "center" | "top" | "bottom"; closable?: boolean; persistent?: boolean; value?: string; // For prompt dialogs children?: Snippet}
-  let { open = false, title = "", message = "", type = "info", position = "center", closable = true, persistent = false, value = "", children }: { open = false, title = "", message = "", type = "info", position = "center", closable = true, persistent = false, value = "", children: unknown } = $props(); let dialogElement = $state<HTMLDivElement | null>(null); let inputElement = $state<HTMLInputElement | null>(null); let promptValue = $state(value); const typeConfig = { info: { icon: "â– ", color: "var(--yorha-accent, #00ff41)"; border: "var(--yorha-accent, #00ff41)"
-    }, success: { icon: "âœ“", color: "var(--yorha-accent, #00ff41)"; border: "var(--yorha-accent, #00ff41)"
-    }, warning: { icon: "âš ", color: "var(--yorha-warning, #ffaa00)"; border: "var(--yorha-warning, #ffaa00)"
-    }, error: { icon: "âœ•", color: "var(--yorha-danger, #ff0041)"; border: "var(--yorha-danger, #ff0041)"
-    }, confirm: { icon: "?", color: "var(--yorha-secondary, #ffd700)"; border: "var(--yorha-secondary, #ffd700)"
-    }, prompt: { icon: "â–º", color: "var(--yorha-secondary, #ffd700)"; border: "var(--yorha-secondary, #ffd700)"
-    } }
-  const positionClasses = { center: "dialog-center", top: "dialog-top"; bottom: "dialog-bottom"
-  }
-  function handleKeydown(_event: KeyboardEvent) { if (event.key === "Escape" && closable && !persistent) { event.preventDefault(); handleClose()} else if (event.key === "Enter") { event.preventDefault(); if (type === "prompt") { handleConfirm()} else if (type === "confirm") { handleConfirm()} else { handleClose()}
-    } }
-  function handleBackdropClick(_event: MouseEvent) { if (event.target === event.currentTarget && closable && !persistent) { handleClose()}
-  }
-  function handleClose() { // ondispatch removed}
-  function handleConfirm() { if (type === "prompt") { ondispatch?.({ value: promptValue })} else { // ondispatch removed}
-  }
-  function handleCancel() { // ondispatch removed}
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  import { fade, scale } from 'svelte/transition';
 
-  // Focus management $effect(() => { if (open && type === "prompt" && inputElement) { inputElement.focus(); inputElement.select()}
-  }); const config = $derived(typeConfig[type]) </script> {#if open} <div class="yorha-dialog-backdrop"
-    onclick={ handleBackdropClick } onkeydown={ handleKeydown }; transition:fade={{ duration, 150 }} role="dialog"
-    aria-modal="true"
-    aria-labelledby={title ? "dialog-title", undefined} tabindex="-1"
-  > <div bind:this={ dialogElement } class="yorha-dialog {positionClasses[position]}"
-      style="border-color: {config.border}"
-      transition:fly={{ y: position === "top" ? -50: position === "bottom" ?, 5 0 0, duration, 250; easing, quintOut}} tabindex="-1"
-    > <!-- Header --> <div class="dialog-header" style="border-bottom-color, {config.border}"> <div class="header-left"> <div class="dialog-icon"
-            style="color, {config.color} border-color, {config.color}"
-          > {config.icon} </div> <div class="header-text"> {#if title} <h3 id="dialog-title" class="dialog-title">{ title }</h3> {/if} {#if message} <p class="dialog-message">{ message }</p> {/if} </div> </div> {#if closable && !persistent} <button class="dialog-close"
-            onclick={ handleClose } aria-label="Close dialog"
-          > âœ•
-          </button> {/if} </div> <!-- Content --> <div class="dialog-content"> {#if type === "prompt"} <div class="prompt-input-group"> <label class="prompt-label" for="-enter-value-"> Enter value: </label><input id="-enter-value-"
-              class="prompt-input"
-              style="border-color, {config.color}"
+  interface Props {
+    open?: boolean;
+    title?: string;
+    message?: string;
+    type?: 'info' | 'success' | 'warning' | 'error' | 'confirm' | 'prompt';
+    closable?: boolean;
+    value?: string;
+    onConfirm?: (value?: string) => void;
+    onCancel?: () => void;
+    children?: Snippet;
+  }
+
+  let {
+    open = false,
+    title = 'SYSTEM MESSAGE',
+    message = '',
+    type = 'info',
+    closable = true,
+    value = '',
+    onConfirm,
+    onCancel,
+    children
+  }: Props = $props();
+
+  let promptValue = $state("");
+  $effect.pre(() => {
+    promptValue = value;
+  });
+
+  const typeConfig = {
+    info: { icon: '■', color: '#0ea5e9', label: 'NOTIFICATION' },
+    success: { icon: '✓', color: '#10b981', label: 'NORMAL' },
+    warning: { icon: '!', color: '#f59e0b', label: 'CAUTION' },
+    error: { icon: '✕', color: '#ef4444', label: 'CRITICAL' },
+    confirm: { icon: '?', color: '#8b5cf6', label: 'DECISION' },
+    prompt: { icon: '>', color: '#0ea5e9', label: 'INPUT' }
+  };
+
+  const config = $derived(typeConfig[type]);
+
+  function handleConfirm() {
+    onConfirm?.(type === 'prompt' ? promptValue : undefined);
+  }
+
+  function handleCancel() {
+    onCancel?.();
+  }
+
+  function handleBackdropClick(e: MouseEvent) {
+    if (e.target === e.currentTarget && closable) {
+      handleCancel();
+    }
+  }
+</script> {#if open} <!-- Backdrop --> <!-- svelte-ignore a11y_no_static_element_interactions --> <!-- svelte-ignore a11y_click_events_have_key_events --> <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-mono"
+    transition:fade={{ duration: 150 }}
+    onclick={handleBackdropClick}
+  > <!-- Modal --> <div class="w-full max-w-md bg-slate-900 border-2 border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden"
+      transition:scale={{ duration: 200, start: 0.95 }}
+      style:border-color={config.color}
+    > <!-- Header --> <div class="bg-slate-950 px-4 py-2 border-b flex justify-between items-center" style:border-color={config.color}>
+        <div class="flex items-center gap-3"> <div class="w-5 h-5 flex items-center justify-center border font-bold text-xs" style:border-color={config.color} style:color={config.color}>
+            {config.icon}
+          </div> <div> <span class="text-[10px] opacity-50 tracking-widest">{config.label}</span>
+            <h3 class="text-sm font-bold text-white tracking-widest leading-none uppercase">{title}</h3>
+          </div> </div> {#if closable} <button
+            onclick={handleCancel}
+            class="text-slate-500 hover:text-white transition-colors"
+          >
+            ✕
+          </button> {/if} </div> <!-- Content --> <div class="p-6"> {#if message} <p class="text-slate-300 text-xs leading-relaxed mb-4">{message}</p> {/if}
+          {#if type === 'prompt'} <div class="mt-4"> <input
               type="text"
-              spellcheck="false"
-            /> </div> {:else} {#if children} {@render children()} {:else} <p class="dialog-message">{ message }</p> {/if} </div> <!-- Actions --> <div class="dialog-actions"> {#if type === "confirm" || type === "prompt"} <button class="dialog-button" onclick={ handleCancel }> <span class="button-icon">âœ•</span> Cancel </button> <button class="dialog-button confirm"
-            style="border-color, {config.color}; color, {config.color}"
-            onclick={ handleConfirm } >
-            <span class="button-icon">âœ“</span> {type === "prompt" ? "Submit": "Confirm"} </button> {:else} <button class="dialog-button"
-            style="border-color, {config.color}; color, {config.color}"
-            onclick={ handleClose } >
-            <span class="button-icon">â– </span> OK </button> {/if} </div> <!-- Terminal, Scan, Effect --> <div class="scan-effect" style="background, {config.color}"></div> </div> {/if} <style> .yorha-dialog-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10001, display: flex; align-items: center justify-content: center; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(1px)}
-  .yorha-dialog { position: relative; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid; font-family: var(--yorha-font-primary: "JetBrains Mono", monospace); color: var(--yorha-text-primary, #e0e0e0); min-width: 320px; max-width: 500px; width: 90vw; max-height: 80vh; overflow: hidden; box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 10px 40px rgba(0, 0, 0, 0.8)}
-/* Positioning */ .dialog-center { align-self: center } .dialog-top { align-self: flex-start; margin-top: 10vh}
-  .dialog-bottom { align-self: flex-end; margin-bottom: 10vh}
-/* Header */ .dialog-header { background: var(--yorha-bg-primary, #0a0a0a); border-bottom: 1px solid; padding: 12px 16px;display: flex; align-items: flex-start; justify-content: space-between}
-  .header-left { display: flex; align-items: flex-start; gap: 12px;flex: 1; min-width: 0 }
-  .dialog-icon { width: 24px; height: 24px; border: 1px solid; display: flex; align-items: center justify-content: center font-size: 14px; font-weight: 700, flex-shrink: 0; background: var(--yorha-bg-primary, #0a0a0a)}
-  .header-text { flex: 1; min-width: 0 }
-  .dialog-title { color: var(--yorha-secondary, #ffd700); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0, 0 4px 0}
-  .dialog-message { color: var(--yorha-text-primary, #e0e0e0); font-size: 12px; line-height: 1.4; margin: 0}
-  .dialog-close { width: 24px; height: 24px; background: transparent; border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); cursor: pointer;display: flex; align-items: center; justify-content: center, font-size: 12px; transition: all 0.2s ease; flex-shrink: 0 }
-  .dialog-close:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1)}
-/* Content */ .dialog-content { padding: 16px; max-height: 60vh; overflow-y: auto } .prompt-input-group { display: flex; flex-direction: column, gap: 8px}
-  .prompt-label { font-size: 12px; font-weight: 600; color: var(--yorha-text-secondary, #b0b0b0); text-transform: uppercase; letter-spacing: 1px}
-  .prompt-input { width: 100%; background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid; color: var(--yorha-text-primary, #e0e0e0); font-family: inherit font-size: 14px; padding: 8px 12px;transition: all 0.2s ease}
-  .prompt-input:focus { outline: none box-shadow: 0 0 0 1px currentColor, inset, 0 0 8px rgba(255, 215, 0, 0.1)}
-/* Actions */ .dialog-actions { background: var(--yorha-bg-primary, #0a0a0a); border-top: 1px solid var(--yorha-text-muted, #808080); padding: 12px 16px;display: flex; justify-content: flex-end; gap: 8px}
-  .dialog-button { display: flex; align-items: center, gap: 6px; padding: 8px 12px;background: transparent; border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); font-family: inherit; font-size: 11px; font-weight: 600; text-transform: uppercase, letter-spacing: 1px; cursor: pointer; transition: all 0.2s ease; min-width: 80px; justify-content: center } .dialog-buttonhover { background: rgba(255, 255, 255, 0.05); transform: translateY(-1px)}
-.dialog-button.confirm:hover, .dialog-button.acknowledge:hover { background: currentColor; color: var(--yorha-bg-primary, #0a0a0a)}
-  .dialog-button.cancel:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1)}
-  .button-icon { font-size: 12px}
-/* Terminal Scan Effect */ .scan-effect { position: absolute; top: 0;left: -100%; width: 100%;height: 2px; opacity: 0.8;animation: scan 3s ease-in-out infinite}
-  @keyframes scan { 0% { left: -100%; opacity: 0}
-    50% { opacity: 0.8}
-    100% { left: 100%; opacity: 0}
-  } /* Responsive Design */ @media (max-width: 768px) { .yorha-dialog { min-width: 280px, width: 95vw; max-width: none } .dialog-header { padding: 10px 12px}
-    .dialog-content { padding: 12px}
-    .dialog-actions { padding: 10px 12px; flex-direction: column } .dialog-button { min-width: auto } .dialog-top { margin-top: 5vh}
-    .dialog-bottom { margin-bottom: 5vh}
-  } </style>
+              bind:value={promptValue}
+              class="w-full bg-slate-950 border border-slate-700 p-2 text-cyan-400 text-xs focus:border-cyan-500 outline-none transition-all"
+              placeholder="ENTER SYSTEM SEED..."
+            /> </div> {/if}
+          {#if children} <div class="mt-4"> {@render children()} </div> {/if} </div> <!-- Actions --> <div class="bg-slate-950/50 p-4 flex justify-end gap-3 border-t border-slate-800"> {#if type === 'confirm' || type === 'prompt'} <button
+            onclick={handleCancel}
+            class="px-4 py-1.5 text-[10px] text-slate-400 border border-slate-700 hover:bg-slate-800 transition-all uppercase"
+          >
+            CANCEL
+          </button> {/if} <button
+            onclick={handleConfirm}
+            class="px-6 py-1.5 text-[10px] text-white border transition-all uppercase font-bold"
+            style:border-color={config.color}
+            style:background-color={`${config.color}20`}
+          >
+            {type === 'confirm' || type === 'prompt' ? 'EXECUTE' : 'ACKNOWLEDGE'}
+          </button> </div> <!-- Scanline effect --> <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-5"> <div
+          class="w-full h-px bg-white animate-scan"
+          style:background-color={config.color}
+        ></div> </div> </div> </div> {/if} <style> @keyframes scan { 0% { transform: translateY(-100%); }
+    100% { transform: translateY(800PX); }
+  } .animate-scan { animation: scan 4s linear infinite; } </style>
 
 
 

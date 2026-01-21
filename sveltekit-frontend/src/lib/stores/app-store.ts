@@ -1,30 +1,45 @@
 import type {
+    Case,
+    CaseStats,
+    Evidence,
+    EvidenceStats,
+    PersonOfInterest,
+    SearchResult,
+    SystemMetrics
+} from '$lib/services/api-client';
+import {
     caseApi,
     evidenceApi,
     poiApi,
     searchApi,
-    systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2} from '$lib/services/api-client';
+    systemApi,
+} from '$lib/services/api-client';
 import { writable } from 'svelte/store';
 
 // Store Types
 export interface AppState {
   // Cases
-  cases: Case[]; caseStats: CaseStats | null;
+  cases: Case[];
+  caseStats: CaseStats | null;
   selectedCase: Case | null;
 
   // Evidence
-  evidence: Evidence[]; evidenceStats: EvidenceStats | null;
+  evidence: Evidence[];
+  evidenceStats: EvidenceStats | null;
   selectedEvidence: Evidence | null;
 
   // Persons of Interest
-  pois: PersonOfInterest[]; selectedPOI: PersonOfInterest | null;
+  pois: PersonOfInterest[];
+  selectedPOI: PersonOfInterest | null;
 
   // Search
-  searchResults: SearchResult[]; searchQuery: string;
+  searchResults: SearchResult[];
+  searchQuery: string;
 
   // System
   systemMetrics: SystemMetrics | null;
-  isLoading: boolean; error: string | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 // Initial State
@@ -54,14 +69,14 @@ export const appActions = {
     appStore.update((state) => ({ ...state, isLoading: loading }));
   },
 
-  setError: (error, string | null) => {
+  setError: (error: string | null) => {
     appStore.update((state) => ({ ...state, error }));
   },
 
   // Cases
   async loadCases(params?: {
-    page?: number,
-    limit?: number,
+    page?: number;
+    limit?: number;
     status?: string;
     priority?: string;
     search?: string;
@@ -69,14 +84,14 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await caseApi.getCases(params);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           cases: response.data.items,
           error: null,
         }));
       } else {
-        appActions.setError(response?.error?? 'Failed to load cases');
+        appActions.setError(response?.error ?? 'Failed to load cases');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Failed to load cases');
@@ -88,7 +103,7 @@ export const appActions = {
   async loadCaseStats() {
     try {
       const response = await caseApi.getCaseStats();
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           caseStats: response.data,
@@ -103,19 +118,19 @@ export const appActions = {
     appStore.update((state) => ({ ...state, selectedCase: case_ }));
   },
 
-  async createCase(data, Omit<Case, 'id' | 'createdAt' | 'updatedAt'>) {
+  async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt' | 'evidenceCount' | 'poiCount'>) {
     appActions.setLoading(true);
     try {
       const response = await caseApi.createCase(data);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          cases: [response.data, ...state.cases],
+          cases: [response.data!, ...state.cases],
           error: null,
         }));
         return response.data;
       } else {
-        appActions.setError(response?.error?? 'Failed to create case');
+        appActions.setError(response?.error ?? 'Failed to create case');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Failed to create case');
@@ -128,15 +143,16 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await caseApi.updateCase(id, data);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          cases: state.cases.map((c) => (c.id === id ? response.data! : c, selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase,
+          cases: state.cases.map((c) => (c.id === id ? response.data! : c)),
+          selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase,
           error: null,
         }));
         return response.data;
       } else {
-        appActions.setError(response?.error?? 'Failed to update case');
+        appActions.setError(response?.error ?? 'Failed to update case');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Failed to update case');
@@ -147,8 +163,8 @@ export const appActions = {
 
   // Evidence
   async loadEvidence(params?: {
-    page?: number,
-    limit?: number,
+    page?: number;
+    limit?: number;
     type?: string;
     status?: string;
     caseId?: string;
@@ -157,14 +173,14 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await evidenceApi.getEvidence(params);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           evidence: response.data.items,
           error: null,
         }));
       } else {
-        appActions.setError(response?.error?? 'Failed to load evidence');
+        appActions.setError(response?.error ?? 'Failed to load evidence');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Failed to load evidence');
@@ -176,7 +192,7 @@ export const appActions = {
   async loadEvidenceStats() {
     try {
       const response = await evidenceApi.getEvidenceStats();
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           evidenceStats: response.data,
@@ -195,15 +211,15 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await evidenceApi.uploadEvidence(formData);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          evidence: [response.data, ...state.evidence],
+          evidence: [response.data!, ...state.evidence],
           error: null,
         }));
         return response.data;
       } else {
-        appActions.setError(response?.error?? 'Failed to upload evidence');
+        appActions.setError(response?.error ?? 'Failed to upload evidence');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Failed to upload evidence');
@@ -214,8 +230,8 @@ export const appActions = {
 
   // Persons of Interest
   async loadPOIs(params?: {
-    page?: number,
-    limit?: number,
+    page?: number;
+    limit?: number;
     threatLevel?: string;
     status?: string;
     search?: string;
@@ -223,14 +239,14 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await poiApi.getPOIs(params);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           pois: response.data.items,
           error: null,
         }));
       } else {
-        appActions.setError(response?.error?? 'Failed to load persons of interest');
+        appActions.setError(response?.error ?? 'Failed to load persons of interest');
       }
     } catch (error) {
       appActions.setError(
@@ -245,19 +261,19 @@ export const appActions = {
     appStore.update((state) => ({ ...state, selectedPOI: poi }));
   },
 
-  async createPOI(data, Omit<PersonOfInterest, 'id' | 'createdAt'>) {
+  async createPOI(data: Omit<PersonOfInterest, 'id' | 'createdAt'>) {
     appActions.setLoading(true);
     try {
       const response = await poiApi.createPOI(data);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          pois: [response.data, ...state.pois],
+          pois: [response.data!, ...state.pois],
           error: null,
         }));
         return response.data;
       } else {
-        appActions.setError(response?.error?? 'Failed to create person of interest');
+        appActions.setError(response?.error ?? 'Failed to create person of interest');
       }
     } catch (error) {
       appActions.setError(
@@ -272,8 +288,8 @@ export const appActions = {
   async search(
     query: string,
     filters?: {
-      type?: string[],
-      tags?: string[],
+      type?: string[];
+      tags?: string[];
       dateFrom?: string;
       dateTo?: string;
       caseId?: string;
@@ -282,7 +298,7 @@ export const appActions = {
     appActions.setLoading(true);
     try {
       const response = await searchApi.searchGlobal(query, filters);
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           searchResults: response.data.items,
@@ -290,7 +306,7 @@ export const appActions = {
           error: null,
         }));
       } else {
-        appActions.setError(response?.error?? 'Search failed');
+        appActions.setError(response?.error ?? 'Search failed');
       }
     } catch (error) {
       appActions.setError(error instanceof Error ? error.message : 'Search failed');
@@ -311,7 +327,7 @@ export const appActions = {
   async loadSystemMetrics() {
     try {
       const response = await systemApi.getMetrics();
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           systemMetrics: response.data,
@@ -325,7 +341,7 @@ export const appActions = {
   async loadGPUMetrics() {
     try {
       const response = await systemApi.getGPUMetrics();
-      if (response?.success&& response.data) {
+      if (response?.success && response.data) {
         appStore.update((state) => ({
           ...state,
           systemMetrics: state.systemMetrics
@@ -353,7 +369,8 @@ export const appActions = {
         appActions.loadEvidenceStats(),
         appActions.loadPOIs({ limit: 20 }),
         appActions.loadSystemMetrics(),
-        appActions.loadGPUMetrics()]);
+        appActions.loadGPUMetrics(),
+      ]);
     } catch (error) {
       console.error('Failed to initialize app:', error);
     } finally {
@@ -370,8 +387,12 @@ export const appActions = {
 // Store selectors (for computed values)
 export const storeSelectors = {
   getActiveCases: (state: AppState) =>
-    state.cases.filter((c) => c.status === 'open' || c.status === 'investigating', getCriticalCases: (state: AppState) => state.cases.filter((c) => c.priority === 'critical', getRecentEvidence: (state: AppState) => state.evidence.slice(0, 10, getHighThreatPOIs: (state: AppState) =>
-    state.pois.filter((p) => p.threatLevel === 'high' || p.threatLevel === 'critical', getSystemHealth: (state: AppState) => {
+    state.cases.filter((c) => c.status === 'open' || c.status === 'investigating'),
+  getCriticalCases: (state: AppState) => state.cases.filter((c) => c.priority === 'critical'),
+  getRecentEvidence: (state: AppState) => state.evidence.slice(0, 10),
+  getHighThreatPOIs: (state: AppState) =>
+    state.pois.filter((p) => p.threatLevel === 'high' || p.threatLevel === 'critical'),
+  getSystemHealth: (state: AppState) => {
     if (!state.systemMetrics) return 'unknown';
     const services = Object.values(state.systemMetrics.services);
     const healthy = services.filter((s) => s.status === 'healthy').length;

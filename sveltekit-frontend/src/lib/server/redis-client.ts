@@ -80,10 +80,8 @@ type RedisLike = Redis & {
 
 export function createRedisClient(options?: RedisClientOptions): Redis {
  const [url, redisOptions] = buildRedisOptions(options);
- // ioredis v4 expects a single options object, include url into options and instantiate with one arg
- const optsWithUrl: RedisOptions = { ...redisOptions, url };
- // cast to Redis to align return type
- return new Redis(optsWithUrl) as unknown as Redis;
+ // ioredis v4 typically takes url as first arg if provided, otherwise host/port in options
+ return new Redis(url, redisOptions);
 }
 
 const globalForRedis = globalThis as unknown as { sharedRedis?: Redis };

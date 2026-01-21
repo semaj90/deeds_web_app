@@ -8,51 +8,27 @@
  * @module db/pool
  */
 
+import { env } from '$env/dynamic/private';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { DATABASE_URL } from '$env/static/private';
 
-// Import from server schema which has proper definitions
-// Use dynamic import to handle schema errors gracefully
-let schema: Record<string, unknown> = {};
-try {
-  // @ts-expect-error - dynamic import for error resilience
-  schema = await import('$lib/server/db/schema-postgres.js');
-} catch (e) {
-  console.warn('[db/pool] Schema import failed, using empty schema:', e);
-}
-
-/**
- * PostgreSQL connection configuration
- */DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-
-/**
- * Connection pool configuration
- *
- * - max: Maximum number of connections in the pool
- * - idle_timeout: Close idle connections after 20 seconds
- * - connect_timeout: Timeout for establishing new connections
- * - max_lifetime: Maximum lifetime of a connection (60 minutes)
- */
-const poolConfig = {
-  max: 20,
-  idle_timeout: 20,
-  connect_timeout: 10,
-  max_lifetime: 60 * 60, // 60 minutes
-};
+// Fallback for development if env is not loaded
+const connectionString = env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 
 /**
  * PostgreSQL client with connection pooling
  */
-const client = postgres(connectionString, poolConfig);
+const client = postgres(connectionString, {
+  max: 20,
+  idle_timeout: 20,
+  connect_timeout: 10,
+  max_lifetime: 60 * 60,
+});
 
 /**
- * Drizzle ORM instance with full schema
- *
- * This instance includes all table definitions and relations,
- * enabling type-safe queries across the entire database.
+ * Drizzle ORM instance
  */
-export const db = drizzle(client, { schema });
+export const db = drizzle(client);
 
 /**
  * Get database connection
@@ -97,7 +73,7 @@ export async function testConnection(): Promise<boolean> {
     await client`SELECT 1`;
     return true;
   } catch (error) {
-    console.error('Database connection test failed:', error);
+    console.error('[db/pool] Connection test failed:', error);
     return false;
   }
 }

@@ -59,9 +59,8 @@ const _ENABLE_GPU = (() => {
 		// ignore
 	}
 
-	try {| string
-			| boolean
-			| undefined;
+	try {
+		const gv = (globalThis as unknown as { ENABLE_GPU?: string | boolean }).ENABLE_GPU;
 		if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';
 		if (typeof gv === 'boolean') return gv;
 	} catch {
@@ -124,7 +123,6 @@ fn compute_similarity(@builtin(global_invocation_id) global_id: vec3<u32>) {
 	} else {
 		similarities[doc_id] = 0.0;
 	}
-}
 `;
 
 	private pageRankShader = `
@@ -281,20 +279,20 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 				if (!db.objectStoreNames.contains('todos')) {
 					const todosStore = db.createObjectStore('todos', { keyPath: 'id' });
-					todosStore.createIndex('priority', 'priority', { unique, false });
-					todosStore.createIndex('category', 'category', { unique, false });
-					todosStore.createIndex('timestamp', 'created_at', { unique, false });
+					todosStore.createIndex('priority', 'priority', { unique: false });
+					todosStore.createIndex('category', 'category', { unique: false });
+					todosStore.createIndex('timestamp', 'created_at', { unique: false });
 				}
 
 				if (!db.objectStoreNames.contains('errors')) {
 					const errorsStore = db.createObjectStore('errors', { keyPath: 'id' });
-					errorsStore.createIndex('severity', 'severity', { unique, false });
-					errorsStore.createIndex('file', 'file', { unique, false });
+					errorsStore.createIndex('severity', 'severity', { unique: false });
+					errorsStore.createIndex('file', 'file', { unique: false });
 				}
 
 				if (!db.objectStoreNames.contains('cache')) {
 					const cacheStore = db.createObjectStore('cache', { keyPath: 'key' });
-					cacheStore.createIndex('timestamp', 'timestamp', { unique, false });
+					cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
 				}
 			};
 		});
@@ -319,10 +317,14 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 			return cached;
 		}
 
-		const errors = this.parseNPMErrors(npmOutput);? await this.computeErrorEmbeddingsGPU(errors)
+		const errors = this.parseNPMErrors(npmOutput);
+		const embeddings = this.device
+			? await this.computeErrorEmbeddingsGPU(errors)
 			: this.computeErrorEmbeddingsCPU(errors);
 
-		const intelligentTodos = await this.callGoSOMAnalyzer(errors);? await this.refineRankingWithWebGPU(intelligentTodos)
+		const intelligentTodos = await this.callGoSOMAnalyzer(errors);
+		const rankedTodos = this.device
+			? await this.refineRankingWithWebGPU(intelligentTodos)
 			: intelligentTodos;
 
 		this.cacheResult(cacheKey, rankedTodos);
@@ -493,7 +495,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const todos: IntelligentTodo[] = [];
 		let todoId = 0;
 
-		categories.forEach((categoryErrors, category) => {(max, error) =>
+		categories.forEach((categoryErrors, category) => {
+			const severity = categoryErrors.reduce(
+				(max, error) =>
 					this.getSeverityWeight(error.severity) > this.getSeverityWeight(max)
 						? error.severity
 						: max,

@@ -1,76 +1,94 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  interface GridColumn {
-    key: string; title: string
-    formatter?: (_value: unknown; row: unknown) => string}
+
+  export interface GridColumn {
+    key: string;
+    title: string;
+    formatter?: (value: any, row: any) => string;
+  }
+
   interface DataGridProps {
     columns?: GridColumn[];
-    data?: unknown[];
-    loading?: boolean
-    className?: string
-    actionsSnippet?: Snippet<[any, number]>}
-  let { columns = [], data = [], loading = false, className = '', actionsSnippet }: DataGridProps = $props();
-  function format(_value: unknown, col: GridColumn, row: unknown) {
-    return col.formatter ? col.formatter(value, row) : valu}
+    data?: any[];
+    loading?: boolean;
+    className?: string;
+    actionsSnippet?: Snippet<[any, number]>;
+  }
+
+  let {
+    columns = [],
+    data = [],
+    loading = false,
+    className = '',
+    actionsSnippet
+  }: DataGridProps = $props();
+
+  function formatCellValue(value: any, col: GridColumn, row: any) {
+    if (col.formatter) return col.formatter(value, row);
+    return value === undefined || value === null ? '-' : String(value);
+  }
 </script>
-<div class="yorha-data-grid {className}">
+
+<div class="w-full bg-slate-900 border-2 border-slate-800 font-mono text-xs {className}">
   {#if loading}
-    <div class="grid-loading">Loading...</div>
+    <div class="p-8 text-center text-cyan-500 animate-pulse uppercase tracking-widest bg-slate-900/50">
+      Syncing Neural Network...
+    </div>
   {:else}
-    <div class="grid-scroll">
-      <table class="grid-table">
-        <thead>
-          <tr>
-            {#each Array.isArray(columns) ? columns : [] as col}
-              <th>{col.title}</th>
+    <div class="overflow-auto max-h-[600px] custom-scrollbar">
+      <table class="w-full border-collapse">
+        <thead class="sticky top-0 z-10">
+          <tr class="bg-slate-800 border-b-2 border-slate-700">
+            {#each columns as col}
+              <th class="p-3 text-slate-400 uppercase text-left font-bold">{col.title}</th>
             {/each}
             {#if actionsSnippet}
-              <th>Actions</th>
+              <th class="p-3 text-slate-400 uppercase text-right font-bold">Actions</th>
             {/if}
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-slate-800">
           {#each data as row, i (row?.id ?? i)}
-            <tr>
-              {#each Array.isArray(columns) ? columns : [] as col}
-                <td>{format(row?.[col.key], col, row)}</td>
+            <tr class="hover:bg-slate-800/50 transition-colors group">
+              {#each columns as col}
+                <td class="p-3 text-slate-300 group-hover:text-cyan-400 transition-colors">
+                  {formatCellValue(row[col.key], col, row)}
+                </td>
               {/each}
               {#if actionsSnippet}
-                <td>{@render actionsSnippet(row, i)}</td>
+                <td class="p-3 text-right">
+                  {@render actionsSnippet(row, i)}
+                </td>
               {/if}
+            </tr>
+          {:else}
+            <tr>
+              <td colspan={columns.length + (actionsSnippet ? 1 : 0)} class="p-12 text-center text-slate-600 italic">
+                NO DATA RECORDS RETRIEVED
+              </td>
             </tr>
           {/each}
         </tbody>
       </table>
-    {/if}
-  {#if !loading && (!data ?? data.length === 0)}
-    <div class="grid-empty">No data{/if}
+    </div>
+  {/if}
 </div>
+
 <style>
-  .yorha-data-grid {
-    border: 2px solid #ffbf00
-    background: #0a0a0a
-   ;color: #e0e0e0
-    font-family: 'JetBrains Mono', monospace}
-  .grid-scroll {
-    overflow: auto
-    max-height: 500px}
-  .grid-table {
-    width: 100%; border-collapse}
-  thead th {
-    position: sticky
-   ;top: 0; background: #ffd700
-    color: #000
-    text-align: left, padding: 8px
-    border-bottom: 2px solid #ffbf00}
-  td {
-    padding: 8px
-    border-bottom: 1px solid #333}; tr:nth-child(even) td {
-    background: #151515}
-  .grid-loading,
-  .grid-empty {
-    padding: 12px
-   ;color: #ffbf00}
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
 </style>
 
 

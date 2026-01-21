@@ -1,50 +1,101 @@
-<!-- YoRHa Notification/Alert System, Component --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from "svelte"; import { fade, fly } from 'svelte/transition'; interface NotificationProps { type?: 'info' | 'success' | 'warning' | 'error' | 'system'; title?: string,message: string duration?: number; persistent?: boolean; closable?: boolean; icon?: string; position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center'; showProgress?: boolean}
-  let { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true }: { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true: unknown } = $props(); let visible = $state<boolean>(true); let progress = $state<number>(100); let progressInterval: NodeJS.Timeout;
- let autoCloseTimeout: NodeJS.Timeout;
- let notificationElement = $state<HTMLDivElement | null>(null); // Auto-close functionality $effect(() => { if (!persistent && duration > 0) { // Progress bar animation: if (showProgress) { const progressStep = 100 / (duration / 100); progressInterval = setInterval(() => { progress = Math.max(0, progress - progressStep)}, 100)}
+<!-- YoRHa Notification/Alert System, Component -->
+<script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
 
-      // Auto close autoCloseTimeout = setTimeout(() => { closeNotification()}, duration)}
-    return () => { if (progressInterval) clearInterval(progressInterval); if (autoCloseTimeout) clearTimeout(autoCloseTimeout)}
-  }); function closeNotification() { visible = false; setTimeout(() => { // ondispatch removed}, 300)}
-  function pauseAutoClose() { if (progressInterval) clearInterval(progressInterval); if (autoCloseTimeout) clearTimeout(autoCloseTimeout)}
-  function resumeAutoClose() { if (!persistent && duration > 0) { const remainingTime = (progress / 100) * duratio; if (showProgress) { const progressStep = 100 / (remainingTime / 100); progressInterval = setInterval(() => { progress = Math.max(0, progress - progressStep)}, 100)}
-      autoCloseTimeout = setTimeout(() => { closeNotification()}, remainingTime)}
+  interface Props {
+    id?: string;
+    type?: 'info' | 'success' | 'warning' | 'error' | 'system';
+    title?: string;
+    message: string;
+    duration?: number;
+    closable?: boolean;
+    onClose?: (id?: string) => void;
   }
 
-   // Icon mapping const iconMap = { info: 'â– ', success: 'âœ“', warning: 'âš ', error: 'âœ•'; system: 'â—†'
-  } const notificationIcon = $derived(icon || iconMap[type]) </script> {#if visible} <div bind:this={ notificationElement } class="yorha-notification { type }"
-    transition:fly={{ x: position.includes('right') ? 150, -150; duration, 250 }} onmouseenter={ pauseAutoClose } onmouseleave={ resumeAutoClose } role="alert"
-    aria-live="polite"
-  > <!-- Progress, Bar --> {#if showProgress && !persistent} <div class="notification-progress"> <div class="progress-fill" style="width: { progress }%" transition, fade={{ duration, 200 }}></div> {/if} <!-- Content --> <div class="notification-content"> <!-- Icon --> <div class="notification-icon"> { notificationIcon } </div> <!-- Text, Content --> <div class="notification-text"> {#if title} <div class="notification-title">{ title }{/if} <div class="notification-message">{ message }</div> </div> <!-- Close, Button --> {#if closable} <button class="notification-close" onclick={ closeNotification } aria-label="Close, notification"> âœ• </button> {/if} </div> <!-- System Status, Indicator --> {#if type === 'system'} <div class="system-indicator"> <div class="system-pulse"></div> {/if} {/if} <style> .yorha-notification { min-width: 300px; max-width: 450px; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); font-family: var(--yorha-font-primary: 'JetBrains Mono', monospace); box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 8px 32px rgba(0, 0, 0, 0.8); overflow: hidden}
-  /* Positioning is handled by the manager */ /* Progress Bar */ .notification-progress { height: 3px; background: var(--yorha-bg-primary, #0a0a0a); overflow: hidden}
-  .progress-fill { height: 100%; background: var(--yorha-secondary, #ffd700); transition: width 0.1s linear; box-shadow: 0 0 8px rgba(255, 215, 0, 0.6)}
-  /* Content Layout */ .notification-content { display: flex; align-items: flex-start; gap: 12px;padding: 16px; position: relative}
-  .notification-icon { flex-shrink: 0; width: 20px; height: 20px, display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--yorha-secondary, #ffd700); border: 1px solid currentColor; background: var(--yorha-bg-primary, #0a0a0a)}
-  .notification-text { flex: 1; min-width: 0 }
-  .notification-title { font-size: 12px; font-weight: 700; color: var(--yorha-secondary, #ffd700); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px}
-  .notification-message { font-size: 12px; color: var(--yorha-text-primary, #e0e0e0); line-height: 1.4; word-wrap: break-word}
-  .notification-close { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; background: transparent; border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); font-size: 10px; cursor: pointer; display: flex; align-items: center, justify-content: center; transition: all 0.2s ease}
-  .notification-close:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1)}
-  /* Type-specific styling */ .yorha-.info { border-left: 4px solid var(--yorha-accent, #00ff41)}
-  .yorha-.info .notification-icon { color: var(--yorha-accent, #00ff41)}
-  .yorha-.success { border-left: 4px solid var(--yorha-accent, #00ff41); background: var(--yorha-bg-secondary, #1a1a1a)}
-  .yorha-.success .notification-icon { color: var(--yorha-accent, #00ff41); background: rgba(0, 255, 65, 0.1)}
-  .yorha-.warning { border-left: 4px solid var(--yorha-warning, #ffaa00)}
-  .yorha-.warning .notification-icon { color: var(--yorha-warning, #ffaa00)}
-  .yorha-.error { border-left: 4px solid var(--yorha-danger, #ff0041)}
-  .yorha-.error .notification-icon { color: var(--yorha-danger, #ff0041)}
-  .yorha-.system { border: 2px solid var(--yorha-secondary, #ffd700); background: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), 0, 0 20px rgba(255, 215, 0, 0.3), inset, 0 0 20px rgba(255, 215, 0, 0.1)}
-  .yorha-.system .notification-icon { color: var(--yorha-secondary, #ffd700); animation: pulse 2s infinite}
-  /* System Status Indicator */ .system-indicator { position: absolute; top: 8px; left: 8px; width: 8px; height: 8px}
-  .system-pulse { width: 100%; height: 100%;background: var(--yorha-secondary, #ffd700); animation: systemPulse 1.5s infinite}
-  /* Animations */ @keyframes pulse { 0%; } 100% { opacity: 1; transform: scale(1)}
-    50% { opacity: 0.7; transform: scale(1.1)}
-  } @keyframes systemPulse { 0%; } 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
-    70% { opacity: 0; box-shadow: 0 0 0 8px rgba(255, 215, 0 | 0)}
-  } /* Responsive Design */ @media (max-width: 768px) { .yorha-notification { min-width: 280px; max-width: calc(100vw - 40px); margin: 0 20px}
-    .notification-top-right, .notification-top-left { top: 10px; right: 10px;left: 10px}
-    .notification-bottom-right, .notification-bottom-left { bottom: 10px; right: 10px;left: 10px}
-  } </style>
+  let {
+    id,
+    type = 'info',
+    title = '',
+    message,
+    duration = 5000,
+    closable = true,
+    onClose
+  }: Props = $props();
+
+  let visible = $state(true);
+  let progress = $state(100);
+  let interval: any;
+
+  const typeConfig = {
+    info: { icon: '■', color: '#0ea5e9' },
+    success: { icon: '✓', color: '#10b981' },
+    warning: { icon: '!', color: '#f59e0b' },
+    error: { icon: '✕', color: '#ef4444' },
+    system: { icon: '◆', color: '#8b5cf6' }
+  };
+
+  const config = $derived(typeConfig[type]);
+
+  function close() {
+    visible = false;
+    onClose?.(id);
+  }
+
+  onMount(() => {
+    if (duration > 0) {
+      const startTime = Date.now();
+      interval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        progress = Math.max(0, 100 - (elapsed / duration) * 100);
+        if (progress <= 0) {
+          clearInterval(interval);
+          close();
+        }
+      }, 100);
+    }
+  });
+
+  onDestroy(() => {
+    if (interval) clearInterval(interval);
+  });
+</script>
+
+{#if visible}
+  <div
+    class="relative overflow-hidden bg-slate-900 border border-slate-700 p-4 min-w-[300px] shadow-2xl"
+    transition:fly={{ x: 100, duration: 400 }}
+  >
+    <div class="flex items-start gap-4">
+      <div class="text-xl" style="color: {config.color}">{config.icon}</div>
+      <div class="flex-1">
+        {#if title}
+          <div class="font-bold text-xs uppercase tracking-widest mb-1" style="color: {config.color}">{title}</div>
+        {/if}
+        <div class="text-xs text-slate-300 font-mono leading-relaxed">{message}</div>
+      </div>
+      {#if closable}
+        <button onclick={close} class="text-slate-500 hover:text-white transition-colors">✕</button>
+      {/if}
+    </div>
+
+    <!-- Progress Bar -->
+    {#if duration > 0}
+      <div class="absolute bottom-0 left-0 h-0.5 bg-slate-800 w-full">
+        <div
+          class="h-full transition-all duration-100 ease-linear"
+          style="width: {progress}%; background-color: {config.color}"
+        ></div>
+      </div>
+    {/if}
+  </div>
+{/if}
+
+<style>
+  div {
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
 
 
 

@@ -19,7 +19,8 @@ export async function extractCaseStructureWithGemma(input: { narrative: string,
  why?: string;
  how?: string;
 }): Promise<IntakeExtractionResult> {
- const { narrative, who, what, when, where, why, how } = input;$1;$2You are a legal intake assistant for a prosecutor.
+ const { narrative, who, what, when, where, why, how } = input;
+ const prompt = `You are a legal intake assistant for a prosecutor.
 
 You will receive:
 - A narrative of what happened
@@ -70,7 +71,7 @@ ${ narrative }
  throw new Error(`Gemma3 intake extraction failed: ${res.status} ${res.statusText}`);
  }
 
- const data = (await res.json()) as { response, string };
+ const data = (await res.json()) as { response: string };
 
  let parsed: IntakeExtractionResult;
  try {

@@ -67,6 +67,13 @@ export const relationTypeEnum = pgEnum('relation_type', ['supports',
 
 export const threatLevelEnum = pgEnum('threat_level', ['low', 'medium', 'high', 'critical']);
 export const patchStatusEnum = pgEnum('patch_status', ['suggested', 'applied', 'rejected']);
+export const documentStatusEnum = pgEnum('document_status', ['queued', 'processing', 'completed', 'failed']);
+export const documentTypeEnum = pgEnum('document_type', ['pleading', 'motion', 'brief', 'contract', 'evidence', 'correspondence', 'court_order', 'transcript', 'affidavit', 'other']);
+export const summaryTypeEnum = pgEnum('summary_type', ['brief', 'detailed', 'executive', 'technical']);
+export const activityStatusEnum = pgEnum('activity_status', ['pending', 'in_progress', 'completed', 'cancelled']);
+export const verificationStatusEnum = pgEnum('verification_status', ['pending', 'verified', 'failed', 'rejected']);
+export const reportStatusEnum = pgEnum('report_status', ['draft', 'pending', 'completed', 'published']);
+export const caseRiskLevelEnum = pgEnum('case_risk_level', ['low', 'medium', 'high', 'critical']);
 
 // === TABLES FOR LEGAL AI APPLICATION ===
 

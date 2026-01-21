@@ -285,10 +285,10 @@ export class ToolInvoker {
 
 	/**
 	 * Update confidence based on tool results
+	 */
 	updateConfidence(currentConfidence: number, diagnosticResult: DiagnosticResult): number {
 		this.stats.confidenceUpdates++;
 
-		const errorCount = diagnosticResult.errors.length;
 		const errorCount = diagnosticResult.errors.length;
 		const warningCount = diagnosticResult.warnings.length;
 

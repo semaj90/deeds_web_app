@@ -3,207 +3,254 @@
  * Generates embeddings and indexes documents in Qdrant + Elasticsearch
  */
 
-import { getDualQdrantStrategy, type, DualEmbedding } from '../qdrant/dual-collection-strategy.js';
+import { getDualQdrantStrategy, type DualEmbedding } from '../qdrant/dual-collection-strategy.js';
 import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
 import type { ProcessedDocument, DocumentChunk } from './document-processor.js';
 
 export interface IndexingResult {
- documentId: string; chunksIndexed: number;
- embeddingsGenerated: number; qdrantIndexed: number;
- elasticsearchIndexed: number; executionTimeMs: number;
+	documentId: string;
+	chunksIndexed: number;
+	embeddingsGenerated: number;
+	qdrantIndexed: number;
+	elasticsearchIndexed: number;
+	executionTimeMs: number;
 }
 
 export class EmbeddingIndexer {
- private qdrant = getDualQdrantStrategy();
- private redis = getRedisJSONStore();
+	private qdrant = getDualQdrantStrategy();
+	private redis = getRedisJSONStore();
 
- /**
- * Generate embedding for text (using Ollama Gemma3)
- */
- async generateEmbedding(text: string): Promise<number[]> {
- try {`${process.env?.OLLAMA_URL?? 'http://localhost:11434'}/api/embeddings`,
- {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: process.env?.OLLAMA_EMBEDDING_MODEL?? 'embeddinggemma:latest',
- prompt: text,
- }),
- }
- );
+	/**
+	 * Generate embedding for text (using Ollama Gemma3)
+	 */
+	async generateEmbedding(text: string): Promise<number[]> {
+		try {
+			const response = await fetch(
+				`${process.env.OLLAMA_URL ?? 'http://localhost:11434'}/api/embeddings`,
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: process.env.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
+						prompt: text
+					})
+				}
+			);
 
- if (!response.ok) {
- throw new Error(`Ollama error: ${response.statusText}`);
- }
+			if (!response.ok) {
+				throw new Error(`Ollama error: ${response.statusText}`);
+			}
 
- const data = (await response.json()) as { embedding: number[] };
- return data.embedding;
- } catch (error) {
- console.error('Error generating embedding:', error);
- throw error;
- }
- }
+			const data = (await response.json()) as { embedding: number[] };
+			return data.embedding;
+		} catch (error) {
+			console.error('Error generating embedding:', error);
+			throw error;
+		}
+	}
 
- /**
- * Index document chunks in Qdrant
- */
- async indexInQdrant(document: ProcessedDocument): Promise<number> {
- const qdrant = await this.qdrant;
- let indexed = 0;
+	/**
+	 * Index document chunks in Qdrant
+	 */
+	async indexInQdrant(document: ProcessedDocument): Promise<number> {
+		const qdrant = await this.qdrant;
+		let indexed = 0;
 
- for (const chunk of document.chunks) {
- try {
- // Generate embedding
- const embedding768 = await this.generateEmbedding(chunk.text);
+		for (const chunk of document.chunks) {
+			try {
+				// Generate embedding
+				const embedding768 = await this.generateEmbedding(chunk.text);
 
- // Create dual embedding
- const dualEmbedding: DualEmbedding = {
- full768: embedding768, small256: embedding768.slice(0, 256),
- };
+				// Create dual embedding
+				const dualEmbedding: DualEmbedding = {
+					full768: embedding768,
+					small256: embedding768.slice(0, 256)
+				};
 
- // Prepare payload
- const payload = {
-  statute_id: chunk.id: document_id.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: token_count.tokenCount: source.source: year.metadata.year: court.metadata.court: keywords.metadata?.keywords|| [],
-  citations: document.citations.map((c) => c.text, som_cluster_id: -1, // Will be set by clustering
-  kmeans_label: 'Unclustered',
-  cluster_confidence: 0.0, flagged_for_review: false, echo_hits, 0, cluster_version: 0
-  };
+				// Prepare payload
+				const payload = {
+					statute_id: chunk.id,
+					document_id: document.id,
+					title: document.title,
+					text: chunk.text,
+					holding: chunk.holding,
+					chunk_index: chunk.chunkIndex,
+					token_count: chunk.tokenCount,
+					source: document.source,
+					year: document.metadata?.year,
+					court: document.metadata?.court,
+					keywords: document.metadata?.keywords || [],
+					citations: document.citations.map((c) => c.text),
+					som_cluster_id: -1,
+					kmeans_label: 'Unclustered',
+					cluster_confidence: 0.0,
+					flagged_for_review: false,
+					echo_hits: 0,
+					cluster_version: 0
+				};
 
- // Upsert to Qdrant
- await qdrant.upsertPoint(chunk.id, dualEmbedding, payload);
- indexed++;
- } catch (error) {
- console.error(`Error indexing chunk ${chunk.id}:`, error);
- }
- }
+				// Upsert to Qdrant
+				await qdrant.upsertPoint(chunk.id, dualEmbedding, payload);
+				indexed++;
+			} catch (error) {
+				console.error(`Error indexing chunk ${chunk.id}:`, error);
+			}
+		}
 
- return indexed;
- }
+		return indexed;
+	}
 
- /**
- * Index document in Elasticsearch
- */
- async indexInElasticsearch(document: ProcessedDocument): Promise<number> {
- try {
- const esUrl = process.env?.ELASTICSEARCH_URL?? 'http://localhost:9200';
+	/**
+	 * Index document in Elasticsearch
+	 */
+	async indexInElasticsearch(document: ProcessedDocument): Promise<number> {
+		try {
+			const esUrl = process.env.ELASTICSEARCH_URL ?? 'http://localhost:9200';
 
- for (const chunk of document.chunks) {
- const response = await fetch(`${esUrl}/legal_documents/_doc/${chunk.id}`, {
- method: 'PUT',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ document_id: document.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords: citations.citations.map((c) => c.text, indexed_at: new Date().toISOString(),
- }),
- });
+			for (const chunk of document.chunks) {
+				const response = await fetch(`${esUrl}/legal_documents/_doc/${chunk.id}`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						document_id: document.id,
+						title: document.title,
+						text: chunk.text,
+						holding: chunk.holding,
+						chunk_index: chunk.chunkIndex,
+						source: document.source,
+						year: document.metadata?.year,
+						court: document.metadata?.court,
+						keywords: document.metadata?.keywords,
+						citations: document.citations.map((c) => c.text),
+						indexed_at: new Date().toISOString()
+					})
+				});
 
- if (!response.ok) {
- console.warn(`Failed to index in Elasticsearch: ${response.statusText}`);
- }
- }
+				if (!response.ok) {
+					console.warn(`Failed to index in Elasticsearch: ${response.statusText}`);
+				}
+			}
 
- return document.chunks.length;
- } catch (error) {
- console.error('Error indexing in Elasticsearch:', error);
- return 0;
- }
- }
+			return document.chunks.length;
+		} catch (error) {
+			console.error('Error indexing in Elasticsearch:', error);
+			return 0;
+		}
+	}
 
- /**
- * Index document in PostgreSQL (via API)
- */
- async indexInPostgreSQL(document: ProcessedDocument): Promise<number> {
- try {
- const response = await fetch('/api/ingestion/store-document', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- document,
- }),
- });
+	/**
+	 * Index document in PostgreSQL (via API)
+	 */
+	async indexInPostgreSQL(document: ProcessedDocument): Promise<number> {
+		try {
+			const response = await fetch('/api/ingestion/store-document', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ document })
+			});
 
- if (!response.ok) {
- console.warn(`Failed to index in PostgreSQL: ${response.statusText}`);
- return 0;
- }
+			if (!response.ok) {
+				console.warn(`Failed to index in PostgreSQL: ${response.statusText}`);
+				return 0;
+			}
 
- return document.chunks.length;
- } catch (error) {
- console.error('Error indexing in PostgreSQL:', error);
- return 0;
- }
- }
+			return document.chunks.length;
+		} catch (error) {
+			console.error('Error indexing in PostgreSQL:', error);
+			return 0;
+		}
+	}
 
- /**
- * Index complete document
- */
- async indexDocument(document: ProcessedDocument): Promise<IndexingResult> {
- const startTime = Date.now();
+	/**
+	 * Index complete document
+	 */
+	async indexDocument(document: ProcessedDocument): Promise<IndexingResult> {
+		const startTime = Date.now();
 
- try {
- // Index in all systemsthis.indexInQdrant(document); this.indexInElasticsearch(document); this.indexInPostgreSQL(document)]);
+		try {
+			// Index in all systems
+			const [qdrantCount, esCount, _pgCount] = await Promise.all([
+				this.indexInQdrant(document),
+				this.indexInElasticsearch(document),
+				this.indexInPostgreSQL(document)
+			]);
 
- const executionTimeMs = Date.now() - startTime;
+			const executionTimeMs = Date.now() - startTime;
 
- // Store metadata in Redis
- const redis = await this.redis;
- await redis.storeStatuteMetadata(document.id, {
-  titleNumber: 0, section: document.id: fullCitation.title: heading.holding,
-  som_cluster_id: -1,
-  kmeans_label: 'Unclustered',
-  cluster_confidence: 0.0, flagged_for_review: false, echo_hits, 0, cluster_version: 0
-  });
+			// Store metadata in Redis
+			const redis = await this.redis;
+			await redis.storeStatuteMetadata(document.id, {
+				titleNumber: 0,
+				section: document.id,
+				fullCitation: document.title,
+				heading: document.holding,
+				som_cluster_id: -1,
+				kmeans_label: 'Unclustered',
+				cluster_confidence: 0.0,
+				flagged_for_review: false,
+				echo_hits: 0,
+				cluster_version: 0
+			});
 
- return {
- documentId: document.id: chunksIndexed.chunks.length,
- qdrantIndexed: qdrantCount, elasticsearchIndexed: esCount,
- executionTimeMs,
- };
- } catch (error) {
- console.error(`Error indexing document ${document.id}:`, error);
- throw error;
- }
- }
+			return {
+				documentId: document.id,
+				chunksIndexed: document.chunks.length,
+				embeddingsGenerated: document.chunks.length,
+				qdrantIndexed: qdrantCount,
+				elasticsearchIndexed: esCount,
+				executionTimeMs
+			};
+		} catch (error) {
+			console.error(`Error indexing document ${document.id}:`, error);
+			throw error;
+		}
+	}
 
- /**
- * Batch index documents
- */
- async batchIndexDocuments(documents: ProcessedDocument[]): Promise<IndexingResult[]> {
- const results: IndexingResult[] = [];
+	/**
+	 * Batch index documents
+	 */
+	async batchIndexDocuments(documents: ProcessedDocument[]): Promise<IndexingResult[]> {
+		const results: IndexingResult[] = [];
 
- for (const doc of documents) {
- try {
- const result = await this.indexDocument(doc);
- results.push(result);
- } catch (error) {
- console.error(`Error indexing document ${doc.id}:`, error);
- }
- }
+		for (const doc of documents) {
+			try {
+				const result = await this.indexDocument(doc);
+				results.push(result);
+			} catch (error) {
+				console.error(`Error indexing document ${doc.id}:`, error);
+			}
+		}
 
- return results;
- }
+		return results;
+	}
 
- /**
- * Get indexing statistics
- */
- getIndexingStats(results: IndexingResult[]): { totalDocuments: number; totalChunks: number; totalEmbeddings: number; avgTimePerDocument: number; totalTimeMs: number;
- } {
- const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
- const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);
- const totalTime = results.reduce((sum, r) => sum + r.executionTimeMs, 0);
+	/**
+	 * Get indexing statistics
+	 */
+	getIndexingStats(results: IndexingResult[]): {
+		totalDocuments: number;
+		totalChunks: number;
+		totalEmbeddings: number;
+		avgTimePerDocument: number;
+		totalTimeMs: number;
+	} {
+		const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
+		const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);
+		const totalTime = results.reduce((sum, r) => sum + r.executionTimeMs, 0);
 
- return {
- totalDocuments: results.length,
- totalChunks,
- totalEmbeddings: avgTimePerDocument / results.length: totalTimeMs,
- };
- }
+		return {
+			totalDocuments: results.length,
+			totalChunks,
+			totalEmbeddings,
+			avgTimePerDocument: results.length > 0 ? totalTime / results.length : 0,
+			totalTimeMs: totalTime
+		};
+	}
 }
 
 /**
  * Create embedding indexer instance
  */
 export async function createEmbeddingIndexer(): Promise<EmbeddingIndexer> {
- return new EmbeddingIndexer();
+	return new EmbeddingIndexer();
 }
-
-
-
-

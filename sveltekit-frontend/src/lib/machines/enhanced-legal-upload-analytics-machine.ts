@@ -1,4 +1,3 @@
-import type { AnyActorLogic } from 'xstate';
 import { assign, createActor, createMachine } from 'xstate';
 import { z } from 'zod';
 
@@ -567,7 +566,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 				states: {
 					validatingFiles: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								fileValidation: { status: 'processing', progress: 0 }
 							})
@@ -576,7 +575,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 							500: {
 								target: 'uploadingFiles',
 								actions: assign({
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										fileValidation: { status: 'completed', progress: 100 }
 									})
@@ -586,7 +585,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					},
 					uploadingFiles: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								fileUpload: { status: 'processing', progress: 0 }
 							})
@@ -596,7 +595,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 								target: 'performingAIAnalysis',
 								actions: assign({
 									uploadProgress: 30,
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										fileUpload: { status: 'completed', progress: 100 }
 									})
@@ -606,20 +605,20 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					},
 					performingAIAnalysis: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								aiAnalysis: { status: 'processing', progress: 0 }
 							})
 						}),
 						invoke: {
 							src: 'performAIAnalysis',
-							input: ({ context }) => ({ files: context.files, context }),
+							input: ({ context }: { context: UploadContext }) => ({ files: context.files, context }),
 							onDone: {
 								target: 'indexingDocuments',
 								actions: assign({
-									uploadResults: ({ event }) => event.output,
+									uploadResults: ({ event }: { event: any }) => event.output,
 									uploadProgress: 100,
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										aiAnalysis: { status: 'completed', progress: 100 }
 									})
@@ -628,8 +627,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 							onError: {
 								target: 'error',
 								actions: assign({
-									errors: ({ context, event }) => [...context.errors, `AI analysis failed: \${event.error}`],
-									pipeline: ({ context }) => ({
+									errors: ({ context, event }: { context: UploadContext; event: any }) => [...context.errors, `AI analysis failed: ${event.error}`],
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										aiAnalysis: { status: 'failed', progress: 0 }
 									})
@@ -639,7 +638,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					},
 					indexingDocuments: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								indexing: { status: 'processing', progress: 0 }
 							})
@@ -649,7 +648,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 								target: 'generatingEmbeddings',
 								actions: assign({
 									uploadProgress: 75,
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										indexing: { status: 'completed', progress: 100 }
 									})
@@ -659,7 +658,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					},
 					generatingEmbeddings: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								vectorEmbedding: { status: 'processing', progress: 0 }
 							})
@@ -669,7 +668,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 								target: 'savingToDatabase',
 								actions: assign({
 									uploadProgress: 90,
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										vectorEmbedding: { status: 'completed', progress: 100 }
 									})
@@ -679,19 +678,19 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 					},
 					savingToDatabase: {
 						entry: assign({
-							pipeline: ({ context }) => ({
+							pipeline: ({ context }: { context: UploadContext }) => ({
 								...context.pipeline,
 								dbStorage: { status: 'processing', progress: 0 }
 							})
 						}),
 						invoke: {
 							src: 'saveToDatabase',
-							input: ({ context }) => ({ results: context.uploadResults, context }),
+							input: ({ context }: { context: UploadContext }) => ({ results: context.uploadResults, context }),
 							onDone: {
 								target: 'completed',
 								actions: assign({
 									uploadProgress: 100,
-									pipeline: ({ context }) => ({
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										dbStorage: { status: 'completed', progress: 100 }
 									})
@@ -700,8 +699,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 							onError: {
 								target: 'error',
 								actions: assign({
-									errors: ({ context, event }) => [...context.errors, `Database save failed: \${event.error}`],
-									pipeline: ({ context }) => ({
+									errors: ({ context, event }: { context: UploadContext; event: any }) => [...context.errors, `Database save failed: ${event.error}`],
+									pipeline: ({ context }: { context: UploadContext }) => ({
 										...context.pipeline,
 										dbStorage: { status: 'failed', progress: 0 }
 									})
@@ -715,7 +714,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 			},
 			completed: {
 				entry: assign({
-					userAnalytics: ({ context }) => ({
+					userAnalytics: ({ context }: { context: UploadContext }) => ({
 						...context.userAnalytics,
 						uploadHistory: {
 							...context.userAnalytics.uploadHistory,
@@ -729,10 +728,13 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 				}),
 				invoke: {
 					src: 'generateContextualPrompts',
-					input: ({ context }) => ({ context, timing: 'after-upload' }),
+					input: ({ context }: { context: UploadContext }) => ({ context, timing: 'after-upload' }),
 					onDone: {
 						actions: assign({
-							contextualPrompts: ({ context, event }) => [...context.contextualPrompts, ...event.output]
+							contextualPrompts: ({ context, event }: { context: UploadContext; event: any }) => [
+								...context.contextualPrompts,
+								...event.output
+							]
 						})
 					}
 				},
@@ -753,7 +755,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
 
 // Factory function
 export function createUploadAnalyticsActor(initialContext: Partial<UploadContext> = {}) {
-	return createActor(comprehensiveUploadAnalyticsMachine as AnyActorLogic, {
+	return createActor(comprehensiveUploadAnalyticsMachine as any, {
 		input: initialContext
 	});
 }

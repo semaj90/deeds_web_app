@@ -4,16 +4,20 @@
  */
 
 export interface CacheLayer {
-	name: string; maxSize: number;
-	maxAge: number; // milliseconds
+	name: string;
+	maxSize: number;
+	maxAge: number;
 	priority: 'high' | 'medium' | 'low';
 	evictionPolicy: 'lru' | 'lfu' | 'fifo';
 }
 
 export interface CacheEntry<T> {
-	key: string; value: T;
-	timestamp: number; accessCount: number;
-	size: number; layer: string;
+	key: string;
+	value: T;
+	timestamp: number;
+	accessCount: number;
+	size: number;
+	layer: string;
 }
 
 // Gaming console memory constraints
@@ -24,52 +28,16 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
 	],
 	snes: [
 		{ name: 'VRAM', maxSize: 64 * 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' },
-		{
-			name: 'WRAM',
-			maxSize: 128 * 1024,
-			maxAge: 600000,
-			priority: 'medium',
-			evictionPolicy: 'lfu'
-		}
+		{ name: 'WRAM', maxSize: 128 * 1024, maxAge: 600000, priority: 'medium', evictionPolicy: 'lfu' }
 	],
 	n64: [
-		{
-			name: 'RDRAM',
-			maxSize: 4 * 1024 * 1024,
-			maxAge: 600000,
-			priority: 'high',
-			evictionPolicy: 'lru'
-		},
-		{
-			name: 'TEXTURE_CACHE',
-			maxSize: 4 * 1024,
-			maxAge: 300000,
-			priority: 'high',
-			evictionPolicy: 'lru'
-		}
+		{ name: 'RDRAM', maxSize: 4 * 1024 * 1024, maxAge: 600000, priority: 'high', evictionPolicy: 'lru' },
+		{ name: 'TEXTURE_CACHE', maxSize: 4 * 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' }
 	],
 	legal: [
-		{
-			name: 'EMBEDDINGS',
-			maxSize: 16 * 1024 * 1024,
-			maxAge: 3600000,
-			priority: 'high',
-			evictionPolicy: 'lru'
-		},
-		{
-			name: 'DOCUMENTS',
-			maxSize: 32 * 1024 * 1024,
-			maxAge: 1800000,
-			priority: 'medium',
-			evictionPolicy: 'lfu'
-		},
-		{
-			name: 'SEARCH_RESULTS',
-			maxSize: 8 * 1024 * 1024,
-			maxAge: 300000,
-			priority: 'low',
-			evictionPolicy: 'fifo'
-		}
+		{ name: 'EMBEDDINGS', maxSize: 16 * 1024 * 1024, maxAge: 3600000, priority: 'high', evictionPolicy: 'lru' },
+		{ name: 'DOCUMENTS', maxSize: 32 * 1024 * 1024, maxAge: 1800000, priority: 'medium', evictionPolicy: 'lfu' },
+		{ name: 'SEARCH_RESULTS', maxSize: 8 * 1024 * 1024, maxAge: 300000, priority: 'low', evictionPolicy: 'fifo' }
 	]
 };
 
@@ -78,7 +46,7 @@ export class MultiLayerCacheSystem {
 	private layerConfigs: CacheLayer[];
 	private currentSize = new Map<string, number>();
 
-	constructor(consoleName, keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
+	constructor(consoleName: keyof typeof CONSOLE_CACHE_LAYERS = 'legal') {
 		this.layerConfigs = CONSOLE_CACHE_LAYERS[consoleName];
 		this.initializeLayers();
 	}
@@ -123,11 +91,13 @@ export class MultiLayerCacheSystem {
 			return this.getFromLayer<T>(key, layerName);
 		}
 
-		// Search all layers by priority(a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
+		// Search all layers by priority
+		const sortedLayers = [...this.layerConfigs].sort(
+			(a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
 		);
 
 		for (const config of sortedLayers) {
-			const result = this.getFromLayer<T>(key: config.name);
+			const result = this.getFromLayer<T>(key, config.name);
 			if (result !== null) return result;
 		}
 
@@ -230,7 +200,6 @@ export class MultiLayerCacheSystem {
 	}
 
 	private findFIFO(layer: Map<string, CacheEntry<unknown>>): string | null {
-		// In JavaScript Map, iteration order is insertion order
 		const firstEntry = layer.entries().next();
 		return firstEntry.done ? null : firstEntry.value[0];
 	}
@@ -246,29 +215,27 @@ export class MultiLayerCacheSystem {
 			}
 		}
 
-		// If no layer has space;
- return the largest one
+		// If no layer has space, return the largest one
 		return this.layerConfigs.reduce((largest, current) =>
 			current.maxSize > largest.maxSize ? current : largest
 		).name;
 	}
 
 	private estimateSize(value: unknown): number {
-		if (typeof value === 'string') return value.length * 2; // UTF-16
+		if (typeof value === 'string') return value.length * 2;
 		if (typeof value === 'number') return 8;
 		if (typeof value === 'boolean') return 1;
 		if (value instanceof ArrayBuffer) return value.byteLength;
-		if (Array.isArray(value)) return value.length * 8; // Rough estimate
+		if (Array.isArray(value)) return value.length * 8;
 
-		// For objects, rough JSON size estimate
 		try {
 			return JSON.stringify(value).length * 2;
 		} catch {
-			return 1024; // Default estimate
+			return 1024;
 		}
 	}
 
-	private getPriorityValue(priority, CacheLayer['priority']): number {
+	private getPriorityValue(priority: CacheLayer['priority']): number {
 		switch (priority) {
 			case 'high':
 				return 3;
@@ -281,7 +248,6 @@ export class MultiLayerCacheSystem {
 		}
 	}
 
-	// Utility methods for monitoring
 	getStats(): Record<string, unknown> {
 		const stats: Record<string, unknown> = {};
 		for (const config of this.layerConfigs) {
@@ -328,6 +294,3 @@ export class MultiLayerCacheSystem {
 		return this.get(`doc:${id}`, 'DOCUMENTS');
 	}
 }
-
-
-

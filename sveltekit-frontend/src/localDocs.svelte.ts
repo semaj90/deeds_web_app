@@ -82,7 +82,9 @@ export class LocalLegalStore {
 		return new Promise((resolve, reject) => {
 			try {
 				const adapter = new LokiIndexedAdapter('legal-ai-db');
-				this.db = new loki('legal-documents.db', { adapter: autoload: true,
+				this.db = new loki('legal-documents.db', {
+					adapter,
+					autoload: true,
 					autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
@@ -126,7 +128,7 @@ export class LocalLegalStore {
 	/**
 	 * Add a new document
 	 */
-	addDocument(doc, Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
+	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
 			...doc,
 			id: this.generateId(),
@@ -189,7 +191,7 @@ export class LocalLegalStore {
 	/**
 	 * Bulk insert documents
 	 */
-	bulkInsert(docs, Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
+	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs = docs.map((doc) => ({
 			...doc,
 			id: this.generateId(),
@@ -231,7 +233,7 @@ export class LocalLegalStore {
 	/**
 	 * Filter by type
 	 */
-	filterByType(type, LegalDoc['type']): void {
+	filterByType(type: LegalDoc['type']): void {
 		this.results = this.documents.find({ type });
 	}
 
@@ -291,12 +293,12 @@ export class LocalLegalStore {
 			};
 
 			// Apply updates
-			if ($1?.$2 > 0) {
+			if (documents && documents.length > 0) {
 				this.bulkInsert(documents);
 			}
 
 			// Handle deletions
-			if ($1?.$2 > 0) {
+			if (deletedIds && deletedIds.length > 0) {
 				deletedIds.forEach((id: string) => this.deleteDocument(id));
 			}
 

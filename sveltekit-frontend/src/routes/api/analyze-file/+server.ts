@@ -14,30 +14,35 @@ import { readFile } from 'fs/promises';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
-const OLLAMA_URL = 'http://127.0.0.1:11434';
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 
 export async function POST({ request }: RequestEvent) {
-	const { filePath } = await request.json();
-
 	try {
+		const { filePath } = await request.json();
+		if (!filePath) {
+			return json({ success: false, error: 'filePath is required' }, { status: 400 });
+		}
+
 		// 1. Read file content
 		const content = await readFile(filePath, 'utf-8');
 
 		// 2. ripgrep: Extract comments
 		const comments = await extractComments(filePath);
 
-		// 3. awk-style pattern search
+		// 3. Pattern search
 		const patterns = await searchPatterns(filePath);
 
-		// 4. PostgreSQL: Get errors for this fileSELECT message, code, line_number, timestamp
+		// 4. PostgreSQL: Get errors for this file
+		const errors: any = await db.execute(sql`
+			SELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
-			WHERE source = ${ filePath }
+			WHERE source = ${filePath}
 			ORDER BY timestamp DESC
 			LIMIT 20
 		`);
 
 		// 5. gemma3-legal: Analyze file
-		const analysis = await analyzeFileWithLLM(filePath, content, comments: errors.rows);
+		const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows || []);
 
 		// 6. Generate enhanced Qdrant tag
 		const qdrantTag = await generateEnhancedTag(filePath, analysis);
@@ -54,13 +59,13 @@ export async function POST({ request }: RequestEvent) {
 				metadata,
 				created_at
 			) VALUES (
-				${ filePath },
+				${filePath},
 				${analysis.summary},
 				${JSON.stringify(comments)},
-				${errors.rows.length},
+				${(errors.rows || []).length},
 				${JSON.stringify(analysis.recommendations)},
 				${JSON.stringify(qdrantTag)},
-				${JSON.stringify({ patterns: timestamp: new Date().toISOString() })},
+				${JSON.stringify({ patterns, timestamp: new Date().toISOString() })},
 				NOW()
 			)
 			ON CONFLICT (file_path) DO UPDATE SET
@@ -78,7 +83,7 @@ export async function POST({ request }: RequestEvent) {
 			filePath,
 			summary: analysis.summary,
 			comments,
-			errors: errors.rows,
+			errors: errors.rows || [],
 			recommendations: analysis.recommendations,
 			qdrantTag,
 			patterns
@@ -87,13 +92,13 @@ export async function POST({ request }: RequestEvent) {
 		console.error('File analysis failed:', error);
 		return json({ success: false, error: error.message }, { status: 500 });
 	}
-};
+}
 
 async function extractComments(filePath: string): Promise<string[]> {
 	try {
 		// ripgrep: Find single-line and multi-line comments
 		const { stdout } = await execAsync(
-			`rg "(/\\*[\\s\\S]*? \\*/ : //.*)" "${filePath}" --no-heading --no-line-number`,
+			`rg "(//.*|/\\*[\\s\\S]*?\\*/)" "${filePath}" --no-heading --no-line-number`,
 			{ timeout: 5000 }
 		);
 
@@ -115,37 +120,20 @@ async function searchPatterns(filePath: string): Promise<any> {
 		svelte5Runes: 0
 	};
 
-	try {
-		// TODO/FIXME
-		const { stdout, todos } = await execAsync(
-			`rg -c "TODO|FIXME" "${filePath}"`,
-			{ timeout: 2000 }
-		).catch(() => ({ stdout: '0' }));
-		patterns.todoComments = parseInt(todos.trim().split(':').pop() ?? '0');
+	const runRgCount = async (pattern: string) => {
+		try {
+			const { stdout } = await execAsync(`rg -c "${pattern}" "${filePath}"`, { timeout: 2000 });
+			return parseInt(stdout.trim()) || 0;
+		} catch {
+			return 0;
+		}
+	};
 
-		// any types
-		const { stdout, anys } = await execAsync(
-			`rg -c ": any" "${filePath}"`,
-			{ timeout: 2000 }
-		).catch(() => ({ stdout: '0' }));
-		patterns.anyTypes = parseInt(anys.trim().split(':').pop() ?? '0');
-
-		// try/catch
-		const { stdout, errors } = await execAsync(
-			`rg -c "try|catch" "${filePath}"`,
-			{ timeout: 2000 }
-		).catch(() => ({ stdout: '0' }));
-		patterns.errorHandlers = parseInt(errors.trim().split(':').pop() ?? '0');
-
-		// Svelte 5 runes
-		const { stdout, runes } = await execAsync(
-			`rg -c "\\$state|\\$derived|\\$effect|\\$props" "${filePath}"`,
-			{ timeout: 2000 }
-		).catch(() => ({ stdout: '0' }));
-		patterns.svelte5Runes = parseInt(runes.trim().split(':').pop() ?? '0');
-	} catch (err) {
-		console.warn('Pattern search failed:', err);
-	}
+	patterns.todoComments = await runRgCount('TODO');
+	patterns.fixmeComments = await runRgCount('FIXME');
+	patterns.anyTypes = await runRgCount(': any');
+	patterns.errorHandlers = await runRgCount('try|catch');
+	patterns.svelte5Runes = await runRgCount('\\$state|\\$derived|\\$effect|\\$props');
 
 	return patterns;
 }
@@ -155,7 +143,9 @@ async function analyzeFileWithLLM(
 	content: string,
 	comments: string[],
 	errors: any[]
-) {File: ${filePath}
+) {
+	const prompt = `
+File: ${filePath}
 Lines: ${content.split('\n').length}
 Comments: ${comments.length}
 Errors: ${errors.length}
@@ -173,42 +163,52 @@ Provide:
 
 Be concise and actionable.`;
 
-	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'gemma3-legal:latest',
-			messages: [
-				{
-					role: 'system',
-					content:
-						'You are an expert code reviewer focused on production-quality TypeScript/Svelte code.'
-				},
-				{
-					role: 'user',
-					content: prompt
-				}
-			],
-			stream: false,
-			options: { temperature: 0.4, num_predict: 500 }
-		})
-	});
+	try {
+		const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma3-legal:latest',
+				messages: [
+					{
+						role: 'system',
+						content:
+							'You are an expert code reviewer focused on production-quality TypeScript/Svelte code.'
+					},
+					{
+						role: 'user',
+						content: prompt
+					}
+				],
+				stream: false,
+				options: { temperature: 0.4, num_predict: 500 }
+			})
+		});
 
-	const data = await response.json();
-	const text = data.message.content;
+		if (!response.ok) throw new Error(`Ollama error: ${response.statusText}`);
+		const data = await response.json();
+		const text = data.message.content;
 
-	// Parse recommendations
-	const recommendations: string[] = [];
-	const lines = text.split('\n');
-	for (const line of lines) {
-		if (/^\d+\./.test(line.trim()) || /^-/.test(line.trim())) {
-			recommendations.push(line.trim());
+		// Parse recommendations
+		const recommendations: string[] = [];
+		const lines = text.split('\n');
+		for (const line of lines) {
+			if (/^\d+\./.test(line.trim()) || /^-/.test(line.trim())) {
+				recommendations.push(line.trim());
+			}
 		}
-	}
 
-	return {
-		summary: text.split('\n\n')[0] ?? 'Analysis complete',
-		recommendations: recommendations.slice(0, 5)
-	};
+		return {
+			summary: text.split('\n\n')[0] ?? 'Analysis complete',
+			recommendations: recommendations.slice(0, 5)
+		};
+	} catch (err) {
+		console.warn('Ollama analysis failed:', err);
+		return {
+			summary: 'Analysis unavailable (Ollama offline)',
+			recommendations: ['Check LLM connectivity']
+		};
+	}
 }
 
 async function generateEnhancedTag(filePath: string, analysis: any) {
@@ -224,24 +224,36 @@ async function generateEnhancedTag(filePath: string, analysis: any) {
 	// Generate tag name
 	const tagName = `${category}:${fileName.replace(/\./g, '_')}`;
 
-	// Generate embedding for summary
-	const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'embeddinggemma:latest',
-			prompt: analysis.summary
-		})
-	});
+	try {
+		// Generate embedding for summary
+		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'nomic-embed-text:latest', // Changed to a common embedding model
+				prompt: analysis.summary
+			})
+		});
 
-	const { embedding } = await embedRes.json();
+		if (!embedRes.ok) throw new Error('Embedding failed');
+		const { embedding } = await embedRes.json();
 
-	return {
-		name: tagName,
-		summary: analysis.summary,
-		category,
-		embedding,
-		timestamp: new Date().toISOString()
-	};
+		return {
+			name: tagName,
+			summary: analysis.summary,
+			category,
+			embedding,
+			timestamp: new Date().toISOString()
+		};
+	} catch (err) {
+		return {
+			name: tagName,
+			summary: analysis.summary,
+			category,
+			embedding: [],
+			timestamp: new Date().toISOString()
+		};
+	}
 }
 
 

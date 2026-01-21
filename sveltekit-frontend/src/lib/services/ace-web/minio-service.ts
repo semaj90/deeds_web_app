@@ -5,12 +5,13 @@
  */
 
 import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  HeadObjectCommand,
-  DeleteObjectCommand,
-  ListObjectsV2Command,$1;$2} from '@aws-sdk/client-s3';
+    DeleteObjectCommand,
+    GetObjectCommand,
+    HeadObjectCommand,
+    ListObjectsV2Command,
+    PutObjectCommand,
+    S3Client
+} from '@aws-sdk/client-s3';
 
 export interface MinIOConfig {
   endpoint?: string;
@@ -33,8 +34,9 @@ export class MinIOService {
   };
 
   constructor(config?: MinIOConfig) {
-    const endpoint = config?.endpoint ?? process.env?.MINIO_ENDPOINT?? 'http://localhost:9000';
-    const accessKeyId = config?.accessKeyId ?? process.env?.MINIO_ACCESS_KEY?? 'minioadmin';config?.secretAccessKey ?? process.env?.MINIO_SECRET_KEY?? 'minioadmin';
+    const endpoint = config?.endpoint ?? process.env?.MINIO_ENDPOINT ?? 'http://localhost:9000';
+    const accessKeyId = config?.accessKeyId ?? process.env?.MINIO_ACCESS_KEY ?? 'minioadmin';
+    const secretAccessKey = config?.secretAccessKey ?? process.env?.MINIO_SECRET_KEY ?? 'minioadmin';
     const region = config?.region ?? 'us-east-1';
 
     this.client = new S3Client({
@@ -141,7 +143,7 @@ export class MinIOService {
    */
   async storeChunks(
     docId: string,
-    chunks: Array<{ text: string, metadata, object }>
+    chunks: Array<{ text: string; metadata: object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
     if (!Array.isArray(chunks) || chunks.length === 0) {
@@ -398,7 +400,7 @@ export class MinIOService {
     bucket: string,
     prefix: string,
     maxKeys: number = 1000
-  ): Promise<Array<{ key: string; size: number; lastModified, Date }>> {
+  ): Promise<Array<{ key: string; size: number; lastModified: Date }>> {
     this.validateInput(bucket, 'bucket');
 
     try {
@@ -409,10 +411,10 @@ export class MinIOService {
       });
 
       const response = await this.client.send(command);
-      const objects = (response?.Contents|| []).map((obj: _Object) => ({
-        key: obj?.Key?? '',
-        size: obj?.Size?? 0,
-        lastModified: obj?.LastModified|| new Date()
+      const objects = (response?.Contents || []).map((obj: _Object) => ({
+        key: obj?.Key ?? '',
+        size: obj?.Size ?? 0,
+        lastModified: obj?.LastModified || new Date()
       }));
 
       console.log(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`);

@@ -254,9 +254,10 @@ export class RedisAdapter implements RedisCacheService {
 		return this.client.get(key);
 	}
 
-	async setex(key: string, seconds: number, value: string): Promise<string | null> {
+	async setex(key: string, seconds: number, value: string): Promise<'OK'> {
 		await this.ensureConnected();
-		return this.client.setEx(key, seconds, value);
+		await this.client.setEx(key, seconds, value);
+		return 'OK';
 	}
 
     // Adding missing methods based on standard usage
@@ -265,10 +266,22 @@ export class RedisAdapter implements RedisCacheService {
         await this.client.set(key, value);
     }
 
-    async del(key: string): Promise<void> {
+    async del(...keys: string[]): Promise<number> {
         await this.ensureConnected();
-        await this.client.del(key);
+        return this.client.del(keys);
     }
+
+	async hset(key: string, field: string, value: string): Promise<number> {
+		await this.ensureConnected();
+		return this.client.hSet(key, field, value);
+	}
+
+	async disconnect(): Promise<void> {
+		if (this.client && this.connected) {
+			await this.client.disconnect();
+			this.connected = false;
+		}
+	}
 }
 
 // ===== Qdrant Adapter =====
@@ -293,12 +306,31 @@ export class QdrantAdapter implements QdrantClient {
 		});
 	}
 
+	async indexCollection(name: string): Promise<void> {
+		await this.ensureClient();
+		// Create a payload index for better filtering performance
+		// Common fields we might want to filter on
+		const fields = ['documentId', 'status', 'type'];
+		
+		for (const field of fields) {
+			try {
+				await this.client.createPayloadIndex(name, {
+					field_name: field,
+					field_schema: 'keyword'
+				});
+			} catch (e) {
+				// Ignore if index already exists
+				console.warn(`Failed to create index for field ${field} in collection ${name}`, e);
+			}
+		}
+	}
+
 	async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
 		await this.ensureClient();
 		await this.client.upsert(collection, { points, wait: true });
 	}
 
-	async search(collection: string, vector: number[], limit = 10): Promise<QdrantSearchResult[]> {
+	async search<T = Record<string, unknown>>(collection: string, vector: number[], limit = 10): Promise<QdrantSearchResult<T>[]> {
 		await this.ensureClient();
 		const results = await this.client.search(collection, {
 			vector,
@@ -308,7 +340,7 @@ export class QdrantAdapter implements QdrantClient {
 		return results.map((r: any) => ({
 			id: r.id,
 			score: r.score,
-			payload: r.payload,
+			payload: r.payload as T,
 			vector: r.vector
 		}));
 	}
@@ -349,10 +381,32 @@ export class MinIOAdapter implements MinIOClient {
         await this.client.makeBucket(bucket, this.config.region);
     }
 
-    async putObject(bucket: string, objectName: string, stream: any): Promise<void> {
+    async putObject(bucket: string, objectName: string, stream: any, metadata?: Record<string, string>): Promise<any> {
         await this.ensureClient();
-        await this.client.putObject(bucket, objectName, stream);
+        return this.client.putObject(bucket, objectName, stream, null, metadata);
     }
+
+	async getObject(bucket: string, objectName: string): Promise<any> {
+		await this.ensureClient();
+		return this.client.getObject(bucket, objectName);
+	}
+
+	async removeObject(bucket: string, objectName: string): Promise<void> {
+		await this.ensureClient();
+		await this.client.removeObject(bucket, objectName);
+	}
+
+	async listObjects(bucket: string, prefix?: string, recursive?: boolean): Promise<any[]> {
+		await this.ensureClient();
+		const stream = this.client.listObjects(bucket, prefix, recursive);
+		const objects: any[] = [];
+		
+		return new Promise((resolve, reject) => {
+			stream.on('data', (obj: any) => objects.push(obj));
+			stream.on('end', () => resolve(objects));
+			stream.on('error', (err: any) => reject(err));
+		});
+	}
 }
 
 // ===== Neo4j Adapter =====
@@ -380,6 +434,10 @@ export class Neo4jAdapter implements Neo4jClient {
         } finally {
             await session.close();
         }
+    }
+
+    async run(query: string, params: Record<string, any> = {}): Promise<any> {
+        return this.executeQuery(query, params);
     }
 
     async close(): Promise<void> {

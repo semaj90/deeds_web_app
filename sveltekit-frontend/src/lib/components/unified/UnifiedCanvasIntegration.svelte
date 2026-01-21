@@ -1,29 +1,274 @@
-<!-- @migration-task Error while migrating Svelte code, Attributes need to be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte; code, Attributes need to be, unique --> <!-- Unified Canvas Integration - Bridge Between Enhanced Evidence Canvas and Detective, Board --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import  EvidenceCanvas  from "$lib/ui/enhanced/EvidenceCanvas.svelte"; import  DetectiveBoard  from "$lib/components/detective/DetectiveBoard.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; // Badge replaced with span - not available in enhanced-bits import { Activity, Cpu, Database, Zap, Eye, Grid3X3, Canvas } from 'lucide-svelte'; // Svelte, 5 state management let viewMode = $state<'canvas' | 'board' | 'hybrid'>('hybrid'); let activeAnalysis = $state<any[]>([]); let canvasEvidence = $state<any[]>([]); let processingQueue = $state<any[]>([]); let systemIntegration = $state({ canvasActive: false, detectiveActive: false, aiProcessingActive: false; realTimeSync: false gpuAcceleration false }); let performanceMetrics = $state({ canvasFrameRate: 60, evidenceCount: 0, processingLatency: 0; memoryUsage: 0 }); // Component props let { caseId = 'unified-case-001', evidence = [] as any[] } = $props(); // Initialize unified integration $effect(() => { (async () => { await, initializeUnifiedSystems(); startPerformanceMonitoring()})()}); async function initializeUnifiedSystems(): Promise<void> { console.log('ðŸš€ Initializing Unified Canvas Integration for caseItem:', caseId); // Initialize canvas system systemIntegration.canvasActive = true; // Initialize detective board systemIntegration.detectiveActive = true; // Enable real-time synchronization systemIntegration.realTimeSync = true; // Attempt GPU acceleration try { if ('gpu' in navigator) { systemIntegration.gpuAcceleration = true; console.log('âœ… WebGPU acceleration enabled')}
-  		} catch (error) { console.warn('âš ï¸ WebGPU not available, falling back to CPU processing')}
-  		// Start AI processing integration systemIntegration.aiProcessingActive = true}
-  	function startPerformanceMonitoring() { setInterval(() => { performanceMetrics.evidenceCount = evidence.length; performanceMetrics.processingLatency = Math.round(Math.random() * 100 + 50); performanceMetrics.memoryUsage = Math.round(Math.random() * 30 + 40)}, 2000)}
-  	function switchViewMode(mode: 'canvas' | 'board' | 'hybrid') { viewMode = mod; console.log(`ðŸ“‹ Switched to ${ mode } view mode`)}
-  	async function handleEvidenceAnalysis(evidenceItem: any): Promise<any> { console.log('ðŸ” Starting evidence analysis:', evidenceItem.title); // Add to processing queue processingQueue = [...processingQueue, evidenceItem]; // Simulate AI processing try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId: evidenceItem.id, content: evidenceItem.description || evidenceItem.title, forceReanalyze: false }) }); const analysisResult = await (response as { json?: any }).json(); if (analysisResult.success) { activeAnalysis = [...activeAnalysis, { evidenceId: evidenceItem.id, ...analysisResult.data.analysis; timestamp: new Date().toISOString()}]; console.log('âœ… Evidence analysis completed:', analysisResult.data.analysis.summary)}
-  		} catch (error) { console.error('âŒ Evidence analysis failed:', error)} finally { // Remove from processing queue processingQueue = processingQueue.filter(item => item.id) !== evidenceItem.id)}
-  	} function handleCanvasEvidenceUpdate(evidenceData: any[]) { canvasEvidence = evidenceData; console.log(`ðŸŽ¨ Canvas evidence updated: ${evidenceData.length} items`)}
-  	function handleDetectiveAnalysis(analysisData: any) { console.log('ðŸ•µï¸ Detective analysis received:', analysisData); activeAnalysis = [...activeAnalysis, analysisData]}
-  	// Integration bridge functions async function syncCanvasToBoard(): Promise<any> { console.log('ðŸ”„ Syncing canvas data to detective board...'); // Convert canvas evidence to detective board format }
-  	async function syncBoardToCanvas(): Promise<any> { console.log('ðŸ”„ Syncing detective board data to canvas...'); // Convert detective board evidence to canvas format }
-  	async function processUnifiedAnalysis(): Promise<any> { console.log('ðŸ§  Starting unified AI analysis across all evidence...'); // Combine evidence from both canvas and board const allEvidence = [...canvasEvidence, ...evidence]; for (const item of allEvidence) { if (!activeAnalysis.find.id)) { await handleEvidenceAnalysis(item)}
-  		} }
-</script> <!-- Unified Canvas, Integration, Interface --> <div class="w-full h-full flex flex-col"> <!-- Integration, Header --> <div class="mb-4"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex items-center"> <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center"> <Canvas class="w-5 h-5" /> </div> <div> <h3 class="nes-text is-primary">Unified Evidence Analysis</h3> <p class="text-sm nes-text">Enhanced Canvas + Detective Board Integration</p> </div> </div> <div class="flex items-center"> <!-- View, Mode, Switcher --> <div class="flex gap-1 bg-muted rounded-md"> <Button.Root, class="bits-btn bits-btn"
-							variant={viewMode === 'canvas' ? 'default', 'ghost'} size="sm"
-							onclick={() => switchViewMode('canvas')} class="h-8 px-3"
-						> <Canvas class="w-4 h-4" /> Canvas <Button.Root, class="bits-btn bits-btn"
-							variant={viewMode === 'board' ? 'default', 'ghost'} size="sm"
-							onclick={() => switchViewMode('board')} class="h-8 px-3"
-						> <Grid3X3 class="w-4 h-4" /> Board <Button.Root, class="bits-btn bits-btn"
-							variant={viewMode === 'hybrid' ? 'default', 'ghost'} size="sm"
-							onclick={() => switchViewMode('hybrid')} class="h-8 px-3"
-						> <Eye class="w-4 h-4" /> Hybrid </div> <!-- System Status, Indicators --> <div class="flex"> <Badge variant={systemIntegration.canvasActive ? "default", "secondary"}> <Activity class="w-3 h-3" /> Canvas: {systemIntegration.canvasActive ? 'Active': 'Inactive'} </Badge> <Badge variant={systemIntegration.gpuAcceleration ? "default", "outline"}> <Cpu class="w-3 h-3" /> GPU: {systemIntegration.gpuAcceleration ? 'On': 'Off'} </Badge> </div> </div> </div> </div> </div> <!-- Performance Metrics, Bar --> <div class="mb-4"> <div class="yorha-panel-content"> <div class="flex justify-between"> <div class="flex"> <div class="flex items-center"> <Database class="w-4 h-4" /> <span class="text-sm">Evidence: {performanceMetrics.evidenceCount}</span> </div> <div class="flex items-center"> <Zap class="w-4 h-4" /> <span class="text-sm">Processing: {processingQueue.length}</span> </div> <div class="flex items-center"> <Activity class="w-4 h-4" /> <span class="text-sm">FPS: {performanceMetrics.canvasFrameRate}</span> </div> <div class="flex items-center"> <Cpu class="w-4 h-4" /> <span class="text-sm">Memory: {performanceMetrics.memoryUsage}%</span> </div> </div> <div class="flex"> <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ syncCanvasToBoard }> Sync Canvas â†’ Board <Button.Root, class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ syncBoardToCanvas }> Sync Board â†’ Canvas <Button.Root, class="bits-btn bits-btn" variant="default" size="sm" onclick={ processUnifiedAnalysis }> Analyze All Evidence </div> </div> </div> </div> <!-- Main Integration, View --> <div class="flex-1"> {#if viewMode === 'canvas'} <!-- Pure Canvas, View --> <div class="h-full"> <EvidenceCanvas bind, evidence={ canvasEvidence } { caseId } onEvidenceUpdate={ handleCanvasEvidenceUpdate } /> </div> {:else if viewMode === 'board'} <!-- Pure Detective Board, View --> <div class="h-full"> <DetectiveBoard { caseId } evidence={ evidence } /> </div> {:else} <!-- Hybrid View - Split, Screen --> <div class="h-full grid grid-cols-2"> <!-- Left Panel - Enhanced Evidence, Canvas --> <div class="h-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-lg flex items-center"> <Canvas class="w-5" /> Evidence Canvas </h3> </div> <div class="yorha-panel-content p-2"> <EvidenceCanvas bind, evidence={ canvasEvidence } { caseId } onEvidenceUpdate={ handleCanvasEvidenceUpdate } /> </div> </div> <!-- Right Panel - Detective, Board --> <div class="h-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-lg flex items-center"> <Grid3X3 class="w-5" /> Detective Board </h3> </div> <div class="yorha-panel-content p-2"> <DetectiveBoard { caseId } evidence={ evidence } /> </div> </div> {/if} </div> <!-- Analysis Results, Overlay --> {#if activeAnalysis.length > 0} <div class="absolute bottom-4 right-4"> <div class="bg-background/95 backdrop-blur-sm"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary text-sm flex items-center"> <Activity class="w-4" /> Live Analysis Results </h3> </div> <div class="yorha-panel-content space-y-2 max-h-48"> {#each Array.isArray(activeAnalysis.slice(-3)) ? activeAnalysis.slice(-3): [] as analysis} <div class="p-2 bg-muted rounded"> <div class="font-medium"> Evidence {analysis.evidenceId.slice(-6)} </div> <div class="nes-text"> {analysis.summary?.slice(0, 80)}... </div> <div class="flex gap-1"> {#each Array.isArray((analysis.tags ?? []).slice(0, 3)) ? (analysis.tags ?? []).slice(0, 3): [] as tag} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{ tag }</span> {/each} </div> </div> {/each} </div> </div> {/if} </div> <style> /* Enhanced integration styles */:global(.unified-canvas-integration) { height: 100vh; overflow: hidden}
-	/* Performance indicator animations */ @keyframes pulse-green { 0%; } 100% { background-color: rgb(34, 197, 94); transform: scale(1)}
-		50% { background-color: rgb(22, 163, 74); transform: scale(1.05)}
-	} .status-indicator-active { animation: pulse-green 2s ease-in-out infinite}
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
+  import DetectiveBoard from "$lib/components/detective/DetectiveBoard.svelte";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Badge } from "$lib/components/ui/badge/index.js";
+  import { Activity, Cpu, Database, Zap, Eye, Grid3X3, Scaling as Canvas } from 'lucide-svelte';
+
+  // Svelte 5 state management
+  let viewMode = $state<'canvas' | 'board' | 'hybrid'>('hybrid');
+  let activeAnalysis = $state<any[]>([]);
+  let canvasEvidence = $state<any[]>([]);
+  let processingQueue = $state<any[]>([]>);
+
+  let systemIntegration = $state({
+    canvasActive: false,
+    detectiveActive: false,
+    aiProcessingActive: false,
+    realTimeSync: false,
+    gpuAcceleration: false
+  });
+
+  let performanceMetrics = $state({
+    canvasFrameRate: 60,
+    evidenceCount: 0,
+    processingLatency: 0,
+    memoryUsage: 0
+  });
+
+  // Component props
+  let { caseId = 'unified-case-001', evidence = [] as any[] } = $props();
+
+  let performanceInterval: any;
+
+  // Initialize unified integration
+  $effect(() => {
+    initializeUnifiedSystems();
+    startPerformanceMonitoring();
+  });
+
+  onDestroy(() => {
+    if (performanceInterval) clearInterval(performanceInterval);
+  });
+
+  async function initializeUnifiedSystems(): Promise<void> {
+    console.log('🚀 Initializing Unified Canvas Integration for caseId:', caseId);
+
+    systemIntegration.canvasActive = true;
+    systemIntegration.detectiveActive = true;
+    systemIntegration.realTimeSync = true;
+
+    // Attempt GPU acceleration
+    if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+      systemIntegration.gpuAcceleration = true;
+      console.log('✅ WebGPU acceleration enabled');
+    }
+
+    systemIntegration.aiProcessingActive = true;
+  }
+
+  function startPerformanceMonitoring() {
+    performanceInterval = setInterval(() => {
+      performanceMetrics.evidenceCount = evidence.length;
+      performanceMetrics.processingLatency = Math.round(Math.random() * 100 + 50);
+      performanceMetrics.memoryUsage = Math.round(Math.random() * 30 + 40);
+    }, 2000);
+  }
+
+  function switchViewMode(mode: 'canvas' | 'board' | 'hybrid') {
+    viewMode = mode;
+    console.log(`📋 Switched to ${mode} view mode`);
+  }
+
+  async function handleEvidenceAnalysis(evidenceItem: any): Promise<void> {
+    console.log('🔍 Starting evidence analysis:', evidenceItem.title);
+    processingQueue = [...processingQueue, evidenceItem];
+
+    try {
+      const response = await fetch('/api/ai/analyze-evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          evidenceId: evidenceItem.id,
+          content: evidenceItem.description || evidenceItem.title,
+          forceReanalyze: false
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          activeAnalysis = [...activeAnalysis, {
+            evidenceId: evidenceItem.id,
+            ...result.data.analysis,
+            timestamp: new Date().toISOString()
+          }];
+          console.log('✅ Evidence analysis completed:', result.data.analysis.summary);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Evidence analysis failed:', error);
+    } finally {
+      processingQueue = processingQueue.filter(item => item.id !== evidenceItem.id);
+    }
+  }
+
+  function handleCanvasEvidenceUpdate(evidenceData: any[]) {
+    canvasEvidence = evidenceData;
+    console.log(`🎨 Canvas evidence updated: ${evidenceData.length} items`);
+  }
+
+  function handleDetectiveAnalysis(analysisData: any) {
+    console.log('🕵️‍♂️ Detective analysis received:', analysisData);
+    activeAnalysis = [...activeAnalysis, analysisData];
+  }
+
+  async function processUnifiedAnalysis(): Promise<void> {
+    console.log('🧠 Starting unified AI analysis across all evidence...');
+    const allEvidence = [...canvasEvidence, ...evidence];
+    for (const item of allEvidence) {
+      if (!activeAnalysis.some(a => a.evidenceId === item.id)) {
+        await handleEvidenceAnalysis(item);
+      }
+    }
+  }
+</script>
+
+<div class="w-full h-full flex flex-col p-4 bg-background">
+  <!-- Integration Header -->
+  <div class="mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+        <Canvas class="w-6 h-6 text-primary" />
+      </div>
+      <div>
+        <h3 class="text-xl font-bold">Unified Evidence Analysis</h3>
+        <p class="text-sm text-muted-foreground">Enhanced Canvas + Detective Board Integration</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <!-- View Mode Switcher -->
+      <div class="flex p-1 bg-muted rounded-lg">
+        <Button variant={viewMode === 'canvas' ? 'default' : 'ghost'} size="sm" onclick={() => switchViewMode('canvas')}>
+          <Canvas class="w-4 h-4 mr-2" /> Canvas
+        </Button>
+        <Button variant={viewMode === 'board' ? 'default' : 'ghost'} size="sm" onclick={() => switchViewMode('board')}>
+          <Grid3X3 class="w-4 h-4 mr-2" /> Board
+        </Button>
+        <Button variant={viewMode === 'hybrid' ? 'default' : 'ghost'} size="sm" onclick={() => switchViewMode('hybrid')}>
+          <Eye class="w-4 h-4 mr-2" /> Hybrid
+        </Button>
+      </div>
+
+      <!-- System Status Indicators -->
+      <div class="flex gap-2">
+        <Badge variant={systemIntegration.canvasActive ? "default" : "secondary"}>
+          <Activity class="w-3 h-3 mr-1" /> Canvas: {systemIntegration.canvasActive ? 'Active' : 'Inactive'}
+        </Badge>
+        <Badge variant={systemIntegration.gpuAcceleration ? "default" : "outline"}>
+          <Cpu class="w-3 h-3 mr-1" /> GPU: {systemIntegration.gpuAcceleration ? 'On' : 'Off'}
+        </Badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Metrics Bar -->
+  <Card.Root class="mb-4">
+    <Card.Content class="p-4">
+      <div class="flex justify-between items-center">
+        <div class="flex gap-6">
+          <div class="flex items-center gap-2">
+            <Database class="w-4 h-4 text-muted-foreground" />
+            <span class="text-sm">Evidence: {performanceMetrics.evidenceCount}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Zap class="w-4 h-4 text-muted-foreground" />
+            <span class="text-sm">Processing: {processingQueue.length}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Activity class="w-4 h-4 text-muted-foreground" />
+            <span class="text-sm">FPS: {performanceMetrics.canvasFrameRate}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Cpu class="w-4 h-4 text-muted-foreground" />
+            <span class="text-sm">Memory: {performanceMetrics.memoryUsage}%</span>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <Button variant="outline" size="sm" onclick={() => console.log('Sync to board')}>Sync Canvas → Board</Button>
+          <Button variant="outline" size="sm" onclick={() => console.log('Sync to canvas')}>Sync Board → Canvas</Button>
+          <Button variant="default" size="sm" onclick={processUnifiedAnalysis}>Analyze All</Button>
+        </div>
+      </div>
+    </Card.Content>
+  </Card.Root>
+
+  <!-- Main View -->
+  <div class="flex-1 min-h-0 overflow-hidden">
+    {#if viewMode === 'canvas'}
+      <div class="h-full border rounded-lg overflow-hidden">
+        <EvidenceCanvas bind:evidence={canvasEvidence} {caseId} onEvidenceUpdate={handleCanvasEvidenceUpdate} />
+      </div>
+    {:else if viewMode === 'board'}
+      <div class="h-full border rounded-lg overflow-hidden">
+        <DetectiveBoard {caseId} evidence={evidence} />
+      </div>
+    {:else}
+      <div class="h-full grid grid-cols-2 gap-4">
+        <div class="flex flex-col border rounded-lg overflow-hidden">
+          <div class="p-2 border-b bg-muted/50 font-medium flex items-center gap-2">
+            <Canvas class="w-4 h-4" /> Evidence Canvas
+          </div>
+          <div class="flex-1">
+            <EvidenceCanvas bind:evidence={canvasEvidence} {caseId} onEvidenceUpdate={handleCanvasEvidenceUpdate} />
+          </div>
+        </div>
+        <div class="flex flex-col border rounded-lg overflow-hidden">
+          <div class="p-2 border-b bg-muted/50 font-medium flex items-center gap-2">
+            <Grid3X3 class="w-4 h-4" /> Detective Board
+          </div>
+          <div class="flex-1">
+            <DetectiveBoard {caseId} evidence={evidence} />
+          </div>
+        </div>
+      {/if}
+  </div>
+
+  <!-- Analysis Results Overlay -->
+  {#if activeAnalysis.length > 0}
+    <div class="fixed bottom-4 right-4 w-80 space-y-2 pointer-events-none">
+      <div class="p-2 bg-background border rounded-lg shadow-lg pointer-events-auto">
+        <div class="flex items-center gap-2 mb-2 font-bold text-sm border-b pb-1">
+          <Activity class="w-4 h-4" /> Live Analysis Results
+        </div>
+        <div class="space-y-2 max-h-60 overflow-y-auto">
+          {#each activeAnalysis.slice(-5).reverse() as analysis}
+            <div class="p-2 bg-muted rounded text-xs">
+              <div class="font-bold border-b border-border/50 mb-1">
+                Evidence ID: {analysis.evidenceId.slice(-8)}
+              </div>
+              <p class="mb-1 line-clamp-2">{analysis.summary}</p>
+              <div class="flex flex-wrap gap-1">
+                {#each analysis.tags?.slice(0, 3) ?? [] as tag}
+                  <Badge variant="outline" class="text-[10px] py-0">{tag}</Badge>
+                {/each}
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+  {/if}
+</div>
+
+<style>
+  :global(.unified-canvas-integration) {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  @keyframes pulse-green {
+    0% { background-color: rgb(34, 197, 94, 0.2); transform: scale(1); }
+    50% { background-color: rgb(34, 197, 94, 0.4); transform: scale(1.05); }
+    100% { background-color: rgb(34, 197, 94, 0.2); transform: scale(1); }
+  }
+
+  .status-indicator-active {
+    animation: pulse-green 2s ease-in-out infinite;
+  }
 </style>
 
 

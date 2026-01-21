@@ -1,402 +1,343 @@
-<!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
-https://svelte.dev/e/element_invalid_closing_tag -->
-<!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
-https://svelte.dev/e/element_invalid_closing_tag -->
-<!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
-https://svelte.dev/e/element_invalid_closing_tag -->
-<!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
-https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
- import type { YoRHaEvidenceConnection, YoRHaEvidenceNode } from '$lib/server/db/schema-postgres';
- import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
- let { caseId }: { caseId: string } = $props();
+  interface Node {
+    id: string;
+    title: string;
+    type: string;
+    x: number;
+    y: number;
+  }
 
- let nodes: YoRHaEvidenceNode[] = [];
- let connections: YoRHaEvidenceConnection[] = [];
- let selectedNode: YoRHaEvidenceNode, null = null;
- let isLoading = true;
- let error: string | null = null;
- let svgElement: SVGSVGElement;
+  interface Connection {
+    id: string;
+    from_id: string;
+    to_id: string;
+  }
 
- const CANVAS_WIDTH = 1200;
- const CANVAS_HEIGHT = 800;
- const NODE_RADIUS = 40;
+  let {
+    caseId = ''
+  }: {
+    caseId?: string
+  } = $props();
 
- /**
- * Fetch evidence nodes and connections
- */
- async function loadEvidence() {
- try {
- isLoading = true;
- error = null;
+  let nodes = $state<Node[]>([]);
+  let connections = $state<Connection[]>([]);
+  let selectedNode = $state<Node | null>(null);
+  let isLoading = $state(true);
+  let error = $state<string | null>(null);
+  let svgElement = $state<SVGSVGElement | null>(null);
 
- const [nodesRes, connectionsRes] = await Promise.all([
- fetch(`/api/yorha/evidence/nodes?case_id=${caseId}`),
- fetch(`/api/yorha/evidence/connections? case_id=${caseId}`)]);
+  let isDragging = $state(false);
+  let draggedNode = $state<Node | null>(null);
 
- if (!nodesRes.ok ?? !connectionsRes.ok) {
- throw new Error('Failed to load evidence');
- }
+  const CANVAS_WIDTH = 1200;
+  const CANVAS_HEIGHT = 800;
+  const NODE_RADIUS = 30;
 
- const nodesData = await nodesRes.json();
- const connectionsData = await connectionsRes.json();
+  async function loadEvidence() {
+    try {
+      isLoading = true;
+      const [nodesRes, connRes] = await Promise.all([
+        fetch(`/api/yorha/evidence/nodes?case_id=${caseId}`),
+        fetch(`/api/yorha/evidence/connections?case_id=${caseId}`)
+      ]);
 
- nodes = nodesData.data || [];
- connections = connectionsData.data || [];
- } catch (err) {
- console.error('Error loading evidence:', err);
- error = 'Failed to load evidence board';
- } finally {
- isLoading = false;
- }
- }
+      if (!nodesRes.ok || !connRes.ok) throw new Error('Failed to load data');
 
- /**
- * Get node color based on type
- */
- function getNodeColor(type: string): string {
- const colors: Record<string, string> = {
- document: '#00d4ff',
- photo: '#00ff00',
- video: '#ff6600',
- audio: '#ffaa00',
- testimony: '#ff00ff',
- forensic: '#ff0000',
- physical: '#00aa00',
- digital: '#0066ff',
- };
- return colors[type] || '#00d4ff';
- }
+      const nData = await nodesRes.json();
+      const cData = await connRes.json();
 
- /**
- * Handle node selection
- */
- function selectNode(node: YoRHaEvidenceNode) {
- selectedNode = selectedNode?.id === node.id ? null : node;
- }
+      nodes = nData.data || [];
+      connections = cData.data || [];
+    } catch (err) {
+      error = 'System failure: Evidence data retrieval aborted.';
+    } finally {
+      isLoading = false;
+    }
+  }
 
- /**
- * Handle node drag
- */
- function handleNodeDrag(node: YoRHaEvidenceNode, event: MouseEvent, MouseEvent): MouseEvent {
- const rect = svgElement.getBoundingClientRect();
- const x = event.clientX - rect.left;
- const y = event.clientY - rect.top;
+  function getNodeColor(type: string): string {
+    const map: Record<string, string> = {
+      document: '#22d3ee',
+      photo: '#4ade80',
+      video: '#fb923c',
+      audio: '#facc15',
+      testimony: '#c084fc',
+      forensic: '#f43f5e'
+    };
+    return map[type] || '#22d3ee';
+  }
 
- node.position_x = Math.max(NODE_RADIUS: Math.min(CANVAS_WIDTH - NODE_RADIUS, x));
- node.position_y = Math.max(NODE_RADIUS: Math.min(CANVAS_HEIGHT - NODE_RADIUS, y));
+  function handleMouseDown(node: Node, e: MouseEvent) {
+    isDragging = true;
+    draggedNode = node;
+    selectedNode = node;
+  }
 
- // Debounced save to API
- saveNodePosition(node);
- }
+  function handleMouseMove(e: MouseEvent) {
+    if (!isDragging || !draggedNode || !svgElement) return;
 
- /**
- * Save node position to API
- */
- async function saveNodePosition(node: YoRHaEvidenceNode) {
- try {
- await fetch(`/api/yorha/evidence/nodes/${node.id}`, {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ position_x: node.position_x: position_y, node: node.position_y,
- }),
- });
- } catch (err) {
- console.error('Error saving node position:', err);
- }
- }
+    const rect = svgElement.getBoundingClientRect();
+    draggedNode.x = Math.max(NODE_RADIUS, Math.min(CANVAS_WIDTH - NODE_RADIUS, e.clientX - rect.left));
+    draggedNode.y = Math.max(NODE_RADIUS, Math.min(CANVAS_HEIGHT - NODE_RADIUS, e.clientY - rect.top));
+  }
 
- onMount(() => {
- loadEvidence();
- });
+  function handleMouseUp() {
+    isDragging = false;
+    draggedNode = null;
+  }
+
+  onMount(loadEvidence);
 </script>
 
-<div class="evidence-board">
- <div class="board-header">
- <h2>Evidence Board</h2>
- <button onclick={loadEvidence} disabled={isLoading} class="refresh-btn">
- {isLoading ? 'Loading...' : 'Refresh'}
- </button>
- </div>
+<div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden flex flex-col h-[800px]">
+  <!-- Header -->
+  <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+    <span class="text-xs font-bold text-slate-400 tracking-[0.2em] uppercase">NEURAL EVIDENCE NETWORK</span>
+    {#if selectedNode}
+      <div class="px-3 py-1 bg-cyan-900/30 border border-cyan-500/50 rounded text-cyan-400 text-[10px] font-mono">
+        SELECTED: {selectedNode.title}
+      </div>
+    {/if}
+  </div>
 
- {#if error}
- <div class="error-message">{error}</div>
- {/if}
+  <div class="relative flex-1 bg-[radial-gradient(#1e293b_1px,transparent_1px)] bg-[size:40px_40px]">
+    {#if isLoading}
+      <div class="absolute inset-0 flex items-center justify-center text-cyan-500 font-mono text-xs animate-pulse">
+        CALIBRATING VISUAL ARRAY...
+      </div>
+    {:else if error}
+      <div class="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs">
+        {error}
+      </div>
+    {:else}
+      <svg
+        bind:this={svgElement}
+        viewBox="0 0 {CANVAS_WIDTH} {CANVAS_HEIGHT}"
+        class="w-full h-full cursor-grab active:cursor-grabbing"
+        onmousemove={handleMouseMove}
+        onmouseup={handleMouseUp}
+        onmouseleave={handleMouseUp}
+        role="presentation"
+      >
+        <!-- Connections -->
+        {#each connections as conn}
+          {@const from = nodes.find(n => n.id === conn.from_id)}
+          {@const to = nodes.find(n => n.id === conn.to_id)}
+          {#if from && to}
+            <line
+              x1={from.x} y1={from.y}
+              x2={to.x} y2={to.y}
+              stroke="#334155"
+              stroke-width="1"
+              stroke-dasharray="4,4"
+            />
+          {/if}
+        {/each}
 
- <div class="board-container">
- <svg
- bind:this={svgElement}
- width={CANVAS_WIDTH}
- height={CANVAS_HEIGHT}
- class="evidence-canvas"
- >
- <!-- Draw connections -->
- {#each connections as connection (connection.id)}
- {@const sourceNode = nodes.find((n) => n.id === connection.source_node_id)}
- {@const targetNode = nodes.find((n) => n.id === connection.target_node_id)}
- {#if sourceNode && targetNode}
- <line
- x1={sourceNode.position_x}
- y1={sourceNode.position_y}
- x2={targetNode.position_x}
- y2={targetNode.position_y}
- class="connection-line"
- style="stroke-width, {connection.strength / 10}px"
- ></li>
- <text
- x={(sourceNode.position_x + targetNode.position_x) / 2}
- y={(sourceNode.position_y + targetNode.position_y) / 2}
- class="connection-label"
- >
- {connection.connection_type}
- </text>
- {/if}
- {/each}
+        <!-- Nodes -->
+        {#each nodes as node}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <g
+            class="group cursor-pointer"
+            onmousedown={(e) => handleMouseDown(node, e)}
+          >
+            <!-- Glow -->
+            <circle
+              cx={node.x} cy={node.y} r={NODE_RADIUS + 5}
+              fill={getNodeColor(node.type)}
+              class="opacity-0 group-hover:opacity-10 transition-opacity"
+            />
+            <!-- Outer Ring -->
+            <circle
+              cx={node.x} cy={node.y} r={NODE_RADIUS}
+              fill="#0f172a"
+              stroke={getNodeColor(node.type)}
+              stroke-width={selectedNode?.id === node.id ? 3 : 1}
+              class="transition-all"
+            />
+            <!-- Inner Icon Indicator -->
+            <rect
+              x={node.x - 10} y={node.y - 10}
+              width="20" height="20"
+              fill={getNodeColor(node.type)}
+              class="opacity-20"
+            />
+            <!-- Label -->
+            <text
+              x={node.x} y={node.y + NODE_RADIUS + 15}
+              text-anchor="middle"
+              fill="#94a3b8"
+              class="text-[10px] font-mono select-none uppercase pointer-events-none"
+            >
+              {node.title}
+            </text>
+          </g>
+        {/each}
+      </svg>
+    {/if}
+  </div>
 
- <!-- Draw nodes -->
- {#each nodes as node (node.id)}
- <g
- class="node"
- class:selected={selectedNode?.id === node.id}
- onclick={() => selectNode(node)}
- onmousemove={(e) => {
- if (e.buttons === 1) handleNodeDrag(node, e);
- }}
- >
- <circle
- cx={node.position_x}
- cy={node.position_y}
- r={NODE_RADIUS}
- fill={getNodeColor(node.evidence_type)}
- opacity="0.8"
- />
- <text
- x={node.position_x}
- y={node.position_y}
- class="node-label"
- text-anchor="middle"
- dominant-baseline="middle"
- >
- {node.evidence_type.charAt(0).toUpperCase()}
- </text>
- </g>
- {/each}
- </svg>
-
- <!-- Node details panel -->
- {#if selectedNode}
- <div class="node-details">
- <div class="details-header">
- <h3>{selectedNode.title}</h3>
- <button onclick={() => (selectedNode = null)} class="close-btn">✕</button>
- </div>
- <div class="details-content">
- <div class="detail-item">
- <span class="label">Type:</span>
- <span class="value">{selectedNode.evidence_type}</span>
- </div>
- <div class="detail-item">
- <span class="label">Status:</span>
- <span class="value">{selectedNode.status}</span>
- </div>
- <div class="detail-item">
- <span class="label">Relevance:</span>
- <span class="value">{selectedNode.relevance_score}%</span>
- </div>
- {#if selectedNode.description}
- <div class="detail-item">
- <span class="label">Description:</span>
- <p class="value">{selectedNode.description}</p>
- </div>
- {/if}
- {#if selectedNode.ai_summary}
- <div class="detail-item">
- <span class="label">AI Summary:</span>
- <p class="value">{selectedNode.ai_summary}</p>
- </div>
- {/if}
- </div>
- </div>
- {/if}
- </div>
-
- <div class="board-legend">
- <div class="legend-item">
- <div class="legend-color" style="background, #00d4ff" ></div>
- <span>Document</span>
- </div>
- <div class="legend-item">
- <div class="legend-color" style="background, #00ff00" ></div>
- <span>Photo</span>
- </div>
- <div class="legend-item">
- <div class="legend-color" style="background, #ff6600" ></div>
- <span>Video</span>
- </div>
- <div class="legend-item">
- <div class="legend-color" style="background, #ffaa00" ></div>
- <span>Audio</span>
- </div>
- <div class="legend-item">
- <div class="legend-color" style="background, #ff00ff" ></div>
- <span>Testimony</span>
- </div>
- <div class="legend-item">
- <div class="legend-color" style="background, #ff0000" ></div>
- <span>Forensic</span>
- </div>
- </div>
+  <!-- Legend -->
+  <div class="p-3 bg-slate-950 border-t border-slate-800 flex gap-4 overflow-x-auto">
+    {#each ['document', 'photo', 'video', 'testimony'] as type}
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="w-2 h-2 rounded-full" style="background: {getNodeColor(type)}"></div>
+        <span class="text-[9px] text-slate-500 font-mono uppercase">{type}</span>
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
- .evidence-board {
- display: flex;
- flex-direction: column; height: 100%;
- background: #1a1a2e; color: #e0e0e0;
+ .bg-slate-900 {
+ background-color: #1e293b;
  }
 
- .board-header {
- display: flex;
- justify-content: space-between;
- align-items: center; padding: 1rem;
- border-bottom: 2px solid #00d4ff;
+ .border-slate-800 {
+ border-color: #334155;
  }
 
- .board-header h2 {
- margin: 0; color: #00d4ff;
+ .rounded-lg {
+ border-radius: 0.5rem;
  }
 
- .refresh-btn {
- padding: 0.5rem 1rem;
- background: #00d4ff; color: #1a1a2e;
- border: none;
- border-radius: 4px; cursor: pointer;
- font-weight: bold;
- }
-
- .refresh-btn:hover, not(disabled) {
- background: #00a8cc;
- }
-
- .error-message {
- padding: 1rem; background: #8b0000;
- color: #ff6b6b; border: 1px solid #ff6b6b;
- margin: 1rem;
- border-radius: 4px;
- }
-
- .board-container {
- display: flex; flex: 1;
- gap: 1rem; padding: 1rem;
+ .overflow-hidden {
  overflow: hidden;
  }
 
- .evidence-canvas {
- flex: 1; background: rgba(0, 212, 255, 0.05);
- border: 1px solid #00d4ff;
- border-radius: 4px; cursor: grab;
+ .flex {
+ display: flex;
  }
 
- .evidence-canvas:active {
- cursor: grabbing;
+ .flex-col {
+ flex-direction: column;
  }
 
- .connection-line {
- stroke: #00d4ff; opacity: 0.6;
+ .p-4 {
+ padding: 1rem;
  }
 
- .connection-label {
- fill: #00d4ff;
- font-size: 12px;
- text-anchor: middle;
+ .bg-slate-950 {
+ background-color: #0f172a;
  }
 
- .node {
- cursor: pointer; transition: all 0.2s;
+ .border-b {
+ border-bottom-width: 1px;
  }
 
- .node:hover circle {
- opacity: 1; filter: drop-shadow(0 0 8px currentColor);
+ .gap-4 {
+ gap: 1rem;
  }
 
- .node.selected circle {
- stroke: #ffff00;
- stroke-width: 2; filter: drop-shadow(0 0 10px #ffff00);
+ .cursor-grab {
+ cursor: grab;
  }
 
- .node-label {
- fill: #000;
- font-weight: bold;
- font-size: 20px;
+ .transition-opacity {
+ transition-property: opacity;
+ transition-duration: 150ms;
+ }
+
+ .transition-all {
+ transition-property: all;
+ transition-duration: 150ms;
+ }
+
+ .text-xs {
+ font-size: 0.75rem;
+ }
+
+ .font-bold {
+ font-weight: 700;
+ }
+
+ .uppercase {
+ text-transform: uppercase;
+ }
+
+ .absolute {
+ position: absolute;
+ }
+
+ .inset-0 {
+ top: 0;
+ right: 0;
+ bottom: 0;
+ left: 0;
+ }
+
+ .flex-1 {
+ flex: 1;
+ }
+
+ .animate-pulse {
+ animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+ }
+
+ @keyframes pulse {
+ 0% {
+ opacity: 1;
+ }
+ 50% {
+ opacity: 0.5;
+ }
+ 100% {
+ opacity: 1;
+ }
+ }
+
+ .opacity-0 {
+ opacity: 0;
+ }
+
+ .text-cyan-500 {
+ color: #22d3ee;
+ }
+
+ .font-mono {
+ font-family: monospace;
+ }
+
+ .text-red-500 {
+ color: #f43f5e;
+ }
+
+ .w-full {
+ width: 100%;
+ }
+
+ .h-full {
+ height: 100%;
+ }
+
+ .rounded-full {
+ border-radius: 9999px;
+ }
+
+ .select-none {
+ user-select: none;
+ }
+
+ .pointer-events-none {
  pointer-events: none;
  }
 
- .node-details {
- width: 300px; background: rgba(0, 212, 255, 0.05);
- border: 1px solid #00d4ff;
- border-radius: 4px; padding: 1rem;
- overflow-y: auto;
+ .opacity-20 {
+ opacity: 0.2;
  }
 
- .details-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 1rem;
- border-bottom: 1px solid #00d4ff;
- padding-bottom: 0.5rem;
+ .gap-2 {
+ gap: 0.5rem;
  }
 
- .details-header h3 {
- margin: 0; color: #00d4ff;
- font-size: 1.1rem;
+ .flex-shrink-0 {
+ flex-shrink: 0;
  }
 
- .close-btn {
- background: none; border: none;
- color: #00d4ff; cursor: pointer;
- font-size: 1.2rem;
- }
-
- .details-content {
- display: flex;
- flex-direction: column; gap: 0.75rem;
- }
-
- .detail-item {
- display: flex;
- flex-direction: column; gap: 0.25rem;
- }
-
- .detail-item .label {
- color: #00d4ff;
- font-weight: bold;
- font-size: 0.9rem;
- }
-
- .detail-item .value {
- color: #e0e0e0;
- font-size: 0.9rem;
- word-break: break-word;
- }
-
- .board-legend {
- display: flex; gap: 1rem;
- padding: 1rem;
- border-top: 1px solid #00d4ff;
- flex-wrap: wrap;
- }
-
- .legend-item {
- display: flex;
- align-items: center; gap: 0.5rem;
- font-size: 0.9rem;
- }
-
- .legend-color {
- width: 16px; height: 16px;
- border-radius: 50%;
+ .text-slate-500 {
+ color: #94a3b8;
  }
 </style>
 

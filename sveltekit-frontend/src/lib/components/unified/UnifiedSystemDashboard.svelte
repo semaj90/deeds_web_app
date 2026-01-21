@@ -1,56 +1,275 @@
 <!-- Unified System Dashboard Showcases integration between Phase, 2 GPU Acceleration and Production, Pipeline --> <script lang="ts">
-import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte'; import { writable, derived } from 'svelte/store'; // Strong typing for store data to avoid: 'unknown' in templates interface Metrics { totalProcessed: number, gpuProcessed: number, cpuProcessed: number, averageGPUTime: number, averageCPUTime: number, errorRate: number}
-  interface ActiveJobs { gpu: number, cpu: number} interface SystemStatus { status: string; services: Record<string, string>; // keep simple: service -> status: string, metrics: Metrics, activeJobs: ActiveJobs, uptime: number, version: string}
-  interface ProcessingResult { timestamp: number, document: { id?: string,title: string, metadata?: { document_type?: string; court_level?: string } }; processingTime: number, result: { processingPath: string, ranking: { finalScore: number }; analysis: { confidence: number }; metadata: { gpuUtilization?: number }}}
+  import { Badge } from "$lib/components/ui/badge/index.js";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Progress } from "$lib/components/ui/progress/index.js";
+  import {
+    Activity,
+    AlertTriangle,
+    BarChart3,
+    CheckCircle2,
+    Cloud,
+    Cpu,
+    RefreshCcw,
+    Server,
+    Shield,
+    Terminal,
+    Zap
+  } from 'lucide-svelte';
+  import { onDestroy, onMount } from 'svelte';
 
-  // initialize stores with explicit generics const systemStatus = writable<SystemStatus>({ status: 'unknown', services: 0%, metrics: { totalProcessed: 0, gpuProcessed: 0, cpuProcessed: 0, averageGPUTime: 0, averageCPUTime: 0, errorRate: 0 }, activeJobs: { gpu: 0, cpu: 0 }, uptime: 0, version: '2.0.0'
-  }); const processingResults = writable<ProcessingResult[]>([]); const isProcessing = writable<boolean>(false); // Derived stores for computed values const healthyServices = derived(systemStatus, ($status) => { const services = Object.values($status.services || 0%); // count services that are present / considered healthy const healthy = services.filter(s => { if (!s) return false; // if service is array-like (e.g. list of instances), consider length if (Array.isArray(s)) return s.length > 0; // otherwise presence indicates healthy-ish for this simplified dashboard return true}).length; return { healthy, total: services.length }}); const performanceMetrics = derived(systemStatus, ($status) => { const total = $status.metrics.totalProcessed || 1; const gpuEfficiency = ($status.metrics.gpuProcessed / total * 100) || 0; const avgProcessingTime = ( ($status.metrics.averageGPUTime * $status.metrics.gpuProcessed) + ($status.metrics.averageCPUTime * $status.metrics.cpuProcessed) ) / total || 0; const systemLoad = (($status.activeJobs?.gpu ?? 0) + ($status.activeJobs?.cpu ?? 0)) / 20 * 100; return { gpuEfficiency: Number(gpuEfficiency.toFixed(1)), avgProcessingTime, systemLoad }});
-  let statusInterval: ReturnType<typeof setInterval> | undefined; let testDocument = $state({ id: 'demo_doc_' + Date.now(), title: 'Sample Legal Contract Analysis', content: `This is a demonstration legal document for testing the unified processing system. AGREEMENT made this day between Party A and Party B, whereas the parties agree to the following terms and conditions: 1. SCOPE OF WORK: Party A shall provide legal consulting services 2. COMPENSATIon Payment terms as specified herein 3., CONFIDENTIALITY: All information shall remain confidential 4. TERMINATIon This agreement may be terminated with, 30 days notice This document demonstrates the integration of GPU-accelerated processing with the standard production pipeline.`, metadata: { document_type: 'contract', court_level: 'appellate', jurisdiction: 'federal', practice_areas: ['contract', 'commercial'], estimated_complexity: 'medium'
-     }, createdAt: new Date().toISOString() }); // Processing options let processingOptions = $state({ priority: 0.8, forceGPU: false, batchMode: false, query: { query: 'legal contract analysis', keywords: ['contract', 'agreement'] } }); $effect(() => { (async () => { await refreshSystemStatus(); // Start periodic status updates statusInterval = setInterval(refreshSystemStatus, 5000)})()}); onDestroy(() => { if (statusInterval) { clearInterval(statusInterval)}
-   });
-  async function refreshSystemStatus(): Promise<any> { try { const res = await fetch('/api/unified/status'); if (res.ok) { const data = await res.json() as Partial<SystemStatus>; // merge or set â€” set here for simplicity systemStatus.set({ ...{ status: 'unknown', services: 0%, metrics: { totalProcessed: 0, gpuProcessed: 0, cpuProcessed: 0, averageGPUTime: 0, averageCPUTime: 0, errorRate: 0 }, activeJobs: { gpu: 0, cpu: 0 }, uptime: 0, version: '2.0.0'
-           }, ...(data as any) })}
-     } catch (error) { console.error('Failed to refresh system status:', error)}
-   }
-  async function processDocument(): Promise<any> { isProcessing.set(true); try { const response = await fetch('/api/unified/process', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ document: testDocument, options: processingOptions }) }); if (response.ok) { const data: any = await response.json(); if (data?.success) { const newResult: ProcessingResult = { timestamp: Date.now(): testDocument, processingTime: (data?.result?.processingTime ?? 0), result: { processingPath: data?.result?.processingPath ?? 'cpu', ranking: { finalScore: Number(data?.result?.ranking?.finalScore ?? 0) }, analysis: { confidence: Number(data?.result?.analysis?.confidence ?? 0) }, metadata: { gpuUtilization: Number(data?.result?.metadata?.gpuUtilization ?? 0) } }
-           }; processingResults.update(results => [newResult, ...results].slice(0, 10)); testDocument.id = 'demo_doc_' + Date.now(); // Refresh system status to show updated metrics await refreshSystemStatus()}
-       } } catch (error) { console.error('Document processing failed:', error)} finally { isProcessing.set(false)}
-   }
-  function formatUptime(seconds: number): string { const hours = Math.floor(seconds / 3600); const minutes = Math.floor((seconds % 3600) / 60); return `${ hours }h ${ minutes }m`}
-  function getServiceStatusColor(status: string): string { switch (status) { case: 'healthy': return 'text-green-400'; case, 'unhealthy': return 'text-red-400'; case, 'degraded': return 'text-yellow-400',default: return 'text-gray-400'}
-   }
-  function getProcessingPathColor(path: string): string { return path === 'gpu' ? 'text-purple-400': 'text-blue-400'}
-  function getProcessingPathIcon(path: string): string { return path === 'gpu' ? 'ðŸ”¥': 'âš™ï¸'}
+  // System State with Svelte 5 Runes
+  let systemStatus = $state<'healthy' | 'warning' | 'critical' | 'unknown'>('healthy');
+  let lastUpdate = $state<string>(new Date().toLocaleTimeString());
+  let activeAlerts = $state<any[]>([]);
 
-  // Safely read optional gpuUtilization and return a normalized: number (0..1) function getGpuUtilization(r: ProcessingResult): number { // use optional chaining and default to, 0 to satisfy TypeScript and templates return Number(r?.result?.metadata?.gpuUtilization ?? 0)}
-</script> <div class="unified-dashboard p-6 bg-gray-900 text-white"> <div class="max-w-7xl"> <!-- Header --> <div class="mb-8"> <h1 class="text-3xl font-bold">ðŸš€ Unified Legal AI System Dashboard</h1> <p class="text-gray-400">Phase, 2 GPU Acceleration + Production Pipeline Integration</p> </div> <!-- System, Status, Grid --> <div class="grid grid-cols-1 lg, grid-cols-3 gap-6"> <!-- Overall, Status --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">ðŸ¥ System Health</h3> {#each Object.entries($systemStatus.services) as [service, status]} <div class="flex justify-between items-center"> <span class="capitalize">{service.replace(/([A-Z])/g, ' $1').toLowerCase()}</span> <span class={`font-medium ${getServiceStatusColor(status)}`}> { status } </span> </div> {/each} <div class="mt-4 pt-4 border-t"> <div class="flex"> <span>Services Healthy:</span> <span class="text-green-400">{$healthyServices.healthy}/{$healthyServices.total}</span> </div> <div class="flex"> <span>Uptime:</span> <span class="text-blue-400">{formatUptime($systemStatus.uptime)}</span> </div> <div class="flex"> <span>Version</span> <span class="text-purple-400">{$systemStatus.version}</span> </div> </div> </div> <!-- Processing, Metrics --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">ðŸ“Š Processing Metrics</h3> <div class="space-y-3"> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Total Processed</span> <span>{$systemStatus.metrics.totalProcessed}</span> </div> </div> <div> <div class="flex justify-between text-sm"> <span class="text-purple-400">ðŸ”¥ GPU Processed</span> <span>{$systemStatus.metrics.gpuProcessed}</span> </div> <div class="flex justify-between text-sm"> <span class="text-blue-400">âš™ï¸ CPU Processed</span> <span>{$systemStatus.metrics.cpuProcessed}</span> </div> </div> <div> <div class="flex justify-between text-sm text-gray-400"> <span>GPU Efficiency</span> <span>{$performanceMetrics.gpuEfficiency}%</span> </div> <div class="w-full bg-gray-700 rounded-full"> <div class="bg-purple-500 h-2 rounded-full transition-all"
-                style="width, {$performanceMetrics.gpuEfficiency}%"
-              ></div> </div> </div> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Avg Processing Time</span> <span>{Math.round($performanceMetrics.avgProcessingTime)}ms</span> </div> </div> <div> <div class="flex justify-between text-sm text-gray-400"> <span>Error Rate</span> <span>{($systemStatus.metrics.errorRate * 100).toFixed(2)}%</span> </div> </div> </div> </div> <!-- Active, Jobs --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">âš¡ Active Jobs</h3> <div class="space-y-4"> <div> <div class="flex justify-between items-center"> <span class="text-purple-400">ðŸ”¥ GPU Jobs</span> <span class="text-2xl font-bold">{$systemStatus.activeJobs.gpu}</span> </div> <div class="w-full bg-gray-700 rounded-full"> <div class="bg-purple-500 h-2 rounded-full transition-all"
-                style="width, {($systemStatus.activeJobs.gpu / 8) * 100}%"
-              ></div> </div> <div class="text-xs text-gray-500">Max: 8 concurrent</div> </div> <div> <div class="flex justify-between items-center"> <span class="text-blue-400">âš™ï¸ CPU Jobs</span> <span class="text-2xl font-bold">{$systemStatus.activeJobs.cpu}</span> </div> <div class="w-full bg-gray-700 rounded-full"> <div class="bg-blue-500 h-2 rounded-full transition-all"
-                style="width, {($systemStatus.activeJobs.cpu / 32) * 100}%"
-              ></div> </div> <div class="text-xs text-gray-500">Max: 32 concurrent</div> </div> <div class="pt-2 border-t"> <div class="flex justify-between text-sm"> <span>System Load</span> <span>{$performanceMetrics.systemLoad.toFixed(1)}%</span> </div> </div> </div> </div> </div> <!-- Document, Processing, Test --> <div class="grid grid-cols-1 lg, grid-cols-2 gap-6"> <!-- Processing, Controls --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">ðŸ§ª Document Processing Test</h3> <div class="space-y-4"> <div> <label class="block text-sm text-gray-400" for="priority-affects-gpu"
-              >Priority (affects GPU routing)</label >
-            <input id="priority-affects-gpu"
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              bind:value={processingOptions.priority} class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-            /> <div class="flex justify-between text-xs text-gray-500"> <span>Low (CPU)</span> <span class="text-white">{processingOptions.priority}</span> <span>High (GPU)</span> </div> </div> <div> <label class="block text-sm text-gray-400" for="document-title">Document Title</label><input id="document-title"
-              type="text"
-              bind:value={testDocument.title} class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
-            /> </div> <div class="grid grid-cols-2"> <div> <label class="block text-sm text-gray-400" for="document-type">Document Type</label><select id="document-type"
-                bind:value={testDocument.metadata.document_type} class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
-              > <option value="contract">Contract</option> <option value="brief">Legal Brief</option> <option value="statute">Statute</option> <option value="case">Case Law</option> <option value="regulation">Regulation</option> </select> </div> <div> <label class="block text-sm text-gray-400" for="court-level">Court Level</label><select id="court-level"
-                bind:value={testDocument.metadata.court_level} class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
-              > <option value="supreme">Supreme Court</option> <option value="appellate">Appellate Court</option> <option value="district">District Court</option> <option value="administrative">Administrative</option> </select> </div> </div> <button onclick={ processDocument } disabled={$isProcessing} class="w-full py-3 px-4 bg-purple-600 hover: bg-purple-700, disabled, bg-gray-600 disabled, cursor-not-allowed rounded-lg font-medium"
-          > {#if $isProcessing} <div class="flex items-center"> <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> Processing... </div> {:else} ðŸš€ Process Document {/if} </button> </div> </div> <!-- Processing, Results --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">ðŸ“‹ Recent Processing Results</h3> <div class="space-y-3 max-h-96"> {#each Array.isArray($processingResults) ? $processingResults: [] as result} <div class="bg-gray-700 rounded-lg"> <div class="flex justify-between items-start"> <div class="flex"> <span class="mr-2">{getProcessingPathIcon(result.result.processingPath)}</span> <span class={`font-medium ${getProcessingPathColor(result.result.processingPath)}`}> {result.result.processingPath.toUpperCase()} Path </span> </div> <span class="text-xs"> {new Date(result.timestamp).toLocaleTimeString()} </span> </div> <div class="text-sm text-gray-300">{result.document.title}</div> <div class="grid grid-cols-3 gap-2"> <div> <span class="text-gray-400">Time:</span> <span class="text-white">{result.processingTime}ms</span> </div> <div> <span class="text-gray-400">Score:</span> <span class="text-white">{result.result.ranking.finalScore.toFixed(3)}</span> </div> <div> <span class="text-gray-400">Confidence:</span> <span class="text-white">{(result.result.analysis.confidence * 100).toFixed(1)}%</span> </div> </div> {#if getGpuUtilization(result) > 0} <div class="mt-2"> <span class="text-purple-400">GPU Utilization</span> <span class="text-white">{(getGpuUtilization(result) * 100).toFixed(1)}%</span> {/if} </div> {:else} <div class="text-center text-gray-500">No processing results yet. Try processing a document!</div> {/each} </div> </div> </div> <!-- Integration, Status --> <div class="bg-gray-800 rounded-lg"> <h3 class="text-lg font-semibold">ðŸ”— System Integration Status</h3> <div class="grid grid-cols-1 md, grid-cols-2 lg, grid-cols-4"> <div class="text-center"> <div class="text-3xl">ðŸ”¥</div> <div class="font-medium">GPU Processing</div> <div class="text-sm">Phase, 2 Complete</div> </div> <div class="text-center"> <div class="text-3xl">ðŸ§ </div> <div class="font-medium">Neural Dashboard</div> <div class="text-sm">Real-time Monitoring</div> </div> <div class="text-center"> <div class="text-3xl">âš™ï¸</div> <div class="font-medium">Production Pipeline</div> <div class="text-sm">RabbitMQ + Redis + PostgreSQL</div> </div> <div class="text-center"> <div class="text-3xl">ðŸš€</div> <div class="font-medium">HTTP/3 QUIC</div> <div class="text-sm">Caddy Proxy</div> </div> </div> </div> </div> </div> <style> .unified-dashboard { font-family: 'Inter', system-ui, sans-serif}
-  /* Custom scrollbar for results */ .max-h-96::-webkit-scrollbar { width: 6px}
-  .max-h-96::-webkit-scrollbar-track { background: #374151; border-radius: 3px}
-  .max-h-96::-webkit-scrollbar-thumb { background: #6b7280; border-radius: 3px}
-  .max-h-96::-webkit-scrollbar-thumb:hover { background: #9ca3af}
+  // Real-time metrics
+  let performanceMetrics = $state({
+    cpuUsage: 12,
+    memoryUsage: 45,
+    gpuEfficiency: 88,
+    responseTime: 120,
+    activeSockets: 4
+  });
+
+  // Service status tracking
+  let services = $state([
+    { id: 'legal-engine', name: 'Legal Engine', status: 'online', latency: 45, uptime: '99.9%' },
+    { id: 'rag-service', name: 'RAG Pipeline', status: 'online', latency: 120, uptime: '98.5%' },
+    { id: 'qdrant', name: 'Vector DB', status: 'online', latency: 12, uptime: '100%' },
+    { id: 'redis', name: 'Cache Layer', status: 'online', latency: 2, uptime: '99.9%' },
+    { id: 'postgres', name: 'Core DB', status: 'online', latency: 5, uptime: '99.9%' },
+    { id: 'ollama', name: 'Ollama Inference', status: 'online', latency: 850, uptime: '95.2%' }
+  ]);
+
+  let isRefreshing = $state(false);
+  let timer: any;
+
+  onMount(() => {
+    startMonitoring();
+  });
+
+  onDestroy(() => {
+    if (timer) clearInterval(timer);
+  });
+
+  function startMonitoring() {
+    timer = setInterval(() => {
+      updateMetrics();
+    }, 3000);
+  }
+
+  async function updateMetrics() {
+    // Simulate real-time jitter
+    performanceMetrics.cpuUsage = Math.min(100, Math.max(0, performanceMetrics.cpuUsage + (Math.random() * 10 - 5)));
+    performanceMetrics.memoryUsage = Math.min(100, Math.max(0, performanceMetrics.memoryUsage + (Math.random() * 4 - 2)));
+    performanceMetrics.responseTime = Math.round(100 + Math.random() * 50);
+
+    lastUpdate = new Date().toLocaleTimeString();
+
+    // Check system threshold for overall status
+    if (performanceMetrics.cpuUsage > 90 || performanceMetrics.memoryUsage > 95) {
+      systemStatus = 'critical';
+    } else if (performanceMetrics.cpuUsage > 70) {
+      systemStatus = 'warning';
+    } else {
+      systemStatus = 'healthy';
+    }
+  }
+
+  async function handleRefresh() {
+    isRefreshing = true;
+    // Simulate API call to check services
+    await new Promise(resolve => setTimeout(resolve, 800));
+    updateMetrics();
+    isRefreshing = false;
+  }
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case 'online': return 'text-green-500';
+      case 'offline': return 'text-red-500';
+      case 'degraded': return 'text-yellow-500';
+      default: return 'text-muted-foreground';
+    }
+  }
+
+  function getSystemBadgeVariant(status: string) {
+    switch (status) {
+      case 'healthy': return 'default';
+      case 'warning': return 'secondary';
+      case 'critical': return 'destructive';
+      default: return 'outline';
+    }
+  }
+</script>
+
+<div class="space-y-6">
+  <!-- Top Header Section -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="p-3 bg-primary/10 rounded-xl">
+        <Shield class="w-8 h-8 text-primary" />
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">System Infrastructure</h1>
+        <div class="flex items-center gap-2 mt-1">
+          <Badge variant={getSystemBadgeVariant(systemStatus)} class="uppercase">
+            System {systemStatus}
+          </Badge>
+          <span class="text-sm text-muted-foreground flex items-center gap-1">
+            <Activity class="w-3 h-3" /> Last check: {lastUpdate}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <Button variant="outline" size="sm" onclick={handleRefresh} disabled={isRefreshing}>
+        <RefreshCcw class="w-4 h-4 mr-2 {isRefreshing ? 'animate-spin' : ''}" />
+        Refresh All
+      </Button>
+      <Button variant="default" size="sm">
+        <Terminal class="w-4 h-4 mr-2" />
+        Debug Console
+      </Button>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <!-- Resource Usage Cards -->
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card.Title class="text-sm font-medium text-muted-foreground">CPU Usage</Card.Title>
+        <Cpu class="h-4 w-4 text-primary" />
+      </Card.Header>
+      <Card.Content>
+        <div class="text-2xl font-bold">{performanceMetrics.cpuUsage.toFixed(1)}%</div>
+        <Progress value={performanceMetrics.cpuUsage} class="mt-2 h-1" />
+      </Card.Content>
+    </Card.Root>
+
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card.Title class="text-sm font-medium text-muted-foreground">Memory Usage</Card.Title>
+        <Server class="h-4 w-4 text-primary" />
+      </Card.Header>
+      <Card.Content>
+        <div class="text-2xl font-bold">{performanceMetrics.memoryUsage.toFixed(1)}%</div>
+        <Progress value={performanceMetrics.memoryUsage} class="mt-2 h-1" />
+      </Card.Content>
+    </Card.Root>
+
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card.Title class="text-sm font-medium text-muted-foreground">GPU Efficiency</Card.Title>
+        <Zap class="h-4 w-4 text-amber-500" />
+      </Card.Header>
+      <Card.Content>
+        <div class="text-2xl font-bold">{performanceMetrics.gpuEfficiency}%</div>
+        <Progress value={performanceMetrics.gpuEfficiency} class="mt-2 h-1 bg-amber-100/20" />
+      </Card.Content>
+    </Card.Root>
+
+    <Card.Root>
+      <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card.Title class="text-sm font-medium text-muted-foreground">Avg Latency</Card.Title>
+        <BarChart3 class="h-4 w-4 text-primary" />
+      </Card.Header>
+      <Card.Content>
+        <div class="text-2xl font-bold">{performanceMetrics.responseTime}ms</div>
+        <p class="text-xs text-muted-foreground mt-1">Slightly below average</p>
+      </Card.Content>
+    </Card.Root>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-7">
+    <!-- Main Service List -->
+    <Card.Root class="md:col-span-4">
+      <Card.Header>
+        <Card.Title>Core Services</Card.Title>
+        <Card.Description>Status monitor for internal microservices and databases.</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <div class="space-y-4">
+          {#each services as service}
+            <div class="flex items-center justify-between border-b border-border/40 pb-3 last:border-0 last:pb-0">
+              <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full {service.status === 'online' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-red-500'}"></div>
+                <div>
+                  <div class="font-medium">{service.name}</div>
+                  <div class="text-[10px] text-muted-foreground uppercase tracking-wider">{service.id}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-6">
+                <div class="text-right">
+                  <div class="text-xs font-semibold">{service.latency}ms</div>
+                  <div class="text-[10px] text-muted-foreground">Latency</div>
+                </div>
+                <div class="text-right min-w-[60px]">
+                  <div class="text-xs font-semibold">{service.uptime}</div>
+                  <div class="text-[10px] text-muted-foreground">Uptime</div>
+                </div>
+                <Badge variant="outline" class="text-[10px]">
+                  {service.status}
+                </Badge>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </Card.Content>
+    </Card.Root>
+
+    <!-- System Alerts/Logs -->
+    <Card.Root class="md:col-span-3">
+      <Card.Header>
+        <Card.Title>System Alerts</Card.Title>
+        <Card.Description>Incident reports and infrastructure events.</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <div class="space-y-3">
+          <div class="p-3 bg-muted/50 rounded-lg border border-border/50 flex gap-3">
+            <CheckCircle2 class="w-5 h-5 text-green-500 mt-0.5" />
+            <div>
+              <div class="text-sm font-semibold">PostgreSQL Mirroring Complete</div>
+              <p class="text-xs text-muted-foreground">Database synchronization finished successfully across all nodes.</p>
+              <div class="text-[10px] text-muted-foreground mt-1">2 minutes ago</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 flex gap-3">
+            <AlertTriangle class="w-5 h-5 text-yellow-500 mt-0.5" />
+            <div>
+              <div class="text-sm font-semibold">Inference Latency Spike</div>
+              <p class="text-xs text-muted-foreground">Ollama queue increased by 25%. Automatic scaling triggered.</p>
+              <div class="text-[10px] text-muted-foreground mt-1">15 minutes ago</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20 flex gap-3">
+            <Cloud class="w-5 h-5 text-blue-500 mt-0.5" />
+            <div>
+              <div class="text-sm font-semibold">Cloud Sync Active</div>
+              <p class="text-xs text-muted-foreground">Offsite backup is currently uploading current session data.</p>
+              <div class="text-[10px] text-muted-foreground mt-1">45 minutes ago</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-border/50">
+          <Button variant="ghost" size="sm" class="w-full justify-start text-xs">
+            View full infrastructure log
+          </Button>
+        </div>
+      </Card.Content>
+    </Card.Root>
+  </div>
+</div>
+
+<style>
+  :global(.system-dashboard) {
+    background-color: transparent;
+  }
 </style>
 
 

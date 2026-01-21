@@ -1,15 +1,6 @@
 /**
  * PgVector Indexing Service
  * Advanced vector search and similarity operations using PostgreSQL pgvector extension
- * Optimized for legal document retrieval with hierarchical indexing
- *
- * Features:
- * - High-performance similarity search with cosine, L2, inner product
- * - Hierarchical document indexing with metadata
- * - Batch upsert operations for efficiency
- * - HNSW index support for fast approximate search
- * - Query optimization and execution plans
- * - Audit trail and versioning support
  */
 
 import { sql } from 'drizzle-orm';
@@ -30,9 +21,12 @@ export interface VectorIndexConfig {
  * Vector Document for Indexing
  */
 export interface VectorDocument {
-	id: string; content: string;
-	embedding: number[]; documentId: string;
-	chunkId?: string; embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
+	id: string;
+	content: string;
+	embedding: number[];
+	documentId: string;
+	chunkId?: string;
+	embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
 	metadata?: {
 		caseId?: string;
 		documentType?: string;
@@ -51,10 +45,13 @@ export interface VectorDocument {
  * Vector Search Result
  */
 export interface VectorSearchResult {
-	id: string; content: string;
+	id: string;
+	content: string;
 	documentId: string;
-	chunkId?: string; similarity: number;
-	distance: number; rank: number;
+	chunkId?: string;
+	similarity: number;
+	distance: number;
+	rank: number;
 	metadata?: Record<string, unknown>;
 	embeddingType?: string;
 }
@@ -63,8 +60,10 @@ export interface VectorSearchResult {
  * Batch Upsert Result
  */
 export interface BatchUpsertResult {
-	inserted: number; updated: number;
-	deleted: number; totalProcessingTime: number;
+	inserted: number;
+	updated: number;
+	deleted: number;
+	totalProcessingTime: number;
 }
 
 /**
@@ -80,9 +79,9 @@ export class PgVectorIndexingService {
 	constructor(config: VectorIndexConfig) {
 		this.db = config.database;
 		this.dimensions = config.embeddingDimensions;
-		this.indexType = config?.indexType?? 'hnsw';
-		this.distanceMetric = config?.distanceMetric?? 'cosine';
-		this.maxResults = config?.maxResults?? 10;
+		this.indexType = config.indexType ?? 'hnsw';
+		this.distanceMetric = config.distanceMetric ?? 'cosine';
+		this.maxResults = config.maxResults ?? 10;
 	}
 
 	/**
@@ -90,14 +89,13 @@ export class PgVectorIndexingService {
 	 */
 	async indexDocument(doc: VectorDocument): Promise<string> {
 		try {
-			// Validate embedding dimensions
 			if (doc.embedding.length !== this.dimensions) {
 				throw new Error(
-					`Embedding dimension mismatch, expected ${this.dimensions}, got ${doc.embedding.length}`
+					`Embedding dimension mismatch: expected ${this.dimensions}, got ${doc.embedding.length}`
 				);
 			}
 
-			// Upsert using raw SQL for pgvector support
+			// Upsert document chunk
 			await this.db.execute(sql`
 				INSERT INTO document_chunks (
 					id, content, metadata, document_id, title, confidentiality_level,
@@ -105,21 +103,21 @@ export class PgVectorIndexingService {
 				) VALUES (
 					${doc.id},
 					${doc.content},
-					${JSON.stringify(doc?.metadata|| {})}::jsonb,
+					${JSON.stringify(doc.metadata || {})}::jsonb,
 					${doc.documentId},
 					${doc.metadata?.documentType ?? null},
 					${doc.metadata?.confidentialityLevel ?? 'public'},
-					${doc?.modelUsed?? 'embeddinggemma:latest'},
+					${doc.modelUsed ?? 'embeddinggemma:latest'},
 					${this.dimensions},
 					NOW(),
 					NOW()
 				) ON CONFLICT (id) DO UPDATE SET
 					content = ${doc.content},
-					metadata = ${JSON.stringify(doc?.metadata|| {})}::jsonb,
+					metadata = ${JSON.stringify(doc.metadata || {})}::jsonb,
 					updated_at = NOW()
 			`);
 
-			// Store embedding in vector table
+			// Store embedding
 			await this.db.execute(sql`
 				INSERT INTO embeddings (
 					id, content, vector, document_id, chunk_id, embedding_type,
@@ -129,10 +127,10 @@ export class PgVectorIndexingService {
 					${doc.content},
 					${this.vectorToString(doc.embedding)}::vector,
 					${doc.documentId},
-					${doc?.chunkId|| doc.id},
+					${doc.chunkId || doc.id},
 					${doc.embeddingType},
-					${doc?.modelUsed?? 'embeddinggemma:latest'},
-					${JSON.stringify(doc?.metadata|| {})}::jsonb,
+					${doc.modelUsed ?? 'embeddinggemma:latest'},
+					${JSON.stringify(doc.metadata || {})}::jsonb,
 					NOW()
 				) ON CONFLICT DO NOTHING
 			`);
@@ -151,7 +149,6 @@ export class PgVectorIndexingService {
 		const startTime = Date.now();
 
 		try {
-			// Validate all embeddings first
 			for (const doc of docs) {
 				if (doc.embedding.length !== this.dimensions) {
 					throw new Error(
@@ -160,7 +157,6 @@ export class PgVectorIndexingService {
 				}
 			}
 
-			// Index each document
 			for (const doc of docs) {
 				await this.indexDocument(doc);
 			}
@@ -183,8 +179,8 @@ export class PgVectorIndexingService {
 	async similaritySearch(
 		embedding: number[],
 		options: {
-			limit?: number,
-			threshold?: number,
+			limit?: number;
+			threshold?: number;
 			documentType?: string;
 			caseId?: string;
 			confidentialityLevel?: string;
@@ -193,26 +189,29 @@ export class PgVectorIndexingService {
 		try {
 			if (embedding.length !== this.dimensions) {
 				throw new Error(
-					`Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
+					`Embedding dimension mismatch: expected ${this.dimensions}, got ${embedding.length}`
 				);
 			}
 
-			const limit = options?.limit|| this.maxResults;
-			const threshold = options?.threshold?? 0.5;
-			const vectorStr = this.vectorToString(embedding);SELECT
-					e.id:
-					e.content:
+			const limit = options.limit || this.maxResults;
+			const threshold = options.threshold ?? 0.5;
+			const vectorStr = this.vectorToString(embedding);
+
+			let query = `
+				SELECT
+					e.id,
+					e.content,
 					e.document_id as "documentId",
 					e.chunk_id as "chunkId",
 					(1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
 					(e.vector <-> '${vectorStr}'::vector) as distance,
-					ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank | e.metadata:
+					ROW_NUMBER() OVER (ORDER BY e.vector <-> '${vectorStr}'::vector) as rank,
+					e.metadata,
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
 			`;
 
-			// Add optional filters
 			if (options.documentType) {
 				query += ` AND e.embedding_type = '${this.escape(options.documentType)}'`;
 			}
@@ -239,30 +238,34 @@ export class PgVectorIndexingService {
 	async hybridSearch(
 		embedding: number[],
 		keyword?: string,
-		options: { limit?: number, vectorWeight?: number, keywordWeight?: number } = {}
+		options: { limit?: number; vectorWeight?: number; keywordWeight?: number } = {}
 	): Promise<VectorSearchResult[]> {
 		try {
-			const limit = options?.limit|| this.maxResults;
-			const vectorWeight = options?.vectorWeight?? 0.7;
-			const keywordWeight = options?.keywordWeight?? 0.3;
+			const limit = options.limit || this.maxResults;
+			const vectorWeight = options.vectorWeight ?? 0.7;
+			const keywordWeight = options.keywordWeight ?? 0.3;
 
 			if (embedding.length !== this.dimensions) {
 				throw new Error(
-					`Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
+					`Embedding dimension mismatch: expected ${this.dimensions}, got ${embedding.length}`
 				);
 			}
 
 			const vectorStr = this.vectorToString(embedding);
-			const keywordEscaped = keyword ? this.escape(keyword) : '';SELECT
-					e.id:
-					e.content:
+			const keywordEscaped = keyword ? this.escape(keyword) : '';
+
+			let query = `
+				SELECT
+					e.id,
+					e.content,
 					e.document_id as "documentId",
 					e.chunk_id as "chunkId",
 					(
 						${vectorWeight} * (1 - (e.vector <-> '${vectorStr}'::vector)) +
 						${keywordWeight} * (CASE WHEN e.content ILIKE '%${keywordEscaped}%' THEN 1.0 ELSE 0.0 END)
 					) as similarity,
-					(e.vector <-> '${vectorStr}'::vector) as distance | e.metadata:
+					(e.vector <-> '${vectorStr}'::vector) as distance,
+					e.metadata,
 					e.embedding_type as "embeddingType"
 				FROM embeddings e
 				WHERE 1=1
@@ -287,10 +290,10 @@ export class PgVectorIndexingService {
 	 */
 	async deleteDocument(documentId: string): Promise<number> {
 		try {
-			// Delete from embeddings tablesql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+			const embedResult = await this.db.execute(
+				sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
 			);
 
-			// Delete from document_chunks table
 			await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
 
 			return Array.isArray(embedResult) ? embedResult.length : 0;
@@ -303,12 +306,16 @@ export class PgVectorIndexingService {
 	/**
 	 * Get document statistics
 	 */
-	async getStats(): Promise<{ totalDocuments: number;
-		totalChunks: number; totalEmbeddings: number;
+	async getStats(): Promise<{
+		totalDocuments: number;
+		totalChunks: number;
+		totalEmbeddings: number;
 		averageEmbeddingDimension: number;
 		indexSize?: string;
 	}> {
-		try {sql.raw(`
+		try {
+			const stats = await this.db.execute(
+				sql.raw(`
 					SELECT
 						(SELECT COUNT(DISTINCT document_id) FROM document_chunks) as total_documents,
 						(SELECT COUNT(*) FROM document_chunks) as total_chunks,
@@ -318,8 +325,10 @@ export class PgVectorIndexingService {
 			);
 
 			const row = (stats as unknown[])[0] as {
-				total_documents: number; total_chunks: number;
-				total_embeddings: number; avg_dimension: number;
+				total_documents: number;
+				total_chunks: number;
+				total_embeddings: number;
+				avg_dimension: number;
 			};
 
 			return {
@@ -379,7 +388,6 @@ export async function createPgVectorIndexingService(
 ): Promise<PgVectorIndexingService> {
 	const service = new PgVectorIndexingService(config);
 
-	// Attempt to create HNSW index on initialization
 	try {
 		await service.createHNSWIndex();
 	} catch (error) {
@@ -398,7 +406,3 @@ export const DEFAULT_PGVECTOR_CONFIG: Partial<VectorIndexConfig> = {
 	distanceMetric: 'cosine',
 	maxResults: 10
 };
-
-
-
-

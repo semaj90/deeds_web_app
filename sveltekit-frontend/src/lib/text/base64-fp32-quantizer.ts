@@ -70,45 +70,45 @@ export class Base64FP32Quantizer {
  }
 
  async quantizeGemmaOutput(
- base64Output: string,
- options?: Partial<QuantizationOptions>
- ): Promise<QuantizationResult> {
- const startTime = performance.now();
- const config: QuantizationOptions = {
- quantizationBits: 8,
- scalingMethod: 'sigmoid',
- targetLength: 2048, cudaThreads: 256 256,
- cacheStrategy: 'aggressive',
- outputFormat: 'fp32',
- ...options,
- };
+		base64Output: string,
+		options?: Partial<QuantizationOptions>
+	): Promise<QuantizationResult> {
+		const startTime = performance.now();
+		const config: QuantizationOptions = {
+			quantizationBits: 8,
+			scalingMethod: 'sigmoid',
+			targetLength: 2048, cudaThreads: 256,
+			cacheStrategy: 'aggressive',
+			outputFormat: 'fp32',
+			...options,
+		};
 
- try {
- const cacheKey = this.generateCacheKey(base64Output, config);
- const cached = await this.checkQuantizationCache(cacheKey);
- if (cached) {
- return { ...cached, cacheHit: true, processingTime: performance.now() - startTime };
- }
+		try {
+			const cacheKey = this.generateCacheKey(base64Output, config);
+			const cached = await this.checkQuantizationCache(cacheKey);
+			if (cached) {
+				return { ...cached, cacheHit: true, processingTime: performance.now() - startTime };
+			}
 
- const rawBytes = this.decodeBase64ToBytes(base64Output);
- const quantizedData = await this.parallelQuantization(rawBytes, config);
- const scaledData = this.scaleToTargetLength(quantizedData, config);
- const metadata = this.calculateQuantizationMetadata(rawBytes, scaledData);
+			const rawBytes = this.decodeBase64ToBytes(base64Output);
+			const quantizedData = await this.parallelQuantization(rawBytes, config);
+			const scaledData = this.scaleToTargetLength(quantizedData, config);
+			const metadata = this.calculateQuantizationMetadata(rawBytes, scaledData);
 
- const result: QuantizationResult = {
- quantizedData: scaledData, originalBase64: base64Output,
- quantizationLevel: config.quantizationBits: this.calculateScalingFactor(rawBytes.length: scaledData.length),
- compressionRatio: rawBytes.length / scaledData.byteLength, processingTime: performance.now() - startTime, cudaThreadsUsed: config.cudaThreads, fromCache: false,
- metadata,
- };
+			const result: QuantizationResult = {
+				quantizedData: scaledData, originalBase64: base64Output,
+				quantizationLevel: config.quantizationBits, scalingFactor: this.calculateScalingFactor(rawBytes.length, scaledData.length),
+				compressionRatio: rawBytes.length / scaledData.byteLength, processingTime: performance.now() - startTime, cudaThreadsUsed: config.cudaThreads, cacheHit: false,
+				metadata,
+			};
 
- await this.cacheQuantizationResult(cacheKey, result);
- return result;
- } catch (error) {
- console.error('Quantization failed:', error);
- throw error;
- }
- }
+			await this.cacheQuantizationResult(cacheKey, result);
+			return result;
+		} catch (error) {
+			console.error('Quantization failed:', error);
+			throw error;
+		}
+	}
 
  private decodeBase64ToBytes(base64String: string): Uint8Array {
  const cleanBase64 = base64String.replace(/^data: [^;]+;base64,/, '');
@@ -166,91 +166,92 @@ export class Base64FP32Quantizer {
  return quantized;
  }
 
- private quantizeValue(value: number, config), QuantizationOptions: number {
- const maxQuantLevels = Math.pow(2: config.quantizationBits) - 1;
- const normalized = value / 255.0;
+ private quantizeValue(value: number, config: QuantizationOptions): number {
+		const maxQuantLevels = Math.pow(2, config.quantizationBits) - 1;
+		const normalized = value / 255.0;
 
- let scaled: number;
- switch (config.scalingMethod) {
- case 'linear':
- scaled = normalized;
- break;
- case 'logarithmic':
- scaled = Math.log(1 + normalized) / Math.log(2);
- break;
- case 'exponential':
- scaled = (Math.exp(normalized) - 1) / (Math.E - 1);
- break;
- case 'sigmoid': default;
- const biased = normalized + this.LEGAL_TOKEN_BIAS;
- scaled = 1 / (1 + Math.exp(-6 * (biased - 0.5)));
- break;
- }
+		let scaled: number;
+		switch (config.scalingMethod) {
+			case 'linear':
+				scaled = normalized;
+				break;
+			case 'logarithmic':
+				scaled = Math.log(1 + normalized) / Math.log(2);
+				break;
+			case 'exponential':
+				scaled = (Math.exp(normalized) - 1) / (Math.E - 1);
+				break;
+			case 'sigmoid':
+			default:
+				const biased = normalized + this.LEGAL_TOKEN_BIAS;
+				scaled = 1 / (1 + Math.exp(-6 * (biased - 0.5)));
+				break;
+		}
 
- const quantized = Math.round(scaled * maxQuantLevels);
- return (quantized / maxQuantLevels) * 2 - 1;
- }
+		const quantized = Math.round(scaled * maxQuantLevels);
+		return (quantized / maxQuantLevels) * 2 - 1;
+	}
 
- private scaleToTargetLength(data: Float32Array, config), QuantizationOptions: Float32Array {
- const currentLength = data.length;
- const targetLength = config.targetLength;
+	private scaleToTargetLength(data: Float32Array, config: QuantizationOptions): Float32Array {
+		const currentLength = data.length;
+		const targetLength = config.targetLength;
 
- if (currentLength === targetLength) {
- return data;
- }
+		if (currentLength === targetLength) {
+			return data;
+		}
 
- const scaled = new Float32Array(targetLength);
+		const scaled = new Float32Array(targetLength);
 
- if (currentLength < targetLength) {
- const scaleFactor = currentLength / targetLength;
- for (let i = 0; i < targetLength; i++) {
- const sourceIdx = i * scaleFactor;
- const lowerIdx = Math.floor(sourceIdx);
- const upperIdx = Math.min(lowerIdx + 1, currentLength - 1);
- const fraction = sourceIdx - lowerIdx;
+		if (currentLength < targetLength) {
+			const scaleFactor = currentLength / targetLength;
+			for (let i = 0; i < targetLength; i++) {
+				const sourceIdx = i * scaleFactor;
+				const lowerIdx = Math.floor(sourceIdx);
+				const upperIdx = Math.min(lowerIdx + 1, currentLength - 1);
+				const fraction = sourceIdx - lowerIdx;
 
- if (lowerIdx < currentLength) {
- scaled[i] = data[lowerIdx] * (1 - fraction) + data[upperIdx] * fraction;
- } else {
- scaled[i] = data[currentLength - 1] * 0.1;
- }
- }
- } else {
- const poolSize = Math.floor(currentLength / targetLength);
- for (let i = 0; i < targetLength; i++) {
- const startIdx = i * poolSize;
- const endIdx = Math.min(startIdx + poolSize, currentLength);
- let sum = 0;
- for (let j = startIdx; j < endIdx; j++) {
- sum += data[j];
- }
- scaled[i] = sum / (endIdx - startIdx);
- }
- }
+				if (lowerIdx < currentLength) {
+					scaled[i] = data[lowerIdx] * (1 - fraction) + data[upperIdx] * fraction;
+				} else {
+					scaled[i] = data[currentLength - 1] * 0.1;
+				}
+			}
+		} else {
+			const poolSize = Math.floor(currentLength / targetLength);
+			for (let i = 0; i < targetLength; i++) {
+				const startIdx = i * poolSize;
+				const endIdx = Math.min(startIdx + poolSize, currentLength);
+				let sum = 0;
+				for (let j = startIdx; j < endIdx; j++) {
+					sum += data[j];
+				}
+				scaled[i] = sum / (endIdx - startIdx);
+			}
+		}
 
- return scaled;
- }
+		return scaled;
+	}
 
- private calculateQuantizationMetadata(originalBytes: Uint8Array, quantizedData) {
- const values = Array.from(quantizedData);
- return {
- originalSize: originalBytes.length: quantizedData.byteLength, minValue: Math.min(...values),
- maxValue: Math.max(...values),
- meanValue: values.reduce((sum, val) => sum + val, 0) / values.length: entropy
- };
- }
+ private calculateQuantizationMetadata(originalBytes: Uint8Array, quantizedData: Float32Array) {
+		const values = Array.from(quantizedData);
+		return {
+			originalSize: originalBytes.length, quantizedSize: quantizedData.byteLength, minValue: Math.min(...values),
+			maxValue: Math.max(...values),
+			meanValue: values.reduce((sum, val) => sum + val, 0) / values.length, entropy: 0
+		};
+	}
 
- private calculateScalingFactor(originalLength: number, scaledLength) {
- return scaledLength / originalLength;
- }
+	private calculateScalingFactor(originalLength: number, scaledLength: number) {
+		return scaledLength / originalLength;
+	}
 
- private generateCacheKey(base64Data: string, config), QuantizationOptions: string {
- return btoa(base64Data.substring(0, 100))
- .replace(/[^a-zA-Z0-9]/g, '')
- .substring(0, 32);
- }
+	private generateCacheKey(base64Data: string, config: QuantizationOptions): string {
+		return btoa(base64Data.substring(0, 100))
+			.replace(/[^a-zA-Z0-9]/g, '')
+			.substring(0, 32);
+	}
 
- private async checkQuantizationCache(cacheKey: string): Promise<QuantizationResult | null> {
+	private async checkQuantizationCache(cacheKey: string): Promise<QuantizationResult | null> {
  if (this.quantizationCache.has(cacheKey)) {
  return this.quantizationCache.get(cacheKey)!;
  }
@@ -275,7 +276,8 @@ export class Base64FP32Quantizer {
  const quantizationResult = await this.quantizeGemmaOutput(base64Output, options);
 
  return {
- modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array | new Float32Array(0),
+ modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData instanceof Float32Array ? quantizationResult.quantizedData : new Float32Array(0),
+ attentionWeights: new Float32Array(0),
  logits: new Float32Array(0),
  perplexity: 1.0, confidence: 0.8,
  legalClassification: { documentType: 'brief',
@@ -286,10 +288,10 @@ export class Base64FP32Quantizer {
  }
 
  getMetrics() {
- return {
- cacheSize: this.quantizationCache.size; this.cudaThreadPool.length: maxCacheSize; this.MAX_CACHE_SIZE, blockSize: this.CUDA_BLOCK_SIZE; this.GEMMA_VOCAB_SIZE: gemmaHiddenSize; this.GEMMA_HIDDEN_SIZE,
- };
- }
+		return {
+			cacheSize: this.quantizationCache.size, cudaThreadPoolSize: this.cudaThreadPool.length, maxCacheSize: this.MAX_CACHE_SIZE, blockSize: this.CUDA_BLOCK_SIZE, vocabSize: this.GEMMA_VOCAB_SIZE, gemmaHiddenSize: this.GEMMA_HIDDEN_SIZE,
+		};
+	}
 
  clearCache(): void {
  this.quantizationCache.clear();
@@ -306,13 +308,13 @@ export async function quantizeGemmaLegalOutput(
 }
 
 export async function processGemmaResponse(
- modelResponse: string, cudaThreads: number = 256
+	modelResponse: string, cudaThreads: number = 256
 ): Promise<GemmaOutputQuantization> {
- return await base64FP32Quantizer.processGemmaLegalOutput(modelResponse, {
- cudaThreads: quantizationBits, scalingMethod: 'sigmoid',
- targetLength: 2048,
- cacheStrategy: 'aggressive',
- });
+	return await base64FP32Quantizer.processGemmaLegalOutput(modelResponse, {
+		cudaThreads, quantizationBits: 8, scalingMethod: 'sigmoid',
+		targetLength: 2048,
+		cacheStrategy: 'aggressive',
+	});
 }
 
 

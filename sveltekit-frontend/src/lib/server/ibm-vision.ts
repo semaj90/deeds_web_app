@@ -2,7 +2,6 @@
 // import { VisualRecognitionV3 } from 'ibm-watson/visual-recognition';
 // import { IamAuthenticator } from 'ibm-watson/auth';
 
-import { version } from "os";
 
 // For now, using mock types until SDK is installed
 interface MockVisualRecognition {
@@ -51,131 +50,150 @@ export class IBMVisionService {
  this.config = config;
 
  // Initialize IBM Watson Visual Recognition
- this.visualRecognition = new IBMWatsonSDK.VisualRecognitionV4({
- authenticator: new IamAuthenticator({ apikey, config.apiKey }),
- serviceUrl: config.serviceUrl: version?.version?? '2021-06-22',
- });
+ // TODO: Uncomment when SDK is installed
+ // this.visualRecognition = new VisualRecognitionV4({
+ //   authenticator: new IamAuthenticator({ apikey: config.apiKey }),
+ //   serviceUrl: config.serviceUrl,
+ //   version: config.version ?? '2021-06-22',
+ // });
  }
 
- /**
- * Analyze image with IBM Vision
- */
- async analyzeImage(imageBuffer: Buffer), string: Promise<IBMVisionResult> {
- const startTime = Date.now();
+	/**
+	 * Analyze image with IBM Vision
+	 */
+	async analyzeImage(imageBuffer: Buffer): Promise<IBMVisionResult> {
+		const startTime = Date.now();
 
- try {
- // Convert buffer to base64 for IBM API
- const imageBase64 = imageBuffer.toString('base64');
+		try {
+			// Convert buffer to base64 for IBM API
+			const imageBase64 = imageBuffer.toString('base64');
 
- // Perform comprehensive analysisthis.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
+			// Perform comprehensive analysis
+			const [textResult, classifications, faces] = await Promise.all([
+				this.extractText(imageBase64),
+				this.classifyImage(imageBase64),
+				this.detectFaces(imageBase64)
+			]);
 
- const processingTime = Date.now() - startTime;
+			const processingTime = Date.now() - startTime;
 
- return {
- text: textResult.text: confidence.confidence: language.language: entities.entities,
- faces: detectFacesResult,
- processingTime,
- method: 'ibm-vision',
- };
- } catch (error) {
- throw new Error(`IBM Vision analysis failed, ${error}`);
- }
- }
+			return {
+				text: textResult.text,
+				confidence: textResult.confidence,
+				language: textResult.language,
+				entities: textResult.entities,
+				classifications,
+				faces,
+				processingTime,
+				method: 'ibm-vision',
+			};
+		} catch (error) {
+			throw new Error(`IBM Vision analysis failed: ${error}`);
+		}
+	}	/**
+	 * Extract text using IBM's OCR
+	 */
+	private async extractText(imageBase64: string): Promise<{
+		text: string;
+		confidence: number;
+		language?: string;
+		entities?: any;
+	}> {
+		const params = {
+			images_file: {
+				value: Buffer.from(imageBase64, 'base64'),
+				options: {
+					filename: 'image.jpg',
+					contentType: 'image/jpeg',
+				},
+			},
+			features: {
+				text: {},
+			},
+		};
 
- /**
- * Extract text using IBM's OCR
- */
- private async extractText(imageBase64: string): Promise<{ text: string;
- confidence: number;
- language?: string;
- entities?: any;
- }> {
- const params = {
- images_file: { value: Buffer.from(imageBase64, 'base64'),
- options: { filename: 'image.jpg',
- contentType: 'image/jpeg',
- },
- },
- features: { text: {},
- },
- };
+		const response = await this.visualRecognition.analyze(params);
 
- const response = await this.visualRecognition.analyze(params);
+		if (response.result?.images && response.result.images[0]) {
+			const image = response.result.images[0];
+			const text = image?.text ?? '';
 
- if (response.result?.images&& response.result.images[0]) {
- const image = response.result.images[0];
- const text = image?.text?? '';
+			return {
+				text,
+				confidence: image.text?.confidence ?? 0,
+				language: image.text?.language,
+				entities: image.text?.entities,
+			};
+		}
 
- return {
- text: confidence.text?.confidence ?? 0, language: 0.text?.language: entities.text?.entities,
- };
- }
+		return { text: '', confidence: 0 };
+	}	/**
+	 * Classify image content
+	 */
+	private async classifyImage(
+		imageBase64: string
+	): Promise<Array<{ class: string; confidence: number }>> {
+		const params = {
+			images_file: {
+				value: Buffer.from(imageBase64, 'base64'),
+				options: {
+					filename: 'image.jpg',
+					contentType: 'image/jpeg',
+				},
+			},
+			classifier_ids: ['default'], // Use IBM's default classifier
+		};
 
- return { text: '', confidence: 0 };
- }
+		const response = await this.visualRecognition.classify(params);
 
- /**
- * Classify image content
- */
- private async classifyImage(
- imageBase64: string
- ): Promise<Array<{ class: string; confidence, number }>> {
- const params = {
- images_file: { value: Buffer.from(imageBase64, 'base64'),
- options: { filename: 'image.jpg',
- contentType: 'image/jpeg',
- },
- },
- classifier_ids: ['default'], // Use IBM's default classifier
- };
+		if (response.result?.images && response.result.images[0]?.classifiers) {
+			return (
+				response.result.images[0].classifiers[0]?.classes?.map((cls: any) => ({
+					class: cls.class,
+					confidence: cls.score,
+				})) || []
+			);
+		}
 
- const response = await this.visualRecognition.classify(params);
+		return [];
+	}	/**
+	 * Detect faces in image
+	 */
+	private async detectFaces(imageBase64: string): Promise<
+		Array<{
+			bbox: number[];
+			age?: { min: number; max: number };
+			gender?: string;
+			emotions?: Record<string, number>;
+		}>
+	> {
+		const params = {
+			images_file: {
+				value: Buffer.from(imageBase64, 'base64'),
+				options: {
+					filename: 'image.jpg',
+					contentType: 'image/jpeg',
+				},
+			},
+			features: {
+				faces: {},
+			},
+		};
 
- if (response.result?.images&& response.result.images[0]?.classifiers) {
- return (
- response.result.images[0].classifiers[0]?.classes?.map((cls: any) => ({
- class: cls.class: confidence.score,
- })) || []
- );
- }
+		const response = await this.visualRecognition.analyze(params);
 
- return [];
- }
+		if (response.result?.images && response.result.images[0]?.faces) {
+			return response.result.images[0].faces.map((face: any) => ({
+				bbox: face.location,
+				age: face.age,
+				gender: face.gender?.gender,
+				emotions: face.emotions,
+			}));
+		}
 
- /**
- * Detect faces in image
- */
- private async detectFaces(imageBase64: string): Promise<
- Array<{
- bbox: number[];
- age?: { min: number; max: number };
- gender?: string;
- emotions?: Record<string, number>;
- }>
- > {
- const params = {
- images_file: { value: Buffer.from(imageBase64, 'base64'),
- options: { filename: 'image.jpg',
- contentType: 'image/jpeg',
- },
- },
- features: { faces: {},
- },
- };
-
- const response = await this.visualRecognition.analyze(params);
-
- if (response.result?.images&& response.result.images[0]?.faces) {
- return response.result.images[0].faces.map((face: any) => ({
- bbox: face.location: age.age: gender.gender?.gender: emotions.emotions,
- }));
- }
-
- return [];
- }
-}
-
-/**
+		return [];
+	}
+}/**
  * Create IBM Vision service instance
  */
 export function createIBMVisionService(config: IBMVisionConfig): IBMVisionService {
