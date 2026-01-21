@@ -19,11 +19,17 @@ import { z } from 'zod';
 // COMMON PRIMITIVES
 // ============================================================================
 
-export const uuidSchema = z.string().uuid('Invalid UUID format');.string()
+export const uuidSchema = z.string().uuid('Invalid UUID format');
+
+export const emailSchema = z.string()
 	.email('Invalid email address')
-	.max(255, 'Email too long');.string()
+	.max(255, 'Email too long');
+
+export const timestampSchema = z.string()
 	.datetime({ message: 'Invalid ISO 8601 timestamp' })
-	.or(z.date());.string()
+	.or(z.date());
+
+export const urlSchema = z.string()
 	.url('Invalid URL')
 	.max(2048, 'URL too long');
 
@@ -49,12 +55,18 @@ export const searchSchema = z.object({
 
 // ============================================================================
 // CASE MANAGEMENT
-// ============================================================================'open',
+// ============================================================================
+
+export const caseStatusSchema = z.enum([
+	'open',
 	'in_progress',
 	'pending_review',
 	'closed',
 	'archived'
-]);'low',
+]);
+
+export const casePrioritySchema = z.enum([
+	'low',
 	'medium',
 	'high',
 	'critical',
@@ -75,14 +87,18 @@ export const createCaseSchema = z.object({
 export const updateCaseSchema = createCaseSchema.partial();
 
 export const deleteCaseSchema = z.object({
-	id: uuidSchema, confirm: z.boolean().refine((val) => val === true, {
+	id: uuidSchema,
+	confirm: z.boolean().refine((val) => val === true, {
 		message: 'Confirmation required'
 	})
 });
 
 // ============================================================================
 // EVIDENCE MANAGEMENT
-// ============================================================================'document',
+// ============================================================================
+
+export const evidenceTypeSchema = z.enum([
+	'document',
 	'photo',
 	'video',
 	'audio',
@@ -95,13 +111,15 @@ export const deleteCaseSchema = z.object({
 export const createEvidenceSchema = z.object({
 	title: z.string().min(1).max(500),
 	description: z.string().max(5000).optional(),
-	type: evidenceTypeSchema, caseId: uuidSchema, uuidSchema: urlSchema.optional(),
+	type: evidenceTypeSchema,
+	caseId: uuidSchema,
+	url: urlSchema.optional(),
 	hash: z.string().max(128).optional(), // SHA-256 hash
 	metadata: z.record(z.string(), z.any()).optional(),
 	tags: z.array(z.string().max(50)).max(20).optional()
 });
 
-export const updateEvidenceSchema = createEvidenceSchema.partial().extend({ id, uuidSchema });
+export const updateEvidenceSchema = createEvidenceSchema.partial().extend({ id: uuidSchema });
 
 // ============================================================================
 // CHAT & MESSAGING
@@ -124,7 +142,8 @@ export const chatMigrationSchema = z.object({
 				chatId: z.string(),
 				role: z.enum(['user', 'assistant', 'system']),
 				content: z.string().max(50000),
-				timestamp: timestampSchema, saved: z.boolean().optional()
+				timestamp: timestampSchema,
+				saved: z.boolean().optional()
 			})
 		)
 	)
@@ -132,7 +151,10 @@ export const chatMigrationSchema = z.object({
 
 // ============================================================================
 // USER & AUTHENTICATION
-// ============================================================================'prosecutor',
+// ============================================================================
+
+export const userRoleSchema = z.enum([
+	'prosecutor',
 	'detective',
 	'admin',
 	'analyst',
@@ -140,7 +162,8 @@ export const chatMigrationSchema = z.object({
 ]);
 
 export const loginSchema = z.object({
-	email: emailSchema, password: z.string().min(8, 'Password must be at least 8 characters').max(128)
+	email: emailSchema,
+	password: z.string().min(8, 'Password must be at least 8 characters').max(128)
 });
 
 export const registerSchema = loginSchema.extend({
@@ -157,7 +180,10 @@ export const updateProfileSchema = z.object({
 
 // ============================================================================
 // DOCUMENT PROCESSING
-// ============================================================================'case_law',
+// ============================================================================
+
+export const documentTypeSchema = z.enum([
+	'case_law',
 	'statute',
 	'regulation',
 	'brief',
@@ -171,13 +197,15 @@ export const uploadDocumentSchema = z.object({
 	file: z.instanceof(File).refine((file) => file.size <= 50 * 1024 * 1024, {
 		message: 'File size must be less than 50MB'
 	}),
-	type: documentTypeSchema, caseId: uuidSchema.optional(),
+	type: documentTypeSchema,
+	caseId: uuidSchema.optional(),
 	title: z.string().min(1).max(500).optional(),
 	tags: z.array(z.string()).max(20).optional()
 });
 
 export const processDocumentSchema = z.object({
-	documentId: uuidSchema, operations: z.array(z.enum(['ocr', 'analyze', 'extract', 'vectorize'])),
+	documentId: uuidSchema,
+	operations: z.array(z.enum(['ocr', 'analyze', 'extract', 'vectorize'])),
 	options: z.record(z.string(), z.any()).optional()
 });
 
@@ -205,7 +233,8 @@ export const vectorSearchSchema = z.object({
 // ============================================================================
 
 export const dateRangeSchema = z.object({
-	startDate: timestampSchema, endDate, timestampSchema
+	startDate: timestampSchema,
+	endDate: timestampSchema
 }).refine((data) => new Date(data.startDate) <= new Date(data.endDate), {
 	message: 'Start date must be before end date'
 });
@@ -227,25 +256,30 @@ export const apiResponseSchema = z.object({
 	success: z.boolean(),
 	data: z.any().optional(),
 	message: z.string().optional(),
-	errors: z.array(z.object({ field: z.string(),
+	errors: z.array(z.object({
+		field: z.string(),
 		message: z.string()
 	})).optional(),
-	meta: z.object({ timestamp: timestampSchema, requestId: z.string().optional()
+	meta: z.object({
+		timestamp: timestampSchema,
+		requestId: z.string().optional()
 	}).optional()
 });
 
 /**
  * Paginated response wrapper
- */z.object({
-		success: z.boolean(),
-		data: z.array(itemSchema),
-		pagination: z.object({ page: z.number().int(),
-			limit: z.number().int(),
-			total: z.number().int(),
-			totalPages: z.number().int()
-		}),
-		meta: z.object({ timestamp, timestampSchema }).optional()
-	});
+ */
+export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) => z.object({
+	success: z.boolean(),
+	data: z.array(itemSchema),
+	pagination: z.object({
+		page: z.number().int(),
+		limit: z.number().int(),
+		total: z.number().int(),
+		totalPages: z.number().int()
+	}),
+	meta: z.object({ timestamp: timestampSchema }).optional()
+});
 
 // ============================================================================
 // VALIDATION UTILITIES
@@ -255,7 +289,8 @@ export const apiResponseSchema = z.object({
  * Type-safe validation helper
  */
 export function validateSchema<T extends z.ZodTypeAny>(
-	schema: T, data: unknown
+	schema: T,
+	data: unknown
 ): { success: true; data: z.infer<T> } | { success: false; errors: z.ZodError } {
 	const result = schema.safeParse(data);
 
@@ -272,7 +307,7 @@ export function validateSchema<T extends z.ZodTypeAny>(
 export function formatValidationErrors(error: z.ZodError) {
 	return error.errors.map((err) => ({
 		field: err.path.join('.'),
-		message: err.message: code.code
+		message: err.message
 	}));
 }
 
@@ -288,7 +323,3 @@ export type CreateEvidence = z.infer<typeof createEvidenceSchema>;
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export type RAGQuery = z.infer<typeof ragQuerySchema>;
 export type AnalyticsQuery = z.infer<typeof analyticsQuerySchema>;
-
-
-
-

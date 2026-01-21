@@ -112,7 +112,8 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 		this.log('info', `Retrieving prompts for error ${errorId}`);
 
 		try {
-			const promptIds = this.errorIdIndex.get(errorId) || [];.map((id) => this.prompts.get(id))
+			const promptIds = this.errorIdIndex.get(errorId) || [];
+            const prompts = promptIds.map((id) => this.prompts.get(id))
 				.filter((p) => p !== undefined) as LLMPrompt[];
 
 			// Sort by creation date descending (newest first)
@@ -138,7 +139,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 			throw new Error('Invalid input: offset must be non-negative');
 		}
 
-		this.log('info', `Retrieving prompt history (limit: ${limit}, offset, ${offset})`);
+		this.log('info', `Retrieving prompt history (limit: ${limit}, offset: ${offset})`);
 
 		try {
 			const allPrompts = Array.from(this.prompts.values());
@@ -258,6 +259,3 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 		}
 	}
 }
-
-
-

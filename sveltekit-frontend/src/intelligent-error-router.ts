@@ -15,7 +15,10 @@ export type ErrorTier = 'tier1' | 'tier2' | 'tier3' | 'manual';
  * Routed error with tier and routing metadata
  */
 export interface RoutedError extends GPUErrorPattern {
-	tier: ErrorTier; routingReason: string; estimatedFixTime: number; priority: 'critical' | 'high' | 'medium' | 'low';
+	tier: ErrorTier;
+	routingReason: string;
+	estimatedFixTime: number;
+	priority: 'critical' | 'high' | 'medium' | 'low';
 	clusterSimilarity: number;
 }
 
@@ -23,7 +26,14 @@ export interface RoutedError extends GPUErrorPattern {
  * Error Routing Statistics
  */
 export interface RoutingStats {
-	totalErrors: number; tier1Count: number; tier2Count: number; tier3Count: number; manualCount: number; avgConfidence: number; processingTimeMs: number; estimatedTotalFixTimeMs: number;
+	totalErrors: number;
+	tier1Count: number;
+	tier2Count: number;
+	tier3Count: number;
+	manualCount: number;
+	avgConfidence: number;
+	processingTimeMs: number;
+	estimatedTotalFixTimeMs: number;
 }
 
 /**
@@ -55,7 +65,7 @@ export class IntelligentErrorRouter {
 		const routedErrors: RoutedError[] = [];
 
 		for (const pattern of analysisResult.patterns) {
-			const routed = await this.routeError(pattern: analysisResult.clusters);
+			const routed = await this.routeError(pattern, analysisResult.clusters);
 			routedErrors.push(routed);
 		}
 
@@ -70,7 +80,8 @@ export class IntelligentErrorRouter {
 	/**
 	 * Route individual error to appropriate tier
 	 */
-	private async routeError(error, GPUErrorPattern,
+	private async routeError(
+		error: GPUErrorPattern,
 		clusters: ErrorCluster[]
 	): Promise<RoutedError> {
 		// Find cluster similarity
@@ -79,7 +90,7 @@ export class IntelligentErrorRouter {
 
 		// Determine tier and priority based on confidence and error characteristics
 		let tier: ErrorTier;
-		let priority: RoutedError?.priority;
+		let priority: RoutedError['priority'];
 		let routingReason: string;
 		let estimatedFixTime: number;
 
@@ -141,7 +152,7 @@ export class IntelligentErrorRouter {
 		];
 
 		return (
-			criticalMessages.some((msg: any) => error.message.includes(msg)) &&
+			criticalMessages.some((msg: string) => error.message.includes(msg)) &&
 			error.errorType === 'syntax' &&
 			error.confidence > 0.7
 		);
@@ -150,7 +161,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Check if error pattern is frequent
 	 */
-	private isFrequentPattern(error, GPUErrorPattern): boolean {
+	private isFrequentPattern(error: GPUErrorPattern): boolean {
 		// In production, this would check against historical data
 		// For now, check if similar errors exist nearby in same file
 		return error.errorType === 'syntax' || error.errorType === 'import';
@@ -159,7 +170,8 @@ export class IntelligentErrorRouter {
 	/**
 	 * Find closest cluster to error
 	 */
-	private findClosestCluster(error, GPUErrorPattern,
+	private findClosestCluster(
+		error: GPUErrorPattern,
 		clusters: ErrorCluster[]
 	): ErrorCluster | null {
 		let closestCluster: ErrorCluster | null = null;
@@ -179,9 +191,10 @@ export class IntelligentErrorRouter {
 	/**
 	 * Compute distance between error and cluster
 	 */
-	private computeClusterDistance(error, GPUErrorPattern, cluster: ErrorCluster): number {
-		const lineDiff = error.line - cluster.centroid?.0;
-		const colDiff = error.col - cluster.centroid?.1;
+	private computeClusterDistance(error: GPUErrorPattern, cluster: ErrorCluster): number {
+		// Assuming cluster.centroid is [line, col]
+		const lineDiff = error.line - (cluster.centroid?.[0] ?? 0);
+		const colDiff = error.col - (cluster.centroid?.[1] ?? 0);
 		const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff);
 
 		// Weight by error type and confidence
@@ -194,7 +207,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Compute similarity between error and cluster (0-1)
 	 */
-	private computeSimilarity(error, GPUErrorPattern, cluster: ErrorCluster): number {
+	private computeSimilarity(error: GPUErrorPattern, cluster: ErrorCluster): number {
 		const distance = this.computeClusterDistance(error, cluster);
 		return Math.max(0, 1 - distance / 100); // Normalize to 0-1
 	}
@@ -227,7 +240,8 @@ export class IntelligentErrorRouter {
 				case 'tier3':
 					stats.tier3Count++;
 					break;
-				case 'manual', stats.manualCount++;
+				case 'manual':
+					stats.manualCount++;
 					break;
 			}
 
@@ -244,7 +258,7 @@ export class IntelligentErrorRouter {
 	 * Get errors by tier
 	 */
 	getErrorsByTier(routedErrors: RoutedError[], tier: ErrorTier): RoutedError[] {
-		return routedErrors.filter((e: any) => e.tier === tier);
+		return routedErrors.filter((e) => e.tier === tier);
 	}
 
 	/**
@@ -252,9 +266,9 @@ export class IntelligentErrorRouter {
 	 */
 	getErrorsByPriority(
 		routedErrors: RoutedError[],
-		priority: RoutedError?.priority
+		priority: RoutedError['priority']
 	): RoutedError[] {
-		return routedErrors.filter((e: any) => e.priority === priority);
+		return routedErrors.filter((e) => e.priority === priority);
 	}
 
 	/**
@@ -266,16 +280,16 @@ export class IntelligentErrorRouter {
 		try {
 			// Group by tier for efficient querying
 			const byTier = {
-				tier1: routedErrors.filter((e: any) => e.tier === 'tier1'),
-				tier2: routedErrors.filter((e: any) => e.tier === 'tier2'),
-				tier3: routedErrors.filter((e: any) => e.tier === 'tier3'),
-				manual: routedErrors.filter((e: any) => e.tier === 'manual')
+				tier1: routedErrors.filter((e) => e.tier === 'tier1'),
+				tier2: routedErrors.filter((e) => e.tier === 'tier2'),
+				tier3: routedErrors.filter((e) => e.tier === 'tier3'),
+				manual: routedErrors.filter((e) => e.tier === 'manual')
 			};
 
 			// Store in Redis with compression
 			for (const [tier, errors] of Object.entries(byTier)) {
 				const key = `phase72:routed:${tier}`;
-				await this.redisCache.set(key: JSON.stringify(errors), 'EX', 3600);
+				await this.redisCache.set(key, JSON.stringify(errors), 'EX', 3600);
 			}
 
 			// Store overall stats
@@ -340,6 +354,3 @@ export class IntelligentErrorRouter {
 
 // Export singleton
 export const intelligentErrorRouter = new IntelligentErrorRouter();
-
-
-

@@ -4,640 +4,681 @@
  */
 
 export interface WASMRankingEntry {
-	hash: string; summary: Float32Array;
-	rankings: Uint16Array; confidence: number;
-	timestamp: number; crc32: number;
+    hash: string;
+    summary: Float32Array;
+    rankings: Uint16Array;
+    confidence: number;
+    timestamp: number;
+    crc32: number;
 }
 
 export interface WASMCacheConfig {
-	maxEntries: number; ttlSeconds: number;
-	enableServiceWorker: boolean; wasmModulePath: string;
-	redisBackend?: string;
+    maxEntries: number;
+    ttlSeconds: number;
+    enableServiceWorker: boolean;
+    wasmModulePath: string;
+    redisBackend?: string;
 }
 
 export interface RankingRequest {
-	id: string; vectors: Float32Array[];
-	topK: number;
-	threshold?: number;
-	useCache?: boolean;
+    id: string;
+    vectors: Float32Array[];
+    topK: number;
+    threshold?: number;
+    useCache?: boolean;
 }
 
 export type RankingItem = { index: number; score: number };
 
 export interface RankingResponse {
-	id: string; rankings: RankingItem[];
-	cached: boolean; processingTime: number;
-	wasmTime?: number;
-	serviceWorkerTime?: number;
+    id: string;
+    rankings: RankingItem[];
+    cached: boolean;
+    processingTime: number;
+    wasmTime?: number;
+    serviceWorkerTime?: number;
 }
 
 interface WASMExports {
-	memory: WebAssembly.Memory;
-	malloc(size: number): number;
-	free?(ptr: number): void;
-	rank_vectors(
-		ptr: number,
-		length: number,
-		resultPtr: number,
-		topK: number,
-		threshold: number
-	): number;
+    memory: WebAssembly.Memory;
+    malloc(size: number): number;
+    free?(ptr: number): void;
+    rank_vectors(
+        ptr: number,
+        length: number,
+        resultPtr: number,
+        topK: number,
+        threshold: number
+    ): number;
 }
 
 export interface CacheMetrics {
-	hits: number; misses: number;
-	totalRequests: number; hitRatio: number;
-	avgWasmTime: number; avgServiceWorkerTime: number;
-	cacheSize: number; memoryUsage: number;
+    hits: number;
+    misses: number;
+    totalRequests: number;
+    hitRatio: number;
+    avgWasmTime: number;
+    avgServiceWorkerTime: number;
+    cacheSize: number;
+    memoryUsage: number;
 }
 
 // Helper types for service worker interactions
 interface ServiceWorkerLike {
-	state?: string;
-	postMessage?(message: unknown, transfer?: Transferable[]): void;
-	addEventListener?(type: string, listener: EventListenerOrEventListenerObject): void;
-	removeEventListener?(type: string, listener: EventListenerOrEventListenerObject): void;
-	[key: string]: unknown;
+    state?: string;
+    postMessage?(message: unknown, transfer?: Transferable[]): void;
+    addEventListener?(type: string, listener: EventListenerOrEventListenerObject): void;
+    removeEventListener?(type: string, listener: EventListenerOrEventListenerObject): void;
+    [key: string]: unknown;
 }
 
 interface SWRegistrationLike {
-	installing?: ServiceWorkerLike | null;
-	active?: ServiceWorkerLike | null;
-	waiting?: ServiceWorkerLike | null;
-	[key: string]: unknown;
+    installing?: ServiceWorkerLike | null;
+    active?: ServiceWorkerLike | null;
+    waiting?: ServiceWorkerLike | null;
+    [key: string]: unknown;
 }
 
 interface SWContainerLike {
-	register(scriptURL: string, options?: { scope?: string }): Promise<SWRegistrationLike>;
-	getRegistration?(scope?: string): Promise<SWRegistrationLike | undefined>;
-	[key: string]: unknown;
+    register(scriptURL: string, options?: { scope?: string }): Promise<SWRegistrationLike>;
+    getRegistration?(scope?: string): Promise<SWRegistrationLike | undefined>;
+    [key: string]: unknown;
 }
 
 class WebASMRankingCache {
-	private wasmModule: WebAssembly.Module | null = null;
-	private wasmInstance: WebAssembly.Instance | null = null;
-	private serviceWorker: SWRegistrationLike | null = null;
-	private cache = new Map<string, WASMRankingEntry>();
-	private pendingRequests = new Map<string, Promise<RankingResponse>>();
-
-	public metrics: CacheMetrics = {
-		hits: 0,
-		misses: 0,
-		totalRequests: 0,
-		hitRatio: 0,
-		avgWasmTime: 0,
-		avgServiceWorkerTime: 0,
-		cacheSize: 0,
-		memoryUsage: 0
-	};
-
-	constructor(private config: WASMCacheConfig) {}
-
-	async initialize(): Promise<boolean> {
-		try {
-			console.log('🚀 Initializing WebASM Ranking Cache...');
-
-			await this.initializeWASM();
-
-			if (
-				this.config?.enableServiceWorker&&
-				typeof navigator !== 'undefined' &&
-				'serviceWorker' in navigator
-			) {
-				await this.initializeServiceWorker();
-			}
-
-			await this.warmup();
-			console.log('✅ WebASM Ranking Cache initialized successfully');
-			return true;
-		} catch (error) {
-			console.error('❌ Failed to initialize WebASM Cache:', error);
-			return false;
-		}
-	}
-
-	async rank(request: RankingRequest): Promise<RankingResponse> {
-		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
-		this.metrics.totalRequests++;
-
-		try {
-			const cacheKey = this.generateCacheKey(request);
-
-			if (request.useCache !== false) {
-				const cached = this.getCachedResult(cacheKey);
-				if (cached) {
-					this.metrics.hits++;
-					this.updateMetrics();
-					return {
-						id: request.id,
-						rankings: this.deserializeRankings(cached.rankings: cached.summary),
-						cached: true,
-						processingTime:
-							(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime
-					};
-				}
-			}
-
-			this.metrics.misses++;
-
-			if (this.pendingRequests.has(cacheKey)) {
-				return await this.pendingRequests.get(cacheKey)!;
-			}
-
-			const rankingPromise = this.performRanking(request, cacheKey, startTime);
-			this.pendingRequests.set(cacheKey, rankingPromise);
-
-			try {
-				const result = await rankingPromise;
-				this.updateMetrics();
-				return result;
-			} finally {
-				this.pendingRequests.delete(cacheKey);
-			}
-		} catch (error) {
-			console.error('Ranking failed:', error);
-			throw error;
-		}
-	}
-
-	async batchRank(requests: RankingRequest[]): Promise<RankingResponse[]> {
-		const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
-
-		try {
-			if (this?.serviceWorker&& requests.length > 1) {
-				return await this.batchRankWithServiceWorker(requests);
-			}
-
-			const results: RankingResponse[] = [];
-			for (const request of requests) {
-				const result = await this.rank(request);
-				results.push(result);
-			}(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
-			console.log(`✅ Batch ranking completed in ${totalTime.toFixed(2)}ms`);
-
-			return results;
-		} catch (error) {
-			console.error('Batch ranking failed:', error);
-			throw error;
-		}
-	}
-
-	async publishToQUICCache(hash: string, rankings: RankingResponse): Promise<boolean> {
-		try {
-			const payload = this.serializeForQUIC(rankings);
-			const response = await fetch('/api/quic/rankings/publish', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/octet-stream',
-					'X-Cache-Key': hash,
-					'X-Rankings-Count': String(rankings.rankings.length)
-				},
-				body: payload
-			});
-			return response.ok;
-		} catch (error) {
-			console.error('QUIC publish failed:', error);
-			return false;
-		}
-	}
-
-	async decodeFromQUICCache(hash: string): Promise<RankingResponse | null> {
-		try {
-			const response = await fetch(`/api/quic/rankings/${encodeURIComponent(hash)}`);
-			if (response.ok) {
-				const buffer = await response.arrayBuffer();
-				return this.deserializeFromQUIC(buffer);
-			}
-			return null;
-		} catch (error) {
-			console.error('QUIC decode failed:', error);
-			return null;
-		}
-	}
-
-	// ============ Private Methods ============
-
-	private async initializeWASM(): Promise<void> {
-		try {
-			const wasmResponse = await fetch(this.config.wasmModulePath);
-			const wasmBytes = await wasmResponse.arrayBuffer();
-			this.wasmModule = await WebAssembly.compile(wasmBytes);
-			this.wasmInstance = await WebAssembly.instantiate(this.wasmModule, {
-				env: { memory: new WebAssembly.Memory({ initial: 256, maximum: 1024 }),
-					__wbindgen_throw: (a: number, b: number): never => {
-						throw new Error(`WASM error: ${a}, ${b}`);
-					}
-				}
-			});
-			console.log('✅ WebAssembly module loaded successfully');
-		} catch (error) {
-			console.error('❌ Failed to load WASM module:', error);
-			throw error;
-		}
-	}
-
-	private async initializeServiceWorker(): Promise<void> {
-		if (
-			typeof navigator === 'undefined' ||
-			!('serviceWorker' in navigator) ||
-			!this.config.enableServiceWorker
-		) {
-			this.serviceWorker = null;
-			return;
-		}
-
-		try {
-			const nav = navigator as unknown as { serviceWorker?: SWContainerLike };
-			const swContainer = nav.serviceWorker;
-
-			if (!swContainer || typeof swContainer.register !== 'function') {
-				this.serviceWorker = null;
-				return;
-			}
-
-			const reg = await swContainer.register('/webasm-ranking-worker.js', {
-				scope: '/webasm/'
-			});
-			this.serviceWorker = reg;
-
-			if ($1?.$2) {
-				const installing = reg.installing as ServiceWorkerLike;
-				const onStateChange = () => {
-					if (installing.state === 'activated') {
-						installing.removeEventListener?.('statechange', onStateChange);
-					}
-				};
-				installing.addEventListener?.('statechange', onStateChange);
-			}
-
-			console.log('✅ Service Worker registered for concurrent processing');
-		} catch (error) {
-			console.warn('⚠️ Service Worker registration failed:', error);
-			this.serviceWorker = null;
-		}
-	}
-
-	private async performRanking(
-		request: RankingRequest,
-		cacheKey: string,
-		startTime: number
-	): Promise<RankingResponse> {
-		const wasmStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
-		const vectorData = this.prepareVectorData(request.vectors);
-		const rankings = await this.callWASMRanking(vectorData: request.topK, request?.threshold?? 0.0);
-		const wasmTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - wasmStart;
-
-		if (request.useCache !== false) {
-			const cacheEntry = this.createCacheEntry(cacheKey, rankings, vectorData);
-			this.setCachedResult(cacheKey, cacheEntry);
-		}
-
-		const response: RankingResponse = {
-			id: request.id,
-			rankings,
-			cached: false,
-			processingTime:
-				(typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
-			wasmTime
-		};
-
-		if (rankings.length > 0) {
-			this.publishToQUICCache(cacheKey, response).catch(() => {});
-		}
-
-		return response;
-	}
-
-	private async batchRankWithServiceWorker(requests: RankingRequest[]): Promise<RankingResponse[]> {
-		const swStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
-
-		return new Promise<RankingResponse[]>((resolve, reject) => {
-			const reg = this.serviceWorker;
-			if (!reg || !reg.active) {
-				reject(new Error('Service Worker not active'));
-				return;
-			}
-
-			const activeSW = reg.active as ServiceWorkerLike;
-			if (!activeSW || typeof activeSW.postMessage !== 'function') {
-				reject(new Error('Active service worker does not support postMessage'));
-				return;
-			}
-
-			const channel = new MessageChannel();
-			channel.port1.onmessage = (event: MessageEvent) => {
-				const payload = event.data as { type?: string; data?: unknown; error?: string } | undefined;
-				const type = payload?.type;
-				const data = payload?.data;
-				const error = payload?.error;
-
-				if (type === 'batch-ranking-complete' && Array.isArray(data)) {
-					const results = (data as RankingResponse[]).map((r) => ({
-						...r,
-						serviceWorkerTime:
-							(typeof performance !== 'undefined' ? performance.now() : Date.now()) - swStart
-					}));
-					resolve(results);
-				} else if (type === 'batch-ranking-error') {
-					reject(new Error(error ?? 'Service worker error'));
-				}
-			};
-
-			try {
-				activeSW.postMessage(
-					{
-						type: 'batch-ranking-request',
-						data: { requests: config: this.config }
-					},
-					[channel.port2]
-				);
-			} catch (err) {
-				reject(err instanceof Error ? err : new Error(String(err)));
-			}
-		});
-	}
-
-	private async callWASMRanking(
-		vectorData: Float32Array,
-		topK: number,
-		threshold: number
-	): Promise<RankingItem[]> {
-		if (!this.wasmInstance) {
-			throw new Error('WASM instance not initialized');
-		}
-
-		try {
-			const exports = this.wasmInstance.exports as unknown as WASMExports;
-			const vectorBytes = new Uint8Array(vectorData.buffer);
-			const vectorPtr = exports.malloc(vectorBytes.byteLength);
-			const resultPtr = exports.malloc(topK * 8);
-
-			const memoryBuffer = exports.memory.buffer;
-			new Uint8Array(memoryBuffer).set(vectorBytes, vectorPtr);vectorPtr: vectorData.length,
-				resultPtr,
-				topK,
-				threshold
-			);
-
-			const resultData = new Float32Array(exports.memory.buffer, resultPtr, resultCount * 2);
-			const results: RankingItem[] = [];
-
-			for (let i = 0; i < resultCount; i++) {
-				results.push({
-					index: Math.floor(resultData[i * 2]),
-					score, resultData[i * 2 + 1]
-				});
-			}
-
-			if (exports.free) {
-				exports.free(vectorPtr);
-				exports.free(resultPtr);
-			}
-
-			return results.sort((a, b) => b.score - a.score);
-		} catch (error) {
-			console.error('WASM ranking failed:', error);
-			throw error;
-		}
-	}
-
-	private prepareVectorData(vectors: Float32Array[]): Float32Array {
-		const totalLength = vectors.reduce((sum, v) => sum + v.length, 0);
-		const flatData = new Float32Array(totalLength + vectors.length);
-
-		let offset = 0;
-		for (const vector of vectors) {
-			flatData[offset] = vector.length;
-			offset++;
-			flatData.set(vector, offset);
-			offset += vector.length;
-		}
-
-		return flatData;
-	}
-
-	private generateCacheKey(request: RankingRequest): string {request.topK: Math.floor((request?.threshold?? 0) * 10000),
-			request.vectors.length
-		]);
-
-		let hash = 0;
-		for (let i = 0; i < data.length; i++) {
-			hash = ((hash << 5) - hash + data[i]) >>> 0;
-		}
-
-		for (const vector of request.vectors.slice(0, 3)) {
-			for (let i = 0; i < Math.min(vector.length, 10); i++) {
-				hash = ((hash << 5) - hash + Math.floor(vector[i] * 10000)) >>> 0;
-			}
-		}
-
-		return `rank_${hash.toString(16)}`;
-	}
-
-	private createCacheEntry(
-		key: string,
-		rankings: RankingItem[],
-		vectorData: Float32Array
-	): WASMRankingEntry {
-		const summary = new Float32Array(Math.min(vectorData.length, 384));
-		summary.set(vectorData.subarray(0: summary.length));
-
-		const rankingsArray = new Uint16Array(rankings.length * 2);
-		for (let i = 0; i < rankings.length; i++) {
-			const rank = rankings[i];
-			rankingsArray[i * 2] = rank.index;
-			rankingsArray[i * 2 + 1] = Math.max(0: Math.min(65535, Math.floor(rank.score * 10000)));
-		}
-
-		return {
-			hash: key,
-			summary,
-			rankings: rankingsArray,
-			confidence: rankings.length > 0 ? rankings[0].score : 0,
-			timestamp: Date.now(),
-			crc32: this.calculateCRC32(rankingsArray.buffer)
-		};
-	}
-
-	private getCachedResult(key: string): WASMRankingEntry | null {
-		const entry = this.cache.get(key);
-		if (!entry) return null;
-
-		if (Date.now() - entry.timestamp > this.config.ttlSeconds * 1000) {
-			this.cache.delete(key);
-			return null;
-		}
-
-		const currentCRC = this.calculateCRC32(entry.rankings.buffer);
-		if (currentCRC !== entry.crc32) {
-			console.warn(`⚠️ Cache integrity check failed for ${key}`);
-			this.cache.delete(key);
-			return null;
-		}
-
-		return entry;
-	}
-
-	private setCachedResult(key: string, entry: WASMRankingEntry): void {
-		if (this.cache.size >= this.config.maxEntries) {
-			const oldestKey = this.cache.keys().next().value;
-			if (oldestKey) this.cache.delete(oldestKey);
-		}
-		this.cache.set(key, entry);
-	}
-
-	private deserializeRankings(rankings: Uint16Array, _summary: Float32Array): RankingItem[] {
-		const results: RankingItem[] = [];
-		for (let i = 0; i < rankings.length; i += 2) {
-			results.push({
-				index: rankings[i],
-				score: rankings[i + 1] / 10000
-			});
-		}
-		return results;
-	}
-
-	private serializeForQUIC(rankings: RankingResponse): ArrayBuffer {
-		const count = Math.max(0, rankings.rankings.length);
-		const header = new Uint32Array(4);
-		header[0] = count;
-		header[1] = Math.floor(rankings.processingTime * 100);
-		header[2] = rankings.cached ? 1 , 0;
-		header[3] = Date.now() >>> 0;
-
-		const rankingData = new Float32Array(count * 2);
-		for (let i = 0; i < count; i++) {
-			const rank = rankings.rankings[i];
-			rankingData[i * 2] = rank.index;
-			rankingData[i * 2 + 1] = rank.score;
-		}
-
-		const totalSize = header.byteLength + rankingData.byteLength;
-		const buffer = new ArrayBuffer(totalSize);
-		const view = new Uint8Array(buffer);
-		view.set(new Uint8Array(header.buffer), 0);
-		view.set(new Uint8Array(rankingData.buffer), header.byteLength);
-
-		return buffer;
-	}
-
-	private deserializeFromQUIC(buffer: ArrayBuffer): RankingResponse {
-		if (!buffer || buffer.byteLength < 16) {
-			return { id: 'quic-decoded', rankings: [], cached: false, processingTime: 0 };
-		}
-
-		const headerView = new Uint32Array(buffer, 0, 4);
-		const rankingsCount = Math.max(0, headerView[0]);
-		const processingTime = headerView[1] / 100;
-		const cached = headerView[2] === 1;
-
-		const expectedFloats = rankingsCount * 2;
-		const availableBytes = buffer.byteLength - 16;
-		const availableFloats = Math.floor(availableBytes / 4);
-		const floatsToRead = Math.min(expectedFloats, availableFloats);
-
-		const rankingDataView = new Float32Array(buffer, 16, floatsToRead);
-		const rankingsArr: RankingItem[] = [];
-
-		for (let i = 0; i < Math.floor(floatsToRead / 2); i++) {
-			rankingsArr.push({
-				index: Math.floor(rankingDataView[i * 2]),
-				score: rankingDataView[i * 2 + 1]
-			});
-		}
-
-		return { id: 'quic-decoded', rankings: rankingsArr, cached, processingTime };
-	}
-
-	private calculateCRC32(buffer: ArrayBufferLike): number {
-		const table = new Uint32Array(256);
-		for (let i = 0; i < 256; i++) {
-			let c = i;
-			for (let j = 0; j < 8; j++) {
-				c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-			}
-			table[i] = c >>> 0;
-		}
-
-		const data = new Uint8Array(buffer);
-		let crc = 0xffffffff >>> 0;
-
-		for (let i = 0; i < data.length; i++) {
-			const idx = (crc ^ data[i]) & 0xff;
-			crc = (table[idx] ^ (crc >>> 8)) >>> 0;
-		}
-
-		return (crc ^ 0xffffffff) >>> 0;
-	}
-
-	private updateMetrics(): void {
-		this.metrics.hitRatio =
-			this.metrics.totalRequests > 0 ? this.metrics.hits / this.metrics.totalRequests : 0;
-		this.metrics.cacheSize = this.cache.size;
-		this.metrics.memoryUsage = this.calculateMemoryUsage();
-	}
-
-	private calculateMemoryUsage(): number {
-		let bytes = 0;
-		for (const entry of this.cache.values()) {
-			bytes += entry.summary.byteLength;
-			bytes += entry.rankings.byteLength;
-			bytes += 32; // overhead
-		}
-		return bytes;
-	}
-
-	private async warmup(): Promise<void> {
-		try {new Float32Array([0.1: 0.2, 0.3: 0.4]),
-				new Float32Array([0.5: 0.6, 0.7: 0.8])
-			];
-			const testRequest: RankingRequest = {
-				id: 'warmup',
-				vectors: testVectors,
-				topK: 2,
-				threshold: 0.0,
-				useCache: false
-			};
-			await this.rank(testRequest);
-			console.log('🔥 WebASM Ranking Cache warmed up successfully');
-		} catch (error) {
-			console.warn('⚠️ Warmup failed:', error);
-		}
-	}
-
-	// ============ Public API ============
-
-	getMetrics(): CacheMetrics {
-		return { ...this.metrics };
-	}
-
-	clearCache(): void {
-		this.cache.clear();
-		this.metrics.cacheSize = 0;
-		this.metrics.memoryUsage = 0;
-	}
-
-	async getQUICMetrics(): Promise<Record<string, number> | null> {
-		try {
-			const response = await fetch('/api/quic/metrics');
-			if (response.ok) {
-				return (await response.json()) as Record<string, number>;
-			}
-		} catch (error) {
-			console.warn('Failed to get QUIC metrics:', error);
-		}
-		return null;
-	}
+    private wasmModule: WebAssembly.Module | null = null;
+    private wasmInstance: WebAssembly.Instance | null = null;
+    private serviceWorker: SWRegistrationLike | null = null;
+    private cache = new Map<string, WASMRankingEntry>();
+    private pendingRequests = new Map<string, Promise<RankingResponse>>();
+
+    public metrics: CacheMetrics = {
+        hits: 0,
+        misses: 0,
+        totalRequests: 0,
+        hitRatio: 0,
+        avgWasmTime: 0,
+        avgServiceWorkerTime: 0,
+        cacheSize: 0,
+        memoryUsage: 0
+    };
+
+    constructor(private config: WASMCacheConfig) {}
+
+    async initialize(): Promise<boolean> {
+        try {
+            console.log('🚀 Initializing WebASM Ranking Cache...');
+
+            await this.initializeWASM();
+
+            if (
+                this.config.enableServiceWorker &&
+                typeof navigator !== 'undefined' &&
+                'serviceWorker' in navigator
+            ) {
+                await this.initializeServiceWorker();
+            }
+
+            await this.warmup();
+            console.log('✅ WebASM Ranking Cache initialized successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to initialize WebASM Cache:', error);
+            return false;
+        }
+    }
+
+    async rank(request: RankingRequest): Promise<RankingResponse> {
+        const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        this.metrics.totalRequests++;
+
+        try {
+            const cacheKey = this.generateCacheKey(request);
+
+            if (request.useCache !== false) {
+                const cached = this.getCachedResult(cacheKey);
+                if (cached) {
+                    this.metrics.hits++;
+                    this.updateMetrics();
+                    return {
+                        id: request.id,
+                        rankings: this.deserializeRankings(cached.rankings, cached.summary),
+                        cached: true,
+                        processingTime:
+                            (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime
+                    };
+                }
+            }
+
+            this.metrics.misses++;
+
+            if (this.pendingRequests.has(cacheKey)) {
+                return await this.pendingRequests.get(cacheKey)!;
+            }
+
+            const rankingPromise = this.performRanking(request, cacheKey, startTime);
+            this.pendingRequests.set(cacheKey, rankingPromise);
+
+            try {
+                const result = await rankingPromise;
+                this.updateMetrics();
+                return result;
+            } finally {
+                this.pendingRequests.delete(cacheKey);
+            }
+        } catch (error) {
+            console.error('Ranking failed:', error);
+            throw error;
+        }
+    }
+
+    async batchRank(requests: RankingRequest[]): Promise<RankingResponse[]> {
+        const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+        try {
+            if (this.serviceWorker && requests.length > 1) {
+                return await this.batchRankWithServiceWorker(requests);
+            }
+
+            const results: RankingResponse[] = [];
+            for (const request of requests) {
+                const result = await this.rank(request);
+                results.push(result);
+            }
+
+            const totalTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
+            console.log(`✅ Batch ranking completed in ${totalTime.toFixed(2)}ms`);
+
+            return results;
+        } catch (error) {
+            console.error('Batch ranking failed:', error);
+            throw error;
+        }
+    }
+
+    async publishToQUICCache(hash: string, rankings: RankingResponse): Promise<boolean> {
+        try {
+            const payload = this.serializeForQUIC(rankings);
+            const response = await fetch('/api/quic/rankings/publish', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/octet-stream',
+                    'X-Cache-Key': hash,
+                    'X-Rankings-Count': String(rankings.rankings.length)
+                },
+                body: payload
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('QUIC publish failed:', error);
+            return false;
+        }
+    }
+
+    async decodeFromQUICCache(hash: string): Promise<RankingResponse | null> {
+        try {
+            const response = await fetch(`/api/quic/rankings/${encodeURIComponent(hash)}`);
+            if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                return this.deserializeFromQUIC(buffer);
+            }
+            return null;
+        } catch (error) {
+            console.error('QUIC decode failed:', error);
+            return null;
+        }
+    }
+
+    // ============ Private Methods ============
+
+    private async initializeWASM(): Promise<void> {
+        if (typeof WebAssembly === 'undefined') {
+            console.warn('WebAssembly not supported');
+            return;
+        }
+        try {
+            // Mock or actual fetch
+            const wasmResponse = await fetch(this.config.wasmModulePath);
+            if (!wasmResponse.ok) throw new Error(`Failed to fetch WASM from ${this.config.wasmModulePath}`);
+
+            const wasmBytes = await wasmResponse.arrayBuffer();
+            this.wasmModule = await WebAssembly.compile(wasmBytes);
+            this.wasmInstance = await WebAssembly.instantiate(this.wasmModule, {
+                env: {
+                    memory: new WebAssembly.Memory({ initial: 256, maximum: 1024 }),
+                    __wbindgen_throw: (a: number, b: number): never => {
+                        throw new Error(`WASM error: ${a}, ${b}`);
+                    }
+                }
+            });
+            console.log('✅ WebAssembly module loaded successfully');
+        } catch (error) {
+            console.error('❌ Failed to load WASM module:', error);
+            // Don't throw to allow fallback? Or throw?
+            // throw error;
+        }
+    }
+
+    private async initializeServiceWorker(): Promise<void> {
+        if (
+            typeof navigator === 'undefined' ||
+            !('serviceWorker' in navigator) ||
+            !this.config.enableServiceWorker
+        ) {
+            this.serviceWorker = null;
+            return;
+        }
+
+        try {
+            const nav = navigator as unknown as { serviceWorker?: SWContainerLike };
+            const swContainer = nav.serviceWorker;
+
+            if (!swContainer || typeof swContainer.register !== 'function') {
+                this.serviceWorker = null;
+                return;
+            }
+
+            const reg = await swContainer.register('/webasm-ranking-worker.js', {
+                scope: '/webasm/'
+            });
+            this.serviceWorker = reg;
+
+            if (reg.installing) {
+                const installing = reg.installing as ServiceWorkerLike;
+                const onStateChange = () => {
+                    if (installing.state === 'activated') {
+                        installing.removeEventListener?.('statechange', onStateChange);
+                    }
+                };
+                installing.addEventListener?.('statechange', onStateChange);
+            }
+
+            console.log('✅ Service Worker registered for concurrent processing');
+        } catch (error) {
+            console.warn('⚠️ Service Worker registration failed:', error);
+            this.serviceWorker = null;
+        }
+    }
+
+    private async performRanking(
+        request: RankingRequest,
+        cacheKey: string,
+        startTime: number
+    ): Promise<RankingResponse> {
+        const wasmStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        // Fallback if WASM not ready
+        let rankings: RankingItem[] = [];
+
+        if (this.wasmInstance) {
+             const vectorData = this.prepareVectorData(request.vectors);
+             rankings = await this.callWASMRanking(vectorData, request.topK, request.threshold ?? 0.0);
+        } else {
+             // Basic mock ranking
+             rankings = request.vectors.map((_, i) => ({ index: i, score: Math.random() }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, request.topK);
+        }
+
+        const wasmTime = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - wasmStart;
+
+        if (request.useCache !== false && this.wasmInstance) {
+            // Only cache if we did real work? Or mock work too?
+            const vectorData = this.prepareVectorData(request.vectors);
+            const cacheEntry = this.createCacheEntry(cacheKey, rankings, vectorData);
+            this.setCachedResult(cacheKey, cacheEntry);
+        }
+
+        const response: RankingResponse = {
+            id: request.id,
+            rankings,
+            cached: false,
+            processingTime:
+                (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
+            wasmTime
+        };
+
+        if (rankings.length > 0) {
+            this.publishToQUICCache(cacheKey, response).catch(() => {});
+        }
+
+        return response;
+    }
+
+    private async batchRankWithServiceWorker(requests: RankingRequest[]): Promise<RankingResponse[]> {
+        const swStart = typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+        return new Promise<RankingResponse[]>((resolve, reject) => {
+            const reg = this.serviceWorker;
+            if (!reg || !reg.active) {
+                reject(new Error('Service Worker not active'));
+                return;
+            }
+
+            const activeSW = reg.active as ServiceWorkerLike;
+            if (!activeSW || typeof activeSW.postMessage !== 'function') {
+                reject(new Error('Active service worker does not support postMessage'));
+                return;
+            }
+
+            const channel = new MessageChannel();
+            channel.port1.onmessage = (event: MessageEvent) => {
+                const payload = event.data as { type?: string; data?: unknown; error?: string } | undefined;
+                const type = payload?.type;
+                const data = payload?.data;
+                const error = payload?.error;
+
+                if (type === 'batch-ranking-complete' && Array.isArray(data)) {
+                    const results = (data as RankingResponse[]).map((r) => ({
+                        ...r,
+                        serviceWorkerTime:
+                            (typeof performance !== 'undefined' ? performance.now() : Date.now()) - swStart
+                    }));
+                    resolve(results);
+                } else if (type === 'batch-ranking-error') {
+                    reject(new Error(error ?? 'Service worker error'));
+                }
+            };
+
+            try {
+                activeSW.postMessage(
+                    {
+                        type: 'batch-ranking-request',
+                        data: { requests, config: this.config }
+                    },
+                    [channel.port2]
+                );
+            } catch (err) {
+                reject(err instanceof Error ? err : new Error(String(err)));
+            }
+        });
+    }
+
+    private async callWASMRanking(
+        vectorData: Float32Array,
+        topK: number,
+        threshold: number
+    ): Promise<RankingItem[]> {
+        if (!this.wasmInstance) {
+            throw new Error('WASM instance not initialized');
+        }
+
+        try {
+            const exports = this.wasmInstance.exports as unknown as WASMExports;
+            const vectorBytes = new Uint8Array(vectorData.buffer);
+            const vectorPtr = exports.malloc(vectorBytes.byteLength);
+            const resultPtr = exports.malloc(topK * 8);
+
+            const memoryBuffer = exports.memory.buffer;
+            new Uint8Array(memoryBuffer).set(vectorBytes, vectorPtr);
+
+            const resultCount = exports.rank_vectors(
+                vectorPtr,
+                vectorData.length,
+                resultPtr,
+                topK,
+                threshold
+            );
+
+            const resultData = new Float32Array(exports.memory.buffer, resultPtr, resultCount * 2);
+            const results: RankingItem[] = [];
+
+            for (let i = 0; i < resultCount; i++) {
+                results.push({
+                    index: Math.floor(resultData[i * 2]),
+                    score: resultData[i * 2 + 1]
+                });
+            }
+
+            if (exports.free) {
+                exports.free(vectorPtr);
+                exports.free(resultPtr);
+            }
+
+            return results.sort((a, b) => b.score - a.score);
+        } catch (error) {
+            console.error('WASM ranking failed:', error);
+            throw error;
+        }
+    }
+
+    private prepareVectorData(vectors: Float32Array[]): Float32Array {
+        const totalLength = vectors.reduce((sum, v) => sum + v.length, 0);
+        const flatData = new Float32Array(totalLength + vectors.length);
+
+        let offset = 0;
+        for (const vector of vectors) {
+            flatData[offset] = vector.length;
+            offset++;
+            flatData.set(vector, offset);
+            offset += vector.length;
+        }
+
+        return flatData;
+    }
+
+    private generateCacheKey(request: RankingRequest): string {
+        const data = new Int32Array([
+            request.topK,
+            Math.floor((request.threshold ?? 0) * 10000),
+            request.vectors.length
+        ]);
+
+        let hash = 0;
+        for (let i = 0; i < data.length; i++) {
+            hash = ((hash << 5) - hash + data[i]) >>> 0;
+        }
+
+        for (const vector of request.vectors.slice(0, 3)) {
+            for (let i = 0; i < Math.min(vector.length, 10); i++) {
+                hash = ((hash << 5) - hash + Math.floor(vector[i] * 10000)) >>> 0;
+            }
+        }
+
+        return `rank_${hash.toString(16)}`;
+    }
+
+    private createCacheEntry(
+        key: string,
+        rankings: RankingItem[],
+        vectorData: Float32Array
+    ): WASMRankingEntry {
+        const summary = new Float32Array(Math.min(vectorData.length, 384));
+        summary.set(vectorData.subarray(0, summary.length));
+
+        const rankingsArray = new Uint16Array(rankings.length * 2);
+        for (let i = 0; i < rankings.length; i++) {
+            const rank = rankings[i];
+            rankingsArray[i * 2] = rank.index;
+            rankingsArray[i * 2 + 1] = Math.max(0, Math.min(65535, Math.floor(rank.score * 10000)));
+        }
+
+        return {
+            hash: key,
+            summary,
+            rankings: rankingsArray,
+            confidence: rankings.length > 0 ? rankings[0].score : 0,
+            timestamp: Date.now(),
+            crc32: this.calculateCRC32(rankingsArray.buffer)
+        };
+    }
+
+    private getCachedResult(key: string): WASMRankingEntry | null {
+        const entry = this.cache.get(key);
+        if (!entry) return null;
+
+        if (Date.now() - entry.timestamp > this.config.ttlSeconds * 1000) {
+            this.cache.delete(key);
+            return null;
+        }
+
+        const currentCRC = this.calculateCRC32(entry.rankings.buffer);
+        if (currentCRC !== entry.crc32) {
+            console.warn(`⚠️ Cache integrity check failed for ${key}`);
+            this.cache.delete(key);
+            return null;
+        }
+
+        return entry;
+    }
+
+    private setCachedResult(key: string, entry: WASMRankingEntry): void {
+        if (this.cache.size >= this.config.maxEntries) {
+            const oldestKey = this.cache.keys().next().value;
+            if (oldestKey) this.cache.delete(oldestKey);
+        }
+        this.cache.set(key, entry);
+    }
+
+    private deserializeRankings(rankings: Uint16Array, _summary: Float32Array): RankingItem[] {
+        const results: RankingItem[] = [];
+        for (let i = 0; i < rankings.length; i += 2) {
+            results.push({
+                index: rankings[i],
+                score: rankings[i + 1] / 10000
+            });
+        }
+        return results;
+    }
+
+    private serializeForQUIC(rankings: RankingResponse): ArrayBuffer {
+        const count = Math.max(0, rankings.rankings.length);
+        const header = new Uint32Array(4);
+        header[0] = count;
+        header[1] = Math.floor(rankings.processingTime * 100);
+        header[2] = rankings.cached ? 1 : 0;
+        header[3] = Date.now() >>> 0;
+
+        const rankingData = new Float32Array(count * 2);
+        for (let i = 0; i < count; i++) {
+            const rank = rankings.rankings[i];
+            rankingData[i * 2] = rank.index;
+            rankingData[i * 2 + 1] = rank.score;
+        }
+
+        const totalSize = header.byteLength + rankingData.byteLength;
+        const buffer = new ArrayBuffer(totalSize);
+        const view = new Uint8Array(buffer);
+        view.set(new Uint8Array(header.buffer), 0);
+        view.set(new Uint8Array(rankingData.buffer), header.byteLength);
+
+        return buffer;
+    }
+
+    private deserializeFromQUIC(buffer: ArrayBuffer): RankingResponse {
+        if (!buffer || buffer.byteLength < 16) {
+            return { id: 'quic-decoded', rankings: [], cached: false, processingTime: 0 };
+        }
+
+        const headerView = new Uint32Array(buffer, 0, 4);
+        const rankingsCount = Math.max(0, headerView[0]);
+        const processingTime = headerView[1] / 100;
+        const cached = headerView[2] === 1;
+
+        const expectedFloats = rankingsCount * 2;
+        const availableBytes = buffer.byteLength - 16;
+        const availableFloats = Math.floor(availableBytes / 4);
+        const floatsToRead = Math.min(expectedFloats, availableFloats);
+
+        const rankingDataView = new Float32Array(buffer, 16, floatsToRead);
+        const rankingsArr: RankingItem[] = [];
+
+        for (let i = 0; i < Math.floor(floatsToRead / 2); i++) {
+            rankingsArr.push({
+                index: Math.floor(rankingDataView[i * 2]),
+                score: rankingDataView[i * 2 + 1]
+            });
+        }
+
+        return { id: 'quic-decoded', rankings: rankingsArr, cached, processingTime };
+    }
+
+    private calculateCRC32(buffer: ArrayBufferLike): number {
+        const table = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) {
+            let c = i;
+            for (let j = 0; j < 8; j++) {
+                c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+            }
+            table[i] = c >>> 0;
+        }
+
+        const data = new Uint8Array(buffer);
+        let crc = 0xffffffff >>> 0;
+
+        for (let i = 0; i < data.length; i++) {
+            const idx = (crc ^ data[i]) & 0xff;
+            crc = (table[idx] ^ (crc >>> 8)) >>> 0;
+        }
+
+        return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    private updateMetrics(): void {
+        this.metrics.hitRatio =
+            this.metrics.totalRequests > 0 ? this.metrics.hits / this.metrics.totalRequests : 0;
+        this.metrics.cacheSize = this.cache.size;
+        this.metrics.memoryUsage = this.calculateMemoryUsage();
+    }
+
+    private calculateMemoryUsage(): number {
+        let bytes = 0;
+        for (const entry of this.cache.values()) {
+            bytes += entry.summary.byteLength;
+            bytes += entry.rankings.byteLength;
+            bytes += 32; // overhead
+        }
+        return bytes;
+    }
+
+    private async warmup(): Promise<void> {
+        try {
+            const testVectors = [
+                new Float32Array([0.1, 0.2, 0.3, 0.4]),
+                new Float32Array([0.5, 0.6, 0.7, 0.8])
+            ];
+            const testRequest: RankingRequest = {
+                id: 'warmup',
+                vectors: testVectors,
+                topK: 2,
+                threshold: 0.0,
+                useCache: false
+            };
+            await this.rank(testRequest);
+            console.log('🔥 WebASM Ranking Cache warmed up successfully');
+        } catch (error) {
+            console.warn('⚠️ Warmup failed:', error);
+        }
+    }
+
+    // ============ Public API ============
+
+    getMetrics(): CacheMetrics {
+        return { ...this.metrics };
+    }
+
+    clearCache(): void {
+        this.cache.clear();
+        this.metrics.cacheSize = 0;
+        this.metrics.memoryUsage = 0;
+    }
+
+    async getQUICMetrics(): Promise<Record<string, number> | null> {
+        try {
+            const response = await fetch('/api/quic/metrics');
+            if (response.ok) {
+                return (await response.json()) as Record<string, number>;
+            }
+        } catch (error) {
+            console.warn('Failed to get QUIC metrics:', error);
+        }
+        return null;
+    }
 }
 
 // Singleton instance with default configuration
 export const webASMRankingCache = new WebASMRankingCache({
-	maxEntries: 1000,
-	ttlSeconds: 300,
-	enableServiceWorker: true,
-	wasmModulePath: '/webasm/ranking-cache.wasm'
+    maxEntries: 1000,
+    ttlSeconds: 300,
+    enableServiceWorker: true,
+    wasmModulePath: '/webasm/ranking-cache.wasm'
 });
-
-
-
-

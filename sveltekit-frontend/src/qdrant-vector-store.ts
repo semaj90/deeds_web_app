@@ -12,56 +12,62 @@ import type { LegalEntity } from '$lib/types/sharedTypes';
 import * as crypto from 'crypto';
 
 // Reusing types from previous context where appropriate
-type QdrantCollectionsResponse = { collections?: Array<{ name, string }> };
+type QdrantCollectionsResponse = { collections?: Array<{ name: string }> };
 
 type QdrantFilterClause = {
-	key: string;
-	match?: { value: string | number };
-	range?: { gte?: number; lte?: number };
+    key: string;
+    match?: { value: string | number | boolean };
+    range?: { gte?: number; lte?: number };
 };
 
 type QdrantFilter = { must?: QdrantFilterClause[] } | undefined;
 
 interface QdrantSearchHit<T> {
-	id?: string | number;
-	score: number;
-	payload?: T;
+    id?: string | number;
+    score: number;
+    payload?: T;
 }
 
 interface ConversationPayload {
-	sessionId?: string;
-	turnIndex?: number;
-	userMessage?: string;
-	agentResponse?: string;
-	intent?: string;
-	hmmState?: number;
-	confidence?: number;
+    sessionId?: string;
+    turnIndex?: number;
+    userMessage?: string;
+    agentResponse?: string;
+    intent?: string;
+    hmmState?: number;
+    confidence?: number;
+    entityCount?: number;
+    timestamp?: number;
 }
 
 interface EntityPayload {
-	sessionId?: string;
-	entityType?: string;
-	entityValue?: string;
-	confidence?: number;
+    sessionId?: string;
+    entityType?: string;
+    entityValue?: string;
+    confidence?: number;
+    timestamp?: number;
+    startPos?: number;
+    endPos?: number;
 }
 
 interface SummaryPayload {
-	sessionId?: string;
-	summary?: string;
-	turnCount?: number;
-	currentState?: number;
-	confidence?: number;
+    sessionId?: string;
+    summary?: string;
+    turnCount?: number;
+    currentState?: number;
+    confidence?: number;
+    timestamp?: number;
 }
 
 // Environment variables
-const QDRANT_URL = process.env?.QDRANT_URL?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 
 // Collection names
 const COLLECTIONS = {
-	CONVERSATIONS: 'legal_conversations',
-	ENTITIES: 'legal_entities',
-	SUMMARIES: 'conversation_summaries'
+    CONVERSATIONS: 'legal_conversations',
+    ENTITIES: 'legal_entities',
+    SUMMARIES: 'conversation_summaries'
 } as const;
 
 // Embedding dimensions (embeddinggemma:latest)
@@ -69,313 +75,331 @@ const EMBEDDING_DIM = 768;
 
 /** Qdrant Vector Store Client */
 export class QdrantVectorStore {
-	private client: QdrantClient;
-	private initialized = false;
+    private client: QdrantClient;
+    private initialized = false;
 
-	constructor() {
-		this.client = new QdrantClient({
-			url: QDRANT_URL,
-			apiKey: QDRANT_API_KEY
-		});
-	}
+    constructor() {
+        this.client = new QdrantClient({
+            url: QDRANT_URL,
+            apiKey: QDRANT_API_KEY
+        });
+    }
 
-	/** Initialize Qdrant collections */
-	async initialize(): Promise<void> {
-		if (this.initialized) return;
-		try {
-			await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM);
-			await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM);
-			await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM);
-			this.initialized = true;
-			console.log('✓ Qdrant vector store initialized');
-		} catch (error) {
-			console.error('✘ Failed to initialize Qdrant:', error);
-			throw error;
-		}
-	}
+    /** Initialize Qdrant collections */
+    async initialize(): Promise<void> {
+        if (this.initialized) return;
+        try {
+            await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM);
+            this.initialized = true;
+            console.log('✓ Qdrant vector store initialized');
+        } catch (error) {
+            console.error('✘ Failed to initialize Qdrant:', error);
+            throw error;
+        }
+    }
 
-	/** Ensure collection exists, create if not */
-	private async ensureCollection(collectionName: string, size: number): Promise<void> {
-		try {(await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
-			const exists = (collections.collections ?? []).some((c) => c.name === collectionName);
+    /** Ensure collection exists, create if not */
+    private async ensureCollection(collectionName: string, size: number): Promise<void> {
+        try {
+            const collections = (await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
+            const exists = (collections.collections ?? []).some((c) => c.name === collectionName);
 
-			if (!exists) {
-				await this.client.createCollection(collectionName, {
-					vectors: { size: distance: 'Cosine'
-					},
-					optimizers_config: { default_segment_number: 2 },
-					replication_factor: 1
-				});
-				console.log(`✓ Created Qdrant collection: ${collectionName}`);
-			}
-		} catch (error) {
-			console.error(`✘ Error creating collection ${collectionName}:`, error);
-			throw error;
-		}
-	}
+            if (!exists) {
+                await this.client.createCollection(collectionName, {
+                    vectors: {
+                        size,
+                        distance: 'Cosine'
+                    },
+                    optimizers_config: { default_segment_number: 2 },
+                    replication_factor: 1
+                });
+                console.log(`✓ Created Qdrant collection: ${collectionName}`);
+            }
+        } catch (error) {
+            console.error(`✘ Error creating collection ${collectionName}:`, error);
+            throw error;
+        }
+    }
 
-	/** Store conversation turn with embedding */
-	async storeConversationTurn(
-		turnIndex: number,
-		userMessage: string,
-		agentResponse: string,
-		metadata?: { intent?: string, hmmState?: number, confidence?: number; entities?: LegalEntity[] }
-	): Promise<string> {
-		await this.ensureInitialized();
+    /** Store conversation turn with embedding */
+    async storeConversationTurn(
+        turnIndex: number,
+        userMessage: string,
+        agentResponse: string,
+        metadata?: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
+    ): Promise<string> {
+        await this.ensureInitialized();
 
-		const payload = {
-			sessionId: `session-${Date.now()}`,
-			turnIndex,
-			userMessage,
-			agentResponse,
-			intent: metadata?.intent,
-			hmmState: metadata?.hmmState,
-			confidence: metadata?.confidence,
-			entityCount: metadata?.entities?.length ?? 0,
-			timestamp: Date.now()
-		};
+        const payload: ConversationPayload = {
+            sessionId: `session-${Date.now()}`,
+            turnIndex,
+            userMessage,
+            agentResponse,
+            intent: metadata?.intent,
+            hmmState: metadata?.hmmState,
+            confidence: metadata?.confidence,
+            entityCount: metadata?.entities?.length ?? 0,
+            timestamp: Date.now()
+        };
 
-		const pointId = crypto.randomUUID();
-		const embedding = new Array(EMBEDDING_DIM).fill(0); // Placeholder
+        const pointId = crypto.randomUUID();
+        // In a real implementation, you would generate a real embedding here.
+        // For now, using a placeholder.
+        const embedding = new Array(EMBEDDING_DIM).fill(0.1);
 
-		await this.client.upsert(COLLECTIONS.CONVERSATIONS, {
-			wait: true,
-			points: [{ id: pointId, vector: embedding, payload }]
-		});
+        await this.client.upsert(COLLECTIONS.CONVERSATIONS, {
+            wait: true,
+            points: [{ id: pointId, vector: embedding, payload }]
+        });
 
-		return pointId;
-	}
+        return pointId;
+    }
 
-	/** Store entity with embedding */
-	async storeEntity(
-		sessionId: string,
-		entity: LegalEntity,
-		embedding: number[]
-	): Promise<string> {
-		await this.ensureInitialized();.createHash('sha256')
-			.update(`${sessionId}-${entity.type}-${entity.value}`)
-			.digest('hex')
-			.substring(0, 32);
+    /** Store entity with embedding */
+    async storeEntity(
+        sessionId: string,
+        entity: LegalEntity,
+        embedding: number[]
+    ): Promise<string> {
+        await this.ensureInitialized();
 
-		const payload: Record<string, unknown> = { sessionId: entityType: entity.type,
-			entityValue: entity.value,
-			confidence: entity.confidence,
-			timestamp: Date.now()
-		};
+        const pointId = crypto
+            .createHash('sha256')
+            .update(`${sessionId}-${entity.type}-${entity.value}`)
+            .digest('hex')
+            .substring(0, 32);
 
-		if (entity.span?.start !== undefined) payload.startPos = entity.span.start;
-		if (entity.span?.end !== undefined) payload.endPos = entity.span.end;
+        const payload: EntityPayload = {
+            sessionId,
+            entityType: entity.type,
+            entityValue: entity.value,
+            confidence: entity.confidence,
+            timestamp: Date.now()
+        };
 
-		await this.client.upsert(COLLECTIONS.ENTITIES, {
-			wait: true,
-			points: [{ id: pointId, vector: embedding, payload }]
-		});
+        if (entity.span?.start !== undefined) payload.startPos = entity.span.start;
+        if (entity.span?.end !== undefined) payload.endPos = entity.span.end;
 
-		return pointId;
-	}
+        await this.client.upsert(COLLECTIONS.ENTITIES, {
+            wait: true,
+            points: [{ id: pointId, vector: embedding, payload }]
+        });
 
-	/** Store conversation summary with embedding */
-	async storeSummary(
-		sessionId: string,
-		summary: string,
-		embedding: number[],
-		metadata?: { turnCount?: number, currentState?: number, confidence?: number }
-	): Promise<string> {
-		await this.ensureInitialized();.createHash('sha256')
-			.update(`summary-${sessionId}-${Date.now()}`)
-			.digest('hex')
-			.substring(0, 32);
+        return pointId;
+    }
 
-		const payload = { sessionId: summary: summary.substring(0, 2000),
-			turnCount: metadata?.turnCount ?? null,
-			currentState: metadata?.currentState ?? null,
-			confidence: metadata?.confidence ?? null,
-			timestamp: Date.now()
-		};
+    /** Store conversation summary with embedding */
+    async storeSummary(
+        sessionId: string,
+        summary: string,
+        embedding: number[],
+        metadata?: { turnCount?: number; currentState?: number; confidence?: number }
+    ): Promise<string> {
+        await this.ensureInitialized();
 
-		await this.client.upsert(COLLECTIONS.SUMMARIES, {
-			wait: true,
-			points: [{ id: pointId, vector: embedding, payload }]
-		});
+        const pointId = crypto
+            .createHash('sha256')
+            .update(`summary-${sessionId}-${Date.now()}`)
+            .digest('hex')
+            .substring(0, 32);
 
-		return pointId;
-	}
+        const payload: SummaryPayload = {
+            sessionId,
+            summary: summary.substring(0, 2000),
+            turnCount: metadata?.turnCount ?? undefined,
+            currentState: metadata?.currentState ?? undefined,
+            confidence: metadata?.confidence ?? undefined,
+            timestamp: Date.now()
+        };
 
-	/** Search similar conversations */
-	async searchSimilarConversations(
-		queryEmbedding: number[],
-		limit = 10,
-		filter?: { sessionId?: string, intent?: string, minConfidence?: number }
-	): Promise<
-		Array<{
-			score: number;
-			sessionId?: string;
-			turnIndex?: number;
-			userMessage?: string;
-			agentResponse?: string;
-			intent?: string;
-			hmmState?: number;
-		}>
-	> {
-		await this.ensureInitialized();
+        await this.client.upsert(COLLECTIONS.SUMMARIES, {
+            wait: true,
+            points: [{ id: pointId, vector: embedding, payload }]
+        });
 
-		const must: QdrantFilterClause[] = [];
-		if (filter?.sessionId) must.push({ key: 'sessionId', match: { value: filter.sessionId } });
-		if (filter?.intent) must.push({ key: 'intent', match: { value: filter.intent } });
-		if (filter?.minConfidence !== undefined)
-			must.push({ key: 'confidence', range: { gte: filter.minConfidence } });
+        return pointId;
+    }
 
-		const qdrantFilter: QdrantFilter = must.length > 0 ? { must } : undefined;
+    /** Search similar conversations */
+    async searchSimilarConversations(
+        queryEmbedding: number[],
+        limit = 10,
+        filter?: { sessionId?: string; intent?: string; minConfidence?: number }
+    ): Promise<
+        Array<{
+            score: number;
+            sessionId?: string;
+            turnIndex?: number;
+            userMessage?: string;
+            agentResponse?: string;
+            intent?: string;
+            hmmState?: number;
+        }>
+    > {
+        await this.ensureInitialized();
 
-		const searchResult = (await this.client.search(COLLECTIONS.CONVERSATIONS, {
-			vector: queryEmbedding,
-			limit,
-			with_payload: true,
-			filter: qdrantFilter
-		})) as unknown as QdrantSearchHit<ConversationPayload>[];
+        const must: QdrantFilterClause[] = [];
+        if (filter?.sessionId) must.push({ key: 'sessionId', match: { value: filter.sessionId } });
+        if (filter?.intent) must.push({ key: 'intent', match: { value: filter.intent } });
+        if (filter?.minConfidence !== undefined)
+            must.push({ key: 'confidence', range: { gte: filter.minConfidence } });
 
-		return searchResult.map((hit) => {
-			const p = hit?.payload|| {};
-			return {
-				score: hit.score,
-				sessionId: p.sessionId,
-				turnIndex: p.turnIndex,
-				userMessage: p.userMessage,
-				agentResponse: p.agentResponse,
-				intent: p.intent,
-				hmmState: p.hmmState
-			};
-		});
-	}
+        const qdrantFilter: QdrantFilter = must.length > 0 ? { must } : undefined;
 
-	/** Search similar entities */
-	async searchSimilarEntities(
-		queryEmbedding: number[],
-		entityType?: string,
-		limit = 10
-	): Promise<
-		Array<{
-			score: number;
-			sessionId?: string;
-			entityType?: string;
-			entityValue?: string;
-			confidence?: number;
-		}>
-	> {
-		await this.ensureInitialized();? { must: [{ key: 'entityType', match: { value, entityType } }] }
-			: undefined;
+        const searchResult = (await this.client.search(COLLECTIONS.CONVERSATIONS, {
+            vector: queryEmbedding,
+            limit,
+            with_payload: true,
+            filter: qdrantFilter
+        })) as unknown as QdrantSearchHit<ConversationPayload>[];
 
-		const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
-			vector: queryEmbedding,
-			limit,
-			with_payload: true,
-			filter
-		})) as unknown as QdrantSearchHit<EntityPayload>[];
+        return searchResult.map((hit) => {
+            const p = hit.payload || {};
+            return {
+                score: hit.score,
+                sessionId: p.sessionId,
+                turnIndex: p.turnIndex,
+                userMessage: p.userMessage,
+                agentResponse: p.agentResponse,
+                intent: p.intent,
+                hmmState: p.hmmState
+            };
+        });
+    }
 
-		return searchResult.map((hit) => {
-			const p = hit?.payload|| {};
-			return {
-				score: hit.score,
-				sessionId: p.sessionId,
-				entityType: p.entityType,
-				entityValue: p.entityValue,
-				confidence: p.confidence
-			};
-		});
-	}
+    /** Search similar entities */
+    async searchSimilarEntities(
+        queryEmbedding: number[],
+        entityType?: string,
+        limit = 10
+    ): Promise<
+        Array<{
+            score: number;
+            sessionId?: string;
+            entityType?: string;
+            entityValue?: string;
+            confidence?: number;
+        }>
+    > {
+        await this.ensureInitialized();
 
-	/** Find similar conversation summaries */
-	async findSimilarSummaries(
-		queryEmbedding: number[],
-		limit = 5
-	): Promise<
-		Array<{
-			score: number;
-			sessionId?: string;
-			summary?: string;
-			turnCount?: number;
-			currentState?: number;
-		}>
-	> {
-		await this.ensureInitialized();
+        const filter: QdrantFilter = entityType
+            ? { must: [{ key: 'entityType', match: { value: entityType } }] }
+            : undefined;
 
-		const searchResult = (await this.client.search(COLLECTIONS.SUMMARIES, {
-			vector: queryEmbedding,
-			limit,
-			with_payload: true
-		})) as unknown as QdrantSearchHit<SummaryPayload>[];
+        const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
+            vector: queryEmbedding,
+            limit,
+            with_payload: true,
+            filter
+        })) as unknown as QdrantSearchHit<EntityPayload>[];
 
-		return searchResult.map((hit) => {
-			const p = hit?.payload|| {};
-			return {
-				score: hit.score,
-				sessionId: p.sessionId,
-				summary: p.summary,
-				turnCount: p.turnCount,
-				currentState: p.currentState
-			};
-		});
-	}
+        return searchResult.map((hit) => {
+            const p = hit.payload || {};
+            return {
+                score: hit.score,
+                sessionId: p.sessionId,
+                entityType: p.entityType,
+                entityValue: p.entityValue,
+                confidence: p.confidence
+            };
+        });
+    }
 
-	/** Simple cluster analysis for entity types (lightweight) */
-	async getEntityClusters(entityType: string, minClusterSize: number = 3) {
-		await this.ensureInitialized();
+    /** Find similar conversation summaries */
+    async findSimilarSummaries(
+        queryEmbedding: number[],
+        limit = 5
+    ): Promise<
+        Array<{
+            score: number;
+            sessionId?: string;
+            summary?: string;
+            turnCount?: number;
+            currentState?: number;
+        }>
+    > {
+        await this.ensureInitialized();
 
-		const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, {
-			filter: { must: [{ key: 'entityType', match: { value, entityType } }] },
-			limit: 1000,
-			with_payload: true
-		})) as { points: { payload?: EntityPayload }[] };
+        const searchResult = (await this.client.search(COLLECTIONS.SUMMARIES, {
+            vector: queryEmbedding,
+            limit,
+            with_payload: true
+        })) as unknown as QdrantSearchHit<SummaryPayload>[];
 
-		const counts = new Map<string, { count: number; confidence?, number }>();
+        return searchResult.map((hit) => {
+            const p = hit.payload || {};
+            return {
+                score: hit.score,
+                sessionId: p.sessionId,
+                summary: p.summary,
+                turnCount: p.turnCount,
+                currentState: p.currentState
+            };
+        });
+    }
 
-		for (const p of scrollResult.points) {
-			const val = p.payload?.entityValue;
-			if (!val) continue;
+    /** Simple cluster analysis for entity types (lightweight) */
+    async getEntityClusters(entityType: string, minClusterSize: number = 3) {
+        await this.ensureInitialized();
 
-			const existing = counts.get(val) ?? { count: 0, confidence: undefined };
-			existing.count += 1;
-			if (p.payload?.confidence !== undefined) existing.confidence = p.payload.confidence;
-			counts.set(val, existing);
-		}
+        const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, {
+            filter: { must: [{ key: 'entityType', match: { value: entityType } }] },
+            limit: 1000,
+            with_payload: true
+        })) as { points: { payload?: EntityPayload }[] };
 
-		const clusters: Array<{ centroid: string;
-			members: Array<{ entityValue: string; confidence?, number }>;
-			size: number;
-		}> = [];
+        const counts = new Map<string, { count: number; confidence?: number }>();
 
-		for (const [entityValue, info] of counts.entries()) {
-			if (info.count >= minClusterSize) {
-				clusters.push({
-					centroid: entityValue,
-					members: [{ entityValue: confidence: info.confidence }],
-					size: info.count
-				});
-			}
-		}
+        for (const p of scrollResult.points) {
+            const val = p.payload?.entityValue;
+            if (!val) continue;
 
-		return clusters.sort((a, b) => b.size - a.size);
-	}
+            const existing = counts.get(val) ?? { count: 0, confidence: undefined };
+            existing.count += 1;
+            if (p.payload?.confidence !== undefined) existing.confidence = p.payload.confidence;
+            counts.set(val, existing);
+        }
 
-	/** Delete conversation data across collections */
-	async deleteConversationData(sessionId: string): Promise<void> {
-		await this.ensureInitialized();
+        const clusters: Array<{
+            centroid: string;
+            members: Array<{ entityValue: string; confidence?: number }>;
+            size: number;
+        }> = [];
 
-		const filter = { must: [{ key: 'sessionId', match: { value, sessionId } }] };
+        for (const [entityValue, info] of counts.entries()) {
+            if (info.count >= minClusterSize) {
+                clusters.push({
+                    centroid: entityValue,
+                    members: [{ entityValue, confidence: info.confidence }],
+                    size: info.count
+                });
+            }
+        }
 
-		await Promise.all([
-			this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }); this.client.delete(COLLECTIONS.ENTITIES, { filter }); this.client.delete(COLLECTIONS.SUMMARIES, { filter })
-		]);
-	}
+        return clusters.sort((a, b) => b.size - a.size);
+    }
 
-	/** Ensure store is initialized */
-	private async ensureInitialized(): Promise<void> {
-		if (!this.initialized) await this.initialize();
-	}
+    /** Delete conversation data across collections */
+    async deleteConversationData(sessionId: string): Promise<void> {
+        await this.ensureInitialized();
+
+        const filter = { must: [{ key: 'sessionId', match: { value: sessionId } }] };
+
+        await Promise.all([
+            this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }),
+            this.client.delete(COLLECTIONS.ENTITIES, { filter }),
+            this.client.delete(COLLECTIONS.SUMMARIES, { filter })
+        ]);
+    }
+
+    /** Ensure store is initialized */
+    private async ensureInitialized(): Promise<void> {
+        if (!this.initialized) await this.initialize();
+    }
 }
 
 // Export singleton instance
 export const qdrantVectorStore = new QdrantVectorStore();
-
-
-

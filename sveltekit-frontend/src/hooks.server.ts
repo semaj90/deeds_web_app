@@ -45,7 +45,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     } else {
       const { session, user } = await validateSession(sessionId);
 
-      if ($1?.$2) {
+      if (session && session.fresh) {
         setSessionCookie(event.cookies, session.id);
       }
 
@@ -90,5 +90,3 @@ export const handleError: HandleServerError = ({ error, event }) => {
     code: errorId,
   };
 };
-
-

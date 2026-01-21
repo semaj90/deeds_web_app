@@ -15,6 +15,7 @@ export function legalCn(...inputs: ClassValue[]): string {
 	const baseClasses = 'font-mono text-yorha-text-primary';
 	return clsx(baseClasses, ...inputs);
 }
+
 /**
  * Generate confidence-based styling classes
  */
@@ -25,10 +26,11 @@ export function confidenceClass(confidence: number): string {
 	if (confidence >= 30) return 'text-orange-400 bg-orange-500/10 border-orange-500/30';
 	return 'text-red-400 bg-red-500/10 border-red-500/30';
 }
+
 /**
  * Generate priority-based styling classes
  */
-export function priorityClass(priority, 'low' | 'medium' | 'high' | 'critical'): string {
+export function priorityClass(priority: 'low' | 'medium' | 'high' | 'critical'): string {
 	switch (priority) {
 		case 'critical':
 			return 'text-red-400 bg-red-500/20 border-red-500/40 ring-red-500/20';
@@ -42,5 +44,3 @@ export function priorityClass(priority, 'low' | 'medium' | 'high' | 'critical'):
 			return 'text-gray-400 bg-gray-500/20 border-gray-500/40 ring-gray-500/20';
 	}
 }
-
-
