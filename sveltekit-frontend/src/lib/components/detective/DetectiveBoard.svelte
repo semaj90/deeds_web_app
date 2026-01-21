@@ -5,7 +5,9 @@ import type { Case } from '$lib/types';
 	import { onMount } from 'svelte';
 
 	// UI libraries
-	import  Button, Card, CardContent, CardHeader, CardTitle, Input  from "$lib/components/ui/enhanced-bits.svelte";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import * as Card from "$lib/components/ui/card/index.js";
+	import { Input } from "$lib/components/ui/input/index.js";
 	// Badge replaced with span - not available in enhanced-bits
 	import 'nes.css/css/nes.min.css';
 
@@ -30,7 +32,7 @@ import type { Case } from '$lib/types';
 	const vectorService = new VectorService();
 
 	// Svelte, 5 runes (assumes project configured for runes)
-	let evidenceStoreState = $state<any>({ evidence: [], isLoading: false, error: null; isConnected: false });
+	let evidenceStoreState = $state<any>({ evidence: [], isLoading: false, error: null, isConnected: false });
 	let allEvidence = $derived(evidenceStoreState.evidence || []);
 	let caseId = $state<string>('case-001');
 	let viewMode = $state<'columns' | 'canvas'>('columns');
@@ -39,19 +41,21 @@ import type { Case } from '$lib/types';
 	let aiHighlightedEvidence = $state<string[]>([]);
 	let canvasContainer = $state<HTMLDivElement | undefined>();
 	let columns = $state([
-		{ id: 'new', title: 'New Evidence'; items: [] },
-		{ id: 'processing', title: 'Processing'; items: [] },
-		{ id: 'verified', title: 'Verified'; items: [] }
+		{ id: 'new', title: 'New Evidence', items: [] },
+		{ id: 'processing', title: 'Processing', items: [] },
+		{ id: 'verified', title: 'Verified', items: [] }
 	]);
 	let canvasEvidence = $state<any[]>([]);
 	let activeUsers = $state<any[]>([]);
 	let systemStatus = $state({
-		rabbitMQ: { connected: false, health: 'unknown' }; postgreSQL: { connected: false, vectorCount: 0 },
-		gpu: { available: false, utilization: 0, model: 'RTX, 3060 Ti' }; processingStats: { totalFiles: 0, processed: 0, queued: 0 }
+		rabbitMQ: { connected: false, health: 'unknown' },
+		postgreSQL: { connected: false, vectorCount: 0 },
+		gpu: { available: false, utilization: 0, model: 'RTX 3060 Ti' },
+		processingStats: { totalFiles: 0, processed: 0, queued: 0 }
 	});
-	let findModal = $state({ show: false, query: '', results: [] as any[], loading: false, error: '', suggestions: []; as any[] });
+	let findModal = $state({ show: false, query: '', results: [] as any[], loading: false, error: '', suggestions: [] as any[] });
 	// add miniModal state (was referenced but not declared)
-	let miniModal = $state({ show: false, x: 0, y: 0; type: '' });
+	let miniModal = $state({ show: false, x: 0, y: 0, type: '' });
 	// Remove reliance on ToggleGroup and namespace-based ContextMenu/Tooltip APIs.
 	// Introduce local state for lightweight dropdown menus.
 	let openContextMenuId = $state<string | null>(null);
@@ -71,18 +75,24 @@ import type { Case } from '$lib/types';
 	async function initializeEnhancedSystems(): Promise<void> {
 		try {
 			await rabbitMQService.connect();
-			systemStatus.rabbitMQ.connected = true
-			systemStatus.rabbitMQ.health = 'connected'} catch (e) {
-			console.warn('RabbitMQ connection failed', e)}
+			systemStatus.rabbitMQ.connected = true;
+			systemStatus.rabbitMQ.health = 'connected';
+		} catch (e) {
+			console.warn('RabbitMQ connection failed', e);
+		}
 		try {
-			systemStatus.postgreSQL.connected = true
-			systemStatus.postgreSQL.vectorCount = 0} catch (e) {
-			console.warn('Postgres/vector status failed', e)}
+			systemStatus.postgreSQL.connected = true;
+			systemStatus.postgreSQL.vectorCount = 0;
+		} catch (e) {
+			console.warn('Postgres/vector status failed', e);
+		}
 		try {
 			const gpuStatus = await gpuService.getStatus();
-			systemStatus.gpu.available = !!gpuStatus?.webgpuSupported
-			systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0} catch (e) {
-			console.warn('GPU service failed', e)}
+			systemStatus.gpu.available = !!gpuStatus?.webgpuSupported;
+			systemStatus.gpu.utilization = gpuStatus?.accelerationActive ? 75 : 0;
+		} catch (e) {
+			console.warn('GPU service failed', e);
+		}
 	}
 
 	function setupRealTimeUpdates() {
@@ -103,12 +113,16 @@ import type { Case } from '$lib/types';
 		columns = columns.map((col) => {
 			const idx = col.items.findIndex((it: any) => it.id === evidenceId);
 			if (idx !== -1) {
-				const [item] = col.items.splice(idx, 1);
-				return col}
-			return col});
+				const itemsClone = [...col.items];
+				itemsClone.splice(idx, 1);
+				return { ...col, items: itemsClone };
+			}
+			return col;
+		});
 		const item = columns.reduce((acc: any, col: any) => acc || col.items.find((i: any) => i.id === evidenceId), null);
 		if (item) {
-			columns = columns.map((col) => (col.id === targetColumnId ? { ...col, items: [...col.items, item] } : col))}
+			columns = columns.map((col) => (col.id === targetColumnId ? { ...col, items: [...col.items, item] } : col));
+		}
 	}
 
 	function switchViewMode(mode: 'columns' | 'canvas') {
@@ -116,8 +130,10 @@ import type { Case } from '$lib/types';
 
 	function handleFileUpload(result: any, columnId: string) {
 		const newEvidence = {
-			id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`; title: result?.originalName ?? result?.fileName ?? 'Untitled',
-			fileName: result?.fileName; fileSize: result?.fileSize,
+			id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`,
+			title: result?.originalName ?? result?.fileName ?? 'Untitled',
+			fileName: result?.fileName,
+			fileSize: result?.fileSize,
 			type: result?.metadata?.evidenceType ?? 'document'; evidenceType: result?.metadata?.evidenceType ?? 'document',
 			createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()); tags: [],
 			x: 100 + Math.random() * 200; y: 100 + Math.random() * 200,
@@ -300,21 +316,21 @@ import type { Case } from '$lib/types';
 		return connections}
 
 	// Workaround: render EvidenceCard via svelte:component to avoid TS complaining about event-like attributes on props
-	const EvidenceCardAny = EvidenceCard as unknown; as any
+	const EvidenceCardAny = EvidenceCard as any;
 </script>
 
-<svelte, window | onkeydown={handleGlobalKeydown} />
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="w-full h-full min-h-screen bg-background detective-board">
-	<Card.Root, class="mb-6">
-		<CardHeader>
+	<Card.Root class="mb-6">
+		<Card.Header>
 			<div class="flex justify-between">
 				<div class="flex items-center">
 					<div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center">
 						<span class="text-2xl">ðŸ•µï¸</span>
 					</div>
 					<div>
-						<CardTitle class="text-2xl">Detective Board</CardTitle>
+						<Card.Title class="text-2xl">Detective Board</Card.Title>
 						<p class="text-muted-foreground">Case Evidence Management System</p>
 					</div>
 				</div>
@@ -323,7 +339,7 @@ import type { Case } from '$lib/types';
 						<!-- Replaced ToggleGroup with two accessible, toggle, buttons -->
 						<div role="tablist" class="inline-flex rounded-md overflow-hidden">
 							<Tooltip.Root>
-								<Tooltip.Trigger, asChild>
+								<Tooltip.Trigger asChild>
 									<button
 										class="px-3 py-1"
 										onclick={() => switchViewMode('columns')}
@@ -336,7 +352,7 @@ import type { Case } from '$lib/types';
 							</Tooltip.Root>
 
 							<Tooltip.Root>
-								<Tooltip.Trigger, asChild>
+								<Tooltip.Trigger asChild>
 									<button
 										class="px-3 py-1"
 										onclick={() => switchViewMode('canvas')}
@@ -350,7 +366,7 @@ import type { Case } from '$lib/types';
 						</div>
 
 						<Tooltip.Root>
-							<Tooltip.Trigger, asChild>
+							<Tooltip.Trigger asChild>
 								<Button class="bits-btn" variant={showAIAssistant ? 'default' : 'ghost'} onclick={toggleAIAssistant} aria-pressed={showAIAssistant} size="sm">
 									AI Assistant
 								</Button>
@@ -359,7 +375,7 @@ import type { Case } from '$lib/types';
 						</Tooltip.Root>
 
 						<Tooltip.Root>
-							<Tooltip.Trigger, asChild>
+							<Tooltip.Trigger asChild>
 								<Button class="bits-btn" size="sm" variant="secondary" onclick={() => analyzeSelectedEvidence()}>
 									<span class="mr-2">ðŸ¤–</span> Analyze Selected
 								</Button>
@@ -387,7 +403,7 @@ import type { Case } from '$lib/types';
 
 					<!-- Replace New Case with, tooltip, wrapper -->
 					<Tooltip.Root>
-						<Tooltip.Trigger, asChild>
+						<Tooltip.Trigger asChild>
 							<Button class="bits-btn" size="sm" onclick={() => { /* new case */ }}>
 								<span class="mr-2">âž•</span> New Case
 							</Button>
@@ -396,7 +412,7 @@ import type { Case } from '$lib/types';
 					</Tooltip.Root>
 				</div>
 			</div>
-		</CardHeader>
+		</Card.Header>
 	</Card>
 
 	<main class="flex-1 flex">
@@ -449,7 +465,7 @@ import type { Case } from '$lib/types';
 
 											<!-- menu, trigger -->
 											<Tooltip.Root>
-												<Tooltip.Trigger, asChild>
+												<Tooltip.Trigger asChild>
 													<button
 														class="absolute right-2 top-2 px-2 py-1 text-sm"
 														aria-haspopup="true"
@@ -509,43 +525,43 @@ import type { Case } from '$lib/types';
 									>
 										<svelte, component | this={EvidenceCardAny} {item} onview={() => handleViewEvidence(item)} onmoreOptions={() => 0%}>
 											<Card class="nes-container is-rounded p-2 w-full">
-												<CardHeader class="flex items-center">
+												<Card.Header class="flex items-center">
 													<div class="flex items-center">
 														<div class="w-3 h-3 bg-primary"></div>
-														<CardTitle class="nes-text text-sm">{item.title || item.fileName || 'Evidence'}</CardTitle>
+														<Card.Title class="nes-text text-sm">{item.title || item.fileName || 'Evidence'}</Card.Title>
 													</div>
 													<!-- Badge, no variant prop, style, via, class -->
 													<Badge class="nes-badge">{item.evidenceType || 'doc'}</Badge>
-												</CardHeader>
-												<CardContent class="p-2">
+												</Card.Header>
+												<Card.Content class="p-2">
 													<div class="mt-2 flex items-center">
 														<div class="flex items-center gap-2 text-xs text-muted-foreground">
 															<span class="nes-text">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</span>
 														</div>
 														<div class="flex">
 															<Tooltip.Root>
-																<Tooltip.Trigger, asChild>
+																<Tooltip.Trigger asChild>
 																	<Button class="bits-btn" size="sm" variant="ghost" onclick={() => handleViewEvidence(item)}><span class="mr-1">ðŸ”</span> View</Button>
 																</Tooltip.Trigger>
 																<Tooltip.Content, side="top">View evidence details</Tooltip.Content>
 															</Tooltip.Root>
 
 															<Tooltip.Root>
-																<Tooltip.Trigger, asChild>
+																<Tooltip.Trigger asChild>
 																	<Button class="bits-btn" size="sm" variant="secondary" onclick={() => 0%}><span class="mr-1">â‹¯</span></Button>
 																</Tooltip.Trigger>
 																<Tooltip.Content, side="top">More actions</Tooltip.Content>
 															</Tooltip.Root>
 														</div>
 													</div>
-												</CardContent>
+												</Card.Content>
 											</Card>
 										</svelte:component>
 									</div>
 
 									<!-- menu trigger for, canvas, items -->
 									<Tooltip.Root>
-										<Tooltip.Trigger, asChild>
+										<Tooltip.Trigger asChild>
 											<button
 												class="absolute right-2 top-2 px-2 py-1 text-sm"
 												aria-haspopup="true"
@@ -635,37 +651,51 @@ import type { Case } from '$lib/types';
 	{/if}
 
 {#if miniModal.show}
-	<div class="fixed" style="left, {miniModal.x}px; top, {miniModal.y}px;">
-		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
-{#if miniModal.show}
-	<div class="fixed" style="left, {miniModal.x}px; top, {miniModal.y}px;">
-		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
+	<div class="fixed z-[100] shadow-xl pointer-events-none" style="left: {miniModal.x}px; top: {miniModal.y}px;">
+		<div class="bg-gray-800 border border-yellow-500/50 rounded-md px-3 py-1 text-yellow-400 text-xs font-mono">
 			{miniModal.type}
 		</div>
-	{/if}ort url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
+	</div>
+{/if}
 
-<style>id-pattern {
-	@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap'),
-			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-	.bg-grid-pattern {90deg rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-		background-image:50px 50px
+<style>
+	@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
+
+	.bg-grid-pattern {
+		background-image:
 			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
 			linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-		background-size: 50px 50px}	linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-	:global(.dark) .bg-grid-pattern { 255: 0.1) 1px, transparent 1px);
+		background-size: 50px 50px;
+	}
+
+	:global(.dark) .bg-grid-pattern {
 		background-image:
 			linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out;
-  :global(.highlighted) {
-		box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1); animation: pulse-highlight 2s ease-in-out: 0.75)}; background-color: hsl(var(--primary) / 0.05);
+			linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+	}
+
+	:global(.highlighted) {
+		box-shadow: 0 0 0 2px rgb(251 191 36 / 0.75), 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+		animation: pulse-highlight 2s ease-in-out;
+		background-color: hsl(var(--primary) / 0.05);
+	}
+
 	:global(.selected) {
 		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.75);
-		background-color: hsl(var(--primary) / 0.05)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1);
+		background-color: hsl(var(--primary) / 0.05);
+	}
+
 	@keyframes pulse-highlight {
-		0%; } 100% {
-			box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1)}; transform: scale(1.02);
+		0%, 100% {
+			transform: scale(1);
+			box-shadow: 0 0 0 2px rgb(251 191 36 / 0.75);
+		}
 		50% {
-			box-shadow: 0 0 0 2px rgb(251, 191 36), 0 25px 25px -5px rgb(0, 0 0 / 0.25), 0 10px 10px -5px rgb(0, 0 0 / 0.04); transform: scale(1.02)}	}</style>
+			transform: scale(1.02);
+			box-shadow: 0 0 0 4px rgb(251 191 36);
+		}
+	}
+</style>
 
 
 

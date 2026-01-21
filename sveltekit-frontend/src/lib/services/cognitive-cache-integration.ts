@@ -27,32 +27,34 @@ if (!browser) {
 		.then(async (module: any) => {
 			redisClient = await module.createRedisClient();
 		})
-		.ca(: anyt)ch((e) => console.error('Failed to load Redis client:', e));
+		.catch((e: any) => console.error('Failed to load Redis client:', e));
 }
 
 // Thread synchronization primitives
 interface ThreadSafeCache {
- mutex: AsyncMutex; data: Map<string, unknown>;
+ mutex: AsyncMutex;
+ data: Map<string, unknown>;
  jsonbIndex: Map<string, JsonbDocument>;
  gpuAccelerated: boolean;
 }
 
 interface JsonbDocument {
- id: string; content: unknown;
- metadata: { lastModified: number;
- accessCount: number; gpuProcessed: boolean;
- threadId?: string;
- [key: string]: unknown;
+ id: string;
+ content: unknown;
+ metadata: {
+  lastModified: number;
+  accessCount: number;
+  gpuProcessed: boolean;
+  threadId?: string;
+  [key: string]: unknown;
  };
-}
-
-// Simple async mutex for thread synchronization
+}// Simple async mutex for thread synchronization
 class AsyncMutex {
  private _locked = false;
  private _waiting: Array<() => void> = [];
 
  async acquire(): Promise<() => void> {
- return n(ew Pro: anym)ise((resolve) => {
+ return new Promise((resolve: any) => {
  if (!this._locked) {
  this._locked = true;
  resolve(() => this.release());
@@ -189,9 +191,11 @@ export class CognitiveCacheService {
  return null;
  }
  /** * JSONB query with thread-safe filtering * Supports complex JSON path operations */
- async queryJsonb(
- jsonPath: string, value: unknown, operator: '@>' | '@? ' :: any: : any: : anyany: anyany '@@' | '->' | '->>' = '@>'
- ): Promise<JsonbDocument[]> {
+	async queryJsonb(
+		jsonPath: string,
+		value: unknown,
+		operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
+	): Promise<JsonbDocument[]> {
  const release = await internalCache.mutex.acquire();
  try {
  const results: JsonbDocument[] = [];
@@ -382,7 +386,8 @@ export async function queryLegalDocuments(
     const docs = await queryJsonb(`metadata.${key}`, value, '@>');
     results.push(...docs.map((d: any) => d.content as LegalDocument));
   }
-  // Remove duplicates(doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
+  // Remove duplicates
+(doc: any, index: any, self: any) => index === self.findIndex((d: any) => d.caseId === doc.caseId)
   );
   return unique;
 }

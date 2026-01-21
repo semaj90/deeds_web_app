@@ -3,19 +3,17 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Progress } from "$lib/components/ui/progress/index.js";
-  import {
-    Activity,
-    AlertTriangle,
-    BarChart3,
-    CheckCircle2,
-    Cloud,
-    Cpu,
-    RefreshCcw,
-    Server,
-    Shield,
-    Terminal,
-    Zap
-  } from 'lucide-svelte';
+  import Activity from 'lucide-svelte/icons/activity';
+  import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
+  import CircleCheck from 'lucide-svelte/icons/circle-check';
+  import Cloud from 'lucide-svelte/icons/cloud';
+  import Cpu from 'lucide-svelte/icons/cpu';
+  import RefreshCcw from 'lucide-svelte/icons/refresh-ccw';
+  import Server from 'lucide-svelte/icons/server';
+  import Shield from 'lucide-svelte/icons/shield';
+  import Terminal from 'lucide-svelte/icons/terminal';
+  import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
+  import Zap from 'lucide-svelte/icons/zap';
   import { onDestroy, onMount } from 'svelte';
 
   // System State with Svelte 5 Runes
@@ -229,7 +227,7 @@
       <Card.Content>
         <div class="space-y-3">
           <div class="p-3 bg-muted/50 rounded-lg border border-border/50 flex gap-3">
-            <CheckCircle2 class="w-5 h-5 text-green-500 mt-0.5" />
+            <CircleCheck class="w-5 h-5 text-green-500 mt-0.5" />
             <div>
               <div class="text-sm font-semibold">PostgreSQL Mirroring Complete</div>
               <p class="text-xs text-muted-foreground">Database synchronization finished successfully across all nodes.</p>
@@ -238,7 +236,7 @@
           </div>
 
           <div class="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 flex gap-3">
-            <AlertTriangle class="w-5 h-5 text-yellow-500 mt-0.5" />
+            <TriangleAlert class="w-5 h-5 text-yellow-500 mt-0.5" />
             <div>
               <div class="text-sm font-semibold">Inference Latency Spike</div>
               <p class="text-xs text-muted-foreground">Ollama queue increased by 25%. Automatic scaling triggered.</p>
