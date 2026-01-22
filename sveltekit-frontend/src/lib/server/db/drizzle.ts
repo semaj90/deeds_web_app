@@ -7,7 +7,7 @@ import qdrantClient from '$lib/services/qdrant-client';
 import { eq, sql } from 'drizzle-orm';
 import { Client as MinioClient } from 'minio';
 import lazyDb from './client.js';
-import * as schema from './schema-unified.js';
+import * as schema from './schema.ts';
 
 const _CFG: Record<string, any> =
 	typeof globalThis !== 'undefined' && (globalThis as any)._CFG

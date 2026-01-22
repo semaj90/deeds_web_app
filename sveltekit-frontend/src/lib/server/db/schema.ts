@@ -9,8 +9,8 @@ export {
     JURISDICTIONS, auditOperationEnum,
     auditResourceTypeEnum,
     citationTags,
-    evidenceTags, jurisdictionEnum, ragIndexMetadata, type AuditLogEntry,
-    // auditLog, // Excluded to avoid conflict with schema-postgres.ts$1;$2} from './schema-evidence-crud.ts';
+    evidenceTags, jurisdictionEnum, ragIndexMetadata, type AuditLogEntry
+} from './schema-evidence-crud.ts';
 
 // Phase 80: Chat Messages Schema
 export {
@@ -20,11 +20,12 @@ export {
 
 // ACE Web Ingestion Schema
 export {
-    aceChunks, aceDocs, aceSources, type AceChunk,$1;$2} from '../../db/schema/ace-web.ts';
+    aceChunks, aceDocs, aceSources, type AceChunk
+} from '../../db/schema/ace-web.ts';
 
 // Canvas & Autosaves Schema (Phase 76+ / NES Integration)
-export * from './schema-canvas.ts';
 export * from './schema-canvas-autosaves.ts';
+export * from './schema-canvas.ts';
 
 // Phase 89 Preserved Tables - DO NOT DELETE
 // Contains 1.2M+ records of error analysis data

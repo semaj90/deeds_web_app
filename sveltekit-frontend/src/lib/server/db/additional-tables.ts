@@ -1,17 +1,17 @@
 // Additional Legal AI Database Tables
 // These will be imported and added to the main unified-schema.ts
-import { text, jsonb } from 'drizzle-orm/pg-core';
 import type {
- pgTable,
- uuid,
- varchar,
- timestamp,
- integer,
- decimal,
- boolean,
+    boolean,
+    decimal,
+    integer,
+    pgTable,
+    timestamp,
+    uuid,
+    varchar,
 } from 'drizzle-orm/pg-core';
+import { jsonb, text } from 'drizzle-orm/pg-core';
 import type { vector } from 'pgvector/drizzle-orm';
-import type { users, cases, evidence, legalDocuments } from './schema-postgres.ts';
+import type { cases, evidence, legalDocuments, users } from './schema-postgres.ts';
 
 // Evidence Chain of Custody
 export const evidenceChainOfCustody = pgTable('evidence_chain_of_custody', {
@@ -22,7 +22,8 @@ export const evidenceChainOfCustody = pgTable('evidence_chain_of_custody', {
  custodian: uuid('custodian')
  .references(() => users.id)
  .notNull(),
- action: varchar('action', { length: 50 }).notNull(), // 'received', 'transferred', 'analyzed', 'stored', 'destroyed', timestamp: timestamp('timestamp', { mode: 'date' }).defaultNow().notNull(),
+ action: varchar('action', { length: 50 }).notNull(), // 'received', 'transferred', 'analyzed', 'stored', 'destroyed'
+ timestamp: timestamp('timestamp', { mode: 'date' }).defaultNow().notNull(),
  location: varchar('location', { length: 255 }).notNull(),
  condition: text('condition').notNull(),
  notes: text('notes'),
@@ -42,11 +43,13 @@ export const caseAssignments = pgTable('case_assignments', {
  userId: uuid('user_id')
  .references(() => users.id)
  .notNull(),
- role: varchar('role', { length: 50 }).notNull(), // 'lead_attorney', 'associate', 'paralegal', 'investigator', assignedAt: timestamp('assigned_at', { mode: 'date' }).defaultNow().notNull(),
+ role: varchar('role', { length: 50 }).notNull(), // 'lead_attorney', 'associate', 'paralegal', 'investigator'
+ assignedAt: timestamp('assigned_at', { mode: 'date' }).defaultNow().notNull(),
  assignedBy: uuid('assigned_by')
  .references(() => users.id)
  .notNull(),
- status: varchar('status', { length: 20 }).default('active').notNull(), // 'active', 'inactive', 'completed', permissions: jsonb('permissions').default({}),
+ status: varchar('status', { length: 20 }).default('active').notNull(), // 'active', 'inactive', 'completed'
+ permissions: jsonb('permissions').default({}),
  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
@@ -101,7 +104,8 @@ export const ragMessages = pgTable('rag_messages', {
  sessionId: uuid('session_id')
  .references(() => ragSessions.id)
  .notNull(),
- role: varchar('role', { length: 20 }).notNull(), // 'user', 'assistant', 'system', content: text('content').notNull(),
+ role: varchar('role', { length: 20 }).notNull(), // 'user', 'assistant', 'system'
+ content: text('content').notNull(),
  embedding: vector('embedding', { dimensions: 384 }),
  sources: jsonb('sources').default([]),
  confidence: decimal('confidence', { precision: 3, scale: 2 }),
@@ -110,7 +114,7 @@ export const ragMessages = pgTable('rag_messages', {
 });
 
 // Document Chunks for RAG
-export const documentChunks = pgTable('document_chunks', {
+export const additionalDocumentChunks = pgTable('document_chunks', {
  id: uuid('id').primaryKey().defaultRandom(),
  documentId: uuid('document_id')
  .references(() => legalDocuments.id)
@@ -130,7 +134,8 @@ export const caseEmbeddings = pgTable('case_embeddings', {
  .references(() => cases.id)
  .notNull(),
  embedding: vector('embedding', { dimensions: 384 }),
- embeddingType: varchar('embedding_type', { length: 50 }).notNull(), // 'description', 'summary', 'full_content', sourceField: varchar('source_field', { length: 100 }).notNull(),
+ embeddingType: varchar('embedding_type', { length: 50 }).notNull(), // 'description', 'summary', 'full_content'
+ sourceField: varchar('source_field', { length: 100 }).notNull(),
  model: varchar('model', { length: 100 }).default('nomic-embed-text').notNull(),
  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
