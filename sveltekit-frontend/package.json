@@ -952,6 +952,7 @@
     "qdrant-client": "^0.0.1",
     "sharp": "0.32.6",
     "svelte-check": "^4.3.1",
+    "svelte-dnd-action": "0.9.69",
     "svelte-tiptap": "^3.0.1",
     "sveltekit-sse": "0.14.3",
     "sveltekit-superforms": "^2.28.0",

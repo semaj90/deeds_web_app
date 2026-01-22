@@ -26,7 +26,7 @@
   let selectedNode = $state<Node | null>(null);
   let isLoading = $state(true);
   let error = $state<string | null>(null);
-  let svgElement = $state<SVGSVGElement | null>(null);
+  let svgElement = $state<SVGSVGElement | null>(null); $state<SVGSVGElement | null>(null);
 
   let isDragging = $state(false);
   let draggedNode = $state<Node | null>(null);
