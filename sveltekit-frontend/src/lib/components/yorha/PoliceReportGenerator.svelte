@@ -1,6 +1,5 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
- // Migrated from createEventDispatcher to callback props;
+  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
  id: string; title: string;
@@ -13,24 +12,36 @@ import { createEventDispatcher } from 'svelte';
  id: string;
  caseId?: string; generatedAt: string;
  type: string; content: string;
- sections: Array<{ title: string; content, string }>;
+ sections: Array<{ title: string; content: string }>;
  metadata: { narrativeProvided: boolean;
  evidenceCount: number; model: string;
  };
  }
 
- let { caseId = null, initialEvidence = [] } = $props<{
- caseId?: string | null;
- initialEvidence?, Evidence[];
- }>();
+ interface Props {
+  caseId?: string | null;
+  initialEvidence?: Evidence[];
+  onReportGenerated?: (data: { report: PoliceReport }) => void;
+ }
 
- const dispatch = createEventDispatcher();
+ let {
+  caseId = 'case-001',
+  initialEvidence = [],
+  onReportGenerated
+ }: Props = $props();
 
  let narrative = $state('');
- let selectedEvidence = $state <Evidence[]>(initialEvidence);
+ let selectedEvidence = $state<Evidence[]>([]);
  let isGenerating = $state(false);
- let generatedReport = $state <PoliceReport, null>(null);
- let activeSection = $state <string | null>(null);
+ let generatedReport = $state<PoliceReport | null>(null);
+ let activeSection = $state<string | null>(null);
+
+ // Initialize evidence from props once
+ $effect(() => {
+   if (selectedEvidence.length === 0 && initialEvidence.length > 0) {
+     selectedEvidence = [...initialEvidence];
+   }
+ });
 
  async function generateReport() {
  if (!narrative.trim() && selectedEvidence.length === 0) {
@@ -46,8 +57,10 @@ import { createEventDispatcher } from 'svelte';
  headers: {
  'Content-Type': 'application/json'
  },
- body: JSON.stringify({ narrative: narrative.trim( evidence: selectedEvidence,
- caseId
+ body: JSON.stringify({
+   narrative: narrative.trim(),
+   evidence: selectedEvidence,
+   caseId
  })
  });
 
@@ -58,7 +71,7 @@ import { createEventDispatcher } from 'svelte';
  const report = await response.json();
  generatedReport = report;
 
- dispatch('reportGenerated', { report });
+ if (onReportGenerated) onReportGenerated({ report });
  } catch (error) {
  console.error('Error generating police report:', error);
  alert('Failed to generate police report. Please try again.');
@@ -141,26 +154,27 @@ import { createEventDispatcher } from 'svelte';
  <h2 class="text-xl font-bold text-blue-400">Auto Police Report Generator</h2>
  </div>
 
- <div class="grid grid-cols-1 lg, grid-cols-2 gap-6">
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
  <!-- Input Section -->
  <div class="space-y-6">
  <!-- Narrative Input -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <label for="narrative-input" class="block text-sm font-medium text-slate-300 mb-2">
  Victim/Reporting Party Narrative
  </label>
  <textarea
+ id="narrative-input"
  bind:value={narrative}
  placeholder="Describe what happened... (e.g., 'I was walking home when I noticed someone following me...')"
- class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus: outline-none, focus: ring-2, focus:ring-blue-500 resize-none"
+ class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
  ></textarea>
  </div>
 
  <!-- Evidence Selection -->
  <div>
- <label class="block text-sm font-medium text-slate-300 mb-2">
+ <span class="block text-sm font-medium text-slate-300 mb-2">
  Evidence to Include
- </label>
+ </span>
  <div class="bg-slate-800 border border-slate-600 rounded-lg p-3 min-h-32">
  {#if selectedEvidence.length === 0}
  <p class="text-slate-500 text-center py-8">

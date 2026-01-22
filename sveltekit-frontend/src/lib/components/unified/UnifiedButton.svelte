@@ -68,7 +68,7 @@
   let isPressed = $state<boolean>(false);
 
   // reactive spring for confidence (smooth transitions)
-  const confidenceSpring = spring(legalContext?.confidence ?? 0, {
+  const confidenceSpring = spring(0, {
     stiffness: 0.3,
     damping: 0.8
   });

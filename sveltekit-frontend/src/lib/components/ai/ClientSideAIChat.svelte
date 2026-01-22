@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { webAssemblyAIAdapter } from '$lib/adapters/webasm-ai-adapter';
-  import { Badge } from "$lib/components/ui/badge/index.js";
   import { Brain, Cpu, Zap } from 'lucide-svelte';
+  import { webAssemblyAIAdapter } from '../../adapters/webasm-ai-adapter';
+  import Badge from "../ui/badge/Badge.svelte";
 
   interface Props {
     collapsed?: boolean;
@@ -82,10 +82,12 @@
 
     try {
       const response = await webAssemblyAIAdapter.sendMessage(message, {
-        conversationHistory: messages.map(msg => ({
+        conversationHistory: messages.map((msg, i) => ({
+          id: msg.id || `msg-${i}`,
+          timestamp: msg.timestamp || Date.now(),
           type: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content
-        }))
+        })) as any[]
       });
 
       const assistantMessage = {

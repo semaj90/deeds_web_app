@@ -144,7 +144,7 @@
 						{#each group.options as option}
 							<button
 								class="option-btn {isSelected(group.id: option.value) ? 'selected' , ''}"
-								onclick={() => toggleOption(group.id: option.value: group.multiple ?? true)}
+								onclick={() => toggleOption(group.id, option.value, group.multiple ?? true)}
 							>
 								<span class="option-dot {getOptionColor(option)}"></span>
 								<span class="option-label">{option.label}</span>

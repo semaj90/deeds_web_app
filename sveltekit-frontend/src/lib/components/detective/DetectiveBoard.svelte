@@ -12,18 +12,27 @@ import { analyzeEvidence, findEvidenceConnections } from "$lib/ai/ai-service";
 import AIAssistantPanel from "$lib/components/ai/AIAssistantPanel.svelte";
 import EvidenceCard from "$lib/components/detective/EvidenceCard.svelte";
 import UploadZone from "$lib/components/detective/UploadZone.svelte";
-import { gpuAccelerationService as gpuService } from "$lib/services/gpu-acceleration-service";
-import { rabbitmqService as rabbitMQService } from "$lib/services/rabbitmq-service";
-import { VectorService } from "$lib/services/vector-service";
-import { evidenceStore } from "$lib/stores/unified";
+import { gpuService } from "$lib/services/gpu-acceleration-service";
+import { rabbitmqService } from "$lib/services/rabbitmq-service";
+import VectorService from "$lib/services/vector-service";
+import { evidenceStore } from "$lib/stores/unified/evidence-store";
 
 const vectorService = new VectorService();
 const EvidenceCardAny = EvidenceCard as any;
 
 // Svelte 5 Runes
+interface Props {
+  caseId?: string;
+  evidence?: any[];
+}
+
+let {
+  caseId = "case-001",
+  evidence = []
+}: Props = $props();
+
 let evidenceStoreState = $state<any>({ evidence: [], isLoading: false, error: null, isConnected: false });
-let allEvidence = $derived(() => evidenceStoreState.evidence || []);
-let caseId = $state<string>("case-001");
+let allEvidence = $derived(() => evidenceStoreState.evidence || evidence || []);
 let viewMode = $state<'columns' | 'canvas'>('columns');
 let showAIAssistant = $state<boolean>(true);
 let selectedEvidenceIds = $state<string[]>([]);
@@ -63,7 +72,7 @@ await initializeEnhancedSystems();
 
 async function initializeEnhancedSystems() {
 try {
-await rabbitMQService.connect();
+await rabbitmqService.initialize();
 systemStatus.rabbitMQ.connected = true;
 systemStatus.rabbitMQ.health = "connected";
 } catch (e) { console.warn("RabbitMQ failed", e); }
@@ -199,7 +208,7 @@ use:dndzone={{ items: column.items, flipDurationMs: 200 }}
 onfinalize={(e: any) => handleDndFinalize(e, column.id)}
 >
 {#if column.id === "new"}
-<UploadZone onupload={(e: any) => handleFileUpload(e.detail, column.id)} caseId={caseId} />
+<UploadZone onUploadComplete={(result: any) => handleFileUpload(result, column.id)} caseId={caseId} />
 {/if}
 
 {#each column.items as item (item.id)}

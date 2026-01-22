@@ -43,7 +43,7 @@
 		id: string; title: string;
 		status: 'active' | 'pending' | 'critical';
 		lastActivity: string; evidenceCount: number;
-		priority, 'low' | 'medium' | 'high' | 'urgent';
+		priority: 'low' | 'medium' | 'high' | 'urgent';
 	}>>([]);
 
 	let systemAlerts = $state<Array<{
@@ -432,11 +432,11 @@
 
 				<!-- Notifications -->
 				<div class="relative">
-					<Button class="bits-btn"
+					<Button
 						variant="outline"
 						size="sm"
 						onclick={() => showNotifications = !showNotifications}
-						class="notification-btn"
+						class="bits-btn notification-btn"
 					>
 						<Bell class="h-4 w-4 mr-2" />
 						Notifications

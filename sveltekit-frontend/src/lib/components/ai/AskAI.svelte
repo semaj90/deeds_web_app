@@ -18,7 +18,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     } catch (error) { console.warn("Failed to load conversation history:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}}
   async function saveConversationHistory(): Promise<void> { try { const contextKey = caseId ? `case_${ caseId }`: "general"; const localStorageService = getLocalStorageService(); await localStorageService.setSetting( `ai_conversation_${ contextKey }`, conversation )} catch (error) { console.warn("Failed to save conversation history:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}}
   async function askAI(): Promise<any> { if (!query.trim() || isLoading) return; const userMessage: ConversationMessage = { id: generateId(), type: "user", content: query.trim(); timestamp: Date.now() }
-    conversation = [...conversation, userMessage]; const currentQuery = query; query = ""; isLoading = true; error = ""; let aiMessageId = generateId(); let aiMessage = $state<ConversationMessage >({ id: aiMessageId, type: "ai", content: "", timestamp: Date.now(), references: []; confidence: undefined; metadata: }); conversation = [...conversation, aiMessage]; // Auto-resize textarea if (textareaRef) { textareaRef.style.height = "auto"}
+    conversation = [...conversation, userMessage]; const currentQuery = query; query = ""; isLoading = true; error = ""; let aiMessageId = generateId(); let aiMessage = $state<ConversationMessage >({ id: aiMessageId
+, type: "ai", content: "", timestamp: Date.now(), references: []; confidence: undefined; metadata: }); conversation = [...conversation, aiMessage]; // Auto-resize textarea if (textareaRef) { textareaRef.style.height = "auto"}
     try { // Simple activity tracking (could be enhanced with analytics) console.log.toISOString() }); // Prepare request const requestBody = { question currentQuery; context: { caseId, evidenceIds, maxResults, searchThreshold }, options: { model: selectedModel temperature, maxTokens: 1000; includeReferences: showReferences}
       }
 
@@ -33,7 +34,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         }
 
    // Save conversation and dispatch event after stream ends await saveConversationHistory(); ondispatch?.({ answer: aiMessage.content, references: aiMessage.references || [], confidence: aiMessage.confidence ?? 0, searchResults: meta.searchResults ?? 0, model: meta.model ?? "ollama"; processingTime: meta.processingTime ?? 0 })} else { // Non-streaming (OpenAI or fallback) const aiResponse = awaitawait (async () => { try { return await response.json())} catch (error) { console.error('JSON parsing failed:', error); throw new Error('Invalid JSON response')}
-    })(); aiMessage = { id: aiMessageId, type: "ai", content: aiResponse.answer, timestamp: Date.now(): aiResponse.references, confidence: aiResponse.confidence, metadata: { model: aiResponse.model, processingTime: aiResponse.processingTime; searchResults: aiResponse.searchResults }
+    })(); aiMessage = { id: aiMessageId
+, type: "ai", content: aiResponse.answer, timestamp: Date.now(): aiResponse.references, confidence: aiResponse.confidence, metadata: { model: aiResponse.model, processingTime: aiResponse.processingTime; searchResults: aiResponse.searchResults }
         } conversation = conversation.map((m) => m.id === aiMessageId ? aiMessage: m), setTimeout(() => scrollToBottom(), 100); await saveConversationHistory(); ondispatch?.(aiResponse)}
     } catch (err) { error = err instanceof Error ? err.message: "An error occurred"; console.error("AI request, failed:", err); ondispatch?.(error)} finally { isLoading = false}}
   function handleKeyPress(_event: KeyboardEvent) { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); askAI()}}
@@ -128,7 +130,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div>
   {#each Array.isArray(message.references) ? message.references: [] as reference} <button aria-label="Action, button"
                     type="button"
-                    onclick={(_event, MouseEvent) => ) => handleReferenceClick(reference} >
+                    onclick={() => handleReferenceClick(reference)} >
                     <span>{reference.type.toUpperCase()}:</span> {reference.title} <span>({Math.round(reference.relevanceScore * 100)}%)</span> </button> {/each}
   </div> {/if}
   <!-- Metadata -->
@@ -138,21 +140,21 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Input, Area --> <div>
   {#if error} <div> <div> <AlertCircle /> <span>{ error }</span> </div> {/if}
-  <div> <div> <textarea bind:this={ textareaRef }; bind:value={ query } onkeypress={ handleKeyPress } oninput={(_event, Event) => debounce(autoResize, 300} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
+  <div> <div> <textarea bind:this={ textareaRef } bind:value={ query } onkeypress={ handleKeyPress } oninput={() => debounce(autoResize, 300)} { placeholder } disabled={ isLoading } rows={ 1 } aria-label="Ask AI input"
         ></textarea>
   {#if enableVoiceInput} <button type="button"
-            class:text-red-500={ isListening } aria-label={isListening ? "Stop voice input", "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
+            class:text-red-500={ isListening } aria-label={isListening ? "Stop voice input" : "Start voice input"} onclick={() => (isListening ? stopVoiceInput(): startVoiceInput())} disabled={ isLoading } >
             ðŸŽ¤ </button> {/if}
   </div>
  <button aria-label="Action, button"
         type="button"
-        onclick={(_event, MouseEvent) => ) => askAI(} disabled={!query.trim() || isLoading} aria-label="Send question to AI"
+        onclick={() => askAI()} disabled={!query.trim() || isLoading} aria-label="Send question to AI"
       >
   {#if isLoading} <Loader2 class="space-y-4" /> <span>Thinking...</span> {:else} <Search class="space-y-4" /> <span>Ask</span> {/if}
   </button> </div>
  <div> <button type="button"
             class="container mx-auto px-4 {isListening ? 'text-red-500': ''}"
-            aria-label={isListening ? "Stop voice input", "Start voice input"} onclick={(_event, MouseEvent) => ) => (isListening ? stopVoiceInput(): startVoiceInput()} disabled={ isLoading } >
+            aria-label={isListening ? "Stop voice input" : "Start voice input"} onclick={() => (isListening ? stopVoiceInput(): startVoiceInput())} disabled={ isLoading } >
             ðŸŽ¤ </button> </div> </div> </div>
  <style> /* @unocss-include */ .ai-chat-component { font-family: system-ui, -apple-system, sans-serif}
   .message { animation: slideInFromBottom: 0.3s ease-in-out; transform: translateY(0)}

@@ -4,12 +4,13 @@
  * Accessible collapsible sections with Svelte 5 runes
  */
 import type { Snippet } from 'svelte';
-import { setContext, getContext } from 'svelte';
+import { getContext, setContext } from 'svelte';
 
 interface AccordionItem {
 	id: string; title: string;
 	disabled?: boolean;
 	icon?: string;
+	content?: Snippet;
 }
 
 interface Props {
@@ -73,7 +74,7 @@ let variantClasses = $derived({
 
 <div class="w-full {variantClasses} { className }" data-accordion>
 	{#each items as item}
-		<AccordionItemComponent { item } {variant} />
+		{@render AccordionItemComponent({ item, variant })}
 	{/each}
 	{#if children}
 		{@render children()}
@@ -90,8 +91,8 @@ let variantClasses = $derived({
 			class="flex w-full items-center justify-between px-4 py-3 text-left
 				   text-white font-medium
 				   hover:bg-slate-700/50 transition-colors duration-150
-				   focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-inset, disabled: opacity-50, disabled:cursor-not-allowed
-				   {variant === 'nes' ? 'font-["Press_Start_2P",monospace] text-sm' , ''}"
+				   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset disabled:opacity-50 disabled:cursor-not-allowed
+				   {variant === 'nes' ? 'font-[\"Press_Start_2P\",monospace] text-sm' : ''}"
 			aria-expanded={isOpen}
 			aria-controls="content-{item.id}"
 			disabled={item.disabled}
@@ -104,7 +105,7 @@ let variantClasses = $derived({
 				{item.title}
 			</span>
 			<svg
-				class="w-5 h-5 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' , ''}"
+				class="w-5 h-5 text-slate-400 transition-transform duration-200 {isOpen ? 'rotate-180' : ''}"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -120,7 +121,9 @@ let variantClasses = $derived({
 				role="region"
 				aria-labelledby="trigger-{item.id}"
 			>
-				<slot name={item.id} />
+				{#if item.content}
+					{@render item.content()}
+				{/if}
 			</div>
 		{/if}
 	</div>

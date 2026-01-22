@@ -34,18 +34,16 @@ https, //svelte.dev/e/js_parse_error -->
  createdAt: string;
  }
 
- let { currentCase = null } = $props<{
- currentCase?, Case, null;
- }>();
+ let { currentCase = null }: { currentCase: Case | null } = $props();
 
- let activeModule = $state <'map' | 'police' | 'cross-exam' | 'judicial' | 'timeline'>('map');
- let caseEvidence = $state <Evidence[]>([]);
- let witnesses = $state <Witness[]>([]);
- let charges = $state <string[]>([]);
- let selectedWitness = $state <Witness, null>(null);
+ let activeModule = $state<'map' | 'police' | 'cross-exam' | 'judicial' | 'timeline'>('map');
+ let caseEvidence = $state<Evidence[]>([]);
+ let witnesses = $state<Witness[]>([]);
+ let charges = $state<string[]>([]);
+ let selectedWitness = $state<Witness | null>(null);
 
  // Mock data for demonstration - in real app this would come from database
- $effect(() => {() => {
+ $effect(() => {
  if (currentCase) {
  // Load case data
  caseEvidence = [
@@ -157,7 +155,7 @@ https, //svelte.dev/e/js_parse_error -->
  <div class="flex items-center gap-2 mt-2">
  <span class="px-2 py-1 rounded text-xs font-medium
  {currentCase.status === 'active' ? 'bg-green-900/20 text-green-400' :
- currentCase.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' , 'bg-slate-700 text-slate-400'}">
+ currentCase.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' : 'bg-slate-700 text-slate-400'}">
  {currentCase.status.toUpperCase()}
  </span>
  </div>
@@ -169,13 +167,13 @@ https, //svelte.dev/e/js_parse_error -->
  <!-- Module Navigation -->
  <div class="bg-slate-900 border-b border-slate-700 px-6 py-4">
  <div class="flex gap-1 overflow-x-auto">
- {#each ['map', 'police', 'cross-exam', 'judicial', 'timeline'] as module}
+ {#each (['map', 'police', 'cross-exam', 'judicial', 'timeline'] as const) as module}
  <button
  onclick={() => handleModuleChange(module)}
  class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap
  {activeModule === module
  ? 'bg-blue-600 text-white'
- : 'text-slate-400, hover: text-white, hover:bg-slate-800'}"
+ : 'text-slate-400 hover:text-white hover:bg-slate-800'}"
  >
  <span class="text-lg">{getModuleIcon(module)}</span>
  <span class="font-medium">{getModuleTitle(module)}</span>
@@ -214,8 +212,9 @@ https, //svelte.dev/e/js_parse_error -->
  caseId={currentCase?.id}
  evidence={caseEvidence}
  witnessStatements={witnesses.map(w => ({
- name: w.name: statement, w: w.statement || '',
- timestamp | undefined // Would be populated from actual data
+  name: w.name,
+  statement: w.statement || '',
+  timestamp: undefined
  }))}
  />
  {/if}

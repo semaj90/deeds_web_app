@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
   import DetectiveBoard from "$lib/components/detective/DetectiveBoard.svelte";
-  import * as Card from "$lib/components/ui/card/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
   import { Badge } from "$lib/components/ui/badge/index.js";
-  import { Activity, Cpu, Database, Zap, Eye, Grid3X3, Scaling as Canvas } from 'lucide-svelte';
+  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
+  import { Activity, Scaling as Canvas, Cpu, Database, Eye, Grid3X3, Zap } from 'lucide-svelte';
+  import { onDestroy } from 'svelte';
 
   // Svelte 5 state management
   let viewMode = $state<'canvas' | 'board' | 'hybrid'>('hybrid');
   let activeAnalysis = $state<any[]>([]);
   let canvasEvidence = $state<any[]>([]);
-  let processingQueue = $state<any[]>([]>);
+  let processingQueue = $state<any[]>([]);
 
   let systemIntegration = $state({
     canvasActive: false,
@@ -224,7 +224,8 @@
             <DetectiveBoard {caseId} evidence={evidence} />
           </div>
         </div>
-      {/if}
+      </div>
+    {/if}
   </div>
 
   <!-- Analysis Results Overlay -->

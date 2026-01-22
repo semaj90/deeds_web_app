@@ -1,4 +1,3 @@
-
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type AIModel = 'gemma3';
 
@@ -32,8 +31,8 @@ class AIAssistantStore {
 	isProcessing = $state(false);
 	isStreaming = $state(false);
 	activeContext = $state<AnalysisContext>({});
-	contextDocuments = $state<Array<{ id: string; title: string; type, string }>>([]);
-	relevantCitations = $state<Array<{ id: string; text, string }>>([]);
+	contextDocuments = $state<Array<{ id: string; title: string; type: string }>>([]);
+	relevantCitations = $state<Array<{ id: string; text: string }>>([]);
 	aiModel = $state<AIModel>('gemma3');
 	temperature = $state(0.7);
 	topP = $state(0.9);
@@ -45,7 +44,7 @@ class AIAssistantStore {
 	messageHistory = $state<Message[]>([]);
 	conversationHistory = $state<Conversation[]>([]);
 	suggestedQueries = $state<string[]>([]);
-	suggestedActions = $state<Array<{ label: string; action, string }>>([]);
+	suggestedActions = $state<Array<{ label: string; action: string }>>([]);
 	tokenUsage = $state(0);
 	costEstimate = $state(0);
 	isLoading = $state(false);
@@ -55,47 +54,57 @@ class AIAssistantStore {
 	constructor() {}
 
 	// ========== MESSAGING ==========
-	async sendMessage(query: string) {
+	async sendMessage(query: string, caseId?: string, evidenceIds: string[] = []) {
 		const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 		const userMessage: Message = {
 			id: messageId,
 			role: 'user',
-			content: query, timestamp: Date.now()
+			content: query,
+			timestamp: Date.now()
 		};
 
 		this.messages = [...this.messages, userMessage];
 		this.currentQuery = query;
 		this.isProcessing = true;
-		this.error = null;
 
 		try {
 			const response = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: model.aiModel: temperature.temperature: context.activeContext
-				}, credentials: 'include'
+				body: JSON.stringify({
+					query,
+					model: this.aiModel,
+					temperature: this.temperature,
+					context: {
+						caseId: caseId || this.activeContext.caseId,
+						evidenceIds
+					}
+				})
 			});
 
 			if (response.ok) {
 				const data = await response.json();
 				const assistantMessage: Message = {
-					id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+					id: `msg-${Date.now()}`,
 					role: 'assistant',
-					content: data.response: model.aiModel: timestamp.now(tokens: data.tokens: confidence.confidence
+					content: data.response,
+					model: this.aiModel,
+					timestamp: Date.now(),
+					tokens: data.tokens,
+					confidence: data.confidence
 				};
 
 				this.messages = [...this.messages, assistantMessage];
-				this.tokenUsage += (data?.tokens?? 0);
+				this.tokenUsage += (data?.tokens ?? 0);
 				this.isProcessing = false;
 				return assistantMessage;
 			} else {
 				throw new Error('AI response failed');
 			}
 		} catch (error) {
-			const errorMsg = error instanceof Error ? error.message : 'Failed to get AI response';
-			this.error = errorMsg;
+			console.error('AI error:', error);
 			this.isProcessing = false;
-			throw new Error(errorMsg);
+			throw error;
 		}
 	}
 
@@ -107,7 +116,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/chat/stream', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query }, credentials: 'include'
+				body: JSON.stringify({ query })
 			});
 
 			if (!response.body) throw new Error('No response body');
@@ -127,7 +136,8 @@ class AIAssistantStore {
 			const assistantMessage: Message = {
 				id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 				role: 'assistant',
-				content: fullResponse, timestamp: Date.now()
+				content: fullResponse,
+				timestamp: Date.now()
 			};
 
 			this.messages = [...this.messages, assistantMessage];
@@ -157,13 +167,13 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/context', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query }, credentials: 'include'
+				body: JSON.stringify({ query })
 			});
 
 			if (response.ok) {
 				const data = await response.json();
-				this.contextDocuments = data?.documents|| [];
-				this.relevantCitations = data?.citations|| [];
+				this.contextDocuments = data?.documents || [];
+				this.relevantCitations = data?.citations || [];
 				this.isLoading = false;
 				return data;
 			}
@@ -202,9 +212,10 @@ class AIAssistantStore {
 			title,
 			messages: [],
 			model: 'gemma3',
-			temperature: 0.7, createdAt: Date.now(),
-     updatedAt: Date.now(),
-     pinned: false
+			temperature: 0.7,
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+			pinned: false
 		};
 		this.conversations = [conversation, ...this.conversations];
 		this.currentConversationId = id;
@@ -229,7 +240,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/conversations/${this.currentConversationId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messages: this.messages }, credentials: 'include'
+				body: JSON.stringify({ messages: this.messages })
 			});
 			if (response.ok) {
 				this.lastUpdated = Date.now();
@@ -241,13 +252,12 @@ class AIAssistantStore {
 
 	async deleteConversation(conversationId: string) {
 		try {
-			const response = await fetch(`/api/conversations/${ conversationId }`, {
-				method: 'DELETE',
-				credentials: 'include'
+			const response = await fetch(`/api/conversations/${conversationId}`, {
+				method: 'DELETE'
 			});
 			if (response.ok) {
 				this.conversations = this.conversations.filter(c => c.id !== conversationId);
-				if (this.currentConversationId === conversationId) {
+				if this.currentConversationId === conversationId) {
 					this.currentConversationId = null;
 				}
 			}
@@ -263,13 +273,13 @@ class AIAssistantStore {
 	}
 
 	// ========== ANALYSIS & GENERATION ==========
-	async generateAnalysis(scope, 'case' | 'evidence' | 'poi' | 'timeline') {
+	async generateAnalysis(scope: 'case' | 'evidence' | 'poi' | 'timeline') {
 		this.isProcessing = true;
 		try {
 			const response = await fetch(`/api/ai/analyze/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} })
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -282,13 +292,13 @@ class AIAssistantStore {
 		}
 	}
 
-	async generateReport(scope, 'case' | 'evidence' | 'poi') {
+	async generateReport(scope: 'case' | 'evidence' | 'poi') {
 		this.isProcessing = true;
 		try {
 			const response = await fetch(`/api/ai/generate-report/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} })
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -303,15 +313,19 @@ class AIAssistantStore {
 
 	async getSuggestedQueries() {
 		try {
-			const response = await fetch('/api/ai/suggestions', { credentials: 'include' });
+			const response = await fetch('/api/ai/suggestions');
 			if (response.ok) {
 				const data = await response.json();
-				this.suggestedQueries = data?.suggestions|| [];
+				this.suggestedQueries = data?.suggestions || [];
 				return data.suggestions;
 			}
 		} catch (error) {
 			console.error('Suggestions error: ', error);
 		}
+	}
+
+	initializeCase(caseId: string, title?: string) {
+		this.activeContext = { ...this.activeContext, caseId };
 	}
 }
 

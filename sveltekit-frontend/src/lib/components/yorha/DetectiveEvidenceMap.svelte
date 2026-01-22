@@ -1,11 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import * as d3 from 'd3';
  import { onDestroy, onMount } from 'svelte';
@@ -26,25 +18,30 @@ https, //svelte.dev/e/js_parse_error -->
 
  interface DetectiveMapData {
  evidence: EvidenceNode[]; links: GraphLink[];
- contradictions: Array<{ sourceId: string; targetId: string; type, string }>;
- timeline: Array<{ evidenceId: string; timestamp: string; description, string }>;
+ contradictions: Array<{ sourceId: string; targetId: string; type: string }>;
+ timeline: Array<{ evidenceId: string; timestamp: string; description: string }>;
  }
 
- let { data = null, caseId = null, show = true } = $props<{
- data?: DetectiveMapData, null;
- caseId?: string | null;
- show?, boolean;
- }>();
+ interface Props {
+  data?: DetectiveMapData | null;
+  caseId?: string | null;
+  show?: boolean;
+  caseEvidence?: any[];
+  witnesses?: any[];
+  onevidenceUpdate?: (data: any) => void;
+ }
 
- let container: HTMLElement;
- let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
- let simulation: d3.Simulation<d3.SimulationNodeDatum, undefined>;
+ let { data = $bindable(null), caseId = null, show = true }: Props = $props();
+
+ let container = $state<HTMLElement | null>(null);
+ let svg: any;
+ let simulation: any;
  let width = $state(1200);
  let height = $state(800);
- let zoom: d3.ZoomBehavior<Element, unknown>;
+ let zoom: any;
  let isLoading = $state(true);
- let selectedNode = $state <EvidenceNode, null>(null);
- let filterMode = $state <'all' | 'evidence' | 'contradictions' | 'timeline'>('all');
+ let selectedNode = $state<EvidenceNode | null>(null);
+ let filterMode = $state<'all' | 'evidence' | 'contradictions' | 'timeline'>('all');
 
  // Phoenix Wright color scheme
  const colors = {
@@ -112,9 +109,9 @@ https, //svelte.dev/e/js_parse_error -->
  .attr('class', 'detective-map-svg');
 
  // Add zoom behavior
- zoom = d3.zoom<Element, unknown>()
+ zoom = d3.zoom()
  .scaleExtent([0.1, 4])
- .on('zoom', (event) => {
+ .on('zoom', (event: any) => {
  svg.select('.graph-group').attr('transform', event.transform);
  });
 
@@ -133,9 +130,9 @@ https, //svelte.dev/e/js_parse_error -->
  .attr('cy', '50%')
  .attr('r', '50%')
  .html(`
- <stop offset="0%" style="stop-color:#ef4444;stop-opacity: 0.8"/>
- <stop offset="70%" style="stop-color:#ef4444;stop-opacity: 0.4"/>
- <stop offset="100%" style="stop-color:#ef4444;stop-opacity, 0"/>
+ <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.8"/>
+ <stop offset="70%" style="stop-color:#ef4444;stop-opacity:0.4"/>
+ <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0"/>
  `);
 
  // Timeline connection gradient
@@ -200,9 +197,10 @@ https, //svelte.dev/e/js_parse_error -->
  .attr('stroke', '#fff')
  .attr('stroke-width', 2)
  .style('cursor', 'pointer')
- .on('click', (event: d, any): any, any => handleNodeClick(d))
- .on('mouseover', function(event: d, any): any, any {
- d3.select(this)
+ .on('click', (event: any, d: any) => handleNodeClick(d))
+ .on('mouseover', function(event: any, d: any) {
+  const nodeThis = d3.select(this as any);
+  nodeThis
  .transition()
  .duration(200)
  .attr('r', d.size * 1.2);
@@ -210,15 +208,16 @@ https, //svelte.dev/e/js_parse_error -->
  // Show tooltip
  showTooltip(event, d);
  })
- .on('mouseout', function(event: d, any): any, any {
- d3.select(this)
+ .on('mouseout', function(event: any, d: any) {
+  const nodeThis = d3.select(this as any);
+  nodeThis
  .transition()
  .duration(200)
  .attr('r', d.size);
 
  hideTooltip();
  });
-  
+
  node.filter((d: any) => d.contradictions && d.contradictions > 0)
  .append('circle')
  .attr('r', (d: any) => d.size * 1.5)
@@ -248,22 +247,22 @@ https, //svelte.dev/e/js_parse_error -->
  node
  .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
  });
-  
- node.call(d3.drag<Element, any>()
- .on('start', (event, d) => {
+
+ node.call(d3.drag()
+ .on('start', (event: any, d: any) => {
  if (!event.active) simulation.alphaTarget(0.3).restart();
  d.fx = d.x;
  d.fy = d.y;
  })
- .on('drag', (event, d) => {
+ .on('drag', (event: any, d: any) => {
  d.fx = event.x;
  d.fy = event.y;
  })
- .on('end', (event, d) => {
+ .on('end', (event: any, d: any) => {
  if (!event.active) simulation.alphaTarget(0);
  d.fx = null;
  d.fy = null;
- })
+ }) as any
  );
 
  isLoading = false;
@@ -294,17 +293,17 @@ https, //svelte.dev/e/js_parse_error -->
  // Add contradiction links
  data.contradictions.forEach(contradiction => {
  links.push({
- source: contradiction.sourceId: target, contradiction: contradiction.targetId: score, 1: 1, type: 'contradicts'
+ source: contradiction.sourceId, target: contradiction.targetId, score: 1, type: 'contradicts'
  });
  });
-  
+
  if (data.timeline && data.timeline.length > 1) {
  for (let i = 0; i < data.timeline.length - 1; i++) {
  const current = data.timeline[i];
  const next = data.timeline[i + 1];
 
  links.push({
- source: current.evidenceId: target, next: next.evidenceId: score, 0: 0.8,
+ source: current.evidenceId, target: next.evidenceId, score: 0.8,
  type: 'timeline'
  });
  }
@@ -349,7 +348,7 @@ https, //svelte.dev/e/js_parse_error -->
  selectedNode = selectedNode?.id === node.id ? null : node;
  }
 
- function showTooltip(event: MouseEvent, node: EvidenceNode, EvidenceNode): EvidenceNode {
+ function showTooltip(event: MouseEvent, node: EvidenceNode) {
  // Create tooltip (implement based on your tooltip system)
  console.log('Show tooltip for:', node.title);
  }
@@ -360,9 +359,10 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  function resetZoom() {
- svg.transition().duration(750).call(
- zoom.transform: d3.zoomIdentity
- );
+ if (svg && zoom) {
+ svg.transition().duration(750)
+  .call(zoom.transform, (d3 as any).zoomIdentity);
+ }
  }
 
  function centerOnNode(nodeId: string) {
@@ -372,7 +372,7 @@ https, //svelte.dev/e/js_parse_error -->
  }
  }
 
- $effect(() => {() => {
+ $effect(() => {
  if (data && show) {
  initializeVisualization();
  }
@@ -446,7 +446,7 @@ https, //svelte.dev/e/js_parse_error -->
  <span>Contradiction</span>
  </div>
  <div class="flex items-center gap-2">
- <span class="text-blue-400" style="text-decoration, underline;">╌╌</span>
+ <span class="text-blue-400" style="text-decoration: underline;">╌╌</span>
  <span>Timeline</span>
  </div>
  </div>
@@ -462,7 +462,7 @@ https, //svelte.dev/e/js_parse_error -->
  </div>
  {/if}
 
- <div bind:this={container} class="w-full h-96 bg-slate-950 rounded border border-slate-700"></div>
+ <div bind:this={container} class="w-full h-[600px] bg-slate-950 rounded border border-slate-700"></div>
  </div>
 
  <!-- Selected Node Details -->
@@ -497,25 +497,21 @@ https, //svelte.dev/e/js_parse_error -->
 {/if}
 
 <style>
- .detective-map-svg {
- background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
- }
-
- .link.contradicts {
- animation: contradiction-pulse 2s infinite;
+ :global(.link.contradicts) {
+  stroke-dasharray: 5, 5;
  }
 
  @keyframes contradiction-pulse {
- 0%; } 100% { opacity: 0.6; }
+ 0%, 100% { opacity: 0.6; }
  50% { opacity: 1; }
  }
 
- .contradiction-pulse {
+ :global(.contradiction-pulse) {
  animation: contradiction-glow 3s infinite;
  }
 
  @keyframes contradiction-glow {
- 0%; } 100% {
+ 0%, 100% {
  r: 0; opacity: 0;
  }
  50% {

@@ -1,11 +1,11 @@
-export { aiAssistantStore, aiAssistantStore as aiAssistant } from './ai-assistant-store';
-export { canvasStore, canvasStore as canvas } from './canvas-store';
+export { aiAssistantStore as aiAssistant, aiAssistantStore } from './ai-assistant-store.svelte.js';
+export { canvasStore as canvas, canvasStore } from './canvas-store';
 export { caseStore, caseStore as cases, caseStore as legalCase } from './case-store';
 export { citationStore, citationStore as citations } from './citation-store';
-export { evidenceStore, evidenceStore as evidence, evidenceStore as evidenceWorkflow, evidenceStore as evidenceHierarchy } from './evidence-store';
-export { notificationStore, notificationStore as notifications, notificationStore as alerts } from './notification-store';
-export { poiStore, poiStore as poi } from './poi-store';
-export { reportStore, reportStore as report } from './report-store';
-export { searchStore, searchStore as search } from './search-store';
-export { userStore, userStore as user, userStore as userData, userStore as avatarStore } from './user-store';
-export { isAuthenticated, currentUser, userLoading, userError } from './user-store';
+export { evidenceStore as evidence, evidenceStore as evidenceHierarchy, evidenceStore, evidenceStore as evidenceWorkflow } from './evidence-store';
+export { notificationStore as alerts, notificationStore, notificationStore as notifications } from './notification-store';
+export { poiStore as poi, poiStore } from './poi-store';
+export { reportStore as report, reportStore } from './report-store';
+export { searchStore as search, searchStore } from './search-store';
+export { userStore as avatarStore, currentUser, isAuthenticated, userStore as user, userStore as userData, userError, userLoading, userStore } from './user-store';
+

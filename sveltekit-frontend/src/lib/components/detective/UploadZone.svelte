@@ -1,92 +1,75 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
-	import { Progress } from '$lib/components/ui/progress';
-	import { Loader, Upload } from 'lucide-svelte';
-
-	interface Props {
-		minimal?: boolean;
-		onupload?: (summary: any) => void;
-		bucket?: string;
-		caseId?: string;
-		enableEmbedding?: boolean;
-		enableTelemetry?: boolean;
-		maxRetries?: number;
-	}
+	import { evidenceStore } from '$lib/stores/unified/evidence-store';
+	import FileUp from 'lucide-svelte/icons/file-up';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
 
 	let {
-		minimal = false,
-		onupload,
-		bucket = 'evidence',
-		caseId = '',
-		enableEmbedding = true,
-		enableTelemetry = true,
-		maxRetries = 3
-	}: Props = $props();
+		caseId = 'case-001',
+		onUploadComplete = (result: any) => {}
+	} = $props<{
+		caseId?: string;
+		onUploadComplete?: (result: any) => void;
+	}>();
 
-	let isDragging = $state(false);
 	let isUploading = $state(false);
 	let uploadProgress = $state(0);
-	let error = $state<string | null>(null);
+	let dropzoneActive = $state(false);
 
 	async function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
-		if (input.files) {
-			await uploadFiles(Array.from(input.files));
-		}
+		if (!input.files?.length) return;
+		await uploadFiles(Array.from(input.files));
 	}
 
 	async function uploadFiles(files: File[]) {
 		isUploading = true;
 		uploadProgress = 0;
-		error = null;
 
 		try {
-			// Mock upload logic
-			for (let i = 0; i <= 100; i += 10) {
-				uploadProgress = i;
-				await new Promise((r) => setTimeout(r, 100));
+			for (const file of files) {
+				// Artificial delay / local upload logic
+				await new Promise((resolve) => setTimeout(resolve, 500));
+				const result = await evidenceStore.uploadEvidence(file, caseId);
+				onUploadComplete(result);
 			}
-
-			if (onupload) {
-				onupload({ count: files.length, totalBytes: files.reduce((s, f) => s + f.size, 0) });
-			}
-		} catch (e) {
-			error = 'Upload failed: ' + (e instanceof Error ? e.message : String(e));
+		} catch (error) {
+			console.error('Upload failed:', error);
 		} finally {
 			isUploading = false;
+			uploadProgress = 100;
 		}
 	}
 </script>
 
 <div
-	class="nes-container with-title is-centered p-4 {isDragging ? 'is-primary' : ''}"
-	role="region"
-	aria-label="File upload zone"
+	class="nes-container is-rounded p-4 flex flex-col items-center justify-center border-dashed border-2 min-h-[150px] transition-colors"
+	class:bg-blue-900={dropzoneActive}
+	ondragover={(e) => { e.preventDefault(); dropzoneActive = true; }}
+	ondragleave={() => dropzoneActive = false}
+	ondrop={async (e) => {
+		e.preventDefault();
+		dropzoneActive = false;
+		if (e.dataTransfer?.files) {
+			await uploadFiles(Array.from(e.dataTransfer.files));
+		}
+	}}
 >
-	<p class="title">UPLOAD {bucket.toUpperCase()}</p>
 	{#if isUploading}
-		<div class="flex flex-col items-center gap-4">
-			<Loader class="animate-spin" />
-			<Progress value={uploadProgress} max={100} />
-			<p>Processing...</p>
-		</div>
+		<Loader2 class="animate-spin mb-2" size={32} />
+		<p class="text-xs">UPLOADING DATA...</p>
+		<progress class="nes-progress is-primary w-full max-w-[200px]" value={uploadProgress} max="100"></progress>
 	{:else}
-		<div class="flex flex-col items-center gap-4">
-			<Upload size={32} />
-			<p>Drag files here or click to browse</p>
-			<input type="file" class="hidden" multiple onchange={handleFileSelect} id="fileInput" />
-			<Button onclick={() => document.getElementById('fileInput')?.click()}>Select Files</Button>
-		</div>
-	{/if}
-	{#if error}
-		<p class="nes-text is-error mt-2">{error}</p>
+		<FileUp class="mb-2" size={32} />
+		<p class="text-xs text-center">DROP INTEL HERE<br/>OR CLICK TO SCAN</p>
+		<label class="mt-2">
+			<span class="nes-btn is-primary text-xs">SELECT FILES</span>
+			<input type="file" class="hidden" multiple onchange={handleFileSelect} />
+		</label>
 	{/if}
 </div>
 
 <style>
-	.hidden {
-		display: none;
-	}
+	.hidden { display: none; }
 </style>
 
 

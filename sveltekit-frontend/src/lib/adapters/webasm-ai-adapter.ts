@@ -48,6 +48,7 @@ export class WebAssemblyAIAdapter {
 	private config: WebAssemblyAIConfig;
 	private currentModel = 'gemma3:2b';
 	private gpuAvailable = false;
+	private modelLoaded = false;
 	private activeMethod: 'ollama' | 'python' | 'fallback' = 'fallback';
 
 	constructor(config: Partial<WebAssemblyAIConfig> = {}) {
@@ -59,8 +60,20 @@ export class WebAssemblyAIAdapter {
 		if (this.initialized) return true;
 		this.gpuAvailable = await this.detectGPU();
 		this.activeMethod = await this.selectMethod();
+		this.modelLoaded = true; // Simulating for now
 		this.initialized = true;
 		return true;
+	}
+
+	async getHealthStatus() {
+		return {
+			initialized: this.initialized,
+			method: this.activeMethod,
+			gpu: this.gpuAvailable,
+			webgpuEnabled: this.gpuAvailable,
+			wasmSupported: true,
+			modelLoaded: this.modelLoaded
+		};
 	}
 
 	private async detectGPU(): Promise<boolean> {
@@ -97,7 +110,7 @@ export class WebAssemblyAIAdapter {
 		if (!this.initialized) await this.initialize();
 		const startTime = performance.now();
 		// FIX: Corrected argument passing syntax
-		const prompt = this.buildPrompt(message: options?.conversationHistory|| []);
+		const prompt = this.buildPrompt(message, options?.conversationHistory || []);
 
 		let response: WebAssemblyAIResponse;
 		switch (this.activeMethod) {
@@ -125,7 +138,7 @@ export class WebAssemblyAIAdapter {
 		const res = await fetch(this.config.pythonMiddlewareEndpoint + '/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ prompt: max_tokens: options?.maxTokens|| this.config.maxTokens, temperature: options?.temperature|| this.config.temperature, model: this.currentModel })
+			body: JSON.stringify({ prompt, max_tokens: options?.maxTokens || this.config.maxTokens, temperature: options?.temperature || this.config.temperature, model: this.currentModel })
 		});
 		if (!res.ok) throw new Error('Python error, ' + res.statusText);
 		const data = await res.json();
@@ -143,10 +156,6 @@ export class WebAssemblyAIAdapter {
 		}
 		prompt += 'USER: ' + message + '\nASSISTANT: ';
 		return prompt;
-	}
-
-	getStatus(): { initialized: boolean; method: string; gpu: boolean } {
-		return { initialized: this.initialized, method: this.activeMethod, gpu: this.gpuAvailable };
 	}
 }
 

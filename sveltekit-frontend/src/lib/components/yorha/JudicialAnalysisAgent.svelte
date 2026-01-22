@@ -1,5 +1,5 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+ import { createEventDispatcher } from 'svelte';
 	let charge = $state<any>(undefined);
 	let rec = $state<any>(undefined);
 	let risk = $state<any>(undefined);
@@ -18,7 +18,7 @@ import { createEventDispatcher } from 'svelte';
  caseId?: string; generatedAt: string;
  admissibility: Array<{ evidence: string;
  ruling: 'admissible' | 'inadmissible' | 'conditional';
- reasoning: string; legalBasis, string;
+ reasoning: string; legalBasis: string;
  }>;
  probableCause: { assessment: 'strong' | 'moderate' | 'weak' | 'none';
  reasoning: string; factors: string[];
@@ -27,25 +27,27 @@ import { createEventDispatcher } from 'svelte';
  prosecution: number; defense: number;
  keyFactors: Array<{ factor: string;
  impact: 'positive' | 'negative' | 'neutral';
- weight, number;
+ weight: number;
  }>;
  };
  recommendations: string[]; risks: string[];
  summary: string;
  }
 
- let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' } = $props<{
- caseId?: string | null;
- evidence?: Evidence[];
- charges?: string[];
- jurisdiction?, 'federal' | 'state' | 'local';
- }>();
+ interface Props {
+  caseId?: string | null;
+  evidence?: Evidence[];
+  charges?: string[];
+  jurisdiction?: 'federal' | 'state' | 'local';
+ }
+
+ let { caseId = null, evidence = [], charges = [], jurisdiction = 'federal' }: Props = $props();
 
  const dispatch = createEventDispatcher();
 
  let isAnalyzing = $state(false);
- let analysis = $state <JudicialAnalysis, null>(null);
- let activeTab = $state <'overview' | 'admissibility' | 'probable-cause' | 'case-strength' | 'recommendations'>('overview');
+ let analysis = $state<JudicialAnalysis | null>(null);
+ let activeTab = $state<'overview' | 'admissibility' | 'probable-cause' | 'case-strength' | 'recommendations'>('overview');
 
  async function performAnalysis() {
  if (evidence.length === 0) {

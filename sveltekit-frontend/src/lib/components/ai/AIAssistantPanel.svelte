@@ -1,29 +1,28 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { aiAssistant } from '$lib/stores/unified';
-	import { Loader, Zap } from 'lucide-svelte';
-
-	interface Props {
-		caseId?: string;
-		selectedEvidenceIds?: string[];
-		isVisible?: boolean;
-	}
+	import { aiAssistantStore } from '$lib/stores/unified/ai-assistant-store.svelte.js';
+	import Loader2 from 'lucide-svelte/icons/loader-2';
+	import Zap from 'lucide-svelte/icons/zap';
 
 	let {
 		caseId = 'case-001',
 		selectedEvidenceIds = [],
 		isVisible = true
-	}: Props = $props();
+	} = $props<{
+		caseId?: string;
+		selectedEvidenceIds?: string[];
+		isVisible?: boolean;
+	}>();
 
 	let userInput = $state('');
 	let isLoading = $state(false);
 
-	const messages = $derived(aiAssistant.currentMessages);
-	const isAssistantLoading = $derived(aiAssistant.isLoading);
+	const messages = $derived(aiAssistantStore.messages);
+	const isAssistantLoading = $derived(aiAssistantStore.isProcessing);
 
 	$effect(() => {
 		if (caseId) {
-			aiAssistant.initializeCase(caseId, `Case ${caseId}`);
+			aiAssistantStore.initializeCase(caseId, `Case ${caseId}`);
 		}
 	});
 
@@ -35,7 +34,7 @@
 		isLoading = true;
 
 		try {
-			await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds);
+			await aiAssistantStore.sendMessage(prompt, caseId, selectedEvidenceIds);
 		} catch (error) {
 			console.error('Failed to send message:', error);
 		} finally {
@@ -48,8 +47,8 @@
 	<div class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-4">
 		{#each messages as msg}
 			<div class="flex {msg.role === 'user' ? 'justify-end' : 'justify-start'}">
-				<div class="nes-balloon {msg.role === 'user' ? 'from-right' : 'from-left'} max-w-[80%]">
-					<p class="text-xs">{msg.content}</p>
+				<div class="nes-balloon {msg.role === 'user' ? 'from-right' : 'from-left'} is-dark text-xs max-w-[80%]">
+					<p>{msg.content}</p>
 				</div>
 			</div>
 		{/each}
@@ -57,7 +56,7 @@
 		{#if isAssistantLoading || isLoading}
 			<div class="flex justify-start">
 				<div class="nes-balloon from-left">
-					<Loader class="animate-spin" />
+					<Loader2 class="animate-spin" />
 				</div>
 			</div>
 		{/if}

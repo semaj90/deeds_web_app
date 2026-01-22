@@ -1,5 +1,5 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+ import { createEventDispatcher } from 'svelte';
 	let followUp = $state<any>(undefined);
 
  // Migrated from createEventDispatcher to callback props;
@@ -31,19 +31,21 @@ import { createEventDispatcher } from 'svelte';
  strategy: string;
  }
 
- let { witness = null, evidence = [], caseContext = '' } = $props<{
- witness?: Witness | null;
- evidence?: Evidence[];
- caseContext?, string;
- }>();
+ interface Props {
+  witness?: Witness | null;
+  evidence?: Evidence[];
+  caseContext?: string;
+ }
+
+ let { witness = null, evidence = [], caseContext = '' }: Props = $props();
 
  const dispatch = createEventDispatcher();
 
  let isGenerating = $state(false);
- let session = $state <CrossExamSession | null>(null);
- let selectedQuestionType = $state <'all' | 'general' | 'timeline' | 'credibility' | 'contradiction'>('all');
- let selectedPriority = $state <'all' | 'high' | 'medium' | 'low'>('all');
- let expandedQuestion = $state <string | null>(null);
+ let session = $state<CrossExamSession | null>(null);
+ let selectedQuestionType = $state<'all' | 'general' | 'timeline' | 'credibility' | 'contradiction'>('all');
+ let selectedPriority = $state<'all' | 'high' | 'medium' | 'low'>('all');
+ let expandedQuestion = $state<string | null>(null);
 
  async function generateQuestions() {
  if (!witness) {

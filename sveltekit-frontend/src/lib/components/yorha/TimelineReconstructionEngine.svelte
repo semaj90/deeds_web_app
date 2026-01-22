@@ -3,7 +3,34 @@
    * src/lib/components/yorha/TimelineReconstructionEngine.svelte
    * Restored base template for Phase 75
    */
-  let { children, ...props } = $props();
+  import type { Snippet } from 'svelte';
+
+  interface Evidence {
+    id: string;
+    title: string;
+    description?: string;
+    timestamp?: string;
+  }
+
+  interface WitnessStatement {
+    name: string;
+    statement: string;
+    timestamp?: string;
+  }
+
+  interface Props {
+    caseId?: string | null;
+    evidence?: Evidence[];
+    witnessStatements?: WitnessStatement[];
+    children?: Snippet;
+  }
+
+  let {
+    caseId = null,
+    evidence = [],
+    witnessStatements = [],
+    children
+  }: Props = $props();
 </script>
 
 <div class="component-restored timelinereconstructionengine">

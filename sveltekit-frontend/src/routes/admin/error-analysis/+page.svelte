@@ -379,9 +379,9 @@
 					<div class="h-px bg-purple-500/30 mb-6"></div>
 
 					<div class="flex justify-end gap-3">
-						<Button class="bits-btn"
+						<Button
 							onclick={() => dialogOpen = false}
-							class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+							class="bits-btn px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
 						>
 							Close
 						</Button>

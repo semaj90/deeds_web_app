@@ -15,24 +15,24 @@
 		initialSnapshot = null,
 		readonly = false,
 		onDirtyChange = null
-	} = $props<Props>();
+	}: Props = $props();
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
 
 	// ===== State (Svelte 5 runes) =====
-	let viewport = $state<BoardViewport>(initialSnapshot?.viewport ?? { pan: { x: 0, y: 0 }, zoom: 1 });
+	const getInitialViewport = (): BoardViewport => initialSnapshot?.viewport ? { ...initialSnapshot.viewport } : { pan: { x: 0, y: 0 }, zoom: 1 };
+	const getInitialNodes = (): BoardNode[] => initialSnapshot?.nodes ? [...initialSnapshot.nodes] : ([
+		{ id: 'n1', kind: 'note', x: 80, y: 80, w: 260, h: 140, title: 'Witness Statement', body: 'Witness claims they saw the suspect...' },
+		{ id: 'n2', kind: 'evidence', x: 420, y: 220, w: 300, h: 180, title: 'Photo Evidence', evidenceId: 'ev_123', body: 'Surveillance footage frame 404' }
+	] as BoardNode[]);
+	const getInitialEdges = (): BoardEdge[] => initialSnapshot?.edges ? [...initialSnapshot.edges] : ([
+		{ id: 'e1', fromId: 'n1', toId: 'n2', style: 'solid', label: 'corroborates' }
+	] as BoardEdge[]);
 
-	let nodes = $state<BoardNode[]>(
-		initialSnapshot?.nodes ?? [
-			{ id: 'n1', kind: 'note', x: 80, y: 80, w: 260, h: 140, title: 'Witness Statement', body: 'Witness claims they saw the suspect...' },
-			{ id: 'n2', kind: 'evidence', x: 420, y: 220, w: 300, h: 180, title: 'Photo Evidence', evidenceId: 'ev_123', body: 'Surveillance footage frame 404' }
-		]
-	);
-
-	let edges = $state<BoardEdge[]>(
-		initialSnapshot?.edges ?? [{ id: 'e1', fromId: 'n1', toId: 'n2', style: 'solid', label: 'corroborates' }]
-	);
+	let viewport = $state<BoardViewport>(getInitialViewport());
+	let nodes = $state<BoardNode[]>(getInitialNodes());
+	let edges = $state<BoardEdge[]>(getInitialEdges());
 
 	let selected = $state<Set<string>>(new Set());
 	let hoveredId = $state<string | null>(null);
@@ -487,7 +487,7 @@
 		onpointercancel={ onPointerUp }
 		oncontextmenu={(e) => e.preventDefault()}
 		ondblclick={ onDblClick }
-	/>
+	></canvas>
 
 	<!-- Layer 2, DOM overlay (selection, handles, editor) -->
 	<div class="absolute inset-0 pointer-events-none">
@@ -531,8 +531,7 @@
 							}
 						}}
 						onblur={commitEditing}
-						autofocus
-					/>
+					></textarea>
 					<div class="mt-2 text-[10px] text-white/40 font-mono tracking-tight">
 						CMD+ENTER to save • ESC to cancel
 					</div>

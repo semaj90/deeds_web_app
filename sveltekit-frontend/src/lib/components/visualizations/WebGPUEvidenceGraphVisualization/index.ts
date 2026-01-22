@@ -1,2 +1,1 @@
-export { default, as WebGPUEvidenceGraphVisualization } from './WebGPUEvidenceGraphVisualization.svelte';
-
+export { default as WebGPUEvidenceGraphVisualization } from './WebGPUEvidenceGraphVisualization.svelte';
