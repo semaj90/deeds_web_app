@@ -7,17 +7,7 @@ https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
-	let loading = $state<any>(undefined);
-	let cancelText = $state<any>(undefined);
-	let confirmText = $state<any>(undefined);
-
- import { AlertCircle } from "lucide-svelte";
-import { AlertTriangle } from "lucide-svelte";
-import { CheckCircle } from "lucide-svelte";
-import { Info } from "lucide-svelte";
-import { X } from "lucide-svelte";
+ import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-svelte";
  import { onDestroy, onMount } from 'svelte';
 
  interface Props {
@@ -37,7 +27,7 @@ import { X } from "lucide-svelte";
  }
 
  let {
- open = $bindable (false),
+ open = $bindable(false),
  title = '',
  description = '',
  children,
@@ -50,10 +40,10 @@ import { X } from "lucide-svelte";
  cancelText = 'Cancel',
  showFooter = true,
  loading = false
- }: Props = $props ();
+ }: Props = $props();
 
- let modalRef = $state <HTMLElement>();
- let previousFocus = $state <HTMLElement>();
+ let modalRef = $state<HTMLElement>();
+ let previousFocus = $state<HTMLElement>();
 
  // Get icon based on variant
  function getVariantIcon() {
@@ -111,7 +101,7 @@ import { X } from "lucide-svelte";
  previousFocus.focus();
  }
  });
-  
+
  $effect(() => {
  document.addEventListener('keydown', handleKeydown);
 

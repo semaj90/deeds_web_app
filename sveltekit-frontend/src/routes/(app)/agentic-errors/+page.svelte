@@ -239,7 +239,7 @@
 									</div>
 								</div>
 								<div class="text-white font-mono text-sm">
-									{result.payload?.file_path ?? result.payload?.message || 'No details'}
+									{(result.payload?.file_path ?? result.payload?.message) || 'No details'}
 								</div>
 							</div>
 						{/each}

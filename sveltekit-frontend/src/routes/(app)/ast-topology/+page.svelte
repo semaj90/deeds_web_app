@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
-  import * d3 from 'd3';
-  import { Menu, MenuButton, MenuItems, MenuItem } from '@rgossiaux/svelte-headlessui';
+  import * as d3 from 'd3';
+  import { onDestroy, onMount } from 'svelte';
 
   // Props from server load
-  // TODO: Convert to $props - // TODO: Convert to $props - export let data;
+  let { data } = $props<{ data: any }>();
 
   interface GraphNode {
     id: string; label: string;
@@ -38,14 +37,14 @@
   }
 
   // State
-  let errorStats = data.errorStats;
-  let topologyData = data.topologyData;
-  let recentActivity = data.recentActivity;
-  let isConnected = false;
-  let selectedNode: GraphNode | null = null;
-  let viewMode: 'tree' | 'graph' | 'list' = 'graph';
-  let filterSource = 'all';
-  let searchQuery = '';
+  let errorStats = $derived(data.errorStats);
+  let topologyData = $derived(data.topologyData);
+  let recentActivity = $derived(data.recentActivity);
+  let isConnected = $state(false);
+  let selectedNode = $state<GraphNode | null>(null);
+  let viewMode = $state<'tree' | 'graph' | 'list'>('graph');
+  let filterSource = $state('all');
+  let searchQuery = $state('');
 
   // Graph state
   let graphContainer: HTMLDivElement;
@@ -56,11 +55,11 @@
   let edges: GraphEdge[] = $state(data.topologyData?.edges ?? []);
   let activities: Activity[] = $state([]);
   let stats: Stats = $state({
-    totalErrors: errorStats?.total ?? 0,
-    fixedToday: errorStats?.fixedToday ?? 0,
-    inProgress: errorStats?.inProgress ?? 0,
-    confidence: errorStats?.confidence ?? 0,
-    errorChange: errorStats?.change ?? 0
+    totalErrors: data.errorStats?.total ?? 0,
+    fixedToday: data.errorStats?.fixedToday ?? 0,
+    inProgress: data.errorStats?.inProgress ?? 0,
+    confidence: data.errorStats?.confidence ?? 0,
+    errorChange: data.errorStats?.change ?? 0
   });
 
   let isAutoFixing = $state(false);
@@ -72,7 +71,8 @@
   let fileTree: Map<string, Set<string>> = new Map();
 
   // Build file tree from error data
-  $: {
+  $effect(() => {
+    if (!topologyData?.nodes) return;
     fileTree.clear();
     for (const node of topologyData.nodes) {
       if (node.type === 'file') {
@@ -92,7 +92,7 @@
         fileTree.get(currentPath || 'root')!.add(node.id);
       }
     }
-  }
+  });
 
   // Connect to SSE for real-time updates
   function connectSSE() {
@@ -180,7 +180,7 @@
       const res = await fetch('/api/phase89/topology');
       if (res.ok) {
         const data = await res.json();
-        topologyData = data.topology ?? topologyData;
+        // Update local state if needed
       }
     } catch (e) {
       console.warn('Failed to fetch topology:', e);
@@ -188,11 +188,11 @@
   }
 
   // Filter nodes
-  let filteredNodes = $derived(topologyData.nodes.filter(node => {
+  let filteredNodes = $derived(topologyData?.nodes?.filter(node => {
     if (filterSource !== 'all' && !node.id.includes(filterSource)) return false;
     if (searchQuery && !node.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
-  });
+  }) ?? []);
 
   function getStatusColor(status: string): string {
     switch (status) {

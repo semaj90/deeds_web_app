@@ -1,8 +1,8 @@
-import type { chrCache, type CHRPattern } from '$lib/gpu/chrrom-cache';
+import { chrCache, type CHRPattern } from '$lib/gpu/chrrom-cache';
 export async function getCHRPatternOrFetch(
- _key,
- string,
- fallbackUrl: string | fetchImpl = fetch
+ key: string,
+ fallbackUrl: string,
+ fetchImpl: typeof fetch = fetch
 ): Promise<any> {
  const cached = chrCache.get(key);
  if (cached) return { pattern: cached, fromCache: true };

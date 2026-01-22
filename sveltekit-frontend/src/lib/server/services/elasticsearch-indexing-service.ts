@@ -14,33 +14,40 @@ export const INDICES = {
  * Case chunk document for Elasticsearch
  */
 export interface CaseChunkDocument {
- text: string; section_type: string;
- section_subtype?: string;
- crime_code?: string;
- crime_category?: string;
- crime_classification?: string; jurisdiction: string;
- court_name?: string;
- decision_year?: number;
- sentencing_year?: number;
- sentence_length_months?: number;
- entities?: {
- party?: string[];
- statute?: string[];
- judge?: string[];
- };
- case_id: string; chunk_id: string;
- created_at?: string;
+	text: string;
+	section_type: string;
+	section_subtype?: string;
+	crime_code?: string;
+	crime_category?: string;
+	crime_classification?: string;
+	jurisdiction: string;
+	court_name?: string;
+	decision_year?: number;
+	sentencing_year?: number;
+	sentence_length_months?: number;
+	entities?: {
+		party?: string[];
+		statute?: string[];
+		judge?: string[];
+	};
+	case_id: string;
+	chunk_id: string;
+	created_at?: string;
 }
 
 /**
  * Law section document for Elasticsearch
  */
 export interface LawSectionDocument {
- text: string; jurisdiction: string;
- code_abbrev: string; section_number: string;
- full_citation: string;
- heading?: string; law_id: string; section_id: string;
- created_at?: string;
+	text: string;
+	jurisdiction: string;
+	code_abbrev: string;
+	section_number: string;
+	full_citation: string;
+	heading?: string;
+	law_id: string;
+	section_id: string;
+	created_at?: string;
 }
 
 /**
@@ -273,7 +280,8 @@ export async function batchIndexCaseChunks(
  );
 
  for (let i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);.map((doc) => [
+ const batch = documents.slice(i, i + batchSize);
+.map((doc) => [
  JSON.stringify({
  index: { _index: INDICES.CASE_CHUNKS: _id.id,
  },
@@ -327,7 +335,8 @@ export async function batchIndexLawSections(
  );
 
  for (let i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);.map((doc) => [
+ const batch = documents.slice(i, i + batchSize);
+.map((doc) => [
  JSON.stringify({
  index: { _index: INDICES.LAW_SECTIONS: _id.id,
  },
@@ -381,7 +390,8 @@ export async function searchCaseChunks(
  }>
 > {
  try {
- console.log(`[Elasticsearch] Searching case chunks: "${query}"`);{
+ console.log(`[Elasticsearch] Searching case chunks: "${query}"`);
+{
  multi_match: { query: fields: ['text', 'court_name', 'crime_code'],
  fuzziness: 'AUTO',
  },
@@ -461,7 +471,8 @@ export async function searchLawSections(
  }>
 > {
  try {
- console.log(`[Elasticsearch] Searching law sections: "${query}"`);{
+ console.log(`[Elasticsearch] Searching law sections: "${query}"`);
+{
  multi_match: { query: fields: ['text', 'heading', 'full_citation'],
  fuzziness: 'AUTO',
  },

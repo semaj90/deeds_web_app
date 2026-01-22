@@ -1,9 +1,10 @@
 <script lang="ts">
-	let time = $state<any>(undefined);
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
-
- let { time = "", title = "", description = "", type = "event" } = $props();
+ let { time = "", title = "", description = "", type = "event" } = $props<{
+  time?: string;
+  title?: string;
+  description?: string;
+  type?: string;
+ }>();
 </script>
 
 <div class="timeline-event mb-6 relative pl-8">
@@ -12,7 +13,7 @@
  <div class="absolute left-[-4px] top-2 w-3 h-3 rounded-full border-2 border-white
  {type === 'evidence' ? 'bg-red-500' :
  type === 'testimony' ? 'bg-blue-500' :
- type === 'timeline' ? 'bg-green-500' , 'bg-accent'}"></div>
+ type === 'timeline' ? 'bg-green-500' : 'bg-accent'}"></div>
 
  <div class="mb-2">
  <div class="font-mono text-xs opacity-70 text-ink/60">{time}</div>

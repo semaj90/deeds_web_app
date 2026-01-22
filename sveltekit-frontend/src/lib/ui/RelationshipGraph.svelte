@@ -7,47 +7,46 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
-	let midX = $state<any>(undefined);
-
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
  type GraphNode = {
- id: string; label: string;
+ id: string;
+ label: string;
  type: 'person' | 'evidence' | 'location' | 'case';
- x: number; y: number;
+ x: number;
+ y: number;
  };
 
  type GraphEdge = {
- id: string; from: string;
+ id: string;
+ from: string;
  to: string;
- label?: string; strength: 'strong' | 'medium' | 'weak';
+ label?: string;
+ strength: 'strong' | 'medium' | 'weak';
  };
 
  let { nodes = [], edges = [] } = $props<{
  nodes?: GraphNode[];
- edges?, GraphEdge[];
+ edges?: GraphEdge[];
  }>();
 
- // Demo data
- if (nodes.length === 0) {
- nodes = [
- { id: 'POI-001', label: 'Marcus Chen', type: 'person', x: 200, y: 150 150 },
- { id: 'POI-003', label: 'David Morrison', type: 'person', x: 450, y: 180 180 },
- { id: 'POI-002', label: 'Keiko Ito', type: 'person', x: 320, y: 350 350 },
- { id: 'EV-001', label: 'Security Footage', type: 'evidence', x: 550, y: 320 320 },
- { id: 'EV-003', label: 'Access Log', type: 'evidence', x: 100, y: 280 280 },
- { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 80 }];
- }
+ // Local state derived from props
+ let displayNodes = $derived(nodes.length > 0 ? nodes : [
+ { id: 'POI-001', label: 'Marcus Chen', type: 'person', x: 200, y: 150 },
+ { id: 'POI-003', label: 'David Morrison', type: 'person', x: 450, y: 180 },
+ { id: 'POI-002', label: 'Keiko Ito', type: 'person', x: 320, y: 350 },
+ { id: 'EV-001', label: 'Security Footage', type: 'evidence', x: 550, y: 320 },
+ { id: 'EV-003', label: 'Access Log', type: 'evidence', x: 100, y: 280 },
+ { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 }]);
 
- if (edges.length === 0) {
- edges = [
+ let displayEdges = $derived(edges.length > 0 ? edges : [
  { id: 'E-1', from: 'POI-001', to: 'POI-003', label: 'Associate', strength: 'strong' },
  { id: 'E-2', from: 'POI-001', to: 'EV-001', label: 'Captured on', strength: 'strong' },
  { id: 'E-3', from: 'POI-001', to: 'EV-003', label: 'Used credentials', strength: 'strong' },
  { id: 'E-4', from: 'POI-002', to: 'EV-001', label: 'Witnessed', strength: 'medium' },
  { id: 'E-5', from: 'POI-003', to: 'LOC-001', label: 'Access to', strength: 'weak' },
- { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' }];
+ { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' }]);
  }
 
  let selectedNode: string | null = null;

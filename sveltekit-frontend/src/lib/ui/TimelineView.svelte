@@ -14,42 +14,47 @@
 
  let { events = [], caseId = 'CASE-001' } = $props<{
  events?: TimelineEvent[];
- caseId?, string;
+ caseId?: string;
  }>();
 
  // Demo data - don't mutate props, use derived
  const demoEvents: TimelineEvent[] = [
  {
  id: 'T-001',
- timestamp: new Date('2024-12-05T20:00:00', title: 'Suspect Arrives at Building',
+ timestamp: new Date('2024-12-05T20:00:00'),
+ title: 'Suspect Arrives at Building',
  description: 'Security footage shows suspect entering lobby',
  type: 'evidence',
  evidenceIds: ['EV-001'],
  },
  {
  id: 'T-002',
- timestamp: new Date('2024-12-05T21:15:00', title: 'Badge Access to Server Room',
+ timestamp: new Date('2024-12-05T21:15:00'),
+ title: 'Badge Access to Server Room',
  description: 'Stolen credentials used to access restricted area',
  type: 'action',
  evidenceIds: ['EV-003'],
  },
  {
  id: 'T-003',
- timestamp: new Date('2024-12-05T21:34:00', title: 'Physical Evidence Created',
+ timestamp: new Date('2024-12-05T21:34:00'),
+ title: 'Physical Evidence Created',
  description: 'Forced entry marks photographed',
  type: 'evidence',
  evidenceIds: ['EV-004'],
  },
  {
  id: 'T-004',
- timestamp: new Date('2024-12-05T21:45:00', title: 'Witness Observation',
+ timestamp: new Date('2024-12-05T21:45:00'),
+ title: 'Witness Observation',
  description: 'K. Ito hears suspicious activity',
  type: 'person',
  personIds: ['POI-002'],
  },
  {
  id: 'T-005',
- timestamp: new Date('2024-12-05T22:10:00', title: 'Suspect Exits Building',
+ timestamp: new Date('2024-12-05T22:10:00'),
+ title: 'Suspect Exits Building',
  description: 'Final security camera footage',
  type: 'evidence',
  evidenceIds: ['EV-001'],

@@ -1,7 +1,4 @@
 <script lang="ts">
-	let photo = $state<any>(undefined);
-	let lastSeen = $state<any>(undefined);
-
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
@@ -14,7 +11,7 @@
  lastSeen?: string;
  connections?: number;
  verified?: boolean;
- onclick?, (() => void) | undefined;
+ onclick?: (() => void) | undefined;
  }>();
 
  function roleLabel(r: typeof role) {
