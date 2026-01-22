@@ -1,25 +1,21 @@
 <!-- DetectiveBoard.svelte - Standardized for Svelte 5 -->
 <script lang="ts">
-import { onMount } from "svelte";
 import Fuse from "fuse.js";
-import { dndzone } from "svelte-dnd-action";
 import "nes.css/css/nes.min.css";
-
+import { dndzone } from "svelte-dnd-action";
 // UI Components
+import { Badge } from "$lib/components/ui/badge/index.js";
 import { Button } from "$lib/components/ui/button/index.js";
 import * as Card from "$lib/components/ui/card/index.js";
-import { Badge } from "$lib/components/ui/badge/index.js";
-import * as Tooltip from "$lib/components/ui/tooltip/index.js";
-
 // App stores & Services
-import { evidenceStore, aiAssistant } from "$lib/stores/unified";
-import AIAssistantPanel from "../ai/AIAssistantPanel.svelte";
-import EvidenceCard from "./EvidenceCard.svelte";
-import UploadZone from "./UploadZone.svelte";
 import { analyzeEvidence, findEvidenceConnections } from "$lib/ai/ai-service";
-import { rabbitMQService } from "$lib/services/rabbitmq-service";
-import { VectorService } from "$lib/services/vector-service";
+import AIAssistantPanel from "$lib/components/ai/AIAssistantPanel.svelte";
+import EvidenceCard from "$lib/components/detective/EvidenceCard.svelte";
+import UploadZone from "$lib/components/detective/UploadZone.svelte";
 import { gpuAccelerationService as gpuService } from "$lib/services/gpu-acceleration-service";
+import { rabbitmqService as rabbitMQService } from "$lib/services/rabbitmq-service";
+import { VectorService } from "$lib/services/vector-service";
+import { evidenceStore } from "$lib/stores/unified";
 
 const vectorService = new VectorService();
 const EvidenceCardAny = EvidenceCard as any;
@@ -102,8 +98,8 @@ columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
 }
 
 function handleEvidenceSelect(id: string) {
-selectedEvidenceIds = selectedEvidenceIds.includes(id) 
-? selectedEvidenceIds.filter(i => i !== id) 
+selectedEvidenceIds = selectedEvidenceIds.includes(id)
+? selectedEvidenceIds.filter(i => i !== id)
 : [...selectedEvidenceIds, id];
 }
 
@@ -236,12 +232,14 @@ onclick={(e) => { e.stopPropagation(); openContextMenuId = openContextMenuId ===
 {/each}
 </div>
 {:else}
-<div class="nes-container is-rounded h-full p-0 relative overflow-hidden bg-slate-900/10"
-bind:this={canvasContainer}
-ondrop={handleCanvasDrop}
-ondragover={(e) => e.preventDefault()}
->
-<div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+	<div class="nes-container is-rounded h-full p-0 relative overflow-hidden bg-slate-900/10"
+		role="region"
+		aria-label="Evidence Board Canvas"
+		bind:this={canvasContainer}
+		ondrop={handleCanvasDrop}
+		ondragover={(e) => e.preventDefault()}
+	>
+		<div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
 
 {#each canvasEvidence as item (item.id)}
 <div class="absolute cursor-move" style="left: {item.x}px; top: {item.y}px; width: 250px;"
@@ -309,7 +307,7 @@ onclick={() => { handleViewEvidence(result); closeFindModal(); }}
 
 <style>
 .bg-grid-pattern {
-background-image: 
+background-image:
 linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
 linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
 background-size: 40px 40px;

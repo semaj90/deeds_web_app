@@ -70,6 +70,13 @@ class BrowserStub implements IRabbitMQService {
     async consume() {
         this.makeError();
     }
+    async connect() { return this; }
+    async createChannel() { return this; }
+    async assertQueue() { return {}; }
+    async sendToQueue() { return true; }
+    async consume() { return { consumerTag: 'stub' }; }
+    async close() { }
+    on() { return this; }
 }
 
 // --- RABBITMQ SERVICE (SINGLETON) ---
@@ -128,7 +135,7 @@ class RabbitMQService implements IRabbitMQService {
                 // Setup Exchanges
                 await this.channel.assertExchange(this.config.exchanges.documents, 'direct', { durable, true });
                 await this.channel.assertExchange(this.config.exchanges.deadLetter, 'direct', { durable, true });
-  
+
                 const queues = Object.values(this.config.queues);
                 for (const queue of queues) {
                     await this.channel.assertQueue(queue, {
@@ -162,7 +169,8 @@ class RabbitMQService implements IRabbitMQService {
         }
 
         try {
-            if (!this.channel) throw new Error('Channel not available');this.config.exchanges.documents,
+            if (!this.channel) throw new Error('Channel not available');
+this.config.exchanges.documents,
                 'process_document',
                 Buffer.from(JSON.stringify(job)),
                 { persistent: true, timestamp: Date.now() }

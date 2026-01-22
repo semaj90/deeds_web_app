@@ -157,12 +157,12 @@ async function createGraphViews() {
 /**
  * Insert or update a knowledge node
  */
-export async function upsertNode(node, Omit<KnowledgeNode, '_rev'>): Promise<KnowledgeNode | null> {
+export async function upsertNode(node: Omit<KnowledgeNode, '_rev'>): Promise<KnowledgeNode | null> {
     try {
         // Check if node exists (get current _rev)
         const existing = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${node._id}`);
 
-        let _rev | undefined;
+        let _rev: string | undefined;
         if (existing.ok) {
             const data = await existing.json();
             _rev = data._rev;
@@ -190,7 +190,7 @@ export async function upsertNode(node, Omit<KnowledgeNode, '_rev'>): Promise<Kno
 /**
  * Create an edge between two nodes
  */
-export async function createEdge(edge, Omit<KnowledgeEdge, '_rev'>): Promise<KnowledgeEdge | null> {
+export async function createEdge(edge: Omit<KnowledgeEdge, '_rev'>): Promise<KnowledgeEdge | null> {
     try {
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${edge._id}`, {
             method: 'PUT',
@@ -215,7 +215,8 @@ export async function createEdge(edge, Omit<KnowledgeEdge, '_rev'>): Promise<Kno
  */
 export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
     try {
-`${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${ nodeId }"`
+        const response = await fetch(
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${nodeId}"`
         );
 
         if (!response.ok) return [];
@@ -233,7 +234,8 @@ export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
  */
 export async function getNeighbors(nodeId: string): Promise<string[]> {
     try {
-`${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${ nodeId }"`
+        const response = await fetch(
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${nodeId}"`
         );
 
         if (!response.ok) return [];
@@ -267,7 +269,8 @@ export async function getNode(nodeId: string): Promise<KnowledgeNode | null> {
  */
 export async function getNodesBySource(source: string): Promise<KnowledgeNode[]> {
     try {
-`${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/by_source?key="${source}"`
+        const response = await fetch(
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/by_source?key="${source}"`
         );
 
         if (!response.ok) return [];
@@ -283,12 +286,12 @@ export async function getNodesBySource(source: string): Promise<KnowledgeNode[]>
 /**
  * Bulk insert nodes (for initial Svelte docs sync)
  */
-export async function bulkInsertNodes(nodes, Omit<KnowledgeNode, '_rev'>[]): Promise<number> {
+export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Promise<number> {
     try {
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/_bulk_docs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ docs, nodes })
+            body: JSON.stringify({ docs: nodes })
         });
 
         if (!response.ok) {
@@ -314,11 +317,12 @@ export async function bulkInsertNodes(nodes, Omit<KnowledgeNode, '_rev'>[]): Pro
  * @returns Array of connected nodes with their depths
  */
 export async function traverseGraph(
-    startNodeId: string, maxDepth: number = 2
-): Promise<Array<{ node: KnowledgeNode; depth, number }>> {
+    startNodeId: string,
+    maxDepth: number = 2
+): Promise<Array<{ node: KnowledgeNode; depth: number }>> {
     const visited = new Set<string>();
-    const queue: Array<{ id: string; depth, number }> = [{ id: startNodeId, depth: 0 0 }];
-    const results: Array<{ node: KnowledgeNode; depth, number }> = [];
+    const queue: Array<{ id: string; depth: number }> = [{ id: startNodeId, depth: 0 }];
+    const results: Array<{ node: KnowledgeNode; depth: number }> = [];
 
     while (queue.length > 0) {
         const { id, depth } = queue.shift()!;
