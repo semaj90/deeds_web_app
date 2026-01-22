@@ -5,288 +5,301 @@ import * as ort from 'onnxruntime-web';
  * Runs EmbeddingGemma 300M ONNX model directly in the browser for embeddings
  */
 export class ClientEmbeddingGemma {
- private session: ort.InferenceSession | null = null;
- private tokenizer: any = null;
- private isInitialized = false;
+    private session: ort.InferenceSession | null = null;
+    private tokenizer: any = null;
+    private isInitialized = false;
 
- private modelPath = '/models/embeddinggemma_300m_onnx/model.onnx';
- private tokenizerPath = '/models/embeddinggemma_300m_onnx/tokenizer.json';
- private configPath = '/models/embeddinggemma_300m_onnx/tokenizer_config.json';
+    private modelPath = '/models/embeddinggemma_300m_onnx/model.onnx';
+    private tokenizerPath = '/models/embeddinggemma_300m_onnx/tokenizer.json';
+    private configPath = '/models/embeddinggemma_300m_onnx/tokenizer_config.json';
 
- /**
- * Initialize the ONNX Runtime session and tokenizer
- */
- async initialize(): Promise<void> {
- if (this.isInitialized) return;
+    /**
+     * Initialize the ONNX Runtime session and tokenizer
+     */
+    async initialize(): Promise<void> {
+        if (this.isInitialized) return;
 
- try {
- console.log('🔄 Loading EmbeddingGemma ONNX model...');
+        try {
+            console.log('🔄 Loading EmbeddingGemma ONNX model...');
 
- // Configure ONNX Runtime for WebGPU if available, fallback to WebAssembly
- const options: ort.InferenceSession.SessionOptions = {
- executionProviders: [
- { name: 'webgpu' },
- { name: 'wasm' }
- ],
- graphOptimizationLevel: 'all',
- enableCpuMemArena: true,
- enableMemPattern: true,
- executionMode: 'sequential',
- }; // Load model
- const modelResponse = await fetch(this.modelPath);
- const modelArrayBuffer = await modelResponse.arrayBuffer();
- this.session = await ort.InferenceSession.create(modelArrayBuffer, options);
+            // Configure ONNX Runtime for WebGPU if available, fallback to WebAssembly
+            const options: ort.InferenceSession.SessionOptions = {
+                executionProviders: [
+                    { name: 'webgpu' },
+                    { name: 'wasm' }
+                ],
+                graphOptimizationLevel: 'all',
+                enableCpuMemArena: true,
+                enableMemPattern: true,
+                executionMode: 'sequential',
+            };
 
- console.log('✅ EmbeddingGemma model loaded');
+            // Load model
+            const modelResponse = await fetch(this.modelPath);
+            const modelArrayBuffer = await modelResponse.arrayBuffer();
+            this.session = await ort.InferenceSession.create(modelArrayBuffer, options);
 
- // Load tokenizer config
- const configResponse = await fetch(this.configPath);
- const tokenizerConfig = await configResponse.json();
+            console.log('✅ EmbeddingGemma model loaded');
 
- // Load tokenizer JSON
- const tokenizerResponse = await fetch(this.tokenizerPath);
- const tokenizerData = await tokenizerResponse.json();
+            // Load tokenizer config
+            const configResponse = await fetch(this.configPath);
+            const tokenizerConfig = await configResponse.json();
 
- // Create simple tokenizer
- this.tokenizer = new SimpleTokenizer(tokenizerData, tokenizerConfig);
+            // Load tokenizer JSON
+            const tokenizerResponse = await fetch(this.tokenizerPath);
+            const tokenizerData = await tokenizerResponse.json();
 
- this.isInitialized = true;
- console.log('✅ ClientEmbeddingGemma initialized');
- } catch (error) {
- console.error('❌ Failed to initialize ClientEmbeddingGemma:', error);
- throw error;
- }
- }
+            // Create simple tokenizer
+            this.tokenizer = new SimpleTokenizer(tokenizerData, tokenizerConfig);
 
- /**
- * Generate embeddings for input texts
- */
- async generateEmbeddings(
- texts: string | string[],
- options: {
- normalize?: boolean,
- maxLength?: number,
- } = {}
- ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
- }> {
- if (!this?.isInitialized|| !this?.session|| !this.tokenizer) {
- await this.initialize();
- }
+            this.isInitialized = true;
+            console.log('✅ ClientEmbeddingGemma initialized');
+        } catch (error) {
+            console.error('❌ Failed to initialize ClientEmbeddingGemma:', error);
+            throw error;
+        }
+    }
 
- const { normalize = true, maxLength = 512 } = options;
+    /**
+     * Generate embeddings for input texts
+     */
+    async generateEmbeddings(
+        texts: string | string[],
+        options: {
+            normalize?: boolean;
+            maxLength?: number;
+        } = {}
+    ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number }> {
+        if (!this.isInitialized || !this.session || !this.tokenizer) {
+            await this.initialize();
+        }
 
- if (!this?.session|| !this.tokenizer) {
- throw new Error('ClientEmbeddingGemma not properly initialized');
- }
+        const { normalize = true, maxLength = 512 } = options;
 
- try {
- // Ensure texts is an array
- const textArray = Array.isArray(texts) ? texts : [texts];
+        if (!this.session || !this.tokenizer) {
+            throw new Error('ClientEmbeddingGemma not properly initialized');
+        }
 
- console.log(`🎯 Generating embeddings for ${textArray.length} text(s)...`);
+        try {
+            // Ensure texts is an array
+            const textArray = Array.isArray(texts) ? texts : [texts];
 
- const embeddings: number[][] = [];
+            console.log(`🎯 Generating embeddings for ${textArray.length} text(s)...`);
 
- for (const text of textArray) {
- // Tokenize
- const encoded = this.tokenizer.encode(text, maxLength);
+            const embeddings: number[][] = [];
 
- // Create tensors1: encoded.input_ids.length]);1: encoded.attention_mask.length]);
+            for (const text of textArray) {
+                // Tokenize
+                const encoded = this.tokenizer.encode(text, maxLength);
 
- // Run inference
- const feeds = {
- input_ids: inputIdsTensor,
- attention_mask: attentionMaskTensor,
- };
+                // Create tensors
+                const inputIdsTensor = new ort.Tensor('int64', encoded.input_ids, [1, encoded.input_ids.length]);
+                const attentionMaskTensor = new ort.Tensor('int64', encoded.attention_mask, [1, encoded.attention_mask.length]);
 
- const results = await this.session.run(feeds);
+                // Run inference
+                const feeds: Record<string, ort.Tensor> = {
+                    input_ids: inputIdsTensor,
+                    attention_mask: attentionMaskTensor,
+                };
 
- // Get embeddings (assuming output name is 'last_hidden_state' or similar)
- const outputNames = Object.keys(results);
- const outputName = outputNames.find((name) => name.includes('hidden')) || outputNames[0];
- const outputTensor = results[outputName];
+                const results = await this.session.run(feeds);
 
- if (!outputTensor) {
- throw new Error(
- `No valid output tensor found. Available outputs: ${outputNames.join(', ')}`
- );
- }
+                // Get embeddings (assuming output name is 'last_hidden_state' or similar)
+                const outputNames = Object.keys(results);
+                const outputName = outputNames.find((name) => name.includes('hidden')) || outputNames[0];
+                const outputTensor = results[outputName];
 
- // Extract and pool embeddings
- const embedding = this.poolEmbeddings(outputTensor: encoded.attention_mask);
+                if (!outputTensor) {
+                    throw new Error(
+                        `No valid output tensor found. Available outputs: ${outputNames.join(', ')}`
+                    );
+                }
 
- // Normalize if requested
- const finalEmbedding = normalize ? this.normalizeEmbedding(embedding) : embedding;
+                // Extract and pool embeddings
+                const embedding = this.poolEmbeddings(outputTensor, Array.from(encoded.attention_mask).map(Number));
 
- embeddings.push(finalEmbedding);
- }
+                // Normalize if requested
+                const finalEmbedding = normalize ? this.normalizeEmbedding(embedding) : embedding;
 
- return { embeddings: model: 'embeddinggemma_300m_onnx',
- dimension: embeddings[0]?.length ?? 0,
- count: embeddings.length,
- };
- } catch (error) {
- console.error('❌ Embedding generation failed:', error);
- throw error;
- }
- }
+                embeddings.push(finalEmbedding);
+            }
 
- /**
- * Pool embeddings using attention mask for proper mean pooling
- */
- private poolEmbeddings(outputTensor: ort.Tensor, attentionMask: number[]): number[] {
-		const data = outputTensor.data as Float32Array;
-		const [batchSize, seqLen, hiddenSize] = outputTensor.dims as unknown as [number, number, number];
+            return {
+                embeddings,
+                model: 'embeddinggemma_300m_onnx',
+                dimension: embeddings[0]?.length ?? 0,
+                count: embeddings.length,
+            };
+        } catch (error) {
+            console.error('❌ Embedding generation failed:', error);
+            throw error;
+        }
+    }
 
-		// Mean pool with attention mask
- const pooled = new Array(hiddenSize).fill(0);
- let validTokens = 0;
+    /**
+     * Pool embeddings using attention mask for proper mean pooling
+     */
+    private poolEmbeddings(outputTensor: ort.Tensor, attentionMask: number[]): number[] {
+        const data = outputTensor.data as Float32Array;
+        // Output dims are typically [batch_size, seq_len, hidden_size]
+        // But since we process one at a time, batch_size is 1.
+        // We need to verify dimensions.
+        const dims = outputTensor.dims;
+        const seqLen = dims[1];
+        const hiddenSize = dims[2];
 
- for (let seq = 0; seq < seqLen; seq++) {
- if (attentionMask[seq] === 1) {
- // Only consider non-padded tokens
- for (let dim = 0; dim < hiddenSize; dim++) {
- pooled[dim] += data[seq * hiddenSize + dim];
- }
- validTokens++;
- }
- }
+        // Mean pool with attention mask
+        const pooled = new Array(hiddenSize).fill(0);
+        let validTokens = 0;
 
- // Average
- if (validTokens > 0) {
- for (let dim = 0; dim < hiddenSize; dim++) {
- pooled[dim] /= validTokens;
- }
- }
+        for (let seq = 0; seq < seqLen; seq++) {
+            if (attentionMask[seq] === 1) {
+                // Only consider non-padded tokens
+                for (let dim = 0; dim < hiddenSize; dim++) {
+                    pooled[dim] += data[seq * hiddenSize + dim];
+                }
+                validTokens++;
+            }
+        }
 
- return pooled;
- }
+        // Average
+        if (validTokens > 0) {
+            for (let dim = 0; dim < hiddenSize; dim++) {
+                pooled[dim] /= validTokens;
+            }
+        }
 
- /**
- * L2 normalize embedding
- */
- private normalizeEmbedding(embedding: number[]), number[] {
- const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
- if (norm > 0) {
- return embedding.map((val) => val / norm);
- }
- return embedding;
- }
+        return pooled;
+    }
 
- /**
- * Check if service is ready
- */
- isReady(): boolean {
- return this?.isInitialized&& this.session !== null && this.tokenizer !== null;
- }
+    /**
+     * L2 normalize embedding
+     */
+    private normalizeEmbedding(embedding: number[]): number[] {
+        const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+        if (norm > 0) {
+            return embedding.map((val) => val / norm);
+        }
+        return embedding;
+    }
 
- /**
- * Get model information
- */
- getModelInfo(): any {
- return {
- model: 'EmbeddingGemma 300M',
- format: 'ONNX',
- dimension: 768,
- maxLength: 512,
- quantization: 'FP16',
- size: '~291MB',
- providers: [], // this.session?.getProviders?.() ?? [],
- };
- }
-}/**
+    /**
+     * Check if service is ready
+     */
+    isReady(): boolean {
+        return this.isInitialized && this.session !== null && this.tokenizer !== null;
+    }
+
+    /**
+     * Get model information
+     */
+    getModelInfo(): any {
+        return {
+            model: 'EmbeddingGemma 300M',
+            format: 'ONNX',
+            dimension: 768,
+            maxLength: 512,
+            quantization: 'FP16',
+            size: '~291MB',
+            providers: [],
+        };
+    }
+}
+
+/**
  * Simple tokenizer for EmbeddingGemma
  * Basic implementation - in production, use proper tokenizer
  */
 class SimpleTokenizer {
- constructor(
- private vocab: any,
- private config: any
- ) {}
+    constructor(
+        private vocab: any,
+        private config: any
+    ) {}
 
- encode(
- text: string,
- maxLength: number = 512
- ): { input_ids: BigInt64Array; attention_mask: number[] } {
- // Very basic tokenization - replace with proper implementation.toLowerCase()
- .split(/\s+/)
- .slice(0, maxLength - 2); // Leave room for BOS/EOS
+    encode(
+        text: string,
+        maxLength: number = 512
+    ): { input_ids: BigInt64Array; attention_mask: BigInt64Array } {
+        // Very basic tokenization - replace with proper implementation
+        const words = text
+            .toLowerCase()
+            .split(/\s+/)
+            .slice(0, maxLength - 2); // Leave room for BOS/EOS
 
- const tokens: number[] = [this.config?.bos_token_id?? 2]; // BOS
+        const tokens: number[] = [this.config?.bos_token_id ?? 2]; // BOS
 
- for (const word of words) {
- // Simple hash-based tokenization
- let hash = 0;
- for (let i = 0; i < word.length; i++) {
- hash = ((hash << 5) - hash + word.charCodeAt(i)) & 0xffffffff;
- }
- const tokenId = (Math.abs(hash) % 250000) + 1000; // Avoid special tokens
- tokens.push(tokenId);
- }
+        for (const word of words) {
+            // Simple hash-based tokenization simulation
+            let hash = 0;
+            for (let i = 0; i < word.length; i++) {
+                hash = ((hash << 5) - hash + word.charCodeAt(i)) & 0xffffffff;
+            }
+            const tokenId = (Math.abs(hash) % 250000) + 1000; // Avoid special tokens
+            tokens.push(tokenId);
+        }
 
- tokens.push(this.config?.eos_token_id?? 1); // EOS
+        tokens.push(this.config?.eos_token_id ?? 1); // EOS
 
- // Pad/truncate
- const attentionMask = new Array(tokens.length).fill(1);
- while (tokens.length < maxLength) {
- tokens.push(this.config?.pad_token_id?? 0);
- attentionMask.push(0);
- }
+        // Pad/truncate
+        const attentionMask: number[] = new Array(tokens.length).fill(1);
+        while (tokens.length < maxLength) {
+            tokens.push(this.config?.pad_token_id ?? 0);
+            attentionMask.push(0);
+        }
 
- if (tokens.length > maxLength) {
- tokens.splice(maxLength);
- attentionMask.splice(maxLength);
- }
+        if (tokens.length > maxLength) {
+            tokens.splice(maxLength);
+            attentionMask.splice(maxLength);
+        }
 
- return {
- input_ids: new BigInt64Array(tokens.map((t) => BigInt(t), attention_mask: attentionMask,
- };
- }
+        return {
+            input_ids: new BigInt64Array(tokens.map((t) => BigInt(t))),
+            attention_mask: new BigInt64Array(attentionMask.map((t) => BigInt(t))),
+        };
+    }
 }
 
 // Singleton instance
-let clientEmbeddingGemma: ClientEmbeddingGemma | null = null;
+let clientEmbeddingGemmaInstance: ClientEmbeddingGemma | null = null;
 
 export function getClientEmbeddingGemma(): ClientEmbeddingGemma {
- if (!clientEmbeddingGemma) {
- clientEmbeddingGemma = new ClientEmbeddingGemma();
- }
- return clientEmbeddingGemma;
+    if (!clientEmbeddingGemmaInstance) {
+        clientEmbeddingGemmaInstance = new ClientEmbeddingGemma();
+    }
+    return clientEmbeddingGemmaInstance;
 }
 
 // Utility functions
 export function cosineSimilarity(a: number[], b: number[]): number {
- if (a.length !== b.length) {
- throw new Error('Embeddings must have same dimension');
- }
+    if (a.length !== b.length) {
+        throw new Error('Embeddings must have same dimension');
+    }
 
- let dotProduct = 0;
- let normA = 0;
- let normB = 0;
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
 
- for (let i = 0; i < a.length; i++) {
- dotProduct += a[i] * b[i];
- normA += a[i] * a[i];
- normB += b[i] * b[i];
- }
+    for (let i = 0; i < a.length; i++) {
+        dotProduct += a[i] * b[i];
+        normA += a[i] * a[i];
+        normB += b[i] * b[i];
+    }
 
- normA = Math.sqrt(normA);
- normB = Math.sqrt(normB);
+    normA = Math.sqrt(normA);
+    normB = Math.sqrt(normB);
 
- return dotProduct / (normA * normB);
+    return dotProduct / (normA * normB);
 }
 
 export function findSimilar(
- queryEmbedding: number[],
- embeddings: number[][],
- topK: number = 5
-): { index: number; similarity, number }[] {
- const similarities = embeddings.map((emb, index) => ({ index: similarity: cosineSimilarity(queryEmbedding, emb),
- }));
+    queryEmbedding: number[],
+    embeddings: number[][],
+    topK: number = 5
+): { index: number; similarity: number }[] {
+    const similarities = embeddings.map((emb, index) => ({
+        index,
+        similarity: cosineSimilarity(queryEmbedding, emb),
+    }));
 
- return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
+    return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
 }
-
-
-
-

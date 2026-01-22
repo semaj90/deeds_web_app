@@ -3,37 +3,40 @@
  * Manages Ollama endpoint and model configuration
  */
 
+import { env } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
+
 /**
  * Get Ollama endpoint URL
  */
 export function getOllamaEndpoint(): string {
  if (typeof window === 'undefined') {
  // Server-side
- return process.env.OLLAMA_ENDPOINT ?? 'http://localhost:11434';
+ return env.OLLAMA_ENDPOINT ?? 'http://localhost:11434';
  }
  // Client-side - use relative URL or environment variable
- return process.env.PUBLIC_OLLAMA_ENDPOINT ?? 'http://localhost:11434';
+ return publicEnv.PUBLIC_OLLAMA_ENDPOINT ?? 'http://localhost:11434';
 }
 
 /**
  * Get Ollama inference model
  */
 export function getOllamaModel(): string {
- return process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+ return env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 }
 
 /**
  * Get Ollama embedding model
  */
 export function getOllamaEmbedModel(): string {
- return process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+ return env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 }
 
 /**
  * Get Ollama fallback embedding model
  */
 export function getOllamaFallbackEmbedModel(): string {
- return process.env.OLLAMA_FALLBACK_EMBED_MODEL ?? 'nomic-embed-text:latest';
+ return env.OLLAMA_FALLBACK_EMBED_MODEL ?? 'nomic-embed-text:latest';
 }
 
 /**
@@ -53,7 +56,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${endpoint}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: prompt: text,
+      body: JSON.stringify({
+        model: model,
+        prompt: text
       }),
     });
 
@@ -83,7 +88,8 @@ async function generateEmbeddingWithFallback(text: string): Promise<number[]> {
     const response = await fetch(`${endpoint}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: fallbackModel,
+      body: JSON.stringify({
+        model: fallbackModel,
         prompt: text,
       }),
     });
@@ -151,7 +157,8 @@ export async function pullOllamaModel(modelName: string): Promise<boolean> {
     const response = await fetch(`${endpoint}/api/pull`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: modelName,
+      body: JSON.stringify({
+        name: modelName,
         stream: false,
       }),
     });
@@ -249,7 +256,7 @@ export async function* streamGenerateWithOllama(
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream, true });
+      buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
 
       for (let i = 0; i < lines.length - 1; i++) {
@@ -284,6 +291,3 @@ export async function* streamGenerateWithOllama(
     throw error;
   }
 }
-
-
-
