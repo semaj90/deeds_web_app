@@ -41,7 +41,7 @@ export interface ProcessingMetrics {
 
 // Machine Context interface
 interface GPUProcessingContext {
- processingQueue: DocumentInput[]; activeProcessing: Map<string, DocumentInput>; completedDocuments: ProcessingResult[];
+ processingQueue: DocumentInput[]; activeProcessing: Map<string: DocumentInput>; completedDocuments: ProcessingResult[];
  errorDocuments: ProcessingResult[]; serviceHealth: ServiceHealth;
  metrics: ProcessingMetrics; maxConcurrent: number;
  retryCount: Map<string, number>;
@@ -59,13 +59,13 @@ interface GPUProcessingContext {
  | { type: 'UPDATE_METRICS' };
 
 // Guards
-const canProcessMore = ({ context }: { context, GPUProcessingContext }) => {
+const canProcessMore = ({ context }: { context: GPUProcessingContext }) => {
  return (
  context.activeProcessing.size < context?.maxConcurrent&& context.processingQueue.length > 0
  );
 };
 
-const hasQueuedDocuments = ({ context }: { context, GPUProcessingContext }) => {
+const hasQueuedDocuments = ({ context }: { context: GPUProcessingContext }) => {
  return context.processingQueue.length > 0;
 };
 
@@ -91,7 +91,7 @@ const addToQueue = ({ context, event }: { context: GPUProcessingContext; event, 
  context.metrics.queueLength = context.processingQueue.length;
 };
 
-const startProcessing = ({ context }: { context, GPUProcessingContext }) => {
+const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
  while (
  context.activeProcessing.size < context?.maxConcurrent&&
  context.processingQueue.length > 0
@@ -149,17 +149,17 @@ const startProcessing = ({ context }: { context, GPUProcessingContext }) => {
  }
 };
 
-const pauseProcessing = ({ context }: { context, GPUProcessingContext }) => {
+const pauseProcessing = ({ context }: { context: GPUProcessingContext }) => {
  // In a real implementation, this would pause ongoing GPU jobs
  console.log('Pausing GPU processing...');
 };
 
-const clearQueue = ({ context }: { context, GPUProcessingContext }) => {
+const clearQueue = ({ context }: { context: GPUProcessingContext }) => {
  context.processingQueue = [];
  context.metrics.queueLength = 0;
 };
 
-const checkServiceHealth = ({ context }: { context, GPUProcessingContext }) => {
+const checkServiceHealth = ({ context }: { context: GPUProcessingContext }) => {
  // Simulate health checks
  const gpuHealthy = Math.random() > 0.1; // 90% uptime
  const webgpuHealthy = Math.random() > 0.05; // 95% uptime
@@ -173,12 +173,12 @@ const checkServiceHealth = ({ context }: { context, GPUProcessingContext }) => {
  };
 };
 
-const updateMetrics = ({ context }: { context, GPUProcessingContext }) => {
+const updateMetrics = ({ context }: { context: GPUProcessingContext }) => {
  // Simulate GPU utilization
  context.metrics.gpuUtilization = Math.random() * 100;
 
  // Calculate average processing time
- if (context.completedDocuments.length > 0) {(sum, doc) => sum + (doc?.processingTime?? 0),
+ if (context.completedDocuments.length > 0) {(sum, doc) => sum + (doc?.processingTime ?? 0),
  0
  );
  context.metrics.averageTime = totalTime / context.completedDocuments.length;
@@ -285,6 +285,7 @@ export const gpuProcessingMachine = setup({
 export const createGPUProcessingActor = () => {
  return createActor(gpuProcessingMachine);
 };
+
 
 
 

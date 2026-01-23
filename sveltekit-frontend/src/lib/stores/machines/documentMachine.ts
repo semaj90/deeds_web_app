@@ -3,7 +3,7 @@ import type { createMachine, assign, type ActorRefFrom } from 'xstate';
 
 /**
  * Document Processing XState Machine
- * Manages document lifecycle, AI analysis, and processing workflows
+ * Manages document lifecycle: AI analysis, and processing workflows
  */
 
 // Local fallback interfaces to satisfy type references during checks
@@ -342,11 +342,11 @@ export function hasErrors(context: DocumentContext): boolean {
 }
 
 export function getProcessingProgress(context: DocumentContext): number {
- return context?.processingProgress?? 0;
+ return context?.processingProgress ?? 0;
 }
 
 export function getCurrentStep(context: DocumentContext): string {
- return context?.currentStep?? 'idle';
+ return context?.currentStep ?? 'idle';
 }
 
 export function getProcessingSteps(context: DocumentContext): string[] {

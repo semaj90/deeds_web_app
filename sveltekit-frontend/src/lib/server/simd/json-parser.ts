@@ -43,7 +43,7 @@ export class SIMDJSONParser {
  for (let i = 0; i < this.workerCount; i++) {
  const worker = new Worker(workerPath);
 
- worker.on('message', (result, ParseResult) => {
+ worker.on('message', (result: ParseResult) => {
  this.handleResult(result);
  });
 

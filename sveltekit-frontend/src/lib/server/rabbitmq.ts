@@ -23,10 +23,10 @@ export const QUEUES = {
 
 export async function getConnection(): Promise<Connection> {
   if (connection) return connection;
-  const rabbitmqUrl = process.env?.RABBITMQ_URL?? 'amqp://legal_admin:123456@localhost:5672';
+  const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:123456@localhost:5672';
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
-    connection = await connect(rabbitmqUrl);
+    connection = await amqplib.connect(rabbitmqUrl);
     connection.on('error', (err) => {
       console.error('❌ RabbitMQ connection error:', err);
       connection = null;
@@ -179,6 +179,5 @@ export const rabbitmqService = {
   publishToQueue,
   consumeFromQueue,
   healthCheck,
-  closeRabbitMQ,
-  QUEUES
+  closeRabbitMQ: QUEUES
 };

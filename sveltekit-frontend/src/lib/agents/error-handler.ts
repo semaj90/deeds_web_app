@@ -153,7 +153,7 @@ export class ToolErrorHandler {
   /**
    * Format error message for user display
    */
-  static formatErrorMessage(error, ToolExecutionError): string {
+  static formatErrorMessage(error: ToolExecutionError): string {
     switch (error.type) {
       case ErrorType.NETWORK_ERROR:
         return `Network error: ${error.message}. Please check your connection and try again.`;
@@ -177,7 +177,7 @@ export class ToolErrorHandler {
   /**
    * Should retry the operation
    */
-  static shouldRetry(error, ToolExecutionError, attempt: number): boolean {
+  static shouldRetry(error: ToolExecutionError, attempt: number): boolean {
     if (!error.retryable) {
       return false;
     }

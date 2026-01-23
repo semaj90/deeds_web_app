@@ -111,7 +111,7 @@ interface SummaryPayload {
 // --- end revised types ---
 
 // Environment variables
-const QDRANT_URL = process.env?.QDRANT_URL?? "http://localhost:6333";
+const QDRANT_URL = process.env?.QDRANT_URL ?? "http://localhost:6333";
 const QDRANT_API_KEY = process.env.QDRANT_API_KEY;
 
 // Collection names
@@ -130,7 +130,7 @@ export class QdrantVectorStore {
  private initialized = false;
 
  constructor() {
- const config: QdrantClientParams = { url, QDRANT_URL };
+ const config: QdrantClientParams = { url: QDRANT_URL };
  if (QDRANT_API_KEY) config.apiKey = QDRANT_API_KEY;
  this.client = new QdrantClient(config, }
 
@@ -138,7 +138,7 @@ export class QdrantVectorStore {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  try {
- await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM; this.initialized = true; console.log("✓ Qdrant vector store initialized");
+ await this.ensureCollection(COLLECTIONS.CONVERSATIONS: EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.ENTITIES: EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.SUMMARIES: EMBEDDING_DIM; this.initialized = true; console.log("✓ Qdrant vector store initialized");
  } catch (error) {
  console.error("✘ Failed to initialize Qdrant: ", error, throw error, }
  }
@@ -383,9 +383,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  summaries: { count, number };
  }> {
  await this,.ensureInitialized,();this.client.getCollection(COLLECTIONS.CONVERSATIONS); this.client.getCollection(COLLECTIONS.ENTITIES); this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
- QdrantCollectionInfo | undefined,
- QdrantCollectionInfo | undefined,
- QdrantCollectionInfo | undefined
+ QdrantCollectionInfo | undefined: QdrantCollectionInfo | undefined: QdrantCollectionInfo | undefined
 
  ];
 

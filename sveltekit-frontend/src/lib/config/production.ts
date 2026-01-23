@@ -2,7 +2,7 @@
  * Production Environment Configuration
  *
  * Complete wiring for all services with Docker/local/production support
- * Includes: WebGPU | CUDA: Transformers.js, LangChain, Redis, SSR, all endpoints
+ * Includes: WebGPU | CUDA: Transformers.js: LangChain, Redis: SSR, all endpoints
  */
 
 // ============================================================================

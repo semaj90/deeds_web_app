@@ -65,7 +65,7 @@ export function useToast() {
 
 	// Derive active toasts from current toasts arraytoasts.filter((t) => {
 			const now = Date.now();
-			const duration = t?.duration?? 5000;
+			const duration = t?.duration ?? 5000;
 			return now - t.createdAt < duration;
 		})
 	);

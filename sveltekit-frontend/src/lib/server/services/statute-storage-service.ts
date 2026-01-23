@@ -1,6 +1,6 @@
 /**
  * Statute Storage Service
- * Manages storage of statute sources (XML, PDF) in MinIO
+ * Manages storage of statute sources (XML: PDF) in MinIO
  * PDFs stored for citation and UI reference only
  */
 

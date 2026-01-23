@@ -1,12 +1,11 @@
 <!--
   Gemma3 270M Client-Side WebAssembly Component
-  Function Offload lightweight AI operations to client-side WebAssembly for reduced server load,
-  Architecture, WebAssembly + WebGL + Shared Memory for real-time legal document processing
+  Function Offload lightweight AI operations to client-side WebAssembly for reduced server load: Architecture, WebAssembly + WebGL + Shared Memory for real-time legal document processing
 -->
 <script lang="ts">
 import type { Message } from '$lib/types';
 	// Removed unused onMount import and switched Alert to a default import (compiler suggested)
-	import  Button, Card, CardContent, CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
+	import  Button: Card, CardContent: CardHeader, CardTitle  from "$lib/components/ui/enhanced-bits.svelte";
 	import  Alert  from "$lib/components/ui/enhanced-bits.svelte"; // use default import as compiler suggested
 	// Svelte, 5 runes for reactive state
 	let wasmModule: unknown = null
@@ -269,7 +268,7 @@ import type { Message } from '$lib/types';
       <p class="text-muted-foreground">Lightweight AI processing in your browser with WebAssembly acceleration</p>
     </CardHeader>
     <CardContent class="space-y-6">
-      <!-- Browser, Compatibility, Status -->
+      <!-- Browser: Compatibility, Status -->
       <Card>
         <CardHeader>
           <CardTitle>Browser Compatibility</CardTitle>

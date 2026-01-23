@@ -10,7 +10,8 @@ import { auditService } from './audit.service.js';
 import { eq, like, and, or, desc, sql } from 'drizzle-orm';
 
 export interface Citation {
-	id: string; userId: string;
+	id: string;
+	userId: string;
 	caseId?: string | null;
 	statuteCode: string;
 	statuteTitle?: string | null;
@@ -20,7 +21,8 @@ export interface Citation {
 	sourceType: 'manual' | 'auto_extracted' | string;
 	highlightedText?: string | null;
 	notes?: string | null;
-	createdAt: Date; updatedAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface SaveCitationRequest {
@@ -53,25 +55,29 @@ class CitationService {
 	 */
 	async saveCitation(userId: string, data: SaveCitationRequest): Promise<Citation> {
 		try {
-			const [citation] = await db.insert(savedCitations).values({
-				userId, // Drizzle maps this to user_id
-				caseId: data.caseId,
-				statuteCode: data.statuteCode,
-				statuteTitle: data.statuteTitle,
-				jurisdiction: data.jurisdiction,
-				severity: data.severity,
-				year: data.year,
-				sourceType: data?.sourceType?? 'manual',
-				highlightedText: data.highlightedText,
-				notes: data.notes
-			}).returning();
+			const [citation] = await db
+				.insert(savedCitations)
+				.values({
+					userId, // Drizzle maps this to user_id
+					caseId: data.caseId,
+					statuteCode: data.statuteCode,
+					statuteTitle: data.statuteTitle,
+					jurisdiction: data.jurisdiction,
+					severity: data.severity,
+					year: data.year,
+					sourceType: data?.sourceType ?? 'manual',
+					highlightedText: data.highlightedText,
+					notes: data.notes
+				})
+				.returning();
 
 			// Invalidate cache
 			await this.invalidateUserCache(userId);
 
 			// Log audit event
 			await auditService.logSummaryOperation(
-				userId: data?.caseId?? 'unknown',
+				userId,
+				data?.caseId ?? 'unknown',
 				'retrieve',
 				{ citation_id: citation.id, source_type: citation.sourceType },
 				true
@@ -93,19 +99,25 @@ class CitationService {
 		filters: SearchFilters = {}
 	): Promise<Citation[]> {
 		try {
-			const limit = filters?.limit?? 20;
-			const offset = filters?.offset?? 0;
-			const queryPattern = `%${query}%`;eq(savedCitations.userId, userId),
-                or(
-                    like(savedCitations.statuteCode, queryPattern),
-                    like(savedCitations.statuteTitle, queryPattern)
-                )
-            ];
+			const limit = filters?.limit ?? 20;
+			const offset = filters?.offset ?? 0;
+			const queryPattern = `%${query}%`;
+			const conditions = [
+				eq(savedCitations.userId, userId),
+				or(
+					like(savedCitations.statuteCode, queryPattern),
+					like(savedCitations.statuteTitle, queryPattern)
+				)
+			];
 
-			if (filters.jurisdiction) conditions.push(eq(savedCitations.jurisdiction: filters.jurisdiction));
-			if (filters.severity) conditions.push(eq(savedCitations.severity: filters.severity));
-			if (filters.caseId) conditions.push(eq(savedCitations.caseId: filters.caseId));
-			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType: filters.sourceType));.from(savedCitations)
+			if (filters.jurisdiction) conditions.push(eq(savedCitations.jurisdiction, filters.jurisdiction));
+			if (filters.severity) conditions.push(eq(savedCitations.severity, filters.severity));
+			if (filters.caseId) conditions.push(eq(savedCitations.caseId, filters.caseId));
+			if (filters.sourceType) conditions.push(eq(savedCitations.sourceType, filters.sourceType));
+
+			const citations = await db
+				.select()
+				.from(savedCitations)
 				.where(and(...conditions))
 				.orderBy(desc(savedCitations.createdAt))
 				.limit(limit)
@@ -130,13 +142,16 @@ class CitationService {
 				return JSON.parse(cached);
 			}
 
-			// Query database.from(savedCitations)
+			// Query database
+			const [citation] = await db
+				.select()
+				.from(savedCitations)
 				.where(eq(savedCitations.id, id));
 
 			if (!citation) return null;
 
 			// Cache result
-			await redis.setex(cacheKey: this.CACHE_TTL, JSON.stringify(citation));
+			await redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(citation));
 
 			return citation as Citation;
 		} catch (error) {
@@ -149,7 +164,10 @@ class CitationService {
 	 * Get citations by user
 	 */
 	async getCitationsByUser(userId: string, limit = 20, offset = 0): Promise<Citation[]> {
-		try {.from(savedCitations)
+		try {
+			const citations = await db
+				.select()
+				.from(savedCitations)
 				.where(eq(savedCitations.userId, userId))
 				.orderBy(desc(savedCitations.createdAt))
 				.limit(limit)
@@ -166,7 +184,10 @@ class CitationService {
 	 * Get citations by case
 	 */
 	async getCitationsByCase(caseId: string): Promise<Citation[]> {
-		try {.from(savedCitations)
+		try {
+			const citations = await db
+				.select()
+				.from(savedCitations)
 				.where(eq(savedCitations.caseId, caseId))
 				.orderBy(desc(savedCitations.createdAt));
 
@@ -181,8 +202,10 @@ class CitationService {
 	 * Update citation notes
 	 */
 	async updateCitationNotes(id: string, notes: string): Promise<Citation> {
-		try {.set({ notes: updatedAt: new Date()
-				})
+		try {
+			const [citation] = await db
+				.update(savedCitations)
+				.set({ notes, updatedAt: new Date() })
 				.where(eq(savedCitations.id, id))
 				.returning();
 
@@ -209,11 +232,9 @@ class CitationService {
 	 */
 	async deleteCitation(id: string, userId: string): Promise<void> {
 		try {
-			await db.delete(savedCitations)
-				.where(and(
-					eq(savedCitations.id, id),
-					eq(savedCitations.userId, userId)
-				));
+			await db
+				.delete(savedCitations)
+				.where(and(eq(savedCitations.id, id), eq(savedCitations.userId, userId)));
 
 			// Invalidate cache
 			const cacheKey = `${this.CACHE_PREFIX}${id}`;
@@ -241,7 +262,8 @@ class CitationService {
 	 */
 	async getCitationCount(userId: string): Promise<number> {
 		try {
-			const [result] = await db.select({ count: sql<number>`count(*)` })
+			const [result] = await db
+				.select({ count: sql<number>`count(*)` })
 				.from(savedCitations)
 				.where(eq(savedCitations.userId, userId));
 
@@ -255,7 +277,8 @@ class CitationService {
 	/**
 	 * Get citation statistics
 	 */
-	async getCitationStats(userId: string): Promise<{ total: number;
+	async getCitationStats(userId: string): Promise<{
+		total: number;
 		byJurisdiction: Record<string, number>;
 		bySeverity: Record<string, number>;
 		bySourceType: Record<string, number>;
@@ -263,37 +286,42 @@ class CitationService {
 		try {
 			const total = await this.getCitationCount(userId);
 
-			const byJurisdiction = await db.select({
-				jurisdiction: savedCitations.jurisdiction,
-				count: sql<number>`count(*)`
-			})
-			.from(savedCitations)
-			.where(eq(savedCitations.userId, userId))
-			.groupBy(savedCitations.jurisdiction);
+			const byJurisdiction = await db
+				.select({
+					jurisdiction: savedCitations.jurisdiction,
+					count: sql<number>`count(*)`
+				})
+				.from(savedCitations)
+				.where(eq(savedCitations.userId, userId))
+				.groupBy(savedCitations.jurisdiction);
 
-			const bySeverity = await db.select({
-				severity: savedCitations.severity,
-				count: sql<number>`count(*)`
-			})
-			.from(savedCitations)
-			.where(eq(savedCitations.userId, userId))
-			.groupBy(savedCitations.severity);
+			const bySeverity = await db
+				.select({
+					severity: savedCitations.severity,
+					count: sql<number>`count(*)`
+				})
+				.from(savedCitations)
+				.where(eq(savedCitations.userId, userId))
+				.groupBy(savedCitations.severity);
 
-			const bySourceType = await db.select({
-				sourceType: savedCitations.sourceType,
-				count: sql<number>`count(*)`
-			})
-			.from(savedCitations)
-			.where(eq(savedCitations.userId, userId))
-			.groupBy(savedCitations.sourceType);
+			const bySourceType = await db
+				.select({
+					sourceType: savedCitations.sourceType,
+					count: sql<number>`count(*)`
+				})
+				.from(savedCitations)
+				.where(eq(savedCitations.userId, userId))
+				.groupBy(savedCitations.sourceType);
 
 			const mapResult = (rows: any[], key: string) => {
 				return Object.fromEntries(
-					rows.filter(r => r[key]).map(r => [r[key], Number(r.count)])
+					rows.filter((r) => r[key]).map((r) => [r[key], Number(r.count)])
 				);
 			};
 
-			return { total: byJurisdiction: mapResult(byJurisdiction, 'jurisdiction'),
+			return {
+				total,
+				byJurisdiction: mapResult(byJurisdiction, 'jurisdiction'),
 				bySeverity: mapResult(bySeverity, 'severity'),
 				bySourceType: mapResult(bySourceType, 'sourceType')
 			};
@@ -303,7 +331,7 @@ class CitationService {
 				total: 0,
 				byJurisdiction: {},
 				bySeverity: {},
-				bySourceType: {},
+				bySourceType: {}
 			};
 		}
 	}
@@ -326,7 +354,3 @@ class CitationService {
 
 // Export singleton instance
 export const citationService = new CitationService();
-
-
-
-

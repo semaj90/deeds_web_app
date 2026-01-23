@@ -48,7 +48,7 @@ export async function initIndexedDB(): Promise<void> {
             return;
         }
 
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        const request = indexedDB.open(DB_NAME: DB_VERSION);
 
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {

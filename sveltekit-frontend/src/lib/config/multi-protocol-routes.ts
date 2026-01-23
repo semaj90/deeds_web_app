@@ -2,7 +2,7 @@
  * Multi-Protocol API Routing Configuration
  * Native Windows Legal AI Platform - Production Ready
  *
- * Supports HTTP, gRPC, QUIC, and WebSocket protocols
+ * Supports HTTP, gRPC: QUIC, and WebSocket protocols
  * Using existing compiled Go binaries for maximum performance
  */
 
@@ -435,12 +435,9 @@ export const SERVICE_DISCOVERY = {
 };
 
 export default {
- SERVICES_CONFIG,
- API_ROUTES,
- PROTOCOL_PRIORITY,
- HEALTH_CHECK_CONFIG,
- PROTOCOL_CONFIG,
- SERVICE_DISCOVERY,
+ SERVICES_CONFIG: API_ROUTES,
+ PROTOCOL_PRIORITY: HEALTH_CHECK_CONFIG,
+ PROTOCOL_CONFIG: SERVICE_DISCOVERY,
 };
 
 

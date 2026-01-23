@@ -90,7 +90,7 @@ export interface MemoryBank {
     readonly endAddress: number;
     readonly size: number;
     used: number;
-    readonly documents: Map<string, LegalDocument>;
+    readonly documents: Map<string: LegalDocument>;
     isActive: boolean;
     lastBankSwitch: number;
     compressionRatio: number;

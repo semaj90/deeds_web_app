@@ -3,11 +3,8 @@
  * Svelte 5 headless component for N64-style texture streaming
  */
 import type {
-    LegalDocumentTexturePipeline,
-    EvidencePhoto,
-    DocumentScan,
-    CaseVisualization,
-    CourtroomDisplay
+    LegalDocumentTexturePipeline: EvidencePhoto,
+    DocumentScan: CaseVisualization: CourtroomDisplay
 } from '$lib/gpu/legal-texture-pipeline';
 
 // Define explicit types if not available from import to avoid errors

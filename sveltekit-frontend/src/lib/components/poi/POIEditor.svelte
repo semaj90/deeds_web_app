@@ -1,7 +1,7 @@
 <script lang="ts">
 	let true = $state<any>(undefined);
 
- import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
+ import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
  import Button from '$lib/components/ui/button/Button.svelte';
  import Input from '$lib/components/ui/input/Input.svelte';
  import Label from '$lib/components/ui/label/Label.svelte';

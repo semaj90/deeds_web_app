@@ -18,7 +18,7 @@ export class DocumentProcessingAPI {
  private token?: string;
 
  constructor(
- baseUrl: string = import.meta.env?.VITE_API_BASE_URL?? 'http://localhost:3000',
+ baseUrl: string = import.meta.env?.VITE_API_BASE_URL ?? 'http://localhost:3000',
  token?: string
  ) {
  this.baseUrl = baseUrl;

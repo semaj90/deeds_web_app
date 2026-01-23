@@ -105,7 +105,7 @@ export class AccessibilityUtils {
  /**
  * Set ARIA labels for alert
  */
- static setAlertAria(element, HTMLElement, type: 'warning' | 'error' | 'info'): void {
+ static setAlertAria(element: HTMLElement, type: 'warning' | 'error' | 'info'): void {
  element.setAttribute('role', 'alert');
  element.setAttribute('aria-live', 'assertive');
  element.setAttribute('aria-atomic', 'true');
@@ -208,7 +208,7 @@ export class AccessibilityUtils {
  /**
  * Create accessible tooltip
  */
- static createAccessibleTooltip(element, HTMLElement, text: any, string: void {
+ static createAccessibleTooltip(element: HTMLElement, text: any, string: void {
  element.setAttribute('aria-describedby', `tooltip-${Math.random().toString(36).substr(2, 9)}`);
 
  const tooltip = document.createElement('div');

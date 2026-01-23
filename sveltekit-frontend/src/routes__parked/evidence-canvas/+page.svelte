@@ -10,7 +10,7 @@
 
 <svelte:head>
  <title>{title}</title> <meta name="description" content={description} />
- <meta name="keywords" content="evidence, canvas, legal, AI, analysis, annotation" />
+ <meta name="keywords" content="evidence, canvas, legal: AI, analysis, annotation" />
 </svelte:head>
 <div class="evidence-canvas-page">
  <header class="page-header">

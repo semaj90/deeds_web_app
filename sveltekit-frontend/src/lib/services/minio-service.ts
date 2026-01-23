@@ -57,7 +57,7 @@ export interface DocumentProcessingResult {
 
 class MinIOService {
     private baseUrl: string;
-    private progressListeners: Map<string, (progress, UploadProgress) => void> = new Map();
+    private progressListeners: Map<string, (progress: UploadProgress) => void> = new Map();
 
     constructor() {
         this.baseUrl = '/api/minio'; // Direct to MinIO API endpoints

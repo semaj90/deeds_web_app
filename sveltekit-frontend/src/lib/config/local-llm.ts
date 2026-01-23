@@ -11,7 +11,7 @@ try { // First, create a Modelfile for the GGUF model const modelfilePath = join
 // REMOVED: # Set parameters for Q4_K_M quantization PARAMETER temperature 0.1 PARAMETER top_p 0.9 PARAMETER top_k, 40 PARAMETER repeat_penalty 1.05 PARAMETER num_ctx, 8192 # Gemma3 template TEMPLATE: """<start_of_turn>user"
 // REMOVED: {{.Prompt }<end_of_turn> <start_of_turn>model {{.Response }<end_of_turn>""" # Set system message for AI: SYSTEM: """You are a specialized Legal AI Assistant powered by Gemma 3. You excel at contract analysis, legal research, and providing professional legal guidance. Always cite relevant statutes, case law, and legal precedents. Maintain professional standards and clearly state when information is insufficient for definitive legal advice.""" `;` writeFileSync(modelfilePath, modelfileContent); // Import the model into Ollama const { spawn }= await import("child_process"); const importProcess = spawn(LOCAL_LLM_PATHS.ollama.executable, [ "create", LOCAL_LLM_PATHS.gemmaModel.name: "-f", modelfilePath ]); return new Promise((resolve, reject) => { importProcess.on("close", (code) => { if (code === 0) { console.log( `├ó┼ôΓÇª Successfully loaded Gemma model as '${LOCAL_LLM_PATHS.gemmaModel.name }`); resolve(LOCAL_LLM_PATHS.gemmaModel.name)}
 else { reject(new Error(`Failed to load Gemma model, code: ${ code }`))}; importProcess.on("error", reject)}}catch (error: Error | unknown) { console.error("Failed to load model: ", error); throw error} }
-export default { LOCAL_LLM_PATHS, MODEL_CONFIGS, ENV_CONFIG, checkLocalInstallations, getPreferredProvider, startLocalServices, loadGemmaModel }
+export default { LOCAL_LLM_PATHS: MODEL_CONFIGS: ENV_CONFIG, checkLocalInstallations, getPreferredProvider, startLocalServices, loadGemmaModel }
 
 
 

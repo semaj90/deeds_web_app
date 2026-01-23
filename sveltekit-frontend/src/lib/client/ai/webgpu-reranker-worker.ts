@@ -101,7 +101,7 @@ const cosine = (a: Float32Array), Float32Array, number => {
  const denom = Math.sqrt(na) * Math.sqrt(nb) ?? 1;
  return dot / denom;
 };queryVec: Float32Array, candidateVecs: Float32Array[],
- suggestions, Suggestion[]
+ suggestions: Suggestion[]
 ) =>
  suggestions
  .map((s, idx) => {
@@ -235,7 +235,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  );
  device.queue.writeBuffer(metaBuffer, 0, new Uint32Array([dim]).buffer, 0, 4);
 
- const module = device.createShaderModule({ code, RERANKER_WGSL });
+ const module = device.createShaderModule({ code: RERANKER_WGSL });
  const pipeline = device.createComputePipeline({
  layout: 'auto',
  compute: { module: entryPoint: 'main' },

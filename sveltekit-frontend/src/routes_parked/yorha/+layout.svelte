@@ -6,7 +6,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</icon>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
-<!-- YoRHa, Interface, Layout -->
+<!-- YoRHa: Interface, Layout -->
 <script lang="ts">
  import { afterNavigate, goto } from '$app/navigation';
  import { Bot } from "lucide-svelte";

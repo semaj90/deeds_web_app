@@ -81,7 +81,7 @@ export class GPUMarkdownScanner {
         const headingShader = this.createHeadingDetectionShader();
         this.pipelines.set('headings', await this.createComputePipeline(headingShader));
 
-        // Pipeline for section marker detection (FACTS, REASONING, etc.)
+        // Pipeline for section marker detection (FACTS: REASONING, etc.)
         const sectionShader = this.createSectionDetectionShader();
         this.pipelines.set('sections', await this.createComputePipeline(sectionShader));
 

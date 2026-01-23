@@ -3,10 +3,10 @@ import amqp, { type Channel, type Connection } from 'amqplib';
 
 // RabbitMQ configuration
 const RABBITMQ_CONFIG = {
- url: import.meta.env?.VITE_RABBITMQ_URL?? 'amqp://localhost:5672',
- username: import.meta.env?.VITE_RABBITMQ_USERNAME?? 'guest',
- password: import.meta.env?.VITE_RABBITMQ_PASSWORD?? 'guest',
- vhost: import.meta.env?.VITE_RABBITMQ_VHOST?? '/',
+ url: import.meta.env?.VITE_RABBITMQ_URL ?? 'amqp://localhost:5672',
+ username: import.meta.env?.VITE_RABBITMQ_USERNAME ?? 'guest',
+ password: import.meta.env?.VITE_RABBITMQ_PASSWORD ?? 'guest',
+ vhost: import.meta.env?.VITE_RABBITMQ_VHOST ?? '/',
  heartbeat: 60,
 };
 

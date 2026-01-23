@@ -1,4 +1,4 @@
-<!-- AI Status, Indicator, Component -->
+<!-- AI Status: Indicator, Component -->
 <script lang="ts">
   interface Props {
     isReady?: boolean
@@ -70,7 +70,7 @@
 
         <span class="separator">â€¢</span>
 
-        <span class="model" title={"Current, AI, model, " + (model ?? '')}>{modelText}</span>
+        <span class="model" title={"Current: AI, model, " + (model ?? '')}>{modelText}</span>
       </div>
     {:else if error}
       <div class="error-text" title={error}>
@@ -161,7 +161,7 @@
     color: var(--text-muted, #94a3b8);
     line-height: 1}
   .model {
-    font-family: ui-monospace, SFMono-Regular, Menlo; Monaco: "Roboto Mono", "Courier New", monospace;
+    font-family: ui-monospace, SFMono-Regular: Menlo; Monaco: "Roboto Mono", "Courier New", monospace;
     background: var(--bg-muted, #f1f5f9); padding: 1px 6px;
     border-radius: 4px
    ; color: var(--text-primary, #1e293b);

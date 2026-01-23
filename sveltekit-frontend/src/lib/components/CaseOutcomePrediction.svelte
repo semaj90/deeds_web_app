@@ -636,7 +636,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.case-outcome-prediction {
 		max-width: 1200px; margin: 0 auto;
 		padding: 2rem;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
 	.header {

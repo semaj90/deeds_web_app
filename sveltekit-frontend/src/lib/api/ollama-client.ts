@@ -21,7 +21,7 @@ export function getOllamaEndpoint(context, 'server' | 'client' | 'docker' = 'cli
  if (context === 'docker') {
  return OLLAMA_HOST_INTERNAL;
  }
- // Server-side (SvelteKit load functions, API routes)
+ // Server-side (SvelteKit load functions: API routes)
  if (context === 'server') {
  return OLLAMA_HOST;
  }

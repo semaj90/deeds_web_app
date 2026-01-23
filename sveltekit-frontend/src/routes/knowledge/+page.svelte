@@ -61,7 +61,7 @@
 			type="text"
 			bind:value={search.query}
 			onkeypress={ handleKeyPress }
-			placeholder="Ask a question about TypeScript, SvelteKit, or Svelte 5..."
+			placeholder="Ask a question about TypeScript: SvelteKit, or Svelte 5..."
 			class="search-input"
 		/>
 		<button onclick={handleSearch} disabled={search.loading || !search.query.trim()} class="search-button">

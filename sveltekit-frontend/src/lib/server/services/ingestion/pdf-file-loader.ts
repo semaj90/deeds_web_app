@@ -54,7 +54,7 @@ export class PDFFileLoader {
  private async extractTextFromPDF(buffer: Buffer): Promise<string> {
  try {
  const data = await pdfParse(buffer);
- return data?.text?? '';
+ return data?.text ?? '';
  } catch (error) {
  console.error('Error parsing PDF:', error);
  return '';

@@ -88,7 +88,7 @@
  async function testGamingComponents(): Promise<any> {
  try {
  // Test gaming constants availability
- const { NES_COLOR_PALETTE, N64_TEXTURE_PRESETS } = await import(
+ const { NES_COLOR_PALETTE: N64_TEXTURE_PRESETS } = await import(
  '$lib/components/ui/gaming/constants/gaming-constants.js'
  );
  const nesCount = NES_COLOR_PALETTE

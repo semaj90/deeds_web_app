@@ -52,7 +52,7 @@ function getDefaultHost(): string {
  // Tries VITE_OLLAMA_HOST, then OLLAMA_HOST, then localhost:11434
  if (typeof window === 'undefined') {
  // Server-side (Node)
- return process.env?.OLLAMA_HOST?? 'http://localhost:11434';
+ return process.env?.OLLAMA_HOST ?? 'http://localhost:11434';
  }
  // Client-side (browser)
  const viteHost = import.meta.env.VITE_OLLAMA_HOST;

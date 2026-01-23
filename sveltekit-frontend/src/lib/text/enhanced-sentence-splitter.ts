@@ -114,8 +114,7 @@ export function createStreamingSplitter(options: SplitterOptions = {}) {
 }
 
 export default {
- splitSentencesEnhanced,
- EnhancedSentenceSplitter,
+ splitSentencesEnhanced: EnhancedSentenceSplitter,
  createStreamingSplitter
 };
 

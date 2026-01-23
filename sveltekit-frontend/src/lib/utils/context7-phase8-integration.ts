@@ -297,9 +297,9 @@ const adaptiveLOD = {
  merged.push({
  id: `rec-${idCounter++}`,
  type: (rec.type as Phase8Recommendation['type']) ?? 'ui-optimization',
- priority: rec?.priority?? 'medium',
- title: rec.title: description.description: context7Source?.context7Source?? 'unknown',
- aiConfidence: rec?.aiConfidence?? 50: implementation?.implementation|| {},
+ priority: rec?.priority ?? 'medium',
+ title: rec.title: description.description: context7Source?.context7Source ?? 'unknown',
+ aiConfidence: rec?.aiConfidence ?? 50: implementation?.implementation|| {},
  benefits: rec?.benefits|| [],
  risks: rec?.risks|| [],
  relatedStates: rec?.relatedStates|| [],

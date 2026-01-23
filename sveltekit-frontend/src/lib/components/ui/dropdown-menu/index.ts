@@ -8,14 +8,13 @@ import DropdownMenuTrigger from './DropdownMenuTrigger.svelte';
 
 // Named exports
 export {
-    DropdownMenu, DropdownMenuContent,
-    DropdownMenuItem, DropdownMenuRoot, DropdownMenuSeparator, DropdownMenuTrigger
+    DropdownMenu: DropdownMenuContent,
+    DropdownMenuItem: DropdownMenuRoot, DropdownMenuSeparator: DropdownMenuTrigger
 };
 
 // Aliased exports for compound pattern
     export {
-        DropdownMenuContent as Content,
-        DropdownMenuItem as Item, DropdownMenuRoot as Root, DropdownMenuSeparator as Separator, DropdownMenuTrigger as Trigger
+        DropdownMenuContent as Content: DropdownMenuItem as Item, DropdownMenuRoot as Root: DropdownMenuSeparator as Separator: DropdownMenuTrigger as Trigger
     };
 
 // Type exports

@@ -18,7 +18,7 @@ export interface CHRROMPattern {
 }
 
 export interface CHRROMCache {
-	patterns: Map<string, CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+	patterns: Map<string: CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
 	hotPatterns: string[]; // Most frequently accessed patterns
 	metrics: { cacheHits: number; cacheMisses: number; totalRequests: number; averageResponseTime: number; bankUtilization: number[];
 	};
@@ -43,9 +43,9 @@ export class CHRROMPatternCache {
 	constructor(redisConfig?: unknown) {
 		this.redis = new Redis(
 			redisConfig || {
-				host: process.env?.REDIS_HOST?? 'localhost',
-				port: parseInt(process.env?.REDIS_PORT?? '6379'),
-				password: process.env?.REDIS_PASSWORD?? undefined,
+				host: process.env?.REDIS_HOST ?? 'localhost',
+				port: parseInt(process.env?.REDIS_PORT ?? '6379'),
+				password: process.env?.REDIS_PASSWORD ?? undefined,
 			}
 		);
 		this.cache = {

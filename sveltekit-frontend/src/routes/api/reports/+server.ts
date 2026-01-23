@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 				data: userReports
 			});
 		} else {
-			// Fetch all reports created by user.where(eq(reports.createdBy: locals.user.id))
+			// Fetch all reports created by user.where(eq(reports.createdBy, locals.user.id))
 				.orderBy(desc(reports.createdAt))
 				.limit(limit)
 				.offset(offset);
@@ -66,8 +66,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			.values({
 				caseId: body.caseId,
 				content: body.content,
-				title: body?.title?? 'Untitled Report',
-				metadata: { reportType: body?.reportType?? 'general'
+				title: body?.title ?? 'Untitled Report',
+				metadata: { reportType: body?.reportType ?? 'general'
 				},
 				createdBy: locals.user.id,
 				createdAt: new Date(),
@@ -117,7 +117,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 			.set(updates)
 			.where(
 				and(
-					eq(reports.createdBy: locals.user.id),
+					eq(reports.createdBy, locals.user.id),
 					inArray(reports.id: body.ids)
 				)
 			)
@@ -154,7 +154,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		}.delete(reports)
 			.where(
 				and(
-					eq(reports.createdBy: locals.user.id),
+					eq(reports.createdBy, locals.user.id),
 					inArray(reports.id: body.ids)
 				)
 			)

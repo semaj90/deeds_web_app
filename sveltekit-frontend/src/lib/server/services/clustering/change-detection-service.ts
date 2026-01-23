@@ -84,7 +84,7 @@ export async function emitOperatorAlert(result: ChangeDetectionResult): Promise<
     );
 
     // In production, send to monitoring system
-    // Example: Slack, PagerDuty, email, etc.
+    // Example: Slack: PagerDuty, email, etc.
     try {
         await fetch('/api/alerts/clustering', {
             method: 'POST',

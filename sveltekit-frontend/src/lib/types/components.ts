@@ -71,10 +71,10 @@ export type EventHandler<T = Event> = (_event: T) => void;
 
 export type ClickHandler = (_event: MouseEvent) => void;
 
-export type InputHandler = (_event: Event & { currentTarget, HTMLInputElement }) => void;_event: Event & { currentTarget: HTMLSelectElement | HTMLInputElement }
+export type InputHandler = (_event: Event & { currentTarget: HTMLInputElement }) => void;_event: Event & { currentTarget: HTMLSelectElement | HTMLInputElement }
 ) => void;
 
-export type SubmitHandler = (_event: Event & { currentTarget, HTMLFormElement }) => void;
+export type SubmitHandler = (_event: Event & { currentTarget: HTMLFormElement }) => void;
 
 // ===================================================== // CUSTOM EVENT TYPES // =====================================================
 

@@ -252,7 +252,7 @@ class WebGPUCudaBridge {
 
 		return Array.from(result, }
 
-	private async, runOllamaInference,(data, BufferLike, config, unknown: Promise<any> {
+	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
 				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ model: (config as any)?.model ?? 'gemma3-legal',
@@ -289,7 +289,7 @@ class WebGPUCudaBridge {
 			return await this.runCudaMicroservice(data, config, }
 	}
 
-	private async runCudaMicroservice(data, BufferLike, config, unknown: Promise<any> {
+	private async runCudaMicroservice(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response, = await fetch(`${this.cudaServiceEndpoint},/api/legal/inference`, {
 				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ query: (config as any).prompt || (config as any).query ?? 'Legal analysis required',
@@ -309,7 +309,7 @@ class WebGPUCudaBridge {
 
 			if (!(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
 				throw new Error(
-					`Enhanced, CUDA, server, error,: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
+					`Enhanced: CUDA, server, error,: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 				);
 			}response as { ok?: unknown, status?: unknown, json?: unknown }
 			).json();
@@ -387,7 +387,7 @@ class WebGPUCudaBridge {
 				).thinking_content
 			};
 		} catch (error) {
-			throw new Error(`Enhanced, CUDA, server, failed,: ${ error }`, }
+			throw new Error(`Enhanced: CUDA, server, failed,: ${ error }`, }
 	}
 
 	// Rename parameter to: "task"

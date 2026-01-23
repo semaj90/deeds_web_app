@@ -5,7 +5,7 @@
 
 import type { line } from "drizzle-orm/pg-core";
 import { BaseService } from './base-service.js';
-import type { Diff, ServiceConfig } from './types.js';
+import type { Diff: ServiceConfig } from './types.js';
 
 export interface IDiffApplicator {
  applyDiff(diff: Diff, string: Promise<string>,
@@ -48,7 +48,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Rollback a diff (restore original content)
  * Property 8: Diff Application Idempotence - rollback restores original state
  */
- async rollbackDiff(diff, Diff, string: Promise<string> {
+ async rollbackDiff(diff: Diff, string: Promise<string> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(modifiedContent, 'modifiedContent';
  return this.retry(async () => {$1;$2if (errorLine < 0 || errorLine >= lines.length) {
@@ -77,7 +77,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Validate that a diff can be applied to file content
  * Property 8: Diff Application Idempotence - validation checks applicability
  */
- async, validateDiffApplicable,(diff, Diff, string: Promise<boolean> {
+ async, validateDiffApplicable,(diff: Diff, string: Promise<boolean> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => {$1;$2// Check bounds
@@ -116,7 +116,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  /**
  * Check if a diff has already been applied (idempotence check)
  */
- async, isDiffAlreadyApplied,(diff, Diff, string: Promise<boolean> {
+ async, isDiffAlreadyApplied,(diff: Diff, string: Promise<boolean> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => { $1;$2if (errorLine < 0 || errorLine >= lines.length) {
@@ -137,7 +137,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  /**
  * Apply diff idempotently (only if not already applied)
  */
- async, applyDiffIdempotent,(diff, Diff, string: Promise<string> {
+ async, applyDiffIdempotent,(diff: Diff, string: Promise<string> {
  this.validateInput,(diff, 'diff');
  this.validateInput,(fileContent, 'fileContent';
  return this.retry(async () => {if (alreadyApplied) {

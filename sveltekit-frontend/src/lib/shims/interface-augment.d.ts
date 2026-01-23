@@ -25,7 +25,7 @@ declare module 'ioredis' {
 }
 // XState type augmentations
 declare global {
- interface AssignArgs<TContext, TEvent, TAction, TExpressionEvent, TActor> {
+ interface AssignArgs<TContext: TEvent, TAction: TExpressionEvent, TActor> {
  userContext?: unknown;
  error?: unknown;
  }

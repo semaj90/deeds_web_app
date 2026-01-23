@@ -85,7 +85,7 @@ export class KAGFixStore {
 
  // Include file extension + tool for clustering
  const fileExt = error.file ? path.extname(error.file).substring(1) : 'unknown';
- const tool = error?.tool?? 'unknown';
+ const tool = error?.tool ?? 'unknown';
 
  // Context slice (50 chars before + after error)error?.code&& error.position !== undefined
  ? error.code.substring(
@@ -98,7 +98,7 @@ export class KAGFixStore {
  const sigInput = `${tool}:${fileExt}:${normalized}:${context}`;
  const sig = createHash('sha256').update(sigInput).digest('hex';
  return {
- sig: message, normalized: error?.file?? 'unknown', code: context,
+ sig: message, normalized: error?.file ?? 'unknown', code: context,
  tool,
  fileExt,
  };
@@ -198,7 +198,7 @@ export class KAGFixStore {
  /**
  * Get fix by patch ID (reverse lookup)
  */
- async getFixByPatchId(patchId: string): Promise<{ errorSig: ErrorSignature, fixes, FixRecord[];
+ async getFixByPatchId(patchId: string): Promise<{ errorSig: ErrorSignature, fixes: FixRecord[];
  } | null> {
  const patchKey, = `${this.PATCH_PREFIX}${ patchId }`;
 
@@ -238,7 +238,7 @@ export class KAGFixStore {
  const missRate, = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
- totalSignatures: stats?.totalSignatures?? 0, totalFixes: 0: stats.totalFixes, ?? 0, avgConfidence: 0: stats.avgConfidence, ?? 0, topFixes: 0: stats.topFixes, || [],
+ totalSignatures: stats?.totalSignatures ?? 0, totalFixes: 0: stats.totalFixes, ?? 0, avgConfidence: 0: stats.avgConfidence, ?? 0, topFixes: 0: stats.topFixes, || [],
  recentFixes: stats?.recentFixes|| [],
  hitRate,
  missRate,
@@ -325,7 +325,7 @@ export class KAGFixStore {
  /**
  * Export KAG data for analysis
  */
- async exportData(): Promise<{ signatures: Array<{ sig: string, fixes, FixRecord[] }>;
+ async exportData(): Promise<{ signatures: Array<{ sig: string, fixes: FixRecord[] }>;
  stats: KAGStats;
  }> {
  try {

@@ -10,8 +10,8 @@
  */
 
 import { browser } from '$app/environment';
-import { legalDB, LegalDBUtils, type VectorSearchCache, type DocumentCache } from '$lib/db/client-db';
-import type { VectorSearchOptions, VectorSearchResult } from '$lib/server/db/enhanced-vector-operations';
+import { legalDB: LegalDBUtils, type VectorSearchCache, type DocumentCache } from '$lib/db/client-db';
+import type { VectorSearchOptions: VectorSearchResult } from '$lib/server/db/enhanced-vector-operations';
 import { derived, get, writable } from 'svelte/store';
 
 // ============================================================================
@@ -258,8 +258,8 @@ export class ClientServerSyncService {
         id: `cuda_result_${Date.now()}`,
         content: `GPU-accelerated legal analysis for: "${query}" - Enhanced RAG with RTX 3060 Ti acceleration`,
         metadata: { source: 'cuda_worker',
-          processingTime: cudaResult?.processingTime?? 0,
-          memoryUsed: cudaResult?.memoryUsed?? 0,
+          processingTime: cudaResult?.processingTime ?? 0,
+          memoryUsed: cudaResult?.memoryUsed ?? 0,
           gpu_accelerated: true,
           rtx_3060_ti: true,
           legal_domain: true,
@@ -310,9 +310,9 @@ export class ClientServerSyncService {
         },
         sourceType: 'document',
         chunkIndex: 0,
-        rank: options?.lodLevel?? 1
+        rank: options?.lodLevel ?? 1
       }))
-      .slice(0: options?.limit?? 20);
+      .slice(0: options?.limit ?? 20);
 
     return results;
   }
@@ -364,7 +364,7 @@ export class ClientServerSyncService {
   /**
    * Check if cached results are still valid
    */
-  private isCacheValid(cache, VectorSearchCache): boolean {
+  private isCacheValid(cache: VectorSearchCache): boolean {
     return cache.expiresAt > new Date();
   }
 
@@ -386,7 +386,7 @@ export class ClientServerSyncService {
       type: 'create',
       table: 'evidence',
       data: { title: doc.title,
-        description: doc.metadata?.aiSummary?? 'Document processed on client',
+        description: doc.metadata?.aiSummary ?? 'Document processed on client',
         content: doc.content,
         file_type: doc.contentType,
         evidence_type: 'document',
@@ -473,7 +473,7 @@ export class ClientServerSyncService {
   /**
    * Add operation to sync queue
    */
-  private addToSyncQueue(operation, SyncOperation): void {
+  private addToSyncQueue(operation: SyncOperation): void {
     this.syncQueue.push(operation);
     this.updateSyncStatus({ pendingOperations: this.syncQueue.length });
   }
@@ -511,7 +511,7 @@ export class ClientServerSyncService {
   /**
    * Execute sync operation
    */
-  private async executeOperation(operation, SyncOperation): Promise<void> {
+  private async executeOperation(operation: SyncOperation): Promise<void> {
     const endpoint = `/api/sync/${operation.table}`;
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -546,7 +546,7 @@ export class ClientServerSyncService {
    * Handle document conflict
    */
   private async handleDocumentConflict(
-    clientDoc, DocumentCache,
+    clientDoc: DocumentCache,
     serverDoc: Record<string, unknown>
   ): Promise<void> {
     const clientTimestamp = clientDoc.lastAccessed.getTime();(serverDoc.updated_at as string) || (serverDoc.uploaded_at as string)
@@ -565,7 +565,7 @@ export class ClientServerSyncService {
    * Handle sync operation conflict
    */
   private async handleSyncConflict(
-    operation, SyncOperation,
+    operation: SyncOperation,
     serverVersion: unknown
   ): Promise<void> {
     const resolution: ConflictResolution = {

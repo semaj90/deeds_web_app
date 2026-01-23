@@ -1,6 +1,6 @@
 /**
  * Qdrant Vector Database Client
- * Resilient client with SDK-first dynamic import, HTTP fallback, and API key support
+ * Resilient client with SDK-first dynamic import: HTTP fallback, and API key support
  */
 
 // Type definitions
@@ -351,4 +351,4 @@ async function bootstrapQdrant(collectionName?: string): Promise<{ ok: boolean; 
 }
 
 export { qdrant, initQdrantIndexes, qdrantHealthCheck, waitForQdrantReady, bootstrapQdrant };
-export type { SearchHit, CollectionsListResponse, CreateCollectionBody, PayloadIndexBody };
+export type { SearchHit: CollectionsListResponse, CreateCollectionBody: PayloadIndexBody };

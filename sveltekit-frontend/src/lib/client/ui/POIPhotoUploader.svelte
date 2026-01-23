@@ -112,7 +112,7 @@ import { Upload } from "lucide-svelte";
  Browse Files
  </Button>
  </div>
- <p class="text-sm text-gray-500">Supports JPG, PNG, GIF up to 10MB each</p>
+ <p class="text-sm text-gray-500">Supports JPG: PNG, GIF up to 10MB each</p>
  </div>
  {/if}
  </div>

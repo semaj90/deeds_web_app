@@ -18,7 +18,7 @@ export class IndexedDBService {
  private db: Promise<IDBPDatabase>;
 
  constructor() {
- this.db = openDB(DB_NAME, DB_VERSION, {
+ this.db = openDB(DB_NAME: DB_VERSION, {
  upgrade(db: any) {
  // Create an object store for documents if it doesn't exist
  if (!db.objectStoreNames.contains(STORE_NAME)) {

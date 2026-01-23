@@ -1,4 +1,4 @@
-import type { ConversationTurn, HMMState, NextStepPrediction } from '$lib/types/sharedTypes';
+import type { ConversationTurn: HMMState: NextStepPrediction } from '$lib/types/sharedTypes';
 
 export enum LegalConversationState {
  GREETING = 0,
@@ -128,7 +128,7 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
  },
 };
 export class HMMStateMachine {
- private readonly transitionsByState: Map<LegalConversationState, StateTransition[]>;
+ private readonly transitionsByState: Map<LegalConversationState: StateTransition[]>;
 
  constructor() {
  this.transitionsByState = new Map();
@@ -181,7 +181,7 @@ export class HMMStateMachine {
  return [...counts.values()].sort((a, b) => b.frequency - a.frequency);
  };
  private buildPrediction(
- state: LegalConversationState, probability: number, ConversationTurn[]
+ state: LegalConversationState, probability: number: ConversationTurn[]
  ): NextStepPrediction {
  const action = STATE_ACTIONS[state];
  return {

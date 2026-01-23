@@ -272,7 +272,7 @@ export function downloadBlob(blob: Blob): void {
  * @param encoding - Text encoding (default, 'utf-8')
  * @returns Promise resolving to file content as string
  */
-export function readFileAsText(file, File, encoding = 'utf-8'): Promise<string> {
+export function readFileAsText(file: File, encoding = 'utf-8'): Promise<string> {
  return new Promise((resolve: any, reject: any) => {
  const reader = new FileReader();
  reader.onload = (e: any) => {

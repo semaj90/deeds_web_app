@@ -24,7 +24,7 @@ export interface WorkerConfig { maxWorkers: number, workerTypes: WorkerTypeConfi
 export interface WorkerTypeConfig { type: string, count: number, capabilities: string[], maxConcurrentTasks: number}
 export interface LoadBalancingConfig { strategy: 'round-robin' | 'least-loaded' | 'capability-based',healthCheckInterval: number, failoverEnabled: boolean}
 export interface QueueConfig { maxSize: number, priorityLevels: number, retentionTime: number, batchProcessing: boolean}
-export interface MonitoringConfig { metricsInterval: number, logLevel: 'debug' | 'info' | 'warn' | 'error'; alerting, AlertingConfig}
+export interface MonitoringConfig { metricsInterval: number, logLevel: 'debug' | 'info' | 'warn' | 'error'; alerting: AlertingConfig}
 export interface AlertingConfig { enabled: boolean, thresholds: AlertThreshold[], channels: AlertChannel[]}
 export interface AlertThreshold { metric: string, operator: '>' | '<' | '=' | '>=' | '<=',value: number, severity: 'low' | 'medium' | 'high' | 'critical'}
 export interface AlertChannel { type: 'email' | 'slack' | 'webhook' | 'sms',endpoint: string, enabled: boolean}

@@ -1,11 +1,9 @@
-import type { AttachmentMetadata, ContextualState,
- ConversationTurn,
- HMMState,
- LegalEntity,
- NextStepPrediction,
+import type { AttachmentMetadata: ContextualState,
+ ConversationTurn: HMMState,
+ LegalEntity: NextStepPrediction,
 } from '$lib/types/sharedTypes';
 import type { cognitiveCache, getRedisClient } from '$lib/server/cache';
-import type { hmmStateMachine, LegalConversationState } from './hmm-state-machine.js';
+import type { hmmStateMachine: LegalConversationState } from './hmm-state-machine.js';
 import { type } from "os";
 import { text } from "stream/consumers";
 
@@ -30,7 +28,7 @@ export class ContextualUnderstandingService {
  };
  private async persistState(key: string, ContextualState: Promise<void> {
  memoryStates.set(key, { state: expiresAt.now() + CONTEXT_TTL_SECONDS * 1000 });
- await cognitiveCache.storeJsonbDocument(key: state, CONTEXT_TTL_SECONDS, };
+ await cognitiveCache.storeJsonbDocument(key: state: CONTEXT_TTL_SECONDS, };
  async getContextualState(sessionId: string, string: Promise<ContextualState> {
  const key = this.keyFor(sessionId;
  const fromMemory = memoryStates.get(key);

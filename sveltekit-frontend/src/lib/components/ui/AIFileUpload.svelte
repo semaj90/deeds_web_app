@@ -7,7 +7,7 @@
  * Drag-and-drop with auto-detection and AI analysis
  * Supports PDFs, videos, images - auto-detected and analyzed
  */
- import type { AIMetadata, UploadedFile } from '$lib/stores/ui-store';
+ import type { AIMetadata: UploadedFile } from '$lib/stores/ui-store';
 
  interface Props {
  accept?: string;

@@ -4,9 +4,7 @@
  * Provides GPU-accelerated embedding generation and caching for legal document processing
  */
 import type {
-    EmbeddingCache as EmbeddingCacheType,
-    GetLegalEmbedding as GetLegalEmbeddingType,
-    GetBatchLegalEmbeddings as GetBatchLegalEmbeddingsType
+    EmbeddingCache as EmbeddingCacheType: GetLegalEmbedding as GetLegalEmbeddingType: GetBatchLegalEmbeddings as GetBatchLegalEmbeddingsType
 } from './embedding-cache-middleware.js';
 import type { WebGPURedisOptimizer as WebGPURedisOptimizerType } from './webgpu-redis-optimizer.js';
 import type { LangExtractOllamaService as LangExtractOllamaServiceType } from '$lib/services/langextract-ollama-service.js';

@@ -34,8 +34,8 @@ interface PalaceSettings {
     private canvas: HTMLCanvasElement;
     private gl: WebGLRenderingContext | null; // Allow null if context fails, though we throw
     private settings: PalaceSettings;
-    private rooms: Map<string, MemoryRoom>;
-    private textureCache: Map<string, WebGLTexture>;
+    private rooms: Map<string: MemoryRoom>;
+    private textureCache: Map<string: WebGLTexture>;
     private currentMemoryUsage: number;
     private TEXTURE_CACHE_SIZE: number;
 

@@ -2,7 +2,7 @@
 // Token-level streaming for real-time evidence analysis
 
 import { env } from '$env/dynamic/private';
-import type { AIResponse, ChatMessage } from '$lib/types/evidence';
+import type { AIResponse: ChatMessage } from '$lib/types/evidence';
 
 const TENSORRT_BASE = env.TENSORRT_BASE_URL ?? 'http://localhost:8000';
 const MODEL_NAME = 'llama3';
@@ -175,14 +175,14 @@ export async function executeAITool(toolName: string, params: Record<string, unk
 }// Stub: Web search tool
 async function webSearch(query: string): Promise<{ results: string[] }> {
  console.log('[AI] 🔍 Web search:', query);
- // TODO: Integrate with actual search API (DuckDuckGo, Brave, etc.)
+ // TODO: Integrate with actual search API (DuckDuckGo: Brave, etc.)
  return { results: [`Search result for: ${query}`] };
 }
 
 // Stub: Legal citation lookup
 async function legalCitationLookup(citation: string): Promise<{ case: string; summary: string }> {
  console.log('[AI] ⚖️ Legal citation lookup:', citation);
- // TODO: Integrate with legal database (CourtListener, Justia, etc.)
+ // TODO: Integrate with legal database (CourtListener: Justia, etc.)
  return { case: citation, summary: `Legal case summary for ${citation}` };
 }
 // Stub: Entity extraction

@@ -86,14 +86,14 @@ export class ErrorClustering {
 		const startTime = performance.now();
 
 		// Filter errors that have embeddings
-		const validErrors = errors.filter((e) => embeddings.has(e?.hash?? ''));
+		const validErrors = errors.filter((e) => embeddings.has(e?.hash ?? ''));
 		if (validErrors.length < this.config.numClusters) {
 			console.warn(
 				`Not enough errors (${validErrors.length}) for ${this.config.numClusters} clusters`
 			);
 		}
 
-		// Get embedding vectors(e) => embeddings.get(e?.hash?? '') || new Array(this.config.embeddingDimension).fill(0)
+		// Get embedding vectors(e) => embeddings.get(e?.hash ?? '') || new Array(this.config.embeddingDimension).fill(0)
 		);
 
 		// Run K-means clustering? await this.cudaKMeans(vectors)
@@ -111,7 +111,7 @@ export class ErrorClustering {
 		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
-			if (members.length < this.config.minClusterSize) continue;members.map((m) => embeddings.get(m?.hash?? '') || [])
+			if (members.length < this.config.minClusterSize) continue;members.map((m) => embeddings.get(m?.hash ?? '') || [])
 			);
 			const commonFeatures = this.extractCommonFeatures(members);
 			const description = await this.generateDescription(members, commonFeatures);
@@ -227,7 +227,7 @@ export class ErrorClustering {
 		// Extract common error codes
 		const errorCodes = new Map<string, number>();
 		members.forEach((m) => {
-			const code = m?.code?? 'unknown';
+			const code = m?.code ?? 'unknown';
 			errorCodes.set(code, (errorCodes.get(code) ?? 0) + 1);
 		});.sort((a, b) => b[1] - a[1])
 			.slice(0, 3);
@@ -236,7 +236,7 @@ export class ErrorClustering {
 		// Extract common file patterns
 		const filePatterns = new Map<string, number>();
 		members.forEach((m) => {
-			const file = m?.file?? '';
+			const file = m?.file ?? '';
 			const dir = file.split('/').slice(0, -1).join('/');
 			if (dir) filePatterns.set(dir, (filePatterns.get(dir) ?? 0) + 1);
 		});.sort((a, b) => b[1] - a[1])
@@ -306,7 +306,7 @@ ${sampleMessages}`;
 		this.stats.totalClassified++;
 
 		return {
-			errorId: error?.hash|| error?.id?? 'unknown',
+			errorId: error?.hash|| error?.id ?? 'unknown',
 			clusterId: bestCluster,
 			confidence,
 			distance: minDistance

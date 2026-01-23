@@ -202,7 +202,7 @@
  height: 100vh; display: flex;
  flex-direction: column; background: #1a1a1a;
  color: #ffffff;
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
 
  .demo-header {

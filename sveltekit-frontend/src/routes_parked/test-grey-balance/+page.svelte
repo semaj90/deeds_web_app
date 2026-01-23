@@ -17,7 +17,7 @@
  </p>
  </div>
 
- <!-- Button, Variants, Section -->
+ <!-- Button: Variants, Section -->
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Button Variants</h2>
 
@@ -49,7 +49,7 @@
  </div>
  </section>
 
- <!-- Card, Variants, Section -->
+ <!-- Card: Variants, Section -->
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Card Variants</h2>
 
@@ -87,7 +87,7 @@
  </p>
  </YoRHaHarvardCard>
 
- <!-- Grey, Balance, Cards -->
+ <!-- Grey: Balance, Cards -->
  <YoRHaHarvardCard variant="grey" title="Pure, Grey" subtitle="NES-style, neutral">
  <p class="text-enhanced-text-secondary">Pure grey card following NES color patterns.</p>
  </YoRHaHarvardCard>
@@ -116,7 +116,7 @@
  </div>
  </section>
 
- <!-- Color, Palette, Reference -->
+ <!-- Color: Palette, Reference -->
  <section class="space-y-6">
  <h2 class="text-2xl font-bold text-harvard-crimson">Color Palette Reference</h2>
 

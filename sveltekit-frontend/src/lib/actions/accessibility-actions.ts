@@ -29,7 +29,7 @@ export interface ARIAStateParams {
 }
 
 export interface KeyboardNavigationParams {
- keys: Record<string, (_event, KeyboardEvent) => void>;
+ keys: Record<string, (_event: KeyboardEvent) => void>;
  capture?: boolean;
  preventDefault?: boolean;
 }
@@ -331,7 +331,7 @@ export function liveRegion(
  let currentParams = { politeness: 'polite', atomic: false, relevant: 'additions', ...params };
 
  function setupLiveRegion() {
- element.setAttribute('aria-live', currentParams?.politeness?? 'polite');
+ element.setAttribute('aria-live', currentParams?.politeness ?? 'polite');
  if (currentParams.atomic) {
  element.setAttribute('aria-atomic', 'true');
  }

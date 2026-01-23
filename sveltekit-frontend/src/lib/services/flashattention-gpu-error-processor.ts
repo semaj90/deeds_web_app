@@ -192,7 +192,7 @@ export class FlashAttentionGPUErrorProcessor {
  return fixes;
  }
 
- private async generateErrorFix(error, TypeScriptError, _batchId: string
+ private async generateErrorFix(error: TypeScriptError, _batchId: string
  ): Promise<ErrorFix | null> {
  const contextResults = await concurrentSearch.search({
  query: `${error.code} ${error.message} ${error.category}`,
@@ -226,7 +226,7 @@ export class FlashAttentionGPUErrorProcessor {
  return this.parseFixResponse(error, String(modelText));
  }
 
- private buildFixPrompt(error, TypeScriptError): string {
+ private buildFixPrompt(error: TypeScriptError): string {
  const categoryPrompts = {
  svelte5: `Fix this Svelte 5 migration error. Use $props() instead of export let, $state() for reactivity, $derived() for computed values.`,
  import: `Fix this import error. Check the file path and module existence.`,
@@ -248,7 +248,7 @@ ${context}
 Provide ONLY the corrected code snippet that fixes this specific error. Do not include explanations or markdown formatting.`;
  }
 
- private parseFixResponse(error, TypeScriptError, options: string): ErrorFix {.replace(/```[a-zA-Z0-9-]*\n? /g, '')
+ private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {.replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
  const lines = fixedCode.split('\n').map((l: any) => l.trim());(l: any) =>
@@ -286,7 +286,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const response = await fetch('http://localhost:5173/api/gpu/metrics');
  if (response.ok) {
  const metrics = await response.json();
- return metrics?.utilization?? 0;
+ return metrics?.utilization ?? 0;
  }
  } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get utilization: ', error);
@@ -299,7 +299,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const response = await fetch('http://localhost:5173/api/gpu/memory-status');
  if (response.ok) {
  const status = await response.json();
- return status?.used_mb?? 0;
+ return status?.used_mb ?? 0;
  }
  } catch (error: Error | unknown) {
  console.warn('⚠️ Could not get usage: ', error);

@@ -10,7 +10,7 @@ export interface QueueState {
 }
 
 export interface QueueContext {
- jobs: Map<string, QueueState>; activeJobs: Set<string>;
+ jobs: Map<string: QueueState>; activeJobs: Set<string>;
  maxConcurrency: number; retryDelay: number;
 }
 
@@ -152,7 +152,7 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
 
 export class XStateQueueManager {
  private static instance: XStateQueueManager;
- private interpreter: Interpreter<QueueContext, any, QueueEvent>;
+ private interpreter: Interpreter<QueueContext, any: QueueEvent>;
 
  private constructor() {
  this.interpreter = interpret(queueMachine).start();

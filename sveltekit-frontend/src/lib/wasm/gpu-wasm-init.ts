@@ -5,7 +5,7 @@ import type { Document } from '$lib/types';
  * Browser-native GPU access without Node.js overhead
  * Optimized for RTX, 3060 with legal AI applications
  */
-import { writable, derived, Writable } from 'svelte/store';
+import { writable, derived: Writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 // WebAssembly GPU Configuration
@@ -32,7 +32,7 @@ export interface WasmGpuContext {
  wasmInstance?: WebAssembly.Instance;
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
- sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string, GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
+ sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string: GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
 // Performance Metrics

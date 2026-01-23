@@ -26,7 +26,7 @@ interface LLMInvoker {
 import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
-import { Case, Document } from "$lib/types";
+import { Case: Document } from "$lib/types";
 
 // import { LegalDocument } from "$lib/models/LegalDocument.svelte"; // Removed invalid import
 
@@ -315,8 +315,8 @@ let cacheHit = false;
                 ld.parties: ld.outcome,
                 ld.precedential_value,
                 (dc.embedding <=> '${queryEmbeddingString}') AS distance
-            FROM ${schema.documentChunks?.name?? 'document_chunks'} dc
-            JOIN ${schema.legalDocuments?.name?? 'legal_documents'} ld ON dc.document_id = ld.id
+            FROM ${schema.documentChunks?.name ?? 'document_chunks'} dc
+            JOIN ${schema.legalDocuments?.name ?? 'legal_documents'} ld ON dc.document_id = ld.id
             WHERE (dc.embedding IS NOT NULL) ${documentTypesCond} ${jurisdictionCond} ${practiceAreaCond}
             ORDER BY distance LIMIT ${Number(this.config.maxRetrievedDocs)};
         `;
@@ -395,7 +395,7 @@ let cacheHit = false;
 
         // Generate context for the LLM.map(
                 (doc: any, i: any) =>
-                    `[${i + 1}] ${doc?.title?? 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
+                    `[${i + 1}] ${doc?.title ?? 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
             )
             .join('\n\n---\n\n');
 
@@ -407,8 +407,8 @@ let cacheHit = false;
  Case Context:
  ${caseContext}
 
- Jurisdiction: ${query?.jurisdiction?? 'Not specified'}
- Practice Area: ${query?.practiceArea?? 'General'}
+ Jurisdiction: ${query?.jurisdiction ?? 'Not specified'}
+ Practice Area: ${query?.practiceArea ?? 'General'}
 
  Question: ${query.query};
  `;
@@ -552,11 +552,11 @@ let cacheHit = false;
 
             const caseData = caseResult[0] as DrizzleCase;
             return [
-                `Case: ${caseData.title} (${caseData?.caseNumber?? 'N/A'})`,
-                `Status: ${caseData?.status?? 'Unknown'}`,
-                `Priority: ${caseData?.priority?? 'Unspecified'}`,
-                `Jurisdiction: ${caseData?.jurisdiction?? 'Not specified'}`,
-                `Description: ${caseData?.description?? 'No description available'}`].join('\n');
+                `Case: ${caseData.title} (${caseData?.caseNumber ?? 'N/A'})`,
+                `Status: ${caseData?.status ?? 'Unknown'}`,
+                `Priority: ${caseData?.priority ?? 'Unspecified'}`,
+                `Jurisdiction: ${caseData?.jurisdiction ?? 'Not specified'}`,
+                `Description: ${caseData?.description ?? 'No description available'}`].join('\n');
         } catch (error) {
             console.warn('Failed to get context:', error);
             return 'Case context unavailable';
@@ -581,7 +581,7 @@ let cacheHit = false;
      */
     async indexDocument(document: LegalDocument): Promise<IndexDocumentResult> {
         try {
-            const content = document?.fullText|| document?.content|| document?.summary?? '';
+            const content = document?.fullText|| document?.content|| document?.summary ?? '';
             if (!content.trim()) {
                 return { success: false, chunksCreated: 0, error: 'No content to index' };
             }
@@ -682,7 +682,7 @@ let cacheHit = false;
         try {
             const queryData: typeof schema.userAiQueries.$inferInsert = {
                 userId: query.userId,
-                caseId: query?.caseId?? null,
+                caseId: query?.caseId ?? null,
                 query: query.query,
                 response: response.answer,
                 model: this.config.generationModel,

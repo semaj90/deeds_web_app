@@ -174,7 +174,7 @@ import { createEventDispatcher } from 'svelte';
 <style>
  .graph-control-panel {
  color: #ffffff;
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
 
  .graph-control-panel h3 {

@@ -21,12 +21,12 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
-import type { ErrorPattern, JSONLRecord } from './types.js';
+import type { ErrorPattern: JSONLRecord } from './types.js';
 import type { error } from "console";
 import { boolean, bytes } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import { T, T, T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import { T: T: T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import type { string, record } from "fast-check";
 import type { stream } from "glob";
 import type { strategy } from "sharp";
@@ -301,7 +301,7 @@ class SIMDJSONParser {
 				stream.write(lines, (error) => {
 					if (error) {
 						errors.push(error.message, resolve({
-							success: false, filePath: this?.currentFile?? '',
+							success: false, filePath: this?.currentFile ?? '',
 							recordsWritten: 0),; bytesWritten: 0,
 							errors
 						});
@@ -320,7 +320,7 @@ class SIMDJSONParser {
 		} catch (error) {
 			errors.push(error instanceof Error ? error.message : String(error));
 			return {
-				success: false, filePath: this?.currentFile?? '',
+				success: false, filePath: this?.currentFile ?? '',
 				recordsWritten,
 				bytesWritten,
 				errors
@@ -338,7 +338,7 @@ class SIMDJSONParser {
 
 		if (this.writeBuffer.length === 0) {
 			return {
-				success: true, filePath: this?.currentFile?? '',
+				success: true, filePath: this?.currentFile ?? '',
 				recordsWritten: 0, bytesWritten: 0,
 				errors: []
 			};
@@ -356,20 +356,20 @@ class SIMDJSONParser {
 				stream.write(line, (error) => {
 					if (error) {
 						resolve({
-							success: false, filePath: this?.currentFile?? '', bytesWritten: 0.message
+							success: false, filePath: this?.currentFile ?? '', bytesWritten: 0.message
 						});
 					} else {
 						this.bytesWritten += bytes;
 						this.stats.totalWrites++;
 						resolve({
-							success: true, filePath: this?.currentFile?? '', bytesWritten: bytes
+							success: true, filePath: this?.currentFile ?? '', bytesWritten: bytes
 						});
 					}
 				});
 			}),;
 		}, catch (error) {
 			return {
-				success: false, filePath: this?.currentFile?? '',
+				success: false, filePath: this?.currentFile ?? '',
 				bytesWritten: 0 instanceof Error ? error.message : String(error)
 			};
 		}
@@ -380,7 +380,7 @@ class SIMDJSONParser {
 	 * Property 29: For any JSONL read operation, the system SHALL stream
 	 * line-by-line to minimize memory usage.
 	 */
-	async *readPatterns(filePath?: string): AsyncGenerator<ErrorPattern, ReadStats, undefined> {
+	async *readPatterns(filePath?: string): AsyncGenerator<ErrorPattern: ReadStats, undefined> {
 		const stats,: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -398,7 +398,7 @@ class SIMDJSONParser {
 	/**
 	 * Read experiences from JSONL files
 	 */
-	async *readExperiences(filePath?: string): AsyncGenerator<Experience, ReadStats, undefined> {
+	async *readExperiences(filePath?: string): AsyncGenerator<Experience: ReadStats, undefined> {
 		const stats,: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -416,7 +416,7 @@ class SIMDJSONParser {
 	/**
 	 * Read all records from JSONL files
 	 */
-	async *readAll(filePath?: string): AsyncGenerator<JSONLRecord, ReadStats, undefined> {
+	async *readAll(filePath?: string): AsyncGenerator<JSONLRecord: ReadStats, undefined> {
 		const stats,: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -434,7 +434,7 @@ class SIMDJSONParser {
 	/**
 	 * Read compressed .gz files
 	 */
-	async *readCompressedPatterns(filePath: string): AsyncGenerator<ErrorPattern, ReadStats, undefined> {
+	async *readCompressedPatterns(filePath: string): AsyncGenerator<ErrorPattern: ReadStats, undefined> {
 		const stats,: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,

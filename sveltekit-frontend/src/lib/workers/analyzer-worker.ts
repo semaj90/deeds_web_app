@@ -18,7 +18,7 @@ const processingQueue: Map<string, any> = new Map();
 // Initialize Ollama client
 function initOllama(config: { url: string, model: string }) {
  ollama = new Ollama({
- host: config?.url?? 'http://localhost:11434',
+ host: config?.url ?? 'http://localhost:11434',
  });
  console.log(`[Worker ${workerId}] Ollama initialized with ${config.model}`);
 }
@@ -108,7 +108,7 @@ self.onmessage = async (event: MessageEvent) => {
 
  switch (type) {
  case 'INIT':
- workerId = data?.workerId?? 0;
+ workerId = data?.workerId ?? 0;
  initOllama(data.config);
  self.postMessage({ type: 'READY', workerId });
  break;
@@ -153,7 +153,7 @@ self.onmessage = async (event: MessageEvent) => {
 };
 
 // Error handler
-self.onerror = (error, ErrorEvent) => {
+self.onerror = (error: ErrorEvent) => {
  console.error(`[Worker ${workerId}] Unhandled error:`, error);
  self.postMessage({ type: 'WORKER_ERROR'.message });
 };

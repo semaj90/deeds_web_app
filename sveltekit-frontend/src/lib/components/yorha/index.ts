@@ -7,12 +7,9 @@ import YoRHaNavigation from './YoRHaNavigation.svelte';
 import YoRHaTable from './YoRHaTable.svelte';
 
 export {
-    YoRHaAIChat, YoRHaCommandCenter,
-    YoRHaDataGrid,
-    YoRHaForm,
-    YoRHaModal,
-    YoRHaNavigation,
-    YoRHaTable
+    YoRHaAIChat: YoRHaCommandCenter,
+    YoRHaDataGrid: YoRHaForm,
+    YoRHaModal: YoRHaNavigation: YoRHaTable
 };
 
 export interface TableColumn {

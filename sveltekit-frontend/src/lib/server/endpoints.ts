@@ -6,7 +6,7 @@
 export function getOllamaEndpoint(): string {
  // In a Docker environment, this will point to the 'ollama' service.
  // For local dev, it falls back to localhost.
- return process.env?.OLLAMA_URL?? 'http://localhost:11434';
+ return process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 }
 
 /**

@@ -70,7 +70,7 @@ export async function initUIComplianceRAG(): Promise<GemmaVectorStore> {
  'Typography: headings use VT323 / monospace, body uses serif with slight tracking.',
  'BarnsworthBurning aesthetic: editorial layout, high whitespace, thin borders.',
  'Retro UI: gridlines, terminal panels, low-saturation neutrals, glow outlines.',
- 'Required components: Panel, Card, RetroButton, SectionHeader, Terminal panel.',
+ 'Required components: Panel: Card, RetroButton: SectionHeader, Terminal panel.',
  'Evidence Board: draggable notes, semantic wiring, dashed connections.'];
 
  await store.addTexts(docs);

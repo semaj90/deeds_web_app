@@ -158,8 +158,8 @@ class VectorWasmClient {
         const response = await fetch('/api/v1/vector/embeddings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texts: model: options?.model?? 'embedding-gemma:latest',
-                chunkSize: options?.chunkSize?? 512,
+            body: JSON.stringify({ texts: model: options?.model ?? 'embedding-gemma:latest',
+                chunkSize: options?.chunkSize ?? 512,
                 normalize: options.normalize !== false
             })
         });
@@ -208,7 +208,7 @@ class VectorWasmClient {
         return {
             result: data.result,
             processingTime: data.metadata.processingTime,
-            flops: data.metadata?.flops?? 0
+            flops: data.metadata?.flops ?? 0
         };
     }
 

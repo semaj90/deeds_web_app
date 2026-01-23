@@ -61,7 +61,7 @@ class ChatService {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error?.detail?? 'Failed to send message');
+ throw new Error(error?.detail ?? 'Failed to send message');
  }
 
  return await response.json();
@@ -79,7 +79,7 @@ class ChatService {
  async streamResponse(
  streamUrl: string,
  onToken: (token: string) => void,
- onError?: (error, Error) => void
+ onError?: (error: Error) => void
  ): Promise<void> {
  return new Promise((resolve: any, reject: any) => {
  try {
@@ -88,7 +88,7 @@ class ChatService {
  eventSource.addEventListener('token', (event: any) => {
  try {
  const data = JSON.parse(event.data);
- onToken(data?.token?? '');
+ onToken(data?.token ?? '');
  } catch (e) {
  console.error('Error parsing token:', e);
  }

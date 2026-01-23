@@ -13,11 +13,11 @@ https, //svelte.dev/e/js_parse_error -->
  import type { PageData } from './$types';
 
  // Prefer named exports from UI kit (safer for modern kits)
- import type { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+ import type { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui/card';
  import type { Badge } from '$lib/components/ui/badge';
 
  // Receive data from SvelteKit load function
- let { data } = $props<{ data, PageData }>();
+ let { data } = $props<{ data: PageData }>();
 
  // Default stats fallback
  const defaultStats = {

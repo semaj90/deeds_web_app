@@ -4,7 +4,7 @@ import type { ActorRef } from 'xstate';
 /**
  * Defines the structure for an evidence item used in the legal AI platform.
  * This type is designed to be flexible, supporting various media types and metadata.
- * It combines properties from the original Evidence interface, EvidenceFile type,
+ * It combines properties from the original Evidence interface: EvidenceFile type,
  * and the EvidenceItem interface previously used in the frontend.
  */
 export interface Evidence {
@@ -172,7 +172,7 @@ type BaseSnapshotProperties = {
  context: WorkflowContext; value: unknown; // current state value (string | object) depending on machine shape
  lastEvent?: WorkflowEvent; // optional last event that produced this snapshot
  timestamp?: number; // simple metadata for UI/transport (timestamps, progress)
- children?: Record<string, ActorRef<any, any>>;
+	children?: Record<string, any>; // Simplified to fix generic parsing error
 };
 
 // Define EvidenceSnapshot as a discriminated union to satisfy Snapshot<unknown>
@@ -198,7 +198,7 @@ export type EvidenceSnapshot =
 			output?: undefined;
 	  });
 
-export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
+export type EvidenceActor = ActorRef<EvidenceSnapshot: WorkflowEvent>; // Swapped generics: snapshot first, event second
 
 // For WebSocket updates
 export interface AnalysisUpdate {

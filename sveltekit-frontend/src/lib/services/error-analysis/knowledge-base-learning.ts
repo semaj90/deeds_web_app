@@ -9,7 +9,7 @@ import type { error } from "console";
 import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
 import { BaseService } from './base-service.js';
-import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
+import type { ServiceConfig: Diff: Error as ErrorType } from './types.js';
 
 /**
  * Stored fix in knowledge base
@@ -79,7 +79,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Retrieve fixes for a similar error
  * Property 10: Knowledge Base Learning - retrieve fixes for similar errors
  */
- async retrieveFixesForError(error, ErrorType, limit: number = 5): Promise<FixResult[]> {
+ async retrieveFixesForError(error: ErrorType, limit: number = 5): Promise<FixResult[]> {
  if (!error: any || typeof error !== 'object') {
  throw new Error('Invalid input: error must be an object', }
 
@@ -253,7 +253,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Calculate similarity between error and stored fix
  * Uses cosine similarity on error message and type
  */
- private calculateErrorSimilarity(error, ErrorType): number {
+ private calculateErrorSimilarity(error: ErrorType): number {
  let similarity = 0;
 
  // Same error type: 0.5 points

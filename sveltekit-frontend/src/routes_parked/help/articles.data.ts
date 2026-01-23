@@ -67,7 +67,7 @@ Welcome to the Legal Case Management System!
 - Ctrl+S: Save
 
 ## User Menu
-Top-right: Settings, Preferences, Logout.
+Top-right: Settings: Preferences, Logout.
 `,
  },
  {

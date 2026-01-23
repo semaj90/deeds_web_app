@@ -1,581 +1,499 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { KnowledgeSearchStore } from '$lib/stores/knowledge-search.svelte';
 
-  interface UploadResult {
-    file: string;
-    chunks: number;
-    points: number;
-    status: string;
-    error?: string;
-  }
+  // Svelte 5: Create reactive store instance
+  const search = $state(new KnowledgeSearchStore());
 
-  interface SearchResult {
-    id: number;
-    score: number;
-    document: string;
-    chunk: number;
-    content: string;
-    source: string;
-  }
+  // Sample queries
+  const sampleQueries = [
+    'How does TypeScript improve code quality?',
+    'What are SvelteKit best practices?',
+    'Explain reactive declarations in Svelte'
+  ];
 
-  let files: FileList;
-  let uploading = false;
-  let uploadResults: UploadResult[] = [];
-  let searching = false;
-  let searchQuery = '';
-  let searchResults: SearchResult[] = [];
-  let generating = false;
-  let generationPrompt = '';
-  let generationResponse = '';
-  let ragContext: any = null;
-  let useGemini = false;
-  let activeTab = 'upload';
+  const webSearchQueries = [
+    'Latest TypeScript 5.7 features December 2024',
+    'What are the newest SvelteKit 2.0 breaking changes?',
+    'How to implement OAuth2 in modern SvelteKit apps?',
+    'Best practices for pg_vector embeddings 2024'
+  ];
 
-  async function uploadDocuments() {
-    if (!files || files.length === 0) {
-      alert('Please select files');
-      return;
-    }
-
-    uploading = true;
-    uploadResults = [];
-
-    try {
-      const formData = new FormData();
-      for (const file of files) {
-        formData.append('files', file);
+  // Event handlers
+  async function handleSearch() {
+    if (search.synthesizeEnabled) {
+      // Use streaming for synthesis
+      for await (const { event } of search.streamSearch()) {
+        // Stream updates happen automatically via reactive state
       }
-      formData.append('source', 'ui-upload');
-
-      const response = await fetch('/api/knowledge', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        uploadResults = data.results;
-        alert(`✅ Uploaded ${files.length} file(s)`);
-        files = undefined;
-      } else {
-        alert(`❌ ${data.error}`);
-      }
-    } catch (err) {
-      alert(`❌ Upload error: ${err}`);
-    } finally {
-      uploading = false;
+    } else {
+      await search.search();
     }
   }
 
-  async function searchKnowledge() {
-    if (!searchQuery.trim()) {
-      alert('Enter a search query');
-      return;
-    }
-
-    searching = true;
-    searchResults = [];
-
-    try {
-      const response = await fetch(
-        `/api/knowledge?q=${encodeURIComponent(searchQuery)}&limit=5`
-      );
-
-      const data = await response.json();
-      if (data.success) {
-        searchResults = data.matches;
-      } else {
-        alert(`❌ ${data.error}`);
-      }
-    } catch (err) {
-      alert(`❌ Search error: ${err}`);
-    } finally {
-      searching = false;
+  function handleKeyPress(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   }
 
-  async function generateResponse() {
-    if (!generationPrompt.trim()) {
-      alert('Enter a prompt');
-      return;
-    }
-
-    generating = true;
-    generationResponse = '';
-    ragContext = null;
-
-    try {
-      const response = await fetch('/api/knowledge', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: generationPrompt,
-          max_context_chunks: 5,
-          use_gemini: useGemini
-        })
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        generationResponse = data.response;
-        ragContext = data.rag_context;
-      } else {
-        alert(`❌ ${data.error}`);
-      }
-    } catch (err) {
-      alert(`❌ Generation error: ${err}`);
-    } finally {
-      generating = false;
-    }
+  function useSampleQuery(sample: string) {
+    search.query = sample;
+    handleSearch();
   }
 
-  onMount(() => {
-    // Initialize
-  });
+  function handleProviderChange(e: Event) {
+    const target = e.target as HTMLSelectElement;
+    search.setProvider(target.value as any);
+  }
 </script>
 
-<div class="knowledge-base-ui">
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>📚 Knowledge Base Manager</h1>
-      <p>Upload documents, search with RAG, and generate responses with local/cloud LLMs</p>
-    </div>
+<div class="knowledge-search-container">
+	<div class="header">
+		<h1>🧠 Phase 76: Knowledge Base Search</h1>
+		<p class="subtitle">
+			Search across {search.metadata?.totalResults ?? 13} documentation sources with AI-powered synthesis
+		</p>
+	</div>
 
-    <!-- Tab Navigation -->
-    <div class="tabs">
-      <button
-        class="tab {activeTab === 'upload' ? 'active' : ''}"
-        on:click={() => (activeTab = 'upload')}
-      >
-        📤 Upload
-      </button>
-      <button
-        class="tab {activeTab === 'search' ? 'active' : ''}"
-        on:click={() => (activeTab = 'search')}
-      >
-        🔍 Search
-      </button>
-      <button
-        class="tab {activeTab === 'generate' ? 'active' : ''}"
-        on:click={() => (activeTab = 'generate')}
-      >
-        🤖 Generate
-      </button>
-    </div>
+	<!-- Search Bar -->
+	<div class="search-bar">
+		<input
+			type="text"
+			bind:value={search.query}
+			onkeypress={ handleKeyPress }
+			placeholder="Ask a question about TypeScript: SvelteKit, or Svelte 5..."
+			class="search-input"
+		/>
+		<button onclick={handleSearch} disabled={search.loading || !search.query.trim()} class="search-button">
+			{search.loading ? '🔄 Searching...' : '🔍 Search'}
+		</button>
+	</div>
 
-    <!-- Upload Section -->
-    {#if activeTab === 'upload'}
-      <section class="card">
-        <h2>📤 Upload Documents</h2>
-        <p class="subtitle">Supported: PDF, TXT, HTML, MD</p>
+	<!-- Options -->
+	<div class="options">
+		<label class="checkbox-label">
+			<input type="checkbox" bind:checked={search.synthesizeEnabled} />
+			<span>AI Synthesis (generate answer)</span>
+		</label>
 
-        <div class="input-group">
-          <input
-            type="file"
-            bind:files
-            multiple
-            accept=".pdf,.txt,.html,.htm,.md,.markdown"
-            disabled={uploading}
-          />
-        </div>
+		{#if search.synthesizeEnabled}
+			<select value={search.provider} onchange={handleProviderChange} class="provider-select">
+				<option value="ollama">🦙 Ollama (Local) - Recommended</option>
+				<option value="gemini">🔮 Gemini 3 (Web Search) - Limited Quota</option>
+				<option value="claude">🧠 Claude - Not configured</option>
+				<option value="openai">🤖 GPT-4 - Not configured</option>
+			</select>
 
-        <button
-          on:click={uploadDocuments}
-          disabled={uploading || !files || files.length === 0}
-        >
-          {uploading ? '⏳ Uploading...' : '🚀 Upload'}
-        </button>
+			{#if search.isGemini}
+				<label class="checkbox-label web-search-toggle">
+					<input type="checkbox" bind:checked={search.useWebSearch} />
+					<span>🌐 Enable Google Search Grounding</span>
+				</label>
+			{:else}
+				<span class="fallback-notice">
+					<span class="icon">✅</span>
+					Using Local Ollama (stable & always available)
+				</span>
+			{/if}
+		{/if}
+	</div>
 
-        {#if uploadResults.length > 0}
-          <div class="results">
-            {#each uploadResults as result}
-              <div class="result-item" class:success={result.status === 'success'}>
-                <div class="file-name">{result.file}</div>
-                {#if result.status === 'success'}
-                  <div class="details">
-                    ✅ {result.chunks} chunks → {result.points} vectors
-                  </div>
-                {:else}
-                  <div class="error">❌ {result.error}</div>
-                {/if}
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </section>
-    {/if}
+	<!-- Sample Queries -->
+	<div class="samples">
+		<span class="samples-label">Try:</span>
+		{#each (search.canUseWebSearch ? webSearchQueries : sampleQueries) as sample}
+			<button onclick={() => useSampleQuery(sample)} class="sample-button">
+				{sample}
+			</button>
+		{/each}
+	</div>
 
-    <!-- Search Section -->
-    {#if activeTab === 'search'}
-      <section class="card">
-        <h2>🔍 Search Knowledge Base</h2>
-        <p class="subtitle">Vector similarity search with RAG</p>
+	<!-- Error -->
+	{#if search.error}
+		<div class="error-banner">
+			{search.error}
+		</div>
+	{/if}
 
-        <div class="input-group">
-          <input
-            type="text"
-            placeholder="Search query (e.g., 'TypeScript error handling')"
-            bind:value={searchQuery}
-            on:keydown={(e) => e.key === 'Enter' && searchKnowledge()}
-            disabled={searching}
-          />
-        </div>
+	<!-- Synthesized Answer -->
+	{#if search.synthesized}
+		<div class="synthesized-answer" class:web-grounded={search.searchUsed}>
+			<h2>
+				{#if search.searchUsed}
+					🌐 AI Answer (Web Grounded)
+				{:else}
+					🤖 AI-Generated Answer
+				{/if}
+			</h2>
+			<div class="answer-content">
+				{search.synthesized}
+			</div>
 
-        <button on:click={searchKnowledge} disabled={searching || !searchQuery}>
-          {searching ? '⏳ Searching...' : '🔎 Search'}
-        </button>
+			{#if search.webSources && search.webSources.length > 0}
+				<div class="web-sources">
+					<h3>📚 Web Sources</h3>
+					<ul>
+						{#each search.webSources as source}
+							<li>
+								{#if source.uri}
+									<a href={source.uri} target="_blank" rel="noopener noreferrer">
+										{source.title || source.uri}
+									</a>
+								{:else}
+									<span>{source.title || 'Unknown source'}</span>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 
-        {#if searchResults.length > 0}
-          <div class="search-results">
-            <p class="result-count">Found {searchResults.length} matches</p>
-            {#each searchResults as result (result.id)}
-              <div class="search-item">
-                <div class="header-info">
-                  <span class="doc-name">📄 {result.document}</span>
-                  <span class="score">Similarity: {(result.score * 100).toFixed(1)}%</span>
-                </div>
-                <div class="content">{result.content.substring(0, 300)}...</div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </section>
-    {/if}
+			{#if search.metadata?.provider}
+				<div class="answer-meta">
+					Provider: {search.metadata.provider} | Time: {search.metadata.processingTime}ms
+					{#if search.searchUsed}
+						| 🌐 Web Search Used
+					{/if}
+				</div>
+			{/if}
+		</div>
+	{/if}
 
-    <!-- Generation Section -->
-    {#if activeTab === 'generate'}
-      <section class="card">
-        <h2>🤖 Generate with RAG</h2>
-        <p class="subtitle">Search knowledge base + generate response with Gemma3 or Gemini</p>
+	<!-- Search Results -->
+	{#if search.hasResults}
+		<div class="results-container">
+			<h2>
+				📚 Found {search.resultCount} Documentation Sources
+				{#if search.metadata}
+					<span class="results-meta">({search.metadata.processingTime}ms)</span>
+				{/if}
+			</h2>
 
-        <div class="input-group">
-          <textarea
-            placeholder="Ask a question (will search knowledge base and generate answer)"
-            bind:value={generationPrompt}
-            disabled={generating}
-            rows="3"
-          />
-        </div>
+			{#each search.results as result, idx (result.id)}
+				<div class="result-card">
+					<div class="result-header">
+						<span class="result-rank">#{idx + 1}</span>
+						<h3 class="result-title">{result.title}</h3>
+						<span class="result-score">{(result.score * 100).toFixed(1)}% match</span>
+					</div>
 
-        <div class="checkbox-group">
-          <label>
-            <input type="checkbox" bind:checked={useGemini} disabled={generating} />
-            Use Gemini API (requires GEMINI_API_KEY)
-          </label>
-          <small>{useGemini ? '☁️ Cloud' : '🖥️ Local (Gemma3)'}</small>
-        </div>
+					<a href={result.url} target="_blank" rel="noopener noreferrer" class="result-url">
+						📄 {result.url}
+					</a>
 
-        <button on:click={generateResponse} disabled={generating || !generationPrompt}>
-          {generating ? '⏳ Generating...' : '✨ Generate'}
-        </button>
+					<div class="result-summary">
+						{result.summary}
+					</div>
 
-        {#if generationResponse}
-          <div class="generation-result">
-            <div class="response-header">
-              <span class="llm-badge">{ragContext?.llm || 'gemma3-legal'}</span>
-              {#if ragContext}
-                <span class="rag-info">
-                  📊 {ragContext.matches} matches (avg {ragContext.avg_similarity}% similarity)
-                </span>
-              {/if}
-            </div>
-            <div class="response-text">{generationResponse}</div>
-
-            {#if ragContext?.documents}
-              <div class="sources">
-                <strong>Sources:</strong>
-                <ul>
-                  {#each ragContext.documents as doc}
-                    <li>{doc}</li>
-                  {/each}
-                </ul>
-              </div>
-            {/if}
-          </div>
-        {/if}
-      </section>
-    {/if}
-  </div>
+					{#if result.entities}
+						<details class="result-entities">
+							<summary>🏷️ Entities</summary>
+							<div class="entities-content">
+								{result.entities}
+							</div>
+						</details>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{:else if !search.loading && search.query}
+		<div class="no-results">
+			No results found for "<strong>{search.query}</strong>"
+		</div>
+	{/if}
 </div>
 
 <style>
-  .knowledge-base-ui {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 2rem 0;
-  }
+	.knowledge-search-container {
+		max-width: 1200px; margin: 2rem auto;
+		padding: 0 2rem;
+	}
 
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
+	.header {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
 
-  .header {
-    color: white;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
+	.header h1 {
+		font-size: 2.5rem;
+		margin-bottom: 0.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	}
 
-  .header h1 {
-    font-size: 2rem;
-    margin: 0;
-  }
+	.subtitle {
+		color: #666;
+		font-size: 1.1rem;
+	}
 
-  .header p {
-    margin: 0.5rem 0 0;
-    opacity: 0.9;
-  }
+	.search-bar {
+		display: flex; gap: 1rem;
+		margin-bottom: 1rem;
+	}
 
-  .tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.5rem;
-    border-radius: 12px;
-  }
+	.search-input {
+		flex: 1; padding: 1rem 1.5rem;
+		font-size: 1.1rem; border: 2px solid #e2e8f0;
+		border-radius: 12px; outline: none;
+		transition: border-color 0.2s;
+	}
 
-  .tab {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    background: transparent;
-    color: white;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-  }
+	.search-input:focus {
+		border-color: #667eea;
+	}
 
-  .tab:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
+	.search-button {
+		padding: 1rem 2rem;
+		font-size: 1.1rem;
+		font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white; border: none;
+		border-radius: 12px; cursor: pointer;
+		transition: transform 0.2s;
+	}
 
-  .tab.active {
-    background: white;
-    color: #667eea;
-    border-color: white;
-  }
+	.search-button:hover, not(disabled) {
+		transform: translateY(-2px);
+	}
 
-  .card {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  }
+	.search-button:disabled {
+		opacity: 0.6; cursor:not-allowed;
+	}
 
-  .card h2 {
-    margin: 0 0 0.5rem;
-    color: #333;
-  }
+	.options {
+		display: flex; gap: 1rem;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
 
-  .subtitle {
-    margin: 0 0 1.5rem;
-    color: #666;
-    font-size: 0.9rem;
-  }
+	.checkbox-label {
+		display: flex;
+		align-items: center; gap: 0.5rem;
+		cursor: pointer;
+	}
 
-  .input-group {
-    margin-bottom: 1rem;
-  }
+	.provider-select {
+		padding: 0.5rem 1rem;
+		border: 2px solid #e2e8f0;
+		border-radius: 8px;
+		font-size: 0.9rem;
+	}
 
-  input[type='file'],
-  input[type='text'],
-  textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-  }
+	.samples {
+		display: flex; gap: 0.5rem;
+		flex-wrap: wrap;
+		margin-bottom: 2rem; padding: 1rem;
+		background: #f7fafc;
+		border-radius: 12px;
+	}
 
-  input[type='file']:focus,
-  input[type='text']:focus,
-  textarea:focus {
-    outline: none;
-    border-color: #667eea;
-  }
+	.samples-label {
+		font-weight: 600; color: #4a5568;
+	}
 
-  input:disabled,
-  textarea:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+	.sample-button {
+		padding: 0.5rem 1rem;
+		background: white; border: 1px solid #e2e8f0;
+		border-radius: 8px; cursor: pointer;
+		font-size: 0.9rem; transition: all 0.2s;
+	}
 
-  .checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-  }
+	.sample-button:hover {
+		background: #667eea; color: white;
+		border-color: #667eea;
+	}
 
-  .checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-  }
+	.error-banner {
+		padding: 1rem; background: #fed7d7;
+		color: #c53030;
+		border-radius: 8px;
+		margin-bottom: 1rem;
+	}
 
-  .checkbox-group small {
-    color: #999;
-    font-size: 0.8rem;
-  }
+	.synthesized-answer {
+		background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+		padding: 2rem;
+		border-radius: 12px;
+		margin-bottom: 2rem; border: 2px solid #667eea50;
+	}
 
-  button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s, opacity 0.2s;
-  }
+	.synthesized-answer h2 {
+		margin-bottom: 1rem; color: #667eea;
+	}
 
-  button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    opacity: 0.9;
-  }
+	.answer-content {
+		line-height: 1.8;
+		white-space: pre-wrap;
+		font-size: 1.05rem;
+	}
 
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+	.answer-meta {
+		margin-top: 1rem;
+		font-size: 0.9rem; color: #666;
+	}
 
-  .results {
-    margin-top: 1.5rem;
-  }
+	.results-container h2 {
+		margin-bottom: 1.5rem;
+		font-size: 1.5rem;
+	}
 
-  .result-item {
-    background: #f5f5f5;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 0.75rem;
-    border-left: 4px solid #ff6b6b;
-  }
+	.results-meta {
+		font-size: 0.9rem; color: #666;
+		font-weight: normal;
+	}
 
-  .result-item.success {
-    border-left-color: #51cf66;
-    background: #f0fdf4;
-  }
+	.result-card {
+		background: white; padding: 1.5rem;
+		border-radius: 12px;
+		margin-bottom: 1.5rem; border: 1px solid #e2e8f0;
+		transition: box-shadow 0.2s;
+	}
 
-  .file-name {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-  }
+	.result-card:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
 
-  .details {
-    color: #51cf66;
-    font-size: 0.9rem;
-  }
+	.result-header {
+		display: flex;
+		align-items: center; gap: 1rem;
+		margin-bottom: 0.5rem;
+	}
 
-  .error {
-    color: #ff6b6b;
-    font-size: 0.9rem;
-  }
+	.result-rank {
+		background: #667eea; color: white;
+		padding: 0.25rem 0.75rem;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
 
-  .result-count {
-    color: #667eea;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
+	.result-title {
+		flex: 1;
+		font-size: 1.2rem; margin: 0;
+	}
 
-  .search-results {
-    margin-top: 1.5rem;
-  }
+	.result-score {
+		background: #48bb78; color: white;
+		padding: 0.25rem 0.75rem;
+		border-radius: 6px;
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
 
-  .search-item {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    border: 1px solid #e0e0e0;
-  }
+	.result-url {
+		display: block; color: #667eea;
+		text-decoration: none;
+		margin-bottom: 1rem;
+		font-size: 0.9rem;
+	}
 
-  .header-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-  }
+	.result-url:hover {
+		text-decoration: underline;
+	}
 
-  .doc-name {
-    font-weight: bold;
-    color: #333;
-  }
+	.result-summary {
+		line-height: 1.6; color: #2d3748;
+		margin-bottom: 1rem;
+	}
 
-  .score {
-    background: #667eea;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-  }
+	.result-entities {
+		margin-top: 1rem;
+	}
 
-  .content {
-    color: #666;
-    line-height: 1.5;
-  }
+	.result-entities summary {
+		cursor: pointer; color: #667eea;
+		font-weight: 600;
+	}
 
-  .generation-result {
-    margin-top: 1.5rem;
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 6px;
-    border: 2px solid #667eea;
-  }
+	.entities-content {
+		margin-top: 0.5rem; padding: 1rem;
+		background: #f7fafc;
+		border-radius: 8px;
+		font-size: 0.9rem;
+		line-height: 1.6;
+	}
 
-  .response-header {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
+	.no-results {
+		text-align: center; padding: 3rem;
+		color: #666;
+		font-size: 1.1rem;
+	}
 
-  .llm-badge {
-    background: #667eea;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-  }
+	/* Web Search Styles */
+	.web-search-toggle {
+		background: linear-gradient(135deg, #667eea15 0%, #22c55e15 100%);
+		padding: 0.5rem 1rem;
+		border-radius: 8px; border: 1px solid #667eea30;
+	}
 
-  .rag-info {
-    color: #666;
-    font-size: 0.9rem;
-  }
+	.web-search-toggle span {
+		font-weight: 500; color: #22c55e;
+	}
 
-  .response-text {
-    color: #333;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    margin-bottom: 1rem;
-  }
+	.synthesized-answer.web-grounded {
+		background: linear-gradient(135deg, #22c55e15 0%, #667eea15 100%);
+		border-color: #22c55e50;
+	}
 
-  .sources {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
-  }
+	.synthesized-answer.web-grounded h2 {
+		color: #22c55e;
+	}
 
-  .sources strong {
-    color: #667eea;
-  }
+	.web-sources {
+		margin-top: 1.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(102, 126, 234, 0.2);
+	}
 
-  .sources ul {
-    margin: 0.5rem 0 0;
-    padding-left: 1.5rem;
-  }
+	.web-sources h3 {
+		font-size: 1rem;
+		margin-bottom: 0.75rem; color: #4a5568;
+	}
 
-  .sources li {
-    color: #666;
-    margin: 0.25rem 0;
-  }
+	.web-sources ul {
+		list-style: none; padding: 0;
+		margin: 0;
+	}
+
+	.web-sources li {
+		padding: 0.5rem 0;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	}
+
+	.web-sources li:last-child {
+		border-bottom: none;
+	}
+
+	.web-sources a {
+		color: #667eea;
+		text-decoration: none;
+		font-size: 0.9rem; display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.web-sources a:hover {
+		text-decoration: underline; color: #764ba2;
+	}
+
+	/* Fallback Notice Styles */
+	.fallback-notice {
+		display: flex;
+		align-items: center; gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background: linear-gradient(135deg, #48bb7815 0%, #38a16915 100%);
+		border: 1px solid #48bb7850;
+		border-radius: 8px;
+		font-size: 0.9rem; color: #276749;
+		font-weight: 500;
+	}
+
+	.fallback-notice .icon {
+		font-size: 1.1rem;
+	}
 </style>
+
+
+
+

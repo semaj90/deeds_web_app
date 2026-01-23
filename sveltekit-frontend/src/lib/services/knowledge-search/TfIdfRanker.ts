@@ -17,7 +17,7 @@ export interface TfIdfConfig {
 }
 
 const DEFAULT_CONFIG: TfIdfConfig = {
-  redisUrl: process.env?.REDIS_URL?? 'redis://localhost:6379',
+  redisUrl: process.env?.REDIS_URL ?? 'redis://localhost:6379',
   cacheTTL: 3600 // 1 hour
 };
 

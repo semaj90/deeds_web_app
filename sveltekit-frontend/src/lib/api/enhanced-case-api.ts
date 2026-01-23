@@ -77,7 +77,7 @@ export class EnhancedCaseAPI {
             });
 
             if (!caseResponse.success) {
-                throw new Error(caseResponse?.error?? 'Failed to create case');
+                throw new Error(caseResponse?.error ?? 'Failed to create case');
             }
             const createdCase = caseResponse.data;
             console.log('✅ Case created successfully: ', createdCase);
@@ -249,8 +249,8 @@ export class EnhancedCaseAPI {
     }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
         return restClient.post('/cases/cluster', {
             ...params,
-            algorithm: params?.algorithm?? 'kmeans',
-            k: params?.k?? 5,
+            algorithm: params?.algorithm ?? 'kmeans',
+            k: params?.k ?? 5,
         });
     }
 }

@@ -1,5 +1,5 @@
 // Ollama endpoint configuration for Phase 72
-// Loads from .env.phase72 (standardized Dec 18, Session 3)
+// Loads from .env.phase72 (standardized Dec 18: Session 3)
 
 export interface OllamaEndpoint {
 	url: string; model: string;
@@ -14,12 +14,12 @@ export interface OllamaConfig {
 }
 
 const DEFAULT_CONFIG: OllamaConfig = {
-	baseUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
-	models: { legal: process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest',
-		embedding: process.env?.OLLAMA_EMBEDDING_MODEL?? 'embeddinggemma:latest',
-		fastFix: process.env?.OLLAMA_FAST_FIX_MODEL?? 'gemma2:2b'
+	baseUrl: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+	models: { legal: process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest',
+		embedding: process.env?.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
+		fastFix: process.env?.OLLAMA_FAST_FIX_MODEL ?? 'gemma2:2b'
 	},
-	timeout: parseInt(process.env?.OLLAMA_TIMEOUT?? '30000', 10)
+	timeout: parseInt(process.env?.OLLAMA_TIMEOUT ?? '30000', 10)
 };
 
 /**

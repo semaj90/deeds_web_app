@@ -1,0 +1,40 @@
+import { json, type RequestHandler } from '@sveltejs/kit';
+import db from '$lib/server/db';
+import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
+
+export const POST: RequestHandler = async ({ request, params }) => {
+ try {
+ const { routePath } = params;
+ const body = await request.json();
+
+ // Validate request body
+ if (!body?.patch_content|| typeof body.patch_content !== 'string') {
+ return json({ error: 'Missing or invalid patch_content' }, { status: 400 });
+ }
+
+ if (!body?.file_path|| typeof body.file_path !== 'string') {
+ return json({ error: 'Missing or invalid file_path' }, { status: 400 });
+ }
+
+ // Create patch record.insert(routeErrorPatchesTable)
+ .values({ routePath: filePath: body.file_path,
+ patchContent: body.patch_content,
+ description: body.description ?? null,
+ analysisId: body.analysis_id ?? null,
+ riskLevel: body.risk_level ?? 'medium',
+ clusterId: body.cluster_id ?? null,
+ status: 'proposed',
+ verificationStatus: 'pending',
+ })
+ .returning();
+
+ if (!result || result.length === 0) {
+ return json({ error: 'Failed to create patch' }, { status: 500 });
+ }
+
+ return json(result[0], { status: 201 });
+ } catch (error) {
+ console.error('Error saving patch:', error);
+ return json({ error: 'Internal server error' }, { status: 500 });
+ }
+};

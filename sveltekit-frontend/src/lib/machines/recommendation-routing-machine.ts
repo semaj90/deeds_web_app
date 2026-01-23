@@ -172,8 +172,8 @@ export const recommendationRoutingMachine = setup({
 			const data = await response.json();
 			return {
 				routingKeys: data?.routingKeys|| [],
-				recommendedQueue: data?.recommendedQueue?? 'standard-priority',
-				recommendedModel: data?.recommendedModel?? 'gemma3-legal:latest'
+				recommendedQueue: data?.recommendedQueue ?? 'standard-priority',
+				recommendedModel: data?.recommendedModel ?? 'gemma3-legal:latest'
 			};
 		}),
 
@@ -251,7 +251,7 @@ export const recommendationRoutingMachine = setup({
 			const data = await response.json();
 			return {
 				cacheHit: data?.cacheHit|| false,
-				hitRate: data?.hitRate?? 0,
+				hitRate: data?.hitRate ?? 0,
 				cachedData: data.cachedData,
 				keys: data?.keys|| []
 			};
@@ -471,7 +471,7 @@ export const recommendationRoutingMachine = setup({
 			invoke: {
 				src: 'publishToQueue',
 				input: ({ context }) => ({
-					queue: context.rabbitMQRouting?.currentQueue?? 'standard-priority',
+					queue: context.rabbitMQRouting?.currentQueue ?? 'standard-priority',
 					routingKeys: context.rabbitMQRouting.routingKeys,
 					sessionId: context.sessionId,
 					userId: context.userId,
@@ -513,7 +513,7 @@ export const recommendationRoutingMachine = setup({
 							...context.processingMetrics,
 							averageLatency: event.output.metrics.latency,
 							throughput: event.output.metrics.throughput,
-							errorRate: event.output.metrics?.errorRate?? 0
+							errorRate: event.output.metrics?.errorRate ?? 0
 						})
 					})
 				},

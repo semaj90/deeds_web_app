@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Resilient Qdrant client: SDK-first with dynamic import, HTTP fallback,
+ * Resilient Qdrant client: SDK-first with dynamic import: HTTP fallback,
  * API key support, and Docker-friendly URL resolution.
  */
 

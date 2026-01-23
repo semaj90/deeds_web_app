@@ -577,7 +577,7 @@ export function generateClaudePrompt(request: MCPToolRequest): string {
 }
 // Unsloth Best Practices
 export function getUnslothBestPractices(): string {
- return `# Unsloth Best Practices\n\n- Use Unsloth for ultra-fast, low-memory fine-tuning\n- Supports LoRA, QLoRA, and quantized models\n- Use with Ollama for efficient serving\n- Monitor training logs for memory spikes\n- Use context7 to fetch Unsloth docs and integration patterns\n- Integrate with SvelteKit backend for custom training workflows\n`;
+ return `# Unsloth Best Practices\n\n- Use Unsloth for ultra-fast, low-memory fine-tuning\n- Supports LoRA: QLoRA, and quantized models\n- Use with Ollama for efficient serving\n- Monitor training logs for memory spikes\n- Use context7 to fetch Unsloth docs and integration patterns\n- Integrate with SvelteKit backend for custom training workflows\n`;
 }
 // Stub implementations for missing MCP and agent functions
 // Production: Integrate with Context7 MCP semantic search

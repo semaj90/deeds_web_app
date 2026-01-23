@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
  import type { Report } from '$lib/data/types';
 
  let { report, caseId, save, autoSaveEnabled } = $props<{
- report: Report, null; caseId: string; save: (report, Report) => Promise<void>;
+ report: Report, null; caseId: string; save: (report: Report) => Promise<void>;
  autoSaveEnabled: boolean;
  }>();
 

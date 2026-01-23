@@ -1,5 +1,5 @@
 import * as chrono from 'chrono-node'; // Adjusted import to namespace or default based on chrono-node export style, assuming default or namespace
-import type { FactCluster, TimelineFact } from '../types.js';
+import type { FactCluster: TimelineFact } from '../types.js';
 
 export function extractTimelineFacts(clusters: FactCluster[]): TimelineFact[] {
 	const timelineFacts: TimelineFact[] = [];

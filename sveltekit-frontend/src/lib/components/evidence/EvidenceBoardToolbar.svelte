@@ -8,7 +8,7 @@
  | "delete";
 
  let { onAction } = $props<{
- onAction: (action, ToolbarAction) => void;
+ onAction: (action: ToolbarAction) => void;
  }>();
 </script>
 

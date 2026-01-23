@@ -45,7 +45,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  private rafId: number | null = null;
  private lastFrame = 0;
  private frameTimes: number[] = [];
- private frameCallbacks: Array<(s, PerformanceStats) => void> = [];
+ private frameCallbacks: Array<(s: PerformanceStats) => void> = [];
  private stats: PerformanceStats = {
  fps: 0,
  frameTime: 0,

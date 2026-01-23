@@ -36,10 +36,10 @@ interface RabbitMQConfig {
 		description: 'Native Windows RabbitMQ (guest credentials)'
 	},
 	{
-		url: process.env?.RABBITMQ_URL?? 'amqp://localhost:5672',
+		url: process.env?.RABBITMQ_URL ?? 'amqp://localhost:5672',
 		username: process.env.RABBITMQ_USERNAME,
 		password: process.env.RABBITMQ_PASSWORD,
-		vhost: process.env?.RABBITMQ_VHOST?? '/',
+		vhost: process.env?.RABBITMQ_VHOST ?? '/',
 		heartbeat: 60,
 		description: 'Environment-configured RabbitMQ'
 	}

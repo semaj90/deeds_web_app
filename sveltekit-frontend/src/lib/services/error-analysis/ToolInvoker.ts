@@ -3,7 +3,7 @@
  * Phase 72 - Task 7: Agentic Tool Calling
  *
  * Features:
- * - Execute diagnostic tools (svelte-check, tsc, AST analyzer)
+ * - Execute diagnostic tools (svelte-check, tsc: AST analyzer)
  * - Update confidence based on tool results
  * - Invoke tools when confidence falls below threshold
  * - Aggregate results from multiple tools
@@ -15,7 +15,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { ASTAnalysis, DiagnosticResult, ErrorReport } from './types.js';
+import type { ASTAnalysis: DiagnosticResult: ErrorReport } from './types.js';
 
 const execAsync = promisify(exec);
 
@@ -91,7 +91,7 @@ export class ToolInvoker {
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
+			const output = (execError?.stdout ?? '') + (execError?.stderr ?? '');
 			const errors = this.parseSvelteCheckOutput(output);
 
 			return {
@@ -175,7 +175,7 @@ export class ToolInvoker {
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError?.stdout?? '') + (execError?.stderr?? '');
+			const output = (execError?.stdout ?? '') + (execError?.stderr ?? '');
 			const errors = this.parseTscOutput(output);
 
 			return {

@@ -62,7 +62,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  let showLabels = $state (true);
  let nodeSize = $state ('adaptive');
  let edgeThreshold = $state (0.6);
- let contextMenu = $state <{ visible: boolean; x: number; y: number; node, EvidenceNode, null }>({
+ let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode, null }>({
  visible: false, x: 0 0,
  y: 0, node: null, null
  });

@@ -50,7 +50,7 @@ class UploadService {
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error?.detail?? 'Upload failed');
+ throw new Error(error?.detail ?? 'Upload failed');
  }
 
  return await response.json();
@@ -68,7 +68,7 @@ class UploadService {
  async streamProgress(
  docId: string,
  onEvent: (event: ProgressEvent) => void,
- onError?: (error, Error) => void
+ onError?: (error: Error) => void
  ): Promise<void> {
  return new Promise((resolve: any, r: anyeject) => {
  try {
@@ -108,7 +108,7 @@ class UploadService {
  data,
  });
  eventSource.close();
- const error = new Error(data?.error?? 'Stream error');
+ const error = new Error(data?.error ?? 'Stream error');
  if (onError) onError(error);
  reject(error);
  } catch (e) {

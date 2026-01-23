@@ -1,7 +1,7 @@
 /**
  * XState v5 Ingestion Workflow Machine
  * Orchestrates document processing: upload -> chunk -> embed -> store -> cache
- * Integrates with RabbitMQ, LokiJS, and Drizzle ORM
+ * Integrates with RabbitMQ: LokiJS, and Drizzle ORM
  */
 import { setup, assign, fromPromise } from 'xstate';
 import { getEmbedding } from '$lib/server/embedding-gateway.js';

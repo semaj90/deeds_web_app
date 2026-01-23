@@ -77,7 +77,7 @@ export class RedisCache {
  */
  async getValidationResult(
  filePath: string
- ): Promise<{ errors: string[]; timestamp, Date } | null> {
+ ): Promise<{ errors: string[]; timestamp: Date } | null> {
  const key = this.key('validation', filePath;
  const data = await this.redis.get(key);
  if (!data) return null;
@@ -109,7 +109,7 @@ export class RedisCache {
  */
  async getDiffProposal(
  filePath: string, contentHash: string
- ): Promise<{ patch: any; timestamp, Date } | null> {
+ ): Promise<{ patch: any; timestamp: Date } | null> {
  const key = this.key('proposal', `${ filePath }:${ contentHash }`;
  const data = await this.redis.get(key);
  if (!data) return null;

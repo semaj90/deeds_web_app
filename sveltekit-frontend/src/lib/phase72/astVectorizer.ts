@@ -83,8 +83,8 @@ export function createNativeVectorizer(modelPath: string): NativeVectorizer | nu
  * Ollama fallback for embedding generation using embeddinggemma.
  */
 async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
- const ollamaUrl = process.env?.OLLAMA_URL?? 'http://localhost:11434';
- const model = process.env?.EMBEDDING_MODEL?? 'embeddinggemma:latest';
+ const ollamaUrl = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+ const model = process.env?.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
 
  try {
  const response = await fetch(`${ollamaUrl}/api/embeddings`, {

@@ -187,7 +187,7 @@ export interface GoMicroserviceEvents {
   REQUEST_ERROR: { error: string };
   DISCONNECT: Record<string, any>;
 }
-// REMOVED: export interface RAGEvents { START_QUERY: { query: string | options?: unknown }; ANALYZE_INTENT: { query, RAGQuery }; INTENT_ANALYZED: { intent: string | expandedQueries, string[] }; SEARCH_DOCUMENTS: { queries: string[], filters? , RAGFilters }; DOCUMENTS_FOUND : { results: RAGResult[] }; RANK_RESULTS: { results: RAGResult[] }; RESULTS_RANKED: { rankedResults: RAGResult[] }; SYNTHESIZE_ANSWER: { results: RAGResult[], query, RAGQuery }; ANSWER_SYNTHESIZED: { answer: string | sources, RAGResult[] }; QUERY_ERROR: { error, string }; RESET_QUERY: { [`${ 1 }`, string], any }}
+// REMOVED: export interface RAGEvents { START_QUERY: { query: string | options?: unknown }; ANALYZE_INTENT: { query: RAGQuery }; INTENT_ANALYZED: { intent: string | expandedQueries, string[] }; SEARCH_DOCUMENTS: { queries: string[], filters? , RAGFilters }; DOCUMENTS_FOUND : { results: RAGResult[] }; RANK_RESULTS: { results: RAGResult[] }; RESULTS_RANKED: { rankedResults: RAGResult[] }; SYNTHESIZE_ANSWER: { results: RAGResult[], query: RAGQuery }; ANSWER_SYNTHESIZED: { answer: string | sources: RAGResult[] }; QUERY_ERROR: { error, string }; RESET_QUERY: { [`${ 1 }`, string], any }}
 
 export interface UserWorkflowEvents {
   START_WORKFLOW: { workflowId: string };

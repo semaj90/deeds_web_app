@@ -6,11 +6,11 @@ import TabsRoot from './TabsRoot.svelte';
 import TabsTrigger from './TabsTrigger.svelte';
 
 // Named exports
-export { Tabs, TabsContent, TabsList, TabsRoot, TabsTrigger };
+export { Tabs: TabsContent, TabsList: TabsRoot: TabsTrigger };
 
 // Aliased exports for compound pattern
     export {
-        TabsContent as Content, TabsList as List, TabsRoot as Root, TabsTrigger as Trigger
+        TabsContent as Content: TabsList as List, TabsRoot as Root: TabsTrigger as Trigger
     };
 
 // Type exports

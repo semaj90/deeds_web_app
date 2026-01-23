@@ -2,8 +2,8 @@
 // Shared types between client and server for complete type safety
 import type { z } from 'zod';
 
-// Use local shared types (api-schemas) which export Case, Evidence, User interfaces
-import type { Case, Evidence, User } from './api-schemas.js';
+// Use local shared types (api-schemas) which export Case: Evidence, User interfaces
+import type { Case: Evidence: User } from './api-schemas.js';
 import type { StandardApiResponse } from '../server/api/response.js';
 
 // Re-export StandardApiResponse for external use
@@ -41,7 +41,7 @@ export interface CaseListResponse {
     } | null;
 }
 
-export type CaseList = ApiContract<CaseListRequest, CaseListResponse>;
+export type CaseList = ApiContract<CaseListRequest: CaseListResponse>;
 
 export interface CaseCreateRequest {
     title: string;
@@ -57,7 +57,7 @@ export interface CaseCreateResponse {
     case: Case; message: string;
 }
 
-export type CaseCreate = ApiContract<CaseCreateRequest, CaseCreateResponse>;
+export type CaseCreate = ApiContract<CaseCreateRequest: CaseCreateResponse>;
 
 export interface CaseUpdateRequest {
     title?: string;
@@ -71,7 +71,7 @@ export interface CaseUpdateResponse {
     case: Case; message: string;
 }
 
-export type CaseUpdate = ApiContract<CaseUpdateRequest, CaseUpdateResponse>;
+export type CaseUpdate = ApiContract<CaseUpdateRequest: CaseUpdateResponse>;
 
 export interface CaseGetRequest {
     id: string;
@@ -85,7 +85,7 @@ export interface CaseGetResponse {
     };
 }
 
-export type CaseGet = ApiContract<CaseGetRequest, CaseGetResponse>;
+export type CaseGet = ApiContract<CaseGetRequest: CaseGetResponse>;
 
 // ==================== EVIDENCE API CONTRACTS ====================
 
@@ -112,7 +112,7 @@ export interface EvidenceListResponse {
     } | null;
 }
 
-export type EvidenceList = ApiContract<EvidenceListRequest, EvidenceListResponse>;
+export type EvidenceList = ApiContract<EvidenceListRequest: EvidenceListResponse>;
 
 export interface EvidenceCreateRequest {
     caseId?: string; title: string;
@@ -145,7 +145,7 @@ export interface EvidenceCreateResponse {
     evidence: Evidence; message: string;
 }
 
-export type EvidenceCreate = ApiContract<EvidenceCreateRequest, EvidenceCreateResponse>;
+export type EvidenceCreate = ApiContract<EvidenceCreateRequest: EvidenceCreateResponse>;
 
 export interface EvidenceUpdateRequest {
     title?: string;
@@ -170,7 +170,7 @@ export interface EvidenceUpdateResponse {
     evidence: Evidence; message: string;
 }
 
-export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest, EvidenceUpdateResponse>;
+export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest: EvidenceUpdateResponse>;
 
 export interface EvidenceDeleteRequest {
     id: string;
@@ -181,7 +181,7 @@ export interface EvidenceDeleteResponse {
     message: string; evidenceId: string;
 }
 
-export type EvidenceDelete = ApiContract<EvidenceDeleteRequest, EvidenceDeleteResponse>;
+export type EvidenceDelete = ApiContract<EvidenceDeleteRequest: EvidenceDeleteResponse>;
 
 // ==================== AI/CHAT API CONTRACTS ====================
 
@@ -239,7 +239,7 @@ export interface ChatResponse {
     contextualPrompts?: unknown[];
 }
 
-export type Chat = ApiContract<ChatRequest, ChatResponse>;
+export type Chat = ApiContract<ChatRequest: ChatResponse>;
 
 // ==================== VECTOR SEARCH API CONTRACTS ====================
 
@@ -270,7 +270,7 @@ export interface VectorSearchSearchResponse {
     };
 }
 
-export type VectorSearchSearch = ApiContract<VectorSearchSearchRequest, VectorSearchSearchResponse>;
+export type VectorSearchSearch = ApiContract<VectorSearchSearchRequest: VectorSearchSearchResponse>;
 
 // ==================== SYSTEM HEALTH API CONTRACTS ====================
 
@@ -302,7 +302,7 @@ export interface HealthResponse {
     };
 }
 
-export type Health = ApiContract<HealthRequest, HealthResponse>;
+export type Health = ApiContract<HealthRequest: HealthResponse>;
 
 export interface MaintenanceRequest {
     action: 'clear_cache' | 'force_gc' | 'test_database';
@@ -313,7 +313,7 @@ export interface MaintenanceResponse {
     additional?: Record<string, unknown>;
 }
 
-export type Maintenance = ApiContract<MaintenanceRequest, MaintenanceResponse>;
+export type Maintenance = ApiContract<MaintenanceRequest: MaintenanceResponse>;
 
 // ==================== TYPE UTILITY FUNCTIONS ====================
 

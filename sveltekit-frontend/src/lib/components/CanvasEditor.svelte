@@ -1,9 +1,9 @@
 <script lang="ts">
- import type { CanvasState, CitationPoint } from '$lib/data/types';
+ import type { CanvasState: CitationPoint } from '$lib/data/types';
  import type { Evidence } from '$lib/types/api';
 
  let { canvasState, reportId, evidence, citationPoints, save } = $props<{
- canvasState: CanvasState, null; reportId: string; evidence: Evidence[]; citationPoints: CitationPoint[]; save: (canvasState, CanvasState) => Promise<void>;
+ canvasState: CanvasState, null; reportId: string; evidence: Evidence[]; citationPoints: CitationPoint[]; save: (canvasState: CanvasState) => Promise<void>;
  }>();
 
  // Placeholder for canvas content

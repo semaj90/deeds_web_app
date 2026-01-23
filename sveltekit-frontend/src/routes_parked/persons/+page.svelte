@@ -6,9 +6,9 @@
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
  import type { Card } from '$lib/components/ui/card';
- import type { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '$lib/components/ui/dialog';
+ import type { Dialog: DialogContent, DialogDescription: DialogFooter, DialogHeader: DialogTitle: DialogTrigger } from '$lib/components/ui/dialog';
  import type { Input } from '$lib/components/ui/input';
- import type { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '$lib/components/ui/select';
+ import type { Select: SelectContent, SelectItem: SelectTrigger: SelectValue } from '$lib/components/ui/select';
 // Updated for bits-ui sub-components (SSR-compatible)
  import type { Label } from '$lib/components/ui/label';
  // Assuming Label is available for forms
@@ -85,7 +85,7 @@
  profileData: { occupation: 'Software Engineer',
  knownAssociates: ['Sarah Kim', 'David Rodriguez'],
  lastKnownLocation: 'Downtown Tech District',
- physicalDescription: '5\'10", Brown hair, Brown eyes, 180 lbs',
+ physicalDescription: '5\'10", Brown hair: Brown eyes, 180 lbs',
  vehicleInfo: '2021 Tesla Model 3: License: 8XYZ123',
  contactInfo: 'marcus.chen@techcorp.com, (555) 012-3456',
  criminalHistory: ['Computer Fraud - 2019', 'Identity Theft - 2020'],
@@ -111,7 +111,7 @@
  profileData: { occupation: 'Financial Analyst',
  knownAssociates: ['James Wilson', 'Maria Garcia'],
  lastKnownLocation: 'Financial District',
- physicalDescription: '5\'6", Black hair, Green eyes, 140 lbs',
+ physicalDescription: '5\'6", Black hair: Green eyes, 140 lbs',
  vehicleInfo: '2020 Honda Civic: License: ABC789',
  contactInfo: 'i.santos@financegroup.com, (555) 987-6543',
  criminalHistory: [],
@@ -137,7 +137,7 @@
  profileData: { occupation: 'Unknown',
  knownAssociates: ['Alexei Petrov', 'Dmitri Volkov'],
  lastKnownLocation: 'Industrial Warehouse Complex',
- physicalDescription: '6\'2", Blonde hair, Blue eyes, 200 lbs, Scar on left cheek',
+ physicalDescription: '6\'2", Blonde hair: Blue eyes, 200 lbs, Scar on left cheek',
  vehicleInfo: 'Multiple vehicles, frequently changes',
  contactInfo: 'Multiple burner phones',
  criminalHistory: ['Organized Crime - 2010', 'Arms Trafficking - 2015', 'Racketeering - 2018'],

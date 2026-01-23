@@ -2,7 +2,7 @@ import type { Document } from '$lib/types';
 import { sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js/driver';
 
-/** * PgVector Indexing Service * Advanced vector search and similarity operations using PostgreSQL pgvector extension * Optimized for legal document retrieval with hierarchical indexing * * Features: * - High-performance similarity search with cosine, L2, inner product * - Hierarchical document indexing with metadata * - Batch upsert operations for efficiency * - HNSW index support for fast approximate search * - Query optimization and execution plans * - Audit trail and versioning support * * @author Legal AI Platform Team * @version 1.0.0
+/** * PgVector Indexing Service * Advanced vector search and similarity operations using PostgreSQL pgvector extension * Optimized for legal document retrieval with hierarchical indexing * * Features: * - High-performance similarity search with cosine: L2, inner product * - Hierarchical document indexing with metadata * - Batch upsert operations for efficiency * - HNSW index support for fast approximate search * - Query optimization and execution plans * - Audit trail and versioning support * * @author Legal AI Platform Team * @version 1.0.0
  */
 /** * Vector Index Configuration */
 export interface VectorIndexConfig {
@@ -51,9 +51,9 @@ export class PgVectorIndexingService {
  constructor(config: VectorIndexConfig) {
  this.db = config.database;
  this.dimensions = config.embeddingDimensions;
- this.indexType = config?.indexType?? 'hnsw';
- this.distanceMetric = config?.distanceMetric?? 'cosine';
- this.maxResults = config?.maxResults?? 10;
+ this.indexType = config?.indexType ?? 'hnsw';
+ this.distanceMetric = config?.distanceMetric ?? 'cosine';
+ this.maxResults = config?.maxResults ?? 10;
  }
  /** * Index a single vector document */
  async indexDocument(doc: VectorDocument): Promise<string> {
@@ -68,7 +68,7 @@ export class PgVectorIndexingService {
 INSERT INTO document_chunks (
  id, content, metadata, document_id, title, confidentiality_level, embedding_model, embedding_dimension, created_at, updated_at
 ) VALUES (
- ${doc.id}, ${doc.content}, ${JSON.stringify(doc?.metadata|| {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc?.modelUsed?? 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
+ ${doc.id}, ${doc.content}, ${JSON.stringify(doc?.metadata|| {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc?.modelUsed ?? 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
 ) ON CONFLICT (id) DO UPDATE SET
  content = ${doc.content},
  metadata = ${JSON.stringify(doc?.metadata|| {})},
@@ -79,7 +79,7 @@ INSERT INTO document_chunks (
 INSERT INTO embeddings (
  id, content, vector, document_id, chunk_id, embedding_type, model_used, metadata, created_at
 ) VALUES (
- gen_random_uuid(), ${doc.content}, ${this.vectorToString(doc.embedding)}::vector, ${doc.documentId}, ${doc?.chunkId|| doc.id}, ${doc.embeddingType}, ${doc?.modelUsed?? 'embeddinggemma:latest'}, ${JSON.stringify(doc?.metadata|| {})}, NOW()
+ gen_random_uuid(), ${doc.content}, ${this.vectorToString(doc.embedding)}::vector, ${doc.documentId}, ${doc?.chunkId|| doc.id}, ${doc.embeddingType}, ${doc?.modelUsed ?? 'embeddinggemma:latest'}, ${JSON.stringify(doc?.metadata|| {})}, NOW()
 ) ON CONFLICT DO NOTHING
 `);
  return doc.id;
@@ -102,7 +102,7 @@ INSERT INTO embeddings (
  }
  // Batch insert document chunks.map(
  (doc) =>
- `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
+ `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed ?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
  .join(',',
  if (chunksValues) {
@@ -121,7 +121,7 @@ ON CONFLICT (id) DO UPDATE SET
 
  // Batch insert embeddings.map(
  (doc) =>
- `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
+ `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed ?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
  )
  .join(',',
  if (embeddingValues) {
@@ -157,7 +157,7 @@ ON CONFLICT DO NOTHING
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
  };
  const limit = options?.limit|| this.maxResults;
- const threshold = options?.threshold?? 0.5;
+ const threshold = options?.threshold ?? 0.5;
  const vectorStr = this.vectorToString(embedding);$1;$2SELECT
  e.id: e.content: e.document_id as "documentId",
  e.chunk_id as "chunkId",
@@ -195,8 +195,8 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  ): Promise<VectorSearchResult[]> {
  try {
  const limit = options?.limit|| this.maxResults;
- const vectorWeight = options?.vectorWeight?? 0.7;
- const keywordWeight = options?.keywordWeight?? 0.3;
+ const vectorWeight = options?.vectorWeight ?? 0.7;
+ const keywordWeight = options?.keywordWeight ?? 0.3;
 
  if (embedding.length !== this.dimensions) {
  throw new Error(

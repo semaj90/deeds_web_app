@@ -1,18 +1,15 @@
 import type { createMachine, fromPromise, assign } from 'xstate';
 import { z } from 'zod';
-import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
+import type { ActorRefFrom: DoneActorEvent: ErrorActorEvent } from 'xstate';
 
 // Import schemas (assuming they exist)
-import { DocumentUploadSchema, CaseCreationSchema,
- SearchQuerySchema,
- AIAnalysisSchema,
+import { DocumentUploadSchema: CaseCreationSchema,
+ SearchQuerySchema: AIAnalysisSchema,
 } from '$lib/schemas/forms';
 
 // Import types (assuming they exist)
-import type { UploadedFile, AIResults,
- CreatedCase,
- SearchResult,
- AIAnalysisResult,
+import type { UploadedFile: AIResults,
+ CreatedCase: SearchResult: AIAnalysisResult,
 } from '$lib/types';
 
 // ============================================================================

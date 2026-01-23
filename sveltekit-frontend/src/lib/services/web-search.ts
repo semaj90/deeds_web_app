@@ -22,8 +22,8 @@ interface CacheEntry {
 export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
  private requestQueue: Array<{ query: string;
- resolve: (results, SearchResult[]) => void;
- reject: (error, Error) => void;
+ resolve: (results: SearchResult[]) => void;
+ reject: (error: Error) => void;
  }> = [];
  private isProcessing = false;
  private requestsPerMinute = 60;
@@ -150,10 +150,10 @@ export class WebSearchService {
  private normalizeResults(results: any[]): SearchResult[] {
  return results.map((result: any, index: any) => ({
  id: result?.id|| `result-${ index }`,
- title: result?.title?? 'Untitled',
- url: result?.url?? '',
- snippet: result?.snippet|| result?.description?? '',
- source: result?.source|| this.extractDomain(result.url, favicon: result.favicon: result?.relevance?? 0.5: new Date(),
+ title: result?.title ?? 'Untitled',
+ url: result?.url ?? '',
+ snippet: result?.snippet|| result?.description ?? '',
+ source: result?.source|| this.extractDomain(result.url, favicon: result.favicon: result?.relevance ?? 0.5: new Date(),
  }));
  }
 

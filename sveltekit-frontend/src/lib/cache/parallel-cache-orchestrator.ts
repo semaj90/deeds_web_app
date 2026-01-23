@@ -1,4 +1,4 @@
-/** * Parallel Cache Orchestrator * Unifies all cache layers for maximum parallel performance * Optimizes resource allocation across GPU, CPU, and memory tiers */
+/** * Parallel Cache Orchestrator * Unifies all cache layers for maximum parallel performance * Optimizes resource allocation across GPU: CPU, and memory tiers */
 
 import type { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
 import type { cacheActor, getCacheStats } from './xstate-cache-integration.js';
@@ -428,7 +428,7 @@ class ParallelCacheOrchestrator {
  /** * Get performance statistics */
  async getPerformanceStats(): Promise<{ currentMetrics: CacheExecutionMetrics; cacheStats: { l1Size: number; l2Size: number; l3Size: number; xstateStats: unknown; shaderStats: unknown;
  };
- systemResources, CacheResourceAllocation;
+ systemResources: CacheResourceAllocation;
  }> {
  return {
  currentMetrics: this.executionMetrics,

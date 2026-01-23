@@ -226,9 +226,9 @@ export class LokiEvidenceService {
 
 	public searchEvidence(query: string): LokiEvidence[] {
 		if (!this.evidenceCollection) return [];
-		return this.evidenceCollection.where((obj: LokiEvidence) => {obj?.title?? '',
-				obj?.description?? '',
-				obj?.type?? '',
+		return this.evidenceCollection.where((obj: LokiEvidence) => {obj?.title ?? '',
+				obj?.description ?? '',
+				obj?.type ?? '',
 				...(obj?.tags|| []),
 				obj.metadata ? JSON.stringify(obj.metadata) : ''
 			]
@@ -267,10 +267,10 @@ export class LokiEvidenceService {
 
 		all.forEach((evidence: any) => {
 			// Count by type
-			const type = evidence?.type?? 'unknown';
+			const type = evidence?.type ?? 'unknown';
 			byType[type] = (byType[type] ?? 0) + 1;
 			// Count by case
-			const caseId = evidence?.caseId?? 'unknown';
+			const caseId = evidence?.caseId ?? 'unknown';
 			byCase[caseId] = (byCase[caseId] ?? 0) + 1;
 			// Count recent evidence
 			const timeline = evidence.timeline;

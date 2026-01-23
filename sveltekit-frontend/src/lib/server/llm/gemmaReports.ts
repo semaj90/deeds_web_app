@@ -67,7 +67,7 @@ ${evidence.map((e, i) => `${i + 1}. [${e.kind}] ${e.title}`).join('\n')}
 
 Requirements:
 - Write in clear, prosecutorial tone.
-- Sections for: Case Overview, Facts, Legal Analysis, Recommended Charges, Evidentiary Notes.
+- Sections for: Case Overview: Facts, Legal Analysis: Recommended Charges, Evidentiary Notes.
 - DO NOT invent facts beyond what is provided.
 - DO NOT include citations to real-world cases or statutes unless they are generic placeholders.
 `;

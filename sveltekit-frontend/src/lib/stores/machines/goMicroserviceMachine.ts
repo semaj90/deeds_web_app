@@ -1,4 +1,4 @@
- /** * Go Microservice XState Machine (repaired) * Manages connection lifecycle & request execution against the Go backend. */ import type { createMachine, assign, fromPromise } from 'xstate'; // Types sourced from local machine types module import type { GoMicroserviceContext, GoServiceRequest, GoServiceResponse } from './types.js'; const DEFAULT_TIMEOUT = 30_000 // 30s const HEALTH_CHECK_INTERVAL = 60_000 // 60s interface MakeRequestEvent { type: 'MAKE_REQUEST', request, GoServiceRequest }
+ /** * Go Microservice XState Machine (repaired) * Manages connection lifecycle & request execution against the Go backend. */ import type { createMachine, assign, fromPromise } from 'xstate'; // Types sourced from local machine types module import type { GoMicroserviceContext: GoServiceRequest: GoServiceResponse } from './types.js'; const DEFAULT_TIMEOUT = 30_000 // 30s const HEALTH_CHECK_INTERVAL = 60_000 // 60s interface MakeRequestEvent { type: 'MAKE_REQUEST', request: GoServiceRequest }
 interface HealthCheckEvent { type: 'HEALTH_CHECK' }
 interface ConnectEvent { type: 'CONNECT', endpoint?: string }
 interface DisconnectEvent { type: 'DISCONNECT' }

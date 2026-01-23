@@ -254,30 +254,37 @@ async function importProcessor() {
   }
 
   async function processFile(filePath, config) {
-    const content = await readFile(filePath, 'utf-8');
-    let result = content;
-    let totalFixes = 0;
+    try {
+      const content = await readFile(filePath, 'utf-8');
+      let result = content;
+      let totalFixes = 0;
 
-    for (const pattern of patterns) {
-      const matches = result.match(pattern.pattern);
-      if (matches) {
-        totalFixes += matches.length;
-        if (typeof pattern.replacement === 'function') {
-          result = result.replace(pattern.pattern, pattern.replacement);
-        } else {
-          result = result.replace(pattern.pattern, pattern.replacement);
+      for (const pattern of patterns) {
+        const matches = result.match(pattern.pattern);
+        if (matches) {
+          totalFixes += matches.length;
+          if (typeof pattern.replacement === 'function') {
+            result = result.replace(pattern.pattern, pattern.replacement);
+          } else {
+            result = result.replace(pattern.pattern, pattern.replacement);
+          }
         }
       }
-    }
 
-    if (totalFixes > 0 && !config.dryRun) {
-      if (config.createBackups) {
-        await copyFile(filePath, `${filePath}.backup`);
+      if (totalFixes > 0 && !config.dryRun) {
+        if (config.createBackups) {
+          await copyFile(filePath, `${filePath}.backup`);
+        }
+        await writeFile(filePath, result, 'utf-8');
       }
-      await writeFile(filePath, result, 'utf-8');
-    }
 
-    return { filePath, totalFixes };
+      return { filePath, totalFixes };
+    } catch (err) {
+      if (config.verbose) {
+        console.log(`  [Skip] ${filePath}: ${err.code || err.message}`);
+      }
+      return { filePath, totalFixes: 0, error: err.message };
+    }
   }
 
   async function runProcessor(targetDir, config) {

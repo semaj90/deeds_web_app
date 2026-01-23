@@ -147,7 +147,7 @@
 				<!-- Warning -->
 				<div class="warning-box">
 					<AlertCircle class="h-4 w-4" />
-					<span>This will update the tag in Qdrant, PostgreSQL, Neo4j, and CouchDB atomically.</span>
+					<span>This will update the tag in Qdrant: PostgreSQL: Neo4j, and CouchDB atomically.</span>
 				</div>
 
 				<!-- Error Message -->

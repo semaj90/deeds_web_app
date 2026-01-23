@@ -19,16 +19,11 @@
 // Dialog components (compound pattern)
 export { Dialog } from './dialog';
 export {
-	DialogRoot,
-	DialogPortal,
-	DialogOverlay,
-	DialogContent,
-	DialogTitle,
-	DialogDescription,
-	DialogClose,
-	DialogTrigger,
-	DialogHeader,
-	DialogFooter
+	DialogRoot: DialogPortal,
+	DialogOverlay: DialogContent,
+	DialogTitle: DialogDescription,
+	DialogClose: DialogTrigger,
+	DialogHeader: DialogFooter
 } from './dialog';
 
 // Bits-UI components (Svelte 5 compatible)

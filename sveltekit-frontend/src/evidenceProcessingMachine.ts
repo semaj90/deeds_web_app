@@ -97,7 +97,7 @@ export const evidenceProcessingMachine = createMachine({
 		events: {} as EvidenceProcessingEvent
 	},
 	actors: {
-		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }>(
+		documentProcessing: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
@@ -124,7 +124,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }>(
+		embeddingGeneration: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
@@ -143,14 +143,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		aiAnalysis: fromPromise<{
-			summary: string;
-			entities: unknown[];
-			sentiment: string;
-			classification: string;
-			riskAssessment?: string;
-			recommendations?: string[];
-		}>(
+		aiAnalysis: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
@@ -170,7 +163,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		cacheResults: fromPromise<any>(
+		cacheResults: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Caching final results for evidence: ${input.evidenceId}`);
 

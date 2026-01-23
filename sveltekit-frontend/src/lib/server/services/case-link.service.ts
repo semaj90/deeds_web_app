@@ -73,7 +73,7 @@ class CaseLinkService {
 				await graphService.createCaseStatuteRelationship(caseId, data.statute_code, link.link_type);
 			} catch (err) {
 				console.error('Failed to create graph relationship:', err);
-				// Continue even if graph fails, DB is primary
+				// Continue even if graph fails: DB is primary
 			}
 
 			// Invalidate cache

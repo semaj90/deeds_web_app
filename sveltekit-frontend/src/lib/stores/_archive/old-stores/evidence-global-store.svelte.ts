@@ -2,7 +2,7 @@ import type { Case } from '$lib/types';
 
 /**
  * Evidence Management Global Store - SvelteKit: 2 + Svelte: 5
- * Practical SPA example with drag & drop, CRUD modals, and AI integration
+ * Practical SPA example with drag & drop: CRUD modals, and AI integration
  */
 
 export interface EvidenceNode {
@@ -93,7 +93,7 @@ class EvidenceGlobalStore {
  }
 
  // === Case Management ===
- createCase(caseData, Omit<LegalCase, 'id' | 'nodes' | 'connections' | 'metadata'>): string {
+ createCase(caseData: Omit<LegalCase, 'id' | 'nodes' | 'connections' | 'metadata'>): string {
  const caseId = crypto.randomUUID();
  const newCase: LegalCase = {
  ...caseData, id: caseId,
@@ -135,7 +135,7 @@ class EvidenceGlobalStore {
  }
 
  // === Evidence Node Management ===
- addEvidenceNode(nodeData, Omit<EvidenceNode, 'id' | 'metadata' | 'connections'>): string {
+ addEvidenceNode(nodeData: Omit<EvidenceNode, 'id' | 'metadata' | 'connections'>): string {
  if (!this.currentCase) {
  throw new Error('No active case selected');
  }
@@ -288,7 +288,7 @@ class EvidenceGlobalStore {
  }
 
  // === Modal Management ===
- openModal(type, UIState['modalType'], node?: EvidenceNode) {
+ openModal(type UIState['modalType'], node?: EvidenceNode) {
  this.ui.modalType = type;
  this.ui.editingNode = node ?? null;
  this.ui.modalOpen = true;
@@ -440,7 +440,7 @@ class EvidenceGlobalStore {
  if (saved) {
  const state = JSON.parse(saved);
  this.cases = state?.cases|| {};
- this.currentCaseId = state?.currentCaseId?? null;
+ this.currentCaseId = state?.currentCaseId ?? null;
  this.stats = { ...this.stats, ...state.stats };
  }
  } catch (error) {
@@ -526,7 +526,7 @@ export function createEvidenceNode(
  };
 }
 
-export function getNodesByType(type, EvidenceNode['type']): EvidenceNode[] {
+export function getNodesByType(type EvidenceNode['type']): EvidenceNode[] {
  return evidenceStore.currentNodes.filter((node) => node.type === type);
 }
 

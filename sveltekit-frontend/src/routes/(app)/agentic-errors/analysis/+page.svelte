@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	const { data } = $props<{ data, PageData }>();
+	const { data } = $props<{ data: PageData }>();
 
 	let generating = $state(false);
 	let selectedCluster = $state<any>(null);

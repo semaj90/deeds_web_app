@@ -40,7 +40,7 @@ export class QdrantService {
   private readonly distanceMetric = 'Cosine';
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || process.env?.QDRANT_URL?? 'http://localhost:6333';
+    this.baseUrl = baseUrl || process.env?.QDRANT_URL ?? 'http://localhost:6333';
   }
 
   /**

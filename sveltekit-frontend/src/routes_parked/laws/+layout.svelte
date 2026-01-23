@@ -22,7 +22,7 @@
  grid-template-columns: 260px 1fr auto;
  min-height: 100vh;
  background-color: #fafafa;
- font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+ font-family: 'Inter', -apple-system: BlinkMacSystemFont, 'Segoe UI', sans-serif;
  }
 
  .content {

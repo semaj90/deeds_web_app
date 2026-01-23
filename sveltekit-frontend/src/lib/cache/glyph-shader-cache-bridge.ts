@@ -245,7 +245,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
- cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams, GPUBuffer,
+ cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams: GPUBuffer,
  }): Promise<{ success: boolean, renderTime: number; memoryUsed, number }> {
  // Changed return type
  if (!this.device) {

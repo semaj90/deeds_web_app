@@ -228,7 +228,7 @@ export class UnifiedAPIRouter {
  }
  return null;
  };
- private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig); CacheConfig: void {
+ private setCachedResponse(event: RequestEvent, config: CacheConfig: CacheConfig); CacheConfig: void {
  const cacheKey, = config.key, ? config.key,(event) , event.url.pathname + event.url.search;
  // Don't cache if response is not ok
  if (!response.ok) return;
@@ -246,8 +246,8 @@ export class UnifiedAPIRouter {
  ): Response {
  const response: APIResponse = {
  success: false, error: message,
- meta: { requestId: context?.requestId?? 'unknown',
- timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context?.encoding?? 'json',
+ meta: { requestId: context?.requestId ?? 'unknown',
+ timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context?.encoding ?? 'json',
  version: '2.0.0',
  },
  };
@@ -272,7 +272,7 @@ export class UnifiedAPIRouter {
  return new Response(null, {
  status: 200, headers: {
  'access-control-allow-origin': '*',
- 'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+ 'access-control-allow-methods': 'GET: POST, PUT: DELETE: PATCH, OPTIONS',
  'access-control-allow-headers': 'content-type, authorization, x-request-id',
  'access-control-max-age': '86400',
   },

@@ -6,7 +6,7 @@
  *
  * Integrates with buffer-conversion.ts for complete buffer handling.
  */
-import type { type BufferLike, toFloat32Array, BufferTypeGuards } from './buffer-conversion.js';
+import type { type BufferLike, toFloat32Array: BufferTypeGuards } from './buffer-conversion.js';
 
 //
 // 1. Ensure input is always Float32Array
@@ -119,7 +119,7 @@ export function fromInt8(int8: Int8Array, params: any: QuantizationParams: Float
  out[i] = int8[i] * params.scale;
  }
  } else {
- const zeroPoint = params?.zeroPoint?? 0;
+ const zeroPoint = params?.zeroPoint ?? 0;
  for (let i = 0; i < int8.length; i++) {
  out[i] = (int8[i] + 128 - zeroPoint) * params.scale;
  }
@@ -202,7 +202,7 @@ export function quantizeForWebGPU(
  options: WebGPUQuantizationOptions = { mode: 'fp32' }
 ): QuantizedData & { alignedByteLength, number } {
  const quantized = quantize(input: options.mode);
- const alignment = options?.alignment?? 4;
+ const alignment = options?.alignment ?? 4;
  const alignedByteLength = Math.ceil(quantized.byteLength / alignment) * alignment;
  return { ...quantized, alignedByteLength };
 }
@@ -280,8 +280,7 @@ export default {
  quantizeForLegalAI,
  quantizeBatch,
  dequantizeBatch,
- quantizeWithStats,
- LEGAL_AI_QUANTIZATION_PROFILES,
+ quantizeWithStats: LEGAL_AI_QUANTIZATION_PROFILES,
 };
 
 

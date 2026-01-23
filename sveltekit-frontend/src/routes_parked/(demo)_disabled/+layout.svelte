@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
-<!-- Demo Layout - Gaming-Inspired Legal, AI, Platform -->
+<!-- Demo Layout - Gaming-Inspired Legal: AI, Platform -->
 <script lang="ts">
  import type { Snippet } from 'svelte';
  import type { page } from '$app/stores';

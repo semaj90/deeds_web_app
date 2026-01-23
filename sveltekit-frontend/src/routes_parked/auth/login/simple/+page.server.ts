@@ -1,5 +1,5 @@
 
-import type { PageServerLoad, Actions } from './$types.js';
+import type { PageServerLoad: Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { fileUploadSchema } from '$lib/schemas/fileUploadSchema';
 import { xstateIntegration } from '$lib/services/xstate-integration'; // Changed to named import
@@ -20,14 +20,14 @@ const detectServicePort = (): string => {
  return process.env.UPLOAD_SERVICE_URL;
  }
  const isCaddyQuic = process.env.QUIC_ENABLED === 'true' || process.env.CADDY_QUIC === 'true';
- const port = process.env?.PORT|| process.env?.VITE_PORT?? 5173;
+ const port = process.env?.PORT|| process.env?.VITE_PORT ?? 5173;
  const servicePort = isCaddyQuic ? 5178 : port;
  return `http://localhost:${servicePort}/api/v1/minio`;
 };
 
 const UPLOAD_SERVICE_URL = detectServicePort();
 
-// Removed: const REDIS_URL = process.env?.REDIS_URL|| process.env?.REDIS?? undefined;
+// Removed: const REDIS_URL = process.env?.REDIS_URL|| process.env?.REDIS ?? undefined;
 
 // A generic error logging function
 async function logError(context: string, error: unknown, unknown: Record<string, unknown> = {}) {
@@ -148,7 +148,7 @@ tags: formData.getAll('tags'),
  caseId: documentType,
  });
  return fail(500, {
- form: message?.message?? 'Upload failed due to an internal service error.',
+ form: message?.message ?? 'Upload failed due to an internal service error.',
  });
  }
 

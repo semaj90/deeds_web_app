@@ -1,18 +1,12 @@
 <script lang="ts">
-	import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
-	import { Dialog, DialogContent, DialogTitle, DialogDescription } from '$lib/components/ui/dialog';
-	import DialogHeader from '$lib/components/ui/dialog/DialogHeader.svelte';
-	import DialogFooter from '$lib/components/ui/dialog/DialogFooter.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import Input from '$lib/components/ui/Input.svelte';
-	import Label from '$lib/components/ui/Label.svelte';
-	import Progress from '$lib/components/ui/progress/Progress.svelte';
-	import { Textarea } from '$lib/components/ui/textarea';
+	import { Card: CardContent, CardDescription: CardFooter, CardHeader: CardTitle } from '$lib/components/ui';
+	import { Label } from '$lib/components/ui/label';
+	import { Progress } from '$lib/components/ui/progress';
+	import { Svelte5Button as Button: Svelte5Input as Input } from '$lib/components/ui/svelte5-index';
 
 	// Define missing types
 	type SearchResult = {
-		status: string;
-		sessionId: string;
+		status: string; sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -32,10 +26,8 @@
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: {
-			source: string;
-			processingTime: string;
-			model: string;
+		metadata?: { source: string;
+			processingTime: string; model: string;
 		};
 	};
 
@@ -112,11 +104,11 @@
 			const response = await fetch('/api/v1/evidence/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					evidenceId: crypto.randomUUID(),
-					filename: evidenceFile?.name || 'uploaded_evidence.txt',
+				body: JSON.stringify({ evidenceId: crypto.randomUUID(),
+					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
-					type: evidenceType === 'police_report' ? 'document' : evidenceType
+					type: evidenceType,
+					evidenceType: evidenceType === 'police_report' ? 'document' : evidenceType
 				})
 			});
 			if (!response.ok) {
@@ -130,18 +122,17 @@
 			// Transform API response to expected format
 			results = {
 				status: 'completed',
-				sessionId: data.data?.evidenceId || 'ai-session-' + Date.now(),
-				analysisResults: {
-					summary: data.data?.analysis?.summary || 'Analysis completed',
-					confidence: data.data?.analysis?.confidence || 0.5,
-					keyFactsCount: data.data?.analysis?.keyFindings?.length || 0,
-					relevantLaws: data.data?.analysis?.relevantLaws || [],
-					suggestedTags: data.data?.analysis?.suggestedTags || [],
-					prosecutionScore: data.data?.analysis?.prosecutionScore || 0,
-					legalRelevance: data.data?.analysis?.legalRelevance || 'Unknown',
-					keyFindings: data.data?.analysis?.keyFindings || [],
-					recommendations: data.data?.analysis?.recommendations || [],
-					model: data.data?.model || 'gemma3-legal',
+				sessionId: data.data?.evidenceId ?? 'ai-session-' + Date.now(),
+     analysisResults: { summary: data.data?.analysis?.summary ?? 'Analysis completed',
+					confidence: data.data?.analysis?.confidence ?? 0.5,
+					keyFactsCount: data.data?.analysis?.keyFindings?.length ?? 0,
+					relevantLaws: data.data?.analysis?.relevantLaws ?? [],
+					suggestedTags: data.data?.analysis?.suggestedTags ?? [],
+					prosecutionScore: data.data?.analysis?.prosecutionScore ?? 0,
+					legalRelevance: data.data?.analysis?.legalRelevance ?? 'Unknown',
+					keyFindings: data.data?.analysis?.keyFindings ?? [],
+					recommendations: data.data?.analysis?.recommendations ?? [],
+					model: data.data?.model ?? 'gemma3-legal',
 					processedAt: data.data?.processedAt
 				}
 			};
@@ -160,8 +151,7 @@
 			results = {
 				status: 'completed',
 				sessionId: 'mock-session-' + Date.now(),
-				analysisResults: {
-					documentType: evidenceType,
+     analysisResults: { documentType: evidenceType,
 					keyFactsCount: Math.floor(Math.random() * 10) + 5,
 					personsOfInterest: [
 						{ name: 'John Doe', role: 'witness', confidence: 0.85 },
@@ -171,12 +161,11 @@
 						{ event: 'Mock incident occurred', date: '2024-01-15', importance: 'high' },
 						{ event: 'Mock evidence collected', date: '2024-01-16', importance: 'medium' }
 					],
-					legalImplications: 'Mock analysis: Strong evidence pattern suggesting liability. Recommend further investigation of contract terms.',
+					legalImplications: 'Mock, analysis: Strong evidence pattern suggesting liability. Recommend further investigation of contract terms.',
 					confidenceScore: 0.78,
 					nextSteps: ['Review additional witness statements', 'Obtain security footage', 'Examine financial records']
 				},
-				metadata: {
-					source: 'mock-evidence-analyzer',
+				metadata: { source: 'mock-evidence-analyzer',
 					processingTime: '45 seconds',
 					model: 'Legal Evidence AI v2.0 (Simulated)'
 				}
@@ -218,14 +207,14 @@
 			<CardDescription>Upload or paste evidence content for AI-powered legal analysis.</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-1 md, grid-cols-2 gap-4 mb-4">
 				<div>
-					<Label for="caseId">Case ID</Label>
+					<Label htmlFor="caseId">Case ID</Label>
 					<Input id="caseId" bind:value={caseId} placeholder="Enter case ID" />
 				</div>
 				<div>
-					<Label for="evidenceType">Evidence Type</Label>
-					<select id="evidenceType" bind:value={evidenceType} class="select-input">
+					<Label htmlFor="evidenceType">Evidence Type</Label>
+					<select id="evidenceType" bind:value={evidenceType} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
 						<option value="" disabled>Select type</option>
 						{#each evidenceTypes as type}
 							<option value={type.value}>{type.label}</option>
@@ -234,16 +223,16 @@
 				</div>
 			</div>
 			<div class="mb-4">
-				<Label for="evidenceFile">Upload File (optional)</Label>
-				<input type="file" id="evidenceFile" on:change={handleFileUpload} class="file-input" />
+			<Label htmlFor="evidenceFile">Upload File (optional)</Label>
+				<input type="file" id="evidenceFile" onchange={handleFileUpload} class="w-full p-3 my-2 bg-[#0a0d10] border-2 border-dashed border-gray-700 rounded-lg text-white cursor-pointer transition-all duration-300 hover:border-[#ffd700]" />
 			</div>
 			<div class="mb-4">
-				<Label for="evidenceContent">Evidence Content</Label>
-				<Textarea id="evidenceContent" bind:value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" />
+			<Label htmlFor="evidenceContent">Evidence Content</Label>
+				<textarea id="evidenceContent" bind:value={evidenceContent} placeholder="Paste or upload evidence content here..." rows="6" ></textarea>
 			</div>
 			<div class="mb-4">
-				<Label for="priority">Priority</Label>
-				<select id="priority" bind:value={priority} class="select-input">
+			<Label htmlFor="priority">Priority</Label>
+				<select id="priority" bind:value={priority} class="w-full p-3 bg-[#0a0d10] border border-gray-700 rounded text-white focus: border-[#ffd700], focus:outline-none">
 					<option value="" disabled>Select priority</option>
 					{#each priorityOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -252,10 +241,10 @@
 			</div>
 		</CardContent>
 		<CardFooter>
-			<Button on:click={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="upload-btn">
+			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover: bg-[#ffed4a], disabled: opacity-50, disabled, cursor-not-allowed bits-btn">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
-			<Button on:click={resetForm} variant="outline" class="reset-btn">Reset</Button>
+			<Button onclick={ resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b] bits-btn">Reset</Button>
 		</CardFooter>
 	</Card>
 
@@ -266,7 +255,7 @@
 			</CardHeader>
 			<CardContent>
 				<Progress value={progress} class="mb-4" />
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 					{#each steps as step, index}
 						<div class="step flex items-center gap-2 {currentStep === index ? 'animate-pulse-glow' : ''}">
 							<span class="text-lg">{step.icon}</span>
@@ -292,7 +281,7 @@
 					<h3 class="text-lg font-semibold">Summary</h3>
 					<p>{results.analysisResults.summary || 'No summary available'}</p>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
 					<div>
 						<h4 class="font-semibold">Key Metrics</h4>
 						<ul class="list-disc list-inside">
@@ -326,7 +315,7 @@
 				{/if}
 			</CardContent>
 			<CardFooter>
-				<Button on:click={() => viewDetailedResults(results!)}>View Details</Button>
+				<Button class="bits-btn" onclick={() => viewDetailedResults(results!)}>View Details</Button>
 			</CardFooter>
 		</Card>
 	{/if}
@@ -355,45 +344,9 @@
 	}
 
 	/* Consistent with evidence page styles */
-	.upload-btn {
-		background: #ffd700;
-		color: #0a0a0a;
-	}
-	.upload-btn:hover {
-		background: #ffed4a;
-	}
-	.upload-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-	.reset-btn {
-		background: #f7d51d;
-		color: #0a0a0a;
-	}
-	.file-input {
-		width: 100%;
-		padding: 0.75rem;
-		margin: 0.5rem 0;
-		background: #0a0d10;
-		border: 2px dashed #444;
-		border-radius: 8px;
-		color: white;
-		cursor: pointer;
-		transition: all 0.3s ease;
-	}
-	.file-input:hover {
-		border-color: #ffd700;
-	}
-	.select-input {
-		width: 100%;
-		padding: 0.75rem;
-		background: #0a0d10;
-		border: 1px solid #444;
-		border-radius: 4px;
-		color: white;
-	}
-	.select-input:focus {
-		border-color: #ffd700;
-		outline: none;
-	}
+
 </style>
+
+
+
+

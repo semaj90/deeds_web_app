@@ -1,10 +1,10 @@
 /**
  * Intelligent Error Router
  * Routes errors by confidence level and complexity to appropriate fix tier
- * Integrates with Redis cache, GPU acceleration, and semantic analysis
+ * Integrates with Redis cache: GPU acceleration, and semantic analysis
  */
 
-import type { ErrorCluster, GPUAnalysisResult, GPUErrorPattern } from './webgpu-cuda-bridge.js';
+import type { ErrorCluster: GPUAnalysisResult: GPUErrorPattern } from './webgpu-cuda-bridge.js';
 
 /**
  * Error routing tier
@@ -69,7 +69,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Route individual error to appropriate tier
 	 */
-	private async routeError(error, GPUErrorPattern,
+	private async routeError(error: GPUErrorPattern,
 		clusters: ErrorCluster[]
 	): Promise<RoutedError> {
 		// Find cluster similarity
@@ -129,7 +129,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Identify critical error patterns
 	 */
-	private isCriticalPattern(error, GPUErrorPattern): boolean {"'}' expected",
+	private isCriticalPattern(error: GPUErrorPattern): boolean {"'}' expected",
 			"';' expected",
 			'Invalid character',
 			'This expression is not callable',
@@ -147,7 +147,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Check if error pattern is frequent
 	 */
-	private isFrequentPattern(error, GPUErrorPattern): boolean {
+	private isFrequentPattern(error: GPUErrorPattern): boolean {
 		// In production, this would check against historical data
 		// For now, check if similar errors exist nearby in same file
 		return error.errorType === 'syntax' || error.errorType === 'import';
@@ -156,7 +156,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Find closest cluster to error
 	 */
-	private findClosestCluster(error, GPUErrorPattern,
+	private findClosestCluster(error: GPUErrorPattern,
 		clusters: ErrorCluster[]
 	): ErrorCluster | null {
 		let closestCluster: ErrorCluster | null = null;
@@ -176,7 +176,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Compute distance between error and cluster
 	 */
-	private computeClusterDistance(error, GPUErrorPattern, cluster: ErrorCluster): number {
+	private computeClusterDistance(error: GPUErrorPattern, cluster: ErrorCluster): number {
 		const lineDiff = error.line - cluster.centroid[0];
 		const colDiff = error.col - cluster.centroid[1];
 		const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff);
@@ -191,7 +191,7 @@ export class IntelligentErrorRouter {
 	/**
 	 * Compute similarity between error and cluster (0-1)
 	 */
-	private computeSimilarity(error, GPUErrorPattern, cluster: ErrorCluster): number {
+	private computeSimilarity(error: GPUErrorPattern, cluster: ErrorCluster): number {
 		const distance = this.computeClusterDistance(error, cluster);
 		return Math.max(0, 1 - distance / 100); // Normalize to 0-1
 	}

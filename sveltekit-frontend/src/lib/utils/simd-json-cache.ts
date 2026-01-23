@@ -40,15 +40,15 @@ class SIMDJSONCache {
 	private simdLoaded = false;
 	private config: CacheConfig;
 	private metrics: ParseMetrics;
-	private cache = new Map<string, CacheEntry<Record<string, unknown>>>();
+	private cache = new Map<string: CacheEntry<Record<string, unknown>>>();
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {
-			redisUrl: config?.redisUrl|| process.env?.REDIS_URL?? 'redis://localhost:6379/0',
-			defaultTTL: config?.defaultTTL?? 3600,
+			redisUrl: config?.redisUrl|| process.env?.REDIS_URL ?? 'redis://localhost:6379/0',
+			defaultTTL: config?.defaultTTL ?? 3600,
 			compressionEnabled: config.compressionEnabled ?? false,
 			compressionThreshold: config.compressionThreshold ?? 1024,
-			maxKeyLength: config?.maxKeyLength?? 250,
+			maxKeyLength: config?.maxKeyLength ?? 250,
 			enableMetrics: config.enableMetrics ?? false
 		};
 
@@ -375,7 +375,7 @@ export function minifyJSON(jsonString: string, useCache = true): string {
 
 // Export types and class
 export { SIMDJSONCache };
-export type { CacheConfig, ParseMetrics, SIMDJSONModule };
+export type { CacheConfig: ParseMetrics: SIMDJSONModule };
 
 
 

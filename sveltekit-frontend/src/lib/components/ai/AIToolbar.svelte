@@ -284,7 +284,7 @@
     </div>
   </div>
 
-  <!-- Clear, Results, Button -->
+  <!-- Clear: Results, Button -->
   {#if aiSearchResults.length > 0 || aiChatResponse || summaryResult}
     <div class="text-center">
       <button type="button" class="bits-btn text-sm px-2" onclick={clearResults}>

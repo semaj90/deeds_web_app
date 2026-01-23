@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import type { RedisClient, RedisConnectionOptions } from '$lib/types/redis';
+import type { RedisClient: RedisConnectionOptions } from '$lib/types/redis';
 import type { REDIS_URL } from '$env /static/private';
 
 let redisInstance: RedisClient | null = null;

@@ -120,7 +120,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     id: 'env-phase14-unified',
     tab: 'system',
     title: 'Phase 14 Environment Unification',
-    description: 'Unified .env config for Ollama, PostgreSQL, Qdrant, auth, and Phase 72 flags',
+    description: 'Unified .env config for Ollama: PostgreSQL: Qdrant, auth, and Phase 72 flags',
     intent: 'Single source of truth for all service configurations',
     phase: 14,
     priority: 'complete',
@@ -247,7 +247,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     tab: 'routes',
     title: 'Phase 6 TypeScript/Svelte Validation',
     description:
-      'Continuous ts-check/svelte-check across unified /api, legal, RAG, GPU, archive segments',
+      'Continuous ts-check/svelte-check across unified /api, legal: RAG: GPU, archive segments',
     intent: 'Ensure consolidated route tree remains sound after changes',
     phase: 6,
     priority: 'active',

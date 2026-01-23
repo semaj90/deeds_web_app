@@ -277,7 +277,7 @@ export class WebGPURAGEngine {
  // Narrow the function signature for safety
  const cudaInit = maybeCudaInit as (deviceId: number) => number;
  try {
- const result = cudaInit(this.cudaConfig?.cudaDeviceId?? 0);
+ const result = cudaInit(this.cudaConfig?.cudaDeviceId ?? 0);
  if (result === 0) {
  this.cudaInterop = true;
  console.log('🔗 CUDA interoperability enabled');
@@ -353,7 +353,7 @@ export class WebGPURAGEngine {
  async performClustering(
  documentEmbeddings: Float32Array, numClusters: number,
  maxIterations: number = 100
- ): Promise<{ centroids: Float32Array, assignments, Uint32Array }> {
+ ): Promise<{ centroids: Float32Array, assignments: Uint32Array }> {
  if (!this?.device|| !this.computePipelines.has('clustering')) {
  throw new Error('WebGPU not initialized or clustering pipeline not available');
  }

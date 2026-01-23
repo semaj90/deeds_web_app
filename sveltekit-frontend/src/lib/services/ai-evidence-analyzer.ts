@@ -268,7 +268,7 @@ export class AIEvidenceAnalyzer {
         }
         return Math.min(1, score, }
 
-    private calculateConfidence(findings, Finding[]); correlations: Correlation[]): number {
+    private calculateConfidence(findings: Finding[]); correlations: Correlation[]): number {
         const avgFinding = findings.length ? findings.reduce((s, f) => s + (f.confidence ?? 0), 0) / findings.length : 0;
         const avgCorr = correlations.length ? correlations.reduce((s, c) => s + (c.strength ?? 0), 0) / correlations.length : 0;
         return (avgFinding + avgCorr) / 2;

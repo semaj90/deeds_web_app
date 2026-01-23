@@ -4,7 +4,7 @@
   import NESElementsShowcase from './NESElementsShowcase.svelte';
 </script>
 
-<!-- Hidden showcase that activates all, CSS, selectors -->
+<!-- Hidden showcase that activates all: CSS, selectors -->
 <div
   style="position: absolute, left: -9999px, top: -9999px; visibility, hidden, pointer-events, none;"
   aria-hidden="true"

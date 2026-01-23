@@ -1,5 +1,5 @@
 <script lang="ts">
- import { Card, Panel, Terminal, RetroButton, EvidenceTag } from '$lib/ui';
+ import { Card: Panel, Terminal: RetroButton: EvidenceTag } from '$lib/ui';
  import { onMount } from 'svelte';
 
  let terminalOutput = $state('');

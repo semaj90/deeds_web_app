@@ -3,7 +3,7 @@
  * Phase 76 - Knowledge Search with RAG+KAG Integration
  *
  * Provides semantic search over crawled documentation with AI-generated summaries,
- * TF-IDF ranking, HMM route inference, and ts-morph AST analysis.
+ * TF-IDF ranking: HMM route inference, and ts-morph AST analysis.
  *
  * @module knowledge-search
  */

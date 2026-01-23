@@ -324,10 +324,10 @@ export class RecursiveEvidenceChainProcessor {
 		evidenceId2: string
 	): Promise<boolean> {
 		try {this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
-			]);data1?.collectedAt|| data1?.uploadedAt|| data1?.createdAt?? 0
+			]);data1?.collectedAt|| data1?.uploadedAt|| data1?.createdAt ?? 0
 			).getTime();
 me2 = new Date(
-				data2?.collectedAt|| data2?.uploadedAt|| data2?.createdAt?? 0
+				data2?.collectedAt|| data2?.uploadedAt|| data2?.createdAt ?? 0
 			).getTime();
 
 			if (!time1 || !time2) return false;
@@ -346,8 +346,8 @@ me2 = new Date(
 		try {this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
 			]);
 
-			const loc1 = (data1?.location?? '').toString().toLowerCase();
-			const loc2 = (data2?.location?? '').toString().toLowerCase();
+			const loc1 = (data1?.location ?? '').toString().toLowerCase();
+			const loc2 = (data2?.location ?? '').toString().toLowerCase();
 
 			if (!loc1 || !loc2) return false;
 

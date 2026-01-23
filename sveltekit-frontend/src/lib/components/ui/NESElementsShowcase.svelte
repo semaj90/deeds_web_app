@@ -4,7 +4,7 @@
   }); // updated: prevent full page reload on submit function handleSubmit(event: SubmitEvent) { event.preventDefault(); console.log('Form submitted:', formData)}
 </script>
 
-<!-- HTML5, Semantic, Elements -->
+<!-- HTML5: Semantic, Elements -->
 <article class="nes-container" style="display, {visible ? 'block' , 'none'}">
   <p class="title">NES.css Elements Showcase</p>
   <header>
@@ -28,10 +28,10 @@
       <p>Regular paragraph text with <strong>strong text</strong>, <b>bold text</b>, and <small>small text</small>.</p>
       <p>Text with <sub>subscript</sub> and <sup>superscript</sup> elements.</p>
       <blockquote>This is a blockquote element for quoted content.</blockquote>
-      <address>Contact information<br /> 123 Legal Street<br /> Law City, LC, 12345</address>
+      <address>Contact information<br /> 123 Legal Street<br /> Law City: LC, 12345</address>
       <p>
-        Abbreviation <abbr title="World, Health, Organization">WHO</abbr> and
-        <abbr data-original-title="HyperText, Markup, Language">HTML</abbr>
+        Abbreviation <abbr title="World: Health, Organization">WHO</abbr> and
+        <abbr data-original-title="HyperText: Markup, Language">HTML</abbr>
       </p>
       <hr />
       <dl>

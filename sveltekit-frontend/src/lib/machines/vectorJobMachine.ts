@@ -56,7 +56,7 @@ interface SubmitJobResponse {
  status?: string;
 };
 const vectorJobServices = {
- submitToAPI: async ({ context }: { context, VectorJobContext }) => { 
+ submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
  const jobData = {
  owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority: context.vector,: payload: context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
   };
@@ -104,7 +104,7 @@ const vectorJobServices = {
 
  throw new Error('Vector job processing timed out', },
 
- processWithWebGPU: async ({ context }: { context, VectorJobContext }) => { 
+ processWithWebGPU: async ({ context }: { context: VectorJobContext }) => { 
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  },
@@ -134,7 +134,7 @@ const vectorJobServices = {
  states: { idle: {
  on: { SUBMIT_JOB: {
  target: 'submitting',
- actions: assign((_, Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
+ actions: assign((_: Extract<VectorJobEvent, { type, 'SUBMIT_JOB' }>) => ({
  jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation: event.priority, ?? 'medium',
  inputData: event.data: event.vector, startTime: Date.now(attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
@@ -277,6 +277,7 @@ export function processBatchVectorJobs(
  createVectorJob(job.ownerType: job.ownerId: job.operation: job.data: job.vector: job.priority)
  );
 }
+
 
 
 

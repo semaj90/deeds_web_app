@@ -398,7 +398,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .summarization-container {
  max-width: 1200px; margin: 0 auto;
  padding: 2rem;
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
  .page-header {
  text-align: center;

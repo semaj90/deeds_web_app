@@ -7,7 +7,7 @@ export function getOllamaEndpoint(): string {
  // Then fallback to: unknown local embedder override.
  // Finally fall back to the docker service name (works inside compose) and then host localhost.
  return (
- process.env?.OLLAMA_URL|| process.env?.LOCAL_EMBEDDER_URL?? 'http://ollama:11434' // docker service name fallback (preferred in compose)
+ process.env?.OLLAMA_URL|| process.env?.LOCAL_EMBEDDER_URL ?? 'http://ollama:11434' // docker service name fallback (preferred in compose)
  );
 }
 

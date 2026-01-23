@@ -29,11 +29,11 @@ export class AnalyzerWorkerPool {
  private workerStatus: Map<number, boolean> = new Map();
  private taskQueue: ProcessTask[] = [];
  private results: Map<string, ProcessResult> = new Map();
- private listeners: Map<string, (result, ProcessResult) => void> = new Map();
+ private listeners: Map<string, (result: ProcessResult) => void> = new Map();
 
  constructor(private config: WorkerPoolConfig = {}) {
- this.config.workerCount = config?.workerCount|| navigator?.hardwareConcurrency?? 8;
- this.config.batchSize = config?.batchSize?? 10;
+ this.config.workerCount = config?.workerCount|| navigator?.hardwareConcurrency ?? 8;
+ this.config.batchSize = config?.batchSize ?? 10;
  }
 
  /**
@@ -71,8 +71,8 @@ export class AnalyzerWorkerPool {
  worker.postMessage({
  type: 'INIT',
  data: { workerId: i,
- config: { url: this.config?.ollamaUrl?? 'http://localhost:11434',
- model: this.config?.model?? 'gemma3-legal:latest',
+ config: { url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ model: this.config?.model ?? 'gemma3-legal:latest',
  },
  },
  });
@@ -225,8 +225,8 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: { workerId: config: { url: this.config?.ollamaUrl?? 'http://localhost:11434',
- model: this.config?.model?? 'gemma3-legal:latest',
+ data: { workerId: config: { url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ model: this.config?.model ?? 'gemma3-legal:latest',
  },
  },
  });

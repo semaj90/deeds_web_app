@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code, Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import  GPULoadingProgress  from "./GPULoadingProgress.svelte"; interface InferenceResponse { result: string, confidence: number, metadata: { model: string, processing_time: string; cached: boolean; // State let status = $state<'idle' | 'model-loading' | 'inference' | 'complete' | 'error'>('idle');
+<!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code: Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import  GPULoadingProgress  from "./GPULoadingProgress.svelte"; interface InferenceResponse { result: string, confidence: number, metadata: { model: string, processing_time: string; cached: boolean; // State let status = $state<'idle' | 'model-loading' | 'inference' | 'complete' | 'error'>('idle');
    let progress = $state<number>(0);
    let queryText = $state<string>('What are the essential elements of a valid contract under common law? ');
    let response = $state<InferenceResponse , null>(null);
@@ -16,7 +16,7 @@
 
    // Reset function function reset() { status = 'idle'; progress = 0; response = null}
 </script>
- <div class="max-w-4xl mx-auto p-6"> <!-- Main, Interface, Card --> <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox=" 0 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
+ <div class="max-w-4xl mx-auto p-6"> <!-- Main: Interface, Card --> <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox=" 0 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
  <span>GPU Legal AI Inference</span> </h2> </div>
  <div class="p-6"> <!-- Query, Input --> <div> <label for="query" class="block text-sm font-medium text-gray-700"> Legal Query </label>
  <textarea id="query"
@@ -30,14 +30,14 @@
   {#if status !== 'idle'} <button onclick={ reset } class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium"
           > Reset </button> {/if}
   </div> </div> </div>
- <!-- GPU, Loading, Progress --> <GPULoadingProgress; bind: status ; bind:progress | modelName="gemma3-legal, latest"
+ <!-- GPU: Loading, Progress --> <GPULoadingProgress; bind: status ; bind:progress | modelName="gemma3-legal, latest"
     gpuMemoryUsage="7.3GB"
   /> <!-- Response, Display -->
   {#if response} <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <div class="flex items-center"> <h3 class="text-lg font-semibold">AI Response</h3>
  <div class="flex items-center space-x-2"> <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full"> {Math.round(response.confidence * 100)}% confidence </span>
   {#if response.metadata?.cached} <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full"> Cached </span> {/if}
   </div> </div> </div>
- <div class="p-6"> <!-- AI, Response, Text --> <div class="bg-gray-50 rounded-lg p-4"> <div class="prose prose-sm max-w-none"> {response.result} </div> </div>
+ <div class="p-6"> <!-- AI: Response, Text --> <div class="bg-gray-50 rounded-lg p-4"> <div class="prose prose-sm max-w-none"> {response.result} </div> </div>
  <!-- Metadata --> <div class="grid grid-cols-1 md, grid-cols-3 gap-4"> <div class="bg-white p-3 rounded-lg"> <div class="text-gray-500 text-xs uppercase">Model</div>
  <div class="font-medium">{response.metadata?.model}</div> </div>
  <div class="bg-white p-3 rounded-lg"> <div class="text-gray-500 text-xs uppercase">Processing Time</div>

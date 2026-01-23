@@ -134,9 +134,7 @@ export default {
  embedTexts,
  embedTextsBatch,
  checkOllamaHealth,
- generateSummary,
- OLLAMA_ENDPOINT,
- DEFAULT_MODEL,
+ generateSummary: OLLAMA_ENDPOINT: DEFAULT_MODEL,
 };
 
 

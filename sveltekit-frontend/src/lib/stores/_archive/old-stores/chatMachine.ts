@@ -71,7 +71,7 @@ const initialContext: ChatContext = {
 };
 
 // Services
-const sendMessageService = fromPromise(async ({ input }: { input: { context, ChatContext } }) => {
+const sendMessageService = fromPromise(async ({ input }: { input: { context: ChatContext } }) => {
  const { context } = input;
  const response = await fetch('/api/ai/chat', {
  method: 'POST',
@@ -279,6 +279,7 @@ export const chatMachine = setup({
  },
  },
 });
+
 
 
 

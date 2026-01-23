@@ -1,7 +1,7 @@
-<!-- @migration-task Error while migrating Svelte, code, Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code, Unexpected, token -->
-<!-- Progress, Indicator, Component -->
+<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
+<!-- Progress: Indicator, Component -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
     interface Props {
