@@ -11,9 +11,12 @@
 import { redis } from './cache/redis';
 
 interface GPUMetrics {
-    gpuUtilization: number; memoryUsage: number;
-    tensorCoreLoad: number; thermalStatus: 'cool' | 'warm' | 'hot';
-    availableComputeUnits: number; queueDepth: number;
+    gpuUtilization: number;
+    memoryUsage: number;
+    tensorCoreLoad: number;
+    thermalStatus: 'cool' | 'warm' | 'hot';
+    availableComputeUnits: number;
+    queueDepth: number;
 }
 
 interface CacheWorkload {
@@ -25,11 +28,35 @@ interface CacheWorkload {
 }
 
 interface ParallelCacheJob {
-    id: string; workload: CacheWorkload;
-    data: any; key: string;
+    id: string;
+    workload: CacheWorkload;
+    data: any;
+    key: string;
     ttl?: number;
     threadAffinity?: number;
 }
+
+const shaderCode = `
+    @group(0) @binding(0) var<storage, read> input: array<f32>;
+    @group(0) @binding(1) var<storage, read_write> output: array<f32>;
+    @group(0) @binding(2) var<uniform> params: vec4<u32>; // [length, compression_ratio, padding, mode]
+
+    @compute @workgroup_size(64, 1, 1)
+    fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+        let index = global_id.x;
+        let length = params.x;
+        let compression_ratio = params.y;
+
+        if (index >= length) {
+            return;
+        }
+
+        // Simple quantization
+        let value = input[index];
+        let quantized = round(value * f32(compression_ratio)) / f32(compression_ratio);
+        output[index] = quantized;
+    }
+`;
 
 export class WebGPURedisOptimizer {
     private gpuDevice: any = null;
@@ -67,32 +94,12 @@ export class WebGPURedisOptimizer {
             }
 
             this.gpuDevice = await adapter.requestDevice({
-                requiredLimits: { maxComputeWorkgroupSizeX: 1024,
+                requiredLimits: {
+                    maxComputeWorkgroupSizeX: 1024,
                     maxComputeInvocationsPerWorkgroup: 1024,
                     maxBufferSize: 1024 * 1024 * 1024, // 1GB
                 },
             });
-
-            // Shader code fixed: removed backslash escapes@group(0) @binding(0) var<storage, read> input: array<f32>;
-                @group(0) @binding(1) var<storage, read_write> output: array<f32>;
-                @group(0) @binding(2) var<uniform> params: vec4<u32>; // [length, compression_ratio, padding, mode]
-
-                @compute @workgroup_size(64, 1, 1)
-                fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-                    let index = global_id.x;
-                    let length = params.x;
-                    let compression_ratio = params.y;
-
-                    if (index >= length) {
-                        return;
-                    }
-
-                    // Simple quantization
-                    let value = input[index];
-                    let quantized = round(value * f32(compression_ratio)) / f32(compression_ratio);
-                    output[index] = quantized;
-                }
-            `;
 
             const shaderModule = this.gpuDevice.createShaderModule({
                 code: shaderCode,
@@ -100,7 +107,8 @@ export class WebGPURedisOptimizer {
 
             this.computePipeline = this.gpuDevice.createComputePipeline({
                 layout: 'auto',
-                compute: { module: shaderModule,
+                compute: {
+                    module: shaderModule,
                     entryPoint: 'main',
                 },
             });
@@ -115,7 +123,7 @@ export class WebGPURedisOptimizer {
      * GPU-accelerated tensor compression for Float32Array data
      */
     private async compressTensorGPU(data: Float32Array, compressionRatio: number = 4): Promise<Uint8Array> {
-        if (!this?.gpuDevice|| !this.computePipeline) {
+        if (!this.gpuDevice || !this.computePipeline) {
             return this.compressTensorCPU(data, compressionRatio);
         }
 
@@ -169,11 +177,11 @@ export class WebGPURedisOptimizer {
     async setOptimized(
         key: string,
         value: any,
-        options: { ttl?: number, compress?: boolean, priority?: CacheWorkload['priority'] } = {}
+        options: { ttl?: number; compress?: boolean; priority?: CacheWorkload['priority'] } = {}
     ): Promise<void> {
-        const ttl = options?.ttl?? 3600;
+        const ttl = options.ttl ?? 3600;
 
-        if (options?.compress&& value instanceof Float32Array) {
+        if (options.compress && value instanceof Float32Array) {
             const compressed = await this.compressTensorGPU(value);
             const metadata = {
                 type: 'compressed_tensor',
@@ -182,7 +190,6 @@ export class WebGPURedisOptimizer {
             };
 
              if (redis) {
-                // Fixed backslash escapes on keys
                 await redis.set(`${key}:data`, Buffer.from(compressed), 'EX', ttl);
                 await redis.set(`${key}:meta`, JSON.stringify(metadata), 'EX', ttl);
              }
@@ -200,7 +207,6 @@ export class WebGPURedisOptimizer {
         if (!redis) return null;
 
         try {
-            // Fixed backslash escapes on keys
             const metaStr = await redis.get(`${key}:meta`);
             const metadata = metaStr ? JSON.parse(metaStr) : null;
 
@@ -230,7 +236,7 @@ export class WebGPURedisOptimizer {
 export const webgpuRedisOptimizer = new WebGPURedisOptimizer();
 
 export const optimizedCache = {
-    async set(key: string, value: any, options: { ttl?: number, compress?: boolean } = {}): Promise<void> {
+    async set(key: string, value: any, options: { ttl?: number; compress?: boolean } = {}): Promise<void> {
         return webgpuRedisOptimizer.setOptimized(key, value, {
             ttl: options.ttl,
             compress: options.compress,
@@ -239,12 +245,8 @@ export const optimizedCache = {
     },
 
     async get(key: string): Promise<any> {
-        return webgpuRedisOptimizer.getOptimized(key, { decompress, true });
+        return webgpuRedisOptimizer.getOptimized(key, { decompress: true });
     }
 };
 
 export type { GPUMetrics, CacheWorkload, ParallelCacheJob };
-
-
-
-

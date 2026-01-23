@@ -123,7 +123,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'validateFiles',
         src: fromPromise<File[]>(async (params) => {
-          const { input } = params as { input, DocumentUploadContext };
+          const { input } = params as { input: DocumentUploadContext };
           const errors: Record<string, string[]> = {};
 
           if (input.files.length === 0) {
@@ -185,7 +185,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'uploadFiles',
         src: fromPromise<any>(async (params) => {
-          const { input } = params as { input, DocumentUploadContext };
+          const { input } = params as { input: DocumentUploadContext };
           const formData = new FormData();
           input.files.forEach((file, index) => {
             formData.append(`file_${index}`, file);
@@ -233,7 +233,7 @@ export const documentUploadMachine = createMachine({
       invoke: {
         id: 'processFiles',
         src: fromPromise<{ processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(async (params) => {
-          const { input } = params as { input, DocumentUploadContext };
+          const { input } = params as { input: DocumentUploadContext };
           const processingResults: AIProcessingResult[] = [];
 
           for (const file of input.uploadedFiles) {

@@ -25,8 +25,8 @@ export interface BoundingBox {
 }
 
 export interface LayoutInfo {
- blocks: Array<{ bbox: BoundingBox; text: string; confidence, number }>;
- tables?: Array<{ rows: number; cols: number; cells, string[][] }>;
+ blocks: Array<{ bbox: BoundingBox; text: string; confidence: number }>;
+ tables?: Array<{ rows: number; cols: number; cells: string[][] }>;
  headers?: string[];
 }
 
@@ -170,7 +170,10 @@ export interface TricubicSearchOptions {
 export interface SOMCluster {
  centroid: number[]; memberIndices: number[];
  variance: number;
-}| 'default'
+}
+
+export type ButtonVariant =
+ | 'default'
  | 'primary'
  | 'secondary'
  | 'destructive'

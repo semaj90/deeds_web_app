@@ -106,7 +106,7 @@ async function verifyDigitalSignature(evidence: Evidence): Promise<boolean> {
 }
 
 // Service implementations
-const evidenceIntakeService = fromPromise<unknown, { input, EvidenceCustodyContext }>(async ({ input })) => {
+const evidenceIntakeService = fromPromise<unknown, { input: EvidenceCustodyContext }>(async ({ input })) => {
   console.log(`Starting evidence intake for custody workflow: ${input.evidenceId}`);
   // Create initial custody event
   const custodyEvent = {
@@ -127,7 +127,7 @@ const evidenceIntakeService = fromPromise<unknown, { input, EvidenceCustodyConte
     integrityStatus: 'pending' as const,
     custodyEvent };
 });
-const integrityVerificationService = fromPromise<unknown, { input, EvidenceCustodyContext }>(
+const integrityVerificationService = fromPromise<unknown, { input: EvidenceCustodyContext }>(
   async ({ input })) => {
     console.log(`Performing integrity verification for evidence: ${input.evidenceId}`);
     // Multi-layer integrity verification
@@ -190,7 +190,7 @@ const aiAnalysisService = fromPromise<{
   relevanceScore?: number;
   riskLevel?: string;
   recommendations?: string[];
-}, { input, EvidenceCustodyContext }>(async ({ input }) => {
+}, { input: EvidenceCustodyContext }>(async ({ input }) => {
   console.log(`Performing AI analysis for evidence custody: ${input.evidenceId}`);
   // Multi-agent AI analysis using the existing pipeline
   const analysisResponse = await fetch('/api/multi-agent/analyze', {
@@ -238,7 +238,7 @@ const aiAnalysisService = fromPromise<{
       eventType: 'analysis' }) };
   return { aiAnalysis, custodyEvent };
 });
-const collaborationService = fromPromise<unknown, { input, EvidenceCustodyContext }>(async ({ input })) => {
+const collaborationService = fromPromise<unknown, { input: EvidenceCustodyContext }>(async ({ input })) => {
   console.log(`Setting up collaboration session for evidence: ${input.evidenceId}`);
   const sessionId = input.collaborationSession?.sessionId ?? crypto.randomUUID();
   const collaborationSession = { sessionId: participants: input.collaborationSession?.participants ?? [{
@@ -274,7 +274,7 @@ const custodyTransferService = fromPromise<unknown, { input: EvidenceCustodyCont
       custodyEvent };
   }
 );
-const finalizationService = fromPromise<unknown, { input, EvidenceCustodyContext }>(async ({ input })) => {
+const finalizationService = fromPromise<unknown, { input: EvidenceCustodyContext }>(async ({ input })) => {
   console.log(`Finalizing custody workflow for evidence: ${input.evidenceId}`);
   const custodyEvent = {
     id: crypto.randomUUID(),

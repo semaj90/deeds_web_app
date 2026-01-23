@@ -90,7 +90,7 @@ export interface AutoTagContext {
  },
  },
  {
- actors: { tagWithAI: fromPromise(async ({ input }, { input, any }) => {
+ actors: { tagWithAI: fromPromise(async ({ input }, { input: any }) => {
  const response = await fetch('/api/ai/tag', {
  method: 'POST',
  headers: {

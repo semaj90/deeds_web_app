@@ -134,7 +134,7 @@ export const clusteringMachineDef = setup({
 }).createMachine({
  id: 'legal-clustering',
  initial: 'waiting',
- context: ({ input }: { input, ClusteringContext }) => ({
+ context: ({ input }: { input: ClusteringContext }) => ({
  ...input, retryCount,
  }, states: { waiting: { on: { START: 'queue',
  },

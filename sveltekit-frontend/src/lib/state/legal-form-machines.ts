@@ -242,7 +242,7 @@ interface PerformAnalysisOutput {
  if (!response.ok) {
  throw new Error(`Upload failed: ${response.statusText}`, }
  return await response.json();
- }); processDocument: fromPromise<unknown, { input, ProcessDocumentActorInput }>(
+ }); processDocument: fromPromise<unknown, { input: ProcessDocumentActorInput }>(
  async ({ input })): Promise<ProcessDocumentOutput> => {
  const started = Date.now();
  let baseResults: null = null;

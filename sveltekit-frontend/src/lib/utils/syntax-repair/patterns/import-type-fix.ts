@@ -1,0 +1,96 @@
+/**
+ * Import Type Syntax Fix Pattern
+ *
+ * Fixes corrupted import type syntax where `type,` appears instead of `type `.
+ *
+ * Before: import { type, AuditLogEntry, type, NewAuditLogEntry }
+ * After:  import { type AuditLogEntry, type NewAuditLogEntry }
+ */
+
+import { createPattern, type PatternMatcher } from '../pattern-matcher';
+
+/**
+ * Pattern to fix `type,` followed by identifier in imports
+ * This handles the case where commas were incorrectly inserted after `type`
+ */
+export const importTypePattern: PatternMatcher = createPattern(
+  'import-type-syntax',
+  'Fix corrupted import type syntax (type, X → type X)',
+  /type,\s*([A-Z][a-zA-Z0-9_]*)/g,
+  'type $1',
+  {
+    priority: 10,
+    validate: (before, after) => !after.includes('type,'),
+  }
+);
+
+/**
+ * Pattern to fix import statements with multiple corrupted type imports
+ * Processes the entire import block to handle complex cases
+ */
+export const importBlockPattern: PatternMatcher = createPattern(
+  'import-block-fix',
+  'Fix entire import blocks with corrupted type syntax',
+  /import\s*\{([^}]+)\}\s*from/g,
+  (match, imports) => {
+    // Fix all `type,` occurrences within the import block
+    const fixed = imports.replace(/type,\s*([A-Z])/g, 'type $1');
+    return `import {${fixed}} from`;
+  },
+  {
+    priority: 5,
+    validate: (before, after) => {
+      // Ensure no `type,` patterns remain in imports
+      const importMatch = after.match(/import\s*\{[^}]+\}/g);
+      if (!importMatch) return true;
+      return !importMatch.some(imp => imp.includes('type,'));
+    },
+  }
+);
+
+/**
+ * Pattern to fix type-only imports that got corrupted
+ * Handles: import type, { X } → import type { X }
+ */
+export const importTypeOnlyPattern: PatternMatcher = createPattern(
+  'import-type-only-fix',
+  'Fix corrupted type-only import statements',
+  /import\s+type,\s*\{/g,
+  'import type {',
+  {
+    priority: 3,
+  }
+);
+
+/**
+ * Get all import-related fix patterns in priority order
+ */
+export function getImportTypePatterns(): PatternMatcher[] {
+  return [
+    importTypeOnlyPattern,
+    importBlockPattern,
+    importTypePattern,
+  ].sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
+}
+
+/**
+ * Apply import type fixes to content
+ */
+export function fixImportTypes(content: string): { result: string; fixCount: number } {
+  let result = content;
+  let totalFixes = 0;
+
+  for (const pattern of getImportTypePatterns()) {
+    const matches = result.match(pattern.pattern);
+    if (matches) {
+      totalFixes += matches.length;
+      if (typeof pattern.replacement === 'function') {
+        result = result.replace(pattern.pattern, pattern.replacement);
+      } else {
+        result = result.replace(pattern.pattern, pattern.replacement);
+      }
+    }
+  }
+
+  return { result, fixCount: totalFixes };
+}

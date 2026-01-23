@@ -9,7 +9,7 @@ import { sql } from 'drizzle-orm';
 import { documents } from '$lib/db/schema';
 import Loki from 'lokijs';
 import Fuse from 'fuse.js';
-import { createClient, type RedisClientType } from 'redis';
+import { createClient } from 'redis';
 import * as Minio from 'minio';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import type { SearchResult } from '$lib/types';
@@ -39,8 +39,10 @@ const lokiDb = new Loki('legal-documents.db');
 const lokiCollection = lokiDb.addCollection<LokiDocument>('documents', { indices: ['id', 'title'] });
 
 // Service Clients
+type RedisClient = ReturnType<typeof createClient>;
+
 let fuseInstance: Fuse<LokiDocument> | null = null;
-let redisClient: RedisClientType | null = null;
+let redisClient: RedisClient | null = null;
 let minioClient: Minio.Client | null = null;
 let qdrantClient: QdrantClient | null = null;
 let cudaAvailable = false;
@@ -295,7 +297,7 @@ export async function searchSimilarDocuments(query: string, limit = 5): Promise<
 			});
 
             results = qdrantResults.map((r: any) => ({
-				content: r.payload?.content as string || '',
+				content: (r.payload?.content as string) ?? '',
 				similarity: r.score,
 				metadata: {
 					source_file: r.payload?.filename,

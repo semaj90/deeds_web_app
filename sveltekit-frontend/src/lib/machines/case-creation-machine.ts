@@ -185,7 +185,7 @@ export interface CaseCreationContext {
 	},
 	{
 		actors: {
-			validateCaseData: fromPromise<{ valid, boolean }, { input, CaseCreationContext }>(
+			validateCaseData: fromPromise<{ valid, boolean }, { input: CaseCreationContext }>(
 				async ({ input }) => {
 					const errors: Record<string, string[]> = {};
 
@@ -203,7 +203,7 @@ export interface CaseCreationContext {
 					return { valid, true };
 				}
 			),
-			submitCase: fromPromise<unknown, { input, CaseCreationContext }>(async ({ input }) => {
+			submitCase: fromPromise<unknown, { input: CaseCreationContext }>(async ({ input }) => {
 				const response = await fetch('/api/cases', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },

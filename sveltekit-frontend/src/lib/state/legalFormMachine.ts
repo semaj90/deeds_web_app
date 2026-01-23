@@ -40,7 +40,7 @@ export interface LegalFormContext {
 /**
  * Async service for case submission
  */{ caseId: string; success: boolean; message: string },
-  { input, LegalFormContext }
+  { input: LegalFormContext }
 >(async ({ input }) => {
  // Simulate network delay
  await new Promise((resolve) => setTimeout(resolve, 2000));

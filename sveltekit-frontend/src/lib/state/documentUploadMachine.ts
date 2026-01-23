@@ -75,7 +75,7 @@ const SUSPICIOUS_EXTENSIONS = ['.exe', '.bat', '.cmd', '.scr', '.com', '.pif'];
 // Services
 // -----------------------------
 
-const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { input, DocumentUploadContext }>(async ({ input }) => {
+const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { input: DocumentUploadContext }>(async ({ input }) => {
   const errors: string[] = [];
 
   if (!input.file) {
@@ -111,7 +111,7 @@ const validateFileService = fromPromise<{ valid: boolean; errors: string[] }, { 
     errors) };
 });
 
-const calculateFileHashService = fromPromise<unknown, { input, DocumentUploadContext }>(
+const calculateFileHashService = fromPromise<unknown, { input: DocumentUploadContext }>(
   async ({ input })) => {
     if (!input.file) {
       throw new Error('No file to hash',  };
@@ -137,7 +137,7 @@ const uploadFileService = fromPromise<{
   evidenceId: string;
   extractedText?: string;
   uploadTime: number;
-}, { input, DocumentUploadContext }>(async ({ input }) => {
+}, { input: DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to upload',  };
   const formData = new FormData();
@@ -160,7 +160,7 @@ const uploadFileService = fromPromise<{
   };
 });
 
-const extractTextService = fromPromise<{ extractedText, string }, { input, DocumentUploadContext }>(async ({ input }) => {
+const extractTextService = fromPromise<{ extractedText, string }, { input: DocumentUploadContext }>(async ({ input }) => {
   if (!input.file) {
     throw new Error('No file to extract text from',  },if (input.file.type === 'text/plain') {
     extractedText = await input.file.text();

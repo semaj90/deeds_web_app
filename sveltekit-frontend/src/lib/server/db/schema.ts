@@ -7,7 +7,7 @@ export * from './schema-postgres';
 // Evidence CRUD + RAG Integration tables
 export {
     JURISDICTIONS, auditOperationEnum,
-    auditResourceTypeEnum,
+    auditTableEnum,
     citationTags,
     evidenceTags, jurisdictionEnum, ragIndexMetadata, type AuditLogEntry
 } from './schema-evidence-crud';
@@ -24,7 +24,7 @@ export {
 } from '../../db/schema/ace-web';
 
 // Canvas & Autosaves Schema (Phase 76+ / NES Integration)
-export * from './schema-canvas-autosaves';
+// export * from './schema-canvas-autosaves';
 // export * from './schema-canvas';
 
 // Phase 89 Preserved Tables - DO NOT DELETE

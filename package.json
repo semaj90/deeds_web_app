@@ -35,7 +35,11 @@
     "phase76:ace": "node scripts/phase76-ace-prompt-engineer.mjs",
     "phase76:mcp": "node scripts/phase76-mcp-server.mjs",
     "phase76:mcp:health": "curl http://localhost:3002/health",
-    "phase76:mcp:tools": "curl http://localhost:3002/tools"
+    "phase76:mcp:tools": "curl http://localhost:3002/tools",
+    "syntax:repair": "node scripts/syntax-repair-cli.mjs --verbose",
+    "syntax:repair:dry-run": "node scripts/syntax-repair-cli.mjs --dry-run --verbose",
+    "syntax:repair:validate": "node scripts/syntax-repair-cli.mjs --validate --verbose",
+    "syntax:repair:report": "npx tsc --noEmit 2>&1 | tail -20"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.0.0",

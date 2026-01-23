@@ -32,7 +32,7 @@ export interface EmbeddingError {
 /**
  * XState v5 actor for generating embeddings with legal context
  */
-export const embeddingActor = fromPromise<unknown, { input, EmbeddingInput }>(async ({ input })): Promise<EmbeddingOutput> => {
+export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(async ({ input })): Promise<EmbeddingOutput> => {
   const startTime = Date.now();
   try {
     // Validate input
@@ -115,7 +115,7 @@ export const batchEmbeddingActor = fromPromise<unknown, { input: EmbeddingInput[
       for (let i = 0; i < input.length; i += batchSize) {
         const batch = input.slice(i, i + batchSize);
         const batchPromises = batch.map(async (item, EmbeddingInput) => {
-          const actor = createActor(embeddingActor, { input, item });
+          const actor = createActor(embeddingActor, { input: item });
           actor.start();
           const snapshot = actor.getSnapshot();
           return (snapshot.output as EmbeddingOutput) ?? null;
@@ -158,7 +158,7 @@ export async function generateEmbedding(input: EmbeddingInput): Promise<Embeddin
  */
 export async function generateBatchEmbeddings(inputs: EmbeddingInput[]): Promise<EmbeddingOutput[]> {
     // TODO: ACE: Async function without await (check if async is needed)
-  const actor = createActor(batchEmbeddingActor, { input, inputs });
+  const actor = createActor(batchEmbeddingActor, { input: inputs });
   actor.start();
   const snapshot = actor.getSnapshot();
   if (!snapshot.output) throw new Error('Batch embedding actor returned no output');

@@ -6,13 +6,14 @@
 
 import { db } from '$lib/server/db/client';
 import { documentChunks } from '$lib/server/db/schema-postgres';
+import { redis } from '$lib/server/redis-client';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { randomUUID } from 'crypto';
 import { sql } from 'drizzle-orm';
 import Fuse from 'fuse.js';
+import type { Redis } from 'ioredis';
 import Loki from 'lokijs';
 import { Client as MinioClient } from 'minio';
-import type { RedisClientType } from 'redis';
 
 // Environment configuration
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
@@ -48,7 +49,7 @@ const lokiCollection = lokiDb.addCollection<LokiDocument>('documents', {
 });
 
 let fuseInstance: Fuse<LokiDocument> | null = null;
-let redisClient: RedisClientType | null = null;
+const redisClient: Redis = redis;
 let minioClient: MinioClient | null = null;
 let qdrantClient: QdrantClient | null = null;
 let cudaAvailable = false;
@@ -66,17 +67,8 @@ export async function initializeIntegratedRAG(): Promise<void> {
 		cudaAvailable = false;
 	}
 
-	// Redis Initialization
-	if (!redisClient) {
-		try {
-			const { createClient } = await import('redis');
-			redisClient = createClient() as unknown as RedisClientType;
-			await redisClient.connect();
-			console.log('✅ RAG: Redis connected');
-		} catch (err) {
-			console.warn('⚠️ RAG: Redis unavailable');
-		}
-	}
+	// Redis is handled by shared client
+	// if (!redisClient) { ... }
 
 	// MinIO Initialization
 	if (!minioClient) {
@@ -148,7 +140,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 		if (redisClient) {
 			try {
-				await redisClient.setEx(cacheKey, 3600, JSON.stringify(embedding));
+				await redisClient.setex(cacheKey, 3600, JSON.stringify(embedding));
 			} catch {
 				// Ignore cache storage errors
 			}
