@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "types": [
       "svelte",
-      "node"
+      "node",
+      "@webgpu/types"
     ]
   },
   "include": [
