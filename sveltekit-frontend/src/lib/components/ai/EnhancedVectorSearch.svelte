@@ -150,7 +150,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="no-results-description"> Try adjusting your search terms or filters </p>
  <Button.Root class="bits-btn bits-btn" variant="ghost" onclick={ resetFilters }> Reset Filters </div> {/if}
   <!-- Analytics, Panel -->
-  {#if $showAnalytics && enableAnalytics} <Dialog.Root bind, open={$showAnalytics}> <Dialog.RootContent class="max-w-4xl"> <Dialog.Header> <Dialog.Title>Search Analytics</Dialog.Title> </Dialog.Header>
+  {#if $showAnalytics && enableAnalytics} <Dialog.Root bind:open={$showAnalytics}> <Dialog.RootContent class="max-w-4xl"> <Dialog.Header> <Dialog.Title>Search Analytics</Dialog.Title> </Dialog.Header>
  <Tabs value="overview" class="analytics-tabs"> <TabsList> <TabsTrigger value="overview">Overview</TabsTrigger>
  <TabsTrigger value="performance">Performance</TabsTrigger>
  <TabsTrigger value="queries">Top Queries</TabsTrigger> </TabsList>

@@ -108,7 +108,7 @@
       onclick={() => loadDashboardData()} disabled={stats.loading} >
       {stats.loading ? 'âš¡ Loading...': 'ðŸ”„ Refresh'}
 </button> </div> </DiamondModal>
- <!-- Individual, Modals --> <LastSearchedModal bind, isOpen={ showSearchModal } /> <LastWorkedModal bind, isOpen={ showWorkModal } /> <AIRecommendationAssistant bind, isOpen={ showAIModal } />
+ <!-- Individual, Modals --> <LastSearchedModal bind:isOpen={ showSearchModal } /> <LastWorkedModal bind:isOpen={ showWorkModal } /> <AIRecommendationAssistant bind:isOpen={ showAIModal } />
 
 
 

@@ -50,7 +50,7 @@ interface Props { open: boolean}
   function formatTimeSpent(seconds: number), string { const minutes = Math.floor(seconds / 60);
    const hours = Math.floor(minutes / 60); if (hours > 0) return `${ hours }h ${minutes % 60}m`; return `${ minutes }m`}
 </script>
- <DiamondModal bind, open title="ðŸ” Search History & AI Suggestions" size="large"> <div class="search-history-modal"> <!-- Header, Controls --> <div class="modal-header"> <div class="search-controls"> <input type="text" placeholder="Filter, searches..." bind:value={ searchFilter } class="search-input" /> <select bind:value={ typeFilter } class="type-filter"> <option value="all">All Types</option>
+ <DiamondModal bind:open title="ðŸ” Search History & AI Suggestions" size="large"> <div class="search-history-modal"> <!-- Header, Controls --> <div class="modal-header"> <div class="search-controls"> <input type="text" placeholder="Filter, searches..." bind:value={ searchFilter } class="search-input" /> <select bind:value={ typeFilter } class="type-filter"> <option value="all">All Types</option>
  <option value="cases">Cases</option>
  <option value="documents">Documents</option>
  <option value="evidence">Evidence</option>

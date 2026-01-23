@@ -12,7 +12,7 @@
 
 <div class="nier-rich-text-editor">
  <textarea
- bind, value
+ bind:value
  { placeholder }
  { readonly }
  class="editor-textarea"

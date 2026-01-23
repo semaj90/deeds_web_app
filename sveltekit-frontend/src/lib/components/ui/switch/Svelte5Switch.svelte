@@ -85,7 +85,7 @@ function handleKeydown(e: KeyboardEvent) {
 		{id}
 		{ name }
 		{ disabled }
-		bind, checked
+		bind:checked
 		class="sr-only peer"
 		onchange={ handleChange }
 	/>

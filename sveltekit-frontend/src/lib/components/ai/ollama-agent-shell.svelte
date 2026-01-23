@@ -35,7 +35,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   function handleKeyDown(e: KeyboardEvent) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit()}
   } // Reactive state from XState let xstateResponse = $derived($state.context.response); // TODO: Convert to $derived: if ( xstateResponse && messages.length > 0 && messages[messages.length - 1].role === "assistant"
   ) { messages[messages.length - 1].content = xstateResponse }
-</script> <Dialog.Root bind, open> <Dialog.Trigger class="fixed bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:scale-105"
+</script> <Dialog.Root bind:open> <Dialog.Trigger class="fixed bottom-4 right-4 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:scale-105"
   > <Terminal class="h-5" /> </Dialog.Trigger> <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 bg-black/50" /> <Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-4xl h-[80vh] bg-background border rounded-lg shadow-xl flex"
     > <div class="flex items-center justify-between p-4"> <div class="flex items-center"> <Terminal class="h-5" /> <h2 class="text-lg">Ollama Agent Shell</h2>
  {#if $state.matches("processing")} <span class="text-sm nes-text is-disabled"

@@ -119,6 +119,16 @@ class JobTracker {
         return job;
     }
 
+    clearCompletedJobs(): number {
+        this.ensureInitialized();
+        const completedJobs = this.jobs.find({ state: 'completed' });
+        const count = completedJobs.length;
+        if (count > 0) {
+            this.jobs.findAndRemove({ state: 'completed' });
+        }
+        return count;
+    }
+
     getJob(jobId: string): JobRecord | null {
         this.ensureInitialized();
         return this.jobs.findOne({ id: jobId });

@@ -75,7 +75,7 @@ form = await superValidate(zod(evidenceSchema), { initialValues: item
     open = false}
 </script>
 
-<Dialog.Root bind, open={open}>
+<Dialog.Root bind:open={open}>
   <div class="uno-p-4 uno-bg-white">
     <div class="mb-4">
       <h2 class="text-lg font-bold">Evidence Details</h2>

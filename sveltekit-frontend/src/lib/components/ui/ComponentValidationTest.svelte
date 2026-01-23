@@ -34,7 +34,7 @@ import type { Case } from '$lib/types';
 
     <Dropdown
       options={legalCaseTypes}
-      bind, selected={selectedCaseType}
+      bind:selected={selectedCaseType}
       placeholder="Select case type"
       label="Legal Case Type"
       id="case-type-dropdown"

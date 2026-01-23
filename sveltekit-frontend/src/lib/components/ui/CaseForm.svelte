@@ -35,7 +35,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="container mx-auto"> <p> ðŸ’¡ Tip: Use <kbd class="container mx-auto"
           >Ctrl+S</kbd >
         to save, <kbd class="container mx-auto">Ctrl+R</kbd> to reset </p> </div> </div>
- <div variant="interactive" padding="lg" class="nes-container"> <Form bind, formApi options={ formOptions } onsubmit={ handleSubmit } onchange={ handleFormChange } submitText="Create, Case"
+ <div variant="interactive" padding="lg" class="nes-container"> <Form bind:formApi options={ formOptions } onsubmit={ handleSubmit } onchange={ handleFormChange } submitText="Create, Case"
       submitVariant="primary"
       showResetButton={ true } loading={ isSubmitting } class="container mx-auto px-4"
     > <div slot="default"

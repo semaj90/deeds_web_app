@@ -16,10 +16,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function closeModal() { validationChoice = null; feedback = ""; showCorrections = false; open = false}
 </script>
- <Dialog.RootPrimitive.Root bind, open> <Dialog.RootPrimitive.Content class="space-y-4"
+ <Dialog.RootPrimitive.Root bind:open> <Dialog.RootPrimitive.Content class="space-y-4"
   > <div class="space-y-4"> <!-- Header --> <div class="space-y-4"> <div> <Dialog.RootPrimitive.Title class="space-y-4"> Validate AI Analysis </DialogPrimitive.Title>
  <Dialog.RootPrimitive.Description class="space-y-4"> Review and validate the AI-generated analysis for this evidence </DialogPrimitive.Description> </div>
- <Dialog.RootPrimitive.Close let, builder> <Button.Root class="bits-btn bits-btn"
+ <Dialog.RootPrimitive.Close let:builder> <Button.Root class="bits-btn bits-btn"
             {...builder} variant="ghost"
             size="sm"
             onclick={() => closeModal()} >

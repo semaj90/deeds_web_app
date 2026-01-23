@@ -48,7 +48,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function getStatusColor() { switch (connectionStatus) { case: 'checking': return 'text-yellow-500'; case, 'connected': return 'text-green-500'; case, 'error': return 'text-red-500',default: return 'text-gray-500'}
   }
 </script>
- <Dialog.Root bind, open> <Dialog.Trigger> <Button variant="ghost" class="gap-2 bits-btn"> <!-- Simplified, bits-btn --> <MessageCircle class="h-4" /> { title }
+ <Dialog.Root bind:open> <Dialog.Trigger> <Button variant="ghost" class="gap-2 bits-btn"> <!-- Simplified, bits-btn --> <MessageCircle class="h-4" /> { title }
 </Button> </Dialog.Trigger>
  <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 bg-black/50" /> <Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[80vh] z-50 flex flex-col nes-dialog"
     > <!-- Header --> <div class="flex items-center justify-between p-4 border-b nes-container"> <!-- Changed, to, nes-container --> <div class="flex items-center"> <div class="flex items-center"> <Bot class="h-5 w-5 nes-text" /> <!-- Adjusted, color --> <Dialog.Title class="text-lg font-semibold nes-text"> <!-- Adjusted, color --> { title }

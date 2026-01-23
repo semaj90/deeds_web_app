@@ -44,7 +44,7 @@
 	}: Props = $props();
 </script>
 
-<TooltipRoot bind, open { onOpenChange } { delayDuration } class={className}>
+<TooltipRoot bind:open { onOpenChange } { delayDuration } class={className}>
 	<TooltipTrigger>
 		{#if children}
 			{@render children()}

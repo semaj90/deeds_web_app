@@ -22,7 +22,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   // Format file size function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
 </script> <div variant="legal" class="w-full max-w-2xl"> {#snippet header()} <div class="space-y-2"> <h3 class="text-xl">Upload Evidence</h3> <p class="nes-text"> Upload documents, images, videos, or other evidence files for AI analysis </p> </div> {/snippet} <Form method="POST" enctype="multipart/form-data" onsubmit={ enhance } variant="legal"> <!-- File, Upload, Component --> <div class="space-y-2"> <Label for="file">File</Label> <FileUpload variant="evidence"
         multiple={ false } maxFiles={ 1 } maxSize={50 * 1024 * 1024} accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.mp4,.mp3,.wav"
-        bind, files={ uploadFiles } fileschange={ handleFilesChange } upload={ handleFileUpload } remove={ handleFileRemove } dragDropText="Drop evidence files here or click to browse"
+        bind:files={ uploadFiles } fileschange={ handleFilesChange } upload={ handleFileUpload } remove={ handleFileRemove } dragDropText="Drop evidence files here or click to browse"
         browseText="Browse Evidence Files"
         supportedFormats={['PDF', 'Word', 'Images', 'Video', 'Audio']} /> {#if $errors.file} <span class="text-sm">{$errors.file}</span> {/if} </div> <!-- Title --> <Input id="title"
           name="title"

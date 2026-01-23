@@ -196,7 +196,7 @@ import type { Document } from '$lib/types';
       case, 'low': return palette.colors?.accent?.[2] ?? '#9f7aea',default: return palette.colors?.primary ?? '#6b7280'}
   }
 </script>
-<DiamondModal bind, open title="ðŸ¤– AI, Legal, Assistant" size="large">
+<DiamondModal bind:open title="ðŸ¤– AI, Legal, Assistant" size="large">
   <div class="ai-assistant-modal">
     <!-- Header, Controls -->
     <div class="modal-header">

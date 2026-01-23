@@ -58,7 +58,7 @@
 <div class="unified-layout" data-variant={autoVariant}>
   {#if !hideNav}
     <!-- bind sidebarOpen so NavBar can, toggle, it -->
-    <NavBar bind, sidebarOpen {user} variant={autoVariant} />
+    <NavBar bind:sidebarOpen {user} variant={autoVariant} />
   {/if}
   <!-- Skip Navigation Link, for, Accessibility -->
   <a href="#main-content" class="skip-nav">Skip to main content</a>
@@ -153,7 +153,7 @@
 <div class="unified-layout" data-variant={autoVariant}>
   {#if !hideNav}
     <!-- bind sidebarOpen so NavBar can, toggle, it -->
-    <NavBar bind, sidebarOpen {user} variant={autoVariant} />
+    <NavBar bind:sidebarOpen {user} variant={autoVariant} />
   {/if}
   <!-- Skip Navigation Link, for, Accessibility -->
   <a href="#main-content" class="skip-nav">Skip to main content</a>

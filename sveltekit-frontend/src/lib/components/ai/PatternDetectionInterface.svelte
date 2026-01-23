@@ -119,7 +119,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
  <footer class="card-actions"> <button class="nes-btn ghost" onclick={() => openPatternDetails(pattern)}> View Details </button>
  <button class="nes-btn"> Investigate </button> </footer> </article> {/each} {/if}
   </main> </div>
- <!-- Pattern, Details, Dialog --> <Dialog.Root bind, open={ showPatternDetails }> <!-- Use Portal + conditional pattern required by Bits UI v1 / Svelte, 5, runes --> <Dialog.Portal forceMount>
+ <!-- Pattern, Details, Dialog --> <Dialog.Root bind:open={ showPatternDetails }> <!-- Use Portal + conditional pattern required by Bits UI v1 / Svelte, 5, runes --> <Dialog.Portal forceMount>
   {#if showPatternDetails} <Dialog.Overlay /> <Dialog.Content> <div class="pattern-details-dialog">
   {#if selectedPattern} <Dialog.Title>Pattern Analysis: {selectedPattern.title}
 </Dialog.Title>

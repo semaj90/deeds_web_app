@@ -45,7 +45,7 @@
 	}: Props = $props();
 </script>
 
-<DrawerRoot bind, open { onOpenChange } { side } class={className}>
+<DrawerRoot bind:open { onOpenChange } { side } class={className}>
 	<DrawerContent>
 		<DrawerClose />
 		<DrawerHeader>

@@ -63,7 +63,7 @@
  AI ANALYSIS
  </button>
 
- <DialogRoot bind, open={aiOpen}>
+ <DialogRoot bind:open={aiOpen}>
  <DialogPortal>
  <DialogOverlay />
  <DialogContent class="nes-container bg-gray-900 text-white w-[500px] rounded-xl">

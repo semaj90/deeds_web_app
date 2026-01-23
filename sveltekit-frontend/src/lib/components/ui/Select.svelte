@@ -15,7 +15,7 @@
 </script>
 
 <select
-	bind, value
+	bind:value
 	class="select { className }"
 	{...restProps}
 >

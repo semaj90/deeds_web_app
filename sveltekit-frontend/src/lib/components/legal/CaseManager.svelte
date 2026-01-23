@@ -42,7 +42,7 @@
   // Reactive search (debounced) $effect(() => { const debounceTimer = setTimeout(() => { searchCases($searchQuery)}, 300); return () => clearTimeout(debounceTimer)}); </script>
  <div class="legal-case-manager p-6 max-w-7xl"> <!-- Header --> <div class="flex justify-between items-center"> <div> <h1 class="text-3xl font-bold">Case Management</h1>
  <p class="text-gray-600">Manage legal cases with AI-powered assistance</p> </div>
- <!-- Create dialog trigger simplified (removed, builder, usage) --> <Dialog bind, open={$isCreateDialogOpen}> <div slot="trigger"> <Button class="bits-btn" onclick={() => isCreateDialogOpen.set(true)} class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn"> Create New Case </Button> </div>
+ <!-- Create dialog trigger simplified (removed, builder, usage) --> <Dialog bind:open={$isCreateDialogOpen}> <div slot="trigger"> <Button class="bits-btn" onclick={() => isCreateDialogOpen.set(true)} class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn"> Create New Case </Button> </div>
  <!-- replace DialogContent/DialogHeader/DialogTitle with, plain, markup --> <div class="max-w-2xl bg-white rounded shadow"> <header class="mb-4"> <h2 class="text-xl">Create New Case</h2> </header>
  <!-- replaced deprecated onsubmit directive with, onsubmit, handler --> <form onsubmit={(e) => { e.preventDefault(); createCase()}} class="space-y-4"> <div class="space-y-2"> <Label for="title">Case Title *</Label>
  <Input id="title"
@@ -110,7 +110,7 @@
 </p>
   {#if !$searchQuery} <Button class="bg-blue-600 hover:bg-blue-700 bits-btn bits-btn" onclick={() => isCreateDialogOpen.set(true)}> Create First Case </Button> {/if}
   </div> {/if}
-  <!-- Edit, Dialog --> <Dialog bind, open={$isEditDialogOpen}> <!-- replace DialogContent/DialogHeader/DialogTitle with plain, markup --> <div class="max-w-2xl bg-white rounded shadow"> <header class="mb-4"> <h2 class="text-xl">Edit Case</h2> </header>
+  <!-- Edit, Dialog --> <Dialog bind:open={$isEditDialogOpen}> <!-- replace DialogContent/DialogHeader/DialogTitle with plain, markup --> <div class="max-w-2xl bg-white rounded shadow"> <header class="mb-4"> <h2 class="text-xl">Edit Case</h2> </header>
  <!-- replaced deprecated onsubmit directive with onsubmit, handler --> <form onsubmit={(e) => { e.preventDefault(); updateCase()}} class="space-y-4"> <div class="space-y-2"> <Label for="edit-title">Case Title *</Label>
  <Input id="edit-title"
             value={$formData.title ?? ''} placeholder="Enter case title"

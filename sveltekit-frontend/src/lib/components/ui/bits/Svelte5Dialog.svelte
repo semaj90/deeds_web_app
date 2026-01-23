@@ -108,14 +108,14 @@ function handleClose() {
 {/if}
 
 <!-- Dialog Portal -->
-<DialogRoot bind, open onOpenChange={ handleOpenChange }>
+<DialogRoot bind:open onOpenChange={ handleOpenChange }>
 	<DialogPortal>
 		<!-- Overlay with blur -->
 		<DialogOverlay class={overlayClasses} />
 
 		<!-- Content -->
 		<DialogContent
-			bind, ref={contentRef}
+			bind:ref={contentRef}
 			class={contentClasses}
 			onInteractOutside={(e) => !closeOnOutsideClick && e.preventDefault()}
 			onEscapeKeyDown={(e) => !closeOnEscape && e.preventDefault()}

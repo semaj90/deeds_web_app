@@ -128,7 +128,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div.Footer> <div class="nier-bits-card-actions"> <button class="nes-btn" variant="ghost" size="sm" onclick={() => openRecommendationDetails(recommendation)}> View Details </button>
  <button class="nes-btn" size="sm" onclick={() => applyRecommendation(recommendation.id)}> Apply </button> </div> </div.Footer> </Card> {/each} {/if}
   </main> </div>
- <!-- Recommendation, Details, Dialog --> <Dialog.Root bind, open={ showRecommendationDetails }> <Dialog.Content class="recommendation-details-dialog">
+ <!-- Recommendation, Details, Dialog --> <Dialog.Root bind:open={ showRecommendationDetails }> <Dialog.Content class="recommendation-details-dialog">
   {#if selectedRecommendation} <Dialog.Title>Recommendation {selectedRecommendation.title}
 </Dialog.Title>
  <Dialog.Description> Detailed implementation plan and analysis </Dialog.Description>

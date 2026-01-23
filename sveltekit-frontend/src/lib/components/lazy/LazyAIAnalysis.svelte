@@ -38,7 +38,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <LazyLoader preset="HEAVY_COMPONENT"
   placeholderHeight={ height } placeholderClass="ai-analysis-placeholder"
   { loadingText } { errorText } class="lazy-ai-analysis { className }"
-  onLoad={ loadAnalysisComponent } bind, lazyState {...lazyOptions} >
+  onLoad={ loadAnalysisComponent } bind:lazyState {...lazyOptions} >
   <div class="analysis-wrapper" style="height, { height }; width, { width }">
   {#if loadError} <!-- Error state with, AI-specific, styling --> <div class="analysis-error" style="background, {config.bgColor}"> <div class="error-icon" style="color, {config.color}">ðŸ¤–âŒ</div>
  <p>AI Analysis Failed</p>

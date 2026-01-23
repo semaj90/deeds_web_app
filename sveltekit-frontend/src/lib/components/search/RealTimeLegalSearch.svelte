@@ -37,7 +37,7 @@
   {#if searchMetrics.totalQueries > 0} <div class="text-xs"> {searchMetrics.totalQueries} queries â€¢ {searchMetrics.averageResponseTime}ms avg {/if}
   </div> </div>
  <!-- Enhanced Search, Input -->
-  {#if browser && CommandRoot} <CommandRoot bind, open> <div class="relative"> <!-- Search Input with Enhanced, Styling -->
+  {#if browser && CommandRoot} <CommandRoot bind:open> <div class="relative"> <!-- Search Input with Enhanced, Styling -->
   {#if CommandInput} <CommandInput class={` flex h-12 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm placeholder: text-gray-500, focus: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-200, disabled: cursor-not-allowed, disabled:opacity-50 ${isStreaming ? 'pr-12': 'pr-10'} `} { placeholder } autocomplete="off"
             spellcheck="false"
  bind:value={ inputValue } onvaluechange={(e: unknown) => { const val = (e && (e.detail ?? (e.target && e.target.value))) ?? ''; handleInputChange(String(val))}} /> {/if}

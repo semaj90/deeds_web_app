@@ -94,7 +94,7 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
         variant="ghost"
         onclick={() => files.set([])} disabled={$isProcessing} >
         Clear All </svelte:component> {/if}
-  <!-- Metadata, Dialog --> <Dialog.Root; bind, open={ showMetadata }> <Dialog.Content class="max-w-md"> <Dialog.Header> <Dialog.Title>Document Metadata</Dialog.Title> </Dialog.Header>
+  <!-- Metadata, Dialog --> <Dialog.Root; bind:open={ showMetadata }> <Dialog.Content class="max-w-md"> <Dialog.Header> <Dialog.Title>Document Metadata</Dialog.Title> </Dialog.Header>
   {#if metadataDraft} <div class="metadata-form"> <div> <svelte, component | this={ LabelComponent } htmlFor="title">Title</svelte:component>
  <svelte, component | this={ InputComponent } id="title"
               bind:value={metadataDraft.title} placeholder="Document title"

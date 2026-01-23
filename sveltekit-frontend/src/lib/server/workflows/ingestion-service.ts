@@ -7,10 +7,10 @@ import type { IngestionJob } from '$lib/machines/ingestion-workflow-machine.js';
 import { ingestionWorkflowMachine } from '$lib/machines/ingestion-workflow-machine.js';
 import { setupQueues } from '$lib/server/rabbitmq.js';
 import { jobTracker } from '$lib/services/job-tracker.js';
-import { createActor, type Actor } from 'xstate';
+import { createActor, type ActorRefFrom } from 'xstate';
 
 // New: explicit minimal actor type to avoid `any` type
-type WorkflowActor = Actor<typeof ingestionWorkflowMachine>;
+type WorkflowActor = ActorRefFrom<typeof ingestionWorkflowMachine>;
 
 type ServiceResponse = {
 	success: boolean;

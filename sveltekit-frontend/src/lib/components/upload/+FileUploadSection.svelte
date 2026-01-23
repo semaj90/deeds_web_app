@@ -11,11 +11,11 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   <div class="nier-bits-card-body">
     <div class="mb-3">
       <label for="caseSelect" class="form-label">Select Case:</label>
-      <SelectBits id="caseSelect" bind, selected={selectedCase} options={caseOptions} />
+      <SelectBits id="caseSelect" bind:selected={selectedCase} options={caseOptions} />
     </div>
     <div class="mb-3">
       <label for="poiSelect" class="form-label">Select POI (Optional):</label>
-      <SelectBits id="poiSelect" bind, selected={selectedPoi} options={poiOptions} />
+      <SelectBits id="poiSelect" bind:selected={selectedPoi} options={poiOptions} />
     </div>
     <div class="mb-3">
       <label for="fileInput" class="form-label">Upload File:</label>

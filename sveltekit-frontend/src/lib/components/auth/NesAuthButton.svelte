@@ -40,7 +40,7 @@
   {/if}{text}
 </button>
 <!-- bind the modal's, "open" prop and pass, onClose, handler -->'
-<NesAuthModal bind, open={isModalOpen} {form} onClose={closeModal} />
+<NesAuthModal bind:open={isModalOpen} {form} onClose={closeModal} />
 <style>
   /* Custom button size classes */
   :global(.nes-btn-small) {

@@ -142,7 +142,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </div>
 
 <!-- Node Details Dialog (bits-ui) -->
-<DialogRoot bind, open={showNodeDialog}>
+<DialogRoot bind:open={showNodeDialog}>
 	<DialogPortal>
 		<DialogOverlay class="nes-dialog-overlay" />
 		<DialogContent class="nes-dialog">

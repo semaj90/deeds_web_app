@@ -30,7 +30,7 @@
   {#if status !== 'idle'} <button onclick={ reset } class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium"
           > Reset </button> {/if}
   </div> </div> </div>
- <!-- GPU, Loading, Progress --> <GPULoadingProgress; bind: status ; bind, progress | modelName="gemma3-legal, latest"
+ <!-- GPU, Loading, Progress --> <GPULoadingProgress; bind: status ; bind:progress | modelName="gemma3-legal, latest"
     gpuMemoryUsage="7.3GB"
   /> <!-- Response, Display -->
   {#if response} <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <div class="flex items-center"> <h3 class="text-lg font-semibold">AI Response</h3>

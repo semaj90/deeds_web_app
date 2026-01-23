@@ -239,7 +239,7 @@ import type { Case } from '$lib/types';
     <div class="mx-auto px-4">
       <div class="mx-auto px-4">
         <ThinkingStyleToggle
-          bind, enabled={thinkingStyleEnabled}
+          bind:enabled={thinkingStyleEnabled}
           loading={$isLoading}
           premium={true}
           size="sm"

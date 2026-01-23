@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
 </script>
 
 <div class="checkbox-container">
-  <input type="checkbox" {id} bind, checked | class="checkbox-input" />
+  <input type="checkbox" {id} bind:checked | class="checkbox-input" />
   {#if label}
     <label for={id} class="checkbox-label">{label}</label>
   {/if}

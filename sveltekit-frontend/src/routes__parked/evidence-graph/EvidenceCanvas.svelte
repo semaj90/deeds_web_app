@@ -446,7 +446,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  <div class="control-panel">
  <!-- @ts-expect-error -->
  <GraphControlPanel
- bind: layoutAlgorithm, bind: showLabels, bind: nodeSize, bind, edgeThreshold
+ bind: layoutAlgorithm, bind: showLabels, bind: nodeSize, bind:edgeThreshold
  {stats}
  onlayoutChange={ handleLayoutChange }
  onnodeSizeChange={ handleNodeSizeChange }

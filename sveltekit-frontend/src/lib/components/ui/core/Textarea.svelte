@@ -23,7 +23,7 @@ import { createEventDispatcher } from 'svelte';
  }
 </script>
 
-<textarea {rows} {placeholder} {id} class={className} oninput={onInput}; bind, value></textarea>
+<textarea {rows} {placeholder} {id} class={className} oninput={onInput}; bind:value></textarea>
 
 <style>
  /* minimal styling so it's visible in the UI — adjust in your theme */

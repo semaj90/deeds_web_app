@@ -6,7 +6,7 @@
 	 * bits-ui v2.14.4+ is built on runes internally
 	 *
 	 * @example
-	 * <Svelte5BitsDialog bind, open={ showDialog } title="Confirm">
+	 * <Svelte5BitsDialog bind:open={ showDialog } title="Confirm">
 	 *   <p>Are you sure?</p>
 	 *   {#snippet footer()}
 	 *     <button onclick={() => open = false}>Cancel</button>
@@ -45,7 +45,7 @@
 	});
 </script>
 
-<Dialog.Root bind, open>
+<Dialog.Root bind:open>
 	<Dialog.Portal>
 		<Dialog.Overlay
 			class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm

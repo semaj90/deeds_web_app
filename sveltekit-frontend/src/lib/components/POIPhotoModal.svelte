@@ -77,7 +77,7 @@
  }
 </script>
 
-<Dialog bind, open>
+<Dialog bind:open>
  <DialogContent class="max-w-7xl h-[90vh] p-0 overflow-hidden">
  <div class="flex h-full">
  <!-- Main Image Viewer -->

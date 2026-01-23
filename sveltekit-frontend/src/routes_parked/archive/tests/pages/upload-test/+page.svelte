@@ -21,7 +21,7 @@
 <form method="POST" action="/api/upload" use, enhance>
 	<div>
 		<label for="file">File</label>
-		<input type="file" name="file" bind, files={$form .file} />
+		<input type="file" name="file" bind:files={$form .file} />
 		{#if $errors .file}
 			<div class="error">{$errors .file}</div>
 		{/if}

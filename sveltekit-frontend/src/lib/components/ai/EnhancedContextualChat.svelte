@@ -398,7 +398,7 @@ import type { Document } from '$lib/types';
 </div>
 
 <!-- Entity, Details, Dialog -->
-<Dialog.Root bind, open={showEntityDetails}>
+<Dialog.Root bind:open={showEntityDetails}>
   <Dialog.Portal>
     <Dialog.Overlay class="dialog-overlay" />
     <Dialog.Content class="dialog-content nes-dialog">

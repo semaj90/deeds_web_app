@@ -263,7 +263,7 @@
 		</form>
 	</div>
 
-	<Dialog.Root bind, open={ showSettings }>
+	<Dialog.Root bind:open={ showSettings }>
 		<Dialog.Content class="max-w-2xl nes-dialog">
 			<Dialog.Header>
 				<Dialog.Title class="nes-text">AI Assistant Settings</Dialog.Title>
@@ -316,7 +316,7 @@
 		</Dialog.Content>
 	</Dialog>
 
-	<Dialog.Root bind, open={ showCitationDialog }>
+	<Dialog.Root bind:open={ showCitationDialog }>
 		<Dialog.Content class="max-w-2xl nes-dialog">
 			<Dialog.Header>
 				<Dialog.Title class="nes-text">

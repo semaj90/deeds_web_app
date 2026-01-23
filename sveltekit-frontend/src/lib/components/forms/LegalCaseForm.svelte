@@ -42,18 +42,18 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
                   required /> </div>
  <div class="form-field"> <SelectBits label="âš–ï¸ Practice, Area"
                   placeholder="Select practice area..."
-                  options={ practiceAreas } bind, selected={formData.practiceArea} error={!!formErrors.practiceArea} errorMessage={formErrors.practiceArea} description="Primary area of law for this case"
+                  options={ practiceAreas } bind:selected={formData.practiceArea} error={!!formErrors.practiceArea} errorMessage={formErrors.practiceArea} description="Primary area of law for this case"
                 /> </div> </div> </div> {:else if activeTab === 'details'} <div class="tab-content"> <div class="form-grid"> <div class="form-field"> <SelectBits label="ðŸ›ï¸ Jurisdiction"
                   placeholder="Select jurisdiction..."
-                  options={ jurisdictions } bind, selected={formData.jurisdiction} error={!!formErrors.jurisdiction} errorMessage={formErrors.jurisdiction} description="Legal jurisdiction for the case"
+                  options={ jurisdictions } bind:selected={formData.jurisdiction} error={!!formErrors.jurisdiction} errorMessage={formErrors.jurisdiction} description="Legal jurisdiction for the case"
                 /> </div>
  <div class="form-field"> <SelectBits label="âš–ï¸ Court, Level"
                   placeholder="Select court level..."
-                  options={ courtLevels } bind, selected={formData.courtLevel} description="Court level if applicable"
+                  options={ courtLevels } bind:selected={formData.courtLevel} description="Court level if applicable"
                 /> </div>
  <div class="form-field"> <SelectBits label="ðŸš¨ Priority, Level"
                   placeholder="Select priority..."
-                  options={ priorities } bind, selected={formData.priority} description="Case priority and urgency level"
+                  options={ priorities } bind:selected={formData.priority} description="Case priority and urgency level"
                 /> </div>
  <div class="form-field"> <label for="description" class="field-label">ðŸ“„ Case Description</label>
  <textarea id="description"
@@ -63,7 +63,7 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
                 ></textarea>
  <p class="field-description">Comprehensive description of the legal matter</p> </div> </div> </div> {:else if activeTab === 'assignment'} <div class="tab-content"> <div class="form-grid"> <div class="form-field"> <SelectBits label="ðŸ‘¨â€ðŸ’¼ Assigned, Attorney"
                   placeholder="Select attorney..."
-                  options={ attorneys } bind, selected={formData.assignedAttorney} description="Primary attorney responsible for the case"
+                  options={ attorneys } bind:selected={formData.assignedAttorney} description="Primary attorney responsible for the case"
                 /> </div>
  <div class="form-field"> <InputBits label="â±ï¸ Estimated, Hours"
                   placeholder="Enter estimated hours..."

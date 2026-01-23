@@ -105,7 +105,7 @@ import type { Document } from '$lib/types';
     <input
       type="file"
       accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff"
-      bind, files
+      bind:files
       onchange={() => (uploadResult = null)}
       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
     />

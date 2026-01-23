@@ -10,7 +10,7 @@
  <LazyLoader preset="HEAVY_COMPONENT"
   placeholderHeight={ height } placeholderClass="chart-placeholder"
   { loadingText } { errorText } class="lazy-chart-container { className }"
-  onLoad={ loadChartComponent } bind, lazyState {...lazyOptions} >
+  onLoad={ loadChartComponent } bind:lazyState {...lazyOptions} >
   <div class="chart-wrapper" style="height, { height }; width, { width }">
   {#if loadError} <!-- Error state with, chart-specific, styling --> <div class="chart-error"> <div class="error-icon">ðŸ“Š</div>
  <p>Unable to render { chartType } chart</p>

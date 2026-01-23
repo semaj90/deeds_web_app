@@ -124,7 +124,7 @@ function handleBlur() {
 		{required}
 		{ disabled }
 		class="sr-only"
-		bind, value
+		bind:value
 		aria-hidden="true"
 		tabindex="-1"
 	>

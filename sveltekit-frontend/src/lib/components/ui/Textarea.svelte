@@ -13,7 +13,7 @@
 </script>
 
 <textarea
-	bind, value
+	bind:value
 	{ rows }
 	class="textarea { className }"
 	{...restProps}

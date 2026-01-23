@@ -111,7 +111,7 @@ showDialog = true}
       Create New Case
     <!-- Dialog, Component -->
     <BitsDialog
-      bind, open={showDialog}
+      bind:open={showDialog}
       title="Create New Legal Case"
       description="Enter the details for a new case file"
       size="lg"

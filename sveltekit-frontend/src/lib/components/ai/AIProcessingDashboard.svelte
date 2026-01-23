@@ -214,7 +214,7 @@ import type { Document } from '$lib/types';
     </div>
     <div class="yorha-panel-content">
       <LLMProviderSelector
-        bind, selectedProvider
+        bind:selectedProvider
       />
     </div>
   </div>

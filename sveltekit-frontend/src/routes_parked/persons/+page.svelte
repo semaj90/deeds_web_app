@@ -348,7 +348,7 @@
  <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20 bits-btn" onclick={ exportData }>
  <Download class="w-4 h-4 mr-2" /> Export
  </Button>
- <Dialog bind, open={showAddModal}>
+ <Dialog bind:open={showAddModal}>
  <DialogTrigger asChild> <!-- Updated to DialogTrigger with asChild for bits-ui -->
  <Button class="bg-yellow-600 text-gray-900 hover:bg-yellow-700 bits-btn">
  <Plus class="w-4 h-4 mr-2" /> Add Person

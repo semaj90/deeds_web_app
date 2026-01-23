@@ -137,7 +137,7 @@
  <!-- Tabs Panel -->
  <SectionHeader title="Navigation" subtitle="Tabbed interface for organized content" />
  <Card>
- <TabsPanel bind, activeTab {tabs}>
+ <TabsPanel bind:activeTab {tabs}>
  {#snippet content({ tab, index })}
  <div class="p-4">
  <h4 class="font-serif text-lg mb-2">{tab.label} Content</h4>
@@ -186,7 +186,7 @@
 </div>
 
 <!-- Modal Demo -->
-<Modal bind, open={modalOpen} title="Detective Modal" size="md">
+<Modal bind:open={modalOpen} title="Detective Modal" size="md">
  <p>This modal demonstrates the full UI component integration.</p>
  <p>All components are working together in the Detective Mode interface!</p>
 </Modal>

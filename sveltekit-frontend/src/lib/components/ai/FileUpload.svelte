@@ -128,8 +128,8 @@ import type { Document } from '$lib/types';
     <div class="yorha-panel-content">
       <div class="grid w-full items-center">
         <Label for="file-upload">PDF or XML Document</Label>
-        <!-- <-- CHANGED, use native input so, bind, files | works, reliably -->
-        <input id="file-upload" type="file" bind, files | accept=".pdf,.xml" />
+        <!-- <-- CHANGED, use native input so, bind:files | works, reliably -->
+        <input id="file-upload" type="file" bind:files | accept=".pdf,.xml" />
       </div>
 
       <div class="flex items-center">

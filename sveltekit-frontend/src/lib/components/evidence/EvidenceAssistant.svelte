@@ -78,7 +78,7 @@ import { createEventDispatcher } from 'svelte';
  }
 </script>
 
-<Dialog bind, open>
+<Dialog bind:open>
  <DialogContent class="evidence-dialog">
  <DialogHeader>
  <DialogTitle class="flex items-center gap-2">
