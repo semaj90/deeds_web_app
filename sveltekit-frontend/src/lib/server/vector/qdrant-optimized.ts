@@ -4,7 +4,7 @@
  * Integrated with NES-style cache orchestrator and production logging
  */
 import { QdrantClient } from '@qdrant/js-client-rest';
-import generateEmbedding from '../ai/embeddings-simple.js';
+import { generateEmbedding } from '../ai/embeddings-simple.js';
 import logger from '../production-logger.js';
 
 type LogContext = Record<string, any>;
