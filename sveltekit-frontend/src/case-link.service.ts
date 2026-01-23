@@ -3,7 +3,7 @@
  * Manages case-statute linking and relationships
  */
 
-import db from '$lib/server/db';
+import { sql } from '$lib/server/db';
 import { redis } from '$lib/server/redis';
 
 // Note: Using dynamic imports or type-only imports for services that might be missing
@@ -60,7 +60,7 @@ class CaseLinkService {
     };
 
     // Save to database
-    await db`
+    await sql`
       INSERT INTO case_statute_links
       (id, case_id, statute_code, linked_by, link_type, notes, created_at, updated_at)
       VALUES
@@ -94,13 +94,13 @@ class CaseLinkService {
    */
   async getCaseStatutes(caseId: string, linkType?: string): Promise<CaseStatuteLink[]> {
     if (linkType) {
-      return await db<CaseStatuteLink[]>`
+      return await sql<CaseStatuteLink[]>`
         SELECT * FROM case_statute_links
         WHERE case_id = ${caseId} AND link_type = ${linkType}
         ORDER BY created_at DESC
       `;
     }
-    return await db<CaseStatuteLink[]>`
+    return await sql<CaseStatuteLink[]>`
       SELECT * FROM case_statute_links
       WHERE case_id = ${caseId}
       ORDER BY created_at DESC
@@ -112,7 +112,7 @@ class CaseLinkService {
    */
   async unlinkStatute(caseId: string, statuteCode: string, userId: string): Promise<void> {
     // Delete from database
-    await db`DELETE FROM case_statute_links WHERE case_id = ${caseId} AND statute_code = ${statuteCode}`;
+    await sql`DELETE FROM case_statute_links WHERE case_id = ${caseId} AND statute_code = ${statuteCode}`;
 
     // Delete Neo4j relationship
     if (graphService?.deleteCaseStatuteRelationship) {
@@ -149,7 +149,7 @@ class CaseLinkService {
     const link_type = data.link_type ?? existing.link_type;
     const notes = data.notes ?? existing.notes;
 
-    const result = await db<CaseStatuteLink[]>`
+    const result = await sql<CaseStatuteLink[]>`
       UPDATE case_statute_links
       SET link_type = ${link_type}, notes = ${notes ?? null}, updated_at = CURRENT_TIMESTAMP
       WHERE case_id = ${caseId} AND statute_code = ${statuteCode}
@@ -179,7 +179,7 @@ class CaseLinkService {
    * Get link detail
    */
   async getLinkDetail(caseId: string, statuteCode: string): Promise<CaseStatuteLink | null> {
-    const result = await db<CaseStatuteLink[]>`
+    const result = await sql<CaseStatuteLink[]>`
       SELECT * FROM case_statute_links WHERE case_id = ${caseId} AND statute_code = ${statuteCode}
     `;
     return result[0] || null;
@@ -189,7 +189,7 @@ class CaseLinkService {
    * Get link count for case
    */
   async getLinkCount(caseId: string): Promise<number> {
-    const result = await db`SELECT COUNT(*) as count FROM case_statute_links WHERE case_id = ${caseId}`;
+    const result = await sql`SELECT COUNT(*) as count FROM case_statute_links WHERE case_id = ${caseId}`;
     return parseInt((result[0] as any).count || '0');
   }
 
@@ -198,7 +198,7 @@ class CaseLinkService {
    */
   async getLinkStats(caseId: string): Promise<{ total: number; byLinkType: Record<string, number> }> {
     const total = await this.getLinkCount(caseId);
-    const byLinkTypeResult = await db`
+    const byLinkTypeResult = await sql`
       SELECT link_type, COUNT(*) as count
       FROM case_statute_links
       WHERE case_id = ${caseId}
@@ -212,6 +212,7 @@ class CaseLinkService {
 
     return { total, byLinkType };
   }
+
 
   /**
    * Invalidate case cache

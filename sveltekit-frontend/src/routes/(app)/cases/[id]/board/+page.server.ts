@@ -1,7 +1,7 @@
-import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id } = params; // Changed from caseId to id to match [id] route
@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
          return {
             caseId: id, // Keep as caseId for component consistency
-            initialState: savedState ? savedState.canvasData : null
+            initialState: savedState ? savedState.stateData : null
         };
     } catch (e) {
         console.error('Failed to load canvas state:', e);

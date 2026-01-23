@@ -1,14 +1,13 @@
 <script lang="ts">
-	let title = $state<any>(undefined);
-	let subtitle = $state<any>(undefined);
-
  import { page } from '$app/stores';
+ import type { Snippet } from 'svelte';
 
  interface Props {
  title?: string;
  subtitle?: string;
  showRightRail?: boolean;
  rightRailContent?: any;
+ children?: Snippet;
  }
 
  let { children, title, subtitle, showRightRail = true, rightRailContent }: Props = $props();
@@ -19,7 +18,7 @@
  gpu: 'idle',
  time: new Date().toLocaleTimeString(),
  });
-  
+
  $effect(() => {
  const interval = setInterval(() => {
  systemStatus.time = new Date().toLocaleTimeString();

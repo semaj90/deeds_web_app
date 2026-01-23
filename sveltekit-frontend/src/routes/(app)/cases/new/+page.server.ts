@@ -55,11 +55,11 @@ export const actions = {
 					id: nanoid(),
 					title: title.trim(),
 					description: narrative.trim(),
-					priority,
+					priority: priority as any,
 					userId: locals.user.id,
-					status: 'active',
-					createdAt: new Date(),
-					updatedAt: new Date()
+					// status: 'active', // Field missing in schema
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString()
 				})
 				.returning();
 

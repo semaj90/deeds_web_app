@@ -1,8 +1,7 @@
 import type { Message } from '$lib/types';
-import * as amqp from 'amqplib';
-import type { Channel } from 'amqplib';
+import { connect, type Connection, type Channel, type ConsumeMessage } from 'amqplib';
 
-let connection: amqp.Connection | null = null;
+let connection: Connection | null = null;
 let channel: Channel | null = null;
 
 export const QUEUES = {
@@ -22,12 +21,12 @@ export const QUEUES = {
   }
 };
 
-export async function getConnection(): Promise<amqp.Connection> {
+export async function getConnection(): Promise<Connection> {
   if (connection) return connection;
   const rabbitmqUrl = process.env?.RABBITMQ_URL?? 'amqp://legal_admin:123456@localhost:5672';
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
-    connection = await amqp.connect(rabbitmqUrl);
+    connection = await connect(rabbitmqUrl);
     connection.on('error', (err) => {
       console.error('❌ RabbitMQ connection error:', err);
       connection = null;
@@ -130,7 +129,8 @@ export async function setupQueues(): Promise<void> {
     await ch.assertQueue('evidence.failed', { durable: true, arguments: { 'x-message-ttl': 86400000 } });
     await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed');
 
-    // Assert all defined queues...Object.values(QUEUES.evidence),
+    // Assert all defined queues
+...Object.values(QUEUES.evidence),
       ...Object.values(QUEUES.ai),
       ...Object.values(QUEUES.notification)
     ];

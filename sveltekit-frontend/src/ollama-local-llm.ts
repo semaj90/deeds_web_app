@@ -397,7 +397,7 @@ PARAMETER num_ctx 4096`;
 				}
 			});
 
-			if ($1?.$2) {
+			if (result?.response) {
 				if (options?.format === 'json') {
 					try {
 						return JSON.parse(result.response);
