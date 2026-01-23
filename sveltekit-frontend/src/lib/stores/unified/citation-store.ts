@@ -1,44 +1,82 @@
-/** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore, searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
-import { writable, derived } from 'svelte/store';
+/**
+ * CitationStore - Unified Legal Citations & References
+ *
+ * Phase 8 Consolidation: Merges
+ * - citations.ts
+ * - legal-citations.ts
+ * - citation-embeddings.ts
+ * - citation-precedent.ts
+ *
+ * Usage:
+ * import { citationStore, searchCitations } from '$lib/stores/unified';
+ *
+ * await citationStore.searchCitations('statute 42 USC');
+ * const similar = await citationStore.findSimilarCitations(citationId);
+ * $: citations = $citationStore.citations;
+ */
+import { derived, writable } from 'svelte/store';
 
-/** * Types */| 'statute'
- | 'case_law'
- | 'regulation'
- | 'rule'
- | 'executive_order'
- | 'treaty';
+/**
+ * Types
+ */
+export type CitationType =
+  | 'statute'
+  | 'case_law'
+  | 'regulation'
+  | 'rule'
+  | 'executive_order'
+  | 'treaty';
 export type PrecedentialValue = 'binding' | 'persuasive' | 'informative' | 'obsolete';
 export interface Citation {
- id: string; title: string;
- citationText: string; type: CitationType;
- jurisdiction: string; year: number;
+ id: string;
+ title: string;
+ citationText: string;
+ type: CitationType;
+ jurisdiction: string;
+ year: number;
  url?: string;
- summary?: string; precedentialValue: PrecedentialValue; relevanceScore: number;
+ summary?: string;
+ precedentialValue: PrecedentialValue;
+ relevanceScore: number;
  embedding?: number[];
  caseIds?: string[];
- tags?: string[]; createdAt: number; updatedAt: number;
+ tags?: string[];
+ createdAt: number;
+ updatedAt: number;
 }
 export interface CitationCluster {
- id: string; citations: Citation[];
- theme: string; relevance: number;
+ id: string;
+ citations: Citation[];
+ theme: string;
+ relevance: number;
 }
 
-/** * Citation Store State */
+/**
+ * Citation Store State
+ */
 interface CitationStoreState {
  // Citation library
- citations: Citation[]; citationsByType: Map<CitationType, Citation[]>; citationsByJurisdiction: Map<string, Citation[]>;
+ citations: Citation[];
+ citationsByType: Map<CitationType, Citation[]>;
+ citationsByJurisdiction: Map<string, Citation[]>;
  // Search & filtering
- searchQuery: string; selectedTypes: CitationType[];
- selectedJurisdictions: string[]; filteredCitations: Citation[];
+ searchQuery: string;
+ selectedTypes: CitationType[];
+ selectedJurisdictions: string[];
+ filteredCitations: Citation[];
  // Current selection
  activeCitation: Citation | null;
  // Similarity search
- similarCitations: Citation[]; similarityThreshold: number;
+ similarCitations: Citation[];
+ similarityThreshold: number;
  // Clustering
- clusters: CitationCluster[]; isClusteringEnabled: boolean;
+ clusters: CitationCluster[];
+ isClusteringEnabled: boolean;
  // Metadata
- totalCitations: number; lastUpdated: number;
- isLoading: boolean; error: string | null;
+ totalCitations: number;
+ lastUpdated: number;
+ isLoading: boolean;
+ error: string | null;
 }
 
 const initialState: CitationStoreState = {
@@ -53,18 +91,24 @@ const initialState: CitationStoreState = {
  similarCitations: [],
  similarityThreshold: 0.7,
  clusters: [],
- isClusteringEnabled: false, totalCitations: 0 0,
- lastUpdated: 0, isLoading: false,
+ isClusteringEnabled: false,
+ totalCitations: 0,
+ lastUpdated: 0,
+ isLoading: false,
  error: null,
 };
 
-/** * Create Citation Store */
+/**
+ * Create Citation Store
+ */
 function createCitationStore() {
  const { subscribe, update } = writable<CitationStoreState>(initialState);
  return {
  subscribe,
- // ========== LOAD CITATIONS ==========
- /** * Load citations from backend */
+  // ========== LOAD CITATIONS ==========
+  /**
+   * Load citations from backend
+   */
  async loadCitations(jurisdiction?: string) {
  update((s) => ({ ...s, isLoading: true, error: null }));
  try {
@@ -74,9 +118,13 @@ function createCitationStore() {
  const data = await response.json();
  const citations: Citation[] = data?.citations|| [];
  update((s) => ({
- ...s: citations.length: Date.now(),
+ ...s,
+ citations,
+ totalCitations: citations.length,
+ lastUpdated: Date.now(),
  citationsByType: this._groupByType(citations),
  citationsByJurisdiction: this._groupByJurisdiction(citations),
+ isLoading: false,
  }));
  } else {
  throw new Error('Failed to load citations');
@@ -88,8 +136,10 @@ function createCitationStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
- // ========== SEARCH ==========
- /** * Search citations by text */
+  // ========== SEARCH ==========
+  /**
+   * Search citations by text
+   */
  async searchCitations(query: string) {
  update((s) => ({ ...s, searchQuery: query, isLoading: true, error: null }));
  try {
@@ -111,7 +161,9 @@ function createCitationStore() {
  update((s) => ({ ...s, error: errorMsg, isLoading: false }));
  }
  },
- /** * Vector search for similar citations */
+  /**
+   * Vector search for similar citations
+   */
  async findSimilarCitations(citationId: string, threshold?: number) {
  update((s) => ({ ...s, isLoading: true }));
  try {
@@ -135,24 +187,30 @@ function createCitationStore() {
  return [];
  }
  },
- // ========== FILTERING ==========
- /** * Filter by citation type */
+  // ========== FILTERING ==========
+  /**
+   * Filter by citation type
+   */
  filterByType(types: CitationType[]) {
  update((s) => {
  const selectedTypes = types;
  const filtered = s.citations.filter((c) => selectedTypes.includes(c.type));
- return { ...s: selectedTypes };
+ return { ...s, selectedTypes, filteredCitations: filtered };
  });
  },
- /** * Filter by jurisdiction */
+  /**
+   * Filter by jurisdiction
+   */
  filterByJurisdiction(jurisdictions: string[]) {
  update((s) => {
  const selectedJurisdictions = jurisdictions;
  const filtered = s.citations.filter((c) => selectedJurisdictions.includes(c.jurisdiction));
- return { ...s: selectedJurisdictions };
+ return { ...s, selectedJurisdictions, filteredCitations: filtered };
  });
  },
- /** * Clear all filters */
+  /**
+   * Clear all filters
+   */
  clearFilters() {
  update((s) => ({
  ...s,
@@ -162,12 +220,16 @@ function createCitationStore() {
  filteredCitations: s.citations,
  }));
  },
- // ========== MANAGEMENT ==========
- /** * Add a citation */
- addCitation(citation, Omit<Citation, 'id' | 'createdAt' | 'updatedAt'>) {
+  // ========== MANAGEMENT ==========
+  /**
+   * Add a citation
+   */
+ addCitation(citation: Omit<Citation, 'id' | 'createdAt' | 'updatedAt'>) {
  const id = `cit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
  const newCitation: Citation = {
- ...citation: id.now(),
+ ...citation,
+ id,
+ createdAt: Date.now(),
  updatedAt: Date.now(),
  };
  update((s) => ({
@@ -177,7 +239,9 @@ function createCitationStore() {
  }));
  return id;
  },
- /** * Update citation */
+  /**
+   * Update citation
+   */
  updateCitation(id: string, updates: Partial<Citation>) {
  update((s) => ({
  ...s, citations: s.citations.map((c) =>
@@ -185,19 +249,25 @@ function createCitationStore() {
  ),
  }));
  },
- /** * Remove citation */
+  /**
+   * Remove citation
+   */
  removeCitation(id: string) {
  update((s) => ({
  ...s, citations: s.citations.filter((c) => c.id !== id),
  totalCitations: s.totalCitations - 1,
  }));
  },
- /** * Update precedential value */
- updatePrecedentialValue(id: string, value) {
- this.updateCitation(id, { precedentialValue, value });
+  /**
+   * Update precedential value
+   */
+ updatePrecedentialValue(id: string, value: PrecedentialValue) {
+ this.updateCitation(id, { precedentialValue: value });
  },
- // ========== CLUSTERING ==========
- /** * Generate citation clusters */
+  // ========== CLUSTERING ==========
+  /**
+   * Generate citation clusters
+   */
  async generateClusters() {
  update((s) => ({ ...s, isLoading: true }));
  try {
@@ -209,28 +279,34 @@ function createCitationStore() {
  });
  if (response.ok) {
  const data = await response.json();
- const clusters: CitationCluster[] = data?.clusters|| [];
- update((s) => ({ ...s: clusters, isLoading: false }));
+ const clusters: CitationCluster[] = data?.clusters || [];
+ update((s) => ({ ...s, clusters, isLoading: false }));
  }
  } catch (error) {
  console.error('Clustering failed: ', error);
  update((s) => ({ ...s, isLoading: false }));
  }
  },
- // ========== SELECTION ==========
- /** * Select a citation */
+  // ========== SELECTION ==========
+  /**
+   * Select a citation
+   */
  selectCitation(id: string) {
  update((s) => {
  const citation = s.citations.find((c) => c.id === id);
  return { ...s, activeCitation: citation ?? null };
  });
  },
- /** * Clear selection */
+  /**
+   * Clear selection
+   */
  clearSelection() {
  update((s) => ({ ...s, activeCitation: null }));
  },
- // ========== HELPER METHODS ==========
- /** * Get all unique jurisdictions */
+  // ========== HELPER METHODS ==========
+  /**
+   * Get all unique jurisdictions
+   */
  getJurisdictions(): string[] {
  let jurisdictions: string[] = [];
  subscribe((s) => {
@@ -238,7 +314,9 @@ function createCitationStore() {
  })();
  return jurisdictions;
  },
- /** * Get relevant citations for a case */
+  /**
+   * Get relevant citations for a case
+   */
  getRelevantCitations(caseId: string, minScore: number = 0.5): Citation[] {
  let relevant: Citation[] = [];
  subscribe((s) => {
@@ -248,7 +326,9 @@ function createCitationStore() {
  })();
  return relevant;
  },
- /** * Get legal principles from a citation */
+  /**
+   * Get legal principles from a citation
+   */
  getLegalPrinciples(citationId: string): string[] {
  let principles: string[] = [];
  subscribe((s) => {
@@ -286,16 +366,36 @@ function createCitationStore() {
  };
 }
 
-/** * Export singleton instance */
+/**
+ * Export singleton instance
+ */
 export const citationStore = createCitationStore();
 
-/** * Derived stores */
+/**
+ * Derived stores
+ */
 export const citations = derived(citationStore, ($store) => $store.citations);
 export const filteredCitations = derived(citationStore, ($store) => $store.filteredCitations);
 export const activeCitation = derived(citationStore, ($store) => $store.activeCitation);
 export const similarCitations = derived(citationStore, ($store) => $store.similarCitations);
 
-/** * MIGRATION NOTES: * * Old imports, to: replace: * import { citations } from '$lib/stores/unified' * import { legalCitations, searchCitations } from '$lib/stores/legal-citations' * * New imports: * import { citationStore, citations, filteredCitations } from '$lib/stores/unified' * * Usage patterns: * ,Old: $citations , $legalCitations * New: $citations or $filteredCitations from unified * * , Old: searchCitations(query) *, New: citationStore.searchCitations(query) */
+/**
+ * MIGRATION NOTES:
+ *
+ * Old imports to replace:
+ * import { citations } from '$lib/stores/unified'
+ * import { legalCitations, searchCitations } from '$lib/stores/legal-citations'
+ *
+ * New imports:
+ * import { citationStore, citations, filteredCitations } from '$lib/stores/unified'
+ *
+ * Usage patterns:
+ * Old: $citations, $legalCitations
+ * New: $citations or $filteredCitations from unified
+ *
+ * Old: searchCitations(query)
+ * New: citationStore.searchCitations(query)
+ */
 
 
 

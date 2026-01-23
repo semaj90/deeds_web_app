@@ -10,10 +10,14 @@
 import { setup, createActor, fromCallback } from 'xstate';
 
 export interface RabbitMQContext {
-  connected: boolean; queue: string | null;
+  connected: boolean;
+  queue: string | null;
   lastMessage: unknown | null;
   error: string | null;
-}| { type: 'CONNECT'; queue: string }
+}
+
+export type RabbitMQEvent =
+  | { type: 'CONNECT'; queue: string }
   | { type: 'CONNECTED' }
   | { type: 'DISCONNECT' }
   | { type: 'MESSAGE_RECEIVED'; payload: unknown }
@@ -28,7 +32,8 @@ const initialContext: RabbitMQContext = {
 
 export const rabbitmqMachine = setup({
   types: {} as { context: RabbitMQContext, events: RabbitMQEvent },
-  actors: { rabbitMQConnection: fromCallback(({ sendBack, input }) => {
+  actors: {
+    rabbitMQConnection: fromCallback(({ sendBack, input }) => {
       // Stub: Replace with real RabbitMQ connection
       console.log('RabbitMQ stub: connecting to', input);
       setTimeout(() => sendBack({ type: 'CONNECTED' }), 1000);
@@ -41,28 +46,37 @@ export const rabbitmqMachine = setup({
   id: 'rabbitmq',
   initial: 'disconnected',
   context: initialContext,
-  states: { disconnected: {
-      on: { CONNECT: { target: 'connecting' },
+  states: {
+    disconnected: {
+      on: {
+        CONNECT: { target: 'connecting' },
       },
     },
-    connecting: { invoke: {
+    connecting: {
+      invoke: {
         src: 'rabbitMQConnection',
         input: ({ event }) => ('queue' in event ? event.queue : 'default'),
       },
-      on: { CONNECTED: { target: 'connected' },
+      on: {
+        CONNECTED: { target: 'connected' },
         ERROR: { target: 'error' },
       },
     },
-    connected: { on: {
+    connected: {
+      on: {
         DISCONNECT: { target: 'disconnected' },
-        MESSAGE_RECEIVED: { actions: ({ context, event }) => {
-            context.lastMessage = event.payload;
+        MESSAGE_RECEIVED: {
+          actions: ({ context, event }) => {
+            if (event.type === 'MESSAGE_RECEIVED') {
+              context.lastMessage = event.payload;
+            }
           },
         },
         ERROR: { target: 'error' },
       },
     },
-    error: { on: {
+    error: {
+      on: {
         CONNECT: { target: 'connecting' },
       },
     },
@@ -71,7 +85,3 @@ export const rabbitmqMachine = setup({
 
 export const rabbitmqActor = createActor(rabbitmqMachine);
 export default rabbitmqActor;
-
-
-
-

@@ -1,192 +1,176 @@
-<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https, //svelte.dev/e/tag_invalid_name -->
-<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https, //svelte.dev/e/tag_invalid_name -->
-<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https, //svelte.dev/e/tag_invalid_name -->
-<!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
-https, //svelte.dev/e/tag_invalid_name -->
+
 <script lang="ts">
- import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-svelte";
- import { onDestroy, onMount } from 'svelte';
+ import AlertCircle from "lucide-svelte/icons/alert-circle";
+ import AlertTriangle from "lucide-svelte/icons/alert-triangle";
+ import CheckCircle from "lucide-svelte/icons/check-circle";
+ import Info from "lucide-svelte/icons/info";
+ import X from "lucide-svelte/icons/x";
 
  interface Props {
- open: boolean;
- title?: string;
- description?: string;
- children?: any;
- size?: 'sm' | 'md' | 'lg' | 'xl';
- variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
- closable?: boolean;
- onClose?: () => void;
- onConfirm?: () => void;
- confirmText?: string;
- cancelText?: string;
- showFooter?: boolean;
- loading?: boolean;
+  open: boolean;
+  title?: string;
+  description?: string;
+  children?: import('svelte').Snippet;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  closable?: boolean;
+  onClose?: () => void;
+  onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  showFooter?: boolean;
+  loading?: boolean;
  }
 
  let {
- open = $bindable(false),
- title = '',
- description = '',
- children,
- size = 'md',
- variant = 'default',
- closable = true,
- onClose,
- onConfirm,
- confirmText = 'Confirm',
- cancelText = 'Cancel',
- showFooter = true,
- loading = false
+  open = $bindable(false),
+  title = '',
+  description = '',
+  children,
+  size = 'md',
+  variant = 'default',
+  closable = true,
+  onClose,
+  onConfirm,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  showFooter = true,
+  loading = false
  }: Props = $props();
 
- let modalRef = $state<HTMLElement>();
- let previousFocus = $state<HTMLElement>();
+ let modalRef = $state<HTMLElement | null>(null);
+ let previousFocus = $state<HTMLElement | null>(null);
 
  // Get icon based on variant
  function getVariantIcon() {
- switch (variant) {
- case 'destructive':
- return AlertTriangle;
- case 'success':
- return CheckCircle;
- case 'warning':
- return AlertCircle;
- case 'info':
- return Info;
- default:
- return null;
+  switch (variant) {
+  case 'destructive': return AlertTriangle;
+  case 'success': return CheckCircle;
+  case 'warning': return AlertCircle;
+  case 'info': return Info;
+  default: return null;
+  }
  }
- }
+
+ let Icon = $derived(getVariantIcon());
 
  // Handle escape key
  function handleKeydown(e: KeyboardEvent) {
- if (e.key === 'Escape' && closable && !loading) {
- handleClose();
- }
+  if (e.key === 'Escape' && closable && !loading) {
+  handleClose();
+  }
  }
 
- // Handle close
  function handleClose() {
- if (loading) return;
- open = false;
- onClose?.();
+  if (loading) return;
+  open = false;
+  onClose?.();
  }
 
- // Handle confirm
  function handleConfirm() {
- if (loading) return;
- onConfirm?.();
+  if (loading) return;
+  onConfirm?.();
  }
 
- // Handle backdrop click
  function handleBackdropClick(e: MouseEvent) {
- if (e.target === modalRef && closable && !loading) {
- handleClose();
- }
+  if (e.target === modalRef && closable && !loading) {
+  handleClose();
+  }
  }
 
- // Focus management
- $effect (() => {
- if (open) {
- previousFocus = document.activeElement as HTMLElement;
-
- // Focus the modal after a short delay to ensure it's rendered
- setTimeout(() => {
- modalRef?.focus();
- }, 10);
- } else if (previousFocus) {
- previousFocus.focus();
- }
+ $effect(() => {
+  if (open) {
+  previousFocus = document.activeElement as HTMLElement;
+  setTimeout(() => { modalRef?.focus(); }, 10);
+  } else if (previousFocus) {
+  previousFocus.focus();
+  }
  });
 
  $effect(() => {
- document.addEventListener('keydown', handleKeydown);
-
- return () => {
- document.removeEventListener('keydown', handleKeydown);
- };
+  document.addEventListener('keydown', handleKeydown);
+  return () => {
+  document.removeEventListener('keydown', handleKeydown);
+  };
  });
 </script>
 
 {#if open}
- <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+ <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
  <div
- bind:this={modalRef}
- class="modal-overlay"
- class: size, class:variant
- onclick={ handleBackdropClick }
- role="dialog"
- aria-modal="true"
- aria-labelledby={title ? 'modal-title' : undefined}
- aria-describedby={description ? 'modal-description' : undefined}
- tabindex="-1"
+  bind:this={modalRef}
+  class="modal-overlay {size} {variant}"
+  onclick={ handleBackdropClick }
+  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClose(); }}
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby={title ? 'modal-title' : undefined}
+  aria-describedby={description ? 'modal-description' : undefined}
+  tabindex="-1"
  >
- <div class="modal-content" role="document">
- {#if title || closable}
- <div class="modal-header">
- <div class="header-content">
- {#if getVariantIcon()}
- <div class="variant-icon">
- <getVariantIcon() size={20} / />
- </div>
- {/if}
+  <div class="modal-content" role="document">
+  {#if title || closable}
+  <div class="modal-header">
+  <div class="header-content">
+  {#if Icon}
+  <div class="variant-icon">
+  <Icon size={20} />
+  </div>
+  {/if}
 
- {#if title}
- <h2 id="modal-title" class="modal-title">{title}</h2>
- {/if}
- </div>
+  {#if title}
+  <h2 id="modal-title" class="modal-title">{title}</h2>
+  {/if}
+  </div>
 
- {#if closable}
- <button
- class="close-btn"
- onclick={handleClose}
- disabled={ loading }
- aria-label="Close modal"
- type="button"
- >
- <X size={20} />
- </button>
- {/if}
- </div>
- {/if}
+  {#if closable}
+  <button
+  class="close-btn"
+  onclick={handleClose}
+  disabled={ loading }
+  aria-label="Close modal"
+  type="button"
+  >
+  <X size={20} />
+  </button>
+  {/if}
+  </div>
+  {/if}
 
- <div class="modal-body">
- {#if description}
- <p id="modal-description" class="modal-description">{description}</p>
- {/if}
+  <div class="modal-body">
+  {#if description}
+  <p id="modal-description" class="modal-description">{description}</p>
+  {/if}
 
- {@render children?.()}
- </div>
+  {@render children?.()}
+  </div>
 
- {#if showFooter}
- <div class="modal-footer">
- <button
- class="btn cancel-btn"
- onclick={handleClose}
- disabled={loading}
- type="button"
- >
- {cancelText}
- </button>
+  {#if showFooter}
+  <div class="modal-footer">
+  <button
+  class="btn cancel-btn"
+  onclick={handleClose}
+  disabled={loading}
+  type="button"
+  >
+  {cancelText}
+  </button>
 
- <button
- class="btn confirm-btn"
- class:loading
- onclick={handleConfirm}
- disabled={loading}
- type="button"
- >
- {#if loading}
- <div class="spinner"></div>
- {/if}
- {confirmText}
- </button>
- </div>
- {/if}
- </div>
+  <button
+  class="btn confirm-btn"
+  class:loading
+  onclick={handleConfirm}
+  disabled={loading}
+  type="button"
+  >
+  {#if loading}
+  <div class="spinner"></div>
+  {/if}
+  {confirmText}
+  </button>
+  </div>
+  {/if}
+  </div>
  </div>
 {/if}
 
@@ -285,8 +269,8 @@ https, //svelte.dev/e/tag_invalid_name -->
  flex-shrink: 0;
  }
 
- .close-btn:hover, not(disabled) {
- background: #f8f9fa; color: #495057;
+ .close-btn:hover:not(:disabled) {
+  background: #f8f9fa; color: #495057;
  }
 
  .close-btn:disabled {
@@ -328,16 +312,16 @@ https, //svelte.dev/e/tag_invalid_name -->
  border-color: #dee2e6;
  }
 
- .cancel-btn:hover, not(disabled) {
- background: #f8f9fa; color: #495057;
+ .cancel-btn:hover:not(:disabled) {
+  background: #f8f9fa; color: #495057;
  }
 
  .confirm-btn {
  background: #007bff; color: white;
  }
 
- .confirm-btn:hover, not(disabled) {
- background: #0056b3;
+ .confirm-btn:hover:not(:disabled) {
+  background: #0056b3;
  }
 
  .confirm-btn.loading {

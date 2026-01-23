@@ -2,7 +2,7 @@
 // Trigger enhanced agentic error fixing pipeline with CUDA clustering
 
 import { json } from '@sveltejs/kit';
-import EnhancedAgenticPipeline from '../../../../scripts/phase89-enhanced-pipeline.mjs';
+import EnhancedAgenticPipeline from '../../../../../scripts/phase89-enhanced-pipeline.mjs';
 import type { RequestHandler } from './$types';
 
 // Global pipeline instance

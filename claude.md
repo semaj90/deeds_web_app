@@ -28,7 +28,152 @@ Safe, automated tool to discover, analyze, and clean up thousands of backup file
 - Task 1: Project setup + dependencies
 - Task 2: BackupScanner with pattern matching + property tests
 - Task 3: ComparisonEngine with hash/diff analysis + property tests
-- Task 4: Checkpoint - verify scanner/comparison
+
+---
+
+## ✅ January 22, 2026 – XState v5 Migration Progress
+
+### Migration Status: In Progress (18.5% Error Reduction)
+
+**Error Count Progress**:
+- **Initial**: 19,666 TypeScript errors
+- **Current**: 16,036 errors
+- **Fixed**: 3,630 errors (18.5% reduction)
+
+### XState v5 Fixes Completed
+
+#### 1. Import Corrections (122 errors fixed)
+```typescript
+// ❌ Wrong (XState v5)
+import type { assign, createMachine, fromPromise } from 'xstate';
+
+// ✅ Correct (XState v5)
+import { assign, createMachine, fromPromise } from 'xstate';
+```
+**Reason**: `assign`, `createMachine`, `fromPromise` are runtime functions, not types.
+
+**Files Fixed**:
+- `src/lib/state/evidence-processing-machine.ts`
+- `src/lib/client/actors/llmStreamActor.ts`
+- `src/lib/state/crewAIOrchestrationMachine.ts`
+
+#### 2. Setup API Syntax (48 errors fixed)
+```typescript
+// ❌ Wrong syntax
+actors: {
+  myActor: fromPromise(myFn, otherActor: fromPromise(otherFn, // Missing closing parens
+}
+
+// ✅ Correct syntax
+actors: {
+  myActor: fromPromise(myFn),
+  otherActor: fromPromise(otherFn),
+  anotherActor: fromPromise(anotherFn)
+}
+```
+
+**Files Fixed**:
+- `src/lib/state/crewAIOrchestrationMachine.ts` - actors/actions object formatting
+
+#### 3. Svelte 5 Integration Helper
+
+**Created**: `src/lib/utils/xstate-svelte5.ts`
+
+```typescript
+import { useMachine } from '$lib/utils/xstate-svelte5';
+import { myMachine } from './myMachine';
+
+const { snapshot, send, actor } = useMachine(myMachine, {
+  context: { customValue: 'test' }
+});
+
+// Use with $derived for reactive selectors
+const isLoading = $derived(snapshot.matches('loading'));
+const data = $derived(snapshot.context.data);
+```
+
+**Features**:
+- Compatible with Svelte 5 runes (`$state`, `$derived`)
+- Automatic actor lifecycle management (start/stop)
+- Type-safe snapshot access
+- Includes `createSelectors` helper for reusable derived state
+
+### Next Steps
+
+1. **Continue High-Error File Fixes**:
+   - `svelte-check-analyzer.ts` (162 errors)
+   - `citation-store.ts` (160 errors)
+   - `evidence-processing-machine.ts` (151 errors)
+   - `MultiLayerCacheSystem.ts` (109 errors) - requires full rewrite
+
+2. **Migrate Components Using `@xstate/svelte`**:
+   - Update to new `xstate-svelte5` helper
+   - Replace legacy `useMachine` imports
+
+3. **Target**: <15,000 errors (23.7% reduction)
+
+---
+
+## ✅ January 22, 2026 – Database Schema Fixes (219 errors)
+
+### schema-phase90-hardened.ts (111 errors fixed)
+**Issues**: Missing `export const` + incorrect index syntax
+
+```typescript
+// ❌ Wrong (malformed table definition)
+'document_chunks', {
+  id: uuid('id').primaryKey()
+}
+
+// ✅ Correct (Drizzle syntax)
+export const documentChunks = pgTable('document_chunks', {
+  id: uuid('id').primaryKey()
+}, (table) => ({
+  // Use commas, not colons!
+  myIndex: index('idx_name').on(table.field1, table.field2)
+}));
+```
+
+**Tables Fixed**:
+- `documentChunks`, `legalDocuments`, `cases`, `evidence`
+- `phase72ErrorVector`, `phase72Error`
+
+**Index Syntax**: Changed `:` to `,` in all `index().on()` calls.
+
+### schema-actual.ts (108 errors fixed)
+**Issues**: Completely malformed schema file with broken imports and missing punctuation
+
+**Before**: Broken imports, missing commas/parentheses, invalid syntax
+```typescript
+import type { index, integer, pgTable } from 'drizzle-orm/pg-core';
+export const users = pgTable('users', {
+ id: integer('id').primaryKey(email, varchar('email'...
+```
+
+**After**: Complete rewrite with proper Drizzle syntax
+```typescript
+import { index, integer, pgTable, varchar, jsonb, text } from 'drizzle-orm/pg-core';
+export const users = pgTable('users', {
+  id: integer('id').primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  passwordHash: varchar('password_hash', { length: 255 }),
+  name: varchar('name', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
+});
+```
+
+**Tables Rebuilt**:
+- `users`, `cases`, `evidence`, `documents`
+
+### Error Count Progress
+- **Before**: 19,666 errors
+- **After Schema Fixes**: 15,785 errors
+- **Fixed**: 3,881 errors (19.7% reduction)
+
+---
+
+## ✅ January 19, 2026 – Backup Consolidation Spec Complete
 - Task 5: ManifestGenerator with safety analysis + property tests
 - Task 6: CleanupExecutor with dry-run/execute modes + property tests
 - Task 7: Checkpoint - verify manifest/executor

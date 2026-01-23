@@ -155,7 +155,8 @@ export const cases = pgTable('cases',
  court: varchar('court', { length: 200 }),
  clientName: varchar('client_name', { length: 200 }),
  opposingParty: varchar('opposing_party', { length: 200 }),
- assignedAttorney: uuid('assigned_attorney'), // Foreign key to users.id
+ userId: uuid('user_id'), // owner of the case
+ assignedAttorney: uuid('assigned_attorney'),
  filingDate: timestamp('filing_date', { withTimezone: true }),
  dueDate: timestamp('due_date', { withTimezone: true }),
  closedDate: timestamp('closed_date', { withTimezone: true }),
@@ -176,11 +177,11 @@ export const cases = pgTable('cases',
  index('idx_cases_status_priority').on(table.status, table.priority),
  index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt)],
  foreignKeys: [
- // Added foreign key for assignedAttorney
+ // Added foreign key for userId
  foreignKey({
- columns: [table.assignedAttorney],
+ columns: [table.userId],
  foreignColumns: [users.id],
- name: 'cases_assigned_attorney_users_id_fk',
+ name: 'cases_user_id_users_id_fk',
  }).onDelete('set null')],
  })
 );
@@ -620,7 +621,7 @@ export const canvasStates = pgTable('canvas_states', {
  .primaryKey()
  .notNull(),
  caseId: uuid('case_id'), // FK to cases.id
- userId: integer('user_id'), // FK to users.id
+ userId: uuid('user_id'), // FK to users.id
  stateData: jsonb('state_data').notNull(),
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),

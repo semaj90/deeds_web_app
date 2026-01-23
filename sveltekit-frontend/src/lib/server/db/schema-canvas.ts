@@ -1,6 +1,6 @@
-import { pgTable, text, varchar, integer, timestamp, boolean, decimal, serial, uuid, real, jsonb } from 'drizzle-orm/pg-core';
-import { users, cases } from './schema-postgres.ts';
 import { relations } from 'drizzle-orm';
+import { boolean, jsonb, pgTable, real, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { cases, users } from './schema-postgres';
 
 // === CANVAS STATES ===
 // Represents a saved canvas/whiteboard state

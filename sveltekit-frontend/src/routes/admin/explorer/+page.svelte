@@ -232,7 +232,10 @@
 							class="route-item"
 							class:selected={$selectedRoute?.id === route.id}
 							class:has-errors={route.errors > 0}
+							role="button"
+							tabindex="0"
 							onclick={() => selectRoute(route)}
+							onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectRoute(route)}
 						>
 							<div class="route-icon">{route.type === 'page' ? '📄' : route.type === 'api' ? '🔌' : '⚙️'}</div>
 							<div class="route-info">
@@ -354,7 +357,10 @@
 	<div class="tree-node">
 		<div
 			class="tree-node-header"
+			role="button"
+			tabindex="0"
 			onclick={() => hasChildren && toggleExpanded(node.path)}
+			onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && hasChildren && toggleExpanded(node.path)}
 		>
 			{#if hasChildren}
 				<span class="tree-icon">{isExpanded ? '📂' : '📁'}</span>
@@ -375,7 +381,10 @@
 						class="tree-route"
 						class:selected={selectedPath === route.path}
 						class:has-errors={route.errors > 0}
+						role="button"
+						tabindex="0"
 						onclick={() => selectRoute(route)}
+						onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && selectRoute(route)}
 					>
 						<span class="route-icon">{route.type === 'page' ? '📄' : '⚙️'}</span>
 						<span class="route-name">{route.path.split('/').pop()}</span>

@@ -9,7 +9,6 @@
  */
 
 import { execSync, spawn } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -24,63 +23,72 @@ class JSONValidationPipelineRunner {
  private mcpProcess?: any;
  private resultsDir = 'test-results/json-validation';
 
- async runFullPipeline(): Promise<PipelineResult> {
- console.log('🚀 Starting Phase52 Complete JSON Validation Pipeline...');
+    async runFullPipeline(): Promise<PipelineResult> {
+        console.log('🚀 Starting Phase52 Complete JSON Validation Pipeline...');
 
- try {
- // Ensure results directory exists
- await fs.mkdir(this.resultsDir, { recursive, true });
-  
- console.log('🧪 Verifying SIMD markdown parser availability...');
- const simdMarkdownVerified = await this.verifySIMDMarkdownParser();
- if (!simdMarkdownVerified) {
- throw new Error('SIMD markdown parser validation failed');
- }
+        let mcpServerStarted = false;
+        let testResult = false;
+        let simdMarkdownVerified = false;
+        let performanceReport = '';
+        let gpuValidation = false;
 
- // Step 1: Start MCP JSON Validation Server
- console.log('📡 Starting MCP JSON Validation Server...');
- const mcpStarted = await this.startMCPServer();
- if (!mcpStarted) {
- throw new Error('Failed to start MCP JSON Validation Server');
- }
+        try {
+            // Ensure results directory exists
+            await fs.mkdir(this.resultsDir, { recursive: true });
 
- // Wait for server to be ready
- await this.waitForServer('http://localhost:3003/mcp/health', 30000);
+            console.log('🧪 Verifying SIMD markdown parser availability...');
+            simdMarkdownVerified = await this.verifySIMDMarkdownParser();
+            if (!simdMarkdownVerified) {
+                console.warn('⚠️ SIMD markdown parser validation failed, continuing...');
+            }
 
- // Step 2: Run Playwright JSON validation tests
- console.log('🧪 Running Playwright JSON validation tests...');
- const testResult = await this.runPlaywrightTests();
+            // Step 1: Start MCP JSON Validation Server
+            console.log('📡 Starting MCP JSON Validation Server...');
+            mcpServerStarted = await this.startMCPServer();
+            if (!mcpServerStarted) {
+                throw new Error('Failed to start MCP JSON Validation Server');
+            }
 
- // Step 3: Generate performance report
- console.log('📊 Generating performance report...');
- const performanceReport = await this.generatePerformanceReport();
+            // Wait for server to be ready
+            await this.waitForServer('http://localhost:3003/mcp/health', 30000);
 
- // Step 4: Validate GPU acceleration
- console.log('🔥 Validating GPU acceleration...');
- const gpuValidation = await this.validateGPUAcceleration();
+            // Step 2: Run Playwright JSON validation tests
+            console.log('🧪 Running Playwright JSON validation tests...');
+            testResult = await this.runPlaywrightTests();
 
- // Cleanup
- await this.stopMCPServer();
+            // Step 3: Generate performance report
+            console.log('📊 Generating performance report...');
+            performanceReport = await this.generatePerformanceReport();
 
- const success = testResult && gpuValidation;
+            // Step 4: Validate GPU acceleration
+            console.log('🔥 Validating GPU acceleration...');
+            gpuValidation = await this.validateGPUAcceleration();
 
- return {
- success: mcpServerStarted,
- playwrightTestsPassed: testResult,
- simdMarkdownVerified,
- performanceReport,
- };
- } catch (error) {
- console.error('❌ Pipeline failed:', error);
- await this.stopMCPServer();
+            // Cleanup
+            await this.stopMCPServer();
 
- return {
- success: false, mcpServerStarted: false, playwrightTestsPassed: false, simdMarkdownVerified: false, error: String(error),
- };
- }
- }
+            const success = testResult && gpuValidation;
 
- private async verifySIMDMarkdownParser(): Promise<boolean> {
+            return {
+                success,
+                mcpServerStarted,
+                playwrightTestsPassed: testResult,
+                simdMarkdownVerified,
+                performanceReport,
+            };
+        } catch (error) {
+            console.error('❌ Pipeline failed:', error);
+            await this.stopMCPServer();
+
+            return {
+                success: false,
+                mcpServerStarted,
+                playwrightTestsPassed: testResult,
+                simdMarkdownVerified,
+                error: String(error),
+            };
+        }
+    } private async verifySIMDMarkdownParser(): Promise<boolean> {
  try {
  execSync('npm run simd: test', { stdio: 'inherit' });
  return true;
@@ -111,7 +119,7 @@ class JSONValidationPipelineRunner {
  this.mcpProcess.stderr?.on('data', (data: Buffer) => {
  console.error('MCP Server Error:', data.toString().trim());
  });
-  
+
  setTimeout(() => {
  if (!started) {
  console.error('MCP Server failed to start within timeout');
@@ -139,54 +147,55 @@ class JSONValidationPipelineRunner {
  }
  }
 
- private async waitForServer(url: string, timeout, size: number): Promise<void> {
- const startTime = Date.now();
+    private async waitForServer(url: string, timeout: number): Promise<void> {
+        const startTime = Date.now();
 
- while (Date.now() - startTime < timeout) {
- try {
- const response = await fetch(url);
- if (response.ok) {
- return;
- }
- } catch (error) {
- // Server not ready yet
- }
+        while (Date.now() - startTime < timeout) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    return;
+                }
+            } catch (error) {
+                // Server not ready yet
+            }
 
- await new Promise((resolve) => setTimeout(resolve, 1000));
- }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
 
- throw new Error(`Server at ${url} did not become ready within ${timeout}ms`);
- }
+        throw new Error(`Server at ${url} did not become ready within ${timeout}ms`);
+    }
 
- private async runPlaywrightTests(): Promise<boolean> {
- try {'npx playwright test src/lib/testing/json-validation-pipeline.ts --config playwright.json-validation.config.js --reporter=json';
- const output = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
-  
- const results = JSON.parse(output);
+    private async runPlaywrightTests(): Promise<boolean> {
+        try {
+            const command = 'npx playwright test src/lib/testing/json-validation-pipeline.ts --config playwright.json-validation.config.js --reporter=json';
+            const output = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
 
- const passed = results.stats.expected === results.stats.passes;
- console.log(`✅ Playwright tests: ${results.stats.passes}/${results.stats.expected} passed`);
+            const results = JSON.parse(output);
 
- // Save detailed results
- await fs.writeFile(
- path.join(this.resultsDir, 'playwright-results.json'),
- JSON.stringify(results, null, 2)
- );
+            const passed = results.stats.expected === results.stats.passes;
+            console.log(`✅ Playwright tests: ${results.stats.passes}/${results.stats.expected} passed`);
 
- return passed;
- } catch (error) {
- console.error('❌ Playwright tests failed:', error);
- return false;
- }
- }
+            // Save detailed results
+            await fs.writeFile(
+                path.join(this.resultsDir, 'playwright-results.json'),
+                JSON.stringify(results, null, 2)
+            );
 
- private async generatePerformanceReport(): Promise<string> {
+            return passed;
+        } catch (error) {
+            console.error('❌ Playwright tests failed:', error);
+            return false;
+        }
+    } private async generatePerformanceReport(): Promise<string> {
  try {
  // Collect MCP metrics
  const mcpResponse = await fetch('http://localhost:3003/mcp/metrics');
  const mcpMetrics = await mcpResponse.json();
 
- // Generate report## MCP Server Metrics
+ // Generate report
+ const report = `
+## MCP Server Metrics
 - Backends Available: ${Object.keys(mcpMetrics.backends)
  .filter((k) => mcpMetrics.backends[k])
  .join(', ')}

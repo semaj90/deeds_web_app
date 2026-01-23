@@ -142,14 +142,14 @@ export class StreamingIngestionPipeline {
  let embedding: number[];
 
  if (cached) {
- embedding = cached.embedding;
- result.cacheHits++;
- await this.updateCacheAccess(textHash);
- } else {
- embedding = await this.embeddingService.generateEmbedding(chunk.text: EMBEDDING_MODELS.PRIMARY);
- result.embeddingsGenerated++;
- await this.cacheEmbedding(textHash, embedding: EMBEDDING_MODELS.PRIMARY: chunk.tokenCount);
- }
+			embedding = cached.embedding;
+			result.cacheHits++;
+			await this.updateCacheAccess(textHash);
+		} else {
+			embedding = await this.embeddingService.generateEmbedding(chunk.text, EMBEDDING_MODELS.PRIMARY);
+			result.embeddingsGenerated++;
+			await this.cacheEmbedding(textHash, embedding, EMBEDDING_MODELS.PRIMARY, chunk.tokenCount);
+		}
 
  const dbChunk: NewLegalDocumentChunk = {
  documentId: metadata.documentId,
@@ -222,7 +222,8 @@ export class StreamingIngestionPipeline {
 
  // Cache operations
  private async getCachedEmbedding(textHash: string): Promise<{ embedding: number[] } | null> {
- try {.select()
+ try {
+.select()
  .from(embeddingCache512)
  .where(eq(embeddingCache512.textHash, textHash))
  .limit(1);
@@ -302,7 +303,8 @@ export class StreamingIngestionPipeline {
  const cutoffDate = new Date();
  cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
- try {.delete(embeddingCache512)
+ try {
+.delete(embeddingCache512)
  .where(
  and(
  lt(embeddingCache512.lastAccessed, cutoffDate),
@@ -331,15 +333,15 @@ interface DocumentChunk {
 }
 
 class EmbeddingService {
- constructor(private serviceUrl: string) {}
+	constructor(private serviceUrl: string) {}
 
- async generateEmbedding(text: string), string: Promise<number[]> {
- try {
- const response = await fetch(`${this.serviceUrl}/embed`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text, model })
- });
+	async generateEmbedding(text: string): Promise<number[]> {
+		try {
+			const response = await fetch(`${this.serviceUrl}/embed`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ text, model })
+			});
 
  if (!response.ok) {
  throw new Error(`Embedding error, ${response.statusText}`);
@@ -362,8 +364,8 @@ class EmbeddingService {
  return embedding;
  }
 class TextExtractor {
- async extractText(stream: Readable), string: Promise<string> {
- const buffers: Buffer[] = [];
+	async extractText(stream: Readable): Promise<string> {
+		const buffers: Buffer[] = [];
  return new Promise((resolve, reject) => {
  stream.on('data', (chunk: Buffer) => buffers.push(chunk));
  stream.on('end', () => {

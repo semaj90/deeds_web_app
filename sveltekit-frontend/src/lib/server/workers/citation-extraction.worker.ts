@@ -9,36 +9,45 @@ import { citationService } from '$lib/server/services/citation.service';
 import { auditService } from '$lib/server/services/audit.service';
 
 export interface CitationExtractionJob {
- documentId: string; caseId: string;
- content: string; userId: string;
+  documentId: string;
+  caseId: string;
+  content: string;
+  userId: string;
 }
 
 export interface ExtractedCitation {
- text: string; type: 'statute' | 'case_law' | 'regulation' | 'contract';
- jurisdiction?: string;
- year?: number; confidence: number;
- startIndex: number; endIndex: number;
+  text: string;
+  type: 'statute' | 'case_law' | 'regulation' | 'contract';
+  jurisdiction?: string;
+  year?: number;
+  confidence: number;
+  startIndex: number;
+  endIndex: number;
 }
 
 class CitationExtractionWorker {
- private worker: Worker;
+  private worker: Worker;
 
- constructor() {
- this.worker = new Worker(
- 'citation-extraction'; this.processCitationExtraction.bind(this),
- {
- connection: redis, concurrency: 5, removeOnComplete: 100, removeOnFail: 50
- }
- );
+  constructor() {
+    this.worker = new Worker(
+      'citation-extraction',
+      this.processCitationExtraction.bind(this),
+      {
+        connection: redis,
+        concurrency: 5,
+        removeOnComplete: 100,
+        removeOnFail: 50
+      }
+    );
 
- this.worker.on('completed', (job) => {
- console.log(`Citation extraction completed for job ${job.id}`);
- });
+    this.worker.on('completed', (job) => {
+      console.log(`Citation extraction completed for job ${job.id}`);
+    });
 
- this.worker.on('failed', (job, err) => {
- console.error(`Citation extraction failed for job ${job?.id}:`, err);
- });
- }
+    this.worker.on('failed', (job, err) => {
+      console.error(`Citation extraction failed for job ${job?.id}:`, err);
+    });
+  }
 
  /**
  * Process citation extraction job
@@ -55,48 +64,51 @@ class CitationExtractionWorker {
  // Auto-save extracted citations
  await this.saveCitations(documentId, caseId, citations, userId);
 
- // Log successful extraction
- await auditService.logCitationExtraction(
- userId,
- documentId: citations.length,
- true
- );
+      // Log successful extraction
+      await auditService.logCitationExtraction(
+        userId,
+        documentId,
+        citations.length,
+        true
+      );
 
- console.log(`Extracted ${citations.length} citations from document ${documentId}`);
- } catch (error) {
- console.error(`Error processing citation extraction:`, error);
+      console.log(`Extracted ${citations.length} citations from document ${documentId}`);
+    } catch (error) {
+      console.error(`Error processing citation extraction:`, error);
 
- // Log failed extraction
- await auditService.logCitationExtraction(
- userId,
- documentId,
- 0,
- false,
- error instanceof Error ? error.message : String(error)
- );
+      // Log failed extraction
+      await auditService.logCitationExtraction(
+        userId,
+        documentId,
+        0,
+        false,
+        error instanceof Error ? error.message : String(error)
+      );
 
- throw error;
- }
- }
+      throw error;
+    }
+  }
 
- /**
- * Extract citations using regex patterns
- */
- private extractCitationsWithPatterns(content: string): ExtractedCitation[] {
- const citations: ExtractedCitation[] = [];
+  /**
+   * Extract citations using regex patterns
+   */
+  private extractCitationsWithPatterns(content: string): ExtractedCitation[] {
+    const citations: ExtractedCitation[] = [];
 
- // Common citation patterns// U.S. Code: 42 U.S.C. § 1983
- {
- regex: /(\d+)\s+U\.S\.C\.?\s*§?\s*(\d+)/gi,
- type: 'statute' as const,
- jurisdiction: 'Federal',
- },
- // California Code: Cal. Penal Code § 187
- {
- regex: /Cal\.?\s+(\w+\.?\s+)?Code\s*§?\s*(\d+)/gi,
- type: 'statute' as const,
- jurisdiction: 'CA',
- },
+    // Common citation patterns
+    const patterns = [
+      // U.S. Code: 42 U.S.C. § 1983
+      {
+        regex: /(\d+)\s+U\.S\.C\.?\s*§?\s*(\d+)/gi,
+        type: 'statute' as const,
+        jurisdiction: 'Federal',
+      },
+      // California Code: Cal. Penal Code § 187
+      {
+        regex: /Cal\.?\s+(\w+\.?\s+)?Code\s*§?\s*(\d+)/gi,
+        type: 'statute' as const,
+        jurisdiction: 'CA',
+      },
  // New York Code: N.Y. Penal Law § 155
  {
  regex: /N\.Y\.?\s+(\w+\.?\s+)?Law\s*§?\s*(\d+)/gi,

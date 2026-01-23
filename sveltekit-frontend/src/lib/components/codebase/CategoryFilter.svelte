@@ -135,7 +135,7 @@
 						<span class="group-count">{(selected[group.id] || []).length}</span>
 					{/if}
 					<ChevronDown
-						class="h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' , ''}"
+						class="h-4 w-4 chevron {expandedGroups.has(group.id) ? 'expanded' : ''}"
 					/>
 				</button>
 
@@ -143,7 +143,7 @@
 					<div class="group-options">
 						{#each group.options as option}
 							<button
-								class="option-btn {isSelected(group.id: option.value) ? 'selected' , ''}"
+								class="option-btn {isSelected(group.id, option.value) ? 'selected' : ''}"
 								onclick={() => toggleOption(group.id, option.value, group.multiple ?? true)}
 							>
 								<span class="option-dot {getOptionColor(option)}"></span>

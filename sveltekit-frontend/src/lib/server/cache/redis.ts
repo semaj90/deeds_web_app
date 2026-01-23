@@ -21,69 +21,31 @@ export async function getRedisClient() {
     return client;
 }
 
-/**
- * Redis wrapper with common operations
- */
-export const redis = {
-    async get(key: string): Promise<string | null> {
-        const c = await getRedisClient();
-        return c.get(key);
-    },
-
-    async set(key: string, value: string): Promise<void> {
-        const c = await getRedisClient();
-        await c.set(key, value);
-    },
-
-    async setex(key: string, seconds: number, value: string): Promise<void> {
-        const c = await getRedisClient();
-        await c.setEx(key, seconds, value);
-    },
-
-    async del(key: string): Promise<number> {
-        const c = await getRedisClient();
-        return c.del(key);
-    },
-
-    async exists(key: string): Promise<boolean> {
-        const c = await getRedisClient();
-        return (await c.exists(key)) > 0;
-    },
-
-    async incr(key: string): Promise<number> {
-        const c = await getRedisClient();
-        return c.incr(key);
-    },
-
-    async lpush(key: string, value: string): Promise<number> {
-        const c = await getRedisClient();
-        return c.lPush(key, value);
-    },
-
-    async lrange(key: string, start: number, stop: number): Promise<string[]> {
-        const c = await getRedisClient();
-        return c.lRange(key, start, stop);
-    },
-
-    async hset(key: string, field: string, value: string): Promise<number> {
-        const c = await getRedisClient();
-        return c.hSet(key, field, value);
-    },
-
-    async hget(key: string, field: string): Promise<string | null> {
-        const c = await getRedisClient();
-        return c.hGet(key, field);
-    },
-
-    async hgetall(key: string): Promise<Record<string, string>> {
-        const c = await getRedisClient();
-        return c.hGetAll(key);
-    },
-
-    async close(): Promise<void> {
-        if (client) {
-            await client.quit();
-            client = null;
+export const cache = {
+    get: async <T>(key: string): Promise<T | null> => {
+        const client = await getRedisClient();
+        if (!client) return null;
+        const result = await client.get(key);
+        if (!result) return null;
+        try {
+            return JSON.parse(result) as T;
+        } catch (e) {
+            console.error('Cache parse error', e);
+            return null;
         }
     },
+    set: async (key: string, value: any, ttlSeconds?: number) => {
+        const client = await getRedisClient();
+        if (!client) return;
+        const str = JSON.stringify(value);
+        if (ttlSeconds) {
+            await client.set(key, str, { EX: ttlSeconds });
+        } else {
+            await client.set(key, str);
+        }
+    },
+    del: async (key: string) => {
+        const client = await getRedisClient();
+        await client?.del(key);
+    }
 };

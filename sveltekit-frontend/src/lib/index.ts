@@ -35,14 +35,14 @@ export { EnhancedApiClient as apiClient } from './services/enhanced-api-client.j
 
 // ===== FILE UPLOAD SERVICES =====
 export { enhancedFileUpload } from './services/enhanced-file-upload.js';
-export { default } from './services/localStorage-file-fallback.js';
+export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
-export { cn, confidenceClass, legalCn, priorityClass } from './utils/cn';
+export { cn, confidenceClass, legalCn, priorityClass } from './utils/cn.js';
 export {
     copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
     theme, throttle
-} from './utils/index';
+} from './utils/index.js';
 
 // Export type helpers for Svelte 5 compatibility
 export type {
@@ -62,7 +62,8 @@ export type {
 // } from './services/comprehensive-ollama-summarizer.js';
 
 export {
-    ollamaIntegrationLayer,$1;$2$1;$2$1;$2} from './services/ollama-integration-layer.js';
+    ollamaIntegrationLayer
+} from './services/ollama-integration-layer.js';
 
 // Temporarily disabled - file is in ai.bak folder, not ai folder
 // export {
@@ -141,4 +142,3 @@ export type { SearchCategory, SearchFilter, SearchOptions, SearchResult, SearchS
 
 // Default export for convenience
 export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };
-

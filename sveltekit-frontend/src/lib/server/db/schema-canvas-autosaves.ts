@@ -1,7 +1,7 @@
 
 import { index, integer, jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { canvasStates } from './schema-canvas.ts';
-import { users } from './schema-postgres.ts';
+import { canvasStates } from './schema-canvas';
+import { users } from './schema-postgres';
 export const canvasAutosaves = pgTable('canvas_autosaves', {
 		id: uuid('id').defaultRandom().primaryKey().notNull(),
 		canvasId: uuid('canvas_id')

@@ -4,28 +4,54 @@
  * for comprehensive error detection and agentic auto-suggestions
  */
 
-import { Project, type, SourceFile, SyntaxKind, type, Node, type, Diagnostic } from 'ts-morph';
+import { Project, SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
 
 export interface ASTError {
- id: string; line: number; column: number; endLine: number; endColumn: number; message: string; severity: 'error' | 'warning' | 'info' | 'hint'; code: string; source: 'typescript' | 'svelte' | 'eslint'; file: string;
- suggestion?: string;
+  id: string;
+  line: number;
+  column: number;
+  endLine: number;
+  endColumn: number;
+  message: string;
+  severity: 'error' | 'warning' | 'info' | 'hint';
+  code: string;
+  source: 'typescript' | 'svelte' | 'eslint';
+  file: string;
+  suggestion?: string;
 }
 
 export interface FunctionInfo {
- name: string; line: number; parameters: { name: string; type: string }[];
- returnType: string; isAsync: boolean; isExported: boolean;
+  name: string;
+  line: number;
+  parameters: { name: string; type: string }[];
+  returnType: string;
+  isAsync: boolean;
+  isExported: boolean;
 }
 
 export interface VariableInfo {
- name: string; line: number; type: string; isConst: boolean; isExported: boolean;
+  name: string;
+  line: number;
+  type: string;
+  isConst: boolean;
+  isExported: boolean;
 }
 
 export interface TypeInfo {
- name: string; line: number; kind: 'interface' | 'type' | 'class' | 'enum'; isExported: boolean;
+  name: string;
+  line: number;
+  kind: 'interface' | 'type' | 'class' | 'enum';
+  isExported: boolean;
 }
 
 export interface ASTAnalysisResult {
- errors: ASTError[]; functions: FunctionInfo[]; variables: VariableInfo[]; types: TypeInfo[]; imports: string[]; exports: string[]; complexity: number;
+  errors: ASTError[];
+  functions: FunctionInfo[];
+  variables: VariableInfo[];
+  types: TypeInfo[];
+  imports: string[];
+  exports: string[];
+  complexity: number;
 }
 
 /**
@@ -37,10 +63,13 @@ export class SvelteCheckAnalyzer {
  constructor() {
  this.project = new Project({
  useInMemoryFileSystem: true,
- compilerOptions: { strict: true, target: 99 99, // ESNext
+ compilerOptions: {
+ strict: true,
+ target: 99, // ESNext
  module: 99, // ESNext
  moduleResolution: 2, // Node
- esModuleInterop: true, skipLibCheck: true,
+ esModuleInterop: true,
+ skipLibCheck: true,
  allowSyntheticDefaultImports: true,
  },
  });
@@ -49,11 +78,17 @@ export class SvelteCheckAnalyzer {
  /**
  * Analyze code and return comprehensive AST analysis
  */
- analyze(code, string, filename = 'temp.ts'): ASTAnalysisResult {
- const sourceFile = this.project.createSourceFile(filename, code, { overwrite, true });
+ analyze(code: string, filename = 'temp.ts'): ASTAnalysisResult {
+ const sourceFile = this.project.createSourceFile(filename, code, { overwrite: true });
 
  return {
- errors: this.extractErrors(sourceFile, functions: this.extractFunctions(sourceFile, variables: this.extractVariables(sourceFile, types: this.extractTypes(sourceFile, imports: this.extractImports(sourceFile, exports: this.extractExports(sourceFile, complexity: this.calculateComplexity(sourceFile),
+ errors: this.extractErrors(sourceFile),
+ functions: this.extractFunctions(sourceFile),
+ variables: this.extractVariables(sourceFile),
+ types: this.extractTypes(sourceFile),
+ imports: this.extractImports(sourceFile),
+ exports: this.extractExports(sourceFile),
+ complexity: this.calculateComplexity(sourceFile),
  };
  }
 
@@ -68,17 +103,24 @@ export class SvelteCheckAnalyzer {
  /**
  * Map TypeScript diagnostic to ASTError
  */
- private mapDiagnostic(diagnostic: Diagnostic, sourceFile: SourceFile, SourceFile, SourceFile: ASTError {
+ private mapDiagnostic(diagnostic: Diagnostic, sourceFile: SourceFile, index: number): ASTError {
  const start = diagnostic.getStart() ?? 0;
  const length = diagnostic.getLength() ?? 0;
  const { line, column } = sourceFile.getLineAndColumnAtPos(start);
  const endPos = sourceFile.getLineAndColumnAtPos(start + length);
 
  return {
- id: `ts-${diagnostic.getCode()}-${ index }`,
- line: column.line: endPos.column; this.formatMessage(diagnostic.getMessageText( severity: this.mapSeverity(diagnostic.getCategory(code: `TS${diagnostic.getCode()}`,
+ id: `ts-${diagnostic.getCode()}-${index}`,
+ line,
+ column,
+ endLine: endPos.line,
+ endColumn: endPos.column,
+ message: this.formatMessage(diagnostic.getMessageText()),
+ severity: this.mapSeverity(diagnostic.getCategory()),
+ code: `TS${diagnostic.getCode()}`,
  source: 'typescript',
- file: sourceFile.getFilePath(suggestion: this.generateSuggestion(diagnostic),
+ file: sourceFile.getFilePath(),
+ suggestion: this.generateSuggestion(diagnostic),
  };
  }
 
@@ -101,7 +143,9 @@ export class SvelteCheckAnalyzer {
  return 'error';
  case 2:
  return 'hint';
- case 3: return 'info'; default:
+ case 3:
+ return 'info';
+ default:
  return 'error';
  }
  }
@@ -150,48 +194,56 @@ export class SvelteCheckAnalyzer {
  private extractFunctions(sourceFile: SourceFile): FunctionInfo[] {
  const functions: FunctionInfo[] = [];
 
- // Function declarations
- sourceFile.getFunctions().forEach((func) => {
- functions.push({
- name: func.getName() ?? 'anonymous',
- line: func.getStartLineNumber(parameters: func.getParameters().map((p) => ({
- name: p.getName(type: p.getType().getText(),
- }, returnType: func.getReturnType().getText(isAsync: func.isAsync(isExported: func.isExported(),
- });
- });
-  
- sourceFile.getVariableDeclarations().forEach((decl) => {
- const init = decl.getInitializer();
- if (init?.getKind() === SyntaxKind.ArrowFunction) {
- const arrow = init.asKindOrThrow(SyntaxKind.ArrowFunction);
- functions.push({
- name: decl.getName(line: decl.getStartLineNumber(parameters: arrow.getParameters().map((p) => ({
- name: p.getName(type: p.getType().getText(),
- }, returnType: arrow.getReturnType().getText(isAsync: arrow.isAsync(isExported: decl.isExported(),
- });
- }
- });
-
- return functions;
+  // Function declarations
+  sourceFile.getFunctions().forEach((func) => {
+   functions.push({
+    name: func.getName() ?? 'anonymous',
+    line: func.getStartLineNumber(),
+    parameters: func.getParameters().map((p) => ({
+     name: p.getName(),
+     type: p.getType().getText()
+    })),
+    returnType: func.getReturnType().getText(),
+    isAsync: func.isAsync(),
+    isExported: func.isExported()
+   });
+  });  sourceFile.getVariableDeclarations().forEach((decl) => {
+   const init = decl.getInitializer();
+   if (init?.getKind() === SyntaxKind.ArrowFunction) {
+    const arrow = init.asKindOrThrow(SyntaxKind.ArrowFunction);
+    functions.push({
+     name: decl.getName(),
+     line: decl.getStartLineNumber(),
+     parameters: arrow.getParameters().map((p) => ({
+      name: p.getName(),
+      type: p.getType().getText()
+     })),
+     returnType: arrow.getReturnType().getText(),
+     isAsync: arrow.isAsync(),
+     isExported: decl.isExported()
+    });
+   }
+  }); return functions;
  }
 
  /**
  * Extract variable information
  */
  private extractVariables(sourceFile: SourceFile): VariableInfo[] {
- return sourceFile
- .getVariableDeclarations()
- .filter((decl) => {
- const init = decl.getInitializer();
- return !init || init.getKind() !== SyntaxKind.ArrowFunction;
- })
- .map((decl) => ({
- name: decl.getName(line: decl.getStartLineNumber(type: decl.getType().getText(isConst: decl.getVariableStatement()?.getDeclarationKind().toString() === 'const',
- isExported: decl.isExported(),
- }));
- }
-
- /**
+  return sourceFile
+   .getVariableDeclarations()
+   .filter((decl) => {
+    const init = decl.getInitializer();
+    return !init || init.getKind() !== SyntaxKind.ArrowFunction;
+   })
+   .map((decl) => ({
+    name: decl.getName(),
+    line: decl.getStartLineNumber(),
+    type: decl.getType().getText(),
+    isConst: decl.getVariableStatement()?.getDeclarationKind().toString() === 'const',
+    isExported: decl.isExported()
+   }));
+ } /**
  * Extract type information
  */
  private extractTypes(sourceFile: SourceFile): TypeInfo[] {
@@ -199,14 +251,18 @@ export class SvelteCheckAnalyzer {
 
  sourceFile.getInterfaces().forEach((iface) => {
  types.push({
- name: iface.getName(line, iface.getStartLineNumber(kind: 'interface',
+ name: iface.getName(),
+ line: iface.getStartLineNumber(),
+ kind: 'interface',
  isExported: iface.isExported(),
  });
  });
 
  sourceFile.getTypeAliases().forEach((alias) => {
  types.push({
- name: alias.getName(line, alias.getStartLineNumber(kind: 'type',
+ name: alias.getName(),
+ line: alias.getStartLineNumber(),
+ kind: 'type',
  isExported: alias.isExported(),
  });
  });
@@ -214,14 +270,17 @@ export class SvelteCheckAnalyzer {
  sourceFile.getClasses().forEach((cls) => {
  types.push({
  name: cls.getName() ?? 'anonymous',
- line: cls.getStartLineNumber(kind, 'class',
+ line: cls.getStartLineNumber(),
+ kind: 'class',
  isExported: cls.isExported(),
  });
  });
 
  sourceFile.getEnums().forEach((enm) => {
  types.push({
- name: enm.getName(line, enm.getStartLineNumber(kind: 'enum',
+ name: enm.getName(),
+ line: enm.getStartLineNumber(),
+ kind: 'enum',
  isExported: enm.isExported(),
  });
  });
@@ -264,14 +323,14 @@ export class SvelteCheckAnalyzer {
  const countNode = (node: Node) => {
  const kind = node.getKind();
  if (
- kind === SyntaxKind?.IfStatement||
- kind === SyntaxKind?.ConditionalExpression||
- kind === SyntaxKind?.ForStatement||
- kind === SyntaxKind?.ForInStatement||
- kind === SyntaxKind?.ForOfStatement||
- kind === SyntaxKind?.WhileStatement||
- kind === SyntaxKind?.DoStatement||
- kind === SyntaxKind?.CaseClause||
+ kind === SyntaxKind.IfStatement ||
+ kind === SyntaxKind.ConditionalExpression ||
+ kind === SyntaxKind.ForStatement ||
+ kind === SyntaxKind.ForInStatement ||
+ kind === SyntaxKind.ForOfStatement ||
+ kind === SyntaxKind.WhileStatement ||
+ kind === SyntaxKind.DoStatement ||
+ kind === SyntaxKind.CaseClause ||
  kind === SyntaxKind.CatchClause
  ) {
  complexity++;
@@ -279,7 +338,7 @@ export class SvelteCheckAnalyzer {
  const binary = node.asKind(SyntaxKind.BinaryExpression);
  if (binary) {
  const op = binary.getOperatorToken().getKind();
- if (op === SyntaxKind?.AmpersandAmpersandToken|| op === SyntaxKind.BarBarToken) {
+ if (op === SyntaxKind.AmpersandAmpersandToken || op === SyntaxKind.BarBarToken) {
  complexity++;
  }
  }
@@ -294,7 +353,7 @@ export class SvelteCheckAnalyzer {
  /**
  * Analyze Svelte component (extracts script content)
  */
- analyzeSvelte(svelteCode, string, filename = 'Component.svelte'): ASTAnalysisResult {
+ analyzeSvelte(svelteCode: string, filename = 'Component.svelte'): ASTAnalysisResult {
  // Extract script content from Svelte file
  const scriptMatch = svelteCode.match(/<script[^>]*>([\s\S]*?)<\/script>/);
  const scriptContent = scriptMatch ? scriptMatch[1] : '';
@@ -306,7 +365,7 @@ export class SvelteCheckAnalyzer {
  /**
  * Get quick fixes for an error
  */
- getQuickFixes(error, ASTError, _code)[] {
+ getQuickFixes(error: ASTError, _code: string): string[] {
  const fixes: string[] = [];
 
  if (error.code.startsWith('TS2304')) {

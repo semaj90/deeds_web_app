@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, TabsContent, TabsList, TabsRoot, TabsTrigger } from 'bits-ui';
-
-	import * as Dialog from 'bits-ui';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 
 	interface Cluster {
@@ -134,7 +133,7 @@
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white p-8">
-	<div class="max-w-7xl mx-auto">
+	<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
 		<!-- Header -->
 		<div class="mb-8">
 			<h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
@@ -144,7 +143,7 @@
 		</div>
 
 		<!-- Stats Cards -->
-		<div class="grid grid-cols-1 md, grid-cols-4 gap-4 mb-8">
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
 			<div class="bg-gray-800/50 backdrop-blur rounded-lg p-6 border border-purple-500/20">
 				<div class="text-sm text-gray-400 mb-1">Total Errors</div>
 				<div class="text-3xl font-bold text-purple-400">{stats.total_errors.toLocaleString()}</div>
@@ -167,39 +166,39 @@
 		</div>
 
 		<!-- Main Tabs -->
-		<TabsRoot value="search" class="w-full">
-			<TabsList class="flex gap-2 mb-6 border-b border-gray-700 pb-2">
-				<TabsTrigger
+		<Tabs.Root value="search" class="w-full">
+			<Tabs.List class="flex gap-2 border-b border-gray-700 mb-6">
+				<Tabs.Trigger
 					value="search"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
-					🔍 Vector Search
-				</TabsTrigger>
+					🔍 Semantic Search
+				</Tabs.Trigger>
 
-				<TabsTrigger
+				<Tabs.Trigger
 					value="clusters"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					📊 Clusters
-				</TabsTrigger>
+				</Tabs.Trigger>
 
-				<TabsTrigger
+				<Tabs.Trigger
 					value="graph"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					🕸️ Graph Analysis
-				</TabsTrigger>
+				</Tabs.Trigger>
 
-				<TabsTrigger
+				<Tabs.Trigger
 					value="pipeline"
-					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive], text-gray-400 transition-colors"
+					class="px-4 py-2 rounded-t data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:text-gray-400 transition-colors"
 				>
 					⚡ Pipeline
-				</TabsTrigger>
-			</TabsList>
+				</Tabs.Trigger>
+			</Tabs.List>
 
 			<!-- Vector Search Tab -->
-			<TabsContent value="search" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<Tabs.Content value="search" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<h2 class="text-2xl font-bold mb-4">Semantic Vector Search</h2>
 				<p class="text-gray-400 mb-6">
 					Search errors using embeddinggemma:latest (768-dim) with cosine similarity ranking
@@ -210,13 +209,13 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Search for errors (e.g., 'svelte5 runes type error')"
-						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus: outline-none, focus: ring-2, focus:ring-purple-500"
+						class="flex-1 bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
 						onkeydown={(e) => e.key === 'Enter' && vectorSearch()}
 					/>
 					<button
 						onclick={vectorSearch}
 						disabled={loading}
-						class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled, opacity-50 transition-colors"
+						class="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
 					>
 						{loading ? '🔄 Searching...' : '🔍 Search'}
 					</button>
@@ -249,25 +248,25 @@
 						No results found. Try a different query.
 					</div>
 				{/if}
-			</TabsContent>
+			</Tabs.Content>
 
 			<!-- Clusters Tab -->
-			<TabsContent value="clusters" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<Tabs.Content value="clusters" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<div class="flex justify-between items-center mb-6">
 					<h2 class="text-2xl font-bold">Error Clusters</h2>
 					<button
 						onclick={fetchClusters}
 						disabled={loading}
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg disabled, opacity-50"
+						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
 					>
 						🔄 Refresh
 					</button>
 				</div>
 
 				{#if clusters.length > 0}
-					<div class="grid grid-cols-1 md, grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{#each clusters as cluster}
-							<DialogRoot>
+							<Dialog.Root>
 								<Dialog.Trigger class="text-left">
 									<div class="bg-gray-700/50 rounded-lg p-4 border border-gray-600 hover:border-purple-500 transition-colors cursor-pointer">
 										<div class="flex justify-between items-start mb-2">
@@ -289,10 +288,10 @@
 									</div>
 								</Dialog.Trigger>
 
-								<DialogPortal>
-									<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-									<DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-purple-500">
-										<DialogTitle class="text-2xl font-bold mb-4">Cluster {cluster.id}</DialogTitle>
+								<Dialog.Portal>
+									<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+									<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto border border-purple-500">
+										<Dialog.Title class="text-2xl font-bold mb-4">Cluster {cluster.id}</Dialog.Title>
 
 										<div class="mb-4">
 											<div class="text-sm text-gray-400 mb-2">Tags:</div>
@@ -318,12 +317,12 @@
 											</div>
 										</div>
 
-										<DialogClose class="absolute top-4 right-4 text-gray-400 hover:text-white">
+										<Dialog.Close class="absolute top-4 right-4 text-gray-400 hover:text-white">
 											✕
-										</DialogClose>
-									</DialogContent>
-								</DialogPortal>
-							</DialogRoot>
+										</Dialog.Close>
+									</Dialog.Content>
+								</Dialog.Portal>
+							</Dialog.Root>
 						{/each}
 					</div>
 				{:else}
@@ -331,10 +330,10 @@
 						No clusters found. Run the clustering pipeline first.
 					</div>
 				{/if}
-			</TabsContent>
+			</Tabs.Content>
 
 			<!-- Graph Analysis Tab -->
-			<TabsContent value="graph" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+			<Tabs.Content value="graph" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
 				<h2 class="text-2xl font-bold mb-4">Codebase Dependency Graph</h2>
 				<p class="text-gray-400 mb-6">
 					Visualize error propagation through import dependencies
@@ -361,19 +360,19 @@
 						No graph data available. Index codebase first.
 					</div>
 				{/if}
-			</TabsContent>
+			</Tabs.Content>
 
 			<!-- Pipeline Tab -->
-			<TabsContent value="pipeline" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
-				<h2 class="text-2xl font-bold mb-4">Clustering Pipeline</h2>
+			<Tabs.Content value="pipeline" class="bg-gray-800/30 backdrop-blur rounded-lg p-6 border border-gray-700">
+				<h2 class="text-2xl font-bold mb-4">Phase 89 Pipeline</h2>
 
 				<div class="space-y-4">
 					<button
 						onclick={runClustering}
 						disabled={loading}
-						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover: from-purple-700, hover:to-pink-700 rounded-lg font-semibold disabled, opacity-50 transition-colors"
+						class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold disabled:opacity-50 transition-colors"
 					>
-						{loading ? '🔄 Running Pipeline...' : '🚀 Run GPU Clustering'}
+						{loading ? '🚀 Pipeline Running...' : '🔥 Start All-in-One Analysis Pipeline'}
 					</button>
 
 					<div class="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
@@ -389,20 +388,22 @@
 						</ol>
 					</div>
 				</div>
-			</TabsContent>
-		</TabsRoot>
+			</Tabs.Content>
+		</Tabs.Root>
 	</div>
 </div>
 
 <style>
 	:global(body) {
-		@apply bg-gray-900;
+		background-color: #111827; /* gray-900 */
 	}
 
 	.line-clamp-2 {
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical; overflow: hidden;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 </style>
 

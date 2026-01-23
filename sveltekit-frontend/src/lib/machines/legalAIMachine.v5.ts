@@ -100,7 +100,10 @@ export interface LegalAIContext {
     };
     metrics: { errorCount: number; performanceScore: number; uptime: number };
   };
-}| { type: 'AUTH.LOGIN'; credentials: { email: string; password: string } }
+}
+
+export type LegalAIEvent =
+  | { type: 'AUTH.LOGIN'; credentials: { email: string; password: string } }
   | { type: 'AUTH.LOGOUT' }
   | { type: 'AUTH.REGISTER'; userData: RegistrationData }
   | { type: 'CASES.LOAD'; filters?: Partial<LegalAIContext['cases']['filters']> }
@@ -144,7 +147,10 @@ const initialContext: LegalAIContext = {
     },
     metrics: { errorCount: 0, performanceScore: 0, uptime: 0 },
   },
-};{
+};
+
+export const legalAIMachine = createMachine(
+  {
     id: 'legalAI',
     initial: 'initializing',
     context: initialContext,
@@ -294,14 +300,16 @@ const initialContext: LegalAIContext = {
     // XState v5 expects service factories under `services` in the machine options
     services: {
       checkSystemStatus: fromPromise(async () => {
-        try {productionServiceClient.makeRequest('/api/system/cluster-status', { method: 'GET' }),
+        try {
+          const [clusterStatusResponse, serviceHealthResponse] = await Promise.all([
+            productionServiceClient.makeRequest('/api/system/cluster-status', { method: 'GET' }),
             productionServiceClient.makeRequest('/api/system/service-health', { method: 'GET' }),
           ]);
 
           const clusterResp = clusterStatusResponse as ServiceResponse<LooseObject>;
           const serviceResp = serviceHealthResponse as ServiceResponse<LooseObject[]>;
 
-          if (!clusterResp?.success|| !serviceResp.success) {
+          if (!clusterResp?.success || !serviceResp.success) {
             throw new Error('Failed to fetch system status');
           }
 
@@ -309,7 +317,9 @@ const initialContext: LegalAIContext = {
           const serviceHealth = (serviceResp.data as LooseObject[] | undefined) ?? [];
 
           const totalServices = (clusterStatus?.totalServices as number) ?? 0;
-          const healthyServices = (clusterStatus?.healthyServices as number) ?? 0;totalServices > 0 ? Math.round((healthyServices / totalServices) * 100) : 0;
+          const healthyServices = (clusterStatus?.healthyServices as number) ?? 0;
+          const performanceScore =
+            totalServices > 0 ? Math.round((healthyServices / totalServices) * 100) : 0;
 
           return {
             connected: healthyServices > 0,
@@ -372,7 +382,7 @@ const initialContext: LegalAIContext = {
               body: input.credentials,
             })) as ServiceResponse<LooseObject>;
 
-            if (response?.success&& response.data) {
+            if (response?.success && response.data) {
               const data = response.data as LooseObject;
               const userObj = (data.user as LooseObject | undefined) ?? {};
               return {
@@ -380,13 +390,13 @@ const initialContext: LegalAIContext = {
                 email: (data.email as string) || input.credentials.email,
                 role: (data.role as string) ?? 'legal_professional',
                 permissions: ((data.permissions as string[]) ?? [
-                  'read: cases',
-                  'write: cases',
-                  'ai: query',
+                  'read:cases',
+                  'write:cases',
+                  'ai:query',
                 ]) as string[],
               };
             } else {
-              throw new Error(response?.error?? 'Authentication failed');
+              throw new Error(response?.error ?? 'Authentication failed');
             }
           } catch (error: unknown) {
             console.error('Authentication error: ', error);
@@ -434,14 +444,14 @@ const initialContext: LegalAIContext = {
 
       processAIQuery: fromPromise<AIResponse>(
         async (params) => {
-          const { input } = params as { input: { prompt, string } };
+          const { input } = params as { input: { prompt: string } };
           try {
             const response = (await productionServiceClient.makeRequest('/api/ai/query', {
               method: 'POST',
               body: input,
             })) as ServiceResponse<LooseObject>;
 
-            if (response?.success&& response.data) {
+            if (response?.success && response.data) {
               const data = response.data as LooseObject;
               return {
                 response: (data.response as string) || (data.answer as string) ?? '',
@@ -454,7 +464,7 @@ const initialContext: LegalAIContext = {
                 metadata: (data.metadata as Record<string, unknown>) || {},
               };
             } else {
-              throw new Error(response?.error?? 'AI query failed');
+              throw new Error(response?.error ?? 'AI query failed');
             }
           } catch (error: unknown) {
             console.error('AI query error: ', error);

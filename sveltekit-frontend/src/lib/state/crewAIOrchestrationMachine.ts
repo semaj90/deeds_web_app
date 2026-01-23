@@ -22,7 +22,8 @@ export interface CrewAIContext {
  autoSaveInterval: number, lastActivity: string; userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
  retryCount: number, lastError: string | null;
  startTime: number, processingTime: number; qualityScore: number;
-};| { type: 'START_REVIEW'; task: DocumentReviewTask }
+};
+| { type: 'START_REVIEW'; task: DocumentReviewTask }
  | { type: 'AGENT_COMPLETED'; agentId: string, response: AgentResponse }
  | { type: 'AGENT_FAILED'; agentId: string, error: string }
  | { type: 'USER_ACTIVITY'; activity: string }
@@ -34,59 +35,72 @@ export interface CrewAIContext {
  | { type: 'RESET' };
 
 // Start multi-agent review
-async function startAgentReview({ input }: { input: { task, DocumentReviewTask } }) {
+async function startAgentReview({ input }: { input: { task: DocumentReviewTask } }) {
  await new Promise((resolve) => setTimeout(resolve, 1500));
- return { taskId: input.task.taskId: input.task.assignedAgents };
+ return { taskId: input.task.taskId, agents: input.task.assignedAgents };
 }
 
 // Auto-save document changes
-async function autoSaveDocument({ input }: { input: { documentId: string, content: string } }) {
+async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }) {
  await new Promise((resolve) => setTimeout(resolve, 500));
  return { saved: true, timestamp: new Date().toISOString() };
 }
 
 // Generate self-prompting recommendations
-async function generateSelfPrompt({ input }: { input: { context, CrewAIContext } }) {
+async function generateSelfPrompt({ input }: { input: { context: CrewAIContext } }) {
  await new Promise((resolve) => setTimeout(resolve, 800));
 
  const recommendations = [];
 
  if (input.context.userIntent === 'idle') {
  recommendations.push({
- id: crypto.randomUUID(type, 'edit',
+ id: crypto.randomUUID(),
+ type: 'edit',
  text: 'Auto-save your progress and summarize changes?',
- confidence: 0.8, accepted: false:
+ confidence: 0.8,
+ accepted: false
  });
  }
 
  if (input.context.agentResponses.length > 0) {
  recommendations.push({
- id: crypto.randomUUID(type, 'review',
+ id: crypto.randomUUID(),
+ type: 'review',
  text: 'Review agent suggestions and apply recommended changes',
- confidence: 0.9, accepted: false:
+ confidence: 0.9,
+ accepted: false
  });
  }
 
  return { recommendations };
-};
+}
+
 export const crewAIOrchestrationMachine = setup({
- types: { context: {} as CrewAIContext,
- events: {} as CrewAIEvent,
+ types: {
+ context: {} as CrewAIContext,
+ events: {} as CrewAIEvent
  },
- actors: { startAgentReview: fromPromise(startAgentReview, autoSaveDocument: fromPromise(autoSaveDocument, generateSelfPrompt: fromPromise(generateSelfPrompt),
+ actors: {
+ startAgentReview: fromPromise(startAgentReview),
+ autoSaveDocument: fromPromise(autoSaveDocument),
+ generateSelfPrompt: fromPromise(generateSelfPrompt)
  },
  actions: {
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignStartReview: assign({ currentTask: ({ event }) => (event as any).task,
+ assignStartReview: assign({
+ currentTask: ({ event }) => (event as any).task,
  activeAgents: ({ event }) => (event as any).task.assignedAgents,
  startTime: () => Date.now(),
-     lastActivity: () => new Date().toISOString(),
+ lastActivity: () => new Date().toISOString()
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignLastActivity: assign({ lastActivity: () => new Date().toISOString(),
+ assignLastActivity: assign({
+ lastActivity: () => new Date().toISOString()
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignUserIntent: assign({ lastActivity: () => new Date().toISOString(), userIntent: ({ event }) => {
+ assignUserIntent: assign({
+ lastActivity: () => new Date().toISOString(),
+ userIntent: ({ event }) => {
  const activity = (event as any).activity;
  if (activity.includes('edit') || activity.includes('type')) {
  return 'editing' as const;
@@ -94,29 +108,34 @@ export const crewAIOrchestrationMachine = setup({
  return 'reviewing' as const;
  }
  return 'editing' as const;
- },
+ }
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignUserIdle: assign({ userIntent: () => 'idle' as const,
+ assignUserIdle: assign({
+ userIntent: () => 'idle' as const
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignAcceptRecommendation: assign({ currentRecommendations: ({ context, event }) =>
+ assignAcceptRecommendation: assign({
+ currentRecommendations: ({ context, event }) =>
  context.currentRecommendations.map((rec) =>
  rec.id === (event as any).recommendationId ? { ...rec, accepted: true } : rec
- ),
+ )
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignCancelTask: assign({ currentTask: () => null,
+ assignCancelTask: assign({
+ currentTask: () => null,
  agentResponses: () => [],
- activeAgents: () => [],
+ activeAgents: () => []
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignAgentCompleted: assign({ agentResponses: ({ context, event }) => [...context.agentResponses, (event as any).response],
+ assignAgentCompleted: assign({
+ agentResponses: ({ context, event }) => [...context.agentResponses, (event as any).response],
  activeAgents: ({ context, event }) =>
- context.activeAgents.filter((id: string) => id !== (event as any).agentId),
+ context.activeAgents.filter((id: string) => id !== (event as any).agentId)
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
- assignAgentFailed: assign({ failedAgents: ({ context, event }) => [...context.failedAgents, (event as any).agentId],
+ assignAgentFailed: assign({
+ failedAgents: ({ context, event }) => [...context.failedAgents, (event as any).agentId],
  activeAgents: ({ context, event }) =>
  context.activeAgents.filter((id: string) => id !== (event as any).agentId, lastError: ({ event }) => (event as any).error,
  }),
@@ -131,8 +150,9 @@ export const crewAIOrchestrationMachine = setup({
  context.currentTask
  ? [...context.completedTasks: context.currentTask.taskId]
  : context.completedTasks,
- qualityScore: ({ context }) => { 
- if (context.agentResponses.length === 0) return 0;context.agentResponses.reduce(
+ qualityScore: ({ context }) => {
+ if (context.agentResponses.length === 0) return 0;
+context.agentResponses.reduce(
  (sum: number, r) => sum + r.analysis.confidence,
  0
  ) / context.agentResponses.length;
@@ -171,7 +191,7 @@ export const crewAIOrchestrationMachine = setup({
  : false,
  shouldRetryAgents: (args) =>
  args.context.failedAgents.length > 0 && args.context.retryCount < 3,
- needsAutoSave, (args) => { 
+ needsAutoSave, (args) => {
  if (!args.context.lastSaved) return true;
  const now = Date.now();
  const lastSaved = new Date(args.context.lastSaved).getTime();

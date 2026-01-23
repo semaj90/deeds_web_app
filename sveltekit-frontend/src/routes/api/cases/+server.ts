@@ -22,12 +22,9 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const search = url.searchParams.get('search');
 
 	try {
-		// Build query with filters
-		let query = db.select().from(cases);
-
 		// Apply filters
 		const filters = [];
-		filters.push(eq(cases.assignedAttorney: locals.user.id));
+		filters.push(eq(cases.userId, locals.user.id));
 
 		if (status) {
 			// Map 'active' to 'open' to handle legacy frontend requests
@@ -35,10 +32,16 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			filters.push(eq(cases.status, statusValue as typeof cases.status.enumValues[number]));
 		}
 		if (priority) {
-		filters.push(eq(cases.priority, priority as typeof cases.priority.enumValues[number]));
-	}		if (search) {
+			filters.push(eq(cases.priority, priority as typeof cases.priority.enumValues[number]));
+		}
+		if (search) {
 			filters.push(like(cases.title, `%${search}%`));
-		}.where(and(...filters))
+		}
+
+		const userCases = await db
+			.select()
+			.from(cases)
+			.where(and(...filters))
 			.orderBy(desc(cases.updatedAt))
 			.limit(limit)
 			.offset(offset);
@@ -71,23 +74,26 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const body = await request.json();
 
 		// Validate required fields
-		if (!body?.title|| !body.description) {
+		if (!body?.title || !body.description) {
 			throw error(400, 'Missing required fields: title, description');
-		}.insert(cases)
+		}
+
+		const newCase = await db
+			.insert(cases)
 			.values({
 				title: body.title,
 				description: body.description,
-				assignedAttorney: locals.user.id,
-				status: body?.status?? 'pending',
-				priority: body?.priority?? 'medium',
-				createdAt: new Date(),
-				updatedAt: new Date()
-			} as any)
+				userId: locals.user.id,
+				status: (body?.status ?? 'open') as any,
+				priority: (body?.priority ?? 'medium') as any,
+				updatedAt: new Date().toISOString()
+			})
 			.returning();
 
 		return json(
 			{
-				success: true, data: newCase[0],
+				success: true,
+				data: newCase[0],
 				message: 'Case created successfully'
 			},
 			{ status: 201 }
@@ -122,7 +128,8 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		};
 
 		if (body.status) updates.status = body.status;
-		if (body.priority) updates.priority = body.priority;.update(cases)
+		if (body.priority) updates.priority = body.priority;
+.update(cases)
 			.set(updates)
 			.where(
 				and(
@@ -162,7 +169,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Missing required field: ids (array)');
 		}
 
-		// Soft delete: set status to 'archived'.update(cases)
+		// Soft delete: set status to 'archived'
+.update(cases)
 			.set({
 				status: 'archived',
 				updatedAt: new Date().toISOString()

@@ -2,7 +2,7 @@
  * XState State Machine for Evidence Processing Workflow
  * Handles the complete lifecycle of evidence from upload to AI analysis
  */
-import { assign, fromPromise, setup } from 'xstate';
+import { assign, createMachine, fromPromise } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
@@ -91,13 +91,13 @@ async function callProcessingAPI(
 }
 
 // Main state machine
-export const evidenceProcessingMachine = setup({
+export const evidenceProcessingMachine = createMachine({
 	types: {
 		context: {} as EvidenceProcessingContext,
 		events: {} as EvidenceProcessingEvent
 	},
 	actors: {
-		documentProcessing: fromPromise(
+		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
@@ -124,7 +124,7 @@ export const evidenceProcessingMachine = setup({
 				};
 			}
 		),
-		embeddingGeneration: fromPromise(
+		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
@@ -143,7 +143,14 @@ export const evidenceProcessingMachine = setup({
 				};
 			}
 		),
-		aiAnalysis: fromPromise(
+		aiAnalysis: fromPromise<{
+			summary: string;
+			entities: unknown[];
+			sentiment: string;
+			classification: string;
+			riskAssessment?: string;
+			recommendations?: string[];
+		}>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
@@ -163,7 +170,7 @@ export const evidenceProcessingMachine = setup({
 				};
 			}
 		),
-		cacheResults: fromPromise(
+		cacheResults: fromPromise<any>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
@@ -196,8 +203,7 @@ export const evidenceProcessingMachine = setup({
 	},
 	guards: {
 		canRetry: ({ context }) => context.retryCount < context.maxRetries
-	}
-}).createMachine({
+	},
 	id: 'evidenceProcessing',
 	initial: 'idle',
 	context: {

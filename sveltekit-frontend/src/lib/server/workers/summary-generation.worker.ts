@@ -23,20 +23,20 @@ const RETRY_DELAYS = [1000, 2000, 4000, 8000]; // Exponential backoff
 /**
  * Log worker activity
  */
-function log(message, string, level: 'info' | 'error' | 'warn' = 'info'): void {
- const timestamp = new Date().toISOString();
- const logDir = path.join(LOGS_DIR, new Date().toISOString().split('T')[0]);
+function log(message: string, level: 'info' | 'error' | 'warn' = 'info'): void {
+  const timestamp = new Date().toISOString();
+  const logDir = path.join(LOGS_DIR, new Date().toISOString().split('T')[0]);
 
- // Ensure log directory exists
- if (!fs.existsSync(logDir)) {
- fs.mkdirSync(logDir, { recursive, true });
- }
+  // Ensure log directory exists
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
 
- const logFile = path.join(logDir, 'summary-generation.log');
- const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}\n`;
+  const logFile = path.join(logDir, 'summary-generation.log');
+  const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}\n`;
 
- fs.appendFileSync(logFile, logMessage);
- console.log(logMessage);
+  fs.appendFileSync(logFile, logMessage);
+  console.log(logMessage);
 }
 
 /**
@@ -47,45 +47,48 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  const caseId = payload.caseId;
  const userId = payload.userId;
 
- try {
- log(`Starting summary generation for case ${caseId}`, 'info');
+  try {
+    log(`Starting summary generation for case ${caseId}`, 'info');
 
- // Get case charges.select()
- .from(caseCharges)
- .where(eq(caseCharges.caseId, caseId));
+    // Get case charges
+    const charges = await db
+      .select()
+      .from(caseCharges)
+      .where(eq(caseCharges.caseId, caseId));
 
- if (charges.length === 0) {
- throw new Error(`No charges found for case ${caseId}`);
- }
+    if (charges.length === 0) {
+      throw new Error(`No charges found for case ${caseId}`);
+    }
 
- const chargeList = charges.map((c) => c.statuteCode);
+    const chargeList = charges.map((c) => c.statuteCode).filter((code): code is string => !!code);
 
- // Update job progress
- await jobQueueService.updateJobStatus(jobId, 'processing', 20);
+    // Update job progress
+    await jobQueueService.updateJobStatus(jobId, 'processing', 20);
 
- // Retrieve statutes and case law in parallel with error handling
- log(`Retrieving statutes and case law for charges: ${chargeList.join(', ')}`, 'info');errorHandlerService.executeWithRetry(
- () => ragService.retrieveStatutes(chargeList),
- 'Retrieve statutes'
- ),
- errorHandlerService.executeWithRetry(
- () => ragService.retrieveCaseLaw(chargeList),
- 'Retrieve case law'
- )]);
+    // Retrieve statutes and case law in parallel with error handling
+    log(`Retrieving statutes and case law for charges: ${chargeList.join(', ')}`, 'info');
 
- await jobQueueService.updateJobStatus(jobId, 'processing', 40);
+    const [statutes, caseLaw] = await Promise.all([
+      errorHandlerService.executeWithRetry(
+        () => ragService.retrieveStatutes(chargeList),
+        'Retrieve statutes'
+      ),
+      errorHandlerService.executeWithRetry(
+        () => ragService.retrieveCaseLaw(chargeList),
+        'Retrieve case law'
+      )
+    // Generate summary using LLM
+    log(`Generating summary with LLM`, 'info');
 
- // Generate summary using LLM
- log(`Generating summary with LLM`, 'info');
+    const summaryContext = {
+      caseId: caseId,
+      charges: charges,
+      evidence: 'Evidence data would be retrieved here', // TODO: Implement evidence retrieval
+      statutes,
+      caseLaw,
+    };
 
- const summaryContext = {
- caseId: charges,
- evidence: 'Evidence data would be retrieved here',
- statutes,
- caseLaw,
- };
-
- const generatedSummary = await llmService.generateSummary(summaryContext);
+    const generatedSummary = await llmService.generateSummary(summaryContext); const generatedSummary = await llmService.generateSummary(summaryContext);
 
  await jobQueueService.updateJobStatus(jobId, 'processing', 60);
 
@@ -100,7 +103,8 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
 
  const citations = await llmService.extractCitations(generatedSummary.overview);
 
- // Check citations for verificationcitations.map(async (citation) => ({
+ // Check citations for verification
+citations.map(async (citation) => ({
  ...citation, verification; await verificationService.checkSourceVerification(citation?.url?? ''),
  }))
  );
@@ -111,7 +115,8 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  const holding = await llmService.extractHolding(generatedSummary.overview);
 
  // Store summary in database
- log(`Storing summary in database`, 'info');caseId: generatedSummary.overview,
+ log(`Storing summary in database`, 'info');
+caseId: generatedSummary.overview,
  citationsWithVerification,
  holding,
  userId

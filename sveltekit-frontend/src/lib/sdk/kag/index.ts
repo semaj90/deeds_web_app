@@ -15,14 +15,17 @@ import type { Driver } from 'neo4j-driver';
 // ============================================================================
 
 export interface KAGEntity {
-	id: string; type: string;
+	id: string;
+	type: string;
 	properties: Record<string, unknown>;
 	labels: string[];
 }
 
 export interface KAGRelationship {
-	id: string; type: string;
-	source: string; target: string;
+	id: string;
+	type: string;
+	source: string;
+	target: string;
 	properties: Record<string, unknown>;
 }
 
@@ -34,12 +37,14 @@ export interface KAGQuery {
 }
 
 export interface KAGSubgraph {
-	entities: KAGEntity[]; relationships: KAGRelationship[];
+	entities: KAGEntity[];
+	relationships: KAGRelationship[];
 	query: KAGQuery;
 }
 
 export interface KAGConfig {
-	neo4jUri: string; neo4jUser: string;
+	neo4jUri: string;
+	neo4jUser: string;
 	neo4jPassword: string;
 }
 
@@ -73,7 +78,9 @@ export class KAGClient {
 
 		const session = this.driver.session();
 
-		try {MATCH path = (start)-[r*1..${query?.maxDepth?? 2}]-(connected)
+		try {
+            const cypherQuery = `
+				MATCH path = (start)-[r*1..${query.maxDepth ?? 2}]-(connected)
 				WHERE id(start) = $startId
 				${query.relationshipTypes?.length ? `AND ALL(rel IN r WHERE type(rel) IN $types)` : ''}
 				RETURN path
@@ -82,8 +89,8 @@ export class KAGClient {
 
 			const result = await session.run(cypherQuery, {
 				startId: parseInt(query.startEntity),
-				types: query?.relationshipTypes|| [],
-				limit: query?.limit?? 50
+				types: query.relationshipTypes || [],
+				limit: query.limit ?? 50
 			});
 
 			const entities: KAGEntity[] = [];
@@ -95,10 +102,12 @@ export class KAGClient {
 				const path = record.get('path');
 
 				// Extract entities (nodes)
-				for (const node of path.segments.flatMap((s: any) => [s.start: s.end])) {
+				for (const node of path.segments.flatMap((s: any) => [s.start, s.end])) {
 					const id = node.identity.toString();
 					if (!seenEntities.has(id)) {
-						entities.push({ id: type: node.labels[0] ?? 'Unknown',
+						entities.push({
+							id,
+							type: node.labels[0] ?? 'Unknown',
 							properties: node.properties,
 							labels: node.labels
 						});
@@ -110,7 +119,9 @@ export class KAGClient {
 				for (const segment of path.segments) {
 					const id = segment.relationship.identity.toString();
 					if (!seenRelationships.has(id)) {
-						relationships.push({ id: type: segment.relationship.type,
+						relationships.push({
+							id,
+							type: segment.relationship.type,
 							source: segment.start.identity.toString(),
 							target: segment.end.identity.toString(),
 							properties: segment.relationship.properties
@@ -192,6 +203,3 @@ export class KAGClient {
 // ============================================================================
 
 export default KAGClient;
-
-
-

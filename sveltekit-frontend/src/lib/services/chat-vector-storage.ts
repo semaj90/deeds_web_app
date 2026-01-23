@@ -44,7 +44,7 @@ class ChatVectorStorage {
         return message.id;
     }
 
-    async predictUserIntent(_userId, string, string: Promise<IntentPrediction> {
+    async predictUserIntent(_userId: string, _currentInput: string, _sessionId: string): Promise<IntentPrediction> {
         return {
             predictedIntent: 'general_inquiry',
             confidence: 0.3,
@@ -52,10 +52,10 @@ class ChatVectorStorage {
             didYouMean: [],
             contextualRecommendations: { similarPastQueries: [], relatedTopics: [], nextSteps: [] },
             temporalInsights: { commonAtThisTime: [], seasonalTrends: [], userPatterns: [] }
-        },
+        };
     }
 
-    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: { start: Date, end: Date }, intentFilter?: string[]; minSimilarity?: number; maxResults?: number }): Promise<SemanticSearchResult[]> {
+    async searchChatHistory(_userId: string, _query: string, _options?: { timeRange?: { start: Date, end: Date }, intentFilter?: string[], minSimilarity?: number, maxResults?: number }): Promise<SemanticSearchResult[]> {
         return [];
     }
 
@@ -100,13 +100,12 @@ export async function storeChatWithVector(
     return await chatVectorStorage.storeChatMessage(message);
 }
 
-export async function getPredictiveAssistance(userId: string, string: Promise<IntentPrediction> {
-   ): void {
+export async function getPredictiveAssistance(userId: string, currentInput: string, sessionId: string): Promise<IntentPrediction> {
   return await chatVectorStorage.predictUserIntent(userId, currentInput, sessionId);
 }
 
 export async function searchUserChatHistory(userId: string, searchQuery: string, maxResults: number = 5): Promise<SemanticSearchResult[]> {
-    return await chatVectorStorage.searchChatHistory(userId, searchQuery, { maxResults: minSimilarity: 0.6 });
+    return await chatVectorStorage.searchChatHistory(userId, searchQuery, { maxResults, minSimilarity: 0.6 });
 }
 
 

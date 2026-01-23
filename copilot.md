@@ -28,6 +28,87 @@ Safe, automated tool to discover, analyze, and clean up thousands of backup file
 - Task 1: Project setup + dependencies
 - Task 2: BackupScanner with pattern matching + property tests
 - Task 3: ComparisonEngine with hash/diff analysis + property tests
+
+---
+
+## ✅ January 22, 2026 – XState v5 Migration Progress
+
+### Database Schema + XState Migration Complete (389 errors fixed)
+
+**Overall Progress**: 19,666 → 15,785 errors (3,881 fixed, 19.7% reduction)
+
+### Key Achievements
+
+#### 1. XState v5 Import Fixes (122 errors)
+- **Problem**: Using `import type` for runtime functions
+- **Solution**: Changed to value imports
+  ```typescript
+  import { assign, createMachine, fromPromise } from 'xstate';
+  ```
+- **Files**: evidence-processing-machine.ts, llmStreamActor.ts, crewAIOrchestrationMachine.ts
+
+#### 2. XState Setup API Corrections (48 errors)
+- **Problem**: Incorrect object syntax in `setup()` API
+- **Solution**:
+  ```typescript
+  export const machine = setup({
+    types: { context: {} as Context, events: {} as Events },
+    actors: {
+      myActor: fromPromise(myFn),
+      otherActor: fromPromise(otherFn)
+    },
+    actions: {
+      myAction: assign({ field: ({ event }) => event.value })
+    }
+  }).createMachine({ /* ... */ });
+  ```
+
+#### 3. Svelte 5 Integration
+- **Created**: `lib/utils/xstate-svelte5.ts`
+- **Provides**: `useMachine` hook with runes support
+- **Usage**:
+  ```typescript
+  const { snapshot, send } = useMachine(machine);
+  const isActive = $derived(snapshot.matches('active'));
+  ```
+
+#### 4. Database Schema Fixes (219 errors)
+
+**schema-phase90-hardened.ts (111 errors)**:
+- Fixed missing `export const tableName = pgTable(` declarations
+- Corrected Drizzle index syntax (`:` → `,` in `index().on()` calls)
+- Tables: documentChunks, legalDocuments, cases, evidence, phase72ErrorVector, phase72Error
+
+**schema-actual.ts (108 errors)**:
+- Complete rewrite of malformed schema file
+- Fixed broken imports (type → value)
+- Corrected table definitions: users, cases, evidence, documents
+- Pattern:
+  ```typescript
+  export const tableName = pgTable('table_name',
+    {
+      id: uuid('id').primaryKey(),
+      field: text('field').notNull()
+    },
+    (table) => ({
+      myIndex: index('idx_name').on(table.field1, table.field2) // Comma, not colon!
+    })
+  );
+  ```
+
+### Files Fixed
+- ✅ `state/evidence-processing-machine.ts`
+- ✅ `state/crewAIOrchestrationMachine.ts`
+- ✅ `client/actors/llmStreamActor.ts`
+- ✅ `utils/xstate-svelte5.ts` (new)
+- ✅ `server/db/schema-phase90-hardened.ts`
+- ✅ `server/db/schema-actual.ts`
+
+### Next Targets
+- svelte-check-analyzer.ts (162 errors)
+- citation-store.ts (160 errors)
+- evidence-processing-machine.ts (151 errors)
+- MultiLayerCacheSystem.ts (109 errors) - requires full rewrite
 - Task 4: Checkpoint - verify scanner/comparison
 - Task 5: ManifestGenerator with safety analysis + property tests
 - Task 6: CleanupExecutor with dry-run/execute modes + property tests

@@ -1,7 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit';
 
 export interface AuthenticatedUser {
-	id: string; email: string;
+	id: string;
+	email: string;
 	firstName?: string;
 	lastName?: string;
 	role?: string;
@@ -13,6 +14,11 @@ export interface AuthenticatedUser {
  */
 export async function requireAuthentication(event: RequestEvent): Promise<AuthenticatedUser | null> {
 	try {
+        // Authenticate via locals if popuplated
+        if (event.locals?.user) {
+            return event.locals.user as AuthenticatedUser;
+        }
+
 		// Development mode: Always authenticate with a default dev user
 		const isDevelopment = process.env.DEV_MODE === 'true';
 		if (isDevelopment) {
@@ -58,7 +64,7 @@ export function checkOwnership(
 		return true;
 	}
 
-	if (user?.role&& allowedRoles.includes(user.role)) {
+	if (user?.role && allowedRoles.includes(user.role)) {
 		return true;
 	}
 
@@ -69,14 +75,14 @@ export function checkOwnership(
  * Rate limiting for storage operations
  */
 export class StorageRateLimit {
-	private static requests = new Map<string, { count: number; resetTime, number }>();
+	private static requests = new Map<string, { count: number; resetTime: number }>();
 
 	static check(userId: string, maxRequests = 100, windowMs = 60000): boolean {
 		const now = Date.now();
 		const userRequests = this.requests.get(userId);
 
 		if (!userRequests || now > userRequests.resetTime) {
-			this.requests.set(userId, { count, 1, resetTime, now + windowMs });
+			this.requests.set(userId, { count: 1, resetTime: now + windowMs });
 			return true;
 		}
 
@@ -88,6 +94,3 @@ export class StorageRateLimit {
 		return true;
 	}
 }
-
-
-

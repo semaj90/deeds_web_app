@@ -374,10 +374,10 @@
 		{:else}
 			<canvas
 				bind:this={canvas}
-				on:mousedown={handleMouseDown}
-				on:mousemove={handleMouseMove}
-				on:mouseup={handleMouseUp}
-				on:wheel={handleWheel}
+				onmousedown={handleMouseDown}
+				onmousemove={handleMouseMove}
+				onmouseup={handleMouseUp}
+				onwheel={handleWheel}
 			></canvas>
 		{/if}
 	</div>
@@ -426,7 +426,7 @@
 				</div>
 			{/if}
 
-			<button class="fix-button" on:click={() => alert('Fix with AI: ' + $selectedNode?.name)}>
+			<button class="fix-button" onclick={() => alert('Fix with AI: ' + $selectedNode?.name)}>
 				🤖 Fix with AI
 			</button>
 		</div>

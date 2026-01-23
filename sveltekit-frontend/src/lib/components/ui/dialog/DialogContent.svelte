@@ -14,11 +14,11 @@
 		forceMount = false,
 		onEscapeKeydown,
 		onInteractOutside,
-	trapFocus = true,
-	preventScroll = true,
-}: Props = $props();
+		trapFocus = true,
+		preventScroll = true,
+	}: Props = $props();
 
-const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
 
 let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
@@ -70,7 +70,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		-translate-x-1/2 -translate-y-1/2
 		gap-4 border border-slate-700 bg-slate-900
 		p-6 shadow-lg duration-200
-		sm: rounded-lg, md:w-full
+		sm:rounded-lg md:w-full
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
@@ -85,7 +85,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
-		data-state={dialogContext?.open ? 'open' , 'closed'}
+		data-state={dialogContext?.open ? 'open' : 'closed'}
 		data-dialog-content=""
 	>
 		{#if children}

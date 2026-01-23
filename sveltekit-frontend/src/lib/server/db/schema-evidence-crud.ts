@@ -114,11 +114,11 @@ export const ragIndexMetadata = pgTable('rag_index_metadata', {
 // === AUDIT LOG TABLE ===
 // Task 5: Immutable audit trail for compliance
 // Requirements: 6.1-6.5
-'audit_log',
+export const auditLog = pgTable('audit_log',
  {
  			id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 			userId: uuid('user_id'),
-			resourceType: auditResourceTypeEnum('resource_type').notNull(),
+			resourceType: auditTableEnum('resource_type').notNull(),
 			resourceId: uuid('resource_id').notNull(),
 			operation: auditOperationEnum('operation').notNull(),
 			oldValues: jsonb('old_values'),

@@ -106,7 +106,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			.select({
 				id: cases.id,
 				title: cases.title,
-				case_number: cases.case_number,
+				case_number: cases.caseNumber,
 				status: cases.status
 			})
 			.from(cases)

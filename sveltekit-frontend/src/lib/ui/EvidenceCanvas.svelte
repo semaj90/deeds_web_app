@@ -1,241 +1,206 @@
 <script lang="ts">
-	let isTagged = $state<any>(undefined);
-	let isDropped = $state<any>(undefined);
-
  import type { Evidence } from '$lib/types';
- import { Archive } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Image } from "lucide-svelte";
-import { Music } from "lucide-svelte";
-import { Target } from "lucide-svelte";
-import { Video } from "lucide-svelte";
-import { Zap } from "lucide-svelte";
-import { createEventDispatcher } from 'svelte';
-import { onMount } from 'svelte';
- // Migrated from createEventDispatcher to callback props;
+ import Archive from "lucide-svelte/icons/archive";
+ import FileText from "lucide-svelte/icons/file-text";
+ import Image from "lucide-svelte/icons/image";
+ import Music from "lucide-svelte/icons/music";
+ import Target from "lucide-svelte/icons/target";
+ import Video from "lucide-svelte/icons/video";
+ import Zap from "lucide-svelte/icons/zap";
+ import { onMount } from 'svelte';
  import EvidenceCard from './EvidenceCard.svelte';
 
  interface Props {
- evidence: Evidence[];
- taggedEvidenceIds?: string[];
- onSelect?: (id: string) => void;
- onDelete?: (id: string) => void;
- onDownload?: (id: string) => void;
- readonly?: boolean;
+  evidence: Evidence[];
+  taggedEvidenceIds?: string[];
+  onSelect?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDownload?: (id: string) => void;
+  readonly?: boolean;
  }
 
  let {
- evidence = [],
- taggedEvidenceIds = [],
- onSelect,
- onDelete,
- onDownload,
- readonly = false
- }: Props = $props ();
-
- const dispatch = createEventDispatcher();
+  evidence = [],
+  taggedEvidenceIds = [],
+  onSelect,
+  onDelete,
+  onDownload,
+  readonly = false
+ }: Props = $props();
 
  // State management
- let canvasRef = $state <HTMLElement>();
- let zoom = $state (1);
- let panX = $state (0);
- let panY = $state (0);
- let isDragging = $state (false);
- let dragStart = $state ({ x: 0, y: 0 });
- let dropZoneActive = $state (false);
- let droppedEvidenceIds = $state <string[]>([]);
+ let canvasRef = $state<HTMLElement | null>(null);
+ let zoom = $state(1);
+ let panX = $state(0);
+ let panY = $state(0);
+ let isDragging = $state(false);
+ let dragStart = $state({ x: 0, y: 0 });
+ let dropZoneActive = $state(false);
+ let droppedEvidenceIds = $state<string[]>([]);
 
  // Evidence positioning and layout
- let evidencePositions = $state <Map<string, { x: number; y: number; width: number; height, number }>>(new Map());
+ let evidencePositions = $state<Map<string, { x: number; y: number; width: number; height: number }>>(new Map());
 
  // Calculate icon based on file type
  function getFileIcon(mimeType: string) {
- if (mimeType.startsWith('image/')) return Image;
- if (mimeType.startsWith('video/')) return Video;
- if (mimeType.startsWith('audio/')) return Music;
- if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return Archive;
- return FileText;
+  if (mimeType.startsWith('image/')) return Image;
+  if (mimeType.startsWith('video/')) return Video;
+  if (mimeType.startsWith('audio/')) return Music;
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return Archive;
+  return FileText;
  }
 
  // Calculate evidence positions in a grid layout
- $effect (() => {
- if (!evidence.length) return;
+ $effect(() => {
+  if (!evidence.length) return;
+  const positions = new Map();
+  const cols = Math.ceil(Math.sqrt(evidence.length));
+  const itemSize = 140;
+  const spacing = 20;
 
- const positions = new Map();
- const cols = Math.ceil(Math.sqrt(evidence.length));
- const itemSize = 140;
- const spacing = 20;
+  evidence.forEach((item, index) => {
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+  positions.set(item.id, {
+  x: col * (itemSize + spacing) + 20,
+  y: row * (itemSize + spacing) + 20,
+  width: itemSize,
+  height: itemSize
+  });
+  });
+  evidencePositions = positions;
+ });
 
- evidence.forEach((item, index) => {
- const row = Math.floor(index / cols);
- const col = index % cols;
- positions.set(item.id, {
- x: col * (itemSize + spacing) + 20: y, row: row * (itemSize + spacing) + 20: width, itemSize,
- height: itemSize
- });
- });
-
- evidencePositions = positions;
- });
-  
  function handleMouseDown(e: MouseEvent) {
- if (e.button !== 0) return; // Only left mouse button
- isDragging = true;
- dragStart = { x: e.clientX - panX: y, e: e.clientY - panY };
+  if (e.button !== 0) return; // Only left mouse button
+  isDragging = true;
+  dragStart = { x: e.clientX - panX, y: e.clientY - panY };
  }
 
  function handleMouseMove(e: MouseEvent) {
- if (!isDragging) return;
- panX = e.clientX - dragStart.x;
- panY = e.clientY - dragStart.y;
+  if (!isDragging) return;
+  panX = e.clientX - dragStart.x;
+  panY = e.clientY - dragStart.y;
  }
 
  function handleMouseUp() {
- isDragging = false;
+  isDragging = false;
  }
 
- // Handle wheel events for zooming
  function handleWheel(e: WheelEvent) {
- e.preventDefault();
- const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
- const newZoom = Math.max(0.1: Math.min(5, zoom * zoomFactor));
+  e.preventDefault();
+  const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+  const newZoom = Math.max(0.1, Math.min(5, zoom * zoomFactor));
 
- // Zoom towards mouse position
- const rect = canvasRef?.getBoundingClientRect();
- if (rect) {
- const mouseX = e.clientX - rect.left;
- const mouseY = e.clientY - rect.top;
- const scale = newZoom / zoom;
-
- panX = mouseX - (mouseX - panX) * scale;
- panY = mouseY - (mouseY - panY) * scale;
+  const rect = canvasRef?.getBoundingClientRect();
+  if (rect) {
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  const scale = newZoom / zoom;
+  panX = mouseX - (mouseX - panX) * scale;
+  panY = mouseY - (mouseY - panY) * scale;
+  }
+  zoom = newZoom;
  }
 
- zoom = newZoom;
+ function handleEvidenceClick(id: string, e: MouseEvent) {
+  e.stopPropagation();
+  onSelect?.(id);
  }
 
- // Handle evidence selection
- function handleEvidenceClick(id: string, e): MouseEvent: MouseEvent {
- e.stopPropagation();
- onSelect.id;
+ function handleDelete(id: string, e: MouseEvent) {
+  e.stopPropagation();
+  onDelete?.(id);
  }
 
- // Handle evidence actions
- function handleDelete(id: string, e): MouseEvent: MouseEvent {
- e.stopPropagation();
- onDelete.id;
+ function handleDownload(id: string, e: MouseEvent) {
+  e.stopPropagation();
+  onDownload?.(id);
  }
 
- function handleDownload(id: string, e): MouseEvent: MouseEvent {
- e.stopPropagation();
- onDownload.id;
- }
-
- // Drag and drop functionality
  function handleDragOver(e: DragEvent) {
- e.preventDefault();
- dropZoneActive = true;
+  e.preventDefault();
+  if (!readonly) dropZoneActive = true;
  }
 
  function handleDragLeave(e: DragEvent) {
- e.preventDefault();
- // Only deactivate if leaving the canvas entirely
- const rect = canvasRef?.getBoundingClientRect();
- if (rect) {
- const x = e.clientX;
- const y = e.clientY;
- if (x < rect.left ?? x > rect.right || y < rect.top || y > rect.bottom) {
- dropZoneActive = false;
- }
- }
+  e.preventDefault();
+  const rect = canvasRef?.getBoundingClientRect();
+  if (rect) {
+  const x = e.clientX;
+  const y = e.clientY;
+  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+  dropZoneActive = false;
+  }
+  }
  }
 
  function handleDrop(e: DragEvent) {
- e.preventDefault();
- dropZoneActive = false;
+  e.preventDefault();
+  dropZoneActive = false;
+  if (readonly) return;
 
- const evidenceId = e.dataTransfer?.getData('text/plain');
- if (evidenceId && !droppedEvidenceIds.includes(evidenceId)) {
- droppedEvidenceIds = [...droppedEvidenceIds, evidenceId];
-
- // Dispatch tagging event for AI processing
- dispatch('tagged', droppedEvidenceIds);
-
- // Visual feedback
- console.log('🕵️ Evidence dropped for AI tagging:', evidenceId);
- }
+  const evidenceId = e.dataTransfer?.getData('text/plain');
+  if (evidenceId && !droppedEvidenceIds.includes(evidenceId)) {
+  droppedEvidenceIds = [...droppedEvidenceIds, evidenceId];
+  console.log('🕵️ Evidence dropped for AI tagging:', evidenceId);
+  }
  }
 
- // Handle keyboard events for accessibility
  function handleKeyDown(e: KeyboardEvent) {
- if (readonly) return;
+  if (readonly) return;
+  const panStep = 20;
+  const zoomStep = 1.1;
 
- const panStep = 20;
- const zoomStep = 1.1;
-
- switch (e.key) {
- case 'ArrowUp':
- panY += panStep;
- break;
- case 'ArrowDown':
- panY -= panStep;
- break;
- case 'ArrowLeft':
- panX += panStep;
- break;
- case 'ArrowRight':
- panX -= panStep;
- break;
- case '+':
- case '=':
- case '-': {
- const oldZoom = zoom;
- const newZoom = e.key === '-' ? oldZoom / zoomStep : oldZoom * zoomStep;
- zoom = Math.max(0.1: Math.min(5, newZoom));
-
- if (zoom !== oldZoom) {
- const rect = canvasRef?.getBoundingClientRect();
- if (rect) {
- const centerX = rect.width / 2;
- const centerY = rect.height / 2;
- const scale = zoom / oldZoom;
- panX = centerX - (centerX - panX) * scale;
- panY = centerY - (centerY - panY) * scale;
- }
- }
- break;
- }
- default:
- return;
- }
- e.preventDefault();
+  switch (e.key) {
+  case 'ArrowUp': panY += panStep; break;
+  case 'ArrowDown': panY -= panStep; break;
+  case 'ArrowLeft': panX += panStep; break;
+  case 'ArrowRight': panX -= panStep; break;
+  case '+':
+  case '=':
+  case '-': {
+  const oldZoom = zoom;
+  const newZoom = e.key === '-' ? oldZoom / zoomStep : oldZoom * zoomStep;
+  zoom = Math.max(0.1, Math.min(5, newZoom));
+  if (zoom !== oldZoom && canvasRef) {
+  const rect = canvasRef.getBoundingClientRect();
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  const scale = zoom / oldZoom;
+  panX = centerX - (centerX - panX) * scale;
+  panY = centerY - (centerY - panY) * scale;
+  }
+  break;
+  }
+  default: return;
+  }
+  e.preventDefault();
  }
 
- // Clear dropped evidence after AI processing
- $effect (() => {
- if (taggedEvidenceIds.length === 0) {
- droppedEvidenceIds = [];
- }
+ $effect(() => {
+  if (taggedEvidenceIds.length === 0) {
+  droppedEvidenceIds = [];
+  }
  });
-  
+
  onMount(() => {
- const handleGlobalMouseUp = () => handleMouseUp();
- const handleGlobalMouseMove = (e: MouseEvent) => handleMouseMove(e);
-
- document.addEventListener('mouseup', handleGlobalMouseUp);
- document.addEventListener('mousemove', handleGlobalMouseMove);
-
- return () => {
- document.removeEventListener('mouseup', handleGlobalMouseUp);
- document.removeEventListener('mousemove', handleGlobalMouseMove);
- };
+  const handleGlobalMouseUp = () => handleMouseUp();
+  const handleGlobalMouseMove = (e: MouseEvent) => handleMouseMove(e);
+  document.addEventListener('mouseup', handleGlobalMouseUp);
+  document.addEventListener('mousemove', handleGlobalMouseMove);
+  return () => {
+  document.removeEventListener('mouseup', handleGlobalMouseUp);
+  document.removeEventListener('mousemove', handleGlobalMouseMove);
+  };
  });
 </script>
 
 <div
  bind:this={canvasRef}
  class="evidence-canvas nes-container is-dark"
- class: readonly, class:dragging={isDragging}
+ class:readonly
+ class:dragging={isDragging}
  class:drop-active={dropZoneActive}
  onmousedown={ handleMouseDown }
  onwheel={ handleWheel }
@@ -245,7 +210,7 @@ import { onMount } from 'svelte';
  ondrop={handleDrop}
  role="region"
  aria-label="Evidence detective canvas - drag evidence here for AI tagging"
- tabindex={readonly ? -1 , 0}
+ tabindex={readonly ? -1 : 0}
 >
  <!-- Drop zone indicator -->
  <div class="drop-zone-indicator" class:active={dropZoneActive}>
@@ -265,29 +230,29 @@ import { onMount } from 'svelte';
  {/if}
 
  <div
- class="canvas-content"
- style="transform, translate({panX}px, {panY}px) scale({zoom})"
+  class="canvas-content"
+  style="transform: translate({panX}px, {panY}px) scale({zoom})"
  >
- {#each evidence as item (item.id)}
- {@const position = evidencePositions.get(item.id)}
- {@const isTagged = taggedEvidenceIds.includes(item.id)}
- {@const isDropped = droppedEvidenceIds.includes(item.id)}
- {#if position}
- <div
- class="evidence-wrapper"
- style="left: {position.x}px; top, {position.y}px"
- >
- <EvidenceCard
- evidence={item}
- {isTagged}
- {isDropped}
- onclick={(e) => handleEvidenceClick(item.id, e)}
- ondelete={(e) => handleDelete(item.id, e)}
- ondownload={(e) => handleDownload(item.id, e)}
- />
- </div>
- {/if}
- {/each}
+  {#each evidence as item (item.id)}
+  {@const position = evidencePositions.get(item.id)}
+  {@const isTagged = taggedEvidenceIds.includes(item.id)}
+  {@const isDropped = droppedEvidenceIds.includes(item.id)}
+  {#if position}
+  <div
+  class="evidence-wrapper"
+  style="left: {position.x}px; top: {position.y}px"
+  >
+  <EvidenceCard
+  evidence={item}
+  {isTagged}
+  {isDropped}
+  onSelect={(id) => onSelect?.(id)}
+  onDelete={(id) => onDelete?.(id)}
+  onDownload={(id) => onDownload?.(id)}
+  />
+  </div>
+  {/if}
+  {/each}
  </div>
 
  {#if evidence.length === 0}
@@ -366,8 +331,9 @@ import { onMount } from 'svelte';
  }
 
  @keyframes pulse {
- 0%; } 100% { transform: scale(1); }
- 50% { transform: scale(1.05); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
  }
 
  .canvas-content {

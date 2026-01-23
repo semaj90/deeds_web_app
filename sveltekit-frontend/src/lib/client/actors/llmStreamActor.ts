@@ -1,4 +1,4 @@
-import type { createMachine, createActor, fromPromise } from 'xstate';
+import { createMachine, createActor, fromPromise } from 'xstate';
 
 export function createLLMStreamActor({
  url = '/api/ai/stream',

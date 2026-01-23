@@ -1,7 +1,8 @@
 <script lang="ts">
-	let text = $state<any>(undefined);
-
- let { children, text = '' } = $props ();
+ let { children, text = '' } = $props<{
+  children?: import('svelte').Snippet;
+  text?: string;
+ }>();
 </script>
 
 <div class="tooltip">

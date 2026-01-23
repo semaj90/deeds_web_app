@@ -1,6 +1,4 @@
 <script lang="ts">
-	let caseId = $state<any>(undefined);
-
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 

@@ -10,39 +10,41 @@ async function seed() {
 		const passwordHash = await bcrypt.hash('password123', 12);
 		const demoPasswordHash = await bcrypt.hash('demo123', 12);
 
-		// Seed users{
-            				email: 'demo@legal-ai.local',
-            				name: 'Demo User',
-            				firstName: 'Demo',
-            				lastName: 'User',
-            				role: 'admin' as const,
-              hashedPassword: demoPasswordHash, demoPasswordHash,
-            				isActive: true
-            			},
+		// Seed users
+		const seedUsers = [
 			{
-            				email: 'prosecutor@legal.ai',
-            				name: 'John Prosecutor',
-            				firstName: 'John',
-            				lastName: 'Prosecutor',
-            				role: 'prosecutor' as const,
-              hashedPassword: passwordHash, passwordHash,
-            				isActive: true
-            			},
+				email: 'demo@legal-ai.local',
+				name: 'Demo User',
+				firstName: 'Demo',
+				lastName: 'User',
+				role: 'admin' as const,
+				hashedPassword: demoPasswordHash,
+				isActive: true
+			},
 			{
-            				email: 'detective@legal.ai',
-            				name: 'Jane Detective',
-            				firstName: 'Jane',
-            				lastName: 'Detective',
-            				role: 'detective' as const,
-              hashedPassword: passwordHash, passwordHash,
-            				isActive: true
-            			}
+				email: 'prosecutor@legal.ai',
+				name: 'John Prosecutor',
+				firstName: 'John',
+				lastName: 'Prosecutor',
+				role: 'prosecutor' as const,
+				hashedPassword: passwordHash,
+				isActive: true
+			},
+			{
+				email: 'detective@legal.ai',
+				name: 'Jane Detective',
+				firstName: 'Jane',
+				lastName: 'Detective',
+				role: 'detective' as const,
+				hashedPassword: passwordHash,
+				isActive: true
+			}
 		];
 
 		const insertedUsers = [];
 		for (const user of seedUsers) {
 			try {
-				const existing = await db.select().from(users).where(eq(users.email: user.email)).limit(1);
+				const existing = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
 
 				if (existing.length === 0) {
 					const [created] = await db.insert(users).values(user).returning();
@@ -58,14 +60,17 @@ async function seed() {
 		}
 
 		// Seed cases
-		if (insertedUsers.length > 0) {{
+		if (insertedUsers.length > 0) {
+			const seedCases = [
+				{
 					caseNumber: 'CASE-2024-001',
 					title: 'Financial Fraud Investigation',
 					description: 'Complex financial fraud case with cryptocurrency transactions',
 					priority: 'high' as const,
 					status: 'open' as const,
 					category: 'financial_fraud',
-					dangerScore: 75, createdBy: insertedUsers[0].id,
+					dangerScore: 75,
+					createdBy: insertedUsers[0].id,
 					aiSummary: 'High-priority financial fraud case',
 					aiTags: ['money_laundering', 'cryptocurrency']
 				},
@@ -76,16 +81,18 @@ async function seed() {
 					priority: 'medium' as const,
 					status: 'open' as const,
 					category: 'cybercrime',
-					dangerScore: 60, createdBy: insertedUsers[1]?.id ?? insertedUsers[0].id,
+					dangerScore: 60,
+					createdBy: insertedUsers[1]?.id ?? insertedUsers[0].id,
 					aiSummary: 'Large-scale data breach investigation',
 					aiTags: ['data_breach', 'identity_theft']
 				}
 			];
 
 			for (const caseData of seedCases) {
-				try {.select()
+				try {
+					const existing = await db.select()
 						.from(cases)
-						.where(eq(cases.caseNumber: caseData.caseNumber))
+						.where(eq(cases.caseNumber, caseData.caseNumber))
 						.limit(1);
 
 					if (existing.length === 0) {

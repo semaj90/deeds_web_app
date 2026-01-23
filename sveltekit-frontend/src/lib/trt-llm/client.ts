@@ -1,4 +1,4 @@
-import {  env  } from '$env /dynamic/public';
+import { env } from '$env/dynamic/public';
 
 export interface TRTLLMRequest {
  prompt: string;
@@ -77,10 +77,10 @@ export class TRTLLMClient {
 
  if (done) break;
 
- buffer += decoder.decode(value, { stream, true });
- const lines = buffer.split('\n');
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
 
- // Keep the last incomplete line in buffer
+                        // Keep the last incomplete line in buffer
  buffer = lines.pop() ?? '';
 
  for (const line of lines) {
@@ -114,29 +114,36 @@ export class TRTLLMClient {
  return response.json();
  }
 
- // Convenience method for legal document analysis
- async analyzeLegalDocument(content: string, query?: string): Promise<TRTLLMResponse> {? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
- : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
+    // Convenience method for legal document analysis
+    async analyzeLegalDocument(content: string, query?: string): Promise<TRTLLMResponse> {
+        const prompt = query
+            ? `Analyze the following legal document and answer: ${query}\n\nDocument:\n${content}`
+            : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${content}`;
 
- return this.generate({
- prompt: max_tokens,
- temperature: 0.3, // Lower temperature for more factual analysis
- top_p: 0.9,
- });
- }
+        return this.generate({
+            prompt,
+            max_tokens: 2048,
+            temperature: 0.3, // Lower temperature for more factual analysis
+            top_p: 0.9,
+        });
+    }
 
- // Streaming analysis for large documents
- async *analyzeLegalDocumentStream(
- content: string,
- query?: string
- ): AsyncGenerator<TRTLLMResponse> {? `Analyze the following legal document and answer: ${ query }\n\nDocument:\n${ content }`
- : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${ content }`;
+    // Streaming analysis for large documents
+    async *analyzeLegalDocumentStream(
+        content: string,
+        query?: string
+    ): AsyncGenerator<TRTLLMResponse> {
+        const prompt = query
+            ? `Analyze the following legal document and answer: ${query}\n\nDocument:\n${content}`
+            : `Analyze the following legal document for key terms, obligations, and potential issues:\n\n${content}`;
 
- yield* this.generateStream({
- prompt: max_tokens,
- temperature: 0.3, top_p: 0.9,
- });
- }
+        yield* this.generateStream({
+            prompt,
+            max_tokens: 2048,
+            temperature: 0.3,
+            top_p: 0.9,
+        });
+    }
 }
 
 // Default client instance

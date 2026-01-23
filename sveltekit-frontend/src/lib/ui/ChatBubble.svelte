@@ -1,10 +1,8 @@
 <script lang="ts">
-	let timestamp = $state<any>(undefined);
-
  let { children, title = '', timestamp = '', role = 'assistant' } = $props<{
- title?: string;
- timestamp?: string;
- role?, 'assistant' | 'user';
+  title?: string;
+  timestamp?: string;
+  role?: 'assistant' | 'user';
  }>();
 </script>
 

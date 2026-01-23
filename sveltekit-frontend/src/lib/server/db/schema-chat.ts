@@ -9,8 +9,8 @@ import {
     pgTable,
     text,
     timestamp,
-    varchar,
-	uuid
+    uuid,
+    varchar
 } from 'drizzle-orm/pg-core';
 import { users } from './schema-postgres';
 
@@ -27,11 +27,11 @@ export const chatMessages = pgTable('chat_messages', {
 	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }), // Nullable for anonymous (pre-migration)
 	role: chatMessageRoleEnum('role').notNull(), // 'user' | 'assistant' | 'system'
 	content: text('content').notNull(), // Message text
-	timestamp: timestamp('timestamp', { withTimezone, true }).notNull().defaultNow(), // When sent
+	timestamp: timestamp('timestamp', { withTimezone: true }).notNull().defaultNow(), // When sent
 	migratedFrom: varchar('migrated_from', { length: 255 }), // Anonymous session ID (if migrated)
 	metadata: text('metadata'), // JSON string for additional data (model, tokens, etc.)
-	createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
-	updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow()
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
 	chatIdIdx: index('idx_chat_messages_chat_id').on(table.chatId),
 	userIdIdx: index('idx_chat_messages_user_id').on(table.userId),
@@ -53,11 +53,11 @@ export const chatMetadata = pgTable('chat_metadata', {
 	title: varchar('title', { length: 500 }), // Auto-generated or user-provided
 	caseId: uuid('case_id'), // Optional case association
 	messageCount: varchar('message_count', { length: 50 }).default('0'),
-	lastMessageAt: timestamp('last_message_at', { withTimezone, true }),
+	lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
 	isArchived: varchar('is_archived', { length: 10 }).default('false'),
 	tags: text('tags'), // JSON array of tags
-	createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
-	updatedAt: timestamp('updated_at', { withTimezone, true }).notNull().defaultNow()
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
 	userIdIdx: index('idx_chat_metadata_user_id').on(table.userId),
 	caseIdIdx: index('idx_chat_metadata_case_id').on(table.caseId),

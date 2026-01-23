@@ -70,6 +70,17 @@ export interface Evidence {
   updatedAt: string;
 }
 
+// Document Types
+export interface Document {
+  id: string;
+  title: string;
+  content: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  chunks?: any[];
+}
+
 // Form Types
 export interface FormField {
   id: string;

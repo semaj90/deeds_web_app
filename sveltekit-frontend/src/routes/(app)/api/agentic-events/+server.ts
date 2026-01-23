@@ -2,7 +2,7 @@
 // Server-Sent Events stream for real-time agentic pipeline updates
 // Connects to Phase 89 Enhanced Pipeline with CUDA clustering
 
-import EnhancedAgenticPipeline from '../../../../scripts/phase89-enhanced-pipeline.mjs';
+import EnhancedAgenticPipeline from '../../../../../scripts/phase89-enhanced-pipeline.mjs';
 import type { RequestHandler } from './$types';
 
 // Global pipeline instance (shared across SSE connections)

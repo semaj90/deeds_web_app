@@ -19,15 +19,15 @@
  *   });
  */
 
-import { beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 import {
-	mockQdrant,
-	mockRedis,
-	mockOllama,
-	mockPostgreSQL,
-	mockMinIO,
-	mockFetch,
-	resetAllMocks
+    mockFetch,
+    mockMinIO,
+    mockOllama,
+    mockPostgreSQL,
+    mockQdrant,
+    mockRedis,
+    resetAllMocks
 } from './mocks.js';
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -106,26 +106,32 @@ export async function initializeQdrantMocks(): Promise<void> {
   await mockQdrant.createCollection('codemod_memories', {
     vectors: { size: 384 },
   });
-  
+
   await mockQdrant.createCollection('error_patterns', {
     vectors: { size: 384 },
   });
-  
+
   await mockQdrant.upsert('codemod_memories', {
     points: [
       {
-        id: 1, vector: Array(384).fill(0.5, payload: { title: 'Svelte 5 Runes',
+        id: 1,
+        vector: Array(384).fill(0.5),
+        payload: {
+          title: 'Svelte 5 Runes',
           content: '$state and $derived are the new reactive primitives',
           url: 'https://svelte.dev/docs/runes',
           tags: ['svelte5', 'runes'],
-        },
+        }
       },
       {
-        id: 2, vector: Array(384).fill(0.6, payload: { title: 'Svelte 5 Migration',
+        id: 2,
+        vector: Array(384).fill(0.6),
+        payload: {
+          title: 'Svelte 5 Migration',
           content: 'Replace export let with $props()',
           url: 'https://svelte.dev/docs/migration',
           tags: ['svelte5', 'migration'],
-        },
+        }
       }],
   });
 }
@@ -135,12 +141,12 @@ export async function initializeQdrantMocks(): Promise<void> {
  */
 export async function initializeRedisMocks(): Promise<void> {
   // Seed with sample cache entries
-  await mockRedis.set('test, key1', 'value1', { EX, 3600 });
-  await mockRedis.set('test, key2', 'value2', { EX, 3600 });
+  await mockRedis.set('test:key1', 'value1', { EX: 3600 });
+  await mockRedis.set('test:key2', 'value2', { EX: 3600 });
   await mockRedis.set(
-    'cache, svelte5',
+    'cache:svelte5',
     JSON.stringify({
-      results, ['result1', 'result2'],
+      results: ['result1', 'result2'],
       timestamp: Date.now(),
     }),
     { EX: 300 }
@@ -159,7 +165,7 @@ export async function initializeOllamaMocks(): Promise<void> {
 
   mockOllama.setResponse(
     'How to migrate to Svelte 5?',
-    'Replace export let with $props( onclick with onclick, and $: with $derived.'
+    'Replace export let with $props(), onclick with onclick, and $: with $derived.'
   );
 }
 
@@ -185,7 +191,8 @@ export async function initializePostgreSQLMocks(): Promise<void> {
   // Seed evidence table
   mockPostgreSQL.seedTable('evidence', [
     {
-      id: 1, case_id: 1 1,
+      id: 1,
+      case_id: 1,
       title: 'Evidence 1',
       type: 'document',
       created_at: new Date().toISOString(),
@@ -215,50 +222,57 @@ export function initializeFetchMocks(): void {
     status: 200,
     data: {}, // Will be populated dynamically
   });
-  
+
   mockFetch.setResponse('localhost:3004/invoke', {
     status: 200,
-    data: { result: {
+    data: {
+      result: {
         results: [
           { title: 'Result 1', score: 0.9 },
-          { title: 'Result 2', score: 0.8 }],
+          { title: 'Result 2', score: 0.8 }
+        ],
         synthesized: 'This is a synthesized response',
       },
     },
   });
-  
+
   mockFetch.setResponse('localhost:3002/function-call', {
     status: 200,
-    data: { errors: [],
+    data: {
+      errors: [],
       warnings: [],
     },
   });
-  
+
   mockFetch.setResponse('localhost:3005/a2a/', {
     status: 200,
-    data: { agents: [{ id: 'agent1', name: 'Test Agent 1', capabilities: ['search'] }],
+    data: {
+      agents: [{ id: 'agent1', name: 'Test Agent 1', capabilities: ['search'] }],
     },
   });
-  
+
   // /api/embed endpoint (used by EmbeddingService) - returns { embeddings: [[...]] }
   mockFetch.setResponse('localhost:11434/api/embed', {
     status: 200,
-    data: { embeddings: [Array(384).fill(0.5)],
+    data: {
+      embeddings: [Array(384).fill(0.5)],
     },
   });
-  
+
   mockFetch.setResponse('localhost:11434/api/embeddings', {
     status: 200,
-    data: { embedding: Array(384).fill(0.5),
+    data: {
+      embedding: Array(384).fill(0.5),
     },
   });
 
   mockFetch.setResponse('localhost:11434/api/generate', {
     status: 200,
-    data: { response: 'Mock LLM response',
+    data: {
+      response: 'Mock LLM response',
     },
   });
-  
+
   global.fetch = mockFetch.getMockFetch();
 }
 
@@ -310,7 +324,7 @@ export async function cleanupTest(): Promise<void> {
 	vi.clearAllMocks();
 
 	// Restore fetch if it was mocked
-	if (global?.fetch&& vi.isMockFunction(global.fetch)) {
+	if (global?.fetch && vi.isMockFunction(global.fetch)) {
 		vi.restoreAllMocks();
 	}
 }
@@ -345,10 +359,12 @@ export function registerTestHooks(options?: Parameters<typeof setupTest>[0]): vo
  */
 export function createTestCase(overrides: Partial<any> = {}): any {
 	return {
-		id: Math.floor(Math.random() * 10000, title: 'Test Case',
+		id: Math.floor(Math.random() * 10000),
+		title: 'Test Case',
 		description: 'Test case description',
 		status: 'active',
-		created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+		created_at: new Date().toISOString(),
+		updated_at: new Date().toISOString(),
 		...overrides
 	};
 }
@@ -358,7 +374,8 @@ export function createTestCase(overrides: Partial<any> = {}): any {
  */
 export function createTestEvidence(overrides: Partial<any> = {}): any {
 	return {
-		id: Math.floor(Math.random() * 10000, case_id: 1,
+		id: Math.floor(Math.random() * 10000),
+		case_id: 1,
 		title: 'Test Evidence',
 		type: 'document',
 		content: 'Test evidence content',
@@ -372,7 +389,8 @@ export function createTestEvidence(overrides: Partial<any> = {}): any {
  */
 export function createTestSearchResult(overrides: Partial<any> = {}): any {
 	return {
-		id: Math.floor(Math.random() * 10000, title: 'Test Result',
+		id: Math.floor(Math.random() * 10000),
+		title: 'Test Result',
 		content: 'Test result content',
 		score: 0.85,
 		url: 'https://example.com/test',
@@ -385,7 +403,7 @@ export function createTestSearchResult(overrides: Partial<any> = {}): any {
  * Create test embedding vector
  */
 export function createTestEmbedding(dimension: number = 384): number[] {
-	return Array.from({ length, dimension }, () => Math.random());
+	return Array.from({ length: dimension }, () => Math.random());
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -447,7 +465,7 @@ export async function waitFor(
  *   import { mockQdrant, mockRedis } from '$lib/test-utils/setup';
  *   await mockQdrant.upsert('collection', { points: [...] });
  */
-export { mockQdrant, mockRedis, mockOllama, mockPostgreSQL, mockMinIO, mockFetch };
+export { mockFetch, mockMinIO, mockOllama, mockPostgreSQL, mockQdrant, mockRedis };
 
 
 

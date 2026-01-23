@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 
 	const { data } = $props<{ data, PageData }>();
 
@@ -178,7 +177,8 @@
 											</div>
 											<span class="ml-4 px-2 py-1 text-xs rounded {
 												item.priority === 'high' ? 'bg-red-900/30 border border-red-500/30 text-red-300' :
-												item.priority === 'medium' : '' : 'bg-blue-900/30 border border-blue-500/30 text-blue-300'
+												item.priority === 'medium' ? 'bg-yellow-900/30 border border-yellow-500/30 text-yellow-300' :
+												'bg-blue-900/30 border border-blue-500/30 text-blue-300'
 											}">
 												{item.priority}
 											</span>

@@ -25,10 +25,10 @@
  { id: 'AG-5', description: 'Leadership/management role', points: 4, selected: false }]);
 
  let mitigatingFactors = $state<MitigatingFactor[]>([
- { id: 'MIT-1', description: 'Acceptance of responsibility', points: -3: selected, false },
- { id: 'MIT-2', description: 'Minimal role in offense', points: -4: selected, false },
- { id: 'MIT-3', description: 'Mental health condition', points: -2: selected, false },
- { id: 'MIT-4', description: 'Cooperation with authorities', points: -2: selected, false }]);
+ { id: 'MIT-1', description: 'Acceptance of responsibility', points: -3, selected: false },
+ { id: 'MIT-2', description: 'Minimal role in offense', points: -4, selected: false },
+ { id: 'MIT-3', description: 'Mental health condition', points: -2, selected: false },
+ { id: 'MIT-4', description: 'Cooperation with authorities', points: -2, selected: false }]);
 
  let selectedAggravating = $derived(aggravatingFactors.filter(f => f.selected));
  let selectedMitigating = $derived(mitigatingFactors.filter(f => f.selected));
@@ -37,7 +37,7 @@
  let adjustedOffenseLevel = $derived(offenseLevel + aggravatingPoints + mitigatingPoints);
  let sentencingRange = $derived(calculateRange(adjustedOffenseLevel, criminalHistory));
 
- function calculateRange(level: number, history): number: { min: number; max: number } {
+ function calculateRange(level: number, history: number): { min: number; max: number } {
  // Simplified Federal Sentencing Guidelines calculation (months)
  const baseMin = level * 4 + history * 6;
  const baseMax = level * 5 + history * 8;

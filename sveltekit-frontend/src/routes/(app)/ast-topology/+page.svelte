@@ -1,6 +1,5 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import * as d3 from 'd3';
   import { onDestroy, onMount } from 'svelte';
 
   // Props from server load
@@ -41,25 +40,42 @@
   let topologyData = $derived(data.topologyData);
   let recentActivity = $derived(data.recentActivity);
   let isConnected = $state(false);
-  let selectedNode = $state<GraphNode | null>(null);
+  let selectedNode = $state<string | null>(null);
   let viewMode = $state<'tree' | 'graph' | 'list'>('graph');
   let filterSource = $state('all');
   let searchQuery = $state('');
 
   // Graph state
   let graphContainer: HTMLDivElement;
-  let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
-  let simulation: d3.Simulation<GraphNode, GraphEdge>;
+  let svg: any; // d3.Selection<SVGSVGElement, unknown, null, undefined>;
+  let simulation: any; // d3.Simulation<GraphNode, GraphEdge>;
 
-  let nodes: GraphNode[] = $state(data.topologyData?.nodes ?? []);
-  let edges: GraphEdge[] = $state(data.topologyData?.edges ?? []);
-  let activities: Activity[] = $state([]);
-  let stats: Stats = $state({
-    totalErrors: data.errorStats?.total ?? 0,
-    fixedToday: data.errorStats?.fixedToday ?? 0,
-    inProgress: data.errorStats?.inProgress ?? 0,
-    confidence: data.errorStats?.confidence ?? 0,
-    errorChange: data.errorStats?.change ?? 0
+  let nodes = $state([]);
+  let edges = $state([]);
+
+  $effect(() => {
+    nodes = data.topologyData?.nodes ?? [];
+    edges = data.topologyData?.edges ?? [];
+  });
+
+  let activities = $state<Activity[]>([]);
+  let stats = $state<Stats>({
+    totalErrors: 0,
+    fixedToday: 0,
+    inProgress: 0,
+    confidence: 0,
+    errorChange: 0
+  });
+
+  // Sync state with data
+  $effect(() => {
+    if (data.errorStats) {
+      stats.totalErrors = data.errorStats.total ?? 0;
+      stats.fixedToday = data.errorStats.fixedToday ?? 0;
+      stats.inProgress = data.errorStats.inProgress ?? 0;
+      stats.confidence = data.errorStats.confidence ?? 0;
+      stats.errorChange = data.errorStats.change ?? 0;
+    }
   });
 
   let isAutoFixing = $state(false);
@@ -311,11 +327,11 @@
               </span>
               <span class="node-label">{node.label || node.id.split('/').pop()}</span>
               {#if node.errorCount > 0}
-                <span class="error-badge" style="background, {getStatusColor(node.status)}">
+                <span class="error-badge" style:background={getStatusColor(node.status)}>
                   {node.errorCount}
                 </span>
               {/if}
-              <span class="node-status" style="background, {getStatusColor(node.status)}"></span>
+              <span class="node-status" style:background={getStatusColor(node.status)}></span>
             </button>
           {/each}
         </div>
@@ -323,9 +339,15 @@
         <div class="error-list">
           {#each filteredNodes.filter(n => n.errorCount > 0).sort((a, b) => b.errorCount - a.errorCount) as node (node.id)}
             <div class="error-item" class:selected={selectedNode === node.id}>
-              <div class="error-header" onclick={() => selectedNode = node.id}>
+              <div
+                class="error-header"
+                role="button"
+                tabindex="0"
+                onclick={() => selectedNode = node.id}
+                onkeydown={(e) => e.key === 'Enter' && (selectedNode = node.id)}
+              >
                 <span class="file-path">{node.id}</span>
-                <span class="error-count" style="color, {getStatusColor(node.status)}">
+                <span class="error-count" style:color={getStatusColor(node.status)}>
                   {node.errorCount} errors
                 </span>
               </div>

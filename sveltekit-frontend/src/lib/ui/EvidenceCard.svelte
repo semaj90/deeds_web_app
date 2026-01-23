@@ -7,121 +7,112 @@ https, //svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https, //svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
-	let isTagged = $state<any>(undefined);
-	let isDropped = $state<any>(undefined);
-	let tag = $state<any>(undefined);
-
  import type { Evidence } from '$lib/types';
- import { Archive } from "lucide-svelte";
-import { Download } from "lucide-svelte";
-import { Eye } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Image } from "lucide-svelte";
-import { Music } from "lucide-svelte";
-import { Trash2 } from "lucide-svelte";
-import { Video } from "lucide-svelte";
-import { Zap } from "lucide-svelte";
- // Migrated from createEventDispatcher to callback props;
+ import Archive from "lucide-svelte/icons/archive";
+ import Download from "lucide-svelte/icons/download";
+ import Eye from "lucide-svelte/icons/eye";
+ import FileText from "lucide-svelte/icons/file-text";
+ import Image from "lucide-svelte/icons/image";
+ import Music from "lucide-svelte/icons/music";
+ import Trash2 from "lucide-svelte/icons/trash-2";
+ import Video from "lucide-svelte/icons/video";
+ import Zap from "lucide-svelte/icons/zap";
  import Tooltip from './Tooltip.svelte';
 
  interface Props {
- evidence: Evidence;
- isTagged?: boolean;
- isDropped?: boolean;
- selected?: boolean;
- onSelect?: (id: string) => void;
- onDelete?: (id: string) => void;
- onDownload?: (id: string) => void;
- readonly?: boolean;
- showActions?: boolean;
+  evidence: Evidence;
+  isTagged?: boolean;
+  isDropped?: boolean;
+  selected?: boolean;
+  onSelect?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDownload?: (id: string) => void;
+  readonly?: boolean;
+  showActions?: boolean;
  }
 
  let {
- evidence,
- isTagged = false,
- isDropped = false,
- selected = false,
- onSelect,
- onDelete,
- onDownload,
- readonly = false,
- showActions = true
- }: Props = $props ();
-
- const dispatch = createEventDispatcher();
+  evidence,
+  isTagged = false,
+  isDropped = false,
+  selected = false,
+  onSelect,
+  onDelete,
+  onDownload,
+  readonly = false,
+  showActions = true
+ }: Props = $props();
 
  // Calculate icon based on file type
  function getFileIcon(mimeType: string) {
- if (mimeType?.startsWith('image/')) return Image;
- if (mimeType?.startsWith('video/')) return Video;
- if (mimeType?.startsWith('audio/')) return Music;
- if (mimeType?.includes('zip') ?? mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
- return FileText;
+  if (mimeType?.startsWith('image/')) return Image;
+  if (mimeType?.startsWith('video/')) return Video;
+  if (mimeType?.startsWith('audio/')) return Music;
+  if (mimeType?.includes('zip') || mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
+  return FileText;
  }
+
+ let Icon = $derived(getFileIcon(evidence.mimeType || 'application/octet-stream'));
 
  // Format file size
  function formatFileSize(bytes: number): string {
- if (bytes === 0) return '0 B';
- const k = 1024;
- const sizes = ['B', 'KB', 'MB', 'GB'];
- const i = Math.floor(Math.log(bytes) / Math.log(k));
- return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
  }
 
- // Handle card click
  function handleCardClick() {
- onSelect?.(evidence.id);
+  onSelect?.(evidence.id);
  }
 
- // Handle drag start
  function handleDragStart(e: DragEvent) {
- if (readonly) return;
-
- e.dataTransfer!.effectAllowed = 'copy';
- e.dataTransfer!.setData('text/plain', evidence.id);
-
- // Add visual feedback
- console.log('🎮 Dragging evidence:', evidence.title);
+  if (readonly) return;
+  e.dataTransfer!.effectAllowed = 'copy';
+  e.dataTransfer!.setData('text/plain', evidence.id);
+  console.log('🎮 Dragging evidence:', evidence.title);
  }
 
- // Handle action clicks
  function handleDelete(e: Event) {
- e.stopPropagation();
- onDelete?.(evidence.id);
+  e.stopPropagation();
+  onDelete?.(evidence.id);
  }
 
  function handleDownload(e: Event) {
- e.stopPropagation();
- onDownload?.(evidence.id);
+  e.stopPropagation();
+  onDownload?.(evidence.id);
  }
 </script>
 
 <div
  class="evidence-card nes-container is-dark with-title"
- class: selected, class: readonly, class:is-tagged={isTagged}
+ class:selected
+ class:readonly
+ class:is-tagged={isTagged}
  class:is-dropped={isDropped}
  draggable={!readonly}
  onclick={ handleCardClick }
  ondragstart={handleDragStart}
  role="button"
  tabindex="0"
- aria-label="Evidence, {evidence.title} - Drag to canvas for AI tagging"
+ aria-label="Evidence {evidence.title} - Drag to canvas for AI tagging"
  onkeydown={(e) => {
- if (e.key === 'Enter' || e.key === ' ') {
- e.preventDefault();
- handleCardClick();
- }
+  if (e.key === 'Enter' || e.key === ' ') {
+  e.preventDefault();
+  handleCardClick();
+  }
  }}
 >
  <div class="card-header">
  <div class="file-icon">
- <getFileIcon(evidence.mimeType || 'application/octet-stream') size={24} / />
+  <Icon size={24} />
  </div>
 
  {#if isTagged}
  <div class="ai-indicator">
- <Zap size={16} />
- <span>AI Tagged</span>
+  <Zap size={16} />
+  <span>AI Tagged</span>
  </div>
  {/if}
 
@@ -251,8 +242,9 @@ import { Zap } from "lucide-svelte";
  }
 
  @keyframes pulse {
- 0%; } 100% { transform: scale(1); }
- 50% { transform: scale(1.02); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
  }
 
  .card-header {
@@ -278,8 +270,9 @@ import { Zap } from "lucide-svelte";
  }
 
  @keyframes glow {
- 0%; } 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
- 50% { text-shadow: 0 0 10px rgba(146, 204, 65, 0.8); }
+  0% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
+  50% { text-shadow: 0 0 10px rgba(146, 204, 65, 0.8); }
+  100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
  }
 
  .card-actions {

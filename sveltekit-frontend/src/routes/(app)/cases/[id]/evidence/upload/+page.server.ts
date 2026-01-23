@@ -1,26 +1,26 @@
-import db from '$lib/server/db';
-import { yorhaCases } from '$lib/server/db/schema-postgres';
+import { db } from '$lib/server/db';
+import { cases } from '$lib/server/db/schema-postgres';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
- if (!locals.user) {
- throw redirect(302, '/auth/login');
- }
+	if (!locals.user) {
+		throw redirect(302, '/auth/login');
+	}
 
- const caseId = params.id;
+	const caseId = params.id;
 
- // Verify case exists and user has access
- const caseRecord = await db.select().from(yorhaCases).where(eq(yorhaCases.id, caseId)).limit(1);
+	// Verify case exists and user has access
+	const caseRecord = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
 
- if (!caseRecord || caseRecord.length === 0) {
- throw error(404, 'Case not found');
- }
+	if (!caseRecord || caseRecord.length === 0) {
+		throw error(404, 'Case not found');
+	}
 
- if (caseRecord[0].created_by !== locals.user.id) {
- throw error(403, 'You do not have access to this case');
- }
+	if (caseRecord[0].userId !== locals.user.id) {
+		throw error(403, 'You do not have access to this case');
+	}
 
 	return {
 		caseId,

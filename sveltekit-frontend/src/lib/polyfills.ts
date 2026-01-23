@@ -9,11 +9,15 @@
 declare global {
 	interface Window {
 		global: typeof globalThis;
-		process: { env: Record<string, string>;
-			browser: boolean; cwd: () => string;
+		process: {
+			env: Record<string, string>;
+			browser: boolean;
+			cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string; versions: { node, string };
-			platform: string; arch: string;
+			version: string;
+			versions: { node: string };
+			platform: string;
+			arch: string;
 		};
 		Buffer: any;
 	}
@@ -21,27 +25,30 @@ declare global {
 
 // Polyfill process.env for browser
 if (typeof window !== 'undefined') {
-	window.global = window?.global|| globalThis;
+	window.global = window?.global || globalThis;
 
 	if (!window.process) {
 		window.process = {
-			env: { NODE_ENV: import.meta.env?.MODE?? 'development',
+			env: {
+				NODE_ENV: import.meta.env?.MODE ?? 'development',
 				PUBLIC_ENV: 'browser'
 			},
 			browser: true,
 			cwd: () => '/',
-			nextTick: (callback: () => void) => setTimeout(callback, 0, version: 'v18.0.0',
+			nextTick: (callback: () => void) => setTimeout(callback, 0),
+			version: 'v18.0.0',
 			versions: { node: '18.0.0' },
 			platform: 'browser',
 			arch: 'x64'
-		} as any,
+		} as any;
 	}
 }
 
 // Polyfill Buffer for browser if needed
 if (typeof window !== 'undefined' && !window.Buffer) {
 	window.Buffer = {
-		from: (str: string, encoding?: string) => new TextEncoder().encode(str, isBuffer: (obj: any) => obj instanceof Uint8Array,
+		from: (str: string, encoding?: string) => new TextEncoder().encode(str),
+		isBuffer: (obj: any) => obj instanceof Uint8Array,
 		alloc: (size: number) => new Uint8Array(size)
 	} as any;
 }
@@ -100,21 +107,22 @@ export const urlUtils = {
 	}
 };
 
-// Enhanced fetch with timeout and better error handlingurl: string, options: RequestInit & { timeout?: number } = {}
-): Promise<Response> => {
+// Enhanced fetch with timeout and better error handling
+export const enhancedFetch = async (url: string, options: RequestInit & { timeout?: number } = {}): Promise<Response> => {
 	const { timeout = 30000, ...fetchOptions } = options;
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), timeout);
 
 	try {
 		const response = await fetch(url, {
-			...fetchOptions, signal: controller.signal
+			...fetchOptions,
+			signal: controller.signal
 		});
 
 		clearTimeout(timeoutId);
 
 		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}, ${response.statusText}`);
+			throw new Error(`HTTP ${response.status} ${response.statusText}`);
 		}
 
 		return response;
@@ -129,8 +137,8 @@ export const urlUtils = {
 	}
 };
 
-// Debounce utility for search and other operationsfunc: T, wait: number
-): ((...args: Parameters<T>) => void) => {
+// Debounce utility for search and other operations
+export const debounce = <T extends (...args: any[]) => void>(func: T, wait: number): ((...args: Parameters<T>) => void) => {
 	let timeout: ReturnType<typeof setTimeout>;
 
 	return (...args: Parameters<T>) => {
@@ -138,8 +146,9 @@ export const urlUtils = {
 		timeout = setTimeout(() => func(...args), wait);
 	};
 };
-// Throttle utility for performance-sensitive operationsfunc: T, limit: number
-): ((...args: Parameters<T>) => void) => {
+
+// Throttle utility for performance-sensitive operations
+export const throttle = <T extends (...args: any[]) => void>(func: T, limit: number): ((...args: Parameters<T>) => void) => {
 	let inThrottle: boolean;
 	return (...args: Parameters<T>) => {
 		if (!inThrottle) {
@@ -158,7 +167,7 @@ export const storage = {
 			const item = localStorage.getItem(_key);
 			return item ? JSON.parse(item) : defaultValue ?? null;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to get localStorage item: "${ _key }":`, error);
+			console.warn(`Failed to get localStorage item: "${_key}":`, error);
 			return defaultValue ?? null;
 		}
 	},
@@ -166,10 +175,10 @@ export const storage = {
 	set: (_key: string, value: unknown): boolean => {
 		try {
 			if (typeof window === 'undefined') return false;
-			localStorage.setItem(_key: JSON.stringify(value));
+			localStorage.setItem(_key, JSON.stringify(value));
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to set localStorage item: "${ _key }":`, error);
+			console.warn(`Failed to set localStorage item: "${_key}":`, error);
 			return false;
 		}
 	},
@@ -180,7 +189,7 @@ export const storage = {
 			localStorage.removeItem(_key);
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to remove localStorage item: "${ _key }":`, error);
+			console.warn(`Failed to remove localStorage item: "${_key}":`, error);
 			return false;
 		}
 	},
@@ -242,9 +251,3 @@ if (typeof window !== 'undefined') {
 }
 
 export default { pathUtils, urlUtils, enhancedFetch, debounce, throttle, storage, webGPU };
-
-
-
-
-
-

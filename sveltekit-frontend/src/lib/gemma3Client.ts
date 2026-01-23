@@ -6,7 +6,8 @@ export interface ChatMessage {
 }
 
 export interface ChatCompletionRequest {
-	model?: string; messages: ChatMessage[];
+	model?: string;
+	messages: ChatMessage[];
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -14,8 +15,10 @@ export interface ChatCompletionRequest {
 }
 
 export interface ChatCompletionResponse {
-	id: string; object: string;
-	created: number; model: string;
+	id: string;
+	object: string;
+	created: number;
+	model: string;
 	choices: Array<{
 		index?: number;
 		message?: { role?: string; content?: string };
@@ -25,7 +28,8 @@ export interface ChatCompletionResponse {
 }
 
 export interface CompletionRequest {
-	model?: string; prompt: string;
+	model?: string;
+	prompt: string;
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -33,9 +37,11 @@ export interface CompletionRequest {
 }
 
 export interface CompletionResponse {
-	id: string; object: string;
-	created: number; model: string;
-	choices: Array<{ index?: number; text?: string; finish_reason?, string }>;
+	id: string;
+	object: string;
+	created: number;
+	model: string;
+	choices: Array<{ index?: number; text?: string; finish_reason?: string }>;
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
@@ -71,7 +77,8 @@ export class Gemma3Client {
 				method: 'GET',
 				signal:
 					typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
-						? (AbortSignal as any).timeout(10_000) : undefined,
+						? (AbortSignal as any).timeout(10_000)
+						: undefined
 			});
 			return res.ok;
 		} catch (err) {
@@ -85,24 +92,27 @@ export class Gemma3Client {
 			method: 'GET',
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
-					? (AbortSignal as any).timeout(10_000) : undefined,
+					? (AbortSignal as any).timeout(10_000)
+					: undefined
 		});
 		if (!res.ok) throw new Error(`Server info request failed, ${res.status}`);
 		const json = (await res.json()) as ServerInfo;
 		return json;
 	}
 
-	async listModels(): Promise<{ models: Array<{ id: string; name?: string; [k: string], unknown }>;
+	async listModels(): Promise<{
+		models: Array<{ id: string; name?: string; [k: string]: unknown }>;
 	}> {
 		const res = await fetch(`${this.baseUrl}/v1/models`, {
 			method: 'GET',
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
-					? (AbortSignal as any).timeout(10_000) : undefined,
+					? (AbortSignal as any).timeout(10_000)
+					: undefined
 		});
 		if (!res.ok) throw new Error(`List models request failed, ${res.status}`);
 		return (await res.json()) as {
-			models: Array<{ id: string; name?: string; [k: string], unknown }>;
+			models: Array<{ id: string; name?: string; [k: string]: unknown }>;
 		};
 	}
 
@@ -113,14 +123,16 @@ export class Gemma3Client {
 			temperature: request.temperature ?? 0.1,
 			top_p: request.top_p ?? 0.9,
 			max_tokens: request.max_tokens ?? 1024,
-			stream: request.stream ?? false,
+			stream: request.stream ?? false
 		};
 		const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload, signal:
+			body: JSON.stringify(payload),
+			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
-					? (AbortSignal as any).timeout(this.timeout) : undefined,
+					? (AbortSignal as any).timeout(this.timeout)
+					: undefined
 		});
 		if (!res.ok) {
 			const body = await res.text();
@@ -136,14 +148,16 @@ export class Gemma3Client {
 			temperature: request.temperature ?? 0.1,
 			top_p: request.top_p ?? 0.9,
 			max_tokens: request.max_tokens ?? 1024,
-			stream: request.stream ?? false,
+			stream: request.stream ?? false
 		};
 		const res = await fetch(`${this.baseUrl}/v1/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload, signal:
+			body: JSON.stringify(payload),
+			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
-					? (AbortSignal as any).timeout(this.timeout) : undefined,
+					? (AbortSignal as any).timeout(this.timeout)
+					: undefined
 		});
 		if (!res.ok) {
 			const body = await res.text();
@@ -153,48 +167,87 @@ export class Gemma3Client {
 	}
 
 	// Helpers tailored for legal workflows
-	async askLegalQuestion(question: string, context?: string): Promise<string> {{
+	async askLegalQuestion(question: string, context?: string): Promise<string> {
+		const messages: ChatMessage[] = [
+			{
 				role: 'system',
-				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${context ? `\n\nAdditional context: ${ context }` : ''}`,
+				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${
+					context ? `\n\nAdditional context: ${context}` : ''
+				}`
 			},
-			{ role: 'user', content: question }];
-		const resp = await this.createChatCompletion({ messages: temperature: 0.05, max_tokens: 1024 });
+			{ role: 'user', content: question }
+		];
+		const resp = await this.createChatCompletion({
+			messages,
+			temperature: 0.05,
+			max_tokens: 1024
+		});
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async analyzeDocument(documentText, string, analysisType = 'general'): Promise<string> {{
+	async analyzeDocument(documentText: string, analysisType = 'general'): Promise<string> {
+		const messages: ChatMessage[] = [
+			{
 				role: 'system',
-				content: `You are a Legal AI Assistant for document analysis. Focus on ${ analysisType } analysis.`,
+				content: `You are a Legal AI Assistant for document analysis. Focus on ${analysisType} analysis.`
 			},
-			{ role: 'user', content: `Please analyze this legal document:\n\n${ documentText }` }];
-		const resp = await this.createChatCompletion({ messages: temperature: 0.05, max_tokens: 2048 });
+			{ role: 'user', content: `Please analyze this legal document:\n\n${documentText}` }
+		];
+		const resp = await this.createChatCompletion({
+			messages,
+			temperature: 0.05,
+			max_tokens: 2048
+		});
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async reviewContract(contractText: string, reviewFocus?: string): Promise<string> {{
+	async reviewContract(contractText: string, reviewFocus?: string): Promise<string> {
+		const messages: ChatMessage[] = [
+			{
 				role: 'system',
-				content: `You are a Legal AI Assistant for contract review.${reviewFocus ? ` Focus particularly on: ${ reviewFocus }` : ''}`,
+				content: `You are a Legal AI Assistant for contract review.${
+					reviewFocus ? ` Focus particularly on: ${reviewFocus}` : ''
+				}`
 			},
-			{ role: 'user', content: `Please review this contract:\n\n${contractText}` }];
-		const resp = await this.createChatCompletion({ messages: temperature: 0.05, max_tokens: 2048 });
+			{ role: 'user', content: `Please review this contract:\n\n${contractText}` }
+		];
+		const resp = await this.createChatCompletion({
+			messages,
+			temperature: 0.05,
+			max_tokens: 2048
+		});
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async createDocumentTemplate(documentType: string, requirements: string): Promise<string> {{ role: 'system', content: 'You are a Legal AI Assistant for document generation.' },
+	async createDocumentTemplate(documentType: string, requirements: string): Promise<string> {
+		const messages: ChatMessage[] = [
+			{ role: 'system', content: 'You are a Legal AI Assistant for document generation.' },
 			{
 				role: 'user',
-				content: `Generate a ${documentType} template with these requirements:\n\n${requirements}`,
-			}];
-		const resp = await this.createChatCompletion({ messages: temperature: 0.1, max_tokens: 2048 });
+				content: `Generate a ${documentType} template with these requirements:\n\n${requirements}`
+			}
+		];
+		const resp = await this.createChatCompletion({
+			messages,
+			temperature: 0.1,
+			max_tokens: 2048
+		});
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 
-	async summarizeContent(content, string, type = 'general'): Promise<string> {{
+	async summarizeContent(content: string, type = 'general'): Promise<string> {
+		const messages: ChatMessage[] = [
+			{
 				role: 'system',
-				content: `You are a Legal AI Assistant for summarization. Provide concise summaries focusing on ${type}.`,
+				content: `You are a Legal AI Assistant for summarization. Provide concise summaries focusing on ${type}.`
 			},
-			{ role: 'user', content: `Please summarize this content:\n\n${content}` }];
-		const resp = await this.createChatCompletion({ messages: temperature: 0.05, max_tokens: 1024 });
+			{ role: 'user', content: `Please summarize this content:\n\n${content}` }
+		];
+		const resp = await this.createChatCompletion({
+			messages,
+			temperature: 0.05,
+			max_tokens: 1024
+		});
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
 }
@@ -203,9 +256,12 @@ export class Gemma3Client {
 export const gemma3Client = new Gemma3Client();
 
 // Detect available server(s)
-export async function detectAvailableServer(): Promise<{ url: string; backend?, string } | null> {
-	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';{ url: getOllamaEndpoint(name, 'Ollama' },
-		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }],
+export async function detectAvailableServer(): Promise<{ url: string; backend?: string } | null> {
+	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';
+	const servers = [
+		{ url: getOllamaEndpoint(), name: 'Ollama' },
+		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }
+	];
 	for (const s of servers) {
 		const client = new Gemma3Client(s.url);
 		try {
@@ -230,7 +286,7 @@ export function createGemma3Store() {
 			askQuestion: async (_q: string, _ctx?: string) => '',
 			analyzeDocument: async (_t: string) => '',
 			reviewContract: async (_t: string) => '',
-			generateTemplate: async (_type: string, _req: string) => '',
+			generateTemplate: async (_type: string, _req: string) => ''
 		};
 	}
 
@@ -263,10 +319,6 @@ export function createGemma3Store() {
 		},
 		async generateTemplate(type: string, requirements: string) {
 			return client.createDocumentTemplate(type, requirements);
-		},
+		}
 	};
 }
-
-
-
-

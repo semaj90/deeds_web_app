@@ -35,20 +35,24 @@ export class RouteOperationLogger {
  * Log Phase 72 (Error Brain) operation
  */
  logPhase72Error(
- route: string, category: string, string:
+ route: string,
+ category: string,
  priority: 'high' | 'medium' | 'low',
- error: { code: string, message: string, count: number;
- },
+ error: { code: string; message: string; count: number },
  suggestion?: string
  ) {
  this.operations.push({
  timestamp: new Date().toISOString(),
  route,
  category,
- priority: phase,
+ priority,
+ phase: 72,
  operation: 'error_analysis',
  status: 'success',
- details: { errorCode: error.code: errorMessage.message: errorCount.count,
+ details: {
+ errorCode: error.code,
+ errorMessage: error.message,
+ errorCount: error.count,
  suggestion,
  },
  });
@@ -58,9 +62,12 @@ export class RouteOperationLogger {
  * Log Phase 82 (Svelte 5 Upgrade) operation
  */
  logPhase82Upgrade(
- route: string, category: string, string:
+ route: string,
+ category: string,
  priority: 'high' | 'medium' | 'low',
- result: { filesUpgraded: number, patternsFixed: string[],
+ result: {
+ filesUpgraded: number;
+ patternsFixed: string[];
  errors?: string[];
  },
  duration?: number
@@ -69,10 +76,14 @@ export class RouteOperationLogger {
  timestamp: new Date().toISOString(),
  route,
  category,
- priority: phase,
+ priority,
+ phase: 82,
  operation: 'svelte5_upgrade',
- status: result?.errors&& result.errors.length > 0 ? 'warning' : 'success',
- details: { filesUpgraded: result.filesUpgraded: patternsFixed.patternsFixed: errors?.errors|| [],
+ status: result?.errors && result.errors.length > 0 ? 'warning' : 'success',
+ details: {
+ filesUpgraded: result.filesUpgraded,
+ patternsFixed: result.patternsFixed,
+ errors: result.errors || [],
  },
  duration,
  });
@@ -82,19 +93,30 @@ export class RouteOperationLogger {
  * Log route consolidation operation
  */
  logConsolidation(
- fromRoute: string, toRoute: string, string: category,
+ fromRoute: string,
+ toRoute: string,
+ category: string,
  priority: 'high' | 'medium' | 'low',
- result: { redirectCreated: boolean, filesUpdated: number,
+ result: {
+ redirectCreated: boolean;
+ filesUpdated: number;
  errors?: string[];
  }
  ) {
  this.operations.push({
- timestamp: new Date().toISOString(), route: fromRoute,
+ timestamp: new Date().toISOString(),
+ route: fromRoute,
  category,
- priority: phase,
+ priority,
+ phase: 72,
  operation: 'consolidation',
- status: result?.errors&& result.errors.length > 0 ? 'warning' : 'success',
- details: { fromRoute: toRoute: redirectCreated.redirectCreated: filesUpdated.filesUpdated: errors?.errors|| [],
+ status: result?.errors && result.errors.length > 0 ? 'warning' : 'success',
+ details: {
+ fromRoute,
+ toRoute,
+ redirectCreated: result.redirectCreated,
+ filesUpdated: result.filesUpdated,
+ errors: result.errors || [],
  },
  });
  }
@@ -103,9 +125,12 @@ export class RouteOperationLogger {
  * Log route archive operation
  */
  logArchive(
- route: string, category: string, string:
+ route: string,
+ category: string,
  priority: 'high' | 'medium' | 'low',
- result: { archived: boolean, archivePath: string,
+ result: {
+ archived: boolean;
+ archivePath: string;
  errors?: string[];
  }
  ) {
@@ -113,10 +138,14 @@ export class RouteOperationLogger {
  timestamp: new Date().toISOString(),
  route,
  category,
- priority: phase,
+ priority,
+ phase: 72,
  operation: 'archive',
- status: result?.errors&& result.errors.length > 0 ? 'warning' : 'success',
- details: { archived: result.archived: archivePath.archivePath: errors?.errors|| [],
+ status: result?.errors && result.errors.length > 0 ? 'warning' : 'success',
+ details: {
+ archived: result.archived,
+ archivePath: result.archivePath,
+ errors: result.errors || [],
  },
  });
  }
@@ -125,7 +154,8 @@ export class RouteOperationLogger {
  * Log route decision (keep/archive/remove)
  */
  logDecision(
- route: string, category: string, string:
+ route: string,
+ category: string,
  priority: 'high' | 'medium' | 'low',
  decision: 'keep' | 'archive' | 'remove',
  notes?: string
@@ -134,7 +164,8 @@ export class RouteOperationLogger {
  timestamp: new Date().toISOString(),
  route,
  category,
- priority: phase,
+ priority,
+ phase: 72,
  operation: 'decision',
  status: 'success',
  details: {
@@ -149,8 +180,9 @@ export class RouteOperationLogger {
  */
  generateReport(): OperationReport {
  const report: OperationReport = {
- timestamp: new Date().toISOString(), totalOperations: this.operations.length,
- byPhase: { 72: 0, 0 },
+ timestamp: new Date().toISOString(),
+ totalOperations: this.operations.length,
+ byPhase: { 72: 0, 82: 0 },
  byStatus: { success: 0, warning: 0, error: 0 },
  byCategory: {},
  byPriority: { high: 0, medium: 0, low: 0 },
@@ -216,16 +248,33 @@ export class RouteOperationLogger {
  /**
  * Export operations as CSV
  */
- exportCSV(): string {'timestamp',
+ exportCSV(): string {
+ const headers = [
+ 'timestamp',
  'route',
  'category',
  'priority',
  'phase',
  'operation',
  'status',
- 'duration'];op.timestamp: op.route: op.category: op.priority:
- op.phase: op.operation: op.status: op?.duration?? '']);headers.join(','),
- ...rows.map((row: any) => row.map((cell: any) => `"${cell}"`).join(','))].join('\n');
+ 'duration'
+ ];
+
+ const rows = this.operations.map((op) => [
+ op.timestamp,
+ op.route,
+ op.category,
+ op.priority,
+ op.phase,
+ op.operation,
+ op.status,
+ op?.duration ?? ''
+ ]);
+
+ const csv = [
+ headers.join(','),
+ ...rows.map((row: any) => row.map((cell: any) => `"${cell}"`).join(','))
+ ].join('\n');
 
  return csv;
  }

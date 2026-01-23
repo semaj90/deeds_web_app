@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	try {
 		// Build query with filters
-		const filters = [eq(cases.assignedAttorney, locals.user.id)];
+		const filters = [eq(cases.userId, locals.user.id)];
 
 		if (status && status !== 'all') {
 			// Map 'active' to 'open' for legacy compatibility
@@ -105,7 +105,7 @@ export const actions: Actions = {
 				.values({
 					title: title.trim(),
 					description: description.trim(),
-					assignedAttorney: locals.user.id,
+					userId: locals.user.id,
 					status: 'open',
 					priority,
 					caseNumber,

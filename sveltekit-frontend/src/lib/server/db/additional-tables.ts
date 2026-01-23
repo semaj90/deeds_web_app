@@ -1,16 +1,17 @@
 // Additional Legal AI Database Tables
 // These will be imported and added to the main unified-schema.ts
-import type {
+import {
     boolean,
     decimal,
     integer,
+    jsonb,
     pgTable,
+    text,
     timestamp,
     uuid,
-    varchar,
+    varchar
 } from 'drizzle-orm/pg-core';
-import { jsonb, text } from 'drizzle-orm/pg-core';
-import type { vector } from 'pgvector/drizzle-orm';
+import { vector } from 'pgvector/drizzle-orm';
 import type { cases, evidence, legalDocuments, users } from './schema-postgres.ts';
 
 // Evidence Chain of Custody

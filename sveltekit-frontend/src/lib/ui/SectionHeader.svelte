@@ -1,7 +1,8 @@
 <script lang="ts">
-	let subtitle = $state<any>(undefined);
-
- let { title = "", subtitle = "" } = $props();
+ let { title = "", subtitle = "" } = $props<{
+  title?: string;
+  subtitle?: string;
+ }>();
 </script>
 
 <div class="mb-6">
