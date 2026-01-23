@@ -1,8 +1,8 @@
 import type { Message } from '$lib/types';
-import { connect, type Connection, type Channel, type ConsumeMessage } from 'amqplib';
+import * as amqplib from 'amqplib';
 
-let connection: Connection | null = null;
-let channel: Channel | null = null;
+let connection: amqplib.Connection | null = null;
+let channel: amqplib.Channel | null = null;
 
 export const QUEUES = {
   evidence: {

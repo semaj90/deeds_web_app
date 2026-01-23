@@ -97,7 +97,7 @@ export const evidenceProcessingMachine = createMachine({
 		events: {} as EvidenceProcessingEvent
 	},
 	actors: {
-		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }, EvidenceProcessingContext>(
+		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
@@ -124,7 +124,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }, EvidenceProcessingContext>(
+		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
@@ -150,7 +150,7 @@ export const evidenceProcessingMachine = createMachine({
 			classification: string;
 			riskAssessment?: string;
 			recommendations?: string[];
-		}, EvidenceProcessingContext>(
+		}>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
@@ -170,7 +170,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		cacheResults: fromPromise<any, EvidenceProcessingContext>(
+		cacheResults: fromPromise<any>(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
