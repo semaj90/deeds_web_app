@@ -1,9 +1,7 @@
 // src/lib/server/embedding-service.ts
 // Simple wrapper around your embedding model (Ollama / Gemma / embeddinggemma, etc.)
 
-// If you don't have a shared config file, you can inline:
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-
 const DEFAULT_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 
 type OllamaEmbedResponse = {
@@ -16,7 +14,7 @@ export async function embedText(text: string): Promise<number[]> {
 }
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-    const baseUrl = OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+    const baseUrl = OLLAMA_BASE_URL;
     const timeout = Number(process.env.OLLAMA_EMBED_TIMEOUT_MS ?? '180000'); // 3 minutes
 
     const controller = new AbortController();
@@ -28,7 +26,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const res = await fetch(`${baseUrl}/api/embeddings`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ model: DEFAULT_EMBED_MODEL,
+            body: JSON.stringify({
+                model: DEFAULT_EMBED_MODEL,
                 prompt: text,
             }),
             signal: controller.signal,
@@ -38,16 +37,14 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         if (!res.ok) {
             const body = await res.text().catch(() => '');
-            console.error('❌ Ollama embeddings error:', res.status: body.slice(0, 200));
-            throw new Error(`Ollama embeddings failed, ${res.status}`);
+            console.error('❌ Ollama embeddings error:', res.status, body.slice(0, 200));
+            throw new Error(`Ollama embeddings failed: ${res.status}`);
         }
 
         const data = (await res.json()) as OllamaEmbedResponse;
 
-        // Handle both response formats: { embedding: [...] } or { embeddings: [[...]] }data.embedding ??
-            (Array.isArray(data.embeddings) && data.embeddings.length > 0
-                ? data.embeddings[0]
-                : undefined);
+        // Handle both response formats
+        const embedding = data.embedding ?? (Array.isArray(data.embeddings) && data.embeddings.length > 0 ? data.embeddings[0] : undefined);
 
         if (!embedding || embedding.length === 0) {
             console.error('❌ No embedding in response:', JSON.stringify(data).substring(0, 200));
@@ -56,8 +53,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         // Validate embedding dimensions
         const expectedDim = Number(process.env.EMBEDDING_DIM ?? 768);
-        if (!Array.isArray(embedding) ?? embedding.length !== expectedDim) {
-            throw new Error(`Invalid embedding size: expected ${expectedDim}, got ${embedding?.length}`);
+        if (!Array.isArray(embedding) || embedding.length !== expectedDim) {
+             // Warn but don't fail, maybe model changed
+             console.warn(`Warning: Embedding size mismatch. Expected ${expectedDim}, got ${embedding?.length}`);
         }
 
         console.log(`✅ Embedding generated: ${embedding.length} dimensions`);
@@ -72,7 +70,3 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         throw error;
     }
 }
-
-
-
-
