@@ -252,30 +252,60 @@ async function importProcessor() {
     },
   ];
 
-  async function findFiles(dirPath, extensions = ['.ts', '.svelte'], excludeDirs = ['node_modules', '.svelte-kit', 'dist', 'build', '.git']) {
+  async function findFiles(
+    dirPath,
+    extensions = ['.ts', '.svelte'],
+    excludeDirs = [
+      'node_modules',
+      '.svelte-kit',
+      'dist',
+      'build',
+      '.git',
+      '__tests__',
+      'syntax-repair',
+    ]
+  ) {
     const files = [];
 
     async function scan(dir) {
-      const entries = await readdir(dir, { withFileTypes: true });
+      try {
+        const entries = await readdir(dir, { withFileTypes: true });
 
-      for (const entry of entries) {
-        const fullPath = join(dir, entry.name);
+        for (const entry of entries) {
+          const fullPath = join(dir, entry.name);
 
-        if (entry.isDirectory()) {
-          if (!excludeDirs.includes(entry.name)) {
-            await scan(fullPath);
-          }
-        } else if (entry.isFile()) {
-          const ext = extname(entry.name);
-          if (extensions.includes(ext)) {
-            files.push(fullPath);
+          if (entry.isDirectory()) {
+            if (!excludeDirs.includes(entry.name)) {
+              await scan(fullPath);
+            }
+          } else if (entry.isFile()) {
+            const ext = extname(entry.name);
+            if (extensions.includes(ext)) {
+              files.push(fullPath);
+            }
           }
         }
+      } catch (err) {
+        // Skip directories we can't read
       }
     }
 
     await scan(dirPath);
     return files;
+  }
+
+  // Process files in batches to avoid OOM
+  async function processBatch(files, config, batchSize = 50) {
+    const results = [];
+    for (let i = 0; i < files.length; i += batchSize) {
+      const batch = files.slice(i, i + batchSize);
+      const batchResults = await Promise.all(batch.map((file) => processFile(file, config)));
+      results.push(...batchResults);
+
+      // Force garbage collection hint
+      if (global.gc) global.gc();
+    }
+    return results;
   }
 
   async function processFile(filePath, config) {
@@ -314,7 +344,9 @@ async function importProcessor() {
 
   async function runProcessor(targetDir, config) {
     const startTime = Date.now();
+    console.log('  Scanning for files...');
     const files = await findFiles(targetDir);
+    console.log(`  Found ${files.length} files to process`);
 
     let totalFixes = 0;
     let filesFixed = 0;
@@ -323,14 +355,17 @@ async function importProcessor() {
     for (let pass = 1; pass <= config.maxPasses; pass++) {
       let passFixes = 0;
       let passFilesFixed = 0;
+      console.log(`  Starting pass ${pass}...`);
 
-      for (const file of files) {
-        const result = await processFile(file, config);
+      // Process in batches of 50 files to avoid OOM
+      const results = await processBatch(files, config, 50);
+
+      for (const result of results) {
         if (result.totalFixes > 0) {
           passFixes += result.totalFixes;
           passFilesFixed++;
           if (config.verbose) {
-            console.log(`  [Pass ${pass}] ${result.totalFixes} fixes in ${file}`);
+            console.log(`  [Pass ${pass}] ${result.totalFixes} fixes in ${result.filePath}`);
           }
         }
       }
@@ -344,10 +379,10 @@ async function importProcessor() {
       totalFixes += passFixes;
       filesFixed += passFilesFixed;
 
+      console.log(`  Pass ${pass} complete: ${passFixes} fixes in ${passFilesFixed} files`);
+
       if (passFixes === 0) {
-        if (config.verbose) {
-          console.log(`  Pass ${pass}: No fixes found, stopping.`);
-        }
+        console.log(`  No more fixes found, stopping.`);
         break;
       }
     }
@@ -388,10 +423,14 @@ async function importProcessor() {
       '',
       '  Pass Details:',
       '  ' + '-'.repeat(40),
-      ...passes.map(p => `    Pass ${p.passNumber}: ${p.totalFixes} fixes in ${p.filesFixed} files`),
+      ...passes.map(
+        (p) => `    Pass ${p.passNumber}: ${p.totalFixes} fixes in ${p.filesFixed} files`
+      ),
       '',
       '═'.repeat(60),
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     return {
       passes,

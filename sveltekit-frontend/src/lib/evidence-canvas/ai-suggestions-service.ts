@@ -67,7 +67,7 @@ export class AISuggestionsService {
  if (priorityDiff !== 0) return priorityDiff;
  return b.confidence - a.confidence;
  });
-  
+
  this.suggestionCache.set(cacheKey, suggestions);
 
  return suggestions.slice(0, 10); // Return top 10 suggestions
