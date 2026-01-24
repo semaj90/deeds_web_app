@@ -177,7 +177,7 @@
  }
  }
 
- function adjustRisk(delta: number, message: string, string): string {
+ function adjustRisk(delta: number, message: string): string {
  const next = Math.max(0, Math.min(100, riskScore + delta));
  riskTrend = delta > 1 ? 'up' : delta < -1 ? 'down' : 'steady';
  riskScore = next;
