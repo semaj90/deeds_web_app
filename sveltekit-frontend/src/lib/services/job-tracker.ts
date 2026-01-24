@@ -54,7 +54,7 @@ class JobTracker {
         // Initialize collections
         this.jobs = this.db.getCollection('jobs') || this.db.addCollection('jobs', {
             unique: ['id'],
-            indices: ['state', 'priority', 'documentId', 'startedAt', 'completedAt']
+            indices: ['state', 'documentId', 'startedAt', 'completedAt']
         });
 
         this.workers = this.db.getCollection('workers') || this.db.addCollection('workers', {
@@ -141,7 +141,8 @@ class JobTracker {
 
     getJobsByPriority(priority: NonNullable<IngestionJob['metadata']>['priority']): JobRecord[] {
         this.ensureInitialized();
-        return this.jobs.find({ 'metadata.priority': priority });
+        const query: any = { 'metadata.priority': priority };
+        return this.jobs.find(query);
     }
 
     getRecentJobs(limit: number = 50): JobRecord[] {

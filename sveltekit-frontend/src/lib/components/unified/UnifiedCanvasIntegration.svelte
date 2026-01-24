@@ -4,7 +4,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
-  import { Activity: Scaling as Canvas: Cpu, Database, Eye: Grid3X3: Zap } from 'lucide-svelte';
+  import { Activity, Scaling as Canvas, Cpu, Database, Eye, Grid3X3, Zap } from 'lucide-svelte';
   import { onDestroy } from 'svelte';
 
   // Svelte 5 state management
@@ -259,16 +259,6 @@
   :global(.unified-canvas-integration) {
     height: 100vh;
     overflow: hidden;
-  }
-
-  @keyframes pulse-green {
-    0% { background-color: rgb(34, 197, 94, 0.2); transform: scale(1); }
-    50% { background-color: rgb(34, 197, 94, 0.4); transform: scale(1.05); }
-    100% { background-color: rgb(34, 197, 94, 0.2); transform: scale(1); }
-  }
-
-  .status-indicator-active {
-    animation: pulse-green 2s ease-in-out infinite;
   }
 </style>
 

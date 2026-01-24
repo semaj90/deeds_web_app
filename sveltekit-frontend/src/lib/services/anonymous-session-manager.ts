@@ -250,12 +250,17 @@ export const anonymousSessionManager = new AnonymousSessionManager();
  */
 export function useAnonymousSession() {
 	return {
-		addMessage: (chatId, string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
-			anonymousSessionManager.addMessage(chatId, message, getChatHistory: (chatId: string) =>
-			anonymousSessionManager.getChatHistory(chatId, hasUnsavedChats: () =>
-			anonymousSessionManager.hasUnsavedChats( getUnsavedCount: () =>
-			anonymousSessionManager.getUnsavedCount( exportForMigration: () =>
-			anonymousSessionManager.exportForMigration( clearSession: () =>
+		addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
+			anonymousSessionManager.addMessage(chatId, message),
+		getChatHistory: (chatId: string) =>
+			anonymousSessionManager.getChatHistory(chatId),
+		hasUnsavedChats: () =>
+			anonymousSessionManager.hasUnsavedChats(),
+		getUnsavedCount: () =>
+			anonymousSessionManager.getUnsavedCount(),
+		exportForMigration: () =>
+			anonymousSessionManager.exportForMigration(),
+		clearSession: () =>
 			anonymousSessionManager.clearSession()
 	};
 }

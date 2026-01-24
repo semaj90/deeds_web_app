@@ -633,7 +633,7 @@ function getOllamaEndpoint(): string {
 
         // 2) import.meta.env (Vite / ESM) - access safely inside try/catch
         try {
-            const ime: unknown = typeof import.meta !== 'undefined' ? ((import.meta as any).env ?? null): null;
+            const ime: any = typeof import.meta !== 'undefined' ? ((import.meta as any).env ?? null): null;
             if (ime) {
                 // check common Vite prefixes first (VITE_...), then plain process.env.OLLAMA_URL
                 if (typeof ime.VITE_OLLAMA_URL === 'string' && ime.VITE_OLLAMA_URL.trim()) return ime.VITE_OLLAMA_URL;

@@ -1,4 +1,7 @@
-import { connect, type Channel, type Connection } from 'amqplib';
+type Channel = any;
+type Connection = any;
+import * as _amqplib from 'amqplib';
+const connect = (_amqplib as any).connect;
 
 let connection: Connection | null = null;
 let channel: Channel | null = null;
@@ -20,12 +23,12 @@ export const QUEUES = {
   }
 };
 
-export async function getConnection(): Promise<amqplib.Connection> {
+export async function getConnection(): Promise<Connection> {
   if (connection) return connection;
   const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:123456@localhost:5672';
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
   try {
-    connection = await amqplib.connect(rabbitmqUrl);
+    connection = await connect(rabbitmqUrl);
     connection.on('error', (err) => {
       console.error('❌ RabbitMQ connection error:', err);
       connection = null;
@@ -43,7 +46,7 @@ export async function getConnection(): Promise<amqplib.Connection> {
   }
 }
 
-export async function getChannel(): Promise<amqplib.Channel> {
+export async function getChannel(): Promise<Channel> {
   if (channel) return channel;
   const conn = await getConnection();
   try {

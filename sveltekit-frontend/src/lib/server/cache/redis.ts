@@ -28,7 +28,7 @@ export const cache = {
         const result = await client.get(key);
         if (!result) return null;
         try {
-            return JSON.parse(result as string) as T;
+            return JSON.parse(result as any) as T;
         } catch (e) {
             console.error('Cache parse error', e);
             return null;
@@ -49,4 +49,3 @@ export const cache = {
         await client?.del(key);
     }
 };
-
