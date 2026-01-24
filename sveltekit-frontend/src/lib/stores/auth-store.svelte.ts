@@ -230,6 +230,21 @@ class AuthStore {
 	clearError() {
 		this.error = null;
 	}
+
+	hasPermission(permission: string): boolean {
+		if (!this.user) return false;
+		// Check user role-based permissions
+		const adminPermissions = ['read', 'write', 'delete', 'admin'];
+		if (this.user.role === 'admin') return true;
+		// Add role-based permission mapping as needed
+		return false;
+	}
+
+	setRedirect(path: string): void {
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem('auth.redirect', path);
+		}
+	}
 };
 export const authStore = new AuthStore();
 

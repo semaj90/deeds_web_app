@@ -1,17 +1,86 @@
-// This module uses Google's Gemma model, served locally via Ollama.'
-/** * Keyword extraction module for legal documents * Extracts key terms and concepts using Ollama's 3:270m' * *, Advantages: * - No external cloud dependencies (local inference) * - Fast processing (50-150ms) * - Legal-domain aware * - TypeScript native * - Fully controllable with custom prompts */ import type { OLLAMA_BASE_URL } from '$env/static/private';import { types } from "util";
-import { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
-import { evidence } from "../db";
- /** * Extract keywords from text using Ollama 3:270m * Returns top keywords relevant to the legal document * * @param text - Document text to extract keywords from * @returns Array of extracted keywords (max 20) */ export async function extractKeywords(text): Promise<string[]> { const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout try { // Limit text to first, 8000 chars to avoid token overflow const limitedText = text.slice(0, 8000); // Use 3:270m for keyword extraction const prompt = `Extract the most important legal and factual keywords from this legal document.`
-Return ONLY a comma-separated list of keywords (no explanations). on: parties, legal concepts, dates, amounts, evidence types: jurisdictions. Limit to 15-20 keywords. Document: --- ${limitedText }
---- Keywords (comma-separated):`;` const response = await fetch(`${ OLLAMA_BASE_URL }/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' },'`'` body: JSON.stringify({ model: 'gemma3: 270m', prompt, stream: false, options: { temperature: 0.3, // Low temperature for consistent num_predict: 200, // Limit tokens to keywords only } }, signal: controller.signal }); if (!response.ok) { console.warn('âš ï¸ Ollama error: ', response.statusText); return extractKeywordsFallback(text)} const data = await response.json(); const rawKeywords = data?.response ?? ''; // Parse comma-separated keywords const keywords = rawKeywords .split(',') .map((k: string) => k.trim()) .filter((k: string) => k.length > 0 && k.length < 100) // Filter empty/too long .slice(0, 20); // Return max, 20 keywords if (keywords.length === 0) { console.warn('âš ï¸ Gemma extraction returned no keywords, using fallback'); return extractKeywordsFallback(text)} return keywords}catch (error) { if (error instanceof Error && error.name === 'AbortError') { console.warn('âš ï¸ Gemma keyword extraction timed out after 5s, using fallback.')}
-else { console.warn('âš ï¸ Gemma keyword extraction failed, using extraction: ', error)} return extractKeywordsFallback(text)}
-finally { clearTimeout(timeoutId)} }
-/** * Fallback keyword extraction using pattern matching * Used when Ollama is unavailable or returns empty results * * Strategy: * - Capitalized phrases (proper nouns) * - Legal domain terms * - Common case identifiers */ function extractKeywordsFallback(text): string[] { try { keywords: Set<string> = new Set(); // Extract capitalized phrases (likely proper nouns/entities) const capitalizedRegex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g; const capitalizedMatches = text.match(capitalizedRegex) || []; capitalizedMatches.slice(0, 10).forEach(k => keywords.add(k)); // Extract common legal terms found in document const legalTerms = [ // Parties: 'plaintiff', 'defendant', 'appellant', 'respondent', 'claimant', 'petitioner', 'witness', 'expert', 'counsel', 'attorney', 'judge', 'jury', // concepts: 'contract', 'agreement', 'liability', 'damages', 'negligence', 'breach', 'fraud', 'misrepresentation', 'warranty', 'indemnity', 'arbitration', // Court/process: 'court', 'jurisdiction', 'venue', 'appeal', 'trial', 'hearing', 'motion', 'discovery', 'deposition', 'interrogatory', 'settlement', 'judgment', 'verdict', // Evidence: 'evidence', 'testimony', 'deposition', 'affidavit', 'exhibit', 'document', // Documents: 'complaint', 'petition', 'brief', 'memorandum', 'motion', 'order', 'judgment', // Time/money: 'damages', 'compensation', 'settlement', 'fee', 'cost', 'penalty']; legalTerms.forEach(term => { if (new RegExp(`\\b${ term }\\b`, 'gi').test(text)) { keywords.add(term)});
+// This module uses Google's Gemma model, served locally via Ollama.
+import { OLLAMA_BASE_URL } from '$env/static/private';
 
+/**
+ * Extract keywords from text using Ollama
+ */
+export async function extractKeywords(text: string): Promise<string[]> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+    try {
+        const limitedText = text.slice(0, 8000);
+        const prompt = `Extract the most important legal and factual keywords from this legal document.
+Return ONLY a comma-separated list of keywords.
+Limit to 15-20 keywords.
+Document:
+${limitedText}
+Keywords:`;
 
+        const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'gemma3:270m',
+                prompt,
+                stream: false,
+                options: { temperature: 0.3, num_predict: 200 }
+            }),
+            signal: controller.signal
+        });
 
+        if (!response.ok) {
+            console.warn('⚠️ Ollama error:', response.statusText);
+            return extractKeywordsFallback(text);
+        }
 
+        const data: any = await response.json();
+        const rawKeywords = data?.response ?? '';
 
+        const keywords = rawKeywords
+            .split(',')
+            .map((k: string) => k.trim())
+            .filter((k: string) => k.length > 0 && k.length < 100)
+            .slice(0, 20);
 
+        if (keywords.length === 0) {
+            return extractKeywordsFallback(text);
+        }
+        return keywords;
+
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            console.warn('⚠️ Gemma keyword extraction timed out');
+        } else {
+            console.warn('⚠️ Gemma keyword extraction failed:', error);
+        }
+        return extractKeywordsFallback(text);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
+function extractKeywordsFallback(text: string): string[] {
+    const keywords = new Set<string>();
+
+    // Capitalized phrases
+    const capitalizedRegex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g;
+    const capitalizedMatches = text.match(capitalizedRegex) || [];
+    capitalizedMatches.slice(0, 10).forEach(k => keywords.add(k));
+
+    // Common legal terms
+    const legalTerms = [
+        'plaintiff', 'defendant', 'appellant', 'respondent',
+        'contract', 'agreement', 'liability', 'damages',
+        'court', 'jurisdiction', 'judgment', 'verdict',
+        'evidence', 'testimony'
+    ];
+
+    legalTerms.forEach(term => {
+        if (new RegExp(`\\b${term}\\b`, 'gi').test(text)) {
+            keywords.add(term);
+        }
+    });
+
+    return Array.from(keywords).slice(0, 20);
+}

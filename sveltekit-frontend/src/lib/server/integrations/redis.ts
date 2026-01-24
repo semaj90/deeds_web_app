@@ -5,7 +5,7 @@
  * automatic serialization: TTL management, and health checks.
  */
 import { createClient, type RedisClientType } from 'redis';
-import type { IRedisCacheService: CacheSetOptions } from '$lib/types/external-services';
+import type { IRedisCacheService, CacheSetOptions } from '$lib/types/external-services';
 
 interface RedisConfig {
   url?: string;
@@ -14,7 +14,7 @@ interface RedisConfig {
   retryDelay?: number;
 }
 
-class RedisCacheService implements IRedisCacheService {
+export class RedisCacheService implements IRedisCacheService {
   client: RedisClientType;
   private connected: boolean = false;
   private connecting: Promise<void> | null = null;
@@ -22,15 +22,15 @@ class RedisCacheService implements IRedisCacheService {
 
   constructor(config: Partial<RedisConfig> = {}) {
     this.config = {
-      url: config?.url || process.env?.REDIS_URL ?? 'redis://127.0.0.1:6379/0',
-      password: config?.password || process.env?.REDIS_PASSWORD ?? '',
+      url: config?.url || process.env?.REDIS_URL || 'redis://localhost:6379',
+      password: config?.password || process.env?.REDIS_PASSWORD || '',
       maxRetries: config?.maxRetries ?? 3,
       retryDelay: config?.retryDelay ?? 1000,
     };
 
     this.client = createClient({
       url: this.config.url,
-      password: this.config?.password ?? undefined,
+      password: this.config.password || undefined,
       socket: {
         reconnectStrategy: (retries) => {
           if (retries > this.config.maxRetries) {
@@ -58,12 +58,8 @@ class RedisCacheService implements IRedisCacheService {
     });
   }
 
-  /**
-   * Ensure connection (with singleton promise to prevent race conditions)
-   */
   private async ensureConnected(): Promise<void> {
     if (this.connected) return;
-
     if (this.connecting) {
       await this.connecting;
       return;
@@ -83,159 +79,104 @@ class RedisCacheService implements IRedisCacheService {
     await this.connecting;
   }
 
-  /**
-   * Get value from cache with automatic JSON parsing
-   */
   async get<T = unknown>(key: string): Promise<T | null> {
     await this.ensureConnected();
     const value = await this.client.get(key);
-
     if (value === null) return null;
-
     try {
       return JSON.parse(value) as T;
     } catch {
-      // If not JSON, return as string
-      return value as T;
+      return value as unknown as T;
     }
   }
 
-  /**
-   * Set value in cache with automatic JSON serialization and TTL
-   */
   async set<T = unknown>(key: string, value: T, options?: CacheSetOptions): Promise<void> {
     await this.ensureConnected();
-
     const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-    const ttl = options?.ttlSeconds ?? (options?.ttlMs ? Math.floor(options.ttlMs / 1000) : undefined);
+    const ttl = options?.ttlSeconds;
 
     if (ttl) {
-      await this.client.setex(key, ttl, serialized);
+      await this.client.setEx(key, ttl, serialized);
     } else {
       await this.client.set(key, serialized);
     }
 
-    // Add tags if provided (using Redis sets for tag-based invalidation)
     if (options?.tags && options.tags.length > 0) {
       for (const tag of options.tags) {
         await this.client.sAdd(`tag:${tag}`, key);
         if (ttl) {
-          await this.client.expire(`tag:${tag}`, ttl);
+            await this.client.expire(`tag:${tag}`, ttl);
         }
       }
     }
   }
 
-  /**
-   * Delete key from cache
-   */
   async del(key: string): Promise<boolean> {
     await this.ensureConnected();
     const deleted = await this.client.del(key);
     return deleted > 0;
   }
 
-  /**
-   * Get multiple keys at once
-   */
   async mget<T = unknown>(keys: string[]): Promise<Array<T | null>> {
     await this.ensureConnected();
-
     if (keys.length === 0) return [];
-
     const values = await this.client.mGet(keys);
     return values.map((value) => {
       if (value === null) return null;
       try {
         return JSON.parse(value) as T;
       } catch {
-        return value as T;
+        return value as unknown as T;
       }
     });
   }
 
-  /**
-   * Get TTL for a key (in seconds)
-   */
   async ttl(key: string): Promise<number | null> {
     await this.ensureConnected();
     const ttl = await this.client.ttl(key);
-
-    // TTL returns -2 if key doesn't exist, -1 if no expiry
     if (ttl === -2) return null;
     if (ttl === -1) return Infinity;
     return ttl;
   }
 
-  /**
-   * Set if not exists (atomic operation for locking)
-   */
-  async setIfNotExists<T = unknown>(
-    key: string,
-    value: T,
-    ttlSeconds?: number
-  ): Promise<boolean> {
+  async setIfNotExists<T = unknown>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
     await this.ensureConnected();
-
     const serialized = typeof value === 'string' ? value : JSON.stringify(value);
 
     if (ttlSeconds) {
-      const result = await this.client.set(key, serialized, {
-        NX: true,
-        EX: ttlSeconds,
-      });
-      return result === 'OK';
+        const result = await this.client.set(key, serialized, { NX: true, EX: ttlSeconds });
+        return result === 'OK';
     } else {
-      const result = await this.client.setNX(key, serialized);
-      return result;
+        const result = await this.client.setNX(key, serialized);
+        return result;
     }
   }
 
-  /**
-   * Invalidate all keys with a specific tag
-   */
   async invalidateByTag(tag: string): Promise<number> {
     await this.ensureConnected();
-
     const keys = await this.client.sMembers(`tag:${tag}`);
     if (keys.length === 0) return 0;
-
-    // Delete all keys and the tag set
     const deleted = await this.client.del([...keys, `tag:${tag}`]);
     return deleted;
   }
 
-  /**
-   * Increment a counter (atomic)
-   */
   async increment(key: string, amount: number = 1): Promise<number> {
     await this.ensureConnected();
     return await this.client.incrBy(key, amount);
   }
 
-  /**
-   * Get all keys matching a pattern (use sparingly in production)
-   */
   async keys(pattern: string): Promise<string[]> {
-    await this.ensureConnected();
-    return await this.client.keys(pattern);
+      await this.ensureConnected();
+      return await this.client.keys(pattern);
   }
 
-  /**
-   * Health check
-   */
-  async health(): Promise<{
-    status: 'healthy' | 'degraded' | 'unavailable';
-    usedMemory?: number;
-  }> {
+  async health(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }> {
     try {
       await this.ensureConnected();
-
       const startTime = Date.now();
       await this.client.ping();
       const latency = Date.now() - startTime;
 
-      // Get memory info
       const info = await this.client.info('memory');
       const usedMemoryMatch = info.match(/used_memory:(\d+)/);
       const usedMemory = usedMemoryMatch ? parseInt(usedMemoryMatch[1]) : undefined;
@@ -249,9 +190,6 @@ class RedisCacheService implements IRedisCacheService {
     }
   }
 
-  /**
-   * Disconnect (for cleanup)
-   */
   async disconnect(): Promise<void> {
     if (this.connected) {
       await this.client.disconnect();
@@ -259,25 +197,16 @@ class RedisCacheService implements IRedisCacheService {
     }
   }
 
-  /**
-   * Flush entire cache (DANGEROUS - use only in dev/test)
-   */
   async flushAll(): Promise<void> {
-    await this.ensureConnected();
-    await this.client.flushAll();
+      await this.ensureConnected();
+      await this.client.flushAll();
   }
 }
 
-// Singleton instance
 let redisInstance: RedisCacheService | null = null;
-
 export function getRedisCache(config?: Partial<RedisConfig>): RedisCacheService {
   if (!redisInstance || config) {
     redisInstance = new RedisCacheService(config);
   }
   return redisInstance;
 }
-
-export { RedisCacheService };
-export type { RedisConfig };
-
