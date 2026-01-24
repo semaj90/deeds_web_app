@@ -1,4 +1,4 @@
-import {  env  } from '$env /dynamic/private';
+import { env } from '$env/dynamic/private';
 import neo4j, { type Driver } from 'neo4j-driver';
 
 let cachedDriver: null = null;

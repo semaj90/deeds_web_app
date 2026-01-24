@@ -1,4 +1,4 @@
-import {  env  } from '$env /dynamic/private';
+import { env } from '$env/dynamic/private';
 import type { evidence } from '$lib/server/db/schema-postgres';
 import type { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
@@ -20,7 +20,8 @@ export class EvidenceFastAPIBridge {
  try {
  console.log(`🔄 Processing evidence ${ evidenceId } with FastAPI RAG pipeline`);
 
- // Get evidence record.select()
+ // Get evidence record
+.select()
  .from(evidence)
  .where(eq(evidence.id, evidenceId))
  .limit(1);

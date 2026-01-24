@@ -1,6 +1,6 @@
 
-import { env as privateEnv } from '$env /dynamic/private';
-import { env as publicEnv } from '$env /dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 
 export const ENV = {
  POSTGRES_URL: privateEnv.POSTGRES_URL!,
