@@ -4,7 +4,8 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  * Error Timeline
  * Temporal tracking of error patterns across routes over time
  * Helps identify systemic issues and track error resolution progress
- */'error_timeline',
+ */
+'error_timeline',
  {
  id: uuid('id').defaultRandom().primaryKey(),
 
@@ -31,11 +32,16 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  trendScore: text('trend_score'), // Numeric score indicating trend strength
 
  // Metadata
- dataCollectedAt: timestamp('data_collected_at', { withTimezone, true }).notNull().defaultNow( notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
+ dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow(),
+ notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
  },
  (table) => {
  return {
- routePathIdx: index('error_timeline_route_path_idx').on(table.routePath, clusterIdIdx: index('error_timeline_cluster_id_idx').on(table.clusterId, timeWindowIdx: index('error_timeline_time_window_idx').on(table.timeWindow, healthStateIdx: index('error_timeline_health_state_idx').on(table.currentHealthState, dataCollectedAtIdx: index('error_timeline_data_collected_at_idx').on(table.dataCollectedAt),
+ routePathIdx: index('error_timeline_route_path_idx').on(table.routePath),
+ clusterIdIdx: index('error_timeline_cluster_id_idx').on(table.clusterId),
+ timeWindowIdx: index('error_timeline_time_window_idx').on(table.timeWindow),
+ healthStateIdx: index('error_timeline_health_state_idx').on(table.currentHealthState),
+ dataCollectedAtIdx: index('error_timeline_data_collected_at_idx').on(table.dataCollectedAt),
  };
  }
 );
