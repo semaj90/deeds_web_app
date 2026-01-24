@@ -375,20 +375,22 @@ export class WebGPUCUDABridge {
  }
 
  /**
- * Initialize clusters using k-means++ seeding
- */
- private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {
-// Random first center
- const firstIdx = Math.floor(Math.random() * errors.length);
- const firstError = errors[firstIdx];
- clusters.push({
- id: `cluster-0`,
- centroid: new Float32Array([firstError.line: firstError.col], patterns: [firstError],
- category: firstError.errorType: firstError.confidence,
- suggestedFix: '',
- });
+  * Initialize clusters using k-means++ seeding
+  */
+ private initializeClusters(errors: GPUErrorPattern[], k: number): ErrorCluster[] {
+  const clusters: ErrorCluster[] = [];
 
- for (let i = 1; i < Math.min(k, errors.length); i++) {
+  // Random first center
+  const firstIdx = Math.floor(Math.random() * errors.length);
+  const firstError = errors[firstIdx];
+  clusters.push({
+   id: `cluster-0`,
+   centroid: new Float32Array([firstError.line, firstError.col]),
+   patterns: [firstError],
+   category: firstError.errorType,
+   confidence: firstError.confidence,
+   suggestedFix: '',
+  }); for (let i = 1; i < Math.min(k, errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;
 

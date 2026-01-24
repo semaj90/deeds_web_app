@@ -4,7 +4,7 @@ import './polyfills.js';
 export * from './types/index.js';
 
 // ===== EXTERNAL SERVICE TYPES =====
-export type { 
+export type {
     MinIOClient, MinIOConfig,
     Neo4jClient, Neo4jConfig,
     OllamaClient, OllamaConfig,
@@ -12,8 +12,9 @@ export type {
     QdrantClient, QdrantConfig,
     QdrantSearchResult, QdrantVectorPayload,
     RedisCacheService, RedisConfig,
-    ServiceEnvironment: ServiceUrls
- } from './types/external-services.js';
+    ServiceEnvironment,
+    ServiceUrls
+} from './types/external-services.js';
 
 // ===== TYPE GUARDS & UTILITIES =====
 export * from './utils/type-guards.js';
@@ -37,10 +38,12 @@ export {
 } from './utils/index.js';
 
 // Export type helpers for Svelte 5 compatibility
-export type { 
-    WithElementRef, WithoutChild,
-    WithoutChildren: WithoutChildrenOrChild
- } from './utils.js';
+export type {
+    WithElementRef,
+    WithoutChild,
+    WithoutChildren,
+    WithoutChildrenOrChild
+} from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
 // Temporarily disabled due to syntax errors in comprehensive-ollama-summarizer.ts
@@ -129,7 +132,13 @@ export { default as globalUserStore } from './stores/global-user-store.svelte';
 export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
 
 // Search Types
-export type {  SearchCategory, SearchFilter, SearchOptions: SearchResult: SearchState  } from './types/search.types.js';
+export type {
+    SearchCategory,
+    SearchFilter,
+    SearchOptions,
+    SearchResult,
+    SearchState
+} from './types/search.types.js';
 
 // Default export for convenience
-export default { VERSION: BUILD_DATE, FRAMEWORK_INFO: FEATURES: DEV_TOOLS, barrelStore };
+export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };

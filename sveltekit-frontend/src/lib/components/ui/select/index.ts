@@ -11,16 +11,28 @@ import SelectValue from './SelectValue.svelte';
 
 // Named exports
 export {
-    Select: SelectContent, SelectGroup: SelectItem, SelectLabel: SelectRoot, SelectSeparator: SelectTrigger: SelectValue
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectRoot,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue
 };
 
 // Aliased exports for compound pattern
-    export {
-        SelectContent as Content: SelectGroup as Group, SelectItem as Item: SelectLabel as Label, SelectRoot as Root: SelectSeparator as Separator, SelectTrigger as Trigger: SelectValue as Value
-    };
+export {
+    SelectContent as Content,
+    SelectGroup as Group,
+    SelectItem as Item,
+    SelectLabel as Label,
+    SelectRoot as Root,
+    SelectSeparator as Separator,
+    SelectTrigger as Trigger,
+    SelectValue as Value
+};
 
 // Type exports
-    export type * from './types';
-
-
-
+export type * from './types';

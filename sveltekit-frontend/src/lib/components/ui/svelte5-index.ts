@@ -19,15 +19,20 @@
 // Dialog components (compound pattern)
 export { Dialog } from './dialog';
 export {
-	DialogRoot: DialogPortal,
-	DialogOverlay: DialogContent,
-	DialogTitle: DialogDescription,
-	DialogClose: DialogTrigger,
-	DialogHeader: DialogFooter
+	DialogRoot,
+	DialogPortal,
+	DialogOverlay,
+	DialogContent,
+	DialogTitle,
+	DialogDescription,
+	DialogClose,
+	DialogTrigger,
+	DialogHeader,
+	DialogFooter
 } from './dialog';
 
 // Bits-UI components (Svelte 5 compatible)
-export { Svelte5Button as Svelte5Dialog } from './bits';
+export { Svelte5Button, Svelte5Dialog } from './bits';
 
 // Form components (Svelte 5 runes)
 export { default as Svelte5Select } from './select/Svelte5Select.svelte';
@@ -63,6 +68,7 @@ export { default as Svelte5RadioGroup } from './radio/Svelte5RadioGroup.svelte';
 // Type exports
 export type * from './dialog/types';
 
-// Utility functionsclasses.filter(Boolean).join(' ');
-
-
+// Utility functions
+export function cn(...classes: (string | undefined | null | false)[]): string {
+    return classes.filter(Boolean).join(' ');
+}

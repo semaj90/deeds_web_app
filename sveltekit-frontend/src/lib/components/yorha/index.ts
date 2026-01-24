@@ -7,23 +7,27 @@ import YoRHaNavigation from './YoRHaNavigation.svelte';
 import YoRHaTable from './YoRHaTable.svelte';
 
 export {
-    YoRHaAIChat: YoRHaCommandCenter,
-    YoRHaDataGrid: YoRHaForm,
-    YoRHaModal: YoRHaNavigation: YoRHaTable
+    YoRHaAIChat,
+    YoRHaCommandCenter,
+    YoRHaDataGrid,
+    YoRHaForm,
+    YoRHaModal,
+    YoRHaNavigation,
+    YoRHaTable
 };
 
 export interface TableColumn {
-  key: string;
-  title: string;
-  sortable?: boolean;
-  width?: string;
-  align?: 'left' | 'center' | 'right';
-  type?: 'text' | 'number' | 'date' | 'status' | 'action';
+    key: string;
+    title: string;
+    sortable?: boolean;
+    width?: string;
+    align?: 'left' | 'center' | 'right';
+    type?: 'text' | 'number' | 'date' | 'status' | 'action';
 }
 
 export interface TableRow {
-  id: string | number;
-  [key: string]: any;
+    id: string | number;
+    [key: string]: any;
 }
 
 // Re-export specific case components
@@ -32,16 +36,11 @@ export { default as CasesList } from './cases/CasesList.svelte';
 export { default as CaseStats } from './cases/CaseStats.svelte';
 
 export const YoRHa = {
-  Table: YoRHaTable,
-  DataGrid: YoRHaDataGrid,
-  Navigation: YoRHaNavigation,
-  CommandCenter: YoRHaCommandCenter,
-  Modal: YoRHaModal,
-  Form: YoRHaForm,
-  AIChat: YoRHaAIChat
+    Table: YoRHaTable,
+    DataGrid: YoRHaDataGrid,
+    Navigation: YoRHaNavigation,
+    CommandCenter: YoRHaCommandCenter,
+    Modal: YoRHaModal,
+    Form: YoRHaForm,
+    AIChat: YoRHaAIChat
 };
-
-
-
-
-
