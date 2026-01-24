@@ -1,5 +1,5 @@
 
-export * from './legal.js';
+// export * from './legal.js';
 
 // Additional Evidence Types
 export interface Evidence {

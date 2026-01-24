@@ -29,25 +29,28 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 export async function generateText(prompt: string): Promise<string> {
  const body = {
- model: CHAT_MODEL,
- messages: [{ role: 'user', content: prompt }],
- stream: false,
- };fetch(`${OLLAMA_BASE_URL}/api/chat`, {
- method: 'POST',
- headers: { 'content-type': 'application/json' },
- body: JSON.stringify(body),
- }),
- REQUEST_TIMEOUT_MS
+  model: CHAT_MODEL,
+  messages: [{ role: 'user', content: prompt }],
+  stream: false,
+ };
+
+ const res = await withTimeout(
+  fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+   method: 'POST',
+   headers: { 'content-type': 'application/json' },
+   body: JSON.stringify(body),
+  }),
+  REQUEST_TIMEOUT_MS
  );
 
  if (!res.ok) {
- const text = await res.text().catch(() => '');
- console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
- throw new Error(`Ollama chat failed, ${res.status}`);
+  const text = await res.text().catch(() => '');
+  console.error('❌ Ollama /api/chat error:', res.status, text.slice(0, 200));
+  throw new Error(`Ollama chat failed: ${res.status}`);
  }
 
  const data = (await res.json()) as {
- message?: { content, string };
+  message?: { content: string };
  };
 
  return data.message?.content ?? '';
@@ -68,26 +71,28 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
 
  const startTime = Date.now();
 
- try {fetch(`${OLLAMA_BASE_URL}/api/chat`, {
- method: 'POST',
- headers: { 'content-type': 'application/json' },
- body: JSON.stringify(body),
- }),
- REQUEST_TIMEOUT_MS
- );
+ try {
+  const res = await withTimeout(
+   fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+   }),
+   REQUEST_TIMEOUT_MS
+  );
 
- const duration = Date.now() - startTime;
- console.log(`[Ollama] Chat response received in ${duration}ms`);
+  const duration = Date.now() - startTime;
+  console.log(`[Ollama] Chat response received in ${duration}ms`);
 
- if (!res.ok) {
- const text = await res.text().catch(() => '');
- console.error('❌ Ollama /api/chat error:', res.status: text.slice(0, 200));
- throw new Error(`Ollama chat failed, ${res.status}`);
- }
+  if (!res.ok) {
+   const text = await res.text().catch(() => '');
+   console.error('❌ Ollama /api/chat error:', res.status, text.slice(0, 200));
+   throw new Error(`Ollama chat failed: ${res.status}`);
+  }
 
- const data = (await res.json()) as {
- message?: { content, string };
- };
+  const data = (await res.json()) as {
+   message?: { content: string };
+  };
 
  const content = data.message?.content ?? '';
  console.log(`✅ Ollama chat completed: ${content.length} chars`);

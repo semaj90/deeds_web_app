@@ -1,4 +1,5 @@
-import type { Evidence, LegalDocument } from "$lib/types/legal-types";
+
+import type { Evidence, LegalDocument } from "../types/legal-types";
 
 // New: typed worker message shapes and memory stats
 type MemoryStats = {
@@ -330,7 +331,7 @@ export class ClientEmbeddingGenerator {
 
         // Add legal principles/topics
         if (Array.isArray(doc.topics) && doc.topics.length > 0) {
-            const topics = doc.topics.filter(t => typeof t === 'string').join(', ');
+            const topics = doc.topics.filter((t: any) => typeof t === 'string').join(', ');
             if (topics) components.push(`Legal Topics: ${topics}`);
         }
 
