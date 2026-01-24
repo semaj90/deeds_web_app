@@ -4,7 +4,7 @@
  * Integrates existing 37 Go services and Ollama cluster
  */
 
-import { productionServiceClient, type ServiceResponse } from './production-service-client.js';
+import { productionServiceClient, type ServiceResponse } from '$lib/api/production-service-client';
 
 export interface GPUTask {
 	id: string;

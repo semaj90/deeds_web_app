@@ -111,7 +111,7 @@ export const DEV_TOOLS = {
 } as const;
 
 // ===== BARREL STORE - MISSING FUNCTIONS & METHODS =====
-export { barrelStore, cacheLayerMethods, configurationProperties, databaseEntityProperties, lokiCollectionMethods, testingFramework, utilityFunctions, webGPUExtendedMethods } from './stores/barrel-functions.js';
+export { barrelStore, cacheLayerMethods, configurationProperties, databaseEntityProperties, lokiCollectionMethods, testingFramework, utilityFunctions, webGPUExtendedMethods } from './stores/_archive/old-stores/barrel-functions';
 
 // ===== DATABASE COMPATIBILITY LAYER =====
 export { createTypeSafeQuery, drizzleCompatibilityLayer, enhanceResultWithTypes, ensureConnection, entityEnhancers, handleQueryResult, safePropertyAccess, vectorOperations } from './database/drizzle-compatibility-fix.js';
@@ -123,7 +123,7 @@ if (typeof globalThis !== 'undefined') {
 
 // ===== ENHANCED SERVICES & STORES =====
 // Global User Store with Svelte 5 Runes
-export { default as globalUserStore } from './stores/global-user-store.svelte';
+export { default as globalUserStore } from './stores/_archive/old-stores/global-user-store.svelte';
 
 // Search Services with Fuse.js Integration - TEMPORARILY DISABLED (corrupted file)
 // export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';

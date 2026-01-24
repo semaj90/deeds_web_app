@@ -5,10 +5,10 @@
  */
 import type {
     EmbeddingCache as EmbeddingCacheType,
-    GetLegalEmbedding as GetLegalEmbeddingType,
-    GetBatchLegalEmbeddings as GetBatchLegalEmbeddingsType
-} from './embedding-cache-middleware.js';
-import type { WebGPURedisOptimizer as WebGPURedisOptimizerType } from './webgpu-redis-optimizer.js';
+    GetBatchLegalEmbeddings as GetBatchLegalEmbeddingsType,
+    GetLegalEmbedding as GetLegalEmbeddingType
+} from '$lib/server/embedding-cache-middleware';
+import type { WebGPURedisOptimizer as WebGPURedisOptimizerType } from '$lib/server/webgpu-redis-optimizer';
 import type { LangExtractOllamaService as LangExtractOllamaServiceType } from '$lib/services/langextract-ollama-service.js';
 
 // Dynamic imports for runtime usage (lazy loaded)
@@ -22,7 +22,7 @@ let langExtractService: LangExtractOllamaServiceType | undefined;
 async function loadServices() {
     if (!embeddingCache) {
         try {
-            const module = await import('./embedding-cache-middleware.js');
+            const module = await import('$lib/server/embedding-cache-middleware');
             embeddingCache = module.embeddingCache;
             getLegalEmbedding = module.getLegalEmbedding;
             getBatchLegalEmbeddings = module.getBatchLegalEmbeddings;
@@ -32,7 +32,7 @@ async function loadServices() {
     }
     if (!webgpuRedisOptimizer) {
         try {
-            const module = await import('./webgpu-redis-optimizer.js');
+            const module = await import('$lib/server/webgpu-redis-optimizer');
             webgpuRedisOptimizer = module.webgpuRedisOptimizer;
         } catch (e) {
             console.warn('webgpu-redis-optimizer not available:', e);

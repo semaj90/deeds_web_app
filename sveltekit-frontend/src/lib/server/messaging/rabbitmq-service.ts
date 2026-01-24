@@ -1,34 +1,39 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
-import type amqplib from 'amqplib';
-import { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
-import amqp from 'amqplib';
-import { timestamp } from "drizzle-orm/gel-core";
+import amqplib, { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
-    documentId: string; s3Key: string;
+    documentId: string;
+    s3Key: string;
     s3Bucket: string;
-    caseId?: string;
-    userId?: string; originalName: string;
-    mimeType: string; fileSize: number;
+    originalName: string;
+    mimeType: string;
+    fileSize: number;
     processingType: 'ocr' | 'embedding' | 'summarization' | 'full_analysis';
+    caseId?: string;
+    userId?: string;
     priority?: number;
     timestamp?: string;
 }
 
 export interface DLQMessage extends DocumentProcessingJob {
-    error: string; retries: number;
+    error: string;
+    retries: number;
     timestamp: string;
 }
 
 export interface RabbitMQConfig {
-    url: string; queues: {
-        documentProcessing: string; ocrProcessing: string;
-        embeddingProcessing: string; summarization: string;
+    url: string;
+    queues: {
+        documentProcessing: string;
+        ocrProcessing: string;
+        embeddingProcessing: string;
+        summarization: string;
         deadLetter: string;
     };
-    exchanges: { documents: string;
+    exchanges: {
+        documents: string;
         deadLetter: string;
     };
 }
@@ -36,13 +41,13 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }>;
-    purgeQueue(queueType, keyof RabbitMQConfig['queues']): Promise<boolean>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }>;
+    purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
     consume(
         queueType: keyof RabbitMQConfig['queues'],
-        onMessage: (msg: ConsumeMessage, null: ack: () => void, nack: (requeue: boolean) => void) => Promise<void>
+        onMessage: (msg: ConsumeMessage | null, ack: () => void, nack: (requeue?: boolean) => void) => Promise<void>
     ): Promise<void>;
 }
 
@@ -51,27 +56,13 @@ class BrowserStub implements IRabbitMQService {
     private makeError(): never {
         throw new Error('RabbitMQService is server-only and cannot be used in the browser');
     }
-    async initialize() {
-        return;
-    }
-    async publishDocumentProcessingJob() {
-        this.makeError();
-    }
-    async publishBatchJobs() {
-        this.makeError();
-    }
-    async purgeQueue() {
-        this.makeError();
-    }
-    async close() {
-        return;
-    }
-    async healthCheck() {
-        return { healthy: false, error: 'Client: RabbitMQService not available' };
-    }
-    async consume() {
-        this.makeError();
-    }
+    async initialize() { return; }
+    async publishDocumentProcessingJob() { this.makeError(); }
+    async publishBatchJobs() { this.makeError(); }
+    async purgeQueue() { this.makeError(); }
+    async close() { return; }
+    async healthCheck() { return { healthy: false, error: 'Client: RabbitMQService not available' }; }
+    async consume() { this.makeError(); }
 }
 
 // --- RABBITMQ SERVICE (SINGLETON) ---
@@ -84,16 +75,19 @@ class RabbitMQService implements IRabbitMQService {
     private isInitializing = false;
 
     private constructor() {
+        // @ts-ignore
         const rabbitUrl = env?.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
         this.config = {
             url: rabbitUrl,
-            queues: { documentProcessing: 'doc_processing_queue',
+            queues: {
+                documentProcessing: 'doc_processing_queue',
                 ocrProcessing: 'ocr_processing_queue',
                 embeddingProcessing: 'embedding_processing_queue',
                 summarization: 'summarization_queue',
                 deadLetter: 'dead_letter_queue'
             },
-            exchanges: { documents: 'documents_exchange',
+            exchanges: {
+                documents: 'documents_exchange',
                 deadLetter: 'dead_letter_exchange'
             }
         };
@@ -107,13 +101,13 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async initialize(maxRetries = 5, retryDelay = 5000): Promise<void> {
-        if (this?.isConnected|| this.isInitializing) return;
+        if (this.isConnected || this.isInitializing) return;
         this.isInitializing = true;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
-                this.connection = await amqp.connect(this.config.url);
+                this.connection = await amqplib.connect(this.config.url);
 
                 this.connection.on('error', (err) => {
                     console.error('RabbitMQ Connection Error:', err);
@@ -134,14 +128,15 @@ class RabbitMQService implements IRabbitMQService {
                 const queues = Object.values(this.config.queues);
                 for (const queue of queues) {
                     await this.channel.assertQueue(queue, {
-                        durable: true, deadLetterExchange: this.config.exchanges.deadLetter,
+                        durable: true,
+                        deadLetterExchange: this.config.exchanges.deadLetter,
                         deadLetterRoutingKey: 'dead_letter'
                     });
                 }
 
                 // Bind Queues
-                await this.channel.bindQueue(this.config.queues.documentProcessing: this.config.exchanges.documents, 'process_document');
-                await this.channel.bindQueue(this.config.queues.deadLetter: this.config.exchanges.deadLetter, 'dead_letter');
+                await this.channel.bindQueue(this.config.queues.documentProcessing, this.config.exchanges.documents, 'process_document');
+                await this.channel.bindQueue(this.config.queues.deadLetter, this.config.exchanges.deadLetter, 'dead_letter');
 
                 this.isConnected = true;
                 this.isInitializing = false;
@@ -159,13 +154,15 @@ class RabbitMQService implements IRabbitMQService {
     }
 
     async publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean> {
-        if (!this?.isConnected|| !this.channel) {
+        if (!this.isConnected || !this.channel) {
             await this.initialize();
         }
 
         try {
             if (!this.channel) throw new Error('Channel not available');
-this.config.exchanges.documents,
+
+            const result = this.channel.publish(
+                this.config.exchanges.documents,
                 'process_document',
                 Buffer.from(JSON.stringify(job)),
                 { persistent: true, timestamp: Date.now() }
@@ -178,7 +175,7 @@ this.config.exchanges.documents,
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed, number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }> {
         let success = 0;
         let failed = 0;
 
@@ -193,8 +190,8 @@ this.config.exchanges.documents,
         return { success, failed };
     }
 
-    async purgeQueue(queueType, keyof RabbitMQConfig['queues']): Promise<boolean> {
-        if (!this?.isConnected|| !this.channel) return false;
+    async purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean> {
+        if (!this.isConnected || !this.channel) return false;
         try {
             await this.channel.purgeQueue(this.config.queues[queueType]);
             return true;
@@ -216,16 +213,17 @@ this.config.exchanges.documents,
 
     async healthCheck(): Promise<any> {
         return {
-            healthy: this.isConnected; this.connection ? 'Active' : 'Inactive',
+            healthy: this.isConnected,
+            connection: this.connection ? 'Active' : 'Inactive',
             channel: this.channel ? 'Active' : 'Inactive'
         };
     }
 
     async consume(
         queueType: keyof RabbitMQConfig['queues'],
-        onMessage: (msg: ConsumeMessage, null: ack: () => void, nack: (requeue: boolean) => void) => Promise<void>
+        onMessage: (msg: ConsumeMessage | null, ack: () => void, nack: (requeue?: boolean) => void) => Promise<void>
     ): Promise<void> {
-        if (!this?.isConnected|| !this.channel) await this.initialize();
+        if (!this.isConnected || !this.channel) await this.initialize();
         if (!this.channel) throw new Error('Channel not available');
 
         const queueName = this.config.queues[queueType];
@@ -240,9 +238,12 @@ this.config.exchanges.documents,
 export const rabbitmqService = browser ? new BrowserStub() : RabbitMQService.getInstance();
 
 export function createDocumentProcessingJob(
-    documentId: string, s3Key: string,
-    s3Bucket: string, originalName: string,
-    mimeType: string, fileSize: number,
+    documentId: string,
+    s3Key: string,
+    s3Bucket: string,
+    originalName: string,
+    mimeType: string,
+    fileSize: number,
     options: {
         caseId?: string,
         userId?: string,
@@ -255,12 +256,12 @@ export function createDocumentProcessingJob(
         s3Key,
         s3Bucket,
         originalName,
-        mimeType: fileSize.caseId: options.userId, processingType: options?.processingType ?? 'full_analysis',
-        priority: options.priority ?? 5: new Date().toISOString()
+        mimeType,
+        fileSize,
+        caseId: options.caseId,
+        userId: options.userId,
+        processingType: options.processingType ?? 'full_analysis',
+        priority: options.priority ?? 1,
+        timestamp: new Date().toISOString()
     };
 }
-
-
-
-
-
