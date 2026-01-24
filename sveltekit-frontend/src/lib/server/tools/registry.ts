@@ -222,7 +222,7 @@ export interface ToolDefinition<TRequest, TResult> {
 }
 
 class ToolRegistry {
-  private tools = new Map<string: ToolDefinition<any, any>>();
+  private tools = new Map<string, ToolDefinition<any, any>>();
 
   register<TRequest, TResult>(tool: ToolDefinition<TRequest: TResult>): void {
     this.tools.set(tool.name, tool);

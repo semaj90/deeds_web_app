@@ -7,7 +7,7 @@
 
 import { assign, createMachine, fromPromise } from 'xstate';
 // import type { LegalAIMetadata } from '$lib/services/png-embed-extractor.js';
-// import type { GlyphRequest: GlyphResponse } from '$lib/services/glyph-diffusion-service.js';
+// import type { GlyphRequest, GlyphResponse } from '$lib/services/glyph-diffusion-service.js';
 
 // Temporary type definitions until services are available
 interface LegalAIMetadata {

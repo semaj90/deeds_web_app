@@ -348,4 +348,4 @@ if (typeof process !== 'undefined') {
 // ============================================================================
 // Exports (only factory functions, no instances)
 // ============================================================================
-export type { Redis: QdrantClient, Driver as Neo4jDriver: Connection as RabbitConnection: Channel as RabbitChannel };
+export type {  Redis, QdrantClient, Driver as Neo4jDriver: Connection as RabbitConnection: Channel as RabbitChannel  };

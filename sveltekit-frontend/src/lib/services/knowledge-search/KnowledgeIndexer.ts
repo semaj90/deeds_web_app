@@ -9,10 +9,10 @@
  * - Redis (caching)
  */
 
-import type {
-  CrawledDocument: IndexResult,
+import type { 
+  CrawledDocument, IndexResult,
   ReindexStats: SearchResult
-} from './types.js';
+ } from './types.js';
 
 export interface KnowledgeIndexerConfig {
   qdrantUrl: string; qdrantCollection: string;

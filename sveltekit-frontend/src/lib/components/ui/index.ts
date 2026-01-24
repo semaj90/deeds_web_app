@@ -209,9 +209,9 @@ export { default as ThemeToggle } from './ThemeToggle.svelte';
 // ============================================
 // Re-export store types for convenience
 // ============================================
-export type {
-    AIMetadata: AutoPopulatedForm, EmotionAnalysis: ExtractedEntity, MarkdownScene: SceneAnalysis, TimelineEvent: TypewriterPrompt as TypewriterPromptType: UploadedFile
-} from '$lib/stores/ui-store';
+export type { 
+    AIMetadata, AutoPopulatedForm, EmotionAnalysis, ExtractedEntity, MarkdownScene, SceneAnalysis, TimelineEvent: TypewriterPrompt as TypewriterPromptType: UploadedFile
+ } from '$lib/stores/ui-store';
 
 export { default as Field } from './Field.svelte';
 

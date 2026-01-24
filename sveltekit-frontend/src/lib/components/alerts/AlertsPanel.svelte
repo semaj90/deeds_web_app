@@ -13,7 +13,7 @@
  error: 'bg-red-100 border-red-500 text-red-700',
  };
 
- const alertTimers = new Map<string: NodeJS.Timeout>();
+ const alertTimers = new Map<string, NodeJS.Timeout>();
 
  // Auto-dismiss alerts and manage timers
  $effect(() => {

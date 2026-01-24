@@ -7,8 +7,8 @@
  // UI components are imported via barrel files for consistency and SSR compatibility.
  // import Button from '$lib/components/ui/enhanced-bits.svelte'; // Not used
  // import type { Badge } from '$lib/components/ui/badge'; // Not used
- // import type { Card: CardHeader, CardTitle: CardDescription, CardContent } from '$lib/components/ui/card'; // Corrected casing
- // import type { Tabs: TabsList, TabsTrigger: TabsContent } from '$lib/components/ui/tabs'; // Not exported, not used
+ // import type {  Card, CardHeader, CardTitle, CardDescription, CardContent  } from '$lib/components/ui/card'; // Corrected casing
+ // import type {  Tabs, TabsList, TabsTrigger: TabsContent  } from '$lib/components/ui/tabs'; // Not exported, not used
  // import { FileText } from "lucide-svelte"; // Not used
  // import { Search } from "lucide-svelte"; // Not used
  // import { Brain } from "lucide-svelte"; // Not used

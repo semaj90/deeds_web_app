@@ -2,10 +2,10 @@ import { createEventDispatcher } from 'svelte';
 <script lang="ts">
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
- import type {
- Dialog: DialogContent,
- DialogDescription: DialogHeader, DialogTitle
- } from '$lib/components/ui/dialog';
+ import type { 
+ Dialog, DialogContent,
+ DialogDescription, DialogHeader, DialogTitle
+  } from '$lib/components/ui/dialog';
  import type { Textarea } from '$lib/components/ui/textarea';
  import type { EvidenceNode } from '$lib/server/db/schema-postgres';
  // Migrated from createEventDispatcher to callback props;

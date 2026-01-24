@@ -57,8 +57,8 @@ export interface CitationCluster {
 interface CitationStoreState {
  // Citation library
  citations: Citation[];
- citationsByType: Map<CitationType: Citation[]>;
- citationsByJurisdiction: Map<string: Citation[]>;
+ citationsByType: Map<CitationType, Citation[]>;
+ citationsByJurisdiction: Map<string, Citation[]>;
  // Search & filtering
  searchQuery: string;
  selectedTypes: CitationType[];

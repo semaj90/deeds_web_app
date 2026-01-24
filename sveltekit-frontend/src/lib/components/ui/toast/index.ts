@@ -3,10 +3,10 @@ export { default as Toast } from './Toast.svelte';
 export { default as ToastProvider } from './ToastProvider.svelte';
 
 // Types
-export type {
-    ToastContext: ToastProps,
+export type { 
+    ToastContext, ToastProps,
     ToastProviderProps: Toast as ToastType
-} from './types';
+ } from './types';
 
 // Helper for creating toast utility
 export { getContext } from 'svelte';

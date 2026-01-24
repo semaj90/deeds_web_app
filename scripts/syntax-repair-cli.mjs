@@ -197,13 +197,11 @@ async function importProcessor() {
       name: 'import-type-colon-fix',
       pattern: /import\s+type\s*\{\s*([^}]+)\s*\}\s*from/g,
       replacement: (match, imports) => {
-        // Replace colons between identifiers with commas (handles A: B patterns)
+        // Replace colons between identifiers with commas
+        // Simple approach: replace : with , inside import type blocks
         let fixed = imports.trim();
-        // Multiple passes to catch all patterns - handle both with and without spaces
-        for (let i = 0; i < 10; i++) {
-          // Handle "Actions: PageServerLoad" -> "Actions, PageServerLoad"
-          fixed = fixed.replace(/([A-Za-z_][A-Za-z0-9_]*):\s*([A-Za-z_][A-Za-z0-9_]*)/g, '$1, $2');
-        }
+        // Only replace colons that are between identifiers (not type annotations)
+        fixed = fixed.replace(/:\s+/g, ', ').replace(/:/g, ', ');
         return `import type { ${fixed} } from`;
       },
     },

@@ -9,7 +9,7 @@
  * - Memory and CPU optimization
  */
 import { N64_TEXTURE_PRESETS } from '../constants/gaming-constants-minimal.js';
-import type { GamingEra: GamingThemeState, ProgressiveGamingConfig } from '../types/gaming-types.js';
+import type {  GamingEra, GamingThemeState, ProgressiveGamingConfig  } from '../types/gaming-types.js';
 import { constructor } from 'function Object() { [native code] }';
 
 interface DeviceCapabilities {

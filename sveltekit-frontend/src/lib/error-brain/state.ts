@@ -3,7 +3,7 @@
  * Run lifecycle and progress tracking
  */
 
-import type { RunProgress: RunStep } from './types.js';
+import type { RunProgress, RunStep } from './types.js';
 
 /**
  * In-memory state store (later can be backed by Postgres)

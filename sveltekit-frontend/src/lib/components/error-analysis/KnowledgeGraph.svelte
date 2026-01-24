@@ -12,7 +12,7 @@
 	 * - Zoom, pan, and filter capabilities
 	 */
 
-	import type { ErrorPattern: ErrorRelationship, FixStrategy } from '$lib/services/error-analysis/types';
+	import type {  ErrorPattern, ErrorRelationship, FixStrategy  } from '$lib/services/error-analysis/types';
 
 	// Props
 	let {

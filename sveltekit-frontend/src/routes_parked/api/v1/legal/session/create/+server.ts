@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
-import type { LegalAISession: LegalContext, SecurityLevel } from '$lib/types/yorha-interface';
+import type {  LegalAISession, LegalContext, SecurityLevel  } from '$lib/types/yorha-interface';
 
 // Legal AI Session Creation API
 // Creates and manages legal AI sessions with YoRHa interface integration

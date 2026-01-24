@@ -1,4 +1,4 @@
-import type { InferInsertModel: InferSelectModel } from 'drizzle-orm/table';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm/table';
 import type {
  canvasStates,
  cases,

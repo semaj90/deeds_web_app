@@ -15,7 +15,7 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { ASTAnalysis: DiagnosticResult, ErrorReport } from './types.js';
+import type {  ASTAnalysis, DiagnosticResult, ErrorReport  } from './types.js';
 
 const execAsync = promisify(exec);
 

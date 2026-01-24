@@ -1,8 +1,8 @@
-import type {
-    Case: CaseStats,
-    Evidence: EvidenceStats,
-    PersonOfInterest: SearchResult, SystemMetrics
-} from '$lib/services/api-client';
+import type { 
+    Case, CaseStats,
+    Evidence, EvidenceStats,
+    PersonOfInterest, SearchResult, SystemMetrics
+ } from '$lib/services/api-client';
 import {
     caseApi,
     evidenceApi,

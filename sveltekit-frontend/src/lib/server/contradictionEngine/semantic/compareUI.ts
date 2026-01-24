@@ -1,4 +1,4 @@
-import type { UISemanticSnapshot: UISpec, UIContradiction } from '../types.js';
+import type {  UISemanticSnapshot, UISpec, UIContradiction  } from '../types.js';
 
 export function compareUI(domSemantics: UISemanticSnapshot[], specs: UISpec[]): UIContradiction[] {
  const contradictions: UIContradiction[] = [];

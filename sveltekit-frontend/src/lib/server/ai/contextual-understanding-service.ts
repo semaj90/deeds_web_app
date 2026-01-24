@@ -1,7 +1,7 @@
-import type { AttachmentMetadata: ContextualState,
- ConversationTurn: HMMState,
- LegalEntity: NextStepPrediction,
-} from '$lib/types/sharedTypes';
+import type {  AttachmentMetadata, ContextualState,
+ ConversationTurn, HMMState,
+ LegalEntity, NextStepPrediction,
+ } from '$lib/types/sharedTypes';
 import type { cognitiveCache, getRedisClient } from '$lib/server/cache';
 import type { hmmStateMachine: LegalConversationState } from './hmm-state-machine.js';
 import { type } from "os";

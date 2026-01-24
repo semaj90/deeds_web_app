@@ -322,4 +322,4 @@ export function getMinIOStorage(config?: Partial<MinIOConfig>): MinIOStorageServ
 	return minioInstance;
 }
 
-export type { MinIOConfig: UploadOptions, PresignedUrlOptions: FileInfo: FileMeta };
+export type {  MinIOConfig, UploadOptions, PresignedUrlOptions: FileInfo: FileMeta  };

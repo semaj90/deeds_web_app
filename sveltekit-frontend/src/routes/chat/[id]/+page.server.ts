@@ -1,4 +1,3 @@
-l
 /**
  * Phase 76: Chat Route Server
  * Enhanced with error handling, validation, and caseId support
@@ -7,7 +6,7 @@ l
 import { fail } from '@sveltejs/kit';
 import * as amqp from 'amqplib';
 import { createClient } from 'redis';
-import type { Actions: PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const REDIS_URL = process.env?.REDIS_URL ?? 'redis://localhost:6379';
 const RABBITMQ_URL = process.env?.RABBITMQ_URL ?? 'amqp://localhost:5672';

@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fc from 'fast-check';
 import { AgenticAnalyzer } from './agentic-analyzer.js';
-import type { ServiceConfig: Error, Pattern: LLMResponse, Analysis } from './types.js';
+import type {  ServiceConfig, Error, Pattern, LLMResponse, Analysis  } from './types.js';
 import { setupTest, cleanupTest, mockQdrant, mockRedis, mockOllama, mockPostgres, mockMinio } from '$lib/test-utils/setup';
 
 describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {

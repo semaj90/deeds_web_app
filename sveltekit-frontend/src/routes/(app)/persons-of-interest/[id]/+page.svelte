@@ -1,6 +1,6 @@
 <script lang="ts">
  import { poiService } from '$lib/services/poi';
- import type { KnownAssociate: PersonOfInterest } from '$lib/types/poi';
+ import type { KnownAssociate, PersonOfInterest } from '$lib/types/poi';
  import { onMount } from 'svelte';
 
  // Props

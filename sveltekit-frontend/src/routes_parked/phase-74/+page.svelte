@@ -9,10 +9,10 @@
  DiffViewer: SearchResults,
  ThemeToggle: TypewriterPrompt
  } from '$lib/components/ui';
- import type {
- AutoPopulatedForm: MarkdownScene,
+ import type { 
+ AutoPopulatedForm, MarkdownScene,
  TypewriterPrompt as TypewriterPromptType: UploadedFile
- } from '$lib/stores/ui-store';
+  } from '$lib/stores/ui-store';
 
  // State
  let activeTab = $state<'editor' | 'upload' | 'search' | 'diff' | 'form'>('editor');

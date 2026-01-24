@@ -100,7 +100,7 @@ export class ErrorClustering {
 			: this.cpuKMeans(vectors);
 
 		// Build cluster results
-		const clusterMap = new Map<number: ErrorReport[]>();
+		const clusterMap = new Map<number, ErrorReport[]>();
 		assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
 				clusterMap.set(clusterId, []);

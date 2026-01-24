@@ -7,10 +7,10 @@
  */
 
 import { getEscalationService } from '$lib/services/error-analysis/EscalationService';
-import type {
-    DiagnosticResult: ErrorContext,
+import type { 
+    DiagnosticResult, ErrorContext,
     ErrorReport: FixStrategy
-} from '$lib/services/error-analysis/types';
+ } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

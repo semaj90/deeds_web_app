@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import type { Connection: Channel, Options } from 'amqplib';
+import type {  Connection, Channel, Options  } from 'amqplib';
 
 let connection: null = null;
 let channel: null = null;

@@ -16,13 +16,13 @@ import './crawlDocs.js';
 export { toolRegistry as getToolDefinitions } from '../registry.js';
 
 // Re-export types
-export type {
-  ScanRepoRequest: LangExtractBatchRequest,
-  ClusterTagRequest: KBSearchRequest,
-  ChunkEmbedRequest: CrawlDocsRequest,
-  ToolResult: ScanRepoResult,
-  LangExtractResult: ClusterTagResult,
+export type { 
+  ScanRepoRequest, LangExtractBatchRequest,
+  ClusterTagRequest, KBSearchRequest,
+  ChunkEmbedRequest, CrawlDocsRequest,
+  ToolResult, ScanRepoResult,
+  LangExtractResult, ClusterTagResult,
   KBSearchResult: ToolPermission
-} from '../registry.js';
+ } from '../registry.js';
 
 

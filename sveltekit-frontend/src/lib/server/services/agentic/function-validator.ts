@@ -192,7 +192,7 @@ export function validateFunctionCall(
 /**
  * Validate individual parameter
  */
-function validateParameter(name: string, value: any): ValidationResult {
+function validateParameter(name: string, value: any, schema: any): ValidationResult {
  const errors: string[] = [];
  const warnings: string[] = [];
 
@@ -242,7 +242,8 @@ function validateParameter(name: string, value: any): ValidationResult {
  if (schema.type === 'object' && typeof value === 'object' && value !== null) {
  if (schema.properties) {
  for (const [propName, propSchema] of Object.entries(schema.properties)) {
- if (propName in value) {`${name}.${propName}`,
+ if (propName in value) {
+`${name}.${propName}`,
  value[propName],
  propSchema
  );

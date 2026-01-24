@@ -88,7 +88,7 @@ export interface ChatInteraction {
 
 export interface UserDictionary {
 	userId: string;
-	legalTerms: Map<string: TermEntry>;
+	legalTerms: Map<string, TermEntry>;
 	preferredStyle: 'formal' | 'casual' | 'technical' | 'adaptive';
 	domainExpertise: string[]; // ['contract-law', 'criminal-defense', etc.]
 	qloraCheckpoint: string; // Path to user's fine-tuned model
@@ -118,9 +118,9 @@ type PatternItem = {
 export class SSRQLorAGPUChatAssistant {
 	private nesMemory: NESMemoryArchitecture;
 	private gpuCache: WebGPUSOMCache;
-	private userDictionaries: Map<string: UserDictionary>;
-	private ssrContextCache: Map<string: SSRChatContext>;
-	// private _activeConnections: Map<string: WebSocket>; // Commented out as unused based on linter
+	private userDictionaries: Map<string, UserDictionary>;
+	private ssrContextCache: Map<string, SSRChatContext>;
+	// private _activeConnections: Map<string, WebSocket>; // Commented out as unused based on linter
 
 	constructor() {
 		this.nesMemory = new NESMemoryArchitecture();

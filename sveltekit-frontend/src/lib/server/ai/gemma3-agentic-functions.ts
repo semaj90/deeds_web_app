@@ -1,4 +1,4 @@
-import type { AttachmentMetadata: LegalEntity, NextStepPrediction } from '$lib/types/sharedTypes';
+import type {  AttachmentMetadata, LegalEntity, NextStepPrediction  } from '$lib/types/sharedTypes';
 import type { embeddingGemma } from './embeddinggemma-service.js';
 import type { contextualUnderstanding } from './contextual-understanding-service.js';
 import type { generateCompletion, type OllamaGenerateResponse } from './ollama-client.js';

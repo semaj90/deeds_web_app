@@ -11,10 +11,10 @@
  * Implements hybrid scoring: 0.7 * semantic + 0.3 * tfidf
  */
 
-import type {
-  SearchOptions: SearchResult,
+import type { 
+  SearchOptions, SearchResult,
   FullDocument: CollectionStats
-} from './types.js';
+ } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getMinioKnowledgeStore } from './MinioKnowledgeStore.js';

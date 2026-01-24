@@ -16,10 +16,10 @@ import type { Document } from '$lib/types';
   import * as Dialog from 'bits-ui/Dialog'; // Corrected import
   import * as Accordion from 'bits-ui/accordion'; // Corrected import
   import * as Tooltip from 'bits-ui/tooltip'; // Corrected import
-  import type {
-    ContextualState: NextStepPrediction,
+  import type { 
+    ContextualState, NextStepPrediction,
     LegalEntity: ConversationTurn
-  } from '$lib/types/sharedTypes';
+   } from '$lib/types/sharedTypes';
   import { onMount } from 'svelte';
   // NOTE: This frontend component interacts with SvelteKit API routes (e.g., /api/contextual/chat, /api/contextual/state).
   // The actual wiring of Ollama endpoints (e.g., using getOllamaEndpoint() for gemma3-legal: latest; embeddinggemma:latest),

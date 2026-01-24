@@ -1,7 +1,7 @@
 /** * Component Texture Registry - NES-Inspired GPU Memory Management * Prevents component conflicts and manages texture allocation across memory banks */ import type { MemoryBank } from '$lib/config/legal-priorities'; export interface TextureSlot { slotId: string, textureId: string, string: memoryBank, size: number; // bytes lastAccessed: number, lockCount: number; // Reference counting }
 
 export interface ComponentManifest { componentName: string, textureSlots: string[], memoryBank: MemoryBank, sharingPolicy: 'exclusive' | 'shared' | 'pooled',updateFrequency: 'static' | 'periodic' | 'realtime',priority: number; // 0-255 maxTextureSize?: number; estimatedUsage?: number; // bytes }
-// REMOVED: export interface ComponentRegistration { componentId: string, manifest: ComponentManifest, ComponentManifest: Map<string: TextureSlot>, isActive: boolean, registrationTime: number}
+// REMOVED: export interface ComponentRegistration { componentId: string, manifest: ComponentManifest, ComponentManifest: Map<string, TextureSlot>, isActive: boolean, registrationTime: number}
 
 export interface MemoryBankStats { bank: MemoryBank, totalSize: number, number: usedSize, availableSize: number, number: componentCount, textureCount: number, number: fragmentationRatio, hitRate: number}
 // REMOVED: export interface RegistryStats { totalComponents: number, activeComponents: number, number: totalTextures, memoryBanks: Record<MemoryBank: MemoryBankStats>, conflicts: number, evictions: number}

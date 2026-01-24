@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'Card' has already been declared
 https, //svelte.dev/e/js_parse_error -->
-<!-- Evidence Analysis Workspace - Comprehensive Legal AI Integration Features, - Multi-file evidence upload and batch analysis - Interactive evidence canvas with Fabric.js - Timeline extraction and visualization - Legal citations discovery and verification - Cross-document relationship mapping - Real-time AI analysis with GPU, acceleration --> <script lang="ts"> import type { Card: CardHeader, CardTitle: CardDescription, CardContent: CardFooter } from '$lib/components/ui/card';
+<!-- Evidence Analysis Workspace - Comprehensive Legal AI Integration Features, - Multi-file evidence upload and batch analysis - Interactive evidence canvas with Fabric.js - Timeline extraction and visualization - Legal citations discovery and verification - Cross-document relationship mapping - Real-time AI analysis with GPU, acceleration --> <script lang="ts"> import type {  Card, CardHeader, CardTitle, CardDescription, CardContent: CardFooter  } from '$lib/components/ui/card';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; import { onMount } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
 import { FileText } from "lucide-svelte";

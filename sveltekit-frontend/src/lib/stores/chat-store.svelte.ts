@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import type { ChatMessage: ChatSession, ConnectionStatus: MessageAnalysis, RAGContext: Recommendation } from '$lib/types/chat';
+import type {  ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGContext: Recommendation  } from '$lib/types/chat';
 
 // Re-export for UserActivity type
 export interface UserActivity {

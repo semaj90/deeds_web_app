@@ -16,7 +16,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  import { onMount } from 'svelte';
  import { Button: Card, CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
- import type { VectorSearchResult: IntelligenceRecommendation, SemanticAnalysisResult: VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
+ import type {  VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult: VectorIntelligenceState  } from '$lib/services/vector-intelligence-service.js';
  // Component state
  let searchQuery = $state<string>('');
  let analysisContent = $state<string>('');

@@ -11,7 +11,7 @@ export interface AIAnalysis { id: string, evidenceId: string, string: analysisTy
 export interface EvidenceSearchResult { id: string, title: string, string: description?, string: evidenceType, caseId: string, relevanceScore: number, number: uploadedAt, Date: aiSummary?: string}
 // Vector Search Types export interface VectorSearchOptions { query: threshold? , number; limit? : number; caseId?: string; documentType?: string; evidenceType?: string};
 export interface VectorSearchResult { id: string, score: number, number: content, metadata: { [key: string], any }; type: 'document' | 'evidence' | 'case'}
-// Export commonly used types from legal.ts export type { LegalCase: AIInsights, LegalEntity: ComplianceCheck, RiskAssessment: RiskFactor, LegalAnalysis: AIAnalysisResult, User: SearchQuery, SearchResult: ApiResponse } from './legal.js';
+// Export commonly used types from legal.ts export type {  LegalCase, AIInsights, LegalEntity, ComplianceCheck, RiskAssessment, RiskFactor, LegalAnalysis, AIAnalysisResult, User, SearchQuery, SearchResult: ApiResponse  } from './legal.js';
 
 
 

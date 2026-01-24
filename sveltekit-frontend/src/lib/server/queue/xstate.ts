@@ -10,7 +10,7 @@ export interface QueueState {
 }
 
 export interface QueueContext {
- jobs: Map<string: QueueState>; activeJobs: Set<string>;
+ jobs: Map<string, QueueState>; activeJobs: Set<string>;
  maxConcurrency: number; retryDelay: number;
 }
 

@@ -14,18 +14,18 @@ import type { CHRROMPattern: CHRROMPatternCache } from '$lib/cache/chr-rom-patte
 import { chrRomPatternCache } from '$lib/cache/chr-rom-pattern-cache';
 import type { LegalVisualizationVertex } from '$lib/gpu/webgpu-vertex-streaming';
 import { WebGPUVertexStreamer } from '$lib/gpu/webgpu-vertex-streaming';
-import type {
-    MemoryQuery: MemoryRetrievalResult, VisualMemoryPalaceManager
-} from '$lib/memory/visual-memory-palace-integration';
+import type { 
+    MemoryQuery, MemoryRetrievalResult, VisualMemoryPalaceManager
+ } from '$lib/memory/visual-memory-palace-integration';
 import { visualMemoryPalace } from '$lib/memory/visual-memory-palace-integration';
 import { getGemmaEmbeddingService } from '$lib/services/gemma-embedding';
-import type {
-    LegalDocumentJSON: SIMDJSONAccelerator, SIMDParsingMetrics
-} from '$lib/wasm/simd-json-wrapper';
+import type { 
+    LegalDocumentJSON, SIMDJSONAccelerator, SIMDParsingMetrics
+ } from '$lib/wasm/simd-json-wrapper';
 import { simdJSONAccelerator } from '$lib/wasm/simd-json-wrapper';
-import type {
-    CacheMetrics: EmbeddingCacheResult, EnhancedCachingService
-} from './enhanced-caching-service.js';
+import type { 
+    CacheMetrics, EmbeddingCacheResult, EnhancedCachingService
+ } from './enhanced-caching-service.js';
 import { enhancedCachingService } from './enhanced-caching-service.js';
 
 export interface RevolutionaryAIQuery {

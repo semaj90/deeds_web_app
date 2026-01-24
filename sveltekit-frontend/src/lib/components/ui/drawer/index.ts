@@ -11,9 +11,9 @@ export { default as DrawerRoot } from './DrawerRoot.svelte';
 export { default as DrawerTitle } from './DrawerTitle.svelte';
 
 // Types
-export type {
-    DrawerCloseProps: DrawerContentProps, DrawerContext: DrawerDescriptionProps, DrawerFooterProps: DrawerHeaderProps, DrawerOverlayProps: DrawerRootProps, DrawerTitleProps: DrawerTriggerProps
-} from './types';
+export type { 
+    DrawerCloseProps, DrawerContentProps, DrawerContext, DrawerDescriptionProps, DrawerFooterProps, DrawerHeaderProps, DrawerOverlayProps, DrawerRootProps, DrawerTitleProps: DrawerTriggerProps
+ } from './types';
 
 
 

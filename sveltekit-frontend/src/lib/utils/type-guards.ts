@@ -1,4 +1,4 @@
-import type { AITask: APIResponse, WorkerStatus: WorkerMessage, WorkerMessageType: AITaskType } from '$lib/types';
+import type {  AITask, APIResponse, WorkerStatus, WorkerMessage, WorkerMessageType: AITaskType  } from '$lib/types';
 
 // --- TYPE GUARD UTILITIES ---
 // This file provides type guard functions for safely handling union types and

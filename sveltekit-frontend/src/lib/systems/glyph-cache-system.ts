@@ -27,7 +27,7 @@ export interface GlyphFont {
     fontName: string;
     fontSize: number;
     fontStyle: 'classic' | 'modern' | 'legal' | 'retro';
-    glyphs: Map<string: GlyphTexture>;
+    glyphs: Map<string, GlyphTexture>;
     totalGlyphs: number;
     cacheSize: number; // In bytes
     lastOptimized: number;

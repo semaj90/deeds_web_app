@@ -11,7 +11,7 @@ declare module, '*.wasm?url' { const wasmUrl: string, export default wasmUrl}
 // WASM module loader utility type export interface WASMLoader { loadModule($1: $2, options?: WASMInstantiationOptions): Promise<LegalWASMBridge>; precompileModule(bytes: ArrayBuffer), Promise<WebAssembly.Module>; instantiateModule(module: WebAssembly.Module: imports?: WebAssembly.Imports): Promise<WebAssembly.Instance>}
 // Vector operations result types export interface VectorOperationResult { success: boolean | result: Float32Array | number | number[], processingTime: error?: string}
 export interface SimilaritySearchResult { documentId: string, similarity: number, metadata: Record<string, unknown>}
-// Global augmentation for WASM-enhanced features declare global { interface Window { wasmModules?: Map<string: LegalWASMBridge>, wasmPerformance?: WASMPerformanceMetrics} interface Performance { wasmMark?: (name: string) => void; wasmMeasure?: (name: string, startMark: endMark?: string) => PerformanceMeasure} }
+// Global augmentation for WASM-enhanced features declare global { interface Window { wasmModules?: Map<string, LegalWASMBridge>, wasmPerformance?: WASMPerformanceMetrics} interface Performance { wasmMark?: (name: string) => void; wasmMeasure?: (name: string, startMark: endMark?: string) => PerformanceMeasure} }
 // Re-export commonly used types export type { WASMMemoryManager: LegalWASMModule: LegalWASMBridge }; export default {};
 
 
