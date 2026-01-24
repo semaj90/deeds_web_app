@@ -1,6 +1,8 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
-import amqp, { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
+import type amqplib from 'amqplib';
+import { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
+import amqp from 'amqplib';
 import { timestamp } from "drizzle-orm/gel-core";
 
 // --- TYPES ---
@@ -128,7 +130,7 @@ class RabbitMQService implements IRabbitMQService {
                 // Setup Exchanges
                 await this.channel.assertExchange(this.config.exchanges.documents, 'direct', { durable: true });
                 await this.channel.assertExchange(this.config.exchanges.deadLetter, 'direct', { durable: true });
-  
+
                 const queues = Object.values(this.config.queues);
                 for (const queue of queues) {
                     await this.channel.assertQueue(queue, {
@@ -162,7 +164,8 @@ class RabbitMQService implements IRabbitMQService {
         }
 
         try {
-            if (!this.channel) throw new Error('Channel not available');this.config.exchanges.documents,
+            if (!this.channel) throw new Error('Channel not available');
+this.config.exchanges.documents,
                 'process_document',
                 Buffer.from(JSON.stringify(job)),
                 { persistent: true, timestamp: Date.now() }

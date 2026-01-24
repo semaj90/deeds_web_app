@@ -7,7 +7,8 @@
  */
 
 export type OllamaEmbedResult = {
-  model: string; embedding: number[];
+  model: string;
+  embedding: number[];
 };
 
 type OllamaEmbedResponse = {
@@ -37,14 +38,14 @@ export async function tryEmbedOllama(
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: prompt: text }),
+      body: JSON.stringify({ model, prompt: text }),
       signal
     });
 
     if (!res.ok) return null;
 
     const data = (await res.json()) as OllamaEmbedResponse;
-    if (!data?.embedding|| !Array.isArray(data.embedding)) return null;
+    if (!data?.embedding || !Array.isArray(data.embedding)) return null;
 
     return {
       model: data.model ?? model,
@@ -60,7 +61,3 @@ export async function tryEmbedOllama(
 export function embeddingDims(vec: number[] | null | undefined): number | null {
   return Array.isArray(vec) ? vec.length : null;
 }
-
-
-
-

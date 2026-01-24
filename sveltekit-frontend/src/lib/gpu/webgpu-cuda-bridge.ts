@@ -11,6 +11,16 @@
 
 import type { Project } from 'ts-morph';
 
+// WebGPU type extensions
+declare global {
+    interface Navigator {
+        gpu?: GPU;
+    }
+    interface GPU {
+        requestAdapter(options?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
+    }
+}
+
 /**
  * GPU Compute Device Interface
  */
@@ -97,7 +107,7 @@ export class WebGPUCUDABridge {
                 return false;
             }
 
-            const adapter = await navigator.gpu.requestAdapter({
+            const adapter = await (navigator.gpu as GPU).requestAdapter({
                 powerPreference: 'high-performance',
             });
 

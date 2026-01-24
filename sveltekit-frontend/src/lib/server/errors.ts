@@ -4,36 +4,37 @@
  * for consistent front-end messaging and debugging
  */
 
-
 /**
  * Base authentication error class
  * All auth-related errors inherit from this for consistent handling
  */
 export class AuthError extends Error {
- code: string; status: number;
- context?: Record<string, unknown>;
+    code: string;
+    status: number;
+    context?: Record<string, unknown>;
 
- constructor(
- message: string, code: string = 'AUTH_ERROR',
- status: number = 401,
- context?: Record<string, unknown>
- ) {
- super(message);
- this.code = code;
- this.status = status;
- this.context = context;
- this.name = 'AuthError';
- Object.setPrototypeOf(this: AuthError.prototype);
- }
+    constructor(
+        message: string,
+        code: string = 'AUTH_ERROR',
+        status: number = 401,
+        context?: Record<string, unknown>
+    ) {
+        super(message);
+        this.code = code;
+        this.status = status;
+        this.context = context;
+        this.name = 'AuthError';
+        Object.setPrototypeOf(this, AuthError.prototype);
+    }
 
- toJSON() {
- return {
- message: this.message,
- code: this.code,
- status: this.status,
- context: this.context,
- };
- }
+    toJSON() {
+        return {
+            message: this.message,
+            code: this.code,
+            status: this.status,
+            context: this.context,
+        };
+    }
 }
 
 /**
@@ -41,14 +42,15 @@ export class AuthError extends Error {
  * Thrown during user account creation
  */
 export class RegistrationError extends AuthError {
- constructor(
- message: string, code: string = 'REGISTRATION_ERROR',
- context?: Record<string, unknown>
- ) {
- super(message, code, 400, context);
- this.name = 'RegistrationError';
- Object.setPrototypeOf(this: RegistrationError.prototype);
- }
+    constructor(
+        message: string,
+        code: string = 'REGISTRATION_ERROR',
+        context?: Record<string, unknown>
+    ) {
+        super(message, code, 400, context);
+        this.name = 'RegistrationError';
+        Object.setPrototypeOf(this, RegistrationError.prototype);
+    }
 }
 
 /**
@@ -56,11 +58,11 @@ export class RegistrationError extends AuthError {
  * Thrown during session creation, validation, or invalidation
  */
 export class SessionError extends AuthError {
- constructor(message, string, code: string = 'SESSION_ERROR', context?: Record<string, unknown>) {
- super(message, code, 401, context);
- this.name = 'SessionError';
- Object.setPrototypeOf(this: SessionError.prototype);
- }
+    constructor(message: string, code: string = 'SESSION_ERROR', context?: Record<string, unknown>) {
+        super(message, code, 401, context);
+        this.name = 'SessionError';
+        Object.setPrototypeOf(this, SessionError.prototype);
+    }
 }
 
 /**
@@ -68,11 +70,11 @@ export class SessionError extends AuthError {
  * Thrown during authentication attempt
  */
 export class LoginError extends AuthError {
- constructor(message, string, code: string = 'LOGIN_ERROR', context?: Record<string, unknown>) {
- super(message, code, 401, context);
- this.name = 'LoginError';
- Object.setPrototypeOf(this: LoginError.prototype);
- }
+    constructor(message: string, code: string = 'LOGIN_ERROR', context?: Record<string, unknown>) {
+        super(message, code, 401, context);
+        this.name = 'LoginError';
+        Object.setPrototypeOf(this, LoginError.prototype);
+    }
 }
 
 /**
@@ -80,11 +82,11 @@ export class LoginError extends AuthError {
  * Thrown during password validation or change operations
  */
 export class PasswordError extends AuthError {
- constructor(message, string, code: string = 'PASSWORD_ERROR', context?: Record<string, unknown>) {
- super(message, code, 400, context);
- this.name = 'PasswordError';
- Object.setPrototypeOf(this: PasswordError.prototype);
- }
+    constructor(message: string, code: string = 'PASSWORD_ERROR', context?: Record<string, unknown>) {
+        super(message, code, 400, context);
+        this.name = 'PasswordError';
+        Object.setPrototypeOf(this, PasswordError.prototype);
+    }
 }
 
 /**
@@ -92,11 +94,11 @@ export class PasswordError extends AuthError {
  * Thrown during user profile modifications
  */
 export class ProfileError extends AuthError {
- constructor(message, string, code: string = 'PROFILE_ERROR', context?: Record<string, unknown>) {
- super(message, code, 400, context);
- this.name = 'ProfileError';
- Object.setPrototypeOf(this: ProfileError.prototype);
- }
+    constructor(message: string, code: string = 'PROFILE_ERROR', context?: Record<string, unknown>) {
+        super(message, code, 400, context);
+        this.name = 'ProfileError';
+        Object.setPrototypeOf(this, ProfileError.prototype);
+    }
 }
 
 /**
@@ -104,93 +106,90 @@ export class ProfileError extends AuthError {
  * Thrown when Go microservice calls fail
  */
 export class MicroserviceError extends AuthError {
- constructor(
- message: string, code: string = 'MICROSERVICE_ERROR',
- context?: Record<string, unknown>
- ) {
- super(message, code, 502, context);
- this.name = 'MicroserviceError';
- Object.setPrototypeOf(this: MicroserviceError.prototype);
- }
+    constructor(
+        message: string,
+        code: string = 'MICROSERVICE_ERROR',
+        context?: Record<string, unknown>
+    ) {
+        super(message, code, 502, context);
+        this.name = 'MicroserviceError';
+        Object.setPrototypeOf(this, MicroserviceError.prototype);
+    }
 }
 
 /**
  * Helper function to determine if an error is an AuthError
  */
 export function isAuthError(error: any): error is AuthError {
- return error instanceof AuthError;
+    return error instanceof AuthError;
 }
 
 /**
  * Helper function to format errors for API responses
  */
 export function formatErrorResponse(error: any) {
- if (isAuthError(error)) {
- return {
- success: false,
- error: { message: error.message,
- code: error.code,
- status: error.status,
- ...(error?.context&& { context: error.context }),
- },
- };
- }
- // Handle unknown errors gracefully
- return {
- success: false,
- error: { message: 'An unexpected error occurred',
- code: 'UNKNOWN_ERROR',
- status: 500,
- },
- };
+    if (isAuthError(error)) {
+        return {
+            success: false,
+            error: {
+                message: error.message,
+                code: error.code,
+                status: error.status,
+                ...(error.context && { context: error.context }),
+            },
+        };
+    }
+    // Handle unknown errors gracefully
+    return {
+        success: false,
+        error: {
+            message: 'An unexpected error occurred',
+            code: 'UNKNOWN_ERROR',
+            status: 500,
+        },
+    };
 }
 
 /**
  * Error codes for common scenarios
- * Use these constants to ensure consistent error handling across the application
  */
 export const ERROR_CODES = {
- // Registration
- EMAIL_TAKEN: 'EMAIL_TAKEN',
- INVALID_EMAIL: 'INVALID_EMAIL',
- WEAK_PASSWORD: 'WEAK_PASSWORD',
- REGISTRATION_FAILED: 'REGISTRATION_FAILED',
+    // Registration
+    EMAIL_TAKEN: 'EMAIL_TAKEN',
+    INVALID_EMAIL: 'INVALID_EMAIL',
+    WEAK_PASSWORD: 'WEAK_PASSWORD',
+    REGISTRATION_FAILED: 'REGISTRATION_FAILED',
 
- // Login
- INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
- ACCOUNT_INACTIVE: 'ACCOUNT_INACTIVE',
- LOGIN_FAILED: 'LOGIN_FAILED',
+    // Login
+    INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+    ACCOUNT_INACTIVE: 'ACCOUNT_INACTIVE',
+    LOGIN_FAILED: 'LOGIN_FAILED',
 
- // Session
- SESSION_NOT_FOUND: 'SESSION_NOT_FOUND',
- SESSION_EXPIRED: 'SESSION_EXPIRED',
- SESSION_INVALID: 'SESSION_INVALID',
- SESSION_ERROR: 'SESSION_ERROR',
- AUTH_REQUIRED: 'AUTH_REQUIRED',
+    // Session
+    SESSION_NOT_FOUND: 'SESSION_NOT_FOUND',
+    SESSION_EXPIRED: 'SESSION_EXPIRED',
+    SESSION_INVALID: 'SESSION_INVALID',
+    SESSION_ERROR: 'SESSION_ERROR',
+    AUTH_REQUIRED: 'AUTH_REQUIRED',
 
- // Password
- PASSWORD_MISMATCH: 'PASSWORD_MISMATCH',
- PASSWORD_CHANGE_FAILED: 'PASSWORD_CHANGE_FAILED',
- CURRENT_PASSWORD_INCORRECT: 'CURRENT_PASSWORD_INCORRECT',
+    // Password
+    PASSWORD_MISMATCH: 'PASSWORD_MISMATCH',
+    PASSWORD_CHANGE_FAILED: 'PASSWORD_CHANGE_FAILED',
+    CURRENT_PASSWORD_INCORRECT: 'CURRENT_PASSWORD_INCORRECT',
 
- // Profile
- PROFILE_UPDATE_FAILED: 'PROFILE_UPDATE_FAILED',
- USER_NOT_FOUND: 'USER_NOT_FOUND',
+    // Profile
+    PROFILE_UPDATE_FAILED: 'PROFILE_UPDATE_FAILED',
+    USER_NOT_FOUND: 'USER_NOT_FOUND',
 
- // Microservice
- CASE_SERVICE_UNAVAILABLE: 'CASE_SERVICE_UNAVAILABLE',
- CASE_NOT_FOUND: 'CASE_NOT_FOUND',
- DOCUMENT_SERVICE_UNAVAILABLE: 'DOCUMENT_SERVICE_UNAVAILABLE',
+    // Microservice
+    CASE_SERVICE_UNAVAILABLE: 'CASE_SERVICE_UNAVAILABLE',
+    CASE_NOT_FOUND: 'CASE_NOT_FOUND',
+    DOCUMENT_SERVICE_UNAVAILABLE: 'DOCUMENT_SERVICE_UNAVAILABLE',
 
- // Database
- DB_ERROR: 'DB_ERROR',
- DB_CONNECTION_FAILED: 'DB_CONNECTION_FAILED',
+    // Database
+    DB_ERROR: 'DB_ERROR',
+    DB_CONNECTION_FAILED: 'DB_CONNECTION_FAILED',
 
- // Generic
- UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+    // Generic
+    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
-
-
-
-
-

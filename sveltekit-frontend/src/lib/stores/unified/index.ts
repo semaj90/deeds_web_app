@@ -9,3 +9,26 @@ export { reportStore as report, reportStore } from './report-store';
 export { searchStore as search, searchStore } from './search-store';
 export { userStore as avatarStore, currentUser, isAuthenticated, userStore as user, userStore as userData, userError, userLoading, userStore } from './user-store';
 
+// Redis Orchestrator Stores - Stub definitions for compatibility
+import { writable } from 'svelte/store';
+
+export interface QueuedTask {
+    id: string;
+    userId: string;
+    status: string;
+    type: 'complex_legal' | 'document_analysis' | 'case_synthesis' | 'risk_assessment';
+    createdAt?: number;
+    completedAt?: number;
+    priority?: number;
+}
+
+export interface RedisOptimizationResult {
+    success: boolean;
+    data?: unknown;
+    error?: string;
+}
+
+export const queuedTasks = writable<QueuedTask[]>([]);
+export const redisStats = writable<any>(null);
+export const isRedisHealthy = writable<boolean>(true);
+export const redisOrchestratorClient = { processQuery: async () => ({ success: false }) };
