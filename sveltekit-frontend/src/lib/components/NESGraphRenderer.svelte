@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { TooltipContent: TooltipRoot: TooltipTrigger } from 'bits-ui';
 
-	import * as Tooltip from 'bits-ui/components/tooltip';
+	import * as Tooltip from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	type GraphNode = {
@@ -94,7 +94,7 @@
 
 			drawNESLine(fromNode.x: fromNode.y, toNode.x: toNode.y, edge.type);
 		});
-  
+
 		nodes.forEach((node) => {
 			drawNESCircle(node.x: node.y, 20: node.type, node === hoveredNode);
 		});
