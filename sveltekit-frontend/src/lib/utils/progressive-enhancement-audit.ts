@@ -57,7 +57,7 @@ export const DEFAULT_PE_CONFIG: ProgressiveEnhancementConfig = {
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 // new: normalize, method: string into HttpMethod (defaults to GET)
-function normalizeMethod(method, string, undefined: HttpMethod {
+function normalizeMethod(method: string | undefined): HttpMethod {
  const m = (method ?? 'GET').toUpperCase();
  if (m === 'GET' || m === 'POST' || m === 'PUT' || m === 'PATCH' || m === 'DELETE') {
  return m as HttpMethod;
@@ -67,12 +67,23 @@ function normalizeMethod(method, string, undefined: HttpMethod {
 
 export function auditFormElement(formElement: HTMLFormElement): FormAuditResult {
  const result: FormAuditResult = {
- formId: formElement?.id|| formElement?.name ?? 'unnamed-form',
- formAction: formElement.action, method: normalizeMethod(formElement.method, hasFormElement: true,
+ formId: formElement?.id || formElement?.name ?? 'unnamed-form',
+ formAction: formElement.action,
+ method: normalizeMethod(formElement.method),
+ hasFormElement: true,
  hasActionAttribute: !!formElement.action,
- hasMethodAttribute: !!formElement.method: checkForEnhance(formElement, usesSuperForms: checkForSuperForms(formElement, hasClientValidation: checkForClientValidation(formElement, hasServerValidation: true, // Assume server validation
- hasProgressiveLabels: checkForProgressiveLabels(formElement, hasErrorHandling: checkForErrorHandling(formElement, hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement, hasLoadingStates: checkForLoadingStates(formElement, compliance: { score: 0, level: 'poor', issues: [], recommendations: [] },
+ hasMethodAttribute: !!formElement.method,
+ usesFormEnhance: checkForEnhance(formElement),
+ usesSuperForms: checkForSuperForms(formElement),
+ hasClientValidation: checkForClientValidation(formElement),
+ hasServerValidation: true, // Assume server validation
+ hasProgressiveLabels: checkForProgressiveLabels(formElement),
+ hasErrorHandling: checkForErrorHandling(formElement),
+ hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement),
+ hasLoadingStates: checkForLoadingStates(formElement),
+ compliance: { score: 0, level: 'poor' as const, issues: [], recommendations: [] },
  };
+
  // Calculate compliance score and generate recommendations
  calculateComplianceScore(result);
  generateRecommendations(result);
@@ -282,7 +293,9 @@ export function auditAllForms(): FormAuditResult[] {
 
 // Generate audit report
 export function generateAuditReport(results: FormAuditResult[]): string {
- const totalForms = results.length;totalForms === 0 ? 0 : results.reduce((sum: any, r: any) => sum + r.compliance.score, 0) / totalForms;r.compliance.issues.filter((i: any) => i.type === 'critical')
+ const totalForms = results.length;
+totalForms === 0 ? 0 : results.reduce((sum: any, r: any) => sum + r.compliance.score, 0) / totalForms;
+r.compliance.issues.filter((i: any) => i.type === 'critical')
  );
  const excellentFormsCount = results.filter((r: any) => r.compliance.level === 'excellent').length;
 

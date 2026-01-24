@@ -9,9 +9,9 @@ import * as Minio from 'minio';
 import type { Readable } from 'stream';
 
 // Define loose types for MinIO if missing
-type MinioClient = any; // Fallback to avoid 'Minio.Client' resolution errors
+type MinioClient = any;
 
-interface MinIOConfig {
+export interface MinIOConfig {
 	endPoint: string;
 	port?: number;
 	useSSL?: boolean;
@@ -20,25 +20,25 @@ interface MinIOConfig {
 	region?: string;
 }
 
-interface UploadOptions {
+export interface UploadOptions {
 	contentType?: string;
 	metadata?: Record<string, string>;
 	tags?: Record<string, string>;
 }
 
-interface PresignedUrlOptions {
+export interface PresignedUrlOptions {
 	expirySeconds?: number;
 	responseHeaders?: Record<string, string>;
 }
 
-interface FileInfo {
+export interface FileInfo {
 	name: string;
 	size: number;
 	etag: string;
 	lastModified: Date;
 }
 
-interface FileMeta {
+export interface FileMeta {
 	size: number;
 	etag: string;
 	lastModified: Date;
@@ -60,7 +60,7 @@ export class MinIOStorageService {
 			region: config.region || process.env.MINIO_REGION || 'us-east-1'
 		};
 
-		// @ts-ignore - Supress potential type mismatch if @types/minio is missing
+		// @ts-ignore - Suppress potential type mismatch
 		this.client = new Minio.Client({
 			endPoint: this.config.endPoint,
 			port: this.config.port,
@@ -70,7 +70,6 @@ export class MinIOStorageService {
 			region: this.config.region
 		});
 	}
-
 
 	/**
 	 * Create bucket if it doesn't exist
@@ -152,58 +151,6 @@ export class MinIOStorageService {
 	}
 
 	/**
-	 * Download file as stream
-	 */
-	async downloadStream(bucketName: string, objectName: string): Promise<Readable> {
-		return await this.client.getObject(bucketName, objectName);
-	}
-
-	/**
-	 * Get presigned URL for upload (POST)
-	 */
-	async getPresignedUploadUrl(
-		bucketName: string,
-		objectName: string,
-		options?: PresignedUrlOptions
-	): Promise<string> {
-		const expiry = options?.expirySeconds ?? 3600;
-		return await this.client.presignedPutObject(bucketName, objectName, expiry);
-	}
-
-	/**
-	 * Get presigned URL for download (GET)
-	 */
-	async getPresignedDownloadUrl(
-		bucketName: string,
-		objectName: string,
-		options?: PresignedUrlOptions
-	): Promise<string> {
-		const expiry = options?.expirySeconds ?? 3600;
-		return await this.client.presignedGetObject(
-			bucketName,
-			objectName,
-			expiry,
-			options?.responseHeaders
-		);
-	}
-
-	/**
-	 * Delete file
-	 */
-	async deleteFile(bucketName: string, objectName: string): Promise<void> {
-		await this.client.removeObject(bucketName, objectName);
-	}
-
-	/**
-	 * Delete multiple files
-	 */
-	async deleteFiles(bucketName: string, objectNames: string[]): Promise<void> {
-		if (objectNames.length === 0) return;
-		await this.client.removeObjects(bucketName, objectNames);
-	}
-
-
-	/**
 	 * List files in bucket with prefix
 	 */
 	async listFiles(
@@ -231,85 +178,6 @@ export class MinIOStorageService {
 			stream.on('error', reject);
 		});
 	}
-
-	/**
-	 * Check if file exists
-	 */
-	async fileExists(bucketName: string, objectName: string): Promise<boolean> {
-		try {
-			await this.client.statObject(bucketName, objectName);
-			return true;
-		} catch (error: unknown) {
-			if ((error as { code?: string })?.code === 'NotFound') {
-				return false;
-			}
-			throw error;
-		}
-	}
-
-	/**
-	 * Get file metadata
-	 */
-	async getFileMeta(bucketName: string, objectName: string): Promise<FileMeta> {
-		const stat = await this.client.statObject(bucketName, objectName);
-
-		return {
-			size: stat.size,
-			etag: stat.etag,
-			lastModified: stat.lastModified,
-			contentType: stat.metaData?.['content-type'],
-			metadata: stat.metaData
-		};
-	}
-
-	/**
-	 * Copy file within MinIO
-	 */
-	async copyFile(
-		sourceBucket: string,
-		sourceObject: string,
-		destBucket: string,
-		destObject: string
-	): Promise<{ etag: string }> {
-		const conds = new Minio.CopyConditions();
-		const result = await this.client.copyObject(
-			destBucket,
-			destObject,
-			`/${sourceBucket}/${sourceObject}`,
-			conds
-		);
-
-		return { etag: result.etag };
-	}
-
-	/**
-	 * Set bucket policy (JSON policy document)
-	 */
-	async setBucketPolicy(bucketName: string, policy: string): Promise<void> {
-		await this.client.setBucketPolicy(bucketName, policy);
-	}
-
-	/**
-	 * Get bucket policy
-	 */
-	async getBucketPolicy(bucketName: string): Promise<string> {
-		return await this.client.getBucketPolicy(bucketName);
-	}
-
-	/**
-	 * Health check
-	 */
-	async health(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; buckets?: string[] }> {
-		try {
-			const buckets = await this.client.listBuckets();
-			return {
-				status: 'healthy',
-				buckets: buckets.map((b:any) => b.name)
-			};
-		} catch {
-			return { status: 'unavailable' };
-		}
-	}
 }
 
 // Singleton
@@ -321,6 +189,3 @@ export function getMinIOStorage(config?: Partial<MinIOConfig>): MinIOStorageServ
 	}
 	return minioInstance;
 }
-
-export type {  MinIOConfig, UploadOptions, PresignedUrlOptions: FileInfo: FileMeta  };
-
