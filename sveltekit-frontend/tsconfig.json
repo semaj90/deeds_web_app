@@ -48,6 +48,7 @@
     "src/routes__parked/**",
     "**/*.test.ts",
     "**/*.spec.ts",
+    "**/*.stories.ts",
     "src.backup/**",
     "src.backup.*/**",
     "src_fixed/**",

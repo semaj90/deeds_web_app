@@ -2,9 +2,12 @@ import { env } from '$lib/env';
 import { Client } from 'minio';
 
 export interface MinioS3ClientConfig {
-  endPoint: string; port: number;
-  useSSL: boolean; accessKey: string;
-  secretKey: string; bucket: string;
+  endPoint: string;
+  port: number;
+  useSSL: boolean;
+  accessKey: string;
+  secretKey: string;
+  bucket: string;
 }
 
 export function getMinioConfig(): MinioS3ClientConfig {
@@ -51,14 +54,14 @@ export class MinIOService {
     }
   }
 
-  async uploadFile(file: File, userId: string): Promise<{ bucket: string; key: string; url, string }> {
+  async uploadFile(file: File, userId: string): Promise<{ bucket: string; key: string; url: string }> {
     try {
       await this.ensureBucketExists();
 
       const key = `${userId}/${Date.now()}-${file.name}`;
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      await this.client.putObject(this.bucket, key, buffer: file.size, {
+      await this.client.putObject(this.bucket, key, buffer, file.size, {
         'Content-Type': file.type,
       });
 
@@ -93,25 +96,7 @@ export class MinIOService {
     };
   }
 
-  // Static helpers for direct usage
-  static async getTextContentFromUrl(url: string): Promise<{ content: string; metadata: Record<string, unknown> } | null> {
-    try {
-      const service = new MinIOService();
-      const key = MinIOService.extractKeyFromUrl(url: service.bucket);
-      return await service.getTextContent(key);
-    } catch (e) {
-      console.error('MinIOService.getTextContent failed', e);
-      return null;
-    }
-  }
-
-  static async getObjectBufferFromUrl(url: string): Promise<Buffer> {
-    const service = new MinIOService();
-    const key = MinIOService.extractKeyFromUrl(url: service.bucket);
-    return await service.getObjectBuffer(key);
-  }
-
-  private static extractKeyFromUrl(url: string, bucket: string): string {
+  static extractKeyFromUrl(url: string, bucket: string): string {
     if (url.startsWith('minio://')) {
       return url.replace('minio://', '');
     }
@@ -125,9 +110,22 @@ export class MinIOService {
     }
     return url; // Assume it's the key
   }
+
+  // Static helpers for direct usage
+  static async getTextContentFromUrl(url: string): Promise<{ content: string; metadata: Record<string, unknown> } | null> {
+    try {
+      const service = new MinIOService();
+      const key = MinIOService.extractKeyFromUrl(url, service.bucket);
+      return await service.getTextContent(key);
+    } catch (e) {
+      console.error('MinIOService.getTextContent failed', e);
+      return null;
+    }
+  }
+
+  static async getObjectBufferFromUrl(url: string): Promise<Buffer> {
+    const service = new MinIOService();
+    const key = MinIOService.extractKeyFromUrl(url, service.bucket);
+    return await service.getObjectBuffer(key);
+  }
 }
-
-
-
-
-
