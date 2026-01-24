@@ -67,7 +67,9 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
  const job: QueueState = {
  ...event.job,
  status: 'idle',
- retryCount: 0, createdAt: new Date( updatedAt: new Date(),
+ retryCount: 0,
+ createdAt: new Date(),
+ updatedAt: new Date(),
  };
 
  context.jobs.set(job.id, job);
