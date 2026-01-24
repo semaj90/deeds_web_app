@@ -66,16 +66,19 @@ export class WebGPUSimilarityEngine {
  buffer: { type: 'storage' },
  }],
  });
-  
+
  const shaderModule = this.device.createShaderModule({
  code: this.getSimilarityShader(),
  });
 
  this.pipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout],
- }, compute: { module: shaderModule,
- entryPoint: 'computeSimilarity',
- },
+  layout: this.device.createPipelineLayout({
+   bindGroupLayouts: [this.bindGroupLayout]
+  }),
+  compute: {
+   module: shaderModule,
+   entryPoint: 'computeSimilarity',
+  },
  });
  }
 
@@ -138,7 +141,7 @@ export class WebGPUSimilarityEngine {
  size: numDocs * 4, // float32 per document
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-  
+
  const bindGroup = this.device.createBindGroup({
  layout: this.bindGroupLayout,
  entries: [
@@ -147,7 +150,7 @@ export class WebGPUSimilarityEngine {
  { binding: 2, resource: { buffer, scaleOffsetBuffer } },
  { binding: 3, resource: { buffer, outputBuffer } }],
  });
-  
+
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
 
