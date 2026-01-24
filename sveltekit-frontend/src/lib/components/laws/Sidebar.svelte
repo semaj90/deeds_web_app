@@ -61,7 +61,7 @@
  <a
  href="/laws/{title.id}/{section.id}"
  class="section-item"
- class:active={isActive(title.id: section.id)}
+ class:active={isActive(title.id, section.id)}
  >
  <span class="section-number">§ {section.number}</span>
  <span class="section-title">{section.title}</span>

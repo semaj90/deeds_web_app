@@ -108,7 +108,7 @@
 
  // Update suggestion state (dismiss, snooze, applied, pending)
  async function updateSuggestionState(
- suggestionId: string, state: SuggestionState, SuggestionState: SuggestionState
+ suggestionId: string, state: SuggestionState
  ) {
  if (!routePath) return;
 

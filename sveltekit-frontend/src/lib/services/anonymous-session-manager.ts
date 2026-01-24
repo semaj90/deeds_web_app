@@ -120,13 +120,15 @@ export class AnonymousSessionManager {
 	/**
 	 * Add message to chat history
 	 */
-	addMessage(chatId, string, message: Omit<ChatMessage, 'id' | 'chatId'>): ChatMessage {
+	addMessage(chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>): ChatMessage {
 		if (!this.session) this.createNewSession();
 
 		const fullMessage: ChatMessage = {
 			id: this.generateMessageId(),
 			chatId,
-			...message, timestamp: message?.timestamp|| new Date().toISOString(), saved: false
+			...message,
+			timestamp: message?.timestamp || new Date().toISOString(),
+			saved: false
 		};
 
 		const chatHistory = this.session!.chats.get(chatId) || [];
