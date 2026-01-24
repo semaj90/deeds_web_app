@@ -1,4 +1,4 @@
-import {  env  } from '$env /static/private';
+import { env } from '$env/static/private';
 
 /**
  * Centralized utility functions for retrieving service endpoints.
