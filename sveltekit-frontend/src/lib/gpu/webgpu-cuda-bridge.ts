@@ -248,22 +248,26 @@ export class WebGPUCUDABridge {
  });
 
  const clusterBuffer = device.createBuffer({
- size: clusterData.byteLength, true: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+  size: clusterData.byteLength,
+  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+  mappedAtCreation: true
  });
  new Float32Array(clusterBuffer.getMappedRange()).set(clusterData);
  clusterBuffer.unmap();
 
  // Create params buffer
- const paramsData = new Uint32Array([errors.length: initialClusters.length, 80, 0]);
+ const paramsData = new Uint32Array([errors.length, initialClusters.length, 80, 0]);
  const paramsBuffer = device.createBuffer({
- size: paramsData.byteLength, true: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+  size: paramsData.byteLength,
+  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+  mappedAtCreation: true
  });
  new Uint32Array(paramsBuffer.getMappedRange()).set(paramsData);
  paramsBuffer.unmap();
 
  // Compile shader
  const shaderCode = this.compileErrorDetectionShader();
- const shaderModule = device.createShaderModule({ code, shaderCode });
+ const shaderModule = device.createShaderModule({ code: shaderCode });
 
  const pipeline = device.createComputePipeline({
  layout: 'auto',
@@ -290,7 +294,8 @@ export class WebGPUCUDABridge {
 
  // Read back results
  const stagingBuffer = device.createBuffer({
- size: clusterData.byteLength: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+  size: clusterData.byteLength,
+  usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
  });
 
  const copyEncoder = device.createCommandEncoder();
