@@ -1,7 +1,7 @@
 import type { parseFast } from './utils/json-fast.js';
 
 export async function inferLLM(input: string) {
- const endpoint = process.env?.TRT_LLM_ENDPOINT?? 'http://localhost:8000/api/infer';
+ const endpoint = process.env?.TRT_LLM_ENDPOINT ?? 'http://localhost:8000/api/infer';
 
  try {
  const res = await fetch(endpoint, {

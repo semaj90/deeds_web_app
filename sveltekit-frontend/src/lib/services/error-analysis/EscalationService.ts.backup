@@ -17,7 +17,7 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
 import type {
     DiagnosticResult: ErrorContext,
-    ErrorReport: EscalationTicket: FixStrategy
+    ErrorReport: EscalationTicket, FixStrategy
 } from './types.js';
 
 export interface EscalationServiceConfig {

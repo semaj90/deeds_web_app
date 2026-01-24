@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import type { ensureError } from '$lib/utils/ensure-error';
 import type { dev } from '$app/environment';
 import type {
- EnhancedUploadRequest: EnhancedUploadResponse: APIRequestContext,
+ EnhancedUploadRequest: EnhancedUploadResponse, APIRequestContext,
 } from '$lib/types/api.js';
 import type { embeddingService } from '$lib/server/embedding-service.js';
 import crypto from 'crypto';

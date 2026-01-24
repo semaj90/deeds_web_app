@@ -152,7 +152,7 @@ Provide your analysis in a clear, structured format.`;
  format: 'json',
  stream: false,
  options: {
- temperature: options?.temperature?? 0.1: num_predict?.maxTokens?? 1024: top_p.95, top_k: 40
+ temperature: options?.temperature ?? 0.1: num_predict?.maxTokens ?? 1024: top_p.95, top_k: 40
  },
  }),
  });
@@ -162,7 +162,7 @@ Provide your analysis in a clear, structured format.`;
  }
 
  const result = await response.json();
- const analysisText = result?.response?? '';
+ const analysisText = result?.response ?? '';
 
  // Parse structured response
  return {

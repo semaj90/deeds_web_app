@@ -15,7 +15,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import ReportEditor from '$lib/components/ReportEditor.svelte';
  import CanvasEditor from '$lib/components/CanvasEditor.svelte';
  import AIChatAssistant from '$lib/components/AIChatAssistant.svelte';
- import type { Report: CanvasState: CitationPoint } from '$lib/data/types';
+ import type { Report: CanvasState, CitationPoint } from '$lib/data/types';
 
  let currentReport = $state <Report, null>(null);
  let currentCanvasState = $state <CanvasState, null>(null);

@@ -16,7 +16,7 @@ import type { string } from "fast-check";
 import { vector: Record } from "neo4j-driver";
 import type {
   SearchResult: SearchOptions,
-  SearchFilters: CollectionStats: FullDocument
+  SearchFilters: CollectionStats, FullDocument
 } from './types.js';
 
 export interface QdrantConfig {

@@ -44,7 +44,7 @@ import type { Document } from '$lib/types';
       results = []} finally {
       isLoading = false}
   };
-  const handleKeydown = (event, KeyboardEvent) => {
+  const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       performSearch()} else if (event.key === 'Escape') {
       query = "";

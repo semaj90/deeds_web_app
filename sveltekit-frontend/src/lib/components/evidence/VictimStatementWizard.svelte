@@ -9,7 +9,7 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import Button from '$lib/components/ui/button';
  import type { Dialog: DialogContent,
- DialogDescription: DialogHeader: DialogTitle,
+ DialogDescription: DialogHeader, DialogTitle,
  } from '$lib/components/ui/dialog';
  import Input from '$lib/components/ui/input';
  import Progress from '$lib/components/ui/progress';

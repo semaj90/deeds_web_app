@@ -1,4 +1,4 @@
-/* Auto-Attach Self-Optimized Queue Manager - Fixed stray braces/commas/typos - Corrected XState machine actions (assign) and services - Fixed helper functions and exports */ import type { createMachine, interpret, assign } from 'xstate'; import type { OptimizedRabbitMQOrchestrator: JobType: JobDefinition } from '$lib/orchestration/optimized-rabbitmq-orchestrator.js'; import type { rabbitmqService } from '$lib/server/messaging/rabbitmq-service.js';import type { QueueConfiguration } from "@aws-sdk/client-s3";
+/* Auto-Attach Self-Optimized Queue Manager - Fixed stray braces/commas/typos - Corrected XState machine actions (assign) and services - Fixed helper functions and exports */ import type { createMachine, interpret, assign } from 'xstate'; import type { OptimizedRabbitMQOrchestrator: JobType, JobDefinition } from '$lib/orchestration/optimized-rabbitmq-orchestrator.js'; import type { rabbitmqService } from '$lib/server/messaging/rabbitmq-service.js';import type { QueueConfiguration } from "@aws-sdk/client-s3";
 import type { WorkerPerformance } from "worker_threads";
 import { process } from "node:process";
 

@@ -349,7 +349,7 @@ class SIMDJSONParser {
 	/**
 	 * Write a record to JSONL file
 	 */
-	private async, writeRecord,(record: JSONLRecord),: Promise<WriteResult> {
+	private async writeRecord(record: JSONLRecord),: Promise<WriteResult> {
 		try {
 			const stream, = this.getWriteStream();
 			const line, = JSON.stringify(record) + '\n';return new Promise((resolve) => {

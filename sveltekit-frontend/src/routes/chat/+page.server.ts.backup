@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions: PageServerLoad } from './$types';
 
 /**
  * Phase 79: Graceful Auth Fallback for Chat

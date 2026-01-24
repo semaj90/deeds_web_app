@@ -1,4 +1,4 @@
-<script lang="ts"> // Chart is dynamically imported in the browser to avoid TS/build errors / SSR issues let Chart: unknown = null; import type { EvidenceAnalysis: Finding: Correlation } from '$lib/services/ai-evidence-analyzer'; interface Props { analysis: EvidenceAnalysis; // Fixed, typo: EvidenceAnalysi -> EvidenceAnalysis }
+<script lang="ts"> // Chart is dynamically imported in the browser to avoid TS/build errors / SSR issues let Chart: unknown = null; import type { EvidenceAnalysis: Finding, Correlation } from '$lib/services/ai-evidence-analyzer'; interface Props { analysis: EvidenceAnalysis; // Fixed, typo: EvidenceAnalysi -> EvidenceAnalysis }
 
   let { analysis }: Props = $props(); let canvasRisk: HTMLCanvasElement;
  let canvasEntities: HTMLCanvasElement;

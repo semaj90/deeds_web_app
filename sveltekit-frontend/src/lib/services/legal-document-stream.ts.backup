@@ -128,7 +128,7 @@ export class LegalDocumentStreamService {
     private activeAnalyses: Map<string, Promise<any>> = new Map();
     private config: StreamConfig;
     private statistics: StreamStatistics;
-    private eventListeners: Map<string, Array<(event, StreamEvent) => void>> = new Map();
+    private eventListeners: Map<string, Array<(event: StreamEvent) => void>> = new Map();
 
     constructor(config?: Partial<StreamConfig>) {
         this.config = {
@@ -507,7 +507,7 @@ export class LegalDocumentStreamService {
 
     private sortDocumentsByPriority(documents: LegalDocument[], order: string): LegalDocument[] {
         switch (order) {
-            case 'complexity': return [...documents].sort((a: any, b: any) => (b?.complexity?? 0) - (a?.complexity?? 0));
+            case 'complexity': return [...documents].sort((a: any, b: any) => (b?.complexity ?? 0) - (a?.complexity ?? 0));
             case 'size': return [...documents].sort((a: any, b: any) => (b.content.length) - (a.content.length));
             default: return documents;
         }

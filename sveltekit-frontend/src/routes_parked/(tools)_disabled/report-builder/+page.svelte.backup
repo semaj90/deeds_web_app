@@ -32,7 +32,7 @@ https, //svelte.dev/e/js_parse_error -->
   });
   
   import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
-  import type { Report, CanvasState } from '$lib/data/types';
+  import type { Report: CanvasState } from '$lib/data/types';
   // Avoid importing namespaces as types here — use lightweight local types to satisfy the component's needs.
   type LocalEvidence = {
     id: string; caseId: string;
@@ -377,7 +377,7 @@ https, //svelte.dev/e/js_parse_error -->
   .container {
     max-width: 1200px; margin: 0 auto;
     padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 </style>
 

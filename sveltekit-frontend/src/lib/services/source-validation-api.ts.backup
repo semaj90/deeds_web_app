@@ -10,7 +10,7 @@ import type {
     AnswerGenerationRequest: AnswerGenerationResponse,
     HealthCheckResponse: KAGUpdateRequest,
     KAGUpdateResponse: KBSearchRequest,
-    KBSearchResponse: SourceValidationRequest: SourceValidationResponse
+    KBSearchResponse: SourceValidationRequest, SourceValidationResponse
 } from '$lib/types/source-validation';
 
 import { SourceValidationError } from '$lib/types/source-validation';

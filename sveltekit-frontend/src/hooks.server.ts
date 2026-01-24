@@ -4,7 +4,7 @@
  */
 
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
-import type { Handle: HandleServerError } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 /**
  * Main request handler with Lucia v3 session validation

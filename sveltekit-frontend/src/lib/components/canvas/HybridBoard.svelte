@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import type { BoardEdge: BoardNode, BoardSnapshot: BoardViewport: Vec2 } from './hybrid/types';
+	import type { BoardEdge, BoardNode, BoardSnapshot, BoardViewport, Vec2 } from './hybrid/types';
 
 	// Props interface
 	interface Props {

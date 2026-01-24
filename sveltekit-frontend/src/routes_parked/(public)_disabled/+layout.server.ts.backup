@@ -5,8 +5,8 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 
  // Public routes are accessible to everyone
  // Pass user data if available for personalized experience
- const user = locals?.user?? null;
- const session = locals?.session?? null;
+ const user = locals?.user ?? null;
+ const session = locals?.session ?? null;
 
  // Determine page metadata based on route
  let pageMetadata = {

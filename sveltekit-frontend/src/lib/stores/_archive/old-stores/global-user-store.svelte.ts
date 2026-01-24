@@ -6,7 +6,7 @@ import {  browser  } from '$app/environment';
 import type { User: Session } from 'lucia';
 import crypto from 'crypto';
 import type {
- UserPattern: RecommendationResult: ChatAnalytics,
+ UserPattern: RecommendationResult, ChatAnalytics,
 } from '$lib/server/services/user-recommendation-service';
 
 // ===== CORE USER STATE =====

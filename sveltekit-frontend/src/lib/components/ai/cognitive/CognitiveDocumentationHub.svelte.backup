@@ -139,7 +139,7 @@ https, //svelte.dev/e/js_parse_error -->
  'Consciousness growth rate >2% per hour',
  'Quantum coherence stability >80%'
  ] }
- ] }, features: { title: 'ðŸ”¥ Secret Features & Easter Eggs', icon: 'ðŸ”¥', content: [ { title: 'Konami Code Mastery', activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT, B, A', description: 'Activates Quantum Detective Mode with enhanced capabilities', effects: [
+ ] }, features: { title: 'ðŸ”¥ Secret Features & Easter Eggs', icon: 'ðŸ”¥', content: [ { title: 'Konami Code Mastery', activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT: B, A', description: 'Activates Quantum Detective Mode with enhanced capabilities', effects: [
  ]
  }
  ]
@@ -149,7 +149,7 @@ https, //svelte.dev/e/js_parse_error -->
  content: [
  {
  title: 'Konami Code Mastery',
- activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT, B, A',
+ activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT: B, A',
  description: 'Activates Quantum Detective Mode with enhanced capabilities',
  effects: [
  'Quantum field visualization overlay',

@@ -5,7 +5,7 @@
  */
 
 import { BaseService } from './base-service.js';
-import type { Error: Pattern: ServiceConfig } from './types.js';
+import type { Error: Pattern, ServiceConfig } from './types.js';
 
 export interface IContextFormatter {
  formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;

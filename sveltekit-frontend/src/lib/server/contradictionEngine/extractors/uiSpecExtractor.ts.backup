@@ -1,4 +1,4 @@
-import type { RouteSpecInput, UISpec } from '../types.js';
+import type { RouteSpecInput: UISpec } from '../types.js';
 
 export async function extractUISpec(route: RouteSpecInput): Promise<UISpec> {
     // This function seemed to be extracting/mocking UI specs.

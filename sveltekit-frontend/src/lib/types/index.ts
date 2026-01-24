@@ -39,14 +39,14 @@ export * from './generics.js';
 
 // External Services Types
 export type {
-    MinIOClient: MinIOConfig,
-    Neo4jClient: Neo4jConfig,
-    OllamaClient: OllamaConfig,
-    PgVectorClient: PostgresConfig,
-    QdrantClient: QdrantConfig,
-    QdrantSearchResult: QdrantVectorPayload,
-    RedisCacheService: RedisConfig,
-    ServiceEnvironment: ServiceUrls
+	MinIOClient: MinIOConfig,
+	Neo4jClient: Neo4jConfig,
+	OllamaClient: OllamaConfig,
+	PgVectorClient: PostgresConfig,
+	QdrantClient: QdrantConfig,
+	QdrantSearchResult: QdrantVectorPayload,
+	RedisCacheService: RedisConfig,
+	ServiceEnvironment: ServiceUrls
 } from './external-services.js';
 
 export interface Case {

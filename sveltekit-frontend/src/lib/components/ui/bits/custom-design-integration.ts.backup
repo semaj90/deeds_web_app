@@ -1,7 +1,7 @@
 // Custom Design Integration System for Enhanced-Bits
 // SSR-Safe design token management and custom styling
 
-import type { CustomDesignTokens, CustomComponentConfig } from './index.js';
+import type { CustomDesignTokens: CustomComponentConfig } from './index.js';
 
 // ======================================================================
 // DESIGN SYSTEM INTEGRATION
@@ -20,7 +20,7 @@ export interface DesignSystem {
         nes: Record<string, string>;
     };
     cssVariables: Record<string, string>;
-    components: Record<string, CustomComponentConfig>;
+    components: Record<string: CustomComponentConfig>;
     animations: AnimationConfig;
     breakpoints: BreakpointConfig;
 }
@@ -138,7 +138,7 @@ export const MinimalDesignSystem: DesignSystem = {
             xl: '2rem',
         },
         typography: {
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontFamily: '-apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontSize: {
                 xs: '0.75rem',
                 sm: '0.875rem',
@@ -166,7 +166,7 @@ export const MinimalDesignSystem: DesignSystem = {
         '--minimal-text': '#111827',
         '--minimal-shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
         '--minimal-border-radius': '0.5rem',
-        '--minimal-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        '--minimal-font-family': '-apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     },
     components: {},
     animations: {
@@ -295,7 +295,7 @@ export function createComponentVariant(
         },
         minimal: {
             border: 'var(--minimal-border-width, 1px) solid var(--minimal-border, #e5e7eb)',
-            fontFamily: 'var(--minimal-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
+            fontFamily: 'var(--minimal-font-family, -apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
             borderRadius: 'var(--minimal-border-radius, 0.5rem)',
             boxShadow: 'var(--minimal-shadow, 0 1px 3px 0 rgba(0, 0, 0, 0.1))',
         },

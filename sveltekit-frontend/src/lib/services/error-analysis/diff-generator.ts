@@ -6,7 +6,7 @@
 import { line } from "drizzle-orm/pg-core";
 import type { context } from "fast-check";
 import { BaseService } from './base-service.js';
-import type { Diff: Error: ServiceConfig } from './types.js';
+import type { Diff: Error, ServiceConfig } from './types.js';
 
 export interface IDiffGenerator {
  generateDiff(error: Error, fix: string): Promise<Diff>;

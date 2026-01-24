@@ -1,7 +1,7 @@
 import type {
     ensureFloat32Array,
     batchProcessArrays,
-    adaptiveQuantization: QuantizationConfig: ArrayConversionResult
+    adaptiveQuantization: QuantizationConfig, ArrayConversionResult
 } from '$lib/utils/webgpu-array-utils';
 
 // --- Type Definitions ---

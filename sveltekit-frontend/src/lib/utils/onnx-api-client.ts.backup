@@ -15,7 +15,7 @@ export class ONNXApiClient {
  private defaultOptions: ONNXApiOptions;
 
  constructor(options: ONNXApiOptions = {}) {
- this.baseUrl = options?.baseUrl?? '';
+ this.baseUrl = options?.baseUrl ?? '';
  this.defaultOptions = {
  timeout: 30000,
  retries: 2,

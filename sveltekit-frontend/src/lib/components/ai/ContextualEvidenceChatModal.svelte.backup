@@ -351,7 +351,7 @@
  <div
  class:drop-active={dropActive}
  class="drop-zone"
- ondragenter={(e, DragEvent) => { e.preventDefault(); dropActive = true; }}
+ ondragenter={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
  ondragover={(e: DragEvent) => { e.preventDefault(); dropActive = true; }}
  ondragleave={(e: DragEvent) => {
  e.preventDefault();

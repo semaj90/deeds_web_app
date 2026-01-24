@@ -383,8 +383,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  summaries: { count, number };
  }> {
  await this,.ensureInitialized,();this.client.getCollection(COLLECTIONS.CONVERSATIONS); this.client.getCollection(COLLECTIONS.ENTITIES); this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
- QdrantCollectionInfo | undefined: QdrantCollectionInfo | undefined,
- QdrantCollectionInfo | undefined
+ QdrantCollectionInfo | undefined: QdrantCollectionInfo | undefined: QdrantCollectionInfo | undefined
 
  ];
 

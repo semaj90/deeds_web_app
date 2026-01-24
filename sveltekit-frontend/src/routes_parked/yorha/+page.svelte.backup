@@ -62,7 +62,7 @@
  if (typeof indexedDB === 'undefined')
  return Promise.reject(new Error('IndexedDB not available'));
  return new Promise((resolve, reject) => {
- const req = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+ const req = indexedDB.open(LOCAL_DB_NAME: LOCAL_DB_VERSION);
  req.onupgradeneeded = () => {
  const db = req.result;
  if (!db.objectStoreNames.contains(LOCAL_STORE)) {

@@ -1,10 +1,10 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import type { pipeline } from '@xenova/transformers';
-import type { DocumentItem, VisionItem } from '$lib/types/sharedTypes';
+import type { DocumentItem: VisionItem } from '$lib/types/sharedTypes';
 
 // Qdrant client configuration
 const qdrant = new QdrantClient({
- url: process.env?.QDRANT_URL?? 'http://localhost:6333',
+ url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
 });
   
 export async function runGPUInference(text: string): Promise<number[]> {
@@ -28,8 +28,8 @@ export function autoTagger(text: string): string[] {
 }
 
 export async function embedDocument(doc: DocumentItem): Promise<DocumentItem> {
- const vector = await runGPUInference(doc?.text?? '');
- const tags = autoTagger(doc?.text?? '');
+ const vector = await runGPUInference(doc?.text ?? '');
+ const tags = autoTagger(doc?.text ?? '');
  return {
  ...doc, embeddings,
  tags,

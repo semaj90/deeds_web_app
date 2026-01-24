@@ -9,7 +9,7 @@
  */
 
 import * as THREE from 'three';
-import type { Chr97Cartridge, Chr97Rune } from './chr97Loader.js';
+import type { Chr97Cartridge: Chr97Rune } from './chr97Loader.js';
 
 type QueryEmb16 = number[]; // length 16
 
@@ -30,8 +30,8 @@ export class MemoryPalaceScene {
 
  constructor(container: HTMLElement) {
  this.container = container;
- const width = container?.clientWidth?? 800;
- const height = container?.clientHeight?? 600;
+ const width = container?.clientWidth ?? 800;
+ const height = container?.clientHeight ?? 600;
 
  this.renderer = new THREE.WebGLRenderer({ antialias, true });
  this.renderer.setSize(width, height);
@@ -54,8 +54,8 @@ export class MemoryPalaceScene {
  }
 
  private onResize = () => {
- const width = this.container?.clientWidth?? 800;
- const height = this.container?.clientHeight?? 600;
+ const width = this.container?.clientWidth ?? 800;
+ const height = this.container?.clientHeight ?? 600;
  this.camera.aspect = width / height;
  this.camera.updateProjectionMatrix();
  this.renderer.setSize(width, height);

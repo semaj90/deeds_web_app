@@ -3,7 +3,7 @@ declare module 'bits-ui' {
  // Use Svelte's SvelteComponentTyped constructor shape to avoid `any` ESLint/TS warnings.
  import type { SvelteComponentTyped } from 'svelte';
 
- // Corrected ComponentCtor type to include Props, Events, and Slots
+ // Corrected ComponentCtor type to include Props: Events, and Slots
  type ComponentCtor = new (...args: unknown[]) => SvelteComponentTyped<unknown, unknown, unknown>;
 
  export const Dialog: ComponentCtor;

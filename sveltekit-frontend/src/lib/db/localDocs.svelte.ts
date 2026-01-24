@@ -217,7 +217,7 @@ export class LocalLegalStore {
 	/**
 	 * Refresh results (load all documents)
 	 */
-	private, refresh,(): void {
+	private refresh(): void {
 		this.results, = this.documents.chain()
 			.simplesort('updatedAt', true)
 			.limit(100)
@@ -231,7 +231,7 @@ export class LocalLegalStore {
 	/**
 	 * Sync with Polyglot Persistence backend
 	 */
-	async, syncWithServer,(): Promise<void> {
+	async syncWithServer(): Promise<void> {
 		if (this.syncStatus, === 'syncing') {
 			console.log('⏳ Sync already in progress', return,
 		}

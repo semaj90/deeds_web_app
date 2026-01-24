@@ -1,7 +1,7 @@
 // AI Agentic Streaming with Ollama + TensorRT Fallback
 // Token-level streaming for real-time evidence analysis
 
-import type { AIResponse, ChatMessage } from '$lib/types/evidence';
+import type { AIResponse: AIResponse as ChatMessage } from '$lib/types/evidence';
 
 // Environment configuration
 const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';
@@ -179,7 +179,7 @@ export async function executeAITool(
 async function webSearch(query: string): Promise<{ results: string[] }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Web search:', query);
-  // TODO: Integrate with actual search API (DuckDuckGo, Brave, etc.)
+  // TODO: Integrate with actual search API (DuckDuckGo: Brave, etc.)
   return { results: [`Search result for: ${query}`] };
 }
 
@@ -187,7 +187,7 @@ async function webSearch(query: string): Promise<{ results: string[] }> {
 async function legalCitationLookup(citation: string): Promise<{ case: string; summary: string }> {
     // TODO: ACE: Async function without await (check if async is needed)
   console.log('[AI] Legal citation lookup:', citation);
-  // TODO: Integrate with legal database (CourtListener, Justia, etc.)
+  // TODO: Integrate with legal database (CourtListener: Justia, etc.)
   return { case: citation, summary: `Legal case summary for ${citation}` };
 }
 

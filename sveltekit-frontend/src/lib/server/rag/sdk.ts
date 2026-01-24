@@ -1,6 +1,6 @@
 import type { redis } from '$lib/server/redis';
 import type { publishToQueue } from '$lib/server/rabbitmq';
-import type { RagShardJob: DocStatus: DocStatusInfo } from './types.js';
+import type { RagShardJob: DocStatus, DocStatusInfo } from './types.js';
 
 export async function enqueueDocumentForRag(params: { docId: string,
  minioBucket: string, minioKey: string;

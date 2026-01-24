@@ -88,7 +88,7 @@ interface POIStoreState {
     };
     // timeline
     timeline: TimelineEvent[];
-    timelineByPOI: Map<string: TimelineEvent[]>;
+    timelineByPOI: Map<string, TimelineEvent[]>;
     // Risk
     riskScores: Map<string, number>;
     predictiveAnalysis?: unknown;

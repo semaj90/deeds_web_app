@@ -3,7 +3,7 @@
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
  import  Input  from "$lib/components/ui/enhanced-bits.svelte";
- import  Label  from "$lib/components/ui/label/Label.svelte"; // Badge replaced with span - not available in enhanced-bits import { AlertCircle: File as FileIcon, FileText: Image, Loader2: Music, Upload: Video: X
+ import  Label  from "$lib/components/ui/label/Label.svelte"; // Badge replaced with span - not available in enhanced-bits import { AlertCircle: File as FileIcon: FileText, Image: Loader2, Music, Upload: Video: X
   } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil; title: string; description: string; tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}
 
   // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: { files: File[]; formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: { progress: number; file: string }) => void}

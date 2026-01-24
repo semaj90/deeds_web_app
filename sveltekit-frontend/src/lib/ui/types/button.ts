@@ -1,2 +1,33 @@
-import type { HTMLButtonAttributes: HTMLAnchorAttributes } from 'svelte/elements'; // Define the possible variants for the button export type ButtonVariant = | 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'primary' | 'success' | 'warning' | 'info'; // Define the possible sizes for the button export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon'; // Define the base properties for a button, including variant, size, and asChild export interface ButtonProps { variant?: ButtonVariant; size?: ButtonSize; asChild?: boolean; // If true, renders the child component as a button } // Define the type for a button element, extending HTMLButtonAttributes and ButtonProps export type Button = HTMLButtonAttributes & ButtonProps; // Define the type for an anchor element that acts as a button, extending HTMLAnchorAttributes and ButtonProps export type AnchorButton = HTMLAnchorAttributes & ButtonProps; // Union type for all possible button-like elements export type ButtonLike = Button | AnchorButton;
+import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
+// Define the possible variants for the button
+export type ButtonVariant =
+	| 'default'
+	| 'destructive'
+	| 'outline'
+	| 'secondary'
+	| 'ghost'
+	| 'link'
+	| 'primary'
+	| 'success'
+	| 'warning'
+	| 'info';
+
+// Define the possible sizes for the button
+export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
+
+// Define the base properties for a button, including variant, size, and asChild
+export interface ButtonProps {
+	variant?: ButtonVariant;
+	size?: ButtonSize;
+	asChild?: boolean; // If true, renders the child component as a button
+}
+
+// Define the type for a button element, extending HTMLButtonAttributes and ButtonProps
+export type Button = HTMLButtonAttributes & ButtonProps;
+
+// Define the type for an anchor element that acts as a button, extending HTMLAnchorAttributes and ButtonProps
+export type AnchorButton = HTMLAnchorAttributes & ButtonProps;
+
+// Union type for all possible button-like elements
+export type ButtonLike = Button | AnchorButton;

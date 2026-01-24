@@ -4,7 +4,7 @@
  * Integrates with Redis cache: GPU acceleration, and semantic analysis
  */
 
-import type { ErrorCluster: GPUAnalysisResult: GPUErrorPattern } from '$lib/gpu/webgpu-cuda-bridge';
+import type { ErrorCluster, GPUAnalysisResult, GPUErrorPattern } from '$lib/gpu/webgpu-cuda-bridge';
 
 /**
  * Error routing tier

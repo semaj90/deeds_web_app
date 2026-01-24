@@ -1,4 +1,4 @@
-/** * Drizzle CHR-ROM Bridge Service * Connects Drizzle database schema to CHR-ROM pattern generation pipeline * * This service provides the solid foundation that feeds real data * to the CHR-ROM pre-computation system for pattern generation */ import type { LegalDocument: ProcessingResult: EntityExtraction } from '../types/legal.js'; import type { chrROMPrecomputation } from './chr-rom-precomputation.js'; import type { redisWebGPUIntegration } from '../integrations/redis-webgpu-simd-integration.js';
+/** * Drizzle CHR-ROM Bridge Service * Connects Drizzle database schema to CHR-ROM pattern generation pipeline * * This service provides the solid foundation that feeds real data * to the CHR-ROM pre-computation system for pattern generation */ import type { LegalDocument: ProcessingResult, EntityExtraction } from '../types/legal.js'; import type { chrROMPrecomputation } from './chr-rom-precomputation.js'; import type { redisWebGPUIntegration } from '../integrations/redis-webgpu-simd-integration.js';
 import { Document } from "$lib/types";
 import { process } from "node:process";
 

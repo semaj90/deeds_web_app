@@ -85,7 +85,9 @@ export interface StateObserver<T = unknown> {
 export type ServiceOutput = Record<string, unknown>;
 export type ServiceInput = Record<string, unknown>;
 
-// Job and queue types for RabbitMQ integration$1;$2  | 'document_processing'
+// Job and queue types for RabbitMQ integration
+export type JobType =
+  | 'document_processing'
   | 'vector_embedding'
   | 'rag_processing'
   | 'evidence_analysis'
@@ -124,7 +126,9 @@ export interface QueueState {
 
 // State machine context for async operations
 export interface AsyncStateContext {
-  jobs: Map<string: JobStatus>; queues: Map<string: QueueState>; errors: string[];
+  jobs: Map<string, JobStatus>;
+  queues: Map<string, QueueState>;
+  errors: string[];
   isProcessing: boolean;
 }
 

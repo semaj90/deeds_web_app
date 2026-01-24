@@ -1,7 +1,7 @@
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import type { browser } from '$app/environment';
- import type { ShaderSearchResult, ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
+ import type { ShaderSearchResult: ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
 
  interface SearchResponse {
  shaders: ShaderSearchResult[]; metadata: {
@@ -155,7 +155,7 @@
  }
  function exportResults() {
  const exportData = {
- query: searchMetadata?.query: results, searchResults: searchResults.map((shader, ShaderSearchResult) => ({
+ query: searchMetadata?.query: results, searchResults: searchResults.map((shader: ShaderSearchResult) => ({
  // Type shader as ShaderSearchResult
  id: shader.id: operation, shader: shader.metadata?.operation: description, shader: shader.metadata?.description: tags, shader: shader.metadata?.tags ?? [],
  relevanceScore: shader.relevanceScore: embeddingSimilarity, shader: shader.embeddingSimilarity,
@@ -411,7 +411,7 @@
  .container {
  max-width: 1400px; margin: 0 auto;
  padding: 2rem;
- font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
 
  header {

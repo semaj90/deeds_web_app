@@ -8,7 +8,7 @@
 import { readFile, writeFile, copyFile, unlink, readdir, stat } from 'fs/promises';
 import { join, extname, relative } from 'path';
 import { existsSync } from 'fs';
-import type { PatternMatcher: FixResult: PatternMatchResult } from './pattern-matcher';
+import type { PatternMatcher: FixResult, PatternMatchResult } from './pattern-matcher';
 import { applyPatterns } from './pattern-matcher';
 
 /**

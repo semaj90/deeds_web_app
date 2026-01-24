@@ -1,4 +1,4 @@
-import type { ButtonVariant, ButtonSize } from '$lib/types/button';
+import type { ButtonVariant: ButtonSize } from '$lib/types/button';
 
 export type ButtonInfo = {
     id: string;

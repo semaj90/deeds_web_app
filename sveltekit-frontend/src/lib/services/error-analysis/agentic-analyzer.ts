@@ -8,7 +8,7 @@
 
 import type { context } from "fast-check";
 import { BaseService } from './base-service.js';
-import type { Analysis: Error, LLMResponse: Pattern: ServiceConfig } from './types.js';
+import type { Analysis: Error, LLMResponse: Pattern, ServiceConfig } from './types.js';
 
 export interface IAgenticAnalyzer {
  analyzeError(error: Error): Promise<Analysis>;

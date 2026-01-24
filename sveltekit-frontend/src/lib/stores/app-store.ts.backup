@@ -1,7 +1,7 @@
 import type {
     Case: CaseStats,
     Evidence: EvidenceStats,
-    PersonOfInterest: SearchResult: SystemMetrics
+    PersonOfInterest: SearchResult, SystemMetrics
 } from '$lib/services/api-client';
 import {
     caseApi,

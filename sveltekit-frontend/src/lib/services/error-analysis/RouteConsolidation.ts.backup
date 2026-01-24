@@ -12,7 +12,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { RouteInfo, ConsolidationRecommendation } from './types.js';
+import type { RouteInfo: ConsolidationRecommendation } from './types.js';
 
 export interface RouteConsolidationConfig {
 	routesDir: string; ignorePatterns: string[];

@@ -11,36 +11,47 @@
 // Types
 // ========================================
 export interface UserSession {
-	user: { id: string;
-		email: string; firstName: string | null;
+	user: {
+		id: string;
+		email: string;
+		firstName: string | null;
 		lastName: string | null;
-		role: string; avatarUrl: string | null;
+		role: string;
+		avatarUrl: string | null;
 	};
-	session: { id: string;
+	session: {
+		id: string;
 		expiresAt: string;
 	};
 }
 
 export interface Case {
-	id: string; title: string;
+	id: string;
+	title: string;
 	status: 'active' | 'closed' | 'pending';
-	createdAt: Date; updatedAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
 	description?: string;
 	assignedTo?: string;
 }
 
 export interface AIMessage {
-	id: string; role: 'user' | 'assistant' | 'system';
-	content: string; timestamp: string;
+	id: string;
+	role: 'user' | 'assistant' | 'system';
+	content: string;
+	timestamp: string;
 	confidence?: number;
 	citations?: string[];
 	warnings?: string[];
 }
 
 export interface ChatMetadata {
-	id: string; title: string;
-	caseId?: string; createdAt: Date;
-	lastMessageAt: Date; messageCount: number;
+	id: string;
+	title: string;
+	caseId?: string;
+	createdAt: Date;
+	lastMessageAt: Date;
+	messageCount: number;
 }
 
 // ========================================
@@ -52,9 +63,11 @@ export const authStore = (() => {
 	let error = $state<string | null>(null);
 
 	// Derived values
-	let isAuthenticated = $derived(session !== null);session?.user?.firstName&& session?.user.lastName
+	let isAuthenticated = $derived(session !== null);
+	let displayName = $derived(
+		session?.user?.firstName && session?.user.lastName
 			? `${session.user.firstName} ${session.user.lastName}`
-			: session?.user.email ?? null
+			: (session?.user.email ?? null)
 	);
 	let userRole = $derived(session?.user.role ?? 'user');
 
@@ -192,7 +205,9 @@ export const aiStore = (() => {
 
 	// Derived values
 	let messageCount = $derived(messages.length);
-	let averageConfidence = $derived(() => {.filter((m) => m.confidence !== undefined)
+	let averageConfidence = $derived(() => {
+		const confidences = messages
+			.filter((m) => m.confidence !== undefined)
 			.map((m) => m.confidence!);
 		if (confidences.length === 0) return 1.0;
 		return confidences.reduce((a, b) => a + b, 0) / confidences.length;
@@ -220,10 +235,12 @@ export const aiStore = (() => {
 		},
 
 		// Actions
-		startMessage(role, 'user' | 'assistant', content: string) {
+		startMessage(role: 'user' | 'assistant', content: string) {
 			const message: AIMessage = {
 				id: `msg-${Date.now()}`,
-				role: content Date().toISOString()
+				role,
+				content,
+				timestamp: new Date().toISOString()
 			};
 
 			messages.push(message);
@@ -269,7 +286,11 @@ export const chatStore = (() => {
 
 	// Derived values
 	let activeChatMetadata = $derived(chats.find((c) => c.id === activeChat) ?? null);
-	let chatCount = $derived(chats.length);[...chats].sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime()).slice(0, 10)
+	let chatCount = $derived(chats.length);
+	let recentChats = $derived(
+		[...chats]
+			.sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime())
+			.slice(0, 10)
 	);
 
 	return {
@@ -335,8 +356,9 @@ export const chatStore = (() => {
 // ========================================
 // Theme Store (with localStorage persistence)
 // ========================================
-export const themeStore = (() => {typeof window !== 'undefined' ? localStorage.getItem('theme') : null;(savedTheme as 'light' | 'dark' | 'nier') ?? 'dark'
-	);
+export const themeStore = (() => {
+	const savedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+	let theme = $state<'light' | 'dark' | 'nier'>((savedTheme as 'light' | 'dark' | 'nier') ?? 'dark');
 
 	// Persist to localStorage and update DOM
 	$effect(() => {
@@ -351,7 +373,7 @@ export const themeStore = (() => {typeof window !== 'undefined' ? localStorage.
 			return theme;
 		},
 
-		setTheme(newTheme, 'light' | 'dark' | 'nier') {
+		setTheme(newTheme: 'light' | 'dark' | 'nier') {
 			theme = newTheme;
 		},
 
@@ -365,11 +387,9 @@ export const themeStore = (() => {typeof window !== 'undefined' ? localStorage.
 // Export All Stores
 // ========================================
 export const stores = {
-	auth: authStore, case: caseStore,
-	ai: aiStore, chat: chatStore,
+	auth: authStore,
+	case: caseStore,
+	ai: aiStore,
+	chat: chatStore,
 	theme: themeStore
 };
-
-
-
-

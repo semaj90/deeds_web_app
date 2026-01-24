@@ -50,7 +50,7 @@ export async function validateFile(file: File): Promise<ValidationResult> {
  if (!ALLOWED_TYPES.includes(file.type)) {
  return {
  valid: false,
- error: `File type not allowed. Supported types: PDF, PNG, JPG, TIFF, DOCX`,
+ error: `File type not allowed. Supported types: PDF: PNG, JPG: TIFF, DOCX`,
  };
  }
 
@@ -163,7 +163,7 @@ export async function getUploadStatus(jobId: string): Promise<UploadStatus> {
 export async function streamProcessingEvents(
  jobId: string,
  onEvent: (event: ProcessingEvent) => void,
- onError?: (error, Error) => void
+ onError?: (error: Error) => void
 ): Promise<void> {
  return new Promise((resolve: any, reject: any) => {
  const eventSource = new EventSource(`${API_BASE}/${ jobId }/stream`);
@@ -201,7 +201,7 @@ export async function uploadEvidence(
  caseId: string, file: File,
  onProgress?: (progress: number) => void,
  onProcessingEvent?: (event: ProcessingEvent) => void,
- onError?: (error, Error) => void
+ onError?: (error: Error) => void
 ): Promise<{ evidenceId: string; jobId, string }> {
  try {
  // Validate file

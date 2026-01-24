@@ -12,7 +12,7 @@
 
 import type {
   SearchResult: SearchOptions,
-  SearchFilters: FullDocument: IndexResult
+  SearchFilters: FullDocument, IndexResult
 } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 

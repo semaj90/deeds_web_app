@@ -7,7 +7,7 @@ import { db } from '$lib/server/db';
 import type {
 	SavedCitation: CitationSearchRequest,
 	CitationSearchResult: CitationSaveRequest,
-	CitationUpdateRequest: StatuteSearchHistory: CitationStatistics
+	CitationUpdateRequest: StatuteSearchHistory, CitationStatistics
 } from '$lib/types/citations';
 // AuditService is imported but usage was corrupted in original, assuming it exists or will be fixed in another pass.
 // If it fails, we'll need to fix AuditService too. For now I'll mock the minimal interface if import fails,

@@ -176,17 +176,17 @@ https, //svelte.dev/e/tag_invalid_name -->
  {/if}
  </div>
 
- {#if evidence.aiSummary}
- <div class="ai-summary nes-container is-rounded">
- <div class="summary-header nes-text is-primary">
- <Eye size={12} />
- <span>AI Summary</span>
- </div>
- <Tooltip text={evidence.aiSummary}>
- <p class="summary-text nes-text">{evidence.aiSummary.length > 100 ? evidence.aiSummary.substring(0, 100) + '...' : evidence.aiSummary}</p>
- </Tooltip>
- </div>
- {/if}
+	{#if evidence.summary}
+		<div class="ai-summary nes-container is-rounded">
+			<div class="summary-header nes-text is-primary">
+				<Eye size={12} />
+				<span>AI Summary</span>
+			</div>
+			<Tooltip text={evidence.summary}>
+				<p class="summary-text nes-text">{evidence.summary.length > 100 ? evidence.summary.substring(0, 100) + '...' : evidence.summary}</p>
+			</Tooltip>
+		</div>
+	{/if}
 
  <!-- Drag instruction -->
  {#if !readonly && !isDropped}

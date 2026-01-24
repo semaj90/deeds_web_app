@@ -22,7 +22,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Mobile, backdrop -->
   {#if open} <button class="fixed inset-0 z-40 bg-black/50" onclick={ closeSidebar } aria-label="Close, sidebar"></button> {/if}
   <!-- Sidebar --> <aside class={cn(
-    'fixed top-0 left-0 z-50 h-full w-64 transform bg-nier-surface border-r border-nier-gray transition-transform duration-300 ease-in-out lg: translate-x-0, lg: static, lg, inset-0', open ? 'translate-x-0', '-translate-x-full'
+    'fixed top-0 left-0 z-50 h-full w-64 transform bg-nier-surface border-r border-nier-gray transition-transform duration-300 ease-in-out lg: translate-x-0, lg: static lg inset-0', open ? 'translate-x-0', '-translate-x-full'
   )} >
   <div class="flex h-full"> <!-- Logo, section --> <div class="flex h-16 items-center border-b border-nier-gray"> <div class="flex items-center"> <div class="w-8 h-8 bg-crimson-gradient rounded-md flex items-center justify-center"> <Scale class="h-5 w-5" /> </div>
  <div class="flex-1"> <h1 class="text-sm font-semibold">Legal AI Platform</h1>

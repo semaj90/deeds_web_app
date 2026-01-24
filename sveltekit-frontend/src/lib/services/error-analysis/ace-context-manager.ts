@@ -7,7 +7,7 @@
  */
 
 import { BaseService } from './base-service.js';
-import type { ACEContext: Analysis, Diff: Metrics: ServiceConfig } from './types.js';
+import type { ACEContext: Analysis, Diff: Metrics, ServiceConfig } from './types.js';
 
 export interface IAceContextManager {
  createContext(sessionId: string): Promise<ACEContext>;

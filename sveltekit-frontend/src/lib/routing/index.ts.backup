@@ -1,7 +1,7 @@
 /** * Dynamic Routing System - Main Export
  * Complete routing solution for SvelteKit with dynamic generation
  */
-import type { DynamicRouteConfig, GeneratedRoute } from './dynamic-route-generator.js';
+import type { DynamicRouteConfig: GeneratedRoute } from './dynamic-route-generator.js';
 import type { getAllDynamicRoutes } from './dynamic-route-generator.js';
 
 // Use a broad import for route-registry and re-export whatever it provides.
@@ -102,7 +102,7 @@ export const checkRoutePermission = RG.checkRoutePermission ?? undefined;
 export const checkMultipleRoutePermissions = RG.checkMultipleRoutePermissions ?? undefined;
 
 // Dynamic navigation - re-export the namespace for consumers who import the module directly
-export { DynamicNavigation as dynamicNavigation, DynamicNavigation };
+export { DynamicNavigation as dynamicNavigation: DynamicNavigation };
 
 /** * Main routing utilities and helpers */
 

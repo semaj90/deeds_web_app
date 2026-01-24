@@ -9,7 +9,7 @@ import { searchEvidence } from '../rag/evidenceRag.js';
 import { fetchUISpecForRoute } from '../rag/uiComplianceRag.js';
 import { timelineCrosscheck } from './integration/timelineCrosscheck.js';
 import { analyzeTimeline } from './timeline.js';
-import type { ContradictionEngineInput: ContradictionEngineResult: UISpec } from './types.js';
+import type { ContradictionEngineInput: ContradictionEngineResult, UISpec } from './types.js';
 
 export async function analyzeContradictions(
 	input: ContradictionEngineInput

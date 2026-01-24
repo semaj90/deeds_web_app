@@ -22,7 +22,7 @@ export class RedisTransport implements ErrorBrainTransport {
  private streamKey: string;
 
  constructor(redisClient?: any) {
- const env = process.env?.NODE_ENV?? 'development';
+ const env = process.env?.NODE_ENV ?? 'development';
  this.channel = `error-brain:${env}:events`;
  this.streamKey = `error-brain:${env}:stream`;
 

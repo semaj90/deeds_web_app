@@ -4,7 +4,7 @@
  */
 import type {
     LegalDocumentTexturePipeline: EvidencePhoto,
-    DocumentScan: CaseVisualization: CourtroomDisplay
+    DocumentScan: CaseVisualization, CourtroomDisplay
 } from '$lib/gpu/legal-texture-pipeline';
 
 // Define explicit types if not available from import to avoid errors

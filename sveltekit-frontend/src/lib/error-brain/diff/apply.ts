@@ -6,7 +6,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { BATCH_REPORT_STAMP: PATCH_DIR } from '../config.js';
-import type { ApplyMode: ApplyResult: PatchCandidate } from '../types.js';
+import type { ApplyMode: ApplyResult, PatchCandidate } from '../types.js';
 import { guardAll, isGuardFailure, sha256 } from './guards.js';
 
 export type ApplyOptions = {

@@ -10,10 +10,8 @@
  */
 
 import type {
-  CrawledDocument,
-  IndexResult,
-  ReindexStats,
-  SearchResult
+  CrawledDocument: IndexResult,
+  ReindexStats: SearchResult
 } from './types.js';
 
 export interface KnowledgeIndexerConfig {
@@ -25,20 +23,20 @@ export interface KnowledgeIndexerConfig {
 }
 
 const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
-  qdrantUrl: process.env?.QDRANT_URL?? 'http://localhost:6333',
+  qdrantUrl: process.env?.QDRANT_URL ?? 'http://localhost:6333',
   qdrantCollection: 'phase76_knowledge_base',
-  postgresUrl: process.env?.DATABASE_URL?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
-  minioEndpoint: process.env?.MINIO_ENDPOINT?? 'localhost',
-  minioBucket: process.env?.MINIO_BUCKET?? 'knowledge-docs',
-  redisUrl: process.env?.REDIS_URL?? 'redis://localhost:6379',
-  ollamaUrl: process.env?.OLLAMA_URL?? 'http://localhost:11434',
-  embeddingModel: process.env?.EMBEDDING_MODEL?? 'nomic-embed-text:latest',
-  summaryModel: process.env?.OLLAMA_MODEL?? 'gemma3-legal:latest'
+  postgresUrl: process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db',
+  minioEndpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
+  minioBucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
+  redisUrl: process.env?.REDIS_URL ?? 'redis://localhost:6379',
+  ollamaUrl: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+  embeddingModel: process.env?.EMBEDDING_MODEL ?? 'nomic-embed-text:latest',
+  summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest'
 };
 
 /**
  * Knowledge Indexer
- * Indexes crawled documents into Qdrant, PostgreSQL, and MinIO
+ * Indexes crawled documents into Qdrant: PostgreSQL, and MinIO
  */
 export class KnowledgeIndexer {
   private config: KnowledgeIndexerConfig;
@@ -59,7 +57,7 @@ export class KnowledgeIndexer {
    * 2. Generate AI summary using gemma3-legal
    * 3. Extract entities and tags
    * 4. Compute TF-IDF vector
-   * 5. Store in Qdrant, PostgreSQL, MinIO
+   * 5. Store in Qdrant: PostgreSQL, MinIO
    */
   async indexDocument(doc: CrawledDocument): Promise<IndexResult> {
     const startTime = Date.now();

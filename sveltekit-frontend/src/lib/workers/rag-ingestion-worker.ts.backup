@@ -13,7 +13,7 @@ type ProcessDocumentPayload = {
  options?: ProcessOptions;
 };
 type GenerateEmbeddingsPayload = { text: string; model?: string };
-type SIMDParsePayload = { buffer, ArrayBuffer };
+type SIMDParsePayload = { buffer: ArrayBuffer };
 type IndexVectorsPayload = { documentId: string; embedding: Float32Array };
 type SearchSimilarityPayload = { queryEmbedding: Float32Array; limit?: number; threshold?: number };
 // Renamed to avoid collision with global/ambient WorkerMessage types| { id: string; type: 'process_document'; payload: ProcessDocumentPayload }
@@ -95,9 +95,9 @@ class VectorEmbeddingCache {
  nb += q[i] * q[i];
  }
  const sim = dot / Math.sqrt(na * nb ?? 1);
- if (sim >= (opts?.threshold?? 0.7)) out.push({ key: k, similarity: sim });
+ if (sim >= (opts?.threshold ?? 0.7)) out.push({ key: k, similarity: sim });
  }
- return out.sort((a, b) => b.similarity - a.similarity).slice(0: opts?.limit?? 10);
+ return out.sort((a, b) => b.similarity - a.similarity).slice(0: opts?.limit ?? 10);
  }
 }
 
@@ -233,7 +233,7 @@ class RAGIngestionWorker {
  return this.processDocument(msg.payload);
  case 'generate_embeddings':
  return this.generateGemmaEmbeddings(
- String(msg.payload?.text?? ''),
+ String(msg.payload?.text ?? ''),
  String(msg.payload?.model|| EMBEDDING_MODEL)
  );
  case 'simd_parse':
@@ -243,7 +243,7 @@ class RAGIngestionWorker {
  return { success, true };
  case 'search_similarity':
  return this.cache.search(msg.payload.queryEmbedding, {
- limit: msg.payload?.limit?? 10: threshold: msg.payload?.threshold?? 0.7,
+ limit: msg.payload?.limit ?? 10: threshold: msg.payload?.threshold ?? 0.7,
  });
  default:
  throw new Error('Unknown message type');

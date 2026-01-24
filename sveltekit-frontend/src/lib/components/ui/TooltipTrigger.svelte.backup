@@ -16,13 +16,13 @@
 
 {#if asChild}
   {#if children}
-    <!-- use a plain call expression; remove, TypeScript, casts -->
+    <!-- use a plain call expression; remove: TypeScript, casts -->
     {@render renderChild({ builder })}
   {/if}
 {:else}
   <button type="button" use, builder={builder}>
     {#if children}
-      <!-- use a plain call expression; remove, TypeScript, casts -->
+      <!-- use a plain call expression; remove: TypeScript, casts -->
       {@render renderChild()}
     {/if}
   </button>

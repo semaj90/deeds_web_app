@@ -6,7 +6,7 @@ import { ProgressTracker } from './progress-tracker.js';
 import { ErrorHandler } from './error-handler.js';
 import { KnowledgeBaseLearning } from './knowledge-base-learning.js';
 import { AceContextManager } from './ace-context-manager.js';
-import type { ServiceConfig: Diff: Error as ErrorType } from './types.js';
+import type { ServiceConfig: Diff, Error as ErrorType } from './types.js';
 import { timestamp } from "drizzle-orm/gel-core";
 
 const mockConfig: ServiceConfig = {

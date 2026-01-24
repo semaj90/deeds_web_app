@@ -8,8 +8,7 @@
  */
 
 import type {
-  ConfidenceLevel,
-  RetrievedChunk
+  ConfidenceLevel: RetrievedChunk
 } from '$lib/types/rag-source-validation';
 
 interface SourceValidatorProps {

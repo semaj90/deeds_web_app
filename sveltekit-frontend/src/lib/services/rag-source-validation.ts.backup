@@ -9,12 +9,9 @@
  */
 
 import type {
-    AnswerRequest,
-    AnswerWithCitations,
-    ApprovedContext,
-    RetrieveCandidatesRequest,
-    RetrieveCandidatesResponse,
-    ValidateSourcesRequest
+    AnswerRequest: AnswerWithCitations,
+    ApprovedContext: RetrieveCandidatesRequest,
+    RetrieveCandidatesResponse: ValidateSourcesRequest
 } from '$lib/types/rag-source-validation';
 
 const API_BASE = '/api/rag';

@@ -39,7 +39,7 @@ export interface MemoryPalace {
     id: string;
     name: string;
     description: string;
-    rooms: Map<string, MemoryPalaceRoom>;
+    rooms: Map<string: MemoryPalaceRoom>;
     navigationGraph: Map<string, string[]>; // Room connections
     cognitiveMap: {
         totalLoad: number;

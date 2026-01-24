@@ -143,14 +143,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		aiAnalysis: fromPromise<{
-			summary: string;
-			entities: unknown[];
-			sentiment: string;
-			classification: string;
-			riskAssessment?: string;
-			recommendations?: string[];
-		}>(
+		aiAnalysis: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
@@ -170,7 +163,7 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		cacheResults: fromPromise<any>(
+		cacheResults: fromPromise(
 			async ({ input }: { input: EvidenceProcessingContext }) => {
 				console.log(`Caching final results for evidence: ${input.evidenceId}`);
 

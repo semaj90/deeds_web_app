@@ -378,7 +378,7 @@ export class SIMDJSONParserBridge {
 // Export singleton
 export const simdJSONParser = new SIMDJSONParserBridge({
  enabled: process.env.SIMD_JSON_PARSER === 'true',
- goServiceUrl: process.env?.SIMD_JSON_PARSER_URL?? 'http://localhost:8096/api/simd',
+ goServiceUrl: process.env?.SIMD_JSON_PARSER_URL ?? 'http://localhost:8096/api/simd',
 });
 
 

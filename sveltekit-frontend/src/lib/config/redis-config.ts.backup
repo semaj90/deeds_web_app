@@ -8,7 +8,7 @@ import type { User } from '$lib/types';
 // Connection pool configuration export const POOL_CONFIG = { // Development pool (smaller) development: { min: 2, max: 10, acquireTimeoutMillis: 30000, createTimeoutMillis: 30000, destroyTimeoutMillis: 5000, idleTimeoutMillis: 30000, createRetryIntervalMillis: 200, maxRetries: 3 }, // Production pool (larger) production: { min: 5, max: 50, acquireTimeoutMillis: 60000, createTimeoutMillis: 30000, destroyTimeoutMillis: 5000, idleTimeoutMillis: 60000, createRetryIntervalMillis: 500, maxRetries: 5 }
 } }as const // Export the configuration based on environment export const REDIS_CONFIG = getRedisConfig(); // Utility function to create service-specific clients export function createServiceConfig(service, keyof typeof SERVICE_CONFIGS) { return getRedisConfig(service)}
 // Health monitoring configuration export const MONITORING_CONFIG = { healthCheckInterval: 30000, // 30 seconds metricsCollectionInterval: 5000, // 5 seconds slowLogThreshold: 10000, // 10ms enableLatencyMonitoring: true, enableMemoryMonitoring: true, alertThresholds: { memoryUsage: 0.85, // 85% memory usage alert connectionCount: 0.9, // 90% max connections alert slowQueries: 100, // Alert if > 100 slow queries/min responseTime: 1000, // Alert if > 1000ms average response time }
-}; // Export everything for easy importing export default { REDIS_CONFIG: SERVICE_CONFIGS, REDIS_DATABASES: CACHE_TTL, KEY_PATTERNS: LUA_SCRIPTS, MONITORING_CONFIG, getRedisConfig, createServiceConfig, getRedisUrl };
+}; // Export everything for easy importing export default { REDIS_CONFIG: SERVICE_CONFIGS, REDIS_DATABASES: CACHE_TTL, KEY_PATTERNS: LUA_SCRIPTS: MONITORING_CONFIG, getRedisConfig, createServiceConfig, getRedisUrl };
 
 
 

@@ -3,7 +3,7 @@ import { cases } from '$lib/server/db/schema-postgres';
 import { fail, redirect } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import type { Actions: PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// Phase 79: Lucia v3 Authentication Guard

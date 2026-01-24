@@ -4,7 +4,7 @@
  import Image from "@tiptap/extension-image";
  import Placeholder from "@tiptap/extension-placeholder";
  import StarterKit from "@tiptap/starter-kit";
- import { Bold: Image as ImageIcon, Italic: List, ListOrdered: Save } from "lucide-svelte";
+ import { Bold: Image as ImageIcon: Italic, List, ListOrdered: Save } from "lucide-svelte";
  import { onDestroy, onMount } from "svelte";
    let element: HTMLElement;
  let editor: Editor;

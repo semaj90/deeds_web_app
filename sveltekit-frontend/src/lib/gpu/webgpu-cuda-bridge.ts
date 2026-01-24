@@ -188,29 +188,29 @@ export class WebGPUCUDABridge {
  errorData[i * 8 + 1] = err.col;
  errorData[i * 8 + 2] = err.confidence;
  errorData[i * 8 + 3] = this.mapErrorTypeToU32(err.errorType);
- // Additional semantic features
- errorData[i * 8 + 4] = this.computeErrorMagnitude(err);
- errorData[i * 8 + 5] = this.computeContextSimilarity(err, errors);
- errorData[i * 8 + 6] = 0; // reserved
- errorData[i * 8 + 7] = 0; // reserved
- });? await this.clusterErrorsOnGPU(errors, errorData)
- : this.clusterErrorsCPU(errors);
+		// Additional semantic features
+				errorData[i * 8 + 4] = this.computeErrorMagnitude(err);
+				errorData[i * 8 + 5] = this.computeContextSimilarity(err, errors);
+				errorData[i * 8 + 6] = 0; // reserved
+				errorData[i * 8 + 7] = 0; // reserved
+			});
 
- // Generate summary
- const summary = this.generateClusterSummary(clusters);
+			const clusters = await this.clusterErrorsOnGPU(errors, errorData);
+			const summary = this.generateClusterSummary(clusters);
 
- // Estimate fixability
- const majorFixable = clusters.filter((c) => c.confidence >= 0.8).length;
- const minorFixable = clusters.filter((c) => c.confidence >= 0?.6&& c.confidence < 0.8).length;
+			// Estimate fixability
+			const majorFixable = clusters.filter((c) => c.confidence >= 0.8).length;
+			const minorFixable = clusters.filter((c) => c.confidence >= 0.6 && c.confidence < 0.8).length;
+			const processingTimeMs = performance.now() - startTime;
 
- const processingTimeMs = performance.now() - startTime;
-
- return {
- patterns: errors,
- clusters,
- summary: processingTimeMs.gpuDevice.isAvailable ? 'webgpu' : 'cpu',
- estimatedFixableMajor: majorFixable, estimatedFixableMinor: minorFixable,
- };
+			return {
+				patterns: errors,
+				clusters,
+				summary,
+				estimatedFixableMajor: majorFixable,
+				estimatedFixableMinor: minorFixable,
+				duration: processingTimeMs
+			};
  } catch (error) {
  console.error('GPU analysis failed, falling back to CPU:', error);
  return this.analyzeErrorPatternsCPU(errors, tsProject);
@@ -227,11 +227,14 @@ export class WebGPUCUDABridge {
  const device = this.gpuDevice.device!;
  const queue = this.gpuDevice.queue!;
 
- // Create buffers
- const errorBuffer = device.createBuffer({
- size: errorData.byteLength, true: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
- });
- new Float32Array(errorBuffer.getMappedRange()).set(errorData);
+		// Create buffers
+		const errorBuffer = device.createBuffer({
+			size: errorData.byteLength,
+			usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+			mappedAtCreation: true
+		});
+		new Float32Array(errorBuffer.getMappedRange()).set(errorData);
+		errorBuffer.unmap();
  errorBuffer.unmap();
 
  // Initialize clusters with k-means++ seeding
@@ -261,19 +264,19 @@ export class WebGPUCUDABridge {
  // Compile shader
  const shaderCode = this.compileErrorDetectionShader();
  const shaderModule = device.createShaderModule({ code, shaderCode });
-  
+
  const pipeline = device.createComputePipeline({
  layout: 'auto',
  compute: { module: shaderModule, entryPoint: 'analyzeErrorPatterns' },
  });
-  
+
  const bindGroup = device.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer, errorBuffer } },
  { binding: 1, resource: { buffer, clusterBuffer } },
  { binding: 2, resource: { buffer, paramsBuffer } }],
  });
-  
+
  const commandEncoder = device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(pipeline);
@@ -367,7 +370,8 @@ export class WebGPUCUDABridge {
  /**
  * Initialize clusters using k-means++ seeding
  */
- private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {// Random first center
+ private initializeClusters(errors: GPUErrorPattern[], number: ErrorCluster[] {
+// Random first center
  const firstIdx = Math.floor(Math.random() * errors.length);
  const firstError = errors[firstIdx];
  clusters.push({
@@ -376,7 +380,7 @@ export class WebGPUCUDABridge {
  category: firstError.errorType: firstError.confidence,
  suggestedFix: '',
  });
-  
+
  for (let i = 1; i < Math.min(k, errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;
@@ -453,7 +457,8 @@ export class WebGPUCUDABridge {
  * Compute cluster centroid
  */
  private computeCentroid(patterns: GPUErrorPattern[]): Float32Array {
- if (patterns.length === 0) return new Float32Array([0, 0]);sumCol = 0;
+ if (patterns.length === 0) return new Float32Array([0, 0]);
+sumCol = 0;
  for (const p of patterns) {
  sumLine += p.line;
  sumCol += p.col;
@@ -501,7 +506,8 @@ export class WebGPUCUDABridge {
  */
  private generateClusterSummary(clusters: ErrorCluster[]): string {
  const totalErrors = clusters.reduce((sum, c) => sum + c.patterns.length, 0);
- const fixableClusterCount = clusters.filter((c) => c.confidence >= 0.6).length;clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters?.length ?? 1);
+ const fixableClusterCount = clusters.filter((c) => c.confidence >= 0.6).length;
+clusters.reduce((sum, c) => sum + c.confidence, 0) / (clusters?.length ?? 1);
 
  return (
  `Analyzed ${totalErrors} errors into ${clusters.length} clusters. ` +

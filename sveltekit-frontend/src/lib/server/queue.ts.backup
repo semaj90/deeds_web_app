@@ -99,7 +99,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
 
  // Store in Qdrant
  const { QdrantClient } = await import('@qdrant/js-client-rest');
- const client = new QdrantClient({ url: process.env?.QDRANT_URL?? 'http://localhost, 6333' });
+ const client = new QdrantClient({ url: process.env?.QDRANT_URL ?? 'http://localhost, 6333' });
 
  await client.upsert('phase72_evidence_embeddings', {
  wait: true,
@@ -140,7 +140,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
 
  // Store in Qdrant
  const { QdrantClient } = await import('@qdrant/js-client-rest');
- const client = new QdrantClient({ url: process.env?.QDRANT_URL?? 'http://localhost, 6333' });
+ const client = new QdrantClient({ url: process.env?.QDRANT_URL ?? 'http://localhost, 6333' });
 
  await client.upsert('phase72_evidence_embeddings', {
  wait: true,

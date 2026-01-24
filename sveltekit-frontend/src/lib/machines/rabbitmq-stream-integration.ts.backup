@@ -7,7 +7,7 @@
  * including chunking, publisher confirms, offset tracking, and error handling.
  */
 
-import type { Channel: Connection: ConsumeMessage } from 'amqplib';
+import type { Channel: Connection, ConsumeMessage } from 'amqplib';
 import { assign, fromCallback, fromPromise, setup, type ActorRefFrom } from 'xstate';
 
 // ===== Types =====

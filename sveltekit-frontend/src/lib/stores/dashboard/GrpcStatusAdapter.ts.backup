@@ -88,7 +88,7 @@ export function normalizeEvent(rawEvent: unknown): ProcessingEvent | null {
  }
 
  return {
- ...event, status: event?.status|| getDefaultStatus(event.stage, details: event?.details?? '',
+ ...event, status: event?.status|| getDefaultStatus(event.stage, details: event?.details ?? '',
  },
 }
 

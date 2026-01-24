@@ -4,7 +4,7 @@ import { type InferInsertModel } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { caseScores } from '../db/schema.js';
 import type {
-    CaseScoringRequest: CaseScoringResult: ScoringCriteria,
+    CaseScoringRequest: CaseScoringResult, ScoringCriteria,
 } from '../../../lib/types/scoring.js';
 import { ollamaService } from '../ai/ollama-adapter.js';
 import { cognitiveCache } from '../ai/cache.js';

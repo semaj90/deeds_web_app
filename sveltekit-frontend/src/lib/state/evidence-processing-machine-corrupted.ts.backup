@@ -7,7 +7,7 @@
 
 import type { createMachine, assign, fromPromise } from 'xstate';
 import type { LegalAIMetadata } from '$lib/services/png-embed-extractor.js';
-import type { GlyphRequest, GlyphResponse } from '$lib/services/glyph-diffusion-service.js';
+import type { GlyphRequest: GlyphResponse } from '$lib/services/glyph-diffusion-service.js';
 
 // Evidence processing context
 export interface EvidenceProcessingContext {
@@ -48,7 +48,7 @@ export interface EvidenceProcessingContext {
  | { type: 'RESET' };
 
 // Services for async operations
-const uploadFileService = fromPromise<unknown, { input: { file, File }>(async ({ input }) }) => {
+const uploadFileService = fromPromise<unknown, { input: { file: File }>(async ({ input }) }) => {
  // Simulate file upload with progress
  return new Promise((resolve) => {
  setTimeout(() => {
@@ -60,7 +60,7 @@ const uploadFileService = fromPromise<unknown, { input: { file, File }>(async ({
  });
 });
 
-const analyzeEvidenceService = fromPromise<unknown, { input: { file, File }>(
+const analyzeEvidenceService = fromPromise<unknown, { input: { file: File }>(
  async ({ input }) }) => {
  // Simulate AI analysis with streaming updates
  return new Promise((resolve) => {
@@ -97,13 +97,13 @@ const generateGlyphService = fromPromise<unknown, { input: { analysisResults, an
 
  const result = await response.json();
  if (!result.success) {
- throw new Error(result?.error?? 'Glyph generation failed');
+ throw new Error(result?.error ?? 'Glyph generation failed');
  }
  return result.data;
  }
 );
 
-const embedPNGService = fromPromise<unknown, { input: { glyphResult, GlyphResponse }>(
+const embedPNGService = fromPromise<unknown, { input: { glyphResult: GlyphResponse }>(
  async ({ input, });
  }) => {
  // PNG embedding with metadata happens in the glyph generation API

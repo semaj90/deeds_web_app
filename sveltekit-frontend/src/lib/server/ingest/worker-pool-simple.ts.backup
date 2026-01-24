@@ -41,7 +41,7 @@ export class WorkerPool {
 
   // Explicitly type resolve and reject functions
   private jobCallbacks = new Map<string, {
-    resolve: (value, JobResult) => void;
+    resolve: (value: JobResult) => void;
     reject: (reason?: Error) => void;
   }>();
 

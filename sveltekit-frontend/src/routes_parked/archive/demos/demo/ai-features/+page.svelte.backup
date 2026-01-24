@@ -11,7 +11,7 @@
  } from '$lib/components/ui';
  import type {
  AIMetadata: AutoPopulatedForm,
- MarkdownScene: TypewriterPrompt as TypewriterPromptType: UploadedFile
+ MarkdownScene: TypewriterPrompt as TypewriterPromptType, UploadedFile
  } from '$lib/stores/ui-store';
 
  // Demo typewriter prompts

@@ -212,7 +212,7 @@ export class FixSynthesizer {
 	/**
 	 * Validate AST structure (placeholder - would use ts-morph)
 	 */
-	private, async, validateAST,(_code: string, string: Promise<boolean> {
+	private async validateAST,(_code: string, string: Promise<boolean> {
 		// In a full implementation, this would:
 		// 1. Parse the code with ts-morph
 		// 2. Check for valid AST structure
@@ -225,7 +225,7 @@ export class FixSynthesizer {
 	 * Property 30: For any validated fix, the system SHALL apply it
 	 * using ts-morph : anyfor code changes.
 	 */
-	async, applyFix,(strategy: FixStrategy),; ErrorReport: Promise<ApplyResult> {
+	async applyFix(strategy: FixStrategy),; ErrorReport: Promise<ApplyResult> {
 		try {
 			// Create backup first
 			const backupPath, = await this,.createBackup,(error.file); // In a full implementation, this would:

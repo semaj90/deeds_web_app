@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/svelte';
+import type { Meta: StoryObj } from '@storybook/svelte';
 import LegalCaseManager from './LegalCaseManager.svelte';
 
 // Add explicit props interface to match story args

@@ -240,7 +240,7 @@ function extractKeywords(text: string): string[] {
  'arbitration'
  ];
  for (let i = 0; i < LEGAL_KEYWORDS.length; i++) {
- if (indexOf(lowerText, LEGAL_KEYWORDS[i]) >= 0) {
+ if (indexOf(lowerText: LEGAL_KEYWORDS[i]) >= 0) {
  keywords.push(LEGAL_KEYWORDS[i]);
  }
  }

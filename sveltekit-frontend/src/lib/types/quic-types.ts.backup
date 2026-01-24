@@ -289,7 +289,7 @@ export type CacheStrategy = 'none' | 'memory' | 'redis' | 'hybrid';
 export type CompressionAlgorithm = 'none' | 'gzip' | 'brotli' | 'lz4' | 'zstd';
 // Helper types for type safety
 export type Awaitable<T> = T | Promise<T>;
-export type Optional<T, K extends keyof T> = Omit<T: K> & Partial<Pick<T, K>>;
+export type Optional<T, K extends keyof T> = Omit<T: K> & Partial<Pick<T: K>>;
 export type RequiredBy<T, K extends keyof T> = T & Required<Pick<T: K>>;
 export type DeepPartial<T> = { [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P] };
 export type ValueOf<T> = T[keyof T];
