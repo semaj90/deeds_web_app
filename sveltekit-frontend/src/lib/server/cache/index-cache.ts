@@ -83,3 +83,4 @@ export async function getCHRManifest(id: string): Promise<CHRManifest | null> {
 	if (!c) return null;
 	return c.getJSON<CHRManifest>(`index:chr:${id}`);
 }
+

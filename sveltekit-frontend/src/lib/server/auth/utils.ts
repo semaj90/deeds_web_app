@@ -133,3 +133,4 @@ export function getUserId(locals: LocalsWithUser): string | null {
 export function isAuthenticated(locals: LocalsWithUser): boolean {
 	return resolveUser(locals) !== null;
 }
+

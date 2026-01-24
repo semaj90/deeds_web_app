@@ -268,7 +268,7 @@ export class OllamaSuggestionsService {
 					const { done, value } = await reader.read();
 					if (done) break;
 
-					buffer += decoder.decode(value, { stream, true });
+					buffer += decoder.decode(value, { stream: true });
 
 					// Split by newlines (SSE/stream convention)
 					const lines = buffer.split(/\r?\n/);

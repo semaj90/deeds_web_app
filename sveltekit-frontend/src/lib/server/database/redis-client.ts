@@ -176,3 +176,4 @@ export async function checkRedisHealth(): Promise<{ status: 'healthy' | 'disconn
 // Provide a typed alias to the shared redis instance from the central module so callers can
 // continue importing `redisClient` from this helper while we still rely on the central factory.
 export const redisClient = redis;
+

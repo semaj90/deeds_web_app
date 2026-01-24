@@ -203,3 +203,4 @@ export const cognitiveCache = {
 		await setCache(key, value, Math.max(1, ttlSeconds) * 1000);
 	},
 };
+

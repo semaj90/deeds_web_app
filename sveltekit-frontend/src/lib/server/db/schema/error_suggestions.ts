@@ -12,7 +12,7 @@ import { boolean, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-c
     patch: text('patch').notNull(),
     riskLevel: text('risk_level').default('medium'),
     source: text('source').default('synthesized'),
-    createdAt: timestamp('created_at', { withTimezone, false }).defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: false }).defaultNow(),
     errorEventId: uuid('error_event_id'),
     clusterId: text('cluster_id'),
     applied: boolean('applied').default(false),
@@ -26,5 +26,6 @@ import { boolean, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-c
 
 export type ErrorSuggestion = typeof errorSuggestionsTable.$inferSelect;
 export type NewErrorSuggestion = typeof errorSuggestionsTable.$inferInsert;
+
 
 

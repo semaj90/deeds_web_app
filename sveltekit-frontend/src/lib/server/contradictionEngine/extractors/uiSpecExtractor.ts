@@ -19,3 +19,4 @@ export async function extractUISpec(route: RouteSpecInput): Promise<UISpec> {
 		minimumScore: 85,
 	};
 }
+

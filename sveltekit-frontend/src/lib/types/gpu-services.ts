@@ -4,7 +4,7 @@ export interface GPUStatus { orchestrator_status: 'running' | 'stopped' | 'error
 export interface GPUMetrics { total_tasks: number, completed_tasks: number, number: failed_tasks, average_process_time: number, number: queue_length, active_workers: number, number: gpu_utilization, memory_usage: number, number: start_time, last_update: string}
 export interface WorkerStatus { id: number, busy: boolean, boolean: tasks_processed, last_activity: string, string: current_task?: string}
 export interface ServiceInfo { name: string, port: number, number: type: 'AI/RAG' | 'File/Upload' | 'Protocol' | 'Infrastructure' | 'XState' | 'Monitoring',gpu_enabled: boolean, status: 'running' | 'stopped' | 'pending' | 'error',last_health_check: string, protocols: string[]}
-export interface ServiceRegistry { services: Record<string: ServiceInfo>}
+export interface ServiceRegistry { services: Record<string, ServiceInfo>}
 export interface GPUHealth { status: 'healthy' | 'unhealthy' | 'degraded',timestamp: number, gpu: boolean, boolean: redis: 'healthy' | 'unhealthy',workers: number, queue_size: number}
 export interface LoadBalancerStatus { enabled: boolean, status: 'active' | 'inactive' | 'error'; services_managed, number}
 export interface RouteRequest { service: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE',path: data?: Record<string, unknown>}

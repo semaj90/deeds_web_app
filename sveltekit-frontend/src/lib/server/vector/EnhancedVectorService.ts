@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
-import { db } from '../db.js';
+import { db } from '../db/index.js';
 import { cases } from '../db/schema-postgres-enhanced.js';
 import type { QdrantApiWrapper } from './qdrant-api-wrapper.js';
 import { createQdrantWrapper } from './qdrant-api-wrapper.js';
@@ -218,6 +218,7 @@ export class EnhancedVectorService {
 }
 
 export const vectorService = new EnhancedVectorService();
+
 
 
 

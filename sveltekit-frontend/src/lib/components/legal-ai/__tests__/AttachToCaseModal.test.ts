@@ -39,7 +39,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should not render when closed', () => {
  const { container } = render(AttachToCaseModal, {
- props: { isOpen, false },
+ props: { isOpen: false },
  });
 
  expect(container.querySelector('.modal-overlay')).toBeFalsy();

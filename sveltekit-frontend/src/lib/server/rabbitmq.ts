@@ -1,8 +1,7 @@
-import type { Message } from '$lib/types';
-import * as amqplib from 'amqplib';
+import { connect, type Channel, type Connection } from 'amqplib';
 
-let connection: amqplib.Connection | null = null;
-let channel: amqplib.Channel | null = null;
+let connection: Connection | null = null;
+let channel: Channel | null = null;
 
 export const QUEUES = {
   evidence: {
@@ -21,7 +20,7 @@ export const QUEUES = {
   }
 };
 
-export async function getConnection(): Promise<Connection> {
+export async function getConnection(): Promise<amqplib.Connection> {
   if (connection) return connection;
   const rabbitmqUrl = process.env?.RABBITMQ_URL ?? 'amqp://legal_admin:123456@localhost:5672';
   console.log('🐰 Connecting to RabbitMQ:', rabbitmqUrl);
@@ -44,7 +43,7 @@ export async function getConnection(): Promise<Connection> {
   }
 }
 
-export async function getChannel(): Promise<Channel> {
+export async function getChannel(): Promise<amqplib.Channel> {
   if (channel) return channel;
   const conn = await getConnection();
   try {
@@ -68,13 +67,13 @@ export async function getChannel(): Promise<Channel> {
 export async function publishToQueue(queueName: string, payload: any): Promise<boolean> {
   try {
     const ch = await getChannel();
-    await ch.assertQueue(queueName, { durable, true });
+    await ch.assertQueue(queueName, { durable: true });
 
     const message = JSON.stringify(payload);
-    const sent = ch.sendToQueue(queueName: Buffer.from(message), {
+    const sent = ch.sendToQueue(queueName, Buffer.from(message), {
       persistent: true,
       timestamp: Date.now(),
-      messageId: payload?.id|| `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      messageId: payload?.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     });
 
     if (!sent) {
@@ -96,7 +95,7 @@ export async function consumeFromQueue(
 ): Promise<void> {
   try {
     const ch = await getChannel();
-    await ch.assertQueue(queueName, { durable, true });
+    await ch.assertQueue(queueName, { durable: true });
 
     console.log(`🔄 Starting consumer for ${queueName}`);
 
@@ -104,7 +103,8 @@ export async function consumeFromQueue(
       if (!msg) return;
 
       const ack = () => ch.ack(msg);
-      const nack = () => ch.nack(msg, false, false); // Don't requeue by default to avoid loops
+      // Don't requeue by default to avoid loops
+      const nack = () => ch.nack(msg, false, false);
 
       try {
         const content = JSON.parse(msg.content.toString());
@@ -125,12 +125,13 @@ export async function setupQueues(): Promise<void> {
     const ch = await getChannel();
 
     // Setup DLX
-    await ch.assertExchange('evidence.dlx', 'direct', { durable, true });
+    await ch.assertExchange('evidence.dlx', 'direct', { durable: true });
     await ch.assertQueue('evidence.failed', { durable: true, arguments: { 'x-message-ttl': 86400000 } });
     await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed');
 
     // Assert all defined queues
-...Object.values(QUEUES.evidence),
+    const allQueues = [
+      ...Object.values(QUEUES.evidence),
       ...Object.values(QUEUES.ai),
       ...Object.values(QUEUES.notification)
     ];
@@ -179,5 +180,7 @@ export const rabbitmqService = {
   publishToQueue,
   consumeFromQueue,
   healthCheck,
-  closeRabbitMQ: QUEUES
+  closeRabbitMQ,
+  QUEUES
 };
+

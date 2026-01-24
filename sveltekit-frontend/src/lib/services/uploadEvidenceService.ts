@@ -54,7 +54,7 @@ export async function validateFile(file: File): Promise<ValidationResult> {
  };
  }
 
- return { valid, true };
+ return { valid: true };
 }
 
 /**

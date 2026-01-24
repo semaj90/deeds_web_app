@@ -275,3 +275,4 @@ class StatuteSearchService {
 
 // Export singleton instance
 export const statuteSearchService = new StatuteSearchService();
+

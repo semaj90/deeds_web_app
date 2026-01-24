@@ -69,3 +69,4 @@ export async function handleCreateCase(user: UserType, request: Request, _depend
 		return json({ success: false, error: 'Failed to create case' }, { status: 500 });
 	}
 }
+

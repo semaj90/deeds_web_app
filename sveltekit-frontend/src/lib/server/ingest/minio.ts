@@ -1,2 +1,3 @@
 /** * MinIO S3 Service for production-grade ingestion and file handling. * * This service provides a hardened interface for interacting with a MinIO * object storage backend, tailored for the authenticated upload/ingestion pipeline. * * - Securely connects to MinIO using environment variables. * - Provides utilities for parsing MinIO-specific URLs. * - Handles file uploads with user-scoping (e.g., `bucket/userId/filename`). * - Fetches objects and their metadata. * - Converts S3: object streams to buffers for processing. */ 
 
+

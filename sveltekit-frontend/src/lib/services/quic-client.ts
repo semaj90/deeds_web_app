@@ -12,7 +12,7 @@ type JsonValue = JsonPrimitive | JsonArray | JsonObject;
 export type TensorOperation = {
 	type: string; input: Float32Array | number[];
 	shape?: number[];
-	metadata?: Record<string: JsonValue>;
+	metadata?: Record<string, JsonValue>;
 };
 
 export type StreamingResponse = {
@@ -423,7 +423,7 @@ class QUICClient {
 
 				if (value) {
 					this.updateStreamMetrics(streamId: value.byteLength);
-					const chunk = decoder.decode(value, { stream, true });
+					const chunk = decoder.decode(value, { stream: true });
 					buffer += chunk;
 					const lines = buffer.split(/\r? \n/);
 					buffer = lines.pop() ?? '';

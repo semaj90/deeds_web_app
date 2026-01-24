@@ -474,3 +474,4 @@ class DocumentChunker {
 		return m ? parseInt(m[1], 10) : undefined;
 	}
 }
+

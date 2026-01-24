@@ -543,3 +543,4 @@ Format your response as JSON with the structure:
 
 // Export singleton instance
 export const aiService = new AIService();
+

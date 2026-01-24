@@ -181,3 +181,4 @@ export async function runMigration(migrationName: string, migrationSql: string):
 		}
 	}, true); // Use admin connection for migrations
 }
+

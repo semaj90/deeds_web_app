@@ -188,7 +188,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
 
  it('should execute fallback function when provided', async () => {
- const fallbackFn = vi.fn().mockResolvedValue({ fallback, true });
+ const fallbackFn = vi.fn().mockResolvedValue({ fallback: true });
 
  const context: ErrorRecoveryContext = {
  toolName: 'test_tool',
@@ -216,19 +216,19 @@ describe('Error Handling - Property 3: Error Handling', () => {
 
  describe('Execute with Recovery', () => {
  it('should execute successfully on first attempt', async () => {
- const executeFn = vi.fn().mockResolvedValue({ success, true });
+ const executeFn = vi.fn().mockResolvedValue({ success: true });
 
  const result = await executeWithRecovery('test_tool', executeFn);
- expect(result).toEqual({ success, true });
+ expect(result).toEqual({ success: true });
  expect(executeFn).toHaveBeenCalledTimes(1);
  });
 
  it('should retry on failure and succeed', async () => {.fn()
  .mockRejectedValueOnce(new Error('Network error'))
- .mockResolvedValueOnce({ success, true });
+ .mockResolvedValueOnce({ success: true });
 
  const result = await executeWithRecovery('test_tool', executeFn, undefined, 3);
- expect(result).toEqual({ success, true });
+ expect(result).toEqual({ success: true });
  expect(executeFn).toHaveBeenCalledTimes(2);
  });
 
@@ -250,10 +250,10 @@ describe('Error Handling - Property 3: Error Handling', () => {
 
  it('should use fallback on failure', async () => {
  const executeFn = vi.fn().mockRejectedValue(new Error('Network error'));
- const fallbackFn = vi.fn().mockResolvedValue({ fallback, true });
+ const fallbackFn = vi.fn().mockResolvedValue({ fallback: true });
 
  const result = await executeWithRecovery('test_tool', executeFn, fallbackFn, 1);
- expect(result).toEqual({ fallback, true });
+ expect(result).toEqual({ fallback: true });
  expect(fallbackFn).toHaveBeenCalled();
  });
  });
@@ -404,7 +404,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
 
  it('should handle concurrent recovery attempts', async () => {
- const executeFn = vi.fn().mockResolvedValue({ success, true });
+ const executeFn = vi.fn().mockResolvedValue({ success: true });
 
  const promises = Array.from({ length: 5 }, () => executeWithRecovery('test_tool', executeFn));
 

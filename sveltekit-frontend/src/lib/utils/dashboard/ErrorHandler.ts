@@ -138,7 +138,7 @@ export class DashboardErrorHandler {
  return { valid: false, error: 'Invalid ETA' };
  }
 
- return { valid, true };
+ return { valid: true };
  }
 
  /**

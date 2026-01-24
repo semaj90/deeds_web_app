@@ -371,3 +371,4 @@ export function getProcessingStats(documents: ProcessedDocument[]): {
 		avgCitationsPerDoc: totalCitations / documents.length
 	};
 }
+

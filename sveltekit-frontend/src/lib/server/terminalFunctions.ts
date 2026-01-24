@@ -382,3 +382,4 @@ export function formatFunctionResult(result: any): string {
 
 	return JSON.stringify(result, null, 2);
 }
+

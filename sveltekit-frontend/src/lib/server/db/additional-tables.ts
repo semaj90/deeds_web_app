@@ -177,3 +177,4 @@ export const legalPrecedents = pgTable('legal_precedents', {
 });
 
 
+

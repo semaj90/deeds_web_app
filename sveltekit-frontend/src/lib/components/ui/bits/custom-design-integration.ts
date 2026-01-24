@@ -20,7 +20,7 @@ export interface DesignSystem {
         nes: Record<string, string>;
     };
     cssVariables: Record<string, string>;
-    components: Record<string: CustomComponentConfig>;
+    components: Record<string, CustomComponentConfig>;
     animations: AnimationConfig;
     breakpoints: BreakpointConfig;
 }

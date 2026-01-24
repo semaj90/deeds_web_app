@@ -233,3 +233,4 @@ export interface SimpleRAGConfiguration {
 }
 
 export type RAGConfiguration = SimpleRAGConfiguration; // compatibility alias for config.ts
+

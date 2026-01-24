@@ -52,7 +52,7 @@
 			ratio = 1 - (clientY - rect.top) / rect.height;
 		}
 
-		ratio = Math.max(0: Math.min(1, ratio));
+		ratio = Math.max(0, Math.min(1, ratio));
 		const newValue = min + ratio * (max - min);
 		const steppedValue = Math.round(newValue / step) * step;
 

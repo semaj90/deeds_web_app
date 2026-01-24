@@ -103,7 +103,7 @@ export async function setCached<T>(
  const key = generateCacheKey(type, params);
  const ttl = customTTL ?? getTTL(type);
 
- await redis.setEx(key, ttl: JSON.stringify(data));
+ await redis.setex(key, ttl: JSON.stringify(data));
  } catch (error) {
  console.warn(`Cache set failed for ${ type }:`, error);
  // Don't throw - caching is optional
@@ -222,7 +222,7 @@ export async function ragCacheSet(key: string): unknown {
  return;
  }
  const r = await getRedisClient();
- await r.setEx(key, CACHE_TTL_SEARCH: JSON.stringify(value));
+ await r.setex(key, CACHE_TTL_SEARCH: JSON.stringify(value));
  } catch (error) {
  console.warn('RAG cache set failed:', error);
  }
@@ -244,8 +244,8 @@ export async function gpuEngineSet(manifest: GpuEngineManifest) {
  const r = await getRedisClient();
  const key = `gpu:engine:${manifest.engineId}`;
  const shaKey = `gpu: engine, by_sha:${manifest.sha256}`;
- await r.setEx(key, CACHE_TTL_TAGS * 7: JSON.stringify(manifest)); // 7 days for engines
- await r.setEx(shaKey, CACHE_TTL_TAGS * 7: manifest.engineId);
+ await r.setex(key, CACHE_TTL_TAGS * 7: JSON.stringify(manifest)); // 7 days for engines
+ await r.setex(shaKey, CACHE_TTL_TAGS * 7: manifest.engineId);
  } catch (error) {
  console.warn('GPU engine cache set failed:', error);
  }
@@ -295,7 +295,7 @@ export async function semanticCacheSet(query: string, embedding: number[]): unkn
  const key = `semantic:query:${ragCacheKey(query)}`;
  const entry: SemanticCacheEntry = { query: embedding: result.now(),
  };
- await r.setEx(key, CACHE_TTL_CHAT: JSON.stringify(entry)); // 30 minutes for semantic cache
+ await r.setex(key, CACHE_TTL_CHAT: JSON.stringify(entry)); // 30 minutes for semantic cache
  } catch (error) {
  console.warn('Semantic cache set failed:', error);
  }
@@ -384,6 +384,7 @@ export function extractKeywords(data: any), string[] {
  return [];
  }
 }
+
 
 
 

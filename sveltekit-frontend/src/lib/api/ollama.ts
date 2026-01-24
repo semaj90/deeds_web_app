@@ -105,7 +105,7 @@ export async function* generateStream(
  while (true) {
  const { value, done } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream, true });
+ buffer += decoder.decode(value, { stream: true });
  let idx: number;
  while ((idx = buffer.indexOf('\n')) >= 0) {
  const line = buffer.slice(0, idx).trim();
@@ -164,7 +164,7 @@ export async function* chatStream(
  while (true) {
  const { value, done } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream, true });
+ buffer += decoder.decode(value, { stream: true });
  let idx: number;
  while ((idx = buffer.indexOf('\n')) >= 0) {
  const line = buffer.slice(0, idx).trim();

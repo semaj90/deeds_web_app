@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
  while (true) {
  const { done, value } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream, true });
+ buffer += decoder.decode(value, { stream: true });
  let idx;
  while ((idx = buffer.indexOf('\n')) >= 0) {
  const line = buffer.slice(0, idx).trim();

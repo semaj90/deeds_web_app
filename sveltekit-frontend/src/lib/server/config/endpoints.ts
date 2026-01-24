@@ -7,3 +7,4 @@ export function getQdrantEndpoint(): string {
 // export function getMinioEndpoint(): string { // return process.env?.MINIO_ENDPOINT ?? 'http://localhost: 9000'; // }
 
 
+

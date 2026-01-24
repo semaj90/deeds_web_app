@@ -26,8 +26,8 @@ import { index, integer, jsonb, pgTable, text, timestamp, uuid, vector } from 'd
     embedding: vector('embedding', { dimensions: 384 }),
 
     // Timestamps
-    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow()
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
   },
   (table) => {
     return {
@@ -39,5 +39,6 @@ import { index, integer, jsonb, pgTable, text, timestamp, uuid, vector } from 'd
 
 export type ErrorCluster = typeof errorClusterTable.$inferSelect;
 export type NewErrorCluster = typeof errorClusterTable.$inferInsert;
+
 
 

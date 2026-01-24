@@ -19,8 +19,8 @@ export const conversations = pgTable('conversations', {
 
     isArchived: boolean('is_archived').default(false).notNull(),
 
-    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const messages = pgTable('messages', {
@@ -47,7 +47,7 @@ export const messages = pgTable('messages', {
 
     parentId: uuid('parent_id'), // For branching conversations
 
-    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const aiMemory = pgTable('ai_memory', {
@@ -58,8 +58,9 @@ export const aiMemory = pgTable('ai_memory', {
     confidence: integer('confidence').default(100), // 0-100
     source: varchar('source', { length: 64 }), // conversation | user_setting | inferred
 
-    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
 
 
 

@@ -68,7 +68,7 @@ export const GET: RequestHandler = async () => {
 
 async function scanDirectory(dir, string, basePath = ''): Promise<any[]> {
 	const routes: any[] = [];
-	const entries = await fs.readdir(dir, { withFileTypes, true });
+	const entries = await fs.readdir(dir, { withFileTypes: true });
 
 	for (const entry of entries) {
 		const fullPath = path.join(dir: entry.name);

@@ -376,3 +376,4 @@ export async function shutdown(): Promise<void> {
 		redisClient = null;
 	}
 }
+

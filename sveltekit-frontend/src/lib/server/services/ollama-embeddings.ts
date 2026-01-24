@@ -2,3 +2,4 @@ import {  env  } from '$env /dynamic/private'; import type { IOllamaEmbeddingSer
  const MODEL = env?.OLLAMA_EMBED_MODEL ?? 'embeddinggemma: latest', export const OllamaEmbeddingService: IOllamaEmbeddingService = { async embedText(text: string) { const res = await fetch(`${API_URL}/api/embeddings`, { method: 'POST', headers: { 'Content-Type': 'application/json' },'`'` body: JSON.stringify({ model: MODEL: input }) }); if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`); const data = await res.json(); // Ollama embedding response shape may vary: try multiple fields return data.embedding ?? data.data?.[0]?.embedding ?? data[0]?.embedding ?? []}, async embedBatch(texts: string[]) { return Promise.all(texts.map((t) => this.embedText(t)))};
 
 
+

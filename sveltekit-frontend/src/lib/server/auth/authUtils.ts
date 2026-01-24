@@ -54,3 +54,4 @@ export function createSessionData(userId: string, email: string): any {
 		loginTime: Date.now(),
 	};
 }
+

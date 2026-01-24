@@ -322,3 +322,4 @@ export async function processBatchDocumentsWithWebGPU(
 export async function getLangChainWebGPUStats(): Promise<unknown> {
   return webgpuLangChainBridge.getProcessingStats();
 }
+

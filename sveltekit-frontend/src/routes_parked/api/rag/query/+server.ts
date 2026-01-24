@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 };
 
 export const GET: RequestHandler = async () => {
- return json({ ok, true });
+ return json({ ok: true });
 };
 
 

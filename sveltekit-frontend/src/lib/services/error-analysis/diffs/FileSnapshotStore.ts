@@ -15,7 +15,7 @@ export class FileSnapshotStore {
  const beforeText = fs.readFileSync(abs, 'utf8');
 
  const bakDir = path.join(this.repoRoot, 'reports', 'patches', stamp, 'bak');
- fs.mkdirSync(bakDir, { recursive, true });
+ fs.mkdirSync(bakDir, { recursive: true });
 
  const safeName = repoRelPath.replace(/[\/\\:]/g, '__');
  const bakPath = path.join(bakDir, `${safeName}.bak`);

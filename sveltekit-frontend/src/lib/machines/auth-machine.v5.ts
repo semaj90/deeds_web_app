@@ -39,7 +39,7 @@ export const authMachine = setup({
       console.log('Auth stub called with:', input.email);
       return { user: { id: '1', email: input.email }, session: { id: 'sess_1' } };
     }, logout: fromPromise(async () => {
-      return { success, true };
+      return { success: true };
     }),
   },
 }).createMachine({

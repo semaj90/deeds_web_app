@@ -471,3 +471,4 @@ export function getLegalAIPipeline(config?: PipelineConfig): LegalAIPipeline {
   }
   return pipelineInstance;
 }
+

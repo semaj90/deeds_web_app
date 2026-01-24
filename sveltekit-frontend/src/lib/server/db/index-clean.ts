@@ -48,3 +48,4 @@ export function closeDatabase() {
 		_client.end();
 	}
 }
+

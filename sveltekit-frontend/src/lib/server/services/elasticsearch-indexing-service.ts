@@ -615,3 +615,4 @@ export async function checkElasticsearchHealth(): Promise<boolean> {
 		return false;
 	}
 }
+

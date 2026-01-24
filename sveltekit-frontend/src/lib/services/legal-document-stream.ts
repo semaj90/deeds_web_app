@@ -391,14 +391,14 @@ export class LegalDocumentStreamService {
                 }
             });
 
-            if (parallelProcessing) {this.streamDocument(connectionId, doc, { streamProgress, false })
+            if (parallelProcessing) {this.streamDocument(connectionId, doc, { streamProgress: false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
                 await Promise.all(promises);
             } else {
                 for (const doc of batch) {
                     try {
-                        await this.streamDocument(connectionId, doc, { streamProgress, false });
+                        await this.streamDocument(connectionId, doc, { streamProgress: false });
                     } catch (err) {
                         console.warn(`Sequential item failed: ${doc.id}`, err);
                     }

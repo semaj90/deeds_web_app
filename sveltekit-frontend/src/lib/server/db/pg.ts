@@ -4,3 +4,4 @@
 // Cleanup function: attempt to close postgres-js client if supported export async function closeDatabase(): Promise<any> { try { if (typeof (pgClient as any).end === 'function') { await (pgClient as any).end()}catch (e) { console.warn('âš ï¸ Error closing postgres-js client: ', e)}finally { _db = null} }
 
 
+

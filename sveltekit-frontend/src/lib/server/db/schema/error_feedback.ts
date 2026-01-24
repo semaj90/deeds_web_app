@@ -23,7 +23,7 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
  userRole: text('user_role'), // "developer" | "reviewer" | "ai-trainer"
 
  // Timestamp
- createdAt: timestamp('created_at', { withTimezone, true }).notNull().defaultNow(),
+ createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
  },
  (table) => {
  return {
@@ -39,5 +39,6 @@ import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export type ErrorFeedback = typeof errorFeedbackTable.$inferSelect;
 export type ErrorFeedbackInsert = typeof errorFeedbackTable.$inferInsert;
+
 
 

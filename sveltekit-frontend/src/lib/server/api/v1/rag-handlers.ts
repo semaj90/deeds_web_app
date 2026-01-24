@@ -69,3 +69,4 @@ export async function handleRAGChat(user: UserType, request: Request, ragService
 		return json({ success: false, error: 'Failed to handle RAG chat' }, { status: 500 });
 	}
 }
+

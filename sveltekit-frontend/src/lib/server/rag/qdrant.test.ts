@@ -74,7 +74,7 @@ describe('Qdrant Operations', () => {
  async (vector, id) => {{
  id,
  vector,
- payload: { test, true },
+ payload: { test: true },
  }];
 
  if (vector.length !== 768) {
@@ -196,6 +196,7 @@ describe('Qdrant Operations', () => {
  }
  });
 });
+
 
 
 

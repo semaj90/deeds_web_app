@@ -80,3 +80,4 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
 
 	return contradictions;
 }
+

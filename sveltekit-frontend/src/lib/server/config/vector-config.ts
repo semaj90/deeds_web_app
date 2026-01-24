@@ -118,3 +118,4 @@ ${Object.entries(VECTOR_CONFIG.COLLECTIONS)
 --------------------
 `.trim();
 }
+

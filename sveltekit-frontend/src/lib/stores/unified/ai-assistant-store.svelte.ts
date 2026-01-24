@@ -257,7 +257,7 @@ class AIAssistantStore {
 			});
 			if (response.ok) {
 				this.conversations = this.conversations.filter(c => c.id !== conversationId);
-				if this.currentConversationId === conversationId) {
+				if (this.currentConversationId === conversationId) {
 					this.currentConversationId = null;
 				}
 			}

@@ -22,7 +22,7 @@ export interface DocShardEmbeddedEvent {
  docId: string; shardId: number;
  vectorCount: number; centroid: number[];
  clusters: { kmeans: { labels: number[]; centers: number[][] };
- som?: { coords: [number: number][]; mapSize: [number: number] };
+ som?: { coords: [number, number][]; mapSize: [number, number] };
  autoencoder?: { latent: number[][]; reconstructionError: number };
  };
 }
@@ -35,6 +35,7 @@ export interface DocStatusInfo {
  totalChunks?: number;
  totalVectors?: number;
 }
+
 
 
 

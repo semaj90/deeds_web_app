@@ -342,3 +342,4 @@ if __name__ == "__main__":
 export function createYOLOService(config?: YOLOConfig): YOLOService {
     return new YOLOService(config);
 }
+

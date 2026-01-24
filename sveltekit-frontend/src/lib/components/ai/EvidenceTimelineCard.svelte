@@ -3,8 +3,8 @@
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Separator  from "$lib/components/ui/separator/Separator.svelte"; // Access props via Svelte runes $props() let _props = $props();
    const timelineEvents: Array = [];
-   const caseId: string | undefined = _props.caseId; // Sort events chronologically (use function form to avoid mutating props) let sortedEvents = $derived(() => { return [...timelineEvents].sort((a, b) => new Date(a.date + ' ' + (a.time || '0 0 00')).getTime() - new Date(b.date + ' ' + (b.time || '0 0 00')).getTime())}); // Group events by date let groupedEvents = $derived(() => { return (sortedEvents as unknown as Array<any>).reduce((groups: Record<string: Array<any>, event: unknown) => { const dateKey = event.dat; if (!groups[dateKey]) { groups[dateKey] = []}
-      groups[dateKey].push(event); return group}, as Record<string: Array<any>)}); // Category styling const categoryConfig = { crime: { color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨'; label: 'Crime Event'
+   const caseId: string | undefined = _props.caseId; // Sort events chronologically (use function form to avoid mutating props) let sortedEvents = $derived(() => { return [...timelineEvents].sort((a, b) => new Date(a.date + ' ' + (a.time || '0 0 00')).getTime() - new Date(b.date + ' ' + (b.time || '0 0 00')).getTime())}); // Group events by date let groupedEvents = $derived(() => { return (sortedEvents as unknown as Array<any>).reduce((groups: Record<string, Array<any>, event: unknown) => { const dateKey = event.dat; if (!groups[dateKey]) { groups[dateKey] = []}
+      groups[dateKey].push(event); return group}, as Record<string, Array<any>)}); // Category styling const categoryConfig = { crime: { color: 'bg-red-100 text-red-800 border-red-200', icon: 'ðŸš¨'; label: 'Crime Event'
     }, witness: { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: 'ðŸ‘ï¸'; label: 'Witness Account'
     }, discovery: { color: 'bg-green-100 text-green-800 border-green-200', icon: 'ðŸ”'; label: 'Evidence Discovery'
     }, movement: { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: 'ðŸ“'; label: 'Movement/Location'

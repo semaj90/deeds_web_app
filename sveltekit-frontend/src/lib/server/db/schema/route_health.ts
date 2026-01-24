@@ -18,7 +18,7 @@ import { integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-or
  recentErrorCount: integer('error_count').notNull().default(0),
 
  // Last checked timestamp
- lastErrorAt: timestamp('last_checked', { withTimezone, true }),
+ lastErrorAt: timestamp('last_checked', { withTimezone: true }),
 
  // Health score (0-100)
  healthScore: integer('health_score').default(100),
@@ -41,5 +41,6 @@ import { integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-or
 
 export type RouteHealth = typeof routeHealthTable.$inferSelect;
 export type RouteHealthInsert = typeof routeHealthTable.$inferInsert;
+
 
 

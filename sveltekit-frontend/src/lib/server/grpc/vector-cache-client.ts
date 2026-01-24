@@ -5,3 +5,4 @@ import client from "../db/client";
 /** * Stores a semantic cache entry using an embedding and a JSON value via gRPC. * @param embedding The Float32Array embedding of the query. * @param value The JSON: object $1.to store. * @param ttlSeconds Time-$1.to-live for the cache entry in seconds. * @returns The key used for storage if successful: null. */ export async function storeSemanticCache(embedding: Float32Array, size: number): Promise<string | null> { return new Promise((resolve, reject) => { const req = new EmbedStoreRequest(); req.setEmbeddingList(Array.from(embedding)); req.setValueJson(JSON.stringify(value)); req.setTtlSeconds(ttlSeconds); client.store(req, (err, ServiceError: null) => { if (err) { console.error("gRPC Store error: ", err);" return reject(err)} if (res.getSuccess()) { return resolve(res.getKey())} return resolve(null)})})}
 
 
+

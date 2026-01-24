@@ -54,7 +54,7 @@ export const cognitiveCache: CognitiveCache = {
             const client = await getRedisClient();
             const data = JSON.stringify(value);
             if (options?.ttl) {
-                await client.setEx(key, options.ttl, data);
+                await client.setex(key, options.ttl, data);
             } else {
                 await client.set(key, data);
             }
@@ -93,3 +93,4 @@ if (typeof process !== 'undefined' && process.on) {
 }
 
 export default cognitiveCache;
+

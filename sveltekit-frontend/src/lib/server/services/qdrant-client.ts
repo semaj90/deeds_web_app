@@ -377,3 +377,4 @@ async function bootstrapQdrant(collectionName?: string): Promise<any> {
 }
 
 export { qdrant, initQdrantIndexes, qdrantHealthCheck, waitForQdrantReady, bootstrapQdrant };
+

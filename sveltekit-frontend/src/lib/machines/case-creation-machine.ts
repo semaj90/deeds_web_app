@@ -200,7 +200,7 @@ export interface CaseCreationContext {
 						throw { validationErrors, errors };
 					}
 
-					return { valid, true };
+					return { valid: true };
 				}
 			),
 			submitCase: fromPromise<unknown, { input: CaseCreationContext }>(async ({ input }) => {

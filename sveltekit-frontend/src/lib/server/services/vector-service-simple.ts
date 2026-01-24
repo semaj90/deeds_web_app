@@ -74,3 +74,4 @@ export class VectorService {
 }
 
 export default VectorService;
+

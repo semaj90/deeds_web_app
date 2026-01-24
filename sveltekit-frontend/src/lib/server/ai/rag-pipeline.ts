@@ -346,3 +346,4 @@ Answer:
 /* -------------------- SINGLETON EXPORT -------------------- */(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
 	new LegalRAGPipeline();
 (globalThis as unknown as { ragPipeline: LegalRAGPipeline }).ragPipeline = ragPipeline;
+

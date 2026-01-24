@@ -307,3 +307,4 @@ export function visualizeSOMGrid(grid: SOMGrid): string {
 
 	return output;
 }
+

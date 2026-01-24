@@ -40,3 +40,4 @@ Use dramatic tone but be precise.
 	const payload = await response.json();
 	return payload.response ?? payload.output ?? '';
 }
+

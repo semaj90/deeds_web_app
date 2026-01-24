@@ -17,7 +17,7 @@ export const cacheConfig = {
  microservices: {
  'enhanced-rag': { enabled: true, ttl: 300 },
  'vector-service': { enabled: true, ttl: 600 },
- 'upload-service': { enabled, false }, // Real-time needed
+ 'upload-service': { enabled: false }, // Real-time needed
  },
  // Frontend caching
  frontend: { components: { enabled: true, ttl: 3600 },

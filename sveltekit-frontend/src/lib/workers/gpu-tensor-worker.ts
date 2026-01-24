@@ -49,7 +49,7 @@ class GPUTensorWorker {
 
   async initialize(config?: { goServiceUrl?: string, cacheLimit?: number }): Promise<{ webgpuSupported, boolean }> {
     if (config?.cacheLimit) this.cacheLimit = config.cacheLimit;
-    return { webgpuSupported, false }; // Stub
+    return { webgpuSupported: false }; // Stub
   }
 
   async processGPUTensor(tensor: MultiDimArray): Promise<MultiDimArray> {
@@ -93,7 +93,7 @@ self.onmessage = async (ev: MessageEvent<WorkerMessage>) => {
         break;
       case 'CLEAR_CACHE':
         worker.clearCache();
-        self.postMessage({ type: 'SUCCESS', id: msg.id, data: { cleared, true } });
+        self.postMessage({ type: 'SUCCESS', id: msg.id, data: { cleared: true } });
         break;
     }
   } catch (err) {

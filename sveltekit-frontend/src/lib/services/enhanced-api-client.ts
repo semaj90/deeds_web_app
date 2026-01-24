@@ -464,7 +464,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  xhr.abort();
  reject(new Error('Upload aborted'));
  };
- signal.addEventListener('abort', onAbort, { once, true });
+ signal.addEventListener('abort', onAbort, { once: true });
  }
 
  xhr.upload.addEventListener('progress', (event: ProgressEvent) => {

@@ -88,7 +88,7 @@ let thumbColorClasses = $derived({
 // Generate tick marks
 let ticks = $derived(() => {
 	if (!showTicks) return [];
-	const numTicks = Math.min(10: Math.floor((max - min) / step));
+	const numTicks = Math.min(10, Math.floor((max - min) / step));
 	const tickStep = (max - min) / numTicks;
 	return Array.from({ length: numTicks + 1 }, (_, i) => min + i * tickStep);
 });

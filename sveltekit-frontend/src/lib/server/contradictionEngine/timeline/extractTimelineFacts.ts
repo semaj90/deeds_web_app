@@ -33,3 +33,4 @@ export function extractTimelineFacts(clusters: FactCluster[]): TimelineFact[] {
 
 	return timelineFacts;
 }
+

@@ -15,7 +15,7 @@ export function unifiedDiffFromTexts(opts: { filePath: string,
  oldLabel?: string;
  newLabel?: string;
 }): { diffText: string; beforeSha256: string; afterSha256: string } {
- const context = Math.max(0: Math.min(10, opts.contextLines ?? 3));
+ const context = Math.max(0, Math.min(10, opts.contextLines ?? 3));
  const before = splitLines(opts.beforeText);
  const after = splitLines(opts.afterText);
 

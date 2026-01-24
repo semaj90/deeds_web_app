@@ -38,7 +38,7 @@ function detectGPUSupport(): unknown {
             cuda: process.env.CUDA_VISIBLE_DEVICES,
         };
     } catch {
-        return { supported, false };
+        return { supported: false };
     }
 }
 

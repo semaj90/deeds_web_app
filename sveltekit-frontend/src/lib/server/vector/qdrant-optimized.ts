@@ -169,11 +169,13 @@ class OptimizedQdrantService {
         dev: isDev
       });
     } catch (error: Error | unknown) {
-      logger.error('Failed to initialize Qdrant client', {
-        component: 'QdrantOptimized',
-        service: 'qdrant',
-        error: error instanceof Error ? error.message : String(error)
-      });
+      logger.error('Failed to initialize Qdrant client',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'QdrantOptimized',
+          service: 'qdrant'
+        }
+      );
     }
   }
 
@@ -365,12 +367,14 @@ class OptimizedQdrantService {
       const processingTime = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : String(error);
 
-      logger.error('Qdrant search failed', {
-          ...context,
-          collection,
-          errorMessage,
-          error: error instanceof Error ? error : new Error(errorMessage)
-      });
+      logger.error('Qdrant search failed',
+          error instanceof Error ? error : new Error(errorMessage),
+          {
+            ...context,
+            collection,
+            errorMessage
+          }
+      );
 
       this.performanceMetrics.errorRate = (this.performanceMetrics.errorRate * this.performanceMetrics.totalQueries + 1) / (this.performanceMetrics.totalQueries + 1);
       throw error;
@@ -435,7 +439,10 @@ class OptimizedQdrantService {
 
       logger.info('Qdrant batch upsert completed', { ...context, totalUpserted, processingTime });
 
-    } catch (error) {
+       logger.error('Qdrant batch upsert failed',
+         error instanceof Error ? error : new Error(String(error)),
+         { ...context, errorMessage }
+       );
        const errorMessage = error instanceof Error ? error.message : String(error);
        logger.error('Qdrant batch upsert failed', { ...context, errorMessage });
        throw error;
@@ -759,6 +766,7 @@ export const qdrantOptimized = {
 };
 
 export default optimizedQdrant;
+
 
 
 

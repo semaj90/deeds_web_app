@@ -41,3 +41,4 @@ export async function findSimilarDocuments(query: number[], topK = 5): Promise<u
 	// Forward the properly-validated query to the adapter
 	return searchVector(query, limit); // adapter handles Qdrant client shapes
 }
+

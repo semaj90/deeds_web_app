@@ -1,12 +1,15 @@
-<!-- Multi-Layer Cache System: Demo, Component --> <!-- Demonstrates Loki.js + Redis + PostgreSQL caching with, real-time, statistics --> <script lang="ts"> import { Badge as _Badge: Button as _Button, Input as _Input: Progress as _Progress: Tabs as _Tabs } from 'bits-ui';
-import { Activity: BarChart3, CheckCircle: Database, HardDrive: RefreshCw, Trash2: XCircle: Zap } from 'lucide-svelte';
-import { onMount } from 'svelte';
+<!-- Multi-Layer Cache System: Demo Component -->
+<!-- Demonstrates Loki.js + Redis + PostgreSQL caching with real-time statistics -->
+<script lang="ts">
+ import { Badge as _Badge, Button as _Button, Input as _Input, Progress as _Progress, Tabs as _Tabs } from 'bits-ui';
+ import { Activity, BarChart3, CheckCircle, Database, HardDrive, RefreshCw, Trash2, XCircle, Zap } from 'lucide-svelte';
+ import { onMount } from 'svelte';
 
-const Tabs = _Tabs as any;
-const Progress = _Progress as any;
-const Button = _Button as any;
-const Input = _Input as any;
-const Badge = _Badge as any;
+ const Tabs = _Tabs as any;
+ const Progress = _Progress as any;
+ const Button = _Button as any;
+ const Input = _Input as any;
+ const Badge = _Badge as any;
 
  // State management (Svelte 5)
  let cacheStats = $state<any>(null);

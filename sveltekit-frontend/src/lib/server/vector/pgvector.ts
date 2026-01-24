@@ -212,3 +212,4 @@ export async function searchPGVector(queryVector: number[], topK = 10): Promise<
 export async function closePool(): Promise<void> {
 	await POOL.end();
 }
+

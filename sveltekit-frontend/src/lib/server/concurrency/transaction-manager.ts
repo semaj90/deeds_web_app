@@ -380,3 +380,4 @@ export class TransactionManager {
 // Export singleton instance
 export const transactionManager = new TransactionManager();
 export default transactionManager;
+

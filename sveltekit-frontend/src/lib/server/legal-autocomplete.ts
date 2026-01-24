@@ -277,3 +277,4 @@ export function getStateSuggestions(query: string, limit: number = 5): LegalSugg
 export function getTitleSuggestions(query: string, limit: number = 5): LegalSuggestion[] {
   return searchTitles(query).slice(0, limit);
 }
+

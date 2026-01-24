@@ -99,3 +99,4 @@ export class EmbeddingGemmaService {
 }
 
 export const embeddingGemma = new EmbeddingGemmaService();
+

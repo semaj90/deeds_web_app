@@ -648,7 +648,7 @@ async function safeSomGet(key: string): Promise<any | null> {
  try {
  return await s.read(key);
  } catch {
- return await s.read(key, { raw, true }).catch(() => null);
+ return await s.read(key, { raw: true }).catch(() => null);
  }
  }
  // No compatible method

@@ -624,12 +624,12 @@ export class ClientServerSyncService {
    */
   private initializeEventListeners(), void {
     window.addEventListener('online', () => {
-      this.updateSyncStatus({ isOnline, true });
+      this.updateSyncStatus({ isOnline: true });
       this.processSyncQueue().catch(console.error);
     });
 
     window.addEventListener('offline', () => {
-      this.updateSyncStatus({ isOnline, false });
+      this.updateSyncStatus({ isOnline: false });
     });
 
     document.addEventListener('visibilitychange', () => {

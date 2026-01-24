@@ -18,12 +18,12 @@ export interface ParameterSchema {
  minimum?: number;
  maximum?: number;
  items?: ParameterSchema;
- properties?: Record<string: ParameterSchema>;
+ properties?: Record<string, ParameterSchema>;
 }
 
 export interface FunctionSchema {
  name: string; description: string;
- parameters: Record<string: ParameterSchema>; requiredParameters: string[];
+ parameters: Record<string, ParameterSchema>; requiredParameters: string[];
  safetyLevel: 'public' | 'internal' | 'restricted';
  auditLog: boolean;
 }
@@ -338,6 +338,7 @@ export function getFunctionSchemaForLLM(functionName: string): any {
 export function getAllApprovedFunctions(): any[] {
  return Object.values(APPROVED_FUNCTIONS).map((schema) => getFunctionSchemaForLLM(schema.name));
 }
+
 
 
 

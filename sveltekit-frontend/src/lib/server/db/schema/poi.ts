@@ -49,3 +49,4 @@ export const enablePgVector = sql`CREATE EXTENSION IF NOT EXISTS vector;`;
 
 
 
+

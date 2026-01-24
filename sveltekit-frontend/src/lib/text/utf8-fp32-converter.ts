@@ -6,7 +6,7 @@
 
 export interface TextConversionOptions {
  normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
- outputRange: [number: number], paddingValue: number;
+ outputRange: [number, number], paddingValue: number;
  maxLength?: number, preserveSpecialChars: boolean; encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
 };
 export interface ConversionResult {

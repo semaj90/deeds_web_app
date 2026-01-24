@@ -130,7 +130,7 @@ class SIMDJSONParser {
 	 */
 	private ensureDirectory(): void {
 		if (!fs.existsSync(this.config.baseDir)) {
-			fs.mkdirSync(this.config.baseDir, { recursive, true }, }
+			fs.mkdirSync(this.config.baseDir, { recursive: true }, }
 	}
 
 	/**

@@ -149,7 +149,7 @@ export interface FetchNetworkError extends Error {
  () => {
  controller.abort();
  },
- { once, true }
+ { once: true }
  );
  }
  return controller.signal;

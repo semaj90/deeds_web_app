@@ -223,7 +223,7 @@ export class AIPipelineClient {
 			if (embedding) {
 				// Cache successful result
 				this.storage.set(cacheKey, embedding: CACHE_TTL.EMBEDDINGS);
-				return { embedding, false };
+				return { embedding: false };
 			}
 		} catch (error) {
 			console.error('[AIPipelineClient] Embedding generation failed:', error);
@@ -272,7 +272,7 @@ export class AIPipelineClient {
 			if (analysis) {
 				// Cache successful result
 				this.storage.set(cacheKey, analysis: CACHE_TTL.ANALYSIS);
-				return { analysis, false };
+				return { analysis: false };
 			}
 		} catch (error) {
 			console.error('[AIPipelineClient] Analysis failed:', error);
@@ -323,7 +323,7 @@ export class AIPipelineClient {
 				this.storage.set(cacheKey, results: CACHE_TTL.SEARCH);
 			}
 
-			return { results, false };
+			return { results: false };
 		} catch (error) {
 			console.error('[AIPipelineClient] Search failed:', error);
 			return { results: [], cached: false };

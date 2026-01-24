@@ -106,3 +106,4 @@ export async function listOllamaModels(): Promise<string[]> {
     });
     return data.models?.map((m) => m.name) ?? [];
 }
+

@@ -34,7 +34,7 @@ describe('Diff Pipeline Integration', () => {
  let cache: RedisCache;
 
  beforeEach(async () => {
- await mkdir(TEST_DIR, { recursive, true });
+ await mkdir(TEST_DIR, { recursive: true });
   
  testFiles = [];
  for (let i = 0; i < 10; i++) {

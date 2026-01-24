@@ -94,7 +94,7 @@ export class QuicAuthClient {
             const response = await this.makeRequest('/auth/logout', { sessionId });
             return await response.json();
         } catch (error) {
-            return { success, false };
+            return { success: false };
         }
     }
 }

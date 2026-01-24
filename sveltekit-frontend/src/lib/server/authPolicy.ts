@@ -40,3 +40,4 @@ export function authorize({ user, action, resource, ownershipUserId }: PolicyInp
 
 	return { allowed: true };
 }
+

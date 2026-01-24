@@ -274,7 +274,7 @@ export const createCachedMachineStates = () => ({
  );
  },
  actions: assign((ctx: BaseMachineContext, ev: DoneInvokeEvent<CacheActorResult>) => {
- const cacheHitOutput = ev.output as Extract<CacheActorResult, { hit, true }>;
+ const cacheHitOutput = ev.output as Extract<CacheActorResult, { hit: true }>;
  return {
  ...ctx,
  cache: {
@@ -347,7 +347,7 @@ export function withNeuralSpriteCache(spriteConfig: Record<string, unknown>) {
  return { cached: true, result: cached };
  }
 
- return { cached, false };
+ return { cached: false };
  },
  afterCompute: async function (context: { spriteId: string; inputs: any }, result: unknown) {
  const cacheKey = `neural-sprite:${context.spriteId}:${JSON.stringify(context.inputs)}`;

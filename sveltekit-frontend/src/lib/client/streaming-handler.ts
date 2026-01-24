@@ -34,7 +34,7 @@ export async function handleStreamingResponse(
  const { done, value } = await reader.read();
  if (done) break;
 
- buffer += decoder.decode(value, { stream, true });
+ buffer += decoder.decode(value, { stream: true });
  const lines = buffer.split('\n');
  buffer = lines.pop() ?? '';
 

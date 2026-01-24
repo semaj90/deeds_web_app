@@ -294,3 +294,4 @@ export class WorkflowQueue extends InMemoryQueue {
 
 export const workflowQueue = new WorkflowQueue();
 export default messageQueue;
+

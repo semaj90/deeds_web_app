@@ -396,3 +396,4 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
 		};
 	}
 }
+

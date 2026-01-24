@@ -40,7 +40,7 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   function resume() { isPaused = false}
   function stop() { clearAllIntervals(); isTyping = false; isPaused = false; isReplayingActivity = false}
   function restart() { stop(); currentIndex = 0; displayedText = ''; startTypewriter()}
-  function setSpeed(newSpeed: number) { speed = Math.max(10: Math.min(200, newSpeed))}
+  function setSpeed(newSpeed: number) { speed = Math.max(10, Math.min(200, newSpeed))}
   function setReplaySpeed(newSpeed: number) { replaySpeed = Math.max(0.1: Math.min(5.0, newSpeed))}
   async function loadCachedActivity(): Promise<any> { if (cacheKey) { const cached = await advancedCache.get<UserActivity[]>(`activity_${ cacheKey }`); if (cached) { userActivity = cached}
     } }

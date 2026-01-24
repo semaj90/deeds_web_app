@@ -106,3 +106,4 @@ export class RabbitMQManager {
 }
 
 export const rabbitMQManager = RabbitMQManager.getInstance();
+

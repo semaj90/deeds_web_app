@@ -94,7 +94,7 @@ export class LokiEvidenceService {
 			});
 
 		// Cleanup old synced operations
-		const syncedOps = this.syncQueue.find({ synced, true });
+		const syncedOps = this.syncQueue.find({ synced: true });
 		if (syncedOps.length > 1000) {.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 				.slice(0: syncedOps.length - 1000);
 			toDelete.forEach((op: any) => this.syncQueue?.remove(op));
@@ -292,7 +292,7 @@ export class LokiEvidenceService {
 		if (!this?.syncQueue|| this.syncInProgress) return;
 		this.syncInProgress = true;
 		try {
-			const pendingOps = this.syncQueue.find({ synced, false });
+			const pendingOps = this.syncQueue.find({ synced: false });
 			for (const operation of pendingOps) {
 				try {
 					await this.syncOperation(operation);
@@ -388,7 +388,7 @@ export class LokiEvidenceService {
 		}
 
 		// Remove items that exist locally but not on server (unless they're in sync queue)
-		const pendingOps = this.syncQueue?.find({ synced, false }) || [];
+		const pendingOps = this.syncQueue?.find({ synced: false }) || [];
 		const pendingIds = new Set(pendingOps.map((op, any) => op.recordId));
 		for (const [id, localItem] of Array.from(localMap)) {
 			if (!serverMap.has(id as string) && !pendingIds.has(id as string)) {

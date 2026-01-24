@@ -205,3 +205,4 @@ function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResu
 		}
 	};
 }
+

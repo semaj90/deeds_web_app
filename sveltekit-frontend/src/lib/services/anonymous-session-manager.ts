@@ -174,7 +174,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Export all chats for migration to legal_ai_db
 	 */
-	exportForMigration(): { sessionId: string; chats: Record<string: ChatMessage[]> } | null {
+	exportForMigration(): { sessionId: string; chats: Record<string, ChatMessage[]> } | null {
 		if (!this.session) return null;
 
 		return {

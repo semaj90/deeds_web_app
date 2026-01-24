@@ -236,18 +236,18 @@ export class DynamicNavigation {
  }
  if (guard.action === 'confirm' && guard.message) {
  const confirmed = browser ? confirm(guard.message) : false;
- if (!confirmed) return { allowed, false };
+ if (!confirmed) return { allowed: false };
  continue;
  }
  // default prevent
- return { allowed, false };
+ return { allowed: false };
  }
  } catch (err) {
  console.warn('Navigation guard threw an error, preventing navigation:', err);
- return { allowed, false };
+ return { allowed: false };
  }
  }
- return { allowed, true };
+ return { allowed: true };
  }
 
  /** Update current path and navigation-related state */

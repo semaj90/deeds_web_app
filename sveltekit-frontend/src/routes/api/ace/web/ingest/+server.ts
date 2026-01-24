@@ -39,7 +39,7 @@ async function getAmqpChannel() {
     }
 
     amqpChannel = await amqpConnection.createChannel();
-    await amqpChannel.assertQueue('ace_web_ingest', { durable, true });
+    await amqpChannel.assertQueue('ace_web_ingest', { durable: true });
 
     return amqpChannel;
   } catch (error) {

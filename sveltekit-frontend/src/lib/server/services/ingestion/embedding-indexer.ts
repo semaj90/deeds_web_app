@@ -254,3 +254,4 @@ export class EmbeddingIndexer {
 export async function createEmbeddingIndexer(): Promise<EmbeddingIndexer> {
 	return new EmbeddingIndexer();
 }
+

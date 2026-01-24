@@ -184,3 +184,4 @@ export function extractNotesText(notes: CaseSynthesis['notes']): string {
 		})
 		.join('\n\n---\n\n');
 }
+

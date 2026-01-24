@@ -593,3 +593,4 @@ if (typeof process !== 'undefined') {
 		process.exit(0);
 	});
 }
+

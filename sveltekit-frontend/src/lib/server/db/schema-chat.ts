@@ -68,3 +68,4 @@ export type ChatMetadata = typeof chatMetadata.$inferSelect;
 export type NewChatMetadata = typeof chatMetadata.$inferInsert;
 
 
+

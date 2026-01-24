@@ -263,7 +263,7 @@ class SIMDJSONCache {
 				};
 			} else {
 				JSON.parse(jsonString);
-				return { valid, true };
+				return { valid: true };
 			}
 		} catch (error) {
 			return {

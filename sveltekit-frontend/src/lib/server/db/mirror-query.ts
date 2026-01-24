@@ -416,3 +416,4 @@ export async function healthCheckAllLayers(): Promise<{
 
 	return { postgres, qdrant, couchdb, minio };
 }
+

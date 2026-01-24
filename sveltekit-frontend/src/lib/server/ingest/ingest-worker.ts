@@ -8,3 +8,4 @@ parentPort.on("message", async (job: Job) => { try { let buffer = job.fileBuffer
 
 
 
+

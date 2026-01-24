@@ -95,3 +95,4 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
 }
 
 export default createQdrantAdapter;
+

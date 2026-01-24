@@ -32,3 +32,4 @@ export const evidenceEmbeddings_simple = chatEmbeddings; // Placeholder alias
 export const documentEmbeddings_simple = chatEmbeddings; // Placeholder alias
 export const vectorSimilarity_simple = (a: number[], b: number[]) => 0; // Placeholder function
 export const semanticSearchCache_simple = chatEmbeddings; // Placeholder alias
+

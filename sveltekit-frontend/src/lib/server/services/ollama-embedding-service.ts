@@ -72,3 +72,4 @@ async function fetchEmbeddingAPI(text: string): Promise<number[]> {
 
 
 
+

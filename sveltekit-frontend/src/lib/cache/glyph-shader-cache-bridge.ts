@@ -4,7 +4,7 @@ export interface GlyphRenderingRequest {
  glyphData: Uint8Array | Float32Array;
  textContent: string, renderingHints: { quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
  compressionMethod: 'chr-rom' | 'simd' | 'texture';
- targetResolution: [number: number], colorSpace: 'sRGB' | 'P3' | 'Rec2020';
+ targetResolution: [number, number], colorSpace: 'sRGB' | 'P3' | 'Rec2020';
  };
  legalContext?: { documentType: 'contract' | 'brief' | 'statute' | 'case';
  confidentialityLevel: 'public' | 'confidential' | 'privileged';

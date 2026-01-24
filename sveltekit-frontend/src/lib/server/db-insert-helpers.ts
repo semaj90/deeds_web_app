@@ -36,3 +36,4 @@ export function prepareSearchSessionInsert(input: SearchSessionInsertInput) {
 		createdAt: new Date()
 	};
 }
+

@@ -173,3 +173,4 @@ runMigrations().catch((err) => {
 	console.error('❌ failed: ', err);
 	process.exit(1);
 });
+

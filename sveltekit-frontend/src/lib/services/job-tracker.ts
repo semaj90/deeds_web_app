@@ -255,6 +255,19 @@ class JobTracker {
             data
         });
     }
+
+    save() {
+        this.ensureInitialized();
+        this.db.saveDatabase();
+    }
+
+    reset() {
+        this.ensureInitialized();
+        if (this.jobs) this.jobs.clear();
+        if (this.workers) this.workers.clear();
+        if (this.metrics) this.metrics.clear();
+        this.db.saveDatabase();
+    }
 }
 
 // Singleton instance

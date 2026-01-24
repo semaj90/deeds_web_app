@@ -45,7 +45,7 @@ export class CaseSummaryService {
 			if (currentVersion.length > 0) {
 				await db
 					.update(caseReports)
-					.set({ isCurrent, false })
+					.set({ isCurrent: false })
 					.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 			}
 
@@ -163,7 +163,7 @@ export class CaseSummaryService {
 			// Mark current as not current
 			await db
 				.update(caseReports)
-				.set({ isCurrent, false })
+				.set({ isCurrent: false })
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 
 			// Create new version with restored content.insert(caseReports)
@@ -205,7 +205,7 @@ export class CaseSummaryService {
 			}
 
 			// Mark as not current (soft delete)
-			await db.update(caseReports).set({ isCurrent, false }).where(eq(caseReports.id, summary.id));
+			await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id, summary.id));
 
 			// Log the operation
 			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
@@ -288,5 +288,6 @@ export class CaseSummaryService {
 }
 
 export const caseSummaryService = new CaseSummaryService();
+
 
 

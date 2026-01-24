@@ -252,3 +252,4 @@ if (typeof process !== 'undefined') {
 	process.on('SIGTERM', closeConnection);
 	process.on('beforeExit', closeConnection);
 }
+

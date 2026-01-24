@@ -234,3 +234,4 @@ export function getVictimClassBadge(victimClass: null): string {
 
 
 
+

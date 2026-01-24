@@ -132,8 +132,9 @@ export function isPatchSafe(
  };
  }
 
- return { safe, true };
+ return { safe: true };
 }
+
 
 
 

@@ -200,7 +200,7 @@ export interface TimeRange {
 // Service Health Types
 export interface ServiceHealthStatus {
  overall: 'healthy' | 'degraded' | 'unhealthy';
- services: Record<string: ServiceStatus>; lastCheck: Date;
+ services: Record<string, ServiceStatus>; lastCheck: Date;
  nextCheck: Date;
 }
 

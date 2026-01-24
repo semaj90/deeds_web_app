@@ -198,7 +198,7 @@ export type EvidenceSnapshot =
 			output?: undefined;
 	  });
 
-export type EvidenceActor = ActorRef<EvidenceSnapshot: WorkflowEvent>; // Swapped generics: snapshot first, event second
+export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
 
 // For WebSocket updates
 export interface AnalysisUpdate {

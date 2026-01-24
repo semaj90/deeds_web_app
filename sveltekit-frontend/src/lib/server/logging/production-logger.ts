@@ -378,3 +378,4 @@ export const xstateLogger = {
 	error: (machine: string, state: string, event: string, error: Error, context?: unknown) =>
 		productionLogger.logXStateTransition(machine, state, event, context, error)
 };
+

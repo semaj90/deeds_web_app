@@ -110,7 +110,7 @@ class RedisCacheService implements IRedisCacheService {
     const ttl = options?.ttlSeconds ?? (options?.ttlMs ? Math.floor(options.ttlMs / 1000) : undefined);
 
     if (ttl) {
-      await this.client.setEx(key, ttl, serialized);
+      await this.client.setex(key, ttl, serialized);
     } else {
       await this.client.set(key, serialized);
     }
@@ -280,3 +280,4 @@ export function getRedisCache(config?: Partial<RedisConfig>): RedisCacheService 
 
 export { RedisCacheService };
 export type { RedisConfig };
+

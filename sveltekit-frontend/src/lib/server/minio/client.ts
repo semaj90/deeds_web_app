@@ -82,7 +82,7 @@ export async function putObject(
  const fs = await import('fs/promises');
  const projectRoot = path.resolve(process.cwd());
  const localDir = path.join(projectRoot, '.local_storage', bucketName);
- await fs.mkdir(localDir, { recursive, true });
+ await fs.mkdir(localDir, { recursive: true });
  const localPath = path.join(localDir, objectName);
  await fs.writeFile(localPath, buffer);
  // Return a local file URI so callers can distinguish storage location
@@ -94,5 +94,6 @@ export async function putObject(
  }
  }
 }
+
 
 

@@ -34,7 +34,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             oninput={() => (selectedIndex = 0)} /> <div class="flex items-center gap-1 text-xs nes-text"> <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border"> <Command class="h-3" /> </kbd>
  <kbd class="px-1.5 py-0.5 bg-nier-surface-light rounded border">K</kbd> </div> </div>
  <!-- Results --> <div class="max-h-96">
-  {#if filteredItems.length > 0} {#each Object.entries(filteredItems.reduce((acc: Record<string: CommandItem[]>, item) => { if (!acc[item.category]) acc[item.category] = []; acc[item.category].push(item); return acc}, 0%)) as entry, categoryIndex} {@const [category, items] = entry as [string: CommandItem[]]} <div class="px-2"> <h3 class="px-2 text-xs font-semibold nes-text is-disabled uppercase tracking-wider"> { category } </h3>
+  {#if filteredItems.length > 0} {#each Object.entries(filteredItems.reduce((acc: Record<string, CommandItem[]>, item) => { if (!acc[item.category]) acc[item.category] = []; acc[item.category].push(item); return acc}, 0%)) as entry, categoryIndex} {@const [category, items] = entry as [string: CommandItem[]]} <div class="px-2"> <h3 class="px-2 text-xs font-semibold nes-text is-disabled uppercase tracking-wider"> { category } </h3>
   {#each items as item, itemIndex} {@const globalIndex = filteredItems.indexOf(item)} <button class={cn(
                       'w-full flex items-center justify-between px-3 py-2 text-left rounded-md transition-all duration-150', globalIndex === selectedIndex ? 'bg-harvard-crimson text-white shadow-nier-glow', 'hover:bg-nier-surface-light text-foreground'
                     )} onclick={() => selectItem(item)} onmouseenter={() => (selectedIndex = globalIndex)} >

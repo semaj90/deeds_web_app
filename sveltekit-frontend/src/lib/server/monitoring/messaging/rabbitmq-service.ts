@@ -72,7 +72,7 @@ export class RabbitMQService {
  if (!this.channel) return false;
  try {
  const messageBuffer = Buffer.from(JSON.stringify(message));
- return this.channel.sendToQueue(queue, messageBuffer, { persistent, true });
+ return this.channel.sendToQueue(queue, messageBuffer, { persistent: true });
  } catch (error: Error | unknown) {
  console.error('❌ Failed to publish message: ', error);
  return false;
@@ -125,6 +125,7 @@ export class RabbitMQService {
 
 export const rabbitmqService = RabbitMQService.getInstance();
 export { QUEUES };
+
 
 
 

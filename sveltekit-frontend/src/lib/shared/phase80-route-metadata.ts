@@ -12,17 +12,20 @@
  * "/all-routes" → "routes"
  */
 export function computeRouteCluster(routePath: string): string {
- // Normalize: remove leading/trailing slashes and parentheses.split('/')
- .filter(Boolean)
- .map((seg) => seg.replace(/[()]/g, '')) // remove parentheses
- .filter(Boolean);
+    // Normalize: remove leading/trailing slashes and parentheses
+    const normalized = routePath
+        .replace(/^\/+|\/+$/g, '')
+        .split('/')
+        .filter(Boolean)
+        .map((seg) => seg.replace(/[()]/g, '')) // remove parentheses
+        .filter(Boolean);
 
- if (normalized.length === 0) return 'root';
- if (normalized[0] === 'api') return 'api';
+    if (normalized.length === 0) return 'root';
+    if (normalized[0] === 'api') return 'api';
 
- // For routes like "/(app)/cases/[id]", first meaningful segment is "cases"
- // For routes like "/cases/[id]", first segment is "cases"
- return normalized[0];
+    // For routes like "/(app)/cases/[id]", first meaningful segment is "cases"
+    // For routes like "/cases/[id]", first segment is "cases"
+    return normalized[0];
 }
 
 /**
@@ -33,52 +36,51 @@ export function computeRouteCluster(routePath: string): string {
  * "api" → "Backend API"
  */
 export function inferRouteOwner(cluster: string): string {
- const ownerMap: Record<string, string> = {
- // Feature teams
- cases: 'Cases Team',
- evidence: 'Evidence Team',
- persons: 'Persons Team',
- organizations: 'Organizations Team',
+    const ownerMap: Record<string, string> = {
+        // Feature teams
+        cases: 'Cases Team',
+        evidence: 'Evidence Team',
+        persons: 'Persons Team',
+        organizations: 'Organizations Team',
 
- // System routes
- system: 'System Admin',
- auth: 'Auth System',
- settings: 'Settings',
+        // System routes
+        system: 'System Admin',
+        auth: 'Auth System',
+        settings: 'Settings',
 
- // AI features
- yorha: 'YoRHa AI',
- 'error-brain': 'Error Brain',
- phase78: 'Error Brain',
+        // AI features
+        yorha: 'YoRHa AI',
+        'error-brain': 'Error Brain',
+        phase78: 'Error Brain',
 
- // API
- api: 'Backend API',
- routes: 'Routes System',
- archive: 'Archive',
+        // API
+        api: 'Backend API',
+        routes: 'Routes System',
+        archive: 'Archive',
 
- // Default
- root: 'Platform',
- };
+        // Default
+        root: 'Platform',
+    };
 
- return ownerMap[cluster.toLowerCase()] || cluster;
+    return ownerMap[cluster.toLowerCase()] || cluster;
 }
 
 /**
  * Get all known clusters for UI dropdowns
  */
 export function getAllKnownClusters(): string[] {
- return [
- 'cases',
- 'evidence',
- 'persons',
- 'organizations',
- 'system',
- 'auth',
- 'settings',
- 'yorha',
- 'error-brain',
- 'api',
- 'routes',
- 'archive'];
+    return [
+        'cases',
+        'evidence',
+        'persons',
+        'organizations',
+        'system',
+        'auth',
+        'settings',
+        'yorha',
+        'error-brain',
+        'api',
+        'routes',
+        'archive'
+    ];
 }
-
-

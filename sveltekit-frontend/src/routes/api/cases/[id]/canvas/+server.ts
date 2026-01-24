@@ -49,7 +49,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
             });
         }
 
-        return json({ success, true });
+        return json({ success: true });
     } catch (e: unknown) {
         console.error('Error saving canvas:', e);
         return json({ error: 'Internal Server Error' }, { status: 500 });

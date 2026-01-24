@@ -43,7 +43,7 @@ export const agenticGemma3 = {
 
  let embedding: number[] | undefined;
  try {
- const embeddingResult = await embeddingGemma.embed(request.prompt, { useCache, true });
+ const embeddingResult = await embeddingGemma.embed(request.prompt, { useCache: true });
  embedding = embeddingResult.embedding;
  } catch (err) {
  console.warn('[agenticGemma3] Failed to embed prompt:', err);
@@ -181,6 +181,7 @@ export const agenticGemma3 = {
  return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
  },
 };
+
 
 
 

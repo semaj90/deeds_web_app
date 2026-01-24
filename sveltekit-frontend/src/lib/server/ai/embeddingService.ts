@@ -2,3 +2,4 @@ const EMBEDDING_MODEL = 'nomic-embed-text'; // Or 'embeddinggemma: latest' as pe
 
 
 
+

@@ -124,3 +124,4 @@ export async function handleDocumentUpload(
 		return json({ success: false, error: 'Failed to handle document upload' }, { status: 500 });
 	}
 }
+

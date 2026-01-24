@@ -33,7 +33,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const deltaY = mousePos.y - lastMousePos.y; rotation.update(r => ({ x: r.x + deltaY * 0.01, y: r.y + deltaX * 0.01, // Fixed syntax }))}
 
       // Check for node hover checkNodeHover(); lastMousePos = { ...mousePos } }); canvas.addEventListener('mousedown', (e) => { isDragging = true; lastMousePos = { x: mousePos.x; y: mousePos.y } }); canvas.addEventListener('mouseup', () => { isDragging = false}); canvas.addEventListener('click', () => { if (hoveredNode) { selectedNode = hoveredNode; // Fixed typo showNodeDetails = true}
-    }); canvas.addEventListener('wheel', (e) => { e.preventDefault(); camera.update(c => ({ ...c, z: Math.max(100: Math.min(1500: c.z + e.deltaY * 0.5))}))})}
+    }); canvas.addEventListener('wheel', (e) => { e.preventDefault(); camera.update(c => ({ ...c, z: Math.max(100, Math.min(1500: c.z + e.deltaY * 0.5))}))})}
   function checkNodeHover() { hoveredNode = null;
    const visibleNodes = getVisibleNodes(); for (const node of visibleNodes) { const screenPos = project3DToScreen(node.position);
    const distance = Math.sqrt( Math.pow(mousePos.x - screenPos.x, 2) + Math.pow(mousePos.y - screenPos.y, 2) ); if (distance < 30) { hoveredNode = nod; break}

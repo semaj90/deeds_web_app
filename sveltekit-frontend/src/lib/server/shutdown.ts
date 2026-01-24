@@ -19,3 +19,4 @@ async function runCleanups(signal): Promise<any> { console.log(`[shutdown] Recei
 function ensureHandlers() { if (registered) return; registered = true; ['SIGINT','SIGTERM'].forEach(sig => { process.on(sig as any, () => runCleanups(sig)}); process.on('uncaughtException', (e) => { console.error('[shutdown] uncaughtException', e)}); process.on('unhandledRejection', (r) => { console.error('[shutdown] unhandledRejection', r)})}
 
 
+
