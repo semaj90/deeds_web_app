@@ -1,5 +1,4 @@
-
-import type { Evidence, LegalDocument } from "../types/legal-types";
+import { getOllamaEndpoint } from '../../utils/ollama-endpoint';
 
 // New: typed worker message shapes and memory stats
 type MemoryStats = {

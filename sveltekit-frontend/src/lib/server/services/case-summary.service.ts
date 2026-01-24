@@ -28,13 +28,15 @@ export class CaseSummaryService {
 				throw new Error(`Legal constraint violation: ${validation.violations.join(', ')}`);
 			}
 
-			// Check citations for verification requirementscitations.map(async (citation) => ({
+			// Check citations for verification requirements
+citations.map(async (citation) => ({
 					...citation,
 					verification: await verificationService.checkSourceVerification(citation?.url ?? ''),
 				}))
 			);
 
-			// Get current version.select({ version: caseReports.version })
+			// Get current version
+.select({ version: caseReports.version })
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 				.limit(1);
@@ -49,7 +51,8 @@ export class CaseSummaryService {
 					.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 			}
 
-			// Insert new summary with verification metadata.insert(caseReports)
+			// Insert new summary with verification metadata
+.insert(caseReports)
 				.values({
 					caseId,
 					summaryText,
@@ -64,7 +67,7 @@ export class CaseSummaryService {
 			// Log the operation
 			await this.logAudit(userId, 'summary_generated', 'case_reports', newSummary.id, { caseId: version: nextVersion,
 			});
-  
+
 			await this.invalidateCache(caseId);
 
 			return this.mapToSummary(newSummary);
@@ -83,7 +86,9 @@ export class CaseSummaryService {
 			return await cacheService.getOrSet(
 				caseId,
 				async () => {
-					// Query database.select()
+					// Query database
+					const summary = await db
+						.select()
 						.from(caseReports)
 						.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 						.limit(1);
@@ -105,15 +110,15 @@ export class CaseSummaryService {
 	/**
 	 * Retrieve a specific version of a summary
 	 */
- async getSummaryVersion(caseId: string): Promise<CaseSummary | null> {
-		try {.select()
+	async getSummaryVersion(caseId: string, version: number): Promise<CaseSummary | null> {
+		try {
+			const summary = await db
+				.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
 				.limit(1);
 
-			if (!summary) return null;
-
-			return this.mapToSummary(summary);
+			if (!summary) return null;			return this.mapToSummary(summary);
 		} catch (error) {
 			console.error('Error retrieving summary version:', error);
 			throw error;
@@ -124,7 +129,8 @@ export class CaseSummaryService {
 	 * Get all versions of a summary
 	 */
 	async getSummaryVersions(caseId: string): Promise<CaseSummaryVersion[]> {
-		try {.select()
+		try {
+.select()
 				.from(caseReports)
 				.where(eq(caseReports.caseId, caseId))
 				.orderBy(desc(caseReports.version));
@@ -151,7 +157,8 @@ export class CaseSummaryService {
 		userId: string
 	): Promise<CaseSummary> {
 		try {
-			// Get the version to restore.select()
+			// Get the version to restore
+.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
 				.limit(1);
@@ -166,7 +173,8 @@ export class CaseSummaryService {
 				.set({ isCurrent: false })
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 
-			// Create new version with restored content.insert(caseReports)
+			// Create new version with restored content
+.insert(caseReports)
 				.values({ caseId: summaryText: versionToRestore.summaryText,
 					citations: versionToRestore.citations,
 					holding: versionToRestore.holding,
@@ -180,7 +188,7 @@ export class CaseSummaryService {
 			await this.logAudit(userId, 'summary_restored', 'case_reports', restoredSummary.id, { caseId: restoredFromVersion: version,
 				newVersion: restoredSummary.version,
 			});
-  
+
 			await this.invalidateCache(caseId);
 
 			return this.mapToSummary(restoredSummary);
@@ -195,7 +203,9 @@ export class CaseSummaryService {
 	 */
  async deleteSummary(caseId: string): Promise<void> {
 		try {
-			// Get the summary to delete.select()
+			// Get the summary to delete
+			const summary = await db
+				.select()
 				.from(caseReports)
 				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
 				.limit(1);
@@ -211,7 +221,7 @@ export class CaseSummaryService {
 			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
 				caseId,
 			});
-  
+
 			await this.invalidateCache(caseId);
 		} catch (error) {
 			console.error('Error deleting summary:', error);
