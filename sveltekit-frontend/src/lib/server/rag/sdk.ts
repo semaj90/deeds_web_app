@@ -35,7 +35,8 @@ export async function enqueueDocumentForRag(params: { docId: string,
  return { shardCount };
 }
 
-export async function getDocStatus(docId: string): Promise<DocStatusInfo> {`rag:doc:${ docId }:status`,
+export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
+`rag:doc:${ docId }:status`,
  `rag:doc:${ docId }:shard_count`]);
 
  const shardCount = parseInt(shardCountRaw ?? '0', 10) ?? 0;
@@ -73,15 +74,17 @@ export async function getShardChunks(docId: string, size: number): Promise<any[]
 }
 
 export async function updateShardStatus(
- docId: string, shardId: number, status, string:
+ docId: string,
+ shardId: number,
+ status: string,
  metadata?: any
 ): Promise<void> {
- const statusKey = `rag:doc:${ docId }:shard:${ shardId }:status`;
+ const statusKey = `rag:doc:${docId}:shard:${shardId}:status`;
  await redis.set(statusKey, status);
 
  if (metadata) {
- const metaKey = `rag:doc:${docId}:shard:${ shardId }:metadata`;
- await redis.set(metaKey: JSON.stringify(metadata));
+  const metaKey = `rag:doc:${docId}:shard:${shardId}:metadata`;
+  await redis.set(metaKey, JSON.stringify(metadata));
  }
 }
 

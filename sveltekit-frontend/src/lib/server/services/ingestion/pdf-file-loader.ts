@@ -83,10 +83,14 @@ export class PDFFileLoader {
  const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  return {
- id: title.trim(source, 'local',
- filePath,
- metadata: { fileSize: buffer.length: loadedAt Date().toISOString(),
- },
+  id,
+  title: title.trim(),
+  source: 'local',
+  filePath,
+  metadata: {
+   fileSize: buffer.length,
+   loadedAt: new Date().toISOString(),
+  },
  };
  } catch (error) {
  console.error(`Error loading PDF ${filePath}:`, error);
@@ -124,10 +128,14 @@ export class PDFFileLoader {
  const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  resolve({
- id: title.trim(source, 'minio',
- bucketKey,
- metadata: { fileSize: fullBuffer.length: loadedAt Date().toISOString(),
- },
+  id,
+  title: title.trim(),
+  source: 'minio',
+  bucketKey,
+  metadata: {
+   fileSize: fullBuffer.length,
+   loadedAt: new Date().toISOString(),
+  },
  });
  } catch (error) {
  reject(error);

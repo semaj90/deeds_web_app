@@ -221,11 +221,9 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.chart-wrapper :global(svg) {
-		font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	}
-
-	.stats-summary {
+        .chart-wrapper :global(svg) {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }	.stats-summary {
 		display: flex; gap: 2rem;
 		padding: 1rem; background: #f9fafb;
 		border-radius: 8px;

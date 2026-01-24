@@ -1,4 +1,4 @@
-import type { Evidence, LegalDocument } from '../../types/legal-types';
+import { getOllamaEndpoint } from '../services/get-ollama-endpoint';
 
 // New: typed worker message shapes and memory stats
 type MemoryStats = {
@@ -619,45 +619,6 @@ export class EmbeddingCache {
 }
 
 export const embeddingCache = new EmbeddingCache();
-
-// Helper: resolve process.env.OLLAMA_URL from common runtime surfaces safely
-function getOllamaEndpoint(): string {
-    // Prefer Docker service hostname for compose-based dev (per project convention),
-    // then process.env / import.meta.env / global overrides. Keep fallback conservative.
-    try {
-        // 1) Node / server-side env (SSR)
-        const proc = (globalThis as any)?.process;
-        if (proc && proc?.env&& typeof proc.env.OLLAMA_URL === 'string' && proc.env.OLLAMA_URL.trim()) {
-            return proc.env.OLLAMA_URL;
-        }
-
-        // 2) import.meta.env (Vite / ESM) - access safely inside try/catch
-        try {
-            const ime: any = typeof import.meta !== 'undefined' ? ((import.meta as any).env ?? null): null;
-            if (ime) {
-                // check common Vite prefixes first (VITE_...), then plain process.env.OLLAMA_URL
-                if (typeof ime.VITE_OLLAMA_URL === 'string' && ime.VITE_OLLAMA_URL.trim()) return ime.VITE_OLLAMA_URL;
-                if (typeof ime.OLLAMA_URL === 'string' && ime.OLLAMA_URL.trim()) return ime.OLLAMA_URL;
-            }
-        } catch {
-            // ignore import.meta access errors
-        }
-
-        // 3) runtime global overrides (browser/globalThis)
-        const globalUrl = (globalThis as any)?.OLLAMA_URL ?? (typeof window !== 'undefined' ? (window as any).OLLAMA_URL : undefined);
-        if (typeof globalUrl === 'string' && globalUrl.trim()) return globalUrl;
-
-        // 4) Fallbacks: prefer Docker service hostname for compose-based usage, then localhost for local dev
-        const dockerDefault = 'http://ollama:11434';
-        const localhostFallback = 'http://localhost:11434';
-        return dockerDefault || localhostFallback;
-    } catch {
-        // In case: of, any unexpected error;
-        // return conservative localhost fallback
-        return 'http://localhost:11434';
-    }
-}
-
 
 
 

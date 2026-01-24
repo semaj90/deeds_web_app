@@ -22,13 +22,13 @@ import {
 	getDatabaseUrls,
 	getConnectionString,
 	validateDatabaseConfig,
-	getPoolConfig: DATABASE_CONSTANTS,
+	getPoolConfig as DATABASE_CONSTANTS,
 	getBrowserSafeDatabaseInfo
 } from '$lib/config/database.js';
 
 // Import schema and types
 import * as schema from './schema-postgres.js';
-import type { DatabaseConfig: DatabaseUrls } from '$lib/config/database.js';
+import type { DatabaseConfig, DatabaseUrls } from '$lib/config/database.js';
 
 // Re-export everything for backwards compatibility
 export {
@@ -45,7 +45,7 @@ export {
 	getDatabaseUrls,
 	getConnectionString,
 	validateDatabaseConfig,
-	getPoolConfig: DATABASE_CONSTANTS,
+	DATABASE_CONSTANTS,
 	getBrowserSafeDatabaseInfo
 };
 
@@ -54,10 +54,9 @@ export * from './schema-postgres.js';
 export { schema };
 
 // Export types
-export type { DatabaseConfig: DatabaseUrls };
+export type { DatabaseConfig, DatabaseUrls };
 
 // Default database instances (lazy initialization)
-// export const db = getDrizzleDb(); // Example if getDrizzleDb returns the db directly
 export const sql = getPostgresJsClient();
 export const pool = getAppPool();
 
@@ -104,7 +103,6 @@ export async function healthCheck(): Promise<any> {
 			};
 		}
 
-        // Return healthy structure directly to avoid complex logic if simple health check passes
         return {
             status: 'healthy',
             timestamp: new Date(),
@@ -141,13 +139,6 @@ export async function getSystemHealth(): Promise<any> {
 	};
 }
 
-// Vector store with centralized connection (updated for embeddinggemma)
-export function getVectorStore() {
-    // Stub implementation as requires LangChain dependencies which might not be present
-    // or properly configured in this scope context without require
-    throw new Error('Vector store factory requires implementation check');
-}
-
 // Database migration utilities
 export async function runMigration(migrationName: string, migrationSql: string): Promise<any> {
 	return executeQuery(async (client) => {
@@ -181,4 +172,3 @@ export async function runMigration(migrationName: string, migrationSql: string):
 		}
 	}, true); // Use admin connection for migrations
 }
-

@@ -283,8 +283,8 @@ class OptimizedQdrantService {
         if (cached) {
           queryVector = cached;
         } else {
-          // Fix: generateEmbedding is an object, use .generate()
-          const generated = await generateEmbedding.generate(query);
+          // generateEmbedding is a function
+          const generated = await generateEmbedding(query);
           queryVector = generated || [];
           if (queryVector.length > 0) {
             this.cacheEmbedding(query, queryVector);

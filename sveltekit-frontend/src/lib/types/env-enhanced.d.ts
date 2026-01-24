@@ -2,7 +2,7 @@
 declare module '$env /dynamic/public' {
  export const env: Record<string, string | undefined>;
 }
-declare module '$env /static/private' {
+declare module '$env/static/private' {
  export const DATABASE_URL: string;
  export const POSTGRES_URL: string;
  export const REDIS_URL: string;

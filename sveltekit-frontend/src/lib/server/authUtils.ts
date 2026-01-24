@@ -45,7 +45,7 @@ export async function verifyPassword(password: string, hashed: string): Promise<
  * Signs a JWT token with the given payload.
  */
 export function signJWT(payload: object): string {
-	return jwt.sign(payload: JWT_SECRET, { expiresIn: '7d' });
+	return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 }
 
 /**
@@ -53,7 +53,7 @@ export function signJWT(payload: object): string {
  */
 export function verifyJWT(token: string): JWTPayload | null {
 	try {
-		const payload = jwt.verify(token: JWT_SECRET);
+		const payload = jwt.verify(token, JWT_SECRET);
 		return payload as JWTPayload;
 	} catch (error: any) {
 		return null;

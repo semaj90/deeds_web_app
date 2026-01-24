@@ -1,4 +1,4 @@
-import { assign, createMachine, fromPromise } from 'xstate';
+import { assign, fromPromise, setup } from 'xstate';
 
 /**
  * XState Legal Form Machine (v5) - Case Creation Wizard
@@ -43,7 +43,7 @@ const submitCaseService = fromPromise<{
 	caseId: string;
 	success: boolean;
 	message: string;
-}>(async ({ input }: { input: LegalFormContext }) => {
+}, { input: LegalFormContext }>(async ({ input }) => {
 	const _input = input;
 	// Simulate network delay
 	await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -65,10 +65,14 @@ const submitCaseService = fromPromise<{
 /**
  * XState Machine Definition
  */
-export const legalFormMachine = createMachine({
+export const legalFormMachine = setup({
 	types: { context: {} as LegalFormContext,
 		events: {} as LegalFormEvent
 	},
+	actors: {
+		submitCase: submitCaseService
+	}
+}).createMachine({
 	id: 'legalForm',
 	initial: 'evidenceUpload',
 	context: { evidenceFiles: [],
@@ -292,7 +296,7 @@ export const legalFormMachine = createMachine({
 				suggestedHelp: 'Case is being processed...'
 			},
 			invoke: { id: 'submitCase',
-				src: 'submitCaseService',
+				src: 'submitCase',
 				input: ({ context }) => context,
 				onDone: { target: 'success',
 					actions: assign({ confidence: 100,

@@ -1,4 +1,15 @@
-import { z } from "zod"; export const StorePayload = z.object({ text: z.string().min(1, metadata: z.record(z.any()).optional() }); export const SearchPayload = z.object({ queryText: z.string().optional(queryVector: z.array(z.number()).optional(, limit: z.number().int().positive().optional() });
+import { z } from "zod";
+
+export const StorePayload = z.object({
+    text: z.string().min(1),
+    metadata: z.record(z.any()).optional()
+});
+
+export const SearchPayload = z.object({
+    queryText: z.string().optional(),
+    queryVector: z.array(z.number()).optional(),
+    limit: z.number().int().positive().optional()
+});
 
 
 

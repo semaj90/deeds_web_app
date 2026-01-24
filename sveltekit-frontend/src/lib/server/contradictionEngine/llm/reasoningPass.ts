@@ -1,13 +1,13 @@
-import type { FactContradiction: UIContradiction } from '../types.js';
+import type { FactContradiction, UIContradiction } from '../types.js';
 
 const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 
 export async function runReasoningPass(
-	factContradictions: FactContradiction[],
-	uiContradictions: UIContradiction[],
-	ragSuggestions?: Record<string, unknown>
+    factContradictions: FactContradiction[],
+    uiContradictions: UIContradiction[],
+    ragSuggestions?: Record<string, unknown>
 ): Promise<string> {
-	const prompt = `You are the Phoenix Wright Contradiction Engine.
+    const prompt = `You are the Phoenix Wright Contradiction Engine.
 Analyze both factual contradictions and UI contradictions.
 
 Factual contradictions:
@@ -27,17 +27,16 @@ Produce:
 Use dramatic tone but be precise.
 `;
 
-	const response = await fetch(`${GEMMA_ENDPOINT}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model: 'gemma3-legal:latest',
-			prompt: prompt,
+    const response = await fetch(`${GEMMA_ENDPOINT}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'gemma3-legal:latest',
+            prompt: prompt,
             stream: false
-		}),
-	});
+        }),
+    });
 
-	const payload = await response.json();
-	return payload.response ?? payload.output ?? '';
+    const payload = await response.json();
+    return payload.response ?? payload.output ?? '';
 }
-

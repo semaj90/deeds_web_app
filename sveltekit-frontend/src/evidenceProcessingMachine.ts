@@ -2,7 +2,7 @@
  * XState State Machine for Evidence Processing Workflow
  * Handles the complete lifecycle of evidence from upload to AI analysis
  */
-import { assign, createMachine, fromPromise } from 'xstate';
+import { assign, fromPromise, setup } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
@@ -91,14 +91,14 @@ async function callProcessingAPI(
 }
 
 // Main state machine
-export const evidenceProcessingMachine = createMachine({
+export const evidenceProcessingMachine = setup({
 	types: {
 		context: {} as EvidenceProcessingContext,
 		events: {} as EvidenceProcessingEvent
 	},
 	actors: {
-		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }>(
-			async ({ input }: { input: EvidenceProcessingContext }) => {
+		documentProcessing: fromPromise<{ jobId: string; extractedText?: string; processingTime: number }, { input: EvidenceProcessingContext }>(
+			async ({ input }) => {
 				console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
 				const result = await callProcessingAPI('document', {
@@ -124,8 +124,8 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }>(
-			async ({ input }: { input: EvidenceProcessingContext }) => {
+		embeddingGeneration: fromPromise<{ chunks: Array<{ text: string; embedding: number[] }> }, { input: EvidenceProcessingContext }>(
+			async ({ input }) => {
 				console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
 				const result = await callProcessingAPI('embeddings', {
@@ -150,8 +150,8 @@ export const evidenceProcessingMachine = createMachine({
 			classification: string;
 			riskAssessment?: string;
 			recommendations?: string[];
-		}>(
-			async ({ input }: { input: EvidenceProcessingContext }) => {
+		}, { input: EvidenceProcessingContext }>(
+			async ({ input }) => {
 				console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
 				const result = await callProcessingAPI('analysis', {
@@ -170,8 +170,8 @@ export const evidenceProcessingMachine = createMachine({
 				};
 			}
 		),
-		cacheResults: fromPromise<any>(
-			async ({ input }: { input: EvidenceProcessingContext }) => {
+		cacheResults: fromPromise<any, { input: EvidenceProcessingContext }>(
+			async ({ input }) => {
 				console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
 				const finalResult = {
@@ -203,7 +203,8 @@ export const evidenceProcessingMachine = createMachine({
 	},
 	guards: {
 		canRetry: ({ context }) => context.retryCount < context.maxRetries
-	},
+	}
+}).createMachine({
 	id: 'evidenceProcessing',
 	initial: 'idle',
 	context: {

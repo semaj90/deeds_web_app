@@ -3,9 +3,12 @@ import path from 'path';
 import type { AuthenticatedUser } from './auth-guard.js';
 
 export interface AuditEntry {
-	timestamp: string; action: 'upload' | 'delete' | 'access' | 'update';
-	userId: string; userEmail: string;
-	bucket: string; key: string;
+	timestamp: string;
+	action: 'upload' | 'delete' | 'access' | 'update';
+	userId: string;
+	userEmail: string;
+	bucket: string;
+	key: string;
 	ip?: string;
 	userAgent?: string;
 	error?: string;
@@ -39,8 +42,8 @@ export class StorageAuditLogger {
 			userEmail: user.email,
 			bucket,
 			key,
-			ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') ?? 'unknown',
-			userAgent: request.headers.get('user-agent') ?? 'unknown',
+			ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+			userAgent: request.headers.get('user-agent') || 'unknown',
 			error,
 			metadata
 		};
@@ -56,7 +59,7 @@ export class StorageAuditLogger {
 			const logLine = JSON.stringify(entry) + '\n';
 			await fs.promises.appendFile(this.logFile, logLine);
 		} catch (error) {
-			console.error('Failed to write audit log to file: ', error);
+			console.error('Failed to write audit log to file:', error);
 		}
 	}
 
@@ -64,17 +67,17 @@ export class StorageAuditLogger {
 	 * Query audit logs (for admin dashboard)
 	 */
 	static async getAuditLogs(filters: {
-		userId?: string,
-		action?: string,
+		userId?: string;
+		action?: string;
 		bucket?: string;
 		startDate?: Date;
 		endDate?: Date;
 		limit?: number;
 	} = {}): Promise<AuditEntry[]> {
 		try {
-			return this.queryLogFile(filters);
+			return await this.queryLogFile(filters);
 		} catch (error) {
-			console.error('Failed to query audit logs: ', error);
+			console.error('Failed to query audit logs:', error);
 			return [];
 		}
 	}
@@ -84,45 +87,48 @@ export class StorageAuditLogger {
 	 */
 	private static async queryLogFile(filters: Record<string, unknown>): Promise<AuditEntry[]> {
 		try {
+			// Check if file exists
+			try {
+				await fs.promises.access(this.logFile);
+			} catch {
+				return [];
+			}
+
 			const content = await fs.promises.readFile(this.logFile, 'utf-8');
-			const lines = content.split('\n');.map((line) => {
+
+			let entries = content.split('\n')
+				.filter(line => line.trim())
+				.map((line) => {
 					try {
 						return JSON.parse(line) as AuditEntry;
 					} catch {
 						return null;
 					}
 				})
-				.filter(Boolean) as AuditEntry[];
+				.filter((e): e is AuditEntry => e !== null);
 
 			// Apply filters
-			if ((filters as any).userId) {
-				entries = entries.filter((e) => e.userId === (filters as any).userId);
+			if (filters.userId) {
+				entries = entries.filter((e) => e.userId === filters.userId);
 			}
-			if ((filters as any).action) {
-				entries = entries.filter((e) => e.action === (filters as any).action);
+			if (filters.action) {
+				entries = entries.filter((e) => e.action === filters.action);
 			}
-			if ((filters as any).bucket) {
-				entries = entries.filter((e) => e.bucket === (filters as any).bucket);
+			if (filters.bucket) {
+				entries = entries.filter((e) => e.bucket === filters.bucket);
 			}
 
 			// Sort by timestamp (newest first)
 			entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-			if ((filters as any).limit) {
-				entries = entries.slice(0, (filters as any).limit);
+			if (filters.limit && typeof filters.limit === 'number') {
+				entries = entries.slice(0, filters.limit);
 			}
 
 			return entries;
 		} catch (error) {
-			console.error('Failed to query log file: ', error);
+			console.error('Failed to query log file:', error);
 			return [];
 		}
 	}
 }
-
-
-
-
-
-
-
