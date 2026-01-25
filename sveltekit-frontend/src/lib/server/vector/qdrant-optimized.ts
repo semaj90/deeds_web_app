@@ -438,14 +438,13 @@ class OptimizedQdrantService {
       });
 
       logger.info('Qdrant batch upsert completed', { ...context, totalUpserted, processingTime });
-
-       logger.error('Qdrant batch upsert failed',
-         error instanceof Error ? error : new Error(String(error)),
-         { ...context, errorMessage }
-       );
-       const errorMessage = error instanceof Error ? error.message : String(error);
-       logger.error('Qdrant batch upsert failed', { ...context, errorMessage });
-       throw error;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Qdrant batch upsert failed',
+        error instanceof Error ? error : new Error(String(error)),
+        { ...context, errorMessage }
+      );
+      throw error;
     }
   }
 

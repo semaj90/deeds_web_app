@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
 import { db } from '../db/index.js';
-import { cases } from '../db/schema-postgres-enhanced.js';
+import { cases } from '../db/schema.js';
 import type { QdrantApiWrapper } from './qdrant-api-wrapper.js';
 import { createQdrantWrapper } from './qdrant-api-wrapper.js';
 
@@ -22,7 +22,7 @@ interface KeywordSearchResult {
 }
 
 interface QdrantPayload {
-	content: string;
+	content?: string;
 	[key: string]: unknown;
 }
 
