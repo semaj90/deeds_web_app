@@ -5,233 +5,242 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 
 export interface RawDocument {
- id: string; title: string;
- text: string; source: 'local' | 'minio';
- filePath?: string;
- bucketKey?: string;
- metadata?: Record<string, unknown>;
+    id: string;
+    title: string;
+    text: string;
+    source: 'local' | 'minio';
+    filePath?: string;
+    bucketKey?: string;
+    metadata?: Record<string, unknown>;
 }
 
 export class PDFFileLoader {
- private localBasePath: string;
- private minioClient?: any;
- private minioBucket?: string;
+    private localBasePath: string;
+    private minioClient?: any;
+    private minioBucket?: string;
 
- constructor(localBasePath, string = './lawpdfs', minioClient?: any, minioBucket?: string) {
- this.localBasePath = localBasePath;
- this.minioClient = minioClient;
- this.minioBucket = minioBucket;
- }
+    constructor(
+        localBasePath: string = './lawpdfs',
+        minioClient?: any,
+        minioBucket?: string
+    ) {
+        this.localBasePath = localBasePath;
+        this.minioClient = minioClient;
+        this.minioBucket = minioBucket;
+    }
 
- /**
- * Get all PDF files from local directory
- */
- getLocalPDFFiles(): string[] {
- if (!fs.existsSync(this.localBasePath)) {
- console.warn(`Local path does not exist: ${this.localBasePath}`);
- return [];
- }
+    /**
+     * Get all PDF files from local directory
+     */
+    getLocalPDFFiles(): string[] {
+        if (!fs.existsSync(this.localBasePath)) {
+            console.warn(`Local path does not exist: ${this.localBasePath}`);
+            return [];
+        }
 
- const files = fs.readdirSync(this.localBasePath);
- return files
- .filter((file) => file.toLowerCase().endsWith('.pdf'))
- .map((file) => path.join(this.localBasePath, file));
- }
+        const files = fs.readdirSync(this.localBasePath);
+        return files
+            .filter((file) => file.toLowerCase().endsWith('.pdf'))
+            .map((file) => path.join(this.localBasePath, file));
+    }
 
- /**
- * Get PDF file count from local directory
- */
- getLocalPDFCount(): number {
- return this.getLocalPDFFiles().length;
- }
+    /**
+     * Get PDF file count from local directory
+     */
+    getLocalPDFCount(): number {
+        return this.getLocalPDFFiles().length;
+    }
 
- /**
- * Extract text from PDF buffer
- */
- private async extractTextFromPDF(buffer: Buffer): Promise<string> {
- try {
- const data = await pdfParse(buffer);
- return data?.text ?? '';
- } catch (error) {
- console.error('Error parsing PDF:', error);
- return '';
- }
- }
+    /**
+     * Extract text from PDF buffer
+     */
+    private async extractTextFromPDF(buffer: Buffer): Promise<string> {
+        try {
+            const data = await pdfParse(buffer);
+            return data?.text ?? '';
+        } catch (error) {
+            console.error('Error parsing PDF:', error);
+            return '';
+        }
+    }
 
- /**
- * Load PDF from local filesystem
- */
- async loadLocalPDF(filePath: string): Promise<RawDocument | null> {
- try {
- if (!fs.existsSync(filePath)) {
- console.warn(`File not found: ${filePath}`);
- return null;
- }
+    /**
+     * Load PDF from local filesystem
+     */
+    async loadLocalPDF(filePath: string): Promise<RawDocument | null> {
+        try {
+            if (!fs.existsSync(filePath)) {
+                console.warn(`File not found: ${filePath}`);
+                return null;
+            }
 
- const buffer = fs.readFileSync(filePath);
- const text = await this.extractTextFromPDF(buffer);
+            const buffer = fs.readFileSync(filePath);
+            const text = await this.extractTextFromPDF(buffer);
 
- if (!text || text.trim().length === 0) {
- console.warn(`No text extracted from: ${filePath}`);
- return null;
- }
+            if (!text || text.trim().length === 0) {
+                console.warn(`No text extracted from: ${filePath}`);
+                return null;
+            }
 
- const fileName = path.basename(filePath, '.pdf');
- const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const fileName = path.basename(filePath, '.pdf');
+            const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
- return {
-  id,
-  title: title.trim(),
-  source: 'local',
-  filePath,
-  metadata: {
-   fileSize: buffer.length,
-   loadedAt: new Date().toISOString(),
-  },
- };
- } catch (error) {
- console.error(`Error loading PDF ${filePath}:`, error);
- return null;
- }
- }
+            return {
+                id,
+                title: fileName.trim(), // Assuming title is derived from filename
+                text: text, // Add text field required by interface
+                source: 'local',
+                filePath,
+                metadata: {
+                    fileSize: buffer.length,
+                    loadedAt: new Date().toISOString(),
+                },
+            };
+        } catch (error) {
+            console.error(`Error loading PDF ${filePath}:`, error);
+            return null;
+        }
+    }
 
- /**
- * Load PDF from MinIO bucket
- */
- async loadMinioPDF(bucketKey: string): Promise<RawDocument | null> {
- if (!this?.minioClient|| !this.minioBucket) {
- console.error('MinIO client not configured');
- return null;
- }
+    /**
+     * Load PDF from MinIO bucket
+     */
+    async loadMinioPDF(bucketKey: string): Promise<RawDocument | null> {
+        if (!this.minioClient || !this.minioBucket) {
+            console.error('MinIO client not configured');
+            return null;
+        }
 
- try {
- const buffer = await this.minioClient.getObject(this.minioBucket, bucketKey);
- const chunks: Buffer[] = [];
+        try {
+            const bufferStream = await this.minioClient.getObject(this.minioBucket, bucketKey);
+            const chunks: Buffer[] = [];
 
- return new Promise((resolve, reject) => {
- buffer.on('data', (chunk: Buffer) => chunks.push(chunk));
- buffer.on('end', async () => {
- try {
- const fullBuffer = Buffer.concat(chunks);
- const text = await this.extractTextFromPDF(fullBuffer);
+            // cast stream to any to allow .on(). MinIO methods usually return Readable
+            const stream = bufferStream as any;
 
- if (!text || text.trim().length === 0) {
- console.warn(`No text extracted from MinIO: ${ bucketKey }`);
- resolve(null);
- return;
- }
+            return new Promise((resolve, reject) => {
+                stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+                stream.on('end', async () => {
+                    try {
+                        const fullBuffer = Buffer.concat(chunks);
+                        const text = await this.extractTextFromPDF(fullBuffer);
 
- const fileName = path.basename(bucketKey, '.pdf');
- const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                        if (!text || text.trim().length === 0) {
+                            console.warn(`No text extracted from MinIO: ${bucketKey}`);
+                            resolve(null);
+                            return;
+                        }
 
- resolve({
-  id,
-  title: title.trim(),
-  source: 'minio',
-  bucketKey,
-  metadata: {
-   fileSize: fullBuffer.length,
-   loadedAt: new Date().toISOString(),
-  },
- });
- } catch (error) {
- reject(error);
- }
- });
- buffer.on('error', reject);
- });
- } catch (error) {
- console.error(`Error loading PDF from MinIO ${bucketKey}:`, error);
- return null;
- }
- }
+                        const fileName = path.basename(bucketKey, '.pdf');
+                        const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
- /**
- * Load batch of PDFs from local directory
- */
- async loadLocalBatch(limit: number = 100: offset = 0): Promise<RawDocument[]> {
- const files = this.getLocalPDFFiles();
- const batch = files.slice(offset, offset + limit);
- const documents: RawDocument[] = [];
+                        resolve({
+                            id,
+                            title: fileName.trim(),
+                            text: text, // Add text field
+                            source: 'minio',
+                            bucketKey,
+                            metadata: {
+                                fileSize: fullBuffer.length,
+                                loadedAt: new Date().toISOString(),
+                            },
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+                stream.on('error', reject);
+            });
+        } catch (error) {
+            console.error(`Error loading PDF from MinIO ${bucketKey}:`, error);
+            return null;
+        }
+    }
 
- for (const filePath of batch) {
- const doc = await this.loadLocalPDF(filePath);
- if (doc) {
- documents.push(doc);
- }
- }
+    /**
+     * Load batch of PDFs from local directory
+     */
+    async loadLocalBatch(limit: number = 100, offset: number = 0): Promise<RawDocument[]> {
+        const files = this.getLocalPDFFiles();
+        const batch = files.slice(offset, offset + limit);
+        const documents: RawDocument[] = [];
 
- return documents;
- }
+        for (const filePath of batch) {
+            const doc = await this.loadLocalPDF(filePath);
+            if (doc) {
+                documents.push(doc);
+            }
+        }
 
- /**
- * Load batch of PDFs from MinIO bucket
- */
- async loadMinioBatch(prefix, string = '', limit: number = 100): Promise<RawDocument[]> {
- if (!this?.minioClient|| !this.minioBucket) {
- console.error('MinIO client not configured');
- return [];
- }
+        return documents;
+    }
 
- try {
- const objectsList: string[] = [];
- const stream = this.minioClient.listObjects(this.minioBucket, prefix, true);
+    /**
+     * Load batch of PDFs from MinIO bucket
+     */
+    async loadMinioBatch(prefix: string = '', limit: number = 100): Promise<RawDocument[]> {
+        if (!this.minioClient || !this.minioBucket) {
+            console.error('MinIO client not configured');
+            return [];
+        }
 
- return new Promise((resolve, reject) => {
- stream.on('data', (obj: any) => {
- if (obj.name.toLowerCase().endsWith('.pdf')) {
- objectsList.push(obj.name);
- }
- });
- stream.on('end', async () => {
- const batch = objectsList.slice(0, limit);
- const documents: RawDocument[] = [];
+        try {
+            const objectsList: string[] = [];
+            const stream = this.minioClient.listObjects(this.minioBucket, prefix, true);
 
- for (const key of batch) {
- const doc = await this.loadMinioPDF(key);
- if (doc) {
- documents.push(doc);
- }
- }
+            return new Promise((resolve, reject) => {
+                stream.on('data', (obj: any) => {
+                    if (obj.name && obj.name.toLowerCase().endsWith('.pdf')) {
+                        objectsList.push(obj.name);
+                    }
+                });
+                stream.on('end', async () => {
+                    const batch = objectsList.slice(0, limit);
+                    const documents: RawDocument[] = [];
 
- resolve(documents);
- });
- stream.on('error', reject);
- });
- } catch (error) {
- console.error('Error loading batch from MinIO:', error);
- return [];
- }
- }
+                    for (const key of batch) {
+                        const doc = await this.loadMinioPDF(key);
+                        if (doc) {
+                            documents.push(doc);
+                        }
+                    }
 
- /**
- * Get statistics about available documents
- */
- getStats(): { localPDFCount: number;
- localPath: string; minioConfigured: boolean;
- } {
- return {
- localPDFCount: this.getLocalPDFCount(localPath: this.localBasePath,
- minioConfigured: !!this?.minioClient&& !!this.minioBucket,
- },
- }
+                    resolve(documents);
+                });
+                stream.on('error', reject);
+            });
+        } catch (error) {
+            console.error('Error loading batch from MinIO:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get statistics about available documents
+     */
+    getStats(): {
+        localPDFCount: number;
+        localPath: string;
+        minioConfigured: boolean;
+    } {
+        return {
+            localPDFCount: this.getLocalPDFCount(),
+            localPath: this.localBasePath,
+            minioConfigured: !!this.minioClient && !!this.minioBucket,
+        };
+    }
 }
 
 /**
  * Create PDF file loader instance
  */
 export async function createPDFFileLoader(
- localBasePath?: string,
- minioClient?: any,
- minioBucket?: string
+    localBasePath?: string,
+    minioClient?: any,
+    minioBucket?: string
 ): Promise<PDFFileLoader> {
- return new PDFFileLoader(localBasePath, minioClient, minioBucket);
+    return new PDFFileLoader(localBasePath, minioClient, minioBucket);
 }
-
-
-
-
-

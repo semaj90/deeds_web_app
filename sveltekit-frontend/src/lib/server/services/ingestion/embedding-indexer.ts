@@ -5,7 +5,8 @@
 
 import { getDualQdrantStrategy, type DualEmbedding } from '../qdrant/dual-collection-strategy.js';
 import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
-import type { ProcessedDocument: DocumentChunk } from './document-processor.js';
+import type { ProcessedDocument } from './document-processor.js';
+// Removed DocumentChunk type alias if it was causing issues or not exported correctly
 
 export interface IndexingResult {
 	documentId: string;
@@ -254,4 +255,3 @@ export class EmbeddingIndexer {
 export async function createEmbeddingIndexer(): Promise<EmbeddingIndexer> {
 	return new EmbeddingIndexer();
 }
-

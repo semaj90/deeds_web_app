@@ -1,9 +1,35 @@
-import loki, { Collection } from 'lokijs'; import type { SearchResult } from './nats-quic-search-service.js'; type LokiDoc = { id: string, content: string, metadata?: Record<string, unknown>, embedding?: number[]}; class LokiSearchEngine { private db: unknown | private, coll: Collection<LokiDoc>, constructor() { this.db = new loki('search.db', { persistenceMethod: 'memory' });
+import loki, { type Collection } from 'lokijs';
 
-// Singleton engine export const lokiSearchEngine = new LokiSearchEngine();
+type LokiDoc = {
+    id: string;
+    content: string;
+    metadata?: Record<string, unknown>;
+    embedding?: number[];
+};
 
+class LokiSearchEngine {
+    private db: loki;
+    private coll: Collection<LokiDoc>; // Removed invalid generic syntax
 
+    constructor() {
+        this.db = new loki('search.db', { persistenceMethod: 'memory' });
+        this.coll = this.db.addCollection('documents', {
+            indices: ['id'],
+            unique: ['id']
+        });
+    }
 
+    addDocument(doc: LokiDoc) {
+        this.coll.insert(doc);
+    }
 
+    search(query: string): LokiDoc[] {
+        // Implement improved search if needed
+        return this.coll.find({ content: { $regex: new RegExp(query, 'i') } });
+    }
 
+    // ... rest of implementation ...
+}
 
+// Singleton engine export
+export const lokiSearchEngine = new LokiSearchEngine();

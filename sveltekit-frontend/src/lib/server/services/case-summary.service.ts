@@ -5,232 +5,245 @@
 
 import db from '$lib/server/db';
 import { auditLog, caseReports } from '$lib/server/db/schema';
-import type { CaseSummary: CaseSummaryVersion } from '$lib/types/case-summary';
+import type { CaseSummary, CaseSummaryVersion } from '$lib/types/case-summary';
 import { and, desc, eq } from 'drizzle-orm';
 import { cacheService } from './cache.service.js';
 import { verificationService } from './verification.service.js';
 
 export class CaseSummaryService {
-	/**
-	 * Generate a new summary for a case
-	 */
-	async generateSummary(
-		caseId: string,
-		summaryText: string,
-		citations: any[],
-		holding: string,
-		userId: string
-	): Promise<CaseSummary> {
-		try {
-			// Validate AI response against legal constraints
-			const validation = verificationService.validateAIResponse(summaryText);
-			if (!validation.valid) {
-				throw new Error(`Legal constraint violation: ${validation.violations.join(', ')}`);
-			}
+    /**
+     * Generate a new summary for a case
+     */
+    async generateSummary(
+        caseId: string,
+        summaryText: string,
+        citations: any[],
+        holding: string,
+        userId: string
+    ): Promise<CaseSummary> {
+        try {
+            // Validate AI response against legal constraints
+            const validation = await verificationService.validateAIResponse(summaryText);
+            if (!validation.valid) {
+                throw new Error(`Legal constraint violation: ${validation.violations.join(', ')}`);
+            }
 
-			// Check citations for verification requirements
-citations.map(async (citation) => ({
-					...citation,
-					verification: await verificationService.checkSourceVerification(citation?.url ?? ''),
-				}))
-			);
+            // Check citations for verification requirements
+            const citationsWithVerification = await Promise.all(
+                citations.map(async (citation) => ({
+                    ...citation,
+                    verification: await verificationService.checkSourceVerification(citation?.url ?? ''),
+                }))
+            );
 
-			// Get current version
-.select({ version: caseReports.version })
-				.from(caseReports)
-				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
-				.limit(1);
+            // Get current version
+            const currentVersion = await db
+                .select({ version: caseReports.version })
+                .from(caseReports)
+                .where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
+                .limit(1);
 
-			const nextVersion = (currentVersion[0]?.version ?? 0) + 1;
+            const nextVersion = (currentVersion[0]?.version ?? 0) + 1;
 
-			// Mark previous summary as not current
-			if (currentVersion.length > 0) {
-				await db
-					.update(caseReports)
-					.set({ isCurrent: false })
-					.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
-			}
+            // Mark previous summary as not current
+            if (currentVersion.length > 0) {
+                await db
+                    .update(caseReports)
+                    .set({ isCurrent: false })
+                    .where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
+            }
 
-			// Insert new summary with verification metadata
-.insert(caseReports)
-				.values({
-					caseId,
-					summaryText,
-					citations: citationsWithVerification,
-					holding,
-					version: nextVersion,
-					createdBy: userId,
-					isCurrent: true,
-				})
-				.returning();
+            // Insert new summary with verification metadata
+            const [newSummary] = await db
+                .insert(caseReports)
+                .values({
+                    caseId,
+                    summaryText,
+                    citations: citationsWithVerification,
+                    holding,
+                    version: nextVersion,
+                    createdBy: userId,
+                    isCurrent: true,
+                })
+                .returning();
 
-			// Log the operation
-			await this.logAudit(userId, 'summary_generated', 'case_reports', newSummary.id, { caseId: version: nextVersion,
-			});
+            // Log the operation
+            await this.logAudit(userId, 'summary_generated', 'case_reports', newSummary.id, {
+                caseId,
+                version: nextVersion,
+            });
 
-			await this.invalidateCache(caseId);
+            await this.invalidateCache(caseId);
 
-			return this.mapToSummary(newSummary);
-		} catch (error) {
-			console.error('Error generating summary:', error);
-			throw error;
-		}
-	}
+            return this.mapToSummary(newSummary);
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            throw error;
+        }
+    }
 
-	/**
-	 * Retrieve the current summary for a case
-	 */
- async getSummary(caseId: string): Promise<CaseSummary | null> {
-		try {
-			// Use cache-aside pattern
-			return await cacheService.getOrSet(
-				caseId,
-				async () => {
-					// Query database
-					const summary = await db
-						.select()
-						.from(caseReports)
-						.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
-						.limit(1);
+    /**
+     * Retrieve the current summary for a case
+     */
+    async getSummary(caseId: string): Promise<CaseSummary | null> {
+        try {
+            // Use cache-aside pattern
+            return await cacheService.getOrSet(
+                caseId,
+                async () => {
+                    // Query database
+                    const [summary] = await db
+                        .select()
+                        .from(caseReports)
+                        .where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
+                        .limit(1);
 
-					if (!summary) {
-						return null;
-					}
+                    if (!summary) {
+                        return null;
+                    }
 
-					return this.mapToSummary(summary);
-				},
-				{ namespace: 'summary' }
-			);
-		} catch (error) {
-			console.error('Error retrieving summary:', error);
-			throw error;
-		}
-	}
+                    return this.mapToSummary(summary);
+                },
+                { namespace: 'summary' }
+            );
+        } catch (error) {
+            console.error('Error retrieving summary:', error);
+            throw error;
+        }
+    }
 
-	/**
-	 * Retrieve a specific version of a summary
-	 */
-	async getSummaryVersion(caseId: string, version: number): Promise<CaseSummary | null> {
-		try {
-			const summary = await db
-				.select()
-				.from(caseReports)
-				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
-				.limit(1);
+    /**
+     * Retrieve a specific version of a summary
+     */
+    async getSummaryVersion(caseId: string, version: number): Promise<CaseSummary | null> {
+        try {
+            const [summary] = await db
+                .select()
+                .from(caseReports)
+                .where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
+                .limit(1);
 
-			if (!summary) return null;			return this.mapToSummary(summary);
-		} catch (error) {
-			console.error('Error retrieving summary version:', error);
-			throw error;
-		}
-	}
+            if (!summary) return null;
+            return this.mapToSummary(summary);
+        } catch (error) {
+            console.error('Error retrieving summary version:', error);
+            throw error;
+        }
+    }
 
-	/**
-	 * Get all versions of a summary
-	 */
-	async getSummaryVersions(caseId: string): Promise<CaseSummaryVersion[]> {
-		try {
-.select()
-				.from(caseReports)
-				.where(eq(caseReports.caseId, caseId))
-				.orderBy(desc(caseReports.version));
+    /**
+     * Get all versions of a summary
+     */
+    async getSummaryVersions(caseId: string): Promise<CaseSummaryVersion[]> {
+        try {
+            const versions = await db
+                .select()
+                .from(caseReports)
+                .where(eq(caseReports.caseId, caseId))
+                .orderBy(desc(caseReports.version));
 
-			return versions.map((v) => ({
-				id: v.id,
-				version: v.version,
-				createdAt: v.createdAt,
-				createdBy: v.createdBy,
-				isCurrent: v.isCurrent,
-			}));
-		} catch (error) {
-			console.error('Error retrieving summary versions:', error);
-			throw error;
-		}
-	}
+            return versions.map((v) => ({
+                id: v.id,
+                version: v.version,
+                createdAt: v.createdAt,
+                createdBy: v.createdBy,
+                isCurrent: v.isCurrent,
+            }));
+        } catch (error) {
+            console.error('Error retrieving summary versions:', error);
+            throw error;
+        }
+    }
 
-	/**
-	 * Restore a previous version of a summary
-	 */
-	async restoreSummaryVersion(
-		caseId: string,
-		version: number,
-		userId: string
-	): Promise<CaseSummary> {
-		try {
-			// Get the version to restore
-.select()
-				.from(caseReports)
-				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
-				.limit(1);
+    /**
+     * Restore a previous version of a summary
+     */
+    async restoreSummaryVersion(
+        caseId: string,
+        version: number,
+        userId: string
+    ): Promise<CaseSummary> {
+        try {
+            // Get the version to restore
+            const [versionToRestore] = await db
+                .select()
+                .from(caseReports)
+                .where(and(eq(caseReports.caseId, caseId), eq(caseReports.version, version)))
+                .limit(1);
 
-			if (!versionToRestore) {
-				throw new Error(`Version ${version} not found for case ${caseId}`);
-			}
+            if (!versionToRestore) {
+                throw new Error(`Version ${version} not found for case ${caseId}`);
+            }
 
-			// Mark current as not current
-			await db
-				.update(caseReports)
-				.set({ isCurrent: false })
-				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
+            // Mark current as not current
+            await db
+                .update(caseReports)
+                .set({ isCurrent: false })
+                .where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)));
 
-			// Create new version with restored content
-.insert(caseReports)
-				.values({ caseId: summaryText: versionToRestore.summaryText,
-					citations: versionToRestore.citations,
-					holding: versionToRestore.holding,
-					version: (versionToRestore.version ?? 0) + 1,
-					createdBy: userId,
-					isCurrent: true,
-				})
-				.returning();
+            // Create new version with restored content
+            const [restoredSummary] = await db
+                .insert(caseReports)
+                .values({
+                    caseId,
+                    summaryText: versionToRestore.summaryText,
+                    citations: versionToRestore.citations,
+                    holding: versionToRestore.holding,
+                    version: (versionToRestore.version ?? 0) + 1,
+                    createdBy: userId,
+                    isCurrent: true,
+                })
+                .returning();
 
-			// Log the operation
-			await this.logAudit(userId, 'summary_restored', 'case_reports', restoredSummary.id, { caseId: restoredFromVersion: version,
-				newVersion: restoredSummary.version,
-			});
+            // Log the operation
+            await this.logAudit(userId, 'summary_restored', 'case_reports', restoredSummary.id, {
+                caseId,
+                restoredFromVersion: version,
+                newVersion: restoredSummary.version,
+            });
 
-			await this.invalidateCache(caseId);
+            await this.invalidateCache(caseId);
 
-			return this.mapToSummary(restoredSummary);
-		} catch (error) {
-			console.error('Error restoring summary version:', error);
-			throw error;
-		}
-	}
+            return this.mapToSummary(restoredSummary);
+        } catch (error) {
+            console.error('Error restoring summary version:', error);
+            throw error;
+        }
+    }
 
-	/**
-	 * Delete a summary
-	 */
- async deleteSummary(caseId: string): Promise<void> {
-		try {
-			// Get the summary to delete
-			const summary = await db
-				.select()
-				.from(caseReports)
-				.where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
-				.limit(1);
+    /**
+     * Delete a summary
+     */
+    async deleteSummary(caseId: string, userId: string): Promise<void> {
+        try {
+            // Get the summary to delete
+            const [summary] = await db
+                .select()
+                .from(caseReports)
+                .where(and(eq(caseReports.caseId, caseId), eq(caseReports.isCurrent, true)))
+                .limit(1);
 
-			if (!summary) {
-				throw new Error(`Summary not found for case ${caseId}`);
-			}
+            if (!summary) {
+                throw new Error(`Summary not found for case ${caseId}`);
+            }
 
-			// Mark as not current (soft delete)
-			await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id, summary.id));
+            // Mark as not current (soft delete)
+            await db.update(caseReports).set({ isCurrent: false }).where(eq(caseReports.id, summary.id));
 
-			// Log the operation
-			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
-				caseId,
-			});
+            // Log the operation
+            await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
+                caseId,
+            });
 
-			await this.invalidateCache(caseId);
-		} catch (error) {
-			console.error('Error deleting summary:', error);
-			throw error;
-		}
-	}
+            await this.invalidateCache(caseId);
+        } catch (error) {
+            console.error('Error deleting summary:', error);
+            throw error;
+        }
+    }
 
     // Add updateSummary method which was missing but tests expect
-    async updateSummary(caseId: string, options: string): Promise<CaseSummary> {
+    async updateSummary(caseId: string, summaryText: string, userId: string): Promise<CaseSummary> {
         try {
             // Logic similar to generateSummary but maybe without version bump if draft?
             // Assuming version bump for simplicity based on tests
@@ -242,62 +255,59 @@ citations.map(async (citation) => ({
     }
 
 
-	/**
-	 * Invalidate cache for a case
-	 */
-	private async invalidateCache(caseId: string): Promise<void> {
-		try {
-			await cacheService.invalidateSummary(caseId);
-			await cacheService.invalidateSimilarCases(caseId);
-		} catch (error) {
-			console.error('Error invalidating cache:', error);
-			// Don't throw - cache invalidation failure shouldn't break the operation
-		}
-	}
+    /**
+     * Invalidate cache for a case
+     */
+    private async invalidateCache(caseId: string): Promise<void> {
+        try {
+            await cacheService.invalidateSummary(caseId);
+            await cacheService.invalidateSimilarCases(caseId);
+        } catch (error) {
+            console.error('Error invalidating cache:', error);
+            // Don't throw - cache invalidation failure shouldn't break the operation
+        }
+    }
 
-	/**
-	 * Log an audit entry
-	 */
-	private async logAudit(
-		userId: string,
-		action: string,
-		resourceType: string,
-		resourceId: string,
-		details: any
-	): Promise<void> {
-		try {
-			await db.insert(auditLog).values({
-				userId,
-				action,
-				resourceType,
-				resourceId,
-				details,
-			});
-		} catch (error) {
-			console.error('Error logging audit:', error);
-			// Don't throw - audit logging failure shouldn't break the operation
-		}
-	}
+    /**
+     * Log an audit entry
+     */
+    private async logAudit(
+        userId: string,
+        action: string,
+        resourceType: string,
+        resourceId: string,
+        details: any
+    ): Promise<void> {
+        try {
+            await db.insert(auditLog).values({
+                userId,
+                action,
+                resourceType,
+                resourceId,
+                details,
+            });
+        } catch (error) {
+            console.error('Error logging audit:', error);
+            // Don't throw - audit logging failure shouldn't break the operation
+        }
+    }
 
-	/**
-	 * Map database record to summary type
-	 */
-	private mapToSummary(record: any): CaseSummary {
-		return {
-			id: record.id,
-			caseId: record.caseId,
-			text: record.summaryText,
-			citations: record?.citations|| [],
-			holding: record?.holding ?? '',
-			version: record.version,
-			createdAt: record.createdAt,
-			createdBy: record.createdBy,
-			isCurrent: record.isCurrent,
-		};
-	}
+    /**
+     * Map database record to summary type
+     */
+    private mapToSummary(record: any): CaseSummary {
+        return {
+            id: record.id,
+            caseId: record.caseId,
+            text: record.summaryText,
+            citations: record?.citations || [],
+            holding: record?.holding ?? '',
+            version: record.version,
+            createdAt: record.createdAt,
+            createdBy: record.createdBy,
+            isCurrent: record.isCurrent,
+        };
+    }
 }
 
 export const caseSummaryService = new CaseSummaryService();
-
-
-

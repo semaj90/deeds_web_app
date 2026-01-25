@@ -4,97 +4,107 @@
  */
 
 import { createActor } from 'xstate';
-import {
- clusteringMachineDef,$1;$2$1;$2} from './xstate-machine.js';
+import { clusteringMachineDef, type ClusteringContext, type ClusteringSnapshot } from './xstate-machine.js';
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
- jobId: string; status: 'success' | 'failed' | 'timeout';
- context: ClusteringContext; executionTimeMs: number;
- error?: Error;
+    jobId: string;
+    status: 'success' | 'failed' | 'timeout';
+    context: ClusteringContext;
+    executionTimeMs: number;
+    error?: Error;
 }
 
 /**
  * Run clustering workflow with timeout and progress tracking
  */
 export async function runClusteringWorkflow(
- input: ClusteringContext, timeoutMs: number = 3600000 // 1 hour
+    input: ClusteringContext,
+    timeoutMs: number = 3600000 // 1 hour
 ): Promise<OrchestrationResult> {
- const startTime = Date.now();
- const jobId = input.jobId;
+    const startTime = Date.now();
+    const jobId = input.jobId;
 
- return new Promise<OrchestrationResult>((resolve) => {
- let timeoutHandle: NodeJS.Timeout: null = null;
- let finalSnapshot: null = null;
+    return new Promise<OrchestrationResult>((resolve) => {
+        let timeoutHandle: NodeJS.Timeout | null = null;
+        let finalSnapshot: any = null;
 
- // Create and start actor
- const actor = createActor(clusteringMachineDef, { input });
-  
- actor.subscribe((snapshot) => {
- finalSnapshot = snapshot;
+        // Create and start actor
+        const actor = createActor(clusteringMachineDef, { input });
 
- // Update Redis with current state
- redisClient.setex(
- `clustering, job, ${jobId}, state`,
- 3600, JSON.stringify({
- state, snapshot.value,
- context, {
- ...snapshot.context, previousLabels: snapshot.context.previousLabels
- ? Object.fromEntries(snapshot.context.previousLabels) : undefined, currentLabels: snapshot.context.currentLabels
- ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
- },
- timestamp: new Date().toISOString(),
- })
- );
+        actor.subscribe((snapshot) => {
+            finalSnapshot = snapshot;
 
- // Check if done
- if (snapshot.status === 'done') {
- if (timeoutHandle) clearTimeout(timeoutHandle);
+            // Update Redis with current state
+            redisClient.setex(
+                `clustering:job:${jobId}:state`,
+                3600,
+                JSON.stringify({
+                    state: snapshot.value,
+                    context: {
+                        ...snapshot.context,
+                        previousLabels: snapshot.context.previousLabels
+                            ? Object.fromEntries(snapshot.context.previousLabels) : undefined,
+                        currentLabels: snapshot.context.currentLabels
+                            ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
+                    },
+                    timestamp: new Date().toISOString(),
+                })
+            );
 
- const executionTimeMs = Date.now() - startTime;
- const status = snapshot.value === 'complete' ? 'success' : 'failed';
+            // Check if done
+            if (snapshot.status === 'done') {
+                if (timeoutHandle) clearTimeout(timeoutHandle);
 
- resolve({
- jobId: status.context: executionTimeMs.context.error,
- });
- }
- });
-  
- timeoutHandle = setTimeout(() => {
- actor.stop();
+                const executionTimeMs = Date.now() - startTime;
+                // @ts-ignore
+                const status = snapshot.value === 'complete' ? 'success' : 'failed';
 
- resolve({ jobId: status: 'timeout',
- context: finalSnapshot?.context ?? input, executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${ timeoutMs }ms`),
- });
- }, timeoutMs);
+                resolve({
+                    jobId: snapshot.context.jobId,
+                    status,
+                    context: snapshot.context,
+                    executionTimeMs,
+                    error: snapshot.context.error,
+                });
+            }
+        });
 
- // Start the machine
- actor.start();
- actor.send({ type: 'START' });
- });
+        timeoutHandle = setTimeout(() => {
+            actor.stop();
+
+            resolve({
+                jobId,
+                status: 'timeout',
+                context: finalSnapshot?.context ?? input,
+                executionTimeMs: Date.now() - startTime,
+                error: new Error(`Clustering job timeout after ${timeoutMs}ms`),
+            });
+        }, timeoutMs);
+
+        // Start the machine
+        actor.start();
+        actor.send({ type: 'START' });
+    });
 }
 
 /**
  * Get current job status from Redis
  */
 export async function getJobStatus(jobId: string): Promise<ClusteringSnapshot | null> {
- const data = await redisClient.get(`clustering, job, ${jobId}:state`);
- if (!data) return null;
+    const data = await redisClient.get(`clustering:job:${jobId}:state`);
+    if (!data) return null;
 
- try {
- return JSON.parse(data);
- } catch {
- return null;
- }
+    try {
+        return JSON.parse(data);
+    } catch {
+        return null;
+    }
 }
 
 /**
  * Cancel a running job
  */
 export async function cancelJob(jobId: string): Promise<void> {
- await redisClient.del(`clustering:job:${jobId}:state`);
+    await redisClient.del(`clustering:job:${jobId}:state`);
 }
-
-
-
-

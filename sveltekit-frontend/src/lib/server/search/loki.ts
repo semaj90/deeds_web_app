@@ -12,21 +12,11 @@ export interface LokiSearchOptions extends LokiCollectionOptions {
 
 export interface SearchQuery {
     [key: string]: any;
-    $and?: SearchQuery[];
-    $or?: SearchQuery[];
-    $regex?: RegExp;
-    $contains?: any;
-    $in?: any[];
-    $gt?: number | string | Date;
-    $gte?: number | string | Date;
-    $lt?: number | string | Date;
-    $lte?: number | string | Date;
-    $ne?: any;
-    $exists?: boolean;
 }
 
 export interface SearchResult<T = any> {
-    data: T[]; count: number;
+    data: T[];
+    count: number;
     total: number;
     page?: number;
     limit?: number;
@@ -48,7 +38,7 @@ export class LokiSearchService {
     getCollection<T extends object = any>(
         name: string,
         options: LokiCollectionOptions = {}
-    ): any {
+    ): Collection<T> {
         if (this.collections.has(name)) {
             return this.collections.get(name)!;
         }
@@ -61,7 +51,7 @@ export class LokiSearchService {
                 autoupdate: options.autoupdate ?? true,
             });
         }
-        
+
         this.collections.set(name, collection);
         return collection;
     }
@@ -77,8 +67,9 @@ export class LokiSearchService {
     }
 
     find<T extends object = any>(collectionName: string, query: SearchQuery = {}): (T & any)[] {
+        // LokiJS find accepts a query object, typing is loose
         const collection = this.getCollection<T>(collectionName);
-        return collection.find(query as any);
+        return collection.find(query);
     }
 
     findOne<T extends object = any>(
@@ -86,7 +77,7 @@ export class LokiSearchService {
         query: SearchQuery = {}
     ): (T & any) | null {
         const collection = this.getCollection<T>(collectionName);
-        return collection.findOne(query as any);
+        return collection.findOne(query);
     }
 
     findPaginated<T extends object = any>(
@@ -96,12 +87,16 @@ export class LokiSearchService {
         limit: number = 10
     ): SearchResult<T & any> {
         const collection = this.getCollection<T>(collectionName);
-        const chain = collection.chain().find(query as any);
-        const total = chain.count();.offset((page - 1) * limit)
+        const chain = collection.chain().find(query);
+        const total = chain.count();
+
+        const data = chain.offset((page - 1) * limit)
             .limit(limit)
             .data();
 
-        return { data: count: data.length,
+        return {
+            data,
+            count: data.length,
             total,
             page,
             limit,
@@ -114,7 +109,7 @@ export class LokiSearchService {
         updateFn: (doc: T & any) => void
     ): number {
         const collection = this.getCollection<T>(collectionName);
-        const docs = collection.find(query as any);
+        const docs = collection.find(query);
         docs.forEach((doc: any) => {
             updateFn(doc);
             collection.update(doc);
@@ -124,7 +119,7 @@ export class LokiSearchService {
 
     remove(collectionName: string, query: SearchQuery): number {
         const collection = this.getCollection(collectionName);
-        const docsToRemove = collection.find(query as any);
+        const docsToRemove = collection.find(query);
         if (docsToRemove.length > 0) {
             collection.remove(docsToRemove);
         }
@@ -132,6 +127,7 @@ export class LokiSearchService {
     }
 
     getById<T extends object = any>(collectionName: string, id: number): (T & any) | null {
+        // cast id to number just in case
         const collection = this.getCollection<T>(collectionName);
         return collection.get(id);
     }
@@ -211,21 +207,26 @@ export class LokiSearchService {
 }
 
 export const LEGAL_LOKI_CONFIGS = {
-    cases: { collection: 'cases',
+    cases: {
+        collection: 'cases',
         indices: ['caseNumber', 'title', 'status', 'createdAt'],
         unique: ['caseNumber'],
     },
-    evidence: { collection: 'evidence',
+    evidence: {
+        collection: 'evidence',
         indices: ['caseId', 'title', 'evidenceType', 'createdAt', 'tags'],
     },
-    documents: { collection: 'documents',
+    documents: {
+        collection: 'documents',
         indices: ['caseId', 'title', 'documentType', 'createdAt', 'author'],
     },
-    persons: { collection: 'persons',
+    persons: {
+        collection: 'persons',
         indices: ['name', 'aliases', 'caseIds', 'createdAt'],
         unique: ['name'],
     },
-    annotations: { collection: 'annotations',
+    annotations: {
+        collection: 'annotations',
         indices: ['evidenceId', 'userId', 'createdAt', 'type'],
     },
 } as const;
@@ -289,6 +290,7 @@ export class LegalLokiManager {
     }
 
     getDatabaseStats() {
+        // This likely needs typings fix, listCollections returns object array
         const collections = this.loki.listCollections();
         const stats: Record<string, any> = {};
 
