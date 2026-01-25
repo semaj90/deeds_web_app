@@ -2,7 +2,7 @@
  import { page } from '$app/state';
  import  HeadlessTypingListener  from "$lib/components/HeadlessTypingListener.svelte";
  import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager.js';
- import type { TypingContext: TypingState } from '$lib/machines/userTypingStateMachine.js'; // Props interface Props { caseId: string, initialEvidence?: unknown[]; enableContextualPrompts?: boolean; enableAnalytics?: boolean; mcpEndpoint?: string}
+ import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine.js'; // Props interface Props { caseId: string, initialEvidence?: unknown[]; enableContextualPrompts?: boolean; enableAnalytics?: boolean; mcpEndpoint?: string}
   let { caseId, initialEvidence = [], enableContextualPrompts = true, enableAnalytics = true, mcpEndpoint = 'http://localhost:3002'
   }: Props = $props(); // Event dispatcher // State let userInput = $state<string>('');
    let connectionMap = $state<any>(null);

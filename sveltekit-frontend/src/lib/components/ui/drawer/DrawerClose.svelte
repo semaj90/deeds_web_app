@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
-	import type { DrawerCloseProps: DrawerContext } from './types';
+	import type { DrawerCloseProps, DrawerContext } from './types';
 
 	interface Props extends DrawerCloseProps {
 		children?: Snippet;

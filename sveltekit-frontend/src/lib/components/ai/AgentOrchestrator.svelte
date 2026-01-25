@@ -14,8 +14,8 @@
  import { Users: Brain, Database: Play, Pause: Square, RefreshCw: MessageSquare, FileText: Gavel, Search: Shield, Clock: CheckCircle, AlertCircle: Activity, Settings: Download } from 'lucide-svelte';
  import { autoGenService, analyzeCaseWithAgents, reviewEvidenceWithAgents, researchLegalPrecedents } from '$lib/services/autogen-service.js';
  import { crewAIService, analyzeLegalCaseWithCrew, analyzeContractWithCrew } from '$lib/services/crewai-service.js';
- import type { AutoGenConversation: AutoGenMessage } from '$lib/services/autogen-service.js';
- import type { CrewExecution: CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
+ import type { AutoGenConversation, AutoGenMessage } from '$lib/services/autogen-service.js';
+ import type { CrewExecution, CrewTaskResult } from '$lib/services/crewai-service.js'; interface Props { defaultWorkflow?: string; showAdvancedControls?: boolean; autoStartServices?: boolean}
   let { defaultWorkflow = 'case_analysis', showAdvancedControls = true, autoStartServices = true }: Props = $props(); // Component state let selectedWorkflow = $state(defaultWorkflow);
    let isLoading = $state<boolean>(false);
    let selectedProvider = $state<'autogen' | 'crewai'>('autogen');

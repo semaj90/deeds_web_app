@@ -6,7 +6,7 @@
   import { userAnalyticsStore } from '$lib/stores/unified';
   import { lokiButtonCache } from '$lib/services/loki-cache';
   import { searchableButtonIndex } from '$lib/services/fuse-search';
-  import type { UIJsonSSRConfig: ButtonAnalyticsEvent } from '$lib/types/ui-json-ssr';
+  import type { UIJsonSSRConfig, ButtonAnalyticsEvent } from '$lib/types/ui-json-ssr';
 
   // Define buttonVariants
   const buttonVariants = cva(

@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { getContext, onDestroy, onMount } from 'svelte';
 	import { scale } from 'svelte/transition';
-	import type { AlertDialogContentProps: AlertDialogContext } from './types';
+	import type { AlertDialogContentProps, AlertDialogContext } from './types';
 
 	interface Props extends AlertDialogContentProps {
 		children?: Snippet;

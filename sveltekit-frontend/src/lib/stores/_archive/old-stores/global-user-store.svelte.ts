@@ -1,11 +1,9 @@
 // Global User Store with PostgreSQL Integration + Svelte 5 Runes
 // Predictive Analytics: Chat History, and Real-time Synchronization
-import { writable, derived } from 'svelte/store';
-import type { type Writable } from 'svelte/store';
-import {  browser  } from '$app/environment';
-import type { User, Session } from 'lucia';
+import { browser } from '$app/environment';
+import type { ChatAnalytics, RecommendationResult, UserPattern, } from '$lib/server/services/user-recommendation-service';
 import crypto from 'crypto';
-import type { UserPattern, RecommendationResult, ChatAnalytics, } from '$lib/server/services/user-recommendation-service';
+import type { Session, User } from 'lucia';
 
 // ===== CORE USER STATE =====
 export interface GlobalUserState {
@@ -128,8 +126,9 @@ const defaultState: GlobalUserState = {
 let globalUserState = $state<GlobalUserState>(defaultState);
 
 // Reactive computations using Svelte 5 $derived
-globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
- globalUserState.profile?.email ?? 'Anonymous User'
+const displayName = $derived(
+  globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
+  globalUserState.profile?.email ?? 'Anonymous User'
 );
 
 const isOnline = $derived(globalUserState.syncStatus !== 'offline' && browser);
@@ -349,31 +348,33 @@ export const globalUserStore = {
  },
 
  async loadUserPatterns() {
- if (!globalUserState.user?.id) return;
- try {
- const response = await fetch(`/api/v1/patterns?userId=${globalUserState.user.id}`);
- if (response.ok) {
- const patterns = await response.json();
- globalUserState.patterns = patterns;
- }
- } catch (error: any) {
- console.error('Failed to load user patterns:', error);
+    if (!globalUserState.user?.id) return;
+    try {
+      const response = await fetch(`/api/v1/patterns?userId=${globalUserState.user.id}`);
+      if (response.ok) {
+        const patterns = await response.json();
+        globalUserState.patterns = patterns;
+      }
+    } catch (error: any) {
+      console.error('Failed to load user patterns:', error);
+    }
+  },
+
   // ===== VECTOR & SEARCH ACTIONS =====
-  addEmbeddingToCache(textHash: string, embedding: number[]): void {
+
+  addEmbeddingToCache(textHash: string, embedding: number[]) {
     const cache: EmbeddingCache = {
       textHash,
       embedding,
       timestamp: new Date(),
     };
-    globalUserState.recentEmbeddings.unshift(cache); number[]): string {
- const cache: EmbeddingCache = { textHash: embedding: model Date(),
- };
- globalUserState.recentEmbeddings.unshift(cache);
- // Keep only recent 100 embeddings
- if (globalUserState.recentEmbeddings.length > 100) {
- globalUserState.recentEmbeddings = globalUserState.recentEmbeddings.slice(0, 100);
- }
- },
+    globalUserState.recentEmbeddings.unshift(cache);
+
+    // Keep only recent 100 embeddings
+    if (globalUserState.recentEmbeddings.length > 100) {
+      globalUserState.recentEmbeddings = globalUserState.recentEmbeddings.slice(0, 100);
+    }
+  },
 
   addSearchQuery(query: string, resultsCount: number, context?: string) {
     const search: SearchQuery = {

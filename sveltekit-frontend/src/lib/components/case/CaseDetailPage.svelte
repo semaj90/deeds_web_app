@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { CaseSummary: SimilarCase } from '$lib/types/case-summary';
+ import type { CaseSummary, SimilarCase } from '$lib/types/case-summary';
  import { onMount } from 'svelte';
  import SimilarCasesPanel from './SimilarCasesPanel.svelte';
  import SummaryEditor from './SummaryEditor.svelte';

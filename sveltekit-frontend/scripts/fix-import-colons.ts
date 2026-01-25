@@ -1,9 +1,6 @@
 /**
- * Fix corrupted TypeScript syntax patterns
- * Patterns fixed:
- * 1. `import type { Actions: PageServerLoad }` -> `import type { Actions, PageServerLoad }`
- * 2. `ErrorCluster: GPUAnalysisResult, GPUErrorPattern` -> `ErrorCluster, GPUAnalysisResult, GPUErrorPattern`
- * 3. `Map<string: Type>` -> `Map<string, Type>`
+ * Fix corrupted TypeScript/Svelte syntax patterns
+ * Also handles .svelte files
  *
  * Usage:
  *   npx tsx scripts/fix-import-colons.ts           # Dry run (preview only)
@@ -69,8 +66,8 @@ function findMatches(filePath: string): Match[] {
                     matches.push({
                         pattern: pattern.name,
                         line: i + 1,
-                        original: line.trim(),
-                        fixed: fixed.trim()
+                        original: line.trim().substring(0, 100),
+                        fixed: fixed.trim().substring(0, 100)
                     });
                 }
             }
@@ -107,7 +104,8 @@ function applyFixes(filePath: string): boolean {
 async function main() {
     console.log(DRY_RUN ? '🔍 DRY RUN MODE (use --apply to make changes)\n' : '🔧 APPLYING CHANGES\n');
 
-    const files = await glob('src/**/*.ts', { ignore: ['**/node_modules/**', '**/_archive/**'] });
+    // Include both .ts and .svelte files
+    const files = await glob('src/**/*.{ts,svelte}', { ignore: ['**/node_modules/**', '**/_archive/**'] });
 
     let totalMatches = 0;
     let filesWithMatches = 0;
@@ -123,8 +121,8 @@ async function main() {
                 console.log(`📄 ${file}`);
                 for (const match of matches) {
                     console.log(`   Line ${match.line} [${match.pattern}]:`);
-                    console.log(`   - ${match.original}`);
-                    console.log(`   + ${match.fixed}`);
+                    console.log(`   - ${match.original}...`);
+                    console.log(`   + ${match.fixed}...`);
                 }
                 console.log();
 

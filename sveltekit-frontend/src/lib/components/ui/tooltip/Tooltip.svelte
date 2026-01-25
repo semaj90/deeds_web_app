@@ -18,7 +18,7 @@
 	import TooltipContent from './TooltipContent.svelte';
 	import TooltipRoot from './TooltipRoot.svelte';
 	import TooltipTrigger from './TooltipTrigger.svelte';
-	import type { TooltipContentProps: TooltipRootProps } from './types';
+	import type { TooltipContentProps, TooltipRootProps } from './types';
 
 	/**
 	 * Convenient all-in-one Tooltip component

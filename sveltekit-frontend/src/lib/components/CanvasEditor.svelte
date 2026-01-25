@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { CanvasState: CitationPoint } from '$lib/data/types';
+ import type { CanvasState, CitationPoint } from '$lib/data/types';
  import type { Evidence } from '$lib/types/api';
 
  let { canvasState, reportId, evidence, citationPoints, save } = $props<{

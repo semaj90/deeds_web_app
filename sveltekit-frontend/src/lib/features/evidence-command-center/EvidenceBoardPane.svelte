@@ -4,7 +4,7 @@
 
 	import { enhance } from '$app/forms';
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
-	import type { ActionData: PageData } from '../../../routes/cases/[id]/evidence/$types';
+	import type { ActionData, PageData } from '../../../routes/cases/[id]/evidence/$types';
 
 	interface Props {
 		data: PageData;

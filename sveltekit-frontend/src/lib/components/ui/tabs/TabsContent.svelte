@@ -3,7 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import type { TabsContentProps: TabsContext } from './types';
+	import type { TabsContentProps, TabsContext } from './types';
 
 	interface Props extends TabsContentProps {
 		children?: Snippet;

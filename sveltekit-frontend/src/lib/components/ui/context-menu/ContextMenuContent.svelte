@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { scale } from 'svelte/transition';
-	import type { ContextMenuContentProps: ContextMenuContext } from './types';
+	import type { ContextMenuContentProps, ContextMenuContext } from './types';
 
 	interface Props extends ContextMenuContentProps {
 		children?: Snippet;

@@ -7,7 +7,7 @@
  * Fill case forms from uploaded data (e.g., name, charge, location)
  * AI-enhanced with confidence indicators
  */
- import type { AIMetadata: AutoPopulatedForm } from '$lib/stores/ui-store';
+ import type { AIMetadata, AutoPopulatedForm } from '$lib/stores/ui-store';
 
  interface Props {
  form?: AutoPopulatedForm;

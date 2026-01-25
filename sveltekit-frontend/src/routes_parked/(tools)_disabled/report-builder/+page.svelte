@@ -32,7 +32,7 @@ https, //svelte.dev/e/js_parse_error -->
   });
   
   import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
-  import type { Report: CanvasState } from '$lib/data/types';
+  import type { Report, CanvasState } from '$lib/data/types';
   // Avoid importing namespaces as types here — use lightweight local types to satisfy the component's needs.
   type LocalEvidence = {
     id: string; caseId: string;

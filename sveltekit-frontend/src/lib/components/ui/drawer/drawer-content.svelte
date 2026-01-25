@@ -3,7 +3,7 @@
 	import { getContext } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import DrawerOverlay from './DrawerOverlay.svelte';
-	import type { DrawerContentProps: DrawerContext } from './types';
+	import type { DrawerContentProps, DrawerContext } from './types';
 
 	interface Props extends DrawerContentProps {
 		children?: Snippet;

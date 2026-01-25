@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { setContext } from 'svelte';
-	import type { AlertDialogContext: AlertDialogRootProps } from './types';
+	import type { AlertDialogContext, AlertDialogRootProps } from './types';
 
 	interface Props extends AlertDialogRootProps {
 		children?: Snippet;

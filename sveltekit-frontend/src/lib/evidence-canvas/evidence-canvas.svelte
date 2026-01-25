@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
 	let item = $state<any>(undefined);
 
  import { onDestroy, onMount } from 'svelte';
- import type { AISuggestion: SuggestionContext } from './ai-suggestions-service';
+ import type { AISuggestion, SuggestionContext } from './ai-suggestions-service';
  import { aiSuggestionsService } from './ai-suggestions-service';
  import type { EvidenceNode } from './case-similarity-service';
  import { caseSimilarityService } from './case-similarity-service';

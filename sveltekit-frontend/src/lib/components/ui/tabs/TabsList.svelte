@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
-	import type { TabsContext: TabsListProps } from './types';
+	import type { TabsContext, TabsListProps } from './types';
 
 	interface Props extends TabsListProps {
 		children?: Snippet;

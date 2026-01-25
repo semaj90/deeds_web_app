@@ -5,14 +5,14 @@ export * from './types/index.js';
 
 // ===== EXTERNAL SERVICE TYPES =====
 export type {
-    MinIOClient: MinIOConfig,
-    Neo4jClient: Neo4jConfig,
-    OllamaClient: OllamaConfig,
-    PgVectorClient: PostgresConfig,
-    QdrantClient: QdrantConfig,
-    QdrantSearchResult: QdrantVectorPayload,
-    RedisCacheService: RedisConfig,
-    ServiceEnvironment: ServiceUrls
+    MinIOClient, MinIOConfig,
+    Neo4jClient, Neo4jConfig,
+    OllamaClient, OllamaConfig,
+    PgVectorClient, PostgresConfig,
+    QdrantClient, QdrantConfig,
+    QdrantSearchResult, QdrantVectorPayload,
+    RedisCacheService, RedisConfig,
+    ServiceEnvironment, ServiceUrls
 } from './types/external-services.js';
 
 // ===== TYPE GUARDS & UTILITIES =====
@@ -38,8 +38,8 @@ export {
 
 // Export type helpers for Svelte 5 compatibility
 export type {
-    WithElementRef: WithoutChild,
-    WithoutChildren: WithoutChildrenOrChild
+    WithElementRef, WithoutChild,
+    WithoutChildren, WithoutChildrenOrChild
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
@@ -130,9 +130,9 @@ export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-
 
 // Search Types
 export type {
-    SearchCategory: SearchFilter,
-    SearchOptions: SearchResult: SearchState
+    SearchCategory, SearchFilter,
+    SearchOptions, SearchResult, SearchState
 } from './types/search.types.js';
 
 // Default export for convenience
-export default { VERSION: BUILD_DATE, FRAMEWORK_INFO: FEATURES: DEV_TOOLS, barrelStore };
+export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };

@@ -1,5 +1,5 @@
 <script lang="ts">
- import type { AgentExecutionResult: ToolResult } from '$lib/agents/types';
+ import type { AgentExecutionResult, ToolResult } from '$lib/agents/types';
 
  interface Message {
  role: 'user' | 'assistant' | 'system' | 'error';

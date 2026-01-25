@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { onMount, setContext } from 'svelte';
-	import type { TabsContext: TabsRootProps } from './types';
+	import type { TabsContext, TabsRootProps } from './types';
 
 	interface Props extends TabsRootProps {
 		children?: Snippet;

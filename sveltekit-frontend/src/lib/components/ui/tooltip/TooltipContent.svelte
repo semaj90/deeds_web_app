@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import type { TooltipContentProps: TooltipContext } from './types';
+	import type { TooltipContentProps, TooltipContext } from './types';
 
 	interface Props extends TooltipContentProps {
 		children?: Snippet;

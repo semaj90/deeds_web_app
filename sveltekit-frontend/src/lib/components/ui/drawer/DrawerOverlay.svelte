@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import type { DrawerContext: DrawerOverlayProps } from './types';
+	import type { DrawerContext, DrawerOverlayProps } from './types';
 
 	interface Props extends DrawerOverlayProps {}
 

@@ -4,7 +4,10 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   compilerOptions: {
-    runes: true
+    runes: true,
+    compatibility: {
+      componentApi: 4
+    }
   },
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),

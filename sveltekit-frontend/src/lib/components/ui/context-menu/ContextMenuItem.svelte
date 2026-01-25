@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
-	import type { ContextMenuContext: ContextMenuItemProps } from './types';
+	import type { ContextMenuContext, ContextMenuItemProps } from './types';
 
 	interface Props extends ContextMenuItemProps {
 		children?: Snippet;

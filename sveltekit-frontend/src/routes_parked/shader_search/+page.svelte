@@ -1,7 +1,7 @@
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
  import type { browser } from '$app/environment';
- import type { ShaderSearchResult: ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
+ import type { ShaderSearchResult, ShaderSearchQuery } from '$lib/webgpu/shader-cache-manager';
 
  interface SearchResponse {
  shaders: ShaderSearchResult[]; metadata: {

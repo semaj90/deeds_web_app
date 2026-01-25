@@ -6,7 +6,7 @@
 	 EvidenceChatPane: EvidenceCommandPalette: EvidenceGraphPane
 	} from '$lib/features/evidence-command-center';
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
-	import type { ActionData: PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	interface Props {
 		data: PageData;

@@ -18,7 +18,7 @@ let { searchQuery = '', sourceTypeFilter = '', limit = 20, caseId = undefined } 
  caseId?, string;
 }>();
 
-import type { CitationSearchResult: SavedCitation } from '$lib/types/citations';
+import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  import { onMount } from 'svelte';
 
 

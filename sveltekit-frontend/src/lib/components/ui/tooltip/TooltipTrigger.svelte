@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
-	import type { TooltipContext: TooltipTriggerProps } from './types';
+	import type { TooltipContext, TooltipTriggerProps } from './types';
 
 	interface Props extends TooltipTriggerProps {
 		children?: Snippet;

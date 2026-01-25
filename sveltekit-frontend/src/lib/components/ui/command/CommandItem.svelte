@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getContext, onDestroy, onMount } from 'svelte';
-	import type { CommandContext: CommandItemProps } from './types';
+	import type { CommandContext, CommandItemProps } from './types';
 
 	interface Props extends CommandItemProps {
 		children?: Snippet;

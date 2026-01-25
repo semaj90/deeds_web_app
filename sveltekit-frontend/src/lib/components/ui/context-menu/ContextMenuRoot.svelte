@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { onDestroy, onMount, setContext } from 'svelte';
-	import type { ContextMenuContext: ContextMenuRootProps } from './types';
+	import type { ContextMenuContext, ContextMenuRootProps } from './types';
 
 	interface Props extends ContextMenuRootProps {
 		children?: Snippet;

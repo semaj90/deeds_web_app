@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { CommandContext: CommandInputProps } from './types';
+	import type { CommandContext, CommandInputProps } from './types';
 
 	interface Props extends CommandInputProps {}
 

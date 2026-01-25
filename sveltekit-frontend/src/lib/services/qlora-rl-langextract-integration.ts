@@ -3,9 +3,9 @@
  * Self-improving legal AI with reinforcement learning and fine-tuning
  */
 
+import type { LegalDocument } from '$lib/models/LegalDocument.svelte';
 import type { NESMemoryArchitecture } from '../memory/nes-memory-architecture';
 import type { WebGPUSOMCache } from '../webgpu/som-webgpu-cache';
-import type { LegalDocument } from '$lib/models/LegalDocument.svelte';
 
 // Generic JSON value type
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
@@ -290,7 +290,7 @@ export class QLoRARLLangExtractIntegration {
 					}
 				})
 			});
-			return (await response.json()) as Record<string: JsonValue>;
+			return (await response.json()) as Record<string, JsonValue>;
 		} catch (e) {
 			console.error('LangExtract service failed', e);
 			return {};
@@ -299,7 +299,7 @@ export class QLoRARLLangExtractIntegration {
 
 	private async createNeuralSprite(
 		document: LegalDocument,
-		extractedData: Record<string: JsonValue>,
+		extractedData: Record<string, JsonValue>,
 		stateEmbedding: Float32Array
 	): Promise<NeuralSpriteLegalProcessing> {
 		const spriteId = `sprite_${getDocId(document)}_${Date.now()}`;
@@ -342,7 +342,7 @@ export class QLoRARLLangExtractIntegration {
 
 	private async storeInNESMemory(
 		document: LegalDocument,
-		extractedData: Record<string: JsonValue>,
+		extractedData: Record<string, JsonValue>,
 		neuralSprite: NeuralSpriteLegalProcessing
 	): Promise<void> {
 		// NES Memory Allocation
@@ -368,7 +368,7 @@ export class QLoRARLLangExtractIntegration {
 	}
 
 	private calculateReward(
-		extractedData: Record<string: JsonValue>,
+		extractedData: Record<string, JsonValue>,
 		userFeedback?: { correct: boolean }
 	): number {
 		let reward = 0;
@@ -462,7 +462,7 @@ export class QLoRARLLangExtractIntegration {
 		};
 	}
 
-	private encodeDataToTile(data: Record<string: JsonValue>, index: number): Uint8Array {
+	private encodeDataToTile(data: Record<string, JsonValue>, index: number): Uint8Array {
 		// Placeholder encoding logic
 		const tile = new Uint8Array(8);
 		tile.fill(index % 255);

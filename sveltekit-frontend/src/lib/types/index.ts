@@ -32,76 +32,87 @@ export interface Message {
   role: 'user' | 'assistant' | 'system';
   timestamp: Date | string;
   metadata?: Record<string, unknown>;
-} /** * Central type export hub for all API response types * * Three Comprehensive Type: Definitions: * 1. DATABASE RESPONSE TYPES - All db.query() operations * 2. ADMIN API TYPES - Health checks, cluster status, metrics * 3. WORKER/CLUSTER TYPES - Background workers and file uploads */ // ============================================================================ // ENDPOINT 1: DATABASE RESPONSE TYPES // ============================================================================ export type {
-    // Health checks
-    DatabaseHealthResponse, HealthCheck,
-    // Core entity types
-    User, Case, DBCase, CaseMetadata, Evidence, DBEvidence,
-    EvidenceAnalysis, EvidenceMetadata, ChainOfCustodyRecord, Document,
-    ChatMessage, ChatMessageMetadata, AnalysisResult,
-    // Query response types
-    QueryResult, ListQueryResult, PaginationInfo, CreateQueryResult, UpdateQueryResult, DeleteQueryResult,
-    // Domain-specific query results
-    CaseQueryResult, CaseListResult, EvidenceQueryResult, EvidenceListResult,
-    UserQueryResult, UserListResult, ChatMessageQueryResult, ChatMessageListResult,
-    DocumentQueryResult, DocumentListResult, AnalysisResultQueryResult, AnalysisResultListResult,
-    // Vector search types
-    VectorSearchResult, VectorSearchQueryResult,
+}
+
+/**
+ * Central type export hub for all API response types
+ *
+ * Three Comprehensive Type Definitions:
+ * 1. DATABASE RESPONSE TYPES - All db.query() operations
+ * 2. ADMIN API TYPES - Health checks, cluster status, metrics
+ * 3. WORKER/CLUSTER TYPES - Background workers and file uploads
+ */
+
+// ============================================================================
+// ENDPOINT 1: DATABASE RESPONSE TYPES
+// ============================================================================
+export type {
+    AnalysisResult, AnalysisResultListResult, AnalysisResultQueryResult,
     // Batch operations
-    BatchQueryResult, Transaction
+    BatchQueryResult, Case, CaseListResult, CaseMetadata,
+    // Domain-specific query results
+    CaseQueryResult, ChainOfCustodyRecord, ChatMessage, ChatMessageListResult, ChatMessageMetadata, ChatMessageQueryResult, CreateQueryResult, DBCase, DBEvidence,
+    // Health checks
+    DatabaseHealthResponse, DeleteQueryResult, Document, DocumentListResult, DocumentQueryResult, Evidence, EvidenceAnalysis, EvidenceListResult, EvidenceMetadata, EvidenceQueryResult, HealthCheck, ListQueryResult, PaginationInfo,
+    // Query response types
+    QueryResult, Transaction, UpdateQueryResult,
+    // Core entity types
+    User, UserListResult, UserQueryResult, VectorSearchQueryResult,
+    // Vector search types
+    VectorSearchResult
 } from './database.js';
 
 // ============================================================================
 // ENDPOINT 2: ADMIN API RESPONSE TYPES
 // ============================================================================
 export type {
-    // Health checks
-    AdminHealthResponse, AdminHealthData, AdminHealth, ServiceStatus,
-    // System metrics
-    SystemMetrics, CPUMetrics, MemoryMetrics, DiskMetrics, NetworkMetrics,
-    // Admin status
-    AdminStatusResponse, AdminStatus, ServiceHealthStatus, ServiceHealth,
-    // Database status
-    DatabaseStatus, DatabaseQueryStats,
-    // Cache status
-    CacheStatus,
-    // Message queue status
-    MessageQueueStatus, QueueInfo,
-    // Vector store status
-    VectorStoreStatus, IndexInfo,
-    // Configuration
-    AdminConfigResponse, AdminConfiguration, DatabaseConfig, CacheConfig,
-    MessageQueueConfig, VectorStoreConfig, GPUConfig, StorageConfig, SecurityConfig,
-    // Audit logs
-    AuditLogResponse, AuditLog, AuditLogPagination,
     // Admin actions
-    AdminActionResponse, DatabaseMaintenanceResponse, CacheClearResponse, ServiceRestartResponse
+    AdminActionResponse,
+    // Configuration
+    AdminConfigResponse, AdminConfiguration, AdminHealth, AdminHealthData,
+    // Health checks
+    AdminHealthResponse, AdminStatus,
+    // Admin status
+    AdminStatusResponse, AuditLog, AuditLogPagination,
+    // Audit logs
+    AuditLogResponse, CPUMetrics, CacheClearResponse, CacheConfig,
+    // Cache status
+    CacheStatus, DatabaseConfig, DatabaseMaintenanceResponse, DatabaseQueryStats,
+    // Database status
+    DatabaseStatus, DiskMetrics, GPUConfig, IndexInfo, MemoryMetrics, MessageQueueConfig,
+    // Message queue status
+    MessageQueueStatus, NetworkMetrics, QueueInfo, SecurityConfig, ServiceHealth, ServiceHealthStatus, ServiceRestartResponse, ServiceStatus, StorageConfig,
+    // System metrics
+    SystemMetrics, VectorStoreConfig,
+    // Vector store status
+    VectorStoreStatus
 } from './admin.js';
 
 // ============================================================================
 // ENDPOINT 3: WORKER/CLUSTER STATE TYPES
 // ============================================================================
 export type {
-    // Process types
-    ProcessMemory, CPUUsage, ProcessInfo,
-    // Cluster status
-    Worker, ClusterStatusResponse, ClusterStatus, ClusterMetadata,
-    // Background workers
-    BackgroundWorkerStatus, WorkerHealthCheckResponse, WorkerMetrics, WorkerPool,
-    // Job queues
-    BackgroundJob, JobQueueStats, JobStatusResponse, JobBatchResponse,
-    // File upload & processing
-    FileUploadJob, FileUploadInfo, FileProcessingStage, FileUploadResponse, FileUploadBatchResponse, FileProcessingProgress,
-    // OCR worker
-    OCRWorkerStatus, OCRJob,
-    // Embedding worker
-    EmbeddingWorkerStatus, EmbeddingJob,
+    AutotagJob,
     // Autotag worker
-    AutotagWorkerStatus, AutotagJob,
-    // Cluster events
-    ClusterEvent, ClusterEventStreamResponse,
+    AutotagWorkerStatus,
+    // Job queues
+    BackgroundJob,
+    // Background workers
+    BackgroundWorkerStatus, CPUUsage,
     // Cluster commands
-    ClusterCommandResponse, ClusterRestartResponse, WorkerScaleResponse
+    ClusterCommandResponse,
+    // Cluster events
+    ClusterEvent, ClusterEventStreamResponse, ClusterMetadata, ClusterRestartResponse, ClusterStatus, ClusterStatusResponse, EmbeddingJob,
+    // Embedding worker
+    EmbeddingWorkerStatus, FileProcessingProgress, FileProcessingStage, FileUploadBatchResponse, FileUploadInfo,
+    // File upload & processing
+    FileUploadJob, FileUploadResponse, JobBatchResponse, JobQueueStats, JobStatusResponse, OCRJob,
+    // OCR worker
+    OCRWorkerStatus, ProcessInfo,
+    // Process types
+    ProcessMemory,
+    // Cluster status
+    Worker, WorkerHealthCheckResponse, WorkerMetrics, WorkerPool, WorkerScaleResponse
 } from './cluster.js';
 
 // Replace wildcard re-export of: './search' (causes duplicate top-level symbols)
