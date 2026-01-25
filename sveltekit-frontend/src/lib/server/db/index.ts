@@ -1,3 +1,4 @@
+import { sql as drizzleSql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 // @ts-ignore
 import postgres from 'postgres';
@@ -8,7 +9,7 @@ const DEFAULT_DATABASE_URL = 'postgresql://legal_admin:123456@localhost:5432/leg
 const connectionString = process.env?.DATABASE_URL|| DEFAULT_DATABASE_URL;
 
 const client = postgres(connectionString);
-export const sql = client;
+export const sql = drizzleSql; // Export Drizzle's sql template tag, not the client
 export const db = drizzle(client, { schema });
 
 export * from './schema';
