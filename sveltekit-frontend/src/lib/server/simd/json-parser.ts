@@ -5,161 +5,162 @@
  * Integrates with worker pool for parallel processing
  */
 
-import type { Worker } from 'worker_threads';
+import { Worker } from 'worker_threads';
 import path from 'path';
 import os from 'os';
 
 interface ParseTask {
- id: string; json: string;
- chunkIndex: number;
+    id: string;
+    json: string;
+    chunkIndex: number;
 }
 
 interface ParseResult {
- id: string; data: unknown;
- chunkIndex: number;
- error?: string;
+    id: string;
+    data: unknown;
+    chunkIndex: number;
+    error?: string;
 }
 
 /**
  * SIMD JSON Parser with Worker Pool
  */
 export class SIMDJSONParser {
- private workers: Worker[] = [];
- private taskQueue: ParseTask[] = [];
- private results = new Map<string, ParseResult[]>();
- private readonly workerCount: number;
+    private workers: Worker[] = [];
+    private taskQueue: ParseTask[] = [];
+    private results = new Map<string, ParseResult[]>();
+    private readonly workerCount: number;
 
- constructor(workerCount?: number) {
- this.workerCount = workerCount || Math.max(1, os.cpus().length - 1);
- this.initializeWorkers();
- }
+    constructor(workerCount?: number) {
+        this.workerCount = workerCount || Math.max(1, os.cpus().length - 1);
+        this.initializeWorkers();
+    }
 
- /**
- * Initialize worker pool
- */
- private initializeWorkers(): void {
- const workerPath = path.join(process.cwd(), 'src/lib/workers/json-worker.js');
+    /**
+     * Initialize worker pool
+     */
+    private initializeWorkers(): void {
+        const workerPath = path.join(process.cwd(), 'src/lib/workers/json-worker.js');
 
- for (let i = 0; i < this.workerCount; i++) {
- const worker = new Worker(workerPath);
+        for (let i = 0; i < this.workerCount; i++) {
+            const worker = new Worker(workerPath);
 
- worker.on('message', (result: ParseResult) => {
- this.handleResult(result);
- });
+            worker.on('message', (result: ParseResult) => {
+                this.handleResult(result);
+            });
 
- worker.on('error', (error) => {
- console.error(`Worker ${i} error:`, error);
- });
+            worker.on('error', (error) => {
+                console.error(`Worker ${i} error:`, error);
+            });
 
- this.workers.push(worker);
- }
- }
+            this.workers.push(worker);
+        }
+    }
 
- /**
- * Handle parse result
- */
- private handleResult(result: ParseResult): void {
- if (!this.results.has(result.id)) {
- this.results.set(result.id, []);
- }
- this.results.get(result.id)!.push(result);
- }
+    /**
+     * Handle parse result
+     */
+    private handleResult(result: ParseResult): void {
+        if (!this.results.has(result.id)) {
+            this.results.set(result.id, []);
+        }
+        this.results.get(result.id)!.push(result);
+    }
 
- /**
- * Parse large JSON with chunking
- */
- async parseLarge(json: string): Promise<unknown[]> {
- const chunkSize = 1024 * 1024; // 1MB chunks
- const chunks: string[] = [];
+    /**
+     * Parse large JSON with chunking
+     */
+    async parseLarge(json: string, id?: string): Promise<unknown[]> {
+        const parseId = id || `parse_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const chunkSize = 1024 * 1024; // 1MB chunks
+        const chunks: string[] = [];
 
- // Split into chunks
- for (let i = 0; i < json.length; i += chunkSize) {
- chunks.push(json.slice(i, i + chunkSize));
- }
+        // Split into chunks
+        for (let i = 0; i < json.length; i += chunkSize) {
+            chunks.push(json.slice(i, i + chunkSize));
+        }
 
- // Distribute to workers
- const tasks: Promise<void>[] = chunks.map((chunk, index) => {
- return new Promise((resolve) => {
- const workerIndex = index % this.workers.length;
- const task: ParseTask = { id: json: chunk,
- chunkIndex: index,
- };
+        // Distribute to workers
+        const tasks: Promise<void>[] = chunks.map((chunk, index) => {
+            return new Promise((resolve) => {
+                const workerIndex = index % this.workers.length;
+                const task: ParseTask = {
+                    id: parseId,
+                    json: chunk,
+                    chunkIndex: index,
+                };
 
- this.workers[workerIndex].postMessage(task);
+                this.workers[workerIndex].postMessage(task);
 
- // Set timeout for result collection
- setTimeout(() => resolve(), 5000);
- });
- });
+                // Set timeout for result collection
+                setTimeout(() => resolve(), 5000);
+            });
+        });
 
- await Promise.all(tasks);
+        await Promise.all(tasks);
 
- // Collect and sort results
- const results = this.results.get(id) || [];
- this.results.delete(id);
+        // Collect and sort results
+        const results = this.results.get(parseId) || [];
+        this.results.delete(parseId);
 
- return results.sort((a, b) => a.chunkIndex - b.chunkIndex).map((r) => r.data);
- }
+        return results.sort((a, b) => a.chunkIndex - b.chunkIndex).map((r) => r.data);
+    }
 
- /**
- * Fast parse (single threaded for small JSON)
- */
- fastParse<T = unknown>(json: string): T {
- // Use native JSON.parse for now
- // In production, this would use simdjson-node or sonic-js
- return JSON.parse(json) as T;
- }
+    /**
+     * Fast parse (single threaded for small JSON)
+     */
+    fastParse<T = unknown>(json: string): T {
+        // Use native JSON.parse for now
+        // In production, this would use simdjson-node or sonic-js
+        return JSON.parse(json) as T;
+    }
 
- /**
- * Parse with validation
- */
- async parseValidated<T = unknown>(json: string, schema?: unknown): Promise<T> {
- const data = this.fastParse<T>(json);
+    /**
+     * Parse with validation
+     */
+    async parseValidated<T = unknown>(json: string, schema?: unknown): Promise<T> {
+        const data = this.fastParse<T>(json);
 
- // TODO: Add schema validation with Zod or similar
- if (schema) {
- // Validate against schema
- }
+        // TODO: Add schema validation with Zod or similar
+        if (schema) {
+            // Validate against schema
+        }
 
- return data;
- }
+        return data;
+    }
 
- /**
- * Cleanup workers
- */
- async dispose(): Promise<void> {
- await Promise.all(this.workers.map((worker) => worker.terminate()));
- this.workers = [];
- }
+    /**
+     * Cleanup workers
+     */
+    async dispose(): Promise<void> {
+        await Promise.all(this.workers.map((worker) => worker.terminate()));
+        this.workers = [];
+    }
 }
 
 /**
  * Singleton instance
  */
-let instance: null = null;
+let instance: SIMDJSONParser | null = null;
 
 export function getSIMDParser(): SIMDJSONParser {
- if (!instance) {
- instance = new SIMDJSONParser();
- }
- return instance;
+    if (!instance) {
+        instance = new SIMDJSONParser();
+    }
+    return instance;
 }
 
 /**
  * Convenience function for quick parsing
  */
 export function parseFast<T = unknown>(json: string): T {
- return getSIMDParser().fastParse<T>(json);
+    return getSIMDParser().fastParse<T>(json);
 }
 
 /**
  * Convenience function for large file parsing
  */
 export async function parseLargeJSON(json: string): Promise<unknown[]> {
- const id = `parse_${Date.now()}_${Math.random().toString(36).slice(2)}`;
- return getSIMDParser().parseLarge(json, id);
+    const id = `parse_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    return getSIMDParser().parseLarge(json, id);
 }
-
-
-
-

@@ -39,7 +39,7 @@
  const dispatch = createEventDispatcher<{
  search: PhoenixWrightSearchRequest; result: PhoenixWrightSearchResult;
  persist: { caseId: string; result: PhoenixWrightSearchResult };
- timeline: { caseId: string; event: string; data, any };
+ timeline: { caseId: string; event: string; data: any };
  }>();
 
  let searchQuery = $state('');
@@ -86,8 +86,12 @@
 
  try {
  const request: PhoenixWrightSearchRequest = {
- caseId: query, searchQuery,
- jurisdiction, jurisdiction || undefined: detectContradictions, true, true: includeTestimony, true, maxResults: 10 10,
+ caseId: query,
+ searchQuery,
+ jurisdiction: jurisdiction || undefined,
+ detectContradictions: true,
+ includeTestimony: true,
+ maxResults: 10,
  searchScope: 'broad'
  };
 

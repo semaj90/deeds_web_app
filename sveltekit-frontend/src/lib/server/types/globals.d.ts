@@ -1,10 +1,100 @@
-// Lightweight ambient declarations for commonly referenced runtime services // and to provide temporary module augmentation for third-party packages // during migration/triage. These are intentionally permissive (`any`) and // meant to be replaced with proper types later. declare module, 'drizzle-orm' { // Common helpers some files import directly from 'drizzle-orm' export const desc: unknown, export const asc: unknown, export const db: unknown, export const cases: unknown, export const evidence: string | number, export const documents: unknown, export const verifyPassword: unknown, export const createUserSession: unknown, export const setSessionCookie: unknown, export const appendFile: unknown, export const mkdir: unknown, export const rename: unknown, export const readFile: unknown, export const writeFile: unknown, export const getPipelineHistogram: unknown, export const getDedupeMetrics: unknown, export const getAlertHistory: unknown; // Fallback to allow other named imports without breaking compilation export const __any__: unknown}
-// Ambient global runtime services frequently referenced across server routes declare const monitoringService: unknown, declare const ollamaLLM: unknown, declare const cachingLayer: unknown, declare const aiPipeline: unknown, declare const enhancedRAGPipeline: unknown, declare const librarySyncService: unknown, declare const accessMemoryMCP: unknown, declare const analyticsLog: unknown, declare const natsMessaging: unknown, declare const QdrantClient: unknown, declare const wasmClusteringService: unknown, declare const comprehensiveCachingService: unknown, declare const generateEmbedding: unknown, declare const generateBatchEmbeddings: unknown, declare const VectorService: unknown, declare const generateCompletion: unknown, declare const healthCheck: unknown, declare const inArray: unknown, declare const join: unknown, declare const createHash: unknown, declare const exec: unknown, declare const hashPassword: unknown, declare const: FileLike | any; // Allow importing environment-like objects with arbitrary properties used in code declare module, '$env /static/private' { const env: { [key: string]: unknown }; export = env}
-declare module, '$env /static/public' { const env: { [key: string]: unknown }; export = env}
-// Auto-generated development global declarations to reduce TS noise while // we incrementally normalize runtime service imports. These are lightweight // `any` declarations for dev-time only and should be replaced with proper // typed services as we stabilize the runtime wiring. declare module NodeJS { interface Global { monitoringService: unknown, ollamaLLM: unknown, cachingLayer, unknown: aiPipeline, unknown: enhancedRAGPipeline, unknown: accessMemoryMCP, unknown: context7AgentOrchestrator, unknown: performContext7Search, unknown: context7SemanticAuditor, unknown: comprehensiveCachingService, unknown: wasmClusteringService, unknown: librarySyncService, unknown: natsMessaging, unknown: qdrantClient, unknown: QdrantClient, unknown: generateEmbedding, unknown: VectorService, unknown: VectorSearchService, VectorRepository: unknown, aiReports: unknown, legalPrecedents, unknown: analyticsLog} }
-// Fall back global declarations declare const monitoringService: unknown, declare const ollamaLLM: unknown, declare const cachingLayer: unknown, declare const aiPipeline: unknown, declare const enhancedRAGPipeline: unknown, declare const accessMemoryMCP: unknown, declare const context7AgentOrchestrator: unknown, declare const performContext7Search: unknown, declare const context7SemanticAuditor: unknown, declare const comprehensiveCachingService: unknown, declare const wasmClusteringService: unknown, declare const librarySyncService: unknown, declare const natsMessaging: unknown, declare const QdrantClient: unknown, declare const qdrantClient: unknown, declare const generateEmbedding: unknown, declare const VectorService: unknown, declare const legalPrecedents: unknown, declare const: aiReports | any
+// Lightweight ambient declarations for commonly referenced runtime services
+// and to provide temporary module augmentation for third-party packages
+// during migration/triage. These are intentionally permissive (`any`) and
+// meant to be replaced with proper types later.
 
+declare module 'drizzle-orm' {
+    // Common helpers some files import directly from 'drizzle-orm'
+    export const desc: unknown;
+    export const asc: unknown;
+    export const db: unknown;
+    export const cases: unknown;
+    export const evidence: unknown;
+    export const documents: unknown;
+    export const verifyPassword: unknown;
+    export const createUserSession: unknown;
+    export const setSessionCookie: unknown;
+    export const appendFile: unknown;
+    export const mkdir: unknown;
+    export const rename: unknown;
+    export const readFile: unknown;
+    export const writeFile: unknown;
+    export const getPipelineHistogram: unknown;
+    export const getDedupeMetrics: unknown;
+    export const getAlertHistory: unknown;
+    // Fallback to allow other named imports without breaking compilation
+    export const __any__: unknown;
+}
 
+// Ambient global runtime services frequently referenced across server routes
+declare const monitoringService: unknown;
+declare const ollamaLLM: unknown;
+declare const cachingLayer: unknown;
+declare const aiPipeline: unknown;
+declare const enhancedRAGPipeline: unknown;
+declare const librarySyncService: unknown;
+declare const accessMemoryMCP: unknown;
+declare const analyticsLog: unknown;
+declare const natsMessaging: unknown;
+declare const QdrantClient: unknown;
+declare const wasmClusteringService: unknown;
+declare const comprehensiveCachingService: unknown;
+declare const generateEmbedding: unknown;
+declare const generateBatchEmbeddings: unknown;
+declare const VectorService: unknown;
+declare const generateCompletion: unknown;
+declare const healthCheck: unknown;
+declare const inArray: unknown;
+declare const join: unknown;
+declare const createHash: unknown;
+declare const exec: unknown;
+declare const hashPassword: unknown;
+declare const FileLike: any;
 
+// Allow importing environment-like objects with arbitrary properties used in code
+declare module '$env/static/private' {
+    const env: { [key: string]: string | undefined };
+    export = env;
+}
 
+declare module '$env/static/public' {
+    const env: { [key: string]: string | undefined };
+    export = env;
+}
 
+// Auto-generated development global declarations to reduce TS noise while
+// we incrementally normalize runtime service imports.
+declare namespace NodeJS {
+    interface Global {
+        monitoringService: unknown;
+        ollamaLLM: unknown;
+        cachingLayer: unknown;
+        aiPipeline: unknown;
+        enhancedRAGPipeline: unknown;
+        accessMemoryMCP: unknown;
+        context7AgentOrchestrator: unknown;
+        performContext7Search: unknown;
+        context7SemanticAuditor: unknown;
+        comprehensiveCachingService: unknown;
+        wasmClusteringService: unknown;
+        librarySyncService: unknown;
+        natsMessaging: unknown;
+        qdrantClient: unknown;
+        QdrantClient: unknown;
+        generateEmbedding: unknown;
+        VectorService: unknown;
+        VectorSearchService: unknown;
+        VectorRepository: unknown;
+        aiReports: unknown;
+        legalPrecedents: unknown;
+        analyticsLog: unknown;
+    }
+}
+
+// Fall back global declarations
+declare const context7AgentOrchestrator: unknown;
+declare const performContext7Search: unknown;
+declare const context7SemanticAuditor: unknown;
+declare const qdrantClient: unknown;
+declare const legalPrecedents: unknown;
+declare const aiReports: any;

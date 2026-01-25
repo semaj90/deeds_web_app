@@ -80,6 +80,15 @@ declare interface SimpleRedis {
 		type(key: string, path?: string): Promise<string | null>;
 	};
 	/** Redis Streams helpers used by some workers */
+	xInfoStream(stream: string): Promise<unknown>;
+	xRevRange(stream: string, start: string, end: string, opts?: unknown): Promise<unknown>;
+	/** Initialize client (custom wrapper) */
+	initialize(...args: unknown[]): Promise<unknown> | void;
+	memory(...args: unknown[]): Promise<unknown>;
+	type(...args: unknown[]): Promise<string>;
+}
+	};
+	/** Redis Streams helpers used by some workers */
 	xInfoStream?(stream: string): Promise<unknown>;
 	xRevRange?(stream: string, start: string, end: string, opts?: unknown): Promise<unknown>;
 	/** Initialize client (custom wrapper) */

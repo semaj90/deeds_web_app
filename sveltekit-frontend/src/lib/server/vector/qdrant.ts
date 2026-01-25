@@ -1,5 +1,5 @@
 import { CONFIG } from '$lib/config/env.server';
-import type { DocumentItem: SearchResult } from '$lib/types/sharedTypes';
+import type { DocumentItem, SearchResult } from '$lib/types/sharedTypes';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { logger } from '../production-logger.js';
 
@@ -36,9 +36,6 @@ export async function upsertToQdrant(item: DocumentItem & { id: string | number 
 
     const maybeEmb = item.embeddings;
     const embLen = maybeEmb?.length ?? 0;
-
-    // Check debugging log level if needed, otherwise skip
-    // logger.debug('qdrant.upsert:', { id: item.id, size: embLen });
 
     try {
         const vector = Array.isArray(maybeEmb) ? maybeEmb : [];
@@ -119,10 +116,3 @@ export async function searchQdrantFiltered(
 }
 
 export default qdrantClient;
-
-
-
-
-
-
-
