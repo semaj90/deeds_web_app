@@ -12,7 +12,7 @@
  * poiStore.createPOI({ name: 'John Doe' });
  */
 
-import { writable, derived } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 /**
  * Types
@@ -88,7 +88,7 @@ interface POIStoreState {
     };
     // timeline
     timeline: TimelineEvent[];
-    timelineByPOI: Map<string: TimelineEvent[]>;
+    timelineByPOI: Map<string, TimelineEvent[]>;
     // Risk
     riskScores: Map<string, number>;
     predictiveAnalysis?: unknown;

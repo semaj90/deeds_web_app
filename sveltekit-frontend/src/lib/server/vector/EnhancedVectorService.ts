@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm/sql';
+import { sql } from 'drizzle-orm';
 import Redis from 'ioredis';
 import { db } from '../db/index.js';
 import { cases } from '../db/schema.js';

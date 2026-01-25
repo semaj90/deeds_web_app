@@ -175,7 +175,7 @@ export class MultiLayerCacheSystem {
 		return false;
 	}
 
-	private findLRU(layer: Map<string: CacheEntry<unknown>>): string | null {
+	private findLRU(layer: Map<string, CacheEntry<unknown>>): string | null {
 		let oldestKey: string | null = null;
 		let oldestTime = Infinity;
 		for (const [key, entry] of layer) {
@@ -187,7 +187,7 @@ export class MultiLayerCacheSystem {
 		return oldestKey;
 	}
 
-	private findLFU(layer: Map<string: CacheEntry<unknown>>): string | null {
+	private findLFU(layer: Map<string, CacheEntry<unknown>>): string | null {
 		let leastUsedKey: string | null = null;
 		let leastCount = Infinity;
 		for (const [key, entry] of layer) {
@@ -199,7 +199,7 @@ export class MultiLayerCacheSystem {
 		return leastUsedKey;
 	}
 
-	private findFIFO(layer: Map<string: CacheEntry<unknown>>): string | null {
+	private findFIFO(layer: Map<string, CacheEntry<unknown>>): string | null {
 		const firstEntry = layer.entries().next();
 		return firstEntry.done ? null : firstEntry.value[0];
 	}

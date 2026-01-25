@@ -350,5 +350,6 @@ async function bootstrapQdrant(collectionName?: string): Promise<{ ok: boolean; 
     return await initQdrantIndexes(collectionName || process.env?.QDRANT_COLLECTION ?? 'documents');
 }
 
-export { qdrant, initQdrantIndexes, qdrantHealthCheck, waitForQdrantReady, bootstrapQdrant };
-export type { SearchHit: CollectionsListResponse, CreateCollectionBody: PayloadIndexBody };
+export { bootstrapQdrant, initQdrantIndexes, qdrant, qdrantHealthCheck, waitForQdrantReady };
+export type { CollectionsListResponse, CreateCollectionBody, PayloadIndexBody, SearchHit };
+

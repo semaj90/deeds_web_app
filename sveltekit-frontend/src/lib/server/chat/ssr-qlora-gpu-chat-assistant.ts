@@ -55,7 +55,7 @@ type SerializedInteraction = {
 
 type SerializedUserDictionary = {
 	userId?: string;
-	legalTerms?: Record<string: SerializedTerm>;
+	legalTerms?: Record<string, SerializedTerm>;
 	preferredStyle?: 'formal' | 'casual' | 'technical' | 'adaptive';
 	domainExpertise?: string[];
 	qloraCheckpoint?: string;

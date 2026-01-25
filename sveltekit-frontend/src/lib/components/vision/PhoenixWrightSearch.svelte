@@ -179,17 +179,17 @@
  link.click();
  document.body.removeChild(link);
  URL.revokeObjectURL(url);
- } else if (format === 'pdf') {
- // Call PDF export API
- const response = await fetch('/api/legal/phoenix-wright-export', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ caseId: result, searchResult,
- format: 'pdf'
- })
- });
-
- if (!response.ok) {
+		} else if (format === 'pdf') {
+			// Call PDF export API
+			const response = await fetch('/api/legal/phoenix-wright-export', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					caseId,
+					searchResult,
+					format: 'pdf'
+				})
+			}); if (!response.ok) {
  throw new Error('PDF export failed');
  }
 

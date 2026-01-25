@@ -8,7 +8,7 @@
 	  Overlay as DialogOverlay,
 	  Root as DialogRoot,
 	  Title as DialogTitle
-	} from '$lib/components/ui/dialog';
+	} from '$lib/components/ui/dialog/index';
 
 	import { goto } from '$app/navigation';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';

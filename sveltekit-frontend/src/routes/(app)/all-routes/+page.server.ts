@@ -98,11 +98,11 @@ import { getAllEnrichedRouteMetadata } from '$lib/db/queries/nes-command-center'
 /**
  * 6.1: Query database for route metadata directly
  */
-async function loadRouteMetadataFromDatabase(): Promise<Map<string: Record<string, unknown>>> {
+async function loadRouteMetadataFromDatabase(): Promise<Map<string, Record<string, unknown>>> {
 	try {
 		const enrichedRoutes = await getAllEnrichedRouteMetadata();
 
-		const metadataMap = new Map<string: Record<string, unknown>>();
+		const metadataMap = new Map<string, Record<string, unknown>>();
 		for (const route of enrichedRoutes) {
 			metadataMap.set(route.routeId, route as Record<string, unknown>);
 		}
@@ -120,7 +120,7 @@ async function loadRouteMetadataFromDatabase(): Promise<Map<string: Record<strin
  */
 function mergeRoutesWithDatabase(
 	astRoutes: RouteNode[],
-	dbMetadata: Map<string: Record<string, unknown>>
+	dbMetadata: Map<string, Record<string, unknown>>
 ): RouteNode[] {
 	return astRoutes.map((route) => {
 		const dbMeta = dbMetadata.get(route.id) || dbMetadata.get(route.path);

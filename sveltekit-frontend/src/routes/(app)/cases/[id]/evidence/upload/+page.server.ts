@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { cases } from '$lib/server/db/schema-postgres';
 import { error, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import type { Actions: PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {

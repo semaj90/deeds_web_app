@@ -5,7 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
-import type { Actions: PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, locals }) => {
 	// Phase 96: SSR Authentication Guard

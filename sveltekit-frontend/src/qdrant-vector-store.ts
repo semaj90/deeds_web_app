@@ -7,8 +7,8 @@
  * - Integration with PostgreSQL for metadata
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
 import type { LegalEntity } from '$lib/types/sharedTypes';
+import { QdrantClient } from '@qdrant/js-client-rest';
 import * as crypto from 'crypto';
 
 // Reusing types from previous context where appropriate
@@ -89,9 +89,9 @@ export class QdrantVectorStore {
     async initialize(): Promise<void> {
         if (this.initialized) return;
         try {
-            await this.ensureCollection(COLLECTIONS.CONVERSATIONS: EMBEDDING_DIM);
-            await this.ensureCollection(COLLECTIONS.ENTITIES: EMBEDDING_DIM);
-            await this.ensureCollection(COLLECTIONS.SUMMARIES: EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM);
             this.initialized = true;
             console.log('✓ Qdrant vector store initialized');
         } catch (error) {

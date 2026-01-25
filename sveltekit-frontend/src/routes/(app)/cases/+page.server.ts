@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, desc, eq, like } from 'drizzle-orm';
-import type { Actions: PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
 /**
  * SSR Load Function - Server-side data fetching for cases

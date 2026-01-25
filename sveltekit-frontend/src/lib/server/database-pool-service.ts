@@ -28,7 +28,7 @@ class DatabasePoolService {
 	private pools: Map<string, ReturnType<typeof postgres>> = new Map();
 	private drizzleInstances: Map<string, PostgresJsDatabase<any>> = new Map();
 	// keep an in-memory index only — do NOT store large results here to avoid memory bloat
-	private queryCacheIndex: Map<string: Omit<CachedQuery, 'result'>> = new Map();
+	private queryCacheIndex: Map<string, Omit<CachedQuery, 'result'>> = new Map();
 
 	// Cache settings
 	private readonly DEFAULT_CACHE_TTL = 300; // 5 minutes
