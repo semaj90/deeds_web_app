@@ -10,7 +10,10 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 // import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
  // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
+ import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
  import { onMount } from 'svelte';
+
+ const cache = useCache();
 
  interface Evidence {
  id: string; fileName: string;
@@ -49,6 +52,17 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const loadCase = async () => {
  try {
+ const cacheKey = `case-${caseId}`;
+
+ // Try cache first
+ const cached = await cache.get<Case>(cacheKey);
+ if (cached) {
+ caseData = cached;
+ console.log('✅ Cache hit: case-' + caseId);
+ return;
+ }
+
+ // Cache miss - fetch from API
  const response = await fetch(`/api/cases/${caseId}`);
  if (!response.ok) {
  if (response.status === 401) {
@@ -57,7 +71,13 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  }
  throw new Error('Failed to load case');
  }
- caseData = await response.json();
+
+ const data = await response.json();
+ caseData = data;
+
+ // Cache with 5 minute TTL
+ await cache.set(cacheKey, data, CacheStrategies.TWO_LAYER);
+ console.log('💾 Cached: case-' + caseId);
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load case';
  }
@@ -65,9 +85,31 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const loadEvidence = async () => {
  try {
+ const cacheKey = `evidence-list-${caseId}`;
+
+ // Try cache first
+ const cached = await cache.get<Evidence[]>(cacheKey);
+ if (cached) {
+ evidence = cached;
+ console.log('✅ Cache hit: evidence-list-' + caseId);
+ isLoading = false;
+ return;
+ }
+
+ // Cache miss - fetch from API
  const response = await fetch(`/api/cases/${caseId}/evidence`);
  if (!response.ok) throw new Error('Failed to load evidence');
- evidence = await response.json();
+
+ const data = await response.json();
+ evidence = data;
+
+ // Cache with 10 minute TTL (evidence changes less frequently)
+ await cache.set(cacheKey, data, {
+ memory: true,
+ persistent: true,
+ ttl: 600000 // 10 minutes
+ });
+ console.log('💾 Cached: evidence-list-' + caseId);
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to load evidence';
  } finally {
@@ -98,7 +140,12 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  throw new Error(data.error || 'Upload failed');
  }
 
- // Reload evidence
+ // Invalidate evidence cache before reloading
+ await cache.delete(`evidence-list-${caseId}`);
+ await cache.delete(`evidence-${caseId}`);
+ console.log('🗑️ Cache invalidated: evidence after upload');
+
+ // Reload evidence (will fetch fresh data)
  await loadEvidence();
  input.value = '';
  } catch (err) {

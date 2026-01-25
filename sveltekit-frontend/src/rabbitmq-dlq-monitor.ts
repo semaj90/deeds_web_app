@@ -4,7 +4,6 @@
  */
 
 import type { DocumentProcessingJob } from '$lib/server/messaging/rabbitmq-service';
-import { rabbitMQService } from '$lib/server/messaging/rabbitmq-service';
 
 interface RetryAttempt {
     attemptNumber: number;

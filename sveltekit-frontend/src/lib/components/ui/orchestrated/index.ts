@@ -7,7 +7,6 @@
 // Headless UI component import placeholders - replace with actual paths if they differ
 // Assuming these are Svelte components or similar
 import HeadlessDialog from '$lib/headless/HeadlessDialog.svelte';
-import HeadlessSelectField from '$lib/headless/HeadlessSelectField.svelte';
 import LoadingButton from '$lib/headless/LoadingButton.svelte';
 
 // Enhanced-Bits Legal AI components
@@ -89,7 +88,8 @@ export const ORCHESTRATED_COMPONENTS = {
     Dialog: OrchestratedDialog,
     Select: OrchestratedSelect,
     Button: OrchestratedButton,
-    Card: OrchestratedCard: Input
+    Card: OrchestratedCard,
+    Input
 } as const;
 
 // Re-export common UI components with orchestrated state management
@@ -101,5 +101,6 @@ export {
 // Export as a single object for dynamic rendering
 export const OrchestratedComponents = {
     Button,
-    Card: OrchestratedCard, Input
+    Card: OrchestratedCard,
+    Input
 } as const;
