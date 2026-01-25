@@ -146,8 +146,17 @@ class ProductionServiceClient {
         return this.makeRequest(endpoint, { method: 'POST', body, headers });
     }
 
-    /** Alias for post() - for compatibility with legacy code */
-    async callService(endpoint: string, body?: object, headers?: Record<string, string>): Promise<ServiceResponse> {
+    /** Alias for post() - for compatibility with legacy code (headers overload) */
+    async callService(endpoint: string, body?: object, headers?: Record<string, string>): Promise<ServiceResponse>;
+
+    /** Alias for post() - for compatibility with legacy code (options overload) */
+    async callService(endpoint: string, body?: object, options?: { preferredProtocol?: string; timeout?: number }): Promise<ServiceResponse>;
+
+    async callService(endpoint: string, body?: object, headersOrOptions?: Record<string, string> | { preferredProtocol?: string; timeout?: number }): Promise<ServiceResponse> {
+        // If headersOrOptions has preferredProtocol or timeout, treat it as options (ignore them, just call post with body)
+        // Otherwise, treat it as headers
+        const hasOptionProps = headersOrOptions && ('preferredProtocol' in headersOrOptions || 'timeout' in headersOrOptions);
+        const headers = hasOptionProps ? undefined : headersOrOptions as Record<string, string> | undefined;
         return this.post(endpoint, body, headers);
     }
 
