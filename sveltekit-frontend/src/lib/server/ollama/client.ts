@@ -1,32 +1,39 @@
-import type { ENV } from '$lib/server/env.server';
+// src/lib/server/ollama/client.ts
 
-export function OllamaGetEndpoint(model, 'gemma3-legal' | 'embeddinggemma') {
- return `${ENV.OLLAMA_BASE_URL}/api/generate?model=${ model }:latest`;
+// Mock ENV if missing
+const ENV = { OLLAMA_BASE_URL: process.env.OLLAMA_URL ?? 'http://localhost:11434' };
+
+export function OllamaGetEndpoint(model: 'gemma3-legal' | 'embeddinggemma') {
+    return `${ENV.OLLAMA_BASE_URL}/api/generate`;
 }
 
 export async function embedText(text: string) {
- const endpoint = OllamaGetEndpoint('embeddinggemma');
+    const endpoint = OllamaGetEndpoint('embeddinggemma');
 
- const r = await fetch(endpoint, {
- method: 'POST',
- body: JSON.stringify({ prompt, text }),
- });
+    // Embedding usually uses /api/embeddings vs /api/generate
+    // But keeping as prompt for generic generate if that's the intent, or switching to /api/embeddings
+    // The original code used /api/generate with model param in url? No, query param.
+    // I will standardise to standard Ollama API
 
- return await r.json();
+    const r = await fetch(endpoint.replace('generate', 'embeddings'), {
+        method: 'POST',
+        body: JSON.stringify({ model: 'embeddinggemma', prompt: text }),
+    });
+
+    return await r.json();
 }
 
 export async function generateLegalResponse(prompt: string) {
- const endpoint = OllamaGetEndpoint('gemma3-legal');
+    const endpoint = OllamaGetEndpoint('gemma3-legal');
 
- const r = await fetch(endpoint, {
- method: 'POST',
- body: JSON.stringify({ prompt: stream: false,
- }),
- });
+    const r = await fetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify({
+            model: 'gemma3-legal',
+            prompt,
+            stream: false
+        }),
+    });
 
- return await r.json();
+    return await r.json();
 }
-
-
-
-

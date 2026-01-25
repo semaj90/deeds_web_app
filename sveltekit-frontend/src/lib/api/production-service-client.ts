@@ -146,6 +146,11 @@ class ProductionServiceClient {
         return this.makeRequest(endpoint, { method: 'POST', body, headers });
     }
 
+    /** Alias for post() - for compatibility with legacy code */
+    async callService(endpoint: string, body?: object, headers?: Record<string, string>): Promise<ServiceResponse> {
+        return this.post(endpoint, body, headers);
+    }
+
     async put(
         endpoint: string,
         body?: object,

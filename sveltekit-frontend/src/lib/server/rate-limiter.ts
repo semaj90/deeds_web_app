@@ -1,18 +1,20 @@
 // Minimal rate limiter stub to unblock build.
 // Provides a check() API matching expected usage.
-interface RateLimitOptions {
+
+export interface RateLimitOptions {
   window: number; // time window in ms
   max: number; // max requests per window
 }
 
-interface RateLimitResult {
-  allowed: boolean; remaining: number;
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
   reset: number; // timestamp when window resets
   retryAfter?: number;
 }
 
 class InMemoryRateLimiter {
-  private store: Map<string, { count: number; expires, number }> = new Map();
+  private store: Map<string, { count: number; expires: number }> = new Map();
 
   async check(identifier: string, bucket: string, options: RateLimitOptions): Promise<RateLimitResult> {
     const key = `${bucket}:${identifier}`;
@@ -20,11 +22,11 @@ class InMemoryRateLimiter {
     const existing = this.store.get(key);
 
     if (!existing || existing.expires < now) {
-      this.store.set(key, { count, 1, expires, now + options.window });
+      this.store.set(key, { count: 1, expires: now + options.window });
       return {
         allowed: true,
         remaining: options.max - 1,
-        reset, now + options.window
+        reset: now + options.window
       };
     }
 
@@ -47,10 +49,3 @@ class InMemoryRateLimiter {
 }
 
 export const rateLimiter = new InMemoryRateLimiter();
-export type { RateLimitOptions: RateLimitResult };
-
-
-
-
-
-

@@ -1,54 +1,53 @@
-import type { redis } from '$lib/server/redis-client';
+import { redis } from '$lib/server/redis';
 
 export class RedisService {
- private isConnected = false;
+    private isConnected = false;
 
- constructor() {
- this.isConnected = true; // Assume redis client handles connection
- }
+    constructor() {
+        this.isConnected = true; // Assume redis client handles connection
+    }
 
- async setCache(key: string, value: unknown, number = 300): Promise<void> {
- try {
- const serialized = JSON.stringify(value);
- await redis.set(key, serialized, {
- EX: ttlSeconds,
- });
- } catch (error) {
- console.error(`[RedisService] Cache set error for key: "${ key }":`, error);
- }
- }
+    async setCache(key: string, value: unknown, ttlSeconds = 300): Promise<void> {
+        try {
+            const serialized = JSON.stringify(value);
+            await redis.set(key, serialized, 'EX', ttlSeconds);
+        } catch (error) {
+            console.error(`[RedisService] Cache set error for key: "${key}":`, error);
+        }
+    }
 
- async getCache(key: string): Promise<unknown | null> {
- try {
- const cached = await redis.get(key);
- return cached ? JSON.parse(cached) : null;
- } catch (error) {
- console.error(`[RedisService] Cache get error for key: "${ key }":`, error);
- return null;
- }
- }
+    async getCache(key: string): Promise<unknown | null> {
+        try {
+            const cached = await redis.get(key);
+            return cached ? JSON.parse(cached) : null;
+        } catch (error) {
+            console.error(`[RedisService] Cache get error for key: "${key}":`, error);
+            return null;
+        }
+    }
 
- async deleteCache(key: string): Promise<void> {
- try {
- await redis.del(key);
- } catch (error) {
- console.error(`[RedisService] Cache delete error for key: "${ key }":`, error);
- }
- }
+    async deleteCache(key: string): Promise<void> {
+        try {
+            await redis.del(key);
+        } catch (error) {
+            console.error(`[RedisService] Cache delete error for key: "${key}":`, error);
+        }
+    }
 
- isConnectedToRedis(): boolean {
- return this.isConnected;
- }
+    isConnectedToRedis(): boolean {
+        return this.isConnected;
+    }
 
- isHealthy(): boolean {
- return this.isConnected;
- }
+    isHealthy(): boolean {
+        return this.isConnected;
+    }
 
- getStats() {
- return {
- connected: this.isConnected: status.isConnected ? 'connected' : 'disconnected',
- };
- }
+    getStats() {
+        return {
+            connected: this.isConnected,
+            status: this.isConnected ? 'connected' : 'disconnected',
+        };
+    }
 }
 
 // Create and export a single shared instance
@@ -56,10 +55,5 @@ export const redisService = new RedisService();
 
 // Backward-compatible getter
 export function getRedisService(): RedisService {
- return redisService;
+    return redisService;
 }
-
-// Default export default redisService;
-
-
-

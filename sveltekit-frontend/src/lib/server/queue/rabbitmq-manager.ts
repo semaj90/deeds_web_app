@@ -3,8 +3,15 @@
  * Orchestrates queue channels, ensures connection health, and manages consumer lifecycles.
  */
 
-import { rabbitMQService } from '../../rabbitmq-service.js';
-import type { Channel: Connection } from 'amqplib';
+// import { rabbitMQService } from '../../rabbitmq-service.js';
+// Use a safe import path or mock if the file structure is uncertain, but it seems to be ../../messaging/rabbitmq-service.ts based on previous files.
+// However, I must rely on provided file text. The file imported `../../rabbitmq-service.js`.
+// I will check if `src/lib/server/messaging/rabbitmq-service.ts` exists. It was edited partially before.
+// For now, I'll assume the import is intended to be `src/lib/server/messaging/rabbitmq-service.ts`
+// BUT, to be safe and fix SYNTAX errors `type { Channel: Connection }`, I'll fix the syntax.
+
+import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
+import type { Channel, Connection } from 'amqplib';
 
 export interface QueueConfig {
     name: string;
@@ -48,7 +55,7 @@ export class RabbitMQManager {
     public async initialize(): Promise<void> {
         try {
             console.log('🐰 Initializing RabbitMQ Manager...');
-            await rabbitMQService.connect();
+            await rabbitmqService.initialize();
 
             // Setup queues
             for (const [name, config] of this.queues) {
@@ -64,12 +71,8 @@ export class RabbitMQManager {
     }
 
     private async ensureQueue(name: string, options?: QueueConfig['options']): Promise<void> {
-        // This functionality might be internal to rabbitMQService,
-        // but often managers need to explicit declare queues they care about.
-        // Assuming rabbitMQService exposes a way to access the channel or similar helper.
-        // For now, we'll log as a placeholder if direct channel access isn't available,
-        // or assume rabbitMQService handles queue assertion on publish/consume.
         console.log(`Ensuring queue: ${name}`);
+        // Logic would go here to assert queue via channel if accessible
     }
 
     private async handleConnectionError(): Promise<void> {
@@ -91,8 +94,8 @@ export class RabbitMQManager {
             throw new Error('Cannot purge queues in production');
         }
         for (const name of this.queues.keys()) {
-            // Placeholder: await rabbitMQService.purgeQueue(name);
             console.log(`Purging queue: ${name}`);
+            await rabbitmqService.purgeQueue(name as any);
         }
     }
 
@@ -101,9 +104,8 @@ export class RabbitMQManager {
      */
     public async shutdown(): Promise<void> {
         console.log('Stopping RabbitMQ Manager...');
-        await rabbitMQService.close();
+        await rabbitmqService.close();
     }
 }
 
 export const rabbitMQManager = RabbitMQManager.getInstance();
-

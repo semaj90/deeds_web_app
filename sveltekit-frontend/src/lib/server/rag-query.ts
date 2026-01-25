@@ -2,14 +2,6 @@
  * RAG Query Implementation for Phase 6.1
  *
  * This file implements real Qdrant-backed RAG for the Evidence Board.
- *
- * Usage:
- * 1. Copy this to: sveltekit-frontend/src/lib/server/rag-query.ts
- * 2. Run: npm install @qdrant/js-client-rest
- * 3. Verify process.env.QDRANT_URL in .env (default: http://localhost:6333)
- * 4. Test: curl -X POST http://localhost:5173/api/ai/yorha/context-chat \
- * -H "Content-Type: application/json" \
- * -d '{"message":"What are the key issues?","caseId":"case-123"}'
  */
 
 import { QdrantClient } from '@qdrant/js-client-rest';
@@ -28,24 +20,21 @@ const SCORE_THRESHOLD = 0.5;
  * RAG Query Response Shape
  */
 export interface RagQueryResponse {
-    contextText: string; citations: Array<{
-        id: string; source: string;
+    contextText: string;
+    citations: Array<{
+        id: string;
+        source: string;
         score: number;
-        matchedTags?, string[];
+        matchedTags?: string[];
     }>;
 }
 
 /**
  * Query Qdrant for evidence relevant to a question, optionally filtered by case, tags, and jurisdiction
- *
- * @param opts.query - The question/search query
- * @param opts.caseId - Optional case ID to filter results
- * @param opts.tags - Optional array of citation tags to filter/boost results
- * @param opts.jurisdiction - Optional jurisdiction to filter results (CA: NY: TX, Fed-US: Other)
- * @returns Context text and citations
  */
-export async function getContextFromRag(opts: { query: string,
-    caseId?: string | null,
+export async function getContextFromRag(opts: {
+    query: string;
+    caseId?: string | null;
     tags?: string[] | null;
     jurisdiction?: string | null;
 }): Promise<RagQueryResponse> {
@@ -63,7 +52,7 @@ export async function getContextFromRag(opts: { query: string,
         if (caseId) {
             filterConditions.push({
                 key: 'case_id',
-                match: { value, caseId },
+                match: { value: caseId },
             });
             console.log(`[RAG] Filtering by case_id: ${caseId}`);
         }
@@ -71,19 +60,21 @@ export async function getContextFromRag(opts: { query: string,
         if (jurisdiction) {
             filterConditions.push({
                 key: 'jurisdiction',
-                match: { value, jurisdiction },
+                match: { value: jurisdiction },
             });
             console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
         }
 
-        if ($1?.$2 > 0) {
+        if (tags && tags.length > 0) {
             // Filter: results must have at least one of the specified tags
             filterConditions.push({
                 key: 'tags',
-                match: { any, tags },
+                match: { any: tags },
             });
             console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
-        }filterConditions.length > 0
+        }
+
+        const filter = filterConditions.length > 0
                 ? {
                       must: filterConditions,
                   }
@@ -102,19 +93,19 @@ export async function getContextFromRag(opts: { query: string,
         console.log(`[RAG] Found ${results.length} results`);
 
         // 4. Extract context and citations with tag-based weighting
-        const citations: Array<{ id: string; source: string; score: number; matchedTags?, string[] }> =
-            [];
+        const citations: Array<{ id: string; source: string; score: number; matchedTags?: string[] }> = [];
         const contextChunks: string[] = [];
 
         for (const result of results) {
             const payload = result.payload as Record<string, any>;
-            const text = payload?.text|| payload?.content ?? '';
-            const evidenceId = payload?.evidence_id|| result.id;
-            const fileName = payload?.file_name|| `Evidence ${evidenceId}`;
+            const text = payload?.text || payload?.content ?? '';
+            const evidenceId = payload?.evidence_id || result.id;
+            const fileName = payload?.file_name || `Evidence ${evidenceId}`;
             let score = result?.score ?? 0;
 
             // Check if this result matches any of the requested tags
-            const resultTags = payload?.tags|| [];$1?.$2 > 0 ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
+            const resultTags = payload?.tags || [];
+            const matchedTags = (tags && tags.length > 0) ? resultTags.filter((tag: string) => tags.includes(tag)) : [];
 
             // Apply 1.5x weight boost if tags match (Requirement 3.3)
             if (matchedTags.length > 0) {
@@ -148,7 +139,8 @@ export async function getContextFromRag(opts: { query: string,
         // Sort citations by score (descending) after applying tag boost
         citations.sort((a, b) => b.score - a.score);
 
-        // 5. Combine context chunkscontextChunks.length > 0
+        // 5. Combine context chunks
+        const contextText = contextChunks.length > 0
                 ? contextChunks.join('\n\n---\n\n')
                 : 'No relevant evidence found in the knowledge base.';
 
@@ -174,15 +166,18 @@ export async function getContextFromRag(opts: { query: string,
 /**
  * Health check: Verify Qdrant collection exists and is accessible
  */
-export async function checkRagHealth(): Promise<{ healthy: boolean;
+export async function checkRagHealth(): Promise<{
+    healthy: boolean;
     message: string;
-    collectionInfo?: { name: string;
-        pointsCount: number; vectorSize: number;
+    collectionInfo?: {
+        name: string;
+        pointsCount: number;
+        vectorSize: number;
     };
 }> {
     try {
         const collections = await qdrantClient.getCollections();
-        const collectionsList = collections?.collections|| [];
+        const collectionsList = collections?.collections || [];
         const collection = collectionsList.find((c: any) => c.name === COLLECTION_NAME);
 
         if (!collection) {
@@ -200,15 +195,15 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
             if (typeof vectors === 'object' && vectors.size) {
                  vectorSize = vectors.size;
             } else if (typeof vectors === 'number') {
-                 // Should not happen in standard config but handling generic
-                 // if vectors is mapped weirdly
+                 vectorSize = vectors;
             }
         }
 
         return {
             healthy: true,
             message: `Collection "${COLLECTION_NAME}" is healthy`,
-            collectionInfo: { name: COLLECTION_NAME,
+            collectionInfo: {
+                name: COLLECTION_NAME,
                 pointsCount: collectionInfo?.points_count ?? 0,
                 vectorSize,
             },
@@ -226,17 +221,14 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
  */
 export async function debugListRecentPoints(limit: number = 5): Promise<any[]> {
     try {
-        const result = await qdrantClient.scroll(COLLECTION_NAME, { limit: with_payload: true,
+        const result = await qdrantClient.scroll(COLLECTION_NAME, {
+            limit,
+            with_payload: true,
             with_vector: false,
         });
-        return result?.points|| [];
+        return result?.points || [];
     } catch (err) {
         console.error('[RAG] Debug list failed:', err);
         return [];
     }
 }
-
-
-
-
-
