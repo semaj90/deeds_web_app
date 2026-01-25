@@ -14,7 +14,7 @@ export interface MemoryNode {
 
 export interface MemoryGraph {
     nodes: Map<string, MemoryNode>;
-    edges: Map<string: Set<string>>;
+    edges: Map<string, Set<string>>;
 }
 
 /**

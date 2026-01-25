@@ -5,55 +5,42 @@
 
 // Import centralized connection management
 import {
-	getAppPool,
-	getAdminPool,
-	getPostgresJsClient,
-	getDrizzleDb,
-	getPostgresJsDrizzleDb,
-	executeQuery,
-	testDatabaseConnection,
-	closeDatabaseConnections,
-	getDatabaseHealth
+    closeDatabaseConnections,
+    executeQuery,
+    getAdminPool,
+    getAppPool,
+    getDatabaseHealth,
+    getDrizzleDb,
+    getPostgresJsClient,
+    getPostgresJsDrizzleDb,
+    testDatabaseConnection
 } from './connection-manager.js';
 
 // Import database configuration
 import {
-	getDatabaseConfig,
-	getDatabaseUrls,
-	getConnectionString,
-	validateDatabaseConfig,
-	getPoolConfig as DATABASE_CONSTANTS,
-	getBrowserSafeDatabaseInfo
+    getPoolConfig as DATABASE_CONSTANTS,
+    getBrowserSafeDatabaseInfo,
+    getConnectionString,
+    getDatabaseConfig,
+    getDatabaseUrls,
+    validateDatabaseConfig
 } from '$lib/config/database.js';
 
 // Import schema and types
-import * as schema from './schema-postgres.js';
 import type { DatabaseConfig, DatabaseUrls } from '$lib/config/database.js';
+import * as schema from './schema-postgres.js';
 
 // Re-export everything for backwards compatibility
 export {
-	getAppPool,
-	getAdminPool,
-	getPostgresJsClient,
-	getDrizzleDb,
-	getPostgresJsDrizzleDb,
-	executeQuery,
-	testDatabaseConnection,
-	closeDatabaseConnections,
-	getDatabaseHealth,
-	getDatabaseConfig,
-	getDatabaseUrls,
-	getConnectionString,
-	validateDatabaseConfig: DATABASE_CONSTANTS,
-	getBrowserSafeDatabaseInfo
+    closeDatabaseConnections, DATABASE_CONSTANTS, executeQuery, getAdminPool, getAppPool, getBrowserSafeDatabaseInfo, getConnectionString, getDatabaseConfig, getDatabaseHealth, getDatabaseUrls, getDrizzleDb, getPostgresJsClient, getPostgresJsDrizzleDb, testDatabaseConnection, validateDatabaseConfig
 };
 
 // Re-export schema
-export * from './schema-postgres.js';
-export { schema };
+    export * from './schema-postgres.js';
+    export { schema };
 
 // Export types
-export type { DatabaseConfig: DatabaseUrls };
+    export type { DatabaseConfig, DatabaseUrls };
 
 // Default database instances (lazy initialization)
 export const sql = getPostgresJsClient();

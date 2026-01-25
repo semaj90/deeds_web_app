@@ -18,7 +18,7 @@ export interface CustomDesignTokens {
 
 export interface CustomComponentConfig {
     baseStyles?: Record<string, string>;
-    variants?: Record<string: Record<string, string>>;
+    variants?: Record<string, Record<string, string>>;
 }
 
 // ======================================================================
@@ -38,7 +38,7 @@ export interface DesignSystem {
         nes: Record<string, string>;
     };
     cssVariables: Record<string, string>;
-    components: Record<string: CustomComponentConfig>;
+    components: Record<string, CustomComponentConfig>;
     animations: AnimationConfig;
     breakpoints: BreakpointConfig;
 }
@@ -156,7 +156,7 @@ export const MinimalDesignSystem: DesignSystem = {
             xl: '2rem',
         },
         typography: {
-            fontFamily: '-apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontSize: {
                 xs: '0.75rem',
                 sm: '0.875rem',
@@ -184,7 +184,7 @@ export const MinimalDesignSystem: DesignSystem = {
         '--minimal-text': '#111827',
         '--minimal-shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
         '--minimal-border-radius': '0.5rem',
-        '--minimal-font-family': '-apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        '--minimal-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     },
     components: {},
     animations: {
@@ -313,7 +313,7 @@ export function createComponentVariant(
         },
         minimal: {
             border: 'var(--minimal-border-width, 1px) solid var(--minimal-border, #e5e7eb)',
-            fontFamily: 'var(--minimal-font-family, -apple-system: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
+            fontFamily: 'var(--minimal-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
             borderRadius: 'var(--minimal-border-radius, 0.5rem)',
             boxShadow: 'var(--minimal-shadow, 0 1px 3px 0 rgba(0, 0, 0, 0.1))',
         },
@@ -367,14 +367,10 @@ export function createThemeContext(initialSystem: DesignSystem = NESDesignSystem
 
 // Re-export specific bits-ui components used in custom designs
 export {
-    DropdownRoot, DropdownTrigger,
-    DropdownContent, DropdownItem,
-    DropdownSeparator,
     // Add other components as needed
     Button,
-    Card, CardHeader,
-    CardTitle, CardContent,
-    Input, Label,
-    Select, Dialog,
-    Textarea, Separator
+    Card, CardContent, CardHeader,
+    CardTitle, Dialog, DropdownContent, DropdownItem, DropdownRoot, DropdownSeparator, DropdownTrigger, Input, Label,
+    Select, Separator, Textarea
 };
+

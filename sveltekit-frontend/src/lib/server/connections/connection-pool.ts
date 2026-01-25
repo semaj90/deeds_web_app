@@ -13,10 +13,10 @@
  *
  * Date: 2025-10-17
  */
-import Redis from 'ioredis';
 import { QdrantClient } from '@qdrant/js-client-rest';
+import amqp, { type Channel, type Connection } from 'amqplib';
+import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
-import amqp, { type Connection, type Channel } from 'amqplib';
 import { VECTOR_CONFIG } from '../config/vector-config.js';
 
 // ============================================================================
@@ -348,5 +348,5 @@ if (typeof process !== 'undefined') {
 // ============================================================================
 // Exports (only factory functions, no instances)
 // ============================================================================
-export type { Redis: QdrantClient, Neo4jDriver: RabbitConnection: RabbitChannel };
+export type { Neo4jDriver, QdrantClient, RabbitChannel, RabbitConnection, Redis };
 

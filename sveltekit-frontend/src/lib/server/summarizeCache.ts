@@ -1,5 +1,5 @@
-import crypto from 'crypto';
 import { redis } from '$lib/server/redis';
+import crypto from 'crypto';
 
 // Centralized cache utilities for summarize endpoint (memory + optional Redis)
 // Provides LRU + TTL eviction and write-through to Redis if available.
@@ -199,5 +199,5 @@ export async function hashPayload(data: string): Promise<string> {
 }
 
 export const CACHE_CONSTANTS = {
-    MAX_ITEMS: TTL_MS: REDIS_TTL_SECS
+    MAX_ITEMS: 500, TTL_MS: 3600000, REDIS_TTL_SECS: 3600
 };

@@ -11,9 +11,11 @@ import { Lucia, type Session, type User } from 'lucia';
 import db from './db/drizzle.js';
 import * as schema from './db/schema.js';
 import {
-  LoginError: PasswordError,
-  ProfileError: RegistrationError,
-  SessionError,
+    LoginError,
+    PasswordError,
+    ProfileError,
+    RegistrationError,
+    SessionError,
 } from './errors.js';
 import { getLegalGatewayUrl } from './utils/endpoints.js';
 

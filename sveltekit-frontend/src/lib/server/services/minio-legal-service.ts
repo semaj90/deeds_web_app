@@ -1,5 +1,5 @@
-import { Client } from 'minio';
 import { env } from '$lib/env';
+import { Client } from 'minio';
 
 const MINIO_ENDPOINT = env?.MINIO_ENDPOINT ?? 'localhost:9000';
 const MINIO_ACCESS_KEY = env?.MINIO_ACCESS_KEY ?? 'minioadmin';
@@ -37,7 +37,7 @@ export async function initializeMinIOBuckets() {
         console.log('[MinIO] Initializing legal search buckets...');
 
         // Create buckets if they don't exist
-        const buckets = [BUCKET_LAWS: BUCKET_LAWS_PARSED: BUCKET_LAWS_METADATA];
+        const buckets = [BUCKET_LAWS, BUCKET_LAWS_PARSED, BUCKET_LAWS_METADATA];
 
         for (const bucket of buckets) {
             try {

@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { createClient } from 'redis'; // Use actual redis client, shim might be for browser
-import { WebSocket: WebSocketServer } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 
 export interface ClientConnection {
     ws: WebSocket;

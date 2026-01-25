@@ -8,44 +8,36 @@ import DropdownMenuTrigger from './DropdownMenuTrigger.svelte';
 
 // Named exports
 export {
-    DropdownMenu: DropdownMenuContent,
-    DropdownMenuItem: DropdownMenuRoot,
-    DropdownMenuSeparator: DropdownMenuTrigger
+    DropdownMenu, DropdownMenuContent,
+    DropdownMenuItem, DropdownMenuRoot,
+    DropdownMenuSeparator, DropdownMenuTrigger
 };
 
 // Aliased exports for compound pattern
-export {
-	Sub,
-	Root,
-	Item,
-	Label,
-	Group,
-	Content,
-	Trigger,
-	CheckboxItem,
-	RadioGroup,
-	RadioItem,
-	Separator,
-	Shortcut,
-	SubContent,
-	SubTrigger,
-	//
-	Root as DropdownMenu,
-	CheckboxItem as DropdownMenuCheckboxItem,
-	Content as DropdownMenuContent,
-	Group as DropdownMenuGroup,
-	Item as DropdownMenuItem,
-	Label as DropdownMenuLabel,
-	Portal as DropdownMenuPortal,
-	RadioGroup as DropdownMenuRadioGroup,
-	RadioItem as DropdownMenuRadioItem,
-	Separator as DropdownMenuSeparator,
-	Shortcut as DropdownMenuShortcut,
-	Sub as DropdownMenuSub,
-	SubContent as DropdownMenuSubContent,
-	SubTrigger as DropdownMenuSubTrigger,
-	Trigger as DropdownMenuTrigger
-};
+    export {
+        CheckboxItem, Content,
+        //
+        Root as DropdownMenu,
+        CheckboxItem as DropdownMenuCheckboxItem,
+        Content as DropdownMenuContent,
+        Group as DropdownMenuGroup,
+        Item as DropdownMenuItem,
+        Label as DropdownMenuLabel,
+        Portal as DropdownMenuPortal,
+        RadioGroup as DropdownMenuRadioGroup,
+        RadioItem as DropdownMenuRadioItem,
+        Separator as DropdownMenuSeparator,
+        Shortcut as DropdownMenuShortcut,
+        Sub as DropdownMenuSub,
+        SubContent as DropdownMenuSubContent,
+        SubTrigger as DropdownMenuSubTrigger,
+        Trigger as DropdownMenuTrigger, Group, Item,
+        Label, RadioGroup,
+        RadioItem, Root, Separator,
+        Shortcut, Sub, SubContent,
+        SubTrigger, Trigger
+    };
 
 // Type exports
-export type * from './types';
+    export type * from './types';
+

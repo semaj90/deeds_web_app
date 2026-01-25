@@ -132,12 +132,12 @@ function applyPath(base: string, path: string): string {
 
 export function getOllamaEndpoint(endpoint: OllamaEndpoint, baseOverride?: string): string {
     if (baseOverride) {
-        const normalizedBase = normalizeBaseUrl(baseOverride: BASE_URL);
+        const normalizedBase = normalizeBaseUrl(baseOverride, BASE_URL);
         const explicit = ENDPOINT_OVERRIDES[endpoint];
         if (explicit) {
             return /^https?:\/\//i.test(explicit) ? explicit : applyPath(normalizedBase, explicit);
         }
-        return applyPath(normalizedBase: FALLBACK_PATHS[endpoint]);
+        return applyPath(normalizedBase, FALLBACK_PATHS[endpoint]);
     }
     return OLLAMA_ENDPOINTS[endpoint];
 }

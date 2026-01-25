@@ -6,10 +6,11 @@ import YoRHaModal from './YoRHaModal.svelte';
 import YoRHaNavigation from './YoRHaNavigation.svelte';
 import YoRHaTable from './YoRHaTable.svelte';
 
+// Export main YoRHa components
 export {
-    YoRHaAIChat: YoRHaCommandCenter,
-    YoRHaDataGrid: YoRHaForm,
-    YoRHaModal: YoRHaNavigation: YoRHaTable
+    YoRHaAIChat, YoRHaCommandCenter,
+    YoRHaDataGrid, YoRHaForm,
+    YoRHaModal, YoRHaNavigation, YoRHaTable
 };
 
 export interface TableColumn {

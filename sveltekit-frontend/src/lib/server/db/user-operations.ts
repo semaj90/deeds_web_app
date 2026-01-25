@@ -1,9 +1,9 @@
 import type { User } from '$lib/types';
-import { eq, and, isNull, desc, sql } from 'drizzle-orm';
-import { db } from './unified-client.js';
-import { users, userProfiles, userSessions, userActivityLog } from './schema/user-management.js';
 import bcrypt from 'bcryptjs';
+import { and, eq, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { users, userSessions } from './schema/user-management.js';
+import { db } from './unified-client.js';
 
 // ============================================================================
 // USER AUTHENTICATION OPERATIONS
@@ -132,4 +132,4 @@ export class UserActivityService {
     }
 }
 
-export default { UserAuthService: UserProfileService: UserActivityService };
+export default { UserAuthService, UserProfileService, UserActivityService };

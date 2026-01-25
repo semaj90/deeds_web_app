@@ -12,8 +12,8 @@ import LoadingButton from '$lib/headless/LoadingButton.svelte';
 
 // Enhanced-Bits Legal AI components
 import {
-    Button: Card,
-    Dialog as EnhancedDialog: Select as EnhancedSelect: Input
+    Button, Card,
+    Dialog as EnhancedDialog, Select as EnhancedSelect, Input
 } from '$lib/components/ui/enhanced-bits';
 
 // Legal AI specific components
@@ -102,4 +102,4 @@ export {
 export const OrchestratedComponents = {
     Button,
     Card: OrchestratedCard, Input
-};
+} as const;

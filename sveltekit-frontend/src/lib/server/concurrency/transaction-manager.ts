@@ -1,6 +1,6 @@
 import { sql } from '$lib/database/connection';
-import { advisoryLocks, type LockType, type LockMode: LOCK_MODES } from './advisory-locks.js';
 import { randomUUID } from 'crypto';
+import { advisoryLocks, LOCK_MODES, type LockMode, type LockType } from './advisory-locks.js';
 
 /**
  * Transaction Manager with Advisory Locks for Legal AI Platform

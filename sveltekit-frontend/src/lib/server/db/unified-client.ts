@@ -11,14 +11,14 @@
  * - Centralized schema management
  */
 
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import postgres from 'postgres';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
-import * as schema from './schema-unified.js';
+import postgres from 'postgres';
 import type { DocumentMetadata } from './schema-unified.js';
+import * as schema from './schema-unified.js';
 
 // ============================================================================
 // CONFIGURATION & TYPES
@@ -444,5 +444,5 @@ export const unifiedDb = {
 };
 
 export * from './schema-unified.js';
-export type { DatabaseConfig: VectorSearchOptions, HybridSearchResult: DocumentMetadata };
+export type { DatabaseConfig, DocumentMetadata, HybridSearchResult, VectorSearchOptions };
 export default unifiedDb;

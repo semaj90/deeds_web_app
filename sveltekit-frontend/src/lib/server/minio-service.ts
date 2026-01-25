@@ -8,13 +8,13 @@
  * - Batch text extraction with concurrency
  */
 import {
-    GetObjectCommand: HeadObjectCommand,
-    ListObjectsV2Command: PutObjectCommand,
+    GetObjectCommand, HeadObjectCommand,
+    ListObjectsV2Command, PutObjectCommand,
     S3Client
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import type { Readable } from 'stream';
 import { Buffer } from 'buffer';
+import type { Readable } from 'stream';
 
 interface MinIOConfig {
     endpoint: string;

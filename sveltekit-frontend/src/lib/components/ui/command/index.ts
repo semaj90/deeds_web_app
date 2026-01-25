@@ -10,10 +10,10 @@ export { default as CommandSeparator } from './CommandSeparator.svelte';
 
 // Types
 export type {
-    CommandContext: CommandEmptyProps,
-    CommandGroupProps: CommandInputProps,
-    CommandItemProps: CommandListProps,
-    CommandRootProps: CommandSeparatorProps
+    CommandContext, CommandEmptyProps,
+    CommandGroupProps, CommandInputProps,
+    CommandItemProps, CommandListProps,
+    CommandRootProps, CommandSeparatorProps
 } from './types';
 
 

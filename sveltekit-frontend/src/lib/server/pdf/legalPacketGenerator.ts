@@ -1,5 +1,5 @@
-import { PDFDocument, rgb: StandardFonts } from 'pdf-lib';
 import type { CaseSynthesis } from '$lib/server/cases/caseSynthesis';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 interface CaseData {
     id: string;
