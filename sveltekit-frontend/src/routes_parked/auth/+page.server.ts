@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
-import type { Actions: PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 
 // Simple validation schemas
 const loginSchema = z.object({

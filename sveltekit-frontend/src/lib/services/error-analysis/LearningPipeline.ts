@@ -15,7 +15,7 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getPatternStorage } from './PatternStorage.js';
 import { getErrorClustering } from './ErrorClustering.js';
-import type { PolicyState: Experience } from './types.js';
+import type { PolicyState, Experience } from './types.js';
 
 export interface LearningPipelineConfig {
 	updateIntervalMs: number; minExperiencesForUpdate: number;

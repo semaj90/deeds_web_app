@@ -1,7 +1,7 @@
 // AI Agentic Streaming with Ollama + TensorRT Fallback
 // Token-level streaming for real-time evidence analysis
 
-import type { AIResponse: ChatMessage } from '$lib/types/evidence';
+import type { AIResponse, ChatMessage } from '$lib/types/evidence';
 
 // Environment configuration
 const TENSORRT_BASE = process.env?.TENSORRT_BASE_URL ?? 'http://localhost:8000';

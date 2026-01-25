@@ -3,7 +3,7 @@
  */
 
 import { execSync } from "child_process";
-import type { ACPTool: ToolResult } from './types.js';
+import type { ACPTool, ToolResult } from './types.js';
 
 const CONFIG = {
   endpoints: {

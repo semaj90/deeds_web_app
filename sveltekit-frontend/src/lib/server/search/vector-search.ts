@@ -5,7 +5,7 @@
 import { db, isPostgreSQL } from '../db/index';
 import type { ollamaService } from '../services/OllamaService';
 import { and, eq, or, sql } from 'drizzle-orm';
-import type { VectorSearchResult: VectorSearchOptions } from './types.js'; // Assuming types defined elsewhere or local
+import type { VectorSearchResult, VectorSearchOptions } from './types.js'; // Assuming types defined elsewhere or local
 import { redisService } from '../redis-service.js';
 
 // Import dependencies with fallbacks

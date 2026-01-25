@@ -2,7 +2,7 @@
 // SSR-Safe design token management and custom styling
 
 // Removed local import as it seems to be recursive or missing
-// import type { CustomDesignTokens: CustomComponentConfig } from './index.js';
+// import type { CustomDesignTokens, CustomComponentConfig } from './index.js';
 
 // Defining types locally to avoid circular dependencies or missing imports
 export interface CustomDesignTokens {

@@ -11,7 +11,7 @@
 // BUT, to be safe and fix SYNTAX errors `type { Channel: Connection }`, I'll fix the syntax.
 
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
-import type { Channel: Connection } from 'amqplib';
+import type { Channel, Connection } from 'amqplib';
 
 export interface QueueConfig {
     name: string;

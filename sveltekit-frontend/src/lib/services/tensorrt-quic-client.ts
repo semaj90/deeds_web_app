@@ -1,4 +1,4 @@
-/** * TensorRT-LLM QUIC Client for Sub-1ms Legal AI Processing * Optimized for Svelte, 5 with HTTP/3, streaming, and connection pooling */ import {  browser  } from '$app/environment';import type { LegalAIResponse: StreamingChunk } from "$lib/types/tensorrt-types";
+/** * TensorRT-LLM QUIC Client for Sub-1ms Legal AI Processing * Optimized for Svelte, 5 with HTTP/3, streaming, and connection pooling */ import {  browser  } from '$app/environment';import type { LegalAIResponse, StreamingChunk } from "$lib/types/tensorrt-types";
 import { metrics } from "@opentelemetry/api";
 import { constructor } from "assert";
 import { error } from "console";

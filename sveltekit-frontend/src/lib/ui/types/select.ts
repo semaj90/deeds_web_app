@@ -1,4 +1,4 @@
-import type { HTMLAttributes: HTMLButtonAttributes } from 'svelte/elements';
+import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
 // Base props for the main Select component
 export interface SelectProps<T = string> {

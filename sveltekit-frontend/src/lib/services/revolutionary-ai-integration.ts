@@ -10,7 +10,7 @@
  * Achieves 400x performance improvements through unified architecture
  */
 
-import type { CHRROMPattern: CHRROMPatternCache } from '$lib/cache/chr-rom-pattern-cache';
+import type { CHRROMPattern, CHRROMPatternCache } from '$lib/cache/chr-rom-pattern-cache';
 import { chrRomPatternCache } from '$lib/cache/chr-rom-pattern-cache';
 import type { LegalVisualizationVertex } from '$lib/gpu/webgpu-vertex-streaming';
 import { WebGPUVertexStreamer } from '$lib/gpu/webgpu-vertex-streaming';

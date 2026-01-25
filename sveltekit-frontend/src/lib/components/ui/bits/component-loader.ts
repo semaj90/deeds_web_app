@@ -2,7 +2,7 @@
  * Component Loader
  * Minimal generic loader for dynamic component imports
  */
-import type { ComponentType: SvelteComponent } from 'svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
 
 export type ComponentLoader<T = any> = () => Promise<{ default: ComponentType<SvelteComponent<T>> }>;
 

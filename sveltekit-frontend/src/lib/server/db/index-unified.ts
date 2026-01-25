@@ -28,7 +28,7 @@ import {
 
 // Import schema and types
 import * as schema from './schema-postgres.js';
-import type { DatabaseConfig: DatabaseUrls } from '$lib/config/database.js';
+import type { DatabaseConfig, DatabaseUrls } from '$lib/config/database.js';
 
 // Re-export everything for backwards compatibility
 export {

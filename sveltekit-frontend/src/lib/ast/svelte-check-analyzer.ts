@@ -4,7 +4,7 @@
  * for comprehensive error detection and agentic auto-suggestions
  */
 
-import { Project: SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
+import { Project, SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
 
 export interface ASTError {
   id: string;

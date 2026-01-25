@@ -21,7 +21,7 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
-import type { ErrorPattern: JSONLRecord } from './types.js';
+import type { ErrorPattern, JSONLRecord } from './types.js';
 import type { error } from "console";
 import { boolean, bytes } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";

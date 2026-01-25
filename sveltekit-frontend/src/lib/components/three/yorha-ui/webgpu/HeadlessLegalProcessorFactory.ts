@@ -1,5 +1,5 @@
 /// <reference types="@webgpu/types" />
-import type { LODCacheEntry: LODLevel } from '$lib/ai/lod-cache-engine.js';
+import type { LODCacheEntry, LODLevel } from '$lib/ai/lod-cache-engine.js';
 import { lodCacheEngine } from '$lib/ai/lod-cache-engine.js';
 import { ollamaService } from '$lib/server/ai/ollama-service.js';
 import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';

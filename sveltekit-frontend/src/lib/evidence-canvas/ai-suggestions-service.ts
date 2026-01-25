@@ -3,7 +3,7 @@
  * Provides intelligent recommendations for legal case analysis
  */
 
-import type { EvidenceNode: SimilarityResult } from './case-similarity-service.js';
+import type { EvidenceNode, SimilarityResult } from './case-similarity-service.js';
 
 export interface AISuggestion {
  id: string; type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';

@@ -1,4 +1,4 @@
-import type { Channel: Connection } from 'amqplib';
+import type { Channel, Connection } from 'amqplib';
 
 let connection: Connection | null = null;
 let channel: Channel | null = null;

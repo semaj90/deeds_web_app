@@ -8,7 +8,7 @@
 import { cleanupTest, setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { KnowledgeBase } from './knowledge-base.js';
-import type { Pattern: ServiceConfig } from './types.js';
+import type { Pattern, ServiceConfig } from './types.js';
 ;
 
 describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {

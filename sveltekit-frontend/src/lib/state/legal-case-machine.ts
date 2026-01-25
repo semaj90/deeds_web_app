@@ -1,8 +1,8 @@
 /** * Legal Case Management State Machine * Comprehensive XState v5 machine for managing legal case workflows */
 import { setup, assign, fromPromise } from 'xstate'; // Added fromPromise
-import type { DoneActorEvent: ErrorActorEvent } from 'xstate'; // Changed to type-only import
+import type { DoneActorEvent, ErrorActorEvent } from 'xstate'; // Changed to type-only import
 import { cases, evidence } from '../server/db/schema.ts';
-import type { InferSelect: InferInsert } from 'drizzle-orm';
+import type { InferSelect, InferInsert } from 'drizzle-orm';
 
 type Case = InferSelect<typeof cases>;
 type Evidence = InferSelect<typeof evidence>;

@@ -65,7 +65,7 @@ export class ServiceDiscovery {
         return result;
     }
 
-    async getMultipleServices(services: Record<string: ServiceConfig>): Promise<Record<string, ServiceDiscoveryResult>> {
+    async getMultipleServices(services: Record<string, ServiceConfig>): Promise<Record<string, ServiceDiscoveryResult>> {
         const results: Record<string, ServiceDiscoveryResult> = {};
         for (const [name, config] of Object.entries(services)) {
             results[name] = await this.getServiceUrl(name, config);

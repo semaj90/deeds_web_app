@@ -1,6 +1,6 @@
 import type { getUserId } from '$lib/server/auth/utils';
 import { fail, json } from '@sveltejs/kit';
-import type { Actions: PageServerLoad } from './$types.js';
+import type { Actions, PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
  try {

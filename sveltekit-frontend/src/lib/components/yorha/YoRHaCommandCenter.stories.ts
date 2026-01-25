@@ -1,5 +1,5 @@
 import type { Case } from '$lib/types';
-import type { Meta: StoryObj } from '@storybook/svelte';
+import type { Meta, StoryObj } from '@storybook/svelte';
 import { within, userEvent, expect } from '@storybook/test';
 import YoRHaCommandCenter from './YoRHaCommandCenter.svelte';
 

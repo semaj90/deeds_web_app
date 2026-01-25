@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import type { IngestionJobRequest: IngestionJobStatus } from './embedding-repository.js';
+import type { IngestionJobRequest, IngestionJobStatus } from './embedding-repository.js';
 
 // Minimal ingestion queue (Redis LIST if available else in-memory) + status store.
 const MEMORY_QUEUE: string[] = [];

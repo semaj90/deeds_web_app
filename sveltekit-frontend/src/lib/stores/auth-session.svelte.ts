@@ -10,7 +10,7 @@
  */
 
 import { browser } from '$app/environment';
-import type { Session: User } from 'lucia';
+import type { Session, User } from 'lucia';
 
 // ===== TYPES =====
 export interface AuthState {

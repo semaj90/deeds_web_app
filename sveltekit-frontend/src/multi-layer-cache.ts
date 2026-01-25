@@ -42,7 +42,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
 };
 
 export class MultiLayerCacheSystem {
-	private layers = new Map<string: Map<string, CacheEntry<unknown>>>();
+	private layers = new Map<string, Map<string, CacheEntry<unknown>>>();
 	private layerConfigs: CacheLayer[];
 	private currentSize = new Map<string, number>();
 

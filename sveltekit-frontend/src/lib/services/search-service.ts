@@ -1,7 +1,7 @@
 // Enhanced Search Service with Fuse.js + Go Binaries Catalog Integration
 // Real-time search across components, documentation, and services
 
-import type { SearchCategory: SearchResult } from '$lib/types/search.types';
+import type { SearchCategory, SearchResult } from '$lib/types/search.types';
 
 // ===== SEARCH INTERFACES =====
 export interface SearchableItem {

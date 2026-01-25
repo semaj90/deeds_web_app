@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import { getEmbeddingViaGate } from '$lib/server/embedding-gateway.js';
-import type { ChunkJob: EmbedResult } from '$lib/types/pipeline';
+import type { ChunkJob, EmbedResult } from '$lib/types/pipeline';
 import { parentPort, workerData } from 'worker_threads';
 
 // Local type definition to ensure worker has correct shape

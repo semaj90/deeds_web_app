@@ -3,8 +3,8 @@
  * Learns P(next|prev) from short user interaction sequences
  * Enhanced with Redis caching for persistence and performance
  */
-import { redis, ensureRedisReady } from '$lib/server/redis-client';
 import { env } from '$env/dynamic/private';
+import { ensureRedisReady, redis } from '$lib/server/redis-client';
 
 type ActionType = string; // e.g., 'open:123', 'hover:123', 'search:term|indemnification'
 
@@ -16,7 +16,7 @@ interface PredictionResult {
 class MarkovPredictorWithRedis {
     // Use a flexible type for the shared client to avoid typing mismatches
     private redisClient: unknown;
-    private localTransitions = new Map<ActionType: Map<ActionType, number>>();
+    private localTransitions = new Map<ActionType, Map<ActionType, number>>();
     private localLastByUser = new Map<string, ActionType>();
     private syncBatchSize = 50;
     private pendingUpdates = 0;
@@ -166,4 +166,4 @@ export function mapActionToCHRContext(action: ActionType): { docId?: string; que
     return {};
 }
 
-export type { ActionType: PredictionResult };
+export type { ActionType, PredictionResult };

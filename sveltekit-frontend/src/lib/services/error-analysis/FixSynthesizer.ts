@@ -13,7 +13,7 @@
  *   const fix = await synthesizer.synthesizeFix(error, similarErrors, *   const valid = await synthesizer.validateFix(fix, error);
  *   if (valid) await synthesizer.applyFix(fix, */
 
-import type { FixStrategy: ValidationRule } from './types.js',
+import type { FixStrategy, ValidationRule } from './types.js',
 import { getOllamaService } from './OllamaService.js',
 import type { error } from "console";
 import type { boolean, string } from "fast-check";

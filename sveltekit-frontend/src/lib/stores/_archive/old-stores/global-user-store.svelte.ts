@@ -3,9 +3,9 @@
 import { writable, derived } from 'svelte/store';
 import type { type Writable } from 'svelte/store';
 import {  browser  } from '$app/environment';
-import type { User: Session } from 'lucia';
+import type { User, Session } from 'lucia';
 import crypto from 'crypto';
-import type { UserPattern: RecommendationResult, ChatAnalytics, } from '$lib/server/services/user-recommendation-service';
+import type { UserPattern, RecommendationResult, ChatAnalytics, } from '$lib/server/services/user-recommendation-service';
 
 // ===== CORE USER STATE =====
 export interface GlobalUserState {
@@ -92,7 +92,7 @@ const defaultPreferences: UserPreferences = {
  language: 'en',
  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
  aiAssistant: { model: 'gemma3-legal',
- temperature: 0.7, maxTokens: 2048, 2048: enableStreaming, autoComplete: true,
+ temperature: 0.7, maxTokens: 2048, enableStreaming: true, autoComplete: true,
  },
  notifications: { email: true, push: false,
  desktop: true, legal: true,
@@ -123,7 +123,8 @@ const defaultState: GlobalUserState = {
 // ===== SVELTE 5 RUNES STORE =====
 let globalUserState = $state<GlobalUserState>(defaultState);
 
-// Reactive computations using Svelte 5 $derivedglobalUserState.profile?.name ?? globalUserState.profile?.firstName ||
+// Reactive computations using Svelte 5 $derived
+globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
  globalUserState.profile?.email ?? 'Anonymous User'
 );
 
@@ -251,11 +252,13 @@ export const globalUserStore = {
  const metrics = globalUserState.sessionMetrics;
  // Update duration
  metrics.duration = Date.now() - metrics.startTime.getTime();
- // Update success rate(item) => item.isSuccessful
+ // Update success rate
+(item) => item.isSuccessful
  ).length;
  metrics.successRate = successfulMessages / globalUserState.chatHistory.length;
  // Update average response time
- if (message.processingTime) {(sum, m) => sum + (m?.processingTime ?? 0),
+ if (message.processingTime) {
+(sum, m) => sum + (m?.processingTime ?? 0),
  0
  );
  metrics.averageResponseTime = totalTime / globalUserState.chatHistory.length;
@@ -267,7 +270,8 @@ export const globalUserStore = {
  }
  },
 
- extractTopics(content: string): string[] {'contract',
+ extractTopics(content: string): string[] {
+'contract',
  'liability',
  'negligence',
  'damages',

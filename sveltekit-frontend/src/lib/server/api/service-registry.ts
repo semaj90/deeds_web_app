@@ -1,11 +1,9 @@
-import type { User } from '$lib/types';
-import type { Document } from '$lib/types';
 
 // API Service Registry and Route Mapper
 // Maps all your existing API routes and provides service discovery
-import { existsSync, readdirSync, statSync } from 'fs';
-import { join } from 'path';
+import { existsSync } from 'fs';
 import { Socket } from 'net';
+import { join } from 'path';
 
 // Add explicit types to avoid `any` type
 export type HealthStatus = 'healthy' | 'unhealthy' | 'error' | 'unknown';
@@ -45,9 +43,9 @@ type ServiceCheckResult = ServiceConfig & {
 
 export class ApiServiceRegistry {
     // replace `any` with explicit types
-    routes: Map<string: RouteConfig>;
-    services: Map<string: ServiceConfig>;
-    healthChecks: Map<string: HealthCheckRecord>;
+    routes: Map<string, RouteConfig>;
+    services: Map<string, ServiceConfig>;
+    healthChecks: Map<string, HealthCheckRecord>;
 
     constructor() {
         this.routes = new Map();

@@ -1,5 +1,5 @@
 
-import type { PageServerLoad: Actions } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { createQdrantService } from '$lib/server/db/qdrant-integration';
 import { tryEmbedOllama } from '$lib/server/embeddings/ollama';

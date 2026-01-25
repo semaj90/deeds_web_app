@@ -1,4 +1,4 @@
-import type { AIResponse: Evidence } from '$lib/types';
+import type { AIResponse, Evidence } from '$lib/types';
 import type { Case } from '$lib/types';
 /** * AutoGen Multi-Agent Service * Handles conversational AI agents with role-based interactions */ import crypto from 'crypto'; import {  env  } from '$env /dynamic/private';
 import { process } from "node:process";

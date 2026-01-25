@@ -5,7 +5,7 @@
  */
 
 import { BaseService } from './base-service.js';
-import type { Pattern: ServiceConfig } from './types.js';
+import type { Pattern, ServiceConfig } from './types.js';
 
 export interface IKnowledgeBase {
  storePattern(pattern: Pattern): Promise<void>;

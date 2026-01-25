@@ -1,4 +1,4 @@
-import type { ChatMessage: RAGContext } from "$lib/types/ai-chat"; export interface RankedChunk { id: string, text: string, score: documentId?: string; sectionId?: string}
+import type { ChatMessage, RAGContext } from "$lib/types/ai-chat"; export interface RankedChunk { id: string, text: string, score: documentId?: string; sectionId?: string}
 
 export interface IntentPoint { x: number, y: number, intent: string}
 

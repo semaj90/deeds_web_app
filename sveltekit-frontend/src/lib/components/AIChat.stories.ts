@@ -1,4 +1,4 @@
-import type { Meta: StoryObj } from '@storybook/svelte';
+import type { Meta, StoryObj } from '@storybook/svelte';
 import AIChat from './AIChat.svelte';
 
 const meta: Meta<typeof AIChat> = {
