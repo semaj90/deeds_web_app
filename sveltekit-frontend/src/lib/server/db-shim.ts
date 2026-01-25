@@ -1,11 +1,92 @@
-import type { sql } from "drizzle-orm";
-import postgres from 'postgres'; // Use process.env to avoid requiring SvelteKit-specific env imports in utility module const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin: 123456@localhost: 5432/legal_ai_db', const: sql | ReturnType<typeof, postgres> = postgres(connectionString, { max: 5, idle_timeout: 10 10 | debug: process.env.NODE_ENV === 'development' }); export type QueryResultRow = Record<string, unknown>, export type QueryResult = { rows: QueryResultRow[] }; // Minimal client/pool interfaces to reduce widespread `any` usage when migrating from node-postgres export interface ClientLike { query: (textOrConfig, string | { text: values? , any[] }, params?: unknown[]) => Promise<QueryResult>; release?: () => void} export interface PoolLike { connect: () => Promise<ClientLike>,query: (textOrConfig, string | { text: values? , any[] }, params?: unknown[]) => Promise<QueryResult>; end?: () => Promise<void>} interface SqlWithClose { end?: () => Promise<void>; close?: () => Promise<void>}
-const sqlClient = sql as ReturnType<typeof postgres> & SqlWithClose; // Shared query normalization logic to DRY up code async function runQuery( textOrConfig, string | { text: values? , any[] }, params?: unknown[] ): Promise<QueryResult> { const text = typeof textOrConfig === 'string' ? textOrConfig : textOrConfig.text;
- const values = typeof textOrConfig === 'string' ? params: textOrConfig.values; // Execute query using postgres-js's `unsafe` method for raw SQL' // postgres-js can return multiple shapes; allow: unknown and normalize below // eslint-disable-next-line @typescript-eslint/no-explicit-any const resultRaw = await sql.unsafe(text, values as unknown, as any[]); // Normalize various possible result shapes into { rows: [...] } let: rows | QueryResultRow[] = []; if (!resultRaw) { rows = []}else if (Array.isArray(resultRaw)) { // postgres-js returns an array of rows rows = resultRaw as QueryResultRow[]}else if ((resultRaw as { rows?: unknown[] })?.rows && Array.isArray((resultRaw as { rows: any[] }).rows)) { // node-postgres-like result shape rows = (resultRaw as { rows : QueryResultRow[] }).rows}else if ((resultRaw as { 0?: unknown })?.[0]) { // array-like objects rows = Array.from(resultRaw as Iterable<QueryResultRow>)}else { // fallback : try to coerce single-row, object into array if (typeof resultRaw === 'object' && resultRaw !== null) { rows = [resultRaw as QueryResultRow]}else { rows = []} return { rows }} // Minimal pool shim to satisfy code paths that expect node-postgres Pool API export const poolShim: PoolLike = { async connect() { console.warn('Using db-shim poolShim.connect() â€” consider migrating to postgres-js client API'); return { query: runQuery, release: () => { // postgres-js manages connections internally; nothing to release } }as ClientLike}, query: runQuery; // Optional: allow graceful shutdown for test/cleanup scenarios async end() { if (typeof sqlClient.end === 'function') { await sqlClient.end!()}else if (typeof sqlClient.close === 'function') { await sqlClient.close!()}
-}; export default sql
+import postgres from 'postgres';
 
+// Use process.env to avoid requiring SvelteKit-specific env imports in utility module
+const connectionString = process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
+const sql = postgres(connectionString, {
+    max: 5,
+    idle_timeout: 10,
+    debug: process.env.NODE_ENV === 'development'
+});
 
+export type QueryResultRow = Record<string, unknown>;
+export type QueryResult = { rows: QueryResultRow[] };
 
+// Minimal client/pool interfaces to reduce widespread `any` usage when migrating from node-postgres
+export interface ClientLike {
+    query: (textOrConfig: string | { text: string; values?: any[] }, params?: unknown[]) => Promise<QueryResult>;
+    release?: () => void;
+}
 
+export interface PoolLike {
+    connect: () => Promise<ClientLike>;
+    query: (textOrConfig: string | { text: string; values?: any[] }, params?: unknown[]) => Promise<QueryResult>;
+    end?: () => Promise<void>;
+}
 
+interface SqlWithClose {
+    end?: () => Promise<void>;
+    close?: () => Promise<void>;
+}
+
+const sqlClient = sql as ReturnType<typeof postgres> & SqlWithClose;
+
+// Shared query normalization logic to DRY up code
+async function runQuery(
+    textOrConfig: string | { text: string; values?: any[] },
+    params?: unknown[]
+): Promise<QueryResult> {
+    const text = typeof textOrConfig === 'string' ? textOrConfig : textOrConfig.text;
+    const values = typeof textOrConfig === 'string' ? params : textOrConfig.values;
+
+    // Execute query using postgres-js's `unsafe` method for raw SQL
+    const resultRaw = await sql.unsafe(text, values as any[]);
+
+    // Normalize various possible result shapes into { rows: [...] }
+    let rows: QueryResultRow[] = [];
+
+    if (!resultRaw) {
+        rows = [];
+    } else if (Array.isArray(resultRaw)) {
+        // postgres-js returns an array of rows
+        rows = resultRaw as QueryResultRow[];
+    } else if ((resultRaw as { rows?: unknown[] })?.rows && Array.isArray((resultRaw as { rows: any[] }).rows)) {
+        // node-postgres-like result shape
+        rows = (resultRaw as { rows: QueryResultRow[] }).rows;
+    } else if ((resultRaw as { 0?: unknown })?.[0]) {
+        // array-like objects
+        rows = Array.from(resultRaw as Iterable<QueryResultRow>);
+    } else {
+        // fallback: try to coerce single-row object into array
+        if (typeof resultRaw === 'object' && resultRaw !== null) {
+            rows = [resultRaw as QueryResultRow];
+        } else {
+            rows = [];
+        }
+    }
+
+    return { rows };
+}
+
+// Minimal pool shim to satisfy code paths that expect node-postgres Pool API
+export const poolShim: PoolLike = {
+    async connect() {
+        console.warn('Using db-shim poolShim.connect() – consider migrating to postgres-js client API');
+        return {
+            query: runQuery,
+            release: () => {
+                // postgres-js manages connections internally; nothing to release
+            }
+        } as ClientLike;
+    },
+    query: runQuery,
+    async end() {
+        if (typeof sqlClient.end === 'function') {
+            await sqlClient.end!();
+        } else if (typeof sqlClient.close === 'function') {
+            await sqlClient.close!();
+        }
+    }
+};
+
+export default sql;

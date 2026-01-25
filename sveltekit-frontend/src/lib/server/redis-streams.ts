@@ -1,7 +1,7 @@
 /**
  * redis-streams.ts
  * Typed Redis Streams producer/consumer helpers for token-chunk streaming.
- * Design: write token chunks to a stream named `stream, tokens:{requestId}`.
+ * Design: write token chunks to a stream named `stream:tokens:{requestId}`.
  * Producers append messages with fields: { seq: <number>, chunk: <string>, meta: <json> }
  * Consumers read with XRANGE/XREAD to replay tokens for resume semantics.
  */
@@ -9,7 +9,8 @@ import { redis } from '$lib/server/redis';
 
 export type TokenEntry = {
     id: string; // The stream ID (e.g. "169616...-0")
-    seq: number; chunk: string;
+    seq: number;
+    chunk: string;
     meta: Record<string, unknown>;
 };
 
@@ -30,11 +31,11 @@ export async function produceTokenChunk(
     if (!redis) throw new Error('Redis client not initialized');
     const key = streamKey(requestId);
 
-    // XADD key * seq <seq> chunk <chunk> meta <json>key,
+    // XADD key * seq <seq> chunk <chunk> meta <json>
+    const id = await redis.xAdd(
+        key,
         '*',
-        'seq', String(seq),
-        'chunk', chunk,
-        'meta', JSON.stringify(meta)
+        { seq: String(seq), chunk: chunk, meta: JSON.stringify(meta) }
     );
 
     return id ?? '';
@@ -53,12 +54,12 @@ export async function readTokenStream(
     const key = streamKey(requestId);
 
     // XRANGE key start end COUNT count
-    const rawRes = await redis.xrange(key, fromId, '+', 'COUNT', count);
+    const rawRes = await (redis as any).xrange(key, fromId, '+', 'COUNT', count);
 
     if (!rawRes) return [];
 
     // Parse [id, [field, value, ...]]
-    return rawRes.map(([id, fields]) => parseStreamEntry(id, fields));
+    return rawRes.map(([id, fields]: [string, string[]]) => parseStreamEntry(id, fields));
 }
 
 /**
@@ -70,7 +71,7 @@ export async function trimTokenStream(
 ): Promise<void> {
     if (!redis) throw new Error('Redis client not initialized');
     const key = streamKey(requestId);
-    await redis.xtrim(key, 'MAXLEN', '~', maxLen);
+    await (redis as any).xtrim(key, 'MAXLEN', '~', maxLen);
 }
 
 /**
@@ -89,12 +90,11 @@ export async function consumeTokenStream(
     const start = Date.now();
 
     // We need a duplicate connection for blocking operations to avoid stalling the main client
-    const reader = redis.duplicate();
+    const reader = (redis as any).duplicate();
 
     try {
         while (Date.now() - start < stopAfterMs) {
             // XREAD BLOCK 5000 STREAMS key lastId
-            // Typed definition in ioredis might verify args, usually we can pass them directly
             const response = await reader.xread('BLOCK', 5000, 'STREAMS', key, lastId);
 
             if (!response) {
@@ -142,11 +142,3 @@ function safeJsonParse<T = unknown>(s: string, fallback: T): T {
         return fallback;
     }
 }
-
-
-
-
-
-
-
-

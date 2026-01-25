@@ -2,8 +2,10 @@
  import { page } from '$app/state';
 
  interface Title {
- id: string; number: string;
- name: string; sections: Array<{ id: string; number: string; title, string }>;
+ id: string;
+ number: string;
+ name: string;
+ sections: Array<{ id: string; number: string; title: string }>;
  }
 
  let titles: Title[] = [
