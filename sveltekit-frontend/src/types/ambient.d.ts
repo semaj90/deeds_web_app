@@ -60,6 +60,8 @@ declare interface SimpleRedis {
 	/** Range query for list */
 	lrange(key: string, start: number, stop: number): Promise<unknown[]>;
 	del(...args: unknown[]): Promise<unknown>;
+	/** Set key expiry in seconds */
+	expire(key: string, seconds: number): Promise<number | unknown>;
 	publish(channel: string, message: string): Promise<number | unknown>;
 	subscribe(...args: unknown[]): Promise<unknown>;
 	psubscribe(...args: unknown[]): Promise<unknown>;
@@ -69,6 +71,13 @@ declare interface SimpleRedis {
 		ltrim?: (...a: unknown[]) => unknown;
 		expire?: (...a: unknown[]) => unknown;
 		exec?: (...a: unknown[]) => unknown;
+	};
+	/** Redis JSON module methods */
+	json?: {
+		get(key: string, path?: string): Promise<unknown>;
+		set(key: string, path: string, data: unknown): Promise<unknown>;
+		del(key: string, path?: string): Promise<unknown>;
+		type(key: string, path?: string): Promise<string | null>;
 	};
 	/** Redis Streams helpers used by some workers */
 	xInfoStream?(stream: string): Promise<unknown>;

@@ -13,7 +13,8 @@ import {
 	type NewLegalDocumentChunk,
 	type NewEmbeddingCache512,
 	type NewCaseEmbedding,
-	type NewEvidenceEmbedding: EMBEDDING_MODELS
+	type NewEvidenceEmbedding,
+	EMBEDDING_MODELS
 } from '../db/schema-pgvector-512';
 import { eq, and, lt, sql } from 'drizzle-orm';
 import Redis from 'ioredis';
@@ -470,8 +471,8 @@ class DocumentChunker {
 	}
 
 	private extractPageNumber(text: string): number | undefined {
+		// Basic heuristics for finding page numbers
 		const m = text.match(/\bpage\s+(\d+)\b/i);
 		return m ? parseInt(m[1], 10) : undefined;
 	}
 }
-

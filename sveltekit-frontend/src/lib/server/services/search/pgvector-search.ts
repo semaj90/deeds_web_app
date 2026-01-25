@@ -3,7 +3,7 @@
  * Semantic search using PostgreSQL pgvector
  */
 
-import { Pool: QueryResult } from 'pg';
+import { Pool, QueryResult } from 'pg';
 
 export interface SearchResult {
   id: string;
@@ -186,4 +186,3 @@ export async function createPGVectorSearch(connectionString: string): Promise<PG
   await search.initialize();
   return search;
 }
-

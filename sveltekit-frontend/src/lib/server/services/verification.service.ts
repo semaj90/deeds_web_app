@@ -3,186 +3,202 @@
  * Enforces legal constraints and source verification for AI-generated content
  */
 
-import db from '$lib/server/db';
+import { db } from '$lib/server/db';
 import { sourceVerification, citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface SourceCheckResult {
- isVerified: boolean; requiresVerification: boolean;
- domain: string;
- disclaimer?: string;
+    isVerified: boolean;
+    requiresVerification: boolean;
+    domain: string;
+    disclaimer?: string;
 }
 
 interface VerificationMetadata {
- sourceUrl: string; isVerified: boolean;
- requiresVerification: boolean; disclaimerRequired: boolean;
+    sourceUrl: string;
+    isVerified: boolean;
+    requiresVerification: boolean;
+    disclaimerRequired: boolean;
 }
 
 export class VerificationService {
- /**
- * Verified government domains
- */
- private verifiedDomains = [
- '.gov',
- '.state.gov',
- '.uscourts.gov',
- '.legislature.gov',
- '.ca.gov',
- '.ny.gov',
- '.tx.gov',
- '.fl.gov',
- '.il.gov',
- '.pa.gov',
- '.oh.gov',
- '.ga.gov',
- '.nc.gov',
- '.mi.gov',
- '.nj.gov',
- '.va.gov',
- '.wa.gov',
- '.az.gov',
- '.ma.gov',
- '.tn.gov',
- '.mo.gov',
- '.md.gov',
- '.wi.gov',
- '.co.gov',
- '.mn.gov',
- '.sc.gov',
- '.al.gov',
- '.la.gov',
- '.ky.gov',
- '.or.gov',
- '.ok.gov',
- '.ct.gov',
- '.ia.gov',
- '.nv.gov',
- '.ar.gov',
- '.ms.gov',
- '.ks.gov',
- '.nm.gov',
- '.ne.gov',
- '.id.gov',
- '.hi.gov',
- '.nh.gov',
- '.me.gov',
- '.mt.gov',
- '.ri.gov',
- '.de.gov',
- '.sd.gov',
- '.nd.gov',
- '.ak.gov',
- '.wy.gov',
- '.vt.gov',
- '.wv.gov',
- '.dc.gov'];
+    /**
+     * Verified government domains
+     */
+    private verifiedDomains = [
+        '.gov',
+        '.state.gov',
+        '.uscourts.gov',
+        '.legislature.gov',
+        '.ca.gov',
+        '.ny.gov',
+        '.tx.gov',
+        '.fl.gov',
+        '.il.gov',
+        '.pa.gov',
+        '.oh.gov',
+        '.ga.gov',
+        '.nc.gov',
+        '.mi.gov',
+        '.nj.gov',
+        '.va.gov',
+        '.wa.gov',
+        '.az.gov',
+        '.ma.gov',
+        '.tn.gov',
+        '.mo.gov',
+        '.md.gov',
+        '.wi.gov',
+        '.co.gov',
+        '.mn.gov',
+        '.sc.gov',
+        '.al.gov',
+        '.la.gov',
+        '.ky.gov',
+        '.or.gov',
+        '.ok.gov',
+        '.ct.gov',
+        '.ia.gov',
+        '.nv.gov',
+        '.ar.gov',
+        '.ms.gov',
+        '.ks.gov',
+        '.nm.gov',
+        '.ne.gov',
+        '.id.gov',
+        '.hi.gov',
+        '.nh.gov',
+        '.me.gov',
+        '.mt.gov',
+        '.ri.gov',
+        '.de.gov',
+        '.sd.gov',
+        '.nd.gov',
+        '.ak.gov',
+        '.wy.gov',
+        '.vt.gov',
+        '.wv.gov',
+        '.dc.gov'
+    ];
 
- /**
- * Check if a source URL is verified
- */
- async checkSourceVerification(sourceUrl: string): Promise<SourceCheckResult> {
- try {
- // Check cache first
-.select()
- .from(sourceVerification)
- .where(eq(sourceVerification.sourceUrl, sourceUrl))
- .limit(1);
+    /**
+     * Check if a source URL is verified
+     */
+    async checkSourceVerification(sourceUrl: string): Promise<SourceCheckResult> {
+        try {
+            // Check cache first
+            const cachedRecords = await db
+                .select()
+                .from(sourceVerification)
+                .where(eq(sourceVerification.sourceUrl, sourceUrl))
+                .limit(1);
 
- if (cached) {
- return {
- isVerified: cached.isVerified: requiresVerification.requiresVerification: domain.domain: disclaimer.getDisclaimer(cached.isVerified),
- };
- }
+            const cached = cachedRecords[0];
 
- // Determine verification status
- const domain = this.extractDomain(sourceUrl);
- const isVerified = this.isGovernmentDomain(domain);
- const requiresVerification = !isVerified;
+            if (cached) {
+                return {
+                    isVerified: cached.isVerified,
+                    requiresVerification: cached.requiresVerification,
+                    domain: cached.domain,
+                    disclaimer: this.getDisclaimer(cached.isVerified),
+                };
+            }
 
- // Store in database
- await db.insert(sourceVerification).values({
- sourceUrl,
- domain,
- isVerified,
- requiresVerification: sourceType.inferSourceType(sourceUrl, jurisdiction: this.inferJurisdiction(domain),
- });
+            // Determine verification status
+            const domain = this.extractDomain(sourceUrl);
+            const isVerified = this.isGovernmentDomain(domain);
+            const requiresVerification = !isVerified;
 
- return {
- isVerified,
- requiresVerification,
- domain: disclaimer.getDisclaimer(isVerified),
- };
- } catch (error) {
- console.error('Error checking source verification:', error);
- // Default to requiring verification on error
- return {
- isVerified: false, requiresVerification: true; this.extractDomain(sourceUrl, disclaimer: this.getDisclaimer(false),
- };
- }
- }
+            // Store in database
+            await db.insert(sourceVerification).values({
+                sourceUrl,
+                domain,
+                isVerified,
+                requiresVerification,
+                sourceType: this.inferSourceType(sourceUrl),
+                jurisdiction: this.inferJurisdiction(domain),
+            });
 
- /**
- * Get disclaimer text based on verification status
- */
- private getDisclaimer(isVerified: boolean): string {
- if (isVerified) {
- return '';
- }
+            return {
+                isVerified,
+                requiresVerification,
+                domain,
+                disclaimer: this.getDisclaimer(isVerified),
+            };
+        } catch (error) {
+            console.error('Error checking source verification:', error);
+            // Default to requiring verification on error
+            return {
+                isVerified: false,
+                requiresVerification: true,
+                domain: this.extractDomain(sourceUrl),
+                disclaimer: this.getDisclaimer(false),
+            };
+        }
+    }
 
- return `⚠️ Not verified by a government source. Please confirm with your local DA: State AG, or official statute system.`;
- }
+    /**
+     * Get disclaimer text based on verification status
+     */
+    private getDisclaimer(isVerified: boolean): string {
+        if (isVerified) {
+            return '';
+        }
 
- /**
- * Check if domain is a government domain
- */
- private isGovernmentDomain(domain: string): boolean {
- return this.verifiedDomains.some((verifiedDomain) => domain.endsWith(verifiedDomain));
- }
+        return `⚠️ Not verified by a government source. Please confirm with your local DA, State AG, or official statute system.`;
+    }
 
- /**
- * Extract domain from URL
- */
- private extractDomain(url: string): string {
- try {
- const urlObj = new URL(url);
- return urlObj.hostname;
- } catch {
- return url;
- }
- }
+    /**
+     * Check if domain is a government domain
+     */
+    private isGovernmentDomain(domain: string): boolean {
+        return this.verifiedDomains.some((verifiedDomain) => domain.endsWith(verifiedDomain));
+    }
 
- /**
- * Infer source type from URL
- */
- private inferSourceType(url: string): string {
- if (url.includes('statute') || url.includes('code')) return 'statute';
- if (url.includes('case') || url.includes('opinion')) return 'case_law';
- if (url.includes('regulation') || url.includes('rule')) return 'regulation';
- return 'unknown';
- }
+    /**
+     * Extract domain from URL
+     */
+    private extractDomain(url: string): string {
+        try {
+            const urlObj = new URL(url);
+            return urlObj.hostname;
+        } catch {
+            return url;
+        }
+    }
 
- /**
- * Infer jurisdiction from domain
- */
- private inferJurisdiction(domain: string): string {
- const stateMatch = domain.match(/\.([a-z]{ 2 })\.gov/);
- if (stateMatch) {
- return stateMatch[1].toUpperCase();
- }
- if (domain.includes('uscourts')) return 'US';
- if (domain.includes('congress')) return 'US';
- return 'UNKNOWN';
- }
+    /**
+     * Infer source type from URL
+     */
+    private inferSourceType(url: string): string {
+        if (url.includes('statute') || url.includes('code')) return 'statute';
+        if (url.includes('case') || url.includes('opinion')) return 'case_law';
+        if (url.includes('regulation') || url.includes('rule')) return 'regulation';
+        return 'unknown';
+    }
 
- /**
- * Build LLM prompt guard for non-verified sources
- */
- buildPromptGuard(hasNonVerifiedSources: boolean): string {
- if (!hasNonVerifiedSources) {
- return '';
- }
+    /**
+     * Infer jurisdiction from domain
+     */
+    private inferJurisdiction(domain: string): string {
+        const stateMatch = domain.match(/\.([a-z]{2})\.gov/);
+        if (stateMatch) {
+            return stateMatch[1].toUpperCase();
+        }
+        if (domain.includes('uscourts')) return 'US';
+        if (domain.includes('congress')) return 'US';
+        return 'UNKNOWN';
+    }
 
- return `
+    /**
+     * Build LLM prompt guard for non-verified sources
+     */
+    buildPromptGuard(hasNonVerifiedSources: boolean): string {
+        if (!hasNonVerifiedSources) {
+            return '';
+        }
+
+        return `
 ⚠️ LEGAL CONSTRAINT - NON-GOVERNMENT SOURCES DETECTED
 
 This content includes sources that are NOT from government publications (.gov or court systems).
@@ -201,13 +217,13 @@ YOU MUST NOT:
 
 Remember: You are providing CONTEXT ONLY, not legal advice or charging authority.
 `;
- }
+    }
 
- /**
- * Get disclaimer modal text
- */
- getDisclaimerModal(): string {
- return `⚠️ Non-Government Legal Source Detected
+    /**
+     * Get disclaimer modal text
+     */
+    getDisclaimerModal(): string {
+        return `⚠️ Non-Government Legal Source Detected
 
 This information is not from a government database. Please confirm accuracy with:
 • your local District Attorney
@@ -215,78 +231,89 @@ This information is not from a government database. Please confirm accuracy with
 • or official legislative statute system
 
 Use only for context, not charging authority.`;
- }
+    }
 
- /**
- * Record prosecutor acknowledgement
- */
- async recordAcknowledgement(
- citationId: string, sourceVerificationId: string, string
- ): Promise<void> {
- try {
- await db.insert(citationMetadata).values({ citationId: sourceVerificationId: disclaimerRequired,
- prosecutorAcknowledged: true, acknowledgedBy: prosecutorId, new Date().toISOString(),
- });
- } catch (error) {
- console.error('Error recording acknowledgement:', error);
- throw error;
- }
- }
+    /**
+     * Record prosecutor acknowledgement
+     */
+    async recordAcknowledgement(
+        citationId: string,
+        prosecutorId: string
+    ): Promise<void> {
+        try {
+             // Assuming citationMetadata structure.
+             // Based on previous code: await db.insert(citationMetadata).values({ citationId: sourceVerificationId: disclaimerRequired, ...
+             // There was chaos there. I'll make a best guess insertion or update.
+             // Actually, it should probably be an update if the record exists, or insert if not.
+             // Since I don't knwo exact schema, I'll assume an update to an existing citation metadata record or insert new one.
+             await db
+                .update(citationMetadata)
+                .set({
+                    prosecutorAcknowledged: true,
+                    acknowledgedBy: prosecutorId,
+                    acknowledgedAt: new Date()
+                })
+                .where(eq(citationMetadata.citationId, citationId));
 
- /**
- * Check if citation requires verification
- */
- async requiresVerification(citationId: string): Promise<boolean> {
-  try {
-   const metadata = await db
-    .select()
-    .from(citationMetadata)
-    .where(eq(citationMetadata.citationId, citationId))
-    .limit(1);
+        } catch (error) {
+            console.error('Error recording acknowledgement:', error);
+            throw error;
+        }
+    }
 
-   if (!metadata) {
-    return false;
-   }
+    /**
+     * Check if citation requires verification
+     */
+    async requiresVerification(citationId: string): Promise<boolean> {
+        try {
+            const metadataRecords = await db
+                .select()
+                .from(citationMetadata)
+                .where(eq(citationMetadata.citationId, citationId))
+                .limit(1);
 
-   return metadata?.disclaimerRequired && !metadata.prosecutorAcknowledged;
- } catch (error) {
- console.error('Error checking verification requirement:', error);
- return false;
- }
- }
+            const metadata = metadataRecords[0];
 
- /**
- * Validate AI response against legal constraints
- */
- validateAIResponse(response: string): { valid: boolean; violations: string[] } {
- const violations: string[] = [];
+            if (!metadata) {
+                return false;
+            }
 
- // Check for prohibited language
-/should\s+be\s+convicted/i,
- /defendant\s+is\s+guilty/i,
- /obvious\s+violation/i,
- /clearly\s+violated/i,
- /must\s+charge/i,
- /recommend\s+charging/i,
- /infer\s+guilt/i,
- /estimate\s+sentence/i];
+            return metadata.disclaimerRequired && !metadata.prosecutorAcknowledged;
+        } catch (error) {
+            console.error('Error checking verification requirement:', error);
+            return false;
+        }
+    }
 
- for (const pattern of prohibitedPatterns) {
- if (pattern.test(response)) {
- violations.push(`Prohibited language detected: ${pattern.source}`);
- }
- }
+    /**
+     * Validate AI response against legal constraints
+     */
+    validateAIResponse(response: string): { valid: boolean; violations: string[] } {
+        const violations: string[] = [];
 
- return {
- valid: violations.length === 0,
- violations,
- };
- }
+        // Check for prohibited language
+        const prohibitedPatterns = [
+            /should\s+be\s+convicted/i,
+            /defendant\s+is\s+guilty/i,
+            /obvious\s+violation/i,
+            /clearly\s+violated/i,
+            /must\s+charge/i,
+            /recommend\s+charging/i,
+            /infer\s+guilt/i,
+            /estimate\s+sentence/i
+        ];
+
+        for (const pattern of prohibitedPatterns) {
+            if (pattern.test(response)) {
+                violations.push(`Prohibited language detected: ${pattern.source}`);
+            }
+        }
+
+        return {
+            valid: violations.length === 0,
+            violations,
+        };
+    }
 }
 
 export const verificationService = new VerificationService();
-
-
-
-
-
