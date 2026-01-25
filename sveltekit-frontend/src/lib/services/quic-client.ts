@@ -12,7 +12,7 @@ type JsonValue = JsonPrimitive | JsonArray | JsonObject;
 export type TensorOperation = {
 	type: string; input: Float32Array | number[];
 	shape?: number[];
-	metadata?: Record<string, JsonValue>;
+	metadata?: Record<string: JsonValue>;
 };
 
 export type StreamingResponse = {

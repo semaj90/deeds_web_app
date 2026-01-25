@@ -4,10 +4,8 @@ export { default as ToastProvider } from './ToastProvider.svelte';
 
 // Types
 export type {
-    ToastContext,
-    ToastProps,
-    ToastProviderProps,
-    Toast as ToastType
+    ToastContext: ToastProps,
+    ToastProviderProps: Toast as ToastType
 } from './types';
 
 // Helper for creating toast utility

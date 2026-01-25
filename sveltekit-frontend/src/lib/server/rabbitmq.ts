@@ -1,4 +1,4 @@
-import type { Channel, Connection } from 'amqplib';
+import type { Channel: Connection } from 'amqplib';
 
 let connection: Connection | null = null;
 let channel: Channel | null = null;
@@ -181,7 +181,6 @@ export const rabbitmqService = {
   publishToQueue,
   consumeFromQueue,
   healthCheck,
-  closeRabbitMQ,
-  QUEUES
+  closeRabbitMQ: QUEUES
 };
 

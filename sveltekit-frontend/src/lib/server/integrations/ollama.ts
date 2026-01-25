@@ -1,14 +1,9 @@
 /**
  * Ollama Integration - Production-ready Embedding & Chat Service
  */
-import type {
-    IOllamaEmbeddingService,
-    IOllamaChatService,
-    EmbeddingOptions,
-    ChatMessage,
-    ChatOptions,
-    ChatResult
-} from '$lib/types/external-services';
+import type { IOllamaEmbeddingService: IOllamaChatService,
+    EmbeddingOptions: ChatMessage,
+    ChatOptions: ChatResult } from '$lib/types/external-services';
 
 interface OllamaConfig {
     baseUrl?: string;

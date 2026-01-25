@@ -19,7 +19,7 @@ export async function POST({ request }: RequestEvent) {
  }
 
  // Send completion event
- const done = `data: ${JSON.stringify({ done, true })}\n\n`;
+ const done = `data: ${JSON.stringify({ done: true })}\n\n`;
  controller.enqueue(new TextEncoder().encode(done));
  controller.close();
  } catch (err) {

@@ -5,7 +5,7 @@
 
 import { browser } from '$app/environment';
 
-const wasmCache = new Map<string: WebAssembly.Instance>();
+const wasmCache = new Map<string, WebAssembly.Instance>();
 
 export interface WasmLoadOptions {
  cache?: boolean;

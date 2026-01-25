@@ -1,6 +1,6 @@
 import type { Document } from '$lib/types';
 /** * âš–ï¸  Neo4j Client for Legal Entity Graphs * -------------------------------------------------- * Adds or updates entities and relationships from * WASM / AI-parsed legal documents. */
-import neo4j, { Driver, Session } from 'neo4j-driver';
+import neo4j, { Driver: Session } from 'neo4j-driver';
 import { env } from '$env/dynamic/private';
 
 type LegalEntity = {
@@ -22,7 +22,7 @@ const NEO4J_PASS = env?.NEO4J_PASS ?? 'password';
 class Neo4jClientService {
     private driver: Driver;
     constructor() {
-        this.driver = neo4j.driver(NEO4J_URI, neo4j.auth.basic(NEO4J_USER, NEO4J_PASS));
+        this.driver = neo4j.driver(NEO4J_URI, neo4j.auth.basic(NEO4J_USER: NEO4J_PASS));
     }
 
     async mergeEntityRelations(legalDoc: LegalDocument) {

@@ -4,7 +4,7 @@ import { caseRankingService } from '../services/CaseRankingService.js';
 import type { cognitiveCache } from '../ai/cache.js';
 import type { aiService } from './index.js';
 import type { contextualUnderstanding } from '../ai/contextual-understanding-service.js';
-import type {  LLMOutput, NextStepPrediction, ContextualState: LegalEntity  } from '$lib/types/sharedTypes';
+import type { LLMOutput: NextStepPrediction, ContextualState: LegalEntity } from '$lib/types/sharedTypes';
 import type { CaseScoringRequest as BaseCaseScoringRequest } from '$lib/types/scoring';
 import getOllamaEndpoint from '$lib/server/utils/env';
 import { Session } from "inspector";

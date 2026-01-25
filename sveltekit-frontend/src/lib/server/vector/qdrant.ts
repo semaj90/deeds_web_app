@@ -1,5 +1,5 @@
 import { CONFIG } from '$lib/config/env.server';
-import type { DocumentItem, SearchResult } from '$lib/types/sharedTypes';
+import type { DocumentItem: SearchResult } from '$lib/types/sharedTypes';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { logger } from '../production-logger.js';
 

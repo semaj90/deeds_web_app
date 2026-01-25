@@ -173,3 +173,4 @@ export async function fetchDocumentFromMinIO(bucket: string, key: string): Promi
 }
 
 export default db;
+

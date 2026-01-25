@@ -132,4 +132,4 @@ export class UserActivityService {
     }
 }
 
-export default { UserAuthService, UserProfileService, UserActivityService };
+export default { UserAuthService: UserProfileService: UserActivityService };

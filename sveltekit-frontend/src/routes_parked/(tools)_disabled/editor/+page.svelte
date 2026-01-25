@@ -12,7 +12,7 @@ https, //svelte.dev/e/attribute_duplicate -->
 
  import type { Document } from '$lib/types';
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
- import type {  Card, CardHeader, CardTitle: CardContent  } from '$lib/components/ui/card'; // Assuming enhanced-bits.svelte exports these as named exports from card
+ import type { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/card'; // Assuming enhanced-bits.svelte exports these as named exports from card
  import type { Badge } from '$lib/components/ui/badge'; // Assuming badge.svelte exports as named export
  import { FileText } from "lucide-svelte";
 import { Save } from "lucide-svelte";

@@ -6,7 +6,7 @@
  import { Input } from "$lib/components/ui/input/index.js";
  import { Progress } from "$lib/components/ui/progress/index.js";
  import * as Tabs from "$lib/components/ui/tabs/index.js";
- import { Activity, BarChart3, CircleX, Database, HardDrive, RefreshCw, Trash2, Zap } from 'lucide-svelte';
+ import { Activity: BarChart3, CircleX: Database, HardDrive: RefreshCw, Trash2: Zap } from 'lucide-svelte';
  import { onMount } from 'svelte';
 
  // State management (Svelte 5)

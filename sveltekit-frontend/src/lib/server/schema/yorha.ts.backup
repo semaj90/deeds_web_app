@@ -30,8 +30,8 @@ import {
  jurisdiction: varchar('jurisdiction', { length: 200 }),
 
  // Dates
- filed_date: timestamp('filed_date', { withTimezone, true }),
- closed_date: timestamp('closed_date', { withTimezone, true }),
+ filed_date: timestamp('filed_date', { withTimezone: true }),
+ closed_date: timestamp('closed_date', { withTimezone: true }),
 
  // Ownership and assignment
  created_by: uuid('created_by').notNull(),
@@ -41,8 +41,8 @@ import {
  metadata: jsonb('metadata'), // Store additional case data
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
  (table) => ({
  case_number_idx: index('yorha_cases_case_number_idx').on(table.case_number),
@@ -71,7 +71,7 @@ import {
 
  // Evidence metadata
  source: varchar('source', { length: 500 }), // where the evidence came from
- date_collected: timestamp('date_collected', { withTimezone, true }),
+ date_collected: timestamp('date_collected', { withTimezone: true }),
  relevance_score: integer('relevance_score').default(0), // 0-100
 
  // File storage
@@ -89,8 +89,8 @@ import {
 
  // Audit fields
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_nodes_case_id_idx').on(table.case_id),
@@ -119,8 +119,8 @@ import {
 
  // Audit fields
  created_by: uuid('created_by').notNull(),
- created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
  (table) => ({
  case_id_idx: index('yorha_evidence_connections_case_id_idx').on(table.case_id),
@@ -150,9 +150,9 @@ import {
  message_count: integer('message_count').default(0),
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
- last_message_at: timestamp('last_message_at', { withTimezone, true }),
+ created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+ last_message_at: timestamp('last_message_at', { withTimezone: true }),
  },
  (table) => ({
  case_id_idx: index('yorha_chat_sessions_case_id_idx').on(table.case_id),
@@ -183,8 +183,8 @@ import {
  tokens_used: integer('tokens_used'),
 
  // Audit fields
- created_at: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
- updated_at: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+ created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+ updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
  (table) => ({
  session_id_idx: index('yorha_chat_messages_session_id_idx').on(table.session_id),
@@ -223,7 +223,7 @@ import {
  active_sessions: integer('active_sessions').default(0),
 
  // Timestamp
- recorded_at: timestamp('recorded_at', { withTimezone, true }).defaultNow().notNull(),
+ recorded_at: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
  },
  (table) => ({
  recorded_at_idx: index('yorha_system_metrics_recorded_at_idx').on(table.recorded_at),
@@ -304,5 +304,6 @@ export type NewChatMessage = typeof chat_messages.$inferInsert;
 
 export type SystemMetrics = typeof system_metrics.$inferSelect;
 export type NewSystemMetrics = typeof system_metrics.$inferInsert;
+
 
 

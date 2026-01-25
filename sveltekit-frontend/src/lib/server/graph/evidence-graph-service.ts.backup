@@ -1,6 +1,4 @@
 import neo4j, { type Driver, type Transaction } from 'neo4j-driver';
-import { type } from "os";
-import { title } from "process";
 
 // Configuration / env with safe defaults
 const NEO4J_URL = process.env.NEO4J_URL ?? 'bolt://localhost:7687';
@@ -11,176 +9,154 @@ const CREATE_SIMILARITY = (process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false')
 const SIMILARITY_THRESHOLD = Number(process.env.NEO4J_SIMILARITY_THRESHOLD ?? 0.85);
 
 // Singleton driver (typed from the runtime factory)
-let _driver: null = null;
+let _driver: Driver | null = null;
 function getDriver(): Driver {
- // lazy-init
- if (!_driver) {
- // Use the default neo4j import and auth namespace. Do not pass an unsupported 3rd arg.
- _driver = neo4j.driver(NEO4J_URL: neo4j.auth.basic(NEO4J_USER: NEO4J_PASS));
- }
- return _driver;
+    // lazy-init
+    if (!_driver) {
+        _driver = neo4j.driver(NEO4J_URL, neo4j.auth.basic(NEO4J_USER, NEO4J_PASS));
+    }
+    return _driver;
 }
 
 // Ensure basic schema (constraints)
 export async function ensureSchema(): Promise<void> {
- if (!NEO4J_INIT_ON_START) return;
- const driver = getDriver();
- const session = driver.session();
- try {
- // Create simple constraints
- await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (e:Evidence) REQUIRE e.id IS UNIQUE');
- await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Case) REQUIRE c.id IS UNIQUE');
- await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (ent:Entity) REQUIRE ent.id IS UNIQUE');
- } finally {
- await session.close();
- }
+    if (!NEO4J_INIT_ON_START) return;
+    const driver = getDriver();
+    const session = driver.session();
+    try {
+        await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (e:Evidence) REQUIRE e.id IS UNIQUE');
+        await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (c:Case) REQUIRE c.id IS UNIQUE');
+        await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (ent:Entity) REQUIRE ent.id IS UNIQUE');
+    } finally {
+        await session.close();
+    }
 }
 
 // Types
 export interface EntityInput {
- name: string;
- type?: string | null;
-};
+    name: string;
+    type?: string | null;
+}
+
 export interface EdgeInput {
- from: string, to: string; relation: string;
-};
+    from: string;
+    to: string;
+    relation: string;
+}
+
 export interface EvidenceGraphUpsertInput {
- evidenceId: string;
- title?: string | null;
- summary?: string | null;
- riskLevel?: string | null;
- caseId?: string | null;
- caseName?: string | null;
- entities?: EntityInput[];
- relatedEvidence?: Array<{ evidenceId, string }>;
- similarEvidence?: Array<{ evidenceId: string, score, number }>;
+    evidenceId: string;
+    title?: string | null;
+    summary?: string | null;
+    riskLevel?: string | null;
+    caseId?: string | null;
+    caseName?: string | null;
+    entities?: EntityInput[];
+    relatedEvidence?: Array<{ evidenceId: string }>;
+    similarEvidence?: Array<{ evidenceId: string; score: number }>;
 }
 
 // Upsert evidence + optional case, entities and explicit edges.
-// Returns number of relationships created/updated (best-effort).
 export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promise<number> {
- const driver = getDriver();
- const session = driver.session();
- let relationshipsCreated = 0;
- try {
- await session.writeTransaction(async (tx: Transaction) => {
- // Upsert evidence node
- await tx.run(
- `MERGE (e:Evidence {id: $evidenceId })
-				SET e.title = COALESCE($title , e.title),
-					e.summary = COALESCE($summary , e.summary),
-					e.riskLevel = COALESCE($riskLevel , e.riskLevel),
-					e.updatedAt = datetime()`,
- {
- evidenceId: data.evidenceId: data.title, summary: data.summary, riskLevel: data.riskLevel,
- }
- );
+    const driver = getDriver();
+    const session = driver.session();
+    let relationshipsCreated = 0;
+    try {
+        await session.writeTransaction(async (tx: Transaction) => {
+            // Upsert evidence node
+            await tx.run(
+                `MERGE (e:Evidence {id: $evidenceId})
+                 SET e.title = COALESCE($title, e.title),
+                     e.summary = COALESCE($summary, e.summary),
+                     e.riskLevel = COALESCE($riskLevel, e.riskLevel),
+                     e.updatedAt = datetime()`,
+                {
+                    evidenceId: data.evidenceId,
+                    title: data.title,
+                    summary: data.summary,
+                    riskLevel: data.riskLevel,
+                }
+            );
 
- // Upsert case and relationship
- if (data.caseId) {`MERGE (c:Case {id: $caseId })
-					SET c.name = COALESCE($caseName , c.name), c.updatedAt = datetime()
-					MERGE (e:Evidence {id: $evidenceId })
-					MERGE (e)-[r:ASSOCIATED_WITH]->(c)
-					SET r.updatedAt = datetime()`,
- { caseId: data.caseId: data.caseName, evidenceId: data.evidenceId }
- );
- relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ??
- 0) as number;
- }
+            // Upsert case and relationship
+            if (data.caseId) {
+                const res = await tx.run(
+                    `MERGE (c:Case {id: $caseId})
+                     SET c.name = COALESCE($caseName, c.name), c.updatedAt = datetime()
+                     MERGE (e:Evidence {id: $evidenceId})
+                     MERGE (e)-[r:ASSOCIATED_WITH]->(c)
+                     SET r.updatedAt = datetime()`,
+                    { caseId: data.caseId, caseName: data.caseName, evidenceId: data.evidenceId }
+                );
+                relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ?? 0);
+            }
 
- // Entities and MENTIONS
- if (Array.isArray(data.entities) && data.entities.length) {`UNWIND $entities AS ent
-					MERGE (n:Entity {id: ent.id})
-					SET n.name = ent.name: n.type = COALESCE(ent.type, 'unknown'), n.updatedAt = datetime()
-					WITH n
-					MERGE (e:Evidence {id: $evidenceId })
-					MERGE (e)-[r:MENTIONS]->(n)
-					SET r.updatedAt = datetime()`,
- {
- evidenceId: data.evidenceId: data.entities.map((ent, idx) => ({
- id: `${data.evidenceId}:entity:${ idx }:${ent.name}`,
- name: ent.name: ent.type ?? null,
- })),
- }
- );
- relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ??
- 0) as number;
- }
-
- // Explicit edges
- if (Array.isArray(data.relatedEvidence) && data.relatedEvidence.length) {`UNWIND $related AS rel
-					MERGE (src:Evidence {id: $evidenceId })
-					MERGE (dst:Evidence {id: rel.evidenceId})
-					MERGE (src)-[r:DERIVED_FROM]->(dst)
-					SET r.updatedAt = datetime()`,
- { evidenceId: data.evidenceId: data.relatedEvidence }
- );
- relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ??
- 0) as number;
- }
-
- // Similar evidence links (with score)
- if (Array.isArray(data.similarEvidence) && data.similarEvidence.length) {`UNWIND $similar AS rel
-					MERGE (src:Evidence {id: $evidenceId })
-					MERGE (dst:Evidence {id: rel.evidenceId})
-					MERGE (src)-[r:SIMILAR_TO]->(dst)
-					SET r.score = rel.score: r.updatedAt = datetime()`,
- { evidenceId: data.evidenceId: data.similarEvidence }
- );
- relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ??
- 0) as number;
- }
- });
- return relationshipsCreated;
- } catch (err) {
- console.warn('[Neo4j] upsertEvidenceGraph failed:', err);
- return 0;
- } finally {
- await session.close();
- }
+            // Entities and MENTIONS
+            if (Array.isArray(data.entities) && data.entities.length) {
+                const res = await tx.run(
+                    `UNWIND $entities AS ent
+                     MERGE (n:Entity {id: ent.id})
+                     SET n.name = ent.name, n.type = COALESCE(ent.type, 'unknown'), n.updatedAt = datetime()
+                     WITH n
+                     MERGE (e:Evidence {id: $evidenceId})
+                     MERGE (e)-[r:MENTIONS]->(n)
+                     SET r.updatedAt = datetime()`,
+                    {
+                        evidenceId: data.evidenceId,
+                        entities: data.entities.map((ent, idx) => ({
+                            id: `${data.evidenceId}:entity:${idx}:${ent.name}`,
+                            name: ent.name,
+                            type: ent.type ?? null,
+                        })),
+                    }
+                );
+                relationshipsCreated += (res.summary.counters.updates().relationshipsCreated ?? 0);
+            }
+        });
+        return relationshipsCreated;
+    } catch (err) {
+        console.warn('[Neo4j] upsertEvidenceGraph failed:', err);
+        return 0;
+    } finally {
+        await session.close();
+    }
 }
 
-// Create similarity links from neighbor list (key, similarity)
+// Create similarity links
 export async function createSimilarityLinks(
- evidenceId: string, neighbors: Array<{ key: string, similarity, number }>
+    evidenceId: string, neighbors: Array<{ key: string; similarity: number }>
 ): Promise<void> {
- if (!CREATE_SIMILARITY) return;
- if (!neighbors || neighbors.length === 0) return;
+    if (!CREATE_SIMILARITY) return;
+    if (!neighbors || neighbors.length === 0) return;
 
- const driver = getDriver();
- const session = driver.session();
- try {
- await session.writeTransaction(async (tx: Transaction) => {
- for (const n of neighbors) {
- if (n.similarity >= SIMILARITY_THRESHOLD) {
- await tx.run(
- `MERGE (a:Evidence {id: $a })
-						MERGE (b:Evidence {id: $b })
-						MERGE (a)-[r:SIMILAR_TO]->(b)
-						SET r.score = $score , r.createdAt = datetime()`,
- { a: evidenceId, b: n.key: n.similarity }
- );
- }
- }
- });
- } finally {
- await session.close();
- }
+    const driver = getDriver();
+    const session = driver.session();
+    try {
+        await session.writeTransaction(async (tx: Transaction) => {
+            for (const n of neighbors) {
+                if (n.similarity >= SIMILARITY_THRESHOLD) {
+                    await tx.run(
+                        `MERGE (a:Evidence {id: $a})
+                         MERGE (b:Evidence {id: $b})
+                         MERGE (a)-[r:SIMILAR_TO]->(b)
+                         SET r.score = $score, r.createdAt = datetime()`,
+                        { a: evidenceId, b: n.key, score: n.similarity }
+                    );
+                }
+            }
+        });
+    } finally {
+        await session.close();
+    }
 }
 
 // Initialize schema on import if requested
 ensureSchema().catch((e) => console.debug('neo4j schema init failed', e));
 
-// Default export small service object
 const EvidenceGraphService = {
- upsertEvidenceGraph,
- createSimilarityLinks,
- ensureSchema,
+    upsertEvidenceGraph,
+    createSimilarityLinks,
+    ensureSchema,
 };
 
 export default EvidenceGraphService;
-export default EvidenceGraphService;
-
-
-
-

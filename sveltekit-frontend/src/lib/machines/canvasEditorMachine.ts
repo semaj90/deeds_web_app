@@ -1,7 +1,5 @@
-/** * Canvas Editor State Machine (XState v5) * Manages canvas editor state with collaboration, history, and auto-save */ import type {
- createMachine,
- assign,
-} from 'xstate';
+/** * Canvas Editor State Machine (XState v5) * Manages canvas editor state with collaboration, history, and auto-save */ import type { createMachine,
+ assign, } from 'xstate';
 
 export interface CanvasEditorContext {
  reportId: string; canvasState: any | null;

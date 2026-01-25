@@ -1,6 +1,6 @@
 import { redis } from '$lib/server/redis';
 import { publishToQueue } from '$lib/server/queue/rabbitmq-queue';
-import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
+import type { RagShardJob: DocStatus, DocStatusInfo } from './types.js';
 
 export async function enqueueDocumentForRag(params: {
     docId: string;

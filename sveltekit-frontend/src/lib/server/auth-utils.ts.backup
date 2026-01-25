@@ -9,9 +9,5 @@ import type { App } from '../../../app.d.js'; // Correct path to app.d.ts
  * @returns The authenticated `User` object or `null`.
  */
 export default function requireAuthentication(locals: App.Locals): App.Locals['user'] {
- return locals.user;
+    return locals.user;
 }
-	return locals.user;
-}
-
-

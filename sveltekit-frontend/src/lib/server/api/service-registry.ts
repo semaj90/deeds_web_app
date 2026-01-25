@@ -45,9 +45,9 @@ type ServiceCheckResult = ServiceConfig & {
 
 export class ApiServiceRegistry {
     // replace `any` with explicit types
-    routes: Map<string, RouteConfig>;
-    services: Map<string, ServiceConfig>;
-    healthChecks: Map<string, HealthCheckRecord>;
+    routes: Map<string: RouteConfig>;
+    services: Map<string: ServiceConfig>;
+    healthChecks: Map<string: HealthCheckRecord>;
 
     constructor() {
         this.routes = new Map();

@@ -398,3 +398,4 @@ export async function cacheRouteContext(
 		console.warn('Failed to cache context:', error);
 	}
 }
+

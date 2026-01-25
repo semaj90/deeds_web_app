@@ -1,11 +1,7 @@
 // PgVector-backed implementation of EmbeddingRepository with Gemma embeddings priority.
-import type {
-    EmbeddingRepository,
-    IngestionJobRequest,
-    IngestionJobStatus,
-    SimilarityQueryOptions,
-    SimilarityResult
-} from './embedding-repository.js';
+import type { EmbeddingRepository: IngestionJobRequest,
+    IngestionJobStatus: SimilarityQueryOptions,
+    SimilarityResult } from './embedding-repository.js';
 import { db } from '../db/unified-client.js'; // Updated to use unified client
 import { sql } from 'drizzle-orm';
 import { embeddingCacheService } from '../embedding-cache-service.js';

@@ -17,10 +17,12 @@ export async function verifyCanvasStatesTable(): Promise<boolean> {
         return canvasStatesExists;
     }
 
-    try {sql`SELECT to_regclass('public.canvas_states') IS NOT NULL AS exists`
+    try {
+        const result = await db.execute(
+            sql`SELECT to_regclass('public.canvas_states') IS NOT NULL AS exists`
         );
 
-        canvasStatesExists = result.rows?.[0]?.exists === true;
+        canvasStatesExists = (result as any).rows?.[0]?.exists === true;
         lastChecked = now;
 
         return canvasStatesExists;
@@ -37,5 +39,3 @@ export function clearCanvasTableCache(): void {
     canvasStatesExists = null;
     lastChecked = 0;
 }
-
-

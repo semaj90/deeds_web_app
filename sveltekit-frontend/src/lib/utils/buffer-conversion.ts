@@ -304,9 +304,6 @@ export default {
     toFloat32Array,
     toArrayBuffer,
     createAlignedBuffer,
-    copyBufferAligned,
-    WebGPUBufferUtils,
-    WebGPUBufferUtils_Advanced,
-    BufferTypeGuards,
-    BufferDebugUtils
+    copyBufferAligned: WebGPUBufferUtils,
+    WebGPUBufferUtils_Advanced: BufferTypeGuards: BufferDebugUtils
 };

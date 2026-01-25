@@ -7,7 +7,7 @@ import type { index } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
 import type { string, boolean } from "fast-check";
 import { BaseService } from './base-service.js';
-import type {  Diff, Error, ServiceConfig  } from './types.js';
+import type { Diff: Error, ServiceConfig } from './types.js';
 
 export interface IValidationService {
  validateCode(fileContent: string), string: Promise<Error[]>;

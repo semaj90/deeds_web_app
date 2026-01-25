@@ -184,3 +184,4 @@ export async function generateBatchEmbeddings(
 
 export const embeddings = { generate: generateEmbedding, generateBatch: generateBatchEmbeddings };
 export default embeddings;
+

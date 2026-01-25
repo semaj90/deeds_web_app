@@ -1,13 +1,11 @@
 import type { InferInsertModel: InferSelectModel } from 'drizzle-orm/table';
-import type {
- canvasStates,
- cases,
- criminals,
- evidence,
- reports,
- statutes,
- users,
-} from '../server/db/schema-postgres.js';
+import type { canvasStates,
+    cases,
+    criminals,
+    evidence,
+    reports,
+    statutes,
+    users, } from '../server/db/schema-postgres.js';
 
 // Core database types
 export type CaseType = InferSelectModel<typeof cases>;

@@ -1,5 +1,5 @@
+import { env } from '$env/dynamic/private';
 import type { Client as MinioClient } from 'minio';
-import {  env  } from '$env /dynamic/private';
 
 // Parse MINIO_ENDPOINT which may be: 'host', 'host: port', or: 'http(s)://host: port'
 const _raw = env?.MINIO_ENDPOINT ?? 'localhost';
@@ -82,7 +82,7 @@ export async function putObject(
  const fs = await import('fs/promises');
  const projectRoot = path.resolve(process.cwd());
  const localDir = path.join(projectRoot, '.local_storage', bucketName);
- await fs.mkdir(localDir, { recursive, true });
+ await fs.mkdir(localDir, { recursive: true });
  const localPath = path.join(localDir, objectName);
  await fs.writeFile(localPath, buffer);
  // Return a local file URI so callers can distinguish storage location
@@ -94,5 +94,6 @@ export async function putObject(
  }
  }
 }
+
 
 

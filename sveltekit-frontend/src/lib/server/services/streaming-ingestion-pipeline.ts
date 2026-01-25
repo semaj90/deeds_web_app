@@ -13,8 +13,7 @@ import {
 	type NewLegalDocumentChunk,
 	type NewEmbeddingCache512,
 	type NewCaseEmbedding,
-	type NewEvidenceEmbedding,
-	EMBEDDING_MODELS
+	type NewEvidenceEmbedding: EMBEDDING_MODELS
 } from '../db/schema-pgvector-512';
 import { eq, and, lt, sql } from 'drizzle-orm';
 import Redis from 'ioredis';

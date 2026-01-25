@@ -576,3 +576,4 @@ export async function apiSearchDocuments(
 		};
 	}
 }
+

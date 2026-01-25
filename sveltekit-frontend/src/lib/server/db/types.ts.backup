@@ -2,3 +2,4 @@
 legalAnalysisSessions.$inferInsert;
 
 
+

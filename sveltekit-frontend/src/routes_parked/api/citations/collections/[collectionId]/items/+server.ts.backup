@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  locals.user.id: body.citationId: params.collectionId!
  );
 
- return json({ success, true });
+ return json({ success: true });
  } catch (error) {
  console.error('Error adding citation to collection:', error);
  if ((error as Error).message.includes('Unauthorized')) {
@@ -54,7 +54,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
  params.collectionId!
  );
 
- return json({ success, true });
+ return json({ success: true });
  } catch (error) {
  console.error('Error removing citation from collection:', error);
  if ((error as Error).message.includes('Unauthorized')) {

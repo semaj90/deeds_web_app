@@ -11,7 +11,8 @@ export const errorBrainDiffs = pgTable('error_brain_diffs', {
  contextLines: integer('context_lines').notNull().default(3),
  confidence: real('confidence').notNull(),
  reason: text('reason').notNull(),
- createdAt: timestamp('created_at', { withTimezone, false }).defaultNow().notNull(),
+ createdAt: timestamp('created_at', { withTimezone: false }).defaultNow().notNull(),
 });
+
 
 

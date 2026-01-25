@@ -199,7 +199,5 @@ export async function hashPayload(data: string): Promise<string> {
 }
 
 export const CACHE_CONSTANTS = {
-    MAX_ITEMS,
-    TTL_MS,
-    REDIS_TTL_SECS
+    MAX_ITEMS: TTL_MS: REDIS_TTL_SECS
 };

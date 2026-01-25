@@ -471,3 +471,4 @@ export async function getBatchLegalEmbeddings(queries: LegalEmbeddingQuery[]): P
 	);
 	return await embeddingCache.getBatchEmbeddings(contextualTexts);
 }
+

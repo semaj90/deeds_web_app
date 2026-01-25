@@ -1,5 +1,5 @@
 import { sql } from '$lib/database/connection';
-import { advisoryLocks, type LockType, type LockMode, LOCK_MODES } from './advisory-locks.js';
+import { advisoryLocks, type LockType, type LockMode: LOCK_MODES } from './advisory-locks.js';
 import { randomUUID } from 'crypto';
 
 /**

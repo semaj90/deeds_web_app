@@ -1,5 +1,5 @@
-import { productionServiceClient } from '$lib/api/production-service-client';
 import { assign, createMachine, fromPromise } from 'xstate';
+import { productionServiceClient } from '../../api/production-service-client';
 
 // Define missing types
 interface LooseObject {
@@ -175,7 +175,7 @@ export const legalAIMachine = createMachine(
       authenticating: {
         invoke: {
           src: 'authenticateUser',
-          input: ({ event }) => ({
+          input: ({ event }: { event: any }) => ({
             credentials: (event as Extract<LegalAIEvent, { type: 'AUTH.LOGIN' }>).credentials,
           }),
           onDone: { target: 'authenticated', actions: ['setUser'] },
@@ -197,7 +197,7 @@ export const legalAIMachine = createMachine(
       loadingCases: {
         invoke: {
           src: 'loadCases',
-          input: ({ event }) => ({
+          input: ({ event }: { event: any }) => ({
             filters: (event as Extract<LegalAIEvent, { type: 'CASES.LOAD' }>).filters,
           }),
           onDone: { target: 'authenticated', actions: 'setCases' },
@@ -208,7 +208,7 @@ export const legalAIMachine = createMachine(
         entry: 'startAIProcessing',
         invoke: {
           src: 'processAIQuery',
-          input: ({ event }) => ({
+          input: ({ event }: { event: any }) => ({
             prompt: (event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>).prompt,
           }),
           onDone: { target: 'authenticated', actions: 'setAIResponse' },
@@ -374,7 +374,7 @@ export const legalAIMachine = createMachine(
       }),
 
       authenticateUser: fromPromise<AuthResponse>(
-        async (params) => {
+        (async (params: any) => {
           const { input } = params as { input: { credentials: { email: string; password: string } } };
           try {
             const response = (await productionServiceClient.makeRequest('/api/auth/login', {
@@ -386,7 +386,7 @@ export const legalAIMachine = createMachine(
               const data = response.data as LooseObject;
               const userObj = (data.user as LooseObject | undefined) ?? {};
               return {
-                id: (data.id as string) || (userObj.id as string) ?? '',
+                id: ((data.id as string) || (userObj.id as string)) ?? '',
                 email: (data.email as string) || input.credentials.email,
                 role: (data.role as string) ?? 'legal_professional',
                 permissions: ((data.permissions as string[]) ?? [
@@ -402,11 +402,11 @@ export const legalAIMachine = createMachine(
             console.error('Authentication error: ', error);
             throw new Error('Authentication service unavailable');
           }
-        }
+        }) as any
       ),
 
       loadCases: fromPromise<Case[]>(
-        async (params) => {
+        (async (params: any) => {
           const { input } = params as { input: { filters?: Partial<LegalAIContext['cases']['filters']> } };
           try {
             const response = (await productionServiceClient.makeRequest('/api/cases', {
@@ -414,7 +414,7 @@ export const legalAIMachine = createMachine(
               body: input?.filters ?? {},
             })) as ServiceResponse<LooseObject[] | { cases?: LooseObject[] }>;
 
-            if (response?.success&& response.data) {
+            if (response?.success && response.data) {
               const data = response.data as LooseObject[] | { cases?: LooseObject[] };
               const casesArray = Array.isArray(data) ? (data as LooseObject[]) : (data.cases ?? []);
               return casesArray.map((caseData) => ({
@@ -439,11 +439,11 @@ export const legalAIMachine = createMachine(
             console.error('Error loading cases: ', error);
             return [];
           }
-        }
+        }) as any
       ),
 
       processAIQuery: fromPromise<AIResponse>(
-        async (params) => {
+        (async (params: any) => {
           const { input } = params as { input: { prompt: string } };
           try {
             const response = (await productionServiceClient.makeRequest('/api/ai/query', {
@@ -454,7 +454,7 @@ export const legalAIMachine = createMachine(
             if (response?.success && response.data) {
               const data = response.data as LooseObject;
               return {
-                response: (data.response as string) || (data.answer as string) ?? '',
+                response: ((data.response as string) || (data.answer as string)) ?? '',
                 confidence: (data.confidence as number) ?? 0.85,
                 sources: ((data.sources as Source[]) ??
                   (data.references as Source[]) ??
@@ -470,7 +470,7 @@ export const legalAIMachine = createMachine(
             console.error('AI query error: ', error);
             throw new Error('AI service unavailable');
           }
-        }
+        }) as any
       ),
     },
   }

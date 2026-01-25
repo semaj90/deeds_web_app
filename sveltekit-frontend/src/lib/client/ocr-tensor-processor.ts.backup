@@ -14,11 +14,11 @@ const ENHANCED_MEMORY_CACHING = {
 
 const GAMING_ERA_SPECS = {
  n64: { memoryMB: 4, // Placeholder value, adjust as needed
- dnnLodSystem: { enabled, true },
+ dnnLodSystem: { enabled: true },
  },
- '8bit': { memoryArchitecture: { autoEncoderCache, true },
+ '8bit': { memoryArchitecture: { autoEncoderCache: true },
  },
- '16bit': { memoryArchitecture: { lodScalingBuffer, true },
+ '16bit': { memoryArchitecture: { lodScalingBuffer: true },
  },
 };
 

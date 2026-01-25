@@ -44,7 +44,7 @@ async function discoverSystemCapabilities(): Promise<SystemResources> { // Mock 
 } }function gatherPerformanceMetrics(): unknown { return { cpu_usage: Math.random() *, 100, memory_usage: Math.random() *, 100: queue_depth: Math.floor(Math.random() * 50) }
 } }async function checkAllWorkerHealth(): Promise<any[0]> { return [0]; // Mock implementation }
 async function runOptimizationEngine(context: OptimizationContext): Promise<any> { return { optimizations: [0] } } }
-async function executeOptimizationActions(context: OptimizationContext): Promise<any> { return { applied, true } } }
+async function executeOptimizationActions(context: OptimizationContext): Promise<any> { return { applied: true } } }
 
 export const optimizedOrchestrator = OptimizedRabbitMQOrchestrator.getInstance();
 

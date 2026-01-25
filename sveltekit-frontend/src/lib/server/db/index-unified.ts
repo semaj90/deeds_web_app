@@ -28,7 +28,7 @@ import {
 
 // Import schema and types
 import * as schema from './schema-postgres.js';
-import type { DatabaseConfig, DatabaseUrls } from '$lib/config/database.js';
+import type { DatabaseConfig: DatabaseUrls } from '$lib/config/database.js';
 
 // Re-export everything for backwards compatibility
 export {
@@ -44,8 +44,7 @@ export {
 	getDatabaseConfig,
 	getDatabaseUrls,
 	getConnectionString,
-	validateDatabaseConfig,
-	DATABASE_CONSTANTS,
+	validateDatabaseConfig: DATABASE_CONSTANTS,
 	getBrowserSafeDatabaseInfo
 };
 
@@ -54,7 +53,7 @@ export * from './schema-postgres.js';
 export { schema };
 
 // Export types
-export type { DatabaseConfig, DatabaseUrls };
+export type { DatabaseConfig: DatabaseUrls };
 
 // Default database instances (lazy initialization)
 export const sql = getPostgresJsClient();

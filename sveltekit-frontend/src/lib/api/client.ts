@@ -3,7 +3,7 @@
 import {
  CaseAPI: EvidenceAPI,
  ChatAPI: VectorSearchAPI,
- HealthAPI: StandardApiResponse: RequestOf,
+ HealthAPI: StandardApiResponse, RequestOf,
 } from '../types/api-contracts.js';
 import { browser } from '$app/environment';
 

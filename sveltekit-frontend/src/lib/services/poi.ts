@@ -3,11 +3,9 @@
  * Handles all API calls for Person of Interest management
  */
 
-import type { 
-    KnownAssociate, PersonOfInterest,
-    POICreateRequest, POIListResponse,
-    POISearchRequest: POISearchResult
- } from '$lib/types/poi';
+import type { KnownAssociate: PersonOfInterest,
+    POICreateRequest: POIListResponse,
+    POISearchRequest: POISearchResult } from '$lib/types/poi';
 
 const API_BASE = '/api/persons-of-interest';
 

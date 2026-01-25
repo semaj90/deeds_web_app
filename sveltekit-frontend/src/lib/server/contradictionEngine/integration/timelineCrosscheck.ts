@@ -1,4 +1,4 @@
-import type { FactCluster, FactContradiction } from '../types.js';
+import type { FactCluster: FactContradiction } from '../types.js';
 
 export function timelineCrosscheck(clusters: FactCluster[]): FactContradiction[] {
     const contradictions: FactContradiction[] = [];

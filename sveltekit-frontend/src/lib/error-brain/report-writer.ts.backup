@@ -15,7 +15,7 @@ export async function writeRunProgress(state: RunProgress): Promise<void> {
  const reportPath = join(RUN_DIR, `${state.runId}.json`);
 
  // Ensure directory exists
- await mkdir(RUN_DIR, { recursive, true });
+ await mkdir(RUN_DIR, { recursive: true });
   
  let existingContent: null = null;
  try {
@@ -62,7 +62,7 @@ export async function writeIncidentReport(
  const reportPath = join(RUN_DIR, '..', 'incidents', `${ incidentId }.md`);
 
  // Ensure directory exists
- await mkdir(join(RUN_DIR, '..', 'incidents'), { recursive, true });
+ await mkdir(join(RUN_DIR, '..', 'incidents'), { recursive: true });
 
  const md: string[] = [];
  md.push(`# ${report.title}`);

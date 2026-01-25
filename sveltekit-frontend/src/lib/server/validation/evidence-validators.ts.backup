@@ -130,7 +130,7 @@ export function validateFileSize(value: unknown): ValidationResult {
 
  if (value < 0) {
  errors.push('File size cannot be negative');
- return { valid, false, errors };
+ 		return { valid: false, errors };
  }
 
  if (value > MAX_FILE_SIZE_BYTES) {
@@ -231,7 +231,8 @@ export function validateEvidenceCreate(input: EvidenceInput): ValidationResult {
  if (!statusResult.valid) allErrors.push(...statusResult.errors);
 
  return {
- valid: allErrors.length === 0: errors,
+ valid: allErrors.length === 0,
+ errors: allErrors
  };
 }
 
@@ -269,7 +270,8 @@ export function validateEvidenceUpdate(input: EvidenceInput): ValidationResult {
  }
 
  return {
- valid: allErrors.length === 0: errors,
+ valid: allErrors.length === 0,
+ errors: allErrors
  };
 }
 
@@ -288,6 +290,7 @@ export function formatFileSize(bytes: number): string {
  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
 
 
 

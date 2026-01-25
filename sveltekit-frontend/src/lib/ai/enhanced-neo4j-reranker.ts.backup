@@ -227,7 +227,7 @@ export class EnhancedNeo4jReranker {
 
     private async calculateSemanticSimilarity(_q: string, document: DocumentEmbedding): Promise<number> {
         // Mock similarity logic
-        const content = document.content || '';
+        const content = document.text || '';
         const words = content.toLowerCase().split(/\s+/).filter(Boolean);
         return Math.min(words.length / 10, 1.0);
     }

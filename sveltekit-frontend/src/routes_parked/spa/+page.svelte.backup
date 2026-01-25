@@ -16,8 +16,7 @@ https, //svelte.dev/e/js_parse_error -->
  import SPACanvasComp from '$lib/components/ui/enhanced-bits/SPACanvasRenderer.svelte';
  import type { LegalAILogic,
  type LegalDocument,
- type EvidenceItem,
- } from '$lib/core/logic/legal-ai-logic';
+ type EvidenceItem, } from '$lib/core/logic/legal-ai-logic';
  // Let Vite resolve the $lib alias (avoids PostCSS ENOENT on @import)
  import '$lib/styles/hybrid-theme.css';
 

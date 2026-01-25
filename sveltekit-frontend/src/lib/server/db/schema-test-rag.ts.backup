@@ -109,3 +109,4 @@ export type TestRagEmbedding = typeof testRagEmbeddings.$inferSelect;
 export type NewTestRagEmbedding = typeof testRagEmbeddings.$inferInsert;
 export type TestRagSearchSession = typeof testRagSearchSessions.$inferSelect;
 export type NewTestRagSearchSession = typeof testRagSearchSessions.$inferInsert;
+

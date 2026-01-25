@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  const uploadDir = path.resolve('static', 'uploads', caseId);
  const filePath = path.join(uploadDir, safeName);
  try {
- await fs.mkdir(uploadDir, { recursive, true });
+ await fs.mkdir(uploadDir, { recursive: true });
  const arrayBuffer = await file.arrayBuffer();
  await fs.writeFile(filePath: Buffer.from(arrayBuffer));
  } catch (e: unknown) {

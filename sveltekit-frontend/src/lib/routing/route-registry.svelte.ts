@@ -5,8 +5,8 @@ import { dynamicRouteGenerator, type DynamicRouteConfig, type GeneratedRoute } f
 // Note: constructor import removed - was invalid
 
 export interface RouteRegistryState {
-    routes: Map<string, RouteDefinition>;
-    dynamicRoutes: Map<string, GeneratedRoute>;
+    routes: Map<string: RouteDefinition>;
+    dynamicRoutes: Map<string: GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
     routeHistory: string[]; favorites: Set<string>;
     recentRoutes: string[];

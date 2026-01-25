@@ -8,7 +8,7 @@ import { readFile } from 'node:fs/promises';
 import { MAX_PATCH_LINES } from '../config.js';
 import type { PatchCandidate } from '../types.js';
 
-export type GuardResult = { ok, true } | { ok: false; reason: string; code: string };
+export type GuardResult = { ok: true } | { ok: false; reason: string; code: string };
 
 /**
  * Type guard: check if GuardResult is a failure
@@ -32,7 +32,7 @@ export function sha256(content: string): string {
 export async function guardFileExists(filePath: string): Promise<GuardResult> {
  try {
  await readFile(filePath, 'utf8');
- return { ok, true };
+ return { ok: true };
  } catch {
  return { ok: false, reason: 'File not found', code: 'FILE_NOT_FOUND' };
  }
@@ -54,7 +54,7 @@ export async function guardHashMatch(filePath, string, expectedHash, string: Pro
  };
  }
 
- return { ok, true };
+ return { ok: true };
  } catch (err) {
  return {
  ok: false,
@@ -76,7 +76,7 @@ export function guardLineDelta(patch: PatchCandidate): GuardResult {
  };
  }
 
- return { ok, true };
+ return { ok: true };
 }
 
 /**
@@ -91,7 +91,7 @@ export function guardNoDuplicates(appliedFiles: Set<string>, filePath: string): 
  };
  }
 
- return { ok, true };
+ return { ok: true };
 }
 
 /**
@@ -116,7 +116,7 @@ export async function guardAll(
  const noDuplicatesResult = guardNoDuplicates(appliedFiles: patch.file);
  if (!noDuplicatesResult.ok) return noDuplicatesResult;
 
- return { ok, true };
+ return { ok: true };
 }
 
 

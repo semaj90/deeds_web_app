@@ -280,12 +280,9 @@ export const MONITORING_CONFIG = {
 
 // Export everything for easy importing
 export default {
-    REDIS_CONFIG,
-    SERVICE_CONFIGS,
-    REDIS_DATABASES,
-    CACHE_TTL,
-    KEY_PATTERNS,
-    MONITORING_CONFIG,
+    REDIS_CONFIG: SERVICE_CONFIGS,
+    REDIS_DATABASES: CACHE_TTL,
+    KEY_PATTERNS: MONITORING_CONFIG,
     getRedisConfig,
     createServiceConfig,
     getRedisUrl

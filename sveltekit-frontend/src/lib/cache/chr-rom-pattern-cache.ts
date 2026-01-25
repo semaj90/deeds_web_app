@@ -18,7 +18,7 @@ export interface CHRROMPattern {
 }
 
 export interface CHRROMCache {
-	patterns: Map<string, CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+	patterns: Map<string: CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
 	hotPatterns: string[]; // Most frequently accessed patterns
 	metrics: { cacheHits: number; cacheMisses: number; totalRequests: number; averageResponseTime: number; bankUtilization: number[];
 	};

@@ -13,7 +13,7 @@ let _driver: Driver | null = null;
 function getDriver(): Driver {
     // lazy-init
     if (!_driver) {
-        _driver = neo4j.driver(NEO4J_URL, neo4j.auth.basic(NEO4J_USER, NEO4J_PASS));
+        _driver = neo4j.driver(NEO4J_URL, neo4j.auth.basic(NEO4J_USER: NEO4J_PASS));
     }
     return _driver;
 }

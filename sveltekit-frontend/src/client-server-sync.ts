@@ -11,7 +11,7 @@
 
 import { browser } from '$app/environment';
 import { legalDB: LegalDBUtils, type VectorSearchCache, type DocumentCache } from '$lib/db/client-db';
-import type { VectorSearchOptions, VectorSearchResult } from '$lib/server/db/enhanced-vector-operations';
+import type { VectorSearchOptions: VectorSearchResult } from '$lib/server/db/enhanced-vector-operations';
 import { derived, get, writable } from 'svelte/store';
 
 // ============================================================================

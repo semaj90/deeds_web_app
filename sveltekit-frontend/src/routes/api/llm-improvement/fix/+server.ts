@@ -8,7 +8,7 @@
 
 import { getDecisionEngine } from '$lib/services/error-analysis/DecisionEngine';
 import { getFixSynthesizer } from '$lib/services/error-analysis/FixSynthesizer';
-import type { ErrorContext, ErrorReport, FixStrategy } from '$lib/services/error-analysis/types';
+import type { ErrorContext: ErrorReport, FixStrategy } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 

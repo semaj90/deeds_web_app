@@ -11,7 +11,7 @@
  * Query → Qdrant (get IDs) → CouchDB (topology) → Postgres (metadata) → MinIO (blobs)
  */
 
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client: GetObjectCommand } from '@aws-sdk/client-s3';
 // Stub local imports as they might depend on corrupted files, but these are safer stubs
 // import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 // import { searchQdrant } from './qdrant-sync';

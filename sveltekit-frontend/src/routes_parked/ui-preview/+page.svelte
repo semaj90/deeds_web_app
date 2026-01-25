@@ -18,15 +18,13 @@
  // Stores and Utilities
  // NOTE: The following functions must be exported from '$lib/utils/formatting.ts'
  // for TypeScript errors to be fully resolved.
- import type {
- formatDetailedTimestamp,
+ import type { formatDetailedTimestamp,
  formatRelativeTime,
  getFileIcon,
  getPriorityColor,
  getStatusColor,
  truncateFilename,
- truncateText,
- } from '$lib/utils/formatting';
+ truncateText, } from '$lib/utils/formatting';
 
  // Component state
  let showDialog = $state <boolean>(false);

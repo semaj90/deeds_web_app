@@ -472,3 +472,4 @@ function hashStringToNumber(str: string): number {
 	// Return a positive integer (Qdrant point IDs should be positive for unsigned int compatibility if that's the setup, or generally safe)
 	return Math.abs(hash);
 }
+

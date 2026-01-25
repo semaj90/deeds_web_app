@@ -153,7 +153,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 		if (redisClient) {
             // Cache for 1 hour
-			await redisClient.setEx(cacheKey, 3600, JSON.stringify(embedding));
+			await redisClient.setex(cacheKey, 3600, JSON.stringify(embedding));
 		}
 		return embedding;
 	} catch (error) {
@@ -358,3 +358,4 @@ export async function getSystemHealth(): Promise<any> {
 		fuse: !!fuseInstance
 	};
 }
+

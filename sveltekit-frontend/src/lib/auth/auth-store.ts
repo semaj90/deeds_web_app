@@ -100,7 +100,7 @@ const AccessControl = {
             admin: ['manage_users', 'manage_content', 'read'],
             editor: ['edit', 'read'],
             viewer: ['read']
-        } as unknown as Record<UserRole, Permission[]>;
+        } as unknown as Record<UserRole: Permission[]>;
         return rolePermissionMap[role] ?? [];
     },
     canAccessResource(

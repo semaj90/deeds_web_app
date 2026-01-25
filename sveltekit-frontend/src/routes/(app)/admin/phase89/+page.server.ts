@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { sql } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions: PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
     try {

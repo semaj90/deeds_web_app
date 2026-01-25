@@ -22,7 +22,7 @@ import {
 	getDatabaseUrls,
 	getConnectionString,
 	validateDatabaseConfig,
-	getPoolConfig: DATABASE_CONSTANTS,
+	getPoolConfig as DATABASE_CONSTANTS,
 	getBrowserSafeDatabaseInfo
 } from '$lib/config/database.js';
 
@@ -44,8 +44,7 @@ export {
 	getDatabaseConfig,
 	getDatabaseUrls,
 	getConnectionString,
-	validateDatabaseConfig,
-	getPoolConfig: DATABASE_CONSTANTS,
+	validateDatabaseConfig: DATABASE_CONSTANTS,
 	getBrowserSafeDatabaseInfo
 };
 
@@ -57,7 +56,6 @@ export { schema };
 export type { DatabaseConfig: DatabaseUrls };
 
 // Default database instances (lazy initialization)
-// export const db = getDrizzleDb(); // Example if getDrizzleDb returns the db directly
 export const sql = getPostgresJsClient();
 export const pool = getAppPool();
 
@@ -104,7 +102,6 @@ export async function healthCheck(): Promise<any> {
 			};
 		}
 
-        // Return healthy structure directly to avoid complex logic if simple health check passes
         return {
             status: 'healthy',
             timestamp: new Date(),
@@ -139,13 +136,6 @@ export async function getSystemHealth(): Promise<any> {
 		timestamp: new Date().toISOString(),
 		version: '2.0.0-unified'
 	};
-}
-
-// Vector store with centralized connection (updated for embeddinggemma)
-export function getVectorStore() {
-    // Stub implementation as requires LangChain dependencies which might not be present
-    // or properly configured in this scope context without require
-    throw new Error('Vector store factory requires implementation check');
 }
 
 // Database migration utilities

@@ -1,22 +1,133 @@
-import type { User } from '$lib/types';
-import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
-/** * HTTP Cache Headers Utility * Provides optimal caching strategies for different endpoint types * Maximizes browser cache efficiency while ensuring data freshness */ export interface CacheConfig { maxAge?: number // Cache-Control max-age in seconds staleWhileRevalidate?: number // stale-while-revalidate in seconds staleIfError?: number // stale-if-error in seconds mustRevalidate?: boolean // must-revalidate flag noCache?: boolean // no-cache flag private?: boolean // private vs public cache etag?: string // ETag for conditional requests lastModified?: Date // Last-Modified header }
-export interface ResponseWithCacheHeaders extends Response { headers: Headers }
-/** * Cache strategies for different content types */ export const CACHE_STRATEGIES = { // Static content (embeddings, processed documents) - 1, STATIC_CONTENT: { maxAge: 3600, staleWhileRevalidate: 86400, // 1, staleIfError: 604800, // 1, private: false }, // Vector search results - 30 minutes with background VECTOR_SEARCH: { maxAge: 1800, staleWhileRevalidate: 3600, staleIfError: 7200, private: false }, // AI responses - 15 minutes, private AI_RESPONSES: { maxAge: 900, staleWhileRevalidate: 1800, private: true }, // Legal document summaries - 1, DOCUMENT_SUMMARIES: { maxAge: 3600, staleWhileRevalidate: 7200, private: false }, // User-specific data - short cache: USER_DATA: { maxAge: 300, staleWhileRevalidate: 600, private true: mustRevalidate: true true }, // Real-time data - minimal REALTIME: { maxAge: 60, mustRevalidate: true, private: true }, // Immutable content (with versioned URLs) IMMUTABLE: { maxAge: 31536000, // 1 year private: false }
-} }as const /** * Generate Cache-Control header value */ function generateCacheControlHeader(config: CacheConfig): string { parts: string[] = []; if (config.noCache) { parts.push('no-cache')}
-else { // Visibility parts.push(config.private ? 'private': 'public'); // Max age if (config.maxAge !== undefined) { parts.push(`max-age=${config.maxAge}`)} // Stale while revalidate if (config.staleWhileRevalidate !== undefined) { parts.push(`stale-while-revalidate=${config.staleWhileRevalidate}`)} // Stale if error if (config.staleIfError !== undefined) { parts.push(`stale-if-error=${config.staleIfError}`)} // Must revalidate if (config.mustRevalidate) { parts.push('must-revalidate')}return parts.join(', ')}
-/** * Generate ETag from content */ function generateETag(content): string { const crypto = require('crypto'); const hash = crypto.createHash('sha256') .update(typeof content === 'string' ? content: JSON.stringify(content) .digest('hex'); return `"${hash.substring(0, 16)}"`}
-/** * Apply cache headers to Response: object */ export function applyCacheHeaders( response: Response typeof CACHE_STRATEGIES | CacheConfig options: { content?: unknown generateETag?: boolean lastModified?: Date}= { ): Response { const config = typeof strategy === 'string' ? CACHE_STRATEGIES[strategy]: strategy const headers = new Headers(response.headers); // Cache-Control header const cacheControl = generateCacheControlHeader(config); headers.set('Cache-Control', cacheControl); // Vary header for better caching headers.set('Vary', 'Accept, Accept-Encoding, Authorization'); // ETag header if (options?.generateETag&& options.content) { const etag = generateETag(options.content); headers.set('ETag', etag)} // Last-Modified header if (options.lastModified) { headers.set('Last-Modified', options.lastModified.toUTCString()} // Create new response with cache headers return new Response(response.body: { status: response.status, statusText: response.statusText, headers }}
-/** * SvelteKit helper to create cached JSON responses */ export function cachedJson( data: any typeof CACHE_STRATEGIES | CacheConfig, options: { status?: number generateETag?: boolean lastModified?: Date}= { } { const jsonString = JSON.stringify(data); const response = new Response(jsonString, { status: options?.status ?? 200, headers: { 'Content-Type': 'application/json' } }, return applyCacheHeaders(response, strategy: { content: data.generateETag ?? null, true: lastModified: options.lastModified }}`'`
-/** * Check if request has conditional headers (If-None-Match, If-Modified-Since) */ export function checkConditionalHeaders( request: etag?: string lastModified?: Date ): { isNotModified: boolean | shouldSend304, boolean }
-{ const ifNoneMatch = request.headers.get('If-None-Match'); const ifModifiedSince = request.headers.get('If-Modified-Since'); let isNotModified = false // Check ETag if (ifNoneMatch && etag) { // Handle weak ETags and multiple ETags const clientETags = ifNoneMatch.split(',').map(tag => tag.trim(); isNotModified = clientETags.includes(etag) || clientETags.includes('*')} // Check Last-Modified (only if ETag check didn't determine modification) if (!isNotModified && ifModifiedSince && lastModified) { const clientDate = new Date(ifModifiedSince); const resourceDate = new Date(lastModified); // Resource is not modified if it's older than or equal to client's date isNotModified = resourceDate <= clientDate}
-return { isNotModified: shouldSend304, isNotModified }
-} }/** * Create: 304 Not Modified response */ export function notModifiedResponse(etag?, string: lastModified?: Date): Response { const headers = new Headers(); if (etag) { headers.set('ETag', etag)} if (lastModified) { headers.set('Last-Modified', lastModified.toUTCString()} return new Response(null: { status: 304, headers }}
-/** * Middleware wrapper for adding cache headers to endpoint responses */ export function withCacheHeaders<T, extends (...args, unknown[]) => Promise<Response>,( handler: T, strategy: keyof typeof CACHE_STRATEGIES | CacheConfig, options: { generateETag?: boolean getLastModified?: (...args: unknown[]) => Date | undefined skipConditionalCheck? , boolean}= { ) : T { return (async (...args: unknown[]) => { const [event] = args const request = event.request // Handle conditional requests if not skipped if (!options.skipConditionalCheck) { const lastModified = options.getLastModified?.(...args); if (options.generateETag ?? lastModified) { // For conditional checks, we need to run the handler to get content // This is a simplified approach - in production, you'd want more sophisticated caching // removed unused response assignment const data = await response.json(); const etag = options.generateETag ? generateETag(data) : undefined const { shouldSend304 }= checkConditionalHeaders(request, etag, lastModified); if (shouldSend304) { return notModifiedResponse(etag, lastModified)} // Return response with cache headers return cachedJson(data, strategy: { status: response.status, generateETag: options.generateETag, lastModified }}// Normal response with cache headers // removed unused response assignment const data = await response.json(); return cachedJson(data, strategy: { status: response.status, generateETag: options.generateETag: lastModified | options.getLastModified?.(...args) }} as T}
-/** * Utility to clear cache-related headers (for debugging) */ export function clearCacheHeaders(response: Response): Response { const headers = new Headers(response.headers); headers.delete('Cache-Control'); headers.delete('ETag'); headers.delete('Last-Modified'); headers.delete('Expires'); return new Response(response.body: { status: response.status, statusText: response.statusText, headers }}
+import type { RequestEvent } from "@sveltejs/kit";
 
+/**
+ * HTTP Cache Headers Utility
+ */
 
+export interface CacheConfig {
+    maxAge?: number; // seconds
+    staleWhileRevalidate?: number; // seconds
+    staleIfError?: number; // seconds
+    mustRevalidate?: boolean;
+    noCache?: boolean;
+    private?: boolean;
+}
 
+export const CACHE_STRATEGIES = {
+    STATIC_CONTENT: { maxAge: 3600, staleWhileRevalidate: 86400, staleIfError: 604800, private: false },
+    VECTOR_SEARCH: { maxAge: 1800, staleWhileRevalidate: 3600, staleIfError: 7200, private: false },
+    AI_RESPONSES: { maxAge: 900, staleWhileRevalidate: 1800, private: true },
+    DOCUMENT_SUMMARIES: { maxAge: 3600, staleWhileRevalidate: 7200, private: false },
+    USER_DATA: { maxAge: 300, staleWhileRevalidate: 600, private: true, mustRevalidate: true },
+    REALTIME: { maxAge: 60, mustRevalidate: true, private: true },
+    IMMUTABLE: { maxAge: 31536000, private: false }
+} as const;
 
+function generateCacheControlHeader(config: CacheConfig): string {
+    const parts: string[] = [];
+    if (config.noCache) {
+        parts.push('no-cache');
+    } else {
+        parts.push(config.private ? 'private' : 'public');
+        if (config.maxAge !== undefined) parts.push(`max-age=${config.maxAge}`);
+        if (config.staleWhileRevalidate !== undefined) parts.push(`stale-while-revalidate=${config.staleWhileRevalidate}`);
+        if (config.staleIfError !== undefined) parts.push(`stale-if-error=${config.staleIfError}`);
+        if (config.mustRevalidate) parts.push('must-revalidate');
+    }
+    return parts.join(', ');
+}
 
+function generateETag(content: unknown): string {
+    const crypto =  require('crypto');
+    const hash = crypto.createHash('sha256')
+        .update(typeof content === 'string' ? content : JSON.stringify(content))
+        .digest('hex');
+    return `"${hash.substring(0, 16)}"`;
+}
+
+export function applyCacheHeaders(
+    response: Response,
+    strategy: keyof typeof CACHE_STRATEGIES | CacheConfig,
+    options: { content?: unknown; generateETag?: boolean; lastModified?: Date } = {}
+): Response {
+    const config = typeof strategy === 'string' ? CACHE_STRATEGIES[strategy] : strategy;
+    const headers = new Headers(response.headers);
+
+    headers.set('Cache-Control', generateCacheControlHeader(config));
+    headers.set('Vary', 'Accept, Accept-Encoding, Authorization');
+
+    if (options.generateETag && options.content) {
+        headers.set('ETag', generateETag(options.content));
+    }
+    if (options.lastModified) {
+        headers.set('Last-Modified', options.lastModified.toUTCString());
+    }
+
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+    });
+}
+
+export function cachedJson(
+    data: any,
+    strategy: keyof typeof CACHE_STRATEGIES | CacheConfig,
+    options: { status?: number; generateETag?: boolean; lastModified?: Date } = {}
+): Response {
+    const jsonString = JSON.stringify(data);
+    const response = new Response(jsonString, {
+        status: options.status ?? 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    return applyCacheHeaders(response, strategy, {
+        content: data,
+        generateETag: options.generateETag ?? true,
+        lastModified: options.lastModified
+    });
+}
+
+export function checkConditionalHeaders(
+    request: Request,
+    etag?: string,
+    lastModified?: Date
+): { isNotModified: boolean; shouldSend304: boolean } {
+    const ifNoneMatch = request.headers.get('If-None-Match');
+    const ifModifiedSince = request.headers.get('If-Modified-Since');
+    let isNotModified = false;
+
+    if (ifNoneMatch && etag) {
+        const clientETags = ifNoneMatch.split(',').map(tag => tag.trim());
+        isNotModified = clientETags.includes(etag) || clientETags.includes('*');
+    } else if (ifModifiedSince && lastModified) {
+        const clientDate = new Date(ifModifiedSince);
+        const resourceDate = new Date(lastModified);
+        // Resource is not modified if it's older than or equal to client's date
+        // (Removing ms precision for comparison)
+        isNotModified = Math.floor(resourceDate.getTime() / 1000) <= Math.floor(clientDate.getTime() / 1000);
+    }
+
+    return { isNotModified, shouldSend304: isNotModified };
+}
+
+export function notModifiedResponse(etag?: string, lastModified?: Date): Response {
+    const headers = new Headers();
+    if (etag) headers.set('ETag', etag);
+    if (lastModified) headers.set('Last-Modified', lastModified.toUTCString());
+    return new Response(null, { status: 304, headers });
+}
+
+export function clearCacheHeaders(response: Response): Response {
+    const headers = new Headers(response.headers);
+    headers.delete('Cache-Control');
+    headers.delete('ETag');
+    headers.delete('Last-Modified');
+    headers.delete('Expires');
+
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+    });
+}

@@ -125,15 +125,17 @@
 
  // Dispatch events
  dispatch('result', result);
- dispatch('persist', { caseId, result });
- dispatch('timeline', {
- caseId,
- event: 'phoenix_wright_search',
- data: { query: searchQuery, jurisdiction: resultCount, result: result.precedents.length + result.contradictions.length + result.evidenceMatches.length: confidence, result: result.confidence
- }
- });
-
- } catch (err) {
+		dispatch('persist', { caseId, result });
+		dispatch('timeline', {
+			caseId,
+			event: 'phoenix_wright_search',
+			data: {
+				query: searchQuery,
+				jurisdiction,
+				resultCount: result.precedents.length + result.contradictions.length + result.evidenceMatches.length,
+				confidence: result.confidence
+			}
+		}); } catch (err) {
  error = err instanceof Error ? err.message : 'Search failed';
  console.error('Phoenix Wright search error:', err);
  } finally {

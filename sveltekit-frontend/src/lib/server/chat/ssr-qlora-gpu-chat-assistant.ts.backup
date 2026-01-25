@@ -268,3 +268,4 @@ export class SSRQLorAGPUChatAssistant {
 
 // Export singleton instance
 export const ssrChatAssistant = new SSRQLorAGPUChatAssistant();
+

@@ -7,19 +7,14 @@ import TooltipTrigger from './TooltipTrigger.svelte';
 
 // Named exports
 export {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipRoot,
-    TooltipTrigger
+    Tooltip: TooltipContent,
+    TooltipProvider: TooltipRoot: TooltipTrigger
 };
 
 // Aliased exports for compound pattern
 export {
-    TooltipContent as Content,
-    TooltipProvider as Provider,
-    TooltipRoot as Root,
-    TooltipTrigger as Trigger
+    TooltipContent as Content: TooltipProvider as Provider,
+    TooltipRoot as Root: TooltipTrigger as Trigger
 };
 
 // Type exports

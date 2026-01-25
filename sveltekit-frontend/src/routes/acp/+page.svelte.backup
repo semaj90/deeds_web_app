@@ -261,11 +261,9 @@
 <style>
 	.dashboard {
 		min-height: 100vh; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
-		color: #e0e0e0;
-		font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;
-	}
-
-	.header {
+                color: #e0e0e0;
+                font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;
+        }	.header {
 		background: linear-gradient(90deg, #1a1a2e 0%, #2a2a4e 100%);
 		padding: 1.5rem 2rem;
 		display: flex;

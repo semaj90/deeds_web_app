@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const decisionEngine = getDecisionEngine({
 			autoApplyEnabled: autoApply ?? false
 		});
-  
+
 		const result = await decisionEngine.processError(error, strategy, context);
 
 		return json({

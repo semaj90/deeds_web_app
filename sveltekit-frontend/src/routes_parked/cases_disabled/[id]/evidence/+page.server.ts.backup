@@ -110,7 +110,7 @@ export const actions: Actions = {
  WHERE id = ${evidenceId}
  `;
 
- return { success, true };
+ return { success: true };
  } catch (err) {
  console.error('Delete failed:', err);
  return fail(500, { message: 'Delete failed' });

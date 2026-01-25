@@ -258,3 +258,4 @@ export function getVictimIcon(victimClass: string): string {
 	};
 	return icons[victimClass] ?? '👤';
 }
+

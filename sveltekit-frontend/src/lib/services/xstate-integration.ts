@@ -1,5 +1,4 @@
-import type {
- legalAIMachine,$1;$2$1;$2} from '$lib/machines/legalAIMachine.v5';
+import type { legalAIMachine,$1;$2$1;$2 } from '$lib/machines/legalAIMachine.v5';
 import { as } from "$lib/server/db/utils";
 import redis from "$lib/server/redis-client";
 import { error } from "console";

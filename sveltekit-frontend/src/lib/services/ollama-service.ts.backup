@@ -310,7 +310,7 @@ class OllamaService {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                buffer += decoder.decode(value, { stream, true });
+                buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split(/\r? \n/);
                 // keep the last partial line in buffer
                 buffer = lines.pop() ?? '';

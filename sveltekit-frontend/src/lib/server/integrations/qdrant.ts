@@ -1,8 +1,8 @@
 /**
  * Qdrant Vector Database Integration - Production-ready Vector Search
  */
-import type { IQdrantVectorService, VectorSearchOptions, VectorSearchResult } from '$lib/types/external-services';
-import type { PointStruct, UpsertPoints, SearchRequest, SearchResponse, Filter } from '$lib/types/qdrant';
+import type { IQdrantVectorService: VectorSearchOptions, VectorSearchResult } from '$lib/types/external-services';
+import type { PointStruct: UpsertPoints, SearchRequest: SearchResponse, Filter } from '$lib/types/qdrant';
 
 interface QdrantConfig {
     url?: string;

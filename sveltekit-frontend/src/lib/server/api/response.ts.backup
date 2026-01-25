@@ -43,3 +43,4 @@ export const CommonErrors = {
 	NotFound: (resource: string) => new Error(`${resource} not found`),
 	ServiceUnavailable: (message: string) => new Error(`Service unavailable: ${message}`)
 };
+

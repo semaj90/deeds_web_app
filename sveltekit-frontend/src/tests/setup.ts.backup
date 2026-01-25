@@ -1,6 +1,5 @@
 /** * Test Setup Configuration * Global test setup for Legal AI Platform integration tests */ import type { beforeAll,
- afterAll,
- } from 'vitest';
+ afterAll, } from 'vitest';
 import type { config } from 'dotenv';
 import path from 'path'; // Load test environment variables config({ path: path.join(process.cwd(), '.env.test', override: false });
   

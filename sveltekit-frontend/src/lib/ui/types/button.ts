@@ -1,4 +1,4 @@
-import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
+import type { HTMLButtonAttributes: HTMLAnchorAttributes } from 'svelte/elements';
 
 // Define the possible variants for the button
 export type ButtonVariant =

@@ -1,4 +1,4 @@
-import type { UISemanticSnapshot, UISnapshotInput } from '../types.js';
+import type { UISemanticSnapshot: UISnapshotInput } from '../types.js';
 
 export async function extractDOMSemantics(snapshot: UISnapshotInput): Promise<UISemanticSnapshot> {
     return {

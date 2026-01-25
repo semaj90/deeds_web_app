@@ -66,7 +66,7 @@ export interface AIAssistantContext {
 
  // Context7 Integration with caching
  context7Analysis?: Context7Analysis; context7Available: boolean;
- context7Cache: Map<string, Context7CacheEntry>;
+ context7Cache: Map<string: Context7CacheEntry>;
 
  // Multi-modal Processing with Web Workers
  currentDocuments: BaseDocument[]; currentImages: ImageAnalysis[];
@@ -76,7 +76,7 @@ export interface AIAssistantContext {
  // Advanced Service Health & Protocol Management
  serviceHealth: ServiceHealthStatus; preferredProtocol: 'http' | 'grpc' | 'quic' | 'websocket';
  activeProtocol: 'http' | 'grpc' | 'quic' | 'websocket';
- serviceLoadBalancer: LoadBalancerState; circuitBreakers: Map<string, CircuitBreakerState>;
+ serviceLoadBalancer: LoadBalancerState; circuitBreakers: Map<string: CircuitBreakerState>;
 
  // Real-time Features with enhanced capabilities
  natsConnected: boolean; activeStreaming: boolean;
@@ -200,7 +200,7 @@ export interface TimeRange {
 // Service Health Types
 export interface ServiceHealthStatus {
  overall: 'healthy' | 'degraded' | 'unhealthy';
- services: Record<string, ServiceStatus>; lastCheck: Date;
+ services: Record<string: ServiceStatus>; lastCheck: Date;
  nextCheck: Date;
 }
 

@@ -18,8 +18,7 @@ https, //svelte.dev/e/js_parse_error -->
  activeReport,
  isSaving,
  saveReport,
- loadReports,
- } from '$lib/stores/reports';
+ loadReports, } from '$lib/stores/reports';
 
  // Add a lightweight ReportDraft type to match store emissions (many fields optional)
  type ReportDraft = Partial<Report> & {

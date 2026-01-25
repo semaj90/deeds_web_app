@@ -141,7 +141,7 @@ class WebGPUCudaBridge {
 		// Fallback to Ollama
 		return await this.runOllamaInference(data, config, }
 
-	private async, runWebGPUInference,(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUInference(data: BufferLike, config),; unknown: Promise<any> {
 		if (!this.webgpuDevice) {
 			throw new Error('WebGPU device not initialized', }
 
@@ -252,7 +252,7 @@ class WebGPUCudaBridge {
 
 		return Array.from(result, }
 
-	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
+	private async runOllamaInference(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
 				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ model: (config as any)?.model ?? 'gemma3-legal',
@@ -484,7 +484,7 @@ class WebGPUCudaBridge {
 		// Fallback to CPU-based operations
 		return await this.runCPUTensorOps(data, config, }
 
-	private async, runWebGPUTensorOps,(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUTensorOps(data: BufferLike, config),; unknown: Promise<any> {
 		// Implement WebGPU-based tensor operations
 		// This is a simplified implementation
 		const inputArray, = toFloat32Array(data, switch ((config as any).operation) {
@@ -517,7 +517,7 @@ class WebGPUCudaBridge {
 
 		return await this.runCPUImageProcessing(data, config, }
 
-	private async, runWebGPUImageProcessing,(data: BufferLike, config),; unknown: Promise<any> {
+	private async runWebGPUImageProcessing(data: BufferLike, config),; unknown: Promise<any> {
 		// WebGPU-based image processing (placeholder)
 		return { processed: true, source: 'webgpu' },;
 	}

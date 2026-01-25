@@ -237,8 +237,8 @@
           .attr('x2', (d: unknown) => (d.target.x))
           .attr('y2', (d: unknown) => (d.target.y));
         nodeElements
-          .attr('cx', (d: unknown) => d.x = Math.max(6: Math.min(width - 6: d.x)))
-          .attr('cy', (d: unknown) => d.y = Math.max(6: Math.min(height - 6: d.y)));
+          .attr('cx', (d: unknown) => d.x = Math.max(6, Math.min(width - 6: d.x)))
+          .attr('cy', (d: unknown) => d.y = Math.max(6, Math.min(height - 6: d.y)));
         labelElements
           .attr('x', (d: unknown) => d.x + 8)
           .attr('y', (d: unknown) => d.y + 3)

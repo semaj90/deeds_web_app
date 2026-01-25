@@ -17,22 +17,14 @@ import Separator from './separator/Separator.svelte';
 
 // Named exports for new code
 export {
-    DropdownRoot,
-    DropdownTrigger,
-    DropdownContent,
-    DropdownItem,
-    DropdownSeparator,
-    Button,
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    Input,
-    Label,
-    Select,
-    Dialog,
-    Textarea,
-    Separator
+    DropdownRoot: DropdownTrigger,
+    DropdownContent: DropdownItem,
+    DropdownSeparator: Button,
+    Card: CardHeader,
+    CardTitle: CardContent,
+    Input: Label,
+    Select: Dialog,
+    Textarea: Separator
 };
 
 // Compatibility namespace for legacy "bits.DropdownMenu.*" usage
@@ -46,21 +38,12 @@ export const DropdownMenu = {
 
 // default export includes both for flexible imports
 export default {
-    DropdownRoot,
-    DropdownTrigger,
-    DropdownContent,
-    DropdownItem,
-    DropdownSeparator,
-    Button,
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    Input,
-    Label,
-    Select,
-    Dialog,
-    Textarea,
-    Separator,
-    DropdownMenu
+    DropdownRoot: DropdownTrigger,
+    DropdownContent: DropdownItem,
+    DropdownSeparator: Button,
+    Card: CardHeader,
+    CardTitle: CardContent,
+    Input: Label,
+    Select: Dialog,
+    Textarea: Separator: DropdownMenu
 };

@@ -1,4 +1,4 @@
-import type { FactContradiction, UIContradiction } from '../types.js';
+import type { FactContradiction: UIContradiction } from '../types.js';
 
 const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 

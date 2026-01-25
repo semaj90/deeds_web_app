@@ -346,3 +346,4 @@ export class PgVectorService {
 
 // Export singleton instance
 export const pgVectorService = new PgVectorService();
+

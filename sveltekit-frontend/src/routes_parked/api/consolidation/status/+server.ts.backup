@@ -10,7 +10,7 @@ export const GET: RequestHandler = async () => {
  // Count routes
  async function countRoutes(dir: string): Promise<number> {
  try {
- const entries = await fs.readdir(dir, { recursive, true });
+ const entries = await fs.readdir(dir, { recursive: true });
  return entries.filter(
  (e) =>
  e.endsWith('+page.svelte') || e.endsWith('+server.ts') || e.endsWith('+layout.svelte')

@@ -236,3 +236,4 @@ export function formatAuditEntry(entry: AuditLogEntry): string {
 			return `[${timestamp}] ${user} performed ${entry.operation} on ${entry.resourceType} ${entry.resourceId}`;
 	}
 }
+

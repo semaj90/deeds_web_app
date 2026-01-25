@@ -207,7 +207,7 @@ export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): 
         });
       }
     },
-    { batchNormalization, true }
+    { batchNormalization: true }
   );
   worker.registerHandler('legal.chunks.embed', vectorEmbeddingHandler);async (message: unknown) => {
       const msg = message as Record<string, unknown>;
@@ -224,7 +224,7 @@ export function registerWASMAcceleratedHandlers(worker: RabbitMQServiceWorker): 
         });
       }
     },
-    { vectorSimilarity, true }
+    { vectorSimilarity: true }
   );
   worker.registerHandler('legal.similarity.compute', similarityHandler);
 

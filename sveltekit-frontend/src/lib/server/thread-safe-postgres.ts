@@ -3,7 +3,7 @@
  * Ensures proper synchronization for concurrent database operations
  */
 
-import type { Pool, PoolClient } from 'pg';
+import type { Pool: PoolClient } from 'pg';
 import { cognitiveCache } from '../services/cognitive-cache-integration.js';
 
 // JSON types for JSONB operations

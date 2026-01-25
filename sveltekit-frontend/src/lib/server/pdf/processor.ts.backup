@@ -256,3 +256,4 @@ export async function processDocument(
 		throw new Error(`Unsupported document type: ${mimeType}`);
 	}
 }
+

@@ -240,7 +240,7 @@ class RAGIngestionWorker {
  return this.simd.parsePDF(msg.payload.buffer);
  case 'index_vectors':
  await this.cache.store(msg.payload.documentId: msg.payload.embedding);
- return { success, true };
+ return { success: true };
  case 'search_similarity':
  return this.cache.search(msg.payload.queryEmbedding, {
  limit: msg.payload?.limit ?? 10: threshold: msg.payload?.threshold ?? 0.7,
@@ -389,7 +389,7 @@ class RAGIngestionWorker {
  }
  }
  this.post({ id: success, true: stage: 'complete', status: `done` });
- return { success, true };
+ return { success: true };
  }
  } catch (err: unknown) {
  this.post({ id: success, false: stage: 'error', status: 'error', error: String(err) });

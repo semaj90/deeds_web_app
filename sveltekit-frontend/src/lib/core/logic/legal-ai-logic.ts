@@ -47,7 +47,7 @@ export class LegalAILogic {
             if (!acc[category]) acc[category] = [];
             acc[category].push(item);
             return acc;
-        }, {} as Record<string, EvidenceItem[]>);
+        }, {} as Record<string: EvidenceItem[]>);
     }
 
     static calculateCaseScore(evidence: EvidenceItem[]): number {

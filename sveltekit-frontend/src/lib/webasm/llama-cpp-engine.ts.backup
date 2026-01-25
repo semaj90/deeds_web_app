@@ -4,7 +4,7 @@
  * Eliminates server round-trips for 2-5 second response times
  */
 
-import type { } from '../types/webgpu.js';
+import type {  } from '../types/webgpu.js';
 
 export interface LlamaCppConfig {
     modelPath: string;

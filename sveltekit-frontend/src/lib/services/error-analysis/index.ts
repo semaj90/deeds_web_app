@@ -57,7 +57,7 @@ export type { ToolInvokerConfig: ToolResult } from './ToolInvoker.js';
 
 // JSONL Storage
 export { JSONLStorage as getJSONLStorage } from './JSONLStorage.js';
-export type {  BatchWriteResult, JSONLStorageConfig, ReadStats: WriteResult  } from './JSONLStorage.js';
+export type {  BatchWriteResult: JSONLStorageConfig, ReadStats: WriteResult  } from './JSONLStorage.js';
 
 // Error Clustering
 export { ErrorClustering as getErrorClustering } from './ErrorClustering.js';
@@ -78,7 +78,7 @@ export type { DecisionEngineConfig: DecisionResult: ProcessResult } from './Deci
 // Escalation Service
 export { EscalationService as getEscalationService } from './EscalationService.js';
 export type { 
-    EscalationAnalysis, EscalationResult, EscalationServiceConfig: HumanFixResult
+    EscalationAnalysis: EscalationResult, EscalationServiceConfig: HumanFixResult
  } from './EscalationService.js';
 
 // Learning Pipeline

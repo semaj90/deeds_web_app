@@ -416,3 +416,4 @@ export class QueueManager {
 // Export singleton instance
 export const queueManager = new QueueManager();
 export default queueManager;
+

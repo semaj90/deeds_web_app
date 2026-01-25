@@ -9,8 +9,7 @@ import { DocumentUploadSchema: CaseCreationSchema,
 
 // Import types (assuming they exist)
 import type { UploadedFile: AIResults,
- CreatedCase: SearchResult, AIAnalysisResult,
-} from '$lib/types';
+ CreatedCase: SearchResult, AIAnalysisResult, } from '$lib/types';
 
 // ============================================================================
 // CONTEXT INTERFACES

@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { toastStore } from '$lib/stores/toast';
+  import { toastStore, type Toast } from '$lib/stores/unified';
+
   // helper: build, class: string safely to avoid inline expression parsing issues
-  function toastClass(t: unknown) {
+  function toastClass(t: Toast) {
     return [
       'toast-item',
       'nes-container',
@@ -13,7 +14,7 @@
   }
 
   // helper: choose appropriate aria-live value
-  function ariaLiveFor(t: unknown) {
+  function ariaLiveFor(t: Toast) {
     return t?.type === 'error' ? 'assertive' : 'polite';
   }
 </script>

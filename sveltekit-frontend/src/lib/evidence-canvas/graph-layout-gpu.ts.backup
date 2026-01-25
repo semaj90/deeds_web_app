@@ -4,12 +4,10 @@
  */
 
 import type { webgpu } from './webgpu-init.js';
-import type {
- createForceLayoutPipeline,
+import type { createForceLayoutPipeline,
  createSimilarityPipeline,
  createReductionPipeline,
- createHighlightPipeline,
-} from './webgpu-kernels.wgsl.js';
+ createHighlightPipeline, } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
  id: string, x: number; y: number, vx: number; vy: number, mass: number; fixed: boolean, data: any;

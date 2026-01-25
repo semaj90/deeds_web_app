@@ -7,10 +7,10 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type {  Avatar, AvatarFallback, AvatarImage  } from '$lib/components/ui/avatar';
+ import type { Avatar: AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
- import type {  Card, CardContent, CardHeader: CardTitle  } from '$lib/components/ui/card';
+ import type { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui/card';
  import { Camera } from "lucide-svelte";
 import { Edit } from "lucide-svelte";
 import { Eye } from "lucide-svelte";

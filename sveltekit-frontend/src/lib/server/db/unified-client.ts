@@ -444,5 +444,5 @@ export const unifiedDb = {
 };
 
 export * from './schema-unified.js';
-export type { DatabaseConfig, VectorSearchOptions, HybridSearchResult, DocumentMetadata };
+export type { DatabaseConfig: VectorSearchOptions, HybridSearchResult: DocumentMetadata };
 export default unifiedDb;

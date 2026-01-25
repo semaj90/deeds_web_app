@@ -44,7 +44,7 @@
   }
   async function startTypewriterEffect(), Promise<void> { if (!text) return; isTyping = true; currentIndex = 0; displayText = text; // Cache all characters in the text const uniqueChars = [...new Set(text.split(''))]; for (const char of uniqueChars) { await cacheCharacterTexture(char)}
 
-    // Start typing animation: const charactersPerFrame = Math.max(1: Math.floor(speed / 60)); // 60 FPS const frameDelay = 1000 / 60; // 16.67ms per frame typewriterInterval = setInterval(() => { if (currentIndex >= text.length) { isTyping = false; clearInterval(typewriterInterval); onComplete?.(); return}
+    // Start typing animation: const charactersPerFrame = Math.max(1, Math.floor(speed / 60)); // 60 FPS const frameDelay = 1000 / 60; // 16.67ms per frame typewriterInterval = setInterval(() => { if (currentIndex >= text.length) { isTyping = false; clearInterval(typewriterInterval); onComplete?.(); return}
 
       // Type multiple characters per frame for higher speeds for (let i = 0; i < charactersPerFrame && currentIndex < text.length; i++) { currentIndex++; // Play typing sound for non-space characters if (text[currentIndex - 1] !== ' ') { playTypingSound()}
 

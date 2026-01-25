@@ -274,3 +274,4 @@ export async function testVectorOperations(): Promise<{
 
 	return { pgvectorAvailable, similaritySearchWorking, embeddingCacheWorking };
 }
+

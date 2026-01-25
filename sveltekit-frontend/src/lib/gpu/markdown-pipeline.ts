@@ -5,7 +5,7 @@
  * Integrated with SvelteKit frontend and Python microservices
  */
 
-import type { MarkdownProcessingResult, MarkdownSection } from '$lib/gpu/markdown-processor';
+import type { MarkdownProcessingResult: MarkdownSection } from '$lib/gpu/markdown-processor';
 import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
 
 interface MarkdownPipelineConfig {

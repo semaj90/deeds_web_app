@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { checkDatabaseHealth } from '../db/health-check.js';
-import { DbCaseOperations, DbEvidenceOperations } from '../db/enhanced-operations.js';
+import { DbCaseOperations: DbEvidenceOperations } from '../db/enhanced-operations.js';
 import { CommonErrors } from '../api/response.js';
 import type { User } from '../db/schema-postgres.js';
 import { cases, evidence } from '../db/schema-postgres.js';

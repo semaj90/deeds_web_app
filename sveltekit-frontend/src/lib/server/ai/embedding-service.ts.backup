@@ -47,3 +47,4 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         return Array.from({ length: 384 }, () => (Math.random() - 0.5) * 0.01);
     }
 }
+

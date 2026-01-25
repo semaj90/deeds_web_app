@@ -162,7 +162,7 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
 
 		// Cache the result
 		if (redis) {
-			await redis.setEx(cacheKey, 3600, JSON.stringify(analysis)); // Cache for 1 hour
+			await redis.setex(cacheKey, 3600, JSON.stringify(analysis)); // Cache for 1 hour
 		}
 
 		// Store in database (assuming evidence_analysis table exists)
@@ -187,3 +187,4 @@ REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary'
         return { error: 'Failed to analyze evidence' };
 	}
 }
+

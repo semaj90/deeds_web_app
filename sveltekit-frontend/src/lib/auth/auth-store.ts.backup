@@ -183,7 +183,7 @@ export class AuthStore {
                 await this.updateAuthState(result.user!, result.session!);
                 // Track login activity
                 this.trackActivity('login');
-                return { success, true };
+                return { success: true };
             } else {
                 return {
                     success: false, error: result?.error ?? 'Login failed',
@@ -304,7 +304,7 @@ export class AuthStore {
                 authState.update(state => ({
                     ...state, user: state.user ? { ...state.user, ...(result.user as AuthUser) } : null
                 }));
-                return { success, true };
+                return { success: true };
             } else {
                 return { success: false, error: result?.error ?? 'Profile update failed' };
             }

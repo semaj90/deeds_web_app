@@ -1,3 +1,3 @@
-import type { } from 'svelte/store';
+import type {  } from 'svelte/store';
 
 

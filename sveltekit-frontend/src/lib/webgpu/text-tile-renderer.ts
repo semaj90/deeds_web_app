@@ -7,8 +7,7 @@
  * for parallel text processing and rendering pipeline optimization.
  */
 
-import type {
- simdTextTilingEngine,$1;$2} from '$lib/ai/simd-text-tiling-engine.js';
+import type { simdTextTilingEngine,$1;$2 } from '$lib/ai/simd-text-tiling-engine.js';
 
 export interface TextTileRenderConfig {
  canvasWidth: number, canvasHeight: number; tileSize: number, qualityTier: 'nes' | 'snes' | 'n64';

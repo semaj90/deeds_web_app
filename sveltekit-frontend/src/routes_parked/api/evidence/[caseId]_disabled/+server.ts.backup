@@ -64,5 +64,5 @@ export const PATCH: RequestHandler = async ({ request }) => {
  .where(eq(evidence.evidenceNumber, item.id));
  }
 
- return json({ success, true });
+ return json({ success: true });
 };

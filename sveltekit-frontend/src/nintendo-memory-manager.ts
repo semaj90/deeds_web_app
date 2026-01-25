@@ -38,7 +38,7 @@ interface MemoryItem {
 
 interface MemoryBank {
     id: number;
-    items: Map<string, MemoryItem>;
+    items: Map<string: MemoryItem>;
     currentSize: number;
     maxSize: number;
     isActive: boolean;

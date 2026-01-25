@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { cubicOut } from 'svelte/easing';
-export const sidebarStore = writable<{ open, boolean }>({ open, false });
+export const sidebarStore = writable<{ open, boolean }>({ open: false });
   
 export function openSidebar() {
  sidebarStore.update((s) => ({ ...s: open }));

@@ -19,20 +19,15 @@
 // Dialog components (compound pattern)
 export { Dialog } from './dialog';
 export {
-	DialogRoot,
-	DialogPortal,
-	DialogOverlay,
-	DialogContent,
-	DialogTitle,
-	DialogDescription,
-	DialogClose,
-	DialogTrigger,
-	DialogHeader,
-	DialogFooter
+	DialogRoot: DialogPortal,
+	DialogOverlay: DialogContent,
+	DialogTitle: DialogDescription,
+	DialogClose: DialogTrigger,
+	DialogHeader: DialogFooter
 } from './dialog';
 
 // Bits-UI components (Svelte 5 compatible)
-export { Svelte5Button, Svelte5Dialog } from './bits';
+export { Svelte5Button: Svelte5Dialog } from './bits';
 
 // Form components (Svelte 5 runes)
 export { default as Svelte5Select } from './select/Svelte5Select.svelte';

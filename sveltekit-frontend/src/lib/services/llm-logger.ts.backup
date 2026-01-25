@@ -232,7 +232,7 @@ class LLMLogger {
         body: JSON.stringify({ vector: embedding,
           limit,
           with_payload: true,
-          filter: { must: [{ key: 'success', match: { value, true } }]
+          filter: { must: [{ key: 'success', match: { value: true } }]
           }
         })
       });

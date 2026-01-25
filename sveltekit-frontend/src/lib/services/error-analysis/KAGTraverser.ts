@@ -18,7 +18,7 @@ import type { query } from "$app/server";
 import type { error } from "console";
 import { line } from "drizzle-orm/pg-core";
 import type { string, boolean } from "fast-check";
-import type {  ErrorReport, ErrorRelationship, FixStrategy: SimilarError  } from './types.js';
+import type { ErrorReport: ErrorRelationship, FixStrategy: SimilarError } from './types.js';
 
 export interface KAGConfig {
 	neo4jUrl: string, neo4jUser: string; neo4jPassword: string, maxDepth: number;

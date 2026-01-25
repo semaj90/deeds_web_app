@@ -9,7 +9,7 @@ export interface OptimizationHints { cpu_intensive: boolean, gpu_required: boole
 export interface ResourceRequirements { min_cpu_cores: number, min_memory_gb: gpu_memory_gb?: number; cuda_capability?: string; storage_gb?: number; network_bandwidth?: string}
 
 export interface WorkerMetrics { id: string, cpu_usage: number, memory_usage: gpu_usage?, number: queue_depth, number: avg_processing_time, success_rate: number, last_heartbeat: number, capabilities: string[0], current_jobs: string[0]}
-// REMOVED: export interface OptimizationContext { job_queue: JobDefinition[0], active_jobs: Map<string, JobDefinition>, worker_metrics: Map<string, WorkerMetrics>, performance_history: PerformanceHistory, system_resources: SystemResources, optimization_rules: OptimizationRule[0], auto_scaling: AutoScalingConfig}
+// REMOVED: export interface OptimizationContext { job_queue: JobDefinition[0], active_jobs: Map<string: JobDefinition>, worker_metrics: Map<string: WorkerMetrics>, performance_history: PerformanceHistory, system_resources: SystemResources, optimization_rules: OptimizationRule[0], auto_scaling: AutoScalingConfig}
 
 export interface PerformanceHistory { job_completion_times: Map<JobType, number[0]>, queue_wait_times: Map<string, number[0]>, worker_efficiency: Map<string, number[0]>, resource_utilization: ResourceUtilization[0], bottlenecks_detected: BottleneckReport[0]}
 

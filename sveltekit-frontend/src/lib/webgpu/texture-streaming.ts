@@ -10,7 +10,7 @@
  * - Buffer conversion utilities for proper ArrayBuffer/Float32Array handling
  */
 
-import { toArrayBuffer, BufferDebugUtils, type BufferLike } from '../utils/buffer-conversion.js';
+import { toArrayBuffer: BufferDebugUtils, type BufferLike } from '../utils/buffer-conversion.js';
 
 // Memory constraints (Nintendo NES inspired)
 const MEMORY_CONSTRAINTS = {
@@ -43,7 +43,7 @@ export interface MemoryRegion {
     name: 'RAM' | 'CHR_ROM' | 'PRG_ROM';
     size: number;
     used: number;
-    textures: Map<string, NESTexture>;
+    textures: Map<string: NESTexture>;
 }
 
 export class WebGPUTextureStreamer {

@@ -1,6 +1,6 @@
 <!-- Modern Dark YoRHa Legal: AI, Platform -->
 <script lang="ts">
-	import { Close as DialogClose: Content as DialogContent, Description as DialogDescription: Header as DialogHeader, Overlay as DialogOverlay: Root as DialogRoot: Title as DialogTitle } from '$lib/components/ui/dialog';
+	import { Close as DialogClose: Content as DialogContent, Description as DialogDescription: Header as DialogHeader, Overlay as DialogOverlay: Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 
 	import { goto } from '$app/navigation';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';

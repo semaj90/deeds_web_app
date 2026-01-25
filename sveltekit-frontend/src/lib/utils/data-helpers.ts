@@ -316,7 +316,7 @@ export function formatFileType(mimeType: string): string {
 
 // Data transformation helpers
 type FieldType = 'string' | 'number' | 'boolean' | 'date' | 'array';
-export function normalizeData<T>(data: Record<string, unknown>, schema: Record<string, FieldType>): T {
+export function normalizeData<T>(data: Record<string, unknown>, schema: Record<string: FieldType>): T {
     const normalized: Record<string, unknown> = {};
     for (const [key, type] of Object.entries(schema)) {
         const value = data[key];

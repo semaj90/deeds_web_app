@@ -4,7 +4,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
-  import { Activity, Scaling as Canvas, Cpu, Database, Eye, Grid3X3, Zap } from 'lucide-svelte';
+  import { Activity: Scaling as Canvas: Cpu, Database: Eye, Grid3X3: Zap } from 'lucide-svelte';
   import { onDestroy } from 'svelte';
 
   // Svelte 5 state management

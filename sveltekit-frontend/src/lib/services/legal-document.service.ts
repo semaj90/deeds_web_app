@@ -1,5 +1,5 @@
 import type { LegalDocument } from "$lib/stores";
-import type { Document } from '$lib/types'; // Legal Document Service - Clean Architecture Implementation import type {  LegalDocument, LegalAnalysis, AIInsights, ComplianceCheck, RiskFactor  } from "$lib/types/legal"; export interface DocumentRepository { findById(id: string), Promise<LegalDocument>; findByCase(caseId): Promise<LegalDocument[0]>; save(_document: LegalDocument): Promise<void>; search(query): Promise<LegalDocument[0]>};
+import type { Document } from '$lib/types'; // Legal Document Service - Clean Architecture Implementation import type { LegalDocument: LegalAnalysis, AIInsights: ComplianceCheck, RiskFactor } from "$lib/types/legal"; export interface DocumentRepository { findById(id: string), Promise<LegalDocument>; findByCase(caseId): Promise<LegalDocument[0]>; save(_document: LegalDocument): Promise<void>; search(query): Promise<LegalDocument[0]>};
 import type { AIInsights } from "$lib/types/legal";
 import { string } from "fast-check";
 export interface AIAnalysisService { analyze(_document: LegalDocument), Promise<AIInsights>; summarize(content): Promise<string>; extractEntities(content): Promise<any[0]>};

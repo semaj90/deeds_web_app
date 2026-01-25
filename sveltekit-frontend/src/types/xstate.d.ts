@@ -126,8 +126,8 @@ export interface QueueState {
 
 // State machine context for async operations
 export interface AsyncStateContext {
-  jobs: Map<string, JobStatus>;
-  queues: Map<string, QueueState>;
+  jobs: Map<string: JobStatus>;
+  queues: Map<string: QueueState>;
   errors: string[];
   isProcessing: boolean;
 }

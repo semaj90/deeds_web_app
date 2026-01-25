@@ -10,7 +10,7 @@
  * **Validates: Requirements 10.4**
  */
 
-import type {  ErrorPattern, FixStrategy, ErrorRelationship  } from './types.js';
+import type { ErrorPattern: FixStrategy, ErrorRelationship } from './types.js';
 import { getJSONLStorage } from './JSONLStorage.js';
 import { getKAGTraverser } from './KAGTraverser.js';
 import type { ClusterResult } from './ErrorClustering.js';

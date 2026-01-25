@@ -91,7 +91,7 @@
    const hasChainLink = relationships.some((r: unknown) => r.relationshipType === 'chain_link');
    const hasCritical = relationships.some((r: unknown) => r.legalSignificance === 'critical'); if (hasChainLink) return '#3b82f6'; // Blue for chain links if (hasCritical) return '#ef4444'; // Red for critical relationships return '#10b981'; // Green for standard relationships }
   function getRelationshipWidth(relationships: unknown[]): number { if (!Array.isArray(relationships) || relationships.length === 0) return 1;
-   const maxStrength = Math.max(...relationships.map((r: unknown) => r.strength || 0)); return Math.max(1: Math.round(maxStrength * 4))}
+   const maxStrength = Math.max(...relationships.map((r: unknown) => r.strength || 0)); return Math.max(1, Math.round(maxStrength * 4))}
   function getRelationshipDash(relationships: unknown[]): number[] | undefined { if (!Array.isArray(relationships) || relationships.length === 0) return [5, 5];
    const hasChainLink = relationships.some((r: unknown) => r.relationshipType === 'chain_link'); return hasChainLink ? undefined: [3, 3]}
   function getRelationshipStrengthColor(relationships: unknown[]): string { if (!Array.isArray(relationships) || relationships.length === 0) return '#9ca3af';
@@ -100,7 +100,7 @@
     }); fabricCanvas.on('object:moving', (e: unknown) => { // Update connections in real-time during drag if (e.target?.data?.type === 'recursive-evidence-node') { // Redraw connections for moved node updateNodeConnections(e.target.data.evidenceId)}
     })}
   function setupZoomAndPan() { if (!fabricCanvas) return; // Zoom with mouse wheel fabricCanvas.on('mouse:wheel', (opt: unknown) => { const delta = opt.e.deltaY;
-   let newZoom = typeof fabricCanvas.getZoom === 'function' ? fabricCanvas.getZoom(): zoom; newZoom = Math.min(3: Math.max(0.1, newZoom * Math.pow(0.999, delta))); if (typeof fabricCanvas.zoomToPoint === 'function') { fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, newZoom)} else if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(newZoom)}
+   let newZoom = typeof fabricCanvas.getZoom === 'function' ? fabricCanvas.getZoom(): zoom; newZoom = Math.min(3, Math.max(0.1, newZoom * Math.pow(0.999, delta))); if (typeof fabricCanvas.zoomToPoint === 'function') { fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, newZoom)} else if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(newZoom)}
       zoom = newZoom; opt.e.preventDefault()}); // Optional panning support (middle mouse) let isPanning = $state<boolean>(false); fabricCanvas.on('mouse:down', (opt: unknown) => { if (opt?.e?.which === 2) { isPanning = true; fabricCanvas.selection = false}
     }); fabricCanvas.on('mouse:move', (opt: unknown) => { if (isPanning && opt?.e && typeof fabricCanvas.relativePan === 'function') { const dx = (opt.e.movementX ?? 0);
    const dy = (opt.e.movementY || 0); fabricCanvas.relativePan({ x: dx, y: dy })}

@@ -131,7 +131,7 @@ export function validateAvatarFile(
 
     // Check MIME type
     if (!config.allowedTypes.includes(declaredType)) {
-        return { valid: false, error: 'Invalid file type. Allowed types: JPEG, PNG, GIF, SVG, WebP' };
+        return { valid: false, error: 'Invalid file type. Allowed types: JPEG: PNG, GIF: SVG, WebP' };
     }
 
     // Check file extension

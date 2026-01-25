@@ -2,14 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 import type { agenticGemma3 } from '$lib/server/ai/gemma3-agentic-functions';
 import type { AttachmentMetadata } from '$lib/types/sharedTypes';
-import type {
- ingestContextualAttachment,
- resolveAttachmentReference,
-} from '$lib/server/storage/contextual-attachment-helper';
-import type {
- isLuciaAvailableForContextualUploads,
- requireLuciaForContextualUploads,
-} from '$lib/server/auth/contextual-upload-guard';
+import type { ingestContextualAttachment,
+ resolveAttachmentReference, } from '$lib/server/storage/contextual-attachment-helper';
+import type { isLuciaAvailableForContextualUploads,
+ requireLuciaForContextualUploads, } from '$lib/server/auth/contextual-upload-guard';
 
 interface ChatPayload {
  message?: string;

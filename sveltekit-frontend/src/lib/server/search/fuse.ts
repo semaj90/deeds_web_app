@@ -1,6 +1,6 @@
 
 import Fuse from 'fuse.js'; // Import Fuse as the default export
-import type { FuseResult, IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
+import type { FuseResult: IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
 
 // Use FuseResult<T> directly from fuse.js for search results.
 // This resolves the 'Fuse.FuseResultMatch' and 'refIndex' type errors.

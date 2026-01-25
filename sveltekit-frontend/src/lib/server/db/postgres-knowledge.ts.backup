@@ -327,3 +327,4 @@ export async function postgresHealthCheck(): Promise<boolean> {
 		return false;
 	}
 }
+

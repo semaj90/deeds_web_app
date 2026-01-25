@@ -10,10 +10,8 @@
  * Property 12: PostgreSQL-Qdrant Embedding Parity
  */
 
-import type {
-  SearchResult: SearchOptions,
-  SearchFilters: FullDocument, IndexResult
-} from './types.js';
+import type { SearchResult: SearchOptions,
+  SearchFilters: FullDocument, IndexResult } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 
 export interface PostgresConfig {

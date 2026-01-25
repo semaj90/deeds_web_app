@@ -279,3 +279,4 @@ export type Evidence = typeof evidenceJsonb.$inferSelect;
 export type NewEvidence = typeof evidenceJsonb.$inferInsert;
 export type DocumentRelationship = typeof documentRelationshipsJsonb.$inferSelect;
 export type NewDocumentRelationship = typeof documentRelationshipsJsonb.$inferInsert;
+

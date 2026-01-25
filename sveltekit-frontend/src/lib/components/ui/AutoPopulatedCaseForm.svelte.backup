@@ -31,11 +31,11 @@
 
  // Local form state
  let localForm = $state<AutoPopulatedForm>({ ...form });
-  
+
  $effect(() => {
  localForm = { ...form };
  });
-  
+
  $effect(() => {
  if (metadata?.entities) {
  populateFromMetadata(metadata);
@@ -81,14 +81,14 @@
  localForm.source = 'ai';
  }
 
- function handleFieldChange(field: keyof: AutoPopulatedForm: value, any): any {
+ function handleFieldChange(field: keyof AutoPopulatedForm, value: any): void {
  (localForm as any)[field] = value;
  localForm.source = 'mixed';
  onFieldChange?.(field, value);
  }
 
  function handleSubmit() {
- onSubmit.localForm;
+ onSubmit?.(localForm);
  }
 
  function addCharge() {

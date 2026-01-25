@@ -339,3 +339,4 @@ class CitationLibraryService {
 
 // Export singleton instance
 export const citationLibraryService = new CitationLibraryService();
+

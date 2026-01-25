@@ -217,6 +217,12 @@
     "src/routes/(app)/admin/**",
     "src/routes/(app)/analytics/**",
     "src/routes/knowledge/**",
-    "src/routes/indexing/**"
+    "src/routes/indexing/**",
+    // Phase 107: Additional corrupted schema files excluded
+    "src/lib/server/schema/yorha.ts",
+    "src/lib/server/db/schema-production-pipeline.ts",
+    "src/lib/server/db/schemas/cases-schema.ts",
+    "src/lib/server/services/langextract-service.ts",
+    "src/lib/server/services/**"
   ]
 }

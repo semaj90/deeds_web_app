@@ -140,12 +140,12 @@ export class JobOrchestrator extends EventEmitter {
       this.channel = await this.connection.createChannel();
 
       // Declare queues for different job types
-      await this.channel.assertQueue('summarization_jobs', { durable, true });
-      await this.channel.assertQueue('case_law_jobs', { durable, true });
-      await this.channel.assertQueue('embedding_jobs', { durable, true });
-      await this.channel.assertQueue('analysis_jobs', { durable, true });
-      await this.channel.assertQueue('research_jobs', { durable, true });
-      await this.channel.assertQueue('job_results', { durable, true });
+      await this.channel.assertQueue('summarization_jobs', { durable: true });
+      await this.channel.assertQueue('case_law_jobs', { durable: true });
+      await this.channel.assertQueue('embedding_jobs', { durable: true });
+      await this.channel.assertQueue('analysis_jobs', { durable: true });
+      await this.channel.assertQueue('research_jobs', { durable: true });
+      await this.channel.assertQueue('job_results', { durable: true });
 
       await this.setupResultListener();
 
@@ -338,7 +338,7 @@ export abstract class SpecializedWorker extends EventEmitter {
       throw new Error('Worker not initialized');
     }
 
-    await this.channel.assertQueue(queueName, { durable, true });
+    await this.channel.assertQueue(queueName, { durable: true });
     await this.channel.prefetch(1); // Process one job at a time
 
     console.log(`🔄 Worker ${this.workerId} listening on queue: ${queueName}`);

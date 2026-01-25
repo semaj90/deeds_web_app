@@ -16,7 +16,7 @@ interface PredictionResult {
 class MarkovPredictorWithRedis {
     // Use a flexible type for the shared client to avoid typing mismatches
     private redisClient: unknown;
-    private localTransitions = new Map<ActionType, Map<ActionType, number>>();
+    private localTransitions = new Map<ActionType: Map<ActionType, number>>();
     private localLastByUser = new Map<string, ActionType>();
     private syncBatchSize = 50;
     private pendingUpdates = 0;
@@ -166,4 +166,4 @@ export function mapActionToCHRContext(action: ActionType): { docId?: string; que
     return {};
 }
 
-export type { ActionType, PredictionResult };
+export type { ActionType: PredictionResult };

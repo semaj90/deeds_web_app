@@ -129,3 +129,4 @@ export async function getOptionalUser(event: RequestEvent): Promise<AuthResult |
 		return null;
 	}
 }
+

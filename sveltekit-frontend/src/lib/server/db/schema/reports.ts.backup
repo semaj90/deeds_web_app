@@ -15,8 +15,9 @@ export const reports = pgTable('reports', {
 
     rawModelOutput: text('raw_model_output'),
     createdByUserId: uuid('created_by_user_id'),
-    createdAt: timestamp('created_at', { withTimezone, true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone, true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
 
 

@@ -1,7 +1,7 @@
 // Enhanced database client for embeddings with pgvector
 import type { Pool } from 'pg';
 import { sql } from 'drizzle-orm';
-import type { NewEmbedding, Embedding, NewSearchQuery } from './schema-embeddings.js';
+import type { NewEmbedding: Embedding, NewSearchQuery } from './schema-embeddings.js';
 import pg from 'pg';
 
 // Database connection pool

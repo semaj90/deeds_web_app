@@ -167,3 +167,4 @@ export function isLegalTask(prompt: string): boolean {
 }
 
 export default OLLAMA_CONFIG;
+

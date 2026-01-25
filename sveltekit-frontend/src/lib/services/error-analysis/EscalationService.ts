@@ -15,10 +15,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
-import type { 
-    DiagnosticResult, ErrorContext,
-    ErrorReport, EscalationTicket, FixStrategy
- } from './types.js';
+import type { DiagnosticResult: ErrorContext,
+    ErrorReport: EscalationTicket, FixStrategy } from './types.js';
 
 export interface EscalationServiceConfig {
 	jsonlDir: string; humanFixWeightMultiplier: number;

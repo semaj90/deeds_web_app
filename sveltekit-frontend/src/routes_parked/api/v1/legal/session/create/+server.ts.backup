@@ -126,7 +126,7 @@ function validateAndEnhanceContext(context: unknown): LegalContext {
 
  const jurisdiction = isString(ctx.jurisdiction) ? ctx.jurisdiction : defaultContext.jurisdiction;? ctx.practice_area
  : defaultContext.practice_area;
- const case_type = isString(ctx.case_type) ? ctx.case_type : defaultContext.case_type;? Math.max(1: Math.min(10, ctx.priority_level))
+ const case_type = isString(ctx.case_type) ? ctx.case_type : defaultContext.case_type;? Math.max(1, Math.min(10, ctx.priority_level))
  : defaultContext.priority_level;? ctx.security_classification
  : defaultContext.security_classification;? ctx.related_cases
  : defaultContext.related_cases;? ctx.key_entities

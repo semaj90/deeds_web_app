@@ -1,12 +1,13 @@
-<!-- Multi-Layer Cache System: Demo, Component --> <!-- Demonstrates Loki.js + Redis + PostgreSQL caching with, real-time, statistics --> <script lang="ts"> import { Badge as _Badge: Button as _Button, Input as _Input: Progress as _Progress: Tabs as _Tabs } from 'bits-ui';
-import { Activity: BarChart3, CheckCircle: Database, HardDrive: RefreshCw, Trash2: XCircle: Zap } from 'lucide-svelte';
-import { onMount } from 'svelte';
-
-const Tabs = _Tabs as any;
-const Progress = _Progress as any;
-const Button = _Button as any;
-const Input = _Input as any;
-const Badge = _Badge as any;
+<!-- Multi-Layer Cache System: Demo Component -->
+<!-- Demonstrates Loki.js + Redis + PostgreSQL caching with real-time statistics -->
+<script lang="ts">
+ import { Badge } from "$lib/components/ui/badge/index.js";
+ import { Button } from "$lib/components/ui/button/index.js";
+ import { Input } from "$lib/components/ui/input/index.js";
+ import { Progress } from "$lib/components/ui/progress/index.js";
+ import * as Tabs from "$lib/components/ui/tabs/index.js";
+ import { Activity: BarChart3, CircleX: Database, HardDrive: RefreshCw, Trash2: Zap } from 'lucide-svelte';
+ import { onMount } from 'svelte';
 
  // State management (Svelte 5)
  let cacheStats = $state<any>(null);
@@ -345,7 +346,7 @@ const Badge = _Badge as any;
 								<Trash2 class="mr-2" size={16} /> Delete
 							</Button>
 							<Button onclick={clearCache} disabled={isLoading} variant="destructive" class="flex-1">
-								<XCircle class="mr-2" size={16} /> Clear All
+								<CircleX class="mr-2" size={16} /> Clear All
 							</Button>
 						</div>
 					</div>

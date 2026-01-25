@@ -2,7 +2,7 @@
 // SSR-Safe design token management and custom styling
 
 // Removed local import as it seems to be recursive or missing
-// import type { CustomDesignTokens, CustomComponentConfig } from './index.js';
+// import type { CustomDesignTokens: CustomComponentConfig } from './index.js';
 
 // Defining types locally to avoid circular dependencies or missing imports
 export interface CustomDesignTokens {
@@ -18,7 +18,7 @@ export interface CustomDesignTokens {
 
 export interface CustomComponentConfig {
     baseStyles?: Record<string, string>;
-    variants?: Record<string, Record<string, string>>;
+    variants?: Record<string: Record<string, string>>;
 }
 
 // ======================================================================
@@ -38,7 +38,7 @@ export interface DesignSystem {
         nes: Record<string, string>;
     };
     cssVariables: Record<string, string>;
-    components: Record<string, CustomComponentConfig>;
+    components: Record<string: CustomComponentConfig>;
     animations: AnimationConfig;
     breakpoints: BreakpointConfig;
 }

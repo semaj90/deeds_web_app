@@ -4,11 +4,9 @@
  * original (but syntactically corrupted) implementation.
  */
 
-import type {
-    isRedisHealthy: QueuedTask,
+import type { isRedisHealthy: QueuedTask,
     queuedTasks: RedisOptimizationResult,
-    redisOrchestratorClient
-} from '$lib/stores/unified';
+    redisOrchestratorClient } from '$lib/stores/unified';
 import { get } from 'svelte/store';
 
 type QueryContext = {

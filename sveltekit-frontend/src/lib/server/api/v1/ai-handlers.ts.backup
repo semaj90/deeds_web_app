@@ -59,3 +59,4 @@ export async function handleAnalyze(
 		return json({ success: false, error: 'Failed to perform AI analysis' }, { status: 500 });
 	}
 }
+

@@ -17,7 +17,7 @@ export const autoApprovalRules = pgTable('auto_approval_rules', {
 	updatedAt: timestamp('updated_at').defaultNow(),
 	isActive: boolean('is_active').default(true),
 }, (table) => ({
-	activeIdx: index('idx_auto_approval_active').on(table.sourceType: table.isActive),
+	activeIdx: index('idx_auto_approval_active').on(table.sourceType, table.isActive),
 }));
 
 // Table 2: KB Provenance Graph (Task 3.3)
@@ -125,5 +125,3 @@ export type NewErrorSession = typeof errorSessions.$inferInsert;
 
 export type GeneratedFix = typeof generatedFixes.$inferSelect;
 export type NewGeneratedFix = typeof generatedFixes.$inferInsert;
-
-

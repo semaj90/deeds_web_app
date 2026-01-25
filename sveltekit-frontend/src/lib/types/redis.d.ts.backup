@@ -32,6 +32,7 @@ export interface RedisConnectionOptions {
 
 // Minimal ambient declarations to reduce noisy type errors during iterative fixes
 // Add more specific typings progressively as files are stabilized.
+/*
 declare interface SimpleRedis {
  connect: (...args: any[]) => Promise<unknown>;
  disconnect: (...args: unknown[]) => Promise<unknown>;
@@ -48,6 +49,7 @@ declare interface SimpleRedis {
  set: (...args: unknown[]) => Promise<unknown>;
  /** Set key with expiry (seconds) */
  setex: (_key: string, seconds: number, value: string) => Promise<unknown>;
+
  /** Push value(s) to list (left) */
  lpush: (_key: string, ...values: unknown[]) => Promise<number | unknown>;
  /** Range query for list */
@@ -71,6 +73,7 @@ declare interface SimpleRedis {
  memory?: (...args: unknown[]) => Promise<unknown>;
  type?: (...args: unknown[]) => Promise<string>;
 }
+*/
 
 
 

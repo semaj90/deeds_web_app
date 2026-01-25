@@ -89,9 +89,9 @@ export class QdrantVectorStore {
     async initialize(): Promise<void> {
         if (this.initialized) return;
         try {
-            await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM);
-            await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM);
-            await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.CONVERSATIONS: EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.ENTITIES: EMBEDDING_DIM);
+            await this.ensureCollection(COLLECTIONS.SUMMARIES: EMBEDDING_DIM);
             this.initialized = true;
             console.log('✓ Qdrant vector store initialized');
         } catch (error) {

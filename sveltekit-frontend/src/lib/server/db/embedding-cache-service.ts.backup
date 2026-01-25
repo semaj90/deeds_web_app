@@ -109,3 +109,4 @@ export async function getEmbedding(textHash: string): Promise<EmbeddingCacheRow 
 	};
 	return serviceRow;
 }
+

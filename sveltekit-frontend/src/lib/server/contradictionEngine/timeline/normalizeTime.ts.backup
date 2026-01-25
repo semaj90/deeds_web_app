@@ -13,3 +13,4 @@ export function normalizeTimelineFact(fact: TimelineFact): TimelineFact {
 export function normalizeTimelineFacts(facts: TimelineFact[]): TimelineFact[] {
 	return facts.map(normalizeTimelineFact);
 }
+

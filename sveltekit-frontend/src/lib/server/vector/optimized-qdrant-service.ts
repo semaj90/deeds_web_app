@@ -181,7 +181,7 @@ export async function semanticSearch(
 
     try {
         // Step 1: Embed query text
-        const vector = await embedText(query, EMBEDDING_MODEL);
+        const vector = await embedText(query: EMBEDDING_MODEL);
         if (!vector?.length) return [];
 
         // Step 2: Ensure collection exists (lazy init)

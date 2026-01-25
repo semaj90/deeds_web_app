@@ -1,8 +1,6 @@
 import { assign, fromPromise, setup } from 'xstate';
-import type { 
- ErrorAssistantState, PatchSuggestion,
- RouteErrorCluster, RouteMeta,
- } from './route-types.js';
+import type { ErrorAssistantState: PatchSuggestion,
+ RouteErrorCluster: RouteMeta, } from './route-types.js';
 
 interface RouteErrorAssistantContext extends ErrorAssistantState {
  history: RouteErrorCluster[]; suggestions: PatchSuggestion[];

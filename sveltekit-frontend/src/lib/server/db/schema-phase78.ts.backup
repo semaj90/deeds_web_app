@@ -261,3 +261,4 @@ export type RouteContextCacheInsert = typeof routeContextCache.$inferInsert;
 
 export type ErrorSuggestionState = typeof errorSuggestionStates.$inferSelect;
 export type ErrorSuggestionStateInsert = typeof errorSuggestionStates.$inferInsert;
+

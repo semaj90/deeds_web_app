@@ -81,8 +81,8 @@ function getPriorityForJobType(jobType: JobType): number {
 /**
  * Actor: Check if user is currently idle
  */
-const checkIdleStatus = fromPromise<{ isIdle: boolean; idleDurationMs: number }, { input: IdleContext }>(
-    async ({ input }) => {
+const checkIdleStatus = fromPromise<{ isIdle: boolean; idleDurationMs: number }>(
+    async ({ input }: { input: IdleContext }) => {
         const now = Date.now();
         const idleDurationMs = now - input.lastActivityTimestamp;
         const isIdle = idleDurationMs >= input.idleThresholdMs;
@@ -93,8 +93,8 @@ const checkIdleStatus = fromPromise<{ isIdle: boolean; idleDurationMs: number },
 /**
  * Actor: Publish job to RabbitMQ queue
  */
-const publishToRabbitMQ = fromPromise<{ success: boolean; jobId: string }, { input: { jobType: JobType; payload: any } }>(
-    async ({ input }) => {
+const publishToRabbitMQ = fromPromise<{ success: boolean; jobId: string }>(
+    async ({ input }: { input: { jobType: JobType; payload: any } }) => {
         const jobId = crypto.randomUUID();
         try {
             const response = await fetch('/api/rabbitmq/publish', {

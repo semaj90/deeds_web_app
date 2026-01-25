@@ -3,3 +3,4 @@
 // Run test if executed directly if (import.meta.url === `file://${process.argv[1]}`) { testGemmaConfiguration().then(result => { if (result.success) { console.log('🎉 All Gemma models configured correctly!'); process.exit(0)}else { console.log('❌ Gemma configuration issues detected'); process.exit(1)}).catch(error => { console.error('💥 Test failed: ', error); process.exit(1)})}
 
 
+

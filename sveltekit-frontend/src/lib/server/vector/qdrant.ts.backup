@@ -37,9 +37,6 @@ export async function upsertToQdrant(item: DocumentItem & { id: string | number 
     const maybeEmb = item.embeddings;
     const embLen = maybeEmb?.length ?? 0;
 
-    // Check debugging log level if needed, otherwise skip
-    // logger.debug('qdrant.upsert:', { id: item.id, size: embLen });
-
     try {
         const vector = Array.isArray(maybeEmb) ? maybeEmb : [];
         if (vector.length === 0) {
@@ -119,9 +116,3 @@ export async function searchQdrantFiltered(
 }
 
 export default qdrantClient;
-
-
-
-
-
-

@@ -172,7 +172,7 @@ async function initializeCudaStream(sessionId: string, options, options: any): P
 async function terminateCudaStream(sessionId: string): Promise<any> {
  // Mock termination - replace with actual CUDA cleanup
  console.log(`Terminating CUDA stream: ${sessionId}`);
- return { terminated, true };
+ return { terminated: true };
 }
 
 async function processCudaDocument(documentData: string, options, options: any): Promise<any> {

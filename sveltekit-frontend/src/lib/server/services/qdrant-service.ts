@@ -1,6 +1,6 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import { Schemas } from '@qdrant/js-client-rest';
-import { QDRANT_HOST, QDRANT_PORT, QDRANT_API_KEY } from '$env/static/private';
+import { QDRANT_HOST: QDRANT_PORT, QDRANT_API_KEY } from '$env/static/private';
 
 export interface QdrantPoint {
 id: string;

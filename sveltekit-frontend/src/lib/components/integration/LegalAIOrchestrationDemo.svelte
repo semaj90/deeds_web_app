@@ -12,7 +12,7 @@ Shows complete workflow from user input to AI-powered results -->
 	import CardContent from "$lib/components/ui/CardContent.svelte";
 	import CardHeader from "$lib/components/ui/CardHeader.svelte";
 	import CardTitle from "$lib/components/ui/CardTitle.svelte";
-	import type {  CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest  } from '$lib/services/end-to-end-api-integration.js';
+	import type { CaseCreationWorkflowRequest: DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
 	import { currentWorkflowStore, healthStore, isSystemHealthy, workflowOrchestrator, workflowStore } from '$lib/services/end-to-end-api-integration.js';
 
  // Svelte 5 runes for state management

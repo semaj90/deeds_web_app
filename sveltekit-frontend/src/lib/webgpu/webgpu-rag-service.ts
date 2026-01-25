@@ -1,8 +1,6 @@
-import type {
-    ensureFloat32Array,
+import type { ensureFloat32Array,
     batchProcessArrays,
-    adaptiveQuantization: QuantizationConfig, ArrayConversionResult
-} from '$lib/utils/webgpu-array-utils';
+    adaptiveQuantization: QuantizationConfig, ArrayConversionResult } from '$lib/utils/webgpu-array-utils';
 
 // --- Type Definitions ---
 interface WebGPUInitialization {

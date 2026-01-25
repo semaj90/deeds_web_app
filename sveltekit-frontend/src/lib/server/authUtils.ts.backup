@@ -66,3 +66,4 @@ export function verifyJWT(token: string): JWTPayload | null {
 export function generateSecureToken(): string {
 	return crypto.randomUUID();
 }
+

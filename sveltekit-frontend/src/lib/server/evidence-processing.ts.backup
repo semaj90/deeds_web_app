@@ -313,3 +313,4 @@ export async function processBatchFiles(files: Evidence[]): Promise<EvidenceAnal
 	console.log(`[Evidence] ✅ Batch complete: ${successResults.length}/${files.length} successful`);
 	return successResults;
 }
+

@@ -279,3 +279,4 @@ export const multiDbTransactions = pgTable('multi_db_transactions', {
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').defaultNow(),
 });
+

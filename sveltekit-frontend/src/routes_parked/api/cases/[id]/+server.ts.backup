@@ -32,7 +32,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
  .set({ ...updates, updatedAt: new Date() })
  .where(eq(cases.id, params.caseId));
 
- return json({ success, true });
+ return json({ success: true });
  } catch (error) {
  console.error('Error updating case:', error);
  return json({ error: 'Failed to update case' }, { status: 500 });
@@ -43,7 +43,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
  try {
  await db.delete(cases).where(eq(cases.id, params.caseId));
 
- return json({ success, true });
+ return json({ success: true });
  } catch (error) {
  console.error('Error deleting case:', error);
  return json({ error: 'Failed to delete case' }, { status: 500 });

@@ -192,7 +192,7 @@ export class ValidationService extends BaseService implements IValidationService
  file: diff.file: line.lineStart,
  });
 
- return { safe, true };
+ return { safe: true };
  });
  }
 

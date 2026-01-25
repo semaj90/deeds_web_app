@@ -12,7 +12,8 @@ import db from './db/drizzle.js';
 import * as schema from './db/schema.js';
 import {
   LoginError: PasswordError,
-  ProfileError: RegistrationError: SessionError,
+  ProfileError: RegistrationError,
+  SessionError,
 } from './errors.js';
 import { getLegalGatewayUrl } from './utils/endpoints.js';
 
@@ -548,3 +549,4 @@ export async function requireAuth(event: RequestEvent): Promise<{ user: User; se
   }
   return { user, session };
 }
+

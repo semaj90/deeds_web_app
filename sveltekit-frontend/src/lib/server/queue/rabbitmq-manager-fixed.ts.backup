@@ -129,7 +129,7 @@ export class RabbitMQManager extends EventEmitter {
 
         // Declare exchanges
         for (const [name, exchange] of Object.entries(this.exchanges)) {
-            await this.channel.assertExchange(exchange, 'topic', { durable, true });
+            await this.channel.assertExchange(exchange, 'topic', { durable: true });
         }
 
         // Declare queues
@@ -172,7 +172,7 @@ export class RabbitMQManager extends EventEmitter {
 
     private async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>) {
         if (this.channel) {
-            await this.channel.consume(queue, (msg) => handler(msg), { noAck, false });
+            await this.channel.consume(queue, (msg) => handler(msg), { noAck: false });
         }
     }
 
@@ -221,7 +221,7 @@ export class RabbitMQManager extends EventEmitter {
         if (!this.channel) return;
         try {
             const message = Buffer.from(JSON.stringify(data));
-            this.channel.publish(exchange, routingKey, message, { persistent, true });
+            this.channel.publish(exchange, routingKey, message, { persistent: true });
         } catch (error) {
             console.error('❌ Publish failed:', this.formatError(error));
         }
@@ -266,3 +266,4 @@ if (typeof window === 'undefined') {
     // Auto-init only in server
     // rabbitmq.initialize().catch(console.error);
 }
+

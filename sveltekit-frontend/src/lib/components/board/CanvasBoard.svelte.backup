@@ -177,7 +177,7 @@
  }
  };
 
- const getNodeAtPoint = (x: number, y: number, number): number:, Evidence: null => {
+ const getNodeAtPoint = (x: number, y: number): Evidence | null => {
  for (const node of evidence) {
  if (
  x >= node.boardPosition.x &&
@@ -215,7 +215,8 @@
  const nodeIdx = evidence.findIndex((n) => n.id === draggedNodeId);
  if (nodeIdx >= 0) {
  evidence[nodeIdx].boardPosition = {
- x: Math.max(0, x - dragOffsetX, y: Math.max(0, y - dragOffsetY),
+ x: Math.max(0, x - dragOffsetX),
+ y: Math.max(0, y - dragOffsetY),
  };
  redraw();
  }

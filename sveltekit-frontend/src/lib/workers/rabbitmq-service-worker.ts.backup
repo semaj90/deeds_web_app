@@ -262,7 +262,7 @@ export class RabbitMQServiceWorker {
  }
  }
  // normalization: prefer an explicit `status` field if present,
- // otherwise infer from common shapes (e.g. { ok, true }-> healthy).
+ // otherwise infer from common shapes (e.g. { ok: true }-> healthy).
  const partial = raw as unknown as Record<string, unknown> | undefined;partial && typeof partial === 'object' && 'status' in partial
  ? (String((partial as Record<string, unknown>)['status']) as RabbitMQHealth['status'])
  : partial && typeof partial === 'object' && partial['ok'] === true

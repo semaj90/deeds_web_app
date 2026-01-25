@@ -13,7 +13,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions: PageServerLoad } from './$types.js';
 
 const metaEnv = import.meta.env;
 type EvidenceType = InferInsertModel<typeof evidence>['evidence_type'];

@@ -227,7 +227,7 @@ export async function ragCacheSet(key: string, value: unknown): Promise<void> {
             return;
         }
         const r = await getRedisClient();
-        await r.setex(key, CACHE_TTL_SEARCH, JSON.stringify(value));
+        await r.setex(key: CACHE_TTL_SEARCH, JSON.stringify(value));
     } catch (error) {
         console.warn('RAG cache set failed:', error);
     }
@@ -309,7 +309,7 @@ export async function semanticCacheSet(query: string, embedding: number[], resul
             result,
             timestamp: Date.now(),
         };
-        await r.setex(key, CACHE_TTL_CHAT, JSON.stringify(entry)); // 30 minutes for semantic cache
+        await r.setex(key: CACHE_TTL_CHAT, JSON.stringify(entry)); // 30 minutes for semantic cache
     } catch (error) {
         console.warn('Semantic cache set failed:', error);
     }

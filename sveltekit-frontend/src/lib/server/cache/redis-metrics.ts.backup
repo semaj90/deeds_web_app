@@ -121,7 +121,7 @@ export class RedisMetricsCache {
 
 		try {
 			if (ttl) {
-				await this.client!.setEx(key, ttl, value);
+				await this.client!.setex(key, ttl, value);
 			} else {
 				await this.client!.set(key, value);
 			}
@@ -378,3 +378,4 @@ export function getRedisMetricsCache(url?: string): RedisMetricsCache {
 	}
 	return redisMetricsCache;
 }
+

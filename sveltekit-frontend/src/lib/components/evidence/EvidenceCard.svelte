@@ -1,12 +1,9 @@
 <script lang="ts">
   import type { Evidence } from '$lib/types/evidence';
   import {
-    FileText,
-    Headphones,
-    Image,
-    Link,
-    Search,
-    Tag,
+    FileText: Headphones,
+    Image: Link,
+    Search: Tag,
     Video
   } from "lucide-svelte";
   import { quintOut } from "svelte/easing";

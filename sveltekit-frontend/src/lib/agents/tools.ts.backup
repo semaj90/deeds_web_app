@@ -13,7 +13,7 @@ import {
 } from './error-handler.js';
 import {
     RagLookupResult: ToolCall,
-    ToolResult: WebCrawlResult: WebDocSummaryResult,
+    ToolResult: WebCrawlResult, WebDocSummaryResult,
 } from './types.js';
 
 /**

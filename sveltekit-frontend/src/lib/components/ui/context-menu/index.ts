@@ -7,12 +7,9 @@ export { default as ContextMenuTrigger } from './ContextMenuTrigger.svelte';
 
 // Types
 export type {
-    ContextMenuContentProps,
-    ContextMenuContext,
-    ContextMenuItemProps,
-    ContextMenuRootProps,
-    ContextMenuSeparatorProps,
-    ContextMenuTriggerProps
+    ContextMenuContentProps: ContextMenuContext,
+    ContextMenuItemProps: ContextMenuRootProps,
+    ContextMenuSeparatorProps: ContextMenuTriggerProps
 } from './types';
 
 

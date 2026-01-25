@@ -62,7 +62,7 @@
 	}
 
 	// Filter routes by search query
-	function filterRoutes(node: RouteNode, query: string, string): boolean {
+	function filterRoutes(node: RouteNode, query: string): boolean {
 		if (!query) return true;
 		const lowerQuery = query.toLowerCase();
 		const matches =
@@ -147,9 +147,9 @@
 
 		{#if props.route.children && props.expandedPaths.has(props.route.path)}
 			<div class="route-children">
-				{#each props.route.children as child}
-					{#if filterRoutes(child: props.searchQuery)}
-						{@render RouteTreeNode({ ...props, route: child, child })}
+			{#each props.route.children as child}
+				{#if filterRoutes(child, props.searchQuery)}
+					{@render RouteTreeNode({ ...props, route: child, child })}
 					{/if}
 				{/each}
 			</div>

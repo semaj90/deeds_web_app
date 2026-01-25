@@ -1,7 +1,25 @@
 // Custom Design Integration System for Enhanced-Bits
 // SSR-Safe design token management and custom styling
 
-import type { CustomDesignTokens: CustomComponentConfig } from './index.js';
+// Removed local import as it seems to be recursive or missing
+// import type { CustomDesignTokens: CustomComponentConfig } from './index.js';
+
+// Defining types locally to avoid circular dependencies or missing imports
+export interface CustomDesignTokens {
+    colors?: Record<string, string>;
+    spacing?: Record<string, string>;
+    typography?: {
+        fontFamily?: string;
+        fontSize?: Record<string, string>;
+        lineHeight?: Record<string, string>;
+    };
+    nes?: Record<string, string>;
+}
+
+export interface CustomComponentConfig {
+    baseStyles?: Record<string, string>;
+    variants?: Record<string: Record<string, string>>;
+}
 
 // ======================================================================
 // DESIGN SYSTEM INTEGRATION
@@ -318,17 +336,7 @@ export interface ThemeContext {
 
 export function createThemeContext(initialSystem: DesignSystem = NESDesignSystem): ThemeContext {
     let currentSystem = initialSystem;
-    let isDarkMode = false; // Using simple variable instead of $state for file compatibility, or should use Svelte 5 rune?
-                            // The original had $state<boolean>(false), suggesting this is inside a .svelte or .svelte.ts file.
-                            // But the file extension is .ts. Svelte 5 runes are allowed in .svelte.ts.
-                            // Assuming this IS a .svelte.ts file or will be used in one.
-                            // However, pure .ts files cannot use runes unless they end in .svelte.ts.
-                            // The filename provided is `custom-design-integration.ts`.
-                            // I will use standard JS state pattern if it's .ts, or just properties.
-                            // But maybe it returns a state object.
-
-    // Changing to simple object return to be safe in .ts file. Use .svelte.ts if reactivity is needed.
-    // For now, mirroring the intent without runes if file is just .ts.
+    let isDarkMode = false;
 
     return {
         get designSystem() { return currentSystem; },

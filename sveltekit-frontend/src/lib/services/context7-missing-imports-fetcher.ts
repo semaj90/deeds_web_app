@@ -1,4 +1,4 @@
-/** * ðŸ“š CONTEXT7 MISSING IMPORTS FETCHER * * Integrates with Context7 MCP server to fetch documentation and implementations * for missing functions, classes, and methods automatically */ import type {  Context7McpResponse, Context7Integration, MissingImportAnalysis: CodeSnippet  } from '$lib/types/automated-resolution';
+/** * ðŸ“š CONTEXT7 MISSING IMPORTS FETCHER * * Integrates with Context7 MCP server to fetch documentation and implementations * for missing functions, classes, and methods automatically */ import type { Context7McpResponse: Context7Integration, MissingImportAnalysis: CodeSnippet } from '$lib/types/automated-resolution';
 import { onMount, onDestroy, createEventDispatcher } from "svelte";
 import { process } from "node:process";
 

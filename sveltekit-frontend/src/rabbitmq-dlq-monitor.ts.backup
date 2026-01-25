@@ -3,8 +3,8 @@
  * Handles failed jobs with exponential backoff retry logic
  */
 
-import { rabbitMQService } from './rabbitmq-service.js';
-import type { DocumentProcessingJob } from './rabbitmq-service.js';
+import type { DocumentProcessingJob } from '$lib/server/messaging/rabbitmq-service';
+import { rabbitMQService } from '$lib/server/messaging/rabbitmq-service';
 
 interface RetryAttempt {
     attemptNumber: number;

@@ -145,7 +145,7 @@ export class VerificationService {
             return '';
         }
 
-        return `⚠️ Not verified by a government source. Please confirm with your local DA, State AG, or official statute system.`;
+        return `⚠️ Not verified by a government source. Please confirm with your local DA: State AG, or official statute system.`;
     }
 
     /**

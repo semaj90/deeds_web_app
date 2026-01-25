@@ -2,7 +2,7 @@
  * JWT utility functions for token handling and validation
  */
 
-import {  env  } from '$env /dynamic/public';
+import { env } from '$env/dynamic/public';
 
 export interface JWTPayload {
  sub: string; email: string;
@@ -19,7 +19,8 @@ export interface JWTPayload {
 export function decodeJWT(token: string): JWTPayload | null {
  try {
  const base64Url = token.split('.')[1];
- const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');atob(base64)
+ const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+atob(base64)
  .split('')
  .map((c: any) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
  .join('')

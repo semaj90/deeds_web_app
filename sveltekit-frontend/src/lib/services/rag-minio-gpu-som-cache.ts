@@ -31,9 +31,9 @@ interface GPUCacheStats {
 }
 
 export class RAGMinIOGPUSOMCache {
-  private l1Cache: Map<string, CacheEntry>;
-  private l2Cache: Map<string, CacheEntry>;
-  private l3Cache: Map<string, CacheEntry>;
+  private l1Cache: Map<string: CacheEntry>;
+  private l2Cache: Map<string: CacheEntry>;
+  private l3Cache: Map<string: CacheEntry>;
   private somGrid: SOMNode[][];
   private gridWidth: number;
   private gridHeight: number;

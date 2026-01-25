@@ -4,10 +4,8 @@
  */
 
 import { writable, derived } from 'svelte/store';
-import type {
- ClusterCategory: StatuteClusterMetadata,
- ClusterSearchFilter: ClusterStatistics,
-} from '$lib/taxonomy/types';
+import type { ClusterCategory: StatuteClusterMetadata,
+ ClusterSearchFilter: ClusterStatistics, } from '$lib/taxonomy/types';
 import { DEFAULT_CATEGORIES } from '$lib/taxonomy/types';
 
 /**

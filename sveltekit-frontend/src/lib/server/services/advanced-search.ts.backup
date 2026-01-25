@@ -412,3 +412,4 @@ class AdvancedSearch {
 
 // Export singleton instance
 export const advancedSearch = new AdvancedSearch();
+

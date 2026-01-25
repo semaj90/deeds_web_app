@@ -11,7 +11,7 @@ import AnswerGenerator from '$lib/components/source-validation/AnswerGenerator.s
 import ProvenanceGraph from '$lib/components/source-validation/ProvenanceGraph.svelte';
 import SourceValidator from '$lib/components/source-validation/SourceValidator.svelte';
 import { sourceValidationAPI } from '$lib/services/source-validation-api';
-import type { CitationMetadata, KBSearchResult } from '$lib/types/source-validation';
+import type { CitationMetadata: KBSearchResult } from '$lib/types/source-validation';
 
 // State
 let caseId = $state(`test_case_${Date.now()}`);

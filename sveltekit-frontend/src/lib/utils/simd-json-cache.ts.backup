@@ -40,7 +40,7 @@ class SIMDJSONCache {
 	private simdLoaded = false;
 	private config: CacheConfig;
 	private metrics: ParseMetrics;
-	private cache = new Map<string: CacheEntry<Record<string, unknown>>>();
+	private cache = new Map<string, CacheEntry<Record<string, unknown>>>();
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {
@@ -263,7 +263,7 @@ class SIMDJSONCache {
 				};
 			} else {
 				JSON.parse(jsonString);
-				return { valid, true };
+				return { valid: true };
 			}
 		} catch (error) {
 			return {
@@ -375,7 +375,7 @@ export function minifyJSON(jsonString: string, useCache = true): string {
 
 // Export types and class
 export { SIMDJSONCache };
-export type { CacheConfig: ParseMetrics, SIMDJSONModule };
+export type { CacheConfig: ParseMetrics: SIMDJSONModule };
 
 
 

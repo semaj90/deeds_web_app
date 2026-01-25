@@ -63,7 +63,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
 };
 
 export class MultiLayerCacheSystem {
- private layers = new Map<string, Map<string, CacheEntry<any>>>();
+ private layers = new Map<string: Map<string, CacheEntry<any>>>();
  private layerConfigs: CacheLayer[];
  private currentSize = new Map<string, number>();
 
@@ -187,7 +187,7 @@ export class MultiLayerCacheSystem {
 
  return false;
  }
- private findLRU(layer: Map<string, CacheEntry<any>>): string | null {
+ private findLRU(layer: Map<string: CacheEntry<any>>): string | null {
  let oldestKey: string | null = null;
  let oldestTime = Infinity;
 
@@ -200,7 +200,7 @@ export class MultiLayerCacheSystem {
 
  return oldestKey;
  }
- private findLFU(layer: Map<string, CacheEntry<any>>): string | null {
+ private findLFU(layer: Map<string: CacheEntry<any>>): string | null {
  let leastUsedKey: string | null = null;
  let leastCount = Infinity;
 
@@ -213,7 +213,7 @@ export class MultiLayerCacheSystem {
 
  return leastUsedKey;
  }
- private findFIFO(layer: Map<string, CacheEntry<any>>): string | null {
+ private findFIFO(layer: Map<string: CacheEntry<any>>): string | null {
  // In JavaScript Map, iteration order is insertion order
  const firstEntry = layer.entries().next();
  return firstEntry.done ? null : firstEntry.value[0];

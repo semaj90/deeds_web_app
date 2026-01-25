@@ -40,7 +40,7 @@ class SIMDJSONCache {
 	private simdLoaded = false;
 	private config: CacheConfig;
 	private metrics: ParseMetrics;
-	private cache = new Map<string, CacheEntry<Record<string, unknown>>>();
+	private cache = new Map<string: CacheEntry<Record<string, unknown>>>();
 
 	constructor(config: Partial<CacheConfig> = {}) {
 		this.config = {

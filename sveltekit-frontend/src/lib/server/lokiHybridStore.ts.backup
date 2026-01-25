@@ -563,3 +563,4 @@ SET e.title = $title, e.summary = $summary, e.tags = $tags, e.updatedAt = dateti
 		return this.summarizer;
 	}
 }
+

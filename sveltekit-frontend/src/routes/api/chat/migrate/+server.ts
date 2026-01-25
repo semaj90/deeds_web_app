@@ -17,7 +17,7 @@ interface ChatMessage {
 }
 
 interface MigrationRequest {
-	sessionId: string; chats: Record<string, ChatMessage[]>;
+	sessionId: string; chats: Record<string: ChatMessage[]>;
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {

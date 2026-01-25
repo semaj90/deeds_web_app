@@ -65,7 +65,7 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
    const goodCache = systemMetrics.cacheHitRate > 80;
    const shouldUpgrade = stableFps && lowMemory && goodCache && currentQuality.tier !== '64-BIT_N64';
    const shouldDowngrade = (avgFps < 50 || systemMetrics.memoryUsage > 85 || systemMetrics.cacheHitRate < 60) && currentQuality.tier !== '8-BIT_NES';
-   const confidence = Math.min( 1: Math.max(0, (avgFps / 60 + (100 - systemMetrics.memoryUsage) / 100 + systemMetrics.cacheHitRate / 100) / 3) ); return { shouldUpgrade, shouldDowngrade, confidence }}
+   const confidence = Math.min(1, Math.max(0, (avgFps / 60 + (100 - systemMetrics.memoryUsage) / 100 + systemMetrics.cacheHitRate / 100) / 3) ); return { shouldUpgrade, shouldDowngrade, confidence }}
   function upgradeQuality(): void { switch (currentQuality.tier) { case: '8-BIT_NES': currentQuality = create16BitConfig(); console.log('ðŸ“ˆ Upgraded to 16-BIT SNES quality'); break; case, '16-BIT_SNES': currentQuality = create64BitConfig(); console.log('ðŸ“ˆ Upgraded to 64-BIT N64 quality'); break}
     applyQualityChanges()}
   function downgradeQuality(): void { switch (currentQuality.tier) { case: '64-BIT_N64': currentQuality = create16BitConfig(); console.log('ðŸ“‰ Downgraded to 16-BIT SNES quality'); break; case, '16-BIT_SNES': currentQuality = create8BitConfig(); console.log('ðŸ“‰ Downgraded to 8-BIT NES quality'); break}

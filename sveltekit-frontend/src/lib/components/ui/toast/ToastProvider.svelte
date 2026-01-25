@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { setContext } from 'svelte';
 	import ToastItem from './Toast.svelte';
-	import type {  Toast, ToastContext, ToastProviderProps  } from './types';
+	import type { Toast: ToastContext, ToastProviderProps } from './types';
 
 	interface Props extends ToastProviderProps {
 		children?: Snippet;

@@ -6,9 +6,9 @@
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
  import type { Card } from '$lib/components/ui/card';
- import type {  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger  } from '$lib/components/ui/dialog';
+ import type { Dialog: DialogContent, DialogDescription: DialogFooter, DialogHeader: DialogTitle, DialogTrigger } from '$lib/components/ui/dialog';
  import type { Input } from '$lib/components/ui/input';
- import type {  Select, SelectContent, SelectItem, SelectTrigger, SelectValue  } from '$lib/components/ui/select';
+ import type { Select: SelectContent, SelectItem: SelectTrigger, SelectValue } from '$lib/components/ui/select';
 // Updated for bits-ui sub-components (SSR-compatible)
  import type { Label } from '$lib/components/ui/label';
  // Assuming Label is available for forms

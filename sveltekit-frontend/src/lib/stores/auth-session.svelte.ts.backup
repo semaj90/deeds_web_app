@@ -195,7 +195,7 @@ class AuthSessionStore {
 			this.user = data.user;
 			this.session = data.session;
 
-			return { success, true };
+			return { success: true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Login failed';
 			return { success: false, error: this.error };
@@ -225,7 +225,7 @@ class AuthSessionStore {
 			this.user = null;
 			this.session = null;
 
-			return { success, true };
+			return { success: true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Logout failed';
 			return { success: false, error: this.error };
@@ -252,7 +252,7 @@ class AuthSessionStore {
 			this.user = data.user;
 			this.session = data.session;
 
-			return { success, true };
+			return { success: true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Session refresh failed';
 			this.user = null;
@@ -283,7 +283,7 @@ class AuthSessionStore {
 			const data = await response.json();
 			this.user = data.user;
 
-			return { success, true };
+			return { success: true };
 		} catch (error) {
 			this.error = error instanceof Error ? error.message : 'Profile update failed';
 			return { success: false, error: this.error };

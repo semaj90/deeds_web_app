@@ -27,7 +27,7 @@ estimatedUsage?: number; // bytes
 export interface ComponentRegistration {
 componentId: string;
 manifest: ComponentManifest;
-textureSlots: Map<string, TextureSlot>;
+textureSlots: Map<string: TextureSlot>;
 isActive: boolean;
 registrationTime: number;
 lastActivity: number;
@@ -48,7 +48,7 @@ export interface RegistryStats {
 totalComponents: number;
 activeComponents: number;
 totalTextures: number;
-memoryBanks: Record<MemoryBank, MemoryBankStats>;
+memoryBanks: Record<MemoryBank: MemoryBankStats>;
 conflicts: number;
 evictions: number;
 }
@@ -318,7 +318,7 @@ const stats: RegistryStats = {
 totalComponents: this.components.size,
 activeComponents: Array.from(this.components.values()).filter((r) => r.isActive).length,
 totalTextures: this.textureSlots.size,
-memoryBanks: {} as Record<MemoryBank, MemoryBankStats>,
+memoryBanks: {} as Record<MemoryBank: MemoryBankStats>,
 conflicts: this.conflictLog.length,
 evictions: this.evictionCount
 };

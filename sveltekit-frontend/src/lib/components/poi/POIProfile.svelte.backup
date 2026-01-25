@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { DialogContent: DialogOverlay, DialogPortal: DialogRoot } from 'bits-ui';
 
- import * as Dialog from 'bits-ui/components/dialog';
-
- let { person } = $props();
+	import * as Dialog from 'bits-ui'; let { person } = $props();
 
  let aiOpen = $state(false);
  let aiSummary = $state("…");

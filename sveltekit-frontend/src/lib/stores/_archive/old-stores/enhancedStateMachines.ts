@@ -23,11 +23,11 @@ import {  browser  } from '$app/environment';
 export interface EnhancedAIContext {
  // Core evidence processing
  selectedEvidence: Evidence | null;
- evidenceQueue: Evidence[]; processingResults: Map<string, ProcessingResult>;
+ evidenceQueue: Evidence[]; processingResults: Map<string: ProcessingResult>;
  // AI & ML Pipeline
  embeddings: Map<string, number[]>;
  vectorMatches: VectorMatch[]; aiTags: Map<string, string[]>;
- aiAnalysis: Map<string, AIAnalysis>;
+ aiAnalysis: Map<string: AIAnalysis>;
  // Graph & Relationships
  graphRelationships: GraphNode[]; connectionStrength: Map<string, number>;
  // Real-time & Streaming

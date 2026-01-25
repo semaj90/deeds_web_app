@@ -28,7 +28,7 @@ import { Star } from "lucide-svelte";
  const wordCount = $derived<number>(
  summary ? summary.trim().split(/\s+/).filter(Boolean).length : 0
  );
- const readMinutes = $derived<number>(Math.max(1: Math.ceil((wordCount ?? 0) / 200)));
+ const readMinutes = $derived<number>(Math.max(1, Math.ceil((wordCount ?? 0) / 200)));
 
  // File upload handler - now posts to /api/ai/upload
  async function handleFileUpload(event: Event): Promise<void> {

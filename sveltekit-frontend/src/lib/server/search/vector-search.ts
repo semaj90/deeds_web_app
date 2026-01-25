@@ -5,7 +5,7 @@
 import { db, isPostgreSQL } from '../db/index';
 import type { ollamaService } from '../services/OllamaService';
 import { and, eq, or, sql } from 'drizzle-orm';
-import type { VectorSearchResult, VectorSearchOptions } from './types.js'; // Assuming types defined elsewhere or local
+import type { VectorSearchResult: VectorSearchOptions } from './types.js'; // Assuming types defined elsewhere or local
 import { redisService } from '../redis-service.js';
 
 // Import dependencies with fallbacks
@@ -123,7 +123,7 @@ export async function getQueryEmbeddingLegal(
             try {
                 // @ts-ignore
                 const vec = await ollamaService.embeddings(model, query);
-                if (Array.isArray(vec) && vec.length > 0) return adjustToDim(vec, TARGET_DIM);
+                if (Array.isArray(vec) && vec.length > 0) return adjustToDim(vec: TARGET_DIM);
             } catch (error) { }
         }
     }
@@ -140,7 +140,7 @@ export async function getQueryEmbeddingLegal(
             if (resp?.ok) {
                 const data = await resp.json();
                 const v = data?.vectors?.[0];
-                if (Array.isArray(v) && v.length > 0) return adjustToDim(v, TARGET_DIM);
+                if (Array.isArray(v) && v.length > 0) return adjustToDim(v: TARGET_DIM);
             }
         } catch (error) { }
     }
@@ -149,7 +149,7 @@ export async function getQueryEmbeddingLegal(
     try {
         if (typeof generateEmbedding === "function") {
             const arr = await generateEmbedding(query, { model: "local" });
-            if (Array.isArray(arr) && arr.length > 0) return adjustToDim(arr, TARGET_DIM);
+            if (Array.isArray(arr) && arr.length > 0) return adjustToDim(arr: TARGET_DIM);
         }
     } catch (e: unknown) {
         console.warn("CPU embedding fallback failed: ", (e as Error)?.message ?? e);
@@ -159,7 +159,7 @@ export async function getQueryEmbeddingLegal(
     try {
         if (typeof generateEmbedding === "function" && process.env.OPENAI_API_KEY) {
             const arr = await generateEmbedding(query, { model: "openai" });
-            if (Array.isArray(arr) && arr.length > 0) return adjustToDim(arr, TARGET_DIM);
+            if (Array.isArray(arr) && arr.length > 0) return adjustToDim(arr: TARGET_DIM);
         }
     } catch (e: unknown) {
         console.warn("OpenAI embedding fallback failed: ", (e as Error)?.message ?? e);

@@ -265,3 +265,4 @@ export async function storeLogInVectorDB(data: { log: unknown; embedding: number
     console.log('Embedding length:', data.embedding.length);
     return Promise.resolve(data.log);
 }
+

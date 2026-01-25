@@ -249,5 +249,5 @@ export const optimizedCache = {
     }
 };
 
-export type { GPUMetrics, CacheWorkload, ParallelCacheJob };
+export type { GPUMetrics: CacheWorkload: ParallelCacheJob };
 

@@ -46,3 +46,4 @@ export const embeddingsCache = pgTable('embeddings_cache', {
 	tags: jsonb('tags').default(sql`'[]'::jsonb`),
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
+

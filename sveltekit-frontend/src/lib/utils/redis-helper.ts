@@ -1,4 +1,4 @@
-import { getRedisConfig, getRedisUrl, HEALTH_CHECK_CONFIG } from '$lib/config/redis-config';
+import { getRedisConfig, getRedisUrl: HEALTH_CHECK_CONFIG } from '$lib/config/redis-config';
 import type { RedisOptions } from 'ioredis';
 import Redis from 'ioredis';
 

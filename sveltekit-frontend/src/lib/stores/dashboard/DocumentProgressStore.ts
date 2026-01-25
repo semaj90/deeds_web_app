@@ -16,7 +16,7 @@ export interface ProcessingError {
 export interface ProgressState {
  documentId: string; documentTitle: string;
  isProcessing: boolean; currentEvent: ProcessingEvent | null;
- pageStatuses: Map<number, PageStatus>; fallbackActive: boolean;
+ pageStatuses: Map<number: PageStatus>; fallbackActive: boolean;
  fallbackConfidence: number; errors: ProcessingError[];
  startTime: Date | null;
  completionTime?: Date;

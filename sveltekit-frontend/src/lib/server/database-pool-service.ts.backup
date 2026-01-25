@@ -372,3 +372,4 @@ if (typeof process !== 'undefined') {
         void dbPool.close().catch(e => console.error('Error closing DB pool SIGINT: ', e));
     });
 }
+

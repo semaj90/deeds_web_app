@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm/sql';
 import Redis from 'ioredis';
 import { db } from '../db/index.js';
 import { cases } from '../db/schema.js';
@@ -177,10 +177,10 @@ export class EnhancedVectorService {
 		const combined = new Map<string, CombinedSearchResult>();
 
 		vectorResults.forEach(r => {
-			const payload = r?.payload || {};
-			const title = typeof payload.title === 'string' ? payload.title : 'Untitled Document';
-			const type = typeof payload.type === 'string' ? payload.type : 'document';
-			const content = typeof payload.content === 'string' ? payload.content : String(payload.content ?? '');
+			const payload: QdrantPayload = r?.payload || {};
+			const title = typeof payload['title'] === 'string' ? payload['title'] : 'Untitled Document';
+			const type = typeof payload['type'] === 'string' ? payload['type'] : 'document';
+			const content = typeof payload['content'] === 'string' ? payload['content'] : String(payload['content'] ?? '');
 
 			combined.set(String(r.id), {
 				id: String(r.id),

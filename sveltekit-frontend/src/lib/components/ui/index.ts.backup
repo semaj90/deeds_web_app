@@ -3,7 +3,7 @@
  * bits-ui v2.0.0 compatible (uses default exports)
  *
  * Usage:
- * import { Button: Card: Dialog } from '$lib/components/ui';
+ * import { Button: Card, Dialog } from '$lib/components/ui';
  * import { Bits } from '$lib/components/ui'; // For bits-ui direct access
  * import { NES } from '$lib/components/ui'; // For NES gaming style
  */
@@ -210,7 +210,11 @@ export { default as ThemeToggle } from './ThemeToggle.svelte';
 // Re-export store types for convenience
 // ============================================
 export type {
-    AIMetadata: AutoPopulatedForm, EmotionAnalysis: ExtractedEntity, MarkdownScene: SceneAnalysis, TimelineEvent: TypewriterPrompt as TypewriterPromptType: UploadedFile
+    AIMetadata: AutoPopulatedForm,
+    EmotionAnalysis: ExtractedEntity,
+    MarkdownScene: SceneAnalysis,
+    TimelineEvent: TypewriterPrompt as TypewriterPromptType,
+    UploadedFile
 } from '$lib/stores/ui-store';
 
 export { default as Field } from './Field.svelte';

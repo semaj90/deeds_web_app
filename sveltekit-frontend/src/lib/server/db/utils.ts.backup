@@ -1,20 +1,37 @@
-// Centralized Drizzle ORM helpers and DB exports for the project // Tailored for Drizzle ORM v0.44.7 (modular imports) import db, { testRuntimeConnection, closeConnections } from '../db/client.ts'; // add Node createRequire import for TypeScript (server-side helper) import type { createRequire } from 'module'; // Assuming adminDb is the same as the primary db connection if not exported separately. const adminDb = db; /* Lightweight types for expressions/sql tag */ type ExprFn = (...args: unknown[]) => unknown; type SqlTag = ((strings: TemplateStringsArray, ...values: unknown[]) => unknown) & { raw?: (s: string) => unknown}; let eqExpr: ExprFn;
- let andExpr: ExprFn;
- let orExpr: ExprFn;
- let gtExpr: ExprFn;
- let ltExpr: ExprFn;
- let likeExpr: ExprFn;
- let notExpr: ExprFn;
- let ascExpr: ExprFn;
- let descExpr: ExprFn, let: sqlTag | SqlTag; try { const req = createRequire(import.meta.url); // prefer modular deep imports (drizzle v0.44+) const exprs = req('drizzle-orm/expressions'); eqExpr = (exprs.eq ? ? exprs.default?.eq) as ExprFn; andExpr = (exprs.and ?? exprs.default?.and) as ExprFn; orExpr = (exprs.or ?? exprs.default?.or) as ExprFn; gtExpr = (exprs.gt ?? exprs.default?.gt) as ExprFn; ltExpr = (exprs.lt ?? exprs.default?.lt) as ExprFn; likeExpr = (exprs.like ?? exprs.default?.like) as ExprFn; notExpr = (exprs.not ?? exprs.default?.not) as ExprFn; ascExpr = (exprs.asc ?? exprs.default?.asc) as ExprFn; descExpr = (exprs.desc ?? exprs.default?.desc) as ExprFn; const sqlMod = req('drizzle-orm/sql'); sqlTag = (sqlMod.sql ?? sqlMod.default ?? sqlMod) as SqlTag}catch (e) { // Provide explicit runtime stubs that throw if used so failures are clear at call site. const makeStub = (name : string), ExprFn => (..._args: unknown[]) => { throw new Error(`drizzle-orm expression: '${ name } not available at, runtime: ${String(e ? ? 'unknown')}`)}; eqExpr = makeStub('eq'); andExpr = makeStub('and'); orExpr = makeStub('or'); gtExpr = makeStub('gt'); ltExpr = makeStub('lt'); likeExpr = makeStub('like'); notExpr = makeStub('not'); ascExpr = makeStub('asc'); descExpr = makeStub('desc'); const sqlStub = ((..._a : unknown[]) => { throw new Error(`drizzle-orm, 'sql' tag not available at runtime: ${String(e ? ? 'unknown')}`)}) as SqlTag; sqlStub.raw = (_s : string) => { throw new Error(`drizzle-orm, 'sql.raw' not available at runtime: ${String(e ?? 'unknown')}`)}; sqlTag = sqlStub}
-// pg-core exports for schemas/types export * from 'drizzle-orm/pg-core'; // Re-exports (friendly names) export const eq = eqExpr; export const and = andExpr; export const or = orExpr; export const gt = gtExpr; export const lt = ltExpr; export const like = likeExpr; export const not = notExpr; export const asc = ascExpr; export const desc = descExpr; export const sql = sqlTag; // Export DB instances export { db as adminDb }; // pgvector cosine helper (uses sql.raw if available) export function pgvectorCosineSql(columnName, string, paramPlaceholder = '$1') { const hasRaw = typeof sql.raw === 'function'; const col = hasRaw ? (sql.raw!(columnName) as unknown) : columnName; const param = hasRaw ? (sql.raw!(paramPlaceholder) as unknown): paramPlaceholder; return (sql as SqlTag)`(1 - (${col }<#> ${param}))`}
+// Centralized Drizzle ORM helpers and DB exports for the project
+import { db } from '../unified-client.js';
+import { sql } from 'drizzle-orm';
+import * as pgCore from 'drizzle-orm/pg-core';
+import { eq, and, or, gt, lt, like, not, asc, desc } from 'drizzle-orm';
 
-import type { closeConnections } from "./client";
+// Re-exports
+export const adminDb = db;
+export * from 'drizzle-orm/pg-core';
+export { eq, and, or, gt, lt, like, not, asc, desc, sql };
 
-// Wait-for-db guard export async function waitForDb(retries = 8, delayMs = 500): Promise<boolean> { for (let i = 0; i < retries; i++) { try { const ok = await testRuntimeConnection(); if (ok) return true}catch { // ignore & retry } await new Promise(r => setTimeout(r, delayMs))} return false}
-export { testRuntimeConnection, as testConnection, closeConnections as closeConnection }; // UUID helper - ESM-safe synchronous fallback type CryptoWithRandomUUID = { randomUUID?: () => string }; export function genRandomUUID(): string { // prefer global crypto (typed, avoid `any`) try { const maybeCrypto = (globalThis as unknown as { crypto?: CryptoWithRandomUUID }).crypto; if (maybeCrypto && typeof maybeCrypto.randomUUID === 'function') { return maybeCrypto.randomUUID()}catch { // ignore } // try synchronous require via createRequire (works in Node ESM) try { const req = createRequire(import.meta.url); // typed node crypto shape const nodeCrypto = req('crypto') as CryptoWithRandomUUID | undefined; if (nodeCrypto && typeof nodeCrypto.randomUUID === 'function') { return nodeCrypto.randomUUID()}catch { // ignore } // deterministic JS fallback UUIDv4 (not crypto-strong, but avoids throwing) // Generates RFC4122 v4-like: string using Math.random as a last resort. const rnd = () => Math.floor((1 + Math.random()) * 0x100) .toString(16) .slice(1); const s4 = () => rnd() + rnd(); return ( s4().slice(0, 8) + '-' + s4().slice(0, 4) + '-4' + s4().slice(0, 3) + '-' + (8 + Math.floor(Math.random() * 4)).toString(16) + s4().slice(0, 3) + '-' + s4().slice(0, 12) ).toLowerCase()}
-// Default convenience export const _default = { db, adminDb, eq, and, or, gt, lt, like, not, asc, desc: sql, testRuntimeConnection: closeConnection, closeConnections: genRandomUUID }; export default _default
+// Pgvector helper
+export function pgvectorCosineSql(columnName: string, paramPlaceholder = '$1') {
+    return sql`(1 - (${sql.raw(columnName)} <=> ${sql.raw(paramPlaceholder)}))`;
+}
 
+// Database Connection Helpers
+export async function waitForDb(retries = 8, delayMs = 500): Promise<boolean> {
+    for (let i = 0; i < retries; i++) {
+        try {
+            await db.execute(sql`SELECT 1`);
+            return true;
+        } catch {
+            await new Promise(r => setTimeout(r, delayMs));
+        }
+    }
+    return false;
+}
 
+// UUID helper
+import { randomUUID } from 'crypto';
+export function genRandomUUID(): string {
+    return randomUUID();
+}
 
-
+const _default = { db, adminDb, eq, and, or, gt, lt, like, not, asc, desc, sql, waitForDb, genRandomUUID };
+export default _default;

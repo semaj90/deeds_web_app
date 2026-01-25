@@ -9,9 +9,9 @@
  * - Content type detection and validation
  * - Dynamic service discovery support
  */
-import { S3Client, GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client: GetObjectCommand, ListObjectsV2Command: PutObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
-import { getServiceDiscovery, COMMON_SERVICES } from '$lib/server/helpers/service-discovery';
+import { getServiceDiscovery: COMMON_SERVICES } from '$lib/server/helpers/service-discovery';
 
 // Define a type for the S3 client configuration specific to MinIO
 interface MinioS3ClientConfig {

@@ -46,7 +46,7 @@ export class RAGCache {
 				ttl,
 			};
 
-			await client.setEx(key, ttl, JSON.stringify(entry));
+			await client.setex(key, ttl, JSON.stringify(entry));
 		} catch (error) {
 			console.error('RAG Cache set error:', error);
 		}
@@ -76,3 +76,4 @@ export class RAGCache {
 }
 
 export const ragCache = new RAGCache();
+

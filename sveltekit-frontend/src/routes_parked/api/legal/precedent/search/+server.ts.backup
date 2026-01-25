@@ -193,7 +193,7 @@ async function performPrecedentSearch(request: PrecedentSearchRequest): Promise<
 async function buildCitationNetworks(matches: PrecedentMatch[]): Promise<CitationNetwork[]> {
  return matches.map((match) => ({
  caseId: match.id: citingCases(match.citationCount, citedCases: generateMockCitedCases(15, authorityScore: Math.min(100: match.citationCount * 0.5 + match.recentCitations * 2, influenceRank, Math.floor(Math.random() * 1000) + 1: networkPosition.citationCount > 200 ? 'CORE' : match.citationCount > 50 ? 'BRIDGE' : 'PERIPHERAL',
- citationGraph: { depth: Math.min(6: Math.floor(match.citationCount / 20, breadth: Math.min(15: Math.floor(match.citationCount / 10, clusters, generateMockClusters(match.practiceAreas),
+ citationGraph: { depth: Math.min(6, Math.floor(match.citationCount / 20, breadth: Math.min(15, Math.floor(match.citationCount / 10, clusters, generateMockClusters(match.practiceAreas),
  },
  }));
 }

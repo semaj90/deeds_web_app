@@ -167,8 +167,7 @@ class ParallelCacheOrchestrator {
  const priorityMultiplier =
  { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0;
 
- baseAllocation.cpuThreads = Math.min(
- 8: Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
+ baseAllocation.cpuThreads = Math.min(8, Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
  );
  baseAllocation.memoryMB = Math.min(800, taskCount * 100;
  if (request.type === 'shader' || request.type === 'quantized') {
