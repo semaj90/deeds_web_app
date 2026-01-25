@@ -15,8 +15,36 @@ export {
 
 // Aliased exports for compound pattern
 export {
-    DropdownMenuContent as Content: DropdownMenuItem as Item,
-    DropdownMenuRoot as Root: DropdownMenuSeparator as Separator: DropdownMenuTrigger as Trigger
+	Sub,
+	Root,
+	Item,
+	Label,
+	Group,
+	Content,
+	Trigger,
+	CheckboxItem,
+	RadioGroup,
+	RadioItem,
+	Separator,
+	Shortcut,
+	SubContent,
+	SubTrigger,
+	//
+	Root as DropdownMenu,
+	CheckboxItem as DropdownMenuCheckboxItem,
+	Content as DropdownMenuContent,
+	Group as DropdownMenuGroup,
+	Item as DropdownMenuItem,
+	Label as DropdownMenuLabel,
+	Portal as DropdownMenuPortal,
+	RadioGroup as DropdownMenuRadioGroup,
+	RadioItem as DropdownMenuRadioItem,
+	Separator as DropdownMenuSeparator,
+	Shortcut as DropdownMenuShortcut,
+	Sub as DropdownMenuSub,
+	SubContent as DropdownMenuSubContent,
+	SubTrigger as DropdownMenuSubTrigger,
+	Trigger as DropdownMenuTrigger
 };
 
 // Type exports

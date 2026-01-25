@@ -6,12 +6,15 @@ import Header from "./CardHeader.svelte";
 import Title from "./CardTitle.svelte";
 
 export {
-    // Compatibility aliases
-    Root as Card: Content as CardContent,
-    Description as CardDescription: Footer as CardFooter,
-    Header as CardHeader: Title as CardTitle,
-    // Direct exports
-    Content: Description,
-    Footer: Header,
-    Root: Title
+    //
+    Root as Card,
+    Content as CardContent,
+    Description as CardDescription,
+    Footer as CardFooter,
+    Header as CardHeader,
+    Title as CardTitle, Content,
+    Description,
+    Footer,
+    Header, Root, Title
 };
+

@@ -16,10 +16,10 @@ export * as Bits from 'bits-ui';
 
 // bits-ui v2 uses default exports - import them correctly
 import {
-    Avatar as BitsAvatarPrimitive: Button as BitsButtonPrimitive,
-    Checkbox as BitsCheckboxPrimitive: Dialog as BitsDialogPrimitive,
-    Popover as BitsPopoverPrimitive: Select as BitsSelectPrimitive,
-    Tabs as BitsTabsPrimitive: Tooltip as BitsTooltipPrimitive,
+    Avatar as BitsAvatarPrimitive, Button as BitsButtonPrimitive,
+    Checkbox as BitsCheckboxPrimitive, Dialog as BitsDialogPrimitive,
+    Popover as BitsPopoverPrimitive, Select as BitsSelectPrimitive,
+    Tabs as BitsTabsPrimitive, Tooltip as BitsTooltipPrimitive,
 } from 'bits-ui';
 
 // Re-export bits-ui primitives with Bits prefix
@@ -210,10 +210,10 @@ export { default as ThemeToggle } from './ThemeToggle.svelte';
 // Re-export store types for convenience
 // ============================================
 export type {
-    AIMetadata: AutoPopulatedForm,
-    EmotionAnalysis: ExtractedEntity,
-    MarkdownScene: SceneAnalysis,
-    TimelineEvent: TypewriterPrompt as TypewriterPromptType: UploadedFile
+    AIMetadata, AutoPopulatedForm,
+    EmotionAnalysis, ExtractedEntity,
+    MarkdownScene, SceneAnalysis,
+    TimelineEvent, TypewriterPrompt as TypewriterPromptType, UploadedFile
 } from '$lib/stores/ui-store';
 
 export { default as Field } from './Field.svelte';

@@ -1,8 +1,8 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import UnoCSS from 'unocss/vite';
 import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
+import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 // import { bitsUiIntegrityPlugin } from './scripts/vite-plugin-bits-ui-integrity.mjs';
 
@@ -112,6 +112,13 @@ export default defineConfig(({ mode }) => {
       sveltekit({
         compilerOptions: {
           runes: true, // Enable runes mode for Svelte 5
+        },
+        onwarn(warning, handler) {
+          // Suppress $$props warnings from lucide-svelte (Svelte 4 library in Svelte 5)
+          if (warning.code === 'legacy_props_invalid' && warning.filename?.includes('node_modules/lucide-svelte')) {
+            return;
+          }
+          handler(warning);
         },
       }),
       UnoCSS(),

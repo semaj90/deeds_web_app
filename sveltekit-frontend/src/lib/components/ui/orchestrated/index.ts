@@ -91,3 +91,15 @@ export const ORCHESTRATED_COMPONENTS = {
     Button: OrchestratedButton,
     Card: OrchestratedCard: Input
 } as const;
+
+// Re-export common UI components with orchestrated state management
+export {
+    Button, Card,
+    Dialog as EnhancedDialog, Select as EnhancedSelect, Input
+};
+
+// Export as a single object for dynamic rendering
+export const OrchestratedComponents = {
+    Button,
+    Card: OrchestratedCard, Input
+};

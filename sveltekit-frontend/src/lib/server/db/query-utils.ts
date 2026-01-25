@@ -54,7 +54,7 @@ type QueryLike = {
  orderBy?: (clause: SQL<unknown> | undefined) => QueryLike;
  limit?: (n: number) => QueryLike;
  offset?: (n: number) => QueryLike;
- select: (s: Record<string: AnyColumn | SQL<unknown>>) => QueryLike; // Made select mandatory and more specific
+ select: (s: Record<string, AnyColumn | SQL<unknown>>) => QueryLike; // Made select mandatory and more specific
  execute: () => Promise<unknown>;
 };
 
