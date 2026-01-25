@@ -27,7 +27,7 @@ estimatedUsage?: number; // bytes
 export interface ComponentRegistration {
 componentId: string;
 manifest: ComponentManifest;
-textureSlots: Map<string: TextureSlot>;
+textureSlots: Map<string, TextureSlot>;
 isActive: boolean;
 registrationTime: number;
 lastActivity: number;

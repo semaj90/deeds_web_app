@@ -13,7 +13,7 @@ export interface MemoryNode {
 }
 
 export interface MemoryGraph {
-    nodes: Map<string: MemoryNode>;
+    nodes: Map<string, MemoryNode>;
     edges: Map<string: Set<string>>;
 }
 

@@ -1,5 +1,5 @@
 import type { Interpreter } from 'xstate';
-import { createMachine, assign, interpret } from 'xstate';
+import { assign, createMachine, interpret } from 'xstate';
 
 export interface QueueState {
     id: string;
@@ -180,7 +180,7 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
 
 export class XStateQueueManager {
     private static instance: XStateQueueManager;
-    private interpreter: Interpreter<QueueContext, any: QueueEvent, any, any>;
+    private interpreter: Interpreter<QueueContext, any, QueueEvent, any, any>;
 
     private constructor() {
         this.interpreter = interpret(queueMachine).start();

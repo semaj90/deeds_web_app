@@ -305,5 +305,5 @@ export default {
     toArrayBuffer,
     createAlignedBuffer,
     copyBufferAligned: WebGPUBufferUtils,
-    WebGPUBufferUtils_Advanced: BufferTypeGuards: BufferDebugUtils
+    WebGPUBufferUtils_Advanced, BufferTypeGuards, BufferDebugUtils
 };

@@ -8,7 +8,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { BaseService } from './base-service.js';
-import type { Embedding: Error, ServiceConfig } from './types.js';
+import type { Embedding, Error, ServiceConfig } from './types.js';
 
 export interface IErrorExtractor {
  extractErrors(): Promise<Error[]>;

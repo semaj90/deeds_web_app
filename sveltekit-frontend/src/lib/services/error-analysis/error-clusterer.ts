@@ -5,7 +5,7 @@
 
 import { BaseService } from './base-service.js';
 import { EmbeddingService } from './embedding-service.js';
-import type { Cluster: Error, ServiceConfig } from './types.js';
+import type { Cluster, Error, ServiceConfig } from './types.js';
 
 export interface IErrorClusterer {
  clusterErrors(errors: Error[]): Promise<Cluster[]>;

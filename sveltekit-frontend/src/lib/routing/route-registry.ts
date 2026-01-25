@@ -15,8 +15,8 @@ import { dynamicRouteGenerator } from './dynamic-route-generator.js';
  * Route Registry State interface
  */
 export interface RouteRegistryState {
-    routes: Map<string: RouteDefinition>;
-    dynamicRoutes: Map<string: GeneratedRoute>;
+    routes: Map<string, RouteDefinition>;
+    dynamicRoutes: Map<string, GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
     routeHistory: string[];
     favorites: Set<string>;

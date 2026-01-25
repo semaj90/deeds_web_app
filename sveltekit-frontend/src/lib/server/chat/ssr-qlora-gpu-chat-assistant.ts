@@ -120,7 +120,7 @@ export class SSRQLorAGPUChatAssistant {
 	private gpuCache: WebGPUSOMCache;
 	private userDictionaries: Map<string, UserDictionary>;
 	private ssrContextCache: Map<string, SSRChatContext>;
-	// private _activeConnections: Map<string: WebSocket>; // Commented out as unused based on linter
+	// private _activeConnections: Map<string, WebSocket>; // Commented out as unused based on linter
 
 	constructor() {
 		this.nesMemory = new NESMemoryArchitecture();

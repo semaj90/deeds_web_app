@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { simdMarkdownParser } from '$lib/utils/simd-markdown-parser';
-import type { MarkdownEvidenceInput: FactCluster, FactClaim } from '../types.js';
+import type { MarkdownEvidenceInput, FactCluster, FactClaim } from '../types.js';
 
 const GEMMA_ENDPOINT = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 

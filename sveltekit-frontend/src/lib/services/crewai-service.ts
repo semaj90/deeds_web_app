@@ -1,4 +1,4 @@
-import type { AIResponse: Case, Evidence } from '$lib/types';
+import type { AIResponse, Case, Evidence } from '$lib/types';
 import crypto from 'crypto';
 import { process } from "node:process";
 

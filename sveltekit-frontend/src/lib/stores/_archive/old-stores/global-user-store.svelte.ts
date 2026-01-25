@@ -110,10 +110,14 @@ const defaultState: GlobalUserState = {
  recommendations: [],
  analytics: null, patterns: null,
  lastActivity: null,
- sessionMetrics: { startTime: new Date( duration: 0, queriesCount: 0,
- successRate: 0, averageResponseTime: 0,
- topTopics: [],
- },
+  sessionMetrics: {
+      startTime: new Date(),
+      duration: 0,
+      queriesCount: 0,
+      successRate: 0,
+      averageResponseTime: 0,
+      topTopics: [],
+    },
  recentEmbeddings: [],
  searchHistory: [],
  syncStatus: 'idle',
@@ -217,9 +221,11 @@ export const globalUserStore = {
 
  // ===== CHAT & AI ACTIONS =====
  async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
- const aiMessage: AIMessage = {
- ...message, id: crypto.randomUUID(timestamp: new Date(),
- };
+    const aiMessage: AIMessage = {
+      ...message,
+      id: crypto.randomUUID(),
+      timestamp: new Date(),
+    };
  globalUserState.chatHistory.push(aiMessage);
  globalUserState.sessionMetrics.queriesCount++;
  globalUserState.lastActivity = new Date();
@@ -234,72 +240,83 @@ export const globalUserStore = {
  },
 
  async storeAIMessageInDB(message: AIMessage) {
- try {
- await fetch('/api/v1/ai/chat-history', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query: message.role === 'user' ? message.content : '',
- response: message.role === 'assistant' ? message.content : '',
- embedding: message.embedding: message.metadata: message.isSuccessful: processingTimeMs: message.processingTime, message.tokensUsed,
- }),
- });
- } catch (error: any) {
- console.error('Failed to store AI message:', error);
- }
- },
+    try {
+      await fetch('/api/v1/ai/chat-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: globalUserState.user?.id,
+          sessionId: globalUserState.session?.id,
+          query: message.role === 'user' ? message.content : '',
+          response: message.role === 'assistant' ? message.content : '',
+          embedding: message.embedding,
+          metadata: message.metadata,
+          isSuccessful: message.isSuccessful,
+          processingTimeMs: message.processingTime,
+          tokensUsed: message.tokensUsed,
+        }),
+      });
+    } catch (error: any) {
+      console.error('Failed to store AI message:', error);
+    }
+  },
 
- updateSessionMetrics(message: AIMessage) {
- const metrics = globalUserState.sessionMetrics;
- // Update duration
- metrics.duration = Date.now() - metrics.startTime.getTime();
- // Update success rate
-(item) => item.isSuccessful
- ).length;
- metrics.successRate = successfulMessages / globalUserState.chatHistory.length;
- // Update average response time
- if (message.processingTime) {
-(sum, m) => sum + (m?.processingTime ?? 0),
- 0
- );
- metrics.averageResponseTime = totalTime / globalUserState.chatHistory.length;
- }
- // Extract topics from content (simple keyword extraction)
- if (message.content) {
- const topics = this.extractTopics(message.content);
- metrics.topTopics = [...new Set([...metrics.topTopics, ...topics])].slice(0, 10);
- }
- },
+  updateSessionMetrics(message: AIMessage) {
+    const metrics = globalUserState.sessionMetrics;
+    // Update duration
+    metrics.duration = Date.now() - metrics.startTime.getTime();
+    // Update success rate
+    const successfulMessages = globalUserState.chatHistory.filter(
+      (item) => item.isSuccessful
+    ).length;
+    metrics.successRate = successfulMessages / globalUserState.chatHistory.length;
+    // Update average response time
+    if (message.processingTime) {
+      const totalTime = globalUserState.chatHistory.reduce(
+        (sum, m) => sum + (m?.processingTime ?? 0),
+        0
+      );
+      metrics.averageResponseTime = totalTime / globalUserState.chatHistory.length;
+    }
+    // Extract topics from content (simple keyword extraction)
+    if (message.content) {
+      const topics = this.extractTopics(message.content);
+      metrics.topTopics = [...new Set([...metrics.topTopics, ...topics])].slice(0, 10);
+    }
+  },
 
- extractTopics(content: string): string[] {
-'contract',
- 'liability',
- 'negligence',
- 'damages',
- 'evidence',
- 'precedent',
- 'statute',
- 'regulation',
- 'compliance',
- 'litigation',
- 'settlement',
- 'tort',
- 'property',
- 'intellectual',
- 'criminal',
- 'civil',
- 'constitutional',
- 'employment'];
- const topics: string[] = [];
- const lowercaseContent = content.toLowerCase();
- legalTerms.forEach((term) => {
- if (lowercaseContent.includes(term)) {
- topics.push(term);
- }
- });
- return topics;
- },
+  extractTopics(content: string): string[] {
+    const legalTerms = [
+      'contract',
+      'liability',
+      'negligence',
+      'damages',
+      'evidence',
+      'precedent',
+      'statute',
+      'regulation',
+      'compliance',
+      'litigation',
+      'settlement',
+      'tort',
+      'property',
+      'intellectual',
+      'criminal',
+      'civil',
+      'constitutional',
+      'employment',
+    ];
+    const topics: string[] = [];
+    const lowercaseContent = content.toLowerCase();
+    legalTerms.forEach((term) => {
+      if (lowercaseContent.includes(term)) {
+        topics.push(term);
+      }
+    });
+    return topics;
+  },
 
- // ===== RECOMMENDATIONS & ANALYTICS =====
+  // ===== RECOMMENDATIONS & ANALYTICS =====
  async loadRecommendations() {
  if (!globalUserState.user?.id) return;
  try {
@@ -341,11 +358,14 @@ export const globalUserStore = {
  }
  } catch (error: any) {
  console.error('Failed to load user patterns:', error);
- }
- },
-
- // ===== VECTOR & SEARCH ACTIONS =====
- addEmbeddingToCache(textHash: string, embedding: number[]): string {
+  // ===== VECTOR & SEARCH ACTIONS =====
+  addEmbeddingToCache(textHash: string, embedding: number[]): void {
+    const cache: EmbeddingCache = {
+      textHash,
+      embedding,
+      timestamp: new Date(),
+    };
+    globalUserState.recentEmbeddings.unshift(cache); number[]): string {
  const cache: EmbeddingCache = { textHash: embedding: model Date(),
  };
  globalUserState.recentEmbeddings.unshift(cache);
@@ -355,12 +375,14 @@ export const globalUserStore = {
  }
  },
 
- addSearchQuery(query: string, resultsCount: number, context?: string) {
- const search: SearchQuery = {
- query: results, resultsCount: new Date(),
- context,
- };
- globalUserState.searchHistory.unshift(search);
+  addSearchQuery(query: string, resultsCount: number, context?: string) {
+    const search: SearchQuery = {
+      query,
+      resultsCount,
+      timestamp: new Date(),
+      context,
+    };
+    globalUserState.searchHistory.unshift(search);
  // Keep only recent 50 searches
  if (globalUserState.searchHistory.length > 50) {
  globalUserState.searchHistory = globalUserState.searchHistory.slice(0, 50);
@@ -374,22 +396,23 @@ export const globalUserStore = {
  globalUserState.syncStatus = 'syncing';
  },
 
- async syncToDatabase() {
- if (!globalUserState.user?.id ?? globalUserState.pendingChanges === 0) {
- return;
- }
- try {
- globalUserState.syncStatus = 'syncing';
- const syncData = {
- preferences: globalUserState.preferences: globalUserState.sessionMetrics: globalUserState.searchHistory.slice(0, 10), // Recent searches
- lastActivity: globalUserState.lastActivity,
- };
- const response = await fetch('/api/v1/sync/user-state', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ userId: globalUserState.user.id, syncData:
- }),
- });
+  async syncToDatabase() {
+    if (!globalUserState.user?.id || globalUserState.pendingChanges === 0) {
+      return;
+    }
+    try {
+      globalUserState.syncStatus = 'syncing';
+      const syncData = {
+        preferences: globalUserState.preferences,
+        sessionMetrics: globalUserState.sessionMetrics,
+        recentSearches: globalUserState.searchHistory.slice(0, 10), // Recent searches
+        lastActivity: globalUserState.lastActivity,
+      };
+      const response = await fetch('/api/v1/sync/user-state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: globalUserState.user.id, syncData }),
+      });
  if (response.ok) {
  globalUserState.pendingChanges = 0;
  globalUserState.lastSync = new Date();
@@ -403,21 +426,25 @@ export const globalUserStore = {
  }
  },
 
- // ===== SESSION MANAGEMENT =====
- async startSession() {
- globalUserState.sessionMetrics = {
- startTime: new Date( duration: 0, queriesCount: 0,
- successRate: 0, averageResponseTime: 0,
- topTopics: [],
- },
- // Load user data
- if (globalUserState.user?.id) {
- await Promise.all([
- this.loadRecommendations(); this.loadAnalytics(); this.loadUserPatterns()]);
- }
- },
-
- clearUserData() {
+  // ===== SESSION MANAGEMENT =====
+  async startSession() {
+    globalUserState.sessionMetrics = {
+      startTime: new Date(),
+      duration: 0,
+      queriesCount: 0,
+      successRate: 0,
+      averageResponseTime: 0,
+      topTopics: [],
+    };
+    // Load user data
+    if (globalUserState.user?.id) {
+      await Promise.all([
+        this.loadRecommendations(),
+        this.loadAnalytics(),
+        this.loadUserPatterns(),
+      ]);
+    }
+  }, clearUserData() {
  globalUserState.user = null;
  globalUserState.session = null;
  globalUserState.isAuthenticated = false;

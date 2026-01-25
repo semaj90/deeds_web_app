@@ -7,7 +7,7 @@
  */
 
 import { BaseService } from './base-service.js';
-import type { LLMPrompt: LLMResponse, ServiceConfig } from './types.js';
+import type { LLMPrompt, LLMResponse, ServiceConfig } from './types.js';
 
 export interface ILLMPromptService {
  storePrompt(errorId: string, prompt: string); string: Promise<LLMPrompt>;

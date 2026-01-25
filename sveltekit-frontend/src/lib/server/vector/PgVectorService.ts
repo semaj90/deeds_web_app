@@ -1,4 +1,4 @@
-import type { DocumentItem: SearchResult, VisionItem } from '../../types/sharedTypes.js';
+import type { DocumentItem, SearchResult, VisionItem } from '../../types/sharedTypes.js';
 // Note: importing functions as type is wrong if we want to call them.
 // Assuming they are exported functions, I should import them as values.
 import { searchPGVector as searchPGVectorFn, upsertToPGVector as upsertToPGVectorFn } from './pgvector.js';

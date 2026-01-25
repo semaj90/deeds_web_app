@@ -54,7 +54,7 @@ export interface Report {
 interface ReportStoreState {
   // Report library
   reports: Report[];
-  reportsByType: Map<ReportType: Report[]>;
+  reportsByType: Map<ReportType, Report[]>;
   // Active report
   activeReportId: string | null;
   activeReport: Report | null;

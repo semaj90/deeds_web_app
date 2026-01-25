@@ -112,7 +112,7 @@ export interface NeuralSpriteLegalProcessing {
 }
 
 export interface IntegratedProcessingResult {
-	extractedData: Record<string: JsonValue>;
+	extractedData: Record<string, JsonValue>;
 	rlGuidance: RLGuidedExtraction;
 	neuralSprite: NeuralSpriteLegalProcessing;
 	qloraJobId?: string;

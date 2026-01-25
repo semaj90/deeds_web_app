@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms';
-	import { onMount } from 'svelte';
-	import type { ActionData: PageData } from './$types';
-
+  import { applyAction, enhance } from '$app/forms';
+  import { onMount } from 'svelte';
+  import type { ActionData, PageData } from './$types';
 	let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
 	let isDragging = $state(false);

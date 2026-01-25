@@ -48,10 +48,10 @@ interface EvidenceStoreState {
     uploadProgress: Map<string, number>;
     uploadingFiles: File[];
     isUploading: boolean;
-    analysisResults: Map<string: AnalysisResult>;
-    analysisStatus: Map<string: AnalysisStatus>;
+    analysisResults: Map<string, AnalysisResult>;
+    analysisStatus: Map<string, AnalysisStatus>;
     isAnalyzing: boolean;
-    chainOfCustody: Map<string: ChainOfCustodyEntry[]>;
+    chainOfCustody: Map<string, ChainOfCustodyEntry[]>;
     typeFilter: EvidenceType[];
     searchQuery: string;
     totalEvidence: number;

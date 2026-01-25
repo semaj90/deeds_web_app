@@ -1,4 +1,4 @@
-import type { ConversationTurn: HMMState, NextStepPrediction } from '$lib/types/sharedTypes';
+import type { ConversationTurn, HMMState, NextStepPrediction } from '$lib/types/sharedTypes';
 
 export enum LegalConversationState {
  GREETING = 0,

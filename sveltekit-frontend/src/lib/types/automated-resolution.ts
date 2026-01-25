@@ -6,7 +6,7 @@ export interface MissingImportAnalysis {
  errorsByCategory: Map<string, string[]>;
 }
 export interface BarrelStoreGeneration {
- packages: Map<string: PackageAnalysis>; implementations: Map<string, string>;
+ packages: Map<string, PackageAnalysis>; implementations: Map<string, string>;
  typeDefinitions: Map<string, string>;
  imports: Map<string, string[]>;
 }
@@ -16,7 +16,7 @@ export interface PackageAnalysis {
  version?: string;
 }
 export interface WebFetchResolution {
- implementations: Map<string: ImplementationResult>; documentation: Map<string: DocumentationResult>; examples: Map<string: ExampleResult>; fallbacks: Map<string: FallbackResult>;
+ implementations: Map<string, ImplementationResult>; documentation: Map<string, DocumentationResult>; examples: Map<string, ExampleResult>; fallbacks: Map<string, FallbackResult>;
 }
 export interface ImplementationResult {
  name: string; implementation: string;
@@ -138,7 +138,7 @@ export interface CodeSnippet {
 // Enhanced error analysis
 export interface EnhancedErrorAnalysis extends MissingImportAnalysis {
  errorClusters: ErrorCluster[]; priorityFiles: string[];
- resolutionStrategies: Map<string: ErrorResolutionStrategy>; dependencies: DependencyAnalysis;
+ resolutionStrategies: Map<string, ErrorResolutionStrategy>; dependencies: DependencyAnalysis;
 }
 export interface ErrorCluster {
  pattern: string; count: number;

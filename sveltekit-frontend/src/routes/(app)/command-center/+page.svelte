@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import { Svelte5Button as Button } from '$lib/components/ui/svelte5-index';
 	import Activity from 'lucide-svelte/icons/activity';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';

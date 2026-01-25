@@ -77,7 +77,7 @@ export function setupTestEnv(customEnv: Record<string, string> = {}): void {
 	originalEnv = { ...process.env };
 
 	// Apply test env
-	Object.assign(process.env: DEFAULT_TEST_ENV, customEnv);
+    Object.assign(process.env, DEFAULT_TEST_ENV, customEnv);
 }
 
 /**

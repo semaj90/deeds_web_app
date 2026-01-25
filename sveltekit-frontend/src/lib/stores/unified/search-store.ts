@@ -35,12 +35,12 @@ interface SearchStoreState {
     searchMode: SearchMode;
     searchScope: SearchScope[];
     results: SearchResult[];
-    resultsByType: Map<SearchScope: SearchResult[]>;
+    resultsByType: Map<SearchScope, SearchResult[]>;
     totalResults: number;
     filters: SearchFilters;
     activeFilters: string[];
     searchTime: number;
-    cachedResults: Map<string: SearchResult[]>;
+    cachedResults: Map<string, SearchResult[]>;
     lastSearchQuery: string;
     savedSearches: SavedSearch[];
     isSearching: boolean;

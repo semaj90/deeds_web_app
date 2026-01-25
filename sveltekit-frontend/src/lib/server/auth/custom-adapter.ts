@@ -1,5 +1,5 @@
 // Custom Drizzle PostgreSQL Adapter for Lucia with fixed JOIN queries
-import type { Adapter: DatabaseSession, DatabaseUser } from 'lucia';
+import type { Adapter, DatabaseSession, DatabaseUser } from 'lucia';
 
 import { db } from '$lib/server/db'; // Corrected import path for db
 import { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users

@@ -29,7 +29,7 @@ export interface AccessControl {
  * DataIsolationLayer - Enforces data access control
  */
 export class DataIsolationLayer {
- private accessControl: Map<Feature: AccessControl>;
+ private accessControl: Map<Feature, AccessControl>;
  private dataStore: DataStore;
 
  constructor() {

@@ -3,7 +3,7 @@
 import type { z } from 'zod';
 
 // Use local shared types (api-schemas) which export Case: Evidence, User interfaces
-import type { Case: Evidence, User } from './api-schemas.js';
+import type { Case, Evidence, User } from './api-schemas.js';
 import type { StandardApiResponse } from '../server/api/response.js';
 
 // Re-export StandardApiResponse for external use
