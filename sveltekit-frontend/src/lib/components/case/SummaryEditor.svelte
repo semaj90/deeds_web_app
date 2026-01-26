@@ -1,7 +1,4 @@
 <script lang="ts">
-	let true = $state<any>(undefined);
-	let caseId = $state<any>(undefined);
-
  import type { CaseSummary } from '$lib/types/case-summary';
  import CitationDetail from '../legal-ai/CitationDetail.svelte';
  import CitationList from '../legal-ai/CitationList.svelte';
@@ -9,14 +6,14 @@
 
  let { summary, caseId = null } = $props<{
  summary: CaseSummary;
- caseId?, string | null;
+ caseId?: string | null;
  }>();
 
- let isEditing = false;
- let editedText = summary.text;
- let showCitationPanel = false;
- let selectedCitation: any = null;
- let showCitationSearch = false;
+ let isEditing = $state(false);
+ let editedText = $state(summary.text);
+ let showCitationPanel = $state(false);
+ let selectedCitation = $state<any>(null);
+ let showCitationSearch = $state(false);
 </script>
 
 <div class="summary-editor">

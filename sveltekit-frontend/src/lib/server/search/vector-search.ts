@@ -1,11 +1,11 @@
 // Complete Vector Search Service - Production Ready
 // Combines PostgreSQL pgvector + Qdrant + Local caching + Loki.js + Fuse.js
 
-import { or, sql } from 'drizzle-orm';
-import { db, isPostgreSQL } from '../db/index';
+import { or, sql } from 'drizzle-orm/pg-core';
+import { isPostgreSQL } from '../db/client';
+import { db } from '../db/index';
 import { redisService } from '../redis-service.js';
 import type { ollamaService } from '../services/OllamaService';
-import type { VectorSearchOptions, VectorSearchResult } from './types.js'; // Assuming types defined elsewhere or local
 
 // Import dependencies with fallbacks
 let qdrant: any = null;
@@ -108,7 +108,7 @@ function adjustToDim(vec: number[], target = TARGET_DIM): number[] {
 export async function getQueryEmbeddingLegal(
     query: string
 ): Promise<number[] | null> {
-    const modelListEnv = process.env?.EMBED_MODEL_LIST || process.env?.EMBED_MODEL ?? "nomic-embed-text,all-minilm";
+    const modelListEnv = (process.env?.EMBED_MODEL_LIST || process.env?.EMBED_MODEL) ?? "nomic-embed-text,all-minilm";
     const candidates = modelListEnv
         .split(",")
         .map((s) => s.trim())
@@ -263,7 +263,7 @@ async function searchWithFuzzy(
                 results.push({
                     id: result.item.id,
                     title: result.item?.title ?? "",
-                    content: result.item?.description || result.item?.content ?? "",
+                    content: (result.item?.description || result.item?.content) ?? "",
                     score: 1 - (result.score ?? 0), // Convert Fuse score to similarity score
                     metadata: { type: "case", matches: result.matches },
                     source: "pgvector", // Keep consistent with other sources,
@@ -278,7 +278,7 @@ async function searchWithFuzzy(
                 results.push({
                     id: result.item.id,
                     title: result.item?.title ?? "",
-                    content: result.item?.description || result.item?.content ?? "",
+                    content: (result.item?.description || result.item?.content) ?? "",
                     score: 1 - (result.score ?? 0),
                     metadata: { type: "evidence", matches: result.matches },
                     source: "pgvector",
@@ -406,7 +406,7 @@ async function searchWithPgVector(
             results.push({
                 id: row.id,
                 title: row?.title ?? '',
-                content: row?.content || row?.description ?? '',
+                content: (row?.content || row?.description) ?? '',
                 score: typeof row.score === 'number' ? row.score : parseFloat(String(row.score ?? 0)),
                 metadata: { type: 'case' },
                 source: 'pgvector',

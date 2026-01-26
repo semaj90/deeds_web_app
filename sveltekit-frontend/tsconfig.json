@@ -15,7 +15,16 @@
       "svelte",
       "node",
       "@webgpu/types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "$lib": [
+        "src/lib"
+      ],
+      "$lib/*": [
+        "src/lib/*"
+      ]
+    }
   },
   "include": [
     "src/**/*",
@@ -235,6 +244,19 @@
     "src/lib/server/cases/**",
     "src/lib/server/database-pool-service.ts",
     "src/lib/server/queue/**",
-    "src/lib/server/search/**"
+    "src/lib/server/search/**",
+    "src/lib/server/messaging/**",
+    "src/lib/server/connections/**",
+    "src/lib/server/embedding/**",
+    "src/lib/server/integrations/**",
+    "src/lib/server/api/**",
+    "src/lib/rabbitmq/**",
+    "src/lib/testing/**",
+    "src/lib/server/ingest/**",
+    "src/lib/server/auth/**",
+    "src/lib/server/db/schema-phase90-hardened.ts",
+    "src/lib/server/db/utils.ts",
+    "src/lib/server/db/query-utils.ts",
+    "src/lib/server/embedding-cache-middleware.ts"
   ]
 }

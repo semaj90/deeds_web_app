@@ -3,7 +3,7 @@ import type {
     EmbeddingRepository, IngestionJobRequest,
     IngestionJobStatus, SimilarityQueryOptions
 } from '$lib/types/embedding';
-import { sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm/pg-core';
 import { db } from '../db/unified-client.js'; // Updated to use unified client
 import { embeddingCacheService } from '../embedding-cache-service.js';
 

@@ -206,15 +206,14 @@ export { default as DiffViewer } from './DiffViewer.svelte';
 // Theme toggle component (Task 13)
 export { default as ThemeToggle } from './ThemeToggle.svelte';
 
-// ============================================
 // Re-export store types for convenience
-// ============================================
-export type {
-    AIMetadata, AutoPopulatedForm,
-    EmotionAnalysis, ExtractedEntity,
-    MarkdownScene, SceneAnalysis,
-    TimelineEvent, TypewriterPrompt as TypewriterPromptType, UploadedFile
-} from '$lib/stores/ui-store';
+// NOTE: These types may not be exported from ui-store - commented until verified
+// export type {
+//     AIMetadata, AutoPopulatedForm,
+//     EmotionAnalysis, ExtractedEntity,
+//     MarkdownScene, SceneAnalysis,
+//     TimelineEvent, TypewriterPrompt as TypewriterPromptType, UploadedFile
+// } from '$lib/stores/ui-store';
 
 export { default as Field } from './Field.svelte';
 

@@ -99,14 +99,14 @@ export interface DialogFooterProps {
 	class?: string;
 }
 
-// Re-export for convenience
-export type {
-    DialogCloseProps as CloseProps, DialogContentProps as ContentProps,
-    DialogDescriptionProps as DescriptionProps, DialogFooterProps as FooterProps,
-    DialogHeaderProps as HeaderProps, DialogOverlayProps as OverlayProps,
-    DialogPortalProps as PortalProps, DialogRootProps as RootProps,
-    DialogTitleProps as TitleProps, DialogTriggerProps as TriggerProps
-} from 'bits-ui';
-
-
-
+// Re-export for convenience - using locally defined types
+export type { DialogCloseProps as CloseProps };
+export type { DialogContentProps as ContentProps };
+export type { DialogDescriptionProps as DescriptionProps };
+export type { DialogFooterProps as FooterProps };
+export type { DialogHeaderProps as HeaderProps };
+export type { DialogOverlayProps as OverlayProps };
+export type { DialogPortalProps as PortalProps };
+export type { DialogRootProps as RootProps };
+export type { DialogTitleProps as TitleProps };
+export type { DialogTriggerProps as TriggerProps };

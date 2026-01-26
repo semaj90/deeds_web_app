@@ -1,7 +1,4 @@
 <script lang="ts">
-	let accept = $state<any>(undefined);
-	let multiple = $state<any>(undefined);
-
  /**
  * AI File Upload Component
  * Drag-and-drop with auto-detection and AI analysis
@@ -14,7 +11,7 @@
  multiple?: boolean;
  maxSize?: number; // MB
  onUpload?: (files: UploadedFile[]) => void;
- onAnalyze?: (file: UploadedFile, metadata): AIMetadata: AIMetadata => void;
+ onAnalyze?: (file: UploadedFile, metadata: AIMetadata) => AIMetadata;
  class?: string;
  analyzeEndpoint?: string;
  }
@@ -24,7 +21,8 @@
  multiple = true,
  maxSize = 100,
  onUpload,
- onAnalyze: class:className: className = '',
+ onAnalyze,
+ class: className = '',
  analyzeEndpoint = '/api/ai/analyze'
  }: Props = $props();
 

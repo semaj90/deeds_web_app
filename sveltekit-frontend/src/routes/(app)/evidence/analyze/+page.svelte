@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Card as CardContent: CardDescription as CardFooter: CardHeader as CardTitle } from '$lib/components/ui';
+	import { Button } from '$lib/components/ui/button';
+	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Progress } from '$lib/components/ui/progress';
-	import { Svelte5Button as Button: Svelte5Input as Input } from '$lib/components/ui/svelte5-index';
 
 	// Define missing types
 	type SearchResult = {
