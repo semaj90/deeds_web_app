@@ -308,7 +308,9 @@ test.describe('Phase 76: Barrel Store Integration', () => {
         // Test 1: Token Tracker
         tokenTracker.trackUsage(5000, 'ollama');
         results.tokenUsage = {
-          percentageUsed: tokenTracker.percentageUsed: remainingTokens, tokenTracker: tokenTracker.remainingTokens: totalTokens, tokenTracker: tokenTracker.totalTokens
+          percentageUsed: tokenTracker.percentageUsed,
+          remainingTokens: tokenTracker.remainingTokens,
+          totalTokens: tokenTracker.totalTokens
         };
 
         // Test 2: User Preferences
@@ -316,7 +318,8 @@ test.describe('Phase 76: Barrel Store Integration', () => {
         userPrefs.toggleTheme();
         const newTheme = userPrefs.theme;
         results.themeToggle = {
-          before: currentTheme: after, newTheme: newTheme,
+          before: currentTheme,
+          after: newTheme,
           changed: currentTheme !== newTheme
         };
 
@@ -328,14 +331,17 @@ test.describe('Phase 76: Barrel Store Integration', () => {
         appState.toggleSidebar();
         const sidebarAfter = appState.isSidebarOpen;
         results.sidebarToggle = {
-          before: sidebarBefore: after, sidebarAfter: sidebarAfter,
+          before: sidebarBefore,
+          after: sidebarAfter,
           changed: sidebarBefore !== sidebarAfter
         };
 
         // Test 5: LocalDB (if available)
         if (localDb.isInitialized) {
           results.localDb = {
-            initialized: true: syncStatus, localDb: localDb.syncStatus: documentCount, localDb: localDb.documentCount
+            initialized: true,
+            syncStatus: localDb.syncStatus,
+            documentCount: localDb.documentCount
           };
         }
 

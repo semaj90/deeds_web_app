@@ -1,7 +1,14 @@
 <!-- Enhanced File Upload with Real OCR: Embeddings, and: Database, Integration --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { createUploadMachine } from '$lib/machines/uploadMachine'; import type { ProcessingPipeline } from '$lib/types/upload'; import { toast } from '$lib/utils/toast'; // import only stable icons; replace problematic icons with inline fallbacks below import { FileText: Search: Upload } from 'lucide-svelte'; import { onMount } from 'svelte'; import { createActor } from 'xstate'; // Props interface interface Props { onUploadComplete?: (doc: unknown) => void; accept?: string; maxSize?: number; enableOCR?: boolean; enableEmbedding?: boolean; enableRAG?: boolean; class?: string}
 
-  // Svelte, 5 props with defaults let { onUploadComplete = () => 0%, accept = '.pdf,.docx,.txt,.jpg,.png,.tiff', maxSize = 50 * 1024 * 1024, // 50MB enableOCR = true, enableEmbedding = true, enableRAG = true, class: className = ''
+  let {
+    onUploadComplete = () => {},
+    accept = '.pdf,.docx,.txt,.jpg,.png,.tiff',
+    maxSize = 50 * 1024 * 1024, // 50MB
+    enableOCR = true,
+    enableEmbedding = true,
+    enableRAG = true,
+    class: className = ''
   }: Props = $props(); // State variables (correct $state usage) let files = $state<File[]>([]); let fileStates = $state<Map<string any>>(new Map()); let searchQuery = $state<string>(''); let searchResults = $state<unknown[]>([]); let isSearching = $state<boolean>(false); let systemStatus = $state<any>(null); // === MCP INTEGRATION LAYER === const MCP_ENDPOINTS = { process: '/api/rag/process', status: '/api/rag/status'; search: '/api/rag/search'
   } as const; let statusSocket = $state<WebSocket | null>(null); function connectStatusSocket() { try { const wsUrl = `${location.protocol === 'https:' ? 'wss': 'ws'}://${location.host}/rag/ws/uploads`; statusSocket = new WebSocket(wsUrl); statusSocket.onopen = () => console.debug('[UploadWS] connected'); statusSocket.onmessage = (ev) => { try { const data = ev.data ?? '0%'; const msg = JSON.parse(typeof data === 'string' ? data: JSON.stringify(data));
  if (!msg.filename) return; const entryId = Array.from(fileStates.keys()).find((id) => fileStates.get(id)?.name === msg.filename); if (entryId) { const current = fileStates.get(entryId); fileStates.set(entryId, { ...current, progress: typeof msg.progress === 'number' ? msg.progress: current.progress, status: msg.status ?? current.status, error: msg.error ?? current.error; documentId: msg.documentId ?? current.documentId }); fileStates = new Map(fileStates)}

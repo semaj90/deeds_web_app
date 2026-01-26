@@ -1,6 +1,16 @@
 <!-- Enhanced Claude Inline Suggestion Loop Real-time AI-powered editing with mini text box, suggestions --> <script lang="ts"> import { onDestroy, tick } from 'svelte';
- import { interpret, type Snapshot, type Interpreter } from 'xstate'; // switched to interpret + Interpreter import { aiProcessingMachine } from '$lib/machines/ai-processing-machine'; // Adjusted path import { createAITask } from '$lib/utils/ai-task-helpers'; // Adjusted path import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store'; // Adjusted path import { debounce } from 'lodash-es'; // Ensure lodash-es and @types/lodash-es are installed import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // Import the new helper // Props using Svelte, 5 $props() let { value = $bindable(''), placeholder = 'Start typing to get AI suggestions...', aiModel = 'gemma3-legal', enableAutoComplete = true, enableGrammarCheck = true, enableSemanticSuggestions = true, minCharactersForSuggestion = 10, suggestionDelay = 800, maxSuggestions = 3, class: className = ''
-  }: { value?: string; placeholder?: string; aiModel?: string; enableAutoComplete?: boolean; enableGrammarCheck?: boolean; enableSemanticSuggestions?: boolean; minCharactersForSuggestion?: number; suggestionDelay?: number; maxSuggestions?: number; class?: string} = $props(); // AI suggestion types interface AISuggestion { id: string, type: 'completion' | 'grammar' | 'semantic' | 'legal_term',text: string, replacement?: string,confidence: number; reasoning: string, range?: { start: number; end: number }}
+ import { interpret, type Snapshot, type Interpreter } from 'xstate'; // switched to interpret + Interpreter import { aiProcessingMachine } from '$lib/machines/ai-processing-machine'; // Adjusted path import { createAITask } from '$lib/utils/ai-task-helpers'; // Adjusted path import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store'; // Adjusted path import { debounce } from 'lodash-es'; // Ensure lodash-es and @types/lodash-es are installed import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // Import the new helper // Props using Svelte, 5 $props()  let {
+    value = $bindable(''),
+    placeholder = 'Start typing to get AI suggestions...',
+    aiModel = 'gemma3-legal',
+    enableAutoComplete = true,
+    enableGrammarCheck = true,
+    enableSemanticSuggestions = true,
+    minCharactersForSuggestion = 10,
+    suggestionDelay = 800,
+    maxSuggestions = 3,
+    class: className = ''
+  } = $props(); // AI suggestion types interface AISuggestion { id: string, type: 'completion' | 'grammar' | 'semantic' | 'legal_term',text: string, replacement?: string,confidence: number; reasoning: string, range?: { start: number; end: number }}
 
   // State management using Svelte, 5 runes let editorElement: HTMLDivElement;
  let suggestionPopup: HTMLDivElement | undefined = undefined; // Declared with $state let isShowingSuggestions = $state<boolean>(false);
@@ -18,24 +28,28 @@
         }); aiActor.send({ type: 'START_PROCESSING'; task: completionTask });
    const result = await waitForAIResult(completionTask.id); if (result?.success && result.result?.completions) { suggestions.push( ...result.result.completions.map((completion: string, index: number) => ({ // Fixed: type annotation, id: `completion_${ index }`, type: 'completion' as const text: completion, confidence: 0.8; reasoning: 'AI-generated text completion'
             })) )}
-      } catch (error) { console.error('Auto-completion error:', error)}'
+      } catch (error) { console.error('Auto-completion error:', error)}
+'
     }
 
    // 2. Grammar and style suggestions if (enableGrammarCheck) { try { const grammarTask = createAITask('grammar', 'analysis', { prompt: `Analyze this text for grammar, style, and legal writing improvements: "${context.text}"`
             Focus on - Grammar errors - Legal writing style - Clarity improvements - Professional tone Return JSON with specific suggestions and replacements.`, model: aiModel, // Assuming Ollama API path for analysis is: '/api/generate'`; apiUrl: getOllamaApiUrl('/api/generate'), // Wired Ollama endpoint format: 'json'
         }); aiActor.send({ type: 'START_PROCESSING'; task: grammarTask });
    const result = await waitForAIResult(grammarTask.id); if (result?.success && result.result?.suggestions) { suggestions.push( ...result.result.suggestions.map((suggestion: unknown, index: number) => ({ // Fixed: type annotation, id: `grammar_${ index }`, type: 'grammar' as const text: suggestion.text, replacement: suggestion.replacement, confidence: suggestion.confidence || 0.7, reasoning: suggestion.reasoning || 'Grammar/style improvement'; range: suggestion.range })) )}
-      } catch (error) { console.error('Grammar check error:', error)}'
+      } catch (error) { console.error('Grammar check error:', error)}
+'
     }
 
    // 3. Semantic and legal term suggestions if (enableSemanticSuggestions) { try { const semanticTask = createAITask(
           'embed',
           'embedding', {
-            text: context.contextBefore, model: 'nomic-embed-text', // Assuming Ollama API path for embeddings is: '/api/embeddings'; apiUrl: getOllamaApiUrl('/api/embeddings'), // Wired Ollama endpoint },
+            text: context.contextBefore, model: 'nomic-embed-text', // Assuming Ollama API path for embeddings is: '/api/embeddings'
+; apiUrl: getOllamaApiUrl('/api/embeddings'), // Wired Ollama endpoint },
           'medium'
         ); aiActor.send({ type: 'START_PROCESSING'; task: semanticTask });
    const embeddingResult = await waitForAIResult(semanticTask.id); if (embeddingResult?.success) { // Use RAG to find related legal terms and concepts const ragResults = await enhancedRAGStore.search(context.contextBefore, { limit: 5, useEnhancedMode: true; filters: { confidenceThreshold: 0.7 } }); if (ragResults.results?.length > 0) { suggestions.push( ...ragResults.results.map((result: unknown, index: number) => ({ id: `semantic_${ index }`, type: 'legal_term' as const text: result.summary || (result.content ? result.content.slice(0, 100): ''): result.confidence ?? 0.75, reasoning: `Related legal; concept: ${result.metadata?.type ?? 'case law'}` })) )}
-        } } catch (error) { console.error('Semantic suggestions error:', error)}'
+        } } catch (error) { console.error('Semantic suggestions error:', error)}
+'
     } return suggestions}
 
   // Wait for AI task completion â€” make subscription safe for timeout function waitForAIResult(taskId: string): Promise<any> { return new Promise((resolve, reject) => { let subscription: ReturnType<typeof aiActor.subscribe> | null = null;

@@ -48,10 +48,21 @@ class ErrorParser:
     """Parse svelte-check / tsc output"""
 
     # Event Log format: <epoch_ms> ERROR "<filePath>" <line>:<col> "<message>"
-    # Example: 1767398430921 ERROR "src\lib\file.ts" 100:3 "',' expected."
+    # Example: 1767398430921 ERROR "src\lib\ClientEmbeddingGemma.ts" 100:3 "',' expected."
     EVENT_ERR = re.compile(
         r'^(?P<ts>\d+)\s+ERROR\s+"(?P<file>[^"]+)"\s+(?P<line>\d+):(?P<col>\d+)\s+"(?P<msg>.*)"\s*$',
         re.MULTILINE
+    )
+
+    # Legacy svelte-check format (fallback)
+    # src/lib/file.ts:10:5 error: message
+    LEGACY_ERR = re.compile(
+        r'^(?P<file>.+):(?P<line>\d+):(?P<col>\d+)\s+\w+:\s+(?P<msg>.*)$'
+    )
+
+    # TSC format: file.ts(line,col): error TSxxxx: message
+    TSC_ERR = re.compile(
+        r'^(?P<file>[^(]+)\((?P<line>\d+),(?P<col>\d+)\):\s+error\s+(?P<msg>.*)$'
     )
 
     def parse(self, check_output: str) -> List[ErrorSignature]:
@@ -64,6 +75,7 @@ class ErrorParser:
             if not line:
                 continue
 
+            # Try timestamped event format first
             match = self.EVENT_ERR.match(line)
             if match:
                 file_path = match.group("file").replace("\\\\", "\\")
@@ -72,16 +84,47 @@ class ErrorParser:
                 message = match.group("msg")
 
                 # Extract TS code if present in message, or normalize message
-                error_code = "UNKNOWN"
-                ts_match = re.search(r'TS(\d+)', message)
-                if ts_match:
-                    error_code = f"TS{ts_match.group(1)}"
-                elif "expected" in message:
-                    error_code = "SYNTAX"
-                elif "Cannot find name" in message:
-                    error_code = "TS2304"
-                elif "Cannot find module" in message:
-                    error_code = "TS2307"
+                error_code = self._extract_error_code(message)
+
+                errors.append(ErrorSignature(
+                    file_path=file_path,
+                    line=line_num,
+                    col=col_num,
+                    error_code=error_code,
+                    message=message,
+                    severity="error"
+                ))
+                continue
+
+            # 2. Try TSC format (file(line,col): error ...)
+            match_tsc = self.TSC_ERR.match(line)
+            if match_tsc:
+                file_path = match_tsc.group("file").replace("\\\\", "\\").strip()
+                line_num = int(match_tsc.group("line"))
+                col_num = int(match_tsc.group("col"))
+                message = match_tsc.group("msg")
+
+                error_code = self._extract_error_code(message)
+
+                errors.append(ErrorSignature(
+                    file_path=file_path,
+                    line=line_num,
+                    col=col_num,
+                    error_code=error_code,
+                    message=message,
+                    severity="error"
+                ))
+                continue
+
+            # 3. Try legacy format fallback
+            match_legacy = self.LEGACY_ERR.match(line)
+            if match_legacy:
+                file_path = match_legacy.group("file").replace("\\\\", "\\").strip()
+                line_num = int(match_legacy.group("line"))
+                col_num = int(match_legacy.group("col"))
+                message = match_legacy.group("msg")
+
+                error_code = self._extract_error_code(message)
 
                 errors.append(ErrorSignature(
                     file_path=file_path,
@@ -92,8 +135,42 @@ class ErrorParser:
                     severity="error"
                 ))
 
-        print(f"   ℹ️  Parsed {len(errors)} errors using EVENT_ERR regex")
+        print(f"   ℹ️  Parsed {len(errors)} errors using regex matchers")
         return errors
+
+    def _extract_error_code(self, message: str) -> str:
+        """Helper to extract or normalize error code from message"""
+        if not message:
+            return "UNKNOWN"
+
+        # 1. Extract TS code if present (e.g., TS2305)
+        ts_match = re.search(r'(TS\d+)', message)
+        if ts_match:
+            return ts_match.group(1)
+
+        # 2. Signature Normalization for common syntax errors
+        if "expected" in message or "Unexpected" in message:
+            if "','" in message: return "SYNTAX_COMMA_EXPECTED"
+            if "';'" in message: return "SYNTAX_SEMICOLON_EXPECTED"
+            if "'}'" in message: return "SYNTAX_BRACE_EXPECTED"
+            return "SYNTAX_ERROR"
+
+        if "Cannot redeclare block-scoped variable" in message:
+            return "REDECLARE_BLOCK_SCOPED"
+
+        if "Cannot find name" in message:
+            return "CANNOT_FIND_NAME"
+
+        if "Cannot find module" in message:
+            return "CANNOT_FIND_MODULE"
+
+        if "is not assignable to" in message:
+            return "TYPE_MISMATCH"
+
+        if "Property" in message and "does not exist on type" in message:
+            return "PROPERTY_MISSING"
+
+        return "UNKNOWN"
 
 class EmbeddingService:
     """embeddinggemma for error embeddings"""

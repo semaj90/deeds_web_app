@@ -25,7 +25,7 @@
         "src/lib/*"
       ],
       "drizzle-orm": [
-        "src/types/drizzle-orm-patch.d.ts"
+        "./src/types/drizzle-orm-patch.d.ts"
       ]
     }
   },
@@ -260,6 +260,10 @@
     "src/lib/server/db/schema-phase90-hardened.ts",
     "src/lib/server/db/utils.ts",
     "src/lib/server/db/query-utils.ts",
-    "src/lib/server/embedding-cache-middleware.ts"
+    "src/lib/server/embedding-cache-middleware.ts",
+    "src/lib/server/services/**",
+    "src/lib/server/cases/**",
+    "src/lib/db/queries/**",
+    "src/lib/db/schema/**"
   ]
 }

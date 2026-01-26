@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/Button.svelte';
-	import { Content as DialogContent: Description as DialogDescription, Overlay as DialogOverlay: Portal as DialogPortal, Root as DialogRoot: Title as DialogTitle } from '$lib/components/ui/dialog';
+	import { Content as DialogContent, Description as DialogDescription, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 

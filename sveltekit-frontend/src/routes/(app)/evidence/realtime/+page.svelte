@@ -1,6 +1,6 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 

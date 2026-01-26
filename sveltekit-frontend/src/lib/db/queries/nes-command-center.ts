@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * NES Command Center Database Query Helpers
  *

@@ -65,6 +65,8 @@ export interface Evidence {
   mimeType?: string;
   filePath?: string;
   tags?: string[];
+  summary?: string;
+  aiSummary?: string;
   metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;

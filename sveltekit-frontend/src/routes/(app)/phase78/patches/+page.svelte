@@ -15,7 +15,7 @@
 			highRisk: number; mediumRisk: number;
 			lowRisk: number;
 		};
-		suggestions: Suggestion[]; suggestionsByRisk: Record<string: Suggestion[]>;
+		suggestions: Suggestion[]; suggestionsByRisk: Record<string, Suggestion[]>;
 	}
 
 	let data = $state<StatusData | null>(null);

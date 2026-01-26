@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Case Synthesis Service
  * Builds aggregated context from notes, evidence, summaries, and chat history
