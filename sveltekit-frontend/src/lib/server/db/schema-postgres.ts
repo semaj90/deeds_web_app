@@ -501,7 +501,7 @@ export const userAiQueries = pgTable('user_ai_queries',
  .default(sql`gen_random_uuid()`)
  .primaryKey()
  .notNull(),
- userId: integer('user_id').notNull(),
+ userId: uuid('user_id').notNull(),
  caseId: uuid('case_id'),
  query: text('query').notNull(),
  response: text('response').notNull(),

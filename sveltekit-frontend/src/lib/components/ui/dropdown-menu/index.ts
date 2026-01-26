@@ -8,36 +8,20 @@ import DropdownMenuTrigger from './DropdownMenuTrigger.svelte';
 
 // Named exports
 export {
-    DropdownMenu, DropdownMenuContent,
-    DropdownMenuItem, DropdownMenuRoot,
-    DropdownMenuSeparator, DropdownMenuTrigger
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuRoot,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
 };
 
-// Aliased exports for compound pattern
-    export {
-        CheckboxItem, Content,
-        //
-        Root as DropdownMenu,
-        CheckboxItem as DropdownMenuCheckboxItem,
-        Content as DropdownMenuContent,
-        Group as DropdownMenuGroup,
-        Item as DropdownMenuItem,
-        Label as DropdownMenuLabel,
-        Portal as DropdownMenuPortal,
-        RadioGroup as DropdownMenuRadioGroup,
-        RadioItem as DropdownMenuRadioItem,
-        Separator as DropdownMenuSeparator,
-        Shortcut as DropdownMenuShortcut,
-        Sub as DropdownMenuSub,
-        SubContent as DropdownMenuSubContent,
-        SubTrigger as DropdownMenuSubTrigger,
-        Trigger as DropdownMenuTrigger, Group, Item,
-        Label, RadioGroup,
-        RadioItem, Root, Separator,
-        Shortcut, Sub, SubContent,
-        SubTrigger, Trigger
-    };
+// Aliased exports for compound component pattern
+export const Root = DropdownMenuRoot;
+export const Content = DropdownMenuContent;
+export const Item = DropdownMenuItem;
+export const Separator = DropdownMenuSeparator;
+export const Trigger = DropdownMenuTrigger;
 
 // Type exports
-    export type * from './types';
-
+export type * from './types';

@@ -65,7 +65,7 @@ class LokiCache {
 		// Create new collection
 		const collection = this.db.addCollection<CachedDocument>(name, {
 			unique: ['id'],
-			indices: ['expiresAt', ...(options.indices || [])],
+			indices: ['expiresAt' as keyof CachedDocument, ...(options.indices || [])] as (keyof CachedDocument)[],
 			disableMeta: false
 		});
 
@@ -321,6 +321,9 @@ class LokiCache {
 
 // Singleton instance with reactive state
 export const lokiCache = new LokiCache();
+
+// Export class for testing
+export { LokiCache };
 
 /**
  * Composable for LokiJS operations with reactive state

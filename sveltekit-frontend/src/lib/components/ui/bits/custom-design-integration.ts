@@ -365,12 +365,5 @@ export function createThemeContext(initialSystem: DesignSystem = NESDesignSystem
     };
 }
 
-// Re-export specific bits-ui components used in custom designs
-export {
-    // Add other components as needed
-    Button,
-    Card, CardContent, CardHeader,
-    CardTitle, Dialog, DropdownContent, DropdownItem, DropdownRoot, DropdownSeparator, DropdownTrigger, Input, Label,
-    Select, Separator, Textarea
-};
-
+// Note: Components like Button, Card, Dialog, etc. should be imported
+// from their respective modules if needed for re-export

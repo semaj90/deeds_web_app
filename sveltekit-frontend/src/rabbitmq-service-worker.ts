@@ -103,7 +103,8 @@ export class RabbitMQServiceWorker {
             return;
         }
         try {
-            if (!rabbitmqService || !rabbitmqService.connected) {
+            // Check if RabbitMQ is connected
+            if (!rabbitmqService || !(rabbitmqService as any).connected) {
                 // If service exists but logic says not connected, check if it truly is.
                 // Assuming rabbitmqService is the singleton instance.
                 // Could actully attempt to connect if possible, but here we just check.

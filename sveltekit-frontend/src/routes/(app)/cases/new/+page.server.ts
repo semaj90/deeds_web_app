@@ -2,7 +2,6 @@ import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema-postgres';
 import { fail, redirect } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -52,12 +51,11 @@ export const actions = {
 			const newCase = await db
 				.insert(cases)
 				.values({
-					id: nanoid(),
 					title: title.trim(),
 					description: narrative.trim(),
 					priority: priority as any,
 					userId: locals.user.id,
-					// status: 'active', // Field missing in schema
+					status: 'open',
 					createdAt: new Date().toISOString(),
 					updatedAt: new Date().toISOString()
 				})

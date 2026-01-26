@@ -10,10 +10,13 @@ import HeadlessDialog from '$lib/headless/HeadlessDialog.svelte';
 import LoadingButton from '$lib/headless/LoadingButton.svelte';
 
 // Enhanced-Bits Legal AI components
-import {
-    Button, Card,
-    Dialog as EnhancedDialog, Select as EnhancedSelect, Input
-} from '$lib/components/ui/enhanced-bits';
+import { Dialog } from '$lib/components/ui/dialog';
+import { Button, Card } from '$lib/components/ui/enhanced-bits';
+import { Input } from '$lib/components/ui/input';
+import { Select } from '$lib/components/ui/select';
+
+const EnhancedDialog = Dialog;
+const EnhancedSelect = Select;
 
 // Legal AI specific components
 export interface LegalEvidenceItem {

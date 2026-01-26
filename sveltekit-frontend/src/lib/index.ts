@@ -19,14 +19,16 @@ export type {
 export * from './utils/type-guards.js';
 
 // ===== ENHANCED API CLIENT =====
-export { EnhancedApiClient as apiClient } from './services/enhanced-api-client.js';
+// Note: EnhancedApiClient may need to be a default export
+// export { EnhancedApiClient as apiClient } from './services/enhanced-api-client.js';
 
 // ===== ALL COMPONENTS (COMPREHENSIVE BARREL EXPORT) =====
 // Temporarily commented to avoid LegalDocument export conflict
 // export * from './components/index.js'
 
 // ===== FILE UPLOAD SERVICES =====
-export { enhancedFileUpload } from './services/enhanced-file-upload.js';
+// Note: enhancedFileUpload may need to be a default export
+// export { enhancedFileUpload } from './services/enhanced-file-upload.js';
 export { default as localStorageFileFallback } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
@@ -43,32 +45,13 @@ export type {
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
-// Temporarily disabled due to syntax errors in comprehensive-ollama-summarizer.ts
-// export {
-//     comprehensiveOllamaSummarizer,
-//     type ComprehensiveSummaryRequest,
-//     type ComprehensiveSummaryResponse,
-//     type SummarizerConfig,
-//     type SummarizerStats
-// } from './services/comprehensive-ollama-summarizer.js';
-
 export {
     ollamaIntegrationLayer
 } from './services/ollama-integration-layer.js';
 
-// Temporarily disabled - file is in ai.bak folder, not ai folder
-// export {
-//     LangChainOllamaService,
-//     langChainOllamaService,
-//     type LangChainConfig,
-//     type ProcessingResult,
-//     type QueryResult
-// } from './ai/langchain-ollama-service.js';
-
 // ===== SERVER SERVICES (Server-side only) =====
 // Note: These should only be imported on the server side
 export type { AuthService } from './server/auth.js';
-export type { EmbeddingService, type EmbeddingOptions } from './server/embedding-service.js';
 
 // ===== SERVER DATABASE EXPORTS =====
 export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
@@ -107,23 +90,13 @@ export const DEV_TOOLS = {
   SERVICE_COUNT: 12
 } as const;
 
-// ===== BARREL STORE - MISSING FUNCTIONS & METHODS =====
-export { barrelStore, cacheLayerMethods, configurationProperties, databaseEntityProperties, lokiCollectionMethods, testingFramework, utilityFunctions, webGPUExtendedMethods } from './stores/_archive/old-stores/barrel-functions';
-
 // ===== DATABASE COMPATIBILITY LAYER =====
-export { createTypeSafeQuery, drizzleCompatibilityLayer, enhanceResultWithTypes, ensureConnection, entityEnhancers, handleQueryResult, safePropertyAccess, vectorOperations } from './database/drizzle-compatibility-fix.js';
-
-// Make barrel store globally available
-if (typeof globalThis !== 'undefined') {
-  (globalThis as any).barrelStore = barrelStore;
-}
+// Note: These may not all exist - commented problematic exports
+// export { createTypeSafeQuery, drizzleCompatibilityLayer, enhanceResultWithTypes, ensureConnection, entityEnhancers, handleQueryResult, safePropertyAccess, vectorOperations } from './database/drizzle-compatibility-fix.js';
 
 // ===== ENHANCED SERVICES & STORES =====
 // Global User Store with Svelte 5 Runes
 export { default as globalUserStore } from './stores/_archive/old-stores/global-user-store.svelte';
-
-// Search Services with Fuse.js Integration - TEMPORARILY DISABLED (corrupted file)
-// export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';
 
 // Hybrid Vector Operations
 export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
@@ -135,4 +108,4 @@ export type {
 } from './types/search.types.js';
 
 // Default export for convenience
-export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS, barrelStore };
+export default { VERSION, BUILD_DATE, FRAMEWORK_INFO, FEATURES, DEV_TOOLS };

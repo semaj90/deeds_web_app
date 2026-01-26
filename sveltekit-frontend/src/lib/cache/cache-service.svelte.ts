@@ -227,6 +227,9 @@ class UnifiedCacheService {
 // Singleton instance with reactive state
 export const cache = new UnifiedCacheService();
 
+// Export class for testing
+export { UnifiedCacheService };
+
 /**
  * Svelte 5 composable for cache operations
  */

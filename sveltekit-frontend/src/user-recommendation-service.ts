@@ -3,8 +3,8 @@
  * Predictive Analytics & Self-Prompting AI Chat History
  */
 import { db } from '$lib/server/db';
-import { userAiQueries, ragMessages, ragSessions } from '$lib/server/db/schema';
-import { eq, and, sql, count, desc } from 'drizzle-orm';
+import { ragMessages, ragSessions, userAiQueries } from '$lib/server/db/schema';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 // User behavior pattern interfaces
 export interface UserPattern {
@@ -102,14 +102,12 @@ export class UserRecommendationService {
                     db.insert(ragMessages).values({
                         sessionId: params.sessionId,
                         role: 'user',
-                        content: params.query,
-                        messageIndex: messageCount
+                        content: params.query
                     }),
                     db.insert(ragMessages).values({
                         sessionId: params.sessionId,
                         role: 'assistant',
-                        content: params.response,
-                        messageIndex: messageCount + 1
+                        content: params.response
                     })
                 ]);
             }

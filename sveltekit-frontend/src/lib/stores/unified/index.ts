@@ -7,10 +7,17 @@ export { notificationStore as alerts, notificationStore as notifications, notifi
 export { poiStore as poi, poiStore } from './poi-store';
 export { reportStore as report, reportStore } from './report-store';
 export { searchStore as search, searchStore } from './search-store';
-export { userStore as avatarStore, currentUser, isAuthenticated, userStore as user, userStore as userData, userError, userLoading, userStore } from './user-store';
-export { userStore as avatarStore, currentUser, isAuthenticated, userStore as user, userStore as userData, userError, userLoading, userStore } from './user-store';
+export {
+    userStore as avatarStore,
+    currentUser,
+    isAuthenticated,
+    userStore as user,
+    userStore as userData,
+    userError,
+    userLoading,
+    userStore
+} from './user-store';
 
-import { writable } from 'svelte/store';
 import { writable } from 'svelte/store';
 
 export interface QueuedTask {

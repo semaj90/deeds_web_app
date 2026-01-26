@@ -10,33 +10,16 @@ export { default as DrawerOverlay } from './DrawerOverlay.svelte';
 export { default as DrawerRoot } from './DrawerRoot.svelte';
 export { default as DrawerTitle } from './DrawerTitle.svelte';
 
-export {
-    Close,
-    Content,
-    Description,
-    //
-    Root as Drawer,
-    Close as DrawerClose,
-    Content as DrawerContent,
-    Description as DrawerDescription,
-    Footer as DrawerFooter,
-    Header as DrawerHeader, NestedRoot as DrawerNestedRoot, Overlay as DrawerOverlay,
-    Portal as DrawerPortal,
-    Title as DrawerTitle,
-    Trigger as DrawerTrigger, Footer,
-    Header, NestedRoot, Overlay,
-    Portal, Root, Title,
-    Trigger
-};
-
 // Types
-    export type {
-        DrawerCloseProps, DrawerContentProps,
-        DrawerContext, DrawerDescriptionProps,
-        DrawerFooterProps, DrawerHeaderProps,
-        DrawerOverlayProps, DrawerRootProps,
-        DrawerTitleProps, DrawerTriggerProps
-    } from './types';
-
-
-
+export type {
+    DrawerCloseProps,
+    DrawerContentProps,
+    DrawerContext,
+    DrawerDescriptionProps,
+    DrawerFooterProps,
+    DrawerHeaderProps,
+    DrawerOverlayProps,
+    DrawerRootProps,
+    DrawerTitleProps,
+    DrawerTriggerProps
+} from './types';

@@ -172,6 +172,9 @@ class IndexedDBCache {
 // Singleton instance with reactive state
 export const indexedDBCache = new IndexedDBCache();
 
+// Export class for testing
+export { IndexedDBCache as IndexedDBCacheService };
+
 /**
  * Composable for cache operations with reactive state
  */

@@ -29,6 +29,7 @@ interface QdrantSearchHit<T> {
 }
 
 interface ConversationPayload {
+    [key: string]: unknown;
     sessionId?: string;
     turnIndex?: number;
     userMessage?: string;
@@ -41,6 +42,7 @@ interface ConversationPayload {
 }
 
 interface EntityPayload {
+    [key: string]: unknown;
     sessionId?: string;
     entityType?: string;
     entityValue?: string;
@@ -51,6 +53,7 @@ interface EntityPayload {
 }
 
 interface SummaryPayload {
+    [key: string]: unknown;
     sessionId?: string;
     summary?: string;
     turnCount?: number;

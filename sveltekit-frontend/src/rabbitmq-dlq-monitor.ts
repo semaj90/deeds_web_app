@@ -4,6 +4,7 @@
  */
 
 import type { DocumentProcessingJob } from '$lib/server/messaging/rabbitmq-service';
+import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
 
 interface RetryAttempt {
     attemptNumber: number;
@@ -67,7 +68,7 @@ export class DLQMonitor {
             this.isMonitoring = true;
             console.log('🔍 DLQ Monitor started');
 
-            await rabbitMQService.consume(
+            await rabbitmqService.consume(
                 'deadLetter',
                 async (msg: DLQMessage, ack: () => void, nack: (requeue: boolean) => void) => {
                     this.stats.processed++;
@@ -182,7 +183,7 @@ export class DLQMonitor {
             };
 
             // Republish to original queue
-            const published = await rabbitMQService.publishDocumentProcessingJob(originalJob);
+            const published = await rabbitmqService.publishDocumentProcessingJob(originalJob);
             return published;
         } catch (error) {
             console.error(`Failed to retry job ${job.documentId}:`, error);

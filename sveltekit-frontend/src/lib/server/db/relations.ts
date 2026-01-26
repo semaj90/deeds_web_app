@@ -1,5 +1,5 @@
-import type { relations } from 'drizzle-orm/relations';
-import type { cases, citations, sessions, users } from './schema-postgres.ts';
+import { relations } from 'drizzle-orm/relations';
+import { cases, citations, sessions, users } from './schema-postgres.js';
 
 export const citationsRelations = relations(citations, ({ one }) => ({
  case: one(cases, { fields: [citations.caseId], references: [cases.id] }),
