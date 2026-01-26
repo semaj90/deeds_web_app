@@ -12,7 +12,7 @@ import {
     varchar
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';
-import type { cases, evidence, legalDocuments, users } from './schema-postgres.ts';
+import { cases, evidence, legalDocuments, users } from './schema-postgres.js';
 
 // Evidence Chain of Custody
 export const evidenceChainOfCustody = pgTable('evidence_chain_of_custody', {

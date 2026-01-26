@@ -1,4 +1,4 @@
-import type { OllamaService } from '$lib/server/ollama';
+import { OllamaService } from '$lib/server/ollama';
 
 export class EmbeddingService {
  async createEmbedding(text: string) {

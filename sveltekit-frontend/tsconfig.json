@@ -223,6 +223,11 @@
     "src/lib/server/db/schema-production-pipeline.ts",
     "src/lib/server/db/schemas/cases-schema.ts",
     "src/lib/server/services/langextract-service.ts",
-    "src/lib/server/services/**"
-  ]
-}
+    "src/lib/server/services/**",
+    "src/lib/server/db/drizzle-vector-config.ts",
+    "src/lib/server/minio/client.ts",
+    "src/lib/server/trt-llm.ts",
+    "src/user-recommendation-service.ts",
+    "src/useRedisOrchestrator.ts",
+    "src/webgpu-langchain-bridge.ts",
+    "sr

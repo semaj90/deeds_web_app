@@ -2,6 +2,7 @@
 	import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
 	import { Database, Zap, Trash2, Download, Upload, Activity } from 'lucide-svelte';
 
 	const cache = useCache();
@@ -251,4 +252,9 @@
 			</div>
 		</CardContent>
 	</Card>
+
+	<!-- Cache Monitor -->
+	<div class="col-span-full">
+		<CacheMonitor />
+	</div>
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { CacheInvalidation } from '$lib/cache/cache-invalidation';
 
 	interface UploadProgress {
 		fileName: string; progress: number;
@@ -117,11 +118,14 @@
 				}
 			});
 
-			xhr.addEventListener('load', () => {
+			xhr.addEventListener('load', async () => {
 				if (xhr.status === 200) {
 					uploads[index].status = 'completed';
 					uploads[index].progress = 100;
 					uploads = [...uploads];
+
+					// Invalidate evidence caches when upload succeeds
+					await CacheInvalidation.invalidateEvidence(caseId);
 				} else {
 					uploads[index].status = 'error';
 					uploads[index].error = `Upload failed: ${xhr.statusText}`;
