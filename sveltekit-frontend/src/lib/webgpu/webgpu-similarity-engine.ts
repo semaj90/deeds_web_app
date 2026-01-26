@@ -35,7 +35,7 @@ export class WebGPUSimilarityEngine {
  throw new Error('WebGPU not supported');
  }
 
- const adapter = await navigator.gpu.requestAdapter();
+ const adapter = await (navigator.gpu as GPU).requestAdapter();
  if (!adapter) {
  throw new Error('No WebGPU adapter found');
  }
@@ -271,7 +271,7 @@ export class WebGPUSimilarityEngine {
  static async isSupported(): Promise<boolean> {
  try {
  if (!navigator.gpu) return false;
- const adapter = await navigator.gpu.requestAdapter();
+ const adapter = await (navigator.gpu as GPU).requestAdapter();
  return adapter !== null;
  } catch {
  return false;
@@ -283,7 +283,7 @@ export class WebGPUSimilarityEngine {
  */
  static async getAdapterInfo(): Promise<GPUAdapterInfo | null> {
  try {
- const adapter = await navigator.gpu.requestAdapter();
+ const adapter = await (navigator.gpu as GPU).requestAdapter();
  return adapter?.info ?? null;
  } catch {
  return null;

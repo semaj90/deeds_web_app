@@ -97,7 +97,7 @@ export async function checkIntegrationStatus(): Promise<IntegrationStatus> {
     if (navigator.gpu) {
       status.webgpu.available = true;
       try {
-        const adapter = await navigator.gpu.requestAdapter();
+        const adapter = await (navigator.gpu as GPU).requestAdapter();
         status.webgpu.dawnBackend = !!adapter;
       } catch (e) {
         console.warn('WebGPU adapter request failed:', e);
