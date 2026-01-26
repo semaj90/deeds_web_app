@@ -5,7 +5,6 @@
     "target": "es2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
     "skipLibCheck": true,
     "strict": false,
@@ -230,4 +229,12 @@
     "src/user-recommendation-service.ts",
     "src/useRedisOrchestrator.ts",
     "src/webgpu-langchain-bridge.ts",
-    "sr
+    "src/lib/server/db/phase90-helpers.ts",
+    "src/lib/server/statute-enrichment.ts",
+    "src/lib/server/db/qdrant-sync.ts",
+    "src/lib/server/cases/**",
+    "src/lib/server/database-pool-service.ts",
+    "src/lib/server/queue/**",
+    "src/lib/server/search/**"
+  ]
+}
