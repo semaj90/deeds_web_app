@@ -25,7 +25,7 @@
  },
  metadata,
  onSubmit,
- onFieldChange: class, className: className = '',
+ onFieldChange, class: className = '',
  editable = true
  }: Props = $props();
 

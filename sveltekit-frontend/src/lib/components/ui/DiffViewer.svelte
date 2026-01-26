@@ -26,11 +26,11 @@
  modified = '',
  language = 'typescript',
  onApply,
- onReject: class:className: className = ''
+ onReject, class: className = ''
  }: Props = $props();
 
  // Simple diff algorithm
- function computeDiff(orig: string, mod): string: DiffLine[] {
+ function computeDiff(orig: string, mod: string): DiffLine[] {
  const origLines = orig.split('\n');
  const modLines = mod.split('\n');
  const diff: DiffLine[] = [];

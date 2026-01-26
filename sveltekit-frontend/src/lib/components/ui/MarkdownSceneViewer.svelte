@@ -19,7 +19,7 @@
  scene,
  onValidate,
  onEdit,
- onReject: class, className: className = '',
+ onReject, class: className = '',
  editable = false
  }: Props = $props();
 
