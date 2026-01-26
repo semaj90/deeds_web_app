@@ -1,17 +1,38 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+  import { cn } from "$lib";
+  import { Button } from "bits-ui";
+  import type { Snippet } from "svelte";
+  import { buttonVariants, type ButtonVariantProps } from "../button-variants";
+
+  interface Props {
+    variant?: ButtonVariantProps["variant"];
+    size?: ButtonVariantProps["size"];
+    class?: string;
+    type?: "button" | "submit" | "reset";
+    onclick?: (event: MouseEvent) => void;
+    disabled?: boolean;
+    children?: Snippet;
+    [key: string]: any; // Allow other HTML button attributes
+  }
+
+  let {
+    children,
+    class: className,
+    variant = "default",
+    size = "default",
+    type = "button",
+    ...rest
+  }: Props = $props();
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
-
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
-</style>
+<Button.Root
+  class={cn(buttonVariants({ variant, size }), className)}
+  {type}
+  {...rest}
+>
+  {#if children}
+    {@render children()}
+  {/if}
+</Button.Root>
 
 

@@ -8,7 +8,7 @@
  * @module db/queries/nes-command-center
  */
 
-import { and, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { getDb } from '../pool.js';
 import {
     errorBrainAnalysis,
@@ -39,7 +39,7 @@ export async function getRouteMetadata(routeId: string) {
     .where(
       and(
         eq(routeMetadata.routeId, routeId),
-        isNull(routeMetadata.archivedAt)
+        sql`${routeMetadata.archivedAt} IS NULL`
       )
     )
     .limit(1);
@@ -55,7 +55,7 @@ export async function getAllRouteMetadata() {
   return await db
     .select()
     .from(routeMetadata)
-    .where(isNull(routeMetadata.archivedAt))
+    .where(sql`${routeMetadata.archivedAt} IS NULL`)
     .orderBy(routeMetadata.path);
 }
 
@@ -127,7 +127,7 @@ export async function getErrorClusterCount(routeId: string): Promise<number> {
   const db = getDb();
   const result = await db.select({ count: sql<number>`count(*)` })
     .from(errorCluster)
-    .where(and(eq(errorCluster.routeId, routeId), isNull(errorCluster.archivedAt)));
+    .where(and(eq(errorCluster.routeId, routeId), sql`${errorCluster.archivedAt} IS NULL`));
 
   return Number(result[0]?.count ?? 0);
 }
@@ -150,13 +150,13 @@ export async function getErrorClusters(
   const db = getDb();
   const { resolved, limit = 50, offset = 0 } = options;
 
-  const conditions = [eq(errorCluster.routeId, routeId), isNull(errorCluster.archivedAt)];
+  const conditions = [eq(errorCluster.routeId, routeId), sql`${errorCluster.archivedAt} IS NULL`];
 
   if (resolved !== undefined) {
     if (resolved) {
       conditions.push(sql`${errorCluster.resolvedAt} IS NOT NULL`);
     } else {
-      conditions.push(isNull(errorCluster.resolvedAt));
+      conditions.push(sql`${errorCluster.resolvedAt} IS NULL`);
     }
   }
 
@@ -220,8 +220,8 @@ export async function getUnresolvedErrorCount(routeId: string): Promise<number> 
     .where(
       and(
         eq(errorCluster.routeId, routeId),
-        isNull(errorCluster.resolvedAt),
-        isNull(errorCluster.archivedAt)
+        sql`${errorCluster.resolvedAt} IS NULL`,
+        sql`${errorCluster.archivedAt} IS NULL`
       )
     );
 
@@ -238,8 +238,8 @@ export async function getLastError(routeId: string) {
     .where(
       and(
         eq(errorCluster.routeId, routeId),
-        isNull(errorCluster.resolvedAt),
-        isNull(errorCluster.archivedAt)
+        sql`${errorCluster.resolvedAt} IS NULL`,
+        sql`${errorCluster.archivedAt} IS NULL`
       )
     )
     .orderBy(desc(errorCluster.createdAt))

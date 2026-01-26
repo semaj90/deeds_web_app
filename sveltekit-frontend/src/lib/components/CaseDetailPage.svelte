@@ -17,15 +17,15 @@
  id: string; caseId: string;
  text: string; holding: string;
  citations: Array<{ code: string;
- title: string; jurisdiction, string;
+ title: string; jurisdiction: string;
  }>;
  version: number; createdAt: string;
  updatedAt: string;
  }
 
- let caseId: string = $state();
- let caseDetail: CaseDetail | null = $state(null);
- let summary: Summary | null = $state(null);
+ let caseId = $state<string>('');
+ let caseDetail = $state<CaseDetail | null>(null);
+ let summary = $state<Summary | null>(null);
  let isGenerating = $state(false);
  let isLoading = $state(true);
  let error: string | null = $state(null);

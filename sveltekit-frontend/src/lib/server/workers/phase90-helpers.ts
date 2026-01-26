@@ -6,7 +6,7 @@
  */
 
 import { createHash } from 'crypto';
-import { and, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from './schema-phase90-hardened.js';
 
@@ -222,7 +222,7 @@ export async function getChunksPendingEmbedding(
     .where(
       and(
         eq(schema.documentChunks.isActive, true),
-        isNull(schema.documentChunks.embedding)
+        sql`${schema.documentChunks.embedding} IS NULL`
       )
     )
     .limit(limit);
@@ -246,9 +246,9 @@ export async function getChunksPendingQdrantSync(
     .where(
       and(
         eq(schema.documentChunks.isActive, true),
-        isNotNull(schema.documentChunks.embedding),
+        sql`${schema.documentChunks.embedding} IS NOT NULL`,
         // Either never synced OR embedding updated after last sync
-        isNull(schema.documentChunks.qdrantSyncedAt)
+        sql`${schema.documentChunks.qdrantSyncedAt} IS NULL`
       )
     )
     .limit(limit);
@@ -381,7 +381,7 @@ export async function getActiveCases(
       and(
         eq(schema.cases.userId, userId),
         eq(schema.cases.isActive, true),
-        isNull(schema.cases.deletedAt)
+        sql`${schema.cases.deletedAt} IS NULL`
       )
     );
 }
@@ -400,7 +400,7 @@ export async function getActiveEvidence(
       and(
         eq(schema.evidence.caseId, caseId),
         eq(schema.evidence.isActive, true),
-        isNull(schema.evidence.deletedAt)
+        sql`${schema.evidence.deletedAt} IS NULL`
       )
     );
 }

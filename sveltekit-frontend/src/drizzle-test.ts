@@ -8,8 +8,6 @@ import {
     gt,
     ilike,
     inArray,
-    isNotNull,
-    isNull,
     like,
     ne,
     not,
@@ -35,8 +33,8 @@ const c3 = gt(users.age, 18);
 const c4 = and(c1, c2);
 const c5 = or(c1, c2);
 const c6 = not(c1);
-const c7 = isNull(users.name);
-const c8 = isNotNull(users.name);
+const c7 = sql`${users.name} IS NULL`;
+const c8 = sql`${users.name} IS NOT NULL`;
 const c9 = like(users.name, '%foo%');
 const c10 = ilike(users.name, '%foo%');
 const c11 = inArray(users.id, [1, 2, 3]);

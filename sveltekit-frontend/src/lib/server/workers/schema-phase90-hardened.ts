@@ -8,7 +8,7 @@
  * 4. All vectors tracked for sync state
  */
 
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { boolean, index, integer, pgTable, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
 
 /**
@@ -58,7 +58,7 @@ export const documentChunks = pgTable('document_chunks', {
   activeChunksIdx: index('document_chunks_active_idx').on(table.isActive, table.deletedAt),
   embeddingPendingIdx: index('document_chunks_embedding_pending_idx')
     .on(table.embedding, table.isActive)
-    .where(and(isNull(table.embedding), eq(table.isActive, true))),
+    .where(and(sql`${table.embedding} IS NULL`, eq(table.isActive, true))),
   qdrantSyncPendingIdx: index('document_chunks_qdrant_pending_idx')
     .on(table.qdrantSyncedAt, table.embeddingUpdatedAt, table.isActive),
   contentHashIdx: index('document_chunks_content_hash_idx').on(table.contentHash),
@@ -106,7 +106,7 @@ export const legalDocuments = pgTable('legal_documents', {
   activeDocsIdx: index('legal_documents_active_idx').on(table.isActive, table.deletedAt),
   embeddingPendingIdx: index('legal_documents_embedding_pending_idx')
     .on(table.embedding, table.isActive)
-    .where(and(isNull(table.embedding), eq(table.isActive, true))),
+    .where(and(sql`${table.embedding} IS NULL`, eq(table.isActive, true))),
   qdrantSyncPendingIdx: index('legal_documents_qdrant_pending_idx')
     .on(table.qdrantSyncedAt, table.embeddingUpdatedAt),
 }));
@@ -175,7 +175,7 @@ export const evidence = pgTable('evidence', {
   caseIdIdx: index('evidence_case_id_idx').on(table.caseId),
   embeddingPendingIdx: index('evidence_embedding_pending_idx')
     .on(table.embedding, table.isActive)
-    .where(and(isNull(table.embedding), eq(table.isActive, true))),
+    .where(and(sql`${table.embedding} IS NULL`, eq(table.isActive, true))),
   qdrantSyncPendingIdx: index('evidence_qdrant_pending_idx')
     .on(table.qdrantSyncedAt, table.embeddingUpdatedAt),
 }));

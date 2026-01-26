@@ -25,6 +25,10 @@ The application is now in a stable enough state to run the dev server, with the 
 - Updated `tsconfig.json` to exclude deeply corrupted/experimental directories that are not needed for the core application.
 - Consolidated duplicate logic in `src/lib/server/services`.
 
+### 5. Root Directory Cleanup
+- **Quarantined**: Moved 15 suspicious root-level service files (e.g., `src/ai-service.ts`, `src/legal-ai-worker.ts`) to `src/_quarantine/duplicates`.
+- **Impact**: Removes "ghost errors" caused by duplicate file compilation contexts.
+
 ## 🚧 Remaining Issues (The Last ~440 Errors)
 
 The remaining errors fall into specific categories that can be addressed incrementally:
