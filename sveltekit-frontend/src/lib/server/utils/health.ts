@@ -1,4 +1,4 @@
-import type { db } from '$lib/server/db/client.js';
+import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 
 export async function getDatabaseHealth() {

@@ -397,7 +397,8 @@
 <style>
   .topology-explorer {
     display: flex;
-    flex-direction: column; height: 100vh;
+    flex-direction: column;
+    height: 100vh;
     background: var(--bg-primary, #0f0f0f);
     color: var(--text-primary, #e5e5e5);
     font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;

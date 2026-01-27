@@ -107,7 +107,6 @@
     "rag:docs": "start http://localhost:8000/docs",
     "services:check": "curl http://localhost:6333/health && curl http://localhost:11434/api/tags",
     "setup:all": "npm run knowledge:setup && npm run index:codebase && npm run index:errors",
-
     "phase82:svelte5-codemod": "node scripts/phase82-svelte-runes-codemod.mjs",
     "phase89:cluster": "pwsh -Command \"$env:PHASE72_PYTHON='C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\python.exe'; & $env:PHASE72_PYTHON scripts/phase89-gpu-streaming-cluster.py --batch-size 5000\"",
     "phase89:copilot": "node scripts/phase89-copilot-integrator.mjs",

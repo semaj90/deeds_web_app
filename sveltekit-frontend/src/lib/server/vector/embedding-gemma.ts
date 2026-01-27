@@ -43,10 +43,10 @@ export async function* streamEmbedding(docId: string, text: string): AsyncGenera
  yield `[quant] quantizing → Uint8`;
  const quant: QuantizedEmbedding = quantizeFloat32ToUint8(float32);
 
- yield `[cache] storing R3 (float32 + uint8 + scale)`;
- await redisR3.storeEmbedding(docId, float32, quant);
+	yield `[cache] storing R3 (float32 + uint8 + scale)`;
+	await redisR3.storeEmbedding(docId, { float32, quant });
 
- yield `[done] embedding complete`;
+	yield `[done] embedding complete`;
 }
 
 export async function getCachedEmbedding(docId: string): Promise<EmbeddingResult | null> {
