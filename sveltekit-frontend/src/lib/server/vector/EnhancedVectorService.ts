@@ -177,7 +177,7 @@ export class EnhancedVectorService {
 		const combined = new Map<string, CombinedSearchResult>();
 
 		vectorResults.forEach(r => {
-			const payload: QdrantPayload = r?.payload || {};
+			const payload: QdrantPayload = (r?.payload || { content: '' }) as QdrantPayload;
 			const title = typeof payload['title'] === 'string' ? payload['title'] : 'Untitled Document';
 			const type = typeof payload['type'] === 'string' ? payload['type'] : 'document';
 			const content = typeof payload['content'] === 'string' ? payload['content'] : String(payload['content'] ?? '');

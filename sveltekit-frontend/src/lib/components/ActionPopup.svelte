@@ -1,12 +1,17 @@
-<script lang="ts">let { pendingFile } = $props();
+<script lang="ts">
+ let {
+ pendingFile,
+ onSelect,
+ onClose
+ } = $props<{
+ pendingFile?: { name: string; [key: string]: any };
+ onSelect?: (event: { file: any; action: string }) => void;
+ onClose?: () => void;
+ }>();
 
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
-
-
- function choose(action) {
- dispatch('select', { file: pendingFile, action });
- dispatch('close');
+ function choose(action: string) {
+ onSelect?.({ file: pendingFile, action });
+ onClose?.();
  }
 </script>
 

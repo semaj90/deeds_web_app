@@ -9,23 +9,27 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
 	let domain = $state<any>(undefined);
 
- import { createEventDispatcher } from 'svelte';
-
- let { isOpen = false, sourceUrl = '', domain = '' } = $props<{
+ let {
+ isOpen = false,
+ sourceUrl = '',
+ domain = '',
+ onAcknowledge,
+ onCancel
+ } = $props<{
  isOpen?: boolean;
  sourceUrl?: string;
- domain?, string;
+ domain?: string;
+ onAcknowledge?: () => void;
+ onCancel?: () => void;
  }>();
 
- const dispatch = createEventDispatcher();
-
  function handleAcknowledge() {
- dispatch('acknowledge');
+ onAcknowledge?.();
  isOpen = false;
  }
 
  function handleCancel() {
- dispatch('cancel');
+ onCancel?.();
  isOpen = false;
  }
 </script>

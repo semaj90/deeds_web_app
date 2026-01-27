@@ -43,6 +43,13 @@
       "when": 1768536520418,
       "tag": "0005_dapper_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1769476283769,
+      "tag": "0006_sleepy_young_avengers",
+      "breakpoints": true
     }
   ]
 }

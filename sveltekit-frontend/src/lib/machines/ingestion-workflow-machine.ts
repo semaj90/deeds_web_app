@@ -3,10 +3,10 @@
  * Orchestrates document processing: upload -> chunk -> embed -> store -> cache
  * Integrates with RabbitMQ: LokiJS, and Drizzle ORM
  */
-import { setup, assign, fromPromise } from 'xstate';
-import { getEmbedding } from '$lib/server/embedding-gateway.js';
-import type { EmbeddingResult } from '$lib/server/embedding-gateway.js';
 import { cache } from '$lib/server/cache/redis.js';
+import type { EmbeddingResult } from '$lib/server/embedding-gateway.js';
+import { getEmbedding } from '$lib/server/embedding-gateway.js';
+import { assign, fromPromise, setup } from 'xstate';
 
 export interface DocumentChunk {
 	id: string;
@@ -314,8 +314,8 @@ export const ingestionWorkflowMachine = setup({
 			const { job } = input;
 			try {
 				// Dynamic import to avoid build issues if rabbitmq isn't strictly available in all envs
-				const { publishMessage } = await import('$lib/server/rabbitmq.js');
-				await publishMessage('ingestion.jobs', { ...job, queuedAt: new Date().toISOString() });
+				const { publishToQueue } = await import('$lib/server/rabbitmq.js');
+				await publishToQueue('ingestion.jobs', { ...job, queuedAt: new Date().toISOString() });
 				console.log(`📨 Published job ${job.id} to RabbitMQ`);
 				return { backend: 'rabbitmq', jobId: job.id };
 			} catch (error) {

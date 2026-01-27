@@ -20,6 +20,7 @@ async function ensureSimd(): Promise<typeof simdParser> {
     try {
         if (typeof window === 'undefined') {
             try {
+                // @ts-ignore - Optional dependency
                 const mod = await import('simdjson');
                 const parser = (mod as any).default || mod;
                 if (parser?.parse) {

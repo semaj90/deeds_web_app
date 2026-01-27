@@ -14,7 +14,7 @@ export interface ShaderProgram {
     name?: string;
     program: WebGLProgram;
     attributes: Map<string, number>;
-    uniforms: Map<string: WebGLUniformLocation | null>;
+    uniforms: Map<string, WebGLUniformLocation | null>;
     vertexSource?: string;
     fragmentSource?: string;
     compilationTime: number;

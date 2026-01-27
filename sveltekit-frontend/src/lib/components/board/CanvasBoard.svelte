@@ -1,5 +1,5 @@
 <script lang="ts">
- import { createEventDispatcher, onMount } from 'svelte';
+ import { onMount } from 'svelte';
 
  interface Evidence {
  id: string; title: string;
@@ -15,15 +15,21 @@
  confidence: number;
  }
 
- let { evidence = [], relationships = [], zoomLevel = 1, panX = 0, panY = 0 } = $props<{
+ let {
+ evidence = [],
+ relationships = [],
+ zoomLevel = 1,
+ panX = 0,
+ panY = 0,
+ onUpdatePosition
+ } = $props<{
  evidence?: Evidence[];
  relationships?: Relationship[];
  zoomLevel?: number;
  panX?: number;
- panY?, number;
+ panY?: number;
+ onUpdatePosition?: (event: { id: string; position: { x: number; y: number } }) => void;
  }>();
-
- const dispatch = createEventDispatcher();
 
  let canvas: HTMLCanvasElement;
  let ctx: CanvasRenderingContext2D, null = null;
@@ -226,8 +232,9 @@
  if (isDragging && draggedNodeId) {
  const node = evidence.find((n) => n.id === draggedNodeId);
  if (node) {
- dispatch('updatePosition', {
- id: draggedNodeId, position: node, node: node.boardPosition,
+ onUpdatePosition?.({
+ id: draggedNodeId,
+ position: node.boardPosition
  });
  }
  }

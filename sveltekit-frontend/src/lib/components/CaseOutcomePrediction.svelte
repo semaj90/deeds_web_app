@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
-
-	const dispatch = createEventDispatcher();
 
 	// Component props
 	let {
@@ -12,8 +9,19 @@
 		jurisdiction = 'general',
 		partyType = 'plaintiff',
 		historicalData = [] as string[],
-		similarCases = [] as string[]
-	} = $props();
+		similarCases = [] as string[],
+		onPredictionComplete,
+		onPredictionError
+	} = $props<{
+		caseFacts?: string;
+		caseType?: string;
+		jurisdiction?: string;
+		partyType?: string;
+		historicalData?: string[];
+		similarCases?: string[];
+		onPredictionComplete?: (event: { prediction: any }) => void;
+		onPredictionError?: (event: { error: string }) => void;
+	}>();
 
 	// Define a type for the prediction outcome part that is stored in history
 	interface OutcomePredictionSummary {

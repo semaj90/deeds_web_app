@@ -151,6 +151,7 @@ async function generateOllamaEmbedding(text: string, model: string): Promise<num
 // CPU embedding using xenova transformers (optional)
 async function generateCpuEmbedding(text: string): Promise<number[]> {
     try {
+        // @ts-ignore - Optional dependency
         const mod = await import('@xenova/transformers');
         const pipeline = (mod as any).pipeline ?? (mod as any).default?.pipeline;
         if (!pipeline) throw new Error('xenova pipeline unavailable');

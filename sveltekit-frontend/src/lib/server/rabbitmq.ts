@@ -181,6 +181,6 @@ export const rabbitmqService = {
   publishToQueue,
   consumeFromQueue,
   healthCheck,
-  closeRabbitMQ: QUEUES
+  closeRabbitMQ
 };
 
