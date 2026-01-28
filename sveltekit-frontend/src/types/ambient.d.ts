@@ -40,52 +40,54 @@ declare module 'fabric' {
 
 /** Redis client surface used across the codebase (trimmed) */
 declare interface SimpleRedis {
-	connect(...args: any[]): Promise<unknown>;
-	disconnect(...args: any[]): Promise<unknown>;
-	ping(...args: any[]): Promise<unknown>;
-	quit(...args: any[]): Promise<unknown>;
-	xAdd(...args: any[]): Promise<unknown>;
-	xadd(...args: any[]): Promise<unknown>;
-	keys(...args: any[]): Promise<string[]>;
-	info(...args: any[]): Promise<unknown>;
-	status?: unknown;
-	isOpen?: boolean;
-	dbsize(...args: any[]): Promise<number>;
-	get(...args: any[]): Promise<unknown>;
-	set(...args: any[]): Promise<unknown>;
-	/** Set key with expiry (seconds) */
-	setex(key: string, seconds: number, value: string): Promise<unknown>;
-	/** Push value(s) to list (left) */
-	lpush(key: string, ...values: unknown[]): Promise<number | unknown>;
-	/** Range query for list */
-	lrange(key: string, start: number, stop: number): Promise<unknown[]>;
-	del(...args: unknown[]): Promise<unknown>;
-	/** Set key expiry in seconds */
-	expire(key: string, seconds: number): Promise<number | unknown>;
-	publish(channel: string, message: string): Promise<number | unknown>;
-	subscribe(...args: unknown[]): Promise<unknown>;
-	psubscribe(...args: unknown[]): Promise<unknown>;
-	on(event: string, cb: (...args: unknown[]) => void): void;
-	pipeline(...args: unknown[]): {
-		lpush?: (...a: unknown[]) => unknown;
-		ltrim?: (...a: unknown[]) => unknown;
-		expire?: (...a: unknown[]) => unknown;
-		exec?: (...a: unknown[]) => unknown;
-	};
-	/** Redis JSON module methods */
-	json?: {
-		get(key: string, path?: string): Promise<unknown>;
-		set(key: string, path: string, data: unknown): Promise<unknown>;
-		del(key: string, path?: string): Promise<unknown>;
-		type(key: string, path?: string): Promise<string | null>;
-	};
-	/** Redis Streams helpers used by some workers */
-	xInfoStream(stream: string): Promise<unknown>;
-	xRevRange(stream: string, start: string, end: string, opts?: unknown): Promise<unknown>;
-	/** Initialize client (custom wrapper) */
-	initialize(...args: unknown[]): Promise<unknown> | void;
-	memory(...args: unknown[]): Promise<unknown>;
-	type(...args: unknown[]): Promise<string>;
+  connect(...args: any[]): Promise<unknown>;
+  disconnect(...args: any[]): Promise<unknown>;
+  ping(...args: any[]): Promise<unknown>;
+  quit(...args: any[]): Promise<unknown>;
+  xAdd(...args: any[]): Promise<unknown>;
+  xadd(...args: any[]): Promise<unknown>;
+  keys(...args: any[]): Promise<string[]>;
+  info(...args: any[]): Promise<unknown>;
+  status?: unknown;
+  isOpen?: boolean;
+  dbsize(...args: any[]): Promise<number>;
+  get(...args: any[]): Promise<unknown>;
+  set(...args: any[]): Promise<unknown>;
+  /** Increment key value */
+  incr(key: string): Promise<number>;
+  /** Set key with expiry (seconds) */
+  setex(key: string, seconds: number, value: string): Promise<unknown>;
+  /** Push value(s) to list (left) */
+  lpush(key: string, ...values: unknown[]): Promise<number | unknown>;
+  /** Range query for list */
+  lrange(key: string, start: number, stop: number): Promise<unknown[]>;
+  del(...args: unknown[]): Promise<unknown>;
+  /** Set key expiry in seconds */
+  expire(key: string, seconds: number): Promise<number | unknown>;
+  publish(channel: string, message: string): Promise<number | unknown>;
+  subscribe(...args: unknown[]): Promise<unknown>;
+  psubscribe(...args: unknown[]): Promise<unknown>;
+  on(event: string, cb: (...args: unknown[]) => void): void;
+  pipeline(...args: unknown[]): {
+    lpush?: (...a: unknown[]) => unknown;
+    ltrim?: (...a: unknown[]) => unknown;
+    expire?: (...a: unknown[]) => unknown;
+    exec?: (...a: unknown[]) => unknown;
+  };
+  /** Redis JSON module methods */
+  json?: {
+    get(key: string, path?: string): Promise<unknown>;
+    set(key: string, path: string, data: unknown): Promise<unknown>;
+    del(key: string, path?: string): Promise<unknown>;
+    type(key: string, path?: string): Promise<string | null>;
+  };
+  /** Redis Streams helpers used by some workers */
+  xInfoStream(stream: string): Promise<unknown>;
+  xRevRange(stream: string, start: string, end: string, opts?: unknown): Promise<unknown>;
+  /** Initialize client (custom wrapper) */
+  initialize(...args: unknown[]): Promise<unknown> | void;
+  memory(...args: unknown[]): Promise<unknown>;
+  type(...args: unknown[]): Promise<string>;
 }
 
 /** CommonJS-style redis module export (typings for legacy imports) */

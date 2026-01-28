@@ -1,6 +1,6 @@
 import { cases, db } from '$lib/server/db/client';
 import { error, json } from '@sveltejs/kit';
-import { and, desc, eq, like } from 'drizzle-orm';
+import { and, desc, eq, like, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 /**
@@ -129,13 +129,14 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 
 		if (body.status) updates.status = body.status;
 		if (body.priority) updates.priority = body.priority;
-.update(cases)
+const updated = await db
+			.update(cases)
 			.set(updates)
 			.where(
 				and(
 					eq(cases.assignedAttorney, locals.user.id),
 					// @ts-expect-error - Drizzle inArray typing issue
-					cases.id.in(body.ids)
+					inArray(cases.id, body.ids)
 				)
 			)
 			.returning();
@@ -170,7 +171,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		}
 
 		// Soft delete: set status to 'archived'
-.update(cases)
+const archived = await db
+			.update(cases)
 			.set({
 				status: 'archived',
 				updatedAt: new Date().toISOString()
@@ -179,7 +181,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 				and(
 					eq(cases.assignedAttorney, locals.user.id),
 					// @ts-expect-error - Drizzle inArray typing issue
-					cases.id.in(body.ids)
+					inArray(cases.id, body.ids)
 				)
 			)
 			.returning();

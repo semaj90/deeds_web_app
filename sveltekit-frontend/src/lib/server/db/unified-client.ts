@@ -17,8 +17,16 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import path from 'path';
 import postgres from 'postgres';
-import type { DocumentMetadata } from './schema-unified.js';
 import * as schema from './schema-unified.js';
+
+// Define DocumentMetadata locally since it may not be exported from schema-unified
+interface DocumentMetadata {
+  title?: string;
+  description?: string;
+  source?: string;
+  type?: string;
+  [key: string]: unknown;
+}
 
 // ============================================================================
 // CONFIGURATION & TYPES

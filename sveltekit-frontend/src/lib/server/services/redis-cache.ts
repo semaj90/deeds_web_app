@@ -3,7 +3,13 @@ import type { redis } from '$lib/server/redis-client';
  * Redis cache service wrapper — prefers centralized createRedisInstance factory when available.
  */
 import { env } from '$env/dynamic/private';
-import type { IRedisCacheService } from '$lib/types/external-services';
+
+// Define the interface locally to avoid import issues
+export interface IRedisCacheService {
+    get(key: string): Promise<unknown | null>;
+    setex(key: string, seconds: number, value: string): Promise<string>;
+    set(key: string, value: unknown, ttl?: number): Promise<void>;
+}
 
 type RedisClientLike = {
     get: (k: string) => Promise<string | null>;

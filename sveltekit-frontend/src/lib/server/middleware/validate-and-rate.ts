@@ -42,44 +42,48 @@ export function withValidationAndRate(
 
         // Rate limiting
         try {
-            const id = identifierFromRequest(event.request) ?? 'anon';
-            const key = `${keyPrefix}${id}`;
+          const id = identifierFromRequest(event.request) ?? 'anon';
+          const key = `${keyPrefix}${id}`;
 
-            // Use Redis-backed token-bucket
-            const service = RedisCacheService.getInstance(); // Ensure singleton access
+          // Use Redis-backed token-bucket
+          const service = RedisCacheService; // Use the exported service directly
 
-            const raw = await service.get<{ tokens: number; last: number }>(key);
-            const now = Date.now() / 1000;
+          const raw = (await service.get(key)) as { tokens: number; last: number } | null;
+          const now = Date.now() / 1000;
 
-            let tokens = capacity;
-            let last = now;
+          let tokens = capacity;
+          let last = now;
 
-            if (raw && typeof raw === 'object') {
-                const parsed = raw;
-                if (typeof parsed.tokens === 'number' && typeof parsed.last === 'number') {
-                    tokens = Math.min(capacity, parsed.tokens + (now - parsed.last) * refillPerSecond);
-                    last = now;
-                }
+          if (raw && typeof raw === 'object') {
+            const parsed = raw as { tokens?: number; last?: number };
+            if (typeof parsed.tokens === 'number' && typeof parsed.last === 'number') {
+              tokens = Math.min(capacity, parsed.tokens + (now - parsed.last) * refillPerSecond);
+              last = now;
             }
+          }
 
-            if (tokens >= 1) {
-                tokens = tokens - 1;
-                // Expiry: enough time to refill to capacity
-                await service.set(key, { tokens, last }, { ttlSeconds: Math.ceil((capacity / refillPerSecond) * 2) });
-            } else {
-                const retryAfter = Math.ceil((1 - tokens) / refillPerSecond);
-                return new Response(JSON.stringify({
-                    success: false,
-                    error: 'Rate limit exceeded',
-                    retryAfter
-                }), {
-                    status: 429,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Retry-After': String(retryAfter)
-                    }
-                });
-            }
+          if (tokens >= 1) {
+            tokens = tokens - 1;
+            // Expiry: enough time to refill to capacity
+            const ttlSeconds = Math.ceil((capacity / refillPerSecond) * 2);
+            await service.set(key, { tokens, last }, ttlSeconds);
+          } else {
+            const retryAfter = Math.ceil((1 - tokens) / refillPerSecond);
+            return new Response(
+              JSON.stringify({
+                success: false,
+                error: 'Rate limit exceeded',
+                retryAfter,
+              }),
+              {
+                status: 429,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Retry-After': String(retryAfter),
+                },
+              }
+            );
+          }
         } catch (err) {
             // On Redis error, fail-open but log
             console.error('Rate limiter internal error', err);

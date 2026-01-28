@@ -9,6 +9,8 @@ declare module '$env/dynamic/private' {
 // Provide a module for the evidence upload schema used across the frontend.
 // This avoids import errors while the schema is being migrated or re-exported.
 declare module '$lib/schemas/evidence-upload' {
+  import { z } from 'zod';
+
   export type VideoMetadata = {
     width?: number;
     height?: number;
@@ -16,6 +18,9 @@ declare module '$lib/schemas/evidence-upload' {
     codec?: string;
     sizeBytes?: number;
   };
+
+  export const evidenceUploadSchema: z.ZodObject<any>;
+  export type EvidenceUploadData = z.infer<typeof evidenceUploadSchema>;
 }
 
 // Also support direct source path imports

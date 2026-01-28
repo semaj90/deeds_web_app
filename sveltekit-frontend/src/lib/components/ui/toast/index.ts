@@ -9,13 +9,12 @@ export type {
 } from './types';
 
 // Helper for creating toast utility
-export { getContext } from 'svelte';
+import { getContext } from 'svelte';
 import type { ToastContext } from './types';
 
 export function useToast(): ToastContext {
-	// This should be called from within a component that is a child of ToastProvider
-	const { getContext } = require('svelte');
-	return getContext<ToastContext>('toast');
+  // This should be called from within a component that is a child of ToastProvider
+  return getContext<ToastContext>('toast');
 }
 
 

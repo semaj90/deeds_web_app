@@ -14,68 +14,74 @@ const pgPool = new Pool({
 
 export const GET: RequestHandler = async () => {
 	try {
-		// Load errors from PostgreSQLSELECT
-				file_path,
-				error_code,
-				COUNT(*) as error_count,
-				MAX(metadata) as metadata
-			FROM raw_error_embeddings
-			WHERE source = 'svelte-check'
-			GROUP BY file_path, error_code
-			ORDER BY error_count DESC
-		`);
+        const result = await pgPool.query(`
+            SELECT
+                file_path,
+                error_code,
+                COUNT(*) as error_count,
+                MAX(metadata) as metadata
+            FROM raw_error_embeddings
+            WHERE source = 'svelte-check'
+            GROUP BY file_path, error_code
+            ORDER BY error_count DESC
+        `);
 
-		// Group by component
-		const componentMap = new Map();
+        // Group by component
+        const componentMap = new Map();
 
-		for (const row of result.rows) {
-			const filePath = row.file_path;
-			const component = extractComponent(filePath);
+        for (const row of result.rows) {
+            const filePath = row.file_path;
+            const component = extractComponent(filePath);
 
-			if (!componentMap.has(component)) {
-				componentMap.set(component, {
-					name: component,
-					path: filePath,
-					errors: 0,
-					complexity: 0,
-					tags: new Set(),
-					error_codes: new Set(),
-					dependencies: new Set()
-				});
-			}
+            if (!componentMap.has(component)) {
+                componentMap.set(component, {
+                    name: component,
+                    path: filePath,
+                    errors: 0,
+                    complexity: 0,
+                    tags: new Set(),
+                    error_codes: new Set(),
+                    dependencies: new Set()
+                });
+            }
 
-			const comp = componentMap.get(component);
-			comp.errors += parseInt(row.error_count);
-			comp.error_codes.add(row.error_code);
+            const comp = componentMap.get(component);
+            comp.errors += parseInt(row.error_count);
+            comp.error_codes.add(row.error_code);
 
-			// Extract metadata
-			if (row.metadata) {
-				const meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
-				if (meta.complexity) {
-					comp.complexity = Math.max(comp.complexity, meta.complexity);
-				}
-			}
-		}
+            // Extract metadata
+            if (row.metadata) {
+                const meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
+                if (meta.complexity) {
+                    comp.complexity = Math.max(comp.complexity, meta.complexity);
+                }
+            }
+        }
 
-		// Load dependencies from file content (simple import detection)
-		for (const [name, comp] of componentMap.entries()) {
-			const tags = generateTags(comp);
-			comp.tags = Array.from(tags);
-			comp.error_codes = Array.from(comp.error_codes);
-			comp.recommended_action = recommendAction(comp);
-			comp.dependencies = [];  // Would need AST parsing for accurate deps
-		}.map(comp => ({
-				...comp,
-				importance: comp.errors * (1 + comp.complexity)
-			}))
-			.sort((a, b) => b.importance - a.importance);
+        // Load dependencies from file content (simple import detection)
+        const components = Array.from(componentMap.values()).map(comp => {
+            const tags = generateTags(comp);
+            comp.tags = Array.from(tags);
+            comp.error_codes = Array.from(comp.error_codes);
+            comp.recommended_action = recommendAction(comp);
+            comp.dependencies = [];  // Would need AST parsing for accurate deps
+            return {
+                ...comp,
+                importance: comp.errors * (1 + comp.complexity)
+            };
+        }).sort((a, b) => b.importance - a.importance);
 
-		return json({ components: summary: { total_components: components.length,
-				total_errors: components.reduce((sum: number, c: any) => sum + c.errors, 0),
-				high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
-				avg_complexity: components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length
-			}
-		});
+        const total_errors = components.reduce((sum: number, c: any) => sum + c.errors, 0);
+
+        return json({
+            components,
+            summary: {
+                total_components: components.length,
+                total_errors,
+                high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
+                avg_complexity: components.length > 0 ? components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length : 0
+            }
+        });
 
 	} catch (error) {
 		console.error('Topology API error:', error);

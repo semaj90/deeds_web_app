@@ -1,6 +1,13 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
-import amqp, { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
+
+// Dynamic import for amqplib to handle type issues
+let amqp: any;
+
+// Types for RabbitMQ
+type Channel = any;
+type Connection = any;
+type ConsumeMessage = any;
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
@@ -104,6 +111,17 @@ class RabbitMQService implements IRabbitMQService {
     async initialize(maxRetries = 5, retryDelay = 5000): Promise<void> {
         if (this.isConnected || this.isInitializing) return;
         this.isInitializing = true;
+
+        // Dynamically import amqplib
+        if (!amqp) {
+            try {
+                amqp = await import('amqplib');
+            } catch (e) {
+                console.error('Failed to import amqplib:', e);
+                this.isInitializing = false;
+                return;
+            }
+        }
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {

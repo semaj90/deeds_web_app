@@ -19,8 +19,8 @@
  error = 'Please provide a case title.';
  return;
  }
- if (!narrative.trim() || !what.trim()) {
- error = 'Please fill in at least the narrative and "What happened" fields.';
+ if (!narrative.trim() && !what.trim()) {
+ error = 'Please fill in at least the narrative or "What happened" fields.';
  return;
  }
 
@@ -47,19 +47,14 @@
  }
 
  // Create case via intake endpoint
- const res = await fetch('/api/intake/case', {
+ const res = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  title,
- narrative,
- who,
- what,
- when,
- where,
- why,
- how,
- uploadedEvidenceIds
+ description: narrative + `\n\nWHO: ${who}\nWHAT: ${what}\nWHEN: ${when}\nWHERE: ${where}\nWHY: ${why}\nHOW: ${how}`,
+ status: 'open',
+ priority: 'medium'
  })
  });
 
@@ -72,7 +67,15 @@
  console.log('Case created:', data);
 
  // Redirect to case overview
- await goto(`/cases/${data.caseId}/overview`);
+ if (data.success && data.data?.id) {
+    await goto(`/cases/${data.data.id}/overview`);
+ } else if (data.success && data.data?.case?.id) {
+    await goto(`/cases/${data.data.case.id}/overview`);
+ } else {
+    // Fallback if structure is different
+    await goto(`/`);
+ }
+
  } catch (err) {
  error = err instanceof Error ? err.message : 'Unknown error';
  console.error('Intake error:', err);
@@ -134,11 +137,16 @@
  <!-- File upload -->
  <div
  class="file-drop-zone"
+ onclick={() => document.getElementById('file-upload-input')?.click()}
  ondrop={handleFileDrop}
  ondragover={(e) => e.preventDefault()}
+ role="button"
+ tabindex="0"
+ onkeydown={(e) => e.key === 'Enter' || e.key === ' ' ? document.getElementById('file-upload-input')?.click() : null}
  >
  <p>📎 Drag evidence files here (PDFs, photos, audio, video)</p>
  <input
+ id="file-upload-input"
  type="file"
  multiple
  onchange={(e) => {
@@ -464,7 +472,3 @@
  font-size: 0.8rem; color: #999;
  }
 </style>
-
-
-
-

@@ -263,7 +263,7 @@
 		min-height: 100vh;
 		background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
 		color: #e0e0e0;
-		font-family: 'Inter', -apple-system: BlinkMacSystemFont, sans-serif;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.header {

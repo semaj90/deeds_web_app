@@ -11,13 +11,7 @@
  */
 
 // Re-export bits-ui components that use named exports
-export {
-    Avatar, Button,
-    Checkbox, Combobox,
-    DatePicker, Dialog,
-    Popover, Select,
-    Tabs, Tooltip
-} from 'bits-ui';
+export { Avatar, Button, Checkbox, Dialog, Popover, Select, Tabs, Tooltip } from 'bits-ui';
 
 // Export custom bits components
 export { default as Alert } from './Alert.svelte';

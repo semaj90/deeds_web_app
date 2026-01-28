@@ -538,7 +538,7 @@
 				<h3 class="nav-title">Operations</h3>
 				<ul class="nav-list">
 					<li class="nav-item" class:active={currentView === 'dashboard'}>
-						<Button class="bits-btn" onclick={() => currentView = 'dashboard'} class="nav-link">
+						<Button class="bits-btn nav-link" onclick={() => currentView = 'dashboard'}>
 							<Activity class="h-4 w-4" />
 							Dashboard
 						</Button>

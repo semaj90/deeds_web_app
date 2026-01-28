@@ -17,8 +17,11 @@ function getMinioClient(): Client {
  }
 
  minioClient = new Client({
- endPoint: endPoint.split(', ')[0], // Handle 'minio:9000' format
- port: endPoint.includes(':') ? parseInt(endPoint.split(':')[1], 10) : port,
+   endPoint: endPoint.split(':')[0], // Handle 'minio:9000' format
+   port: endPoint.includes(':') ? parseInt(endPoint.split(':')[1], 10) : port,
+   useSSL,
+   accessKey,
+   secretKey,
  });
  }
  return minioClient;

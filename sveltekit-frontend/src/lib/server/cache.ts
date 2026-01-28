@@ -57,7 +57,7 @@ async function connectRedis(): Promise<RedisClient | null> {
 		};
 
 		if (REDIS_PASSWORD) {
-			options.password = REDIS_PASSWORD;
+			(options as { password?: string }).password = REDIS_PASSWORD;
 		}
 
 		const client = createClient(options);

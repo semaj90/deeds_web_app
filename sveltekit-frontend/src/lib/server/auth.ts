@@ -102,7 +102,7 @@ export class AuthService {
     try {
       // Validate email format
       if (!data?.email || !data.email.includes('@')) {
-        throw new RegistrationError('Invalid email format', 'INVALID_EMAIL', JSON.stringify({ email: data.email }));
+        throw new RegistrationError('Invalid email format', 'INVALID_EMAIL', { email: data.email });
       }
 
       // Check for existing user
@@ -113,9 +113,9 @@ export class AuthService {
         .limit(1);
 
       if (existingUser.length > 0) {
-        throw new RegistrationError('A user with this email already exists', 'EMAIL_TAKEN', JSON.stringify({
+        throw new RegistrationError('A user with this email already exists', 'EMAIL_TAKEN', {
           email: data.email,
-        }));
+        });
       }
 
       // Validate password strength

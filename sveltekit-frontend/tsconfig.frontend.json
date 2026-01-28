@@ -30,6 +30,8 @@
     "node_modules/**",
     ".svelte-kit/**",
     "dist/**",
-    "build/**"
+    "build/**",
+    "src/routes_parked/**",
+    "src/routes_legacy/**"
   ]
 }

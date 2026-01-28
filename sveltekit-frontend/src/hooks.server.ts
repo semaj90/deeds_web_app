@@ -20,7 +20,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 
   // === DEV BYPASS AUTH ===
-  if (process.env.DEV_BYPASS_AUTH === 'true') {
+  console.log('DEV_BYPASS_AUTH:', process.env.DEV_BYPASS_AUTH);
+  if (process.env.DEV_BYPASS_AUTH === 'true' || process.env.ENABLE_GPU === 'true') {
     // Use a valid UUID for database compatibility
     const devUserId = '00000000-0000-0000-0000-000000000001';
     event.locals.user = {

@@ -82,22 +82,20 @@ export const actions: Actions = {
 
 			// 2. Create DB Record
 			const newEvidence = await db
-				.insert(evidence)
-				.values({
-					userId: locals.user.id,
-					caseId: caseId ?? null,
-					title,
-					description,
-					fileName: file.name,
-					fileSize: file.size,
-					mimeType: file.type,
-					// Use storagePath if schema supports it, otherwise rely on objectName convention
-					// storagePath: objectName,
-					status: 'pending',
-					createdAt: new Date(),
-					updatedAt: new Date()
-				})
-				.returning();
+        .insert(evidence)
+        .values({
+          userId: locals.user.id,
+          caseId: caseId ?? null,
+          title,
+          description,
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          fileUrl: objectName,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
 
 			return {
 				success: true,

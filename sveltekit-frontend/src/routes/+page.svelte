@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import { buttonVariants } from '$lib/components/ui/button-variants';
 
 	let { data }: { data: PageData } = $props();
 
@@ -110,6 +111,9 @@
  <a href="/analysis-center" class="nav-item">
  <span class="nav-icon">🔍</span> ANALYSIS CENTER
  </a>
+ <a href="/global-search" class="nav-item">
+ <span class="nav-icon">🔍</span> GLOBAL SEARCH
+ </a>
  <a href="/chat" class="nav-item">
  <span class="nav-icon">🤖</span> AI ASSISTANT
  </a>
@@ -140,15 +144,15 @@
 			<div class="header-subtitle">YoRHa <span class="dimmed">Detective Interface / 8/13.10</span></div>
 		</div>
  <div class="header-right">
- <button class="header-btn">
+ <button class="{buttonVariants({ variant: 'outline', size: 'sm' })} header-btn">
  <span class="icon">🔔</span> HELP <span class="badge">0</span>
  </button>
- <button class="header-btn">
+ <button class="{buttonVariants({ variant: 'outline', size: 'sm' })} header-btn">
  <span class="icon">⚙️</span> OPTIONS
  </button>
- <button class="header-btn">
- <span class="icon">🔍</span> GLOBAL SEARCH
- </button>
+ <a href="/cases/new" class="{buttonVariants({ variant: 'default', size: 'sm' })} header-btn new-case-btn">
+ <span class="icon">➕</span> NEW CASE
+ </a>
  </div>
  </header>
 

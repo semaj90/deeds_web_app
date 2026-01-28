@@ -13,7 +13,8 @@ import LoadingButton from '$lib/headless/LoadingButton.svelte';
 import { Dialog } from '$lib/components/ui/dialog';
 import { Button, Card } from '$lib/components/ui/enhanced-bits';
 import { Input } from '$lib/components/ui/input';
-import { Select } from '$lib/components/ui/select';
+// Select is imported from enhanced-bits or a compatible source
+import { Select } from '$lib/components/ui/enhanced-bits';
 
 const EnhancedDialog = Dialog;
 const EnhancedSelect = Select;

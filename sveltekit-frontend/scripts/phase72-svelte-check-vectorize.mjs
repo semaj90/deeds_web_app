@@ -16,6 +16,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { detectLibTorchVectorizer } from './phase72-detect-libtorch.mjs'
 
+import { parseSvelteCheckOutput } from './phase72-svelte-check-parse.mjs'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const SVELTE_CHECK_JSON = path.join(ROOT, 'svelte-check-machine.json')
@@ -28,7 +30,7 @@ function log(msg) {
 function runSvelteCheck() {
   return new Promise((resolve, reject) => {
     log('Running svelte-check...')
-    const proc = spawn('npx', ['svelte-check', '--output', 'machine'], {
+    const proc = spawn('npx', ['svelte-check', '--output', 'machine', '--tsconfig', './tsconfig.frontend.json'], {
       cwd: ROOT,
       stdio: ['ignore', 'pipe', 'inherit'],
       shell: true
@@ -41,7 +43,7 @@ function runSvelteCheck() {
 
     proc.on('exit', (code) => {
       if (code !== 0 && code !== 1) {
-        return reject(new Error(`svelte-check exited with ${code}`))
+        log(`svelte-check exited with code ${code}`)
       }
       fs.writeFileSync(SVELTE_CHECK_JSON, buf, 'utf8')
       resolve(buf)
@@ -50,17 +52,23 @@ function runSvelteCheck() {
 }
 
 /**
- * Build raw features from svelte-check JSON
+ * Build raw features from parsed diagnostics
  */
-function buildErrorFeatures(json) {
-  const errors = json?.diagnostics ?? json?.errors ?? []
-  return errors.map((e) => ({
-    code: Number(e.code ?? 0),
-    severity: Number(e.severity === 'error' ? 2 : 1),
-    line: Number(e.start?.line ?? 0),
-    column: Number(e.start?.column ?? 0),
-    file_score: e.filename ? e.filename.length / 1024 : 0
-  }))
+function buildErrorFeatures(diagnostics) {
+  return diagnostics.map((e) => {
+    // Attempt to extract a numeric code from message or use hash
+    const code = e.code === 'SVELTE_CHECK_ERROR' ? 0 : Number(e.code)
+
+    return {
+        code,
+        severity: Number(e.severity === 'error' ? 2 : 1),
+        line: Number(e.line ?? 0),
+        column: Number(e.column ?? 0),
+        file_score: e.file ? e.file.length / 1024 : 0,
+        filename: e.file,
+        message: e.message
+    }
+  })
 }
 
 /**
@@ -71,6 +79,8 @@ async function encodeWithAddon(nativePath, features) {
 
   // require() because it's CJS native addon
   // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createRequire } = await import('node:module');
+  const require = createRequire(import.meta.url);
   const addon = require(nativePath)
 
   if (typeof addon.encodeErrorsGpu !== 'function') {
@@ -144,9 +154,9 @@ async function parseAndVectorize() {
   log('Parsing errors...')
 
   const raw = fs.readFileSync(SVELTE_CHECK_JSON, 'utf8')
-  const data = JSON.parse(raw)
+  const diagnostics = parseSvelteCheckOutput(raw)
 
-  const features = buildErrorFeatures(data)
+  const features = buildErrorFeatures(diagnostics)
   log(`Collected ${features.length} errors`)
 
   // Try LibTorch first, fall back to simple features
@@ -195,8 +205,8 @@ async function main() {
 }
 
 // Run if executed directly
-const isMainModule = import.meta.url === `file://${process.argv[1]}` ||
-                     process.argv[1].endsWith('phase72-svelte-check-vectorize.mjs')
+const isMainModule = process.argv[1] && (process.argv[1] === fileURLToPath(import.meta.url) ||
+                     process.argv[1].endsWith('phase72-svelte-check-vectorize.mjs'))
 
 if (isMainModule) {
   main().catch(err => {

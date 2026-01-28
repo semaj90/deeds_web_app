@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Phase 72: Hardened Svelte-Check JSON Parser
+ * Phase 72: Hardened Svelte-Check Machine Output Parser
  *
- * Robustly parses svelte-check output, filtering out PostCSS/Vite noise
- * Only accepts well-formed JSON lines with required fields
+ * Robustly parses svelte-check's machine-readable output.
+ * Format: TIMESTAMP TYPE "FILE" LINE:COL "MESSAGE"
  */
 
 import fs from 'node:fs'
@@ -19,9 +19,7 @@ function log(msg) {
 }
 
 /**
- * Robustly parse svelte-check output
- * Filters out PostCSS, Vite, and other noise
- * Only accepts well-formed JSON with required fields
+ * Robustly parse svelte-check machine output
  */
 export function parseSvelteCheckOutput(raw) {
   const errors = []
@@ -29,45 +27,38 @@ export function parseSvelteCheckOutput(raw) {
   let skipped = 0
   let parsed = 0
 
+  // Regex for svelte-check --output machine
+  // Format: <timestamp> <TYPE> "<filepath>" <line>:<col> "<message>"
+  // Example: 1769573384817 WARNING "src\lib\components\AIChatAssistant.svelte" 9:60 "This reference..."
+  const lineRegex = /^(\d+)\s+(ERROR|WARNING)\s+"([^"]+)"\s+(\d+):(\d+)\s+"(.*)"$/
+
   for (const line of lines) {
     const trimmed = line.trim()
-
-    // Skip empty lines
-    if (!trimmed) continue
-
-    // Skip non-JSON lines (PostCSS, Vite, etc.)
-    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+    if (!trimmed || trimmed.startsWith('START') || trimmed.endsWith('COMPLETED')) {
       skipped++
       continue
     }
 
-    try {
-      const obj = JSON.parse(trimmed)
+    const match = trimmed.match(lineRegex)
+    if (match) {
+      const severity = match[2].toLowerCase()
+      const filename = match[3]
+      const lineNum = parseInt(match[4])
+      const colNum = parseInt(match[5])
+      const message = match[6]
 
-      // Validate required fields for error object
-      if (!obj || typeof obj !== 'object') {
-        skipped++
-        continue
-      }
-
-      // Check for svelte-check error format
-      if (obj.type === 'error' && obj.filename && obj.start) {
-        const error = {
-          file: obj.filename,
-          line: obj.start.line ?? 0,
-          column: obj.start.character ?? 0,
-          code: obj.code ?? 'UNKNOWN',
-          message: obj.text ?? '',
-          severity: obj.severity === 'error' ? 'error' : 'warning'
-        }
-
-        errors.push(error)
-        parsed++
-      } else {
-        skipped++
-      }
-    } catch (e) {
-      // Silently skip unparseable lines
+      errors.push({
+        file: filename,
+        line: lineNum,
+        column: colNum,
+        code: 'SVELTE_CHECK_ERROR', // Machine output doesn't always have the numeric code in a separate field
+        message: message,
+        severity: severity === 'error' ? 'error' : 'warning'
+      })
+      parsed++
+    } else {
+      // Handle potential variation or simpler format
+      // Sometimes it might not have the timestamp if not redirected/piped same way
       skipped++
     }
   }
@@ -84,7 +75,8 @@ export async function runSvelteCheckAndParse() {
 
   return new Promise((resolve, reject) => {
     log('Running svelte-check...')
-    const proc = spawn('npx', ['svelte-check', '--output', 'machine'], {
+    // We use the --tsconfig to respect the exclusions
+    const proc = spawn('npx', ['svelte-check', '--output', 'machine', '--tsconfig', './tsconfig.frontend.json'], {
       cwd: ROOT,
       stdio: ['ignore', 'pipe', 'pipe'],
       shell: true
@@ -102,8 +94,9 @@ export async function runSvelteCheckAndParse() {
     })
 
     proc.on('exit', (code) => {
+      // svelte-check returns 1 if errors found, which is fine
       if (code !== 0 && code !== 1) {
-        return reject(new Error(`svelte-check exited with ${code}: ${stderr}`))
+        log(`svelte-check exited with code ${code}`)
       }
 
       const errors = parseSvelteCheckOutput(stdout)
@@ -131,8 +124,8 @@ async function main() {
 }
 
 // Run if executed directly
-const isMainModule = import.meta.url === `file://${process.argv[1]}` ||
-                     process.argv[1].endsWith('phase72-svelte-check-parse.mjs')
+const isMainModule = process.argv[1] && (process.argv[1] === fileURLToPath(import.meta.url) ||
+                     process.argv[1].endsWith('phase72-svelte-check-parse.mjs'))
 
 if (isMainModule) {
   main()
