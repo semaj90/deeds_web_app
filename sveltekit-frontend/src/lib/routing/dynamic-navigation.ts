@@ -263,8 +263,7 @@ export class DynamicNavigation {
  return {
  ...state, previousPath: prev,
  currentPath: path,
- breadcrumbs,
- canGoBack,
+ breadcrumbs: canGoBack,
  canGoForward,
  };
  });

@@ -273,10 +273,8 @@ class RealTimeEvidenceStore {
  this.addToHistory({
  id: this.createUUID(type, 'UPDATE',
  timestamp: new Date().toISOString(),
- userId,
- evidenceId,
- previousState,
- newState,
+ userId: evidenceId,
+ previousState: newState,
  changes,
  });
  items[index] = newState;

@@ -125,14 +125,10 @@ export class AIService {
 
       if (saveQuery) {
         queryId = await this.logQuery({
-          userId,
-          caseId,
-          query,
-          response,
-          model,
-          confidence,
-          processingTime,
-          contextUsed,
+          userId: caseId,
+          query: response,
+          model: confidence,
+          processingTime: contextUsed,
           embedding: embedding ?? undefined
         });
       }
@@ -143,8 +139,7 @@ export class AIService {
       if (options.saveQuery) {
         try {
           await this.logQuery({
-            userId,
-            caseId,
+            userId: caseId,
             query,
             response: '',
             model: options.model ?? 'gemma3-legal:latest',

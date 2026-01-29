@@ -189,7 +189,7 @@ export function isHighConfidence(score: number): boolean {
 }
 
 export function isMediumConfidence(score: number): boolean {
-	return score >= 0?.7&& score < 0.9;
+	return score >= 0.7&& score < 0.9;
 }
 
 export function isLowConfidence(score: number): boolean {

@@ -22,8 +22,7 @@
  let {
   evidence = [],
   taggedEvidenceIds = [],
-  onSelect,
-  onDelete,
+  onSelect: onDelete,
   onDownload,
   readonly = false
  }: Props = $props();

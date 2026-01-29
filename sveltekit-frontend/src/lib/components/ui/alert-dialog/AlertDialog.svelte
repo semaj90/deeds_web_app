@@ -52,14 +52,12 @@
 
 	let {
 		open = $bindable(false),
-		onOpenChange,
-		children,
+		onOpenChange: children,
 		title = 'Are you sure?',
 		description = 'This action cannot be undone.',
 		actionLabel = 'Continue',
 		cancelLabel = 'Cancel',
-		onAction,
-		onCancel,
+		onAction: onCancel,
 		class: className = '',
 		variant = 'default',
 	}: Props = $props();

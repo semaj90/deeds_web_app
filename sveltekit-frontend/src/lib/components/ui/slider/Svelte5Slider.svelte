@@ -49,8 +49,7 @@ let {
 	size = 'md',
 	color = 'blue',
 	class: className = '',
-	onchange,
-	oninput,
+	onchange: oninput,
 	valueLabel
 }: Props = $props();
 

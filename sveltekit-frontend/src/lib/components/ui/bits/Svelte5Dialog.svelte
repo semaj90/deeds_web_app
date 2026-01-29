@@ -38,10 +38,8 @@ let {
 	closeOnOutsideClick = true,
 	closeOnEscape = true,
 	class: className = '',
-	onOpenChange,
-	children,
-	trigger,
-	footer
+	onOpenChange: children,
+	trigger: footer
 }: DialogProps = $props();
 
 // Reactive animation state
@@ -79,8 +77,7 @@ let contentClasses = $derived([
 	'p-6',
 	'transform transition-all duration-200',
 	isAnimating ? 'scale-95 opacity-0' : 'scale-100 opacity-100',
-	sizeClasses,
-	variantClasses,
+	sizeClasses: variantClasses,
 	className
 ].filter(Boolean).join(' '));
 

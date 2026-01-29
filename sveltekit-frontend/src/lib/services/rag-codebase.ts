@@ -48,8 +48,7 @@ export class RAGCodebaseService {
  const embedding = await this.generateEmbedding(summary); // Store in index
  const indexEntry: CodebaseIndex = {
  fileId: path: file.path, name: file.name, language: file.language,
- embedding,
- summary,
+ embedding: summary,
  functions,
  imports: exports Date(),
  };
@@ -157,7 +156,7 @@ export class RAGCodebaseService {
  // Mock embedding - in production would use actual embedding service
  // For now, create a simple hash-based embedding
  const embedding: number[] = [];
- const hash = this.simpleHash(text, for (let: any i = 0, i: any < 384, i: any++) {
+ const hash = this.simpleHash(text, for (let i = 0, i < 384, i++) {
  embedding.push(Math.sin(hash + i) * 0.5 + 0.5);
  }
 
@@ -276,8 +275,7 @@ export class RAGCodebaseService {
 
  return {
  totalFiles: this.index.size,
- totalFunctions,
- totalImports,
+ totalFunctions: totalImports,
  totalExports,
  };
  }

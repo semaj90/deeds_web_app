@@ -5,10 +5,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import {
- RecoveryStrategy,
- createRetryConfig,
- retryWithBackoff,
- getSafeDefaults,
+ RecoveryStrategy: createRetryConfig,
+ retryWithBackoff: getSafeDefaults,
  gracefulDegrade,
 } from './recovery.js';
 
@@ -146,8 +144,7 @@ describe('Recovery Strategy', () => {
  it('should use primary operation when successful', async () => {
  const primaryOp = vi.fn().mockResolvedValue('primary result');
  const fallbackOp = vi.fn().mockResolvedValue('fallback result');primaryOp,
- fallbackOp,
- 'errorBrain',
+ fallbackOp: 'errorBrain',
  'user-123'
  );
 
@@ -167,8 +164,7 @@ describe('Recovery Strategy', () => {
  it('should use fallback when primary fails', async () => {
  const primaryOp = vi.fn().mockRejectedValue(new Error('Primary failed'));
  const fallbackOp = vi.fn().mockResolvedValue('fallback result');primaryOp,
- fallbackOp,
- 'errorBrain',
+ fallbackOp: 'errorBrain',
  'user-123'
  );
 
@@ -188,8 +184,7 @@ describe('Recovery Strategy', () => {
  it('should fail when both operations fail', async () => {
  const primaryOp = vi.fn().mockRejectedValue(new Error('Primary failed'));
  const fallbackOp = vi.fn().mockRejectedValue(new Error('Fallback failed'));primaryOp,
- fallbackOp,
- 'legalAi',
+ fallbackOp: 'legalAi',
  'user-123'
  );
 

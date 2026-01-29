@@ -35,10 +35,8 @@ let {
 	align = 'start',
 	side = 'bottom',
 	class: className = '',
-	onselect,
-	onOpenChange,
-	children,
-	trigger
+	onselect: onOpenChange,
+	children: trigger
 }: Props = $props();
 
 let menuRef = $state<HTMLDivElement | null>(null);

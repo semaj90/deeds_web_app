@@ -370,8 +370,7 @@ export class OllamaSuggestionsService {
 								: [],
 							aiGenerated: true,
 							model: response.model ?? this.model,
-							reportType,
-							index
+							reportType: index
 						}
 					} as OllamaSuggestion;
 				});
@@ -523,8 +522,7 @@ export async function generateOllamaSuggestions(
 	options: Partial<OllamaSuggestionRequest> = {}
 ): Promise<OllamaSuggestion[]> {
 	const request: OllamaSuggestionRequest = {
-		content,
-		reportType,
+		content: reportType,
 		context,
 		maxSuggestions: 5,
 		temperature: 0.3,
@@ -564,8 +562,7 @@ export async function testOllamaIntegration(): Promise<{
 		return {
 			success: true,
 			model: config.model,
-			availableModels,
-			testSuggestions
+			availableModels: testSuggestions
 		};
 	} catch (error: unknown) {
 		const err = error instanceof Error ? error : new Error(String(error));

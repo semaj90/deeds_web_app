@@ -66,10 +66,8 @@ export class EnhancedAIAnalysisService {
     summary: summaryAndTopics.summary,
     keyTopics: summaryAndTopics.topics,
     legalEntities: entities,
-    sentiment,
-    complexity,
-    embedding,
-    similarDocuments
+    sentiment: complexity,
+    embedding: similarDocuments
    };
    console.log(`✅ Semantic analysis complete for ${document.id}: ${entities.length} entities, ${similarDocuments.length} similar docs`);
    return result;

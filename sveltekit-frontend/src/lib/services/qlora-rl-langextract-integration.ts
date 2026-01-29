@@ -176,15 +176,13 @@ export class QLoRARLLangExtractIntegration {
 
 		// 3. Perform Extraction via LangExtract Service
 		const extractedData = await this.callLangExtractService(
-			document,
-			extractionSchema,
+			document: extractionSchema,
 			rlGuidance
 		);
 
 		// 4. Create Neural Sprite Representation (Visual/Memory Encoding)
 		const neuralSprite = await this.createNeuralSprite(
-			document,
-			extractedData,
+			document: extractedData,
 			stateEmbedding
 		);
 
@@ -203,10 +201,8 @@ export class QLoRARLLangExtractIntegration {
 		}
 
 		return {
-			extractedData,
-			rlGuidance,
-			neuralSprite,
-			qloraJobId
+			extractedData: rlGuidance,
+			neuralSprite: qloraJobId
 		};
 	}
 
@@ -331,12 +327,9 @@ export class QLoRARLLangExtractIntegration {
 		const embeddingVector = new Float32Array(stateEmbedding); // Clone
 
 		return {
-			spriteId,
-			patternBuffer,
-			vertexBuffer,
-			embeddingVector,
-			nametablePosition,
-			attributeData
+			spriteId: patternBuffer,
+			vertexBuffer: embeddingVector,
+			nametablePosition: attributeData
 		};
 	}
 

@@ -251,8 +251,7 @@ export function withEnhancedStyling(
 ) {
 	return {
 		component: Component,
-		theme,
-		variant,
+		theme: variant,
 		apply: (element: HTMLElement) => applyCustomDesign(element, theme)
 	};
 }

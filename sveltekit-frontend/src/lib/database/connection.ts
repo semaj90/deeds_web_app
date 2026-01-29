@@ -84,8 +84,7 @@ export async function testDatabaseConnection(): Promise<DBResult> {
             message: 'Database connection successful',
             count: Array.isArray(result) ? result.length : 0,
             details: {
-                postgresVersion,
-                hasVector,
+                postgresVersion: hasVector,
                 poolSize: 'n/a', // postgres.js doesn't easily expose pool size
                 timestamp: new Date().toISOString()
             }

@@ -189,10 +189,8 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId,
- fromEvidenceId,
- toEvidenceId,
- relationshipType,
+ caseId: fromEvidenceId,
+ toEvidenceId: relationshipType,
  strength: 'medium',
  label: relationshipType.replace('_', ' ')
  }),

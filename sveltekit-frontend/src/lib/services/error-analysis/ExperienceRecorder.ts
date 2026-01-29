@@ -73,10 +73,8 @@ export class ExperienceRecorder {
 			strategyId: strategy.id,
 			outcome,
 			confidence: strategy.confidence,
-			context,
-			toolsInvoked,
-			humanIntervention,
-			feedback,
+			context: toolsInvoked,
+			humanIntervention: feedback,
 			timestamp: new Date()
 		};
 
@@ -104,8 +102,7 @@ export class ExperienceRecorder {
 
 			return {
 				success: true,
-				experienceId,
-				groupId
+				experienceId: groupId
 			};
 		} catch (err) {
 			return {
@@ -172,8 +169,8 @@ export class ExperienceRecorder {
 			// Create new group
 			const newGroupId = `group_${uuidv4().slice(0, 8)}`;
 			this.groups.set(newGroupId, {
-				id, newGroupId,
-				centroid, embedding,
+				id: newGroupId,
+				centroid: embedding,
 				members: [experience.id],
 				commonPattern: ''
 			});

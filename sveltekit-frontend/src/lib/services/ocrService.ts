@@ -193,8 +193,7 @@ export class OCRService {
 				id: `ocr_\${Date.now()}_\${Math.random().toString(36).slice(2, 11)}`,
 				text: data.text || '',
 				confidence: data.confidence || 0,
-				boundingBoxes,
-				extractedFields,
+				boundingBoxes: extractedFields,
 				metadata: {
 					filename: file.name,
 					fileSize: file.size,
@@ -326,8 +325,7 @@ Return only one of: legal_document, contract, form.`;
 				const boundingBox = this.findBoundingBox(value, boundingBoxes);
 
 				fields.push({
-					fieldName,
-					value,
+					fieldName: value,
 					confidence: 0.8,
 					boundingBox: boundingBox || { x: 0, y: 0, width: 0, height: 0, text: value, confidence: 0 },
 					fieldType,

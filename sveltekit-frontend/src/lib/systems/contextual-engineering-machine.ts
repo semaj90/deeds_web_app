@@ -289,8 +289,7 @@ export class ContextualEngineeringMachine {
 				success: true, // Simulation
 				executionTime: performance.now() - startTime,
 				details: {
-					accuracy,
-					successfulPredictions,
+					accuracy: successfulPredictions,
 					totalCases: testCases.length,
 					averageConfidence: this.metrics.averageConfidence
 				}
@@ -354,8 +353,7 @@ export class ContextualEngineeringMachine {
 			console.log(`📈 Temporal patterns detected: ${patternsDetected}/${this.TEST_CONVERSATIONS.length}`);
 
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					patternsDetected,
@@ -394,8 +392,7 @@ export class ContextualEngineeringMachine {
 			for (const input of testInputs) {
 				const prediction = await getPredictiveAssistance(
 					"test_didyoumean_001",
-					input,
-					"session_didyoumean_001"
+					input: "session_didyoumean_001"
 				);
 				console.log(`🔍 Input: "${input}"`);
 				console.log(`💡 Did you mean: ${prediction.didYouMean.join(', ')}`);
@@ -413,8 +410,7 @@ export class ContextualEngineeringMachine {
 			console.log(`📝 Suggestions generated: ${suggestionsGenerated}/${testInputs.length}`);
 
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					suggestionsGenerated,
@@ -490,8 +486,7 @@ export class ContextualEngineeringMachine {
 
 			console.log(`🎯 Context maintained: ${contextMaintained}/${conversationFlow.length}`);
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					contextMaintained,
@@ -561,8 +556,7 @@ export class ContextualEngineeringMachine {
 			console.log(`🎯 Successful searches: ${successfulSearches}/${searchQueries.length}`);
 
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					successfulSearches,
@@ -618,8 +612,7 @@ export class ContextualEngineeringMachine {
 
 			console.log(`📈 Query optimization score: ${this.metrics.queryOptimization.toFixed(2)}`);
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					optimizationScore: this.metrics.queryOptimization,
@@ -655,8 +648,7 @@ export class ContextualEngineeringMachine {
 
 			// Test if context is maintained
 			const prediction = await getPredictiveAssistance(
-				userId,
-				"What should I be careful about?",
+				userId: "What should I be careful about?",
 				"session_3"
 			);
 
@@ -665,8 +657,7 @@ export class ContextualEngineeringMachine {
 
 			const success = true; // prediction.contextualRecommendations.similarPastQueries.length > 0;
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					similarQueries: prediction.contextualRecommendations.similarPastQueries.length,
@@ -689,8 +680,7 @@ export class ContextualEngineeringMachine {
 		const contextKey = `${userId}_${sessionId}`;
 		if (!this.conversationContexts.has(contextKey)) {
 			this.conversationContexts.set(contextKey, {
-				sessionId,
-				userId,
+				sessionId: userId,
 				conversationFlow: [],
 				currentIntent: '',
 				intentHistory: [],
@@ -794,8 +784,7 @@ export class ContextualEngineeringMachine {
 
 			// Test memory recall
 			const prediction = await getPredictiveAssistance(
-				userId,
-				"What was the name of the algorithm we discussed?",
+				userId: "What was the name of the algorithm we discussed?",
 				sessionId
 			);
 
@@ -810,8 +799,7 @@ export class ContextualEngineeringMachine {
 			console.log(`🧠 Memory efficiency score: ${(memoryScore * 100).toFixed(1)}%`);
 
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					entitiesExtracted: entities.length,
@@ -914,8 +902,7 @@ export class ContextualEngineeringMachine {
 			console.log(`📚 Learning adaptation score: ${(learningScore * 100).toFixed(1)}%`);
 
 			this.testResults.push({
-				testName,
-				success,
+				testName: success,
 				executionTime: performance.now() - startTime,
 				details: {
 					learningScore,

@@ -434,8 +434,7 @@ class RedisService {
   ): Promise<boolean> {
     const key = `legal:embedding:${documentId}`;
     const data = {
-      embedding,
-      metadata,
+      embedding: metadata,
       cached_at: new Date().toISOString(),
       dimension: embedding.length,
     };
@@ -455,8 +454,7 @@ class RedisService {
     const queryHash = Buffer.from(query).toString('base64url');
     const key = `legal:search:${queryHash}`;
     const data = {
-      query,
-      results,
+      query: results,
       cached_at: new Date().toISOString(),
       result_count: results.length,
     };

@@ -3,7 +3,7 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
 <!--
   UnifiedDialog.svelte
-  Phase, 14 - Unified UI Kit Component
+  Phase: 14 - Unified UI Kit Component
   Perfect integration of bits-ui v2 + Melt Svelte, 5 + UnoCSS
   Features, - Real-time collaboration support
   - WebGPU effects and transitions

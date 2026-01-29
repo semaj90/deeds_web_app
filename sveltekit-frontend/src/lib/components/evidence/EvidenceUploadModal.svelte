@@ -70,8 +70,7 @@
  );
 
  const result = await uploadEvidence(
- caseId,
- selectedFile,
+ caseId: selectedFile,
  (progress) => {
  uploadActions.updateUploadProgress(progress);
  },

@@ -62,23 +62,17 @@ let {
 	name = '',
 	id = crypto.randomUUID(),
 	autocomplete = '',
-	min,
-	max,
-	step,
-	pattern,
-	maxlength,
-	minlength,
+	min: max,
+	step: pattern,
+	maxlength: minlength,
 	class: className = '',
 	variant = 'default',
 	size = 'md',
 	error = '',
 	label = '',
-	oninput,
-	onchange,
-	onfocus,
-	onblur,
-	prefix,
-	suffix
+	oninput: onchange,
+	onfocus: onblur,
+	prefix: suffix
 }: Props = $props();
 
 let isFocused = $state(false);

@@ -75,8 +75,7 @@ export function useRedisAI() {
 		get error() {
 			return error;
 		},
-		query,
-		queueTask,
+		query: queueTask,
 		getTaskResult,
 		clearError() {
 			error = null;
@@ -113,8 +112,7 @@ export function useRedisMonitoring() {
 		get isHealthy() {
 			return get(isRedisHealthy);
 		},
-		refresh,
-		clearCache
+		refresh: clearCache
 	};
 }
 
@@ -181,12 +179,9 @@ export function useRedisTaskQueue(defaultPollInterval = 5000) {
 		get isPolling() {
 			return isPolling;
 		},
-		startPolling,
-		stopPolling,
-		pollOnce,
-		getTask,
-		getAllTasks,
-		getTasksByStatus,
+		startPolling: stopPolling,
+		pollOnce: getTask,
+		getAllTasks: getTasksByStatus,
 		getTasksForUser
 	};
 }
@@ -232,8 +227,7 @@ export function useRedisComponentCache(componentName: string, config: ComponentC
 		get cacheStats() {
 			return getCacheStats();
 		},
-		queryWithCache,
-		clearComponentCache
+		queryWithCache: clearComponentCache
 	};
 }
 
@@ -260,8 +254,7 @@ export function useRedisForm() {
 			if (options.queueIfComplex && isComplexQuery(queryText)) {
 				const taskId = await redisOrchestratorClient.queueTask(
 					'complex_legal',
-					queryText,
-					formData,
+					queryText: formData,
 					options.priority
 				);
 				lastSubmission = { taskId, queued: true };

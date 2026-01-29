@@ -174,8 +174,7 @@ export class ProgressTracker extends BaseService {
  sessionId: this.sessionId,
  metrics: { ...this.metrics },
  status: this.status,
- elapsedTime,
- completionPercentage,
+ elapsedTime: completionPercentage,
  };
  }
 

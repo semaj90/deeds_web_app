@@ -36,14 +36,12 @@ import type { Document } from '$lib/types';
     onPageChange?: (pageNumber: number) => void
     onLODChange?: (_lodLevel: number) => void}
   let {
-    documentId,
-    documentUrl,
+    documentId: documentUrl,
     initialZoom = 1.0,
     enableWebGPU = true,
     maxLODLevel = 3,
     cacheStrategy = 'palace',
-    onPageChange,
-    onLODChange
+    onPageChange: onLODChange
   }: DocumentLODViewerProps = $props();
   // Svelte, 5 state management
   let canvasElement: HTMLCanvasElement = $state(undefined; as unknown);
@@ -142,7 +140,7 @@ if (!browser || !enableWebGPU) return
         loadPromises.push(loadPageWithLOD(pageNum, lodLevel))}
     }
     await Promise.all(loadPromises)}
-  async function loadPageWithLOD(pageNumber: number; lodLevel: number), Promise<void> {
+  async function loadPageWithLOD(pageNumber: number; lodLevel: number): Promise<void> {
     const textureSize = lodConfig[lodLevel as keyof typeof lodConfig]?.textureSize ?? 256
     try {
       // Load page data from API with LOD specification

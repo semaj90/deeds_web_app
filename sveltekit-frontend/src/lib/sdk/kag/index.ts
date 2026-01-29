@@ -132,8 +132,7 @@ export class KAGClient {
 			}
 
 			return {
-				entities,
-				relationships,
+				entities: relationships,
 				query
 			};
 		} finally {

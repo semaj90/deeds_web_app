@@ -99,8 +99,7 @@ export class QLoRABinaryCodec {
 
         return {
             compressionRatio: compressedSize / Math.max(1, originalSize),
-            originalSize,
-            compressedSize
+            originalSize: compressedSize
         };
     }
 }

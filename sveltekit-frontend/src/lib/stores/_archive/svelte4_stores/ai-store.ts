@@ -40,8 +40,7 @@ function createAIStore() {
  startMessage(intent: LegalIntent, query) {
  const message: AIMessage = {
  id: `msg-${Date.now()}`,
- intent,
- query,
+ intent: query,
  response: '',
  isStreaming: true, createdAt: new Date(),
  };

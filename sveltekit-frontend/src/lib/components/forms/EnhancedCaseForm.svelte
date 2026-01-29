@@ -357,8 +357,7 @@
   label.required: after {
     content: "*"; color: #ef4444
     margin-left: 0.25rem}
-  input,
-  select,
+  input: select,
   textarea {
     width: 100%; padding: 0.75rem
     border: 1px solid #d1d5db

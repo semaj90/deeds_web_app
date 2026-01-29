@@ -24,8 +24,7 @@
 	function addToast(toast: Omit<Toast, 'id'>): string {
 		const id = generateId();
 		const newToast: Toast = {
-			id,
-			duration,
+			id: duration,
 			variant: 'default',
 			...toast,
 		};
@@ -51,8 +50,7 @@
 
 	const context: ToastContext = {
 		get toasts() { return toasts; },
-		addToast,
-		removeToast,
+		addToast: removeToast,
 		clearAll,
 	};
 

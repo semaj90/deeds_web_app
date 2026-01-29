@@ -34,14 +34,12 @@ import type { Case } from '$lib/types';
     onViewRelated?: (caseId: string) => void
     class?: string}
   let {
-    precedent,
-    currentCaseId,
+    precedent: currentCaseId,
     showRelevanceScore = true,
     showSimilarityScore = false,
     expandable = true,
     interactive = true,
-    onViewFull,
-    onAddToCase,
+    onViewFull: onAddToCase,
     onViewRelated,
     class: className = ''
   }: LegalPrecedentCardProps = $props();

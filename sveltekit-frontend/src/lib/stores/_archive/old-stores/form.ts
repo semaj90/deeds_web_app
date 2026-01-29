@@ -117,8 +117,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  });
 
  return {
- subscribe,
- values,
+ subscribe: values,
  errors,
  // Set field value
  setField: <K extends keyof T>(name: K, value: T[K]) => {

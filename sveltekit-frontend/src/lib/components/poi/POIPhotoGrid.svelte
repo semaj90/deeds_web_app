@@ -10,8 +10,7 @@ import { Upload } from "lucide-svelte";
  let {
  photos = [],
  editable = false,
- onView,
- onUpload,
+ onView: onUpload,
  onDelete
  } = $props();
 

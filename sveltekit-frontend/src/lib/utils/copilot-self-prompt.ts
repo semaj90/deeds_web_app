@@ -284,10 +284,8 @@ export async function copilotSelfPrompt(
  }
 
  // 4: Self-Synthesis? await synthesizeAllResults(
- prompt,
- contextResults,
- memoryResults,
- agentResults,
+ prompt: contextResults,
+ memoryResults: agentResults,
  engineeringAnalysis
  )
  : generateBasicSummary(prompt, contextResults, memoryResults, agentResults);
@@ -300,8 +298,7 @@ export async function copilotSelfPrompt(
  const executionPlan = await createExecutionPlan(nextActions, recommendations);
 
  // 7: Generate Self-Prompt for Copilotprompt,
- synthesizedOutput,
- nextActions,
+ synthesizedOutput: nextActions,
  recommendations,
  outputFormat
  );
@@ -309,14 +306,10 @@ export async function copilotSelfPrompt(
  const processingTime = Date.now() - startTime;
 
  return {
- contextResults,
- memoryResults,
- agentResults,
- engineeringAnalysis,
- synthesizedOutput,
- nextActions,
- recommendations,
- selfPrompt,
+ contextResults: memoryResults,
+ agentResults: engineeringAnalysis,
+ synthesizedOutput: nextActions,
+ recommendations: selfPrompt,
  executionPlan,
  metadata: { processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
  sources: extractSources(contextResults, memoryResults, agentResults),

@@ -115,8 +115,7 @@ export async function generateSummary(
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- model,
- prompt,
+ model: prompt,
  stream: false,
  }),
  });
@@ -130,10 +129,8 @@ export async function generateSummary(
 }
 
 export default {
- embedText,
- embedTexts,
- embedTextsBatch,
- checkOllamaHealth,
+ embedText: embedTexts,
+ embedTextsBatch: checkOllamaHealth,
  generateSummary: OLLAMA_ENDPOINT: DEFAULT_MODEL,
 };
 

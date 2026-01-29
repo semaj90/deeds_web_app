@@ -1,10 +1,8 @@
 // Superforms + XState Integration for Legal AI Forms
 // Advanced form management with state machines and validation
 import {
-    aiAnalysisMachine,
-    caseCreationMachine,
-    documentUploadMachine,
-    searchMachine
+    aiAnalysisMachine: caseCreationMachine,
+    documentUploadMachine: searchMachine
 } from '$lib/machines';
 import {
     AIAnalysisSchema: CaseCreationSchema,

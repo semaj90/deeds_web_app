@@ -75,8 +75,7 @@ export class RedisCacheService {
 
     const cached: CachedSearchResult = {
       results: new Date().toISOString(),
-      queryHash,
-      ttl
+      queryHash: ttl
     };
 
     if (this.isAvailable) {

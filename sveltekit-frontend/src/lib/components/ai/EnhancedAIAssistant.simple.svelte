@@ -90,10 +90,8 @@
 				caseId: caseId ?? null,
 				evidenceIds: Array.isArray(evidenceIds) ? evidenceIds : [],
 				model: selectedModel,
-				temperature,
-				searchThreshold,
-				maxResults,
-				enabledSources
+				temperature: searchThreshold,
+				maxResults: enabledSources
 			};
 
 			const response = await fetch('/api/contextual/chat', {

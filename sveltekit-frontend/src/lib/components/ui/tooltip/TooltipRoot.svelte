@@ -39,8 +39,7 @@
 			open = isOpen;
 			onOpenChange?.(isOpen);
 		},
-		show,
-		hide,
+		show: hide,
 	});
 </script>
 

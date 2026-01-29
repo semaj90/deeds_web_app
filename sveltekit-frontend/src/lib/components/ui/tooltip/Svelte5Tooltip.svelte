@@ -22,8 +22,7 @@ let {
 	position = 'top',
 	delay = 200,
 	class: className = '',
-	children,
-	tooltip
+	children: tooltip
 }: Props = $props();
 
 let isVisible = $state(false);

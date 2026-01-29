@@ -21,8 +21,7 @@ const { subscribe, set, update } = writable<EvidenceState>(initialState);
  * Exposes Svelte store subscribe and a few helper methods.
  */
 export const evidenceStore = {
- subscribe,
- set,
+ subscribe: set,
  update,
  add(item: Evidence) {
  update((s) => ({ ...s, evidence: [...(s?.evidence|| []), item] }));

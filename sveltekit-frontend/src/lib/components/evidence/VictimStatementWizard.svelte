@@ -30,8 +30,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  let {
  open = $bindable(false),
- caseId,
- onSave,
+ caseId: onSave,
  onCancel
  } = $props<Props>();
 

@@ -3,10 +3,8 @@
  type Snippet<T = any> = (args: T) => any;
 
  let {
-  label,
-  id,
-  hint,
-  error,
+  label: id,
+  hint: error,
   required = false,
   control,
  } = $props<{

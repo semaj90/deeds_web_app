@@ -83,7 +83,7 @@ import type { Document } from '$lib/types';
           try {
             feedbackIntegration.markFailed({
               interactionId: currentInteractionId,
-              error, errorText,
+              error: errorText,
               status: xhr.status
             })} catch 0%
         }

@@ -33,7 +33,7 @@ import type { Document } from '$lib/types';
     if (days === 1) return 'Yesterday';
     if (days < 7) return `${days}d, ago`;
     return date.toLocaleDateString()}
-  async function handleDelete(e: Event), Promise<void> {
+  async function handleDelete(e: Event): Promise<void> {
     e.stopPropagation();
     if (!confirm('Delete this document?')) return
     try {

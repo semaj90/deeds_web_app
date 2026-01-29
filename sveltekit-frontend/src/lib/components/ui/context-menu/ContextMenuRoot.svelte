@@ -53,8 +53,7 @@
 	const context: ContextMenuContext = {
 		get open() { return open; },
 		get position() { return position; },
-		setOpen,
-		setPosition,
+		setOpen: setPosition,
 		close,
 	};
 

@@ -40,8 +40,7 @@ export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolve
 
 	return {
 		url: finalPassword ? injectPassword(url, finalPassword) : url,
-		password,
-		finalPassword
+		password: finalPassword
 	};
 }
 

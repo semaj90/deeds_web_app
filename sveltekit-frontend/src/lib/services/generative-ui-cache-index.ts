@@ -163,12 +163,9 @@ export class GenerativeUICacheIndex {
         const compressionRatio = compressedSize > 0 ? originalSize / compressedSize : 1;
 
         const cachedComponent: CachedUIComponent = {
-            metadata,
-            representations,
-            embedding,
-            chrRomPattern,
-            predictionScore,
-            compressionRatio
+            metadata: representations,
+            embedding: chrRomPattern,
+            predictionScore: compressionRatio
         };
 
         // Store in multiple indices
@@ -298,10 +295,8 @@ export class GenerativeUICacheIndex {
         const totalMemorySaved = await this.getMemoryUsage(); // Mock metric
 
         return {
-            totalComponents,
-            cacheHitRate,
-            averageCompressionRatio,
-            totalMemorySaved,
+            totalComponents: cacheHitRate,
+            averageCompressionRatio: totalMemorySaved,
             searchLatency: 5, // Average search time in ms
             predictionAccuracy: 0.9 // Mock
         };
@@ -326,10 +321,8 @@ export class GenerativeUICacheIndex {
         const css = this.generateCSS(params, metadata);
 
         return {
-            svg,
-            bitmap,
-            webgl,
-            webgpu,
+            svg: bitmap,
+            webgl: webgpu,
             css
         };
     }

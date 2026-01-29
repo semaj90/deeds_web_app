@@ -301,7 +301,6 @@ export async function getCacheStats(): Promise<{
 
     return {
         count: statutes.length,
-        lastUpdated,
-        isStale
+        lastUpdated: isStale
     };
 }

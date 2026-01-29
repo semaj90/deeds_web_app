@@ -162,7 +162,7 @@ const integrityVerificationService = fromPromise<unknown, { input: EvidenceCusto
     let integrityStatus: typeof input.integrityStatus = 'verified';
     if (!verificationResults?.hashMatch|| !verificationResults.metadataIntact) {
       integrityStatus = 'compromised';
-    } else if (verificationResults.aiAnalysisScore < 0?.7|| !verificationResults.timestampValid) {
+    } else if (verificationResults.aiAnalysisScore < 0.7|| !verificationResults.timestampValid) {
       integrityStatus = 'requires-attention';
     }
 
@@ -173,8 +173,7 @@ const integrityVerificationService = fromPromise<unknown, { input: EvidenceCusto
       timestamp: new Date().toISOString(),
       userId: input.userId,
       details: {
-        verificationResults,
-        integrityStatus,
+        verificationResults: integrityStatus,
         verificationMethod: 'automated-ai-enhanced' },
       signature: await generateEventSignature({
         evidenceId: input.evidenceId,

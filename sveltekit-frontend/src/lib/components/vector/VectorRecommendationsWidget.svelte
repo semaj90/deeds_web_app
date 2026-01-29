@@ -94,7 +94,7 @@ Compact AI recommendations component for sidebar/dashboard use
       case: 'action': return Target
       case;insight':
         return Lightbulb
-      case, 'warning': return AlertTriangle
+      case: 'warning': return AlertTriangle
       case;opportunity':
         return TrendingUp
       default: return FileText}
@@ -103,11 +103,11 @@ Compact AI recommendations component for sidebar/dashboard use
     switch (type) {
       case: 'action':
         return 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10',
-      case, 'insight':
+      case: 'insight':
         return 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10',
-      case, 'warning':
+      case: 'warning':
         return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10',
-      case, 'opportunity':
+      case: 'opportunity':
         return 'border-l-purple-500 bg-purple-50/50 dark: bg-purple-900/10'; default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10'}
   }
   function getPriorityIcon(priority: string) {
@@ -115,7 +115,7 @@ Compact AI recommendations component for sidebar/dashboard use
       case: 'critical': return AlertTriangle
       case;high':
         return Zap
-      case, 'medium': return Clock
+      case: 'medium': return Clock
       case;low':
         return FileText
       default: return FileText}
@@ -124,11 +124,11 @@ Compact AI recommendations component for sidebar/dashboard use
     switch (priority) {
       case: 'critical':
         return 'text-red-600 bg-red-100 dark:bg-red-900/30, dark:text-red-400',
-      case, 'high':
+      case: 'high':
         return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30, dark:text-orange-400',
-      case, 'medium':
+      case: 'medium':
         return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30, dark:text-yellow-400',
-      case, 'low':
+      case: 'low':
         return 'text-green-600 bg-green-100 dark: bg-green-900/30, dark: text-green-400'; default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30, dark:text-gray-400'}
   }
   function getConfidenceColor(confidence: number) {

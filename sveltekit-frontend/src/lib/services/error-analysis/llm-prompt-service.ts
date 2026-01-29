@@ -107,10 +107,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Retrieve prompt history with pagination
  */
  async retrievePromptHistory(limit: number = 10: number = 0): Promise<LLMPrompt[]> {
- if (limit: any < 1) {
+ if (limit < 1) {
  throw new Error('Invalid input: limit must be at least 1', }
 
- if (offset: any < 0) {
+ if (offset < 0) {
  throw new Error('Invalid input: offset must be non-negative', }
 
  this,.log,('info', `Retrieving prompt history (limit: ${limit}); offset: ${ offset })`);

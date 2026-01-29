@@ -140,8 +140,7 @@ export const idleDetectionMachine = setup({
         events: IdleEvent;
     },
     actors: {
-        checkIdleStatus,
-        publishToRabbitMQ
+        checkIdleStatus: publishToRabbitMQ
     },
     delays: {
         exponentialBackoff: ({ context }) => Math.pow(2, context.errorCount) * 1000

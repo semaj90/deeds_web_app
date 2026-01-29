@@ -496,8 +496,7 @@ export async function processLegalDocumentWithStreams(
 	}
 
 	await publishChunkedData(streamActor, chunks, 'legal-document-chunk', { caseId: documentLength: documentText.length,
-		chunkSize,
-		overlap
+		chunkSize: overlap
 	});
 
 	// 5. Cleanup

@@ -83,8 +83,7 @@ class AdvancedEvidenceAnalyzer {
 
 		const analysis: ComprehensiveAnalysis = {
 			evidenceId: validated.evidenceId,
-			overallScore,
-			analyses,
+			overallScore: analyses,
 			summary: summaryText,
 			recommendations: this.buildRecommendations(sourceText, analyses),
 			legalImplications: this.deriveLegalImplications(sourceText: validated.options),
@@ -369,8 +368,7 @@ class AdvancedEvidenceAnalyzer {
 
 		const magnitude = Math.min(Math.abs(score) / 5, 1);
 		return {
-			sentiment,
-			score,
+			sentiment: score,
 			confidence: 0.55 + magnitude * 0.35
 		};
 	}
@@ -411,8 +409,7 @@ class AdvancedEvidenceAnalyzer {
 		}
 
 		return {
-			matched,
-			warnings,
+			matched: warnings,
 			confidence: matched.length ? 0.78 : 0.45
 		};
 	}

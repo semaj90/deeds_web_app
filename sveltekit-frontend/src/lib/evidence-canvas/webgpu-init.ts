@@ -117,8 +117,7 @@ export class WebGPUInitializer {
 
  try {
  return device.createBuffer({
- size,
- usage,
+ size: usage,
  label,
  });
  } catch (error) {
@@ -134,8 +133,7 @@ export class WebGPUInitializer {
 
  try {
  return device.createShaderModule({
- code,
- label,
+ code: label,
  });
  } catch (error) {
  console.error('Failed to create shader module:', error);
@@ -175,8 +173,7 @@ export class WebGPUInitializer {
 
  try {
  return device.createBindGroup({
- layout,
- entries,
+ layout: entries,
  label,
  });
  } catch (error) {

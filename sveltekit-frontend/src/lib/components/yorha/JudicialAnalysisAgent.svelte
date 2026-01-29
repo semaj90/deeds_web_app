@@ -64,10 +64,8 @@
  'Content-Type': 'application/json'
  },
  body: JSON.stringify({
- caseId,
- evidence,
- charges,
- jurisdiction
+ caseId: evidence,
+ charges: jurisdiction
  })
  });
 

@@ -208,7 +208,15 @@ export async function runMultiPassProcessor(
  */
 export async function runSinglePass(
   targetDirectory: string,
-  category: 'import-type' | 'function-param' | 'function-call' | 'object-literal' | 'nullish-coalescing',
+  category:
+    | 'import-type'
+    | 'function-param'
+    | 'function-call'
+    | 'object-literal'
+    | 'nullish-coalescing'
+    | 'bits-ui-migration'
+    | 'colon-chain'
+    | 'a11y-label',
   config: Partial<FileProcessorConfig> = {}
 ): Promise<DirectoryProcessResult> {
   const patternsByCategory = getPatternsByCategory();
@@ -219,6 +227,137 @@ export async function runSinglePass(
   }
 
   return processDirectory(targetDirectory, patterns, config);
+}
+
+/**
+ * Run remediation with specific pattern categories
+ * Useful for targeted fixes
+ */
+export async function runCategoryRemediation(
+  targetDirectory: string,
+  categories: Array<
+    | 'import-type'
+    | 'function-param'
+    | 'function-call'
+    | 'object-literal'
+    | 'nullish-coalescing'
+    | 'bits-ui-migration'
+    | 'colon-chain'
+    | 'a11y-label'
+  >,
+  config: Partial<MultiPassConfig> = {}
+): Promise<MultiPassResult> {
+  const cfg = { ...defaultMultiPassConfig, ...config };
+  const patternsByCategory = getPatternsByCategory();
+
+  // Collect patterns from specified categories
+  const selectedPatterns: PatternMatcher[] = [];
+  for (const category of categories) {
+    const patterns = patternsByCategory.get(category);
+    if (patterns) {
+      selectedPatterns.push(...patterns);
+    }
+  }
+
+  // Sort by priority
+  selectedPatterns.sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
+
+  const startTime = Date.now();
+  const passes: PassResult[] = [];
+
+  // Get initial error count
+  let initialValidation: ProjectValidationResult | undefined;
+  if (cfg.cwd) {
+    initialValidation = await validateProject(cfg.cwd);
+  }
+  const initialErrors = initialValidation?.totalErrors ?? 0;
+
+  if (cfg.verbose) {
+    console.log(`Running category remediation on ${targetDirectory}`);
+    console.log(`Categories: ${categories.join(', ')}`);
+    console.log(`Patterns: ${selectedPatterns.length}`);
+    console.log(`Initial error count: ${initialErrors}`);
+  }
+
+  let totalFixes = 0;
+  let totalFilesFixed = 0;
+
+  // Run passes with selected patterns
+  for (let passNum = 1; passNum <= cfg.maxPasses; passNum++) {
+    const passStartTime = Date.now();
+
+    if (cfg.verbose) {
+      console.log(`\n--- Pass ${passNum} ---`);
+    }
+
+    const result = await processDirectory(targetDirectory, selectedPatterns, cfg);
+
+    const passResult: PassResult = {
+      passNumber: passNum,
+      patternsApplied: selectedPatterns.map((p) => p.name),
+      totalFixes: result.totalFixes,
+      filesFixed: result.filesFixed,
+      durationMs: Date.now() - passStartTime,
+    };
+
+    if (cfg.validateAfterPass && cfg.cwd && !cfg.dryRun) {
+      passResult.validation = await validateProject(cfg.cwd);
+      if (cfg.verbose) {
+        console.log(`Errors after pass ${passNum}: ${passResult.validation.totalErrors}`);
+      }
+    }
+
+    passes.push(passResult);
+    totalFixes += result.totalFixes;
+    totalFilesFixed += result.filesFixed;
+
+    if (cfg.verbose) {
+      console.log(`Pass ${passNum}: ${result.totalFixes} fixes in ${result.filesFixed} files`);
+    }
+
+    if (cfg.stopOnNoFixes && result.totalFixes === 0) {
+      if (cfg.verbose) {
+        console.log(`No fixes found in pass ${passNum}, stopping.`);
+      }
+      break;
+    }
+  }
+
+  // Get final error count
+  let finalValidation: ProjectValidationResult | undefined;
+  if (cfg.cwd && !cfg.dryRun) {
+    finalValidation = await validateProject(cfg.cwd);
+  }
+  const finalErrors = finalValidation?.totalErrors ?? initialErrors;
+
+  const errorReduction =
+    initialErrors > 0 ? ((initialErrors - finalErrors) / initialErrors) * 100 : 0;
+
+  const totalDurationMs = Date.now() - startTime;
+
+  const summary = generateSummary({
+    passes,
+    totalFixes,
+    totalFilesFixed,
+    initialErrors,
+    finalErrors,
+    errorReduction,
+    totalDurationMs,
+    dryRun: cfg.dryRun ?? false,
+  });
+
+  return {
+    passes,
+    totalPasses: passes.length,
+    totalFixes,
+    totalFilesFixed,
+    initialErrors,
+    finalErrors,
+    errorReduction,
+    totalDurationMs,
+    success: finalErrors <= initialErrors,
+    summary,
+  };
 }
 
 /**

@@ -190,10 +190,8 @@ class JobTracker {
             : 0;
 
         return {
-            total,
-            byState,
-            byPriority,
-            averageProcessingTime,
+            total: byState,
+            byPriority: averageProcessingTime,
             successRate
         };
     }
@@ -243,8 +241,7 @@ class JobTracker {
 
         worker.errors.push({
             timestamp: new Date().toISOString(),
-            error,
-            jobId
+            error: jobId
         });
         this.workers.update(worker);
     }
@@ -252,8 +249,7 @@ class JobTracker {
     private recordMetric(type: string, data: any) {
         this.metrics.insert({
             timestamp: new Date().toISOString(),
-            type,
-            data
+            type: data
         });
     }
 

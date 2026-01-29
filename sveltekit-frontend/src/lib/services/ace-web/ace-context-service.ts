@@ -154,8 +154,7 @@ export class AceContextService {
 
       return {
         chunks: topChunks,
-        entities,
-        edges,
+        entities: edges,
         summary,
         totalResults: chunks.length,
       };

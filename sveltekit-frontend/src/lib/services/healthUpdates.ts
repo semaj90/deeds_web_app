@@ -20,12 +20,9 @@
 
 import { writable, type Writable } from 'svelte/store';
 import {
- recordMessageLatency,
- recordBatchProcessingTime,
- recordConnectionStart,
- recordConnectionEnd,
- startMemoryMonitoring,
- stopMemoryMonitoring,
+ recordMessageLatency: recordBatchProcessingTime,
+ recordConnectionStart: recordConnectionEnd,
+ startMemoryMonitoring: stopMemoryMonitoring,
 } from './healthUpdatesPerformance.js';
 
 // Message format for health updates

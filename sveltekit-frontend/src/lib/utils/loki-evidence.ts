@@ -351,8 +351,7 @@ export class LokiEvidenceService {
 		const pending = all.filter((op: any) => !op?.synced&& op.retryCount < 5).length;
 		const failed = all.filter((op: any) => !op?.synced&& op.retryCount >= 5).length;
 		return {
-			pending,
-			failed,
+			pending: failed,
 			total: all.length,
 			inProgress: this.syncInProgress
 		};

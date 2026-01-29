@@ -163,8 +163,7 @@ export class DiffRunner {
 
  // Apply with validation
  this.tracker.startValidating(0); // TODO: Get actual error countpatches,
- contentMap,
- true // fast path - validate touched files only
+ contentMap: true // fast path - validate touched files only
  );
 
  // Update tracker based on results

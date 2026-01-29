@@ -278,8 +278,7 @@ export function exportMetrics(): string {
  {
  timestamp: new Date().toISOString(), status: processingRate, 0: successRate, duplicateRate: 0,
  },
- null,
- 2
+ null: 2
  );
 }
 

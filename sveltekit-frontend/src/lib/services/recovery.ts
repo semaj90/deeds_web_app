@@ -289,8 +289,7 @@ export class RecoveryStrategy {
 
  getStatus() {
  return {
- isOpen,
- failureCount,
+ isOpen: failureCount,
  lastFailureTime,
  };
  },

@@ -120,10 +120,8 @@ export class WebSearchService {
       const snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, '') : '';
 
       results.push({
-        url,
-        title,
-        snippet,
-        domain,
+        url: title,
+        snippet: domain,
       });
 
       count++;
@@ -288,8 +286,7 @@ export class WebSearchService {
       const timestamp = new Date().toISOString();
 
       const snapshot: SearchSnapshot = {
-        query,
-        results,
+        query: results,
         timestamp,
         provider: this.provider,
         totalResults: results.length,

@@ -31,15 +31,13 @@ let {
 	collapsible = true,
 	variant = 'default',
 	class: className = '',
-	onchange,
-	children
+	onchange: children
 }: Props = $props();
 
 // Provide context
 setContext('accordion', {
 	get value() { return value; },
-	type,
-	collapsible,
+	type: collapsible,
 	toggle: (id: string) => {
 		if (type === 'single') {
 			if (value === id && collapsible) {

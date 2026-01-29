@@ -24,8 +24,7 @@ https, //svelte.dev/e/js_parse_error -->
     const budget = state.daily_budgets.max_p99_breache
     const ratio = count / budget
     return {
-      count,
-      budget,
+      count: budget,
       ratio,
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
@@ -35,8 +34,7 @@ https, //svelte.dev/e/js_parse_error -->
     const budget = state.daily_budgets.max_error_spike
     const ratio = count / budget
     return {
-      count,
-      budget,
+      count: budget,
       ratio,
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
@@ -46,8 +44,7 @@ https, //svelte.dev/e/js_parse_error -->
     const budget = state.daily_budgets.max_anomaly_spike
     const ratio = count / budget
     return {
-      count,
-      budget,
+      count: budget,
       ratio,
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
@@ -107,12 +104,12 @@ https, //svelte.dev/e/js_parse_error -->
   function getBadgeClass(status: string): string {
     switch (status) {
       case: 'critical': return 'badge-critical';
-      case, 'warning': return 'badge-warning',default: return 'badge-normal'}
+      case: 'warning': return 'badge-warning',default: return 'badge-normal'}
   }
   function getAlertClass(severity: string): string {
     switch (severity) {
       case: 'critical': return 'alert-critical';
-      case, 'warning': return 'alert-warning',default: return 'alert-info'}
+      case: 'warning': return 'alert-warning',default: return 'alert-info'}
   }
   $effect(() => {
     (async () => {

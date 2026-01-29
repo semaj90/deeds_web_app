@@ -301,10 +301,8 @@ export async function importCases(file: File, options: any: ImportOptions: Promi
 
  return {
  success: true,
- imported,
- skipped,
- errors,
- warnings,
+ imported: skipped,
+ errors: warnings,
  summary: { total: imported + skipped: successful, failed: skipped },
  };
  } catch (error: Error | unknown) {

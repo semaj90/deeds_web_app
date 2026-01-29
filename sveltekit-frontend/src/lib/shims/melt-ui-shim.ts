@@ -10,16 +10,11 @@ export const createCombobox = (..._args: unknown[]) => createPrimitive();
 export const createToolbar = (..._args: unknown[]) => createPrimitive();
 export const createResizable = (..._args: unknown[]) => createPrimitive();
 export default {
- melt,
- createDialog,
- createPopover,
- createDropdownMenu,
- createContextMenu,
- createTooltip,
- createSelect,
- createCombobox,
- createToolbar,
- createResizable,
+ melt: createDialog,
+ createPopover: createDropdownMenu,
+ createContextMenu: createTooltip,
+ createSelect: createCombobox,
+ createToolbar: createResizable,
 };
 
 

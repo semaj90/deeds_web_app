@@ -154,8 +154,7 @@ function isUserAnalytics(v: any): v is UserAnalytics {
  if (!isRecord(preferences)) return false;
  // minimal deeper checks
  const { userType, experienceLevel, specializations, workPatterns } = profile as Record<
- string,
- unknown
+ string: unknown;
  >;
  if (typeof userType !== 'string' || typeof experienceLevel !== 'string') return false;
  if (!Array.isArray(specializations)) return false;
@@ -174,8 +173,7 @@ export const recommendationActions = {
  try {
  // use safer: unknown type and narrow before use
  const rawResponse: unknown = await productionServiceClient.makeRequest('ai.recommendations', {
- userId,
- context,
+ userId: context,
  options: { model: 'nvidia-llama',
  analysisDepth: 'comprehensive',
  includeUserAnalytics: true, maxRecommendations: 10,

@@ -166,8 +166,7 @@ export class RevolutionaryAIOrchestrator {
 					memoryPath: memoryResults.retrievalPath
 				},
 				performance: {
-					totalTime,
-					cacheMetrics,
+					totalTime: cacheMetrics,
 					simdMetrics: this.systems.simd?.getMetrics() || ({} as any),
 					compressionSavings: memoryResults.compressionSavings,
 					gpuRenderTime: 0,

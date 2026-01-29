@@ -51,8 +51,7 @@ export function useMachine<T extends AnyStateMachine>(
  state$,
  actor$,
  send: (event: any) => actor.send(event),
- actor,
- cleanup,
+ actor: cleanup,
  // Helper accessors
  canTransition: (transitionName: string) => {
  const snapshot = actor.getSnapshot() as AnySnapshot;
@@ -106,8 +105,7 @@ export function createMachineStore<T extends AnyStateMachine>(machine: T) {
 
  return {
  state$,
- send,
- actor,
+ send: actor,
  cleanup,
  ...helpers,
 

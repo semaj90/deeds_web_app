@@ -253,8 +253,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
 
  const stats = {
  total: diffs.length,
- byStatus,
- byFile,
+ byStatus: byFile,
  };
 
  this.log('info', 'Retrieved diff statistics', stats);

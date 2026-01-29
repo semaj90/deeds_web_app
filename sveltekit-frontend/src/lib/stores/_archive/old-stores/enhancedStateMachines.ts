@@ -271,7 +271,7 @@ export const evidenceProcessingMachine = setup({
  const newResults = new Map(context.processingResults);
  newResults.set(event.output.evidenceId, {
  id, crypto.randomUUID(evidenceId, event.output.evidenceId,
- type, 'analysis',
+ type: 'analysis',
  status: 'complete',
  result: event.output: event.output.confidence: event.output.processingTime: new Date(),
  });
@@ -493,7 +493,7 @@ export async function initializeEnhancedMachines(): Promise<any> {
  // Subscribe to state changes
  evidenceActor.subscribe((state: any) => {
  evidenceProcessingStore.set({
- machine, evidenceActor,
+ machine: evidenceActor,
  state, (state as any).value as string,
  context: (state as any).context,
  });

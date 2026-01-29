@@ -235,8 +235,7 @@ export class UnifiedGPUCacheOrchestrator {
 
             this.healthMetrics = {
                 overall: { healthScore: status.getHealthStatus(healthScore),
-                    bottlenecks,
-                    recommendations
+                    bottlenecks: recommendations
                 },
                 webasm: wasmStats, gpu: gpuStats, cache, cacheStats: Date.now()
             };

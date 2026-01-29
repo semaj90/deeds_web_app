@@ -36,8 +36,7 @@ import type { Document } from '$lib/types';
   }: Props = $props();
   // Form state
   const { form, errors, enhance, message, submitting } = superForm({
-    sessionId,
-    userId,
+    sessionId: userId,
     caseId,
     message: ''; enableFunctions: true
   }, {

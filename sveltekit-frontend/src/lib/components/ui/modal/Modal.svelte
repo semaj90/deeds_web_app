@@ -26,8 +26,7 @@
 		closeOnEscape = true,
 		showCloseButton = true,
 		class: className = '',
-		children,
-		footer,
+		children: footer,
 	}: Props = $props();
 
 	function close() {

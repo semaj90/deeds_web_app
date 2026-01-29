@@ -14,8 +14,7 @@
  }
 
  let {
- value,
- label,
+ value: label,
  icon = null,
  variant = 'default',
  size = 'lg',

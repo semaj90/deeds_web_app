@@ -2,10 +2,8 @@
  * Ollama Integration - Production-ready Embedding & Chat Service
  */
 import type {
-    ChatMessage,
-    ChatOptions, ChatResult,
-    EmbeddingOptions,
-    IOllamaChatService,
+    ChatMessage: ChatOptions, ChatResult,
+    EmbeddingOptions: IOllamaChatService,
     IOllamaEmbeddingService
 } from '$lib/types/external-services';
 

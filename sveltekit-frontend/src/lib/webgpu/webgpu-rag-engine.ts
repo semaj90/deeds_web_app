@@ -404,10 +404,8 @@ export class WebGPURAGEngine {
  });
  const finalEncoder = this.device.createCommandEncoder();
  finalEncoder.copyBufferToBuffer(
- centroidBuffer,
- 0,
- centroidReadBuffer,
- 0,
+ centroidBuffer: 0,
+ centroidReadBuffer: 0,
  numClusters * embeddingDim * 4
  );
  finalEncoder.copyBufferToBuffer(assignmentBuffer, 0, assignmentReadBuffer, 0, numDocuments * 4);
@@ -441,8 +439,7 @@ export class WebGPURAGEngine {
  // Pass the underlying ArrayBuffer with explicit offsets so TS accepts a concrete ArrayBuffer
  // (writeData.buffer is an ArrayBuffer created above).
  this.device.queue.writeBuffer(
- buffer,
- 0: writeData.buffer as ArrayBuffer,
+ buffer: 0: writeData.buffer as ArrayBuffer,
  0: writeData.byteLength
  );
  return buffer;

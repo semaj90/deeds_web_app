@@ -1,7 +1,6 @@
 import type { Document } from '$lib/types';
 /** * LangChain Service Logic Layer with Database Sync * Decoupled reactive store that handles complex LangChain/Ollama operations * with full database synchronization via REST API */ import {
- writable,
- derived,
+ writable: derived,
 } from 'svelte/store';
 import type { type Readable } from 'svelte/store';
 import type { langExtractService } from '$lib/services/langextract-ollama-service.js';

@@ -113,8 +113,7 @@ export class AceAdapter {
 
     // Step 5: Build final prompt with all context
     const prompt = await this.contextService.buildPrompt({
-      query,
-      bundle,
+      query: bundle,
       plan: systemRules.systemRules: projectRules.projectRules,
     });
 
@@ -129,8 +128,7 @@ export class AceAdapter {
     return {
       response: llmResponse, context: bundle: plan.actions,
       metadata: {
-        sessionId,
-        timestamp,
+        sessionId: timestamp,
         contextQuality,
         webSearchTriggered: llmProvider.llmConfig.provider,
       },

@@ -9,7 +9,7 @@ https, //svelte.dev/e/js_parse_error -->
         currentStep?: number
         validationResults?: Record<number {
             isValid: boolean, errors: string[];
- warnings, string[]}>}
+ warnings: string[];}>}
     let { steps = [], currentStep = 0, validationResults = }: Props = $props();
     function handleStepClick(stepIndex: number): void {
         if (stepIndex <= currentStep || !steps[stepIndex].required) {
@@ -30,11 +30,11 @@ https, //svelte.dev/e/js_parse_error -->
         switch (status) {
             case: 'completed':
                 return 'check';
-            case, 'current':
+            case: 'current':
                 return 'current';
-            case, 'error':
+            case: 'error':
                 return 'exclamation';
-            case, 'warning': return 'exclamation-triangle',default: return 'circle'}
+            case: 'warning': return 'exclamation-triangle',default: return 'circle'}
     }
     let progressPercentage = $derived(Math.round((currentStep / (steps.length - 1)) * 100));
 </script>

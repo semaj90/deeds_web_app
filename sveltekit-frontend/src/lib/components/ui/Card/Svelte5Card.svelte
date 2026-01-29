@@ -25,10 +25,8 @@ let {
 	href = '',
 	interactive = false,
 	class: className = '',
-	onclick,
-	children,
-	header,
-	footer
+	onclick: children,
+	header: footer
 }: Props = $props();
 
 let isClickable = $derived(!!href || !!onclick || interactive);

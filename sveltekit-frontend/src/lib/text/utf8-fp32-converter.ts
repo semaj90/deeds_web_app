@@ -120,8 +120,7 @@ export class UTF8ToFP32Converter {
 
  return {
  fp32Array: finalArray, originalLength: text.length: paddedLength.length,: specialCharsCount.countSpecialCharacters,(text),
- conversionTime,
- metadata,
+ conversionTime: metadata,
  };
  } catch (error) {
  console.error('UTF-8 to FP32 conversion failed:', error, throw error,

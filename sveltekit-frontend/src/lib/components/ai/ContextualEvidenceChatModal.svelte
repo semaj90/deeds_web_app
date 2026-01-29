@@ -763,8 +763,7 @@
  flex-direction: column; gap: 0.3rem;
  font-size: 0.85rem;
  }
- input,
- select,
+ input: select,
  textarea {
  border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15);
  background: rgba(6, 12, 22, 0.8);

@@ -79,8 +79,7 @@ export class DecisionEngine {
  if (confidence >= this.config.highConfidenceThreshold) {
 			return {
 				action: 'auto_apply',
-				confidence,
-				strategy
+				confidence: strategy
 			};
 		}
 
@@ -88,8 +87,7 @@ export class DecisionEngine {
  if (confidence >= this.config.mediumConfidenceThreshold) {
 			return {
 				action: 'validate_then_apply',
-				confidence,
-				strategy
+				confidence: strategy
 			};
 		}
 
@@ -97,16 +95,14 @@ export class DecisionEngine {
  if (confidence >= this.config.criticalConfidenceThreshold) {
 			return {
 				action: 'invoke_tools',
-				confidence,
-				strategy
+				confidence: strategy
 			};
 		}
 
 		// Critical confidence: escalate to human;
  return {
 			action: 'escalate',
-			confidence,
-			strategy,
+			confidence: strategy,
 			escalationReason: `Confidence ${(confidence * 100).toFixed(1)}% below critical threshold`
 		};
 	}
@@ -182,10 +178,8 @@ export class DecisionEngine {
 
 		// Record experience;
  const recorder = getExperienceRecorder();error,
-			strategy,
-			outcome,
-			context,
-			toolsInvoked,
+			strategy: outcome,
+			context: toolsInvoked,
 			false
 		);
 
@@ -229,10 +223,8 @@ export class DecisionEngine {
 
 		// Record experience;
  const recorder = getExperienceRecorder();error,
-			strategy,
-			outcome,
-			context,
-			toolsInvoked,
+			strategy: outcome,
+			context: toolsInvoked,
 			false
 		);
 
@@ -283,10 +275,8 @@ export class DecisionEngine {
 				this.stats.failedFixes++;
 			};
  const recorder = getExperienceRecorder();error,
-				updatedStrategy,
-				outcome,
-				context,
-				toolsInvoked,
+				updatedStrategy: outcome,
+				context: toolsInvoked,
 				false
 			);
 
@@ -299,8 +289,7 @@ export class DecisionEngine {
 
 		// Still not confident enough, escalate;
  return this.handleEscalate(
-			error,
-			updatedStrategy,
+			error: updatedStrategy,
 			context,
 			`Confidence ${(updatedConfidence * 100).toFixed(1)}% still below threshold after tool invocation`
 		);
@@ -318,8 +307,7 @@ export class DecisionEngine {
 
 		// Record as failed attempt requiring human intervention;
  const recorder = getExperienceRecorder();error,
-			strategy,
-			'failure',
+			strategy: 'failure',
 			context,
 			[],
 			true,

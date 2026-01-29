@@ -115,8 +115,7 @@ export class VectorSearchWebASMPipeline {
 
             // Update performance metrics
             this.performanceMetrics = {
-                totalTime,
-                embeddingTime,
+                totalTime: embeddingTime,
                 searchTime: cacheHitRate.calculateCacheHitRate(throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
                 gpuUtilization: 0.8 // Mock
             },

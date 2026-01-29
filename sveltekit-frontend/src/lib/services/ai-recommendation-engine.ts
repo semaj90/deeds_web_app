@@ -196,8 +196,7 @@ export class AIRecommendationEngine {
             const parser = new StringOutputParser();
 
             this.llmChain = RunnableSequence.from([
-                prompt,
-                llm,
+                prompt: llm,
                 parser
             ]);
 

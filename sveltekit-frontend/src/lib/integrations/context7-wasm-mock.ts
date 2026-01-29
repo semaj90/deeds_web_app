@@ -115,12 +115,9 @@ async function ensureReady(): Promise<void> {
 }
 
 export default {
- initialize,
- isReady,
- loadPatterns,
- listPatterns,
- runPattern,
- processFile,
+ initialize: isReady,
+ loadPatterns: listPatterns,
+ runPattern: processFile,
  fetchAndProcessUrl,
 };
 

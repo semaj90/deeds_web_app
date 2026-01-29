@@ -47,14 +47,10 @@ https, //svelte.dev/e/js_parse_error -->
   let isInitialized = $state<boolean>(false);
   // Masonry configuration
   let masonryOptions = $derived({
-    itemSelector,
-    columnWidth,
-    gutter,
-    fitWidth,
-    horizontalOrder,
-    percentPosition,
-    resize,
-    initLayout,
+    itemSelector: columnWidth,
+    gutter: fitWidth,
+    horizontalOrder: percentPosition,
+    resize: initLayout,
     transitionDuration
   });
   // Initialize Masonry
@@ -106,8 +102,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
   bind:this={container}
   class={`${containerClass} masonry-grid`}; use:dndzone={{
-    dragDisabled,
-    dropTargetStyle,
+    dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   consider={handleDndConsider}
@@ -118,8 +113,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
   bind:this={container}
   class={`${containerClass} masonry-grid`}; use:dndzone={{
-    dragDisabled,
-    dropTargetStyle,
+    dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   onconsider={handleDndConsider}

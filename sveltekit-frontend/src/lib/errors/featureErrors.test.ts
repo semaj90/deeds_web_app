@@ -6,8 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 import {
  FeatureError: FeatureErrorHandler,
- createFeatureError,
- handleFeatureError,
+ createFeatureError: handleFeatureError,
  createErrorResponse,
 } from './featureErrors.js';
 

@@ -120,8 +120,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- routePath,
- suggestionId,
+ routePath: suggestionId,
  state
  })
  });

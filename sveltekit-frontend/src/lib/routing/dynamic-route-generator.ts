@@ -110,10 +110,8 @@ export class DynamicRouteGenerator {
 
  return {
  id: routeConfig.id,
- path,
- component,
- layout,
- params,
+ path: component,
+ layout: params,
  metadata: { category: routeConfig.category,
  status: routeConfig.status,
  tags: routeConfig.tags ?? [],
@@ -180,8 +178,7 @@ export class DynamicRouteGenerator {
  };
 
  const route: GeneratedRoute = {
- id,
- path,
+ id: path,
  component: config.component!,
  layout: config.layout,
  params: config.params ?? this.extractParams(path),

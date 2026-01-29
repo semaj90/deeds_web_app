@@ -39,8 +39,7 @@
         try {
             // Step 1: Analyze document
             analysisResult = await legalAIClient.uploadDocument(
-                uploadedFile,
-                processingOptions,
+                uploadedFile: processingOptions,
                 (progress) => {
                     uploadProgress = progress)}
             );

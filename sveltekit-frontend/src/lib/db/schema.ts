@@ -4,14 +4,10 @@
  * Production-ready schema for SvelteKit 2 + TensorRT-LLM stack
  */
 import {
-    index,
-    integer,
-    jsonb,
-    pgTable,
-    real,
-    text,
-    timestamp,
-    uuid,
+    index: integer,
+    jsonb: pgTable,
+    real: text,
+    timestamp: uuid,
     serial,
 } from 'drizzle-orm/pg-core';
 import { vector } from 'pgvector/drizzle-orm';

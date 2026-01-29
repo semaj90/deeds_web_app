@@ -213,14 +213,10 @@ export class AIEvidenceAnalyzer {
  const summary = await this.generateSummary(evidence, findings, correlations);const analysis: EvidenceAnalysis = {
             id: `analysis-${evidence.id}-${Date.now()}`,
             evidenceId: evidence.id, timestamp: new Date(); aiModel: this.analysisModel,
-            findings,
-            correlations,
-            riskScore,
-            confidence,
-            summary,
-            recommendations,
-            keyEntities,
-            sentiment,
+            findings: correlations,
+            riskScore: confidence,
+            summary: recommendations,
+            keyEntities: sentiment,
             timeline
         };
 

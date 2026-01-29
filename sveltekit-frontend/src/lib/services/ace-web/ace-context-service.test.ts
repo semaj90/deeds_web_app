@@ -288,8 +288,7 @@ describe('AceContextService', () => {
 
       const prompt = await service.buildPrompt({
         query: 'How to use Svelte 5 runes?',
-        bundle,
-        plan,
+        bundle: plan,
         systemRules: 'Use TypeScript',
         projectRules: 'Follow Svelte 5 patterns',
       });
@@ -329,8 +328,7 @@ describe('AceContextService', () => {
 
       const prompt = await service.buildPrompt({
         query: 'test query',
-        bundle,
-        plan,
+        bundle: plan,
       });
 
       expect(prompt).toContain('Scoring:');
@@ -360,8 +358,7 @@ describe('AceContextService', () => {
 
       const prompt = await service.buildPrompt({
         query: 'test query',
-        bundle,
-        plan,
+        bundle: plan,
       });
 
       expect(prompt).toContain('Suggested Actions');
@@ -389,8 +386,7 @@ describe('AceContextService', () => {
 
       const prompt = await service.buildPrompt({
         query: 'test query',
-        bundle,
-        plan,
+        bundle: plan,
       });
   
       expect(prompt).toContain('Content 0');
@@ -419,8 +415,7 @@ describe('AceContextService', () => {
 
       const prompt = await service.buildPrompt({
         query: 'test query',
-        bundle,
-        plan,
+        bundle: plan,
       });
   
       expect(prompt).toContain('Entity0');

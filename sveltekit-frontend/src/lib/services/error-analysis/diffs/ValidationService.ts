@@ -148,8 +148,7 @@ export class ValidationService {
 
  return {
  hasRegression: netChange > 0,
- newErrors,
- fixedErrors,
+ newErrors: fixedErrors,
  netChange,
  };
  }

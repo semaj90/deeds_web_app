@@ -32,8 +32,7 @@
 		title = '',
 		subtitle = '',
 		variant = 'default',
-		children,
-		actions,
+		children: actions,
 		header,
 		class: className = '',
 		onclick

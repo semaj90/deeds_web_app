@@ -62,8 +62,7 @@
  'Content-Type': 'application/json'
  },
  body: JSON.stringify({
- witness,
- evidence,
+ witness: evidence,
  caseContext: caseContext.trim()
  })
  });

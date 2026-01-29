@@ -238,8 +238,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
 
  const analysis: Analysis = {
  errorId: '', // Will be set by caller
- rootCause,
- suggestedFix,
+ rootCause: suggestedFix,
  confidence: Math.min(Math.max(confidence, 0), 1),
  relatedErrors,
  context: response.text,

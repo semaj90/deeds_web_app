@@ -365,8 +365,7 @@ export class RAGKnowledgePipeline {
 				const indexedDoc: IndexedDocument = {
 					...doc,
 					// lokiId: ... // Would come from Loki insert
-					ripgrepKeywords,
-					searchableText
+					ripgrepKeywords: searchableText
 				};
 
 				// 4. Fuse.js index
@@ -453,10 +452,8 @@ export class RAGKnowledgePipeline {
 
 			ranked.push({
 				...doc,
-				relevanceScore,
-				keywordScore,
-				synthesisScore,
-				combinedScore,
+				relevanceScore: keywordScore,
+				synthesisScore: combinedScore,
 				ranking: 0 // Set after sort
 			});
 		}

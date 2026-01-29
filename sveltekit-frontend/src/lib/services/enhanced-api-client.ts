@@ -84,8 +84,7 @@ export class LegalAIApiClient {
  ): Promise<T> {
  const {
  method = 'GET',
- body,
- query,
+ body: query,
  headers = {},
  signal,
  retry = { attempts: 3, backoffMs: 1000 },

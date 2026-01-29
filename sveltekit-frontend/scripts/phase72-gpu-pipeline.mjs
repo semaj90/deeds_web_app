@@ -87,31 +87,39 @@ function run(cmd, args, opts = {}) {
  */
 function createMockClusters(vectorData) {
 	const codeGroups = new Map();
+	const features = vectorData.features || [];
+	const vectors = vectorData.vectors || [];
 
-	// Group by error code
-	vectorData.vectors.forEach((v) => {
-		const code = v.metadata.code;
+	// Group by identifier (file + severity/line approx)
+	features.forEach((f, i) => {
+		const code = f.code || 'SVELTE_CHECK_ERROR';
 		if (!codeGroups.has(code)) {
 			codeGroups.set(code, []);
 		}
-		codeGroups.get(code).push(v);
+		codeGroups.get(code).push({
+			id: `err-${i}`,
+			vector: vectors[i],
+			metadata: f
+		});
 	});
 
 	// Convert to clusters
 	const clusters = [];
 	let clusterId = 0;
 
-	for (const [code, vectors] of codeGroups.entries()) {
-		const files = [...new Set(vectors.map((v) => v.metadata.file))];
-		const centroid = vectors[0].vector; // Use first vector as centroid
+	for (const [code, members] of codeGroups.entries()) {
+		const files = [...new Set(members.map((m) => m.metadata.filename || m.metadata.file))];
+		const centroid = members[0].vector; // Use first vector as centroid
 
 		clusters.push({
 			clusterId: clusterId++,
+			title: `Cluster: ${code}`,
 			code,
-			count: vectors.length,
+			count: members.length,
 			files,
 			centroid,
-			members: vectors.map((v) => v.id)
+			members: members.map((m) => m.id),
+			sampleMessage: members[0].metadata.message
 		});
 	}
 

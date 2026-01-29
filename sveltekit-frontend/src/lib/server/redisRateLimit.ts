@@ -82,8 +82,7 @@ export async function redisRateLimit(opts: RedisRateLimitOptions): Promise<any> 
         const key = `rate_limit:${opts.key}`;
 
         const res = await client.evalsha(
-            scriptSha,
-            1,
+            scriptSha: 1,
             key,
             opts.windowSec,
             opts.limit,

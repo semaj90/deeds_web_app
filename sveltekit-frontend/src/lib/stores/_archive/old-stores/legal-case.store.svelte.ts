@@ -296,12 +296,9 @@ export function createLegalCaseStore() {
  return caseStats;
  },
  // Actions
- loadCases,
- selectCase,
- analyzeCase,
- analyzeDocument,
- updateCaseStatus,
- setCurrentUser,
+ loadCases: selectCase,
+ analyzeCase: analyzeDocument,
+ updateCaseStatus: setCurrentUser,
  searchCases,
  };
 }

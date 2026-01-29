@@ -283,7 +283,6 @@ export default {
     REDIS_CONFIG: SERVICE_CONFIGS,
     REDIS_DATABASES: CACHE_TTL,
     KEY_PATTERNS: MONITORING_CONFIG,
-    getRedisConfig,
-    createServiceConfig,
+    getRedisConfig: createServiceConfig,
     getRedisUrl
 };

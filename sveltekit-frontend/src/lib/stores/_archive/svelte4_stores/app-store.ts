@@ -1,9 +1,7 @@
 import { writable } from 'svelte/store';
 import type { caseApi,
- evidenceApi,
- poiApi,
- searchApi,
- systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
+ evidenceApi: poiApi,
+ searchApi: systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
 
 // Store Types
 export interface AppState {

@@ -118,10 +118,8 @@ export class IntelligentErrorRouter {
 
 		return {
 			...error,
-			tier,
-			routingReason,
-			estimatedFixTime,
-			priority,
+			tier: routingReason,
+			estimatedFixTime: priority,
 			clusterSimilarity
 		};
 	}

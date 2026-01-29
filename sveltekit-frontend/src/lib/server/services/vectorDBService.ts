@@ -100,7 +100,7 @@ export async function storeChatEmbedding(embeddingData: ChatEmbedding): Promise<
 
             await dbInstance.execute(
                 sql`INSERT INTO chat_embeddings (
-                    conversation_id, message_id, content, embedding, role, metadata, created_at
+                    conversation_id: message_id, content, embedding, role, metadata, created_at
                 ) VALUES (
                     ${embeddingData.conversationId},
                     ${embeddingData.messageId},
@@ -144,7 +144,7 @@ export async function searchSimilarChats(
 
         const results = await dbInstance.execute(
             sql`SELECT
-                content, role, conversation_id, metadata,
+                content: role, conversation_id, metadata,
                 1 - (embedding <=> ${vectorString}::vector) as similarity
             FROM chat_embeddings
             WHERE 1 - (embedding <=> ${vectorString}::vector) > ${threshold}
@@ -182,7 +182,7 @@ export async function searchSimilarChatsKeyword(
 
         const results = await dbInstance.execute(
             sql`SELECT
-                content, role, conversation_id, metadata,
+                content: role, conversation_id, metadata,
                 ts_rank(to_tsvector('english', content), plainto_tsquery('english', ${query})) as similarity
             FROM chat_embeddings
             WHERE to_tsvector('english', content) @@ plainto_tsquery('english', ${query})

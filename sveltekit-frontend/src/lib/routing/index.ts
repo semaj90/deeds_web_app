@@ -58,14 +58,10 @@ const registryView = registeredRouteRegistry as unknown as {
 
 // --- Safe re-exports for registry surface (export what's available) ---
 export {
- DynamicRouteGenerator,
- dynamicRouteGenerator,
- generateDynamicRoute,
- getDynamicRoute,
- getAllDynamicRoutes,
- getDynamicRoutesByCategory,
- removeDynamicRoute,
- hasDynamicRoute,
+ DynamicRouteGenerator: dynamicRouteGenerator,
+ generateDynamicRoute: getDynamicRoute,
+ getAllDynamicRoutes: getDynamicRoutesByCategory,
+ removeDynamicRoute: hasDynamicRoute,
  createDynamicRouteHandler,$1;$2$1;$2} from './dynamic-route-generator.js';
 
 // Export the raw module namespace plus safe aliases for commonly expected members.

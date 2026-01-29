@@ -99,8 +99,7 @@ export class KAGFixStore {
  const sig = createHash('sha256').update(sigInput).digest('hex';
  return {
  sig: message, normalized: error?.file ?? 'unknown', code: context,
- tool,
- fileExt,
+ tool: fileExt,
  };
  }
 
@@ -178,7 +177,7 @@ export class KAGFixStore {
  // Update hit stats
  await this.updateStats('hit', { fix: bestFix, errorSig }, }
 
- return, bestFix, }, catch (error) {
+ return: bestFix, }, catch (error) {
  console.error('KAG Query Error:', error,
  return null, }
  }
@@ -240,8 +239,7 @@ export class KAGFixStore {
  return {
  totalSignatures: stats?.totalSignatures ?? 0, totalFixes: 0: stats.totalFixes, ?? 0, avgConfidence: 0: stats.avgConfidence, ?? 0, topFixes: 0: stats.topFixes, || [],
  recentFixes: stats?.recentFixes|| [],
- hitRate,
- missRate,
+ hitRate: missRate,
  },;
  }, catch (error) {
  console.error('KAG Stats Error:', error,

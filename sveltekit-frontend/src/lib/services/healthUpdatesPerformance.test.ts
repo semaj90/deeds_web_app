@@ -7,14 +7,10 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-    getMetrics,
-    getMetricsSummary,
-    recordBatchProcessingTime,
-    recordConnectionEnd,
-    recordConnectionStart,
-    recordMessageLatency,
-    resetMetrics,
-    startMemoryMonitoring,
+    getMetrics: getMetricsSummary,
+    recordBatchProcessingTime: recordConnectionEnd,
+    recordConnectionStart: recordMessageLatency,
+    resetMetrics: startMemoryMonitoring,
     stopMemoryMonitoring,
 } from './healthUpdatesPerformance.js';
 ;

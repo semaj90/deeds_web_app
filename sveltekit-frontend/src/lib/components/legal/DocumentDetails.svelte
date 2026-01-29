@@ -66,7 +66,7 @@ import type { Document } from '$lib/types';
   }
 
   // Server fetch with caching
-  async function fetchAndCacheDocument(docId: string | includeGPU = false), Promise<Response> {
+  async function fetchAndCacheDocument(docId: string | includeGPU = false): Promise<Response> {
     const serverStartTime = performance.now();
     loadingSource.set('server');
     console.log('ðŸŒ Fetching from server with full analysis...');

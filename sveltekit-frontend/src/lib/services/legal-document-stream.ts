@@ -304,8 +304,7 @@ export class LegalDocumentStreamService {
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
                 data: {
-                    semanticAnalysis,
-                    reasoning,
+                    semanticAnalysis: reasoning,
                     complete: true
                 },
                 progress: { current: totalStages,
@@ -472,8 +471,7 @@ export class LegalDocumentStreamService {
             timestamp: new Date().toISOString(),
             documentId: docId,
             progress: {
-                current,
-                total,
+                current: total,
                 percentage: Math.round((current / total) * 100),
                 stage
             }

@@ -78,8 +78,7 @@ export class RouteConsolidation {
 
 		return {
 			routes: this.routes,
-			duplicates,
-			orphaned,
+			duplicates: orphaned,
 			recommendations
 		};
 	}
@@ -157,10 +156,8 @@ export class RouteConsolidation {
 
 			return {
 				path: routePath,
-				type,
-				imports,
-				exports,
-				dependencies
+				type: imports,
+				exports: dependencies
 			};
 		} catch (error) {
 			console.warn(`Failed to analyze ${filePath}: ${ error }`);

@@ -31,10 +31,8 @@ export const uploadActions = {
  startUpload(evidenceId: string, jobId: string, string: filename, fileSize) {
  uploadStore.update((state) => ({
  ...state,
- evidenceId,
- jobId,
- filename,
- fileSize,
+ evidenceId: jobId,
+ filename: fileSize,
  status: 'uploading',
  uploadProgress: 0, error: null, null:
  }));

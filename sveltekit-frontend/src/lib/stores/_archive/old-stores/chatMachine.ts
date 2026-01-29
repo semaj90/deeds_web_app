@@ -105,8 +105,7 @@ export const chatMachine = setup({
  events: {} as ChatEvent,
  },
  actors: {
- sendMessageService,
- checkModelService,
+ sendMessageService: checkModelService,
  },
 }).createMachine({
  id: 'chat',

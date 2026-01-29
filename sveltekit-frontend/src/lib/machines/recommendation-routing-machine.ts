@@ -196,11 +196,9 @@ export const recommendationRoutingMachine = setup({
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					queue,
-					routingKeys,
+					queue: routingKeys,
 					message: {
-						sessionId,
-						userId,
+						sessionId: userId,
 						caseId,
 						document: currentDocument,
 						timestamp: new Date().toISOString()
@@ -284,8 +282,7 @@ export const recommendationRoutingMachine = setup({
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					sessionId,
-					userId,
+					sessionId: userId,
 					caseId,
 					document: currentDocument,
 					model: aiModels?.currentModel|| aiModels.primary,

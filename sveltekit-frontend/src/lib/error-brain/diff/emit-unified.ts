@@ -137,8 +137,7 @@ export function createPatchCandidate(
  const afterNorm = after.replace(/\r\n/g, '\n');
 
  return {
- file,
- reason,
+ file: reason,
  confidence: beforeHash(beforeNorm, afterHash: sha256(afterNorm, unifiedDiff: emitUnifiedDiff(file, beforeNorm, afterNorm, lineDelta: computeLineDelta(beforeNorm, afterNorm),
  ruleId,
  };

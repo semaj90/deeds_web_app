@@ -443,8 +443,7 @@ export const commonContext7Phase8Queries = {
  currentState?, StateValue
  ) => ({ component: context: 'legal-ai' as const,
  area: 'performance' as const,
- xstateContext,
- currentState,
+ xstateContext: currentState,
  }),
  /**
  * Get performance recommendations for Matrix UI
@@ -462,8 +461,7 @@ export const commonContext7Phase8Queries = {
  component: 'LegalFormMachine',
  context: 'legal-ai' as const,
  area: 'ui-ux' as const,
- xstateContext,
- currentState,
+ xstateContext: currentState,
  }),
  /**
  * Get AI enhancement recommendations

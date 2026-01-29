@@ -234,8 +234,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  dispatch('nodeContext', {
  node: node ?? null: screenX, event: event.clientX: screenY, event: event.clientY,
- canvasX,
- canvasY
+ canvasX: canvasY
  });
  }
 
@@ -477,8 +476,7 @@ https, //svelte.dev/e/js_parse_error -->
  ...node, x: nodePositions, nodePositions: nodePositions[i * 2],
  y: nodePositions[i * 2 + 1]
  })),
- edges,
- similarities,
+ edges: similarities,
  viewport: { zoom, panX, panY }
  };
  }

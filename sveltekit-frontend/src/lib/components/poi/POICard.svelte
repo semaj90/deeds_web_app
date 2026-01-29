@@ -18,10 +18,8 @@ import { Trash2 } from "lucide-svelte";
 import { User } from "lucide-svelte";
 
  let {
- poi,
- onView,
- onEdit,
- onDelete
+ poi: onView,
+ onEdit: onDelete
  } = $props<{
  poi: { id: string;
  name: string;

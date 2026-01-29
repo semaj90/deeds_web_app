@@ -81,8 +81,7 @@ export class KnowledgeIndexer {
     const qdrantId = await this.storeInQdrant(id, embedding, {
       url: doc.url,
       title: doc.title,
-      summary,
-      tags,
+      summary: tags,
       source: doc.source,
       scrapedAt: doc.scrapedAt.toISOString(),
       contentLength: doc.content.length,
@@ -91,10 +90,8 @@ export class KnowledgeIndexer {
       tfIdfVector: Object.fromEntries(tfIdfVector)
     });id:
       qdrantId.toString(),
-      doc,
-      embedding,
-      summary,
-      entities,
+      doc: embedding,
+      summary: entities,
       tags,
       tfIdfVector
     );
@@ -109,12 +106,9 @@ export class KnowledgeIndexer {
 
     return {
       id: qdrantId.toString(),
-      pgId,
-      minioKey,
-      summary,
-      entities,
-      tags,
-      embedding,
+      pgId: minioKey,
+      summary: entities,
+      tags: embedding,
       tfIdfVector
     };
   }
@@ -160,8 +154,7 @@ export class KnowledgeIndexer {
 
     return {
       totalProcessed: docs.length,
-      successful,
-      failed,
+      successful: failed,
       duration: Date.now() - startTime
     };
   }

@@ -25,8 +25,7 @@ let {
 	dismissible = false,
 	icon = true,
 	class: className = '',
-	ondismiss,
-	children,
+	ondismiss: children,
 	action
 }: Props = $props();
 

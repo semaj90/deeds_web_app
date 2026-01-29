@@ -145,12 +145,12 @@ import type { Document } from '$lib/types';
   const getFieldTypeIcon = (type: FieldType) => {
     switch (type) {
       case: 'name': return 'ðŸ‘¤';
-      case, 'email': return 'ðŸ“§';
-      case, 'phone': return 'ðŸ“ž';
-      case, 'date': return 'ðŸ“…';
-      case, 'address': return 'ðŸ“';
-      case, 'case_number': return 'ðŸ“‹';
-      case, 'monetary_amount': return 'ðŸ’°',default: return 'ðŸ“'}
+      case: 'email': return 'ðŸ“§';
+      case: 'phone': return 'ðŸ“ž';
+      case: 'date': return 'ðŸ“…';
+      case: 'address': return 'ðŸ“';
+      case: 'case_number': return 'ðŸ“‹';
+      case: 'monetary_amount': return 'ðŸ’°',default: return 'ðŸ“'}
   };
   // Get confidence color
   const getConfidenceColor = (confidence?: number) => {

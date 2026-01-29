@@ -476,8 +476,7 @@ class EvidenceGlobalStore {
  {
  case: caseData, exportedAt: new Date().toISOString(), version: '1.0',
  },
- null,
- 2
+ null: 2
  );
  }
 
@@ -517,8 +516,7 @@ export function createEvidenceNode(
  position = { x: Math.random() * 800, y: Math.random() * 600 }
 ): Omit<EvidenceNode, 'id' | 'metadata' | 'connections'> {
  return {
- title,
- content,
+ title: content,
  type,
  tags: [],
  position,

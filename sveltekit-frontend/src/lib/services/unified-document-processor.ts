@@ -313,8 +313,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 
 		const baseResult: ProcessingResult = {
 			success: false,
-			documentId,
-			processingId,
+			documentId: processingId,
 			ocr: {
 				extractedText: '',
 				confidence: 0,

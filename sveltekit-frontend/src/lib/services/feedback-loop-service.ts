@@ -127,7 +127,7 @@ export class FeedbackLoopService {
             await this.updateUserBehaviorPattern(ratingData.userId, ratingData);
 
             // Find similar low-rated interactions using vector similarity
-            if (ratingData.score < 3?.0&& queryEmbedding) {
+            if (ratingData.score < 3.0&& queryEmbedding) {
                 await this.findSimilarLowRatedInteractions(ratingData.userId, queryEmbedding);
             }
 
@@ -496,10 +496,8 @@ export class FeedbackLoopService {
             }
 
             return {
-                averageRating,
-                totalRatings,
-                ratingDistribution,
-                improvementTrends,
+                averageRating: totalRatings,
+                ratingDistribution: improvementTrends,
                 activeTrainingItems: this.trainingQueue.length
             };
         } catch (error: unknown) {

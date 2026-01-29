@@ -84,10 +84,8 @@ export class EscalationService {
 		const ticketId = uuidv4();
 		const ticket: EscalationTicket = {
 			id: ticketId, errorReport: error,
-			attemptedStrategies,
-			confidence,
-			toolResults,
-			context,
+			attemptedStrategies: confidence,
+			toolResults: context,
 			status: 'open',
 			createdAt: new Date()
 		};
@@ -148,8 +146,7 @@ export class EscalationService {
 
 			// Record as high-value experience
 			const recorder = getExperienceRecorder();ticket.errorReport,
-				fix,
-				'success',
+				fix: 'success',
 				ticket.context,
 				[],
 				true,
@@ -245,8 +242,7 @@ export class EscalationService {
 
 		return {
 			totalEscalations: tickets.length,
-			commonPatterns,
-			avgResolutionTime,
+			commonPatterns: avgResolutionTime,
 			resolutionRate
 		};
 	}

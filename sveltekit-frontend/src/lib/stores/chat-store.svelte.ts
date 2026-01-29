@@ -224,8 +224,7 @@ export class ChatStore {
 
     trackActivity(userId: string, sessionId: string, isTyping: boolean = false): void {
         const activity: UserActivity = {
-            userId,
-            sessionId,
+            userId: sessionId,
             lastSeen: new Date(),
             status: 'online'
         };

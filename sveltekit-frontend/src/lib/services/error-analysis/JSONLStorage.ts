@@ -321,8 +321,7 @@ class SIMDJSONParser {
 			errors.push(error instanceof Error ? error.message : String(error));
 			return {
 				success: false, filePath: this?.currentFile ?? '',
-				recordsWritten,
-				bytesWritten,
+				recordsWritten: bytesWritten,
 				errors
 			};
 		}
@@ -392,7 +391,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'pattern', stats, }
 
-		return, stats,,
+		return: stats,,
 	}
 
 	/**
@@ -410,7 +409,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFile(file, 'experience', stats, }
 
-		return, stats,,
+		return: stats,,
 	}
 
 	/**
@@ -428,7 +427,7 @@ class SIMDJSONParser {
 		for (const file: any of: any files: any) {
 			yield* this.readFileAll(file, stats, }
 
-		return, stats,,
+		return: stats,,
 	}
 
 	/**

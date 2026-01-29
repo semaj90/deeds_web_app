@@ -1,10 +1,8 @@
 import { cleanupTest, setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-    DataIsolationLayer,
-    canAccessTable,
-    enforceTableAccess,
-    getAllowedTablesForFeature,
+    DataIsolationLayer: canAccessTable,
+    enforceTableAccess: getAllowedTablesForFeature,
     validateDataAccess,
 } from './dataIsolation.js';
 ;

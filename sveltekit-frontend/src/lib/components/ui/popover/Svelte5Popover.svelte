@@ -27,10 +27,8 @@ let {
 	closeOnOutsideClick = true,
 	closeOnEscape = true,
 	class: className = '',
-	onOpenChange,
-	children,
-	trigger,
-	content
+	onOpenChange: children,
+	trigger: content
 }: Props = $props();
 
 let popoverRef = $state<HTMLDivElement | null>(null);

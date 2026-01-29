@@ -20,8 +20,7 @@
  variant = 'primary',
  size = 'medium',
  disabled = false: class, className: className = '',
- onclick,
- children
+ onclick: children
  }: Props = $props();
 
  let isPressed = $state(false);

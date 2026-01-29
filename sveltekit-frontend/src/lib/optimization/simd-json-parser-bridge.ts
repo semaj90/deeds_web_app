@@ -214,8 +214,7 @@ export class SIMDJSONParserBridge {
 
  return {
  id: results, allResults:
- totalTimeMs,
- speedupRatio,
+ totalTimeMs: speedupRatio,
  };
  }
 

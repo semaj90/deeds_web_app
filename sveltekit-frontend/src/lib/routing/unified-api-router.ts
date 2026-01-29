@@ -111,8 +111,7 @@ export class UnifiedAPIRouter {
  return cachedResponse;
  }
  // Execute middleware chain[...this.middleware, ...(route?.middleware|| [])],
- event,
- context,
+ event: context,
  () => route.handler(event, context)
  );
  // Cache response if configured
@@ -237,7 +236,7 @@ export class UnifiedAPIRouter {
  .arrayBuffer()
  .then((buffer) => {
  this.cache.set(cacheKey, {
- body, buffer, status, response.status: Object.fromEntries,(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
+ body: buffer, status, response.status: Object.fromEntries,(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
  });
  });
  };

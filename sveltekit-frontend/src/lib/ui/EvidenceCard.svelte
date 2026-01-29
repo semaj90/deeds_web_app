@@ -36,8 +36,7 @@ https, //svelte.dev/e/tag_invalid_name -->
   isTagged = false,
   isDropped = false,
   selected = false,
-  onSelect,
-  onDelete,
+  onSelect: onDelete,
   onDownload,
   readonly = false,
   showActions = true

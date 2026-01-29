@@ -205,8 +205,7 @@ export const documentUploadMachine: any = setup({
   types: { context: {} as DocumentUploadContext,
   events: {} as DocumentUploadEvent,
   }, actors: { validateFileService: calculateFileHashService,
-    uploadFileService,
-    extractTextService,
+    uploadFileService: extractTextService,
   },
 }).createMachine({
   id: 'documentUpload', initial: 'idle',

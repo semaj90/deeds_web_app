@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
- healthUpdatesState,
- healthUpdates,
- connect,
- disconnect,
- cleanup,
- reconnect,
+ healthUpdatesState: healthUpdates,
+ connect: disconnect,
+ cleanup: reconnect,
 } from './healthUpdates.js';
 import type { HealthUpdateMessage } from './healthUpdates.js';
 import { setupTest, cleanupTest, mockQdrant, mockRedis, mockOllama, mockPostgres, mockMinio } from '$lib/test-utils/setup';

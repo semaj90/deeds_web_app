@@ -483,7 +483,7 @@ import { Plus } from "lucide-svelte";
  (notifications as unknown as NotificationStoreWithAdd).add({
  type: "info",
  title: "Layout Toggle",
- message, "Layout toggled (feature to be implemented)"
+ message: "Layout toggled (feature to be implemented)"
  });
  }
 

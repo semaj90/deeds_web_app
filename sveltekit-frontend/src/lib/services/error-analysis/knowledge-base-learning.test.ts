@@ -530,8 +530,7 @@ describe('KnowledgeBaseLearning', () => {
  status: 'fixed',
  createdAt: new Date( updatedAt: new Date(),
  };diff,
- error,
- 'Use const for immutable variables'
+ error: 'Use const for immutable variables'
  );
 
  // Apply results

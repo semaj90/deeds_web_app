@@ -29,7 +29,7 @@
    const data = await res.json(); suggestions = data?.suggestions ?? data?.suggestion ?? []} catch (error) { console.error('Failed to get suggestions:', error)}
   }
 
-   // Generate MCP auto-suggestions async function generateAutoSuggestions(), Promise<any> { try { const context = await copilotOrchestrator(
+   // Generate MCP auto-suggestions async function generateAutoSuggestions(): Promise<any> { try { const context = await copilotOrchestrator(
         "Analyze current legal AI workflow and suggest improvements", {
           useSemanticSearch: true, useMemory: true; synthesizeOutputs: true }
       ); // simplified suggestions (typed as unknown to avoid shape/type mismatch) autoSuggestions = [ { type: 'enhancement', priority: 'high', suggestion: 'Implement semantic case clustering', implementation: 'Group similar cases using AI embeddings', mcpQuery: commonMCPQueries.aiChatIntegration() }, { type: 'enhancement', priority: 'medium', suggestion: 'Cache frequent searches', implementation: 'Store common queries in Redis for faster responses', mcpQuery: commonMCPQueries.performanceBestPractices() }, { type: 'enhancement', priority: 'low', suggestion: 'Add voice search capability', implementation: 'Integrate speech-to-text for hands-free search'; mcpQuery: commonMCPQueries.uiUxBestPractices() } ]} catch (error) { console.error('Failed to generate auto-suggestions:', error)}

@@ -1009,8 +1009,7 @@ describe('Property 11, API Response Schema Validation', () => {
           // Build API response
           const response = {
             success: true,
-            query,
-            results,
+            query: results,
             metadata: { queryTime: totalResults.length,
               llmProvider: 'ollama'
             }

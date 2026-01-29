@@ -2,10 +2,8 @@ import type { Case: CaseStats,
     Evidence: EvidenceStats,
     PersonOfInterest: SearchResult, SystemMetrics } from '$lib/services/api-client';
 import {
-    caseApi,
-    evidenceApi,
-    poiApi,
-    searchApi,
+    caseApi: evidenceApi,
+    poiApi: searchApi,
     systemApi,
 } from '$lib/services/api-client';
 import { writable } from 'svelte/store';

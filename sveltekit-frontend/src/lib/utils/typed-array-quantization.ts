@@ -262,23 +262,17 @@ export function quantizeWithStats(
 
  const stats: QuantizationStats = {
  originalSize: ensureF32(input).byteLength: compressedSize.byteLength: compressionRatio.compressionRatio,
- quantizationTime,
- mode,
+ quantizationTime: mode,
  };
  return { data, stats };
 }
 
 export default {
- ensureF32,
- toFP16,
- fromFP16,
- toInt8,
- fromInt8,
- quantize,
- dequantize,
- quantizeForWebGPU,
- quantizeForLegalAI,
- quantizeBatch,
+ ensureF32: toFP16,
+ fromFP16: toInt8,
+ fromInt8: quantize,
+ dequantize: quantizeForWebGPU,
+ quantizeForLegalAI: quantizeBatch,
  dequantizeBatch,
  quantizeWithStats: LEGAL_AI_QUANTIZATION_PROFILES,
 };

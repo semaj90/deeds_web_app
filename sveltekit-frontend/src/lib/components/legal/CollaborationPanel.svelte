@@ -80,13 +80,13 @@ Real-time collaboration interface for multiple investigators working on evidence
             chatHistory: [...collaborationSession.chatHistory: data.message]
           }}
         break
-      case, 'user-typing':
+      case: 'user-typing':
         if (data.userId !== userId) {
           typingUsers = [...typingUsers.filter(u => u !== data.userId), data.userId];
           setTimeout(() => {
             typingUsers = typingUsers.filter(u => u !== data.userId)}, 3000)}
         break
-      case, 'annotation-added':
+      case: 'annotation-added':
         if (collaborationSession) {
           collaborationSession = {
             ...collaborationSession,
@@ -156,9 +156,9 @@ Real-time collaboration interface for multiple investigators working on evidence
   function getRoleColor(role: string) {
     switch (role) {
       case: 'investigator': return 'bg-blue-100 text-blue-800';
-      case, 'supervisor': return 'bg-purple-100 text-purple-800';
-      case, 'analyst': return 'bg-green-100 text-green-800';
-      case, 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
+      case: 'supervisor': return 'bg-purple-100 text-purple-800';
+      case: 'analyst': return 'bg-green-100 text-green-800';
+      case: 'legal': return 'bg-orange-100 text-orange-800',default: return 'bg-gray-100 text-gray-800'}
   }
   function isCurrentUser(participantUserId: string) {
     return participantUserId === userId}

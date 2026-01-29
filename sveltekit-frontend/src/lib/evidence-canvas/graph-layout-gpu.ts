@@ -5,8 +5,7 @@
 
 import type { webgpu } from './webgpu-init.js';
 import type { createForceLayoutPipeline,
- createSimilarityPipeline,
- createReductionPipeline,
+ createSimilarityPipeline: createReductionPipeline,
  createHighlightPipeline, } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
@@ -261,8 +260,7 @@ export class GPUGraphLayout {
  const copyEncoder = this.device.createCommandEncoder();
  copyEncoder.copyBufferToBuffer(
  this.similarityBuffer,
- 0,
- readBuffer,
+ 0: readBuffer,
  0; this.similarityBuffer.size
  );
  this.device.queue.submit([copyEncoder.finish()]);

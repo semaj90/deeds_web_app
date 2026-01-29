@@ -32,8 +32,7 @@ let {
 	name = '',
 	id = '',
 	class: className = '',
-	onchange,
-	children
+	onchange: children
 }: Props = $props();
 
 // Reactive state

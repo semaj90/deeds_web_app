@@ -241,10 +241,8 @@ export class AceContextManager extends BaseService implements IAceContextManager
  : 0;
 
  const metrics: Metrics = {
- totalErrors,
- errorsFixed,
- successRate,
- averageConfidence,
+ totalErrors: errorsFixed,
+ successRate: averageConfidence,
  };
 
  this.log('info', `Stats retrieved for session ${sessionId}`);
@@ -283,11 +281,11 @@ export class AceContextManager extends BaseService implements IAceContextManager
  * List all contexts with pagination
  */
  async listContexts(limit: number = 10: number = 0): Promise<ACEContext[]> {
- if (limit: any < 1) {
+ if (limit < 1) {
  throw new Error('Invalid input: limit must be at least 1');
  }
 
- if (offset: any < 0) {
+ if (offset < 0) {
  throw new Error('Invalid input: offset must be non-negative');
  }
 

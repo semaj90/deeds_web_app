@@ -114,8 +114,7 @@ export function deserializeChr97Binary(buffer: ArrayBuffer): Chr97Cartridge {
  case_id: 'unknown',
  chunk_index: i,
  manifold_float32: [u, v, w, t],
- heat_u16,
- emb16,
+ heat_u16: emb16,
  });
  }
 

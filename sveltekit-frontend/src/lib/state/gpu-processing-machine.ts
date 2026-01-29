@@ -194,16 +194,12 @@ export const gpuProcessingMachine = setup({
  events: {} as GPUProcessingEvent,
  },
  actions: {
- addToQueue,
- startProcessing,
- pauseProcessing,
- clearQueue,
- checkServiceHealth,
- updateMetrics,
+ addToQueue: startProcessing,
+ pauseProcessing: clearQueue,
+ checkServiceHealth: updateMetrics,
  },
  guards: {
- canProcessMore,
- hasQueuedDocuments,
+ canProcessMore: hasQueuedDocuments,
  canRetry,
  },
 }).createMachine({

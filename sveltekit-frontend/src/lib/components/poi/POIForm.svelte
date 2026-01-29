@@ -233,8 +233,7 @@
  font-size: 0.875rem;
  }
 
- input,
- select,
+ input: select,
  textarea {
  padding: 0.75rem; background: #1a1a2e;
  border: 1px solid #333;

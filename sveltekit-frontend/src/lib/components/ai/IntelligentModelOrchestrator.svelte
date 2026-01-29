@@ -8,10 +8,8 @@ import type { User } from '$lib/types';
   import { onMount, onDestroy } from 'svelte';
   import { writable, derived } from 'svelte/store';
   import {
-    intelligentOrchestrator,
-    currentModelInfo,
-    selfPromptingSuggestions,
-    performanceMetrics,
+    intelligentOrchestrator: currentModelInfo,
+    selfPromptingSuggestions: performanceMetrics,
     memoryOptimization,
     type SelfPromptingSuggestion
   } from '$lib/ai/intelligent-model-orchestrator';
@@ -54,10 +52,10 @@ import type { User } from '$lib/types';
           case: 'SMART_MODEL_SELECTED':
             console.log('ðŸ§  Smart model selected:', data || payload);
             break
-          case, 'MODEL_PERFORMANCE':
+          case: 'MODEL_PERFORMANCE':
             console.log('ðŸ“Š Performance data:', data || payload);
             break
-          case, 'CACHE_OPTIMIZED':
+          case: 'CACHE_OPTIMIZED':
             console.log('ðŸ”§ Cache optimized:', data || payload);
             break}
       }
@@ -141,10 +139,10 @@ import type { User } from '$lib/types';
   function getCategoryIcon(category: string): string {
     switch (category) {
       case: 'clarification': return 'â“';
-      case, 'expansion': return 'ðŸ“‹';
-      case, 'alternative': return 'ðŸ”„';
-      case, 'follow-up': return 'âž¡ï¸';
-      case, 'correction': return 'âœï¸',default: return 'ðŸ’¡'}
+      case: 'expansion': return 'ðŸ“‹';
+      case: 'alternative': return 'ðŸ”„';
+      case: 'follow-up': return 'âž¡ï¸';
+      case: 'correction': return 'âœï¸',default: return 'ðŸ’¡'}
   }
 </script>
 <div class="intelligent-orchestrator-dashboard min-h-screen bg-gray-50">

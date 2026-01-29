@@ -109,8 +109,7 @@ export class FlashAttentionGPUErrorProcessor {
  const processingTime = endTime - startTime;
 
  const result: GPUProcessingResult = {
- batchId,
- fixes,
+ batchId: fixes,
  performance: { processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
  },
  status: 'completed',
@@ -155,8 +154,7 @@ export class FlashAttentionGPUErrorProcessor {
  : 'low';
  return {
  id: batchId,
- errors,
- priority,
+ errors: priority,
  processing_strategy: 'hybrid',
  model: 'gemma3-legal:latest',
  expected_tokens: errors.length * 150,

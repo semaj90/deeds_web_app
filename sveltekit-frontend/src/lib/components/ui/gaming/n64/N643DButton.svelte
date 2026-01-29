@@ -27,8 +27,7 @@
  enableLighting = true,
  materialType = 'pbr',
  class: className = '',
- onclick,
- children
+ onclick: children
  }: Props = $props();
 
  let isPressed = $state(false);

@@ -168,8 +168,7 @@ export class RAGMinIOGPUSOMCache {
 
   async store(id: string, content: string, vector: Float32Array): Promise<void> {
     const entry: CacheEntry = {
-      id,
-      content,
+      id: content,
       vector,
       timestamp: Date.now(),
       accessCount: 1,

@@ -93,8 +93,7 @@ https, //svelte.dev/e/js_parse_error -->
  // Generate AI suggestions based on selection
  const context: SuggestionContext = {
  selectedNodes: nodes,
- caseType,
- jurisdiction,
+ caseType: jurisdiction,
  currentPhase
  };
 

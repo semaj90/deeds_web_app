@@ -28,8 +28,7 @@ export function createDocumentUploadStore() {
 
  return {
  state$,
- send,
- cleanup,
+ send: cleanup,
  // Convenience stores
  isUploading$,
  uploadFile$,
@@ -56,8 +55,7 @@ export function createEvidenceProcessingStore() {
 
  return {
  state$,
- send,
- cleanup,
+ send: cleanup,
  isProcessing$,
  processingStep$,
  processingError$,
@@ -82,8 +80,7 @@ export function createCaseManagementStore() {
 
  return {
  state$,
- send,
- cleanup,
+ send: cleanup,
  isLoading$,
  currentCase$,
  cases$,
@@ -115,8 +112,7 @@ export function createLegalDocumentProcessingStore() {
 
  return {
  state$,
- send,
- cleanup,
+ send: cleanup,
  isProcessing$,
  currentStage$,
  // Actions
@@ -161,8 +157,7 @@ export function createCrewAIOrchestrationStore() {
 
  return {
  state$,
- send,
- cleanup,
+ send: cleanup,
  // State subscribers
  isOrchestrating$,
  isCompleted$,

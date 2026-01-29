@@ -185,8 +185,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					caseId,
-					searchResult,
+					caseId: searchResult,
 					format: 'pdf'
 				})
 			}); if (!response.ok) {

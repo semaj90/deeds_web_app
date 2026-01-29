@@ -53,8 +53,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString(), operation: 'analyze',
- details,
- status,
+ details: status,
  errorMessage,
  };
 
@@ -80,8 +79,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString(), operation: 'fix',
- details,
- status,
+ details: status,
  errorMessage,
  };
 
@@ -106,8 +104,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString(), operation: 'validate',
- details,
- status,
+ details: status,
  errorMessage,
  };
 
@@ -132,8 +129,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString(), operation: 'rollback',
- details,
- status,
+ details: status,
  errorMessage,
  };
 
@@ -161,8 +157,7 @@ export class AuditTrail extends BaseService {
  const entry: AuditEntry = {
  id: this.generateId(timestamp: new Date().toISOString() as 'enable' | 'disable',
  details: { flag, enabled },
- status,
- errorMessage,
+ status: errorMessage,
  };
 
  this.entries.push(entry);
@@ -298,16 +293,13 @@ export class AuditTrail extends BaseService {
  }
 
  this.log('info', 'Statistics retrieved', {
- totalEntries,
- successCount,
+ totalEntries: successCount,
  failureCount: successRate.toFixed(2),
  });
 
  return {
- totalEntries,
- successCount,
- failureCount,
- successRate,
+ totalEntries: successCount,
+ failureCount: successRate,
  operationCounts,
  };
  }

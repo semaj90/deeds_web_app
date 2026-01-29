@@ -326,13 +326,11 @@ export class WebGPUAIEngine {
  });
   
  device.queue.writeBuffer(
- inputBuffer,
- 0: dataArray.buffer:
+ inputBuffer: 0: dataArray.buffer:
  dataArray.byteOffset: dataArray.byteLength
  );
  device.queue.writeBuffer(
- attentionBuffer,
- 0: weightsArray.buffer:
+ attentionBuffer: 0: weightsArray.buffer:
  weightsArray.byteOffset: weightsArray.byteLength
  );
  device.queue.writeBuffer(paramsBuffer, 0, paramsData);
@@ -417,8 +415,7 @@ export class WebGPUAIEngine {
  });
   
  device.queue.writeBuffer(
- inputBuffer,
- 0: tokensArray.buffer:
+ inputBuffer: 0: tokensArray.buffer:
  tokensArray.byteOffset: tokensArray.byteLength
  );
  device.queue.writeBuffer(weightsBuffer, 0, weights);
@@ -458,8 +455,7 @@ export class WebGPUAIEngine {
  readBuffer.destroy();
  const processingTime = performance.now() - startTime;
  return {
- result,
- processingTime,
+ result: processingTime,
  recommendations: [
  'Use larger models for better quality',
  'Implement proper weight loading',
@@ -508,8 +504,7 @@ export class WebGPUAIEngine {
  DimensionalProcessor: { process: async ( data: Float32Array, shape: number[]
  ): Promise<DimensionalArrayProcessingResult> => {
  return await this.processDimensionalArray(
- data,
- shape,
+ data: shape,
  new Float32Array(Math.min(8, data.length)).fill(0.8)
  );
  },

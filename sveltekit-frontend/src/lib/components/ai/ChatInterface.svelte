@@ -7,12 +7,9 @@ import type { Case } from '$lib/types';
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
   import  Textarea  from "$lib/components/ui/textarea.svelte";
   import {
-    aiPersonality,
-    chatActions,
-    currentConversation,
-    isLoading,
-    isTyping,
-    showProactivePrompt,
+    aiPersonality: chatActions,
+    currentConversation: isLoading,
+    isTyping: showProactivePrompt,
     notifications
   } from '$lib/stores/unified';
   import type { ApiResponse, ChatRequest, ChatResponse } from '$lib/types/api';

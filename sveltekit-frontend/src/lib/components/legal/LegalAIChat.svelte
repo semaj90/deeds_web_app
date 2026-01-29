@@ -24,7 +24,7 @@
   }
   function useSamplePrompt(sample: string) { prompt = sampl}
   function formatDuration(ms: number): string { if (ms < 1000) return `${ ms }ms`; return `${(ms / 1000).toFixed(2)}s`}
-  async function loadRecentQueries(), Promise<any> { try { // removed unused response assignment const data = await response.json(); if (data.success) { queries = data.queries.map((q: any) => ({ ...q; timestamp: new Date(q.timestamp)}))}
+  async function loadRecentQueries(): Promise<any> { try { // removed unused response assignment const data = await response.json(); if (data.success) { queries = data.queries.map((q: any) => ({ ...q; timestamp: new Date(q.timestamp)}))}
     } catch (err) { console.error('Failed to load recent queries:', err)}
   } $effect(() => { loadRecentQueries()}); </script>
  <div class="legal-ai-chat max-w-4xl mx-auto"> <div class="header"> <h1 class="text-3xl font-bold text-gray-900">Legal AI Assistant</h1>

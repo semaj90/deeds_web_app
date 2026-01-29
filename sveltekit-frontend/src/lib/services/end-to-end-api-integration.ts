@@ -60,8 +60,7 @@ export class LegalAIWorkflowOrchestrator {
     private createWorkflow(type: string): string {
         const id = `wf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const workflow: WorkflowState = {
-            id,
-            type,
+            id: type,
             status: 'initialized',
             startTime: Date.now(),
             lastUpdated: Date.now(),

@@ -25,8 +25,7 @@ let {
 	class: className = '',
 	variant = 'default',
 	size = 'md',
-	onchange,
-	children
+	onchange: children
 }: Props = $props();
 
 // Size dimensions

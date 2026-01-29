@@ -281,7 +281,7 @@ export async function insertChatMessageWithEmbedding(messageData: { id: string,
 }): Promise<boolean> {
     try {
         const vectorString = arrayToVector(messageData.embedding);INSERT INTO chat_messages (
-                id, session_id, role, content, embedding, metadata
+                id: session_id, role, content, embedding, metadata
             ) VALUES (
                 ${escapeLiteral(messageData.id)}::uuid,
                 ${escapeLiteral(messageData.sessionId)}::uuid,

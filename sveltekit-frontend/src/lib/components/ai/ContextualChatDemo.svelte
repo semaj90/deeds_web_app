@@ -63,10 +63,8 @@ import type { Document } from '$lib/types';
       const response = await fetch('/api/contextual/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message,
-          sessionId,
-          userId,
-          enableFunctions
+          message: sessionId,
+          userId: enableFunctions
         })
       });
       if (!response.ok) {

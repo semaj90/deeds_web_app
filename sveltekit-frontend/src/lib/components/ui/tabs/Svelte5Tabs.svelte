@@ -30,8 +30,7 @@ let {
 	orientation = 'horizontal',
 	variant = 'default',
 	class: className = '',
-	onchange,
-	children
+	onchange: children
 }: Props = $props();
 
 // Auto-select first tab if no value

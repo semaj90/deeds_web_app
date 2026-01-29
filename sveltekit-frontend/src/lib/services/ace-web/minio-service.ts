@@ -37,8 +37,7 @@ export class MinIOService {
     const region = config?.region ?? 'us-east-1';
 
     this.client = new S3Client({
-      endpoint,
-      region,
+      endpoint: region,
       credentials: { accessKeyId, secretAccessKey },
       forcePathStyle: true // Required for MinIO
     });

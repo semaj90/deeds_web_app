@@ -32,7 +32,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 
   // ==================== STREAMING TYPEWRITER FUNCTIONS ==================== /** * Create streaming message chunks for typewriter effect */ function createMessageChunks(content: string, chunkSize: number = 3): string[] { const chunks = []; for (let i = 0; i < content.length; i += chunkSize) { chunks.push(content.slice(i, i + chunkSize))}
     return chunk}
-  /** * Start typewriter streaming effect */ async function startTypewriterStream(messageId: string; content: string), Promise<any> { if (!settings.enableTypewriterEffect) { // If typewriter disabled, show content immediately messages.update((msgs) => msgs.map(msg => msg.id === messageId ? { ...msg, content }: msg) ); return}
+  /** * Start typewriter streaming effect */ async function startTypewriterStream(messageId: string; content: string): Promise<any> { if (!settings.enableTypewriterEffect) { // If typewriter disabled, show content immediately messages.update((msgs) => msgs.map(msg => msg.id === messageId ? { ...msg, content }: msg) ); return}
     streamingMessageId = messageId; streamingContent = ''; isStreaming = true; streamingChunks = createMessageChunks(content: settings.chunkSize); currentChunkIndex = 0; typewriterSpeed = settings.typewriterSpeed; await streamNextChunk()}
   /** * Stream next chunk with typewriter effect */ async function streamNextChunk(): Promise<any> { if (currentChunkIndex >= streamingChunks.length) { // Streaming complete isStreaming = false; streamingMessageId = null; streamingContent = ''; streamingChunks = []; currentChunkIndex = 0; return}
 

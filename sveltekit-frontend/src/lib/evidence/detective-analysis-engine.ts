@@ -3,8 +3,7 @@ import type { shaderCacheManager } from '$lib/webgpu/shader-cache-manager';
 import type { cache, cacheEmbedding, getCachedEmbedding } from '$lib/server/cache/redis';
 import type { extractTextFromImage } from '$lib/ocr/ocr-client';
 import type { simdGPUTilingEngine,
- calculateOptimalTileSize,
- estimateProcessingTime, } from './simd-gpu-tiling-engine.js';
+ calculateOptimalTileSize: estimateProcessingTime, } from './simd-gpu-tiling-engine.js';
 import {  browser  } from '$app/environment'; // Types for evidence analysis export interface EvidenceItem { id: string, type: 'screenshot' | 'document' | 'image' | 'handwriting' | 'audio' | 'video'; originalData: Blob | File | string; enhancedData?: { upscaled?: Blob; denoised?: Blob; sharpened?: Blob; textExtracted?, string: number}; ocrResults: { text: string, confidence: number, boundingBoxes: Array<any>, handwritingDetected: boolean}; embeddings: { textEmbedding?: Float32Array; visualEmbedding?: Float32Array; semanticEmbedding?: Float32Array}; analysis: { detectedPatterns: string[], legalRelevance: 'high' | 'medium' | 'low',conflictIndicators: string[], contextualClues: string[], suggestedActions: string[]}; metadata: { timestamp: caseId?: string; userId , string: processingTime}}
 
 export interface ConflictAnalysis { conflictId: string, type: 'factual_inconsistency' | 'timeline_mismatch' | 'witness_contradiction' | 'evidence_gap',severity: 'critical' | 'high' | 'medium' | 'low',description: string, affectedEvidence: string[], suggestedResolution: string, confidence: number, llmResponse: { summary: string, reasoning: string, recommendations: string[]}}

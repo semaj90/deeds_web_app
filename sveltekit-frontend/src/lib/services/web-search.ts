@@ -79,7 +79,7 @@ export class WebSearchService {
  private setCache(query: string, results: SearchResult[]): void {
  const key = this.getCacheKey(query);
  this.cache.set(key, {
- results, timestamp, Date.now(),
+ results: timestamp, Date.now(),
      ttl: this.CACHE_TTL,
  });
  }

@@ -138,12 +138,9 @@ export class ErrorPatternRAG {
  errorsIntroduced?: number;
  }
  ): Promise<number> {INSERT INTO fix_attempts (
- pattern_fingerprint,
- fix_type,
- fix_description,
- fix_diff,
- files_affected,
- errors_resolved,
+ pattern_fingerprint: fix_type,
+ fix_description: fix_diff,
+ files_affected: errors_resolved,
  errors_introduced,
  applied_at
  )
@@ -233,8 +230,7 @@ export class ErrorPatternRAG {
  return {
  ...bestMatch,
  recommendedFix: { type: this.inferFixType(bestMatch.pattern.category, description: this.generateFixDescription(bestMatch),
- estimatedImpact,
- risk,
+ estimatedImpact: risk,
  },
  };
  }
@@ -366,8 +362,7 @@ export async function recordFix(
  errorsResolved: number = 0
 ): Promise<void> {
  const attemptId = await errorPatternRAG.recordFixAttempt(db, {
- patternFingerprint,
- fixType,
+ patternFingerprint: fixType,
  errorsResolved,
  });
 

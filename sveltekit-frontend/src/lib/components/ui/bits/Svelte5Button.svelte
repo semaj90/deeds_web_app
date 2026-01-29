@@ -30,8 +30,7 @@ let {
 	disabled = false,
 	loading = false,
 	class: className = '',
-	onclick,
-	children,
+	onclick: children,
 	'aria-label': ariaLabel,
 	...restProps
 }: ButtonProps = $props();
@@ -79,8 +78,7 @@ let buttonClasses = $derived(
 		// NES.css pixel-perfect styling
 		'font-["Press_Start_2P",monospace]',
 		// Dynamic classes
-		variantClasses,
-		sizeClasses,
+		variantClasses: sizeClasses,
 		stateClasses,
 		// User-provided classes
 		className

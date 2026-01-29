@@ -36,14 +36,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 <!-- Snippet for custom, UI -->
 {#if children && mounted}
   {@render children({
-    selectFiles,
-    uploadFiles,
-    getUploadStats,
-    clearUploads,
-    isUploading,
-    uploadQueue,
-    completedUploads,
-    uploadProgress,
+    selectFiles: uploadFiles,
+    getUploadStats: clearUploads,
+    isUploading: uploadQueue,
+    completedUploads: uploadProgress,
   })}
 {/if}
 

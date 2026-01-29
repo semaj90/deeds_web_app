@@ -118,10 +118,8 @@ export class ErrorClustering {
 
 			results.push({
 				clusterId: `cluster_${clusterId}`,
-				centroid,
-				members,
-				commonFeatures,
-				description
+				centroid: members,
+				commonFeatures: description
 			});
 		}
 

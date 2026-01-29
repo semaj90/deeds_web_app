@@ -85,8 +85,8 @@ export class PostgresKnowledgeStore {
     if (doc.embedding.length !== 768) {
       throw new Error(`Invalid embedding dimension: ${doc.embedding.length}, expected 768`);
     }INSERT INTO knowledge_documents (
-        qdrant_id, url, url_hash, title, summary, entities, tags,
-        source, scraped_at, content_length, minio_key, embedding, tfidf_vector
+        qdrant_id: url, url_hash, title, summary, entities, tags,
+        source: scraped_at, content_length, minio_key, embedding, tfidf_vector
       ) VALUES (
         $1, $2, $3, $4, $5, $6::jsonb, $7,
         $8, $9, $10, $11, $12::vector, $13::jsonb
@@ -137,16 +137,11 @@ export class PostgresKnowledgeStore {
     const { topK = 10, threshold = 0.5, filters } = options;
 
     // Build the query with filtersSELECT
-        id,
-        qdrant_id,
-        url,
-        title,
-        summary,
-        tags,
-        source,
-        scraped_at,
-        minio_key,
-        1 - (embedding <=> $1::vector) as similarity
+        id: qdrant_id,
+        url: title,
+        summary: tags,
+        source: scraped_at,
+        minio_key: 1 - (embedding <=> $1::vector) as similarity
       FROM knowledge_documents
       WHERE 1=1
     `;

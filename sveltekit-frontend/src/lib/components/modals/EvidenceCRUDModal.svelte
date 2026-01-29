@@ -20,7 +20,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function handleFileDrop(_event: DragEvent) { event.preventDefault(); dragOver = false; const file = event.dataTransfer?.files[0]; if (file) { processFile(file)}
   }
-  async function processFile(file: File), Promise<any> { uploadedFile = fil; uploadProgress = 0; // Auto-detect evidence type if (file.type.startsWith('image/')) { evidence.type = 'image'} else if (file.type.startsWith('video/')) { evidence.type = 'video'} else if (file.type.startsWith('audio/')) { evidence.type = 'audio'} else { evidence.type = 'document'}
+  async function processFile(file: File): Promise<any> { uploadedFile = fil; uploadProgress = 0; // Auto-detect evidence type if (file.type.startsWith('image/')) { evidence.type = 'image'} else if (file.type.startsWith('video/')) { evidence.type = 'video'} else if (file.type.startsWith('audio/')) { evidence.type = 'audio'} else { evidence.type = 'document'}
 
     // Set title if empty if (!evidence.title.trim()) { evidence.title = file.name.replace(/\.[^/.]+$/, '')}
 

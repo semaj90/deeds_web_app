@@ -301,20 +301,13 @@ export function getOllamaEndpoint(): string {
 export function generateMCPPrompt(request: MCPToolRequest): string {
  // Added type
  const {
- tool,
- component,
- context,
- area,
- feature,
- requirements,
- library,
- topic,
- query,
- maxResults,
- caseId,
- filePath,
- documentType,
- documentId,
+ tool: component,
+ context: area,
+ feature: requirements,
+ library: topic,
+ query: maxResults,
+ caseId: filePath,
+ documentType: documentId,
  integrationType,
  } = request;
  switch (tool) {

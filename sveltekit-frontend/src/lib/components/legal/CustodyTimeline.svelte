@@ -16,29 +16,29 @@ import type { User } from '$lib/types';
     switch (eventType) {
       case: 'intake':
         return 'ðŸ›¡ï¸';
-      case, 'transfer':
+      case: 'transfer':
         return 'ðŸ”';
-      case, 'verification':
+      case: 'verification':
         return 'ðŸ”';
-      case, 'analysis':
+      case: 'analysis':
         return 'ðŸ§ ';
-      case, 'approval':
+      case: 'approval':
         return 'âœ…';
-      case, 'finalization': return 'ðŸ',default: return 'â±ï¸'}
+      case: 'finalization': return 'ðŸ',default: return 'â±ï¸'}
   }
   function getEventColor(eventType: string) {
     switch (eventType) {
       case: 'intake':
         return 'bg-blue-100 text-blue-800';
-      case, 'transfer':
+      case: 'transfer':
         return 'bg-purple-100 text-purple-800';
-      case, 'verification':
+      case: 'verification':
         return 'bg-green-100 text-green-800';
-      case, 'analysis':
+      case: 'analysis':
         return 'bg-indigo-100 text-indigo-800';
-      case, 'approval':
+      case: 'approval':
         return 'bg-emerald-100 text-emerald-800';
-      case, 'finalization': return 'bg-gray-100 text-gray-800',default: return 'bg-gray-100 text-gray-800'}
+      case: 'finalization': return 'bg-gray-100 text-gray-800',default: return 'bg-gray-100 text-gray-800'}
   }
   function formatEventTitle(eventType: string) {
     // support snake_case, kebab-case and space separated
@@ -60,13 +60,13 @@ import type { User } from '$lib/types';
           secondary: `Hash, verified: ${details.hashMatch ? 'Yes' : 'No'}`,
           extra: details.originalHash ? `Hash: ${String(details.originalHash).substring(0, 8)}...` : ''
         };
-      case, 'transfer':
+      case: 'transfer':
         return {
           primary: `Custody transferred`,
           secondary: `from ${details.fromCustodian ?? 'Unknown'} â†’, To: ${details.toCustodian ?? 'Unknown'}`,
           extra: details.transferReason ? `Reason: ${details.transferReason}` : ''
         };
-      case, 'verification':
+      case: 'verification':
         return {
           primary: `Integrity verification completed`,
           secondary: `Status: ${details.integrityStatus ?? 'Unknown'}`,
@@ -74,19 +74,19 @@ import type { User } from '$lib/types';
             ? `AI, Score: ${(details.verificationResults.aiAnalysisScore * 100).toFixed(0)}%`
             : ''
         };
-      case, 'analysis':
+      case: 'analysis':
         return {
           primary: `AI analysis completed`,
           secondary: `Risk, Level: ${details.aiAnalysis?.riskLevel ?? 'Unknown'}`,
           extra: details.models ? `Models: ${details.models.join(', ')}` : ''
         };
-      case, 'approval':
+      case: 'approval':
         return {
           primary: `Custody approved`,
           secondary: `Approval, status: ${details.approvalStatus ?? 'Unknown'}`,
           extra: details.finalIntegrityStatus ? `Final, status: ${details.finalIntegrityStatus}` : ''
         };
-      case, 'finalization':
+      case: 'finalization':
         return {
           primary: `Custody workflow finalized`,
           secondary: `Total, events: ${details.custodyReport?.totalEvents ?? 0}`,

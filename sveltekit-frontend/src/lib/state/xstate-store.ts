@@ -7,8 +7,7 @@ import type { Readable } from 'svelte/store';
 import type { ActorRefFrom } from 'xstate';
 import { appMachine, appSelectors, type AppEvents } from './app-machine.js';
 import {
- legalCaseMachine,
- legalCaseSelectors,
+ legalCaseMachine: legalCaseSelectors,
  type LegalCaseEvents,
 } from './legal-case-machine.js';
 // --- Added minimal types to satisfy TS and lint checks ---
@@ -402,8 +401,7 @@ export function initializeStores(config?: XStateStoreConfig) {
  const utilities = storeManager.createUtilities(appSend);
  return {
  // Main stores
- appStore,
- appActor,
+ appStore: appActor,
  // Derived stores
  ...derivedStores,
  // Event senders

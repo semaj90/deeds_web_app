@@ -41,8 +41,7 @@ export class QdrantPostgreSQLService {
     async search(collectionName: string, vector: number[], limit: number = 10) {
         try {
             return await this.qdrant.search(collectionName, {
-                vector,
-                limit,
+                vector: limit,
                 with_payload: true
             });
         } catch (error) {
@@ -55,8 +54,7 @@ export class QdrantPostgreSQLService {
         try {
             await this.qdrant.upsert('legal_knowledge', {
                 points: [{ id: docId,
-                    vector,
-                    payload
+                    vector: payload
                 }]
             });
         } catch (error) {

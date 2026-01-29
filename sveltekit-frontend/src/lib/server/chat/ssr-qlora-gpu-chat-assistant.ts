@@ -205,8 +205,7 @@ export class SSRQLorAGPUChatAssistant {
 
 		// Generate SSR context
 		const ssrContext: SSRChatContext = {
-			userId,
-			sessionId,
+			userId: sessionId,
             userDictionary,
 			nesMemoryState: this.nesMemory.getMemoryStats(),
 			gpuCacheState: (this.gpuCache as any)?.getStats?.() ?? null,

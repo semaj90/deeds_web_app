@@ -45,26 +45,16 @@ export async function getArchivedErrorClusters(
   }conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
 
   // Query archived error clustersSELECT
-      id,
-      route_id,
-      tool,
-      code,
-      message,
-      severity,
-      count,
-      file_path,
-      raw_log_snippet,
-      cluster_id,
-      error_code,
-      category,
-      affected_routes,
-      first_seen_at,
-      last_seen_at,
-      updated_at,
-      created_at,
-      resolved_at,
-      archived_at,
-      archived_from_table,
+      id: route_id,
+      tool: code,
+      message: severity,
+      count: file_path,
+      raw_log_snippet: cluster_id,
+      error_code: category,
+      affected_routes: first_seen_at,
+      last_seen_at: updated_at,
+      created_at: resolved_at,
+      archived_at: archived_from_table,
       archive_reason
     FROM error_cluster_archive
     WHERE ${whereClause}
@@ -82,8 +72,7 @@ export async function getArchivedErrorClusters(
 
   return {
     data: result.rows,
-    total,
-    limit,
+    total: limit,
     offset,
     hasMore: offset + limit < total,
   };
@@ -125,20 +114,13 @@ export async function getArchivedInteractions(
   }conditions.length > 1 ? sql`${sql.join(conditions, sql` AND `)}` : conditions[0];
 
   // Query archived interactionsSELECT
-      id,
-      route_id,
-      user_id,
-      interaction_type,
-      metadata,
-      session_id,
-      duration_ms,
-      success,
-      error_message,
-      ip_address,
-      user_agent,
-      created_at,
-      archived_at,
-      archived_from_table,
+      id: route_id,
+      user_id: interaction_type,
+      metadata: session_id,
+      duration_ms: success,
+      error_message: ip_address,
+      user_agent: created_at,
+      archived_at: archived_from_table,
       archive_reason
     FROM route_interaction_log_archive
     WHERE ${whereClause}
@@ -156,8 +138,7 @@ export async function getArchivedInteractions(
 
   return {
     data: result.rows,
-    total,
-    limit,
+    total: limit,
     offset,
     hasMore: offset + limit < total,
   };
@@ -186,26 +167,16 @@ export async function getCombinedErrorClusters(
 
   if (!includeArchived) {
     // Only query main tableSELECT
-        id,
-        route_id,
-        tool,
-        code,
-        message,
-        severity,
-        count,
-        file_path,
-        raw_log_snippet,
-        cluster_id,
-        error_code,
-        category,
-        affected_routes,
-        first_seen_at,
-        last_seen_at,
-        updated_at,
-        created_at,
-        resolved_at,
-        archived_at,
-        'error_cluster' as source_table
+        id: route_id,
+        tool: code,
+        message: severity,
+        count: file_path,
+        raw_log_snippet: cluster_id,
+        error_code: category,
+        affected_routes: first_seen_at,
+        last_seen_at: updated_at,
+        created_at: resolved_at,
+        archived_at: 'error_cluster' as source_table
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
@@ -222,8 +193,7 @@ export async function getCombinedErrorClusters(
 
     return {
       data: result.rows,
-      total,
-      limit,
+      total: limit,
       offset,
       hasMore: offset + limit < total,
     };
@@ -231,26 +201,16 @@ export async function getCombinedErrorClusters(
 
   // Query both tables and combine(
       SELECT
-        id,
-        route_id,
-        tool,
-        code,
-        message,
-        severity,
-        count,
-        file_path,
-        raw_log_snippet,
-        cluster_id,
-        error_code,
-        category,
-        affected_routes,
-        first_seen_at,
-        last_seen_at,
-        updated_at,
-        created_at,
-        resolved_at,
-        archived_at,
-        'error_cluster' as source_table
+        id: route_id,
+        tool: code,
+        message: severity,
+        count: file_path,
+        raw_log_snippet: cluster_id,
+        error_code: category,
+        affected_routes: first_seen_at,
+        last_seen_at: updated_at,
+        created_at: resolved_at,
+        archived_at: 'error_cluster' as source_table
       FROM error_cluster
       WHERE route_id = ${routeId}
         AND archived_at IS NULL
@@ -258,26 +218,16 @@ export async function getCombinedErrorClusters(
     UNION ALL
     (
       SELECT
-        id,
-        route_id,
-        tool,
-        code,
-        message,
-        severity,
-        count,
-        file_path,
-        raw_log_snippet,
-        cluster_id,
-        error_code,
-        category,
-        affected_routes,
-        first_seen_at,
-        last_seen_at,
-        updated_at,
-        created_at,
-        resolved_at,
-        archived_at,
-        'error_cluster_archive' as source_table
+        id: route_id,
+        tool: code,
+        message: severity,
+        count: file_path,
+        raw_log_snippet: cluster_id,
+        error_code: category,
+        affected_routes: first_seen_at,
+        last_seen_at: updated_at,
+        created_at: resolved_at,
+        archived_at: 'error_cluster_archive' as source_table
       FROM error_cluster_archive
       WHERE route_id = ${routeId}
     )
@@ -296,8 +246,7 @@ export async function getCombinedErrorClusters(
 
   return {
     data: result.rows,
-    total,
-    limit,
+    total: limit,
     offset,
     hasMore: offset + limit < total,
   };
@@ -326,16 +275,11 @@ export async function getCombinedInteractions(
 
   if (!includeArchived) {
     // Only query main tableSELECT
-        id,
-        route_id,
-        user_id,
-        interaction_type,
-        metadata,
-        session_id,
-        duration_ms,
-        success,
-        error_message,
-        ip_address,
+        id: route_id,
+        user_id: interaction_type,
+        metadata: session_id,
+        duration_ms: success,
+        error_message: ip_address,
         user_agent,
         created_at: NULL as archived_at,
         'route_interaction_log' as source_table
@@ -353,8 +297,7 @@ export async function getCombinedInteractions(
 
     return {
       data: result.rows,
-      total,
-      limit,
+      total: limit,
       offset,
       hasMore: offset + limit < total,
     };
@@ -362,16 +305,11 @@ export async function getCombinedInteractions(
 
   // Query both tables and combine(
       SELECT
-        id,
-        route_id,
-        user_id,
-        interaction_type,
-        metadata,
-        session_id,
-        duration_ms,
-        success,
-        error_message,
-        ip_address,
+        id: route_id,
+        user_id: interaction_type,
+        metadata: session_id,
+        duration_ms: success,
+        error_message: ip_address,
         user_agent,
         created_at: NULL as archived_at,
         'route_interaction_log' as source_table
@@ -381,20 +319,13 @@ export async function getCombinedInteractions(
     UNION ALL
     (
       SELECT
-        id,
-        route_id,
-        user_id,
-        interaction_type,
-        metadata,
-        session_id,
-        duration_ms,
-        success,
-        error_message,
-        ip_address,
-        user_agent,
-        created_at,
-        archived_at,
-        'route_interaction_log_archive' as source_table
+        id: route_id,
+        user_id: interaction_type,
+        metadata: session_id,
+        duration_ms: success,
+        error_message: ip_address,
+        user_agent: created_at,
+        archived_at: 'route_interaction_log_archive' as source_table
       FROM route_interaction_log_archive
       WHERE route_id = ${routeId}
     )
@@ -413,8 +344,7 @@ export async function getCombinedInteractions(
 
   return {
     data: result.rows,
-    total,
-    limit,
+    total: limit,
     offset,
     hasMore: offset + limit < total,
   };
@@ -439,10 +369,8 @@ export async function getArchiveStatistics() {
  * Export for convenience
  */
 export default {
-	getArchivedErrorClusters,
-	getArchivedInteractions,
-	getCombinedErrorClusters,
-	getCombinedInteractions,
+	getArchivedErrorClusters: getArchivedInteractions,
+	getCombinedErrorClusters: getCombinedInteractions,
 	getArchiveStatistics,
 };
 
