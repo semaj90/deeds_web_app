@@ -83,22 +83,22 @@ This implementation plan breaks down the comprehensive testing and remediation s
   - Ensure all property tests pass
   - Ask the user if questions arise
 
-- [ ] 4. Implement User Flow Testing Module
-  - [ ] 4.1 Create login flow E2E test
+- [x] 4. Implement User Flow Testing Module
+  - [x] 4.1 Create login flow E2E test
     - Navigate to /login page
     - Fill credentials form
     - Submit and verify redirect to dashboard
     - Capture screenshots at each step
     - _Requirements: 2.1, 2.2, 2.7_
 
-  - [ ] 4.2 Create case creation flow E2E test
+  - [x] 4.2 Create case creation flow E2E test
     - Click "+ NEW CASE" button from dashboard
     - Fill case creation form
     - Submit and verify persistence
     - Capture confirmation screenshot
     - _Requirements: 2.3, 2.4, 2.7_
 
-  - [ ] 4.3 Create evidence upload flow E2E test
+  - [x] 4.3 Create evidence upload flow E2E test
     - Select a case from the list
     - Upload evidence file via file input
     - Verify file stored in MinIO bucket

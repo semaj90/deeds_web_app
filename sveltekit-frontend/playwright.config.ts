@@ -30,7 +30,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
-    ['json', { outputFile: 'test-results/e2e-results.json' }]
+    ['json', { outputFile: 'test-results/e2e-results.json' }],
   ],
 
   // Global test timeout (2 minutes for complex flows)
@@ -42,7 +42,7 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for the SvelteKit dev server
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5175',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
 
     // Collect trace on first retry for debugging
     trace: 'on-first-retry',
@@ -75,9 +75,9 @@ export default defineConfig({
           args: [
             '--enable-features=WebAssemblySimd',
             '--disable-web-security',
-            '--allow-running-insecure-content'
-          ]
-        }
+            '--allow-running-insecure-content',
+          ],
+        },
       },
     },
     // Firefox project for cross-browser testing (optional)
@@ -88,12 +88,13 @@ export default defineConfig({
   ],
 
   // Web server configuration
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://127.0.0.1:5175',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  // Web server configuration
+  // webServer: {
+  //   command: 'npm run dev',
+  //   url: 'http://127.0.0.1:5173',
+  //   reuseExistingServer: true, // Always reuse if server is running
+  //   timeout: 120000,
+  // },
 
   // Output directory for test artifacts (screenshots, videos, traces)
   outputDir: 'test-results/',
