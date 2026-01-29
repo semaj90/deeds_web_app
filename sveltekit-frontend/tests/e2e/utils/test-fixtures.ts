@@ -120,6 +120,7 @@ export const imageEvidenceData: TestEvidenceData = {
  * @validates Requirements 3.1-3.7
  */
 export const testRoutes: TestRoute[] = [
+  // Public routes (no auth required)
   {
     path: '/',
     name: 'Homepage',
@@ -135,6 +136,14 @@ export const testRoutes: TestRoute[] = [
     expectedElements: ['[data-testid="login-form"]', '[data-testid="username-input"]'],
   },
   {
+    path: '/health',
+    name: 'Health Check',
+    requiresAuth: false,
+    expectedTitle: 'Health',
+  },
+
+  // App routes (auth required - grouped under (app))
+  {
     path: '/dashboard',
     name: 'Dashboard',
     requiresAuth: true,
@@ -149,6 +158,12 @@ export const testRoutes: TestRoute[] = [
     expectedElements: ['[data-testid="cases-list"]'],
   },
   {
+    path: '/cases/new',
+    name: 'New Case',
+    requiresAuth: true,
+    expectedTitle: 'New Case',
+  },
+  {
     path: '/evidence',
     name: 'Evidence Board',
     requiresAuth: true,
@@ -161,6 +176,64 @@ export const testRoutes: TestRoute[] = [
     requiresAuth: true,
     expectedTitle: 'Evidence Library',
     expectedElements: ['[data-testid="evidence-library"]'],
+  },
+  {
+    path: '/persons-of-interest',
+    name: 'Persons of Interest',
+    requiresAuth: true,
+    expectedTitle: 'Persons of Interest',
+  },
+  {
+    path: '/global-search',
+    name: 'Global Search',
+    requiresAuth: true,
+    expectedTitle: 'Search',
+  },
+  {
+    path: '/command-center',
+    name: 'Command Center',
+    requiresAuth: true,
+    expectedTitle: 'Command Center',
+  },
+  {
+    path: '/terminal',
+    name: 'Terminal',
+    requiresAuth: true,
+    expectedTitle: 'Terminal',
+  },
+
+  // Utility routes
+  {
+    path: '/chat',
+    name: 'Chat',
+    requiresAuth: false,
+    expectedTitle: 'Chat',
+  },
+  {
+    path: '/knowledge',
+    name: 'Knowledge Base',
+    requiresAuth: false,
+    expectedTitle: 'Knowledge',
+  },
+  {
+    path: '/rag-search',
+    name: 'RAG Search',
+    requiresAuth: false,
+    expectedTitle: 'RAG Search',
+  },
+
+  // Admin routes
+  {
+    path: '/admin/error-analysis',
+    name: 'Error Analysis',
+    requiresAuth: true,
+    expectedTitle: 'Error Analysis',
+  },
+  {
+    path: '/admin/topology',
+    name: 'Topology',
+    requiresAuth: true,
+    expectedTitle: 'Topology',
   },
 ];
 

@@ -13,40 +13,79 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     const userId = locals.user.id;
     const encoder = new TextEncoder();
 
+    // Track intervals for cleanup
+    let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+    let simulateInterval: ReturnType<typeof setInterval> | null = null;
+    let isClosed = false;
+
     // 2. Create ReadableStream
     const stream = new ReadableStream({
         start(controller) {
+            // Helper to safely enqueue data
+            const safeEnqueue = (data: string) => {
+                if (!isClosed) {
+                    try {
+                        controller.enqueue(encoder.encode(data));
+                    } catch {
+                        // Controller already closed, ignore
+                        isClosed = true;
+                        cleanup();
+                    }
+                }
+            };
+
+            // Cleanup function
+            const cleanup = () => {
+                if (keepAliveInterval) {
+                    clearInterval(keepAliveInterval);
+                    keepAliveInterval = null;
+                }
+                if (simulateInterval) {
+                    clearInterval(simulateInterval);
+                    simulateInterval = null;
+                }
+            };
+
             // Send initial connection message
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected', userId })}\n\n`));
+            safeEnqueue(`data: ${JSON.stringify({ type: 'connected', userId })}\n\n`);
 
             // Setup keep-alive interval (every 30s)
-            const keepAlive = setInterval(() => {
-                controller.enqueue(encoder.encode(': keep-alive\n\n'));
+            keepAliveInterval = setInterval(() => {
+                safeEnqueue(': keep-alive\n\n');
             }, 30000);
 
             // TODO: Hook into actual event bus (Redis PubSub or Postgres Notify)
             // For now, we simulate processing updates if a 'simulate' param is present
             if (url.searchParams.has('simulate')) {
                 let progress = 0;
-                const interval = setInterval(() => {
+                simulateInterval = setInterval(() => {
                     progress += 10;
                     if (progress > 100) {
-                        clearInterval(interval);
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'complete', docId: '123' })}\n\n`));
+                        if (simulateInterval) {
+                            clearInterval(simulateInterval);
+                            simulateInterval = null;
+                        }
+                        safeEnqueue(`data: ${JSON.stringify({ type: 'complete', docId: '123' })}\n\n`);
                     } else {
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'progress', progress, status: 'processing' })}\n\n`));
+                        safeEnqueue(`data: ${JSON.stringify({ type: 'progress', progress, status: 'processing' })}\n\n`);
                     }
                 }, 1000);
             }
 
-            // Cleanup on close
-            return () => {
-                clearInterval(keepAlive);
-                // remove event listeners
-            };
+            // Return cleanup function
+            return cleanup;
         },
         cancel() {
-            // client disconnected
+            // Client disconnected
+            isClosed = true;
+            if (keepAliveInterval) {
+                clearInterval(keepAliveInterval);
+                keepAliveInterval = null;
+            }
+            if (simulateInterval) {
+                clearInterval(simulateInterval);
+                simulateInterval = null;
+            }
         }
     });
 
@@ -60,6 +99,3 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         }
     });
 };
-
-
-
