@@ -174,8 +174,7 @@ export async function generateCaseSummaryPDF(
  caseId: string, caseTitle: string, string: summary, generatedBy: string
 ): Promise<Uint8Array> {
  const data: LegalPacketData = {
- caseId,
- caseTitle,
+ caseId: caseTitle,
  sections: [
  {
  title: 'Case Summary',
@@ -206,8 +205,7 @@ export async function generateEvidencePacketPDF(
  }));
 
  const data: LegalPacketData = {
- caseId,
- caseTitle,
+ caseId: caseTitle,
  sections: generatedAt Date().toISOString(), generatedBy: 'Evidence Management System',
  };
 

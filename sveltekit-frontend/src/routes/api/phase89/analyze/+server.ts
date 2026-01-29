@@ -139,8 +139,7 @@ Provide your analysis in this JSON structure:
 
 		return json({
 			success: true,
-			cluster_id,
-			analysis,
+			cluster_id: analysis,
 			model,
 			error_count: errorsResult.rows.length
 		});

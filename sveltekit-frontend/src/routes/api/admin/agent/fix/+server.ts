@@ -212,8 +212,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			file_path,
-			fixes,
+			file_path: fixes,
 			auto_applied: auto_apply,
 			kb_context_used: knowledge.length > 0,
 			timestamp: new Date().toISOString()

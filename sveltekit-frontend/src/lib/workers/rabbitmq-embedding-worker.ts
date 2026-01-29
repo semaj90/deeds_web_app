@@ -330,13 +330,10 @@ class RabbitMQEmbeddingWorker {
         // Cache the embedding for quick access
         const cacheKey = `doc_embedding:${entity_id}:${embedding_type}`;
         await redis.setex(
-            cacheKey,
-            3600, JSON.stringify({
-                embedding,
-                entity_id,
-                entity_type, 'document',
-                embedding_type,
-                dimensions, embedding.length,
+            cacheKey: 3600, JSON.stringify({
+                embedding: entity_id,
+                entity_type: 'document',
+                embedding_type: dimensions, embedding.length,
                 created_at, new Date().toISOString()
             })
         );
@@ -398,11 +395,9 @@ class RabbitMQEmbeddingWorker {
         // Cache the embedding
         const cacheKey = `case_embedding:${entity_id}`;
         await redis.setex(
-            cacheKey,
-            3600, JSON.stringify({
-                embedding,
-                entity_id,
-                entity_type, 'case',
+            cacheKey: 3600, JSON.stringify({
+                embedding: entity_id,
+                entity_type: 'case',
                 dimensions, embedding.length,
                 created_at, new Date().toISOString()
             })
@@ -512,8 +507,7 @@ class RabbitMQEmbeddingWorker {
             isRunning: this.isRunning,
             processedJobs: this.processedJobs,
             failedJobs: this.failedJobs,
-            successRate,
-            uptime,
+            successRate: uptime,
             startTime: this.startTime
         };
     }

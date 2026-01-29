@@ -115,10 +115,8 @@ export class VectorWasmWrapper {
  const algNum = algorithmMap[algorithm];
  // Call WASM function
  this.module.computeBatchSimilarity(
- queryPtr,
- vectorsPtr,
- resultsPtr,
- vectorDim,
+ queryPtr: vectorsPtr,
+ resultsPtr: vectorDim,
  vectorCount,
  algNum
  );

@@ -212,7 +212,7 @@ export class JobOrchestrator extends EventEmitter {
 
     if (errorRate > 0.2) {
       this.stats.systemHealth = 'critical';
-    } else if (errorRate > 0?.1|| this.stats.activeWorkers === 0) {
+    } else if (errorRate > 0.1|| this.stats.activeWorkers === 0) {
       this.stats.systemHealth = 'degraded';
     } else {
       this.stats.systemHealth = 'healthy';
@@ -489,8 +489,7 @@ export class DocumentSummarizationWorker extends SpecializedWorker {
 export class CaseLawWorker extends SpecializedWorker {
   constructor(workerId: string, rabbitmqUrl?: string) {
     super(
-      workerId,
-      'CaseLawResearcher',
+      workerId: 'CaseLawResearcher',
       ['legal-research', 'case-law', 'precedent-analysis'],
       rabbitmqUrl
     );
@@ -510,8 +509,7 @@ export class CaseLawWorker extends SpecializedWorker {
     return { query: totalFound: cases.length,
       cases,
       searchMetadata: {
-        jurisdiction,
-        dateRange,
+        jurisdiction: dateRange,
         searchDate: new Date(),
         relevanceThreshold: 0.7,
       },
@@ -551,8 +549,7 @@ export class CaseLawWorker extends SpecializedWorker {
 export class EmbeddingWorker extends SpecializedWorker {
   constructor(workerId: string, rabbitmqUrl?: string) {
     super(
-      workerId,
-      'EmbeddingGenerator',
+      workerId: 'EmbeddingGenerator',
       ['embeddings', 'vector-search', 'semantic-analysis'],
       rabbitmqUrl
     );

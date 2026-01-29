@@ -26,10 +26,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
 
     // Find similar nodes using cosine distanceSELECT
-        id,
-        kind,
-        label,
-        meta,
+        id: kind,
+        label: meta,
         1 - (embedding <=> ${node.embedding}::vector) AS similarity
       FROM kg_nodes
       WHERE

@@ -68,8 +68,7 @@ export const GET: RequestHandler = async () => {
 
     return json({
       topology: {
-        nodes,
-        edges,
+        nodes: edges,
         summary: { totalFiles: nodes.length,
           totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)

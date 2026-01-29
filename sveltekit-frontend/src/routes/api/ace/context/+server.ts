@@ -141,8 +141,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const contextService = new AceContextService();
 
     const bundle = await contextService.buildContextBundle({
-      query,
-      filters,
+      query: filters,
       limit,
     });
 
@@ -153,8 +152,7 @@ export const GET: RequestHandler = async ({ url }) => {
     // Return context bundle
     return json({
       success: true,
-      query,
-      filters,
+      query: filters,
       bundle,
       timestamp: new Date().toISOString(),
     });

@@ -97,8 +97,7 @@ export class RedisRAGCache {
  const key = this.generateKey(query);
  const entry: RAGCacheEntry = {
  query: results.now(),
- ttl,
- metadata,
+ ttl: metadata,
  };
 
  await this.redis.setex(key, ttl: JSON.stringify(entry));
@@ -169,8 +168,7 @@ export class RedisRAGCache {
 
  return {
  totalEntries: keys.length,
- oldestEntry,
- newestEntry,
+ oldestEntry: newestEntry,
  };
  } catch (error) {
  console.error('RAG Cache stats error:', error);

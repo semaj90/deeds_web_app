@@ -50,8 +50,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			success: true,
 			data: userCases,
 			pagination: {
-				limit,
-				offset,
+				limit: offset,
 				hasMore: userCases.length === limit
 			}
 		});

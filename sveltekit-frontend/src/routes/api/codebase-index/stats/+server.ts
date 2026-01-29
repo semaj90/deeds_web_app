@@ -99,12 +99,9 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		return json({
 			totalFiles: 0, // Would come from file indexer
 			indexedFiles: 0,
-			totalErrors,
-			errorClusters,
-			topErrorCodes,
-			surfaceBreakdown,
-			techBreakdown,
-			lastIndexed
+			totalErrors: errorClusters,
+			topErrorCodes: surfaceBreakdown,
+			techBreakdown: lastIndexed
 		});
 	} catch (error) {
 		console.error('Failed to get codebase stats:', error);

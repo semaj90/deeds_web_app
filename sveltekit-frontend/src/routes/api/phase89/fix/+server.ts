@@ -27,8 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (redis.isOpen) {
       await redis.set(`phase89:fix:${requestId}`, JSON.stringify({
-        file,
-        errorId,
+        file: errorId,
         status: 'pending',
         timestamp: Date.now()
       }), { EX: 3600 });

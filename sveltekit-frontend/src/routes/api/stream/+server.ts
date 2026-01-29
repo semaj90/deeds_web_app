@@ -8,8 +8,7 @@
  */
 
 import {
-    createSSEStream,
-    streamOllamaResponse,
+    createSSEStream: streamOllamaResponse,
     streamRAGResponse
 } from '$lib/server/streaming/chunked-response';
 import type { RequestHandler } from './$types';

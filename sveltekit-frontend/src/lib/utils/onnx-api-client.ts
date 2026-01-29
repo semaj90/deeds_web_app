@@ -175,8 +175,7 @@ export class ONNXApiClient {
 
  return {
  success: successCount === tests.length,
- results,
- summary,
+ results: summary,
  };
  }
 

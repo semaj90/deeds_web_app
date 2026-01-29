@@ -92,14 +92,11 @@ export const GET: RequestHandler = async () => {
  luciaInstanceReused,
  },
  schemaIdentity: {
- usersSameRef,
- sessionsSameRef,
+ usersSameRef: sessionsSameRef,
  },
  counts: {
- userCount,
- sessionCount,
- recentSessions,
- countsError,
+ userCount: sessionCount,
+ recentSessions: countsError,
  },
  environment: { nodeVersion: process.version,
  pid: process.pid,

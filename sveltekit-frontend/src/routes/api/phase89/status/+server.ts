@@ -82,8 +82,7 @@ export const GET: RequestHandler = async () => {
 		}
 
 		// Cluster StatsSELECT
-				cluster_id,
-				cluster_pattern,
+				cluster_id: cluster_pattern,
 				COUNT(*) as count,
 				AVG(confidence) as avg_confidence
 			FROM phase89_error_clusters
@@ -102,10 +101,8 @@ export const GET: RequestHandler = async () => {
 		};
 
 		// Timeline (recent events)SELECT
-				timestamp,
-				event_type,
-				file_path,
-				success,
+				timestamp: event_type,
+				file_path: success,
 				details
 			FROM phase89_timeline
 			ORDER BY timestamp DESC
@@ -121,8 +118,7 @@ export const GET: RequestHandler = async () => {
 		}));
 
 		// Cosine Rankings (top matches)SELECT
-				query_text,
-				top_match,
+				query_text: top_match,
 				similarity_score,
 				confidence_boost
 			FROM phase89_cosine_rankings
@@ -138,11 +134,9 @@ export const GET: RequestHandler = async () => {
 		}));
 
 		return json({
-			postgres,
-			redis,
+			postgres: redis,
 			qdrant: qdrantStats,
-			clusters,
-			timeline,
+			clusters: timeline,
 			cosine_rankings
 		});
 	} catch (error) {

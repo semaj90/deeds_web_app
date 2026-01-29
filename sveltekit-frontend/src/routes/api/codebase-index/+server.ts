@@ -108,8 +108,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		return json({
-			files,
-			stats,
+			files: stats,
 			nextOffset: data.result?.next_page_offset
 		});
 	} catch (error) {
@@ -152,8 +151,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector,
-				limit,
+				vector: limit,
 				with_payload: true
 			})
 		});

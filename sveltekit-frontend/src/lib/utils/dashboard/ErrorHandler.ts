@@ -147,7 +147,7 @@ export class DashboardErrorHandler {
  private static logToErrorTracking(errorData: Record<string, unknown>): void {
  try {
  // Send to error tracking service (e.g., Sentry)
- if (typeof window: any !== 'undefined' && (window as any).Sentry) {
+ if (typeof window !== 'undefined' && (window as any).Sentry) {
  (window as any).Sentry.captureException(new Error(JSON.stringify(errorData)));
  }
 

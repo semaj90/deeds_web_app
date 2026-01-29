@@ -113,6 +113,8 @@ export async function removeBackup(backupPath: string): Promise<void> {
 
 /**
  * Process a single file with the given patterns
+ *
+ * @requirements 1.5
  */
 export async function processFile(
   filePath: string,
@@ -122,11 +124,30 @@ export async function processFile(
   const cfg = { ...defaultConfig, ...config };
 
   try {
+    // Filter patterns based on fileFilter
+    const applicablePatterns = patterns.filter(pattern => {
+      if (pattern.fileFilter) {
+        return pattern.fileFilter(filePath);
+      }
+      return true;
+    });
+
+    // If no patterns apply to this file, skip it
+    if (applicablePatterns.length === 0) {
+      return {
+        filePath,
+        success: true,
+        totalFixes: 0,
+        patternResults: [],
+        dryRun: cfg.dryRun,
+      };
+    }
+
     // Read file content
     const content = await readFile(filePath, 'utf-8');
 
-    // Apply all patterns
-    const { content: fixedContent, results } = applyPatterns(content, patterns);
+    // Apply all applicable patterns
+    const { content: fixedContent, results } = applyPatterns(content, applicablePatterns);
 
     // Calculate total fixes
     const totalFixes = results.reduce((sum, r) => sum + r.matchCount, 0);

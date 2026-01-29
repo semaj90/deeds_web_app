@@ -107,10 +107,8 @@ function extractFileMetadata(content: string, filePath: string): any {
       : 'javascript';
 
   return {
-    language,
-    imports,
-    exports,
-    typeCount,
+    language: imports,
+    exports: typeCount,
     functionCount
   };
 }
@@ -248,8 +246,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       return json({
         success: true,
-        indexed,
-        results,
+        indexed: results,
         message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
     } catch (err: any) {
@@ -277,8 +274,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
       }
 
       // Fetch error clustersSELECT DISTINCT
-          file_path,
-          error_code,
+          file_path: error_code,
           message,
           COUNT(*) as error_count
         FROM error_cluster
@@ -317,10 +313,8 @@ Phase: Phase 66-79 Error Analysis
                   id: pointId,
                   vector: Array.from(embedding),
                   payload: {
-                    error_code,
-                    file_path,
-                    message,
-                    error_count,
+                    error_code: file_path,
+                    message: error_count,
                     phase: 'phase66-79',
                     indexed_at: new Date().toISOString()
                   }
@@ -355,8 +349,7 @@ Phase: Phase 66-79 Error Analysis
 
       return json({
         success: true,
-        indexed,
-        results,
+        indexed: results,
         message: `Indexed ${indexed} error clusters`
       });
     } catch (err: any) {

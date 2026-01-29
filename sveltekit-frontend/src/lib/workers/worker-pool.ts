@@ -46,7 +46,7 @@ export class AnalyzerWorkerPool {
 
  for (let i = 0; i < this.config.workerCount!; i++) {
  const worker = new Worker(new URL('./analyzer-worker.ts', import.meta.url), {
- type, 'module',
+ type: 'module',
  });
 
  this.workers.push(worker);

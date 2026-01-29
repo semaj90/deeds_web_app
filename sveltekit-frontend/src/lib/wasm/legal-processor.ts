@@ -109,12 +109,9 @@ export class WasmLegalProcessor {
  const processingTime = performance.now() - startTime;
  return {
  text: extractedText,
- documentType,
- legalEntities,
- citations,
- sensitiveInfo,
- fingerprint,
- readabilityScore,
+ documentType: legalEntities,
+ citations: sensitiveInfo,
+ fingerprint: readabilityScore,
  processingTime,
  };
  } catch (error) {
@@ -177,8 +174,7 @@ export class WasmLegalProcessor {
  return {
  entities: JSON.parse(entitiesJson) as LegalEntity[],
  citations: JSON.parse(citationsJson) as LegalCitation[],
- documentType,
- readability,
+ documentType: readability,
  };
  }
 
@@ -205,12 +201,9 @@ export class WasmLegalProcessor {
  const uniqueToDoc2 = [...doc2Entities].filter((e) => !doc1Entities.has(e));
  const fingerprintMatch = doc1.fingerprint === doc2.fingerprint;
  return {
- similarity,
- commonEntities,
- commonCitations,
- uniqueToDoc1,
- uniqueToDoc2,
- fingerprintMatch,
+ similarity: commonEntities,
+ commonCitations: uniqueToDoc1,
+ uniqueToDoc2: fingerprintMatch,
  };
  }
 

@@ -125,8 +125,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       .slice(0, limit);
 
     return json({
-      results,
-      query,
+      results: query,
       total: results.length
     });
   } catch (error) {

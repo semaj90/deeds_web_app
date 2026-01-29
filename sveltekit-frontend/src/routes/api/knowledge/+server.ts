@@ -215,8 +215,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
     return json({
       success: true,
-      query,
-      matches,
+      query: matches,
       count: matches.length,
       avg_similarity: matches.length > 0
         ? (matches.reduce((sum, m) => sum + m.score, 0) / matches.length).toFixed(2)

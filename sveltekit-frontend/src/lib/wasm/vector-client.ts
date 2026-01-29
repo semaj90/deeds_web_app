@@ -191,8 +191,7 @@ class VectorWasmClient {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                operation,
-                matrixA,
+                operation: matrixA,
                 matrixB,
                 options: { useCUDA: options.useCUDA !== false,
                     parallel: options.parallel !== false
@@ -350,8 +349,7 @@ class VectorWasmClient {
 
         return {
             localPerformance: benchmarkTime,
-            memoryUsage,
-            recommendations
+            memoryUsage: recommendations
         };
     }
 }

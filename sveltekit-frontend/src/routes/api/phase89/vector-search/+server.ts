@@ -69,8 +69,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: true,
-			results,
-			query,
+			results: query,
 			total: results.length
 		});
 	} catch (error) {

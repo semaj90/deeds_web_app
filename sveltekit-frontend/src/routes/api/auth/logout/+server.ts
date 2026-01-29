@@ -15,7 +15,7 @@ export const POST: RequestHandler = async (event) => {
  // Create blank session cookie
  const sessionCookie = lucia.createBlankSessionCookie();
  event.cookies.set(sessionCookie.name, sessionCookie.value, {
- path, '/',
+ path: '/',
  ...sessionCookie.attributes,
  });
 
@@ -48,7 +48,7 @@ export const GET: RequestHandler = async (event) => {
  // Create blank session cookie
  const sessionCookie = lucia.createBlankSessionCookie();
  event.cookies.set(sessionCookie.name, sessionCookie.value, {
- path, '/',
+ path: '/',
  ...sessionCookie.attributes,
  });
 

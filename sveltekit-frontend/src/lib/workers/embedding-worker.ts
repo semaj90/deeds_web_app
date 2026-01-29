@@ -220,8 +220,7 @@ export async function findSimilar(
 	options?: { threshold?: number, maxResults?: number }
 ): Promise<SimilarityResult[]> {
 	return getEmbeddingWorker().processSimilarity({
-		queryEmbedding,
-		targetEmbeddings,
+		queryEmbedding: targetEmbeddings,
 		threshold: options?.threshold ?? 0.7,
 		maxResults: options?.maxResults ?? 10,
 	});

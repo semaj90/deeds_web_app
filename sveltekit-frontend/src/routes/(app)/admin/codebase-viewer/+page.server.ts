@@ -40,10 +40,8 @@ SELECT
 
 		// Get file timeline from PostgreSQL
 SELECT
-				file_path,
-				indexed_at,
-				tagged_at,
-				edited_at,
+				file_path: indexed_at,
+				tagged_at: edited_at,
 				analyzed_at,
 				metadata
 			FROM phase89_file_timeline

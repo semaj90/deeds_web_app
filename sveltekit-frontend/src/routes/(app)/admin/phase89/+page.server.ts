@@ -135,7 +135,7 @@ Analyze this error cluster (ID: ${clusterId}): Sample, Messages:
             // Save to KB cards
             await db.execute(sql`
                 INSERT INTO phase89_kb_cards (
-                    card_type, title, description, tags, metadata, created_at
+                    card_type: title, description, tags, metadata, created_at
                 ) VALUES (
                     'cluster_analysis',
                     ${analysis.title},

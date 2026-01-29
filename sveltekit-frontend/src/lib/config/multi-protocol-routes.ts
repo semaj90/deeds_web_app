@@ -299,145 +299,180 @@ export const SERVICES_CONFIG: Record<string, ServiceConfig> = {
  },
 };
 
-// Multi-Protocol API Routes Configuration// Enhanced RAG Routes
- {
- service: 'enhancedRag',
- endpoint: '/api/v1/rag',
- protocols: { quic: 'quic://localhost:8094/api/v1/rag',
- grpc: 'grpc://localhost:50051/rag.v1.RAGService',
- http: 'http://localhost:8094/api/v1/rag',
- ws: 'ws://localhost:8094/api/v1/rag/stream',
- },
- fallback: ['quic', 'grpc', 'http'],
- timeout: 30000,
- },
- // Upload Routes
- {
- service: 'uploadService',
- endpoint: '/api/v1/upload',
- protocols: { http: 'http://localhost:8093/upload',
- ws: 'ws://localhost:8093/upload/stream',
- },
- fallback: ['http'],
- timeout: 60000,
- },
- // AI Summary Routes
- {
- service: 'aiSummary',
- endpoint: '/api/v1/ai/summary',
- protocols: { http: 'http://localhost:8097/api/v1/summary',
- ws: 'ws://localhost:8097/api/v1/summary/stream',
- },
- fallback: ['http'],
- timeout: 45000,
- },
- // Legal AI Routes
- {
- service: 'legalAI',
- endpoint: '/api/v1/legal',
- protocols: { grpc: 'grpc://localhost:50051/legal.v1.LegalService',
- http: 'http://localhost:8202/api/v1/legal',
- },
- fallback: ['grpc', 'http'],
- timeout: 30000,
- },
- // QUIC Gateway Routes
- {
- service: 'quicGateway',
- endpoint: '/api/v1/quic',
- protocols: { quic: 'quic://localhost:8216/api/v1/gateway',
- http: 'http://localhost:8216/api/v1/gateway',
- },
- fallback: ['quic', 'http'],
- timeout: 5000,
- },
- // Cluster Management Routes
- {
- service: 'clusterManager',
- endpoint: '/api/v1/cluster',
- protocols: { http: 'http://localhost:8213/api/v1/cluster',
- },
- fallback: ['http'],
- timeout: 15000,
- },
- // XState Management Routes
- {
- service: 'xstateManager',
- endpoint: '/api/v1/state',
- protocols: { http: 'http://localhost:8212/api/v1/state',
- ws: 'ws://localhost:8212/api/v1/state/events',
- },
- fallback: ['http'],
- timeout: 10000,
- },
- // Load Balancer Routes
- {
- service: 'loadBalancer',
- endpoint: '/api/v1/lb',
- protocols: { http: 'http://localhost:8222/api/v1/balance',
- },
- fallback: ['http'],
- timeout: 5000,
- },
- // GPU Indexer Routes
- {
- service: 'gpuIndexer',
- endpoint: '/api/v1/gpu/index',
- protocols: { http: 'http://localhost:8220/api/v1/index',
- },
- fallback: ['http'],
- timeout: 60000,
- },
- // Recommendation Routes
- {
- service: 'recommendations',
- endpoint: '/api/v1/recommendations',
- protocols: { http: 'http://localhost:8223/api/v1/recommend',
- },
- fallback: ['http'],
- timeout: 15000,
- }];
+// Multi-Protocol API Routes Configuration
+export const API_ROUTES: ProtocolRoute[] = [
+  // Enhanced RAG Routes
+  {
+    service: 'enhancedRag',
+    endpoint: '/api/v1/rag',
+    protocols: {
+      quic: 'quic://localhost:8094/api/v1/rag',
+      grpc: 'grpc://localhost:50051/rag.v1.RAGService',
+      http: 'http://localhost:8094/api/v1/rag',
+      ws: 'ws://localhost:8094/api/v1/rag/stream',
+    },
+    fallback: ['quic', 'grpc', 'http'],
+    timeout: 30000,
+  },
+  // Upload Routes
+  {
+    service: 'uploadService',
+    endpoint: '/api/v1/upload',
+    protocols: {
+      http: 'http://localhost:8093/upload',
+      ws: 'ws://localhost:8093/upload/stream',
+    },
+    fallback: ['http'],
+    timeout: 60000,
+  },
+  // AI Summary Routes
+  {
+    service: 'aiSummary',
+    endpoint: '/api/v1/ai/summary',
+    protocols: {
+      http: 'http://localhost:8097/api/v1/summary',
+      ws: 'ws://localhost:8097/api/v1/summary/stream',
+    },
+    fallback: ['http'],
+    timeout: 45000,
+  },
+  // Legal AI Routes
+  {
+    service: 'legalAI',
+    endpoint: '/api/v1/legal',
+    protocols: {
+      grpc: 'grpc://localhost:50051/legal.v1.LegalService',
+      http: 'http://localhost:8202/api/v1/legal',
+    },
+    fallback: ['grpc', 'http'],
+    timeout: 30000,
+  },
+  // QUIC Gateway Routes
+  {
+    service: 'quicGateway',
+    endpoint: '/api/v1/quic',
+    protocols: {
+      quic: 'quic://localhost:8216/api/v1/gateway',
+      http: 'http://localhost:8216/api/v1/gateway',
+    },
+    fallback: ['quic', 'http'],
+    timeout: 5000,
+  },
+  // Cluster Management Routes
+  {
+    service: 'clusterManager',
+    endpoint: '/api/v1/cluster',
+    protocols: {
+      http: 'http://localhost:8213/api/v1/cluster',
+    },
+    fallback: ['http'],
+    timeout: 15000,
+  },
+  // XState Management Routes
+  {
+    service: 'xstateManager',
+    endpoint: '/api/v1/state',
+    protocols: {
+      http: 'http://localhost:8212/api/v1/state',
+      ws: 'ws://localhost:8212/api/v1/state/events',
+    },
+    fallback: ['http'],
+    timeout: 10000,
+  },
+  // Load Balancer Routes
+  {
+    service: 'loadBalancer',
+    endpoint: '/api/v1/lb',
+    protocols: {
+      http: 'http://localhost:8222/api/v1/balance',
+    },
+    fallback: ['http'],
+    timeout: 5000,
+  },
+  // GPU Indexer Routes
+  {
+    service: 'gpuIndexer',
+    endpoint: '/api/v1/gpu/index',
+    protocols: {
+      http: 'http://localhost:8220/api/v1/index',
+    },
+    fallback: ['http'],
+    timeout: 60000,
+  },
+  // Recommendation Routes
+  {
+    service: 'recommendations',
+    endpoint: '/api/v1/recommendations',
+    protocols: {
+      http: 'http://localhost:8223/api/v1/recommend',
+    },
+    fallback: ['http'],
+    timeout: 15000,
+  },
+];
 
 // Protocol Priority Configuration
 export const PROTOCOL_PRIORITY = {
- performance: ['quic', 'grpc', 'http', 'sse', 'ws'],
- reliability: ['http', 'grpc', 'quic', 'sse', 'ws'],
- realtime: ['ws', 'sse', 'quic', 'grpc', 'http'],
+  performance: ['quic', 'grpc', 'http', 'sse', 'ws'],
+  reliability: ['http', 'grpc', 'quic', 'sse', 'ws'],
+  realtime: ['ws', 'sse', 'quic', 'grpc', 'http'],
 } as const;
 
 // Service Health Check Configuration
 export const HEALTH_CHECK_CONFIG = {
- interval: 30000, // 30 seconds
- timeout: 5000, // 5 seconds
- retries: 3, unhealthyThreshold: 3, healthyThreshold: 2,
+  interval: 30000, // 30 seconds
+  timeout: 5000, // 5 seconds
+  retries: 3,
+  unhealthyThreshold: 3,
+  healthyThreshold: 2,
 };
 
 // Protocol-specific configurations
 export const PROTOCOL_CONFIG = {
- http: { timeout: 30000, retries: 3, headers: {
- 'Content-Type': 'application/json',
- 'User-Agent': 'Legal-AI-Platform/1.0',
- },
- },
- grpc: { timeout: 15000, retries: 3, keepAlive: true, keepAliveTimeout: 30000
- },
- quic: { timeout: 5000, retries: 2, keepAlive: true, maxStreams: 100
- },
- ws: { timeout: 0, // No timeout for WebSocket
- pingInterval: 30000, pongTimeout: 5000, reconnectDelay: 1000,
- },
+  http: {
+    timeout: 30000,
+    retries: 3,
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Legal-AI-Platform/1.0',
+    },
+  },
+  grpc: {
+    timeout: 15000,
+    retries: 3,
+    keepAlive: true,
+    keepAliveTimeout: 30000
+  },
+  quic: {
+    timeout: 5000,
+    retries: 2,
+    keepAlive: true,
+    maxStreams: 100
+  },
+  ws: {
+    timeout: 0, // No timeout for WebSocket
+    pingInterval: 30000,
+    pongTimeout: 5000,
+    reconnectDelay: 1000,
+  },
 };
 
 // Service Discovery Configuration
 export const SERVICE_DISCOVERY = {
- enabled: true, refreshInterval: 60000 // 1 minute
- healthCheckEnabled: true, autoFailover: true, circuitBreakerEnabled: true,
+  enabled: true,
+  refreshInterval: 60000, // 1 minute
+  healthCheckEnabled: true,
+  autoFailover: true,
+  circuitBreakerEnabled: true,
 };
 
 export default {
- SERVICES_CONFIG: API_ROUTES,
- PROTOCOL_PRIORITY: HEALTH_CHECK_CONFIG,
- PROTOCOL_CONFIG: SERVICE_DISCOVERY,
+  SERVICES_CONFIG,
+  API_ROUTES,
+  PROTOCOL_PRIORITY,
+  HEALTH_CHECK_CONFIG, // Fixed keys to match exported constants
+  PROTOCOL_CONFIG,
+  SERVICE_DISCOVERY
 };
 
 

@@ -81,8 +81,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         }
 
         return { errors: totalErrors: stats.result?.points_count ?? 0,
-            errorCodeCounts,
-            surfaceCounts,
+            errorCodeCounts: surfaceCounts,
             techCounts,
             filters: { errorCode, surface, tech, clusterId },
             hasNextPage: !!data.result.next_page_offset

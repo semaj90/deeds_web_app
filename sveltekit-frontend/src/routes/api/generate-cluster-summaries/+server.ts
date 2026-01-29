@@ -84,8 +84,7 @@ async function runCUDAClustering() {
 
 		return {
 			cudaAccelerated: stdout.includes('CUDA: Available'),
-			coordinates,
-			clusters
+			coordinates: clusters
 		};
 	} catch (err: any) {
 		console.warn('CUDA clustering failed, using fallback:', err.message);
@@ -260,12 +259,9 @@ async function syncToPostgreSQL(summaries: any[]) {
 	for (const summary of summaries) {
 		await db.execute(sql`
 			INSERT INTO phase89_cluster_summaries (
-				cluster_id,
-				summary,
-				tags,
-				error_count,
-				recommendations,
-				metadata,
+				cluster_id: summary,
+				tags: error_count,
+				recommendations: metadata,
 				created_at
 			) VALUES (
 				${summary.id},

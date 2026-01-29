@@ -279,8 +279,7 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 					const { publishToQueue } = await import('$lib/server/rabbitmq');
 					await publishToQueue('embedding.generation', {
 						type: 'chat_message',
-						sessionId,
-						userId,
+						sessionId: userId,
 						message: fullResponse
 					});
 				} catch (rabbitError) {

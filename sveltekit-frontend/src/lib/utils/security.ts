@@ -546,8 +546,7 @@ export function trackPrivilegedAccess(documentId: string, action: "view" | "edit
             userId: session.userId,
             timestamp: Date.now(),
             details: {
-                documentId,
-                action,
+                documentId: action,
                 isLegalProfessional: session.isLegalProfessional,
                 barNumber: session.barNumber
             },

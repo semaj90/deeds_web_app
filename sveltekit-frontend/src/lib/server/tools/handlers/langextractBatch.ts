@@ -64,8 +64,7 @@ JSON:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model,
-        prompt,
+        model: prompt,
         stream: false,
         options: { temperature: 0.1 }
       })

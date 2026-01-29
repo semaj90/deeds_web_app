@@ -90,8 +90,7 @@ export const POST: RequestHandler = async ({ request }) => {
       const result: CollectionSummary = {
         collection: collectionName,
         points: info.points_count,
-        summary,
-        tags,
+        summary: tags,
         summarized_at: new Date().toISOString()
       };
 

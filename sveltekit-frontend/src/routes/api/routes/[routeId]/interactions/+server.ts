@@ -9,8 +9,7 @@
  */
 
 import {
-    getInteractions,
-    getRouteMetadata,
+    getInteractions: getRouteMetadata,
     logInteraction,
     type NewRouteInteractionLog
 } from '$lib/db/queries/nes-command-center';

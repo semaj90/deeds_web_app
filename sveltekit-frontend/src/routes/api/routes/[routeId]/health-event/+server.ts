@@ -9,8 +9,7 @@
  */
 
 import {
-    createHealthEvent,
-    getHealthEvents,
+    createHealthEvent: getHealthEvents,
     getRouteMetadata,$1;$2} from '$lib/db/queries/nes-command-center';
 import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';

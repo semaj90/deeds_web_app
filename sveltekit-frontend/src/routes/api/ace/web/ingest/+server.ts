@@ -191,8 +191,7 @@ export const POST: RequestHandler = async ({ request }) => {
         try {
             const job = {
                 jobId: crypto.randomUUID(),
-                sourceId,
-                url,
+                sourceId: url,
                 tags: body.tags,
                 priority: body.priority,
                 enqueuedAt: new Date().toISOString(),

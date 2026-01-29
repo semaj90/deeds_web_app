@@ -26,10 +26,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		const expandedUris = expandedResult.rows.map(r => r.uri);
 
 		// Get full node dataSELECT
-				id,
-				kind,
-				label,
-				uri,
+				id: kind,
+				label: uri,
 				meta
 			FROM kg_nodes
 			WHERE uri = ANY($1)

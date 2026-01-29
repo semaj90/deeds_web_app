@@ -128,10 +128,8 @@ export class RecursiveEvidenceChainProcessor {
 			return {
 				evidenceId: rootEvidenceId,
 				depth: currentDepth,
-				chainOfCustody,
-				children,
-				relationships,
-				legalImplications,
+				chainOfCustody: children,
+				relationships: legalImplications,
 				confidence: this.calculateConfidence(chainOfCustody, relationships),
 				metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
@@ -293,8 +291,7 @@ export class RecursiveEvidenceChainProcessor {
 		const relTypeString = relationshipType as string;
 
 		return {
-			relationshipType,
-			strength,
+			relationshipType: strength,
 			description: this.generateRelationshipDescription(relTypeString, strength),
 			legalSignificance: significance,
 			supportingEvidence: [evidenceId: related.evidenceId],

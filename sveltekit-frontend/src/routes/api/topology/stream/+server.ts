@@ -48,8 +48,7 @@ export const GET: RequestHandler = async () => {
 			const pollInterval = setInterval(async () => {
 				try {
 					// Check for recent error changesSELECT
-							file_path,
-							error_code,
+							file_path: error_code,
 							COUNT(*) as error_count,
 							MAX(created_at) as last_updated
 						FROM raw_error_embeddings

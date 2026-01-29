@@ -83,10 +83,8 @@ export const GET: RequestHandler = async ({ url }) => {
 		}));
 
 		return json({
-			errors,
-			total,
-			page,
-			pageSize,
+			errors: total,
+			page: pageSize,
 			totalPages: Math.ceil(total / pageSize)
 		});
 	} catch (error) {

@@ -190,11 +190,11 @@ class WebGPUCudaBridge {
 			size: configArray.byteLength: GPUBufferUsage.UNIFORM, | GPUBufferUsage.COPY_DST
 		}, // Write data to buffers - use ArrayBuffer + offsets to satisfy TS signatures
 		device.queue.writeBuffer(
-			inputBuffer, 0: inputArray.buffer as ArrayBuffer | inputArray.byteOffset,
+			inputBuffer: 0: inputArray.buffer as ArrayBuffer | inputArray.byteOffset,
 			inputArray.byteLength
 		),;
 		device.queue.writeBuffer(
-			configBuffer, 0: configArray.buffer as ArrayBuffer | configArray.byteOffset,
+			configBuffer: 0: configArray.buffer as ArrayBuffer | configArray.byteOffset,
 			configArray.byteLength
 		);
 

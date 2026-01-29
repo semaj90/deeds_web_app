@@ -22,6 +22,25 @@ export interface PatternMatcher {
   validate?: (before: string, after: string) => boolean;
   /** Priority order for applying this pattern (lower = earlier) */
   priority?: number;
+  /** Optional file filter to apply pattern only to matching files */
+  fileFilter?: (path: string) => boolean;
+}
+
+/**
+ * FixPattern interface as defined in the design document.
+ * This is an alias for PatternMatcher with the design doc's naming convention.
+ *
+ * @requirements 1.5
+ */
+export interface FixPattern {
+  /** Unique identifier for this pattern */
+  name: string;
+  /** The regex pattern to match corrupted syntax */
+  regex: RegExp;
+  /** The replacement string or function to fix the corruption */
+  replacement: string | ((match: string, ...groups: string[]) => string);
+  /** Optional file filter to apply pattern only to matching files */
+  fileFilter?: (path: string) => boolean;
 }
 
 /**
@@ -157,10 +176,7 @@ export function validateTransformation(
 /**
  * Apply a single pattern to content and return the result
  */
-export function applyPattern(
-  content: string,
-  pattern: PatternMatcher
-): PatternMatchResult {
+export function applyPattern(content: string, pattern: PatternMatcher): PatternMatchResult {
   try {
     // Count matches before replacement
     const matches = content.match(pattern.pattern);
@@ -239,9 +255,7 @@ export function executePattern(
   replacement: string | ReplacementFunction
 ): { result: string; matchCount: number } {
   // Ensure the pattern has the global flag for counting
-  const globalPattern = pattern.global
-    ? pattern
-    : new RegExp(pattern.source, pattern.flags + 'g');
+  const globalPattern = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags + 'g');
 
   const matches = content.match(globalPattern);
   const matchCount = matches?.length ?? 0;
@@ -258,6 +272,8 @@ export function executePattern(
 
 /**
  * Create a pattern matcher with default values
+ *
+ * @requirements 1.5
  */
 export function createPattern(
   name: string,
@@ -267,6 +283,7 @@ export function createPattern(
   options?: {
     validate?: (before: string, after: string) => boolean;
     priority?: number;
+    fileFilter?: (path: string) => boolean;
   }
 ): PatternMatcher {
   return {
@@ -276,5 +293,55 @@ export function createPattern(
     replacement,
     validate: options?.validate,
     priority: options?.priority ?? 100,
+    fileFilter: options?.fileFilter,
+  };
+}
+
+/**
+ * Convert a FixPattern (design doc interface) to PatternMatcher (internal interface)
+ *
+ * @requirements 1.5
+ */
+export function fixPatternToMatcher(fixPattern: FixPattern, description?: string): PatternMatcher {
+  return {
+    name: fixPattern.name,
+    description: description ?? `Fix pattern: ${fixPattern.name}`,
+    pattern: fixPattern.regex,
+    replacement: fixPattern.replacement,
+    fileFilter: fixPattern.fileFilter,
+    priority: 100,
+  };
+}
+
+/**
+ * Convert a PatternMatcher to FixPattern (design doc interface)
+ *
+ * @requirements 1.5
+ */
+export function matcherToFixPattern(matcher: PatternMatcher): FixPattern {
+  return {
+    name: matcher.name,
+    regex: matcher.pattern,
+    replacement: matcher.replacement,
+    fileFilter: matcher.fileFilter,
+  };
+}
+
+/**
+ * Create a FixPattern directly (matches design doc interface)
+ *
+ * @requirements 1.5
+ */
+export function createFixPattern(
+  name: string,
+  regex: RegExp,
+  replacement: string | ((match: string, ...groups: string[]) => string),
+  fileFilter?: (path: string) => boolean
+): FixPattern {
+  return {
+    name,
+    regex,
+    replacement,
+    fileFilter,
   };
 }
