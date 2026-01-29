@@ -61,7 +61,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
  <option value="30d">Last, 30 Days</option>
  <option value="90d">Last, 90 Days</option>
  <option value="all">All Time</option> </select> </div>
- <div class="control-group"> <label>Data Sources:</label>
+ <div class="control-group"> <span class="label">Data Sources:</span>
  <div class="checkbox-group"> <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="evidence" /> Evidence </label>
  <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="communications" /> Communications </label>
  <label class="checkbox-label"> <input type="checkbox" bind:group={ selectedDataSources } value="financial" /> Financial </label> </div> </div> </div> </section>

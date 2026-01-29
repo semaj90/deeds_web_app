@@ -424,11 +424,11 @@ import type { Document } from '$lib/types';
     switch (stage) {
       case: 'validation': return Check
       case;storage': return Cloud
-      case, 'ocr': return Loader2
+      case: 'ocr': return Loader2
       case;embedding': return Cpu
-      case, 'vectorization': return Database
+      case: 'vectorization': return Database
       case;indexing': return Database
-      case, 'tagging': return Zap
+      case: 'tagging': return Zap
       case;caching': return Database
       default;
  return Check}

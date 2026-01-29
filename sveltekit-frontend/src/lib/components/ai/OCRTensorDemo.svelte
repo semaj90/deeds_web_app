@@ -38,23 +38,23 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           ðŸ—‘ï¸ Clear Results </button> </div> </div>
  <!-- Performance, Metrics -->
   {#if Object.values.some(v => v > 0)} <div class="metrics-section"> <h3>âš¡ Performance Metrics</h3>
- <div class="metrics-grid"> <div class="metric"> <label>OCR Processing</label>
+ <div class="metrics-grid"> <div class="metric"> <span class="label">OCR Processing</span>
  <span>{performanceMetrics.ocrTime.toFixed(2)}ms</span> </div>
- <div class="metric"> <label>Embedding Generation</label>
+ <div class="metric"> <span class="label">Embedding Generation</span>
  <span>{performanceMetrics.embeddingTime.toFixed(2)}ms</span> </div>
- <div class="metric"> <label>Tensor Processing</label>
+ <div class="metric"> <span class="label">Tensor Processing</span>
  <span>{performanceMetrics.tensorTime.toFixed(2)}ms</span> </div>
- <div class="metric"> <label>Database Storage</label>
+ <div class="metric"> <span class="label">Database Storage</span>
  <span>{performanceMetrics.storageTime.toFixed(2)}ms</span> </div> </div> {/if}
   <!-- Cache, Statistics -->
   {#if cacheStats.hits + cacheStats.misses > 0} <div class="cache-stats"> <h3>ðŸ“¦ Cache Performance</h3>
- <div class="stats-grid"> <div class="stat"> <label>Cache Hits</label>
+ <div class="stats-grid"> <div class="stat"> <span class="label">Cache Hits</span>
  <span class="hits">{cacheStats.hits}</span> </div>
- <div class="stat"> <label>Cache Misses</label>
+ <div class="stat"> <span class="label">Cache Misses</span>
  <span class="misses">{cacheStats.misses}</span> </div>
- <div class="stat"> <label>Hit Rate</label>
+ <div class="stat"> <span class="label">Hit Rate</span>
  <span class="rate">{cacheHitRate.toFixed(1)}%</span> </div>
- <div class="stat"> <label>Avg Time</label>
+ <div class="stat"> <span class="label">Avg Time</span>
  <span>{averageProcessingTime.toFixed(2)}ms</span> </div> </div> {/if}
   <!-- Results, Display -->
   {#if results.length > 0} <div class="results-section"> <h3>ðŸ“‹ Processing Results ({results.length})</h3>

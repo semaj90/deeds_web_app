@@ -6,10 +6,8 @@
  * @requirements 1.5
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  type FixPattern,
-  type PatternMatcher,
   createPattern,
   createFixPattern,
   fixPatternToMatcher,
@@ -18,14 +16,10 @@ import {
   applyPattern,
   applyPatterns,
 } from './pattern-matcher';
-import {
-  type ErrorRemediationConfig,
-  type RemediationResult,
-  type MultiPassConfig,
-  type MultiPassResult,
-  defaultMultiPassConfig,
-} from './multi-pass-processor';
-import { getAllPatterns, getPatternsByCategory, type PatternCategory } from './patterns';
+import type { FixPattern, PatternMatcher } from './pattern-matcher';
+import { defaultMultiPassConfig } from './multi-pass-processor';
+import type { ErrorRemediationConfig, RemediationResult } from './multi-pass-processor';
+import { getAllPatterns, getPatternsByCategory } from './patterns';
 
 describe('FixPattern Interface', () => {
   it('should create a valid FixPattern with required fields', () => {
@@ -95,7 +89,7 @@ describe('Pattern conversion functions', () => {
       name: 'test-fix',
       regex: /test/g,
       replacement: 'fixed',
-      fileFilter: (path) => path.endsWith('.ts'),
+      fileFilter: (path: string) => path.endsWith('.ts'),
     };
 
     const matcher = fixPatternToMatcher(fixPattern, 'Test description');
@@ -115,7 +109,7 @@ describe('Pattern conversion functions', () => {
       pattern: /pattern/g,
       replacement: 'replaced',
       priority: 50,
-      fileFilter: (path) => path.endsWith('.svelte'),
+      fileFilter: (path: string) => path.endsWith('.svelte'),
     };
 
     const fixPattern = matcherToFixPattern(matcher);
@@ -133,12 +127,7 @@ describe('PatternRegistry', () => {
   });
 
   it('should register and retrieve patterns', () => {
-    const pattern = createPattern(
-      'registry-test',
-      'Test pattern for registry',
-      /test/g,
-      'fixed'
-    );
+    const pattern = createPattern('registry-test', 'Test pattern for registry', /test/g, 'fixed');
 
     patternRegistry.register(pattern);
 
@@ -238,7 +227,9 @@ describe('Pattern categories', () => {
     const patterns = getAllPatterns();
 
     expect(patterns.length).toBeGreaterThan(0);
-    expect(patterns.every(p => p.name && p.pattern && p.replacement !== undefined)).toBe(true);
+    expect(
+      patterns.every((p: PatternMatcher) => p.name && p.pattern && p.replacement !== undefined)
+    ).toBe(true);
   });
 
   it('should group patterns by category', () => {
@@ -253,7 +244,7 @@ describe('Pattern categories', () => {
   it('should have patterns sorted by priority within categories', () => {
     const categories = getPatternsByCategory();
 
-    for (const [category, patterns] of categories) {
+    for (const [, patterns] of categories) {
       for (let i = 1; i < patterns.length; i++) {
         const prevPriority = patterns[i - 1].priority ?? 100;
         const currPriority = patterns[i].priority ?? 100;
@@ -322,7 +313,7 @@ describe('File filter functionality', () => {
       /on:click/g,
       'onclick',
       {
-        fileFilter: (path) => path.endsWith('.svelte'),
+        fileFilter: (path: string) => path.endsWith('.svelte'),
       }
     );
 
@@ -338,7 +329,7 @@ describe('File filter functionality', () => {
       /import type/g,
       'import { type',
       {
-        fileFilter: (path) => path.endsWith('.ts') && !path.endsWith('.svelte'),
+        fileFilter: (path: string) => path.endsWith('.ts') && !path.endsWith('.svelte'),
       }
     );
 

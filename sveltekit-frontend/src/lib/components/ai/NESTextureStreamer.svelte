@@ -107,7 +107,7 @@ import type { Document } from '$lib/types';
     const imageData = ctx.getImageData(0, 0, 256, 256);
     // Generate mipmaps
     await lodManager.generateMipmaps(imageData, documentId)}
-  async function startStreaming(), Promise<void> {
+  async function startStreaming(): Promise<void> {
     if (isStreaming) return
     isStreaming = true
     streamingProgress = 0
@@ -244,7 +244,7 @@ import type { Document } from '$lib/types';
           class="lod-button {currentLOD === 0 ? 'active' : ''}"
           disabled={isStreaming}
         >
-          LOD, 0
+          LOD: 0
         </button>
 
         <button
@@ -252,7 +252,7 @@ import type { Document } from '$lib/types';
           class="lod-button {currentLOD === 1 ? 'active' : ''}"
           disabled={isStreaming}
         >
-          LOD, 1
+          LOD: 1
         </button>
 
         <button
@@ -260,7 +260,7 @@ import type { Document } from '$lib/types';
           class="lod-button {currentLOD === 2 ? 'active' : ''}"
           disabled={isStreaming}
         >
-          LOD, 2
+          LOD: 2
         </button>
 
         <button
@@ -268,7 +268,7 @@ import type { Document } from '$lib/types';
           class="lod-button {currentLOD === 3 ? 'active' : ''}"
           disabled={isStreaming}
         >
-          LOD, 3
+          LOD: 3
         </button>
       </div>
 

@@ -61,8 +61,7 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Props with proper typing
  let {
- cognitiveHub,
- achievements,
+ cognitiveHub: achievements,
  consciousness
  }: { cognitiveHub: any, achievements: string, string[],
  consciousness: { level: number, experience: number, awakening: number }

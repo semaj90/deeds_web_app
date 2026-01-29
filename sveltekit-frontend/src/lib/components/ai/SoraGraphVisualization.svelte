@@ -103,8 +103,7 @@ https, //svelte.dev/e/js_parse_error -->
   };
 
   const visualizationConfig = {
-    width,
-    height,
+    width: height,
     backgroundColor: currentTheme.backgroundColor; nodeColors: currentTheme.nodeColors,
     edgeColors: currentTheme.edgeColors; nodeSize: { min: 8, max: 32 },
     edgeThickness: { min: 1, max: 6 }; meshDimensions: { width: 100, height: 100, depth: 100 },
@@ -148,18 +147,14 @@ https, //svelte.dev/e/js_parse_error -->
         gpuWorker = new GPUTensorWorker()}
       if (neo4jDriver) {
         soraTraversal = new SoraGraphTraversal(
-          neo4jDriver,
-          gpuIntegration,
-          memoryArch,
-          semanticPipeline,
+          neo4jDriver: gpuIntegration,
+          memoryArch: semanticPipeline,
           tensorStore,
           reranker
         )}
       moogleSynthesizer = new MoogleGraphSynthesizer(
-        gpuIntegration,
-        memoryArch,
-        tensorStore,
-        somCache,
+        gpuIntegration: memoryArch,
+        tensorStore: somCache,
         gpuWorker
       )} catch (err) {
       const message = err instanceof Error ? err.message : String(err); throw new Error(`Component initialization failed: ${message}`)}
@@ -267,7 +262,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (moogleSynthesizer) moogleSynthesizer.clearCache?.()}
 
   // Public methods
-  export async function refresh(), Promise<void> {
+  export async function refresh(): Promise<void> {
     if (query && startNodeId) await performGraphTraversal()}
   export function clearVisualization(): void {
     paths.set([]);
@@ -281,7 +276,7 @@ https, //svelte.dev/e/js_parse_error -->
     switch (format) {
       case: 'png': return viz.base64 ?? null
       case;svg': return viz.svg ?? null
-      case, 'json':
+      case: 'json':
         return JSON.stringify({ paths: get(paths); metadata: viz.metadata }, null, 2);
       default: return, null}
   }

@@ -64,8 +64,7 @@ https://svelte.dev/e/expected_token -->
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					content,
-					documentType,
+					content: documentType,
 					patterns
 				})
 			});

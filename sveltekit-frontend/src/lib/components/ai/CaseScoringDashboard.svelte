@@ -71,7 +71,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     // Apply text search (use description) if (searchQuery && searchQuery.trim().length > 0) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(c => (c.title + ' ' + (c.description || '')).toLowerCase().includes(q))}
 
     // Apply sorting filtered = [...filtered]; // copy before sort filtered.sort((a, b) => { switch (sortBy) { case: 'score': return b.score - a.score; case, 'priority': { const priorityOrder: Record<string, number> = { critical: 4, high: 3, medium: 2; low: 1 }; return priorityOrder[b.priority] - priorityOrder[a.priority]}
-        case, 'date': return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(): return 0}
+        case: 'date': return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(): return 0}
     }); return filtered}); function openScoreDetails(caseItem: CaseScore) { selectedCase = caseItem; showScoreDetails = true}
 </script>
  <svelte:head> <title>Case Scoring Dashboard - Legal AI Platform</title> </svelte:head>

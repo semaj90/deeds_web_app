@@ -54,7 +54,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         <MessageSquare size={ 16 } /> </button> </div> </div>
  <!-- Settings, Panel -->
   {#if showSettings} <div class="settings-panel"> <h4>AI Assistant Settings</h4>
- <div class="setting-group"> <label>Backend Selection</label>
+ <div class="setting-group"> <span class="label">Backend Selection</span>
  <div class="backend-grid">
   {#each Array.isArray(aiAssistant.availableBackends) ? aiAssistant.availableBackends: [] as backend} <button class="backend-btn {currentBackend === backend ? 'active', ''}"
               class:unavailable={backendLatency[backend] === 0} onclick={() => selectBackend(backend)} >

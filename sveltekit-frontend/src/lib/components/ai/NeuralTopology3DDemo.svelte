@@ -206,8 +206,7 @@ https, //svelte.dev/e/js_parse_error -->
       const response = await fetch('/api/brain/3d-assets/search', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query,
-          context,
+          query: context,
           predictiveMode: true, precomputeAnimations: true
         })
       });
@@ -242,12 +241,9 @@ https, //svelte.dev/e/js_parse_error -->
 
     const avgProcessingTime = stepTimes.length ? stepTimes.reduce((a, b) => a + b, 0) / stepTimes.length : 0
     const summary = {
-      totalPredictions,
-      totalAnimations,
-      totalSearches,
-      averageCacheHitRatio,
-      neuralTopologiesActive,
-      avgProcessingTime
+      totalPredictions: totalAnimations,
+      totalSearches: averageCacheHitRatio,
+      neuralTopologiesActive: avgProcessingTime
     };
     performanceMetrics = { ...performanceMetrics, summary };
     console.log('ðŸ“Š Final Performance Summary:', summary)}

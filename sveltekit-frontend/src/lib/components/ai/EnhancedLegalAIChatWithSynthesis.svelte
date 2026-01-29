@@ -155,19 +155,19 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Settings, Toggle --> <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showSettings = !showSettings)}> <Settings class="w-4" /> </Button> </div> </div> </div>
  <!-- Advanced Settings, Panel -->
   {#if showSettings} <div class="yorha-panel-content"> <Collapsible.Root> <Collapsible.Trigger class="flex items-center gap-2 text-sm font-medium"> <Zap class="w-4" /> Advanced AI Settings </Collapsible.Trigger>
- <Collapsible.Content> <div class="grid grid-cols-2 gap-4"> <div class="flex items-center"> <label>LegalBERT Analysis</label>
+ <Collapsible.Content> <div class="grid grid-cols-2 gap-4"> <div class="flex items-center"> <span class="label">LegalBERT Analysis</span>
  <Switch bind:checked={settings.enableLegalBERT} /> </div>
- <div class="flex items-center"> <label>RAG Pipeline</label>
+ <div class="flex items-center"> <span class="label">RAG Pipeline</span>
  <Switch bind:checked={settings.enableRAG} /> </div>
- <div class="flex items-center"> <label>Input Synthesis</label>
+ <div class="flex items-center"> <span class="label">Input Synthesis</span>
  <Switch bind:checked={settings.enableInputSynthesis} /> </div>
- <div class="flex items-center"> <label>Confidence Scores</label>
+ <div class="flex items-center"> <span class="label">Confidence Scores</span>
  <Switch bind:checked={settings.includeConfidenceScores} /> </div>
- <div class="flex items-center"> <label>Database Persistence</label>
+ <div class="flex items-center"> <span class="label">Database Persistence</span>
  <Switch bind:checked={ persistConversation } disabled /> </div>
- <div class="flex items-center"> <label>Streaming Response</label>
+ <div class="flex items-center"> <span class="label">Streaming Response</span>
  <Switch bind:checked={settings.enableStreamingResponse} /> </div>
- <div class="flex items-center"> <label>Typewriter Effect</label>
+ <div class="flex items-center"> <span class="label">Typewriter Effect</span>
  <Switch bind:checked={settings.enableTypewriterEffect} /> </div> </div>
  <!-- Typewriter Speed, Control -->
   {#if settings.enableTypewriterEffect} <div class="mt-4"> <label class="text-sm">Typewriter Speed</label>

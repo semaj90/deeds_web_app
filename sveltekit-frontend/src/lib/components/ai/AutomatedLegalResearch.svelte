@@ -111,10 +111,8 @@ import { createEventDispatcher } from 'svelte';
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({ query: query.trim(),
-					jurisdiction,
-					caseType,
-					depth,
-					includePrecedents,
+					jurisdiction: caseType,
+					depth: includePrecedents,
 					includeStatutes
 				})
 			});

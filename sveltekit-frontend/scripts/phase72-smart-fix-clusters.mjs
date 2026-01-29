@@ -41,6 +41,10 @@ function fixCommonPatterns(content) {
   // Pattern 8: Floating point corruption (0?.0 -> 0.0)
   fixed = fixed.replace(/(\d+)\?\.(\d+)/g, '$1.$2');
 
+  // Pattern 9: A11y Label fix (label -> span.label for non-input labels)
+  // Only targets simple text labels common in the logs: <label>Phone</label>
+  fixed = fixed.replace(/<label>([^<]+)<\/label>/g, '<span class="label">$1</span>');
+
   // Pattern 6: Fix {, prop: -> { prop:
   fixed = fixed.replace(/\{\s*,\s+(\w+):/g, '{ $1:');
 

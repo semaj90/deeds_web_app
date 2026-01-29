@@ -23,8 +23,7 @@
  errors = [],
  readonly = false,
  placeholder = 'Enter your code here...',
- onchange,
- onErrorClick,
+ onchange: onErrorClick,
  }: Props = $props();
 
  let editorRef: HTMLTextAreaElement;
