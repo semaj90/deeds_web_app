@@ -127,13 +127,14 @@ const patterns = [
     regex: /::/g,
     replace: ':',
   },
-  {
-    name: 'trailing-comma-object',
-    description: 'Add missing trailing comma before closing brace',
-    fileTypes: ['.ts', '.svelte'],
-    regex: /(\w+)\s*\n\s*\}/g,
-    replace: '$1,\n}',
-  },
+  // DISABLED: Too aggressive, causes corruption
+  // {
+  //   name: 'trailing-comma-object',
+  //   description: 'Add missing trailing comma before closing brace',
+  //   fileTypes: ['.ts', '.svelte'],
+  //   regex: /(\w+)\s*\n\s*\}/g,
+  //   replace: '$1,\n}',
+  // },
 ];
 
 // Directories to exclude
