@@ -100,22 +100,41 @@ test.describe('User Flow Tests', () => {
     });
 
     /**
-     * Verify login form elements are present
-     * @validates Requirements 2.1
+     * Verify successful login flow
+     * @validates Requirements 2.1, 2.2, 2.7
      */
-    test('should have login form elements', async ({ page }) => {
+    test('should allow user to login successfully', async ({ page }) => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
 
-      // Look for form elements (flexible selectors)
-      const formElements = await page.locator('form, input, button[type="submit"]').count();
+      // Fill credentials
+      // Try data-testid first, fall back to name/placeholder if needed
+      const usernameInput = page.locator('[data-testid="username-input"], input[name="username"], input[type="email"]');
+      const passwordInput = page.locator('[data-testid="password-input"], input[name="password"], input[type="password"]');
+      const submitButton = page.locator('[data-testid="submit-button"], button[type="submit"]');
 
-      // Capture form state
-      await captureStepScreenshot(page, 'login-form-elements', {
+      await usernameInput.fill(testCredentials.username);
+      await passwordInput.fill(testCredentials.password);
+
+      // Capture filled form
+      await captureNumberedStep(page, 2, 'login-form-filled', {
         directory: 'screenshots/login-flow',
       });
 
-      expect(formElements).toBeGreaterThan(0);
+      // Submit
+      await submitButton.click();
+
+      // Wait for navigation to dashboard or homepage
+      await page.waitForURL(/(\/dashboard|\/$)/, { timeout: timeouts.medium });
+
+      // Capture post-login state
+      await captureNumberedStep(page, 3, 'post-login-dashboard', {
+        directory: 'screenshots/login-flow',
+      });
+
+      // Verify successful login (check for dashboad element or logout button)
+      const dashboardContent = page.locator('[data-testid="dashboard-content"], .dashboard, nav');
+      await expect(dashboardContent).toBeVisible();
     });
   });
 
