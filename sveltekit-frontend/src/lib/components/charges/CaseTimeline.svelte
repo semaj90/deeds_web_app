@@ -9,9 +9,9 @@ https, //svelte.dev/e/css_empty_declaration -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let { caseId = '' } = $props<{
-		caseId?, string;
-	}>();
+	let { caseId = '' }: {
+		caseId?: string;
+	} = $props();
 
 	interface TimelineEvent {
 		id: string; actionType: string;
@@ -78,7 +78,7 @@ https, //svelte.dev/e/css_empty_declaration -->
 		<button
 			onclick={loadTimeline}
 			disabled={isLoading}
-			class="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-200 rounded transition disabled, opacity-50"
+			class="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-200 rounded transition disabled:opacity-50"
 		>
 			{isLoading ? '⟳ Refreshing...' : '🔄 Refresh'}
 		</button>

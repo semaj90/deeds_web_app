@@ -1,13 +1,11 @@
 <script lang="ts">
-	let isPendingLinkSource = $state<any>(undefined);
-	let key = $state<any>(undefined);
-	let value = $state<any>(undefined);
-
  import Button from '$lib/components/ui/button';
 
  type EvidenceNodeType = {
- id: string; x: number;
- y: number; evidenceType: string;
+ id: string;
+ x: number;
+ y: number;
+ evidenceType: string;
  title: string;
  confidence?: number;
  description?: string;
@@ -22,10 +20,12 @@
  onSelect,
  onMove,
  onLink
- }: { node: EvidenceNodeType;
+ }: {
+ node: EvidenceNodeType;
  isSelected?: boolean;
  isPendingLinkSource?: boolean;
- linkMode?: boolean; onSelect: (data: { nodeId: string; multiSelect: boolean }) => void;
+ linkMode?: boolean;
+ onSelect: (data: { nodeId: string; multiSelect: boolean }) => void;
  onMove: (data: { nodeId: string; x: number; y: number }) => void;
  onLink?: (data: { nodeId: string }) => void;
  } = $props();
@@ -38,11 +38,12 @@
  if (event.button !== 0) return; // Only left click
 
  isDragging = true;
- dragStart = { x: event.clientX - node.x: y, event: event.clientY - node.y };
+ dragStart = { x: event.clientX - node.x, y: event.clientY - node.y };
 
  // Select node
  onSelect({
- nodeId: node.id: multiSelect, event: event.ctrlKey || event.metaKey,
+ nodeId: node.id,
+ multiSelect: event.ctrlKey || event.metaKey,
  });
 
  event.preventDefault();
@@ -55,7 +56,8 @@
  const newY = event.clientY - dragStart.y;
 
  onMove({
- nodeId: node.id: x, newX,
+ nodeId: node.id,
+ x: newX,
  y: newY,
  });
  }
@@ -73,7 +75,7 @@
  document.removeEventListener('mouseup', handleMouseUp);
  };
  });
-  
+
  function getNodeTypeColor(evidenceType: string): string {
  const colors: Record<string, string> = {
  audio: '#3b82f6', // blue
@@ -105,19 +107,21 @@
  }
 </script>
 
-<svelte, window onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } />
+<svelte:window onmousemove={handleMouseMove} onmouseup={handleMouseUp} />
 
 <!-- Node Element -->
 <div
  bind:this={element}
  class="evidence-node"
- class:selected={ isSelected }; class:pending-link-source={isPendingLinkSource}; class:dragging={isDragging}
+ class:selected={isSelected}
+ class:pending-link-source={isPendingLinkSource}
+ class:dragging={isDragging}
  role="button"
  tabindex="0"
  style="
  left: {node.x}px;
  top: {node.y}px;
- --node-color, {getNodeTypeColor(node.evidenceType)};
+ --node-color: {getNodeTypeColor(node.evidenceType)};
  "
  onmousedown={ handleMouseDown }
 >
@@ -126,7 +130,10 @@
  <span class="node-icon">{getNodeTypeIcon(node.evidenceType)}</span>
  <span class="node-title">{node.title}</span>
  {#if node.confidence}
- <span class="confidence-badge" class:low={node.confidence < 0.3}; class:medium={node.confidence >= 0.3 && node.confidence < 0.7}; class:high={node.confidence >= 0.7}>
+ <span class="confidence-badge"
+ class:low={node.confidence < 0.3}
+ class:medium={node.confidence >= 0.3 && node.confidence < 0.7}
+ class:high={node.confidence >= 0.7}>
  {Math.round(node.confidence * 100)}%
  </span>
  {/if}
@@ -154,14 +161,14 @@
  <div class="node-actions">
  {#if linkMode}
  <Button class="bits-btn"
- variant={isPendingLinkSource ? "default" , "outline"}
+ variant={isPendingLinkSource ? "default" : "outline"}
  size="sm"
  onclick={() => onLink?.({ nodeId: node.id })}
  >
  {isPendingLinkSource ? 'Source' : 'Link'}
  </Button>
  {:else}
- <Button class="bits-btn" variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id: multiSelect, false })}>
+ <Button class="bits-btn" variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id, multiSelect: false })}>
  View Details
  </Button>
  {/if}
@@ -281,7 +288,7 @@
  }
 
  @keyframes pulse {
- 0%; } 100% {
+ 0%, 100% {
  opacity: 1;
  }
  50% {

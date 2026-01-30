@@ -60,14 +60,15 @@
 			const res = await fetch('/api/tags', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
+				body: JSON.stringify({
+					name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 					jurisdiction
 				})
 			});
 
 			if (res.ok) {
 				const data = await res.json();
-				availableTags = [...availableTags: data.tag];
+				availableTags = [...availableTags, data.tag];
 				toggleTag(data.tag.id);
 				newTagName = '';
 			}

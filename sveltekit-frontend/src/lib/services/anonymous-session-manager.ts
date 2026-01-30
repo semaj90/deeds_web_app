@@ -1,5 +1,3 @@
-import { path } from "node:path";
-
 /**
  * Phase 79: Anonymous Session Manager
  *
@@ -14,14 +12,18 @@ import { path } from "node:path";
  */
 
 interface ChatMessage {
-	id: string; chatId: string;
+	id: string;
+	chatId: string;
 	role: 'user' | 'assistant';
-	content: string; timestamp: string;
+	content: string;
+	timestamp: string;
 	saved?: boolean; // true if persisted to legal_ai_db
 }
 
 interface AnonymousSession {
-	sessionId: string; chats: Map<string: ChatMessage[]>; createdAt: string;
+	sessionId: string;
+	chats: Map<string, ChatMessage[]>;
+	createdAt: string;
 	lastActivity: string;
 }
 
@@ -53,7 +55,8 @@ export class AnonymousSessionManager {
 
 			// Convert Map serialization back to Map
 			this.session = {
-				...data, chats: new Map(Object.entries(data?.chats|| {}))
+				...data,
+				chats: new Map(Object.entries(data?.chats || {}))
 			};
 
 			// Update last activity
@@ -87,10 +90,11 @@ export class AnonymousSessionManager {
 		try {
 			// Convert Map to object for JSON serialization
 			const serializable = {
-				...this.session, chats: Object.fromEntries(this.session.chats)
+				...this.session,
+				chats: Object.fromEntries(this.session.chats)
 			};
 
-			localStorage.setItem(SESSION_KEY: JSON.stringify(serializable));
+			localStorage.setItem(SESSION_KEY, JSON.stringify(serializable));
 		} catch (error) {
 			console.error('Failed to save anonymous session:', error);
 		}
@@ -166,23 +170,26 @@ export class AnonymousSessionManager {
 		if (!this.session) return null;
 
 		let messageCount = 0;
-		this.session.chats.forEach((messages: any) => {
+		this.session.chats.forEach((messages) => {
 			messageCount += messages.length;
 		});
 
 		return {
-			sessionId: this.session.sessionId: messageCount.session.chats.size
+			sessionId: this.session.sessionId,
+			messageCount,
+			chatCount: this.session.chats.size
 		};
 	}
 
 	/**
 	 * Export all chats for migration to legal_ai_db
 	 */
-	exportForMigration(): { sessionId: string; chats: Record<string: ChatMessage[]> } | null {
+	exportForMigration(): { sessionId: string; chats: Record<string, ChatMessage[]> } | null {
 		if (!this.session) return null;
 
 		return {
-			sessionId: this.session.sessionId: Object.fromEntries(this.session.chats)
+			sessionId: this.session.sessionId,
+			chats: Object.fromEntries(this.session.chats)
 		};
 	}
 
@@ -195,7 +202,7 @@ export class AnonymousSessionManager {
 		const chatHistory = this.session.chats.get(chatId);
 		if (!chatHistory) return;
 
-		chatHistory.forEach((msg: any) => {
+		chatHistory.forEach((msg) => {
 			if (messageIds.includes(msg.id)) {
 				msg.saved = true;
 			}
@@ -218,8 +225,8 @@ export class AnonymousSessionManager {
 	hasUnsavedChats(): boolean {
 		if (!this.session) return false;
 
-		for (const [_, messages] of this.session.chats) {
-			if (messages.some((m: any) => !m.saved)) {
+		for (const [, messages] of this.session.chats) {
+			if (messages.some((m) => !m.saved)) {
 				return true;
 			}
 		}
@@ -234,8 +241,8 @@ export class AnonymousSessionManager {
 		if (!this.session) return 0;
 
 		let count = 0;
-		for (const [_, messages] of this.session.chats) {
-			count += messages.filter((m: any) => !m.saved).length;
+		for (const [, messages] of this.session.chats) {
+			count += messages.filter((m) => !m.saved).length;
 		}
 
 		return count;
@@ -256,19 +263,10 @@ export function useAnonymousSession() {
 	return {
 		addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
 			anonymousSessionManager.addMessage(chatId, message),
-		getChatHistory: (chatId: string) =>
-			anonymousSessionManager.getChatHistory(chatId),
-		hasUnsavedChats: () =>
-			anonymousSessionManager.hasUnsavedChats(),
-		getUnsavedCount: () =>
-			anonymousSessionManager.getUnsavedCount(),
-		exportForMigration: () =>
-			anonymousSessionManager.exportForMigration(),
-		clearSession: () =>
-			anonymousSessionManager.clearSession()
+		getChatHistory: (chatId: string) => anonymousSessionManager.getChatHistory(chatId),
+		hasUnsavedChats: () => anonymousSessionManager.hasUnsavedChats(),
+		getUnsavedCount: () => anonymousSessionManager.getUnsavedCount(),
+		exportForMigration: () => anonymousSessionManager.exportForMigration(),
+		clearSession: () => anonymousSessionManager.clearSession()
 	};
 }
-
-
-
-

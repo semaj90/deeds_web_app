@@ -2,11 +2,10 @@
 	let evidenceNode = $state<any>(undefined);
 
  import Button from '$lib/components/ui/button';
- import { onMount } from 'svelte';
  import { get, writable } from 'svelte/store';
+ import EvidenceBoardToolbar from './EvidenceBoardToolbar.svelte';
  import EvidenceConnections from './EvidenceConnections.svelte';
  import EvidenceNode from './EvidenceNode.svelte';
- import EvidenceBoardToolbar from './EvidenceBoardToolbar.svelte';
  import RelationshipInspector from './RelationshipInspector.svelte';
 
  // Define types locally to avoid importing server schema in browser
@@ -78,9 +77,10 @@
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number, number): number: { x: number; y: number } {
+ function snapToGrid(x: number, y: number): { x: number; y: number } {
  return {
- x: Math.round(x / GRID_SIZE) * GRID_SIZE: y, Math: Math.round(y / GRID_SIZE) * GRID_SIZE,
+ x: Math.round(x / GRID_SIZE) * GRID_SIZE,
+ y: Math.round(y / GRID_SIZE) * GRID_SIZE,
  };
  }
 
@@ -93,7 +93,7 @@
  const response = await fetch('/api/evidence/ai/magnetize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ nodes: currentNodes, connections: currentConnections, currentConnections,
+ body: JSON.stringify({ nodes: currentNodes, connections: currentConnections,
  caseId,
  }),
  });
@@ -105,7 +105,9 @@
  const force = forces.find((f: any) => f.id === node.id);
  if (force) {
  return {
- ...node, x: node, node: node.x + force.dx: y, node: node.y + force.dy,
+ ...node,
+ x: node.x + force.dx,
+ y: node.y + force.dy,
  };
  }
  return node;
@@ -116,7 +118,7 @@
  }
 
  // Node selection
- function selectNode(nodeId: string, multiSelect: boolean, boolean: boolean = false) {
+ function selectNode(nodeId: string, multiSelect: boolean = false) {
  selectedNodes.update(current => {
  const newSelection = new Set(current);
  if (multiSelect) {
@@ -131,14 +133,14 @@
  }
  return newSelection;
  });
-  
+
  if (!multiSelect) {
  selectedEvidenceForInspector = nodeId;
  }
  }
 
  // Node movement
- function moveNode(nodeId: string, newX: number, number, newY): number {
+ function moveNode(nodeId: string, newX: number, newY: number) {
  if (boardMode === 'grid') {
  const snapped = snapToGrid(newX, newY);
  newX = snapped.x;
@@ -147,7 +149,7 @@
 
  nodes.update(current =>
  current.map(node =>
- node.id === nodeId ? { ...node, x: newX, newX, y: newY } : node
+ node.id === nodeId ? { ...node, x: newX, y: newY } : node
  )
  );
 
@@ -155,7 +157,7 @@
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ x: newX, y: newY, newY }),
+ body: JSON.stringify({ x: newX, y: newY }),
  });
  }
 
@@ -167,9 +169,11 @@
  const response = await fetch('/api/evidence/connections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ fromNodeId: selected[0],
+ body: JSON.stringify({
+ fromNodeId: selected[0],
  toNodeId: selected[1],
- caseId: strength, 0: 0.5, // Default strength
+ caseId,
+ strength: 0.5, // Default strength
  }),
  });
 
@@ -310,7 +314,7 @@
 
  <div class="actions">
  <Button class="bits-btn"
- variant={linkMode ? "default" , "outline"}
+ variant={linkMode ? "default" : "outline"}
  onclick={() => { linkMode = !linkMode; pendingLinkSource = null; selectedNodes.set(new Set()); }}
  >
  {linkMode ? 'Exit Link Mode' : 'Link Mode'}
@@ -353,7 +357,9 @@
  <!-- Board Canvas -->
  <div
  class="board-canvas"
- class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind:this={canvasElement}
+ class:grid-mode={boardMode === 'grid'}
+ class:magnetic-mode={boardMode === 'magnetic'}
+ bind:this={canvasElement}
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />
@@ -363,8 +369,8 @@
  isSelected={currentSelectedNodes.has(evidenceNode.id)}
  isPendingLinkSource={pendingLinkSource === evidenceNode.id}
  linkMode={linkMode}
- onSelect={(data) => selectNode(data.nodeId: data.multiSelect)}
- onMove={(data) => moveNode(data.nodeId: data.x, data.y)}
+ onSelect={(data) => selectNode(data.nodeId, data.multiSelect)}
+ onMove={(data) => moveNode(data.nodeId, data.x, data.y)}
  onLink={(data) => handleLinkClick(data.nodeId)}
  />
  {/each}
