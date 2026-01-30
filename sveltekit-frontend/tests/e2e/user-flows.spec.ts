@@ -96,9 +96,8 @@ test.describe('User Flow Tests', () => {
 
       // Verify we're on a login-related page OR redirected to home (auth bypass)
       const url = page.url();
-      // Accept either login page or home redirect (auth bypass mode)
       expect(
-        url.includes('login') || url === 'http://localhost:5173/' || url.endsWith('/')
+        url.includes('login') || url === 'http://localhost:5173/' || url === 'http://127.0.0.1:5173/' || url.endsWith('/')
       ).toBeTruthy();
     });
 

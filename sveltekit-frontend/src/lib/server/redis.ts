@@ -1,31 +1,47 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const IORedis = require('ioredis');
+import IORedis from 'ioredis';
 
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
-// Single shared client for SSR
+// Single shared client for SSR (auto-connects)
 export const redis = new IORedis(REDIS_URL, {
-	lazyConnect: true, maxRetriesPerRequest: 2, enableReadyCheck: true
+	maxRetriesPerRequest: 1,
+	enableReadyCheck: false,
+	connectTimeout: 3000,
+	commandTimeout: 3000,
+	retryStrategy: (times: number) => {
+		if (times > 2) return null; // Stop retrying after 2 attempts
+		return Math.min(times * 100, 500);
+	}
 });
+
+// Log connection status
+redis.on('connect', () => console.log('📡 Redis connected'));
+redis.on('error', (err: Error) => console.warn('⚠️ Redis error:', err.message));
 
 export function createRedisConnection() {
 	return new IORedis(REDIS_URL, {
-		lazyConnect: true, maxRetriesPerRequest: 2, enableReadyCheck: true
+		maxRetriesPerRequest: 1,
+		enableReadyCheck: false,
+		connectTimeout: 3000,
+		commandTimeout: 3000
 	});
 }
 
 export async function ensureRedis() {
- if (redis.status === 'ready') return;
- if (redis.status === 'connecting') {
- // Wait for connection
- await new Promise<void>((resolve, reject) => {
- redis.once('ready', resolve);
- redis.once('error', reject);
- });
- return;
- }
- await redis.connect();
+	if (redis.status === 'ready') return;
+	if (redis.status === 'connecting') {
+		// Wait for connection with timeout
+		await new Promise<void>((resolve, reject) => {
+			const timeout = setTimeout(() => reject(new Error('Redis connection timeout')), 3000);
+			redis.once('ready', () => { clearTimeout(timeout); resolve(); });
+			redis.once('error', (err) => { clearTimeout(timeout); reject(err); });
+		});
+		return;
+	}
+	// ioredis auto-connects, just wait for ready
+	await new Promise<void>((resolve, reject) => {
+		const timeout = setTimeout(() => reject(new Error('Redis connection timeout')), 3000);
+		redis.once('ready', () => { clearTimeout(timeout); resolve(); });
+		redis.once('error', (err) => { clearTimeout(timeout); reject(err); });
+	});
 }
-
-
-

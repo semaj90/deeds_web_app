@@ -64,7 +64,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 720 },
   },
 
-  // Browser projects
+  // Browser projects - only chromium to reduce memory usage
   projects: [
     {
       name: 'chromium',
@@ -76,15 +76,17 @@ export default defineConfig({
             '--enable-features=WebAssemblySimd',
             '--disable-web-security',
             '--allow-running-insecure-content',
+            '--disable-gpu', // Reduce GPU memory usage during tests
+            '--no-sandbox',
           ],
         },
       },
     },
-    // Firefox project for cross-browser testing (optional)
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // Firefox disabled to reduce memory usage
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
   ],
 
   // Web server configuration

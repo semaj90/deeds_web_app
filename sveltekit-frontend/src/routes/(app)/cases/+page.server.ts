@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { cases } from '$lib/server/db/schema';
+import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, desc, eq, like } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
@@ -7,57 +8,74 @@ import type { Actions, PageServerLoad } from './$types';
 /**
  * SSR Load Function - Server-side data fetching for cases
  * Replaces client-side fetch('/api/cases')
+ * Requirements: 5.2 - SSR database connection verification
  */
 export const load: PageServerLoad = async ({ locals, url }) => {
-	// Phase 79: Lucia v3 Authentication Guard
-	if (!locals.user) {
-		throw redirect(302, '/login');
-	}
+  // Phase 79: Lucia v3 Authentication Guard
+  if (!locals.user) {
+    throw redirect(302, '/login');
+  }
 
-	// Parse query parameters for filtering
-	const limit = Number(url.searchParams.get('limit')) ?? 50;
-	const offset = Number(url.searchParams.get('offset')) ?? 0;
-	const status = url.searchParams.get('status');
-	const priority = url.searchParams.get('priority');
-	const search = url.searchParams.get('search');
+  // Parse query parameters for filtering
+  const limit = Number(url.searchParams.get('limit')) ?? 50;
+  const offset = Number(url.searchParams.get('offset')) ?? 0;
+  const status = url.searchParams.get('status');
+  const priority = url.searchParams.get('priority');
+  const search = url.searchParams.get('search');
 
-	try {
-		// Build query with filters
-		const filters = [eq(cases.userId, locals.user.id)];
+  // Use SSR database verification with graceful fallback
+  const {
+    data: userCases,
+    error: dbError,
+    fromFallback,
+  } = await verifySSRDatabaseConnection(
+    async () => {
+      // Build query with filters
+      const filters = [eq(cases.userId, locals.user!.id)];
 
-		if (status && status !== 'all') {
-			// Map 'active' to 'open' for legacy compatibility
-			const statusValue = status === 'active' ? 'open' : status;
-			filters.push(eq(cases.status, statusValue as typeof cases.status.enumValues[number]));
-		}
-		if (priority) {
-			filters.push(eq(cases.priority, priority as typeof cases.priority.enumValues[number]));
-		}
-		if (search) {
-			filters.push(like(cases.title, `%${search}%`));
-		}
-		const userCases = await db
-			.select()
-			.from(cases)
-			.where(and(...filters))
-			.orderBy(desc(cases.updatedAt))
-			.limit(limit)
-			.offset(offset);
+      if (status && status !== 'all') {
+        // Map 'active' to 'open' for legacy compatibility
+        const statusValue = status === 'active' ? 'open' : status;
+        filters.push(eq(cases.status, statusValue as (typeof cases.status.enumValues)[number]));
+      }
+      if (priority) {
+        filters.push(eq(cases.priority, priority as (typeof cases.priority.enumValues)[number]));
+      }
+      if (search) {
+        filters.push(like(cases.title, `%${search}%`));
+      }
 
-		return {
-			user: locals.user,
-			cases: userCases,
-			pagination: {
-				limit,
-				offset,
-				hasMore: userCases.length === limit
-			},
-			filters: { status, priority, search }
-		};
-	} catch (err) {
-		console.error('Error loading cases:', err);
-		throw error(500, 'Failed to load cases');
-	}
+      return await db
+        .select()
+        .from(cases)
+        .where(and(...filters))
+        .orderBy(desc(cases.updatedAt))
+        .limit(limit)
+        .offset(offset);
+    },
+    [] // Fallback to empty array if database unavailable
+  );
+
+  // Log database errors but don't crash the page
+  if (dbError) {
+    console.warn('⚠️ Cases page: Database unavailable, showing empty state:', dbError);
+  }
+
+  return {
+    user: locals.user,
+    cases: userCases,
+    pagination: {
+      limit,
+      offset,
+      hasMore: userCases.length === limit,
+    },
+    filters: { status, priority, search },
+    // Pass database status to UI for graceful degradation
+    databaseStatus: {
+      available: !fromFallback,
+      error: dbError,
+    },
+  };
 };
 
 /**

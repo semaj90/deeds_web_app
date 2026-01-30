@@ -1,48 +1,47 @@
 /**
  * Phase 76: Chat Route Server
- * Enhanced with error handling, validation, and caseId support
+ * Enhanced with direct Ollama integration and Redis pub/sub for SSE
  */
 
 import { fail } from '@sveltejs/kit';
-import * as amqp from 'amqplib';
-import { createClient } from 'redis';
+import { redis } from '$lib/server/redis';
 import type { Actions, PageServerLoad } from './$types';
 
-const REDIS_URL = process.env?.REDIS_URL ?? 'redis://localhost:6379';
-const RABBITMQ_URL = process.env?.RABBITMQ_URL ?? 'amqp://localhost:5672';
-const QUEUE = 'ai_chat_queue';
+const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	const redis = createClient({ url: REDIS_URL });
-	await redis.connect();
+	let history: any[] = [];
 
-	const chatId = params.id;
-	const isAuthenticated = !!locals.user;
-	const redisKey = `chat:${chatId}`;
+	try {
+		const chatId = params.id;
+		const redisKey = `chat:${chatId}`;
 
-	// Load from Redis (shared between anonymous and authenticated)
-	const rawHistory = await (redis as any).get(redisKey);
-	const history = rawHistory ? JSON.parse(rawHistory) : [];
+		// Load from Redis with timeout (shared between anonymous and authenticated)
+		const timeoutPromise = new Promise((_, reject) =>
+			setTimeout(() => reject(new Error('Redis timeout')), 3000)
+		);
 
-	// If authenticated, optionally load from legal_ai_db for persistence
-	let savedChats: any[] = [];
-	if (locals.user) {
-		// TODO: Load user's saved chats from database
-		// savedChats = await db.query.chatMessages.findMany({
-		//   where: eq(chatMessages.chatId, chatId)
-		// });
+		const rawHistory = await Promise.race([
+			redis.get(redisKey),
+			timeoutPromise
+		]) as string | null;
+
+		history = rawHistory ? JSON.parse(rawHistory) : [];
+	} catch (error) {
+		console.warn('Redis not available, using empty history:', error);
+		// Continue with empty history - don't block page load
 	}
 
-	await redis.disconnect();
+	const isAuthenticated = !!locals.user;
 
 	return {
-		chatId,
+		chatId: params.id,
 		history,
 		user: locals?.user ?? null,
 		isAuthenticated,
 		shouldPromptAuth: !isAuthenticated,
-		// Merge Redis (ephemeral) + DB (persistent) if authenticated
-		savedChats: isAuthenticated ? savedChats : []
+		savedChats: []
 	};
 };
 
@@ -50,8 +49,8 @@ export const actions: Actions = {
 	send: async ({ request, params, locals }) => {
 		const formData = await request.formData();
 		const userMessage = formData.get('message') as string;
-		const caseId = (formData.get('caseId') as string) ?? null;
 		const isAnonymous = !locals.user;
+		const chatId = params.id;
 
 		// Validation
 		if (!userMessage || userMessage.trim().length === 0) {
@@ -62,48 +61,230 @@ export const actions: Actions = {
 			return fail(400, { error: 'Message too long (max 10,000 characters)' });
 		}
 
+		const channel = `updates:${chatId}`;
+		const redisKey = `chat:${chatId}`;
+
 		try {
-			// Send job to RabbitMQ worker
-			const conn = await (amqp as any).connect(RABBITMQ_URL);
-			const channel = await conn.createChannel();
-			await channel.assertQueue(QUEUE, { durable: true });
+			// Publish start event
+			await redis.publish(channel, JSON.stringify({ type: 'start' }));
 
-			const job = {
-				chatId: params.id,
-				message: userMessage.trim(),
-				caseId,
-				userId: locals.user?.id ?? null,
-				isAnonymous,
-				timestamp: new Date().toISOString()
-			};
+			// Generate AI response via Ollama (streaming)
+			const aiResponse = await streamOllamaResponse(userMessage.trim(), channel);
 
-			channel.sendToQueue(QUEUE, Buffer.from(JSON.stringify(job)), { persistent: true });
+			// Save to Redis history
+			try {
+				const rawHistory = await redis.get(redisKey);
+				const history = rawHistory ? JSON.parse(rawHistory) : [];
 
-			console.log(`📤 Sent message to RabbitMQ for chat:${params.id} (${isAnonymous ? 'anonymous' : 'authenticated'})`);
+				// Add user message
+				history.push({
+					role: 'user',
+					content: userMessage.trim(),
+					timestamp: new Date().toISOString()
+				});
 
-			await channel.close();
-			await conn.close();
+				// Add AI response
+				history.push({
+					role: 'assistant',
+					content: aiResponse.content,
+					timestamp: new Date().toISOString(),
+					metadata: {
+						confidence: aiResponse.confidence,
+						citations: aiResponse.citations,
+						warnings: aiResponse.warnings
+					}
+				});
 
-			// If authenticated, save to legal_ai_db
-			if (locals.user) {
-				// TODO: Persist chat message
-				// await db.insert(chatMessages).values({
-				//   chatId: params.id,
-				//   userId: locals.user.id,
-				//   message: userMessage.trim(),
-				//   timestamp: new Date()
-				// });
+				// Save updated history
+				await redis.set(redisKey, JSON.stringify(history));
+
+				// Publish final AI_REPLY event for SSE
+				await redis.publish(
+					channel,
+					JSON.stringify({
+						type: 'AI_REPLY',
+						content: aiResponse.content,
+						confidence: aiResponse.confidence,
+						citations: aiResponse.citations,
+						warnings: aiResponse.warnings,
+						timestamp: new Date().toISOString()
+					})
+				);
+			} catch (redisError) {
+				console.warn('Redis save failed:', redisError);
 			}
 
-			// Optimistic response - SSE will deliver AI reply
 			return {
 				success: true,
 				saved: !!locals.user,
-				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined
+				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined,
+				response: aiResponse
 			};
 		} catch (error: any) {
-			console.error('Failed to send message to RabbitMQ:', error);
+			console.error('Failed to generate AI response:', error);
+
+			// Publish error event
+			try {
+				await redis.publish(
+					channel,
+					JSON.stringify({
+						type: 'AI_ERROR',
+						error: error.message || 'Failed to generate response',
+						timestamp: new Date().toISOString()
+					})
+				);
+			} catch (e) {
+				console.warn('Failed to publish error event:', e);
+			}
+
 			return fail(500, { error: 'Failed to process message. Please try again.' });
 		}
 	}
 };
+
+/**
+ * Stream response from Ollama and publish deltas to Redis
+ */
+async function streamOllamaResponse(
+	message: string,
+	channel: string
+): Promise<{
+	content: string;
+	confidence: number;
+	citations: string[];
+	warnings: string[];
+}> {
+	let fullContent = '';
+
+	try {
+		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: OLLAMA_MODEL,
+				prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
+				stream: true,
+				options: {
+					temperature: 0.7,
+					top_p: 0.9
+				}
+			})
+		});
+
+		if (!response.ok) {
+			throw new Error(`Ollama API error: ${response.status}`);
+		}
+
+		if (!response.body) {
+			throw new Error('No response body from Ollama');
+		}
+
+		const reader = response.body.getReader();
+		const decoder = new TextDecoder();
+
+		let streamDone = false;
+		while (!streamDone) {
+			const { done, value } = await reader.read();
+			if (done) {
+				streamDone = true;
+				continue;
+			}
+
+			const chunk = decoder.decode(value, { stream: true });
+
+			// Ollama streams JSONL lines
+			for (const line of chunk.split('\n')) {
+				if (!line.trim()) continue;
+
+				try {
+					const obj = JSON.parse(line);
+					const delta = obj.response ?? '';
+
+					if (delta) {
+						fullContent += delta;
+
+						// Publish delta to Redis for SSE
+						await redis.publish(
+							channel,
+							JSON.stringify({
+								type: 'delta',
+								content: delta
+							})
+						);
+					}
+
+					if (obj.done) {
+						// Publish done event
+						await redis.publish(channel, JSON.stringify({ type: 'done' }));
+					}
+				} catch {
+					// Skip malformed JSON lines
+				}
+			}
+		}
+
+		// Calculate confidence and extract citations
+		const confidence = calculateConfidence(fullContent, message);
+		const citations = extractCitations(fullContent);
+		const warnings = confidence < 0.65 ? ['Low confidence response - please verify with official sources'] : [];
+
+		return {
+			content: fullContent || 'I apologize, but I was unable to generate a response.',
+			confidence,
+			citations,
+			warnings
+		};
+	} catch (error) {
+		console.error('Ollama streaming failed:', error);
+
+		// Publish error and done
+		await redis.publish(channel, JSON.stringify({ type: 'error', error: String(error) }));
+		await redis.publish(channel, JSON.stringify({ type: 'done' }));
+
+		throw error;
+	}
+}
+
+/**
+ * Calculate confidence score based on response quality
+ */
+function calculateConfidence(response: string, _query: string): number {
+	let confidence = 0.8; // Base confidence
+
+	// Reduce confidence for short responses
+	if (response.length < 100) confidence -= 0.1;
+
+	// Reduce confidence for uncertain language
+	const uncertainPhrases = ['i think', 'maybe', 'possibly', 'not sure', 'uncertain'];
+	for (const phrase of uncertainPhrases) {
+		if (response.toLowerCase().includes(phrase)) {
+			confidence -= 0.05;
+		}
+	}
+
+	// Increase confidence for citations
+	if (response.includes('§') || response.includes('U.S.C.') || response.includes('Cal.')) {
+		confidence += 0.1;
+	}
+
+	return Math.max(0.3, Math.min(1.0, confidence));
+}
+
+/**
+ * Extract legal citations from response
+ */
+function extractCitations(response: string): string[] {
+	const citations: string[] = [];
+
+	// Match common legal citation patterns
+	const patterns = [/\d+\s+U\.S\.C\.\s+§\s*\d+/g, /\d+\s+Cal\.\s+\d+/g, /\d+\s+F\.\d+d\s+\d+/g];
+
+	for (const pattern of patterns) {
+		const matches = response.match(pattern);
+		if (matches) {
+			citations.push(...matches);
+		}
+	}
+
+	return [...new Set(citations)]; // Remove duplicates
+}

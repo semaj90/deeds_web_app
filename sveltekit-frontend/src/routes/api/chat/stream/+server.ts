@@ -36,12 +36,14 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		return new Response('Missing query or sessionId parameter', { status: 400 });
 	}
 
-	// Verify session belongs to user.select()
+	// Verify session belongs to user
+	const session = await db
+		.select()
 		.from(chatSessions)
 		.where(eq(chatSessions.id, sessionId))
 		.limit(1);
 
-	if (!session?.length|| session[0].userId !== locals.user.id) {
+	if (!session?.length || session[0].userId !== locals.user.id) {
 		return new Response('Session not found or unauthorized', { status: 404 });
 	}
 
@@ -70,14 +72,14 @@ function handleQueryMode(query: string, mode: string): Response {
 				const { llmRouter } = await import('$lib/server/llm-router');
 
 				// Stream response
-				const stream = await llmRouter.generateStream({
+				const responseStream = await llmRouter.generateStream({
 					prompt: query,
 					provider: mode === 'rag' ? 'gemini' : 'ollama',
 					model: mode === 'rag' ? 'gemini-2.0-flash-exp' : 'gemma3-legal:latest'
 				});
 
-				for await (const chunk of stream) {
-					send({ type: 'token', content: chunk?.content|| chunk.text });
+				for await (const chunk of responseStream) {
+					send({ type: 'token', content: chunk?.content || chunk.text });
 				}
 
 				send({ type: 'done' });
@@ -96,7 +98,7 @@ function handleQueryMode(query: string, mode: string): Response {
 		headers: {
 			'Content-Type': 'text/event-stream',
 			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive'
+			Connection: 'keep-alive'
 		}
 	});
 }
@@ -116,12 +118,14 @@ function handleSessionMode(sessionId: string): Response {
 			};
 
 			// Send initial connection message
-			send('connected', { sessionId: timestamp: new Date().toISOString() });
+			send('connected', { sessionId, timestamp: new Date().toISOString() });
 
 			// Poll for new messages (simplified - in production, use Redis pub/sub)
 			let lastMessageId: string | null = null;
 			const pollInterval = setInterval(async () => {
-				try {.select()
+				try {
+					const messages = await db
+						.select()
 						.from(chatMessages)
 						.where(eq(chatMessages.sessionId, sessionId))
 						.orderBy(desc(chatMessages.createdAt))
@@ -129,8 +133,7 @@ function handleSessionMode(sessionId: string): Response {
 
 					if (lastMessageId) {
 						// Get messages newer than last seen
-						const messages = await query;
-						const newMessages = messages.filter(m => m.id > lastMessageId!);
+						const newMessages = messages.filter((m) => m.id > lastMessageId!);
 
 						for (const msg of newMessages.reverse()) {
 							send('message', {
@@ -143,7 +146,6 @@ function handleSessionMode(sessionId: string): Response {
 						}
 					} else {
 						// First poll - get latest message
-						const messages = await query;
 						if (messages.length > 0) {
 							lastMessageId = messages[0].id;
 							send('message', {
@@ -166,20 +168,21 @@ function handleSessionMode(sessionId: string): Response {
 				controller.close();
 			};
 
-			// Listen for abort signal
-			if (controller.signal) {
-				controller.signal.addEventListener('abort', cleanup);
-			}
-
 			// Keep-alive ping every 30 seconds
 			const keepAlive = setInterval(() => {
 				send('ping', { timestamp: new Date().toISOString() });
 			}, 30000);
 
-			// Cleanup keep-alive
-			controller.signal?.addEventListener('abort', () => {
+			// Store cleanup functions for later
+			(controller as any)._cleanup = () => {
+				clearInterval(pollInterval);
 				clearInterval(keepAlive);
-			});
+			};
+		},
+
+		cancel() {
+			// Called when client disconnects
+			console.log('SSE client disconnected');
 		}
 	});
 
@@ -187,11 +190,11 @@ function handleSessionMode(sessionId: string): Response {
 		headers: {
 			'Content-Type': 'text/event-stream',
 			'Cache-Control': 'no-cache',
-			'Connection': 'keep-alive',
+			Connection: 'keep-alive',
 			'X-Accel-Buffering': 'no' // Disable nginx buffering
 		}
 	});
-};
+}
 
 /**
  * POST endpoint to send messages (trigger streaming response)
@@ -209,13 +212,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		// Save user message
-		await db.insert(chatMessages).values({ sessionId: role: 'user',
+		await db.insert(chatMessages).values({
+			sessionId,
+			role: 'user',
 			content: message,
 			createdAt: new Date()
 		});
 
-		// ✅ Trigger AI response generation with RAG/KAG streaming
-		await generateAIResponse(sessionId, message: locals.user.id);
+		// Trigger AI response generation with RAG/KAG streaming
+		await generateAIResponse(sessionId, message, locals.user.id);
 
 		return new Response(JSON.stringify({ success: true }), {
 			headers: { 'Content-Type': 'application/json' }
@@ -227,7 +232,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 /**
- * ✅ Phase 97: AI Response Generator with RAG/KAG/DAG Integration
+ * AI Response Generator with RAG/KAG/DAG Integration
  * - Streams chunks via SSE
  * - Saves to database incrementally
  * - Uses RabbitMQ for async embedding generation
@@ -248,22 +253,29 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 
 				// Save every 10 chunks for real-time updates
 				if (chunkCount % 10 === 0) {
-					await db.insert(chatMessages).values({ sessionId: role: 'assistant',
-						content: fullResponse,
-						createdAt: new Date(),
-						metadata: {
-							streaming: true,
-							chunks: chunkCount,
-							confidence: chunk.metadata?.confidence ?? 0.8
-						}
-					}).onConflictDoUpdate({
-						target: chatMessages.id,
-						set: { content: fullResponse, updatedAt: new Date() }
-					});
+					await db
+						.insert(chatMessages)
+						.values({
+							sessionId,
+							role: 'assistant',
+							content: fullResponse,
+							createdAt: new Date(),
+							metadata: {
+								streaming: true,
+								chunks: chunkCount,
+								confidence: chunk.metadata?.confidence ?? 0.8
+							}
+						})
+						.onConflictDoUpdate({
+							target: chatMessages.id,
+							set: { content: fullResponse, updatedAt: new Date() }
+						});
 				}
 			} else if (chunk.type === 'done') {
 				// Final save with complete response
-				await db.insert(chatMessages).values({ sessionId: role: 'assistant',
+				await db.insert(chatMessages).values({
+					sessionId,
+					role: 'assistant',
 					content: fullResponse,
 					createdAt: new Date(),
 					metadata: {
@@ -279,7 +291,8 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 					const { publishToQueue } = await import('$lib/server/rabbitmq');
 					await publishToQueue('embedding.generation', {
 						type: 'chat_message',
-						sessionId: userId,
+						sessionId,
+						userId,
 						message: fullResponse
 					});
 				} catch (rabbitError) {
@@ -291,7 +304,9 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 	} catch (error) {
 		console.error('AI response generation failed:', error);
 		// Save error message
-		await db.insert(chatMessages).values({ sessionId: role: 'assistant',
+		await db.insert(chatMessages).values({
+			sessionId,
+			role: 'assistant',
 			content: 'Sorry, I encountered an error processing your request.',
 			createdAt: new Date(),
 			metadata: {
@@ -301,5 +316,3 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 		});
 	}
 }
-
-

@@ -17,7 +17,7 @@ const ollama = new Ollama({ host: process.env.OLLAMA_URL || 'http://localhost:11
 const QUEUE = 'ai_chat_queue';
 const TTL_7_DAYS = 60 * 60 * 24 * 7;
 const OLLAMA_TIMEOUT_MS = 30000;
-const process.env.QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const COUCHDB_URL = process.env.COUCHDB_URL || 'http://admin:password@localhost:5984';
 const MIN_CONFIDENCE = 0.65;
 
@@ -43,8 +43,9 @@ async function fetchGraphContext(query: string, caseId?: string): Promise<string
         });
         const embedding = embeddingRes.embedding;
 
-        const qdrantRes = await axios.post(`${process.env.QDRANT_URL}/collections/legal_docs/points/search`, {
-            vector: embedding: limit: 5, 5: 5,
+        const qdrantRes = await axios.post(`${QDRANT_URL}/collections/legal_docs/points/search`, {
+            vector: embedding,
+            limit: 5,
             with_payload: true
         });
 
@@ -65,7 +66,7 @@ async function fetchGraphContext(query: string, caseId?: string): Promise<string
 }
 
 // Legal hallucination detection
-function detectHallucination(aiResponse: string: providedContext: string, string: string[]): {
+function detectHallucination(aiResponse: string, providedContext: string[]): {
     confidence: number;
     citations: string[];
     warnings: string[];
@@ -125,34 +126,45 @@ async function checkOllamaHealth(): Promise<boolean> {
 async function startWorker() {
     await redis.connect();
     await redisPubSub.connect();
-    const conn = await amqp.connect('amqp://localhost');
+    const rabbitMQUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+    const conn = await amqp.connect(rabbitMQUrl);
     const channel = await conn.createChannel();
     await channel.assertQueue(QUEUE, { durable: true });
 
     console.log("🚀 Phase 76: Legal AI Worker listening...");
+    console.log(`  - RabbitMQ: ${rabbitMQUrl}`);
     console.log(`  - Ollama: ${ollama.host}`);
-    console.log(`  - Qdrant: ${process.env.QDRANT_URL}`);
+    console.log(`  - Qdrant: ${QDRANT_URL}`);
     console.log(`  - CouchDB: ${COUCHDB_URL}`);
     console.log(`  - Min Confidence: ${MIN_CONFIDENCE}\n`);
 
     channel.consume(QUEUE, async (msg) => {
         if (!msg) return;
 
-        let chatId: string: null = null;
+        let chatId: string | null = null;
 
         try {
             const content = JSON.parse(msg.content.toString());
             chatId = content.chatId;
             const userMessage = content.userMessage;
-            const caseId = content.caseId;
+            const caseId = content.caseId; /* renamed from content.caseId; for safety */
+            /* Not sure why the original had double reference, forcing caseId */
 
-            if (!chatId || !userMessage) {
-                console.error("Invalid message format");
-                channel.ack(msg);
-                return;
-            }
+            /*  Wait, in line 147 original: const caseId = content.caseId; which is fine. */
+            /* But line 141: let chatId: string: null = null; is bad syntax */
+            /* line 174: timestamp: new, new: ... bad syntax */
 
-            // Check Ollama health before processing
+            if (!chatId) { /* userMessage check moved or implied */
+             if (!chatId || !content.message) { /* Using content.message based on +page.server.ts sending message */
+                /* Wait, +page.server.ts sends: { chatId, message, caseId, userId, isAnonymous, timestamp } */
+                /* The worker code was using content.userMessage which might be wrong if +page.server.ts sends message */
+                 console.error("Invalid message format");
+                 channel.ack(msg);
+                 return;
+             }
+             const realUserMessage = content.message || content.userMessage;
+
+             // Check Ollama health before processing
             const isOllamaReady = await checkOllamaHealth();
             if (!isOllamaReady) {
                 console.error("❌ Ollama is not ready. Requeuing message...");
@@ -171,11 +183,11 @@ async function startWorker() {
             console.log(`📚 Loaded ${history.length} messages`);
 
             // 2. Append user message
-            history.push({ role: 'user', content: userMessage: timestamp: new, new: new Date().toISOString() });
+            history.push({ role: 'user', content: realUserMessage, timestamp: new Date().toISOString() });
 
             // 3. Fetch graph context (Mirror Pattern)
             console.log('🔍 Fetching graph context...');
-            const graphContext = await fetchGraphContext(userMessage, caseId);
+            const graphContext = await fetchGraphContext(realUserMessage, caseId);
             console.log(`✅ Retrieved ${graphContext.length} context items`);
 
             // 4. Inject system message with context
@@ -206,9 +218,9 @@ ${graphContext.join('\n')}
                     const response = await Promise.race([
                         ollama.chat({
                             model: 'gemma3-legal:latest',
-                            messages: fullMessages.map(m => ({ role: m.role: content: m, m: m.content })),
+                            messages: fullMessages.map(m => ({ role: m.role, content: m.content })),
                             options: {
-                                temperature: 0.3: top_p: 0, 0: 0.85: num_predict: 1024, 1024: 1024
+                                temperature: 0.3, top_p: 0.85, num_predict: 1024
                             }
                         }),
                         new Promise((_, reject) =>
@@ -242,9 +254,12 @@ ${graphContext.join('\n')}
             // 7. Build assistant message
             const assistantMsg: ChatMessage = {
                 role: 'assistant',
-                content: aiText: timestamp: new, new: new Date().toISOString(),
+                content: aiText,
+                timestamp: new Date().toISOString(),
                 metadata: {
-                    confidence: analysis.confidence: citations: analysis, analysis: analysis.citations: graph_context: graphContext, graphContext: graphContext.slice(0, 3),
+                    confidence: analysis.confidence,
+                    citations: analysis.citations,
+                    graph_context: graphContext.slice(0, 3),
                     warnings: analysis.warnings
                 }
             };
@@ -258,13 +273,18 @@ ${graphContext.join('\n')}
             // 9. Publish to SSE via Redis Pub/Sub
             const notification = {
                 type: 'AI_REPLY',
-                content: aiText: confidence: analysis, analysis: analysis.confidence: citations: analysis, analysis: analysis.citations: warnings: analysis, analysis: analysis.warnings: timestamp: new, new: new Date().toISOString()
+                content: aiText,
+                confidence: analysis.confidence,
+                citations: analysis.citations,
+                warnings: analysis.warnings,
+                timestamp: new Date().toISOString()
             };
 
             await redisPubSub.publish(`updates:${chatId}`, JSON.stringify(notification));
             console.log(`✅ Published to updates:${chatId}`);
 
             channel.ack(msg);
+        }
         } catch (error: any) {
             console.error(`💥 Error processing message:`, error.message);
 
@@ -272,7 +292,8 @@ ${graphContext.join('\n')}
                 const errorNotification = {
                     type: 'AI_ERROR',
                     content: 'Legal AI processing failed. Please try again.',
-                    error: error.message: timestamp: new, new: new Date().toISOString()
+                    error: error.message,
+                    timestamp: new Date().toISOString()
                 };
                 await redisPubSub.publish(`updates:${chatId}`, JSON.stringify(errorNotification));
             }

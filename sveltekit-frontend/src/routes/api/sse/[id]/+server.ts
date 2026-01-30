@@ -1,72 +1,144 @@
 /**
  * Phase 76: Server-Sent Events (SSE) Endpoint
  * Enhanced with heartbeat, error handling, and proper cleanup
+ *
+ * ChatSession connects to /api/sse/${chatId} - this endpoint handles that
  */
 
-
-import { createClient } from 'redis';
+import IORedis from 'ioredis';
 import type { RequestHandler } from './$types';
 
-const REDIS_URL = process.env?.REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
-export const GET: RequestHandler = async ({ params }) => {
+function sseFormat(event: string, data: unknown): string {
+	return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+}
+
+export const GET: RequestHandler = async ({ params, request }) => {
 	const chatId = params.id;
 
 	if (!chatId) {
 		return new Response('Chat ID required', { status: 400 });
 	}
 
-	const redisSubscriber = createClient({ url: REDIS_URL });
-	await redisSubscriber.connect();
+	// Create a dedicated Redis connection for pub/sub (ioredis auto-connects)
+	const redisSubscriber = new IORedis(REDIS_URL, {
+		maxRetriesPerRequest: 2,
+		enableReadyCheck: true
+	});
 
-	console.log(`📡 SSE connection established for chat:${chatId}`);
+	let closed = false;
+	let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
-	let heartbeatInterval: NodeJS.Timeout;
+	console.log(`📡 SSE connection request for chat:${chatId}`);
 
 	const stream = new ReadableStream({
 		async start(controller) {
-			// Subscribe to the specific Redis channel for this chat ID
-			await redisSubscriber.subscribe(`updates:${chatId}`, (message) => {
-				try {
-					// Parse and re-stringify to ensure valid JSON
-					const data = JSON.parse(message);
-					const eventData = `data: ${JSON.stringify(data)}\n\n`;
-					controller.enqueue(new TextEncoder().encode(eventData));
+			const encoder = new TextEncoder();
 
-					console.log(`📨 Sent ${data.type} to chat:${chatId}`);
-				} catch (error) {
-					console.error('Failed to parse Redis message:', error);
-				}
-			});
-  
-			heartbeatInterval = setInterval(() => {
+			const write = (event: string, data: unknown) => {
+				if (closed) return;
 				try {
-					controller.enqueue(new TextEncoder().encode(`: heartbeat\n\n`));
-				} catch {
-					// Client disconnected
-					clearInterval(heartbeatInterval);
+					controller.enqueue(encoder.encode(sseFormat(event, data)));
+				} catch (e) {
+					// Controller may be closed
+					console.warn('SSE write failed:', e);
 				}
-			}, 30000);
+			};
+
+			try {
+				// Wait for Redis to be ready
+				await new Promise<void>((resolve, reject) => {
+					if (redisSubscriber.status === 'ready') {
+						resolve();
+						return;
+					}
+					redisSubscriber.once('ready', resolve);
+					redisSubscriber.once('error', reject);
+					// Timeout after 5 seconds
+					setTimeout(() => reject(new Error('Redis connection timeout')), 5000);
+				});
+
+				console.log(`📡 SSE Redis connected for chat:${chatId}`);
+
+				// Send initial ready event so tests can detect connection
+				write('ready', { chatId, timestamp: new Date().toISOString() });
+
+				// Subscribe to the specific Redis channel for this chat ID
+				const channel = `updates:${chatId}`;
+
+				redisSubscriber.on('message', (ch: string, message: string) => {
+					if (ch !== channel) return;
+
+					try {
+						// Parse and forward the message
+						const data = JSON.parse(message);
+						write('message', data);
+						console.log(`📨 SSE forwarded ${data.type} to chat:${chatId}`);
+					} catch (error) {
+						// If not JSON, send as raw content
+						write('message', { type: 'delta', content: message });
+					}
+				});
+
+				await redisSubscriber.subscribe(channel);
+				console.log(`📡 SSE subscribed to ${channel}`);
+
+				// Keepalive ping every 15 seconds (some proxies kill idle streams)
+				heartbeatInterval = setInterval(() => {
+					write('ping', { t: Date.now() });
+				}, 15000);
+
+			} catch (error) {
+				console.error('SSE Redis connection failed:', error);
+				write('error', { message: 'Failed to connect to message stream' });
+				controller.close();
+			}
 		},
 
-		async cancel() {
+		cancel() {
 			console.log(`🔌 SSE connection closed for chat:${chatId}`);
+			closed = true;
 
 			// Clear heartbeat
 			if (heartbeatInterval) {
 				clearInterval(heartbeatInterval);
+				heartbeatInterval = null;
 			}
 
-			// Unsubscribe and close Redis connection
-			await (redisSubscriber as any).unsubscribe(`updates:${chatId}`);
-			await redisSubscriber.quit();
+			// Cleanup Redis connection safely
+			try {
+				if (redisSubscriber.status === 'ready' || redisSubscriber.status === 'connect') {
+					redisSubscriber.unsubscribe(`updates:${chatId}`).catch(() => {});
+					redisSubscriber.quit().catch(() => {});
+				}
+			} catch (e) {
+				// Ignore cleanup errors - connection may already be closed
+			}
+		}
+	});
+
+	// Handle client disconnect via abort signal
+	request.signal.addEventListener('abort', () => {
+		closed = true;
+		if (heartbeatInterval) {
+			clearInterval(heartbeatInterval);
+			heartbeatInterval = null;
+		}
+		try {
+			if (redisSubscriber.status === 'ready' || redisSubscriber.status === 'connect') {
+				redisSubscriber.unsubscribe(`updates:${chatId}`).catch(() => {});
+				redisSubscriber.quit().catch(() => {});
+			}
+		} catch (e) {
+			// Ignore cleanup errors
 		}
 	});
 
 	return new Response(stream, {
 		headers: {
-			'Content-Type': 'text/event-stream',
-			'Cache-Control': 'no-cache',
+			'Content-Type': 'text/event-stream; charset=utf-8',
+			'Cache-Control': 'no-cache, no-transform',
 			'Connection': 'keep-alive',
 			'X-Accel-Buffering': 'no' // Disable nginx buffering for real-time streaming
 		}
