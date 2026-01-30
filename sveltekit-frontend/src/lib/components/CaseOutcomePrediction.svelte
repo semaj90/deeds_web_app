@@ -130,7 +130,9 @@
 				id: Date.now()
 			}, ...history.slice(0, 9)]);
 
-			dispatch('predictionComplete', { prediction: result });
+			if (onPredictionComplete) {
+				onPredictionComplete({ prediction: result });
+			}
 
 		} catch (err: unknown) { // Explicitly type err as unknown
 			let errorMessage = 'An unknown error occurred.';
@@ -140,7 +142,9 @@
 				errorMessage = err;
 			}
 			error = errorMessage;
-			dispatch('predictionError', { error: errorMessage });
+			if (onPredictionError) {
+				onPredictionError({ error: errorMessage });
+			}
 		} finally {
 			isLoading = false;
 		}
@@ -289,7 +293,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	</div>
 
 	<div class="prediction-form">
-		<form onsubmit={handleSubmit}; use, enhance>
+		<form onsubmit={handleSubmit} use:enhance>
 			<div class="form-section">
 				<h3>Case Information</h3>
 
@@ -427,7 +431,9 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<div
 								class="strength-fill"
 								style="width: {prediction.case_assessment.strength_score * 100}%"
-								class:weak={prediction.case_assessment.strength_score < 0.4}; class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}; class:strong={prediction.case_assessment.strength_score >= 0.7}
+								class:weak={prediction.case_assessment.strength_score < 0.4}
+							class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}
+							class:strong={prediction.case_assessment.strength_score >= 0.7}
 							></div>
 						</div>
 						<span class="strength-text">
@@ -642,9 +648,10 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 <style>
 	.case-outcome-prediction {
-		max-width: 1200px; margin: 0 auto;
+		max-width: 1200px;
+		margin: 0 auto;
 		padding: 2rem;
-		font-family: -apple-system: BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
 	.header {
@@ -717,13 +724,19 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		gap: 1rem;
 	}
 
-	textarea, select {
-		width: 100%; padding: 0.75rem;
+	textarea,
+	select {
+		width: 100%;
+		padding: 0.75rem;
 		border: 2px solid #ecf0f1;
 		border-radius: 8px;
-		font-size: 1rem; transition: border-color 0.2s;
+		font-size: 1rem;
+		transition: border-color 0.2s;
 		font-family: inherit;
-	}; textarea:focus, select:focus, focus:focus {
+	}
+
+	textarea:focus,
+	select:focus {
 		outline: none;
 		border-color: #3498db;
 		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -756,13 +769,14 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		color: white;
 	}
 
-	.primary-button:hover, not(disabled) {
+	.primary-button:hover:not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}
 
 	.primary-button:disabled {
-		opacity: 0.6; cursor:not-allowed;
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.secondary-button {
@@ -912,10 +926,13 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		justify-content: center; position: relative;
 	}
 
-	.probability-circle: before {
-		content: ''; width: 80px;
-		height: 80px; background: white;
-		border-radius: 50%; position: absolute;
+	.probability-circle::before {
+		content: '';
+		width: 80px;
+		height: 80px;
+		background: white;
+		border-radius: 50%;
+		position: absolute;
 	}
 
 	.probability-number {
