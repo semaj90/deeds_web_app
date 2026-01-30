@@ -260,3 +260,43 @@ export interface ACEResponse {
 
 
 
+
+
+// ============================================================================
+// Service Configuration Types
+// ============================================================================
+
+export interface ServiceConfig {
+	name: string;
+	version: string;
+	logLevel: 'debug' | 'info' | 'warn' | 'error';
+	enabled: boolean;
+	timeout?: number;
+	retryAttempts?: number;
+	maxRetries?: number;
+	retryDelayMs?: number;
+}
+
+// ============================================================================
+// LLM Types
+// ============================================================================
+
+export interface LLMPrompt {
+	id: string;
+	errorId: string;
+	prompt: string;
+	response: string;
+	model: string;
+	tokens: number;
+	confidence: number;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
+export interface LLMResponse {
+	text: string;
+	model: string;
+	tokens: number;
+	confidence?: number;
+	finishReason?: string;
+}

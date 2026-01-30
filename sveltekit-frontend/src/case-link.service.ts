@@ -94,17 +94,19 @@ class CaseLinkService {
    */
   async getCaseStatutes(caseId: string, linkType?: string): Promise<CaseStatuteLink[]> {
     if (linkType) {
-      return await sql<CaseStatuteLink[]>`
+      const result = await sql`
         SELECT * FROM case_statute_links
         WHERE case_id = ${caseId} AND link_type = ${linkType}
         ORDER BY created_at DESC
       `;
+      return result as unknown as CaseStatuteLink[];
     }
-    return await sql<CaseStatuteLink[]>`
+    const result = await sql`
       SELECT * FROM case_statute_links
       WHERE case_id = ${caseId}
       ORDER BY created_at DESC
     `;
+    return result as unknown as CaseStatuteLink[];
   }
 
   /**
@@ -199,7 +201,7 @@ class CaseLinkService {
   async getLinkStats(caseId: string): Promise<{ total: number; byLinkType: Record<string, number> }> {
     const total = await this.getLinkCount(caseId);
     const byLinkTypeResult = await sql`
-      SELECT link_type COUNT(*) as count
+      SELECT link_type, COUNT(*) as count
       FROM case_statute_links
       WHERE case_id = ${caseId}
       GROUP BY link_type

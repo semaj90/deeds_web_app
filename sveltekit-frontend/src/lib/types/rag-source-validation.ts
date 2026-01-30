@@ -357,7 +357,9 @@ export async function ragWithSourceValidation(
   userId?: string
 ): Promise<AnswerWithCitations> {
   // Step 1: Retrieve candidates
-  const searchResult = await searchKnowledgeBase({ query: case_id: caseId,
+  const searchResult = await searchKnowledgeBase({
+    query,
+    case_id: caseId,
     top_k: 10,
     use_hybrid: true,
     use_rerank: true,

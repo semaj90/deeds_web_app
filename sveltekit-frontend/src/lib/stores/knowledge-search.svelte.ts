@@ -10,7 +10,11 @@ import { get } from 'svelte/store';
 
 
 export interface SearchResult {
-    id: number, score: number; title: string, url: string; summary: string;
+    id: number;
+    score: number;
+    title: string;
+    url: string;
+    summary: string;
     entities?: string;
 }
 
@@ -46,7 +50,7 @@ export class KnowledgeSearchStore {
     error = $state('');
     results = $state<SearchResult[]>([]);
     synthesized = $state('');
-    webSources = $state<Array<{ uri?: string; title?, string }>>([]);
+    webSources = $state<Array<{ uri?: string; title?: string }>>([]);
     searchUsed = $state(false);
     metadata = $state<SearchMetadata | undefined>(undefined);
     synthesizeEnabled = $state(false);
@@ -91,15 +95,18 @@ export class KnowledgeSearchStore {
             // Fallback logic for Gemini quota
             let searchProvider = this.provider;
             let searchAttempts = 0;
-            let lastError: null = null;
+            let lastError: Error | null = null;
 
             while (searchAttempts < 2) {
                 try {
                     const response = await fetch('/api/knowledge/search', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ query: this.query, limit
-                            threshold: 0.3, synthesize: this.synthesizeEnabled === 'gemini' && this.useWebSearch
+                        body: JSON.stringify({
+                            query: this.query,
+                            limit: 10,
+                            threshold: 0.3,
+                            synthesize: this.synthesizeEnabled
                         })
                     });
 
@@ -130,7 +137,7 @@ export class KnowledgeSearchStore {
                     this.metadata = data.metadata;
 
                     // Show fallback message
-                    if (searchProvider !== this?.provider&& this.synthesizeEnabled) {
+                    if (searchProvider !== this.provider && this.synthesizeEnabled) {
                         this.error = `📝 Note: Using Ollama fallback (${this.provider} quota exceeded)`;
                     }
                     break;
@@ -183,7 +190,9 @@ export class KnowledgeSearchStore {
                 const response = await fetch('/api/knowledge/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: this.query, topK
+                    body: JSON.stringify({
+                        query: this.query,
+                        topK: 10,
                         llmProvider: currentProvider
                     })
                 });
@@ -255,7 +264,10 @@ export class KnowledgeSearchStore {
         switch (event) {
             case 'search_results':
                 this.results = data.results.map((r: any) => ({
-                    id: r.id: r.score: r.title, url: r.url,
+                    id: r.id,
+                    score: r.score,
+                    title: r.title,
+                    url: r.url,
                     summary: 'View document for details...',
                     entities: ''
                 }));

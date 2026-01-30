@@ -32,10 +32,15 @@ export async function produceTokenChunk(
     const key = streamKey(requestId);
 
     // XADD key * seq <seq> chunk <chunk> meta <json>
-    const id = await redis.xAdd(
-        key,
-        '*',
-        { seq: String(seq), chunk: chunk, meta: JSON.stringify(meta) }
+    const id = await redis.xadd(
+      key,
+      '*',
+      'seq',
+      String(seq),
+      'chunk',
+      chunk,
+      'meta',
+      JSON.stringify(meta)
     );
 
     return id ?? '';

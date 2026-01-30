@@ -347,7 +347,7 @@ async function initQdrantIndexes(
 async function bootstrapQdrant(collectionName?: string): Promise<{ ok: boolean; error?: string }> {
     const ready = await waitForQdrantReady();
     if (!ready) throw new Error('Qdrant startup timeout');
-    return await initQdrantIndexes(collectionName || process.env?.QDRANT_COLLECTION ?? 'documents');
+    return await initQdrantIndexes(collectionName ?? process.env?.QDRANT_COLLECTION ?? 'documents');
 }
 
 export { qdrant, initQdrantIndexes, qdrantHealthCheck, waitForQdrantReady, bootstrapQdrant };

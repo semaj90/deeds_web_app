@@ -1,6 +1,41 @@
 import { browser } from '$app/environment';
 import { env } from '$lib/env';
-import amqplib, { type Channel, type Connection, type ConsumeMessage } from 'amqplib';
+
+// Type definitions for amqplib when types aren't available
+type AmqpChannel = {
+    assertExchange: (exchange: string, type: string, options?: Record<string, unknown>) => Promise<unknown>;
+    assertQueue: (queue: string, options?: Record<string, unknown>) => Promise<unknown>;
+    bindQueue: (queue: string, exchange: string, routingKey: string) => Promise<unknown>;
+    publish: (exchange: string, routingKey: string, content: Buffer, options?: Record<string, unknown>) => boolean;
+    purgeQueue: (queue: string) => Promise<unknown>;
+    consume: (queue: string, callback: (msg: ConsumeMessage | null) => void) => Promise<unknown>;
+    ack: (msg: ConsumeMessage) => void;
+    nack: (msg: ConsumeMessage, allUpTo?: boolean, requeue?: boolean) => void;
+    close: () => Promise<void>;
+    on: (event: string, callback: (...args: unknown[]) => void) => void;
+};
+
+type AmqpConnection = {
+    createChannel: () => Promise<AmqpChannel>;
+    close: () => Promise<void>;
+    on: (event: string, callback: (...args: unknown[]) => void) => void;
+};
+
+// ConsumeMessage type
+export interface ConsumeMessage {
+    content: Buffer;
+    fields: {
+        deliveryTag: number;
+        redelivered: boolean;
+        exchange: string;
+        routingKey: string;
+    };
+    properties: {
+        headers?: Record<string, unknown>;
+        timestamp?: number;
+        [key: string]: unknown;
+    };
+}
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
@@ -57,9 +92,9 @@ class BrowserStub implements IRabbitMQService {
         throw new Error('RabbitMQService is server-only and cannot be used in the browser');
     }
     async initialize() { return; }
-    async publishDocumentProcessingJob() { this.makeError(); }
-    async publishBatchJobs() { this.makeError(); }
-    async purgeQueue() { this.makeError(); }
+    async publishDocumentProcessingJob(): Promise<boolean> { this.makeError(); }
+    async publishBatchJobs(): Promise<{ success: number; failed: number }> { this.makeError(); }
+    async purgeQueue(): Promise<boolean> { this.makeError(); }
     async close() { return; }
     async healthCheck() { return { healthy: false, error: 'Client: RabbitMQService not available' }; }
     async consume() { this.makeError(); }
@@ -68,8 +103,8 @@ class BrowserStub implements IRabbitMQService {
 // --- RABBITMQ SERVICE (SINGLETON) ---
 class RabbitMQService implements IRabbitMQService {
     private static instance: RabbitMQService;
-    private connection: Connection | null = null;
-    private channel: Channel | null = null;
+    private connection: AmqpConnection | null = null;
+    private channel: AmqpChannel | null = null;
     private config: RabbitMQConfig;
     private isConnected = false;
     private isInitializing = false;
@@ -107,9 +142,13 @@ class RabbitMQService implements IRabbitMQService {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
-                this.connection = await amqplib.connect(this.config.url);
+                const amqp = await import('amqplib');
+                const amqpModule = amqp as { default?: { connect: (url: string) => Promise<AmqpConnection> }; connect?: (url: string) => Promise<AmqpConnection> };
+                const connectFn = amqpModule.default?.connect ?? amqpModule.connect;
+                if (!connectFn) throw new Error('amqplib connect function not found');
+                this.connection = await connectFn(this.config.url);
 
-                this.connection.on('error', (err) => {
+                this.connection.on('error', (err: Error) => {
                     console.error('RabbitMQ Connection Error:', err);
                     this.isConnected = false;
                 });

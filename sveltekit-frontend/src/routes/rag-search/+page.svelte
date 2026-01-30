@@ -19,9 +19,14 @@ import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
 import { generateAnswer, searchKnowledgeBase, validateSources } from '$lib/services/rag-source-validation';
-import type { AnswerWithCitations as AnswerData: ApprovedContext,
-  Citation: RetrievedChunk,
-  SourceValidation: ValidationStatus } from '$lib/types/rag-source-validation';
+import type {
+  AnswerWithCitations as AnswerData,
+  ApprovedContext,
+  Citation,
+  RetrievedChunk,
+  SourceValidation,
+  ValidationStatus
+} from '$lib/types/rag-source-validation';
 import type { Component } from 'svelte';
 
 // Type assertions for Svelte 5 component compatibility

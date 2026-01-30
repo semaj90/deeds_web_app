@@ -2,7 +2,7 @@
   import { KnowledgeSearchStore } from '$lib/stores/knowledge-search.svelte';
 
   // Svelte 5: Create reactive store instance
-  const search = $state(new KnowledgeSearchStore());
+  const search = new KnowledgeSearchStore();
 
   // Sample queries
   const sampleQueries = [
@@ -252,7 +252,7 @@
 		transition: transform 0.2s;
 	}
 
-	.search-button:hover, not(disabled) {
+	.search-button:hover:not(:disabled) {
 		transform: translateY(-2px);
 	}
 

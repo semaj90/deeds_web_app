@@ -11,14 +11,15 @@
 
 import type { Project } from 'ts-morph';
 
-// WebGPU type extensions
-declare global {
+// WebGPU type extensions - using module augmentation
+declare module globalThis {
     interface Navigator {
         gpu?: GPU;
     }
-    interface GPU {
-        requestAdapter(options?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
-    }
+}
+
+interface GPUExtended {
+    requestAdapter(options?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
 }
 
 /**
@@ -107,7 +108,7 @@ export class WebGPUCUDABridge {
                 return false;
             }
 
-            const adapter = await (navigator.gpu as GPU).requestAdapter({
+            const adapter = await ((navigator as any).gpu as GPUExtended).requestAdapter({
                 powerPreference: 'high-performance',
             });
 
@@ -126,7 +127,7 @@ export class WebGPUCUDABridge {
             this.gpuDevice.isAvailable = true;
 
             // Detect vendor
-            const adapterInfo = (await adapter.requestAdapterInfo()) as any;
+            const adapterInfo = await (adapter as any).requestAdapterInfo?.() ?? {};
             this.gpuDevice.vendorName = (adapterInfo?.vendor ?? 'unknown').toLowerCase() as any;
             this.gpuDevice.deviceName = adapterInfo?.device ?? 'unknown';
 
