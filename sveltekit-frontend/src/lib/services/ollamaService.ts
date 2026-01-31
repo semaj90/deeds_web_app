@@ -100,6 +100,10 @@ export class OllamaService {
 
     async generateCompletion(prompt: string, options?: any): Promise<string | null> {
         try {
+            // 3-minute timeout for Ollama completion (LLM can be slow)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
+
             const response = await fetch(`${this.baseUrl}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -108,15 +112,22 @@ export class OllamaService {
                     prompt,
                     stream: false,
                     ...options
-                })
+                }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             if (!response.ok) return null;
 
             const data = await response.json();
             return data?.response ?? null;
         } catch (err) {
-            console.error('Completion generation failed:', err);
+            if (err instanceof Error && err.name === 'AbortError') {
+                console.error('Ollama completion timed out after 3 minutes');
+            } else {
+                console.error('Completion generation failed:', err);
+            }
             return null;
         }
     }

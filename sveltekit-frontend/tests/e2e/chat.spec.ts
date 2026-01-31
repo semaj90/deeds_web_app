@@ -113,8 +113,8 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     // Wait for AI response (with timeout)
     const aiMessage = page.locator('.message.assistant, [data-role="assistant"]').last();
 
-    // Wait for AI response (mocked, should be fast)
-    await expect(aiMessage).toBeVisible({ timeout: 10000 });
+    // Wait for AI response (mocked, but may be slow if real Ollama is used)
+    await expect(aiMessage).toBeVisible({ timeout: 180000 }); // 3 minutes
 
     // Verify AI response has content
     const aiContent = await aiMessage.textContent();
@@ -138,7 +138,7 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     await page.locator('button[type="submit"]').first().click();
 
     // Wait for AI response
-    await page.waitForTimeout(10000); // Wait 10 seconds for response
+    await page.waitForTimeout(180000); // Wait 3 minutes for slow Ollama response
 
     // Check for confidence indicator
     const confidenceIndicator = page.locator('.confidence, [data-testid="confidence"]');
@@ -166,7 +166,7 @@ test.describe('Phase 76: Context-Aware RAG Chat Interface', () => {
     await page.locator('button[type="submit"]').first().click();
 
     // Wait for AI response
-    await page.waitForTimeout(10000);
+    await page.waitForTimeout(180000); // Wait 3 minutes for slow Ollama response
 
     // Check for citations
     const citations = page.locator('.citations, [data-testid="citations"]');
