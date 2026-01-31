@@ -106,7 +106,7 @@ function handleChange(e: Event) {
 </script>
 
 <div class="w-full {className}">
-	{#if label ?? showValue}
+	{#if label || showValue}
 		<div class="flex justify-between items-center mb-2">
 			{#if label}
 				<label for={id} class="text-sm font-medium text-slate-300">
@@ -149,7 +149,7 @@ function handleChange(e: Event) {
 			{disabled}
 			bind:value
 			class="relative w-full appearance-none bg-transparent cursor-pointer
-				   disabled: opacity-50, disabled:cursor-not-allowed
+				   disabled:opacity-50 disabled:cursor-not-allowed
 				   [&::-webkit-slider-thumb]:appearance-none
 				   [&::-webkit-slider-thumb]:{thumbSize}
 				   [&::-webkit-slider-thumb]:rounded-full
@@ -165,13 +165,13 @@ function handleChange(e: Event) {
 				   [&::-moz-range-thumb]:{thumbColorClasses}
 				   [&::-moz-range-thumb]:border-2
 				   [&::-moz-range-thumb]:shadow-md
-				   [&: :-moz-range-thumb]:cursor-pointer, focus:outline-none"
+				   [&::-moz-range-thumb]:cursor-pointer focus:outline-none"
 			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' : '16px'}"
-			oninput={ handleInput }
-			onchange={ handleChange }
+			oninput={handleInput}
+			onchange={handleChange}
 			aria-valuemin={min}
 			aria-valuemax={max}
-			aria-valuenow={ value }
+			aria-valuenow={value}
 		/>
 	</div>
 

@@ -43,7 +43,13 @@ test.describe('User Flow Tests', () => {
      */
     test('should load homepage with navigation elements', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
+
+      console.log('Homepage loaded, URL:', page.url());
 
       // Capture screenshot of homepage
       await captureNumberedStep(page, 1, 'homepage-loaded', {
@@ -61,7 +67,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should have functional navigation buttons', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Look for common navigation elements
       const navElements = await page.locator('nav, [role="navigation"], header').count();
@@ -87,7 +97,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should display login page', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Capture login page screenshot
       await captureNumberedStep(page, 1, 'login-page-displayed', {
@@ -107,7 +121,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should allow user to login successfully', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Check if we're already logged in (auth bypass mode)
       const url = page.url();
@@ -200,7 +218,11 @@ test.describe('User Flow Tests', () => {
       // Navigate to case creation page
       const response = await page.goto('/cases/new', { timeout: timeouts.extended });
 
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Capture case creation page
       await captureNumberedStep(page, 1, 'case-creation-page', {
@@ -217,7 +239,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should allow case creation with form submission', async ({ page }) => {
       await page.goto('/cases/new');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Check if we're on the case creation page or redirected
       const url = page.url();
@@ -294,7 +320,11 @@ test.describe('User Flow Tests', () => {
     test('should display evidence page', async ({ page }) => {
       const response = await page.goto('/evidence', { timeout: timeouts.extended });
 
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Capture evidence page
       await captureNumberedStep(page, 1, 'evidence-page', {
@@ -311,7 +341,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should have evidence upload capability', async ({ page }) => {
       await page.goto('/evidence');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Look for file upload elements
       const fileInput = page.locator('input[type="file"]');
@@ -352,7 +386,11 @@ test.describe('User Flow Tests', () => {
      */
     test('should capture screenshots at test steps', async ({ page }) => {
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 });
+      } catch {
+        // networkidle may timeout on SSE routes
+      }
 
       // Capture multiple screenshots to verify functionality
       const screenshot1 = await captureNumberedStep(page, 1, 'screenshot-test-step1', {

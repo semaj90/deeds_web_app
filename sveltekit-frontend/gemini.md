@@ -643,4 +643,24 @@ python scripts/phase66_automated_error_fixer.py
 **Status:** Phase 2 in progress (CSS pattern fixing)
 **Next Milestone:** Apply fixes to 1-2 test files for validation
 **Maintained by:** Antigravity (Google Deepmind ACE)
-**Last Updated:** 2026-01-11 10:50 PST
+**Last Updated:** 2026-01-31 07:15 PST
+
+---
+
+## 🛠️ Diagnostics & Testing
+
+### Ollama Connectivity
+Test basic Ollama connectivity and model response (gemma3-legal:latest).
+
+**Script:** `scripts/diagnostics/log-ollama-response.ts`
+
+**Usage:**
+```bash
+npx tsx scripts/diagnostics/log-ollama-response.ts
+```
+
+**What it does:**
+1. Resolves Ollama endpoint (ENV > Defaults)
+2. Sends a "Hello, are you online?" prompt to `gemma3-legal:latest`
+3. Logs the full response or error details
+4. Useful for verifying model availability before running complex RAG flows

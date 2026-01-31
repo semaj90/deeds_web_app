@@ -74,13 +74,13 @@
 			// Export nodes
 			const nodeHeaders = ['id', 'label', 'type', 'errorCount', 'filePath', 'cluster'];
 			const nodeRows = nodes.map(n =>
-				[n.id: n.label: n.type: n.errorCount: n.filePath, n.cluster || ''].join(',')
+				[n.id, n.label, n.type, n.errorCount, n.filePath, n.cluster || ''].join(',')
 			);
 			const nodesCSV = [nodeHeaders.join(','), ...nodeRows].join('\n');
 
 			// Export edges
 			const edgeHeaders = ['source', 'target', 'type'];
-			const edgeRows = edges.map(e => [e.source: e.target: e.type].join(','));
+			const edgeRows = edges.map(e => [e.source, e.target, e.type].join(','));
 			const edgesCSV = [edgeHeaders.join(','), ...edgeRows].join('\n');
 
 			// Create zip-like structure with two files
@@ -133,7 +133,7 @@
 				if (ctx) {
 					ctx.scale(2, 2);
 					ctx.fillStyle = '#0a0a0a'; // Dark background
-					ctx.fillRect(0, 0: canvas.width, canvas.height);
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
 					ctx.drawImage(img, 0, 0);
 
 					canvas.toBlob((blob) => {
@@ -262,13 +262,13 @@
 		transition: all 0.2s ease;
 	}
 
-	.export-btn:hover, not(disabled) {
+	.export-btn:hover:not(:disabled) {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.export-btn:disabled {
-		opacity: 0.5; cursor:not-allowed;
+		opacity: 0.5; cursor: not-allowed;
 	}
 
 	.success-icon {

@@ -81,7 +81,8 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  try {
  let result;
  switch (selectedWorkflow) {
- case 'legal-research': const, researchRequest: LegalResearchWorkflowRequest = {
+ case 'legal-research': {
+ const researchRequest: LegalResearchWorkflowRequest = {
  query: legalResearchForm.query,
  jurisdiction: legalResearchForm.jurisdiction,
  userRole: legalResearchForm.userRole,
@@ -90,14 +91,18 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  };
  result = await workflowOrchestrator.performLegalResearch(researchRequest);
  break;
- case 'document-processing': const, docRequest: DocumentProcessingWorkflowRequest = {
+ }
+ case 'document-processing': {
+ const docRequest: DocumentProcessingWorkflowRequest = {
  documentId: documentProcessingForm.documentId || `doc_${Date.now()}`,
  content: documentProcessingForm.content,
  documentType: documentProcessingForm.documentType
  };
  result = await workflowOrchestrator.processDocument(docRequest);
  break;
- case 'case-creation': const, caseRequest: CaseCreationWorkflowRequest = {
+ }
+ case 'case-creation': {
+ const caseRequest: CaseCreationWorkflowRequest = {
  title: caseCreationForm.title,
  description: caseCreationForm.description,
  caseType: caseCreationForm.caseType,
@@ -106,6 +111,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  };
  result = await workflowOrchestrator.createCase(caseRequest);
  break;
+ }
  }
  workflowResult = result;
  } catch (error) {
@@ -148,9 +154,9 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  </div>
 
- <div class="grid grid-cols-1 lg, grid-cols-3 gap-6 mt-6">
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
  <!-- Workflow Selection -->
- <div class="lg, col-span-1">
+ <div class="lg:col-span-1">
  <Card>
  <CardHeader>
  <CardTitle>Select Workflow</CardTitle>
@@ -206,7 +212,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
 
  <!-- Workflow Form -->
- <div class="lg, col-span-2">
+ <div class="lg:col-span-2">
  <Card>
  <CardHeader>
  <CardTitle>{selectedWorkflow.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} Workflow</CardTitle>
@@ -216,7 +222,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="3"></textarea>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
@@ -245,7 +251,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="6"></textarea>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="6"></textarea>
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
@@ -264,11 +270,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" />
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus, ring-blue-500" rows="4"></textarea>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>

@@ -27,27 +27,31 @@
     // Initialize AI accessibility patterns
     aiAccessibilityPatterns?.updateOptions({
       enableVoiceCommands,
-      progressiveDisclosure: showProgressiveDisclosure, enhancedFocusIndicators: true, aiResultSummaries: true
-; contextualHelp: true
+      progressiveDisclosure: showProgressiveDisclosure, enhancedFocusIndicators: true, aiResultSummaries: true,
+      contextualHelp: true
     });
     // Set up keyboard shortcuts for voice commands
     const handleKeyboard = (_event: KeyboardEvent) => {
       // Ctrl+Shift+V: Toggle voice commands
       if (event.ctrlKey && event.shiftKey && event.key === 'V') {
         event.preventDefault();
-        toggleVoiceCommands()}
-    }
+        toggleVoiceCommands();
+      }
+    };
     if (typeof document !== 'undefined') document.addEventListener('keydown', handleKeyboard);
     return () => {
       if (typeof document !== 'undefined') document.removeEventListener('keydown', handleKeyboard);
-      if (voiceCommandsActive) aiAccessibilityPatterns?.stopVoiceCommands()}
+      if (voiceCommandsActive) aiAccessibilityPatterns?.stopVoiceCommands();
+    };
   });
   function toggleVoiceCommands() {
     if (voiceCommandsActive) {
       aiAccessibilityPatterns?.stopVoiceCommands();
-      voiceCommandsActive = false} else {
+      voiceCommandsActive = false;
+    } else {
       aiAccessibilityPatterns?.startVoiceCommands();
-      voiceCommandsActive = true}
+      voiceCommandsActive = true;
+    }
   }
 
   // React to status changes
@@ -85,14 +89,13 @@
     }
   }
   function handleVoiceCommand() {
-    toggleVoiceCommands()}
+    toggleVoiceCommands();
+  }
 </script>
 <div
   class="ai-accessibility-wrapper"
   role="region"
-  aria-label={`${operation}
-
-interface with accessibility enhancements`}
+  aria-label={`${operation} interface with accessibility enhancements`}
 >
   <!-- Voice: Commands, Toggle -->
   {#if enableVoiceCommands}
