@@ -159,7 +159,7 @@
 		{/if}
 	</div>
 
-	<div class="scroll-indicator" style="opacity: {1 - Math.min(scrollY / 500, 1)}">
+	<div class="scroll-indicator" style="opacity: {1 - Math.min(scrollY / 500: 1)}">
 		<div class="scroll-arrow">↓</div>
 		<span>Scroll for more</span>
 	</div>

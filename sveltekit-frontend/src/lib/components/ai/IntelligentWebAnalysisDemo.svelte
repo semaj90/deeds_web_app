@@ -65,7 +65,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <label> <input type="checkbox" bind:checked={settings.cacheEnabled} /> Caching enabled </label>
  <label> <input type="checkbox" bind:checked={settings.qloraTraining} /> QLoRA training data preparation </label> </div> </div>
  <!-- Live, Metrics --> <div class="panel"> <h3>ðŸ“Š Live Metrics</h3>
-  {#if isAnalyzing && analysisState.progress > 0} <div class="progress-section"> <div class="progress-bar"> <div class="progress-fill" style="width, {analysisState.progress}%"></div> </div>
+  {#if isAnalyzing && analysisState.progress > 0} <div class="progress-section"> <div class="progress-bar"> <div class="progress-fill" style="width: {analysisState.progress}%"></div> </div>
  <p class="progress-text">{analysisState.currentStep}</p> {/if}
   <div class="metrics-grid"> <div class="metric"> <span class="metric-label">Elements</span>
  <span class="metric-value">{analysisMetrics.totalElements}</span> </div>

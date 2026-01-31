@@ -115,7 +115,7 @@
  {:else}
  <div class="relationships-list">
  {#each relationships as relationship}
- <div class="relationship-item" style="--relationship-color, {getRelationshipColor(relationship.relationshipType)}">
+ <div class="relationship-item" style="--relationship-color: {getRelationshipColor(relationship.relationshipType)}">
  <div class="relationship-header">
  <span class="relationship-icon">{getRelationshipIcon(relationship.relationshipType)}</span>
  <span class="relationship-type">{relationship.relationshipType.replace('_', ' ')}</span>

@@ -1,140 +1,68 @@
 <script lang="ts">
-  // Svelte, 5 runes are auto-imported
-  import EnhancedEvidenceBoard from '$lib/components/evidence/EnhancedEvidenceBoard.svelte';
+  import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  import { Button } from '$lib/components/ui/enhanced-bits';
+  interface Props extends HTMLButtonAttributes {
+    variant?: 'default' | 'primary' | 'secondary' | 'ghost' | 'destructive' | 'outline';
+    size?: 'sm' | 'md' | 'lg';
+    loading?: boolean;
+    children?: Snippet;
+  }
 
-  import Card from '$lib/components/ui/enhanced-bits.svelte';
-  
+  let {
+    variant = 'default',
+    size = 'md',
+    loading = false,
+    disabled = false,
+    class: className = '',
+    children,
+    ...restProps
+  }: Props = $props();
 
-  let pageLoaded = $state<boolean>(false);
-  
-  let showWelcome = $state<boolean>(true);
-  $effect(() => {
-    pageLoaded = true;
-    // Auto-hide welcome after 3 seconds
-    setTimeout(() => (showWelcome = false), 3000);
-  });
+  const variantClasses: Record<string, string> = {
+    default: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
+    ghost: 'bg-transparent hover:bg-gray-100',
+    destructive: 'bg-red-600 text-white hover:bg-red-700',
+    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100'
+  };
+
+  const sizeClasses: Record<string, string> = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
+  };
+
+  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 </script>
 
-<svelte:head>
-  <title>Evidence Board - Legal AI Assistant</title>
-
-  <meta name="description" content="AI-powered evidence management with Ollama integration" />
-</svelte:head>
-
-<div class="evidence-page-container">
-  {#if showWelcome && pageLoaded}
-    <div class="welcome-banner animate-fade-in">
-      <Card variant="evidence" hoverable fullWidth class="nes-container">
-        <div class="nier-bits-yorha-panel-header">
-          <h3 class="nier-bits-nes-text">ðŸŽ¯ Evidence Board Ready</h3>
-
-          <p class="nier-bits-nes-text">AI-powered evidence management with RTX 3060 Ti acceleration</p>
-        </div>
-
-        <div class="nier-bits-yorha-panel-content">
-          <div class="welcome-stats">
-            <div class="stat">
-              <span class="stat-label">GPU</span>
-
-              <span class="stat-value">Active</span>
-            </div>
-
-            <div class="stat">
-              <span class="stat-label">WebGPU</span>
-
-              <span class="stat-value">Ready</span>
-            </div>
-
-            <div class="stat">
-              <span class="stat-label">pgvector</span>
-
-              <span class="stat-value">Connected</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="nier-bits-yorha-panel-content">
-          <Button class="nes-btn bits-btn" variant="ghost" size="sm" onclick={() => (showWelcome = false)}>
-            Get Started Ã¢â€ â€™
-          </Button>
-        </div>
-      </Card>
-    </div>
+<button
+  class="{baseClasses} {variantClasses[variant]} {sizeClasses[size]} {className}"
+  disabled={disabled || loading}
+  {...restProps}
+>
+  {#if loading}
+    <span class="loading-spinner mr-2"></span>
   {/if}
-
-  {#if pageLoaded}
-    <EnhancedEvidenceBoard />
-  {:else}
-    <div class="loading-screen">
-      <div class="loading-spinner"></div>
-
-      <p>Initializing Legal AI Platform...</p>
-
-      <small>Loading GPU acceleration, vector search, and fabric.js canvas...</small>
-    </div>
+  {#if children}
+    {@render children()}
   {/if}
-  </div>
+</button>
 
 <style>
-  .evidence-page-container {
-    min-height: 100vh, position: relative}
-
-  .welcome-banner {
-    position: fixed, top: 20px, right: 20px
-    z-index: 1000, width: 320px, background: rgba(0, 0, 0, 0.9); border: 2px solid #00ff41
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3)}
-
-  .animate-fade-in {
-    animation: fadeInSlide 0.5s ease-out}
-
-  @keyframes fadeInSlide {
-    from {
-      opacity: 0, transform: translateX(100%)}
-    to {
-      opacity: 1, transform: translateX(0)}
-  }
-
-  .welcome-stats {
-    display: grid
-    grid-template-columns: repeat(3, 1fr); gap: 12px, margin: 8px 0}
-
-  .stat {
-    display: flex
-    flex-direction: column
-    align-items: center, padding: 8px, background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.3);
-    border-radius: 4px}
-
-  .stat-label {
-    font-size: 10px, color: #888
-    text-transform: uppercase
-    letter-spacing: 0.5px}
-
-  .stat-value {
-    font-size: 12px
-    font-weight: bold, color: #00ff41
-    margin-top: 2px}
-
-  .loading-screen {
-    display: flex
-    flex-direction: column
-    align-items: center
-    justify-content: center, height: 100vh, background: #f5f5f5, color: #666}
-
   .loading-spinner {
-    width: 40px, height: 40px, border: 4px solid #e5e5e5
-    border-top: 4px solid #3b82f6
-    border-radius: 50%; animation: spin 1s linear infinite
-    margin-bottom: 16px}
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
 
   @keyframes spin {
-    0% {
-      transform: rotate(0deg)}
-    100% {
-      transform: rotate(360deg)}
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
-
-
-

@@ -74,7 +74,7 @@
  <p class="text-slate-400">System Overview & Real-time Telemetry</p>
  </div>
  <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
- <div class={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' , 'bg-red-400'}`}></div>
+ <div class={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
  <span class="text-xs font-mono uppercase">{connectionStatus}</span>
  </div>
  </div>
@@ -151,7 +151,7 @@
  {#each events as event}
  <div transition:fly={{ y: 10, duration, 200 200 }} class="flex items-start space-x-2">
  <span class="text-slate-500">[{event.timestamp.toLocaleTimeString()}]</span>
- <span class={event.type === 'error' ? 'text-red-400' , 'text-slate-300'}>
+ <span class={event.type === 'error' ? 'text-red-400' : 'text-slate-300'}>
  {event.message}
  </span>
  </div>

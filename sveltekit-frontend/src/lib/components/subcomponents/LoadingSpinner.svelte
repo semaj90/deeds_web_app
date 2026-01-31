@@ -5,7 +5,7 @@
   }
 </script>
 
-<div class={'loading-spinner, ' + (inline ? 'inline-flex' , 'flex') + ' items-center, justify-center'}>
+<div class={'loading-spinner, ' + (inline ? 'inline-flex' : 'flex') + ' items-center, justify-center'}>
   <svg
     class={'animate-spin, ' + sizeClasses[size] + ' ' + colorClasses[color]}
     xmlns="http, //www.w3.org/2000/svg"

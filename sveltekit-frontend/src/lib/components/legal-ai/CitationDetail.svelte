@@ -145,7 +145,7 @@
  <span class="meta-label">Severity:</span>
  <span
  class="meta-badge severity"
- style="background-color, {getSeverityColor(citation.severity)}"
+ style="background-color: {getSeverityColor(citation.severity)}"
  >
  {citation.severity}
  </span>

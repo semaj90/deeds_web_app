@@ -34,7 +34,7 @@
 	{#each messages as message (message.id)}
 		<div class="message" class:assistant={message.role === 'assistant'}>
 			<div class="message-header">
-				<span class="role-badge" style="background, {getRoleColor(message.role)}">
+				<span class="role-badge" style="background: {getRoleColor(message.role)}">
 					{getRoleLabel(message.role)}
 				</span>
 				<span class="timestamp">{formatTime(message.timestamp)}</span>

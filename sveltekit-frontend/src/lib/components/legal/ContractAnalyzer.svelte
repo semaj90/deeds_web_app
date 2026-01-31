@@ -106,7 +106,7 @@
   <!-- Contract, Header -->
   <div
     class="card-wrapper"
-    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius, 8px; padding: 0.25rem;"
+    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius: 8px; padding: 0.25rem;"
   >
     <Card>
       <CardHeader>
@@ -127,7 +127,7 @@
 
                 <span
                   class="risk-score"
-                  style="color, {getRiskBadgeStyle(contractData.riskScore > 7 ? 'high' : 'medium').color}"
+                  style="color: {getRiskBadgeStyle(contractData.riskScore > 7 ? 'high' : 'medium').color}"
                 >
                   Risk: {contractData.riskScore.toFixed(1)}/10
                 </span>
@@ -195,7 +195,7 @@
                 <div class="risk-track">
                   <div
                     class="risk-fill"
-                    style="width, {(count / contractData.clauses.length) * 100}%; background, {getRiskBadgeStyle(riskLevel as keyof typeof riskStyles).color}"
+                    style="width, {(count / contractData.clauses.length) * 100}%; background: {getRiskBadgeStyle(riskLevel as keyof typeof riskStyles).color}"
                   ></div>
                 </div>
 
@@ -213,7 +213,7 @@
           <div class="clauses-grid">
   {#each filteredClauses as clause (clause.id)}
               <div
-                class="clause-card {selectedClause === clause.id ? 'selected' , ''}"
+                class="clause-card {selectedClause === clause.id ? 'selected' : ''}"
                 role="button"
                 tabindex="0"
                 aria-pressed={selectedClause === clause.id}
@@ -235,7 +235,7 @@
                   </div>
 
                   <div class="clause-risk"
-                     style="background: {getRiskBadgeStyle(clause.riskLevel).background}; color, {getRiskBadgeStyle(clause.riskLevel).color}; border, {getRiskBadgeStyle(clause.riskLevel).border};">
+                     style="background: {getRiskBadgeStyle(clause.riskLevel).background}; color, {getRiskBadgeStyle(clause.riskLevel).color}; border: {getRiskBadgeStyle(clause.riskLevel).border};">
                     {clause.riskLevel}
 </div>
                 </div>
@@ -251,7 +251,7 @@
                       <div class="confidence-bar">
                         <div
                           class="confidence-fill"
-                          style="width, {clause.confidence * 100}%; background, {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
+                          style="width, {clause.confidence * 100}%; background: {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
                         ></div>
                       </div>
 

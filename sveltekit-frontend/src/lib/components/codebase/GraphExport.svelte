@@ -208,7 +208,7 @@
 			class="export-btn"
 			onclick={exportSVG}
 			disabled={isExporting || !svgElement}
-			title={!svgElement ? 'SVG element not available' , ''}
+			title={!svgElement ? 'SVG element not available' : ''}
 		>
 			<Image class="h-4 w-4" />
 			<span>SVG</span>
@@ -221,7 +221,7 @@
 			class="export-btn"
 			onclick={exportPNG}
 			disabled={isExporting || !svgElement}
-			title={!svgElement ? 'SVG element not available' , ''}
+			title={!svgElement ? 'SVG element not available' : ''}
 		>
 			<Image class="h-4 w-4" />
 			<span>PNG</span>

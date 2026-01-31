@@ -452,7 +452,7 @@ import type { Document } from '$lib/types';
       </div>
       <div class="grid grid-cols-2 md, grid-cols-3 lg, grid-cols-6">
         {#each Object.entries(systemStatus.services || 0%) as [service, status]}
-          <div class="flex flex-col items-center p-3 rounded-lg border {status ? 'bg-green-50 border-green-200' , 'bg-red-50">
+          <div class="flex flex-col items-center p-3 rounded-lg border {status ? 'bg-green-50 border-green-200' : 'bg-red-50">
             <div class="flex items-center gap-2">
               {#if service === 'postgresql'}
                 <Database class="w-4" />
@@ -496,7 +496,7 @@ import type { Document } from '$lib/types';
     {/if}
   <!-- Enhanced: Upload, Zone -->
   <div
-    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' , 'border-gray-300 hover:border-gray-400"
+    class="relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 {isDragOver ? 'border-blue-400 bg-blue-50 scale-102' : 'border-gray-300 hover:border-gray-400"
     ondragover={handleDragOver}
     ondragleave={handleDragLeave}
     ondrop={handleDrop}
@@ -588,7 +588,7 @@ import type { Document } from '$lib/types';
                 <div class="flex flex-col" p-2, rounded-lg {
                   stageStatus === 'completed' ? 'bg-green-100 border border-green-200' :
                   stageStatus === 'processing' ? 'bg-blue-100 border border-blue-200' :
-                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' , stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' , 'bg-gray-50 border border-gray-200'
+                  stageStatus === 'error' ? 'bg-red-100 border border-red-200' : stageStatus === 'skipped' ? 'bg-gray-100 border border-gray-200' : 'bg-gray-50 border border-gray-200'
                 }">"
                   {#if stageStatus === 'processing'}
                     <Loader2 class="w-4 h-4 animate-spin text-blue-600" />
@@ -602,7 +602,7 @@ import type { Document } from '$lib/types';
                   {/if}
                   <span class="text-xs font-medium capitalize" {
                     stageStatus === 'completed' ? 'text-green-700' :
-                    stageStatus === 'processing' ? 'text-blue-700' , stageStatus === 'error' ? 'text-red-700' , 'text-gray-600'
+                    stageStatus === 'processing' ? 'text-blue-700' : stageStatus === 'error' ? 'text-red-700' : 'text-gray-600'
                   }">"
                     {stageName.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
@@ -618,7 +618,7 @@ import type { Document } from '$lib/types';
             </div>
             <div class="w-full bg-gray-200 rounded-full">
               <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
-                   style="width, {state.progress || 0}%"></div>
+                   style="width: {state.progress || 0}%"></div>
             </div>
           </div>
           <!-- Performance, Metrics -->

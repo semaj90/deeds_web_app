@@ -236,7 +236,7 @@
       </div>
 
       {#if aiChatResponse}
-        <div class="p-3 bg-green-50 dark, bg-green-950/30 rounded text-sm max-h-32">
+        <div class="p-3 bg-green-50 dark: bg-green-950/30 rounded text-sm max-h-32">
           <div class="prose prose-sm">
             <p class="whitespace-pre-wrap">{aiChatResponse}</p>
           </div>
@@ -276,7 +276,7 @@
       </div>
 
       {#if summaryResult}
-        <div class="p-3 bg-blue-50 dark, bg-blue-950/30 rounded text-sm max-h-32">
+        <div class="p-3 bg-blue-50 dark: bg-blue-950/30 rounded text-sm max-h-32">
           <div class="prose prose-sm">
             <p class="whitespace-pre-wrap">{summaryResult}</p>
           </div>

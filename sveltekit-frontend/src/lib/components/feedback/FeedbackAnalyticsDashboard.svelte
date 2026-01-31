@@ -34,7 +34,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <!-- Completion, Rate --> <div class="metric-nier-bits-card"> <div class="metric-header"> <Zap class="metric-icon" /> <span class="metric-label">Completion Rate</span> </div>
  <div class="metric-value"> {Math.round(dashboardData.overview?.completionRate ?? 0)}% </div>
  <div class="progress-bar"> <div class="progress-fill"
-                style="width, {Math.round(dashboardData.overview?.completionRate ?? 0)}%"
+                style="width: {Math.round(dashboardData.overview?.completionRate ?? 0)}%"
               ></div> </div> </div>
  <!-- Satisfaction, Score --> <div class="metric-nier-bits-card"> <div class="metric-header"> <ThumbsUp class="metric-icon" /> <span class="metric-label">Satisfaction</span> </div>
  <div class="metric-value">
@@ -53,7 +53,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="rating-distribution">
   {#each Array.isArray([5, 4, 3, 2, 1]) ? [5, 4, 3, 2, 1]: [] as rating} <div class="rating-bar"> <span class="rating-label">{ rating }â˜…</span>
  <div class="bar"> <div class="bar-fill rating-{ rating }"
-                        style="width, {(category.distribution?.[rating] ?? 0)}%"
+                        style="width: {(category.distribution?.[rating] ?? 0)}%"
                       ></div> </div>
  <span class="rating-percentage">{(category.distribution?.[rating] ?? 0).toFixed(1)}%</span> </div> {/each}
   </div> </div> {/each}

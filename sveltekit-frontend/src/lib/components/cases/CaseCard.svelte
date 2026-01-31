@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Badge from "$lib/components/ui/badge.svelte";
+  import Badge from "$lib/components/ui/Badge.svelte";
   import Button from "$lib/components/ui/enhanced-bits.svelte";
   import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
   import Archive from 'lucide-svelte/icons/archive';
@@ -111,7 +111,10 @@
 
       <div class="flex items-center gap-2">
         <Badge variant="ghost" class={currentStatus.class}>
-          <svelte:component this={currentStatus.icon} class="w-3 h-3 mr-1" />
+          {#if currentStatus.icon}
+            {@const StatusIcon = currentStatus.icon}
+            <StatusIcon class="w-3 h-3 mr-1" />
+          {/if}
           {currentStatus.label}
         </Badge>
         <Button

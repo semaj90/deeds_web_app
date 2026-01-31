@@ -33,7 +33,10 @@ export interface DocumentUploadContext {
   } | null;
   error: string | null;
   retryCount: number;
-}| { type: 'SELECT_FILES'; files: File[] }
+}
+
+export type DocumentUploadEvent =
+  | { type: 'SELECT_FILES'; files: File[] }
   | { type: 'SUBMIT' }
   | { type: 'RETRY' }
   | { type: 'RESET' };
@@ -78,7 +81,9 @@ function extractUploadedFilesFromInvoke(evt: any): UploadedFile[] {
   return [];
 }
 
-function extractAIResultsFromInvoke(evt: any): { processedFiles: AIProcessingResult[]; summary: ProcessingSummary } | null {
+function extractAIResultsFromInvoke(
+  evt: any
+): { processedFiles: AIProcessingResult[]; summary: ProcessingSummary } | null {
   const e = asRecord(evt);
   const maybe = (e.data ?? e.output) as unknown;
   if (typeof maybe === 'object' && maybe !== null) {
@@ -93,7 +98,7 @@ function extractAIResultsFromInvoke(evt: any): { processedFiles: AIProcessingRes
 export const documentUploadMachine = createMachine({
   types: {
     context: {} as DocumentUploadContext,
-    events: {} as DocumentUploadEvent
+    events: {} as DocumentUploadEvent,
   },
   id: 'documentUpload',
   initial: 'idle',
@@ -105,7 +110,7 @@ export const documentUploadMachine = createMachine({
     uploadedFiles: [],
     aiResults: null,
     error: null,
-    retryCount: 0
+    retryCount: 0,
   },
   states: {
     idle: {
@@ -114,10 +119,10 @@ export const documentUploadMachine = createMachine({
           target: 'validating',
           actions: assign({
             files: ({ event }) => event.files,
-            error: () => null
-          })
-        }
-      }
+            error: () => null,
+          }),
+        },
+      },
     },
     validating: {
       invoke: {
@@ -135,17 +140,17 @@ export const documentUploadMachine = createMachine({
 
           for (const file of input.files) {
             if (!allowedTypes.includes(file.type)) {
-              errors.files = errors?.files|| [];
+              errors.files = errors.files || [];
               errors.files.push(`${file.name}: File type not allowed`);
             }
             if (file.size > maxSize) {
-              errors.files = errors?.files|| [];
+              errors.files = errors.files || [];
               errors.files.push(`${file.name}: File too large (max 10MB)`);
             }
           }
 
           if (Object.keys(errors).length > 0) {
-            throw { validationErrors, errors };
+            throw { validationErrors: errors };
           }
           return input.files;
         }),
@@ -154,17 +159,17 @@ export const documentUploadMachine = createMachine({
           target: 'validated',
           actions: assign({
             validationErrors: () => ({}),
-            error: () => null
-          })
+            error: () => null,
+          }),
         },
         onError: {
           target: 'idle',
           actions: assign({
             validationErrors: ({ event }) => extractValidationErrorsFromInvoke(event) ?? {},
-            error: () => 'File validation failed'
-          })
-        }
-      }
+            error: () => 'File validation failed',
+          }),
+        },
+      },
     },
     validated: {
       on: {
@@ -172,15 +177,15 @@ export const documentUploadMachine = createMachine({
         SELECT_FILES: {
           target: 'validating',
           actions: assign({
-            files: ({ event }) => event.files
-          })
-        }
-      }
+            files: ({ event }) => event.files,
+          }),
+        },
+      },
     },
     uploading: {
       entry: assign({
         uploadProgress: () => 0,
-        retryCount: ({ context }) => context.retryCount + 1
+        retryCount: ({ context }) => context.retryCount + 1,
       }),
       invoke: {
         id: 'uploadFiles',
@@ -193,12 +198,12 @@ export const documentUploadMachine = createMachine({
 
           const response = await fetch('/api/upload', {
             method: 'POST',
-            body: formData
+            body: formData,
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData?.error|| `HTTP ${response.status}`);
+            throw new Error(errorData?.error ?? `HTTP ${response.status}`);
           }
           return response.json();
         }),
@@ -208,81 +213,87 @@ export const documentUploadMachine = createMachine({
           actions: assign({
             uploadedFiles: ({ event }) => extractUploadedFilesFromInvoke(event),
             uploadProgress: () => 100,
-            error: () => null
-          })
+            error: () => null,
+          }),
         },
         onError: [
           {
             guard: ({ context }) => context.retryCount < 3,
             target: 'retrying',
             actions: assign({
-              error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed'
-            })
+              error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed',
+            }),
           },
           {
             target: 'failed',
             actions: assign({
-              error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed after retries'
-            })
-          }
-        ]
-      }
+              error: ({ event }) =>
+                extractErrorMessageFromInvoke(event) ?? 'Upload failed after retries',
+            }),
+          },
+        ],
+      },
     },
     processing: {
       entry: assign({ processingProgress: () => 0 }),
       invoke: {
         id: 'processFiles',
-        src: fromPromise<{ processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(async (params) => {
-          const { input } = params as { input: DocumentUploadContext };
-          const processingResults: AIProcessingResult[] = [];
+        src: fromPromise<{ processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(
+          async (params) => {
+            const { input } = params as { input: DocumentUploadContext };
+            const processingResults: AIProcessingResult[] = [];
 
-          for (const file of input.uploadedFiles) {
-            const response = await fetch('/api/ai/process-document', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ fileId: file.id, analysisType: 'full' })
-            });
+            for (const file of input.uploadedFiles) {
+              const response = await fetch('/api/ai/process-document', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileId: file.id, analysisType: 'full' }),
+              });
 
-            if (!response.ok) {
-              throw new Error(`Processing failed for ${file.name}`);
+              if (!response.ok) {
+                throw new Error(`Processing failed for ${file.name}`);
+              }
+              const result = (await response.json()) as AIProcessingResult;
+              processingResults.push(result);
             }
-            const result = await response.json() as AIProcessingResult;
-            processingResults.push(result);
+
+            return {
+              processedFiles: processingResults,
+              summary: {
+                totalFiles: input.uploadedFiles.length,
+                successfulProcessing: processingResults.length,
+                extractedTextLength: processingResults.reduce(
+                  (acc, r) => acc + (r.extractedText?.length ?? 0),
+                  0
+                ),
+              },
+            };
           }
-
-          return {
-            processedFiles: processingResults,
-            summary: {
-              totalFiles: input.uploadedFiles.length,
-              successfulProcessing: processingResults.length,
-              extractedTextLength: processingResults.reduce((acc, r) => acc + (r.extractedText?.length ?? 0), 0)
-            }
-          };
-        }),
+        ),
         input: ({ context }) => context,
         onDone: {
           target: 'completed',
           actions: assign({
             aiResults: ({ event }) => extractAIResultsFromInvoke(event),
             processingProgress: () => 100,
-            error: () => null
-          })
+            error: () => null,
+          }),
         },
         onError: {
           target: 'failed',
           actions: assign({
-            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed'
-          })
-        }
-      }
+            error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed',
+          }),
+        },
+      },
     },
     retrying: {
       after: {
-        2000: 'uploading'
+        2000: 'uploading',
       },
       on: {
-        RETRY: 'uploading'
-      }
+        RETRY: 'uploading',
+      },
     },
     completed: {
       type: 'final',
@@ -297,10 +308,10 @@ export const documentUploadMachine = createMachine({
             uploadedFiles: () => [],
             aiResults: () => null,
             error: () => null,
-            retryCount: () => 0
-          })
-        }
-      }
+            retryCount: () => 0,
+          }),
+        },
+      },
     },
     failed: {
       on: {
@@ -309,12 +320,12 @@ export const documentUploadMachine = createMachine({
           target: 'idle',
           actions: assign({
             error: () => null,
-            retryCount: () => 0
-          })
-        }
-      }
-    }
-  }
+            retryCount: () => 0,
+          }),
+        },
+      },
+    },
+  },
 });
 
 export default documentUploadMachine;

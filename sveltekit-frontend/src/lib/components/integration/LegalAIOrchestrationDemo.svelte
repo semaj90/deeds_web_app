@@ -137,7 +137,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div class="flex items-center space-x-2">
  <div class="flex items-center">
- <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' , 'bg-red-500'}"></div>
+ <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' : 'bg-red-500'}"></div>
  <span class="text-sm ml-2">{systemHealthy ? 'System Healthy' : 'System Issues'}</span>
  </div>
 				{#if Object.entries(systemHealth).filter(([k, v]) => !v).length > 0}
@@ -195,7 +195,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  {#each Object.entries(systemHealth) as [service, healthy]}
  <div class="flex items-center justify-between">
  <span class="capitalize">{service.replace(/[/_-]/g, ' ')}</span>
- <span class="{healthy ? 'text-green-600' , 'text-red-600'}">
+ <span class="{healthy ? 'text-green-600' : 'text-red-600'}">
  {healthy ? '✓' : '✗'}
  </span>
  </div>
@@ -295,7 +295,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  <!-- Execute Button -->
  <div class="pt-4 border-t mt-4">
- <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' , ''} bits-btn">
+ <Button onclick={executeWorkflow} disabled={isProcessing || !systemHealthy} class="w-full {isProcessing ? 'opacity-50 cursor-not-allowed' : ''} bits-btn">
  {#if isProcessing}
  <div class="flex items-center justify-center">
  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
@@ -333,7 +333,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  </div>
  <div class="mt-4">
  <div class="w-full bg-gray-200 rounded-full h-2">
- <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width, {activeWorkflowStatus.progress}%"></div>
+ <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: {activeWorkflowStatus.progress}%"></div>
  </div>
  </div>
  </CardContent>

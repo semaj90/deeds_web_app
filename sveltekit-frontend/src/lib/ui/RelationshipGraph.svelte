@@ -157,7 +157,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   <div
   class="absolute select-none cursor-grab active:cursor-grabbing
   {activeId === node.id ? 'z-50' : 'z-10'}"
-  style="transform: translate({node.x - NODE_RADIUS}px, {node.y - NODE_RADIUS}px);"
+  style="transform: translate({node.x - NODE_RADIUS}px: {node.y - NODE_RADIUS}px);"
   onpointerdown={(e) => onNodePointerDown(e, node.id)}
   onclick={() => selectedNode = node.id}
   role="presentation"

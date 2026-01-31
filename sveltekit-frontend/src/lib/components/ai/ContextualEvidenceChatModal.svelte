@@ -475,7 +475,7 @@
  {reportStatus.state === 'running' ? 'Generating…' : 'Generate Report'}
  </button>
  {#if reportStatus.state !== 'idle'}
- <p class={reportStatus.state === 'error' ? 'error-text' , 'status-text'}>
+ <p class={reportStatus.state === 'error' ? 'error-text' : 'status-text'}>
  {reportStatus.message}
  </p>
  {/if}
@@ -524,7 +524,7 @@
  {caseFormStatus.state === 'running' ? 'Creating…' : 'Create Case'}
  </button>
  {#if caseFormStatus.state !== 'idle'}
- <p class={caseFormStatus.state === 'error' ? 'error-text' , 'status-text'}>
+ <p class={caseFormStatus.state === 'error' ? 'error-text' : 'status-text'}>
  {caseFormStatus.message}
  </p>
  {/if}
@@ -575,7 +575,7 @@
  {evidenceStatus.state === 'running' ? 'Uploading…' : 'Upload Evidence'}
  </button>
  {#if evidenceStatus.state !== 'idle'}
- <p class={evidenceStatus.state === 'error' ? 'error-text' , 'status-text'}>
+ <p class={evidenceStatus.state === 'error' ? 'error-text' : 'status-text'}>
  {evidenceStatus.message}
  </p>
  {/if}

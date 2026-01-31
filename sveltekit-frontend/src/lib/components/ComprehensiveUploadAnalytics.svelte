@@ -347,7 +347,7 @@
 					multiple
 					accept={allowedTypes.join(',')}
 					onchange={handleFileSelect}
-					style="display, none;"
+					style="display: none;"
 				/>
 				<button class="btn-select-files">Select Files</button>
 			</div>
@@ -404,7 +404,7 @@
 				<span class="progress-percentage">{Math.round(uploadProgress)}%</span>
 			</div>
 			<div class="progress-bar">
-				<div class="progress-fill" style="width, {uploadProgress}%"></div>
+				<div class="progress-fill" style="width: {uploadProgress}%"></div>
 			</div>
 
 			<div class="pipeline-status">

@@ -314,7 +314,7 @@
 			<div class="legend-title">Node Types</div>
 			{#each Object.entries(nodeColors) as [type, color]}
 				<div class="legend-item">
-					<span class="legend-dot" style="background, {color}"></span>
+					<span class="legend-dot" style="background: {color}"></span>
 					<span class="legend-label">{ type }</span>
 				</div>
 			{/each}

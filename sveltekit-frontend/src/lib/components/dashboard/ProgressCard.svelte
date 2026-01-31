@@ -90,7 +90,7 @@
  </div>
 
  <div class="progress-bar-container">
- <div class="progress-bar-fill" style="width, {percentage}%"></div>
+ <div class="progress-bar-fill" style="width: {percentage}%"></div>
  </div>
 
  <div class="progress-info">

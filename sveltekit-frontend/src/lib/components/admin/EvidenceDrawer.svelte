@@ -336,12 +336,13 @@
 		margin-left: 1rem;
 	}
 
-	.close-btn:hover, not(disabled) {
+	.close-btn:hover:not(:disabled) {
 		color: #ddd;
 	}
 
 	.close-btn:disabled {
-		opacity: 0.5; cursor:not-allowed;
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.drawer-content {
@@ -454,7 +455,8 @@
 	.form-input:disabled,
 	.form-select:disabled,
 	.form-textarea:disabled {
-		opacity: 0.6; cursor:not-allowed;
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.form-input.error,
@@ -504,7 +506,7 @@
 		background: #9df; color: #000;
 	}
 
-	.btn-primary:hover, not(disabled) {
+	.btn-primary:hover:not(:disabled) {
 		background: #7ce;
 		box-shadow: 0 0 8px rgba(153, 221, 255, 0.3);
 	}
@@ -513,7 +515,7 @@
 		background: #333; color: #ddd;
 	}
 
-	.btn-secondary:hover, not(disabled) {
+	.btn-secondary:hover:not(:disabled) {
 		background: #444;
 	}
 
@@ -521,12 +523,13 @@
 		background: #f44; color: #fff;
 	}
 
-	.btn-danger:hover, not(disabled) {
+	.btn-danger:hover:not(:disabled) {
 		background: #e33;
 	}
 
 	.btn:disabled {
-		opacity: 0.5; cursor:not-allowed;
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	/* Modal */

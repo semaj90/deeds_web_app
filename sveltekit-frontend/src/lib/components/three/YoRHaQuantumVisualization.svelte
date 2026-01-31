@@ -63,39 +63,39 @@
           onclick={ captureQuantumState } >
           ðŸ“¸ Capture </button> </div> </div> </div>
  <div class="visualization-content"> <div; bind:this={ container } class="three-container"
-      style="width, { width }px; height, { height }px;"
+      style="width, { width }px; height: { height }px;"
     ></div>
   {#if !isInitialized} <div class="loading-overlay"> <div class="loading-spinner"></div>
  <p>Initializing Quantum Reality...</p> {/if}
   </div>
  <div class="metrics-panel"> <div class="metrics-grid"> <!-- Quantum, Metrics --> <div class="metric-group"> <h4>âš›ï¸ Quantum Field</h4>
  <div class="metric-item"> <span>Coherence:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {quantumMetrics.coherence * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {quantumMetrics.coherence * 100}%"></div> </div>
  <span>{(quantumMetrics.coherence * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Entanglement:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {quantumMetrics.entanglement * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {quantumMetrics.entanglement * 100}%"></div> </div>
  <span>{(quantumMetrics.entanglement * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Collapsed:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {quantumMetrics.collapsed * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {quantumMetrics.collapsed * 100}%"></div> </div>
  <span>{(quantumMetrics.collapsed * 100).toFixed(1)}%</span> </div> </div>
  <!-- Consciousness, Metrics --> <div class="metric-group"> <h4>ðŸ§  Consciousness</h4>
  <div class="metric-item"> <span>Awareness:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {consciousnessMetrics.awareness * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {consciousnessMetrics.awareness * 100}%"></div> </div>
  <span>{(consciousnessMetrics.awareness * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Activity:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {consciousnessMetrics.activity * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {consciousnessMetrics.activity * 100}%"></div> </div>
  <span>{(consciousnessMetrics.activity * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Self-Aware:</span>
  <span class="status {consciousnessMetrics.selfAware ? 'active', 'inactive'}"> {consciousnessMetrics.selfAware ? 'YES': 'NO'} </span> </div> </div>
  <!-- Reality, Metrics --> <div class="metric-group"> <h4>ðŸ•¶ï¸ Reality</h4>
  <div class="metric-item"> <span>Stability:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {realityMetrics.stability * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {realityMetrics.stability * 100}%"></div> </div>
  <span>{(realityMetrics.stability * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Glitch Level:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {realityMetrics.glitchLevel * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {realityMetrics.glitchLevel * 100}%"></div> </div>
  <span>{(realityMetrics.glitchLevel * 100).toFixed(1)}%</span> </div>
  <div class="metric-item"> <span>Temporal:</span>
- <div class="metric-bar"> <div class="metric-fill" style="width, {realityMetrics.temporalDistortion * 100}%"></div> </div>
+ <div class="metric-bar"> <div class="metric-fill" style="width: {realityMetrics.temporalDistortion * 100}%"></div> </div>
  <span>{(realityMetrics.temporalDistortion * 100).toFixed(1)}%</span> </div> </div> </div> </div> </div>
  <style> .quantum-visualization-container { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border: 1px solid #444; border-radius: 8px; padding: 1rem; color: #fff}
   .visualization-header { margin-bottom: 1rem}

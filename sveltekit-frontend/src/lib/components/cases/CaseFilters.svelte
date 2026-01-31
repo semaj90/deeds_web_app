@@ -85,7 +85,7 @@
       return sortOrder === 'asc' ? compare : -compar})});
 </script>
 
-<div class="flex flex-wrap gap-4 p-4 bg-white dark, bg-gray-800 rounded-lg shadow-sm">
+<div class="flex flex-wrap gap-4 p-4 bg-white dark: bg-gray-800 rounded-lg shadow-sm">
   <div class="flex items-center gap-2 flex-1">
     <Search class="w-4 h-4" />
     <Input

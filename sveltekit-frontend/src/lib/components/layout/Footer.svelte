@@ -71,15 +71,15 @@
 					<h4 class="section-title nes-text">System Status</h4>
 					<div class="status-indicators">
 						<div class="status-item">
-							<span class="status-dot nes-container" style="background: var(--nes-success, #50e3c2);"></span>
+							<span class="status-dot nes-container" style="background: var(--nes-success: #50e3c2);"></span>
 							<span class="status-label">AI Services</span>
 						</div>
 						<div class="status-item">
-							<span class="status-dot nes-container" style="background: var(--nes-success, #50e3c2);"></span>
+							<span class="status-dot nes-container" style="background: var(--nes-success: #50e3c2);"></span>
 							<span class="status-label">Database</span>
 						</div>
 						<div class="status-item">
-							<span class="status-dot nes-container" style="background: var(--n64-secondary, #7ed321);"></span>
+							<span class="status-dot nes-container" style="background: var(--n64-secondary: #7ed321);"></span>
 							<span class="status-label">GPU Cluster</span>
 						</div>
 					</div>

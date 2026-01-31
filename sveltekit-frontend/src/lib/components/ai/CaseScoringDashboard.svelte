@@ -146,7 +146,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Scoring, Factors --> <section class="scoring-factors"> <h3>Scoring Factors</h3>
  <div class="factors-grid">
   {#each Array.isArray(selectedCase.factors) ? selectedCase.factors: [] as factor} <div class="factor-card"> <h4>{factor.category}</h4>
- <div class="factor-metrics"> <div class="factor-bar"> <div class="factor-fill" style="width, {factor.impact * 100}%"></div> </div>
+ <div class="factor-metrics"> <div class="factor-bar"> <div class="factor-fill" style="width: {factor.impact * 100}%"></div> </div>
  <span class="factor-percentage">{(factor.impact * 100).toFixed(1)}%</span> </div>
  <p class="factor-description">{factor.description}</p>
  <p class="factor-confidence">Confidence: {factor.confidence}%</p> </div> {/each}

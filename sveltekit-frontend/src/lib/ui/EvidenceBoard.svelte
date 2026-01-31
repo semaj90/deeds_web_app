@@ -208,7 +208,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   {#each items as item (item.id)}
   <div
   class="absolute w-[260px] select-none cursor-grab active:cursor-grabbing {activeId === item.id ? 'z-50 scale-105' : 'z-10'}"
-  style="transform: translate({item.x}px, {item.y}px); transition: {activeId === item.id ? 'none' : 'transform 0.2s ease'}"
+  style="transform: translate({item.x}px: {item.y}px); transition: {activeId === item.id ? 'none' : 'transform 0.2s ease'}"
   onpointerdown={(e) => onCardPointerDown(e, item.id)}
   role="presentation"
   >

@@ -39,7 +39,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             onclick={() => (showAIInterface = false)} class="p-2 rounded-lg hover:bg-red-500/20 transition-colors"
           > <X class="w-5 h-5" /> </button> </div> </div> <!-- System: Metrics, Bar --> <div class="flex items-center gap-4 px-4 py-2 bg-gray-800/50">
  {#each Object.entries(systemMetrics) as [key, value]} <div class="flex items-center"> <span class="text-xs {theme.secondary} uppercase">{key.replace(/([A-Z])/g, ' $1').trim()}:</span> <div class="w-16 h-2 bg-gray-700 rounded-full"> <div class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 transition-all"
-                style="width, { value }%"
+                style="width: { value }%"
               ></div> </div> <span class="text-xs {theme.accent}">{ value }%</span> </div> {/each}
 </div> <div class="flex"> <!-- Messages, Area --> <div class="flex-1 flex"> <!-- Messages, Container --> <div class="flex-1 overflow-y-auto p-4">
  {#each messages as message (message.id)} <div class="flex {message.role === 'user' ? 'justify-end': 'justify-start'}"

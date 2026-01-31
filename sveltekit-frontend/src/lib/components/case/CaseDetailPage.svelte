@@ -1,256 +1,272 @@
 <script lang="ts">
- import type { CaseSummary, SimilarCase } from '$lib/types/case-summary';
- import { onMount } from 'svelte';
- import SimilarCasesPanel from './SimilarCasesPanel.svelte';
- import SummaryEditor from './SummaryEditor.svelte';
+  import type { CaseSummary, SimilarCase } from '$lib/types/case-summary';
+  import { onMount } from 'svelte';
+  import SimilarCasesPanel from './SimilarCasesPanel.svelte';
+  import SummaryEditor from './SummaryEditor.svelte';
 
- let { caseId } = $props<{
- caseId, string;
- }>();
+  interface Props {
+    caseId: string;
+  }
 
- let summary: CaseSummary, null = null;
- let similarCases: SimilarCase[] = [];
- let isLoading = false;
- let isGenerating = false;
- let error: string | null = null;
+  let { caseId }: Props = $props();
 
- onMount(() => {
- (async () => {
- await loadSummary();
- await loadSimilarCases();
- })();
- });
+  let summary: CaseSummary | null = $state(null);
+  let similarCases: SimilarCase[] = $state([]);
+  let isLoading = $state(false);
+  let isGenerating = $state(false);
+  let error: string | null = $state(null);
 
- async function loadSummary() {
- try {
- isLoading = true;
- const response = await fetch(`/api/cases/${caseId}/summary`);
- const data = await response.json();
+  onMount(() => {
+    (async () => {
+      await loadSummary();
+      await loadSimilarCases();
+    })();
+  });
 
- if (data.success) {
- summary = data.summary;
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to load summary';
- } finally {
- isLoading = false;
- }
- }
+  async function loadSummary() {
+    try {
+      isLoading = true;
+      const response = await fetch(`/api/cases/${caseId}/summary`);
+      const data = await response.json();
 
- async function loadSimilarCases() {
- try {
- const response = await fetch(`/api/cases/${caseId}/summary/similar?limit=5`);
- const data = await response.json();
+      if (data.success) {
+        summary = data.summary;
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to load summary';
+    } finally {
+      isLoading = false;
+    }
+  }
 
- if (data.success) {
- similarCases = data.cases;
- }
- } catch (err) {
- console.error('Failed to load similar cases:', err);
- }
- }
+  async function loadSimilarCases() {
+    try {
+      const response = await fetch(`/api/cases/${caseId}/summary/similar?limit=5`);
+      const data = await response.json();
 
- async function generateSummary() {
- try {
- isGenerating = true;
- error = null;
+      if (data.success) {
+        similarCases = data.cases;
+      }
+    } catch (err) {
+      console.error('Failed to load similar cases:', err);
+    }
+  }
 
- const response = await fetch('/api/cases/summary', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ caseId: includeEvidence, true, true: includeTimeline, true,
- analysisDepth: 'comprehensive',
- }),
- });
+  async function generateSummary() {
+    try {
+      isGenerating = true;
+      error = null;
 
- const data = await response.json();
+      const response = await fetch('/api/cases/summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId,
+          includeEvidence: true,
+          includeTimeline: true,
+          analysisDepth: 'comprehensive'
+        })
+      });
 
- if (data.success) {
- summary = data.summary;
- await loadSimilarCases();
- } else {
- error = data.error || 'Failed to generate summary';
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to generate summary';
- } finally {
- isGenerating = false;
- }
- }
+      const data = await response.json();
 
- async function exportPDF() {
- try {
- const response = await fetch(`/api/cases/${caseId}/summary/export-pdf`, {
- method: 'POST',
- });
+      if (data.success) {
+        summary = data.summary;
+        await loadSimilarCases();
+      } else {
+        error = data.error || 'Failed to generate summary';
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to generate summary';
+    } finally {
+      isGenerating = false;
+    }
+  }
 
- const data = await response.json();
+  async function exportPDF() {
+    try {
+      const response = await fetch(`/api/cases/${caseId}/summary/export-pdf`, {
+        method: 'POST'
+      });
 
- if (data.success) {
- // Download PDF
- const link = document.createElement('a');
- link.href = `data:application/pdf;base64,${data.pdf}`;
- link.download = data.filename;
- link.click();
- } else {
- error = data.error || 'Failed to export PDF';
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to export PDF';
- }
- }
+      const data = await response.json();
+
+      if (data.success) {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${data.pdf}`;
+        link.download = data.filename;
+        link.click();
+      } else {
+        error = data.error || 'Failed to export PDF';
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to export PDF';
+    }
+  }
 </script>
 
 <div class="case-detail-page">
- <div class="header">
- <h1>Case {caseId}</h1>
- <div class="actions">
- <button onclick={generateSummary} disabled={isGenerating} class="btn-primary">
- {isGenerating ? 'Generating...' : 'Generate Summary'}
- </button>
- {#if summary}
- <button onclick={ exportPDF } class="btn-secondary">Export PDF</button>
- {/if}
- </div>
- </div>
+  <div class="header">
+    <h1>Case {caseId}</h1>
+    <div class="actions">
+      <button onclick={generateSummary} disabled={isGenerating} class="btn-primary">
+        {isGenerating ? 'Generating...' : 'Generate Summary'}
+      </button>
+      {#if summary}
+        <button onclick={exportPDF} class="btn-secondary">Export PDF</button>
+      {/if}
+    </div>
+  </div>
 
- {#if error}
- <div class="error-message">
- <p>{error}</p>
- <button onclick={() => (error = null)}>Dismiss</button>
- </div>
- {/if}
+  {#if error}
+    <div class="error-message">
+      <p>{error}</p>
+      <button onclick={() => (error = null)}>Dismiss</button>
+    </div>
+  {/if}
 
- {#if isLoading}
- <div class="loading">Loading summary...</div>
- {:else if summary}
- <div class="content">
- <div class="main">
- <SummaryEditor {summary} />
- </div>
- <div class="sidebar">
- <SimilarCasesPanel cases={similarCases} />
- </div>
- </div>
- {:else}
- <div class="empty-state">
- <p>No summary yet. Click "Generate Summary" to create one.</p>
- </div>
- {/if}
+  {#if isLoading}
+    <div class="loading">Loading summary...</div>
+  {:else if summary}
+    <div class="content">
+      <div class="main">
+        <SummaryEditor {summary} />
+      </div>
+      <div class="sidebar">
+        <SimilarCasesPanel cases={similarCases} />
+      </div>
+    </div>
+  {:else}
+    <div class="empty-state">
+      <p>No summary yet. Click "Generate Summary" to create one.</p>
+    </div>
+  {/if}
 </div>
 
 <style>
- .case-detail-page {
- padding: 2rem;
- max-width: 1400px; margin: 0 auto;
- }
+  .case-detail-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
 
- .header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 2rem;
- border-bottom: 1px solid #e0e0e0;
- padding-bottom: 1rem;
- }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1rem;
+  }
 
- .header h1 {
- margin: 0;
- font-size: 1.5rem;
- }
+  .header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
 
- .actions {
- display: flex; gap: 1rem;
- }
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
 
- .btn-primary,
- .btn-secondary {
- padding: 0.5rem 1rem;
- border: none;
- border-radius: 4px; cursor: pointer;
- font-size: 0.9rem; transition: all 0.2s;
- }
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
 
- .btn-primary {
- background-color: #007bff; color: white;
- }
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
 
- .btn-primary:hover, not(disabled) {
- background-color: #0056b3;
- }
+  .btn-primary:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
 
- .btn-primary:disabled {
- opacity: 0.6; cursor:not-allowed;
- }
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
- .btn-secondary {
- background-color: #6c757d; color: white;
- }
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
 
- .btn-secondary:hover {
- background-color: #545b62;
- }
+  .btn-secondary:hover {
+    background-color: #545b62;
+  }
 
- .error-message {
- background-color: #f8d7da; border: 1px solid #f5c6cb;
- color: #721c24; padding: 1rem;
- border-radius: 4px;
- margin-bottom: 1rem; display: flex;
- justify-content: space-between;
- align-items: center;
- }
+  .error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
- .error-message button {
- background: none; border: none;
- color: #721c24; cursor: pointer;
- font-weight: bold;
- }
+  .error-message button {
+    background: none;
+    border: none;
+    color: #721c24;
+    cursor: pointer;
+    font-weight: bold;
+  }
 
- .loading {
- text-align: center; padding: 2rem;
- color: #666;
- }
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
 
- .content {
- display: grid;
- grid-template-columns: 1fr 300px;
- gap: 2rem;
- }
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+  }
 
- .main {
- min-width: 0;
- }
+  .main {
+    min-width: 0;
+  }
 
- .sidebar {
- min-width: 0;
- }
+  .sidebar {
+    min-width: 0;
+  }
 
- .empty-state {
- text-align: center; padding: 3rem;
- background-color: #f5f5f5;
- border-radius: 4px; color: #666;
- }
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    color: #666;
+  }
 
- @media (max-width: 768px) {
- .content {
- grid-template-columns: 1fr;
- }
+  @media (max-width: 768px) {
+    .content {
+      grid-template-columns: 1fr;
+    }
 
- .header {
- flex-direction: column;
- align-items: flex-start; gap: 1rem;
- }
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
 
- .actions {
- width: 100%;
- }
+    .actions {
+      width: 100%;
+    }
 
- .actions button {
- flex: 1;
- }
- }
+    .actions button {
+      flex: 1;
+    }
+  }
 </style>
-
-
-
-

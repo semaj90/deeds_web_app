@@ -159,7 +159,7 @@
             style=";
 							left: {20 + i * 30}%;
 							animation-delay, {i * 0.5}
-							animation-duration, {3 + i * 0.5}
+							animation-duration: {3 + i * 0.5}
 						"
           ></div>
         {/each}

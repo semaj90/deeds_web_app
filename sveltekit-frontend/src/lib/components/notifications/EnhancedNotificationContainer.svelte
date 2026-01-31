@@ -73,7 +73,7 @@
   <!-- Progress bar for timed, notifications -->
   {#if (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).duration && (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).duration > 0} <div class="container mx-auto px-4"
                     > <div class="container mx-auto"
-                        style="width, 100%"
+                        style="width: 100%"
                       ></div> {/if}
   <!-- Actions -->
   {#if (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions && (notification as { type?: any; title?: any; message?: any; id?: any; duration?: any; actions?: any }).actions.length > 0} <div class="container mx-auto">

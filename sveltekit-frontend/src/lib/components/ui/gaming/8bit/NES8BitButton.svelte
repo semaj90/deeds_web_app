@@ -70,13 +70,13 @@
  box-shadow: {isPressed ? 'none' : `4px 4px 0 ${colors.shadow}`};
  transform: {isPressed ? 'translate(2px, 2px)' : 'translate(0, 0)'};
  image-rendering: pixelated;
- font-family: 'Press Start 2P', monospace, system-ui;
+ font-family: 'Press Start 2P', monospace: system-ui;
  "
 >
  <!-- Pixel highlight -->
  <span
  class="absolute top-0 left-0 right-0 h-1 pointer-events-none"
- style="background, linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);"
+ style="background, linear-gradient(to bottom, rgba(255, 255, 255, 0.3): transparent);"
  ></span>
 
  <!-- Content -->

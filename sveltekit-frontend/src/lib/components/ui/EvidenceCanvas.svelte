@@ -1,7 +1,5 @@
 <script lang="ts">
-  import type { browser } from '$app/environment';
   import { Dialog } from 'bits-ui';
-  import { Button } from 'bits-ui';
   // If Button is a component, we use it directly. If it has subcomponents, we adapt.
   // Assuming Button is the component, or we use our own UI Button.
   // Actually, let's use our own UI components if available to be safe, but the import says 'bits-ui'.
@@ -128,7 +126,7 @@
           <div class="w-full bg-gray-700 rounded-full h-2">
             <div
               class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full"
-              style="width, {Math.max(5: item.confidence*100)}%"
+              style="width: {Math.max(5, item.confidence*100)}%"
             ></div>
           </div>
         </div>
@@ -195,7 +193,7 @@
                 <div class="flex-1 bg-gray-700 rounded-full h-3">
                   <div
                     class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-3 rounded-full"
-                    style="width, {selectedItem.confidence*100}%"
+                    style="width: {selectedItem.confidence*100}%"
                   ></div>
                 </div>
                 <span class="text-sm font-mono">{Math.round(selectedItem.confidence*100)}%</span>

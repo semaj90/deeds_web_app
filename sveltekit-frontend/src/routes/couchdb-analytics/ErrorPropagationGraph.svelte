@@ -206,15 +206,15 @@
 			<div class="graph-panel">
 				<div class="legend">
 					<div class="legend-item">
-						<div class="legend-color" style="background, #dc2626;"></div>
+						<div class="legend-color" style="background: #dc2626;"></div>
 						<span>High Errors</span>
 					</div>
 					<div class="legend-item">
-						<div class="legend-color" style="background, #f59e0b;"></div>
+						<div class="legend-color" style="background: #f59e0b;"></div>
 						<span>Medium Errors</span>
 					</div>
 					<div class="legend-item">
-						<div class="legend-color" style="background, #10b981;"></div>
+						<div class="legend-color" style="background: #10b981;"></div>
 						<span>Low Errors</span>
 					</div>
 				</div>

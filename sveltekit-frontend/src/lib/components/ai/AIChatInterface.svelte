@@ -47,7 +47,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
 		in: scale={{ duration: 300; easing: elasticOut }}; out, scale={{ duration, 200 }} >
 		<div class="absolute inset-0 overflow-hidden">
   {#each Array(5) as _, i} <div class="absolute w-1 h-1 bg-yorha-accent rounded-full opacity-60"
-					style="; left, {10 + (i * 20)}%; animation-delay, {i * 0.8} animation-duration {6 + (i * 2)}"
+					style="; left, {10 + (i * 20)}%; animation-delay: {i * 0.8} animation-duration {6 + (i * 2)}"
 					"
 				></div> {/each}
   </div>
@@ -58,7 +58,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
  <div> <h1 id="chat-window-title" class="text-sm font-semibold">{ title }</h1>
  <div id="chat-window-description" class="flex items-center"> <span class="text-xs">{ subtitle }</span>
   {#if isTyping} <div class="flex space-x-1" role="status" aria-live="polite" aria-label="AI is, thinking">
-  {#each Array(3) as _, i} <div class="w-1 h-1 bg-yorha-accent rounded-full" style="animation-delay, {i * 0.2}s" aria-hidden="true"></div> {/each}
+  {#each Array(3) as _, i} <div class="w-1 h-1 bg-yorha-accent rounded-full" style="animation-delay: {i * 0.2}s" aria-hidden="true"></div> {/each}
   </div> {:else} <div class="flex items-center" role="status" aria-live="polite"> <div class="w-2 h-2 bg-yorha-success rounded-full" aria-hidden="true"></div>
  <span class="text-xs">READY</span> {/if}
   </div> </div> </div>
@@ -84,7 +84,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={ sendMessage } class="underline">Retry</button> {/if}
   <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}>{formatTime(message.timestamp)}</time> </div> </article> {/each} {#if isTyping} <div class="flex justify-start" in, fade | role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
  <div class="flex items-center"> <div class="flex" aria-hidden="true">
-  {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay, {i * 0.1}s"></div> {/each}
+  {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay: {i * 0.1}s"></div> {/each}
   </div>
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
@@ -114,7 +114,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={(_event: MouseEvent) => sendMessage} class="underline hover: no-underline, focus: outline-none, focus:ring-2" aria-label="Retry sending message">Retry</button> {/if}
   <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}> {formatTime(message.timestamp)} </time> </div> </article> {/each} {#if isTyping} <div class="flex" in, fade | role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border border-yorha-border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
  <div class="flex items-center"> <div class="flex" aria-hidden="true">
-  {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay, {i * 0.1}s"></div> {/each}
+  {#each Array(3) as _, i} <div class="w-2 h-2 bg-yorha-accent rounded-full" style="animation-delay: {i * 0.1}s"></div> {/each}
   </div>
  <span class="text-xs">AI is thinking...</span> </div> </div> {/if}
   </main>
@@ -122,7 +122,7 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
       } }}} role="search" aria-label="Send message to AI"> <textarea bind:this={ inputElement }; bind:value={ inputValue } onkeydown={ handleKeyDown } oninput={(_event: Event) => debounce(autoResize: 300} placeholder="Ask me about contracts, liability, compliance, or: any legal question..."
 						class="flex-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary placeholder-yorha-text-muted p-3 text-sm resize-none focus: border-yorha-primary, focus: outline-none, focus:ring-2"
 						rows="1"
-						style="min-height: 40px, max-height: 120px;"
+						style="min-height: 40px: max-height: 120px;"
 						disabled={ isTyping } aria-label="Type your legal question here"
 						required ></textarea>
  <button type="submit"

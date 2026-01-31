@@ -113,7 +113,7 @@
         <div class="mt-3 h-1 bg-gray-200 rounded">
           <div
             class="h-full bg-indigo-600"
-            style="animation, shrink {notification.duration}ms linear forwards;"
+            style="animation: shrink {notification.duration}ms linear forwards;"
           ></div>
         {/if}
     </div>

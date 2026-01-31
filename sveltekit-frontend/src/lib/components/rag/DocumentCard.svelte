@@ -97,7 +97,7 @@ import type { Document } from '$lib/types';
         <div class="w-full h-2 bg-gray-200 rounded-full">
           <div
             class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all"
-            style="width, {document.metadata.confidence * 100}%"
+            style="width: {document.metadata.confidence * 100}%"
           />
         </div>
       {/if}

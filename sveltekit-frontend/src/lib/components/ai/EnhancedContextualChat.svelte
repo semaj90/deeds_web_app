@@ -315,7 +315,7 @@ import type { Document } from '$lib/types';
                     <div class="confidence-bar">
                       <div
                         class="confidence-fill"
-                        style="width, {prediction.confidence * 100}%"
+                        style="width: {prediction.confidence * 100}%"
                       ></div>
                     </div>
                   </div>

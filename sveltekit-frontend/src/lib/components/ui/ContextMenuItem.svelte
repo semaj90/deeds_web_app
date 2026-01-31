@@ -11,7 +11,7 @@
 </script>
 
 <button
-  class="flex items-center w-full px-3 py-2 text-sm text-left hover: bg-gray-100, dark:hover:bg-gray-700, focus: bg-gray-100, dark, focus:bg-gray-700 focus:outline-none"
+  class="flex items-center w-full px-3 py-2 text-sm text-left hover: bg-gray-100, dark:hover:bg-gray-700, focus: bg-gray-100, dark: focus:bg-gray-700 focus:outline-none"
   {disabled}
   onclick={() => handleSelect()}
 >

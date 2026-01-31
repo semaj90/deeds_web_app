@@ -307,7 +307,7 @@
 
 				<div class="results-grid">
 					{#each searchResults as result (result.id)}
-						<div class="result-card" style="--score, {result.score}">
+						<div class="result-card" style="--score: {result.score}">
 							<div class="result-header">
 								<span class="score">{(result.score * 100).toFixed(1)}%</span>
 								<span class="source">{result.source}</span>
@@ -436,7 +436,7 @@
 				</div>
 
 				<div class="progress-bar">
-					<div class="progress-fill" style="width, {pipelineProgress}%"></div>
+					<div class="progress-fill" style="width: {pipelineProgress}%"></div>
 					<span class="progress-text">{pipelineProgress}%</span>
 				</div>
 

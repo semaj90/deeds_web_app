@@ -276,15 +276,15 @@ import type { Message } from '$lib/types';
         <CardContent>
           <div class="grid grid-cols-3 gap-4">
             <div class="flex items-center">
-              <div class="{wasmSupported ? 'bg-green-500' , 'bg-red-500'} w-3 h-3"></div>
+              <div class="{wasmSupported ? 'bg-green-500' : 'bg-red-500'} w-3 h-3"></div>
               <span>WebAssembly</span>
             </div>
             <div class="flex items-center">
-              <div class="{webglSupported ? 'bg-green-500' , 'bg-yellow-500'} w-3 h-3"></div>
+              <div class="{webglSupported ? 'bg-green-500' : 'bg-yellow-500'} w-3 h-3"></div>
               <span>WebGL</span>
             </div>
             <div class="flex items-center">
-              <div class="{sharedMemorySupported ? 'bg-green-500' , 'bg-yellow-500'} w-3 h-3"></div>
+              <div class="{sharedMemorySupported ? 'bg-green-500' : 'bg-yellow-500'} w-3 h-3"></div>
               <span>SharedMemory</span>
             </div>
           </div>
@@ -358,7 +358,7 @@ import type { Message } from '$lib/types';
             <span>{processingProgress}%</span>
           </div>
           <div class="w-full bg-secondary rounded-full">
-            <div class="bg-primary h-2 rounded-full transition-all" style="width, {processingProgress}%"></div>
+            <div class="bg-primary h-2 rounded-full transition-all" style="width: {processingProgress}%"></div>
           </div>
         </Alert>
       {/if}

@@ -267,7 +267,7 @@ import type { Case } from '$lib/types';
   <div
     bind:this={messagesContainer}
     class="mx-auto px-4 max-w-7xl"
-    style="height, calc({height} - 140px);"
+    style="height: calc({height} - 140px);"
   >
     {#if $currentConversation?.messages.length === 0}
       <!-- Enhanced: Welcome, Message -->

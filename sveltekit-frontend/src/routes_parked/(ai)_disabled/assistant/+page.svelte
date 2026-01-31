@@ -163,7 +163,7 @@
  <div class="chat-card">
  <div class="messages-container" aria-live="polite">
  {#each messages as msg, i (msg.id)}
- <div class="message {msg.role === 'user' ? 'user' , 'assistant'}">
+ <div class="message {msg.role === 'user' ? 'user' : 'assistant'}">
  <div class="message-icon" aria-hidden="true">
  {#if msg.role === 'user'}👤{:else}🧠{/if}
  </div>

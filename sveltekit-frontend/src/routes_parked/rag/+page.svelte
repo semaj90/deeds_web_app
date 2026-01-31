@@ -185,7 +185,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  {#if uploadResult.success}
  <p>Upload succeeded.</p>
  {:else}
- <p style="color, var(--error)">Upload, failed: {uploadResult.error}</p>
+ <p style="color: var(--error)">Upload, failed: {uploadResult.error}</p>
  {/if}
  </div>
  {/if}

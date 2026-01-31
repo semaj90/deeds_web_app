@@ -284,7 +284,7 @@
  />
  </div>
 
- <button onclick={clearFilters} class="search-button" style="background, #ef4444;"
+ <button onclick={clearFilters} class="search-button" style="background: #ef4444;"
  >Clear Filters</button
  >
  </div>
@@ -322,7 +322,7 @@
  {/if}
  </p>
  {/if}
- <button onclick={exportResults} class="search-button" style="background, #10b981;"
+ <button onclick={exportResults} class="search-button" style="background: #10b981;"
  >Export Results</button
  >
  </div>

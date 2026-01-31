@@ -353,7 +353,7 @@ https, //svelte.dev/e/js_parse_error -->
         <p>Current Action <code>{userActions[currentActionIndex]}</code></p>
 
         <div class="progress-bar">
-          <div class="progress-fill" style="width, {((currentActionIndex + 1) / userActions.length) * 100}%"></div>
+          <div class="progress-fill" style="width: {((currentActionIndex + 1) / userActions.length) * 100}%"></div>
         </div>
       </div>
     {:else if demoStage === 'completed'}
@@ -639,7 +639,7 @@ https, //svelte.dev/e/js_parse_error -->
   {#if initError}
         <p class="error">Init error: {initError}</p>
       {/if}
-  <div class="placeholder" style="width, {Math.min(width,600)}px;height, {Math.min(height,300)}px">
+  <div class="placeholder" style="width, {Math.min(width,600)}px;height, {Math.min(height:300)}px">
         <svg width="100%" height="100%" viewBox=" 0 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
           <rect width="100%" height="100%" rx="8" fill="#eef2ff" />
           <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4b5563" font-size="14">

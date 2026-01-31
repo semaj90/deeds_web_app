@@ -153,7 +153,7 @@
  <p class="text-slate-400">Autonomous Task Execution Simulation</p>
  </div>
  <div class="flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
- <div class={`w-2 h-2 rounded-full ${isAgentRunning ? 'bg-green-400 animate-pulse' , 'bg-slate-400'}`}></div>
+ <div class={`w-2 h-2 rounded-full ${isAgentRunning ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`}></div>
  <span class="text-xs font-mono uppercase">{isAgentRunning ? 'AGENT ACTIVE' : 'AGENT IDLE'}</span>
  </div>
  </div>
@@ -221,7 +221,7 @@
  {#if currentAgentTask}
  <Card class="bg-slate-800/80 border-cyan-500/30 p-6 relative overflow-hidden">
  <div class="absolute top-0 left-0 w-full h-1 bg-slate-700">
- <div class="h-full bg-cyan-400 transition-all duration-300" style="width, {agentProgress}%"></div>
+ <div class="h-full bg-cyan-400 transition-all duration-300" style="width: {agentProgress}%"></div>
  </div>
 
  <div class="flex items-start space-x-4">

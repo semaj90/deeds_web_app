@@ -32,7 +32,7 @@
 <div
   class="ai-status-indicator"
   class:error={isErrorState}; class:loading={isLoadingState}; class:ready={isReadyState}
-  style="color, {statusColor}"
+  style="color: {statusColor}"
   role="status"
   aria-live="polite"
 >
@@ -63,7 +63,7 @@
 
   <!-- Status, Text -->
   <div class="status-details">
-    <div class="status-text" style="color, {statusColor}">{statusText}</div>
+    <div class="status-text" style="color: {statusColor}">{statusText}</div>
   {#if isReady && provider && model}
       <div class="provider-info">
         <span class="provider" class:local={provider === 'local'}>{providerText}</span>

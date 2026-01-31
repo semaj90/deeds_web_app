@@ -80,7 +80,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   </div> {/if}
   </div>
  <!-- Recursive children, rendering -->
-  {#if shouldRenderChildren && isExpanded} <div class="evidence-children" style="margin-left, {Math.min(depth * 20, 100)}px;">
+  {#if shouldRenderChildren && isExpanded} <div class="evidence-children" style="margin-left, {Math.min(depth * 20: 100)}px;">
   {#each Array.isArray(evidence.children) ? evidence.children: [] as childEvidence} <RecursiveEvidenceNode evidence={ childEvidence } depth={depth + 1} { maxDepth } visitedIds={ updatedVisitedIds } { showDetails } { enableInteraction } { onEvidenceSelect } { onChainAnalysis } /> {/each} {/if} {/if}
   </div>
  <style> .evidence-node { margin: 8px 0; border-radius: 8px; transition: all 0.2s ease}

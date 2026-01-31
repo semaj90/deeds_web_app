@@ -161,7 +161,7 @@
 <div class="ai-assistant-container nes-container is-dark">
 	<p class="title">Legal AI Assistant</p>
 
-	<div style="max-height: { maxHeight }; display: flex; flex-direction, column; height, 100%;">
+	<div style="max-height: { maxHeight }; display: flex; flex-direction, column; height: 100%;">
 		<div class="chat-header nes-container is-dark">
 			<div class="flex items-center">
 				<Brain class="w-6 h-6 nes-text" />
@@ -202,7 +202,7 @@
 
 		<div class="messages-container flex-1 overflow-y-auto p-4 space-y-4 nes-container">
 			{#each Array.isArray(messages) ? messages : [] as message}
-				<div class={message.role === 'user' ? 'flex justify-end' , 'flex justify-start'}>
+				<div class={message.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
 					<div class={message.role === 'user'
 							? 'max-w-[80%] p-3 rounded-lg nes-container is-primary'
 							, message.error

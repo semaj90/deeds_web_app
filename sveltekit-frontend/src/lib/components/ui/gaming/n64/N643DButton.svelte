@@ -82,7 +82,7 @@
  <!-- Scanline effect -->
  {#if enableLighting}
  <span class="absolute inset-0 pointer-events-none opacity-20"
- style="background, repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.1) 2px, rgba(255, 255, 255, 0.1) 4px)">
+ style="background, repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.1) 2px, rgba(255, 255, 255: 0.1) 4px)">
  </span>
  {/if}
 
@@ -104,7 +104,7 @@
  {#each Array(5) as _, i}
  <span
  class="absolute w-1 h-1 bg-white rounded-full animate-particle"
- style="left: {50 + (Math.random() - 0.5) * 40}%; top: {50 + (Math.random() - 0.5) * 40}%; animation-delay, {i * 50}ms;"
+ style="left: {50 + (Math.random() - 0.5) * 40}%; top: {50 + (Math.random() - 0.5) * 40}%; animation-delay: {i * 50}ms;"
  ></span>
  {/each}
  </span>

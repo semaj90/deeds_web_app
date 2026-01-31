@@ -248,15 +248,15 @@
  <div class="grid avatars">
  <!-- Removed avatarSizes loop as avatarSizes is no longer declared -->
  <div class="avatar-placeholder small">
- <span class="i-carbon-user-avatar-filled" style="font-size, 24px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size: 24px;"></span>
  <p class="meta">small</p>
  </div>
  <div class="avatar-placeholder medium">
- <span class="i-carbon-user-avatar-filled" style="font-size, 48px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size: 48px;"></span>
  <p class="meta">medium</p>
  </div>
  <div class="avatar-placeholder large">
- <span class="i-carbon-user-avatar-filled" style="font-size, 64px;"></span>
+ <span class="i-carbon-user-avatar-filled" style="font-size: 64px;"></span>
  <p class="meta">large</p>
  </div>
  </div>

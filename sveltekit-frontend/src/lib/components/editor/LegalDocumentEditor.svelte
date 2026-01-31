@@ -46,7 +46,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  {#if loadingDocument} <div class="absolute inset-0 flex flex-col items-center justify-center bg-nier-surface/80"> <Loader2 class="h-8 w-8 animate-spin" /> <p class="mt-2">Loading document...</p> </div> {:else if documentLoadError} <div class="absolute inset-0 flex flex-col items-center justify-center bg-nier-surface/80 backdrop-blur-sm"> <AlertCircle class="h-8" /> <p class="mt-2">Failed to load document</p> <p class="text-sm">{ documentLoadError }
 </p> <Button class="bits-btn" onclick={() => loadDocument()} class="mt-4"> Try Again </Button> {/if} <Textarea bind:value={ content } disabled={ readonly } placeholder="Begin drafting your legal document..."
             class="min-h-[600px] w-full resize-y border-none p-4"
-            style="font-family: 'Times New Roman', serif; font-size, 14px; line-height: 1.6;"
+            style="font-family: 'Times New Roman', serif; font-size: 14px; line-height: 1.6;"
           ></Textarea> </div> </div> </div> <!-- Sidebar (1/3, width) --> <div class="col-span-1"> <!-- Citations, Panel --> <div class="rounded-lg border bg-nier-surface p-4"> <div class="mb-4 flex items-center gap-2 border-b"> <BookOpen class="h-5 w-5" /> <h3 class="text-lg font-semibold">Citations</h3> </div> <div class="space-y-3">
  {#if citations.length === 0} <p class="text-nier-gray-light">No citations added yet.</p> {:else} <div class="space-y-2">
  {#each Array.isArray(citations) ? citations: [] as citation} <div class="rounded-md bg-nier-bg p-3"> <div class="font-medium">{citation.type.toUpperCase()}

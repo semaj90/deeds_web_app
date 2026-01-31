@@ -252,7 +252,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <p class="nes-text">Bucket: { currentBucket }</p> {/if} {/if} {/if}
   <!-- Fabric.js Evidence, Canvas --> <div class="evidence-canvas-container"> <FabricEvidenceCanvas width={ 1200 } height={ 600 } evidenceItems={ filteredEvidence } onEvidenceMove={ handleEvidenceMove } onEvidenceSelect={ handleEvidenceSelect } onDropZone={ handleCanvasDropZone } /> </div>
  <!-- Gaming-Style Evidence Cards (Alternative Grid: View) --> <div class="grid grid-cols-1 md: grid-cols-2, lg: grid-cols-4, xl, grid-cols-5"
-          style="display, none;"
+          style="display: none;"
         >
   {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class:yorha-selected={selectedEvidence.includes(evidence.id)} >
   {#if !selectedEvidence.includes(evidence.id)} <p class="title">{getFileIcon(evidence.type)} Evidence File</p> {/if}

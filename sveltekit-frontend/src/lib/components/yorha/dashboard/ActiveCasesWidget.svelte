@@ -140,7 +140,7 @@
  <div class="w-full bg-slate-600 rounded-full h-1.5">
  <div
  class="h-1.5 rounded-full bg-cyan-400 transition-all duration-300"
- style="width, {caseItem.progress}%"
+ style="width: {caseItem.progress}%"
  ></div>
  </div>
  <div class="text-xs text-slate-400 mt-1">{caseItem.progress}% complete</div>

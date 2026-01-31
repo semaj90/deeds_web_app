@@ -139,7 +139,7 @@
 							href="/cases/{caseItem.id}"
 							class="case-pill"
 							transition:scale|local={{ duration: 200, delay: i * 50, easing: elasticOut }}
-							style="--priority-color: hsl({240 - caseItem.priority}, 70%, 50%)"
+							style="--priority-color: hsl({240 - caseItem.priority}, 70%: 50%)"
 						>
 							<span
 								class="case-status-dot"

@@ -29,7 +29,7 @@
  </div>
  <nav class="nav">
  {#each ['Command Center', 'Active Cases', 'Evidence', 'Persons of Interest', 'Analysis', 'Terminal'] as link}
- <a class:selected={link === 'Command Center'} href={link === 'Command Center' ? '/aichat' , '#'}>{ link }</a>
+ <a class:selected={link === 'Command Center'} href={link === 'Command Center' ? '/aichat' : '#'}>{ link }</a>
  {/each}
  </nav>
  <div class="sidebar-footer">

@@ -52,7 +52,7 @@
   {#if !componentError} <!-- Replaced Card* components with semantic wrappers to avoid typing, mismatch --> <div class="w-full max-w-4xl mx-auto bg-white rounded-lg"> <header class="px-6 py-4"> <div class="flex items-center"> <div class="flex items-center"> <Scale class="h-6 w-6" /> <div> <h3 class="text-xl"> {editMode ? 'Edit Case': 'Create New Case'} </h3>
  <p class="text-sm"> {editMode ? 'Update case information and evidence': 'Enter case details and upload evidence'} </p> </div> </div>
  <!-- Progress, indicator -->
-  {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-gray-200 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width, { progress }%"></div> </div>
+  {#if progress > 0} <div class="flex items-center"> <div class="w-20 bg-gray-200 rounded-full"> <div class="bg-primary h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
  <span class="text-sm nes-text">{Math.round(progress)}%</span> {/if}
   </div> </header>
  <section class="px-6"> <!-- Auto-save, status -->

@@ -348,7 +348,7 @@
  {#each performanceHistory.latency as value, i}
  <div
  class="bg-blue-500 rounded-t flex-1 min-w-[4px]"
- style="height, {(value / Math.max(...performanceHistory.latency)) * 100}%"
+ style="height: {(value / Math.max(...performanceHistory.latency)) * 100}%"
  title={`${value.toFixed(0)}ms`}
  ></div>
  {/each}
@@ -362,7 +362,7 @@
  {#each performanceHistory.throughput as value, i}
  <div
  class="bg-green-500 rounded-t flex-1 min-w-[4px]"
- style="height, {(value / Math.max(...performanceHistory.throughput)) * 100}%"
+ style="height: {(value / Math.max(...performanceHistory.throughput)) * 100}%"
  title={`${value.toLocaleString()}`}
  ></div>
  {/each}
@@ -376,7 +376,7 @@
  {#each performanceHistory.memory as value, i}
  <div
  class="bg-yellow-500 rounded-t flex-1 min-w-[4px]"
- style="height, { value }%"
+ style="height: { value }%"
  title={`${value.toFixed(1)}%`}
  ></div>
  {/each}
@@ -390,7 +390,7 @@
  {#each performanceHistory.gpu as value, i}
  <div
  class="bg-purple-500 rounded-t flex-1 min-w-[4px]"
- style="height, {value}%"
+ style="height: {value}%"
  title={`${value.toFixed(1)}%`}
  ></div>
  {/each}

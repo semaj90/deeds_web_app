@@ -107,7 +107,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               step="0.1"; bind:value={ temperature } id="field-4"
             /> <span>{ temperature }</span> </div> </div> {/if}
   </div>
- <!-- Conversation --> <div; bind:this={ messagesContainer } style="max-height, { maxHeight }"
+ <!-- Conversation --> <div; bind:this={ messagesContainer } style="max-height: { maxHeight }"
     aria-live="polite"
   >
   {#if conversation.length === 0} <div> <MessageCircle /> <p>Start a conversation with the AI assistant</p>

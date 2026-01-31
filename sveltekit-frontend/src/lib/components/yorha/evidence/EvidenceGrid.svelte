@@ -147,13 +147,13 @@
  <!-- View Mode Toggle -->
  <div class="flex bg-slate-700/50 rounded-lg p-1">
  <button
- class="p-1 rounded {viewMode === 'grid' ? 'bg-cyan-400/20 text-cyan-400' , 'text-slate-400'}"
+ class="p-1 rounded {viewMode === 'grid' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-400'}"
  onclick={() => viewMode = 'grid'}
  >
  ⊞
  </button>
  <button
- class="p-1 rounded {viewMode === 'list' ? 'bg-cyan-400/20 text-cyan-400' , 'text-slate-400'}"
+ class="p-1 rounded {viewMode === 'list' ? 'bg-cyan-400/20 text-cyan-400' : 'text-slate-400'}"
  onclick={() => viewMode = 'list'}
  >
  ☰

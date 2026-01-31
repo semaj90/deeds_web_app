@@ -188,7 +188,7 @@
  {:else}
  {#each $items as item (item.id)}
  <div
- class="item-card {$selectedItem?.id === item.id ? 'active' , ''}"
+ class="item-card {$selectedItem?.id === item.id ? 'active' : ''}"
  onclick={() => selectedItem.set(item)}
  >
  <div class="item-header">

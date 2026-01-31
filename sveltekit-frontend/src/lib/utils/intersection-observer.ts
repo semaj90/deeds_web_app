@@ -205,6 +205,7 @@ export interface LazyComponentState {
   isVisible: boolean;
   hasBeenVisible: boolean;
   intersectionRatio: number;
+  isLoaded?: boolean;
 }
 
 export function createLazyStore(initialState: Partial<LazyComponentState> = {}) {

@@ -60,12 +60,12 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </span>
  <span>{Math.round((currentJob.progress.currentStep / currentJob.progress.totalSteps) * 100)}%</span> </div>
  <div class="w-full bg-gray-700 rounded-full"> <div class="bg-cyan-500 h-2 rounded-full transition-all"
-                style="width, {(currentJob.progress.currentStep / currentJob.progress.totalSteps) * 100}%"
+                style="width: {(currentJob.progress.currentStep / currentJob.progress.totalSteps) * 100}%"
               ></div> </div> </div>
   {#if uploadProgress > 0 && uploadProgress < 100} <div> <div class="flex justify-between text-sm text-gray-400"> <span>File Upload</span>
  <span>{Math.round(uploadProgress)}%</span> </div>
  <div class="w-full bg-gray-700 rounded-full"> <div class="bg-green-500 h-2 rounded-full transition-all duration-300"
-                  style="width, { uploadProgress }%"
+                  style="width: { uploadProgress }%"
                 ></div> </div> {/if}
   </div>
  <!-- Training, Metrics --> <div class="grid grid-cols-2 lg, grid-cols-4"> <div class="bg-gray-800/50 p-3 rounded border"> <p class="text-gray-400">Loss</p>

@@ -95,7 +95,7 @@
     aria-multiline="true"
     { placeholder } oninput={ handleInput } onkeydown={ handleKeyDown } >
     { value } </div> <!-- AI Suggestions, Popup --> {#if isShowingSuggestions && currentSuggestions.length > 0} <div bind:this={ suggestionPopup } class="suggestions-popup"
-      style="left, {cursorPosition.x}px; top, {cursorPosition.y}px;"
+      style="left, {cursorPosition.x}px; top: {cursorPosition.y}px;"
     > <div class="suggestions-header"> <span class="suggestions-title">AI Suggestions</span> {#if isProcessing} <div class="processing-indicator">â—{/if} </div> <div class="suggestions-list"> {#each currentSuggestions as suggestion, index} <button class="suggestion-item {index === selectedSuggestionIndex ? 'selected', ''}"
             onclick={() => applySuggestion(suggestion)} type="button"
           > <div class="suggestion-content"> <span class="suggestion-text">{suggestion.text}</span> <span class="suggestion-type">{suggestion.type}</span> </div> <div class="suggestion-meta"> <span class="confidence">{Math.round(suggestion.confidence * 100)}%</span> <span class="reasoning">{suggestion.reasoning}</span> </div> </button> {/each} </div> <div class="suggestions-footer"> <span class="keyboard-hint">â†‘â†“ Navigate â€¢ Enter/Tab Apply â€¢ Esc Close</span> </div> {/if} </div> <style> .enhanced-inline-editor { position: relative; /*, Fixed: missing colon */ font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system: BlinkMacSystemFont)}

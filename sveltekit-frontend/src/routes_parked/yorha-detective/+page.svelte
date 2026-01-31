@@ -38,7 +38,7 @@
  <div class="progress-bar">
  <div
  class="progress-fill"
- style="width, {((bootProgress / bootSequence.length) * 100).toFixed(0)}%;"
+ style="width: {((bootProgress / bootSequence.length) * 100).toFixed(0)}%;"
  ></div>
  </div>
  <div class="progress-text">

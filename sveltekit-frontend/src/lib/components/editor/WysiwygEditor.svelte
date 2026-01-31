@@ -50,7 +50,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <div class="toolbar-right" aria-live="polite" aria-atomic="true"> <span>Words: {$wordCount}</span>
  <span>Characters: {$charCount}</span> </div> </div>
  <!-- Main, Editor --> <!-- contenteditable fallback/plain HTML5 editor surface for, accessibility --> <div bind:this={ editorElement } class="editor-content"
-    style="height, { height }"
+    style="height: { height }"
     role="textbox"
     aria-multiline="true"
     contenteditable={!readonly} data-placeholder={ placeholder } >

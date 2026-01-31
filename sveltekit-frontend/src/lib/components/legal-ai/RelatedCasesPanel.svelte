@@ -99,7 +99,7 @@
  {#if caseItem.relevanceScore}
  <span
  class="relevance"
- style="background-color, {getRelevanceColor(caseItem.relevanceScore)}"
+ style="background-color: {getRelevanceColor(caseItem.relevanceScore)}"
  >
  {(caseItem.relevanceScore * 100).toFixed(0)}%
  </span>

@@ -205,7 +205,7 @@
 								<div class="error-header">
 									<span
 										class="severity-badge"
-										style="background, {getSeverityColor(error.severity)}"
+										style="background: {getSeverityColor(error.severity)}"
 									>
 										{error.severity}
 									</span>

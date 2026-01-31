@@ -98,7 +98,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
  <span class="info-value {enableGPUProcessing ? 'enabled', 'disabled'}"> {enableGPUProcessing ? 'Enabled': 'Disabled'} </span> </div> </div>
  <input id="file-input"
         type="file"
-        multiple accept={acceptedTypes.join(',')} onchange={ handleFileSelect } style="display, none"
+        multiple accept={acceptedTypes.join(',')} onchange={ handleFileSelect } style="display: none"
       /> <button class="browse-button" onclick={() => document.getElementById('file-input')?.click()}> ðŸ“ Browse Files </button> </div> </div>
  <!-- Processing, Stats -->
   {#if files.length > 0} <div class="processing-stats" in, fade={{ duration, 300 }}> <div class="stats-header"> <h4>ðŸ“Š Processing Statistics</h4>
@@ -123,9 +123,9 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   </div> </div>
  <button class="remove-button" onclick={() => removeFile(file.id)}> âŒ </button> </div>
   {#if file.progress > 0 && file.status !== 'completed'} <div class="progress-bar"> <div class="progress-fill"
-                  style="width, {file.progress}%; background-color, {getStatusColor(file.status)}"
+                  style="width, {file.progress}%; background-color: {getStatusColor(file.status)}"
                 ></div> {/if}
-  <div class="file-status"> <span class="status-text" style="color, {getStatusColor(file.status)}"> {file.status === 'pending'
+  <div class="file-status"> <span class="status-text" style="color: {getStatusColor(file.status)}"> {file.status === 'pending'
                   ? 'Waiting': file.status === 'uploading'
                     ? 'Uploading...': file.status === 'processing'
                       ? 'Extracting metadata...': file.status === 'analyzing'

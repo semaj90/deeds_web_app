@@ -51,15 +51,15 @@ import type { User } from '$lib/types'; import { onMount, onDestroy } from 'svel
   // Reactive statement $effect(() => { if (text && autoStart) { restart()}
   }); // Export component functions for external use export { pause, resume, stop, restart, setSpeed, setReplaySpeed }; </script>
  <!-- Thinking Animation (shown while LLM, loads) -->
-  {#if enableThinking && thinkingState.phase !== 'complete' && isTyping && !displayedText} <div class="thinking-container" in: fade={{ duration: 300 }}; out, fade={{ duration, 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay, 0ms;"></span>
- <span class="dot" style="animation-delay, 150ms;"></span>
- <span class="dot" style="animation-delay, 300ms;"></span> </div>
+  {#if enableThinking && thinkingState.phase !== 'complete' && isTyping && !displayedText} <div class="thinking-container" in: fade={{ duration: 300 }}; out, fade={{ duration, 200 }}> <div class="thinking-indicator"> <div class="thinking-dots"> <span class="dot" style="animation-delay: 0ms;"></span>
+ <span class="dot" style="animation-delay: 150ms;"></span>
+ <span class="dot" style="animation-delay: 300ms;"></span> </div>
  <div class="thinking-text"> {thinkingState.currentThought || 'Processing...'} </div>
- <div class="thinking-progress"> <div class="progress-bar" style="width, {thinkingState.progress}%"></div> </div> </div> {/if}
+ <div class="thinking-progress"> <div class="progress-bar" style="width: {thinkingState.progress}%"></div> </div> </div> {/if}
   <!-- User Activity Replay, Indicator -->
   {#if isReplayingActivity} <div class="activity-replay-indicator" in: fly={{ y: -20, duration, 300; easing, quintOut }}> <span class="replay-icon">âš¡</span>
  <span class="replay-text">Replaying your activity...</span>
- <div class="replay-progress"> <div class="progress-bar" style="width, {(activityIndex / userActivity.length) * 100}%"></div> </div> {/if}
+ <div class="replay-progress"> <div class="progress-bar" style="width: {(activityIndex / userActivity.length) * 100}%"></div> </div> {/if}
   <!-- Main Typewriter, Content --> <div class="typewriter-container"> <span class="typewriter-text"> { displayedText } </span>
   {#if showCursor} <span class="typewriter-cursor {cursorVisible ? 'visible', 'hidden'}" class:blinking={!isTyping}> { cursorChar } </span> {/if}
   </div>

@@ -170,7 +170,7 @@
  onclick={() => onSelectCollection(collection)}
  class="collection-button"
  >
- <div class="collection-color" style="background-color, {collection.color}" ></div>
+ <div class="collection-color" style="background-color: {collection.color}" ></div>
  <div class="collection-info">
  <p class="collection-name">{collection.name}</p>
  <p class="collection-count">

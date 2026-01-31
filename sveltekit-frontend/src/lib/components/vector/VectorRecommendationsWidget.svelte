@@ -152,7 +152,7 @@ Compact AI recommendations component for sidebar/dashboard use
     <h3 class="nes-text is-primary flex items-center">
       <div class="flex items-center">
         <Lightbulb class="h-4 w-4" />
-        <span class="{compact ? 'text-sm' , 'text-base'}">AI Recommendations</span>
+        <span class="{compact ? 'text-sm' : 'text-base'}">AI Recommendations</span>
         {#if recommendations.length > 0}
           <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{recommendations.length}</span>
         {/if}

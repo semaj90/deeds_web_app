@@ -133,7 +133,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   <!-- Processing, Progress -->
   {#if isProcessing} <div class="space-y-4"> <div class="flex items-center"> <h3 class="font-medium">Processing Evidence</h3>
  <span class="text-sm">{ progress }% Complete</span> </div>
- <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width, { progress }%"></div> </div>
+ <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: { progress }%"></div> </div>
  <!-- Current Step, Display --> <div class="space-y-2">
   {#each Array.isArray(currentState.context.streamingUpdates || []) ? currentState.context.streamingUpdates ?? []: [] as update} <div class="flex items-center justify-between"> <div class="flex items-center">
   {#if update.status === 'completed'} <span class="text-green-600">âœ…</span> {:else if update.status === 'in_progress'} <div class="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent"></div> {:else if update.status === 'error'} <span class="text-red-600">âŒ</span> {:else} <span class="text-gray-400">â³</span> {/if}

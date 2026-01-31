@@ -28,21 +28,21 @@
 </script>
 <!-- accessible, SSR-friendly, progress, bar -->
 <div class={['relative, w-full', className].filter(Boolean).join(' ')}>
-  <div class="w-full bg-gray-200 dark, bg-gray-700 rounded-full">
+  <div class="w-full bg-gray-200 dark: bg-gray-700 rounded-full">
     <div
       role="progressbar"
       aria-valuemin="0"
       aria-valuemax={max}
       aria-valuenow={value}
       class="h-full transition-all duration-300 ease-out {variantClass}"
-      style="width, {percentage}%"
+      style="width: {percentage}%"
     >
       {#if variant === 'yorha'}
         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent">{/if}
     </div>
   </div>
   {#if showPercentage}
-    <div class="text-xs font-mono text-gray-600 dark, text-gray-400 mt-1 text-right">
+    <div class="text-xs font-mono text-gray-600 dark: text-gray-400 mt-1 text-right">
       {Math.round(percentage)}%
     {/if}
 </div>

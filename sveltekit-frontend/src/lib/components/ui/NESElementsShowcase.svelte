@@ -5,7 +5,7 @@
 </script>
 
 <!-- HTML5: Semantic, Elements -->
-<article class="nes-container" style="display, {visible ? 'block' , 'none'}">
+<article class="nes-container" style="display: {visible ? 'block' : 'none'}">
   <p class="title">NES.css Elements Showcase</p>
   <header>
     <h1>Main Title (H1)</h1>

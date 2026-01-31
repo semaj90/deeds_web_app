@@ -120,7 +120,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width, {gpuMetrics.utilization}%"
+ style="width: {gpuMetrics.utilization}%"
  ></div>
  </div>
  </div>
@@ -136,7 +136,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width, {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
+ style="width: {(gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100}%"
  ></div>
  </div>
  </div>
@@ -168,7 +168,7 @@
  {#each performanceHistory as point}
  <div
  class="bg-cyan-400/60 rounded-sm flex-1 transition-all duration-200"
- style="height, {point.utilization}%"
+ style="height: {point.utilization}%"
  ></div>
  {/each}
  </div>

@@ -67,7 +67,7 @@
  <span>{isInitialized ? 'Online': 'Initializing'}</span> </div> </div>
  <div class="initialization-progress">
   {#each Array.isArray(progressStages) ? progressStages: [] as stage} <div class="stage" class:active={stage.status === 'active'}; class:completed={stage.status === 'completed'}> <div class="stage-name">{stage.name}</div>
- <div class="stage-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, {stage.progress * 100}%"></div> </div>
+ <div class="stage-progress"> <div class="progress-bar"> <div class="progress-fill" style="width: {stage.progress * 100}%"></div> </div>
  <span class="progress-text">{(stage.progress * 100).toFixed(0)}%</span> </div> </div> {/each}
   </div>
  <div class="performance-metrics"> <div class="metric"><span class="metric-label">FPS</span>

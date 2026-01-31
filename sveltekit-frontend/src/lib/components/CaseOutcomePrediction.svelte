@@ -343,10 +343,10 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			</div>
 
 			<div class="form-section">
-				<div class="section-header" onclick={() => showAdvanced.update(v => !v)}>
+				<button type="button" class="section-header" onclick={() => showAdvanced.update(v => !v)}>
 					<h3>Advanced Analysis Options</h3>
 					<span class="toggle-icon">{$showAdvanced ? '▼' : '▶'}</span>
-				</div>
+				</button>
 
 				{#if $showAdvanced}
 					<div class="advanced-options">
@@ -630,7 +630,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			<h3>📚 Recent Analyses</h3>
 			<div class="history-list">
 				{#each $analysisHistory as historyItem (historyItem.id)}
-					<div class="history-item" onclick={() => loadFromHistory(historyItem)}>
+					<button type="button" class="history-item" onclick={() => loadFromHistory(historyItem)}>
 						<div class="history-header">
 							<span class="history-case">{historyItem.caseFacts}</span>
 							<span class="history-type">{historyItem.caseType}</span>
@@ -639,7 +639,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 						<div class="history-prediction">
 							{historyItem.prediction.most_likely_outcome} ({historyItem.prediction.success_probability}%)
 						</div>
-					</div>
+					</button>
 				{/each}
 			</div>
 		</div>
@@ -693,12 +693,19 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	.section-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center; cursor: pointer;
+		align-items: center;
+		cursor: pointer;
 		user-select: none;
+		width: 100%;
+		background: transparent;
+		border: none;
+		padding: 0;
+		text-align: left;
 	}
 
 	.toggle-icon {
-		font-size: 1.2rem; color: #7f8c8d;
+		font-size: 1.2rem;
+		color: #7f8c8d;
 		transition: transform 0.2s;
 	}
 
@@ -1048,19 +1055,25 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.history-list {
 		display: flex;
-		flex-direction: column; gap: 1rem;
+		flex-direction: column;
+		gap: 1rem;
 	}
 
 	.history-item {
-		padding: 1rem; background: #f8f9fa;
-		border-radius: 8px; cursor: pointer;
+		padding: 1rem;
+		background: #f8f9fa;
+		border-radius: 8px;
+		cursor: pointer;
 		transition: all 0.2s;
 		border: 1px solid #ecf0f1;
+		width: 100%;
+		text-align: left;
 	}
 
 	.history-item:hover {
 		background: #e9ecef;
-		border-color: #3498db; transform: translateY(-1px);
+		border-color: #3498db;
+		transform: translateY(-1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
@@ -1072,7 +1085,8 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	.history-case {
-		font-weight: 600; color: #2c3e50;
+		font-weight: 600;
+		color: #2c3e50;
 		flex: 1;
 		margin-right: 1rem;
 	}

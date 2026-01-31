@@ -103,13 +103,13 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div.Description class="recommendation-description"> {recommendation.description}
 </div.Description> </CardHeader>
  <CardContent> <div class="recommendation-stats"> <div class="stat-grid"> <div class="stat"> <span class="stat-label">Impact</span>
- <div class="stat-bar"> <div class="stat-fill" style="width, {recommendation.impact}%"></div> </div>
+ <div class="stat-bar"> <div class="stat-fill" style="width: {recommendation.impact}%"></div> </div>
  <span class="stat-value">{recommendation.impact}%</span> </div>
  <div class="stat"> <span class="stat-label">Effort</span>
- <div class="stat-bar"> <div class="stat-fill" style="width, {recommendation.effort}%"></div> </div>
+ <div class="stat-bar"> <div class="stat-fill" style="width: {recommendation.effort}%"></div> </div>
  <span class="stat-value">{recommendation.effort}%</span> </div>
  <div class="stat"> <span class="stat-label">Risk</span>
- <div class="stat-bar"> <div class="stat-fill" style="width, {calculateRiskScore(recommendation.risks)}%"></div> </div>
+ <div class="stat-bar"> <div class="stat-fill" style="width: {calculateRiskScore(recommendation.risks)}%"></div> </div>
  <span class="stat-value">{calculateRiskScore(recommendation.risks).toFixed(0)}%</span> </div> </div> </div>
  <div class="recommendation-preview"> <div class="steps-preview"> <h4>Action Steps ({recommendation.steps.length}):</h4>
  <ol class="steps-list">

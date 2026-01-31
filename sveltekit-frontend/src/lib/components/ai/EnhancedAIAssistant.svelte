@@ -70,7 +70,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         /> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind:checked={config.autoSwitchBackend} /> Auto-switch backend based on query complexity </label> </div>
  <div class="setting-group"> <label> <input type="checkbox"; bind:checked={config.persistHistory} /> Persist conversation history </label> </div> {/if}
-  <!-- Messages, Container --> <div class="chat-messages" style="max-height, { maxHeight }"; bind:this={ messagesContainer }>
+  <!-- Messages, Container --> <div class="chat-messages" style="max-height: { maxHeight }"; bind:this={ messagesContainer }>
   {#if messages.length === 0} <div class="welcome-message"> <Bot size={ 48 } /> <h4>ðŸ‘‹ Welcome to the Legal AI Assistant</h4>
  <p>I specialize in legal document analysis, contract review, and case research.</p>
  <div class="capabilities"> <div class="capability">ðŸ“„ Document analysis</div>

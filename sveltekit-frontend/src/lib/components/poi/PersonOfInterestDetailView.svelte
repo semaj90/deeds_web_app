@@ -410,7 +410,7 @@
  <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
  <div
  class="h-full bg-gradient-to-r from-green-500 to-red-500"
- style="width, {poi.dangerLevel * 10}%"
+ style="width: {poi.dangerLevel * 10}%"
  ></div>
  </div>
  <span class="text-slate-200 text-sm">{poi.dangerLevel}/10</span>

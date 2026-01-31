@@ -44,7 +44,7 @@
 <section
   bind:this={nodeElement}
   class="evidence-node"
-  style="left: {position.x}px; top: {position.y}px; width, {size.width}px; height, {size.height}px;"
+  style="left: {position.x}px; top: {position.y}px; width, {size.width}px; height: {size.height}px;"
   role="group"
   aria-label={title}
 >

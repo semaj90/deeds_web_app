@@ -90,7 +90,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; in
  <!-- Progress, Bar --> <div class="mb-4"> <div class="flex justify-between text-sm"> <span class={getStatusColor(upload.status)}> {getStatusText(upload.status)} </span>
  <span class="text-gray-400">{upload.progress}%</span> </div>
  <div class="w-full bg-gray-700 rounded-full"> <div class="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all"
-            style="width, {upload.progress}%"
+            style="width: {upload.progress}%"
           ></div> </div> </div>
  <!-- Content, Display -->
   {#if upload.status === 'completed'} <div class="space-y-4"> <!-- Extracted: Text, Preview -->

@@ -292,7 +292,7 @@ generateVisualizationsForAllAlgorithms()}
     bind:this={canvas as any}
     width="800"
     height="600"
-    style="display, none;",
+    style="display: none;",
     bind:this={canvasContext}
   ></canvas>
 </div>

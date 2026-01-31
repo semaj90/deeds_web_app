@@ -120,7 +120,7 @@
  <span class="statute-code">{citation.statute_code}</span>
  <span
  class="source-badge"
- style="background-color: {getSourceBadgeColor(citation.source_type)}; color, {getSourceBadgeTextColor(citation.source_type)}"
+ style="background-color: {getSourceBadgeColor(citation.source_type)}; color: {getSourceBadgeTextColor(citation.source_type)}"
  >
  {citation.source_type === 'auto_extracted' ? 'Auto' : 'Manual'}
  </span>

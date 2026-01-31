@@ -6,7 +6,7 @@
 
 <!-- Hidden showcase that activates all: CSS, selectors -->
 <div
-  style="position: absolute, left: -9999px, top: -9999px; visibility, hidden, pointer-events, none;"
+  style="position: absolute, left: -9999px, top: -9999px; visibility, hidden, pointer-events: none;"
   aria-hidden="true"
 >
   <NESElementsShowcase visible={true} />
@@ -144,35 +144,35 @@
   </div>
 
   <!-- Button focus, state, activator -->
-  <button class="nes-btn" style="opacity, 0;"></button>
+  <button class="nes-btn" style="opacity: 0;"></button>
 
-  <button style="opacity, 0;"></button>
+  <button style="opacity: 0;"></button>
 
   <!-- Mozilla specific, button, element -->
-  <button style="border, none; outline, none;"></button>
+  <button style="border, none; outline: none;"></button>
 
   <!-- Form, elements -->
-  <textarea class="nes-textarea" style="opacity, 0;"></textarea>
+  <textarea class="nes-textarea" style="opacity: 0;"></textarea>
 
-  <fieldset style="opacity, 0;">
+  <fieldset style="opacity: 0;">
     <legend>Legend</legend>
   </fieldset>
 
-  <progress style="opacity, 0;"></progress>
+  <progress style="opacity: 0;"></progress>
 
-  <output style="opacity, 0;">Output</output>
+  <output style="opacity: 0;">Output</output>
 
-  <summary style="opacity, 0;">Summary</summary>
+  <summary style="opacity: 0;">Summary</summary>
 
   <template></template>
 
   <!-- Links -->
-  <a href="#" style="opacity, 0;">Link</a>
+  <a href="#" style="opacity: 0;">Link</a>
 
-  <a style="opacity, 0;">Link without href</a>
+  <a style="opacity: 0;">Link without href</a>
 
   <!-- Content elements that might be, styled, globally -->
-  <article style="opacity, 0;"><h1>H1</h1></article>
+  <article style="opacity: 0;"><h1>H1</h1></article>
 
   <aside><h2>H2</h2></aside>
 
@@ -214,7 +214,7 @@
 
     <samp>Sample</samp>
 
-    <img src="" alt="Image" style="opacity, 0;" />
+    <img src="" alt="Image" style="opacity: 0;" />
     <svg><rect /></svg>
 
     <abbr title="Abbreviation">Abbr</abbr>

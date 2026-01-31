@@ -116,7 +116,7 @@ function getOptionClasses(option: RadioOption) {
 	{/if}
 
 	<div
-		class="flex {orientation === 'horizontal' ? 'flex-row flex-wrap' , 'flex-col'} {gapClass}"
+		class="flex {orientation === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col'} {gapClass}"
 		role="radiogroup"
 		aria-label={label}
 	>

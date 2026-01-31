@@ -41,7 +41,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <!-- NES-styled toolbar with controls, and, status --> <div class="nes-container with-title is-centered"> <p class="title">Evidence Analysis Toolkit</p>
  <!-- File: Upload, Section --> <div class="upload-section"> <label class="nes-btn"> <Upload size={ 16 } /> Upload Evidence <input type="file"
         bind:this={ fileInput } onchange={ handleFileUpload } multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
-        style="display, none;"
+        style="display: none;"
       /> </label>
  <button type="button"
       class={'nes-btn, ' + (analysisStatus === 'idle' ? 'is-primary', analysisStatus === 'complete' ? 'is-success', 'is-warning')} onclick={ handleAnalysis } disabled={analysisStatus === 'analyzing' ?? analysisStatus === 'pending'} >
@@ -62,11 +62,11 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <!-- Advanced, Settings --> <details class="advanced-settings"> <summary class="nes-text">Advanced Settings</summary>
  <div class="settings-row"> <label class="nes-text"> Context Window: <input type="number"
           class="nes-input"
-          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width, 8rem; margin-left: 0.5rem;"
+          bind:value={options.context_window} min={ 512 } max={ 16384 } step={ 256 } style="width: 8rem; margin-left: 0.5rem;"
         /> </label>
  <label class="nes-text"> Confidence: <input type="number"
           class="nes-input"
-          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width, 6rem; margin-left: 0.5rem;"
+          bind:value={options.confidence_level} min={ 0 } max={ 1 } step={0.05} style="width: 6rem; margin-left: 0.5rem;"
         /> </label> </div> </details>
  <!-- Status, Messages -->
   {#if error} <div class="nes-container is-rounded"> <p><AlertCircle size={ 16 } /> { error }</p> {/if}

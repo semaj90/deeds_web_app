@@ -116,7 +116,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if uploadedFile} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p class="font-medium">{uploadedFile.name}</p>
  <p class="text-sm"> {(uploadedFile.size / 1024).toFixed(1)} KB </p>
   {#if uploadProgress > 0 && uploadProgress < 100} <div class="w-full bg-muted rounded-full"> <div class="bg-primary h-2 rounded-full transition-all"
-                              style="width, { uploadProgress }%"
+                              style="width: { uploadProgress }%"
                             ></div> {/if}
   </div> {:else} <div class="space-y-2"> <Upload class="w-8 h-8 mx-auto" /> <p>Drop file here or click to browse</p>
  <input type="file"

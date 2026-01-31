@@ -40,7 +40,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if pe(rson as CustomEvent).details} <div class="text-sm text-gray-600">
   {#if pe(rson as CustomEvent).details.age} <p>Age: {pe(rson as CustomEvent).details.age}
 </p> {/if} {#if pe(rson as CustomEvent).details.occupation} <p>Occupation {pe(rson as CustomEvent).details.occupation}
-</p> {/if} {/if} {#if person.confidence} <div class="mt-2 flex items-center"> <div class="flex-1 bg-gray-200 rounded-full"> <div class="bg-blue-500 h-1.5" style="width, {person.confidence * 100}%"></div> </div>
+</p> {/if} {/if} {#if person.confidence} <div class="mt-2 flex items-center"> <div class="flex-1 bg-gray-200 rounded-full"> <div class="bg-blue-500 h-1.5" style="width: {person.confidence * 100}%"></div> </div>
  <span class="text-xs">{Math.round(person.confidence * 100)}%</span> {/if}
   </div> {/each} {#if persons.length > 4} <div class="p-3 border rounded-lg bg-gray-50 flex items-center justify-center"> +{persons.length - 4} more persons {/if}
   </div>

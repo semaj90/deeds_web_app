@@ -229,7 +229,7 @@ Real-time collaboration interface for multiple investigators working on evidence
             </div>
           {:else}
             {#each Array.isArray(collaborationSession.chatHistory) ? collaborationSession.chatHistory : [] as message}
-              <div class={`flex ${isCurrentUser(message.userId) ? 'justify-end' , 'justify-start'}`}>
+              <div class={`flex ${isCurrentUser(message.userId) ? 'justify-end' : 'justify-start'}`}>
                 <div class={`max-w-xs lg, max-w-md px-3, py-2, rounded-lg ${`
                   isCurrentUser(message.userId)
                     ? 'bg-blue-600 text-white'
@@ -241,7 +241,7 @@ Real-time collaboration interface for multiple investigators working on evidence
                     {/if}
                   <div class="text-sm">{message.message}</div>
                   <div class={`text-xs, mt-1 ${`
-                    isCurrentUser(message.userId) ? 'text-blue-200' , 'text-gray-500'
+                    isCurrentUser(message.userId) ? 'text-blue-200' : 'text-gray-500'
                   }`}>`
                     {formatTimestamp(message.timestamp)}
                   </div>

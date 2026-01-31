@@ -88,7 +88,7 @@
  <Card>
  <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
  <CardTitle class="text-sm font-medium">System Status</CardTitle>
- <Badge variant={status.enabled ? 'default' , 'secondary'}>
+ <Badge variant={status.enabled ? 'default' : 'secondary'}>
  {status.enabled ? 'Enabled' : 'Disabled'}
  </Badge>
  </CardHeader>

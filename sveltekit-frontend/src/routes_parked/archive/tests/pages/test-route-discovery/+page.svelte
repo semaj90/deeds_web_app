@@ -93,10 +93,10 @@
  <div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-3">
  <span class="font-mono text-sm text-slate-300">{tag}</span>
  <div class="flex items-center gap-3">
- <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden" style="width, 100px;">
+ <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden" style="width: 100px;">
  <div
  class="h-full bg-cyan-500"
- style="width, {Math.min((count / stats.total) * 100 * 10, 100)}%"
+ style="width, {Math.min((count / stats.total) * 100 * 10: 100)}%"
  ></div>
  </div>
  <span class="text-sm font-semibold text-cyan-400 min-w-[3rem] text-right">{count}</span>

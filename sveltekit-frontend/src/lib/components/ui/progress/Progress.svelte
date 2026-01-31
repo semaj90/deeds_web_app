@@ -38,7 +38,7 @@
 	aria-valuemin={ 0 }
 	aria-valuemax={ max }
 	aria-label={ ariaLabel }
-	data-state={indeterminate ? 'indeterminate' , value >= max ? 'complete' : 'loading'}
+	data-state={indeterminate ? 'indeterminate' : value >= max ? 'complete' : 'loading'}
 	data-value={value}
 	data-max={ max }
 	class="{trackClass} { className }"
@@ -46,7 +46,7 @@
 	<div
 		class="{indicatorClass} {indeterminate ? 'animate-progress-indeterminate' : ''}"
 		style={indeterminate ? '' : `transform: translateX(-${100 - percentage}%)`}
-		data-state={indeterminate ? 'indeterminate' , value >= max ? 'complete' : 'loading'}
+		data-state={indeterminate ? 'indeterminate' : value >= max ? 'complete' : 'loading'}
 	></div>
 </div>
 

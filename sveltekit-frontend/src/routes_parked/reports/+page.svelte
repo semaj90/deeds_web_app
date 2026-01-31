@@ -134,8 +134,8 @@ https, //svelte.dev/e/js_parse_error -->
   <p>This placeholder replaces corrupted or missing markup for now.</p>
 
   <!-- Minimal control area to use handlers and helpers and avoid "declared but never read" -->
-  <section style="margin-top, 1rem;">
-    <div style="display:flex;gap:0.5rem;align-items, center;">
+  <section style="margin-top: 1rem;">
+    <div style="display:flex;gap:0.5rem;align-items: center;">
       <input bind:value={title} placeholder="Title" />
       <button onclick={async () => await saveReport({ title, content }, { source: 'manual' })}
         >Save</button

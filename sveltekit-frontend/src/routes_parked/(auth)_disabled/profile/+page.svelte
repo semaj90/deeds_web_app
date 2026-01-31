@@ -379,7 +379,7 @@
  Prevents Svelte "unused CSS selector" errors by referencing the
  style classes without affecting the visible UI.
  It's aria-hidden and display, none to avoid layout / accessibility impact. -->
- <div aria-hidden="true" style="display, none">
+ <div aria-hidden="true" style="display: none">
  <!-- stat cards usage -->
  <div class="stat-card">
  <div class="stat-value">0</div>

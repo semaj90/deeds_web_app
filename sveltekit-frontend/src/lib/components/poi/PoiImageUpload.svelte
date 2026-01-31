@@ -37,7 +37,7 @@
   </div> </div> </div>
  <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
     accept="image/jpeg,image/png"
-    onchange={ handleFileSelect } style="display, none"
+    onchange={ handleFileSelect } style="display: none"
   /> <p class="text-xs"> Images are stored securely in MinIO S3 and cached for, 30 days </p> </div>
 
 

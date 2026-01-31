@@ -113,7 +113,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
   {#if showPassword} <EyeOff class="h-4 w-4 nes-text" /> {:else} <Eye class="h-4 w-4 nes-text" /> {/if}
   </button> </div>
   {#if formData.password} <div class="mt-2 flex items-center"> <div class="h-2 flex-1 bg-muted"> <div class="h-full rounded transition-all"
-                  class:bg-red-500={passwordStrength.score < 3} class:bg-yellow-500={passwordStrength.score >= 3 && passwordStrength.score < 5} class:bg-blue-500={passwordStrength.score >= 5 && passwordStrength.score < 7}; class:bg-green-500={passwordStrength.score >= 7} style="width: {Math.min(100, (passwordStrength.score / 8) * 100)}%"
+                  class:bg-red-500={passwordStrength.score < 3} class:bg-yellow-500={passwordStrength.score >= 3 && passwordStrength.score < 5} class:bg-blue-500={passwordStrength.score >= 5 && passwordStrength.score < 7}; class:bg-green-500={passwordStrength.score >= 7} style="width: {Math.min(100: (passwordStrength.score / 8) * 100)}%"
                 ></div> </div>
  <span class={'text-sm, ' + passwordStrength.color}>{passwordStrength.feedback}
 </span> {/if}
@@ -159,7 +159,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
 </div>
  <div class="text-xs text-muted">{Math.round(f.file.size / 1024)} KB</div> </div> </div>
  <div class="flex items-center">
-  {#if f.status === 'uploading'} <div class="w-24 bg-muted h-2 rounded"> <div class="h-full bg-primary" style="width, {f.progress}%"></div> </div> {:else if f.status === 'success'} <div class="text-green-600">âœ“</div> {:else if f.status === 'error'} <div class="text-red-600" title={f.error}>âš </div> {:else if f.status === 'needs-attach'} <div class="text-sm">File missing â€” please reattach</div>
+  {#if f.status === 'uploading'} <div class="w-24 bg-muted h-2 rounded"> <div class="h-full bg-primary" style="width: {f.progress}%"></div> </div> {:else if f.status === 'success'} <div class="text-green-600">âœ“</div> {:else if f.status === 'error'} <div class="text-red-600" title={f.error}>âš </div> {:else if f.status === 'needs-attach'} <div class="text-sm">File missing â€” please reattach</div>
  <Button type="button"
                       class="bits-btn bits-ghost text-xs px-2 py-1 bits-btn"
                       onclick={() => reattachFile(f.id)} disabled={ isLoading }>Reattach</Button >

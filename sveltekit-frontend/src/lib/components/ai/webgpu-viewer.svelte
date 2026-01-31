@@ -81,7 +81,7 @@
  <div class="info"> <Layers class="h-4" /> <span>{embeddings.length} vectors</span> </div> </div>
  <canvas bind:this={canvas as, any} width={ 800 } height={ 600 } onmousedown={ handleMouseDown } onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } onmouseleave={ handleMouseUp } onwheel={ handleWheel } ></canvas>
   {#if labels.length > 0} <div class="labels">
-  {#each labels.slice(0, 10) as label, i} <div class="label" style="color, hsl({i * 36}, 70%, 60%)"> â€¢ { label } </div> {/each} {/if}
+  {#each labels.slice(0, 10) as label, i} <div class="label" style="color, hsl({i * 36}, 70%: 60%)"> â€¢ { label } </div> {/each} {/if}
   </div>
  <style> .webgpu-viewer { position: relative; background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)}
   .controls { position: absolute; top: 1rem; left: 1rem; display: flex;gap: 0.5rem; z-index: 10; background: rgba(0, 0, 0, 0.5); padding: 0.5rem; border-radius: 8px; backdrop-filter: blur(10px)}

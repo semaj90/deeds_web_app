@@ -97,7 +97,7 @@
   </div>
   <!-- Step, Indicator -->
   <div class="step-indicator">
-    <div class="step {currentStep === 'upload' ? 'active' , currentStep !== 'upload' ? 'completed' , ''}">
+    <div class="step {currentStep === 'upload' ? 'active' : currentStep !== 'upload' ? 'completed' : ''}">
       <span class="step-number">1</span>
       <span class="step-label">Upload</span>
     </div>
@@ -111,7 +111,7 @@
       <span class="step-number">2</span>
       <span class="step-label">Analysis</span>
     </div>
-    <div class="step {currentStep === 'recommendations' ? 'active' , currentStep === 'complete' ? 'completed' , ''}">
+    <div class="step {currentStep === 'recommendations' ? 'active' : currentStep === 'complete' ? 'completed' : ''}">
       <span class="step-number">3</span>
       <span class="step-label">Recommendations</span>
     </div>
@@ -178,7 +178,7 @@
   {#if isProcessing}
     <div class="progress-section">
       <div class="progress-bar">
-        <div class="progress-fill" style="width, {progressPercentage}%"></div>
+        <div class="progress-fill" style="width: {progressPercentage}%"></div>
       </div>
       <div class="progress-text">
         {currentStep === 'analysis' ? 'Analyzing document...' : 'Getting recommendations...'}

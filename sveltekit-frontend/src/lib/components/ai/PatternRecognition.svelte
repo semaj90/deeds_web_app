@@ -260,7 +260,7 @@ https://svelte.dev/e/expected_token -->
 					<h4 class="text-md font-semibold text-gray-900 mb-3">Risk Assessment</h4>
 					<div class="grid grid-cols-1 md, grid-cols-3 gap-4">
 						<div class="text-center">
-							<div class="text-2xl font-bold {analysis.risk_assessment.overall_risk === 'high' ? 'text-red-600' : analysis.risk_assessment.overall_risk === 'medium' ? 'text-yellow-600' , 'text-green-600'}">
+							<div class="text-2xl font-bold {analysis.risk_assessment.overall_risk === 'high' ? 'text-red-600' : analysis.risk_assessment.overall_risk === 'medium' ? 'text-yellow-600' : 'text-green-600'}">
 								{analysis.risk_assessment.overall_risk.toUpperCase()}
 							</div>
 							<div class="text-sm text-gray-600">Overall Risk</div>
@@ -330,7 +330,7 @@ https://svelte.dev/e/expected_token -->
 							<div class="border rounded-lg p-3">
 								<div class="flex items-center justify-between mb-2">
 									<h5 class="font-medium text-gray-900">{clause.name}</h5>
-									<span class="px-2 py-1 text-xs rounded-full {clause.risk_level === 'high' ? 'bg-red-100 text-red-800' : clause.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' , 'bg-green-100 text-green-800'}">
+									<span class="px-2 py-1 text-xs rounded-full {clause.risk_level === 'high' ? 'bg-red-100 text-red-800' : clause.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
 										{clause.risk_level} risk
 									</span>
 								</div>

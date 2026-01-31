@@ -127,7 +127,7 @@ import type { User } from '$lib/types';
         class="absolute inset-0 w-full h-full"
         width="800"
         height="600"
-        style="mix-blend-mode, multiply, opacity: 0.6;"
+        style="mix-blend-mode, multiply: opacity: 0.6;"
       ></canvas>
     {/if}
 
@@ -155,7 +155,7 @@ import type { User } from '$lib/types';
             {#each collaboration.users ?? [] as user (user.id)}
               <div
                 class="w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-xs font-bold text-white"
-                style="background-color, {user.color}"
+                style="background-color: {user.color}"
                 title={user.name}
               >
                 {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -259,7 +259,7 @@ import type { User } from '$lib/types';
             </svg>
             <span
               class="ml-2 px-1 py-0.5 text-xs font-medium text-white rounded shadow-lg"
-              style="background-color, {cursor.color}"
+              style="background-color: {cursor.color}"
             >
               {cursor.name}
             </span>

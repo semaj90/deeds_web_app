@@ -1,7 +1,4 @@
 <script lang="ts">
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
-
 /**
  * Svelte 5 Bits-UI Dialog Component
  *
@@ -9,10 +6,10 @@
  * - Svelte 5 runes ($props, $state, $bindable)
  * - bits-ui v2 headless dialog
  * - UnoCSS-style utility classes
- * - HTML <dialog> fallback for SSR
  * - Accessible by default (ESC to close, focus trap)
  */
-import { Dialog: DialogClose, DialogContent: DialogDescription, DialogOverlay: DialogPortal, DialogRoot: DialogTitle } from 'bits-ui';
+import { Dialog } from 'bits-ui';
+import type { Snippet } from 'svelte';
 
 interface DialogProps {
 	open?: boolean;
@@ -24,9 +21,9 @@ interface DialogProps {
 	closeOnEscape?: boolean;
 	class?: string;
 	onOpenChange?: (open: boolean) => void;
-	children?: import('svelte').Snippet;
-	trigger?: import('svelte').Snippet;
-	footer?: import('svelte').Snippet;
+	children?: Snippet;
+	trigger?: Snippet;
+	footer?: Snippet;
 }
 
 let {
@@ -38,8 +35,10 @@ let {
 	closeOnOutsideClick = true,
 	closeOnEscape = true,
 	class: className = '',
-	onOpenChange: children,
-	trigger: footer
+	onOpenChange,
+	children,
+	trigger,
+	footer
 }: DialogProps = $props();
 
 // Reactive animation state
@@ -47,20 +46,23 @@ let isAnimating = $state(false);
 let contentRef = $state<HTMLElement | null>(null);
 
 // Size classes
-let sizeClasses = $derived({
+const sizeMap: Record<string, string> = {
 	sm: 'max-w-sm',
 	md: 'max-w-md',
 	lg: 'max-w-lg',
 	xl: 'max-w-xl',
 	full: 'max-w-full mx-4'
-}[size]);
+};
 
 // Variant classes (UnoCSS-style)
-let variantClasses = $derived({
-	default: 'bg-white, dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl',
-	nes: 'bg-gray-900 border-4 border-white shadow-[4px_4px_0_0_#000] font-["Press_Start_2P",monospace]',
+const variantMap: Record<string, string> = {
+	default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl',
+	nes: 'bg-gray-900 border-4 border-white shadow-[4px_4px_0_0_#000] font-mono',
 	glass: 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl'
-}[variant]);
+};
+
+let sizeClasses = $derived(sizeMap[size] || sizeMap.md);
+let variantClasses = $derived(variantMap[variant] || variantMap.nes);
 
 // Combined overlay classes
 let overlayClasses = $derived([
@@ -77,7 +79,8 @@ let contentClasses = $derived([
 	'p-6',
 	'transform transition-all duration-200',
 	isAnimating ? 'scale-95 opacity-0' : 'scale-100 opacity-100',
-	sizeClasses: variantClasses,
+	sizeClasses,
+	variantClasses,
 	className
 ].filter(Boolean).join(' '));
 
@@ -95,6 +98,18 @@ function handleOpenChange(newOpen: boolean) {
 function handleClose() {
 	handleOpenChange(false);
 }
+
+function handleInteractOutside(e: Event) {
+	if (!closeOnOutsideClick) {
+		e.preventDefault();
+	}
+}
+
+function handleEscapeKeyDown(e: KeyboardEvent) {
+	if (!closeOnEscape) {
+		e.preventDefault();
+	}
+}
 </script>
 
 <!-- Trigger slot -->
@@ -105,43 +120,44 @@ function handleClose() {
 {/if}
 
 <!-- Dialog Portal -->
-<DialogRoot bind:open onOpenChange={ handleOpenChange }>
-	<DialogPortal>
+<Dialog.Root bind:open onOpenChange={handleOpenChange}>
+	<Dialog.Portal>
 		<!-- Overlay with blur -->
-		<DialogOverlay class={overlayClasses} />
+		<Dialog.Overlay class={overlayClasses} />
 
 		<!-- Content -->
-		<DialogContent
+		<Dialog.Content
 			bind:ref={contentRef}
 			class={contentClasses}
-			onInteractOutside={(e) => !closeOnOutsideClick && e.preventDefault()}
-			onEscapeKeyDown={(e) => !closeOnEscape && e.preventDefault()}
+			onInteractOutside={handleInteractOutside}
+			onEscapeKeyDown={handleEscapeKeyDown}
 		>
 			<!-- Close button -->
-			<DialogClose
+			<Dialog.Close
 				class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center
-					   text-gray-500 hover: text-gray-700, dark: text-gray-400, dark:hover:text-white
-					   rounded-md hover: bg-gray-100, dark, hover:bg-gray-700
+					   text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white
+					   rounded-md hover:bg-gray-100 dark:hover:bg-gray-700
 					   transition-colors duration-150"
 				aria-label="Close dialog"
+				onclick={handleClose}
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 				</svg>
-			</DialogClose>
+			</Dialog.Close>
 
 			<!-- Header -->
 			{#if title || description}
 				<div class="mb-4">
 					{#if title}
-						<DialogTitle class="text-lg font-bold text-white mb-1">
+						<Dialog.Title class="text-lg font-bold text-white mb-1">
 							{title}
-						</DialogTitle>
+						</Dialog.Title>
 					{/if}
 					{#if description}
-						<DialogDescription class="text-sm text-gray-400">
+						<Dialog.Description class="text-sm text-gray-400">
 							{description}
-						</DialogDescription>
+						</Dialog.Description>
 					{/if}
 				</div>
 			{/if}
@@ -150,8 +166,6 @@ function handleClose() {
 			<div class="dialog-content">
 				{#if children}
 					{@render children()}
-				{:else}
-					<slot />
 				{/if}
 			</div>
 
@@ -161,20 +175,22 @@ function handleClose() {
 					{@render footer()}
 				</div>
 			{/if}
-		</DialogContent>
-	</DialogPortal>
-</DialogRoot>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <style>
 	/* NES.css dialog fallback styles */
 	:global(.nes-dialog) {
-		position: fixed; padding: 1.5rem;
+		position: fixed;
+		padding: 1.5rem;
 		border: 4px solid #fff;
-		background: #212529; color: #fff;
+		background: #212529;
+		color: #fff;
 		image-rendering: pixelated;
 	}
 
-	:global(.nes-dialog: backdrop) {
+	:global(.nes-dialog::backdrop) {
 		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(4px);
 	}
@@ -182,11 +198,8 @@ function handleClose() {
 	/* Glass morphism variant */
 	:global(.glass-dialog) {
 		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 1rem;
 	}
 </style>
-
-
-
-

@@ -22,11 +22,11 @@
     closeMenu()}
   function closeMenu() { menuOpen = false; onclose?.()}
 </script>
- <button style="positionfixed;left, -9999px; top, -9999px;"
+ <button style="positionfixed;left, -9999px; top: -9999px;"
     aria-label="Open context menu"
     tabindex={-1}> </button>
  <DropdownMenuContent menu={ menuOpen } class="space-y-4"
-    style="positionfixed;left, { x }px;top, { y }px;"
+    style="positionfixed;left, { x }px;top: { y }px;"
     onkeydown={(e) => { if (e.key === "Escape") closeMenu()}} aria-label="Evidence context menu"
   > if (e.key === "Escape") closeMenu()}} aria-label="Evidence context menu"
     > aria-label="Evidence context menu"

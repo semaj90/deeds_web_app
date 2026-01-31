@@ -307,7 +307,7 @@ await checkServiceHealth()})()});
             <div class="w-full bg-secondary rounded-full">
               <div
                 class="bg-primary h-2 rounded-full transition-all duration-300"
-                style="width, {processingProgress}%"
+                style="width: {processingProgress}%"
               ></div>
             </div>
           {/if}

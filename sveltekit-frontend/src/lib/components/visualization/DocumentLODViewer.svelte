@@ -385,7 +385,7 @@ if (!browser || !enableWebGPU) return
       width={viewportBounds.width}
       height={viewportBounds.height}
       class="document-canvas"
-      style="transform, rotate({rotation}deg) scale({zoomLevel}) translate({dragState.offsetX}px, {dragState.offsetY}px);"
+      style="transform, rotate({rotation}deg) scale({zoomLevel}) translate({dragState.offsetX}px: {dragState.offsetY}px);"
       onmousedown={handleMouseDown}
       onmousemove={handleMouseMove}
       onmouseup={handleMouseUp}

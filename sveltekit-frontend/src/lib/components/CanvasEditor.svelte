@@ -28,7 +28,7 @@
  <p class="placeholder">Drag evidence or citations here to start building your canvas.</p>
  {:else}
  {#each currentCanvasElements as element (element.id)}
- <div class="canvas-element" style="left: {element.x}px; top, {element.y}px;">
+ <div class="canvas-element" style="left: {element.x}px; top: {element.y}px;">
  {element.type}: {element.text}
  </div>
  {/each}

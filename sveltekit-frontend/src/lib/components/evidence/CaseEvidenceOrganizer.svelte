@@ -115,7 +115,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <!-- Loading and progress, indicators -->
   {#if isLoading || isGeneratingClusters} <div class="loading-section"> <div class="loading-content">
   {#if isGeneratingClusters} <h3>Generating AI Clusters with Gemma Embeddings...</h3>
- <div class="progress-bar"> <div class="progress-fill" style="width, { clusteringProgress }%"></div> </div>
+ <div class="progress-bar"> <div class="progress-fill" style="width: { clusteringProgress }%"></div> </div>
  <p>Progress: { clusteringProgress }%</p> {:else} <h3>Reorganizing Evidence...</h3>
  <div class="spinner">{/if}
   </div> {/if}
@@ -149,10 +149,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <span class="timeline-type">{evidence.evidenceType}</span> </div> </div> </button> {/each}
   </div> </div> {/each}
   </div> {:else if organizationStructure?.type === 'ai_clusters'} <!-- Clusters, organization --> <div class="clusters-organization">
-  {#each Array.isArray(organizationStructure.clusters) ? organizationStructure.clusters: [] as cluster} <div class="cluster-group" style="border-left-color, {cluster.color}"> <div class="cluster-header"> <h3>{cluster.name}</h3>
+  {#each Array.isArray(organizationStructure.clusters) ? organizationStructure.clusters: [] as cluster} <div class="cluster-group" style="border-left-color: {cluster.color}"> <div class="cluster-header"> <h3>{cluster.name}</h3>
  <div class="cluster-meta"> <span class="cluster-count">{cluster.count} items</span>
  <span class="cluster-similarity"> {Math.round(cluster.similarity * 100)}% similarity </span> </div> </div>
-  {#if cluster.warning} <div class="cluster-warning" style="color: #ef4444, font-weight, 500; margin-bottom: 0.5rem;"> {cluster.warning} {/if}
+  {#if cluster.warning} <div class="cluster-warning" style="color: #ef4444, font-weight: 500; margin-bottom: 0.5rem;"> {cluster.warning} {/if}
   <p class="cluster-description">{cluster.description}</p>
   {#if cluster.keywords?.length > 0} <div class="cluster-keywords">
   {#each Array.isArray(cluster.keywords) ? cluster.keywords: [] as keyword} <span class="keyword-tag">{ keyword }</span> {/each} {/if}

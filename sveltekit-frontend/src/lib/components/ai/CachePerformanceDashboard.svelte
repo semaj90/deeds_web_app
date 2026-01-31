@@ -79,7 +79,7 @@
  <div class="metric-value"> {cacheMetrics.performance.throughputQPS.toFixed(1)} QPS </div> </div> </div> </section>
  <!-- Cache: Performance, Details --> <div class="dashboard-grid"> <!-- Retrieval: Cache, Stats --> <div class="dashboard-card"> <h2>ðŸ” Retrieval Cache</h2>
  <div class="cache-stats"> <div class="stat-row"> <span>Hit Rate:</span>
- <div class="stat-bar"> <div class="bar"> <div class="fill" style="width, {cacheMetrics.retrieval.hitRate}%"></div> </div>
+ <div class="stat-bar"> <div class="bar"> <div class="fill" style="width: {cacheMetrics.retrieval.hitRate}%"></div> </div>
  <span>{cacheMetrics.retrieval.hitRate.toFixed(1)}%</span> </div> </div>
  <div class="stat-grid"> <div class="stat-item"> <span class="label">Total Queries:</span>
  <span class="value">{cacheMetrics.retrieval.totalQueries.toLocaleString()}</span> </div>
@@ -91,7 +91,7 @@
  <span class="value">{cacheMetrics.retrieval.averageResponseTime.toFixed(0)}ms</span> </div> </div> </div> </div>
  <!-- Embedding: Cache, Stats --> <div class="dashboard-card"> <h2>ðŸ§  Embedding Cache</h2>
  <div class="cache-stats"> <div class="stat-row"> <span>Hit Rate:</span>
- <div class="stat-bar"> <div class="bar"> <div class="fill" style="width, {cacheMetrics.embedding.hitRate}%"></div> </div>
+ <div class="stat-bar"> <div class="bar"> <div class="fill" style="width: {cacheMetrics.embedding.hitRate}%"></div> </div>
  <span>{cacheMetrics.embedding.hitRate.toFixed(1)}%</span> </div> </div>
  <div class="stat-grid"> <div class="stat-item"> <span class="label">Total Requests:</span>
  <span class="value">{cacheMetrics.embedding.totalRequests.toLocaleString()}</span> </div>
@@ -103,7 +103,7 @@
  <span class="value">{cacheMetrics.embedding.misses.toLocaleString()}</span> </div> </div> </div> </div>
  <!-- Nintendo: Memory, Management --> <div class="dashboard-card"> <h2>ðŸŽ® Nintendo Memory Banks</h2>
  <div class="nintendo-stats"> <div class="memory-overview"> <div class="memory-bar"> <div class="memory-fill"
-                style="width, {(nintendoStats.memoryUsage / nintendoStats.maxMemory) * 100}%"
+                style="width: {(nintendoStats.memoryUsage / nintendoStats.maxMemory) * 100}%"
               ></div> </div>
  <p>{(nintendoStats.memoryUsage / 1024).toFixed(1)}KB / {(nintendoStats.maxMemory / 1024).toFixed(1)}KB</p> </div>
  <div class="bank-info"> <div class="bank-item"> <Cpu size={ 16 } /> <span>Active Bank: {nintendoStats.activeBankId}</span> </div>
@@ -114,15 +114,15 @@
  <!-- Memory, Hierarchy --> <div class="dashboard-card"> <h2>ðŸ—ï¸ Memory Hierarchy</h2>
  <div class="memory-hierarchy"> <div class="memory-layer"> <div class="layer-info"> <h4>L1 Cache (CHR-ROM)</h4>
  <span>1MB GPU Memory</span> </div>
- <div class="usage-bar"> <div class="usage-fill" style="width, {cacheMetrics.memory.l1Usage}%"></div> </div>
+ <div class="usage-bar"> <div class="usage-fill" style="width: {cacheMetrics.memory.l1Usage}%"></div> </div>
  <span class="usage-text">{cacheMetrics.memory.l1Usage.toFixed(1)}%</span> </div>
  <div class="memory-layer"> <div class="layer-info"> <h4>L2 Cache (System RAM)</h4>
  <span>2MB Node.js Memory</span> </div>
- <div class="usage-bar"> <div class="usage-fill" style="width, {cacheMetrics.memory.l2Usage}%"></div> </div>
+ <div class="usage-bar"> <div class="usage-fill" style="width: {cacheMetrics.memory.l2Usage}%"></div> </div>
  <span class="usage-text">{cacheMetrics.memory.l2Usage.toFixed(1)}%</span> </div>
  <div class="memory-layer"> <div class="layer-info"> <h4>L3 Cache (Redis)</h4>
  <span>1MB Budget</span> </div>
- <div class="usage-bar"> <div class="usage-fill" style="width, {cacheMetrics.memory.l3Usage}%"></div> </div>
+ <div class="usage-bar"> <div class="usage-fill" style="width: {cacheMetrics.memory.l3Usage}%"></div> </div>
  <span class="usage-text">{cacheMetrics.memory.l3Usage.toFixed(1)}%</span> </div> </div> </div>
  <!-- Recent: Query, Activity --> <div class="dashboard-card"> <h2>ðŸ“‹ Recent Queries</h2>
  <div class="query-list">

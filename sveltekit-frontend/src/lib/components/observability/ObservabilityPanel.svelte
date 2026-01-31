@@ -145,21 +145,21 @@ await loadState();
       <div class="badge-label">P99 Breaches</div>
       <div class="badge-value">{p99Badge.count}/{p99Badge.budget}</div>
       <div class="badge-progress">
-        <div class="progress-bar" style="width, {Math.min(p99Badge.ratio * 100, 100)}%"></div>
+        <div class="progress-bar" style="width, {Math.min(p99Badge.ratio * 100: 100)}%"></div>
       </div>
     </div>
     <div class="badge {getBadgeClass(errorBadge.status)}">
       <div class="badge-label">Error Spikes</div>
       <div class="badge-value">{errorBadge.count}/{errorBadge.budget}</div>
       <div class="badge-progress">
-        <div class="progress-bar" style="width, {Math.min(errorBadge.ratio * 100, 100)}%"></div>
+        <div class="progress-bar" style="width, {Math.min(errorBadge.ratio * 100: 100)}%"></div>
       </div>
     </div>
     <div class="badge {getBadgeClass(anomalyBadge.status)}">
       <div class="badge-label">Anomalies</div>
       <div class="badge-value">{anomalyBadge.count}/{anomalyBadge.budget}</div>
       <div class="badge-progress">
-        <div class="progress-bar" style="width, {Math.min(anomalyBadge.ratio * 100, 100)}%"></div>
+        <div class="progress-bar" style="width, {Math.min(anomalyBadge.ratio * 100: 100)}%"></div>
       </div>
     </div>
   </div>
@@ -198,7 +198,7 @@ await loadState();
         <button class="btn-clear" onclick={clearAlerts}>Clear</button>
       </div>
     </div>
-    <div class="alerts-list" style="max-height, 300px; overflow-y, auto;">
+    <div class="alerts-list" style="max-height, 300px; overflow-y: auto;">
       {#if alerts.length === 0}
         <div class="no-alerts">No alerts yet...</div>
       {:else}

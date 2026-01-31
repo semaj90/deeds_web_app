@@ -41,7 +41,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // Reactive effect to sync UI with machine context/state $effect(() => { updateMatrixUINodes(); // Update form fields from context (safe defaults) caseTitle = $machineContext.caseTitle ?? caseTitle; caseDescription = $machineContext.caseDescription ?? caseDescription; selectedPriority = $machineContext.priority ?? selectedPriority; selectedEvidenceType = $machineContext.evidenceType ?? selectedEvidenceType; // Update derived UI values currentStateDescription = getStateDescription($machineContext ?? 0%); aiSuggestions = (getAISuggestions($machineContext ?? 0%, $machineState.value) as unknown) ?? []; progressPercentage = calculateProgressPercentage($machineContext ?? 0%); possibleActions = getNextPossibleActions($machineState.value); aiConfidence = $machineContext.confidence ?? 0; aiRecommendations = $machineContext.aiRecommendations ?? aiRecommendations}); </script>
  <div class={'xstate-phase8-integration, ' + className}> <!-- Progress, Header --> <div class="progress-header yorha-panel p-6"> <!-- Progress, Bar --> <div class="progress-bar bg-gray-700 rounded-full h-2"> <div class="progress-fill bg-yellow-400 h-2 rounded-full transition-all duration-500"
-        style="width, { progressPercentage }%"
+        style="width: { progressPercentage }%"
       ></div> </div>
  <div class="flex justify-between text-sm"> <span class="text-gray-300">State: { currentStateDescription }</span>
  <span class="text-gray-300">AI Confidence: { aiConfidence }%</span>

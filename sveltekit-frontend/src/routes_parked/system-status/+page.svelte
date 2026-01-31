@@ -40,7 +40,7 @@
 
  <div class="nes-grid-3">
  {#each systemChecks as check}
- <div class="nes-container is-rounded {check.status === 'PASS' ? 'is-success' , 'is-error'}">
+ <div class="nes-container is-rounded {check.status === 'PASS' ? 'is-success' : 'is-error'}">
  <p class="check-icon">{check.icon}</p>
  <p class="check-name">{check.name}</p>
  <p class="check-status">{check.status}</p>

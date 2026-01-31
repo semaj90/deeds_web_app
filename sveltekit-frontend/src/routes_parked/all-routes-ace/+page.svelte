@@ -275,7 +275,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <div class="p-4 rounded-lg border-2 transition-all h-full {
  state.status === 'complete' ? 'bg-green-500/20 border-green-500/50' :
  state.status === 'running' ? 'bg-blue-500/20 border-blue-500/50 animate-pulse' :
- state.status === 'error' ? 'bg-red-500/20 border-red-500/50' , 'bg-gray-700/30 border-gray-600/30'
+ state.status === 'error' ? 'bg-red-500/20 border-red-500/50' : 'bg-gray-700/30 border-gray-600/30'
  }">
  <div class="flex items-center justify-between mb-2">
  <span class="text-2xl">{stage.icon}</span>
@@ -292,7 +292,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  {#if state.status === 'running'}
  <div class="mt-3 h-1.5 bg-gray-700 rounded-full overflow-hidden">
- <div class="h-full bg-blue-500 transition-all rounded-full" style="width, {state.progress}%"></div>
+ <div class="h-full bg-blue-500 transition-all rounded-full" style="width: {state.progress}%"></div>
  </div>
  <span class="text-xs text-blue-300 mt-1">{state.progress}%</span>
  {/if}
@@ -333,7 +333,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="{
  log.level === 'error' ? 'text-red-400' :
  log.level === 'success' ? 'text-green-400' :
- log.level === 'warn' ? 'text-yellow-400' , 'text-gray-300'
+ log.level === 'warn' ? 'text-yellow-400' : 'text-gray-300'
  }">{log.message}</span>
  </div>
  {/each}
@@ -379,7 +379,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  error.fixed ? 'bg-green-500/10 border-green-500/30' :
  error.severity === 'critical' ? 'bg-red-500/20 border-red-500/50' :
  error.severity === 'high' ? 'bg-orange-500/20 border-orange-500/50' :
- error.severity === 'medium' ? 'bg-yellow-500/20 border-yellow-500/50' , 'bg-gray-700/30 border-gray-600/30'
+ error.severity === 'medium' ? 'bg-yellow-500/20 border-yellow-500/50' : 'bg-gray-700/30 border-gray-600/30'
  }">
  <div class="flex items-start justify-between gap-4">
  <div class="flex-1">
@@ -387,7 +387,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="px-2 py-0.5 text-xs rounded font-medium {
  error.severity === 'critical' ? 'bg-red-500/30 text-red-300' :
  error.severity === 'high' ? 'bg-orange-500/30 text-orange-300' :
- error.severity === 'medium' ? 'bg-yellow-500/30 text-yellow-300' , 'bg-gray-500/30 text-gray-300'
+ error.severity === 'medium' ? 'bg-yellow-500/30 text-yellow-300' : 'bg-gray-500/30 text-gray-300'
  }">{error.severity.toUpperCase()}</span>
  <span class="px-2 py-0.5 text-xs rounded bg-blue-500/30 text-blue-300">{error.type}</span>
  {#if error.fixed}

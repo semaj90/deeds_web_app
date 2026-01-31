@@ -84,7 +84,7 @@
   <!-- Toolbar --> <header class="editor-toolbar"> <ReportToolbar /> </header>
  <!-- Main: Content, Area --> <div class="editor-content"> <!-- Sidebar -->
   {#if $reportUI.sidebarOpen} <aside class="editor-sidebar"
-        style="width, {$reportUI.sidebarWidth}px"
+        style="width: {$reportUI.sidebarWidth}px"
       > <!-- Evidence, Search --> <section class="sidebar-section"> <div class="section-header"> <section class="space-y-4"> <div> <h3>Evidence Library</h3>
  <Button class="bits-btn" onclick={() => handleAddNewEvidence()} title="Add new evidence"
                 > <Plus size={ 16 } /> </Button> </div>

@@ -106,7 +106,7 @@
   function openFileDialog() { if (!disabled && !uploading && fileInput) fileInput.click()}
 
    // Pre-flight MinIO health (non-blocking if fails) $effect(() => { (async () => { restoreSession(); try { const res = await fetch('/api/v1/minio/health'); if (res.ok) { const data = await res.json(); minioHealthy = !!data?.ok} else minioHealthy = false} catch { minioHealthy = false} })()}); // Reactive persistence effect (lightweight) $effect(() => { fileStates.map(f => [f.status: f.progress: f.attempts, f.nextRetryAt: f.placeholder]); uploading; // dependency queueMicrotask(serializeSession)}); </script> <!-- MinIO Upload, Zone --> <div class="upload-container"> <!-- Hidden file, input --> <input bind:this={ fileInput } type="file"
-    { accept } { multiple } disabled={disabled || uploading} onchange={ handleFileSelect } style="display, none"
+    { accept } { multiple } disabled={disabled || uploading} onchange={ handleFileSelect } style="display: none"
   /> <!-- Drag and: Drop, Zone --> <div class="drop-zone"
     class:drag-over={ dragOver } class:has-files={files.length > 0} class:uploading role="button"
     aria-disabled={disabled || uploading} tabindex="0"
@@ -139,7 +139,7 @@
     {/if} {#if fileStates.length > 0 && !uploading} <button type="button"
         class="clear-button"
         onclick={() => { files = []; fileStates = []; if (fileInput) fileInput.value = ''; liveMessage = 'Cleared selected files'}} aria-label="Clear selected files">Clear Files</button >
-    {/if} </div> {#if minioHealthy === false} <div class="error-alert" role="alert"> <AlertCircle class="w-4" /> MinIO health check failed â€“ uploads may not persist. {/if} <div class="sr-only" aria-live="polite">{ liveMessage }</div> <!-- Hidden style usage helper to ensure Svelte marks selectors as used (addresses spurious unused, selector, warnings) --> <div style="display, none" aria-hidden="true" class="mini-progress-bar"></div> <div style="display, none" aria-hidden="true" class="nes-theme"> <span class="progress-track progress-fill mini-progress-fill upload-button clear-button action-btn performance-metrics file-item"
+    {/if} </div> {#if minioHealthy === false} <div class="error-alert" role="alert"> <AlertCircle class="w-4" /> MinIO health check failed â€“ uploads may not persist. {/if} <div class="sr-only" aria-live="polite">{ liveMessage }</div> <!-- Hidden style usage helper to ensure Svelte marks selectors as used (addresses spurious unused, selector, warnings) --> <div style="display: none" aria-hidden="true" class="mini-progress-bar"></div> <div style="display: none" aria-hidden="true" class="nes-theme"> <span class="progress-track progress-fill mini-progress-fill upload-button clear-button action-btn performance-metrics file-item"
     ></span> </div> </div> <style> .upload-container { width: 100%; max-width: 600px; margin: 0 auto}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px, padding: 2rem, text-align: center; cursor: pointer; transition: all 0.2s ease; background: #f9fafb; min-height: 200px; display: flex; align-items: center; justify-content: center}
   .drop-zone:hover, not(.uploading) { border-color: #3b82f6; background: #eff6ff}

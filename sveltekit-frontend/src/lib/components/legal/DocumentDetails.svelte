@@ -283,7 +283,7 @@ import type { Document } from '$lib/types';
                       <div class="w-full bg-purple-200 rounded-full h-2">
                         <div
                           class="bg-purple-600 h-2 rounded-full"
-                          style="width, {($gpuAnalysis.confidence * 100).toFixed(1)}%"
+                          style="width: {($gpuAnalysis.confidence * 100).toFixed(1)}%"
                         ></div>
                       </div>
                       <p class="text-sm text-purple-600">{($gpuAnalysis.confidence * 100).toFixed(1)}%</p>

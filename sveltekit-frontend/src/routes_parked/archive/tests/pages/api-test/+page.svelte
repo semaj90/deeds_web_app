@@ -236,7 +236,7 @@
  class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-amber-200"
  class:animate-spin={autoRefresh}
  onclick={ toggleAutoRefresh }
- title={autoRefresh ? 'Disable auto refresh' , 'Enable auto refresh'}
+ title={autoRefresh ? 'Disable auto refresh' : 'Enable auto refresh'}
  >
  <RefreshCw class="h-4" />
  </button>

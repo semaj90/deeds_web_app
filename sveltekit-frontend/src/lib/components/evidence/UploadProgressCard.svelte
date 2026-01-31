@@ -95,7 +95,7 @@
  </div>
 
  <div class="progress-bar">
- <div class="progress-fill" style="width, {$uploadStore.processingPercentage}%"></div>
+ <div class="progress-fill" style="width: {$uploadStore.processingPercentage}%"></div>
  </div>
 
  {#if $uploadStore.metrics.cpu > 0 || $uploadStore.metrics.memory > 0 || $uploadStore.metrics.gpu > 0}

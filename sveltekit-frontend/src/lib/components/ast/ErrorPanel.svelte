@@ -40,23 +40,23 @@
 
 <div class="flex flex-col h-full">
  <!-- Header with counts -->
- <div class="flex items-center gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark, bg-gray-800">
- <h3 class="font-medium text-gray-900 dark, text-gray-100">Problems</h3>
+ <div class="flex items-center gap-4 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark: bg-gray-800">
+ <h3 class="font-medium text-gray-900 dark: text-gray-100">Problems</h3>
  <div class="flex items-center gap-3 text-sm">
  {#if errorCounts.error > 0}
- <span class="flex items-center gap-1 text-red-600 dark, text-red-400">
+ <span class="flex items-center gap-1 text-red-600 dark: text-red-400">
  <span class="i-lucide-x-circle"></span>
  {errorCounts.error}
  </span>
  {/if}
  {#if errorCounts.warning > 0}
- <span class="flex items-center gap-1 text-yellow-600 dark, text-yellow-400">
+ <span class="flex items-center gap-1 text-yellow-600 dark: text-yellow-400">
  <span class="i-lucide-alert-triangle"></span>
  {errorCounts.warning}
  </span>
  {/if}
  {#if errorCounts.info > 0}
- <span class="flex items-center gap-1 text-blue-600 dark, text-blue-400">
+ <span class="flex items-center gap-1 text-blue-600 dark: text-blue-400">
  <span class="i-lucide-info"></span>
  {errorCounts.info}
  </span>
@@ -65,18 +65,18 @@
  </div>
 
  <!-- Error list -->
- <div class="flex-1 overflow-y-auto" style="max-height, { maxHeight }">
+ <div class="flex-1 overflow-y-auto" style="max-height: { maxHeight }">
  {#if errors.length === 0}
  <div class="flex flex-col items-center justify-center py-8 text-gray-500">
  <span class="i-lucide-check-circle text-4xl text-green-500 mb-2"></span>
  <p>No problems detected</p>
  </div>
  {:else}
- <div class="divide-y divide-gray-200 dark, divide-gray-700">
+ <div class="divide-y divide-gray-200 dark: divide-gray-700">
  {#each errors as error (error.id)}
  <button
  type="button"
- class="w-full text-left px-4 py-3 hover: bg-gray-100, dark:hover:bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' , ''}"
+ class="w-full text-left px-4 py-3 hover: bg-gray-100, dark:hover:bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}"
  onclick={() => onErrorClick.error}
  >
  <div class="flex items-start gap-3">
@@ -86,18 +86,18 @@
  <!-- Error details -->
  <div class="flex-1 min-w-0">
  <div class="flex items-center gap-2 mb-1">
- <span class="text-xs font-mono text-gray-500 dark, text-gray-400">
+ <span class="text-xs font-mono text-gray-500 dark: text-gray-400">
  {error.code}
  </span>
- <span class="text-xs text-gray-400 dark, text-gray-500">
+ <span class="text-xs text-gray-400 dark: text-gray-500">
  Ln {error.line}, Col {error.column}
  </span>
  </div>
- <p class="text-sm text-gray-800 dark, text-gray-200 break-words">
+ <p class="text-sm text-gray-800 dark: text-gray-200 break-words">
  {error.message}
  </p>
  {#if error.suggestion}
- <p class="text-xs text-gray-500 dark, text-gray-400 mt-1 italic">
+ <p class="text-xs text-gray-500 dark: text-gray-400 mt-1 italic">
  💡 {error.suggestion}
  </p>
  {/if}

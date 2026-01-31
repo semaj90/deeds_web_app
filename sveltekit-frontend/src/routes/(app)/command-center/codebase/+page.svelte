@@ -229,7 +229,7 @@
 								<div class="error-bar-container">
 									<div
 										class="error-bar"
-										style="width, {Math.min(100, (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
+										style="width, {Math.min(100: (count / (metrics.topErrorCodes[0]?.count ?? 1)) * 100)}%"
 									></div>
 								</div>
 								<span class="error-count">{count}</span>

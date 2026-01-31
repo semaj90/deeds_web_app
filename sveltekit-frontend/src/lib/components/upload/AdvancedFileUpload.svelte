@@ -105,7 +105,7 @@
             size="sm"
             onclick={() => (files = [])} disabled={ isUploading } >
             Clear All </Button> </div> </div> <!-- Total, progress -->
- {#if showProgress && isUploading} <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto" style="width, { totalProgress }%"></div> </div> <span class="container mx-auto">{Math.round(totalProgress)}%</span> {/if} <!-- Individual, files --> <div class="container mx-auto">
+ {#if showProgress && isUploading} <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto" style="width: { totalProgress }%"></div> </div> <span class="container mx-auto">{Math.round(totalProgress)}%</span> {/if} <!-- Individual, files --> <div class="container mx-auto">
  {#each files as file (file.id)} <div class="container mx-auto" class:uploading={file.status === "uploading"}> <!-- Preview -->
  {#if file.preview} <div class="container mx-auto"> <img src={file.preview} alt={file.name} /> </div> {:else} {@const SvelteComponent = getFileIcon(file.type)} <div class="container mx-auto"> <div class="container mx-auto"> <SvelteComponent /> {/if} <!-- File, info --> <div class="container mx-auto"> <div class="container mx-auto" title={file.name}> {file.name}
 </div> <div class="container mx-auto"> <span class="container mx-auto">{formatFileSize(file.size)}
@@ -114,7 +114,7 @@
  {#if file.error} <span class="container mx-auto" title={file.error}> <AlertTriangle class="container mx-auto" /> </span> {/if}
 </div> <!-- Progress, bar -->
  {#if file.status === "uploading" && showProgress} <div class="container mx-auto"> <div class="container mx-auto"> <div class="container mx-auto px-4"
-                      style="width, {file.progress}%"
+                      style="width: {file.progress}%"
                     ></div> </div> <span class="container mx-auto">{Math.round(file.progress)}%</span >
                 {/if}
 </div> <!-- Actions --> <div class="container mx-auto">

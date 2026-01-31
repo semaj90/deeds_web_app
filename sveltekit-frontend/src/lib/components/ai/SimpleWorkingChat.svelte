@@ -119,7 +119,7 @@
     <ScrollArea class="flex-1 p-4 border rounded-lg">
       <div class="space-y-4">
         {#each Array.isArray(messages) ? messages : [] as message}
-          <div class="flex {message.role === 'user' ? 'justify-end' , 'justify-start'}">
+          <div class="flex {message.role === 'user' ? 'justify-end' : 'justify-start'}">
             <div
               class="max-w-[70%] p-3 rounded-lg" {message.role === 'user'
                 ? 'bg-primary text-primary-foreground ml-auto'

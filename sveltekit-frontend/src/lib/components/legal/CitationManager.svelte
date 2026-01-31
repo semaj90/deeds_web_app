@@ -59,7 +59,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   // Allow using events on these UI components without TS complaining. // They are cast to `any` for the template usage only. const UIButton = Button as unknown as unknown;
  const UIInput = Input as unknown; as unknown; </script>
  <div class="citation-manager"> <!-- Citation: Manager, Header --> <Card> <!-- Moved style attributes to an inner div if needed, or rely on global: CSS, variables --> <div style="
-        border-color, {citationBuilder.styling.colors.primary}; border-width, {citationBuilder.styling.nes.borderWidth};
+        border-color, {citationBuilder.styling.colors.primary}; border-width: {citationBuilder.styling.nes.borderWidth};
       "
     > <CardHeader> <CardTitle> <div class="citation-title"> <div class="title-section"> <span class="citation-icon">ðŸ“š</span>
  <div class="title-text"> <h2>Citation Manager</h2>
@@ -127,7 +127,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <div class="citation-type"> <span class="type-icon">{getCitationIcon(citation.type)}</span>
  <span class="type-label">{citation.type.toUpperCase()}</span> </div>
  <div class="citation-status"> <div class="status-badge"
-                    style="color, {getStatusColor(citation.status)}; border-color, {getStatusColor(citation.status)};"
+                    style="color, {getStatusColor(citation.status)}; border-color: {getStatusColor(citation.status)};"
                   > {citation.status} </div>
  <div class="verification-badge"
                     class:verified={citation.verified} >
@@ -154,14 +154,14 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <div class="citation-metrics"> <div class="metric-item"> <span class="metric-label">Relevance Score:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width, {citation.relevanceScore * 100}%; background, {citationBuilder.styling.colors.evidence};
+                          width, {citation.relevanceScore * 100}%; background: {citationBuilder.styling.colors.evidence};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.relevanceScore * 100)}% </span> </div>
  <div class="metric-item"> <span class="metric-label">Accuracy:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width, {citation.accuracy * 100}%; background, {getAccuracyColor(citation.accuracy)};
+                          width, {citation.accuracy * 100}%; background: {getAccuracyColor(citation.accuracy)};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.accuracy * 100)}% </span> </div>

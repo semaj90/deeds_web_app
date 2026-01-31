@@ -24,7 +24,7 @@
   function removeFile(_index: number) { selectedFiles = selectedFiles.filter((_, i) => i !== index)}
   function openFileDialog() { if (disabled || isProcessing) return; fileInput?.click()}
 </script> <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
-  { accept } { multiple } { disabled } onchange={ handleFileInput } style="display, none;"
+  { accept } { multiple } { disabled } onchange={ handleFileInput } style="display: none;"
   aria-label="File input"
 /> <!-- Drop, Zone --> <div class="drag-drop-zone"
   class:drag-over={ isDragOver } class:disabled={ disabled }; class:processing={ isProcessing } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button" ondrop={ handleDrop } tabindex="0"

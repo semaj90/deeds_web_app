@@ -184,7 +184,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if currentSessionId} <div>Session {currentSessionId.slice(0, 8)}...{/if} {#if lastSyncTime} <div>Last Sync: {lastSyncTime.toLocaleTimeString()}{/if}
   <div>PostgreSQL + pg_vector + Drizzle ORM</div> </div> </div> </Collapsible.Content> </Collapsible.Root> {/if}
   </div>
- <!-- Messages, Container --> <div; bind:this={ chatContainer } class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark, bg-gray-900 rounded-lg">
+ <!-- Messages, Container --> <div; bind:this={ chatContainer } class="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 dark: bg-gray-900 rounded-lg">
   {#each $messages as message (message.id)} <div class="message-bubble {message.role}" /* transition, removed */}> <div class="flex items-start"> <!-- Message, Icon --> <div class="flex-shrink-0 w-8 h-8" rounded-full flex items-center, justify-center {message.role ===
             'user'
               ? 'bg-blue-500', message.role === 'assistant'
@@ -198,7 +198,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if message.confidence && settings.includeConfidenceScores} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{Math.round(message.confidence * 100)}% confidence</span> {/if} {#if message.processingTime} <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{message.processingTime}ms</span> {/if} {#if streamingMessageId === message.id && isStreaming} <span class="streaming-badge">Streaming</span> {/if}
   </div>
  <!-- Main, Content --> <div class="prose prose-sm max-w-none" {message.role === 'user'
-                ? 'bg-blue-50 dark:bg-blue-900/20', 'bg-white; dark, bg-gray-800'} p-3 rounded-lg">
+                ? 'bg-blue-50 dark:bg-blue-900/20', 'bg-white; dark: bg-gray-800'} p-3 rounded-lg">
   {#if streamingMessageId === message.id && isStreaming && settings.enableTypewriterEffect} <!-- Advanced TypewriterResponse component for, streaming --> <TypewriterResponse text={ streamingContent } speed={settings.typewriterSpeed} showCursor={ true } cursorChar="â–ˆ"
                   enableThinking={ false } autoStart={ true } oncomplete={() => { // Handle streaming completion isStreaming = false; streamingMessageId = null; // Final update of message content messages.update(msgs => msgs.map(msg => msg.id === message.id ? { ...msg, content: streamingContent }: msg )
                     )}} /> {:else} <!-- Normal, content --> {/* JSX syntax converted to Svelte */} {/if}
@@ -207,19 +207,19 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if message.synthesizedInput || message.legalAnalysis || message.ragResults} <div class="mt-2">
   {#if message.synthesizedInput} <details class="text-xs"> <summary class="cursor-pointer text-blue-600"
                       >ðŸ§  Input Analysis</summary>
- <div class="mt-1 p-2 bg-blue-50 dark, bg-blue-900/20"> <div> <strong>Intent:</strong> {message.synthesizedInput.intent?.primary} ({Math.round( (message.synthesizedInput.intent?.confidence ?? 0) * 100 )}%) </div>
+ <div class="mt-1 p-2 bg-blue-50 dark: bg-blue-900/20"> <div> <strong>Intent:</strong> {message.synthesizedInput.intent?.primary} ({Math.round( (message.synthesizedInput.intent?.confidence ?? 0) * 100 )}%) </div>
  <div> <strong>Legal Domain:</strong> {message.synthesizedInput.legalContext?.domain}
 </div>
  <div> <strong>Entities:</strong> {message.synthesizedInput.legalContext?.entities?.length ?? 0}
 </div> </div> </details> {/if} {#if message.legalAnalysis} <details class="text-xs"> <summary class="cursor-pointer text-green-600"
                       >âš–ï¸ Legal Analysis</summary>
- <div class="mt-1 p-2 bg-green-50 dark, bg-green-900/20"> <div> <strong>Entities:</strong> {message.legalAnalysis.entities?.length ?? 0}
+ <div class="mt-1 p-2 bg-green-50 dark: bg-green-900/20"> <div> <strong>Entities:</strong> {message.legalAnalysis.entities?.length ?? 0}
 </div>
  <div> <strong>Concepts:</strong> {message.legalAnalysis.concepts?.length ?? 0}
 </div>
  <div> <strong>Complexity:</strong> {Math.round( (message.legalAnalysis.complexity?.legalComplexity ?? 0) * 100 )}% </div> </div> </details> {/if} {#if message.ragResults} <details class="text-xs"> <summary class="cursor-pointer text-purple-600"
                       >ðŸ“š Document Analysis</summary>
- <div class="mt-1 p-2 bg-purple-50 dark, bg-purple-900/20"> <div> <strong>Documents Processed:</strong> {message.ragResults.metadata?.documentsProcessed ?? 0}
+ <div class="mt-1 p-2 bg-purple-50 dark: bg-purple-900/20"> <div> <strong>Documents Processed:</strong> {message.ragResults.metadata?.documentsProcessed ?? 0}
 </div>
  <div><strong>Sources:</strong> {message.ragResults.sources?.length ?? 0}
 </div> </div> </details> {/if} {/if}
@@ -233,7 +233,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Analysis, Panel -->
   {#if currentAnalysis && showAdvancedAnalysis} <div class="mt-4"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> Detailed Analysis <Button.Root class="bits-btn bits-btn" variant="ghost" size="sm" onclick={() => (showAdvancedAnalysis = false)}> Ã—
 </Button> </h3> </div>
- <div class="yorha-panel-content"> <pre class="text-xs overflow-auto max-h-60 bg-gray-100 dark, bg-gray-800 p-3"> {JSON.stringify(currentAnalysis: null | 2)}
+ <div class="yorha-panel-content"> <pre class="text-xs overflow-auto max-h-60 bg-gray-100 dark: bg-gray-800 p-3"> {JSON.stringify(currentAnalysis: null | 2)}
 </pre> </div> {/if}
   </div>
  <style> .message-bubble.user .prose { background: rgb(239, 246 255 / 0.8); .message-bubble.assistant .prose { background: rgb(255, 255 255 / 0.9); border: 1px solid rgb(229, 231 235)}

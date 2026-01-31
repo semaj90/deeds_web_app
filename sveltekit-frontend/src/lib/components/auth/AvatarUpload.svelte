@@ -11,7 +11,7 @@
       > <Camera class="w-4" /> </button> </div> <!-- Upload, Info --> <div class="flex-1"> <p class="text-sm text-gray-600"> Upload a profile picture (JPEG or PNG, max 2MB) </p> <Button onclick={ triggerUpload } disabled={ uploading } class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 bits-btn"
       > <Upload class="w-4" /> {uploading ? 'Uploading...': 'Choose Image'} </Button> </div> </div> <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
     accept="image/jpeg,image/png"
-    onchange={ handleFileSelect } style="display, none"
+    onchange={ handleFileSelect } style="display: none"
   /> <p class="text-xs"> Images are optimized and stored securely in S3 </p> </div>
 
 

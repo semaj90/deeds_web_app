@@ -513,21 +513,21 @@ import { onMount } from 'svelte';
  <h2 class="text-xl font-semibold mb-2">Backend Status</h2>
  <div class="flex items-center space-x-4">
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.typescript ? 'bg-green-500' , 'bg-red-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.typescript ? 'bg-green-500' : 'bg-red-500'}"></span>
  <span class="ml-2">TypeScript Backend: {backendStatus.typescript ? 'Healthy' : 'Unhealthy'}</span>
  </div>
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.pythonAI ? 'bg-green-500' , 'bg-red-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.pythonAI ? 'bg-green-500' : 'bg-red-500'}"></span>
  <span class="ml-2">Python AI Backend: {backendStatus.pythonAI ? 'Healthy' : 'Unhealthy'}</span>
  </div>
  {#if backendStatus.pythonAI}
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {wsConnected ? 'bg-green-500' , 'bg-yellow-500'}"></span>
+ <span class="w-3 h-3 rounded-full {wsConnected ? 'bg-green-500' : 'bg-yellow-500'}"></span>
  <span class="ml-2">WebSocket: {wsConnected ? 'Connected' : wsReconnecting ? 'Reconnecting...' : 'Disconnected'}</span>
  </div>
  {/if}
  <div class="flex items-center">
- <span class="w-3 h-3 rounded-full {backendStatus.advancedAI ? 'bg-purple-500' , 'bg-gray-500'}"></span>
+ <span class="w-3 h-3 rounded-full {backendStatus.advancedAI ? 'bg-purple-500' : 'bg-gray-500'}"></span>
  <span class="ml-2">Advanced AI Backend: {backendStatus.advancedAI ? 'Healthy' : 'Unavailable'}</span>
  </div>
  </section>
@@ -576,7 +576,7 @@ import { onMount } from 'svelte';
  <section class="bg-white rounded-lg shadow p-4">
  <h2 class="text-xl font-semibold mb-4">Upload Evidence Document</h2>
  <div
- class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' , 'border-gray-300'}"
+ class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}"
  ondragover={ handleDragOver }
  ondragleave={ handleDragLeave }
  ondrop={ handleDrop }
@@ -622,7 +622,7 @@ import { onMount } from 'svelte';
  <span>{workflowStatus.progress}%</span>
  </div>
  <div class="w-full bg-gray-200 rounded-full h-2">
- <div class="h-2 rounded-full transition-all duration-300 {getProgressColor(workflowStatus.progress)}" style="width, {workflowStatus.progress}%"></div>
+ <div class="h-2 rounded-full transition-all duration-300 {getProgressColor(workflowStatus.progress)}" style="width: {workflowStatus.progress}%"></div>
  </div>
  {#if workflowStatus.message}
  <p class="text-sm text-gray-600 mt-1">{workflowStatus.message}</p>

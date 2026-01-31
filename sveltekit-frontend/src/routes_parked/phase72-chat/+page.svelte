@@ -202,7 +202,7 @@
  <div class="flex-1 overflow-auto space-y-3 p-4">
  {#each messages as msg}
  <div
- class={`flex ${msg.role === 'user' ? 'justify-end' , 'justify-start'}`}
+ class={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
  >
  <div
  class={`max-w-md px-4 py-2 rounded-lg ${

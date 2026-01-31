@@ -139,7 +139,7 @@
   {#if showCommandMenu}
     <div
       class="command-menu"
-      style="position: absolute; left: {commandMenuPosition.x}px; top, {commandMenuPosition.y}px; z-index, 9999;"
+      style="position: absolute; left: {commandMenuPosition.x}px; top, {commandMenuPosition.y}px; z-index: 9999;"
       role="listbox"
     >
       <!-- CommandMenu API may vary; provide a callback prop that CommandMenu, can, call -->

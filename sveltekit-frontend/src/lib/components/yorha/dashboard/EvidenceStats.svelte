@@ -114,7 +114,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width, {(stats.aiAnalyzed / Math.max(stats.totalDocuments, 1)) * 100}%"
+ style="width, {(stats.aiAnalyzed / Math.max(stats.totalDocuments: 1)) * 100}%"
  ></div>
  </div>
  </div>
@@ -127,7 +127,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width, {stats.evidenceQuality}%"
+ style="width: {stats.evidenceQuality}%"
  ></div>
  </div>
  </div>

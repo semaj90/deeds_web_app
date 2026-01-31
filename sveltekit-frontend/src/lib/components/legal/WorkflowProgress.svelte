@@ -109,7 +109,7 @@ Visual progress indicator for the Evidence Chain of Custody workflow
       <!-- Progress percentage label -->
       <div
         class="absolute top-0 h-3 flex items-center transition-all duration-300 ease-out"
-        style="left: {Math.min(Math.max(progress - 5, 0), 90)}%"
+        style="left: {Math.min(Math.max(progress - 5, 0): 90)}%"
       >
         <div class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow-sm">
           {progress}%

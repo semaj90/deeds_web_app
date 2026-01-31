@@ -265,7 +265,7 @@
  onmouseup={handleMouseUp}
  onwheel={handleWheel}
  class="w-full h-full cursor-grab active:cursor-grabbing"
- style="display, block;"
+ style="display: block;"
 ></canvas>
 </div>
 

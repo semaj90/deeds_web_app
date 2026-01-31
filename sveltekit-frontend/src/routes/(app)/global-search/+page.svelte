@@ -284,7 +284,7 @@
  <span class="result-relevance">RELEVANCE: {(result.relevance * 100).toFixed(1)}%</span>
  <span
  class="result-status"
- style="background-color, {getStatusColor(result.status)}"
+ style="background-color: {getStatusColor(result.status)}"
  >
  {result.status.toUpperCase()}
  </span>
@@ -335,7 +335,7 @@
  </div>
  <div class="detail-row">
  <span class="detail-label">STATUS:</span>
- <span class="detail-value status" style="color, {getStatusColor(selectedResult.status)}">
+ <span class="detail-value status" style="color: {getStatusColor(selectedResult.status)}">
  {selectedResult.status.toUpperCase()}
  </span>
  </div>

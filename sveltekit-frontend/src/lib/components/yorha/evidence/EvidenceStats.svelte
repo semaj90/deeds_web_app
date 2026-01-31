@@ -74,7 +74,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-green-400 transition-all duration-300"
- style="width, {(stats.documentsProcessed / stats.totalDocuments) * 100}%"
+ style="width: {(stats.documentsProcessed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">
@@ -98,7 +98,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-purple-400 transition-all duration-300"
- style="width, {(stats.aiAnalyzed / stats.totalDocuments) * 100}%"
+ style="width: {(stats.aiAnalyzed / stats.totalDocuments) * 100}%"
  ></div>
  </div>
  <p class="text-xs text-slate-400 mt-1">
@@ -152,7 +152,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width, {item.progress}%"
+ style="width: {item.progress}%"
  ></div>
  </div>
  </div>

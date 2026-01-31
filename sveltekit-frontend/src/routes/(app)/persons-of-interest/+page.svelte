@@ -120,10 +120,10 @@
  <div class="card-header">
  <h3>{poi.name}</h3>
  <div class="badges">
- <span class="badge status" style="background-color, {getStatusColor(poi.status)}">
+ <span class="badge status" style="background-color: {getStatusColor(poi.status)}">
  {poi.status.replace(/_/g, ' ')}
  </span>
- <span class="badge priority" style="background-color, {getPriorityColor(poi.priority)}">
+ <span class="badge priority" style="background-color: {getPriorityColor(poi.priority)}">
  {poi.priority}
  </span>
  </div>
@@ -142,7 +142,7 @@
  </div>
 
  <div class="card-footer">
- <span class="threat-level" style="color, {getPriorityColor(poi.threatLevel)}">
+ <span class="threat-level" style="color: {getPriorityColor(poi.threatLevel)}">
  Threat: {poi.threatLevel}
  </span>
  <span class="date">

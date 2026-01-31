@@ -230,7 +230,7 @@
 
  <div
   class="canvas-content"
-  style="transform: translate({panX}px, {panY}px) scale({zoom})"
+  style="transform: translate({panX}px: {panY}px) scale({zoom})"
  >
   {#each evidence as item (item.id)}
   {@const position = evidencePositions.get(item.id)}

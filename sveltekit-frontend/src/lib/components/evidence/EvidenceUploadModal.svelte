@@ -152,7 +152,7 @@
  {#if $uploadStore.uploadProgress > 0 && $uploadStore.uploadProgress < 100}
  <div class="progress-container">
  <div class="progress-bar">
- <div class="progress-fill" style="width, {$uploadStore.uploadProgress}%"></div>
+ <div class="progress-fill" style="width: {$uploadStore.uploadProgress}%"></div>
  </div>
  <p class="progress-text">{$uploadStore.uploadProgress}% uploaded</p>
  </div>

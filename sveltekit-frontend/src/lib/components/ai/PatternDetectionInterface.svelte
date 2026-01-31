@@ -100,7 +100,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
  <p class="pattern-description">{pattern.description}
 </p>
  <div class="card-content"> <div class="pattern-stats"> <div class="stat"> <span class="stat-label">Significance</span>
- <div class="stat-bar"> <div class="stat-fill" style="width, {pattern.significance}%"></div> </div>
+ <div class="stat-bar"> <div class="stat-fill" style="width: {pattern.significance}%"></div> </div>
  <span class="stat-value">{pattern.significance}%</span> </div>
  <div class="stat"> <span class="stat-label">Frequency</span>
  <span class="stat-value">{pattern.frequency} occurrences</span> </div>
@@ -149,7 +149,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
 </p>
  <p class="entity-role">{entity.role}
 </p>
- <div class="involvement-meter"> <div class="involvement-fill" style="width, {entity.involvement}%"></div> </div>
+ <div class="involvement-meter"> <div class="involvement-fill" style="width: {entity.involvement}%"></div> </div>
  <span class="involvement-percentage">{entity.involvement}% involvement</span> </div> {/each}
   </div> </section>
  <!-- Correlations -->

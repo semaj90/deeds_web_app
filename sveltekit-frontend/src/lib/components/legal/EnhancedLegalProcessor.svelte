@@ -203,7 +203,7 @@ import type { Document } from '$lib/types';
       <div class="w-full bg-gray-200 rounded-full">
         <div
           class="bg-blue-600 h-4 rounded-full transition-all duration-500"
-          style="width, {getProgress()}%"
+          style="width: {getProgress()}%"
         ></div>
       </div>
       <p class="text-center text-blue-700 font-medium">

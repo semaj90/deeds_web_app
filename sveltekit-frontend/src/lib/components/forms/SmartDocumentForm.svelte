@@ -372,7 +372,7 @@ import type { Document } from '$lib/types';
         <div class="flex items-center justify-between pt-6 border-t">
           <div class="flex items-center">
             <!-- Badge replaced, with, span -->
-            <span class={isFormValid ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' , 'bg-yorha-warning text-yorha-bg-primary px-2, py-1, rounded'}>
+            <span class={isFormValid ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' : 'bg-yorha-warning text-yorha-bg-primary px-2, py-1, rounded'}>
               {isFormValid ? 'Ready to Submit' : 'Incomplete'}
             </span>
             {#if enableOCR && $extractedFields.length > 0}
@@ -420,7 +420,7 @@ import type { Document } from '$lib/types';
             </span>
             <span
               class={
-                field.validationStatus === 'valid' ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' , field.validationStatus === 'invalid' ? 'bg-yorha-danger text-yorha-bg-primary px-2 py-1 rounded' , 'bg-yorha-warning text-yorha-bg-primary px-2 py-1 rounded'
+                field.validationStatus === 'valid' ? 'bg-yorha-success text-yorha-bg-primary px-2 py-1 rounded' : field.validationStatus === 'invalid' ? 'bg-yorha-danger text-yorha-bg-primary px-2 py-1 rounded' : 'bg-yorha-warning text-yorha-bg-primary px-2 py-1 rounded'
               }
             >
               {field.validationStatus}

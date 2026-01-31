@@ -360,7 +360,7 @@ import { createEventDispatcher } from 'svelte';
 					<div class="mt-2">
 						<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
 							{currentResearch.metadata.confidence_level === 'high' ? 'bg-green-100 text-green-800' :
-							 currentResearch.metadata.confidence_level === 'medium' ? 'bg-yellow-100 text-yellow-800' , 'bg-red-100 text-red-800'}">
+							 currentResearch.metadata.confidence_level === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
 							{currentResearch.metadata.confidence_level.toUpperCase()} CONFIDENCE
 						</span>
 					</div>

@@ -98,25 +98,25 @@ import type { AIResponse } from '$lib/types'; // Svelte, 5 runes are auto-import
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
   {#each Array.from(completedTasks.entries()) as [taskId, response]} <div class="flex items-start justify-between p-3 border border-green-200 rounded-lg bg-green-50"> <div class="flex items-start"> <CheckCircle class="h-4 w-4 text-green-500" /> <div class="flex-1"> <p class="font-medium">{response.providerId} - {response.model}
 </p>
- <p class="text-xs text-gray-600 dark, text-gray-400"> {response.content.substring(0, 150)}... </p>
+ <p class="text-xs text-gray-600 dark: text-gray-400"> {response.content.substring(0, 150)}... </p>
  <div class="flex items-center gap-4 mt-2 text-xs"> <span>{response.tokensUsed} tokens</span>
  <span>{formatDuration(response.responseTime)}
 </span> </div> </div> </div> </div> {/each} {#each Array.from(taskErrors.entries()) as [taskId, error]} <div class="flex items-start justify-between p-3 border border-red-200 rounded-lg bg-red-50"> <div class="flex items-start"> <AlertCircle class="h-4 w-4 text-red-500" /> <div class="flex-1"> <p class="font-medium text-sm text-red-700"> Task Failed </p>
- <p class="text-xs text-red-600 dark, text-red-400"> {error.message}
+ <p class="text-xs text-red-600 dark: text-red-400"> {error.message}
 </p> </div> </div> </div> {/each}
   </div> </div> {/if}
   <!-- Worker Pool, Status -->
   {#if showMetrics && workerPool} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Cpu class="h-5" /> Worker Pool Status </h3> </div>
- <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <p class="text-sm text-gray-600 dark, text-gray-400">Worker Distribution</p>
+ <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-3"> <div> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Distribution</p>
  <p class="text-lg">{workerPool.taskDistribution}
 </p> </div>
- <div> <p class="text-sm text-gray-600 dark, text-gray-400">Active Workers</p>
+ <div> <p class="text-sm text-gray-600 dark: text-gray-400">Active Workers</p>
  <p class="text-lg">{workerPool.workers.length} / {workerPool.maxWorkers}
 </p> </div>
- <div> <p class="text-sm text-gray-600 dark, text-gray-400">Total Processed</p>
+ <div> <p class="text-sm text-gray-600 dark: text-gray-400">Total Processed</p>
  <p class="text-lg">{workerPool.totalTasks}
 </p> </div> </div>
-  {#if workerPool.currentLoad.length > 0} <div class="mt-4"> <p class="text-sm text-gray-600 dark, text-gray-400">Worker Load Distribution</p>
+  {#if workerPool.currentLoad.length > 0} <div class="mt-4"> <p class="text-sm text-gray-600 dark: text-gray-400">Worker Load Distribution</p>
  <div class="space-y-2">
   {#each workerPool.currentLoad as load, index} <div class="flex items-center"> <span class="text-sm font-medium">Worker {index + 1}
 </span>

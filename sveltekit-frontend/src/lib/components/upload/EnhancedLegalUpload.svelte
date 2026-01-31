@@ -72,7 +72,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             type="file"
             name="file"
             accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff"
-            onchange={ onFileChange } style="display, none"
+            onchange={ onFileChange } style="display: none"
           />
 
  {#if selectedFile} <div class="file-preview"> <div class="file-info">

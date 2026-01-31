@@ -27,7 +27,7 @@
 	{disabled}
 	onclick={handleClick}
 	class={className}
-	data-state={dialogContext?.open ? 'open' , 'closed'}
+	data-state={dialogContext?.open ? 'open' : 'closed'}
 >
 	{#if children}
 		{@render children()}

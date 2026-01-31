@@ -70,22 +70,22 @@ import type { Case } from '$lib/types';
     <h3>ðŸ” Integration Validation Results</h3>
 
     <div class="result-item">
-      <span class="indicator {selectedCaseType ? 'success' , 'pending'}">â—</span>
+      <span class="indicator {selectedCaseType ? 'success' : 'pending'}">â—</span>
       Dropdown functional: {selectedCaseType ? 'YES' : 'NO'}
     </div>
 
     <div class="result-item">
-      <span class="indicator {acceptTerms ? 'success' , 'pending'}">â—</span>
+      <span class="indicator {acceptTerms ? 'success' : 'pending'}">â—</span>
       Checkbox functional: {acceptTerms || urgentCaseOnly ? 'YES' : 'NO'}
     </div>
 
     <div class="result-item">
-      <span class="indicator {searchQuery ? 'success' , 'pending'}">â—</span>
+      <span class="indicator {searchQuery ? 'success' : 'pending'}">â—</span>
       SearchBar functional: {searchQuery.length > 0 ? 'YES' : 'NO'}
     </div>
 
     <div class="result-item">
-      <span class="indicator {isFormValid ? 'success' , 'pending'}">â—</span>
+      <span class="indicator {isFormValid ? 'success' : 'pending'}">â—</span>
       Form validation {isFormValid ? 'COMPLETE' : 'INCOMPLETE'}
     </div>
   </div>

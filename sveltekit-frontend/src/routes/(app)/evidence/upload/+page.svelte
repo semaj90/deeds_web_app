@@ -236,7 +236,7 @@
 		type="file"
 		accept=".pdf,.docx,.png,.jpg,.jpeg"
 		onchange={handleFileSelect}
-		style="display, none"
+		style="display: none"
 	/>
 
 	{#if uploadStatus.status !== 'idle'}
@@ -259,7 +259,7 @@
 			</div>
 
 			<div class="progress-bar">
-				<div class="progress-fill" style="width, {uploadStatus.progress}%"></div>
+				<div class="progress-fill" style="width: {uploadStatus.progress}%"></div>
 			</div>
 
 			<p class="status-message">{uploadStatus.message}</p>

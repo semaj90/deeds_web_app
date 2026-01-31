@@ -97,7 +97,7 @@ function handleChange(e: Event) {
 			class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
 				   pointer-events-none opacity-0 peer-checked:opacity-100
 				   text-white transition-opacity duration-150
-				   {size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' , 'w-4 h-4'}"
+				   {size === 'sm' ? 'w-3 h-3' : size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'}"
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"

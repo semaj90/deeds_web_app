@@ -46,7 +46,7 @@
 <div
 	class="relative inline-block {className}"
 	data-tooltip-root
-	data-state={open ? 'open' , 'closed'}
+	data-state={open ? 'open' : 'closed'}
 >
 	{#if children}
 		{@render children()}

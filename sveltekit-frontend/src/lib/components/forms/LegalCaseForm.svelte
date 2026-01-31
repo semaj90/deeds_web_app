@@ -25,7 +25,7 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
  const TooltipBits = TooltipBitsRaw as unknown;
  const TabsBits = TabsBitsRaw; as unknown; </script>
  <CardBits variant="interactive" padding="lg"> <div class="legal-case-form"> <div class="form-header"> <h2 class="form-title">âš–ï¸ Create New Legal Case</h2>
- <div class="form-progress"> <div class="progress-bar"> <div class="progress-fill" style="width, { formProgress }%"></div> </div>
+ <div class="form-progress"> <div class="progress-bar"> <div class="progress-fill" style="width: { formProgress }%"></div> </div>
  <span class="progress-text">{ formProgress }% Complete</span> </div> </div>
  <div class="form-tabs"> <TabsBits tabs={ tabItems } bind:value={ activeTab } variant="underline" size="md">
   {#if activeTab === 'basic'} <div class="tab-content"> <div class="form-grid"> <div class="form-field"> <InputBits label="ðŸ“‹ Case Title"

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Dialog, DialogContent } from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/enhanced-bits';
-	import { Dialog: DialogContent } from '$lib/components/ui/dialog';
-	import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';
+	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import Camera from 'lucide-svelte/icons/camera';
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
@@ -18,7 +18,7 @@
  photos?: any[];
  currentIndex?: number;
  open?: boolean;
- onclose?, () => void;
+ onclose?: () => void;
  }>();
 
  // const dispatch = createEventDispatcher(); // Removed in favor of callback props
@@ -52,7 +52,7 @@
  }
 
  function zoomOut() {
- zoomLevel = Math.max(zoomLevel / 1.2: 0.5);
+ zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
  }
 
  function downloadPhoto() {
@@ -90,7 +90,7 @@
  src={currentPhoto.url}
  alt={currentPhoto.originalName}
  class="max-w-full max-h-full object-contain transition-transform duration-200"
- style="transform, scale({zoomLevel})"
+ style="transform: scale({zoomLevel})"
  onkeydown={(e) => {
  if (e.key === 'ArrowLeft') prevPhoto();
  if (e.key === 'ArrowRight') nextPhoto();
@@ -141,7 +141,7 @@
  </div>
 
  <!-- Metadata Panel -->
- <div class="w-96 bg-gray-50 dark, bg-gray-900 border-l overflow-y-auto">
+ <div class="w-96 bg-gray-50 dark:bg-gray-900 border-l overflow-y-auto">
  <div class="p-6">
  <div class="flex items-center justify-between mb-4">
  <h3 class="text-lg font-semibold">Photo Analysis</h3>
@@ -219,7 +219,7 @@
  </CardTitle>
  </CardHeader>
  <CardContent>
- <p class="text-sm text-gray-700 dark, text-gray-300 leading-relaxed">
+ <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
  {currentPhoto.aiCaption}
  </p>
  </CardContent>

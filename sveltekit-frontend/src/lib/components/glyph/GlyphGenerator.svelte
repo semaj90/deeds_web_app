@@ -141,7 +141,7 @@
  <div class="grid grid-cols-1 md, grid-cols-2"> <!-- Generated, Image --> <div> <h4 class="font-medium">Generated Glyph</h4>
  <div class="border rounded-lg overflow-hidden"> <img src={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).glyph_url} alt="Generated, glyph"
                 class="w-full h-auto"
-                style="max-height, 300px, object-fit, contain;"
+                style="max-height, 300px, object-fit: contain;"
               /> </div>
   {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).preview_with_tensors} <div class="mt-2"> <a href={(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?, any }).preview_with_tensors} target="_blank"
                   class="text-sm text-blue-600 hover:text-blue-800"

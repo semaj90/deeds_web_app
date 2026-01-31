@@ -31,7 +31,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
     } }
 </script>
  <div class="evidence-manager"> <!-- Evidence: Manager, Header --> <Card style="
-      border-color, {evidenceBuilder.styling.colors.primary} border-width, {evidenceBuilder.styling.nes.borderWidth}
+      border-color, {evidenceBuilder.styling.colors.primary} border-width: {evidenceBuilder.styling.nes.borderWidth}
     "
   > <CardHeader> <CardTitle class="evidence-title"> <div class="title-section"> <span class="evidence-icon">ðŸ—‚ï¸</span>
  <div class="title-text"> <h2>Evidence Manager</h2>
@@ -97,7 +97,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   </div> </div>
  <div class="evidence-metrics"> <div class="relevance-score"> <span class="relevance-label">Relevance Score: </span>
  <div class="relevance-bar"> <div class="relevance-fill"
-                      style="; width, {evidence.relevanceScore * 100}%; background, {evidenceBuilder.styling.colors.evidence}"
+                      style="; width, {evidence.relevanceScore * 100}%; background: {evidenceBuilder.styling.colors.evidence}"
                       "
                     ></div> </div>
  <span class="relevance-value"> {Math.round(evidence.relevanceScore * 100)}% </span> </div>

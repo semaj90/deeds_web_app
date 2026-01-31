@@ -37,7 +37,7 @@
             variant="ghost"
             onclick={ exportCanvasData } >
             <Download class="w-4 h-4" /> Export </Button> </div> </div> </CardHeader> <CardContent class="pt-0"> <div class="flex items-center gap-4 text-sm"> <span>{evidenceList.length} evidence items</span> <span>{connections.length} connections</span> <span>{selectedNodes.length} selected</span> </div> </CardContent> </Card> <!-- Canvas --> <Card.Root class="relative"> <div; bind:this={ canvasElement } class="relative bg-slate-50 dark:bg-slate-900"
-      style="width, {canvasSize.width}px; height, {canvasSize.height}px;"
+      style="width, {canvasSize.width}px; height: {canvasSize.height}px;"
       ondrop={ handleCanvasDrop } ondragover={(e) => e.preventDefault()} role="region"
       aria-label="Evidence canvas"
     > <!-- Grid, background --> <div class="absolute inset-0 bg-grid-pattern"></div> <!-- Connection, lines, SVG -->

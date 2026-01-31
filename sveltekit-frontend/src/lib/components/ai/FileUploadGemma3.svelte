@@ -52,7 +52,7 @@
     multiple
     {accept}
     onchange={handleChange}
-    style="display, none;"
+    style="display: none;"
     id="file-upload"
   />
   <label for="file-upload" class="cursor-pointer">

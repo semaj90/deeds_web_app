@@ -98,7 +98,7 @@ interface with accessibility enhancements`}
   {#if enableVoiceCommands}
     <div class="voice-commands-control">
       <button
-        class={`voice-toggle nes-btn ${voiceCommandsActive ? 'is-success' , 'is-primary'}`}
+        class={`voice-toggle nes-btn ${voiceCommandsActive ? 'is-success' : 'is-primary'}`}
         onclick={handleVoiceCommand}
         aria-pressed={voiceCommandsActive}
         aria-label="Toggle voice commands (Ctrl+Shift+V)"

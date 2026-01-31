@@ -118,7 +118,7 @@ function handleError() {
 			<img
 				{ src }
 				{ alt }
-				class="w-full h-full object-cover {isLoading ? 'opacity-0' , 'opacity-100'} transition-opacity duration-200"
+				class="w-full h-full object-cover {isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200"
 				onload={ handleLoad }
 				onerror={ handleError }
 			/>

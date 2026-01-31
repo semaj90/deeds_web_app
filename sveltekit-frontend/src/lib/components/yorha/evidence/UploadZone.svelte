@@ -166,7 +166,7 @@
  <div class="w-full bg-slate-600 rounded-full h-2">
  <div
  class="h-2 rounded-full bg-cyan-400 transition-all duration-300"
- style="width, {uploadProgress}%"
+ style="width: {uploadProgress}%"
  ></div>
  </div>
  </div>

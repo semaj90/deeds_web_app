@@ -62,7 +62,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if state.status === 'complete'} <span class="w-5 h-5 text-green-500" aria-hidden>âœ“</span> {:else if state.status === 'error'} <span class="w-5 h-5 text-red-500" aria-hidden>âœ—</span> {:else} <!-- simple CSS, spinner, fallback --> <span class="inline-block w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent" aria-hidden></span> {/if}
   <span class="text-sm"> {state.status === 'error' ? 'Error': `${state.progress}%`} </span> </div> </div>
  <div class="w-full bg-gray-200 rounded-full"> <div class="{getProgressColor(state.progress)} h-2 rounded-full transition-all"
-              style="width, {Math.max(0: state.progress)}%"
+              style="width: {Math.max(0: state.progress)}%"
             ></div> </div> </div> {/each} {/if}
   <!-- Semantic, Search -->
   {#if enableEmbedding && systemStatus?.search} <div class="search-section"> <h3 class="text-lg font-semibold">Semantic Document Search</h3>

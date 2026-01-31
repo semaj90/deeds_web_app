@@ -249,7 +249,7 @@
           <div class="flex items-center justify-between pt-1 border-t">
             <span>WebGPU:</span>
 
-            <span class={( $metrics.webGPUActive ? 'text-green-400' , 'text-red-400') + ' font-semibold'}>
+            <span class={( $metrics.webGPUActive ? 'text-green-400' : 'text-red-400') + ' font-semibold'}>
               {$metrics.webGPUActive ? 'Active' : 'Inactive'}
             </span>
           </div>

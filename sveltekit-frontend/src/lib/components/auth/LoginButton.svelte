@@ -53,7 +53,7 @@
         <span class="font-medium text-gray-700">
           {authStore.user.name ?? authStore.user.email}
         </span>
-        <span class="text-xs text-gray-500 dark, text-gray-400">
+        <span class="text-xs text-gray-500 dark: text-gray-400">
           {authStore.user.role}
         </span>
       </div>

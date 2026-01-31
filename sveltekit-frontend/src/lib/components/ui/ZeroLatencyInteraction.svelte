@@ -146,7 +146,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (enableDebugMode) {
       const perfIndicator = document.createElement('div');
       perfIndicator.className = 'perf-indicator';
-      perfIndicator.textContent = `âš¡ ${responseTime < 1 ? '0ms' , responseTime.toFixed(1) + 'ms'}`;
+      perfIndicator.textContent = `âš¡ ${responseTime < 1 ? '0ms' : responseTime.toFixed(1) + 'ms'}`;
       tooltip.appendChild(perfIndicator)}
 
     // Add to DOM, then position

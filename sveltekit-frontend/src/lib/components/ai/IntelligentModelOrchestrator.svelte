@@ -194,7 +194,7 @@ import type { User } from '$lib/types';
             <div>
               <div class="text-sm">Estimated Latency:</div>
               <div
-                class="text-lg font-semibold {$results.estimatedLatency < 500 ? 'text-green-600' , 'text-yellow-600'}"
+                class="text-lg font-semibold {$results.estimatedLatency < 500 ? 'text-green-600' : 'text-yellow-600'}"
               >
                 {formatLatency($results.estimatedLatency)}
               </div>
@@ -245,7 +245,7 @@ import type { User } from '$lib/types';
           <div class="pt-2">
             <div class="flex items-center">
               <div class="w-2 h-2"></div>
-              <span class="text-sm {$modelStatusDisplay.isHealthy ? 'text-green-600' , 'text-red-600'}">
+              <span class="text-sm {$modelStatusDisplay.isHealthy ? 'text-green-600' : 'text-red-600'}">
                 {$modelStatusDisplay.isHealthy ? 'Healthy' : 'Issues Detected'}
               </span>
             </div>
@@ -275,8 +275,8 @@ import type { User } from '$lib/types';
             <div class="text-gray-600">Fragmentation</div>
             <div class="w-full bg-gray-200 rounded-full">
               <div
-                class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' , 'orange'}-500 h-2"
-                style="width, {$memoryStatusDisplay.fragmentation * 100}%"
+                class="bg-{$memoryStatusDisplay.fragmentation < 0.3 ? 'green' : 'orange'}-500 h-2"
+                style="width: {$memoryStatusDisplay.fragmentation * 100}%"
               ></div>
             </div>
             <div class="text-xs text-gray-500">
@@ -318,7 +318,7 @@ import type { User } from '$lib/types';
             <div class="w-full bg-gray-200 rounded-full">
               <div
                 class="bg-blue-500 h-2 rounded-full"
-                style="width, {($systemStatus.summary?.overallSatisfaction ?? 0) * 100}%"
+                style="width: {($systemStatus.summary?.overallSatisfaction ?? 0) * 100}%"
               ></div>
             </div>
             <div class="text-xs text-gray-500">

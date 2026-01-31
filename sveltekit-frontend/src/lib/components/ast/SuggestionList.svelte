@@ -56,7 +56,7 @@
  <div class="flex items-start justify-between gap-2 mb-2">
  <div class="flex items-center gap-2">
  <ClusterBadge cluster={suggestion.cluster} size="sm" />
- <h4 class="font-medium text-gray-900 dark, text-gray-100">
+ <h4 class="font-medium text-gray-900 dark: text-gray-100">
  {suggestion.title}
  </h4>
  </div>
@@ -67,14 +67,14 @@
  </div>
 
  <!-- Description -->
- <p class="text-sm text-gray-600 dark, text-gray-400 mb-3">
+ <p class="text-sm text-gray-600 dark: text-gray-400 mb-3">
  {suggestion.description}
  </p>
 
  <!-- Code Preview -->
  {#if suggestion.code}
- <div class="mb-3 rounded bg-gray-100 dark, bg-gray-900 p-3 font-mono text-sm overflow-x-auto">
- <pre class="text-gray-800 dark, text-gray-200">{suggestion.code}</pre>
+ <div class="mb-3 rounded bg-gray-100 dark: bg-gray-900 p-3 font-mono text-sm overflow-x-auto">
+ <pre class="text-gray-800 dark: text-gray-200">{suggestion.code}</pre>
  </div>
  {/if}
 
@@ -82,7 +82,7 @@
  <div class="flex items-center gap-2 mb-3 flex-wrap">
  <span class="text-xs text-gray-500">Sources:</span>
  {#each suggestion.sources as source}
- <span class="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark, bg-gray-700 px-2 py-0.5 rounded">
+ <span class="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark: bg-gray-700 px-2 py-0.5 rounded">
  <span class={getSourceIcon(source.type)}></span>
  {source.name}
  {#if source.url}
@@ -107,7 +107,7 @@
  {#if onDismiss}
  <button
  type="button"
- class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover: text-gray-800, dark:hover:text-gray-200 border border-gray-300 dark, border-gray-600 rounded transition-colors"
+ class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 dark: text-gray-400, hover: text-gray-800, dark:hover:text-gray-200 border border-gray-300 dark: border-gray-600 rounded transition-colors"
  onclick={() => onDismiss.suggestion}
  >
  <span class="i-lucide-x"></span>

@@ -131,7 +131,7 @@ import type { Message } from '$lib/types';
             {/if}
           {/if}
         {#if message.metadata.tokenCount}
-          <div class={isUser ? 'text-right' , 'text-left'}>Tokens: {message.metadata.tokenCount}{/if}
+          <div class={isUser ? 'text-right' : 'text-left'}>Tokens: {message.metadata.tokenCount}{/if}
       {/if}
   </div>
   {#if isUser}

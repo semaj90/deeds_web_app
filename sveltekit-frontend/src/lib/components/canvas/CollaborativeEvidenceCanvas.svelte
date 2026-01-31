@@ -152,7 +152,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <Button class="bits-btn" variant="ghost" onclick={() => exportCanvas('png')} size="sm">ðŸ’¾ Export</Button> </div>
   {#if aiAssisted} <div class="ai-group"> <button class="ai-btn" onclick={ applyAILayout } disabled={ isGeneratingLayout }> {isGeneratingLayout ? 'â³': 'ðŸ¤–'} AI Layout </button>
  <button class="ai-btn" onclick={() => (showAISuggestions = !showAISuggestions)}> ðŸ’¡ Suggestions </button> {/if} {#if collaborative} <div class="collab-group"> <div class="collaborators">
-  {#each Array.isArray(Array.from(collaborators.values())) ? Array.from(collaborators.values()): [] as collaborator} <div class="collaborator-avatar" style="background-color, {collaborator.color}"> {collaborator.name[0]} </div> {/each}
+  {#each Array.isArray(Array.from(collaborators.values())) ? Array.from(collaborators.values()): [] as collaborator} <div class="collaborator-avatar" style="background-color: {collaborator.color}"> {collaborator.name[0]} </div> {/each}
   </div>
  <span class="save-status"> Last saved: {lastSaveTime.toLocaleTimeString()} </span> {/if}
   </div>
@@ -190,7 +190,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </CardContent> </Card> {/if}
   <!-- Context, Menu -->
   {#if contextMenu} <div class="fixed z-50 bg-background border border-border rounded-md shadow-lg"
-      style="left, {contextMenu.x}px; top, {contextMenu.y}px;"
+      style="left, {contextMenu.x}px; top: {contextMenu.y}px;"
     >
   {#each Array.isArray(contextMenu.actions) ? contextMenu.actions: [] as action} <Button class="bits-btn" variant="ghost"
           size="sm"

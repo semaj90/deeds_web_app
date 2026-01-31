@@ -196,13 +196,13 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  </header>
  <div class="tab-navigation">
  <button
- class="tab {activeTab === 'input' ? 'active' , ''}"
+ class="tab {activeTab === 'input' ? 'active' : ''}"
  onclick={() => (activeTab = 'input')}
  >
  📄 Document Input
  </button>
  <button
- class="tab {activeTab === 'summary' ? 'active' , ''}"
+ class="tab {activeTab === 'summary' ? 'active' : ''}"
  onclick={() => (activeTab = 'summary')}
  disabled={!summary && !isLoading}
  >
@@ -212,7 +212,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  {/if}
  </button>
  <button
- class="tab {activeTab === 'analysis' ? 'active' , ''}"
+ class="tab {activeTab === 'analysis' ? 'active' : ''}"
  onclick={() => (activeTab = 'analysis')}
  disabled={!metadata?.legalRiskAnalysis}
  >
@@ -299,7 +299,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <h3>🧠 AI Processing in Progress</h3>
  <div class="processing-steps">
  {#each processingSteps as step, i}
- <div class="step {i === processingSteps.length - 1 ? 'current' , 'completed'}">
+ <div class="step {i === processingSteps.length - 1 ? 'current' : 'completed'}">
  { step }
  </div>
  {/each}

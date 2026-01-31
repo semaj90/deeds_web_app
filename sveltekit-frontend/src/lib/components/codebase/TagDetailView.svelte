@@ -211,7 +211,7 @@
 						{#each tag.embedding.slice(0, 64) as value}
 							<div
 								class="embedding-cell"
-								style="background-color, {getEmbeddingColor(value)}"
+								style="background-color: {getEmbeddingColor(value)}"
 								title={value.toFixed(4)}
 							></div>
 						{/each}

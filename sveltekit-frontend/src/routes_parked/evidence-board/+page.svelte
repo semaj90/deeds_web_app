@@ -133,7 +133,7 @@
 						role="button"
 						tabindex="0"
 					>
-						<div class="status-indicator" style="background, {item.status_color}"></div>
+						<div class="status-indicator" style="background: {item.status_color}"></div>
 						<div class="list-item-content">
 							<div class="list-item-title">{item.title}</div>
 							<div class="list-item-meta">{item.doc_id}</div>
@@ -154,7 +154,7 @@
 			role="application"
 			aria-label="Evidence board canvas"
 		>
-			<div class="canvas-content" style="transform, translate({panX}px, {panY}px) scale({zoom / 100})">
+			<div class="canvas-content" style="transform, translate({panX}px: {panY}px) scale({zoom / 100})">
 				<!-- Connection Lines -->
 				<EvidenceConnections {evidence} />
 
@@ -183,7 +183,7 @@
 					</div>
 					<div class="metadata-section">
 						<label>Status</label>
-						<span class="status-badge" style="background, {selectedEvidence.status_color}">
+						<span class="status-badge" style="background: {selectedEvidence.status_color}">
 							{selectedEvidence.status}
 						</span>
 					</div>

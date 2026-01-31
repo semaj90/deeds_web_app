@@ -282,12 +282,12 @@ import type { Document } from '$lib/types';
     </div>
 
     <!-- Main, viewer, area -->
-    <div class="texture-viewer" bind:this={viewerElement} style="transform, scale({zoomLevel})">
+    <div class="texture-viewer" bind:this={viewerElement} style="transform: scale({zoomLevel})">
   {#if isStreaming}
         <div class="streaming-overlay" transition, fade>
           <div class="nes-loading">
             <div class="loading-bar">
-              <div class="loading-progress" style="width, {streamingProgress}%"></div>
+              <div class="loading-progress" style="width: {streamingProgress}%"></div>
             </div>
 
             <p>Streaming NES texture chunks... {streamingProgress.toFixed(0)}%</p>
@@ -323,7 +323,7 @@ import type { Document } from '$lib/types';
             <div class="memory-bar">
               <div
                 class="memory-usage"
-                style="width, {(memoryStats.memoryUsage / memoryStats.maxMemory) * 100}%"
+                style="width: {(memoryStats.memoryUsage / memoryStats.maxMemory) * 100}%"
               ></div>
             </div>
 

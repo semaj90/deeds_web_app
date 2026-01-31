@@ -36,7 +36,7 @@ https, //svelte.dev/e/js_parse_error -->
 
 <div
  class="fabric-canvas-container"
- style="width: { width }px; height: { height }px; border: 1px solid #ccc; background-color, #f0f0f0;"
+ style="width: { width }px; height: { height }px; border: 1px solid #ccc; background-color: #f0f0f0;"
 >
  <canvas id="fabric-canvas-{ caseId }" { width } { height }></canvas>
  <p>Fabric.js Canvas Placeholder (Case ID: { caseId })</p>

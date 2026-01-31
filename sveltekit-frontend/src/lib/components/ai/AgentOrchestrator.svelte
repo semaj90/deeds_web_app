@@ -113,11 +113,11 @@
   {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
   </div> </SelectItem> {/each}
   </SelectContent> </Select> </div> </div>
-  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-blue-50 dark, bg-blue-900/20"> <div class="flex items-start"> <div class="h-5 w-5 text-blue-500"> <SvelteComponent /> <div> <p class="font-medium text-blue-800">{workflow?.name}
+  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon ?? Activity} <div class="p-3 bg-blue-50 dark: bg-blue-900/20"> <div class="flex items-start"> <div class="h-5 w-5 text-blue-500"> <SvelteComponent /> <div> <p class="font-medium text-blue-800">{workflow?.name}
 </p>
  <p class="text-sm text-blue-600">{workflow?.description}
 </p>
- <p class="text-xs text-blue-500 dark, text-blue-400"> Estimated time: {workflow?.estimatedTime}
+ <p class="text-xs text-blue-500 dark: text-blue-400"> Estimated time: {workflow?.estimatedTime}
 </p> </div> </div> {/if}
   <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
  <Textarea id="orchestrator-input"; bind:value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
@@ -135,7 +135,7 @@
  <div class="yorha-panel-content"> <div class="space-y-3"> <div class="flex items-center"> <span class="text-sm">Progress</span>
  <span class="text-sm">{ executionProgress }%</span> </div>
  <div class="w-full bg-gray-200 rounded-full"> <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-              style="width, { executionProgress }%"
+              style="width: { executionProgress }%"
             ></div> </div>
  <div class="flex items-center gap-2">
   {#if isProcessing} <div class="animate-spin h-4 w-4 border border-gray-300 border-t-blue-500"></div> {:else} <CheckCircle class="h-4 w-4" /> {/if}
@@ -144,7 +144,7 @@
   <!-- Results, Display -->
   {#if selectedProvider === 'autogen' && conversationMessages.length > 0} <div class="nes-container"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <MessageSquare class="h-5" /> AutoGen Conversation ({conversationMessages.length} messages) </h3> </div>
  <div class="yorha-panel-content"> <div class="space-y-3 max-h-96">
-  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-blue-100 dark, bg-blue-900 flex items-center"> <span class="text-xs font-medium text-blue-600"> {message.sender.substring.toUpperCase()}
+  {#each Array.isArray(conversationMessages) ? conversationMessages: [] as message} <div class="flex items-start gap-3 p-3 border"> <div class="flex-shrink-0"> <div class="h-8 w-8 rounded-full bg-blue-100 dark: bg-blue-900 flex items-center"> <span class="text-xs font-medium text-blue-600"> {message.sender.substring.toUpperCase()}
 </span> </div> </div>
  <div class="flex-1"> <div class="flex items-center gap-2"> <span class="font-medium">{message.sender}
 </span>

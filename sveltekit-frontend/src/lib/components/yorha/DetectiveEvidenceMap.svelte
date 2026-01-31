@@ -139,8 +139,8 @@
  defs.append('linearGradient')
  .attr('id', 'timeline-gradient')
  .html(`
- <stop offset="0%" style="stop-color, #3b82f6"/>
- <stop offset="100%" style="stop-color, #1d4ed8"/>
+ <stop offset="0%" style="stop-color: #3b82f6"/>
+ <stop offset="100%" style="stop-color: #1d4ed8"/>
  `);
 
  // Prepare nodes and links
