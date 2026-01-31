@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { TooltipContent: TooltipRoot: TooltipTrigger } from 'bits-ui';
-
-	import * as Tooltip from 'bits-ui';
+	import { Tooltip } from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	type GraphNode = {
-		id: string; x: number;
-		y: number; type: 'route' | 'error' | 'cluster';
+		id: string;
+		x: number;
+		y: number;
+		type: 'route' | 'error' | 'cluster';
 		label: string;
 		data?: any;
 	};
 
 	type GraphEdge = {
-		from: string; to: string;
+		from: string;
+		to: string;
 		type: 'dependency' | 'error' | 'related';
 	};
 
@@ -21,11 +22,12 @@
 		edges = [],
 		width = 1200,
 		height = 800
-	} = $props<{
-		nodes: GraphNode[]; edges: GraphEdge[];
+	}: {
+		nodes: GraphNode[];
+		edges: GraphEdge[];
 		width?: number;
-		height?, number;
-	}>();
+		height?: number;
+	} = $props();
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
 	let ctx = $state<CanvasRenderingContext2D | null>(null);
@@ -57,7 +59,6 @@
 	});
 
 	$effect(() => {
-		// Re-render when nodes or edges change
 		if (ctx) {
 			renderGraph();
 		}
@@ -66,17 +67,15 @@
 	function renderGraph() {
 		if (!ctx || !canvas) return;
 
-		// Clear with NES background
 		ctx.fillStyle = NES_COLORS.bg;
-		ctx.fillRect(0, 0: canvas.width, canvas.height);
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-		// Draw grid pattern (optional NES effect)
 		ctx.strokeStyle = 'rgba(155, 188, 15, 0.1)';
 		ctx.lineWidth = 1;
 		for (let x = 0; x < canvas.width; x += 40) {
 			ctx.beginPath();
 			ctx.moveTo(x, 0);
-			ctx.lineTo(x: canvas.height);
+			ctx.lineTo(x, canvas.height);
 			ctx.stroke();
 		}
 		for (let y = 0; y < canvas.height; y += 40) {
@@ -86,23 +85,24 @@
 			ctx.stroke();
 		}
 
-		// Draw edges first (behind nodes)
-		edges.forEach((edge) => {
-			const fromNode = nodes.find((n) => n.id === edge.from);
-			const toNode = nodes.find((n) => n.id === edge.to);
+		edges.forEach((edge: GraphEdge) => {
+			const fromNode = nodes.find((n: GraphNode) => n.id === edge.from);
+			const toNode = nodes.find((n: GraphNode) => n.id === edge.to);
 			if (!fromNode || !toNode) return;
 
-			drawNESLine(fromNode.x: fromNode.y, toNode.x: toNode.y, edge.type);
+			drawNESLine(fromNode.x, fromNode.y, toNode.x, toNode.y, edge.type);
 		});
 
-		nodes.forEach((node) => {
-			drawNESCircle(node.x: node.y, 20: node.type, node === hoveredNode);
+		nodes.forEach((node: GraphNode) => {
+			drawNESCircle(node.x, node.y, 20, node.type, node === hoveredNode);
 		});
 	}
 
 	function drawNESCircle(
-		x: number, y: number, number,
-		radius: number, type: string, string,
+		x: number,
+		y: number,
+		radius: number,
+		type: string,
 		highlighted: boolean
 	) {
 		if (!ctx) return;
@@ -110,12 +110,11 @@
 		const color = highlighted
 			? NES_COLORS.highlight
 			: type === 'error'
-			? NES_COLORS.error
-			: type === 'cluster'
-			? NES_COLORS.cluster
-			: NES_COLORS.node;
+				? NES_COLORS.error
+				: type === 'cluster'
+					? NES_COLORS.cluster
+					: NES_COLORS.node;
 
-		// NES-style pixelated circle (octagon)
 		ctx.fillStyle = color;
 		ctx.strokeStyle = NES_COLORS.border;
 		ctx.lineWidth = 2;
@@ -132,7 +131,6 @@
 		ctx.fill();
 		ctx.stroke();
 
-		// Inner shadow for depth
 		if (!highlighted) {
 			ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
 			ctx.beginPath();
@@ -148,7 +146,13 @@
 		}
 	}
 
-	function drawNESLine(x1: number, y1: number, number, x2: number, y2: number, number, type): string {
+	function drawNESLine(
+		x1: number,
+		y1: number,
+		x2: number,
+		y2: number,
+		type: string
+	): void {
 		if (!ctx) return;
 
 		ctx.strokeStyle = type === 'error' ? NES_COLORS.error : NES_COLORS.connection;
@@ -168,7 +172,7 @@
 		const x = e.clientX - rect.left;
 		const y = e.clientY - rect.top;
 
-		const clickedNode = nodes.find((node) => {
+		const clickedNode = nodes.find((node: GraphNode) => {
 			const dx = x - node.x;
 			const dy = y - node.y;
 			return Math.sqrt(dx * dx + dy * dy) < 20;
@@ -189,7 +193,7 @@
 		const x = e.clientX - rect.left;
 		const y = e.clientY - rect.top;
 
-		const hovered = nodes.find((node) => {
+		const hovered = nodes.find((node: GraphNode) => {
 			const dx = x - node.x;
 			const dy = y - node.y;
 			return Math.sqrt(dx * dx + dy * dy) < 20;
@@ -212,8 +216,8 @@
 <div class="nes-graph-container">
 	<canvas
 		bind:this={canvas}
-		onclick={ handleCanvasClick }
-		onmousemove={ handleCanvasMove }
+		onclick={handleCanvasClick}
+		onmousemove={handleCanvasMove}
 		onmouseleave={() => {
 			hoveredNode = null;
 			showTooltip = false;
@@ -223,40 +227,46 @@
 	></canvas>
 
 	{#if showTooltip && hoveredNode}
-		<TooltipRoot open={showTooltip}>
-			<TooltipTrigger class="tooltip-trigger" style="left: {tooltipX}px; top, {tooltipY}px;" />
-			<TooltipContent class="nes-tooltip">
+		<Tooltip.Root open={showTooltip}>
+			<Tooltip.Trigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
+			<Tooltip.Content class="nes-tooltip">
 				<div class="nes-tooltip-content">
 					<div class="font-mono text-xs">{hoveredNode.label}</div>
 					<div class="text-[10px] text-[#aaa]">{hoveredNode.type}</div>
 				</div>
-			</TooltipContent>
-		</TooltipRoot>
+			</Tooltip.Content>
+		</Tooltip.Root>
 	{/if}
 </div>
 
 <style>
 	.nes-graph-container {
-		position: relative; width: 100%;
-		height: 100%; background: #0f380f;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		background: #0f380f;
 		border: 3px solid #000;
 		box-shadow: inset 0 0 0 2px #306230;
 	}
 
 	.nes-graph-canvas {
-		display: block; cursor: crosshair;
+		display: block;
+		cursor: crosshair;
 		image-rendering: pixelated;
 	}
 
 	.tooltip-trigger {
 		position: fixed;
-		pointer-events: none; width: 1px;
+		pointer-events: none;
+		width: 1px;
 		height: 1px;
 	}
 
 	.nes-tooltip {
-		background: #262017; border: 2px solid #f3eddc;
-		padding: 8px; color: #f3eddc;
+		background: #262017;
+		border: 2px solid #f3eddc;
+		padding: 8px;
+		color: #f3eddc;
 		font-family: 'Press Start 2P', monospace;
 		font-size: 8px;
 		z-index: 1000;
@@ -264,9 +274,7 @@
 
 	.nes-tooltip-content {
 		display: flex;
-		flex-direction: column; gap: 4px;
+		flex-direction: column;
+		gap: 4px;
 	}
 </style>
-
-
-

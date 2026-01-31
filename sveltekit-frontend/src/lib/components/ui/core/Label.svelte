@@ -1,17 +1,23 @@
 <script lang="ts">
- let { children, forId = undefined, className = '', text = '' } = $props<{
- forId?: string;
- className?: string;
- text?, string;
- }>();
+	import type { Snippet } from 'svelte';
+
+	let {
+		children,
+		forId = undefined,
+		className = '',
+		text = ''
+	}: {
+		children?: Snippet;
+		forId?: string;
+		className?: string;
+		text?: string;
+	} = $props();
 </script>
 
-<label {...forId ? { for: forId } , {}} class={ className }>
- {#if text}
- { text }
- {:else}
- {@render children?.()}
- {/if}
+<label {...(forId ? { for: forId } : {})} class={className}>
+	{#if text}
+		{text}
+	{:else if children}
+		{@render children()}
+	{/if}
 </label>
-
-

@@ -1,15 +1,7 @@
-<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https, //svelte.dev/e/attribute_invalid_event_handler -->
-<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https, //svelte.dev/e/attribute_invalid_event_handler -->
-<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https, //svelte.dev/e/attribute_invalid_event_handler -->
-<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
-https, //svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	let showModal = false;
+	let showModal = $state(false);
 
 	export function open() {
 		showModal = true;
@@ -18,14 +10,30 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	export function close() {
 		showModal = false;
 	}
+
+	function handleOverlayClick() {
+		close();
+	}
+
+	function stopPropagation(e: MouseEvent) {
+		e.stopPropagation();
+	}
 </script>
 
 {#if showModal}
-	<div class="modal-overlay" onclick={close}; transition, fade>
-		<div class="modal-container" onclick>
+	<div
+		class="modal-overlay"
+		onclick={handleOverlayClick}
+		onkeydown={(e) => e.key === 'Escape' && close()}
+		role="dialog"
+		aria-modal="true"
+		tabindex="-1"
+		transition:fade
+	>
+		<div class="modal-container" onclick={stopPropagation} role="document">
 			<div class="modal-header">
 				<slot name="header">Modal Title</slot>
-				<button class="close-button" onclick={close}>X</button>
+				<button class="close-button" onclick={close} aria-label="Close modal">X</button>
 			</div>
 			<div class="modal-content">
 				<slot />
@@ -36,9 +44,12 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 
 <style>
 	.modal-overlay {
-		position: fixed; top: 0;
-		left: 0; width: 100%;
-		height: 100%; background: rgba(0, 0, 0, 0.7);
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.7);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -46,12 +57,14 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	}
 
 	.modal-container {
-		background: #212121; border: 4px solid #fff;
+		background: #212121;
+		border: 4px solid #fff;
 		box-shadow: 0 0 0 4px #888, 0 0 0 8px #212121;
 		color: #fff;
 		font-family: 'Press Start 2P', cursive;
 		padding: 1rem;
-		max-width: 80%; width: 600px;
+		max-width: 80%;
+		width: 600px;
 	}
 
 	.modal-header {
@@ -65,7 +78,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 	}
 
 	.close-button {
-		background: none; border: none;
+		background: none;
+		border: none;
 		color: #fff;
 		font-family: 'Press Start 2P', cursive;
 		cursor: pointer;
@@ -76,6 +90,3 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
 		overflow-y: auto;
 	}
 </style>
-
-
-
