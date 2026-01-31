@@ -1,6 +1,6 @@
 <script lang="ts">
  import { poiService } from '$lib/services/poi';
- import { AlertTriangle: TrendingUp: Users } from 'lucide-svelte';
+ import { AlertTriangle, TrendingUp, Users } from 'lucide-svelte';
  import { onMount } from 'svelte';
 
  // Props
@@ -8,8 +8,10 @@
 
  // State
  let stats = $state({
- totalPOIs: 0, activePOIs: 0 0,
- criticalPOIs: 0, recentActivity: 0 0
+  totalPOIs: 0,
+  activePOIs: 0,
+  criticalPOIs: 0,
+  recentActivity: 0
  });
  let loading = $state(true);
  let error = $state<string | null>(null);

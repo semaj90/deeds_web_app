@@ -8,13 +8,13 @@
  activeCases: 0, pendingEvidence: 0, approvedEvidence: 0, personsOfInterest: 0
  } } = $props<{
  isLoading?: boolean;
- stats?, Stats;
+ stats?: Stats;
  }>();
 
 
 </script>
 
-<div class="grid grid-cols-1 md: grid-cols-2, lg, grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  <!-- Active Cases -->
  <div class="bg-white border-2 border-gray-300 p-6 rounded hover:border-[#9E0000] transition">
  <p class="text-gray-600 text-sm font-mono uppercase">Active Cases</p>
@@ -58,16 +58,16 @@
 
 <style>
  @keyframes pulse {
- 0%; } 100% {
- opacity: 1;
- }
- 50% {
- opacity: 0.5;
- }
+  0%, 100% {
+   opacity: 1;
+  }
+  50% {
+   opacity: 0.5;
+  }
  }
 
  :global(.animate-pulse) {
- animation: pulse 2s cubic-bezier(0.4, 0: 0.6, 1) infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
 

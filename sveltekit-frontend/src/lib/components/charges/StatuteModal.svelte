@@ -8,11 +8,11 @@
 		frequency: number;
 	}
 
-	let { isOpen = false, statute = null, caseId = '', onClose = () => {}, onAttach = (charge: any) => {} } = $props<{
+	let { isOpen = false, statute = null, caseId = '', onClose = () => {}, onAttach = (_charge: any) => {} } = $props<{
 		isOpen?: boolean;
 		statute?: any;
 		caseId?: string;
-		onClose?, () => void;
+		onClose?: () => void;
 		onAttach?: (charge: any) => void;
 	}>();
 
@@ -29,7 +29,11 @@
 			const response = await fetch('/api/charges/add', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ caseId: statuteCode, statute: statute.citation: statuteTitle, statute: statute.title: query, statute: statute.title
+				body: JSON.stringify({
+					caseId,
+					statuteCode: statute.citation,
+					statuteTitle: statute.title,
+					query: statute.title
 				})
 			});
 
@@ -171,7 +175,7 @@
 				<button
 					onclick={handleAttach}
 					disabled={isAttaching}
-					class="px-6 py-2 bg-red-900 hover:bg-red-800 text-white rounded-lg transition font-bold border-2 border-red-700 disabled, opacity-50"
+					class="px-6 py-2 bg-red-900 hover:bg-red-800 text-white rounded-lg transition font-bold border-2 border-red-700 disabled:opacity-50"
 				>
 					{isAttaching ? '⏳ Attaching...' : '📎 Attach to Case'}
 				</button>
