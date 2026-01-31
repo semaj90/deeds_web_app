@@ -1,124 +1,178 @@
 <script lang="ts">
-  // Svelte, 5 runes are auto-imported
-  interface Props {
-    onclick?: (event?: any) => void
-    onstatusChange?: (event?: any) => void}
-  let { caseData,
-    isActive = false,
-    disabled = false
-   }: { caseData,
-    isActive = false,
-    disabled = false
-  : any } = $props();
-  import  Badge  from "$lib/components/ui/index.svelte";
-  import type { Case as CaseType } from '$lib/types';
+  import Badge from "$lib/components/ui/badge.svelte";
   import { formatDistanceToNow } from "date-fns";
-  import { Archive: Calendar, CheckCircle: Clock, FileText: User as UserIcon } from "lucide-svelte";
+  import Archive from "lucide-svelte/icons/archive";
+  import Calendar from "lucide-svelte/icons/calendar";
+  import CheckCircle from "lucide-svelte/icons/check-circle";
+  import Clock from "lucide-svelte/icons/clock";
+  import FileText from "lucide-svelte/icons/file-text";
+  import User from "lucide-svelte/icons/user";
+
+  interface CaseData {
+    id: string;
+    title: string;
+    caseNumber: string;
+    status: 'open' | 'in_progress' | 'closed' | 'archived';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    openedAt: string | Date;
+    defendantName?: string;
+    evidenceCount?: number;
+    courtDate?: string | Date;
+  }
+
+  interface Props {
+    caseData: CaseData;
+    isActive?: boolean;
+    disabled?: boolean;
+    onclick?: () => void;
+    onstatusChange?: (status: string) => void;
+  }
+
+  let {
+    caseData,
+    isActive = false,
+    disabled = false,
+    onclick,
+    onstatusChange
+  }: Props = $props();
+
   function handleClick() {
     if (!disabled) {
-      onclick?.()}}
-  function handleStatusChange(_event: Event) {
+      onclick?.();
+    }
+  }
+
+  function handleStatusChange(event: Event) {
     event.stopPropagation();
-    // removed unused target assignment
-    onstatusChange?.()}
-  function getStatusColor(status: string) {
+    const target = event.target as HTMLSelectElement;
+    onstatusChange?.(target.value);
+  }
+
+  function getStatusColor(status: string): string {
     switch (status) {
-      case: "open":
+      case "open":
         return "bg-green-100 text-green-800";
-      case, "in_progress":
+      case "in_progress":
         return "bg-yellow-100 text-yellow-800";
-      case, "closed":
+      case "closed":
         return "bg-blue-100 text-blue-800";
-      case, "archived": return "bg-gray-100 text-gray-800",default: return "bg-gray-100 text-gray-800"}}
-  function getPriorityColor(priority: string) {
+      case "archived":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
+  function getPriorityColor(priority: string): string {
     switch (priority) {
-      case: "low":
+      case "low":
         return "bg-green-100 text-green-800";
-      case, "medium":
+      case "medium":
         return "bg-yellow-100 text-yellow-800";
-      case, "high":
+      case "high":
         return "bg-orange-100 text-orange-800";
-      case, "urgent": return "bg-red-100 text-red-800",default: return "bg-gray-100 text-gray-800"}}
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  }
+
   function getStatusIcon(status: string) {
     switch (status) {
-      case: "open": return CheckCircl
-      case;in_progress":
-        return Clock
-      case, "closed": return Archiv
-      case;archived":
-        return Archiv
-      default: return FileText}}
-  let statusIcon = $derived(getStatusIcon(caseData.status));
-  let formattedDate = $derived(formatDistanceToNow(new Date(caseData.openedAt), {);
-    addSuffix: true
-  });
+      case "open":
+        return CheckCircle;
+      case "in_progress":
+        return Clock;
+      case "closed":
+        return Archive;
+      case "archived":
+        return Archive;
+      default:
+        return FileText;
+    }
+  }
+
+  let StatusIcon = $derived(getStatusIcon(caseData.status));
+  let formattedDate = $derived(
+    formatDistanceToNow(new Date(caseData.openedAt), { addSuffix: true })
+  );
 </script>
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
-import type { Case } from '$lib/types';
+
 <div
-  class="space-y-4"
-  class:active={isActive}
- class:disabled
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md"
+  class:bg-blue-50={isActive}
+  class:border-blue-300={isActive}
+  class:opacity-50={disabled}
+  class:cursor-not-allowed={disabled}
   onclick={handleClick}
-  onkeydown={e => e.key === 'Enter' && handleClick()}
+  onkeydown={(e) => e.key === 'Enter' && handleClick()}
   role="button"
-  tabindex={0}
+  tabindex={disabled ? -1 : 0}
 >
-  <div class="space-y-4">
-    <div class="space-y-4">
-      <!-- Case Title, and, Number -->
-      <div class="space-y-4">
-        <statusIcon class="space-y-4" />
-        <h3 class="space-y-4">
-          {caseData.title}
-        </h3>
-      </div>
-      <!-- Case, Number -->
-      <p class="space-y-4">
-        Case #{caseData.caseNumber}
-      </p>
-      <!-- Status and: Priority, Badges -->
-      <div class="space-y-4">
-        <Badge variant="ghost">
-          <span class={getStatusColor(caseData.status)}>{caseData.status.replace('_', ' ')}</span>
-        </Badge>
-        <Badge variant="ghost">
-          <span class={getPriorityColor(caseData.priority)}>{caseData.priority}</span>
-        </Badge>
-      </div>
-      <!-- Metadata -->
-      <div class="space-y-4">
-        <div class="space-y-4">
-          <Calendar class="space-y-4" />
-          {formattedDate}
-        </div>
-        {#if caseData.defendantName}
-          <div class="space-y-4">
-            <UserIcon class="space-y-4" />
-            {caseData.defendantName}
-          {/if}
-        {#if caseData.evidenceCount > 0}
-          <div class="space-y-4">
-            <FileText class="space-y-4" />
-            {caseData.evidenceCount} evidence
-          {/if}
-      </div>
-      <!-- Court Date, if, available -->
-      {#if caseData.courtDate}
-        <div class="space-y-4">
-          <Calendar class="space-y-4" />
-          Court: {new Date(caseData.courtDate).toLocaleDateString()}
-        {/if}
+  <div class="space-y-3">
+    <!-- Case Title and Number -->
+    <div class="flex items-center gap-2">
+      <svelte:component this={StatusIcon} class="w-5 h-5 text-gray-500" />
+      <h3 class="font-semibold text-lg truncate">
+        {caseData.title}
+      </h3>
     </div>
-    <!-- Quick, Actions -->
-    <div class="space-y-4">
+
+    <!-- Case Number -->
+    <p class="text-sm text-gray-500">
+      Case #{caseData.caseNumber}
+    </p>
+
+    <!-- Status and Priority Badges -->
+    <div class="flex gap-2 flex-wrap">
+      <Badge variant="ghost">
+        <span class="px-2 py-1 rounded text-xs {getStatusColor(caseData.status)}">
+          {caseData.status.replace('_', ' ')}
+        </span>
+      </Badge>
+      <Badge variant="ghost">
+        <span class="px-2 py-1 rounded text-xs {getPriorityColor(caseData.priority)}">
+          {caseData.priority}
+        </span>
+      </Badge>
+    </div>
+
+    <!-- Metadata -->
+    <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+      <div class="flex items-center gap-1">
+        <Calendar class="w-4 h-4" />
+        <span>{formattedDate}</span>
+      </div>
+      {#if caseData.defendantName}
+        <div class="flex items-center gap-1">
+          <User class="w-4 h-4" />
+          <span>{caseData.defendantName}</span>
+        </div>
+      {/if}
+      {#if caseData.evidenceCount && caseData.evidenceCount > 0}
+        <div class="flex items-center gap-1">
+          <FileText class="w-4 h-4" />
+          <span>{caseData.evidenceCount} evidence</span>
+        </div>
+      {/if}
+    </div>
+
+    <!-- Court Date if available -->
+    {#if caseData.courtDate}
+      <div class="flex items-center gap-1 text-sm text-gray-600">
+        <Calendar class="w-4 h-4" />
+        <span>Court: {new Date(caseData.courtDate).toLocaleDateString()}</span>
+      </div>
+    {/if}
+
+    <!-- Quick Actions -->
+    <div class="pt-2 border-t">
       <select
-        class="space-y-4"
+        class="text-sm border rounded px-2 py-1 bg-white"
         value={caseData.status}
         onchange={handleStatusChange}
-        onclick={e => e.stopPropagation()}
+        onclick={(e) => e.stopPropagation()}
       >
         <option value="open">Open</option>
         <option value="in_progress">In Progress</option>
@@ -128,7 +182,3 @@ import type { Case } from '$lib/types';
     </div>
   </div>
 </div>
-;
-
-
-

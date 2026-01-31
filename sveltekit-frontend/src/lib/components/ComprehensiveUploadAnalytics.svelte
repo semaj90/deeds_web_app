@@ -323,7 +323,8 @@
 	<!-- File Selection Area -->
 	<div
 		class="file-drop-zone"
-		class:drag-over={dragOver}; class:has-files={selectedFiles.length > 0}
+		class:drag-over={dragOver}
+		class:has-files={selectedFiles.length > 0}
 		ondrop={handleDrop}
 		ondragover={handleDragOver}
 		ondragleave={handleDragLeave}

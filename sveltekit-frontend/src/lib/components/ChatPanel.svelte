@@ -2,7 +2,9 @@
 	import { getCachedEmbedding, subscribeEmbedding } from '$lib/client/subscribeEmbedding';
 	import type { EmbeddingResult } from '$lib/shared/embedding-types';
 	import { quantizedCosineSimilarity } from '$lib/shared/quantize';
-	import { Loader, Paperclip, Send } from 'lucide-svelte';
+	import Loader from 'lucide-svelte/icons/loader';
+	import Paperclip from 'lucide-svelte/icons/paperclip';
+	import Send from 'lucide-svelte/icons/send';
 	import ActionPopup from './ActionPopup.svelte';
 
 	interface Message {
