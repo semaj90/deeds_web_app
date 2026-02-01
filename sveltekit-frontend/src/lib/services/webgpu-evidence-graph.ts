@@ -3,7 +3,7 @@ export interface GraphNode {
     x: number;
     y: number;
     z: number;
-    type: 'evidence' | 'entity' | 'event' | 'correlation';
+    type: 'evidence' | 'entity' | 'event' | 'correlation' | 'person' | 'organization' | 'location' | 'object' | 'date' | 'amount';
     label: string;
     weight: number;
     color: [number, number, number, number];
@@ -14,7 +14,7 @@ export interface GraphEdge {
     source: string;
     target: string;
     weight: number;
-    type: 'temporal' | 'causal' | 'semantic' | 'entity';
+    type: 'temporal' | 'causal' | 'semantic' | 'entity' | 'spatial';
     color: [number, number, number, number];
 }
 

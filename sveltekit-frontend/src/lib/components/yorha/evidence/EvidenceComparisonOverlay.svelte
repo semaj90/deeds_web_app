@@ -48,12 +48,6 @@
     </button>
   </div>
 {/if}
- onclick={ close }
- >
- ✕ Close Comparison
- </button>
- </div>
-{/if}
 
 <style>
  .nes-container {
