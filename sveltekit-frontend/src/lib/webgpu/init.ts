@@ -10,7 +10,7 @@
 import { browser } from '$app/environment';
 
 export interface WebGPUContext {
-  adapter: GPUAdapter;, device: GPUDevice;
+  adapter: GPUAdapter, device: GPUDevice;
   format: GPUTextureFormat;
 }
 

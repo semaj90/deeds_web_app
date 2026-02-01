@@ -1,4 +1,20 @@
-// Enhanced Case API Client
+import os
+
+def write_file(path, content):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"Repaired: {path}")
+
+# enhanced-case-api.ts
+# Fixes:
+# 1. Mashed semicolons/commas in interfaces
+# 2. Missing 'options' parameter in createCase
+# 3. 'this.client' -> 'restClient' in triggerWorkerProcessing
+# 4. Clean object literal syntax
+# 5. Correct TypeScript types
+
+content = r'''// Enhanced Case API Client
 // Integrates REST architecture with PostgreSQL-first workers and clustering
 import { restClient, type APIResponse } from './enhanced-rest-architecture';
 
@@ -272,3 +288,6 @@ export class EnhancedCaseAPI {
 export const enhancedCaseAPI = new EnhancedCaseAPI();
 // Export for use in components
 export default enhancedCaseAPI;
+'''
+
+write_file(r"c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\api\enhanced-case-api.ts", content)

@@ -28,11 +28,11 @@ export type CitationType =
   | 'treaty';
 export type PrecedentialValue = 'binding' | 'persuasive' | 'informative' | 'obsolete';
 export interface Citation {
- id: string;, title: string;
- citationText: string;, type: CitationType;
- jurisdiction: string;, year: number;
+ id: string, title: string;
+ citationText: string, type: CitationType;
+ jurisdiction: string, year: number;
  url?: string;
- summary?: string;, precedentialValue: PrecedentialValue;
+ summary?: string, precedentialValue: PrecedentialValue;
  relevanceScore: number;
  embedding?: number[];
  caseIds?: string[];
@@ -40,8 +40,8 @@ export interface Citation {
  updatedAt: number;
 }
 export interface CitationCluster {
- id: string;, citations: Citation[];
- theme: string;, relevance: number;
+ id: string, citations: Citation[];
+ theme: string, relevance: number;
 }
 
 /**
@@ -52,7 +52,7 @@ interface CitationStoreState {
 	citations: Citation[];, citationsByType: Map<CitationType, Citation[]>;
 	citationsByJurisdiction: Map<string, Citation[]>;
 	// Search & filtering
-	searchQuery: string;, selectedTypes: CitationType[];
+	searchQuery: string, selectedTypes: CitationType[];
  selectedJurisdictions: string[];, filteredCitations: Citation[];
  // Current selection
  activeCitation: Citation | null;
@@ -61,8 +61,8 @@ interface CitationStoreState {
  // Clustering
  clusters: CitationCluster[];, isClusteringEnabled: boolean;
  // Metadata
- totalCitations: number;, lastUpdated: number;
- isLoading: boolean;, error: string | null;
+ totalCitations: number, lastUpdated: number;
+ isLoading: boolean, error: string | null;
 }
 
 const initialState: CitationStoreState = {
@@ -156,7 +156,7 @@ function createCitationStore() {
  const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, threshold: threshold ?? 0.7 }),
+ body: JSON.stringify({ threshold: threshold ?? 0.7 }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -260,7 +260,7 @@ function createCitationStore() {
  const response = await fetch('/api/citations/cluster', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, citations: this._getCurrentCitations() }),
+ body: JSON.stringify({ citations: this._getCurrentCitations() }),
  credentials: 'include',
  });
  if (response.ok) {

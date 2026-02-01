@@ -60,7 +60,7 @@ export class UserAuthService {
         password: string,
         ipAddress?: string,
         userAgent?: string
-    ): Promise<{ user?: User; session?: any;, success: boolean; error?: string }> {
+    ): Promise<{ user?: User; session?: any, success: boolean; error?: string }> {
         try {
             const userResult = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
             const user = userResult[0];

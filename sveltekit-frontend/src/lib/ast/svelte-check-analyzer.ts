@@ -7,23 +7,23 @@
 import { Project, SyntaxKind, type Diagnostic, type Node, type SourceFile } from 'ts-morph';
 
 export interface ASTError {
-  id: string;, line: number;, column: number;, endLine: number;, endColumn: number;, message: string;, severity: 'error' | 'warning' | 'info' | 'hint';
-  code: string;, source: 'typescript' | 'svelte' | 'eslint';
+  id: string, line: number, column: number, endLine: number, endColumn: number, message: string, severity: 'error' | 'warning' | 'info' | 'hint';
+  code: string, source: 'typescript' | 'svelte' | 'eslint';
   file: string;
   suggestion?: string;
 }
 
 export interface FunctionInfo {
-  name: string;, line: number;, parameters: {, name: string;, type: string }[];
-  returnType: string;, isAsync: boolean;, isExported: boolean;
+  name: string, line: number, parameters: { name: string, type: string }[];
+  returnType: string, isAsync: boolean, isExported: boolean;
 }
 
 export interface VariableInfo {
-  name: string;, line: number;, type: string;, isConst: boolean;, isExported: boolean;
+  name: string, line: number, type: string, isConst: boolean, isExported: boolean;
 }
 
 export interface TypeInfo {
-  name: string;, line: number;, kind: 'interface' | 'type' | 'class' | 'enum';
+  name: string, line: number, kind: 'interface' | 'type' | 'class' | 'enum';
   isExported: boolean;
 }
 
@@ -40,7 +40,7 @@ export class SvelteCheckAnalyzer {
  constructor() {
  this.project = new Project({
  useInMemoryFileSystem: true,
- compilerOptions: {, strict: true,
+ compilerOptions: { strict: true,
  target: 99, // ESNext
  module: 99, // ESNext
  moduleResolution: 2, // Node
