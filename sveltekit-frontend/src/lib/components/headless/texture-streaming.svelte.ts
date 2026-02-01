@@ -7,20 +7,15 @@
 // (The pipeline types are imported, but just in case of environment issues)
 
 export interface TextureStreamingConfig {
-    enableGPU: boolean;
-    maxChunkSize: number;
-    cacheSize: number;
-    adaptiveQuality: boolean;
+    enableGPU: boolean;, maxChunkSize: number;
+    cacheSize: number;, adaptiveQuality: boolean;
     compressionEnabled: boolean;
 }
 
 export interface StreamingStats {
-    chunksLoaded: number;
-    cacheHits: number;
-    renderTime: number;
-    qualityLevel: number;
-    hasWebGL: boolean;
-    hasWASM: boolean;
+    chunksLoaded: number;, cacheHits: number;
+    renderTime: number;, qualityLevel: number;
+    hasWebGL: boolean;, hasWASM: boolean;
 }
 
 // Explicit texture type union to avoid `any`

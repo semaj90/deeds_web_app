@@ -13,8 +13,7 @@ export class UserAuthService {
     /**
      * Register a new user with complete profile setup
      */
-    static async registerUser(userData: {
-        email: string;
+    static async registerUser(userData: {, email: string;
         password: string;
         firstName?: string;
         lastName?: string;
@@ -22,7 +21,7 @@ export class UserAuthService {
         jurisdiction?: string;
         practiceAreas?: string[];
         profileData?: any;
-    }): Promise<{ user: User | null; success: boolean; error?: string }> {
+    }): Promise<{, user: User | null; success: boolean; error?: string }> {
         try {
             // Check if user already exists
             const existingUser = await db.select().from(users).where(eq(users.email, userData.email.toLowerCase())).limit(1);
@@ -61,7 +60,7 @@ export class UserAuthService {
         password: string,
         ipAddress?: string,
         userAgent?: string
-    ): Promise<{ user?: User; session?: any; success: boolean; error?: string }> {
+    ): Promise<{ user?: User; session?: any;, success: boolean; error?: string }> {
         try {
             const userResult = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
             const user = userResult[0];
@@ -98,7 +97,7 @@ export class UserAuthService {
     /**
      * Validate session
      */
-    static async validateSession(sessionId: string): Promise<{ valid: boolean; user?: User }> {
+    static async validateSession(sessionId: string): Promise<{, valid: boolean; user?: User }> {
         try {
             const session = await db.query.userSessions.findFirst({
                 where: and(
@@ -106,8 +105,7 @@ export class UserAuthService {
                     eq(userSessions.isActive, true),
                     sql`${userSessions.expiresAt} > NOW()`
                 ),
-                with: {
-                    user: true
+                with: {, user: true
                 }
             } as any);
 

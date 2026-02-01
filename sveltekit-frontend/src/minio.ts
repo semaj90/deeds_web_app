@@ -10,8 +10,7 @@ import * as Minio from 'minio';
 export interface MinIOConfig {
     endPoint: string;
     port?: number;
-    useSSL?: boolean;
-    accessKey: string;
+    useSSL?: boolean;, accessKey: string;
     secretKey: string;
     region?: string;
 }
@@ -28,15 +27,12 @@ export interface PresignedUrlOptions {
 }
 
 export interface FileInfo {
-    name: string;
-    size: number;
-    etag: string;
-    lastModified: Date;
+    name: string;, size: number;
+    etag: string;, lastModified: Date;
 }
 
 export interface FileMeta {
-    size: number;
-    etag: string;
+    size: number;, etag: string;
     lastModified: Date;
     contentType?: string;
     metadata?: Record<string, string>;
@@ -89,7 +85,7 @@ export class MinIOStorageService {
         objectName: string,
         buffer: Buffer,
         options?: UploadOptions
-    ): Promise<{ etag: string; versionId?: string }> {
+    ): Promise<{, etag: string; versionId?: string }> {
         await this.ensureBucket(bucketName);
 
         const metaData: Record<string, string> = {
@@ -114,7 +110,7 @@ export class MinIOStorageService {
         stream: NodeJS.ReadableStream,
         size: number,
         options?: UploadOptions
-    ): Promise<{ etag: string; versionId?: string }> {
+    ): Promise<{, etag: string; versionId?: string }> {
         await this.ensureBucket(bucketName);
 
         const metaData: Record<string, string> = {
@@ -262,7 +258,7 @@ export class MinIOStorageService {
         sourceObject: string,
         destBucket: string,
         destObject: string
-    ): Promise<{ etag: string }> {
+    ): Promise<{, etag: string }> {
         const conds = new Minio.CopyConditions();
         const result = await this.client.copyObject(
             destBucket,
@@ -291,7 +287,7 @@ export class MinIOStorageService {
     /**
      * Health check
      */
-    async health(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; buckets?: string[] }> {
+    async health(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; buckets?: string[] }> {
         try {
             const buckets = await this.client.listBuckets();
             return {

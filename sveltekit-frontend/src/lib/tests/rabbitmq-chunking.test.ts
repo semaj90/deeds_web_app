@@ -18,8 +18,7 @@ const TEST_CONFIG = {
 	prefetchCount: 100
 };$1;$2PROSECUTION MEMORANDUM
 
-CASE NO: 2024-CR-12345
-DEFENDANT: John Doe
+CASE NO: 2024-CR-12345, DEFENDANT: John Doe
 CHARGES: Burglary in the Second Degree (RCW 9A.52.030)
 
 FACTUAL SUMMARY:
@@ -203,8 +202,7 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			// Publish one more message
 			streamActor.send({
 				type: 'PUBLISH',
-				message: {
-					id: 'test-msg-4',
+				message: {, id: 'test-msg-4',
 					type: 'offset-test',
 					data: 'Msg 4',
 					timestamp: Date.now()

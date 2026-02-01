@@ -17,21 +17,21 @@ import { timestamp } from "drizzle-orm/gel-core";| 'idle'
  | 'failed';
 
 export interface RunProgress {
- runId: string; phase: RunPhase;
+ runId: string;, phase: RunPhase;
 
  // Diff generation
- totalPatches: number; generatedPatches: number;
+ totalPatches: number;, generatedPatches: number;
 
  // Diff application
- appliedPatches: number; failedPatches: number;
+ appliedPatches: number;, failedPatches: number;
  rolledBackPatches: number;
 
  // Validation
  validationStatus: 'pending' | 'passed' | 'failed' | 'regression';
- errorCountBefore: number; errorCountAfter: number;
+ errorCountBefore: number;, errorCountAfter: number;
 
  // Timing
- startedAt: Date; updatedAt: Date;
+ startedAt: Date;, updatedAt: Date;
  completedAt?: Date;
 
  // Error tracking
@@ -41,7 +41,7 @@ export interface RunProgress {
 
 export interface ProgressEvent {
  type: 'progress' | 'patch-applied' | 'validation-complete' | 'error' | 'done';
- runId: string; timestamp: Date;
+ runId: string;, timestamp: Date;
  data: Partial<RunProgress>;
 }
 

@@ -124,8 +124,7 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
         return {
             ...doc,
             score,
-            ranking: {
-                bm25: bm25[index] ?? 0,
+            ranking: {, bm25: bm25[index] ?? 0,
                 semantic: semanticScores[index] ?? 0,
                 precedent: precedentWeights[index] ?? 0,
                 contradiction: contradictionScores[index] ?? 0,

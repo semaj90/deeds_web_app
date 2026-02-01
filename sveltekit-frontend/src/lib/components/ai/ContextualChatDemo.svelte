@@ -11,8 +11,8 @@ import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   import { onMount } from 'svelte';
-  import type { ContextualState: NextStepPrediction,
-    LegalEntity: ConversationTurn } from '$lib/types/sharedTypes';
+  import type { ContextualState, NextStepPrediction,
+    LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
   // Props
   interface Props {
     sessionId?: string
@@ -62,8 +62,7 @@ import type { Document } from '$lib/types';
     try {
       const response = await fetch('/api/contextual/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: sessionId,
+        body: JSON.stringify({, message: sessionId,
           userId: enableFunctions
         })
       });
@@ -74,9 +73,9 @@ import type { Document } from '$lib/types';
         // Add to conversation history
         conversationHistory = [
           ...conversationHistory, {
-            userMessage: message; agentResponse: result.data.response,
-            timestamp: Date.now(); intent: 'general_query',
-            entities: []; hmmState: contextualState?.hmmState.currentState ?? 0
+            userMessage: message;, agentResponse: result.data.response,
+            timestamp: Date.now();, intent: 'general_query',
+            entities: [];, hmmState: contextualState?.hmmState.currentState ?? 0
           }
         ];
         // Clear input
@@ -353,7 +352,7 @@ import type { Document } from '$lib/types';
   .demo-content {
     display: grid
     grid-template-columns: 1fr 400px
-    height: 100%; overflow: hidden}
+    height: 100%;, overflow: hidden}
   /* Chat Panel */
   .chat-panel { display: flex
     flex-direction: column
@@ -398,7 +397,7 @@ import type { Document } from '$lib/types';
     border-radius: 4px
     font-size: 0.875rem}
   textarea {
-    width: 100%; padding: 0.75rem
+    width: 100%;, padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px, resize: none
     font-family: inherit
@@ -492,7 +491,7 @@ import type { Document } from '$lib/types';
    ;background: var(--muted, #f9fafb);
     border-radius: 2px, overflow: hidden}
   .prediction-fill {
-    height: 100%; background: var(--primary, #3b82f6);
+    height: 100%;, background: var(--primary, #3b82f6);
     transition: width 0.3s ease}
   .entities-list {
     display: flex

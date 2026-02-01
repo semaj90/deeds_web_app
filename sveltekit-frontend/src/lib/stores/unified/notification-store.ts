@@ -7,30 +7,22 @@ export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 export type ToastDuration = 2000 | 3000 | 5000 | 'indefinite';
 
 export interface Toast {
-    id: string;
-    message: string;
-    type: NotificationType;
-    duration: ToastDuration;
+    id: string;, message: string;
+    type: NotificationType;, duration: ToastDuration;
     createdAt: number;
 }
 
 export interface Notification {
-    id: string;
-    title: string;
-    message: string;
-    type: NotificationType;
-    isRead: boolean;
-    createdAt: number;
+    id: string;, title: string;
+    message: string;, type: NotificationType;
+    isRead: boolean;, createdAt: number;
     actionUrl?: string;
 }
 
 export interface Alert {
-    id: string;
-    title: string;
-    description: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    isDismissed: boolean;
-    createdAt: number;
+    id: string;, title: string;
+    description: string;, severity: 'low' | 'medium' | 'high' | 'critical';
+    isDismissed: boolean;, createdAt: number;
     dismissedAt?: number;
 }
 
@@ -38,12 +30,9 @@ export interface Alert {
  * Notification Store State
  */
 interface NotificationStoreState {
-    notifications: Notification[];
-    toasts: Toast[];
-    alerts: Alert[];
-    unreadCount: number;
-    alertSettings: {
-        enableSoundNotification: boolean;
+    notifications: Notification[];, toasts: Toast[];
+    alerts: Alert[];, unreadCount: number;
+    alertSettings: {, enableSoundNotification: boolean;
         enableDesktopNotification: boolean;
     };
 }
@@ -53,8 +42,7 @@ const initialState: NotificationStoreState = {
     toasts: [],
     alerts: [],
     unreadCount: 0,
-    alertSettings: {
-        enableSoundNotification: true,
+    alertSettings: {, enableSoundNotification: true,
         enableDesktopNotification: false
     }
 };

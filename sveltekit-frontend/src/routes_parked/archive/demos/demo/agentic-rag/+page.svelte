@@ -78,9 +78,9 @@ import { Upload } from "lucide-svelte";
  const response = await fetch('/api/agent/orchestrate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: currentQuery,
+ body: JSON.stringify({, query: currentQuery,
  documents: selectedDocument ? [selectedDocument] : [],
- context: { conversationHistory: messages },
+ context: {, conversationHistory: messages },
  }),
  });
 
@@ -142,7 +142,7 @@ import { Upload } from "lucide-svelte";
 
 <style>
  .agentic-rag-demo {
- background: #212529; color: #d4af37;
+ background: #212529;, color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 

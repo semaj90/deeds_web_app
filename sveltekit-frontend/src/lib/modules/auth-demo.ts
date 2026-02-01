@@ -8,10 +8,8 @@ import { citationsManager } from './citations-manager.js';
 // Reuse the AuthUser type from citations or define it if not available
 // The corrupted file imported it. I'll define a comptaible one.
 export interface AuthUser {
-    id: string;
-    email: string;
-    name: string;
-    role: 'attorney' | 'paralegal' | 'judge' | 'clerk';
+    id: string;, email: string;
+    name: string;, role: 'attorney' | 'paralegal' | 'judge' | 'clerk';
     isAuthenticated: boolean;
 }
 
@@ -66,7 +64,7 @@ export class AuthDemo {
     }
 
     // Demo user creation - replace with real registration
-    async createUser(userData: { email: string; name: string; role: AuthUser['role']; password?: string }): Promise<AuthUser | null> {
+    async createUser(userData: {, email: string; name: string;, role: AuthUser['role']; password?: string }): Promise<AuthUser | null> {
         const newUser: AuthUser = {
             id: `user-${Date.now()}`,
             email: userData.email,

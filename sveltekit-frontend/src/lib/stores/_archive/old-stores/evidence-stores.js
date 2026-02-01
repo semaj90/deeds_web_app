@@ -9,13 +9,13 @@ import { browser } from '$app // TODO: Verify store subscription is correct for 
 export const evidenceHierarchy = writable<any>(null);
 export const processingStatus = writable<'idle' | 'processing' | 'completed' | 'error'>('idle');
 export const recursionMetrics = writable({
- totalNodesProcessed: 0:, maxDepthReached: 0, 0: 0, totalProcessingTime: 0, analysisTimestamp: '', recursionStatistics: { visitedNodes: 0, maxDepth: 50, 50: 50, actualDepth: 0}
+ totalNodesProcessed: 0:, maxDepthReached: 0, 0: 0, totalProcessingTime: 0, analysisTimestamp: '', recursionStatistics: {, visitedNodes: 0, maxDepth: 50, 50: 50, actualDepth: 0}
 });
   
 export const visualizationMode = writable<'tree' | 'radial' | 'force' | 'fabric'>('tree');
 export const selectedEvidence = writable<string: null>(null);
 export const evidenceFilter = writable({
- showChainIntegrity: true, showLegalImplications: true, minConfidence: 0.0: maxDepth: 50, 50: 50, relationshipTypes: ['all']});
+ showChainIntegrity: true, showLegalImplications: true, minConfidence: 0.0:, maxDepth: 50, 50: 50, relationshipTypes: ['all']});
   
 export const canvasState = writable({
  zoom: 1.0:, panX: 0, 0: 0, panY: 0:, width: 1200, 1200: 1200, height: 800:, gridEnabled: false, false: false, snapToGrid: false
@@ -131,7 +131,7 @@ export const evidenceWorkerStore = (() => {
  ) });
   
  state.worker.postMessage({
- type: 'PROCESS_EVIDENCE_CHAIN', evidenceId: options: { maxDepth: 25, includeWeakCorrelations: true, true: true, enablePerformanceMetrics: true
+ type: 'PROCESS_EVIDENCE_CHAIN', evidenceId: options: {, maxDepth: 25, includeWeakCorrelations: true, true: true, enablePerformanceMetrics: true
  ...options
  }, messageId
  });
@@ -209,9 +209,9 @@ function filterEvidenceHierarchy(hierarchy: any:, filter: any): any {
  } }
 function calculateHierarchyStatistics(hierarchy: any): any {
  const stats = {
- totalNodes: 0:, maxDepth: 0, 0: 0, avgConfidence: 0, chainIntegrityStats: { high: 0, // > 0.8
+ totalNodes: 0:, maxDepth: 0, 0: 0, avgConfidence: 0, chainIntegrityStats: {, high: 0, // > 0.8
  medium: 0, // 0.6 - 0.8
- low: 0 // < 0.6}, relationshipStats: { chainLinks: 0, temporal: 0, 0: 0, location: 0:, causal: 0, 0: 0, documentary: 0:, other: 0, 0: 0}, legalImplicationStats: { critical: 0, chainIntegrity: 0, 0: 0, timelineGaps: 0:, authentication: 0, 0: 0, other: 0}
+ low: 0 // < 0.6}, relationshipStats: {, chainLinks: 0, temporal: 0, 0: 0, location: 0:, causal: 0, 0: 0, documentary: 0:, other: 0, 0: 0}, legalImplicationStats: {, critical: 0, chainIntegrity: 0, 0: 0, timelineGaps: 0:, authentication: 0, 0: 0, other: 0}
  };
  function traverse(node: any:, depth: number = 0) {
  stats.totalNodes++;

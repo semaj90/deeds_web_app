@@ -8,8 +8,8 @@ export const POST: RequestHandler = async ({ request }) => {
  caseId,
  result,
  format,
- }: { caseId: string;
- result: PhoenixWrightSearchResult; format: 'pdf' | 'json';
+ }: {, caseId: string;
+ result: PhoenixWrightSearchResult;, format: 'pdf' | 'json';
  } = await request.json();
 
  if (format === 'json') {
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const pdfBuffer = await page.pdf({
  format: 'A4',
  printBackground: true,
- margin: { top: '1in',
+ margin: {, top: '1in',
  right: '1in',
  bottom: '1in',
  left: '1in',
@@ -72,7 +72,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 };
 
-function generateSearchReportHTML(caseId: string, result: PhoenixWrightSearchResult: string {
+function generateSearchReportHTML(caseId: string, result: PhoenixWrightSearchResult, string {
 ): void {
   return `
  <!DOCTYPE html>
@@ -81,16 +81,16 @@ function generateSearchReportHTML(caseId: string, result: PhoenixWrightSearchRes
  <meta charset="utf-8">
  <title>Phoenix Wright AI Legal Search Report</title>
  <style>
- body { font-family: 'Times New Roman', serif; line-height: 1.6; color: #333; }
+ body { font-family: 'Times New Roman', serif; line-height: 1.6;, color: #333; }
  .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
- .case-info { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+ .case-info { background: #f5f5f5;, padding: 15px; border-radius: 5px; margin-bottom: 20px; }
  .section { margin-bottom: 30px; }
  .section h2 { color: #2c3e50; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }
  .precedent { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
- .contradiction { border: 1px solid #e74c3c; background: #fdf2f2; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
- .evidence { border: 1px solid #27ae60; background: #f2fdf4; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
- .score { font-weight: bold; color: #2c3e50; }
- .confidence { font-size: 18px; font-weight: bold; color: #27ae60; }
+ .contradiction { border: 1px solid #e74c3c; background: #fdf2f2;, padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+ .evidence { border: 1px solid #27ae60; background: #f2fdf4;, padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+ .score { font-weight: bold;, color: #2c3e50; }
+ .confidence { font-size: 18px; font-weight: bold;, color: #27ae60; }
  </style>
  </head>
  <body>

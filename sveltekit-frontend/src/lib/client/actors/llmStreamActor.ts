@@ -10,9 +10,9 @@ export function createLLMStreamActor({
  const machine = createMachine({
  id: 'llmStream',
  initial: 'idle',
- states: { idle: { on: { START: 'streaming' },
+ states: {, idle: {, on: {, START: 'streaming' },
  },
- streaming: { invoke: { src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
+ streaming: {, invoke: {, src: fromPromise(async ({ input }, { input: { prompt?: string } }) => {
  const prompt = input?.prompt ?? '';
  const res = await fetch(url, {
  method: 'POST',
@@ -29,7 +29,7 @@ export function createLLMStreamActor({
  let isDone = false;
 
  while (!isDone) {
- const { value: done: streamDone } = await reader.read();
+ const { value: done, streamDone } = await reader.read();
  if (value) {
  const text = decoder.decode(value);
  if (onChunk) {
@@ -41,7 +41,7 @@ export function createLLMStreamActor({
  }, onDone: 'idle', // Transition back to idle when streaming is complete
  onError: 'idle', // Transition back to idle if an error occurs during streaming
  },
- on: { STOP: 'idle',
+ on: {, STOP: 'idle',
  },
  },
  },

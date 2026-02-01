@@ -23,7 +23,7 @@
 			case 'success': return 'border-green-500 bg-green-50 text-green-900 dark: bg-green-900/20, dark:text-green-100';
 			case 'error': return 'border-red-500 bg-red-50 text-red-900 dark: bg-red-900/20, dark:text-red-100';
 			case 'warning': return 'border-yellow-500 bg-yellow-50 text-yellow-900 dark: bg-yellow-900/20, dark:text-yellow-100';
-			case 'info': return 'border-blue-500 bg-blue-50 text-blue-900 dark: bg-blue-900/20, dark: text-blue-100'; default: return 'border-border bg-background text-foreground';
+			case 'info': return 'border-blue-500 bg-blue-50 text-blue-900 dark: bg-blue-900/20, dark: text-blue-100';, default: return 'border-border bg-background text-foreground';
 		}
 	});
 
@@ -39,7 +39,7 @@
 </script>
 
 <div
-	transition:fly={{ x: 100, duration, 200 }}
+	transition: fly={{, x: 100, duration, 200 }}
 	class="{baseClass} {variantClass()} { className }"
 	role="alert"
 >

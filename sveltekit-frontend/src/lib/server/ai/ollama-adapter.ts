@@ -1,8 +1,7 @@
 // This file provides a typed adapter for the Ollama service.
 
 interface OllamaClient {
-    generateCompletion: (
-        model: string,
+    generateCompletion: (, model: string,
         prompt: string,
         options?: { temperature?: number; max_tokens?: number }
     ) => Promise<string>;
@@ -31,8 +30,7 @@ const mockOllamaClient: OllamaClient = {
 
 export const ollamaService: OllamaClient = mockOllamaClient;
 
-export async function summarizeWithGemma(params: {
-    query: string;
+export async function summarizeWithGemma(params: {, query: string;
     context: string;
 }): Promise<string> {
     const prompt = `Query: ${params.query}\nContext: ${params.context}\n\nSummary:`;

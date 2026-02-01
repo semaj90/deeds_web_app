@@ -9,7 +9,7 @@ import { Star } from "lucide-svelte";
  const FALLBACK_SUMMARY = `This legal document: "{ filename }" outlines key provisions, procedural requirements, and compliance standards. Main points: statutory obligations, evidence handling rules, timelines, and recommended next steps.`;
 
  // Types
- type FileMetadata = { id: string; name: string; size: number; uploadedAt?: string };
+ type FileMetadata = { id: string;, name: string; size: number; uploadedAt?: string };
 
  // State (Svelte, 5 runes are auto-imported)
  let selectedFile = $state <FileMetadata, null>(null);
@@ -187,7 +187,7 @@ import { Star } from "lucide-svelte";
 <style>
  /* Custom styles for this page */
  .nes-container {
- background-color: #fff; border: 1px solid #ddd;
+ background-color: #fff;, border: 1px solid #ddd;
  }
 
  .nes-text.is-primary {
@@ -205,7 +205,7 @@ import { Star } from "lucide-svelte";
  }
 
  .nes-badge.is-success {
- background-color: #28a745; color: #fff;
+ background-color: #28a745;, color: #fff;
  }
 
  .nes-radio.is-primary {
@@ -247,39 +247,39 @@ import { Star } from "lucide-svelte";
  Arial;
  }
  .container {
- max-width: 900px; margin: 0 auto;
+ max-width: 900px;, margin: 0 auto;
  }
  .header {
  display: flex;
- align-items: center; gap: 0.75rem;
+ align-items: center;, gap: 0.75rem;
  margin-bottom: 1rem;
  }
  .header .title {
  display: flex;
- align-items: center; gap: 0.5rem;
- font-size: 1.25rem; margin: 0;
+ align-items: center;, gap: 0.5rem;
+ font-size: 1.25rem;, margin: 0;
  }
  .uploader {
- margin-bottom: 1rem; display: flex;
- flex-direction: column; gap: 0.5rem;
+ margin-bottom: 1rem;, display: flex;
+ flex-direction: column;, gap: 0.5rem;
  }
  .controls {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  align-items: center;
  margin-top: 0.5rem;
  }
  .file-meta {
- margin-top: 0.5rem; color: #666;
+ margin-top: 0.5rem;, color: #666;
  font-size: 0.9rem;
  }
  .summary-box {
- white-space: pre-wrap; background: #f9f9f9;
+ white-space: pre-wrap;, background: #f9f9f9;
  padding: 1rem;
- border-radius: 6px; border: 1px solid #eee;
+ border-radius: 6px;, border: 1px solid #eee;
  }
  .stats {
- margin-top: 0.5rem; display: flex;
- gap: 1rem; color: #555;
+ margin-top: 0.5rem;, display: flex;
+ gap: 1rem;, color: #555;
  font-size: 0.9rem;
  align-items: center;
  }
@@ -298,8 +298,8 @@ import { Star } from "lucide-svelte";
  }
  .summary-type select {
  padding: 0.5rem;
- font-size: 1rem; border: 1px solid #ccc;
- border-radius: 4px; width: 100%;
+ font-size: 1rem;, border: 1px solid #ccc;
+ border-radius: 4px;, width: 100%;
  max-width: 200px;
  }
 </style>

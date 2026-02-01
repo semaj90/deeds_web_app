@@ -51,7 +51,7 @@ describe('IndexedDB Cache Service', () => {
 
 	it('should return null for expired entries', async () => {
 		const expiredEntry = {
-			data: { name: 'Old Data' },
+			data: {, name: 'Old Data' },
 			timestamp: Date.now() - 7200000, // 2 hours ago
 			ttl: 3600000 // 1 hour TTL
 		};
@@ -93,7 +93,7 @@ describe('IndexedDB Cache Service', () => {
 
 	it('should track statistics', async () => {
 		const cacheEntry = {
-			data: { test: 'data' },
+			data: {, test: 'data' },
 			timestamp: Date.now(),
 			ttl: 3600000
 		};
@@ -276,7 +276,7 @@ describe('Unified Cache Service', () => {
 
 	it('should calculate hit rate correctly', async () => {
 		const cacheEntry = {
-			data: { test: 'data' },
+			data: {, test: 'data' },
 			timestamp: Date.now(),
 			ttl: 3600000
 		};
@@ -366,7 +366,7 @@ describe('Offline Fetch Helper', () => {
 		await expect(
 			offlineMutate('/api/test', {
 				method: 'POST',
-				body: JSON.stringify({ test: 'data' })
+				body: JSON.stringify({, test: 'data' })
 			})
 		).rejects.toThrow('queued for sync');
 

@@ -116,7 +116,7 @@
       const ragResponse = await fetch(`${RAG_SERVICE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, history: messages })
+        body: JSON.stringify({, message: trimmed, history: messages })
       }).catch(() => null);
 
       if (ragResponse && ragResponse.ok) {
@@ -152,7 +152,7 @@
       messages = [...messages, {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `❌ Error: ${err instanceof Error ? err.message : String(err)}`,
+        content: `❌, Error: ${err instanceof Error ? err.message : String(err)}`,
         timestamp: new Date().toISOString(),
         type: 'error'
       }];
@@ -241,7 +241,7 @@
         bind:value={messageInput}
         onkeydown={handleKeydown}
         placeholder="ENTER_COMMAND_OR_QUERY..."
-        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus:outline-none focus:border-cyan-500 resize-none"
+        class="flex-1 bg-black border border-zinc-800 p-3 text-sm focus: outline-none, focus:border-cyan-500 resize-none"
         rows="2"
       ></textarea>
       <Button variant="outline" class="h-auto px-6 border-zinc-800 bg-black hover:bg-zinc-900" onclick={sendMessage}>

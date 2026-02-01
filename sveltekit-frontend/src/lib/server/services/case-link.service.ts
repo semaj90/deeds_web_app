@@ -11,19 +11,15 @@ import { auditService } from './audit.service.js';
 import crypto from 'crypto';
 
 export interface CaseStatuteLink {
-	id: string;
-	case_id: string;
-	statute_code: string;
-	linked_by: string;
+	id: string;, case_id: string;
+	statute_code: string;, linked_by: string;
 	link_type: string;
-	notes?: string;
-	created_at: Date;
+	notes?: string;, created_at: Date;
 	updated_at: Date;
 }
 
 export interface LinkCaseStatuteRequest {
-	statute_code: string;
-	link_type: string;
+	statute_code: string;, link_type: string;
 	notes?: string;
 }
 

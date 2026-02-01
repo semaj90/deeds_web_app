@@ -4,21 +4,16 @@
 import { logger } from '$lib/server/logger.js';
 
 export interface MCPWorkerCore {
-    id: string;
-    port: number;
+    id: string;, port: number;
     status: 'online' | 'offline' | 'busy' | 'error';
-    capabilities: string[];
-    currentLoad: number;
-    maxLoad: number;
-    models: string[];
-    lastHeartbeat: number;
-    processingQueue: number;
+    capabilities: string[];, currentLoad: number;
+    maxLoad: number;, models: string[];
+    lastHeartbeat: number;, processingQueue: number;
     averageResponseTime: number;
 }
 
 export interface MCPTask {
-    id: string;
-    type: 'embedding' | 'generation' | 'analysis' | 'search' | 'workflow';
+    id: string;, type: 'embedding' | 'generation' | 'analysis' | 'search' | 'workflow';
     priority: 'low' | 'normal' | 'high' | 'critical';
     payload: any;
     assignedCore?: string;
@@ -27,16 +22,12 @@ export interface MCPTask {
 }
 
 export interface MCPResponse {
-    success: boolean;
-    taskId: string;
-    coreId: string;
-    result: unknown;
+    success: boolean;, taskId: string;
+    coreId: string;, result: unknown;
     processingTime: number;
     error?: string;
-    metadata?: {
-        model: string;
-        tokens: number;
-        cacheHit: boolean;
+    metadata?: {, model: string;
+        tokens: number;, cacheHit: boolean;
         gpuAccelerated: boolean;
     };
 }
@@ -146,7 +137,7 @@ export class MCPMultiCoreClient {
             const response = await fetch(`${this.baseUrl}/api/cores/${selectedCore.id}/process`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ taskId: task.id, type: task.type, priority: task.priority, payload: task.payload })
+                body: JSON.stringify({, taskId: task.id, type: task.type, priority: task.priority, payload: task.payload })
             });
 
             if (!response.ok) {
@@ -167,8 +158,7 @@ export class MCPMultiCoreClient {
                 coreId: selectedCore.id,
                 result: result.data || result.result || result,
                 processingTime,
-                metadata: {
-                    model: result.model ?? "unknown",
+                metadata: {, model: result.model ?? "unknown",
                     tokens: result.tokens ?? 0,
                     cacheHit: result.cacheHit || false,
                     gpuAccelerated: result.gpuAccelerated || false

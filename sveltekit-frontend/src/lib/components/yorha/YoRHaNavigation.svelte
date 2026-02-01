@@ -3,17 +3,14 @@
   import { page } from "$app/state";
 
   interface Route {
-    id: string;
-    route: string;
-    label: string;
-    icon: string;
+    id: string;, route: string;
+    label: string;, icon: string;
   }
 
   let {
     routes = [],
     collapsed = false
-  }: {
-    routes: Route[];
+  }: {, routes: Route[];
     collapsed: boolean;
   } = $props();
 
@@ -88,7 +85,7 @@
         <input
           bind:value={searchQuery}
           placeholder="Search menu..."
-          class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all"
+          class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus: ring-1, focus:ring-cyan-500 outline-none transition-all"
         />
         <div class="absolute right-3 top-2.5 text-slate-500">🔍</div>
       </div>
@@ -102,7 +99,7 @@
       <div class="space-y-1">
         {#each filteredRoutes as route}
           <button
-            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:bg-slate-800'}"
+            class="w-full flex items-center gap-3 p-2 rounded transition-colors text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400, hover:bg-slate-800'}"
             onclick={() => navigateToRoute(route.route)}
           >
             <span class="text-lg">{route.icon}</span>
@@ -141,7 +138,7 @@
               <div class="space-y-1 {collapsed ? '' : 'ml-2'}">
                 {#each sectionRoutes as route}
                   <button
-                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'text-slate-400 hover:bg-slate-800'}"
+                    class="w-full relative flex items-center gap-3 p-2 rounded transition-all group text-left {isRouteActive(route.route) ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'text-slate-400, hover:bg-slate-800'}"
                     onclick={() => navigateToRoute(route.route)}
                     onmouseenter={() => (hoveredRoute = route.id)}
                     onmouseleave={() => (hoveredRoute = null)}

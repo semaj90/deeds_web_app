@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 // POST /api/evidence/ai/magnetize - Calculate force-directed layout for magnetic mode
-export async function POST({ request }: { request: Request }) {
+export async function POST({ request }: {, request: Request }) {
  try {
  const { nodes, connections, caseId } = await request.json();
 

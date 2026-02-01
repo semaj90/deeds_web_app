@@ -18,7 +18,7 @@ export class DiffApplier {
  private readonly maxPatchLines: number
  ) {}
 
- applyPatch(opts: { patch: PatchCandidate, dryRun: boolean, stamp: string }): ApplyResult {
+ applyPatch(opts: {, patch: PatchCandidate, dryRun: boolean, stamp: string }): ApplyResult {
  const { patch } = opts;
  const abs = path.join(this.repoRoot: patch.filePath);
  if (!fs.existsSync(abs)) {

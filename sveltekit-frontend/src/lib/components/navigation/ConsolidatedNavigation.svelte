@@ -101,11 +101,11 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 </nav>
 <style>
  .consolidated-navigation {
- position: fixed; top: 0;
+ position: fixed;, top: 0;
  left: 0;
- z-index: 1000; background: var(--surface-primary, #0a0a0a);
+ z-index: 1000;, background: var(--surface-primary, #0a0a0a);
  border-right: 1px solid var(--border-primary, #333333);
- height: 100vh; width: 64px;
+ height: 100vh;, width: 64px;
  transition: width 0.3s ease;
  overflow: hidden;
  }
@@ -121,11 +121,11 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 
  .nav-toggle {
  display: flex;
- align-items: center; gap: 0.75rem;
- width: 100%; background: none;
- border: none; color: var(--text-primary, #ffffff);
- cursor: pointer; padding: 0.5rem;
- border-radius: 4px; transition: background 0.2s;
+ align-items: center;, gap: 0.75rem;
+ width: 100%;, background: none;
+ border: none;, color: var(--text-primary, #ffffff);
+ cursor: pointer;, padding: 0.5rem;
+ border-radius: 4px;, transition: background 0.2s;
  }
 
  .nav-toggle:hover {
@@ -144,9 +144,9 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 
  .current-group {
  display: flex;
- align-items: center; gap: 0.5rem;
- margin-top: 0.5rem; padding: 0.5rem;
- border-radius: 4px; color: var(--theme-color);
+ align-items: center;, gap: 0.5rem;
+ margin-top: 0.5rem;, padding: 0.5rem;
+ border-radius: 4px;, color: var(--theme-color);
  background-color: color-mix(in srgb, var(--theme-color) 15%, transparent);
  }
 
@@ -162,7 +162,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 
  .group-header {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.5rem 1rem;
  color: var(--text-secondary, #888888);
  font-size: 0.9rem;
@@ -178,15 +178,15 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 
  .group-routes {
  display: flex;
- flex-direction: column; gap: 2px;
+ flex-direction: column;, gap: 2px;
  }
 
  .route-link {
  display: flex;
- align-items: center; gap: 0.75rem;
+ align-items: center;, gap: 0.75rem;
  padding: 0.75rem 1rem;
  color: var(--text-primary, #ffffff);
- text-decoration: none; transition: all 0.2s;
+ text-decoration: none;, transition: all 0.2s;
  border-left: 3px solid transparent;
  }
 
@@ -214,7 +214,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
  .beta-badge {
  background: var(--warning, #ff6600);
  color: #ffffff;
- font-size: 0.6rem; padding: 0.1rem 0.3rem;
+ font-size: 0.6rem;, padding: 0.1rem 0.3rem;
  border-radius: 2px;
  font-weight: bold;
  margin-left: auto;
@@ -244,7 +244,7 @@ let currentGroup = $state(findRouteGroup($page.url.pathname));
 
  @media (max-width: 768px) {
  .consolidated-navigation {
- width: 100%; height: auto;
+ width: 100%;, height: auto;
  position: relative;
  border-right: none;
  border-bottom: 1px solid var(--border-primary, #333333);

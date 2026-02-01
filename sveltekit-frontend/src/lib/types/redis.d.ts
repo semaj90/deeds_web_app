@@ -6,16 +6,13 @@ export type RedisClient = IORedisClient;
 // Define: unknown custom types for data structures stored in Redis.
 // These examples demonstrate how you might type cached legal documents or session data.
 export interface CachedLegalDocument {
- id: string;
- title: string;
- contentSnippet: string;
- embeddingVector: number[];
+ id: string;, title: string;
+ contentSnippet: string;, embeddingVector: number[];
  lastAccessed: string;
 }
 
 export interface SessionData {
- userId: string;
- isAuthenticated: boolean;
+ userId: string;, isAuthenticated: boolean;
 }
 
 // Interface for Redis connection options, useful for centralized configuration.
@@ -43,8 +40,7 @@ declare interface SimpleRedis {
  keys: (...args: unknown[]) => Promise<string[]>;
  info: (...args: unknown[]) => Promise<unknown>;
  status: unknown;
- isOpen?: boolean;
- dbsize: (...args: unknown[]) => Promise<number>;
+ isOpen?: boolean;, dbsize: (...args: unknown[]) => Promise<number>;
  get: (...args: unknown[]) => Promise<unknown>;
  set: (...args: unknown[]) => Promise<unknown>;
  /** Set key with expiry (seconds) */

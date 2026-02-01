@@ -10,21 +10,17 @@ export interface KeyValue {
 }
 
 export interface SemanticAnalysisResult {
-    summaryEmbedding: number[];
-    legalRelevanceScore: number;
+    summaryEmbedding: number[];, legalRelevanceScore: number;
     concepts: Array<KeyValue>;
 }
 
 export interface RAGQuery {
     query: string;
-    context?: string;
-    semantic: {
-        useEmbeddings: boolean;
-        expandConcepts: boolean;
+    context?: string;, semantic: {
+        useEmbeddings: boolean;, expandConcepts: boolean;
         includeRelated: boolean;
     };
-    filters: {
-        confidenceThreshold: number;
+    filters: {, confidenceThreshold: number;
     };
 }
 
@@ -44,39 +40,29 @@ export interface WebGPUCapabilities {
 }
 
 export interface SystemStatus {
-    enhancedRAG: {
-        status: 'online' | 'offline' | 'degraded';
-        lastChecked: Date;
-        responseTime: number;
+    enhancedRAG: {, status: 'online' | 'offline' | 'degraded';
+        lastChecked: Date;, responseTime: number;
     };
-    webGPU: {
-        available: boolean;
+    webGPU: {, available: boolean;
         capabilities: WebGPUCapabilities | null;
         performance: number;
     };
-    realtimeComm: {
-        websocket: boolean;
-        sse: boolean;
-        webrtc: boolean;
+    realtimeComm: {, websocket: boolean;
+        sse: boolean;, webrtc: boolean;
         primaryChannel: string | null;
     };
-    databases: {
-        postgresql: boolean;
-        redis: boolean;
-        qdrant: boolean;
+    databases: {, postgresql: boolean;
+        redis: boolean;, qdrant: boolean;
         neo4j: boolean;
     };
-    models: {
-        ollama: boolean;
-        embeddings: boolean;
-        gemma3Legal: boolean;
+    models: {, ollama: boolean;
+        embeddings: boolean;, gemma3Legal: boolean;
     };
 }
 
 export interface IntegratedQuery {
     query: string;
-    context?: string;
-    options: {
+    context?: string;, options: {
         useWebGPU?: boolean;
         enableStreaming?: boolean;
         semanticExpansion?: boolean;
@@ -86,25 +72,21 @@ export interface IntegratedQuery {
 }
 
 export interface IntegratedResponse {
-    query: string;
-    semanticAnalysis: SemanticAnalysisResult | null;
+    query: string;, semanticAnalysis: SemanticAnalysisResult | null;
     ragResults: RAGResponse | null;
-    webGPUMetrics: {
-        used: boolean;
+    webGPUMetrics: {, used: boolean;
         processingTime: number;
         gpuTime?: number;
         speedup?: number;
     } | null;
     realtimeStreamId: string | null;
-    timestamp: Date;
-    processingTime: number;
+    timestamp: Date;, processingTime: number;
     confidence: number;
 }
 
 // Add small domain types to avoid `any`
 export interface QdrantPoint {
-    id: string;
-    vector: number[];
+    id: string;, vector: number[];
     payload?: Record<string, unknown>;
 }
 
@@ -120,22 +102,18 @@ export interface Neo4jResultRow {
 
 // Replace `any` with explicit/unknown types
 export interface DatabaseOperations {
-    postgresql: {
-        query: (sql: string, params?: unknown[]) => Promise<unknown[]>;
+    postgresql: {, query: (sql: string, params?: unknown[]) => Promise<unknown[]>;
         insert: (table: string, data: KeyValue) => Promise<string>;
         update: (table: string, id: string, data: KeyValue) => Promise<boolean>;
     };
-    redis: {
-        get: (key: string) => Promise<string | null>;
+    redis: {, get: (key: string) => Promise<string | null>;
         set: (key: string, value: string, ttl?: number) => Promise<boolean>;
         del: (key: string) => Promise<boolean>;
     };
-    qdrant: {
-        search: (vector: number[], collection: string, limit?: number) => Promise<QdrantSearchResult[]>;
+    qdrant: {, search: (vector: number[], collection: string, limit?: number) => Promise<QdrantSearchResult[]>;
         upsert: (collection: string, points: QdrantPoint[]) => Promise<boolean>;
     };
-    neo4j: {
-        query: (cypher: string, params?: unknown) => Promise<Neo4jResultRow[]>;
+    neo4j: {, query: (cypher: string, params?: unknown) => Promise<Neo4jResultRow[]>;
         createNode: (label: string, properties: KeyValue) => Promise<string>;
         createRelationship: (from: string, to: string, type: string, properties?: KeyValue) => Promise<string>;
     };
@@ -152,7 +130,7 @@ const semanticAnalyzer = {
     },
     // renamed unused param to _query to satisfy linter rule for unused args
     async enhancedQuery(_query: RAGQuery): Promise<RAGResponse> {
-        return { results: [{ relevanceScore: Math.random() }] };
+        return { results: [{, relevanceScore: Math.random() }] };
     }
 };
 
@@ -179,30 +157,26 @@ const realtimeComm = {
 
 class ComprehensiveIntegrationService {
     private systemStatus: SystemStatus = {
-        enhancedRAG: { status: 'offline', lastChecked: new Date(), responseTime: 0 },
-        webGPU: { available: false, capabilities: null, performance: 0 },
-        realtimeComm: { websocket: false, sse: false, webrtc: false, primaryChannel: null },
-        databases: { postgresql: false, redis: false, qdrant: false, neo4j: false },
-        models: { ollama: false, embeddings: false, gemma3Legal: false }
+        enhancedRAG: {, status: 'offline', lastChecked: new Date(), responseTime: 0 },
+        webGPU: {, available: false, capabilities: null, performance: 0 },
+        realtimeComm: {, websocket: false, sse: false, webrtc: false, primaryChannel: null },
+        databases: {, postgresql: false, redis: false, qdrant: false, neo4j: false },
+        models: {, ollama: false, embeddings: false, gemma3Legal: false }
     };
 
     private dbOperations: DatabaseOperations = {
-        postgresql: {
-            query: this.executePostgreSQLQuery.bind(this),
+        postgresql: {, query: this.executePostgreSQLQuery.bind(this),
             insert: this.insertPostgreSQL.bind(this),
             update: this.updatePostgreSQL.bind(this)
         },
-        redis: {
-            get: this.getRedis.bind(this),
+        redis: {, get: this.getRedis.bind(this),
             set: this.setRedis.bind(this),
             del: this.deleteRedis.bind(this)
         },
-        qdrant: {
-            search: this.searchQdrant.bind(this),
+        qdrant: {, search: this.searchQdrant.bind(this),
             upsert: this.upsertQdrant.bind(this)
         },
-        neo4j: {
-            query: this.queryNeo4j.bind(this),
+        neo4j: {, query: this.queryNeo4j.bind(this),
             createNode: this.createNeo4jNode.bind(this),
             createRelationship: this.createNeo4jRelationship.bind(this)
         }
@@ -266,13 +240,11 @@ class ComprehensiveIntegrationService {
                     const ragQuery: RAGQuery = {
                         query: query.query,
                         context: query.context,
-                        semantic: {
-                            useEmbeddings: query.options.includeEmbeddings ?? true,
+                        semantic: {, useEmbeddings: query.options.includeEmbeddings ?? true,
                             expandConcepts: query.options.semanticExpansion ?? true,
                             includeRelated: true
                         },
-                        filters: {
-                            confidenceThreshold: query.options.confidenceThreshold ?? 0.7
+                        filters: {, confidenceThreshold: query.options.confidenceThreshold ?? 0.7
                         }
                     };
                     response.ragResults = await semanticAnalyzer.enhancedQuery(ragQuery);
@@ -521,8 +493,7 @@ class ComprehensiveIntegrationService {
                     {
                         id: response?.realtimeStreamId || `query_${Date.now()}`,
                         vector: response.semanticAnalysis.summaryEmbedding,
-                        payload: {
-                            query: query.query,
+                        payload: {, query: query.query,
                             timestamp: response.timestamp.toISOString(),
                             confidence: response.confidence
                         }
@@ -664,7 +635,7 @@ class ComprehensiveIntegrationService {
                 'Content-Type': 'application/json',
                 'Authorization': `Basic bmVvNGo6cGFzc3dvcmQ=`
             },
-            body: JSON.stringify({ statements: [{ statement: cypher, parameters: params }] })
+            body: JSON.stringify({, statements: [{ statement: cypher, parameters: params }] })
         });
         if (!response.ok) throw new Error('Neo4j query failed');
         const result: any = await response.json();

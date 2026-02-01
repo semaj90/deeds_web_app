@@ -48,7 +48,7 @@
     if (currentState !== newState) {
       currentState = newState;
       onstateChange?.(new CustomEvent('stateChange', {
-        detail: { state: newState, context }
+        detail: {, state: newState, context }
       }));
     }
   }

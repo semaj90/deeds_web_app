@@ -2,30 +2,23 @@ import { writable, derived } from 'svelte/store';
 import type { ProcessingEvent } from './SSEStatusStore.js';
 
 export interface PageStatus {
-  pageNumber: number;
-  status: 'complete' | 'processing' | 'pending' | 'error';
+  pageNumber: number;, status: 'complete' | 'processing' | 'pending' | 'error';
   stage?: string;
   timestamp?: Date;
   errorMessage?: string;
 }
 
 export interface ProcessingError {
-  timestamp: Date;
-  stage: string;
-  message: string;
-  recoverable: boolean;
+  timestamp: Date;, stage: string;
+  message: string;, recoverable: boolean;
 }
 
 export interface ProgressState {
-  documentId: string;
-  documentTitle: string;
-  isProcessing: boolean;
-  currentEvent: ProcessingEvent | null;
+  documentId: string;, documentTitle: string;
+  isProcessing: boolean;, currentEvent: ProcessingEvent | null;
   pageStatuses: Map<number, PageStatus>;
-  fallbackActive: boolean;
-  fallbackConfidence: number;
-  errors: ProcessingError[];
-  startTime: Date | null;
+  fallbackActive: boolean;, fallbackConfidence: number;
+  errors: ProcessingError[];, startTime: Date | null;
   completionTime?: Date;
 }
 

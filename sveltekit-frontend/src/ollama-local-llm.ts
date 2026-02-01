@@ -6,12 +6,12 @@
 export type JsonObject = Record<string, unknown>;
 
 export interface OllamaModel {
-	name: string; size: string;
-	digest: string; modified: string;
+	name: string;, size: string;
+	digest: string;, modified: string;
 }
 
 export interface OllamaGenerateOptions {
-	model: string; prompt: string;
+	model: string;, prompt: string;
 	system?: string;
 	template?: string;
 	context?: number[];
@@ -31,8 +31,8 @@ export interface OllamaGenerateOptions {
 }
 
 export interface OllamaResponse {
-	model: string; created_at: string;
-	response: string; done: boolean;
+	model: string;, created_at: string;
+	response: string;, done: boolean;
 	context?: number[];
 	total_duration?: number;
 	load_duration?: number;
@@ -48,8 +48,8 @@ export interface OllamaChatMessage {
 }
 
 export interface OllamaChatResponse {
-	model: string; created_at: string;
-	message: OllamaChatMessage; done: boolean;
+	model: string;, created_at: string;
+	message: OllamaChatMessage;, done: boolean;
 	total_duration?: number;
 	load_duration?: number;
 	prompt_eval_count?: number;
@@ -160,7 +160,7 @@ PARAMETER num_ctx 4096`;
 			const response = await fetch(`${this.baseUrl}/api/create`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name: targetName,
+				body: JSON.stringify({, name: targetName,
 					modelfile
 				})
 			});
@@ -307,7 +307,7 @@ PARAMETER num_ctx 4096`;
 			const response = await fetch(`${this.baseUrl}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: embeddingModel,
+				body: JSON.stringify({, model: embeddingModel,
 					prompt: text
 				})
 			});
@@ -317,7 +317,7 @@ PARAMETER num_ctx 4096`;
 				throw new Error(`Embedding failed: ${response.statusText} - ${errorText}`);
 			}
 
-			const result: { embedding: number[] } = await response.json();
+			const result: {, embedding: number[] } = await response.json();
 			return result.embedding;
 		} catch (error) {
 			console.error('[OllamaLLM] Embedding failed:', error);
@@ -329,7 +329,7 @@ PARAMETER num_ctx 4096`;
 	 * Chat completion with conversation history
 	 */
 	async chat(
-		messages: Array<{ role: 'user' | 'assistant', content, string }>,
+		messages: Array<{, role: 'user' | 'assistant', content, string }>,
 		model?: string
 	): Promise<string | null> {
 		try {
@@ -338,7 +338,7 @@ PARAMETER num_ctx 4096`;
 			const response = await fetch(`${this.baseUrl}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: selectedModel,
+				body: JSON.stringify({, model: selectedModel,
 					messages,
 					stream: false
 				})
@@ -391,7 +391,7 @@ PARAMETER num_ctx 4096`;
 				model: this.defaultModel,
 				prompt,
 				system: systemPrompt,
-				options: { temperature: 0.3,
+				options: {, temperature: 0.3,
 					top_p: 0.9,
 					num_predict: 2000
 				}

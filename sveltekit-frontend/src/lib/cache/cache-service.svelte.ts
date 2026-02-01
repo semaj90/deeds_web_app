@@ -208,10 +208,7 @@ class UnifiedCacheService {
 	/**
 	 * Check system health
 	 */
-	healthCheck(): {
-		memory: boolean;
-		persistent: boolean;
-		healthy: boolean;
+	healthCheck(): {, memory: boolean;, persistent: boolean;, healthy: boolean;
 	} {
 		const memory = lokiCache.isReady();
 		const persistent = indexedDBCache.isReady();
@@ -252,22 +249,22 @@ export function useCache() {
  */
 export const CacheStrategies = {
 	/** Memory-only (fastest, not persistent) */
-	MEMORY_ONLY: { memory: true, persistent: false, ttl: 3600000 } as CacheStrategy,
+	MEMORY_ONLY: {, memory: true, persistent: false, ttl: 3600000 } as CacheStrategy,
 
 	/** Persistent-only (slower, survives reload) */
-	PERSISTENT_ONLY: { memory: false, persistent: true, ttl: 86400000 } as CacheStrategy,
+	PERSISTENT_ONLY: {, memory: false, persistent: true, ttl: 86400000 } as CacheStrategy,
 
 	/** Two-layer (fast + persistent) */
-	TWO_LAYER: { memory: true, persistent: true, ttl: 3600000 } as CacheStrategy,
+	TWO_LAYER: {, memory: true, persistent: true, ttl: 3600000 } as CacheStrategy,
 
 	/** Short-term (5 minutes) */
-	SHORT_TERM: { memory: true, persistent: true, ttl: 300000 } as CacheStrategy,
+	SHORT_TERM: {, memory: true, persistent: true, ttl: 300000 } as CacheStrategy,
 
 	/** Long-term (24 hours) */
-	LONG_TERM: { memory: true, persistent: true, ttl: 86400000 } as CacheStrategy,
+	LONG_TERM: {, memory: true, persistent: true, ttl: 86400000 } as CacheStrategy,
 
 	/** Session-only (memory, expires on reload) */
-	SESSION: { memory: true, persistent: false, ttl: Infinity } as CacheStrategy
+	SESSION: {, memory: true, persistent: false, ttl: Infinity } as CacheStrategy
 };
 
 // Auto-persist LokiJS snapshot every 10 minutes

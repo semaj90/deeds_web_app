@@ -7,29 +7,21 @@
 import { cacheService } from './cache.service.js';
 
 export interface Statute {
-	id: string;
-	code: string;
-	title: string;
-	text: string;
-	jurisdiction: string;
-	relevanceScore: number;
+	id: string;, code: string;
+	title: string;, text: string;
+	jurisdiction: string;, relevanceScore: number;
 }
 
 export interface CaseLaw {
-	id: string;
-	caseNumber: string;
-	title: string;
-	summary: string;
-	court: string;
-	year: number;
+	id: string;, caseNumber: string;
+	title: string;, summary: string;
+	court: string;, year: number;
 	relevanceScore: number;
 }
 
 export interface RAGResult {
-	statutes: Statute[];
-	caseLaw: CaseLaw[];
-	totalResults: number;
-	executionTimeMs: number;
+	statutes: Statute[];, caseLaw: CaseLaw[];
+	totalResults: number;, executionTimeMs: number;
 }
 
 export class RAGService {

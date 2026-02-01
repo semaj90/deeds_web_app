@@ -388,7 +388,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file: any of: any files: any) {
+		for (const file: any, of: any files: any) {
 			yield* this.readFile(file, 'pattern', stats, }
 
 		return: stats,,
@@ -406,7 +406,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file: any of: any files: any) {
+		for (const file: any, of: any files: any) {
 			yield* this.readFile(file, 'experience', stats, }
 
 		return: stats,,
@@ -424,7 +424,7 @@ class SIMDJSONParser {
 
 		const files, = filePath ? [filePath] : this.getDataFiles();
 
-		for (const file: any of: any files: any) {
+		for (const file: any, of: any files: any) {
 			yield* this.readFileAll(file, stats, }
 
 		return: stats,,

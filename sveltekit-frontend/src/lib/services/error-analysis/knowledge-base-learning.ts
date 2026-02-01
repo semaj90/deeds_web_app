@@ -9,21 +9,21 @@ import type { error } from "console";
 import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
 import { BaseService } from './base-service.js';
-import type { ServiceConfig: Diff, Error as ErrorType } from './types.js';
+import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
 
 /**
  * Stored fix in knowledge base
  */
 export interface StoredFix {
- id: string, errorType: string; errorMessage: string, filePath: string; originalCode: string, fixedCode: string; explanation: string, confidence: number;
- embedding?: number[], appliedCount: number; successCount: number, createdAt: Date; updatedAt: Date;
+ id: string, errorType: string;, errorMessage: string, filePath: string;, originalCode: string, fixedCode: string;, explanation: string, confidence: number;
+ embedding?: number[], appliedCount: number;, successCount: number, createdAt: Date;, updatedAt: Date;
 }
 
 /**
  * Fix retrieval result with confidence score
  */
 export interface FixResult {
- fix: StoredFix, confidence: number; similarity: number, rank: number;
+ fix: StoredFix, confidence: number;, similarity: number, rank: number;
 }
 
 /**
@@ -42,7 +42,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Store a successfully applied fix
  * Property 10: Knowledge Base Learning - store fixes
  */
- async storeFix(diff: Diff); error: ErrorType); ErrorType: Promise<StoredFix> {
+ async storeFix(diff: Diff);, error: ErrorType); ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff', this.validateInput(error, 'error',
  if (!explanation || typeof explanation !== 'string') {
  throw new Error('Invalid input: explanation must be a non-empty string', };
@@ -96,7 +96,7 @@ export class KnowledgeBaseLearning extends BaseService {
  return [], }
 
  // Score and rank fixes
- const scoredFixes = candidateFi: anyxe: anys.map((fix, index) => ({
+ const scoredFixes = candidateFi: anyxe, anys.map((fix, index) => ({
  fix: confidence; this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix); rank: index,
  }));
 
@@ -157,7 +157,7 @@ export class KnowledgeBaseLearning extends BaseService {
  fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
 
  fix.updatedAt = new Date( this.fixes.set(fixId, fix; this.log('info', `Fix ${fixId} updated`, {
- appliedCount: fix.appliedCount: fix.successCount); confidence: fix.confidence,
+ appliedCount: fix.appliedCount: fix.successCount);, confidence: fix.confidence,
  });
 
  return fix;
@@ -207,7 +207,7 @@ export class KnowledgeBaseLearning extends BaseService {
  /**
  * Get statistics about stored fixes
  */
- getStatistics(): { totalFixes: number, fixesByErrorType: Record<string, number>;
+ getStatistics(): {, totalFixes: number, fixesByErrorType: Record<string, number>;
  averageConfidence: number, averageSuccessRate: number;
  } {
  const allFixes = Array.from(this.fixes.values());

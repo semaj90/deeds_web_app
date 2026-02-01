@@ -26,17 +26,11 @@ const MINIO_PORT = parseInt(process.env.MINIO_PORT ?? '9000', 10);
 /* -------------------------------------------------------------------------- */
 
 interface LokiDocument {
-	id: string;
-	title: string;
-	content: string;
-	chunks: number;
-	timestamp: number;
+	id: string;, title: string;, content: string;, chunks: number;, timestamp: number;
 }
 
 export interface SearchResult {
-	content: string;
-	similarity: number;
-	metadata: Record<string, unknown>;
+	content: string;, similarity: number;, metadata: Record<string, unknown>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -97,7 +91,7 @@ export async function initializeIntegratedRAG(): Promise<void> {
 
 			if (!exists) {
 				await qdrantClient.createCollection('legal-documents', {
-					vectors: { size: 768, distance: 'Cosine' }
+					vectors: {, size: 768, distance: 'Cosine' }
 				});
 			}
 			console.log('✅ RAG: Qdrant connected');
@@ -127,8 +121,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(`\${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: 'embeddinggemma:latest',
+			body: JSON.stringify({, model: 'embeddinggemma:latest',
 				prompt: text
 			})
 		});
@@ -156,12 +149,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 export async function processDocument(
 	file: File,
 	content: string
-): Promise<{
-	documentId: string;
-	filename: string;
-	chunksCount: number;
-	qdrantStored: boolean;
-	cudaUsed: boolean;
+): Promise<{, documentId: string;, filename: string;, chunksCount: number;, qdrantStored: boolean;, cudaUsed: boolean;
 }> {
 	await initializeIntegratedRAG();
 
@@ -201,8 +189,7 @@ export async function processDocument(
 				chunkIndex: i,
 				content: chunks[i],
 				embedding: JSON.stringify(embeddings[i]),
-				metadata: {
-					source_file: filename,
+				metadata: {, source_file: filename,
 					minioUrl,
 					totalChunks: chunks.length
 				}
@@ -218,8 +205,7 @@ export async function processDocument(
 			const points = chunks.map((chunk, i) => ({
 				id: Math.floor(Math.random() * 10000000) + i,
 				vector: embeddings[i],
-				payload: {
-					content: chunk,
+				payload: {, content: chunk,
 					filename,
 					chunkIndex: i,
 					tags: autoTagContent(chunk)
@@ -293,8 +279,7 @@ export async function searchSimilarDocuments(
 			return qdrantResults.map((r: any) => ({
 				content: r.payload?.content ?? '',
 				similarity: r.score,
-				metadata: {
-					source: 'qdrant',
+				metadata: {, source: 'qdrant',
 					filename: r.payload?.filename,
 					tags: r.payload?.tags
 				}

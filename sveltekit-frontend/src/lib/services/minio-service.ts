@@ -5,9 +5,9 @@
  * Auto-indexes documents in vector search system with Gemma embeddings
  */
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical'; export interface MinIOFile {
-    id: string; filename: string;
-    objectPath: string; size: number;
-    contentType: string; uploadedAt: Date;
+    id: string;, filename: string;
+    objectPath: string;, size: number;
+    contentType: string;, uploadedAt: Date;
     processedAt?: Date;
     metadata?: {
         documentType?: 'contract' | 'evidence' | 'brief' | 'citation' | 'precedent' | 'unknown';
@@ -23,8 +23,8 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical'; export interface
 }
 
 export interface UploadProgress {
-    filename: string; loaded: number;
-    total: number; percentage: number;
+    filename: string;, loaded: number;
+    total: number;, percentage: number;
     stage: 'uploading' | 'processing' | 'embedding' | 'indexing' | 'complete' | 'error';
     message?: string;
 }
@@ -45,13 +45,13 @@ export interface DocumentEntity {
 }
 
 export interface DocumentProcessingResult {
-    documentId: string; extractedText: string;
+    documentId: string;, extractedText: string;
     // allow legacy responses where entities might be plain strings
     entities: Array<DocumentEntity | string>;
-    riskAssessment: { level: RiskLevel;
-        factors: string[]; confidence: number;
+    riskAssessment: {, level: RiskLevel;
+        factors: string[];, confidence: number;
     };
-    vectorEmbedding: Float32Array; keywords: string[];
+    vectorEmbedding: Float32Array;, keywords: string[];
     summary: string;
 }
 

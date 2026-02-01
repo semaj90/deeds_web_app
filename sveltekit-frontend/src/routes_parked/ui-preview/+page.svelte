@@ -45,7 +45,7 @@
  });
 
  interface TabItem {
- id: string; label: string;
+ id: string;, label: string;
  }
  const tabs: TabItem[] = [
  { id: 'buttons', label: 'Buttons' },
@@ -131,7 +131,7 @@
  casesWorked: 23, documentsReviewed: 157, hoursLogged: 89.5, accuracy: 94.2, totalCases: 47,
  totalEvidence: 1284, totalDocuments: 567, totalCitations: 89, totalReports: 34
  }
- : { totalCases: 0, totalEvidence: 0, totalDocuments: 0, totalCitations: 0, totalReports: 0,
+ : {, totalCases: 0, totalEvidence: 0, totalDocuments: 0, totalCitations: 0, totalReports: 0,
  }
  );
 
@@ -480,11 +480,11 @@
 
 <style>
  .layout {
- display: grid; gap: 1.25rem;
+ display: grid;, gap: 1.25rem;
  padding: 1.5rem;
  }
  .tabs {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  flex-wrap: wrap;
  }
  .tab-btn {
@@ -494,7 +494,7 @@
  outline: 3px solid var(--nes-primary, #212529);
  }
  .grid {
- display: grid; gap: 1rem;
+ display: grid;, gap: 1rem;
  }
  .grid.buttons {
  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -503,7 +503,7 @@
  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
  }
  .cards-grid {
- display: grid; gap: 1rem;
+ display: grid;, gap: 1rem;
  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
  }
  /* Removed unused CSS selector: h1 { font-family: 'Press Start 2P', monospace; font-size: 1.1rem} */
@@ -513,29 +513,29 @@
  letter-spacing: 0.5px;
  }
  .section-wrap {
- padding: 1rem; border: 2px dashed #ccc;
- border-radius: 8px; background: #fff;
+ padding: 1rem;, border: 2px dashed #ccc;
+ border-radius: 8px;, background: #fff;
  }
  .meta {
- font-size: 0.65rem; opacity: 0.7;
+ font-size: 0.65rem;, opacity: 0.7;
  margin-top: 0.4rem;
  }
  /* Session Demo Styles */
  .session-controls {
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
  .status-display {
  display: flex;
- align-items: center; gap: 1rem;
+ align-items: center;, gap: 1rem;
  flex-wrap: wrap;
  }
  .user-details {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
  .session-actions {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  flex-wrap: wrap;
  }
  .user-stats h4 {
@@ -547,21 +547,21 @@
  gap: 0.5rem;
  }
  .stat-card {
- text-align: center; padding: 0.5rem;
+ text-align: center;, padding: 0.5rem;
  }
  .stat-number {
  display: block;
  font-weight: bold;
- font-size: 1.2rem; color: #007bff;
+ font-size: 1.2rem;, color: #007bff;
  }
  .stat-label {
  display: block;
- font-size: 0.8rem; opacity: 0.8;
+ font-size: 0.8rem;, opacity: 0.8;
  }
  /* Formatting Demo Styles */
  .formatting-demos {
  display: flex;
- flex-direction: column; gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  }
  .demo-group h3 {
  margin: 0 0 0.75rem;
@@ -571,12 +571,12 @@
  .filename-examples,
  .case-examples {
  display: flex;
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
  .timestamp-row {
  display: grid;
  grid-template-columns: 1fr 100px 1fr;
- gap: 0.5rem; padding: 0.5rem;
+ gap: 0.5rem;, padding: 0.5rem;
  background: #f8f9fa;
  border-radius: 4px;
  }
@@ -584,15 +584,15 @@
  font-size: 0.8rem;
  }
  .relative {
- font-weight: bold; color: #007bff;
+ font-weight: bold;, color: #007bff;
  }
  .detailed {
- color: #666; cursor: help;
+ color: #666;, cursor: help;
  }
  .filename-row {
  display: grid;
  grid-template-columns: 30px 1fr 1fr;
- gap: 0.5rem; padding: 0.5rem;
+ gap: 0.5rem;, padding: 0.5rem;
  background: #f8f9fa;
  border-radius: 4px;
  align-items: center;
@@ -608,7 +608,7 @@
  .filename-row .truncated {
  font-family: monospace;
  font-size: 0.8rem;
- font-weight: bold; color: #007bff;
+ font-weight: bold;, color: #007bff;
  }
  .case-row {
  margin-bottom: 0.5rem;
@@ -623,21 +623,21 @@
  font-weight: bold;
  }
  .case-meta {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
  /* Sidebar Demo Styles */
  .sidebar-controls {
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
  .control-group {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  align-items: center;
  }
  .sidebar-info {
  color: inherit;
  }
- /* Removed unused CSS selector: .feature-list { list-style: none; padding: 0; margin: 0.5rem 0} */
+ /* Removed unused CSS selector: .feature-list { list-style: none;, padding: 0; margin: 0.5rem 0} */
  /* Removed unused CSS selector: .feature-list li { margin: 0.25rem 0; padding: 0.25rem 0} */
  .integration-notes {
  margin-top: 1rem;
@@ -653,21 +653,21 @@
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; gap: 0.5rem;
+ justify-content: center;, gap: 0.5rem;
  text-align: center;
  }
  .modal-backdrop {
- position: fixed; top: 0;
- left: 0; width: 100%;
- height: 100%; background: rgba(0, 0, 0, 0.5);
+ position: fixed;, top: 0;
+ left: 0;, width: 100%;
+ height: 100%;, background: rgba(0, 0, 0, 0.5);
  display: flex;
  align-items: center;
  justify-content: center;
- z-index: 100; border: none;
- padding: 0; cursor: pointer;
+ z-index: 100;, border: none;
+ padding: 0;, cursor: pointer;
  } /* Added border: none, padding: 0, cursor: pointer */
  .modal-content {
- background: white; padding: 2rem;
+ background: white;, padding: 2rem;
  border-radius: 8px;
  }
  .modal-content.sm {

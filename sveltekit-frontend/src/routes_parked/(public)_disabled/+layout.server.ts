@@ -29,7 +29,7 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
  };
  }
 
- return { user: session: isPublicRoute,
+ return { user: session, isPublicRoute,
  path,
  pageMetadata,
  };

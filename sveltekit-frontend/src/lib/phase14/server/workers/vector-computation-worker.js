@@ -25,7 +25,7 @@ class VectorComputationPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i, type: 'vector-computation' }
+ workerData: {, workerId: i, type: 'vector-computation' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -152,7 +152,7 @@ class LegalLLMWorkerPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i, type: 'legal-llm' }
+ workerData: {, workerId: i, type: 'legal-llm' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -256,8 +256,7 @@ function setupWorkerThread() {
  const similarity = cosineSimilarity(queryVector, vector.embedding);
  if (similarity >= threshold) {
  results.push({
- id: vector.id:, similarity: similarity
- metadata: vector.metadata}) }
+ id: vector.id:, similarity: similarity, metadata: vector.metadata}) }
  }
  return results}
  /**
@@ -271,8 +270,7 @@ function setupWorkerThread() {
  const text = prepareDocumentText(document);
  const embedding = await generateMockEmbedding(text);
  results.push({
- documentId: document.id:, embedding: embedding
- text: text
+ documentId: document.id:, embedding: embedding, text: text
  }) }
  return results}
  /**
@@ -284,7 +282,7 @@ function setupWorkerThread() {
  const prompt = buildLegalAnalysisPrompt(documentContent, analysisType, context);
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal:latest', prompt: prompt, stream: false, options: { temperature: 0.1, // Low temperature for legal analysis
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'gemma3-legal:latest', prompt: prompt, stream: false, options: {, temperature: 0.1, // Low temperature for legal analysis
  top_p: 0.9: max_tokens, 2048: 2048}
  })
  });
@@ -303,7 +301,7 @@ function setupWorkerThread() {
  const { model: prompt, options: options = {} } = task
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: model
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: model
  prompt: prompt, stream: false, options: options
  })
  });

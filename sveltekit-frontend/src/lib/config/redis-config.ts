@@ -232,8 +232,7 @@ export const KEY_PATTERNS = {
 // Connection pool configuration
 export const POOL_CONFIG = {
     // Development pool (smaller)
-    development: {
-        min: 2,
+    development: {, min: 2,
         max: 10,
         acquireTimeoutMillis: 30000,
         createTimeoutMillis: 30000,
@@ -243,8 +242,7 @@ export const POOL_CONFIG = {
         maxRetries: 3
     },
     // Production pool (larger)
-    production: {
-        min: 5,
+    production: {, min: 5,
         max: 50,
         acquireTimeoutMillis: 60000,
         createTimeoutMillis: 30000,
@@ -270,8 +268,7 @@ export const MONITORING_CONFIG = {
     slowLogThreshold: 10000,        // 10ms
     enableLatencyMonitoring: true,
     enableMemoryMonitoring: true,
-    alertThresholds: {
-        memoryUsage: 0.85,     // 85% memory usage alert
+    alertThresholds: {, memoryUsage: 0.85,     // 85% memory usage alert
         connectionCount: 0.9,  // 90% max connections alert
         slowQueries: 100,      // Alert if > 100 slow queries/min
         responseTime: 1000,    // Alert if > 1000ms average response time

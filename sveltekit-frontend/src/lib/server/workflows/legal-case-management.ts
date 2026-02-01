@@ -2,35 +2,27 @@
 import { createMachine } from 'xstate';
 
 export interface LegalCaseContext {
-	caseId: string;
-	title: string;
-	description: string;
-	caseType: string;
-	jurisdiction: string;
-	createdBy: string;
+	caseId: string;, title: string;
+	description: string;, caseType: string;
+	jurisdiction: string;, createdBy: string;
 	status: 'pending' | 'active' | 'completed' | 'archived';
-	progress: number;
-	errors: string[];
+	progress: number;, errors: string[];
 }
 
 export type LegalCaseEvent =
 	| {
-			type: 'CREATE_CASE';
-			title: string;
-			description: string;
-			caseType: string;
-			jurisdiction: string;
-			createdBy: string;
+			type: 'CREATE_CASE';, title: string;
+			description: string;, caseType: string;
+			jurisdiction: string;, createdBy: string;
 	  }
-	| { type: 'UPDATE_CASE'; updates: Partial<LegalCaseContext> }
+	| { type: 'UPDATE_CASE';, updates: Partial<LegalCaseContext> }
 	| { type: 'COMPLETE' }
 	| { type: 'ARCHIVE' };
 
 export const legalCaseManagementMachine = createMachine({
 	id: 'legalCaseManagement',
 	initial: 'idle',
-	context: {
-		caseId: '',
+	context: {, caseId: '',
 		title: '',
 		description: '',
 		caseType: '',
@@ -40,22 +32,18 @@ export const legalCaseManagementMachine = createMachine({
 		progress: 0,
 		errors: [],
 	} as LegalCaseContext,
-	states: {
-		idle: {
-			on: { CREATE_CASE: 'active' },
+	states: {, idle: {
+			on: {, CREATE_CASE: 'active' },
 		},
-		active: {
-			on: {
+		active: {, on: {
 				UPDATE_CASE: 'active',
 				COMPLETE: 'completed',
 				ARCHIVE: 'archived',
 			},
 		},
-		completed: {
-			on: { ARCHIVE: 'archived' },
+		completed: {, on: { ARCHIVE: 'archived' },
 		},
-		archived: {
-			type: 'final',
+		archived: {, type: 'final',
 		},
 	},
 });

@@ -3,8 +3,8 @@
  *
  * Fixes corrupted object literal type annotations where commas appear instead of colons.
  *
- * Before: { document: CaseChunkDocument }
- * After:  { document: CaseChunkDocument }
+ * Before: {, document: CaseChunkDocument }
+ * After: {, document: CaseChunkDocument }
  */
 
 import { createPattern, type PatternMatcher } from '../pattern-matcher';
@@ -29,7 +29,7 @@ export const propertyTypePattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix return type object literals
- * Handles: ): { prop: Type } → ): { prop: Type }
+ * Handles: ): {, prop: Type } → ): {, prop: Type }
  */
 export const returnTypeObjectPattern: PatternMatcher = createPattern(
   'return-type-object-fix',
@@ -57,7 +57,7 @@ export const interfacePropertyPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix generic type parameters with corrupted syntax
- * Handles: Promise<{ data: Type }> → Promise<{ data: Type }>
+ * Handles: Promise<{, data: Type }> → Promise<{ data: Type }>
  */
 export const genericTypeObjectPattern: PatternMatcher = createPattern(
   'generic-type-object-fix',
@@ -71,7 +71,7 @@ export const genericTypeObjectPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix multiple properties in object type
- * Handles: { a: TypeA; b: TypeB } → { a: TypeA; b: TypeB }
+ * Handles: {, a: TypeA; b: TypeB } → { a: TypeA;, b: TypeB }
  */
 export const multiPropertyTypePattern: PatternMatcher = createPattern(
   'multi-property-type-fix',
@@ -85,7 +85,7 @@ export const multiPropertyTypePattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix variable declarations with object type
- * Handles: const x: { prop: Type } = ... → const x: { prop: Type } = ...
+ * Handles: const, x: { prop: Type } = ... → const x: {, prop: Type } = ...
  */
 export const variableObjectTypePattern: PatternMatcher = createPattern(
   'variable-object-type-fix',
@@ -129,7 +129,7 @@ export function getObjectLiteralPatterns(): PatternMatcher[] {
 /**
  * Apply object literal type fixes to content
  */
-export function fixObjectLiteralTypes(content: string): { result: string; fixCount: number } {
+export function fixObjectLiteralTypes(content: string): {, result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

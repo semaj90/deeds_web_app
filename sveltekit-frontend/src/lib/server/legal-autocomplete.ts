@@ -2,15 +2,12 @@ import { getAllStates, getAllTitles } from './law-mapping.js';
 
 interface LegalSuggestion {
   type: 'statute' | 'crime' | 'state' | 'title';
-  label: string;
-  value: string;
-  description?: string;
-  confidence: number;
+  label: string;, value: string;
+  description?: string;, confidence: number;
 }
 
 interface Crime {
-  name: string;
-  codes: string[];
+  name: string;, codes: string[];
   abbr: string[];
 }
 

@@ -65,7 +65,7 @@
 <style>
 	.results-container {
 		display: flex;
-		flex-direction: column; gap: 0;
+		flex-direction: column;, gap: 0;
 		flex: 1;
 		overflow-y: auto;
 	}
@@ -73,7 +73,7 @@
 	.result-item {
 		padding: 1rem;
 		border-bottom: 1px solid #e0ddd8;
-		cursor: pointer; transition: background 0.2s;
+		cursor: pointer;, transition: background 0.2s;
 	}
 
 	.result-item:hover {
@@ -85,16 +85,16 @@
 	}
 
 	.result-header {
-		display: flex; gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-bottom: 0.75rem;
 		align-items: center;
 	}
 
 	.rank-badge {
-		display: inline-block; width: 32px;
-		height: 32px; background: #8b3a3a;
+		display: inline-block;, width: 32px;
+		height: 32px;, background: #8b3a3a;
 		color: white;
-		border-radius: 50%; display: flex;
+		border-radius: 50%;, display: flex;
 		align-items: center;
 		justify-content: center;
 		font-weight: 600;
@@ -103,19 +103,19 @@
 
 	.score-badge {
 		display: flex;
-		flex-direction: column; gap: 0.25rem;
+		flex-direction: column;, gap: 0.25rem;
 		margin-left: auto;
 	}
 
 	.score-label {
-		font-size: 0.75rem; color: #999;
+		font-size: 0.75rem;, color: #999;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
 	.score-value {
 		font-size: 1.1rem;
-		font-weight: 700; color: #8b3a3a;
+		font-weight: 700;, color: #8b3a3a;
 	}
 
 	.result-content {
@@ -125,30 +125,30 @@
 	.result-title {
 		margin: 0 0 0.5rem 0;
 		font-size: 1rem;
-		font-weight: 600; color: #2d2d2d;
-		display: flex; gap: 0.5rem;
+		font-weight: 600;, color: #2d2d2d;
+		display: flex;, gap: 0.5rem;
 		align-items: center;
 	}
 
 	.page-number {
-		font-size: 0.85rem; color: #999;
+		font-size: 0.85rem;, color: #999;
 		font-weight: 400;
 	}
 
 	.result-snippet {
 		margin: 0;
-		font-size: 0.9rem; color: #555;
+		font-size: 0.9rem;, color: #555;
 		line-height: 1.4;
 	}
 
 	.result-meta {
-		display: flex; gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-top: 0.5rem;
-		font-size: 0.85rem; color: #999;
+		font-size: 0.85rem;, color: #999;
 	}
 
 	.meta-item {
-		display: flex; gap: 0.25rem;
+		display: flex;, gap: 0.25rem;
 	}
 
 	.meta-item strong {
@@ -161,7 +161,7 @@
 	}
 
 	.click-hint {
-		font-size: 0.8rem; color: #bbb;
+		font-size: 0.8rem;, color: #bbb;
 		font-style: italic;
 	}
 

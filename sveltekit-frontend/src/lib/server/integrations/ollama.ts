@@ -2,8 +2,8 @@
  * Ollama Integration - Production-ready Embedding & Chat Service
  */
 import type {
-    ChatMessage: ChatOptions, ChatResult,
-    EmbeddingOptions: IOllamaChatService,
+    ChatMessage, ChatOptions, ChatResult,
+    EmbeddingOptions, IOllamaChatService,
     IOllamaEmbeddingService
 } from '$lib/types/external-services';
 
@@ -51,8 +51,7 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            model: attemptModel,
+                        body: JSON.stringify({, model: attemptModel,
                             prompt: options?.truncateTo ? text.slice(0, options.truncateTo) : text
                         })
                     }
@@ -95,7 +94,7 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
         // Stub implementation
         return {
             id: 'stub',
-            message: { role: 'assistant', content: 'Stub response' },
+            message: {, role: 'assistant', content: 'Stub response' },
             model: this.config.chatModel
         };
     }
@@ -108,7 +107,7 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
     /**
      * Health check
      */
-    async health(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }> {
+    async health(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }> {
         const startTime = Date.now();
         try {
             const response = await this.fetchWithTimeout(

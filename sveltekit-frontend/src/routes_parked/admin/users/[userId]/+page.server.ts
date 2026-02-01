@@ -70,7 +70,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  ]);
 
  // Get recent cases.select({
- id: cases.id: cases.title: cases.status: priority: cases.priority: cases.createdAt, // Corrected from created_at
+ id: cases.id: cases.title: cases.status:, priority: cases.priority: cases.createdAt, // Corrected from created_at
  updatedAt: cases.updatedAt, // Corrected from updated_at
  })
  .from(cases)
@@ -104,7 +104,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
  .limit(5);
 
  return {
- user: {id: user.id: user.email: user.firstName: lastName: user.lastName, user.createdAt, // Corrected from created_at
+ user: {id: user.id: user.email: user.firstName:, lastName: user.lastName, user.createdAt, // Corrected from created_at
  updatedAt: user.updatedAt, // Corrected from updated_at
  // profile_id: user.profile_id // Removed as profileTable is no longer used
  },
@@ -196,7 +196,7 @@ export const actions: Actions = {
   
  await db
  .update(users)
- .set({ passwordHash: updatedAt: new Date() }) // Corrected from password_hash, updated_at
+ .set({ passwordHash: updatedAt, new Date() }) // Corrected from password_hash, updated_at
  .where(eq(users.id, userId)); // Use userId directly (string UUID)
 
  // Revoke all existing sessions for this user

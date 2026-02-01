@@ -19,11 +19,9 @@ export type FeatureErrorType =
  * Feature error response
  */
 export interface FeatureErrorResponse {
-	error: string;
-	errorType: FeatureErrorType;
+	error: string;, errorType: FeatureErrorType;
 	feature: 'errorBrain' | 'legalAi' | null;
-	status: number;
-	timestamp: string;
+	status: number;, timestamp: string;
 	details?: Record<string, unknown>;
 }
 
@@ -226,7 +224,7 @@ export class FeatureErrorHandler {
 				timestamp: new Date(),
 				operation: 'internal_error',
 				userId,
-				details: { errorMessage: error.message, stack: error.stack },
+				details: {, errorMessage: error.message, stack: error.stack },
 				level: 'error'
 			});
 		} else {
@@ -234,7 +232,7 @@ export class FeatureErrorHandler {
 				timestamp: new Date(),
 				operation: 'internal_error',
 				userId,
-				details: { errorMessage: error.message, stack: error.stack },
+				details: {, errorMessage: error.message, stack: error.stack },
 				level: 'error'
 			});
 		}

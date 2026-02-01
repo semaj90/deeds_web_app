@@ -9,10 +9,8 @@ import * as schema from '$lib/server/db/schema-postgres';
 import ollamaService from '$lib/server/services/ollama-service'; // Placeholder import
 
 interface UserType {
-	id: string;
-	email: string;
-	firstName: string;
-	lastName: string;
+	id: string;, email: string;
+	firstName: string;, lastName: string;
 	role: string;
 }
 

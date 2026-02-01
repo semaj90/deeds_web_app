@@ -3,7 +3,7 @@
 
   import { browser } from '$app/environment';
   interface Props {
-    label: string; model: string;
+    label: string;, model: string;
     prompt: string;
     onActionComplete?: (response: any) => void;
     onActionError?: (error: Error) => void;

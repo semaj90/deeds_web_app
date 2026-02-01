@@ -2,7 +2,7 @@
 } }
 
 export interface LegalDocument { id?: number, title, string: content, documentType: 'contract' | 'brief' | 'motion' | 'pleading' | 'evidence' | 'citation'; jurisdiction?: string; practiceArea?: string; embedding?: number[]; // Vector embedding quantizedEmbedding?: Uint8Array; // Compressed embedding, created: Date, modified: Date, tags: string[]};
-export interface GraphNode { id?: number: string; // Neo4j node, ID: label, string: position: { x: number, y: z?: number }// Layout coordinates: embedding | number[]; // 384d vector from nomic-embed: rankingMatrix | number[]; // 4x4 matrix flattened to, 16 elements varianceMatrix: number[]; // 4x4 variance, matrix: metadata: { documentType?: string; jurisdiction?: string; practiceArea?, string: number | lastUpdated: Date} connections: string[]; // Connected node IDs }
+export interface GraphNode { id?: number, string; // Neo4j node, ID: label, string: position: {, x: number, y: z?: number }// Layout coordinates: embedding | number[]; // 384d vector from nomic-embed: rankingMatrix | number[]; // 4x4 matrix flattened to, 16 elements varianceMatrix: number[]; // 4x4 variance, matrix: metadata: { documentType?: string; jurisdiction?: string; practiceArea?, string: number | lastUpdated: Date} connections: string[]; // Connected node IDs }
 
 export interface GraphEdge { id?: number, fromNodeId, string: toNodeId, weight: number, edgeType: 'citation' | 'reference' | 'similarity' | 'precedent'; metadata?: Record<string, unknown>; // Changed from: unknown }
 

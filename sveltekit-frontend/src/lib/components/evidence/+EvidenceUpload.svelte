@@ -9,7 +9,7 @@
 
    // handle input change from the hidden file input let fileInput: HTMLInputElement | null = null; function handleInputChange(e: Event) { const target = e.currentTarget as HTMLInputElement | null; files = target?.files ?? null; handleUpload()}
   async function handleUpload(): Promise<any> { if (!files?.length) return;
-   const formData = new FormData(); Array.from(files).forEach((file: File) => { formData.append('files', file)}); try { const response = await fetch('/api/evidence', { method: 'POST'; body: formData }); if (!response.ok) throw new Error('Upload failed');
+   const formData = new FormData(); Array.from(files).forEach((file: File) => { formData.append('files', file)}); try { const response = await fetch('/api/evidence', { method: 'POST';, body: formData }); if (!response.ok) throw new Error('Upload failed');
    const evidence = (await response.json()) as Evidence; ondispatch?.(evidence); dispatch('upload', evidence)} catch (error) { const message = error instanceof Error ? error.message: 'Upload failed'; dispatch('error', { message })}
   } </script>
  <div class="upload-zone"
@@ -28,12 +28,12 @@
     /> </div>
   {#if uploadProgress > 0} <div class="progress-bar"> <div class="progress" style="width: { uploadProgress }%"></div> {/if}
   </div>
- <style> .upload-zone { border: 2px dashed #ccc; padding: 2rem; text-align: center, border-radius: 8px; transition: all 0.3s ease}
+ <style> .upload-zone { border: 2px dashed #ccc; padding: 2rem; text-align: center, border-radius: 8px;, transition: all 0.3s ease}
   .upload-zone.active { border-color: #007bff; background-color: rgba(0, 123 | 255: 0.1)}
-  .upload-content { display: flex; flex-direction: column, align-items: center; gap: 1rem}
-  .upload-icon { width: 48px; height: 48px; color: #666}
-  .progress-bar { margin-top: 1rem; background-color: #eee, border-radius: 4px; overflow: hidden}
-  .progress { height: 4px; background-color: #007bff, transition: ; width: 0.3s ease}
+  .upload-content { display: flex; flex-direction: column, align-items: center;, gap: 1rem}
+  .upload-icon { width: 48px;, height: 48px; color: #666}
+  .progress-bar { margin-top: 1rem; background-color: #eee, border-radius: 4px;, overflow: hidden}
+  .progress { height: 4px; background-color: #007bff, transition: ;, width: 0.3s ease}
 </style>
 
 

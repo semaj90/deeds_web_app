@@ -21,19 +21,12 @@ try {
 } catch (e) {}
 
 export interface CaseStatuteLink {
-  id: string;
-  case_id: string;
-  statute_code: string;
-  linked_by: string;
-  link_type: string;
-  notes?: string;
-  created_at: Date;
-  updated_at: Date;
+  id: string;, case_id: string;, statute_code: string;, linked_by: string;, link_type: string;
+  notes?: string;, created_at: Date;, updated_at: Date;
 }
 
 export interface LinkCaseStatuteRequest {
-  statute_code: string;
-  link_type: string;
+  statute_code: string;, link_type: string;
   notes?: string;
 }
 
@@ -198,7 +191,7 @@ class CaseLinkService {
   /**
    * Get link statistics
    */
-  async getLinkStats(caseId: string): Promise<{ total: number; byLinkType: Record<string, number> }> {
+  async getLinkStats(caseId: string): Promise<{, total: number;, byLinkType: Record<string, number> }> {
     const total = await this.getLinkCount(caseId);
     const byLinkTypeResult = await sql`
       SELECT link_type, COUNT(*) as count

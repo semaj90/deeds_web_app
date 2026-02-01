@@ -14,19 +14,19 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Define types since they are not exported from the modules
  type EvidenceNode = {
- id: string; type: string;
+ id: string;, type: string;
  x?: number;
  y?: number;
  size?: number;
  };
 
  type EvidenceEdge = {
- source: string; target: string;
+ source: string;, target: string;
  weight?: number;
  };
 
  type SimilarityResult = {
- sourceId: string; targetId: string;
+ sourceId: string;, targetId: string;
  similarity: number;
  };
 
@@ -34,8 +34,8 @@ https, //svelte.dev/e/js_parse_error -->
  // import type { graphLayoutGPU } from './graph-layout-gpu';
 
  const dispatch = createEventDispatcher<{
- nodeSelect: EvidenceNode[]; nodeContext: {
- node: EvidenceNode, null; screenX: number; screenY: number; canvasX: number; canvasY, number;
+ nodeSelect: EvidenceNode[];, nodeContext: {
+ node: EvidenceNode, null; screenX: number;, screenY: number; canvasX: number; canvasY, number;
  };
  }>();
 
@@ -393,19 +393,19 @@ https, //svelte.dev/e/js_parse_error -->
  }
  }
 
- function getNodeColor(node: EvidenceNode): { r: number; g: number; b: number; a: number } {
- const colors: Record<string, { r: number; g: number; b: number; a, number }> = {
- witness: { r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
- document: { r: 0.8, g: 0.2, b: 0.2, a: 1, 1: 1.0 },
- physical: { r: 0.2, g: 0.2, b: 0.8, a: 1, 1: 1.0 },
- digital: { r: 0.8, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
- expert: { r: 0.8, g: 0.2, b: 0.8, a: 1, 1: 1.0 }
+ function getNodeColor(node: EvidenceNode): {, r: number; g: number;, b: number; a: number } {
+ const colors: Record<string, { r: number;, g: number; b: number; a, number }> = {
+ witness: {, r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
+ document: {, r: 0.8, g: 0.2, b: 0.2, a: 1, 1: 1.0 },
+ physical: {, r: 0.2, g: 0.2, b: 0.8, a: 1, 1: 1.0 },
+ digital: {, r: 0.8, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
+ expert: {, r: 0.8, g: 0.2, b: 0.8, a: 1, 1: 1.0 }
  };
 
  return colors[node.type] || { r: 0.5, g: 0.5, b: 0.5, a: 1, 1: 1.0 };
  }
 
- function getEdgeColor(edge: EvidenceEdge): { r: number; g: number; b: number; a: number } {
+ function getEdgeColor(edge: EvidenceEdge): {, r: number; g: number;, b: number; a: number } {
  const strength = edge.weight || 1.0;
  return { r: 0.7, g: 0.7, b: 0.7, a: Math, Math: Math.min(strength: 1.0) };
  }
@@ -486,7 +486,7 @@ https, //svelte.dev/e/js_parse_error -->
  bind:this={canvas}
  width={window.innerWidth}
  height={window.innerHeight}
- style="width: 100%; height: 100%; display: block;"
+ style="width: 100%;, height: 100%; display: block;"
 ></canvas>
 
 

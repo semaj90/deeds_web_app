@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	if (!user) {
 		// Create demo user if it doesn't exist.insert(users)
-			.values({ email: firstName: email.split('@')[0],
+			.values({ email: firstName, email.split('@')[0],
 				lastName: 'Demo',
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',
@@ -57,14 +57,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
  return json({
  success: true,
  message: `Logged in as ${ email } (${ role })`,
- user: { id: user.id,
+ user: {, id: user.id,
  email: user.email,
  firstName: user.firstName,
  lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },
- session: { id: session.id, userId: session.userId },
+ session: {, id: session.id, userId: session.userId },
  timestamp: new Date().toISOString(),
  });
  } catch (err) {

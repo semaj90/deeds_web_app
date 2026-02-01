@@ -19,7 +19,7 @@ type SearchHit = {
 };
 
 type CollectionsListResponse = {
-  collections?: Array<{ name: string }>;
+  collections?: Array<{, name: string }>;
 };
 
 type PayloadIndexBody = {
@@ -30,8 +30,7 @@ type PayloadIndexBody = {
 };
 
 type CreateCollectionBody = {
-  vectors: {
-    size: number;
+  vectors: {, size: number;
     distance?: 'Cosine' | 'Dot' | 'Euclid';
   };
   [k: string]: unknown;
@@ -333,7 +332,7 @@ async function waitForQdrantReady(maxRetries = 15, delayMs = 2000): Promise<bool
 
 async function initQdrantIndexes(
   collectionName = process.env?.QDRANT_COLLECTION ?? 'documents'
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{, ok: boolean; error?: string }> {
   try {
     const cols = await qdrant.getCollections();
     const exists = cols?.collections?.some((c: any) => c.name === collectionName);
@@ -341,7 +340,7 @@ async function initQdrantIndexes(
     if (!exists) {
       const vectorSize = Number(process.env.EMBED_DIM ?? '1536');
       await qdrant.createCollection(collectionName, {
-        vectors: { size: vectorSize, distance: 'Cosine' },
+        vectors: {, size: vectorSize, distance: 'Cosine' },
       });
       console.log(`✅ Created collection: ${collectionName}`);
     }

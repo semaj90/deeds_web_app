@@ -16,22 +16,22 @@ interface SIMDJSONModule {
 
 // Cache Configuration
 interface CacheConfig {
-	redisUrl: string; defaultTTL: number;
-	compressionEnabled: boolean; compressionThreshold: number;
-	maxKeyLength: number; enableMetrics: boolean;
+	redisUrl: string;, defaultTTL: number;
+	compressionEnabled: boolean;, compressionThreshold: number;
+	maxKeyLength: number;, enableMetrics: boolean;
 }
 
 // Performance Metrics
 interface ParseMetrics {
-	totalParses: number; simdParses: number;
-	nativeParses: number; cacheHits: number;
-	cacheMisses: number; averageParseTime: number;
-	averageSIMDTime: number; averageNativeTime: number;
-	totalDataProcessed: number; compressionRatio: number;
+	totalParses: number;, simdParses: number;
+	nativeParses: number;, cacheHits: number;
+	cacheMisses: number;, averageParseTime: number;
+	averageSIMDTime: number;, averageNativeTime: number;
+	totalDataProcessed: number;, compressionRatio: number;
 }
 
 interface CacheEntry<T = unknown> {
-	data: T; timestamp: number;
+	data: T;, timestamp: number;
 	ttl: number;
 }
 
@@ -255,11 +255,11 @@ class SIMDJSONCache {
 		}
 	}
 
-	public validate(jsonString: string): { valid: boolean; error?: string } {
+	public validate(jsonString: string): {, valid: boolean; error?: string } {
 		try {
 			if (this?.simdLoaded&& this.simdModule) {
 				const valid = this.simdModule.isValid(jsonString);
-				return { valid: error: valid ? undefined : this.simdModule.getLastErrorMessage()
+				return { valid: error, valid ? undefined : this.simdModule.getLastErrorMessage()
 				};
 			} else {
 				JSON.parse(jsonString);
@@ -311,7 +311,7 @@ class SIMDJSONCache {
 		return { ...this.metrics };
 	}
 
-	public getSIMDStatus(): { loaded: boolean; available: boolean; performance: string } {this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
+	public getSIMDStatus(): {, loaded: boolean; available: boolean;, performance: string } {this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
 				? `${Math.round((this.metrics.averageNativeTime / this.metrics.averageSIMDTime) * 100) / 100}x faster`
 				: 'No comparison data';
 
@@ -326,7 +326,7 @@ class SIMDJSONCache {
 		this.cache.clear();
 	}
 
-	public getCacheStats(): { memoryEntries: number; hitRate: number; compressionRatio: number } {this.metrics.totalParses > 0
+	public getCacheStats(): {, memoryEntries: number; hitRate: number;, compressionRatio: number } {this.metrics.totalParses > 0
 				? this.metrics.cacheHits / this.metrics.totalParses
 				: 0;
 
@@ -363,7 +363,7 @@ export function fastStringify(obj: unknown, useCache = true): string {
 	return cache.stringify(obj, useCache);
 }
 
-export function validateJSON(jsonString: string): { valid: boolean; error?: string } {
+export function validateJSON(jsonString: string): {, valid: boolean; error?: string } {
 	const cache = getSIMDJSONCache() || createSIMDJSONCache();
 	return cache.validate(jsonString);
 }

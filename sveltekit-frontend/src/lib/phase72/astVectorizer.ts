@@ -90,7 +90,7 @@ async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
  const response = await fetch(`${ollamaUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt: text }),
+ body: JSON.stringify({, model: prompt, text }),
  });
 
  if (!response.ok) {

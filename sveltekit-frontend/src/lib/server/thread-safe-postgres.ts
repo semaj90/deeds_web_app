@@ -24,8 +24,7 @@ connectionTimeoutMillis: 2000
 
 // Thread synchronization
 interface QueryLock {
-id: string;
-acquired: boolean;
+id: string;, acquired: boolean;
 waitingQueries: Array<() => void>;
 lastAccessed: number;
 }
@@ -34,12 +33,9 @@ const queryLocks = new Map<string, QueryLock>();
 const activeTxs = new Map<string, PoolClient>();
 
 interface HealthCheckResult {
-connected: boolean;
-activeConnections: number;
-activeLocks: number;
-activeTransactions: number;
-performance: {
-avgQueryTime: number;
+connected: boolean;, activeConnections: number;
+activeLocks: number;, activeTransactions: number;
+performance: {, avgQueryTime: number;
 totalQueries: number;
 };
 message?: string;
@@ -269,8 +265,7 @@ connected: true,
 activeConnections: (pool as any).totalCount ?? 0,
 activeLocks: queryLocks.size,
 activeTransactions: activeTxs.size,
-performance: {
-avgQueryTime: 0,
+performance: {, avgQueryTime: 0,
 totalQueries: 0
 }
 };
@@ -283,8 +278,7 @@ connected: false,
 activeConnections: 0,
 activeLocks: queryLocks.size,
 activeTransactions: activeTxs.size,
-performance: {
-avgQueryTime: 0,
+performance: {, avgQueryTime: 0,
 totalQueries: 0
 },
 message: error instanceof Error ? error.message : String(error)

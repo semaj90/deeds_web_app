@@ -18,18 +18,15 @@ import type { RequestEvent } from '@sveltejs/kit';
 // --- ADDED: missing type declarations to fix TS errors ---
 type GPUCache = {
 	getStats?: () => unknown;
-	findSimilar?: (
-		embedding: Float32Array,
+	findSimilar?: (, embedding: Float32Array,
 		threshold?: number
 	) => Promise<Array<{ metadata?: { response?: string }; similarity: number }> | undefined | null>;
 	storeVector?: (id: string, vector: Float32Array, metadata?: Record<string, unknown>) => Promise<void>;
 };
 
 type TermEntry = {
-	definition: string;
-	frequency: number;
-	confidence: number;
-	lastUsed: Date;
+	definition: string;, frequency: number;
+	confidence: number;, lastUsed: Date;
 	contextEmbedding: Float32Array;
 };
 
@@ -42,14 +39,10 @@ type SerializedTerm = {
 };
 
 type SerializedInteraction = {
-	id: string;
-	timestamp: string;
-	userMessage: string;
-	aiResponse: string;
-	feedback: number;
-	extractedEntities: string[];
-	glyphGenerated: boolean;
-	processingTime: number;
+	id: string;, timestamp: string;
+	userMessage: string;, aiResponse: string;
+	feedback: number;, extractedEntities: string[];
+	glyphGenerated: boolean;, processingTime: number;
 	gpuCacheHit: boolean;
 };
 
@@ -75,20 +68,15 @@ type EmbeddingResponse = { embedding?: number[]; [k: string]: any };
 // --- end added types ---
 
 export interface ChatInteraction {
-	id: string;
-	timestamp: Date;
-	userMessage: string;
-	aiResponse: string;
+	id: string;, timestamp: Date;
+	userMessage: string;, aiResponse: string;
 	feedback: number; // -1 to 1 (user satisfaction)
-	extractedEntities: string[];
-	glyphGenerated: boolean;
-	processingTime: number;
-	gpuCacheHit: boolean;
+	extractedEntities: string[];, glyphGenerated: boolean;
+	processingTime: number;, gpuCacheHit: boolean;
 }
 
 export interface UserDictionary {
-	userId: string;
-	legalTerms: Map<string, TermEntry>;
+	userId: string;, legalTerms: Map<string, TermEntry>;
 	preferredStyle: 'formal' | 'casual' | 'technical' | 'adaptive';
 	domainExpertise: string[]; // ['contract-law', 'criminal-defense', etc.]
 	qloraCheckpoint: string; // Path to user's fine-tuned model
@@ -96,19 +84,15 @@ export interface UserDictionary {
 }
 
 export interface SSRChatContext {
-	userId: string;
-	sessionId: string;
-	userDictionary: UserDictionary;
-	nesMemoryState: unknown;
-	gpuCacheState: any;
-	preloadedResponses: Map<string, string>;
-	currentCase?: { caseId: string; documents: string[]; activeContext: Float32Array };
+	userId: string;, sessionId: string;
+	userDictionary: UserDictionary;, nesMemoryState: unknown;
+	gpuCacheState: any;, preloadedResponses: Map<string, string>;
+	currentCase?: {, caseId: string; documents: string[];, activeContext: Float32Array };
 }
 
 type PatternItem = {
 	id?: string | number;
-	pattern: string;
-    response: string; // Added response for common patterns
+	pattern: string;, response: string; // Added response for common patterns
 };
 
 /**
@@ -190,10 +174,8 @@ export class SSRQLorAGPUChatAssistant {
 		userId: string,
 		sessionId: string,
 		initialMessage?: string
-	): Promise<{
-		ssrContext: SSRChatContext;
-		prerenderedHTML: string;
-		preloadedData: Record<string, unknown>;
+	): Promise<{, ssrContext: SSRChatContext;
+		prerenderedHTML: string;, preloadedData: Record<string, unknown>;
 	}> {
 		console.log(`📱 Rendering SSR chat context for user ${userId}`);
 

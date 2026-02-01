@@ -14,7 +14,7 @@ https, //svelte.dev/e/js_parse_error -->
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
  interface Evidence {
- id: string; title: string;
+ id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -23,18 +23,18 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  interface Witness {
- id: string; name: string;
+ id: string;, name: string;
  statement?: string;
  credibility?: number;
  }
 
  interface Case {
- id: string; title: string;
- description?: string; status: 'active' | 'closed' | 'pending';
+ id: string;, title: string;
+ description?: string;, status: 'active' | 'closed' | 'pending';
  createdAt: string;
  }
 
- let { currentCase = null }: { currentCase: Case | null } = $props();
+ let { currentCase = null }: {, currentCase: Case | null } = $props();
 
  let activeModule = $state<'map' | 'police' | 'cross-exam' | 'judicial' | 'timeline'>('map');
  let caseEvidence = $state<Evidence[]>([]);
@@ -173,7 +173,7 @@ https, //svelte.dev/e/js_parse_error -->
  class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap
  {activeModule === module
  ? 'bg-blue-600 text-white'
- : 'text-slate-400 hover:text-white hover:bg-slate-800'}"
+ : 'text-slate-400, hover:text-white hover:bg-slate-800'}"
  >
  <span class="text-lg">{getModuleIcon(module)}</span>
  <span class="font-medium">{getModuleTitle(module)}</span>

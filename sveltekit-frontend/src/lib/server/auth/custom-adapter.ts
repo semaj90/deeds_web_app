@@ -17,8 +17,7 @@ type UserRow = {
 };
 
 type SessionRow = {
-	id: string;
-	userId: string; // Changed from user_id to userId, assumption based on schema
+	id: string;, userId: string; // Changed from user_id to userId, assumption based on schema
 	expiresAt: Date; // Changed from expires_at to expiresAt
 };
 
@@ -99,8 +98,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
 
 			const databaseUser: DatabaseUser = {
 				id: user.id,
-				attributes: {
-					email: user.email ?? null,
+				attributes: {, email: user.email ?? null,
 					firstName: user.first_name ?? null,
 					lastName: user.last_name ?? null,
 					role: user.role ?? 'user',

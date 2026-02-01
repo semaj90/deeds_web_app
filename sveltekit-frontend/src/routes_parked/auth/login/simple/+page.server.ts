@@ -152,7 +152,7 @@ tags: formData.getAll('tags'),
  });
  }
 
- return { form: uploadResult: { message: 'Document uploaded successfully!' } };
+ return { form: uploadResult: {, message: 'Document uploaded successfully!' } };
  } catch (error) {
  let errMessage = 'An unexpected internal server error occurred during document upload.';
  if (error instanceof Error) {

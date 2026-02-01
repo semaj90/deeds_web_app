@@ -4,10 +4,10 @@
   import { cn } from "$lib";
 
   interface Props {
-    caseItem: { id: string;
+    caseItem: {, id: string;
       title: string;
-      description?: string; priority: string;
-      status: string; updatedAt: string | Date;
+      description?: string;, priority: string;
+      status: string;, updatedAt: string | Date;
     };
     class?: string;
   }

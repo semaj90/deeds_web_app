@@ -85,11 +85,7 @@ export class ClientEmbeddingService {
             maxLength?: number;
             batchSize?: number;
         } = {}
-    ): Promise<{
-        embeddings: number[][];
-        model: string;
-        dimension: number;
-        count: number;
+    ): Promise<{, embeddings: number[][];, model: string;, dimension: number;, count: number;
     }> {
         if (!this.isInitialized) {
             await this.initialize();
@@ -207,7 +203,7 @@ export class ClientEmbeddingService {
         queryEmbedding: number[],
         embeddings: number[][],
         topK: number = 5
-    ): { index: number; similarity: number }[] {
+    ): {, index: number;, similarity: number }[] {
         const similarities = embeddings.map((emb, index) => ({
             index,
             similarity: this.cosineSimilarity(queryEmbedding, emb),

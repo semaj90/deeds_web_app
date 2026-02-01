@@ -9,7 +9,7 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
 const SHOULD_USE_REDIS = process.env.CACHE_BACKEND === 'redis' || process.env.USE_REDIS === 'true' || Boolean(process.env.REDIS_URL);
 
 export const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000;
-export const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
+export const memoryCache = new Map<string, { value: unknown;, expiresAt: number }>();
 
 const RATE_LIMIT_TOKENS = Number(process.env.CACHE_RATE_LIMIT_TOKENS ?? 10);
 const RATE_LIMIT_REFILL_MS = Number(process.env.CACHE_RATE_LIMIT_REFILL_MS ?? 60_000);
@@ -51,8 +51,7 @@ async function connectRedis(): Promise<RedisClient | null> {
 	try {
 		const options: RedisClientOptions = {
 			url: DEFAULT_REDIS_URL,
-			socket: {
-				reconnectStrategy: () => 1000
+			socket: {, reconnectStrategy: () => 1000
 			}
 		};
 
@@ -113,7 +112,7 @@ export async function setCache(
 	}
 }
 
-export function getFromMemoryCache(key: string): { found: boolean; value?: unknown } {
+export function getFromMemoryCache(key: string): {, found: boolean; value?: unknown } {
 	const entry = memoryCache.get(key);
 	if (!entry) return { found: false };
 
@@ -125,9 +124,9 @@ export function getFromMemoryCache(key: string): { found: boolean; value?: unkno
 	return { found: true, value: entry.value };
 }
 
-const tokenBuckets = new Map<string, { tokens: number; lastRefill: number }>();
+const tokenBuckets = new Map<string, { tokens: number;, lastRefill: number }>();
 
-export function checkRateLimit(key = 'global'): { ok: boolean; remaining: number } {
+export function checkRateLimit(key = 'global'): {, ok: boolean; remaining: number } {
 	const now = Date.now();
 	const bucket = tokenBuckets.get(key) ?? { tokens: RATE_LIMIT_TOKENS, lastRefill: now };
 	const elapsed = now - bucket.lastRefill;
@@ -154,7 +153,7 @@ export async function redisRateLimit(
 	key = 'global',
 	maxRequests = RATE_LIMIT_TOKENS,
 	windowMs = RATE_LIMIT_REFILL_MS
-): Promise<{ ok: boolean; remaining: number }> {
+): Promise<{, ok: boolean; remaining: number }> {
 	const client = await getRedisClient();
 	if (!client) {
 		return checkRateLimit(key);

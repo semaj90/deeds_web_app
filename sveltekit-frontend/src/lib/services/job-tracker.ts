@@ -9,10 +9,8 @@ import type { IngestionJob } from '$lib/machines/ingestion-workflow-machine.js';
 interface JobRecord extends IngestionJob {
     // LokiJS metadata
     $loki?: number;
-    meta?: {
-        created: number;
-        revision: number;
-        updated: number;
+    meta?: {, created: number;
+        revision: number;, updated: number;
         version: number;
     };
     metadata: IngestionJob['metadata'] & {
@@ -23,12 +21,9 @@ interface JobRecord extends IngestionJob {
 }
 
 interface WorkerStats {
-    id: string;
-    startedAt: string;
-    totalProcessed: number;
-    averageTime: number;
-    currentLoad: number;
-    lastHeartbeat: string;
+    id: string;, startedAt: string;
+    totalProcessed: number;, averageTime: number;
+    currentLoad: number;, lastHeartbeat: string;
     status: 'active' | 'idle' | 'error' | 'offline';
     errors: Array<any>;
 }
@@ -153,12 +148,10 @@ class JobTracker {
             .data();
     }
 
-    getJobStats(): {
-        total: number;
+    getJobStats(): {, total: number;
         byState: Record<IngestionJob['state'], number>;
         byPriority: Record<string, number>;
-        averageProcessingTime: number;
-        successRate: number;
+        averageProcessingTime: number;, successRate: number;
     } {
         this.ensureInitialized();
         const allJobs = this.jobs.find();

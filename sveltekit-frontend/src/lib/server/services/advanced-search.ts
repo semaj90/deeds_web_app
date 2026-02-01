@@ -32,7 +32,7 @@ export interface SearchFilters {
 	query?: string;
 	caseStatus?: string[];
 	priority?: string[];
-	dateRange?: { start: string; end: string };
+	dateRange?: {, start: string; end: string };
 	tags?: string[];
 	evidenceType?: string[];
 	sortBy?: 'date' | 'priority' | 'status' | 'relevance';
@@ -55,38 +55,31 @@ type EvidenceMetadata = {
 };
 
 export type SearchResultCase = {
-	type: 'case';
-	id: string;
+	type: 'case';, id: string;
 	title: string;
 	description?: string;
-	relevanceScore?: number;
-	metadata: CaseMetadata;
+	relevanceScore?: number;, metadata: CaseMetadata;
 	highlights?: string[];
 };
 
 export type SearchResultEvidence = {
-	type: 'evidence';
-	id: string;
+	type: 'evidence';, id: string;
 	title: string;
 	description?: string;
-	relevanceScore?: number;
-	metadata: EvidenceMetadata;
+	relevanceScore?: number;, metadata: EvidenceMetadata;
 	highlights?: string[];
 };
 
 export type SearchResult = SearchResultCase | SearchResultEvidence;
 
 export interface SearchResponse {
-	results: SearchResult[];
-	total: number;
-	facets: {
-		caseStatus: { value: string; count: number }[];
-		priority: { value: string; count: number }[];
-		evidenceType: { value: string; count: number }[];
-		tags: { value: string; count: number }[];
+	results: SearchResult[];, total: number;
+	facets: {, caseStatus: { value: string;, count: number }[];
+		priority: {, value: string; count: number }[];
+		evidenceType: {, value: string; count: number }[];
+		tags: {, value: string; count: number }[];
 	};
-	suggestions?: string[];
-	queryTime: number;
+	suggestions?: string[];, queryTime: number;
 }
 
 class AdvancedSearch {
@@ -187,8 +180,7 @@ class AdvancedSearch {
 				title: case_.title ?? '',
 				description: case_.description ?? undefined,
 				relevanceScore: this.calculateRelevance(text, filters.query),
-				metadata: {
-					status: case_.status,
+				metadata: {, status: case_.status,
 					priority: case_.priority,
 					createdAt: case_.createdAt,
 					tags: case_.tags
@@ -236,8 +228,7 @@ class AdvancedSearch {
 				title: evid.fileName ?? 'Untitled Evidence',
 				description: evid.description ?? undefined,
 				relevanceScore: this.calculateRelevance(text, filters.query),
-				metadata: {
-					fileType: evid.fileType,
+				metadata: {, fileType: evid.fileType,
 					uploadedAt: evid.uploadedAt,
 					caseId: evid.caseId
 				},

@@ -92,11 +92,9 @@
       const response = await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          key: cacheKey,
+        body: JSON.stringify({, key: cacheKey,
           value: cacheValue,
-          options: {
-            ttl: parseInt(selectedTTL) * 1000,
+          options: {, ttl: parseInt(selectedTTL) * 1000,
             priority: selectedPriority,
             tags: tags.length > 0 ? tags : undefined
           }
@@ -203,7 +201,7 @@
         testData.push({
           key: `perf_${Math.random().toString(36).substring(7)}`,
           value: `val_${Math.random().toString(36).substring(7)}`,
-          options: { ttl: 300000, priority: i % 3 === 0 ? 'high' : 'medium' }
+          options: {, ttl: 300000, priority: i % 3 === 0 ? 'high' : 'medium' }
         });
       }
 
@@ -211,7 +209,7 @@
       const response = await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ operations: testData })
+        body: JSON.stringify({, operations: testData })
       });
       const result = await response.json();
       const duration = Date.now() - startTime;
@@ -249,7 +247,7 @@
       await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: testKey, value: 'test_data', options: { ttl: 60000 } })
+        body: JSON.stringify({, key: testKey, value: 'test_data', options: {, ttl: 60000 } })
       });
 
       // Test cache hit
@@ -451,7 +449,7 @@
 
     <Tabs.Content value="statistics">
       {#if cacheStats}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
           <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <h4 class="text-sm text-gray-400 mb-2">Service Stats</h4>
             <div class="space-y-1">

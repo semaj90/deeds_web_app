@@ -11,8 +11,7 @@ export const LOCAL_LLM_CONFIG = {
   // Local TensorRT Bridge configuration
   OLLAMA_BASE_URL: "http://localhost:8086",
 
-  OLLAMA_MODELS: {
-    LEGAL_DETAILED: "gemma3-legal:latest",
+  OLLAMA_MODELS: {, LEGAL_DETAILED: "gemma3-legal:latest",
     GENERAL: "gemma3-legal:latest",
     EMBEDDINGS: "nomic-embed-text"
   },

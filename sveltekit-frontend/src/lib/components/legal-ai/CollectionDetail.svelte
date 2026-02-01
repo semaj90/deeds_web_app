@@ -2,9 +2,9 @@
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface Collection {
- id: string; name: string;
- description?: string; is_public: boolean;
- citation_count?: number; created_at: string;
+ id: string;, name: string;
+ description?: string;, is_public: boolean;
+ citation_count?: number;, created_at: string;
  }
 
  let { collection } = $props<{
@@ -140,16 +140,16 @@
 <style>
  .collection-detail {
  display: flex;
- flex-direction: column; gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  padding: 1.5rem;
- background-color: white; border: 2px solid #d4a574;
+ background-color: white;, border: 2px solid #d4a574;
  border-radius: 8px;
  }
 
  .detail-header {
  display: flex;
  justify-content: space-between;
- align-items: flex-start; gap: 1rem;
+ align-items: flex-start;, gap: 1rem;
  padding-bottom: 1rem;
  border-bottom: 1px solid #e0d5c7;
  }
@@ -160,7 +160,7 @@
 
  .header-left h2 {
  margin: 0;
- font-size: 1.5rem; color: #2c2c2c;
+ font-size: 1.5rem;, color: #2c2c2c;
  }
 
  .description {
@@ -170,13 +170,13 @@
  }
 
  .meta {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  margin-top: 0.75rem;
- font-size: 0.85rem; color: #666;
+ font-size: 0.85rem;, color: #666;
  }
 
  .header-actions {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
 
  .btn-share,
@@ -185,13 +185,13 @@
  padding: 0.5rem 1rem;
  border: none;
  border-radius: 4px;
- font-weight: 500; cursor: pointer;
+ font-weight: 500;, cursor: pointer;
  transition: all 0.2s;
  }
 
  .btn-share,
  .btn-export {
- background-color: #e0d5c7; color: #2c2c2c;
+ background-color: #e0d5c7;, color: #2c2c2c;
  }
 
  .btn-share:hover,
@@ -200,7 +200,7 @@
  }
 
  .btn-delete {
- background-color: #ff6b6b; color: white;
+ background-color: #ff6b6b;, color: white;
  }
 
  .btn-delete:hover {
@@ -218,15 +218,15 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 200px; gap: 1rem;
+ min-height: 200px;, gap: 1rem;
  color: #666;
  }
 
  .spinner {
- width: 30px; height: 30px;
+ width: 30px;, height: 30px;
  border: 3px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%; animation: spin 1s linear infinite;
+ border-radius: 50%;, animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -237,36 +237,36 @@
 
  .citations-list {
  display: flex;
- flex-direction: column; gap: 0.75rem;
+ flex-direction: column;, gap: 0.75rem;
  }
 
  .citation-item {
  display: flex;
  justify-content: space-between;
- align-items: center; padding: 0.75rem;
+ align-items: center;, padding: 0.75rem;
  background-color: #f5f1e8;
  border-radius: 4px;
  }
 
  .citation-info {
  display: flex;
- flex-direction: column; gap: 0.25rem;
+ flex-direction: column;, gap: 0.25rem;
  }
 
  .code {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.85rem;
- font-weight: 600; color: #8b4513;
+ font-weight: 600;, color: #8b4513;
  }
 
  .title {
- font-size: 0.85rem; color: #333;
+ font-size: 0.85rem;, color: #333;
  }
 
  .btn-remove {
- background: none; border: none;
- font-size: 1rem; cursor: pointer;
- color: #999; padding: 0;
+ background: none;, border: none;
+ font-size: 1rem;, cursor: pointer;
+ color: #999;, padding: 0;
  transition: color 0.2s;
  }
 

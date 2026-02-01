@@ -24,31 +24,23 @@ export type CaseStatus = 'open' | 'in_progress' | 'closed' | 'archived' | 'pendi
 export type CasePriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Case {
-    id: string;
-    title: string;
-    description: string;
-    caseNumber: string;
-    status: CaseStatus;
-    priority: CasePriority;
-    jurisdiction?: string;
-    openedDate: number;
+    id: string;, title: string;
+    description: string;, caseNumber: string;
+    status: CaseStatus;, priority: CasePriority;
+    jurisdiction?: string;, openedDate: number;
     closedDate?: number;
     assignedTo?: string;
     tags?: string[];
-    caseType?: string;
-    evidenceCount: number;
-    reportCount: number;
-    poiCount: number;
-    citationCount: number;
-    createdAt: number;
+    caseType?: string;, evidenceCount: number;
+    reportCount: number;, poiCount: number;
+    citationCount: number;, createdAt: number;
     updatedAt: number;
 }
 
 export interface CaseFilters {
-    statuses: CaseStatus[];
-    priorities: CasePriority[];
+    statuses: CaseStatus[];, priorities: CasePriority[];
     jurisdictions: string[];
-    dateRange?: { start: number; end: number };
+    dateRange?: {, start: number; end: number };
     tags?: string[];
     searchText?: string;
 }
@@ -58,25 +50,21 @@ export interface CaseFilters {
  */
 interface CaseStoreState {
     // Case list
-    cases: Case[];
-    filteredCases: Case[];
+    cases: Case[];, filteredCases: Case[];
     // Active selection
     activeCase: Case | null;
     activeCaseId: string | null;
     // Search & filters
-    searchQuery: string;
-    filters: CaseFilters;
+    searchQuery: string;, filters: CaseFilters;
     appliedFilters: string[];
     // Sorting
     sortBy: 'date' | 'title' | 'priority' | 'status';
     sortDirection: 'asc' | 'desc';
     // Metadata
-    totalCases: number;
-    casesByStatus: Map<CaseStatus, number>;
+    totalCases: number;, casesByStatus: Map<CaseStatus, number>;
     casesByPriority: Map<CasePriority, number>;
     // UI state
-    isLoading: boolean;
-    error: string | null;
+    isLoading: boolean;, error: string | null;
     lastUpdated: number;
 }
 

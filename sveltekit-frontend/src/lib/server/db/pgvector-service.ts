@@ -23,20 +23,19 @@ export class PgVectorService {
 	/**
 	 * Test database connection
 	 */
-	async testConnection(): Promise<{ success: boolean; details?: any }> {
+	async testConnection(): Promise<{, success: boolean; details?: any }> {
 		try {
 			const result = await this.client`SELECT NOW() as current_time, version() as pg_version`;
 			return {
 				success: true,
-				details: {
-					currentTime: result[0]?.current_time,
+				details: {, currentTime: result[0]?.current_time,
 					version: result[0]?.pg_version
 				}
 			};
 		} catch (error) {
 			return {
 				success: false,
-				details: { error: (error as Error).message }
+				details: {, error: (error as Error).message }
 			};
 		}
 	}
@@ -49,7 +48,7 @@ export class PgVectorService {
 		content: string,
 		embedding: number[],
 		metadata: Record<string, any> = {}
-	): Promise<{ success: boolean; id?: string; error?: string }> {
+	): Promise<{, success: boolean; id?: string; error?: string }> {
 		try {
 			// Validate embedding dimensions
 			if (!Array.isArray(embedding) || (embedding.length !== 768 && embedding.length !== 1536)) {
@@ -108,7 +107,7 @@ export class PgVectorService {
 			documentType?: string;
 			includeContent?: boolean;
 		} = {}
-	): Promise<{ success: boolean; results?: any[]; metadata?: any; error?: string }> {
+	): Promise<{, success: boolean; results?: any[]; metadata?: any; error?: string }> {
 		try {
 			const {
 				limit = 10,
@@ -175,8 +174,7 @@ export class PgVectorService {
 			return {
 				success: true,
 				results,
-				metadata: {
-					searchTimeMs: searchTime,
+				metadata: {, searchTimeMs: searchTime,
 					totalResults: results.length,
 					distanceMetric,
 					limit
@@ -194,13 +192,11 @@ export class PgVectorService {
 	 * Batch insert documents with embeddings
 	 */
 	async batchInsertDocuments(
-		documents: Array<{
-			documentId: string;
-			content: string;
-			embedding: number[];
+		documents: Array<{, documentId: string;
+			content: string;, embedding: number[];
 			metadata?: Record<string, any>;
 		}>
-	): Promise<{ success: boolean; inserted: number; errors?: string[] }> {
+	): Promise<{, success: boolean; inserted: number; errors?: string[] }> {
 		const errors: string[] = [];
 		let inserted = 0;
 
@@ -245,7 +241,7 @@ export class PgVectorService {
 			tableName?: string;
 			columnName?: string;
 		} = {}
-	): Promise<{ success: boolean; indexName?: string; error?: string }> {
+	): Promise<{, success: boolean; indexName?: string; error?: string }> {
 		try {
 			const {
 				lists = 100,
@@ -289,7 +285,7 @@ export class PgVectorService {
 	/**
 	 * Get database statistics
 	 */
-	async getDatabaseStats(): Promise<{ success: boolean; stats?: any; error?: string }> {
+	async getDatabaseStats(): Promise<{, success: boolean; stats?: any; error?: string }> {
 		try {
 			const vectorStats = await this.client`
 				SELECT
@@ -316,8 +312,7 @@ export class PgVectorService {
 
 			return {
 				success: true,
-				stats: {
-					vectors: vectorStats[0],
+				stats: {, vectors: vectorStats[0],
 					documentTypes: docTypeStats,
 					sizes: sizeStats[0]
 				}

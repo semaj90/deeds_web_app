@@ -33,12 +33,10 @@ export interface LogContext {
 }
 
 export interface LogEntry {
-    timestamp: string;
-    level: LogLevel;
+    timestamp: string;, level: LogLevel;
     message: string;
     context?: LogContext;
-    error?: {
-        name: string;
+    error?: {, name: string;
         message: string;
         stack?: string;
         code?: string | number;
@@ -52,10 +50,8 @@ export interface LogEntry {
 }
 
 export interface LogMetrics {
-    totalLogs: number;
-    logsByLevel: Record<LogLevel, number>;
-    errorRate: number;
-    averageResponseTime: number;
+    totalLogs: number;, logsByLevel: Record<LogLevel, number>;
+    errorRate: number;, averageResponseTime: number;
     memoryTrend: number[];
     windowsSpecific?: Record<string, unknown>;
 }
@@ -69,16 +65,12 @@ interface WindowsGPUInfo {
 }
 
 interface WindowsProcessMetrics {
-    pid: number;
-    uptime: number;
-    memoryUsage: {
-        rss: number;
-        heapUsed: number;
-        heapTotal: number;
+    pid: number;, uptime: number;
+    memoryUsage: {, rss: number;
+        heapUsed: number;, heapTotal: number;
         external: number;
     };
-    cpuUsage: {
-        user: number;
+    cpuUsage: {, user: number;
         system: number;
     };
 }
@@ -86,10 +78,8 @@ interface WindowsProcessMetrics {
 interface WindowsMetrics {
     gpu?: WindowsGPUInfo | null;
     process?: WindowsProcessMetrics | null;
-    platform?: {
-        osVersion: string;
-        totalMemory: number;
-        freeMemory: number;
+    platform?: {, osVersion: string;
+        totalMemory: number;, freeMemory: number;
     };
     error?: string;
 }
@@ -108,8 +98,7 @@ class WindowsPerformanceMonitor {
             return {
                 gpu: gpuInfo,
                 process: processMetrics,
-                platform: {
-                    osVersion: os.release(),
+                platform: {, osVersion: os.release(),
                     totalMemory: Math.round(os.totalmem() / 1024 / 1024),
                     freeMemory: Math.round(os.freemem() / 1024 / 1024)
                 }
@@ -170,14 +159,12 @@ class WindowsPerformanceMonitor {
             return {
                 pid: process.pid,
                 uptime: process.uptime(),
-                memoryUsage: {
-                    rss: Math.round(memUsage.rss / 1024 / 1024),
+                memoryUsage: {, rss: Math.round(memUsage.rss / 1024 / 1024),
                     heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
                     heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
                     external: Math.round(externalBytes / 1024 / 1024)
                 },
-                cpuUsage: {
-                    user: cpuUsage.user,
+                cpuUsage: {, user: cpuUsage.user,
                     system: cpuUsage.system
                 }
             };
@@ -192,7 +179,7 @@ export class ProductionLogger {
     private logBuffer: LogEntry[] = [];
     private metrics: LogMetrics = {
         totalLogs: 0,
-        logsByLevel: { debug: 0, info: 0, warn: 0, error: 0 },
+        logsByLevel: {, debug: 0, info: 0, warn: 0, error: 0 },
         errorRate: 0,
         averageResponseTime: 0,
         memoryTrend: []
@@ -538,8 +525,7 @@ export class ProductionLogger {
                 }
             }
             this.debug('Logger metrics collected', undefined, {
-                metrics: {
-                    totalLogs: this.metrics.totalLogs,
+                metrics: {, totalLogs: this.metrics.totalLogs,
                     errorRate: Math.round(this.metrics.errorRate * 100) / 100,
                     averageResponseTime: Math.round(this.metrics.averageResponseTime),
                     memoryTrendSize: this.metrics.memoryTrend.length
@@ -555,7 +541,7 @@ export class ProductionLogger {
         return { ...this.metrics };
     }
 
-    public async getHealthStatus(): Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; details: Record<string, unknown> }> {
+    public async getHealthStatus(): Promise<{, status: 'healthy' | 'degraded' | 'unhealthy'; details: Record<string, unknown> }> {
         const details: Record<string, unknown> = {
             totalLogs: this.metrics.totalLogs,
             errorRate: this.metrics.errorRate,
@@ -577,7 +563,7 @@ export class ProductionLogger {
         this.logBuffer = [];
         this.metrics = {
             totalLogs: 0,
-            logsByLevel: { debug: 0, info: 0, warn: 0, error: 0 },
+            logsByLevel: {, debug: 0, info: 0, warn: 0, error: 0 },
             errorRate: 0,
             averageResponseTime: 0,
             memoryTrend: []

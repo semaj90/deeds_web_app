@@ -60,7 +60,7 @@ export interface AnimationConfig {
 // Page and layout load functions
 export interface LoadEvent {
  params: Record<string, string>;
- url: URL; request: Request;
+ url: URL;, request: Request;
  cookies: {
  get(name: string): string | undefined;
  set(name: string, value: string, options?: any): void;
@@ -76,7 +76,7 @@ export type LayoutLoad<Data = unknown> = (_event: LoadEvent) => Promise<Data> | 
 // Server-side request handlers
 export interface RequestEvent {
  params: Record<string, string>;
- url: URL; request: Request;
+ url: URL;, request: Request;
  cookies: {
  get(name: string): string | undefined;
  set(name: string, value: string, options?: any): void;
@@ -89,23 +89,23 @@ export interface RequestEvent {
 export type RequestHandler = (_event: RequestEvent) => Promise<Response> | Response;
 
 // SvelteKit hooks
-export type Handle = (input: { event: RequestEvent; resolve: any }) => Promise<Response>;
-export type HandleError = (input: { error: any; event: RequestEvent }) => any;
-export type HandleFetch = (input: { event: RequestEvent;
- request: Request; fetch: typeof fetch;
+export type Handle = (input: {, event: RequestEvent; resolve: any }) => Promise<Response>;
+export type HandleError = (input: {, error: any; event: RequestEvent }) => any;
+export type HandleFetch = (input: {, event: RequestEvent;
+ request: Request;, fetch: typeof fetch;
 }) => Promise<Response>;
 
 // SvelteKit stores
 export interface PageStore {
- url: URL; params: Record<string, string>;
+ url: URL;, params: Record<string, string>;
  route: { id, null };
  data: Record<string, unknown>;
- error: any; state: Record<string, unknown>;
+ error: any;, state: Record<string, unknown>;
  form: any;
 }
 export type NavigatingStore = {
- from?: { params: Record<string, string>; url: URL };
- to?: { params: Record<string, string>; url: URL };
+ from?: {, params: Record<string, string>; url: URL };
+ to?: {, params: Record<string, string>; url: URL };
  type?: 'link' | 'popstate' | 'goto';
 } | null;
 export interface UpdatedStore {
@@ -120,12 +120,12 @@ export interface SQL<T = Record<string, unknown>> {
  queryChunks: readonly string[];
  params: readonly unknown[];
  typings?: { [key: string]: string };
- shouldInlineParams?: boolean; sql: string;
+ shouldInlineParams?: boolean;, sql: string;
  /** Phantom property to reference generic T so linters/TS don't complain about unused type param */
  _rowType?: T;
 }
 export interface QueryResult<T = unknown> {
- rows: T[]; rowCount: number;
+ rows: T[];, rowCount: number;
  command?: string;
  fields?: Array<unknown>;
 }
@@ -163,35 +163,35 @@ export interface DrizzleConfig {
 }
 // Enhanced Drizzle column functions to fix untyped function calls
 export interface DrizzleColumnHelpers {
- pgTable: any; serial: any;
- text: any; varchar: any;
- integer: any; boolean: any;
- timestamp: any; json: any;
- jsonb: any; uuid: any;
- real: any; doublePrecision: any;
- vector: any; primaryKey: any;
- foreignKey: any; unique: any;
+ pgTable: any;, serial: any;
+ text: any;, varchar: any;
+ integer: any;, boolean: any;
+ timestamp: any;, json: any;
+ jsonb: any;, uuid: any;
+ real: any;, doublePrecision: any;
+ vector: any;, primaryKey: any;
+ foreignKey: any;, unique: any;
  index: any;
  // Query operators
- eq: any; ne: any;
- gt: any; gte: any;
- lt: any; lte: any;
- isNull: any; isNotNull: any;
- inArray: any; notInArray: any;
- like: any; ilike: any;
- between: any; notBetween: any;
- exists: any; notExists: any;
- and: any; or: any;
- not: any; sql: any;
+ eq: any;, ne: any;
+ gt: any;, gte: any;
+ lt: any;, lte: any;
+ isNull: any;, isNotNull: any;
+ inArray: any;, notInArray: any;
+ like: any;, ilike: any;
+ between: any;, notBetween: any;
+ exists: any;, notExists: any;
+ and: any;, or: any;
+ not: any;, sql: any;
 }
 export interface DrizzleTable<T extends Record<string, unknown> = Record<string, unknown>> {
- _: { name: string;
+ _: {, name: string;
  columns: T;
- schema?: string; baseName: string;
+ schema?: string;, baseName: string;
  };
 }
 export interface DrizzleColumn<T = unknown> {
- name: string; dataType: string;
+ name: string;, dataType: string;
  columnType: string;
  data?: T;
  notNull?: boolean;
@@ -200,11 +200,11 @@ export interface DrizzleColumn<T = unknown> {
 }
 // Vector database types
 export interface EmbeddingVector {
- id: string; values: number[];
+ id: string;, values: number[];
  metadata?: Record<string, unknown>;
 }
 export interface VectorSearchResult {
- id: string; score: number;
+ id: string;, score: number;
  values?: number[];
  metadata?: Record<string, unknown>;
  document?: any;
@@ -220,7 +220,7 @@ export interface VectorSearchOptions {
 // ===== AI/ML TYPES =====
 // Ollama types
 export interface OllamaGenerateRequest {
- model: string; prompt: string;
+ model: string;, prompt: string;
  stream?: boolean;
  format?: 'json' | string;
  options?: {
@@ -239,8 +239,8 @@ export interface OllamaGenerateRequest {
  keep_alive?: string;
 }
 export interface OllamaGenerateResponse {
- model: string; created_at: string;
- response: string; done: boolean;
+ model: string;, created_at: string;
+ response: string;, done: boolean;
  context?: number[];
  total_duration?: number;
  load_duration?: number;
@@ -250,7 +250,7 @@ export interface OllamaGenerateResponse {
  eval_duration?: number;
 }
 export interface OllamaEmbeddingRequest {
- model: string; prompt: string;
+ model: string;, prompt: string;
  options?: any;
  keep_alive?: string;
 }
@@ -258,16 +258,16 @@ export interface OllamaEmbeddingResponse {
  embedding: number[];
 }
 export interface OllamaModel {
- name: string; modified_at: string;
- size: number; digest: string;
- details: { format: string;
- family: string; parameter_size: string;
+ name: string;, modified_at: string;
+ size: number;, digest: string;
+ details: {, format: string;
+ family: string;, parameter_size: string;
  quantization_level?: string;
  };
 }
 // RAG types
 export interface RAGDocument {
- id: string; content: string;
+ id: string;, content: string;
  metadata: Record<string, unknown>;
  embedding?: number[];
 }
@@ -283,8 +283,8 @@ export interface RAGQuery {
  };
 }
 export interface RAGResponse {
- response: string; context: RAGDocument[];
- sources: any[]; confidence: number;
+ response: string;, context: RAGDocument[];
+ sources: any[];, confidence: number;
  processingTime: number;
  model?: string;
  metadata?: Record<string, unknown>;
@@ -293,9 +293,9 @@ export interface RAGResponse {
 // ===== CACHE TYPES =====
 // Enhanced cache configuration (fixing our previous errors)
 export interface CacheConfiguration {
- layers: CacheLayerConfig[]; defaultTtl: number;
+ layers: CacheLayerConfig[];, defaultTtl: number;
  defaultTTL?: number; // Alias for defaultTtl
- maxMemoryUsage: number; enableCompression: boolean;
+ maxMemoryUsage: number;, enableCompression: boolean;
  enableIntelligentTierSelection?: boolean;
  enableAnalytics?: boolean;
  enablePredictiveLoading?: boolean;
@@ -306,25 +306,25 @@ export interface CacheConfiguration {
 }
 export interface CacheLayerConfig {
  type: 'memory' | 'redis' | 'postgres' | 'vector' | 'filesystem' | 'cdn' | 'browser';
- priority: number; capacity: number;
+ priority: number;, capacity: number;
  ttl: number;
  enabled?: boolean;
  options?: Record<string, unknown>;
 }
 export interface CacheEntry {
- value: any; metadata: Record<string, unknown>;
- ttl: number; createdAt: number;
+ value: any;, metadata: Record<string, unknown>;
+ ttl: number;, createdAt: number;
  lastAccessed?: number;
  accessCount?: number;
  size?: number;
  compressed?: boolean;
 }
 export interface CacheMetrics {
- hits: number; misses: number;
+ hits: number;, misses: number;
  errors?: number;
  gets?: number;
  sets?: number;
- deletes?: number; totalOperations: number;
+ deletes?: number;, totalOperations: number;
  totalOperationTime?: number;
  hitsByLayer?: Record<string, number>;
  writesByLayer?: Record<string, number>;
@@ -339,7 +339,7 @@ export interface CacheAnalytics {
  usageStats?: Record<string, unknown>;
 }
 export interface CacheStats {
- totalEntries: number; memoryUsage: number;
+ totalEntries: number;, memoryUsage: number;
  hitRate: number;
  size?: number;
 }
@@ -351,7 +351,7 @@ export interface CacheStrategy {
 }
 export interface CachePolicy {
  evictionStrategy?: 'lru' | 'lfu' | 'fifo' | 'ttl';
- maxSize: number; ttl: number;
+ maxSize: number;, ttl: number;
  compressionEnabled: boolean;
 }
 
@@ -364,7 +364,7 @@ export interface Collection<T = unknown> {
  update(obj: T): T;
  remove(obj: T | T[]): void;
  chain(): any;
- count(query?: any): number; data: T[];
+ count(query?: any): number;, data: T[];
  name: string;
 }
 export interface LokiMemoryAdapter {
@@ -409,7 +409,7 @@ export interface TestContext {
  only?: boolean;
 }
 export interface ExpectationResult {
- pass: boolean; message: string;
+ pass: boolean;, message: string;
 }
 export interface MockFunction<T extends (...args, any[]) => unknown = (...args: any[]) => unknown> {
  (...args: Parameters<T>): ReturnType<T>;
@@ -419,8 +419,8 @@ export interface MockFunction<T extends (...args, any[]) => unknown = (...args: 
  mockRejectedValue(error: any): this;
  mockClear(): this;
  mockReset(): this;
- mockRestore(): this; calls: Parameters<T>[];
- results: { type: 'return' | 'throw'; value: any }[];
+ mockRestore(): this;, calls: Parameters<T>[];
+ results: {, type: 'return' | 'throw'; value: any }[];
 }
 
 // ===== ENVIRONMENT TYPES =====

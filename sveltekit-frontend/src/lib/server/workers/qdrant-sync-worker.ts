@@ -20,10 +20,8 @@ import type { DocumentChunk } from './schema-phase90-hardened.js';
 import * as schema from './schema-phase90-hardened.js';
 
 interface QdrantSyncConfig {
-	qdrantUrl: string;
-	batchSize: number;
-	pollIntervalMs: number;
-	retryAttempts: number;
+	qdrantUrl: string;, batchSize: number;
+	pollIntervalMs: number;, retryAttempts: number;
 }
 
 const DEFAULT_CONFIG: QdrantSyncConfig = {
@@ -86,12 +84,10 @@ export class QdrantSyncWorker {
 			} catch (error) {
 				console.log(`📦 Creating collection "${name}" (${dimension}d)`);
 				await this.qdrant.createCollection(name, {
-					vectors: {
-						size: dimension,
+					vectors: {, size: dimension,
 						distance: 'Cosine',
 					},
-					optimizers_config: {
-						default_segment_number: 2,
+					optimizers_config: {, default_segment_number: 2,
 					},
 				});
 			}
@@ -141,7 +137,7 @@ export class QdrantSyncWorker {
 	/**
 	 * Process a batch of pending chunks
 	 */
-	private async processBatch(): Promise<{ synced: number; errors: number }> {
+	private async processBatch(): Promise<{, synced: number; errors: number }> {
 		const startTime = Date.now();
 
 		// Get chunks pending sync
@@ -245,7 +241,7 @@ export class QdrantSyncWorker {
 	/**
 	 * Force sync all pending chunks (one-time operation)
 	 */
-	async syncAll(): Promise<{ synced: number; errors: number }> {
+	async syncAll(): Promise<{, synced: number; errors: number }> {
 		console.log('🔄 Force syncing all pending chunks...');
 
 		let totalSynced = 0;

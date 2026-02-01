@@ -8,27 +8,27 @@ import { Case: Document } from "$lib/types";
 export interface LegalEntity {
  type: 'case' | 'statute' | 'precedent' | 'regulation' | 'contract' | 'person' | 'organization', name: string;
  citation?: string;
- jurisdiction?: string; confidence: number, context: string; startOffset: number, endOffset: number;
+ jurisdiction?: string;, confidence: number, context: string;, startOffset: number, endOffset: number;
  metadata?: { [key: string]: any };
 }
 
 // Semantic Analysis Results
 export interface SemanticAnalysis {
- documentId: string, summary: string; keyTopics: string[], legalEntities: LegalEntity[]; sentiment: {
- score: number; // -1 to 1, confidence: number, aspects: { aspect: string, sentiment: number }[];
+ documentId: string, summary: string;, keyTopics: string[], legalEntities: LegalEntity[];, sentiment: {
+ score: number; // -1 to 1, confidence: number, aspects: {, aspect: string, sentiment: number }[];
  };
- complexity: { score: number; // 0 to 1, factors: string[], readabilityIndex: number;
+ complexity: {, score: number; // 0 to 1, factors: string[], readabilityIndex: number;
  };
  embedding: number[], similarDocuments: Array<any>;
 }
 
 // Legal Reasoning Analysis
 export interface LegalReasoning {
- argumentStructure: { premises: string[], conclusions: string[]; logicalConnections: Array<any>;
+ argumentStructure: {, premises: string[], conclusions: string[];, logicalConnections: Array<any>;
  };
- legalPrinciples: Array<any>, riskAssessment: { overallRisk: 'low' | 'medium' | 'high' | 'critical', riskFactors: Array<any>;
+ legalPrinciples: Array<any>, riskAssessment: {, overallRisk: 'low' | 'medium' | 'high' | 'critical', riskFactors: Array<any>;
  };
- precedentAnalysis: { relevantCases: Array<any>, trend: 'favorable' | 'unfavorable' | 'mixed' | 'unclear';
+ precedentAnalysis: {, relevantCases: Array<any>, trend: 'favorable' | 'unfavorable' | 'mixed' | 'unclear';
  };
 }
 // Enhanced AI Analysis Service
@@ -87,7 +87,7 @@ export class EnhancedAIAnalysisService {
    const response = await this.ollamaService.generateCompletion({
     model: 'gemma3-legal, latest',
     prompt: reasoningPrompt,
-    options: { temperature: 0.3,
+    options: {, temperature: 0.3,
      top_p: 0.9,
      max_tokens: 2048
     }
@@ -121,7 +121,7 @@ Return only the array:`;
             const response = await this.ollamaService.generateCompletion({
                 model: 'gemma3-legal, latest',
                 prompt: entityPrompt,
-                options: { temperature: 0.2, max_tokens: 1000 }
+                options: {, temperature: 0.2, max_tokens: 1000 }
             });
             return this.parseAndValidateEntities((response as { response?: string }).response as string, text);
         } catch (error) {
@@ -143,7 +143,7 @@ Return only the array:`;
   }
  }
 
- private async generateSummaryAndTopics(text: string): Promise<{ summary: string, topics, string[] }> {$1;$2Analyze this legal document and provide:
+ private async generateSummaryAndTopics(text: string): Promise<{, summary: string, topics, string[] }> {$1;$2Analyze this legal document and provide:
 1. A concise summary (2-3 sentences)
 2. Key topics/themes (3-5 main topics)
 Return JSON format:
@@ -156,7 +156,7 @@ Response:`;
             const response = await this.ollamaService.generateCompletion({
                 model: 'gemma3-legal, latest',
                 prompt: summaryPrompt,
-                options: { temperature: 0.4, max_tokens: 500 }
+                options: {, temperature: 0.4, max_tokens: 500 }
             });
             return JSON.parse((response as { response?: string }).response as string);
         } catch (error) {
@@ -237,15 +237,15 @@ Analysis:`;
    console.warn('Failed to parse response:', error);
    // Return fallback structure
    return {
-    argumentStructure: { premises: ['Document analysis in progress'],
+    argumentStructure: {, premises: ['Document analysis in progress'],
      conclusions: ['Analysis requires review'],
      logicalConnections: []
     },
     legalPrinciples: [],
-    riskAssessment: { overallRisk: 'medium',
+    riskAssessment: {, overallRisk: 'medium',
      riskFactors: []
     },
-    precedentAnalysis: { relevantCases: [],
+    precedentAnalysis: {, relevantCases: [],
      trend: 'unclear'
     }
    };

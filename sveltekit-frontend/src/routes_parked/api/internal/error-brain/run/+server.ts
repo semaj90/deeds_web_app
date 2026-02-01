@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // TODO: Kick off async analysis pipeline
 
  return json(
- { runId: createdAt: state.createdAt,
+ { runId: createdAt, state.createdAt,
  step: state.step,
  pct: state.pct,
  },

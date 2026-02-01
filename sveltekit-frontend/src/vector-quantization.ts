@@ -18,22 +18,17 @@ export interface QuantizationConfig {
 }
 
 export interface QuantizedVector {
-    id: string;
-    original: Float32Array;
+    id: string;, original: Float32Array;
     quantized: Uint8Array | Int8Array;
-    config: QuantizationConfig;
-    compressionRatio: number;
-    reconstructionError: number;
-    metadata: {
+    config: QuantizationConfig;, compressionRatio: number;
+    reconstructionError: number;, metadata: {
         documentType?: string;
-        practiceArea?: string;
-        timestamp: number;
+        practiceArea?: string;, timestamp: number;
     };
 }
 
 export interface ProductQuantizationCodebook {
-    centroids: Float32Array[];
-    subspaceSize: number;
+    centroids: Float32Array[];, subspaceSize: number;
     numClusters: number;
     legalTermWeights?: Map<string, number>;
 }
@@ -76,7 +71,7 @@ export class VectorQuantizationService {
             config,
             compressionRatio: (vector.length * 4) / binaryBits.length,
             reconstructionError: error,
-            metadata: { timestamp: Date.now() }
+            metadata: {, timestamp: Date.now() }
         };
     }
 
@@ -122,7 +117,7 @@ export class VectorQuantizationService {
             config,
             compressionRatio: (vector.length * 4) / (quantized.length + 8),
             reconstructionError: error,
-            metadata: { timestamp: Date.now() }
+            metadata: {, timestamp: Date.now() }
         };
     }
 
@@ -219,7 +214,7 @@ export class VectorQuantizationService {
             config: { ...config, codebookSize: subspaceSize, clusters: numClusters },
             compressionRatio: (vector.length * 4) / quantizedIndices.length,
             reconstructionError: error,
-            metadata: { timestamp: Date.now() }
+            metadata: {, timestamp: Date.now() }
         };
     }
 

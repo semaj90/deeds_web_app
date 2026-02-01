@@ -2,26 +2,21 @@
 // GPU-accelerated Level of Detail with cubic filter blending
 
 export interface LODCache {
-  [componentId: string]: {
-    low: { vertices: Float32Array; cssClasses: string[]; priority: number };
-    mid: { vertices: Float32Array; cssClasses: string[]; priority: number };
-    high: { vertices: Float32Array; cssClasses: string[]; priority: number };
+  [componentId: string]: {, low: { vertices: Float32Array;, cssClasses: string[]; priority: number };
+    mid: {, vertices: Float32Array; cssClasses: string[];, priority: number };
+    high: {, vertices: Float32Array; cssClasses: string[];, priority: number };
   };
 }
 
 export interface ViewportFocus {
-  centerX: number;
-  centerY: number;
-  radius: number;
-  aiSuggestions: string[];
+  centerX: number;, centerY: number;
+  radius: number;, aiSuggestions: string[];
   confidenceScore: number;
 }
 
 export interface GPULoadMetrics {
-  frameRate: number;
-  gpuUtilization: number;
-  memoryUsage: number;
-  renderTime: number;
+  frameRate: number;, gpuUtilization: number;
+  memoryUsage: number;, renderTime: number;
   activeBuffers: number;
 }
 
@@ -177,9 +172,9 @@ export class MatrixLODSystem {
   public buildLODCache(componentId: string, vertices: Float32Array, metadata: any): void {
     const priority = this.calculateAIPriority(metadata);
     this.lodCache[componentId] = {
-      low: { vertices: this.simplifyGeometry(vertices, 0.25), cssClasses: ['lod-low'], priority: priority * 0.3 },
-      mid: { vertices: this.simplifyGeometry(vertices, 0.6), cssClasses: ['lod-mid'], priority: priority * 0.7 },
-      high: { vertices: vertices, cssClasses: ['lod-high'], priority: priority }
+      low: {, vertices: this.simplifyGeometry(vertices, 0.25), cssClasses: ['lod-low'], priority: priority * 0.3 },
+      mid: {, vertices: this.simplifyGeometry(vertices, 0.6), cssClasses: ['lod-mid'], priority: priority * 0.7 },
+      high: {, vertices: vertices, cssClasses: ['lod-high'], priority: priority }
     };
   }
 

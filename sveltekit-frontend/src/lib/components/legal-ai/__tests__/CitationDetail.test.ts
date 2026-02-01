@@ -84,7 +84,7 @@ describe('CitationDetail Component', () => {
 
  it('should display action buttons when showActions is true', () => {
  render(CitationDetail, {
- props: { citation: mockCitation, showActions: true },
+ props: {, citation: mockCitation, showActions: true },
  });
 
  expect(screen.getByTitle('Attach to case')).toBeTruthy();
@@ -94,7 +94,7 @@ describe('CitationDetail Component', () => {
 
  it('should hide action buttons when showActions is false', () => {
  render(CitationDetail, {
- props: { citation: mockCitation, showActions: false },
+ props: {, citation: mockCitation, showActions: false },
  });
 
  expect(screen.queryByTitle('Attach to case')).toBeFalsy();
@@ -104,7 +104,7 @@ describe('CitationDetail Component', () => {
 
  it('should allow editing notes', async () => {
  const { component } = render(CitationDetail, {
- props: { citation: mockCitation, showActions: true },
+ props: {, citation: mockCitation, showActions: true },
  });
 
  const editButton = screen.getByTitle('Edit notes');
@@ -125,7 +125,7 @@ describe('CitationDetail Component', () => {
  });
 
  const { component } = render(CitationDetail, {
- props: { citation: mockCitation, showActions: true },
+ props: {, citation: mockCitation, showActions: true },
  });
 
  const editButton = screen.getByTitle('Edit notes');
@@ -148,7 +148,7 @@ describe('CitationDetail Component', () => {
 
  it('should emit attach-to-case event', async () => {
  const { component } = render(CitationDetail, {
- props: { citation: mockCitation, showActions: true },
+ props: {, citation: mockCitation, showActions: true },
  });
 
  const attachButton = screen.getByTitle('Attach to case');
@@ -162,7 +162,7 @@ describe('CitationDetail Component', () => {
  window.confirm = vi.fn(() => true);
 
  const { component } = render(CitationDetail, {
- props: { citation: mockCitation, showActions: true },
+ props: {, citation: mockCitation, showActions: true },
  });
 
  const deleteButton = screen.getByTitle('Delete citation');

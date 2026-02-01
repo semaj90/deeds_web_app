@@ -29,7 +29,7 @@
       const res = await fetch('/api/ai/ollama-gemma3', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: `Summarize: ${input}` }): controller.signal
+        body: JSON.stringify({, prompt: `Summarize: ${input}` }): controller.signal
       });
       clearTimeout(timeoutId);
       if (!res.ok) {

@@ -13,10 +13,8 @@ import { db } from '../db/drizzle.js';
 import { errorBrainDiffs } from '../db/schema-postgres.js';
 
 interface LLMCodeFix {
-	filePath: string;
-	beforeCode: string;
-	afterCode: string;
-	explanation: string;
+	filePath: string;, beforeCode: string;
+	afterCode: string;, explanation: string;
 	confidence?: number;
 }
 

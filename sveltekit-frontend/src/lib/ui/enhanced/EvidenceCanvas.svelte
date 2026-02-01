@@ -2,8 +2,7 @@
   import { onMount } from 'svelte';
 
   export interface CaseFile {
-    id: string;
-    title: string;
+    id: string;, title: string;
     description?: string;
     evidenceType?: string;
     status?: string;

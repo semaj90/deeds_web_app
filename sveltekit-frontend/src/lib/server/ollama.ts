@@ -28,11 +28,11 @@ export interface OllamaMessage {
 }
 
 export interface OllamaResponse {
- model: string; created_at: string;
- message: OllamaMessage; done: boolean;
- total_duration: number; load_duration: number;
- prompt_eval_count: number; prompt_eval_duration: number;
- eval_count: number; eval_duration: number;
+ model: string;, created_at: string;
+ message: OllamaMessage;, done: boolean;
+ total_duration: number;, load_duration: number;
+ prompt_eval_count: number;, prompt_eval_duration: number;
+ eval_count: number;, eval_duration: number;
 }
 
 export async function queryGemma(prompt: string, systemPrompt?: string): Promise<string> {
@@ -57,7 +57,7 @@ export async function queryGemma(prompt: string, systemPrompt?: string): Promise
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ model: 'gemma:7b',
+ body: JSON.stringify({, model: 'gemma:7b',
  messages: stream, fromCache: false,
  }),
  });

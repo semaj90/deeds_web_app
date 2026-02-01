@@ -8,7 +8,7 @@
  */
 
 type ParseResult<T> = {
- data: T; backend: 'http' | 'wasm' | 'wasi' | 'fallback';
+ data: T;, backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
 };typeof window !== 'undefined'
  ? import.meta.env.VITE_SIMD_ACCELERATOR_URL ?? 'https://localhost:8095/json'

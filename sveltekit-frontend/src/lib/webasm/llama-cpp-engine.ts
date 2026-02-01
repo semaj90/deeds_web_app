@@ -7,29 +7,22 @@
 import type {  } from '../types/webgpu.js';
 
 export interface LlamaCppConfig {
-    modelPath: string;
-    contextSize: number;
+    modelPath: string;, contextSize: number;
     gpuLayers: number; // RTX 3060 Ti can handle 32-40 layers
-    threadCount: number;
-    batchSize: number;
-    useGPU: boolean;
-    quantization: 'f16' | 'q4_0' | 'q4_1' | 'q5_0' | 'q5_1' | 'q8_0';
+    threadCount: number;, batchSize: number;
+    useGPU: boolean;, quantization: 'f16' | 'q4_0' | 'q4_1' | 'q5_0' | 'q5_1' | 'q8_0';
 }
 
 export interface InferenceRequest {
-    prompt: string;
-    maxTokens: number;
-    temperature: number;
-    topP: number;
+    prompt: string;, maxTokens: number;
+    temperature: number;, topP: number;
     stopTokens?: string[];
     stream?: boolean;
 }
 
 export interface InferenceResult {
-    text: string;
-    tokens: number;
-    processingTime: number;
-    tokensPerSecond: number;
+    text: string;, tokens: number;
+    processingTime: number;, tokensPerSecond: number;
     memoryUsage: number;
     gpuUtilization?: number;
 }
@@ -39,8 +32,7 @@ type WasmPtr = number;
 type TokenArray = Int32Array | Uint32Array | number[];
 
 interface LlamaInitOptions {
-    model_ptr: WasmPtr;
-    model_size: number;
+    model_ptr: WasmPtr;, model_size: number;
     context_size?: number;
     gpu_layers?: number;
     thread_count?: number;

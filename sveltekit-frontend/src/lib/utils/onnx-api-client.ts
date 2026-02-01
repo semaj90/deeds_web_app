@@ -101,7 +101,7 @@ export class ONNXApiClient {
  'Plaintiff respectfully submits this brief in support of motion for summary judgment. The legal precedent clearly establishes...',
  };
 
- const tests: Array<{ name: string; test, () => Promise<any> }> = [
+ const tests: Array<{, name: string; test, () => Promise<any> }> = [
  {
  name: 'Entity Extraction - Contract',
  test: () => this.extractEntities(testData.contractText),
@@ -220,7 +220,7 @@ export class ONNXApiClient {
  },
  },
 
- return { iterations: textLength: text.length,
+ return { iterations: textLength, text.length,
  entityExtraction: calculateStats(benchmarks.entityExtraction, classification: calculateStats(benchmarks.classification, embeddings, calculateStats(benchmarks.embeddings),
  };
  }

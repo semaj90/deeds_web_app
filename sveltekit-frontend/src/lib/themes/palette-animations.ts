@@ -5,22 +5,18 @@
 import { CONSOLE_PALETTES, type ConsolePaletteName } from './retro-console-palettes.js';
 
 export interface AnimationOptions {
-	duration: number;
-	easing: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce';
+	duration: number;, easing: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'bounce';
 	effects: AnimationEffect[];
 }
 
 export interface AnimationEffect {
 	type: 'scanlines' | 'chromatic-aberration' | 'pixelate' | 'glitch' | 'crt-curve';
-	intensity: number;
-	duration: number;
+	intensity: number;, duration: number;
 }
 
 export interface ColorTransition {
-	from: string;
-	to: string;
-	current: string;
-	progress: number;
+	from: string;, to: string;
+	current: string;, progress: number;
 }
 
 export class PaletteAnimationController {
@@ -140,7 +136,7 @@ export class PaletteAnimationController {
 		return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 	}
 
-	private hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+	private hexToRgb(hex: string): {, r: number; g: number;, b: number } | null {
 		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 		return result
 			? {
@@ -220,8 +216,7 @@ export class PaletteAnimationController {
 	private createScanlinesEffect(intensity: number): void {
 		const scanlineCSS = `
 			.palette-scanlines::before {
-				content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
-				background: linear-gradient( transparent 50%, rgba(0, 255, 0, ${intensity * 0.1}) 51%, transparent 52% );
+				content: '';, position: fixed; top: 0;, left: 0; right: 0;, bottom: 0; pointer-events: none;, background: linear-gradient( transparent 50%, rgba(0, 255, 0, ${intensity * 0.1}) 51%, transparent 52% );
 				background-size: 100% 4px; animation: scanline-scroll 0.1s linear infinite; z-index: 9999;
 			}
 			@keyframes scanline-scroll { 0% { transform: translateY(0) } 100% { transform: translateY(4px) } }
@@ -274,7 +269,7 @@ export class PaletteAnimationController {
 			const pixelSize = Math.max(1, intensity * 8);
 			root.style.setProperty('--pixel-size', `${pixelSize}px`);
 			const pixelateCSS = `
-				.palette-pixelate { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; filter: blur(${intensity}px) saturate(1.2); }
+				.palette-pixelate { image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;, filter: blur(${intensity}px) saturate(1.2); }
 			`;
 			this.injectCSS('palette-pixelate', pixelateCSS);
 			document.body.classList.add('palette-pixelate');
@@ -285,8 +280,7 @@ export class PaletteAnimationController {
 		if (intensity > 0) {
 			const crtCSS = `
 				.palette-crt::before {
-					content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
-					background: radial-gradient( ellipse at center, transparent 70%, rgba(0, 0, 0, ${intensity * 0.3}) 100% );
+					content: '';, position: fixed; top: 0;, left: 0; right: 0;, bottom: 0; pointer-events: none;, background: radial-gradient( ellipse at center, transparent 70%, rgba(0, 0, 0, ${intensity * 0.3}) 100% );
 					z-index: 9998;
 				}
 				.palette-crt { transform: perspective(1000px) rotateX(${intensity * 2}deg); filter: brightness(1.1) contrast(1.2); }

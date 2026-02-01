@@ -76,31 +76,31 @@ describe('FeatureFlagManager', () => {
  describe('Flag Validation', () => {
  it('should validate correct flags', () => {
  const flags: FeatureFlags = {
- errorBrain: { enabled: true, requireAuth: false, logLevel: 'debug' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'info' },
+ errorBrain: {, enabled: true, requireAuth: false, logLevel: 'debug' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'info' },
  };
  expect(manager.validate(flags)).toBe(true);
  });
 
  it('should reject flags with missing properties', () => {
  const flags = {
- errorBrain: { enabled: true, requireAuth: false },
+ errorBrain: {, enabled: true, requireAuth: false },
  } as any;
  expect(manager.validate(flags)).toBe(false);
  });
 
  it('should reject flags with invalid log levels', () => {
  const flags: FeatureFlags = {
- errorBrain: { enabled: true, requireAuth: false, logLevel: 'invalid' as any },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'info' },
+ errorBrain: {, enabled: true, requireAuth: false, logLevel: 'invalid' as any },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'info' },
  };
  expect(manager.validate(flags)).toBe(false);
  });
 
  it('should reject flags with non-boolean enabled', () => {
  const flags = {
- errorBrain: { enabled: 'true', requireAuth: false, logLevel: 'debug' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'info' },
+ errorBrain: {, enabled: 'true', requireAuth: false, logLevel: 'debug' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'info' },
  } as any;
  expect(manager.validate(flags)).toBe(false);
  });
@@ -109,7 +109,7 @@ describe('FeatureFlagManager', () => {
  describe('Flag Updates', () => {
  it('should update error-brain flags', () => {
  manager.updateFlags({
- errorBrain: { enabled: false, requireAuth: true, logLevel: 'warn' },
+ errorBrain: {, enabled: false, requireAuth: true, logLevel: 'warn' },
  });
  const flags = manager.getFlags();
  expect(flags.errorBrain.enabled).toBe(false);
@@ -119,7 +119,7 @@ describe('FeatureFlagManager', () => {
 
  it('should update legal-ai flags', () => {
  manager.updateFlags({
- legalAi: { enabled: false, requireAuth: false, logLevel: 'error' },
+ legalAi: {, enabled: false, requireAuth: false, logLevel: 'error' },
  });
  const flags = manager.getFlags();
  expect(flags.legalAi.enabled).toBe(false);
@@ -129,8 +129,8 @@ describe('FeatureFlagManager', () => {
 
  it('should update both flags simultaneously', () => {
  manager.updateFlags({
- errorBrain: { enabled: true, requireAuth: true, logLevel: 'info' },
- legalAi: { enabled: false, requireAuth: true, logLevel: 'warn' },
+ errorBrain: {, enabled: true, requireAuth: true, logLevel: 'info' },
+ legalAi: {, enabled: false, requireAuth: true, logLevel: 'warn' },
  });
  const flags = manager.getFlags();
  expect(flags.errorBrain.enabled).toBe(true);
@@ -142,7 +142,7 @@ describe('FeatureFlagManager', () => {
  // Add small delay to ensure timestamp changes
  await new Promise((resolve: any) => setTimeout(resolve, 10));
  manager.updateFlags({
- errorBrain: { enabled: false, requireAuth: false, logLevel: 'debug' },
+ errorBrain: {, enabled: false, requireAuth: false, logLevel: 'debug' },
  });
  const after = manager.getConfig().lastUpdated;
  expect(after.getTime()).toBeGreaterThanOrEqual(before.getTime());
@@ -222,8 +222,8 @@ describe('FeatureFlagManager', () => {
 
  it('should validate log level values', () => {
  const flags: FeatureFlags = {
- errorBrain: { enabled: true, requireAuth: false, logLevel: 'debug' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'info' },
+ errorBrain: {, enabled: true, requireAuth: false, logLevel: 'debug' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'info' },
  };
  expect(manager.validate(flags)).toBe(true);
  });

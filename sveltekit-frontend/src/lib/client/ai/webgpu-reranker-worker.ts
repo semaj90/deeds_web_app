@@ -47,8 +47,8 @@ const GPU_MAP_MODE = { READ: 1 } as const;
 // Minimal local WebGPU interface shapes to satisfy TS without pulling lib.dom types
 type GPUAdapterLike = { requestDevice?, () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
- createBuffer: (desc: { size: number, usage: number }) => unknown;
- queue: { writeBuffer: (buffer: unknown, bufferOffset: number,
+ createBuffer: (desc: {, size: number, usage: number }) => unknown;
+ queue: {, writeBuffer: (buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
  dataOffset?: number,
  size?: number
@@ -56,9 +56,9 @@ type GPUDeviceLike = {
  submit: (commandBuffers: unknown[]) => void;
  };
  createShaderModule: (opts: { code, string }) => unknown;
- createComputePipeline: (opts, { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
+ createComputePipeline: (opts, { layout: 'auto' | unknown, compute: {, module: unknown, entryPoint: string };
  }) => unknown;
- getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer, unknown } }>;
+ getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: {, layout: unknown, entries: Array<{, binding: number, resource: { buffer, unknown } }>;
  }) => unknown;
  createCommandEncoder: () => unknown;
 };
@@ -238,7 +238,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  const module = device.createShaderModule({ code: RERANKER_WGSL });
  const pipeline = device.createComputePipeline({
  layout: 'auto',
- compute: { module: entryPoint: 'main' },
+ compute: {, module: entryPoint: 'main' },
  });
   
  // eslint-disable-next-line @typescript-eslint/ban-ts-comment

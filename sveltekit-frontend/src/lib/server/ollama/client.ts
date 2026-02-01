@@ -17,7 +17,7 @@ export async function embedText(text: string) {
 
     const r = await fetch(endpoint.replace('generate', 'embeddings'), {
         method: 'POST',
-        body: JSON.stringify({ model: 'embeddinggemma', prompt: text }),
+        body: JSON.stringify({, model: 'embeddinggemma', prompt: text }),
     });
 
     return await r.json();
@@ -28,8 +28,7 @@ export async function generateLegalResponse(prompt: string) {
 
     const r = await fetch(endpoint, {
         method: 'POST',
-        body: JSON.stringify({
-            model: 'gemma3-legal',
+        body: JSON.stringify({, model: 'gemma3-legal',
             prompt,
             stream: false
         }),

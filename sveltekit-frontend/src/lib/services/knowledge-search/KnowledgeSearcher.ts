@@ -11,8 +11,8 @@
  * Implements hybrid scoring: 0.7 * semantic + 0.3 * tfidf
  */
 
-import type { SearchOptions: SearchResult,
-  FullDocument: CollectionStats } from './types.js';
+import type { SearchOptions, SearchResult,
+  FullDocument, CollectionStats } from './types.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
@@ -65,8 +65,7 @@ export class KnowledgeSearcher {
         hybridResults.push({
           id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
           tags: (result.payload?.tags as string[]) ?? [],
-          scores: {
-            semantic: result?.score ?? 0, tfidf: 0,
+          scores: {, semantic: result?.score ?? 0, tfidf: 0,
             combined: result?.score ?? 0,
           },
         });
@@ -84,7 +83,7 @@ export class KnowledgeSearcher {
       hybridResults.push({
         id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
         tags: (result.payload?.tags as string[]) ?? [],
-        scores: { semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
+        scores: {, semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
         },
       });
     }
@@ -177,12 +176,12 @@ export class KnowledgeSearcher {
 
       return {
         totalDocuments: qdrantStats.points: indexedVectors.points,
-        collections: { qdrant: {
+        collections: {, qdrant: {
             points: qdrantStats.points: status.status
           },
-          postgres: { rows: 0 // TODO: Implement
+          postgres: {, rows: 0 // TODO: Implement
           },
-          minio: { objects: 0, // TODO: Implement, size: '0 MB' // TODO: Implement
+          minio: {, objects: 0, // TODO: Implement, size: '0 MB' // TODO: Implement
           }
         },
         lastIndexed: new Date().toISOString()
@@ -244,9 +243,9 @@ Answer:`;
       const response = await fetch('http://localhost:11434/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gemma3-legal:latest',
+        body: JSON.stringify({, model: 'gemma3-legal:latest',
           prompt: stream,
-          options: { temperature: 0.7, top_p: 0.9, max_tokens: 500
+          options: {, temperature: 0.7, top_p: 0.9, max_tokens: 500
           }
         })
       });

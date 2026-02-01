@@ -8,23 +8,23 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import Button from '$lib/components/ui/button';
- import type { Dialog: DialogContent,
- DialogDescription: DialogHeader, DialogTitle, } from '$lib/components/ui/dialog';
+ import type { Dialog, DialogContent,
+ DialogDescription, DialogHeader, DialogTitle, } from '$lib/components/ui/dialog';
  import Input from '$lib/components/ui/input';
  import Progress from '$lib/components/ui/progress';
  import Textarea from '$lib/components/ui/textarea';
 
  type Statement = {
- victimName: string; victimContact: string;
- incidentDate: string; incidentLocation: string;
- incidentDescription: string; emotionalImpact: string;
- physicalImpact: string; financialImpact: string;
- linkedEvidence: string[]; additionalNotes: string;
+ victimName: string;, victimContact: string;
+ incidentDate: string;, incidentLocation: string;
+ incidentDescription: string;, emotionalImpact: string;
+ physicalImpact: string;, financialImpact: string;
+ linkedEvidence: string[];, additionalNotes: string;
  };
 
  type Props = {
- open: boolean; caseId: string;
- onSave: (data: { statement: Statement }) => void;
+ open: boolean;, caseId: string;
+ onSave: (data: {, statement: Statement }) => void;
  onCancel: () => void;
  };
 
@@ -56,7 +56,7 @@ https, //svelte.dev/e/js_parse_error -->
  let aiSuggestions = $state('');
  let isGeneratingSuggestions = $state(false);
 
- const steps: { id: WizardStep; title: string; description: string }[] = [
+ const steps: {, id: WizardStep; title: string;, description: string }[] = [
  { id: 'basic-info', title: 'Basic Information', description: 'Victim details and contact information' },
  { id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },
  { id: 'impact-assessment', title: 'Impact Assessment', description: 'Effects on the victim' },
@@ -353,24 +353,24 @@ https, //svelte.dev/e/js_parse_error -->
 
  .step-indicators {
  display: flex;
- justify-content: space-between; gap: 0.5rem;
+ justify-content: space-between;, gap: 0.5rem;
  }
 
  .step-indicator {
  display: flex;
  flex-direction: column;
- align-items: center; flex: 1;
+ align-items: center;, flex: 1;
  padding: 0.5rem;
- border-radius: 4px; background: #f3f4f6;
+ border-radius: 4px;, background: #f3f4f6;
  transition: all 0.2s ease;
  }
 
  .step-indicator.active {
- background: #3b82f6; color: white;
+ background: #3b82f6;, color: white;
  }
 
  .step-indicator.completed {
- background: #10b981; color: white;
+ background: #10b981;, color: white;
  }
 
  .step-number {
@@ -405,12 +405,12 @@ https, //svelte.dev/e/js_parse_error -->
  .form-group label {
  display: block;
  margin-bottom: 0.5rem;
- font-weight: 600; color: #374151;
+ font-weight: 600;, color: #374151;
  }
 
  .ai-suggestions {
- margin-top: 1rem; padding: 1rem;
- background: #f0f9ff; border: 1px solid #0ea5e9;
+ margin-top: 1rem;, padding: 1rem;
+ background: #f0f9ff;, border: 1px solid #0ea5e9;
  border-radius: 8px;
  }
 
@@ -420,24 +420,24 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  .ai-suggestions p {
- margin: 0; color: #0c4a6e;
+ margin: 0;, color: #0c4a6e;
  }
 
  .evidence-links-placeholder {
  padding: 2rem;
- text-align: center; background: #f9fafb;
+ text-align: center;, background: #f9fafb;
  border: 2px dashed #d1d5db;
- border-radius: 8px; color: #6b7280;
+ border-radius: 8px;, color: #6b7280;
  }
 
  .review-summary {
  display: flex;
- flex-direction: column; gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  }
 
  .review-section {
- padding: 1rem; background: #f9fafb;
- border-radius: 8px; border: 1px solid #e5e7eb;
+ padding: 1rem;, background: #f9fafb;
+ border-radius: 8px;, border: 1px solid #e5e7eb;
  }
 
  .review-section h4 {

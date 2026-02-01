@@ -18,29 +18,25 @@ export type ContextChatRequest = {
 };
 
 export type Suggestion = {
-    query: string;
-    reason: string;
+    query: string;, reason: string;
     score: number;
 };
 
 export type ContextChatResponse = {
-    turnId: string;
-    answer: string;
-    keywords: string[];
-    keyPhrases: string[];
-    suggestions: Suggestion[];
-    latencyMs: number;
-    citations?: Array<{ id: string; source: string; score: number }>;
+    turnId: string;, answer: string;
+    keywords: string[];, keyPhrases: string[];
+    suggestions: Suggestion[];, latencyMs: number;
+    citations?: Array<{, id: string; source: string;, score: number }>;
 };
 
 // Stub implementation for compilation
-async function getContextFromRag(params: any): Promise<{ contextText: string }> {
+async function getContextFromRag(params: any): Promise<{, contextText: string }> {
     return { contextText: "" };
 }
 async function callOllamaChat(sys: string, msg: string): Promise<string> {
     return "Stub response";
 }
-async function extractKeywords(text: string, mode: string): Promise<{ keywords: string[], keyPhrases: string[] }> {
+async function extractKeywords(text: string, mode: string): Promise<{, keywords: string[], keyPhrases: string[] }> {
     return { keywords: [], keyPhrases: [] };
 }
 

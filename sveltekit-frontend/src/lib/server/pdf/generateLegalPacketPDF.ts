@@ -1,8 +1,7 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 type PacketInput = {
-    caseTitle: string;
-    caseId: string;
+    caseTitle: string;, caseId: string;
     createdAtISO?: string;
     memoText?: string;
     notes?: Array<{ title?: string | null; content?: string | null; pinned?: boolean }>;

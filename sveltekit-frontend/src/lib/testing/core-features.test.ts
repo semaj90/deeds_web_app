@@ -34,8 +34,7 @@ describe('Contextual Chat API', () => {
 		const response = await fetch('/api/ai/contextual-chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				message: 'What evidence supports the claim?',
+			body: JSON.stringify({, message: 'What evidence supports the claim?',
 				caseId: 'case-123',
 				messages: []
 			})
@@ -59,8 +58,7 @@ describe('Contextual Chat API', () => {
 		const response = await fetch('/api/ai/contextual-chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				message: 'test',
+			body: JSON.stringify({, message: 'test',
 				caseId: 'case-123',
 				messages: []
 			})
@@ -84,7 +82,7 @@ describe('Svelte 5 Runes Type Safety', () => {
 		interface Message {
 			role: 'user' | 'assistant';
 			content: string;
-			citations?: Array<{ type: string; id: string; text: string }>;
+			citations?: Array<{, type: string; id: string;, text: string }>;
 		}
 
 		// Type assertions that should pass
@@ -120,22 +118,17 @@ describe('Drizzle ORM 0.44 Types', () => {
 	it('should have proper schema type definitions', () => {
 		// Mock schema type that mirrors Drizzle patterns
 		interface Case {
-			id: string;
-			title: string;
+			id: string;, title: string;
 			status: 'open' | 'closed' | 'pending' | 'archived';
 			priority: 'low' | 'medium' | 'high' | 'urgent';
-			createdAt: Date;
-			updatedAt: Date;
+			createdAt: Date;, updatedAt: Date;
 		}
 
 		interface Evidence {
-			id: string;
-			caseId: string;
-			title: string;
-			evidenceType: string;
+			id: string;, caseId: string;
+			title: string;, evidenceType: string;
 			fileUrl?: string;
-			hash?: string;
-			createdAt: Date;
+			hash?: string;, createdAt: Date;
 		}
 
 		const mockCase: Case = {
@@ -161,8 +154,7 @@ describe('Drizzle ORM 0.44 Types', () => {
 
 	it('should handle nullable fields correctly', () => {
 		interface DocumentChunk {
-			id: string;
-			documentId: string;
+			id: string;, documentId: string;
 			content: string;
 			embedding?: string | null;
 			metadata?: Record<string, unknown> | null;
@@ -173,7 +165,7 @@ describe('Drizzle ORM 0.44 Types', () => {
 			documentId: 'doc-001',
 			content: 'Sample content',
 			embedding: null,
-			metadata: { key: 'value' }
+			metadata: {, key: 'value' }
 		};
 
 		expect(chunk.embedding).toBeNull();
@@ -187,15 +179,11 @@ describe('Drizzle ORM 0.44 Types', () => {
 describe('Client-Side Caching Types', () => {
 	it('should have proper LokiJS document structure', () => {
 		interface CachedDocument {
-			id: string;
-			title: string;
-			content: string;
-			type: string;
-			size: number;
-			priority: number;
+			id: string;, title: string;
+			content: string;, type: string;
+			size: number;, priority: number;
 			riskLevel: 'low' | 'medium' | 'high' | 'critical';
-			cacheTimestamp: number;
-			accessCount: number;
+			cacheTimestamp: number;, accessCount: number;
 			syncStatus: 'synced' | 'dirty' | 'pending';
 		}
 
@@ -218,16 +206,14 @@ describe('Client-Side Caching Types', () => {
 
 	it('should have proper cache search result structure', () => {
 		interface SearchResult<T = unknown> {
-			id?: string;
-			score: number;
-			document: T;
-			matchType: 'exact' | 'fuzzy' | 'semantic';
+			id?: string;, score: number;
+			document: T;, matchType: 'exact' | 'fuzzy' | 'semantic';
 		}
 
-		const result: SearchResult<{ title: string }> = {
+		const result: SearchResult<{, title: string }> = {
 			id: 'result-001',
 			score: 0.95,
-			document: { title: 'Found Document' },
+			document: {, title: 'Found Document' },
 			matchType: 'semantic'
 		};
 
@@ -242,8 +228,7 @@ describe('Client-Side Caching Types', () => {
 describe('XState v5 State Machine Types', () => {
 	it('should have proper state context types', () => {
 		interface IngestionContext {
-			documentId: string;
-			progress: number;
+			documentId: string;, progress: number;
 			error: string | null;
 			retryCount: number;
 		}
@@ -285,22 +270,20 @@ describe('API Client Response Types', () => {
 		}
 
 		interface PaginatedResponse<T = unknown> {
-			data: T[];
-			page: number;
-			limit: number;
-			total: number;
+			data: T[];, page: number;
+			limit: number;, total: number;
 			totalPages: number;
 			hasNext?: boolean;
 			hasPrev?: boolean;
 		}
 
-		const apiResponse: ApiResponse<{ id: string; name: string }> = {
+		const apiResponse: ApiResponse<{, id: string; name: string }> = {
 			success: true,
-			data: { id: '1', name: 'Test' }
+			data: {, id: '1', name: 'Test' }
 		};
 
-		const paginatedResponse: PaginatedResponse<{ id: string }> = {
-			data: [{ id: '1' }, { id: '2' }],
+		const paginatedResponse: PaginatedResponse<{, id: string }> = {
+			data: [{, id: '1' }, { id: '2' }],
 			page: 1,
 			limit: 10,
 			total: 25,
@@ -321,8 +304,7 @@ describe('API Client Response Types', () => {
 describe('Vector Search Types', () => {
 	it('should have proper embedding structure', () => {
 		interface VectorDocument {
-			id: string;
-			content: string;
+			id: string;, content: string;
 			embedding: number[] | Float32Array;
 			metadata: Record<string, unknown>;
 			score?: number;
@@ -332,7 +314,7 @@ describe('Vector Search Types', () => {
 			id: 'vec-001',
 			content: 'Legal document content',
 			embedding: new Float32Array(384).fill(0.1),
-			metadata: { source: 'case-123', type: 'evidence' }
+			metadata: {, source: 'case-123', type: 'evidence' }
 		};
 
 		expect(vectorDoc.embedding.length).toBe(384);
@@ -341,8 +323,7 @@ describe('Vector Search Types', () => {
 
 	it('should have proper Qdrant search result structure', () => {
 		interface QdrantSearchResult {
-			id: string;
-			score: number;
+			id: string;, score: number;
 			payload: Record<string, unknown>;
 			vector?: number[];
 		}
@@ -350,8 +331,7 @@ describe('Vector Search Types', () => {
 		const result: QdrantSearchResult = {
 			id: 'point-001',
 			score: 0.92,
-			payload: {
-				documentId: 'doc-001',
+			payload: {, documentId: 'doc-001',
 				chunkIndex: 0,
 				content: 'Relevant content...'
 			}
@@ -368,17 +348,13 @@ describe('Vector Search Types', () => {
 describe('RabbitMQ Message Types', () => {
 	it('should have proper job message structure', () => {
 		interface DocumentProcessingJob {
-			documentId: string;
-			s3Key: string;
-			s3Bucket: string;
-			originalName: string;
-			mimeType: string;
-			fileSize: number;
+			documentId: string;, s3Key: string;
+			s3Bucket: string;, originalName: string;
+			mimeType: string;, fileSize: number;
 			processingType: 'ocr' | 'embedding' | 'chunk' | 'full_analysis';
 			caseId?: string;
 			userId?: string;
-			priority?: number;
-			timestamp: string;
+			priority?: number;, timestamp: string;
 		}
 
 		const job: DocumentProcessingJob = {

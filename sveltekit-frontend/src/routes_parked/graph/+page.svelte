@@ -12,7 +12,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  async function loadEngineData(): Promise<any> { engineStats = wasmGraphEngine.getStats(); hotQueries = await unifiedServiceRegistry.getHotQueries(10); cacheStats = unifiedServiceRegistry.getCacheStats()}
  async function executeQuery(): Promise<any> { if (!queryInput.trim() || isExecuting) return; isExecuting = true; const startTime = Date.now(); try { const result = await wasmGraphEngine.executeQuery(queryInput); const executionTime = Date.now() - startTime; queryResult = result; // Add to history queryHistory.unshift({ query: queryInput, result, timestamp: new Date(), executionTime });
   
- await loadEngineData()} catch (error) { queryResult = { error: error.message, metadata: { source: 'error', queryTime: Date.now() - startTime, resultCount: 0 }
+ await loadEngineData()} catch (error) { queryResult = { error: error.message, metadata: {, source: 'error', queryTime: Date.now() - startTime, resultCount: 0 }
  } } finally { isExecuting = false}
  }
  async function useHotQuery(query): Promise<any> { queryInput = query; await executeQuery()}

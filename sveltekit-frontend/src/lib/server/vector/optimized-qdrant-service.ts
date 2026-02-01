@@ -101,8 +101,7 @@ export async function ensureCollection(dim: number): Promise<void> {
         if (!exists) {
             console.log(`[Qdrant] Creating collection ${COLLECTION_NAME} (${dim} dims)`);
             await qdrantClient.createCollection(COLLECTION_NAME, {
-                vectors: {
-                    size: dim,
+                vectors: {, size: dim,
                     distance: 'Cosine'
                 }
             });

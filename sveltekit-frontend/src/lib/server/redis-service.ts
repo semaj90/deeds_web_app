@@ -15,22 +15,16 @@ type AugmentedIORedisClient = IORedisClass & {
 };
 
 interface RedisConfig extends RedisOptions {
-  host: string;
-  port: number;
-  password?: string;
-  db: number;
-  maxRetriesPerRequest: number;
-  retryDelayOnFailover: number;
-  enableReadyCheck: boolean;
-  lazyConnect: boolean;
-  keepAlive: number;
-  family: number;
+  host: string;, port: number;
+  password?: string;, db: number;
+  maxRetriesPerRequest: number;, retryDelayOnFailover: number;
+  enableReadyCheck: boolean;, lazyConnect: boolean;
+  keepAlive: number;, family: number;
   keyPrefix?: string;
 }
 
 interface RedisConnectionPool {
-  primary: AugmentedIORedisClient;
-  subscriber: AugmentedIORedisClient;
+  primary: AugmentedIORedisClient;, subscriber: AugmentedIORedisClient;
   publisher: AugmentedIORedisClient;
 }
 
@@ -41,14 +35,11 @@ interface RedisInfo {
 interface CachedEmbedding {
   embedding: number[];
   metadata?: Record<string, unknown>;
-  cached_at: string;
-  dimension: number;
+  cached_at: string;, dimension: number;
 }
 interface CachedSearch {
-  query: string;
-  results: unknown[];
-  cached_at: string;
-  result_count: number;
+  query: string;, results: unknown[];
+  cached_at: string;, result_count: number;
 }
 
 class RedisService {
@@ -220,10 +211,8 @@ class RedisService {
   }
 
   /** * Get Redis connection statistics */
-  getStats(): {
-    connected: boolean;
-    status: string;
-    reconnectAttempts: number;
+  getStats(): {, connected: boolean;
+    status: string;, reconnectAttempts: number;
     config: RedisConfig;
   } {
     // const client = this.pool?.primary; // Removed unused variable

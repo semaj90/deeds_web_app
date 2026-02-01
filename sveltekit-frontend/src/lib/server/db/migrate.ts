@@ -19,8 +19,7 @@ type PoolLike = {
 type PostgresJsClient = ReturnType<typeof postgres>;
 
 interface Migration {
-	id: string;
-	filename: string;
+	id: string;, filename: string;
 	applied_at?: string | Date | null;
 }
 

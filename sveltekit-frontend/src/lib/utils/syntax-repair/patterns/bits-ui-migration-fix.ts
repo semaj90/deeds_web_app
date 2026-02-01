@@ -6,7 +6,7 @@
  * and updates event handlers from on:click to onclick.
  *
  * Key migrations:
- * 1. Event handlers: on:click -> onclick, on:change -> onchange, etc.
+ * 1. Event handlers: on, click -> onclick, on:change -> onchange, etc.
  * 2. Props: export let -> let { ... } = $props()
  * 3. Components: <Button> -> <Button.Root>, <Dialog> -> <Dialog.Root>
  *
@@ -40,7 +40,7 @@ export const bitsUiButtonImportPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to convert on:click to onclick for Svelte 5
- * Before: <Button on:click={handler}>
+ * Before: <Button, on:click={handler}>
  * After:  <Button onclick={handler}>
  */
 export const svelteEventHandlerPattern: PatternMatcher = createPattern(
@@ -55,7 +55,7 @@ export const svelteEventHandlerPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to convert on:click with modifiers to onclick
- * Before: <button on:click|preventDefault={handler}>
+ * Before: <button, on:click|preventDefault={handler}>
  * After:  <button onclick={(e) => { e.preventDefault(); handler(e); }}>
  */
 export const svelteEventHandlerWithModifiersPattern: PatternMatcher = createPattern(
@@ -469,7 +469,7 @@ export const exportLetWithTypePattern: PatternMatcher = createPattern(
 /**
  * Pattern to fix export let with type annotation but no default
  * Before: export let value: string;
- * After:  let { value }: { value: string } = $props();
+ * After:  let { value }: {, value: string } = $props();
  */
 export const exportLetWithTypeNoDefaultPattern: PatternMatcher = createPattern(
   'svelte5-export-let-type-no-default',
@@ -725,7 +725,7 @@ export function getBitsUiMigrationPatterns(): PatternMatcher[] {
  *
  * @requirements 1.2, 4.3
  */
-export function fixBitsUiMigration(content: string): { result: string; fixCount: number } {
+export function fixBitsUiMigration(content: string): {, result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 
@@ -759,7 +759,7 @@ export function fixBitsUiMigration(content: string): { result: string; fixCount:
 export function fixBitsUiMigrationMultiPass(
   content: string,
   maxPasses: number = 3
-): { result: string; fixCount: number; passes: number } {
+): {, result: string; fixCount: number;, passes: number } {
   let result = content;
   let totalFixes = 0;
   let passCount = 0;
@@ -785,10 +785,8 @@ export function fixBitsUiMigrationMultiPass(
  * @param content - The source code content to check
  * @returns Object containing boolean flags for each pattern type found
  */
-export function detectSvelte4Patterns(content: string): {
-  hasOldEventHandlers: boolean;
-  hasExportLet: boolean;
-  hasOldBitsUiComponents: boolean;
+export function detectSvelte4Patterns(content: string): {, hasOldEventHandlers: boolean;
+  hasExportLet: boolean;, hasOldBitsUiComponents: boolean;
   patternCounts: Record<string, number>;
 } {
   const patternCounts: Record<string, number> = {};

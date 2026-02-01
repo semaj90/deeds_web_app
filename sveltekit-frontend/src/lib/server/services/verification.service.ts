@@ -8,17 +8,14 @@ import { sourceVerification, citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface SourceCheckResult {
-    isVerified: boolean;
-    requiresVerification: boolean;
+    isVerified: boolean;, requiresVerification: boolean;
     domain: string;
     disclaimer?: string;
 }
 
 interface VerificationMetadata {
-    sourceUrl: string;
-    isVerified: boolean;
-    requiresVerification: boolean;
-    disclaimerRequired: boolean;
+    sourceUrl: string;, isVerified: boolean;
+    requiresVerification: boolean;, disclaimerRequired: boolean;
 }
 
 export class VerificationService {
@@ -242,7 +239,7 @@ Use only for context, not charging authority.`;
     ): Promise<void> {
         try {
              // Assuming citationMetadata structure.
-             // Based on previous code: await db.insert(citationMetadata).values({ citationId: sourceVerificationId: disclaimerRequired, ...
+             // Based on previous code: await db.insert(citationMetadata).values({ citationId: sourceVerificationId, disclaimerRequired, ...
              // There was chaos there. I'll make a best guess insertion or update.
              // Actually, it should probably be an update if the record exists, or insert if not.
              // Since I don't knwo exact schema, I'll assume an update to an existing citation metadata record or insert new one.
@@ -288,7 +285,7 @@ Use only for context, not charging authority.`;
     /**
      * Validate AI response against legal constraints
      */
-    validateAIResponse(response: string): { valid: boolean; violations: string[] } {
+    validateAIResponse(response: string): {, valid: boolean; violations: string[] } {
         const violations: string[] = [];
 
         // Check for prohibited language

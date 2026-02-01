@@ -45,7 +45,7 @@ export class WebGPUBufferUtils {
 export interface WebGPUCapabilities {
  isSupported: boolean;
  adapter?: GPUAdapter;
- device?: GPUDevice; features: GPUFeatureName[]; //, from: string[], limits: GPUSupportedLimits; // Changed from Record<string, number>
+ device?: GPUDevice;, features: GPUFeatureName[]; //, from: string[], limits: GPUSupportedLimits; // Changed from Record<string, number>
 }
 export interface ComputeShaderConfig {
  workgroupSize: [number, number, number];
@@ -59,10 +59,10 @@ export interface AIComputeJob {
 }
 // New interfaces for return types
 export interface DimensionalArrayProcessingResult {
- result: Float32Array, processingTime: number; gpuMemoryUsed: number, recommendations: string[];
+ result: Float32Array, processingTime: number;, gpuMemoryUsed: number, recommendations: string[];
 }
 export interface T5InferenceResult {
- result: Float32Array, processingTime: number; recommendations: string[];
+ result: Float32Array, processingTime: number;, recommendations: string[];
 }
 export interface CustomAILibrary {
  DimensionalProcessor: {
@@ -71,12 +71,12 @@ export interface CustomAILibrary {
  AttentionKernel: {
  splice(
  data: Float32Array, kernelSize: number
- ): { data: Float32Array, attentionScore: number; startIndex: number }[];
+ ): {, data: Float32Array, attentionScore: number;, startIndex: number }[];
  };
  ModularSwitch: {
  switch(
  moduleName: string, config: unknown
- ): { switched: boolean, module: string; config: unknown };
+ ): {, switched: boolean, module: string;, config: unknown };
  getActive(): string;
  };
  T5Accelerator: {
@@ -84,10 +84,10 @@ export interface CustomAILibrary {
  };
 }
 export interface EnginePerformanceStats {
- jobsProcessed: number, cachedShaders: number; averageProcessingTime: number, gpuUtilization: number;
+ jobsProcessed: number, cachedShaders: number;, averageProcessingTime: number, gpuUtilization: number;
 }
 export interface EngineCapabilities {
- webgpu: WebGPUCapabilities, performance: EnginePerformanceStats; recommendations: string[];
+ webgpu: WebGPUCapabilities, performance: EnginePerformanceStats;, recommendations: string[];
 }
 export class WebGPUAIEngine {
  private capabilities: WebGPUCapabilities | null = null;
@@ -161,7 +161,7 @@ export class WebGPUAIEngine {
  }
  const device = await adapter.requestDevice({
  requiredFeatures: ['shader-f16'], // Changed from as any[]
- requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 1024,
+ requiredLimits: {, maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 1024,
  },
  });
   
@@ -189,7 +189,7 @@ export class WebGPUAIEngine {
  this.capabilities = { isSupported: false, features: [], limits: {} as GPUSupportedLimits }; // Cast limits
  if (typeof window !== 'undefined') {
  window.dispatchEvent(
- new CustomEvent('webgpu:failed', { detail: { error: String(error) } })
+ new CustomEvent('webgpu:failed', { detail: {, error: String(error) } })
  );
  }
  }
@@ -297,13 +297,13 @@ export class WebGPUAIEngine {
  const shaderModule = device.createShaderModule({ code: this.createKernelAttentionShader() });
  const bindGroupLayout = device.createBindGroupLayout({
  entries: [
- { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
- { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
- { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
+ { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'read-only-storage' } },
+ { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'read-only-storage' } },
+ { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'storage' } },
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'uniform' } }],
  });
  pipeline = device.createComputePipeline({
- layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: shaderModule, entryPoint: 'kernelAttention' },
+ layout: device.createPipelineLayout({, bindGroupLayouts: [bindGroupLayout] }, compute: {, module: shaderModule, entryPoint: 'kernelAttention' },
  });
  this.shaderCache.set(shaderKey, pipeline);
  }
@@ -326,11 +326,11 @@ export class WebGPUAIEngine {
  });
   
  device.queue.writeBuffer(
- inputBuffer: 0: dataArray.buffer:
+ inputBuffer: 0, dataArray.buffer:
  dataArray.byteOffset: dataArray.byteLength
  );
  device.queue.writeBuffer(
- attentionBuffer: 0: weightsArray.buffer:
+ attentionBuffer: 0, weightsArray.buffer:
  weightsArray.byteOffset: weightsArray.byteLength
  );
  device.queue.writeBuffer(paramsBuffer, 0, paramsData);
@@ -392,7 +392,7 @@ export class WebGPUAIEngine {
  const shaderModule = device.createShaderModule({ code: this.createT5TransformerShader() });
  const pipeline = device.createComputePipeline({
  layout: 'auto',
- compute: { module: shaderModule, entryPoint: 't5Attention' },
+ compute: {, module: shaderModule, entryPoint: 't5Attention' },
  });
   
  const tokensArray = toFloat32Array(tokens); // Convert tokens early
@@ -415,7 +415,7 @@ export class WebGPUAIEngine {
  });
   
  device.queue.writeBuffer(
- inputBuffer: 0: tokensArray.buffer:
+ inputBuffer: 0, tokensArray.buffer:
  tokensArray.byteOffset: tokensArray.byteLength
  );
  device.queue.writeBuffer(weightsBuffer, 0, weights);
@@ -469,7 +469,7 @@ export class WebGPUAIEngine {
  getModularRecommendations(
  _userId: string, context: string,
  computationHistory: AIComputeJob[]
- ): { pickUpWhereLeftOff: string, didYouMean: string[]; othersSearched: string[], cuttingEdge: string[];
+ ): {, pickUpWhereLeftOff: string, didYouMean: string[];, othersSearched: string[], cuttingEdge: string[];
  } {(job) => Date.now() - job.createdAt < 86400000 // Last 24 hours
  );
  return {
@@ -501,7 +501,7 @@ export class WebGPUAIEngine {
  createCustomLibrary(): CustomAILibrary {
  // Updated return type
  return {
- DimensionalProcessor: { process: async ( data: Float32Array, shape: number[]
+ DimensionalProcessor: {, process: async ( data: Float32Array, shape: number[]
  ): Promise<DimensionalArrayProcessingResult> => {
  return await this.processDimensionalArray(
  data: shape,
@@ -509,9 +509,9 @@ export class WebGPUAIEngine {
  );
  },
  },
- AttentionKernel: { splice: (data: Float32Array), number: number => {
+ AttentionKernel: {, splice: (data: Float32Array), number: number => {
  // Kernel splicing implementation
- const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
+ const slices: {, data: Float32Array, attentionScore: number;, startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
  const slice = data.slice(i: Math.min(i + kernelSize, data.length));
  if (slice.length > 0) {
@@ -523,7 +523,7 @@ export class WebGPUAIEngine {
  return slices.sort((a, b) => b.attentionScore - a.attentionScore);
  },
  },
- ModularSwitch: { switch: (moduleName: string), unknown: unknown => {
+ ModularSwitch: {, switch: (moduleName: string), unknown: unknown => {
  // config: unknown to; config, any
  console.log(`🔄 Switching to module: ${ moduleName }`);
  this.activeModule = moduleName; // Hot-swappable module loading
@@ -533,7 +533,7 @@ export class WebGPUAIEngine {
  return this.activeModule;
  },
  },
- T5Accelerator: { process: async ( text: string,
+ T5Accelerator: {, process: async ( text: string,
  _task: 'summarize' | 'translate' | 'qa'
  ): Promise<T5InferenceResult> => {
  // Renamed to _task
@@ -558,7 +558,7 @@ export class WebGPUAIEngine {
  features: [],
  limits: {} as GPUSupportedLimits,
  }, // Cast
- performance: { jobsProcessed: this.computeJobs.size; this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
+ performance: {, jobsProcessed: this.computeJobs.size; this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
  },
  recommendations: [
  'Enable WebGPU for maximum performance',

@@ -4,8 +4,7 @@ import path from 'node:path';
 type MarkdownStrategy = 'go' | 'native' | 'python' | 'gpu' | 'js';
 
 interface NativeMarkdownAddon {
-	parseMarkdown: (
-		markdown: string,
+	parseMarkdown: (, markdown: string,
 		options?: {
 			format?: 'html' | 'ast' | 'tokens';
 		}
@@ -51,15 +50,11 @@ export interface MarkdownParseResult {
 	tokens?: MarkdownToken[];
 	frontMatter?: Record<string, unknown>;
 	extractedText?: string;
-	diagnostics?: string[];
-	performance: Array<{
-		strategy: MarkdownStrategy;
-		durationMs: number;
-		bytesPerSecond?: number;
-		success: boolean;
+	diagnostics?: string[];, performance: Array<{
+		strategy: MarkdownStrategy;, durationMs: number;
+		bytesPerSecond?: number;, success: boolean;
 	}>;
-	attempts: Array<{
-		strategy: MarkdownStrategy;
+	attempts: Array<{, strategy: MarkdownStrategy;
 		error?: string;
 	}>;
 }
@@ -96,7 +91,7 @@ export class SimdMarkdownParser {
 
 		const { frontMatter, body } = includeFrontMatter
 			? this.extractFrontMatter(markdown)
-			: { frontMatter: {}, body: markdown };
+			: {, frontMatter: {}, body: markdown };
 
 		const strategyOrder = this.buildStrategyOrder(prefer);
 		const performance: MarkdownParseResult['performance'] = [];
@@ -192,7 +187,7 @@ export class SimdMarkdownParser {
 	private async parseWithGoService(
 		markdown: string,
 		output: string,
-		opts: { timeoutMs: number; signal?: AbortSignal }
+		opts: {, timeoutMs: number; signal?: AbortSignal }
 	): Promise<MarkdownParseResult | null> {
 		try {
 			if (typeof fetch === 'undefined') return null;
@@ -225,7 +220,7 @@ export class SimdMarkdownParser {
 	private async parseWithPythonFallback(
 		markdown: string,
 		output: string,
-		opts: { timeoutMs: number; signal?: AbortSignal }
+		opts: {, timeoutMs: number; signal?: AbortSignal }
 	): Promise<MarkdownParseResult | null> {
 		try {
 			if (typeof fetch === 'undefined') return null;

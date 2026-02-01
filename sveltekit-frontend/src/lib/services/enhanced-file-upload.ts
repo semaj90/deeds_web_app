@@ -6,10 +6,8 @@
 import localStorageFiles from './localStorage-file-fallback.js';
 
 export interface UploadResponse {
-	success: boolean;
-	fileName: string;
-	size: number;
-	storageType: 'server' | 'localStorage';
+	success: boolean;, fileName: string;
+	size: number;, storageType: 'server' | 'localStorage';
 	fallbackUsed: boolean;
 	fileId?: string;
 	url?: string;
@@ -24,27 +22,21 @@ export interface UploadOptions {
 }
 
 export interface LocalFileRecord {
-	id: string;
-	fileName: string;
-	size: number;
-	type: string;
+	id: string;, fileName: string;
+	size: number;, type: string;
 	data: string;
 	caseId?: string;
-	description?: string;
-	tags: string[];
+	description?: string;, tags: string[];
 	uploadedAt: string;
 }
 
 export interface ServerFileDetails {
-	fileId: string;
-	fileName: string;
-	size: number;
-	type: string;
+	fileId: string;, fileName: string;
+	size: number;, type: string;
 	url: string;
 	caseId?: string;
 	description?: string;
-	tags?: string[];
-	uploadedAt: string;
+	tags?: string[];, uploadedAt: string;
 }
 
 export type RetrievedFile = LocalFileRecord | ServerFileDetails;

@@ -6,17 +6,13 @@
 import { generateText } from './ollama-service.js';
 
 export interface KeywordExtractionResult {
-	keywords: string[];
-	keyPhrases: string[];
-	entities: Array<{
-		text: string;
+	keywords: string[];, keyPhrases: string[];
+	entities: Array<{, text: string;
 		type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
 		confidence: number;
 	}>;
-	topics: string[];
-	summary: string;
-	confidence: number;
-	method: 'ollama' | 'fallback';
+	topics: string[];, summary: string;
+	confidence: number;, method: 'ollama' | 'fallback';
 	processingTimeMs: number;
 }
 
@@ -306,7 +302,7 @@ function inferTopics(documentType?: string, keywords?: string[]): string[] {
  * Batch extract keywords from multiple documents
  */
 export async function extractKeywordsBatch(
-	documents: Array<{ content: string; documentType?: string }>
+	documents: Array<{, content: string; documentType?: string }>
 ): Promise<KeywordExtractionResult[]> {
 	console.log(`📦 Extracting keywords from ${documents.length} documents...`);
 

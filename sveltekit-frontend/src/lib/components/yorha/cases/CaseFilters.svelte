@@ -42,14 +42,14 @@
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50 mb-6">
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+  <div class="flex flex-col lg: flex-row, lg:items-center lg:justify-between gap-4">
     <!-- Search -->
     <div class="flex-1 max-w-md">
       <div class="relative">
         <input
           type="text"
           placeholder="Search cases..."
-          class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all"
+          class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus: ring-2, focus:ring-cyan-400 focus:border-transparent transition-all"
           bind:value={searchQuery}
           oninput={applyFilters}
         />
@@ -64,7 +64,7 @@
     <!-- Filters -->
     <div class="flex flex-wrap items-center gap-4">
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none"
+        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus:border-transparent outline-none"
         bind:value={statusFilter}
         onchange={applyFilters}
       >
@@ -74,7 +74,7 @@
       </select>
 
       <select
-        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none"
+        class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus: ring-2, focus:ring-cyan-400 focus:border-transparent outline-none"
         bind:value={priorityFilter}
         onchange={applyFilters}
       >

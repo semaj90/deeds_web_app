@@ -6,13 +6,10 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 
 export interface AuthResult {
-	user: {
-		id: string;
-		email: string;
-		role: 'admin' | 'lead_prosecutor' | 'prosecutor' | 'paralegal' | 'investigator' | 'analyst' | 'viewer' | 'user';
+	user: {, id: string;
+		email: string;, role: 'admin' | 'lead_prosecutor' | 'prosecutor' | 'paralegal' | 'investigator' | 'analyst' | 'viewer' | 'user';
 	};
-	session: unknown;
-	isTestMode: boolean;
+	session: unknown;, isTestMode: boolean;
 }
 
 /**
@@ -34,13 +31,11 @@ export async function getUserWithFallback(event: RequestEvent): Promise<AuthResu
     if (process.env.NODE_ENV === 'development' || process.env.TEST_MODE === 'true') {
         console.log('⚠️ Auth not available, using test mode');
         return {
-            user: {
-                id: 'test-user-id',
+            user: {, id: 'test-user-id',
                 email: 'test@legal-ai.dev',
                 role: 'admin'
             },
-            session: {
-                id: 'test-session-id',
+            session: {, id: 'test-session-id',
                 userId: 'test-user-id',
                 fresh: false,
                 expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours

@@ -20,7 +20,7 @@ const threadSafePostgres = {
 
 // GPU coordinator stub
 const gpuCoordinator = {
-    processEmbeddingBatch: async (texts: string[], opts: any) => ({ result: { embeddings: [] } })
+    processEmbeddingBatch: async (texts: string[], opts: any) => ({ result: {, embeddings: [] } })
 };
 
 // Optimized cache stub
@@ -39,14 +39,10 @@ export interface EmbeddingCacheConfig {
 }
 
 export interface CachedEmbedding {
-	id: string;
-	text: string;
-	vector: Float32Array;
-	metadata: {
-		model: string;
-		timestamp: number;
-		gpuProcessed: boolean;
-		threadId: string;
+	id: string;, text: string;
+	vector: Float32Array;, metadata: {
+		model: string;, timestamp: number;
+		gpuProcessed: boolean;, threadId: string;
 	};
 }
 
@@ -132,7 +128,7 @@ export class EmbeddingCacheMiddleware {
 				throw new Error(`Python GPU worker error: ${response.status} ${response.statusText}`);
 			}
 
-			const { vectors, metadata } = (await response.json()) as { vectors: number[][]; metadata: any };
+			const { vectors, metadata } = (await response.json()) as { vectors: number[][];, metadata: any };
 			console.log(`🚀 GPU embedding batch completed: ${texts.length} texts, ${metadata.gpu_time_ms}ms`);
 			return vectors.map((v: number[]) => new Float32Array(v));
 		} catch (error) {
@@ -147,8 +143,7 @@ export class EmbeddingCacheMiddleware {
 			id: cacheKey,
 			text,
 			vector,
-			metadata: {
-				model: 'embeddinggemma:latest',
+			metadata: {, model: 'embeddinggemma:latest',
 				timestamp: Date.now(),
 				gpuProcessed: true,
 				threadId: 'middleware_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
@@ -270,7 +265,7 @@ export class EmbeddingCacheMiddleware {
 		if (texts.length === 0) return [];
 
 		const results: Float32Array[] = new Array(texts.length);
-		const missingTexts: { index: number; text: string; cacheKey: string }[] = [];
+		const missingTexts: {, index: number; text: string;, cacheKey: string }[] = [];
 
 		await this.initializeRedisCache();
 
@@ -279,7 +274,7 @@ export class EmbeddingCacheMiddleware {
 			const cacheOperations = texts.map((text, i) => ({
 				type: 'get' as const,
 				key: `embed:${this.generateCacheKey(text)}`,
-				options: { decompress: true }
+				options: {, decompress: true }
 			}));
 
 			const cachedResults = await optimizedCache.batch(cacheOperations);
@@ -351,8 +346,7 @@ export class EmbeddingCacheMiddleware {
 				type: 'set' as const,
 				key: `embed:${missingTexts[i].cacheKey}`,
 				value: embedding,
-				options: {
-					ttl: 3600,
+				options: {, ttl: 3600,
 					compress: true,
 					parallel: true,
 					priority: 'high' as const
@@ -387,10 +381,8 @@ export class EmbeddingCacheMiddleware {
 	}
 
 	// Get cache statistics
-	async getCacheStats(): Promise<{
-		redisConnected: boolean;
-		postgresConnected: boolean;
-		totalEmbeddings: number;
+	async getCacheStats(): Promise<{, redisConnected: boolean;
+		postgresConnected: boolean;, totalEmbeddings: number;
 		gpuAcceleration: boolean;
 	}> {
 		const postgresHealth = await (threadSafePostgres.healthCheck?.() ?? threadSafePostgres.health());
@@ -450,12 +442,9 @@ export interface LegalEmbeddingQuery {
 }
 
 // Legal document embedding with metadata context
-export async function getLegalEmbedding(query: LegalEmbeddingQuery): Promise<{
-	embedding: Float32Array;
-	metadata: {
-		cacheHit: boolean;
-		processingTime: number;
-		documentContext: {
+export async function getLegalEmbedding(query: LegalEmbeddingQuery): Promise<{, embedding: Float32Array;
+	metadata: {, cacheHit: boolean;
+		processingTime: number;, documentContext: {
 			documentType?: string;
 			jurisdiction?: string;
 			practiceArea?: string;
@@ -473,11 +462,9 @@ export async function getLegalEmbedding(query: LegalEmbeddingQuery): Promise<{
 
 	return {
 		embedding,
-		metadata: {
-			cacheHit: false, // TODO: Track cache hits
+		metadata: {, cacheHit: false, // TODO: Track cache hits
 			processingTime: Date.now() - startTime,
-			documentContext: {
-				documentType: query.documentType,
+			documentContext: {, documentType: query.documentType,
 				jurisdiction: query.jurisdiction,
 				practiceArea: query.practiceArea
 			}

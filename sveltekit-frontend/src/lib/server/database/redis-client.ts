@@ -9,12 +9,9 @@ import createRedisConnection, { redis } from '$lib/server/redis'; // Fix: create
 dotenv.config();
 
 export interface RedisConfig {
-	host: string;
-	port: number;
-	password?: string;
-	db: number;
-	retryDelayOnFailover: number;
-	maxRetriesPerRequest: number;
+	host: string;, port: number;
+	password?: string;, db: number;
+	retryDelayOnFailover: number;, maxRetriesPerRequest: number;
 	lazyConnect: boolean;
 }
 
@@ -48,8 +45,7 @@ type IORedisClient = MinimalRedisClient;
 // This is the module's managed shared instance
 // It seems `redis` exported from '$lib/server/redis' is already the instance we want to use
 // or `createRedisConnection` creates it.
-// To match signature:
-let redisInstance: IORedisClient | null = null;
+// To match signature: let, redisInstance: IORedisClient | null = null;
 let isConnected = false;
 
 /**
@@ -154,7 +150,7 @@ export function createRedisClient(customConfig: Partial<RedisConfig> = {}): IORe
 /**
  * Redis health check
  */
-export async function checkRedisHealth(): Promise<{ status: 'healthy' | 'disconnected' | 'error'; latency?: number; error?: string }> {
+export async function checkRedisHealth(): Promise<{, status: 'healthy' | 'disconnected' | 'error'; latency?: number; error?: string }> {
 	try {
 		const start = Date.now();
         // Use getRedisClient to ensure we have a client

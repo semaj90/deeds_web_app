@@ -7,10 +7,8 @@
     title = '',
     onClose = () => {},
     children
-  }: {
-    showModal: boolean;
-    title: string;
-    onClose: () => void;
+  }: {, showModal: boolean;
+    title: string;, onClose: () => void;
     children?: Snippet;
   } = $props();
 
@@ -85,17 +83,17 @@
   }
   .modal-header {
     justify-content: space-between;
-    align-items: center; padding: 1.5rem;
+    align-items: center;, padding: 1.5rem;
     border-bottom: 1px solid #D1CFC7}
   .modal-title {
     font-size: 1.5rem;
-    font-weight: bold; color: #3D3D3D;
+    font-weight: bold;, color: #3D3D3D;
     margin: 0}
   .modal-close {
-    background: none; border: none;
-    font-size: 1.5rem; color: #666;
-    cursor: pointer; padding: 0.25rem;
-    line-height: 1; transition: color 0.2s ease}
+    background: none;, border: none;
+    font-size: 1.5rem;, color: #666;
+    cursor: pointer;, padding: 0.25rem;
+    line-height: 1;, transition: color 0.2s ease}
   .modal-close:hover {
     color: #3D3D3D}
   .modal-content { padding: 1.5rem;
@@ -108,8 +106,8 @@
       opacity: 1}
   }
   @keyframes slideIn {
-    from { transform: scale(0.9); opacity: 0}
-    to { transform: scale(1); opacity: 1}
+    from { transform: scale(0.9);, opacity: 0}
+    to { transform: scale(1);, opacity: 1}
   }
 /* Responsive */ @media (max-width: 640px) {
     .modal-panel {

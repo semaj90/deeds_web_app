@@ -18,8 +18,8 @@ const registerSchema = z.object({
 });
 
 interface RegisterRequest {
-	email: string; password: string;
-	firstName: string; lastName: string;
+	email: string;, password: string;
+	firstName: string;, lastName: string;
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			success: true,
 			userId: newUser.id,
 			sessionId: session.sessionId,
-			user: { id: newUser.id,
+			user: {, id: newUser.id,
 				email: newUser.email,
 				firstName: newUser.firstName,
 				lastName: newUser.lastName,

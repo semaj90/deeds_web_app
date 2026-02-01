@@ -7,8 +7,7 @@
  */
 
 export type OllamaEmbedResult = {
-  model: string;
-  embedding: number[];
+  model: string;, embedding: number[];
 };
 
 type OllamaEmbedResponse = {

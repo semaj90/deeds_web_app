@@ -38,10 +38,8 @@ export interface SystemStatus {
 }
 
 export interface ServiceHealth {
-  service: string;
-  status: 'healthy' | 'unhealthy' | 'degraded';
-  last_check: string;
-  response_time: number;
+  service: string;, status: 'healthy' | 'unhealthy' | 'degraded';
+  last_check: string;, response_time: number;
   error_count: number;
   metadata?: Record<string, any>;
 }
@@ -50,10 +48,8 @@ export interface ServiceHealth {
 // SEARCH & RETRIEVAL
 // =====================================================
 export interface SearchResults {
-  documents: LegalDocument[];
-  total: number;
-  processingTime: number;
-  query: string;
+  documents: LegalDocument[];, total: number;
+  processingTime: number;, query: string;
   facets?: Record<string, any>;
   suggestions?: string[];
   results?: any[];
@@ -71,7 +67,7 @@ export interface TestResults {
     total_time?: number;
   };
   accuracy?: number;
-  error?: string | { message: string; code: string; stack?: string };
+  error?: string | { message: string;, code: string; stack?: string };
   executionTime?: number;
   passed?: boolean;
 }
@@ -80,13 +76,10 @@ export interface TestResults {
 // LEGAL DOMAIN TYPES
 // =====================================================
 export interface LegalDocument {
-  id: string;
-  title: string;
-  content: string;
-  type: 'contract' | 'case_law' | 'statute' | 'regulation' | 'brief' | 'evidence';
+  id: string;, title: string;
+  content: string;, type: 'contract' | 'case_law' | 'statute' | 'regulation' | 'brief' | 'evidence';
   status: 'draft' | 'reviewed' | 'approved' | 'archived';
-  created: string;
-  updated: string;
+  created: string;, updated: string;
   metadata?: {
     author?: string;
     jurisdiction?: string;
@@ -101,24 +94,17 @@ export interface LegalDocument {
 }
 
 export interface CaseFile {
-  id: string;
-  case_name: string;
-  case_number: string;
-  status: 'open' | 'closed' | 'pending';
-  documents: LegalDocument[];
-  persons_of_interest: PersonOfInterest[];
-  evidence: Evidence[];
-  timeline: TimelineEvent[];
-  created_at: string;
-  updated_at: string;
+  id: string;, case_name: string;
+  case_number: string;, status: 'open' | 'closed' | 'pending';
+  documents: LegalDocument[];, persons_of_interest: PersonOfInterest[];
+  evidence: Evidence[];, timeline: TimelineEvent[];
+  created_at: string;, updated_at: string;
 }
 
 export interface Evidence {
-  id: string;
-  case_id: string;
+  id: string;, case_id: string;
   type: 'document' | 'photo' | 'video' | 'audio' | 'physical';
-  title: string;
-  description: string;
+  title: string;, description: string;
   file_path?: string;
   hash?: string;
   metadata?: Record<string, any>;
@@ -126,25 +112,20 @@ export interface Evidence {
 }
 
 export interface PersonOfInterest {
-  id: string;
-  name: string;
+  id: string;, name: string;
   role: 'suspect' | 'witness' | 'victim' | 'expert' | 'attorney';
   contact_info?: {
     email?: string;
     phone?: string;
     address?: string;
   };
-  notes: string;
-  cases: string[];
+  notes: string;, cases: string[];
 }
 
 export interface TimelineEvent {
-  id: string;
-  case_id: string;
-  title: string;
-  description: string;
-  date: string;
-  type: 'incident' | 'investigation' | 'legal' | 'evidence';
+  id: string;, case_id: string;
+  title: string;, description: string;
+  date: string;, type: 'incident' | 'investigation' | 'legal' | 'evidence';
   participants?: string[];
 }
 
@@ -152,25 +133,20 @@ export interface TimelineEvent {
 // USER & AUTHENTICATION
 // =====================================================
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'prosecutor' | 'defense' | 'judge' | 'investigator' | 'admin' | 'analyst' | 'user';
-  permissions: Permission[];
-  preferences: UserPreferences;
+  id: string;, email: string;
+  name: string;, role: 'prosecutor' | 'defense' | 'judge' | 'investigator' | 'admin' | 'analyst' | 'user';
+  permissions: Permission[];, preferences: UserPreferences;
   created_at: string;
   last_login?: string;
 }
 
 export interface Permission {
-  resource: string;
-  actions: ('read' | 'write' | 'delete' | 'admin')[];
+  resource: string;, actions: ('read' | 'write' | 'delete' | 'admin')[];
 }
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto';
-  language: string;
-  notifications: boolean;
+  language: string;, notifications: boolean;
   ai_assistance: boolean;
 }
 
@@ -178,19 +154,15 @@ export interface UserPreferences {
 // AI & MACHINE LEARNING
 // =====================================================
 export interface AIResponse {
-  response: string;
-  confidence: number;
-  model: string;
-  processing_time: number;
+  response: string;, confidence: number;
+  model: string;, processing_time: number;
   tokens_used: number;
   suggestions?: string[];
 }
 
 export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
+  id: string;, role: 'user' | 'assistant' | 'system';
+  content: string;, timestamp: string;
   metadata?: {
     model?: string;
     tokens?: number;
@@ -199,11 +171,9 @@ export interface ChatMessage {
 }
 
 export interface ChatSession {
-  id: string;
-  user_id: string;
+  id: string;, user_id: string;
   messages: ChatMessage[];
-  title?: string;
-  created_at: string;
+  title?: string;, created_at: string;
   updated_at: string;
 }
 
@@ -211,29 +181,25 @@ export interface ChatSession {
 // ERROR HANDLING
 // =====================================================
 export interface APIError {
-  code: string;
-  message: string;
+  code: string;, message: string;
   details?: any;
 }
 
 export interface ValidationError {
-  field: string;
-  message: string;
+  field: string;, message: string;
 }
 
 // =====================================================
 // SYSTEM UTILS
 // =====================================================
 export interface TokenUsage {
-  promptTokens: number;
-  completionTokens: number;
+  promptTokens: number;, completionTokens: number;
   totalTokens: number;
   cost?: number;
 }
 
 export interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  id: string;, type: 'success' | 'error' | 'warning' | 'info';
   title: string;
   description?: string;
   duration?: number;

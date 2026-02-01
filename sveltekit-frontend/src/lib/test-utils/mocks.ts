@@ -25,8 +25,7 @@ import { vi } from 'vitest';
 
 export interface MockQdrantPoint {
 	id: string | number;
-	vector: number[];
-  payload: Record<string, any>;
+	vector: number[];, payload: Record<string, any>;
 }
 
 export interface MockRedisEntry {
@@ -35,8 +34,7 @@ export interface MockRedisEntry {
 }
 
 export interface MockMinIOObject {
-	bucket: string;
-  key: string;
+	bucket: string;, key: string;
 	data: Buffer | string;
 	contentType?: string;
 	metadata?: Record<string, string>;
@@ -53,7 +51,7 @@ class MockQdrantClient {
 	/**
 	 * Create or recreate a collection
 	 */
-	async createCollection(collectionName: string, config: { vectors: { size: number } }): Promise<void> {
+	async createCollection(collectionName: string, config: {, vectors: { size: number } }): Promise<void> {
 		this.collections.set(collectionName, []);
 		this.collectionConfigs.set(collectionName, { vectorSize: config.vectors.size });
 	}
@@ -68,7 +66,7 @@ class MockQdrantClient {
 	/**
 	 * Upsert points into collection
 	 */
-	async upsert(collectionName: string, options: { points: MockQdrantPoint[] }): Promise<void> {
+	async upsert(collectionName: string, options: {, points: MockQdrantPoint[] }): Promise<void> {
 		if (!this.collections.has(collectionName)) {
 			throw new Error(`Collection ${collectionName} does not exist`);
 		}
@@ -89,12 +87,11 @@ class MockQdrantClient {
 	/**
 	 * Search for similar vectors
 	 */
-	async search(collectionName: string, options: {
-    vector: number[];
+	async search(collectionName: string, options: {, vector: number[];
 		limit: number;
 		filter?: Record<string, any>;
 		scoreThreshold?: number;
-	}): Promise<Array<{ id: string | number; score: number; payload: Record<string, any> }>> {
+	}): Promise<Array<{, id: string | number; score: number;, payload: Record<string, any> }>> {
 		if (!this.collections.has(collectionName)) {
 			return [];
 		}
@@ -131,7 +128,7 @@ class MockQdrantClient {
 	/**
 	 * Get points by IDs
 	 */
-	async retrieve(collectionName: string, options: { ids: (string | number)[] }): Promise<MockQdrantPoint[]> {
+	async retrieve(collectionName: string, options: {, ids: (string | number)[] }): Promise<MockQdrantPoint[]> {
 		if (!this.collections.has(collectionName)) {
 			return [];
 		}
@@ -143,7 +140,7 @@ class MockQdrantClient {
 	/**
 	 * Delete points by IDs
 	 */
-	async delete(collectionName: string, options: { points: (string | number)[] }): Promise<void> {
+	async delete(collectionName: string, options: {, points: (string | number)[] }): Promise<void> {
 		if (!this.collections.has(collectionName)) {
 			return;
 		}
@@ -160,7 +157,7 @@ class MockQdrantClient {
 	/**
 	 * Get collection info
 	 */
-	async getCollection(collectionName: string): Promise<{ pointsCount: number; vectorSize: number } | null> {
+	async getCollection(collectionName: string): Promise<{, pointsCount: number; vectorSize: number } | null> {
 		if (!this.collections.has(collectionName)) {
 			return null;
 		}
@@ -322,7 +319,7 @@ class MockOllamaClient {
 	/**
 	 * Generate embeddings
 	 */
-	async embeddings(options: { model: string, prompt: string }): Promise<{ embedding: number[] }> {
+	async embeddings(options: {, model: string, prompt: string }): Promise<{, embedding: number[] }> {
 		// Generate deterministic fake embedding based on prompt
 		const seed = this.hashString(options.prompt);
 		const embedding = Array.from({ length: this.embeddingDimension }, (_, i) => {
@@ -335,11 +332,10 @@ class MockOllamaClient {
 	/**
 	 * Generate text
 	 */
-	async generate(options: {
-    model: string;
+	async generate(options: {, model: string;
 		prompt: string;
 		stream?: boolean;
-	}): Promise<{ response: string }> {
+	}): Promise<{, response: string }> {
 		// Check if we have a pre-configured response
     const response = this.responses.get(options.prompt) || `Mock response for: ${options.prompt.substring(0, 50)}...`;
 
@@ -384,7 +380,7 @@ class MockPostgreSQLClient {
 	/**
 	 * Execute SQL query
 	 */
-	async query(sql: string, params?: any[]): Promise<{ rows: any[]; rowCount: number }> {
+	async query(sql: string, params?: any[]): Promise<{, rows: any[]; rowCount: number }> {
 		// Simple mock - just return empty results
 		// In real tests, you'd parse SQL and return appropriate data
 		const rows: any[] = [];
@@ -456,7 +452,7 @@ class MockMinIOClient {
 	/**
 	 * Check if object exists
 	 */
- async statObject(bucket: string, key: string): Promise<{ size: number } | null> {
+ async statObject(bucket: string, key: string): Promise<{, size: number } | null> {
 		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 
@@ -472,8 +468,8 @@ class MockMinIOClient {
 	/**
 	 * List objects in bucket
 	 */
-	async listObjects(bucket: string, prefix?: string): Promise<Array<{ name: string; size: number }>> {
-		const results: Array<{ name: string; size: number }> = [];
+	async listObjects(bucket: string, prefix?: string): Promise<Array<{, name: string; size: number }>> {
+		const results: Array<{, name: string; size: number }> = [];
 
 		for (const [objectKey, object] of this.objects.entries()) {
 			if (object.bucket !== bucket) continue;
@@ -532,7 +528,7 @@ export function resetAllMocks(): void {
 // ═══════════════════════════════════════════════════════════════════════
 
 export interface MockFetchResponse {
-	url: string; status: number;
+	url: string;, status: number;
 	data: any;
 }
 
@@ -541,7 +537,7 @@ class MockFetchClient {
 	private defaultResponse: MockFetchResponse = {
 		url: '',
 		status: 200,
-		data: { success: true }
+		data: {, success: true }
 	};
 
 	/**

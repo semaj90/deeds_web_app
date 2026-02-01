@@ -16,40 +16,30 @@ import { sql } from 'drizzle-orm';
 
 // Types
 export interface ErrorPattern {
-	id: string;
-	errorMessage: string;
-	errorCode?: string;
-	filePath: string;
+	id: string;, errorMessage: string;
+	errorCode?: string;, filePath: string;
 	lineNumber?: number;
-	embedding?: number[];
-	fixCount: number;
-	successRate: number;
-	lastSeen: Date;
+	embedding?: number[];, fixCount: number;
+	successRate: number;, lastSeen: Date;
 	metadata?: Record<string, unknown>;
 }
 
 export interface PatchKnowledge {
-	id: string;
-	patchContent: string;
-	targetFile: string;
-	errorFixed: string;
-	embedding?: number[];
-	applied: boolean;
-	successful?: boolean;
-	timestamp: Date;
+	id: string;, patchContent: string;
+	targetFile: string;, errorFixed: string;
+	embedding?: number[];, applied: boolean;
+	successful?: boolean;, timestamp: Date;
 	runId: string;
 }
 
 export interface KnowledgeSearchResult {
 	pattern: ErrorPattern | PatchKnowledge;
-	similarity: number;
-	relevance: number;
+	similarity: number;, relevance: number;
 }
 
 export interface LearningContext {
 	errorMessage: string;
-	errorCode?: string;
-	filePath: string;
+	errorCode?: string;, filePath: string;
 	codeContext?: string;
 }
 
@@ -133,8 +123,7 @@ export class KnowledgeBase {
 			const response = await fetch(`${this.ollamaUrl}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: this.embeddingModel,
+				body: JSON.stringify({, model: this.embeddingModel,
 					prompt: text
 				})
 			});
@@ -254,8 +243,7 @@ export class KnowledgeBase {
 			`);
 
 			return results.map((row: any) => ({
-				pattern: {
-					id: row.id,
+				pattern: {, id: row.id,
 					errorMessage: row.error_message,
 					errorCode: row.error_code,
 					filePath: row.file_path,

@@ -4,17 +4,12 @@
   let tag = $state<any>(undefined);
 
   interface EvidenceItem {
-    id: string;
-    title: string;
+    id: string;, title: string;
     type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
-    format: string;
-    size: string;
-    uploaded: Date;
-    case: string;
-    tags: string[];
-    aiAnalyzed: boolean;
-    confidence: number;
-    status: 'processed' | 'pending' | 'processing' | 'failed';
+    format: string;, size: string;
+    uploaded: Date;, case: string;
+    tags: string[];, aiAnalyzed: boolean;
+    confidence: number;, status: 'processed' | 'pending' | 'processing' | 'failed';
   }
 
   let evidence = $state<EvidenceItem[]>([

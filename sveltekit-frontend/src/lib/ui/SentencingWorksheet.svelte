@@ -4,13 +4,13 @@
  import Tag from './Tag.svelte';
 
  type AggravatingFactor = {
- id: string; description: string;
- points: number; selected: boolean;
+ id: string;, description: string;
+ points: number;, selected: boolean;
  };
 
  type MitigatingFactor = {
- id: string; description: string;
- points: number; selected: boolean;
+ id: string;, description: string;
+ points: number;, selected: boolean;
  };
 
  let caseId = 'CASE-002';
@@ -37,7 +37,7 @@
  let adjustedOffenseLevel = $derived(offenseLevel + aggravatingPoints + mitigatingPoints);
  let sentencingRange = $derived(calculateRange(adjustedOffenseLevel, criminalHistory));
 
- function calculateRange(level: number, history: number): { min: number; max: number } {
+ function calculateRange(level: number, history: number): {, min: number; max: number } {
  // Simplified Federal Sentencing Guidelines calculation (months)
  const baseMin = level * 4 + history * 6;
  const baseMax = level * 5 + history * 8;

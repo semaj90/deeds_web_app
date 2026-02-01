@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     }
 
     // Create error cluster
-    const errorClusterData: NewErrorCluster = { routeId: tool: body.tool,
+    const errorClusterData: NewErrorCluster = { routeId: tool, body.tool,
       code: body.code,
       message: body.message,
       severity: body.severity,

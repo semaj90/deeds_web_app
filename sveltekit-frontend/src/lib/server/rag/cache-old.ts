@@ -159,8 +159,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{
-    available: boolean;
+export async function getCacheStats(): Promise<{, available: boolean;
     keyCount: number;
     memoryUsage?: string;
 } | null> {
@@ -235,12 +234,9 @@ export async function ragCacheSet(key: string, value: unknown): Promise<void> {
 
 // GPU Engine Manifest Caching
 export interface GpuEngineManifest {
-    engineId: string;
-    sha256: string;
-    path: string;
-    model: string;
-    version: string;
-    createdAt: string;
+    engineId: string;, sha256: string;
+    path: string;, model: string;
+    version: string;, createdAt: string;
     sizeBytes: number;
 }
 
@@ -251,7 +247,7 @@ export async function gpuEngineSet(manifest: GpuEngineManifest) {
         }
         const r = await getRedisClient();
         const key = `gpu:engine:${manifest.engineId}`;
-        const shaKey = `gpu:engine:by_sha:${manifest.sha256}`;
+        const shaKey = `gpu: engine, by_sha:${manifest.sha256}`;
         await r.setex(key, CACHE_TTL_TAGS * 7, JSON.stringify(manifest)); // 7 days for engines
         await r.setex(shaKey, CACHE_TTL_TAGS * 7, manifest.engineId);
     } catch (error) {
@@ -280,7 +276,7 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
             return null;
         }
         const r = await getRedisClient();
-        const key = `gpu:engine:by_sha:${sha256}`;
+        const key = `gpu: engine, by_sha:${sha256}`;
         return await r.get(key);
     } catch (error) {
         console.warn('GPU engine SHA cache get failed:', error);
@@ -290,10 +286,8 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
 
 // Semantic Caching with Embeddings
 export interface SemanticCacheEntry {
-    query: string;
-    embedding: number[];
-    result: unknown;
-    timestamp: number;
+    query: string;, embedding: number[];
+    result: unknown;, timestamp: number;
 }
 
 export async function semanticCacheSet(query: string, embedding: number[], result: unknown): Promise<void> {

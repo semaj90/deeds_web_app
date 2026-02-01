@@ -62,7 +62,7 @@ export interface ProjectValidationResult {
 export function parseTypeScriptOutput(output: string): TypeScriptError[] {
   const errors: TypeScriptError[] = [];
 
-  // Match TypeScript error format: file(line,col): error TSxxxx: message
+  // Match TypeScript error format: file(line,col): error, TSxxxx: message
   const errorPattern = /^(.+?)\((\d+),(\d+)\):\s*error\s+(TS\d+):\s*(.+)$/gm;
 
   let match;
@@ -209,7 +209,7 @@ function parseSvelteCheckOutput(output: string): TypeScriptError[] {
   const errors: TypeScriptError[] = [];
 
   // Match svelte-check error format
-  // /path/to/file.svelte:line:col
+  // /path/to/file.svelte: line, col
   // Error: message (ts)
   const errorPattern = /^(.+?):(\d+):(\d+)\s*\n\s*Error:\s*(.+?)(?:\s*\(ts\))?$/gm;
 

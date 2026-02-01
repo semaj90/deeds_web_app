@@ -6,67 +6,46 @@
 import { getPredictiveAssistance, searchUserChatHistory, storeChatWithVector, type ChatMessage } from '../services/chat-vector-storage.js';
 
 export interface ContextualTestResult {
-	testName: string;
-	success: boolean;
-	executionTime: number;
-	details: Record<string, unknown>;
+	testName: string;, success: boolean;
+	executionTime: number;, details: Record<string, unknown>;
 	errors?: string[];
 }
 
 export interface ContextualEngineMetrics {
-	totalQueries: number;
-	successfulPredictions: number;
-	averageConfidence: number;
-	temporalPatternsDetected: number;
-	contextMaintenance: number;
-	queryOptimization: number;
+	totalQueries: number;, successfulPredictions: number;
+	averageConfidence: number;, temporalPatternsDetected: number;
+	contextMaintenance: number;, queryOptimization: number;
 	// Enhanced metrics
-	memoryEfficiency: number;
-	learningRate: number;
-	adaptabilityScore: number;
-	coherenceIndex: number;
-	predictionAccuracy: number;
-	contextualRelevance: number;
+	memoryEfficiency: number;, learningRate: number;
+	adaptabilityScore: number;, coherenceIndex: number;
+	predictionAccuracy: number;, contextualRelevance: number;
 }
 
 export interface ConversationContext {
-	sessionId: string;
-	userId: string;
-	conversationFlow: ChatMessage[];
-	currentIntent: string;
-	intentHistory: string[];
-	temporalPatterns: {
-		preferredTimeSlots: number[];
-		commonDaysOfWeek: number[];
-		seasonalTrends: string[];
-		timeBasedIntents: Map<string, number[]>; // Intent -> time slots when most active
+	sessionId: string;, userId: string;
+	conversationFlow: ChatMessage[];, currentIntent: string;
+	intentHistory: string[];, temporalPatterns: {
+		preferredTimeSlots: number[];, commonDaysOfWeek: number[];
+		seasonalTrends: string[];, timeBasedIntents: Map<string, number[]>; // Intent -> time slots when most active
 		workflowPatterns: string[]; // Common task sequences
 	};
-	contextualMemory: {
-		topicsDiscussed: string[];
-		documentsReferenced: string[];
-		decisionsTracked: string[];
-		followUpItems: string[];
-		keyEntities: Array<{
-			entity: string;
-			type: 'organization' | 'person' | 'legal_concept';
-			frequency: number;
-			lastMentioned: Date;
+	contextualMemory: {, topicsDiscussed: string[];
+		documentsReferenced: string[];, decisionsTracked: string[];
+		followUpItems: string[];, keyEntities: Array<{
+			entity: string;, type: 'organization' | 'person' | 'legal_concept';
+			frequency: number;, lastMentioned: Date;
 			context: string[];
 		}>;
 		conceptGraph: Map<string, string[]>; // Concept -> related concepts
-		emotionalState: {
-			sentiment: number; // -1 to 1
+		emotionalState: {, sentiment: number; // -1 to 1
 			stress_level: number; // 0 to 1
 			confidence: number; // 0 to 1
 			engagement: number; // 0 to 1
 		};
 	};
-	learningProfile: {
-		expertise_level: 'novice' | 'intermediate' | 'expert';
+	learningProfile: {, expertise_level: 'novice' | 'intermediate' | 'expert';
 		preferred_explanation_style: 'detailed' | 'concise' | 'examples';
-		common_mistakes: string[];
-		learning_velocity: number;
+		common_mistakes: string[];, learning_velocity: number;
 		knowledge_gaps: string[];
 	};
 }
@@ -288,8 +267,7 @@ export class ContextualEngineeringMachine {
 				testName,
 				success: true, // Simulation
 				executionTime: performance.now() - startTime,
-				details: {
-					accuracy: successfulPredictions,
+				details: {, accuracy: successfulPredictions,
 					totalCases: testCases.length,
 					averageConfidence: this.metrics.averageConfidence
 				}
@@ -473,8 +451,7 @@ export class ContextualEngineeringMachine {
                     timestamp: new Date(),
                     sessionId,
                     messageType: 'user',
-                    metadata: {
-                        intent: prediction.predictedIntent,
+                    metadata: {, intent: prediction.predictedIntent,
                         confidence: prediction.confidence
                     }
                 };
@@ -614,8 +591,7 @@ export class ContextualEngineeringMachine {
 			this.testResults.push({
 				testName: success,
 				executionTime: performance.now() - startTime,
-				details: {
-					optimizationScore: this.metrics.queryOptimization,
+				details: {, optimizationScore: this.metrics.queryOptimization,
 					totalQueries: partialQueries.length
 				}
 			});
@@ -659,8 +635,7 @@ export class ContextualEngineeringMachine {
 			this.testResults.push({
 				testName: success,
 				executionTime: performance.now() - startTime,
-				details: {
-					similarQueries: prediction.contextualRecommendations.similarPastQueries.length,
+				details: {, similarQueries: prediction.contextualRecommendations.similarPastQueries.length,
 					intent: prediction.predictedIntent
 				}
 			});
@@ -684,29 +659,25 @@ export class ContextualEngineeringMachine {
 				conversationFlow: [],
 				currentIntent: '',
 				intentHistory: [],
-				temporalPatterns: {
-					preferredTimeSlots: [],
+				temporalPatterns: {, preferredTimeSlots: [],
 					commonDaysOfWeek: [],
 					seasonalTrends: [],
 					timeBasedIntents: new Map(),
 					workflowPatterns: []
 				},
-				contextualMemory: {
-					topicsDiscussed: [],
+				contextualMemory: {, topicsDiscussed: [],
 					documentsReferenced: [],
 					decisionsTracked: [],
 					followUpItems: [],
 					keyEntities: [],
 					conceptGraph: new Map(),
-					emotionalState: {
-						sentiment: 0,
+					emotionalState: {, sentiment: 0,
 						stress_level: 0,
 						confidence: 0.5,
 						engagement: 0.5
 					}
 				},
-				learningProfile: {
-					expertise_level: 'novice',
+				learningProfile: {, expertise_level: 'novice',
 					preferred_explanation_style: 'detailed',
 					common_mistakes: [],
 					learning_velocity: 0.1,
@@ -801,8 +772,7 @@ export class ContextualEngineeringMachine {
 			this.testResults.push({
 				testName: success,
 				executionTime: performance.now() - startTime,
-				details: {
-					entitiesExtracted: entities.length,
+				details: {, entitiesExtracted: entities.length,
 					conceptRelationships: conceptGraph.size,
 					memoryScore
 				}
@@ -871,8 +841,7 @@ export class ContextualEngineeringMachine {
                         timestamp: new Date(),
                         sessionId,
                         messageType: 'user',
-                        metadata: {
-                            intent: prediction.predictedIntent,
+                        metadata: {, intent: prediction.predictedIntent,
                             confidence: prediction.confidence
                         }
                     };

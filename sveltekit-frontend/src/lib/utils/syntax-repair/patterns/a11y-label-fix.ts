@@ -368,8 +368,8 @@ export const fieldsetWithoutLegendPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix Svelte bind:value inputs without labels
- * Before: <input bind:value={name} />
- * After:  <input bind:value={name} aria-label="Input field" />
+ * Before: <input, bind:value={name} />
+ * After: <input, bind:value={name} aria-label="Input field" />
  */
 export const svelteBindInputPattern: PatternMatcher = createPattern(
   'svelte-bind-input',
@@ -486,8 +486,7 @@ export function fixA11yLabels(content: string): A11yLabelFixResult {
  * @param content - The source code content to check
  * @returns Object containing detection results
  */
-export function detectA11yLabelIssues(content: string): {
-  hasIssues: boolean;
+export function detectA11yLabelIssues(content: string): {, hasIssues: boolean;
   patternMatches: Record<string, number>;
   totalMatches: number;
 } {

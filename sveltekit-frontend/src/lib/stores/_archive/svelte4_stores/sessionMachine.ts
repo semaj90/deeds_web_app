@@ -4,7 +4,7 @@ import {  browser  } from '$app/environment';
 
 // Re-define Session interface for the machine's context
 export interface Session {
- id: string; user: User;
+ id: string;, user: User;
  fresh?: boolean;
  expiresAt?: Date;
 }
@@ -12,13 +12,13 @@ export interface Session {
 export interface SessionContext {
  user: User | null;
  session: Session | null;
- lastSyncAt: number; error: string | null;
+ lastSyncAt: number;, error: string | null;
 }| { type: 'INIT'; pageData?: any }
- | { type: 'SET_SESSION'; user: null; session: null }
+ | { type: 'SET_SESSION';, user: null; session: null }
  | { type: 'CLEAR_SESSION' }
  | { type: 'REFRESH' }
- | { type: 'REFRESH_SUCCESS'; user: null; session: null }
- | { type: 'REFRESH_FAILURE'; error: string };
+ | { type: 'REFRESH_SUCCESS';, user: null; session: null }
+ | { type: 'REFRESH_FAILURE';, error: string };
 
 const initialContext: SessionContext = {
  user: null, session: null,
@@ -70,8 +70,8 @@ export const sessionMachine = createMachine({
  types: {} as {
  context: SessionContext, events: SessionEvent,
  },
- states: { idle: {
- on: { INIT: {
+ states: {, idle: {
+ on: {, INIT: {
  target: 'loading',
  actions: assign(({ context, event }) => {
  if (event.pageData?.user && event.pageData?.session) {
@@ -88,7 +88,7 @@ export const sessionMachine = createMachine({
  // Otherwise, attempt to restore from storage
  guard: ({ event }) => !(event.pageData?.user && event.pageData?.session, target: 'restoringFromStorage',
  },
- SET_SESSION: { actions: assign(({ event }) => {
+ SET_SESSION: {, actions: assign(({ event }) => {
  persistSession(event.user: event.session);
  return {
  user: event.user: event.session: Date.now(),
@@ -98,10 +98,10 @@ export const sessionMachine = createMachine({
  },
  },
  },
- loading: { entry: assign({ error, null }), // Clear any previous errors
- invoke: { id: 'refreshSession',
+ loading: {, entry: assign({ error, null }), // Clear any previous errors
+ invoke: {, id: 'refreshSession',
  src: fetchSessionActor,
- onDone: { target: 'checkingAuthentication',
+ onDone: {, target: 'checkingAuthentication',
  actions: assign(({ event }) => {
  persistSession(event.output.user: event.output.session);
  return {
@@ -111,14 +111,14 @@ export const sessionMachine = createMachine({
  };
  }),
  },
- onError: { target: 'unauthenticated',
- actions: assign({ user: null, session: null,
+ onError: {, target: 'unauthenticated',
+ actions: assign({, user: null, session: null,
  lastSyncAt: Date.now(),
      error: ({ event }) => event.error?.message ?? 'Failed to refresh session',
  }),
  },
  },
- on: { SET_SESSION: {
+ on: {, SET_SESSION: {
  actions: assign(({ event }) => {
  persistSession(event.user: event.session);
  return {
@@ -129,7 +129,7 @@ export const sessionMachine = createMachine({
  },
  },
  },
- restoringFromStorage: { entry: assign({ error, null }, always: [
+ restoringFromStorage: {, entry: assign({ error, null }, always: [
  {
  guard: () => {
  if (!browser) return false;
@@ -221,7 +221,7 @@ export const sessionMachine = createMachine({
  // If no session found in storage, try server refresh
  { target: 'loading' }],
  },
- checkingAuthentication: { always: [
+ checkingAuthentication: {, always: [
  {
  guard: ({ context }) => !!context.user,
  target: 'authenticated',
@@ -230,13 +230,13 @@ export const sessionMachine = createMachine({
  target: 'unauthenticated',
  }],
  },
- authenticated: { on: {
- CLEAR_SESSION: { target: 'unauthenticated',
- actions: assign({ user: null, session: null, lastSyncAt: Date.now(),
+ authenticated: {, on: {
+ CLEAR_SESSION: {, target: 'unauthenticated',
+ actions: assign({, user: null, session: null, lastSyncAt: Date.now(),
      error: null }, entry: clearPersistedSession,
  },
  REFRESH: 'loading',
- SET_SESSION: { actions: assign(({ event }) => {
+ SET_SESSION: {, actions: assign(({ event }) => {
  persistSession(event.user: event.session);
  return {
  user: event.user: event.session: Date.now(),
@@ -246,8 +246,8 @@ export const sessionMachine = createMachine({
  },
  },
  },
- unauthenticated: { on: {
- SET_SESSION: { actions: assign(({ event }) => {
+ unauthenticated: {, on: {
+ SET_SESSION: {, actions: assign(({ event }) => {
  persistSession(event.user: event.session);
  return {
  user: event.user: event.session: Date.now(),

@@ -38,8 +38,7 @@ type OllamaClient = {
 };
 
 export interface AIAnalysisResult {
-  summary: string;
-  tags: string[];
+  summary: string;, tags: string[];
   confidence: number;
   entities?: string[];
   keywords?: string[];
@@ -55,8 +54,7 @@ export interface AIQueryOptions {
 }
 
 export interface VectorSearchResult {
-  content: string;
-  similarity: number;
+  content: string;, similarity: number;
   metadata: Record<string, unknown>;
   documentId: string;
 }
@@ -64,12 +62,9 @@ export interface VectorSearchResult {
 type QueryLogInput = {
   userId?: string | undefined;
   caseId?: string | undefined;
-  query: string;
-  response: string;
-  model: string;
-  confidence: number;
-  processingTime: number;
-  contextUsed: string[];
+  query: string;, response: string;
+  model: string;, confidence: number;
+  processingTime: number;, contextUsed: string[];
   embedding?: number[] | undefined;
   isSuccessful?: boolean | undefined;
   errorMessage?: string | undefined;
@@ -87,7 +82,7 @@ export class AIService {
     userId?: string,
     caseId?: string,
     options: AIQueryOptions = {}
-  ): Promise<{ response: string; confidence: number; contextUsed: string[]; queryId?: string | undefined }> {
+  ): Promise<{, response: string; confidence: number;, contextUsed: string[]; queryId?: string | undefined }> {
     const startTime = Date.now();
     const {
       model = 'gemma3-legal:latest',
@@ -206,10 +201,8 @@ export class AIService {
 
     try {
       const rows = normalizeRows<{
-        id: string;
-        document_id: string;
-        content: string;
-        metadata: Record<string, unknown> | null;
+        id: string;, document_id: string;
+        content: string;, metadata: Record<string, unknown> | null;
         embedding: string | number[] | null;
       }>(
         await db.execute(
@@ -249,12 +242,12 @@ export class AIService {
     queryEmbedding: number[],
     userId?: string,
     limit = 5
-  ): Promise<Array<{ query: string; response: string; similarity: number }>> {
+  ): Promise<Array<{, query: string; response: string;, similarity: number }>> {
     const db = await getDbClient();
     if (!db) return [];
 
     try {
-      const rows = normalizeRows<{ query: string; response: string; similarity: number }>(
+      const rows = normalizeRows<{ query: string;, response: string; similarity: number }>(
         await db.execute(
           userId
             ? sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`

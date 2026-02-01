@@ -10,23 +10,19 @@ export enum LogLevel {
 }
 
 interface LogEntry {
-    timestamp: string;
-    level: LogLevel;
-    message: string;
-    component: string;
+    timestamp: string;, level: LogLevel;
+    message: string;, component: string;
     userId?: string;
     conversationId?: string;
     requestId?: string;
     metadata?: { [key: string]: any };
-    error?: { name: string; message: string; stack?: string };
-    performance?: { duration: number; memoryUsage: number };
+    error?: {, name: string; message: string; stack?: string };
+    performance?: {, duration: number; memoryUsage: number };
 }
 
 interface LoggerConfig {
-    level: LogLevel;
-    enableConsole: boolean;
-    enableFile: boolean;
-    enableDatabase: boolean;
+    level: LogLevel;, enableConsole: boolean;
+    enableFile: boolean;, enableDatabase: boolean;
     maxRetries: number;
 }
 

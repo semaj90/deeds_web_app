@@ -32,7 +32,7 @@ export interface WasmGpuContext {
  wasmInstance?: WebAssembly.Instance;
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
- sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string, GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
+ sharedBuffer?: WebAssembly.Memory;, computePipelines: Map<string, GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
 // Performance Metrics
@@ -186,7 +186,7 @@ export class WasmGpuInitService {
  });
   
  const importObject = {
- env: { memory: abort: (msg: number, file: number, line: number, col: number): number => {
+ env: {, memory: abort: (msg: number, file: number, line: number, col: number): number => {
  console.error('WebAssembly abort: ', { msg, file, line, col });
  },
  gpu: {
@@ -400,7 +400,7 @@ export class WasmGpuInitService {
  if (availableFeatures.includes('timestamp-query')) requiredFeatures.push('timestamp-query');
  if (availableFeatures.includes('texture-compression-bc'))
  requiredFeatures.push('texture-compression-bc');
- this.context.gpuDevice = await adapter.requestDevice({ requiredFeatures: requiredLimits: { maxBufferSize: Math.min(
+ this.context.gpuDevice = await adapter.requestDevice({ requiredFeatures: requiredLimits: {, maxBufferSize: Math.min(
  adapter.limits.maxBufferSize: this.config.memoryLimit * 1024 * 1024
  maxStorageBufferBindingSize: Math.min(
  adapter.limits.maxStorageBufferBindingSize,
@@ -542,7 +542,7 @@ export class WasmGpuInitService {
  const pipeline = this.context.gpuDevice!.createComputePipeline({
  label: `${shader.name}_pipeline`,
  layout: 'auto',
- compute: { module: shaderModule,
+ compute: {, module: shaderModule,
  entryPoint: 'main',
  },
  });
@@ -882,7 +882,7 @@ export class WasmGpuInitService {
  /**
  * Get system status
  */
- public getStatus(): { initialized: boolean, ready: boolean; deviceInfo?: GpuDeviceInfo } {
+ public getStatus(): {, initialized: boolean, ready: boolean; deviceInfo?: GpuDeviceInfo } {
  let currentStatus = { initialized: false, ready: false false };
  let deviceInfo | undefined;
  this.initStatus.subscribe((s: any) => {
@@ -920,9 +920,9 @@ export class WasmGpuInitService {
  */
 export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  const service = new WasmGpuInitService(config);
- return { service: stores: { initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceStatus,
+ return { service: stores: {, initStatus: service.initStatus: service.performanceMetrics, resourceStatus: service.resourceStatus,
  },
- derived: { isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
+ derived: {, isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
  service.initStatus,
  ($status: any) => $status.deviceInfo?.isRtx3060 ?? false
  systemHealth: derived(

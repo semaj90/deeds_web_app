@@ -1,11 +1,11 @@
 <script lang="ts">
 
 	interface EvidenceFile {
-		id: string; filename: string; file_type: string; file_size: number; jurisdiction: string; processing_status: string; created_at: string; chunk_count: number;
+		id: string;, filename: string;, file_type: string;, file_size: number;, jurisdiction: string;, processing_status: string;, created_at: string;, chunk_count: number;
 	}
 
 	interface DataGridProps {
-		items: EvidenceFile[]; total: number; page: number; pageSize: number; isLoading: boolean; onRowClick: (item: EvidenceFile) => void;
+		items: EvidenceFile[];, total: number;, page: number;, pageSize: number;, isLoading: boolean;, onRowClick: (item: EvidenceFile) => void;
 		onPageChange: (page: number) => void;
 		onSearch: (query: string) => void;
 		onFilterChange: (filters: Record<string, string>) => void;
@@ -240,26 +240,26 @@
 <style>
 	.datagrid-container {
 		display: flex;
-		flex-direction: column; height: 100%; background: #0d0d0f;
-		border-radius: 4px; overflow: hidden;
+		flex-direction: column;, height: 100%;, background: #0d0d0f;
+		border-radius: 4px;, overflow: hidden;
 	}
 
 	/* Filter Bar */
 	.filter-bar {
-		display: flex; gap: 1rem; padding: 1rem; background: #111;
+		display: flex;, gap: 1rem;, padding: 1rem;, background: #111;
 		border-bottom: 1px solid #222;
 		flex-wrap: wrap;
 	}
 
 	.search-box {
-		position: relative; flex: 1;
+		position: relative;, flex: 1;
 		min-width: 200px;
 	}
 
 	.search-input {
-		width: 100%; padding: 0.5rem 0.75rem 0.5rem 2rem;
-		background: #16161a; border: 1px solid #333;
-		border-radius: 4px; color: #ddd;
+		width: 100%;, padding: 0.5rem 0.75rem 0.5rem 2rem;
+		background: #16161a;, border: 1px solid #333;
+		border-radius: 4px;, color: #ddd;
 		font-size: 0.9rem;
 	}
 
@@ -270,19 +270,19 @@
 	}
 
 	.search-icon {
-		position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); color: #666;
+		position: absolute;, left: 0.5rem;, top: 50%;, transform: translateY(-50%);, color: #666;
 	}
 
 	.filter-group {
-		display: flex; gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
 	.filter-select {
 		padding: 0.5rem 0.75rem;
-		background: #16161a; border: 1px solid #333;
-		border-radius: 4px; color: #ddd;
-		font-size: 0.9rem; cursor: pointer;
+		background: #16161a;, border: 1px solid #333;
+		border-radius: 4px;, color: #ddd;
+		font-size: 0.9rem;, cursor: pointer;
 	}
 
 	.filter-select:focus {
@@ -292,7 +292,7 @@
 
 	/* Table */
 	.table-wrapper {
-		flex: 1; overflow: auto; position: relative;
+		flex: 1;, overflow: auto;, position: relative;
 	}
 
 	.datagrid {
@@ -302,14 +302,14 @@
 	}
 
 	.datagrid thead {
-		position: sticky; top: 0; background: #111;
+		position: sticky;, top: 0;, background: #111;
 		border-bottom: 1px solid #333;
 		z-index: 10;
 	}
 
 	.datagrid th {
 		padding: 0.75rem;
-		text-align: left; color: #999;
+		text-align: left;, color: #999;
 		font-weight: 600;
 		border-right: 1px solid #222;
 		white-space: nowrap;
@@ -321,12 +321,12 @@
 	}
 
 	.datagrid th.sortable:hover {
-		background: #16161a; color: #bbb;
+		background: #16161a;, color: #bbb;
 	}
 
 	.sort-indicator {
 		margin-left: 0.25rem;
-		font-size: 0.8rem; color: #9df;
+		font-size: 0.8rem;, color: #9df;
 	}
 
 	.datagrid tbody tr {
@@ -335,11 +335,11 @@
 	}
 
 	.datagrid tbody tr.clickable:hover {
-		background: #16161a; cursor: pointer;
+		background: #16161a;, cursor: pointer;
 	}
 
 	.datagrid td {
-		padding: 0.75rem; color: #ddd;
+		padding: 0.75rem;, color: #ddd;
 		border-right: 1px solid #222;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -377,12 +377,12 @@
 
 	.datagrid td.date {
 		width: 160px;
-		font-size: 0.85rem; color: #999;
+		font-size: 0.85rem;, color: #999;
 	}
 
 	/* Status Badges */
 	.badge {
-		display: inline-block; padding: 0.25rem 0.5rem;
+		display: inline-block;, padding: 0.25rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
 		font-weight: 500;
@@ -413,13 +413,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center; height: 300px; color: #666;
+		justify-content: center;, height: 300px;, color: #666;
 	}
 
 	.spinner {
-		width: 40px; height: 40px; border: 3px solid #333;
+		width: 40px;, height: 40px;, border: 3px solid #333;
 		border-top-color: #9df;
-		border-radius: 50%; animation: spin 0.8s linear infinite;
+		border-radius: 50%;, animation: spin 0.8s linear infinite;
 		margin-bottom: 1rem;
 	}
 
@@ -433,7 +433,7 @@
 	.empty-state {
 		display: flex;
 		align-items: center;
-		justify-content: center; height: 300px; color: #666;
+		justify-content: center;, height: 300px;, color: #666;
 		font-size: 1rem;
 	}
 
@@ -441,9 +441,9 @@
 	.pagination {
 		display: flex;
 		justify-content: space-between;
-		align-items: center; padding: 1rem; background: #111;
+		align-items: center;, padding: 1rem;, background: #111;
 		border-top: 1px solid #222;
-		flex-wrap: wrap; gap: 1rem;
+		flex-wrap: wrap;, gap: 1rem;
 	}
 
 	.pagination-info {
@@ -452,34 +452,34 @@
 	}
 
 	.pagination-controls {
-		display: flex; gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		align-items: center;
 	}
 
 	.pagination-btn {
 		padding: 0.5rem 0.75rem;
-		background: #16161a; border: 1px solid #333;
-		border-radius: 4px; color: #ddd; cursor: pointer;
-		font-size: 0.9rem; transition: all 0.15s ease;
+		background: #16161a;, border: 1px solid #333;
+		border-radius: 4px;, color: #ddd;, cursor: pointer;
+		font-size: 0.9rem;, transition: all 0.15s ease;
 	}
 
 	.pagination-btn:hover, not(disabled) {
 		background: #1a1a1f;
-		border-color: #9df; color: #9df;
+		border-color: #9df;, color: #9df;
 	}
 
 	.pagination-btn:disabled {
-		opacity: 0.5; cursor:not-allowed;
+		opacity: 0.5;, cursor:not-allowed;
 	}
 
 	.page-numbers {
-		display: flex; gap: 0.25rem;
+		display: flex;, gap: 0.25rem;
 	}
 
 	.page-number {
-		width: 32px; height: 32px; padding: 0; background: #16161a; border: 1px solid #333;
-		border-radius: 4px; color: #ddd; cursor: pointer;
-		font-size: 0.9rem; transition: all 0.15s ease;
+		width: 32px;, height: 32px;, padding: 0;, background: #16161a;, border: 1px solid #333;
+		border-radius: 4px;, color: #ddd;, cursor: pointer;
+		font-size: 0.9rem;, transition: all 0.15s ease;
 	}
 
 	.page-number:hover {
@@ -489,13 +489,13 @@
 
 	.page-number.active {
 		background: #9df;
-		border-color: #9df; color: #000;
+		border-color: #9df;, color: #000;
 		font-weight: 600;
 	}
 
 	/* Scrollbar */
 	::-webkit-scrollbar {
-		width: 6px; height: 6px;
+		width: 6px;, height: 6px;
 	}
 
 	::-webkit-scrollbar-track {

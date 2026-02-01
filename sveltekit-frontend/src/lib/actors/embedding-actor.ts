@@ -16,16 +16,16 @@ export interface EmbeddingInput {
 }
 
 export interface EmbeddingOutput {
-  embedding: number[]; dimension: number; model: string; metadata: { textLength: number; processingTime: number;
+  embedding: number[];, dimension: number;, model: string;, metadata: {, textLength: number;, processingTime: number;
     caseId?: string;
     evidenceId?: string;
     documentType?: string;
-    priority?: string; timestamp: Date;
+    priority?: string;, timestamp: Date;
   };
 }
 
 export interface EmbeddingError {
-  message: string; code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
+  message: string;, code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
   details?: any;
 }
 
@@ -58,9 +58,9 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingInput }>(as
 
     const processingTime = Date.now() - startTime;
 
-    		return { embedding: dimension: embedding.length,
+    		return { embedding: dimension, embedding.length,
 			model: 'nomic-embed-text',
-			metadata: { textLength: input.text.length,
+			metadata: {, textLength: input.text.length,
 				processingTime,
 				caseId: input.context?.caseId,
 				evidenceId: input.context?.evidenceId,

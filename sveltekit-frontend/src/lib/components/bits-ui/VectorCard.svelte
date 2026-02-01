@@ -12,7 +12,7 @@
 
 <style>
   .vector-card {
-    padding: 0.5rem; border: 1px solid #e5e7eb;
+    padding: 0.5rem;, border: 1px solid #e5e7eb;
     border-radius: 6px;
     margin-bottom: 0.5rem;
   }
@@ -24,7 +24,7 @@
     font-size: 0.9rem;
   }
   .meta {
-    font-size: 0.8rem; color: #9ca3af;
+    font-size: 0.8rem;, color: #9ca3af;
   }
 </style>
 

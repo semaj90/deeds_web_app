@@ -19,7 +19,7 @@ interface SearchHit {
 }
 
 interface CollectionsListResponse {
-    collections?: Array<{ name: string }>;
+    collections?: Array<{, name: string }>;
 }
 
 interface PayloadIndexBody {
@@ -30,8 +30,7 @@ interface PayloadIndexBody {
 }
 
 interface CreateCollectionBody {
-    vectors: {
-        size: number;
+    vectors: {, size: number;
         distance?: 'Cosine' | 'Dot' | 'Euclid';
     };
     [key: string]: unknown;
@@ -311,7 +310,7 @@ async function waitForQdrantReady(maxRetries = 15, delayMs = 2000): Promise<bool
 
 async function initQdrantIndexes(
     collectionName = process.env?.QDRANT_COLLECTION ?? 'documents'
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{, ok: boolean; error?: string }> {
     try {
         const cols = await qdrant.getCollections();
         const exists = cols?.collections?.some((c) => c.name === collectionName);
@@ -319,7 +318,7 @@ async function initQdrantIndexes(
         if (!exists) {
             const vectorSize = Number(process.env.EMBED_DIM ?? '1536');
             await qdrant.createCollection(collectionName, {
-                vectors: { size: vectorSize, distance: 'Cosine' }
+                vectors: {, size: vectorSize, distance: 'Cosine' }
             });
             console.log(`✅ Created collection: ${collectionName}`);
         }
@@ -344,7 +343,7 @@ async function initQdrantIndexes(
     }
 }
 
-async function bootstrapQdrant(collectionName?: string): Promise<{ ok: boolean; error?: string }> {
+async function bootstrapQdrant(collectionName?: string): Promise<{, ok: boolean; error?: string }> {
     const ready = await waitForQdrantReady();
     if (!ready) throw new Error('Qdrant startup timeout');
     return await initQdrantIndexes(collectionName ?? process.env?.QDRANT_COLLECTION ?? 'documents');

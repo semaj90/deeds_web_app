@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 
@@ -29,8 +29,8 @@ https, //svelte.dev/e/js_parse_error -->
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
-// REMOVED: { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
-// REMOVED: { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
+// REMOVED: {, id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+// REMOVED: {, id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
 
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
@@ -58,7 +58,7 @@ https, //svelte.dev/e/js_parse_error -->
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
  .map((caseItem: any) => ({
-// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
+// REMOVED: id, caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
  caseNumber: caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',

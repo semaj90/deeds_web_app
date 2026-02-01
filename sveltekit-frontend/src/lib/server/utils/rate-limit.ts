@@ -2,20 +2,18 @@
 // For production, consider using Redis or a proper rate limiting service
 
 export interface RateLimitConfig {
-    windowMs: number;
-    max: number;
+    windowMs: number;, max: number;
     message?: string;
 }
 
 export interface RateLimitResult {
-    allowed: boolean;
-    remaining: number;
+    allowed: boolean;, remaining: number;
     resetTime: number;
     retryAfter?: number;
 }
 
 class InMemoryRateLimiter {
-    private requests = new Map<string, { count: number; resetTime: number }>();
+    private requests = new Map<string, { count: number;, resetTime: number }>();
     private config: RateLimitConfig;
 
     constructor(config: RateLimitConfig) {

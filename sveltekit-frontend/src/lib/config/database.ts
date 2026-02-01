@@ -1,10 +1,8 @@
 import { getDatabaseConfig, getConnectionString } from './env';
 
 export interface PoolConfig {
-    connectionString: string;
-    max: number;
-    idleTimeoutMillis: number;
-    connectionTimeoutMillis: number;
+    connectionString: string;, max: number;
+    idleTimeoutMillis: number;, connectionTimeoutMillis: number;
 }
 
 /**
@@ -13,18 +11,15 @@ export interface PoolConfig {
 export function getPoolConfig(environment: 'development' | 'production' | 'test' = 'development'): PoolConfig {
     const config = getDatabaseConfig();
     const poolConfigs: Record<'development' | 'production' | 'test', Omit<PoolConfig, 'connectionString'>> = {
-        development: {
-            max: 5,
+        development: {, max: 5,
             idleTimeoutMillis: 30000,
             connectionTimeoutMillis: 10000
         },
-        production: {
-            max: config?.maxConnections ?? 20,
+        production: {, max: config?.maxConnections ?? 20,
             idleTimeoutMillis: config?.idleTimeoutMs ?? 60000,
             connectionTimeoutMillis: config?.connectionTimeoutMs ?? 5000
         },
-        test: {
-            max: 2,
+        test: {, max: 2,
             idleTimeoutMillis: 10000,
             connectionTimeoutMillis: 5000
         }

@@ -8,8 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
         steps?: any[];
         currentStep?: number
         validationResults?: Record<number {
-            isValid: boolean, errors: string[];
- warnings: string[];}>}
+            isValid: boolean, errors: string[];, warnings: string[];}>}
     let { steps = [], currentStep = 0, validationResults = }: Props = $props();
     function handleStepClick(stepIndex: number): void {
         if (stepIndex <= currentStep || !steps[stepIndex].required) {
@@ -57,7 +56,7 @@ https, //svelte.dev/e/js_parse_error -->
               disabled={!isClickable}
               class="group flex items-center" w-full text-left
                                    {isClickable
-                ? 'cursor-pointer hover:bg-gray-50, dark:hover:bg-gray-700'
+                ? 'cursor-pointer hover:bg-gray-50, dark: hover, bg-gray-700'
                 : 'cursor-not-allowed'}
                                    rounded-lg p-2 transition-colors duration-200"
               aria-current={status === 'current' ? 'step' : undefined}
@@ -132,7 +131,7 @@ https, //svelte.dev/e/js_parse_error -->
                   {/if}
                   <!-- Estimated, time, badge -->
                   <span
-                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark: bg-gray-700 dark: text-gray-200"
+                    class="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark: bg-gray-700, dark: text-gray-200"
                   >
                     ~{step.estimatedTime}m
                   </span>

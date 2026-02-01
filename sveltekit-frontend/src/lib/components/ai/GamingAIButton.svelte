@@ -26,9 +26,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     aria-label="AI Assistant Controls"
   > <!-- Quick: Action, Menu -->
   {#if isExpanded} <div class="flex flex-col gap-2"
-        in: fly={{ y: 20, duration: 200, delay: 100 }}; out: fly={{ y, 20, duration, 150 }} >
+        in: fly={{, y: 20, duration: 200, delay: 100 }}; out: fly={{ y, 20, duration, 150 }} >
   {#each quickActions as action, index} <button type="button"
-            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{ duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
+            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{, duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
             <!-- Action, Icon --> <div class="relative"> <svelte, component this={action.icon} class="w-5 h-5 text-gray-300 group-hover:text-white"
               /> <!-- Glow, effect --> <div class="absolute inset-0 opacity-0 group-hover:opacity-30"> <svelte, component this={action.icon} class="w-5 h-5 text-white"
                 /> </div> </div>

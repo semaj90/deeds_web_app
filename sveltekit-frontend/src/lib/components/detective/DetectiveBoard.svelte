@@ -48,10 +48,10 @@ let columns = $state([
 let canvasEvidence = $state<any[]>([]);
 let activeUsers = $state<any[]>([]);
 let systemStatus = $state({
-rabbitMQ: { connected: false, health: "unknown" },
-postgreSQL: { connected: false, vectorCount: 0 },
-gpu: { available: false, utilization: 0, model: "RTX 3060 Ti" },
-processingStats: { totalFiles: 0, processed: 0, queued: 0 }
+rabbitMQ: {, connected: false, health: "unknown" },
+postgreSQL: {, connected: false, vectorCount: 0 },
+gpu: {, available: false, utilization: 0, model: "RTX 3060 Ti" },
+processingStats: {, totalFiles: 0, processed: 0, queued: 0 }
 });
 
 let findModal = $state({ show: false, query: "", results: [] as any[], loading: false, error: "" });
@@ -101,7 +101,7 @@ url: result?.url
 columns = columns.map(col => col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col);
 }
 
-function handleDndFinalize(e: CustomEvent<{ items: any[] }>, columnId: string) {
+function handleDndFinalize(e: CustomEvent<{, items: any[] }>, columnId: string) {
 const { items } = e.detail;
 columns = columns.map(col => col.id === columnId ? { ...col, items } : col);
 }
@@ -145,7 +145,7 @@ findModal.results = fuse.search(findModal.query).map(r => r.item);
 const resp = await fetch("/api/vector-search", {
 method: "POST",
 headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ query: findModal.query })
+body: JSON.stringify({, query: findModal.query })
 });
 if (resp.ok) {
 const vectorResults = await resp.json();
@@ -204,7 +204,7 @@ canvasEvidence = [...canvasEvidence, item];
 <p class="title bg-background">{column.title} ({column.items.length})</p>
 
 <div class="flex-1 overflow-y-auto p-2 space-y-4 custom-scrollbar"
-use:dndzone={{ items: column.items, flipDurationMs: 200 }}
+use: dndzone={{, items: column.items, flipDurationMs: 200 }}
 onfinalize={(e: any) => handleDndFinalize(e, column.id)}
 >
 {#if column.id === "new"}
@@ -322,5 +322,5 @@ linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
 background-size: 40px 40px;
 }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor; opacity: 0.2; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: currentColor;, opacity: 0.2; }
 </style>

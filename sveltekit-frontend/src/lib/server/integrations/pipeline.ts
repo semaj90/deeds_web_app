@@ -47,19 +47,15 @@ interface DocumentMetadata {
 }
 
 interface ProcessedDocument {
-  id: string;
-  content: string;
-  embedding: Float32Array;
-  metadata: DocumentMetadata;
+  id: string;, content: string;
+  embedding: Float32Array;, metadata: DocumentMetadata;
   cached: boolean;
 }
 
 interface RAGResponse {
-  answer: string;
-  sources: SearchResult[];
+  answer: string;, sources: SearchResult[];
   model: string;
-  tokensUsed?: number;
-  cacheHit: boolean;
+  tokensUsed?: number;, cacheHit: boolean;
   processingTimeMs: number;
 }
 
@@ -71,10 +67,8 @@ interface RAGResponse {
  * - MinIO (document storage)
  */
 export class LegalAIPipeline {
-  ollama: OllamaService;
-  redis: RedisCacheService;
-  qdrant: QdrantVectorService;
-  minio: MinIOStorageService;
+  ollama: OllamaService;, redis: RedisCacheService;
+  qdrant: QdrantVectorService;, minio: MinIOStorageService;
   private config: Required<PipelineConfig>;
 
   constructor(config: PipelineConfig = {}) {
@@ -131,8 +125,7 @@ export class LegalAIPipeline {
       if (file) {
         await this.minio.uploadBuffer('legal-documents', `${documentId}.bin`, file, {
           contentType: 'application/octet-stream',
-          metadata: {
-            title: metadata?.title ?? 'Untitled',
+          metadata: {, title: metadata?.title ?? 'Untitled',
             type: metadata?.type ?? 'document',
             ingestionDate: new Date().toISOString(),
           },
@@ -351,7 +344,7 @@ export class LegalAIPipeline {
       temperature?: number;
       maxTokens?: number;
     }
-  ): AsyncGenerator<{ type: 'sources' | 'token' | 'done'; data: unknown }> {
+  ): AsyncGenerator<{, type: 'sources' | 'token' | 'done'; data: unknown }> {
     const topK = options?.topK ?? 5;
 
     // 1. Search for sources
@@ -363,7 +356,7 @@ export class LegalAIPipeline {
         type: 'token',
         data: 'I could not find any relevant information to answer your question.',
       };
-      yield { type: 'done', data: { sources: [], processingTimeMs: 0 } };
+      yield { type: 'done', data: {, sources: [], processingTimeMs: 0 } };
       return;
     }
 
@@ -397,8 +390,7 @@ export class LegalAIPipeline {
    * Batch ingest documents (with parallelization)
    */
   async batchIngest(
-    documents: Array<{
-      content: string;
+    documents: Array<{, content: string;
       metadata: DocumentMetadata;
       file?: Buffer;
     }>,
@@ -420,12 +412,9 @@ export class LegalAIPipeline {
   /**
    * Health check for all services
    */
-  async healthCheck(): Promise<{
-    overall: 'healthy' | 'degraded' | 'unavailable';
-    services: {
-      ollama: unknown;
-      redis: unknown;
-      qdrant: unknown;
+  async healthCheck(): Promise<{, overall: 'healthy' | 'degraded' | 'unavailable';
+    services: {, ollama: unknown;
+      redis: unknown;, qdrant: unknown;
       minio: unknown;
     };
   }> {

@@ -6,15 +6,13 @@
   import type { Snippet } from 'svelte';
 
   interface Evidence {
-    id: string;
-    title: string;
+    id: string;, title: string;
     description?: string;
     timestamp?: string;
   }
 
   interface WitnessStatement {
-    name: string;
-    statement: string;
+    name: string;, statement: string;
     timestamp?: string;
   }
 
@@ -48,7 +46,7 @@
 
 <style>
   .component-restored {
-    display: block; width: 100%;
+    display: block;, width: 100%;
   }
 </style>
 

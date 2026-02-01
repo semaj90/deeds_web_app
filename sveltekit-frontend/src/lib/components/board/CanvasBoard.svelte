@@ -2,16 +2,16 @@
  import { onMount } from 'svelte';
 
  interface Evidence {
- id: string; title: string;
+ id: string;, title: string;
  classification: 'public' | 'confidential' | 'sealed';
  status: 'pending' | 'approved' | 'locked' | 'rejected';
  type: 'document' | 'image' | 'audio' | 'video';
- boardPosition: { x: number; y: number };
+ boardPosition: {, x: number; y: number };
  }
 
  interface Relationship {
- id: string; sourceNodeId: string;
- targetNodeId: string; type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
+ id: string;, sourceNodeId: string;
+ targetNodeId: string;, type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
  confidence: number;
  }
 
@@ -28,7 +28,7 @@
  zoomLevel?: number;
  panX?: number;
  panY?: number;
- onUpdatePosition?: (event: { id: string; position: { x: number; y: number } }) => void;
+ onUpdatePosition?: (event: {, id: string; position: {, x: number; y: number } }) => void;
  }>();
 
  let canvas: HTMLCanvasElement;

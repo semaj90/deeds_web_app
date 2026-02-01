@@ -15,8 +15,7 @@ export type RouterFeatures = {
 };
 
 export interface RouterDecision {
-    useGPU: boolean;
-    useQUIC: boolean;
+    useGPU: boolean;, useQUIC: boolean;
     useCache: boolean;
     score?: number; // optional confidence score from model (0..1)
 }

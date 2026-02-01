@@ -16,15 +16,15 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  const cache = useCache();
 
  interface Evidence {
- id: string; fileName: string;
- documentType: string; inferenceConfidence: number;
+ id: string;, fileName: string;
+ documentType: string;, inferenceConfidence: number;
  status: 'pending' | 'approved' | 'rejected';
  createdAt: string;
  metadata?: Record<string, unknown>;
  }
 
  interface Case {
- id: string; title: string;
+ id: string;, title: string;
  createdAt: string;
  }
 
@@ -366,7 +366,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  class={`w-full text-left p-4 rounded-lg border-2 transition ${
  selectedEvidence?.id === item.id
  ? 'border-blue-500 bg-blue-50'
-  : 'border-gray-200 hover:border-gray-300'
+  : 'border-gray-200, hover:border-gray-300'
  }`}
  >
  <div class="flex items-start justify-between">

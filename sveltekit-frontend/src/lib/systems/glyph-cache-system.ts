@@ -7,48 +7,36 @@ import { chrRomPatternCache } from '../cache/chr-rom-pattern-cache.js';
 import { base64FP32Quantizer } from '../text/base64-fp32-quantizer.js';
 
 export interface GlyphTexture {
-    char: string;
-    charCode: number;
+    char: string;, charCode: number;
     nesPattern: Uint8Array; // 8x8 NES-style pattern
     quantizedData: Float32Array; // Quantized representation
     textureData: ImageData | null; // Rendered texture
     chrRomBankId: number; // CHR-ROM bank assignment
-    cacheTimestamp: number;
-    accessCount: number;
-    renderMetrics: {
-        width: number;
-        height: number;
-        pixelDensity: number;
+    cacheTimestamp: number;, accessCount: number;
+    renderMetrics: {, width: number;
+        height: number;, pixelDensity: number;
         colorDepth: number;
     };
 }
 
 export interface GlyphFont {
-    fontName: string;
-    fontSize: number;
+    fontName: string;, fontSize: number;
     fontStyle: 'classic' | 'modern' | 'legal' | 'retro';
     glyphs: Map<string, GlyphTexture>;
-    totalGlyphs: number;
-    cacheSize: number; // In bytes
+    totalGlyphs: number;, cacheSize: number; // In bytes
     lastOptimized: number;
 }
 
 export interface GlyphCacheMetrics {
-    totalGlyphs: number;
-    cacheHitRate: number;
-    memoryUsage: number;
-    renderingTime: number;
-    compressionRatio: number;
-    nesPatternEfficiency: number;
+    totalGlyphs: number;, cacheHitRate: number;
+    memoryUsage: number;, renderingTime: number;
+    compressionRatio: number;, nesPatternEfficiency: number;
 }
 
 export interface SynthesizedGlyph {
-    original: string;
-    synthesized: string;
-    confidence: number;
-    didYouMean: string[];
-    llmGenerated: boolean;
-    embeddings: Float32Array;
+    original: string;, synthesized: string;
+    confidence: number;, didYouMean: string[];
+    llmGenerated: boolean;, embeddings: Float32Array;
 }
 
 export class GlyphCacheSystem {
@@ -219,8 +207,7 @@ export class GlyphCacheSystem {
             chrRomBankId,
             cacheTimestamp: Date.now(),
             accessCount: 1,
-            renderMetrics: {
-                width: this.GLYPH_SIZE,
+            renderMetrics: {, width: this.GLYPH_SIZE,
                 height: this.GLYPH_SIZE,
                 pixelDensity: 1,
                 colorDepth: 32 // RGBA

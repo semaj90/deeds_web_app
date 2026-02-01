@@ -78,11 +78,11 @@ import type { Message } from '$lib/types';
 					embedding: simulateEmbedding,
 					summarize: simulateSummarization,
 					extract: simulateExtraction,
-					memory: { allocate: simulateMemoryAllocate,
+					memory: {, allocate: simulateMemoryAllocate,
 						free: simulateMemoryFree,
 						usage: simulateMemoryUsage
 					},
-					gpu: { initialize: simulateGPUInit,
+					gpu: {, initialize: simulateGPUInit,
 						transfer: simulateGPUTransfer,
 						compute: simulateGPUCompute
 					}
@@ -240,7 +240,7 @@ import type { Message } from '$lib/types';
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
 		return {
-			entities: [{ type: 'person', value: 'Client Entity', confidence: 0.9 }],
+			entities: [{, type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {

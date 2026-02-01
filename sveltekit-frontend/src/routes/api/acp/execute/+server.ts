@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const schema = getACPToolSchema(tool);
 		if (!schema) {
-			return json({ error: `Unknown tool: ${tool}` }, { status: 404 });
+			return json({ error: `Unknown, tool: ${tool}` }, { status: 404 });
 		}
 
 		const result = await executeACPTool(tool, args || {});
@@ -27,8 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			success: result.success,
 			result: result.data,
 			error: result.error,
-			metadata: {
-				duration: result.duration,
+			metadata: {, duration: result.duration,
 				totalTime: Date.now() - startTime,
 				timestamp: new Date().toISOString()
 			}

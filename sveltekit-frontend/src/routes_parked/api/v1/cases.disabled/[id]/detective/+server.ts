@@ -76,7 +76,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  success: true,
  data: {case: updatedCase,
  },
- meta: { userId: timestamp: new Date().toISOString(), action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
+ meta: {, userId: timestamp, new Date().toISOString(), action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
  },
  });
  } catch (err: unknown) {

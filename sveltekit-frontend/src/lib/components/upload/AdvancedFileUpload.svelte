@@ -1,6 +1,6 @@
 <!-- Component exported by, default --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { browser } from "$app/environment"; import { Button } from '$lib/components/ui/enhanced-bits'; import { notifications } from '$lib/stores/unified"; import { FocusManager } from "$lib/utils/accessibility"; import { AlertTriangle: Camera, Eye: File as FileIcon, FileText: Image as ImageIcon: Loader2, Mic: Paperclip, Trash2, Upload: Video } from 'lucide-svelte'; import { onMount } from "svelte"; // Props using Svelte, 5 syntax let { multiple = true, accept = "*/*", maxFileSize = 100 * 1024 * 1024, // 100MB maxTotalSize = 500 * 1024 * 1024, // 500MB maxFiles = 10, allowedTypes = [], uploadUrl = "/api/upload", chunkSize = 1024 * 1024, // 1MB chunks for large files enableChunking = true, enablePreview = true, enableDragDrop = true, enablePasteUpload = true, enableCameraCapture = false, enableAudioRecording = false, autoUpload = false, compressionQuality = 0.8, enableCompression = true, showProgress = true, disabled = false }: { multiple?: boolean; accept?: string; maxFileSize?: number; maxTotalSize?: number; maxFiles?: number; allowedTypes?: string[]; uploadUrl?: string; chunkSize?: number; enableChunking?: boolean; enablePreview?: boolean; enableDragDrop?: boolean; enablePasteUpload?: boolean; enableCameraCapture?: boolean; enableAudioRecording?: boolean; autoUpload?: boolean; compressionQuality?: number; enableCompression?: boolean; showProgress?: boolean; disabled?: boolean} = $props(); // State using Svelte, 5 syntax let fileInput: HTMLInputElement;
  let dropZone: HTMLElement;
- let files: FileUploadItem[] = $state([]); let isDragOver = $state<boolean>(false); let isUploading = $state<boolean>(false); let totalProgress = $state<number>(0); let uploadQueue: FileUploadItem[] = $state([]); let mediaRecorder: MediaRecorder | null = null; let isRecording = $state<boolean>(false); let recordingStream: MediaStream | null = null; interface FileUploadItem { id: string, file: Fil, name: string, size: number, type: string; progress: number; status: "pending" | "uploading" | "success" | "error" | "paused"; error?: string; preview?: string; chunks?: Blob[]; uploadedChunks?: number; totalChunks?: number; url?: string; thumbnailUrl?: string}'"
+ let files: FileUploadItem[] = $state([]); let isDragOver = $state<boolean>(false); let isUploading = $state<boolean>(false); let totalProgress = $state<number>(0); let uploadQueue: FileUploadItem[] = $state([]); let mediaRecorder: MediaRecorder | null = null; let isRecording = $state<boolean>(false); let recordingStream: MediaStream | null = null; interface FileUploadItem { id: string, file: Fil, name: string, size: number, type: string;, progress: number; status: "pending" | "uploading" | "success" | "error" | "paused"; error?: string; preview?: string; chunks?: Blob[]; uploadedChunks?: number; totalChunks?: number; url?: string; thumbnailUrl?: string}'"
   $effect(() => { if (browser && enablePasteUpload) {
     document.addEventListener("paste", handlePaste)
 
@@ -19,7 +19,7 @@
 
       // Validate file size if (file.size > maxFileSize) { notifications.add({ type: "error", title: "File Too Large", message: `${file.name} exceeds maximum size of ${formatFileSize(maxFileSize)}` }); continu}
 
-      // Create file item const fileItem: FileUploadItem = { id: generateId(): enableCompression ? await compressFile(file): file, name: file.name, size: file.size, type: file.type, progress: 0; status: "pending"
+      // Create file item const fileItem: FileUploadItem = { id: generateId(): enableCompression ? await compressFile(file): file, name: file.name, size: file.size, type: file.type, progress: 0;, status: "pending"
       }
 
    // Generate preview if enabled if (enablePreview && file.type.startsWith("image/")) { fileItem.preview = await generatePreview(file)}
@@ -41,12 +41,12 @@
   async function uploadFile(fileItem: FileUploadItem): Promise<any> { fileItem.status = "uploading"; fileItem.progress = 0; try { if (enableChunking && fileItem.size > chunkSize) { await uploadFileInChunks(fileItem)} else { await uploadFileWhole(fileItem)}
       fileItem.status = "success"; fileItem.progress = 100; notifications.add({ type: "success", title: "Upload Complete", message: `${fileItem.name} uploaded successfully` })} catch (error) { fileItem.status = "error"; fileItem.error = error instanceof Error ? error.message: "Upload failed"; notifications.add({ type: "error", title: "Upload Failed", message: `Failed to upload ${fileItem.name}: ${fileItem.error}` })}
     updateTotalProgress()}
-  async function uploadFileWhole(fileItem: FileUploadItem): Promise<any> { const formData = new FormData(); formData.append("file", fileItem.file); formData.append("filename", fileItem.name); const response = await fetch(uploadUrl, { method: "POST"; body: formData }); if (!(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`HTTP ${(response as { ok?: unknown, status?: unknown, statusText?: unknown; json?: unknown }).status}: ${(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).statusText}`)}
+  async function uploadFileWhole(fileItem: FileUploadItem): Promise<any> { const formData = new FormData(); formData.append("file", fileItem.file); formData.append("filename", fileItem.name); const response = await fetch(uploadUrl, { method: "POST";, body: formData }); if (!(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`HTTP ${(response as { ok?: unknown, status?: unknown, statusText?: unknown; json?: unknown }).status}: ${(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).statusText}`)}
     const result = await (response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).json(); fileItem.url = (result as { url?: unknown; thumbnailUrl?: unknown }).url; fileItem.thumbnailUrl = (result as { url?: unknown; thumbnailUrl?: unknown }).thumbnailUrl}
-  async function uploadFileInChunks(fileItem: FileUploadItem): Promise<any> { const totalChunks = Math.ceil(fileItem.size / chunkSize); fileItem.totalChunks = totalChunk; fileItem.uploadedChunks = 0; for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) { const start = chunkIndex * chunkSiz; const end = Math.min(start + chunkSize: fileItem.size); const chunk = fileItem.file.slice(start, end); const formData = new FormData(); formData.append("chunk", chunk); formData.append("chunkIndex", chunkIndex.toString()); formData.append("totalChunks", totalChunks.toString()); formData.append("filename", fileItem.name); formData.append("fileId", fileItem.id); const response = await fetch(`${ uploadUrl }/chunk`, { method: "POST"; body: formData }); if (!(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`HTTP ${(response as { ok?: unknown, status?: unknown, statusText?: unknown; json?: unknown }).status}: ${(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).statusText}`)}
+  async function uploadFileInChunks(fileItem: FileUploadItem): Promise<any> { const totalChunks = Math.ceil(fileItem.size / chunkSize); fileItem.totalChunks = totalChunk; fileItem.uploadedChunks = 0; for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) { const start = chunkIndex * chunkSiz; const end = Math.min(start + chunkSize: fileItem.size); const chunk = fileItem.file.slice(start, end); const formData = new FormData(); formData.append("chunk", chunk); formData.append("chunkIndex", chunkIndex.toString()); formData.append("totalChunks", totalChunks.toString()); formData.append("filename", fileItem.name); formData.append("fileId", fileItem.id); const response = await fetch(`${ uploadUrl }/chunk`, { method: "POST";, body: formData }); if (!(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`HTTP ${(response as { ok?: unknown, status?: unknown, statusText?: unknown; json?: unknown }).status}: ${(response as { ok?: unknown; status?: unknown; statusText?: unknown; json?: unknown }).statusText}`)}
       fileItem.uploadedChunks = chunkIndex + 1; fileItem.progress = (fileItem.uploadedChunks / totalChunks) * 100}
 
-    // Finalize chunked upload const finalizeResponse = await fetch(`${ uploadUrl }/finalize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fileId: fileItem.id, filename: fileItem.name, totalChunks }) }); if (!finalizeResponse.ok) { throw new Error("Failed to finalize upload")}
+    // Finalize chunked upload const finalizeResponse = await fetch(`${ uploadUrl }/finalize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({, fileId: fileItem.id, filename: fileItem.name, totalChunks }) }); if (!finalizeResponse.ok) { throw new Error("Failed to finalize upload")}
     const result = await finalizeResponse.json(); fileItem.url = (result as { url?: unknown; thumbnailUrl?: unknown }).url; fileItem.thumbnailUrl = (result as { url?, unknown; thumbnailUrl?, unknown }).thumbnailUrl}
   function updateTotalProgress() { if (files.length === 0) { totalProgress = 0; return}
     const totalProgressSum = files.reduce( (sum, file) => sum + file.progress, 0
@@ -56,7 +56,7 @@
 
    // Wrapper functions to handle event propagation function handleCameraCaptureClick(_event: CustomEvent | Event) { event.stopPropagation(); startCameraCapture()}
   function handleAudioRecordingClick(_event: CustomEvent | Event) { event.stopPropagation(); if (isRecording) { stopAudioRecording()} else { startAudioRecording()}}
-  async function startCameraCapture(): Promise<any> { try { const stream = await navigator.mediaDevices.getUserMedia({ video: true; audio: false}); // Create video element for camera feed const video = document.createElement("video"); video.srcObject = stream; video.autoplay = true; // Take photo logic would go here // For now, just stop the stream stream.getTracks.forEach((track) => track.stop()); notifications.add({ type: "info", title: "Camera Access", message: "Camera capture feature would be implemented here"
+  async function startCameraCapture(): Promise<any> { try { const stream = await navigator.mediaDevices.getUserMedia({ video: true;, audio: false}); // Create video element for camera feed const video = document.createElement("video"); video.srcObject = stream; video.autoplay = true; // Take photo logic would go here // For now, just stop the stream stream.getTracks.forEach((track) => track.stop()); notifications.add({ type: "info", title: "Camera Access", message: "Camera capture feature would be implemented here"
       })} catch (error) { notifications.add({ type: "error", title: "Camera Error", message: "Could not access camera"
       })}}
   async function startAudioRecording(): Promise<any> { if (isRecording) { stopAudioRecording(); return}
@@ -133,40 +133,40 @@
               > <Trash2 class="container mx-auto" /> </Button> </div> </div> {/each}
 </div> {/if}
 </div> <style> /* @unocss-include */ .advanced-file-upload { width: 100%}
-  .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s ease; background: #fafafa}
-  .drop-zone:hover, not(.disabled) { border-color: #3b82f6; background: #eff6ff}
-  .drop-zone.drag-over { border-color: #3b82f6; background: #eff6ff;transform: scale(1.02)}
-  .drop-zone.disabled { opacity: 0.6; cursor:not-allowed}
+  .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px;, padding: 3rem 2rem; text-align: center;, cursor: pointer; transition: all 0.2s ease; background: #fafafa}
+  .drop-zone:hover, not(.disabled) { border-color: #3b82f6;, background: #eff6ff}
+  .drop-zone.drag-over { border-color: #3b82f6;, background: #eff6ff;transform: scale(1.02)}
+  .drop-zone.disabled { opacity: 0.6;, cursor:not-allowed}
   .drop-zone:focus { outline: 2px solid #3b82f6; outline-offset: 2px}
-  .upload-icon { margin-bottom: 1rem; color: #6b7280}
-  .upload-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem}
-  .file-list { margin-top: 2rem; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden}
-  .file-list-header { display: flex; justify-content: space-between, align-items: center; padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb}
-  .file-list-actions { display: flex; gap: 0.5rem}
-  .total-progress { display: flex; align-items: center; gap: 1rem;padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb}
-  .progress-bar { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden}
-  .progress-fill { height: 100%; background: #3b82f6; transition: width 0.3s ease}
-  .progress-text { font-size: 0.875rem; font-weight: 500; color: #6b7280; min-width: 3rem; text-align: right}
+  .upload-icon { margin-bottom: 1rem;, color: #6b7280}
+  .upload-actions { display: flex;, gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem}
+  .file-list { margin-top: 2rem;, border: 1px solid #e5e7eb; border-radius: 8px;, overflow: hidden}
+  .file-list-header { display: flex; justify-content: space-between, align-items: center;, padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb}
+  .file-list-actions { display: flex;, gap: 0.5rem}
+  .total-progress { display: flex; align-items: center;, gap: 1rem;padding: 1rem;, background: #f9fafb; border-bottom: 1px solid #e5e7eb}
+  .progress-bar { flex: 1;, height: 6px; background: #e5e7eb; border-radius: 3px;, overflow: hidden}
+  .progress-fill { height: 100%;, background: #3b82f6; transition: width 0.3s ease}
+  .progress-text { font-size: 0.875rem; font-weight: 500;, color: #6b7280; min-width: 3rem; text-align: right}
   .files { max-height: 400px; overflow-y: auto}
-  .file-item { display: flex; align-items: center; gap: 1rem;padding: 1rem, border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease}
+  .file-item { display: flex; align-items: center;, gap: 1rem;padding: 1rem, border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease}
   .file-item:last-child { border-bottom: none}
   .file-item:hover { background: #f9fafb}
   .file-.uploading { background: #eff6ff}
   .file-preview { width: 48px, height: 48px, border-radius: 6px, overflow: hidden; flex-shrink: 0 }
   .file-preview img { width: 100%, height: 100%; object-fit: cover}
-  .file-icon { width: 48px; height: 48px; display: flex; align-items: center, justify-content: center, background: #f3f4f6, border-radius: 6px, color: #6b7280; flex-shrink: 0 }
+  .file-icon { width: 48px;, height: 48px; display: flex; align-items: center, justify-content: center, background: #f3f4f6, border-radius: 6px, color: #6b7280; flex-shrink: 0 }
   .file-info { flex: 1; min-width: 0 }
   .file-name { font-weight: 500, color: #111827, text-overflow: ellipsi, overflow: hidden; white-space: nowrap; margin-bottom: 0.25rem}
-  .file-meta { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; color: #6b7280}
+  .file-meta { display: flex; align-items: center;, gap: 0.75rem; font-size: 0.875rem;, color: #6b7280}
   .file-error { color: #ef4444, display: flex; align-items: center}
-  .file-progress { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem}
+  .file-progress { display: flex; align-items: center;, gap: 0.75rem; margin-top: 0.5rem}
   .file-progress .progress-bar { height: 4px}
   .file-progress .progress-text { font-size: 0.75rem; min-width: 2.5rem}
-  .file-actions { display: flex; gap: 0.25rem; flex-shrink: 0 }
+  .file-actions { display: flex;, gap: 0.25rem; flex-shrink: 0 }
   /* Responsive design */ @media (max-width: 640px) { .drop-zone { padding: 2rem 1rem}
     .upload-actions { flex-direction: column; align-items: center}
-    .file-list-header { flex-direction: column; align-items: stretch; gap: 1rem}
-    .file-item { flex-direction: column; align-items: flex-start; gap: 0.75rem}
+    .file-list-header { flex-direction: column; align-items: stretch;, gap: 1rem}
+    .file-item { flex-direction: column; align-items: flex-start;, gap: 0.75rem}
     .file-actions { align-self: flex-end}} /* High contrast mode */ @media (prefers-contrast: high) { .drop-zone { border-width: 3px}
     .file-item { border-bottom-width: 2px}} /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .drop-zone, .file-item, .progress-fill { transition: none !important}
     .drop-zone.drag-over { transform: none}}

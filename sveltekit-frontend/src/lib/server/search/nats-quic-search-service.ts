@@ -39,8 +39,7 @@ const SEARCH_TOPICS = {
 
 // Search Request/Response Types
 export interface SearchRequest {
-    id: string;
-    query: string;
+    id: string;, query: string;
     searchType: 'semantic' | 'text' | 'hybrid';
     filters?: {
         caseId?: string;
@@ -62,40 +61,30 @@ export interface SearchRequest {
 }
 
 export interface SearchResponse {
-    id: string;
-    success: boolean;
+    id: string;, success: boolean;
     results?: SearchResult[];
     error?: string;
-    analytics?: {
-        totalResults: number;
-        processingTime: number;
-        cacheHit: boolean;
-        searchType: string;
-        hasEmbedding: boolean;
+    analytics?: {, totalResults: number;
+        processingTime: number;, cacheHit: boolean;
+        searchType: string;, hasEmbedding: boolean;
     };
-    suggestions?: string[];
-    timestamp: number;
+    suggestions?: string[];, timestamp: number;
 }
 
 export interface SearchSuggestion {
-    query: string;
-    score: number;
-    frequency: number;
-    lastUsed: number;
+    query: string;, score: number;
+    frequency: number;, lastUsed: number;
 }
 
 // Add typed interfaces for health/metrics to avoid `any`
 export interface ServiceMetrics {
-    requestsProcessed: number;
-    avgResponseTime: number;
-    cacheHitRate: number;
-    activeConnections: number;
+    requestsProcessed: number;, avgResponseTime: number;
+    cacheHitRate: number;, activeConnections: number;
     suggestionsGenerated: number;
 };
 
 export interface HealthStatus {
-    initialized: boolean;
-    quicEnabled: boolean;
+    initialized: boolean;, quicEnabled: boolean;
     metrics: ServiceMetrics;
 };
 
@@ -150,8 +139,7 @@ export class NatsQuicSearchService {
             id: `test_${Date.now()}`,
             query,
             searchType: options.type ?? 'hybrid',
-            options: {
-                limit: options.limit,
+            options: {, limit: options.limit,
                 threshold: options.threshold
             },
             timestamp: Date.now()
@@ -225,8 +213,7 @@ export class NatsQuicSearchService {
                         ...cachedResponse,
                         id: request.id,
                         timestamp: Date.now(),
-                        analytics: {
-                            totalResults: cachedResponse.analytics?.totalResults ?? cachedResponse.results?.length ?? 0,
+                        analytics: {, totalResults: cachedResponse.analytics?.totalResults ?? cachedResponse.results?.length ?? 0,
                             processingTime: Date.now() - startTime,
                             cacheHit: true,
                             searchType: cachedResponse.analytics?.searchType ?? request.searchType,
@@ -296,8 +283,7 @@ export class NatsQuicSearchService {
                 id: request.id,
                 success: true,
                 results: uniqueResults,
-                analytics: {
-                    totalResults: uniqueResults.length,
+                analytics: {, totalResults: uniqueResults.length,
                     processingTime: Date.now() - startTime,
                     cacheHit: false,
                     searchType: request.searchType,
@@ -322,8 +308,7 @@ export class NatsQuicSearchService {
             const response = await fetch('http://localhost:11434/api/embeddings', {
                 method: 'POST',
                 headers: { 'Content-Type': `application/json` },
-                body: fastStringify({
-                    model: model ?? 'embeddinggemma:latest',
+                body: fastStringify({, model: model ?? 'embeddinggemma:latest',
                     prompt: query.slice(0, 2048)
                 }),
                 signal: AbortSignal.timeout(15000)
@@ -347,8 +332,7 @@ export class NatsQuicSearchService {
             query: request.query,
             searchType: request.searchType,
             filters: request.filters,
-            options: {
-                limit: request.options?.limit,
+            options: {, limit: request.options?.limit,
                 threshold: request.options?.threshold,
                 model: request.options?.model ?? 'unknown'
             }

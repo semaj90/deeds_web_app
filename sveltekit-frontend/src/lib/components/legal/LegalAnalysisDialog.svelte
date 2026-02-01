@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   let prompt = ''; let analysisType: 'case_analysis' | 'legal_research' | 'document_review' | 'precedent_search' = 'case_analysis'; let loading = $state<boolean>(false); let analysis: LegalAnalysis | null = null; let error = ''; const analysisTypes = [ { value: 'case_analysis', label: 'Case Analysis' }, { value: 'legal_research', label: 'Legal Research' }, { value: 'document_review', label: 'Document Review' }, { value: 'precedent_search', label: 'Precedent Search' } ]; async function performAnalysis(): Promise<any> { if (!prompt.trim()) { error = 'Please enter an analysis prompt'; return}
     loading = true; error = ''; try { const response = await fetch('/api/legal/chat', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: { caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
+        }, body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: {, caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
         }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       analysis = await response.json(); onAnalysisComplete(analysis)} catch (err) { error = err instanceof Error ? err.message: 'Analysis failed'; console.error('Legal analysis, error:', err)} finally { loading = false}'
   }
@@ -13,11 +13,11 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function closeDialog() { isOpen = false; resetDialog()}
   $effect(() => { if (!isOpen) { resetDialog()}
 </script> <Dialog bind:isOpen title="Legal: AI, Analysis" onClose={ closeDialog }> <div class="space-y-6"> {#if !analysis} <!-- Analysis: Input, Form --> <div class="space-y-4"> <div> <label for="analysis-type" class="block text-sm font-medium"> Analysis Type </label> <select id="analysis-type"
-            bind:value={ analysisType } class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            bind:value={ analysisType } class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
           > {#each Array.isArray(analysisTypes) ? analysisTypes: [] as type} <option value={type.value}>{type.label}</option> {/each} </select> </div> <div> <label for="prompt" class="block text-sm font-medium"> Analysis Prompt </label> <textarea id="prompt"
             bind:value={ prompt } placeholder="Enter your legal analysis question or prompt..."
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2"
           ></textarea> </div> {#if error} <div class="p-3 bg-red-50 border border-red-200"> <p class="text-sm">{ error }</p> {/if} <div class="flex gap-3"> <button type="button"
             onclick={ performAnalysis } disabled={loading || !prompt.trim()} class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled, opacity-50"
           > {#if loading} <span class="flex items-center justify-center"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> Analyzing... </span> {:else} Perform Analysis {/if} </button> <button type="button"

@@ -21,10 +21,8 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface PaginatedResponse<T = unknown> {
- data: T[];
- page: number;
- limit: number;
- total: number;
+ data: T[];, page: number;
+ limit: number;, total: number;
  totalPages: number;
  hasNext?: boolean;
  hasPrev?: boolean;
@@ -195,7 +193,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new case
  */
  async createCase(
- caseData: { title: string,
+ caseData: {, title: string,
  description?: string,
  caseNumber?: string;
  status?: 'open' | 'closed' | 'pending' | 'archived';
@@ -212,8 +210,8 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update case
  */
  async updateCase(
- id: string, caseData: Partial<{ title: string, description: string, caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived',
- priority: 'low' | 'medium' | 'high' | 'urgent', category: string; metadata: Record<string, unknown>;
+ id: string, caseData: Partial<{, title: string, description: string, caseNumber: string, status: 'open' | 'closed' | 'pending' | 'archived',
+ priority: 'low' | 'medium' | 'high' | 'urgent', category: string;, metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -260,7 +258,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new evidence
  */
  async createEvidence(
- evidenceData: { caseId: string, title: string, evidenceType: string,
+ evidenceData: {, caseId: string, title: string, evidenceType: string,
  description?: string;
  fileUrl?: string;
  fileName?: string;
@@ -287,7 +285,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update evidence
  */
  async updateEvidence(
- id: string, evidenceData: Partial<{ title: string, evidenceType: string, description: string, fileUrl: string, fileName: string, fileSize: number; mimeType: string, hash: string; tags: string[], chainOfCustody: unknown[]; aiSummary: string, summary: string; isAdmissible: boolean, confidentialityLevel: string;
+ id: string, evidenceData: Partial<{, title: string, evidenceType: string, description: string, fileUrl: string, fileName: string, fileSize: number;, mimeType: string, hash: string;, tags: string[], chainOfCustody: unknown[];, aiSummary: string, summary: string;, isAdmissible: boolean, confidentialityLevel: string;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -334,7 +332,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new report
  */
  async createReport(
- reportData: { title: string,
+ reportData: {, title: string,
  description?: string, reportType: string;
  caseId?: string;
  content?: string;
@@ -354,7 +352,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update report
  */
  async updateReport(
- id: string, reportData: Partial<{ title: string, description: string, reportType: string, caseId: string, content: string, status: string; metadata: Record<string, unknown>;
+ id: string, reportData: Partial<{, title: string, description: string, reportType: string, caseId: string, content: string, status: string;, metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
  ): Promise<ApiResponse<unknown>> {
@@ -400,7 +398,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Create new person of interest
  */
  async createPersonOfInterest(
- personData: { name: string,
+ personData: {, name: string,
  description?: string, riskLevel: string;
  caseId?: string;
  contactInfo?: Record<string, unknown>;
@@ -420,7 +418,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  * Update person of interest
  */
  async updatePersonOfInterest(
- id: string, personData: Partial<{ name: string, description: string, riskLevel: string, caseId: string, contactInfo: Record<string, unknown>;
+ id: string, personData: Partial<{, name: string, description: string, riskLevel: string, caseId: string, contactInfo: Record<string, unknown>;
  aliases: string[], metadata: Record<string, unknown>;
  }>,
  signal?: AbortSignal
@@ -450,7 +448,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  file: File,
  onProgress?: (progress: number) => void,
  signal?: AbortSignal
- ): Promise<{ fileUrl: string; fileName: string; fileSize: number; mimeType: string; hash: string }>
+ ): Promise<{, fileUrl: string; fileName: string;, fileSize: number; mimeType: string;, hash: string }>
  {
  const formData = new FormData();
  formData.append('file', file);
@@ -482,7 +480,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  const parsed = text ? JSON.parse(text) : {};
  // Expect server to return ApiResponse-like payload
  if ((parsed as ApiResponse<unknown>)?.success) {
- 	resolve((parsed as ApiResponse<{ fileUrl: string; fileName: string; fileSize: number; mimeType: string; hash: string }>).data ?? (parsed as any));
+ 	resolve((parsed as ApiResponse<{ fileUrl: string;, fileName: string; fileSize: number;, mimeType: string; hash: string }>).data ?? (parsed as any));
  } else {
  	resolve(parsed as any);
  }
@@ -515,10 +513,10 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  async getHealthStatus(
  signal?: AbortSignal
  ): Promise<
- ApiResponse<{ status: string, timestamp: string; services: Record<string, unknown> }>
+ ApiResponse<{ status: string, timestamp: string;, services: Record<string, unknown> }>
  > {
  return this.request<
- ApiResponse<{ status: string, timestamp: string; services: Record<string, unknown> }>
+ ApiResponse<{ status: string, timestamp: string;, services: Record<string, unknown> }>
  >('/health', { signal });
  }
 }

@@ -20,26 +20,26 @@
  } from 'lucide-svelte';
 
  interface PhysicalDescription {
- height: string; weight: string;
- hair: string; eyes: string;
+ height: string;, weight: string;
+ hair: string;, eyes: string;
  distinguishingMarks: string;
  }
 
  interface ProfileData {
- modusOperandi: string; knownHabits: string[];
+ modusOperandi: string;, knownHabits: string[];
  associates: string[];
  }
 
  interface Poi {
- id?: string; name: string;
- aliases: string[]; dateOfBirth: string;
- address: string; phone: string;
- email: string; status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
+ id?: string;, name: string;
+ aliases: string[];, dateOfBirth: string;
+ address: string;, phone: string;
+ email: string;, status: 'person_of_interest' | 'witness' | 'suspect' | 'victim' | 'informant';
  priority: 'low' | 'medium' | 'high' | 'critical';
  threatLevel: 'low' | 'medium' | 'high' | 'extreme';
- physicalDescription: PhysicalDescription; profileData: ProfileData;
- lastKnownLocation: string; lastSeen: string;
- dangerLevel: number; notes: string;
+ physicalDescription: PhysicalDescription;, profileData: ProfileData;
+ lastKnownLocation: string;, lastSeen: string;
+ dangerLevel: number;, notes: string;
  photo?: string;
  tags?: string[];
  createdAt?: string;
@@ -47,7 +47,7 @@
  }
 
  interface Props {
- poi: Poi, null; open: boolean; onOpenChange: (open: boolean) => void;
+ poi: Poi, null; open: boolean;, onOpenChange: (open: boolean) => void;
  onEdit: (poi: Poi) => void;
  }
 

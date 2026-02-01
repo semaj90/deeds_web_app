@@ -4,8 +4,7 @@ import { mat4, vec4 } from 'gl-matrix';
 
 export interface MatrixUINode {
     type?: 'button' | 'card' | 'input' | 'dialog' | 'grid' | 'evidence-item' | 'panel' | 'text' | 'image' | 'container';
-    id: string;
-    matrix: number[]; // 4x4 transform matrix
+    id: string;, matrix: number[]; // 4x4 transform matrix
     styles: {
         base?: string;
         color?: string;
@@ -28,48 +27,36 @@ export interface MatrixUINode {
         component?: string;
     };
     content?: string;
-    bounds?: { x: number; y: number; width: number; height: number };
+    bounds?: {, x: number; y: number;, width: number; height: number };
 }
 
 export interface EnhancedWebGLBuffer {
-    vertices: Float32Array;
-    indices: Uint16Array;
-    colors: Float32Array;
-    texCoords: Float32Array;
-    matrices: Float32Array;
-    metadata: {
-        vertexCount: number;
-        indexCount: number;
-        nodeCount: number;
-        lodLevel: 'low' | 'mid' | 'high';
+    vertices: Float32Array;, indices: Uint16Array;
+    colors: Float32Array;, texCoords: Float32Array;
+    matrices: Float32Array;, metadata: {
+        vertexCount: number;, indexCount: number;
+        nodeCount: number;, lodLevel: 'low' | 'mid' | 'high';
         shaderComplexity: 'basic' | 'standard' | 'advanced';
     };
 }
 
 export interface CSSOutput {
-    classes: string[];
-    variables: Record<string, string>;
-    animations: string[];
-    unoCSS: string;
+    classes: string[];, variables: Record<string, string>;
+    animations: string[];, unoCSS: string;
 }
 
 export interface EventMapping {
-    nodeId: string;
-    events: {
-        type: string;
-        handler: string;
-        matrix: number[];
-        bounds: { x: number; y: number; width: number; height: number };
+    nodeId: string;, events: {
+        type: string;, handler: string;
+        matrix: number[];, bounds: { x: number;, y: number; width: number;, height: number };
     }[];
 }
 
 export interface CompiledNode {
-    element: HTMLElement;
-    matrix: mat4;
+    element: HTMLElement;, matrix: mat4;
     cssClasses: string[];
     webglBuffer?: WebGLBuffer;
-    enhancedBuffer?: EnhancedWebGLBuffer;
-    lodLevel: 'low' | 'mid' | 'high';
+    enhancedBuffer?: EnhancedWebGLBuffer;, lodLevel: 'low' | 'mid' | 'high';
 }
 
 export class MatrixUICompiler {
@@ -77,9 +64,9 @@ export class MatrixUICompiler {
     private cssCache = new Map<string, string>();
     private bufferCache = new Map<string, WebGLBuffer>();
     private lodThresholds = {
-        low: { maxVertices: 1000, maxNodes: 50 },
-        mid: { maxVertices: 5000, maxNodes: 200 },
-        high: { maxVertices: 20000, maxNodes: 1000 }
+        low: {, maxVertices: 1000, maxNodes: 50 },
+        mid: {, maxVertices: 5000, maxNodes: 200 },
+        high: {, maxVertices: 20000, maxNodes: 1000 }
     };
 
     constructor(canvas?: HTMLCanvasElement) {
@@ -94,12 +81,9 @@ export class MatrixUICompiler {
     async compileEnhanced(
         nodes: MatrixUINode[],
         _xstateContext?: unknown
-    ): Promise<{
-        compiled: CompiledNode[];
-        webgl: EnhancedWebGLBuffer;
-        css: CSSOutput;
-        events: EventMapping[];
-        optimizations: string[];
+    ): Promise<{, compiled: CompiledNode[];
+        webgl: EnhancedWebGLBuffer;, css: CSSOutput;
+        events: EventMapping[];, optimizations: string[];
     }> {
         const optimizations: string[] = [];
 

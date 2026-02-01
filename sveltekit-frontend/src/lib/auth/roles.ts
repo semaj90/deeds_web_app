@@ -42,12 +42,12 @@ export type Permission =
 	| 'manage_integrations';
 
 export interface RoleDefinition {
-	name: UserRole; displayName: string; description: string; permissions: Permission[]; hierarchyLevel: number; // Higher number = more authority, canDelegate: boolean;
+	name: UserRole;, displayName: string;, description: string;, permissions: Permission[];, hierarchyLevel: number; // Higher number = more authority, canDelegate: boolean;
 	maxCasesAssigned?: number;
 }
 // Role definitions with complete permission sets
 export const ROLES: Record<UserRole, RoleDefinition> = {
-	admin: { name: 'admin',
+	admin: {, name: 'admin',
 		displayName: 'System Administrator',
 		description: 'Full system access with all administrative privileges',
  hierarchyLevel: 100,
@@ -83,7 +83,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'manage_integrations'
 		]
 	},
-	lead_prosecutor: { name: 'lead_prosecutor',
+	lead_prosecutor: {, name: 'lead_prosecutor',
 		displayName: 'Lead Prosecutor',
 		description: 'Senior prosecutor with case management and team oversight responsibilities',
  hierarchyLevel: 80,
@@ -112,7 +112,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'approve_reports'
 		]
 	},
-	prosecutor: { name: 'prosecutor',
+	prosecutor: {, name: 'prosecutor',
 		displayName: 'Prosecutor',
  hierarchyLevel: 60,
  canDelegate: false,cases',
@@ -136,7 +136,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'edit_criminals'
 		]
 	},
-	paralegal: { name: 'paralegal',
+	paralegal: {, name: 'paralegal',
 		displayName: 'Paralegal',
  hierarchyLevel: 40,
  canDelegate: false,nd evidence management duties',
@@ -155,7 +155,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'view_criminals'
 		]
 	},
-	investigator: { name: 'investigator',
+	investigator: {, name: 'investigator',
 		displayName: 'Criminal Investigator',
  hierarchyLevel: 50,
  canDelegate: false,nce collection responsibilities',
@@ -175,7 +175,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'view_criminals'
 		]
 	},
-	analyst: { name: 'analyst',
+	analyst: {, name: 'analyst',
  hierarchyLevel: 45,
  canDelegate: false,
 		description: 'Specialized analyst with advanced AI and data analysis capabilities',
@@ -193,7 +193,7 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 			'view_criminals'
 		]
 	},
-	viewer: { name: 'viewer',
+	viewer: {, name: 'viewer',
  hierarchyLevel: 10,
  canDelegate: false,
 		description: 'Read-only access for supervisors and auditors',
@@ -210,25 +210,25 @@ export const ROLES: Record<UserRole, RoleDefinition> = {
 
 // Permission categories for UI organization
 export const PERMISSION_CATEGORIES = {
-	case_management: { name: 'Case Management',
+	case_management: {, name: 'Case Management',
 		permissions: ['create_case', 'edit_case', 'delete_case', 'view_case', 'assign_cases'] as Permission[]
 	},
-	evidence_management: { name: 'Evidence Management',
+	evidence_management: {, name: 'Evidence Management',
 		permissions: ['upload_evidence', 'edit_evidence', 'delete_evidence', 'view_evidence'] as Permission[]
 	},
-	report_management: { name: 'Report Management',
+	report_management: {, name: 'Report Management',
 		permissions: ['generate_report', 'edit_report', 'delete_report', 'view_report', 'approve_reports'] as Permission[]
 	},
-	user_management: { name: 'User Management',
+	user_management: {, name: 'User Management',
 		permissions: ['manage_users', 'view_users'] as Permission[]
 	},
-	criminal_records: { name: 'Criminal Records',
+	criminal_records: {, name: 'Criminal Records',
 		permissions: ['manage_criminals', 'edit_criminals', 'view_criminals'] as Permission[]
 	},
-	ai_tools: { name: 'AI Tools',
+	ai_tools: {, name: 'AI Tools',
 		permissions: ['ai_analysis', 'vector_search', 'graph_analysis'] as Permission[]
 	},
-	system_admin: { name: 'System Administration',
+	system_admin: {, name: 'System Administration',
 		permissions: [
 			'system_admin',
 			'access_admin_panel',
@@ -237,7 +237,7 @@ export const PERMISSION_CATEGORIES = {
 			'manage_integrations'
 		] as Permission[]
 	},
-	data_export: { name: 'Data Export',
+	data_export: {, name: 'Data Export',
 		permissions: ['export_data'] as Permission[]
 	}
 };

@@ -35,23 +35,23 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let viewMode = $state<'pipeline' | 'errors' | 'routes'>('pipeline');
 
  // ACE Pipeline State
- let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?, any }>>({
- webCrawl: { progress: 0, status: 'idle' },
- vlmProcess: { progress: 0, status: 'idle' },
- graphBuild: { progress: 0, status: 'idle' },
- vectorIndex: { progress: 0, status: 'idle' },
- llmAnalyze: { progress: 0, status: 'idle' }
+ let pipelineState = $state<Record<StageKey, { progress: number;, status: StageStatus; results?, any }>>({
+ webCrawl: {, progress: 0, status: 'idle' },
+ vlmProcess: {, progress: 0, status: 'idle' },
+ graphBuild: {, progress: 0, status: 'idle' },
+ vectorIndex: {, progress: 0, status: 'idle' },
+ llmAnalyze: {, progress: 0, status: 'idle' }
  });
 
  let isProcessing = $state(false);
- let processingLogs = $state<Array<{ time: string; stage: string; message: string; level, 'info' | 'success' | 'error' | 'warn' }>>([]);
+ let processingLogs = $state<Array<{ time: string;, stage: string; message: string; level, 'info' | 'success' | 'error' | 'warn' }>>([]);
 
  // Error Detection Results
  let detectedErrors = $state<Array<{
- id: string; route: string;
+ id: string;, route: string;
  type: 'syntax' | 'runtime' | 'ui' | 'accessibility' | 'performance';
  severity: 'critical' | 'high' | 'medium' | 'low';
- message: string; suggestion: string;
+ message: string;, suggestion: string;
  autoFixable: boolean; fixed, boolean;
  }>>([]);
 
@@ -92,7 +92,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const response = await fetch(stage.endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ routes: discoveredRoutes.map(r => r.route) })
+ body: JSON.stringify({, routes: discoveredRoutes.map(r => r.route) })
  });
 
  const result = await response.json();

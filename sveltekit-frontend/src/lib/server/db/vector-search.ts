@@ -13,15 +13,12 @@ export interface VectorSearchOptions {
 }
 
 export interface VectorSearchResult {
-    id: string;
-    content: string;
+    id: string;, content: string;
     filename?: string;
-    caseId?: string;
-    distance: number;
+    caseId?: string;, distance: number;
     relevanceScore: number;
     summary?: string;
-    keywords?: string[];
-    createdAt: Date;
+    keywords?: string[];, createdAt: Date;
 }
 
 export class VectorSearchService {

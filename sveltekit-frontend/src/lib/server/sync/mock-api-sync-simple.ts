@@ -7,7 +7,7 @@ import type { Document } from '$lib/types';
 
 // Simple mock database operations (no external deps)
 const mockDb = {
-    async query(sql: string): Promise<{ rows: unknown[] }> {
+    async query(sql: string): Promise<{, rows: unknown[] }> {
         // Intentionally minimal: log and return empty rows
         console.log('Mock DB Query:', sql);
         return { rows: [] };
@@ -64,7 +64,7 @@ export const mockDataGenerators = {
         for (let i = 0; i < count; i++) {
             shards.push({
                 shardId: `shard_${Date.now()}_${i}`,
-                vec: Array.from({ length: 128 }, () => Math.random())
+                vec: Array.from({, length: 128 }, () => Math.random())
             });
         }
         return shards;

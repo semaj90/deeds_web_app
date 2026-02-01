@@ -2,53 +2,53 @@ import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 /** * Type-safe API Response Schemas for Bits UI SSR */ // Base API Response Structure
 export interface APIResponse<T = unknown> {
- success: boolean; data: T;
- meta: { timestamp: string; cached: boolean; source: 'ssr' | 'api' };
+ success: boolean;, data: T;
+ meta: {, timestamp: string; cached: boolean;, source: 'ssr' | 'api' };
  error?: string;
 }
 // User Authentication Schemas
 export interface User {
- id: string; email: string;
- username?: string; firstName: string;
- lastName: string; displayName: string;
+ id: string;, email: string;
+ username?: string;, firstName: string;
+ lastName: string;, displayName: string;
  role: 'admin' | 'prosecutor' | 'detective' | 'user';
  department?: string;
- jurisdiction?: string; practiceAreas: string[];
+ jurisdiction?: string;, practiceAreas: string[];
  barNumber?: string;
  firmName?: string;
  avatarUrl?: string;
- lastLoginAt?: string; permissions: string[];
+ lastLoginAt?: string;, permissions: string[];
  isActive: boolean;
- emailVerified?: string; metadata: Record<string, unknown>;
- createdAt: string; updatedAt: string;
+ emailVerified?: string;, metadata: Record<string, unknown>;
+ createdAt: string;, updatedAt: string;
 }
 export interface UserActivity {
- totalCases: number; activeCases: number;
+ totalCases: number;, activeCases: number;
  totalEvidence: number;
 }
 export interface AuthMeResponse {
- user: User; activity: UserActivity;
- authenticated: true; loadSource: 'cache' | 'database';
+ user: User;, activity: UserActivity;
+ authenticated: true;, loadSource: 'cache' | 'database';
 }
 // System Health Schemas
 export interface SystemHealth {
- overall: { status: 'healthy' | 'degraded' | 'unhealthy';
- healthScore: number; healthyServices: number;
- totalServices: number; timestamp: string;
+ overall: {, status: 'healthy' | 'degraded' | 'unhealthy';
+ healthScore: number;, healthyServices: number;
+ totalServices: number;, timestamp: string;
  };
- services: { databases: Record<string: ServiceStatus>; aiServices: Record<string: ServiceStatus>; gpuServices: Record<string: GPUServiceStatus>; orchestration: Record<string: ServiceStatus>; storage: Record<string: ServiceStatus>;
+ services: {, databases: Record<string: ServiceStatus>;, aiServices: Record<string: ServiceStatus>;, gpuServices: Record<string: GPUServiceStatus>;, orchestration: Record<string: ServiceStatus>;, storage: Record<string: ServiceStatus>;
  };
- performance: { systemUptime: number;
+ performance: {, systemUptime: number;
  memoryUsage: MemoryUsage;
  };
- architecture: { platform: string;
- version: string; gpuArchitecture: string;
- microservices: number; protocols: string[];
+ architecture: {, platform: string;
+ version: string;, gpuArchitecture: string;
+ microservices: number;, protocols: string[];
  features: string[];
  };
 }
 export interface ServiceStatus {
- host: string; port: number;
+ host: string;, port: number;
  status: string;
 }
 export interface GPUServiceStatus {
@@ -56,51 +56,51 @@ export interface GPUServiceStatus {
  vram?: string;
 }
 export interface MemoryUsage {
- heapUsed: number; heapTotal: number;
- external: number; rss: number;
+ heapUsed: number;, heapTotal: number;
+ external: number;, rss: number;
 }
 // Dashboard Schemas
 export interface DashboardStats {
- activeCases: number; evidenceItems: number;
- aiAnalyses: number; systemUptime: number;
+ activeCases: number;, evidenceItems: number;
+ aiAnalyses: number;, systemUptime: number;
  cognitive?: CognitiveMetrics;
 }
 export interface CognitiveMetrics {
- routingEfficiency: number; cacheHitRatio: number;
- gpuUtilization: number; consciousnessLevel: number;
- quantumCoherence: number; timestamp: string;
+ routingEfficiency: number;, cacheHitRatio: number;
+ gpuUtilization: number;, consciousnessLevel: number;
+ quantumCoherence: number;, timestamp: string;
 }
 export interface RecentActivity {
- id: string; type: 'case_created' | 'evidence_uploaded' | 'ai_analysis' | 'document_processed';
- title: string; timestamp: Date | string;
+ id: string;, type: 'case_created' | 'evidence_uploaded' | 'ai_analysis' | 'document_processed';
+ title: string;, timestamp: Date | string;
  priority: 'low' | 'medium' | 'high' | 'urgent';
 }
 // Case Management Schemas
 export interface Case {
- id: string; title: string;
- description?: string; status: 'open' | 'active' | 'closed' | 'archived';
+ id: string;, title: string;
+ description?: string;, status: 'open' | 'active' | 'closed' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'urgent';
- assignedTo?: string; createdBy: string;
+ assignedTo?: string;, createdBy: string;
  department?: string;
- jurisdiction?: string; tags: string[];
+ jurisdiction?: string;, tags: string[];
  metadata: Record<string, unknown>;
- createdAt: string; updatedAt: string;
+ createdAt: string;, updatedAt: string;
 }
 export interface Evidence {
- id: string; caseId: string;
+ id: string;, caseId: string;
  title: string;
- description?: string; type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital';
+ description?: string;, type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital';
  fileUrl?: string;
  fileSize?: number;
  mimeType?: string;
- hash?: string; chainOfCustody: ChainOfCustodyEntry[];
- tags: string[]; metadata: Record<string, unknown>;
- createdBy: string; createdAt: string;
+ hash?: string;, chainOfCustody: ChainOfCustodyEntry[];
+ tags: string[];, metadata: Record<string, unknown>;
+ createdBy: string;, createdAt: string;
  updatedAt: string;
 }
 export interface ChainOfCustodyEntry {
- id: string; action: 'created' | 'accessed' | 'modified' | 'transferred' | 'analyzed';
- performedBy: string; timestamp: string;
+ id: string;, action: 'created' | 'accessed' | 'modified' | 'transferred' | 'analyzed';
+ performedBy: string;, timestamp: string;
  notes?: string;
  location?: string;
 }
@@ -119,67 +119,67 @@ export interface AIAnalysis {
  confidence?: number;
  model?: string;
  parameters?: Record<string, unknown>;
- createdBy: string; createdAt: string;
+ createdBy: string;, createdAt: string;
  completedAt?: string;
 }
 // Search and Query Schemas
 export interface SearchQuery {
  query: string;
  filters?: Record<string, unknown>;
- sort?: { field: string; direction: 'asc' | 'desc' };
- pagination?: { page: number; limit: number };
+ sort?: {, field: string; direction: 'asc' | 'desc' };
+ pagination?: {, page: number; limit: number };
 }
 export interface SearchResults<T = unknown> {
- items: T[]; totalCount: number;
- page: number; limit: number;
- hasNextPage: boolean; hasPreviousPage: boolean;
+ items: T[];, totalCount: number;
+ page: number;, limit: number;
+ hasNextPage: boolean;, hasPreviousPage: boolean;
 }
 // Page Data Schemas for SSR
 export interface HomePageData {
  userId?: string | null;
  sessionId?: string | null;
  email?: string | null;
- isAuthenticated: boolean; health: SystemHealth | null;
+ isAuthenticated: boolean;, health: SystemHealth | null;
  systemInfo: SystemInfo | null;
- dashboardStats: DashboardStats; recentActivities: RecentActivity[];
- metrics?: CognitiveMetrics; loadedAt: string;
+ dashboardStats: DashboardStats;, recentActivities: RecentActivity[];
+ metrics?: CognitiveMetrics;, loadedAt: string;
  error?: string;
 }
 export interface SystemInfo {
- platform: string; arch: string;
- cpus: number; gpuInfo: string;
- memoryUsage: string; nodeVersion: string;
+ platform: string;, arch: string;
+ cpus: number;, gpuInfo: string;
+ memoryUsage: string;, nodeVersion: string;
  uptime: number;
 }
 export interface DashboardPageData {
- systemStatus: SystemHealth | MulticoreStatus: null; graphData: SystemGraphData;
- initialLoad: boolean; timestamp: string;
+ systemStatus: SystemHealth | MulticoreStatus: null;, graphData: SystemGraphData;
+ initialLoad: boolean;, timestamp: string;
  error?: string;
 }
 export interface MulticoreStatus {
- totalWorkers: number; healthyWorkers: number;
- busyWorkers: number; queueSize: number;
- activeTasks: number; totalTasks: number;
- completedTasks: number; failedTasks: number;
+ totalWorkers: number;, healthyWorkers: number;
+ busyWorkers: number;, queueSize: number;
+ activeTasks: number;, totalTasks: number;
+ completedTasks: number;, failedTasks: number;
 }
 export interface SystemGraphData {
- nodes: GraphNode[]; edges: GraphEdge[];
+ nodes: GraphNode[];, edges: GraphEdge[];
 }
 export interface GraphNode {
- id: string; type: 'database' | 'service' | 'component';
- label: string; position: { x: number; y: number; z: number };
+ id: string;, type: 'database' | 'service' | 'component';
+ label: string;, position: { x: number;, y: number; z: number };
  metrics: Record<string, unknown>;
  status: 'healthy' | 'degraded' | 'unhealthy';
 }
 export interface GraphEdge {
- from: string; to: string;
+ from: string;, to: string;
  type: 'api' | 'data' | 'grpc';
- traffic: number; latency: number;
+ traffic: number;, latency: number;
 }
 // Error Response Schema
 export interface ErrorResponse {
- success: false; data: null;
- meta: { timestamp: string; cached: false; source: 'ssr' | 'api' };
+ success: false;, data: null;
+ meta: {, timestamp: string; cached: false;, source: 'ssr' | 'api' };
  error: string;
 }
 // Type Guards for Runtime Validation

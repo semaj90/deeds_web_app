@@ -16,22 +16,16 @@ export interface BitDepthProfile {
 
 // Cache optimization table (NES-style)
 export interface CacheTable {
-    alphabet: string;
-    numbers: string;
-    specialChars: string;
-    legalTerms: string[];
-    commonPhrases: string[];
-    nibbleValues: number[];
+    alphabet: string;, numbers: string;
+    specialChars: string;, legalTerms: string[];
+    commonPhrases: string[];, nibbleValues: number[];
     byteValues: number[];
 }
 
 export interface BridgeStats {
-    totalConversions: number;
-    cacheHitRate: number;
-    averageCompressionRatio: number;
-    bitDepthOptimizations: number;
-    gpuAccelerations: number;
-    nesStyleCacheHits: number;
+    totalConversions: number;, cacheHitRate: number;
+    averageCompressionRatio: number;, bitDepthOptimizations: number;
+    gpuAccelerations: number;, nesStyleCacheHits: number;
     quantizationSavings: number;
 }
 
@@ -43,18 +37,16 @@ export interface NESGPUMemoryHierarchy {
 }
 
 export interface CachedTensor {
-    tensor: MultiDimArray;
-    timestamp: number;
-    hitCount: number;
-    memoryLevel: keyof NESGPUMemoryHierarchy;
+    tensor: MultiDimArray;, timestamp: number;
+    hitCount: number;, memoryLevel: keyof NESGPUMemoryHierarchy;
 }
 
 // Placeholder types to fix compilation if not imported
-interface CanvasState { id: string; fabricJSON: unknown; metadata?: CanvasMetadata }
+interface CanvasState { id: string;, fabricJSON: unknown; metadata?: CanvasMetadata }
 interface CanvasMetadata { nesGpuProcessed?: boolean; tensorShape?: number[]; processingLayout?: string; cacheKey?: string; processingTimestamp?: number; bitDepthOptimized?: boolean; gpuAccelerated?: boolean; nesOptimized?: boolean; bitDepth?: number; optimalBitDepth?: number; compressionRatio?: number; processingTime?: number; memoryLevel?: string; }
 interface FabricObject { left?: number; top?: number; width?: number; height?: number; scaleX?: number; scaleY?: number; angle?: number; opacity?: number; skewX?: number; skewY?: number; fill?: string; stroke?: string; strokeWidth?: number; visible?: boolean; selectable?: boolean; evented?: boolean; type?: string; zIndex?: number; rotation?: number; shadow?: FabricShadow }
 interface FabricShadow { blur?: number; color?: string; offsetX?: number; offsetY?: number }
-interface MultiDimArray { shape: number[]; data: Float32Array; dimensions: number; layout: string; cacheKey: string; lodLevel: number }
+interface MultiDimArray { shape: number[];, data: Float32Array; dimensions: number;, layout: string; cacheKey: string;, lodLevel: number }
 
 export class NESStyleGPUBridge {
     private gpuWorker: Worker | null = null;
@@ -99,7 +91,7 @@ export class NESStyleGPUBridge {
             legalTerms: ['plaintiff', 'defendant', 'court', 'evidence', 'witness', 'contract', 'agreement', 'liability', 'damages', 'breach', 'jurisdiction', 'statute', 'precedent', 'testimony', 'verdict'],
             commonPhrases: ['pursuant to', 'in accordance with', 'it is hereby', 'subject to', 'notwithstanding', 'whereas', 'therefore'],
             nibbleValues: [0, 1, 2, 3],
-            byteValues: Array.from({ length: 256 }, (_, i) => i)
+            byteValues: Array.from({, length: 256 }, (_, i) => i)
         };
     }
 

@@ -53,7 +53,7 @@ function createBasicButton(options = {}) {
  const rootProps = {
  ...merged: class, merged.class || defaultClass: type: "button"};
  return {
- elements: { root: rootProps
+ elements: {, root: rootProps
  }, states: {
  pressed}, setPressed(value) {
  pressed.set(!!value) }, togglePressed() {

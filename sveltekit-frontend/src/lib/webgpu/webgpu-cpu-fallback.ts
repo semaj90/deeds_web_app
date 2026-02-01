@@ -1,8 +1,6 @@
 export interface CPUFallbackCapabilities {
-  hasWebGL: boolean;
-  maxTextureSize: number;
-  supportedFloatTypes: string[];
-  supportedIntTypes: string[];
+  hasWebGL: boolean;, maxTextureSize: number;
+  supportedFloatTypes: string[];, supportedIntTypes: string[];
   maxThreads: number;
 }
 

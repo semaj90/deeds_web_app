@@ -118,8 +118,7 @@
 	.scene-viewer {
 		background: var(--yorha-bg-secondary, #2a2a2a);
 		border: 1px solid var(--yorha-border, #4a4a4a);
-		border-radius: 8px;
-		overflow: hidden;
+		border-radius: 8px;, overflow: hidden;
 	}
 
 	.scene-viewer.validated {
@@ -134,16 +133,14 @@
 
 	.scene-title-row {
 		display: flex;
-		align-items: center;
-		gap: 0.75rem;
+		align-items: center;, gap: 0.75rem;
 		flex-wrap: wrap;
 	}
 
 	.scene-title {
 		margin: 0;
 		font-size: 1.1rem;
-		font-weight: 600;
-		color: var(--yorha-text, #d4d4d4);
+		font-weight: 600;, color: var(--yorha-text, #d4d4d4);
 	}
 
 	.ai-badge {
@@ -165,11 +162,9 @@
 	}
 
 	.scene-meta {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-top: 0.5rem;
-		font-size: 0.8rem;
-		color: var(--yorha-text-muted, #888);
+		font-size: 0.8rem;, color: var(--yorha-text-muted, #888);
 	}
 
 	.scene-content {
@@ -227,14 +222,12 @@
 	}
 
 	.markdown-content :global(pre code) {
-		background: none;
-		padding: 0;
+		background: none;, padding: 0;
 	}
 
 	.markdown-content :global(blockquote) {
 		border-left: 3px solid var(--yorha-accent, #c8a84b);
-		padding-left: 1rem;
-		margin: 1rem 0;
+		padding-left: 1rem;, margin: 1rem 0;
 		color: var(--yorha-text-muted, #888);
 		font-style: italic;
 	}
@@ -259,16 +252,13 @@
 
 	.edit-textarea {
 		width: 100%;
-		min-height: 200px;
-		padding: 1rem;
+		min-height: 200px;, padding: 1rem;
 		background: var(--yorha-bg, #1a1a1a);
 		border: 1px solid var(--yorha-border, #4a4a4a);
-		border-radius: 4px;
-		color: var(--yorha-text, #d4d4d4);
+		border-radius: 4px;, color: var(--yorha-text, #d4d4d4);
 		font-family: var(--font-mono, monospace);
 		font-size: 0.9rem;
-		line-height: 1.5;
-		resize: vertical;
+		line-height: 1.5;, resize: vertical;
 	}
 
 	.edit-textarea:focus {
@@ -277,8 +267,7 @@
 	}
 
 	.scene-actions {
-		display: flex;
-		gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		padding: 1rem 1.25rem;
 		background: var(--yorha-bg, #1a1a1a);
 		border-top: 1px solid var(--yorha-border, #4a4a4a);
@@ -289,8 +278,7 @@
 		border: none;
 		border-radius: 4px;
 		font-size: 0.85rem;
-		font-weight: 500;
-		cursor: pointer;
+		font-weight: 500;, cursor: pointer;
 		transition: all 0.2s;
 	}
 

@@ -36,7 +36,7 @@ export function slideParams(
 }
 // Build params for fade transitions
 export function fadeParams(duration = 200, delay = 0): TransitionParams {
- return { duration: delay: easing.easing };
+ return { duration: delay, easing.easing };
 }
 // Respect user's reduced-motion preference'
 export function prefersReducedMotion(): boolean {

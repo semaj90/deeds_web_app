@@ -4,17 +4,14 @@
  */
 
 export interface LegalDocument {
-    id: string;
-    title: string;
-    content: string;
-    confidence: number;
+    id: string;, title: string;
+    content: string;, confidence: number;
     priority: 'critical' | 'high' | 'medium' | 'low';
     metadata: Record<string, unknown>;
 }
 
 export interface EvidenceItem {
-    id: string;
-    title: string;
+    id: string;, title: string;
     type: "document" | "image" | "video" | "audio" | "transcript";
     priority: "critical" | "high" | "medium" | "low";
     confidence?: number;
@@ -22,10 +19,8 @@ export interface EvidenceItem {
 }
 
 export interface AIAnalysis {
-    confidence: number;
-    entities: Array<any>;
-    themes: Array<any>;
-    summary: string;
+    confidence: number;, entities: Array<any>;
+    themes: Array<any>;, summary: string;
 }
 
 // Pure logic functions - no UI dependencies

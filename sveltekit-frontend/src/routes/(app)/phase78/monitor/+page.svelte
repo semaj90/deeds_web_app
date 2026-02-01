@@ -2,27 +2,21 @@
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
- timestamp: string;
- summary: {
- totalErrors: number;
- totalRoutes: number;
- totalClusters: number;
- totalSuggestions: number;
+ timestamp: string;, summary: {
+ totalErrors: number;, totalRoutes: number;
+ totalClusters: number;, totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: { bySeverity: Array<{ severity: string; count: number }> };
- routes: {
- byHealth: Array<{ state: string; count: number }>;
- top: Array<{
- routePath: string;
- errorState: string;
- recentErrorCount: number;
+ errors: {, bySeverity: Array<{ severity: string;, count: number }> };
+ routes: {, byHealth: Array<{ state: string;, count: number }>;
+ top: Array<{, routePath: string;
+ errorState: string;, recentErrorCount: number;
  lastErrorAt: string;
  }>;
  };
- suggestions: { byRisk: Array<{ level: string; count: number }>; applied: number; effectiveness: number };
- topErrors: Array<{ tsCode: string; count: number; messages: string[] }>;
- errorVelocity: Array<{ date: string; count: number }>;
+ suggestions: {, byRisk: Array<{ level: string;, count: number }>; applied: number;, effectiveness: number };
+ topErrors: Array<{, tsCode: string; count: number;, messages: string[] }>;
+ errorVelocity: Array<{, date: string; count: number }>;
  }
 
 	let stats = $state<MonitoringStats | null>(null);
@@ -106,7 +100,7 @@
  <button
  onclick={loadStats}
  disabled={isLoading}
- class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
+ class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover: bg-blue-700, disabled:bg-gray-400 transition"
  >
  {isLoading ? 'Loading...' : 'Refresh Now'}
  </button>

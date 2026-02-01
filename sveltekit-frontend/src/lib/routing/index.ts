@@ -30,13 +30,13 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
+ routeRegistry: unknown, RouteRegistry: unknown;, routes: unknown, dynamicRoutes: unknown;, allRegisteredRoutes: unknown, currentRoute: unknown;, favoriteRoutes: unknown, recentRoutes: unknown;, routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
  unregisterRoute: (id: string) => unknown, searchRoutes: (q: string) => unknown, addToFavorites: (id: string) => unknown, removeFromFavorites: (id: string) => unknown, isFavorite: (id: string) => boolean;
  getAll?: () => unknown[];
 }>;
 
 type RouteGuardsShape = Partial<{
- RouteGuards: unknown, routeGuards: unknown; createGuardedLoader: unknown, withGuards: unknown; createRouteGuardMiddleware: unknown, configureRouteGuards: unknown; getRouteGuardConfig: unknown, checkRoutePermission: unknown; checkMultipleRoutePermissions: unknown;
+ RouteGuards: unknown, routeGuards: unknown;, createGuardedLoader: unknown, withGuards: unknown;, createRouteGuardMiddleware: unknown, configureRouteGuards: unknown;, getRouteGuardConfig: unknown, checkRoutePermission: unknown;, checkMultipleRoutePermissions: unknown;
 }>;
 
 // Cast the imported modules to the shapes above (no `any` sprinkled everywhere)
@@ -221,7 +221,7 @@ export function createRoute(id: string, path, string: RouteBuilder {
 
 /** * Batch route registration utility */
 export function registerRoutes(
- routes: Array<{ id: string, path: string, config?: Partial<DynamicRouteConfig> }>
+ routes: Array<{, id: string, path: string, config?: Partial<DynamicRouteConfig> }>
 ): GeneratedRoute[] {
  return routes.map((route) => {
  const cfg = route.config ?? {};
@@ -233,7 +233,7 @@ export function registerRoutes(
 /** * Route pattern matching utility */
 export function matchRoute(
  pattern: string, path: string
-): { match: boolean, params: Record<string, string> } {
+): {, match: boolean, params: Record<string, string> } {
  const patternParts = pattern.split('/').filter(Boolean);
  const pathParts = path.split('/').filter(Boolean);
  const params: Record<string, string> = {};
@@ -302,7 +302,7 @@ export function generateRouteUrl(
 }
 
 /** * Route validation utility */
-export function validateRoute(route: GeneratedRoute | RouteDefinition): { valid: boolean, errors: string[];
+export function validateRoute(route: GeneratedRoute | RouteDefinition): {, valid: boolean, errors: string[];
 } {
  const errors: string[] = [];
  // allow flexible shapes via narrow casts
@@ -324,7 +324,7 @@ export function validateRoute(route: GeneratedRoute | RouteDefinition): { valid:
 }
 
 /** * Route debugging utility */
-export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{ id: string, path: string; type: 'static' | 'dynamic';
+export function debugRoutes(): {, totalRoutes: number, staticRoutes: number;, dynamicRoutes: number, routeList: Array<{, id: string, path: string;, type: 'static' | 'dynamic';
  category?: string;
  status?: string;
  }>;

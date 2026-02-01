@@ -47,7 +47,7 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+ body: JSON.stringify({, model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: false,
  format: 'json',
  }),
@@ -138,7 +138,7 @@ export async function* streamAgentResponse(
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+ body: JSON.stringify({, model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: true,
  }),
  });

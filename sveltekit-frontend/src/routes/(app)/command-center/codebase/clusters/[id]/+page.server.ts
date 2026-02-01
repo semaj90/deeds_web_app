@@ -1,18 +1,18 @@
 import type { PageServerLoad } from './$types';
 
 interface ClusterCard {
-    id: string; name: string;
-    cluster_id: string; errorCode: string;
-    count: number; top_files: string[];
-    top_messages: string[]; representative_errors: string[];
-    summary: string; fix_suggestion: string;
-    surface: string[]; tech: string[];
-    coordinates: {x: number; y: number } | null;
-    runId: string; timestamp: string;
+    id: string;, name: string;
+    cluster_id: string;, errorCode: string;
+    count: number;, top_files: string[];
+    top_messages: string[];, representative_errors: string[];
+    summary: string;, fix_suggestion: string;
+    surface: string[];, tech: string[];
+    coordinates: {x: number;, y: number } | null;
+    runId: string;, timestamp: string;
 }
 
 interface QdrantPoint {
-    id: number; payload: ClusterCard;
+    id: number;, payload: ClusterCard;
 }
 
 interface QdrantScrollResponse {

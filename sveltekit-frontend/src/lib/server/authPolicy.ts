@@ -8,8 +8,7 @@ export type UserContext = {
 
 export interface PolicyInput {
 	user?: UserContext | null;
-	action: string;
-	resource: string;
+	action: string;, resource: string;
 	ownershipUserId?: string | null;
 }
 

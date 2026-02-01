@@ -19,7 +19,7 @@
   import Value from "./SelectValue.svelte";
 
   interface SelectOption {
-    value: string; label: string;
+    value: string;, label: string;
     disabled?: boolean;
   }
 

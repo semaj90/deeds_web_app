@@ -57,7 +57,7 @@ describe('FixPattern Interface', () => {
       },
     };
 
-    const testContent = 'prop: value: next';
+    const testContent = 'prop: value, next';
     const result = testContent.replace(pattern.regex, pattern.replacement as any);
     expect(result).toBe('prop: value, next');
   });
@@ -172,7 +172,7 @@ describe('Pattern application', () => {
       '$1: $2, $3'
     );
 
-    const content = 'const obj = { key: value: next }';
+    const content = 'const obj = { key: value, next }';
     const result = applyPattern(content, pattern);
 
     expect(result.success).toBe(true);

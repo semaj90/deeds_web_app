@@ -6,8 +6,7 @@ import path from 'path';
 export type JobType = 'ocr' | 'audio' | 'video' | 'document' | 'embedding' | 'json' | 'other';
 
 export type Job = {
-    id: string;
-    type: JobType;
+    id: string;, type: JobType;
     payload?: unknown;
     options?: {
         priority?: number;

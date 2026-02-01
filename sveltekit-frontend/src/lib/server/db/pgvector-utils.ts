@@ -75,7 +75,7 @@ function asObject(v: any): Record<string, unknown> | undefined {
 }
 
 export interface VectorSearchResult {
-    id: string; content: string;
+    id: string;, content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     documentType?: string;
@@ -90,7 +90,7 @@ export interface VectorSearchOptions {
 // Add a typed return shape for the health check
 export interface PgVectorHealthResult {
     available: boolean;
-    version?: string; functions: string[];
+    version?: string;, functions: string[];
     error?: string;
 }
 
@@ -274,9 +274,8 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: { id: string,
-    sessionId: string, role: string;
-    content: string; embedding: number[];
+export async function insertChatMessageWithEmbedding(messageData: {, id: string,
+    sessionId: string, role: string;, content: string; embedding: number[];
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
     try {
@@ -342,13 +341,13 @@ export async function searchAcrossAllVectors(
     // Search messages
     if (includeMessages) {
         searchPromises.push(
-            searchSimilarMessages(queryEmbedding, { limit: threshold: includeMetadata })
+            searchSimilarMessages(queryEmbedding, { limit: threshold, includeMetadata })
         );
     }
     // Search evidence
     if (includeEvidence) {
         searchPromises.push(
-            searchSimilarEvidence(queryEmbedding, caseId, { limit: threshold: includeMetadata })
+            searchSimilarEvidence(queryEmbedding, caseId, { limit: threshold, includeMetadata })
         );
     }
 

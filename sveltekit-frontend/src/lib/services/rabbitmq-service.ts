@@ -11,36 +11,28 @@ type ConsumeMessage = any;
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
-    documentId: string;
-    s3Key: string;
+    documentId: string;, s3Key: string;
     s3Bucket: string;
     caseId?: string;
-    userId?: string;
-    originalName: string;
-    mimeType: string;
-    fileSize: number;
+    userId?: string;, originalName: string;
+    mimeType: string;, fileSize: number;
     processingType: 'ocr' | 'embedding' | 'summarization' | 'full_analysis';
     priority?: number;
     timestamp?: string;
 }
 
 export interface DLQMessage extends DocumentProcessingJob {
-    error: string;
-    retries: number;
+    error: string;, retries: number;
     timestamp: string;
 }
 
 export interface RabbitMQConfig {
-    url: string;
-    queues: {
-        documentProcessing: string;
-        ocrProcessing: string;
-        embeddingProcessing: string;
-        summarization: string;
+    url: string;, queues: {
+        documentProcessing: string;, ocrProcessing: string;
+        embeddingProcessing: string;, summarization: string;
         deadLetter: string;
     };
-    exchanges: {
-        documents: string;
+    exchanges: {, documents: string;
         deadLetter: string;
     };
 }
@@ -48,7 +40,7 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -65,7 +57,7 @@ class BrowserStub implements IRabbitMQService {
     }
     async initialize() { return; }
     async publishDocumentProcessingJob(): Promise<boolean> { this.makeError(); }
-    async publishBatchJobs(): Promise<{ success: number; failed: number }> { this.makeError(); }
+    async publishBatchJobs(): Promise<{, success: number; failed: number }> { this.makeError(); }
     async purgeQueue(): Promise<boolean> { this.makeError(); }
     async close() { return; }
     async healthCheck() {
@@ -87,15 +79,13 @@ class RabbitMQService implements IRabbitMQService {
         const rabbitUrl = (env as any)?.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
         this.config = {
             url: rabbitUrl,
-            queues: {
-                documentProcessing: 'doc_processing_queue',
+            queues: {, documentProcessing: 'doc_processing_queue',
                 ocrProcessing: 'ocr_processing_queue',
                 embeddingProcessing: 'embedding_processing_queue',
                 summarization: 'summarization_queue',
                 deadLetter: 'dead_letter_queue'
             },
-            exchanges: {
-                documents: 'documents_exchange',
+            exchanges: {, documents: 'documents_exchange',
                 deadLetter: 'dead_letter_exchange'
             }
         };
@@ -194,7 +184,7 @@ class RabbitMQService implements IRabbitMQService {
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{ success: number; failed: number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }> {
         let success = 0;
         let failed = 0;
 

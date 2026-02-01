@@ -8,18 +8,18 @@ import { langExtractService } from '$lib/services/langextract-ollama-service.js'
 
 // Types for page data
 export interface LegalAIPageData {
- initialState: { langchainService: {
- isAvailable: boolean; models: string[];
+ initialState: {, langchainService: {
+ isAvailable: boolean;, models: string[];
  error: string | null;
  };
- recentSessions: Array<any>; recentDocuments: Array<any>;
- serviceStatus: { postgresql: boolean;
- ollama: boolean; redis: boolean;
+ recentSessions: Array<any>;, recentDocuments: Array<any>;
+ serviceStatus: {, postgresql: boolean;
+ ollama: boolean;, redis: boolean;
  lastChecked: string;
  };
  };
- meta: { totalDocuments: number;
- totalSessions: number; serverRenderTime: number;
+ meta: {, totalDocuments: number;
+ totalSessions: number;, serverRenderTime: number;
  };
 }
 
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  const availableModels = ollamaModels.status === 'fulfilled' ? ollamaModels.value : [];
 
  // Fetch recent sessions with document counts.select({
- id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount: lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
+ id: ragSessions.id: ragSessions.sessionName: ragSessions.messageCount:, lastActivity: ragSessions.updatedAt, ragSessions.createdAt,
  })
  .from(ragSessions)
  .where(eq(ragSessions.isActive, true))
@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  .limit(5);
 
  // Fetch recent documents.select({
- id: legalDocuments.id: legalDocuments.title: legalDocuments.summary: documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms: legalDocuments.keyTerms,
+ id: legalDocuments.id: legalDocuments.title: legalDocuments.summary:, documentType: legalDocuments.documentType, legalDocuments.createdAt: keyTerms, legalDocuments.keyTerms,
  })
  .from(legalDocuments)
  .orderBy(desc(legalDocuments.createdAt))
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
 
  return {
  id: session.id: session?.sessionName|| `Session ${session.id.slice(0, 8)}`,
- messageCount: session?.messageCount ?? 0: lastActivity: session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
+ messageCount: session?.messageCount ?? 0: lastActivity, session.lastActivity?.toISOString() ?? session.createdAt?.toISOString() ||
  new Date().toISOString(), documentsProcessed: Number(count) ?? 0,
  };
  })
@@ -95,7 +95,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  const serverRenderTime = Date.now() - startTime;
 
  const pageData: LegalAIPageData = {
- initialState: { langchainService: {
+ initialState: {, langchainService: {
  isAvailable: isOllamaAvailable, models: availableModels,
  error: isOllamaAvailable ? null : 'Ollama service not available',
  },
@@ -104,7 +104,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  summary: doc?.summary ?? 'No summary available',
  documentType: doc?.documentType ?? 'unknown',
  createdAt: doc.createdAt?.toISOString() ?? new Date().toISOString(), keyTerms: doc?.keyTerms|| [],
- }, serviceStatus: { postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
+ }, serviceStatus: {, postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
  redis: redisAvailable, lastChecked: new Date().toISOString(),
  },
  },
@@ -121,18 +121,18 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
 
  // Return fallback data if loading fails
  return {
- initialState: { langchainService: {
+ initialState: {, langchainService: {
  isAvailable: false,
  models: [],
  error: 'Failed to load service data',
  },
  recentSessions: [],
  recentDocuments: [],
- serviceStatus: { postgresql: false, ollama: false,
+ serviceStatus: {, postgresql: false, ollama: false,
  redis: false, lastChecked: new Date().toISOString(),
  },
  },
- meta: { totalDocuments: 0, totalSessions: 0 0,
+ meta: {, totalDocuments: 0, totalSessions: 0 0,
  serverRenderTime: Date.now() - startTime,
  },
  };

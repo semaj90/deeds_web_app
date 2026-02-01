@@ -2,10 +2,8 @@ import type { User } from '$lib/types';
 import { browser } from '$app/environment';
 
 export interface AccessibilityConfig {
-    enableScreenReaderAnnouncements: boolean;
-    enableKeyboardNavigation: boolean;
-    enableHighContrast: boolean;
-    enableReducedMotion: boolean;
+    enableScreenReaderAnnouncements: boolean;, enableKeyboardNavigation: boolean;
+    enableHighContrast: boolean;, enableReducedMotion: boolean;
     fontSize: 'small' | 'normal' | 'large' | 'extra-large';
     focusManagement: boolean;
 }
@@ -43,15 +41,11 @@ class AccessibilityService {
         this.announceElement.setAttribute('aria-atomic', 'true');
         this.announceElement.className = 'sr-only';
         this.announceElement.style.cssText = `
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
+            position: absolute;, width: 1px;
+            height: 1px;, padding: 0;
+            margin: -1px;, overflow: hidden;
             clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+            white-space: nowrap;, border: 0;
         `;
         document.body.appendChild(this.announceElement);
     }

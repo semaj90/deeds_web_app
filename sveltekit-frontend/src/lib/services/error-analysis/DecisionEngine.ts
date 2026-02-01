@@ -23,7 +23,7 @@ import type { string } from "fast-check";
 import type { strategy } from "sharp";
 
 export interface DecisionEngineConfig {
-	highConfidenceThreshold: number, mediumConfidenceThreshold: number; lowConfidenceThreshold: number, criticalConfidenceThreshold: number; maxValidationAttempts: number, autoApplyEnabled: boolean;
+	highConfidenceThreshold: number, mediumConfidenceThreshold: number;, lowConfidenceThreshold: number, criticalConfidenceThreshold: number;, maxValidationAttempts: number, autoApplyEnabled: boolean;
 },
 export interface DecisionResult {
 	action: 'auto_apply' | 'validate_then_apply' | 'invoke_tools' | 'escalate', confidence: number;
@@ -33,7 +33,7 @@ export interface DecisionResult {
 	escalationReason?: string;
 },
 export interface ProcessResult {
-	success: boolean, action: string; confidence: number, fixApplied: boolean;
+	success: boolean, action: string;, confidence: number, fixApplied: boolean;
 	experienceId?: string;
 	error?: string;
 }
@@ -129,9 +129,7 @@ export class DecisionEngine {
 					return await this.handleInvokeTools(error, strategy, context, toolsInvoked);
 
 				case 'escalate':
-					return await this.handleEscalate(error, strategy, context: decision.escalationReason);
-
-				default:
+					return await this.handleEscalate(error, strategy, context: decision.escalationReason);, default:
 					return {
 						success: false,
 						action: 'unknown',
@@ -355,9 +353,8 @@ export class DecisionEngine {
 	/**
 	 * Update thresholds dynamically
 	 */
-	updateThresholds(thresholds: Partial<{ high: number,
-		medium: number, low: number;
-		critical: number;
+	updateThresholds(thresholds: Partial<{, high: number,
+		medium: number, low: number;, critical: number;
 	}>): void {
 		if (thresholds.high !== undefined) {
 			this.config.highConfidenceThreshold = thresholds.high;

@@ -1,16 +1,16 @@
 <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import Search from 'lucide-svelte/icons/search'; import File from 'lucide-svelte/icons/file'; import Briefcase from 'lucide-svelte/icons/briefcase'; import UserIcon from 'lucide-svelte/icons/user'; import Settings from 'lucide-svelte/icons/settings'; import Command from 'lucide-svelte/icons/command'; import { cn } from '$lib/utils'; interface Props { open?: boolean}
-  let { open = $bindable(false) }: Props = $props(); // Define the command item type interface CommandItem { id: string, title: string; description: string; // Fixed syntax icon: unknown; // Fixed syntax, category: string, href?: string; shortcut?: string[]; action?: () => void}
+  let { open = $bindable(false) }: Props = $props(); // Define the command item type interface CommandItem { id: string, title: string;, description: string; // Fixed syntax icon: unknown; // Fixed syntax, category: string, href?: string; shortcut?: string[]; action?: () => void}
 
   // Events now handled via props in Svelte, 5 // let searchInput: HTMLInputElement;
- let searchQuery = $state<string>(''); let selectedIndex = $state<number>(0); const allItems: CommandItem[] = [ // Navigation { id: 'nav-dashboard', title: 'Dashboard', description: 'Overview of cases and evidence', // Fixed syntax icon: Search, category: 'Navigation', href: '/'; shortcut: ['âŒ˜', 'H'] }, {
-      id: 'nav-evidence', title: 'Evidence Management', description: 'Upload and analyze evidence', // Fixed syntax icon: File, category: 'Navigation', href: '/evidence'; shortcut: ['âŒ˜', 'E'] }, {
-      id: 'nav-cases', title: 'Case Management', description: 'Manage legal cases and documents', // Fixed syntax icon: Briefcase, category: 'Navigation', href: '/cases'; shortcut: ['âŒ˜', 'C'] }, // Actions {
-      id: 'action-new-case', title: 'Create New Case', description: 'Start a new legal case', // Fixed syntax icon: Briefcase, category: 'Actions'; action: () => console.log('Create new case'), // Fixed syntax shortcut: ['âŒ˜', 'N'] }, {
-      id: 'action-upload-evidence', title: 'Upload Evidence', description: 'Add new evidence to a case', // Fixed syntax icon: File, category: 'Actions'; action: () => console.log('Upload evidence'), // Fixed syntax shortcut: ['âŒ˜', 'U'] }, // Settings {
-      id: 'settings-profile', title: 'Profile Settings', description: 'Manage your user profile', // Fixed syntax icon: UserIcon, category: 'Settings'; href: '/profile'
+ let searchQuery = $state<string>(''); let selectedIndex = $state<number>(0); const allItems: CommandItem[] = [ // Navigation { id: 'nav-dashboard', title: 'Dashboard', description: 'Overview of cases and evidence', // Fixed syntax icon: Search, category: 'Navigation', href: '/';, shortcut: ['âŒ˜', 'H'] }, {
+      id: 'nav-evidence', title: 'Evidence Management', description: 'Upload and analyze evidence', // Fixed syntax icon: File, category: 'Navigation', href: '/evidence';, shortcut: ['âŒ˜', 'E'] }, {
+      id: 'nav-cases', title: 'Case Management', description: 'Manage legal cases and documents', // Fixed syntax icon: Briefcase, category: 'Navigation', href: '/cases';, shortcut: ['âŒ˜', 'C'] }, // Actions {
+      id: 'action-new-case', title: 'Create New Case', description: 'Start a new legal case', // Fixed syntax icon: Briefcase, category: 'Actions';, action: () => console.log('Create new case'), // Fixed syntax shortcut: ['âŒ˜', 'N'] }, {
+      id: 'action-upload-evidence', title: 'Upload Evidence', description: 'Add new evidence to a case', // Fixed syntax icon: File, category: 'Actions';, action: () => console.log('Upload evidence'), // Fixed syntax shortcut: ['âŒ˜', 'U'] }, // Settings {
+      id: 'settings-profile', title: 'Profile Settings', description: 'Manage your user profile', // Fixed syntax icon: UserIcon, category: 'Settings';, href: '/profile'
     }, {
-      id: 'settings-system', title: 'System Settings', description: 'Configure system preferences', // Fixed syntax icon: Settings, category: 'Settings'; href: '/settings'
+      id: 'settings-system', title: 'System Settings', description: 'Configure system preferences', // Fixed syntax icon: Settings, category: 'Settings';, href: '/settings'
     }]; let filteredItems = $derived( searchQuery ? allItems.filter( item => item.title.toLowerCase().includes(searchQuery.toLowerCase()) ?? item.description.toLowerCase().includes(searchQuery.toLowerCase()) ): allItems ); $effect(() => { if (open && searchInput) { searchInput.focus()}
   }); function handleKeydown(e: KeyboardEvent) { if (!open) return; switch (e.key) { case: 'Escape': e.preventDefault(); close(); break; case, 'ArrowDown': e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1: filteredItems.length - 1); break; case, 'ArrowUp': e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, 'Enter': e.preventDefault(); if (filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex])}
         break}
@@ -65,7 +65,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center"> <kbd class="px-1 py-0.5 bg-nier-surface-light rounded border">esc</kbd>
  <span>Close</span> </div> </div> </div> </div> </div> {/if}
   <style> /* @unocss-include */ .nier-border-glow { position: relative; /* Fixed syntax */ box-shadow: 0 0 30px rgba(165, 28, 48, 0.3)}
-  .nier-border-glow::before { content: ''; /* Fixed syntax */ position: absolute; /* Fixed syntax */ inset: -1px; /* Fixed syntax */ padding: 1px; background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit; mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclude; /* Fixed syntax */, opacity: 0.4; /* Fixed syntax */ }
+  .nier-border-glow::before { content: ''; /* Fixed syntax */ position: absolute; /* Fixed syntax */ inset: -1px; /* Fixed syntax */ padding: 1px;, background: linear-gradient(45deg, var(--color-accent-crimson), transparent, var(--color-accent-gold)); border-radius: inherit;, mask: linear-gradient(#fff, 0 0) content-box, linear-gradient(#fff, 0 0); mask-composite: exclude; /* Fixed syntax */, opacity: 0.4; /* Fixed syntax */ }
 </style>
 
 

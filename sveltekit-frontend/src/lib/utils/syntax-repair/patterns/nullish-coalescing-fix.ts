@@ -140,7 +140,7 @@ export function getNullishCoalescingPatterns(): PatternMatcher[] {
 /**
  * Apply nullish coalescing fixes to content
  */
-export function fixNullishCoalescing(content: string): { result: string; fixCount: number } {
+export function fixNullishCoalescing(content: string): {, result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

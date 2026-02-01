@@ -20,15 +20,15 @@ import type { DiffPatch } from './diffTypes.js';
 const execAsync = promisify(exec);
 
 export interface ValidationResult {
- success: boolean; errorCount: number;
- errors: string[]; validatedFiles: string[];
+ success: boolean;, errorCount: number;
+ errors: string[];, validatedFiles: string[];
  duration: number;
  reason?: string;
 }
 
 export interface RegressionResult {
- hasRegression: boolean; newErrors: string[];
- fixedErrors: string[]; netChange: number;
+ hasRegression: boolean;, newErrors: string[];
+ fixedErrors: string[];, netChange: number;
 }
 
 export class ValidationService {
@@ -165,7 +165,7 @@ export class ValidationService {
  patches: DiffPatch[],
  contentMap: Map<string, string>,
  fastPath = true
- ): Promise<{ validationResult: ValidationResult;
+ ): Promise<{, validationResult: ValidationResult;
  rolledBack: boolean;
  regression?, RegressionResult;
  }> {
@@ -181,7 +181,7 @@ export class ValidationService {
  const failedPatches = applyResults.filter((r: any) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: { success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: {, success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
  rolledBack: false,
  };

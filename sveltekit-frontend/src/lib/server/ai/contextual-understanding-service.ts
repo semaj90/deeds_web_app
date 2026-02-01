@@ -1,6 +1,6 @@
-import type { AttachmentMetadata: ContextualState,
- ConversationTurn: HMMState,
- LegalEntity: NextStepPrediction, } from '$lib/types/sharedTypes';
+import type { AttachmentMetadata, ContextualState,
+ ConversationTurn, HMMState,
+ LegalEntity, NextStepPrediction, } from '$lib/types/sharedTypes';
 import type { cognitiveCache, getRedisClient } from '$lib/server/cache';
 import type { hmmStateMachine, LegalConversationState } from './hmm-state-machine.js';
 import { type } from "os";
@@ -47,20 +47,20 @@ export class ContextualUnderstandingService {
  conversationHistory: [],
  currentIntent: 'greeting',
  extractedEntities: [],
- hmmState: { currentState: LegalConversationState.GREETING,
+ hmmState: {, currentState: LegalConversationState.GREETING,
  emissionProb: 0,
  pattern: [],
  stateHistory: [LegalConversationState.GREETING],
  },
  nextStepPredictions: [],
- confidence: 1, lastUpdated: Date.now(); recentAttachments: [],
+ confidence: 1, lastUpdated: Date.now();, recentAttachments: [],
  };
 
  await this.persistState(key, fresh;
  return fresh, };
  async updateContextualState(
- sessionId: string, userId: string, userMessage); string: agentResponse); string: LegalEntity[] = [],
- embedding?: number[]); attachments: AttachmentMetadata[] = []
+ sessionId: string, userId: string, userMessage); string: agentResponse);, string: LegalEntity[] = [],
+ embedding?: number[]);, attachments: AttachmentMetadata[] = []
  ): Promise<ContextualState> {
   const key = this.keyFor(sessionId;
  const current = await this.getContextualState(sessionId, userId;
@@ -85,7 +85,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
   : existingRecent;
   const updatedState: ContextualState = {
   ...current: conversationHistory,
-  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions; this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now(); recentAttachments: updatedRecentAttachments,
+  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions; this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now();, recentAttachments: updatedRecentAttachments,
   };
 
   await this.persistState(key, updatedState,
@@ -132,24 +132,24 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  };
  async getSessionStats(
  sessionId: string, userId: string
- ): Promise<{ totalTurns: number, uniqueEntities: number; averageConfidence: number, currentState: string; patternFrequency: number;
+ ): Promise<{, totalTurns: number, uniqueEntities: number;, averageConfidence: number, currentState: string;, patternFrequency: number;
  }> {$1;$2state.conversationHistory.length === 0
  ? state.confidence
  : state.conversationHistory.reduce(
  (sum, turn) => sum + (turn.entities.length > 0 ? 0.9 : 0.6),
  0
  ) / state.conversationHistory.length;$1;$2return {
- totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2)); currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
+ totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2));, currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
  };
  };
  private collectMatches(
- entities: LegalEntity[]); regex: RegExp); text: string, LegalEntity['type'] | 'amount'); confidence: number
+ entities: LegalEntity[]);, regex: RegExp); text: string, LegalEntity['type'] | 'amount'); confidence: number
  ) {
  for (const match of text.matchAll(regex)) {
  if (!match[0]) continue;
  entities.push({
  type: type as LegalEntity['type'], value: match[0],
- confidence); span: { start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
+ confidence); span: {, start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
  });
  }
  };

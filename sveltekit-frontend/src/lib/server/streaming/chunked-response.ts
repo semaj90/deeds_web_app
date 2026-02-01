@@ -18,8 +18,7 @@ export interface StreamChunk {
 	type: 'content' | 'metadata' | 'error' | 'done';
 	content?: string;
 	metadata?: Record<string, unknown>;
-	error?: string;
-	timestamp: number;
+	error?: string;, timestamp: number;
 }
 
 /**
@@ -179,8 +178,7 @@ export async function* streamOllamaResponse(
 					if (data.done) {
 						yield {
 							type: 'metadata',
-							metadata: {
-								total_duration: data.total_duration,
+							metadata: {, total_duration: data.total_duration,
 								prompt_eval_count: data.prompt_eval_count,
 								eval_count: data.eval_count
 							},
@@ -213,7 +211,7 @@ export async function* streamRAGResponse(
 		// 1. Get embeddings
 		yield {
 			type: 'metadata',
-			metadata: { stage: 'embedding' },
+			metadata: {, stage: 'embedding' },
 			timestamp: Date.now()
 		};
 
@@ -222,8 +220,7 @@ export async function* streamRAGResponse(
 			const embeddingResponse = await fetch('http://localhost:11434/api/embeddings', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: 'nomic-embed-text:latest',
+				body: JSON.stringify({, model: 'nomic-embed-text:latest',
 					prompt: query
 				})
 			});
@@ -240,7 +237,7 @@ export async function* streamRAGResponse(
 		// 2. Vector search (optional - skip if no embeddings)
 		yield {
 			type: 'metadata',
-			metadata: { stage: 'search' },
+			metadata: {, stage: 'search' },
 			timestamp: Date.now()
 		};
 
@@ -250,8 +247,7 @@ export async function* streamRAGResponse(
 				const searchResponse = await fetch(`http://localhost:6333/collections/${qdrantCollection}/points/search`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						vector: embedding,
+					body: JSON.stringify({, vector: embedding,
 						limit: 5,
 						with_payload: true
 					})
@@ -272,7 +268,7 @@ export async function* streamRAGResponse(
 		// 3. Build enhanced prompt
 		yield {
 			type: 'metadata',
-			metadata: { stage: 'generate', contextSize: context.length },
+			metadata: {, stage: 'generate', contextSize: context.length },
 			timestamp: Date.now()
 		};
 

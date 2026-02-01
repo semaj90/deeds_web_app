@@ -8,21 +8,11 @@ import type { Collection } from 'lokijs';
 import Loki from 'lokijs';
 
 interface CacheEntry<T = any> {
-    key: string;
-    value: T;
-    timestamp: number;
-    ttl: number;
-    priority: number;
-    accessCount: number;
-    sizeBytes: number;
+    key: string;, value: T;, timestamp: number;, ttl: number;, priority: number;, accessCount: number;, sizeBytes: number;
 }
 
 interface CacheLayer {
-    name: string;
-    maxSize: number;
-    currentSize: number;
-    hitRate: number;
-    missRate: number;
+    name: string;, maxSize: number;, currentSize: number;, hitRate: number;, missRate: number;
 }
 
 export class MultiLayerCacheSystem {
@@ -42,8 +32,8 @@ export class MultiLayerCacheSystem {
 
     // Cache statistics
     private stats = {
-        hits: { l1: 0, l2: 0, l3: 0, l4: 0 },
-        misses: { l1: 0, l2: 0, l3: 0, l4: 0 },
+        hits: {, l1: 0, l2: 0, l3: 0, l4: 0 },
+        misses: {, l1: 0, l2: 0, l3: 0, l4: 0 },
         evictions: 0,
         writes: 0
     };
@@ -397,9 +387,7 @@ export class MultiLayerCacheSystem {
                     }
                 }
                 break;
-            case 'all':
-            default:
-                this.memoryCollection.clear();
+            case 'all': default, this.memoryCollection.clear();
                 if (browser && this.indexedDB) {
                     const transaction = this.indexedDB.transaction(['cache'], 'readwrite');
                     const store = transaction.objectStore('cache');
@@ -428,7 +416,7 @@ export class MultiLayerCacheSystem {
     /**
      * Get cache statistics
      */
-    getStats(): { layers: CacheLayer[]; totalHits: number; totalMisses: number; hitRate: number; evictions: number; writes: number } {
+    getStats(): {, layers: CacheLayer[];, totalHits: number;, totalMisses: number;, hitRate: number;, evictions: number;, writes: number } {
         const totalHits = Object.values(this.stats.hits).reduce((a, b) => a + b, 0);
         const totalMisses = Object.values(this.stats.misses).reduce((a, b) => a + b, 0);
         return {

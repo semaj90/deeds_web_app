@@ -9,7 +9,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface TabItem {
-	id: string; label: string;
+	id: string;, label: string;
 	disabled?: boolean;
 	icon?: string;
 }

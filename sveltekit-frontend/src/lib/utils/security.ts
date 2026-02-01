@@ -7,12 +7,9 @@ import { browser } from '$app/environment';
 
 // Security configuration
 export interface SecurityConfig {
-    maxFileSize: number;
-    allowedFileTypes: string[];
-    sessionTimeout: number;
-    maxLoginAttempts: number;
-    passwordMinLength: number;
-    requireMFA: boolean;
+    maxFileSize: number;, allowedFileTypes: string[];
+    sessionTimeout: number;, maxLoginAttempts: number;
+    passwordMinLength: number;, requireMFA: boolean;
     encryptionKey?: string;
 }
 
@@ -33,12 +30,9 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
 
 // Authentication and session management
 export interface UserSession {
-    userId: string;
-    username: string;
-    role: string[];
-    permissions: string[];
-    loginTime: number;
-    lastActivity: number;
+    userId: string;, username: string;
+    role: string[];, permissions: string[];
+    loginTime: number;, lastActivity: number;
     sessionId: string;
     isLegalProfessional?: boolean;
     barNumber?: string;
@@ -47,8 +41,7 @@ export interface UserSession {
 
 export interface SecurityEvent {
     type: "login" | "logout" | "access_denied" | "suspicious_activity" | "file_upload" | "data_export" | "privileged_access" | "evidence_access";
-    userId?: string;
-    timestamp: number;
+    userId?: string;, timestamp: number;
     details: Record<string, unknown>;
     severity: "low" | "medium" | "high" | "critical";
     ipAddress?: string;
@@ -83,7 +76,7 @@ class SessionManager {
             type: "login",
             userId: user.userId,
             timestamp: now,
-            details: { username: user.username, role: user.role },
+            details: {, username: user.username, role: user.role },
             severity: "low"
         });
         return this.session;
@@ -95,7 +88,7 @@ class SessionManager {
                 type: "logout",
                 userId: this.session.userId,
                 timestamp: Date.now(),
-                details: { username: this.session.username },
+                details: {, username: this.session.username },
                 severity: "low"
             });
         }
@@ -247,8 +240,7 @@ export function sanitizeInput(input: string, type: "html" | "sql" | "js" = "html
 
 // File security checks with legal document considerations
 export interface FileSecurityResult {
-    isSafe: boolean;
-    issues: string[];
+    isSafe: boolean;, issues: string[];
     risk: "low" | "medium" | "high";
     isLegalDocument?: boolean;
     requiresPrivilegedAccess?: boolean;
@@ -387,7 +379,7 @@ export function generateCSPNonce(): string {
 }
 
 // Password security
-export function checkPasswordStrength(password: string): { score: number; feedback: string[]; isStrong: boolean } {
+export function checkPasswordStrength(password: string): {, score: number; feedback: string[];, isStrong: boolean } {
     const feedback: string[] = [];
     let score = 0;
 
@@ -430,8 +422,7 @@ export function generateSecureToken(length: number = 32): string {
 
 // Evidence chain of custody protection for legal compliance
 export interface ChainOfCustodyEvent {
-    timestamp: number;
-    action: "created" | "accessed" | "modified" | "transferred" | "analyzed" | "sealed";
+    timestamp: number;, action: "created" | "accessed" | "modified" | "transferred" | "analyzed" | "sealed";
     userId: string;
     details?: {
         hash?: string;
@@ -453,8 +444,7 @@ export function addChainOfCustodyEvent(evidenceId: string, event: Omit<ChainOfCu
         type: "evidence_access",
         userId: event.userId,
         timestamp: fullEvent.timestamp,
-        details: {
-            action: "chain_of_custody",
+        details: {, action: "chain_of_custody",
             evidenceId,
             custodyEvent: fullEvent
         },
@@ -469,8 +459,7 @@ export function secureDataExport(data: unknown, userId: string, legalContext?: R
         type: "data_export",
         userId,
         timestamp: Date.now(),
-        details: {
-            dataType: typeof data,
+        details: {, dataType: typeof data,
             recordCount: Array.isArray(data) ? data.length : 1,
             fields: Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []
         },
@@ -510,7 +499,7 @@ export function checkAttorneyClientPrivilege(userId: string, documentId: string,
             type: "access_denied",
             userId,
             timestamp: Date.now(),
-            details: { reason: "non_legal_professional_access", documentId, action },
+            details: {, reason: "non_legal_professional_access", documentId, action },
             severity: "high"
         });
         return false;
@@ -545,8 +534,7 @@ export function trackPrivilegedAccess(documentId: string, action: "view" | "edit
             type: "privileged_access",
             userId: session.userId,
             timestamp: Date.now(),
-            details: {
-                documentId: action,
+            details: {, documentId: action,
                 isLegalProfessional: session.isLegalProfessional,
                 barNumber: session.barNumber
             },

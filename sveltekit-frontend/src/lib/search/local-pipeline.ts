@@ -1,8 +1,7 @@
 import Fuse from 'fuse.js';
 
 export interface LocalDoc {
-    id: string;
-    text: string;
+    id: string;, text: string;
     metadata?: Record<string, unknown>;
 }
 
@@ -100,12 +99,12 @@ export class LocalSearchPipeline {
                 {
                     id: 'seed-1',
                     text: 'Contract indemnification clause and liability limitations for commercial agreements.',
-                    metadata: { title: 'Indemnification Basics', type: 'contract' }
+                    metadata: {, title: 'Indemnification Basics', type: 'contract' }
                 },
                 {
                     id: 'seed-2',
                     text: 'Case law summary regarding breach of contract and damages calculation methods.',
-                    metadata: { title: 'Breach and Damages', type: 'case-law' }
+                    metadata: {, title: 'Breach and Damages', type: 'case-law' }
                 }
             ];
             this.addDocuments(seed);

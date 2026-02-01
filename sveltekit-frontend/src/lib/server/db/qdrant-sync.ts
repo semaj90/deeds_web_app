@@ -42,11 +42,10 @@ export async function initQdrantCollection(): Promise<boolean> {
 		if (!exists) {
 			console.log(`📦 Creating Qdrant collection: ${COLLECTION_NAME}`);
 			await qdrant.createCollection(COLLECTION_NAME, {
-				vectors: {
-					size: VECTOR_SIZE,
+				vectors: {, size: VECTOR_SIZE,
 					distance: 'Cosine'
 				},
-				optimizers_config: { default_segment_number: 2 },
+				optimizers_config: {, default_segment_number: 2 },
 				replication_factor: 1
 			});
 
@@ -89,8 +88,7 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
 				{
 					id: doc.id, // Use Postgres ID as Qdrant ID if number
 					vector: doc.embedding,
-					payload: {
-						couchdb_id: doc.couchdb_id,
+					payload: {, couchdb_id: doc.couchdb_id,
 						postgres_id: doc.id,
 						title: doc.title,
 						type: doc.metadata?.type ?? 'unknown',
@@ -225,16 +223,11 @@ export async function searchQdrant(
 	filter?: Record<string, any>
 ): Promise<
 	Array<{
-		id: number;
-		score: number;
-		payload: {
-			couchdb_id: string | null;
-			postgres_id: number;
-			title: string;
-			type: string;
-			source: string;
-			tags: string[];
-			importance: number;
+		id: number;, score: number;
+		payload: {, couchdb_id: string | null;
+			postgres_id: number;, title: string;
+			type: string;, source: string;
+			tags: string[];, importance: number;
 			blob_url: string | null;
 		};
 	}>
@@ -267,23 +260,20 @@ export async function searchQdrantWithFilter(
 	limit: number = 10
 ): Promise<
 	Array<{
-		id: number;
-		score: number;
+		id: number;, score: number;
 		payload: any;
 	}>
 > {
 	return searchQdrant(queryEmbedding, limit, {
-		must: [{ key: 'source', match: { value: source } }]
+		must: [{, key: 'source', match: {, value: source } }]
 	});
 }
 
 /**
  * Get Qdrant collection stats
  */
-export async function getQdrantStats(): Promise<{
-	points_count: number;
-	segments_count: number;
-	status: string;
+export async function getQdrantStats(): Promise<{, points_count: number;
+	segments_count: number;, status: string;
 } | null> {
 	try {
 		const info = await qdrant.getCollection(COLLECTION_NAME);

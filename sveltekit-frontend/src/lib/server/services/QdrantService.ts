@@ -29,7 +29,7 @@ interface QdrantClientLike {
   delete(collection: string, params: Record<string, unknown>): Promise<unknown>;
   updatePoints(collection: string, params: Record<string, unknown>): Promise<unknown>;
   getCollection(collection: string): Promise<Record<string, unknown> | undefined>;
-  getCollections(): Promise<{ collections?: Array<{ name: string }> }>;
+  getCollections(): Promise<{ collections?: Array<{, name: string }> }>;
   createCollection(name: string, params: Record<string, unknown>): Promise<unknown>;
   updateCollection(name: string, params: Record<string, unknown>): Promise<unknown>;
   createSnapshot(collection: string): Promise<Record<string, unknown>>;
@@ -37,8 +37,7 @@ interface QdrantClientLike {
 
 // Simplified types for QdrantService
 export interface VectorSearchResult {
-  id: string;
-  score: number;
+  id: string;, score: number;
   payload?: Record<string, unknown>;
   vector?: number[];
   similarity?: number;
@@ -52,8 +51,7 @@ export interface VectorSearchResult {
 }
 
 export interface DocumentVector {
-  id?: string;
-  vector: number[];
+  id?: string;, vector: number[];
   content?: string;
   title?: string;
   type?: string;
@@ -80,8 +78,7 @@ export interface CollectionInfo {
 }
 
 export interface BatchUpsertResult {
-  operation_id: string;
-  status: string;
+  operation_id: string;, status: string;
   successful?: boolean;
 }
 
@@ -115,13 +112,11 @@ export class QdrantService {
             onDisk: false,
             shardNumber: key === 'documents' ? 2 : 1,
             replicationFactor: 1,
-            optimizersConfig: {
-              indexingThreshold: 20000,
+            optimizersConfig: {, indexingThreshold: 20000,
               memmapThreshold: 50000,
               maxOptimizationThreads: 2,
             },
-            hnswConfig: {
-              m: 16,
+            hnswConfig: {, m: 16,
               efConstruct: 200,
               fullScanThreshold: 10000,
               maxIndexingThreads: 4,
@@ -160,8 +155,7 @@ export class QdrantService {
       const point = {
         id: document.id ?? crypto.randomUUID(),
         vector: document.vector,
-        payload: {
-          content: document.content ?? '',
+        payload: {, content: document.content ?? '',
           title: document.title ?? '',
           type: document.type ?? 'document',
           metadata: document.metadata ?? {},
@@ -199,8 +193,7 @@ export class QdrantService {
       const points = documents.map((doc) => ({
         id: doc?.id || crypto.randomUUID(),
         vector: doc.vector,
-        payload: {
-          content: doc.content ?? '',
+        payload: {, content: doc.content ?? '',
           title: doc.title ?? '',
           type: doc.type ?? 'document',
           metadata: doc.metadata ?? {},
@@ -257,7 +250,7 @@ export class QdrantService {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'case_id',
-          match: { value: filterRecord['case_id'] },
+          match: {, value: filterRecord['case_id'] },
         });
       }
 
@@ -265,7 +258,7 @@ export class QdrantService {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'type',
-          match: { value: filterRecord['type'] },
+          match: {, value: filterRecord['type'] },
         });
       }
 
@@ -274,7 +267,7 @@ export class QdrantService {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'created_at',
-          range: { gte: dr['start'], lte: dr['end'] },
+          range: {, gte: dr['start'], lte: dr['end'] },
         });
       }
 
@@ -422,8 +415,7 @@ export class QdrantService {
   async optimizeCollection(collection: string = this.DEFAULT_COLLECTION): Promise<void> {
     try {
       await this.client.updateCollection(collection, {
-        optimizers_config: {
-          indexing_threshold: 20000,
+        optimizers_config: {, indexing_threshold: 20000,
           max_optimization_threads: 4,
         },
       });
@@ -467,8 +459,7 @@ export class QdrantService {
   private async createCollection(name: string, config: Record<string, unknown>): Promise<void> {
     try {
       await this.client.createCollection(name, {
-        vectors: {
-          size: config['vectorSize'],
+        vectors: {, size: config['vectorSize'],
           distance: config['distance'],
           on_disk: config['onDisk'],
         },

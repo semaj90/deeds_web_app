@@ -9,19 +9,17 @@
    */
 
   interface ContextData {
-    context_id: string;
-    source: string;
-    score: number;
-    snippet: string;
-    range?: { from_msg_id: number; to_msg_id: number };
+    context_id: string;, source: string;
+    score: number;, snippet: string;
+    range?: {, from_msg_id: number; to_msg_id: number };
     timestamp?: string;
   }
 
   interface Props {
     context: ContextData;
     hint?: string | null;
-    onaccept?: (detail: { comment: string }) => void;
-    onreject?: (detail: { comment: string }) => void;
+    onaccept?: (detail: {, comment: string }) => void;
+    onreject?: (detail: {, comment: string }) => void;
   }
 
   let {

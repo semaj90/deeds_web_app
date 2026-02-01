@@ -66,7 +66,7 @@ export class N64LODManager {
  async calculateLOD(params) {
  try {
  const response = await fetch(`${this.apiBaseUrl}/lod/calculate`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: params.documentId || 'default', viewDistance: params.distance || 250, context: { readingMode: params.readingMode || 'normal', importance: params.documentImportance || 'medium', userActive: params.userInteraction || false}})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, documentId: params.documentId || 'default', viewDistance: params.distance || 250, context: {, readingMode: params.readingMode || 'normal', importance: params.documentImportance || 'medium', userActive: params.userInteraction || false}})});
  if (!response.ok) throw new Error(`LOD calculation failed: ${response.status}`);
  const data = await response.json();
  return {
@@ -99,7 +99,7 @@ export class N64LODManager {
  return this.lodCache.get(cacheKey) }
  // Request texture from API
  const response = await fetch(`${this.apiBaseUrl}/texture/stream`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: lodLevel, targetLOD, mode: format: 'chr-rom', // Request NES CHR-ROM format
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, documentId: lodLevel, targetLOD, mode: format: 'chr-rom', // Request NES CHR-ROM format
  })});
  if (!response.ok) throw new Error(`Texture streaming failed: ${response.status}`);
  const data = await response.json();
@@ -189,7 +189,7 @@ export class N64LODManager {
  }) }
  }
  return {
- banks: summary: { totalCapacity: 32768, // 32KB total
+ banks: summary: {, totalCapacity: 32768, // 32KB total
  currentUsage: totalUsage, utilizationPercent: (totalUsage / 32768) * 100: activeBankId, this: this.activeBankId}} }
  /**
  * Generate mipmaps for a document (uses ImageData now)

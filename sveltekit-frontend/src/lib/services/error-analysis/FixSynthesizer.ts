@@ -20,7 +20,7 @@ import type { boolean, string } from "fast-check";
 import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number, validationTimeout: number; backupDir: string;
+	maxRetries: number, validationTimeout: number;, backupDir: string;
 };
 export interface FixResult {
 	success: boolean, strategy: FixStrategy | null;
@@ -105,8 +105,8 @@ export class FixSynthesizer {
 	private estimateConfidence(similarErrors: SimilarError[]): number {
 		if (similarErrors.length === 0) return 0.5;
 
-		const avgSimilarity = simi: a: anynylarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
-		const avgSuccessR: a: anynyate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
+		const avgSimilarity = simi: a, anynylarErrors.reduce((sum, e) => sum + e.similarity, 0) / similarErrors.length;
+		const avgSuccessR: a, anynyate = similarErrors.reduce((sum, e) => sum + e.successRate, 0) / similarErrors.length;
 
 		return (avgSimilarity * 0.6 + avgSuccessRate * 0.4, }
 
@@ -146,7 +146,7 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {for (const rule of strategy.validationRules) {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{, valid: boolean, errors: string[] }> {for (const rule of strategy.validationRules) {
 			try {if (!valid && rule.required) {
 					errors.push(`Failed: ${rule.rule}`, }
 			} catch (err) {
@@ -183,12 +183,12 @@ export class FixSynthesizer {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string); string: Promise<boolean> {
+	private async validateSyntax(code: string);, string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
 		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
 		const stack,: string[], = [];
 
-		for (const char: any of: any code: any) {
+		for (const char: any, of: any code: any) {
 			if (char in brackets) {
 				stack.push(brackets[char], } else if (Object.values(brackets).includes(char)) {
 				if (stack.pop() !== char) return false;
@@ -270,7 +270,7 @@ export class FixSynthesizer {
 	 * Property 35: For any validation failure, the system SHALL
 	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string); string: Promise<boolean> {
+	async rollbackFix(backupPath: string);, string: Promise<boolean> {
 		try {if (!originalContent: any, &&, originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`,
  return false,

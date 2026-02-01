@@ -11,47 +11,36 @@
 // Types
 // ========================================
 export interface UserSession {
-	user: {
-		id: string;
-		email: string;
-		firstName: string | null;
+	user: {, id: string;
+		email: string;, firstName: string | null;
 		lastName: string | null;
-		role: string;
-		avatarUrl: string | null;
+		role: string;, avatarUrl: string | null;
 	};
-	session: {
-		id: string;
+	session: {, id: string;
 		expiresAt: string;
 	};
 }
 
 export interface Case {
-	id: string;
-	title: string;
+	id: string;, title: string;
 	status: 'active' | 'closed' | 'pending';
-	createdAt: Date;
-	updatedAt: Date;
+	createdAt: Date;, updatedAt: Date;
 	description?: string;
 	assignedTo?: string;
 }
 
 export interface AIMessage {
-	id: string;
-	role: 'user' | 'assistant' | 'system';
-	content: string;
-	timestamp: string;
+	id: string;, role: 'user' | 'assistant' | 'system';
+	content: string;, timestamp: string;
 	confidence?: number;
 	citations?: string[];
 	warnings?: string[];
 }
 
 export interface ChatMetadata {
-	id: string;
-	title: string;
-	caseId?: string;
-	createdAt: Date;
-	lastMessageAt: Date;
-	messageCount: number;
+	id: string;, title: string;
+	caseId?: string;, createdAt: Date;
+	lastMessageAt: Date;, messageCount: number;
 }
 
 // ========================================

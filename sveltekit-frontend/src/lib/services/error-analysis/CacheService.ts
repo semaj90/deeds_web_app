@@ -49,7 +49,7 @@ export class CacheService {
 
 			this.redis = createClient({
 				url: redisUrl,
-				socket: { connectTimeout: 5000, keepAlive: true
+				socket: {, connectTimeout: 5000, keepAlive: true
 				}
 			}) as unknown as RedisClient;
 
@@ -204,7 +204,7 @@ export class CacheService {
 	 *
 	 * @returns Cache statistics
 	 */
-	async getStats(): Promise<{ available: boolean; hits: number; misses: number; hitRate: number;
+	async getStats(): Promise<{, available: boolean; hits: number;, misses: number; hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
 		// For now;

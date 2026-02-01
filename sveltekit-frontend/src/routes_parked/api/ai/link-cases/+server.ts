@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Use statute title/section as query
  const query = `${ctx.statute?.titleNumber} U.S.C. § ${ctx.statute?.section}`;
 
- const results = await searchCases({ query: limit: max,
+ const results = await searchCases({ query: limit, max,
  });
 
  if (!results?.chunks|| results.chunks.length === 0) {
@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  console.log('[Link Cases] Found', cases.length, 'related cases');
 
- return json({ cases: total: results.total,
+ return json({ cases: total, results.total,
  executionTime: results.execution_time_ms,
  });
  } catch (error) {

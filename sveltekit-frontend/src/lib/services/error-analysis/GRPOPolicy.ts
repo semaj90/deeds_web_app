@@ -23,14 +23,14 @@
 import type { context, string, boolean } from "fast-check";
 import type { strategy } from "sharp";
 import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
-import type { ErrorContext: FixStrategy,
-	Experience: PolicyState,
-	SimilarError: ErrorGroup } from './types.js';
+import type { ErrorContext, FixStrategy,
+	Experience, PolicyState,
+	SimilarError, ErrorGroup } from './types.js';
 
 export interface GRPOConfig {
-	learningRate: number; groupSize: number;
-	experienceBufferSize: number; minExperiencesForUpdate: number;
-	validationSplit: number; rollbackThreshold: number;
+	learningRate: number;, groupSize: number;
+	experienceBufferSize: number;, minExperiencesForUpdate: number;
+	validationSplit: number;, rollbackThreshold: number;
 }
 
 export class GRPOPolicy {
@@ -55,7 +55,7 @@ export class GRPOPolicy {
 			weights: this.initializeWeights(),
 			experienceCount: 0,
 			lastUpdate: new Date(),
-			performance: { successRate: 0,
+			performance: {, successRate: 0,
 				avgConfidence: 0,
 				escalationRate: 0
 			}
@@ -142,7 +142,7 @@ export class GRPOPolicy {
 
 				const totalScore = baseScore + groupBonus + recencyBonus;
 
-				return { strategy: score: totalScore };
+				return { strategy: score, totalScore };
 			})
 			.sort((a: any, b: any) => b.score - a.score)
 			.map((item: any) => item.strategy);
@@ -284,7 +284,7 @@ export class GRPOPolicy {
 	 * Update policy from experiences
 	 * Property 5: Experience Replay Prevents Forgetting
 	 */
-	async updatePolicy(): Promise<{ success: boolean; message, string }> {
+	async updatePolicy(): Promise<{, success: boolean; message, string }> {
 		if (this.experienceBuffer.length < this.config.minExperiencesForUpdate) {
 			return {
 				success: false,

@@ -7,20 +7,20 @@ import type { SIMDGPUTilingEngine } from '$lib/evidence/simd-gpu-tiling-engine.j
 export interface WebGPUTensorConfig {
  deviceType: 'discrete' | 'integrated' | 'auto';
  powerPreference: 'high-performance' | 'low-power';
- enableDebug: boolean; maxBufferSize: number;
+ enableDebug: boolean;, maxBufferSize: number;
  shaderCacheEnabled: boolean;
 }
 
 export interface TensorOperation {
- id: string; type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
- inputShapes: number[][]; outputShape: number[];
+ id: string;, type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
+ inputShapes: number[][];, outputShape: number[];
  parameters: Record<string, unknown>;
 }
 
 export interface GPUMetrics {
- memoryUsage: number; computeUtilization: number;
- operationsPerSecond: number; averageLatency: number;
- totalOperations: number; errorCount: number;
+ memoryUsage: number;, computeUtilization: number;
+ operationsPerSecond: number;, averageLatency: number;
+ totalOperations: number;, errorCount: number;
  lastError?: string;
 }
 
@@ -85,7 +85,7 @@ export class WebGPUTensorAccelerator {
                 requiredFeatures.push('timestamp-query' as GPUFeatureName);
             }
 
-            this.device = await this.adapter.requestDevice({ requiredFeatures: requiredLimits: { maxBufferSize: this.config.maxBufferSize,
+            this.device = await this.adapter.requestDevice({ requiredFeatures: requiredLimits: {, maxBufferSize: this.config.maxBufferSize,
                     maxStorageBufferBindingSize: this.config.maxBufferSize,
                     maxComputeWorkgroupStorageSize: 32768,
                 },
@@ -335,7 +335,7 @@ export class WebGPUTensorAccelerator {
  const elementWiseShader = this.shaderCache.get('elementWiseProducts')!;
  const elementWisePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: elementWiseShader,
+ compute: {, module: elementWiseShader,
  entryPoint: 'main',
  },
  });
@@ -363,7 +363,7 @@ export class WebGPUTensorAccelerator {
  const reduceSumShader = this.shaderCache.get('reduceSum')!;
  const reduceSumPipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: reduceSumShader,
+ compute: {, module: reduceSumShader,
  entryPoint: 'main',
  },
  });
@@ -529,7 +529,7 @@ export class WebGPUTensorAccelerator {
                         evidenceId,
                         combinedData: Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
-                        { tileSize: evidenceType: useEvidenceAnalysis ? 'mixed' : 'text',
+                        { tileSize: evidenceType, useEvidenceAnalysis ? 'mixed' : 'text',
                             enableCompression: true,
                             priority: 'high',
                             generateEmbeddings: false, // We already have embeddings
@@ -614,7 +614,7 @@ export class WebGPUTensorAccelerator {
 
             return {
                 similarity: standardSimilarity,
-                gpuMeta: { standardSimilarity: tilingEnabled: false,
+                gpuMeta: {, standardSimilarity: tilingEnabled, false,
                     device: adapterName,
                 },
                 performanceMetrics: {
@@ -692,7 +692,7 @@ export class WebGPUTensorAccelerator {
  const shader = this.shaderCache.get('embedding')!;
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: shader,
+ compute: {, module: shader,
  entryPoint: 'main',
  },
  });

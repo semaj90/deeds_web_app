@@ -4,8 +4,8 @@
  */
 
 export interface BitsUITestResult {
- component: string; status: 'pass' | 'fail' | 'warning';
- message: string; timestamp: number;
+ component: string;, status: 'pass' | 'fail' | 'warning';
+ message: string;, timestamp: number;
 }
 
 export class BitsUIIntegrationTester {

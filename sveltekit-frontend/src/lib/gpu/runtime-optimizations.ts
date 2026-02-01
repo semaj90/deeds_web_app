@@ -20,8 +20,7 @@ declare global {
 	}
 
 	interface GPUBufferDescriptor {
-		size: number;
-		usage: GPUBufferUsageFlags;
+		size: number;, usage: GPUBufferUsageFlags;
 	}
 
 	interface GPUBuffer {
@@ -142,12 +141,9 @@ export class GPUMarkdownPerformanceMonitor {
  return duration;
  }
 
- getMetrics(operation?: string): {
- average: number;
- min: number;
- max: number;
- count: number;
- p95: number;
+ getMetrics(operation?: string): {, average: number;
+ min: number;, max: number;
+ count: number;, p95: number;
  } {
  if (operation) {
  const measurements = this.metrics.get(operation) || [];
@@ -190,10 +186,8 @@ export class GPUMarkdownPerformanceMonitor {
  this.startTimes.clear();
  }
 
- getMemoryUsage(): {
- heapUsed: number;
- heapTotal: number;
- external: number;
+ getMemoryUsage(): {, heapUsed: number;
+ heapTotal: number;, external: number;
  gpuMemory?: number;
  } {
  const memUsage = process.memoryUsage();

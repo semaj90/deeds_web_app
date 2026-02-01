@@ -2,8 +2,7 @@
   import type { Snippet } from 'svelte';
 
   export interface TableColumn {
-    key: string;
-    title: string;
+    key: string;, title: string;
     sortable?: boolean;
     width?: string;
     align?: 'left' | 'center' | 'right';
@@ -27,8 +26,7 @@
     dense = false,
     actionsSnippet
   } = $props<{
-    columns: TableColumn[];
-    data: TableRow[];
+    columns: TableColumn[];, data: TableRow[];
     loading?: boolean;
     selectable?: boolean;
     sortable?: boolean;
@@ -102,8 +100,7 @@
       case 'date':
         return new Date(String(value)).toLocaleDateString();
       case 'number':
-        return typeof value === 'number' ? value.toLocaleString() : String(value);
-      default:
+        return typeof value === 'number' ? value.toLocaleString() : String(value);, default:
         return String(value);
     }
   }
@@ -116,7 +113,7 @@
       <input
         bind:value={searchQuery}
         placeholder="Filter records..."
-        class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:ring-1 focus:ring-cyan-500 outline-none"
+        class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder-slate-500 focus: ring-1, focus:ring-cyan-500 outline-none"
       />
     </div>
     {#if loading}
@@ -136,8 +133,7 @@
           {/if}
           {#each columns as col}
             <th
-              class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer hover:text-slate-300"
-              style:width={col.width}
+              class="p-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest cursor-pointer hover: text-slate-300", style:width={col.width}
               onclick={() => handleSort(col)}
             >
               <div class="flex items-center gap-1">
@@ -204,14 +200,14 @@
         <button
           disabled={currentPage === 1}
           onclick={() => currentPage--}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover:bg-slate-700 disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled: hover, bg-slate-700, disabled:opacity-30 transition-all font-mono"
         >
           PREV
         </button>
         <button
           disabled={currentPage === totalPages()}
           onclick={() => currentPage++}
-          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled:hover:bg-slate-700 disabled:opacity-30 transition-all font-mono"
+          class="px-2 py-1 bg-slate-800 border border-slate-700 text-[10px] font-bold enabled: hover, bg-slate-700, disabled:opacity-30 transition-all font-mono"
         >
           NEXT
         </button>

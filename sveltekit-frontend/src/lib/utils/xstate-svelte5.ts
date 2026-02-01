@@ -9,8 +9,7 @@ import { onDestroy, onMount } from 'svelte';
 import { createActor, type Actor, type AnyStateMachine, type Snapshot } from 'xstate';
 
 export interface UseMachineReturn<TMachine extends AnyStateMachine> {
-	snapshot: Snapshot<TMachine>;
-	send: Actor<TMachine>['send'];
+	snapshot: Snapshot<TMachine>;, send: Actor<TMachine>['send'];
 	actor: Actor<TMachine>;
 }
 
@@ -23,7 +22,7 @@ export interface UseMachineReturn<TMachine extends AnyStateMachine> {
  * import { myMachine } from './myMachine';
  *
  * const { snapshot, send, actor } = useMachine(myMachine, {
- *   context: { customValue: 'test' }
+ *   context: {, customValue: 'test' }
  * });
  * ```
  */
@@ -38,8 +37,7 @@ export function useMachine<TMachine extends AnyStateMachine>(
 	const actor = createActor(machine, {
 		input: options?.input,
 		...(options?.context && {
-			snapshot: {
-				context: {
+			snapshot: {, context: {
 					...machine.context,
 					...options.context
 				}

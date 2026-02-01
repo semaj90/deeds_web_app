@@ -4,35 +4,22 @@
  */
 
 export interface ConsolePalette {
-    name: string;
-    era: string;
-    colors: {
-        primary: string;
-        secondary: string;
-        tertiary: string;
-        success: string;
-        warning: string;
-        error: string;
-        background: string;
-        foreground: string;
-        accent: string[];
+    name: string;, era: string;
+    colors: {, primary: string;
+        secondary: string;, tertiary: string;
+        success: string;, warning: string;
+        error: string;, background: string;
+        foreground: string;, accent: string[];
         // Legal AI specific colors
-        evidence: string;
-        classification: string;
-        confidence: string;
-        priority: string;
+        evidence: string;, classification: string;
+        confidence: string;, priority: string;
     };
-    gradients: {
-        main: string;
-        modal: string;
-        card: string;
-        evidence: string;
-        priority: string;
+    gradients: {, main: string;
+        modal: string;, card: string;
+        evidence: string;, priority: string;
     };
-    constraints: {
-        maxColors: number;
-        bitDepth: number;
-        memoryKB: number;
+    constraints: {, maxColors: number;
+        bitDepth: number;, memoryKB: number;
     };
     cssVariables: Record<string, string>;
 }
@@ -41,8 +28,7 @@ export interface ConsolePalette {
 export const NES_PALETTE: ConsolePalette = {
     name: 'NES Classic',
     era: '8-bit',
-    colors: {
-        primary: '#E52521', // Nintendo Red
+    colors: {, primary: '#E52521', // Nintendo Red
         secondary: '#0084FF', // Classic Blue
         tertiary: '#4CAF50', // Green
         success: '#5CB85C', // Light Green
@@ -65,15 +51,13 @@ export const NES_PALETTE: ConsolePalette = {
             '#BCBCBC', // Light Gray
         ]
     },
-    gradients: {
-        main: 'linear-gradient(0deg, #000000, #1C1C1C, #383838)',
+    gradients: {, main: 'linear-gradient(0deg, #000000, #1C1C1C, #383838)',
         modal: 'linear-gradient(135deg, #000000, #0000FC, #000000)',
         card: 'linear-gradient(45deg, #1C1C1C, #383838)',
         evidence: 'linear-gradient(90deg, #8B4513, #CD853F)',
         priority: 'linear-gradient(45deg, #FF6347, #DC3545)'
     },
-    constraints: {
-        maxColors: 54,
+    constraints: {, maxColors: 54,
         bitDepth: 2,
         memoryKB: 2
     },
@@ -97,8 +81,7 @@ export const NES_PALETTE: ConsolePalette = {
 export const SNES_PALETTE: ConsolePalette = {
     name: 'SNES Mode 7',
     era: '16-bit',
-    colors: {
-        primary: '#B266FF', // Purple
+    colors: {, primary: '#B266FF', // Purple
         secondary: '#00C8FF', // Cyan
         tertiary: '#FFD700', // Gold
         success: '#00FF00', // Bright Green
@@ -121,15 +104,13 @@ export const SNES_PALETTE: ConsolePalette = {
             '#6A0572', // Violet
         ]
     },
-    gradients: {
-        main: 'linear-gradient(180deg, #1A0033, #524A7B, #B266FF)',
+    gradients: {, main: 'linear-gradient(180deg, #1A0033, #524A7B, #B266FF)',
         modal: 'linear-gradient(135deg, #1A0033 0%, #524A7B 50%, #B266FF 100%)',
         card: 'radial-gradient(circle, #524A7B, #1A0033)',
         evidence: 'linear-gradient(135deg, #9C88FF, #706FD3)',
         priority: 'linear-gradient(90deg, #FF5252, #FF0066)'
     },
-    constraints: {
-        maxColors: 32768,
+    constraints: {, maxColors: 32768,
         bitDepth: 15,
         memoryKB: 128
     },
@@ -153,8 +134,7 @@ export const SNES_PALETTE: ConsolePalette = {
 export const PS1_PALETTE: ConsolePalette = {
     name: 'PlayStation Classic',
     era: '32-bit',
-    colors: {
-        primary: '#003791', // PlayStation Blue
+    colors: {, primary: '#003791', // PlayStation Blue
         secondary: '#FF3131', // PSX Red
         tertiary: '#00BF63', // PSX Green
         success: '#00D452', // Success Green
@@ -177,15 +157,13 @@ export const PS1_PALETTE: ConsolePalette = {
             '#FF5722', // Deep Orange
         ]
     },
-    gradients: {
-        main: 'linear-gradient(90deg, #0A0E27, #003791, #2196F3)',
+    gradients: {, main: 'linear-gradient(90deg, #0A0E27, #003791, #2196F3)',
         modal: 'linear-gradient(135deg, #003791 0%, #2196F3 50%, #00BCD4 100%)',
         card: 'linear-gradient(180deg, #0A0E27, #003791)',
         evidence: 'linear-gradient(45deg, #8B5CF6, #EC4899)',
         priority: 'linear-gradient(90deg, #F59E0B, #FF1744)'
     },
-    constraints: {
-        maxColors: 16777216,
+    constraints: {, maxColors: 16777216,
         bitDepth: 24,
         memoryKB: 2048
     },
@@ -209,8 +187,7 @@ export const PS1_PALETTE: ConsolePalette = {
 export const N64_PALETTE: ConsolePalette = {
     name: 'N64 Ultra',
     era: '64-bit',
-    colors: {
-        primary: '#00AA00', // N64 Green
+    colors: {, primary: '#00AA00', // N64 Green
         secondary: '#0055FF', // N64 Blue
         tertiary: '#FF5555', // N64 Red
         success: '#00FF00', // Bright Green
@@ -233,15 +210,13 @@ export const N64_PALETTE: ConsolePalette = {
             '#FF55AA', // Pink
         ]
     },
-    gradients: {
-        main: 'linear-gradient(45deg, #1E1E1E, #00AA00, #0055FF, #FF5555)',
+    gradients: {, main: 'linear-gradient(45deg, #1E1E1E, #00AA00, #0055FF, #FF5555)',
         modal: 'conic-gradient(from 180deg, #00AA00, #0055FF, #FF5555, #AA00FF, #00AA00)',
         card: 'linear-gradient(135deg, #1E1E1E, #00AA00, #1E1E1E)',
         evidence: 'linear-gradient(90deg, #CD853F, #D2691E)',
         priority: 'linear-gradient(45deg, #FF6347, #FF0000)'
     },
-    constraints: {
-        maxColors: 32768,
+    constraints: {, maxColors: 32768,
         bitDepth: 15,
         memoryKB: 4096
     },
@@ -265,8 +240,7 @@ export const N64_PALETTE: ConsolePalette = {
 export const PS2_PALETTE: ConsolePalette = {
     name: 'PS2 Emotion',
     era: '128-bit',
-    colors: {
-        primary: '#1B3A6B', // PS2 Navy
+    colors: {, primary: '#1B3A6B', // PS2 Navy
         secondary: '#3A7BC8', // PS2 Blue
         tertiary: '#67B3CC', // PS2 Cyan
         success: '#4ECDC4', // Teal
@@ -289,15 +263,13 @@ export const PS2_PALETTE: ConsolePalette = {
             '#FC5C65', // Red
         ]
     },
-    gradients: {
-        main: 'linear-gradient(120deg, #0C1929, #1B3A6B, #3A7BC8, #67B3CC)',
+    gradients: {, main: 'linear-gradient(120deg, #0C1929, #1B3A6B, #3A7BC8, #67B3CC)',
         modal: 'linear-gradient(45deg, #1B3A6B 0%, #3A7BC8 25%, #67B3CC 50%, #4ECDC4 75%, #A55EEA 100%)',
         card: 'radial-gradient(ellipse at top, #3A7BC8, #1B3A6B, #0C1929)',
         evidence: 'linear-gradient(135deg, #A55EEA, #8854D0)',
         priority: 'linear-gradient(90deg, #FC5C65, #F7B731)'
     },
-    constraints: {
-        maxColors: 16777216,
+    constraints: {, maxColors: 16777216,
         bitDepth: 32,
         memoryKB: 32768
     },
@@ -321,8 +293,7 @@ export const PS2_PALETTE: ConsolePalette = {
 export const CYBERPUNK_PALETTE: ConsolePalette = {
     name: 'Cyberpunk 2077',
     era: 'Neo-Noir',
-    colors: {
-        primary: '#00FFFF', // Electric Cyan
+    colors: {, primary: '#00FFFF', // Electric Cyan
         secondary: '#FF00FF', // Hot Pink
         tertiary: '#FFFF00', // Neon Yellow
         success: '#00FF00', // Bright Green
@@ -345,15 +316,13 @@ export const CYBERPUNK_PALETTE: ConsolePalette = {
             '#FF69B4', // Hot Pink
         ]
     },
-    gradients: {
-        main: 'linear-gradient(135deg, #0A0A0A, #00FFFF, #FF00FF)',
+    gradients: {, main: 'linear-gradient(135deg, #0A0A0A, #00FFFF, #FF00FF)',
         modal: 'linear-gradient(45deg, #0A0A0A 0%, #00FFFF 50%, #FF00FF 100%)',
         card: 'linear-gradient(180deg, #0A0A0A, #1A1A1A)',
         evidence: 'linear-gradient(90deg, #9400D3, #FF69B4)',
         priority: 'linear-gradient(45deg, #FF4500, #FF0000)'
     },
-    constraints: {
-        maxColors: 16777216,
+    constraints: {, maxColors: 16777216,
         bitDepth: 32,
         memoryKB: 131072
     },
@@ -377,8 +346,7 @@ export const CYBERPUNK_PALETTE: ConsolePalette = {
 export const LEGAL_AI_PALETTE: ConsolePalette = {
     name: 'Legal AI Professional',
     era: 'Modern',
-    colors: {
-        primary: '#1E293B', // Slate, 800,
+    colors: {, primary: '#1E293B', // Slate, 800,
         secondary: '#334155', // Slate, 700,
         tertiary: '#00FF88', // Legal AI green
         success: '#10B981', // Emerald, 500,
@@ -401,15 +369,13 @@ export const LEGAL_AI_PALETTE: ConsolePalette = {
             '#84CC16', // Lime, 500
         ]
     },
-    gradients: {
-        main: 'linear-gradient(135deg, #0F172A, #1E293B, #00FF88)',
+    gradients: {, main: 'linear-gradient(135deg, #0F172A, #1E293B, #00FF88)',
         modal: 'linear-gradient(45deg, #1E293B 0%, #334155 50%, #00FF88 100%)',
         card: 'linear-gradient(180deg, #1E293B, #0F172A)',
         evidence: 'linear-gradient(90deg, #8B5CF6, #EC4899)',
         priority: 'linear-gradient(45deg, #F59E0B, #EF4444)'
     },
-    constraints: {
-        maxColors: 16777216,
+    constraints: {, maxColors: 16777216,
         bitDepth: 32,
         memoryKB: 65536
     },

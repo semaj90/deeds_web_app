@@ -13,14 +13,11 @@ import type { PatternMatcher } from './pattern-matcher';
  * Represents an unfixable file entry
  */
 export interface UnfixableEntry {
-  filePath: string;
-  errorType: string;
+  filePath: string;, errorType: string;
   errorMessage: string;
   lineNumber?: number;
-  columnNumber?: number;
-  attemptedPatterns: string[];
-  reason: UnfixableReason;
-  timestamp: Date;
+  columnNumber?: number;, attemptedPatterns: string[];
+  reason: UnfixableReason;, timestamp: Date;
 }
 
 /**
@@ -40,24 +37,19 @@ export type UnfixableReason =
  * Pattern fix statistics
  */
 export interface PatternStats {
-  patternName: string;
-  totalAttempts: number;
-  successCount: number;
-  failureCount: number;
-  successRate: number;
-  commonFailureReasons: Map<UnfixableReason, number>;
+  patternName: string;, totalAttempts: number;
+  successCount: number;, failureCount: number;
+  successRate: number;, commonFailureReasons: Map<UnfixableReason, number>;
 }
 
 /**
  * Manual review report
  */
 export interface ManualReviewReport {
-  generatedAt: Date;
-  totalUnfixableFiles: number;
+  generatedAt: Date;, totalUnfixableFiles: number;
   byReason: Map<UnfixableReason, number>;
   byErrorType: Map<string, number>;
-  patternStats: PatternStats[];
-  entries: UnfixableEntry[];
+  patternStats: PatternStats[];, entries: UnfixableEntry[];
   recommendations: string[];
 }
 
@@ -66,7 +58,7 @@ export interface ManualReviewReport {
  */
 export class UnfixableLogger {
   private entries: UnfixableEntry[] = [];
-  private patternAttempts: Map<string, { success: number; failure: number; reasons: Map<UnfixableReason, number> }> = new Map();
+  private patternAttempts: Map<string, { success: number;, failure: number; reasons: Map<UnfixableReason, number> }> = new Map();
 
   /**
    * Log an unfixable file

@@ -1,8 +1,7 @@
 import loki, { type Collection } from 'lokijs';
 
 type LokiDoc = {
-    id: string;
-    content: string;
+    id: string;, content: string;
     metadata?: Record<string, unknown>;
     embedding?: number[];
 };

@@ -30,9 +30,9 @@ let {
 
 // Size dimensions
 let dimensions = $derived({
-	sm: { track: 'w-8 h-4', thumb: 'w-3 h-3', translate: 'translate-x-4' },
-	md: { track: 'w-11 h-6', thumb: 'w-5 h-5', translate: 'translate-x-5' },
-	lg: { track: 'w-14 h-7', thumb: 'w-6 h-6', translate: 'translate-x-7' }
+	sm: {, track: 'w-8 h-4', thumb: 'w-3 h-3', translate: 'translate-x-4' },
+	md: {, track: 'w-11 h-6', thumb: 'w-5 h-5', translate: 'translate-x-5' },
+	lg: {, track: 'w-14 h-7', thumb: 'w-6 h-6', translate: 'translate-x-7' }
 }[size]);
 
 let labelSizeClasses = $derived({
@@ -124,9 +124,9 @@ function handleKeydown(e: KeyboardEvent) {
 
 <style>
 	.sr-only {
-		position: absolute; width: 1px;
-		height: 1px; padding: 0;
-		margin: -1px; overflow: hidden;
+		position: absolute;, width: 1px;
+		height: 1px;, padding: 0;
+		margin: -1px;, overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;

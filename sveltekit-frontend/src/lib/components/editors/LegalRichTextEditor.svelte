@@ -47,14 +47,14 @@
         element: editorElement,
         extensions: [
           StarterKit.configure({
-            heading: { levels: [1, 2, 3, 4] }
+            heading: {, levels: [1, 2, 3, 4] }
           }),
           Placeholder.configure({ placeholder }),
           Underline
         ],
         content,
         editable: !readonly,
-        onUpdate: ({ editor: e }) => {
+        onUpdate: ({, editor: e }) => {
           const html = e.getHTML();
           content = html;
           onchange?.(html);
@@ -189,40 +189,31 @@
   .toolbar-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 32px;
+    justify-content: center;, width: 32px;
     height: 32px;
-    border-radius: 4px;
-    color: var(--color-gray-600);
+    border-radius: 4px;, color: var(--color-gray-600);
     transition: all 0.15s;
-    border: none;
-    background: transparent;
+    border: none;, background: transparent;
     cursor: pointer;
   }
 
   .toolbar-btn:hover {
-    background: var(--color-gray-200);
-    color: var(--color-gray-900);
+    background: var(--color-gray-200);, color: var(--color-gray-900);
   }
 
   .toolbar-btn.active {
-    background: var(--color-blue-100);
-    color: var(--color-blue-600);
+    background: var(--color-blue-100);, color: var(--color-blue-600);
   }
 
   .toolbar-btn-primary {
     display: flex;
-    align-items: center;
-    gap: 4px;
+    align-items: center;, gap: 4px;
     padding: 6px 12px;
-    border-radius: 4px;
-    background: var(--color-blue-500);
+    border-radius: 4px;, background: var(--color-blue-500);
     color: white;
     font-size: 0.875rem;
-    font-weight: 500;
-    transition: background 0.15s;
-    border: none;
-    cursor: pointer;
+    font-weight: 500;, transition: background 0.15s;
+    border: none;, cursor: pointer;
   }
 
   .toolbar-btn-primary:hover {
@@ -231,8 +222,7 @@
 
   .toolbar-select {
     padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--color-gray-300);
+    border-radius: 4px;, border: 1px solid var(--color-gray-300);
     background: white;
     font-size: 0.875rem;
   }

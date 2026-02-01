@@ -11,18 +11,14 @@ export interface CacheOptions {
 }
 
 export interface CacheStats {
-    hits: number;
-    misses: number;
-    evictions: number;
-    size: number;
+    hits: number;, misses: number;
+    evictions: number;, size: number;
     memoryUsage: number;
 }
 
 interface HotCacheItem {
-    data: any;
-    hits: number;
-    lastAccess: number;
-    accessCount: number;
+    data: any;, hits: number;
+    lastAccess: number;, accessCount: number;
 }
 
 class CachingLayer {

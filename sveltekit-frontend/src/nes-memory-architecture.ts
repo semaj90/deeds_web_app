@@ -13,51 +13,44 @@
 // Nintendo NES Memory Map (authentic constraints)
 const NES_MEMORY_MAP = {
     // Internal RAM (2KB, mirrored to fill 8KB space)
-    INTERNAL_RAM: {
-        start: 0x0000,
+    INTERNAL_RAM: {, start: 0x0000,
         end: 0x07ff,
         size: 2048,
         mirrored: true,
         mirrorSize: 8192
     },
     // PPU registers (for UI components)
-    PPU_REGISTERS: {
-        start: 0x2000,
+    PPU_REGISTERS: {, start: 0x2000,
         end: 0x2007,
         size: 8,
         mirrored: true,
         mirrorSize: 8192
     },
     // APU and I/O registers (for audio/input)
-    APU_IO_REGISTERS: {
-        start: 0x4000,
+    APU_IO_REGISTERS: {, start: 0x4000,
         end: 0x4017,
         size: 24
     },
     // Expansion ROM (for legal plugins)
-    EXPANSION_ROM: {
-        start: 0x4020,
+    EXPANSION_ROM: {, start: 0x4020,
         end: 0x5fff,
         size: 8160,
         bankSwitchable: false
     },
     // Save RAM (for persistent legal data)
-    SAVE_RAM: {
-        start: 0x6000,
+    SAVE_RAM: {, start: 0x6000,
         end: 0x7fff,
         size: 8192,
         bankSwitchable: false
     },
     // PRG-ROM (Program ROM - for legal processing logic)
-    PRG_ROM: {
-        start: 0x8000,
+    PRG_ROM: {, start: 0x8000,
         end: 0xffff,
         size: 32768,
         bankSwitchable: true
     },
     // CHR-ROM (Character ROM - for legal document patterns)
-    CHR_ROM: {
-        start: 0x0000,
+    CHR_ROM: {, start: 0x0000,
         end: 0x1fff,
         size: 8192,
         bankSwitchable: true
@@ -88,11 +81,9 @@ export interface MemoryBank {
     readonly type: 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM' | 'EXPANSION_ROM';
     readonly startAddress: number;
     readonly endAddress: number;
-    readonly size: number;
-    used: number;
+    readonly size: number;, used: number;
     readonly documents: Map<string, LegalDocument>;
-    isActive: boolean;
-    lastBankSwitch: number;
+    isActive: boolean;, lastBankSwitch: number;
     compressionRatio: number;
 }
 
@@ -133,7 +124,7 @@ export class NESMemoryArchitecture {
         ppu2001: 0,
         ppu2002: 0,
         oamaddr: 0,
-        ppuscroll: { x: 0, y: 0 },
+        ppuscroll: {, x: 0, y: 0 },
         ppuaddr: 0,
         ppudata: 0
     };

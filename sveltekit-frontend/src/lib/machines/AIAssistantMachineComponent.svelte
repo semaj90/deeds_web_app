@@ -123,19 +123,15 @@
 <style>
   .yorha-assistant-container {
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: #dad4bb;
-    border: 2px solid #57544a;
+    flex-direction: column;, height: 100%;
+    background: #dad4bb;, border: 2px solid #57544a;
     color: #454138;
     font-family: 'Exo 2', sans-serif;
-    position: relative;
-    overflow: hidden;
+    position: relative;, overflow: hidden;
   }
 
   .yorha-header {
-    background: #454138;
-    color: #dad4bb;
+    background: #454138;, color: #dad4bb;
     padding: 0.5rem 1rem;
     display: flex;
     justify-content: space-between;
@@ -145,8 +141,7 @@
 
   .header-main {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: center;, gap: 0.5rem;
   }
 
   .title {
@@ -155,8 +150,7 @@
   }
 
   .status-badge {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
+    font-size: 0.7rem;, padding: 0.1rem 0.4rem;
     border: 1px solid currentColor;
     margin-left: 0.5rem;
   }
@@ -166,11 +160,9 @@
 
   .chat-viewport {
     flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
+    overflow-y: auto;, padding: 1rem;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: column;, gap: 1rem;
     background-image:
       linear-gradient(rgba(69, 65, 56, 0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(69, 65, 56, 0.05) 1px, transparent 1px);
@@ -178,8 +170,7 @@
   }
 
   .message-wrapper {
-    max-width: 85%;
-    padding: 0.5rem;
+    max-width: 85%;, padding: 0.5rem;
     border-left: 4px solid #57544a;
     background: rgba(87, 84, 74, 0.05);
   }
@@ -199,8 +190,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 0.7rem;
-    margin-bottom: 0.25rem;
-    opacity: 0.7;
+    margin-bottom: 0.25rem;, opacity: 0.7;
   }
 
   .message-body {
@@ -219,41 +209,33 @@
   }
 
   .input-area {
-    padding: 1rem;
-    background: #cdc7b0;
+    padding: 1rem;, background: #cdc7b0;
     border-top: 2px solid #57544a;
   }
 
   textarea {
-    width: 100%;
-    background: transparent;
+    width: 100%;, background: transparent;
     border: 1px solid #57544a;
-    color: #454138;
-    padding: 0.5rem;
-    resize: none;
-    height: 80px;
+    color: #454138;, padding: 0.5rem;
+    resize: none;, height: 80px;
     font-family: inherit;
   }
 
   textarea:focus {
-    outline: none;
-    background: rgba(255, 255, 255, 0.2);
+    outline: none;, background: rgba(255, 255, 255, 0.2);
   }
 
   .controls {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
+    justify-content: flex-end;, gap: 0.5rem;
     margin-top: 0.5rem;
   }
 
   .empty-state {
-    flex: 1;
-    display: flex;
+    flex: 1;, display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    opacity: 0.3;
+    align-items: center;, opacity: 0.3;
   }
 
   .error-panel {
@@ -265,18 +247,15 @@
 
   .error-label {
     color: #e74c3c;
-    font-weight: bold;
-    display: block;
+    font-weight: bold;, display: block;
     margin-bottom: 0.5rem;
   }
 
   .spinner {
-    width: 18px;
-    height: 18px;
+    width: 18px;, height: 18px;
     border: 2px solid currentColor;
     border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    border-radius: 50%;, animation: spin 0.8s linear infinite;
   }
 
   @keyframes spin {

@@ -4,11 +4,9 @@
  */
 
 export interface MemoryNode {
-    id: string;
-    content: string;
+    id: string;, content: string;
     type: 'conversation' | 'document' | 'code' | 'memory';
-    timestamp: number;
-    connections: string[];
+    timestamp: number;, connections: string[];
     metadata?: Record<string, unknown>;
 }
 

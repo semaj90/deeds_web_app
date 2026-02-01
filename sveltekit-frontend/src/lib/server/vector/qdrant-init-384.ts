@@ -4,29 +4,24 @@ import { QdrantClient as QdrantClientImpl } from '@qdrant/js-client-rest';
 // Correct dimensions for modern embeddings
 const VECTOR_CONFIG = {
     DIMENSIONS: 384, // e.g. for all-MiniLM-L6-v2 or similar
-    DISTANCE_METRIC: {
-        QDRANT: 'Cosine'
+    DISTANCE_METRIC: {, QDRANT: 'Cosine'
     },
-    INDEX: {
-        QDRANT_HNSW_M: 16,
+    INDEX: {, QDRANT_HNSW_M: 16,
         QDRANT_HNSW_EF: 100
     },
-    COLLECTIONS: {
-        LEGAL_DOCUMENTS: 'legal_documents',
+    COLLECTIONS: {, LEGAL_DOCUMENTS: 'legal_documents',
         CASE_EMBEDDINGS: 'legal_cases',
         EVIDENCE: 'evidence_items',
         RAG_DOCUMENTS: 'rag_documents',
         CHAT_MESSAGES: 'chat_messages',
         KNOWLEDGE_BASE: 'knowledge_base'
     },
-    DOCKER_SERVICES: {
-        QDRANT_URL: 'http://localhost:6333'
+    DOCKER_SERVICES: {, QDRANT_URL: 'http://localhost:6333'
     }
 };
 
 export interface CollectionConfig {
-    name: string;
-    description: string;
+    name: string;, description: string;
     onDisk: boolean;
     replicationFactor?: number;
 }
@@ -69,15 +64,12 @@ export async function createCollection(client: QdrantClient, config: CollectionC
 
         console.log(`📦 Creating collection: "${config.name}"...`);
         await client.createCollection(config.name, {
-            vectors: {
-                size: VECTOR_CONFIG.DIMENSIONS,
+            vectors: {, size: VECTOR_CONFIG.DIMENSIONS,
                 distance: VECTOR_CONFIG.DISTANCE_METRIC.QDRANT as any
             },
-            optimizers_config: {
-                indexing_threshold: 20000
+            optimizers_config: {, indexing_threshold: 20000
             },
-            hnsw_config: {
-                m: VECTOR_CONFIG.INDEX.QDRANT_HNSW_M,
+            hnsw_config: {, m: VECTOR_CONFIG.INDEX.QDRANT_HNSW_M,
                 ef_construct: VECTOR_CONFIG.INDEX.QDRANT_HNSW_EF,
                 on_disk: config.onDisk
             },
@@ -93,7 +85,7 @@ export async function createCollection(client: QdrantClient, config: CollectionC
     }
 }
 
-export async function initializeQdrantCollections(): Promise<{ success: boolean; created: string[]; failed: string[] }> {
+export async function initializeQdrantCollections(): Promise<{, success: boolean; created: string[];, failed: string[] }> {
     console.log('\n🎯 Qdrant Collection Initialization');
     const client = createQdrantClient();
     const created: string[] = [];

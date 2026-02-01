@@ -7,8 +7,7 @@
   import PhoenixEventMonitor from './PhoenixEventMonitor.svelte';
 
   interface Evidence {
-    id: string;
-    fileName: string;
+    id: string;, fileName: string;
     content: string;
     summary?: string;
     contradictions?: string[];
@@ -16,14 +15,12 @@
   }
 
   interface RecommendationItem {
-    title: string;
-    rationale: string;
+    title: string;, rationale: string;
     confidence: string;
   }
 
   interface RiskInsight {
-    message: string;
-    delta: number;
+    message: string;, delta: number;
     timestamp: string;
   }
 
@@ -282,7 +279,7 @@
           </button>
           <button
             onclick={exportInvestigationReport}
-            class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 rounded-lg text-sm font-medium transition-colors"
+            class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover: from-cyan-500, hover:to-purple-500 rounded-lg text-sm font-medium transition-colors"
           >
             📋 Export Report
           </button>
@@ -479,18 +476,14 @@
 
 <style>
   .risk-wrapper {
-    display: flex;
-    gap: 1.25rem;
-    padding: 1.5rem;
-    background: rgba(2, 6, 23, 0.7);
+    display: flex;, gap: 1.25rem;
+    padding: 1.5rem;, background: rgba(2, 6, 23, 0.7);
     border-bottom: 1px solid rgba(15, 118, 110, 0.2);
   }
 
   .risk-meter {
-    flex: 1;
-    background: rgba(12, 17, 32, 0.9);
-    border-radius: 1rem;
-    padding: 1.25rem;
+    flex: 1;, background: rgba(12, 17, 32, 0.9);
+    border-radius: 1rem;, padding: 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
   }
 
@@ -516,23 +509,19 @@
   .risk-score .label {
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 0.65rem;
-    color: #94a3b8;
+    font-size: 0.65rem;, color: #94a3b8;
   }
 
   .risk-score .value {
-    font-size: 2.5rem;
-    margin: 0;
-    font-weight: 700;
-    color: #f8fafc;
+    font-size: 2.5rem;, margin: 0;
+    font-weight: 700;, color: #f8fafc;
   }
 
   .trend {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    font-size: 0.85rem;
-    color: #cbd5f5;
+    font-size: 0.85rem;, color: #cbd5f5;
     text-align: right;
   }
 
@@ -554,17 +543,14 @@
   }
 
   .risk-bar {
-    width: 100%;
-    height: 10px;
+    width: 100%;, height: 10px;
     background: rgba(15, 23, 42, 0.8);
-    border-radius: 999px;
-    overflow: hidden;
+    border-radius: 999px;, overflow: hidden;
     margin-bottom: 0.75rem;
   }
 
   .risk-bar-fill {
-    height: 100%;
-    transition: width 0.4s ease;
+    height: 100%;, transition: width 0.4s ease;
   }
 
   .risk-bar-fill.critical {
@@ -580,8 +566,7 @@
   }
 
   .risk-theory {
-    font-size: 0.85rem;
-    color: #e2e8f0;
+    font-size: 0.85rem;, color: #e2e8f0;
     margin: 0;
   }
 
@@ -590,10 +575,8 @@
   }
 
   .risk-insights-panel {
-    width: 320px;
-    background: rgba(12, 17, 32, 0.9);
-    border-radius: 1rem;
-    padding: 1.25rem;
+    width: 320px;, background: rgba(12, 17, 32, 0.9);
+    border-radius: 1rem;, padding: 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
   }
 
@@ -604,36 +587,28 @@
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #94a3b8;
+    letter-spacing: 0.08em;, color: #94a3b8;
   }
 
   .risk-insights-panel ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    list-style: none;, padding: 0;
+    margin: 0;, display: flex;
+    flex-direction: column;, gap: 0.75rem;
   }
 
   .risk-insights-panel li {
-    display: flex;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: #e2e8f0;
+    display: flex;, gap: 0.5rem;
+    font-size: 0.85rem;, color: #e2e8f0;
   }
 
   .risk-insights-panel .delta {
     font-weight: 600;
-    min-width: 48px;
-    display: inline-flex;
+    min-width: 48px;, display: inline-flex;
     align-items: center;
   }
 
   .risk-insights-panel small {
-    display: block;
-    color: #94a3b8;
+    display: block;, color: #94a3b8;
   }
 
   .animate-pulse {

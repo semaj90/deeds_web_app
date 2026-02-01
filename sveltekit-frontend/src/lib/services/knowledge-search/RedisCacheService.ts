@@ -20,7 +20,7 @@ export interface RedisCacheConfig {
 }
 
 export interface CachedSearchResult {
-  results: SearchResult[], cachedAt: string; queryHash: string, ttl: number;
+  results: SearchResult[], cachedAt: string;, queryHash: string, ttl: number;
 }
 
 const DEFAULT_CONFIG: RedisCacheConfig = {
@@ -102,7 +102,7 @@ export class RedisCacheService {
    * @param query - Search query
    * @returns Cached results or null if not found
    */
-  async getCachedResults(query: string): Promise<{ results: SearchResult[], cacheHit: boolean;
+  async getCachedResults(query: string): Promise<{, results: SearchResult[], cacheHit: boolean;
     cachedAt?: string;
   }> {
     const queryHash = this.hashQuery(query);

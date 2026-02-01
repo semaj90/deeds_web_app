@@ -13,7 +13,7 @@ describe('AceAdapter', () => {
 
   beforeEach(() => {
     adapter = new AceAdapter({
-      llmConfig: { provider: 'gemma3',
+      llmConfig: {, provider: 'gemma3',
         temperature: 0.1, maxTokens: 1000
       },
     });
@@ -63,7 +63,7 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this obscure error that has no documentation',
-        errorContext: { message: 'Property does not exist',
+        errorContext: {, message: 'Property does not exist',
           filePath: 'src/test.ts',
           lineNumber: 42,
         },
@@ -83,7 +83,7 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this error',
-        errorContext: { message: 'Type error',
+        errorContext: {, message: 'Type error',
           filePath: 'src/component.svelte',
           lineNumber: 10,
           code: 'const, x: string = 123;',
@@ -163,15 +163,15 @@ describe('AceAdapter', () => {
 
     it('should support different LLM providers', () => {
       const gemma3Adapter = new AceAdapter({
-        llmConfig: { provider: 'gemma3' },
+        llmConfig: {, provider: 'gemma3' },
       });
 
       const claudeAdapter = new AceAdapter({
-        llmConfig: { provider: 'claude' },
+        llmConfig: {, provider: 'claude' },
       });
 
       const geminiAdapter = new AceAdapter({
-        llmConfig: { provider: 'gemini' },
+        llmConfig: {, provider: 'gemini' },
       });
 
       expect(gemma3Adapter).toBeDefined();

@@ -8,15 +8,12 @@ import { ElasticsearchSearch, type KeywordSearchResult } from './elasticsearch-s
 import { RerankerClient } from './reranker-client.js';
 
 export interface SearchQuery {
-	text: string;
-	embedding: number[];
+	text: string;, embedding: number[];
 }
 
 export interface OrchestrationResult {
-	semantic_results: VectorSearchResult[];
-	keyword_results: KeywordSearchResult[];
-	reranked_results: any[];
-	latency_ms: number;
+	semantic_results: VectorSearchResult[];, keyword_results: KeywordSearchResult[];
+	reranked_results: any[];, latency_ms: number;
 }
 
 export class SearchOrchestrator {
@@ -122,7 +119,7 @@ export class SearchOrchestrator {
 	/**
 	 * Get search statistics
 	 */
-	async getStats(): Promise<{ pgvector_chunks: number; elasticsearch_documents: number }> {
+	async getStats(): Promise<{, pgvector_chunks: number; elasticsearch_documents: number }> {
 		const [pgvectorCount, elasticsearchCount] = await Promise.all([
 			this.pgvector.getChunkCount(),
 			this.elasticsearch.getDocumentCount()

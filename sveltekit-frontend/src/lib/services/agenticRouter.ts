@@ -13,7 +13,7 @@ export async function routeAgenticCall(modelOutput: string) {
  const res = await fetch(AGENTIC_URL, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: fn, args }),
+ body: JSON.stringify({, name: fn, args }),
  });
  return await res.json();
  } catch (err) {

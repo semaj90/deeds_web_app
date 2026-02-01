@@ -38,16 +38,13 @@ type RabbitMQServiceLike = {
   close?: () => Promise<void> | void;
   stop?: () => Promise<void> | void;
   closeConnection?: () => Promise<void> | void;
-  consume?: (
-    queue: string,
+  consume?: (, queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
-  subscribe?: (
-    queue: string,
+  subscribe?: (, queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
-  createConsumer?: (
-    queue: string,
+  createConsumer?: (, queue: string,
     cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
   ) => Promise<void> | void;
   on?: (event: string, cb: (...args: unknown[]) => void) => void;
@@ -290,8 +287,7 @@ export class RabbitMQServiceWorker {
         caseId: getString(msg, 'caseId'),
         evidenceId: getString(msg, 'evidenceId'),
         analysisComplete: true,
-        insights: {
-          confidence: 0.85,
+        insights: {, confidence: 0.85,
           keyEntities: ['contract', 'signature', 'date'],
           summary: 'Legal document analysis completed',
         },

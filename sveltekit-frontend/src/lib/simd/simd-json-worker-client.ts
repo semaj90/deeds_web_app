@@ -4,8 +4,7 @@
  */
 
 interface SIMDWorkerMessage {
-  type: string;
-  id: string;
+  type: string;, id: string;
   data?: unknown;
   error?: string;
   success?: boolean;
@@ -97,9 +96,7 @@ export class SIMDJSONWorkerClient {
       case 'VECTOR_PARSE_COMPLETE':
       case 'STATS':
       case 'BENCHMARK_COMPLETE':
-      case 'STATS_RESET':
-        pending.resolve({
-          data: message.data,
+      case 'STATS_RESET': pending.resolve({, data: message.data,
           metadata: message.metadata,
           success: true,
         });
@@ -246,12 +243,9 @@ export class SIMDJSONWorkerClient {
   /**
    * Get worker performance statistics
    */
-  async getStats(): Promise<{
-    totalParsed: number;
-    totalTime: number;
-    avgTime: number;
-    errors: number;
-    simdReady: boolean;
+  async getStats(): Promise<{, totalParsed: number;
+    totalTime: number;, avgTime: number;
+    errors: number;, simdReady: boolean;
   }> {
     if (!this.worker) {
       return {
@@ -266,10 +260,8 @@ export class SIMDJSONWorkerClient {
     try {
       const result = (await this.sendMessage('GET_STATS')) as { data?: unknown };
       return result?.data as {
-        totalParsed: number;
-        totalTime: number;
-        avgTime: number;
-        errors: number;
+        totalParsed: number;, totalTime: number;
+        avgTime: number;, errors: number;
         simdReady: boolean;
       };
     } catch (error) {

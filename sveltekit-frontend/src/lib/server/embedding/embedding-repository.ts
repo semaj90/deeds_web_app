@@ -13,8 +13,7 @@ export interface IngestionJobRequest {
 }
 
 export interface IngestionJobStatus {
-    jobId: string;
-    evidenceId: string;
+    jobId: string;, evidenceId: string;
     status: 'queued' | 'processing' | 'completed' | 'failed';
     totalChunks?: number;
     processedChunks?: number;
@@ -34,8 +33,7 @@ export interface SimilarityQueryOptions {
 export interface SimilarityResult {
     id: string;
     evidenceId?: string;
-    documentId?: string;
-    content: string;
+    documentId?: string;, content: string;
     score: number; // 0-1 similarity
     metadata?: Record<string, any>;
     chunkIndex?: number;

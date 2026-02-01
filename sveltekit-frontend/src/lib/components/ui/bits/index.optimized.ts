@@ -80,8 +80,7 @@ import CardContentComp from './CardContent.svelte';
 import CardFooterComp from './CardFooter.svelte';
 
 export const CompoundComponents = {
-    Card: {
-        Root: CardRoot,
+    Card: {, Root: CardRoot,
         Header: CardHeaderComp,
         Title: CardTitleComp,
         Description: CardDescriptionComp,
@@ -105,8 +104,7 @@ export const COMPONENT_BUNDLES = {
 export function getComponentBundleInfo() {
     return {
         bundles: COMPONENT_BUNDLES,
-        estimatedSizes: {
-            core: '~15KB',
+        estimatedSizes: {, core: '~15KB',
             legal: '~45KB',
             ai: '~38KB',
             gaming: '~22KB',

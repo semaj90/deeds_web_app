@@ -3,24 +3,15 @@
 
 export interface FormAuditResult {
   formId: string;
-  formAction?: string;
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-  hasFormElement: boolean;
-  hasActionAttribute: boolean;
-  hasMethodAttribute: boolean;
-  usesEnhance: boolean;
-  usesSuperForms: boolean;
-  hasClientValidation: boolean;
-  hasServerValidation: boolean;
-  hasProgressiveLabels: boolean;
-  hasErrorHandling: boolean;
-  hasAccessibilityFeatures: boolean;
-  hasLoadingStates: boolean;
-  compliance: {
-    score: number;
-    level: 'poor' | 'basic' | 'good' | 'excellent';
-    issues: FormIssue[];
-    recommendations: string[];
+  formAction?: string;, method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  hasFormElement: boolean;, hasActionAttribute: boolean;
+  hasMethodAttribute: boolean;, usesEnhance: boolean;
+  usesSuperForms: boolean;, hasClientValidation: boolean;
+  hasServerValidation: boolean;, hasProgressiveLabels: boolean;
+  hasErrorHandling: boolean;, hasAccessibilityFeatures: boolean;
+  hasLoadingStates: boolean;, compliance: {
+    score: number;, level: 'poor' | 'basic' | 'good' | 'excellent';
+    issues: FormIssue[];, recommendations: string[];
   };
 }
 
@@ -33,24 +24,15 @@ export interface FormIssue {
 }
 
 export interface ProgressiveEnhancementConfig {
-  enableClientValidation: boolean;
-  enableRealTimeValidation: boolean;
-  enableAutoSave: boolean;
-  enableOptimisticUpdates: boolean;
-  showSubmitSpinner: boolean;
-  disableFormDuringSubmit: boolean;
-  showProgressIndicator: boolean;
-  showInlineErrors: boolean;
-  showSummaryErrors: boolean;
-  preserveFormDataOnError: boolean;
-  announceErrors: boolean;
-  useLiveRegions: boolean;
-  provideFocusManagement: boolean;
-  includeSkipLinks: boolean;
-  confirmBeforeLeaving: boolean;
-  highlightRequiredFields: boolean;
-  showCharacterCounts: boolean;
-  enableKeyboardShortcuts: boolean;
+  enableClientValidation: boolean;, enableRealTimeValidation: boolean;
+  enableAutoSave: boolean;, enableOptimisticUpdates: boolean;
+  showSubmitSpinner: boolean;, disableFormDuringSubmit: boolean;
+  showProgressIndicator: boolean;, showInlineErrors: boolean;
+  showSummaryErrors: boolean;, preserveFormDataOnError: boolean;
+  announceErrors: boolean;, useLiveRegions: boolean;
+  provideFocusManagement: boolean;, includeSkipLinks: boolean;
+  confirmBeforeLeaving: boolean;, highlightRequiredFields: boolean;
+  showCharacterCounts: boolean;, enableKeyboardShortcuts: boolean;
 }
 
 export const DEFAULT_PE_CONFIG: ProgressiveEnhancementConfig = {
@@ -100,7 +82,7 @@ export function auditFormElement(formElement: HTMLFormElement): FormAuditResult 
     hasErrorHandling: checkForErrorHandling(formElement),
     hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement),
     hasLoadingStates: checkForLoadingStates(formElement),
-    compliance: { score: 0, level: 'poor', issues: [], recommendations: [] },
+    compliance: {, score: 0, level: 'poor', issues: [], recommendations: [] },
   };
 
   calculateComplianceScore(result);
@@ -208,7 +190,7 @@ function calculateComplianceScore(result: FormAuditResult): void {
       type: 'warning',
       category: 'ux',
       message: 'Form does not use SvelteKit enhance - missing progressive enhancement',
-      fix: 'Add use:enhance action to form element',
+      fix: 'Add, use:enhance action to form element',
     });
   }
 
@@ -348,18 +330,15 @@ ${result.compliance.recommendations.map((rec) => `- ${rec}`).join('\n')}
 
 // Form state interface
 export interface FormState<T = Record<string, unknown>> {
-  data: T;
-  errors: Record<string, string>;
+  data: T;, errors: Record<string, string>;
   touched: Record<string, boolean>;
-  isDirty: boolean;
-  isSubmitting: boolean;
+  isDirty: boolean;, isSubmitting: boolean;
   isValid: boolean;
 }
 
 // Progressive form utilities
 export interface ProgressiveFormUtils<T = Record<string, unknown>> {
-  config: ProgressiveEnhancementConfig;
-  createFormState: (initialData?: Partial<T>) => FormState<T>;
+  config: ProgressiveEnhancementConfig;, createFormState: (initialData?: Partial<T>) => FormState<T>;
   generateFieldId: (fieldName: string, formId: string) => string;
   generateErrorId: (fieldId: string) => string;
   validateRequired: (value: unknown, fieldName: string) => string | null;

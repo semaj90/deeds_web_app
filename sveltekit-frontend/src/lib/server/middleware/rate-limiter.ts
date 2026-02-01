@@ -2,14 +2,12 @@
 // Prevents abuse and ensures fair usage
 
 interface RateLimitConfig {
-    windowMs: number;
-    maxRequests: number;
+    windowMs: number;, maxRequests: number;
     keyGenerator?: (request: Request) => string;
 }
 
 interface RateLimitEntry {
-    count: number;
-    resetTime: number;
+    count: number;, resetTime: number;
 }
 
 class RateLimiter {
@@ -43,7 +41,7 @@ class RateLimiter {
         return `${ip}:${request.headers.get('user-agent') ?? 'unknown'}`;
     }
 
-    check(request: Request): { allowed: boolean; resetTime: number; remaining?: number } {
+    check(request: Request): {, allowed: boolean; resetTime: number; remaining?: number } {
         const key = this.getKey(request);
         const now = Date.now();
         const resetTime = now + this.config.windowMs;

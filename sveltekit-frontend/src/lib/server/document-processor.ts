@@ -8,14 +8,12 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 
 export interface DocumentProcessingResult {
-    text: string;
-    metadata: {
+    text: string;, metadata: {
         title?: string;
         author?: string;
         pages?: number;
         language?: string;
-        confidence?: number;
-        processingTime: number;
+        confidence?: number;, processingTime: number;
     };
     entities?: {
         persons?: string[];
@@ -24,30 +22,23 @@ export interface DocumentProcessingResult {
         dates?: string[];
         legalCitations?: string[];
     };
-    layout?: {
-        regions: Array<{
-            type: string;
-            bbox: number[];
+    layout?: {, regions: Array<{
+            type: string;, bbox: number[];
             confidence: number;
             text?: string;
         }>;
     };
-    objects?: Array<{
-        class: string;
-        bbox: number[];
-        confidence: number;
+    objects?: Array<{, class: string;
+        bbox: number[];, confidence: number;
     }>;
-    tables?: Array<{
-        content: string[][];
+    tables?: Array<{, content: string[][];
         bbox?: number[];
     }>;
-    images?: Array<{
-        content: Buffer;
+    images?: Array<{, content: Buffer;
         bbox?: number[];
         caption?: string;
     }>;
-    method: string;
-    engines: string[];
+    method: string;, engines: string[];
 }
 
 export interface DocumentProcessingOptions {
@@ -143,7 +134,7 @@ export class DocumentProcessor {
         if (results.length === 0) {
             return {
                 text: '',
-                metadata: { processingTime: 0 },
+                metadata: {, processingTime: 0 },
                 method: 'none',
                 engines: []
             };

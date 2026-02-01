@@ -14,8 +14,7 @@
   let { evidence = [] }: Props = $props();
 
   interface ConnectionLine {
-    from: EvidenceItem;
-    to: EvidenceItem;
+    from: EvidenceItem;, to: EvidenceItem;
     type: string;
   }
 
@@ -60,8 +59,7 @@
 
 <style>
   .connections-svg {
-    position: absolute;
-    top: 0;
+    position: absolute;, top: 0;
     left: 0;
     pointer-events: none;
     z-index: 1;
@@ -71,22 +69,18 @@
     stroke: #d0ccc7;
     stroke-width: 1;
     stroke-dasharray: 4, 4;
-    opacity: 0.5;
-    transition: all 0.2s;
+    opacity: 0.5;, transition: all 0.2s;
   }
 
   .connection-line.precedent {
-    stroke: #6b8e6b;
-    opacity: 0.6;
+    stroke: #6b8e6b;, opacity: 0.6;
   }
 
   .connection-line.related {
-    stroke: #8b3a3a;
-    opacity: 0.4;
+    stroke: #8b3a3a;, opacity: 0.4;
   }
 
   .connection-line:hover {
-    stroke-width: 2;
-    opacity: 1;
+    stroke-width: 2;, opacity: 1;
   }
 </style>

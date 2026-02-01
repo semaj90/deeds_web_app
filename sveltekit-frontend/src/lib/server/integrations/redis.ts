@@ -31,8 +31,7 @@ export class RedisCacheService implements IRedisCacheService {
     this.client = createClient({
       url: this.config.url,
       password: this.config.password || undefined,
-      socket: {
-        reconnectStrategy: (retries) => {
+      socket: {, reconnectStrategy: (retries) => {
           if (retries > this.config.maxRetries) {
             console.error('Redis max retries exceeded');
             return new Error('Redis connection failed');
@@ -170,7 +169,7 @@ export class RedisCacheService implements IRedisCacheService {
       return await this.client.keys(pattern);
   }
 
-  async health(): Promise<{ status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }> {
+  async health(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; usedMemory?: number }> {
     try {
       await this.ensureConnected();
       const startTime = Date.now();

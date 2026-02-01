@@ -1,6 +1,6 @@
 // replace import with a minimal local LegalDocument shape so this module compiles standalone
 // (keep this in sync with your canonical definition in nes-memory-architecture.ts)
-type LegalDocument = { id: string; type: string; metadata?: Record<string, unknown> };
+type LegalDocument = { id: string;, type: string; metadata?: Record<string, unknown> };
 
 // Minimal typed shim for nesGPUBridge used by ultra-json-parser.
 // Replace with the real GPU/FlatBuffer implementation when available.

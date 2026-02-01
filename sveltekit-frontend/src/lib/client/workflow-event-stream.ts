@@ -209,9 +209,7 @@ export class WorkflowEventStream {
  * Svelte store-based wrapper for reactive workflow events
  */
 export interface WorkflowState {
-    connected: boolean;
-    events: WorkflowEvent[];
-    lastEvent: WorkflowEvent | null;
+    connected: boolean;, events: WorkflowEvent[];, lastEvent: WorkflowEvent | null;
     errors: string[];
 }
 

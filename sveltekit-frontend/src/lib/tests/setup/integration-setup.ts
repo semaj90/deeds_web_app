@@ -26,8 +26,7 @@ Object.defineProperty(window, 'sessionStorage', { value: mockStorage() });
 // Mock Performance API
 Object.defineProperty(window, 'performance', {
     writable: true,
-    value: {
-        mark: vi.fn(),
+    value: {, mark: vi.fn(),
         measure: vi.fn(),
         getEntriesByType: vi.fn(() => []),
         getEntriesByName: vi.fn(() => []),

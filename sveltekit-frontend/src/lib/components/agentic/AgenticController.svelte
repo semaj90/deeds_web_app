@@ -2,33 +2,19 @@
   import { onMount } from 'svelte';
 
   interface AgenticStatus {
-    status: string;
-    system: {
-      redisConnected: boolean;
-      agenticControllerActive: boolean;
-      watcherStatus: string;
+    status: string;, system: {, redisConnected: boolean;, agenticControllerActive: boolean;, watcherStatus: string;
     };
-    activity: {
-      recentASTProcessing: number;
-      pendingErrors: number;
-      lastActivity: string;
+    activity: {, recentASTProcessing: number;, pendingErrors: number;, lastActivity: string;
     };
   }
 
   interface ErrorEmbedding {
-    id: number;
-    text: string;
-    screenshotPath?: string;
-    confidence: number;
-    resolved: boolean;
-    createdAt: string;
+    id: number;, text: string;
+    screenshotPath?: string;, confidence: number;, resolved: boolean;, createdAt: string;
   }
 
   interface FixSuggestion {
-    suggestion: string;
-    successRate: number;
-    similarError: string;
-    relevance: number;
+    suggestion: string;, successRate: number;, similarError: string;, relevance: number;
   }
 
   let status = $state<AgenticStatus | null>(null);
@@ -166,7 +152,7 @@
       <button
         onclick={queryFixSuggestions}
         disabled={loading || !errorQuery.trim()}
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded text-white"
+        class="px-4 py-2 bg-blue-600 hover: bg-blue-700, disabled:opacity-50 rounded text-white"
       >
         Search
       </button>
@@ -210,7 +196,6 @@
 
 <style>
   .agentic-controller {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 800px;, margin: 0 auto;
   }
 </style>

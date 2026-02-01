@@ -16,8 +16,7 @@ import { parse as simdParse } from 'simdjson-node';
 export interface FastJSONResult<T = any> {
     ok: boolean;
     data?: T;
-    error?: string;
-    backend: 'simd_gpu' | 'simd_cpu' | 'simdnode' | 'wasm' | 'native';
+    error?: string;, backend: 'simd_gpu' | 'simd_cpu' | 'simdnode' | 'wasm' | 'native';
     ms: number;
     metadata?: {
         inputLength?: number;
@@ -38,7 +37,7 @@ async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
         const res = await fetch('http://localhost:8097/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ json: input }),
+            body: JSON.stringify({, json: input }),
             signal: controller.signal,
         });
 
@@ -53,8 +52,7 @@ async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
             data: payload.data,
             backend: payload.gpu ? 'simd_gpu' : 'simd_cpu',
             ms: payload.ms,
-            metadata: {
-                inputLength: input.length,
+            metadata: {, inputLength: input.length,
                 tokensProcessed: payload.tokensProcessed,
                 gpuLayers: payload.gpuLayers,
                 batchSize: payload.batchSize,
@@ -66,7 +64,7 @@ async function tryPythonSIMD(input: string): Promise<FastJSONResult> {
             backend: 'simd_cpu',
             ms: 0,
             error: String(err),
-            metadata: { inputLength: input.length },
+            metadata: {, inputLength: input.length },
         }
     }
 }
@@ -83,8 +81,7 @@ function trySIMDNode(input: string): FastJSONResult {
             data,
             backend: 'simdnode',
             ms: performance.now() - t0,
-            metadata: {
-                inputLength: input.length,
+            metadata: {, inputLength: input.length,
                 tokensProcessed: Array.isArray(data) ? data.length : 1,
             },
         };
@@ -94,7 +91,7 @@ function trySIMDNode(input: string): FastJSONResult {
             backend: 'simdnode',
             ms: performance.now() - t0,
             error: String(err),
-            metadata: { inputLength: input.length },
+            metadata: {, inputLength: input.length },
         }
     }
 }
@@ -117,8 +114,7 @@ async function tryUltraJSON(input: string): Promise<FastJSONResult> {
             data,
             backend: 'wasm',
             ms,
-            metadata: {
-                inputLength: input.length,
+            metadata: {, inputLength: input.length,
                 tokensProcessed: Array.isArray(data) ? data.length : 1,
             },
         };
@@ -128,7 +124,7 @@ async function tryUltraJSON(input: string): Promise<FastJSONResult> {
             backend: 'wasm',
             ms: 0,
             error: String(err),
-            metadata: { inputLength: input.length },
+            metadata: {, inputLength: input.length },
         }
     }
 }
@@ -144,7 +140,7 @@ function tryNative(input: string): FastJSONResult {
             data: JSON.parse(input),
             backend: 'native',
             ms: performance.now() - t0,
-            metadata: { inputLength: input.length },
+            metadata: {, inputLength: input.length },
         };
     } catch (err: any) {
         return {
@@ -152,7 +148,7 @@ function tryNative(input: string): FastJSONResult {
             backend: 'native',
             ms: performance.now() - t0,
             error: String(err),
-            metadata: { inputLength: input.length },
+            metadata: {, inputLength: input.length },
         }
     }
 }
@@ -172,7 +168,7 @@ export async function fastjson<T = any>(input: string): Promise<FastJSONResult<T
             ok: false,
             backend: 'native',
             ms: 0,
-            error: 'Invalid input: must be non-empty string',
+            error: 'Invalid, input: must be non-empty string',
         };
     }
 
@@ -202,7 +198,7 @@ export function fastjsonSync<T = any>(input: string): FastJSONResult<T> {
             ok: false,
             backend: 'native',
             ms: 0,
-            error: 'Invalid input: must be non-empty string',
+            error: 'Invalid, input: must be non-empty string',
         };
     }
 
@@ -217,10 +213,8 @@ export function fastjsonSync<T = any>(input: string): FastJSONResult<T> {
 /**
  * Health check for all backends
  */
-export async function checkBackends(): Promise<{
-    pythonSIMD: boolean;
-    simdNode: boolean;
-    ultraJSON: boolean;
+export async function checkBackends(): Promise<{, pythonSIMD: boolean;
+    simdNode: boolean;, ultraJSON: boolean;
     native: boolean;
 }> {
     const results = {

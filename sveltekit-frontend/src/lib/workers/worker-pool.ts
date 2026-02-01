@@ -13,14 +13,14 @@ export interface WorkerPoolConfig {
 }
 
 export interface ProcessTask {
- id: string; jsonData: string;
+ id: string;, jsonData: string;
  source: string;
  extractEntities?: boolean;
 }
 
 export interface ProcessResult {
- id: string; summary: string;
- embedding: number[]; metadata: Record<string, unknown>;
+ id: string;, summary: string;
+ embedding: number[];, metadata: Record<string, unknown>;
  error?: string;
 }
 
@@ -70,8 +70,8 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: { workerId: i,
- config: { url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ data: {, workerId: i,
+ config: {, url: this.config?.ollamaUrl ?? 'http://localhost:11434',
  model: this.config?.model ?? 'gemma3-legal:latest',
  },
  },
@@ -225,7 +225,7 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: { workerId: config: { url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ data: {, workerId: config: {, url: this.config?.ollamaUrl ?? 'http://localhost:11434',
  model: this.config?.model ?? 'gemma3-legal:latest',
  },
  },

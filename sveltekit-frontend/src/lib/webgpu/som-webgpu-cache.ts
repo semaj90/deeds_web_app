@@ -9,30 +9,21 @@ import Loki from 'lokijs';
 type Collection<T> = ReturnType<Loki['addCollection']>;
 
 export interface NPMError {
-	message: string;
-	file: string;
-	line: number;
-	severity: 'low' | 'medium' | 'high' | 'critical';
-	category: string;
-	type: string;
+	message: string;, file: string;
+	line: number;, severity: 'low' | 'medium' | 'high' | 'critical';
+	category: string;, type: string;
 	timestamp: string;
 	context?: string[];
 	dependencies?: string[];
 }
 
 export interface IntelligentTodo {
-	id: string;
-	priority: number;
-	category: string;
-	title: string;
-	description: string;
-	estimated_effort: number;
-	dependencies: string[];
-	suggested_fixes: string[];
-	related_errors: NPMError[];
-	confidence: number;
-	tags: string[];
-	created_at: string;
+	id: string;, priority: number;
+	category: string;, title: string;
+	description: string;, estimated_effort: number;
+	dependencies: string[];, suggested_fixes: string[];
+	related_errors: NPMError[];, confidence: number;
+	tags: string[];, created_at: string;
 	metadata: Record<string, unknown>;
 }
 
@@ -246,8 +237,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
 			this.device = await adapter.requestDevice({
 				requiredFeatures: ['shader-f16'] as GPUFeatureName[],
-				requiredLimits: {
-					maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
+				requiredLimits: {, maxStorageBufferBindingSize: adapter.limits.maxComputeWorkgroupStorageSize
 				}
 			});
 
@@ -394,7 +384,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 		const shaderModule = this.device.createShaderModule({ code: this.errorEmbeddingShader });
 		const computePipeline = this.device.createComputePipeline({
 			layout: 'auto',
-			compute: { module: shaderModule, entryPoint: 'compute_error_embedding' }
+			compute: {, module: shaderModule, entryPoint: 'compute_error_embedding' }
 		});
 
 		for (const error of errors) {
@@ -517,8 +507,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 				confidence: 0.8 + Math.random() * 0.2,
 				tags: [category, severity],
 				created_at: new Date().toISOString(),
-				metadata: {
-					error_count: categoryErrors.length,
+				metadata: {, error_count: categoryErrors.length,
 					files_affected: new Set(categoryErrors.map((e) => e.file)).size
 				}
 			});

@@ -7,50 +7,38 @@ const RUNTIME_DIR = '.runtime';
 const STATE_FILE = join(RUNTIME_DIR, 'observability-state.json');
 
 export interface ObservabilityState {
-	baselines: {
-		p99_latency_ms: number;
-		error_rate_percent: number;
-		connection_count: number;
+	baselines: {, p99_latency_ms: number;
+		error_rate_percent: number;, connection_count: number;
 		last_calculated: string;
 	};
-	sustained_counters: {
-		p99_breaches: number;
-		error_spikes: number;
-		anomaly_spikes: number;
+	sustained_counters: {, p99_breaches: number;
+		error_spikes: number;, anomaly_spikes: number;
 		last_reset: string;
 	};
-	daily_budgets: {
-		max_p99_breaches: number;
-		max_error_spikes: number;
-		max_anomaly_spikes: number;
+	daily_budgets: {, max_p99_breaches: number;
+		max_error_spikes: number;, max_anomaly_spikes: number;
 	};
-	metadata: {
-		created_at: string;
-		last_updated: string;
-		version: string;
+	metadata: {, created_at: string;
+		last_updated: string;, version: string;
 	};
 }
 
 const DEFAULT_STATE: ObservabilityState = {
-	baselines: {
-		p99_latency_ms: 100,
+	baselines: {, p99_latency_ms: 100,
 		error_rate_percent: 1.0,
 		connection_count: 10,
 		last_calculated: new Date().toISOString()
 	},
-	sustained_counters: {
-		p99_breaches: 0,
+	sustained_counters: {, p99_breaches: 0,
 		error_spikes: 0,
 		anomaly_spikes: 0,
 		last_reset: new Date().toISOString()
 	},
-	daily_budgets: {
-		max_p99_breaches: parseInt(import.meta.env?.DAILY_P99_BREACH_BUDGET ?? '10', 10),
+	daily_budgets: {, max_p99_breaches: parseInt(import.meta.env?.DAILY_P99_BREACH_BUDGET ?? '10', 10),
 		max_error_spikes: parseInt(import.meta.env?.DAILY_ERROR_SPIKE_BUDGET ?? '5', 10),
 		max_anomaly_spikes: parseInt(import.meta.env?.DAILY_ANOMALY_SPIKE_BUDGET ?? '3', 10)
 	},
-	metadata: {
-		created_at: new Date().toISOString(),
+	metadata: {, created_at: new Date().toISOString(),
 		last_updated: new Date().toISOString(),
 		version: '1.0.0'
 	}

@@ -100,16 +100,11 @@
 
 <style>
     .chat-window {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        height: 500px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        max-width: 800px;, margin: 0 auto;
+        padding: 20px;, border: 1px solid #ccc;
+        border-radius: 8px;, height: 500px;
+        overflow-y: auto;, display: flex;
+        flex-direction: column;, gap: 10px;
     }
     .message {
         padding: 10px;
@@ -126,57 +121,45 @@
     }
     .loading {
         align-self: center;
-        font-style: italic;
-        color: #888;
+        font-style: italic;, color: #888;
         padding: 10px;
     }
     .confidence {
         display: block;
-        font-size: 0.8em;
-        color: #666;
+        font-size: 0.8em;, color: #666;
         margin-top: 5px;
     }
     .citations {
         font-size: 0.85em;
-        margin-top: 8px;
-        padding: 5px;
+        margin-top: 8px;, padding: 5px;
         background: #f5f5f5;
         border-radius: 4px;
     }
     .citation {
-        display: inline-block;
-        margin: 2px 5px;
+        display: inline-block;, margin: 2px 5px;
         padding: 2px 6px;
         background: #e0e0e0;
         border-radius: 3px;
     }
     .warning {
-        margin-top: 8px;
-        padding: 8px;
-        background: #fff3cd;
-        border: 1px solid #ffc107;
-        border-radius: 4px;
-        color: #856404;
+        margin-top: 8px;, padding: 8px;
+        background: #fff3cd;, border: 1px solid #ffc107;
+        border-radius: 4px;, color: #856404;
     }
     form {
-        max-width: 800px;
-        margin: 20px auto;
-        display: flex;
-        gap: 10px;
+        max-width: 800px;, margin: 20px auto;
+        display: flex;, gap: 10px;
     }
     input {
-        flex: 1;
-        padding: 10px;
+        flex: 1;, padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
     }
     button {
         padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
+        background-color: #007bff;, color: white;
         border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        border-radius: 4px;, cursor: pointer;
     }
     button:disabled {
         background-color: #ccc;

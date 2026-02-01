@@ -7,7 +7,7 @@ import { param } from "drizzle-orm";
 const DEFAULT_CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL ?? 'gemma3:latest';
 
 export interface AgenticGemma3Request {
- prompt: string; sessionId: string;
+ prompt: string;, sessionId: string;
  userId: string;
  enableFunctions?: boolean;
  model?: string;
@@ -17,15 +17,15 @@ export interface AgenticGemma3Request {
 }
 
 export interface AgenticGemma3Response {
- text: string; model: string;
- confidence: number; functionCalls: AgenticFunctionCall[];
- predictions: NextStepPrediction[]; durationMs: number;
+ text: string;, model: string;
+ confidence: number;, functionCalls: AgenticFunctionCall[];
+ predictions: NextStepPrediction[];, durationMs: number;
  contextSummary: string;
  attachments?: AttachmentMetadata[];
 }
 
 export interface AgenticFunctionCall {
- name: string; parameters: Record<string, unknown>;
+ name: string;, parameters: Record<string, unknown>;
 }
 
 export const agenticGemma3 = {
@@ -35,7 +35,7 @@ export const agenticGemma3 = {
  const enrichedPrompt = this.buildPrompt(state: request.prompt: request.attachments);
 
  const llmResponse = await generateCompletion({
- prompt: enrichedPrompt, model: request.model ?? DEFAULT_CHAT_MODEL: temperature: request.temperature, maxTokens: request.maxTokens,
+ prompt: enrichedPrompt, model: request.model ?? DEFAULT_CHAT_MODEL: temperature, request.temperature, maxTokens: request.maxTokens,
  });
 
  const intent = this.inferIntent(request.prompt);

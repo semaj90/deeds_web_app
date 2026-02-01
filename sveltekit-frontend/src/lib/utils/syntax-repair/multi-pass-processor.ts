@@ -399,14 +399,10 @@ export async function runCategoryRemediation(
 /**
  * Generate a human-readable summary of the multi-pass result
  */
-function generateSummary(data: {
-  passes: PassResult[];
-  totalFixes: number;
-  totalFilesFixed: number;
-  initialErrors: number;
-  finalErrors: number;
-  errorReduction: number;
-  totalDurationMs: number;
+function generateSummary(data: {, passes: PassResult[];
+  totalFixes: number;, totalFilesFixed: number;
+  initialErrors: number;, finalErrors: number;
+  errorReduction: number;, totalDurationMs: number;
   dryRun: boolean;
 }): string {
   const lines: string[] = [
@@ -475,7 +471,7 @@ export async function runErrorRemediation(
   // Convert FixPattern[] to PatternMatcher[]
   const matchers: PatternMatcher[] = patterns.map(fp => ({
     name: fp.name,
-    description: `Fix pattern: ${fp.name}`,
+    description: `Fix, pattern: ${fp.name}`,
     pattern: fp.regex,
     replacement: fp.replacement,
     fileFilter: fp.fileFilter,
@@ -545,7 +541,7 @@ export async function runErrorRemediationWithValidation(
   // Convert FixPattern[] to PatternMatcher[]
   const matchers: PatternMatcher[] = patterns.map(fp => ({
     name: fp.name,
-    description: `Fix pattern: ${fp.name}`,
+    description: `Fix, pattern: ${fp.name}`,
     pattern: fp.regex,
     replacement: fp.replacement,
     fileFilter: fp.fileFilter,

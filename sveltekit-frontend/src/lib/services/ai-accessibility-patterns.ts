@@ -137,7 +137,7 @@ export class AIAccessibilityPatterns {
     createProgressiveDisclosure(
         container: HTMLElement,
         data: Record<string, unknown>,
-        options: { summary: string, levels: Array<{ label: string, content: unknown, level: number }> }
+        options: {, summary: string, levels: Array<{, label: string, content: unknown, level: number }> }
     ) {
         if (typeof document === 'undefined' || !this.options.progressiveDisclosure) {
             if (typeof document !== 'undefined') {

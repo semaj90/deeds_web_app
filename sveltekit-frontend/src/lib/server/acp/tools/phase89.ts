@@ -8,40 +8,33 @@ import path from 'path';
 
 export const phase89Tools = {
 	/**
-	 * Tool: phase89:cluster
+	 * Tool: phase89, cluster
 	 * Run GPU-accelerated CUDA clustering on error embeddings
 	 */
-	'phase89:cluster': {
-		name: 'phase89:cluster',
+	'phase89:cluster': {, name: 'phase89:cluster',
 		description: 'Run multi-core CUDA clustering on error embeddings with Redis caching',
 		category: 'machine-learning',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				eps: {
+		inputSchema: {, type: 'object',
+			properties: {, eps: {
 					type: 'number',
 					description: 'DBSCAN epsilon parameter (distance threshold)',
 					default: 0.3
 				},
-				minSamples: {
-					type: 'number',
+				minSamples: {, type: 'number',
 					description: 'Minimum samples per cluster',
 					default: 2
 				},
-				batchSize: {
-					type: 'number',
+				batchSize: {, type: 'number',
 					description: 'Batch size for GPU processing',
 					default: 1000
 				}
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				clusters: { type: 'number', description: 'Number of clusters found' },
-				embeddings_processed: { type: 'number' },
-				cache_hits: { type: 'number' },
-				gpu_memory_used: { type: 'string' }
+		outputSchema: {, type: 'object',
+			properties: {, clusters: { type: 'number', description: 'Number of clusters found' },
+				embeddings_processed: {, type: 'number' },
+				cache_hits: {, type: 'number' },
+				gpu_memory_used: {, type: 'string' }
 			}
 		},
 		execute: async (args: any) => {
@@ -97,29 +90,24 @@ export const phase89Tools = {
 	},
 
 	/**
-	 * Tool: phase89:summarize
+	 * Tool: phase89, summarize
 	 * Generate LLM summaries for error clusters
 	 */
-	'phase89:summarize': {
-		name: 'phase89:summarize',
+	'phase89:summarize': {, name: 'phase89:summarize',
 		description: 'Generate LLM summaries for CUDA clusters and store in KB cards',
 		category: 'knowledge-management',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				clusterIds: {
+		inputSchema: {, type: 'object',
+			properties: {, clusterIds: {
 					type: 'array',
-					items: { type: 'number' },
+					items: {, type: 'number' },
 					description: 'Specific cluster IDs to summarize (optional - summarizes all if empty)'
 				}
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				summaries_generated: { type: 'number' },
-				kb_cards_created: { type: 'number' },
-				copilot_md_updated: { type: 'boolean' }
+		outputSchema: {, type: 'object',
+			properties: {, summaries_generated: { type: 'number' },
+				kb_cards_created: {, type: 'number' },
+				copilot_md_updated: {, type: 'boolean' }
 			}
 		},
 		execute: async (args: any) => {
@@ -166,34 +154,28 @@ export const phase89Tools = {
 	},
 
 	/**
-	 * Tool: phase89:tag
+	 * Tool: phase89, tag
 	 * Auto-tag Qdrant collections using ripgrep
 	 */
-	'phase89:tag': {
-		name: 'phase89:tag',
+	'phase89:tag': {, name: 'phase89:tag',
 		description: 'Auto-tag Qdrant points with file metadata extracted via ripgrep',
 		category: 'indexing',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				collections: {
+		inputSchema: {, type: 'object',
+			properties: {, collections: {
 					type: 'array',
-					items: { type: 'string' },
+					items: {, type: 'string' },
 					description: 'Collections to tag (optional - tags all Phase 89 collections if empty)'
 				},
-				showStats: {
-					type: 'boolean',
+				showStats: {, type: 'boolean',
 					description: 'Show tag statistics after tagging',
 					default: false
 				}
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				points_tagged: { type: 'number' },
-				collections_processed: { type: 'number' },
-				tag_statistics: { type: 'object' }
+		outputSchema: {, type: 'object',
+			properties: {, points_tagged: { type: 'number' },
+				collections_processed: {, type: 'number' },
+				tag_statistics: {, type: 'object' }
 			}
 		},
 		execute: async (args: any) => {
@@ -245,27 +227,22 @@ export const phase89Tools = {
 	},
 
 	/**
-	 * Tool: phase89:pipeline
+	 * Tool: phase89, pipeline
 	 * Run full Phase 89 pipeline: cluster → summarize → tag
 	 */
-	'phase89:pipeline': {
-		name: 'phase89:pipeline',
-		description: 'Run complete Phase 89 pipeline: CUDA clustering: LLM summarization, and auto-tagging',
+	'phase89:pipeline': {, name: 'phase89:pipeline',
+		description: 'Run complete Phase 89 pipeline: CUDA, clustering: LLM summarization, and auto-tagging',
 		category: 'orchestration',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				skipClustering: { type: 'boolean', default: false },
-				skipSummarization: { type: 'boolean', default: false },
-				skipTagging: { type: 'boolean', default: false }
+		inputSchema: {, type: 'object',
+			properties: {, skipClustering: { type: 'boolean', default: false },
+				skipSummarization: {, type: 'boolean', default: false },
+				skipTagging: {, type: 'boolean', default: false }
 			}
 		},
-		outputSchema: {
-			type: 'object',
-			properties: {
-				pipeline_stages: { type: 'array', items: { type: 'string' } },
-				total_duration_ms: { type: 'number' },
-				results: { type: 'object' }
+		outputSchema: {, type: 'object',
+			properties: {, pipeline_stages: { type: 'array', items: {, type: 'string' } },
+				total_duration_ms: {, type: 'number' },
+				results: {, type: 'object' }
 			}
 		},
 		execute: async (args: any) => {

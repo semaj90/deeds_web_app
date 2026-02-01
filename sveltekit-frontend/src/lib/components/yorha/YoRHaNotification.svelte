@@ -6,8 +6,7 @@
   interface Props {
     id?: string;
     type?: 'info' | 'success' | 'warning' | 'error' | 'system';
-    title?: string;
-    message: string;
+    title?: string;, message: string;
     duration?: number;
     closable?: boolean;
     onClose?: (id?: string) => void;
@@ -28,11 +27,11 @@
   let interval: any;
 
   const typeConfig = {
-    info: { icon: '■', color: '#0ea5e9' },
-    success: { icon: '✓', color: '#10b981' },
-    warning: { icon: '!', color: '#f59e0b' },
-    error: { icon: '✕', color: '#ef4444' },
-    system: { icon: '◆', color: '#8b5cf6' }
+    info: {, icon: '■', color: '#0ea5e9' },
+    success: {, icon: '✓', color: '#10b981' },
+    warning: {, icon: '!', color: '#f59e0b' },
+    error: {, icon: '✕', color: '#ef4444' },
+    system: {, icon: '◆', color: '#8b5cf6' }
   };
 
   const config = $derived(typeConfig[type]);
@@ -64,7 +63,7 @@
 {#if visible}
   <div
     class="relative overflow-hidden bg-slate-900 border border-slate-700 p-4 min-w-[300px] shadow-2xl"
-    transition:fly={{ x: 100, duration: 400 }}
+    transition: fly={{, x: 100, duration: 400 }}
   >
     <div class="flex items-start gap-4">
       <div class="text-xl" style="color: {config.color}">{config.icon}</div>

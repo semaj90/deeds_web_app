@@ -19,67 +19,50 @@ const VECTOR_DB = (process.env?.VECTOR_DB ?? 'pgvector').toLowerCase();
 // ===== Interfaces =====
 
 export interface DocumentProcessingConfig {
-	enableOCR: boolean;
-	enableLegalAnalysis: boolean;
-	enableEmbeddings: boolean;
-	enableSummarization: boolean;
-	enableMinIOStorage: boolean;
-	enableEntityExtraction: boolean;
-	enableChainOfCustody: boolean;
-	model: 'gemma3-legal:latest' | 'embeddinggemma:latest' | 'nomic-embed-text:latest' | 'legal-bert' | 'auto';
-	chunkSize: number;
-	confidence: number;
+	enableOCR: boolean;, enableLegalAnalysis: boolean;
+	enableEmbeddings: boolean;, enableSummarization: boolean;
+	enableMinIOStorage: boolean;, enableEntityExtraction: boolean;
+	enableChainOfCustody: boolean;, model: 'gemma3-legal:latest' | 'embeddinggemma:latest' | 'nomic-embed-text:latest' | 'legal-bert' | 'auto';
+	chunkSize: number;, confidence: number;
 	priority: 'low' | 'medium' | 'high' | 'critical';
 	legalContext?: 'litigation' | 'contract' | 'compliance' | 'discovery' | 'general';
 	outputFormat: 'json' | 'structured' | 'summary' | 'full';
 }
 
 export interface LegalEntity {
-	text: string;
-	type: 'person' | 'organization' | 'location' | 'date' | 'money' | 'case_number' | 'statute' | 'legal_term';
-	confidence: number;
-	position: { start: number; end: number };
+	text: string;, type: 'person' | 'organization' | 'location' | 'date' | 'money' | 'case_number' | 'statute' | 'legal_term';
+	confidence: number;, position: { start: number;, end: number };
 	context?: string;
 }
 
 export interface LegalEntityResult {
-	entities: LegalEntity[];
-	concepts: string[];
-	documentType: string;
-	jurisdiction: string;
-	confidentialityLevel: string;
-	legalDomains: string[];
+	entities: LegalEntity[];, concepts: string[];
+	documentType: string;, jurisdiction: string;
+	confidentialityLevel: string;, legalDomains: string[];
 	relevanceScore: number;
 }
 
 export interface DocumentChunk extends TextChunk {
 	pageNumber?: number;
-	section?: string;
-	confidence: number;
+	section?: string;, confidence: number;
 	metadata: Record<string, unknown>;
 }
 
 export interface DocumentStructure {
-	title?: string;
-	headers: Array<{ level: number; text: string; position: number }>;
-	sections: Array<{
-		id: string;
-		title: string;
-		content: string;
+	title?: string;, headers: Array<{ level: number;, text: string; position: number }>;
+	sections: Array<{, id: string;
+		title: string;, content: string;
 		subsections: Array<Record<string, unknown>>;
-		type: string;
-		pageRange: { start: number; end: number };
+		type: string;, pageRange: { start: number;, end: number };
 	}>;
-	footnotes: string[];
-	references: Array<{ text: string; type: string; citation?: string; url?: string; page?: number }>;
+	footnotes: string[];, references: Array<{ text: string;, type: string; citation?: string; url?: string; page?: number }>;
 	signatures: Array<Record<string, unknown>>;
 	tables: Array<Record<string, unknown>>;
 	images: Array<Record<string, unknown>>;
 }
 
 export interface RiskFactor {
-	type: string;
-	description: string;
+	type: string;, description: string;
 	severity: 'low' | 'medium' | 'high' | 'critical';
 	likelihood: 'unlikely' | 'possible' | 'likely' | 'certain';
 	mitigation?: string;
@@ -87,143 +70,104 @@ export interface RiskFactor {
 
 export interface RiskAssessment {
 	overallRisk: 'low' | 'medium' | 'high' | 'critical';
-	riskFactors: RiskFactor[];
-	recommendations: string[];
+	riskFactors: RiskFactor[];, recommendations: string[];
 	urgency: 'routine' | 'priority' | 'urgent' | 'critical';
 }
 
 export interface ComplianceFlag {
 	type: 'regulatory' | 'privacy' | 'disclosure' | 'retention' | 'access';
-	description: string;
-	severity: 'info' | 'warning' | 'error' | 'critical';
-	regulation?: string;
-	action_required: boolean;
+	description: string;, severity: 'info' | 'warning' | 'error' | 'critical';
+	regulation?: string;, action_required: boolean;
 	deadline?: string;
 }
 
 export interface DocumentSection {
-	id: string;
-	title: string;
-	content: string;
-	summary: string;
-	keyPoints: string[];
-	legalRelevance: number;
+	id: string;, title: string;
+	content: string;, summary: string;
+	keyPoints: string[];, legalRelevance: number;
 	pageNumbers: number[];
 }
 
 export interface TimelineEvent {
-	date: string;
-	event: string;
+	date: string;, event: string;
 	type: 'deadline' | 'milestone' | 'obligation' | 'right' | 'notice';
 	importance: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface ProcessingError {
-	stage: string;
-	error: string;
+	stage: string;, error: string;
 	severity: 'warning' | 'error' | 'critical';
-	timestamp: string;
-	recovery_attempted: boolean;
+	timestamp: string;, recovery_attempted: boolean;
 }
 
 export interface PerformanceMetrics {
-	ocrTime: number;
-	analysisTime: number;
-	embeddingTime: number;
-	summarizationTime: number;
-	storageTime: number;
-	totalTime: number;
-	memoryUsage: number;
-	cpuUsage: number;
+	ocrTime: number;, analysisTime: number;
+	embeddingTime: number;, summarizationTime: number;
+	storageTime: number;, totalTime: number;
+	memoryUsage: number;, cpuUsage: number;
 }
 
 export interface ComplianceMetadata {
-	retentionPeriod?: string;
-	classificationLevel: string;
-	accessRestrictions: string[];
-	auditRequired: boolean;
-	encryptionRequired: boolean;
-	redactionRequired: boolean;
+	retentionPeriod?: string;, classificationLevel: string;
+	accessRestrictions: string[];, auditRequired: boolean;
+	encryptionRequired: boolean;, redactionRequired: boolean;
 }
 
 export interface ChainOfCustodyEntry {
-	id: string;
-	timestamp: string;
+	id: string;, timestamp: string;
 	action: 'created' | 'accessed' | 'modified' | 'transferred' | 'archived';
-	user: string;
-	location: string;
+	user: string;, location: string;
 	hash: string;
 	notes?: string;
 }
 
 export interface AccessLogEntry {
-	timestamp: string;
-	user: string;
+	timestamp: string;, user: string;
 	action: 'view' | 'download' | 'edit' | 'print' | 'share';
-	ipAddress: string;
-	userAgent: string;
+	ipAddress: string;, userAgent: string;
 	duration?: number;
 }
 
 export interface AccessControlInfo {
 	accessLevel: 'public' | 'internal' | 'confidential' | 'restricted' | 'privileged';
-	authorizedUsers: string[];
-	accessLog: AccessLogEntry[];
+	authorizedUsers: string[];, accessLog: AccessLogEntry[];
 	encryptionKey?: string;
 	expirationDate?: string;
 }
 
 export interface ProcessingResult {
-	success: boolean;
-	documentId: string;
-	processingId: string;
-	ocr: {
-		extractedText: string;
-		confidence: number;
+	success: boolean;, documentId: string;
+	processingId: string;, ocr: {
+		extractedText: string;, confidence: number;
 		processingMethod: 'tesseract' | 'azure_ocr' | 'google_vision' | 'hybrid' | 'enhanced' | 'none';
-		pageCount: number;
-		languageDetected: string;
-		legal?: LegalEntityResult;
-		quality: 'excellent' | 'good' | 'fair' | 'poor';
+		pageCount: number;, languageDetected: string;
+		legal?: LegalEntityResult;, quality: 'excellent' | 'good' | 'fair' | 'poor';
 	};
-	embeddings: {
-		chunks: DocumentChunk[];
-		vectors: number[][];
-		indexedCount: number;
-		embeddingModel: string;
-		dimensions: number;
+	embeddings: {, chunks: DocumentChunk[];
+		vectors: number[][];, indexedCount: number;
+		embeddingModel: string;, dimensions: number;
 		searchReady: boolean;
 	};
-	analysis: {
-		summary: string;
-		keywords: string[];
-		complexity: 'low' | 'medium' | 'high' | 'expert';
-		legalDomains: string[];
-		documentStructure: DocumentStructure;
+	analysis: {, summary: string;
+		keywords: string[];, complexity: 'low' | 'medium' | 'high' | 'expert';
+		legalDomains: string[];, documentStructure: DocumentStructure;
 		riskAssessment?: RiskAssessment;
 		complianceFlags?: ComplianceFlag[];
 	};
-	summarization: {
-		sections: DocumentSection[];
-		keyInsights: string[];
-		confidence: number;
+	summarization: {, sections: DocumentSection[];
+		keyInsights: string[];, confidence: number;
 		executiveSummary: string;
 		actionItems?: string[];
 		timeline?: TimelineEvent[];
 	};
 	storage: {
 		minioUrl?: string;
-		databaseId?: string;
-		documentHash: string;
-		backupLocation?: string;
-		encryptionStatus: boolean;
+		databaseId?: string;, documentHash: string;
+		backupLocation?: string;, encryptionStatus: boolean;
 	};
-	metadata: {
-		processingTime: number;
-		stagesCompleted: string[];
-		errors: ProcessingError[];
-		warnings: string[];
-		performance: PerformanceMetrics;
+	metadata: {, processingTime: number;
+		stagesCompleted: string[];, errors: ProcessingError[];
+		warnings: string[];, performance: PerformanceMetrics;
 		compliance: ComplianceMetadata;
 	};
 	chainOfCustody?: ChainOfCustodyEntry[];
@@ -287,7 +231,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 		message: string,
 		severity: 'warning' | 'error' | 'critical'
 	): void {
-		errors.push({ stage: error: message,
+		errors.push({ stage: error, message,
 			severity,
 			timestamp: new Date().toISOString(),
 			recovery_attempted: false
@@ -314,29 +258,25 @@ class UnifiedDocumentProcessor extends EventEmitter {
 		const baseResult: ProcessingResult = {
 			success: false,
 			documentId: processingId,
-			ocr: {
-				extractedText: '',
+			ocr: {, extractedText: '',
 				confidence: 0,
 				processingMethod: 'none',
 				pageCount: 0,
 				languageDetected: 'en',
 				quality: 'poor'
 			},
-			embeddings: {
-				chunks: [],
+			embeddings: {, chunks: [],
 				vectors: [],
 				indexedCount: 0,
 				embeddingModel: '',
 				dimensions: 0,
 				searchReady: false
 			},
-			analysis: {
-				summary: '',
+			analysis: {, summary: '',
 				keywords: [],
 				complexity: 'low',
 				legalDomains: [],
-				documentStructure: {
-					headers: [],
+				documentStructure: {, headers: [],
 					sections: [],
 					footnotes: [],
 					references: [],
@@ -345,23 +285,19 @@ class UnifiedDocumentProcessor extends EventEmitter {
 					images: []
 				}
 			},
-			summarization: {
-				sections: [],
+			summarization: {, sections: [],
 				keyInsights: [],
 				confidence: 0,
 				executiveSummary: ''
 			},
-			storage: {
-				documentHash: '',
+			storage: {, documentHash: '',
 				encryptionStatus: false
 			},
-			metadata: {
-				processingTime: 0,
+			metadata: {, processingTime: 0,
 				stagesCompleted: [],
 				errors: [],
 				warnings: [],
-				performance: {
-					ocrTime: 0,
+				performance: {, ocrTime: 0,
 					analysisTime: 0,
 					embeddingTime: 0,
 					summarizationTime: 0,
@@ -370,8 +306,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 					memoryUsage: 0,
 					cpuUsage: 0
 				},
-				compliance: {
-					classificationLevel: 'internal',
+				compliance: {, classificationLevel: 'internal',
 					accessRestrictions: [],
 					auditRequired: true,
 					encryptionRequired: config.priority === 'critical',
@@ -419,7 +354,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 						startIndex: i * (config?.chunkSize ?? 500),
 						endIndex: (i + 1) * (config?.chunkSize ?? 500),
 						confidence: 0.9,
-						metadata: { documentId: chunkIndex: i,
+						metadata: {, documentId: chunkIndex: i,
 							...(metadata || {})
 						}
 					});
@@ -444,7 +379,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			baseResult.metadata.processingTime = Date.now() - startTime;
 			baseResult.metadata.performance.totalTime = baseResult.metadata.processingTime;
 
-			this.emit('document_processed', { documentId: success: baseResult.success,
+			this.emit('document_processed', { documentId: success, baseResult.success,
 				stagesCompleted: stagesCompleted.length,
 				errors: errors.length
 			});
@@ -456,7 +391,7 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			baseResult.success = false;
 			baseResult.metadata.processingTime = Date.now() - startTime;
 			baseResult.metadata.errors = errors;
-			this.emit('document_processing_failed', { documentId: error: msg });
+			this.emit('document_processing_failed', { documentId: error, msg });
 			return baseResult;
 		} finally {
 			this.activeProcessors.delete(processingId);
@@ -476,16 +411,13 @@ class UnifiedDocumentProcessor extends EventEmitter {
 			includeMetadata?: boolean;
 			filter?: Record<string, unknown>;
 		} = {}
-	): Promise<{
-		results: Array<{
-			content: string;
-			similarity: number;
+	): Promise<{, results: Array<{
+			content: string;, similarity: number;
 			metadata?: Record<string, unknown> | null;
 			documentId?: string;
 			chunkId?: string;
 		}>;
-		processingTime: number;
-		totalMatches: number;
+		processingTime: number;, totalMatches: number;
 	}> {
 		const startTime = Date.now();
 		try {

@@ -1,14 +1,11 @@
 <script lang="ts">
 	interface FunctionCall {
-		name: string;
-		result: unknown;
+		name: string;, result: unknown;
 	}
 
 	interface Query {
-		id: string;
-		query: string;
-		response: string;
-		timestamp: Date;
+		id: string;, query: string;
+		response: string;, timestamp: Date;
 		functionCalls: FunctionCall[];
 	}
 
@@ -122,22 +119,17 @@
 
 <style>
 	.terminal-container {
-		background-color: black;
-		border: 2px solid #00FF00;
-		border-radius: 4px;
-		overflow: hidden;
+		background-color: black;, border: 2px solid #00FF00;
+		border-radius: 4px;, overflow: hidden;
 		display: flex;
-		flex-direction: column;
-		height: 600px;
+		flex-direction: column;, height: 600px;
 	}
 
 	.terminal-output {
 		flex: 1;
-		overflow-y: auto;
-		padding: 1rem;
+		overflow-y: auto;, padding: 1rem;
 		font-family: monospace;
-		font-size: 0.875rem;
-		color: #00FF00;
+		font-size: 0.875rem;, color: #00FF00;
 		background-color: black;
 		background-image: repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
 		background-size: 100% 2px;
@@ -172,8 +164,7 @@
 	}
 
 	.loading-indicator {
-		color: #00AA00;
-		animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+		color: #00AA00;, animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	}
 
 	@keyframes pulse {
@@ -187,14 +178,12 @@
 
 	.terminal-input {
 		border-top: 1px solid #00FF00;
-		background-color: black;
-		padding: 0.75rem;
+		background-color: black;, padding: 0.75rem;
 	}
 
 	.input-row {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 	}
 
 	.prompt {
@@ -204,11 +193,9 @@
 
 	.input-field {
 		flex: 1;
-		background-color: black;
-		color: #00FF00;
+		background-color: black;, color: #00FF00;
 		font-family: monospace;
-		font-size: 0.875rem;
-		border: none;
+		font-size: 0.875rem;, border: none;
 		outline: none;
 	}
 
@@ -218,22 +205,18 @@
 
 	.send-button {
 		padding: 0.25rem 0.75rem;
-		background-color: black;
-		border: 1px solid #00FF00;
+		background-color: black;, border: 1px solid #00FF00;
 		color: #00FF00;
 		font-family: monospace;
-		font-size: 0.75rem;
-		cursor: pointer;
+		font-size: 0.75rem;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
-	.send-button:hover:not(:disabled) {
-		background-color: #00FF00;
-		color: black;
+	.send-button: hover, not(:disabled) {
+		background-color: #00FF00;, color: black;
 	}
 
 	.send-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
+		opacity: 0.5;, cursor: not-allowed;
 	}
 </style>

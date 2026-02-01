@@ -3,9 +3,9 @@
 import { writable, derived } from 'svelte/store';
 // Performance metrics store
 export const performanceMetrics = writable({
- system: { cpu: 0, memory: 0, eventLoopLag: 0, uptime: 0}, services: { postgresql: { status: 'unknown', responseTime: 0, connections: 0 }, ollama: { status: 'unknown', responseTime: 0, gpuUsage: 0 }, context7: { status: 'unknown', responseTime: 0, cacheHits: 0 }, enhancedRag: { status: 'unknown', responseTime: 0, simdOps: 0 }, sveltekit: { status: 'unknown', responseTime: 0, requests: 0 }}, optimization: { eventLoop: {
- enabled: true, priority: 'high', batchSize: 100, processingRate: 0, lagThreshold: 10}, caching: { l1: { size: 0, hits: 0, misses: 0, efficiency: 0 }, l2: { size: 0, hits: 0, misses: 0, efficiency: 0 }, total: { hits: 0, misses: 0, efficiency: 0 }}, interrupts: { total: 0, handled: 0, recovery: 0, success_rate: 0}, patterns: { compiled: 0, matches: 0, confidence: 0, processing_time: 0}, simd: { enabled: true
- operations: 0, speedup: 0, efficiency: 0}, jsonb: { queries: 0, avg_time: 0, index_usage: 0, optimization_level: 0}}, autoSolve: { enabled: true
+ system: {, cpu: 0, memory: 0, eventLoopLag: 0, uptime: 0}, services: {, postgresql: { status: 'unknown', responseTime: 0, connections: 0 }, ollama: {, status: 'unknown', responseTime: 0, gpuUsage: 0 }, context7: {, status: 'unknown', responseTime: 0, cacheHits: 0 }, enhancedRag: {, status: 'unknown', responseTime: 0, simdOps: 0 }, sveltekit: {, status: 'unknown', responseTime: 0, requests: 0 }}, optimization: {, eventLoop: {
+ enabled: true, priority: 'high', batchSize: 100, processingRate: 0, lagThreshold: 10}, caching: {, l1: { size: 0, hits: 0, misses: 0, efficiency: 0 }, l2: {, size: 0, hits: 0, misses: 0, efficiency: 0 }, total: {, hits: 0, misses: 0, efficiency: 0 }}, interrupts: {, total: 0, handled: 0, recovery: 0, success_rate: 0}, patterns: {, compiled: 0, matches: 0, confidence: 0, processing_time: 0}, simd: {, enabled: true
+ operations: 0, speedup: 0, efficiency: 0}, jsonb: {, queries: 0, avg_time: 0, index_usage: 0, optimization_level: 0}}, autoSolve: {, enabled: true
  requests: 0, successful: 0, errors_fixed: 0, success_rate: 0}});
   
 let updateInterval
@@ -53,7 +53,7 @@ async function fetchSystemMetrics() {
 // Service health metrics
 async function fetchServiceMetrics() {
  const services = {
- postgresql: { port: 5432, path: '/health' }, ollama: { port: 11434, path: '/api/version' }, context7: { port: 4000, path: '/health' }, context7MultiCore: { port: 4100, path: '/health' }, enhancedRag: { port: 8094, path: '/health' }};
+ postgresql: {, port: 5432, path: '/health' }, ollama: {, port: 11434, path: '/api/version' }, context7: {, port: 4000, path: '/health' }, context7MultiCore: {, port: 4100, path: '/health' }, enhancedRag: {, port: 8094, path: '/health' }};
  const results = {};
  for (const [name, config] of Object.entries(services)) {
  try {
@@ -86,11 +86,11 @@ async function fetchOptimizationMetrics() {
  const totalEfficiency =
  totalHits + totalMisses > 0 ? +((totalHits / (totalHits + totalMisses)) * 100).toFixed(2) : 0
  return {
- eventLoop: { enabled: true
+ eventLoop: {, enabled: true
  priority: 'high', batchSize: 100, processingRate: Math.round(Math.random() * 1000 + 500), lagThreshold: 10, currentLag: +(Math.random() * 3).toFixed(2)}, caching: {
- l1, l2: total: { hits: totalHits
- misses: totalMisses, efficiency: totalEfficiency}}, interrupts: { total: Math.round(Math.random() * 100), handled: Math.round(Math.random() * 95), recovery: +(Math.random() * 90).toFixed(2), success_rate: +(94 + Math.random() * 5).toFixed(2)}, patterns: { compiled: 24, matches: Math.round(Math.random() * 1000), confidence: +(0.89 + Math.random() * 0.1).toFixed(3), processing_time: +(Math.random() * 50 + 10).toFixed(2)}, simd: { enabled: true
- operations: Math.round(Math.random() * 50000), speedup: +(3.2 + Math.random() * 1.8).toFixed(2), efficiency: +(92 + Math.random() * 7).toFixed(2)}, jsonb: { queries: Math.round(Math.random() * 10000), avg_time: +(Math.random() * 20 + 5).toFixed(2), index_usage: +(88 + Math.random() * 10).toFixed(2), optimization_level: +(95 + Math.random() * 4).toFixed(2)}} }
+ l1, l2: total: {, hits: totalHits
+ misses: totalMisses, efficiency: totalEfficiency}}, interrupts: {, total: Math.round(Math.random() * 100), handled: Math.round(Math.random() * 95), recovery: +(Math.random() * 90).toFixed(2), success_rate: +(94 + Math.random() * 5).toFixed(2)}, patterns: {, compiled: 24, matches: Math.round(Math.random() * 1000), confidence: +(0.89 + Math.random() * 0.1).toFixed(3), processing_time: +(Math.random() * 50 + 10).toFixed(2)}, simd: {, enabled: true
+ operations: Math.round(Math.random() * 50000), speedup: +(3.2 + Math.random() * 1.8).toFixed(2), efficiency: +(92 + Math.random() * 7).toFixed(2)}, jsonb: {, queries: Math.round(Math.random() * 10000), avg_time: +(Math.random() * 20 + 5).toFixed(2), index_usage: +(88 + Math.random() * 10).toFixed(2), optimization_level: +(95 + Math.random() * 4).toFixed(2)}} }
 }
 // AutoSolve metrics
 async function fetchAutoSolveMetrics() {

@@ -11,7 +11,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
  */
 const mockHealthResponse = {
  status: 'healthy',
- timestamp: new Date().toISOString(), services: { ollama: 'healthy',
+ timestamp: new Date().toISOString(), services: {, ollama: 'healthy',
  qdrant: 'healthy',
  redis: 'healthy',
  },
@@ -20,11 +20,11 @@ const mockHealthResponse = {
 const mockToolExecutionResponse = {
  success: true,
  toolName: 'rag_lookup',
- result: { matches: [
+ result: {, matches: [
  {
  id: '1',
  score: 0.95,
- payload: { text: 'Sample legal document' },
+ payload: {, text: 'Sample legal document' },
  }],
  },
 };
@@ -35,9 +35,9 @@ const mockAgentChatResponse = {
  toolCalls: [
  {
  toolName: 'rag_lookup',
- arguments: { query: 'contract law' },
+ arguments: {, query: 'contract law' },
  }],
- context: { caseId: 'case-123',
+ context: {, caseId: 'case-123',
  userId: 'user-456',
  },
 };
@@ -95,7 +95,7 @@ describe('Agent API Endpoints', () => {
 
  const unhealthyResponse = {
  status: 'degraded',
- services: { ollama: 'healthy',
+ services: {, ollama: 'healthy',
  qdrant: 'unavailable',
  redis: 'healthy',
  },
@@ -193,7 +193,7 @@ describe('Agent API Endpoints', () => {
  const emptyResponse = {
  success: true,
  toolName: 'rag_lookup',
- result: { matches: [],
+ result: {, matches: [],
  },
  };
 
@@ -286,7 +286,7 @@ describe('Agent API Endpoints', () => {
 
  const requestWithContext = {
  message: 'Analyze this case',
- context: { caseId: 'case-123',
+ context: {, caseId: 'case-123',
  userId: 'user-456',
  },
  };
@@ -466,7 +466,7 @@ describe('Agent API Endpoints', () => {
  const detailedError = {
  success: false,
  error: 'Tool execution failed',
- details: { toolName: 'rag_lookup',
+ details: {, toolName: 'rag_lookup',
  reason: 'Qdrant connection failed',
  timestamp: new Date().toISOString(),
  },

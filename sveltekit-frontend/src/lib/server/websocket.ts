@@ -86,9 +86,9 @@ export function setupWebSocketServer(server: any) {
 
 function handleWebSocketMessage(
     caseId: string,
-    message: { type: string; payload?: any },
+    message: {, type: string; payload?: any },
     sender: any,
-    user: { id: string; name: string; email: string }
+    user: {, id: string; name: string;, email: string }
 ) {
     switch (message.type) {
         case 'EVIDENCE_POSITION_UPDATE':
@@ -151,7 +151,7 @@ function handleWebSocketMessage(
 
 function broadcastToCase(
     caseId: string,
-    message: { type: string; payload?: any },
+    message: {, type: string; payload?: any },
     excludeConnection?: any
 ) {
     const connections = caseConnections.get(caseId);

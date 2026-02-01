@@ -6,40 +6,19 @@
 import { browser } from '$app/environment';
 
 export interface CacheEntry<T = unknown> {
-  key: string;
-  data: T;
-  timestamp: number;
-  ttl: number;
-  version: string;
+  key: string;, data: T;, timestamp: number;, ttl: number;, version: string;
   embedding?: Float32Array;
-  metadata?: {
-    size: number;
-    hits: number;
-    lastAccess: number;
-    source: 'server' | 'client' | 'hybrid';
+  metadata?: {, size: number;, hits: number;, lastAccess: number;, source: 'server' | 'client' | 'hybrid';
     computeCost: number;
   };
 }
 
 export interface CacheStrategy {
-  memory: boolean;
-  indexeddb: boolean;
-  localStorage: boolean;
-  lru: boolean;
-  semantic: boolean;
-  cost: boolean;
-  syncWithRedis: boolean;
-  conflictResolution: 'client' | 'server' | 'merge';
+  memory: boolean;, indexeddb: boolean;, localStorage: boolean;, lru: boolean;, semantic: boolean;, cost: boolean;, syncWithRedis: boolean;, conflictResolution: 'client' | 'server' | 'merge';
 }
 
 export interface CacheConfig {
-  maxMemorySize: number;
-  maxIndexedDBSize: number;
-  maxLocalStorageSize: number;
-  defaultTTL: number;
-  embeddingDimensions: number;
-  syncInterval: number;
-  strategy: CacheStrategy;
+  maxMemorySize: number;, maxIndexedDBSize: number;, maxLocalStorageSize: number;, defaultTTL: number;, embeddingDimensions: number;, syncInterval: number;, strategy: CacheStrategy;
 }
 
 export class HeadlessUICache {
@@ -59,8 +38,7 @@ export class HeadlessUICache {
       defaultTTL: 30 * 60 * 1000,
       embeddingDimensions: 256,
       syncInterval: 5 * 60 * 1000,
-      strategy: {
-        memory: true,
+      strategy: {, memory: true,
         indexeddb: true,
         localStorage: false,
         lru: true,
@@ -168,8 +146,7 @@ export class HeadlessUICache {
       timestamp: Date.now(),
       ttl: ttl || this.config.defaultTTL,
       version: this.generateVersion(),
-      metadata: {
-        size: this.estimateSize(data),
+      metadata: {, size: this.estimateSize(data),
         hits: 0,
         lastAccess: Date.now(),
         source,

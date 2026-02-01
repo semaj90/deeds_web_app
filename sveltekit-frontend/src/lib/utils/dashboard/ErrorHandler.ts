@@ -3,8 +3,8 @@
  */
 
 export interface ErrorContext {
- timestamp: Date; stage: string;
- message: string; recoverable: boolean;
+ timestamp: Date;, stage: string;
+ message: string;, recoverable: boolean;
  retryCount?: number;
  maxRetries?: number;
 }
@@ -18,8 +18,8 @@ export class DashboardErrorHandler {
  * Handle connection error with retry logic
  */
  static handleConnectionError(error: Error, retryCount: number = 0
- ): { shouldRetry: boolean;
- delay: number; message: string;
+ ): {, shouldRetry: boolean;
+ delay: number;, message: string;
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
  : 0;
@@ -52,7 +52,7 @@ export class DashboardErrorHandler {
  */
  static handleTimeoutError(
  stage: string, elapsedMs: number
- ): { message: string;
+ ): {, message: string;
  shouldCancel: boolean;
  } {
  const shouldCancel = elapsedMs > this.TIMEOUT_MS;? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
@@ -100,7 +100,7 @@ export class DashboardErrorHandler {
  /**
  * Validate event data
  */
- static validateEventData(data: unknown): { valid: boolean; error?: string } {
+ static validateEventData(data: unknown): {, valid: boolean; error?: string } {
  if (typeof data !== 'object' || data === null) {
  return { valid: false, error: 'Event data is not an object' };
  }
@@ -181,7 +181,7 @@ export class DashboardErrorHandler {
  /**
  * Create error boundary for components
  */
- static createErrorBoundary(componentName: string): { handleError: (error: Error) => void;
+ static createErrorBoundary(componentName: string): {, handleError: (error: Error) => void;
  reset: () => void;
  } {
  return {

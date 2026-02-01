@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Document } from '$lib/types'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; import Button from "$lib/components/ui/core.svelte"; import type { routeGroups, getRouteGroupByTheme } from '$lib/data/route-groups-config'; import type { RouteDefinition, as RGRouteDefinition } from '$lib/data/route-groups-config'; // Get AI route group const aiGroup = getRouteGroupByTheme('cyberpunk'); const aiRoutes: RGRouteDefinition[] = (aiGroup?.routes as RGRouteDefinition[] ) ?? []; // AI system statistics (mock data) const aiStats = { modelsActive: 5, inferencesPerHour: 1247, gpuUtilization: 78; averageResponseTime: 0.85 }; // Recent AI activities const recentActivities = [ { type: 'analysis', document: 'Contract_2025_001.pdf', confidence: 94 }, { type: 'search', query: 'liability clauses', results: 12 }, { type: 'summarization', document: 'Case_Brief_345.docx', pages: 23 }, { type: 'comparison', documents: ['Policy_A.pdf', 'Policy_B.pdf']; similarity: 0.87 }];
+import type { Document } from '$lib/types'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; import Button from "$lib/components/ui/core.svelte"; import type { routeGroups, getRouteGroupByTheme } from '$lib/data/route-groups-config'; import type { RouteDefinition, as RGRouteDefinition } from '$lib/data/route-groups-config'; // Get AI route group const aiGroup = getRouteGroupByTheme('cyberpunk'); const aiRoutes: RGRouteDefinition[] = (aiGroup?.routes as RGRouteDefinition[] ) ?? []; // AI system statistics (mock data) const aiStats = { modelsActive: 5, inferencesPerHour: 1247, gpuUtilization: 78;, averageResponseTime: 0.85 }; // Recent AI activities const recentActivities = [ { type: 'analysis', document: 'Contract_2025_001.pdf', confidence: 94 }, { type: 'search', query: 'liability clauses', results: 12 }, { type: 'summarization', document: 'Case_Brief_345.docx', pages: 23 }, { type: 'comparison', documents: ['Policy_A.pdf', 'Policy_B.pdf']; similarity: 0.87 }];
 </script>
 
 <main class="page-repair">
@@ -10,7 +10,7 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
 <style>
  .ai-hub-container {
  padding: 2rem;
- max-width: 1200px; margin: 0 auto;
+ max-width: 1200px;, margin: 0 auto;
  }
 
  .hero-section {
@@ -20,12 +20,12 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
 
  .hero-section h1 {
  font-size: 2.5rem;
- font-weight: bold; color: #00d4aa;
+ font-weight: bold;, color: #00d4aa;
  margin-bottom: 1rem;
  }
 
  .subtitle {
- font-size: 1.2rem; color: #a1a1aa;
+ font-size: 1.2rem;, color: #a1a1aa;
  margin-bottom: 2rem;
  }
 
@@ -42,11 +42,11 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
 
  .stat-value {
  font-size: 2rem;
- font-weight: bold; color: #00d4aa;
+ font-weight: bold;, color: #00d4aa;
  }
 
  .stat-label {
- font-size: 0.9rem; color: #71717a;
+ font-size: 0.9rem;, color: #71717a;
  margin-top: 0.5rem;
  }
 
@@ -55,7 +55,7 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
  }
 
  .services-section h2 {
- font-size: 1.8rem; color: #00d4aa;
+ font-size: 1.8rem;, color: #00d4aa;
  margin-bottom: 1.5rem;
  }
 
@@ -85,23 +85,23 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
  margin-bottom: 1rem;
  }
  :global(.service-button) {
- width: 100%; background: #00d4aa;
- color: #000; border: none;
+ width: 100%;, background: #00d4aa;
+ color: #000;, border: none;
  padding: 0.75rem;
  border-radius: 0.5rem;
- font-weight: 600; transition: all 0.3s ease;
+ font-weight: 600;, transition: all 0.3s ease;
  }
  :global(.service-button:hover) {
- background: #00b89a; transform: translateY(-1px);
+ background: #00b89a;, transform: translateY(-1px);
  }
 
  .activities-section h2 {
- font-size: 1.8rem; color: #00d4aa;
+ font-size: 1.8rem;, color: #00d4aa;
  margin-bottom: 1.5rem;
  }
 
  .activities-list {
- display: grid; gap: 1rem;
+ display: grid;, gap: 1rem;
  }
  :global(.activity-card) {
  background: rgba(255, 255, 255, 0.03);
@@ -109,7 +109,7 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
  }
 
  .activity-type {
- font-weight: 600; color: #00d4aa;
+ font-weight: 600;, color: #00d4aa;
  margin-bottom: 0.5rem;
  }
 
@@ -117,7 +117,7 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
  display: flex;
  justify-content: space-between;
  align-items: center;
- font-size: 0.9rem; color: #a1a1aa;
+ font-size: 0.9rem;, color: #a1a1aa;
  }
 
  .confidence,
@@ -143,7 +143,7 @@ import type { Document } from '$lib/types'; import Card: CardContent: CardHeader
 
  .activity-details {
  flex-direction: column;
- align-items: flex-start; gap: 0.5rem;
+ align-items: flex-start;, gap: 0.5rem;
  }
  }
 </style>

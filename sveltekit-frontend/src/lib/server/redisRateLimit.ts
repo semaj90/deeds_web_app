@@ -130,7 +130,7 @@ export function createRateLimitConfig(
         case 'auth': return { limit: 30, windowSec: 3600 };
         case 'search': return { limit: 120, windowSec: 3600 };
         case 'public': return { limit: 60, windowSec: 3600 };
-        case 'api': default: return { limit: 120, windowSec: 3600 };
+        case 'api': default, return { limit: 120, windowSec: 3600 };
     }
 }
 

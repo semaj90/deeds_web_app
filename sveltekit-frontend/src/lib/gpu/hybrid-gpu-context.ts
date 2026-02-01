@@ -58,7 +58,7 @@ export function setVertexAttribDivisor(ctx: HybridGPUContext, location: number, 
     }
 
     if (ctx.type === 'webgpu') {
-        // WebGPU uses buffer layouts: { stepMode: "vertex" | "instance" } in GPUVertexBufferLayout.
+        // WebGPU uses buffer layouts: {, stepMode: "vertex" | "instance" } in GPUVertexBufferLayout.
         // There's no direct per-attribute divisor setter; instruct caller to set GPUVertexBufferLayout.stepMode = "instance".
         // Keep this as a no-op to avoid throwing in hybrid code paths.
         // Example guidance: gpuBufferLayout.stepMode = "instance";

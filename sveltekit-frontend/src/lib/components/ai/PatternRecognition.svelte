@@ -18,17 +18,17 @@ https://svelte.dev/e/expected_token -->
 
 	// Define the AnalysisResult interface for type safety
 	interface AnalysisResult {
-		risk_assessment?: { overall_risk: 'high' | 'medium' | 'low';
+		risk_assessment?: {, overall_risk: 'high' | 'medium' | 'low';
 			key_concerns?: string[];
 			recommendations?: string[];
 		};
-		patterns?: Array<{ type: string; confidence: number; text: string; category: string;
+		patterns?: Array<{, type: string;, confidence: number;, text: string;, category: string;
 			implications?, string;
 		}>;
-		clauses?: Array<{ name: string; risk_level: 'high' | 'medium' | 'low';
+		clauses?: Array<{, name: string;, risk_level: 'high' | 'medium' | 'low';
 			text: string; analysis, string;
 		}>;
-		metadata?: { document_type: string; analysis_timestamp: string; model_used: string;
+		metadata?: {, document_type: string;, analysis_timestamp: string;, model_used: string;
 		};
 	}
 
@@ -63,8 +63,7 @@ https://svelte.dev/e/expected_token -->
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					content: documentType,
+				body: JSON.stringify({, content: documentType,
 					patterns
 				})
 			});

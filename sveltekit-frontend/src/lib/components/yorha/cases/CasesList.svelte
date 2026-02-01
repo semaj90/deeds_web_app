@@ -1,16 +1,12 @@
 <script lang="ts">
 
   interface Case {
-    id: string;
-    title: string;
+    id: string;, title: string;
     status: 'active' | 'review' | 'closed';
     priority: 'high' | 'medium' | 'low';
-    assignee: string;
-    created: Date;
-    updated: Date;
-    evidenceCount: number;
-    progress: number;
-    description: string;
+    assignee: string;, created: Date;
+    updated: Date;, evidenceCount: number;
+    progress: number;, description: string;
   }
 
   let cases = $state<Case[]>([

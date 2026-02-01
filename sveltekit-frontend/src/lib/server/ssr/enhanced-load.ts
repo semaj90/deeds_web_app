@@ -10,15 +10,13 @@ type $Evidence = typeof evidence.$inferSelect;
 
 // Performance monitoring for SSR
 export interface SSRMetrics {
-    loadTime: number;
-    dbQueries: number;
-    cacheHits: number;
-    errors: string[];
+    loadTime: number;, dbQueries: number;
+    cacheHits: number;, errors: string[];
 }
 
 // Enhanced cache with TTL
 class SSRCache {
-    private static cache = new Map<string, { data: unknown; expires: number }>();
+    private static cache = new Map<string, { data: unknown;, expires: number }>();
     private static readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
 
     static set(key: string, data: unknown, ttl = SSRCache.DEFAULT_TTL): void {
@@ -39,7 +37,7 @@ class SSRCache {
         this.cache.clear();
     }
 
-    static getStats(): { size: number; validEntries: number } {
+    static getStats(): {, size: number; validEntries: number } {
         return {
             size: this.cache.size,
             validEntries: Array.from(this.cache.values()).filter(
@@ -108,9 +106,8 @@ export const createEnhancedLayoutLoad = () => {
                 dbHealth,
                 userCases: [],
                 recentEvidence: [],
-                caseStats: { total: 0, open: 0, investigating: 0, closed: 0 },
-                systemStatus: {
-                    apiHealthy: true,
+                caseStats: {, total: 0, open: 0, investigating: 0, closed: 0 },
+                systemStatus: {, apiHealthy: true,
                     pgvectorEnabled: dbHealth?.pgvectorEnabled ?? false
                 }
             };
@@ -174,16 +171,15 @@ export const createEnhancedLayoutLoad = () => {
             return {
                 session: locals.session,
                 user: locals?.user ?? null,
-                dbHealth: {
-                    connected: false,
+                dbHealth: {, connected: false,
                     pgvectorEnabled: false,
                     queryTime: 0,
                     errors: ['Database unavailable']
                 },
                 userCases: [],
                 recentEvidence: [],
-                caseStats: { total: 0, open: 0, investigating: 0, closed: 0 },
-                systemStatus: { apiHealthy: false, pgvectorEnabled: false, aiServicesOnline: false },
+                caseStats: {, total: 0, open: 0, investigating: 0, closed: 0 },
+                systemStatus: {, apiHealthy: false, pgvectorEnabled: false, aiServicesOnline: false },
                 hydrationContext: createHydrationContext(url, request, locals.user),
                 _metrics: metrics,
                 _error: error instanceof Error ? error.message : 'Unknown error'
@@ -268,25 +264,21 @@ function createHydrationContext(url: URL, request: Request, user: User | null) {
         userAgent: request?.headers?.get('user-agent') ?? 'unknown',
         userId: user?.id ?? null,
         // Performance settings for client hydration
-        goldenRatio: {
-            phi: 1.618,
+        goldenRatio: {, phi: 1.618,
             containerWidth: 1200,
             contentRatio: 0.618,
             sidebarRatio: 0.382
         },
         // AI system status for client hydration
-        aiSystemStatus: {
-            localLLMEnabled: true,
+        aiSystemStatus: {, localLLMEnabled: true,
             ragEnabled: true,
             vectorSearchEnabled: true,
             streamingEnabled: true
         },
         // Theme and UI preferences
-        uiPreferences: {
-            theme: 'auto',
+        uiPreferences: {, theme: 'auto',
             language: 'en',
-            accessibility: {
-                highContrast: false,
+            accessibility: {, highContrast: false,
                 reducedMotion: false,
                 screenReader: false
             }
@@ -298,10 +290,8 @@ function createHydrationContext(url: URL, request: Request, user: User | null) {
 
 // Define the interface for case statistics
 interface CaseStatistics {
-    total: number;
-    open: number;
-    investigating: number;
-    closed: number;
+    total: number;, open: number;
+    investigating: number;, closed: number;
 }
 
 // Helper function to get case statistics

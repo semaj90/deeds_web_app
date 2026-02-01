@@ -6,23 +6,23 @@
 
  // Types
  interface Task {
- id: string; title: string;
- description: string; priority: 'low' | 'medium' | 'high' | 'critical';
- estimatedComplexity: number; type: 'feature' | 'bug' | 'refactor';
+ id: string;, title: string;
+ description: string;, priority: 'low' | 'medium' | 'high' | 'critical';
+ estimatedComplexity: number;, type: 'feature' | 'bug' | 'refactor';
  status: 'pending' | 'in-progress' | 'completed' | 'failed';
  files: string[];
  completedAt?: string;
  }
 
  interface Log {
- id: number; timestamp: string;
- message: string; type: 'info' | 'success' | 'warning' | 'error';
+ id: number;, timestamp: string;
+ message: string;, type: 'info' | 'success' | 'warning' | 'error';
  }
 
  interface Patch {
- id: string; filePath: string;
- description: string; status: 'pending' | 'applied' | 'failed';
- confidence: number; createdAt: string;
+ id: string;, filePath: string;
+ description: string;, status: 'pending' | 'applied' | 'failed';
+ confidence: number;, createdAt: string;
  }
 
  // State

@@ -183,8 +183,8 @@ import { onMount } from 'svelte';
  const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
- headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: file_id, fileId, fileId || currentFileId })
+ headers: {, Accept: 'application/json', 'Content-Type': 'application/json' },
+ body: JSON.stringify({, query: file_id, fileId, fileId || currentFileId })
  }).catch(err => console.warn('REST analysis fallback failed', err));
  streamingTokens = '';
  isStreaming = true;
@@ -291,7 +291,7 @@ import { onMount } from 'svelte';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ file_id: result.aiProcessing.file_id, prompt: `Analyze this legal evidence, document: ${selectedFile.name}` })
+ body: JSON.stringify({, file_id: result.aiProcessing.file_id, prompt: `Analyze this legal evidence, document: ${selectedFile.name}` })
  }).catch(err => console.warn('REST analysis trigger failed', err));
  }
  }
@@ -337,7 +337,7 @@ import { onMount } from 'svelte';
  const response = await fetch('http://localhost:8001/api/v3/advanced-ai/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ file_id: fileId,
+ body: JSON.stringify({, file_id: fileId,
  prompt: `Perform comprehensive legal analysis of this evidence document using advanced AI orchestration: ${selectedFile?.name}`,
  user_id: 'current_user'
  })

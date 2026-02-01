@@ -6,19 +6,14 @@
 export type MemoryBank = 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM';
 
 export interface TextureSlot {
-  slotId: string;
-  textureId: string;
-  memoryBank: MemoryBank;
-  size: number;
-  lastAccessed: number;
-  lockCount: number;
+  slotId: string;, textureId: string;
+  memoryBank: MemoryBank;, size: number;
+  lastAccessed: number;, lockCount: number;
 }
 
 export interface ComponentManifest {
-  componentName: string;
-  textureSlots: string[];
-  memoryBank: MemoryBank;
-  sharingPolicy: 'exclusive' | 'shared' | 'pooled';
+  componentName: string;, textureSlots: string[];
+  memoryBank: MemoryBank;, sharingPolicy: 'exclusive' | 'shared' | 'pooled';
   updateFrequency: 'static' | 'periodic' | 'realtime';
   priority: number;
   maxTextureSize?: number;
@@ -26,32 +21,23 @@ export interface ComponentManifest {
 }
 
 export interface ComponentRegistration {
-  componentId: string;
-  manifest: ComponentManifest;
+  componentId: string;, manifest: ComponentManifest;
   textureSlots: Map<string, TextureSlot>;
-  isActive: boolean;
-  registrationTime: number;
+  isActive: boolean;, registrationTime: number;
   lastActivity: number;
 }
 
 export interface MemoryBankStats {
-  bank: MemoryBank;
-  totalSize: number;
-  usedSize: number;
-  availableSize: number;
-  componentCount: number;
-  textureCount: number;
-  fragmentationRatio: number;
-  hitRate: number;
+  bank: MemoryBank;, totalSize: number;
+  usedSize: number;, availableSize: number;
+  componentCount: number;, textureCount: number;
+  fragmentationRatio: number;, hitRate: number;
 }
 
 export interface RegistryStats {
-  totalComponents: number;
-  activeComponents: number;
-  totalTextures: number;
-  memoryBanks: Record<MemoryBank, MemoryBankStats>;
-  conflicts: number;
-  evictions: number;
+  totalComponents: number;, activeComponents: number;
+  totalTextures: number;, memoryBanks: Record<MemoryBank, MemoryBankStats>;
+  conflicts: number;, evictions: number;
 }
 
 /**
@@ -204,10 +190,10 @@ class ComponentTextureRegistry {
 
   private canAllocateInBank(bank: MemoryBank, size: number): boolean {
     const bankConfig: Record<MemoryBank, { size: number }> = {
-      INTERNAL_RAM: { size: 1024 * 1024 },
-      CHR_ROM: { size: 2 * 1024 * 1024 },
-      PRG_ROM: { size: 4 * 1024 * 1024 },
-      SAVE_RAM: { size: Infinity },
+      INTERNAL_RAM: {, size: 1024 * 1024 },
+      CHR_ROM: {, size: 2 * 1024 * 1024 },
+      PRG_ROM: {, size: 4 * 1024 * 1024 },
+      SAVE_RAM: {, size: Infinity },
     };
 
     const maxSize = bankConfig[bank].size;

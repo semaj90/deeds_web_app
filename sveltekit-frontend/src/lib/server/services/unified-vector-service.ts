@@ -27,8 +27,7 @@ export interface VectorSearchRequest {
 }
 
 export interface VectorSearchResult {
-	id: string;
-	score: number;
+	id: string;, score: number;
 	content: string;
 	metadata?: Record<string, unknown>;
 	document_id?: string;
@@ -37,15 +36,11 @@ export interface VectorSearchResult {
 }
 
 export interface VectorSearchResponse {
-	success: boolean;
-	results: VectorSearchResult[];
-	total_results: number;
-	execution_time_ms: number;
+	success: boolean;, results: VectorSearchResult[];
+	total_results: number;, execution_time_ms: number;
 	backend: string;
-	metadata?: {
-		cached: boolean;
-		cache_hit: boolean;
-		filter_applied: boolean;
+	metadata?: {, cached: boolean;
+		cache_hit: boolean;, filter_applied: boolean;
 	};
 }
 
@@ -55,8 +50,7 @@ export interface EmbeddingRequest {
 }
 
 export interface EmbeddingResponse {
-	embedding: number[];
-	model: string;
+	embedding: number[];, model: string;
 	dimension: number;
 }
 
@@ -69,13 +63,11 @@ const getConfig = () => ({
 	databaseUrl: process.env.DATABASE_URL || 'postgresql://localhost:5432/legal_ai_db',
 	redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379/0',
 	redisPassword: process.env.REDIS_PASSWORD,
-	pinecone: {
-		apiKey: process.env.PINECONE_API_KEY,
+	pinecone: {, apiKey: process.env.PINECONE_API_KEY,
 		environment: process.env.PINECONE_ENVIRONMENT,
 		indexName: process.env.PINECONE_INDEX_NAME || 'legal-ai-documents'
 	},
-	qdrant: {
-		url: process.env.QDRANT_URL || 'http://localhost:6333',
+	qdrant: {, url: process.env.QDRANT_URL || 'http://localhost:6333',
 		apiKey: process.env.QDRANT_API_KEY,
 		collection: process.env.QDRANT_COLLECTION || 'legal-documents'
 	},
@@ -134,7 +126,7 @@ async function generateEmbedding(text: string, model: string = 'gemma'): Promise
 		const response = await fetch(`${config.ollamaUrl}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: embeddingModel, prompt: text })
+			body: JSON.stringify({, model: embeddingModel, prompt: text })
 		});
 
 		if (!response.ok) {
@@ -282,8 +274,7 @@ export async function searchVectors(request: VectorSearchRequest): Promise<Vecto
 			total_results: 0,
 			execution_time_ms: executionTime,
 			backend: config.vectorBackend,
-			metadata: {
-				cached: false,
+			metadata: {, cached: false,
 				cache_hit: false,
 				filter_applied: !!request.metadata_filter
 			}
@@ -316,12 +307,9 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
 // HEALTH CHECK
 // ============================================================================
 
-export async function healthCheck(): Promise<{
-	status: 'healthy' | 'degraded' | 'unhealthy';
-	vectorBackend: string;
-	embeddingModel: string;
-	redisConnected: boolean;
-	databaseConnected: boolean;
+export async function healthCheck(): Promise<{, status: 'healthy' | 'degraded' | 'unhealthy';
+	vectorBackend: string;, embeddingModel: string;
+	redisConnected: boolean;, databaseConnected: boolean;
 	ollamaConnected: boolean;
 }> {
 	const config = getConfig();

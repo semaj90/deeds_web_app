@@ -116,7 +116,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {
  method: 'POST',
- body: JSON.stringify({ suggestions: phase: 'suggesting',
+ body: JSON.stringify({, suggestions: phase: 'suggesting',
  }),
  });
 

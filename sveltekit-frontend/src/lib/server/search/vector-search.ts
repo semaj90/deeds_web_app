@@ -133,7 +133,7 @@ export async function getQueryEmbeddingLegal(
             const resp = await fetch(`${ragUrl}/embed`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ texts: [query], model }),
+                body: JSON.stringify({, texts: [query], model }),
                 signal: AbortSignal.timeout(4000)
             });
             if (resp?.ok) {
@@ -265,7 +265,7 @@ async function searchWithFuzzy(
                     title: result.item?.title ?? "",
                     content: (result.item?.description || result.item?.content) ?? "",
                     score: 1 - (result.score ?? 0), // Convert Fuse score to similarity score
-                    metadata: { type: "case", matches: result.matches },
+                    metadata: {, type: "case", matches: result.matches },
                     source: "pgvector", // Keep consistent with other sources,
                     type: "case"
                 });
@@ -280,7 +280,7 @@ async function searchWithFuzzy(
                     title: result.item?.title ?? "",
                     content: (result.item?.description || result.item?.content) ?? "",
                     score: 1 - (result.score ?? 0),
-                    metadata: { type: "evidence", matches: result.matches },
+                    metadata: {, type: "evidence", matches: result.matches },
                     source: "pgvector",
                     type: "evidence"
                 });
@@ -329,7 +329,7 @@ async function searchWithLoki(
                     title: item.title ?? "",
                     content: item.description ?? "",
                     score: 0.9 - index * 0.1, // Mock relevance score
-                    metadata: { type: "case" },
+                    metadata: {, type: "case" },
                     source: "pgvector",
                     type: "case"
                 });
@@ -355,7 +355,7 @@ async function searchWithLoki(
                     title: item.title ?? "",
                     content: item.description ?? "",
                     score: 0.85 - index * 0.1,
-                    metadata: { type: "evidence" },
+                    metadata: {, type: "evidence" },
                     source: "pgvector",
                     type: "evidence"
                 });
@@ -408,7 +408,7 @@ async function searchWithPgVector(
                 title: row?.title ?? '',
                 content: (row?.content || row?.description) ?? '',
                 score: typeof row.score === 'number' ? row.score : parseFloat(String(row.score ?? 0)),
-                metadata: { type: 'case' },
+                metadata: {, type: 'case' },
                 source: 'pgvector',
                 type: 'case'
             });
@@ -431,7 +431,7 @@ async function searchWithPgVector(
                 title: row?.title ?? '',
                 content: row?.content ?? '',
                 score: typeof row.score === 'number' ? row.score : parseFloat(String(row.score ?? 0)),
-                metadata: { type: 'evidence' },
+                metadata: {, type: 'evidence' },
                 source: 'pgvector',
                 type: 'evidence'
             });
@@ -550,7 +550,7 @@ async function searchWithTextFallback(
                 title: result.title ?? "",
                 content: result.description ?? "",
                 score: 0.9 - index * 0.1, // Mock relevance score
-                metadata: { type: "case" },
+                metadata: {, type: "case" },
                 source: "pgvector", // Pretend it's pgvector for consistency
                 type: "case"
             });
@@ -562,7 +562,7 @@ async function searchWithTextFallback(
                 title: result.title ?? "",
                 content: result.description ?? "",
                 score: 0.85 - index * 0.1,
-                metadata: { type: "evidence" },
+                metadata: {, type: "evidence" },
                 source: "pgvector",
                 type: "evidence"
             });

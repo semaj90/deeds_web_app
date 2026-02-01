@@ -72,7 +72,7 @@
       {/if}
     </div>
   {:else}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md: grid-cols-3, lg:grid-cols-4 gap-4">
       {#each photos as photo, index}
         <div class="relative group">
           <div

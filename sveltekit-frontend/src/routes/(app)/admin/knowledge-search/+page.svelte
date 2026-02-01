@@ -4,7 +4,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 
-	let { data, form }: { data: PageData, form: ActionData } = $props();
+	let { data, form }: {, data: PageData, form: ActionData } = $props();
 
 	// Search State
 	let searchQuery = $state('');
@@ -37,7 +37,7 @@
 
 	// Actions
 	function handleEnhance() {
-		return async ({ update }: { update: () => Promise<void> }) => {
+		return async ({ update }: {, update: () => Promise<void> }) => {
 			isSearching = true;
 			await update();
 			isSearching = false;
@@ -184,7 +184,7 @@
 <style>
 	.knowledge-search-container {
 		padding: 2rem;
-		max-width: 1400px; margin: 0 auto;
+		max-width: 1400px;, margin: 0 auto;
 	}
 
 	.search-header {
@@ -198,17 +198,17 @@
 	}
 
 	.tabs {
-		display: flex; gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		margin-bottom: 2rem;
 		border-bottom: 2px solid #e5e7eb;
 	}
 
 	.tabs button {
 		padding: 0.75rem 1.5rem;
-		background: none; border: none;
+		background: none;, border: none;
 		border-bottom: 3px solid transparent;
 		cursor: pointer;
-		font-weight: 500; transition: all 0.2s;
+		font-weight: 500;, transition: all 0.2s;
 	}
 
 	.tabs button:hover {
@@ -216,16 +216,16 @@
 	}
 
 	.tabs button.active {
-		border-bottom-color: #3b82f6; color: #3b82f6;
+		border-bottom-color: #3b82f6;, color: #3b82f6;
 	}
 
 	.search-controls {
-		display: flex; gap: 1rem;
+		display: flex;, gap: 1rem;
 		margin-bottom: 2rem;
 	}
 
 	.search-input {
-		flex: 1; padding: 0.75rem 1rem;
+		flex: 1;, padding: 0.75rem 1rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 0.5rem;
 		font-size: 1rem;
@@ -239,10 +239,10 @@
 
 	.btn-primary {
 		padding: 0.75rem 2rem;
-		background: #3b82f6; color: white;
+		background: #3b82f6;, color: white;
 		border: none;
 		border-radius: 0.5rem;
-		font-weight: 600; cursor: pointer;
+		font-weight: 600;, cursor: pointer;
 	}
 
 	.btn-primary:hover {
@@ -250,13 +250,13 @@
 	}
 
 	.btn-primary:disabled {
-		background: #9ca3af; cursor:not-allowed;
+		background: #9ca3af;, cursor:not-allowed;
 	}
 
     .btn-secondary {
         padding: 0.5rem 1rem;
-        background: white; border: 1px solid #d1d5db;
-        border-radius: 0.375rem; cursor: pointer;
+        background: white;, border: 1px solid #d1d5db;
+        border-radius: 0.375rem;, cursor: pointer;
     }
 
 	.results-grid {
@@ -266,8 +266,8 @@
 	}
 
 	.result-card {
-		background: white; border: 1px solid #e5e7eb;
-		border-radius: 0.5rem; padding: 1.5rem;
+		background: white;, border: 1px solid #e5e7eb;
+		border-radius: 0.5rem;, padding: 1.5rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 
@@ -278,11 +278,11 @@
 	}
 
 	.score {
-		font-weight: bold; color: #10b981;
+		font-weight: bold;, color: #10b981;
 	}
 
 	.collection-badge {
-		background: #e0e7ff; color: #4f46e5;
+		background: #e0e7ff;, color: #4f46e5;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-size: 0.75rem;
@@ -290,10 +290,10 @@
 	}
 
 	.file-link {
-		background: #f3f4f6; border: none;
+		background: #f3f4f6;, border: none;
 		padding: 0.5rem 1rem;
-		border-radius: 0.375rem; cursor: pointer;
-		font-size: 0.875rem; margin: 0.5rem 0;
+		border-radius: 0.375rem;, cursor: pointer;
+		font-size: 0.875rem;, margin: 0.5rem 0;
         width: 100%;
         text-align: left;
 	}
@@ -304,12 +304,12 @@
 
 	.tags {
 		display: flex;
-		flex-wrap: wrap; gap: 0.5rem;
+		flex-wrap: wrap;, gap: 0.5rem;
 		margin-top: 1rem;
 	}
 
 	.tag {
-		background: #dbeafe; color: #1e40af;
+		background: #dbeafe;, color: #1e40af;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-size: 0.75rem;

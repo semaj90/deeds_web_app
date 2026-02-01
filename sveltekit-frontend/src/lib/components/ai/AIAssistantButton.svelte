@@ -60,7 +60,7 @@
 		if (disabled) {
 			classes += ' opacity-50 cursor-not-allowed';
 		} else {
-			classes += ' cursor-pointer hover:scale-105 active:scale-95';
+			classes += ' cursor-pointer hover: scale-105, active:scale-95';
 		}
 		return cn(classes, className);
 	});
@@ -83,10 +83,10 @@
 	}
 
 	const statusConfig = {
-		idle: { color: 'bg-gray-400', pulse: false },
-		processing: { color: 'bg-blue-500', pulse: true },
-		listening: { color: 'bg-red-500', pulse: true },
-		connected: { color: 'bg-yellow-500', pulse: false }
+		idle: {, color: 'bg-gray-400', pulse: false },
+		processing: {, color: 'bg-blue-500', pulse: true },
+		listening: {, color: 'bg-red-500', pulse: true },
+		connected: {, color: 'bg-yellow-500', pulse: false }
 	};
 </script>
 
@@ -185,18 +185,11 @@
 
 <style>
 	.ai-assistant-btn {
-		position: relative;
-		overflow: hidden;
+		position: relative;, overflow: hidden;
 	}
 
 	.ai-assistant-btn::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+		content: '';, position: absolute;, top: 0;, left: -100%;, width: 100%;, height: 100%;, background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
 		transition: left 0.5s ease;
 	}
 

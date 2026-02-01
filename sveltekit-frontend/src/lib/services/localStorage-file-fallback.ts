@@ -8,30 +8,23 @@ const STORAGE_INDEX = 'legal-ai-files:index';
 const MAX_STORAGE_SIZE = 5 * 1024 * 1024; // 5MB limit for localStorage
 
 export interface FileRecord {
-    id: string;
-    fileName: string;
-    size: number;
-    type: string;
+    id: string;, fileName: string;
+    size: number;, type: string;
     data: string; // base64 encoded
     caseId?: string;
-    description?: string;
-    tags: string[];
+    description?: string;, tags: string[];
     uploadedAt: string;
 }
 
 export interface StorageStats {
-    used: number;
-    available: number;
-    percentage: number;
-    fileCount: number;
+    used: number;, available: number;
+    percentage: number;, fileCount: number;
 }
 
 interface FileIndexEntry {
-    fileName: string;
-    size: number;
+    fileName: string;, size: number;
     type: string;
-    caseId?: string;
-    uploadedAt: string;
+    caseId?: string;, uploadedAt: string;
     tags: string[];
 }
 
@@ -235,7 +228,7 @@ class LocalStorageFiles {
     /**
      * Import files from JSON (for restore)
      */
-    importFiles(jsonData: string): { success: number; failed: number } {
+    importFiles(jsonData: string): {, success: number; failed: number } {
         let success = 0;
         let failed = 0;
 

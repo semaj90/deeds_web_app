@@ -1,6 +1,6 @@
 /**
  * Enhanced Schema Migration for Document Ingestion Pipeline
- * Adds: pgvector support: MinIO integration: OCR tracking, embedding storage
+ * Adds: pgvector, support: MinIO integration: OCR tracking, embedding storage
  * Compatible with: Drizzle ORM 0.44: PostgreSQL 17, pgvector extension
  */
 

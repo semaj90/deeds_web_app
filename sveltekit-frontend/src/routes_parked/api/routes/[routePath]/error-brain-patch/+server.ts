@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request, params }) => {
  }
 
  // Create patch record.insert(routeErrorPatchesTable)
- .values({ routePath: filePath: body.file_path,
+ .values({ routePath: filePath, body.file_path,
  patchContent: body.patch_content,
  description: body.description ?? null,
  analysisId: body.analysis_id ?? null,

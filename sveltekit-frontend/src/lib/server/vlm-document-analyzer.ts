@@ -7,14 +7,10 @@ import { analyzeImageWithVision, generateText, embedText } from './ollama-servic
 import type { VisionAnalysisResponse } from './ollama-service.js';
 
 export interface DocumentAnalysisResult {
-    documentId: string;
-    documentType: string;
-    summary: string;
-    keyEntities: string[];
-    legalConcepts: string[];
-    visionAnalysis: VisionAnalysisResponse;
-    embedding: number[];
-    confidence: number;
+    documentId: string;, documentType: string;
+    summary: string;, keyEntities: string[];
+    legalConcepts: string[];, visionAnalysis: VisionAnalysisResponse;
+    embedding: number[];, confidence: number;
     timestamp: Date;
 }
 
@@ -127,7 +123,7 @@ ${context ? `Context: ${context}` : ''}`,
 async function extractDocumentInfo(
     visionAnalysis: string,
     _documentType: string
-): Promise<{ summary: string; entities: string[]; concepts: string[] }> {
+): Promise<{, summary: string; entities: string[];, concepts: string[] }> {
     const extractionPrompt = `Based on this document analysis:
 ${visionAnalysis}
 
@@ -193,11 +189,10 @@ function computeConfidence(analysis: string, documentType: string): number {
  * Enrich contextual chat with VLM analysis
  * Called from enhanced-rag endpoint
  */
-export async function enrichChatWithVLMAnalysis(chatContext: {
-    query: string;
-    ragResults: Array<{ text: string; evidence_id: string }>;
+export async function enrichChatWithVLMAnalysis(chatContext: {, query: string;
+    ragResults: Array<{, text: string; evidence_id: string }>;
     imageData?: string;
-}): Promise<{ enrichedContext: string; visionInsights: string[]; confidence: number }> {
+}): Promise<{, enrichedContext: string; visionInsights: string[];, confidence: number }> {
     const { query, ragResults, imageData } = chatContext;
 
     try {

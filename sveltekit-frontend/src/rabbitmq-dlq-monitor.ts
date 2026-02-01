@@ -7,16 +7,13 @@ import type { DocumentProcessingJob } from '$lib/server/messaging/rabbitmq-servi
 import { rabbitmqService } from '$lib/server/messaging/rabbitmq-service';
 
 interface RetryAttempt {
-    attemptNumber: number;
-    timestamp: string;
+    attemptNumber: number;, timestamp: string;
     errorMessage?: string;
 }
 
 interface DLQMessage extends DocumentProcessingJob {
-    retryAttempts: RetryAttempt[];
-    maxRetries: number;
-    firstFailedAt: string;
-    lastFailedAt: string;
+    retryAttempts: RetryAttempt[];, maxRetries: number;
+    firstFailedAt: string;, lastFailedAt: string;
     originalQueue: string;
 }
 
@@ -208,8 +205,7 @@ export class DLQMonitor {
             retryAttempts: job.retryAttempts.length,
             caseId: job.caseId,
             userId: job.userId,
-            metadata: {
-                s3Key: job.s3Key,
+            metadata: {, s3Key: job.s3Key,
                 s3Bucket: job.s3Bucket,
                 originalName: job.originalName,
                 mimeType: job.mimeType

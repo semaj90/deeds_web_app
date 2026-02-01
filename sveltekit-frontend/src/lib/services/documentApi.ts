@@ -3,10 +3,8 @@
  * Handles document processing, upload, and management operations
  */
 export interface DocumentMetadata {
-  filename: string;
-  fileSize: number;
-  mimeType: string;
-  uploadedAt: string;
+  filename: string;, fileSize: number;
+  mimeType: string;, uploadedAt: string;
   caseId?: string;
   documentType?: string;
   tags?: string[];
@@ -14,30 +12,24 @@ export interface DocumentMetadata {
 }
 
 export interface ProcessingResult {
-  documentId: string;
-  status: 'processing' | 'completed' | 'failed';
+  documentId: string;, status: 'processing' | 'completed' | 'failed';
   extractedText?: string;
   embeddings?: number[][];
-  analysis?: {
-    summary: string;
+  analysis?: {, summary: string;
     entities: Record<string, unknown>[]; // replaced any[] -> Record<string, unknown>[]
-    sentiment: string;
-    classification: string;
+    sentiment: string;, classification: string;
   };
   error?: string;
 }
 
 export interface UploadProgress {
-  documentId: string;
-  progress: number;
-  stage: string;
-  status: 'uploading' | 'processing' | 'completed' | 'error';
+  documentId: string;, progress: number;
+  stage: string;, status: 'uploading' | 'processing' | 'completed' | 'error';
 }
 
 export interface ListDocumentsResult {
   documents: Record<string, unknown>[]; // replaced any[] -> Record<string, unknown>[]
-  total: number;
-  page: number;
+  total: number;, page: number;
   limit: number;
 }
 
@@ -47,10 +39,8 @@ export interface SearchDocumentsResult {
 }
 
 export interface ProcessingAnalytics {
-  totalDocuments: number;
-  processingStats: { completed: number; processing: number; failed: number };
-  averageProcessingTime: number;
-  documentTypes: Record<string, number>;
+  totalDocuments: number;, processingStats: { completed: number;, processing: number; failed: number };
+  averageProcessingTime: number;, documentTypes: Record<string, number>;
 }
 
 export class DocumentApiService {
@@ -71,7 +61,7 @@ export class DocumentApiService {
   async uploadDocument(
     file: File,
     metadata: Partial<DocumentMetadata> = {}
-  ): Promise<{ success: boolean; documentId?: string; error?: string }> {
+  ): Promise<{, success: boolean; documentId?: string; error?: string }> {
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -214,7 +204,7 @@ export class DocumentApiService {
   /**
    * Delete a document
    */
-  async deleteDocument(documentId: string): Promise<{ success: boolean; error?: string }> {
+  async deleteDocument(documentId: string): Promise<{, success: boolean; error?: string }> {
     try {
       const response = await fetch(`${this.baseUrl}/documents/${encodeURIComponent(documentId)}`, {
         method: 'DELETE',
@@ -281,7 +271,7 @@ export class DocumentApiService {
       console.error('Analytics failed:', message);
       return {
         totalDocuments: 0,
-        processingStats: { completed: 0, processing: 0, failed: 0 },
+        processingStats: {, completed: 0, processing: 0, failed: 0 },
         averageProcessingTime: 0,
         documentTypes: {},
       };
@@ -293,17 +283,15 @@ export class DocumentApiService {
    */
   async processLegalDocuments(
     files: File[],
-    options: { caseId: string; jurisdiction?: string; enhanceRAG?: boolean }
+    options: {, caseId: string; jurisdiction?: string; enhanceRAG?: boolean }
   ): Promise<
     | {
-        success: boolean;
-        caseId: string;
-        documentsProcessed: number;
-        totalProcessingTime: number;
+        success: boolean;, caseId: string;
+        documentsProcessed: number;, totalProcessingTime: number;
         documents: Record<string, unknown>[]; // replaced any[] -> Record<string, unknown>[]
         error?: string;
       }
-    | { success: false; error: string }
+    | { success: false;, error: string }
   > {
     try {
       const formData = new FormData();
@@ -323,14 +311,12 @@ export class DocumentApiService {
 
       return (await response.json()) as
         | {
-            success: boolean;
-            caseId: string;
-            documentsProcessed: number;
-            totalProcessingTime: number;
+            success: boolean;, caseId: string;
+            documentsProcessed: number;, totalProcessingTime: number;
             documents: Record<string, unknown>[];
             error?: string;
           }
-        | { success: false; error: string };
+        | { success: false;, error: string };
     } catch (error: unknown) {
       const message = this.formatError(error);
       console.error('Legal document processing failed:', message);

@@ -10,10 +10,8 @@
 export interface SIMDParseResult {
 	success: boolean;
 	data?: any;
-	performance?: {
-		method: string;
-		timeMs: number;
-		throughputMBps: number;
+	performance?: {, method: string;
+		timeMs: number;, throughputMBps: number;
 	};
 	error?: string;
 }
@@ -48,7 +46,7 @@ class SIMDJSONParser {
 				const response = await fetch(this.goServiceUrl, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ json: jsonString }),
+					body: JSON.stringify({, json: jsonString }),
 					signal: controller.signal
 				});
 
@@ -62,8 +60,7 @@ class SIMDJSONParser {
 					return {
 						success: true,
 						data: result,
-						performance: {
-							method: 'go-simd-service',
+						performance: {, method: 'go-simd-service',
 							timeMs: end - start,
 							throughputMBps:
 								((jsonString.length / (end - start)) * 1000) / (1024 * 1024)
@@ -88,8 +85,7 @@ class SIMDJSONParser {
 				return {
 					success: true,
 					data,
-					performance: {
-						method: 'native-json-parse',
+					performance: {, method: 'native-json-parse',
 						timeMs: end - start,
 						throughputMBps:
 							((jsonString.length / (end - start)) * 1000) / (1024 * 1024)
@@ -123,8 +119,7 @@ class SIMDJSONParser {
 			return {
 				success: true,
 				data,
-				performance: {
-					method: 'native-json-parse-sync',
+				performance: {, method: 'native-json-parse-sync',
 					timeMs: end - start,
 					throughputMBps:
 						((jsonString.length / (end - start)) * 1000) / (1024 * 1024)
@@ -143,7 +138,7 @@ class SIMDJSONParser {
 	/**
 	 * Validate JSON string
 	 */
-	validate(jsonString: string): { valid: boolean; error?: string } {
+	validate(jsonString: string): {, valid: boolean; error?: string } {
 		try {
 			JSON.parse(jsonString);
 			return { valid: true };
@@ -161,10 +156,8 @@ class SIMDJSONParser {
 	async benchmark(
 		jsonString: string,
 		iterations = 100
-	): Promise<{
-		method: string;
-		iterations: number;
-		avgTimeMs: number;
+	): Promise<{, method: string;
+		iterations: number;, avgTimeMs: number;
 		throughputMBps: number;
 	}> {
 		const results = [];
@@ -202,7 +195,7 @@ class SIMDJSONParser {
 			const response = await fetch(this.goServiceUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ json: '{}' }),
+				body: JSON.stringify({, json: '{}' }),
 				signal: controller.signal
 			});
 

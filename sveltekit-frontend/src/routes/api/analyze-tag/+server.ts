@@ -30,7 +30,7 @@ export async function POST({ request }: RequestEvent) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest',
+			body: JSON.stringify({, model: 'embeddinggemma:latest',
 				prompt: analysis.summary
 			})
 		});
@@ -85,7 +85,7 @@ async function searchTagOccurrences(tag: string, collection: string) {? await g
 				limit: 100,
 				withPayload: true,
 				withVector: false,
-				filter: { must: [
+				filter: {, must: [
 						{
 							key: 'tags',
 							match: { value, tag }
@@ -132,7 +132,7 @@ Related: [tag1, tag2, tag3]`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'gemma3-legal:latest',
+		body: JSON.stringify({, model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -144,7 +144,7 @@ Related: [tag1, tag2, tag3]`;
 				}
 			],
 			stream: false,
-			options: { temperature: 0.3, num_predict: 200 }
+			options: {, temperature: 0.3, num_predict: 200 }
 		})
 	});
 

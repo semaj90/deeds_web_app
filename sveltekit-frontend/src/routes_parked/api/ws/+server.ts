@@ -23,7 +23,7 @@ function initializeWebSocket() {
  if (io) return io;
  // Create Socket.IO server
  io = new Server({
- cors: { origin: dev ? 'http://localhost:5173' : false,
+ cors: {, origin: dev ? 'http://localhost:5173' : false,
  methods: ['GET', 'POST'],
  },
  transports: ['websocket', 'polling'],
@@ -81,7 +81,7 @@ function initializeWebSocket() {
  }
  );
  // Handle real-time collaboration
- socket.on('document-edit', (data: { documentId: string, change: unknown, userId: string }) => {
+ socket.on('document-edit', (data: {, documentId: string, change: unknown, userId: string }) => {
  // Destructure forward: unknown change payload as-is
  const { documentId, change, userId } = data;
  socket
@@ -104,7 +104,7 @@ function setupRedisSubscriptions() {
  if (!io || pubSub) return;
  pubSub = createPubSubHelper(redisPrimary, {
  patterns: ['progress:*', 'result:*', 'error:*'],
- onMessage: ({ channel, message }: { channel: unknown, message: any }) => {
+ onMessage: ({ channel, message }: {, channel: unknown, message: any }) => {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
@@ -157,7 +157,7 @@ function setupRedisSubscriptions() {
 // Track user attention for AI context switching
 async function trackUserAttention(
  socketId: string,
- data: { type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
+ data: {, type: 'focus' | 'blur' | 'scroll' | 'click' | 'typing',
  timestamp: string,
  metadata?: unknown;
  }
@@ -183,13 +183,13 @@ async function triggerAIContextSwitching(socketId, string, query, string: Promis
  const contextResponse = await fetch('http://localhost:8080/api/context/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: socketId Date().toISOString() }),
+ body: JSON.stringify({, query: socketId Date().toISOString() }),
  });
  if (contextResponse.ok) {
  const context = await contextResponse.json();
  // Emit context suggestions to client
  io?.to(socketId).emit('ai-context-suggestion', {
- query: suggestions: context.suggestions, context.documents: confidence: context.confidence,
+ query: suggestions, context.suggestions, context.documents: confidence, context.confidence,
  });
  }
  } catch (error: unknown) {

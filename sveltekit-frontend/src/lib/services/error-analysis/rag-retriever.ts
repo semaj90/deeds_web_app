@@ -46,7 +46,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ vector: embedding, limit: topK, with_payload, true:
+ body: JSON.stringify({, vector: embedding, limit: topK, with_payload, true:
  }),
  }
  );
@@ -82,7 +82,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  try {
  // Sort by similarity score descending
- const ranked = patterns.sort((a: a: anyny, b) => b.similarity - a.similarity);
+ const ranked = patterns.sort((a: a, anyny, b) => b.similarity - a.similarity);
  this.log('info', 'Patterns ranked successfully');
  return ranked;
  } catch (error: any) {
@@ -144,10 +144,10 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ points: [
+ body: JSON.stringify({, points: [
  {
  id: pattern.id,
- payload: { filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
+ payload: {, filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
  },
  }],
  }),

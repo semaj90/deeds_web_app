@@ -4,13 +4,11 @@
  */
 
 interface PalaceSettings {
-    renderDistance: number;
-    textureCacheSize: number;
+    renderDistance: number;, textureCacheSize: number;
   }
 
   export interface MemoryRoom {
-    id: string;
-    name: string;
+    id: string;, name: string;
     theme?: 'evidence' | 'contracts' | 'cases' | 'research';
     documents?: LegalDocument[];
     position?: [number, number, number];
@@ -20,13 +18,8 @@ interface PalaceSettings {
   }
 
   export interface LegalDocument {
-    id: string;
-    title: string;
-    type: 'evidence' | 'contract' | 'brief' | 'citation' | 'research';
-    content?: string;
-    confidence: number;
-    priority: number;
-    position: [number, number, number];
+    id: string;, title: string;, type: 'evidence' | 'contract' | 'brief' | 'citation' | 'research';
+    content?: string;, confidence: number;, priority: number;, position: [number, number, number];
     embedding?: Float32Array;
   }
 

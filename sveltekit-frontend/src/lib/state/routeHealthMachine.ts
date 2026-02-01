@@ -18,34 +18,34 @@ export type RouteHealthStateType = 'healthy' | 'flaky' | 'broken';
 
 export interface RouteHealthContext {
  routePath: string;
- file?: string; recentErrorCount: number;
+ file?: string;, recentErrorCount: number;
  totalErrorCount: number;
  lastErrorAt?: number;
  lastErrorClusterId?: string;
  lastErrorMessageShort?: string;
 }| {
- type: 'ERROR_OBSERVED'; clusterId: string;
+ type: 'ERROR_OBSERVED';, clusterId: string;
  severity: 'warn' | 'error' | 'fatal';
  message: string;
  }
  | { type: 'RECOVERED' }
  | { type: 'RESET' }
- | { type: 'TICK'; now: number };
+ | { type: 'TICK';, now: number };
 
 // ============================================================================
 // MACHINE DEFINITION
 // ============================================================================createMachine(
  {
  id: `routeHealth:${ routePath }`,
- types: { context: {} as RouteHealthContext,
+ types: {, context: {} as RouteHealthContext,
  events: {} as RouteHealthEvent,
  },
  initial: 'healthy',
- context: { routePath: file: recentErrorCount,
+ context: {, routePath: file, recentErrorCount,
  totalErrorCount: 0,
  },
- states: { healthy: {
- on: { ERROR_OBSERVED: {
+ states: {, healthy: {
+ on: {, ERROR_OBSERVED: {
  target: 'flaky',
  actions: 'recordError',
  },
@@ -56,7 +56,7 @@ export interface RouteHealthContext {
  },
  },
 
- flaky: { on: {
+ flaky: {, on: {
  ERROR_OBSERVED: [
  {
  // If 3+ recent errors or fatal, transition to broken
@@ -82,7 +82,7 @@ export interface RouteHealthContext {
  },
  },
 
- broken: { on: {
+ broken: {, on: {
  RECOVERED: {
  // Move back to flaky as a sign of progress
  target: 'flaky',
@@ -101,7 +101,7 @@ export interface RouteHealthContext {
  },
  },
  {
- actions: { recordError: assign({
+ actions: {, recordError: assign({
  recentErrorCount: ({ context }) => context.recentErrorCount + 1,
  totalErrorCount: ({ context }) => context.totalErrorCount + 1,
  lastErrorAt: () => Date.now(),
@@ -109,12 +109,12 @@ export interface RouteHealthContext {
  event.type === 'ERROR_OBSERVED' ? event.clusterId : undefined,
  lastErrorMessageShort: (_, event) =>
  event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100) : undefined,
- }, resetErrors: assign({ recentErrorCount: () => 0,
+ }, resetErrors: assign({, recentErrorCount: () => 0,
  lastErrorAt: () => undefined,
  lastErrorClusterId: () => undefined,
  lastErrorMessageShort: () => undefined,
- }, partialReset: assign({ recentErrorCount: ({ context }) => Math.max(0, context.recentErrorCount - 2),
- }, decayErrors: assign({ recentErrorCount: ({ context }) => {
+ }, partialReset: assign({, recentErrorCount: ({ context }) => Math.max(0, context.recentErrorCount - 2),
+ }, decayErrors: assign({, recentErrorCount: ({ context }) => {
  // Decay: every 5 minutes with no error, decrement count
  const now = Date.now();
  const ageMs = now - (context.lastErrorAt ?? now);
@@ -124,7 +124,7 @@ export interface RouteHealthContext {
  }),
  },
 
- guards: { shouldBecomeBroken: ({ context }, event) => {
+ guards: {, shouldBecomeBroken: ({ context }, event) => {
  if (event.type !== 'ERROR_OBSERVED') return false;
  // Become broken if: 3+ recent errors OR fatal severity
  return (

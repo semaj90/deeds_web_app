@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json(
  {
  success: true,
- data: { predictions: count.length,
+ data: {, predictions: count.length,
  },
  },
  { status: 200 }

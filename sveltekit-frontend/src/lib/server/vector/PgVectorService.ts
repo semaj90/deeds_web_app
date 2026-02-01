@@ -9,7 +9,7 @@ import { searchPGVector as searchPGVectorFn, upsertToPGVector as upsertToPGVecto
  * - Adds consistent error handling and simple method names for consumers
  */
 class PgVectorService {
-	async upsert(item: DocumentItem | VisionItem): Promise<{ ok: boolean; error?: string }> {
+	async upsert(item: DocumentItem | VisionItem): Promise<{, ok: boolean; error?: string }> {
 		try {
 			await upsertToPGVectorFn(item);
 			return { ok: true };
@@ -24,7 +24,7 @@ class PgVectorService {
 	async search(
 		queryVector: number[],
 		topK = 10
-	): Promise<{ results: SearchResult[]; error?: string | null }> {
+	): Promise<{, results: SearchResult[]; error?: string | null }> {
 		try {
 			const results = await searchPGVectorFn(queryVector, topK);
 			return { results: results as SearchResult[], error: null };

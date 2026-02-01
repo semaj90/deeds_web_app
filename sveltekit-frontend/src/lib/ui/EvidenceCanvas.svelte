@@ -38,7 +38,7 @@
  let droppedEvidenceIds = $state<string[]>([]);
 
  // Evidence positioning and layout
- let evidencePositions = $state<Map<string, { x: number; y: number; width: number; height: number }>>(new Map());
+ let evidencePositions = $state<Map<string, { x: number;, y: number; width: number;, height: number }>>(new Map());
 
  // Calculate icon based on file type
  function getFileIcon(mimeType: string) {
@@ -198,8 +198,7 @@
 <div
  bind:this={canvasRef}
  class="evidence-canvas nes-container is-dark"
- class:readonly
- class:dragging={isDragging}
+ class: readonly, class:dragging={isDragging}
  class:drop-active={dropZoneActive}
  onmousedown={ handleMouseDown }
  onwheel={ handleWheel }
@@ -265,12 +264,12 @@
 
 <style>
  .evidence-canvas {
- width: 100%; height: 600px;
+ width: 100%;, height: 600px;
  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
  border: 4px solid #333;
- border-radius: 8px; overflow: hidden;
- position: relative; cursor: grab;
- user-select: none; transition: all 0.3s ease;
+ border-radius: 8px;, overflow: hidden;
+ position: relative;, cursor: grab;
+ user-select: none;, transition: all 0.3s ease;
  }
 
  .evidence-canvas.readonly {
@@ -288,33 +287,33 @@
  }
 
  .drop-zone-indicator {
- position: absolute; top: 50%;
- left: 50%; transform: translate(-50%, -50%);
+ position: absolute;, top: 50%;
+ left: 50%;, transform: translate(-50%, -50%);
  display: flex;
  flex-direction: column;
- align-items: center; gap: 1rem;
- color: #666; opacity: 0;
+ align-items: center;, gap: 1rem;
+ color: #666;, opacity: 0;
  transition: opacity 0.3s ease;
  pointer-events: none;
  z-index: 10;
  }
 
  .drop-zone-indicator.active {
- opacity: 1; color: #ffc107;
+ opacity: 1;, color: #ffc107;
  }
 
  .drop-zone-indicator p {
  font-size: 0.8rem;
- text-align: center; margin: 0;
+ text-align: center;, margin: 0;
  }
 
  .ai-processing-indicator {
- position: absolute; top: 1rem;
- right: 1rem; background: #ffc107;
- color: #000; padding: 0.75rem 1rem;
- border-radius: 8px; display: flex;
+ position: absolute;, top: 1rem;
+ right: 1rem;, background: #ffc107;
+ color: #000;, padding: 0.75rem 1rem;
+ border-radius: 8px;, display: flex;
  flex-direction: column;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
  animation: pulse 2s infinite;
  z-index: 20;
@@ -326,7 +325,7 @@
  }
 
  .processing-evidence {
- font-size: 0.6rem; opacity: 0.8;
+ font-size: 0.6rem;, opacity: 0.8;
  }
 
  @keyframes pulse {
@@ -346,9 +345,9 @@
  }
 
  .empty-state {
- position: absolute; top: 50%;
- left: 50%; transform: translate(-50%, -50%);
- text-align: center; color: #666;
+ position: absolute;, top: 50%;
+ left: 50%;, transform: translate(-50%, -50%);
+ text-align: center;, color: #666;
  }
 
  .empty-state p {

@@ -5,10 +5,8 @@ import { db } from "$lib/server/db";
 import * as schema from '$lib/server/db/schema-postgres';
 
 interface UserType {
-	id: string;
-	email: string;
-	firstName: string;
-	lastName: string;
+	id: string;, email: string;
+	firstName: string;, lastName: string;
 	role: string;
 }
 
@@ -23,7 +21,7 @@ export async function getRAGSessions(user: UserType, request: Request, _deps: an
         // return a placeholder
 		return json({
 			success: true,
-			data: [{ id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
+			data: [{, id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
 		});
 	} catch (error) {
 		console.error('Error fetching RAG sessions:', error);

@@ -28,8 +28,7 @@ async function getRedisClient(): Promise<Redis | null> {
 
 type HealthCheckResult = {
     status: 'healthy' | 'unhealthy';
-    embedMode: boolean;
-    llmMode: boolean;
+    embedMode: boolean;, llmMode: boolean;
     model: string[];
 };
 
@@ -82,8 +81,7 @@ export class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/embeddings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: this.embedModel,
+                body: JSON.stringify({, model: this.embedModel,
                     prompt: text
                 })
             });
@@ -107,8 +105,7 @@ export class OllamaService {
             const response = await fetch(`${this.baseUrl}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: this.llmModel,
+                body: JSON.stringify({, model: this.llmModel,
                     prompt,
                     stream: false,
                     ...options

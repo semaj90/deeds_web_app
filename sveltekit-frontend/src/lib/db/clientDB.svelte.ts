@@ -15,7 +15,7 @@ export class LocalLegalStore {
     constructor() {
         if (typeof window !== 'undefined') {
             const adapter = new LokiIndexedAdapter('legal-ai');
-            this.db = new loki('legal.db', { adapter: autoload: true,
+            this.db = new loki('legal.db', { adapter: autoload, true,
                 autoloadCallback: () => this.init()
             });
         } else {

@@ -3,8 +3,7 @@
   import { authStore } from '$lib/stores';
 
   interface Props {
-    children?: import('svelte').Snippet;
-    permissions: string | string[];
+    children?: import('svelte').Snippet;, permissions: string | string[];
     fallback?: import('svelte').Snippet;
     requireAll?: boolean; // For multiple permissions, require all or just one
     caseId?: string; // For case-specific permissions

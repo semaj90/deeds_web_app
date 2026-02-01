@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					sendEvent('search_started', { query: timestamp: Date.now() });
 
 					const searcher = getKnowledgeSearcher();
-					const results = await searcher.search(query, { topK: includeContent: true
+					const results = await searcher.search(query, { topK: includeContent, true
 					});
 
 					sendEvent('search_results', {
@@ -71,7 +71,7 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
 					}
 
 					// Step 6: Send completion event
-					sendEvent('complete', { query: resultsCount: results.length,
+					sendEvent('complete', { query: resultsCount, results.length,
 						timestamp: Date.now()
 					});
 
@@ -118,10 +118,10 @@ async function streamOllamaResponse(
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: MODEL,
+		body: JSON.stringify({, model: MODEL,
 			prompt,
 			stream: true,
-			options: { temperature: 0.3,
+			options: {, temperature: 0.3,
 				num_predict: 2048
 			}
 		})
@@ -151,7 +151,7 @@ async function streamOllamaResponse(
 						sendEvent('synthesis_chunk', { text: json.response });
 					}
 					if (json.done) {
-						sendEvent('synthesis_complete', { fullResponse: evalCount: json.eval_count,
+						sendEvent('synthesis_complete', { fullResponse: evalCount, json.eval_count,
 							evalDuration: json.eval_duration
 						});
 					}

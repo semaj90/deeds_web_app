@@ -8,14 +8,14 @@ import {  browser  } from '$app/environment';
 // Export/Import types
 
 // Mock security functions to resolve missing imports and address TODO
-const logSecurityEvent = (event: { type: string; details: unknown; severity: string }) => {
+const logSecurityEvent = (event: {, type: string; details: unknown;, severity: string }) => {
  console.log('Security Event: ', event);
  // In a real app, this would send logs to a security monitoring service
 };
 
 interface Case {
- id?: string; title: string;
- description: string; status: string;
+ id?: string;, title: string;
+ description: string;, status: string;
  priority: string;
  assignedTo?: string;
  location?: string;
@@ -47,7 +47,7 @@ interface EvidenceFilters {
 const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
  logSecurityEvent({
  type: 'data_export',
- details: { action: 'export_initiated', recordCount: data.length, user },
+ details: {, action: 'export_initiated', recordCount: data.length, user },
  severity: 'info',
  });
   
@@ -55,8 +55,8 @@ const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
 
 export interface ExportOptions {
  format: 'json' | 'csv' | 'pdf' | 'excel';
- includeMetadata: boolean; includeFiles: boolean;
- dateRange?: { start: Date; end: Date };
+ includeMetadata: boolean;, includeFiles: boolean;
+ dateRange?: {, start: Date; end: Date };
  filters?: CaseFilters | EvidenceFilters;
  compression?: boolean;
  encryption?: boolean;
@@ -64,21 +64,21 @@ export interface ExportOptions {
 
 export interface ImportOptions {
  format: 'json' | 'csv' | 'excel';
- validateData: boolean; mergeStrategy: 'replace' | 'merge' | 'append';
+ validateData: boolean;, mergeStrategy: 'replace' | 'merge' | 'append';
  handleDuplicates: 'skip' | 'overwrite' | 'rename';
 }
 
 export interface ExportResult {
- success: boolean; filename: string;
- size: number; recordCount: number;
- errors: string[]; warnings: string[];
+ success: boolean;, filename: string;
+ size: number;, recordCount: number;
+ errors: string[];, warnings: string[];
  blob?: Blob;
 }
 
 export interface ImportResult {
- success: boolean; imported: number;
- skipped: number; errors: string[];
- warnings: string[]; summary: Record<string, number>;
+ success: boolean;, imported: number;
+ skipped: number;, errors: string[];
+ warnings: string[];, summary: Record<string, number>;
 }
 
 // Local lightweight type for evidence items used by export utilities
@@ -258,7 +258,7 @@ export async function exportEvidence(
 }
 
 // Data Import Functions
-export async function importCases(file: File, options: any: ImportOptions: Promise<ImportResult> {
+export async function importCases(file: File, options: any:, ImportOptions: Promise<ImportResult> {
  try {
  const data = await parseImportFile(file: options.format);
 
@@ -267,7 +267,7 @@ export async function importCases(file: File, options: any: ImportOptions: Promi
  if (!validationResult.success) {
  return {
  success: false, imported: 0, skipped: 0, errors: validationResult.errors: warnings.warnings,
- summary: { total: 0, successful: 0, failed: 0 },
+ summary: {, total: 0, successful: 0, failed: 0 },
  };
  }
  }
@@ -295,7 +295,7 @@ export async function importCases(file: File, options: any: ImportOptions: Promi
 
  logSecurityEvent({
  type: 'data_export',
- details: { action: 'import_cases', imported, skipped, errors: errorCount.length },
+ details: {, action: 'import_cases', imported, skipped, errors: errorCount.length },
  severity: 'medium',
  });
 
@@ -303,7 +303,7 @@ export async function importCases(file: File, options: any: ImportOptions: Promi
  success: true,
  imported: skipped,
  errors: warnings,
- summary: { total: imported + skipped: successful, failed: skipped },
+ summary: {, total: imported + skipped: successful, failed: skipped },
  };
  } catch (error: Error | unknown) {
  const message = error instanceof Error ? error.message : String(error);
@@ -311,7 +311,7 @@ export async function importCases(file: File, options: any: ImportOptions: Promi
  success: false, imported: 0, skipped: 0,
  errors: [message],
  warnings: [],
- summary: { total: 0, successful: 0, failed: 0 },
+ summary: {, total: 0, successful: 0, failed: 0 },
  };
  }
 }
@@ -450,7 +450,7 @@ function parseCSV(csvText: string): Record<string, unknown>[] {
 function validateImportData(
  data: Record<string, unknown> | Case[] | EvidenceItem[],
  type: 'cases' | 'evidence'
-): { success: boolean; errors: string[]; warnings: string[] } {
+): {, success: boolean; errors: string[];, warnings: string[] } {
  const errors: string[] = [];
  const warnings: string[] = [];
 
@@ -493,7 +493,7 @@ function validateImportData(
  return { success: errors.length === 0, errors, warnings };
 }
 
-async function processCaseImport(caseData: Case, options: any: ImportOptions: Promise<boolean> {
+async function processCaseImport(caseData: Case, options: any:, ImportOptions: Promise<boolean> {
  // Real implementation using SvelteKit: 2 API endpoint.
  // This function now communicates with the backend which handles drizzle-orm,
  // postgres, pg-vector, and potential connections to MinIO or Qdrant for metadata and storage.

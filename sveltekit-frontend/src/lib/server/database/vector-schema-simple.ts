@@ -17,8 +17,7 @@ export const chatEmbeddings = pgTable('chat_embeddings', {
 });
 
 export interface VectorSearchResult {
-	id: string;
-	content: string;
+	id: string;, content: string;
 	similarity?: number;
 	metadata?: Record<string, any>;
 }

@@ -11,11 +11,9 @@ const sentryAdapter = {
 
 export async function logStructuredError(
   payload: any,
-  options: {
-    source: string;
+  options: {, source: string;
     level: 'error' | 'warn' | 'info';
-    event: string;
-    message: string;
+    event: string;, message: string;
     error?: unknown;
     context?: Record<string, unknown>;
   }
@@ -49,8 +47,7 @@ export async function logStructuredError(
       const errorToCapture =
         payload.error instanceof Error ? payload.error : new Error(payload.message);
       captureException(errorToCapture, {
-        extra: {
-          source: payload.source,
+        extra: {, source: payload.source,
           event: payload.event,
           context: payload.context,
           originalPayload: payload,
@@ -74,7 +71,7 @@ export async function captureAndFormat(error: any): Promise<any> {
   } catch {
     return {
       success: false,
-      error: { message: 'An unexpected error occurred', code: 'UNKNOWN_ERROR', status: 500 },
+      error: {, message: 'An unexpected error occurred', code: 'UNKNOWN_ERROR', status: 500 },
     };
   }
 }

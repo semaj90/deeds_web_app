@@ -240,17 +240,13 @@
 <style>
 	.citation-list {
 		display: flex;
-		flex-direction: column;
-		gap: 20px;
+		flex-direction: column;, gap: 20px;
 	}
 
 	.search-bar {
-		display: flex;
-		gap: 12px;
-		background: var(--color-parchment);
-		padding: 16px;
-		border-radius: 8px;
-		border: 1px solid var(--color-tan);
+		display: flex;, gap: 12px;
+		background: var(--color-parchment);, padding: 16px;
+		border-radius: 8px;, border: 1px solid var(--color-tan);
 	}
 
 	.search-bar input,
@@ -258,8 +254,7 @@
 		padding: 10px 12px;
 		border: 1px solid var(--color-tan);
 		border-radius: 4px;
-		font-size: 14px;
-		background: white;
+		font-size: 14px;, background: white;
 	}
 
 	.search-bar input {
@@ -275,23 +270,18 @@
 
 	.btn-search {
 		padding: 10px 16px;
-		background: var(--color-burgundy);
-		color: white;
+		background: var(--color-burgundy);, color: white;
 		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 16px;
-		transition: all 150ms ease;
+		border-radius: 4px;, cursor: pointer;
+		font-size: 16px;, transition: all 150ms ease;
 	}
 
-	.btn-search:hover:not(:disabled) {
-		background: var(--color-dark-burgundy);
-		transform: translateY(-1px);
+	.btn-search: hover, not(:disabled) {
+		background: var(--color-dark-burgundy);, transform: translateY(-1px);
 	}
 
 	.btn-search:disabled {
-		background: var(--color-light-gray);
-		cursor: not-allowed;
+		background: var(--color-light-gray);, cursor: not-allowed;
 	}
 
 	.results-info {
@@ -301,17 +291,14 @@
 	}
 
 	.error-message {
-		background: #fee;
-		border: 1px solid #fcc;
-		border-radius: 4px;
-		padding: 12px 16px;
+		background: #fee;, border: 1px solid #fcc;
+		border-radius: 4px;, padding: 12px 16px;
 		color: #c33;
 	}
 
 	.loading,
 	.empty-state {
-		text-align: center;
-		padding: 40px 20px;
+		text-align: center;, padding: 40px 20px;
 		color: var(--color-medium-gray);
 	}
 
@@ -322,13 +309,10 @@
 	}
 
 	.citation-card {
-		background: white;
-		border: 1px solid var(--color-tan);
-		border-radius: 8px;
-		padding: 16px;
+		background: white;, border: 1px solid var(--color-tan);
+		border-radius: 8px;, padding: 16px;
 		display: flex;
-		flex-direction: column;
-		gap: 12px;
+		flex-direction: column;, gap: 12px;
 		transition: all 150ms ease;
 	}
 
@@ -340,19 +324,16 @@
 	.citation-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;
-		gap: 12px;
+		align-items: flex-start;, gap: 12px;
 	}
 
 	.citation-meta {
-		display: flex;
-		gap: 8px;
+		display: flex;, gap: 8px;
 		align-items: center;
 	}
 
 	.source-badge {
-		display: inline-block;
-		padding: 4px 8px;
+		display: inline-block;, padding: 4px 8px;
 		border-radius: 4px;
 		font-size: 12px;
 		font-weight: 600;
@@ -360,38 +341,30 @@
 	}
 
 	.source-badge[data-type='statute'] {
-		background: #e8f4f8;
-		color: #0066cc;
+		background: #e8f4f8;, color: #0066cc;
 	}
 
 	.source-badge[data-type='case_law'] {
-		background: #f0e8f8;
-		color: #6600cc;
+		background: #f0e8f8;, color: #6600cc;
 	}
 
 	.source-badge[data-type='regulation'] {
-		background: #f8f0e8;
-		color: #cc6600;
+		background: #f8f0e8;, color: #cc6600;
 	}
 
 	.source-badge[data-type='manual'] {
-		background: #e8f8e8;
-		color: #00cc00;
+		background: #e8f8e8;, color: #00cc00;
 	}
 
 	.date {
-		font-size: 12px;
-		color: var(--color-medium-gray);
+		font-size: 12px;, color: var(--color-medium-gray);
 	}
 
 	.btn-delete {
-		background: none;
-		border: none;
+		background: none;, border: none;
 		cursor: pointer;
-		font-size: 16px;
-		padding: 4px;
-		opacity: 0.6;
-		transition: opacity 150ms ease;
+		font-size: 16px;, padding: 4px;
+		opacity: 0.6;, transition: opacity 150ms ease;
 	}
 
 	.btn-delete:hover {
@@ -399,27 +372,23 @@
 	}
 
 	.citation-text {
-		font-weight: 600;
-		color: var(--color-burgundy);
+		font-weight: 600;, color: var(--color-burgundy);
 		line-height: 1.4;
 	}
 
 	.statute-info {
-		padding: 8px;
-		background: var(--color-parchment);
+		padding: 8px;, background: var(--color-parchment);
 		border-radius: 4px;
 		font-size: 13px;
 	}
 
 	.statute-code {
-		font-weight: 600;
-		color: var(--color-dark);
+		font-weight: 600;, color: var(--color-dark);
 		margin: 0;
 	}
 
 	.statute-title {
-		color: var(--color-medium-gray);
-		margin: 4px 0 0 0;
+		color: var(--color-medium-gray);, margin: 4px 0 0 0;
 	}
 
 	.context,
@@ -430,29 +399,24 @@
 	.context-label,
 	.notes-label,
 	.relevance-label {
-		font-weight: 600;
-		color: var(--color-dark);
+		font-weight: 600;, color: var(--color-dark);
 		margin: 0 0 4px 0;
 	}
 
 	.context-text,
 	.notes-text {
-		color: var(--color-medium-gray);
-		margin: 0;
+		color: var(--color-medium-gray);, margin: 0;
 		line-height: 1.4;
 	}
 
 	.tags {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 6px;
+		flex-wrap: wrap;, gap: 6px;
 	}
 
 	.tag {
-		display: inline-block;
-		background: var(--color-burgundy);
-		color: white;
-		padding: 4px 8px;
+		display: inline-block;, background: var(--color-burgundy);
+		color: white;, padding: 4px 8px;
 		border-radius: 4px;
 		font-size: 12px;
 	}
@@ -462,47 +426,37 @@
 	}
 
 	.relevance-bar {
-		height: 6px;
-		background: var(--color-light-gray);
-		border-radius: 3px;
-		overflow: hidden;
+		height: 6px;, background: var(--color-light-gray);
+		border-radius: 3px;, overflow: hidden;
 		margin: 4px 0;
 	}
 
 	.relevance-fill {
-		height: 100%;
-		background: var(--color-burgundy);
+		height: 100%;, background: var(--color-burgundy);
 		transition: width 300ms ease;
 	}
 
 	.relevance-value {
-		color: var(--color-medium-gray);
-		margin: 4px 0 0 0;
+		color: var(--color-medium-gray);, margin: 4px 0 0 0;
 	}
 
 	.load-more {
-		text-align: center;
-		padding: 20px;
+		text-align: center;, padding: 20px;
 	}
 
 	.btn-load-more {
 		padding: 10px 24px;
-		background: var(--color-tan);
-		color: var(--color-dark);
+		background: var(--color-tan);, color: var(--color-dark);
 		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-weight: 600;
-		transition: all 150ms ease;
+		border-radius: 4px;, cursor: pointer;
+		font-weight: 600;, transition: all 150ms ease;
 	}
 
-	.btn-load-more:hover:not(:disabled) {
-		background: var(--color-dark-tan);
-		transform: translateY(-1px);
+	.btn-load-more: hover, not(:disabled) {
+		background: var(--color-dark-tan);, transform: translateY(-1px);
 	}
 
 	.btn-load-more:disabled {
-		background: var(--color-light-gray);
-		cursor: not-allowed;
+		background: var(--color-light-gray);, cursor: not-allowed;
 	}
 </style>

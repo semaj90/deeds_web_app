@@ -8,7 +8,7 @@ export type SearchScope = 'cases' | 'evidence' | 'documents' | 'poi' | 'citation
 export type SearchMode = 'full-text' | 'vector' | 'hybrid';
 
 export interface SearchFilters {
-    dateRange?: { start: number | null; end: number | null };
+    dateRange?: {, start: number | null; end: number | null };
     caseIds?: string[];
     entityTypes?: string[];
     jurisdictions?: string[];
@@ -18,12 +18,9 @@ export interface SearchFilters {
 }
 
 export interface SavedSearch {
-    id: string;
-    name: string;
-    query: string;
-    filters: SearchFilters;
-    scope: SearchScope[];
-    mode: SearchMode;
+    id: string;, name: string;
+    query: string;, filters: SearchFilters;
+    scope: SearchScope[];, mode: SearchMode;
     createdAt: number;
 }
 
@@ -31,20 +28,14 @@ export interface SavedSearch {
  * Search Store State
  */
 interface SearchStoreState {
-    query: string;
-    searchMode: SearchMode;
-    searchScope: SearchScope[];
-    results: SearchResult[];
+    query: string;, searchMode: SearchMode;
+    searchScope: SearchScope[];, results: SearchResult[];
     resultsByType: Map<SearchScope, SearchResult[]>;
-    totalResults: number;
-    filters: SearchFilters;
-    activeFilters: string[];
-    searchTime: number;
+    totalResults: number;, filters: SearchFilters;
+    activeFilters: string[];, searchTime: number;
     cachedResults: Map<string, SearchResult[]>;
-    lastSearchQuery: string;
-    savedSearches: SavedSearch[];
-    isSearching: boolean;
-    error: string | null;
+    lastSearchQuery: string;, savedSearches: SavedSearch[];
+    isSearching: boolean;, error: string | null;
     lastUpdated: number;
 }
 

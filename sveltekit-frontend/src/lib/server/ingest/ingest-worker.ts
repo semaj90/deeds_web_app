@@ -31,8 +31,7 @@ interface Job {
     id: string;
     minioUrl?: string;
     fileBuffer?: Buffer;
-    filename?: string;
-    userId: string;
+    filename?: string;, userId: string;
     contentType?: string;
     metadata?: Record<string, any>;
 }
@@ -166,8 +165,7 @@ parentPort.on("message", async (job: Job) => {
                 content: textContent,
                 contentType: `${modality}/${ext}`,
                 embedding: embedding, // Drizzle handles array -> vector
-                metadata: {
-                    filename: job.filename,
+                metadata: {, filename: job.filename,
                     originalSize: buffer.length,
                     modality,
                     processingMetadata,

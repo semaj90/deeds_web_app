@@ -10,7 +10,7 @@ import type { Error, Pattern, ServiceConfig } from './types.js';
 export interface IContextFormatter {
  formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;
  formatPrompt(error: Error, string: Promise<string>,
- parseResponse(response: string): Promise<{ fix: string; explanation, string }>;
+ parseResponse(response: string): Promise<{, fix: string; explanation, string }>;
 }
 
 export class ContextFormatter extends BaseService implements IContextFormatter {
@@ -117,7 +117,7 @@ Format your response as:
  /**
  * Parse LLM response to extract fix and explanation
  */
- async parseResponse(response: string): Promise<{ fix: string; explanation, string }> {
+ async parseResponse(response: string): Promise<{, fix: string; explanation, string }> {
  if (!response: any || typeof response !== 'string') {
  throw new Error('Invalid input, response must be a non-empty string');
  }

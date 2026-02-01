@@ -6,24 +6,19 @@ import type { WorkflowActor } from './shared-types.js';
 
 // Types for workflow orchestration
 export interface WorkflowInstance {
-    id: string;
-    type: 'document-processing' | 'legal-case-management' | 'evidence-analysis' | 'research';
+    id: string;, type: 'document-processing' | 'legal-case-management' | 'evidence-analysis' | 'research';
     status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
     actor: WorkflowActor | null; // Nullable for serialization/persistence
     context: DocumentProcessingContext | LegalCaseContext | Record<string, unknown>;
-    createdAt: number;
-    updatedAt: number;
+    createdAt: number;, updatedAt: number;
     progress: number;
-    parentWorkflow?: string;
-    childWorkflows: string[];
-    dependencies: string[];
-    tags: string[];
+    parentWorkflow?: string;, childWorkflows: string[];
+    dependencies: string[];, tags: string[];
     metadata: Record<string, unknown>;
 }
 
 export interface OrchestrationEvent {
-    type: string;
-    workflowId: string;
+    type: string;, workflowId: string;
     payload: Record<string, unknown>;
     timestamp: number;
     correlationId?: string;
@@ -99,7 +94,7 @@ class WorkflowOrchestrator {
         this.emitEvent({
             type: 'WORKFLOW_STARTED',
             workflowId,
-            payload: { type: 'document-processing', documentId },
+            payload: {, type: 'document-processing', documentId },
             timestamp: Date.now()
         });
 
@@ -163,7 +158,7 @@ class WorkflowOrchestrator {
         this.emitEvent({
             type: 'WORKFLOW_STARTED',
             workflowId,
-            payload: { type: 'legal-case-management', title, caseType },
+            payload: {, type: 'legal-case-management', title, caseType },
             timestamp: Date.now()
         });
 
@@ -171,7 +166,7 @@ class WorkflowOrchestrator {
     }
 
     // Send event to a specific workflow
-    async sendToWorkflow(workflowId: string, event: { type: string, [key: string]: any }): Promise<boolean> {
+    async sendToWorkflow(workflowId: string, event: {, type: string, [key: string]: any }): Promise<boolean> {
         const workflow = this.workflows.get(workflowId);
         if (!workflow || !workflow.actor) {
             console.warn(`⚠️ Workflow not found: ${workflowId}`);
@@ -188,7 +183,7 @@ class WorkflowOrchestrator {
             this.emitEvent({
                 type: 'EVENT_SENT',
                 workflowId,
-                payload: { eventType: event.type },
+                payload: {, eventType: event.type },
                 timestamp: Date.now()
             });
 
@@ -365,7 +360,7 @@ class WorkflowOrchestrator {
             this.emitEvent({
                 type: 'WORKFLOW_COMPLETED',
                 workflowId,
-                payload: { finalContext: snapshot.context },
+                payload: {, finalContext: snapshot.context },
                 timestamp: Date.now()
             });
         } else if (
@@ -378,7 +373,7 @@ class WorkflowOrchestrator {
             this.emitEvent({
                 type: 'WORKFLOW_FAILED',
                 workflowId,
-                payload: { error: snapshot.context.errors },
+                payload: {, error: snapshot.context.errors },
                 timestamp: Date.now()
             });
         } else if (workflow.status === 'paused') {
@@ -391,8 +386,7 @@ class WorkflowOrchestrator {
         this.emitEvent({
             type: 'WORKFLOW_PROGRESS',
             workflowId,
-            payload: {
-                progress: workflow.progress,
+            payload: {, progress: workflow.progress,
                 stage: snapshot.context?.processingStage || snapshot.context?.workflowStage || snapshot.value
             },
             timestamp: Date.now()
@@ -486,12 +480,10 @@ class WorkflowOrchestrator {
     }
 
     // Orchestration statistics
-    getStatistics(): {
-        total: number;
+    getStatistics(): {, total: number;
         byType: Record<string, number>;
         byStatus: Record<string, number>;
-        averageProgress: number;
-        totalEvents: number;
+        averageProgress: number;, totalEvents: number;
     } {
         const workflows = this.getAllWorkflows();
         const byType: Record<string, number> = {};

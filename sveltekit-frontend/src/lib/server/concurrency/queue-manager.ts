@@ -58,8 +58,8 @@ export class QueueManager {
 	private processors = new Map<string, JobProcessor>();
 	private pendingJobs = new Map<string, QueueJob>();
 	private processingJobs = new Map<string, QueueJob>();
-	private completedJobs = new Map<string, { job: QueueJob; result: unknown; completedAt: Date }>();
-	private failedJobs = new Map<string, { job: QueueJob; error: Error; failedAt: Date }>();
+	private completedJobs = new Map<string, { job: QueueJob;, result: unknown; completedAt: Date }>();
+	private failedJobs = new Map<string, { job: QueueJob;, error: Error; failedAt: Date }>();
 	private isRunning = false;
 	private processingInterval: NodeJS.Timeout | null = null;
 	private maxConcurrentJobs = 5;
@@ -197,7 +197,7 @@ export class QueueManager {
 					timeout: job.timeout,
 					userId: job.userId,
 					sessionId: job.sessionId,
-					metadata: { jobId: job.id, type: job.type }
+					metadata: {, jobId: job.id, type: job.type }
 				}
 			);
 

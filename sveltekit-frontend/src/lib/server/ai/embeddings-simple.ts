@@ -105,8 +105,7 @@ async function generateOpenAIEmbedding(text: string): Promise<number[]> {
 
     const res = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
+        headers: {, Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)

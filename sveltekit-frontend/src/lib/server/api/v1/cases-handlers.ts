@@ -5,10 +5,8 @@ import * as schema from '$lib/server/db/schema-postgres'; // Assuming this impor
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 interface UserType {
-	id: string;
-	email: string;
-	firstName: string;
-	lastName: string;
+	id: string;, email: string;
+	firstName: string;, lastName: string;
 	role: string;
 }
 

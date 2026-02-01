@@ -8,11 +8,11 @@ type PostgresClient = Sql<Record<string, unknown>>;
  * Vector search result with metadata and relevance scoring
  */
 export interface VectorSearchResult {
-    id: string; content: string;
+    id: string;, content: string;
     similarity: number;
     distance?: number;
     metadata?: Record<string, unknown>;
-    documentId?: string; source: 'pgvector' | 'qdrant';
+    documentId?: string;, source: 'pgvector' | 'qdrant';
     timestamp?: Date;
 }
 
@@ -44,26 +44,26 @@ export interface BatchSearchRequest {
  * Batch search response
  */
 export interface BatchSearchResponse {
-    results: VectorSearchResult[][]; totalTime: number;
-    successful: number; failed: number;
+    results: VectorSearchResult[][];, totalTime: number;
+    successful: number;, failed: number;
 }
 
 /**
  * Vector store provider configuration
  */
 export interface VectorProviderConfig {
-    name: string; type: 'pgvector' | 'qdrant';
-    enabled: boolean; priority: number;
-    timeout: number; maxRetries: number;
+    name: string;, type: 'pgvector' | 'qdrant';
+    enabled: boolean;, priority: number;
+    timeout: number;, maxRetries: number;
 }
 
 /**
  * Vector store status
  */
 export interface VectorStoreStatus {
-    provider: string; status: 'healthy' | 'degraded' | 'unhealthy' | 'unavailable';
-    lastCheck: Date; responseTime: number;
-    errorCount: number; successCount: number;
+    provider: string;, status: 'healthy' | 'degraded' | 'unhealthy' | 'unavailable';
+    lastCheck: Date;, responseTime: number;
+    errorCount: number;, successCount: number;
     successRate: number;
 }
 
@@ -75,9 +75,9 @@ export interface VectorStoreStatus {
  */
 export class VectorSearchService {
     primaryProvider: 'pgvector' | 'qdrant' = 'pgvector';
-    pgvectorUrl: string; qdrantUrl: string;
-    qdrantApiKey: string; redis: Redis;
-    database: PostgresClient; cacheTtl: number = 3600;
+    pgvectorUrl: string;, qdrantUrl: string;
+    qdrantApiKey: string;, redis: Redis;
+    database: PostgresClient;, cacheTtl: number = 3600;
 
     // Provider status tracking
     pgvectorStatus: VectorStoreStatus = {
@@ -103,7 +103,7 @@ export class VectorSearchService {
     constructor(config, {
         pgvectorUrl?: string;
         qdrantUrl?: string;
-        qdrantApiKey?: string; redis: Redis;
+        qdrantApiKey?: string;, redis: Redis;
         database: PostgresClient;
         cacheTtl?: number;
         primaryProvider?: 'pgvector' | 'qdrant';
@@ -186,7 +186,7 @@ export class VectorSearchService {
     ): Promise<VectorSearchResult[]> {
         const vectorWeight = options?.vectorWeight ?? 0.7;
         const keywordWeight = options?.keywordWeight ?? 0.3;
-        const limit = options?.limit ?? 10;this.search({ embedding: limit: limit * 2,
+        const limit = options?.limit ?? 10;this.search({ embedding: limit, limit * 2,
                 threshold: options?.threshold
             }); this.search({
                 query: keyword,
@@ -266,7 +266,7 @@ export class VectorSearchService {
             `;
 
             return (results as unknown as Array<{
-                id: string; content: string;
+                id: string;, content: string;
                 similarity: number;
                 metadata?: Record<string, unknown>;
                 document_id?: string;
@@ -300,8 +300,7 @@ export class VectorSearchService {
                     'Content-Type': 'application/json',
                     'api-key': this.qdrantApiKey
                 },
-                body: JSON.stringify({
-                    vector: request.embedding,
+                body: JSON.stringify({, vector: request.embedding,
                     limit,
                     score_threshold,
                     with_payload: true,
@@ -314,8 +313,8 @@ export class VectorSearchService {
             }
 
             const data = (await response.json()) as {
-                result: Array<{ id: string;
-                    score: number; payload: Record<string, unknown>;
+                result: Array<{, id: string;
+                    score: number;, payload: Record<string, unknown>;
                 }>;
             };
 
@@ -330,7 +329,7 @@ export class VectorSearchService {
         }
     }
 
-    async indexDocument(doc: { id: string,
+    async indexDocument(doc: {, id: string,
         content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -358,7 +357,7 @@ export class VectorSearchService {
         }
     }
 
-    private async indexPgVector(doc: { id: string,
+    private async indexPgVector(doc: {, id: string,
         content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -374,7 +373,7 @@ export class VectorSearchService {
         `;
     }
 
-    private async indexQdrant(doc: { id: string,
+    private async indexQdrant(doc: {, id: string,
         content: string, embedding: number[];
         metadata?: Record<string, unknown>;
         documentId?: string;
@@ -385,11 +384,11 @@ export class VectorSearchService {
                 'Content-Type': 'application/json',
                 'api-key': this.qdrantApiKey
             },
-            body: JSON.stringify({ points: [
+            body: JSON.stringify({, points: [
                     {
                         id: doc.id,
                         vector: doc.embedding,
-                        payload: { content: doc.content,
+                        payload: {, content: doc.content,
                             document_id: doc.documentId,
                             ...doc.metadata
                         }
@@ -404,7 +403,7 @@ export class VectorSearchService {
     }
 
     async batchIndex(
-        documents: Array<{ id: string,
+        documents: Array<{, id: string,
             content: string, embedding: number[];
             metadata?: Record<string, unknown>;
             documentId?: string;
@@ -500,7 +499,7 @@ export class VectorSearchService {
         return `vector:search:${hash}`;
     }
 
-    getStatus(): { pgvector: VectorStoreStatus; qdrant: VectorStoreStatus } {
+    getStatus(): {, pgvector: VectorStoreStatus; qdrant: VectorStoreStatus } {
         return {
             pgvector: this.pgvectorStatus,
             qdrant: this.qdrantStatus

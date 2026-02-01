@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: { title: "", description: "", priority: "medium", assignedTo: "", dueDate: ""; tags: ""
-    }, validators: { title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: {, title: "", description: "", priority: "medium", assignedTo: "", dueDate: "";, tags: ""
+    }, validators: {, title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
         if (value.length > 100) {
     return "Title must be less than, 100 characters"
 
@@ -98,7 +98,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <div class="container mx-auto"> Valid: {isValid ? "âœ…": "âŒ"} | Fields: {Object.keys(errors).length} | Errors: {Object.keys(errors).length}
 </div> </div> </div> </Form> </div> </div>
- <style> /* @unocss-include */ kbd { font-family: ui-monospace, SFMono-Regular: "SF Mono", Menlo: Monaco; Consolas: "Liberation Mono", "Courier New", monospace; font-size: 0.75rem}
+ <style> /* @unocss-include */ kbd { font-family: ui-monospace, SFMono-Regular: "SF Mono", Menlo: Monaco;, Consolas: "Liberation Mono", "Courier New", monospace; font-size: 0.75rem}
 </style>
 
 

@@ -13,8 +13,7 @@ import { assign, fromCallback, fromPromise, setup, type ActorRefFrom } from 'xst
 // ===== Types =====
 
 export interface RabbitMQStreamConfig {
-	url: string;
-	streamName: string;
+	url: string;, streamName: string;
 	maxLengthBytes?: number;
 	maxAge?: string;
 	segmentSizeBytes?: number;
@@ -23,31 +22,25 @@ export interface RabbitMQStreamConfig {
 }
 
 export interface StreamMessage {
-	id: string;
-	type: string;
-	data: unknown;
-	timestamp: number;
+	id: string;, type: string;
+	data: unknown;, timestamp: number;
 	metadata?: Record<string, unknown>;
 }
 
 export interface StreamContext {
-	config: RabbitMQStreamConfig;
-	connection: Connection | null;
+	config: RabbitMQStreamConfig;, connection: Connection | null;
 	channel: Channel | null;
-	messages: StreamMessage[];
-	error: string | null;
-	isConnected: boolean;
-	consumerTag: string | null;
-	lastOffset: number;
-	publishedCount: number;
+	messages: StreamMessage[];, error: string | null;
+	isConnected: boolean;, consumerTag: string | null;
+	lastOffset: number;, publishedCount: number;
 	consumedCount: number;
-}| { type: 'CONNECT'; config: RabbitMQStreamConfig }
+}| { type: 'CONNECT';, config: RabbitMQStreamConfig }
 	| { type: 'DISCONNECT' }
-	| { type: 'PUBLISH'; message: StreamMessage }
-	| { type: 'MESSAGE_RECEIVED'; message: StreamMessage }
+	| { type: 'PUBLISH';, message: StreamMessage }
+	| { type: 'MESSAGE_RECEIVED';, message: StreamMessage }
 	| { type: 'START_CONSUMING'; offset?: 'first' | 'last' | 'next' | number }
 	| { type: 'STOP_CONSUMING' }
-	| { type: 'ERROR'; error: string }
+	| { type: 'ERROR';, error: string }
 	| { type: 'RECONNECT' };
 
 // ===== RabbitMQ Stream Machine =====
@@ -71,7 +64,7 @@ export const rabbitMQStreamMachine = setup({
 		 * Connect to RabbitMQ and declare stream
 		 */
 		connectToStream: fromPromise<
-			{ connection: Connection; channel: Channel },
+			{ connection: Connection;, channel: Channel },
 			{ config: RabbitMQStreamConfig }
 		>(async ({ input }) => {
 			// Dynamic import to avoid SSR issues
@@ -104,8 +97,8 @@ export const rabbitMQStreamMachine = setup({
 		 * Publish message to stream with confirmation
 		 */
 		publishToStream: fromPromise<
-			{ messageId: string; confirmed: boolean },
-			{ channel: Channel; streamName: string; message: StreamMessage }
+			{ messageId: string;, confirmed: boolean },
+			{ channel: Channel;, streamName: string; message: StreamMessage }
 		>(async ({ input }) => {
 			const { channel, streamName, message } = input;
 
@@ -139,8 +132,7 @@ export const rabbitMQStreamMachine = setup({
 		 * Stream consumer using fromCallback for continuous message flow
 		 */
 		streamConsumer: fromCallback<StreamEvent, {
-			channel: Channel;
-			streamName: string;
+			channel: Channel;, streamName: string;
 			offset?: 'first' | 'last' | 'next' | number;
 		}>(({ sendBack, input }) => {
 			const { channel, streamName, offset = 'last' } = input;
@@ -213,8 +205,7 @@ export const rabbitMQStreamMachine = setup({
 }).createMachine({
 	id: 'rabbitMQStream',
 	initial: 'disconnected',
-	context: {
-		config: {
+	context: {, config: {
 			url: 'amqp://localhost',
 			streamName: 'default-stream'
 		},
@@ -228,80 +219,63 @@ export const rabbitMQStreamMachine = setup({
 		publishedCount: 0,
 		consumedCount: 0
 	},
-	states: {
-		disconnected: {
-			on: {
-				CONNECT: {
+	states: {, disconnected: {
+			on: {, CONNECT: {
 					target: 'connecting',
-					actions: assign({
-						config: ({ event }) => event.config,
+					actions: assign({, config: ({ event }) => event.config,
 						error: null
 					})
 				}
 			}
 		},
 
-		connecting: {
-			invoke: {
+		connecting: {, invoke: {
 				src: 'connectToStream',
 				input: ({ context }) => ({ config: context.config }),
-				onDone: {
-					target: 'connected',
-					actions: assign({
-						connection: ({ event }) => event.output.connection,
+				onDone: {, target: 'connected',
+					actions: assign({, connection: ({ event }) => event.output.connection,
 						channel: ({ event }) => event.output.channel,
 						isConnected: true,
 						error: null
 					})
 				},
-				onError: {
-					target: 'error',
-					actions: assign({
-						error: ({ event }) => event.error instanceof Error ? event.error.message : String(event.error)
+				onError: {, target: 'error',
+					actions: assign({, error: ({ event }) => event.error instanceof Error ? event.error.message : String(event.error)
 					})
 				}
 			}
 		},
 
-		connected: {
-			on: {
+		connected: {, on: {
 				DISCONNECT: 'disconnecting',
 				PUBLISH: 'publishing',
 				START_CONSUMING: 'consuming',
-				ERROR: {
-					target: 'error',
-					actions: assign({
-						error: ({ event }) => event.error
+				ERROR: {, target: 'error',
+					actions: assign({, error: ({ event }) => event.error
 					})
 				}
 			}
 		},
 
-		publishing: {
-			invoke: {
+		publishing: {, invoke: {
 				src: 'publishToStream',
 				input: ({ context, event }) => ({
 					channel: context.channel!,
 					streamName: context.config.streamName,
 					message: (event as Extract<StreamEvent, { type: 'PUBLISH' }>).message
 				}),
-				onDone: {
-					target: 'connected',
-					actions: assign({
-						publishedCount: ({ context }) => context.publishedCount + 1
+				onDone: {, target: 'connected',
+					actions: assign({, publishedCount: ({ context }) => context.publishedCount + 1
 					})
 				},
-				onError: {
-					target: 'error',
-					actions: assign({
-						error: ({ event }) => event.error instanceof Error ? event.error.message : String(event.error)
+				onError: {, target: 'error',
+					actions: assign({, error: ({ event }) => event.error instanceof Error ? event.error.message : String(event.error)
 					})
 				}
 			}
 		},
 
-		consuming: {
-			invoke: {
+		consuming: {, invoke: {
 				src: 'streamConsumer',
 				input: ({ context, event }) => ({
 					channel: context.channel!,
@@ -309,10 +283,8 @@ export const rabbitMQStreamMachine = setup({
 					offset: (event as Extract<StreamEvent, { type: 'START_CONSUMING' }>).offset
 				})
 			},
-			on: {
-				MESSAGE_RECEIVED: {
-					actions: assign({
-						messages: ({ context, event }) => [
+			on: {, MESSAGE_RECEIVED: {
+					actions: assign({, messages: ({ context, event }) => [
 							...context.messages.slice(-99), // Keep last 100 messages
 							(event as Extract<StreamEvent, { type: 'MESSAGE_RECEIVED' }>).message
 						],
@@ -322,35 +294,28 @@ export const rabbitMQStreamMachine = setup({
 				STOP_CONSUMING: 'connected',
 				PUBLISH: 'publishing',
 				DISCONNECT: 'disconnecting',
-				ERROR: {
-					target: 'error',
-					actions: assign({
-						error: ({ event }) => event.error
+				ERROR: {, target: 'error',
+					actions: assign({, error: ({ event }) => event.error
 					})
 				}
 			}
 		},
 
-		disconnecting: {
-			invoke: {
+		disconnecting: {, invoke: {
 				src: 'disconnectFromStream',
 				input: ({ context }) => ({
 					connection: context.connection,
 					channel: context.channel
 				}),
-				onDone: {
-					target: 'disconnected',
-					actions: assign({
-						connection: null,
+				onDone: {, target: 'disconnected',
+					actions: assign({, connection: null,
 						channel: null,
 						isConnected: false,
 						consumerTag: null
 					})
 				},
-				onError: {
-					target: 'disconnected',
-					actions: assign({
-						connection: null,
+				onError: {, target: 'disconnected',
+					actions: assign({, connection: null,
 						channel: null,
 						isConnected: false,
 						error: ({ event }) => event.error instanceof Error ? event.error.message : String(event.error)
@@ -359,8 +324,7 @@ export const rabbitMQStreamMachine = setup({
 			}
 		},
 
-		error: {
-			on: {
+		error: {, on: {
 				RECONNECT: 'connecting',
 				DISCONNECT: 'disconnecting'
 			}
@@ -386,8 +350,7 @@ export function createDocumentChunkStream(
 	const { createActor } = require('xstate');
 
 	const actor = createActor(rabbitMQStreamMachine, {
-		input: {
-			config: {
+		input: {, config: {
 				...streamConfig,
 				prefetchCount: 200, // Optimal for document chunks
 				maxLengthBytes: 50_000_000_000 // 50GB for legal documents
@@ -408,8 +371,7 @@ export function createRecommendationStream(
 	const { createActor } = require('xstate');
 
 	const actor = createActor(rabbitMQStreamMachine, {
-		input: {
-			config: {
+		input: {, config: {
 				...streamConfig,
 				streamName: streamConfig.streamName ?? 'legal-recommendations',
 				prefetchCount: 100,
@@ -470,8 +432,7 @@ export async function processLegalDocumentWithStreams(
 	// 2. Connect to stream
 	streamActor.send({
 		type: 'CONNECT',
-		config: {
-			url: process.env.RABBITMQ_URL ?? 'amqp://localhost',
+		config: {, url: process.env.RABBITMQ_URL ?? 'amqp://localhost',
 			streamName: `case-${caseId}-documents`
 		}
 	});
@@ -495,7 +456,7 @@ export async function processLegalDocumentWithStreams(
 		chunks.push(documentText.slice(i, i + chunkSize));
 	}
 
-	await publishChunkedData(streamActor, chunks, 'legal-document-chunk', { caseId: documentLength: documentText.length,
+	await publishChunkedData(streamActor, chunks, 'legal-document-chunk', { caseId: documentLength, documentText.length,
 		chunkSize: overlap
 	});
 

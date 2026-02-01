@@ -19,18 +19,18 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 
 export interface MetricsConfig {
-	collectionIntervalMs: number; retentionPeriodMs: number;
+	collectionIntervalMs: number;, retentionPeriodMs: number;
 	enableServiceHealthChecks: boolean;
 }
 
 export interface MetricPoint {
-	timestamp: number; value: number;
+	timestamp: number;, value: number;
 }
 
 export interface MetricsSnapshot {
-	timestamp: Date; metrics: SystemMetrics;
-	history: { errorDetectionRate: MetricPoint[];
-		cacheHitRate: MetricPoint[]; fixSuccessRate: MetricPoint[];
+	timestamp: Date;, metrics: SystemMetrics;
+	history: {, errorDetectionRate: MetricPoint[];
+		cacheHitRate: MetricPoint[];, fixSuccessRate: MetricPoint[];
 		escalationRate: MetricPoint[];
 	};
 }
@@ -42,8 +42,8 @@ export interface MetricsSnapshot {
  */
 export class MetricsCollector {
 	private config: MetricsConfig;
-	private history: { errorDetectionRate: MetricPoint[];
-		cacheHitRate: MetricPoint[]; fixSuccessRate: MetricPoint[];
+	private history: {, errorDetectionRate: MetricPoint[];
+		cacheHitRate: MetricPoint[];, fixSuccessRate: MetricPoint[];
 		escalationRate: MetricPoint[];
 	};
 	private collectionTimer: NodeJS.Timeout: null = null;
@@ -164,8 +164,8 @@ export class MetricsCollector {
 	/**
 	 * Check service availability
 	 */
-	async checkServiceHealth(): Promise<{ redis: boolean;
-		qdrant: boolean; neo4j: boolean;
+	async checkServiceHealth(): Promise<{, redis: boolean;
+		qdrant: boolean;, neo4j: boolean;
 		ollama: boolean;
 	}> {
 		const health = {
@@ -270,7 +270,7 @@ export class MetricsCollector {
 		const total = experiences?.length ?? 1;
 
 		const metrics: SystemMetrics = {
-			errorDetectionRate: this.getLatestValue('errorDetectionRate', cacheHitRate: this.getLatestValue('cacheHitRate', confidenceDistribution: { high: highConfidence / total,
+			errorDetectionRate: this.getLatestValue('errorDetectionRate', cacheHitRate: this.getLatestValue('cacheHitRate', confidenceDistribution: {, high: highConfidence / total,
 				medium: mediumConfidence / total,
 				low: lowConfidence / total
 			},
@@ -278,7 +278,7 @@ export class MetricsCollector {
 			escalationRate: decisionStats.escalationRate,
 			policyUpdateFrequency: pipelineStatus.totalUpdates,
 			serviceAvailability: serviceHealth,
-			performance: { embeddingGenerationTime: this.performanceMetrics.embeddingGenerationTime,
+			performance: {, embeddingGenerationTime: this.performanceMetrics.embeddingGenerationTime,
 				vectorSearchLatency: this.performanceMetrics.vectorSearchLatency,
 				fixApplicationTime: this.performanceMetrics.fixApplicationTime,
 				policyUpdateTime: this.performanceMetrics.policyUpdateTime
@@ -306,7 +306,7 @@ export class MetricsCollector {
 	getSummary() {
 		return {
 			lastCollection: this.lastCollection,
-			historySize: { errorDetectionRate: this.history.errorDetectionRate.length,
+			historySize: {, errorDetectionRate: this.history.errorDetectionRate.length,
 				cacheHitRate: this.history.cacheHitRate.length,
 				fixSuccessRate: this.history.fixSuccessRate.length,
 				escalationRate: this.history.escalationRate.length

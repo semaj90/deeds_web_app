@@ -26,15 +26,14 @@ export interface EmbeddingCacheRow {
 }
 
 export interface UpsertEmbeddingOptions {
-	model: string;
-	textHash: string;
+	model: string;, textHash: string;
 	embedding: number[]; // raw float embedding
 	packMethod?: 'uint8-linear' | 'int8-symmetric';
 }
 
 export async function upsertEmbedding(
 	opts: UpsertEmbeddingOptions
-): Promise<{ created?: boolean; updated?: boolean; method: string; scale?: number | null }> {
+): Promise<{ created?: boolean; updated?: boolean;, method: string; scale?: number | null }> {
 	const { model, textHash, embedding, packMethod = 'int8-symmetric' } = opts;
 
 	// packEmbedding returns { b64, scale, method }

@@ -8,7 +8,7 @@ import { dev } from '$app/environment';
 class NodeSIMDJSONService {
     private isOptimized: boolean = false;
     private optimizationLevel: 'none' | 'basic' | 'simd' = 'none';
-    private performanceMetrics: { type: string; time: number; size: number }[] = [];
+    private performanceMetrics: {, type: string; time: number;, size: number }[] = [];
 
     constructor() {
         this.detectOptimizations();
@@ -247,7 +247,7 @@ class NodeSIMDJSONService {
     /**
      * Get performance statistics
      */
-    getStats(): { avgParseTime: number; avgStringifyTime: number; totalOps: number } {
+    getStats(): {, avgParseTime: number; avgStringifyTime: number;, totalOps: number } {
         const parseMetrics = this.performanceMetrics.filter(m => m.type === 'parse');
         const stringifyMetrics = this.performanceMetrics.filter(m => m.type === 'stringify');
 
@@ -272,12 +272,9 @@ export const nodeSIMDJSON = new NodeSIMDJSONService();
 
 // Export types
 export interface LegalDocumentJSON {
-    id: string;
-    title: string;
-    content: string;
-    metadata: {
-        document_type: string;
-        jurisdiction: string;
+    id: string;, title: string;
+    content: string;, metadata: {
+        document_type: string;, jurisdiction: string;
         confidence: number;
         [key: string]: unknown;
     };

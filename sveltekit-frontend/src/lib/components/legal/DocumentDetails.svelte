@@ -1,18 +1,21 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
-https, //svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte, code: Unexpected, token -->
 <script lang="ts">
-import type { Case } from '$lib/types';
-import type { Document } from '$lib/types';
-  // Svelte, 5 runes are auto-imported
+  import type { Document, Case } from '$lib/types';
   import { writable } from 'svelte/store';
   import { legalDB } from '$lib/db/client-db.js';
-  // Correct prop destructuring and types for Svelte, 5
+
+  // Svelte 5 props
   let {
     documentId = '',
     isVisible = false,
-    onClose = () => 0%
-  }: { documentId?: string; isVisible?: boolean; onClose?: () => void } = $props();
+    onClose = () => {},
+    relatedDocumentsLoaded = (e: any) => {}
+  }: {
+    documentId?: string;
+    isVisible?: boolean;
+    onClose?: () => void;
+    relatedDocumentsLoaded?: (e: any) => void;
+  } = $props();
+
   // Reactive state management
   const documentData = writable<any>(null);
   const isLoading = writable<boolean>(false);
@@ -23,81 +26,484 @@ import type { Document } from '$lib/types';
   const caseAssociations = writable<any[]>([]);
   const gpuAnalysis = writable<any>(null);
   const processingMetrics = writable<any>(null);
+
+  // Svelte 5 state
   let showGPUAnalysis = $state<boolean>(false);
   let cacheHitTime = $state<number>(0);
   let serverFetchTime = $state<number>(0);
+
+  // Re-run load when documentId changes and isVisible is true
+  $effect(() => {
+    if (isVisible && documentId) {
+      loadDocumentDetails(documentId);
+    }
+  });
+
   // Node click handler with cache-first strategy
-  async function loadDocumentDetails(docId: string | forceRefresh = false): Promise<any> {
-    if (!docId) return
+  async function loadDocumentDetails(docId: string, forceRefresh = false): Promise<any> {
+    if (!docId) return;
+
     const startTime = performance.now();
     isLoading.set(true);
     errorMessage.set(null);
+
     try {
       // THE FAST PATH: Check IndexedDB cache first
       if (!forceRefresh) {
         loadingSource.set('cache');
         const cachedDocument = await legalDB.documentCache.get(docId);
+
         if (cachedDocument) {
-          cacheHitTime = performance.now() - startTime
-          console.log(`âœ… CACHE HIT! Loaded ${docId} from IndexedDB in ${cacheHitTime.toFixed(2)}ms`);
+          cacheHitTime = performance.now() - startTime;
+          console.log(
+            `✅ CACHE HIT! Loaded ${docId} from IndexedDB in ${cacheHitTime.toFixed(2)}ms`
+          );
           // Update UI instantly with cached data
           displayDocumentDetails(cachedDocument);
+
           loadingSource.set(null);
           isLoading.set(false);
+
           // Check if cache is still fresh (5 minutes)
           const cacheAge = Date.now() - new Date(cachedDocument.lastAccessed).getTime();
           const cacheTimeout = 5 * 60 * 1000; // 5 minutes
+
           if (cacheAge < cacheTimeout) {
-            console.log('ðŸ“¦ Cache is fresh, using cached data');
-            return} else {
-            console.log('ðŸ”„ Cache is stale, fetching fresh data in background');
+            console.log('📦 Cache is fresh, using cached data');
+            return;
+          } else {
+            console.log('🔄 Cache is stale, fetching fresh data in background');
             // Continue to server fetch for fresh data
           }
         } else {
-          console.log('âŒ CACHE MISS! Document not in IndexedDB')}
+          console.log('❌ CACHE MISS! Document not in IndexedDB');
+        }
       }
 
       // THE SLOW PATH: Fetch from server
-      await fetchAndCacheDocument(docId, forceRefresh)} catch (error) {
+      await fetchAndCacheDocument(docId, forceRefresh);
+    } catch (error) {
       console.error('Document loading failed:', error);
       errorMessage.set(error instanceof Error ? error.message : 'Failed to load document');
       isLoading.set(false);
-      loadingSource.set(null)}
+      loadingSource.set(null);
+    }
   }
 
   // Server fetch with caching
-  async function fetchAndCacheDocument(docId: string | includeGPU = false): Promise<Response> {
+  async function fetchAndCacheDocument(docId: string, includeGPU = false): Promise<void> {
     const serverStartTime = performance.now();
     loadingSource.set('server');
-    console.log('ðŸŒ Fetching from server with full analysis...');
+    console.log('🌐 Fetching from server with full analysis...');
+
     const url = `/api/document/${docId}${includeGPU ? '?gpu=true' : ''}`;
+
     // perform network request
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Server error: ${response.status} ${response.statusText}`)}
+      throw new Error(`Server error: ${response.status} ${response.statusText}`);
+    }
+
     const data = await response.json();
-    serverFetchTime = performance.now() - serverStartTime
-    console.log(`ðŸš€ Server fetch completed in ${serverFetchTime.toFixed(2)}ms`);
-    console.log(`ðŸ“Š Server processing: ${data.enhanced_metadata?.server_processing?.total_server_time ?? 'n/a'}`);
-    // Build a safe cache entry (cast to: unknown to avoid strict schema mismatch here)
-    const doc = (data && (data.document ?? data)) as unknown
-    const cacheEntry: unknown = { id: doc.id ?? doc.documentId ?? docId, // primary key in IndexedDB
+    serverFetchTime = performance.now() - serverStartTime;
+
+    console.log(`🚀 Server fetch completed in ${serverFetchTime.toFixed(2)}ms`);
+    console.log(
+      `📊 Server processing: ${data.enhanced_metadata?.server_processing?.total_server_time ?? 'n/a'}`
+    );
+
+    // Build a safe cache entry
+    // Note: Assuming a flexible structure here to handle API variability
+    const doc: any = data.document ?? data;
+
+    // Normalize logic for cache entry
+    const cacheEntry = {
+      id: doc.id ?? doc.documentId ?? docId, // primary key in IndexedDB
       documentId: docId,
-      title: doc.title ?? '',
+      title: doc.title ?? 'Untitled Document',
       content: doc.content ?? '',
       documentType: doc.document_type ?? doc.documentType ?? 'unknown',
       metadata: {
-        ...(doc.metadata ?? 0%): data.related_documents ?? [],
+        ...(doc.metadata ?? {}),
+        related_documents: data.related_documents ?? [],
         graph_connections: data.graph_connections ?? [],
         case_associations: data.case_associations ?? [],
         gpu_analysis: data.gpu_analysis ?? null,
-        enhanced_metadata: data.enhanced_metadata ?? null
+        enhanced_metadata: data.enhanced_metadata ?? null,
       },
       hash: doc.content_hash ?? `hash_${Date.now()}`,
-      lastAccessed: new Date().toISOString(): JSON.stringify((doc.content && doc.content.length) || 0)
+      lastAccessed: new Date().toISOString(),
+      size: (doc.content && doc.content.length) || 0,
     };
+
     // Store in IndexedDB with error handling
     try {
+      await legalDB.documentCache.put(cacheEntry);
+      console.log(`💾 Cached ${docId} to IndexedDB`);
+    } catch (e) {
+      console.warn('Failed to cache document:', e);
+    }
+
+    displayDocumentDetails(cacheEntry);
+    isLoading.set(false);
+    loadingSource.set(null);
+  }
+
+  function displayDocumentDetails(doc: any) {
+    documentData.set(doc);
+
+    // Extract detailed sections
+    const meta = doc.metadata || {};
+
+    // Safety checks for arrays
+    const relDocs = Array.isArray(meta.related_documents) ? meta.related_documents : [];
+    const graphConns = Array.isArray(meta.graph_connections) ? meta.graph_connections : [];
+    const caseAssoc = Array.isArray(meta.case_associations) ? meta.case_associations : [];
+
+    relatedDocuments.set(relDocs);
+    graphConnections.set(graphConns);
+    caseAssociations.set(caseAssoc);
+
+    // Emit event for graph updates if we have related documents
+    if (relDocs.length > 0 && relatedDocumentsLoaded) {
+      // Create custom event compatible struct
+      relatedDocumentsLoaded({ detail: {, relatedDocuments: relDocs } });
+    }
+
+    if (meta.gpu_analysis) {
+      gpuAnalysis.set(meta.gpu_analysis);
+    }
+
+    if (meta.enhanced_metadata?.server_processing) {
+      processingMetrics.set(meta.enhanced_metadata.server_processing);
+    }
+  }
+
+  function toggleGPU() {
+    showGPUAnalysis = !showGPUAnalysis;
+  }
+</script>
+
+<!-- ============================================================================ -->
+<!-- TEMPLATE -->
+<!-- ============================================================================ -->
+
+{#if isVisible}
+  <div class="modal-backdrop" onclick={onClose} role="button" tabindex="0" onkeydown={e => e.key === 'Escape' && onClose()}>
+    <div class="modal-content" onclick={(e) => e.stopPropagation()} role="document" tabindex="0" onkeydown={e => e.key === 'Escape' && onClose()}>
+      <div class="modal-header">
+        <h2>
+          {#if $documentData?.title}
+            {$documentData.title}
+          {:else}
+            Document Details
+          {/if}
+        </h2>
+        <button class="close-btn" onclick={onClose}>&times;</button>
+      </div>
+
+      <div class="modal-body">
+        {#if $isLoading}
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading document analysis...</p>
+            {#if $loadingSource === 'cache'}
+              <small>Checking local cache...</small>
+            {:else if $loadingSource === 'server'}
+              <small>Fetching from Legal AI Server...</small>
+            {/if}
+          </div>
+        {:else if $errorMessage}
+          <div class="error-state">
+            <p class="error-icon">⚠️</p>
+            <p>{$errorMessage}</p>
+            <button onclick={() => loadDocumentDetails(documentId, true)}>Retry Fetch</button>
+          </div>
+        {:else if $documentData}
+          <!-- Performance Metrics Banner -->
+          <div class="metrics-banner">
+            <div class="metric">
+              <span class="label">Load Time:</span>
+              <span class="value">
+                {#if cacheHitTime > 0}
+                  ⚡ {cacheHitTime.toFixed(1)}ms (Cache)
+                {:else}
+                  🌐 {serverFetchTime.toFixed(0)}ms (Server)
+                {/if}
+              </span>
+            </div>
+            {#if $processingMetrics}
+              <div class="metric">
+                <span class="label">AI Processing:</span>
+                <span class="value">{$processingMetrics.total_server_time}</span>
+              </div>
+            {/if}
+            <div class="metric">
+              <span class="label">Type:</span>
+              <span class="value tag">{$documentData.documentType}</span>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <!-- Left Column: Content & Analysis -->
+            <div class="main-content">
+              {#if $documentData.content}
+                <div class="content-preview">
+                  <h3>Document Excerpt</h3>
+                  <p class="text-content">
+                    {$documentData.content.substring(0, 500)}
+                    {$documentData.content.length > 500 ? '...' : ''}
+                  </p>
+                </div>
+              {/if}
+
+              {#if $gpuAnalysis}
+                <div class="gpu-analysis-section">
+                  <div class="section-header">
+                    <h3>🧠 GPU Semantic Analysis</h3>
+                    <button class="toggle-btn" onclick={toggleGPU}>
+                      {showGPUAnalysis ? 'Hide' : 'Show Details'}
+                    </button>
+                  </div>
+
+                  {#if showGPUAnalysis}
+                    <div class="analysis-content">
+                      <div class="tensor-viz">
+                        <!-- Placeholder for tensor visualization -->
+                        <div class="tensor-placeholder">Tensor Embedding Visualized</div>
+                      </div>
+                      <div class="insights">
+                        {#each $gpuAnalysis.insights || [] as insight}
+                          <div class="insight-item">
+                            <span class="confidence {(insight.confidence > 0.8) ? 'high' : 'medium'}">
+                              {(insight.confidence * 100).toFixed(0)}%
+                            </span>
+                            <p>{insight.text}</p>
+                          </div>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+
+            <!-- Right Column: Relations & Graph -->
+            <div class="sidebar">
+              {#if $relatedDocuments.length > 0}
+                <div class="sidebar-section">
+                  <h3>🔗 Related Documents</h3>
+                  <ul class="related-list">
+                    {#each $relatedDocuments as doc}
+                      <li class="related-item">
+                        <span class="t-score">{(doc.similarity * 100).toFixed(0)}%</span>
+                        <span class="t-title">{doc.title || doc.id}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              {/if}
+
+              {#if $caseAssociations.length > 0}
+                <div class="sidebar-section">
+                  <h3>⚖️ Cited Cases</h3>
+                  <ul class="case-list">
+                    {#each $caseAssociations as kase}
+                      <li class="case-item">
+                        <a href="/cases/{kase.id}" onclick|preventDefault>{kase.name}</a>
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              {/if}
+
+              <div class="actions">
+                 <button class="primary-btn">Full Analysis Report</button>
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- ============================================================================ -->
+<!-- STYLES -->
+<!-- ============================================================================ -->
+<style>
+  .modal-backdrop {
+    position: fixed;, top: 0;
+    left: 0;, width: 100%;
+    height: 100%;, background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    background: #ffffff;, width: 90%;
+    max-width: 900px;, height: 85vh;
+    border-radius: 12px;, display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;, background: #f9fafb;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;, color: #111827;
+  }
+
+  .close-btn {
+    background: none;, border: none;
+    font-size: 24px;, cursor: pointer;
+    color: #6b7280;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;, padding: 0;
+    background: #f3f4f6;
+  }
+
+  .metrics-banner {
+    display: flex;, gap: 20px;
+    padding: 12px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+  }
+
+  .metric {
+    display: flex;
+    align-items: center;, gap: 8px;
+  }
+
+  .metric .label {
+    color: #6b7280;
+  }
+
+  .metric .value {
+    font-weight: 600;, color: #111827;
+  }
+
+  .metric .tag {
+    background: #e0e7ff;, color: #4338ca;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;, padding: 24px;
+  }
+
+  .main-content, .sidebar {
+    display: flex;
+    flex-direction: column;, gap: 24px;
+  }
+
+  .content-preview, .gpu-analysis-section, .sidebar-section {
+    background: #ffffff;, padding: 20px;
+    border-radius: 8px;, border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 1rem;, color: #374151;
+    font-weight: 600;, display: flex;
+    align-items: center;, gap: 8px;
+  }
+
+  .text-content {
+    line-height: 1.6;, color: #4b5563;
+    white-space: pre-wrap;
+  }
+
+  .related-list, .case-list {
+    list-style: none;, padding: 0;
+    margin: 0;
+  }
+
+  .related-item, .case-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;, gap: 12px;
+    align-items: center;
+  }
+
+  .related-item:last-child, .case-item:last-child {
+    border-bottom: none;
+  }
+
+  .t-score {
+    background: #ecfdf5;, color: #059669;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+
+  .t-title {
+    font-size: 0.875rem;, color: #1f2937;
+    white-space: nowrap;, overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .primary-btn {
+    width: 100%;, padding: 10px;
+    background: #2563eb;, color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;, cursor: pointer;
+  }
+
+  .primary-btn:hover {
+    background: #1d4ed8;
+  }
+
+  .loading-state, .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;, height: 100%;
+    color: #6b7280;, gap: 16px;
+  }
+
+  .spinner {
+    width: 40px;, height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;, animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .details-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
       await legalDB.documentCache.put(cacheEntry);
       console.log('ðŸ’¾ Document cached successfully in IndexedDB')} catch (cacheError) {
       console.warn('âš ï¸ Failed to cache document:', cacheError)}

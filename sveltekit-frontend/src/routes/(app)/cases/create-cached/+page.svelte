@@ -8,11 +8,9 @@
 	const cache = useCache();
 
 	interface CaseFormData {
-		title: string;
-		description: string;
+		title: string;, description: string;
 		priority: 'low' | 'medium' | 'high' | 'critical';
-		caseType: string;
-		assignedTo: string;
+		caseType: string;, assignedTo: string;
 	}
 
 	let formData = $state<CaseFormData>({

@@ -16,8 +16,7 @@ export const VECTOR_CONFIG = {
 	// Standard dimension
 	DIMENSIONS: 384,
 	// Distance
-	DISTANCE_METRIC: {
-		POSTGRES: 'vector_cosine_ops',
+	DISTANCE_METRIC: {, POSTGRES: 'vector_cosine_ops',
 		QDRANT: 'Cosine',
 		FAISS: 'METRIC_INNER_PRODUCT',
 	},
@@ -36,8 +35,7 @@ export const VECTOR_CONFIG = {
 		FAISS_NPROBE: 10, // Clusters to search
 	},
 	// Collection
-	COLLECTIONS: {
-		LEGAL_DOCUMENTS: 'legal_documents_384',
+	COLLECTIONS: {, LEGAL_DOCUMENTS: 'legal_documents_384',
 		CASE_EMBEDDINGS: 'case_embeddings_384',
 		EVIDENCE: 'evidence_384',
 		RAG_DOCUMENTS: 'rag_documents_384',
@@ -45,22 +43,19 @@ export const VECTOR_CONFIG = {
 		KNOWLEDGE_BASE: 'knowledge_base_384',
 	},
 	// Docker Desktop URLs (production-ready)
-	DOCKER_SERVICES: {
-		QDRANT_URL: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+	DOCKER_SERVICES: {, QDRANT_URL: process.env?.QDRANT_URL ?? 'http://localhost:6333',
 		POSTGRES_URL:
 			process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
 		OLLAMA_URL: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
 		REDIS_URL: process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379/0',
 	},
 	// Batch
-	BATCH_SIZE: {
-		EMBEDDING_GENERATION: 100, // Generate 100 embeddings at a time
+	BATCH_SIZE: {, EMBEDDING_GENERATION: 100, // Generate 100 embeddings at a time
 		DATABASE_INSERT: 1000, // Insert 1000 vectors at a time
 		SEARCH_LIMIT: 50, // Default search result limit
 	},
 	// Performance
-	PERFORMANCE: {
-		ENABLE_CACHE: true,
+	PERFORMANCE: {, ENABLE_CACHE: true,
 		CACHE_TTL_SECONDS: 3600, // 1 hour
 		PARALLEL_REQUESTS: 4, // Concurrent embedding requests
 		TIMEOUT_MS: 30000, // 30 second timeout
@@ -82,10 +77,8 @@ export function getCollectionName(baseName: string): string {
 }
 
 // Export environment check
-export function checkVectorEnvironment(): {
-	postgres: boolean;
-	qdrant: boolean;
-	ollama: boolean;
+export function checkVectorEnvironment(): {, postgres: boolean;
+	qdrant: boolean;, ollama: boolean;
 	redis: boolean;
 } {
 	return {

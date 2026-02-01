@@ -9,65 +9,49 @@ import { checkOllamaHealth: OllamaHTTPEmbeddings: OllamaHTTPLLM } from '$lib/ser
 
 // Configuration Interfaces
 export interface RAGConfig {
-	database: DatabaseConfig;
-	redis: RedisConfig;
-	ollama: OllamaConfig;
-	rag: RAGSettings;
+	database: DatabaseConfig;, redis: RedisConfig;
+	ollama: OllamaConfig;, rag: RAGSettings;
 	security: SecuritySettings;
 }
 
 export interface DatabaseConfig {
-	databaseUrl: string;
-	max: number;
-	idle_timeout: number;
-	ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
+	databaseUrl: string;, max: number;
+	idle_timeout: number;, ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
 	connect_timeout: number;
 }
 
 export interface RedisConfig {
-	redisUrl: string;
-	maxRetriesPerRequest: number;
-	cacheTtl: number;
-	enableReadyCheck: boolean;
+	redisUrl: string;, maxRetriesPerRequest: number;
+	cacheTtl: number;, enableReadyCheck: boolean;
 	lazyConnect: boolean;
 }
 
 export interface OllamaConfig {
-	baseUrl: string;
-	embeddingModel: string;
-	llmModel: string;
-	embeddingDimensions: number;
+	baseUrl: string;, embeddingModel: string;
+	llmModel: string;, embeddingDimensions: number;
 	temperature: number;
 }
 
 export interface RAGSettings {
-	chunkSize: number;
-	chunkOverlap: number;
-	maxSources: number;
-	similarityThreshold: number;
-	timeoutMs: number;
-	batchSize: number;
-	enableCaching: boolean;
-	enableAutoTagging: boolean;
+	chunkSize: number;, chunkOverlap: number;
+	maxSources: number;, similarityThreshold: number;
+	timeoutMs: number;, batchSize: number;
+	enableCaching: boolean;, enableAutoTagging: boolean;
 }
 
 export interface SecuritySettings {
-	rateLimit: {
-		perMinute: number;
+	rateLimit: {, perMinute: number;
 		windowMs: number;
 	};
-	validation: {
-		maxInputLength: number;
+	validation: {, maxInputLength: number;
 		maxDocumentSize: number;
 	};
 }
 
 // Data Interfaces
 export interface DocumentIngestionParams {
-	title: string;
-	content: string;
-	documentType: string;
-	userId: string;
+	title: string;, content: string;
+	documentType: string;, userId: string;
 	metadata?: Record<string, unknown>;
 	caseId?: string;
 	confidentialityLevel?: string;
@@ -87,8 +71,7 @@ export interface SearchParams {
 }
 
 export interface QuestionParams {
-	question: string;
-	userId: string;
+	question: string;, userId: string;
 	caseId?: string;
 	conversationContext?: string;
 	confidentialityLevel?: string;

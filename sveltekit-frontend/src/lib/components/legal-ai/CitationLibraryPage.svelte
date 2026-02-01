@@ -4,12 +4,9 @@
 	import CollectionDetail from './CollectionDetail.svelte';
 
 	interface Collection {
-		id: string;
-		name: string;
-		description?: string;
-		is_public: boolean;
-		citation_count?: number;
-		created_at: string;
+		id: string;, name: string;
+		description?: string;, is_public: boolean;
+		citation_count?: number;, created_at: string;
 	}
 
 	let collections: Collection[] = $state([]);
@@ -61,8 +58,7 @@
 			const response = await fetch('/api/citations/collections', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					name: newCollectionName,
+				body: JSON.stringify({, name: newCollectionName,
 					description: newCollectionDescription || undefined,
 					is_public: false
 				})
@@ -185,8 +181,7 @@
 <style>
 	.citation-library-page {
 		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
+		flex-direction: column;, gap: 1.5rem;
 	}
 
 	.page-header {
@@ -200,18 +195,15 @@
 	.page-header h1 {
 		margin: 0;
 		font-family: 'Crimson Text', Georgia, serif;
-		font-size: 2rem;
-		color: #2c2c2c;
+		font-size: 2rem;, color: #2c2c2c;
 	}
 
 	.btn-create {
 		padding: 0.75rem 1.5rem;
-		background-color: #8b4513;
-		color: #f5f1e8;
+		background-color: #8b4513;, color: #f5f1e8;
 		border: none;
 		border-radius: 4px;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -221,42 +213,35 @@
 
 	.error-message {
 		padding: 1rem;
-		background-color: #ffe6e6;
-		border: 1px solid #ff6b6b;
-		border-radius: 4px;
-		color: #c92a2a;
+		background-color: #ffe6e6;, border: 1px solid #ff6b6b;
+		border-radius: 4px;, color: #c92a2a;
 	}
 
 	.create-form {
 		padding: 1.5rem;
-		background-color: #f5f1e8;
-		border: 2px solid #d4a574;
+		background-color: #f5f1e8;, border: 2px solid #d4a574;
 		border-radius: 8px;
 	}
 
 	.create-form h3 {
 		margin: 0 0 1rem 0;
-		font-size: 1.1rem;
-		color: #2c2c2c;
+		font-size: 1.1rem;, color: #2c2c2c;
 	}
 
 	.form-group {
 		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
+		flex-direction: column;, gap: 0.5rem;
 		margin-bottom: 1rem;
 	}
 
 	.form-group label {
-		font-weight: 600;
-		color: #2c2c2c;
+		font-weight: 600;, color: #2c2c2c;
 		font-size: 0.9rem;
 	}
 
 	.form-group input,
 	.form-group textarea {
-		padding: 0.75rem;
-		border: 1px solid #d4a574;
+		padding: 0.75rem;, border: 1px solid #d4a574;
 		border-radius: 4px;
 		font-family: 'Source Sans 3', sans-serif;
 		font-size: 0.95rem;
@@ -271,13 +256,11 @@
 
 	.form-group input:disabled,
 	.form-group textarea:disabled {
-		background-color: #e0d5c7;
-		color: #999;
+		background-color: #e0d5c7;, color: #999;
 	}
 
 	.form-actions {
-		display: flex;
-		gap: 1rem;
+		display: flex;, gap: 1rem;
 		justify-content: flex-end;
 	}
 
@@ -286,33 +269,29 @@
 		padding: 0.75rem 1.5rem;
 		border: none;
 		border-radius: 4px;
-		font-weight: 600;
-		cursor: pointer;
+		font-weight: 600;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.btn-cancel {
-		background-color: #e0d5c7;
-		color: #2c2c2c;
+		background-color: #e0d5c7;, color: #2c2c2c;
 	}
 
-	.btn-cancel:hover:not(:disabled) {
+	.btn-cancel: hover, not(:disabled) {
 		background-color: #d4a574;
 	}
 
 	.btn-submit {
-		background-color: #8b4513;
-		color: #f5f1e8;
+		background-color: #8b4513;, color: #f5f1e8;
 	}
 
-	.btn-submit:hover:not(:disabled) {
+	.btn-submit: hover, not(:disabled) {
 		background-color: #a0522d;
 	}
 
 	.btn-cancel:disabled,
 	.btn-submit:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+		opacity: 0.6;, cursor: not-allowed;
 	}
 
 	.content {
@@ -321,18 +300,14 @@
 
 	.detail-view {
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		flex-direction: column;, gap: 1rem;
 	}
 
 	.back-btn {
-		align-self: flex-start;
-		padding: 0.5rem 1rem;
-		background-color: #e0d5c7;
-		border: 1px solid #d4a574;
+		align-self: flex-start;, padding: 0.5rem 1rem;
+		background-color: #e0d5c7;, border: 1px solid #d4a574;
 		border-radius: 4px;
-		font-size: 0.9rem;
-		cursor: pointer;
+		font-size: 0.9rem;, cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -346,18 +321,15 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		min-height: 300px;
-		gap: 1rem;
+		min-height: 300px;, gap: 1rem;
 		color: #666;
 	}
 
 	.spinner {
-		width: 40px;
-		height: 40px;
+		width: 40px;, height: 40px;
 		border: 4px solid #e0e0e0;
 		border-top-color: #8b4513;
-		border-radius: 50%;
-		animation: spin 1s linear infinite;
+		border-radius: 50%;, animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {

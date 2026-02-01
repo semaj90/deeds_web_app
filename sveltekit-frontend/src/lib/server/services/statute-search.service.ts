@@ -9,16 +9,13 @@ import { ragService } from './rag.service.js';
 import { graphService } from './graph.service.js';
 
 export interface Statute {
-	id: string;
-	code: string;
+	id: string;, code: string;
 	title: string;
-	full_text?: string;
-	jurisdiction: string;
+	full_text?: string;, jurisdiction: string;
 	severity?: string;
 	category?: string;
 	year?: number;
-	relevance_score?: number;
-	created_at: Date;
+	relevance_score?: number;, created_at: Date;
 	updated_at: Date;
 }
 
@@ -31,11 +28,9 @@ export interface SearchFilters {
 }
 
 export interface SearchHistory {
-	id: string;
-	user_id: string;
+	id: string;, user_id: string;
 	query: string;
-	statute_code?: string;
-	results_count: number;
+	statute_code?: string;, results_count: number;
 	searched_at: Date;
 }
 
@@ -210,8 +205,7 @@ class StatuteSearchService {
 	/**
 	 * Get statute statistics
 	 */
-	async getStatuteStats(): Promise<{
-		total: number;
+	async getStatuteStats(): Promise<{, total: number;
 		byJurisdiction: Record<string, number>;
 		byCategory: Record<string, number>;
 		bySeverity: Record<string, number>;

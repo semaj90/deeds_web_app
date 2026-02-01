@@ -12,19 +12,14 @@ const advancedCache = {
 const RECOMMENDATION_WORKER_PATH = '/workers/recommendation-worker.js'; // TODO: Confirm path
 
 export interface RecommendationContext {
-    userQuery: string;
-    legalDomain: string;
-    userRole: string;
-    priority: string;
+    userQuery: string;, legalDomain: string;
+    userRole: string;, priority: string;
 }
 
 export interface Recommendation {
-    id: string;
-    title: string;
-    description: string;
-    confidence: number;
-    actionable: boolean;
-    category: string;
+    id: string;, title: string;
+    description: string;, confidence: number;
+    actionable: boolean;, category: string;
 }
 
 export class AIRecommendationEngine {
@@ -145,7 +140,7 @@ export class AIRecommendationEngine {
                 };
                 this.workerClient.onerror = error => {
                     console.error('❌ Recommendation Worker error: ', error);
-                    this.interpreter.send({ type: 'ERROR', data: { message: 'Worker Error' } });
+                    this.interpreter.send({ type: 'ERROR', data: {, message: 'Worker Error' } });
                 };
             } catch (error: unknown) {
                 console.error('❌ Service Worker registration failed: ', error);
@@ -171,8 +166,7 @@ export class AIRecommendationEngine {
 
             const prompt = PromptTemplate.fromTemplate(`
                 You are an AI recommendation engine for a Legal AI Platform specializing in user experience optimization.
-                User Context:
-                - Role: {userRole}
+                User Context: -, Role: {userRole}
                 - Experience: {experienceLevel}
                 - Device: {deviceType}
                 - Legal Domain: {legalDomain}
@@ -204,7 +198,7 @@ export class AIRecommendationEngine {
             this.interpreter.send({ type: `INITIALIZED` });
         } catch (error: unknown) {
             console.error('❌ Failed to initialize LangChain.js: ', error);
-            this.interpreter.send({ type: 'ERROR', data: { message: error instanceof Error ? error.message : String(error) } });
+            this.interpreter.send({ type: 'ERROR', data: {, message: error instanceof Error ? error.message : String(error) } });
         }
     }
 

@@ -260,15 +260,14 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 							role: 'assistant',
 							content: fullResponse,
 							createdAt: new Date(),
-							metadata: {
-								streaming: true,
+							metadata: {, streaming: true,
 								chunks: chunkCount,
 								confidence: chunk.metadata?.confidence ?? 0.8
 							}
 						})
 						.onConflictDoUpdate({
 							target: chatMessages.id,
-							set: { content: fullResponse, updatedAt: new Date() }
+							set: {, content: fullResponse, updatedAt: new Date() }
 						});
 				}
 			} else if (chunk.type === 'done') {
@@ -278,8 +277,7 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 					role: 'assistant',
 					content: fullResponse,
 					createdAt: new Date(),
-					metadata: {
-						streaming: false,
+					metadata: {, streaming: false,
 						chunks: chunkCount,
 						confidence: chunk.metadata?.confidence ?? 0.8,
 						sources: chunk.metadata?.sources || []
@@ -309,8 +307,7 @@ async function generateAIResponse(sessionId: string, userMessage: string, userId
 			role: 'assistant',
 			content: 'Sorry, I encountered an error processing your request.',
 			createdAt: new Date(),
-			metadata: {
-				error: true,
+			metadata: {, error: true,
 				message: error instanceof Error ? error.message : 'Unknown error'
 			}
 		});

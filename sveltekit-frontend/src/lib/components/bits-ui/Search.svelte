@@ -7,7 +7,7 @@
   
   let results: any[] = [];
   async function doSearch(): Promise<any> {
-    const res = await fetch(searchUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ queryText: query }) });
+    const res = await fetch(searchUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, queryText: query }) });
     results = (await res.json()).results ?? []}
 </script>
 
@@ -29,7 +29,7 @@
     display: block;
   }
   .search-bar {
-    display: flex; gap: 0.5rem;
+    display: flex;, gap: 0.5rem;
   }
   .results {
     margin-top: 0.75rem;

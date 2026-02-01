@@ -40,14 +40,12 @@ export interface ApiResponse<T = any> {
 
 export interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
-  timestamp: string;
-  uptime: number;
+  timestamp: string;, uptime: number;
   checks?: Record<string, boolean>;
 }
 
 export interface ChatMessage {
-  id: string;
-  content: string;
+  id: string;, content: string;
   role: 'user' | 'assistant' | 'system';
   timestamp: Date | string;
   sources?: any[];
@@ -66,8 +64,7 @@ export interface ChatMessage {
 }
 
 export interface AIResponse {
-  answer: string;
-  confidence: number;
+  answer: string;, confidence: number;
   sources?: any[];
   metadata?: Record<string, any>;
 }

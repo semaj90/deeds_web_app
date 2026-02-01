@@ -12,9 +12,9 @@
  import { onMount } from 'svelte';
 
  type CandidateContext = {
- context_id: string; source: string;
- score: number; snippet: string;
- range?: { from_msg_id: number; to_msg_id: number };
+ context_id: string;, source: string;
+ score: number;, snippet: string;
+ range?: {, from_msg_id: number; to_msg_id: number };
  timestamp?: string;
  };
 
@@ -66,7 +66,7 @@
  await fetch('/api/phase72/log_chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ session_id: sessionId,
+ body: JSON.stringify({, session_id: sessionId,
  role: 'user',
  content: userText, msg_id: messageId, messageId
  })
@@ -82,7 +82,7 @@
  const res = await fetch('/api/phase72/next_step', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ session_id: sessionId, message: userText, userText,
+ body: JSON.stringify({, session_id: sessionId, message: userText, userText,
  spec_files: ['.kiro/specs/phase72-neo4j-ast-reducer.md']
  })
  });
@@ -120,7 +120,7 @@
  await fetch('/api/phase72/log_chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ session_id: sessionId,
+ body: JSON.stringify({, session_id: sessionId,
  role: 'assistant',
  content: assistantMessage, msg_id: messageId, messageId: messageId + 1
  })
@@ -154,7 +154,7 @@
  const res = await fetch('/api/phase72/context_feedback', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment, comment
+ body: JSON.stringify({, session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment, comment
  })
  });
 

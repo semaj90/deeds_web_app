@@ -6,26 +6,21 @@
  */
 
 interface TaskAction {
-  label: string;
-  command: string;
+  label: string;, command: string;
   expected: string;
 }
 
 interface TaskValidation {
   command?: string;
-  query?: string;
-  expectation: string;
+  query?: string;, expectation: string;
   threshold?: string;
   current_status?: string;
 }
 
 interface RestructureTask {
-  id: string;
-  tab: 'system' | 'evidence' | 'routes';
-  title: string;
-  description: string;
-  intent: string;
-  phase: number;
+  id: string;, tab: 'system' | 'evidence' | 'routes';
+  title: string;, description: string;
+  intent: string;, phase: number;
   priority: 'high' | 'medium' | 'active' | 'complete';
   tags: string[];
   actions?: TaskAction[];
@@ -70,8 +65,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
         expected: 'Unified api/legal tree with feature flags',
       },
     ],
-    validation: {
-      command: 'npm run phase6:core',
+    validation: {, command: 'npm run phase6:core',
       expectation: 'TypeScript check passes with reduced error count',
     },
   },
@@ -85,8 +79,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 72,
     priority: 'active',
     tags: ['gpu', 'embeddings', 'clustering', 'phase72'],
-    status: {
-      addon_built: true,
+    status: {, addon_built: true,
       addon_path: 'build/Release/ast_error_vectorizer.node',
       fallback_model: 'embeddinggemma:latest',
       embedding_dimension: 384,
@@ -111,8 +104,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
         expected: 'List of similar errors with scores',
       },
     ],
-    validation: {
-      query: 'SELECT COUNT(*) FROM phase72_error WHERE embedding IS NOT NULL',
+    validation: {, query: 'SELECT COUNT(*) FROM phase72_error WHERE embedding IS NOT NULL',
       expectation: 'All captured errors have embeddings (< 5% NULL rate)',
     },
   },
@@ -125,8 +117,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 14,
     priority: 'complete',
     tags: ['env', 'config', 'phase14'],
-    verified: {
-      OLLAMA_URL: 'http://localhost:11434',
+    verified: {, OLLAMA_URL: 'http://localhost:11434',
       DATABASE_URL: 'postgresql://legal_admin:*****@localhost:5434/legal_ai_db',
       QDRANT_URL: 'http://localhost:6333',
       AUTH_COOKIE_NAME: 'yorha_session',
@@ -168,8 +159,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
         expected: 'Only YoRHa variant remains',
       },
     ],
-    validation: {
-      command: 'npm run check',
+    validation: {, command: 'npm run check',
       expectation: 'Svelte check passes with reduced warning count',
     },
   },
@@ -210,8 +200,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
         expected: 'Only reference/legacy routes remain',
       },
     ],
-    validation: {
-      command: 'npm run build -- --dry-run',
+    validation: {, command: 'npm run build -- --dry-run',
       expectation: 'Route manifest size reduced by >20%',
     },
   },
@@ -237,8 +226,7 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
       'src/routes/api/webgpu/**',
       'src/routes/routes/+page.server.ts',
     ],
-    validation: {
-      command: 'npm run build',
+    validation: {, command: 'npm run build',
       expectation: 'No route manifest conflicts',
     },
   },
@@ -252,17 +240,14 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 6,
     priority: 'active',
     tags: ['typescript', 'svelte5', 'validation', 'phase6'],
-    checks: {
-      typescript: 'npx tsc --noEmit --skipLibCheck',
+    checks: {, typescript: 'npx tsc --noEmit --skipLibCheck',
       svelte: 'npx svelte-check --tsconfig tsconfig.json',
       core: 'npm run phase6:core',
     },
-    auto_fix: {
-      svelte5_syntax: 'node scripts/fix-svelte5-syntax.mjs',
+    auto_fix: {, svelte5_syntax: 'node scripts/fix-svelte5-syntax.mjs',
       components_fixed: ['src/lib/components/yorha/**', 'src/lib/filters/**', 'src/lib/search/**'],
     },
-    validation: {
-      threshold: '< 100 TypeScript errors',
+    validation: {, threshold: '< 100 TypeScript errors',
       current_status: 'Passing after route consolidation',
       expectation: 'TypeScript and Svelte checks pass',
     },

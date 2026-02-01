@@ -16,9 +16,9 @@
  import { X } from "lucide-svelte";
 
  interface POI {
- id: string; name: string;
- alias?: string; threatLevel: string;
- photos?: Array<{ url: string;
+ id: string;, name: string;
+ alias?: string;, threatLevel: string;
+ photos?: Array<{, url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?, any;
@@ -26,12 +26,12 @@
  }
 
  interface Match {
- poi: POI; similarity: number;
+ poi: POI;, similarity: number;
  confidence: 'high' | 'medium' | 'low';
  }
 
  interface Props {
- open: boolean; matches: Match[];
+ open: boolean;, matches: Match[];
  onClose?: () => void;
  onSelect?: (poi: POI) => void;
  }

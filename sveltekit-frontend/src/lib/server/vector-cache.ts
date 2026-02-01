@@ -8,29 +8,21 @@ import crypto from 'crypto';
 import { redisService } from './redis-service.js';
 
 export interface VectorCacheEntry {
-	results: unknown[];
-	query: string;
+	results: unknown[];, query: string;
 	embedding?: number[];
-	similarity_scores?: number[];
-	metadata: {
-		searchTime: number;
-		totalResults: number;
-		model: string;
-		distanceMetric: 'cosine' | 'euclidean' | 'inner_product';
+	similarity_scores?: number[];, metadata: {
+		searchTime: number;, totalResults: number;
+		model: string;, distanceMetric: 'cosine' | 'euclidean' | 'inner_product';
 		threshold?: number;
 	};
-	ts: number;
-	lastAccess: number;
+	ts: number;, lastAccess: number;
 	ttlMs: number;
 }
 
 export interface EmbeddingCacheEntry {
-	embedding: number[];
-	text: string;
-	model: string;
-	dimensions: number;
-	ts: number;
-	lastAccess: number;
+	embedding: number[];, text: string;
+	model: string;, dimensions: number;
+	ts: number;, lastAccess: number;
 	ttlMs: number;
 }
 
@@ -116,7 +108,7 @@ function evictEmbeddingCache(): void {
 export async function getVectorCache(
 	query: string,
 	options: Record<string, any> = {}
-): Promise<{ entry: VectorCacheEntry | null; source: string | null }> {
+): Promise<{, entry: VectorCacheEntry | null; source: string | null }> {
 	const key = generateVectorKey(query, options);
 	const now = Date.now();
 
@@ -192,7 +184,7 @@ export async function setVectorCache(
 export async function getEmbeddingCache(
 	text: string,
 	model: string = 'default'
-): Promise<{ entry: EmbeddingCacheEntry | null; source: string | null }> {
+): Promise<{, entry: EmbeddingCacheEntry | null; source: string | null }> {
 	const key = generateEmbeddingKey(text, model);
 	const now = Date.now();
 
@@ -285,18 +277,15 @@ export async function clearVectorCache(): Promise<void> {
 /**
  * Get cache statistics
  */
-export function getVectorCacheStats(): {
-	memory: { vectorEntries: number; embeddingEntries: number; maxItems: number };
-	config: { vectorTtlMs: number; embeddingTtlMs: number; redisEnabled: boolean };
+export function getVectorCacheStats(): {, memory: { vectorEntries: number;, embeddingEntries: number; maxItems: number };
+	config: {, vectorTtlMs: number; embeddingTtlMs: number;, redisEnabled: boolean };
 } {
 	return {
-		memory: {
-			vectorEntries: vectorCache.size,
+		memory: {, vectorEntries: vectorCache.size,
 			embeddingEntries: embeddingCache.size,
 			maxItems: VECTOR_CACHE_MAX_ITEMS
 		},
-		config: {
-			vectorTtlMs: VECTOR_TTL_MS,
+		config: {, vectorTtlMs: VECTOR_TTL_MS,
 			embeddingTtlMs: EMBEDDING_TTL_MS,
 			redisEnabled: !!getRedisClient()
 		}

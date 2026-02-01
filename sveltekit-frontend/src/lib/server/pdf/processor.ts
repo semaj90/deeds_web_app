@@ -12,8 +12,7 @@ import sharp from 'sharp';
 import { readFile } from 'fs/promises';
 
 export interface PDFProcessingResult {
-	text: string;
-	pageCount: number;
+	text: string;, pageCount: number;
 	metadata: {
 		title?: string;
 		author?: string;
@@ -27,16 +26,14 @@ export interface PDFProcessingResult {
 		dates?: string[];
 		legalCitations?: string[];
 	};
-	ocr?: {
-		confidence: number;
+	ocr?: {, confidence: number;
 		text: string;
 	};
 	processingTime: number;
 }
 
 export interface OCRResult {
-	text: string;
-	confidence: number;
+	text: string;, confidence: number;
 	processingTime: number;
 }
 
@@ -45,7 +42,7 @@ export interface OCRResult {
  */
 export async function extractPDFText(
 	filePath: string
-): Promise<{ text: string; pages: number; metadata: Record<string, unknown> }> {
+): Promise<{, text: string; pages: number;, metadata: Record<string, unknown> }> {
 	const dataBuffer = await readFile(filePath);
 	const data = await pdfParse(dataBuffer, {
 		max: 0,
@@ -116,19 +113,15 @@ export async function performOCR(
  */
 export async function extractEntities(
 	text: string
-): Promise<{
-	persons: string[];
-	organizations: string[];
-	locations: string[];
-	dates: string[];
-	legalCitations: string[];
+): Promise<{, persons: string[];
+	organizations: string[];, locations: string[];
+	dates: string[];, legalCitations: string[];
 }> {
 	try {
 		const response = await fetch('http://localhost:8099/api/extract', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				text: text.slice(0, 10000),
+			body: JSON.stringify({, text: text.slice(0, 10000),
 				extract_entities: true,
 				extract_legal: true
 			})
@@ -197,8 +190,7 @@ export async function processPDF(
 	return {
 		text: finalText,
 		pageCount: pdfData.pages,
-		metadata: {
-			title: (pdfData.metadata as any).Title,
+		metadata: {, title: (pdfData.metadata as any).Title,
 			author: (pdfData.metadata as any).Author,
 			subject: (pdfData.metadata as any).Subject,
 			createdAt: (pdfData.metadata as any).CreationDate

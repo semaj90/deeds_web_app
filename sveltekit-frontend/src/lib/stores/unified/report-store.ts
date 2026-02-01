@@ -25,27 +25,19 @@ export type ReportType =
   | 'custom';
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'markdown' | 'json';
 export interface ReportSection {
-  id: string;
-  title: string;
-  content: string;
-  order: number;
+  id: string;, title: string;
+  content: string;, order: number;
   type: 'text' | 'table' | 'image' | 'code' | 'divider';
   metadata?: Record<string, unknown>;
 }
 export interface Report {
-  id: string;
-  title: string;
-  type: ReportType;
-  caseId: string;
-  sections: ReportSection[];
-  createdBy: string;
-  createdAt: number;
-  updatedAt: number;
-  publishedAt?: number;
-  isPublished: boolean;
+  id: string;, title: string;
+  type: ReportType;, caseId: string;
+  sections: ReportSection[];, createdBy: string;
+  createdAt: number;, updatedAt: number;
+  publishedAt?: number;, isPublished: boolean;
   isShared: boolean;
-  sharedWith?: string[];
-  citations: string[];
+  sharedWith?: string[];, citations: string[];
   evidenceReferences: string[];
   metadata?: Record<string, unknown>;
 }
@@ -53,26 +45,22 @@ export interface Report {
 /** * Report Store State */
 interface ReportStoreState {
   // Report library
-  reports: Report[];
-  reportsByType: Map<ReportType, Report[]>;
+  reports: Report[];, reportsByType: Map<ReportType, Report[]>;
   // Active report
   activeReportId: string | null;
   activeReport: Report | null;
   // Editor state
-  editorContent: ReportSection[];
-  isEditing: boolean;
+  editorContent: ReportSection[];, isEditing: boolean;
   isDirty: boolean;
   // Available references
-  availableCitations: Array<{ id: string; text: string }>;
-  availableEvidence: Array<{ id: string; name: string }>;
+  availableCitations: Array<{, id: string; text: string }>;
+  availableEvidence: Array<{, id: string; name: string }>;
   // Collaboration
-  collaborators: Array<{ id: string; name: string }>;
+  collaborators: Array<{, id: string; name: string }>;
   isCollaborating: boolean;
   // Metadata
-  totalReports: number;
-  isLoading: boolean;
-  isSaving: boolean;
-  isPublishing: boolean;
+  totalReports: number;, isLoading: boolean;
+  isSaving: boolean;, isPublishing: boolean;
   error: string | null;
   lastUpdated: number;
 }
@@ -154,7 +142,7 @@ function createReportStore() {
  const response = await fetch('/api/reports', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ title: reportTitle, type, caseId }),
+ body: JSON.stringify({, title: reportTitle, type, caseId }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -248,14 +236,14 @@ function createReportStore() {
  if (!id) return;
  update((s: ReportStoreState) => ({ ...s, isSaving: true }));
  try {
- const state: { editorContent: ReportSection[] } = { editorContent: [] };
+ const state: {, editorContent: ReportSection[] } = { editorContent: [] };
  subscribe((s: ReportStoreState) => {
  state.editorContent = s.editorContent;
  })();
  const response = await fetch(`/api/reports/${id}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ sections: state.editorContent }),
+ body: JSON.stringify({, sections: state.editorContent }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -282,7 +270,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/citations`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const citations: Array<{ id: string; text: string }> = data?.citations || [];
+ const citations: Array<{, id: string; text: string }> = data?.citations || [];
  update((s: ReportStoreState) => ({ ...s, availableCitations: citations }));
  } else {
  throw new Error('Failed to load citations');
@@ -298,7 +286,7 @@ function createReportStore() {
  const response = await fetch(`/api/cases/${ caseId }/evidence`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
- const evidence: Array<{ id: string; name: string }> = data?.evidence || [];
+ const evidence: Array<{, id: string; name: string }> = data?.evidence || [];
  update((s: ReportStoreState) => ({ ...s, availableEvidence: evidence }));
  } else {
  throw new Error('Failed to load evidence');
@@ -309,7 +297,7 @@ function createReportStore() {
  }
  },
  /** * Insert citation into report */
- insertCitation: (sectionId: string, citation: { id: string; text: string }) => {
+ insertCitation: (sectionId: string, citation: {, id: string; text: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId
@@ -325,7 +313,7 @@ function createReportStore() {
  });
  },
  /** * Insert evidence reference into report */
- insertEvidence: (sectionId: string, evidence: { id: string; name: string }) => {
+ insertEvidence: (sectionId: string, evidence: {, id: string; name: string }) => {
  update((s: ReportStoreState) => {
  const sectionIndex = s.editorContent.findIndex(
  (sec: ReportSection) => sec.id === sectionId

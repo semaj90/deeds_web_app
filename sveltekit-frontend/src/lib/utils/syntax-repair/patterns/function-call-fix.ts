@@ -187,7 +187,7 @@ export function getFunctionCallPatterns(): PatternMatcher[] {
 /**
  * Apply function call fixes to content
  */
-export function fixFunctionCalls(content: string): { result: string; fixCount: number } {
+export function fixFunctionCalls(content: string): {, result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

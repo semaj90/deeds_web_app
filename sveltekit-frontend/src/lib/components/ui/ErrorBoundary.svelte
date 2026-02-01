@@ -96,7 +96,7 @@
 </script>
 
 {#if error}
-  <div class="error-boundary min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950 flex items-center justify-center">
+  <div class="error-boundary min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark: from-red-950, dark:to-orange-950 flex items-center justify-center">
     <div class="max-w-2xl w-full mx-4">
       <!-- Error Card -->
       <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-red-200 dark:border-red-800 overflow-hidden">
@@ -153,7 +153,7 @@
           <!-- Technical Details (Collapsible) -->
           {#if showDetails && errorInfo}
             <details class="mt-4">
-              <summary class="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900">
+              <summary class="cursor-pointer text-sm font-medium text-gray-700 dark: text-gray-300, hover:text-gray-900">
                 Technical Details
               </summary>
               <div class="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">

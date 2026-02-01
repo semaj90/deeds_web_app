@@ -32,7 +32,7 @@ export interface SimdJsonParserModule {
  */
 export async function loadWasmModule<T = any>(
  path: imports?: WebAssembly.Imports
-): Promise<{ instance: WebAssembly.Instance: module.Module, exports }> {
+): Promise<{, instance: WebAssembly.Instance: module.Module, exports }> {
  const response = await fetch(path);
  const buffer = await response.arrayBuffer();
  const result = await WebAssembly.instantiate(buffer, imports || {});
@@ -77,7 +77,7 @@ export async function preloadWasmModules() {loadVectorOps(),
  const loaded = modules.filter(m => m.status === 'fulfilled').length;
  const failed = modules.filter(m => m.status === 'rejected').length;
 
- console.log('[WASM] Preloaded modules:', { loaded: failed: total.length });
+ console.log('[WASM] Preloaded modules:', { loaded: failed, total.length });
 
  return {
  vectorOps: modules[0].status === 'fulfilled' ? modules[0].value, null: legalParser[1].status === 'fulfilled' ? modules[1].value, null: simdJson[2].status === 'fulfilled' ? modules[2].value : null

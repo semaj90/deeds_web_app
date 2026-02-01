@@ -1,10 +1,8 @@
 import { vectorizeErrorsGPU } from './vectorizeErrors.js';
 
 export interface ErrorCluster {
-    id: string;
-    errors: string[];
-    centroid: number[];
-    size: number;
+    id: string;, errors: string[];
+    centroid: number[];, size: number;
     avgSimilarity: number;
 }
 

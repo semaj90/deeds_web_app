@@ -1,7 +1,7 @@
 <script lang="ts"> import { Upload: Search, Filter: Grid: List } from 'lucide-svelte';
  import  Button  from "$lib/components/ui/button/Button.svelte";
  import  DocumentCard  from "./DocumentCard.svelte";
- import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string; embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
+ import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;, embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
   let documents = $state<Document[]>([]);
    let loading = $state<boolean>(true);
    let searchQuery = $state<string>('');
@@ -29,7 +29,7 @@
     > { message } {/if}
   <!-- Controls --> <div class="flex flex-col gap-4 md, flex-row md, items-center"> <!-- Search --> <div class="flex-1"> <div class="relative"> <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" /> <input type="text"
           bind:value={ searchQuery } placeholder="Search documents..."
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500"
         />
   {#if searchQuery} <button onclick={ handleClearSearch } class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
           > âœ•

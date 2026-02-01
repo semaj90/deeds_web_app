@@ -5,7 +5,7 @@ export async function getApiInfo() {
  message: 'Deeds API v1',
  version: '1.0.0',
  status: 'online',
- endpoints: { auth: ['/auth/login', '/auth/register', '/auth/logout'],
+ endpoints: {, auth: ['/auth/login', '/auth/register', '/auth/logout'],
  cases: ['/cases', '/cases/:id'],
  documents: ['/documents', '/documents/:id', '/documents/:id/ocr'],
  evidence: ['/evidence', '/evidence/:id', '/evidence/detective'],

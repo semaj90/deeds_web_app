@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ limit: with_payload: true,
+				body: JSON.stringify({, limit: with_payload, true,
 					with_vector: false
 				})
 			}
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		const data = await response.json();
 		const points = data.result?.points ?? [];
 
-		// Sort by member_count descending.map((p: { id: string, payload: Record<string, unknown> }) => ({
+		// Sort by member_count descending.map((p: {, id: string, payload: Record<string, unknown> }) => ({
 				id: p.id,
 				...p.payload
 			}))

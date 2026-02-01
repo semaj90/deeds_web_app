@@ -200,8 +200,7 @@ export class ClientEmbeddingGenerator {
                 {
                     type: 'generate_embedding',
                     text: text,
-                    options: {
-                        maxLength: 8192,
+                    options: {, maxLength: 8192,
                         normalize: true,
                         legal_mode: true
                     }
@@ -255,8 +254,7 @@ export class ClientEmbeddingGenerator {
                 {
                     type: 'generate_batch_embeddings',
                     texts: texts,
-                    options: {
-                        batchSize: 10,
+                    options: {, batchSize: 10,
                         maxLength: 4096,
                         normalize: true,
                         legal_mode: true
@@ -395,7 +393,7 @@ export class ClientEmbeddingGenerator {
     /**
      * Get embedding model information
      */
-    getModelInfo(): { model: string, dimensions: number, initialized: boolean } {
+    getModelInfo(): {, model: string, dimensions: number, initialized: boolean } {
         const dimensions = this.embedModel === 'nomic-embed' ? 384 :
                            this.embedModel === 'ollama-embedding' ? 1536 : 512;
         return {
@@ -435,7 +433,7 @@ export class ClientEmbeddingGenerator {
             const json = await res.json().catch(() => null);
             if (!json) return null;
 
-            // handle common shapes: { embedding: [...] } or { embeddings: [[...]] } or { data: [{embedding: [...] }] }
+            // handle common shapes: {, embedding: [...] } or { embeddings: [[...]] } or { data: [{embedding: [...] }] }
             let vec: number[] | undefined;
             if (Array.isArray(json.embedding)) vec = json.embedding;
             else if (Array.isArray(json.embeddings) && Array.isArray(json.embeddings[0])) vec = json.embeddings[0];
@@ -469,7 +467,7 @@ export class ClientEmbeddingGenerator {
             const json = await res.json().catch(() => null);
             if (!json) return [];
 
-            // Normalize shapes: { embeddings: [[...], ...] or { data: [{embedding: [...]}, ...] }
+            // Normalize shapes: {, embeddings: [[...], ...] or { data: [{embedding: [...]}, ...] }
             let arrays: number[][] = [];
             if (Array.isArray(json.embeddings)) arrays = json.embeddings;
             else if (Array.isArray(json.data)) arrays = json.data.map((d: any) => d.embedding).filter(Array.isArray);
@@ -530,7 +528,7 @@ export const clientEmbeddingGenerator = new ClientEmbeddingGenerator('ollama-emb
 
 // Utility functions for embedding management
 export class EmbeddingCache {
-    private cache = new Map<string, { embedding: Float32Array; timestamp: number }>();
+    private cache = new Map<string, { embedding: Float32Array;, timestamp: number }>();
     private maxCacheSize = 1000;
     private maxAge = 24 * 60 * 60 * 1000; // 24 hours
 

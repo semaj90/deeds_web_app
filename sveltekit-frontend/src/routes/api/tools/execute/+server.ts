@@ -12,7 +12,7 @@ import { toolRegistry } from '$lib/server/tools/handlers/index.js';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
-    const body = await request.json() as { tool: string; args: unknown };
+    const body = await request.json() as { tool: string;, args: unknown };
 
     if (!body?.tool|| typeof body.tool !== 'string') {
       return json({
@@ -44,12 +44,12 @@ export const GET: RequestHandler = async () => {
   // Return list of available tools
   const tools = toolRegistry.list().map(name => {
     const tool = toolRegistry.get(name);
-    return { name: description: tool?.description ?? '',
+    return { name: description, tool?.description ?? '',
       permissions: tool?.permissions ?? []
     };
   });
 
-  return json({ tools: total: tools.length,
+  return json({ tools: total, tools.length,
     timestamp: new Date().toISOString()
   });
 };

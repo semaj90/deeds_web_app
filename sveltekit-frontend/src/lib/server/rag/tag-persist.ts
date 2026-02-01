@@ -34,8 +34,7 @@ async function linkChunkTag(chunkId: string, tagId: string, source: LinkSource =
 /**
  * Extract tags from text and persist them with links to the chunk
  */
-export async function upsertAndLinkChunkTags(opts: {
-    chunkId: string;
+export async function upsertAndLinkChunkTags(opts: {, chunkId: string;
     jurisdiction?: string | null;
     tags: ExtractedLegalTags;
     source?: LinkSource;

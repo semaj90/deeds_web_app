@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
 // REMOVED: import type { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 // REMOVED:
@@ -27,9 +27,9 @@ https, //svelte.dev/e/js_parse_error -->
 
 // REMOVED: const sections = $state([
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
-// REMOVED: { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
+// REMOVED: {, id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
-// REMOVED: { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+// REMOVED: {, id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
  { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
 // REMOVED: ]);
 
@@ -58,11 +58,11 @@ https, //svelte.dev/e/js_parse_error -->
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 // REMOVED: .slice(0, 10)
  .map((caseItem: any) => ({
-// REMOVED: id: caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
-// REMOVED: caseNumber: caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
-// REMOVED: createdBy: caseItem.createdBy || 'System',
+// REMOVED: id, caseItem.id || caseItem.caseId: title, caseItem: caseItem.title || caseItem.name || 'Untitled Case',
+// REMOVED: caseNumber, caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
+// REMOVED: createdBy, caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
-// REMOVED: createdAt: caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
+// REMOVED: createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 // REMOVED: }));
 
 // REMOVED: } catch (err) {
@@ -71,7 +71,7 @@ https, //svelte.dev/e/js_parse_error -->
 
 // REMOVED: // Fallback to mock data
  recentCases = [
-// REMOVED: { id: 'case-001',
+// REMOVED: {, id: 'case-001',
 // REMOVED: title: 'Project Chimera',
  caseNumber: '2024-001',
 // REMOVED: priority: 'high',
@@ -80,7 +80,7 @@ https, //svelte.dev/e/js_parse_error -->
  createdAt: new Date().toISOString(),
 // REMOVED: status: 'active'
  },
-// REMOVED: { id: 'case-002',
+// REMOVED: {, id: 'case-002',
 // REMOVED: title: 'Network Intrusion',
  caseNumber: '2024-002',
 // REMOVED: priority: 'medium',
@@ -109,7 +109,7 @@ https, //svelte.dev/e/js_parse_error -->
  .map((item: any, index: number, number): number => ({
 // REMOVED: id: `insight-${item.id || index}`,
  label: item.filename || item.title || `Evidence Analysis ${index + 1}`,
-// REMOVED: summary: item.analysis || item.summary || 'AI analysis completed'
+// REMOVED: summary, item.analysis || item.summary || 'AI analysis completed'
  }));
 // REMOVED:
  // Add some generated insights if we don't have enough
@@ -121,7 +121,7 @@ https, //svelte.dev/e/js_parse_error -->
  label: 'Anomaly detected in network logs',
 // REMOVED: summary: 'Unusual data transfer patterns identified.'
  },
-// REMOVED: { id: 'insight-gen-002',
+// REMOVED: {, id: 'insight-gen-002',
 // REMOVED: label: 'Facial recognition match',
  summary: 'Subject identified in surveillance footage.'
 // REMOVED: }
@@ -134,7 +134,7 @@ https, //svelte.dev/e/js_parse_error -->
  // Fallback insights
 // REMOVED: evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
-// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
+// REMOVED: {, id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
 // REMOVED: }
  }
 // REMOVED:

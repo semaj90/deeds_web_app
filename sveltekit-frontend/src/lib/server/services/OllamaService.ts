@@ -79,8 +79,7 @@ export class OllamaService {
 				model,
 				prompt,
 				stream: options.stream ?? false,
-				options: {
-					temperature: options.temperature ?? 0.7,
+				options: {, temperature: options.temperature ?? 0.7,
 					num_predict: options.max_tokens ?? 1000
 				}
 			};

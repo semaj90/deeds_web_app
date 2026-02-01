@@ -2,20 +2,20 @@
  extends Omit<RequestInit, 'signal'> {
  /** Timeout in milliseconds (default: 30000ms / 30s) */ timeout?: number;
  /** Custom AbortSignal to combine with timeout */ signal?: AbortSignal;
- /** Retry configuration */ retry?: { attempts: number;
+ /** Retry configuration */ retry?: {, attempts: number;
  delay: number;
  backoff?: 'linear' | 'exponential';
  };
 }
 export interface FetchTimeoutError extends Error {
- name: 'TimeoutError'; code: 'FETCH_TIMEOUT';
+ name: 'TimeoutError';, code: 'FETCH_TIMEOUT';
  duration?: number;
 }
 export interface FetchAbortError extends Error {
- name: 'AbortError'; code: 'FETCH_ABORTED';
+ name: 'AbortError';, code: 'FETCH_ABORTED';
 }
 export interface FetchNetworkError extends Error {
- name: 'NetworkError'; code: 'NETWORK_ERROR';
+ name: 'NetworkError';, code: 'NETWORK_ERROR';
  status?: number;
 }
 /** * Enhanced fetch with AbortController-based timeout and retry logic */ export async function fetchWithTimeout(
@@ -104,7 +104,7 @@ export interface FetchNetworkError extends Error {
 ): Promise<Response> {
  return fetchWithTimeout(url, {
  timeout: 45000, // 45s for AI operations
- retry: { attempts: 3, delay: 1000, backoff: 'exponential' },
+ retry: {, attempts: 3, delay: 1000, backoff: 'exponential' },
  headers: {
  'Content-Type': 'application/json',
  Accept: 'application/json',
@@ -118,7 +118,7 @@ export interface FetchNetworkError extends Error {
 ): Promise<Response> {
  return fetchWithTimeout(url, {
  timeout: 60000, // 60s for model operations
- retry: { attempts: 2, delay: 2000, backoff: 'linear' },
+ retry: {, attempts: 2, delay: 2000, backoff: 'linear' },
  headers: {
  'Content-Type': 'application/json',
  ...options.headers,
@@ -131,7 +131,7 @@ export interface FetchNetworkError extends Error {
 ): Promise<Response> {
  return fetchWithTimeout(url, {
  timeout: 15000, // 15s for DB operations
- retry: { attempts: 2, delay: 500, backoff: 'linear' },
+ retry: {, attempts: 2, delay: 500, backoff: 'linear' },
  ...options,
  });
 }
@@ -186,7 +186,7 @@ export interface FetchNetworkError extends Error {
 }
 /** * Create a reusable AbortController with timeout */ export function createTimeoutController(
  timeout: number
-): { controller: AbortController; timeoutId: ReturnType<typeof setTimeout>; clear: () => void } {
+): {, controller: AbortController; timeoutId: ReturnType<typeof setTimeout>; clear: () => void } {
  const controller = new AbortController();
  const timeoutId = setTimeout(() => {
  controller.abort();

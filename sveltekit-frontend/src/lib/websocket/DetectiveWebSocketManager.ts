@@ -21,10 +21,8 @@ export interface DetectiveWebSocketMessage {
 }
 
 export interface CollaborativeUser {
-  id: string;
-  name: string;
-  typing: boolean;
-  lastActivity: string;
+  id: string;, name: string;
+  typing: boolean;, lastActivity: string;
   currentFocus?: 'evidence' | 'connections' | 'analysis';
   analytics?: TypingContext;
 }
@@ -155,7 +153,7 @@ export default class DetectiveWebSocketManager {
   sendConnectionMapUpdate(metadata: unknown): void {
     this.send({
       type: 'connection_map_update',
-      data: { action: 'generated', metadata },
+      data: {, action: 'generated', metadata },
     });
   }
 
@@ -164,8 +162,7 @@ export default class DetectiveWebSocketManager {
     return {
       connectedUsers: this.collaborativeUsers.size,
       typingUsers: users.filter((u) => u.typing).length,
-      focusDistribution: {
-        evidence: users.filter((u) => u.currentFocus === 'evidence').length,
+      focusDistribution: {, evidence: users.filter((u) => u.currentFocus === 'evidence').length,
         connections: users.filter((u) => u.currentFocus === 'connections').length,
         analysis: users.filter((u) => u.currentFocus === 'analysis').length,
       },

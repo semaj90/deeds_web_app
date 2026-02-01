@@ -7,33 +7,27 @@ import { browser } from '$app/environment';
 import { writable, type Writable } from 'svelte/store';
 
 export interface KeyboardShortcut {
-    id: string;
-    key: string;
+    id: string;, key: string;
     ctrl?: boolean;
     alt?: boolean;
     shift?: boolean;
-    meta?: boolean;
-    description: string;
+    meta?: boolean;, description: string;
     category: 'navigation' | 'ai' | 'cases' | 'evidence' | 'system' | 'remote';
-    context?: string[];
-    action: () => void | Promise<void>;
+    context?: string[];, action: () => void | Promise<void>;
     enabled?: boolean;
     remote?: boolean; // Can be triggered remotely
 }
 
 export interface RemoteCommand {
-    id: string;
-    command: string;
+    id: string;, command: string;
     args?: { [key: string]: any };
     source: 'keyboard' | 'api' | 'websocket' | 'voice';
     timestamp: number;
 }
 
 export interface ShortcutCategory {
-    id: string;
-    name: string;
-    shortcuts: KeyboardShortcut[];
-    enabled: boolean;
+    id: string;, name: string;
+    shortcuts: KeyboardShortcut[];, enabled: boolean;
 }
 
 class KeyboardShortcutsService {
@@ -177,7 +171,7 @@ class KeyboardShortcutsService {
             this.logRemoteCommand({
                 id: crypto.randomUUID(),
                 command: shortcut.id,
-                args: { description: shortcut.description, category: shortcut.category },
+                args: {, description: shortcut.description, category: shortcut.category },
                 source: source,
                 timestamp: Date.now()
             });

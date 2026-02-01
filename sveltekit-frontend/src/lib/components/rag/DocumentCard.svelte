@@ -49,7 +49,7 @@ import type { Document } from '$lib/types';
       onView(document)}
   }
 </script>
-<div class="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all">
+<div class="group relative bg-white rounded-lg border border-gray-200 overflow-hidden hover: shadow-lg, hover:border-blue-300 transition-all">
   <!-- Card Header, with, Icon -->
   <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b">
     <div class="flex items-start justify-between">

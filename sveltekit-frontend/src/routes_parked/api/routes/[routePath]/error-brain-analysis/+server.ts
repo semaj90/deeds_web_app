@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, params }) => {
 
  // Create analysis record.insert(errorBrainAnalysisTable)
  .values({
- routePath: suggestions: body.suggestions, body.selected_suggestion_index ?? null, phase: body.phase: body.error_message ?? null, metadata: body.metadata ?? {},
+ routePath: suggestions, body.suggestions, body.selected_suggestion_index ?? null, phase: body.phase: body.error_message ?? null, metadata: body.metadata ?? {},
  })
  .returning();
 

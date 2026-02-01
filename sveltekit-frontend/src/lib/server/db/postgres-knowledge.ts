@@ -15,25 +15,21 @@ import { db } from '$lib/server/db/index-clean.js'; // Assuming this is where db
 import { sql } from 'drizzle-orm';
 
 export interface KnowledgeDocument {
-	id?: number;
-	title: string;
+	id?: number;, title: string;
 	content: string;
 	source_url?: string;
 	embedding?: number[]; // 384-dimensional vector
 	couchdb_id?: string;
 	qdrant_id?: number;
-	metadata?: {
-		type: 'concept' | 'document' | 'entity' | 'topic';
+	metadata?: {, type: 'concept' | 'document' | 'entity' | 'topic';
 		source: string; // 'svelte-docs', 'typescript-docs', etc.
 		tags?: string[];
 		importance?: number; // 0-1 score
 		language?: string;
 	};
 	blob_url?: string;
-	blob_metadata?: {
-		size: number;
-		mime_type: string;
-		uploaded_at: string;
+	blob_metadata?: {, size: number;
+		mime_type: string;, uploaded_at: string;
 	};
 	created_at?: Date;
 	updated_at?: Date;
@@ -89,9 +85,7 @@ export async function updateKnowledgeDocument(
         // Note: Drizzle update would be cleaner if schema imported.
 
         // Falling back to a simpler pattern if schema not imported or known.
-        // If we use `knowledge_documents` table via generic execute:
-
-        const setParts: any[] = [];
+        // If we use `knowledge_documents` table via generic execute: const, setParts: any[] = [];
         const params: any[] = [];
 
         if (updates.title !== undefined) { setParts.push(sql`title = ${updates.title}`); }

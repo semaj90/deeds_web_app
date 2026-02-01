@@ -7,10 +7,8 @@ import { db } from "$lib/server/db";
 import * as schema from '$lib/server/db/schema-postgres';
 
 interface UserType {
-	id: string;
-	email: string;
-	firstName: string;
-	lastName: string;
+	id: string;, email: string;
+	firstName: string;, lastName: string;
 	role: string;
 }
 

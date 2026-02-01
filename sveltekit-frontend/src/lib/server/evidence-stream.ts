@@ -1,9 +1,7 @@
 export type StoredMessage = {
-    id: string;
-    sessionId: string;
+    id: string;, sessionId: string;
     type?: string;
-    payload?: unknown;
-    timestamp: string;
+    payload?: unknown;, timestamp: string;
 };
 
 // In-memory dev store (replace with Redis/DB in production)

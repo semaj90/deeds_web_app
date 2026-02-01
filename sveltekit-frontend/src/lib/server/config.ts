@@ -7,16 +7,14 @@
 // MCP CONFIGURATION
 // ============================================================================
 export const MCP_CONFIG = {
-	context7: {
-		enabled: true,
+	context7: {, enabled: true,
 		officialCommand: 'npx -y @upstash/context7-mcp',
 		mockUrl: process.env.CONTEXT7_MCP_URL || 'http://localhost:4000',
 		useOfficial: process.env.USE_OFFICIAL_CONTEXT7 === 'true',
 		timeout: 30000,
 		retries: 3
 	},
-	multicore: {
-		enabled: process.env.MCP_ENABLED === 'true',
+	multicore: {, enabled: process.env.MCP_ENABLED === 'true',
 		port: parseInt(process.env.MCP_PORT || '3001', 10),
 		workers: parseInt(process.env.MCP_WORKERS || '4', 10),
 		healthCheckInterval: 30000
@@ -28,17 +26,14 @@ export const MCP_CONFIG = {
 // ============================================================================
 export const AI_CONFIG = {
 	// Primary: Ollama with Gemma models
-	ollama: {
-		baseUrl: process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-		models: {
-			legal: process.env.GEMMA_LEGAL_MODEL || 'gemma3-legal:latest',
+	ollama: {, baseUrl: process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+		models: {, legal: process.env.GEMMA_LEGAL_MODEL || 'gemma3-legal:latest',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
 			fallback: process.env.EMBEDDING_FALLBACK_MODEL || 'nomic-embed-text'
 		},
 		timeout: 60000,
 		maxRetries: 3,
-		gemma: {
-			contextWindow: 8192,
+		gemma: {, contextWindow: 8192,
 			temperature: 0.7,
 			numCtx: 8192,
 			numPredict: 2048,
@@ -47,23 +42,20 @@ export const AI_CONFIG = {
 		}
 	},
 	// Secondary: TensorRT-LLM with Triton Inference Server
-	tensorrt: {
-		enabled: process.env.TENSORRT_ENABLED === 'true',
+	tensorrt: {, enabled: process.env.TENSORRT_ENABLED === 'true',
 		tritonUrl: process.env.TRITON_URL || 'http://localhost:8000',
 		modelName: process.env.TENSORRT_MODEL_NAME || 'gemma_legal_tensorrt',
 		modelVersion: process.env.TENSORRT_MODEL_VERSION || '1',
 		timeout: 30000,
 		batchSize: parseInt(process.env.TENSORRT_BATCH_SIZE || '8', 10),
 		maxTokens: 2048,
-		optimization: {
-			precision: (process.env.TENSORRT_PRECISION as 'fp16' | 'int8' | 'fp32') || 'fp16',
+		optimization: {, precision: (process.env.TENSORRT_PRECISION as 'fp16' | 'int8' | 'fp32') || 'fp16',
 			maxBatchSize: parseInt(process.env.TENSORRT_MAX_BATCH || '8', 10),
 			maxWorkspaceSize: parseInt(process.env.TENSORRT_WORKSPACE || '2147483648', 10),
 			enableCudaGraph: process.env.TENSORRT_ENABLE_CUDA_GRAPH === 'true'
 		}
 	},
-	// Tertiary: vLLM
-	vllm: {
+	// Tertiary: vLLM, vllm: {
 		enabled: process.env.VLLM_ENABLED === 'true',
 		baseUrl: process.env.VLLM_URL || 'http://localhost:8001',
 		model: process.env.VLLM_MODEL || 'gemma-2b-it',
@@ -71,18 +63,15 @@ export const AI_CONFIG = {
 		maxTokens: 2048
 	},
 	// Fallback: OpenAI API
-	openai: {
-		enabled: process.env.OPENAI_ENABLED === 'true',
+	openai: {, enabled: process.env.OPENAI_ENABLED === 'true',
 		apiKey: process.env.OPENAI_API_KEY,
 		model: process.env.OPENAI_MODEL || 'gpt-4',
 		timeout: 30000,
 		maxTokens: 2048
 	},
 	providerPriority: ['ollama', 'tensorrt', 'vllm', 'openai'] as const,
-	functionCalling: {
-		enabled: true,
-		functions: {
-			legal: [
+	functionCalling: {, enabled: true,
+		functions: {, legal: [
 				'extractCitations',
 				'identifyLegalIssues',
 				'analyzeContracts',
@@ -98,38 +87,31 @@ export const AI_CONFIG = {
 // VECTOR SEARCH CONFIGURATION
 // ============================================================================
 export const VECTOR_SEARCH_CONFIG = {
-	pgvector: {
-		enabled: process.env.PGVECTOR_ENABLED !== 'false',
+	pgvector: {, enabled: process.env.PGVECTOR_ENABLED !== 'false',
 		dimensions: parseInt(process.env.PGVECTOR_DIMENSIONS || '768', 10),
 		indexType: 'hnsw' as const,
-		hnsw: {
-			efConstruction: parseInt(process.env.PGVECTOR_HNSW_EF_CONSTRUCTION || '200', 10),
+		hnsw: {, efConstruction: parseInt(process.env.PGVECTOR_HNSW_EF_CONSTRUCTION || '200', 10),
 			efSearch: parseInt(process.env.PGVECTOR_HNSW_EF_SEARCH || '40', 10),
 			m: parseInt(process.env.PGVECTOR_HNSW_M || '16', 10)
 		},
-		ivf: {
-			lists: parseInt(process.env.PGVECTOR_IVF_LISTS || '100', 10),
+		ivf: {, lists: parseInt(process.env.PGVECTOR_IVF_LISTS || '100', 10),
 			probes: parseInt(process.env.PGVECTOR_IVF_PROBES || '10', 10)
 		}
 	},
-	qdrant: {
-		enabled: process.env.QDRANT_ENABLED === 'true',
+	qdrant: {, enabled: process.env.QDRANT_ENABLED === 'true',
 		url: process.env.QDRANT_URL || 'http://localhost:6333',
 		apiKey: process.env.QDRANT_API_KEY,
 		collectionName: process.env.QDRANT_COLLECTION || 'legal_documents',
 		dimensions: parseInt(process.env.QDRANT_DIMENSIONS || '768', 10),
 		timeout: 10000,
-		vectorConfig: {
-			distance: 'Cosine' as const,
+		vectorConfig: {, distance: 'Cosine' as const,
 			onDisk: process.env.QDRANT_ON_DISK === 'true'
 		},
-		quantization: {
-			enabled: process.env.QDRANT_QUANTIZATION === 'true',
+		quantization: {, enabled: process.env.QDRANT_QUANTIZATION === 'true',
 			type: (process.env.QDRANT_QUANT_TYPE as 'scalar' | 'binary') || 'scalar'
 		}
 	},
-	hybrid: {
-		pgvectorWeight: parseFloat(process.env.HYBRID_PGVECTOR_WEIGHT || '0.7'),
+	hybrid: {, pgvectorWeight: parseFloat(process.env.HYBRID_PGVECTOR_WEIGHT || '0.7'),
 		qdrantWeight: parseFloat(process.env.HYBRID_QDRANT_WEIGHT || '0.3'),
 		fusionMethod: (process.env.HYBRID_FUSION_METHOD as 'weighted' | 'rrf') || 'weighted',
 		minSimilarity: parseFloat(process.env.HYBRID_MIN_SIMILARITY || '0.5'),
@@ -142,8 +124,7 @@ export const VECTOR_SEARCH_CONFIG = {
 // ============================================================================
 export const DATABASE_CONFIG = {
 	url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
-	postgres: {
-		host: process.env.DATABASE_HOST || 'localhost',
+	postgres: {, host: process.env.DATABASE_HOST || 'localhost',
 		port: parseInt(process.env.DATABASE_PORT || '5432', 10),
 		database: process.env.DATABASE_NAME || 'legal_ai_db',
 		username: process.env.DATABASE_USER || 'legal_admin',
@@ -165,8 +146,7 @@ export const REDIS_CONFIG = {
 	password: process.env.REDIS_PASSWORD || undefined,
 	db: parseInt(process.env.REDIS_DB || '0', 10),
 	keyPrefix: process.env.REDIS_KEY_PREFIX || 'legal-ai:',
-	cacheTtl: {
-		embeddings: parseInt(process.env.REDIS_TTL_EMBEDDINGS || '86400', 10),
+	cacheTtl: {, embeddings: parseInt(process.env.REDIS_TTL_EMBEDDINGS || '86400', 10),
 		search: parseInt(process.env.REDIS_TTL_SEARCH || '3600', 10),
 		docs: parseInt(process.env.REDIS_TTL_DOCS || '7200', 10),
 		sessions: parseInt(process.env.REDIS_TTL_SESSIONS || '1800', 10)
@@ -180,35 +160,29 @@ export const REDIS_CONFIG = {
 // RAG PIPELINE CONFIGURATION
 // ============================================================================
 export const RAG_CONFIG = {
-	chunking: {
-		chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500', 10),
+	chunking: {, chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500', 10),
 		chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300', 10),
 		strategy: (process.env.RAG_CHUNK_STRATEGY as 'legal-aware' | 'semantic' | 'fixed') || 'legal-aware'
 	},
-	search: {
-		maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10', 10),
+	search: {, maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10', 10),
 		similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
 		hybridSearch: process.env.RAG_HYBRID_SEARCH !== 'false',
 		rerankResults: process.env.RAG_RERANK_RESULTS !== 'false'
 	},
-	processing: {
-		enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
+	processing: {, enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
 		enableAutoTagging: process.env.RAG_ENABLE_AUTOTAGGING !== 'false',
 		batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10', 10),
 		parallelProcessing: process.env.RAG_PARALLEL_PROCESSING !== 'false'
 	},
-	rateLimiting: {
-		enabled: process.env.RAG_RATE_LIMITING !== 'false',
+	rateLimiting: {, enabled: process.env.RAG_RATE_LIMITING !== 'false',
 		perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60', 10),
 		perHour: parseInt(process.env.RAG_RATE_LIMIT_PER_HOUR || '1000', 10),
 		perDay: parseInt(process.env.RAG_RATE_LIMIT_PER_DAY || '10000', 10)
 	},
-	security: {
-		maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000', 10),
+	security: {, maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000', 10),
 		maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760', 10),
 		allowedDocumentTypes: ['contract', 'statute', 'case_law', 'brief', 'memo', 'evidence'],
-		sanitization: {
-			removeHtmlTags: true,
+		sanitization: {, removeHtmlTags: true,
 			removeSqlChars: true,
 			maxLineLength: 2000
 		}
@@ -222,21 +196,18 @@ export const HEALTH_CONFIG = {
 	checkInterval: 30000,
 	timeout: 5000,
 	retries: 3,
-	endpoints: {
-		ollama: '/api/tags',
+	endpoints: {, ollama: '/api/tags',
 		tensorrt: '/v2/health/ready',
 		qdrant: '/health',
 		postgres: true,
 		redis: true
 	},
-	circuitBreaker: {
-		failureThreshold: 3,
+	circuitBreaker: {, failureThreshold: 3,
 		successThreshold: 2,
 		timeout: 60000,
 		halfOpenRequests: 1
 	},
-	failover: {
-		enabled: true,
+	failover: {, enabled: true,
 		retryDelay: 1000,
 		maxRetries: 3,
 		backoffMultiplier: 2
@@ -250,8 +221,7 @@ export const METRICS_CONFIG = {
 	enabled: true,
 	collectInterval: 30000,
 	retentionPeriod: 86400000,
-	collect: {
-		aiProviderLatency: true,
+	collect: {, aiProviderLatency: true,
 		vectorSearchPerformance: true,
 		cacheHitRates: true,
 		errorRates: true,
@@ -275,7 +245,7 @@ export type FusionMethod = 'weighted' | 'rrf';
 // ============================================================================
 // CONFIGURATION VALIDATOR
 // ============================================================================
-export function validateConfig(): { valid: boolean; errors: string[] } {
+export function validateConfig(): {, valid: boolean; errors: string[] } {
 	const errors: string[] = [];
 
 	// Validate at least one AI provider is available
@@ -312,24 +282,20 @@ export function validateConfig(): { valid: boolean; errors: string[] } {
 // ============================================================================
 export function getConfigSummary() {
 	return {
-		aiProviders: {
-			ollama: AI_CONFIG.ollama?.baseUrl || 'disabled',
+		aiProviders: {, ollama: AI_CONFIG.ollama?.baseUrl || 'disabled',
 			tensorrt: AI_CONFIG.tensorrt.enabled ? AI_CONFIG.tensorrt.tritonUrl : 'disabled',
 			vllm: AI_CONFIG.vllm.enabled ? AI_CONFIG.vllm.baseUrl : 'disabled',
 			openai: AI_CONFIG.openai.enabled ? 'enabled' : 'disabled'
 		},
-		vectorSearch: {
-			pgvector: VECTOR_SEARCH_CONFIG.pgvector.enabled,
+		vectorSearch: {, pgvector: VECTOR_SEARCH_CONFIG.pgvector.enabled,
 			qdrant: VECTOR_SEARCH_CONFIG.qdrant.enabled,
 			hybrid: VECTOR_SEARCH_CONFIG.hybrid
 		},
-		gemmaModels: {
-			legal: AI_CONFIG.ollama.models.legal,
+		gemmaModels: {, legal: AI_CONFIG.ollama.models.legal,
 			embedding: AI_CONFIG.ollama.models.embedding,
 			dimensions: AI_CONFIG.ollama.gemma.embeddingDimensions
 		},
-		healthMonitoring: {
-			enabled: HEALTH_CONFIG.circuitBreaker.failureThreshold > 0,
+		healthMonitoring: {, enabled: HEALTH_CONFIG.circuitBreaker.failureThreshold > 0,
 			interval: HEALTH_CONFIG.checkInterval,
 			failover: HEALTH_CONFIG.failover.enabled
 		}

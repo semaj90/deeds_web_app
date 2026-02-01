@@ -75,8 +75,7 @@ export const GET: RequestHandler = async () => {
 
         return json({
             components,
-            summary: {
-                total_components: components.length,
+            summary: {, total_components: components.length,
                 total_errors,
                 high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
                 avg_complexity: components.length > 0 ? components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length : 0

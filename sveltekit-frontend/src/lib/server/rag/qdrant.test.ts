@@ -33,7 +33,7 @@ describe('Qdrant Operations', () => {
  // 1. Reject the request (preferred)
  // 2. Handle gracefully with an error
  try {
- await qdrantSearch({ vector: limit: withPayload,
+ await qdrantSearch({ vector: limit, withPayload,
  });
   
  } catch (error) {
@@ -43,7 +43,7 @@ describe('Qdrant Operations', () => {
  } else {
  // For 768-dimensional vectors, should work (assuming Qdrant is available)
  try {
- const results = await qdrantSearch({ vector: limit: withPayload,
+ const results = await qdrantSearch({ vector: limit, withPayload,
  });
 
  expect(Array.isArray(results)).toBe(true);
@@ -74,7 +74,7 @@ describe('Qdrant Operations', () => {
  async (vector, id) => {{
  id,
  vector,
- payload: { test: true },
+ payload: {, test: true },
  }];
 
  if (vector.length !== 768) {
@@ -140,12 +140,12 @@ describe('Qdrant Operations', () => {
 
  it('should handle filter parameters correctly', async () => {
  const vector = new Array(768).fill(0.1);undefined,
- { must: [{ key: 'jurisdiction', match: { value: 'CA' } }] },
- { must: [{ key: 'case_id', match: { value: 'test-case-123' } }] },
+ { must: [{, key: 'jurisdiction', match: {, value: 'CA' } }] },
+ { must: [{, key: 'case_id', match: {, value: 'test-case-123' } }] },
  {
  must: [
- { key: 'jurisdiction', match: { value: 'US-FED' } },
- { key: 'tag_ids', match: { any: ['tag1', 'tag2'] } }],
+ { key: 'jurisdiction', match: {, value: 'US-FED' } },
+ { key: 'tag_ids', match: {, any: ['tag1', 'tag2'] } }],
  }];
 
  for (const filter of testFilters) {
@@ -187,7 +187,7 @@ describe('Qdrant Operations', () => {
  // Test with invalid point structure
  try {
  await qdrantUpsert({
- points: [{ id: '', vector: [], payload: {} }],
+ points: [{, id: '', vector: [], payload: {} }],
  wait: true,
  });
  } catch (error) {

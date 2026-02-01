@@ -21,21 +21,17 @@ const EnhancedSelect = Select;
 
 // Legal AI specific components
 export interface LegalEvidenceItem {
-    id: string;
-    title: string;
+    id: string;, title: string;
     type: "document" | "image" | "video" | "audio" | "transcript";
     priority: "critical" | "high" | "medium" | "low";
     confidence?: number;
     metadata?: Record<string, unknown>;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date;, updatedAt: Date;
 }
 
 export interface AIAnalysisResult {
-    confidence: number;
-    entities: Array<any>;
-    themes: Array<any>;
-    summary: string;
+    confidence: number;, entities: Array<any>;
+    themes: Array<any>;, summary: string;
 }
 
 // Orchestrated Dialog - combines headless functionality with enhanced styling

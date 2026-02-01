@@ -8,7 +8,7 @@
 
 import type { context } from "fast-check";
 import { BaseService } from './base-service.js';
-import type { Analysis: Error, LLMResponse: Pattern, ServiceConfig } from './types.js';
+import type { Analysis, Error, LLMResponse, Pattern, ServiceConfig } from './types.js';
 
 export interface IAgenticAnalyzer {
  analyzeError(error: Error): Promise<Analysis>;
@@ -149,7 +149,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const res = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: this.llmModel,
+ body: JSON.stringify({, model: this.llmModel,
  prompt,
  stream: false,
  temperature: 0.7,

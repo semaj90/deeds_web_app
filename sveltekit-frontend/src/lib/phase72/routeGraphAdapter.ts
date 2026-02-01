@@ -23,17 +23,14 @@ function loadGraph(): RouteAstGraph {
 
 const graphJson = loadGraph();
 
-export async function getRouteAstGraph(): Promise<{
-	graph: RouteAstGraph;
-	stats: {
-		totalRoutes: number;
+export async function getRouteAstGraph(): Promise<{, graph: RouteAstGraph;
+	stats: {, totalRoutes: number;
 		totalEdges: number;
 	};
 }> {
 	const graph = graphJson;
 
-	return { graph, stats: {
-			totalRoutes: graph.nodes?.length ?? 0,
+	return { graph, stats: {, totalRoutes: graph.nodes?.length ?? 0,
 			totalEdges: graph.edges?.length ?? 0
 		}
 	};

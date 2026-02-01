@@ -31,28 +31,17 @@ declare const FileLike: unknown;
 // we incrementally normalize runtime service imports.
 declare namespace NodeJS {
   interface Global {
-    monitoringService: unknown;
-    ollamaLLM: unknown;
-    cachingLayer: unknown;
-    aiPipeline: unknown;
-    enhancedRAGPipeline: unknown;
-    accessMemoryMCP: unknown;
-    context7AgentOrchestrator: unknown;
-    performContext7Search: unknown;
-    context7SemanticAuditor: unknown;
-    comprehensiveCachingService: unknown;
-    wasmClusteringService: unknown;
-    librarySyncService: unknown;
-    natsMessaging: unknown;
-    qdrantClient: unknown;
-    QdrantClient: unknown;
-    generateEmbedding: unknown;
-    VectorService: unknown;
-    VectorSearchService: unknown;
-    VectorRepository: unknown;
-    aiReports: unknown;
-    legalPrecedents: unknown;
-    analyticsLog: unknown;
+    monitoringService: unknown;, ollamaLLM: unknown;
+    cachingLayer: unknown;, aiPipeline: unknown;
+    enhancedRAGPipeline: unknown;, accessMemoryMCP: unknown;
+    context7AgentOrchestrator: unknown;, performContext7Search: unknown;
+    context7SemanticAuditor: unknown;, comprehensiveCachingService: unknown;
+    wasmClusteringService: unknown;, librarySyncService: unknown;
+    natsMessaging: unknown;, qdrantClient: unknown;
+    QdrantClient: unknown;, generateEmbedding: unknown;
+    VectorService: unknown;, VectorSearchService: unknown;
+    VectorRepository: unknown;, aiReports: unknown;
+    legalPrecedents: unknown;, analyticsLog: unknown;
   }
 }
 

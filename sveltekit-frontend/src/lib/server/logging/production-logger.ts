@@ -7,18 +7,15 @@ import { appendFile, mkdir, readFile } from 'fs/promises';
 import * as path from 'path';
 
 export interface LogEntry {
-	id: string;
-	timestamp: Date;
+	id: string;, timestamp: Date;
 	level: 'info' | 'warn' | 'error' | 'debug';
-	service: string;
-	message: string;
+	service: string;, message: string;
 	data?: unknown;
 	error?: Error;
 	userId?: string;
 	caseId?: string;
 	documentId?: string;
-	performanceMetrics?: {
-		duration: number;
+	performanceMetrics?: {, duration: number;
 		memoryUsage: number;
 		cpuUsage?: number;
 	};
@@ -155,7 +152,7 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'info',
 			service: 'database',
-			message: `Database operation: ${operation}`,
+			message: `Database, operation: ${operation}`,
 			data,
 			error,
 			performanceMetrics: performanceMetrics || {
@@ -174,7 +171,7 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'info',
 			service: 'ocr',
-			message: `OCR processing: ${fileName}`,
+			message: `OCR, processing: ${fileName}`,
 			data: result,
 			error,
 			performanceMetrics: performanceMetrics || {
@@ -193,7 +190,7 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'info',
 			service: 'vector',
-			message: `Vector operation: ${operation}`,
+			message: `Vector, operation: ${operation}`,
 			data: {
 				query,
 				results: results && Array.isArray(results) ? { count: results.length, sample: results[0] } : null
@@ -212,9 +209,8 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'info',
 			service: 'ai',
-			message: `AI operation: ${model}`,
-			data: {
-				prompt: typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : 'No prompt',
+			message: `AI, operation: ${model}`,
+			data: {, prompt: typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : 'No prompt',
 				responseLength: typeof response === 'string' ? response.length : Array.isArray(response) ? response.length : 0,
 				tokenUsage: (performanceMetrics as any)?.tokens ?? 0
 			},
@@ -236,7 +232,7 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'info',
 			service: 'upload',
-			message: `File upload: ${fileName}`,
+			message: `File, upload: ${fileName}`,
 			data: { fileSize, caseId, result },
 			error,
 			caseId,
@@ -254,7 +250,7 @@ export class ProductionLogger {
 		await this.log({
 			level: error ? 'error' : 'debug',
 			service: 'xstate',
-			message: `State transition: ${machine} -> ${state}`,
+			message: `State, transition: ${machine} -> ${state}`,
 			data: { machine, state, event, context },
 			error
 		});
@@ -294,11 +290,9 @@ export class ProductionLogger {
 	}
 
 	// Get error summary
-	async getErrorSummary(hours = 24): Promise<{
-		totalErrors: number;
+	async getErrorSummary(hours = 24): Promise<{, totalErrors: number;
 		errorsByService: Record<string, number>;
-		recentErrors: LogEntry[];
-		timeRange: string;
+		recentErrors: LogEntry[];, timeRange: string;
 	}> {
 		try {
 			const recentLogs = await this.getRecentLogs();

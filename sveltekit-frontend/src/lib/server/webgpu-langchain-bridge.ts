@@ -5,17 +5,13 @@
  */
 
 export interface LangChainWebGPUConfig {
-  useWebGPUCache: boolean;
-  batchSize: number;
-  cacheEmbeddings: boolean;
-  compressVectors: boolean;
-  practiceArea: string;
-  documentType: 'contract' | 'case' | 'statute' | 'brief' | 'general';
+  useWebGPUCache: boolean;, batchSize: number;
+  cacheEmbeddings: boolean;, compressVectors: boolean;
+  practiceArea: string;, documentType: 'contract' | 'case' | 'statute' | 'brief' | 'general';
 }
 
 export interface ExtractionData {
-  summary: string;
-  keyTerms: string[];
+  summary: string;, keyTerms: string[];
   entities: unknown[];
   contractTerms?: unknown[];
   caseCitations?: unknown[];
@@ -25,32 +21,24 @@ export interface ExtractionData {
 
 export interface EmbeddingData {
   documentEmbedding: Float32Array;
-  sectionEmbeddings?: Float32Array[];
-  compressionRatio: number;
-  processingTime: number;
-  cacheHit: boolean;
+  sectionEmbeddings?: Float32Array[];, compressionRatio: number;
+  processingTime: number;, cacheHit: boolean;
 }
 
 export interface PerformanceData {
-  totalTime: number;
-  extractionTime: number;
-  embeddingTime: number;
-  webgpuUtilized: boolean;
+  totalTime: number;, extractionTime: number;
+  embeddingTime: number;, webgpuUtilized: boolean;
   throughput: number;
 }
 
 export interface MetadataData {
-  documentLength: number;
-  embeddingDimensions: number;
-  sectionsProcessed: number;
-  cacheStrategy: string;
+  documentLength: number;, embeddingDimensions: number;
+  sectionsProcessed: number;, cacheStrategy: string;
 }
 
 export interface ProcessingResult {
-  extraction: ExtractionData;
-  embeddings: EmbeddingData;
-  performance: PerformanceData;
-  metadata: MetadataData;
+  extraction: ExtractionData;, embeddings: EmbeddingData;
+  performance: PerformanceData;, metadata: MetadataData;
 }
 
 export class WebGPULangChainBridge {
@@ -96,8 +84,7 @@ export class WebGPULangChainBridge {
         webgpuUtilized: mergedConfig.useWebGPUCache,
         throughput: documentText.length / (totalTime / 1000),
       },
-      metadata: {
-        documentLength: documentText.length,
+      metadata: {, documentLength: documentText.length,
         embeddingDimensions: embeddingResult.documentEmbedding.length,
         sectionsProcessed: embeddingResult.sectionEmbeddings?.length ?? 1,
         cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard',
@@ -109,7 +96,7 @@ export class WebGPULangChainBridge {
    * Process batch of documents with WebGPU optimization
    */
   async processBatchDocuments(
-    documents: Array<{ id: string; content: string; metadata?: unknown }>,
+    documents: Array<{, id: string; content: string; metadata?: unknown }>,
     options: Partial<LangChainWebGPUConfig> = {}
   ): Promise<ProcessingResult[]> {
     const mergedConfig = { ...this.config, ...options };
@@ -144,7 +131,7 @@ export class WebGPULangChainBridge {
   private async extractWithLangChain(
     text: string,
     config: LangChainWebGPUConfig
-  ): Promise<{ data: ExtractionData; processingTime: number }> {
+  ): Promise<{, data: ExtractionData; processingTime: number }> {
     const startTime = Date.now();
 
     try {
@@ -153,8 +140,7 @@ export class WebGPULangChainBridge {
       const processingTime = Date.now() - startTime;
 
       return {
-        data: {
-          summary: text.substring(0, 500) + (text.length > 500 ? '...' : ''),
+        data: {, summary: text.substring(0, 500) + (text.length > 500 ? '...' : ''),
           keyTerms,
           entities: [],
           contractTerms: [],
@@ -167,8 +153,7 @@ export class WebGPULangChainBridge {
     } catch (error) {
       console.error('LangChain extraction failed:', error);
       return {
-        data: {
-          summary: 'Extraction failed - using fallback',
+        data: {, summary: 'Extraction failed - using fallback',
           keyTerms: this.extractKeyTermsFallback(text),
           entities: [],
           contractTerms: [],
@@ -270,16 +255,13 @@ export class WebGPULangChainBridge {
   /**
    * Get comprehensive processing statistics
    */
-  async getProcessingStats(): Promise<{
-    webgpuOptimizer: unknown;
-    embeddingCache: unknown;
-    langchainService: { available: boolean; models: string[] };
+  async getProcessingStats(): Promise<{, webgpuOptimizer: unknown;
+    embeddingCache: unknown;, langchainService: { available: boolean;, models: string[] };
   }> {
     return {
       webgpuOptimizer: {},
       embeddingCache: {},
-      langchainService: {
-        available: false,
+      langchainService: {, available: false,
         models: [],
       },
     };
@@ -313,7 +295,7 @@ export async function processLegalDocumentWithWebGPU(
 }
 
 export async function processBatchDocumentsWithWebGPU(
-  documents: Array<{ id: string; content: string; metadata?: unknown }>,
+  documents: Array<{, id: string; content: string; metadata?: unknown }>,
   options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
   return webgpuLangChainBridge.processBatchDocuments(documents, options);

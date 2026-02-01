@@ -13,8 +13,7 @@ type DBRow = Record<string, unknown>;
 
 export interface SimilarityResult {
 	id: string;
-	title?: string;
-	content: string;
+	title?: string;, content: string;
 	similarity: number;
 	metadata?: Metadata;
 	cacheLayer?: 'hot' | 'warm' | 'cold';
@@ -211,7 +210,7 @@ export async function hybridSearch(
 			title: typeof row.title === 'string' ? row.title : undefined,
 			content: typeof row.content === 'string' ? row.content : '',
 			similarity: Number(row.rank ?? 0) * 0.5,
-			metadata: { searchType: 'text' }
+			metadata: {, searchType: 'text' }
 		}));
 
 		// Combine and deduplicate
@@ -244,10 +243,8 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 /**
  * Vector operations test function
  */
-export async function testVectorOperations(): Promise<{
-	pgvectorAvailable: boolean;
-	similaritySearchWorking: boolean;
-	embeddingCacheWorking: boolean;
+export async function testVectorOperations(): Promise<{, pgvectorAvailable: boolean;
+	similaritySearchWorking: boolean;, embeddingCacheWorking: boolean;
 }> {
 	const pgvectorAvailable = await checkPgVectorAvailable();
 	let similaritySearchWorking = false;

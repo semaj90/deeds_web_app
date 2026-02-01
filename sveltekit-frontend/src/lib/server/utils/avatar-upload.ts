@@ -3,10 +3,8 @@ import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 export interface UploadConfig {
-    uploadDir: string;
-    maxFileSize: number;
-    allowedTypes: string[];
-    allowedExtensions: string[];
+    uploadDir: string;, maxFileSize: number;
+    allowedTypes: string[];, allowedExtensions: string[];
 }
 
 export interface ValidationResult {
@@ -36,8 +34,7 @@ export const AVATAR_UPLOAD_CONFIG: UploadConfig = {
 type MinimalFileLike = {
     readonly size: number;
     readonly name: string;
-    readonly type: string;
-    arrayBuffer: () => Promise<ArrayBuffer>;
+    readonly type: string;, arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
 // Accept DOM File, Blob or the minimal server-side shape
@@ -301,8 +298,7 @@ export function formatFileSize(bytes: number): string {
 export function generateInitials(user: {
     name?: string;
     firstName?: string;
-    lastName?: string;
-    email: string;
+    lastName?: string;, email: string;
 }): string {
     if (user?.firstName && user.lastName) {
         return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();

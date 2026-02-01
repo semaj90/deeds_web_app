@@ -140,7 +140,7 @@ export class WebGPUBufferUtils {
     /**
      * Prepare data for WebGPU buffer upload
      */
-    static prepareForUpload(data: BufferLike): { buffer: ArrayBuffer; byteLength: number; elementCount: number } {
+    static prepareForUpload(data: BufferLike): {, buffer: ArrayBuffer; byteLength: number;, elementCount: number } {
         const buffer = toArrayBuffer(data);
         const byteLength = buffer.byteLength;
         const elementCount = data instanceof Float32Array ? data.length : byteLength / 4;
@@ -183,7 +183,7 @@ export const BufferDebugUtils = {
     /**
      * Get detailed info about a buffer
      */
-    inspectBuffer(data: BufferLike): { type: string; byteLength: number; elementCount?: number; alignment: number } {
+    inspectBuffer(data: BufferLike): {, type: string; byteLength: number; elementCount?: number;, alignment: number } {
         const type = data.constructor.name;
         let byteLength: number;
         let elementCount: number | undefined;
@@ -257,10 +257,8 @@ export class WebGPUBufferUtils_Advanced {
     static prepareForUploadAdvanced(
         data: BufferLike,
         options: { alignment?: number; quantizationHint?: 'precision' | 'performance' | 'storage' } = {}
-    ): {
-        buffer: ArrayBuffer;
-        byteLength: number;
-        elementCount: number;
+    ): {, buffer: ArrayBuffer;
+        byteLength: number;, elementCount: number;
         recommendedQuantization: 'fp32' | 'fp16' | 'int8_symmetric';
     } {
         const buffer = toArrayBuffer(data);

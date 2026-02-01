@@ -39,7 +39,7 @@ export const actions: Actions = {
  try {
  if (isRegister) {
  // Registration flow
- const registerData = { email: firstName: lastName.get('lastName') as string,
+ const registerData = { email: firstName, lastName.get('lastName') as string,
  password: confirmPassword.get('confirmPassword') as string | role.get('role') as string | department.get('department') as string | jurisdiction.get('jurisdiction') as string,
  badgeNumber: (formData.get('badgeNumber') as string) ?? '',
  agreeToTerms: formData.get('agreeToTerms') as string | agreeToPrivacy.get('agreeToPrivacy') as string,

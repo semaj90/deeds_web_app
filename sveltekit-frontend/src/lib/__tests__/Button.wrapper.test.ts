@@ -15,7 +15,7 @@ describe('Bits overrides registry', () => {
   });
 
   it('allows registering and retrieving an override', () => {
-    const fake = { Button: { name: 'FakeButton' } };
+    const fake = { Button: {, name: 'FakeButton' } };
     registerOverride('test-override', fake, {});
 
     const all = getBitsOverrides();

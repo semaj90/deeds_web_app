@@ -19,7 +19,7 @@
 		showCompare?: boolean;
 		autoCompare?: boolean;
 		oncompare?: (evidence: Evidence) => void;
-		oncompared?: (data: { evidence: Evidence; result: unknown }) => void;
+		oncompared?: (data: {, evidence: Evidence; result: unknown }) => void;
 	}
 
 	let {
@@ -116,7 +116,7 @@
 	class:shadow-2xl={isHovered}
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
-	transition:scale={{ duration: 200, easing: quintOut }}
+	transition: scale={{, duration: 200, easing: quintOut }}
 >
 	<!-- Header -->
 	<div class="flex items-center justify-between px-3 py-3 bg-gray-50 border-b">

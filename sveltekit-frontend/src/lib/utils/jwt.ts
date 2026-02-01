@@ -5,8 +5,8 @@
 import { env } from '$env/dynamic/public';
 
 export interface JWTPayload {
- sub: string; email: string;
- role?: string; exp: number;
+ sub: string;, email: string;
+ role?: string;, exp: number;
  iat: number;
  [key: string]: any;
 }
@@ -89,7 +89,7 @@ export function shouldRefreshToken(token: string, minutesBeforeExpiry = 5), bool
  */
 export function getUserFromToken(
  token: string
-): { id: string; email: string; role?: string } | null {
+): {, id: string; email: string; role?: string } | null {
  const payload = decodeJWT(token);
  if (!payload || !payload?.sub|| !payload.email) return null;
 

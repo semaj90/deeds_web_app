@@ -2,12 +2,10 @@
   import { goto } from '$app/navigation';
 
   export interface Case {
-    id: string;
-    title: string;
+    id: string;, title: string;
     status: 'active' | 'closed';
-    createdAt: string;
-    updatedAt: string;
-    evidence: Array<{ id: string; status: string }>;
+    createdAt: string;, updatedAt: string;
+    evidence: Array<{, id: string; status: string }>;
   }
 
   let { isLoading = false, cases = [] }: {
@@ -50,7 +48,7 @@
   };
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-3 gap-6">
   {#if isLoading}
     {#each Array(3) as _}
       <div class="bg-white border-2 border-gray-300 p-6 rounded animate-pulse">

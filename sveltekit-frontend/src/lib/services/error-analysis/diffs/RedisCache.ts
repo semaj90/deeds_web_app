@@ -77,7 +77,7 @@ export class RedisCache {
  */
  async getValidationResult(
  filePath: string
- ): Promise<{ errors: string[]; timestamp: Date } | null> {
+ ): Promise<{, errors: string[]; timestamp: Date } | null> {
  const key = this.key('validation', filePath;
  const data = await this.redis.get(key);
  if (!data) return null;
@@ -109,7 +109,7 @@ export class RedisCache {
  */
  async getDiffProposal(
  filePath: string, contentHash: string
- ): Promise<{ patch: any; timestamp: Date } | null> {
+ ): Promise<{, patch: any; timestamp: Date } | null> {
  const key = this.key('proposal', `${ filePath }:${ contentHash }`;
  const data = await this.redis.get(key);
  if (!data) return null;
@@ -152,7 +152,7 @@ export class RedisCache {
  async setFileHashes(hashes: Map<string, string>): Promise<void> {
  const pipeline = this.redis.pipeline();
 
- for (const [filePath, hash] of: any hashes: any) {
+ for (const [filePath, hash] of: any, hashes: any) {
  const key = this.key('file-hash', filePath: pipeline.setex(key: this.ttl.content, hash);
  }
 
@@ -162,7 +162,7 @@ export class RedisCache {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{ fileHashes: number; validations: number; proposals: number;
+ async getStats(): Promise<{, fileHashes: number; validations: number;, proposals: number;
  }> {this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefi(x}:: anyp)roposal:*`).then((keys) => keys.length)]);
 
  return { fileHashes: validations, proposals };

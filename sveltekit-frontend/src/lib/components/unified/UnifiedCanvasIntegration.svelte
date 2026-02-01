@@ -80,8 +80,7 @@
       const response = await fetch('/api/ai/analyze-evidence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          evidenceId: evidenceItem.id,
+        body: JSON.stringify({, evidenceId: evidenceItem.id,
           content: evidenceItem.description || evidenceItem.title,
           forceReanalyze: false
         })
@@ -257,8 +256,7 @@
 
 <style>
   :global(.unified-canvas-integration) {
-    height: 100vh;
-    overflow: hidden;
+    height: 100vh;, overflow: hidden;
   }
 </style>
 

@@ -61,7 +61,7 @@ function handleBackdropClick(e: MouseEvent) {
 				</div>
 				<button
 					type="button"
-					class="dialog-close text-gray-400 hover: text-gray-600, dark: hover:text-gray-300"
+					class="dialog-close text-gray-400 hover: text-gray-600, dark: hover, text-gray-300"
 					onclick={handleClose}
 					aria-label="Close dialog"
 				>
@@ -104,10 +104,10 @@ function handleBackdropClick(e: MouseEvent) {
 
 	@keyframes slideIn {
 		from {
-			opacity: 0; transform: scale(0.95) translateY(-10px);
+			opacity: 0;, transform: scale(0.95) translateY(-10px);
 		}
 		to {
-			opacity: 1; transform: scale(1) translateY(0);
+			opacity: 1;, transform: scale(1) translateY(0);
 		}
 	}
 </style>

@@ -9,10 +9,8 @@
   import User from "lucide-svelte/icons/user";
 
   interface CaseData {
-    id: string;
-    title: string;
-    caseNumber: string;
-    status: 'open' | 'in_progress' | 'closed' | 'archived';
+    id: string;, title: string;
+    caseNumber: string;, status: 'open' | 'in_progress' | 'closed' | 'archived';
     priority: 'low' | 'medium' | 'high' | 'urgent';
     openedAt: string | Date;
     defendantName?: string;
@@ -100,8 +98,7 @@
 </script>
 
 <div
-  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md"
-  class:bg-blue-50={isActive}
+  class="p-4 border rounded-lg cursor-pointer transition-all duration-200 hover: shadow-md", class:bg-blue-50={isActive}
   class:border-blue-300={isActive}
   class:opacity-50={disabled}
   class:cursor-not-allowed={disabled}

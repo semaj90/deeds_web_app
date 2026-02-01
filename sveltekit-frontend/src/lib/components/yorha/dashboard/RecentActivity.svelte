@@ -2,12 +2,9 @@
   import { onMount } from 'svelte';
 
   interface Activity {
-    id: number;
-    type: string;
-    message: string;
-    timestamp: Date;
-    icon: string;
-    color: string;
+    id: number;, type: string;
+    message: string;, timestamp: Date;
+    icon: string;, color: string;
   }
 
   let activities: Activity[] = $state([]);

@@ -19,7 +19,7 @@ export interface CasesTools {
   }): Promise<MCPToolResponse<any[]>>;
   createCase(caseData: any): Promise<MCPToolResponse<any>>;
   updateCase(caseId: string, updates: any): Promise<MCPToolResponse<any>>;
-  deleteCase(caseId: string): Promise<MCPToolResponse<{ deleted: boolean; id: string }>>;
+  deleteCase(caseId: string): Promise<MCPToolResponse<{, deleted: boolean; id: string }>>;
   findSimilarCases(embedding: number[], limit?: number): Promise<MCPToolResponse<any[]>>;
   getCaseAnalytics(userId: string): Promise<MCPToolResponse<any>>;
 }
@@ -32,11 +32,9 @@ export interface EvidenceTools {
   }): Promise<MCPToolResponse<any[]>>;
   createEvidence(evidenceData: any): Promise<MCPToolResponse<any>>;
   updateEvidence(evidenceId: string, updates: any): Promise<MCPToolResponse<any>>;
-  deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{ deleted: boolean; id: string }>>;
-  findSimilarEvidence(params: {
-    embedding: number[];
-    caseId?: string;
-    limit: number;
+  deleteEvidence(evidenceId: string): Promise<MCPToolResponse<{, deleted: boolean; id: string }>>;
+  findSimilarEvidence(params: {, embedding: number[];
+    caseId?: string;, limit: number;
     threshold?: number;
   }): Promise<MCPToolResponse<any[]>>;
   getEvidenceAnalytics(caseId: string): Promise<MCPToolResponse<any>>;
@@ -57,18 +55,16 @@ export interface RAGTools {
       threshold?: number;
     }
   ): Promise<MCPToolResponse<any[]>>;
-  indexWebPage(url: string): Promise<MCPToolResponse<{ indexed: boolean; id: string }>>;
-  indexDirectory(path: string): Promise<MCPToolResponse<{ indexed: number; errors: string[] }>>;
-  syncMinIO(): Promise<MCPToolResponse<{ processed: number; skipped: number }>>;
-  getLangCacheStats(): Promise<MCPToolResponse<{ hits: number; misses: number; total: number }>>;
-  clearLangCache(scope?: string): Promise<MCPToolResponse<{ cleared: number }>>;
+  indexWebPage(url: string): Promise<MCPToolResponse<{, indexed: boolean; id: string }>>;
+  indexDirectory(path: string): Promise<MCPToolResponse<{, indexed: number; errors: string[] }>>;
+  syncMinIO(): Promise<MCPToolResponse<{, processed: number; skipped: number }>>;
+  getLangCacheStats(): Promise<MCPToolResponse<{, hits: number; misses: number;, total: number }>>;
+  clearLangCache(scope?: string): Promise<MCPToolResponse<{, cleared: number }>>;
 }
 
 export interface MCPTools {
-  cases: CasesTools;
-  evidence: EvidenceTools;
-  users: UserTools;
-  rag: RAGTools;
+  cases: CasesTools;, evidence: EvidenceTools;
+  users: UserTools;, rag: RAGTools;
   getAnalytics(params: Record<string, string>): Promise<MCPToolResponse<any>>;
   analyzeLegalDocument(document: any): Promise<MCPToolResponse<any>>;
   extractClauses(documentId: string): Promise<MCPToolResponse<any>>;
@@ -79,53 +75,49 @@ export interface MCPTools {
 
 // Mock implementation for development
 export const mcpTools: MCPTools = {
-  cases: {
-    loadCases: async (_params) => ({ success: true, data: [] }),
+  cases: {, loadCases: async (_params) => ({ success: true, data: [] }),
     createCase: async (caseData) => ({
       success: true,
-      data: { id: 'new-case-123', ...(caseData || {}) },
+      data: {, id: 'new-case-123', ...(caseData || {}) },
     }),
     updateCase: async (caseId, updates) => ({
       success: true,
-      data: { id: caseId, ...(updates || {}) },
+      data: {, id: caseId, ...(updates || {}) },
     }),
-    deleteCase: async (caseId) => ({ success: true, data: { deleted: true, id: caseId } }),
+    deleteCase: async (caseId) => ({ success: true, data: {, deleted: true, id: caseId } }),
     findSimilarCases: async (_embedding, _limit) => ({ success: true, data: [] }),
     getCaseAnalytics: async (_userId) => ({
       success: true,
-      data: { totalCases: 0, activeCases: 0 },
+      data: {, totalCases: 0, activeCases: 0 },
     }),
   },
-  evidence: {
-    loadEvidence: async (_params) => ({ success: true, data: [] }),
+  evidence: {, loadEvidence: async (_params) => ({ success: true, data: [] }),
     createEvidence: async (evidenceData) => ({
       success: true,
-      data: { id: 'new-evidence-123', ...(evidenceData || {}) },
+      data: {, id: 'new-evidence-123', ...(evidenceData || {}) },
     }),
     updateEvidence: async (evidenceId, updates) => ({
       success: true,
-      data: { id: evidenceId, ...(updates || {}) },
+      data: {, id: evidenceId, ...(updates || {}) },
     }),
-    deleteEvidence: async (evidenceId) => ({ success: true, data: { deleted: true, id: evidenceId } }),
+    deleteEvidence: async (evidenceId) => ({ success: true, data: {, deleted: true, id: evidenceId } }),
     findSimilarEvidence: async (_params) => ({ success: true, data: [] }),
     getEvidenceAnalytics: async (_caseId) => ({
       success: true,
-      data: { totalEvidence: 0, processedEvidence: 0 },
+      data: {, totalEvidence: 0, processedEvidence: 0 },
     }),
   },
-  users: {
-    getUserById: async (userId) => ({
+  users: {, getUserById: async (userId) => ({
       success: true,
-      data: { id: userId, name: 'Demo User', role: 'attorney' },
+      data: {, id: userId, name: 'Demo User', role: 'attorney' },
     }),
     updateUser: async (userId, updates) => ({
       success: true,
-      data: { id: userId, ...(updates || {}) },
+      data: {, id: userId, ...(updates || {}) },
     }),
-    getUserAnalytics: async () => ({ success: true, data: { totalUsers: 1, activeUsers: 1 } }),
+    getUserAnalytics: async () => ({ success: true, data: {, totalUsers: 1, activeUsers: 1 } }),
   },
-  rag: {
-    webSearch: async (query, options) => {
+  rag: {, webSearch: async (query, options) => {
       try {
         const response = await fetch('/api/websearch', {
           method: 'POST',
@@ -140,35 +132,35 @@ export const mcpTools: MCPTools = {
     },
     indexWebPage: async (url) => {
       try {
-        return { success: true, data: { indexed: true, id: `web-${Date.now()}` } };
+        return { success: true, data: {, indexed: true, id: `web-${Date.now()}` } };
       } catch (error) {
         return { success: false, error: String(error) };
       }
     },
     indexDirectory: async (path) => {
       try {
-        return { success: true, data: { indexed: 0, errors: [] } };
+        return { success: true, data: {, indexed: 0, errors: [] } };
       } catch (error) {
         return { success: false, error: String(error) };
       }
     },
     syncMinIO: async () => {
       try {
-        return { success: true, data: { processed: 0, skipped: 0 } };
+        return { success: true, data: {, processed: 0, skipped: 0 } };
       } catch (error) {
         return { success: false, error: String(error) };
       }
     },
     getLangCacheStats: async () => {
       try {
-        return { success: true, data: { hits: 0, misses: 0, total: 0 } };
+        return { success: true, data: {, hits: 0, misses: 0, total: 0 } };
       } catch (error) {
         return { success: false, error: String(error) };
       }
     },
     clearLangCache: async (scope) => {
       try {
-        return { success: true, data: { cleared: 0 } };
+        return { success: true, data: {, cleared: 0 } };
       } catch (error) {
         return { success: false, error: String(error) };
       }

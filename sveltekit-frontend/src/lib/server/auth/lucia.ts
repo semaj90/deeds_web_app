@@ -12,7 +12,7 @@ export const auth = {
  createSessionCookie: (sessionId: string) => ({
  name: 'yorha_session',
  value: sessionId,
- attributes: { path: '/', httpOnly: true }
+ attributes: {, path: '/', httpOnly: true }
  }),
  createBlankSessionCookie: () => ({
  name: 'yorha_session',
@@ -31,7 +31,7 @@ interface DatabaseUserAttributes {
 
 // Placeholder type for when Lucia is disabled
 type LuciaUser<T> = {
- id: string; email: string;
+ id: string;, email: string;
  role?: string;
 };
 

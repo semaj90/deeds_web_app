@@ -113,18 +113,13 @@ export const formatFileSize = (bytes: number): string => {
 }
 
 export interface FileUpload {
-    title: string;
-    description: string;
+    title: string;, description: string;
     evidenceType: z.infer<typeof evidenceTypeEnum>;
-    fileType: FileType;
-    tags: string[];
+    fileType: FileType;, tags: string[];
     confidentialityLevel: z.infer<typeof confidentialityLevelEnum>;
-    isAdmissible: boolean;
-    enableAiAnalysis: boolean;
-    enableOcr: boolean;
-    enableEmbeddings: boolean;
-    enableSummarization: boolean;
-    chainOfCustody: z.infer<typeof chainOfCustodyEntrySchema>[];
+    isAdmissible: boolean;, enableAiAnalysis: boolean;
+    enableOcr: boolean;, enableEmbeddings: boolean;
+    enableSummarization: boolean;, chainOfCustody: z.infer<typeof chainOfCustodyEntrySchema>[];
     metadata: Record<string, unknown>;
 }
 
@@ -147,17 +142,12 @@ export const defaultFileUploadValues: Partial<FileUpload> = {
 
 // Assuming CaseWithFiles interface needs to be defined or is meant to be exported
 export interface CaseWithFiles {
-    title: string;
-    caseNumber: string;
-    description: string;
-    category: string;
+    title: string;, caseNumber: string;
+    description: string;, category: string;
     priority: z.infer<typeof casePriorityEnum>;
-    assignedTeam: string[];
-    tags: string[];
-    files: File[];
-    fileDescriptions: string[];
-    fileTitles: string[];
-    fileTypes: string[];
+    assignedTeam: string[];, tags: string[];
+    files: File[];, fileDescriptions: string[];
+    fileTitles: string[];, fileTypes: string[];
     fileEvidenceTypes: string[];
 }
 

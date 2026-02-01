@@ -8,7 +8,7 @@ https, //svelte.dev/e/bind_invalid_value -->
 https, //svelte.dev/e/bind_invalid_value -->
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
 // REMOVED: import { onDestroy, onMount } from 'svelte';
 

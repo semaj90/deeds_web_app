@@ -15,7 +15,7 @@ export interface VectorSearchRequest {
 	filters?: {
 		case_ids?: string[];
 		doc_types?: DocumentType[];
-		date_range?: { from: number; to: number };
+		date_range?: {, from: number;, to: number };
 		legal_categories?: string[];
 		jurisdictions?: string[];
 		min_confidence?: number;
@@ -29,53 +29,53 @@ export interface VectorSearchRequest {
 }
 
 export interface VectorSearchResponse {
-	results: SearchResult[]; metadata: ResponseMetadata; analytics: QueryAnalytics; recommendations: Recommendation[];
+	results: SearchResult[];, metadata: ResponseMetadata;, analytics: QueryAnalytics;, recommendations: Recommendation[];
 }
 
 export interface DocumentMetadata {
-	title: string; content_preview: string; type: DocumentType; created_at: number; updated_at: number; case_id: string; jurisdiction: string; legal_categories: string[]; confidence_score: number; page_count: number; word_count: number;
+	title: string;, content_preview: string;, type: DocumentType;, created_at: number;, updated_at: number;, case_id: string;, jurisdiction: string;, legal_categories: string[];, confidence_score: number;, page_count: number;, word_count: number;
 }
 
 export interface TextSnippet {
-	text: string; highlights: HighlightRange[]; relevance_score: number; page_number: number;
+	text: string;, highlights: HighlightRange[];, relevance_score: number;, page_number: number;
 }
 
 export interface HighlightRange {
-	start: number; end: number; match_type: 'exact' | 'semantic' | 'keyword';
+	start: number;, end: number;, match_type: 'exact' | 'semantic' | 'keyword';
 }
 
 export interface LegalContext {
-	precedents: string[]; citations: Citation[]; key_terms: string[]; practice_area: string; legal_weight: number;
+	precedents: string[];, citations: Citation[];, key_terms: string[];, practice_area: string;, legal_weight: number;
 }
 
 export interface Citation {
-	citation_text: string; source: string; url: string; relevance: number;
+	citation_text: string;, source: string;, url: string;, relevance: number;
 }
 
 export interface ResponseMetadata {
-	processing_time_ms: number; total_results: number; algorithm_used: string; from_cache: boolean; data_source: string; vector_dimensions: number; quality: SearchQuality;
+	processing_time_ms: number;, total_results: number;, algorithm_used: string;, from_cache: boolean;, data_source: string;, vector_dimensions: number;, quality: SearchQuality;
 	client_time_ms?: number;
 }
 
 export interface SearchQuality {
-	avg_similarity: number; query_clarity: number; result_diversity: number; exact_matches: number; semantic_matches: number;
+	avg_similarity: number;, query_clarity: number;, result_diversity: number;, exact_matches: number;, semantic_matches: number;
 }
 
 export interface QueryAnalytics {
-	query_id: string; query_hash: string; expansion_terms: string[]; clusters: SemanticCluster[]; complexity: QueryComplexity;
+	query_id: string;, query_hash: string;, expansion_terms: string[];, clusters: SemanticCluster[];, complexity: QueryComplexity;
 }
 
 export interface SemanticCluster {
-	cluster_id: string; theme: string; weight: number; representative_terms: string[];
+	cluster_id: string;, theme: string;, weight: number;, representative_terms: string[];
 }
 
 export interface QueryComplexity {
-	complexity_score: number; complexity_level: 'simple' | 'moderate' | 'complex';
+	complexity_score: number;, complexity_level: 'simple' | 'moderate' | 'complex';
 	complexity_factors: string[];
 }
 
 export interface Recommendation {
-	type: string; title: string; description: string; action_url: string; confidence: number; tags: string[];
+	type: string;, title: string;, description: string;, action_url: string;, confidence: number;, tags: string[];
 }
 
 export enum DocumentType {
@@ -160,7 +160,7 @@ export class VectorSearchClient {
 	}
 
 	async batchSearch(requests: VectorSearchRequest[]): Promise<VectorSearchResponse[]> {
-		const batchRequest = { requests: batch_params: { parallel_processing: true, max_concurrent: 10 10,
+		const batchRequest = { requests: batch_params: {, parallel_processing: true, max_concurrent: 10 10,
 				return_aggregated_analytics: true
 			}
 		};

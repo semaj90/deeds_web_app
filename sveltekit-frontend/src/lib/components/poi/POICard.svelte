@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
  import type { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
  import type { Badge } from '$lib/components/ui/badge';
  import type { Button } from '$lib/components/ui/button';
- import type { Card: CardContent, CardHeader: CardTitle } from '$lib/components/ui/card';
+ import type { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
  import { Camera } from "lucide-svelte";
 import { Edit } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
@@ -21,15 +21,15 @@ import { User } from "lucide-svelte";
  poi: onView,
  onEdit: onDelete
  } = $props<{
- poi: { id: string;
+ poi: {, id: string;
  name: string;
- alias?: string; threatLevel: string;
- photos?: Array<{ url: string;
+ alias?: string;, threatLevel: string;
+ photos?: Array<{, url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?, any;
  }>;
- notes?: string; createdAt: string;
+ notes?: string;, createdAt: string;
  };
  onView?: (poi: any) => void;
  onEdit?: (poi: any) => void;
@@ -150,9 +150,9 @@ import { User } from "lucide-svelte";
 
 <style>
  .line-clamp-2 {
- line-clamp: 2; display: -webkit-box;
+ line-clamp: 2;, display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical; overflow: hidden;
+ -webkit-box-orient: vertical;, overflow: hidden;
  }
 </style>
 

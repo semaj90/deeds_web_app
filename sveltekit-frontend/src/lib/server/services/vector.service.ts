@@ -15,15 +15,13 @@ function hashText(text: string): string {
 }
 
 export interface EmbeddingResult {
-	embedding: number[];
-	success: boolean;
+	embedding: number[];, success: boolean;
 	model?: string;
 	error?: string;
 }
 
 export interface VectorSearchResult {
-	id: string;
-	content: string;
+	id: string;, content: string;
 	score: number;
 	metadata?: Record<string, any>;
 }
@@ -190,7 +188,7 @@ export class VectorOperationsService {
 	static async analyzeDocument(
 		documentId: string,
 		analysisType: string
-	): Promise<{ documentId: string; analysisType: string; result: string }> {
+	): Promise<{, documentId: string; analysisType: string;, result: string }> {
 		console.warn('analyzeDocument is a stub');
 		return { documentId, analysisType, result: 'mock_analysis_result' };
 	}

@@ -112,8 +112,7 @@ export async function getSystemHealth(): Promise<any> {
 
 	return {
 		overall: appHealth.status,
-		database: {
-			status: dbHealth.status,
+		database: {, status: dbHealth.status,
             // @ts-ignore
 			config: dbHealth.config,
 			connection: connectionTest,

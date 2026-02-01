@@ -14,13 +14,13 @@ export interface CacheConfig {
 }
 
 export const CACHE_STRATEGIES = {
-    STATIC_CONTENT: { maxAge: 3600, staleWhileRevalidate: 86400, staleIfError: 604800, private: false },
-    VECTOR_SEARCH: { maxAge: 1800, staleWhileRevalidate: 3600, staleIfError: 7200, private: false },
-    AI_RESPONSES: { maxAge: 900, staleWhileRevalidate: 1800, private: true },
-    DOCUMENT_SUMMARIES: { maxAge: 3600, staleWhileRevalidate: 7200, private: false },
-    USER_DATA: { maxAge: 300, staleWhileRevalidate: 600, private: true, mustRevalidate: true },
-    REALTIME: { maxAge: 60, mustRevalidate: true, private: true },
-    IMMUTABLE: { maxAge: 31536000, private: false }
+    STATIC_CONTENT: {, maxAge: 3600, staleWhileRevalidate: 86400, staleIfError: 604800, private: false },
+    VECTOR_SEARCH: {, maxAge: 1800, staleWhileRevalidate: 3600, staleIfError: 7200, private: false },
+    AI_RESPONSES: {, maxAge: 900, staleWhileRevalidate: 1800, private: true },
+    DOCUMENT_SUMMARIES: {, maxAge: 3600, staleWhileRevalidate: 7200, private: false },
+    USER_DATA: {, maxAge: 300, staleWhileRevalidate: 600, private: true, mustRevalidate: true },
+    REALTIME: {, maxAge: 60, mustRevalidate: true, private: true },
+    IMMUTABLE: {, maxAge: 31536000, private: false }
 } as const;
 
 function generateCacheControlHeader(config: CacheConfig): string {
@@ -92,7 +92,7 @@ export function checkConditionalHeaders(
     request: Request,
     etag?: string,
     lastModified?: Date
-): { isNotModified: boolean; shouldSend304: boolean } {
+): {, isNotModified: boolean; shouldSend304: boolean } {
     const ifNoneMatch = request.headers.get('If-None-Match');
     const ifModifiedSince = request.headers.get('If-Modified-Since');
     let isNotModified = false;

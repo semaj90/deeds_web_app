@@ -9,7 +9,7 @@
 	// Features: Agentic recommendations, next steps, timestamp tracking
 	// ═══════════════════════════════════════════════════════════════════════
 
-	let { data }: { data: PageData } = $props();
+	let { data }: {, data: PageData } = $props();
 
 	let analysisData = $state<any>(null);
 	let selectedCluster = $state<any>(null);
@@ -45,7 +45,7 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ cluster_id: clusterId, enable_tools: true })
+				body: JSON.stringify({, cluster_id: clusterId, enable_tools: true })
 			});
 
 			if (!response.body) throw new Error('No response body');
@@ -130,7 +130,7 @@
 				<Button
 					onclick={() => loadAnalysis()}
 					disabled={loading}
-					class="bits-btn px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
+					class="bits-btn px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover: from-purple-700, hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
 				>
 					<i class="i-carbon-renew mr-2"></i>
 					{loading ? 'Loading...' : 'Refresh Analysis'}
@@ -361,7 +361,7 @@
 						</p>
 						<Button
 							onclick={() => executeAgenticFix(selectedCluster.cluster_id)}
-							class="bits-btn px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all shadow-lg"
+							class="bits-btn px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover: from-pink-700, hover:to-purple-700 transition-all shadow-lg"
 						>
 							<i class="i-carbon-play-filled mr-2"></i>
 							Run Full Pipeline

@@ -21,10 +21,8 @@ export {
 import { writable } from 'svelte/store';
 
 export interface QueuedTask {
-    id: string;
-    userId: string;
-    status: string;
-    type: 'complex_legal' | 'document_analysis' | 'case_synthesis' | 'risk_assessment';
+    id: string;, userId: string;
+    status: string;, type: 'complex_legal' | 'document_analysis' | 'case_synthesis' | 'risk_assessment';
     createdAt?: number;
     completedAt?: number;
     priority?: number;

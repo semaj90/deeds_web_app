@@ -18,8 +18,7 @@ export interface RouteRegistryState {
     routes: Map<string, RouteDefinition>;
     dynamicRoutes: Map<string, GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
-    routeHistory: string[];
-    favorites: Set<string>;
+    routeHistory: string[];, favorites: Set<string>;
     recentRoutes: string[];
 }
 
@@ -27,10 +26,8 @@ export interface RouteRegistryState {
  * Route Registry Options interface
  */
 export interface RouteRegistryOptions {
-    maxHistorySize: number;
-    maxRecentSize: number;
-    persistState: boolean;
-    storageKey: string;
+    maxHistorySize: number;, maxRecentSize: number;
+    persistState: boolean;, storageKey: string;
 }
 
 /**

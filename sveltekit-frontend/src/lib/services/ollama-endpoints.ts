@@ -66,9 +66,9 @@ export async function generateWithGemma3Legal(
  const response = await fetch(getOllamaEndpoint('gemma3Legal'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: OLLAMA_ENDPOINTS.gemma3Legal,
+ body: JSON.stringify({, model: OLLAMA_ENDPOINTS.gemma3Legal,
  prompt: stream,
- options: { num_predict: max_tokens,
+ options: {, num_predict: max_tokens,
  temperature,
  top_p: num_ctx,
  },
@@ -96,7 +96,7 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
  const response = await fetch(getOllamaEndpoint('embeddingGemma'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: OLLAMA_ENDPOINTS.embeddingGemma,
+ body: JSON.stringify({, model: OLLAMA_ENDPOINTS.embeddingGemma,
  stream: false,
  }, signal: AbortSignal.timeout(10000),
  });
@@ -126,7 +126,7 @@ async function fallbackToCudaService(
  const response = await fetch(`${cudaEndpoint}/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ prompt: max_length,
+ body: JSON.stringify({, prompt: max_length,
  temperature,
  }, signal: AbortSignal.timeout(15000),
  });
@@ -168,7 +168,7 @@ export async function getAvailableModels(): Promise<string[]> {
  * Contextual chat with robust fetch calls
  */
 export async function contextualChat(
- messages: Array<{ role: string, content, string }>,
+ messages: Array<{, role: string, content, string }>,
  context?: any
 ): Promise<string> {
  try {

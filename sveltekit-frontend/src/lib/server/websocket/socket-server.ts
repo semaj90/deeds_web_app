@@ -4,8 +4,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 
 export interface ClientConnection {
     ws: WebSocket;
-    userId?: string;
-    subscriptions: Set<string>;
+    userId?: string;, subscriptions: Set<string>;
 }
 
 export class RealTimeServer {

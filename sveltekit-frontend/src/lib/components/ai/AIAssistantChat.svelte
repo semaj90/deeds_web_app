@@ -12,7 +12,7 @@
   } // Handle keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
   } // Format timestamp function formatTime(date: Date): string { return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit'
     }).format(date)}
-  // Get message role color function getRoleColor(role: string): string { switch (role) { case 'user': return 'bg-blue-100 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'; case 'assistant': return 'bg-green-100 border-green-200 dark:bg-green-900/20 dark:border-green-800'; case 'system': return 'bg-gray-100 border-gray-200 dark:bg-gray-900/20 dark:border-gray-800'; default: return 'bg-gray-100 border-gray-200 dark:bg-gray-900/20 dark:border-gray-800'}
+  // Get message role color function getRoleColor(role: string): string { switch (role) { case 'user': return 'bg-blue-100 border-blue-200 dark: bg-blue-900/20, dark:border-blue-800'; case 'assistant': return 'bg-green-100 border-green-200 dark: bg-green-900/20, dark:border-green-800'; case 'system': return 'bg-gray-100 border-gray-200 dark: bg-gray-900/20, dark: border-gray-800';, default: return 'bg-gray-100 border-gray-200 dark: bg-gray-900/20, dark:border-gray-800'}
   } // Clear conversation function clearConversation() { aiAssistantManager.clearConversation()}
   // Export conversation function exportConversation() { aiAssistantManager.exportConversation()}
   // Stop generation function stopGeneration() { aiAssistantManager.stopGeneration()}

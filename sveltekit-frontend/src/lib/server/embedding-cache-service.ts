@@ -7,27 +7,22 @@ import { redisService } from './redis-service.js';
 const typedRedisService = redisService as any;
 
 interface EmbeddingCacheEntry {
-    text: string;
-    embedding: number[] | string; // number[] raw or string compressed
-    model: string;
-    timestamp: number;
-    accessCount: number;
-    lastAccessed: number;
+    text: string;, embedding: number[] | string; // number[] raw or string compressed
+    model: string;, timestamp: number;
+    accessCount: number;, lastAccessed: number;
     compressed: boolean;
 }
 
 interface QueryCacheEntry {
-    query: string;
-    results: unknown[];
+    query: string;, results: unknown[];
     metadata: Record<string, unknown>;
-    timestamp: number;
-    ttl: number;
+    timestamp: number;, ttl: number;
 }
 
 interface CacheStats {
-    embeddings: { hits: number; misses: number; size: number };
-    queries: { hits: number; misses: number; size: number };
-    sessions: { active: number; total: number };
+    embeddings: {, hits: number; misses: number;, size: number };
+    queries: {, hits: number; misses: number;, size: number };
+    sessions: {, active: number; total: number };
 }
 
 class EmbeddingCacheService {

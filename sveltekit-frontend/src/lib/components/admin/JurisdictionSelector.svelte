@@ -1,7 +1,7 @@
 <script lang="ts">
 
 	interface JurisdictionSelectorProps {
-		value: string; onChange: (jurisdiction: string) => void;
+		value: string;, onChange: (jurisdiction: string) => void;
 		disabled?: boolean;
 		required?: boolean;
 		showLabel?: boolean;
@@ -68,18 +68,18 @@
 <style>
 	.jurisdiction-selector {
 		display: flex;
-		flex-direction: column; gap: 0.75rem;
+		flex-direction: column;, gap: 0.75rem;
 	}
 
 	label {
 		display: flex;
-		flex-direction: column; gap: 0.25rem;
+		flex-direction: column;, gap: 0.25rem;
 	}
 
 	.label-text {
 		font-size: 0.95rem;
-		font-weight: 600; color: #ddd; display: flex;
-		align-items: center; gap: 0.5rem;
+		font-weight: 600;, color: #ddd;, display: flex;
+		align-items: center;, gap: 0.5rem;
 	}
 
 	.required {
@@ -88,16 +88,16 @@
 	}
 
 	.hint {
-		font-size: 0.8rem; color: #999;
+		font-size: 0.8rem;, color: #999;
 		font-weight: normal;
 	}
 
 	.jurisdiction-select {
 		padding: 0.75rem 1rem;
-		background: #16161a; border: 2px solid #333;
-		border-radius: 6px; color: #ddd;
+		background: #16161a;, border: 2px solid #333;
+		border-radius: 6px;, color: #ddd;
 		font-size: 0.95rem;
-		font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+		font-weight: 500;, cursor: pointer;, transition: all 0.2s ease;
 		appearance: none;
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239df' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
 		background-repeat: no-repeat;
@@ -117,7 +117,7 @@
 	}
 
 	.jurisdiction-select:disabled {
-		opacity: 0.6; cursor:not-allowed;
+		opacity: 0.6;, cursor:not-allowed;
 		background-color: #0d0d0f;
 	}
 
@@ -129,16 +129,16 @@
 		padding: 0.75rem 1rem;
 		background: rgba(255, 68, 68, 0.1);
 		border: 1px solid rgba(255, 68, 68, 0.3);
-		border-radius: 4px; color: #f88;
-		font-size: 0.9rem; display: flex;
-		align-items: center; gap: 0.5rem;
+		border-radius: 4px;, color: #f88;
+		font-size: 0.9rem;, display: flex;
+		align-items: center;, gap: 0.5rem;
 	}
 
 	/* Option styling */
 	option {
-		background: #111; color: #ddd; padding: 0.5rem;
+		background: #111;, color: #ddd;, padding: 0.5rem;
 	}; option:checked {
-		background: #9df; color: #000;
+		background: #9df;, color: #000;
 	}
 </style>
 

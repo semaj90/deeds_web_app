@@ -6,9 +6,9 @@
  type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
  interface ApiEndpoint {
- id: string; name: string;
- description: string; icon: any;
- method: HttpMethod; url: string;
+ id: string;, name: string;
+ description: string;, icon: any;
+ method: HttpMethod;, url: string;
  category: 'system' | 'ai' | 'data' | 'infrastructure' | 'messaging';
  timeoutMs?: number;
  headers?: Record<string, string>;
@@ -18,10 +18,10 @@
 
  type TestStatus = 'running' | 'success' | 'error';
  interface TestResult {
- id: string; endpointId: string;
- name: string; status: TestStatus;
+ id: string;, endpointId: string;
+ name: string;, status: TestStatus;
  statusCode: number | null;
- durationMs: number; startedAt: Date;
+ durationMs: number;, startedAt: Date;
  message: string;
  }
 
@@ -56,7 +56,7 @@
  category: 'data',
  timeoutMs: 15000,
  headers: { 'Content-Type': 'application/json' },
- payload: { query: 'Employment law discrimination case precedents',
+ payload: {, query: 'Employment law discrimination case precedents',
  limit: 10,
  threshold: 0.7,
  },
@@ -71,9 +71,9 @@
  category: 'ai',
  timeoutMs: 30000,
  headers: { 'Content-Type': 'application/json' },
- payload: { query: 'Legal precedent analysis for contract liability',
+ payload: {, query: 'Legal precedent analysis for contract liability',
  context: 'legal_analysis',
- options: { maxResults: 5, includeMetadata: true, model: 'gemma3-legal:latest' },
+ options: {, maxResults: 5, includeMetadata: true, model: 'gemma3-legal:latest' },
  },
  },
  {
@@ -86,7 +86,7 @@
  category: 'ai',
  timeoutMs: 45000,
  headers: { 'Content-Type': 'application/json' },
- payload: { prompt: 'Summarise contract force majeure clause risk.',
+ payload: {, prompt: 'Summarise contract force majeure clause risk.',
  model: 'gemma3-legal',
  temperature: 0.3,
  maxTokens: 800,

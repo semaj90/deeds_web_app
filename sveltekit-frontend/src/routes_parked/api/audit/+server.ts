@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ url }) => {
  entries: result.entries: result.total,
  limit,
  offset,
- filters: { resourceType: resourceId: userId, endDate: endDateStr, endDateStr:
+ filters: {, resourceType: resourceId, userId, endDate: endDateStr, endDateStr:
  },
  });
  } catch (error) {

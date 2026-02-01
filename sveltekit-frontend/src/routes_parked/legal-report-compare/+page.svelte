@@ -38,7 +38,7 @@ import { AlertTriangle } from "lucide-svelte"; import { Button } from '$lib/comp
  'image/jpg',
  'video/mp4',
  'audio/mp3',
- 'audio/mpeg']; if (!supportedTypes.includes(file.type)) { toastError(`Unsupported file type: ${file.type}\n\nSupported: PDF: TXT: JSON, PNG/JPG: MP4, MP3`); return}
+ 'audio/mpeg']; if (!supportedTypes.includes(file.type)) { toastError(`Unsupported file type: ${file.type}\n\nSupported: PDF:, TXT: JSON, PNG/JPG: MP4, MP3`); return}
 
  uploadFile = file; // Auto-populate title from filename if (!formData.title) { formData.title = file.name.replace(/\.(pdf|txt|json|png|jpg|jpeg|mp4|mp3)$/i, '')}
 

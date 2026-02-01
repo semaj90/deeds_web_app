@@ -15,22 +15,19 @@ declare global {
 
 export namespace Telemetry {
   export interface BaseEvent {
-    timestamp: number;
-    sessionId: string;
+    timestamp: number;, sessionId: string;
     userId?: string;
   }
 
   export interface GPUEvent extends BaseEvent {
     type: 'gpu_usage' | 'context_switch' | 'memory_allocation';
-    gpuUtilization: number;
-    memoryUsed: number;
+    gpuUtilization: number;, memoryUsed: number;
     temperature?: number;
   }
 
   export interface PerformanceEvent extends BaseEvent {
     type: 'render_time' | 'api_latency' | 'cache_hit' | 'vector_encoding';
-    duration: number;
-    operation: string;
+    duration: number;, operation: string;
     success: boolean;
   }
 
@@ -43,27 +40,22 @@ export namespace Telemetry {
 }
 
 export interface MemoryBank {
-  id: number;
-  size: number;
-  used: number;
-  available: number;
+  id: number;, size: number;
+  used: number;, available: number;
   type: 'L1_GPU' | 'L2_RAM' | 'L3_REDIS' | 'CHR_ROM' | 'PRG_ROM';
 }
 
 export type TelemetryEvent = Telemetry.GPUEvent | Telemetry.PerformanceEvent | Telemetry.ErrorEvent;
 
 interface TelemetryOptions {
-  maxBufferSize: number;
-  flushInterval: number;
+  maxBufferSize: number;, flushInterval: number;
   enableDebug: boolean;
   endpoint?: string;
 }
 
 interface TelemetryMetrics {
-  eventsCollected: number;
-  eventsFlushed: number;
-  bufferSize: number;
-  avgFlushTime: number;
+  eventsCollected: number;, eventsFlushed: number;
+  bufferSize: number;, avgFlushTime: number;
   lastFlushTimestamp: number;
 }
 
@@ -224,8 +216,7 @@ export class TelemetryEventBus {
       exportedAt: Date.now(),
       metrics: this.getMetrics(),
       events: [...this.eventBuffer],
-      environment: {
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+      environment: {, userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
         viewport:
           typeof window !== 'undefined'
             ? { width: window.innerWidth, height: window.innerHeight }

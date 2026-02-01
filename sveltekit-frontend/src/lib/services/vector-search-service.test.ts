@@ -16,7 +16,7 @@ interface VectorSearchConfig {
 }
 
 interface CollectionStatus {
-  vectorDimension: number; documentCount: number;
+  vectorDimension: number;, documentCount: number;
 }
 
 // Mock service implementation
@@ -32,9 +32,9 @@ class MockVectorSearchService {
   async initialize() {
     this.initialized = true;
     return {
-      qdrant: { status: 'connected' },
-      postgres: { status: 'connected' },
-      redis: { status: 'connected' },
+      qdrant: {, status: 'connected' },
+      postgres: {, status: 'connected' },
+      redis: {, status: 'connected' },
     };
   }
 
@@ -94,8 +94,8 @@ class MockVectorSearchService {
 
   async ensureCollections() {
     return {
-      qdrant: { name: 'legal_documents', vectorSize: 384 },
-      postgres: { name: 'embeddings', vectorSize: 384 },
+      qdrant: {, name: 'legal_documents', vectorSize: 384 },
+      postgres: {, name: 'embeddings', vectorSize: 384 },
     };
   }
 

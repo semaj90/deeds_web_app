@@ -11,12 +11,9 @@
 import { redis } from './cache/redis';
 
 interface GPUMetrics {
-    gpuUtilization: number;
-    memoryUsage: number;
-    tensorCoreLoad: number;
-    thermalStatus: 'cool' | 'warm' | 'hot';
-    availableComputeUnits: number;
-    queueDepth: number;
+    gpuUtilization: number;, memoryUsage: number;
+    tensorCoreLoad: number;, thermalStatus: 'cool' | 'warm' | 'hot';
+    availableComputeUnits: number;, queueDepth: number;
 }
 
 interface CacheWorkload {
@@ -28,10 +25,8 @@ interface CacheWorkload {
 }
 
 interface ParallelCacheJob {
-    id: string;
-    workload: CacheWorkload;
-    data: any;
-    key: string;
+    id: string;, workload: CacheWorkload;
+    data: any;, key: string;
     ttl?: number;
     threadAffinity?: number;
 }
@@ -94,8 +89,7 @@ export class WebGPURedisOptimizer {
             }
 
             this.gpuDevice = await adapter.requestDevice({
-                requiredLimits: {
-                    maxComputeWorkgroupSizeX: 1024,
+                requiredLimits: {, maxComputeWorkgroupSizeX: 1024,
                     maxComputeInvocationsPerWorkgroup: 1024,
                     maxBufferSize: 1024 * 1024 * 1024, // 1GB
                 },
@@ -107,8 +101,7 @@ export class WebGPURedisOptimizer {
 
             this.computePipeline = this.gpuDevice.createComputePipeline({
                 layout: 'auto',
-                compute: {
-                    module: shaderModule,
+                compute: {, module: shaderModule,
                     entryPoint: 'main',
                 },
             });

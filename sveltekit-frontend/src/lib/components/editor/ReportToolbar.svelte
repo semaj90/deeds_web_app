@@ -184,11 +184,11 @@
   <div class="status-info">
     <span class="word-count">{wordCount} words</span>
     {#if hasUnsavedChanges}
-      <span class="unsaved-indicator" transition:slide={{ duration: 200 }}>
+      <span class="unsaved-indicator" transition: slide={{, duration: 200 }}>
         Unsaved changes
       </span>
     {:else}
-      <span class="saved-indicator" transition:slide={{ duration: 200 }}>
+      <span class="saved-indicator" transition: slide={{, duration: 200 }}>
         Saved {lastSaved ? lastSaved.toLocaleTimeString() : 'never'}
       </span>
     {/if}
@@ -199,20 +199,17 @@
   .report-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #ffffff;
+    justify-content: space-between;, background: #ffffff;
     border-bottom: 1px solid #e2e8f0;
     padding: 0.5rem 1rem;
-    min-height: 3rem;
-    position: sticky;
+    min-height: 3rem;, position: sticky;
     top: 0;
     z-index: 40;
   }
 
   .menu-bar {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: center;, gap: 0.5rem;
   }
 
   .menu-dropdown {
@@ -220,14 +217,11 @@
   }
 
   .menu-trigger {
-    background: none;
-    border: none;
+    background: none;, border: none;
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
-    font-size: 0.875rem;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    font-size: 0.875rem;, color: #374151;
+    cursor: pointer;, transition: all 0.15s ease;
   }
 
   .menu-trigger:hover {
@@ -235,11 +229,9 @@
   }
 
   .dropdown-menu {
-    position: absolute;
-    top: 100%;
+    position: absolute;, top: 100%;
     left: 0;
-    min-width: 12rem;
-    background: #ffffff;
+    min-width: 12rem;, background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -249,18 +241,13 @@
 
   .dropdown-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: none;
-    background: none;
+    align-items: center;, gap: 0.5rem;
+    width: 100%;, padding: 0.5rem 0.75rem;
+    border: none;, background: none;
     text-align: left;
     border-radius: 0.25rem;
-    font-size: 0.875rem;
-    color: #374151;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+    font-size: 0.875rem;, color: #374151;
+    cursor: pointer;, transition: background-color 0.15s ease;
   }
 
   .dropdown-item:hover {
@@ -268,41 +255,33 @@
   }
 
   .dropdown-separator {
-    height: 1px;
-    background: #e2e8f0;
+    height: 1px;, background: #e2e8f0;
     margin: 0.5rem 0;
   }
 
   .shortcut {
     margin-left: auto;
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 0.75rem;, color: #6b7280;
     opacity: 0.7;
   }
 
   .quick-actions {
     display: flex;
-    align-items: center;
-    gap: 0.25rem;
+    align-items: center;, gap: 0.25rem;
   }
 
   .action-button {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border: none;
+    justify-content: center;, width: 2rem;
+    height: 2rem;, border: none;
     background: none;
-    border-radius: 0.25rem;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    border-radius: 0.25rem;, color: #6b7280;
+    cursor: pointer;, transition: all 0.15s ease;
   }
 
   .action-button:hover {
-    background: #f3f4f6;
-    color: #3b82f6;
+    background: #f3f4f6;, color: #3b82f6;
   }
 
   .action-button.unsaved {
@@ -310,18 +289,14 @@
   }
 
   .separator {
-    width: 1px;
-    height: 1.5rem;
-    background: #e2e8f0;
-    margin: 0 0.5rem;
+    width: 1px;, height: 1.5rem;
+    background: #e2e8f0;, margin: 0 0.5rem;
   }
 
   .status-info {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.75rem;
-    color: #6b7280;
+    align-items: center;, gap: 1rem;
+    font-size: 0.75rem;, color: #6b7280;
   }
 
   .word-count {

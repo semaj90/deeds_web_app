@@ -124,27 +124,23 @@ export function getConfidenceLevel(confidence: number) {
  * Get case status styling
  */
 export function getCaseStatusStyling(status: string) {
-    const statusMap: { [key: string]: { label: string, color: string, bgColor: string, borderColor: string } } = {
-        active: {
-            label: 'Active',
+    const statusMap: { [key: string]: {, label: string, color: string, bgColor: string, borderColor: string } } = {
+        active: {, label: 'Active',
             color: 'text-legal-success',
             bgColor: 'bg-legal-success/10',
             borderColor: 'border-legal-success',
         },
-        pending: {
-            label: 'Pending',
+        pending: {, label: 'Pending',
             color: 'text-legal-warning',
             bgColor: 'bg-legal-warning/10',
             borderColor: 'border-legal-warning',
         },
-        closed: {
-            label: 'Closed',
+        closed: {, label: 'Closed',
             color: 'text-muted-foreground',
             bgColor: 'bg-muted/10',
             borderColor: 'border-muted',
         },
-        archived: {
-            label: 'Archived',
+        archived: {, label: 'Archived',
             color: 'text-legal-document',
             bgColor: 'bg-legal-document/10',
             borderColor: 'border-legal-document',
@@ -157,33 +153,28 @@ export function getCaseStatusStyling(status: string) {
  * Get evidence type styling
  */
 export function getEvidenceTypeStyling(type: string) {
-    const typeMap: { [key: string]: { label: string, color: string, bgColor: string, borderColor: string } } = {
-        document: {
-            label: 'Document',
+    const typeMap: { [key: string]: {, label: string, color: string, bgColor: string, borderColor: string } } = {
+        document: {, label: 'Document',
             color: 'text-legal-document',
             bgColor: 'bg-legal-document/10',
             borderColor: 'border-legal-document',
         },
-        image: {
-            label: 'Image',
+        image: {, label: 'Image',
             color: 'text-legal-info',
             bgColor: 'bg-legal-info/10',
             borderColor: 'border-legal-info',
         },
-        video: {
-            label: 'Video',
+        video: {, label: 'Video',
             color: 'text-harvard-crimson',
             bgColor: 'bg-harvard-crimson/10',
             borderColor: 'border-harvard-crimson',
         },
-        audio: {
-            label: 'Audio',
+        audio: {, label: 'Audio',
             color: 'text-harvard-gold',
             bgColor: 'bg-harvard-gold/10',
             borderColor: 'border-harvard-gold',
         },
-        physical: {
-            label: 'Physical',
+        physical: {, label: 'Physical',
             color: 'text-legal-evidence',
             bgColor: 'bg-legal-evidence/10',
             borderColor: 'border-legal-evidence',
@@ -296,8 +287,7 @@ export const storage = {
  * Color theme utilities
  */
 export const theme = {
-    colors: {
-        nier: {
+    colors: {, nier: {
             black: '#0A0A0A',
             darkGray: '#1A1A1A',
             gray: '#2A2A2A',
@@ -305,15 +295,13 @@ export const theme = {
             offWhite: '#F5F5F5',
             white: '#FFFFFF',
         },
-        harvard: {
-            crimson: '#A51C30',
+        harvard: {, crimson: '#A51C30',
             darkCrimson: '#8B1521',
             lightCrimson: '#C42847',
             gold: '#C9A96E',
             darkGold: '#B8965A',
         },
-        legal: {
-            success: '#2D5F3F',
+        legal: {, success: '#2D5F3F',
             warning: '#B8965A',
             error: '#8B1521',
             info: '#2A4A5A',
@@ -322,8 +310,7 @@ export const theme = {
             document: '#6A7A8A',
         },
     },
-    gradients: {
-        crimson: 'linear-gradient(135deg, #A51C30 0%, #C42847 100%)',
+    gradients: {, crimson: 'linear-gradient(135deg, #A51C30 0%, #C42847 100%)',
         gold: 'linear-gradient(135deg, #C9A96E 0%, #B8965A 100%)',
         nier: 'linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 50%, #3A3A3A 100%)',
         hero: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #A51C30 100%)',

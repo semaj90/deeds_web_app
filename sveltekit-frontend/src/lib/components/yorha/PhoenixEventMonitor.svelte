@@ -5,8 +5,7 @@
     type: string;
     evidenceId?: string;
     fileName?: string;
-    caseId?: string;
-    message: string;
+    caseId?: string;, message: string;
     timestamp?: string;
     [key: string]: unknown;
   }

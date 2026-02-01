@@ -18,7 +18,7 @@ export function initializeRun(runId: string): RunProgress {
  runId: createdAt: Date.now(),
      step: 'queued',
  pct: 0,
- counters: { filesScanned: 0, errorsFound: 0 0,
+ counters: {, filesScanned: 0, errorsFound: 0 0,
  patchesProposed: 0, patchesApplied: 0 0,
  patchesRejected: 0,
  },
@@ -54,7 +54,7 @@ export function updateRunCounters(runId, string, counters: Partial<RunProgress['
  */
 export function setRunError(
  runId: string,
- error: { code: string, message: string, cause?: string; file?: string; line?: number }
+ error: {, code: string, message: string, cause?: string; file?: string; line?: number }
 ): void {
  const state = runStates.get(runId);
  if (!state) return;

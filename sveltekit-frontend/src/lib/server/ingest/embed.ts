@@ -35,7 +35,7 @@ interface GemmaApiResponse {
     embedding?: number[];
     embeddings?: number[][];
     // Some APIs return data array
-    data?: Array<{ embedding: number[] }>;
+    data?: Array<{, embedding: number[] }>;
 }
 
 export interface EmbeddingResult {
@@ -44,8 +44,7 @@ export interface EmbeddingResult {
     error?: string;
     metadata?: {
         model?: string;
-        dimensions?: number;
-        processingTime: number;
+        dimensions?: number;, processingTime: number;
         inputType: 'text' | 'image' | 'audio';
         inputSize?: number;
     };
@@ -55,10 +54,8 @@ export interface BatchEmbeddingResult {
     success: boolean;
     embeddings?: number[][];
     errors?: string[];
-    metadata?: {
-        batchSize: number;
-        successCount: number;
-        failureCount: number;
+    metadata?: {, batchSize: number;
+        successCount: number;, failureCount: number;
         totalProcessingTime: number;
     };
 }
@@ -92,7 +89,7 @@ export async function embedText(texts: string | string[]): Promise<EmbeddingResu
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ mode: 'text', input: inputTexts }),
+                body: JSON.stringify({, mode: 'text', input: inputTexts }),
                 timeoutMs: 30000
             }
         );
@@ -109,8 +106,7 @@ export async function embedText(texts: string | string[]): Promise<EmbeddingResu
             return {
                 success: true,
                 embeddings: embeddings,
-                metadata: {
-                    batchSize: inputTexts.length,
+                metadata: {, batchSize: inputTexts.length,
                     successCount: embeddings.length,
                     failureCount: Math.max(0, inputTexts.length - embeddings.length),
                     totalProcessingTime: Date.now() - startTime
@@ -120,8 +116,7 @@ export async function embedText(texts: string | string[]): Promise<EmbeddingResu
             return {
                 success: true,
                 embedding: embeddings[0],
-                metadata: {
-                    model: result.model ?? 'unknown',
+                metadata: {, model: result.model ?? 'unknown',
                     dimensions: embeddings[0]?.length,
                     processingTime: Date.now() - startTime,
                     inputType: 'text',
@@ -154,7 +149,7 @@ export async function embedImageBuffer(buffer: Buffer): Promise<EmbeddingResult>
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ mode: 'image', input: dataUri }),
+                body: JSON.stringify({, mode: 'image', input: dataUri }),
                 timeoutMs: 60000
             }
         );
@@ -174,8 +169,7 @@ export async function embedImageBuffer(buffer: Buffer): Promise<EmbeddingResult>
         return {
             success: true,
             embedding,
-            metadata: {
-                model: result.model ?? 'unknown',
+            metadata: {, model: result.model ?? 'unknown',
                 dimensions: embedding.length,
                 processingTime: Date.now() - startTime,
                 inputType: 'image',
@@ -208,7 +202,7 @@ export async function embedAudioFilePath(wavPath: string): Promise<EmbeddingResu
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ mode: 'audio', input: dataUri }),
+                body: JSON.stringify({, mode: 'audio', input: dataUri }),
                 timeoutMs: 90000
             }
         );
@@ -228,8 +222,7 @@ export async function embedAudioFilePath(wavPath: string): Promise<EmbeddingResu
         return {
             success: true,
             embedding,
-            metadata: {
-                model: result.model ?? 'unknown',
+            metadata: {, model: result.model ?? 'unknown',
                 dimensions: embedding.length,
                 processingTime: Date.now() - startTime,
                 inputType: 'audio',
@@ -304,8 +297,7 @@ export async function embedImageBuffers(
         success: embeddings.length > 0,
         embeddings: embeddings,
         errors: errors.length > 0 ? errors : undefined,
-        metadata: {
-            batchSize: buffers.length,
+        metadata: {, batchSize: buffers.length,
             successCount: embeddings.length,
             failureCount: errors.length,
             totalProcessingTime: Date.now() - startTime

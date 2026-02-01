@@ -145,7 +145,7 @@ tags: formData.getAll('tags'),
  uploadResult: metadataSent, metadata: caseId, type:
  });
  return fail(500, {
- form: message: uploadResult?.message ?? 'Upload failed due to an internal service error.',
+ form: message, uploadResult?.message ?? 'Upload failed due to an internal service error.',
  });
  }
 

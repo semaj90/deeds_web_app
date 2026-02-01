@@ -53,8 +53,7 @@ export const testingFramework = {
   test: _globals?.test || _globals?.it || ((name: string, fn: () => void) => fn()),
 }; // ===== CACHE LAYER METHODS BARREL STORE =====
 export const cacheLayerMethods = {
-  memory: {
-    get: async (_key: string) => null as unknown,
+  memory: {, get: async (_key: string) => null as unknown,
     set: async (_key: string, _value: any) => true,
     delete: async (_key: string) => true,
     clear: async () => true,
@@ -64,8 +63,7 @@ export const cacheLayerMethods = {
     capacity: 1000,
     ttl: 3600,
   },
-  redis: {
-    get: async (_key: string) => null as unknown,
+  redis: {, get: async (_key: string) => null as unknown,
     set: async (_key: string, _value: any) => true,
     delete: async (_key: string) => true,
     exists: async (_key: string) => false,
@@ -73,48 +71,41 @@ export const cacheLayerMethods = {
     priority: 2,
     capacity: 10000,
   },
-  postgres: {
-    query: async (_sql: string, _params?: any[]) => ({ rows: [] as unknown[], rowCount: 0 }),
+  postgres: {, query: async (_sql: string, _params?: any[]) => ({ rows: [] as unknown[], rowCount: 0 }),
     execute: async (_sql: string, _params?: any[]) => true,
     transaction: async (callback: (tx: any) => Promise<unknown>) => callback({} as unknown),
     close: async () => true,
   },
-  vector: {
-    search: async (_query: number[], _k: number) => [] as unknown[],
+  vector: {, search: async (_query: number[], _k: number) => [] as unknown[],
     insert: async (_vector: number[], _metadata: Record<string, unknown>) => true,
     delete: async (_id: string) => true,
     update: async (_id: string, _vector: number[], _metadata: Record<string, unknown>) => true,
     similarity: (_v1: number[], _v2: number[]) => 0,
   },
-  filesystem: {
-    read: async (_path: string) => null as unknown,
+  filesystem: {, read: async (_path: string) => null as unknown,
     write: async (_path: string, _data: any) => true,
     delete: async (_path: string) => true,
     exists: async (_path: string) => false,
     list: async (_path: string) => [] as string[],
     stat: async (_path: string) => null as unknown,
   },
-  cdn: {
-    get: async (_url: string) => null as unknown,
+  cdn: {, get: async (_url: string) => null as unknown,
     put: async (_url: string, _data: any) => true,
     delete: async (_url: string) => true,
     purge: async (_pattern: string) => true,
   },
-  browser: {
-    localStorage: {
+  browser: {, localStorage: {
       get: (_key: string) => globalThis.localStorage?.getItem(_key) ?? null,
       set: (_key: string, value: string) => globalThis.localStorage?.setItem(_key, value),
       delete: (_key: string) => globalThis.localStorage?.removeItem(_key),
       clear: () => globalThis.localStorage?.clear(),
     },
-    sessionStorage: {
-      get: (_key: string) => globalThis.sessionStorage?.getItem(_key) ?? null,
+    sessionStorage: {, get: (_key: string) => globalThis.sessionStorage?.getItem(_key) ?? null,
       set: (_key: string, value: string) => globalThis.sessionStorage?.setItem(_key, value),
       delete: (_key: string) => globalThis.sessionStorage?.removeItem(_key),
       clear: () => globalThis.sessionStorage?.clear(),
     },
-    indexedDB: {
-      open: async (_name: string) => null as unknown,
+    indexedDB: {, open: async (_name: string) => null as unknown,
       get: async (_key: string) => null as unknown,
       set: async (_key: string, _value: any) => true,
       delete: async (_key: string) => true,
@@ -140,8 +131,7 @@ export const databaseEntityProperties = {
     return obj;
   },
   // Common legal document properties
-  legalDocumentProperties: {
-    case_id: null,
+  legalDocumentProperties: {, case_id: null,
     document_id: null,
     content: '',
     metadata: {} as Record<string, unknown>,
@@ -152,8 +142,7 @@ export const databaseEntityProperties = {
     type: 'document',
   },
   // Chat/message properties
-  messageProperties: {
-    message: '',
+  messageProperties: {, message: '',
     role: 'user',
     timestamp: new Date().toISOString(),
     sources: [] as unknown[],
@@ -161,8 +150,7 @@ export const databaseEntityProperties = {
     user_id: null,
   },
   // Cache entry properties
-  cacheEntryProperties: {
-    lastAccessed: Date.now(),
+  cacheEntryProperties: {, lastAccessed: Date.now(),
     accessCount: 0,
     createdAt: Date.now(),
     expiresAt: Date.now() + 3600000, // 1 hour
@@ -198,7 +186,7 @@ export const webGPUExtendedMethods = {
           listeners.delete(listener);
         }
       };
-      dev.dispatchEvent = (event: { type: string; [k: string]: any }) => {
+      dev.dispatchEvent = (event: {, type: string; [k: string]: any }) => {
         const listeners = eventListeners.get(event.type);
         if (listeners) {
           for (const listener of Array.from(listeners)) {
@@ -288,8 +276,7 @@ export const lokiCollectionMethods = {
 }; // ===== CONFIGURATION PROPERTIES BARREL STORE =====
 export const configurationProperties = {
   // Cache configuration with missing properties
-  cacheConfiguration: {
-    layers: [],
+  cacheConfiguration: {, layers: [],
     defaultTtl: 3600000, // 1 hour
     maxMemoryUsage: 1024 * 1024 * 100, // 100MB
     enableCompression: true,
@@ -303,22 +290,19 @@ export const configurationProperties = {
     defaultTTL: 3600000, // alias for defaultTtl to handle both naming conventions
   },
   // Cache strategy properties
-  cacheStrategy: {
-    readStrategy: 'cache-first',
+  cacheStrategy: {, readStrategy: 'cache-first',
     writeStrategy: 'write-through',
     evictionStrategy: 'lru',
     replicationStrategy: 'none',
   },
   // Cache policy properties
-  cachePolicy: {
-    evictionStrategy: 'lru',
+  cachePolicy: {, evictionStrategy: 'lru',
     maxSize: 1000,
     ttl: 3600000,
     compressionEnabled: false,
   },
   // Cache metrics with missing properties
-  cacheMetrics: {
-    hits: 0,
+  cacheMetrics: {, hits: 0,
     misses: 0,
     errors: 0,
     gets: 0,
@@ -332,16 +316,14 @@ export const configurationProperties = {
     averageOperationTime: 0,
   },
   // Cache analytics with missing properties
-  cacheAnalytics: {
-    accessPatterns: new Map(),
+  cacheAnalytics: {, accessPatterns: new Map(),
     hotKeys: new Set(),
     coldKeys: new Set(),
     performanceMetrics: {} as Record<string, any>,
     usageStats: {} as Record<string, any>,
   },
   // Cache entry with missing properties
-  cacheEntry: {
-    value: null,
+  cacheEntry: {, value: null,
     metadata: {} as Record<string, any>,
     ttl: 3600000,
     createdAt: Date.now(),
@@ -351,8 +333,7 @@ export const configurationProperties = {
     compressed: false,
   },
   // Cache stats with missing properties
-  cacheStats: {
-    totalEntries: 0,
+  cacheStats: {, totalEntries: 0,
     memoryUsage: 0,
     hitRate: 0,
     size: 0,

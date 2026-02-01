@@ -70,25 +70,20 @@ export const shaderCacheEntries = pgTable("shader_cache_entries", {
 }));
 
 export interface ShaderPredictionContext {
-    userId: string;
-    currentWorkflow: string;
+    userId: string;, currentWorkflow: string;
     caseContext?: unknown;
     userHistory?: any[];
     sessionContext?: unknown;
 }
 
 export interface ReinforcementReward {
-    timestamp: number;
-    reward: number;
-    context: string;
-    performanceBonus: number;
+    timestamp: number;, reward: number;
+    context: string;, performanceBonus: number;
     userSatisfactionScore: number;
 }
 
 export interface PredictionResult {
-    shaderCacheId: string;
-    confidence: number;
-    model: string;
-    features: Record<string, any>;
+    shaderCacheId: string;, confidence: number;
+    model: string;, features: Record<string, any>;
     priority: number;
 }

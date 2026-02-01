@@ -2,8 +2,7 @@
 // Consolidated GPU Tensor Worker (Restored)
 
 export type MultiDimArray = {
-    shape: number[];
-    data: Float32Array | number[];
+    shape: number[];, data: Float32Array | number[];
     layout?: string;
     cacheKey?: string;
     timestamp?: number;
@@ -34,10 +33,8 @@ export interface WorkerResponse {
 }
 
 export interface GPUProcessingStats {
-    totalProcessed: number;
-    cacheHitRate: number;
-    averageProcessingTime: number;
-    webgpuSupported: boolean;
+    totalProcessed: number;, cacheHitRate: number;
+    averageProcessingTime: number;, webgpuSupported: boolean;
     lastProcessedTime?: number;
 }
 
@@ -50,7 +47,7 @@ class GPUTensorWorker {
         webgpuSupported: false
     };
 
-    async initialize(config?: { goServiceUrl?: string; cacheLimit?: number }): Promise<{ webgpuSupported: boolean }> {
+    async initialize(config?: { goServiceUrl?: string; cacheLimit?: number }): Promise<{, webgpuSupported: boolean }> {
         if (config?.cacheLimit) this.cacheLimit = config.cacheLimit;
         return { webgpuSupported: false }; // Stub
     }
@@ -91,12 +88,11 @@ self.onmessage = async (ev: MessageEvent<WorkerMessage>) => {
                 const results = await worker.processBatch(msg.data as MultiDimArray[]);
                 self.postMessage({ type: 'SUCCESS', id: msg.id, data: results });
                 break;
-            case 'GET_STATS':
-                self.postMessage({ type: 'STATS', id: msg.id, data: worker.getStats() });
+            case 'GET_STATS': self.postMessage({, type: 'STATS', id: msg.id, data: worker.getStats() });
                 break;
             case 'CLEAR_CACHE':
                 worker.clearCache();
-                self.postMessage({ type: 'SUCCESS', id: msg.id, data: { cleared: true } });
+                self.postMessage({ type: 'SUCCESS', id: msg.id, data: {, cleared: true } });
                 break;
         }
     } catch (err) {

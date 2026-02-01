@@ -33,11 +33,11 @@ Shows complete workflow from user input to AI-powered results -->
 
  // Demo data for quick testing
  const demoData = {
- legalResearch: { query: 'breach of contract damages in commercial agreements',
+ legalResearch: {, query: 'breach of contract damages in commercial agreements',
  jurisdiction: 'federal',
  userRole: 'attorney'
  },
- documentProcessing: { content: `PURCHASE AGREEMENT
+ documentProcessing: {, content: `PURCHASE AGREEMENT
 This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Corporation ("Buyer") and XYZ Ltd ("Seller").
 1. PURCHASE PRICE: The total purchase price shall be $500,000.
 2. DELIVERY: Seller agrees to deliver the goods within 30 days of contract execution.
@@ -46,7 +46,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 [Additional standard terms and conditions...]`,
  documentType: 'contract'
  },
- caseCreation: { title: 'Smith v. Johnson Contract Dispute',
+ caseCreation: {, title: 'Smith v. Johnson Contract Dispute',
  description: 'Commercial contract dispute involving breach of delivery terms and damages claim. Client seeks recovery of $75,000 in damages plus attorney fees.',
  caseType: 'civil'
  }
@@ -222,7 +222,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="research-query">Research Query</label>
- <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+ <textarea id="research-query" bind:value={legalResearchForm.query} placeholder="Enter your legal research question..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="3"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>
@@ -251,7 +251,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-content">Document Content</label>
- <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="6"></textarea>
+ <textarea id="document-content" bind:value={documentProcessingForm.content} placeholder="Paste your document content here..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="6"></textarea>
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="document-type">Document Type</label>
@@ -270,11 +270,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="space-y-4">
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-title">Case Title</label>
- <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" />
+ <input id="case-title" type="text" bind:value={caseCreationForm.title} placeholder="Enter case title..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" />
  </div>
  <div>
  <label class="block text-sm font-medium text-gray-700" for="case-description">Case Description</label>
- <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" rows="4"></textarea>
+ <textarea id="case-description" bind:value={caseCreationForm.description} placeholder="Describe the case details..." class="w-full p-3 border border-gray-300 rounded-md focus: ring-2, focus:ring-blue-500" rows="4"></textarea>
  </div>
  <div class="grid grid-cols-2 gap-4">
  <div>

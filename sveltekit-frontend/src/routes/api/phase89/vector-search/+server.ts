@@ -13,7 +13,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest',
+			body: JSON.stringify({, model: 'embeddinggemma:latest',
 				prompt: text
 			})
 		});

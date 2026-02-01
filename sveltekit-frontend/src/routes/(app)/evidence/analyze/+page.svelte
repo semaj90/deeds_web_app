@@ -7,7 +7,7 @@
 
 	// Define missing types
 	type SearchResult = {
-		status: string; sessionId: string;
+		status: string;, sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -21,14 +21,14 @@
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: { name: string; role: string; confidence: number }[];
-			timeline?: { event: string; date: string; importance: string }[];
+			personsOfInterest?: {, name: string; role: string;, confidence: number }[];
+			timeline?: {, event: string; date: string;, importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: { source: string;
-			processingTime: string; model: string;
+		metadata?: {, source: string;
+			processingTime: string;, model: string;
 		};
 	};
 
@@ -105,7 +105,7 @@
 			const response = await fetch('/api/v1/evidence/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ evidenceId: crypto.randomUUID(),
+				body: JSON.stringify({, evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
@@ -124,7 +124,7 @@
 			results = {
 				status: 'completed',
 				sessionId: data.data?.evidenceId ?? 'ai-session-' + Date.now(),
-     analysisResults: { summary: data.data?.analysis?.summary ?? 'Analysis completed',
+     analysisResults: {, summary: data.data?.analysis?.summary ?? 'Analysis completed',
 					confidence: data.data?.analysis?.confidence ?? 0.5,
 					keyFactsCount: data.data?.analysis?.keyFindings?.length ?? 0,
 					relevantLaws: data.data?.analysis?.relevantLaws ?? [],
@@ -142,7 +142,7 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results
@@ -152,7 +152,7 @@
 			results = {
 				status: 'completed',
 				sessionId: 'mock-session-' + Date.now(),
-     analysisResults: { documentType: evidenceType,
+     analysisResults: {, documentType: evidenceType,
 					keyFactsCount: Math.floor(Math.random() * 10) + 5,
 					personsOfInterest: [
 						{ name: 'John Doe', role: 'witness', confidence: 0.85 },
@@ -166,7 +166,7 @@
 					confidenceScore: 0.78,
 					nextSteps: ['Review additional witness statements', 'Obtain security footage', 'Examine financial records']
 				},
-				metadata: { source: 'mock-evidence-analyzer',
+				metadata: {, source: 'mock-evidence-analyzer',
 					processingTime: '45 seconds',
 					model: 'Legal Evidence AI v2.0 (Simulated)'
 				}

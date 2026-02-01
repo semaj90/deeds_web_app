@@ -4,7 +4,7 @@ import { productionLogger as logger } from '../production-logger.js';
 export class QdrantApiWrapper {
     private client: QdrantClient;
 
-    constructor(config: { url: string; apiKey?: string }) {
+    constructor(config: {, url: string; apiKey?: string }) {
         this.client = new QdrantClient({
             url: config.url,
             apiKey: config.apiKey,
@@ -87,7 +87,7 @@ export class QdrantApiWrapper {
         }
     }
 
-    async upsert(collectionName: string, options: { wait?: boolean; points: any[] }) {
+    async upsert(collectionName: string, options: { wait?: boolean;, points: any[] }) {
         try {
             const response = await this.client.upsert(collectionName, options);
             logger.debug(`Upserted ${options.points.length} points to ${collectionName}`, {
@@ -108,7 +108,7 @@ export class QdrantApiWrapper {
         }
     }
 
-    async search(collectionName: string, options: { vector: number[]; limit?: number; offset?: number; score_threshold?: number; with_payload?: boolean; with_vector?: boolean; filter?: any }) {
+    async search(collectionName: string, options: {, vector: number[]; limit?: number; offset?: number; score_threshold?: number; with_payload?: boolean; with_vector?: boolean; filter?: any }) {
         try {
             const response = await this.client.search(collectionName, options);
             logger.debug(`Search completed in ${collectionName}`, {
@@ -129,7 +129,7 @@ export class QdrantApiWrapper {
         }
     }
 
-    async retrieve(collectionName: string, options: { ids: (string | number)[]; with_payload?: boolean; with_vector?: boolean }) {
+    async retrieve(collectionName: string, options: {, ids: (string | number)[]; with_payload?: boolean; with_vector?: boolean }) {
         try {
             const response = await this.client.retrieve(collectionName, options);
             logger.debug(`Retrieved ${options.ids.length} points from ${collectionName}`, {

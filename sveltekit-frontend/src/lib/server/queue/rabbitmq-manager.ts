@@ -30,9 +30,9 @@ export class RabbitMQManager {
 
     private constructor() {
         // Initialize default queues
-        this.registerQueue({ name: 'document-processing', options: { durable: true } });
-        this.registerQueue({ name: 'deadLetter', options: { durable: true } });
-        this.registerQueue({ name: 'notifications', options: { durable: true } });
+        this.registerQueue({ name: 'document-processing', options: {, durable: true } });
+        this.registerQueue({ name: 'deadLetter', options: {, durable: true } });
+        this.registerQueue({ name: 'notifications', options: {, durable: true } });
     }
 
     public static getInstance(): RabbitMQManager {

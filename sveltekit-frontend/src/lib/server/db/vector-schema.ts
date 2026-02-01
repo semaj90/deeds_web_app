@@ -27,7 +27,7 @@ export const searchQueries = pgTable('search_queries', {
     queryEmbedding: vector('query_embedding', { dimensions: 384 }),
     searchType: text('search_type').notNull().default('semantic'),
     resultsCount: integer('results_count').default(0),
-    results: jsonb('results').default({ items: [], totalFound: 0, searchTime: 0 }),
+    results: jsonb('results').default({, items: [], totalFound: 0, searchTime: 0 }),
     createdAt: timestamp('created_at').defaultNow()
 }, (table) => ({
     userIdx: index('idx_search_user').on(table.userId),

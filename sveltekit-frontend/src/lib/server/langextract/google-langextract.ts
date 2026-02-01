@@ -20,11 +20,10 @@ Keywords:`;
         const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'gemma3:270m',
+            body: JSON.stringify({, model: 'gemma3:270m',
                 prompt,
                 stream: false,
-                options: { temperature: 0.3, num_predict: 200 }
+                options: {, temperature: 0.3, num_predict: 200 }
             }),
             signal: controller.signal
         });

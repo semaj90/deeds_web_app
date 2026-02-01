@@ -14,27 +14,20 @@ import type { ErrorReport } from './types.js';
 import { getOllamaService } from './OllamaService.js';
 
 export interface ClusteringConfig {
-	numClusters: number;
-	maxIterations: number;
-	convergenceThreshold: number;
-	useCUDA: boolean;
-	embeddingDimension: number;
-	minClusterSize: number;
+	numClusters: number;, maxIterations: number;
+	convergenceThreshold: number;, useCUDA: boolean;
+	embeddingDimension: number;, minClusterSize: number;
 }
 
 export interface ClusterResult {
-	clusterId: string;
-	centroid: number[];
-	members: ErrorReport[];
-	commonFeatures: string[];
+	clusterId: string;, centroid: number[];
+	members: ErrorReport[];, commonFeatures: string[];
 	description: string;
 }
 
 export interface ClassificationResult {
-	errorId: string;
-	clusterId: string;
-	confidence: number;
-	distance: number;
+	errorId: string;, clusterId: string;
+	confidence: number;, distance: number;
 }
 
 /**

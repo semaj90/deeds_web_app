@@ -4,20 +4,15 @@
  */
 
 export interface CacheLayer {
-	name: string;
-	maxSize: number;
-	maxAge: number;
-	priority: 'high' | 'medium' | 'low';
+	name: string;, maxSize: number;
+	maxAge: number;, priority: 'high' | 'medium' | 'low';
 	evictionPolicy: 'lru' | 'lfu' | 'fifo';
 }
 
 export interface CacheEntry<T> {
-	key: string;
-	value: T;
-	timestamp: number;
-	accessCount: number;
-	size: number;
-	layer: string;
+	key: string;, value: T;
+	timestamp: number;, accessCount: number;
+	size: number;, layer: string;
 }
 
 // Gaming console memory constraints

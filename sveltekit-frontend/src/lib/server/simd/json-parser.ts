@@ -10,14 +10,12 @@ import path from 'path';
 import os from 'os';
 
 interface ParseTask {
-    id: string;
-    json: string;
+    id: string;, json: string;
     chunkIndex: number;
 }
 
 interface ParseResult {
-    id: string;
-    data: unknown;
+    id: string;, data: unknown;
     chunkIndex: number;
     error?: string;
 }

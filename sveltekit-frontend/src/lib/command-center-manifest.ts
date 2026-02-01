@@ -1,11 +1,7 @@
 export type TabId = 'cases' | 'evidence' | 'persons' | 'system' | 'routes';
 
 export type CommandCenterRoute = {
-    tab: TabId;
-    href: string;
-    label: string;
-    description: string;
-    kind: 'page' | 'layout' | 'endpoint';
+    tab: TabId;, href: string;, label: string;, description: string;, kind: 'page' | 'layout' | 'endpoint';
     group: string;
     badges?: ('ai' | 'experimental' | 'system' | 'api')[];
     priority?: number;
@@ -17,23 +13,13 @@ export type CommandCenterRoute = {
 
 // Phase 72 Task Definition
 export type Phase72Task = {
-    id: string;
-    tab: TabId;
-    title: string;
-    description: string;
-    intent: string;
-    phase: number;
-    priority: 'high' | 'medium' | 'active' | 'complete';
+    id: string;, tab: TabId;, title: string;, description: string;, intent: string;, phase: number;, priority: 'high' | 'medium' | 'active' | 'complete';
     tags: string[];
-    actions?: Array<{
-        label: string;
-        command: string;
-        expected: string;
+    actions?: Array<{, label: string;, command: string;, expected: string;
     }>;
     validation?: {
         command?: string;
-        query?: string;
-        expectation: string;
+        query?: string;, expectation: string;
     };
     status?: Record<string, any>;
 };
@@ -212,27 +198,22 @@ export function getRoutesByTab(tab: TabId): CommandCenterRoute[] {
 
 // --- Phase 72 / Phase 78 wiring --- //
 export type RouteAstNode = {
-    id: string;
-    path: string;
-    file: string;
+    id: string;, path: string;, file: string;
 };
 
 export type RouteAstEdge = {
-    from: string;
-    to: string;
-    kind: 'load' | 'action' | 'link' | 'api';
+    from: string;, to: string;, kind: 'load' | 'action' | 'link' | 'api';
 };
 
 export type RouteAstGraph = {
-    nodes: RouteAstNode[];
-    edges: RouteAstEdge[];
+    nodes: RouteAstNode[];, edges: RouteAstEdge[];
 };
 
 export function enrichRoutesWithPhase72(
     base: CommandCenterRoute[],
     graph: RouteAstGraph,
     _shieldData: Record<string, unknown>,
-    errorSummary: Record<string, { totalErrors: number; lastSeen: string | null }>
+    errorSummary: Record<string, { totalErrors: number;, lastSeen: string | null }>
 ): CommandCenterRoute[] {
     return base.map((route) => {
         const summary = errorSummary[route.href];

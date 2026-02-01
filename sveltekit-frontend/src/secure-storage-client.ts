@@ -23,8 +23,7 @@ export interface DeleteResponse {
 }
 
 export interface StorageFile {
-    bucket: string;
-    key: string;
+    bucket: string;, key: string;
     url?: string;
     size?: number;
     type?: string;
@@ -90,7 +89,7 @@ export class SecureStorageClient {
                     const result = await response.json();
                     return { ok: false, error: result?.error ?? 'Upload failed' };
                 } catch {
-                    return { ok: false, error: `Upload failed: ${response.statusText}` };
+                    return { ok: false, error: `Upload, failed: ${response.statusText}` };
                 }
             }
 
@@ -122,7 +121,7 @@ export class SecureStorageClient {
                     const result = await response.json();
                     return { ok: false, error: result?.error ?? 'Delete failed' };
                 } catch {
-                    return { ok: false, error: `Delete failed: ${response.statusText}` };
+                    return { ok: false, error: `Delete, failed: ${response.statusText}` };
                 }
             }
 
@@ -172,9 +171,9 @@ export class SecureStorageClient {
         files: File[],
         bucket: string = 'legal-documents',
         onProgress?: (completed: number, total: number) => void
-    ): Promise<{ successful: UploadResponse[]; failed: { file: File; error: string }[] }> {
+    ): Promise<{, successful: UploadResponse[]; failed: {, file: File; error: string }[] }> {
         const successful: UploadResponse[] = [];
-        const failed: Array<{ file: File; error: string }> = [];
+        const failed: Array<{, file: File; error: string }> = [];
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];

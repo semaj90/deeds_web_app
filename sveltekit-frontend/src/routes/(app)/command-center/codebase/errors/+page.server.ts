@@ -1,21 +1,21 @@
 import type { PageServerLoad } from './$types';
 
 interface ErrorCard {
-    id: string; name: string;
-    errorCode: string; filePath: string;
-    line: number; col: number;
-    message: string; signature: string;
-    surface: string[]; tech: string[];
+    id: string;, name: string;
+    errorCode: string;, filePath: string;
+    line: number;, col: number;
+    message: string;, signature: string;
+    surface: string[];, tech: string[];
     clusterId: string | null;
-    severity: string; tool: string;
+    severity: string;, tool: string;
 }
 
 interface QdrantPoint {
-    id: number; payload: ErrorCard;
+    id: number;, payload: ErrorCard;
 }
 
 interface QdrantScrollResponse {
-    result: { points: QdrantPoint[];
+    result: {, points: QdrantPoint[];
         next_page_offset: string | null;
     };
 }
@@ -35,10 +35,10 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
             must.push({ key: 'errorCode', match: { value, errorCode } });
         }
         if (surface) {
-            must.push({ key: 'surface', match: { any: surface.split(',') } });
+            must.push({ key: 'surface', match: {, any: surface.split(',') } });
         }
         if (tech) {
-            must.push({ key: 'tech', match: { any: tech.split(',') } });
+            must.push({ key: 'tech', match: {, any: tech.split(',') } });
         }
         if (clusterId) {
             must.push({ key: 'clusterId', match: { value, clusterId } });
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
         const response = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ limit: with_payload: true,
+            body: JSON.stringify({, limit: with_payload, true,
                 filter
             })
         });
@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
             }
         }
 
-        return { errors: totalErrors: stats.result?.points_count ?? 0,
+        return { errors: totalErrors, stats.result?.points_count ?? 0,
             errorCodeCounts: surfaceCounts,
             techCounts,
             filters: { errorCode, surface, tech, clusterId },

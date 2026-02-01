@@ -10,8 +10,7 @@ import { statuteChunks, statutes } from '../db/schema-postgres.js';
 import { generateEmbedding } from './embedding-service.js';
 
 export interface StatuteSource {
- title: string;
- content: string;
+ title: string;, content: string;
  jurisdiction: string;
  section?: string;
  category?: string;
@@ -141,7 +140,7 @@ export async function createStatuteChunks(
 export async function ingestStatuteWithChunks(
  source: StatuteSource,
  chunkingOptions?: ChunkingOptions
-): Promise<{ statuteId: string; chunksCreated: number }> {
+): Promise<{, statuteId: string; chunksCreated: number }> {
  // Ingest statute
  const statuteId = await ingestStatute(source);
 
@@ -157,7 +156,7 @@ export async function ingestStatuteWithChunks(
 export async function batchIngestStatutes(
  sources: StatuteSource[],
  chunkingOptions?: ChunkingOptions
-): Promise<Array<{ statuteId: string; chunksCreated: number; error?: string }>> {
+): Promise<Array<{, statuteId: string; chunksCreated: number; error?: string }>> {
  const results = [];
 
  for (const source of sources) {
@@ -183,8 +182,8 @@ export async function searchStatuteChunks(
  threshold: number = 0.5
 ): Promise<
  Array<{
- id: string; statuteId: string;
- content: string; similarity: number;
+ id: string;, statuteId: string;
+ content: string;, similarity: number;
  }>
 > {
  const chunks = await db.select().from(statuteChunks);
@@ -219,10 +218,8 @@ export async function searchStatuteChunks(
  .slice(0, topK);
 
  return results.filter((item) => item !== null) as Array<{
-  id: string;
-  statuteId: string;
-  content: string;
-  similarity: number;
+  id: string;, statuteId: string;
+  content: string;, similarity: number;
  }>;
 }
 
@@ -250,12 +247,9 @@ export async function getStatuteWithChunks(statuteId: string) {
 /**
  * Get ingestion statistics
  */
-export async function getIngestionStats(): Promise<{
- totalStatutes: number;
- totalChunks: number;
- chunksWithEmbeddings: number;
- jurisdictions: string[];
- categories: string[];
+export async function getIngestionStats(): Promise<{, totalStatutes: number;
+ totalChunks: number;, chunksWithEmbeddings: number;
+ jurisdictions: string[];, categories: string[];
 }> {
  const allStatutes = await db.select().from(statutes);
  const allChunks = await db.select().from(statuteChunks);

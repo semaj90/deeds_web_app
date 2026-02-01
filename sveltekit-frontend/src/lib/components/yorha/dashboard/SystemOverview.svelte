@@ -91,7 +91,7 @@
  {/if}
  </div>
 
- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+ <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 gap-4">
  <!-- Overall Health -->
  <div class="bg-slate-700/30 rounded-lg p-4">
  <div class="flex items-center justify-between mb-2">

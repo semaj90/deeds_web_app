@@ -7,7 +7,7 @@
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string; title: string;
+ id: string;, title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -15,22 +15,22 @@
 
  interface JudicialAnalysis {
  id: string;
- caseId?: string; generatedAt: string;
- admissibility: Array<{ evidence: string;
+ caseId?: string;, generatedAt: string;
+ admissibility: Array<{, evidence: string;
  ruling: 'admissible' | 'inadmissible' | 'conditional';
- reasoning: string; legalBasis: string;
+ reasoning: string;, legalBasis: string;
  }>;
- probableCause: { assessment: 'strong' | 'moderate' | 'weak' | 'none';
- reasoning: string; factors: string[];
+ probableCause: {, assessment: 'strong' | 'moderate' | 'weak' | 'none';
+ reasoning: string;, factors: string[];
  };
- caseStrength: { overall: number; // 0-100
- prosecution: number; defense: number;
- keyFactors: Array<{ factor: string;
+ caseStrength: {, overall: number; // 0-100
+ prosecution: number;, defense: number;
+ keyFactors: Array<{, factor: string;
  impact: 'positive' | 'negative' | 'neutral';
  weight: number;
  }>;
  };
- recommendations: string[]; risks: string[];
+ recommendations: string[];, risks: string[];
  summary: string;
  }
 
@@ -63,8 +63,7 @@
  headers: {
  'Content-Type': 'application/json'
  },
- body: JSON.stringify({
- caseId: evidence,
+ body: JSON.stringify({, caseId: evidence,
  charges: jurisdiction
  })
  });

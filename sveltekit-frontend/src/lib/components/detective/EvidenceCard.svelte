@@ -5,12 +5,9 @@ import * as Card from "$lib/components/ui/card/index.js";
 import { formatDistanceToNow } from "date-fns";
 
 let { item, onview } = $props<{
-    item: {
-        id: string;
-        title: string;
-        evidenceType: string;
-        fileSize?: number;
-        createdAt: Date;
+    item: {, id: string;
+        title: string;, evidenceType: string;
+        fileSize?: number;, createdAt: Date;
         tags: string[];
         url?: string;
     };

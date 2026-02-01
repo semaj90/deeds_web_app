@@ -179,7 +179,7 @@ export function useRedisTaskQueue() {
 }
 
 export function useRedisComponentCache(config: ComponentCacheConfig = {}) {
-    const cacheStats = $state<{ hits: number; misses: number }>({ hits: 0, misses: 0 });
+    const cacheStats = $state<{ hits: number;, misses: number }>({ hits: 0, misses: 0 });
 
     function getCacheStats() {
         return cacheStats;

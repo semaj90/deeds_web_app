@@ -9,8 +9,7 @@ export interface EmbedGatewayOptions {
 }
 
 export interface EmbedGatewayResult {
-  embedding: number[];
-  backend: BackendId;
+  embedding: number[];, backend: BackendId;
   model: string;
 }
 
@@ -25,8 +24,7 @@ export async function getEmbeddingViaGate(
     const response = await fetchFn(`${OLLAMA_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: model,
+      body: JSON.stringify({, model: model,
         prompt: text,
       }),
     });

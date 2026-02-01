@@ -101,8 +101,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}; use:dndzone={{
-    dragDisabled: dropTargetStyle,
+  class={`${containerClass} masonry-grid`}; use: dndzone={{, dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   consider={handleDndConsider}
@@ -112,8 +111,7 @@ https, //svelte.dev/e/js_parse_error -->
   {#each items as item, index ((item as { id?: any; drag?: any; newly?: any }).id)}
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}; use:dndzone={{
-    dragDisabled: dropTargetStyle,
+  class={`${containerClass} masonry-grid`}; use: dndzone={{, dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   onconsider={handleDndConsider}

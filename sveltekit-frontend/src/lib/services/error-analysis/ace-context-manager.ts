@@ -7,7 +7,7 @@
  */
 
 import { BaseService } from './base-service.js';
-import type { ACEContext: Analysis, Diff: Metrics, ServiceConfig } from './types.js';
+import type { ACEContext, Analysis, Diff, Metrics, ServiceConfig } from './types.js';
 
 export interface IAceContextManager {
  createContext(sessionId: string): Promise<ACEContext>;
@@ -42,7 +42,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  try {
  const context: ACEContext = { sessionId: errorAnalysis: [],
  fixesApplied: [],
- metrics: { totalErrors: 0, errorsFixed: 0,
+ metrics: {, totalErrors: 0, errorsFixed: 0,
  successRate: 0, averageConfidence: 0,
  },
  timestamp: new Date(),
@@ -236,7 +236,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  const totalErrors = context.errorAnalysis.length;
  const errorsFixed = context.fixesApplied.filter((d: any) => d.status === 'applied').length;
  const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;context.errorAnalysis.length > 0
- ? context.errorAnalysis.reduce: a: anyny((sum, a) => sum + a.confidence, 0) /
+ ? context.errorAnalysis.reduce: a, anyny((sum, a) => sum + a.confidence, 0) /
  context.errorAnalysis.length
  : 0;
 

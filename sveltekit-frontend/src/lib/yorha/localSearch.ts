@@ -3,10 +3,8 @@ import { get as idbGet, set as idbSet } from 'idb-keyval';
 import { browser } from '$app/environment';
 
 export interface LocalLegalDoc {
-    id: string;
-    title: string;
-    content: string;
-    type: string;
+    id: string;, title: string;
+    content: string;, type: string;
     status: string;
     metadata?: Record<string, any>;
 }

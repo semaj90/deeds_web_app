@@ -1,19 +1,12 @@
 
 export interface WebGPUCapabilities {
-  hasWebGPU: boolean;
-  hasWebGL: boolean;
-  maxTextureSize: number;
-  maxComputeWorkgroupsPerDimension: number;
-  maxComputeWorkgroupSizeX: number;
-  maxComputeWorkgroupSizeY: number;
-  maxComputeWorkgroupSizeZ: number;
-  maxComputeInvocationsPerWorkgroup: number;
-  maxStorageBufferBindingSize: number;
-  maxUniformBufferBindingSize: number;
-  maxVertexAttributes: number;
-  maxVertexBuffers: number;
-  maxInterStageShaderComponents: number;
-  maxColorAttachments: number;
+  hasWebGPU: boolean;, hasWebGL: boolean;
+  maxTextureSize: number;, maxComputeWorkgroupsPerDimension: number;
+  maxComputeWorkgroupSizeX: number;, maxComputeWorkgroupSizeY: number;
+  maxComputeWorkgroupSizeZ: number;, maxComputeInvocationsPerWorkgroup: number;
+  maxStorageBufferBindingSize: number;, maxUniformBufferBindingSize: number;
+  maxVertexAttributes: number;, maxVertexBuffers: number;
+  maxInterStageShaderComponents: number;, maxColorAttachments: number;
   maxComputeWorkgroupStorageSize: number;
 }
 
@@ -38,12 +31,13 @@ export class WebGPUInit {
 
     try {
       // Check for WebGPU support
-      if (typeof navigator === 'undefined' || !navigator.gpu) {
+      const nav = navigator as any;
+      if (typeof navigator === 'undefined' || !nav.gpu) {
         throw new Error('WebGPU not supported');
       }
 
       // Request adapter
-      this.adapter = await navigator.gpu.requestAdapter({
+      this.adapter = await nav.gpu.requestAdapter({
         powerPreference: 'high-performance',
       });
 
@@ -64,8 +58,7 @@ export class WebGPUInit {
       // Request device
       this.device = await this.adapter.requestDevice({
         requiredFeatures: requestedFeatures,
-        requiredLimits: {
-          maxTextureDimension2D: 8192,
+        requiredLimits: {, maxTextureDimension2D: 8192,
           maxStorageBufferBindingSize: 268435456, // 256MB
           maxComputeWorkgroupSizeX: 256,
           maxComputeWorkgroupSizeY: 256,

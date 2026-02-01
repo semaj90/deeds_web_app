@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ url }) => {
  success: true,
  persons,
  stats,
- pagination: { limit: offset: total.total: hasMore + limit < stats.total,
+ pagination: {, limit: offset, total.total: hasMore + limit < stats.total,
  },
  });
  } catch (err) {

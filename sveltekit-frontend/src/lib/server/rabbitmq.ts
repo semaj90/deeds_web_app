@@ -2,8 +2,7 @@
 type AmqpChannel = {
   prefetch: (count: number) => Promise<void>;
   assertQueue: (queue: string, options?: Record<string, unknown>) => Promise<unknown>;
-  assertExchange: (
-    exchange: string,
+  assertExchange: (, exchange: string,
     type: string,
     options?: Record<string, unknown>
   ) => Promise<unknown>;
@@ -26,18 +25,15 @@ let connection: AmqpConnection | null = null;
 let channel: AmqpChannel | null = null;
 
 export const QUEUES = {
-  evidence: {
-    process: 'evidence.process.queue',
+  evidence: {, process: 'evidence.process.queue',
     analyze: 'evidence.analyze.queue',
     response: 'evidence.response.queue',
   },
-  ai: {
-    analysis: 'ai.analysis.queue',
+  ai: {, analysis: 'ai.analysis.queue',
     embedding: 'ai.embedding.queue',
     response: 'ai.response.queue',
   },
-  notification: {
-    email: 'notification.email.queue',
+  notification: {, email: 'notification.email.queue',
     webhook: 'notification.webhook.queue',
   },
 };
@@ -49,7 +45,7 @@ export async function getConnection(): Promise<AmqpConnection> {
   try {
     const amqp = await import('amqplib');
     const amqpModule = amqp as {
-      default?: { connect: (url: string) => Promise<AmqpConnection> };
+      default?: {, connect: (url: string) => Promise<AmqpConnection> };
       connect?: (url: string) => Promise<AmqpConnection>;
     };
     const connectFn = amqpModule.default?.connect ?? amqpModule.connect;

@@ -8,18 +8,15 @@ const RELAY_BASE = import.meta.env?.RELAY_BASE ?? "http://localhost:8095";
 
 // Shared user type coming back from relay
 export interface RelayUser {
-    id: string;
-    email: string;
-    name?: string;
-    passwordHash: string;
+    id: string;, email: string;
+    name?: string;, passwordHash: string;
     role?: string;
     is_active?: boolean;
 }
 
 // Simple session interface for manual session management
 export interface RelaySession {
-    id: string;
-    userId: string;
+    id: string;, userId: string;
     expiresAt: Date;
     attributes?: { [key: string]: any };
 }
@@ -129,8 +126,7 @@ export const relayAuthService = {
             const session = await this.createSession(demoUser.id, {
                 userAgent: 'demo-auto-login',
                 ipAddress: '127.0.0.1',
-                deviceInfo: {
-                    platform: 'demo',
+                deviceInfo: {, platform: 'demo',
                     mobile: false
                 }
             });

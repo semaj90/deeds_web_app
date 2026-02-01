@@ -47,7 +47,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
             };
 
             // Send initial connection message
-            safeEnqueue(`data: ${JSON.stringify({ type: 'connected', userId })}\n\n`);
+            safeEnqueue(`data: ${JSON.stringify({, type: 'connected', userId })}\n\n`);
 
             // Setup keep-alive interval (every 30s)
             keepAliveInterval = setInterval(() => {
@@ -65,9 +65,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
                             clearInterval(simulateInterval);
                             simulateInterval = null;
                         }
-                        safeEnqueue(`data: ${JSON.stringify({ type: 'complete', docId: '123' })}\n\n`);
+                        safeEnqueue(`data: ${JSON.stringify({, type: 'complete', docId: '123' })}\n\n`);
                     } else {
-                        safeEnqueue(`data: ${JSON.stringify({ type: 'progress', progress, status: 'processing' })}\n\n`);
+                        safeEnqueue(`data: ${JSON.stringify({, type: 'progress', progress, status: 'processing' })}\n\n`);
                     }
                 }, 1000);
             }

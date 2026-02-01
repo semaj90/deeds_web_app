@@ -13,10 +13,7 @@ interface CacheOptions {
 }
 
 interface CachedDocument {
-	id: string;
-	data: any;
-	createdAt: number;
-	expiresAt: number;
+	id: string;, data: any;, createdAt: number;, expiresAt: number;
 	meta?: any;
 }
 

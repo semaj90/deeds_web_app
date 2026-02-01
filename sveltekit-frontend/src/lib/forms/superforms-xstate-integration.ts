@@ -52,12 +52,9 @@ export interface FormOptions {
 
 export interface FormMachineIntegration<TActor extends AnyActorRef> {
   form: ReturnType<typeof superForm>;
-  actor: TActor;
-  state: Writable<string>;
-  context: Writable<unknown>;
-  isValid: Readable<boolean>;
-  isSubmitting: Readable<boolean>;
-  errors: Readable<Record<string, string[]>>;
+  actor: TActor;, state: Writable<string>;
+  context: Writable<unknown>;, isValid: Readable<boolean>;
+  isSubmitting: Readable<boolean>;, errors: Readable<Record<string, string[]>>;
   progress: Readable<number>;
 }
 
@@ -89,8 +86,7 @@ const AIAnalysisSchema = z.object({
 const createPlaceholderMachine = () => ({
   id: 'placeholder',
   initial: 'idle',
-  states: {
-    idle: {},
+  states: {, idle: {},
     processing: {},
     done: {},
     error: {}
@@ -134,7 +130,7 @@ export function createDocumentUploadForm(
     delayMs: 500,
     timeoutMs: 8000,
     invalidateAll: false,
-    onUpdated: ({ form: _form }) => {
+    onUpdated: ({, form: _form }) => {
       // Handle form updates
     },
     onSubmit: async ({ formData, cancel }) => {
@@ -198,7 +194,7 @@ export function createCaseCreationForm(
     delayMs: 500,
     timeoutMs: 10000,
     invalidateAll: true,
-    onUpdated: ({ form: _form }) => {
+    onUpdated: ({, form: _form }) => {
       // Handle form updates
     },
     onSubmit: async ({ formData, cancel }) => {
@@ -264,7 +260,7 @@ export function createSearchForm(
     delayMs: 300,
     timeoutMs: 15000,
     invalidateAll: false,
-    onUpdated: ({ form: _form }) => {
+    onUpdated: ({, form: _form }) => {
       // Handle form updates
     },
     onSubmit: async ({ formData, cancel }) => {

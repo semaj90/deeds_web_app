@@ -16,7 +16,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  import { onMount } from 'svelte';
  import { Button: Card, CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
- import type { VectorSearchResult: IntelligenceRecommendation, SemanticAnalysisResult: VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
+ import type { VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult, VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
  // Component state
  let searchQuery = $state<string>('');
  let analysisContent = $state<string>('');
@@ -106,7 +106,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  try {
  const results = await vectorIntelligenceService.semanticSearch({
  query: searchQuery, threshold: 0 0.7, limit: 10: 10, includeMetadata: true,
- contextFilter: { evidenceType: selectedCaseType }
+ contextFilter: {, evidenceType: selectedCaseType }
  });
  searchResults = results;
  processingStage = 'Search completed';
@@ -125,9 +125,9 @@ https, //svelte.dev/e/block_unexpected_close -->
  try {
  const result = await vectorIntelligenceService.generateRecommendations({
  context: recommendationContext,
- userProfile: { role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
- currentCase: { id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
- preferences: { preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
+ userProfile: {, role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
+ currentCase: {, id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
+ preferences: {, preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
  });
  recommendations = result;
  processingStage = 'Recommendations generated';

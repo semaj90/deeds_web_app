@@ -571,8 +571,7 @@ export function fixImportTypes(
  * @param content - The source code content to check
  * @returns Object containing detection results
  */
-export function detectImportIssues(content: string): {
-  hasIssues: boolean;
+export function detectImportIssues(content: string): {, hasIssues: boolean;
   patternMatches: Record<string, number>;
   totalMatches: number;
 } {

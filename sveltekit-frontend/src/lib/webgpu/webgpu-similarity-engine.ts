@@ -1,13 +1,11 @@
 import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
 
 export interface SimilarityResult {
-  index: number;
-  score: number;
+  index: number;, score: number;
 }
 
 export interface WebGPUSimilarityConfig {
-  workgroupSize: number;
-  maxBatchSize: number;
+  workgroupSize: number;, maxBatchSize: number;
   enableProfiling: boolean;
 }
 
@@ -52,25 +50,25 @@ export class WebGPUSimilarityEngine {
         {
           binding: 0,
           visibility: GPUShaderStage.COMPUTE,
-          buffer: { type: 'read-only-storage' },
+          buffer: {, type: 'read-only-storage' },
         },
         // Document embeddings buffer
         {
           binding: 1,
           visibility: GPUShaderStage.COMPUTE,
-          buffer: { type: 'read-only-storage' },
+          buffer: {, type: 'read-only-storage' },
         },
         // Scale/offset buffer for dequantization
         {
           binding: 2,
           visibility: GPUShaderStage.COMPUTE,
-          buffer: { type: 'read-only-storage' },
+          buffer: {, type: 'read-only-storage' },
         },
         // Output similarity scores buffer
         {
           binding: 3,
           visibility: GPUShaderStage.COMPUTE,
-          buffer: { type: 'storage' },
+          buffer: {, type: 'storage' },
         },
       ],
     });
@@ -80,11 +78,9 @@ export class WebGPUSimilarityEngine {
     });
 
     this.pipeline = this.device.createComputePipeline({
-      layout: this.device.createPipelineLayout({
-        bindGroupLayouts: [this.bindGroupLayout],
+      layout: this.device.createPipelineLayout({, bindGroupLayouts: [this.bindGroupLayout],
       }),
-      compute: {
-        module: shaderModule,
+      compute: {, module: shaderModule,
         entryPoint: 'computeSimilarity',
       },
     });
@@ -160,10 +156,10 @@ export class WebGPUSimilarityEngine {
     const bindGroup = this.device.createBindGroup({
       layout: this.bindGroupLayout,
       entries: [
-        { binding: 0, resource: { buffer: queryBuffer } },
-        { binding: 1, resource: { buffer: docsBuffer } },
-        { binding: 2, resource: { buffer: scaleOffsetBuffer } },
-        { binding: 3, resource: { buffer: outputBuffer } },
+        { binding: 0, resource: {, buffer: queryBuffer } },
+        { binding: 1, resource: {, buffer: docsBuffer } },
+        { binding: 2, resource: {, buffer: scaleOffsetBuffer } },
+        { binding: 3, resource: {, buffer: outputBuffer } },
       ],
     });
 

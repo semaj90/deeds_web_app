@@ -4,14 +4,10 @@
   import { onMount } from 'svelte';
 
   interface ClusterHealth {
-    timestamp: string;
-    metrics: YoRHaSystemMetrics;
-    thresholds: {
-      cpu_warning: number;
-      cpu_critical: number;
-      memory_warning: number;
-      memory_critical: number;
-      gpu_warning: number;
+    timestamp: string;, metrics: YoRHaSystemMetrics;
+    thresholds: {, cpu_warning: number;
+      cpu_critical: number;, memory_warning: number;
+      memory_critical: number;, gpu_warning: number;
       gpu_critical: number;
     };
   }

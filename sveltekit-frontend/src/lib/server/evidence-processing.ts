@@ -7,8 +7,7 @@ import { createActor, createMachine, assign } from 'xstate';
 
 // Types
 export interface Evidence {
-	id: string;
-	fileName: string;
+	id: string;, fileName: string;
 	fileType?: string;
 	fileSize?: number;
 	uploadedBy?: string;
@@ -17,10 +16,8 @@ export interface Evidence {
 }
 
 export interface EvidenceAnalysisResult {
-	success: boolean;
-	fileId: string;
-	summary: string;
-	autoTags: string[];
+	success: boolean;, fileId: string;
+	summary: string;, autoTags: string[];
 	processingTimeMs: number;
 	embedding?: number[];
 }
@@ -28,15 +25,13 @@ export interface EvidenceAnalysisResult {
 export interface WorkflowContext {
 	currentFile?: Evidence;
 	result?: EvidenceAnalysisResult;
-	error?: string;
-	progress: number;
+	error?: string;, progress: number;
 	stage: 'upload' | 'analysis' | 'embedding' | 'storage' | 'complete';
 	retryCount: number;
 }
 
 export interface AnalysisUpdate {
-	summary: string;
-	autoTags: string[];
+	summary: string;, autoTags: string[];
 }
 
 // Simple storage stubs
@@ -153,95 +148,72 @@ async function storeVectors(context: WorkflowContext): Promise<EvidenceAnalysisR
 const evidenceProcessingMachine = createMachine({
 	id: 'evidenceProcessing',
 	initial: 'idle',
-	context: {
-		currentFile: undefined,
+	context: {, currentFile: undefined,
 		result: undefined,
 		error: undefined,
 		progress: 0,
 		stage: 'upload',
 		retryCount: 0
 	} as WorkflowContext,
-	states: {
-		idle: {
-			on: {
-				PROCESS_EVIDENCE: {
+	states: {, idle: {
+			on: {, PROCESS_EVIDENCE: {
 					target: 'analyzing',
-					actions: assign({
-						currentFile: ({ event }) => (event as any).data,
+					actions: assign({, currentFile: ({ event }) => (event as any).data,
 						progress: () => 25,
 						stage: () => 'analysis' as const
 					})
 				}
 			}
 		},
-		analyzing: {
-			invoke: {
+		analyzing: {, invoke: {
 				src: async ({ context }) => analyzeWithAI(context),
-				onDone: {
-					target: 'embedding',
-					actions: assign({
-						result: ({ event }) => event.output,
+				onDone: {, target: 'embedding',
+					actions: assign({, result: ({ event }) => event.output,
 						progress: () => 50,
 						stage: () => 'embedding' as const
 					})
 				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => (event.error as Error).message,
+				onError: {, target: 'failed',
+					actions: assign({, error: ({ event }) => (event.error as Error).message,
 						stage: () => 'complete' as const
 					})
 				}
 			}
 		},
-		embedding: {
-			invoke: {
+		embedding: {, invoke: {
 				src: async ({ context }) => generateEmbeddings(context),
-				onDone: {
-					target: 'storing',
-					actions: assign({
-						result: ({ event }) => event.output,
+				onDone: {, target: 'storing',
+					actions: assign({, result: ({ event }) => event.output,
 						progress: () => 75,
 						stage: () => 'storage' as const
 					})
 				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => (event.error as Error).message,
+				onError: {, target: 'failed',
+					actions: assign({, error: ({ event }) => (event.error as Error).message,
 						stage: () => 'complete' as const
 					})
 				}
 			}
 		},
-		storing: {
-			invoke: {
+		storing: {, invoke: {
 				src: async ({ context }) => storeVectors(context),
-				onDone: {
-					target: 'completed',
-					actions: assign({
-						progress: () => 100,
+				onDone: {, target: 'completed',
+					actions: assign({, progress: () => 100,
 						stage: () => 'complete' as const
 					})
 				},
-				onError: {
-					target: 'failed',
-					actions: assign({
-						error: ({ event }) => (event.error as Error).message,
+				onError: {, target: 'failed',
+					actions: assign({, error: ({ event }) => (event.error as Error).message,
 						stage: () => 'complete' as const
 					})
 				}
 			}
 		},
-		completed: {
-			type: 'final'
+		completed: {, type: 'final'
 		},
-		failed: {
-			on: {
-				RETRY: {
-					target: 'analyzing',
-					actions: assign({
-						retryCount: ({ context }) => context.retryCount + 1,
+		failed: {, on: {
+				RETRY: {, target: 'analyzing',
+					actions: assign({, retryCount: ({ context }) => context.retryCount + 1,
 						error: () => undefined
 					})
 				}

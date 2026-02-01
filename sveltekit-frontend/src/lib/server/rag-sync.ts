@@ -50,8 +50,7 @@ async function safeUpdateEvidenceFile(evidenceId: string, fields: Record<string,
  * Result of RAG sync operation
  */
 export interface RagSyncResult {
-	success: boolean;
-	message: string;
+	success: boolean;, message: string;
 	chunksProcessed?: number;
 	errors?: string[];
 }
@@ -367,8 +366,7 @@ export async function updateRagIndexTags(
 					{
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							payload: { tags: newTags },
+						body: JSON.stringify({, payload: { tags: newTags },
 							points: [chunk.id]
 						})
 					}
@@ -478,7 +476,7 @@ export async function removeEvidenceFromRagIndex(
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ points: chunkIds })
+					body: JSON.stringify({, points: chunkIds })
 				}
 			);
 			if (deleteRes.ok) {
@@ -604,13 +602,10 @@ export async function regenerateEvidenceEmbeddings(
 /**
  * Health check: Verify RAG sync service is operational
  */
-export async function checkRagSyncHealth(): Promise<{
-	healthy: boolean;
+export async function checkRagSyncHealth(): Promise<{, healthy: boolean;
 	message: string;
-	details?: {
-		qdrantConnected: boolean;
-		databaseConnected: boolean;
-		collectionExists: boolean;
+	details?: {, qdrantConnected: boolean;
+		databaseConnected: boolean;, collectionExists: boolean;
 	};
 }> {
 	try {

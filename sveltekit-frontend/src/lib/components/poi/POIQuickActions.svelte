@@ -41,14 +41,14 @@
 
 <style>
  .poi-quick-actions {
- padding: 1.5rem; background: #1a1a2e;
+ padding: 1.5rem;, background: #1a1a2e;
  border: 1px solid #333;
  border-radius: 0.5rem;
  }
 
  h3 {
  color: #ffffff;
- font-size: 1rem; margin: 0 0 1rem 0;
+ font-size: 1rem;, margin: 0 0 1rem 0;
  text-transform: uppercase;
  letter-spacing: 0.05em;
  }
@@ -63,13 +63,13 @@
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; gap: 0.5rem;
- padding: 1rem; background: #0f0f23;
+ justify-content: center;, gap: 0.5rem;
+ padding: 1rem;, background: #0f0f23;
  border: 1px solid #333;
- border-radius: 0.375rem; color: #dc2626;
+ border-radius: 0.375rem;, color: #dc2626;
  cursor: pointer;
  font-weight: 600;
- font-size: 0.75rem; transition: all 0.2s;
+ font-size: 0.75rem;, transition: all 0.2s;
  }
 
  .action-button:hover {

@@ -23,26 +23,19 @@ const MEMORY_CONSTRAINTS = {
 } as const;
 
 export interface NESTexture {
-    id: string;
-    data: ArrayBuffer;
-    width: number;
-    height: number;
-    format: GPUTextureFormat;
-    size: number;
-    lastUsed: number;
-    priority: number;
+    id: string;, data: ArrayBuffer;
+    width: number;, height: number;
+    format: GPUTextureFormat;, size: number;
+    lastUsed: number;, priority: number;
     compressed: boolean;
-    legalContext?: {
-        documentType: 'contract' | 'evidence' | 'brief' | 'citation';
-        confidenceLevel: number;
-        riskIndicator: boolean;
+    legalContext?: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+        confidenceLevel: number;, riskIndicator: boolean;
     };
 }
 
 export interface MemoryRegion {
     name: 'RAM' | 'CHR_ROM' | 'PRG_ROM';
-    size: number;
-    used: number;
+    size: number;, used: number;
     textures: Map<string, NESTexture>;
 }
 
@@ -351,7 +344,7 @@ export class WebGPUTextureStreamer {
         if (!this.device) return;
 
         const texture = this.device.createTexture({
-            size: { width: nesTexture.width, height: nesTexture.height },
+            size: {, width: nesTexture.width, height: nesTexture.height },
             format: nesTexture.format,
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
         });

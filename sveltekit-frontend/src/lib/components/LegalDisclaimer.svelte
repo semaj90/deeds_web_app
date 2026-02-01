@@ -38,9 +38,9 @@
 	}
 
 	.disclaimer-content {
-		display: flex; gap: 1rem;
+		display: flex;, gap: 1rem;
 		align-items: center;
-		max-width: 1400px; width: 100%;
+		max-width: 1400px;, width: 100%;
 	}
 
 	.disclaimer-icon {
@@ -50,7 +50,7 @@
 
 	.disclaimer-text {
 		flex: 1;
-		font-size: 0.9rem; color: #c33;
+		font-size: 0.9rem;, color: #c33;
 		line-height: 1.4;
 	}
 
@@ -59,14 +59,14 @@
 	}
 
 	.dismiss-btn {
-		background: none; border: none;
-		font-size: 1.2rem; color: #c33;
-		cursor: pointer; padding: 0;
-		width: 24px; height: 24px;
+		background: none;, border: none;
+		font-size: 1.2rem;, color: #c33;
+		cursor: pointer;, padding: 0;
+		width: 24px;, height: 24px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		flex-shrink: 0; transition: color 0.2s;
+		flex-shrink: 0;, transition: color 0.2s;
 	}
 
 	.dismiss-btn:hover {

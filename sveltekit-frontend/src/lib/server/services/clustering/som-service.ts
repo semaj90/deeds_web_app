@@ -5,24 +5,19 @@
  */
 
 export interface SOMConfig {
-	width: number;
-	height: number;
-	epochs: number;
-	initialLearningRate: number;
+	width: number;, height: number;
+	epochs: number;, initialLearningRate: number;
 	finalLearningRate: number;
 }
 
 export interface Neuron {
-	weights: number[];
-	x: number;
+	weights: number[];, x: number;
 	y: number;
 }
 
 export interface SOMGrid {
-	width: number;
-	height: number;
-	neurons: Neuron[][];
-	config: SOMConfig;
+	width: number;, height: number;
+	neurons: Neuron[][];, config: SOMConfig;
 }
 
 const DEFAULT_CONFIG: SOMConfig = {
@@ -44,7 +39,7 @@ export function initializeSOMGrid(inputDim: number, config: Partial<SOMConfig> =
 		neurons[y] = [];
 		for (let x = 0; x < finalConfig.width; x++) {
 			neurons[y][x] = {
-				weights: Array.from({ length: inputDim }, () => Math.random()),
+				weights: Array.from({, length: inputDim }, () => Math.random()),
 				x,
 				y
 			};
@@ -82,7 +77,7 @@ function euclideanDistance(a: number[], b: number[]): number {
 function findBMU(
 	input: number[],
 	grid: SOMGrid
-): { x: number; y: number; minDistance: number } {
+): {, x: number; y: number;, minDistance: number } {
 	let minDistance = Infinity;
 	let bmuX = 0;
 	let bmuY = 0;
@@ -218,7 +213,7 @@ export function getSOMCentroids(grid: SOMGrid): number[][] {
 /**
  * Find SOM cluster for embedding
  */
-export function findSOMCluster(input: number[], grid: SOMGrid): { x: number; y: number } {
+export function findSOMCluster(input: number[], grid: SOMGrid): {, x: number; y: number } {
 	const bmu = findBMU(input, grid);
 	return { x: bmu.x, y: bmu.y };
 }
@@ -236,7 +231,7 @@ export function getSOMClusterId(x: number, y: number, gridWidth: number): number
 export function getSOMClusterCoords(
 	clusterId: number,
 	gridWidth: number
-): { x: number; y: number } {
+): {, x: number; y: number } {
 	return {
 		x: clusterId % gridWidth,
 		y: Math.floor(clusterId / gridWidth)
@@ -249,8 +244,7 @@ export function getSOMClusterCoords(
 export function calculateSOMQuality(
 	embeddings: number[][],
 	grid: SOMGrid
-): {
-	quantizationError: number;
+): {, quantizationError: number;
 	topographicError: number;
 } {
 	let quantizationError = 0;

@@ -29,23 +29,19 @@ async function ensure(): Promise<RedisJSON | null> {
 }
 
 export interface EmbeddingShard {
-	id: string; // e.g., doc: chunk
-	hash: string;
+	id: string; // e.g., doc: chunk, hash: string;
 	dim: number[]; // small shards or PQ codebooks in future
 	createdAt: string;
 }
 
 export interface RankingBitmap {
-	id: string; // e.g., query: hash
-	bitmapHex: string; // compact hitset
+	id: string; // e.g., query: hash, bitmapHex: string; // compact hitset
 	createdAt: string;
 }
 
 export interface CHRManifest {
-	id: string; // e.g., chr: bundle:<query-hash>
-	keys: string[]; // list of CHR keys persisted elsewhere
-	ttlSec: number;
-	createdAt: string;
+	id: string; // e.g., chr: bundle:<query-hash>, keys: string[]; // list of CHR keys persisted elsewhere
+	ttlSec: number;, createdAt: string;
 }
 
 export async function putEmbeddingShard(shard: EmbeddingShard, ttlSec = 24 * 3600): Promise<void> {

@@ -12,10 +12,8 @@
   }
 
   interface UploadStats {
-    isUploading: boolean;
-    queueLength: number;
-    completedCount: number;
-    progressMap: Map<string, UploadProgress>;
+    isUploading: boolean;, queueLength: number;
+    completedCount: number;, progressMap: Map<string, UploadProgress>;
   }
 
   interface SlotProps {
@@ -23,10 +21,8 @@
     uploadFiles: (files: FileList | File[]) => Promise<MinIOFile[]>;
     getUploadStats: () => UploadStats;
     clearUploads: () => void;
-    isUploading: boolean;
-    uploadQueue: File[];
-    completedUploads: MinIOFile[];
-    uploadProgress: Map<string, UploadProgress>;
+    isUploading: boolean;, uploadQueue: File[];
+    completedUploads: MinIOFile[];, uploadProgress: Map<string, UploadProgress>;
   }
 
   interface DocumentUploaderProps {
@@ -37,12 +33,12 @@
     caseId?: string;
     priority?: number;
     processingOptions?: ProcessingOptions;
-    onFilesSelected?: (event: { files: FileList }) => void;
-    onUploadStart?: (event: { files: File[] }) => void;
-    onUploadProgress?: (event: { progress: UploadProgress }) => void;
-    onUploadComplete?: (event: { file: MinIOFile }) => void;
-    onUploadError?: (event: { error: string; file?: File }) => void;
-    onAllUploadsComplete?: (event: { files: MinIOFile[] }) => void;
+    onFilesSelected?: (event: {, files: FileList }) => void;
+    onUploadStart?: (event: {, files: File[] }) => void;
+    onUploadProgress?: (event: {, progress: UploadProgress }) => void;
+    onUploadComplete?: (event: {, file: MinIOFile }) => void;
+    onUploadError?: (event: {, error: string; file?: File }) => void;
+    onAllUploadsComplete?: (event: {, files: MinIOFile[] }) => void;
     children?: Snippet<[SlotProps]>;
   }
 

@@ -12,21 +12,18 @@ import { join } from 'node:path';
 
 export type DoclingBlock = {
     type: 'paragraph' | 'heading' | 'table' | 'list' | 'equation' | 'image' | 'other';
-    text: string;
-    page: number;
+    text: string;, page: number;
     bbox?: [number, number, number, number];
 };
 
 export type DoclingResult = {
-    fullText: string;
-    blocks: DoclingBlock[];
+    fullText: string;, blocks: DoclingBlock[];
     pageCount?: number;
     processingTimeMs?: number;
 };
 
 type AnalyzeArgs = {
-    fileBuffer: Buffer;
-    mimeType: string;
+    fileBuffer: Buffer;, mimeType: string;
 };
 
 /**

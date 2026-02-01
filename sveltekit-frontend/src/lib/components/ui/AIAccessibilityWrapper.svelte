@@ -185,16 +185,13 @@
 </div>
 <style>
   .ai-accessibility-wrapper {
-    position: relative;
-    padding: 1rem;
+    position: relative;, padding: 1rem;
     border: 1px solid var(--color-border, #333);
-    border-radius: 8px;
-    background: var(--color-bg-secondary, #1a1a2e);
+    border-radius: 8px;, background: var(--color-bg-secondary, #1a1a2e);
   }
   .voice-commands-control {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    align-items: center;, gap: 1rem;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--color-border, #333);
@@ -202,21 +199,17 @@
   .voice-toggle {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 4px;, cursor: pointer;
     transition: all 0.2s ease;
   }
   .voice-status {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary, #aaa);
+    font-size: 0.875rem;, color: var(--color-text-secondary, #aaa);
     padding: 0.25rem 0.5rem;
     background: rgba(0, 188, 212, 0.1);
-    border-radius: 4px;
-    border: 1px solid rgba(0, 188, 212, 0.3);
+    border-radius: 4px;, border: 1px solid rgba(0, 188, 212, 0.3);
   }
   .ai-status-indicator {
-    margin-bottom: 1rem;
-    padding: 0.75rem;
+    margin-bottom: 1rem;, padding: 0.75rem;
     border-radius: 6px;
     font-weight: 500;
   }
@@ -239,8 +232,7 @@
   .success-indicator,
   .error-indicator {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: center;, gap: 0.5rem;
   }
   .spinner {
     animation: pulse 1.5s ease-in-out infinite;
@@ -257,8 +249,7 @@
     }
   }
   .ai-content-area {
-    min-height: 100px;
-    padding: 1rem;
+    min-height: 100px;, padding: 1rem;
     border: 1px dashed var(--color-border, #444);
     border-radius: 6px;
     margin-bottom: 1rem;
@@ -268,26 +259,20 @@
     padding-top: 1rem;
   }
   .help-toggle {
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 4px;
-    background: transparent;
+    cursor: pointer;, padding: 0.5rem;
+    border-radius: 4px;, background: transparent;
     border: 1px solid var(--color-border, #333);
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+    align-items: center;, gap: 0.5rem;
+    font-weight: 500;, transition: background-color 0.2s ease;
   }
   .help-toggle:hover {
     background: rgba(0, 188, 212, 0.1);
   }
   .help-content {
     padding: 1rem;
-    margin-top: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    border: 1px solid var(--color-border, #444);
+    margin-top: 0.5rem;, background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;, border: 1px solid var(--color-border, #444);
   }
   .help-content h3,
   .help-content h4 {
@@ -300,13 +285,11 @@
     padding-left: 1rem;
   }
   .help-content dt {
-    font-weight: 600;
-    color: var(--color-text-primary, #fff);
+    font-weight: 600;, color: var(--color-text-primary, #fff);
   }
   .help-content dd {
     margin-left: 1rem;
-    margin-bottom: 0.5rem;
-    color: var(--color-text-secondary, #aaa);
+    margin-bottom: 0.5rem;, color: var(--color-text-secondary, #aaa);
   }
   /* Enhanced focus indicators for AI components */
   :global(.ai-component:focus-visible) {

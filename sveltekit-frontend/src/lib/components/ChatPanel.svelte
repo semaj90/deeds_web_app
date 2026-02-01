@@ -71,7 +71,7 @@
 			} else if (event.done) {
 				uploading = false;
 				showPopup = true;
-				messages.push({ role: 'ai', text: `Analysis complete: ${file.name}. Embedding stored.` });
+				messages.push({ role: 'ai', text: `Analysis, complete: ${file.name}. Embedding stored.` });
 				embeddingStream = null;
 			} else if (event.error) {
 				uploading = false;
@@ -99,7 +99,7 @@
 				const cached = await getCachedEmbedding(currentDocId);
 				if (cached && queryResult) {
 					const similarity = quantizedCosineSimilarity(queryResult.quantized, cached.quantized);
-					messages.push({ role: 'ai', text: `Similarity score: ${(similarity * 100).toFixed(2)}%` });
+					messages.push({ role: 'ai', text: `Similarity, score: ${(similarity * 100).toFixed(2)}%` });
 				}
 			}
 		});
@@ -151,7 +151,7 @@
 		/>
 
 		<button
-			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir"
+			class="px-3 py-2 border border-beige text-sm hover: bg-beige, hover:text-noir"
 			onclick={sendMessage}
 		>
 			<Send class="w-4 h-4" />
@@ -172,7 +172,6 @@
 		border-color: #9b9b9b;
 	}
 	.system {
-		border-color: #ff6b6b;
-		background: rgba(255, 107, 107, 0.1);
+		border-color: #ff6b6b;, background: rgba(255, 107, 107, 0.1);
 	}
 </style>

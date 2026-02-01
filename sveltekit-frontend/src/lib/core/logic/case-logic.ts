@@ -3,8 +3,7 @@
  * No UI dependencies here — usable by DOM or Canvas renderers
  */
 export type CaseFile = {
-    id: string;
-    title: string;
+    id: string;, title: string;
     summary?: string;
     pages?: number;
     attachments?: number;

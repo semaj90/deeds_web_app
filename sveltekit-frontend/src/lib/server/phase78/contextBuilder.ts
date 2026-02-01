@@ -16,34 +16,28 @@ import type postgres from 'postgres';
 
 export interface ErrorContextChunk {
 	kind: 'log' | 'ast' | 'schema' | 'migration' | 'test';
-	text: string;
-	score: number;
+	text: string;, score: number;
 	source?: string;
 }
 
 export interface KagNode {
-	id: string;
-	label: string;
+	id: string;, label: string;
 	kind: 'route' | 'file' | 'table' | 'migration' | 'test';
 	metadata?: Record<string, unknown>;
 }
 
 export interface KagEdge {
-	from: string;
-	to: string;
+	from: string;, to: string;
 	label: string;
 }
 
 export interface KagGraph {
-	nodes: KagNode[];
-	edges: KagEdge[];
+	nodes: KagNode[];, edges: KagEdge[];
 }
 
 export interface RouteContext {
-	routePath: string;
-	ragChunks: ErrorContextChunk[];
-	kagGraph: KagGraph;
-	relatedTests: string[];
+	routePath: string;, ragChunks: ErrorContextChunk[];
+	kagGraph: KagGraph;, relatedTests: string[];
 	relatedMigrations: string[];
 }
 
@@ -81,7 +75,7 @@ export async function getErrorContextChunks(
 
 		chunks.push({
 			kind: 'log',
-			text: `Canonical error: ${canonicalMsg}`,
+			text: `Canonical, error: ${canonicalMsg}`,
 			score: 1.0,
 			source: `cluster:${clusterId}`
 		});

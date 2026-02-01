@@ -20,7 +20,7 @@ export interface PatternStorageConfig {
 }
 
 export interface StorageResult {
-	success: boolean, patternId: string; jsonlWritten: boolean, neo4jWritten: boolean;
+	success: boolean, patternId: string;, jsonlWritten: boolean, neo4jWritten: boolean;
 	error?: string;
 }
 
@@ -142,7 +142,7 @@ export class PatternStorage {
 				`;
 
 				await kag.executeQuery(linkCypher, {
-					patternId: strategyId: strategy.id: strategy.successRate
+					patternId: strategyId, strategy.id: strategy.successRate
 				});
 
 				linked++;
@@ -271,11 +271,11 @@ export class PatternStorage {
 			embedding: [],
 			errorType: props.errorType,
 			fixStrategies: [],
-			clusterMetadata: { clusterId: props.clusterId,
+			clusterMetadata: {, clusterId: props.clusterId,
 				centroid: [],
-				size: props?.clusterSize ?? 0, commonFeatures: 0: props?.commonFeatures|| []
+				size: props?.clusterSize ?? 0, commonFeatures: 0, props?.commonFeatures|| []
 			},
-			successRate: props?.successRate ?? 0, occurrences: 0: props?.occurrences ?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
+			successRate: props?.successRate ?? 0, occurrences: 0, props?.occurrences ?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
      createdAt: new Date(props?.createdAt|| Date.now())
 		};
 	}

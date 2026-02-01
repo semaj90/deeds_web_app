@@ -5,7 +5,7 @@ import { z } from 'zod';
 const schema = z.any();
 
 export async function withApiHandler(
-	handler: (params: { url: URL; locals: any; request?: Request }) => Promise<any>,
+	handler: (params: {, url: URL; locals: any; request?: Request }) => Promise<any>,
 	event: any
 ): Promise<Response> {
 	try {
@@ -27,7 +27,7 @@ export async function parseRequestBody<T>(request: Request): Promise<T> {
 	return body as T;
 }
 
-export function createPagination(page: number, limit: number, total: number): { page: number, limit: number, total: number, totalPages: number } {
+export function createPagination(page: number, limit: number, total: number): {, page: number, limit: number, total: number, totalPages: number } {
 	return {
 		page,
 		limit,

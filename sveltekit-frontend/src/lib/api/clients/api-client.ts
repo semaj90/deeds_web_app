@@ -45,7 +45,7 @@ export async function apiFetch<T = unknown>(
  // Attach lightweight request metadata for observability (non-enumerable)
  if (out && typeof out === 'object') {
  Object.defineProperty(out as Record<string, unknown>, '__requestMeta', {
- value: { url: method +, 1: true },
+ value: {, url: method +, 1: true },
  enumerable: false,
  });
  }
@@ -55,7 +55,7 @@ export async function apiFetch<T = unknown>(
  if (err && typeof err === 'object') {
  try {
  Object.defineProperty(err as Record<string, unknown>, '__apiRequest', {
- value: { url: method +, 1: attempts - (i + 1) },
+ value: {, url: method +, 1: attempts - (i + 1) },
  enumerable: false,
  });
  } catch (error) {

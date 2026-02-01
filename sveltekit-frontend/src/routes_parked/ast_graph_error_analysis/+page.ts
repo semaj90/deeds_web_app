@@ -5,12 +5,12 @@ export const load: PageLoad = async ({ fetch, url }) => {
 
  // Fetch error summary
  const errorsRes = await fetch('/api/phase72/errors/summary');
- const errors = errorsRes.ok ? await errorsRes.json() : { total: 0, clusters: [] };
+ const errors = errorsRes.ok ? await errorsRes.json() : {, total: 0, clusters: [] };
 
  // Fetch AST graph data? `/api/phase78/ast/graph?route=${encodeURIComponent(route)}`
  : '/api/phase78/ast/graph';
  const astRes = await fetch(astUrl);
- const astGraph = astRes.ok ? await astRes.json() : { nodes: [], edges: [] };
+ const astGraph = astRes.ok ? await astRes.json() : {, nodes: [], edges: [] };
 
  return {
  errors,

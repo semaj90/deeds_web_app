@@ -98,7 +98,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  results,
- metadata: { processingTime: timestamp: new Date().toISOString(),
+ metadata: {, processingTime: timestamp, new Date().toISOString(),
  },
  });
  } finally {
@@ -120,12 +120,12 @@ export const POST: RequestHandler = async ({ request }) => {
 /**
  * Extract citations from text
  */
-function extractCitationsFromText(text: string): Array<{ type: string;
- code: string; text: string;
+function extractCitationsFromText(text: string): Array<{, type: string;
+ code: string;, text: string;
  context: string;
 }> {
- const citations: Array<{ type: string;
- code: string; text: string;
+ const citations: Array<{, type: string;
+ code: string;, text: string;
  context: string;
  }> = [];
 

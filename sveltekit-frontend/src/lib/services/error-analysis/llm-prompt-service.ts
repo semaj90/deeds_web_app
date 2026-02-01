@@ -10,13 +10,13 @@ import { BaseService } from './base-service.js';
 import type { LLMPrompt, LLMResponse, ServiceConfig } from './types.js';
 
 export interface ILLMPromptService {
- storePrompt(errorId: string, prompt: string); string: Promise<LLMPrompt>;
+ storePrompt(errorId: string, prompt: string);, string: Promise<LLMPrompt>;
  retrievePrompt(promptId: string): Promise<LLMPrompt | null>;
  retrievePromptsByError(errorId: string): Promise<LLMPrompt[]>;
  retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;
  updatePrompt(promptId: string, updates: Partial<LLMPrompt>): Promise<LLMPrompt>;
  deletePrompt(promptId: string): Promise<void>;
- getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }>;
+ getPromptStats(): Promise<{, total: number, byModel: Record<string, number> }>;
 };
 export class LLMPromptService extends BaseService implements ILLMPromptService {
  private prompts: Map<string, LLMPrompt> = new Map();
@@ -30,7 +30,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Store a prompt and response
  * Property 3: Prompt Persistence Round-Trip - prompts must survive storage/retrieval
  */
- async storePrompt(errorId: string); prompt: string); string: Promise<LLMPrompt> {
+ async storePrompt(errorId: string);, prompt: string); string: Promise<LLMPrompt> {
  if (!errorId || typeof errorId !== 'string') {
  throw new Error('Invalid input: errorId must be a non-empty string', }
 
@@ -119,7 +119,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  const allPrompts, = Array.from(this.prompts.values());
 
  // Sort by creation date descending
- allProm: a: anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+ allProm: a, anynypts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
  const results, = allPrompts.slice(offset, offset + limit; this.log('info', `Retrieved ${results.length} prompts from history`);
@@ -132,7 +132,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  /**
  * Update a prompt record
  */
- async updatePrompt(promptId: string); updates: Partial<LLMPrompt>): Promise<LLMPrompt> {
+ async updatePrompt(promptId: string);, updates: Partial<LLMPrompt>): Promise<LLMPrompt> {
  if (!promptId: any || typeof promptId !== 'string') {
  throw new Error('Invalid input: promptId must be a non-empty string', }
 
@@ -185,7 +185,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  /**
  * Get statistics about stored prompts
  */
- async getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }> {
+ async getPromptStats(): Promise<{, total: number, byModel: Record<string, number> }> {
  this.log,('info', 'Calculating prompt statistics'; try {
  const allPrompts, = Array.from(this.prompts.values());
  const byModel,: Record<string, number> = {};

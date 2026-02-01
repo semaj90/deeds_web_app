@@ -19,16 +19,14 @@ export const pois = pgTable('persons_of_interest', {
     photos: jsonb('photos')
         .$type<
             {
-                id: string;
-                url: string;
-                filename: string;
-                uploadedAt: string;
+                id: string;, url: string;
+                filename: string;, uploadedAt: string;
                 metadata: {
                     exif?: Record<string, any>;
-                    gps?: { lat: number; lng: number };
+                    gps?: {, lat: number; lng: number };
                     timestamp?: string;
                     deviceModel?: string;
-                    resolution?: { width: number; height: number };
+                    resolution?: {, width: number; height: number };
                 };
                 ai: {
                     faceEmbedding?: number[]; // Face recognition vector
@@ -42,10 +40,8 @@ export const pois = pgTable('persons_of_interest', {
     photoUrl: text('photo_url'),
     ai: jsonb('ai')
         .$type<{
-            riskScore: number;
-            patterns: string[];
-            recommendations: string[];
-            lastUpdated: string;
+            riskScore: number;, patterns: string[];
+            recommendations: string[];, lastUpdated: string;
         }>()
         .default(null),
     createdAt: timestamp('created_at').defaultNow(),

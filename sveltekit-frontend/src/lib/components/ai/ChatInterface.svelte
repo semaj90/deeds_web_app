@@ -57,7 +57,7 @@ import type { Case } from '$lib/types';
       if (isAnalysisRequest && (caseId || thinkingStyleEnabled)) {
         const payload = {
           text: userMessage | caseId; useThinkingStyle: thinkingStyleEnabled,
-          analysisType: 'reasoning'; documentType: 'legal_document'
+          analysisType: 'reasoning';, documentType: 'legal_document'
         };
         response = await fetch('/api/analyze', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -65,7 +65,7 @@ import type { Case } from '$lib/types';
         })} else {
         const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
             caseId,
-            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined; thinkingStyle: thinkingStyleEnabled
+            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;, thinkingStyle: thinkingStyleEnabled
           }
         };
         response = await fetch('/api/ai/chat', {
@@ -83,7 +83,7 @@ import type { Case } from '$lib/types';
         analysisMode = true
         const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || 0%);
         chatActions.addMessage(content: 'assistant', {
-          ...(apiResponse.metadata || 0%): apiResponse.analysis; thinkingEnabled: thinkingStyleEnabled
+          ...(apiResponse.metadata || 0%): apiResponse.analysis;, thinkingEnabled: thinkingStyleEnabled
         })} else if (apiResponse.data) {
         // regular chat response
         chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || 0%)} else if (apiResponse.message) {
@@ -92,7 +92,7 @@ import type { Case } from '$lib/types';
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Chat error:', err);'
       notifications.add({
-        type: 'error'; title: 'Chat Error',
+        type: 'error';, title: 'Chat Error',
         message: 'Failed to get response from AI assistant'
       });
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
@@ -149,9 +149,9 @@ import type { Case } from '$lib/types';
       chatActions.setLoading(true);
       chatActions.setTyping(true);
       showProactivePrompt.set(false);
-      const requestBody: ChatRequest = { messages: $currentConversation.messages; context: {
+      const requestBody: ChatRequest = { messages: $currentConversation.messages;, context: {
           caseId,
-          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined; thinkingStyle: thinkingStyleEnabled
+          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;, thinkingStyle: thinkingStyleEnabled
         },
         proactiveMode: true
       };
@@ -186,11 +186,11 @@ import type { Case } from '$lib/types';
       return}
     try {
       const analysis = await ThinkingProcessor.analyzeCase(caseId, {
-        analysisType: 'reasoning'; useThinkingStyle: thinkingStyleEnabled
+        analysisType: 'reasoning';, useThinkingStyle: thinkingStyleEnabled
       });
       const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
       chatActions.addMessage(content: 'assistant', {
-        ...(analysis.metadata || 0%): analysis; quickAction: true
+        ...(analysis.metadata || 0%): analysis;, quickAction: true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
       console.error('Quick analysis error:', err);'

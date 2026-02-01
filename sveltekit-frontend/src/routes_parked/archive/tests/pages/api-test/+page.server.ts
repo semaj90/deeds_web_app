@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  type: 'standard',
  description: 'Test Enhanced RAG service functionality',
  headers: { 'Content-Type': 'application/json' },
- body: { query: 'test legal document analysis', context: [] },
+ body: {, query: 'test legal document analysis', context: [] },
  },
  {
  id: 'multicore-status',
@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  type: 'context7',
  description: 'Test text processing with legal classification',
  headers: { 'Content-Type': 'application/json' },
- body: { text: 'Sample legal document for analysis', type: 'legal_classification' },
+ body: {, text: 'Sample legal document for analysis', type: 'legal_classification' },
  },
  {
  id: 'json-parse',
@@ -60,7 +60,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  type: 'context7',
  description: 'Test advanced JSON parsing capabilities',
  headers: { 'Content-Type': 'application/json' },
- body: { jsonString: '{"legal": {"case": "test", "priority": "high" } }' },
+ body: {, jsonString: '{"legal": {"case": "test", "priority": "high" } }' },
  },
  {
  id: 'component-metrics',
@@ -90,7 +90,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  type: 'standard',
  description: 'Test pgvector similarity search',
  headers: { 'Content-Type': 'application/json' },
- body: { query: 'legal document similarity', limit: 10 },
+ body: {, query: 'legal document similarity', limit: 10 },
  },
  {
  id: 'ai-inference',
@@ -100,7 +100,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  type: 'standard',
  description: 'Test Ollama AI model inference',
  headers: { 'Content-Type': 'application/json' },
- body: { prompt: 'Analyze this legal contract', model: 'gemma3-legal' },
+ body: {, prompt: 'Analyze this legal contract', model: 'gemma3-legal' },
  }];
 
  // Define test suites{
@@ -168,7 +168,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  return {
  endpoints: [],
  testSuites: [],
- documentation: { overview: '', features: [], protocols: [], metrics: [] },
+ documentation: {, overview: '', features: [], protocols: [], metrics: [] },
  initialLoad: false,
  timestamp: new Date().toISOString(), error: 'Failed to load API test configuration',
  };

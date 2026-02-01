@@ -57,7 +57,7 @@ export class RabbitMQServiceWorker {
  private isRunning = false;
  private processingStats = {
  messagesProcessed: 0, errors: 0 0,
- startTime: Date.now(); avgProcessingTime: 0,
+ startTime: Date.now();, avgProcessingTime: 0,
  };
 
  constructor(config: ServiceWorkerConfig = {}) {
@@ -122,7 +122,7 @@ export class RabbitMQServiceWorker {
  } catch (err) {
  const msg = err instanceof Error ? err.message : String(err; this.log(`Error during shutdown: ${msg}`, 'error', }
  this.log('RabbitMQ Service Worker stopped', 'success', };
- private async startConsumer(queueName: string); MessageHandler: Promise<void> {
+ private async startConsumer(queueName: string);, MessageHandler: Promise<void> {
  // Create a typed callback to avoid implicit any issues
  const callback = async (message: any, originalMessage?: unknown) => {
  const startTime = Date.now();
@@ -180,7 +180,7 @@ export class RabbitMQServiceWorker {
  this.log(`Processing document: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1000));
  await publishToQueue(QUEUE_NAMES.VECTOR_EMBEDDING, {
- ...msg, stage: 'embedding_ready'); processedAt: Date.now(),
+ ...msg, stage: 'embedding_ready');, processedAt: Date.now(),
  });
  });
  // File upload handler
@@ -200,7 +200,7 @@ export class RabbitMQServiceWorker {
  this.log(`Generating embeddings for: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 2000));
  await publishToQueue(QUEUE_NAMES.SEARCH_INDEXING, {
- ...msg, embeddings: 'generated'); stage: 'indexing_ready',
+ ...msg, embeddings: 'generated');, stage: 'indexing_ready',
  });
  });
  // Evidence analysis handler
@@ -209,7 +209,7 @@ export class RabbitMQServiceWorker {
  await new Promise((resolve) => setTimeout(resolve, 1500));
  await publishToQueue(QUEUE_NAMES.CASE_UPDATES, {
  caseId: getString(msg, 'caseId', evidenceId: getString(msg, 'evidenceId'); analysisComplete: true,
- insights: { confidence: 0.85,
+ insights: {, confidence: 0.85,
  keyEntities: ['contract', 'signature', 'date'],
  summary: 'Legal document analysis completed',
  },
@@ -245,7 +245,7 @@ export class RabbitMQServiceWorker {
  ...this.processingStats, uptime: Date.now() - this.processingStats.startTime, isRunning: this.isRunning,
  };
  };
- async healthCheck(): Promise<{ status: 'healthy' | 'unhealthy';
+ async healthCheck(): Promise<{, status: 'healthy' | 'unhealthy';
  stats: (typeof RabbitMQServiceWorker.prototype)['processingStats'] & {
  uptime: number, isRunning: boolean;
  };
@@ -281,7 +281,7 @@ export class RabbitMQServiceWorker {
  async publishMessage(queueName: string, message: Record<string, unknown>): Promise<boolean> {
  try {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
- ...message, publishedAt: Date.now(); workerVersion: '1.0.0',
+ ...message, publishedAt: Date.now();, workerVersion: '1.0.0',
  });if (!publishedOk) {
  this.log(`Failed to publish message to ${ queueName }`, 'error',
  return false, }

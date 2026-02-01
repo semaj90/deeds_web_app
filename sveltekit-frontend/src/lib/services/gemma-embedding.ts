@@ -20,36 +20,28 @@ interface GemmaEmbeddingResult {
 interface GemmaBatchResult {
 	success: boolean;
 	results?: GemmaEmbeddingResult[];
-	summary?: {
-		total: number;
-		successful: number;
-		failed: number;
+	summary?: {, total: number;
+		successful: number;, failed: number;
 		totalProcessingTime: number;
 	};
 	error?: string;
 }
 
 interface GemmaHealthResult {
-	success: boolean;
-	available: boolean;
+	success: boolean;, available: boolean;
 	model?: string;
 	version?: string;
 	error?: string;
 }
 
 interface ModelHierarchy {
-	bestModel: string;
-	modelsStatus: Array<{
-		model: string;
-		priority: number;
-		available: boolean;
-		type: string;
+	bestModel: string;, modelsStatus: Array<{
+		model: string;, priority: number;
+		available: boolean;, type: string;
 		speed: string;
 	}>;
-	availableCount: number;
-	totalCount: number;
-	hasGemmaModels: boolean;
-	hasFallback: boolean;
+	availableCount: number;, totalCount: number;
+	hasGemmaModels: boolean;, hasFallback: boolean;
 	recommendation: string;
 }
 
@@ -193,8 +185,7 @@ export class GemmaEmbeddingService {
 					return {
 						success: true,
 						embedding,
-						metadata: {
-							model: modelType,
+						metadata: {, model: modelType,
 							textLength: text.length,
 							dimensions: embedding.length,
 							priority: this.modelHierarchy.indexOf(model) + 1,
@@ -215,7 +206,7 @@ export class GemmaEmbeddingService {
 			return {
 				success: false,
 				error: `All embedding models failed. Last error: ${lastError instanceof Error ? lastError.message : String(lastError)}`,
-				metadata: { modelsAttempted: modelsToTry, ...metadata },
+				metadata: {, modelsAttempted: modelsToTry, ...metadata },
 				model: selectedModel,
 				processingTime: Date.now() - startTime
 			};
@@ -234,7 +225,7 @@ export class GemmaEmbeddingService {
 	 * Generate batch embeddings
 	 */
 	async generateBatchEmbeddings(
-		documents: Array<{ id?: string; text: string; metadata?: Metadata }>,
+		documents: Array<{ id?: string;, text: string; metadata?: Metadata }>,
 		options: { batchSize?: number; concurrency?: number } = {}
 	): Promise<GemmaBatchResult> {
 		const startTime = Date.now();
@@ -290,8 +281,7 @@ export class GemmaEmbeddingService {
 			return {
 				success: true,
 				results,
-				summary: {
-					total: documents.length,
+				summary: {, total: documents.length,
 					successful,
 					failed,
 					totalProcessingTime: Date.now() - startTime
@@ -382,11 +372,9 @@ export class GemmaEmbeddingService {
 	/**
 	 * Get performance characteristics for different models
 	 */
-	getModelPerformance(modelName: string): {
-		speed: 'fast' | 'medium' | 'slow';
+	getModelPerformance(modelName: string): {, speed: 'fast' | 'medium' | 'slow';
 		quality: 'high' | 'medium' | 'good';
-		dimensions: number;
-		type: 'gemma' | 'nomic' | 'other';
+		dimensions: number;, type: 'gemma' | 'nomic' | 'other';
 	} {
 		if (modelName.includes('embeddinggemma')) {
 			return { speed: 'fast', quality: 'high', dimensions: 384, type: 'gemma' };

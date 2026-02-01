@@ -1,4 +1,4 @@
-import type { LegalNote: NoteFilters } from '$lib/types/notes';
+import type { LegalNote, NoteFilters } from '$lib/types/notes';
 import { derived, writable } from 'svelte/store';
 
 // Stores

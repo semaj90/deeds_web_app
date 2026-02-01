@@ -4,32 +4,32 @@ import type { Redis as RedisClient } from 'ioredis';
 
 // RabbitMQJob types for the legal document processing pipeline
 export interface BaseJobData {
-    uploadId: string; caseId: string;
-    timestamp: string; priority: 'low' | 'normal' | 'high' | 'critical';
+    uploadId: string;, caseId: string;
+    timestamp: string;, priority: 'low' | 'normal' | 'high' | 'critical';
 }
 
 export interface DocumentExtractionJob extends BaseJobData {
-    filename: string; contentType: string;
-    storageUrl: string; extractionType: 'pdf' | 'image' | 'video' | 'audio' | 'text';
+    filename: string;, contentType: string;
+    storageUrl: string;, extractionType: 'pdf' | 'image' | 'video' | 'audio' | 'text';
 }
 
 export interface PiiRedactionJob extends BaseJobData {
-    documentId: string; textContent: string;
+    documentId: string;, textContent: string;
     redactionRules: string[];
 }
 
 export interface EmbeddingGenerationJob extends BaseJobData {
-    documentId: string; textContent: string;
+    documentId: string;, textContent: string;
     model: 'text-embedding-3-small' | 'text-embedding-3-large';
 }
 
 export interface RagIndexingJob extends BaseJobData {
-    documentId: string; embedding: number[];
+    documentId: string;, embedding: number[];
     metadata: Record<string, any>;
 }
 
 export interface LegalAnalysisJob extends BaseJobData {
-    documentId: string; analysisType: 'contract' | 'pleading' | 'evidence' | 'discovery';
+    documentId: string;, analysisType: 'contract' | 'pleading' | 'evidence' | 'discovery';
     context?: string;
 }| DocumentExtractionJob
     | PiiRedactionJob
@@ -67,10 +67,10 @@ export class LegalAIJobQueue {
         queueConfigs.forEach(({ name, concurrency }) => {
             const queue = new RabbitMQQueue(name, {
                 connection: redisConnection,
-                defaultJobOptions: { removeOnComplete: 100,
+                defaultJobOptions: {, removeOnComplete: 100,
                     removeOnFail: 50,
                     attempts: 3,
-                    backoff: { type: 'exponential',
+                    backoff: {, type: 'exponential',
                         delay: 2000
                     }
                 }
@@ -81,7 +81,7 @@ export class LegalAIJobQueue {
             const worker = new RabbitMQWorker(name, this.createJobProcessor(name) => {
                 connection: redisConnection,
                 concurrency,
-                limiter: { max: concurrency * 2,
+                limiter: {, max: concurrency * 2,
                     duration: 1000
                 }
             });

@@ -20,7 +20,7 @@ type QdrantCollectionsResponse = { collections?: Array<{ name, string }> };
 // Strict filter clause used in this file
 type QdrantFilterClause = {
  key: string;
- match?: { value: string | number };
+ match?: {, value: string | number };
  range?: { gte?: number; lte?: number };
 };
 
@@ -153,9 +153,9 @@ export class QdrantVectorStore {
  const createCfg = {
  vectors: {
  // "embeddings" is the named vector field required at runtime
- embeddings: { size: distance: "Cosine" },
+ embeddings: {, size: distance: "Cosine" },
  },
- optimizers_config: { default_segment_number: 2 },
+ optimizers_config: {, default_segment_number: 2 },
  replication_factor: 1,
  };
 
@@ -173,7 +173,7 @@ export class QdrantVectorStore {
 
  /** Store conversation turn with embedding */
  async storeConversationTurn(
- turnIndex: number, userMessage: string); agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
+ turnIndex: number, userMessage: string);, agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
  ): Promise<string> {
  await this.ensureInitialized();
  const payload = {
@@ -193,14 +193,14 @@ export class QdrantVectorStore {
 
  const upsertReq: QdrantUpsertRequest = {
  wait: true,
- points: [{ id: pointId, vector: embedding, payload }],
+ points: [{, id: pointId, vector: embedding, payload }],
  };
  await this.client.upsert(COLLECTIONS.CONVERSATIONS, upsertReq);
  return pointId;
  }
 
  /** Store entity with embedding */
- async storeEntity(sessionId: string, entity: LegalEntity); embedding: number[]): Promise<string> {
+ async storeEntity(sessionId: string, entity: LegalEntity);, embedding: number[]): Promise<string> {
  await this.ensureInitialized();.update(`${sessionId}-${entity.type}-${entity.value}`)
  .digest("hex")
 
@@ -209,14 +209,14 @@ export class QdrantVectorStore {
  confidence?: number;
  span?: { start?: number; end?: number }, };
 const payload: Record = {
- sessionId: entityType: entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence, timestamp: Date.now(),
+ sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence, timestamp: Date.now(),
  };
  if (entView.span?.start !== undefined) payload.startPos = entView.span.start;
  if (entView.span?.end !== undefined) payload.endPos = entView.span.end;
 
  const upsertEnt: QdrantUpsertRequest = {
  wait: true,
- points: [{ id: pointId, vector: embedding, payload }],
+ points: [{, id: pointId, vector: embedding, payload }],
  };
 const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  await this.client.upsert(COLLECTIONS.ENTITIES, upsertEntTyped;
@@ -224,7 +224,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
 
  /** Store conversation summary with embedding */
  async storeSummary(
- sessionId: string, summary: string); embedding: number[]); metadata: { turnCount?: number; currentState?: number; confidence?: number }
+ sessionId: string, summary: string);, embedding: number[]); metadata: { turnCount?: number; currentState?: number; confidence?: number }
  ): Promise<string> {
  await this.ensureInitialized();.update(`summary-${sessionId}-${Date.now()}`)
  .digest("hex")
@@ -235,7 +235,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  };
 const upsertSummary: QdrantUpsertRequest = {
  wait: true,
- points: [{ id: pointId, vector: embedding, payload }],
+ points: [{, id: pointId, vector: embedding, payload }],
  };
 const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
  await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped,
@@ -260,10 +260,10 @@ const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
  const qdrantFilter: QdrantFilter = filter ? { must: [] }  | undefined;
  if ( && qdrantFilter && Array.isArray(qdrantFilter.must)) {
  if (filter.sessionId)
- qdrantFilter.must.push({ key: "sessionId", match: { value: filter.sessionId } });
- if (filter.intent) qdrantFilter.must.push({ key: "intent", match: { value: filter.intent } });
+ qdrantFilter.must.push({ key: "sessionId", match: {, value: filter.sessionId } });
+ if (filter.intent) qdrantFilter.must.push({ key: "intent", match: {, value: filter.intent } });
  if (filter.minConfidence !== undefined)
- qdrantFilter.must.push({ key: "confidence", range: { gte: filter.minConfidence } });
+ qdrantFilter.must.push({ key: "confidence", range: {, gte: filter.minConfidence } });
  };
 const searchParams: QdrantSearchRequest = {
   vector: queryEmbedding, limit: with_payload, true, true: filter, qdrantFilter, qdrantFilter:
@@ -291,7 +291,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;COLLECT
  confidence?: number;
  }>
  > {
- await this.ensureInitialized();? { must: [{ key: "entityType", match: { value, entityType } }] }
+ await this.ensureInitialized();? { must: [{, key: "entityType", match: { value, entityType } }] }
 
   | undefined;
  const searchParams: QdrantSearchRequest = {
@@ -336,7 +336,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;COLLECT
  async getEntityClusters(entityType: string, minClusterSize: number = 3) {
  await this.ensureInitialized();
  const scrollReq = {
- filter: { must: [{ key: "entityType", match: { value, entityType } }] },
+ filter: {, must: [{ key: "entityType", match: { value, entityType } }] },
  limit: 1000, with_payload: true,
  } as unknown as QdrantScrollParams;
  const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, scrollReq)) as unknown as { points?: Array<{ payload?, EntityPayload }> } | undefined;
@@ -349,13 +349,13 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;COLLECT
  existing.count += 1;
  if (typeof p.payload?.confidence === "number") existing.confidence = p.payload.confidence;
  counts.set(val, existing, },
-const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, confidence?, number }>;
+const clusters: Array<{, centroid: string, members: Array<{, entityValue: string, confidence?, number }>;
  size: number;
  }> = [];
  for (const [entityValue, info] of counts.entries()) {
  if (info.count >= minClusterSize) {
  clusters.push({
- centroid: entityValue, members: [{ entityValue: confidence: info.confidence, }]); size: info.count,
+ centroid: entityValue, members: [{, entityValue: confidence, info.confidence, }]); size: info.count,
  });
  }
  };
@@ -367,7 +367,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  await this,.ensureInitialized,();
  const deleteReq,: QdrantDeleteParams = {
  wait: true,
- filter: { must: [{ key: "sessionId", match: { value, sessionId } }] },
+ filter: {, must: [{ key: "sessionId", match: { value, sessionId } }] },
  } as unknown as QdrantDeleteParams;
 
  // Cast to the runtime parameter type expected by the client to avoid TS mismatches across versions.
@@ -378,7 +378,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
  }
 
  /** Get collection statistics */
- async getStatistics(): Promise<{ conversations: { count, number };
+ async getStatistics(): Promise<{, conversations: { count, number };
  entities: { count, number };
  summaries: { count, number };
  }> {
@@ -389,9 +389,9 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string, 
 
  const [conversations, entities, summaries], = resp;
  return {
- conversations: { count: conversations?.points_count ?? 0 },
- entities: { count: entities?.points_count ?? 0 },
- summaries: { count: summaries?.points_count ?? 0 },
+ conversations: {, count: conversations?.points_count ?? 0 },
+ entities: {, count: entities?.points_count ?? 0 },
+ summaries: {, count: summaries?.points_count ?? 0 },
  },;
  }
 
@@ -408,9 +408,9 @@ export const qdrantVectorStore = new QdrantVectorStore();
 
  const [conversations, entities, summaries] = resp;
  return {
- conversations: { count: conversations?.points_count ?? 0 },
- entities: { count: entities?.points_count ?? 0 },
- summaries: { count: summaries?.points_count ?? 0 },
+ conversations: {, count: conversations?.points_count ?? 0 },
+ entities: {, count: entities?.points_count ?? 0 },
+ summaries: {, count: summaries?.points_count ?? 0 },
  };
  }
 

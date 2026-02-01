@@ -1,9 +1,7 @@
 // Minimal Qdrant indexer with lazy import and safe fallback
-export async function indexQdrant(doc: {
-    id: string;
-    text: string;
-    embedding: number[];
-}): Promise<{ ok: boolean; error?: string }> {
+export async function indexQdrant(doc: {, id: string;
+    text: string;, embedding: number[];
+}): Promise<{, ok: boolean; error?: string }> {
     try {
         const { QdrantClient } = await import('@qdrant/js-client-rest');
         const client = new QdrantClient({
@@ -17,7 +15,7 @@ export async function indexQdrant(doc: {
                 {
                     id: doc.id,
                     vector: doc.embedding,
-                    payload: { text: doc.text, source: 'tensor-api' }
+                    payload: {, text: doc.text, source: 'tensor-api' }
                 }
             ]
         });

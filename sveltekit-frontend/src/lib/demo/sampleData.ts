@@ -3,33 +3,24 @@
  */
 
 export interface DemoCase {
-    id: string;
-    title: string;
-    description: string;
-    status: 'active' | 'pending' | 'closed';
+    id: string;, title: string;
+    description: string;, status: 'active' | 'pending' | 'closed';
     priority: 'low' | 'medium' | 'high' | 'urgent';
-    createdAt: Date;
-    updatedAt: Date;
-    assignedTo?: string;
-    tags: string[];
+    createdAt: Date;, updatedAt: Date;
+    assignedTo?: string;, tags: string[];
 }
 
 export interface DemoEvidence {
-    id: string;
-    caseId: string;
-    title: string;
-    description: string;
+    id: string;, caseId: string;
+    title: string;, description: string;
     type?: 'police_report' | 'witness_statement' | 'financial_records' | 'digital_forensics' | 'physical_evidence' | 'expert_testimony';
     status: 'new' | 'reviewing' | 'approved';
-    content: string;
-    uploadedAt: Date;
-    fileSize: number;
-    tags: string[];
+    content: string;, uploadedAt: Date;
+    fileSize: number;, tags: string[];
 }
 
 export interface DemoPerson {
-    id: string;
-    name: string;
+    id: string;, name: string;
     role: 'suspect' | 'witness' | 'victim' | 'officer' | 'expert' | 'other';
     contactInfo: {
         phone?: string;

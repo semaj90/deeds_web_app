@@ -7,18 +7,14 @@
 
 export interface BackendError {
 	service: 'database' | 'minio' | 'redis' | 'ollama' | 'qdrant' | 'unknown';
-	message: string;
-	userMessage: string;
-	retryable: boolean;
-	timestamp: string;
+	message: string;, userMessage: string;
+	retryable: boolean;, timestamp: string;
 	originalError?: Error;
 }
 
 export interface RetryConfig {
-	maxRetries: number;
-	baseDelayMs: number;
-	maxDelayMs: number;
-	backoffMultiplier: number;
+	maxRetries: number;, baseDelayMs: number;
+	maxDelayMs: number;, backoffMultiplier: number;
 }
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
@@ -101,7 +97,7 @@ export async function withRetry<T>(
 		config?: Partial<RetryConfig>;
 		onRetry?: (attempt: number, error: BackendError) => void;
 	} = {}
-): Promise<{ data: T; retries: number } | { error: BackendError; retries: number }> {
+): Promise<{, data: T; retries: number } | { error: BackendError;, retries: number }> {
 	const config = { ...DEFAULT_RETRY_CONFIG, ...options.config };
 	const service = options.service ?? 'unknown';
 	let lastError: BackendError | null = null;
@@ -151,7 +147,7 @@ export async function withFallback<T>(
 		service?: BackendError['service'];
 		logError?: boolean;
 	} = {}
-): Promise<{ data: T; fromFallback: boolean; error?: string }> {
+): Promise<{, data: T; fromFallback: boolean; error?: string }> {
 	const { service = 'unknown', logError = true } = options;
 
 	try {

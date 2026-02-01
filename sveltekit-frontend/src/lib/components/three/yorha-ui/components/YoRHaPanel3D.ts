@@ -39,8 +39,7 @@ export class YoRHaPanel3D extends YoRHa3DComponent {
 			backgroundColor: options?.backgroundColor|| YORHA_COLORS.primary.beige,
 			borderColor: options?.borderColor|| YORHA_COLORS.primary.black,
 			borderWidth: options?.borderWidth ?? 0.02,
-			shadow: {
-				enabled: true,
+			shadow: {, enabled: true,
 				color: YORHA_COLORS.primary.black,
 				intensity: 0.3,
 				offsetY: -0.1,

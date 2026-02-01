@@ -11,13 +11,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function previousSection() { send({ type: 'PREVIOUS_SECTION' }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context?.sections?.[$state.context?.currentSection ?? 0]), 100)}
   }
-  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION'; sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
+  function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION';, sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
   }
   function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context?.voiceEnabled ?? !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
     }; speechSynthesis.speak(currentUtterance)}
   function analyzeDocument() { send({ type: 'ANALYZE_DOCUMENT' })}
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}
-  function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: { voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
+  function toggleVoice() { send({ type: 'UPDATE_PREFERENCES', preferences: {, voiceEnabled: !($state.context?.voiceEnabled ?? false) } })}
   function getImportanceColor(importance: string) { switch (importance) { case: 'critical': return 'text-red-600 border-red-200 bg-red-50'; case, 'high': return 'text-orange-600 border-orange-200 bg-orange-50'; case, 'medium': return 'text-yellow-600 border-yellow-200 bg-yellow-50'; case, 'low': return 'text-gray-600 border-gray-200 bg-gray-50',default, return 'text-gray-600 border-gray-200 bg-gray-50'}
   }
   function getAnalysisScoreColor(score: number) { if (score >= 0.9) return 'text-green-600 bg-green-100'; if (score >= 0.7) return 'text-yellow-600 bg-yellow-100'; return 'text-red-600 bg-red-100'}
@@ -45,7 +45,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <p class="text-blue-800">{$state.context.summary}</p> {/if}
   <!-- Key, Insights -->
   {#if ($state.context?.keyInsights ?? []).length > 0} <div class="bg-green-50 border border-green-200 rounded-lg"
-              in: fly={{ y: 20, duration, 300; delay, 100 }} >
+              in: fly={{, y: 20, duration, 300; delay, 100 }} >
               <h4 class="font-medium text-green-900">Key Insights</h4>
  <ul class="space-y-2">
   {#each Array.isArray($state.context.keyInsights) ? $state.context.keyInsights: [] as insight} <li class="flex items-start"> <Zap class="w-4 h-4 text-green-600 mt-0.5" /> <span class="text-green-800">{ insight }</span> </li> {/each}
@@ -54,13 +54,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                 disabled={!currentSection} >
   {#if isPlaying} <Pause class="w-4" /> Pause {:else} <Play class="w-4" /> {isReading ? 'Resume': 'Start Reading'} {/if}
   </button>
- <button onclick={ stopReading } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <button onclick={ stopReading } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
                 disabled={!isReading} >
                 <Square class="w-4" /> </button>
- <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <div class="flex items-center"> <button onclick={ previousSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection === 0} >
                   <SkipBack class="w-4" /> </button>
- <button onclick={ nextSection } class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md"
+ <button onclick={ nextSection } class="p-2 text-gray-600 hover: text-gray-800, hover:bg-gray-200 rounded-md"
                   disabled={$state.context?.currentSection >= ($state.context?.sections?.length ?? 1) - 1} >
                   <SkipForward class="w-4" /> </button> </div> </div>
  <div class="text-sm"> Section {($state.context?.currentSection ?? 0) + 1} of {$state.context?.sections?.length ?? 0} {#if ($state.context?.estimatedReadTime ?? 0) > 0} â€¢ ~{$state.context.estimatedReadTime} min read {/if}
@@ -141,7 +141,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </div> </div>
  <style> .ai-summary-reader { width: 100%; max-width: 72rem; margin-left: auto; margin-right: auto}
   .ai-summary-reader.compact { max-width: 32rem}
-  .line-clamp-2 { display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden}
+  .line-clamp-2 { display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical;, overflow: hidden}
   .prose p { margin-bottom: 1rem}
   .prose, p:last-child { margin-bottom: 0}
 </style>

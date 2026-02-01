@@ -26,8 +26,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const res = await fetch(`${baseUrl}/api/embeddings`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                model: DEFAULT_EMBED_MODEL,
+            body: JSON.stringify({, model: DEFAULT_EMBED_MODEL,
                 prompt: text,
             }),
             signal: controller.signal,

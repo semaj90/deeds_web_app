@@ -16,13 +16,13 @@ import type { Session, User } from 'lucia';
 export interface AuthState {
 	user: User | null;
 	session: Session | null;
-	isLoading: boolean; error: string | null;
+	isLoading: boolean;, error: string | null;
 }
 
 export interface UIPreferences {
 	theme: 'light' | 'dark' | 'yorha';
 	lastCaseId: string | null;
-	sidebarOpen: boolean; preferredLanguage: string;
+	sidebarOpen: boolean;, preferredLanguage: string;
 }
 
 // ===== CONSTANTS =====
@@ -164,7 +164,7 @@ class AuthSessionStore {
 	 * Initialize session from server data
 	 * Called in +layout.svelte with data from +layout.server.ts
 	 */
-	initialize(data: { user: User | null, session: Session | null }) {
+	initialize(data: {, user: User | null, session: Session | null }) {
 		this.user = data.user;
 		this.session = data.session;
 		this.isLoading = false;

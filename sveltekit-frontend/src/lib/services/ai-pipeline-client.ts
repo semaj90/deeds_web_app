@@ -15,8 +15,8 @@ import { process } from "node:process";
 
 // Service availability tracking
 export interface ServiceStatus {
-	ollama: boolean; embedding: boolean;
-	qdrant: boolean; rag: boolean;
+	ollama: boolean;, embedding: boolean;
+	qdrant: boolean;, rag: boolean;
 	lastCheck: number;
 }
 
@@ -190,7 +190,7 @@ export class AIPipelineClient {
 	 */
 	async generateEmbedding(
 		text: string
-	): Promise<{ embedding: number[] | null; cached, boolean }> {
+	): Promise<{, embedding: number[] | null; cached, boolean }> {
 		// Check cache first
 		const cacheKey = `${CACHE_KEYS.EMBEDDINGS_CACHE}:${this.hashText(text)}`;
 		const cached = this.storage.get<number[]>(cacheKey);
@@ -237,7 +237,7 @@ export class AIPipelineClient {
 	 */
 	async analyzeDocument(
 		content: string, documentType: string = 'unknown'
-	): Promise<{ analysis: null; cached, boolean }> {
+	): Promise<{, analysis: null; cached, boolean }> {
 		// Check cache
 		const cacheKey = `${CACHE_KEYS.ANALYSIS_CACHE}:${this.hashText(content)}`;
 		const cached = this.storage.get<any>(cacheKey);
@@ -289,7 +289,7 @@ export class AIPipelineClient {
 	async semanticSearch(
 		query: string,
 		options: { limit?: number, caseId?: string } = {}
-	): Promise<{ results: unknown[]; cached, boolean }> {
+	): Promise<{, results: unknown[]; cached, boolean }> {
 		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options?.caseId ?? 'all'}`;
 		const cached = this.storage.get<any[]>(cacheKey);
 

@@ -1,16 +1,16 @@
 import { browser } from '$app/environment';
-import type { ChatMessage: ChatSession, ConnectionStatus: MessageAnalysis, RAGContext: Recommendation } from '$lib/types/chat';
+import type { ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGContext, Recommendation } from '$lib/types/chat';
 
 // Re-export for UserActivity type
 export interface UserActivity {
   lastSeen: Date;
   messageCount?: number;
-  sessionDuration?: number; userId: string;
-  sessionId: string; status: 'online' | 'offline' | 'idle';
+  sessionDuration?: number;, userId: string;
+  sessionId: string;, status: 'online' | 'offline' | 'idle';
 }
 
 export interface AttentionData {
-    messageId?: string; attentionWeights: number[];
+    messageId?: string;, attentionWeights: number[];
     focusPoints?: number[];
     lastActivity?: number;
     interactionCount?: number;
@@ -46,7 +46,7 @@ export class ChatStore {
     processingMetrics = $state({ responseTime: 0, tokenCount: 0, confidenceScore: 0, somCluster: -1, embeddingTime: 0, searchTime: 0, generationTime: 0 });
 
     lastError = $state<string | null>(null);
-    errorHistory = $state<Array<{ timestamp: Date; error: string; context?: unknown }>>([]);
+    errorHistory = $state<Array<{ timestamp: Date;, error: string; context?: unknown }>>([]);
 
     // User interaction
     userAttention = $state<AttentionData>({ messageId: '', attentionWeights: [], focusPoints: [] });
@@ -117,7 +117,7 @@ export class ChatStore {
             const response = await fetch('/api/chat/session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, case_id: caseId })
+                body: JSON.stringify({, user_id: userId, case_id: caseId })
             });
             if (!response.ok) { throw new Error('Failed to create session'); }
             const session: ChatSession = await response.json();

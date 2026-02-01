@@ -6,32 +6,27 @@
 export type CHRPatternType = 'text' | 'svg' | 'state';
 
 export interface CHRPatternBase {
-	key: string;
-	type: CHRPatternType;
-	ttlMs?: number;
-	createdAt: string;
+	key: string;, type: CHRPatternType;
+	ttlMs?: number;, createdAt: string;
 	meta?: Record<string, any>;
 }
 
 export interface CHRTextPattern extends CHRPatternBase {
-	type: 'text';
-	payload: {
+	type: 'text';, payload: {
 		text: string;
 		style?: 'mono' | 'body' | 'small' | 'title';
 	};
 }
 
 export interface CHRSVGPattern extends CHRPatternBase {
-	type: 'svg';
-	payload: {
+	type: 'svg';, payload: {
 		svg: string;
 		viewBox?: string;
 	};
 }
 
 export interface CHRStatePattern extends CHRPatternBase {
-	type: 'state';
-	payload: Record<string, unknown>;
+	type: 'state';, payload: Record<string, unknown>;
 }
 
 export type CHRPattern = CHRTextPattern | CHRSVGPattern | CHRStatePattern;
@@ -67,7 +62,7 @@ async function fetchJson(url: string, init?: RequestInit, ms = 8000) {
 		const data = await res.json();
 		return { ok: true, data, status: res.status };
 	} catch (e) {
-		return { ok: false, data: { error: String(e) }, status: 0 };
+		return { ok: false, data: {, error: String(e) }, status: 0 };
 	}
 }
 
@@ -80,7 +75,7 @@ function hashKey(s: string): string {
 }
 
 // Simple in-memory cache
-const patternCache = new Map<string, { pattern: CHRPattern; expires: number }>();
+const patternCache = new Map<string, { pattern: CHRPattern;, expires: number }>();
 
 async function readThrough(
 	key: string,
@@ -117,8 +112,7 @@ export async function generateCHRPatterns(ctx: PrecomputeContext): Promise<CHRPa
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						query: summaryQuery,
+					body: JSON.stringify({, query: summaryQuery,
 						document_ids: [ctx.docId],
 						max_results: 5,
 						temperature: 0.2
@@ -144,8 +138,8 @@ export async function generateCHRPatterns(ctx: PrecomputeContext): Promise<CHRPa
 						type: 'text' as const,
 						createdAt: now,
 						ttlMs: 60000,
-						meta: { precomputed: true, source: 'enhanced-rag' },
-						payload: { text: summaryText, style: 'body' as const }
+						meta: {, precomputed: true, source: 'enhanced-rag' },
+						payload: {, text: summaryText, style: 'body' as const }
 					}));
 					if (summaryPattern) out.push(summaryPattern);
 				}
@@ -165,8 +159,7 @@ export async function generateCHRPatterns(ctx: PrecomputeContext): Promise<CHRPa
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						query: ctx.query,
+					body: JSON.stringify({, query: ctx.query,
 						include_metadata: true
 					})
 				},
@@ -184,8 +177,8 @@ export async function generateCHRPatterns(ctx: PrecomputeContext): Promise<CHRPa
 						type: 'text' as const,
 						createdAt: now,
 						ttlMs: 45000,
-						meta: { source: 'enhanced-rag' },
-						payload: { text: snippet, style: 'body' as const }
+						meta: {, source: 'enhanced-rag' },
+						payload: {, text: snippet, style: 'body' as const }
 					}));
 					if (answerPattern) out.push(answerPattern);
 				}

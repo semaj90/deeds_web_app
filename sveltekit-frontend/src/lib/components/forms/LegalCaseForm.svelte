@@ -403,8 +403,7 @@
 
 <style>
   .legal-case-form {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 800px;, margin: 0 auto;
     padding: 1.5rem;
   }
 
@@ -413,46 +412,38 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-wrap: wrap;, gap: 1rem;
   }
 
   .form-title {
     font-size: 1.5rem;
-    font-weight: 600;
-    color: #f1f5f9;
+    font-weight: 600;, color: #f1f5f9;
     margin: 0;
   }
 
   .form-progress {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    align-items: center;, gap: 0.75rem;
   }
 
   .progress-bar {
-    width: 120px;
-    height: 8px;
+    width: 120px;, height: 8px;
     background: #334155;
-    border-radius: 4px;
-    overflow: hidden;
+    border-radius: 4px;, overflow: hidden;
   }
 
   .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #f59e0b, #d97706);
+    height: 100%;, background: linear-gradient(90deg, #f59e0b, #d97706);
     transition: width 0.3s ease;
   }
 
   .progress-text {
-    font-size: 0.875rem;
-    color: #94a3b8;
+    font-size: 0.875rem;, color: #94a3b8;
     font-weight: 500;
   }
 
   .tab-nav {
-    display: flex;
-    gap: 0.5rem;
+    display: flex;, gap: 0.5rem;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid #475569;
     padding-bottom: 0.5rem;
@@ -460,22 +451,17 @@
 
   .tab-btn {
     padding: 0.5rem 1rem;
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    border-radius: 0.25rem;
-    transition: all 0.2s;
+    background: transparent;, border: none;
+    color: #94a3b8;, cursor: pointer;
+    border-radius: 0.25rem;, transition: all 0.2s;
   }
 
   .tab-btn:hover {
-    background: #1e293b;
-    color: #f1f5f9;
+    background: #1e293b;, color: #f1f5f9;
   }
 
   .tab-btn.active {
-    background: #f59e0b;
-    color: #0f172a;
+    background: #f59e0b;, color: #0f172a;
     font-weight: 600;
   }
 
@@ -491,8 +477,7 @@
 
   .form-field {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: column;, gap: 0.5rem;
   }
 
   .form-field.full-width {
@@ -501,20 +486,16 @@
 
   .form-field label {
     font-size: 0.875rem;
-    font-weight: 600;
-    color: #f1f5f9;
+    font-weight: 600;, color: #f1f5f9;
   }
 
   .form-field input,
   .form-field select,
   .form-field textarea {
-    padding: 0.75rem;
-    border: 2px solid #475569;
-    border-radius: 0.5rem;
-    background: #1e293b;
+    padding: 0.75rem;, border: 2px solid #475569;
+    border-radius: 0.5rem;, background: #1e293b;
     color: #f1f5f9;
-    font-size: 0.875rem;
-    transition: border-color 0.2s;
+    font-size: 0.875rem;, transition: border-color 0.2s;
   }
 
   .form-field input:focus,
@@ -530,13 +511,11 @@
   }
 
   .error-msg {
-    font-size: 0.75rem;
-    color: #ef4444;
+    font-size: 0.75rem;, color: #ef4444;
   }
 
   .review-section h3 {
-    font-size: 1.25rem;
-    color: #f1f5f9;
+    font-size: 1.25rem;, color: #f1f5f9;
     margin-bottom: 1rem;
   }
 
@@ -549,17 +528,14 @@
 
   .review-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 1rem;
-    background: #1e293b;
+    flex-direction: column;, gap: 0.25rem;
+    padding: 1rem;, background: #1e293b;
     border-radius: 0.5rem;
     border-left: 3px solid #f59e0b;
   }
 
   .review-item strong {
-    font-size: 0.75rem;
-    color: #94a3b8;
+    font-size: 0.75rem;, color: #94a3b8;
     text-transform: uppercase;
   }
 
@@ -577,20 +553,17 @@
 
   .validation-status.valid {
     background: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: #22c55e;, border: 1px solid rgba(34, 197, 94, 0.2);
   }
 
   .validation-status.invalid {
     background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: #f59e0b;, border: 1px solid rgba(245, 158, 11, 0.2);
   }
 
   .form-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
+    justify-content: flex-end;, gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #475569;
@@ -600,8 +573,7 @@
   .btn-secondary {
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
+    font-weight: 600;, cursor: pointer;
     transition: all 0.2s;
     border: none;
   }
@@ -611,19 +583,17 @@
     color: #0f172a;
   }
 
-  .btn-primary:hover:not(:disabled) {
+  .btn-primary: hover, not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
   }
 
   .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    opacity: 0.5;, cursor: not-allowed;
   }
 
   .btn-secondary {
-    background: #334155;
-    color: #f1f5f9;
+    background: #334155;, color: #f1f5f9;
   }
 
   .btn-secondary:hover {

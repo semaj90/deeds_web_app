@@ -83,7 +83,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * RAG Lookup: Query knowledge base using vector similarity search
  * PHASE13: Implements vector similarity search with Redis caching and error recovery
  */
- rag_lookup: async (args: { query: string; topK?: number }) => {
+ rag_lookup: async (args: {, query: string; topK?: number }) => {
  const { query, topK = 5 } = args;
 
  try {
@@ -109,7 +109,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ vector: embedding,
+ body: JSON.stringify({, vector: embedding,
  limit: topK,
  with_payload: true,
  }),
@@ -156,7 +156,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * PHASE13: Implements web page fetching with link extraction and error recovery
  * NOTE: depth parameter reserved for future multi-level crawling implementation
  */
- web_crawl: async (args: { url: string; depth?: number; maxLinks?: number }) => {
+ web_crawl: async (args: {, url: string; depth?: number; maxLinks?: number }) => {
  const { url, maxLinks = 5 } = args;
  // depth parameter reserved for future implementation of recursive crawling
 
@@ -209,7 +209,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  }
 
  const result: WebCrawlResult = {
- url: status: response.status: text.substring(0, 5000), // Limit text size
+ url: status, response.status: text.substring(0, 5000), // Limit text size
  links,
  };
 
@@ -232,7 +232,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * Web Document Summary: Summarize web documentation
  * PHASE13: Implements documentation summarization with Ollama integration and error recovery
  */
- web_doc_summary: async (args: { url: string; topic?, string }) => {
+ web_doc_summary: async (args: {, url: string; topic?, string }) => {
  const { url, topic = 'SvelteKit/TypeScript codemods' } = args;
 
  try {
@@ -269,7 +269,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  fetch(`${ollamaEndpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
+ body: JSON.stringify({, model: prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
  stream: false,
  }),
  }),
@@ -386,7 +386,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * TODO: Integrate with Go code search microservice
  * IMPLEMENT: Add Go service endpoint configuration and result parsing
  */
- code_search: async (args: { pattern: string; path?: string }) => {
+ code_search: async (args: {, pattern: string; path?: string }) => {
  const { pattern, path = '.' } = args;
 
  try {
@@ -430,7 +430,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  {
  file: 'src/lib/agents/tools.ts',
  line: 450,
- content: `code_search, async (args: { pattern: string; path?: string }) => {`,
+ content: `code_search, async (args: {, pattern: string; path?: string }) => {`,
  match_type: 'definition',
  }],
  status: 'simulated',
@@ -458,7 +458,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * Apply Patch: Modify files with backup and rollback capability
  * PHASE79: Core tool for autonomous error fixing
  */
- apply_patch: async (args: { filePath: string; patchContent: string;
+ apply_patch: async (args: {, filePath: string;, patchContent: string;
  createBackup?: boolean;
  dryRun?: boolean;
  }) => {
@@ -521,7 +521,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * Verify Fix: Run svelte-check on specific file to verify no errors
  * PHASE79: Verification step in autonomous repair loop
  */
- verify_fix: async (args: { filePath: string, }) => {
+ verify_fix: async (args: {, filePath: string, }) => {
  const { filePath } = args;
 
  try {

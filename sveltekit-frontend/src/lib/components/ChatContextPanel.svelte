@@ -4,11 +4,11 @@
 
  // Define interfaces locally since they are not exported from chat-context
  interface TopicNode {
- clusterSize: number; tags: string[];
+ clusterSize: number;, tags: string[];
  }
 
  interface ShardNode {
- chunkCount: number; status: string;
+ chunkCount: number;, status: string;
  }
 
  const chatContext = chatContextRaw as any;

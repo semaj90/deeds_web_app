@@ -28,9 +28,9 @@ describe('CitationList Component', () => {{
 
  const mockStats = {
  total: 2,
- byJurisdiction: { Federal: 1, CA: 1 },
- bySeverity: { Felony: 2 },
- bySourceType: { manual: 1, auto_extracted: 1 },
+ byJurisdiction: {, Federal: 1, CA: 1 },
+ bySeverity: {, Felony: 2 },
+ bySourceType: {, manual: 1, auto_extracted: 1 },
  };
 
  beforeEach(() => {
@@ -125,7 +125,7 @@ describe('CitationList Component', () => {{
  ok: true, json: async () => ({
  success: true,
  citations: [],
- stats: { total: 0, byJurisdiction: {}, bySeverity: {}, bySourceType: {} },
+ stats: {, total: 0, byJurisdiction: {}, bySeverity: {}, bySourceType: {} },
  }),
  });
 

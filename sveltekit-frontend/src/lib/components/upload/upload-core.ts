@@ -11,11 +11,9 @@ export type UploadResult = {
 };
 
 export type FileState = {
-    file: File;
-    status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
+    file: File;, status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error' | 'canceled';
     progress: number; // 0-100
-    attempts: number;
-    error: string | null;
+    attempts: number;, error: string | null;
     result: UploadResult | null;
 };
 
@@ -120,7 +118,7 @@ export class UploadManager {
                     await fetch('/api/gpu/process', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileName: state.file.name })
+                        body: JSON.stringify({, fileName: state.file.name })
                     }).catch(() => null);
                 } catch {
                     // ignore GPU errors; not blocking
@@ -132,7 +130,7 @@ export class UploadManager {
                     await fetch('/api/embed/process', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ fileName: state.file.name })
+                        body: JSON.stringify({, fileName: state.file.name })
                     }).catch(() => null);
                 } catch {
                      // ignore

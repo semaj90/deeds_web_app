@@ -298,10 +298,8 @@ export async function healthCheckRabbitMQ(): Promise<boolean> {
  * Check health of all connections
  * Useful for QUIC health endpoints
  */
-export async function healthCheckAll(): Promise<{
-	redis: boolean;
-	qdrant: boolean;
-	neo4j: boolean;
+export async function healthCheckAll(): Promise<{, redis: boolean;
+	qdrant: boolean;, neo4j: boolean;
 	rabbitmq: boolean;
 }> {
 	const [redis, qdrant, neo4j, rabbitmq] = await Promise.allSettled([

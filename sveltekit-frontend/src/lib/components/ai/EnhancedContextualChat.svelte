@@ -16,11 +16,11 @@ import type { Document } from '$lib/types';
   import * as Dialog from 'bits-ui/Dialog'; // Corrected import
   import * as Accordion from 'bits-ui/accordion'; // Corrected import
   import * as Tooltip from 'bits-ui/tooltip'; // Corrected import
-  import type { ContextualState: NextStepPrediction,
-    LegalEntity: ConversationTurn } from '$lib/types/sharedTypes';
+  import type { ContextualState, NextStepPrediction,
+    LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
   import { onMount } from 'svelte';
   // NOTE: This frontend component interacts with SvelteKit API routes (e.g., /api/contextual/chat, /api/contextual/state).
-  // The actual wiring of Ollama endpoints (e.g., using getOllamaEndpoint() for gemma3-legal: latest; embeddinggemma:latest),
+  // The actual wiring of Ollama endpoints (e.g., using getOllamaEndpoint() for gemma3-legal: latest;, embeddinggemma:latest),
   // Drizzle-ORM, and Docker environment variables for production readiness
   // occurs within those server-side SvelteKit API routes (+server.ts files).
   // This component correctly uses relative paths for API calls, allowing SvelteKit to handle routing.
@@ -38,9 +38,9 @@ import type { Document } from '$lib/types';
   const { form, errors, enhance, message, submitting } = superForm({
     sessionId: userId,
     caseId,
-    message: ''; enableFunctions: true
+    message: '';, enableFunctions: true
   }, {
-    validators: zodClient(chatMessageSchema); resetForm: false,
+    validators: zodClient(chatMessageSchema);, resetForm: false,
     onSubmit: async () => {
       // Form submission handled by enhance
     },
@@ -49,8 +49,8 @@ import type { Document } from '$lib/types';
         // Add to conversation history
         conversationHistory = [
           ...conversationHistory, {
-            userMessage: $form.message; agentResponse: result.data.response,
-            timestamp: Date.now(); intent: 'general_query',
+            userMessage: $form.message;, agentResponse: result.data.response,
+            timestamp: Date.now();, intent: 'general_query',
             entities: result.data.entities || []; hmmState: result.data.metadata?.currentState ?? 0
           }
         ];
@@ -440,7 +440,7 @@ import type { Document } from '$lib/types';
 <style>
   .enhanced-contextual-chat {
     display: flex;
-    flex-direction: column; height: 100vh;
+    flex-direction: column;, height: 100vh;
     max-height: 900px
    ;background: #212529;
     font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -455,11 +455,11 @@ import type { Document } from '$lib/types';
     align-items: center;
     margin-bottom: 1rem}
   .header-actions {
-    display: flex; gap: 0.5rem}
+    display: flex;, gap: 0.5rem}
   .state-indicator {
-    display: flex; gap: 1rem;
-    align-items: center; padding: 0.5rem 1rem;
-    background: #2a2d30; border: 2px solid #d4af37;
+    display: flex;, gap: 1rem;
+    align-items: center;, padding: 0.5rem 1rem;
+    background: #2a2d30;, border: 2px solid #d4af37;
     border-radius: 4px}
   .state-label {
     color: #888}
@@ -471,7 +471,7 @@ import type { Document } from '$lib/types';
   .chat-body {
     display: grid;
     grid-template-columns: 1fr 400px;
-    flex: 1; overflow: hidden}
+    flex: 1;, overflow: hidden}
   .conversation-panel {
     display: flex;
     flex-direction: column;
@@ -484,18 +484,18 @@ import type { Document } from '$lib/types';
     margin-bottom: 1.5rem}
   .user-message,
   .agent-message {
-    margin-bottom: 0.75rem; padding: 1rem !important}
+    margin-bottom: 0.75rem;, padding: 1rem !important}
   .message-label {
     font-size: 10px;
-    margin-bottom: 0.5rem; color: #d4af37}
+    margin-bottom: 0.5rem;, color: #d4af37}
   .message-meta {
-    display: flex; gap: 1rem;
+    display: flex;, gap: 1rem;
     margin-top: 0.5rem;
-    font-size: 10px; color: #888}
+    font-size: 10px;, color: #888}
   .empty-state {
-    text-align: center; padding: 3rem 2rem}
+    text-align: center;, padding: 3rem 2rem}
   .message-form {
-    padding: 1rem; background: #1a1d20;
+    padding: 1rem;, background: #1a1d20;
     border-top: 4px solid #d4af37}
   .form-controls {
     display: flex;
@@ -506,11 +506,11 @@ import type { Document } from '$lib/types';
     margin-top: 0.25rem;
     font-size: 10px}
   .info-panel {
-    overflow-y: auto; padding: 1rem; background: #1a1d20}
+    overflow-y: auto;, padding: 1rem;, background: #1a1d20}
   .accordion-trigger {
-    width: 100%; display: flex;
+    width: 100%;, display: flex;
     justify-content: space-between;
-    align-items: center; padding: 0.75rem 1rem !important;
+    align-items: center;, padding: 0.75rem 1rem !important;
     cursor: pointer;
     margin-bottom: 0.5rem}
   .accordion-content { padding: 1rem}
@@ -518,7 +518,7 @@ import type { Document } from '$lib/types';
   .entities-list,
   .state-history {
     display: flex;
-    flex-direction: column; gap: 0.75rem}
+    flex-direction: column;, gap: 0.75rem}
   .prediction-item {
     padding: 1rem !important}
   .prediction-header {
@@ -526,45 +526,45 @@ import type { Document } from '$lib/types';
     justify-content: space-between;
     margin-bottom: 0.5rem}
   .prediction-action {
-    font-weight: bold; color: #d4af37}
+    font-weight: bold;, color: #d4af37}
   .prediction-confidence {
     color: #4ade80}
   .prediction-description {
     margin: 0.5rem 0;
-    font-size: 10px; color: #ccc}
+    font-size: 10px;, color: #ccc}
   .confidence-bar {
-    height: 6px; background: #2a2d30; border: 2px solid #444;
-    border-radius: 2px; overflow: hidden}
+    height: 6px;, background: #2a2d30;, border: 2px solid #444;
+    border-radius: 2px;, overflow: hidden}
   .confidence-fill {
-    height: 100%; background: linear-gradient(90deg, #d4af37, #4ade80);
+    height: 100%;, background: linear-gradient(90deg, #d4af37, #4ade80);
     transition: width 0.3s ease}
   .entity-item {
     display: flex;
     justify-content: space-between;
-    text-align: left; width: 100%}
+    text-align: left;, width: 100%}
   .entity-type {
     color: #d4af37;
     font-weight: bold}
   .history-item {
-    display: flex; gap: 1rem; padding: 0.5rem 1rem !important}
+    display: flex;, gap: 1rem;, padding: 0.5rem 1rem !important}
   .history-index {
     color: #888}
   .dialog-overlay {
-    position: fixed; inset: 0
+    position: fixed;, inset: 0
    ;background: rgba(0, 0, 0, 0.8);
     z-index: 50}
   .dialog-content {
-    position: fixed; top: 50%; left: 50%;transform: translate(-50%, -50%): 90%; max-width: 500px;
-    max-height: 85vh; padding: 2rem;
+    position: fixed;, top: 50%;, left: 50%;transform: translate(-50%, -50%): 90%; max-width: 500px;
+    max-height: 85vh;, padding: 2rem;
     z-index: 51}
   .dialog-title {
-    margin-bottom: 1.5rem; color: #d4af37;
+    margin-bottom: 1.5rem;, color: #d4af37;
     font-size: 14px}
   .entity-details {
     margin-bottom: 1.5rem}
   .detail-row {
     display: flex;
-    justify-content: space-between; padding: 0.5rem 0;
+    justify-content: space-between;, padding: 0.5rem 0;
     border-bottom: 1px solid #444}
   .detail-label {
     color: #888}

@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 

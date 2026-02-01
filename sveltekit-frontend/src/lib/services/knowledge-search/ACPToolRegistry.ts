@@ -6,17 +6,14 @@ import { execSync } from "child_process";
 import type { ACPTool, ToolResult } from './types.js';
 
 const CONFIG = {
-  endpoints: {
-    ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
+  endpoints: {, ollama: process.env.OLLAMA_URL || 'http://localhost:11434',
     qdrant: process.env.QDRANT_URL || 'http://localhost:6333',
     redis: process.env.REDIS_URL || 'http://localhost:6379',
   },
-  models: {
-    embedding: process.env.EMBEDDING_MODEL || 'nomic-embed-text:latest',
+  models: {, embedding: process.env.EMBEDDING_MODEL || 'nomic-embed-text:latest',
     chat: process.env.OLLAMA_MODEL || 'gemma3-legal:latest'
   },
-  timeouts: {
-    default: 30000,
+  timeouts: {, default: 30000,
     llm: 120000,
     crawl: 15000
   }
@@ -29,7 +26,7 @@ const handlers: Record<string, (args: any) => Promise<ToolResult>> = {
       // Mock for now, would call Qdrant
       return {
         success: true,
-        data: { results: [], synthesized: null },
+        data: {, results: [], synthesized: null },
         duration: Date.now() - startTime
       };
     } catch (error: any) {
@@ -60,8 +57,8 @@ const handlers: Record<string, (args: any) => Promise<ToolResult>> = {
     try {
       const containerName = process.env.REDIS_CONTAINER || 'legal-ai-redis';
       const output = execSync(`docker exec ${containerName} redis-cli GET "${key}"`, { encoding: 'utf-8' }).trim();
-      if (output === '(nil)') return { success: true, data: { value: null, exists: false }, duration: Date.now() - startTime };
-      return { success: true, data: { value: output, exists: true }, duration: Date.now() - startTime };
+      if (output === '(nil)') return { success: true, data: {, value: null, exists: false }, duration: Date.now() - startTime };
+      return { success: true, data: {, value: output, exists: true }, duration: Date.now() - startTime };
     } catch (error: any) {
       return { success: false, error: error.message, duration: Date.now() - startTime };
     }
@@ -77,7 +74,7 @@ const handlers: Record<string, (args: any) => Promise<ToolResult>> = {
         body: JSON.stringify({ model, prompt, stream: false })
       });
       const data = await response.json();
-      return { success: true, data: { text: data.response }, duration: Date.now() - startTime };
+      return { success: true, data: {, text: data.response }, duration: Date.now() - startTime };
     } catch (error: any) {
       return { success: false, error: error.message, duration: Date.now() - startTime };
     }
@@ -85,39 +82,35 @@ const handlers: Record<string, (args: any) => Promise<ToolResult>> = {
 };
 
 export const TOOLS: Record<string, ACPTool> = {
-  'knowledge:search': {
-    name: 'knowledge:search',
+  'knowledge:search': {, name: 'knowledge:search',
     description: 'Search knowledge base',
     category: 'search',
-    inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] },
-    outputSchema: { type: 'object' },
+    inputSchema: {, type: 'object', properties: {, query: { type: 'string' } }, required: ['query'] },
+    outputSchema: {, type: 'object' },
     examples: [],
     handler: handlers.knowledgeSearch
   },
-  'db:query': {
-    name: 'db:query',
+  'db:query': {, name: 'db:query',
     description: 'Query database',
     category: 'database',
-    inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] },
-    outputSchema: { type: 'object' },
+    inputSchema: {, type: 'object', properties: {, query: { type: 'string' } }, required: ['query'] },
+    outputSchema: {, type: 'object' },
     examples: [],
     handler: handlers.dbQuery
   },
-  'cache:get': {
-    name: 'cache:get',
+  'cache:get': {, name: 'cache:get',
     description: 'Get from cache',
     category: 'database',
-    inputSchema: { type: 'object', properties: { key: { type: 'string' } }, required: ['key'] },
-    outputSchema: { type: 'object' },
+    inputSchema: {, type: 'object', properties: {, key: { type: 'string' } }, required: ['key'] },
+    outputSchema: {, type: 'object' },
     examples: [],
     handler: handlers.cacheGet
   },
-  'llm:generate': {
-    name: 'llm:generate',
+  'llm:generate': {, name: 'llm:generate',
     description: 'Generate text',
     category: 'llm',
-    inputSchema: { type: 'object', properties: { prompt: { type: 'string' } }, required: ['prompt'] },
-    outputSchema: { type: 'object' },
+    inputSchema: {, type: 'object', properties: {, prompt: { type: 'string' } }, required: ['prompt'] },
+    outputSchema: {, type: 'object' },
     examples: [],
     handler: handlers.llmGenerate
   }

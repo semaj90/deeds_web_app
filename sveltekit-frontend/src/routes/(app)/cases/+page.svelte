@@ -117,13 +117,13 @@
 					placeholder="Search cases..."
 					bind:value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && applyFilters()}
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
 				/>
 			</div>
 			<select
 				bind:value={statusFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
 			>
 				<option value="all">All Status</option>
 				<option value="open">Open</option>
@@ -135,7 +135,7 @@
 			<select
 				bind:value={priorityFilter}
 				onchange={applyFilters}
-				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+				class="rounded border border-slate-600 bg-slate-800 px-4 py-2 text-sm focus: border-emerald-500, focus:outline-none"
 			>
 				<option value="">All Priorities</option>
 				<option value="critical">Critical</option>
@@ -178,7 +178,7 @@
 					<button
 						type="submit"
 						disabled={!bulkStatus}
-						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
+						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						Update
 					</button>
@@ -224,10 +224,10 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<div class="grid gap-4 md: grid-cols-2, lg:grid-cols-3">
 					{#each data.cases as caseItem (caseItem.id)}
 						<div
-							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover:border-emerald-500/50 hover:bg-slate-900"
+							class="group relative rounded-lg border border-slate-700 bg-slate-900/50 p-5 transition-all hover: border-emerald-500/50, hover:bg-slate-900"
 						>
 							<!-- Selection Checkbox -->
 							<input
@@ -324,7 +324,7 @@
 						id="title"
 						name="title"
 						required
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
 						placeholder="e.g., State v. Smith"
 					/>
 				</div>
@@ -338,7 +338,7 @@
 					name="description"
 					required
 					rows="4"
-					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none resize-none"
+					class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none resize-none"
 					placeholder="Brief overview of the case..."
 				></textarea>
 				</div>
@@ -349,7 +349,7 @@
 					<select
 						id="priority"
 						name="priority"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
 					>
 							<option value="low">Low</option>
 							<option value="medium">Medium</option>
@@ -365,7 +365,7 @@
 						type="text"
 						id="caseNumber"
 						name="caseNumber"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
 						placeholder="e.g., 2026-CR-0042"
 					/>
 					</div>
@@ -378,7 +378,7 @@
 						type="text"
 						id="practiceArea"
 						name="practiceArea"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
 						placeholder="e.g., Criminal Law"
 					/>
 					</div>
@@ -389,7 +389,7 @@
 						type="text"
 						id="jurisdiction"
 						name="jurisdiction"
-						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+						class="w-full rounded border border-slate-600 bg-slate-800 px-4 py-2 focus: border-emerald-500, focus:outline-none"
 						placeholder="e.g., Federal District Court"
 					/>
 					</div>
@@ -420,7 +420,7 @@
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
-		-webkit-box-orient: vertical; overflow: hidden;
+		-webkit-box-orient: vertical;, overflow: hidden;
 	}
 </style>
 

@@ -12,19 +12,15 @@
  */
 
 interface ChatMessage {
-	id: string;
-	chatId: string;
+	id: string;, chatId: string;
 	role: 'user' | 'assistant';
-	content: string;
-	timestamp: string;
+	content: string;, timestamp: string;
 	saved?: boolean; // true if persisted to legal_ai_db
 }
 
 interface AnonymousSession {
-	sessionId: string;
-	chats: Map<string, ChatMessage[]>;
-	createdAt: string;
-	lastActivity: string;
+	sessionId: string;, chats: Map<string, ChatMessage[]>;
+	createdAt: string;, lastActivity: string;
 }
 
 const SESSION_KEY = 'anonymous_chat_session';
@@ -166,7 +162,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Get session info for migration
 	 */
-	getSessionInfo(): { sessionId: string; messageCount: number; chatCount: number } | null {
+	getSessionInfo(): {, sessionId: string; messageCount: number;, chatCount: number } | null {
 		if (!this.session) return null;
 
 		let messageCount = 0;
@@ -184,7 +180,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Export all chats for migration to legal_ai_db
 	 */
-	exportForMigration(): { sessionId: string; chats: Record<string, ChatMessage[]> } | null {
+	exportForMigration(): {, sessionId: string; chats: Record<string, ChatMessage[]> } | null {
 		if (!this.session) return null;
 
 		return {

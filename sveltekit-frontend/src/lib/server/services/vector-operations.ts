@@ -9,7 +9,7 @@ export async function storeDocumentWithEmbedding(
 	id: string,
 	text: string,
 	metadata: Record<string, unknown> = {}
-): Promise<{ id: string; dim: number }> {
+): Promise<{, id: string; dim: number }> {
 	try {
 		const embedding = await OllamaEmbeddingService.embedText(text);
 		validateEmbedding(embedding);

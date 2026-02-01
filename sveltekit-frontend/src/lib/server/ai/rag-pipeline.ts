@@ -36,8 +36,7 @@ const redis = new Redis(process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379
 /* -------------------- EMBEDDINGS CLIENT -------------------- */
 
 interface OllamaEmbeddingsOptions {
-	baseUrl?: string;
-	model: string;
+	baseUrl?: string;, model: string;
 	requestOptions?: Record<string, unknown>;
 }
 
@@ -80,7 +79,7 @@ class OllamaEmbeddingsClient {
 const embeddings = new OllamaEmbeddingsClient({
 	baseUrl: OLLAMA_BASE_URL,
 	model: EMBEDDING_MODEL,
-	requestOptions: { num_thread: 8 }
+	requestOptions: {, num_thread: 8 }
 });
 
 const llm = new ChatOllama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL, temperature: 0.3 });
@@ -127,16 +126,15 @@ export class LegalRAGPipeline {
 	}
 
 	/* ---------- INGEST ---------- */
-	async ingestLegalDocument(params: {
-		title: string,
+	async ingestLegalDocument(params: {, title: string,
 		content: string,
 		documentType: string;
 		metadata?: Record<string, unknown>;
 		caseId?: string | null;
 		userId?: string | null;
-	}): Promise<{ documentId?: string; chunksCreated: number; tags: string[] }> {
+	}): Promise<{ documentId?: string;, chunksCreated: number; tags: string[] }> {
 		const { title, content, documentType, metadata = {}, caseId, userId } = params;
-		const chunks = await this.smartLegalChunking(content);chunks.map(async (text) => ({ text: embedding: await this.generateEmbedding(text)
+		const chunks = await this.smartLegalChunking(content);chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text)
 			}))
 		);
 
@@ -170,12 +168,11 @@ export class LegalRAGPipeline {
 	}
 
 	/* ---------- QUESTION ANSWERING ---------- */
-	async answerLegalQuestion(params: {
-		question: string,
+	async answerLegalQuestion(params: {, question: string,
 		caseId?: string,
 		conversationContext?: string;
 		userId?: string;
-	}): Promise<{ answer: string; sources: Array<{ id?: string; score?: number }>; confidence: number }> {
+	}): Promise<{, answer: string; sources: Array<{ id?: string; score?: number }>; confidence: number }> {
 		const start = Date.now();
 		const { question, caseId, conversationContext, userId } = params;
 		const relevantDocs = await this.hybridSearch({ query: question, caseId, limit: 5 });
@@ -208,7 +205,7 @@ Answer:
 			console.warn('[RAG] userAiQueries insert failed:', e);
 		}
 
-		return { answer: sources: relevantDocs.map((d) => ({
+		return { answer: sources, relevantDocs.map((d) => ({
 				id: (d.metadata as Record<string, unknown>)?.documentId as string | undefined,
 				score: (d.metadata as Record<string, unknown>)?.score as number | undefined
 			})),
@@ -217,8 +214,7 @@ Answer:
 	}
 
 	/* ---------- HYBRID SEARCH ---------- */
-	async hybridSearch(options: {
-		query: string,
+	async hybridSearch(options: {, query: string,
 		caseId?: string,
 		limit?: number;
 	}): Promise<LangChainDocument[]> {
@@ -228,14 +224,13 @@ Answer:
 		const qdrantUrl = process.env.QDRANT_URL;
 		if (qdrantUrl) {
 			try {
-				const collection = process.env?.QDRANT_COLLECTION ?? 'documents';? { must: [{ key: 'caseId', match: { value, caseId } }] }
+				const collection = process.env?.QDRANT_COLLECTION ?? 'documents';? { must: [{, key: 'caseId', match: { value, caseId } }] }
 					: undefined;
 
 				const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						vector: queryEmbedding,
+					body: JSON.stringify({, vector: queryEmbedding,
 						limit,
 						with_payload: true,
 						with_vector: false,
@@ -254,7 +249,7 @@ Answer:
 									: '';
 						return {
 							pageContent: String(text ?? ''),
-							metadata: { documentId: h.id, score: h.score }
+							metadata: {, documentId: h.id, score: h.score }
 						} as LangChainDocument;
 					});
 				}
@@ -274,7 +269,7 @@ Answer:
 			const text = r.summary?.toString() ?? r.content?.toString() || r.title?.toString() ?? '';
 			return {
 				pageContent: text,
-				metadata: { documentId: r.id, score: Math.max(0, 1 - i * 0.15) }
+				metadata: {, documentId: r.id, score: Math.max(0, 1 - i * 0.15) }
 			} as LangChainDocument;
 		});
 	}

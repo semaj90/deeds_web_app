@@ -10,10 +10,8 @@ export interface LegalAIRequest {
 }
 
 export interface LegalAIResponse {
-    text: string;
-    tokens: number;
-    inference_time: number;
-    model_used: string;
+    text: string;, tokens: number;
+    inference_time: number;, model_used: string;
 }
 
 class TensorRTLegalAI {
@@ -142,7 +140,7 @@ except Exception as e:
     private async pytorchInference(request: LegalAIRequest): Promise<LegalAIResponse> {
         // Fallback PyTorch inference implementation
         return {
-            text: 'PyTorch fallback: Legal analysis pending implementation.',
+            text: 'PyTorch, fallback: Legal analysis pending implementation.',
             tokens: 10,
             inference_time: 0.5,
             model_used: 'PyTorch-Fallback'

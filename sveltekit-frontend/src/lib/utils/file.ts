@@ -18,9 +18,9 @@ export interface FileProcessingOptions {
 
 export interface ProcessedFile {
  file: File;
- preview?: string; metadata: {
- name: string; size: number;
- type: string; lastModified: number;
+ preview?: string;, metadata: {
+ name: string;, size: number;
+ type: string;, lastModified: number;
  };
 }
 
@@ -208,7 +208,7 @@ export function createImagePreview(file: File): Promise<string> {
  * @returns Promise resolving to processed file data
  */
 export async function processFile(file: File, createPreview = false): Promise<ProcessedFile> {
- const processed: ProcessedFile = { file: metadata: { name: file.name,
+ const processed: ProcessedFile = { file: metadata: {, name: file.name,
  size: file.size,
  type: file.type,
  lastModified: file.lastModified,

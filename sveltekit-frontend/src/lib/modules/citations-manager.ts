@@ -5,12 +5,9 @@
  */
 
 export interface Citation {
-    id: string;
-    title: string;
-    citation: string;
-    court: string;
-    year: string;
-    category: string;
+    id: string;, title: string;
+    citation: string;, court: string;
+    year: string;, category: string;
     relevance: 'low' | 'medium' | 'high' | 'critical';
     keyPoints: string[];
     fullText?: string;
@@ -22,35 +19,27 @@ export interface Citation {
 }
 
 export interface SavedCitation extends Citation {
-    savedAt: Date;
-    userId: string;
+    savedAt: Date;, userId: string;
     collection?: string;
     isPrivate?: boolean;
 }
 
 export interface CitationCollection {
-    id: string;
-    name: string;
-    description?: string;
-    citations: string[]; // Citation IDs
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    isShared: boolean;
+    id: string;, name: string;
+    description?: string;, citations: string[]; // Citation IDs
+    userId: string;, createdAt: Date;
+    updatedAt: Date;, isShared: boolean;
 }
 
 export interface AuthUser {
-    id: string;
-    email: string;
-    name: string;
-    role: 'attorney' | 'paralegal' | 'clerk' | 'admin' | 'judge';
+    id: string;, email: string;
+    name: string;, role: 'attorney' | 'paralegal' | 'clerk' | 'admin' | 'judge';
     isAuthenticated: boolean;
 }
 
 export interface CitationImportOptions {
     format: 'bluebook' | 'apa' | 'mla' | 'custom';
-    includeKeyPoints: boolean;
-    includeSummary: boolean;
+    includeKeyPoints: boolean;, includeSummary: boolean;
     includeNotes?: boolean;
 }
 

@@ -19,7 +19,7 @@
 <style>
  .evidence-graph-page {
  min-height: 100vh;
- background-color: var(--yorha-dark); padding: 1.5rem;
+ background-color: var(--yorha-dark);, padding: 1.5rem;
  }
 
  .page-header {
@@ -30,7 +30,7 @@
  .neon-title {
  font-size: 2.25rem;
  line-height: 2.5rem;
- font-weight: 700; color: var(--neon-green);
+ font-weight: 700;, color: var(--neon-green);
  margin-bottom: 0.5rem;
  text-shadow: 0 0 10px rgba(0, 255, 128, 0.5);
  }

@@ -12,11 +12,11 @@
 import { getOllamaService } from './OllamaService.js';
 
 export interface FixSynthesizerConfig {
-  maxRetries: number; validationTimeout: number; backupDir: string;
+  maxRetries: number;, validationTimeout: number;, backupDir: string;
 }
 
 export interface FixResult {
-  success: boolean; strategy: FixStrategy | null;
+  success: boolean;, strategy: FixStrategy | null;
   error?: string;
   validationErrors?: string[];
 }
@@ -68,7 +68,7 @@ export class FixSynthesizer {
         .slice(0, 3);
 
       // Generate fix using Gemma3
-      const fixSuggestion = await ollama.generateFixSuggestion({ error: context: successfulFixes.map((f) => ({
+      const fixSuggestion = await ollama.generateFixSuggestion({ error: context, successfulFixes.map((f) => ({
           message: error.message,
           code: f.code,
         }))
@@ -162,7 +162,7 @@ export class FixSynthesizer {
   async validateFix(
     strategy: FixStrategy,
     error: ErrorReport
-  ): Promise<{ valid: boolean; errors: string[] }> {
+  ): Promise<{, valid: boolean;, errors: string[] }> {
     const errors: string[] = [];
 
     for (const rule of strategy.validationRules) {

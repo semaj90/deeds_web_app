@@ -84,7 +84,7 @@ Provide your analysis in this JSON structure:
 		const ollamaRes = await fetch('http://localhost:11434/api/chat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: messages: [
+			body: JSON.stringify({, model: messages: [
 					{
 						role: 'system',
 						content: 'You are an expert TypeScript and Svelte 5 developer. Always respond with valid JSON.'
@@ -92,7 +92,7 @@ Provide your analysis in this JSON structure:
 					{ role: 'user', content: prompt }
 				],
 				stream: false,
-				options: { temperature: 0.3 }
+				options: {, temperature: 0.3 }
 			})
 		});
 

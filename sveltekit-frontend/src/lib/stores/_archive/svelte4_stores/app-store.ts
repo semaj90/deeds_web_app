@@ -1,27 +1,27 @@
 import { writable } from 'svelte/store';
 import type { caseApi,
- evidenceApi: poiApi,
- searchApi: systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
+ evidenceApi, poiApi,
+ searchApi, systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
 
 // Store Types
 export interface AppState {
  // Cases
- cases: Case[]; caseStats: CaseStats | null;
+ cases: Case[];, caseStats: CaseStats | null;
  selectedCase: Case | null;
 
  // Evidence
- evidence: Evidence[]; evidenceStats: EvidenceStats | null;
+ evidence: Evidence[];, evidenceStats: EvidenceStats | null;
  selectedEvidence: Evidence | null;
 
  // Persons of Interest
- pois: PersonOfInterest[]; selectedPOI: PersonOfInterest | null;
+ pois: PersonOfInterest[];, selectedPOI: PersonOfInterest | null;
 
  // Search
- searchResults: SearchResult[]; searchQuery: string;
+ searchResults: SearchResult[];, searchQuery: string;
 
  // System
  systemMetrics: SystemMetrics | null;
- isLoading: boolean; error: string | null;
+ isLoading: boolean;, error: string | null;
 }
 
 // Initial State

@@ -6,32 +6,15 @@
 import { ASTError } from './svelte-check-analyzer.js';
 
 export interface ErrorVector {
-    id: string;
-    file: string;
-    code: string;
-    message: string;
-    vector: number[];
-    metadata: {
-        line: number;
-        severity: string;
-        source: string;
+    id: string;, file: string;, code: string;, message: string;, vector: number[];, metadata: {, line: number;, severity: string;, source: string;
     };
 }
 
 export interface WebGPUExport {
-    vectors: Array<{
-        id: string;
-        vector: number[];
-        metadata: {
-            file: string;
-            code: string;
-            line: number;
-            severity: string;
+    vectors: Array<{, id: string;, vector: number[];, metadata: {, file: string;, code: string;, line: number;, severity: string;
         };
     }>;
-    dimensions: number;
-    count: number;
-    codebook: Record<string, number>;
+    dimensions: number;, count: number;, codebook: Record<string, number>;
     filebook: Record<string, number>;
 }
 
@@ -68,8 +51,7 @@ export class ErrorVectorizer {
             code: error.code,
             message: error.message,
             vector,
-            metadata: {
-                line: error.line,
+            metadata: {, line: error.line,
                 severity: error.severity,
                 source: error.source || 'svelte-check',
             },
@@ -91,8 +73,7 @@ export class ErrorVectorizer {
             vectors: vectors.map((v) => ({
                 id: v.id,
                 vector: v.vector,
-                metadata: {
-                    file: v.file,
+                metadata: {, file: v.file,
                     code: v.code,
                     line: v.metadata.line,
                     severity: v.metadata.severity,

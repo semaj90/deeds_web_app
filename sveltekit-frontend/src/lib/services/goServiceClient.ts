@@ -3,10 +3,8 @@
  * Integrates with Enhanced RAG (8094), Upload Service (8093), and Kratos Server (50051)
  */
 export interface GoServiceConfig {
-    enhancedRagUrl: string;
-    uploadServiceUrl: string;
-    kratosServerUrl: string;
-    timeout: number;
+    enhancedRagUrl: string;, uploadServiceUrl: string;
+    kratosServerUrl: string;, timeout: number;
 }
 
 export interface RAGRequest {
@@ -17,13 +15,10 @@ export interface RAGRequest {
 }
 
 export interface RAGResponse {
-    response: string;
-    confidence: number;
+    response: string;, confidence: number;
     sources: string[];
-    embedding?: number[];
-    metadata: {
-        model: string;
-        processingTime: number;
+    embedding?: number[];, metadata: {
+        model: string;, processingTime: number;
         tokensUsed: number;
     };
 }
@@ -75,7 +70,7 @@ export class GoServiceClient {
         }
     }
 
-    async checkHealth(): Promise<{ rag: boolean; upload: boolean; kratos: boolean }> {
+    async checkHealth(): Promise<{, rag: boolean; upload: boolean;, kratos: boolean }> {
         const results = await Promise.allSettled([
             fetch(`${this.config.enhancedRagUrl}/health`, { signal: AbortSignal.timeout(5000) }),
             fetch(`${this.config.uploadServiceUrl}/health`, { signal: AbortSignal.timeout(5000) }),
@@ -106,7 +101,7 @@ export class GoServiceClient {
         }
     }
 
-    async acceptPatch(data: any): Promise<{ success: boolean; message?: string }> {
+    async acceptPatch(data: any): Promise<{, success: boolean; message?: string }> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/patch/accept`, {
                 method: 'POST',
@@ -123,7 +118,7 @@ export class GoServiceClient {
         }
     }
 
-    async rateSuggestion(data: Record<string, unknown>): Promise<{ success: boolean; message?: string }> {
+    async rateSuggestion(data: Record<string, unknown>): Promise<{, success: boolean; message?: string }> {
         try {
             const response = await fetch(`${this.config.enhancedRagUrl}/api/suggestion/rate`, {
                 method: 'POST',

@@ -29,18 +29,14 @@ export enum Priority {
 }
 
 interface MemoryItem {
-    key: string;
-    size: number;
-    priority: Priority;
-    lastAccessed: number;
+    key: string;, size: number;
+    priority: Priority;, lastAccessed: number;
     bankId?: number;
 }
 
 interface MemoryBank {
-    id: number;
-    items: Map<string, MemoryItem>;
-    currentSize: number;
-    maxSize: number;
+    id: number;, items: Map<string, MemoryItem>;
+    currentSize: number;, maxSize: number;
     isActive: boolean;
 }
 
@@ -311,7 +307,7 @@ export class NintendoMemoryManager {
     /**
      * Get Redis memory information
      */
-    private async getRedisMemoryInfo(): Promise<{ used_memory: number; maxmemory: number }> {
+    private async getRedisMemoryInfo(): Promise<{, used_memory: number; maxmemory: number }> {
         try {
             const info = await this.redis.info('memory');
             const lines = info.split('\r\n');

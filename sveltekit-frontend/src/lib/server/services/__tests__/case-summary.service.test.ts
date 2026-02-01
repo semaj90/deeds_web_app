@@ -22,7 +22,7 @@ vi.mock('$lib/server/db', async () => {
 vi.mock('$lib/server/redis', async () => {
     const { vi } = await import('vitest');
     return {
-        redis: { get: vi.fn( setex: vi.fn(del: vi.fn()
+        redis: {, get: vi.fn( setex: vi.fn(del: vi.fn()
         }
     };
 });
@@ -30,7 +30,7 @@ vi.mock('$lib/server/redis', async () => {
 vi.mock('../verification.service', async () => {
     const { vi } = await import('vitest');
     return {
-        verificationService: { validateAIResponse: vi.fn().mockReturnValue({ valid: true, violations: [] }, checkSourceVerification: vi.fn().mockResolvedValue({ verified: true, score: 1.0 })
+        verificationService: {, validateAIResponse: vi.fn().mockReturnValue({ valid: true, violations: [] }, checkSourceVerification: vi.fn().mockResolvedValue({, verified: true, score: 1.0 })
         }
     };
 });
@@ -66,7 +66,7 @@ describe('CaseSummaryService', () => {
 			// Mock checking for current version (returns empty)
 			// Mock inserting new version
 			vi.mocked(db.insert).mockReturnValueOnce({
-				values: vi.fn().mockReturnValueOnce({ returning: vi.fn().mockResolvedValueOnce([dbResult])
+				values: vi.fn().mockReturnValueOnce({, returning: vi.fn().mockResolvedValueOnce([dbResult])
 				})
 			} as any);caseId,
 				text,
@@ -127,7 +127,7 @@ describe('CaseSummaryService', () => {
 
 			// Mock chain: select -> from -> where -> limit
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockResolvedValueOnce([dbReport])
 					}),
 				}),
@@ -146,7 +146,7 @@ describe('CaseSummaryService', () => {
 			vi.mocked(redis.get).mockResolvedValueOnce(null);
 			// Mock returns empty array
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockResolvedValueOnce([])
 					}),
 				}),
@@ -175,7 +175,7 @@ describe('CaseSummaryService', () => {
 			};
 
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockResolvedValueOnce([dbReport])
 					}),
 				}),
@@ -204,7 +204,7 @@ describe('CaseSummaryService', () => {
             			};
 
 			vi.mocked(db.insert).mockReturnValueOnce({
-				values: vi.fn().mockReturnValueOnce({ returning: vi.fn().mockResolvedValueOnce([dbResult])
+				values: vi.fn().mockReturnValueOnce({, returning: vi.fn().mockResolvedValueOnce([dbResult])
 				})
 			} as any);
 
@@ -223,7 +223,7 @@ describe('CaseSummaryService', () => {
 
 			// getSummary to find ID
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockResolvedValueOnce([dbReport])
 					}),
 				}),
@@ -242,7 +242,7 @@ describe('CaseSummaryService', () => {
 				{ version: 2, summaryText: 'Version 2', createdAt: new Date() }];
 
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						orderBy: vi.fn().mockResolvedValueOnce(versions)
 					}),
 				}),
@@ -265,7 +265,7 @@ describe('CaseSummaryService', () => {
 			// The error might come from select OR insert.
 			// Let's force select to throw as it is the first DB call
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockRejectedValueOnce(new Error('Database error'))
 					}),
 				}),
@@ -292,7 +292,7 @@ describe('CaseSummaryService', () => {
 
 			// Should fall back to database
 			vi.mocked(db.select).mockReturnValueOnce({
-				from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockReturnValueOnce({
+				from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockReturnValueOnce({
 						limit: vi.fn().mockResolvedValueOnce([dbReport])
 					}),
 				}),

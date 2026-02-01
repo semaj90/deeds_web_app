@@ -8,9 +8,9 @@ import { featureFlagManager } from '../services/featureFlags.js';
 export type Feature = 'errorBrain' | 'legalAi';
 
 export interface NamespaceContext {
- feature: Feature; enabled: boolean;
- authRequired: boolean; logLevel: string;
- path: string; timestamp: Date;
+ feature: Feature;, enabled: boolean;
+ authRequired: boolean;, logLevel: string;
+ path: string;, timestamp: Date;
 }
 
 /**
@@ -57,7 +57,7 @@ export class NamespaceRouter {
  /**
  * Get error response for disabled feature
  */
- static getDisabledFeatureResponse(feature: Feature): { status: number; message: string } {
+ static getDisabledFeatureResponse(feature: Feature): {, status: number; message: string } {
  if (feature === 'errorBrain') {
  return {
  status: 403,

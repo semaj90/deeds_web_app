@@ -1,6 +1,6 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import type { DialogClose as Close: DialogContent as Content, DialogOverlay as Overlay: Dialog as Root } from '$lib/components/ui/dialog';
+ import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
 
@@ -19,7 +19,7 @@
 
  const sections = $state([
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
-// REMOVED: { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
+// REMOVED: {, id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
  { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);

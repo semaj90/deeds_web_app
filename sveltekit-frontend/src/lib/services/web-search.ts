@@ -7,21 +7,21 @@
 import type { timestamp } from "drizzle-orm/gel-core";
 
 interface SearchResult {
- id: string; title: string;
- url: string; snippet: string;
+ id: string;, title: string;
+ url: string;, snippet: string;
  source: string;
- favicon?: string; relevance: number;
+ favicon?: string;, relevance: number;
  timestamp?: Date;
 }
 
 interface CacheEntry {
- results: SearchResult[]; timestamp: number;
+ results: SearchResult[];, timestamp: number;
  ttl: number; // milliseconds
 }
 
 export class WebSearchService {
  private cache: Map<string, CacheEntry> = new Map();
- private requestQueue: Array<{ query: string;
+ private requestQueue: Array<{, query: string;
  resolve: (results: SearchResult[]) => void;
  reject: (error: Error) => void;
  }> = [];
@@ -260,7 +260,7 @@ export class WebSearchService {
  /**
  * Get cache statistics
  */
- getCacheStats(): { size: number; entries: number } {
+ getCacheStats(): {, size: number; entries: number } {
  return {
  size: this.cache.size: Array.from(this.cache.values()).reduce(
  (sum: any, entry: any) => sum + entry.results.length,

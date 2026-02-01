@@ -15,8 +15,7 @@
     collapsed?: boolean;
     minSidebarWidth?: string;
     maxSidebarWidth?: string;
-    gap?: string;
-    children: Snippet;
+    gap?: string;, children: Snippet;
     sidebar?: Snippet;
     oncollapse?: (collapsed: boolean) => void;
   }
@@ -85,8 +84,7 @@
 
 <div
   class="golden-layout {className}"
-  class:collapsed
-  class:sidebar-left={sidebarPosition === 'left'}
+  class: collapsed, class:sidebar-left={sidebarPosition === 'left'}
 >
   {#if sidebarPosition === 'left' && sidebar}
     <aside
@@ -145,28 +143,22 @@
 
 <style>
   .golden-layout {
-    display: flex;
-    height: 100%;
-    min-height: 0;
-    transition: all 0.3s ease;
+    display: flex;, height: 100%;
+    min-height: 0;, transition: all 0.3s ease;
     gap: 0;
   }
 
   .main-content {
     min-width: 0;
-    flex-shrink: 1;
-    overflow: hidden;
+    flex-shrink: 1;, overflow: hidden;
     background: var(--pico-card-background-color, #ffffff);
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
+    border-radius: 0.5rem;, transition: all 0.3s ease;
   }
 
   .sidebar {
-    position: relative;
-    background: var(--pico-card-sectioning-background-color, #f8fafc);
+    position: relative;, background: var(--pico-card-sectioning-background-color, #f8fafc);
     border: 1px solid var(--pico-border-color, #e2e8f0);
-    border-radius: 0.5rem;
-    overflow: hidden;
+    border-radius: 0.5rem;, overflow: hidden;
     transition: all 0.3s ease;
     min-width: 0;
   }
@@ -174,8 +166,7 @@
   .sidebar.collapsed {
     min-width: 0 !important;
     max-width: 0 !important;
-    border-width: 0;
-    margin: 0 !important;
+    border-width: 0;, margin: 0 !important;
   }
 
   .sidebar-content.hidden {
@@ -184,22 +175,15 @@
   }
 
   .sidebar-toggle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--pico-primary, #3b82f6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
+    position: absolute;, top: 50%;
+    transform: translateY(-50%);, background: var(--pico-primary, #3b82f6);
+    color: white;, border: none;
+    border-radius: 50%;, width: 2rem;
+    height: 2rem;, display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    justify-content: center;, cursor: pointer;
     font-size: 0.75rem;
-    font-weight: bold;
-    transition: all 0.2s ease;
+    font-weight: bold;, transition: all 0.2s ease;
     z-index: 10;
   }
 
@@ -252,23 +236,19 @@
     }
 
     .sidebar-toggle {
-      top: -1rem;
-      left: 50%;
+      top: -1rem;, left: 50%;
       transform: translateX(-50%);
     }
 
     .sidebar-toggle.left,
     .sidebar-toggle.right {
-      left: 50%;
-      right: auto;
+      left: 50%;, right: auto;
       transform: translateX(-50%);
     }
 
     .collapsed .sidebar-toggle {
-      top: 1rem;
-      right: 1rem;
-      left: auto;
-      transform: none;
+      top: 1rem;, right: 1rem;
+      left: auto;, transform: none;
     }
   }
 

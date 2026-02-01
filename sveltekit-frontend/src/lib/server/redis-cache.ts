@@ -8,7 +8,7 @@ import { redis } from '$lib/server/redis'; // Use centralized redis client
 // Cache configuration
 const SEARCH_CACHE_PREFIX = 'search:pgvector:';
 const EMBEDDING_CACHE_PREFIX = 'embedding:';
-const STATS_KEY = 'search:cache:stats';
+const STATS_KEY = 'search: cache, stats';
 const DEFAULT_TTL = 3600; // 1 hour
 
 /**
@@ -101,9 +101,7 @@ export async function setCacheIfNotExists(key: string, value: string, ttl?: numb
  * Search result interface for caching
  */
 export interface CachedSearchResult {
-    query: string;
-    results: Array<{ id: string; title: string; content: string; score: number }>;
-    stats: { totalResults: number; processingTimeMs: number };
-    timestamp: number;
-    ttl: number;
+    query: string;, results: Array<{ id: string;, title: string; content: string;, score: number }>;
+    stats: {, totalResults: number; processingTimeMs: number };
+    timestamp: number;, ttl: number;
 }

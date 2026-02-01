@@ -13,13 +13,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type EvidenceType = 'video' | 'document' | 'photo' | 'note';
 
  type EvidenceItem = {
-  id: string; title: string;
-  type: EvidenceType; summary: string;
-  x: number; y: number;
+  id: string;, title: string;
+  type: EvidenceType;, summary: string;
+  x: number;, y: number;
  };
 
  type EvidenceConnection = {
-  id: string; from: string; // evidence id
+  id: string;, from: string; // evidence id
   to: string; // evidence id
   label?: string;
  };

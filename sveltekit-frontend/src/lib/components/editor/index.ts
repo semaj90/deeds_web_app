@@ -8,8 +8,7 @@ export type EditorFormat = 'markdown' | 'html' | 'plain' | 'legal';
 export type EditorMode = 'edit' | 'preview' | 'split';
 
 export interface EditorConfig {
-    format: EditorFormat;
-    mode: EditorMode;
+    format: EditorFormat;, mode: EditorMode;
     spellCheck?: boolean;
     autoSave?: boolean;
     placeholder?: string;

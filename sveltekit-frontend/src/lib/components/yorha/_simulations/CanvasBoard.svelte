@@ -79,7 +79,7 @@
     // We'll only fill on init or clear.
   }
 
-  function getMousePos(e: MouseEvent): { x: number, y: number } {
+  function getMousePos(e: MouseEvent): {, x: number, y: number } {
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
@@ -278,46 +278,36 @@
 
 <style>
   .yorha-canvas-board {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    position: fixed;, top: 0;
+    left: 0;, right: 0;
     bottom: 0;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+    z-index: 1000;, display: flex;
+    flex-direction: column;, background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
     border: 2px solid #00ff88;
-    color: #00ff88;
-    overflow: hidden;
+    color: #00ff88;, overflow: hidden;
     font-family: 'Courier New', monospace;
   }
 
   .canvas-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
+    align-items: center;, padding: 1rem 2rem;
     background: rgba(0, 255, 136, 0.1);
     border-bottom: 2px solid #00ff88;
   }
 
   .canvas-title {
     font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
+    font-weight: bold;, margin: 0;
     text-shadow: 0 0 10px #00ff88;
     letter-spacing: 2px;
   }
 
   .close-btn {
-    background: transparent;
-    border: 2px solid #00ff88;
+    background: transparent;, border: 2px solid #00ff88;
     color: #00ff88;
-    font-size: 1.5rem;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
+    font-size: 1.5rem;, width: 40px;
+    height: 40px;, cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -326,8 +316,7 @@
 
   .close-btn:hover {
     background: rgba(255, 0, 0, 0.2);
-    border-color: #ff0000;
-    color: #ff0000;
+    border-color: #ff0000;, color: #ff0000;
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
     transform: scale(1.1);
   }
@@ -335,8 +324,7 @@
   .canvas-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
+    justify-content: space-between;, padding: 1rem;
     background: rgba(0, 0, 0, 0.8);
     border-bottom: 1px solid #00ff88;
     gap: 2rem;
@@ -345,67 +333,54 @@
 
   .tool-section, .color-section, .size-section {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: column;, gap: 0.5rem;
     align-items: center;
   }
 
   .tool-section h3, .color-section h3, .size-section h3 {
-    font-size: 0.8rem;
-    margin: 0;
+    font-size: 0.8rem;, margin: 0;
     color: #00ff88;
     text-shadow: 0 0 5px #00ff88;
   }
 
   .tool-buttons {
-    display: flex;
-    gap: 0.5rem;
+    display: flex;, gap: 0.5rem;
   }
 
   .tool-btn {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid #333;
-    color: #00ff88;
-    padding: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
+    color: #00ff88;, padding: 0.5rem;
+    cursor: pointer;, transition: all 0.3s ease;
+    font-size: 1.2rem;, width: 40px;
+    height: 40px;, display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .tool-btn:hover {
-    border-color: #00ff88;
-    background: rgba(0, 255, 136, 0.1);
+    border-color: #00ff88;, background: rgba(0, 255, 136, 0.1);
     box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
   }
 
   .tool-btn.active {
-    border-color: #00ff88;
-    background: rgba(0, 255, 136, 0.2);
+    border-color: #00ff88;, background: rgba(0, 255, 136, 0.2);
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
   }
 
   .color-palette {
-    display: flex;
-    gap: 0.25rem;
+    display: flex;, gap: 0.25rem;
     flex-wrap: wrap;
   }
 
   .color-btn {
-    width: 30px;
-    height: 30px;
+    width: 30px;, height: 30px;
     border: 2px solid #333;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    cursor: pointer;, transition: all 0.3s ease;
   }
 
   .color-btn:hover {
-    border-color: #00ff88;
-    transform: scale(1.1);
+    border-color: #00ff88;, transform: scale(1.1);
   }
 
   .color-btn.active {
@@ -415,26 +390,20 @@
   }
 
   .size-slider {
-    width: 100px;
-    height: 20px;
-    background: #333;
-    outline: none;
+    width: 100px;, height: 20px;
+    background: #333;, outline: none;
     cursor: pointer;
   }
 
   .canvas-container {
-    flex: 1;
-    position: relative;
-    background: #000;
-    display: flex;
+    flex: 1;, position: relative;
+    background: #000;, display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: auto;
+    justify-content: center;, overflow: auto;
   }
 
   .yorha-canvas {
-    cursor: crosshair;
-    background: transparent;
+    cursor: crosshair;, background: transparent;
   }
 
   .yorha-canvas.drawing {
@@ -442,8 +411,7 @@
   }
 
   .canvas-overlay {
-    position: absolute;
-    bottom: 1rem;
+    position: absolute;, bottom: 1rem;
     right: 1rem;
     pointer-events: none;
   }
@@ -451,27 +419,25 @@
   .canvas-info {
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid #00ff88;
-    padding: 0.5rem;
-    display: flex;
+    padding: 0.5rem;, display: flex;
     gap: 1rem;
     font-size: 0.8rem;
   }
 
   .info-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: center;, gap: 0.5rem;
   }
-  .size-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #00ff88; cursor: pointer; border-radius: 0 }
-  .size-display { font-weight: bold; color: #00ff88; text-shadow: 0 0 5px #00ff88 }
-  .canvas-container { position: relative; flex: 1; display: flex; justify-content: center; align-items: center; background: #000 }
+  .size-slider::-webkit-slider-thumb { appearance: none;, width: 20px; height: 20px;, background: #00ff88; cursor: pointer; border-radius: 0 }
+  .size-display { font-weight: bold;, color: #00ff88; text-shadow: 0 0 5px #00ff88 }
+  .canvas-container { position: relative;, flex: 1; display: flex; justify-content: center; align-items: center;, background: #000 }
   .yorha-canvas { border: 2px solid #333; cursor: crosshair }
   .yorha-canvas:hover { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3) }
   .yorha-canvas.drawing { box-shadow: 0 0 30px rgba(0, 255, 136, 0.5)}
-  .canvas-overlay { position: absolute; top: 1rem; right: 1rem; background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none}
-  .canvas-info { display: flex; flex-direction: column; gap: 0.25rem}
+  .canvas-overlay { position: absolute;, top: 1rem; right: 1rem;, background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; padding: 0.5rem; pointer-events: none}
+  .canvas-info { display: flex; flex-direction: column;, gap: 0.25rem}
   .info-item { font-size: 0.8rem; font-family: 'Courier New', monospace; color: #00ff88}
-  /* Responsive design */ @media (max-width: 768px) { .canvas-toolbar { flex-direction: column; gap: 1rem}
+  /* Responsive design */ @media (max-width: 768px) { .canvas-toolbar { flex-direction: column;, gap: 1rem}
     .tool-section, .color-section, .size-section { flex-direction: row; align-items: center}
     .color-palette { max-width: 200px}
   } /* YoRHa-style animations */ @keyframes yorha-glow { 0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3) } 50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.6) } 100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3) } }

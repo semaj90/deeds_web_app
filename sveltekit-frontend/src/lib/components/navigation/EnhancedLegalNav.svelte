@@ -9,12 +9,9 @@
 	import { scale, slide } from 'svelte/transition';
 
 	interface RecentCase {
-		id: string;
-		title: string;
-		priority: number;
-		lastAccessed: Date;
-		confidence: number;
-		status: 'active' | 'pending' | 'closed';
+		id: string;, title: string;
+		priority: number;, lastAccessed: Date;
+		confidence: number;, status: 'active' | 'pending' | 'closed';
 		glyphSignature?: string;
 	}
 
@@ -71,8 +68,7 @@
 			// Calculate priority for each case
 			recentCases = response.map((caseItem: any) => ({
 				...caseItem,
-				priority: calculateDocumentPriority({
-					type: 'case',
+				priority: calculateDocumentPriority({, type: 'case',
 					urgency: caseItem.status === 'active' ? 'critical' : 'normal',
 					lastAccessed: new Date(caseItem.lastAccessed),
 					activeReview: caseItem.status === 'active'
@@ -123,7 +119,7 @@
 	</div>
 
 	<!-- Recent Cases Bar -->
-	<div class="recent-cases-bar" transition:slide={{ duration: 300, easing: cubicOut }}>
+	<div class="recent-cases-bar" transition: slide={{, duration: 300, easing: cubicOut }}>
 		<div class="cases-container">
 			<span class="cases-label">📊 Recent:</span>
 			{#if isLoading}
@@ -138,7 +134,7 @@
 						<a
 							href="/cases/{caseItem.id}"
 							class="case-pill"
-							transition:scale|local={{ duration: 200, delay: i * 50, easing: elasticOut }}
+							transition: scale|local={{, duration: 200, delay: i * 50, easing: elasticOut }}
 							style="--priority-color: hsl({240 - caseItem.priority}, 70%: 50%)"
 						>
 							<span
@@ -157,10 +153,8 @@
 
 <style>
 	.enhanced-legal-nav {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
+		position: fixed;, top: 0;
+		left: 0;, right: 0;
 		z-index: 1000;
 		backdrop-filter: blur(12px) saturate(1.5);
 		background: rgba(0, 0, 0, var(--nav-translucency));
@@ -172,8 +166,7 @@
 	.nav-main {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 1rem 2rem;
+		justify-content: space-between;, padding: 1rem 2rem;
 		min-height: 60px;
 	}
 
@@ -184,36 +177,29 @@
 	}
 
 	.nav-links {
-		display: flex;
-		gap: 2rem;
+		display: flex;, gap: 2rem;
 	}
 
 	.nav-links a {
 		color: var(--nes-white);
-		text-decoration: none;
-		padding: 0.5rem 1rem;
+		text-decoration: none;, padding: 0.5rem 1rem;
 		border: 2px solid transparent;
 		transition: all 0.2s;
 		position: relative;
 	}
 
 	.nav-links a:hover {
-		border-color: var(--nes-primary);
-		transform: translateY(-2px);
+		border-color: var(--nes-primary);, transform: translateY(-2px);
 	}
 
 	.nav-links a.active {
-		border-color: var(--nes-success);
-		background: rgba(92, 184, 92, 0.1);
+		border-color: var(--nes-success);, background: rgba(92, 184, 92, 0.1);
 	}
 
 	.nav-links a.active:after {
-		content: '';
-		position: absolute;
-		bottom: -2px;
-		left: 0;
-		right: 0;
-		height: 2px;
+		content: '';, position: absolute;
+		bottom: -2px;, left: 0;
+		right: 0;, height: 2px;
 		background: linear-gradient(90deg, transparent, var(--nes-success), transparent);
 		animation: shimmer 2s infinite;
 	}
@@ -231,8 +217,7 @@
 
 	.cases-container {
 		display: flex;
-		align-items: center;
-		gap: 1rem;
+		align-items: center;, gap: 1rem;
 		overflow-x: auto;
 		scrollbar-width: thin;
 		scrollbar-color: var(--nes-primary) transparent;
@@ -246,22 +231,18 @@
 	}
 
 	.cases-list {
-		display: flex;
-		gap: 0.75rem;
+		display: flex;, gap: 0.75rem;
 	}
 
 	.case-pill {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		padding: 0.375rem 0.75rem;
 		background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
 		border: 1px solid var(--priority-color);
-		border-radius: 16px;
-		color: var(--nes-white);
+		border-radius: 16px;, color: var(--nes-white);
 		text-decoration: none;
-		white-space: nowrap;
-		transition: all 0.2s;
+		white-space: nowrap;, transition: all 0.2s;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
 
@@ -272,40 +253,33 @@
 	}
 
 	.case-status-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		animation: pulse 2s infinite;
+		width: 8px;, height: 8px;
+		border-radius: 50%;, animation: pulse 2s infinite;
 	}
 
 	.case-title {
-		max-width: 150px;
-		overflow: hidden;
+		max-width: 150px;, overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
 	.case-confidence {
-		font-size: 0.75rem;
-		opacity: 0.8;
+		font-size: 0.75rem;, opacity: 0.8;
 		font-family: 'Courier New', monospace;
 	}
 
 	.loading-shimmer {
-		display: flex;
-		gap: 0.75rem;
+		display: flex;, gap: 0.75rem;
 	}
 
 	.shimmer-case {
-		width: 120px;
-		height: 32px;
+		width: 120px;, height: 32px;
 		background: linear-gradient(
 			90deg,
 			rgba(255, 255, 255, 0.05),
 			rgba(255, 255, 255, 0.1),
 			rgba(255, 255, 255, 0.05)
 		);
-		border-radius: 16px;
-		animation: shimmer 1.5s infinite;
+		border-radius: 16px;, animation: shimmer 1.5s infinite;
 	}
 
 	@keyframes shimmer {

@@ -178,14 +178,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 
 	.nes-admin-layout {
-		min-height: 100vh; background: #0f380f;
+		min-height: 100vh;, background: #0f380f;
 		color: #f3eddc;
 	}
 
 	.nes-admin-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center; padding: 1.5rem;
+		align-items: center;, padding: 1.5rem;
 		background: #262017;
 		border-bottom: 3px solid #f3eddc;
 	}
@@ -206,20 +206,20 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	.nes-sidebar-title {
 		font-size: 10px;
 		letter-spacing: 0.2em;
-		margin-bottom: 1rem; color: #9bbc0f;
+		margin-bottom: 1rem;, color: #9bbc0f;
 	}
 
 	.nes-cluster-list {
 		display: flex;
-		flex-direction: column; gap: 0.5rem;
+		flex-direction: column;, gap: 0.5rem;
 	}
 
 	.nes-cluster-item {
 		display: flex;
-		align-items: center; gap: 0.5rem;
-		width: 100%; padding: 0.5rem;
-		background: #262017; border: 2px solid #306230;
-		color: #f3eddc; cursor: pointer;
+		align-items: center;, gap: 0.5rem;
+		width: 100%;, padding: 0.5rem;
+		background: #262017;, border: 2px solid #306230;
+		color: #f3eddc;, cursor: pointer;
 		transition: all 0.2s;
 		text-align: left;
 	}
@@ -231,7 +231,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 
 	.nes-cluster-icon {
-		width: 16px; height: 16px;
+		width: 16px;, height: 16px;
 		border: 2px solid #000;
 		flex-shrink: 0;
 	}
@@ -244,12 +244,12 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	.nes-cluster-name {
 		font-size: 8px;
 		letter-spacing: 0.1em;
-		white-space: nowrap; overflow: hidden;
+		white-space: nowrap;, overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
 	.nes-cluster-count {
-		font-size: 6px; color: #aaa;
+		font-size: 6px;, color: #aaa;
 	}
 
 	.nes-empty-state {
@@ -258,7 +258,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 
 	.nes-graph-main {
-		position: relative; overflow: hidden;
+		position: relative;, overflow: hidden;
 	}
 
 	.nes-controls {
@@ -273,36 +273,36 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 
 	.nes-btn {
-		display: block; width: 100%;
+		display: block;, width: 100%;
 		padding: 0.5rem;
 		margin-bottom: 0.5rem;
 		font-size: 8px;
-		letter-spacing: 0.1em; background: #306230;
+		letter-spacing: 0.1em;, background: #306230;
 		border: 2px solid #9bbc0f;
-		color: #f3eddc; cursor: pointer;
+		color: #f3eddc;, cursor: pointer;
 		text-decoration: none;
-		text-align: center; transition: all 0.2s;
+		text-align: center;, transition: all 0.2s;
 	}
 
 	.nes-btn:hover {
-		background: #9bbc0f; color: #0f380f;
+		background: #9bbc0f;, color: #0f380f;
 	}
 
 	.nes-checkbox {
 		display: flex;
-		align-items: center; gap: 0.5rem;
+		align-items: center;, gap: 0.5rem;
 		font-size: 8px;
-		margin-bottom: 0.5rem; cursor: pointer;
+		margin-bottom: 0.5rem;, cursor: pointer;
 	}
 
 	.nes-checkbox input[type='checkbox'] {
-		width: 16px; height: 16px;
+		width: 16px;, height: 16px;
 		border: 2px solid #9bbc0f;
-		background: #0f380f; cursor: pointer;
+		background: #0f380f;, cursor: pointer;
 	}
 
 	.nes-selected-route {
-		padding: 0.5rem; background: #262017;
+		padding: 0.5rem;, background: #262017;
 		border: 2px solid #306230;
 		word-break: break-all;
 	}
@@ -310,7 +310,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	.nes-badge {
 		padding: 4px 8px;
 		font-size: 8px;
-		letter-spacing: 0.2em; border: 2px solid;
+		letter-spacing: 0.2em;, border: 2px solid;
 	}
 
 	.nes-badge-error {
@@ -324,17 +324,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 	}
 
 	.nes-dialog-overlay {
-		position: fixed; inset: 0;
+		position: fixed;, inset: 0;
 		background: rgba(0, 0, 0, 0.7);
 		z-index: 50;
 	}
 
 	.nes-dialog {
-		position: fixed; top: 50%;
-		left: 50%; transform: translate(-50%, -50%);
-		background: #262017; border: 3px solid #f3eddc;
-		padding: 1.5rem; color: #f3eddc;
-		max-width: 500px; width: 90%;
+		position: fixed;, top: 50%;
+		left: 50%;, transform: translate(-50%, -50%);
+		background: #262017;, border: 3px solid #f3eddc;
+		padding: 1.5rem;, color: #f3eddc;
+		max-width: 500px;, width: 90%;
 		z-index: 51;
 	}
 
@@ -352,7 +352,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 		display: flex;
 		justify-content: space-between;
 		font-size: 8px;
-		margin-bottom: 0.5rem; gap: 1rem;
+		margin-bottom: 0.5rem;, gap: 1rem;
 	}
 
 	.nes-detail-label {

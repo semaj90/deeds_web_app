@@ -11,8 +11,7 @@ import type { OllamaConfig, ModelConfig } from './types.js';
  */
 // Model configurations aligned with the blueprint architecture
 export const MODELS: Record<string, ModelConfig> = {
-	'gemma3-legal:latest': {
-		name: 'gemma3-legal:latest',
+	'gemma3-legal:latest': {, name: 'gemma3-legal:latest',
 		type: 'local',
 		capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
 		contextWindow: 8192,
@@ -21,23 +20,20 @@ export const MODELS: Record<string, ModelConfig> = {
 		topP: 0.9,
 		topK: 40,
 		systemPrompt: `You are a sophisticated legal AI assistant powered by Gemma3, specialized in legal document analysis, contract review, and case law research. You provide accurate, context-aware legal insights while maintaining strict confidentiality and professional standards. Your responses are based on deep understanding of legal terminology, precedents, and regulatory frameworks.`,
-		options: {
-			num_gpu: 1, // Use GPU acceleration
+		options: {, num_gpu: 1, // Use GPU acceleration
 			num_thread: 8, // Parallel processing threads
 			repeat_penalty: 1.1,
 			seed: 42,
 			stop: ['User: ', 'Human: ', '\n\n\n']
 		}
 	},
-	'nomic-embed-text': {
-		name: 'nomic-embed-text',
+	'nomic-embed-text': {, name: 'nomic-embed-text',
 		type: 'embedding',
 		capabilities: ['embeddings'],
 		embeddingDimension: 768,
 		contextWindow: 8192
 	},
-	embeddinggemma: {
-		name: 'embeddinggemma',
+	embeddinggemma: {, name: 'embeddinggemma',
 		type: 'embedding',
 		capabilities: ['embeddings'],
 		embeddingDimension: 768,
@@ -66,8 +62,7 @@ export const OLLAMA_CONFIG: OllamaConfig = {
 	defaultModel: 'gemma3-legal:latest',
 	embeddingModel: 'embeddinggemma',
 	fallbackModel: 'gemma3-legal:latest',
-	fallbackModels: {
-		legal: 'gemma3-legal:latest',
+	fallbackModels: {, legal: 'gemma3-legal:latest',
 		general: 'gemma3-legal:latest'
 	},
 	timeout: 60000, // 60 seconds for complex legal analysis
@@ -75,24 +70,21 @@ export const OLLAMA_CONFIG: OllamaConfig = {
 	streamEnabled: true,
 
     // GPU acceleration settings
-	gpu: {
-		enabled: true,
+	gpu: {, enabled: true,
 		layers: 35, // Number of layers to offload to GPU
 		mainGpu: 0,
 		tensorSplit: null
 	},
 
     // Performance optimization
-	performance: {
-		batchSize: 32,
+	performance: {, batchSize: 32,
 		parallelRequests: 4,
 		cacheEnabled: true,
 		cacheTTL: 3600, // 1 hour cache
 	},
 
 	// Advanced features from blueprint
-	features: {
-		som: true, // Self-Organizing Map for topic modeling
+	features: {, som: true, // Self-Organizing Map for topic modeling
 		proactiveCaching: true,
 		multiModalIndexing: true,
 		reinforcementLearning: false, // Can be enabled later

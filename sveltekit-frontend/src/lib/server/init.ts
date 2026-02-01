@@ -11,15 +11,15 @@ import { initializeCommonServices, getServiceDiscovery } from '$lib/server/helpe
 import { verifyServiceEndpoint } from '$lib/server/helpers/docker-discovery';
 
 export interface ServerServices {
-    minio: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    minioConsole: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    ollama: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    qdrant: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    redis: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    postgres: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    neo4j: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    rabbitmq: { url: string; source: 'env' | 'discovery' | 'fallback' };
-    rabbitmqManagement: { url: string; source: 'env' | 'discovery' | 'fallback' };
+    minio: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    minioConsole: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    ollama: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    qdrant: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    redis: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    postgres: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    neo4j: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    rabbitmq: {, url: string; source: 'env' | 'discovery' | 'fallback' };
+    rabbitmqManagement: {, url: string; source: 'env' | 'discovery' | 'fallback' };
 }
 
 // Global services instance

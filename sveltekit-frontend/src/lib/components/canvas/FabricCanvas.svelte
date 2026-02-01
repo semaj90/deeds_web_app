@@ -9,9 +9,9 @@ https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Define the props expected by this component using Svelte 5 runes
  let { width, height, caseId, readOnly, gridEnabled, snapToGrid, onSave } = $props<{
- width: number; height: number;
- caseId: string; readOnly: boolean;
- gridEnabled: boolean; snapToGrid: boolean;
+ width: number;, height: number;
+ caseId: string;, readOnly: boolean;
+ gridEnabled: boolean;, snapToGrid: boolean;
  onSave: (data: { objects, unknown[] }) => Promise<void>;
  }>();
 
@@ -44,7 +44,7 @@ https, //svelte.dev/e/js_parse_error -->
  <p>Read Only: { readOnly }</p>
  <p>Grid Enabled: { gridEnabled }</p>
  <p>Snap to Grid: {snapToGrid}</p>
- <button onclick={() => onSave({ objects: [{ type: 'dummy', id: 'simulated-object' }] })}>
+ <button onclick={() => onSave({ objects: [{, type: 'dummy', id: 'simulated-object' }] })}>
  Simulate Save
  </button>
 </div>
@@ -55,7 +55,7 @@ https, //svelte.dev/e/js_parse_error -->
  display: flex;
  flex-direction: column;
  justify-content: center;
- align-items: center; color: #666;
+ align-items: center;, color: #666;
  margin-top: 20px;
  border-radius: 8px;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -66,10 +66,10 @@ https, //svelte.dev/e/js_parse_error -->
  margin-bottom: 10px;
  }
  button {
- margin-top: 10px; padding: 8px 16px;
- background-color: #007bff; color: white;
+ margin-top: 10px;, padding: 8px 16px;
+ background-color: #007bff;, color: white;
  border: none;
- border-radius: 4px; cursor: pointer;
+ border-radius: 4px;, cursor: pointer;
  transition: background-color 0.2s ease-in-out;
  }; button:hover {
  background-color: #0056b3;

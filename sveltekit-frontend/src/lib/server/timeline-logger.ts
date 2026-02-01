@@ -18,8 +18,7 @@ export async function logStatuteView(userId: string, data: TimelineLogData): Pro
         await db.insert(userTimeline).values({
             userId,
             action: 'view_statute',
-            data: {
-                citation: data.citation,
+            data: {, citation: data.citation,
                 title: data.title,
                 severity: data.severity,
                 victimClass: data.victimClass,

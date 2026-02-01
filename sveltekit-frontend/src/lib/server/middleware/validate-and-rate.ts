@@ -48,7 +48,7 @@ export function withValidationAndRate(
           // Use Redis-backed token-bucket
           const service = RedisCacheService; // Use the exported service directly
 
-          const raw = (await service.get(key)) as { tokens: number; last: number } | null;
+          const raw = (await service.get(key)) as { tokens: number;, last: number } | null;
           const now = Date.now() / 1000;
 
           let tokens = capacity;

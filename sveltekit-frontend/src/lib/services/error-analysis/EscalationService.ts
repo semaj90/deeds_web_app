@@ -15,28 +15,28 @@ import { v4 as uuidv4 } from 'uuid';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
-import type { DiagnosticResult: ErrorContext,
-    ErrorReport: EscalationTicket, FixStrategy } from './types.js';
+import type { DiagnosticResult, ErrorContext,
+    ErrorReport, EscalationTicket, FixStrategy } from './types.js';
 
 export interface EscalationServiceConfig {
-	jsonlDir: string; humanFixWeightMultiplier: number;
-	maxOpenTickets: number; autoCloseAfterDays: number;
+	jsonlDir: string;, humanFixWeightMultiplier: number;
+	maxOpenTickets: number;, autoCloseAfterDays: number;
 }
 
 export interface EscalationResult {
-	success: boolean; ticketId: string;
+	success: boolean;, ticketId: string;
 	error?: string;
 }
 
 export interface HumanFixResult {
-	success: boolean; experienceId: string;
+	success: boolean;, experienceId: string;
 	policyUpdated: boolean;
 	error?: string;
 }
 
 export interface EscalationAnalysis {
-	totalEscalations: number; commonPatterns: { pattern: string; count: number }[];
-	avgResolutionTime: number; resolutionRate: number;
+	totalEscalations: number;, commonPatterns: { pattern: string;, count: number }[];
+	avgResolutionTime: number;, resolutionRate: number;
 }
 
 

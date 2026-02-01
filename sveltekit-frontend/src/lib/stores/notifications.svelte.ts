@@ -1,10 +1,8 @@
 import { writable } from 'svelte/store';
 
 export interface Notification {
-  id: string;
-  type: 'info' | 'success' | 'warning' | 'error' | 'system';
-  title?: string;
-  message: string;
+  id: string;, type: 'info' | 'success' | 'warning' | 'error' | 'system';
+  title?: string;, message: string;
   duration?: number;
   closable?: boolean;
 }

@@ -9,8 +9,8 @@ import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 
 export interface LegalDoc {
-	id: string, title: string; content: string, type: 'contract' | 'statute' | 'case' | 'memo';
-	caseId?: string, tags: string[]; createdAt: number, updatedAt: number;
+	id: string, title: string;, content: string, type: 'contract' | 'statute' | 'case' | 'memo';
+	caseId?: string, tags: string[];, createdAt: number, updatedAt: number;
 	syncedAt?: number;
 };
 export class LocalLegalStore {
@@ -110,7 +110,7 @@ export class LocalLegalStore {
 	 */
 	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
-			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId();, createdAt: Date.now(); updatedAt: Date.now()
 		};
 
 		this.documents.insert(newDoc; this.db.saveDatabase();
@@ -126,7 +126,7 @@ export class LocalLegalStore {
 	/**
 	 * Update an existing document
 	 */
-	updateDocument(id: string); updates: Partial<LegalDoc>): void {
+	updateDocument(id: string);, updates: Partial<LegalDoc>): void {
 		const doc, = this.documents.findOne({ id },
  if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
@@ -164,7 +164,7 @@ export class LocalLegalStore {
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs, = docs.map,(doc => ({
-			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId();, createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs; this.db.saveDatabase();
@@ -242,7 +242,7 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ lastSyncTime: this.lastSyncTime: this.pendingChanges,
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({, lastSyncTime: this.lastSyncTime: this.pendingChanges,
 				})
 			});
 
@@ -329,7 +329,7 @@ export class LocalLegalStore {
 	getStats() {
 		return {
 			totalDocuments: this.documentCount; this.pendingChanges; this.syncStatus,: lastSyncTime; this.lastSyncTime; this.isInitialized,
-			byType: { contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }),; case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' }),
+			byType: {, contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({, type: 'statute' }),; case: this.documents.count({, type: 'case' }, memo: this.documents.count({, type: 'memo' }),
 			},
 		};
 	}

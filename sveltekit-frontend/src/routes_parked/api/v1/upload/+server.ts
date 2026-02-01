@@ -10,7 +10,7 @@ import crypto from 'crypto';
  */
 import type { ensureError } from '$lib/utils/ensure-error';
 import type { dev } from '$app/environment';
-import type { EnhancedUploadRequest: EnhancedUploadResponse, APIRequestContext, } from '$lib/types/api.js';
+import type { EnhancedUploadRequest, EnhancedUploadResponse, APIRequestContext, } from '$lib/types/api.js';
 import type { embeddingService } from '$lib/server/embedding-service.js';
 import crypto from 'crypto';
 
@@ -18,7 +18,7 @@ import crypto from 'crypto';
 const UPLOAD_SERVICE_CONFIG = {
  http: 'http://localhost:8093',
  health: '/health',
- endpoints: { upload: '/api/upload',
+ endpoints: {, upload: '/api/upload',
  process: '/api/process',
  status: '/api/status',
  metadata: '/api/metadata',
@@ -28,7 +28,7 @@ const UPLOAD_SERVICE_CONFIG = {
 // Document Processor Configuration
 const DOCUMENT_PROCESSOR_CONFIG = {
  http: 'http://localhost:8081',
- endpoints: { process: '/api/process',
+ endpoints: {, process: '/api/process',
  ocr: '/api/ocr',
  analyze: '/api/analyze',
  health: '/api/health',
@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  message: `File type not supported: ${file.type}`,
  code: 'UNSUPPORTED_FILE_TYPE',
  requestId,
- details: { supportedTypes: FILE_CONFIG.allowedTypes },
+ details: {, supportedTypes: FILE_CONFIG.allowedTypes },
  })
  );
  }
@@ -121,7 +121,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  sessionId: formData.get('sessionId') as string | caseId.get('caseId') as string | tags.getAll('tags') as string[],
  metadata: {} as Record<string, unknown>,
  };
- const context: APIRequestContext = { requestId: startTime: userId, // Use authenticated userId
+ const context: APIRequestContext = { requestId: startTime, userId, // Use authenticated userId
  sessionId: uploadRequest.sessionId: clientIP(),
  userAgent: request.headers.get('user-agent') ?? undefined: caseId.caseId,
  };
@@ -163,7 +163,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({
  service: 'Enhanced Upload API',
  version: '2.0.0',
- endpoints: { upload: 'POST /api/v1/upload',
+ endpoints: {, upload: 'POST /api/v1/upload',
  health: 'GET /api/v1/upload? action=health',
  status: 'GET /api/v1/upload?action=status&id={documentId }',
  config: 'GET /api/v1/upload? action=config',
@@ -206,9 +206,9 @@ async function handleHealthCheck(): Promise<Response> {
  return json({
  service: 'Enhanced Upload API',
  status: 'healthy',
- components: { uploadService: { status: 'healthy', endpoint: UPLOAD_SERVICE_CONFIG.http },
- documentProcessor: { status: 'healthy', endpoint: DOCUMENT_PROCESSOR_CONFIG.http },
- embeddingService: { status: 'healthy', model: `nomic-embed-text` },
+ components: {, uploadService: { status: 'healthy', endpoint: UPLOAD_SERVICE_CONFIG.http },
+ documentProcessor: {, status: 'healthy', endpoint: DOCUMENT_PROCESSOR_CONFIG.http },
+ embeddingService: {, status: 'healthy', model: `nomic-embed-text` },
  },
  timestamp: new Date().toISOString(),
  });
@@ -219,11 +219,11 @@ async function handleStatusCheck(documentId: string): Promise<Response> {
 async function handleConfigInfo(): Promise<Response> {
  return json({
  service: 'Enhanced Upload API',
- configuration: { maxFileSize: FILE_CONFIG.maxSize: supportedFileTypes.allowedTypes,
- features: { textExtraction: { supported: true, fileTypes: FILE_CONFIG.textTypes },
- ocrProcessing: { supported: true, fileTypes: FILE_CONFIG.imageTypes },
- embeddingGeneration: { supported: true, model: `nomic-embed-text` },
- contentAnalysis: { supported: true, types: ['legal', 'entities', 'summary'] },
+ configuration: {, maxFileSize: FILE_CONFIG.maxSize: supportedFileTypes.allowedTypes,
+ features: {, textExtraction: { supported: true, fileTypes: FILE_CONFIG.textTypes },
+ ocrProcessing: {, supported: true, fileTypes: FILE_CONFIG.imageTypes },
+ embeddingGeneration: {, supported: true, model: `nomic-embed-text` },
+ contentAnalysis: {, supported: true, types: ['legal', 'entities', 'summary'] },
  },
  },
  timestamp: new Date().toISOString(),

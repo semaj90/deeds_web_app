@@ -71,8 +71,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     },
     filters: { status, priority, search },
     // Pass database status to UI for graceful degradation
-    databaseStatus: {
-      available: !fromFallback,
+    databaseStatus: {, available: !fromFallback,
       error: dbError,
     },
   };

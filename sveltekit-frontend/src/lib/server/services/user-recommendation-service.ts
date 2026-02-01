@@ -7,41 +7,31 @@ import { eq, and, sql, count, desc } from 'drizzle-orm';
 
 // User behavior pattern interfaces
 export interface UserPattern {
-	userId: string;
-	commonQueries: string[];
-	frequentCases: string[];
-	preferredTopics: string[];
+	userId: string;, commonQueries: string[];
+	frequentCases: string[];, preferredTopics: string[];
 	queryComplexity: 'simple' | 'moderate' | 'complex';
 	usageFrequency: 'low' | 'medium' | 'high';
-	timePatterns: {
-		mostActiveHours: number[];
-		averageSessionLength: number;
-		queriesPerSession: number;
+	timePatterns: {, mostActiveHours: number[];
+		averageSessionLength: number;, queriesPerSession: number;
 	};
 }
 
 export interface RecommendationResult {
 	type: 'query' | 'case' | 'document' | 'legal_precedent';
-	content: string;
-	confidence: number;
-	reasoning: string;
-	relatedItems: string[];
+	content: string;, confidence: number;
+	reasoning: string;, relatedItems: string[];
 }
 
 export interface ChatAnalytics {
-	totalQueries: number;
-	successRate: number;
-	averageProcessingTime: number;
-	topTopics: Array<{ topic: string; count: number }>;
-	userSatisfaction: number;
-	improvementSuggestions: string[];
+	totalQueries: number;, successRate: number;
+	averageProcessingTime: number;, topTopics: Array<{ topic: string;, count: number }>;
+	userSatisfaction: number;, improvementSuggestions: string[];
 }
 
 interface StoreAiChatParams {
 	userId: string;
 	sessionId?: string;
-	caseId?: string;
-	query: string;
+	caseId?: string;, query: string;
 	response: string;
 	embedding?: number[];
 	metadata?: Record<string, any>;
@@ -115,7 +105,7 @@ export class UserRecommendationService {
 	/**
 	 * Create new RAG session for user
 	 */
-	async createRagSession(params: { userId: string; caseId?: string; sessionName?: string }): Promise<string> {
+	async createRagSession(params: {, userId: string; caseId?: string; sessionName?: string }): Promise<string> {
 		try {
 			const [insertedSession] = await db
 				.insert(ragSessions)
@@ -154,8 +144,7 @@ export class UserRecommendationService {
 				preferredTopics: topicAnalysis.topics,
 				queryComplexity: queryStats.complexity,
 				usageFrequency: sessionStats.frequency as 'low' | 'medium' | 'high',
-				timePatterns: {
-					mostActiveHours: sessionStats.activeHours,
+				timePatterns: {, mostActiveHours: sessionStats.activeHours,
 					averageSessionLength: sessionStats.avgSessionLength,
 					queriesPerSession: sessionStats.avgQueriesPerSession
 				}
@@ -198,7 +187,7 @@ export class UserRecommendationService {
 	/**
 	 * Get comprehensive chat analytics for a user
 	 */
-	async getChatAnalytics(userId: string, timeRange?: { from: Date; to: Date }): Promise<ChatAnalytics> {
+	async getChatAnalytics(userId: string, timeRange?: {, from: Date; to: Date }): Promise<ChatAnalytics> {
 		try {
 			const whereCondition = timeRange
 				? and(
@@ -320,7 +309,7 @@ export class UserRecommendationService {
 		return [];
 	}
 
-	private async extractTopTopics(userId: string, limit: number): Promise<{ topic: string; count: number }[]> {
+	private async extractTopTopics(userId: string, limit: number): Promise<{, topic: string; count: number }[]> {
 		const queries = await db
 			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
@@ -377,7 +366,7 @@ export class UserRecommendationService {
 		return 'complex';
 	}
 
-	private extractActiveHours(sessions: { startedAt: Date | null }[]) {
+	private extractActiveHours(sessions: {, startedAt: Date | null }[]) {
 		const hourCounts = new Map<number, number>();
 		sessions.forEach((session) => {
 			if (session.startedAt) {

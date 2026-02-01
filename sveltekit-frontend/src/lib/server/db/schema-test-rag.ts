@@ -28,7 +28,7 @@ export const testRagDocuments = pgTable('test_rag_documents', {
 	}>(),
 	confidence: real('confidence'),
 	legalAnalysis: jsonb('legal_analysis').$type<{
-		entities?: Array<{ type: string; value: string; offset: [number, number] }>;
+		entities?: Array<{, type: string; value: string;, offset: [number, number] }>;
 		parties?: string[];
 		dates?: string[];
 		citations?: string[];
@@ -69,10 +69,8 @@ export const testRagSearchSessions = pgTable('test_rag_search_sessions', {
 	queryEmbedding: vector('query_embedding', { dimensions: 768 }),
 	results: jsonb('results').$type<
 		Array<{
-			documentId: string;
-			filename: string;
-			similarity: number;
-			score: number;
+			documentId: string;, filename: string;
+			similarity: number;, score: number;
 			rank: number;
 		}>
 	>(),

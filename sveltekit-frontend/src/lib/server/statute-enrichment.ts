@@ -1,28 +1,28 @@
 // Statute enrichment: severity, victim class, and charge bundling
 
 interface StatuteEnrichment {
- citation: string; title: string;
+ citation: string;, title: string;
  severity: 'misdemeanor' | 'felony' | 'wobbler' | 'infraction';
- severityColor: string; victimClass: 'child' | 'spouse' | 'elder' | 'disabled' | 'general' | null;
- description: string; penalty: string;
- relatedStatutes: string[]; bundledCharges: BundledCharge[];
+ severityColor: string;, victimClass: 'child' | 'spouse' | 'elder' | 'disabled' | 'general' | null;
+ description: string;, penalty: string;
+ relatedStatutes: string[];, bundledCharges: BundledCharge[];
  precedents: Precedent[];
 }
 
 interface BundledCharge {
- citation: string; title: string;
+ citation: string;, title: string;
  reason: string; // e.g., "Enhancement", "Common companion", "Prior offense", frequency: number; // How often filed together (0-1)
 }
 
 interface Precedent {
- caseId: string; title: string;
- year: number; court: string;
+ caseId: string;, title: string;
+ year: number;, court: string;
  relevance: number;
 }
 
 // Statute database with enrichment data
 const statuteDatabase: Record<string, StatuteEnrichment> = {
- '273a': { citation: '273a PC',
+ '273a': {, citation: '273a PC',
  title: 'Child Endangerment',
  severity: 'wobbler',
  severityColor: 'crimson',
@@ -72,7 +72,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.88,
  }],
  },
- '211': { citation: '211 PC',
+ '211': {, citation: '211 PC',
  title: 'Robbery',
  severity: 'felony',
  severityColor: 'crimson',
@@ -115,7 +115,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.96,
  }],
  },
- '23153': { citation: '23153 VC',
+ '23153': {, citation: '23153 VC',
  title: 'DUI Causing Injury',
  severity: 'wobbler',
  severityColor: 'orange',
@@ -157,7 +157,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  relevance: 0.94,
  }],
  },
- '148': { citation: '148 PC',
+ '148': {, citation: '148 PC',
  title: 'Resisting Arrest',
  severity: 'misdemeanor',
  severityColor: 'yellow',

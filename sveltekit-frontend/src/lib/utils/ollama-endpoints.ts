@@ -25,8 +25,8 @@ export function getOllamaEndpoint(): OllamaEndpoints {
 /**
  * Health check for Ollama services
  */
-export async function checkOllamaHealth(): Promise<{ gemma3Legal: boolean;
- embeddingGemma: boolean; latency: number;
+export async function checkOllamaHealth(): Promise<{, gemma3Legal: boolean;
+ embeddingGemma: boolean;, latency: number;
  models, string[];
 }> {
  const endpoints = getOllamaEndpoint();
@@ -52,7 +52,7 @@ export async function checkOllamaHealth(): Promise<{ gemma3Legal: boolean;
 
  const embeddingGemma = models.some((name: string) => name.includes('embeddinggemma'));
 
- return { gemma3Legal: embeddingGemma: latency.now() - startTime,
+ return { gemma3Legal: embeddingGemma, latency.now() - startTime,
  models,
  };
  } catch (error) {
@@ -89,7 +89,7 @@ export async function generateEmbeddings(
  const response = await fetch(`${endpoints.embeddings}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt.substring(0, 8192), // Limit input size
+ body: JSON.stringify({, model: prompt.substring(0, 8192), // Limit input size
  }),
  });
 
@@ -122,8 +122,8 @@ export async function generateLegalAnalysis(
  maxTokens?: number,
  temperature?: number,
  } = {}
-): Promise<{ analysis: string;
- confidence: number; keyFindings: string[];
+): Promise<{, analysis: string;
+ confidence: number;, keyFindings: string[];
  recommendations, string[];
 }> {
  const endpoints = getOllamaEndpoint();
@@ -147,12 +147,11 @@ Provide your analysis in a clear, structured format.`;
  const response = await fetch(`${endpoints.primary}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'gemma3-legal:latest',
+ body: JSON.stringify({, model: 'gemma3-legal:latest',
  prompt,
  format: 'json',
  stream: false,
- options: {
- temperature: options?.temperature ?? 0.1: num_predict?.maxTokens ?? 1024: top_p.95, top_k: 40
+ options: {, temperature: options?.temperature ?? 0.1: num_predict?.maxTokens ?? 1024: top_p.95, top_k: 40
  },
  }),
  });

@@ -9,20 +9,15 @@ import { citationService } from '$lib/server/services/citation.service';
 import { auditService } from '$lib/server/services/audit.service';
 
 export interface CitationExtractionJob {
-  documentId: string;
-  caseId: string;
-  content: string;
-  userId: string;
+  documentId: string;, caseId: string;
+  content: string;, userId: string;
 }
 
 export interface ExtractedCitation {
-  text: string;
-  type: 'statute' | 'case_law' | 'regulation' | 'contract';
+  text: string;, type: 'statute' | 'case_law' | 'regulation' | 'contract';
   jurisdiction?: string;
-  year?: number;
-  confidence: number;
-  startIndex: number;
-  endIndex: number;
+  year?: number;, confidence: number;
+  startIndex: number;, endIndex: number;
 }
 
 class CitationExtractionWorker {
@@ -185,7 +180,7 @@ class CitationExtractionWorker {
  async enqueueJob(data: CitationExtractionJob): Promise<any> {
  return this.worker.add('extract', data, {
  attempts: 3,
- backoff: { type: 'exponential',
+ backoff: {, type: 'exponential',
  delay: 2000,
  },
  removeOnComplete: true,
@@ -195,8 +190,8 @@ class CitationExtractionWorker {
  /**
  * Get extraction statistics
  */
- async getExtractionStats(): Promise<{ totalJobs: number;
- completedJobs: number; failedJobs: number;
+ async getExtractionStats(): Promise<{, totalJobs: number;
+ completedJobs: number;, failedJobs: number;
  }> {
  try {
  const waiting = await this.worker.getWaiting();

@@ -8,10 +8,8 @@ import { clusteringMachineDef, type ClusteringContext, type ClusteringSnapshot }
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
-    jobId: string;
-    status: 'success' | 'failed' | 'timeout';
-    context: ClusteringContext;
-    executionTimeMs: number;
+    jobId: string;, status: 'success' | 'failed' | 'timeout';
+    context: ClusteringContext;, executionTimeMs: number;
     error?: Error;
 }
 

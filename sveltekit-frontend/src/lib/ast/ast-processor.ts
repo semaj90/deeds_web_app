@@ -2,36 +2,24 @@ import { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morph';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints';
 
 export interface ASTNode {
-    id: string;
-    kind: SyntaxKind;
-    text: string;
-    start: number;
-    end: number;
-    children: ASTNode[];
+    id: string;, kind: SyntaxKind;, text: string;, start: number;, end: number;, children: ASTNode[];
     type?: string;
     symbol?: string;
 }
 
 export interface AutosuggestContext {
-    filePath: string;
-    position: number;
-    prefix: string;
-    scope: 'global' | 'class' | 'function' | 'method';
+    filePath: string;, position: number;, prefix: string;, scope: 'global' | 'class' | 'function' | 'method';
     contextNode?: ASTNode;
 }
 
 export interface AutosuggestResult {
-    suggestions: Autosuggestion[];
-    confidence: number;
-    context: AutosuggestContext;
+    suggestions: Autosuggestion[];, confidence: number;, context: AutosuggestContext;
 }
 
 export interface Autosuggestion {
-    text: string;
-    kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
+    text: string;, kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
     type?: string;
-    description?: string;
-    score: number;
+    description?: string;, score: number;
 }
 
 /**
@@ -404,11 +392,10 @@ Response:`;
             const response = await fetch(`${endpoints.primary}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'gemma3-legal:latest',
+                body: JSON.stringify({, model: 'gemma3-legal:latest',
                     prompt,
                     format: 'json',
-                    options: { temperature: 0.3, num_predict: 100 },
+                    options: {, temperature: 0.3, num_predict: 100 },
                 }),
             });
 

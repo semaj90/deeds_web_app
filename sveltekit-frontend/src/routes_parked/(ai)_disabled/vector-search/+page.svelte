@@ -4,7 +4,7 @@
  interface VectorResult {
  id: string;
  content?: string;
- textContent?: string; similarity: number;
+ textContent?: string;, similarity: number;
  metadata: Record<string, unknown>;
  source: string;
  contentType?: string;
@@ -27,7 +27,7 @@
  const response = await fetch('/api/ai/vector-search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: query.trim( type: searchType,
+ body: JSON.stringify({, query: query.trim( type: searchType,
  threshold,
  limit,
  }),
@@ -225,7 +225,7 @@
 
 <style>
  .vector-search-page {
- max-width: 1400px; margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  padding: 0 1rem;
  }
 
@@ -235,7 +235,7 @@
  }
 
  .page-header h1 {
- font-size: 2.5rem; color: var(--text-primary, #00ccff);
+ font-size: 2.5rem;, color: var(--text-primary, #00ccff);
  margin-bottom: 0.5rem;
  text-shadow: 0 0 15px currentColor;
  }
@@ -243,29 +243,29 @@
  /* now applied to real DOM wrappers */
  .search-card,
  .tips-card {
- margin-bottom: 2rem; background: var(--surface-secondary, #111111);
+ margin-bottom: 2rem;, background: var(--surface-secondary, #111111);
  border: 1px solid var(--border-primary, #00ccff);
  }
 
  .query-textarea {
- width: 100%; background: var(--surface-primary, #0a0a0a);
+ width: 100%;, background: var(--surface-primary, #0a0a0a);
  border: 1px solid rgba(0, 204, 255, 0.3);
- border-radius: 4px; padding: 1rem;
+ border-radius: 4px;, padding: 1rem;
  color: var(--text-primary, #ffffff);
- font-family: inherit; resize: vertical;
+ font-family: inherit;, resize: vertical;
  margin-bottom: 1rem;
  }
 
  /* simple native button styles for page actions */
  .btn {
  background: linear-gradient(90deg, #00ccff, #0088cc);
- color: #001; border: none;
+ color: #001;, border: none;
  padding: 0.5rem 1rem;
  border-radius: 6px;
- font-weight: 600; cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  }
  .btn[disabled] {
- opacity: 0.5; cursor:not-allowed;
+ opacity: 0.5;, cursor:not-allowed;
  }
 
  .query-textarea:focus {
@@ -283,7 +283,7 @@
 
  .option-group {
  display: flex;
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
 
  .option-group label {
@@ -296,7 +296,7 @@
  .limit-input {
  background: var(--surface-primary, #0a0a0a);
  border: 1px solid rgba(0, 204, 255, 0.3);
- border-radius: 4px; padding: 0.5rem;
+ border-radius: 4px;, padding: 0.5rem;
  color: var(--text-primary, #ffffff);
  }
 
@@ -316,15 +316,15 @@
 
  .loading-state,
  .empty-state {
- text-align: center; padding: 4rem 2rem;
+ text-align: center;, padding: 4rem 2rem;
  color: var(--text-secondary, #888888);
  }
 
  .loading-spinner {
- width: 40px; height: 40px;
+ width: 40px;, height: 40px;
  border: 3px solid rgba(0, 204, 255, 0.3);
  border-top: 3px solid var(--text-primary, #00ccff);
- border-radius: 50%; animation: spin 1s linear infinite;
+ border-radius: 50%;, animation: spin 1s linear infinite;
  margin: 0 auto 1rem;
  }
 
@@ -378,7 +378,7 @@
  :global(.result-title) {
  color: var(--text-primary, #00ccff);
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
 
  .content-type-badge {
@@ -397,7 +397,7 @@
  .result-content {
  color: var(--text-primary, #ffffff);
  line-height: 1.4;
- margin-bottom: 1rem; padding: 0.75rem;
+ margin-bottom: 1rem;, padding: 0.75rem;
  background: rgba(0, 204, 255, 0.05);
  border-radius: 4px;
  }
@@ -411,7 +411,7 @@
  padding: 0.5rem;
  border-radius: 4px;
  font-family: monospace;
- font-size: 0.8rem; color: var(--text-secondary, #cccccc);
+ font-size: 0.8rem;, color: var(--text-secondary, #cccccc);
  overflow-x: auto;
  white-space: pre-wrap;
  }
@@ -430,7 +430,7 @@
  }
 
  .result-actions {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
 
  .tips-list {
@@ -453,7 +453,7 @@
 
  .results-header {
  flex-direction: column;
- align-items: flex-start; gap: 0.5rem;
+ align-items: flex-start;, gap: 0.5rem;
  }
 
  .page-header h1 {
