@@ -91,6 +91,14 @@
 	depth: 0, speed: 0 },
 	focusTime: 0
 			},
+			interactionPatterns: {
+				totalInteractions: 0,
+				preferredFeatures: []
+			},
+			timeMetrics: {
+				averageUploadDuration: 0,
+				totalTimeSpent: 0
+			},
 	contextualPreferences: {
 	preferredAIPromptStyle: 'detailed',
 				helpLevel: 'moderate',

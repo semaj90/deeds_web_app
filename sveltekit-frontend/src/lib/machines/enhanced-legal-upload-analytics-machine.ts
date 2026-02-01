@@ -163,6 +163,8 @@ export interface ContextualPrompt {
 	relevance: number;
 	actionable: boolean;
 	legalSpecific: boolean;
+	priority?: number;
+	timestamp?: number;
 }
 
 export interface UploadResult {
