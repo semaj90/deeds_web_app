@@ -1,11 +1,13 @@
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm/table';
-import type { canvasStates,
+import type {
+    canvasStates,
     cases,
     criminals,
     evidence,
     reports,
     statutes,
-    users, } from '../server/db/schema-postgres.js';
+    users,
+} from '../server/db/schema-postgres.js';
 
 // Core database types
 export type CaseType = InferSelectModel<typeof cases>;
@@ -39,12 +41,9 @@ export type NewEvidence = InferInsertModel<typeof evidence>;
 
 // Extended Evidence type with computed UI properties
 export interface ExtendedEvidence extends Evidence {
- status?: string; // computed from isAdmissible and other fields
- type?: string; // alias for evidenceType
- createdAt?: string | Date; // alias for collectedAt or uploadedAt
-}
-
-// Helper function to convert Evidence to ExtendedEvidence
+	status?: string; // computed from isAdmissible and other fields
+	type?: string; // alias for evidenceType
+}// Helper function to convert Evidence to ExtendedEvidence
 export function extendEvidence(evidenceItem: Evidence): ExtendedEvidence {
  return {
  ...evidenceItem,

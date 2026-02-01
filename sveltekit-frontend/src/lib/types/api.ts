@@ -2,6 +2,9 @@
  * API response and request types
  */
 
+// Re-export Evidence types from data layer
+export type { Evidence, ExtendedEvidence, NewEvidence } from '$lib/data/types';
+
 export interface EvidenceAIAnalysis {
   validationScore?: number;
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';
