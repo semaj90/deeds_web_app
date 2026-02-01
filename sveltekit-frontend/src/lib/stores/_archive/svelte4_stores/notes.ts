@@ -48,13 +48,13 @@ export const noteStats = derived(legalNotes, ($legalNotes) => {
  acc[note.noteType] = (acc[note.noteType] ?? 0) + 1;
  return acc;
  },
- {} as Record<string, number>
+	{} as Record<string, number>
  byRiskLevel: $legalNotes.reduce(
  (acc, note) => {
  acc[note.riskLevel] = (acc[note.riskLevel] ?? 0) + 1;
  return acc;
  },
- {} as Record<string, number>
+	{} as Record<string, number>
  ),
  };
 });

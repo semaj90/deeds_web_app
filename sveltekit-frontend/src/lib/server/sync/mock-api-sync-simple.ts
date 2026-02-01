@@ -7,7 +7,8 @@ import type { Document } from '$lib/types';
 
 // Simple mock database operations (no external deps)
 const mockDb = {
-    async query(sql: string): Promise<{, rows: unknown[] }> {
+    async query(sql: string): Promise<{
+	rows: unknown[] }> {
         // Intentionally minimal: log and return empty rows
         console.log('Mock DB Query:', sql);
         return { rows: [] };
@@ -19,7 +20,8 @@ export const mockDataGenerators = {
     async generateMockLegalDocuments(count: number = 10) {
         const documentTypes = ['contract', 'evidence', 'brief', 'citation', 'precedent'] as const;
         const EMB_DIM = 1536;
-        const makeVec = () => Array.from({ length: EMB_DIM }, () => Math.random() * 2 - 1);
+        const makeVec = () => Array.from({ length: EMB_DIM },
+	() => Math.random() * 2 - 1);
 
         const docs: Array<Record<string, any>> = [];
         for (let i = 0; i < count; i++) {
@@ -36,8 +38,7 @@ export const mockDataGenerators = {
         }
         return docs;
     },
-
-    async generateMockQLoRAStates(count: number = 5) {
+	async generateMockQLoRAStates(count: number = 5) {
         const states = [] as any[];
         for (let i = 0; i < count; i++) {
             states.push({
@@ -47,8 +48,7 @@ export const mockDataGenerators = {
         }
         return states;
     },
-
-    async generateMockAssetPredictions(count: number = 8) {
+	async generateMockAssetPredictions(count: number = 8) {
         const preds = [] as any[];
         for (let i = 0; i < count; i++) {
             preds.push({
@@ -58,19 +58,19 @@ export const mockDataGenerators = {
         }
         return preds;
     },
-
-    async generateMockEmbeddingShards(count: number = 15) {
+	async generateMockEmbeddingShards(count: number = 15) {
         const shards = [] as any[];
         for (let i = 0; i < count; i++) {
             shards.push({
                 shardId: `shard_${Date.now()}_${i}`,
-                vec: Array.from({, length: 128 }, () => Math.random())
+                vec: Array.from({
+	length: 128 },
+	() => Math.random())
             });
         }
         return shards;
     },
-
-    async generateMockCHRManifests(count: number = 6) {
+	async generateMockCHRManifests(count: number = 6) {
         const manifests = [] as any[];
         for (let i = 0; i < count; i++) {
             manifests.push({
@@ -95,8 +95,7 @@ export const databaseSync = {
             return { success: false, error: (err as Error)?.message ?? String(err), count: 0 };
         }
     },
-
-    async syncQLoRATrainingData() {
+	async syncQLoRATrainingData() {
         console.log('Syncing QLoRA training data (mock)...');
         try {
             const states = await mockDataGenerators.generateMockQLoRAStates(10);
@@ -107,8 +106,7 @@ export const databaseSync = {
             return { success: false, error: (err as Error)?.message ?? String(err), count: 0 };
         }
     },
-
-    async syncPredictiveAssetCache() {
+	async syncPredictiveAssetCache() {
         console.log('Syncing predictive asset cache (mock)...');
         try {
             const preds = await mockDataGenerators.generateMockAssetPredictions(15);

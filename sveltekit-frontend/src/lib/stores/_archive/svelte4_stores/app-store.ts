@@ -1,27 +1,33 @@
 import { writable } from 'svelte/store';
 import type { caseApi,
  evidenceApi, poiApi,
- searchApi, systemApi,$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
+ searchApi, systemApi,
+$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2$1;$2 } from '$lib/services/api-client';
 
 // Store Types
 export interface AppState {
  // Cases
- cases: Case[];, caseStats: CaseStats | null;
+ cases: Case[];
+	caseStats: CaseStats | null;
  selectedCase: Case | null;
 
  // Evidence
- evidence: Evidence[];, evidenceStats: EvidenceStats | null;
+ evidence: Evidence[];
+	evidenceStats: EvidenceStats | null;
  selectedEvidence: Evidence | null;
 
  // Persons of Interest
- pois: PersonOfInterest[];, selectedPOI: PersonOfInterest | null;
+ pois: PersonOfInterest[];
+	selectedPOI: PersonOfInterest | null;
 
  // Search
- searchResults: SearchResult[];, searchQuery: string;
+ searchResults: SearchResult[];
+	searchQuery: string;
 
  // System
  systemMetrics: SystemMetrics | null;
- isLoading: boolean;, error: string | null;
+ isLoading: boolean;
+	error: string | null;
 }
 
 // Initial State
@@ -47,12 +53,10 @@ export const appActions = {
  setLoading: (loading: boolean) => {
  appStore.update((state) => ({ ...state, isLoading: loading }));
  },
-
- setError: (error, null) => {
+	setError: (error, null) => {
  appStore.update((state) => ({ ...state, error }));
  },
-
- // Cases
+	// Cases
  async loadCases(params?: {
  page?: number,
  limit?: number,
@@ -76,8 +80,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- async loadCaseStats() {
+	async loadCaseStats() {
  try {
  const response = await caseApi.getCaseStats();
  if (response?.success&& response.data) {
@@ -89,12 +92,10 @@ export const appActions = {
  console.error('Failed to load case stats:', error);
  }
  },
-
- setSelectedCase: (case_: null) => {
+	setSelectedCase: (case_: null) => {
  appStore.update((state) => ({ ...state, selectedCase: case_ }));
  },
-
- async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt'>) {
+	async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt'>) {
  appActions.setLoading(true);
  try {
  const response = await caseApi.createCase(data);
@@ -114,8 +115,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- async updateCase(id: string, data: Partial<Case>) {
+	async updateCase(id: string, data: Partial<Case>) {
  appActions.setLoading(true);
  try {
  const response = await caseApi.updateCase(id, data);
@@ -133,8 +133,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- // Evidence
+	// Evidence
  async loadEvidence(params?: {
  page?: number,
  limit?: number,
@@ -159,8 +158,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- async loadEvidenceStats() {
+	async loadEvidenceStats() {
  try {
  const response = await evidenceApi.getEvidenceStats();
  if (response?.success&& response.data) {
@@ -172,12 +170,10 @@ export const appActions = {
  console.error('Failed to load evidence stats:', error);
  }
  },
-
- setSelectedEvidence: (evidence: null) => {
+	setSelectedEvidence: (evidence: null) => {
  appStore.update((state) => ({ ...state, selectedEvidence: evidence }));
  },
-
- async uploadEvidence(formData: FormData) {
+	async uploadEvidence(formData: FormData) {
  appActions.setLoading(true);
  try {
  const response = await evidenceApi.uploadEvidence(formData);
@@ -197,8 +193,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- // Persons of Interest
+	// Persons of Interest
  async loadPOIs(params?: {
  page?: number,
  limit?: number,
@@ -224,12 +219,10 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- setSelectedPOI: (poi: null) => {
+	setSelectedPOI: (poi: null) => {
  appStore.update((state) => ({ ...state, selectedPOI: poi }));
  },
-
- async createPOI(data: Omit<PersonOfInterest, 'id' | 'createdAt'>) {
+	async createPOI(data: Omit<PersonOfInterest, 'id' | 'createdAt'>) {
  appActions.setLoading(true);
  try {
  const response = await poiApi.createPOI(data);
@@ -251,8 +244,7 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- // Search
+	// Search
  async search(
  query: string,
  filters?: {
@@ -279,16 +271,14 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- clearSearch: () => {
+	clearSearch: () => {
  appStore.update((state) => ({
  ...state,
  searchResults: [],
  searchQuery: '',
  }));
  },
-
- // System Metrics
+	// System Metrics
  async loadSystemMetrics() {
  try {
  const response = await systemApi.getMetrics();
@@ -301,8 +291,7 @@ export const appActions = {
  console.error('Failed to load system metrics:', error);
  }
  },
-
- async loadGPUMetrics() {
+	async loadGPUMetrics() {
  try {
  const response = await systemApi.getGPUMetrics();
  if (response?.success&& response.data) {
@@ -318,8 +307,7 @@ export const appActions = {
  console.error('Failed to load GPU metrics:', error);
  }
  },
-
- // Initialize app data
+	// Initialize app data
  async initializeApp() {
  appActions.setLoading(true);
  try {
@@ -338,12 +326,11 @@ export const appActions = {
  appActions.setLoading(false);
  }
  },
-
- // Reset store
+	// Reset store
  reset: () => {
  appStore.set(initialState);
  },
-};
+	};
 
 // Store selectors (for computed values)
 export const storeSelectors = {
@@ -356,7 +343,7 @@ export const storeSelectors = {
  const total = services.length;
  return healthy === total ? 'healthy' : healthy > total / 2 ? 'degraded' : 'unhealthy';
  },
-};
+	};
 
 // Export store for component usage
 export default appStore;

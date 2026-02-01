@@ -5,22 +5,22 @@ const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {
-	file_path: string;, role: string;
-	surface: string[];, dependencies: string[];
-	exports: string[];, imports: string[];
-	comments: string[];, risk: string;
-	change_frequency: string;, related_routes: string[];
-	tags: string[];, summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
 interface QdrantPoint {
-	id: number;, payload: FileProfile;
+	id: number; payload: FileProfile;
 	vector?: number[];
 }
 
 interface QdrantScrollResponse {
-	result: {, points: QdrantPoint[];
+	result: { points: QdrantPoint[];
 		next_page_offset?: number;
 	};
 	status: string;
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			must.push({ key: 'risk', match: { value, risk } });
 		}
 		if (surface) {
-			must.push({ key: 'surface', match: {, any: [surface] } });
+			must.push({ key: 'surface', match: { any: [surface] } });
 		}
 
 		// Scroll through Qdrant collection
@@ -71,7 +71,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			console.error('Qdrant error:', errorText);
 			return json({
 				files: [],
-				stats: {, totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
+				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 				error: `Qdrant request failed: ${response.status}`
 			}, { status: 200 });
   
@@ -115,7 +115,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		console.error('Codebase index API error:', error);
 		return json({
 			files: [],
-			stats: {, totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
+			stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 			error: error instanceof Error ? error.message : 'Unknown error'
 		}, { status: 200 });
 	}
@@ -134,7 +134,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const embedResponse = await fetch('http://localhost:11434/api/embeddings', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: query
 			})
 		});
@@ -150,7 +150,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const searchResponse = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/search`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, vector: limit,
+			body: JSON.stringify({ vector: limit,
 				with_payload: true
 			})
 		});

@@ -89,7 +89,8 @@ export async function checkRedisHealth(): Promise<boolean> {
 /**
  * Get Redis connection info and stats
  */
-export async function getRedisInfo(): Promise<{, connected: boolean; info?: Record<string, string>; memory?: Record<string, string>; stats?: Record<string, string> }> {
+export async function getRedisInfo(): Promise<{
+	connected: boolean; info?: Record<string, string>; memory?: Record<string, string>; stats?: Record<string, string> }> {
     try {
         const client = getRedisClient();
         // Best-effort readiness check

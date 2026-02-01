@@ -21,7 +21,8 @@ function getOllamaEndpoint(): string {
 
 const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const LLM_MODEL = process.env?.OLLAMA_LLM_MODEL ?? 'gemma3-legal:latest';
-const OLLAMA_BASE_URL = getOllamaEndpoint();process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
+const OLLAMA_BASE_URL = getOllamaEndpoint();
+process.env?.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const sql = postgres(DATABASE_URL, { max: 20, idle_timeout: 10, prepare: true });
 const db = drizzle(sql, { schema });
@@ -36,7 +37,8 @@ const redis = new Redis(process.env?.REDIS_URL ?? 'redis://:redis@localhost:6379
 /* -------------------- EMBEDDINGS CLIENT -------------------- */
 
 interface OllamaEmbeddingsOptions {
-	baseUrl?: string;, model: string;
+	baseUrl?: string;
+	model: string;
 	requestOptions?: Record<string, unknown>;
 }
 
@@ -57,13 +59,14 @@ class OllamaEmbeddingsClient {
 		const res = await fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
 		});
 
 		if (!res.ok) {
 			const msg = await res.text().catch(() => '');
 			throw new Error(`Ollama embeddings error: ${res.status} ${res.statusText} ${msg}`);
-		}| { embedding: number[] }
+		}
+| { embedding: number[] }
 			| { embeddings: number[][] }
 			| Array<{ embedding: number[] }>;
 
@@ -79,7 +82,8 @@ class OllamaEmbeddingsClient {
 const embeddings = new OllamaEmbeddingsClient({
 	baseUrl: OLLAMA_BASE_URL,
 	model: EMBEDDING_MODEL,
-	requestOptions: {, num_thread: 8 }
+	requestOptions: {
+	num_thread: 8 }
 });
 
 const llm = new ChatOllama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL, temperature: 0.3 });
@@ -126,15 +130,19 @@ export class LegalRAGPipeline {
 	}
 
 	/* ---------- INGEST ---------- */
-	async ingestLegalDocument(params: {, title: string,
+	async ingestLegalDocument(params: {
+	title: string,
 		content: string,
 		documentType: string;
 		metadata?: Record<string, unknown>;
 		caseId?: string | null;
 		userId?: string | null;
-	}): Promise<{ documentId?: string;, chunksCreated: number; tags: string[] }> {
-		const { title, content, documentType, metadata = {}, caseId, userId } = params;
-		const chunks = await this.smartLegalChunking(content);chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text)
+	}): Promise<{ documentId?: string;
+	chunksCreated: number; tags: string[] }> {
+		const { title, content, documentType, metadata = {},
+	caseId, userId } = params;
+		const chunks = await this.smartLegalChunking(content);
+chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text)
 			}))
 		);
 
@@ -142,7 +150,13 @@ export class LegalRAGPipeline {
 			if ('documents' in S) {
 				const insertRes = await sql<Array<{ id?: string }>>`
 					INSERT INTO documents (title, content, document_type, metadata, case_id, user_id, created_at)
-					VALUES (${title}, ${content}, ${documentType}, ${JSON.stringify(metadata)}, ${caseId ?? null}, ${userId ?? null}, ${new Date()})
+					VALUES (${title},
+	${content},
+	${documentType},
+	${JSON.stringify(metadata)},
+	${caseId ?? null},
+	${userId ?? null},
+	${new Date()})
 					RETURNING id
 				`;
 				const docId: string | undefined = insertRes[0]?.id;
@@ -152,7 +166,10 @@ export class LegalRAGPipeline {
 						const c = chunksData[i];
 						await sql`
 							INSERT INTO document_chunks (document_id, chunk_index, text, embedding)
-							VALUES (${docId}, ${i}, ${c.text}, ${JSON.stringify(c.embedding)})
+							VALUES (${docId},
+	${i},
+	${c.text},
+	${JSON.stringify(c.embedding)})
 						`;
 					}
 				}
@@ -168,19 +185,23 @@ export class LegalRAGPipeline {
 	}
 
 	/* ---------- QUESTION ANSWERING ---------- */
-	async answerLegalQuestion(params: {, question: string,
+	async answerLegalQuestion(params: {
+	question: string,
 		caseId?: string,
 		conversationContext?: string;
 		userId?: string;
-	}): Promise<{, answer: string; sources: Array<{ id?: string; score?: number }>; confidence: number }> {
+	}): Promise<{
+	answer: string; sources: Array<{ id?: string; score?: number }>; confidence: number }> {
 		const start = Date.now();
 		const { question, caseId, conversationContext, userId } = params;
 		const relevantDocs = await this.hybridSearch({ query: question, caseId, limit: 5 });
 
 		if (!relevantDocs.length) {
 			return { answer: "I couldn't find relevant information.", sources: [], confidence: 0 };
-		}.map((d, i) => `[Source ${i + 1}]:\n${d.pageContent}`)
-			.join('\n\n---\n\n');$1;$2You are a legal AI assistant. Answer ONLY from context.
+		}
+.map((d, i) => `[Source ${i + 1}]:\n${d.pageContent}`)
+			.join('\n\n---\n\n');
+$1;$2You are a legal AI assistant. Answer ONLY from context.
 ${conversationContext ? `Previous Context:\n${conversationContext}\n\n` : ''}
 Context: {context}
 Question: {question}
@@ -198,7 +219,14 @@ Answer:
 					INSERT INTO user_ai_queries
 					(user_id, case_id, query, response, model, query_type, confidence, processing_time)
 					VALUES
-					(${userId ?? null}, ${caseId ?? null}, ${question}, ${answer}, ${LLM_MODEL}, ${'legal_research'}, ${String(analysis.confidence)}, ${Date.now() - start})
+					(${userId ?? null},
+	${caseId ?? null},
+	${question},
+	${answer},
+	${LLM_MODEL},
+	${'legal_research'},
+	${String(analysis.confidence)},
+	${Date.now() - start})
 				`;
 			}
 		} catch (e) {
@@ -214,7 +242,8 @@ Answer:
 	}
 
 	/* ---------- HYBRID SEARCH ---------- */
-	async hybridSearch(options: {, query: string,
+	async hybridSearch(options: {
+	query: string,
 		caseId?: string,
 		limit?: number;
 	}): Promise<LangChainDocument[]> {
@@ -224,13 +253,16 @@ Answer:
 		const qdrantUrl = process.env.QDRANT_URL;
 		if (qdrantUrl) {
 			try {
-				const collection = process.env?.QDRANT_COLLECTION ?? 'documents';? { must: [{, key: 'caseId', match: { value, caseId } }] }
+				const collection = process.env?.QDRANT_COLLECTION ?? 'documents';
+? { must: [{
+	key: 'caseId', match: { value, caseId } }] }
 					: undefined;
 
 				const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, vector: queryEmbedding,
+	body: JSON.stringify({
+	vector: queryEmbedding,
 						limit,
 						with_payload: true,
 						with_vector: false,
@@ -242,14 +274,16 @@ Answer:
 					type QdrantHit = { id?: string; payload?: Record<string, unknown>; score?: number };
 					const json = (await res.json()) as { result?: QdrantHit[] };
 					return (json?.result|| []).map((h) => {
-						const payload = h.payload ?? {};typeof payload['text'] === 'string'
+						const payload = h.payload ?? {};
+typeof payload['text'] === 'string'
 								? payload['text']
 								: typeof payload['content'] === 'string'
 									? payload['content']
 									: '';
 						return {
 							pageContent: String(text ?? ''),
-							metadata: {, documentId: h.id, score: h.score }
+							metadata: {
+	documentId: h.id, score: h.score }
 						} as LangChainDocument;
 					});
 				}
@@ -258,7 +292,8 @@ Answer:
 			}
 		}
 
-		const pattern = `%${query.replace(/[%_]/g, '$&')}%`;SELECT id, title, content, COALESCE(summary, '') AS summary
+		const pattern = `%${query.replace(/[%_]/g, '$&')}%`;
+SELECT id, title, content, COALESCE(summary, '') AS summary
 			FROM documents
 			${caseId ? sql`WHERE case_id = ${caseId} AND content ILIKE ${pattern}` : sql`WHERE content ILIKE ${pattern}`}
 			ORDER BY char_length(content) DESC
@@ -269,7 +304,8 @@ Answer:
 			const text = r.summary?.toString() ?? r.content?.toString() || r.title?.toString() ?? '';
 			return {
 				pageContent: text,
-				metadata: {, documentId: r.id, score: Math.max(0, 1 - i * 0.15) }
+				metadata: {
+	documentId: r.id, score: Math.max(0, 1 - i * 0.15) }
 			} as LangChainDocument;
 		});
 	}
@@ -308,11 +344,13 @@ Answer:
 	}
 
 	private analyzeAnswer(answer: string, sources: LangChainDocument[]) {
-		if (!sources.length) return { confidence: 0, keyPoints: [] };sources.reduce(
+		if (!sources.length) return { confidence: 0, keyPoints: [] };
+sources.reduce(
 				(s, d) => s + (Number((d.metadata as { score?: number })?.score ?? 0) ?? 0),
 				0
 			) / sources.length;
-		const confidence = Math.min(0.95, avgScore);.split(/\r?\n/)
+		const confidence = Math.min(0.95, avgScore);
+.split(/\r?\n/)
 			.map((l) => l.replace(/^[\d.\-\s•*]+/, '').trim())
 			.filter(Boolean)
 			.slice(0, 3);
@@ -338,7 +376,8 @@ Answer:
 	}
 }
 
-/* -------------------- SINGLETON EXPORT -------------------- */(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
+/* -------------------- SINGLETON EXPORT -------------------- */
+(globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
 	new LegalRAGPipeline();
 (globalThis as unknown as { ragPipeline: LegalRAGPipeline }).ragPipeline = ragPipeline;
 

@@ -10,8 +10,10 @@ import { performance } from 'perf_hooks';
 
 // Types for serialization context
 interface SerializationTask {
-	id: string;, data: unknown;
-	options: SerializationOptions;, priority: 'low' | 'medium' | 'high' | 'critical';
+	id: string;
+	data: unknown;
+	options: SerializationOptions;
+	priority: 'low' | 'medium' | 'high' | 'critical';
 	timestamp: number;
 }
 
@@ -26,10 +28,14 @@ interface SerializationOptions {
 }
 
 interface SerializationResult {
-	id: string;, serialized: string;
-	metadata: {, originalSize: number;
-		serializedSize: number;, compressionRatio: number;
-		processingTime: number;, method: 'cpu' | 'gpu' | 'worker';
+	id: string;
+	serialized: string;
+	metadata: {
+	originalSize: number;
+		serializedSize: number;
+	compressionRatio: number;
+		processingTime: number;
+	method: 'cpu' | 'gpu' | 'worker';
 		chunks?: number;
 	};
 	error?: string;
@@ -39,7 +45,8 @@ interface SerializationResult {
 class WorkerPool {
 	private workers: Worker[] = [];
 	private availableWorkers: Worker[] = [];
-	private taskQueue: Array<{, task: SerializationTask;
+	private taskQueue: Array<{
+	task: SerializationTask;
 		resolve: (value: SerializationResult) => void;
 		reject: (reason?: any) => void;
 	}> = [];
@@ -93,12 +100,14 @@ class WorkerPool {
                                     : '[Buffer]';
                             }
                             return value;
-                        }, options.compress ? 0 : 2);
+                        },
+	options.compress ? 0 : 2);
 
                         const processingTime = performance.now() - start;
                         return {
                             serialized,
-                            metadata: {, originalSize: 0, // Approximate
+                            metadata: {
+	originalSize: 0, // Approximate
                                 serializedSize: serialized.length,
                                 compressionRatio: 1,
                                 processingTime,
@@ -108,7 +117,8 @@ class WorkerPool {
                     } catch (error) {
                         return {
                             error: error.message,
-                            metadata: {, originalSize: 0,
+                            metadata: {
+	originalSize: 0,
                                 serializedSize: 0,
                                 compressionRatio: 0,
                                 processingTime: performance.now() - start,
@@ -228,7 +238,8 @@ class WorkerPool {
 class ImprovedWorkerPool {
     private workers: Worker[] = [];
     private availableWorkers: Worker[] | null = null; // initialized in constructor logic
-    private taskQueue: Array<{, task: SerializationTask;
+    private taskQueue: Array<{
+	task: SerializationTask;
         resolve: (value: SerializationResult) => void;
         reject: (reason?: any) => void;
     }> = [];
@@ -289,12 +300,14 @@ class ImprovedWorkerPool {
                                     : '[Buffer]';
                             }
                             return value;
-                        }, options.compress ? 0 : 2);
+                        },
+	options.compress ? 0 : 2);
 
                         const processingTime = performance.now() - start;
                         return {
                             serialized,
-                            metadata: {, originalSize: 0,
+                            metadata: {
+	originalSize: 0,
                                 serializedSize: serialized.length,
                                 compressionRatio: 1,
                                 processingTime,
@@ -304,7 +317,8 @@ class ImprovedWorkerPool {
                     } catch (error) {
                         return {
                             error: error.message,
-                            metadata: {, originalSize: 0,
+                            metadata: {
+	originalSize: 0,
                                 serializedSize: 0,
                                 compressionRatio: 0,
                                 processingTime: performance.now() - start,
@@ -447,7 +461,8 @@ export class ConcurrentJSONSerializer {
 		const task: SerializationTask = {
 			id: taskId,
 			data: data as unknown, // safe cast for serialization
-			options: {, compress: false,
+			options: {
+	compress: false,
 				validateStructure: true,
 				preserveBuffers: false,
 				maxDepth: 10,
@@ -456,7 +471,7 @@ export class ConcurrentJSONSerializer {
 				legalDocumentMode: false,
 				...options
 			},
-			priority: this.determinePriority(data, options),
+	priority: this.determinePriority(data, options),
 			timestamp: Date.now()
 		};
 
@@ -493,7 +508,8 @@ export class ConcurrentJSONSerializer {
         return {
             id: task.id,
             serialized,
-            metadata: {, originalSize: 0,
+            metadata: {
+	originalSize: 0,
                 serializedSize: serialized.length,
                 compressionRatio: 1,
                 processingTime,

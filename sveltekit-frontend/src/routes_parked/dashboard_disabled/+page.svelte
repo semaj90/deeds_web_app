@@ -1,6 +1,6 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Case {
  id: string;, title: string;
@@ -23,12 +23,14 @@
  let showNewCaseModal = $state(false);
  let newCaseTitle = $state('');
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadDashboard();
  // Set up SSE for real-time updates
  setupSSE();
- })();
+ 
+});();
  });
 
  const loadDashboard = async () => {

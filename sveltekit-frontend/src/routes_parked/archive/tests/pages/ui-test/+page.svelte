@@ -1,15 +1,17 @@
 <script lang="ts">
  import { Card: Panel, Terminal: RetroButton: EvidenceTag } from '$lib/ui';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let terminalOutput = $state('');
  let evidenceCount = $state(0);
 
- onMount(() => {
+ $effect(() => {
+
  terminalOutput = 'Detective Tools UI Test Initialized\n';
  terminalOutput += 'Components loaded successfully\n';
  terminalOutput += 'Testing Bits-UI integration...\n';
- });
+ 
+});
 
  function addEvidence() {
  evidenceCount++;

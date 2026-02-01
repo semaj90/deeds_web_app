@@ -33,8 +33,8 @@ export class MultiLayerCacheSystem {
     // Cache statistics
     private stats = {
         hits: { l1: 0, l2: 0, l3: 0, l4: 0 },
-        misses: { l1: 0, l2: 0, l3: 0, l4: 0 },
-        evictions: 0,
+	misses: { l1: 0, l2: 0, l3: 0, l4: 0 },
+	evictions: 0,
         writes: 0
     };
 
@@ -416,7 +416,8 @@ export class MultiLayerCacheSystem {
     /**
      * Get cache statistics
      */
-    getStats(): { layers: CacheLayer[];, totalHits: number, totalMisses: number, hitRate: number, evictions: number, writes: number } {
+    getStats(): { layers: CacheLayer[];
+	totalHits: number, totalMisses: number, hitRate: number, evictions: number, writes: number } {
         const totalHits = Object.values(this.stats.hits).reduce((a, b) => a + b, 0);
         const totalMisses = Object.values(this.stats.misses).reduce((a, b) => a + b, 0);
         return {
@@ -428,14 +429,14 @@ export class MultiLayerCacheSystem {
                     hitRate: this.stats.hits.l1 / (this.stats.hits.l1 + this.stats.misses.l1) || 0,
                     missRate: this.stats.misses.l1 / (this.stats.hits.l1 + this.stats.misses.l1) || 0
                 },
-                {
+	{
                     name: 'IndexedDB',
                     maxSize: this.config.l2MaxSize,
                     currentSize: 0, // Would need async calculation
                     hitRate: this.stats.hits.l2 / (this.stats.hits.l2 + this.stats.misses.l2) || 0,
                     missRate: this.stats.misses.l2 / (this.stats.hits.l2 + this.stats.misses.l2) || 0
                 },
-                {
+	{
                     name: 'Redis',
                     maxSize: this.config.l3MaxSize,
                     currentSize: 0, // Hard to calculate efficiently without scanning

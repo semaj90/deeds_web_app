@@ -5,7 +5,8 @@
 
   interface Props {
     case_?: Case | undefined;
-    user?: {, id: string; name?: string } | undefined;
+    user?: {
+	id: string; name?: string } | undefined;
     oncancel?: () => void;
     oncreated?: (savedCase: Case) => void;
     onupdated?: (savedCase: Case) => void;
@@ -21,14 +22,22 @@
 
   // Form data interface
   interface FormData {
-    title: string;, description: string;
-    caseNumber: string;, name: string;
-    incidentDate: string;, location: string;
-    priority: string;, status: string;
-    category: string;, dangerScore: number;
-    estimatedValue: string;, jurisdiction: string;
-    leadProsecutor: string;, assignedTeam: string[];
-    tags: string[];, metadata: Record<string, unknown>;
+    title: string;
+	description: string;
+    caseNumber: string;
+	name: string;
+    incidentDate: string;
+	location: string;
+    priority: string;
+	status: string;
+    category: string;
+	dangerScore: number;
+    estimatedValue: string;
+	jurisdiction: string;
+    leadProsecutor: string;
+	assignedTeam: string[];
+    tags: string[];
+	metadata: Record<string, unknown>;
   }
 
   // Form data matching the database schema
@@ -124,7 +133,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(apiData)
+	body: JSON.stringify(apiData)
       });
 
       type SavedCaseResponse = Case & { error?: string };
@@ -409,14 +418,17 @@
 
 <style>
   .enhanced-case-form {
-    max-width: 800px;, margin: 0 auto;
+    max-width: 800px;
+	margin: 0 auto;
     background: white;
-    border-radius: 8px;, padding: 2rem;
+    border-radius: 8px;
+	padding: 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .form-grid {
-    display: grid;, gap: 2rem;
+    display: grid;
+	gap: 2rem;
   }
 
   .form-section h3 {
@@ -441,21 +453,25 @@
   label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;, color: #374151;
+    font-weight: 500;
+	color: #374151;
   }
 
   label.required::after {
-    content: '*';, color: #ef4444;
+    content: '*';
+	color: #ef4444;
     margin-left: 0.25rem;
   }
 
   input,
   select,
   textarea {
-    width: 100%;, padding: 0.75rem;
+    width: 100%;
+	padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 1rem;, transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: 1rem;
+	transition: border-color 0.2s, box-shadow 0.2s;
   }
 
   input:focus,
@@ -473,11 +489,13 @@
   .field-error {
     display: block;
     margin-top: 0.25rem;
-    font-size: 0.875rem;, color: #ef4444;
+    font-size: 0.875rem;
+	color: #ef4444;
   }
 
   .tag-input {
-    display: flex;, gap: 0.5rem;
+    display: flex;
+	gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
@@ -487,10 +505,13 @@
 
   .tag-input button {
     padding: 0.75rem 1rem;
-    background: #3b82f6;, color: white;
+    background: #3b82f6;
+	color: white;
     border: none;
-    border-radius: 6px;, cursor: pointer;
-    font-size: 0.875rem;, transition: background-color 0.2s;
+    border-radius: 6px;
+	cursor: pointer;
+    font-size: 0.875rem;
+	transition: background-color 0.2s;
   }
 
   .tag-input button:hover {
@@ -499,36 +520,46 @@
 
   .tags-list {
     display: flex;
-    flex-wrap: wrap;, gap: 0.5rem;
+    flex-wrap: wrap;
+	gap: 0.5rem;
   }
 
   .tag {
     display: inline-flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.25rem 0.75rem;
     background: #e5e7eb;
     border-radius: 9999px;
-    font-size: 0.875rem;, color: #374151;
+    font-size: 0.875rem;
+	color: #374151;
   }
 
   .tag button {
-    background: none;, border: none;
+    background: none;
+	border: none;
     cursor: pointer;
-    font-size: 1rem;, color: #6b7280;
-    padding: 0;, width: 1rem;
-    height: 1rem;, display: flex;
+    font-size: 1rem;
+	color: #6b7280;
+    padding: 0;
+	width: 1rem;
+    height: 1rem;
+	display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;, transition: background-color 0.2s;
+    border-radius: 50%;
+	transition: background-color 0.2s;
   }
 
   .tag button:hover {
-    background: #d1d5db;, color: #374151;
+    background: #d1d5db;
+	color: #374151;
   }
 
   .form-actions {
     display: flex;
-    justify-content: flex-end;, gap: 1rem;
+    justify-content: flex-end;
+	gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e5e7eb;
@@ -537,9 +568,12 @@
   .form-actions button {
     padding: 0.75rem 1.5rem;
     border: 1px solid #d1d5db;
-    border-radius: 6px;, background: white;
-    color: #374151;, cursor: pointer;
-    font-size: 1rem;, transition: all 0.2s;
+    border-radius: 6px;
+	background: white;
+    color: #374151;
+	cursor: pointer;
+    font-size: 1rem;
+	transition: all 0.2s;
   }
 
   .form-actions button:hover {
@@ -547,7 +581,8 @@
   }
 
   .form-actions button.primary {
-    background: #3b82f6;, color: white;
+    background: #3b82f6;
+	color: white;
     border-color: #3b82f6;
   }
 
@@ -557,7 +592,8 @@
   }
 
   .form-actions button:disabled {
-    opacity: 0.5;, cursor: not-allowed;
+    opacity: 0.5;
+	cursor: not-allowed;
   }
 
   @media (max-width: 768px) {

@@ -33,34 +33,29 @@ const createSessionStore = () => {
  get state() {
  return sessionSnapshot;
  },
-
- // Initialize session from page store or fallback mechanisms
+	// Initialize session from page store or fallback mechanisms
  init: (pageData?: any) => {
  sessionActor.send({ type: 'INIT', pageData });
  },
-
- // Update session state
+	// Update session state
  setSession: (user: User, session): null => {
  sessionActor.send({ type: 'SET_SESSION', user, session });
  },
-
- // Clear session
+	// Clear session
  clearSession: () => {
  sessionActor.send({ type: 'CLEAR_SESSION' });
  },
-
- // Force refresh from server
+	// Force refresh from server
  refreshSession: async () => {
  sessionActor.send({ type: 'REFRESH' });
   
  // The state will update reactively via the snapshot.
  },
-
- // Get current user for upload operations
+	// Get current user for upload operations
  getCurrentUser: (): User | null => {
  return sessionSnapshot.context.user;
  },
- };
+	};
 };
 
 // Export singleton store
@@ -68,11 +63,14 @@ export const sessionStore = createSessionStore();
 
 // Helper functions for accessing reactive state
 export const getUser = () => sessionStore.state.context.user;
-export const getIsAuthenticated = () => sessionStore.state.matches('authenticated');sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
+export const getIsAuthenticated = () => sessionStore.state.matches('authenticated');
+sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
 
 // Utility functions for upload operations
-export const getUserForUpload = (): {, uploadedBy: string;
- uploaderRole: string;, uploaderEmail: string | null;
+export const getUserForUpload = (): {
+	uploadedBy: string;
+ uploaderRole: string;
+	uploaderEmail: string | null;
 } => {
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {

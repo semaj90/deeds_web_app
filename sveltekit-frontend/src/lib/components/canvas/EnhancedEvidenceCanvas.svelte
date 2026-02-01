@@ -1,4 +1,4 @@
-<!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> import { onMount, onDestroy } from 'svelte';
+<!-- Enhanced Canvas Evidence Board with Fabric.js, Integration --> <script lang="ts"> // Migrated to $effect
  import { browser } from '$app/environment';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { notifications } from '$lib/stores/unified';
@@ -12,21 +12,26 @@
    let caseId: string | undefined;
    let evidenceItems: any[] = [];
    let selectedTool = 'select'; // Simple local mode instead of the broken XState bootstrapping let currentMode = 'evidence'; function setWorkflowMode(mode: string) { currentMode = mode}
-  onMount(() => {
+  $effect(() => {
+
 		(async () => {
- if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true 		})();
+ if (!browser) return; try { const mod = await import('fabric'); // support different module shapes const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (!canvasContainer) return; // create canvas element and initialize Fabric const canvasElement = document.createElement('canvas'); canvasElement.width = 1200; canvasElement.height = 800; canvasContainer.appendChild(canvasElement); fabricCanvas = new fabric.Canvas(canvasElement, { backgroundColor: '#f8fafc', selection !readonly, preserveObjectStacking: true, enableRetinaScaling: true 		
+});();
 	}); // listen to changes so we can save state to history fabricCanvas.on && fabricCanvas.on('object:modified', saveCanvasState); fabricCanvas.on && fabricCanvas.on('object:removed', saveCanvasState); // load initial evidence items if any if (evidenceItems && evidenceItems.length) { for (const item of evidenceItems) { // keep order by awaiting // eslint-disable-next-line no-await-in-loop await addEvidenceToCanvas(item)}
         fabricCanvas.renderAll()}
 
       // push initial state saveCanvasState(); fabricLoaded = true} catch (error) { console.error('Failed to initialize Fabric.js:', error); notifications.add({ type: 'error', title: 'Canvas Error', message: 'Failed to initialize canvas. Some features may not work.'
       })}
-  }); onDestroy(() => { if (fabricCanvas && typeof fabricCanvas.dispose === 'function') { fabricCanvas.dispose()}
-  });
+  }); // TODO: Add as cleanup in $effect: return () => { if (fabricCanvas && typeof fabricCanvas.dispose === 'function') { fabricCanvas.dispose()}
+  }
   async function addEvidenceToCanvas(item: any): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
-   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly;, evented: !readonly }); // optional scaling if width/height provided if (item.width && img.width) { img.scaleX = item.width / img.width}
+   const fabric = (mod as any).fabric ?? (mod as any).default ?? mod; if (item?.type === 'image' && item?.thumbnailUrl) { // fabric.Image.fromURL is callback-based fabric.Image.fromURL( item.thumbnailUrl, (img: any) => { img.set({ left: item.x ?? 100, top: item.y ?? 100, selectable: !readonly;
+	evented: !readonly }); // optional scaling if width/height provided if (item.width && img.width) { img.scaleX = item.width / img.width}
             if (item.height && img.height) { img.scaleY = item.height / img.height}
-            img.set('evidenceId', item.id ?? null); img.set('evidenceType', item.type); fabricCanvas.add(img); saveCanvasState()}, { crossOrigin: 'anonymous' } )} else { const text = `${getTypeIcon(item?.type)} ${item?.title ?? ''}`;
-   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly;, evented: !readonly }); textbox.set('evidenceId', item.id ?? null); textbox.set('evidenceType', item?.type ?? 'document'); fabricCanvas.add(textbox); saveCanvasState()}
+            img.set('evidenceId', item.id ?? null); img.set('evidenceType', item.type); fabricCanvas.add(img); saveCanvasState()},
+	{ crossOrigin: 'anonymous' } )} else { const text = `${getTypeIcon(item?.type)} ${item?.title ?? ''}`;
+   const textbox = new fabric.Textbox(text, { left: item.x ?? 100, top: item.y ?? 100, width: item.width ?? 200, fontSize: 14, fontFamily: 'Arial', fill: '#1f2937', backgroundColor: '#ffffff', padding: 8, selectable: !readonly;
+	evented: !readonly }); textbox.set('evidenceId', item.id ?? null); textbox.set('evidenceType', item?.type ?? 'document'); fabricCanvas.add(textbox); saveCanvasState()}
     } catch (error) { console.error('Error adding evidence to canvas:', error)}
   }
   function getTypeIcon(type: string | undefined): string { switch (type) { case: 'image': return 'ðŸ–¼ï¸'; case, 'document': return 'ðŸ“„'; case, 'video': return 'ðŸŽ¥'; case, 'audio': return 'ðŸŽµ',default: return 'ðŸ“Ž'}
@@ -36,7 +41,8 @@
   async function addShape(shape: 'rectangle' | 'circle'): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
    let obj: any;
- if (shape === 'rectangle') { obj = new fabric.Rect({ left: 100, top: 100, width: 100, height: 80, fill: 'rgba(59, 130, 246, 0.08)', stroke: '#3b82f6', strokeWidth: 2 })} else { obj = new fabric.Circle({ left: 100, top: 100, radius: 50, fill: 'rgba(16, 185, 129, 0.08)', stroke: '#10b981';, strokeWidth: 2 })}
+ if (shape === 'rectangle') { obj = new fabric.Rect({ left: 100, top: 100, width: 100, height: 80, fill: 'rgba(59, 130, 246, 0.08)', stroke: '#3b82f6', strokeWidth: 2 })} else { obj = new fabric.Circle({ left: 100, top: 100, radius: 50, fill: 'rgba(16, 185, 129, 0.08)', stroke: '#10b981';
+	strokeWidth: 2 })}
       obj.set('customType', 'shape'); fabricCanvas.add(obj); fabricCanvas.setActiveObject(obj); saveCanvasState()} catch (error) { console.error('Error adding shape:', error)}
   }
   async function addTextBox(): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
@@ -61,11 +67,14 @@
   }
   async function saveCanvas(): Promise<void> { if (!fabricCanvas) return; try { const canvasData = JSON.stringify(fabricCanvas.toJSON(['evidenceId', 'evidenceType', 'customType']));
    const positions = (fabricCanvas.getObjects ? fabricCanvas.getObjects(): []) .filter((obj: any) => obj.evidenceId) .map((obj: any) => ({ evidenceId: obj.evidenceId, x: obj.left, y: obj.top, width: (obj.width ?? (obj.getScaledWidth ? obj.getScaledWidth(): 0)) * (obj.scaleX ?? 1); height: (obj.height ?? (obj.getScaledHeight ? obj.getScaledHeight(): 0)) * (obj.scaleY ?? 1) }));
-   const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
+   const response = await fetch('/api/canvas/save', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ caseId, canvasData, positions }) }); if (!response.ok) throw new Error('Failed to save canvas'); notifications.add({ type: 'success', title: 'Canvas Saved', message: 'Evidence board saved successfully.'
       })} catch (error) { notifications.add({ type: 'error', title: 'Save Failed'; message: 'Failed to save evidence board.'
-      }); console.error('Save error:', error)}'
+      }); console.error('Save error:', error)}
+'
   }
-  async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9;, multiplier: 2 });
+  async function exportCanvas(): Promise<any> { if (!fabricCanvas) return; try { const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9;
+	multiplier: 2 });
    const link = document.createElement('a'); link.download = `evidence-board-${caseId ?? 'canvas'}-${Date.now()}.png`; link.href = dataURL; link.click(); notifications.add({ type: 'success', title: 'Export Complete', message: 'Evidence board exported successfully.'
       })} catch (error) { console.error('Export error:', error); notifications.add({ type: 'error', title: 'Export Failed', message: 'Failed to export evidence board.'
       })}
@@ -113,7 +122,8 @@
   {#if fabricLoaded && evidenceItems.length === 0} <div> <Image /> <p>Evidence Board</p>
  <p>Add evidence items to start building your case visualization</p> {/if}
   </div>
- <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;, height: auto;display: block}
+ <style> /* @unocss-include */ .canvas-placeholder canvas { width: 100%;
+	height: auto;display: block}
 </style>
 
 

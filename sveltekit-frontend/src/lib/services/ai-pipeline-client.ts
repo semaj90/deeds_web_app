@@ -15,8 +15,10 @@ import { process } from "node:process";
 
 // Service availability tracking
 export interface ServiceStatus {
-	ollama: boolean;, embedding: boolean;
-	qdrant: boolean;, rag: boolean;
+	ollama: boolean;
+	embedding: boolean;
+	qdrant: boolean;
+	rag: boolean;
 	lastCheck: number;
 }
 
@@ -190,7 +192,8 @@ export class AIPipelineClient {
 	 */
 	async generateEmbedding(
 		text: string
-	): Promise<{, embedding: number[] | null; cached, boolean }> {
+	): Promise<{
+	embedding: number[] | null; cached, boolean }> {
 		// Check cache first
 		const cacheKey = `${CACHE_KEYS.EMBEDDINGS_CACHE}:${this.hashText(text)}`;
 		const cached = this.storage.get<number[]>(cacheKey);
@@ -212,7 +215,8 @@ export class AIPipelineClient {
 			const response = await fetch(`${this.baseUrl}/api/ai/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text }, signal: AbortSignal.timeout(10000) // 10s timeout
+	body: JSON.stringify({ text },
+	signal: AbortSignal.timeout(10000) // 10s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -237,7 +241,8 @@ export class AIPipelineClient {
 	 */
 	async analyzeDocument(
 		content: string, documentType: string = 'unknown'
-	): Promise<{, analysis: null; cached, boolean }> {
+	): Promise<{
+	analysis: null; cached, boolean }> {
 		// Check cache
 		const cacheKey = `${CACHE_KEYS.ANALYSIS_CACHE}:${this.hashText(content)}`;
 		const cached = this.storage.get<any>(cacheKey);
@@ -254,14 +259,15 @@ export class AIPipelineClient {
 			return {
 				analysis: this.getFallbackAnalysis(content, documentType, cached: false
 			},
-		}
+	}
 
 		// Try live API
 		try {
 			const response = await fetch(`${this.baseUrl}/api/ai/analyze`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content, documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
+	body: JSON.stringify({ content, documentType },
+	signal: AbortSignal.timeout(30000) // 30s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -289,7 +295,8 @@ export class AIPipelineClient {
 	async semanticSearch(
 		query: string,
 		options: { limit?: number, caseId?: string } = {}
-	): Promise<{, results: unknown[]; cached, boolean }> {
+	): Promise<{
+	results: unknown[]; cached, boolean }> {
 		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options?.caseId ?? 'all'}`;
 		const cached = this.storage.get<any[]>(cacheKey);
 
@@ -310,7 +317,8 @@ export class AIPipelineClient {
 			const response = await fetch(`${this.baseUrl}/api/ai/rag`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query, ...options }, signal: AbortSignal.timeout(15000) // 15s timeout
+	body: JSON.stringify({ query, ...options },
+	signal: AbortSignal.timeout(15000) // 15s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -406,9 +414,11 @@ export class AIPipelineClient {
 		const words = content.toLowerCase().split(/\s+/);
 		const wordCount = words.length;
 
-		// Extract potential entities (capitalized words)content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
+		// Extract potential entities (capitalized words)
+content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
 
-		// Common legal keywords'contract',
+		// Common legal keywords
+'contract',
 			'agreement',
 			'evidence',
 			'witness',

@@ -6,18 +6,23 @@ import YoRHaCommandCenter from './YoRHaCommandCenter.svelte';
 const meta = {
     title: 'YoRHa/CommandCenter',
     component: YoRHaCommandCenter,
-    parameters: {, layout: 'fullscreen',
-        docs: {, description: {
+    parameters: {
+	layout: 'fullscreen',
+        docs: {
+	description: {
                 component: 'YoRHa Command Center Dashboard - Main interface for legal AI operations'
             }
         }
     },
-    tags: ['autodocs'],
-    argTypes: {, systemData: {
+	tags: ['autodocs'],
+    argTypes: {
+	systemData: {
             control: 'object',
             description: 'System metrics and status data',
-            table: {, type: { summary: 'SystemData' },
-                defaultValue: {, summary: 'Default system data with zeros' }
+            table: {
+	type: { summary: 'SystemData' },
+	defaultValue: {
+	summary: 'Default system data with zeros' }
             }
         }
     }
@@ -28,7 +33,8 @@ type Story = StoryObj<typeof meta>;
 
 // Default story with baseline system data
 export const Default: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 12,
             evidenceItems: 45,
             personsOfInterest: 8,
@@ -43,7 +49,8 @@ export const Default: Story = {
 
 // High load scenario
 export const HighLoad: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 89,
             evidenceItems: 234,
             personsOfInterest: 34,
@@ -54,8 +61,10 @@ export const HighLoad: Story = {
             networkLatency: 125
         }
     },
-    parameters: {, docs: {
-            description: {, story: 'Command Center under high system load - shows warning indicators'
+	parameters: {
+	docs: {
+            description: {
+	story: 'Command Center under high system load - shows warning indicators'
             }
         }
     }
@@ -63,7 +72,8 @@ export const HighLoad: Story = {
 
 // Critical system state
 export const Critical: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 156,
             evidenceItems: 567,
             personsOfInterest: 67,
@@ -74,8 +84,10 @@ export const Critical: Story = {
             networkLatency: 250
         }
     },
-    parameters: {, docs: {
-            description: {, story: 'Critical system state - all metrics in red zone'
+	parameters: {
+	docs: {
+            description: {
+	story: 'Critical system state - all metrics in red zone'
             }
         }
     }
@@ -83,7 +95,8 @@ export const Critical: Story = {
 
 // Low activity scenario
 export const LowActivity: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 3,
             evidenceItems: 12,
             personsOfInterest: 2,
@@ -94,8 +107,10 @@ export const LowActivity: Story = {
             networkLatency: 18
         }
     },
-    parameters: {, docs: {
-            description: {, story: 'Low activity scenario - minimal system usage'
+	parameters: {
+	docs: {
+            description: {
+	story: 'Low activity scenario - minimal system usage'
             }
         }
     }
@@ -103,7 +118,8 @@ export const LowActivity: Story = {
 
 // Empty state
 export const EmptyState: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 0,
             evidenceItems: 0,
             personsOfInterest: 0,
@@ -114,8 +130,10 @@ export const EmptyState: Story = {
             networkLatency: 12
         }
     },
-    parameters: {, docs: {
-            description: {, story: 'Empty state - fresh system with no active cases or data'
+	parameters: {
+	docs: {
+            description: {
+	story: 'Empty state - fresh system with no active cases or data'
             }
         }
     }
@@ -123,7 +141,8 @@ export const EmptyState: Story = {
 
 // Interactive demo with actions
 export const Interactive: Story = {
-    args: {, systemData: {
+    args: {
+	systemData: {
             activeCases: 25,
             evidenceItems: 89,
             personsOfInterest: 15,
@@ -134,12 +153,14 @@ export const Interactive: Story = {
             networkLatency: 38
         }
     },
-    parameters: {, docs: {
-            description: {, story: 'Interactive demo - test all quick actions and modal interactions'
+	parameters: {
+	docs: {
+            description: {
+	story: 'Interactive demo - test all quick actions and modal interactions'
             }
         }
     },
-    play: async ({ canvasElement, step }) => {
+	play: async ({ canvasElement, step }) => {
         const canvas = within(canvasElement);
         await step('Click new case action', async () => {
             const newCaseButton = canvas.getByText('Create New Case');

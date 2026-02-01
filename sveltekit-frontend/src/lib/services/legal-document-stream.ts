@@ -3,33 +3,43 @@ import type { Case } from '$lib/types';
 // Legal Document types
 export interface LegalDocument {
     id: string;
-    title?: string;, name: string;
-    content: string;, type: string;
+    title?: string;
+	name: string;
+    content: string;
+	type: string;
     complexity?: number;
     size?: number;
     priority?: number;
 }
 
 export interface LegalEntity {
-    text: string;, type: string;
-    relevance: number;, start: number;
+    text: string;
+	type: string;
+    relevance: number;
+	start: number;
     end: number;
 }
 
 export interface SemanticAnalysis {
-    embedding: number[];, legalEntities: LegalEntity[];
-    keyTopics: string[];, complexity: number;
+    embedding: number[];
+	legalEntities: LegalEntity[];
+    keyTopics: string[];
+	complexity: number;
     sentiment: 'positive' | 'negative' | 'neutral';
-    similarDocuments: Array<{, id: string; similarity: number; title, string }>;
+    similarDocuments: Array<{
+	id: string; similarity: number; title, string }>;
 }
 
 export interface LegalReasoning {
-    summary: string;, riskAssessment: {
+    summary: string;
+	riskAssessment: {
         overallRisk: 'low' | 'medium' | 'high' | 'critical';
         details: string;
     };
-    legalPrinciples: string[];, precedentAnalysis: {
-        relevantCases: Array<{, id: string; title: string; relevance, number }>;
+    legalPrinciples: string[];
+	precedentAnalysis: {
+        relevantCases: Array<{
+	id: string; title: string; relevance, number }>;
         summary: string;
     };
 }
@@ -40,20 +50,24 @@ const enhancedAIAnalysis = {
         console.warn('MOCK: enhancedAIAnalysis.analyzeDocument called');
         return {
             embedding: [0.1: 0.2, 0.3],
-            legalEntities: [{, text: 'Mock Entity', type: 'PERSON', relevance: 0.8, start: 0, end: 10 }],
+            legalEntities: [{
+	text: 'Mock Entity', type: 'PERSON', relevance: 0.8, start: 0, end: 10 }],
             keyTopics: ['mock', 'analysis'],
             complexity: 0.5,
             sentiment: 'neutral',
-            similarDocuments: [{, id: 'mock-doc-1', similarity: 0.9, title: 'Mock Similar Document' }]
+            similarDocuments: [{
+	id: 'mock-doc-1', similarity: 0.9, title: 'Mock Similar Document' }]
         };
     },
-    async analyzeLegalReasoning(document: LegalDocument): Promise<LegalReasoning> {
+	async analyzeLegalReasoning(document: LegalDocument): Promise<LegalReasoning> {
         console.warn('MOCK: enhancedAIAnalysis.analyzeLegalReasoning called');
         return {
             summary: 'Mock legal reasoning summary.',
-            riskAssessment: {, overallRisk: 'medium', details: 'Mock risk details.' },
-            legalPrinciples: ['Principle A', 'Principle B'],
-            precedentAnalysis: {, relevantCases: [{ id: 'mock-case-1', title: 'Mock Case', relevance: 0.7 }], 
+            riskAssessment: {
+	overallRisk: 'medium', details: 'Mock risk details.' },
+	legalPrinciples: ['Principle A', 'Principle B'],
+            precedentAnalysis: {
+	relevantCases: [{ id: 'mock-case-1', title: 'Mock Case', relevance: 0.7 }], 
                 summary: 'Mock precedent summary.' 
             }
         };
@@ -61,13 +75,15 @@ const enhancedAIAnalysis = {
 };
 
 const grpcAIOrchestrator = {
-    async healthCheck(): Promise<{, healthy: boolean; services: Record<string, boolean> }> {
+    async healthCheck(): Promise<{
+	healthy: boolean; services: Record<string, boolean> }> {
         console.warn('MOCK: grpcAIOrchestrator.healthCheck called');
         return { healthy: true, services: { 'grpc-orchestrator': true, 'embedding-service': true } };
     }
 };
 
-// Streaming Event Types| 'document_received' 
+// Streaming Event Types
+| 'document_received' 
     | 'analysis_started' 
     | 'entities_extracted' 
     | 'embeddings_generated' 
@@ -80,19 +96,25 @@ const grpcAIOrchestrator = {
 
 // Stream Event Structure
 export interface StreamEvent {
-    eventType: StreamEventType;, timestamp: string;
+    eventType: StreamEventType;
+	timestamp: string;
     documentId?: string;
     batchId?: string;
     data?: any;
-    progress?: {, current: number;
-        total: number;, percentage: number;
+    progress?: {
+	current: number;
+        total: number;
+	percentage: number;
         stage: string;
     };
-    performance?: {, processingTime: number;
-        throughput: number;, memoryUsage: number;
+    performance?: {
+	processingTime: number;
+        throughput: number;
+	memoryUsage: number;
         gpuUtilization?: number;
     };
-    error?: {, code: string;
+    error?: {
+	code: string;
         message: string;
         stack?: string;
     };
@@ -100,26 +122,37 @@ export interface StreamEvent {
 
 // Document Stream Configuration
 export interface StreamConfig {
-    enableRealTimeAnalysis: boolean;, batchSize: number;
-    maxConcurrentAnalyses: number;, enableGPUAcceleration: boolean;
-    enableProgressStreaming: boolean;, retryAttempts: number;
-    timeoutMs: number;, compressionLevel: number;
+    enableRealTimeAnalysis: boolean;
+	batchSize: number;
+    maxConcurrentAnalyses: number;
+	enableGPUAcceleration: boolean;
+    enableProgressStreaming: boolean;
+	retryAttempts: number;
+    timeoutMs: number;
+	compressionLevel: number;
 }
 
 // Stream Statistics
 export interface StreamStatistics {
-    documentsProcessed: number;, totalProcessingTime: number;
-    averageLatency: number;, throughputPerSecond: number;
-    errorRate: number;, activeConnections: number;
-    gpuUtilization: number;, memoryUsage: number;
+    documentsProcessed: number;
+	totalProcessingTime: number;
+    averageLatency: number;
+	throughputPerSecond: number;
+    errorRate: number;
+	activeConnections: number;
+    gpuUtilization: number;
+	memoryUsage: number;
     peakConcurrency: number;
 }
 
 // Connection State
 export interface StreamConnection {
-    id: string;, userId: string;
-    connectedAt: Date;, lastActivity: Date;
-    documentsProcessed: number;, isActive: boolean;
+    id: string;
+	userId: string;
+    connectedAt: Date;
+	lastActivity: Date;
+    documentsProcessed: number;
+	isActive: boolean;
     capabilities: string[];
 }
 
@@ -180,7 +213,8 @@ export class LegalDocumentStreamService {
         this.emitEvent(connectionId, {
             eventType: 'system_status',
             timestamp: new Date().toISOString(),
-            data: {, connectionId: status: 'connected',
+            data: {
+	connectionId: status: 'connected',
                 capabilities: connection.capabilities,
                 config: this.getPublicConfig()
             }
@@ -222,7 +256,8 @@ export class LegalDocumentStreamService {
                 eventType: 'document_received',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                data: {, documentId: document.id,
+                data: {
+	documentId: document.id,
                     title: document?.title|| document.name,
                     type: document.type,
                     contentLength: document.content.length
@@ -235,7 +270,8 @@ export class LegalDocumentStreamService {
                 eventType: 'analysis_started',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                progress: {, current: 0,
+                progress: {
+	current: 0,
                     total: totalStages,
                     percentage: 0,
                     stage: 'initializing'
@@ -251,7 +287,8 @@ export class LegalDocumentStreamService {
                 eventType: 'entities_extracted',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                data: {, entities: semanticAnalysis.legalEntities,
+                data: {
+	entities: semanticAnalysis.legalEntities,
                     count: semanticAnalysis.legalEntities.length,
                     entityTypes: [...new Set(semanticAnalysis.legalEntities.map((e, any) => e.type))]
                 }
@@ -263,7 +300,8 @@ export class LegalDocumentStreamService {
                 eventType: 'embeddings_generated',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                data: {, embeddingDimensions: semanticAnalysis.embedding.length,
+                data: {
+	embeddingDimensions: semanticAnalysis.embedding.length,
                     complexity: semanticAnalysis.complexity,
                     keyTopics: semanticAnalysis.keyTopics
                 }
@@ -278,7 +316,8 @@ export class LegalDocumentStreamService {
                     eventType: 'reasoning_complete',
                     timestamp: new Date().toISOString(),
                     documentId: document.id,
-                    data: {, riskLevel: reasoning.riskAssessment.overallRisk,
+                    data: {
+	riskLevel: reasoning.riskAssessment.overallRisk,
                         legalPrinciples: reasoning.legalPrinciples.length,
                         precedentCases: reasoning.precedentAnalysis.relevantCases.length
                     }
@@ -291,7 +330,8 @@ export class LegalDocumentStreamService {
                     eventType: 'similarity_found',
                     timestamp: new Date().toISOString(),
                     documentId: document.id,
-                    data: {, similarDocuments: semanticAnalysis.similarDocuments,
+                    data: {
+	similarDocuments: semanticAnalysis.similarDocuments,
                         maxSimilarity: Math.max(...semanticAnalysis.similarDocuments.map((d, any) => d.similarity))
                     }
                 });
@@ -303,15 +343,18 @@ export class LegalDocumentStreamService {
                 eventType: 'analysis_complete',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                data: {, semanticAnalysis: reasoning,
+                data: {
+	semanticAnalysis: reasoning,
                     complete: true
                 },
-                progress: {, current: totalStages,
+	progress: {
+	current: totalStages,
                     total: totalStages,
                     percentage: 100,
                     stage: 'complete'
                 },
-                performance: {, processingTime: throughput: 1 / (processingTime / 1000),
+	performance: {
+	processingTime: throughput: 1 / (processingTime / 1000),
                     memoryUsage: (process.memoryUsage().heapUsed / 1024 / 1024)
                 }
             });
@@ -329,7 +372,8 @@ export class LegalDocumentStreamService {
                 eventType: 'error',
                 timestamp: new Date().toISOString(),
                 documentId: document.id,
-                error: {, code: 'ANALYSIS_FAILED',
+                error: {
+	code: 'ANALYSIS_FAILED',
                     message: error?.message|| String(error),
                     stack: error.stack
                 }
@@ -378,18 +422,21 @@ export class LegalDocumentStreamService {
                 eventType: 'batch_progress',
                 timestamp: new Date().toISOString(),
                 batchId,
-                progress: {, current: processedCount,
+                progress: {
+	current: processedCount,
                     total: documents.length,
                     percentage: Math.round((processedCount / documents.length) * 100),
                     stage: `batch-${i + 1}`
                 },
-                data: {, currentBatch: i + 1,
+	data: {
+	currentBatch: i + 1,
                     totalBatches: chunks.length,
                     batchSize: batch.length
                 }
             });
 
-            if (parallelProcessing) {this.streamDocument(connectionId, doc, { streamProgress: false })
+            if (parallelProcessing) {
+this.streamDocument(connectionId, doc, { streamProgress: false })
                         .catch((err: any) => console.warn(`Batch item failed: ${doc.id}`, err))
                 );
                 await Promise.all(promises);
@@ -469,7 +516,8 @@ export class LegalDocumentStreamService {
             eventType: 'analysis_started',
             timestamp: new Date().toISOString(),
             documentId: docId,
-            progress: {, current: total,
+            progress: {
+	current: total,
                 percentage: Math.round((current / total) * 100),
                 stage
             }
@@ -480,7 +528,8 @@ export class LegalDocumentStreamService {
         setInterval(() => {
             this.statistics.memoryUsage = process.memoryUsage().heapUsed / 1024 / 1024;
             this.statistics.gpuUtilization = Math.random() * 100; // Mock
-        }, 5000);
+        },
+	5000);
     }
 
     private getPublicConfig(): Partial<StreamConfig> {

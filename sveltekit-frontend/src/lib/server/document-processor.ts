@@ -8,12 +8,14 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 
 export interface DocumentProcessingResult {
-    text: string;, metadata: {
+    text: string;
+	metadata: {
         title?: string;
         author?: string;
         pages?: number;
         language?: string;
-        confidence?: number;, processingTime: number;
+        confidence?: number;
+	processingTime: number;
     };
     entities?: {
         persons?: string[];
@@ -22,23 +24,30 @@ export interface DocumentProcessingResult {
         dates?: string[];
         legalCitations?: string[];
     };
-    layout?: {, regions: Array<{
-            type: string;, bbox: number[];
+    layout?: {
+	regions: Array<{
+            type: string;
+	bbox: number[];
             confidence: number;
             text?: string;
         }>;
     };
-    objects?: Array<{, class: string;
-        bbox: number[];, confidence: number;
+    objects?: Array<{
+	class: string;
+        bbox: number[];
+	confidence: number;
     }>;
-    tables?: Array<{, content: string[][];
+    tables?: Array<{
+	content: string[][];
         bbox?: number[];
     }>;
-    images?: Array<{, content: Buffer;
+    images?: Array<{
+	content: Buffer;
         bbox?: number[];
         caption?: string;
     }>;
-    method: string;, engines: string[];
+    method: string;
+	engines: string[];
 }
 
 export interface DocumentProcessingOptions {
@@ -81,7 +90,7 @@ export class DocumentProcessor {
                         ...doclingResult.metadata,
                         processingTime: doclingResult.metadata.processingTime,
                     },
-                    tables: doclingResult.tables,
+	tables: doclingResult.tables,
                     images: doclingResult.images,
                     method: 'docling',
                 });
@@ -115,7 +124,7 @@ export class DocumentProcessor {
                 processingTime: Date.now() - startTime,
                 confidence: mergedResult.metadata?.confidence ?? 0.8 // Default confidence
             },
-            method: results.length > 1 ? 'merged' : (results[0]?.method || 'none'),
+	method: results.length > 1 ? 'merged' : (results[0]?.method || 'none'),
             engines: usedEngines
         };
     }
@@ -134,8 +143,9 @@ export class DocumentProcessor {
         if (results.length === 0) {
             return {
                 text: '',
-                metadata: {, processingTime: 0 },
-                method: 'none',
+                metadata: {
+	processingTime: 0 },
+	method: 'none',
                 engines: []
             };
         }
@@ -147,8 +157,7 @@ export class DocumentProcessor {
         return {
             text: bestResult.text || '',
             metadata: { ...bestResult.metadata, processingTime: 0 },
-
-            // Consolidate arrays
+	// Consolidate arrays
             tables: results.flatMap(r => r.tables || []),
             images: results.flatMap(r => r.images || []),
             entities: bestResult.entities,

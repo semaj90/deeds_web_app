@@ -1,7 +1,7 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
 	import { appStore, appActions } from '$lib/stores/app-store';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
 
  let selectedSection = $state('command-center');
  let showNewCaseModal = $state(false);
@@ -16,10 +16,10 @@
 
  const sections = $state([
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
- { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
- { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
- { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
- { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
+	{ id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
+	{ id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
+	{ id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+	{ id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
 
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
@@ -73,7 +73,7 @@
 		createdAt: new Date().toISOString(),
 		status: 'active'
  },
- {
+	{
  id: 'case-002',
  title: 'Network Intrusion',
  caseNumber: '2024-002',
@@ -115,7 +115,7 @@
  label: 'Anomaly detected in network logs',
  summary: 'Unusual data transfer patterns identified.'
  },
- {
+	{
  id: 'insight-gen-002',
  label: 'Facial recognition match',
  summary: 'Subject identified in surveillance footage.'
@@ -129,7 +129,7 @@
  // Fallback insights
  evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
- { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
+	{ id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
  }
  }
 
@@ -181,22 +181,25 @@
 
  let intervalId: ReturnType<typeof setInterval>;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadData();
 
  // Refresh data periodically
  intervalId = setInterval(async () => {
  await loadData();
- }, 60000); // Refresh every minute
- })();
+ },
+	60000); // Refresh every minute
+ 
+});();
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (intervalId) {
  clearInterval(intervalId);
  }
- });
+ }
 </script>
 
 <svelte:head>

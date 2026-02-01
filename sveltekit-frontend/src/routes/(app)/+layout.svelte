@@ -12,7 +12,8 @@
 {#if data.devBypass}
 	<div
 		class="dev-bypass-banner"
-		style="background: #ff6b35;, color: white; padding: 0.5rem; text-align: center; font-size: 0.875rem;"
+		style="background: #ff6b35;
+	color: white; padding: 0.5rem; text-align: center; font-size: 0.875rem;"
 	>
 		⚠️ DEV MODE: Authentication bypassed (DEV_BYPASS_AUTH=true)
 	</div>
@@ -24,7 +25,8 @@
 
 <style>
 	.app-layout {
-		min-height: 100vh;, display: flex;
+		min-height: 100vh;
+	display: flex;
 		flex-direction: column;
 	}
 </style>

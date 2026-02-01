@@ -1,6 +1,6 @@
 <!-- Enhanced AI Chat Component - Svelte 5 Compatible -->
 <script lang="ts">
-import { onDestroy, tick } from 'svelte';
+// Migrated to $effect
 import { browser } from '$app/environment';
 import type { ChatMessage } from '$lib/types/ai-chat';
 
@@ -47,7 +47,8 @@ try {
 const response = await fetch('/api/ai/chat', {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({, message: currentInput,
+	body: JSON.stringify({
+	message: currentInput,
 caseId,
 userId,
 enableWebGPU,
@@ -108,7 +109,7 @@ isLoading = false;
 <div class="input-container">
 <textarea
 bind:value={inputValue}
-on:keydown={(e) => {
+onkeydown={(e) => {
 if (e.key === 'Enter' && !e.shiftKey) {
 e.preventDefault();
 sendMessage();
@@ -117,7 +118,7 @@ sendMessage();
 placeholder="Ask a question..."
 rows="3"
 ></textarea>
-<button on:click={sendMessage} disabled={isLoading || !inputValue.trim()}>
+<button onclick={sendMessage} disabled={isLoading || !inputValue.trim()}>
 Send
 </button>
 </div>
@@ -126,16 +127,21 @@ Send
 <style>
 .enhanced-ai-chat {
 display: flex;
-flex-direction: column;, height: 100%;
-max-height: 600px;, border: 1px solid #e0e0e0;
-border-radius: 8px;, overflow: hidden;
+flex-direction: column;
+	height: 100%;
+max-height: 600px;
+	border: 1px solid #e0e0e0;
+border-radius: 8px;
+	overflow: hidden;
 }
 
 .chat-header {
-padding: 1rem;, background: #f5f5f5;
+padding: 1rem;
+	background: #f5f5f5;
 border-bottom: 1px solid #e0e0e0;
 display: flex;
-align-items: center;, gap: 1rem;
+align-items: center;
+	gap: 1rem;
 }
 
 .chat-header h2 {
@@ -145,20 +151,25 @@ font-size: 1.25rem;
 
 .badge {
 padding: 0.25rem 0.5rem;
-background: #4caf50;, color: white;
+background: #4caf50;
+	color: white;
 border-radius: 4px;
 font-size: 0.75rem;
 }
 
 .messages-container {
 flex: 1;
-overflow-y: auto;, padding: 1rem;, display: flex;
-flex-direction: column;, gap: 1rem;
+overflow-y: auto;
+	padding: 1rem;
+	display: flex;
+flex-direction: column;
+	gap: 1rem;
 }
 
 .message {
 display: flex;
-flex-direction: column;, gap: 0.25rem;
+flex-direction: column;
+	gap: 0.25rem;
 max-width: 80%;
 }
 
@@ -177,11 +188,13 @@ white-space: pre-wrap;
 }
 
 .message.user .message-content {
-background: #2196f3;, color: white;
+background: #2196f3;
+	color: white;
 }
 
 .message.assistant .message-content {
-background: #f5f5f5;, color: #333;
+background: #f5f5f5;
+	color: #333;
 }
 
 .message.loading .message-content {
@@ -189,25 +202,34 @@ animation: pulse 1.5s ease-in-out infinite;
 }
 
 .message-timestamp {
-font-size: 0.75rem;, color: #999;, padding: 0 0.75rem;
+font-size: 0.75rem;
+	color: #999;
+	padding: 0 0.75rem;
 }
 
 .input-container {
 padding: 1rem;
 border-top: 1px solid #e0e0e0;
-display: flex;, gap: 0.5rem;
+display: flex;
+	gap: 0.5rem;
 }
 
 textarea {
-flex: 1;, padding: 0.75rem;, border: 1px solid #e0e0e0;
-border-radius: 4px;, resize: none;
+flex: 1;
+	padding: 0.75rem;
+	border: 1px solid #e0e0e0;
+border-radius: 4px;
+	resize: none;
 font-family: inherit;
 }
 
 button {
 padding: 0.75rem 1.5rem;
-background: #2196f3;, color: white;, border: none;
-border-radius: 4px;, cursor: pointer;
+background: #2196f3;
+	color: white;
+	border: none;
+border-radius: 4px;
+	cursor: pointer;
 font-weight: 500;
 }
 
@@ -216,7 +238,8 @@ background: #1976d2;
 }
 
 button:disabled {
-background: #ccc;, cursor: not-allowed;
+background: #ccc;
+	cursor: not-allowed;
 }
 
 @keyframes pulse {

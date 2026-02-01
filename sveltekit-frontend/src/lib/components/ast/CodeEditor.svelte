@@ -5,7 +5,7 @@
  * Lightweight alternative to Monaco for simple code analysis
  */
  import type { ASTError } from '$lib/ast/svelte-check-analyzer';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Props {
  code?: string;
@@ -33,7 +33,8 @@
  // Update line numbers when code changes
  $effect(() => {
  const lines = code.split('\n').length;
- lineNumbers = Array.from({ length: lines }, (_, i) => i + 1);
+ lineNumbers = Array.from({ length: lines },
+	(_, i) => i + 1);
  });
   
  $effect(() => {
@@ -57,7 +58,8 @@
  // Set cursor position after the inserted spaces
  setTimeout(() => {
  target.selectionStart = target.selectionEnd = start + 2;
- }, 0);
+ },
+	0);
  }
  }
 
@@ -85,10 +87,12 @@
  return 'text-gray-500';
  }
 
- onMount(() => {
+ $effect(() => {
+
  // Focus editor on mount
  editorRef?.focus();
- });
+ 
+});
 </script>
 
 <div class="code-editor flex h-full w-full rounded-lg border border-gray-700 bg-gray-900 overflow-hidden font-mono text-sm">

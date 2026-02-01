@@ -32,12 +32,18 @@
   });
 
   const typeConfig = {
-    info: {, icon: '■', color: '#0ea5e9', label: 'NOTIFICATION' },
-    success: {, icon: '✓', color: '#10b981', label: 'NORMAL' },
-    warning: {, icon: '!', color: '#f59e0b', label: 'CAUTION' },
-    error: {, icon: '✕', color: '#ef4444', label: 'CRITICAL' },
-    confirm: {, icon: '?', color: '#8b5cf6', label: 'DECISION' },
-    prompt: {, icon: '>', color: '#0ea5e9', label: 'INPUT' }
+    info: {
+	icon: '■', color: '#0ea5e9', label: 'NOTIFICATION' },
+	success: {
+	icon: '✓', color: '#10b981', label: 'NORMAL' },
+	warning: {
+	icon: '!', color: '#f59e0b', label: 'CAUTION' },
+	error: {
+	icon: '✕', color: '#ef4444', label: 'CRITICAL' },
+	confirm: {
+	icon: '?', color: '#8b5cf6', label: 'DECISION' },
+	prompt: {
+	icon: '>', color: '#0ea5e9', label: 'INPUT' }
   };
 
   const config = $derived(typeConfig[type]);
@@ -56,10 +62,12 @@
     }
   }
 </script> {#if open} <!-- Backdrop --> <!-- svelte-ignore a11y_no_static_element_interactions --> <!-- svelte-ignore a11y_click_events_have_key_events --> <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-mono"
-    transition: fade={{, duration: 150 }}
+    transition: fade={{
+	duration: 150 }}
     onclick={handleBackdropClick}
   > <!-- Modal --> <div class="w-full max-w-md bg-slate-900 border-2 border-slate-700 shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden"
-      transition: scale={{, duration: 200, start: 0.95 }}
+      transition: scale={{
+	duration: 200, start: 0.95 }}
       style:border-color={config.color}
     > <!-- Header --> <div class="bg-slate-950 px-4 py-2 border-b flex justify-between items-center" style:border-color={config.color}>
         <div class="flex items-center gap-3"> <div class="w-5 h-5 flex items-center justify-center border font-bold text-xs" style:border-color={config.color} style:color={config.color}>

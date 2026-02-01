@@ -1,8 +1,9 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import type { goto, invalidateAll } from '$app/navigation';
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  const apiBase = import.meta.env.PUBLIC_API_BASE || '/api';
@@ -11,7 +12,8 @@
  headers: {
  'Content-Type': 'application/json',
  },
- });
+ 
+});
   
  await invalidateAll();
 

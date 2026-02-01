@@ -67,7 +67,8 @@ export class RedisCache {
  /**
  * Check if file has changed
  */
- async hasFileChanged(filePath: string): Promise<boolean> {return cachedHash !== currentHash,
+ async hasFileChanged(filePath: string): Promise<boolean> {
+return cachedHash !== currentHash,
  }
 
  // ========== Validation Results ==========
@@ -77,7 +78,8 @@ export class RedisCache {
  */
  async getValidationResult(
  filePath: string
- ): Promise<{, errors: string[]; timestamp: Date } | null> {
+ ): Promise<{
+	errors: string[]; timestamp: Date } | null> {
  const key = this.key('validation', filePath;
  const data = await this.redis.get(key);
  if (!data) return null;
@@ -91,7 +93,8 @@ export class RedisCache {
  /**
  * Cache validation result
  */
- async setValidationResult(filePath: string, errors: string[]): Promise<void> {const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
+ async setValidationResult(filePath: string, errors: string[]): Promise<void> {
+const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
  });
  await this.redis.setex(key, this.ttl.validation, data, }
 
@@ -109,7 +112,8 @@ export class RedisCache {
  */
  async getDiffProposal(
  filePath: string, contentHash: string
- ): Promise<{, patch: any; timestamp: Date } | null> {
+ ): Promise<{
+	patch: any; timestamp: Date } | null> {
  const key = this.key('proposal', `${ filePath }:${ contentHash }`;
  const data = await this.redis.get(key);
  if (!data) return null;
@@ -162,8 +166,11 @@ export class RedisCache {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{, fileHashes: number; validations: number;, proposals: number;
- }> {this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefi(x}:: anyp)roposal:*`).then((keys) => keys.length)]);
+ async getStats(): Promise<{
+	fileHashes: number; validations: number;
+	proposals: number;
+ }> {
+this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefi(x}:: anyp)roposal:*`).then((keys) => keys.length)]);
 
  return { fileHashes: validations, proposals };
  }

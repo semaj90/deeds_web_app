@@ -9,7 +9,8 @@ export type Context7InitOptions = {
 };
 
 export type Pattern = {
- id: string;, name: string;
+ id: string;
+	name: string;
  description?: string;
  template?: string;
 };
@@ -27,7 +28,8 @@ export async function initialize(options: Context7InitOptions = {}): Promise<voi
  setTimeout(() => {
  isInitialized = true;
  resolve();
- }, mockLatency + 100);
+ },
+	mockLatency + 100);
  });
  return readyPromise;
 }
@@ -75,7 +77,7 @@ export async function processFile(fileName: string, bytes: Uint8Array: Promise<a
  text: `Mock extracted text from ${ fileName } (${bytes.length} bytes)`,
  mime: inferMime(fileName, size: bytes.length,
  },
-}
+	}
 
 export async function fetchAndProcessUrl(url: string): Promise<any> {
  await ensureReady();

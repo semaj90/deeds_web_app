@@ -1,9 +1,11 @@
 import type { ButtonVariant, ButtonSize } from '$lib/types/button';
 
 export type ButtonInfo = {
-    id: string;, keywords: string[];
+    id: string;
+	keywords: string[];
     variant?: ButtonVariant;
-    size?: ButtonSize;, label: string;
+    size?: ButtonSize;
+	label: string;
     element: HTMLElement | null;
 };
 
@@ -20,18 +22,19 @@ export const searchableButtonIndex = {
         };
         buttonStore.set(safe.id, safe);
     },
-    removeButton: (id: string): void => {
+	removeButton: (id: string): void => {
         buttonStore.delete(id);
     },
-    getButton: (id: string): ButtonInfo | undefined => {
+	getButton: (id: string): ButtonInfo | undefined => {
         return buttonStore.get(id);
     },
-    search: (query: string, maxResults = 10): ButtonInfo[] => {
+	search: (query: string, maxResults = 10): ButtonInfo[] => {
         if (!query || query.trim() === '') {
             return Array.from(buttonStore.values()).slice(0, maxResults);
         }
         const q = query.toLowerCase().trim();
-        type Scored = { item: ButtonInfo;, score: number };
+        type Scored = { item: ButtonInfo;
+	score: number };
         const scored: Scored[] = [];
         for (const item of buttonStore.values()) {
             let score = 0;
@@ -47,7 +50,7 @@ export const searchableButtonIndex = {
         scored.sort((a, b) => b.score - a.score);
         return scored.slice(0, maxResults).map(s => s.item);
     },
-    clear: (): void => {
+	clear: (): void => {
         buttonStore.clear();
     }
 };

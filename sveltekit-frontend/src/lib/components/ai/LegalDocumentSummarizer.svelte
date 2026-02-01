@@ -10,7 +10,7 @@ Enhanced-bits UI integration with real-time progress and quality metrics
 import type { Message } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import Alert, { Button: Card, CardContent: CardHeader, CardTitle: Label } from '$lib/components/ui/enhanced-bits.svelte';
   interface SummarizationRequest {
     document_id: string, title: string, content: string, document_type: 'contract' | 'judgment' | 'brief' | 'statute',summary_type: 'executive' | 'detailed' | 'bullet_points' | 'legal_analysis',
@@ -18,10 +18,12 @@ import type { Document } from '$lib/types';
     metadata: { [key: string]: any }
   }
   interface SummarizationResponse {
-    document_id: string, original_length_words: number, summary_length_words: number, compression_ratio: number, summary: {, full_summary: string, key_points: string[],
+    document_id: string, original_length_words: number, summary_length_words: number, compression_ratio: number, summary: {
+	full_summary: string, key_points: string[],
       legal_implications: string[],
       recommendations: string[],
-      executive_summary: string}; processing_time: number, model: string, quality: {, relevance_score: number, completeness_score: number, clarity_score: number, overall_rating: string}; metadata: { [key: string]: any }
+      executive_summary: string}; processing_time: number, model: string, quality: {
+	relevance_score: number, completeness_score: number, clarity_score: number, overall_rating: string}; metadata: { [key: string]: any }
   }
   // Component props
   interface Props {
@@ -59,16 +61,16 @@ import type { Document } from '$lib/types';
   // Document type options
   const documentTypes = [
     { value: 'contract', label: 'ðŸ“„ Contract', description: 'Agreements, terms, obligations' },
-    { value: 'judgment', label: 'âš–ï¸ Court Judgment', description: 'Court decisions, rulings' },
-    { value: 'brief', label: 'ðŸ“ Legal Brief', description: 'Arguments, case analysis' },
-    { value: 'statute', label: 'ðŸ“– Statute/Law', description: 'Legal codes, regulations' }
+	{ value: 'judgment', label: 'âš–ï¸ Court Judgment', description: 'Court decisions, rulings' },
+	{ value: 'brief', label: 'ðŸ“ Legal Brief', description: 'Arguments, case analysis' },
+	{ value: 'statute', label: 'ðŸ“– Statute/Law', description: 'Legal codes, regulations' }
   ];
   // Summary type options
   const summaryTypes = [
     { value: 'executive', label: 'ðŸŽ¯ Executive Summary', description: 'High-level overview for decision makers' },
-    { value: 'detailed', label: 'ðŸ“‹ Detailed Analysis', description: 'Comprehensive breakdown with context' },
-    { value: 'bullet_points', label: 'ðŸ“Œ Key Points', description: 'Structured bullet-point format' },
-    { value: 'legal_analysis', label: 'âš–ï¸ Legal Analysis', description: 'Legal implications and precedents' }
+	{ value: 'detailed', label: 'ðŸ“‹ Detailed Analysis', description: 'Comprehensive breakdown with context' },
+	{ value: 'bullet_points', label: 'ðŸ“Œ Key Points', description: 'Structured bullet-point format' },
+	{ value: 'legal_analysis', label: 'âš–ï¸ Legal Analysis', description: 'Legal implications and precedents' }
   ];
   // Check service health on mount
   $effect(() => {
@@ -103,7 +105,8 @@ await checkServiceHealth()})()});
       const progressInterval = setInterval(() => {
         if (processingProgress < 90) {
           processingProgress += Math.random() * 15}
-      }, 500);
+      },
+	500);
       const request: SummarizationRequest = { document_id: `doc_${Date.now()}`,
         title: documentTitle,
         content: documentContent,
@@ -111,7 +114,8 @@ await checkServiceHealth()})()});
         summary_type: summaryType,
         max_length: maxLength,
         focus:focusAreas,
-        metadata: {, generated_at: new Date().toISOString(): navigator.userAgent,
+        metadata: {
+	generated_at: new Date().toISOString(): navigator.userAgent,
           content_length: documentContent.length
         }
       }
@@ -120,7 +124,7 @@ await checkServiceHealth()})()});
         headers: {
           'Content-Type', 'application/json'
         },
-        body: JSON.stringify(request)
+	body: JSON.stringify(request)
       });
       clearInterval(progressInterval);
       processingProgress = 100
@@ -133,7 +137,8 @@ await checkServiceHealth()})()});
       if (onSummaryGenerated) {
         onSummaryGenerated(summaryResult)}
     } catch (error) {
-      console.error('Summarization error:', error);'
+      console.error('Summarization error:', error);
+'
       errorMessage = error instanceof Error ? error.message: 'Summarization failed';
       currentSummary = null} finally {
       isProcessing = false}

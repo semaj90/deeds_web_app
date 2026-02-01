@@ -1,21 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface Suggestion {
-		id: string;, routePath: string;
-		summary: string;, patch: string;
-		riskLevel: string;, createdAt: string;
+		id: string;
+routePath: string;
+		summary: string;
+patch: string;
+		riskLevel: string;
+createdAt: string;
 		applied: boolean;
 		appliedAt?: string;
 	}
 
 	interface StatusData {
-		timestamp: string;, stats: {
-			totalSuggestions: number;, pendingSuggestions: number;
-			highRisk: number;, mediumRisk: number;
+		timestamp: string;
+stats: {
+			totalSuggestions: number;
+pendingSuggestions: number;
+			highRisk: number;
+mediumRisk: number;
 			lowRisk: number;
 		};
-		suggestions: Suggestion[];, suggestionsByRisk: Record<string, Suggestion[]>;
+		suggestions: Suggestion[];
+suggestionsByRisk: Record<string, Suggestion[]>;
 	}
 
 	let data = $state<StatusData | null>(null);
@@ -47,7 +54,7 @@
 			const res = await fetch('/api/system/phase78/apply-patch', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ suggestionId }),
+	body: JSON.stringify({ suggestionId }),
 			});
 
 			const result = await res.json();
@@ -89,9 +96,11 @@
 		return patch.substring(0, 300) + (patch.length > 300 ? '...' : '');
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadData();
-	});
+	
+});
 </script>
 
 <svelte:head>

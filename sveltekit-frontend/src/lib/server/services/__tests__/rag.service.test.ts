@@ -27,13 +27,14 @@ describe('RAGService', () => {
 
 	describe('retrieveStatutes', () => {
 		it('should retrieve statutes for given charges', async () => {
-			const charges = ['42 U.S.C. § 1983', 'Cal. Penal Code § 187'];{
+			const charges = ['42 U.S.C. § 1983', 'Cal. Penal Code § 187'];
+{
 					code: '42 U.S.C. § 1983',
 					title: 'Civil Rights',
 					text: 'Every person who...',
 					relevance: 0.95,
 				},
-				{
+	{
 					code: 'Cal. Penal Code § 187',
 					title: 'Murder',
 					text: 'Murder is the unlawful killing...',
@@ -59,7 +60,8 @@ describe('RAGService', () => {
 		});
 
 		it('should cache statute results', async () => {
-			const charges = ['42 U.S.C. § 1983'];{
+			const charges = ['42 U.S.C. § 1983'];
+{
 					code: '42 U.S.C. § 1983',
 					title: 'Civil Rights',
 					text: 'Every person who...',
@@ -77,7 +79,8 @@ describe('RAGService', () => {
 
  describe('retrieveCaseLaw', () => {
  it('should retrieve case law for given charges', async () => {
- const charges = ['murder', 'assault'];{
+ const charges = ['murder', 'assault'];
+{
  caseNumber: '123 F.3d 456',
  title: 'State v. Defendant',
  holding: 'The court held that...',
@@ -85,7 +88,8 @@ describe('RAGService', () => {
  }];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -96,12 +100,14 @@ describe('RAGService', () => {
  });
 
  it('should rank case law by relevance', async () => {
- const charges = ['murder'];{ caseNumber: 'Case 1', relevance: 0.85 },
- { caseNumber: 'Case 2', relevance: 0.95 },
- { caseNumber: 'Case 3', relevance: 0.75 }];
+ const charges = ['murder'];
+{ caseNumber: 'Case 1', relevance: 0.85 },
+	{ caseNumber: 'Case 2', relevance: 0.95 },
+	{ caseNumber: 'Case 3', relevance: 0.75 }];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -113,9 +119,10 @@ describe('RAGService', () => {
  });
 
  describe('rankByRelevance', () => {
- it('should rank results by relevance score', () => {{ id: '1', relevance: 0.75 },
- { id: '2', relevance: 0.95 },
- { id: '3', relevance: 0.85 }] as const;
+ it('should rank results by relevance score', () => {
+{ id: '1', relevance: 0.75 },
+	{ id: '2', relevance: 0.95 },
+	{ id: '3', relevance: 0.85 }] as const;
 
  const ranked = ragService.rankByRelevance(results);
 
@@ -138,7 +145,8 @@ describe('RAGService', () => {
  const charges = ['42 U.S.C. § 1983'];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
  }),
  });
 
@@ -146,7 +154,8 @@ describe('RAGService', () => {
  });
 
  it('should handle cache errors and fall back to database', async () => {
- const charges = ['42 U.S.C. § 1983'];{
+ const charges = ['42 U.S.C. § 1983'];
+{
  code: '42 U.S.C. § 1983',
  title: 'Civil Rights',
  text: 'Every person who...',
@@ -155,7 +164,8 @@ describe('RAGService', () => {
 
  vi.mocked(redis.get).mockRejectedValueOnce(new Error('Cache error'));
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  });
 
@@ -173,13 +183,16 @@ describe('RAGService', () => {
 
  vi.mocked(db.select)
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  })
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({
+	where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
- });ragService.retrieveStatutes(charges),
+ });
+ragService.retrieveStatutes(charges),
  ragService.retrieveCaseLaw(charges)]);
 
  expect(retrievedStatutes).toEqual(statutes);

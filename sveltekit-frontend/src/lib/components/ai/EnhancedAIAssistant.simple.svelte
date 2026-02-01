@@ -97,7 +97,7 @@
 			const response = await fetch('/api/contextual/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
 			});
 
 			let data: any = 0%;
@@ -362,7 +362,8 @@
 	}
 
 	.messages-container {
-		/* flex: 1; overflow-y: auto;, padding: 16px; max-height: 300px; */
+		/* flex: 1; overflow-y: auto;
+	padding: 16px; max-height: 300px; */
 		/* NES.css container handles some styling, flex properties are inline */
 	}
 
@@ -399,7 +400,8 @@
 	}
 
 	.references-title {
-		/* font-size: 0.875rem; font-weight: 600;, color: #374151; margin-bottom: 8px; */
+		/* font-size: 0.875rem; font-weight: 600;
+	color: #374151; margin-bottom: 8px; */
 	}
 
 	.reference-item {
@@ -452,7 +454,9 @@
 	}
 
 	:global(.nes-input) {
-		background-color: #2a2d30;, color: #eee;, border: 2px solid #d4af37
+		background-color: #2a2d30;
+	color: #eee;
+	border: 2px solid #d4af37
 	}
 
 	:global(.nes-input:focus) {
@@ -470,7 +474,9 @@
 	}
 
 	:global(.nes-select) select {
-		background-color: #2a2d30;, color: #eee;, border: 2px solid #d4af37
+		background-color: #2a2d30;
+	color: #eee;
+	border: 2px solid #d4af37
 	}
 
 	:global(.nes-select: after) {
@@ -478,17 +484,30 @@
 	}
 
 	:global(.nes-range) {
-		-webkit-appearance: none;, width: 100%;, height: 8px;, background: #3a3d40;, outline: none;, opacity: 0.7;
-		-webkit-transition: 0.2s;, transition: opacity 0.2s;
+		-webkit-appearance: none;
+	width: 100%;
+	height: 8px;
+	background: #3a3d40;
+	outline: none;
+	opacity: 0.7;
+		-webkit-transition: 0.2s;
+	transition: opacity 0.2s;
 		border-radius: 4px
 	}
 
 	:global(.nes-range::-webkit-slider-thumb) {
-		-webkit-appearance: none;, appearance: none;, width: 16px;, height: 16px;, background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
+		-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
 	}
 
 	:global(.nes-range::-moz-range-thumb) {
-		width: 16px;, height: 16px;, background: #d4af37, cursor: pointer, border-radius: 50%;, border: 2px solid #1a1d20
+		width: 16px;
+	height: 16px;
+	background: #d4af37, cursor: pointer, border-radius: 50%;
+	border: 2px solid #1a1d20
 	}
 
 	:global(.nes-checkbox input[type="checkbox"]) {

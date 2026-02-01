@@ -22,7 +22,8 @@ type OllamaClient = {
 };
 
 export interface AIAnalysisResult {
-	summary: string;, tags: string[];
+	summary: string;
+	tags: string[];
 	confidence: number;
 	entities?: string[];
 	keywords?: string[];
@@ -38,22 +39,26 @@ export interface AIQueryOptions {
 }
 
 export interface VectorSearchResult {
-	content: string;, similarity: number;
+	content: string;
+	similarity: number;
 	metadata: Record<string, unknown>;
 	documentId: string;
 }
 
 // Add local types for embedding cache rows
 type EmbeddingCacheRow = {
-	id: string;, textHash: string;
+	id: string;
+	textHash: string;
 	embedding: string | number[] | null;
 	model?: string | null;
 	createdAt?: string | null;
 };
 
 type NewEmbeddingCache = {
-	id: string;, textHash: string;
-	embedding: string;, model: string;
+	id: string;
+	textHash: string;
+	embedding: string;
+	model: string;
 	createdAt: string;
 };
 
@@ -73,7 +78,9 @@ export class AIService {
 		userId: string,
 		caseId?: string,
 		options: AIQueryOptions = {}
-	): Promise<{, response: string; confidence: number;, contextUsed: string[]; queryId?: string }> {
+	): Promise<{
+	response: string; confidence: number;
+	contextUsed: string[]; queryId?: string }> {
 		const startTime = Date.now();
 		const {
 			model = 'gemma3-legal',
@@ -220,8 +227,10 @@ Format your response as JSON with the structure:
 			const rows = (await db.execute(
 				sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
 			)) as Array<{
-				id: string;, document_id: string;
-				content: string;, metadata: Record<string, unknown>;
+				id: string;
+	document_id: string;
+				content: string;
+	metadata: Record<string, unknown>;
 				embedding: string | number[] | null;
 			}>;
 
@@ -246,7 +255,7 @@ Format your response as JSON with the structure:
 							content: row.content,
 							similarity: sim,
 							metadata: row.metadata ?? {},
-							documentId: row.document_id
+	documentId: row.document_id
 						});
 					}
 				} catch {
@@ -270,12 +279,15 @@ Format your response as JSON with the structure:
 		queryEmbedding: number[],
 		userId?: string,
 		limit = 5
-	): Promise<Array<{, query: string; response: string;, similarity: number }>> {
+	): Promise<Array<{
+	query: string; response: string;
+	similarity: number }>> {
 		try {
 			if (userId) {
 				const rows = (await db.execute(
 					sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
-				)) as Array<{ query: string;, response: string; similarity: number }>;
+				)) as Array<{ query: string;
+	response: string; similarity: number }>;
 				return rows.map((r) => ({
 					query: r.query,
 					response: r.response,
@@ -284,7 +296,8 @@ Format your response as JSON with the structure:
 			} else {
 				const rows = (await db.execute(
 					sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
-				)) as Array<{ query: string;, response: string; similarity: number }>;
+				)) as Array<{ query: string;
+	response: string; similarity: number }>;
 				return rows.map((r) => ({
 					query: r.query,
 					response: r.response,
@@ -352,12 +365,17 @@ Format your response as JSON with the structure:
 	/**
 	 * Log AI query to database
 	 */
-	private async logQuery(data: {, userId: string;
-		caseId?: string;, query: string;
-		response: string;, model: string;
-		confidence: number;, processingTime: number;
+	private async logQuery(data: {
+	userId: string;
+		caseId?: string;
+	query: string;
+		response: string;
+	model: string;
+		confidence: number;
+	processingTime: number;
 		contextUsed: string[];
-		embedding?: number[];, isSuccessful: boolean;
+		embedding?: number[];
+	isSuccessful: boolean;
 		errorMessage?: string;
 	}): Promise<string> {
 		try {
@@ -437,7 +455,7 @@ Format your response as JSON with the structure:
 				content: content.slice(0, 2000), // Updated to use 'content' key, assumed from code
 				embedding: embeddingString,
 				metadata: { analysis },
-				createdAt: new Date().toISOString()
+	createdAt: new Date().toISOString()
 			} as unknown as NewDocumentChunk; // Cast because 'content' key might differ in schema
 
 			await db.insert(documentChunks).values(chunkData);

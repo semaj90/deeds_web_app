@@ -1,7 +1,8 @@
 import { writable, derived, get } from 'svelte/store';
 
 export interface FormField<TValue = unknown> {
- name: string;, value: TValue;
+ name: string;
+	value: TValue;
  error?: string | null;
  touched: boolean;
  required?: boolean;
@@ -10,9 +11,12 @@ export interface FormField<TValue = unknown> {
 
 export interface FormState<T extends Record<string, unknown>> {
  fields: Partial<{ [K in keyof T]: FormField<T[K]> }>;
- values: Partial<T>;, errors: Record<string, string>;
- isSubmitting: boolean;, isValid: boolean;
- isDirty: boolean;, submitCount: number;
+ values: Partial<T>;
+	errors: Record<string, string>;
+ isSubmitting: boolean;
+	isValid: boolean;
+ isDirty: boolean;
+	submitCount: number;
 }
 
 export interface FormOptions<T extends Record<string, unknown>> {
@@ -45,8 +49,10 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  return null;
  };
 
- // Refactored validateForm to return updated fields and validityfields: Partial<{ [K in keyof T]: FormField<T[K]> }>
- ): {, updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
+ // Refactored validateForm to return updated fields and validity
+fields: Partial<{ [K in keyof T]: FormField<T[K]> }>
+ ): {
+	updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }>; isValid: boolean } => {
  let isValid = true;
  const updatedFields: Partial<{ [K in keyof T]: FormField<T[K]> }> = { ...fields };
  (Object.keys(updatedFields) as Array<keyof T>).forEach((name) => {
@@ -95,7 +101,8 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  const { subscribe, set, update } = writable<FormState<T>>(initialState);
 
  // Derived store for form values
- const values = derived({ subscribe }, (state) => {
+ const values = derived({ subscribe },
+	(state) => {
  const vals: Partial<T> = {} as Partial<T>;
  (Object.values(state.fields) as FormField<unknown>[]).forEach((field) => {
  if (field) {
@@ -106,7 +113,8 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  return vals;
  });
   
- const errors = derived({ subscribe }, (state) => {
+ const errors = derived({ subscribe },
+	(state) => {
  const errs: Record<string, string> = {};
  (Object.values(state.fields) as FormField<unknown>[]).forEach((field) => {
  if (field?.error) {
@@ -154,30 +162,31 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  };
  });
  },
- // Touch field (mark as interacted with)
+	// Touch field (mark as interacted with)
  touchField: <K extends keyof T>(name: K) => {
  update((state) => ({
  ...state,
  fields: { ...state.fields, [name]: { ...state.fields[name], touched: true } },
- }));
+	}));
  },
- // Validate all fields
+	// Validate all fields
  validate: () => {
  let isValid = false; // Initialize to false, will be set by update
  update((state) => {
  const { updatedFields, formIsValid } = validateForm(state.fields);
  isValid = formIsValid; // Capture for return value
- // Re-calculate errors based on validatedFields(acc, field) => {
+ // Re-calculate errors based on validatedFields
+(acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },
- {} as Record<string, string>
+	{} as Record<string, string>
  );
  return { ...state, fields: updatedFields, errors: newErrors, isValid: formIsValid };
  });
  return isValid;
  },
- // Submit form
+	// Submit form
  submit: async () => {
  let canSubmit = false;
  update((state) => {
@@ -194,11 +203,12 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  const { updatedFields: validatedFields, isValid: formIsValid } =
  validateForm(touchedFields);
  canSubmit = formIsValid;
- // Re-calculate errors based on validatedFields(acc, field) => {
+ // Re-calculate errors based on validatedFields
+(acc, field) => {
  if (field?.error) acc[field.name] = field.error;
  return acc;
  },
- {} as Record<string, string>
+	{} as Record<string, string>
  );
  return { ...newState, fields: validatedFields, errors: newErrors, isValid: formIsValid };
  });
@@ -212,19 +222,20 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  update((state) => ({ ...state, isSubmitting: false }));
  return canSubmit;
  },
- // Reset form
+	// Reset form
  reset: () => {
  set(initialState);
  },
- // Add new field dynamically
+	// Add new field dynamically
  addField: <K extends keyof T>(name: K, initialValue: T[K], isRequired: boolean = false) => {
  update((state) => {
  const newFields = {
  ...state.fields,
- [name]: {, name: name as string | value, initialValue: touched, required: isRequired,
+ [name]: {
+	name: name as string | value, initialValue: touched, required: isRequired,
  validator: validators[name],
  },
- };
+	};
  // Re-validate the form after adding a field
  const { updatedFields: validatedFields, isValid } = validateForm(newFields);
  // Re-calculate values and errors based on validatedFields
@@ -245,7 +256,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  }; // Adding a field makes the form dirty
  });
  },
- };
+	};
 }
 
 export default createFormStore;

@@ -19,24 +19,31 @@ import type { DiagnosticResult, ErrorContext,
     ErrorReport, EscalationTicket, FixStrategy } from './types.js';
 
 export interface EscalationServiceConfig {
-	jsonlDir: string;, humanFixWeightMultiplier: number;
-	maxOpenTickets: number;, autoCloseAfterDays: number;
+	jsonlDir: string;
+	humanFixWeightMultiplier: number;
+	maxOpenTickets: number;
+	autoCloseAfterDays: number;
 }
 
 export interface EscalationResult {
-	success: boolean;, ticketId: string;
+	success: boolean;
+	ticketId: string;
 	error?: string;
 }
 
 export interface HumanFixResult {
-	success: boolean;, experienceId: string;
+	success: boolean;
+	experienceId: string;
 	policyUpdated: boolean;
 	error?: string;
 }
 
 export interface EscalationAnalysis {
-	totalEscalations: number;, commonPatterns: { pattern: string;, count: number }[];
-	avgResolutionTime: number;, resolutionRate: number;
+	totalEscalations: number;
+	commonPatterns: { pattern: string;
+	count: number }[];
+	avgResolutionTime: number;
+	resolutionRate: number;
 }
 
 
@@ -71,7 +78,8 @@ export class EscalationService {
 		confidence: number, toolResults: DiagnosticResult[],
 		context: ErrorContext
 	): Promise<EscalationResult> {
-		// Check max open tickets(t: any) => t.status === 'open' || t.status === 'in_progress'
+		// Check max open tickets
+(t: any) => t.status === 'open' || t.status === 'in_progress'
 		);
 		if (openTickets.length >= this.config.maxOpenTickets) {
 			return {
@@ -145,7 +153,8 @@ export class EscalationService {
 			ticket.resolvedAt = new Date();
 
 			// Record as high-value experience
-			const recorder = getExperienceRecorder();ticket.errorReport,
+			const recorder = getExperienceRecorder();
+ticket.errorReport,
 				fix: 'success',
 				ticket.context,
 				[],
@@ -154,7 +163,8 @@ export class EscalationService {
 			);
 
 			// Update policy with increased weight for human fixes
-			const policy = getGRPOPolicy();ticket,
+			const policy = getGRPOPolicy();
+ticket,
 				fix,
 				policy
 			);
@@ -228,16 +238,21 @@ export class EscalationService {
 			patternCounts.set(pattern, (patternCounts.get(pattern) ?? 0) + 1);
 		}
 
-		// Sort by frequency.sort((a: any, b: any) => b[1] - a[1])
+		// Sort by frequency
+.sort((a: any, b: any) => b[1] - a[1])
 			.slice(0, 10)
 			.map(([pattern, count]) => ({ pattern, count }));
 
 		// Calculate resolution metrics
-		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');? resolvedTickets.reduce((sum: any, t: any) => {? t.resolvedAt.getTime() - t.createdAt.getTime()
+		const resolvedTickets = tickets.filter((t: any) => t.status === 'resolved');
+? resolvedTickets.reduce((sum: any, t: any) => {
+? t.resolvedAt.getTime() - t.createdAt.getTime()
 						: 0;
 					return sum + resolveTime;
-				}, 0) / resolvedTickets.length / (1000 * 60 * 60) // hours
-			: 0;? resolvedTickets.length / tickets.length
+				},
+	0) / resolvedTickets.length / (1000 * 60 * 60) // hours
+			: 0;
+? resolvedTickets.length / tickets.length
 			: 0;
 
 		return {

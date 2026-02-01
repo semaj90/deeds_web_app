@@ -6,9 +6,12 @@
 import { cacheService } from './cache.service.js';
 
 export interface SimilarCase {
-    caseId: string;, caseNumber: string;
-    charges: string[];, outcome: string;
-    relevanceScore: number;, jurisdiction: string;
+    caseId: string;
+	caseNumber: string;
+    charges: string[];
+	outcome: string;
+    relevanceScore: number;
+	jurisdiction: string;
     year: number;
 }
 
@@ -25,7 +28,7 @@ export class SimilarCasesService {
                     // Query similar cases from vector database or Neo4j
                     return this.querySimilarCases(caseId); // Fixed: Removed `limit` argument if helper doesn't imply it, or updating querySimilarCases to match
                 },
-                {
+	{
                     namespace: 'similar-cases',
                     ttl: 24 * 60 * 60, // 24 hours
                 }

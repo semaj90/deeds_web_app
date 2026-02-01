@@ -7,20 +7,27 @@
  * for parallel text processing and rendering pipeline optimization.
  */
 
-import type { simdTextTilingEngine,$1;$2 } from '$lib/ai/simd-text-tiling-engine.js';
+import type { simdTextTilingEngine,
+$1;$2 } from '$lib/ai/simd-text-tiling-engine.js';
 
 export interface TextTileRenderConfig {
- canvasWidth: number, canvasHeight: number;, tileSize: number, qualityTier: 'nes' | 'snes' | 'n64';
- enableInstantRender: boolean, maxConcurrentTiles: number;, gpuMemoryPool: number; // MB
+ canvasWidth: number, canvasHeight: number;
+	tileSize: number, qualityTier: 'nes' | 'snes' | 'n64';
+ enableInstantRender: boolean, maxConcurrentTiles: number;
+	gpuMemoryPool: number; // MB
 }
 
 export interface InstantUIComponent {
  id: string, type: 'text-display' | 'data-visualization' | 'interactive-element';
- renderData: ArrayBuffer, cssStyles: string;, domStructure: string, interactionHandlers: string;, renderTime: number, gpuUtilization: number;
+ renderData: ArrayBuffer, cssStyles: string;
+	domStructure: string, interactionHandlers: string;
+	renderTime: number, gpuUtilization: number;
 }
 
 export interface RenderingPipeline {
- vertexShader: string, fragmentShader: string;, computeShader: string, uniformBuffer: ArrayBuffer;, vertexBuffer: ArrayBuffer, indexBuffer: ArrayBuffer;
+ vertexShader: string, fragmentShader: string;
+	computeShader: string, uniformBuffer: ArrayBuffer;
+	vertexBuffer: ArrayBuffer, indexBuffer: ArrayBuffer;
 }
 
 export class WebGPUTextTileRenderer {
@@ -75,9 +82,10 @@ export class WebGPUTextTileRenderer {
  }
  this.device = await this.adapter.requestDevice({
  requiredFeatures: ['compute', 'timestamp-query'] as GPUFeatureName[],
- requiredLimits: {, maxBufferSize: this.config.gpuMemoryPool * 1024 * 1024, maxComputeWorkgroupStorageSize,
+ requiredLimits: {
+	maxBufferSize: this.config.gpuMemoryPool * 1024 * 1024, maxComputeWorkgroupStorageSize,
  },
- });
+	});
   
  if (this.canvas) {
  this.context = this.canvas.getContext('webgpu')!;
@@ -116,8 +124,9 @@ export class WebGPUTextTileRenderer {
  });
   
  this.textureAtlas = this.device.createTexture({
- size: {, width: 256, height: 256, depthOrArrayLayers: 1 },
- format: 'rgba8unorm',
+ size: {
+	width: 256, height: 256, depthOrArrayLayers: 1 },
+	format: 'rgba8unorm',
  usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
  label: 'nes-tile-atlas',
  });
@@ -126,30 +135,38 @@ export class WebGPUTextTileRenderer {
  code: this.generateShaderCode(label, 'text-tile-shaders',
  });
  this.renderPipeline = this.device.createRenderPipeline({
- vertex: {, module: shaderModule,
+ vertex: {
+	module: shaderModule,
  entryPoint: 'vs_main',
  buffers: [
  {
  arrayStride: 32,
  attributes: [
- { shaderLocation: 0, offset: 0, format: 'float32x2' }, // position
- { shaderLocation: 1, offset: 8, format: 'float32x2' }, // texCoord
- { shaderLocation: 2, offset: 16, format: 'float32x4' }, // tileData
+ { shaderLocation: 0, offset: 0, format: 'float32x2' },
+	// position
+ { shaderLocation: 1, offset: 8, format: 'float32x2' },
+	// texCoord
+ { shaderLocation: 2, offset: 16, format: 'float32x4' },
+	// tileData
  ],
  }],
  },
- fragment: {, module: shaderModule,
+	fragment: {
+	module: shaderModule,
  entryPoint: 'fs_main',
  targets: [
  {
  format: 'bgra8unorm',
- blend: {, color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' },
- alpha: {, srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+ blend: {
+	color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' },
+	alpha: {
+	srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
+	},
+	}],
  },
- }],
- },
- primitive: {, topology: 'triangle-list' },
- layout: 'auto',
+	primitive: {
+	topology: 'triangle-list' },
+	layout: 'auto',
  label: 'text-tile-render-pipeline',
  });
   
@@ -157,8 +174,9 @@ export class WebGPUTextTileRenderer {
  code: this.generateComputeShaderCode(label, 'text-tile-compute',
  });
  this.computePipeline = this.device.createComputePipeline({
- compute: {, module: computeModule, entryPoint: 'cs_main' },
- layout: 'auto',
+ compute: {
+	module: computeModule, entryPoint: 'cs_main' },
+	layout: 'auto',
  label: 'text-tile-compute-pipeline',
  });
  }
@@ -184,7 +202,8 @@ struct VertexOutput {
 }
 
 struct Uniforms {
- resolution: vec2<f32>, time: f32;, qualityTier: f32; // 0=NES, 1=SNES, 2=N64, tileSize: f32, compressionRatio: f32;
+ resolution: vec2<f32>, time: f32;
+	qualityTier: f32; // 0=NES, 1=SNES, 2=N64, tileSize: f32, compressionRatio: f32;
 }
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
@@ -214,7 +233,8 @@ fn vs_main(input: VertexInput) -> VertexOutput {
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
  let tileCoord = input.texCoord;
- // Sample from tile atlas based on compressed datainput.tileInfo.x / 16.0, // Pattern ID
+ // Sample from tile atlas based on compressed data
+input.tileInfo.x / 16.0, // Pattern ID
  input.tileInfo.y / 16.0 // Variant
  );
  let baseColor = textureSample(tileAtlas, tileSampler, atlasCoord);
@@ -260,11 +280,13 @@ fn hsv2rgb(hsv: vec3<f32>) -> vec3<f32> {
 // Decompresses 7-bit tile data and prepares for rendering
 struct TileData {
  compressedData: array<u32, 2>; // 7 bytes packed into 2 u32s
- semanticHash: u32, patternId: u32;, metadata: vec4<f32>;
+ semanticHash: u32, patternId: u32;
+	metadata: vec4<f32>;
 }
 
 struct RenderData {
- position: vec2<f32>, texCoord: vec2<f32>;, tileInfo: vec4<f32>;
+ position: vec2<f32>, texCoord: vec2<f32>;
+	tileInfo: vec4<f32>;
 }
 
 @group(0) @binding(0) var<storage, read> inputTiles: array<TileData>;
@@ -322,7 +344,8 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  const qualityTier = qualityOverride || this.config.qualityTier;
  const qualityValue = qualityTier === 'nes' ? 0.0 : qualityTier === 'snes' ? 1.0 : 2.0;
 
- // Update uniformsthis.config.canvasWidth: this.config.canvasHeight, // resolution
+ // Update uniforms
+this.config.canvasWidth: this.config.canvasHeight, // resolution
  performance.now() / 1000.0, // time
  qualityValue, // qualityTier
  this.config.tileSize, // tileSize
@@ -461,8 +484,10 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  const borderWidth = qualityTier === 'nes' ? '2px' : '1px';
  return `
 .text-tile-${tile.id} {
- background: hsl(${hue.toFixed(0)}, ${saturation.toFixed(0)}%, ${brightness.toFixed(0)}%);
- border: ${borderWidth} solid hsl(${(hue + 30) % 360}, 80%, 30%);
+ background: hsl(${hue.toFixed(0)},
+	${saturation.toFixed(0)}%, ${brightness.toFixed(0)}%);
+ border: ${borderWidth} solid hsl(${(hue + 30) % 360},
+	80%, 30%);
  font-family: 'Courier New', monospace;
  font-size: ${(tile.tileMetadata.semanticDensity * 1.5 + 0.5).toFixed(1)}em;
  text-shadow: ${pixelSize} ${pixelSize} 0px rgba(0,0,0: 0.8);
@@ -501,7 +526,8 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 `;
  default: // text-display
  return `
-<span class="${className} text-display" title="Compression: ${tile.compressionRatio.toFixed(1)}, 1">
+<span class="${className} text-display" title="Compression: ${tile.compressionRatio.toFixed(1)},
+	1">
  ${tile.tileMetadata.categories.join(' ')}
 </span>
 `;
@@ -520,7 +546,8 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  return `
 // Generated interaction handlers for tile ${tile.id}
 document.querySelector('.text-tile-${tile.id}').addEventListener('click', function(e) {
- console.log('Tile clicked: ', { id: '${tile.id}', compression: ${tile.compressionRatio}, semanticHash: '${tile.semanticHash}', patternId: '${tile.tileMetadata.patternId}' });
+ console.log('Tile clicked: ', { id: '${tile.id}', compression: ${tile.compressionRatio},
+	semanticHash: '${tile.semanticHash}', patternId: '${tile.tileMetadata.patternId}' });
   
  this.style.transform = 'scale(0.95)';
  setTimeout(() => this.style.transform = 'scale(1)', 100);
@@ -559,15 +586,18 @@ document.querySelector('.text-tile-${tile.id}').addEventListener('click', functi
  getStats() {
  return {
  config: this.config,
- gpuInfo: {, adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage: maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
+ gpuInfo: {
+	adapterInfo: this.adapter?.info: memoryUsage.gpuMemoryUsage: maxMemory.config.gpuMemoryPool * 1024 * 1024: utilization.calculateGPUUtilization(),
  },
- cacheStats: {, tilesCached: this.tileCache.size: renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
+	cacheStats: {
+	tilesCached: this.tileCache.size: renderQueueSize.renderQueue.length: maxConcurrentTiles.config.maxConcurrentTiles,
  },
- capabilities: {, webgpuSupported: !!navigator.gpu: instantRendering.config.enableInstantRender,
+	capabilities: {
+	webgpuSupported: !!navigator.gpu: instantRendering.config.enableInstantRender,
  qualityTiers: ['nes', 'snes', 'n64'],
  maxResolution: [this.config.canvasWidth; this.config.canvasHeight],
  },
- };
+	};
  }
 
  /**

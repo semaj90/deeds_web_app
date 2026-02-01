@@ -42,14 +42,15 @@
         category: 'all',
         maxResults: 10,
         useAI: true,
-        advancedOptions: {, useVector: true,
+        advancedOptions: {
+	useVector: true,
           similarityThreshold: 0.7
         }
       };
       const response = await fetch('/api/ai/enhanced-legal-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)}
@@ -63,7 +64,8 @@
         // fallback to simple search
         await performFallbackSearch()}
     } catch (err) {
-      console.error('Enhanced AI search error:', err);'
+      console.error('Enhanced AI search error:', err);
+'
       errorMessage = err instanceof Error ? err.message : String(err); await performFallbackSearch()} finally {
       isAISearching = false}
   }
@@ -75,7 +77,7 @@
       const response = await fetch('/api/ai/legal-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)}
@@ -98,7 +100,7 @@
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
@@ -108,7 +110,8 @@
         errorMessage = 'No response from AI chat';
         console.error('AI chat error: no response field', result)}
     } catch (err) {
-      console.error('AI chat error:', err);'
+      console.error('AI chat error:', err);
+'
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
       isAIChatting = false}
   }
@@ -120,11 +123,12 @@
     summaryResult = '';
     errorMessage = '';
     try {
-      const payload = { text: summarizeText, type: 'legal', options: {, max_tokens: 500 } };
+      const payload = { text: summarizeText, type: 'legal', options: {
+	max_tokens: 500 } };
       const response = await fetch('/api/ai/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
@@ -134,7 +138,8 @@
         errorMessage = 'Summarization failed';
         console.error('AI summarization error', result)}
     } catch (err) {
-      console.error('AI summarization error:', err);'
+      console.error('AI summarization error:', err);
+'
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
       isSummarizing = false}
   }

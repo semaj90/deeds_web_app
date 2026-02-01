@@ -13,10 +13,11 @@ describe('AceAdapter', () => {
 
   beforeEach(() => {
     adapter = new AceAdapter({
-      llmConfig: {, provider: 'gemma3',
+      llmConfig: {
+	provider: 'gemma3',
         temperature: 0.1, maxTokens: 1000
       },
-    });
+	});
   
     global.fetch = vi.fn();
   });
@@ -27,7 +28,8 @@ describe('AceAdapter', () => {
 
   describe('processRequest', () => {
     it('should process request with sufficient context', async () => {
-      // Mock context service to return sufficient context.mockResolvedValueOnce({
+      // Mock context service to return sufficient context
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -50,7 +52,8 @@ describe('AceAdapter', () => {
       expect(response.metadata.llmProvider).toBe('gemma3');
     });
 
-    it('should trigger web search when context is insufficient', async () => {// Mock ingestion API
+    it('should trigger web search when context is insufficient', async () => {
+// Mock ingestion API
         .mockResolvedValueOnce({
           ok: true, json: async () => ({ jobIds: ['job-1'], success: true }),
         })
@@ -63,11 +66,12 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this obscure error that has no documentation',
-        errorContext: {, message: 'Property does not exist',
+        errorContext: {
+	message: 'Property does not exist',
           filePath: 'src/test.ts',
           lineNumber: 42,
         },
-      };
+	};
 
       const response = await adapter.processRequest(request);
 
@@ -75,7 +79,8 @@ describe('AceAdapter', () => {
       expect(response.metadata.webSearchTriggered).toBeDefined();
     });
 
-    it('should include error context in query', async () => {.mockResolvedValueOnce({
+    it('should include error context in query', async () => {
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -83,12 +88,13 @@ describe('AceAdapter', () => {
 
       const request: AceRequest = {
         userRequest: 'Fix this error',
-        errorContext: {, message: 'Type error',
+        errorContext: {
+	message: 'Type error',
           filePath: 'src/component.svelte',
           lineNumber: 10,
           code: 'const, x: string = 123;',
         },
-      };
+	};
 
       const response = await adapter.processRequest(request);
 
@@ -96,7 +102,8 @@ describe('AceAdapter', () => {
       expect(response.context).toBeDefined();
     });
 
-    it('should handle LLM API failures gracefully', async () => {.mockRejectedValueOnce(new Error('LLM API unavailable'));
+    it('should handle LLM API failures gracefully', async () => {
+.mockRejectedValueOnce(new Error('LLM API unavailable'));
 
       global.fetch = mockFetch;
 
@@ -107,7 +114,8 @@ describe('AceAdapter', () => {
       await expect(adapter.processRequest(request)).rejects.toThrow();
     });
 
-    it('should use provided session ID', async () => {.mockResolvedValueOnce({
+    it('should use provided session ID', async () => {
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -125,7 +133,8 @@ describe('AceAdapter', () => {
       expect(response.metadata.sessionId).toBe(sessionId);
     });
 
-    it('should generate unique session ID if not provided', async () => {.mockResolvedValueOnce({
+    it('should generate unique session ID if not provided', async () => {
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock LLM response' }),
         });
 
@@ -143,7 +152,8 @@ describe('AceAdapter', () => {
   });
 
   describe('LLM integration', () => {
-    it('should call Gemma3 with correct parameters', async () => {.mockResolvedValueOnce({
+    it('should call Gemma3 with correct parameters', async () => {
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Gemma3 response' }),
         });
 
@@ -163,16 +173,19 @@ describe('AceAdapter', () => {
 
     it('should support different LLM providers', () => {
       const gemma3Adapter = new AceAdapter({
-        llmConfig: {, provider: 'gemma3' },
-      });
+        llmConfig: {
+	provider: 'gemma3' },
+	});
 
       const claudeAdapter = new AceAdapter({
-        llmConfig: {, provider: 'claude' },
-      });
+        llmConfig: {
+	provider: 'claude' },
+	});
 
       const geminiAdapter = new AceAdapter({
-        llmConfig: {, provider: 'gemini' },
-      });
+        llmConfig: {
+	provider: 'gemini' },
+	});
 
       expect(gemma3Adapter).toBeDefined();
       expect(claudeAdapter).toBeDefined();
@@ -181,7 +194,8 @@ describe('AceAdapter', () => {
   });
 
   describe('context quality assessment', () => {
-    it('should detect stale context', async () => {.mockResolvedValueOnce({
+    it('should detect stale context', async () => {
+.mockResolvedValueOnce({
           ok: true, json: async () => ({ response: 'Mock response' }),
         });
 

@@ -52,11 +52,11 @@
   // YoRHa modules configuration
   const yorhaModules: YoRHaModule[] = [
     { id: 'legal-ai', name: 'LEGAL AI CORE', status: 'ACTIVE', power: 96.8, description: 'Advanced Legal Document Analysis', icon: 'gavel', color: '#00ff88' },
-    { id: 'evidence-processor', name: 'EVIDENCE ANALYSIS', status: 'STANDBY', power: 78.2, description: 'Digital Evidence Processing Unit', icon: 'search', color: '#ff6b35' },
-    { id: 'neural-network', name: 'NEURAL MATRIX', status: 'ACTIVE', power: 94.1, description: 'Machine Learning Core System', icon: 'brain', color: '#3b82f6' },
-    { id: 'quantum-db', name: 'QUANTUM DATABASE', status: 'ACTIVE', power: 89.7, description: 'High-Speed Data Storage Matrix', icon: 'database', color: '#8b5cf6' },
-    { id: 'security-grid', name: 'SECURITY GRID', status: 'MAXIMUM', power: 99.2, description: 'Perimeter Defense System', icon: 'shield', color: '#ef4444' },
-    { id: 'comms-array', name: 'COMMUNICATIONS', status: 'ACTIVE', power: 87.4, description: 'Multi-Protocol Communication Hub', icon: 'radio', color: '#06b6d4' }
+	{ id: 'evidence-processor', name: 'EVIDENCE ANALYSIS', status: 'STANDBY', power: 78.2, description: 'Digital Evidence Processing Unit', icon: 'search', color: '#ff6b35' },
+	{ id: 'neural-network', name: 'NEURAL MATRIX', status: 'ACTIVE', power: 94.1, description: 'Machine Learning Core System', icon: 'brain', color: '#3b82f6' },
+	{ id: 'quantum-db', name: 'QUANTUM DATABASE', status: 'ACTIVE', power: 89.7, description: 'High-Speed Data Storage Matrix', icon: 'database', color: '#8b5cf6' },
+	{ id: 'security-grid', name: 'SECURITY GRID', status: 'MAXIMUM', power: 99.2, description: 'Perimeter Defense System', icon: 'shield', color: '#ef4444' },
+	{ id: 'comms-array', name: 'COMMUNICATIONS', status: 'ACTIVE', power: 87.4, description: 'Multi-Protocol Communication Hub', icon: 'radio', color: '#06b6d4' }
   ];
 
   $effect(() => {
@@ -72,9 +72,21 @@
 
   function initializeHolographics() {
     const initialData: HolographicData[] = [
-      { id: 'central-core', type: 'sphere', position: {, x: 0, y: 0, z: 0 }, rotation: {, x: 0, y: 0, z: 0 }, scale: 1.0, color: '#00ff88', opacity: 0.8, animation: 'rotate' },
-      { id: 'data-streams', type: 'lines', position: {, x: 0, y: 0, z: 0 }, rotation: {, x: 0, y: 0, z: 0 }, scale: 1.0, color: '#3b82f6', opacity: 0.6, animation: 'flow' },
-      { id: 'neural-nodes', type: 'points', position: {, x: 0, y: 0, z: 0 }, rotation: {, x: 0, y: 0, z: 0 }, scale: 1.0, color: '#8b5cf6', opacity: 0.9, animation: 'pulse' }
+      { id: 'central-core', type: 'sphere', position: {
+	x: 0, y: 0, z: 0 },
+	rotation: {
+	x: 0, y: 0, z: 0 },
+	scale: 1.0, color: '#00ff88', opacity: 0.8, animation: 'rotate' },
+	{ id: 'data-streams', type: 'lines', position: {
+	x: 0, y: 0, z: 0 },
+	rotation: {
+	x: 0, y: 0, z: 0 },
+	scale: 1.0, color: '#3b82f6', opacity: 0.6, animation: 'flow' },
+	{ id: 'neural-nodes', type: 'points', position: {
+	x: 0, y: 0, z: 0 },
+	rotation: {
+	x: 0, y: 0, z: 0 },
+	scale: 1.0, color: '#8b5cf6', opacity: 0.9, animation: 'pulse' }
     ];
     holographicData.set(initialData);
   }
@@ -93,7 +105,8 @@
       if (Math.random() < 0.05) {
         triggerGlitch();
       }
-    }, 2000);
+    },
+	2000);
   }
 
   function initWebGL() {
@@ -134,7 +147,8 @@
     holographicData.update(currentData =>
       currentData.map(item => ({
         ...item,
-        rotation: {, x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
+        rotation: {
+	x: item.rotation.x + (item.animation === 'rotate' ? 0.01 : 0),
           y: item.rotation.y + (item.animation === 'rotate' ? 0.02 : 0),
           z: item.rotation.z + (item.animation === 'rotate' ? 0.005 : 0)
         }
@@ -213,7 +227,8 @@
   async function executeAnalysisCommand(cmd: string): Promise<CommandResponse> {
     return {
         output: `Analysis, initiated: ${cmd.replace('analyze ', '')}`,
-        data: {, analysis_id: 'ANL-' + Date.now(), status: 'queued' }
+        data: {
+	analysis_id: 'ANL-' + Date.now(), status: 'queued' }
     };
   }
 
@@ -237,20 +252,23 @@
         data: get(activeModules)
       };
     }
-    return { output: 'System command processed', data: {, status: 'ok' } };
+    return { output: 'System command processed', data: {
+	status: 'ok' } };
   }
 
   async function executeNeuralCommand(): Promise<CommandResponse> {
     return {
         output: 'Neural network processing initiated',
-        data: {, neural_activity: get(metrics).neural_activity }
+        data: {
+	neural_activity: get(metrics).neural_activity }
     };
   }
 
   function executeHelpCommand(): CommandResponse {
     return {
         output: `Available, commands: LEGAL <query>, ANALYZE <target>, SEARCH <terms>, SYSTEM STATUS, NEURAL SCAN`,
-        data: {, commands: ['legal', 'analyze', 'search', 'system', 'neural'] }
+        data: {
+	commands: ['legal', 'analyze', 'search', 'system', 'neural'] }
     };
   }
 
@@ -260,7 +278,8 @@
     setTimeout(() => {
       glitchActive = false;
       hologramFlicker = false;
-    }, 200);
+    },
+	200);
   }
 
   function handleKeyPress(event: KeyboardEvent) {
@@ -294,7 +313,8 @@
   <!-- Animated Data Streams -->
   {#each Array(12) as _, i}
     <div class="data-stream absolute w-0.5 bg-gradient-to-b from-transparent via-cyan-500 to-transparent h-24 z-10"
-         style="left: {5 + i * 8}%; top: -100px;, animation: dataFlow 3s linear infinite; animation-delay: {i * 0.3}s"></div>
+         style="left: {5 + i * 8}%; top: -100px;
+	animation: dataFlow 3s linear infinite; animation-delay: {i * 0.3}s"></div>
   {/each}
 
   <!-- Main Interface Content -->
@@ -433,10 +453,12 @@
   }
 
   @keyframes dataFlow {
-      0% { transform: translateY(-100%);, opacity: 0; }
+      0% { transform: translateY(-100%);
+	opacity: 0; }
       20% { opacity: 0.5; }
       80% { opacity: 0.5; }
-      100% { transform: translateY(100vh);, opacity: 0; }
+      100% { transform: translateY(100vh);
+	opacity: 0; }
   }
 
   .glitch-effect {

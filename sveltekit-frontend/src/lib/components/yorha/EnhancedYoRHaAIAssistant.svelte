@@ -5,7 +5,8 @@
   import { fade, scale } from 'svelte/transition';
 
   interface AssistantProps {
-    isOpen?: boolean;, onClose: () => void;
+    isOpen?: boolean;
+	onClose: () => void;
     userRole?: 'prosecutor' | 'detective' | 'admin';
   }
 
@@ -22,8 +23,10 @@
   // RAG Integration
   let ragStore = createRagStreamStore({
     maxRetries: 3,
-    batching: {, enabled: true, intervalMs: 40, adaptive: true },
-    persistence: {, enabled: true, storage: 'session' }
+    batching: {
+	enabled: true, intervalMs: 40, adaptive: true },
+	persistence: {
+	enabled: true, storage: 'session' }
   });
 
   // UI state
@@ -60,7 +63,8 @@
       if (chatContainerRef) {
         chatContainerRef.scrollTop = chatContainerRef.scrollHeight;
       }
-    }, 100);
+    },
+	100);
   }
 
   async function handleSearch() {
@@ -83,10 +87,10 @@
           responseContent += token;
           updateLastAssistantMessage(responseContent);
         },
-        onDone: () => {
+	onDone: () => {
           isProcessing = false;
         },
-        onError: (error) => {
+	onError: (error) => {
           console.error('RAG Error:', error);
           addMessage('assistant', `I encountered an error: ${error.message}. Please try again.`);
           isProcessing = false;
@@ -152,7 +156,8 @@
     setTimeout(() => {
       evidence.content = `Processed evidence: ${evidence.name}. Ready for analysis.`;
       evidenceItems = [...evidenceItems];
-    }, 1000);
+    },
+	1000);
   }
 
   function removeEvidence(id: string) {
@@ -182,7 +187,8 @@
 
 {#if isOpen}
   <div class="ai-assistant-overlay"
-    transition: fade={{, duration: 200 }}
+    transition: fade={{
+	duration: 200 }}
     onclick={onClose}
     onkeydown={(e) => e.key === 'Escape' && onClose()}
     role="button"
@@ -302,7 +308,8 @@
             </div>
             <div class="evidence-grid">
               {#each evidenceItems as evidence, index (evidence.id)}
-                <div class="evidence-item" transition: scale={{, duration: 200, delay: index * 50 }}>
+                <div class="evidence-item" transition: scale={{
+	duration: 200, delay: index * 50 }}>
                   <div class="evidence-header">
                     <h3>{evidence.name}</h3>
                     <button onclick={() => removeEvidence(evidence.id)}>🗑️</button>
@@ -390,90 +397,125 @@
 
 <style>
   .ai-assistant-overlay {
-    position: fixed;, inset: 0;
+    position: fixed;
+	inset: 0;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);, display: flex;
+    backdrop-filter: blur(8px);
+	display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;, padding: 2rem;
+    z-index: 1000;
+	padding: 2rem;
   }
   .ai-assistant-container {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
     border: 3px solid #ffd700;
-    border-radius: 12px;, display: flex;
-    flex-direction: column;, overflow: hidden;
+    border-radius: 12px;
+	display: flex;
+    flex-direction: column;
+	overflow: hidden;
     box-shadow: 0 0 0 3px #1a1a1a, 0 0 30px rgba(255, 215, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.5);
     font-family: 'JetBrains Mono', monospace;
     color: #e0e0e0;
   }
   .assistant-header {
     background: linear-gradient(45deg, #ffbf00, #ffd700);
-    color: #000;, padding: 1rem 1.5rem;
+    color: #000;
+	padding: 1rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #ffd700;
   }
-  .header-left { display: flex; align-items: center;, gap: 1rem; }
+  .header-left { display: flex; align-items: center;
+	gap: 1rem; }
   .yorha-logo { font-size: 2rem; }
-  .assistant-title { font-size: 1.25rem; font-weight: 700;, margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-  .assistant-subtitle { font-size: 0.75rem;, margin: 0; opacity: 0.8; font-weight: 600; }
-  .header-controls { display: flex; align-items: center;, gap: 1rem; }
-  .mode-switcher { display: flex;, gap: 0.5rem; }
+  .assistant-title { font-size: 1.25rem; font-weight: 700;
+	margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+  .assistant-subtitle { font-size: 0.75rem;
+	margin: 0; opacity: 0.8; font-weight: 600; }
+  .header-controls { display: flex; align-items: center;
+	gap: 1rem; }
+  .mode-switcher { display: flex;
+	gap: 0.5rem; }
   .mode-btn {
     padding: 0.5rem 1rem;
-    background: transparent;, border: 2px solid #000;
+    background: transparent;
+	border: 2px solid #000;
     color: #000;
     font-family: inherit;
     font-size: 0.8rem;
-    font-weight: 600;, cursor: pointer;
+    font-weight: 600;
+	cursor: pointer;
     transition: all 0.2s ease;
     text-transform: uppercase;
   }
-  .mode-btn:hover, .mode-btn.active { background: #000;, color: #ffd700; }
+  .mode-btn:hover, .mode-btn.active { background: #000;
+	color: #ffd700; }
   .close-btn {
-    background: #ff0041;, border: 2px solid #ff0041;
-    color: #fff;, padding: 0.5rem;
+    background: #ff0041;
+	border: 2px solid #ff0041;
+    color: #fff;
+	padding: 0.5rem;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;, transition: all 0.2s ease;
+    font-weight: bold;
+	transition: all 0.2s ease;
   }
-  .close-btn:hover { background: transparent;, color: #ff0041; }
+  .close-btn:hover { background: transparent;
+	color: #ff0041; }
 
-  .search-section { padding: 1.5rem;, background: #1a1a1a; border-bottom: 1px solid #333; }
-  .search-container { position: relative; max-width: 61.8%;, margin: 0 auto; display: flex;, gap: 0.5rem; }
+  .search-section { padding: 1.5rem;
+	background: #1a1a1a; border-bottom: 1px solid #333; }
+  .search-container { position: relative; max-width: 61.8%;
+	margin: 0 auto; display: flex;
+	gap: 0.5rem; }
   .search-input {
-    flex: 1;, padding: 1rem 1.5rem;
-    background: #0a0a0a;, border: 2px solid #ffd700;
-    border-radius: 8px;, color: #e0e0e0;
+    flex: 1;
+	padding: 1rem 1.5rem;
+    background: #0a0a0a;
+	border: 2px solid #ffd700;
+    border-radius: 8px;
+	color: #e0e0e0;
     font-family: inherit;
-    font-size: 1rem;, transition: all 0.3s ease;
+    font-size: 1rem;
+	transition: all 0.3s ease;
   }
   .search-input:focus { outline: none; border-color: #00ff41; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); }
   .search-btn {
     padding: 1rem 1.5rem;
-    background: #ffd700;, border: 2px solid #ffd700;
+    background: #ffd700;
+	border: 2px solid #ffd700;
     color: #000;
     font-size: 1.2rem;
-    border-radius: 8px;, cursor: pointer;
+    border-radius: 8px;
+	cursor: pointer;
     transition: all 0.2s ease;
   }
-  .search-btn: hover, not(:disabled) { background: transparent;, color: #ffd700; transform: translateY(-1px); }
-  .search-btn:disabled { opacity: 0.5;, cursor: not-allowed; }
+  .search-btn: hover, not(:disabled) { background: transparent;
+	color: #ffd700; transform: translateY(-1px); }
+  .search-btn:disabled { opacity: 0.5;
+	cursor: not-allowed; }
 
-  .context-controls { display: flex; justify-content: center;, gap: 1rem; margin-top: 1rem; }
+  .context-controls { display: flex; justify-content: center;
+	gap: 1rem; margin-top: 1rem; }
   .context-toggle {
     padding: 0.5rem 1rem;
-    background: #333;, border: 1px solid #555;
+    background: #333;
+	border: 1px solid #555;
     color: #e0e0e0;
-    border-radius: 6px;, cursor: pointer;
+    border-radius: 6px;
+	cursor: pointer;
     font-family: inherit;
-    font-size: 0.9rem;, transition: all 0.2s ease;
+    font-size: 0.9rem;
+	transition: all 0.2s ease;
   }
-  .context-toggle:hover { background: #ffd700;, color: #000; }
+  .context-toggle:hover { background: #ffd700;
+	color: #000; }
   .rag-status {
     padding: 0.5rem 1rem;
-    background: #1a1a1a;, border: 1px solid #00ff41;
+    background: #1a1a1a;
+	border: 1px solid #00ff41;
     color: #00ff41;
     border-radius: 6px;
     font-size: 0.8rem;
@@ -484,71 +526,109 @@
 
   .context-panel { background: #1a1a1a; border-bottom: 1px solid #333; padding: 1rem 1.5rem; }
   .context-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .context-header h3 { margin: 0;, color: #ffd700; font-size: 1rem; }
-  .context-items { display: flex; flex-wrap: wrap;, gap: 0.5rem; }
+  .context-header h3 { margin: 0;
+	color: #ffd700; font-size: 1rem; }
+  .context-items { display: flex; flex-wrap: wrap;
+	gap: 0.5rem; }
   .context-item {
     display: flex;
-    align-items: center;, gap: 0.5rem;
-    padding: 0.5rem;, background: #333;
+    align-items: center;
+	gap: 0.5rem;
+    padding: 0.5rem;
+	background: #333;
     border-radius: 4px;
     font-size: 0.8rem;
   }
   .context-name { color: #e0e0e0; }
   .context-type { color: #ffd700; text-transform: uppercase; font-size: 0.7rem; }
 
-  .assistant-main { flex: 1;, overflow: hidden; display: flex; flex-direction: column; }
-  .chat-container { flex: 1; overflow-y: auto;, padding: 1rem; display: flex; flex-direction: column;, gap: 1rem; }
-  .message { display: flex;, gap: 1rem; align-items: flex-start; }
+  .assistant-main { flex: 1;
+	overflow: hidden; display: flex; flex-direction: column; }
+  .chat-container { flex: 1; overflow-y: auto;
+	padding: 1rem; display: flex; flex-direction: column;
+	gap: 1rem; }
+  .message { display: flex;
+	gap: 1rem; align-items: flex-start; }
   .message.user { flex-direction: row-reverse; }
   .message-avatar { font-size: 1.5rem; flex-shrink: 0; }
-  .message-content { max-width: 70%;, background: #333; padding: 1rem; border-radius: 12px;, position: relative; }
-  .message.user .message-content { background: #ffd700;, color: #000; }
+  .message-content { max-width: 70%;
+	background: #333; padding: 1rem; border-radius: 12px;
+	position: relative; }
+  .message.user .message-content { background: #ffd700;
+	color: #000; }
   .message-text { line-height: 1.5; margin-bottom: 0.5rem; white-space: pre-wrap; word-break: break-word; }
-  .message-time { font-size: 0.7rem;, opacity: 0.7; }
-  .typing-indicator { display: flex;, gap: 0.25rem; }
+  .message-time { font-size: 0.7rem;
+	opacity: 0.7; }
+  .typing-indicator { display: flex;
+	gap: 0.25rem; }
   .typing-indicator span {
-    width: 6px;, height: 6px;
+    width: 6px;
+	height: 6px;
     background: #ffd700;
-    border-radius: 50%;, animation: typing 1.4s infinite ease-in-out;
+    border-radius: 50%;
+	animation: typing 1.4s infinite ease-in-out;
   }
   .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
-  .evidence-container { flex: 1;, padding: 1rem; display: flex; flex-direction: column; }
+  .evidence-container { flex: 1;
+	padding: 1rem; display: flex; flex-direction: column; }
   .evidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .evidence-header h2 { margin: 0;, color: #ffd700; }
-  .evidence-controls { display: flex;, gap: 0.5rem; }
+  .evidence-header h2 { margin: 0;
+	color: #ffd700; }
+  .evidence-controls { display: flex;
+	gap: 0.5rem; }
   .evidence-controls button {
     padding: 0.5rem 1rem;
-    background: #333;, border: 1px solid #555;
+    background: #333;
+	border: 1px solid #555;
     color: #e0e0e0;
-    border-radius: 6px;, cursor: pointer;
+    border-radius: 6px;
+	cursor: pointer;
     font-family: inherit;
-    font-size: 0.9rem;, transition: all 0.2s ease;
+    font-size: 0.9rem;
+	transition: all 0.2s ease;
   }
-  .evidence-controls button:hover { background: #ffd700;, color: #000; }
-  .evidence-grid { flex: 1;, display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; overflow-y: auto; }
-  .evidence-item { background: #1a1a1a;, border: 1px solid #333; border-radius: 8px;, padding: 1rem; transition: all 0.2s ease; }
-  .evidence-item:hover { border-color: #ffd700;, transform: translateY(-2px); }
+  .evidence-controls button:hover { background: #ffd700;
+	color: #000; }
+  .evidence-grid { flex: 1;
+	display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; overflow-y: auto; }
+  .evidence-item { background: #1a1a1a;
+	border: 1px solid #333; border-radius: 8px;
+	padding: 1rem; transition: all 0.2s ease; }
+  .evidence-item:hover { border-color: #ffd700;
+	transform: translateY(-2px); }
   .evidence-item .evidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-  .evidence-item h3 { margin: 0;, color: #ffd700; font-size: 0.9rem; }
+  .evidence-item h3 { margin: 0;
+	color: #ffd700; font-size: 0.9rem; }
   .evidence-type { color: #00ff41; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem; }
   .evidence-text { font-size: 0.8rem; line-height: 1.4; margin-bottom: 0.5rem; }
-  .evidence-tags { display: flex; flex-wrap: wrap;, gap: 0.25rem; }
-  .tag { background: #333;, color: #ffd700; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.7rem; text-transform: uppercase; }
-  .evidence-empty { grid-column: 1 / -1; text-align: center;, padding: 3rem; color: #666; }
+  .evidence-tags { display: flex; flex-wrap: wrap;
+	gap: 0.25rem; }
+  .tag { background: #333;
+	color: #ffd700; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.7rem; text-transform: uppercase; }
+  .evidence-empty { grid-column: 1 / -1; text-align: center;
+	padding: 3rem; color: #666; }
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
 
-  .analysis-container { flex: 1;, padding: 1rem; overflow-y: auto; }
+  .analysis-container { flex: 1;
+	padding: 1rem; overflow-y: auto; }
   .analysis-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-  .stat-card { background: #1a1a1a;, border: 1px solid #333; padding: 1rem; text-align: center; border-radius: 8px; }
-  .stat-value { font-size: 2rem; font-weight: bold;, color: #ffd700; margin-bottom: 0.5rem; }
-  .stat-label { font-size: 0.8rem;, color: #999; text-transform: uppercase; }
-  .analysis-sections { display: flex; flex-direction: column;, gap: 1.5rem; }
-  .analysis-section { background: #1a1a1a;, border: 1px solid #333; border-radius: 8px;, padding: 1.5rem; }
+  .stat-card { background: #1a1a1a;
+	border: 1px solid #333; padding: 1rem; text-align: center; border-radius: 8px; }
+  .stat-value { font-size: 2rem; font-weight: bold;
+	color: #ffd700; margin-bottom: 0.5rem; }
+  .stat-label { font-size: 0.8rem;
+	color: #999; text-transform: uppercase; }
+  .analysis-sections { display: flex; flex-direction: column;
+	gap: 1.5rem; }
+  .analysis-section { background: #1a1a1a;
+	border: 1px solid #333; border-radius: 8px;
+	padding: 1.5rem; }
   .analysis-section h3 { margin: 0 0 1rem 0; color: #ffd700; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
   .analysis-content { line-height: 1.6; }
-  .evidence-analysis { margin-bottom: 0.5rem;, padding: 0.5rem; background: #333; border-radius: 4px; }
+  .evidence-analysis { margin-bottom: 0.5rem;
+	padding: 0.5rem; background: #333; border-radius: 4px; }
 
   .assistant-footer {
     background: #1a1a1a;
@@ -558,20 +638,28 @@
     justify-content: space-between;
     align-items: center;
   }
-  .footer-info { display: flex;, gap: 1rem; align-items: center; }
-  .status-indicator { font-size: 0.8rem; text-transform: uppercase;, color: #666; }
+  .footer-info { display: flex;
+	gap: 1rem; align-items: center; }
+  .status-indicator { font-size: 0.8rem; text-transform: uppercase;
+	color: #666; }
   .status-indicator.active { color: #00ff41; }
-  .token-count { font-size: 0.8rem;, color: #ffd700; }
-  .footer-controls { display: flex;, gap: 0.5rem; }
+  .token-count { font-size: 0.8rem;
+	color: #ffd700; }
+  .footer-controls { display: flex;
+	gap: 0.5rem; }
   .footer-controls button {
     padding: 0.5rem 1rem;
-    background: transparent;, border: 1px solid #555;
+    background: transparent;
+	border: 1px solid #555;
     color: #e0e0e0;
-    border-radius: 4px;, cursor: pointer;
+    border-radius: 4px;
+	cursor: pointer;
     font-family: inherit;
-    font-size: 0.8rem;, transition: all 0.2s ease;
+    font-size: 0.8rem;
+	transition: all 0.2s ease;
   }
-  .footer-controls button:hover { border-color: #ffd700;, color: #ffd700; }
+  .footer-controls button:hover { border-color: #ffd700;
+	color: #ffd700; }
 
   @keyframes typing {
     0%, 60%, 100% { transform: translateY(0); }

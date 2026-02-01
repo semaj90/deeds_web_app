@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   interface Activity {
-    id: number;, type: string;
-    message: string;, timestamp: Date;
-    icon: string;, color: string;
+    id: number;
+	type: string;
+    message: string;
+	timestamp: Date;
+    icon: string;
+	color: string;
   }
 
   let activities: Activity[] = $state([]);
@@ -26,7 +29,7 @@
           icon: '🤖',
           color: 'text-cyan-400'
         },
-        {
+	{
           id: 2,
           type: 'case_updated',
           message: 'Case CASE-2024-001 status changed to "Under Review"',
@@ -34,7 +37,7 @@
           icon: '📋',
           color: 'text-yellow-400'
         },
-        {
+	{
           id: 3,
           type: 'user_action',
           message: 'Evidence correlation completed for POI-789',
@@ -42,7 +45,7 @@
           icon: '🔗',
           color: 'text-green-400'
         },
-        {
+	{
           id: 4,
           type: 'system_alert',
           message: 'GPU memory optimization completed',
@@ -50,7 +53,7 @@
           icon: '⚡',
           color: 'text-purple-400'
         },
-        {
+	{
           id: 5,
           type: 'evidence_uploaded',
           message: 'New evidence batch uploaded: financial_records_q3.pdf',
@@ -90,16 +93,19 @@
     return activities.filter(a => a.timestamp > oneWeekAgo).length;
   }
 
-  onMount(() => {
+  $effect(() => {
+
     loadRecentActivity().catch(err => console.error('Failed to load initial activities:', err));
 
     // Refresh activities periodically
     const interval = setInterval(() => {
       loadRecentActivity().catch(err => console.error('Failed to refresh activities:', err));
-    }, 120000); // Refresh every 2 minutes
+    },
+	120000); // Refresh every 2 minutes
 
     return () => clearInterval(interval);
-  });
+  
+});
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">

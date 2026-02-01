@@ -6,7 +6,8 @@ import path from 'path';
 export type JobType = 'ocr' | 'audio' | 'video' | 'document' | 'embedding' | 'json' | 'other';
 
 export type Job = {
-    id: string;, type: JobType;
+    id: string;
+	type: JobType;
     payload?: unknown;
     options?: {
         priority?: number;
@@ -162,7 +163,8 @@ export class ServerIngestWorkerPool extends EventEmitter {
                 this.activeJobs--;
                 resolve({ success: false, error: 'job timeout', processingTimeMs: Date.now() - start });
                 this.maybeProcess();
-            }, timeout);
+            },
+	timeout);
 
             const listener = (msg: any) => {
                 // Check if msg matches job id? Assuming worker echoes ID or we rely on serial execution per slot logic which isn't guaranteed with raw listeners unless careful.

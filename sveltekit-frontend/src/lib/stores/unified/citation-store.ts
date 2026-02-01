@@ -12,7 +12,7 @@
  *
  * await citationStore.searchCitations('statute 42 USC');
  * const similar = await citationStore.findSimilarCitations(citationId);
- * $: citations = $citationStore.citations;
+ * let citations = $derived($citationStore.citations);
  */
 import { derived, writable } from 'svelte/store';
 
@@ -36,7 +36,8 @@ export interface Citation {
  relevanceScore: number;
  embedding?: number[];
  caseIds?: string[];
- tags?: string[];, createdAt: number;
+ tags?: string[];
+	createdAt: number;
  updatedAt: number;
 }
 export interface CitationCluster {
@@ -49,17 +50,21 @@ export interface CitationCluster {
  */
 interface CitationStoreState {
 	// Citation library
-	citations: Citation[];, citationsByType: Map<CitationType, Citation[]>;
+	citations: Citation[];
+	citationsByType: Map<CitationType, Citation[]>;
 	citationsByJurisdiction: Map<string, Citation[]>;
 	// Search & filtering
 	searchQuery: string, selectedTypes: CitationType[];
- selectedJurisdictions: string[];, filteredCitations: Citation[];
+ selectedJurisdictions: string[];
+	filteredCitations: Citation[];
  // Current selection
  activeCitation: Citation | null;
  // Similarity search
- similarCitations: Citation[];, similarityThreshold: number;
+ similarCitations: Citation[];
+	similarityThreshold: number;
  // Clustering
- clusters: CitationCluster[];, isClusteringEnabled: boolean;
+ clusters: CitationCluster[];
+	isClusteringEnabled: boolean;
  // Metadata
  totalCitations: number, lastUpdated: number;
  isLoading: boolean, error: string | null;
@@ -122,7 +127,7 @@ function createCitationStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-  // ========== SEARCH ==========
+	// ========== SEARCH ==========
   /**
    * Search citations by text
    */
@@ -132,7 +137,7 @@ function createCitationStore() {
  const response = await fetch('/api/citations/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query }),
+	body: JSON.stringify({ query }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -147,7 +152,7 @@ function createCitationStore() {
  update((s) => ({ ...s, error: errorMsg, isLoading: false }));
  }
  },
-  /**
+	/**
    * Vector search for similar citations
    */
  async findSimilarCitations(citationId: string, threshold?: number) {
@@ -156,7 +161,7 @@ function createCitationStore() {
  const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ threshold: threshold ?? 0.7 }),
+	body: JSON.stringify({ threshold: threshold ?? 0.7 }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -173,7 +178,7 @@ function createCitationStore() {
  return [];
  }
  },
-  // ========== FILTERING ==========
+	// ========== FILTERING ==========
   /**
    * Filter by citation type
    */
@@ -184,7 +189,7 @@ function createCitationStore() {
  return { ...s, selectedTypes, filteredCitations: filtered };
  });
  },
-  /**
+	/**
    * Filter by jurisdiction
    */
  filterByJurisdiction(jurisdictions: string[]) {
@@ -194,7 +199,7 @@ function createCitationStore() {
  return { ...s, selectedJurisdictions, filteredCitations: filtered };
  });
  },
-  /**
+	/**
    * Clear all filters
    */
  clearFilters() {
@@ -206,7 +211,7 @@ function createCitationStore() {
  filteredCitations: s.citations,
  }));
  },
-  // ========== MANAGEMENT ==========
+	// ========== MANAGEMENT ==========
   /**
    * Add a citation
    */
@@ -225,7 +230,7 @@ function createCitationStore() {
  }));
  return id;
  },
-  /**
+	/**
    * Update citation
    */
  updateCitation(id: string, updates: Partial<Citation>) {
@@ -235,7 +240,7 @@ function createCitationStore() {
  ),
  }));
  },
-  /**
+	/**
    * Remove citation
    */
  removeCitation(id: string) {
@@ -244,13 +249,13 @@ function createCitationStore() {
  totalCitations: s.totalCitations - 1,
  }));
  },
-  /**
+	/**
    * Update precedential value
    */
  updatePrecedentialValue(id: string, value: PrecedentialValue) {
  this.updateCitation(id, { precedentialValue: value });
  },
-  // ========== CLUSTERING ==========
+	// ========== CLUSTERING ==========
   /**
    * Generate citation clusters
    */
@@ -260,7 +265,7 @@ function createCitationStore() {
  const response = await fetch('/api/citations/cluster', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ citations: this._getCurrentCitations() }),
+	body: JSON.stringify({ citations: this._getCurrentCitations() }),
  credentials: 'include',
  });
  if (response.ok) {
@@ -273,7 +278,7 @@ function createCitationStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-  // ========== SELECTION ==========
+	// ========== SELECTION ==========
   /**
    * Select a citation
    */
@@ -283,13 +288,13 @@ function createCitationStore() {
  return { ...s, activeCitation: citation ?? null };
  });
  },
-  /**
+	/**
    * Clear selection
    */
  clearSelection() {
  update((s) => ({ ...s, activeCitation: null }));
  },
-  // ========== HELPER METHODS ==========
+	// ========== HELPER METHODS ==========
   /**
    * Get all unique jurisdictions
    */
@@ -300,7 +305,7 @@ function createCitationStore() {
  })();
  return jurisdictions;
  },
-  /**
+	/**
    * Get relevant citations for a case
    */
  getRelevantCitations(caseId: string, minScore: number = 0.5): Citation[] {
@@ -312,7 +317,7 @@ function createCitationStore() {
  })();
  return relevant;
  },
-  /**
+	/**
    * Get legal principles from a citation
    */
  getLegalPrinciples(citationId: string): string[] {
@@ -325,7 +330,7 @@ function createCitationStore() {
  })();
  return principles;
  },
- // ========== PRIVATE HELPERS ==========
+	// ========== PRIVATE HELPERS ==========
  _groupByType(citations: Citation[]): Map<CitationType, Citation[]> {
  const grouped = new Map<CitationType, Citation[]>();
  citations.forEach((c) => {
@@ -334,7 +339,7 @@ function createCitationStore() {
  });
  return grouped;
  },
- _groupByJurisdiction(citations: Citation[]): Map<string, Citation[]> {
+	_groupByJurisdiction(citations: Citation[]): Map<string, Citation[]> {
  const grouped = new Map<string, Citation[]>();
  citations.forEach((c) => {
  if (!grouped.has(c.jurisdiction)) grouped.set(c.jurisdiction, []);
@@ -342,14 +347,14 @@ function createCitationStore() {
  });
  return grouped;
  },
- _getCurrentCitations(): Citation[] {
+	_getCurrentCitations(): Citation[] {
  let current: Citation[] = [];
  subscribe((s) => {
  current = s.citations;
  })();
  return current;
  },
- };
+	};
 }
 
 /**

@@ -13,7 +13,7 @@ https, //svelte.dev/e/js_parse_error -->
 -->
 <script lang="ts">
 import type { User } from '$lib/types';
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { fade, scale } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
 
@@ -108,14 +108,16 @@ import type { User } from '$lib/types';
       device = null}
   }
 
-  onMount(() => {
-    if (webgpuEffects) initWebGPU()});
+  $effect(() => {
 
-  onDestroy(() => {
+    if (webgpuEffects) initWebGPU()
+});
+
+  // TODO: Add as cleanup in $effect: return () => {
     if (animationFrame) cancelAnimationFrame(animationFrame);
     // Device destruction if supported (some implementations expose destroy())
     try { if (device && (device as unknown).destroy) (device as unknown).destroy()} catch 0%
-    device = null});
+    device = null}
 </script>
 
 {#if open}

@@ -48,8 +48,7 @@ export const cognitiveCache: CognitiveCache = {
         }
         return null;
     },
-
-    async set<T>(key: string, value: T, options?: CacheOptions): Promise<void> {
+	async set<T>(key: string, value: T, options?: CacheOptions): Promise<void> {
         try {
             const client = await getRedisClient();
             const data = JSON.stringify(value);
@@ -62,8 +61,7 @@ export const cognitiveCache: CognitiveCache = {
             console.error(`Error setting cache for key ${key}:`, error);
         }
     },
-
-    async del(key: string): Promise<void> {
+	async del(key: string): Promise<void> {
         try {
             const client = await getRedisClient();
             await client.del(key);
@@ -71,15 +69,13 @@ export const cognitiveCache: CognitiveCache = {
             console.error(`Error deleting from cache for key ${key}:`, error);
         }
     },
-
-    async getJsonbDocument<T>(key: string): Promise<T | null> {
+	async getJsonbDocument<T>(key: string): Promise<T | null> {
         return cognitiveCache.get<T>(key);
     },
-
-    async storeJsonbDocument<T = unknown>(key: string, value: T, ttl = 300): Promise<void> {
+	async storeJsonbDocument<T = unknown>(key: string, value: T, ttl = 300): Promise<void> {
         return cognitiveCache.set<T>(key, value, { ttl });
     },
-};
+	};
 
 // Ensure Redis client disconnects on process exit
 // Check if process is defined (node environment)

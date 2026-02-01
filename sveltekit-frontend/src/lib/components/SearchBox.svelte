@@ -45,7 +45,8 @@
       const response = await fetch(`${cudaServiceUrl}/api/v1/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, q: trimmedQuery, limit })
+	body: JSON.stringify({
+	q: trimmedQuery, limit })
       });
 
       if (!response.ok) {
@@ -191,12 +192,14 @@
 
 <style>
   .search-container {
-    max-width: 800px;, margin: 20px auto;
+    max-width: 800px;
+	margin: 20px auto;
     padding: 20px;
   }
 
   .search-input-group {
-    display: flex;, gap: 10px;
+    display: flex;
+	gap: 10px;
     margin-bottom: 15px;
     align-items: center;
     flex-wrap: wrap;
@@ -214,7 +217,8 @@
 
   .search-config {
     display: flex;
-    align-items: center;, gap: 20px;
+    align-items: center;
+	gap: 20px;
     margin-bottom: 20px;
     flex-wrap: wrap;
   }
@@ -237,12 +241,14 @@
   }
 
   .result-item {
-    margin-bottom: 20px;, padding: 15px;
+    margin-bottom: 20px;
+	padding: 15px;
   }
 
   .result-header {
     display: flex;
-    align-items: center;, gap: 15px;
+    align-items: center;
+	gap: 15px;
     margin-bottom: 10px;
     flex-wrap: wrap;
   }
@@ -262,7 +268,8 @@
 
   .result-payload {
     margin: 15px 0;
-    background-color: #f8f8f8;, padding: 10px;
+    background-color: #f8f8f8;
+	padding: 10px;
     border-radius: 4px;
   }
 
@@ -277,7 +284,8 @@
   }
 
   .metadata-content {
-    background-color: #f0f0f0;, padding: 10px;
+    background-color: #f0f0f0;
+	padding: 10px;
     border-radius: 8px;
   }
 
@@ -288,11 +296,13 @@
 
   .metadata-content td:first-child {
     font-weight: bold;
-    background-color: #e0e0e0;, width: 30%;
+    background-color: #e0e0e0;
+	width: 30%;
   }
 
   .no-results {
-    text-align: center;, padding: 30px;
+    text-align: center;
+	padding: 30px;
     background-color: #f8f8f8;
   }
 
@@ -325,6 +335,7 @@
   }
 
   .nes-btn.is-disabled {
-    cursor: not-allowed;, opacity: 0.6;
+    cursor: not-allowed;
+	opacity: 0.6;
   }
 </style>

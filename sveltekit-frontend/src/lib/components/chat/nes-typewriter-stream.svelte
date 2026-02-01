@@ -4,7 +4,7 @@
   Uses quantized cached text with Nintendo-inspired styling
 -->
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	// Migrated to $effect
 	import { chrRomPatternCache } from '../../cache/chr-rom-pattern-cache';
 	import { base64FP32Quantizer } from '../../text/base64-fp32-quantizer';
 
@@ -42,8 +42,10 @@
 
 	// Texture cache for alphabet characters
 	interface AlphabetTexture {
-		char: string;, texture: ImageData | null;
-		quantizedData: Float32Array;, nesPattern: Uint8Array;
+		char: string;
+	texture: ImageData | null;
+		quantizedData: Float32Array;
+	nesPattern: Uint8Array;
 		cached: boolean;
 	}
 
@@ -64,15 +66,17 @@
 	let textElement: HTMLSpanElement;
 	let cursorElement: HTMLSpanElement;
 
-	onMount(() => {
+	$effect(() => {
+
 		initializeTextureSystem();
 		initializeAudioSystem();
 		startTypewriterEffect();
-	});
+	
+});
 
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		cleanup();
-	});
+	}
 
 	function initializeTextureSystem(): void {
 		if (!cacheTextures) return;
@@ -289,7 +293,8 @@
 				}
 				applyCharacterEffects(text[currentIndex - 1]);
 			}
-		}, frameDelay);
+		},
+	frameDelay);
 
 		startCursorBlink();
 	}
@@ -306,9 +311,11 @@
 					textElement.classList.add('nes-text-emphasis');
 					setTimeout(() => {
 						textElement.classList.remove('nes-text-emphasis');
-					}, 200);
+					},
+	200);
 				}
-			}, 50);
+			},
+	50);
 		}
 	}
 
@@ -319,11 +326,12 @@
 			} else {
 				cursor = true;
 			}
-		}, 500);
+		},
+	500);
 
-		onDestroy(() => {
+		// TODO: Add as cleanup in $effect: return () => {
 			clearInterval(blinkInterval);
-		});
+		}
 	}
 
 	function cleanup(): void {
@@ -375,25 +383,31 @@
 	.nes-typewriter-container {
 		font-family: 'Courier New', 'Press Start 2P', monospace;
 		font-size: 16px;
-		line-height: 1.5;, color: #212529;
-		background: transparent;, padding: 8px;
+		line-height: 1.5;
+	color: #212529;
+		background: transparent;
+	padding: 8px;
 		border: 2px solid transparent;
-		word-wrap: break-word;, position: relative;
+		word-wrap: break-word;
+	position: relative;
 	}
 
 	.nes-classic {
-		color: #ffffff;, background: #000000;
+		color: #ffffff;
+	background: #000000;
 		border-color: #ffffff;
 	}
 
 	.nes-modern {
-		color: #00ff00;, background: #001100;
+		color: #00ff00;
+	background: #001100;
 		border-color: #00ff00;
 		text-shadow: 0 0 2px #00ff00;
 	}
 
 	.nes-legal {
-		color: #ffd700;, background: #1a1a2e;
+		color: #ffd700;
+	background: #1a1a2e;
 		border-color: #ffd700;
 		text-shadow: 0 0 1px #ffd700;
 	}
@@ -425,9 +439,11 @@
 	}
 
 	.nes-typewriter-cursor {
-		display: inline-block;, opacity: 0;
+		display: inline-block;
+	opacity: 0;
 		margin-left: 1px;
-		font-weight: bold;, color: currentColor;
+		font-weight: bold;
+	color: currentColor;
 	}
 
 	.nes-typewriter-cursor.visible {
@@ -459,13 +475,15 @@
 
 	@media (max-width: 768px) {
 		.nes-typewriter-container {
-			font-size: 14px;, padding: 6px;
+			font-size: 14px;
+	padding: 6px;
 		}
 	}
 
 	@media (max-width: 480px) {
 		.nes-typewriter-container {
-			font-size: 12px;, padding: 4px;
+			font-size: 12px;
+	padding: 4px;
 		}
 	}
 
@@ -482,7 +500,8 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.nes-typewriter-cursor {
-			animation: none;, opacity: 1;
+			animation: none;
+	opacity: 1;
 		}
 
 		.nes-typewriter-text:global(.nes-text-emphasis) {

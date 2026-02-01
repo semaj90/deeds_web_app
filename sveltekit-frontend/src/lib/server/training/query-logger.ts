@@ -6,7 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 interface QueryLogEntry {
-    timestamp: string;, userQuery: string;
+    timestamp: string;
+	userQuery: string;
     toolsUsed: string[];
     resultsClicked?: string[];
     contextUsed?: string[];
@@ -45,7 +46,8 @@ class QueryLogger {
             timestamp: new Date().toISOString(),
             userQuery: query,
             toolsUsed: [toolName],
-            metadata: {, toolArgs: args,
+            metadata: {
+	toolArgs: args,
                 toolResult: result,
                 toolName
             }
@@ -63,7 +65,8 @@ class QueryLogger {
             userQuery: query,
             toolsUsed: [toolUsed],
             resultsClicked: clickedIds,
-            metadata: {, resultCount: results.length,
+            metadata: {
+	resultCount: results.length,
                 clickedCount: clickedIds.length
             }
         });

@@ -12,7 +12,7 @@
  *
  * await caseStore.loadCases();
  * caseStore.selectCase(caseId);
- * $: activeCase = $caseStore.activeCase;
+ * let activeCase = $derived($caseStore.activeCase);
  */
 
 import { derived, writable } from 'svelte/store';
@@ -24,23 +24,32 @@ export type CaseStatus = 'open' | 'in_progress' | 'closed' | 'archived' | 'pendi
 export type CasePriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Case {
-    id: string;, title: string;
-    description: string;, caseNumber: string;
-    status: CaseStatus;, priority: CasePriority;
-    jurisdiction?: string;, openedDate: number;
+    id: string;
+	title: string;
+    description: string;
+	caseNumber: string;
+    status: CaseStatus;
+	priority: CasePriority;
+    jurisdiction?: string;
+	openedDate: number;
     closedDate?: number;
     assignedTo?: string;
     tags?: string[];
-    caseType?: string;, evidenceCount: number;
-    reportCount: number;, poiCount: number;
-    citationCount: number;, createdAt: number;
+    caseType?: string;
+	evidenceCount: number;
+    reportCount: number;
+	poiCount: number;
+    citationCount: number;
+	createdAt: number;
     updatedAt: number;
 }
 
 export interface CaseFilters {
-    statuses: CaseStatus[];, priorities: CasePriority[];
+    statuses: CaseStatus[];
+	priorities: CasePriority[];
     jurisdictions: string[];
-    dateRange?: {, start: number; end: number };
+    dateRange?: {
+	start: number; end: number };
     tags?: string[];
     searchText?: string;
 }
@@ -50,21 +59,25 @@ export interface CaseFilters {
  */
 interface CaseStoreState {
     // Case list
-    cases: Case[];, filteredCases: Case[];
+    cases: Case[];
+	filteredCases: Case[];
     // Active selection
     activeCase: Case | null;
     activeCaseId: string | null;
     // Search & filters
-    searchQuery: string;, filters: CaseFilters;
+    searchQuery: string;
+	filters: CaseFilters;
     appliedFilters: string[];
     // Sorting
     sortBy: 'date' | 'title' | 'priority' | 'status';
     sortDirection: 'asc' | 'desc';
     // Metadata
-    totalCases: number;, casesByStatus: Map<CaseStatus, number>;
+    totalCases: number;
+	casesByStatus: Map<CaseStatus, number>;
     casesByPriority: Map<CasePriority, number>;
     // UI state
-    isLoading: boolean;, error: string | null;
+    isLoading: boolean;
+	error: string | null;
     lastUpdated: number;
 }
 
@@ -186,20 +199,17 @@ function createCaseStore() {
                 update(s => ({ ...s, error: errorMsg, isLoading: false }));
             }
         },
-
-        // ========== CASE SELECTION ==========
+	// ========== CASE SELECTION ==========
         selectCase(id: string) {
             update(s => {
                 const activeCase = s.cases.find(c => c.id === id) || null;
                 return { ...s, activeCase, activeCaseId: id };
             });
         },
-
-        clearSelection() {
+	clearSelection() {
             update(s => ({ ...s, activeCase: null, activeCaseId: null }));
         },
-
-        // ========== SEARCH & FILTER ==========
+	// ========== SEARCH & FILTER ==========
         searchCases(query: string) {
             update(s => {
                 const newFilters: CaseFilters = { ...s.filters, searchText: query };
@@ -212,8 +222,7 @@ function createCaseStore() {
                 };
             });
         },
-
-        filterCases(filters: Partial<CaseFilters>) {
+	filterCases(filters: Partial<CaseFilters>) {
             update(s => {
                 const newFilters = { ...s.filters, ...filters };
                 const filtered = s.cases.filter(c => matchesFilters(c, newFilters));
@@ -230,8 +239,7 @@ function createCaseStore() {
                 };
             });
         },
-
-        clearFilters() {
+	clearFilters() {
             update(s => ({
                 ...s,
                 searchQuery: '',
@@ -240,8 +248,7 @@ function createCaseStore() {
                 filteredCases: applySorting(s.cases, s.sortBy, s.sortDirection)
             }));
         },
-
-        // ========== SORTING ==========
+	// ========== SORTING ==========
         setSortOrder(sortBy: 'date' | 'title' | 'priority' | 'status', direction: 'asc' | 'desc') {
             update(s => ({
                 ...s,
@@ -250,14 +257,13 @@ function createCaseStore() {
                 filteredCases: applySorting(s.filteredCases, sortBy, direction)
             }));
         },
-
-        // ========== CASE MANAGEMENT ==========
+	// ========== CASE MANAGEMENT ==========
         async createCase(caseData: Omit<Case, 'id' | 'createdAt' | 'updatedAt' | 'evidenceCount' | 'reportCount' | 'poiCount' | 'citationCount'>) {
             try {
                 const response = await fetch('/api/cases', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(caseData)
+	body: JSON.stringify(caseData)
                 });
 
                 if (response.ok) {
@@ -284,13 +290,12 @@ function createCaseStore() {
                 throw new Error(errorMsg);
             }
         },
-
-        async updateCase(id: string, updates: Partial<Case>) {
+	async updateCase(id: string, updates: Partial<Case>) {
             try {
                 const response = await fetch(`/api/cases/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updates)
+	body: JSON.stringify(updates)
                 });
 
                 if (response.ok) {
@@ -310,8 +315,7 @@ function createCaseStore() {
                 throw new Error(errorMsg);
             }
         },
-
-        async deleteCase(id: string) {
+	async deleteCase(id: string) {
             try {
                 const response = await fetch(`/api/cases/${id}`, { method: 'DELETE' });
 
@@ -331,12 +335,10 @@ function createCaseStore() {
                 throw new Error(errorMsg);
             }
         },
-
-        async archiveCase(id: string) {
+	async archiveCase(id: string) {
             return this.updateCase(id, { status: 'archived' });
         },
-
-        async reopenCase(id: string) {
+	async reopenCase(id: string) {
             return this.updateCase(id, { status: 'open' });
         }
     };

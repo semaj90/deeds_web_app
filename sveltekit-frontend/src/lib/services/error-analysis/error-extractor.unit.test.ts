@@ -31,7 +31,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
 
  describe('Svelte Error Parsing', () => {
  it('should parse svelte-check output correctly', async () => {
- // Mock extractSvelteErrors to return parsed errors{
+ // Mock extractSvelteErrors to return parsed errors
+{
  id: 'test-1',
  file: 'src/routes/+page.svelte',
  line: 10,
@@ -43,7 +44,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  status: 'new' as const,
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: 'test-2',
  file: 'src/lib/components/Button.svelte',
  line: 25,
@@ -69,7 +70,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[1].severity).toBe('warning');
  });
 
- it('should normalize file paths correctly', async () => {{
+ it('should normalize file paths correctly', async () => {
+{
  id: 'test-1',
  file: 'src/routes/+page.svelte',
  line: 10,
@@ -92,7 +94,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  });
 
  describe('TypeScript Error Parsing', () => {
- it('should parse tsc output correctly', async () => {{
+ it('should parse tsc output correctly', async () => {
+{
  id: 'test-1',
  file: 'src/lib/utils.ts',
  line: 25,
@@ -116,7 +119,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].code).toBe('TS2304');
  });
 
- it('should handle both error and warning severity levels', async () => {{
+ it('should handle both error and warning severity levels', async () => {
+{
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,
@@ -128,7 +132,7 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  status: 'new' as const,
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: 'test-2',
  file: 'src/test.ts',
  line: 20,
@@ -182,7 +186,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].status).toBe('new');
  });
 
- it('should include error code when available', async () => {{
+ it('should include error code when available', async () => {
+{
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,
@@ -203,7 +208,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].code).toBe('TS2322');
  });
 
- it('should handle errors without code gracefully', async () => {{
+ it('should handle errors without code gracefully', async () => {
+{
  id: 'test-1',
  file: 'src/test.svelte',
  line: 10,
@@ -225,7 +231,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  });
 
  describe('Error Normalization', () => {
- it('should normalize file paths to relative paths', async () => {{
+ it('should normalize file paths to relative paths', async () => {
+{
  id: 'test-1',
  file: 'src/lib/utils.ts',
  line: 10,
@@ -246,7 +253,8 @@ describe('ErrorExtractor - Unit Tests (Task 2.1)', () => {
  expect(errors[0].file).toMatch(/^src\//);
  });
 
- it('should trim whitespace from error messages', async () => {{
+ it('should trim whitespace from error messages', async () => {
+{
  id: 'test-1',
  file: 'src/test.ts',
  line: 10,

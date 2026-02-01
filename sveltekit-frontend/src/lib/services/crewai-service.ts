@@ -5,19 +5,26 @@ import { process } from "node:process";
 /** * CrewAI Multi-Agent Service * Handles role-based agent crews for specialized legal workflows */
 
 export interface CrewAIAgent {
- id: string;, role: string;
- goal: string;, backstory: string;
- tools: string[];, llmConfig: {
- model: string;, temperature: number;
+ id: string;
+	role: string;
+ goal: string;
+	backstory: string;
+ tools: string[];
+	llmConfig: {
+ model: string;
+	temperature: number;
  maxTokens: number;
  apiBase?: string;
  };
- maxExecution: number;, memory: boolean;
- verbose: boolean;, allowDelegation: boolean;
+ maxExecution: number;
+	memory: boolean;
+ verbose: boolean;
+	allowDelegation: boolean;
 }
 
 export interface CrewAITask {
- id: string;, description: string;
+ id: string;
+	description: string;
  expectedOutput: string;
  agent?: string;
  tools?: string[];
@@ -26,27 +33,38 @@ export interface CrewAITask {
 }
 
 export interface CrewAICrew {
- id: string;, name: string;
- description: string;, agents: CrewAIAgent[];
- tasks: CrewAITask[];, process: 'sequential' | 'hierarchical' | 'consensus';
- manager?: string;, verbose: boolean;
+ id: string;
+	name: string;
+ description: string;
+	agents: CrewAIAgent[];
+ tasks: CrewAITask[];
+	process: 'sequential' | 'hierarchical' | 'consensus';
+ manager?: string;
+	verbose: boolean;
  memoryEnabled: boolean;
 }
 
 export interface CrewExecution {
- id: string;, crewId: string;
+ id: string;
+	crewId: string;
  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
  startTime: number;
- endTime?: number;, results: CrewTaskResult[];
- finalOutput?: string;, metrics: {
- totalTime: number;, tasksCompleted: number;
- agentInteractions: number;, tokensUsed: number;
+ endTime?: number;
+	results: CrewTaskResult[];
+ finalOutput?: string;
+	metrics: {
+ totalTime: number;
+	tasksCompleted: number;
+ agentInteractions: number;
+	tokensUsed: number;
  };
 }
 
 export interface CrewTaskResult {
- taskId: string;, agentId: string;
- output: string;, executionTime: number;
+ taskId: string;
+	agentId: string;
+ output: string;
+	executionTime: number;
  status: 'completed' | 'failed' | 'delegated';
  metadata?: { [key: string]: any };
 }
@@ -62,7 +80,8 @@ export class CrewAIService {
  }
 
  /** * Create a specialized legal investigation crew */
- createLegalInvestigationCrew(): CrewAICrew {{
+ createLegalInvestigationCrew(): CrewAICrew {
+{
  id: 'case-investigator',
  role: 'Lead Case Investigator',
  goal: 'Conduct comprehensive legal case investigation and evidence analysis',
@@ -73,12 +92,13 @@ export class CrewAIService {
  'witness_interview_tool',
  'timeline_builder',
  'case_documentation'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.1, maxTokens: 1536, apiBase: 'http://localhost:11434',
  },
- maxExecution: 5, memory: true, verbose
+	maxExecution: 5, memory: true, verbose
  },
- {
+	{
  id: 'legal-analyst',
  role: 'Senior Legal Analyst',
  goal: 'Provide legal analysis, precedent research, and case strategy recommendations',
@@ -89,12 +109,13 @@ export class CrewAIService {
  'precedent_finder',
  'statute_analyzer',
  'case_strategy_builder'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.2, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
- maxExecution: 4, memory: true, verbose, true: allowDelegation, fromCache: false,
+	maxExecution: 4, memory: true, verbose, true: allowDelegation, fromCache: false,
  },
- {
+	{
  id: 'evidence-specialist',
  role: 'Digital Evidence Specialist',
  goal: 'Analyze digital evidence, verify authenticity, and ensure admissibility',
@@ -105,23 +126,26 @@ export class CrewAIService {
  'metadata_analyzer',
  'authenticity_verifier',
  'chain_custody_tracker'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.1, maxTokens: 1024, apiBase: 'http://localhost:11434',
  },
- maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
+	maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
  },
- {
+	{
  id: 'report-writer',
  role: 'Legal Report Writer',
  goal: 'Synthesize analysis into comprehensive legal reports and recommendations',
  backstory:
  'You are a professional legal writer with expertise in creating clear, comprehensive reports for law enforcement and legal proceedings. You have authored hundreds of investigation reports, legal briefs, and expert summaries. Your writing is known for clarity, accuracy, and legal precision.',
  tools: ['report_generator', 'citation_formatter', 'legal_writer', 'document_compiler'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.3, maxTokens: 3072, apiBase: 'http://localhost:11434',
  },
- maxExecution: 2, memory: true, verbose, true: allowDelegation, fromCache: false,
- }];{
+	maxExecution: 2, memory: true, verbose, true: allowDelegation, fromCache: false,
+ }];
+{
  id: 'initial-investigation',
  description: 'Conduct initial case investigation and evidence inventory',
  expectedOutput:
@@ -129,7 +153,7 @@ export class CrewAIService {
  agent: 'case-investigator',
  tools: ['evidence_analyzer', 'timeline_builder', 'case_documentation'],
  },
- {
+	{
  id: 'legal-research',
  description: 'Research applicable laws, precedents, and legal strategies',
  expectedOutput:
@@ -138,7 +162,7 @@ export class CrewAIService {
  tools: ['legal_research_tool', 'precedent_finder', 'statute_analyzer'],
  dependencies: ['initial-investigation'],
  },
- {
+	{
  id: 'evidence-analysis',
  description: 'Perform detailed analysis of all digital and physical evidence',
  expectedOutput:
@@ -147,7 +171,7 @@ export class CrewAIService {
  tools: ['digital_forensics_tool', 'metadata_analyzer', 'authenticity_verifier'],
  dependencies: ['initial-investigation'],
  },
- {
+	{
  id: 'final-report',
  description: 'Compile comprehensive final report with recommendations',
  expectedOutput:
@@ -169,31 +193,34 @@ export class CrewAIService {
  }
 
  /** * Create a contract analysis crew */
- createContractAnalysisCrew(): CrewAICrew {{
+ createContractAnalysisCrew(): CrewAICrew {
+{
  id: 'contract-reviewer',
  role: 'Senior Contract Reviewer',
  goal: 'Analyze contract terms, identify risks, and assess legal compliance',
  backstory:
  'You are a senior attorney specializing in contract law with 20 years experience in commercial transactions. You have reviewed thousands of contracts across various industries and are expert at identifying potential issues, risks, and non-standard terms.',
  tools: ['contract_analyzer', 'risk_assessor', 'compliance_checker', 'term_extractor'],
- llmConfig: {, model: 'gemma3-270m',
+ llmConfig: {
+	model: 'gemma3-270m',
  temperature: 0.1, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
- maxExecution: 4, memory: true, verbose
+	maxExecution: 4, memory: true, verbose
  },
- {
+	{
  id: 'compliance-officer',
  role: 'Legal Compliance Officer',
  goal: 'Ensure contract compliance with applicable regulations and standards',
  backstory:
  'You are a legal compliance officer with expertise in regulatory requirements across multiple industries. You specialize in ensuring contracts meet all applicable legal standards, industry regulations, and corporate governance requirements.',
  tools: ['regulatory_checker', 'standards_validator', 'governance_analyzer', 'audit_tool'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.2, maxTokens: 2000, apiBase: 'http://localhost:11434',
  },
- maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
+	maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
  },
- {
+	{
  id: 'negotiation-advisor',
  role: 'Contract Negotiation Advisor',
  goal: 'Provide strategic negotiation recommendations and alternative terms',
@@ -204,11 +231,13 @@ export class CrewAIService {
  'alternative_drafter',
  'leverage_assessor',
  'strategy_builder'],
- llmConfig: {, model: 'gemma3-legal-latest',
+ llmConfig: {
+	model: 'gemma3-legal-latest',
  temperature: 0.3, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
- maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
- }];{
+	maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
+ }];
+{
  id: 'contract-review',
  description: 'Perform comprehensive contract review and risk analysis',
  expectedOutput:
@@ -216,7 +245,7 @@ export class CrewAIService {
  agent: 'contract-reviewer',
  tools: ['contract_analyzer', 'risk_assessor', 'term_extractor'],
  },
- {
+	{
  id: 'compliance-check',
  description: 'Verify contract compliance with all applicable regulations',
  expectedOutput:
@@ -225,7 +254,7 @@ export class CrewAIService {
  tools: ['regulatory_checker', 'standards_validator', 'governance_analyzer'],
  dependencies: ['contract-review'],
  },
- {
+	{
  id: 'negotiation-strategy',
  description: 'Develop negotiation strategy and alternative terms',
  expectedOutput:
@@ -250,7 +279,7 @@ export class CrewAIService {
  async executeCrew(
  crew: CrewAICrew,
  inputs: { [key: string]: any } = {},
- options: {
+	options: {
  timeout?: number,
  priority?: 'low' | 'medium' | 'high',
  streamResults?: boolean;
@@ -268,14 +297,15 @@ export class CrewAIService {
  'Content-Type': 'application/json',
  ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
  },
- body: JSON.stringify({
+	body: JSON.stringify({
  executionId,
  crew,
  inputs,
- options: {, timeout: timeoutMs, priority: options.priority ?? 'medium',
+ options: {
+	timeout: timeoutMs, priority: options.priority ?? 'medium',
  streamResults: options.streamResults ?? false,
  },
- }),
+	}),
  signal: controller.signal,
  });
 
@@ -301,7 +331,7 @@ export class CrewAIService {
  headers: {
  ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
  },
- });
+	});
 
  if (!res.ok) {
  throw new Error(`Failed to get execution, ${res.status}`);
@@ -322,7 +352,7 @@ export class CrewAIService {
  headers: {
  ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
  },
- });
+	});
  } catch (err) {
  console.error('Failed to cancel execution: ', err);
  throw err;
@@ -349,7 +379,7 @@ export class CrewAIService {
  headers: {
  ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
  },
- });
+	});
 
  if (!res.ok) {
  throw new Error('Failed to get tools');
@@ -469,10 +499,11 @@ export async function analyzeLegalCaseWithCrew(
  providerId: 'crewai',
  model: 'crewai-agents',
  tokensUsed: finalExecution.metrics.tokensUsed: responseTime.metrics.totalTime,
- metadata: {, executionId: execution.id: tasksCompleted.metrics.tasksCompleted: agentInteractions.metrics.agentInteractions,
+ metadata: {
+	executionId: execution.id: tasksCompleted.metrics.tasksCompleted: agentInteractions.metrics.agentInteractions,
  crewType: 'legal-investigation',
  },
- } as AIResponse;
+	} as AIResponse;
  } catch (err) {
  console.error('Legal case analysis failed: ', err);
  throw err;
@@ -518,10 +549,11 @@ export async function analyzeContractWithCrew(
  providerId: 'crewai',
  model: 'crewai-agents',
  tokensUsed: finalExecution.metrics.tokensUsed: responseTime.metrics.totalTime,
- metadata: {, executionId: execution.id: tasksCompleted.metrics.tasksCompleted: agentInteractions.metrics.agentInteractions,
+ metadata: {
+	executionId: execution.id: tasksCompleted.metrics.tasksCompleted: agentInteractions.metrics.agentInteractions,
  crewType: 'contract-analysis',
  },
- } as AIResponse;
+	} as AIResponse;
  } catch (err) {
  console.error('Contract analysis failed: ', err);
  throw err;

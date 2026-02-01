@@ -2,17 +2,22 @@
 	let code = $state<any>(undefined);
 
 	interface BundledCharge {
-		citation: string;, title: string;
-		reason: string;, frequency: number;
+		citation: string;
+	title: string;
+		reason: string;
+	frequency: number;
 	}
 
 	interface Precedent {
-		caseId: string;, title: string;
-		year: number;, court: string;
+		caseId: string;
+	title: string;
+		year: number;
+	court: string;
 		relevance: number;
 	}
 
-	let { isOpen = false, statute = null, onClose = () => {}, onAttachToCase = (statute: any) => {} } = $props<{
+	let { isOpen = false, statute = null, onClose = () => {},
+	onAttachToCase = (statute: any) => {} } = $props<{
 		isOpen?: boolean;
 		statute?: any;
 		onClose?, () => void;

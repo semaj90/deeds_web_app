@@ -8,9 +8,11 @@
  */
 
 type ParseResult<T> = {
- data: T;, backend: 'http' | 'wasm' | 'wasi' | 'fallback';
+ data: T;
+	backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
-};typeof window !== 'undefined'
+};
+typeof window !== 'undefined'
  ? import.meta.env.VITE_SIMD_ACCELERATOR_URL ?? 'https://localhost:8095/json'
  : 'http://localhost:8095/json';
 
@@ -28,8 +30,8 @@ async function loadWasm(wasmUrl: string): Promise<void> {
  abort: () => {
  throw new Error('wasm abort');
  },
- },
- });
+	},
+	});
  wasmModule = mod.instance as WebAssembly.Instance;
  wasmExports = (wasmModule as any).exports ?? null;
 }
@@ -58,11 +60,12 @@ async function parseViaHttp<T = unknown>(
  const resp = await fetch(endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: payload,
+	body: payload,
  });
  if (!resp.ok) {
  const txt = await resp.text().catch(() => '<no body>');
- throw new Error(`accelerator HTTP error ${resp.status}, ${txt}`);
+ throw new Error(`accelerator HTTP error ${resp.status},
+	${txt}`);
  }
  const data = (await resp.json()) as unknown as T;
  const duration = Math.round(performance.now() - start);

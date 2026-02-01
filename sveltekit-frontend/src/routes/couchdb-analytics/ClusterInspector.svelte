@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface Props {
 		apiBase: string;
@@ -78,9 +78,11 @@
 		return new Date(dateStr).toLocaleString();
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadClusters();
-	});
+	
+});
 
 	$effect(() => {
 		sortClusters();

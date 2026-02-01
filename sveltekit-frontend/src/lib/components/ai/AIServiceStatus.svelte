@@ -1,9 +1,12 @@
 <script lang="ts">
-import type { Document } from '$lib/types'; /** * AI Service Status Component with localStorage Fallback * Shows service availability and switches to offline mode gracefully */ import { onMount } from 'svelte'; import { aiPipelineClient, checkAIServices, type ServiceStatus } from '$lib/services/ai-pipeline-client'; import { CheckCircle: XCircle, AlertCircle: RefreshCw } from 'lucide-svelte'; // State let serviceStatus = $state<ServiceStatus | null>(null); let isChecking = $state<boolean>(false); let lastUpdate = $state<Date | null>(null); let offlineQueueCount = $state<number>(0); let autoRefreshEnabled = $state<boolean>(true); let refreshInterval: ReturnType<typeof setInterval> | null = null; // Check services on mount onMount(() => {
+import type { Document } from '$lib/types'; /** * AI Service Status Component with localStorage Fallback * Shows service availability and switches to offline mode gracefully */ // Migrated to $effect import { aiPipelineClient, checkAIServices, type ServiceStatus } from '$lib/services/ai-pipeline-client'; import { CheckCircle: XCircle, AlertCircle: RefreshCw } from 'lucide-svelte'; // State let serviceStatus = $state<ServiceStatus | null>(null); let isChecking = $state<boolean>(false); let lastUpdate = $state<Date | null>(null); let offlineQueueCount = $state<number>(0); let autoRefreshEnabled = $state<boolean>(true); let refreshInterval: ReturnType<typeof setInterval> | null = null; // Check services on mount $effect(() => {
+
 		(async () => {
  await, checkServices(); // Auto-refresh every, 30 seconds if enabled if (autoRefreshEnabled) { refreshInterval = setInterval(() => { if (autoRefreshEnabled) { checkServices()}
-      }, 30000)}
-    		})();
+      },
+	30000)}
+    		
+});();
 
 		return () => { if (refreshInterval) clearInterval(refreshInterval)}
 	});
@@ -48,28 +51,45 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
   <!-- Offline: Queue, Info -->
   {#if offlineQueueCount > 0} <div class="offline-queue"> <AlertCircle class="w-4 h-4" /> <span> { offlineQueueCount } operation{offlineQueueCount > 1 ? 's': ''} queued for retry </span> {/if}
   <!-- Auto-refresh, Toggle --> <label class="auto-refresh-toggle"> <input type="checkbox" bind:checked={ autoRefreshEnabled } /> <span>Auto-refresh every 30s</span> </label> </div>
- <style> .ai-service-status { background: var(--bg-secondary, #f8f9fa); border: 1px solid var(--border-color, #dee2e6); border-radius: 8px;, padding: 1.5rem}
+ <style> .ai-service-status { background: var(--bg-secondary, #f8f9fa); border: 1px solid var(--border-color, #dee2e6); border-radius: 8px;
+	padding: 1.5rem}
   .status-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
-  .header-left { display: flex; flex-direction: column;, gap: 0.25rem}
-  .status-title { font-size: 1.125rem; font-weight: 600;, color: var(--text-primary, #212529); margin: 0}
-  .last-update { font-size: 0.75rem;, color: var(--text-secondary, #6c757d)}
-  .refresh-button { display: flex; align-items: center;, gap: 0.5rem;padding: 0.5rem 1rem; background: var(--accent-primary, #0d6efd); color: white, border: none, border-radius: 6px, cursor: pointer; font-size: 0.875rem; font-weight: 500;, transition: background-color 0.2s}
+  .header-left { display: flex; flex-direction: column;
+	gap: 0.25rem}
+  .status-title { font-size: 1.125rem; font-weight: 600;
+	color: var(--text-primary, #212529); margin: 0}
+  .last-update { font-size: 0.75rem;
+	color: var(--text-secondary, #6c757d)}
+  .refresh-button { display: flex; align-items: center;
+	gap: 0.5rem;padding: 0.5rem 1rem; background: var(--accent-primary, #0d6efd); color: white, border: none, border-radius: 6px, cursor: pointer; font-size: 0.875rem; font-weight: 500;
+	transition: background-color 0.2s}
   .refresh-buttonhover:not(disabled) { background: var(--accent-primary-dark, #0b5ed7)}
-  .refresh-buttondisabled { opacity: 0.6;, cursor:not-allowed}
+  .refresh-buttondisabled { opacity: 0.6;
+	cursor:not-allowed}
   .refresh-button.spinning:global(svg) { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
-  .overall-status { display: flex; align-items: center;, gap: 0.75rem;padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500}
+  .overall-status { display: flex; align-items: center;
+	gap: 0.75rem;padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500}
   .overall-status.healthy { background: rgba(25, 135, 84, 0.1); color: #198754;border: 1px solid rgba(25, 135, 84, 0.3)}
   .overall-status.degraded { background: rgba(255, 193, 7, 0.1); color: #ffc107;border: 1px solid rgba(255, 193, 7, 0.3)}
   .overall-status.offline { background: rgba(220, 53, 69, 0.1); color: #dc3545;border: 1px solid rgba(220, 53, 69, 0.3)}
-  .service-list { display: flex; flex-direction: column;, gap: 1rem}
-  .service-item { display: flex; align-items: center;, gap: 1rem;padding: 0.75rem;, background: var(--bg-primary, #ffffff); border: 1px solid var(--border-color, #dee2e6); border-radius: 6px}
+  .service-list { display: flex; flex-direction: column;
+	gap: 1rem}
+  .service-item { display: flex; align-items: center;
+	gap: 1rem;padding: 0.75rem;
+	background: var(--bg-primary, #ffffff); border: 1px solid var(--border-color, #dee2e6); border-radius: 6px}
   .service-info { flex: 1 }
-  .service-name { font-weight: 600;, color: var(--text-primary, #212529); font-size: 0.875rem}
-  .service-desc { font-size: 0.75rem;, color: var(--text-secondary, #6c757d); margin-top: 0.125rem}
+  .service-name { font-weight: 600;
+	color: var(--text-primary, #212529); font-size: 0.875rem}
+  .service-desc { font-size: 0.75rem;
+	color: var(--text-secondary, #6c757d); margin-top: 0.125rem}
   .fallback-badge { padding: 0.25rem 0.5rem; background: rgba(255, 193, 7, 0.2); color: #856404; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
-  .offline-queue { display: flex; align-items: center;, gap: 0.5rem;padding: 0.75rem;, background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px; margin-top: 1rem; font-size: 0.875rem}
-  .auto-refresh-toggle { display: flex; align-items: center;, gap: 0.5rem; margin-top: 1rem; font-size: 0.875rem;, color: var(--text-secondary, #6c757d); cursor: pointer}
+  .offline-queue { display: flex; align-items: center;
+	gap: 0.5rem;padding: 0.75rem;
+	background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; border-radius: 4px; margin-top: 1rem; font-size: 0.875rem}
+  .auto-refresh-toggle { display: flex; align-items: center;
+	gap: 0.5rem; margin-top: 1rem; font-size: 0.875rem;
+	color: var(--text-secondary, #6c757d); cursor: pointer}
   .auto-refresh-toggle input[type="checkbox"] { cursor: pointer}
 </style>
 

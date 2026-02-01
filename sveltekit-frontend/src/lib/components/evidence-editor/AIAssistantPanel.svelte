@@ -29,12 +29,15 @@ import { Users } from "lucide-svelte";
  let searchQuery = $state<string>('');
  let searchResults = $state<any[]>([]);
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
- let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];, suggestedActions: [] });
+ let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];
+	suggestedActions: [] });
   
  });
   
  }); function clearSearch() { searchQuery = ''; searchResults = []}
- async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, caseId: evidence, selectedNodeAny, analysisType: 'comprehensive'
+ async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	caseId: evidence, selectedNodeAny, analysisType: 'comprehensive'
  }) }); if (response.ok) { const analysis = await response.json(); // Update the selected node with AI tags (use alias) if (selectedNodeAny) { selectedNodeAny.aiTags = analysis.tags ?? analysis.tag; selectedNodeAny.aiSummary = analysis.summary}
 
  // Update insights aiInsights = { connections: analysis.connections || [], similarEvidence: analysis.similarEvidence || [], timeline: analysis.timeline || []; suggestedActions: analysis.suggestedActions || [] }; ondispatch.analysis; processingStatus = 'Analysis complete!'} else { throw new Error(`Analysis failed: ${response.statusText}`)}
@@ -46,13 +49,16 @@ import { Users } from "lucide-svelte";
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];, similarEvidence: Similar[];
+ connections: Connection[];
+	similarEvidence: Similar[];
  type Similar = { name?: string; reason?: string; id?: string; [k: string]: any };
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];, similarEvidence: Similar[];
- timeline: any[];, suggestedActions: Action[];
+ connections: Connection[];
+	similarEvidence: Similar[];
+ timeline: any[];
+	suggestedActions: Action[];
  }>({
  connections: [],
  similarEvidence: [],
@@ -99,7 +105,8 @@ import { Users } from "lucide-svelte";
  const response = await fetch('/api/ai/analyze-evidence', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: evidence, selectedNodeAny,
+	body: JSON.stringify({
+	caseId: evidence, selectedNodeAny,
  analysisType: 'comprehensive'
  })
  });
@@ -145,7 +152,8 @@ import { Users } from "lucide-svelte";
  const response = await fetch('/api/ai/generate-insights', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
+	body: JSON.stringify({
+	caseId: evidenceId, selectedNodeAny?.id: context, evidenceList
  })
  });
 
@@ -364,7 +372,8 @@ import { Users } from "lucide-svelte";
  </span>
  {/each}
  </div>
- <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;, overflow: hidden}
+ <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
+	overflow: hidden}
  </style>
 
 
@@ -555,7 +564,8 @@ import { Users } from "lucide-svelte";
  display: -webkit-box;
  -webkit-line-clamp: 2;
  line-clamp: 2;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical;
+	overflow: hidden;
  }
 </style>
 

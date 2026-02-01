@@ -7,7 +7,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 
   import  Button  from "bits-ui/Button.svelte";
 
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   import { superValidate } from 'sveltekit-superforms/client';
 
@@ -17,8 +17,10 @@ https, //svelte.dev/e/attribute_invalid_name -->
   // Props
   let { item,
     open = $bindable(false)
-   }: {, item: {
-      jsonData: {, title: string, description: string
+   }: {
+	item: {
+      jsonData: {
+	title: string, description: string
         tags?: string[];
         tagsString?: string
         type?: string}
@@ -39,8 +41,9 @@ https, //svelte.dev/e/attribute_invalid_name -->
     id: 'evidence',
     initial: 'view',
     context: { item },
-    states: {, view: { on { EDIT: 'edit' } },
-      edit: { on { SAVE: 'view', CANCEL: 'view' } }
+	states: {
+	view: { on { EDIT: 'edit' } },
+	edit: { on { SAVE: 'view', CANCEL: 'view' } }
     }
   });
   // Use initialState property for xstate v5+ or .initialState for v4

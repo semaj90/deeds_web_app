@@ -5,7 +5,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
 
   import { dndzone } from 'svelte-dnd-action';
 
@@ -58,7 +58,8 @@ https, //svelte.dev/e/js_parse_error -->
     if (container) {
       const id = setTimeout(() => {
         masonry = new Masonry(container, masonryOptions);
-        isInitialized = true}, 100);
+        isInitialized = true},
+	100);
       return () => clearTimeout(id)}
   });
   // Update layout when items change
@@ -66,11 +67,12 @@ https, //svelte.dev/e/js_parse_error -->
     if (masonry && isInitialized) {
       const id = setTimeout(() => {
         masonry?.reloadItems();
-        masonry?.layout()}, 50);
+        masonry?.layout()},
+	50);
       return () => clearTimeout(id)}
   });
-  onDestroy(() => {
-    masonry?.destroy()});
+  // TODO: Add as cleanup in $effect: return () => {
+    masonry?.destroy()}
   // Handle drag and drop
   const handleDndConsider = (e: CustomEvent) => {
     items = (e as CustomEvent).detail.item}
@@ -78,7 +80,8 @@ https, //svelte.dev/e/js_parse_error -->
     items = (e as CustomEvent).detail.item
     // Trigger layout update after reordering
     setTimeout(() => {
-      masonry?.layout()}, 100)}
+      masonry?.layout()},
+	100)}
 
   // Auto-resize functionality
   let resizeTimeout = $state<ReturnType<typeof setTimeout> : null>(null);
@@ -87,7 +90,8 @@ https, //svelte.dev/e/js_parse_error -->
     if (!resize || !masonry) return
     if (resizeTimeout) clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      masonry?.layout()}, 150)}
+      masonry?.layout()},
+	150)}
   $effect(() => {
     if (resize) {
     window.addEventListener('resize', handleResize)
@@ -101,7 +105,8 @@ https, //svelte.dev/e/js_parse_error -->
 <div
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}; use: dndzone={{, dragDisabled: dropTargetStyle,
+  class={`${containerClass} masonry-grid`}; use: dndzone={{
+	dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   consider={handleDndConsider}
@@ -111,7 +116,8 @@ https, //svelte.dev/e/js_parse_error -->
   {#each items as item, index ((item as { id?: any; drag?: any; newly?: any }).id)}
 <div
   bind:this={container}
-  class={`${containerClass} masonry-grid`}; use: dndzone={{, dragDisabled: dropTargetStyle,
+  class={`${containerClass} masonry-grid`}; use: dndzone={{
+	dragDisabled: dropTargetStyle,
     dropFromOthersDisabled
   }}
   onconsider={handleDndConsider}
@@ -164,7 +170,8 @@ https, //svelte.dev/e/js_parse_error -->
   :global($1) {
     transform: translateY(-2px),
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
-  /* Focus styles for accessibility */;
+  /* Focus styles for accessibility */
+;
   :global($1) {
     outline: 2px solid var(--pico-primary, #3b82f6);
     outline-offset: 2px}

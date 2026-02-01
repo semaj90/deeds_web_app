@@ -32,7 +32,8 @@ export interface SimdJsonParserModule {
  */
 export async function loadWasmModule<T = any>(
  path: imports?: WebAssembly.Imports
-): Promise<{, instance: WebAssembly.Instance: module.Module, exports }> {
+): Promise<{
+	instance: WebAssembly.Instance: module.Module, exports }> {
  const response = await fetch(path);
  const buffer = await response.arrayBuffer();
  const result = await WebAssembly.instantiate(buffer, imports || {});
@@ -69,7 +70,8 @@ export async function loadSimdJsonParser(): Promise<SimdJsonParserModule> {
 /**
  * Preload all WASM modules for faster runtime access
  */
-export async function preloadWasmModules() {loadVectorOps(),
+export async function preloadWasmModules() {
+loadVectorOps(),
  loadLegalParser(),
  loadSimdJsonParser()
  ]);

@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card/index';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Progress } from '$lib/components/ui/progress';
 
 	// Define missing types
 	type SearchResult = {
-		status: string;, sessionId: string;
+		status: string;
+	sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -21,14 +22,20 @@
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: {, name: string; role: string;, confidence: number }[];
-			timeline?: {, event: string; date: string;, importance: string }[];
+			personsOfInterest?: {
+	name: string; role: string;
+	confidence: number }[];
+			timeline?: {
+	event: string; date: string;
+	importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
-		metadata?: {, source: string;
-			processingTime: string;, model: string;
+		metadata?: {
+	source: string;
+			processingTime: string;
+	model: string;
 		};
 	};
 
@@ -50,28 +57,28 @@
 	// Analysis pipeline steps with enhanced metadata
 	const steps = [
 		{ name: 'Evidence Analysis', key: 'evidence_analysis', status: 'pending', description: 'Structuring document and extracting key facts', icon: '📋', duration: '30-45s' },
-		{ name: 'Person Extraction', key: 'persons_extracted', status: 'pending', description: 'Identifying persons of interest and roles', icon: '👥', duration: '20-30s' },
-		{ name: 'Relationship Mapping', key: 'neo4j_updates', status: 'pending', description: 'Building knowledge graph connections', icon: '🔗', duration: '15-25s' },
-		{ name: 'Case Synthesis', key: 'case_synthesis', status: 'pending', description: 'Generating prosecutorial analysis', icon: '⚖️', duration: '25-35s' }
+	{ name: 'Person Extraction', key: 'persons_extracted', status: 'pending', description: 'Identifying persons of interest and roles', icon: '👥', duration: '20-30s' },
+	{ name: 'Relationship Mapping', key: 'neo4j_updates', status: 'pending', description: 'Building knowledge graph connections', icon: '🔗', duration: '15-25s' },
+	{ name: 'Case Synthesis', key: 'case_synthesis', status: 'pending', description: 'Generating prosecutorial analysis', icon: '⚖️', duration: '25-35s' }
 	];
 
 	// Evidence type options
 	const evidenceTypes = [
 		{ value: 'police_report', label: 'Police Report' },
-		{ value: 'witness_statement', label: 'Witness Statement' },
-		{ value: 'financial_records', label: 'Financial Records' },
-		{ value: 'digital_forensics', label: 'Digital Forensics' },
-		{ value: 'physical_evidence', label: 'Physical Evidence' },
-		{ value: 'expert_testimony', label: 'Expert Testimony' },
-		{ value: 'other', label: 'Other Document' }
+	{ value: 'witness_statement', label: 'Witness Statement' },
+	{ value: 'financial_records', label: 'Financial Records' },
+	{ value: 'digital_forensics', label: 'Digital Forensics' },
+	{ value: 'physical_evidence', label: 'Physical Evidence' },
+	{ value: 'expert_testimony', label: 'Expert Testimony' },
+	{ value: 'other', label: 'Other Document' }
 	];
 
 	// Priority options
 	const priorityOptions = [
 		{ value: 'low', label: 'Low Priority', color: 'bg-gray-100 text-gray-800' },
-		{ value: 'medium', label: 'Medium Priority', color: 'bg-blue-100 text-blue-800' },
-		{ value: 'high', label: 'High Priority', color: 'bg-orange-100 text-orange-800' },
-		{ value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
+	{ value: 'medium', label: 'Medium Priority', color: 'bg-blue-100 text-blue-800' },
+	{ value: 'high', label: 'High Priority', color: 'bg-orange-100 text-orange-800' },
+	{ value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
 	];
 
 	// Current step tracking
@@ -105,7 +112,8 @@
 			const response = await fetch('/api/v1/evidence/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, evidenceId: crypto.randomUUID(),
+	body: JSON.stringify({
+	evidenceId: crypto.randomUUID(),
 					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
@@ -124,7 +132,8 @@
 			results = {
 				status: 'completed',
 				sessionId: data.data?.evidenceId ?? 'ai-session-' + Date.now(),
-     analysisResults: {, summary: data.data?.analysis?.summary ?? 'Analysis completed',
+     analysisResults: {
+	summary: data.data?.analysis?.summary ?? 'Analysis completed',
 					confidence: data.data?.analysis?.confidence ?? 0.5,
 					keyFactsCount: data.data?.analysis?.keyFindings?.length ?? 0,
 					relevantLaws: data.data?.analysis?.relevantLaws ?? [],
@@ -142,7 +151,10 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = `position: fixed;
+	top: 20px; right: 20px;
+	background: rgba(220, 53, 69, 0.9); color: white;
+	padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;`;
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results
@@ -152,21 +164,23 @@
 			results = {
 				status: 'completed',
 				sessionId: 'mock-session-' + Date.now(),
-     analysisResults: {, documentType: evidenceType,
+     analysisResults: {
+	documentType: evidenceType,
 					keyFactsCount: Math.floor(Math.random() * 10) + 5,
 					personsOfInterest: [
 						{ name: 'John Doe', role: 'witness', confidence: 0.85 },
-						{ name: 'Jane Smith', role: 'defendant', confidence: 0.92 }
+	{ name: 'Jane Smith', role: 'defendant', confidence: 0.92 }
 					],
 					timeline: [
 						{ event: 'Mock incident occurred', date: '2024-01-15', importance: 'high' },
-						{ event: 'Mock evidence collected', date: '2024-01-16', importance: 'medium' }
+	{ event: 'Mock evidence collected', date: '2024-01-16', importance: 'medium' }
 					],
 					legalImplications: 'Mock, analysis: Strong evidence pattern suggesting liability. Recommend further investigation of contract terms.',
 					confidenceScore: 0.78,
 					nextSteps: ['Review additional witness statements', 'Obtain security footage', 'Examine financial records']
 				},
-				metadata: {, source: 'mock-evidence-analyzer',
+	metadata: {
+	source: 'mock-evidence-analyzer',
 					processingTime: '45 seconds',
 					model: 'Legal Evidence AI v2.0 (Simulated)'
 				}

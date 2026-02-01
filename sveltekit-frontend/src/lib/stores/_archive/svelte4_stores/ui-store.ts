@@ -18,16 +18,21 @@ import { getContext, setContext } from 'svelte';
 // ============================================
 
 export interface TypewriterPrompt {
- id: string;, text: string;
+ id: string;
+	text: string;
  caseId?: string;
- caseName?: string;, timestamp: Date;
- isTyping: boolean;, displayedText: string;
+ caseName?: string;
+	timestamp: Date;
+ isTyping: boolean;
+	displayedText: string;
 }
 
 export interface UploadedFile {
- id: string;, name: string;
+ id: string;
+	name: string;
  type: 'pdf' | 'video' | 'image' | 'document' | 'audio' | 'unknown';
- size: number;, uploadedAt: Date;
+ size: number;
+	uploadedAt: Date;
  status: 'uploading' | 'processing' | 'analyzed' | 'error';
  progress: number;
  metadata?: AIMetadata;
@@ -46,31 +51,39 @@ export interface AIMetadata {
  embedding?: number[];
  embeddingModel?: string;
  analyzedAt?: Date;
- processingTimeMs?: number;, confidence: number;
+ processingTimeMs?: number;
+	confidence: number;
  entities?: ExtractedEntity[];
 }
 
 export interface TimelineEvent {
- timestamp: string;, description: string;
- confidence: number;, type: 'event' | 'action' | 'statement' | 'observation';
+ timestamp: string;
+	description: string;
+ confidence: number;
+	type: 'event' | 'action' | 'statement' | 'observation';
 }
 
 export interface EmotionAnalysis {
- timestamp?: number;, emotion: string;
- intensity: number;, confidence: number;
+ timestamp?: number;
+	emotion: string;
+ intensity: number;
+	confidence: number;
 }
 
 export interface SceneAnalysis {
  startTime?: number;
- endTime?: number;, description: string;
- objects: string[];, actions: string[];
+ endTime?: number;
+	description: string;
+ objects: string[];
+	actions: string[];
  confidence: number;
  thumbnailUrl?: string;
 }
 
 export interface ExtractedEntity {
  type: 'person' | 'location' | 'date' | 'organization' | 'charge' | 'evidence';
- value: string;, confidence: number;
+ value: string;
+	confidence: number;
  context?: string;
 }
 
@@ -84,28 +97,40 @@ export interface AutoPopulatedForm {
  date?: string;
  witnesses?: string[];
  evidenceIds?: string[];
- summary?: string;, confidence: number;
+ summary?: string;
+	confidence: number;
  source: 'ocr' | 'ai' | 'manual' | 'mixed';
 }
 
 export interface MarkdownScene {
- id: string;, title: string;
- markdown: string;, validated: boolean;
+ id: string;
+	title: string;
+ markdown: string;
+	validated: boolean;
  validatedBy?: string;
- validatedAt?: Date;, aiGenerated: boolean;
- confidence: number;, sourceFiles: string[];
+ validatedAt?: Date;
+	aiGenerated: boolean;
+ confidence: number;
+	sourceFiles: string[];
 }
 
 export interface UIState {
- typewriterPrompts: TypewriterPrompt[];, currentPromptIndex: number;
- isTypewriterActive: boolean;, uploadedFiles: UploadedFile[];
- isDragging: boolean;, uploadQueue: string[];
- processingFiles: Set<string>;, analyzedCount: number;
- autoPopulatedForms: Map<string: AutoPopulatedForm>;, markdownScenes: MarkdownScene[];
+ typewriterPrompts: TypewriterPrompt[];
+	currentPromptIndex: number;
+ isTypewriterActive: boolean;
+	uploadedFiles: UploadedFile[];
+ isDragging: boolean;
+	uploadQueue: string[];
+ processingFiles: Set<string>;
+	analyzedCount: number;
+ autoPopulatedForms: Map<string: AutoPopulatedForm>;
+	markdownScenes: MarkdownScene[];
  activeSceneId: string | null;
- sidebarOpen: boolean;, commandPaletteOpen: boolean;
+ sidebarOpen: boolean;
+	commandPaletteOpen: boolean;
  theme: 'light' | 'dark' | 'yorha' | 'nier';
- globalSearchQuery: string;, searchResults: any[];
+ globalSearchQuery: string;
+	searchResults: any[];
  isSearching: boolean;
 }
 
@@ -141,12 +166,17 @@ export function createUIStore() {
  const searchResults = writable<any[]>([]);
  const isSearching = writable(false);
 
- // Derived stores$files.filter((f) => f.status === 'uploading')
- );$files.filter((f) => f.status === 'analyzed')
- );[typewriterPrompts, currentPromptIndex],
+ // Derived stores
+$files.filter((f) => f.status === 'uploading')
+ );
+$files.filter((f) => f.status === 'analyzed')
+ );
+[typewriterPrompts, currentPromptIndex],
  ([$prompts, $index]) => $prompts[$index]
- );$scenes.filter((s) => !s.validated)
- );$scenes.find((s) => s.id === $id)
+ );
+$scenes.filter((s) => !s.validated)
+ );
+$scenes.find((s) => s.id === $id)
  );
 
  // ============================================
@@ -159,7 +189,7 @@ export function createUIStore() {
  caseId: caseName Date( isTyping: false,
  displayedText: '',
  },
- typewriterPrompts.update((prompts) => [...prompts, prompt]);
+	typewriterPrompts.update((prompts) => [...prompts, prompt]);
  return prompt.id;
  }
 
@@ -210,7 +240,7 @@ export function createUIStore() {
  id: crypto.randomUUID(name, file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
  progress: 0,
  },
- uploadedFiles.update((files) => [...files, uploadedFile]);
+	uploadedFiles.update((files) => [...files, uploadedFile]);
  return uploadedFile.id;
  }
 

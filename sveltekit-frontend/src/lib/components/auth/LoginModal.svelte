@@ -1,6 +1,9 @@
 <script lang="ts"> import { Dialog } from 'bits-ui'; import  Button  from "$lib/components/ui/button/Button.svelte"; import X from 'lucide-svelte'; import { goto } from '$app/navigation'; import { superForm } from 'sveltekit-superforms'; import { zod } from 'sveltekit-superforms/adapters'; import { loginSchema } from '$lib/schemas/auth'; import { toastStore } from '$lib/stores/toast'; interface Props { onlogin?: () => void; open?: boolean}
-  let { onlogin, open = $bindable() }: Props = $props(); const { form, errors, enhance, submitting, message } = superForm( { email: '', password: '', rememberMe: false }, {
-      validators: zod(loginSchema), onUpdate({ form: f }) { if (f.valid) { toastStore.success('âœ… Signed in successfully!'); onlogin?.(); open = false; // Redirect to dashboard after successful login setTimeout(() => { goto('/dashboard').catch(err => console.error('Navigation error:', err))}, 500)}'
+  let { onlogin, open = $bindable() }: Props = $props(); const { form, errors, enhance, submitting, message } = superForm( { email: '', password: '', rememberMe: false },
+	{
+      validators: zod(loginSchema), onUpdate({ form: f }) { if (f.valid) { toastStore.success('âœ… Signed in successfully!'); onlogin?.(); open = false; // Redirect to dashboard after successful login setTimeout(() => { goto('/dashboard').catch(err => console.error('Navigation error:', err))},
+	500)}
+'
       } }
   ); function closeModal() { open = false}
 </script> <Dialog.Root bind:open> <Dialog.Portal> <Dialog.Overlay class="fixed inset-0 bg-black/80" /> <Dialog.Content class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-slate-200 bg-white p-6"

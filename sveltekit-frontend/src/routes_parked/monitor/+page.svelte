@@ -1,7 +1,7 @@
 <script lang="ts">
 	let value = $state<any>(undefined);
 
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
  import type { PageData } from './$types';
 
  let { data } = $props<{ data: PageData }>();
@@ -191,19 +191,21 @@
  return `${(ms / 1000).toFixed(2)}s`;
  }
 
- onMount(() => {
+ $effect(() => {
+
  // Initial refresh
  refreshAllMetrics();
 
  // Set up periodic refresh every 30 seconds
  refreshInterval = setInterval(refreshAllMetrics, 30000);
- });
+ 
+});
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (refreshInterval) {
  clearInterval(refreshInterval);
  }
- });
+ }
 </script>
 
 <svelte:head>

@@ -22,36 +22,54 @@ declare global {
 const browser = typeof window !== 'undefined';
 
 export interface IntegrationStatus {
-  webassembly: {, available: boolean;
-    simdSupport: boolean;, runtimeConnected: boolean;
+  webassembly: {
+	available: boolean;
+    simdSupport: boolean;
+	runtimeConnected: boolean;
   };
-  sveltekit: {, version: string;
-    svelte5Patterns: boolean;, ssrReady: boolean;
+  sveltekit: {
+	version: string;
+    svelte5Patterns: boolean;
+	ssrReady: boolean;
   };
-  database: {, drizzleOrm: boolean;
-    pgvectorSupport: boolean;, postgresqlReady: boolean;
+  database: {
+	drizzleOrm: boolean;
+    pgvectorSupport: boolean;
+	postgresqlReady: boolean;
   };
-  ui: {, enhancedBitsComponents: boolean;
-    unoCSS: boolean;, nesCSS: boolean;
+  ui: {
+	enhancedBitsComponents: boolean;
+    unoCSS: boolean;
+	nesCSS: boolean;
     gamingTheme: boolean;
   };
-  webgpu: {, available: boolean;
-    dawnBackend: boolean;, unifiedRuntime: boolean;
+  webgpu: {
+	available: boolean;
+    dawnBackend: boolean;
+	unifiedRuntime: boolean;
   };
-  cache: {, chrRomCache: boolean;
-    redisConnected: boolean;, wasmCache: boolean;
+  cache: {
+	chrRomCache: boolean;
+    redisConnected: boolean;
+	wasmCache: boolean;
   };
 }
 
 export async function checkIntegrationStatus(): Promise<IntegrationStatus> {
   const status: IntegrationStatus = {
-    webassembly: {, available: false, simdSupport: false, runtimeConnected: false },
-    sveltekit: {, version: '2.0', svelte5Patterns: true, ssrReady: true },
-    database: {, drizzleOrm: true, pgvectorSupport: true, postgresqlReady: false },
-    ui: {, enhancedBitsComponents: true, unoCSS: true, nesCSS: true, gamingTheme: true },
-    webgpu: {, available: false, dawnBackend: false, unifiedRuntime: true },
-    cache: {, chrRomCache: true, redisConnected: false, wasmCache: true },
-  };
+    webassembly: {
+	available: false, simdSupport: false, runtimeConnected: false },
+	sveltekit: {
+	version: '2.0', svelte5Patterns: true, ssrReady: true },
+	database: {
+	drizzleOrm: true, pgvectorSupport: true, postgresqlReady: false },
+	ui: {
+	enhancedBitsComponents: true, unoCSS: true, nesCSS: true, gamingTheme: true },
+	webgpu: {
+	available: false, dawnBackend: false, unifiedRuntime: true },
+	cache: {
+	chrRomCache: true, redisConnected: false, wasmCache: true },
+	};
 
   if (!browser) return status;
 

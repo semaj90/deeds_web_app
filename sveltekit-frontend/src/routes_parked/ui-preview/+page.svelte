@@ -2,7 +2,7 @@
 	let filename = $state<any>(undefined);
 
  import type { page } from '$app/stores';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 // NES UI Components
  import Dialog from '$lib/components/ui/dialog/Dialog.svelte';
  import DialogContent from '$lib/components/ui/dialog/DialogContent.svelte';
@@ -114,13 +114,15 @@
  }
 
  // Mock page store data simulation
- onMount(() => {
+ $effect(() => {
+
  // Initialize session store with page data (simulated)
  const { data } = $page ; // Destructure data from $page to avoid deprecation warning
  if (data?.user) {
  mockSessionActions.init(data);
  }
- });
+ 
+});
   
  let currentUser = $derived (mockSessionActive ? mockUser : null);
  let authenticated = $derived (mockSessionActive);

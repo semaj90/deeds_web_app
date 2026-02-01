@@ -65,9 +65,9 @@
   // Legal role options
   const roleOptions = [
     { value: 'prosecutor', label: 'Prosecutor', icon: Scale },
-    { value: 'investigator', label: 'Investigator', icon: Badge },
-    { value: 'analyst', label: 'Legal Analyst', icon: Building },
-    { value: 'admin', label: 'Administrator', icon: Shield }
+	{ value: 'investigator', label: 'Investigator', icon: Badge },
+	{ value: 'analyst', label: 'Legal Analyst', icon: Building },
+	{ value: 'admin', label: 'Administrator', icon: Shield }
   ];
 
   // XState auth machine
@@ -99,7 +99,8 @@
 
       authActor.send({
         type: 'START_REGISTRATION',
-        data: {, email: formData.get('email') as string,
+        data: {
+	email: formData.get('email') as string,
           firstName: formData.get('firstName') as string,
           lastName: formData.get('lastName') as string,
           password: formData.get('password') as string,
@@ -111,7 +112,7 @@
         }
       });
     },
-    onResult: ({ result }) => {
+	onResult: ({ result }) => {
       isLoading = false;
       const typedResult = result as { type?: string; data?: { requiresVerification?: boolean; success?: boolean }; error?: { message?: string } };
 
@@ -143,7 +144,10 @@
 
   let passwordStrength = $derived(calculatePasswordStrength($form.password || ''));
 
-  function calculatePasswordStrength(password: string): {, score: number;, feedback: string;, color: string } {
+  function calculatePasswordStrength(password: string): {
+	score: number;
+	feedback: string;
+	color: string } {
     if (!password) return { score: 0, feedback: 'Enter a password', color: 'text-gray-400' };
 
     let score = 0;

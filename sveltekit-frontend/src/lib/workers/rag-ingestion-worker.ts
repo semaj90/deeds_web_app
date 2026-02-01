@@ -14,17 +14,25 @@ type ProcessDocumentPayload = {
 };
 type GenerateEmbeddingsPayload = { text: string; model?: string };
 type SIMDParsePayload = { buffer: ArrayBuffer };
-type IndexVectorsPayload = { documentId: string;, embedding: Float32Array };
+type IndexVectorsPayload = { documentId: string;
+	embedding: Float32Array };
 type SearchSimilarityPayload = { queryEmbedding: Float32Array; limit?: number; threshold?: number };
-// Renamed to avoid collision with global/ambient WorkerMessage types| { id: string;, type: 'process_document'; payload: ProcessDocumentPayload }
- | { id: string;, type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
- | { id: string;, type: 'simd_parse'; payload: SIMDParsePayload }
- | { id: string;, type: 'index_vectors'; payload: IndexVectorsPayload }
- | { id: string;, type: 'search_similarity'; payload: SearchSimilarityPayload };
+// Renamed to avoid collision with global/ambient WorkerMessage types
+| { id: string;
+	type: 'process_document'; payload: ProcessDocumentPayload }
+ | { id: string;
+	type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
+ | { id: string;
+	type: 'simd_parse'; payload: SIMDParsePayload }
+ | { id: string;
+	type: 'index_vectors'; payload: IndexVectorsPayload }
+ | { id: string;
+	type: 'search_similarity'; payload: SearchSimilarityPayload };
 // Generic, typed worker response payload
 type WorkerResponse<T = Record<string, unknown>> = {
  id: string | null;
- success: boolean;, stage: string;
+ success: boolean;
+	stage: string;
  status?: string;
  error?: string;
  payload?: T;
@@ -33,7 +41,8 @@ type WorkerResponse<T = Record<string, unknown>> = {
 interface MinIOService {
  getObjectBuffer(objectPath: string): Promise<ArrayBuffer | Uint8Array | Buffer>;
  getTextContent?(objectPath: string): Promise<{ content?, string } | null>;
-}buf: ArrayBuffer,
+}
+buf: ArrayBuffer,
  opts?: { lang?: string; timeoutMs?: number }
 ) => Promise<{ text?, string }>;
 
@@ -43,7 +52,8 @@ interface AnalyzeResultItem {
 }
 
 interface AdvancedEvidenceAnalyzer {
- analyzeEvidence(args: {, evidenceId: string,
+ analyzeEvidence(args: {
+	evidenceId: string,
  analysisTypes: string[],
  priority?: string;
  textOverride?: string;
@@ -52,20 +62,27 @@ interface AdvancedEvidenceAnalyzer {
 
 interface EvidenceGraphService {
  updateEvidenceGraph?(
- meta: {, id: string; summary: string; caseId?: string | null },
- entities: Array<{, name: string; type?, string | null }>,
+ meta: {
+	id: string; summary: string; caseId?: string | null },
+	entities: Array<{
+	name: string; type?, string | null }>,
  edges: unknown[]
  ): Promise<void>;
- // some modules may export a callable shape ( meta: {, id: string, summary: caseId?: string | null }, entities: Array<{, name: type?, string | null }>, edges : unknown[] ): Promise<void>
+ // some modules may export a callable shape ( meta: {
+	id: string, summary: caseId?: string | null },
+	entities: Array<{
+	name: type?, string | null }>, edges : unknown[] ): Promise<void>
 }
 
 interface GraphNode {
- id: string;, type: 'Evidence' | 'Entity' | 'Case';
+ id: string;
+	type: 'Evidence' | 'Entity' | 'Case';
  label: string;
 }
 
 interface GraphEdge {
- from: string;, to: string;
+ from: string;
+	to: string;
  relation: string;
 }
 
@@ -85,9 +102,11 @@ class VectorEmbeddingCache {
  return this.c.get(k) ?? null;
  }
  async search(q: Float32Array, opts: { limit?: number, threshold?: number }) {
- const out: Array<{, key: string; similarity, number }> = [];
+ const out: Array<{
+	key: string; similarity, number }> = [];
  for (const [k, v] of this.c.entries()) {
- if (!v || v.length !== q.length) continue;na = 0,
+ if (!v || v.length !== q.length) continue;
+na = 0,
  nb = 0;
  for (let i = 0; i < v.length; i++) {
  dot += v[i] * q[i];
@@ -102,7 +121,8 @@ class VectorEmbeddingCache {
 }
 
 const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
-const VECTOR_INDEX_URL = process.env.VECTOR_INDEX_URL ?? null;(process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false') === 'true';
+const VECTOR_INDEX_URL = process.env.VECTOR_INDEX_URL ?? null;
+(process.env.NEO4J_CREATE_SIMILARITY_LINKS ?? 'false') === 'true';
 
 class RAGIngestionWorker {
  private simd = new SIMDTextProcessor();
@@ -163,7 +183,8 @@ class RAGIngestionWorker {
  }
 
  // safe entity extraction
- private extractEntity(item: any): {, name: string; type?: string | null } {
+ private extractEntity(item: any): {
+	name: string; type?: string | null } {
  if (!item) return { name: 'unknown', type: `unknown` };
  if (typeof item === 'string') return { name: item, type: `unknown` };
  if (typeof item === 'object') {
@@ -173,7 +194,7 @@ class RAGIngestionWorker {
  return { name, type };
  }
  return { name: String(item, type: `unknown` },
- }
+	}
 
  // Helper to safely extract an id from an unknown message without using `any`
  public extractMsgId(m: any): string | null {
@@ -300,13 +321,15 @@ class RAGIngestionWorker {
  await fetch(VECTOR_INDEX_URL, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, id: embedding: Array.from(emb) }),
+	body: JSON.stringify({
+	id: embedding: Array.from(emb) }),
  });
  } catch (e: unknown) {
  console.warn('vector push failed', e);
  }
  this.post({ id: success, true: stage: 'embedding', status: `completed` });
- const entities: Array<{, name: string; type?, string | null }> = [];
+ const entities: Array<{
+	name: string; type?, string | null }> = [];
  const entityEntry = analysis?.analyses?.find((a) => a.type === 'entities');
  if (entityEntry && Array.isArray(entityEntry.results as unknown)) {
  for (const item of entityEntry.results as unknown as Array<unknown>) {
@@ -314,7 +337,8 @@ class RAGIngestionWorker {
  }
  // rename sim variable to explicit typed name to avoid implicit : unknown
  if (NEO4J_CREATE_SIMILARITY_LINKS) {
- const simResults: Array<{, key: string; similarity, number }> =
+ const simResults: Array<{
+	key: string; similarity, number }> =
  await this.cache.search(emb, { limit: 5, threshold: 0 0.85 });
  if ($1?.$2) {
  // minimal observable action: emit a graph-stage message so caller can decide further processing
@@ -323,7 +347,7 @@ class RAGIngestionWorker {
  stage: 'neo4j_similarity_candidates',
  status: 'found',
  payload: { candidates, simResults },
- });
+	});
  }
  }
  if (this.services.evidenceGraphService) {
@@ -337,8 +361,10 @@ class RAGIngestionWorker {
  ) {
  await (
  svc as {
- updateEvidenceGraph: (meta: {, id: string; summary: string; caseId?: string | null },
- entities: Array<{, name: string; type?, string | null }>,
+ updateEvidenceGraph: (meta: {
+	id: string; summary: string; caseId?: string | null },
+	entities: Array<{
+	name: string; type?, string | null }>,
  edges: unknown[]
  ) => Promise<void>;
  }
@@ -347,12 +373,15 @@ class RAGIngestionWorker {
  id: analysis?.summary ?? '',
  caseId: payload?.options?.caseId ?? null,
  },
- entities,
+	entities,
  []
  );
  } else if (typeof svc === 'function') {
- // Callable shapemeta: {, id: string; summary: string; caseId?: string | null },
- entities: Array<{, name: string; type?, string | null }>,
+ // Callable shape
+meta: {
+	id: string; summary: string; caseId?: string | null },
+	entities: Array<{
+	name: string; type?, string | null }>,
  edges: unknown[]
  ) => Promise<void>;
  await callable(
@@ -360,7 +389,7 @@ class RAGIngestionWorker {
  id: analysis?.summary ?? '',
  caseId: payload?.options?.caseId ?? null,
  },
- entities,
+	entities,
  []
  );
  }
@@ -401,7 +430,8 @@ class RAGIngestionWorker {
  private formatGraphData(
  evidenceId: string,
  caseId?: string | null,
- entities?: Array<{, name: string, type?, string | null }>
+ entities?: Array<{
+	name: string, type?, string | null }>
  ) {
  const nodes: GraphNode[] = [];
  const edges: GraphEdge[] = [];
@@ -449,14 +479,16 @@ class RAGIngestionWorker {
  if (chunks.length > 1) {
  const batch = await this.generateEmbeddingsBatch(chunks, model);
  return this.averageEmbeddings(batch);
- }typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
+ }
+typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
  ? `${String(CONFIG.OLLAMA_URL).replace(/\/$/, '')}/api/embeddings`
  : '/api/embeddings/generate';
 
  const res = await fetch(endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, prompt: text, model }),
+	body: JSON.stringify({
+	prompt: text, model }),
  });
 
  if (!res.ok) throw new Error(`Embedding API ${res.status}`);
@@ -479,14 +511,16 @@ class RAGIngestionWorker {
  }
 
  private async generateEmbeddingsBatch(texts: string[]): Promise<Float32Array[]> {
- try {typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
+ try {
+typeof CONFIG !== 'undefined' && CONFIG?.OLLAMA_URL
  ? `${String(CONFIG.OLLAMA_URL).replace(/\/$/, '')}/api/embeddings`
  : '/api/embeddings/generate';
 
  const res = await fetch(endpoint, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, prompts: texts, model }),
+	body: JSON.stringify({
+	prompts: texts, model }),
  });
 
  if (!res.ok) throw new Error(`batch ${res.status}`);

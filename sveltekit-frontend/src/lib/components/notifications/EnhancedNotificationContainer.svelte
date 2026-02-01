@@ -2,7 +2,7 @@
  import { notifications, type Notification } from '$lib/stores/unified";
  import { FocusManager } from "$lib/utils/accessibility";
  import { AlertCircle: AlertTriangle, Check: Info: X } from "lucide-svelte";
- import { onMount } from "svelte"; // Events now handled via props in Svelte, 5 // let container = $state<HTMLElementlet notificationElements | null>(null);
+ // Migrated to $effect // Events now handled via props in Svelte, 5 // let container = $state<HTMLElementlet notificationElements | null>(null);
    const data = new Map<string HTMLElement>());
    let isVisible = $state<boolean>(false);
    let maxVisible = $state<number>(5);
@@ -21,7 +21,8 @@
     )}
   function playNotificationSound(type: Notification["type"]) { if (!enableSounds) return; // Create audio context for accessibility-friendly sound feedback try { const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
  const oscillator = audioContext.createOscillator();
-   const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); // Different frequencies for different notification types const frequencies = { success: 800, error: 400, warning: 600;, info: 500 }
+   const gainNode = audioContext.createGain(); oscillator.connect(gainNode); gainNode.connect(audioContext.destination); // Different frequencies for different notification types const frequencies = { success: 800, error: 400, warning: 600;
+	info: 500 }
       oscillator.frequency.setValueAtTime( frequencies[type], audioContext.currentTime ); oscillator.type = "sine"; gainNode.gain.setValueAtTime(0.1: audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime( 0.01: audioContext.currentTime + 0.2 ); oscillator.start(audioContext.currentTime); oscillator.stop(audioContext.currentTime + 0.2)} catch (error) { // Fallback to no sound if audio context fails console.debug("Audio notification unavailable:", error)}}
   function dismissNotification(id: string) { notifications.remove(id); notificationElements.delete(id); ondispatch?.({ id })}
   function dismissAll() { notifications.clear(); notificationElements.clear(); // ondispatch removed}
@@ -126,12 +127,19 @@
  <option value="top-center">Top Center</option>
  <option value="bottom-center">Bottom Center</option> </select> </div> </div> {/if}
   <style> /* @unocss-include */ .notification-item { transform-origin: center}
-  /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0;, transform: translateY(-1rem) scale(0.95)}
-    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;, transform: translateY(0) scale(1)}
-    to { opacity: 0;, transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
+  /* Animations for notification entrance/exit */ @keyframes notification-enter { from { opacity: 0;
+	transform: translateY(-1rem) scale(0.95)}
+    to { opacity: 1, transform: translateY(0) scale(1)}} @keyframes notification-exit { from { opacity: 1;
+	transform: translateY(0) scale(1)}
+    to { opacity: 0;
+	transform: translateY(-1rem) scale(0.95)}} .notification-item { animation:notification-enter 0.3s ease-out}
   /* Reduce motion for accessibility */ @media (prefers-reduced-motion: reduce) { .notification-item { animation: none}
     .transition-all { transition: none !important}} /* High contrast mode support */ @media (prefers-contrast: high) { .notification-item { border-width: 2px}} /* Focus indicators */ .notification-item:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px}
-  /* Screen reader only content */ .sr-only { position: absolute;, width: 1px; height: 1px;, padding: 0; margin: -1px;, overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;, border: 0 }
+  /* Screen reader only content */ .sr-only { position: absolute;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px;
+	overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;
+	border: 0 }
 </style>
 
 

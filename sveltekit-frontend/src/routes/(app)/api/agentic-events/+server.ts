@@ -22,7 +22,8 @@ export const GET: RequestHandler = async ({ request }) => {
 			// Send heartbeat every 30s
 			const heartbeat = setInterval(() => {
 				controller.enqueue(`: heartbeat\n\n`);
-			}, 30000);
+			},
+	30000);
 
 			// Create SSE responder that writes to controller
 			const sseResponder = {
@@ -45,42 +46,42 @@ export const GET: RequestHandler = async ({ request }) => {
 						`event: stage_started\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				clustering_complete: (data) => {
+	clustering_complete: (data) => {
 					controller.enqueue(
 						`event: clustering_complete\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				recommendations_fetched: (data) => {
+	recommendations_fetched: (data) => {
 					controller.enqueue(
 						`event: recommendations_fetched\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				fix_proposed: (data) => {
+	fix_proposed: (data) => {
 					controller.enqueue(
 						`event: fix_proposed\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				fix_applied: (data) => {
+	fix_applied: (data) => {
 					controller.enqueue(
 						`event: fix_applied\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				pattern_learned: (data) => {
+	pattern_learned: (data) => {
 					controller.enqueue(
 						`event: pattern_learned\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				rag_updated: (data) => {
+	rag_updated: (data) => {
 					controller.enqueue(
 						`event: rag_updated\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				kag_updated: (data) => {
+	kag_updated: (data) => {
 					controller.enqueue(
 						`event: kag_updated\ndata: ${JSON.stringify(data)}\n\n`
 					);
 				},
-				ranking_complete: (data) => {
+	ranking_complete: (data) => {
 					controller.enqueue(
 						`event: ranking_complete\ndata: ${JSON.stringify(data)}\n\n`
 					);

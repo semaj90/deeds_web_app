@@ -7,16 +7,21 @@ import { writable, derived } from 'svelte/store';
 import type { LegalIntent } from '$lib/ai/intents';
 
 export interface AIMessage {
- id: string;, intent: LegalIntent;
- query: string;, response: string;
+ id: string;
+	intent: LegalIntent;
+ query: string;
+	response: string;
  isStreaming: boolean;
- error?: string;, createdAt: Date;
+ error?: string;
+	createdAt: Date;
  executionTimeMs?: number;
 }
 
 export interface AIState {
- messages: AIMessage[];, currentMessage: AIMessage | null;
- isLoading: boolean;, error: string | null;
+ messages: AIMessage[];
+	currentMessage: AIMessage | null;
+ isLoading: boolean;
+	error: string | null;
 }
 
 /**
@@ -52,8 +57,7 @@ function createAIStore() {
 
  return message.id;
  },
-
- /**
+	/**
  * Append chunk to current message
  */
  appendChunk(chunk: string) {
@@ -65,11 +69,10 @@ function createAIStore() {
  currentMessage: {
  ...state.currentMessage, response: state.currentMessage.response + chunk,
  },
- };
+	};
  });
  },
-
- /**
+	/**
  * Complete current message
  */
  completeMessage(executionTimeMs: number) {
@@ -88,8 +91,7 @@ function createAIStore() {
  };
  });
  },
-
- /**
+	/**
  * Set error
  */
  setError(error: string) {
@@ -102,8 +104,7 @@ function createAIStore() {
  : null,
  }));
  },
-
- /**
+	/**
  * Clear messages
  */
  clearMessages() {
@@ -113,8 +114,7 @@ function createAIStore() {
  currentMessage: null, error: null,
  }));
  },
-
- /**
+	/**
  * Remove message by ID
  */
  removeMessage(id: string) {
@@ -122,14 +122,13 @@ function createAIStore() {
  ...state, messages: state.messages.filter((m) => m.id !== id),
  }));
  },
-
- /**
+	/**
  * Reset store
  */
  reset() {
  set(initialState);
  },
- };
+	};
 }
 
 export const aiStore = createAIStore();
@@ -141,7 +140,8 @@ export const messageCount = derived(aiStore, ($state) => $state.messages.length)
 
 /**
  * Derived store for last message
- */aiStore,
+ */
+aiStore,
  ($state) => $state.messages[$state.messages.length - 1] ?? null
 );
 

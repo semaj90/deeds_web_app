@@ -8,7 +8,8 @@ type QdrantVectorPayload = {
 };
 
 type QdrantSearchResult<T = Record<string, unknown>> = {
-    id: string;, score: number;
+    id: string;
+	score: number;
     payload: T;
 };
 
@@ -36,7 +37,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
                 id: v.id,
                 vector: v.vector,
                 payload: v.payload ?? {},
-            })),
+	})),
         };
         const res = await fetch(`${base}/collections/${encodeURIComponent(name)}/points`, {
             method: 'POST',
@@ -44,7 +45,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
                 'Content-Type': 'application/json',
                 ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
             },
-            body: JSON.stringify(body),
+	body: JSON.stringify(body),
         });
         if (!res.ok) {
             const txt = await res.text();
@@ -64,7 +65,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
                 'Content-Type': 'application/json',
                 ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
             },
-            body: JSON.stringify(body),
+	body: JSON.stringify(body),
         });
 
         if (!res.ok) {

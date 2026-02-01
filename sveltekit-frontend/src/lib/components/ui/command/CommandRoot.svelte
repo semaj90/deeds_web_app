@@ -47,8 +47,8 @@
 
 	const context: CommandContext = {
 		get searchValue() { return searchValue; },
-		get selectedValue() { return value; },
-		setSearchValue,
+	get selectedValue() { return value; },
+	setSearchValue,
 		setSelectedValue,
 		registerItem,
 		unregisterItem,

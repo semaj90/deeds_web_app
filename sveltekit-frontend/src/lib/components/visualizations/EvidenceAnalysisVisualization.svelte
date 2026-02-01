@@ -54,22 +54,29 @@
 
     const chart = new Chart(ctx, {
       type: 'doughnut',
-      data: {, labels: ['Risk', 'Safe'],
-        datasets: [{, data: [analysis.riskScore * 100, (1 - analysis.riskScore) * 100],
+      data: {
+	labels: ['Risk', 'Safe'],
+        datasets: [{
+	data: [analysis.riskScore * 100, (1 - analysis.riskScore) * 100],
           backgroundColor: [
-            `rgba(${255 * analysis.riskScore}, ${255 * (1 - analysis.riskScore)}, 0, 0.8)`,
+            `rgba(${255 * analysis.riskScore},
+	${255 * (1 - analysis.riskScore)},
+	0, 0.8)`,
             'rgba(34, 197, 94, 0.8)'
           ],
           borderWidth: 2,
           borderColor: '#1f2937'
         }]
       },
-      options: {, responsive: true,
+	options: {
+	responsive: true,
         maintainAspectRatio: false,
-        plugins: {, legend: {
+        plugins: {
+	legend: {
             display: false
           },
-          tooltip: {, callbacks: {
+	tooltip: {
+	callbacks: {
               label: (context: any) => `${context.label}: ${context.parsed.toFixed(1)}%`
             }
           }
@@ -93,22 +100,28 @@
 
     const chart = new Chart(ctx, {
       type: 'bar',
-      data: {, labels: entityTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
-        datasets: [{, label: 'Entity Count',
+      data: {
+	labels: entityTypes.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+        datasets: [{
+	label: 'Entity Count',
           data: entityCounts,
           backgroundColor: 'rgba(99, 102, 241, 0.8)',
           borderColor: 'rgba(99, 102, 241, 1)',
           borderWidth: 1
         }]
       },
-      options: {, responsive: true,
+	options: {
+	responsive: true,
         maintainAspectRatio: false,
-        scales: {, y: {
+        scales: {
+	y: {
             beginAtZero: true,
-            ticks: {, precision: 0 }
+            ticks: {
+	precision: 0 }
           }
         },
-        plugins: {, legend: { display: false }
+	plugins: {
+	legend: { display: false }
         }
       }
     });
@@ -126,8 +139,10 @@
 
     const chart = new Chart(ctx, {
       type: 'line',
-      data: {, labels: sortedEvents.map(e => new Date(e.timestamp).toLocaleDateString()),
-        datasets: [{, label: 'Event Confidence',
+      data: {
+	labels: sortedEvents.map(e => new Date(e.timestamp).toLocaleDateString()),
+        datasets: [{
+	label: 'Event Confidence',
           data: sortedEvents.map(e => (e.confidence as number) * 100),
           borderColor: 'rgba(168, 85, 247, 1)',
           backgroundColor: 'rgba(168, 85, 247, 0.1)',
@@ -135,18 +150,23 @@
           fill: true
         }]
       },
-      options: {, responsive: true,
+	options: {
+	responsive: true,
         maintainAspectRatio: false,
-        scales: {, y: {
+        scales: {
+	y: {
             beginAtZero: true,
             max: 100,
-            title: {, display: true,
+            title: {
+	display: true,
               text: 'Confidence %'
             }
           }
         },
-        plugins: {, tooltip: {
-            callbacks: {, afterLabel: (context: any) => {
+	plugins: {
+	tooltip: {
+            callbacks: {
+	afterLabel: (context: any) => {
                 const event = sortedEvents[context.dataIndex];
                 return `${event.type}: ${event.description}`;
               }
@@ -165,8 +185,10 @@
 
     const chart = new Chart(ctx, {
       type: 'radar',
-      data: {, labels: analysis.correlations.map((_, i) => `Evidence ${i + 1}`),
-        datasets: [{, label: 'Correlation Strength',
+      data: {
+	labels: analysis.correlations.map((_, i) => `Evidence ${i + 1}`),
+        datasets: [{
+	label: 'Correlation Strength',
           data: analysis.correlations.map(c => c.strength * 100),
           borderColor: 'rgba(34, 197, 94, 1)',
           backgroundColor: 'rgba(34, 197, 94, 0.2)',
@@ -176,12 +198,15 @@
           pointHoverBorderColor: 'rgba(34, 197, 94, 1)'
         }]
       },
-      options: {, responsive: true,
+	options: {
+	responsive: true,
         maintainAspectRatio: false,
-        scales: {, r: {
+        scales: {
+	r: {
             beginAtZero: true,
             max: 100,
-            ticks: {, stepSize: 20 }
+            ticks: {
+	stepSize: 20 }
           }
         }
       }
@@ -197,8 +222,10 @@
     const emotions = analysis.sentiment.emotions;
     const chart = new Chart(ctx, {
       type: 'polarArea',
-      data: {, labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
-        datasets: [{, data: Object.values(emotions).map(v => v * 100),
+      data: {
+	labels: Object.keys(emotions).map((e: string) => e.charAt(0).toUpperCase() + e.slice(1)),
+        datasets: [{
+	data: Object.values(emotions).map(v => v * 100),
           backgroundColor: [
             'rgba(239, 68, 68, 0.7)', // anger - red
             'rgba(156, 163, 175, 0.7)', // fear - gray
@@ -210,11 +237,14 @@
           borderWidth: 1
         }]
       },
-      options: {, responsive: true,
+	options: {
+	responsive: true,
         maintainAspectRatio: false,
-        scales: {, r: { beginAtZero: true, max: 100 }
+        scales: {
+	r: { beginAtZero: true, max: 100 }
         },
-        plugins: {, legend: { position: 'right' }
+	plugins: {
+	legend: { position: 'right' }
         }
       }
     });
@@ -372,7 +402,8 @@
 
 <style>
   .evidence-analysis-visualization {
-    padding: 1.5rem;, background: #ffffff;
+    padding: 1.5rem;
+	background: #ffffff;
     border-radius: 0.5rem;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   }
@@ -384,22 +415,26 @@
     padding-bottom: 1rem;
   }
   .metadata {
-    display: flex;, gap: 0.75rem;
+    display: flex;
+	gap: 0.75rem;
     align-items: center;
   }
   .badge {
     padding: 0.25rem 0.75rem;
-    background: #eef2ff;, color: #3730a3;
+    background: #eef2ff;
+	color: #3730a3;
     border-radius: 9999px;
     font-size: 0.875rem;
   }
   .section-title {
     font-size: 1.125rem;
-    font-weight: 600;, color: #1f2937;
+    font-weight: 600;
+	color: #1f2937;
     margin-bottom: 0.75rem;
   }
   .summary-section {
-    background: #f9fafb;, padding: 1rem;
+    background: #f9fafb;
+	padding: 1rem;
     border-radius: 0.5rem;
   }
   .summary-text {
@@ -408,37 +443,47 @@
   }
   .charts-grid {
     display: grid;
-    grid-template-columns: 1fr;, gap: 1.5rem;
+    grid-template-columns: 1fr;
+	gap: 1.5rem;
   }
   .chart-container {
-    background: #f9fafb;, padding: 1rem;
-    border-radius: 0.5rem;, position: relative;
+    background: #f9fafb;
+	padding: 1rem;
+    border-radius: 0.5rem;
+	position: relative;
     min-height: 250px;
   }
   .chart-title {
     font-size: 0.875rem;
-    font-weight: 500;, color: #374151;
+    font-weight: 500;
+	color: #374151;
     margin-bottom: 0.5rem;
   }
   .risk-value {
-    position: absolute;, top: 50%;
-    left: 50%;, transform: translate(-50%, -50%);
+    position: absolute;
+	top: 50%;
+    left: 50%;
+	transform: translate(-50%, -50%);
     text-align: center;
   }
   .risk-score {
     font-size: 1.75rem;
-    font-weight: 700;, display: block;
+    font-weight: 700;
+	display: block;
   }
   .risk-label {
-    font-size: 0.875rem;, color: #6b7280;
+    font-size: 0.875rem;
+	color: #6b7280;
   }
   .findings-grid {
     display: grid;
-    grid-template-columns: 1fr;, gap: 1rem;
+    grid-template-columns: 1fr;
+	gap: 1rem;
   }
   .finding-card {
     padding: 1rem;
-    border-radius: 0.5rem;, border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+	border: 1px solid #e5e7eb;
   }
   .finding-card.pattern {
     background: #eff6ff;
@@ -462,7 +507,8 @@
   }
   .finding-header {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
   .finding-icon {
@@ -475,57 +521,92 @@
   }
   .finding-confidence {
     margin-left: auto;
-    font-size: 0.875rem;, color: #6b7280;
+    font-size: 0.875rem;
+	color: #6b7280;
   }
   .finding-description {
-    font-size: 0.875rem;, color: #374151;
+    font-size: 0.875rem;
+	color: #374151;
     margin-bottom: 0.5rem;
   }
   .finding-relevance {
-    height: 0.5rem;, background: #e5e7eb;
-    border-radius: 9999px;, overflow: hidden;
+    height: 0.5rem;
+	background: #e5e7eb;
+    border-radius: 9999px;
+	overflow: hidden;
   }
   .relevance-bar {
-    height: 100%;, background: #6366f1;
+    height: 100%;
+	background: #6366f1;
     transition: all 0.3s;
   }
 
-  .charts-grid { display: grid; grid-template-columns: 1fr;, gap: 1.5rem; }
-  .chart-container { background: #f9fafb;, padding: 1rem; border-radius: 0.5rem;, position: relative; min-height: 250px; }
-  .chart-title { font-size: 0.875rem; font-weight: 500;, color: #374151; margin-bottom: 0.5rem; }
-  .risk-value { position: absolute;, top: 50%; left: 50%;, transform: translate(-50%, -50%); text-align: center; }
-  .risk-score { font-size: 1.75rem; font-weight: 700;, display: block; }
-  .risk-label { font-size: 0.875rem;, color: #6b7280; }
-  .findings-grid { display: grid; grid-template-columns: 1fr;, gap: 1rem; }
-  .finding-card { padding: 1rem; border-radius: 0.5rem;, border: 1px solid #e5e7eb; }
+  .charts-grid { display: grid; grid-template-columns: 1fr;
+	gap: 1.5rem; }
+  .chart-container { background: #f9fafb;
+	padding: 1rem; border-radius: 0.5rem;
+	position: relative; min-height: 250px; }
+  .chart-title { font-size: 0.875rem; font-weight: 500;
+	color: #374151; margin-bottom: 0.5rem; }
+  .risk-value { position: absolute;
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%); text-align: center; }
+  .risk-score { font-size: 1.75rem; font-weight: 700;
+	display: block; }
+  .risk-label { font-size: 0.875rem;
+	color: #6b7280; }
+  .findings-grid { display: grid; grid-template-columns: 1fr;
+	gap: 1rem; }
+  .finding-card { padding: 1rem; border-radius: 0.5rem;
+	border: 1px solid #e5e7eb; }
   .finding-card.pattern { background: #eff6ff; border-color: #bfdbfe; }
   .finding-card.anomaly { background: #fffbeb; border-color: #fef3c7; }
   .finding-card.match { background: #ecfdf5; border-color: #bbf7d0; }
   .finding-card.contradiction { background: #fff1f2; border-color: #fecaca; }
   .finding-card.gap { background: #f8fafc; border-color: #e6eef3; }
-  .finding-header { display: flex; align-items: center;, gap: 0.5rem; margin-bottom: 0.5rem; }
+  .finding-header { display: flex; align-items: center;
+	gap: 0.5rem; margin-bottom: 0.5rem; }
   .finding-icon { font-size: 1.25rem; }
   .finding-type { font-size: 0.875rem; font-weight: 500; text-transform: capitalize; }
-  .finding-confidence { margin-left: auto; font-size: 0.875rem;, color: #6b7280; }
-  .finding-description { font-size: 0.875rem;, color: #374151; margin-bottom: 0.5rem; }
-  .finding-relevance { height: 0.5rem;, background: #e5e7eb; border-radius: 9999px;, overflow: hidden; }
-  .relevance-bar { height: 100%;, background: #6366f1; transition: all 0.3s; }
+  .finding-confidence { margin-left: auto; font-size: 0.875rem;
+	color: #6b7280; }
+  .finding-description { font-size: 0.875rem;
+	color: #374151; margin-bottom: 0.5rem; }
+  .finding-relevance { height: 0.5rem;
+	background: #e5e7eb; border-radius: 9999px;
+	overflow: hidden; }
+  .relevance-bar { height: 100%;
+	background: #6366f1; transition: all 0.3s; }
   .correlations-list { margin-top: 0.5rem; }
-  .correlation-item { display: flex;, gap: 0.75rem; padding: 0.75rem;, background: #f9fafb; border-radius: 0.5rem; }
+  .correlation-item { display: flex;
+	gap: 0.75rem; padding: 0.75rem;
+	background: #f9fafb; border-radius: 0.5rem; }
   .correlation-icon { font-size: 1.25rem; }
   .correlation-content { flex: 1; }
-  .correlation-description { font-size: 0.875rem;, color: #374151; margin-bottom: 0.25rem; }
-  .correlation-meta { display: flex;, gap: 0.75rem; font-size: 0.75rem;, color: #6b7280; }
-  .shared-entities { display: flex; flex-wrap: wrap;, gap: 0.25rem; margin-top: 0.5rem; }
+  .correlation-description { font-size: 0.875rem;
+	color: #374151; margin-bottom: 0.25rem; }
+  .correlation-meta { display: flex;
+	gap: 0.75rem; font-size: 0.75rem;
+	color: #6b7280; }
+  .shared-entities { display: flex; flex-wrap: wrap;
+	gap: 0.25rem; margin-top: 0.5rem; }
   .entity-tag { padding: 0.25rem 0.5rem; background: #e5e7eb; border-radius: 0.25rem; font-size: 0.75rem; }
   .recommendations-list { margin-top: 0.5rem; }
-  .recommendation-item { display: flex;, gap: 0.75rem; }
-  .recommendation-number { width: 1.5rem;, height: 1.5rem; background: #6366f1;, color: #ffffff; border-radius: 9999px;, display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; }
+  .recommendation-item { display: flex;
+	gap: 0.75rem; }
+  .recommendation-number { width: 1.5rem;
+	height: 1.5rem; background: #6366f1;
+	color: #ffffff; border-radius: 9999px;
+	display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; }
   .entities-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-  .entity-card { padding: 0.75rem;, background: #f9fafb; border-radius: 0.5rem; }
-  .entity-type { font-size: 0.75rem;, color: #6b7280; text-transform: uppercase; }
-  .entity-value { display: block; font-size: 0.875rem;, color: #111827; margin: 0.25rem 0; }
-  .entity-stats { display: flex; justify-content: space-between; font-size: 0.75rem;, color: #6b7280; }
+  .entity-card { padding: 0.75rem;
+	background: #f9fafb; border-radius: 0.5rem; }
+  .entity-type { font-size: 0.75rem;
+	color: #6b7280; text-transform: uppercase; }
+  .entity-value { display: block; font-size: 0.875rem;
+	color: #111827; margin: 0.25rem 0; }
+  .entity-stats { display: flex; justify-content: space-between; font-size: 0.75rem;
+	color: #6b7280; }
 </style>
 
 

@@ -3,16 +3,16 @@
 
  const navItems = [
  { label: 'Command Center', href: '/command', key: 'command' },
- { label: 'Active Cases', href: '/cases', key: 'cases' },
- { label: 'Evidence Board', href: '/evidence', key: 'evidence' },
- { label: 'Timeline', href: '/timeline', key: 'timeline' },
- { label: 'Relationship Graph', href: '/graph', key: 'graph' },
- { label: 'Sentencing Worksheet', href: '/sentencing', key: 'sentencing' },
- { label: 'Persons of Interest', href: '/poi', key: 'poi' },
- { label: 'Analysis Center', href: '/analysis', key: 'analysis' },
- { label: 'Global Search', href: '/search', key: 'search' },
- { label: 'Terminal', href: '/terminal', key: 'terminal' },
- { label: 'System Config', href: '/settings', key: 'settings' }];
+	{ label: 'Active Cases', href: '/cases', key: 'cases' },
+	{ label: 'Evidence Board', href: '/evidence', key: 'evidence' },
+	{ label: 'Timeline', href: '/timeline', key: 'timeline' },
+	{ label: 'Relationship Graph', href: '/graph', key: 'graph' },
+	{ label: 'Sentencing Worksheet', href: '/sentencing', key: 'sentencing' },
+	{ label: 'Persons of Interest', href: '/poi', key: 'poi' },
+	{ label: 'Analysis Center', href: '/analysis', key: 'analysis' },
+	{ label: 'Global Search', href: '/search', key: 'search' },
+	{ label: 'Terminal', href: '/terminal', key: 'terminal' },
+	{ label: 'System Config', href: '/settings', key: 'settings' }];
 let currentPath = $state(page.url.pathname);
 </script>
 

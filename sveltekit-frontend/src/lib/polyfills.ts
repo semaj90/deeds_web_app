@@ -9,11 +9,15 @@
 declare global {
 	interface Window {
 		global: typeof globalThis;
-		process: {, env: Record<string, string>;
-			browser: boolean;, cwd: () => string;
+		process: {
+	env: Record<string, string>;
+			browser: boolean;
+	cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string;, versions: { node: string };
-			platform: string;, arch: string;
+			version: string;
+	versions: { node: string };
+			platform: string;
+	arch: string;
 		};
 		Buffer: any;
 	}
@@ -25,15 +29,17 @@ if (typeof window !== 'undefined') {
 
 	if (!window.process) {
 		window.process = {
-			env: {, NODE_ENV: import.meta.env?.MODE ?? 'development',
+			env: {
+	NODE_ENV: import.meta.env?.MODE ?? 'development',
 				PUBLIC_ENV: 'browser'
 			},
-			browser: true,
+	browser: true,
 			cwd: () => '/',
 			nextTick: (callback: () => void) => setTimeout(callback, 0),
 			version: 'v18.0.0',
-			versions: {, node: '18.0.0' },
-			platform: 'browser',
+			versions: {
+	node: '18.0.0' },
+	platform: 'browser',
 			arch: 'x64'
 		} as any;
 	}
@@ -57,7 +63,6 @@ export const pathUtils = {
 			.replace(/\/+/g, '/')
 			.replace(/\/$/, '');
 	},
-
 	resolve: (...parts: string[]) => {
 		let resolvedPath = '';
 		for (const part of parts) {
@@ -67,12 +72,10 @@ export const pathUtils = {
 		}
 		return resolvedPath.startsWith('/') ? resolvedPath : `/${resolvedPath}`;
 	},
-
 	dirname: (path: string) => {
 		const lastSlash = path.lastIndexOf('/');
 		return lastSlash === -1 ? '.' : path.slice(0, lastSlash);
 	},
-
 	basename: (path: string, ext?: string) => {
 		let base = path.split('/').pop() ?? '';
 		if (ext && base.endsWith(ext)) {
@@ -87,12 +90,10 @@ export const urlUtils = {
 	isAbsolute: (url: string) => {
 		return /^https?:\/\//.test(url) || url.startsWith('/');
 	},
-
 	resolve: (base: string, relative: string): string => {
 		if (urlUtils.isAbsolute(relative)) return relative;
 		return new URL(relative, base).href;
 	},
-
 	parse: (url: string) => {
 		try {
 			return new URL(url);
@@ -166,7 +167,6 @@ export const storage = {
 			return defaultValue ?? null;
 		}
 	},
-
 	set: (_key: string, value: unknown): boolean => {
 		try {
 			if (typeof window === 'undefined') return false;
@@ -177,7 +177,6 @@ export const storage = {
 			return false;
 		}
 	},
-
 	remove: (_key: string): boolean => {
 		try {
 			if (typeof window === 'undefined') return false;
@@ -188,7 +187,6 @@ export const storage = {
 			return false;
 		}
 	},
-
 	clear: (): boolean => {
 		try {
 			if (typeof window === 'undefined') return false;
@@ -220,7 +218,6 @@ export const webGPU = {
 			return null;
 		}
 	},
-
 	getDevice: async (options?: {
 		adapter?: GPURequestAdapterOptions;
 		device?: GPUDeviceDescriptor;
@@ -233,7 +230,6 @@ export const webGPU = {
 			return null;
 		}
 	},
-
 	ensureDevice: async () => {
 		const device = await webGPU.getDevice();
 		if (!device) throw new Error('WebGPU not supported or device unavailable');

@@ -4,7 +4,8 @@
  */
 
 interface SIMDWorkerMessage {
-  type: string;, id: string;
+  type: string;
+	id: string;
   data?: unknown;
   error?: string;
   success?: boolean;
@@ -96,7 +97,8 @@ export class SIMDJSONWorkerClient {
       case 'VECTOR_PARSE_COMPLETE':
       case 'STATS':
       case 'BENCHMARK_COMPLETE':
-      case 'STATS_RESET': pending.resolve({, data: message.data,
+      case 'STATS_RESET': pending.resolve({
+	data: message.data,
           metadata: message.metadata,
           success: true,
         });
@@ -128,7 +130,8 @@ export class SIMDJSONWorkerClient {
       const timeoutId = setTimeout(() => {
         this.pendingRequests.delete(id);
         reject(new Error('Worker request timeout'));
-      }, timeout);
+      },
+	timeout);
 
       // Store pending request
       this.pendingRequests.set(id, {
@@ -179,7 +182,8 @@ export class SIMDJSONWorkerClient {
     }
 
     try {
-      const result = (await this.sendMessage('PARSE_JSON', { jsonString, options }, options)) as {
+      const result = (await this.sendMessage('PARSE_JSON', { jsonString, options },
+	options)) as {
         data?: unknown;
       };
       return result?.data;
@@ -204,7 +208,8 @@ export class SIMDJSONWorkerClient {
     }
 
     try {
-      const result = (await this.sendMessage('PARSE_BATCH', { jsonStrings }, options)) as {
+      const result = (await this.sendMessage('PARSE_BATCH', { jsonStrings },
+	options)) as {
         data?: unknown[];
       };
       return result?.data ?? [];
@@ -229,7 +234,8 @@ export class SIMDJSONWorkerClient {
     }
 
     try {
-      const result = (await this.sendMessage('PARSE_VECTOR_DATA', { vectorJson }, options)) as {
+      const result = (await this.sendMessage('PARSE_VECTOR_DATA', { vectorJson },
+	options)) as {
         data?: unknown;
       };
       return result?.data;
@@ -243,9 +249,12 @@ export class SIMDJSONWorkerClient {
   /**
    * Get worker performance statistics
    */
-  async getStats(): Promise<{, totalParsed: number;
-    totalTime: number;, avgTime: number;
-    errors: number;, simdReady: boolean;
+  async getStats(): Promise<{
+	totalParsed: number;
+    totalTime: number;
+	avgTime: number;
+    errors: number;
+	simdReady: boolean;
   }> {
     if (!this.worker) {
       return {
@@ -260,8 +269,10 @@ export class SIMDJSONWorkerClient {
     try {
       const result = (await this.sendMessage('GET_STATS')) as { data?: unknown };
       return result?.data as {
-        totalParsed: number;, totalTime: number;
-        avgTime: number;, errors: number;
+        totalParsed: number;
+	totalTime: number;
+        avgTime: number;
+	errors: number;
         simdReady: boolean;
       };
     } catch (error) {

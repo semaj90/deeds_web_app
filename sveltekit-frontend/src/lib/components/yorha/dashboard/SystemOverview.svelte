@@ -1,6 +1,6 @@
 <script lang="ts">
  import { appActions, appStore } from '$lib/stores/app-store';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let { webgpuCapabilities = null, cpuCapabilities = null } = $props();
 
@@ -54,16 +54,19 @@
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  loadSystemMetrics();
 
  // Update health metrics periodically
  const interval = window.setInterval(() => {
  loadSystemMetrics();
- }, 30000); // Update every 30 seconds
+ },
+	30000); // Update every 30 seconds
 
  return () => clearInterval(interval);
- });
+ 
+});
 
  function getHealthColor(score: number): string {
  if (score >= 90) return 'text-green-400';

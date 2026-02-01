@@ -6,11 +6,16 @@ import type { ServiceConfig } from './types.js';
  * Tracks error analysis progress and improvement metrics
  */
 export interface ProgressMetrics {
- totalErrors: number;, errorsAnalyzed: number;
- errorsFixed: number;, errorsFailed: number;
- successRate: number;, errorReduction: number;
- averageConfidence: number;, startTime: string;
- lastUpdateTime: string;, estimatedTimeRemaining: number;
+ totalErrors: number;
+	errorsAnalyzed: number;
+ errorsFixed: number;
+	errorsFailed: number;
+ successRate: number;
+	errorReduction: number;
+ averageConfidence: number;
+	startTime: string;
+ lastUpdateTime: string;
+	estimatedTimeRemaining: number;
 }
 
 /**
@@ -18,9 +23,11 @@ export interface ProgressMetrics {
  * Comprehensive progress summary
  */
 export interface ProgressReport {
- sessionId: string;, metrics: ProgressMetrics;
+ sessionId: string;
+	metrics: ProgressMetrics;
  status: 'not_started' | 'in_progress' | 'paused' | 'completed';
- elapsedTime: number;, completionPercentage: number;
+ elapsedTime: number;
+	completionPercentage: number;
 }
 
 /**
@@ -101,7 +108,8 @@ export class ProgressTracker extends BaseService {
  this.metrics.successRate = (this.metrics.errorsFixed / this.metrics.errorsAnalyzed) * 100;
  }
 
- // Update average confidencethis.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
+ // Update average confidence
+this.metrics.averageConfidence * (this.metrics.errorsAnalyzed - 1) + confidence;
  this.metrics.averageConfidence = totalConfidence / this.metrics.errorsAnalyzed;
 
  // Update error reduction
@@ -173,7 +181,7 @@ export class ProgressTracker extends BaseService {
  return {
  sessionId: this.sessionId,
  metrics: { ...this.metrics },
- status: this.status,
+	status: this.status,
  elapsedTime: completionPercentage,
  };
  }

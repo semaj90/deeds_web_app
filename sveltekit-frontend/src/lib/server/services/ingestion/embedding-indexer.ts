@@ -9,9 +9,12 @@ import type { ProcessedDocument } from './document-processor.js';
 // Removed DocumentChunk type alias if it was causing issues or not exported correctly
 
 export interface IndexingResult {
-	documentId: string;, chunksIndexed: number;
-	embeddingsGenerated: number;, qdrantIndexed: number;
-	elasticsearchIndexed: number;, executionTimeMs: number;
+	documentId: string;
+	chunksIndexed: number;
+	embeddingsGenerated: number;
+	qdrantIndexed: number;
+	elasticsearchIndexed: number;
+	executionTimeMs: number;
 }
 
 export class EmbeddingIndexer {
@@ -28,7 +31,8 @@ export class EmbeddingIndexer {
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, model: process.env.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
+	body: JSON.stringify({
+	model: process.env.OLLAMA_EMBEDDING_MODEL ?? 'embeddinggemma:latest',
 						prompt: text
 					})
 				}
@@ -108,7 +112,8 @@ export class EmbeddingIndexer {
 				const response = await fetch(`${esUrl}/legal_documents/_doc/${chunk.id}`, {
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, document_id: document.id,
+	body: JSON.stringify({
+	document_id: document.id,
 						title: document.title,
 						text: chunk.text,
 						holding: chunk.holding,
@@ -142,7 +147,7 @@ export class EmbeddingIndexer {
 			const response = await fetch('/api/ingestion/store-document', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ document })
+	body: JSON.stringify({ document })
 			});
 
 			if (!response.ok) {
@@ -223,9 +228,12 @@ export class EmbeddingIndexer {
 	/**
 	 * Get indexing statistics
 	 */
-	getIndexingStats(results: IndexingResult[]): {, totalDocuments: number;
-		totalChunks: number;, totalEmbeddings: number;
-		avgTimePerDocument: number;, totalTimeMs: number;
+	getIndexingStats(results: IndexingResult[]): {
+	totalDocuments: number;
+		totalChunks: number;
+	totalEmbeddings: number;
+		avgTimePerDocument: number;
+	totalTimeMs: number;
 	} {
 		const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
 		const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);

@@ -11,7 +11,7 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
     retryStrategy(times) {
         return Math.min(times * 50, 2000);
     },
-    maxRetriesPerRequest: 3
+	maxRetriesPerRequest: 3
 });
 
 redis.on('error', (err) => {
@@ -197,8 +197,10 @@ export async function getCacheHealth() {
     } catch (error) {
         return {
             connected: error instanceof Error ? error.message : 'Unknown error',
-            stats: {, embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
-                search: {, hits: 0, misses: 0, total: 0, hitRate: '0.00' }
+            stats: {
+	embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
+	search: {
+	hits: 0, misses: 0, total: 0, hitRate: '0.00' }
             }
         };
     }

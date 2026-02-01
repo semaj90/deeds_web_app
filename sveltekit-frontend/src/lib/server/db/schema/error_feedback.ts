@@ -26,7 +26,7 @@ export const errorFeedbackTable = pgTable('error_feedback',
         // Timestamp
         createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     },
-    (table) => {
+	(table) => {
         return {
             errorEventIdIdx: index('error_feedback_error_event_id_idx').on(table.errorEventId),
             clusterIdIdx: index('error_feedback_cluster_id_idx').on(table.clusterId),

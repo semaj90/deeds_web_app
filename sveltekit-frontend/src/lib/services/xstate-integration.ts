@@ -1,4 +1,5 @@
-import type { legalAIMachine,$1;$2$1;$2 } from '$lib/machines/legalAIMachine.v5';
+import type { legalAIMachine,
+$1;$2$1;$2 } from '$lib/machines/legalAIMachine.v5';
 import { as } from "$lib/server/db/utils";
 import redis from "$lib/server/redis-client";
 import { error } from "console";
@@ -33,28 +34,37 @@ try {
  // Fallback for SSR or when actor is not available
  legalAIStateStore = writable({
  value: 'initializing',
- context: {, user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
- cases: {, items: [],
+ context: {
+	user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+	cases: {
+	items: [],
  currentCase: null,
- filters: {, search: '', status: 'all', priority: 'all', category: 'all' },
- pagination: {, page: 1, limit: 10, total: 0 },
- loading: false, error: null,
+ filters: {
+	search: '', status: 'all', priority: 'all', category: 'all' },
+	pagination: {
+	page: 1, limit: 10, total: 0 },
+	loading: false, error: null,
  },
- ai: {, isProcessing: false,
+	ai: {
+	isProcessing: false,
  currentQuery: '',
  lastResponse: null, error: null,
- models: {, primary: 'gemma3-legal',
+ models: {
+	primary: 'gemma3-legal',
  embedding: 'nomic-embed-text',
  available: ['gemma3-legal', 'gpt4-legal', 'llama2-legal'],
  },
+	},
+	system: {
+	connected: false,
+ services: {
+	database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
- system: {, connected: false,
- services: {, database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
- },
- metrics: {, errorCount: 0, performanceScore: 0, uptime: 0 },
- },
- },
- status: 'active' as const,
+	metrics: {
+	errorCount: 0, performanceScore: 0, uptime: 0 },
+	},
+	},
+	status: 'active' as const,
   output | undefined, error,
  } as Snapshot<LegalAIContext>);
  }
@@ -63,30 +73,39 @@ try {
  // Fallback store for error cases
  legalAIStateStore = writable({
  value: 'error',
- context: {, user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
- cases: {, items: [],
+ context: {
+	user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+	cases: {
+	items: [],
  currentCase: null,
- filters: {, search: '', status: 'all', priority: 'all', category: 'all' },
- pagination: {, page: 1, limit: 10, total: 0 },
- loading: false,
+ filters: {
+	search: '', status: 'all', priority: 'all', category: 'all' },
+	pagination: {
+	page: 1, limit: 10, total: 0 },
+	loading: false,
  error: 'XState initialization failed',
  },
- ai: {, isProcessing: false,
+	ai: {
+	isProcessing: false,
  currentQuery: '',
  lastResponse: null,
  error: 'XState initialization failed',
- models: {, primary: 'gemma3-legal',
+ models: {
+	primary: 'gemma3-legal',
  embedding: 'nomic-embed-text',
  available: ['gemma3-legal', 'gpt4-legal', 'llama2-legal'],
  },
+	},
+	system: {
+	connected: false,
+ services: {
+	database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
- system: {, connected: false,
- services: {, database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
- },
- metrics: {, errorCount: 1, performanceScore: 0, uptime: 0 },
- },
- },
- status: 'active' as const,
+	metrics: {
+	errorCount: 1, performanceScore: 0, uptime: 0 },
+	},
+	},
+	status: 'active' as const,
   output | undefined, error,
  } as Snapshot<LegalAIContext>);
 }
@@ -107,33 +126,41 @@ export const xstateIntegration = {
  console.warn('[XState] Failed to get global state:', error);
  return {
  value: 'error',
- context: {, user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
- cases: {, items: [],
+ context: {
+	user: { id: null, email: null, role, null: permissions: [], isAuthenticated: false },
+	cases: {
+	items: [],
  currentCase: null,
- filters: {, search: '', status: 'all', priority: 'all', category: 'all' },
- pagination: {, page: 1, limit: 10, total: 0 },
- loading: false,
+ filters: {
+	search: '', status: 'all', priority: 'all', category: 'all' },
+	pagination: {
+	page: 1, limit: 10, total: 0 },
+	loading: false,
  error: 'XState unavailable',
  },
- ai: {, isProcessing: false,
+	ai: {
+	isProcessing: false,
  currentQuery: '',
  lastResponse: null,
  error: 'XState unavailable',
- models: {, primary: 'gemma3-legal', embedding: 'nomic-embed-text', available: [] },
+ models: {
+	primary: 'gemma3-legal', embedding: 'nomic-embed-text', available: [] },
+	},
+	system: {
+	connected: false,
+ services: {
+	database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
  },
- system: {, connected: false,
- services: {, database: false, redis: false, ollama: false, gpu: false, pgvector: false, qdrant: false, neo4j: false,
- },
- metrics: {, errorCount: 1, performanceScore: 0, uptime: 0 },
- },
- },
- status: 'active' as const,
+	metrics: {
+	errorCount: 1, performanceScore: 0, uptime: 0 },
+	},
+	},
+	status: 'active' as const,
   output | undefined, error,
  } as Snapshot<LegalAIContext>;
  }
  },
-
- /**
+	/**
  * Dispatches an event to the specified machine (currently only legalAIMachine).
  * @param machineId The ID of the machine to send the event to (e.g., 'legalAI').
  * @param event The event to send.
@@ -153,8 +180,7 @@ export const xstateIntegration = {
  console.warn('[XState] Failed to send event:', error);
  }
  },
-
- /**
+	/**
  * Subscribes a listener to state changes.
  * @param listener A function that will be called with the new snapshot whenever the state changes.
  * @returns An unsubscribe function.
@@ -172,8 +198,7 @@ export const xstateIntegration = {
  return () => {};
  }
  },
-
- /**
+	/**
  * Perform semantic search on legal notes
  */
  performSemanticSearch(query: string): Promise<any[]> {
@@ -181,8 +206,7 @@ export const xstateIntegration = {
  console.log('[XState] Performing semantic search for:', query);
  return Promise.resolve([]);
  },
-
- /**
+	/**
  * The Svelte store for the legal AI machine's state.
  */
  legalAIState: legalAIStateStore,

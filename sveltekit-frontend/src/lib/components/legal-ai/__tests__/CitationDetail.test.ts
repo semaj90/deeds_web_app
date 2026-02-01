@@ -35,7 +35,7 @@ describe('CitationDetail Component', () => {
  it('should render citation detail', () => {
  const { container } = render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(container.querySelector('.citation-detail')).toBeTruthy();
  });
@@ -43,7 +43,7 @@ describe('CitationDetail Component', () => {
  it('should display statute code', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText('18 U.S.C. § 1001')).toBeTruthy();
  });
@@ -51,7 +51,7 @@ describe('CitationDetail Component', () => {
  it('should display statute title', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText('Fraud and false statements')).toBeTruthy();
  });
@@ -59,7 +59,7 @@ describe('CitationDetail Component', () => {
  it('should display metadata', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText('Federal')).toBeTruthy();
  expect(screen.getByText('Felony')).toBeTruthy();
@@ -69,7 +69,7 @@ describe('CitationDetail Component', () => {
  it('should display highlighted text', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText('Fraud and false statements')).toBeTruthy();
  });
@@ -77,15 +77,16 @@ describe('CitationDetail Component', () => {
  it('should display notes', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText('Important statute')).toBeTruthy();
  });
 
  it('should display action buttons when showActions is true', () => {
  render(CitationDetail, {
- props: {, citation: mockCitation, showActions: true },
- });
+ props: {
+	citation: mockCitation, showActions: true },
+	});
 
  expect(screen.getByTitle('Attach to case')).toBeTruthy();
  expect(screen.getByTitle('Edit notes')).toBeTruthy();
@@ -94,8 +95,9 @@ describe('CitationDetail Component', () => {
 
  it('should hide action buttons when showActions is false', () => {
  render(CitationDetail, {
- props: {, citation: mockCitation, showActions: false },
- });
+ props: {
+	citation: mockCitation, showActions: false },
+	});
 
  expect(screen.queryByTitle('Attach to case')).toBeFalsy();
  expect(screen.queryByTitle('Edit notes')).toBeFalsy();
@@ -104,8 +106,9 @@ describe('CitationDetail Component', () => {
 
  it('should allow editing notes', async () => {
  const { component } = render(CitationDetail, {
- props: {, citation: mockCitation, showActions: true },
- });
+ props: {
+	citation: mockCitation, showActions: true },
+	});
 
  const editButton = screen.getByTitle('Edit notes');
  await fireEvent.click(editButton);
@@ -121,12 +124,13 @@ describe('CitationDetail Component', () => {
  ok: true, json: async () => ({
  success: true,
  citation: { ...mockCitation, notes: 'Updated notes' },
- }),
+	}),
  });
 
  const { component } = render(CitationDetail, {
- props: {, citation: mockCitation, showActions: true },
- });
+ props: {
+	citation: mockCitation, showActions: true },
+	});
 
  const editButton = screen.getByTitle('Edit notes');
  await fireEvent.click(editButton);
@@ -140,7 +144,7 @@ describe('CitationDetail Component', () => {
  it('should display timestamps', () => {
  render(CitationDetail, {
  props: { citation, mockCitation },
- });
+	});
 
  expect(screen.getByText(/Created:/)).toBeTruthy();
  expect(screen.getByText(/Updated:/)).toBeTruthy();
@@ -148,8 +152,9 @@ describe('CitationDetail Component', () => {
 
  it('should emit attach-to-case event', async () => {
  const { component } = render(CitationDetail, {
- props: {, citation: mockCitation, showActions: true },
- });
+ props: {
+	citation: mockCitation, showActions: true },
+	});
 
  const attachButton = screen.getByTitle('Attach to case');
  await fireEvent.click(attachButton);
@@ -162,8 +167,9 @@ describe('CitationDetail Component', () => {
  window.confirm = vi.fn(() => true);
 
  const { component } = render(CitationDetail, {
- props: {, citation: mockCitation, showActions: true },
- });
+ props: {
+	citation: mockCitation, showActions: true },
+	});
 
  const deleteButton = screen.getByTitle('Delete citation');
  await fireEvent.click(deleteButton);

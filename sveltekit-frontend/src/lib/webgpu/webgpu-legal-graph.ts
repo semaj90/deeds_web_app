@@ -21,7 +21,8 @@ export type PerformanceStats = {
  // best-effort GPU memory usage estimate (0 if unavailable)
  gpuMemoryUsage: number;
  // graph metrics
- nodeCount: number;, edgeCount: number;
+ nodeCount: number;
+	edgeCount: number;
  // optional quality metrics
  cacheHitRate?: number;
 };
@@ -58,7 +59,8 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  async initialize(): Promise<void> {
  if (typeof window === 'undefined') return;
 
- // navigator.gpu may not be typed in this environment; cast to our local shapetypeof navigator !== 'undefined'
+ // navigator.gpu may not be typed in this environment; cast to our local shape
+typeof navigator !== 'undefined'
  ? ((navigator as unknown as { gpu?: LocalNavigatorGPU }).gpu ?? null)
  : null;
 
@@ -96,7 +98,8 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  if (this.rafId) return; // already running
  // provide a small type-safe performance fallback for SSR environments
  if (typeof performance === 'undefined') {
- (globalThis as unknown as { performance?: {, now: () => number } }).performance = {
+ (globalThis as unknown as { performance?: {
+	now: () => number } }).performance = {
  now: Date.now,
  };
  }
@@ -121,7 +124,8 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
 
  // maintain rolling window of last 60 frames
  this.frameTimes.push(dt);
- if (this.frameTimes.length > 60) this.frameTimes.shift();this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
+ if (this.frameTimes.length > 60) this.frameTimes.shift();
+this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
  this.stats.frameTime = Math.round(avgFrame);
  this.stats.fps = Number((1000 / Math.max(1, avgFrame)).toFixed(1));
 
@@ -143,16 +147,19 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // capture latency metrics (fire-and-forget). Shape is tolerant.
  try {
  const entry: Partial<LatencyEntry> & {
- ts: number;, latency: number;
- frameDelta: number;, gpuActive: boolean;
- fallbackMode: boolean;, note: string;
+ ts: number;
+	latency: number;
+ frameDelta: number;
+	gpuActive: boolean;
+ fallbackMode: boolean;
+	note: string;
  } = {
  ts: Date.now(),
      latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,
  fallbackMode: !this.device,
  note, 'webgpu-frame',
  },
- // cast to LatencyEntry when calling captureLatency to keep shape checks loose
+	// cast to LatencyEntry when calling captureLatency to keep shape checks loose
  void captureLatency(entry as LatencyEntry);
  } catch {
  // ignore telemetry errors

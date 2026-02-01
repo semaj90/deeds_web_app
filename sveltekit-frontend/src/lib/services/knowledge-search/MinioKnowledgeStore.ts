@@ -14,16 +14,21 @@
 import type { FullDocument } from './types.js';
 
 export interface MinioConfig {
-  endpoint: string;, port: number;
-  useSSL: boolean;, accessKey: string;
-  secretKey: string;, bucket: string;
+  endpoint: string;
+	port: number;
+  useSSL: boolean;
+	accessKey: string;
+  secretKey: string;
+	bucket: string;
   region?: string;
 }
 
 export interface StoredDocument {
-  key: string;, content: string;
+  key: string;
+	content: string;
   metadata: Record<string, string>;
-  size: number;, lastModified: Date;
+  size: number;
+	lastModified: Date;
 }
 
 const DEFAULT_CONFIG: MinioConfig = {
@@ -34,8 +39,7 @@ const DEFAULT_CONFIG: MinioConfig = {
   bucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
   region: process.env?.MINIO_REGION ?? 'us-east-1'
 },
-
-// Maximum content size before chunking (100KB)
+	// Maximum content size before chunking (100KB)
 const MAX_CHUNK_SIZE = 100 * 1024;
 
 /**
@@ -248,7 +252,8 @@ export class MinioKnowledgeStore {
   /**
    * Get storage statistics
    */
-  async getStats(): Promise<{, objects: number; size, string }> {
+  async getStats(): Promise<{
+	objects: number; size, string }> {
     await this.initialize();
 
     try {
@@ -393,7 +398,8 @@ export class MinioKnowledgeStore {
    * Build URL for MinIO request
    */
   private buildUrl(key: string): string {
-    const protocol = this.config.useSSL ? 'https' : 'http';? `:${this.config.port}`
+    const protocol = this.config.useSSL ? 'https' : 'http';
+? `:${this.config.port}`
       : '';
     return `${protocol}://${this.config.endpoint}${port}/${this.config.bucket}/${key}`;
   }

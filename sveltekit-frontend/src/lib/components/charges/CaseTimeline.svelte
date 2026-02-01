@@ -7,28 +7,33 @@ https, //svelte.dev/e/css_empty_declaration -->
 <!-- @migration-task Error while migrating Svelte code: Declaration cannot be empty
 https, //svelte.dev/e/css_empty_declaration -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let { caseId = '' }: {
 		caseId?: string;
 	} = $props();
 
 	interface TimelineEvent {
-		id: string;, actionType: string;
-		description: string;, time: string;
-		payload: any;, createdAt: string;
+		id: string;
+	actionType: string;
+		description: string;
+	time: string;
+		payload: any;
+	createdAt: string;
 	}
 
 	let events: TimelineEvent[] = [];
 	let isLoading = false;
 	let error = '';
 
-	onMount(() => {
+	$effect(() => {
+
 		loadTimeline();
 		// Refresh timeline every 5 seconds
 		const interval = setInterval(loadTimeline, 5000);
 		return () => clearInterval(interval);
-	});
+	
+});
 
 	async function loadTimeline() {
 		if (!caseId) return;

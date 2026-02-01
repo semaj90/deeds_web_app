@@ -121,7 +121,8 @@ export async function storeEmbedding(
 		if (qdrantClient) {
 			await (qdrantClient as any).upsert({
 				collectionName: _CFG.QDRANT_COLLECTION ?? 'legal_embeddings',
-				points: [{, id: recordId, vector: embedding, payload: metadata }]
+				points: [{
+	id: recordId, vector: embedding, payload: metadata }]
 			});
 		}
 	} catch (err) {

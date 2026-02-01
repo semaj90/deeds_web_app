@@ -10,30 +10,41 @@
 
  // Define types locally to avoid importing server schema in browser
  type EvidenceNodeType = {
- id: string;, caseId: string;
+ id: string;
+	caseId: string;
  title: string;
- description?: string;, evidenceType: string;
+ description?: string;
+	evidenceType: string;
  fileType?: string;
  fileName?: string;
- fileUrl?: string;, canvasPosition: { x: number;, y: number };
- uploadedBy?: number;, uploadedAt: string;
- updatedAt: string;, x: number;
+ fileUrl?: string;
+	canvasPosition: { x: number;
+	y: number };
+ uploadedBy?: number;
+	uploadedAt: string;
+ updatedAt: string;
+	x: number;
  y: number;
  };
 
  type EvidenceConnection = {
- id: string;, caseId: string;
- fromEvidenceId: string;, toEvidenceId: string;
+ id: string;
+	caseId: string;
+ fromEvidenceId: string;
+	toEvidenceId: string;
  connectionType: string;
  label?: string;
- notes?: string;, strength: number;
+ notes?: string;
+	strength: number;
  isVisible: boolean;
- createdBy?: number;, createdAt: string;
+ createdBy?: number;
+	createdAt: string;
  updatedAt: string;
  };
  type BoardMode = 'grid' | 'free' | 'magnetic';
 
- let { caseId, initialNodes = [], initialConnections = [] }: {, caseId: string;
+ let { caseId, initialNodes = [], initialConnections = [] }: {
+	caseId: string;
  initialNodes?: EvidenceNodeType[];
  initialConnections?: EvidenceConnection[]
  } = $props();
@@ -52,23 +63,23 @@
  // Relationship types for the selector
  const relationshipTypes = [
  { value: 'supports', label: 'Supports' },
- { value: 'contradicts', label: 'Contradicts' },
- { value: 'same_person', label: 'Same Person' },
- { value: 'timeline', label: 'Timeline' },
- { value: 'chain_of_custody', label: 'Chain of Custody' },
- { value: 'corroborates', label: 'Corroborates' },
- { value: 'alibi', label: 'Alibi' },
- { value: 'motive', label: 'Motive' },
- { value: 'opportunity', label: 'Opportunity' },
- { value: 'means', label: 'Means' },
- { value: 'witness_statement', label: 'Witness Statement' },
- { value: 'physical_evidence', label: 'Physical Evidence' },
- { value: 'digital_evidence', label: 'Digital Evidence' },
- { value: 'circumstantial', label: 'Circumstantial' },
- { value: 'direct_evidence', label: 'Direct Evidence' },
- { value: 'hearsay', label: 'Hearsay' },
- { value: 'privileged', label: 'Privileged' },
- { value: 'inadmissible', label: 'Inadmissible' }
+	{ value: 'contradicts', label: 'Contradicts' },
+	{ value: 'same_person', label: 'Same Person' },
+	{ value: 'timeline', label: 'Timeline' },
+	{ value: 'chain_of_custody', label: 'Chain of Custody' },
+	{ value: 'corroborates', label: 'Corroborates' },
+	{ value: 'alibi', label: 'Alibi' },
+	{ value: 'motive', label: 'Motive' },
+	{ value: 'opportunity', label: 'Opportunity' },
+	{ value: 'means', label: 'Means' },
+	{ value: 'witness_statement', label: 'Witness Statement' },
+	{ value: 'physical_evidence', label: 'Physical Evidence' },
+	{ value: 'digital_evidence', label: 'Digital Evidence' },
+	{ value: 'circumstantial', label: 'Circumstantial' },
+	{ value: 'direct_evidence', label: 'Direct Evidence' },
+	{ value: 'hearsay', label: 'Hearsay' },
+	{ value: 'privileged', label: 'Privileged' },
+	{ value: 'inadmissible', label: 'Inadmissible' }
  ];
 
  // Reactive statements for store values
@@ -77,7 +88,8 @@
 
  // Grid snapping
  const GRID_SIZE = 50;
- function snapToGrid(x: number, y: number): {, x: number; y: number } {
+ function snapToGrid(x: number, y: number): {
+	x: number; y: number } {
  return {
  x: Math.round(x / GRID_SIZE) * GRID_SIZE,
  y: Math.round(y / GRID_SIZE) * GRID_SIZE,
@@ -93,7 +105,8 @@
  const response = await fetch('/api/evidence/ai/magnetize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, nodes: currentNodes, connections: currentConnections,
+	body: JSON.stringify({
+	nodes: currentNodes, connections: currentConnections,
  caseId,
  }),
  });
@@ -157,7 +170,8 @@
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, x: newX, y: newY }),
+	body: JSON.stringify({
+	x: newX, y: newY }),
  });
  }
 
@@ -169,7 +183,8 @@
  const response = await fetch('/api/evidence/connections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, fromNodeId: selected[0],
+	body: JSON.stringify({
+	fromNodeId: selected[0],
  toNodeId: selected[1],
  caseId,
  strength: 0.5, // Default strength
@@ -191,7 +206,8 @@
  const response = await fetch('/api/evidence/relationships', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: fromEvidenceId,
+	body: JSON.stringify({
+	caseId: fromEvidenceId,
  toEvidenceId: relationshipType,
  strength: 'medium',
  label: relationshipType.replace('_', ' ')
@@ -292,7 +308,8 @@
  if (boardMode === 'magnetic') {
  applyMagneticForces();
  }
- }, 2000); // Apply forces every 2 seconds
+ },
+	2000); // Apply forces every 2 seconds
 
  return () => clearInterval(magneticInterval);
  });
@@ -382,14 +399,16 @@
 <style>
  .evidence-board-container {
  display: flex;
- flex-direction: column;, height: 100vh;
+ flex-direction: column;
+	height: 100vh;
  background: #f8f9fa;
  }
 
  .board-toolbar {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
+ align-items: center;
+	padding: 1rem;
  background: white;
  border-bottom: 1px solid #e9ecef;
  gap: 1rem;
@@ -400,38 +419,47 @@
  }
 
  .actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  align-items: center;
  }
 
  .relationship-selector {
  display: flex;
- align-items: center;, gap: 0.5rem;
- background: #f0f9ff;, padding: 0.5rem;
- border-radius: 0.375rem;, border: 1px solid #0ea5e9;
+ align-items: center;
+	gap: 0.5rem;
+ background: #f0f9ff;
+	padding: 0.5rem;
+ border-radius: 0.375rem;
+	border: 1px solid #0ea5e9;
  }
 
  .relationship-label {
  font-size: 0.875rem;
- font-weight: 500;, color: #0c4a6e;
+ font-weight: 500;
+	color: #0c4a6e;
  white-space: nowrap;
  }
 
  .relationship-select {
  padding: 0.25rem 0.5rem;
  border: 1px solid #cbd5e1;
- border-radius: 0.25rem;, background: white;
+ border-radius: 0.25rem;
+	background: white;
  font-size: 0.875rem;
  min-width: 140px;
  }
 
  .board-main-content {
- flex: 1;, display: flex;
+ flex: 1;
+	display: flex;
  }
 
  .board-canvas {
- flex: 1;, position: relative;
- overflow: hidden;, background: white;
+ flex: 1;
+	position: relative;
+ overflow: hidden;
+	background: white;
  }
 
  .board-canvas.grid-mode {

@@ -1,6 +1,28 @@
-import type { User } from '$lib/types';
-import type { Case } from '$lib/types';
-import { z } from 'zod'; // Case creation form schema export const caseFormSchema = z.object({ caseNumber, z .string() .min(1, 'Case, number is required') .max(50, 'Case, number too long') .regex(/^[A-Z]{ 2: 4 }-\d{ 4 }-\d{ 6 }$/, 'Case, number must follow: ABC-2024-123456', title: z.string().min(1, 'Title is required').max(200, 'Title too long', description: z .string() .min(10, 'Description must be at least, 10 characters') .max(1000, 'Description too long') .optional( priority: z.enum(['low', 'medium', 'high'], { errorMap: () => ({ message: 'Please select a priority level' }) }, status: z .enum(['draft', 'active', 'pending', 'closed'], { errorMap: () => ({ message: 'Please select a status' }) }) .default('draft', assignedTo: z.string().uuid('Please select a valid user').optional( dueDate: z .string() .optional() .refine( date => { if (!date) return true; const parsed = new Date(date); return !Number.isNaN(parsed.getTime()) && parsed > new Date()}, { message: 'Due date must be in the future' } , tags: z.array(z.string().min(1).max(30)).max(10, 'Maximum, 10 tags allowed').optional( isConfidential: z.boolean().default(false, notifyAssignee: z.boolean().default(true) });
+import type {
+User }
+from '$lib/types';
+import type {
+Case }
+from '$lib/types';
+import {
+z }
+from 'zod';
+// Case creation form schema export const caseFormSchema = z.object({
+caseNumber, z .string() .min(1, 'Case, number is required') .max(50, 'Case, number too long') .regex(/^[A-Z]{
+2: 4 }-\d{
+4 }-\d{
+6 }$/, 'Case, number must follow: ABC-2024-123456', title: z.string().min(1, 'Title is required').max(200, 'Title too long', description: z .string() .min(10, 'Description must be at least, 10 characters') .max(1000, 'Description too long') .optional( priority: z.enum(['low', 'medium', 'high'], {
+errorMap: () => ({
+message: 'Please select a priority level' }) },
+	status: z .enum(['draft', 'active', 'pending', 'closed'], {
+errorMap: () => ({
+message: 'Please select a status' }) }) .default('draft', assignedTo: z.string().uuid('Please select a valid user').optional( dueDate: z .string() .optional() .refine( date => {
+if (!date) return true;
+const parsed = new Date(date);
+return !Number.isNaN(parsed.getTime()) && parsed > new Date()},
+	{
+message: 'Due date must be in the future' }
+, tags: z.array(z.string().min(1).max(30)).max(10, 'Maximum, 10 tags allowed').optional( isConfidential: z.boolean().default(false, notifyAssignee: z.boolean().default(true) });
   
 
 

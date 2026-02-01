@@ -68,7 +68,7 @@ export const wardenEvidence = pgTable(
         prevSha256: varchar('prev_sha256', { length: 64 }), // Version lineage
         createdAt: timestamp('created_at').defaultNow(),
     },
-    (table) => ({
+	(table) => ({
         caseIdIdx: index('warden_evidence_case_id_idx').on(table.caseId),
         sha256Idx: index('warden_evidence_sha256_idx').on(table.sha256),
         statusIdx: index('warden_evidence_status_idx').on(table.status),
@@ -107,7 +107,7 @@ export const wardenChunks = pgTable(
         latent128: vector('latent128', { dimensions: 128 }), // Autoencoder compressed
         createdAt: timestamp('created_at').defaultNow(),
     },
-    (table) => ({
+	(table) => ({
         evidenceIdIdx: index('warden_chunks_evidence_id_idx').on(table.evidenceId),
         caseIdIdx: index('warden_chunks_case_id_idx').on(table.caseId),
     })
@@ -131,7 +131,7 @@ export const wardenCitations = pgTable(
         page: integer('page'),
         createdAt: timestamp('created_at').defaultNow(),
     },
-    (table) => ({
+	(table) => ({
         evidenceIdIdx: index('warden_citations_evidence_id_idx').on(table.evidenceId),
         caseIdIdx: index('warden_citations_case_id_idx').on(table.caseId),
     })
@@ -183,7 +183,7 @@ export const wardenAuditLog = pgTable(
         sha256: varchar('sha256', { length: 64 }), // Evidence hash for immutability
         timestamp: timestamp('timestamp').defaultNow(),
     },
-    (table) => ({
+	(table) => ({
         prosecutorIdIdx: index('warden_audit_log_prosecutor_id_idx').on(table.prosecutorId),
         caseIdIdx: index('warden_audit_log_case_id_idx').on(table.caseId),
         actionIdx: index('warden_audit_log_action_idx').on(table.action),
@@ -221,7 +221,7 @@ export const wardenCitationGraph = pgTable(
         approvedAt: timestamp('approved_at'),
         createdAt: timestamp('created_at').defaultNow(),
     },
-    (table) => ({
+	(table) => ({
         caseIdIdx: index('warden_citation_graph_case_id_idx').on(table.caseId),
         citedCaseIdIdx: index('warden_citation_graph_cited_case_id_idx').on(table.citedCaseId),
     })

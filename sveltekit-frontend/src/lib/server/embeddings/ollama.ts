@@ -7,7 +7,8 @@
  */
 
 export type OllamaEmbedResult = {
-  model: string;, embedding: number[];
+  model: string;
+	embedding: number[];
 };
 
 type OllamaEmbedResponse = {
@@ -37,7 +38,7 @@ export async function tryEmbedOllama(
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, prompt: text }),
+	body: JSON.stringify({ model, prompt: text }),
       signal
     });
 

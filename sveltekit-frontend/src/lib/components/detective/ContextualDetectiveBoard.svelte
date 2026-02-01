@@ -6,7 +6,7 @@
   import HeadlessTypingListener from '$lib/components/HeadlessTypingListener.svelte';
   import type { TypingContext, TypingState } from '$lib/machines/userTypingStateMachine';
   import DetectiveWebSocketManager, { type CollaborativeUser } from '$lib/websocket/DetectiveWebSocketManager';
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
 
   // Props interface
   interface Props {
@@ -28,7 +28,9 @@
   // State
   let userInput = $state<string>('');
   let connectionMap = $state<{
-    nodes?: {, type: string; label: string;, color: string }[];
+    nodes?: {
+	type: string; label: string;
+	color: string }[];
     edges?: unknown[];
     clusters?: unknown[];
   } | null>(null);
@@ -37,8 +39,10 @@
   let typingContext = $state<TypingContext | undefined>(undefined);
   let contextualPrompts = $state<string[]>([]);
   let detectiveAnalysis = $state<{
-    keyEntities?: {, name: string; type: string }[];
-    suggestedConnections?: {, description: string; confidence: number }[];
+    keyEntities?: {
+	name: string; type: string }[];
+    suggestedConnections?: {
+	description: string; confidence: number }[];
     anomalies?: unknown[];
     timelineGaps?: unknown[];
   } | null>(null);
@@ -51,7 +55,8 @@
   let collaborationStats = $state({
     connectedUsers: 0,
     typingUsers: 0,
-    focusDistribution: {, evidence: 0, connections: 0, analysis: 0 }
+    focusDistribution: {
+	evidence: 0, connections: 0, analysis: 0 }
   });
 
   // Typing behavior element binding
@@ -81,11 +86,11 @@
   /**
    * Cleanup on destroy
    */
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (wsManager) {
       wsManager.disconnect();
     }
-  });
+  }
 
   /**
    * Load case evidence from API
@@ -170,7 +175,8 @@
   /**
    * Handle typing state changes from the headless listener
    */
-  function handleTypingStateChange(event: CustomEvent<{, state: TypingState; context: TypingContext }>) {
+  function handleTypingStateChange(event: CustomEvent<{
+	state: TypingState; context: TypingContext }>) {
     currentTypingState = event.detail.state;
     typingContext = event.detail.context;
 
@@ -188,7 +194,8 @@
   /**
    * Handle contextual prompts from typing behavior
    */
-  function handleContextualPrompt(event: CustomEvent<{, prompts: string[]; context: TypingContext }>) {
+  function handleContextualPrompt(event: CustomEvent<{
+	prompts: string[]; context: TypingContext }>) {
     contextualPrompts = [...event.detail.prompts];
 
     // Add detective-specific contextual prompts
@@ -206,7 +213,8 @@
   /**
    * Handle analytics updates from typing behavior
    */
-  function handleAnalyticsUpdate(event: CustomEvent<{, analytics: unknown }>) {
+  function handleAnalyticsUpdate(event: CustomEvent<{
+	analytics: unknown }>) {
     if (enableAnalytics) {
       console.log('[ContextualDetectiveBoard] Analytics update:', event.detail.analytics);
     }
@@ -223,7 +231,8 @@
       const response = await fetch(`${mcpEndpoint}/mcp/detective-analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, text: userInput,
+	body: JSON.stringify({
+	text: userInput,
           caseId,
           evidence: evidenceList,
           analysisType: 'contextual_detective',
@@ -255,12 +264,13 @@
       const response = await fetch('/api/v1/detective/connections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+	body: JSON.stringify({
           caseId,
           focusTypes: ['people', 'evidence', 'locations', 'events'],
           connectionStrength: 0.4,
           maxDepth: 3,
-          options: {, includeWeakConnections: true,
+          options: {
+	includeWeakConnections: true,
             includePredictedConnections: true,
             clusterSimilar: true,
             layout: 'force'
@@ -488,7 +498,8 @@
 <style>
   .contextual-detective-board {
     display: flex;
-    flex-direction: column;, height: 100vh;
+    flex-direction: column;
+	height: 100vh;
     background: #f8fafc;
     font-family: system-ui, -apple-system, sans-serif;
   }
@@ -496,7 +507,8 @@
   .board-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;, padding: 1rem 2rem;
+    align-items: center;
+	padding: 1rem 2rem;
     background: white;
     border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -504,7 +516,8 @@
 
   .case-info h1 {
     margin: 0;
-    font-size: 1.5rem;, color: #1e293b;
+    font-size: 1.5rem;
+	color: #1e293b;
   }
 
   .case-id {
@@ -514,17 +527,20 @@
   }
 
   .analytics-panel {
-    display: flex;, gap: 1.5rem;
+    display: flex;
+	gap: 1.5rem;
   }
 
   .metric {
     display: flex;
     flex-direction: column;
-    align-items: center;, gap: 0.25rem;
+    align-items: center;
+	gap: 0.25rem;
   }
 
   .metric .label {
-    font-size: 0.75rem;, color: #64748b;
+    font-size: 0.75rem;
+	color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -535,14 +551,18 @@
   }
 
   .analysis-area {
-    flex: 1;, padding: 2rem;
-    overflow-y: auto;, display: flex;
-    flex-direction: column;, gap: 2rem;
+    flex: 1;
+	padding: 2rem;
+    overflow-y: auto;
+	display: flex;
+    flex-direction: column;
+	gap: 2rem;
   }
 
   .input-section {
     background: white;
-    border-radius: 0.5rem;, padding: 1.5rem;
+    border-radius: 0.5rem;
+	padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
@@ -555,27 +575,33 @@
 
   .input-header h2 {
     margin: 0;
-    font-size: 1.25rem;, color: #1e293b;
+    font-size: 1.25rem;
+	color: #1e293b;
   }
 
   .typing-indicator {
     padding: 0.25rem 0.75rem;
     border-radius: 1rem;
     font-size: 0.75rem;
-    font-weight: 500;, color: #64748b;
-    background: #f1f5f9;, transition: all 0.2s;
+    font-weight: 500;
+	color: #64748b;
+    background: #f1f5f9;
+	transition: all 0.2s;
   }
 
   .typing-indicator.active {
-    color: #059669;, background: #dcfce7;
+    color: #059669;
+	background: #dcfce7;
   }
 
   .analysis-input {
-    width: 100%;, padding: 1rem;
+    width: 100%;
+	padding: 1rem;
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
     font-size: 1rem;
-    line-height: 1.5;, resize: vertical;
+    line-height: 1.5;
+	resize: vertical;
     font-family: inherit;
   }
 
@@ -586,7 +612,8 @@
   }
 
   .input-actions {
-    display: flex;, gap: 1rem;
+    display: flex;
+	gap: 1rem;
     margin-top: 1rem;
   }
 
@@ -594,12 +621,14 @@
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 0.375rem;
-    font-weight: 500;, cursor: pointer;
+    font-weight: 500;
+	cursor: pointer;
     transition: all 0.2s;
   }
 
   .input-actions button:first-child {
-    background: #3b82f6;, color: white;
+    background: #3b82f6;
+	color: white;
   }
 
   .input-actions button:first-child: hover, not(:disabled) {
@@ -607,11 +636,13 @@
   }
 
   .input-actions button:first-child:disabled {
-    background: #9ca3af;, cursor: not-allowed;
+    background: #9ca3af;
+	cursor: not-allowed;
   }
 
   .input-actions button:last-child {
-    background: #f3f4f6;, color: #374151;
+    background: #f3f4f6;
+	color: #374151;
   }
 
   .input-actions button:last-child:hover {
@@ -620,50 +651,60 @@
 
   .contextual-prompts {
     background: white;
-    border-radius: 0.5rem;, padding: 1.5rem;
+    border-radius: 0.5rem;
+	padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .contextual-prompts h3 {
     margin: 0 0 1rem 0;
-    font-size: 1.125rem;, color: #1e293b;
+    font-size: 1.125rem;
+	color: #1e293b;
   }
 
   .prompts-list {
     display: flex;
-    flex-wrap: wrap;, gap: 0.5rem;
+    flex-wrap: wrap;
+	gap: 0.5rem;
   }
 
   .prompt-button {
     padding: 0.5rem 1rem;
-    background: #f0f9ff;, color: #0369a1;
+    background: #f0f9ff;
+	color: #0369a1;
     border: 1px solid #0ea5e9;
     border-radius: 1rem;
-    font-size: 0.875rem;, cursor: pointer;
+    font-size: 0.875rem;
+	cursor: pointer;
     transition: all 0.2s;
   }
 
   .prompt-button:hover {
-    background: #0ea5e9;, color: white;
+    background: #0ea5e9;
+	color: white;
   }
 
   .connection-map,
   .detective-analysis {
     background: white;
-    border-radius: 0.5rem;, padding: 1.5rem;
+    border-radius: 0.5rem;
+	padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .connection-map h3,
   .detective-analysis h3 {
     margin: 0 0 1rem 0;
-    font-size: 1.125rem;, color: #1e293b;
+    font-size: 1.125rem;
+	color: #1e293b;
   }
 
   .map-stats {
-    display: flex;, gap: 1rem;
+    display: flex;
+	gap: 1rem;
     margin-bottom: 1rem;
-    font-size: 0.875rem;, color: #64748b;
+    font-size: 0.875rem;
+	color: #64748b;
   }
 
   .nodes-preview {
@@ -674,7 +715,8 @@
 
   .node-item {
     padding: 0.75rem;
-    border-radius: 0.375rem;, color: white;
+    border-radius: 0.375rem;
+	color: white;
     font-size: 0.875rem;
   }
 
@@ -682,7 +724,8 @@
     display: block;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75rem;, opacity: 0.9;
+    font-size: 0.75rem;
+	opacity: 0.9;
   }
 
   .node-label {
@@ -699,7 +742,8 @@
   .entities h4,
   .connections h4 {
     margin: 0 0 0.5rem 0;
-    font-size: 1rem;, color: #374151;
+    font-size: 1rem;
+	color: #374151;
   }
 
   .entities ul,
@@ -710,6 +754,7 @@
 
   .entities li,
   .connections li {
-    margin-bottom: 0.25rem;, color: #4b5563;
+    margin-bottom: 0.25rem;
+	color: #4b5563;
   }
 </style>

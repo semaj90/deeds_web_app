@@ -47,7 +47,8 @@ if (browser) {
  });
   
  // Load database from IndexedDB if available
- db.loadDatabase({}, (err) => {
+ db.loadDatabase({},
+	(err) => {
  if (err) console.error('Error loading Loki.js database: ', err);
  else console.log('Loki.js database loaded.');
  });
@@ -62,7 +63,8 @@ async function webgpuRerank(
  query: string, candidates: Candidate[] | Array<Record<string, unknown>>
 ): Promise<Candidate[]> {
  const qTokens = query.toLowerCase().split(/\s+/).filter(Boolean);
- const scored = (candidates as Candidate[]).map((c) => {(c?.metadata&& (c.metadata['text'] as string)) || (c['text'] as string) ?? '';
+ const scored = (candidates as Candidate[]).map((c) => {
+(c?.metadata&& (c.metadata['text'] as string)) || (c['text'] as string) ?? '';
  const text = (textFromMeta ?? '').toLowerCase();
  let overlap = 0;
  for (const t of qTokens) {
@@ -102,7 +104,7 @@ export async function rerank(
  const res = await fetch('/api/rerank', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query, candidates, options }),
+	body: JSON.stringify({ query, candidates, options }),
  });
 
  if (!res.ok) {

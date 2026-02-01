@@ -13,7 +13,8 @@ describe('CitationSearch Component', () => {
 
   afterEach(async () => {
     await cleanupTest();
-  });{
+  });
+{
  id: 'citation-1',
  statute_code: '18 U.S.C. § 1001',
  statute_title: 'Fraud and false statements',
@@ -23,7 +24,7 @@ describe('CitationSearch Component', () => {
  source_type: 'manual' as const,
   created_at: new Date().toISOString(),
  },
- {
+	{
  id: 'citation-2',
  statute_code: '18 U.S.C. § 1002',
  statute_title: 'Possession of false papers',
@@ -61,7 +62,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  expect(container.querySelector('.search-results')).toBeTruthy();
@@ -72,7 +74,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  expect(screen.getByText('18 U.S.C. § 1001')).toBeTruthy();
@@ -84,7 +87,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  expect(screen.getByText('Federal')).toBeTruthy();
@@ -103,7 +107,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: 'nonexistent' } });
+ await fireEvent.input(input, { target: {
+	value: 'nonexistent' } });
 
  await waitFor(() => {
  expect(screen.getByText('No citations found')).toBeTruthy();
@@ -118,7 +123,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  expect(container.querySelector('.error-message')).toBeTruthy();
@@ -129,7 +135,8 @@ describe('CitationSearch Component', () => {
  const { component } = render(CitationSearch);
 
  const input = screen.getByPlaceholderText('Search citations...');
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  const resultButton = screen.getByText('18 U.S.C. § 1001').closest('button');
@@ -141,7 +148,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: '18 U.S.C.' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U.S.C.' } });
 
  await waitFor(() => {
  const clearBtn = container.querySelector('.clear-btn');
@@ -155,9 +163,12 @@ describe('CitationSearch Component', () => {
  const input = container.querySelector('.search-input') as HTMLInputElement;
 
  // Type multiple characters quickly
- await fireEvent.input(input, { target: {, value: '1' } });
- await fireEvent.input(input, { target: {, value: '18' } });
- await fireEvent.input(input, { target: {, value: '18 U' } });
+ await fireEvent.input(input, { target: {
+	value: '1' } });
+ await fireEvent.input(input, { target: {
+	value: '18' } });
+ await fireEvent.input(input, { target: {
+	value: '18 U' } });
   
  await waitFor(() => {
  expect((global.fetch as any).mock.calls.length).toBeLessThanOrEqual(3);
@@ -168,7 +179,8 @@ describe('CitationSearch Component', () => {
  const { container } = render(CitationSearch);
 
  const input = container.querySelector('.search-input') as HTMLInputElement;
- await fireEvent.input(input, { target: {, value: 'a' } });
+ await fireEvent.input(input, { target: {
+	value: 'a' } });
   
  expect(container.querySelector('.search-results')).toBeFalsy();
  });

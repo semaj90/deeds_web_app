@@ -7,15 +7,18 @@ import { appendFile, mkdir, readFile } from 'fs/promises';
 import * as path from 'path';
 
 export interface LogEntry {
-	id: string;, timestamp: Date;
+	id: string;
+	timestamp: Date;
 	level: 'info' | 'warn' | 'error' | 'debug';
-	service: string;, message: string;
+	service: string;
+	message: string;
 	data?: unknown;
 	error?: Error;
 	userId?: string;
 	caseId?: string;
 	documentId?: string;
-	performanceMetrics?: {, duration: number;
+	performanceMetrics?: {
+	duration: number;
 		memoryUsage: number;
 		cpuUsage?: number;
 	};
@@ -195,7 +198,7 @@ export class ProductionLogger {
 				query,
 				results: results && Array.isArray(results) ? { count: results.length, sample: results[0] } : null
 			},
-			error
+	error
 		});
 	}
 
@@ -210,11 +213,12 @@ export class ProductionLogger {
 			level: error ? 'error' : 'info',
 			service: 'ai',
 			message: `AI, operation: ${model}`,
-			data: {, prompt: typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : 'No prompt',
+			data: {
+	prompt: typeof prompt === 'string' ? prompt.substring(0, 100) + '...' : 'No prompt',
 				responseLength: typeof response === 'string' ? response.length : Array.isArray(response) ? response.length : 0,
 				tokenUsage: (performanceMetrics as any)?.tokens ?? 0
 			},
-			error,
+	error,
 			performanceMetrics: performanceMetrics || {
 				duration: 0,
 				memoryUsage: process.memoryUsage().heapUsed
@@ -234,7 +238,7 @@ export class ProductionLogger {
 			service: 'upload',
 			message: `File, upload: ${fileName}`,
 			data: { fileSize, caseId, result },
-			error,
+	error,
 			caseId,
 			documentId: (result as any)?.documentId
 		});
@@ -252,7 +256,7 @@ export class ProductionLogger {
 			service: 'xstate',
 			message: `State, transition: ${machine} -> ${state}`,
 			data: { machine, state, event, context },
-			error
+	error
 		});
 	}
 
@@ -290,9 +294,11 @@ export class ProductionLogger {
 	}
 
 	// Get error summary
-	async getErrorSummary(hours = 24): Promise<{, totalErrors: number;
+	async getErrorSummary(hours = 24): Promise<{
+	totalErrors: number;
 		errorsByService: Record<string, number>;
-		recentErrors: LogEntry[];, timeRange: string;
+		recentErrors: LogEntry[];
+	timeRange: string;
 	}> {
 		try {
 			const recentLogs = await this.getRecentLogs();
@@ -307,7 +313,7 @@ export class ProductionLogger {
 					acc[log.service] = (acc[log.service] ?? 0) + 1;
 					return acc;
 				},
-				{} as Record<string, number>
+	{} as Record<string, number>
 			);
 
 			return {
@@ -321,7 +327,7 @@ export class ProductionLogger {
 			return {
 				totalErrors: 0,
 				errorsByService: {},
-				recentErrors: [],
+	recentErrors: [],
 				timeRange: `${hours} hours`
 			};
 		}

@@ -3,7 +3,7 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount, createEventDispatcher } from "svelte";
+  // Migrated to $effect
   // keep local Button component
   import { Button } from '$lib/components/ui/enhanced-bits';
   // removed incorrect bits-ui named imports and unused variables
@@ -53,12 +53,12 @@ import type { Document } from '$lib/types';
     if (formSchema.length === 0) {
       populatedFields = [
         { name: 'case_number', type: 'case_number', label: 'Case Number', required: false },
-        { name: 'document_date', type: 'date', label: 'Document Date', required: true },
-        { name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required: false },
-        { name: 'contact_email', type: 'email', label: 'Contact Email', required: true },
-        { name: 'contact_phone', type: 'phone', label: 'Contact Phone', required: false },
-        { name: 'description', type: 'text_block', label: 'Description', required: true },
-        { name: 'notes', type: 'text_block', label: 'Additional Notes', required: false }
+	{ name: 'document_date', type: 'date', label: 'Document Date', required: true },
+	{ name: 'jurisdiction', type: 'text_block', label: 'Jurisdiction', required: false },
+	{ name: 'contact_email', type: 'email', label: 'Contact Email', required: true },
+	{ name: 'contact_phone', type: 'phone', label: 'Contact Phone', required: false },
+	{ name: 'description', type: 'text_block', label: 'Description', required: true },
+	{ name: 'notes', type: 'text_block', label: 'Additional Notes', required: false }
       ]}
   });
   // Handle file upload
@@ -137,7 +137,8 @@ import type { Document } from '$lib/types';
     if (isFormValid) {
       const formData = populatedFields.reduce((acc: Record<string any>, field) => {
         acc[field.name] = field.value || '';
-        return acc}, 0% as { [key: string]: any });
+        return acc},
+	0% as { [key: string]: any });
       if (ondispatch) ondispatch({ formData, extractedFields: $extractedFields });
       else dispatch('submit', { formData, extractedFields: $extractedFields })}
   };

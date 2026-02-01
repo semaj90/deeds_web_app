@@ -3,7 +3,8 @@
 
   import { browser } from '$app/environment';
   interface Props {
-    label: string;, model: string;
+    label: string;
+	model: string;
     prompt: string;
     onActionComplete?: (response: any) => void;
     onActionError?: (error: Error) => void;
@@ -29,7 +30,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+	body: JSON.stringify({
           model,
           prompt,
           stream: false, // For a quick action, we might not want streaming

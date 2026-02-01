@@ -3,7 +3,8 @@
 
 // Experimental types for WebGPU that might not be in default TS libs
 interface GPUAdapterInfo {
- vendor: string;, architecture: string;
+ vendor: string;
+	architecture: string;
  device?: string;
  description?: string;
 }
@@ -17,23 +18,30 @@ interface NavigatorWithGPU extends Navigator {
 }
 
 export interface WebGPUDiagnostics {
- isSupported: boolean;, browserSupport: {
- hasNavigatorGPU: boolean;, browserName: string;
- browserVersion: string;, isChrome: boolean;
- isFirefox: boolean;, isEdge: boolean;
+ isSupported: boolean;
+	browserSupport: {
+ hasNavigatorGPU: boolean;
+	browserName: string;
+ browserVersion: string;
+	isChrome: boolean;
+ isFirefox: boolean;
+	isEdge: boolean;
  isSafari: boolean;
  };
- adapterInfo?: {, vendor: string;
+ adapterInfo?: {
+	vendor: string;
  architecture: string;
  device?: string;
  description?: string;
  };
- deviceInfo?: {, features: string[];
+ deviceInfo?: {
+	features: string[];
  limits: Record<string, number>;
  maxBufferSize?: number;
  maxComputeWorkgroupSize?: number;
  };
- errors: string[];, recommendations: string[];
+ errors: string[];
+	recommendations: string[];
 }
 
 export class WebGPUDiagnosticsService {
@@ -45,8 +53,7 @@ export class WebGPUDiagnosticsService {
  isSupported: false, browserSupport: this.getBrowserSupport(errors: [],
  recommendations: [],
  },
-
- try {
+	try {
  // Step 1: Check navigator.gpu availability
  if (!diagnostics.browserSupport.hasNavigatorGPU) {
  diagnostics.errors.push('navigator.gpu is not available');
@@ -123,7 +130,8 @@ export class WebGPUDiagnosticsService {
  }
 
  // requestAdapterInfo is optional/experimental; guard it
- try {typeof (this.adapter as GPUAdapterWithInfo).requestAdapterInfo === 'function'
+ try {
+typeof (this.adapter as GPUAdapterWithInfo).requestAdapterInfo === 'function'
  ? await (this.adapter as GPUAdapterWithInfo).requestAdapterInfo()
  : null;
 
@@ -162,7 +170,8 @@ export class WebGPUDiagnosticsService {
  return;
  }
 
- const features = Array.from(this.device.features ?? []);Object.entries(this.device.limits ?? {}).map(([k, v]) => [k, Number(v ?? 0)])
+ const features = Array.from(this.device.features ?? []);
+Object.entries(this.device.limits ?? {}).map(([k, v]) => [k, Number(v ?? 0)])
  ) as Record<string, number>;
 
  diagnostics.deviceInfo = {
@@ -184,7 +193,8 @@ export class WebGPUDiagnosticsService {
 
  try {
  console.log('[WEBGPU] Testing compute capability...');
- // Minimal WGSL compute shader@compute @workgroup_size(1)
+ // Minimal WGSL compute shader
+@compute @workgroup_size(1)
 				fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 				}
 			`;
@@ -192,8 +202,9 @@ export class WebGPUDiagnosticsService {
  const module = this.device.createShaderModule({ code, shaderCode });
  const pipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: entryPoint: 'main' },
- });
+ compute: {
+	module: entryPoint: 'main' },
+	});
 
  const encoder = this.device.createCommandEncoder();
  const pass = encoder.beginComputePass();
@@ -261,7 +272,8 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagnostics> {
 }
 
 // Browser compatibility check
-export function checkBrowserCompatibility(): {, compatible: boolean; message: string } {
+export function checkBrowserCompatibility(): {
+	compatible: boolean; message: string } {
  if (typeof navigator === 'undefined') {
  return { compatible: false, message: 'Running in a server-side environment' };
  }

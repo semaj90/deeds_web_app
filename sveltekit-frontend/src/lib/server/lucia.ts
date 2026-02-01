@@ -7,7 +7,8 @@ import { Lucia } from 'lucia';
 
 // Define the expected return type for createUserSession
 export interface CreateUserSessionResult {
-  sessionId: string;, userId: string;
+  sessionId: string;
+	userId: string;
   expiresAt: Date;
 }
 
@@ -16,11 +17,12 @@ const adapter = new DrizzlePostgreSQLAdapter(db as any, sessions, users);
 // ... (lines 17-33 unchanged)
 
 export const lucia = new Lucia(adapter, {
-  sessionCookie: {, attributes: {
+  sessionCookie: {
+	attributes: {
       secure: process.env.NODE_ENV === 'production',
     },
-  },
-  getUserAttributes: (attributes) => {
+	},
+	getUserAttributes: (attributes) => {
     return {
       email: attributes.email,
       firstName: attributes.firstName,
@@ -30,7 +32,7 @@ export const lucia = new Lucia(adapter, {
       avatarUrl: attributes.avatarUrl,
     };
   },
-});
+	});
 
 declare module 'lucia' {
   interface Register {
@@ -40,9 +42,12 @@ declare module 'lucia' {
 }
 
 interface DatabaseUserAttributes {
-  email: string;, firstName: string;
-  lastName: string;, role: string;
-  isActive: boolean;, avatarUrl: string;
+  email: string;
+	firstName: string;
+  lastName: string;
+	role: string;
+  isActive: boolean;
+	avatarUrl: string;
 }
 
 /**
@@ -76,9 +81,12 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export interface ValidatedUser {
-  id: string;, email: string;
-  firstName: string;, lastName: string;
-  role: string;, isActive: boolean;
+  id: string;
+	email: string;
+  firstName: string;
+	lastName: string;
+  role: string;
+	isActive: boolean;
   avatarUrl: string;
 }
 
@@ -94,7 +102,8 @@ export async function validateSession(sessionId: string): Promise<ValidationResu
   if (session && user) {
     return {
       session,
-      user: {, id: user.id,
+      user: {
+	id: user.id,
         email: user.email as string,
         firstName: user.firstName as string,
         lastName: user.lastName as string,

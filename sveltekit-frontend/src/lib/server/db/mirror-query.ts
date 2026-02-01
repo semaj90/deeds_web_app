@@ -31,7 +31,7 @@ const minioClient = new S3Client({
     credentials: { accessKeyId: CONFIG.MINIO_ACCESS_KEY,
         secretAccessKey: CONFIG.MINIO_SECRET_KEY
     },
-    forcePathStyle: true
+	forcePathStyle: true
 });
 
 export interface MirrorQueryResult {
@@ -76,8 +76,9 @@ export async function mirrorQuery(
     // Stub implementation to fix compilation
     return {
         vector_results: [],
-        graph_context: { nodes: [], neighbors: {}, traversal_depth: 0 },
-        metadata: [],
+        graph_context: { nodes: [], neighbors: {},
+	traversal_depth: 0 },
+	metadata: [],
         performance: { qdrant_ms: 0, couchdb_ms: 0, postgres_ms: 0, minio_ms: 0, total_ms: 0 }
     };
 }

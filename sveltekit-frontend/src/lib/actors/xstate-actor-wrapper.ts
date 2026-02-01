@@ -14,7 +14,10 @@ export interface EmbeddingActorInput {
 }
 
 export interface EmbeddingActorOutput {
-  embedding: number[];, dimensions: number;, model: string;, processingTime: number;
+  embedding: number[];
+	dimensions: number;
+	model: string;
+	processingTime: number;
   tokenCount?: number;
 }
 
@@ -24,7 +27,8 @@ export const embeddingActor = fromPromise<unknown, { input: EmbeddingActorInput 
     const response = await fetchWithTimeout('/api/ai/embed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, text: input.text,
+	body: JSON.stringify({
+	text: input.text,
         documentId: input.documentId,
         caseId: input.caseId,
         chunkIndex: input.chunkIndex,
@@ -60,8 +64,11 @@ export interface DocumentProcessingOutput {
   documentId: string;
   summary?: string;
   entities?: Array<unknown>;
-  embeddings?: {, chunks: number;, dimensions: number };
-  processingTime: number;, success: boolean;
+  embeddings?: {
+	chunks: number;
+	dimensions: number };
+  processingTime: number;
+	success: boolean;
 }
 
 export const documentProcessingActor = fromPromise<unknown, { input: DocumentProcessingInput }>(
@@ -71,7 +78,7 @@ export const documentProcessingActor = fromPromise<unknown, { input: DocumentPro
       const response = await fetchWithTimeout('/api/ai/process-document', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
+	body: JSON.stringify(input),
         timeout: 60000,
       });
       if (!response.ok) {
@@ -103,7 +110,12 @@ export interface LegalAnalysisInput {
 }
 
 export interface LegalAnalysisOutput {
-  riskScore: number;, riskFactors: string[];, recommendations: string[];, precedents: Array<unknown>;, confidence: number;, processingTime: number;
+  riskScore: number;
+	riskFactors: string[];
+	recommendations: string[];
+	precedents: Array<unknown>;
+	confidence: number;
+	processingTime: number;
 }
 
 export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInput }>(async ({ input })) => {
@@ -112,7 +124,7 @@ export const legalAnalysisActor = fromPromise<unknown, { input: LegalAnalysisInp
     const response = await fetchWithTimeout('/api/ai/legal-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
+	body: JSON.stringify(input),
       timeout: 45000,
     });
     if (!response.ok) {
@@ -145,7 +157,10 @@ export interface RAGSearchInput {
 }
 
 export interface RAGSearchOutput {
-  results: Array<unknown>;, totalResults: number;, processingTime: number;, model: string;
+  results: Array<unknown>;
+	totalResults: number;
+	processingTime: number;
+	model: string;
 }
 
 export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(async ({ input })) => {
@@ -154,7 +169,7 @@ export const ragSearchActor = fromPromise<unknown, { input: RAGSearchInput }>(as
     const response = await fetchWithTimeout('/api/ai/rag-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
+	body: JSON.stringify(input),
       timeout: 30000,
     });
     if (!response.ok) {
@@ -198,20 +213,25 @@ export function createRAGSearchActor(input: RAGSearchInput): ActorRefFrom<typeof
 
 // ===== WORKFLOW ORCHESTRATION ACTOR =====
 export interface WorkflowInput {
-  steps: Array<{, type: string; input, unknown }>;
+  steps: Array<{
+	type: string; input, unknown }>;
   parallel?: boolean;
 }
 
 export interface WorkflowOutput {
   results: { [key: string]: unknown };
-  totalTime: number;, success: boolean;, errors: Array<{, step: string; error, string }>;
+  totalTime: number;
+	success: boolean;
+	errors: Array<{
+	step: string; error, string }>;
 }
 
 export const workflowActor = fromPromise<unknown, { input: WorkflowInput }>(
   async ({ input })): Promise<WorkflowOutput> => {
     const startTime = Date.now();
     const results: { [key: string]: unknown } = {};
-    const errors: Array<{, step: string; error, string }> = [];
+    const errors: Array<{
+	step: string; error, string }> = [];
     let success = true;
 
     try {
@@ -331,11 +351,11 @@ export async function runActor<T>(actor: ActorRefFrom<typeof embeddingActor | ty
           resolve(snapshot.output as T);
         }
       },
-      error: (error) => {
+	error: (error) => {
         subscription.unsubscribe();
         reject(error);
       },
-    });
+	});
     actor.start();
   });
 }

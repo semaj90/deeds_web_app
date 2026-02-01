@@ -52,7 +52,7 @@ export const routeMetadata = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     archivedAt: timestamp('archived_at'), // Soft delete pattern
   },
-  (table) => ({
+	(table) => ({
     routeIdIndex: index('idx_route_metadata_route_id').on(table.routeId),
     statusIndex: index('idx_route_metadata_status').on(table.status),
     archivedAtIndex: index('idx_route_metadata_archived_at').on(table.archivedAt),
@@ -98,7 +98,7 @@ export const errorCluster = pgTable(
     resolvedAt: timestamp('resolved_at'),
     archivedAt: timestamp('archived_at'), // Soft delete pattern
   },
-  (table) => ({
+	(table) => ({
     routeIdIndex: index('idx_error_cluster_route_id').on(table.routeId),
     severityIndex: index('idx_error_cluster_severity').on(table.severity),
     createdAtIndex: index('idx_error_cluster_created_at').on(table.createdAt),
@@ -136,7 +136,7 @@ export const routeHealthEvent = pgTable(
     // Timestamps
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
+	(table) => ({
     routeIdIndex: index('idx_route_health_event_route_id').on(table.routeId),
     createdAtIndex: index('idx_route_health_event_created_at').on(table.createdAt),
     triggeredByIndex: index('idx_route_health_event_triggered_by').on(table.triggeredBy),
@@ -172,7 +172,7 @@ export const errorBrainAnalysis = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     completedAt: timestamp('completed_at'),
   },
-  (table) => ({
+	(table) => ({
     routeIdIndex: index('idx_error_brain_analysis_route_id').on(table.routeId),
     createdAtIndex: index('idx_error_brain_analysis_created_at').on(table.createdAt),
     statusIndex: index('idx_error_brain_analysis_status').on(table.status),
@@ -216,7 +216,7 @@ export const errorBrainPatch = pgTable(
     // Timestamps
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
+	(table) => ({
     analysisIdIndex: index('idx_error_brain_patch_analysis_id').on(table.analysisId),
     routeIdIndex: index('idx_error_brain_patch_route_id').on(table.routeId),
     verificationStatusIndex: index('idx_error_brain_patch_verification_status').on(
@@ -255,7 +255,7 @@ export const routeInteractionLog = pgTable(
     // Timestamps
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => ({
+	(table) => ({
     routeIdIndex: index('idx_route_interaction_log_route_id').on(table.routeId),
     userIdIndex: index('idx_route_interaction_log_user_id').on(table.userId),
     createdAtIndex: index('idx_route_interaction_log_created_at').on(table.createdAt),

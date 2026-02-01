@@ -6,28 +6,36 @@ export interface ContextualState {
 	userId?: string;
 	caseId?: string;
 	evidenceId?: string;
-	sessionId?: string;, contextType: 'case' | 'evidence' | 'document' | 'person' | 'general';
+	sessionId?: string;
+	contextType: 'case' | 'evidence' | 'document' | 'person' | 'general';
 	metadata: Record<string, any>;
-	timestamp: Date;, version: number;
+	timestamp: Date;
+	version: number;
 }
 
 export interface ContextualAction {
-	type: string;, payload: any;
+	type: string;
+	payload: any;
 	timestamp: Date;
 	userId?: string;
 	sessionId?: string;
 }
 
 export interface ContextualPrediction {
-	id: string;, type: 'pattern' | 'risk' | 'recommendation' | 'alert';
-	confidence: number;, description: string;
-	data: any;, timestamp: Date;
+	id: string;
+	type: 'pattern' | 'risk' | 'recommendation' | 'alert';
+	confidence: number;
+	description: string;
+	data: any;
+	timestamp: Date;
 	context: ContextualState;
 }
 
 export interface ContextualMemory {
-	shortTerm: ContextualState[];, longTerm: Map<string, ContextualState>;
-	predictions: ContextualPrediction[];, actions: ContextualAction[];
+	shortTerm: ContextualState[];
+	longTerm: Map<string, ContextualState>;
+	predictions: ContextualPrediction[];
+	actions: ContextualAction[];
 }
 
 export class ContextualService {
@@ -66,7 +74,7 @@ export class ContextualService {
 				...(current?.metadata || {}),
 				...(context?.metadata || {})
 			},
-			contextType: context?.contextType || current?.contextType ?? 'general'
+	contextType: context?.contextType || current?.contextType ?? 'general'
 		} as ContextualState;
 
 		// Add to short-term memory
@@ -265,7 +273,7 @@ export function createContextStore(): Writable<ContextualState | null> {
 			store.set(value);
 			if (value) service.setContext(value);
 		},
-		update: store.update
+	update: store.update
 	};
 }
 
@@ -295,12 +303,14 @@ export function createContextProvider() {
 	});
 
 	return {
-		context: {, subscribe: context.subscribe,
+		context: {
+	subscribe: context.subscribe,
 			set: (ctx: ContextualState) => service.setContext(ctx)
 		},
-		predictions: {, subscribe: predictions.subscribe
+	predictions: {
+	subscribe: predictions.subscribe
 		},
-		recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action),
+	recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action),
 		addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
 			service.addPrediction(prediction),
 		getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit),

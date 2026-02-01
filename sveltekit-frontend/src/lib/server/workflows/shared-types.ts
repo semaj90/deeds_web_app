@@ -11,14 +11,18 @@ export type VectorEmbedding = number[];
 
 /** Document chunk stored in pgvector and Qdrant */
 export interface DocumentChunk {
-    id: string;, content: string;
-    embedding: VectorEmbedding;, metadata: DocumentMetadata;
-    createdAt: Date;, updatedAt: Date;
+    id: string;
+	content: string;
+    embedding: VectorEmbedding;
+	metadata: DocumentMetadata;
+    createdAt: Date;
+	updatedAt: Date;
 }
 
 /** Metadata attached to document chunks */
 export interface DocumentMetadata {
-    documentId: string;, chunkIndex: number;
+    documentId: string;
+	chunkIndex: number;
     sourceFile?: string;
     caseId?: string;
     tags?: string[];
@@ -27,15 +31,18 @@ export interface DocumentMetadata {
 
 /** Qdrant search result */
 export interface QdrantSearchResult {
-    id: string;, score: number;
+    id: string;
+	score: number;
     payload: Record<string, unknown>;
     vector?: VectorEmbedding;
 }
 
 /** PostgreSQL pgvector search result */
 export interface PgVectorSearchResult {
-    id: string;, content: string;
-    embedding: VectorEmbedding;, similarity: number;
+    id: string;
+	content: string;
+    embedding: VectorEmbedding;
+	similarity: number;
     metadata: DocumentMetadata;
 }
 
@@ -74,7 +81,8 @@ export type CacheKeyPattern =
 
 /** Redis cache value with TTL */
 export interface CachedValue<T = unknown> {
-    data: T;, expiresAt: number;
+    data: T;
+	expiresAt: number;
     metadata?: Record<string, unknown>;
 }
 
@@ -110,7 +118,8 @@ export interface ApiResponse<T = unknown> {
     success: boolean;
     data?: T;
     error?: string;
-    metadata?: {, timestamp: number;
+    metadata?: {
+	timestamp: number;
         requestId?: string;
         cached?: boolean;
     };
@@ -122,15 +131,18 @@ export interface ApiResponse<T = unknown> {
 
 /** Pagination parameters */
 export interface PaginationParams {
-    page: number;, pageSize: number;
+    page: number;
+	pageSize: number;
     offset?: number;
     limit?: number;
 }
 
 /** Paginated result wrapper */
 export interface PaginatedResult<T> {
-    items: T[];, total: number;
-    page: number;, pageSize: number;
+    items: T[];
+	total: number;
+    page: number;
+	pageSize: number;
     hasMore: boolean;
 }
 
@@ -145,7 +157,8 @@ export interface VectorSearchParams {
 
 /** Vector search result */
 export interface VectorSearchResult {
-    chunks: DocumentChunk[];, scores: number[];
+    chunks: DocumentChunk[];
+	scores: number[];
     total: number;
     queryEmbedding?: VectorEmbedding;
 }
@@ -180,7 +193,8 @@ export interface ErrorResponse {
 
 /** Validation error */
 export interface ValidationError {
-    field: string;, message: string;
+    field: string;
+	message: string;
     value?: unknown;
 }
 

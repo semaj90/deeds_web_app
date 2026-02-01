@@ -29,9 +29,13 @@ export type JobType =
 	| 'recommendation_generation';
 
 export interface IdleContext {
-	lastActivityTimestamp: number;, idleThresholdMs: number;
-	isIdle: boolean;, activityCount: number;
-	queuedJobs: Array<{, type: JobType; payload: any;, timestamp: number }>;
+	lastActivityTimestamp: number;
+	idleThresholdMs: number;
+	isIdle: boolean;
+	activityCount: number;
+	queuedJobs: Array<{
+	type: JobType; payload: any;
+	timestamp: number }>;
 	errorCount: number;
 	lastError?: string;
 }
@@ -39,7 +43,8 @@ export interface IdleContext {
 export type IdleEvent =
 	| { type: 'ACTIVITY_DETECTED' }
 	| { type: 'IDLE_TIMEOUT' }
-	| { type: 'QUEUE_JOB';, jobType: JobType; payload: any }
+	| { type: 'QUEUE_JOB';
+	jobType: JobType; payload: any }
 	| { type: 'RESET' };
 
 /**
@@ -79,8 +84,10 @@ function getPriorityForJobType(jobType: JobType): number {
 /**
  * Actor: Check if user is currently idle
  */
-const checkIdleStatus = fromPromise<{ isIdle: boolean;, idleDurationMs: number }>(
-    async ({ input }: {, input: IdleContext }) => {
+const checkIdleStatus = fromPromise<{ isIdle: boolean;
+	idleDurationMs: number }>(
+    async ({ input }: {
+	input: IdleContext }) => {
         const now = Date.now();
         const idleDurationMs = now - input.lastActivityTimestamp;
         const isIdle = idleDurationMs >= input.idleThresholdMs;
@@ -91,21 +98,26 @@ const checkIdleStatus = fromPromise<{ isIdle: boolean;, idleDurationMs: number }
 /**
  * Actor: Publish job to RabbitMQ queue
  */
-const publishToRabbitMQ = fromPromise<{ success: boolean;, jobId: string }>(
-    async ({ input }: {, input: { jobType: JobType;, payload: any } }) => {
+const publishToRabbitMQ = fromPromise<{ success: boolean;
+	jobId: string }>(
+    async ({ input }: {
+	input: { jobType: JobType;
+	payload: any } }) => {
         const jobId = crypto.randomUUID();
         try {
             const response = await fetch('/api/rabbitmq/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, queue: getQueueNameForJobType(input.jobType),
+	body: JSON.stringify({
+	queue: getQueueNameForJobType(input.jobType),
                     message: {
                         jobId,
                         type: input.jobType,
                         payload: input.payload,
                         timestamp: Date.now()
                     },
-                    options: {, persistent: true,
+	options: {
+	persistent: true,
                         priority: getPriorityForJobType(input.jobType)
                     }
                 })
@@ -132,19 +144,25 @@ const publishToRabbitMQ = fromPromise<{ success: boolean;, jobId: string }>(
  */
 export const idleDetectionMachine = setup({
     types: {} as {
-        context: IdleContext;, events: IdleEvent;
+        context: IdleContext;
+	events: IdleEvent;
     },
-    actors: {, checkIdleStatus: publishToRabbitMQ
+	actors: {
+	checkIdleStatus: publishToRabbitMQ
     },
-    delays: {, exponentialBackoff: ({ context }) => Math.pow(2, context.errorCount) * 1000
+	delays: {
+	exponentialBackoff: ({ context }) => Math.pow(2, context.errorCount) * 1000
     },
-    actions: {, recordActivity: assign({
+	actions: {
+	recordActivity: assign({
             lastActivityTimestamp: () => Date.now(),
             activityCount: ({ context }) => context.activityCount + 1,
             isIdle: false
         }),
-        markIdle: assign({, isIdle: true }),
-        queueJob: assign({, queuedJobs: ({ context, event }) => {
+        markIdle: assign({
+	isIdle: true }),
+        queueJob: assign({
+	queuedJobs: ({ context, event }) => {
                 if (event.type !== 'QUEUE_JOB') return context.queuedJobs;
                 return [
                     ...context.queuedJobs,
@@ -156,9 +174,11 @@ export const idleDetectionMachine = setup({
                 ];
             }
         }),
-        incrementErrorCount: assign({, errorCount: ({ context }) => context.errorCount + 1
+        incrementErrorCount: assign({
+	errorCount: ({ context }) => context.errorCount + 1
         }),
-        recordError: assign({, lastError: ({ event }) => {
+        recordError: assign({
+	lastError: ({ event }) => {
                 if ('error' in event) {
                     // @ts-ignore
                     return String(event.error);
@@ -166,37 +186,49 @@ export const idleDetectionMachine = setup({
                 return 'Unknown error';
             }
         }),
-        resetErrors: assign({, errorCount: 0,
+        resetErrors: assign({
+	errorCount: 0,
             lastError: undefined
         }),
-        clearQueue: assign({, queuedJobs: []
+        clearQueue: assign({
+	queuedJobs: []
         }),
-        popQueue: assign({, queuedJobs: ({ context }) => context.queuedJobs.slice(1)
+        popQueue: assign({
+	queuedJobs: ({ context }) => context.queuedJobs.slice(1)
         })
     },
-    guards: {, isIdleThresholdReached: ({ context }, params?: unknown) => context.isIdle,
+	guards: {
+	isIdleThresholdReached: ({ context },
+	params?: unknown) => context.isIdle,
         hasQueuedJobs: ({ context }) => context.queuedJobs.length > 0,
         canRetry: ({ context }) => context.errorCount < 5
     }
 }).createMachine({
     id: 'idleDetection',
     initial: 'active',
-    context: {, lastActivityTimestamp: Date.now(),
+    context: {
+	lastActivityTimestamp: Date.now(),
         idleThresholdMs: 5 * 60 * 1000,
         isIdle: false,
         activityCount: 0,
         queuedJobs: [],
         errorCount: 0
     },
-    states: {, active: {
-            on: {, ACTIVITY_DETECTED: { actions: 'recordActivity' },
-                IDLE_TIMEOUT: {, target: 'checkingIdleStatus' },
-                QUEUE_JOB: {, actions: 'queueJob' }
+	states: {
+	active: {
+            on: {
+	ACTIVITY_DETECTED: { actions: 'recordActivity' },
+	IDLE_TIMEOUT: {
+	target: 'checkingIdleStatus' },
+	QUEUE_JOB: {
+	actions: 'queueJob' }
             },
-            after: {, 5000: 'checkingIdleStatus'
+	after: {
+	5000: 'checkingIdleStatus'
             }
         },
-        checkingIdleStatus: {, invoke: {
+	checkingIdleStatus: {
+	invoke: {
                 src: 'checkIdleStatus',
                 input: ({ context }) => context,
                 onDone: [
@@ -205,54 +237,66 @@ export const idleDetectionMachine = setup({
                         target: 'idle',
                         actions: 'markIdle'
                     },
-                    { target: 'active' }
+	{ target: 'active' }
                 ],
-                onError: {, target: 'active',
+                onError: {
+	target: 'active',
                     actions: ['recordError', 'incrementErrorCount']
                 }
             }
         },
-        idle: {, entry: 'resetErrors',
-            on: {, ACTIVITY_DETECTED: { target: 'active', actions: 'recordActivity' },
-                QUEUE_JOB: {, target: 'processingQueue', actions: 'queueJob' }
+	idle: {
+	entry: 'resetErrors',
+            on: {
+	ACTIVITY_DETECTED: { target: 'active', actions: 'recordActivity' },
+	QUEUE_JOB: {
+	target: 'processingQueue', actions: 'queueJob' }
             },
-            after: {, 10000: [
+	after: {
+	10000: [
                     { guard: 'hasQueuedJobs', target: 'processingQueue' },
-                    { target: 'idle' }
+	{ target: 'idle' }
                 ]
             }
         },
-        processingQueue: {, invoke: {
+	processingQueue: {
+	invoke: {
                 src: 'publishToRabbitMQ',
                 input: ({ context }) => {
                     const nextJob = context.queuedJobs[0];
                     return { jobType: nextJob.type, payload: nextJob.payload };
                 },
-                onDone: {, target: 'idle',
+	onDone: {
+	target: 'idle',
                     actions: ['popQueue', 'resetErrors']
                 },
-                onError: [
+	onError: [
                     {
                         guard: 'canRetry',
                         target: 'retrying',
                         actions: ['recordError', 'incrementErrorCount']
                     },
-                    {
+	{
                         target: 'error',
                         actions: ['recordError']
                     }
                 ]
             }
         },
-        retrying: {, after: {
+	retrying: {
+	after: {
                 exponentialBackoff: 'processingQueue'
             }
         },
-        error: {, entry: 'clearQueue',
-            on: {, RESET: { target: 'active', actions: 'resetErrors' },
-                ACTIVITY_DETECTED: {, target: 'active', actions: ['recordActivity', 'resetErrors'] }
+	error: {
+	entry: 'clearQueue',
+            on: {
+	RESET: { target: 'active', actions: 'resetErrors' },
+	ACTIVITY_DETECTED: {
+	target: 'active', actions: ['recordActivity', 'resetErrors'] }
             },
-            after: {, 30000: 'active'
+	after: {
+	30000: 'active'
             }
         }
     }

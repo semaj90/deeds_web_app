@@ -6,19 +6,23 @@
  */
 
 import {
-  toolRegistry: LangExtractBatchRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
+  toolRegistry: LangExtractBatchRequestSchema,
+$1;$2$1;$2$1;$2} from '../registry.js';
 
 const LANGEXTRACT_URL = process.env?.LANGEXTRACT_URL ?? 'http://localhost:8095';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
 interface ExtractedEntity {
-  type: string;, name: string;
+  type: string;
+	name: string;
   confidence: number;
 }
 
 interface ExtractedRelation {
-  type: string;, source: string;
-  target: string;, confidence: number;
+  type: string;
+	source: string;
+  target: string;
+	confidence: number;
 }
 
 async function extractFromDocument(
@@ -27,7 +31,8 @@ async function extractFromDocument(
   relationTypes: string[],
   model: string,
   timeout: number
-): Promise<{, entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
+): Promise<{
+	entities: ExtractedEntity[]; relations: ExtractedRelation[] }> {
   // Try LangExtract first
   try {
     const controller = new AbortController();
@@ -36,16 +41,19 @@ async function extractFromDocument(
     const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, content: entity_types, entityTypes,
+	body: JSON.stringify({
+	content: entity_types, entityTypes,
         relation_types: relationTypes,
         model
-      }, signal: controller.signal
+      },
+	signal: controller.signal
     });
 
     clearTimeout(timeoutId);
 
     if (response.ok) {
-      return await response.json() as { entities: ExtractedEntity[];, relations: ExtractedRelation[] };
+      return await response.json() as { entities: ExtractedEntity[];
+	relations: ExtractedRelation[] };
     }
   } catch {
     // Fallback to Ollama
@@ -63,9 +71,11 @@ JSON:`;
     const response = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: prompt,
+	body: JSON.stringify({
+	model: prompt,
         stream: false,
-        options: {, temperature: 0.1 }
+        options: {
+	temperature: 0.1 }
       })
     });
 
@@ -106,8 +116,10 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
   const model = options?.model ?? 'gemma3-legal:latest';
   const timeout = options?.timeout_ms ?? 30000;
 
-  const extractions: Array<{, doc_url: string;
-    entities: ExtractedEntity[];, relations: ExtractedRelation[];
+  const extractions: Array<{
+	doc_url: string;
+    entities: ExtractedEntity[];
+	relations: ExtractedRelation[];
   }> = [];
 
   let totalEntities = 0;
@@ -115,7 +127,8 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
 
   for (const doc of request.docs) {
     try {
-      const content = await fetchDocumentContent(doc.url: doc.text_ref);, content:
+      const content = await fetchDocumentContent(doc.url: doc.text_ref);
+	content:
         request.schema.entities: request.schema.relations,
         model,
         timeout
@@ -142,10 +155,11 @@ async function langextractBatchHandler(request: LangExtractBatchRequest): Promis
     success: true,
     run_id: request.run_id,
     tool: 'langextract_batch',
-    data: {, extractions: total_entities, totalEntities,
+    data: {
+	extractions: total_entities, totalEntities,
       total_relations: totalRelations
     },
-    duration_ms: 0,
+	duration_ms: 0,
     timestamp: new Date().toISOString()
   };
 }

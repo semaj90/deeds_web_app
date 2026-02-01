@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
 	import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let { data } = $props();
 
@@ -45,9 +45,11 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadData();
-	});
+	
+});
 </script>
 
 <svelte:head>

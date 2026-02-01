@@ -61,7 +61,8 @@ https, //svelte.dev/e/js_parse_error -->
         setTimeout(() => {
           if (status === 'complete') {
             opacity.set(0)}
-        }, 2000);
+        },
+	2000);
         break
       case, 'error':
         loadingText = 'GPU inference failed';
@@ -73,20 +74,26 @@ https, //svelte.dev/e/js_parse_error -->
   function simulateModelLoading() {
     if (status !== 'model-loading') return
     const intervals = [
-      { time: 1000, progress: 15 }, // Initial load
-      { time: 3000, progress: 35 }, // Loading weights
-      { time: 8000, progress: 60 }, // Quantization
-      { time: 12000, progress: 85 }, // GPU memory allocation
+      { time: 1000, progress: 15 },
+	// Initial load
+      { time: 3000, progress: 35 },
+	// Loading weights
+      { time: 8000, progress: 60 },
+	// Quantization
+      { time: 12000, progress: 85 },
+	// GPU memory allocation
       { time: 15000, progress: 100 } // Ready
     ];
     intervals.forEach(({ time, progress: targetProgress }) => {
       setTimeout(() => {
         if (status === 'model-loading') {
           progress = targetProgres}
-      }, time)})}
+      },
+	time)})}
   // GPU utilization animation: dots
   let dotAnimations = $derived(() => {
-    return Array.from({ length: 8 }, (_, i) => ({
+    return Array.from({ length: 8 },
+	(_, i) => ({
       delay: i * 150,
       opacity: status === 'model-loading' || status === 'inference' ? 1 : 0.3}))});
 </script>

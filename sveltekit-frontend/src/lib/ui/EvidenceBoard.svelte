@@ -13,13 +13,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type EvidenceType = 'video' | 'document' | 'photo' | 'note';
 
  type EvidenceItem = {
-  id: string;, title: string;
-  type: EvidenceType;, summary: string;
-  x: number;, y: number;
+  id: string;
+	title: string;
+  type: EvidenceType;
+	summary: string;
+  x: number;
+	y: number;
  };
 
  type EvidenceConnection = {
-  id: string;, from: string; // evidence id
+  id: string;
+	from: string; // evidence id
   to: string; // evidence id
   label?: string;
  };
@@ -39,21 +43,21 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   summary: 'Footage from 21:34–21:52 showing suspect entering the lobby.',
   x: 80, y: 120
   },
-  {
+	{
   id: 'EV-002',
   title: 'Witness Statement – K. Ito',
   type: 'document',
   summary: 'Witness describes verbal threat in parking garage, level B2.',
   x: 380, y: 220
   },
-  {
+	{
   id: 'EV-003',
   title: 'Access Badge Log',
   type: 'document',
   summary: 'Server room swipes between 20:00 and 22:00.',
   x: 220, y: 390
   },
-  {
+	{
   id: 'EV-004',
   title: 'Forensic Photo – Scene',
   type: 'photo',
@@ -64,8 +68,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  let connections = $state<EvidenceConnection[]>(propConnections.length > 0 ? propConnections : [
   { id: 'C-1', from: 'EV-001', to: 'EV-002', label: 'suspect + timeline' },
-  { id: 'C-2', from: 'EV-001', to: 'EV-003', label: 'same individual?' },
-  { id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' }
+	{ id: 'C-2', from: 'EV-001', to: 'EV-003', label: 'same individual?' },
+	{ id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' }
  ]);
 
  let boardEl = $state<HTMLDivElement | null>(null);

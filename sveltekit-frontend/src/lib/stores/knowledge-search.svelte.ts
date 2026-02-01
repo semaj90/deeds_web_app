@@ -10,8 +10,10 @@ import { get } from 'svelte/store';
 
 
 export interface SearchResult {
-    id: number;, score: number;
-    title: string;, url: string;
+    id: number;
+	score: number;
+    title: string;
+	url: string;
     summary: string;
     entities?: string;
 }
@@ -100,7 +102,8 @@ export class KnowledgeSearchStore {
                     const response = await fetch('/api/knowledge/search', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({, query: this.query,
+	body: JSON.stringify({
+	query: this.query,
                             limit: 10,
                             threshold: 0.3,
                             synthesize: this.synthesizeEnabled
@@ -187,7 +190,8 @@ export class KnowledgeSearchStore {
                 const response = await fetch('/api/knowledge/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({, query: this.query,
+	body: JSON.stringify({
+	query: this.query,
                         topK: 10,
                         llmProvider: currentProvider
                     })

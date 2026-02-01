@@ -22,14 +22,17 @@ import Fuse from 'fuse.js';
 // ============================================================================
 
 export interface RAGDocument {
-	id: string;, content: string;
-	title: string;, source: string;
+	id: string;
+	content: string;
+	title: string;
+	source: string;
 	createdAt: Date;
 	metadata?: Record<string, unknown>;
 }
 
 export interface EmbeddedDocument extends RAGDocument {
-	embedding: number[];, embeddingModel: string;
+	embedding: number[];
+	embeddingModel: string;
 	tensorSlice?: Float32Array; // For potential GPU processing
 	chunkIndex?: number;
 	totalChunks?: number;
@@ -42,17 +45,23 @@ export interface SummarizedDocument extends EmbeddedDocument {
 	keywords: string[]; // Extracted keywords
 	entities: {
 		// Named entity extraction
-		people: string[];, organizations: string[];
-		locations: string[];, dates: string[];
+		people: string[];
+	organizations: string[];
+		locations: string[];
+	dates: string[];
 		legalCitations: string[];
 	};
 }
 
 export interface GemmaExtractionResult {
-	summary: string;, keyPoints: string[];
-	keywords: string[];, entities: {
-		people: string[];, organizations: string[];
-		locations: string[];, dates: string[];
+	summary: string;
+	keyPoints: string[];
+	keywords: string[];
+	entities: {
+		people: string[];
+	organizations: string[];
+		locations: string[];
+	dates: string[];
 		legalCitations: string[];
 	};
 }
@@ -73,7 +82,8 @@ export interface RankedDocument extends IndexedDocument {
 }
 
 export interface SynthesisRankingConfig {
-	weights: {, relevance: number; // Weight for semantic relevance (default: 0.5), keywords: number; // Weight for keyword matching (default: 0.3), synthesis: number; // Weight for synthesis quality (default: 0.2)
+	weights: {
+	relevance: number; // Weight for semantic relevance (default: 0.5), keywords: number; // Weight for keyword matching (default: 0.3), synthesis: number; // Weight for synthesis quality (default: 0.2)
 	};
 	keywordExtractor?: 'ripgrep' | 'awk' | 'hybrid';
 	enableGemmaFunctionCalling?: boolean;
@@ -81,13 +91,19 @@ export interface SynthesisRankingConfig {
 }
 
 export interface RAGPipelineResult {
-	documents: RankedDocument[];, totalProcessed: number;
-	timing: {, embedding: number;
-		summarization: number;, indexing: number;
-		ranking: number;, total: number;
+	documents: RankedDocument[];
+	totalProcessed: number;
+	timing: {
+	embedding: number;
+		summarization: number;
+	indexing: number;
+		ranking: number;
+	total: number;
 	};
-	cacheHits: number;, metadata: {
-		embeddingModel: string;, synthesisModel: string;
+	cacheHits: number;
+	metadata: {
+		embeddingModel: string;
+	synthesisModel: string;
 		rankingAlgorithm: string;
 	};
 }
@@ -103,7 +119,8 @@ export class RAGKnowledgePipeline {
 	private readonly SYNTHESIS_MODEL = 'gemma3:latest'; // Adjusted to a likely available model
 
 	private defaultRankingConfig: SynthesisRankingConfig = {
-		weights: {, relevance: 0.5,
+		weights: {
+	relevance: 0.5,
 			keywords: 0.3,
 			synthesis: 0.2
 		}
@@ -233,29 +250,46 @@ export class RAGKnowledgePipeline {
 		const functionDefinition = {
 			name: 'extract_document_metadata',
 			description: 'Extract structured metadata from a legal document',
-			parameters: {, type: 'object',
-				properties: {, summary: {
+			parameters: {
+	type: 'object',
+				properties: {
+	summary: {
 						type: 'string',
 						description: 'A concise 2-3 sentence summary of the document'
 					},
-					keyPoints: {, type: 'array',
-						items: {, type: 'string' },
-						description: 'List of key points or main ideas (max 5)'
+	keyPoints: {
+	type: 'array',
+						items: {
+	type: 'string' },
+	description: 'List of key points or main ideas (max 5)'
 					},
-					keywords: {, type: 'array',
-						items: {, type: 'string' },
-						description: 'Important keywords and phrases for search'
+	keywords: {
+	type: 'array',
+						items: {
+	type: 'string' },
+	description: 'Important keywords and phrases for search'
 					},
-					entities: {, type: 'object',
-						properties: {, people: { type: 'array', items: {, type: 'string' } },
-							organizations: {, type: 'array', items: {, type: 'string' } },
-							locations: {, type: 'array', items: {, type: 'string' } },
-							dates: {, type: 'array', items: {, type: 'string' } },
-							legalCitations: {, type: 'array', items: {, type: 'string' } }
+	entities: {
+	type: 'object',
+						properties: {
+	people: { type: 'array', items: {
+	type: 'string' } },
+	organizations: {
+	type: 'array', items: {
+	type: 'string' } },
+	locations: {
+	type: 'array', items: {
+	type: 'string' } },
+	dates: {
+	type: 'array', items: {
+	type: 'string' } },
+	legalCitations: {
+	type: 'array', items: {
+	type: 'string' } }
 						}
 					}
 				},
-				required: ['summary', 'keyPoints', 'keywords']
+	required: ['summary', 'keyPoints', 'keywords']
 			}
 		};
 
@@ -263,13 +297,14 @@ export class RAGKnowledgePipeline {
 			const response = await fetch(`${endpoint}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: this.SYNTHESIS_MODEL,
+	body: JSON.stringify({
+	model: this.SYNTHESIS_MODEL,
 					messages: [
 						{
 							role: 'system',
 							content: 'You are a legal AI assistant. Extract structured metadata from documents.'
 						},
-						{
+	{
 							role: 'user',
 							content: `Extract metadata from this document:\n\nTitle: ${doc.title}\n\nContent: ${doc.content.substring(0, 2000)}...`
 						}
@@ -296,7 +331,8 @@ export class RAGKnowledgePipeline {
 				summary: doc.content.substring(0, 200) + '...',
 				keyPoints: [doc.title],
 				keywords: doc.title.split(' ').filter((w: any) => w.length > 5).slice(0, 5),
-				entities: {, people: [],
+				entities: {
+	people: [],
 					organizations: [],
 					locations: [],
 					dates: [],
@@ -310,7 +346,8 @@ export class RAGKnowledgePipeline {
 				summary: doc.content.substring(0, 200) + '...',
 				keyPoints: [doc.title],
 				keywords: [],
-				entities: {, people: [], organizations: [], locations: [], dates: [], legalCitations: [] }
+				entities: {
+	people: [], organizations: [], locations: [], dates: [], legalCitations: [] }
 			};
 		}
 	}
@@ -343,7 +380,8 @@ export class RAGKnowledgePipeline {
 					description: doc.summary,
 					type: 'rag_document',
 					tags: doc.keywords,
-					metadata: {, embedding: doc.embedding,
+					metadata: {
+	embedding: doc.embedding,
 						entities: doc.entities,
 						keyPoints: doc.keyPoints,
 						source: doc.source
@@ -355,7 +393,8 @@ export class RAGKnowledgePipeline {
 				// 2. Ripgrep keyword extraction
 				const ripgrepKeywords = await this.extractRipgrepKeywords(doc);
 
-				// 3. Searchable text compilationdoc.title: doc.summary,
+				// 3. Searchable text compilation
+doc.title: doc.summary,
 					doc.content,
 					...doc.keywords,
 					...doc.keyPoints,
@@ -388,7 +427,8 @@ export class RAGKnowledgePipeline {
 	 * Extract keywords using patterns
 	 */
 	private async extractRipgrepKeywords(doc: SummarizedDocument): Promise<string[]> {
-		// Simulated ripgrep pattern matching/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
+		// Simulated ripgrep pattern matching
+/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
 			/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
 			/\b[A-Z]{2}\b/g, // Acronyms
 			/\$\d+(?:\d{3})*(?:\.\d{2})? /g, // Currency
@@ -446,7 +486,8 @@ export class RAGKnowledgePipeline {
 			// 3. Synthesis Score (cross-document quality)
 			const synthesisScore = this.calculateSynthesisScore(doc);
 
-			// 4. Combined Score (weighted)(relevanceScore * finalConfig.weights.relevance) +
+			// 4. Combined Score (weighted)
+(relevanceScore * finalConfig.weights.relevance) +
 				(keywordScore * finalConfig.weights.keywords) +
 				(synthesisScore * finalConfig.weights.synthesis);
 
@@ -490,7 +531,8 @@ export class RAGKnowledgePipeline {
 	}
 
 	private calculateKeywordScore(query: string, doc: IndexedDocument): number {
-		const queryTokens = query.toLowerCase().split(/\s+/);...(doc?.keywords|| []).map((k: any) => k.toLowerCase()),
+		const queryTokens = query.toLowerCase().split(/\s+/);
+...(doc?.keywords|| []).map((k: any) => k.toLowerCase()),
 			...(doc?.ripgrepKeywords|| []).map((k: any) => k.toLowerCase())
 		];
 
@@ -576,14 +618,16 @@ export class RAGKnowledgePipeline {
 		const result: RAGPipelineResult = {
 			documents: ranked,
 			totalProcessed: documents.length,
-			timing: {, embedding: embeddingTime,
+			timing: {
+	embedding: embeddingTime,
 				summarization: summarizationTime,
 				indexing: indexingTime,
 				ranking: rankingTime,
 				total: totalTime
 			},
-			cacheHits: 0, // Placeholder
-			metadata: {, embeddingModel: this.EMBEDDING_MODEL,
+	cacheHits: 0, // Placeholder
+			metadata: {
+	embeddingModel: this.EMBEDDING_MODEL,
 				synthesisModel: this.SYNTHESIS_MODEL,
 				rankingAlgorithm: 'synthesis_ranking'
 			}

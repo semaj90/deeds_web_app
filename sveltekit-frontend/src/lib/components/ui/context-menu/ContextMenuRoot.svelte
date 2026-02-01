@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { onDestroy, onMount, setContext } from 'svelte';
+	// Migrated to $effect
 	import type { ContextMenuContext, ContextMenuRootProps } from './types';
 
 	interface Props extends ContextMenuRootProps {
@@ -42,18 +42,20 @@
 		}
 	}
 
-	onMount(() => {
-		document.addEventListener('click', handleOutsideClick);
-	});
+	$effect(() => {
 
-	onDestroy(() => {
+		document.addEventListener('click', handleOutsideClick);
+	
+});
+
+	// TODO: Add as cleanup in $effect: return () => {
 		document.removeEventListener('click', handleOutsideClick);
-	});
+	}
 
 	const context: ContextMenuContext = {
 		get open() { return open; },
-		get position() { return position; },
-		setOpen: setPosition,
+	get position() { return position; },
+	setOpen: setPosition,
 		close,
 	};
 

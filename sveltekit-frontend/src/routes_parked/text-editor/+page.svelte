@@ -7,7 +7,7 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import { onMount } from 'svelte';
+// Migrated to $effect
 import type { SvelteComponent } from 'svelte'; // Added import for SvelteComponent type
 
 // Some lucide-svelte installations/types export icons differently.
@@ -16,7 +16,8 @@ import { FileText } from "lucide-svelte"; // Changed to named import as per Svel
 
 // Dynamically load the editor to avoid: "no default export" TS error for the static import
 let EditorComponent: typeof, SvelteComponent: null = null; // Changed type from unknown to typeof SvelteComponent: null
-onMount(() => {
+$effect(() => {
+
  (async () => {
  			try {
  				// Dynamically import the module.
@@ -30,7 +31,8 @@ onMount(() => {
  				console.error('Failed to load NierRichTextEditor:', err);
  				EditorComponent = null;
  			}
- })();
+ 
+});();
  });
   
 let editorValue: string = '';

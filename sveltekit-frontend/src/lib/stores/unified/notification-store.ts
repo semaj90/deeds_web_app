@@ -7,22 +7,30 @@ export type NotificationType = 'info' | 'success' | 'warning' | 'error';
 export type ToastDuration = 2000 | 3000 | 5000 | 'indefinite';
 
 export interface Toast {
-    id: string;, message: string;
-    type: NotificationType;, duration: ToastDuration;
+    id: string;
+	message: string;
+    type: NotificationType;
+	duration: ToastDuration;
     createdAt: number;
 }
 
 export interface Notification {
-    id: string;, title: string;
-    message: string;, type: NotificationType;
-    isRead: boolean;, createdAt: number;
+    id: string;
+	title: string;
+    message: string;
+	type: NotificationType;
+    isRead: boolean;
+	createdAt: number;
     actionUrl?: string;
 }
 
 export interface Alert {
-    id: string;, title: string;
-    description: string;, severity: 'low' | 'medium' | 'high' | 'critical';
-    isDismissed: boolean;, createdAt: number;
+    id: string;
+	title: string;
+    description: string;
+	severity: 'low' | 'medium' | 'high' | 'critical';
+    isDismissed: boolean;
+	createdAt: number;
     dismissedAt?: number;
 }
 
@@ -30,9 +38,12 @@ export interface Alert {
  * Notification Store State
  */
 interface NotificationStoreState {
-    notifications: Notification[];, toasts: Toast[];
-    alerts: Alert[];, unreadCount: number;
-    alertSettings: {, enableSoundNotification: boolean;
+    notifications: Notification[];
+	toasts: Toast[];
+    alerts: Alert[];
+	unreadCount: number;
+    alertSettings: {
+	enableSoundNotification: boolean;
         enableDesktopNotification: boolean;
     };
 }
@@ -42,7 +53,8 @@ const initialState: NotificationStoreState = {
     toasts: [],
     alerts: [],
     unreadCount: 0,
-    alertSettings: {, enableSoundNotification: true,
+    alertSettings: {
+	enableSoundNotification: true,
         enableDesktopNotification: false
     }
 };
@@ -76,8 +88,7 @@ function createNotificationStore() {
 
             return id;
         },
-
-        /**
+	/**
          * Remove notification by ID
          */
         removeNotification(id: string) {
@@ -90,8 +101,7 @@ function createNotificationStore() {
                 };
             });
         },
-
-        /**
+	/**
          * Mark notification as read
          */
         markAsRead(id: string) {
@@ -110,8 +120,7 @@ function createNotificationStore() {
                 };
             });
         },
-
-        /**
+	/**
          * Mark all notifications as read
          */
         markAllAsRead() {
@@ -121,8 +130,7 @@ function createNotificationStore() {
                 unreadCount: 0
             }));
         },
-
-        /**
+	/**
          * Clear all notifications
          */
         clearAllNotifications() {
@@ -132,8 +140,7 @@ function createNotificationStore() {
                 unreadCount: 0
             }));
         },
-
-        /**
+	/**
          * Show toast message (auto-dismiss)
          */
         showToast(message: string, type: NotificationType = 'info', duration: ToastDuration = 3000) {
@@ -155,13 +162,13 @@ function createNotificationStore() {
             if (duration !== 'indefinite') {
                 setTimeout(() => {
                     this.dismissToast(id);
-                }, typeof duration === 'number' ? duration : 3000);
+                },
+	typeof duration === 'number' ? duration : 3000);
             }
 
             return id;
         },
-
-        /**
+	/**
          * Dismiss a toast
          */
         dismissToast(id: string) {
@@ -170,15 +177,13 @@ function createNotificationStore() {
                 toasts: s.toasts.filter(t => t.id !== id)
             }));
         },
-
-        /**
+	/**
          * Clear all toasts
          */
         clearAllToasts() {
             update(s => ({ ...s, toasts: [] }));
         },
-
-        /**
+	/**
          * Add an alert (system-level)
          */
         addAlert(alert: Omit<Alert, 'id' | 'isDismissed' | 'createdAt'>) {
@@ -197,8 +202,7 @@ function createNotificationStore() {
 
             return id;
         },
-
-        /**
+	/**
          * Dismiss an alert
          */
         dismissAlert(id: string) {
@@ -209,8 +213,7 @@ function createNotificationStore() {
                 )
             }));
         },
-
-        /**
+	/**
          * Remove alert completely
          */
         removeAlert(id: string) {
@@ -219,8 +222,7 @@ function createNotificationStore() {
                 alerts: s.alerts.filter(a => a.id !== id)
             }));
         },
-
-        /**
+	/**
          * Clear all dismissed alerts
          */
         clearDismissedAlerts() {
@@ -229,8 +231,7 @@ function createNotificationStore() {
                 alerts: s.alerts.filter(a => !a.isDismissed)
             }));
         },
-
-        /**
+	/**
          * Update notification settings
          */
         updateSettings(settings: Partial<NotificationStoreState['alertSettings']>) {
@@ -239,8 +240,7 @@ function createNotificationStore() {
                 alertSettings: { ...s.alertSettings, ...settings }
             }));
         },
-
-        /**
+	/**
          * Toggle sound notifications
          */
         toggleSoundNotification() {
@@ -252,8 +252,7 @@ function createNotificationStore() {
                 }
             }));
         },
-
-        /**
+	/**
          * Toggle desktop notifications
          */
         toggleDesktopNotification() {

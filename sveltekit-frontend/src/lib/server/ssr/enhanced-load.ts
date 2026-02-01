@@ -107,7 +107,7 @@ export const createEnhancedLayoutLoad = () => {
                 userCases: [],
                 recentEvidence: [],
                 caseStats: { total: 0, open: 0, investigating: 0, closed: 0 },
-                systemStatus: { apiHealthy: true,
+	systemStatus: { apiHealthy: true,
                     pgvectorEnabled: dbHealth?.pgvectorEnabled ?? false
                 }
             };
@@ -176,11 +176,11 @@ export const createEnhancedLayoutLoad = () => {
                     queryTime: 0,
                     errors: ['Database unavailable']
                 },
-                userCases: [],
+	userCases: [],
                 recentEvidence: [],
                 caseStats: { total: 0, open: 0, investigating: 0, closed: 0 },
-                systemStatus: { apiHealthy: false, pgvectorEnabled: false, aiServicesOnline: false },
-                hydrationContext: createHydrationContext(url, request, locals.user),
+	systemStatus: { apiHealthy: false, pgvectorEnabled: false, aiServicesOnline: false },
+	hydrationContext: createHydrationContext(url, request, locals.user),
                 _metrics: metrics,
                 _error: error instanceof Error ? error.message : 'Unknown error'
             };
@@ -269,13 +269,13 @@ function createHydrationContext(url: URL, request: Request, user: User | null) {
             contentRatio: 0.618,
             sidebarRatio: 0.382
         },
-        // AI system status for client hydration
+	// AI system status for client hydration
         aiSystemStatus: { localLLMEnabled: true,
             ragEnabled: true,
             vectorSearchEnabled: true,
             streamingEnabled: true
         },
-        // Theme and UI preferences
+	// Theme and UI preferences
         uiPreferences: { theme: 'auto',
             language: 'en',
             accessibility: { highContrast: false,
@@ -283,7 +283,7 @@ function createHydrationContext(url: URL, request: Request, user: User | null) {
                 screenReader: false
             }
         },
-        // Cache statistics for debugging
+	// Cache statistics for debugging
         cacheStats: SSRCache.getStats()
     };
 }
@@ -313,7 +313,7 @@ export const SSRCacheUtils = {
     invalidateUser: (userId: string) => {
         SSRCache.delete(`user_layout_${userId}`);
     },
-    invalidateCase: (caseId: string, userId: string) => {
+	invalidateCase: (caseId: string, userId: string) => {
         SSRCache.delete(`case_${caseId}_${userId}`);
     }
 };

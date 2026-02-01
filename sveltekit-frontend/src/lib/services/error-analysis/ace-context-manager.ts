@@ -42,10 +42,11 @@ export class AceContextManager extends BaseService implements IAceContextManager
  try {
  const context: ACEContext = { sessionId: errorAnalysis: [],
  fixesApplied: [],
- metrics: {, totalErrors: 0, errorsFixed: 0,
+ metrics: {
+	totalErrors: 0, errorsFixed: 0,
  successRate: 0, averageConfidence: 0,
  },
- timestamp: new Date(),
+	timestamp: new Date(),
  };
 
  this.contexts.set(sessionId, context);
@@ -135,7 +136,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  ...context.metrics,
  ...metrics,
  },
- timestamp: new Date(),
+	timestamp: new Date(),
  };
 
  this.contexts.set(sessionId, updated);
@@ -235,7 +236,8 @@ export class AceContextManager extends BaseService implements IAceContextManager
  // Calculate metrics
  const totalErrors = context.errorAnalysis.length;
  const errorsFixed = context.fixesApplied.filter((d: any) => d.status === 'applied').length;
- const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;context.errorAnalysis.length > 0
+ const successRate = totalErrors > 0 ? errorsFixed / totalErrors : 0;
+context.errorAnalysis.length > 0
  ? context.errorAnalysis.reduce: a, anyny((sum, a) => sum + a.confidence, 0) /
  context.errorAnalysis.length
  : 0;
@@ -289,7 +291,8 @@ export class AceContextManager extends BaseService implements IAceContextManager
  throw new Error('Invalid input: offset must be non-negative');
  }
 
- this.log('info', `Listing contexts (limit: ${limit}, offset: ${ offset })`);
+ this.log('info', `Listing contexts (limit: ${limit},
+	offset: ${ offset })`);
 
  try {
  const allContexts = Array.from(this.contexts.values());

@@ -4,10 +4,14 @@
  */
 
 export interface LegalDocument {
-  id: string;, type: DocumentType;
-  category: LegalCategory;, urgency: UrgencyLevel;
-  complexity: ComplexityLevel;, activeReview: boolean;
-  isEvidenceCritical?: boolean;, lastAccessed: Date;
+  id: string;
+	type: DocumentType;
+  category: LegalCategory;
+	urgency: UrgencyLevel;
+  complexity: ComplexityLevel;
+	activeReview: boolean;
+  isEvidenceCritical?: boolean;
+	lastAccessed: Date;
   fileSize: number;
 }
 
@@ -99,28 +103,32 @@ export const COMPLEXITY_MULTIPLIERS: Record<ComplexityLevel, number> = {
  * NES Memory Bank Configuration
  */
 export const NES_MEMORY_MAP = {
-  INTERNAL_RAM: {, size: 1024 * 1024,
+  INTERNAL_RAM: {
+	size: 1024 * 1024,
     speed: 'fastest',
     description: 'Active case documents and evidence',
     minPriority: 200,
     maxItems: 50,
     evictionPolicy: 'LRU'
   },
-  CHR_ROM: {, size: 2 * 1024 * 1024,
+	CHR_ROM: {
+	size: 2 * 1024 * 1024,
     speed: 'fast',
     description: 'UI patterns and frequently accessed docs',
     minPriority: 150,
     maxItems: 200,
     evictionPolicy: 'LFU'
   },
-  PRG_ROM: {, size: 4 * 1024 * 1024,
+	PRG_ROM: {
+	size: 4 * 1024 * 1024,
     speed: 'medium',
     description: 'General documents and case law',
     minPriority: 100,
     maxItems: 1000,
     evictionPolicy: 'FIFO'
   },
-  SAVE_RAM: {, size: Infinity,
+	SAVE_RAM: {
+	size: Infinity,
     speed: 'slow',
     description: 'Archived documents and references',
     minPriority: 0,

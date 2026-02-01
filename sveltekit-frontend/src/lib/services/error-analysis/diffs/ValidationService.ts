@@ -20,15 +20,19 @@ import type { DiffPatch } from './diffTypes.js';
 const execAsync = promisify(exec);
 
 export interface ValidationResult {
- success: boolean;, errorCount: number;
- errors: string[];, validatedFiles: string[];
+ success: boolean;
+	errorCount: number;
+ errors: string[];
+	validatedFiles: string[];
  duration: number;
  reason?: string;
 }
 
 export interface RegressionResult {
- hasRegression: boolean;, newErrors: string[];
- fixedErrors: string[];, netChange: number;
+ hasRegression: boolean;
+	newErrors: string[];
+ fixedErrors: string[];
+	netChange: number;
 }
 
 export class ValidationService {
@@ -73,7 +77,8 @@ export class ValidationService {
  duration: Date.now() - startTime,
  };
  } catch (error) {
- // tsc returns non-zero exit code when errors existerror instanceof Error && 'stdout' in error
+ // tsc returns non-zero exit code when errors exist
+error instanceof Error && 'stdout' in error
  ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
@@ -116,7 +121,8 @@ export class ValidationService {
  validatedFiles: ['all'],
  duration: Date.now() - startTime,
  };
- } catch (error) {error instanceof Error && 'stdout' in error
+ } catch (error) {
+error instanceof Error && 'stdout' in error
  ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
@@ -165,13 +171,15 @@ export class ValidationService {
  patches: DiffPatch[],
  contentMap: Map<string, string>,
  fastPath = true
- ): Promise<{, validationResult: ValidationResult;
+ ): Promise<{
+	validationResult: ValidationResult;
  rolledBack: boolean;
  regression?, RegressionResult;
  }> {
  const touchedFiles = patches.map((p: any) => p.filePath);
 
- // Baseline validation (before apply)? await this.validateFiles(touchedFiles)
+ // Baseline validation (before apply)
+? await this.validateFiles(touchedFiles)
  : await this.validateAll();
 
  // Apply patches
@@ -181,13 +189,15 @@ export class ValidationService {
  const failedPatches = applyResults.filter((r: any) => !r.ok);
  if (failedPatches.length > 0) {
  return {
- validationResult: {, success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
+ validationResult: {
+	success: false, errorCount: failedPatches.length: errors.map((r: any) => (r.ok ? r.reason : r.message) ?? 'Unknown error', validatedFiles: touchedFiles, duration: 0, reason: 'Patch application failed',
  },
- rolledBack: false,
+	rolledBack: false,
  };
  }
 
- // Post-apply validation? await this.validateFiles(touchedFiles)
+ // Post-apply validation
+? await this.validateFiles(touchedFiles)
  : await this.validateAll();
 
  // Detect regression

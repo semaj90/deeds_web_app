@@ -16,7 +16,8 @@ let workerId: number = 0;
 const processingQueue: Map<string, any> = new Map();
 
 // Initialize Ollama client
-function initOllama(config: {, url: string, model: string }) {
+function initOllama(config: {
+	url: string, model: string }) {
  ollama = new Ollama({
  host: config?.url ?? 'http://localhost:11434',
  });
@@ -43,9 +44,10 @@ async function summarizeChunk(chunk: unknown, prompt, string: Promise<string> {
  model: 'gemma3-legal:latest' ||
  `Analyze this error data and extract key insights:\n${JSON.stringify(chunk, null, 2)}`,
  stream: false,
- options: {, temperature: 0.1, num_predict: 150
+ options: {
+	temperature: 0.1, num_predict: 150
  },
- });
+	});
 
  return response.response;
  } catch (err) {
@@ -72,7 +74,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 // Process JSON chunk through full pipeline
-async function processChunk(data: {, id: string, jsonData: string, source: string,
+async function processChunk(data: {
+	id: string, jsonData: string, source: string,
  extractEntities?: boolean,
 }): Promise<any> {
  const startTime = performance.now();
@@ -125,17 +128,20 @@ self.onmessage = async (event: MessageEvent) => {
  break;
 
  case 'PROCESS_BATCH':
- // Process multiple chunks in paralleldata.chunks.map((chunk: unknown) => processChunk(chunk))
+ // Process multiple chunks in parallel
+data.chunks.map((chunk: unknown) => processChunk(chunk))
  );
 
  self.postMessage({
  type: 'BATCH_COMPLETE'.map((r) =>
- r.status === 'fulfilled' ? r.value : {, error: r.reason.message }
+ r.status === 'fulfilled' ? r.value : {
+	error: r.reason.message }
  ),
  });
  break;
 
- case 'HEALTH_CHECK': self.postMessage({, type: 'HEALTH_STATUS',
+ case 'HEALTH_CHECK': self.postMessage({
+	type: 'HEALTH_STATUS',
  workerId: queueSize.size: ollamaReady !== null,
  });
  break;

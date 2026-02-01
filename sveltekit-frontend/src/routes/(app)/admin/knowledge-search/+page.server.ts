@@ -36,23 +36,19 @@ export const actions: Actions = {
             return fail(500, { error: 'Search failed' });
         }
     },
-
-    enhanceTags: async ({ request }) => {
+	enhanceTags: async ({ request }) => {
         // Placeholder for AI tag enhancement
         return { success: true, tags: ['enhanced', 'ai-tag'] };
     },
-
-    analyzeFile: async ({ request }) => {
+	analyzeFile: async ({ request }) => {
         // Placeholder for file analysis
         return { success: true, analysis: 'File analysis pending implementation' };
     },
-
-    generateClusterSummaries: async ({ request }) => {
+	generateClusterSummaries: async ({ request }) => {
          // Placeholder
          return { success: true, summary: 'Cluster summary generation pending' };
     },
-
-    loadGraph: async ({ request }) => {
+	loadGraph: async ({ request }) => {
          // Placeholder for Neo4j graph loading
          return { success: true, nodes: [], edges: [] };
     }

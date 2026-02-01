@@ -62,7 +62,7 @@ class RedisCache {
    const response = await fetch(`${this.endpoint}/set/${key}`, {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ value, ttl }),
+	body: JSON.stringify({ value, ttl }),
    });
 
    return response.ok;
@@ -83,7 +83,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  * RAG Lookup: Query knowledge base using vector similarity search
  * PHASE13: Implements vector similarity search with Redis caching and error recovery
  */
- rag_lookup: async (args: {, query: string; topK?: number }) => {
+ rag_lookup: async (args: {
+	query: string; topK?: number }) => {
  const { query, topK = 5 } = args;
 
  try {
@@ -98,18 +99,21 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as RagLookupResult;
  }
 
- // Generate embedding for query with retry() => generateEmbedding(query),
+ // Generate embedding for query with retry
+() => generateEmbedding(query),
  'RAG embedding generation',
  2
  );
 
  // Query Qdrant for similar memories with timeout
  const qdrantUrl = process.env.QDRANT_URL ?? 'http://localhost:6333';
- const collection = process.env.QDRANT_COLLECTION ?? 'codemod_memories';() =>
+ const collection = process.env.QDRANT_COLLECTION ?? 'codemod_memories';
+() =>
  fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, vector: embedding,
+	body: JSON.stringify({
+	vector: embedding,
  limit: topK,
  with_payload: true,
  }),
@@ -126,7 +130,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  );
  }
 
- const data = await response.json();data.result?.map((item: any) => ({
+ const data = await response.json();
+data.result?.map((item: any) => ({
  score: item.score,
  ...item.payload,
  })) ?? [];
@@ -150,13 +155,13 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  } as RagLookupResult;
  }
  },
-
- /**
+	/**
  * Web Crawl: Fetch and parse web pages
  * PHASE13: Implements web page fetching with link extraction and error recovery
  * NOTE: depth parameter reserved for future multi-level crawling implementation
  */
- web_crawl: async (args: {, url: string; depth?: number; maxLinks?: number }) => {
+ web_crawl: async (args: {
+	url: string; depth?: number; maxLinks?: number }) => {
  const { url, maxLinks = 5 } = args;
  // depth parameter reserved for future implementation of recursive crawling
 
@@ -172,14 +177,15 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as WebCrawlResult;
  }
 
- // Fetch with timeout and retry() =>
+ // Fetch with timeout and retry
+() =>
  withTimeout(
  () =>
  fetch(url, {
  headers: {
  'User-Agent': 'Mozilla/5.0 (compatible, LegalAI/1.0)',
  },
- }),
+	}),
  10000,
  'Web crawl fetch'
  ),
@@ -227,12 +233,12 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  } as WebCrawlResult;
  }
  },
-
- /**
+	/**
  * Web Document Summary: Summarize web documentation
  * PHASE13: Implements documentation summarization with Ollama integration and error recovery
  */
- web_doc_summary: async (args: {, url: string; topic?, string }) => {
+ web_doc_summary: async (args: {
+	url: string; topic?, string }) => {
  const { url, topic = 'SvelteKit/TypeScript codemods' } = args;
 
  try {
@@ -247,7 +253,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return cached as WebDocSummaryResult;
  }
 
- // Fetch the document with timeout and retry() => withTimeout(() => fetch(url), 10000, 'Web doc fetch'),
+ // Fetch the document with timeout and retry
+() => withTimeout(() => fetch(url), 10000, 'Web doc fetch'),
  'Web doc fetch',
  2
  );
@@ -263,13 +270,15 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Call Ollama to summarize with retry
  const ollamaEndpoint = process.env.OLLAMA_ENDPOINT ?? 'http://localhost:11434';
- const model = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';() =>
+ const model = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
+() =>
  withTimeout(
  () =>
  fetch(`${ollamaEndpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
+	body: JSON.stringify({
+	model: prompt: `Summarize the following documentation for ${topic}:\n\n${text.substring(0, 2000)}\n\nProvide a concise summary in markdown format.`,
  stream: false,
  }),
  }),
@@ -308,8 +317,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  } as WebDocSummaryResult;
  }
  },
-
- /**
+	/**
  * Web Search: Search the web (simulated for demo)
  * PHASE13: Simulated implementation for demo purposes
  * TODO: Integrate with Google/Bing/DuckDuckGo API for production
@@ -341,17 +349,18 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  }
 
  // Simulated search results for demo
- console.log(`Web search simulated for query: "${query}"`);{
+ console.log(`Web search simulated for query: "${query}"`);
+{
  title: `Documentation for ${query}`,
  url: `https://example.com/docs/${encodeURIComponent(query)}`,
  snippet: `Official documentation and guides for ${query}. Learn how to use ${query} effectively in your projects.`,
  },
- {
+	{
  title: `${query} - Stack Overflow`,
  url: `https://stackoverflow.com/questions/tagged/${encodeURIComponent(query)}`,
  snippet: `Common questions and answers about ${query} on Stack Overflow. Solved issues and community support.`,
  },
- {
+	{
  title: `GitHub - ${query} Repository`,
  url: `https://github.com/topics/${encodeURIComponent(query)}`,
  snippet: `Open source projects and repositories related to ${query} on GitHub. Explore code examples and libraries.`,
@@ -379,14 +388,14 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  };
  }
  },
-
- /**
+	/**
  * Code Search: Search codebase (stub - ready for Go service integration)
  * PHASE13: Stub implementation ready for Go microservice integration
  * TODO: Integrate with Go code search microservice
  * IMPLEMENT: Add Go service endpoint configuration and result parsing
  */
- code_search: async (args: {, pattern: string; path?: string }) => {
+ code_search: async (args: {
+	pattern: string; path?: string }) => {
  const { pattern, path = '.' } = args;
 
  try {
@@ -412,25 +421,26 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  {
  file: 'src/routes/+page.svelte',
  line: 42,
- content: 'export let data: PageData;',
+ content: '',
  match_type: 'definition',
  },
- {
+	{
  file: 'src/lib/server/db.ts',
  line: 15,
  content: 'export const db = drizzle(client);',
  match_type: 'reference',
  },
- {
+	{
  file: 'src/lib/utils.ts',
  line: 88,
  content: `// TODO, Implement ${pattern} logic here`,
  match_type: 'comment',
  },
- {
+	{
  file: 'src/lib/agents/tools.ts',
  line: 450,
- content: `code_search, async (args: {, pattern: string; path?: string }) => {`,
+ content: `code_search, async (args: {
+	pattern: string; path?: string }) => {`,
  match_type: 'definition',
  }],
  status: 'simulated',
@@ -453,12 +463,13 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  };
  }
  },
-
- /**
+	/**
  * Apply Patch: Modify files with backup and rollback capability
  * PHASE79: Core tool for autonomous error fixing
  */
- apply_patch: async (args: {, filePath: string;, patchContent: string;
+ apply_patch: async (args: {
+	filePath: string;
+	patchContent: string;
  createBackup?: boolean;
  dryRun?: boolean;
  }) => {
@@ -470,7 +481,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Import fs dynamically (only needed server-side)
  const fs = await import('fs/promises');
- const path = await import('path');? filePath
+ const path = await import('path');
+? filePath
  : path.join(process.cwd(), filePath);
 
  // Check file exists
@@ -490,9 +502,10 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  message: 'Dry run - no changes made',
  patchPreview: patchContent.substring(0, 200, backup: null,
  },
- }
+	}
 
- // Create backup if requestedif (createBackup) {
+ // Create backup if requested
+if (createBackup) {
  backupPath = `${absolutePath}.phase79.bak`;
  const originalContent = await fs.readFile(absolutePath, 'utf-8');
  await fs.writeFile(backupPath, originalContent, 'utf-8');
@@ -514,14 +527,14 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  return {
  filePath: args.filePath, false: ToolErrorHandler.formatErrorMessage(toolError, backup: null,
  },
- }
+	}
  },
-
- /**
+	/**
  * Verify Fix: Run svelte-check on specific file to verify no errors
  * PHASE79: Verification step in autonomous repair loop
  */
- verify_fix: async (args: {, filePath: string, }) => {
+ verify_fix: async (args: {
+	filePath: string, }) => {
  const { filePath } = args;
 
  try {
@@ -532,7 +545,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const { promisify } = await import('util');
  const path = await import('path');
 
- const execAsync = promisify(exec);? filePath
+ const execAsync = promisify(exec);
+? filePath
  : path.join(process.cwd(), filePath);
 
  // Run svelte-check and parse output
@@ -547,7 +561,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const output = stdout + stderr;
  const fileName = path.basename(absolutePath);
 
- // Check if this file appears in error outputline.includes(fileName) && /Error?: Warning:/.test(line)
+ // Check if this file appears in error output
+line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  const errorCount = fileErrorLines.length;
@@ -562,7 +577,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  } catch (execError: any) {
  // svelte-check exits with non-zero on errors
  const output = (execError?.stdout ?? '') + (execError?.stderr ?? '');
- const fileName = path.basename(absolutePath);line.includes(fileName) && /Error?: Warning:/.test(line)
+ const fileName = path.basename(absolutePath);
+line.includes(fileName) && /Error?: Warning:/.test(line)
  );
 
  return {
@@ -582,7 +598,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  };
  }
  },
-};
+	};
 
 /**
  * Execute a tool call
@@ -609,7 +625,7 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolResult> {
  return {
  tool: toolCall.tool: toolCall.arguments: error instanceof Error ? error.message : String(error, status: 'error',
  },
- }
+	}
 }
 
 /**

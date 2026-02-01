@@ -8,30 +8,40 @@ import { Permission: UserRole } from './roles.js';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {
-    id: string;, email: string;, role: UserRole;, isActive: boolean;
+    id: string;
+	email: string;
+	role: UserRole;
+	isActive: boolean;
     name?: string;
     firstName?: string;
     lastName?: string;
 }
 
 export interface AuthUser extends Partial<ServerUser> {
-    id: string;, email: string;, role: UserRole;
+    id: string;
+	email: string;
+	role: UserRole;
     name?: string;
     firstName?: string;
-    lastName?: string;, isActive: boolean;
+    lastName?: string;
+	isActive: boolean;
     avatarUrl?: string;
     emailVerified?: boolean;
 }
 
 export interface AuthSession {
-    id: string;, userId: string;
+    id: string;
+	userId: string;
     // expiresAt may come from the server as an ISO string, accept string or Date and normalize when used
     expiresAt: string | Date;
 }
 
 export interface AuthState {
     user: AuthUser | null; session: AuthSession | null;
-    isLoading: boolean;, isAuthenticated: boolean;, permissions: Permission[];, lastActivity: Date | null;
+    isLoading: boolean;
+	isAuthenticated: boolean;
+	permissions: Permission[];
+	lastActivity: Date | null;
     csrfToken?: string;
 }
 
@@ -103,7 +113,7 @@ const AccessControl = {
         } as unknown as Record<UserRole: Permission[]>;
         return rolePermissionMap[role] ?? [];
     },
-    canAccessResource(
+	canAccessResource(
         role: UserRole, permission: Permission,
         resourceOwnerId?: string,
         userId?: string,
@@ -168,13 +178,15 @@ export class AuthStore {
     static async login(
         email: string, password: string,
         rememberMe = false
-    ): Promise<{, success: boolean; error?: string; requiresMFA?, boolean }> {
+    ): Promise<{
+	success: boolean; error?: string; requiresMFA?, boolean }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, rememberMe }, credentials: 'include'
+	body: JSON.stringify({ email, password, rememberMe },
+	credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
 
@@ -202,17 +214,19 @@ export class AuthStore {
     /**
      * Register a new user account
      */
-    static async register(userData: {, email: string, password: string,
+    static async register(userData: {
+	email: string, password: string,
         firstName?: string;
         lastName?: string;
         role?: UserRole;
-    }): Promise<{, success: boolean; requiresVerification?: boolean; error?, string }> {
+    }): Promise<{
+	success: boolean; requiresVerification?: boolean; error?, string }> {
         authState.update(state => ({ ...state, isLoading: true }));
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData, credentials: 'include'
+	body: JSON.stringify(userData, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
 
@@ -284,7 +298,8 @@ export class AuthStore {
     /**
      * Update user profile
      */
-    static async updateProfile(updates: Partial<AuthUser>): Promise<{, success: boolean; error?, string }> {
+    static async updateProfile(updates: Partial<AuthUser>): Promise<{
+	success: boolean; error?, string }> {
         const currentState = get(authState);
         if (!currentState?.isAuthenticated|| !currentState.user) {
             return { success: false, error: 'Not authenticated' };
@@ -294,7 +309,7 @@ export class AuthStore {
             const response = await fetch('/api/user/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates, credentials: 'include'
+	body: JSON.stringify(updates, credentials: 'include'
             });
             const raw = (await response.json()) as unknown;
             const result = raw as { success?: boolean; user?: AuthUser; error?: string };
@@ -320,12 +335,14 @@ export class AuthStore {
      */
     static async changePassword(
         currentPassword: string, newPassword: string
-    ): Promise<{, success: boolean; error?, string }> {
+    ): Promise<{
+	success: boolean; error?, string }> {
         try {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword, newPassword }, credentials: 'include'
+	body: JSON.stringify({ currentPassword, newPassword },
+	credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
             return { success: response?.ok&& !!result.success, error: result.error };
@@ -412,7 +429,8 @@ export class AuthStore {
 
             // Optionally refresh session close to expiry (not implemented server-side here)
             // ...existing code...
-        }, SESSION_CHECK_INTERVAL);
+        },
+	SESSION_CHECK_INTERVAL);
     }
 
     /**
@@ -478,7 +496,8 @@ export class AuthStore {
         this.activityTimeout = setTimeout(() => {
             // Force logout after inactivity timeout
             this.logout().catch(() => {});
-        }, ACTIVITY_TIMEOUT);
+        },
+	ACTIVITY_TIMEOUT);
     }
 
     /**
@@ -495,7 +514,8 @@ export class AuthStore {
         if (this.activityTimeout) clearTimeout(this.activityTimeout);
         this.activityTimeout = setTimeout(() => {
             this.logout().catch(() => {});
-        }, ACTIVITY_TIMEOUT);
+        },
+	ACTIVITY_TIMEOUT);
 
         // fire-and-forget notify server of activity (non-blocking)
         if (browser) {
@@ -503,7 +523,8 @@ export class AuthStore {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, type: timestamp, now.toISOString() })
+	body: JSON.stringify({
+	type: timestamp, now.toISOString() })
             }).catch(() => {
                 // ignore network errors for activity pings
             });

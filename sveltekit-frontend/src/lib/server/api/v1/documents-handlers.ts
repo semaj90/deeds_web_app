@@ -7,8 +7,10 @@ import { db } from "$lib/server/db";
 import * as schema from '$lib/server/db/schema-postgres';
 
 interface UserType {
-	id: string;, email: string;
-	firstName: string;, lastName: string;
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
 	role: string;
 }
 
@@ -23,7 +25,8 @@ export async function getDocuments(user: UserType, request: Request, _deps: any)
 		return json({ success: true, data: documents });
 	} catch (error) {
 		console.error('Error fetching documents:', error);
-		return json({ success: false, error: 'Failed to fetch documents' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch documents' },
+	{ status: 500 });
 	}
 }
 
@@ -43,14 +46,16 @@ export async function getDocument(
 			),
 		});
 		if (!document) {
-			return json({ success: false, error: 'Document not found or unauthorized' }, { status: 404 });
+			return json({ success: false, error: 'Document not found or unauthorized' },
+	{ status: 404 });
 		}
 		// Placeholder for getting document content from MinIO
 		// const fileContent = await minioService.getFile(document.bucket, document.objectName);
 		return json({ success: true, data: { ...document, content: 'Placeholder for file content' } });
 	} catch (error) {
 		console.error('Error fetching document:', error);
-		return json({ success: false, error: 'Failed to fetch document' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch document' },
+	{ status: 500 });
 	}
 }
 
@@ -70,14 +75,16 @@ export async function getDocumentOCR(
 			),
 		});
 		if (!document) {
-			return json({ success: false, error: 'Document not found or unauthorized' }, { status: 404 });
+			return json({ success: false, error: 'Document not found or unauthorized' },
+	{ status: 404 });
 		}
 		// Placeholder for OCR processing
 		// const ocrResult = await ocrService.performOcr(document.bucket, document.objectName);
 		return json({ success: true, data: { documentId, ocrText: 'Placeholder OCR text' } });
 	} catch (error) {
 		console.error('Error performing OCR:', error);
-		return json({ success: false, error: 'Failed to perform OCR' }, { status: 500 });
+		return json({ success: false, error: 'Failed to perform OCR' },
+	{ status: 500 });
 	}
 }
 
@@ -115,11 +122,12 @@ export async function handleDocumentUpload(
 
 		return json(
 			{ success: true, data: newDocument, message: 'Document upload initiated' },
-			{ status: 202 }
+	{ status: 202 }
 		);
 	} catch (error) {
 		console.error('Error handling document upload:', error);
-		return json({ success: false, error: 'Failed to handle document upload' }, { status: 500 });
+		return json({ success: false, error: 'Failed to handle document upload' },
+	{ status: 500 });
 	}
 }
 

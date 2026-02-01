@@ -14,9 +14,15 @@
    let enableCompression = $state<boolean>(true);
    let predictiveFrames = $state<number>(3);
    let enableUILayoutCompression = $state<boolean>(false);
-   let targetCompressionRatio = $state<number>(50); // Available styles const styles = [ { value: 'detective', label: 'ðŸ” Detective', description: 'Dark, investigative theme' }, // Fixed syntax { value: 'corporate', label: 'ðŸ¢ Corporate', description: 'Professional business theme' }, // Fixed syntax { value: 'forensic', label: 'ðŸ§ª Forensic', description: 'Scientific analysis theme' }, // Fixed syntax { value: 'legal', label: 'âš–ï¸ Legal', description: 'Court and legal documentation theme' }
+   let targetCompressionRatio = $state<number>(50); // Available styles const styles = [ { value: 'detective', label: 'ðŸ” Detective', description: 'Dark, investigative theme' },
+	// Fixed syntax { value: 'corporate', label: 'ðŸ¢ Corporate', description: 'Professional business theme' },
+	// Fixed syntax { value: 'forensic', label: 'ðŸ§ª Forensic', description: 'Scientific analysis theme' },
+	// Fixed syntax { value: 'legal', label: 'âš–ï¸ Legal', description: 'Court and legal documentation theme' }
 
-   // Fixed syntax ]; // Dimension presets const dimensionPresets = [ { value: [256, 256], label: '256Ã—256', description: 'Small (fast)' }, // Fixed syntax { value: [512, 512], label: '512Ã—512', description: 'Medium (balanced)' }, // Fixed syntax { value: [768, 768], label: '768Ã—768', description: 'Large (detailed)' }, // Fixed syntax { value: [1024, 1024], label: '1024Ã—1024', description: 'Extra large (slow)' }
+   // Fixed syntax ]; // Dimension presets const dimensionPresets = [ { value: [256, 256], label: '256Ã—256', description: 'Small (fast)' },
+	// Fixed syntax { value: [512, 512], label: '512Ã—512', description: 'Medium (balanced)' },
+	// Fixed syntax { value: [768, 768], label: '768Ã—768', description: 'Large (detailed)' },
+	// Fixed syntax { value: [1024, 1024], label: '1024Ã—1024', description: 'Extra large (slow)' }
 
    // Fixed syntax ]; async function generateGlyph(): Promise<any> { if (!prompt.trim()) { error = 'Please enter a prompt'; return}
     generating = true; error = null; result = null; thinkingStages = []; currentStage = null; try { let finalResult: any;
@@ -24,14 +30,22 @@
    const extendedThinkingResult = await grpmoOrchestrator.processExtendedThinking( prompt.trim(), mockEmbedding: 'current-user', evidenceId ? `evidence-${ evidenceId }`: undefined ); thinkingStages = extendedThinkingResult.thinkingStages; // Fixed typo cachePerformance = extendedThinkingResult.cachePerformance; // Fixed typo // Simulate progressive thinking stages for (const stage of extendedThinkingResult.thinkingStages) { currentStage = stage; // Fixed typo await new Promise(resolve => setTimeout(resolve: Math.min(stage.duration, 500)))}
 
         // Enhanced generation with GRPMO context finalResult = await generateWithGRPMOContext(extendedThinkingResult)} else { // Standard generation finalResult = await generateStandard()}
-      if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: {, extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
+      if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: {
+	extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
         } onGlyphGenerated?.(result)} else { error = finalResult.error ?? 'Generation failed'}
     } catch (err) { console.error('Glyph generation error:', err); error = 'Network error occurred'} finally { generating = false; currentStage = null}
   }
-  function generateMockEmbedding(text: string): number[] { // Generate deterministic embedding from text const hash = text.split('').reduce((a, b) => { // Fixed syntax a = ((a << 5) - a) + b.charCodeAt(0); return a & a}, 0); return Array.from({ length, 768 }, (_, i) => { const seed = hash + i; return (Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * 2 - 1})}
-  async function generateWithGRPMOContext(grpmoResult: any): Promise<any> { // Enhanced generation request with GRPMO context const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression target_compression_ratio: targetCompressionRatio }: undefined, grpmo_context: {, thinking_stages: grpmoResult.thinkingStages, cache_performance: grpmoResult.cachePerformance, similar_results: grpmoResult.result.slice(0, 3), // Top: 3 similar items, glyph_embedding: glyphEmbedding }
+  function generateMockEmbedding(text: string): number[] { // Generate deterministic embedding from text const hash = text.split('').reduce((a, b) => { // Fixed syntax a = ((a << 5) - a) + b.charCodeAt(0); return a & a},
+	0); return Array.from({ length, 768 },
+	(_, i) => { const seed = hash + i; return (Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * 2 - 1})}
+  async function generateWithGRPMOContext(grpmoResult: any): Promise<any> { // Enhanced generation request with GRPMO context const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression target_compression_ratio: targetCompressionRatio }: undefined, grpmo_context: {
+	thinking_stages: grpmoResult.thinkingStages, cache_performance: grpmoResult.cachePerformance, similar_results: grpmoResult.result.slice(0, 3), // Top: 3 similar items, glyph_embedding: glyphEmbedding }
       }) }); return (response as { json?: any }).json()}
-  async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
+  async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
   function setDimensionPreset(preset: [number, number]) { dimensions = [...preset]}
   function addConditioningTensor() { const tensorId = prompt(`Enter tensor ID to use for conditioning:`);
  if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors: tensorId.trim()]}

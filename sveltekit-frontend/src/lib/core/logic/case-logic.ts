@@ -3,7 +3,8 @@
  * No UI dependencies here — usable by DOM or Canvas renderers
  */
 export type CaseFile = {
-    id: string;, title: string;
+    id: string;
+	title: string;
     summary?: string;
     pages?: number;
     attachments?: number;
@@ -21,8 +22,7 @@ export const CaseLogic = {
         if ((caseFile?.title ?? '').length > 40) score = Math.min(100, score + 5);
         return score;
     },
-
-    getDisplayStatus(caseFile: CaseFile) {
+	getDisplayStatus(caseFile: CaseFile) {
         const score = CaseLogic.calculateRiskScore(caseFile);
         if (score >= 80) return 'Critical';
         if (score >= 50) return 'High';

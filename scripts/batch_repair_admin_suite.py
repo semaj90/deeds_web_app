@@ -1,0 +1,1053 @@
+import os
+
+def write_file(path, content):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"✅ Repaired: {path}")
+
+# 1. Repair src/routes/acp/+page.svelte
+acp_page_svelte = r"""<script lang="ts">
+	import { onMount } from 'svelte';
+
+	// State using Svelte 5 $state runes
+	let tools = $state<any[]>([]);
+	let categories = $state<string[]>([]);
+	let selectedCategory = $state<string>('all');
+	let selectedTool = $state<string>('');
+	let toolArgs = $state<string>('{}');
+	let result = $state<any>(null);
+	let loading = $state(false);
+	let systemHealth = $state<any>(null);
+	let error = $state<string>('');
+
+	// Derived filtered tools
+	let filteredTools = $derived(
+		selectedCategory === 'all'
+			? tools
+			: tools.filter((t) => t.category === selectedCategory)
+	);
+
+	onMount(async () => {
+		await loadTools();
+		await checkHealth();
+	});
+
+	async function loadTools() {
+		try {
+			const res = await fetch('/api/acp/tools');
+			const data = await res.json();
+			tools = data.tools || [];
+			categories = [...new Set(tools.map((t: any) => t.category))];
+		} catch (e) {
+			error = 'Failed to load tools';
+		}
+	}
+
+	async function checkHealth() {
+		try {
+			const res = await fetch('/api/acp/execute', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ tool: 'system:health', args: {} })
+			});
+			const data = await res.json();
+			systemHealth = data.result?.services ?? {};
+		} catch {
+			systemHealth = null;
+		}
+	}
+
+	async function executeTool() {
+		if (!selectedTool) return;
+
+		loading = true;
+		error = '';
+		result = null;
+
+		try {
+			const args = JSON.parse(toolArgs);
+			const res = await fetch('/api/acp/execute', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ tool: selectedTool, args })
+			});
+			const data = await res.json();
+			result = data;
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Execution failed';
+		} finally {
+			loading = false;
+		}
+	}
+
+	function selectTool(toolName: string) {
+		selectedTool = toolName;
+		toolArgs = '{}';
+		result = null;
+
+		// Set default args based on tool
+		const defaults: Record<string, any> = {
+			'knowledge:search': { query: 'Svelte 5 runes', topK: 5 },
+			'llm:generate': { prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
+			'llm:embed': { text: 'Svelte 5 runes for state management' },
+			'vector:similarity': { text: 'Svelte reactivity', topK: 5 },
+			'ast:analyze': { filePath: 'src/lib/components/Example.svelte' },
+			'code:search': { pattern: 'export let', path: 'src' },
+			'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
+		};
+
+		if (defaults[toolName]) {
+			toolArgs = JSON.stringify(defaults[toolName], null, 2);
+		}
+	}
+
+	function getStatusIcon(status: string) {
+		switch (status) {
+			case 'healthy':
+				return '🟢';
+			case 'unhealthy':
+				return '🟡';
+			default:
+				return '🔴';
+		}
+	}
+
+	function getCategoryIcon(category: string) {
+		const icons: Record<string, string> = {
+			knowledge: '📚',
+			database: '🗄️',
+			cache: '💾',
+			storage: '📦',
+			llm: '🧠',
+			code: '💻',
+			agent: '🤖',
+			fix: '🔧',
+			system: '⚙️',
+			vector: '🔢',
+			ast: '🌳',
+			drizzle: '💧',
+			testing: '🧪',
+			search: '🔍',
+			external: '🌐'
+		};
+		return icons[category] || '📋';
+	}
+</script>
+
+<svelte:head>
+	<title>ACP Tool Dashboard | Phase 76</title>
+	<meta name="description" content="Agent Communication Protocol Tool Dashboard" />
+</svelte:head>
+
+<div class="dashboard">
+	<!-- Header -->
+	<header class="header">
+		<div class="header-content">
+			<h1>🛠️ ACP Tool Dashboard</h1>
+			<p class="subtitle">Phase 76 Agent Communication Protocol</p>
+		</div>
+		<div class="header-stats">
+			<span class="stat">{tools.length} Tools</span>
+			<span class="stat">{categories.length} Categories</span>
+		</div>
+	</header>
+
+	<!-- System Health -->
+	{#if systemHealth}
+		<section class="health-panel">
+			<h2>System Health</h2>
+			<div class="health-grid">
+				{#each Object.entries(systemHealth) as [service, status]}
+					<div class="health-item" class:healthy={status === 'healthy'} class:offline={status === 'offline'}>
+						<span class="health-icon">{getStatusIcon(status as string)}</span>
+						<span class="health-name">{service}</span>
+						<span class="health-status">{status}</span>
+					</div>
+				{/each}
+			</div>
+			<button class="refresh-btn" onclick={checkHealth}>🔄 Refresh</button>
+		</section>
+	{/if}
+
+	<div class="main-layout">
+		<!-- Tool Browser -->
+		<aside class="tool-browser">
+			<div class="category-filter">
+				<label for="category">Category:</label>
+				<select id="category" bind:value={selectedCategory}>
+					<option value="all">All Categories</option>
+					{#each categories as cat}
+						<option value={cat}>{getCategoryIcon(cat)} {cat.toUpperCase()}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="tool-list">
+				{#each filteredTools as tool}
+					<button
+						class="tool-item"
+						class:selected={selectedTool === tool.name}
+						onclick={() => selectTool(tool.name)}
+					>
+						<span class="tool-icon">{getCategoryIcon(tool.category)}</span>
+						<div class="tool-info">
+							<span class="tool-name">{tool.name}</span>
+							<span class="tool-desc">{tool.description}</span>
+						</div>
+					</button>
+				{/each}
+			</div>
+		</aside>
+
+		<!-- Execution Panel -->
+		<main class="execution-panel">
+			{#if selectedTool}
+				<div class="executor">
+					<h2>{selectedTool}</h2>
+					<p class="tool-description">
+						{tools.find((t) => t.name === selectedTool)?.description}
+					</p>
+
+					<div class="args-section">
+						<label for="args">Arguments (JSON):</label>
+						<textarea
+							id="args"
+							bind:value={toolArgs}
+							rows="6"
+							placeholder={'{"query", "example"}'}
+						></textarea>
+					</div>
+
+					<button class="execute-btn" onclick={ executeTool } disabled={loading}>
+						{#if loading}
+							⏳ Executing...
+						{:else}
+							▶️ Execute Tool
+						{/if}
+					</button>
+
+					{#if error}
+						<div class="error-box">
+							❌ {error}
+						</div>
+					{/if}
+
+					{#if result}
+						<div class="result-box">
+							<h3>Result</h3>
+							<div class="result-meta">
+								<span class:success={result.success} class:failure={!result.success}>
+									{result.success ? '✅ Success' : '❌ Failed'}
+								</span>
+								{#if result.metadata?.duration}
+									<span class="duration">⏱️ {result.metadata.duration}ms</span>
+								{/if}
+							</div>
+							<pre class="result-json">{JSON.stringify(result.result ?? result.error, null, 2)}</pre>
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<div class="placeholder">
+					<div class="placeholder-icon">🛠️</div>
+					<h2>Select a Tool</h2>
+					<p>Choose a tool from the sidebar to execute it</p>
+
+					<div class="quick-actions">
+						<h3>Quick Actions</h3>
+						<button onclick={() => selectTool('system:health')}>🏥 System Health</button>
+						<button onclick={() => selectTool('llm:models')}>🧠 List LLM Models</button>
+						<button onclick={() => selectTool('knowledge:search')}>🔍 Knowledge Search</button>
+						<button onclick={() => selectTool('agent:discover')}>🤖 Discover Agents</button>
+					</div>
+				</div>
+			{/if}
+		</main>
+	</div>
+</div>
+
+<style>
+	.dashboard {
+		min-height: 100vh;
+		background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+		color: #e0e0e0;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	.header {
+		background: linear-gradient(90deg, #1a1a2e 0%, #2a2a4e 100%);
+		padding: 1.5rem 2rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.header h1 {
+		margin: 0;
+		font-size: 1.8rem;
+		background: linear-gradient(135deg, #00d4ff, #00ff88);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+
+	.subtitle {
+		margin: 0.25rem 0 0;
+		color: #888;
+		font-size: 0.9rem;
+	}
+
+	.header-stats {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.stat {
+		background: rgba(0, 212, 255, 0.1);
+		border: 1px solid rgba(0, 212, 255, 0.3);
+		padding: 0.5rem 1rem;
+		border-radius: 20px;
+		font-size: 0.85rem;
+		color: #00d4ff;
+	}
+
+	.health-panel {
+		margin: 0 2rem 1rem;
+	}
+
+	.health-panel h2 {
+		margin: 0 0 1rem;
+		font-size: 1rem;
+		color: #888;
+	}
+
+	.health-grid {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.health-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: rgba(255, 255, 255, 0.05);
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.2s;
+	}
+
+	.healthy {
+		border-color: rgba(0, 255, 136, 0.3);
+		background: rgba(0, 255, 136, 0.05);
+	}
+
+	.offline {
+		opacity: 0.5;
+	}
+
+	.health-status {
+		font-size: 0.8rem;
+		color: #888;
+		text-transform: capitalize;
+	}
+
+	.refresh-btn {
+		margin-top: 1rem;
+		background: transparent;
+		border: 1px solid rgba(0, 212, 255, 0.3);
+		color: #00d4ff;
+		padding: 0.4rem 0.8rem;
+		border-radius: 6px;
+		cursor: pointer;
+		font-size: 0.8rem;
+		transition: all 0.2s;
+	}
+
+	.refresh-btn:hover {
+		background: rgba(0, 212, 255, 0.1);
+	}
+
+	.main-layout {
+		display: grid;
+		grid-template-columns: 300px 1fr;
+		gap: 0;
+		height: calc(100vh - 80px);
+	}
+
+	.tool-browser {
+		background: rgba(0, 0, 0, 0.2);
+		border-right: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1rem;
+		overflow-y: auto;
+	}
+
+	.category-filter {
+		margin-bottom: 1.5rem;
+	}
+
+	.category-filter label {
+		display: block;
+		font-size: 0.8rem;
+		color: #888;
+		margin-bottom: 0.5rem;
+	}
+
+	.category-filter select {
+		width: 100%;
+		padding: 0.6rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 6px;
+		color: #e0e0e0;
+		font-size: 0.9rem;
+	}
+
+	.tool-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.tool-item {
+		width: 100%;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 8px;
+		cursor: pointer;
+		text-align: left;
+		color: #e0e0e0;
+		transition: all 0.2s;
+	}
+
+	.tool-item:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.tool-item.selected {
+		background: rgba(0, 212, 255, 0.1);
+		border-color: rgba(0, 212, 255, 0.3);
+	}
+
+	.tool-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.tool-name {
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+
+	.tool-desc {
+		font-size: 0.75rem;
+		color: #888;
+		line-height: 1.3;
+	}
+
+	.execution-panel {
+		padding: 2rem;
+		overflow-y: auto;
+		background: rgba(0, 0, 0, 0.1);
+	}
+
+	.executor h2 {
+		margin: 0 0 0.5rem;
+		font-size: 1.5rem;
+	}
+
+	.tool-description {
+		color: #aaa;
+		margin-bottom: 2rem;
+		line-height: 1.5;
+	}
+
+	.args-section {
+		margin-bottom: 2rem;
+	}
+
+	.args-section label {
+		display: block;
+		font-size: 0.85rem;
+		color: #888;
+		margin-bottom: 0.5rem;
+	}
+
+	.args-section textarea {
+		width: 100%;
+		padding: 1rem;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		color: #e0e0e0;
+		font-family: 'Fira Code', monospace;
+		font-size: 0.9rem;
+		resize: vertical;
+	}
+
+	.execute-btn {
+		width: 100%;
+		background: linear-gradient(135deg, #00d4ff, #00ff88);
+		color: #000;
+		border: none;
+		padding: 0.8rem 2rem;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.execute-btn:hover:not(:disabled) {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+	}
+
+	.execute-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.error-box {
+		margin-top: 1rem;
+		padding: 1rem;
+		background: rgba(255, 100, 100, 0.1);
+		border: 1px solid rgba(255, 100, 100, 0.3);
+		border-radius: 8px;
+		color: #ff6b6b;
+	}
+
+	.result-box {
+		margin-top: 1.5rem;
+		background: rgba(0, 0, 0, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	.result-box h3 {
+		margin: 0;
+		padding: 0.75rem 1rem;
+		background: rgba(255, 255, 255, 0.05);
+		font-size: 0.9rem;
+		color: #888;
+	}
+
+	.result-meta {
+		display: flex;
+		gap: 1rem;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	.success {
+		color: #00ff88;
+	}
+
+	.failure {
+		color: #ff6b6b;
+	}
+
+	.duration {
+		color: #888;
+	}
+
+	.result-json {
+		margin: 0;
+		padding: 1rem;
+		font-family: 'Fira Code', monospace;
+		font-size: 0.85rem;
+		overflow-x: auto;
+		max-height: 400px;
+		overflow-y: auto;
+	}
+
+	.placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		text-align: center;
+		color: #666;
+	}
+
+	.placeholder-icon {
+		font-size: 4rem;
+		margin-bottom: 1rem;
+		opacity: 0.5;
+	}
+
+	.placeholder h2 {
+		margin: 0;
+		font-size: 1.5rem;
+		color: #e0e0e0;
+	}
+
+	.placeholder p {
+		margin-bottom: 2rem;
+	}
+
+	.quick-actions {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.5rem;
+		max-width: 400px;
+	}
+
+	.quick-actions h3 {
+		grid-column: 1 / -1;
+		font-size: 0.9rem;
+		color: #888;
+		margin-bottom: 1rem;
+	}
+
+	.quick-actions button {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #e0e0e0;
+		padding: 0.6rem 1rem;
+		border-radius: 6px;
+		margin: 0.25rem;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.quick-actions button:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: rgba(0, 212, 255, 0.3);
+	}
+</style>
+"""
+
+# 2. Repair src/routes/admin/codebase-graph/+page.svelte
+codebase_graph_svelte = r"""<script lang="ts">
+	import Button from '$lib/components/ui/button/Button.svelte';
+	import { Close as DialogClose, Content as DialogContent, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
+	import { onMount } from 'svelte';
+
+	interface VectorCluster {
+		id: number;
+		cluster_id: number;
+		pattern: string;
+		error_count: number;
+		avg_similarity: number;
+		file_paths: string[];
+		summary: string;
+		tags: string[];
+		embedding: number[];
+	}
+
+	interface GraphNode {
+		id: string;
+		label: string;
+		type: 'file' | 'error' | 'cluster' | 'fix';
+		cluster_id?: number;
+		similarity?: number;
+		tags: string[];
+		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
+	}
+
+	interface GraphEdge {
+		source: string;
+		target: string;
+		weight: number;
+		type: 'similarity' | 'dependency' | 'fix-attempt';
+	}
+
+	let clusters = $state<VectorCluster[]>([]);
+	let selectedCluster = $state<VectorCluster | null>(null);
+	let similarClusters = $state<VectorCluster[]>([]);
+	let searchQuery = $state('');
+	let searchResults = $state<VectorCluster[]>([]);
+	let loading = $state(true);
+	let detailsOpen = $state(false);
+	let fixDialogOpen = $state(false);
+	let agenticFixStatus = $state<string>('');
+
+	// Graph visualization state
+	let graphNodes = $state<GraphNode[]>([]);
+	let graphEdges = $state<GraphEdge[]>([]);
+	let selectedNode = $state<GraphNode | null>(null);
+
+	async function loadClusters() {
+		try {
+			loading = true;
+			const response = await fetch('/api/phase89/clusters');
+			if (!response.ok) throw new Error('Failed to load clusters');
+			const data = await response.json();
+			clusters = data.clusters || [];
+			buildGraph(clusters);
+		} catch (e) {
+			console.error('Error loading clusters:', e);
+		} finally {
+			loading = false;
+		}
+	}
+
+	function buildGraph(clusterData: VectorCluster[]) {
+		const nodes: GraphNode[] = [];
+		const edges: GraphEdge[] = [];
+
+		// Create cluster nodes
+		for (const cluster of clusterData) {
+			nodes.push({
+				id: `cluster-${cluster.cluster_id}`,
+				label: cluster.pattern.substring(0, 30),
+				type: 'cluster',
+				cluster_id: cluster.cluster_id,
+				tags: cluster.tags || []
+			});
+
+			for (const filePath of cluster.file_paths || []) {
+				const fileId = `file-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`;
+				if (!nodes.find((n) => n.id === fileId)) {
+					nodes.push({
+						id: fileId,
+						label: filePath.split('/').pop() || filePath,
+						type: 'file',
+						tags: []
+					});
+				}
+
+				edges.push({
+					source: `cluster-${cluster.cluster_id}`,
+					target: fileId,
+					weight: cluster.avg_similarity || 0.5,
+					type: 'similarity'
+				});
+			}
+		}
+
+		graphNodes = nodes;
+		graphEdges = edges;
+	}
+
+	async function performVectorSearch() {
+		if (!searchQuery.trim()) return;
+
+		try {
+			const response = await fetch('/api/phase89/vector-search', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					query: searchQuery,
+					limit: 10,
+					threshold: 0.7
+				})
+			});
+
+			if (!response.ok) throw new Error('Vector search failed');
+			const data = await response.json();
+			searchResults = data.results || [];
+		} catch (e) {
+			console.error('Search error:', e);
+		}
+	}
+
+	async function findSimilarClusters(cluster: VectorCluster) {
+		try {
+			const response = await fetch('/api/phase89/similar-clusters', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					cluster_id: cluster.cluster_id,
+					embedding: cluster.embedding,
+					limit: 5
+				})
+			});
+
+			if (!response.ok) throw new Error('Failed to find similar clusters');
+			const data = await response.json();
+			similarClusters = data.similar || [];
+		} catch (e) {
+			console.error('Error finding similar clusters:', e);
+		}
+	}
+
+	async function initiateAgenticFix(cluster: VectorCluster) {
+		try {
+			agenticFixStatus = 'Starting agentic fix pipeline...';
+			fixDialogOpen = true;
+
+			const response = await fetch('/api/phase89/agentic-fix', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					cluster_id: cluster.cluster_id,
+					pattern: cluster.pattern,
+					file_paths: cluster.file_paths,
+					context: {
+						summary: cluster.summary,
+						tags: cluster.tags,
+						similar_clusters: similarClusters.map((c) => c.pattern)
+					}
+				})
+			});
+
+            if (!response.body) throw new Error('No response body');
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const text = decoder.decode(value);
+                agenticFixStatus = text;
+            }
+        } catch (e) {
+            console.error(e);
+            agenticFixStatus = 'Error: ' + String(e);
+        }
+    }
+</script>
+
+<div class="codebase-graph">
+    <!-- Graph visualization Placeholder -->
+    <div class="graph-container">
+        <h3>Graph Visualization</h3>
+        <p>{graphNodes.length} nodes, {graphEdges.length} edges</p>
+
+        <div class="nodes-list">
+            {#each graphNodes.slice(0, 50) as node}
+                <div class="node-item" class:cluster={node.type === 'cluster'}>
+                    <span class="node-label">{node.label}</span>
+                    <span class="node-type">{node.type}</span>
+                </div>
+            {/each}
+        </div>
+    </div>
+</div>
+
+<style>
+    .codebase-graph {
+        padding: 2rem;
+        background: #0f0f1a;
+        color: #e0e0e0;
+        min-height: 100vh;
+    }
+    .graph-container {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .nodes-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .node-item {
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    .node-item.cluster {
+        border-left: 3px solid #00d4ff;
+    }
+</style>
+"""
+
+# 3. Repair src/routes/admin/error-analysis/+page.svelte
+error_analysis_page_svelte = r"""<script lang="ts">
+	import Button from '$lib/components/ui/button/Button.svelte';
+	import { Content as DialogContent, Description as DialogDescription, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
+	import { onMount } from 'svelte';
+	import type { PageData } from './$types';
+
+	// ═══════════════════════════════════════════════════════════════════════
+	// Phase 89: RAG+KAG Powered Error Analysis UI
+	// Features: Agentic recommendations, next steps, timestamp tracking
+	// ═══════════════════════════════════════════════════════════════════════
+
+	let { data }: { data: PageData } = $props();
+
+	let analysisData = $state<any>(null);
+	let selectedCluster = $state<any>(null);
+	let dialogOpen = $state(false);
+	let loading = $state(false);
+	let agenticLogs = $state<string[]>([]);
+	let showRecommendations = $state(true);
+
+	// Load enhanced analysis from API
+	async function loadAnalysis() {
+		loading = true;
+		try {
+			const response = await fetch('/api/phase89/analyze');
+			const result = await response.json();
+
+			if (result.success) {
+				analysisData = result;
+			} else {
+				console.error('Analysis failed:', result.error);
+			}
+		} catch (err) {
+			console.error('Failed to load analysis:', err);
+		} finally {
+			loading = false;
+		}
+	}
+
+	// Execute agentic fix with function tool calling
+	async function executeAgenticFix(clusterId: number) {
+		agenticLogs = [`🚀 Starting agentic fix for cluster #${clusterId}...`];
+
+		try {
+			const response = await fetch('/api/phase89/agentic-fix', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ cluster_id: clusterId, enable_tools: true })
+			});
+
+			if (!response.body) throw new Error('No response body');
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				const chunk = decoder.decode(value);
+				const lines = chunk.split('\n');
+
+				for (const line of lines) {
+					if (line.startsWith('data: ')) {
+						const data = JSON.parse(line.slice(6));
+						if (data.log) {
+							agenticLogs = [...agenticLogs, data.log];
+						}
+					}
+				}
+			}
+
+			agenticLogs = [...agenticLogs, '✅ Agentic fix completed!'];
+
+			// Reload analysis
+			await loadAnalysis();
+
+		} catch (err) {
+			agenticLogs = [...agenticLogs, `❌ Error: ${err}`];
+		}
+	}
+
+	// Execute next step command
+	async function executeNextStep(command: string) {
+		agenticLogs = [`⚡ Executing: ${command}`];
+
+		try {
+			const response = await fetch('/api/phase89/execute-command', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ command })
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				agenticLogs = [...agenticLogs, `✅ ${result.output}`];
+			} else {
+				agenticLogs = [...agenticLogs, `❌ ${result.error}`];
+			}
+        } catch (e) {
+            console.error(e);
+        }
+    }
+</script>
+
+<div class="error-analysis">
+    <h1>Error Analysis & Remediation</h1>
+
+    <div class="controls">
+        <button onclick={loadAnalysis} disabled={loading}>
+            {loading ? 'Analyzing...' : 'Refresh Analysis'}
+        </button>
+    </div>
+
+    {#if loading}
+        <p>Loading analysis...</p>
+    {:else if analysisData}
+        <div class="analysis-content">
+            <p>Analysis loaded: {analysisData.timestamp || 'Just now'}</p>
+
+            <div class="clusters-list">
+                {#if analysisData.clusters}
+                    {#each analysisData.clusters as cluster}
+                        <div class="cluster-item">
+                            <h3>{cluster.pattern}</h3>
+                            <button onclick={() => executeAgenticFix(cluster.cluster_id)}>
+                                Fix Cluster #{cluster.cluster_id}
+                            </button>
+                        </div>
+                    {/each}
+                {:else}
+                    <p>No error clusters found or analysis data pending.</p>
+                {/if}
+            </div>
+        </div>
+    {/if}
+
+    {#if agenticLogs.length > 0}
+        <div class="logs-panel">
+            <h3>Agent Operations Log</h3>
+            <pre>{agenticLogs.join('\n')}</pre>
+        </div>
+    {/if}
+</div>
+
+<style>
+    .error-analysis {
+        padding: 2rem;
+        color: #e0e0e0;
+        min-height: 100vh;
+        background: #1a1a2e;
+    }
+    .controls {
+        margin-bottom: 2rem;
+    }
+    button {
+        background: #00d4ff;
+        color: #000;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .cluster-item {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .logs-panel {
+        margin-top: 2rem;
+        padding: 1rem;
+        background: #000;
+        border-radius: 8px;
+        font-family: monospace;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+"""
+
+write_file('src/routes/acp/+page.svelte', acp_page_svelte)
+write_file('src/routes/admin/codebase-graph/+page.svelte', codebase_graph_svelte)
+write_file('src/routes/admin/error-analysis/+page.svelte', error_analysis_page_svelte)

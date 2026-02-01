@@ -8,15 +8,18 @@ const RELAY_BASE = import.meta.env?.RELAY_BASE ?? "http://localhost:8095";
 
 // Shared user type coming back from relay
 export interface RelayUser {
-    id: string;, email: string;
-    name?: string;, passwordHash: string;
+    id: string;
+	email: string;
+    name?: string;
+	passwordHash: string;
     role?: string;
     is_active?: boolean;
 }
 
 // Simple session interface for manual session management
 export interface RelaySession {
-    id: string;, userId: string;
+    id: string;
+	userId: string;
     expiresAt: Date;
     attributes?: { [key: string]: any };
 }
@@ -41,7 +44,7 @@ export const relayAuthService = {
             // const res = await fetch(`${RELAY_BASE}/auth-relay/user-by-email`, {
             //   method: "POST",
             //   headers: { "content-type": "application/json" },
-            //   body: JSON.stringify({ email })
+	//   body: JSON.stringify({ email })
             // })
             // if (!res.ok) return null
             // return (await res.json()) as RelayUser
@@ -51,8 +54,7 @@ export const relayAuthService = {
             return null;
         }
     },
-
-    /** Validate password against relay user */
+	/** Validate password against relay user */
     async validatePassword(user: RelayUser, password: string): Promise<boolean> {
         try {
             return await bcrypt.compare(password, user.passwordHash);
@@ -61,8 +63,7 @@ export const relayAuthService = {
             return false;
         }
     },
-
-    /** Register a new user via relay */
+	/** Register a new user via relay */
     async register(email: string, password: string, name?: string): Promise<RelayUser> {
         try {
             const passwordHash = await bcrypt.hash(password, 12);
@@ -70,7 +71,7 @@ export const relayAuthService = {
             // const res = await fetch(`${RELAY_BASE}/auth-relay/register`, {
             //   method: "POST",
             //   headers: { "content-type": "application/json" },
-            //   body: JSON.stringify({ email, passwordHash, name })
+	//   body: JSON.stringify({ email, passwordHash, name })
             // })
             // if (!res.ok) throw new Error("Registration failed")
             // const data = await res.json()
@@ -92,8 +93,7 @@ export const relayAuthService = {
             throw error;
         }
     },
-
-    /** Create a manual session (avoiding Lucia database calls) */
+	/** Create a manual session (avoiding Lucia database calls) */
     async createSession(userId: string, attributes: { [key: string]: any } = {}): Promise<RelaySession> {
         try {
             const sessionId = this.generateId();
@@ -114,8 +114,7 @@ export const relayAuthService = {
             throw error;
         }
     },
-
-    /** Demo user authentication (bypasses database entirely) */
+	/** Demo user authentication (bypasses database entirely) */
     async authenticateDemoUser(): Promise<any> {
         try {
             const demoUser = await this.getUserByEmail('demo@legalai.gov');
@@ -126,7 +125,8 @@ export const relayAuthService = {
             const session = await this.createSession(demoUser.id, {
                 userAgent: 'demo-auto-login',
                 ipAddress: '127.0.0.1',
-                deviceInfo: {, platform: 'demo',
+                deviceInfo: {
+	platform: 'demo',
                     mobile: false
                 }
             });
@@ -136,8 +136,7 @@ export const relayAuthService = {
             return null;
         }
     },
-
-    /** Generate a random ID */
+	/** Generate a random ID */
     generateId(): string {
         const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let result = '';
@@ -146,8 +145,7 @@ export const relayAuthService = {
         }
         return result;
     },
-
-    /** Health check for relay service */
+	/** Health check for relay service */
     async healthCheck(): Promise<boolean> {
         try {
             // Simple health check - if we can create a demo user object, service is "healthy"

@@ -104,7 +104,7 @@ export class CaseSummaryService {
 
                     return this.mapToSummary(summary);
                 },
-                { namespace: 'summary' }
+	{ namespace: 'summary' }
             );
         } catch (error) {
             console.error('Error retrieving summary:', error);

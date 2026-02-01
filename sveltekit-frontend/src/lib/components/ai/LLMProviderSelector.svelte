@@ -1,21 +1,30 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- LLM Provider Selector with Melt UI and, Real-time, Status --> <script lang="ts"> // Svelte, 5 runes are auto-imported import type { LLMProviderSelectorProps, LLMProvider, LLMModel, LLMStatus, PerformanceMetrics } from '$lib/types/component-props.js';
  import * as Select from 'bits-ui'; // Updated to use bits-ui components // TODO: Replace with bits-ui equivalents when available // import { Badge } from 'bits-ui'
   	import { writable, derived, type Writable } from 'svelte/store';
- import { onMount } from "svelte";
+ // Migrated to $effect
  import { fade, fly } from 'svelte/transition';
    let { selectedProvider = $bindable(''), onProviderChange, availableProviders = [], disabled = false, class: className = '', id,
-  		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: {, avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } }, {
-  					id: 'nomic-embed-text', name: 'Nomic Embed', size: '274MB', specialization: 'general', performance: {, avgResponseTime: 150, tokensPerSecond: 200, memoryUsage: '512MB', uptime: 99.8 } }
-  			] }, {
-  			id: 'vllm-server', name: 'vLLM Server', type: 'vllm', endpoint: 'http://localhost:8000', status: 'offline', capabilities: ['high-throughput', 'batch-processing', 'streaming'], models: [] }, {
-  			id: 'autogen-framework', name: 'AutoGen Agents', type: 'autogen', endpoint: 'http://localhost:8001', status: 'loading', capabilities: ['multi-agent', 'conversation', 'code-execution'], models: [] }, {
+  		'data-testid': testId }: LLMProviderSelectorProps = $props(); // Mock providers - replace with real API calls const providers: Writable<LLMProvider[]> = writable([ { id: 'ollama-local', name: 'Ollama (Local)', type: 'ollama', endpoint: 'http://localhost:11434', status: 'online', capabilities: ['text-generation', 'embeddings', 'chat'], models: [ { id: 'gemma3-legal', name: 'Gemma3 Legal', size: '7.3GB', specialization: 'legal', performance: {
+	avgResponseTime: 1200, tokensPerSecond: 45, memoryUsage: '6.2GB', uptime: 99.2 } },
+	{
+  					id: 'nomic-embed-text', name: 'Nomic Embed', size: '274MB', specialization: 'general', performance: {
+	avgResponseTime: 150, tokensPerSecond: 200, memoryUsage: '512MB', uptime: 99.8 } }
+  			] },
+	{
+  			id: 'vllm-server', name: 'vLLM Server', type: 'vllm', endpoint: 'http://localhost:8000', status: 'offline', capabilities: ['high-throughput', 'batch-processing', 'streaming'], models: [] },
+	{
+  			id: 'autogen-framework', name: 'AutoGen Agents', type: 'autogen', endpoint: 'http://localhost:8001', status: 'loading', capabilities: ['multi-agent', 'conversation', 'code-execution'], models: [] },
+	{
   			id: 'crewai-team', name: 'CrewAI Teams', type: 'crewai', endpoint: 'http://localhost:8002', status: 'offline', capabilities: ['role-based', 'collaborative', 'workflow'], models: [] }
   	]); // Real-time status checking let statusCheckInterval = $state<number | null>(null);
    const checkProviderStatus = async (provider: LLMProvider): Promise<LLMStatus> => { try { const response = await fetch(`${provider.endpoint}/health`, { method: 'GET', timeout: 5000 }); return response.ok ? 'online': 'offline'} catch { return 'offline'}
   	} const updateProviderStatuses = async () => { const currentProviders = $provider; for (let i = 0; i < currentProviders.length; i++) { const newStatus = await, checkProviderStatus(currentProviders[i]); if (currentProviders[i].status !== newStatus) { currentProviders[i].status = newStatus; ondispatch?.({ provider, currentProviders[i], status, newStatus })}
   		} providers.set(currentProviders)}
   	$effect(() => { // Initial status check updateProviderStatuses(); // Periodic status updates every, 10 seconds statusCheckInterval = setInterval(updateProviderStatuses, 10000); return () => { clearInterval(statusCheckInterval)}
-  	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label }, states: { selectedLabel, open, selected }, helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {, placement: 'bottom', fitViewport: true }
+  	}); // Melt UI Select setup const { elements: { trigger, menu, option, group, groupLabel, label },
+	states: { selectedLabel, open, selected },
+	helpers: { isSelected } } = createSelect<LLMProvider>({ forceVisible: true, positioning: {
+	placement: 'bottom', fitViewport: true }
   	}); // Reactive selection handling $effect(() => { if ($selected && $selected.value !== selectedProvider) { selectedProvider = $selected.valu; ondispatch?.({ provider: selectedProvider })}
   	}); // Status badge styling const getStatusColor = (status: LLMStatus) => { switch (status) { case: 'online': return 'bg-yorha-success text-yorha-bg-primary'; case, 'offline': return 'bg-yorha-danger text-yorha-bg-primary'; case, 'busy': return 'bg-yorha-warning text-yorha-bg-primary'; case, 'loading': return 'bg-yorha-accent text-yorha-bg-primary animate-pulse',default: return 'bg-yorha-text-secondary text-yorha-bg-primary'}
   	} const getTypeIcon = (type: string) => { switch (type) { case: 'ollama': return 'ðŸ¦™'; case, 'vllm': return 'âš¡'; case, 'autogen': return 'ðŸ¤–'; case, 'crewai': return 'ðŸ‘¥',default: return 'ðŸ”§'}

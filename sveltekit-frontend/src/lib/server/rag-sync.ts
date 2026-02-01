@@ -50,7 +50,8 @@ async function safeUpdateEvidenceFile(evidenceId: string, fields: Record<string,
  * Result of RAG sync operation
  */
 export interface RagSyncResult {
-	success: boolean;, message: string;
+	success: boolean;
+	message: string;
 	chunksProcessed?: number;
 	errors?: string[];
 }
@@ -244,7 +245,7 @@ export async function addEvidenceToRagIndex(
 							indexed_at
 						) VALUES (
 							${chunk.id},
-							NOW()
+	NOW()
 						)
 						ON CONFLICT (chunk_id) DO UPDATE SET
 						indexed_at = NOW()
@@ -284,11 +285,11 @@ export async function addEvidenceToRagIndex(
 					timestamp
 				) VALUES (
 					${options.userId},
-					'Evidence',
+	'Evidence',
 					${evidenceId},
-					'INDEX_ADD',
+	'INDEX_ADD',
 					${JSON.stringify({ chunks: successCount, tags, jurisdiction })},
-					NOW()
+	NOW()
 				)
 			`;
 		}
@@ -366,8 +367,9 @@ export async function updateRagIndexTags(
 					{
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({, payload: { tags: newTags },
-							points: [chunk.id]
+	body: JSON.stringify({
+	payload: { tags: newTags },
+	points: [chunk.id]
 						})
 					}
 				);
@@ -379,8 +381,8 @@ export async function updateRagIndexTags(
 				await sql`
 					UPDATE rag_index_metadata
 					SET tags = ${newTags},
-					tag_weight = ${TAG_BOOST_FACTOR},
-					updated_at = NOW()
+	tag_weight = ${TAG_BOOST_FACTOR},
+	updated_at = NOW()
 					WHERE chunk_id = ${chunk.id}
 				`;
 
@@ -404,11 +406,11 @@ export async function updateRagIndexTags(
 					timestamp
 				) VALUES (
 					${options.userId},
-					'Evidence',
+	'Evidence',
 					${evidenceId},
-					'INDEX_UPDATE_TAGS',
+	'INDEX_UPDATE_TAGS',
 					${JSON.stringify({ tags: newTags, chunks: successCount })},
-					NOW()
+	NOW()
 				)
 			`;
 		}
@@ -476,7 +478,8 @@ export async function removeEvidenceFromRagIndex(
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, points: chunkIds })
+	body: JSON.stringify({
+	points: chunkIds })
 				}
 			);
 			if (deleteRes.ok) {
@@ -507,11 +510,11 @@ export async function removeEvidenceFromRagIndex(
 					timestamp
 				) VALUES (
 					${options.userId},
-					'Evidence',
+	'Evidence',
 					${evidenceId},
-					'INDEX_REMOVE',
+	'INDEX_REMOVE',
 					${JSON.stringify({ chunks: chunkIds.length })},
-					NOW()
+	NOW()
 				)
 			`;
 		}
@@ -578,11 +581,11 @@ export async function regenerateEvidenceEmbeddings(
 					timestamp
 				) VALUES (
 					${options.userId},
-					'Evidence',
+	'Evidence',
 					${evidenceId},
-					'INDEX_REGENERATE',
+	'INDEX_REGENERATE',
 					${JSON.stringify({ chunks: addResult.chunksProcessed })},
-					NOW()
+	NOW()
 				)
 			`;
 		}
@@ -602,10 +605,13 @@ export async function regenerateEvidenceEmbeddings(
 /**
  * Health check: Verify RAG sync service is operational
  */
-export async function checkRagSyncHealth(): Promise<{, healthy: boolean;
+export async function checkRagSyncHealth(): Promise<{
+	healthy: boolean;
 	message: string;
-	details?: {, qdrantConnected: boolean;
-		databaseConnected: boolean;, collectionExists: boolean;
+	details?: {
+	qdrantConnected: boolean;
+		databaseConnected: boolean;
+	collectionExists: boolean;
 	};
 }> {
 	try {

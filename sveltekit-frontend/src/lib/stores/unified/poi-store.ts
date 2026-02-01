@@ -15,34 +15,44 @@ export type POIRole =
 export type RelationshipType = 'family' | 'business' | 'friendship' | 'conflict' | 'unknown';
 
 export interface PersonOfInterest {
-  id: string;, name: string;
-  role: POIRole;, caseId: string;
+  id: string;
+	name: string;
+  role: POIRole;
+	caseId: string;
   aliases?: string[];
   description?: string;
   contactInfo?: { phone?: string; email?: string; address?: string };
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  tags?: string[];, createdAt: number;
+  tags?: string[];
+	createdAt: number;
   updatedAt: number;
 }
 
 export interface POIRelationship {
-  id: string;, poiId1: string;
-  poiId2: string;, type: RelationshipType;
+  id: string;
+	poiId1: string;
+  poiId2: string;
+	type: RelationshipType;
   strength: number; // 0-1
   description?: string;
   evidence?: string[];
 }
 
 export interface TimelineEvent {
-  id: string;, poiId: string;
-  date: number;, title: string;
-  description: string;, type: string;
+  id: string;
+	poiId: string;
+  date: number;
+	title: string;
+  description: string;
+	type: string;
   location?: string;
 }
 
 export interface POICluster {
-  id: string;, pois: PersonOfInterest[];
-  theme: string;, confidence: number;
+  id: string;
+	pois: PersonOfInterest[];
+  theme: string;
+	confidence: number;
 }
 
 /**
@@ -50,21 +60,26 @@ export interface POICluster {
  */
 interface POIStoreState {
   // POI
-  personOfInterest: PersonOfInterest[];, activePOI: PersonOfInterest | null;
+  personOfInterest: PersonOfInterest[];
+	activePOI: PersonOfInterest | null;
   // relationships
-  relationships: POIRelationship[];, relationshipGraph: Map<string, string[]>;
+  relationships: POIRelationship[];
+	relationshipGraph: Map<string, string[]>;
   // Network
-  clusters: POICluster[];, networkMetrics: {
+  clusters: POICluster[];
+	networkMetrics: {
     centrality: Map<string, number>;
     clustering: Map<string, number>;
     density: number;
   };
   // timeline
-  timeline: TimelineEvent[];, timelineByPOI: Map<string, TimelineEvent[]>;
+  timeline: TimelineEvent[];
+	timelineByPOI: Map<string, TimelineEvent[]>;
   // Risk
   riskScores: Map<string, number>;
   // Stats
-  totalPOIs: number;, isLoading: boolean;
+  totalPOIs: number;
+	isLoading: boolean;
   error: string | null;
   lastUpdated: number;
 }
@@ -75,11 +90,12 @@ const initialState: POIStoreState = {
   relationships: [],
   relationshipGraph: new Map(),
   clusters: [],
-  networkMetrics: {, centrality: new Map(),
+  networkMetrics: {
+	centrality: new Map(),
     clustering: new Map(),
     density: 0
   },
-  timeline: [],
+	timeline: [],
   timelineByPOI: new Map(),
   riskScores: new Map(),
   totalPOIs: 0,
@@ -125,15 +141,14 @@ function createPOIStore() {
         update((s) => ({ ...s, error: errorMsg, isLoading: false }));
       }
     },
-
-    // ========== CREATE & UPDATE ==========
+	// ========== CREATE & UPDATE ==========
 
     async createPOI(poiData: Omit<PersonOfInterest, 'id' | 'createdAt' | 'updatedAt'>) {
       try {
         const response = await fetch('/api/pois', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(poiData),
+	body: JSON.stringify(poiData),
           credentials: 'include',
         });
         if (response.ok) {
@@ -153,13 +168,12 @@ function createPOIStore() {
         throw new Error(errorMsg);
       }
     },
-
-    async updatePOI(id: string, updates: Partial<PersonOfInterest>) {
+	async updatePOI(id: string, updates: Partial<PersonOfInterest>) {
       try {
         const response = await fetch(`/api/pois/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
           credentials: 'include',
         });
         if (response.ok) {
@@ -181,8 +195,7 @@ function createPOIStore() {
         throw new Error(errorMsg);
       }
     },
-
-    async deletePOI(id: string) {
+	async deletePOI(id: string) {
       try {
         const response = await fetch(`/api/pois/${id}`, {
           method: 'DELETE',
@@ -200,8 +213,7 @@ function createPOIStore() {
         console.error('Delete error: ', error);
       }
     },
-
-    // ========== SELECTION ==========
+	// ========== SELECTION ==========
 
     selectPOI(id: string) {
       update((s) => {
@@ -209,12 +221,10 @@ function createPOIStore() {
         return { ...s, activePOI: poi ?? null };
       });
     },
-
-    clearSelection() {
+	clearSelection() {
       update((s) => ({ ...s, activePOI: null }));
     },
-
-    // ========== RELATIONSHIPS ==========
+	// ========== RELATIONSHIPS ==========
 
     async createRelationship(
       poiId1: string, poiId2: string,
@@ -224,7 +234,7 @@ function createPOIStore() {
         const response = await fetch('/api/pois/relationships', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ poiId1, poiId2, type, strength }),
+	body: JSON.stringify({ poiId1, poiId2, type, strength }),
           credentials: 'include',
         });
         if (response.ok) {
@@ -241,8 +251,7 @@ function createPOIStore() {
         console.error('Relationship error: ', error);
       }
     },
-
-    // ========== PRIVATE HELPERS ==========
+	// ========== PRIVATE HELPERS ==========
 
     _buildRelationshipGraph(relationships: POIRelationship[]): Map<string, string[]> {
       const graph = new Map<string, string[]>();

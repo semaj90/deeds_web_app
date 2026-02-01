@@ -33,9 +33,12 @@ interface DocumentMetadata {
 // ============================================================================
 
 interface DatabaseConfig {
-    runtime: {, url: string; poolSize: number };
-    admin: {, url: string; poolSize: number };
-    qdrant?: {, url: string; apiKey?: string };
+    runtime: {
+	url: string; poolSize: number };
+    admin: {
+	url: string; poolSize: number };
+    qdrant?: {
+	url: string; apiKey?: string };
     environment: 'development' | 'production' | 'test';
 }
 
@@ -49,21 +52,26 @@ interface VectorSearchOptions {
 }
 
 interface SearchResultEntry {
-    id: string;, score: number;
+    id: string;
+	score: number;
     document: DocumentMetadata | Record<string, unknown> | null;
     source: 'qdrant' | 'postgresql';
 }
 
 interface HybridSearchResult {
-    results: Array<SearchResultEntry>;, performance: {
+    results: Array<SearchResultEntry>;
+	performance: {
         postgresqlTime?: number;
-        qdrantTime?: number;, totalTime: number;
+        qdrantTime?: number;
+	totalTime: number;
     };
 }
 
 interface HealthStatus {
-    postgresql: boolean;, qdrant: boolean;
-    pgvector: boolean;, overallHealth: boolean;
+    postgresql: boolean;
+	qdrant: boolean;
+    pgvector: boolean;
+	overallHealth: boolean;
 }
 
 type QdrantHit = { id: string | number; score?: number; payload?: Record<string, unknown> };
@@ -75,13 +83,15 @@ type QdrantHit = { id: string | number; score?: number; payload?: Record<string,
 const isDev = process.env.NODE_ENV === 'development';
 
 const config: DatabaseConfig = {
-    runtime: {, url: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+    runtime: {
+	url: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
         poolSize: isDev ? 5 : 20
     },
-    admin: {, url: process.env.DATABASE_URL_ADMIN ?? process.env.ADMIN_DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
+	admin: {
+	url: process.env.DATABASE_URL_ADMIN ?? process.env.ADMIN_DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5433/legal_ai_db',
         poolSize: 2
     },
-    qdrant: process.env.QDRANT_URL ? {
+	qdrant: process.env.QDRANT_URL ? {
         url: process.env.QDRANT_URL,
         apiKey: process.env.QDRANT_API_KEY
     } : undefined,
@@ -121,7 +131,8 @@ class DatabaseManager {
                 ssl: false,
                 types: {
                     // Custom pgvector support
-                    vector: {, to: 1184,
+                    vector: {
+	to: 1184,
                         from: [1184],
                         serialize: (x: number[]) => (Array.isArray(x) ? `[${x.join(',')}]` : x),
                         parse: (x: string) => (typeof x === 'string' && x.startsWith('[') && x.endsWith(']') ? x.slice(1, -1).split(',').map(Number) : [])
@@ -248,9 +259,12 @@ class DatabaseManager {
 
             if (!exists) {
                 await qdrant.createCollection(collectionName, {
-                    vectors: {, size: vectorSize, distance },
-                    optimizers_config: {, default_segment_number: 2, memmap_threshold: 20000, indexing_threshold: 20000 },
-                    hnsw_config: {, m: 16, ef_construct: 64, full_scan_threshold: 10000 }
+                    vectors: {
+	size: vectorSize, distance },
+	optimizers_config: {
+	default_segment_number: 2, memmap_threshold: 20000, indexing_threshold: 20000 },
+	hnsw_config: {
+	m: 16, ef_construct: 64, full_scan_threshold: 10000 }
                 });
                 console.log(`✅ Created collection: ${collectionName}`);
             }
@@ -262,7 +276,8 @@ class DatabaseManager {
 
     async hybridVectorSearch(queryEmbedding: number[], options: VectorSearchOptions = {}): Promise<HybridSearchResult> {
         const startTime = Date.now();
-        const { collection = 'legal_documents', limit = 10, threshold = 0.7, filter = {}, usePostgreSQL = true, useQdrant = true } = options;
+        const { collection = 'legal_documents', limit = 10, threshold = 0.7, filter = {},
+	usePostgreSQL = true, useQdrant = true } = options;
 
         const results: Array<SearchResultEntry> = [];
         let postgresqlTime: number | undefined;

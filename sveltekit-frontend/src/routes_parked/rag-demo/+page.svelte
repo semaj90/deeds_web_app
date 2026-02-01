@@ -8,7 +8,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 https, //svelte.dev/e/attribute_invalid_name -->
 <!-- src/routes/rag-demo/+page.svelte -->
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let documentUrl = '';
  let jobId: string | null = null;
@@ -73,14 +73,16 @@ https, //svelte.dev/e/attribute_invalid_name -->
  });
  }
 
- onMount(() => {
+ $effect(() => {
+
  // Cleanup on unmount
  return () => {
  if (statusInterval) {
  clearInterval(statusInterval);
  }
  };
- });
+ 
+});
 </script>
 
 <svelte:head>

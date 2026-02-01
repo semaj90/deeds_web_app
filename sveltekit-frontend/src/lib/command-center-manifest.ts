@@ -1,7 +1,11 @@
 export type TabId = 'cases' | 'evidence' | 'persons' | 'system' | 'routes';
 
 export type CommandCenterRoute = {
-    tab: TabId;, href: string;, label: string;, description: string;, kind: 'page' | 'layout' | 'endpoint';
+    tab: TabId;
+	href: string;
+	label: string;
+	description: string;
+	kind: 'page' | 'layout' | 'endpoint';
     group: string;
     badges?: ('ai' | 'experimental' | 'system' | 'api')[];
     priority?: number;
@@ -13,13 +17,23 @@ export type CommandCenterRoute = {
 
 // Phase 72 Task Definition
 export type Phase72Task = {
-    id: string;, tab: TabId;, title: string;, description: string;, intent: string;, phase: number;, priority: 'high' | 'medium' | 'active' | 'complete';
+    id: string;
+	tab: TabId;
+	title: string;
+	description: string;
+	intent: string;
+	phase: number;
+	priority: 'high' | 'medium' | 'active' | 'complete';
     tags: string[];
-    actions?: Array<{, label: string;, command: string;, expected: string;
+    actions?: Array<{
+	label: string;
+	command: string;
+	expected: string;
     }>;
     validation?: {
         command?: string;
-        query?: string;, expectation: string;
+        query?: string;
+	expectation: string;
     };
     status?: Record<string, any>;
 };
@@ -43,7 +57,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Cases',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/new',
             label: 'New Case',
@@ -51,7 +65,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Cases',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/overview',
             label: 'Case Overview',
@@ -59,7 +73,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Case Detail',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/evidence',
             label: 'Case Evidence',
@@ -67,7 +81,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Case Detail',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/board',
             label: 'Case Board / Canvas',
@@ -76,7 +90,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'Case Detail',
             badges: ['experimental'],
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/chat',
             label: 'Case Chat',
@@ -84,7 +98,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Case Detail',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/ai',
             label: 'AI Legal Assistant',
@@ -93,7 +107,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'Case Detail',
             badges: ['ai'],
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/persons',
             label: 'Case Persons',
@@ -101,7 +115,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Case Detail',
         },
-        {
+	{
             tab: 'cases',
             href: '/cases/[id]/reports',
             label: 'Case Reports',
@@ -120,7 +134,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             kind: 'page',
             group: 'Evidence',
         },
-        {
+	{
             tab: 'evidence',
             href: '/evidence-board',
             label: 'Evidence Board',
@@ -129,7 +143,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'Evidence',
             badges: ['experimental'],
         },
-        {
+	{
             tab: 'evidence',
             href: '/evidence-canvas',
             label: 'Evidence Canvas',
@@ -138,7 +152,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'Evidence',
             badges: ['experimental'],
         },
-        {
+	{
             tab: 'evidence',
             href: '/gpu-evidence-graph',
             label: 'GPU Evidence Graph',
@@ -170,7 +184,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'System',
             badges: ['system'],
         },
-        {
+	{
             tab: 'system',
             href: '/all-routes',
             label: 'Route Command Center',
@@ -179,7 +193,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
             group: 'System',
             badges: ['system'],
         },
-        {
+	{
             tab: 'system',
             href: '/command/routes',
             label: 'Raw Route Dump',
@@ -198,22 +212,28 @@ export function getRoutesByTab(tab: TabId): CommandCenterRoute[] {
 
 // --- Phase 72 / Phase 78 wiring --- //
 export type RouteAstNode = {
-    id: string;, path: string;, file: string;
+    id: string;
+	path: string;
+	file: string;
 };
 
 export type RouteAstEdge = {
-    from: string;, to: string;, kind: 'load' | 'action' | 'link' | 'api';
+    from: string;
+	to: string;
+	kind: 'load' | 'action' | 'link' | 'api';
 };
 
 export type RouteAstGraph = {
-    nodes: RouteAstNode[];, edges: RouteAstEdge[];
+    nodes: RouteAstNode[];
+	edges: RouteAstEdge[];
 };
 
 export function enrichRoutesWithPhase72(
     base: CommandCenterRoute[],
     graph: RouteAstGraph,
     _shieldData: Record<string, unknown>,
-    errorSummary: Record<string, { totalErrors: number;, lastSeen: string | null }>
+    errorSummary: Record<string, { totalErrors: number;
+	lastSeen: string | null }>
 ): CommandCenterRoute[] {
     return base.map((route) => {
         const summary = errorSummary[route.href];

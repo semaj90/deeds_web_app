@@ -11,9 +11,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 interface SearchResult {
-  id: string;, filePath: string;
-  label: string;, type: string;
-  score: number;, errorCount: number;
+  id: string; filePath: string;
+  label: string; type: string;
+  score: number; errorCount: number;
   snippet?: string;
 }
 
@@ -56,7 +56,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
       console.warn('FastAPI search service not available, using mock data:', backendError);
     }
 
-    // Mock search results for development{
+    // Mock search results for development
+{
         id: 'route-home',
         filePath: 'src/routes/+page.svelte',
         label: '+page.svelte',
@@ -113,7 +114,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     ];
 
     // Simple fuzzy search
-    const queryLower = query.toLowerCase();.filter(item => {item.label.toLowerCase().includes(queryLower) ||
+    const queryLower = query.toLowerCase();
+.filter(item => {
+item.label.toLowerCase().includes(queryLower) ||
           item.filePath.toLowerCase().includes(queryLower) ||
           (item.snippet?.toLowerCase().includes(queryLower));
 

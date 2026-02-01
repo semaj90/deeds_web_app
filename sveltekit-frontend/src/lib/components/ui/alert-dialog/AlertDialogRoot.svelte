@@ -17,11 +17,11 @@
 	// Create context with getter pattern for reactivity
 	setContext<AlertDialogContext>('alert-dialog', {
 		get open() { return open; },
-		setOpen: (value: boolean) => {
+	setOpen: (value: boolean) => {
 			open = value;
 			onOpenChange?.(value);
 		},
-		close: () => {
+	close: () => {
 			open = false;
 			onOpenChange?.(false);
 		}

@@ -1,11 +1,13 @@
 <script lang="ts">
 	let isGenerating = $state<any>(undefined);
 
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Props {
- evidenceId: string;, fileName: string;
- documentType: string;, confidence: number;
+ evidenceId: string;
+	fileName: string;
+ documentType: string;
+	confidence: number;
  metadata: Record<string, unknown>;
  onGenerateSummary: () => void;
  onReject: () => void;
@@ -17,13 +19,15 @@
  let extractedText = $state('');
  let showFullText = $state(false);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  // Extract preview from metadata
  if (metadata?.extractedText) {
  extractedText = metadata.extractedText as string;
  }
- })();
+ 
+});();
  });
 
  const confidenceColor = (conf: number) => {

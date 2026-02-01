@@ -122,11 +122,13 @@
 
 <style>
   :global(.nes-btn) {
-    position: relative;, display: inline-block;
+    position: relative;
+	display: inline-block;
     padding: 6px 8px;
     margin: 4px;
     text-align: center;
-    vertical-align: middle;, cursor: pointer;
+    vertical-align: middle;
+	cursor: pointer;
     user-select: none;
     border-style: solid;
     border-width: 4px;

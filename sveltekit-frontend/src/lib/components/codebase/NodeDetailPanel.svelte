@@ -14,9 +14,11 @@
   import X from 'lucide-svelte/icons/x';
 
   interface GraphNode {
-    id: string;, label: string;
+    id: string;
+	label: string;
     type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-    errorCount: number;, filePath: string;
+    errorCount: number;
+	filePath: string;
     cluster?: string;
     imports?: string[];
     exports?: string[];
@@ -33,8 +35,8 @@
   let {
     node = null,
     onClose = () => {},
-    onViewErrors = () => {},
-    onViewFile = () => {}
+	onViewErrors = () => {},
+	onViewFile = () => {}
   }: Props = $props();
 
   // Type colors
@@ -160,7 +162,8 @@
   .node-detail-panel {
     background: rgba(0, 0, 0, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;, overflow: hidden;
+    border-radius: 12px;
+	overflow: hidden;
     min-width: 280px;
     max-width: 350px;
   }
@@ -168,67 +171,85 @@
   .panel-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;, padding: 1rem;
+    align-items: flex-start;
+	padding: 1rem;
     background: rgba(255, 255, 255, 0.03);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .header-content {
     display: flex;
-    flex-direction: column;, gap: 0.5rem;
+    flex-direction: column;
+	gap: 0.5rem;
   }
 
   .type-badge {
     font-size: 0.7rem;
-    font-weight: 500;, padding: 0.2rem 0.5rem;
-    border-radius: 4px;, border: 1px solid;
+    font-weight: 500;
+	padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+	border: 1px solid;
     text-transform: uppercase;
-    letter-spacing: 0.05em;, width: fit-content;
+    letter-spacing: 0.05em;
+	width: fit-content;
   }
 
   .node-name {
     font-size: 1rem;
-    font-weight: 600;, color: white;
+    font-weight: 600;
+	color: white;
     margin: 0;
   }
 
   .close-btn {
-    background: transparent;, border: none;
+    background: transparent;
+	border: none;
     color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;, padding: 0.25rem;
-    border-radius: 4px;, transition: all 0.2s ease;
+    cursor: pointer;
+	padding: 0.25rem;
+    border-radius: 4px;
+	transition: all 0.2s ease;
   }
 
   .close-btn:hover {
-    color: white;, background: rgba(255, 255, 255, 0.1);
+    color: white;
+	background: rgba(255, 255, 255, 0.1);
   }
 
   .panel-content {
-    padding: 1rem;, display: flex;
-    flex-direction: column;, gap: 1rem;
+    padding: 1rem;
+	display: flex;
+    flex-direction: column;
+	gap: 1rem;
   }
 
   .detail-section {
     display: flex;
-    flex-direction: column;, gap: 0.5rem;
+    flex-direction: column;
+	gap: 0.5rem;
   }
 
   .section-label {
     font-size: 0.7rem;
-    font-weight: 500;, color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+	color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
   .file-path {
     display: flex;
-    align-items: center;, gap: 0.5rem;
-    padding: 0.5rem;, background: rgba(255, 255, 255, 0.05);
+    align-items: center;
+	gap: 0.5rem;
+    padding: 0.5rem;
+	background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;, color: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+	color: rgba(255, 255, 255, 0.8);
     font-size: 0.8rem;
     font-family: 'JetBrains Mono', monospace;
-    cursor: pointer;, transition: all 0.2s ease;
+    cursor: pointer;
+	transition: all 0.2s ease;
     text-align: left;
   }
 
@@ -245,11 +266,15 @@
 
   .error-badge {
     display: flex;
-    align-items: center;, gap: 0.5rem;
-    padding: 0.5rem;, background: rgba(239, 68, 68, 0.1);
+    align-items: center;
+	gap: 0.5rem;
+    padding: 0.5rem;
+	background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 6px;, color: #f87171;
-    font-size: 0.875rem;, cursor: pointer;
+    border-radius: 6px;
+	color: #f87171;
+    font-size: 0.875rem;
+	cursor: pointer;
     transition: all 0.2s ease;
   }
 
@@ -259,21 +284,26 @@
 
   .view-link {
     margin-left: auto;
-    font-size: 0.75rem;, color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+	color: rgba(255, 255, 255, 0.5);
   }
 
   .cluster-badge {
     display: flex;
-    align-items: center;, gap: 0.5rem;
-    padding: 0.5rem;, background: rgba(168, 85, 247, 0.1);
+    align-items: center;
+	gap: 0.5rem;
+    padding: 0.5rem;
+	background: rgba(168, 85, 247, 0.1);
     border: 1px solid rgba(168, 85, 247, 0.3);
-    border-radius: 6px;, color: #c084fc;
+    border-radius: 6px;
+	color: #c084fc;
     font-size: 0.875rem;
   }
 
   .list-container {
     display: flex;
-    flex-direction: column;, gap: 0.25rem;
+    flex-direction: column;
+	gap: 0.25rem;
   }
 
   .list-item {
@@ -282,7 +312,8 @@
     color: rgba(255, 255, 255, 0.7);
     padding: 0.25rem 0.5rem;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: 4px;, overflow: hidden;
+    border-radius: 4px;
+	overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -296,7 +327,8 @@
   }
 
   .list-more {
-    font-size: 0.75rem;, color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+	color: rgba(255, 255, 255, 0.4);
     padding: 0.25rem 0.5rem;
   }
 </style>

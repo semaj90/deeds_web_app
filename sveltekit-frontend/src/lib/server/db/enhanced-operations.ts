@@ -7,7 +7,8 @@ export const DbCaseOperations = {
 		status?: string[];
 		priority?: string[];
 		assignedTo?: string;
-		dateRange?: {, start: Date; end: Date };
+		dateRange?: {
+	start: Date; end: Date };
 		limit?: number;
 		offset?: number;
 		useVectorSearch?: boolean;
@@ -20,13 +21,15 @@ export const DbCaseOperations = {
 			total: 1
 		};
 	},
-	create: async (payload: {, title: string;
+	create: async (payload: {
+	title: string;
 		description?: string;
 		priority?: string;
 		status?: string;
 		incidentDate?: Date;
 		location?: string;
-		jurisdiction?: string;, createdBy: string;
+		jurisdiction?: string;
+	createdBy: string;
 	}) => {
 		// Stub: Return mock new case
 		return {
@@ -37,9 +40,12 @@ export const DbCaseOperations = {
 	},
 	update: async (
 		id: string,
-		updates: Partial<{, title: string;
-			description: string;, priority: string;
-			status: string;, location: string;
+		updates: Partial<{
+	title: string;
+			description: string;
+	priority: string;
+			status: string;
+	location: string;
 			jurisdiction: string;
 		}>,
 		userId: string

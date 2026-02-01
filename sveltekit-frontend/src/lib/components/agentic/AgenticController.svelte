@@ -1,20 +1,34 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   interface AgenticStatus {
-    status: string;, system: {, redisConnected: boolean;, agenticControllerActive: boolean;, watcherStatus: string;
+    status: string;
+	system: {
+	redisConnected: boolean;
+	agenticControllerActive: boolean;
+	watcherStatus: string;
     };
-    activity: {, recentASTProcessing: number;, pendingErrors: number;, lastActivity: string;
+    activity: {
+	recentASTProcessing: number;
+	pendingErrors: number;
+	lastActivity: string;
     };
   }
 
   interface ErrorEmbedding {
-    id: number;, text: string;
-    screenshotPath?: string;, confidence: number;, resolved: boolean;, createdAt: string;
+    id: number;
+	text: string;
+    screenshotPath?: string;
+	confidence: number;
+	resolved: boolean;
+	createdAt: string;
   }
 
   interface FixSuggestion {
-    suggestion: string;, successRate: number;, similarError: string;, relevance: number;
+    suggestion: string;
+	successRate: number;
+	similarError: string;
+	relevance: number;
   }
 
   let status = $state<AgenticStatus | null>(null);
@@ -93,10 +107,12 @@
     }
   }
 
-  onMount(() => {
+  $effect(() => {
+
     fetchStatus();
     fetchRecentErrors();
-  });
+  
+});
 </script>
 
 <div class="agentic-controller p-4 bg-gray-900 rounded-lg">
@@ -196,6 +212,7 @@
 
 <style>
   .agentic-controller {
-    max-width: 800px;, margin: 0 auto;
+    max-width: 800px;
+	margin: 0 auto;
   }
 </style>

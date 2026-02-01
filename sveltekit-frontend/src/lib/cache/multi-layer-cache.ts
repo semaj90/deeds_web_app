@@ -1,22 +1,29 @@
 /** * Multi-Layer Cache System for Legal AI Platform * Implements gaming-inspired memory management with console constraints */
 
 export interface CacheLayer {
- name: string;, maxSize: number;, maxAge: number; // milliseconds
+ name: string;
+	maxSize: number;
+	maxAge: number; // milliseconds
  priority: 'high' | 'medium' | 'low';
  evictionPolicy: 'lru' | 'lfu' | 'fifo';
 }
 export interface CacheEntry<T> {
- key: string;, value: T;, timestamp: number;, accessCount: number;, size: number;, layer: string;
+ key: string;
+	value: T;
+	timestamp: number;
+	accessCount: number;
+	size: number;
+	layer: string;
 }
 
 // Gaming console memory constraints
 export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  nes: [
  { name: 'CHR_ROM', maxSize: 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' },
- { name: 'PRG_ROM', maxSize: 1024, maxAge: 600000, priority: 'medium', evictionPolicy: 'fifo' }],
+	{ name: 'PRG_ROM', maxSize: 1024, maxAge: 600000, priority: 'medium', evictionPolicy: 'fifo' }],
  snes: [
  { name: 'VRAM', maxSize: 64 * 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' },
- {
+	{
  name: 'WRAM',
  maxSize: 128 * 1024,
  maxAge: 600000,
@@ -31,7 +38,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  priority: 'high',
  evictionPolicy: 'lru',
  },
- {
+	{
  name: 'TEXTURE_CACHE',
  maxSize: 4 * 1024,
  maxAge: 1800000,
@@ -46,14 +53,14 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  priority: 'high',
  evictionPolicy: 'lru',
  },
- {
+	{
  name: 'DOCUMENTS',
  maxSize: 32 * 1024 * 1024,
  maxAge: 3600000,
  priority: 'medium',
  evictionPolicy: 'lfu',
  },
- {
+	{
  name: 'SEARCH_RESULTS',
  maxSize: 8 * 1024 * 1024,
  maxAge: 900000,
@@ -108,7 +115,8 @@ export class MultiLayerCacheSystem {
  return this.getFromLayer<T>(key, layerName);
  }
 
- // Search all layers by priority(a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
+ // Search all layers by priority
+(a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority)
  );
 
  for (const config of sortedLayers) {
@@ -294,11 +302,11 @@ export class MultiLayerCacheSystem {
  // Gaming-specific cache operations
  async cacheEmbedding(documentId, string: Float32Array, Promise<boolean> {
  return this.set(`embedding, ${ documentId }`, embedding, 'EMBEDDINGS', },
- async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
+	async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', };
  async cacheDocument(id, string, unknown: Promise<boolean> {
  return this.set(`doc, ${ id }`, document, 'DOCUMENTS', },
- async getCachedDocument(id: string): Promise<any> {
+	async getCachedDocument(id: string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');
  }
 }

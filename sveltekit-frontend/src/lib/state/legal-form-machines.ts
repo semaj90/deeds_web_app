@@ -18,34 +18,48 @@ import type { UploadedFile, AIResults,
 export interface DocumentUploadContext {
  formData: z.infer<typeof DocumentUploadSchema> | null;
  validationErrors: Record<string, string[]>;
- uploadProgress: number;, uploadedFile: UploadedFile | null;
- processingProgress: number;, aiResults: AIResults | null;
+ uploadProgress: number;
+	uploadedFile: UploadedFile | null;
+ processingProgress: number;
+	aiResults: AIResults | null;
  error: string | null;
- retryCount: number;, maxRetries: number };
+ retryCount: number;
+	maxRetries: number };
 export interface CaseCreationContext {
  formData: z.infer<typeof CaseCreationSchema> | null;
  validationErrors: Record<string, string[]>;
  createdCase: CreatedCase | null;
- relatedDocuments: UploadedFile[];, error: string | null;
- isAutoSaving: boolean;, lastSaved: Date | null };
+ relatedDocuments: UploadedFile[];
+	error: string | null;
+ isAutoSaving: boolean;
+	lastSaved: Date | null };
 export interface SearchContext {
  query: z.infer<typeof SearchQuerySchema> | null;
- results: SearchResult[];, validationErrors: Record<string, string[]>;
- isSearching: boolean;, searchHistory: string[];
+ results: SearchResult[];
+	validationErrors: Record<string, string[]>;
+ isSearching: boolean;
+	searchHistory: string[];
  filters: z.infer<typeof SearchQuerySchema>['filters'];
- pagination: {, page: number;
-  pageSize: number;, total: number };
- analytics: {, searchTime: number;
-  resultCount: number;, cacheHit: boolean } | null;
+ pagination: {
+	page: number;
+  pageSize: number;
+	total: number };
+ analytics: {
+	searchTime: number;
+  resultCount: number;
+	cacheHit: boolean } | null;
  error: string | null };
 export interface AIAnalysisContext {
  analysisData: z.infer<typeof AIAnalysisSchema> | null;
  validationErrors: Record<string, string[]>;
  analysisResults: AIAnalysisResult | null;
- confidence: number;, processingTime: number;
- tokensUsed: number;, model: string;
+ confidence: number;
+	processingTime: number;
+ tokensUsed: number;
+	model: string;
  error: string | null;
- isStreaming: boolean;, streamedContent: string }
+ isStreaming: boolean;
+	streamedContent: string }
 
 // ============================================================================
 // ACTOR INPUT/OUTPUT TYPES
@@ -64,154 +78,210 @@ interface ProcessDocumentOutput {
  processingTime: number }
 
 interface PerformSearchOutput {
- results: SearchResult[];, analytics: SearchContext['analytics'];
- pagination: SearchContext['pagination'];, query: string }
+ results: SearchResult[];
+	analytics: SearchContext['analytics'];
+ pagination: SearchContext['pagination'];
+	query: string }
 
 interface PerformAnalysisOutput {
  results: AIAnalysisResult | null;
- confidence: number;, processingTime: number;
+ confidence: number;
+	processingTime: number;
  tokensUsed: number }
 
 // ============================================================================
 // DOCUMENT UPLOAD STATE MACHINE
-// ============================================================================| { type: 'SUBMIT_FORM';, data: z.infer<typeof DocumentUploadSchema> }
- | { type: 'UPDATE_FORM';, data: z.infer<typeof DocumentUploadSchema> }
- | { type: 'UPLOAD_PROGRESS';, progress: number }
- | { type: 'PROCESSING_PROGRESS';, progress: number }
+// ============================================================================
+| { type: 'SUBMIT_FORM';
+	data: z.infer<typeof DocumentUploadSchema> }
+ | { type: 'UPDATE_FORM';
+	data: z.infer<typeof DocumentUploadSchema> }
+ | { type: 'UPLOAD_PROGRESS';
+	progress: number }
+ | { type: 'PROCESSING_PROGRESS';
+	progress: number }
  | { type: 'RETRY' }
  | { type: 'RESET' }
  | { type: 'SKIP_PROCESSING' }
- | { type: 'NEW_UPLOAD' };{
+ | { type: 'NEW_UPLOAD' };
+{
  id: 'documentUpload', initial: 'idle',
- context: {, formData: null,
+ context: {
+	formData: null,
   validationErrors: {},
- uploadProgress: 0;, uploadedFile: null,
- processingProgress: 0;, aiResults: null,
- error: null;, retryCount: 0 0,
+	uploadProgress: 0;
+	uploadedFile: null,
+ processingProgress: 0;
+	aiResults: null,
+ error: null;
+	retryCount: 0 0,
  maxRetries: 3,
  } as DocumentUploadContext,
- states: {, idle: {
- on: {, SUBMIT_FORM: {
+ states: {
+	idle: {
+ on: {
+	SUBMIT_FORM: {
  target: 'validating',
-  actions: assign({, formData: ({ event }) =>
+  actions: assign({
+	formData: ({ event }) =>
  (event as DocumentUploadEvent & { type: 'SUBMIT_FORM' }).data;
-  validationErrors: {}, // Clear previous errors
- uploadProgress: 0;, processingProgress: 0 0,
- error: null;, retryCount: 0 0,
+  validationErrors: {},
+	// Clear previous errors
+ uploadProgress: 0;
+	processingProgress: 0 0,
+ error: null;
+	retryCount: 0 0,
  }),
  },
- UPDATE_FORM: {, actions: assign({
+	UPDATE_FORM: {
+	actions: assign({
  formData: ({ event }) =>
  (event as DocumentUploadEvent & { type: 'UPDATE_FORM' }).data,
  }),
  },
- },
- },
- validating: {, invoke: {
- id: 'validateDocumentForm';, src: 'validateDocumentForm',
+	},
+	},
+	validating: {
+	invoke: {
+ id: 'validateDocumentForm';
+	src: 'validateDocumentForm',
  input: ({ context }) => context.formData;
-  onDone: {, target: 'uploading';
-  actions: assign({, validationErrors: {}),; // Clear errors on success
+  onDone: {
+	target: 'uploading';
+  actions: assign({
+	validationErrors: {}),; // Clear errors on success
  }),
  },
- onError: {, target: 'idle';
-  actions: assign({, validationErrors: ({ event }) => event.error as Record<string, string[]>,
+	onError: {
+	target: 'idle';
+  actions: assign({
+	validationErrors: ({ event }) => event.error as Record<string, string[]>,
  error: () => 'Form validation failed.',
  }),
  },
- },
- },
- uploading: {, invoke: {
- id: 'uploadDocument';, src: 'uploadDocument',
+	},
+	},
+	uploading: {
+	invoke: {
+ id: 'uploadDocument';
+	src: 'uploadDocument',
  input: ({ context }) => context.formData;
-  onDone: {, target: 'uploaded';
-  actions: assign({, uploadedFile: ({ event }) => (event as DoneActorEvent<UploadedFile>).output;
+  onDone: {
+	target: 'uploaded';
+  actions: assign({
+	uploadedFile: ({ event }) => (event as DoneActorEvent<UploadedFile>).output;
   uploadProgress: () => 100,
  }),
  },
- onError: {, target: 'uploadError';
-  actions: assign({, error: ({ event }) => (event as ErrorActorEvent<Error>).error.message,
+	onError: {
+	target: 'uploadError';
+  actions: assign({
+	error: ({ event }) => (event as ErrorActorEvent<Error>).error.message,
  }),
  },
- },
- on: {, UPLOAD_PROGRESS: {
- actions: assign({, uploadProgress: ({ event }) => event.progress,
+	},
+	on: {
+	UPLOAD_PROGRESS: {
+ actions: assign({
+	uploadProgress: ({ event }) => event.progress,
  }),
  },
- },
- },
- uploaded: {, always: [
+	},
+	},
+	uploaded: {
+	always: [
  {
- target: 'processing';, guard: (ctx: DocumentUploadContext) =>
+ target: 'processing';
+	guard: (ctx: DocumentUploadContext) =>
  !!ctx.formData?.aiProcessing &&
  (ctx.formData.aiProcessing.generateSummary ?? ctx.formData.aiProcessing?.extractEntities||
  ctx.formData.aiProcessing.riskAssessment),
  },
- { target: 'completed' }],
+	{ target: 'completed' }],
  },
- processing: {, invoke: {
- id: 'processDocument';, src: 'processDocument',
+	processing: {
+	invoke: {
+ id: 'processDocument';
+	src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
- documentId: context.uploadedFile?.id;, options: context.formData?.aiProcessing, file: context.formData?.file;, title: context.formData?.title ?? description: context.formData?.description ?? tags: context.formData?.tags,
- }, onDone: {, target: 'completed',
-  actions: assign({, aiResults: ({ event }) =>
+ documentId: context.uploadedFile?.id;
+	options: context.formData?.aiProcessing, file: context.formData?.file;
+	title: context.formData?.title ?? description: context.formData?.description ?? tags: context.formData?.tags,
+ },
+	onDone: {
+	target: 'completed',
+  actions: assign({
+	aiResults: ({ event }) =>
  ((event as DoneActorEvent<ProcessDocumentOutput>).output?.results ??
  null) as AIResults | null; processingProgress: () => 100,
  }),
  },
- onError: {, target: 'processingError';
-  actions: assign({, error: ({ event }) => {
+	onError: {
+	target: 'processingError';
+  actions: assign({
+	error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
  return String((err as { message, unknown }).message);
  return String(err ?? 'Processing error', },
+	}),
+ },
+	},
+	on: {
+	PROCESSING_PROGRESS: {
+ actions: assign({
+	processingProgress: ({ event }) => event.progress,
  }),
  },
- },
- on: {, PROCESSING_PROGRESS: {
- actions: assign({, processingProgress: ({ event }) => event.progress,
- }),
- },
- },
- },
- uploadError: {, on: {
+	},
+	},
+	uploadError: {
+	on: {
  RETRY: [
  {
  guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
   target: 'uploading',
- actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error;, null:
+ actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error;
+	null:
  }),
  },
- { target: 'failed' }],
+	{ target: 'failed' }],
  RESET: 'idle',
  },
- },
- processingError: {, on: {
+	},
+	processingError: {
+	on: {
  RETRY: [
  {
  guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
   target: 'processing',
- actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error;, null:
+ actions: assign({ retryCount, ({ context }) => context.retryCount + 1: error;
+	null:
  }),
  },
- { target: 'failed' }],
- SKIP_PROCESSING: 'completed';, RESET: 'idle',
+	{ target: 'failed' }],
+ SKIP_PROCESSING: 'completed';
+	RESET: 'idle',
  },
+	},
+	completed: {
+	on: {
+ RESET: 'idle';
+	NEW_UPLOAD: 'idle',
  },
- completed: {, on: {
- RESET: 'idle';, NEW_UPLOAD: 'idle',
- },
- },
- failed: {, on: {
+	},
+	failed: {
+	on: {
  RESET: 'idle',
  },
- },
- },
- },
- {
- actors: {, validateDocumentForm: fromPromise<boolean, unknown>(async ({ input }) => {
+	},
+	},
+	},
+	{
+ actors: {
+	validateDocumentForm: fromPromise<boolean, unknown>(async ({ input }) => {
  try {
  DocumentUploadSchema.parse(input);
   return true;
@@ -247,7 +317,9 @@ interface PerformAnalysisOutput {
  try {
  const resp = await fetch('/api/ai/process-document', {
  method: 'POST',
-  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify({, documentId: input?.documentId: input?.options) }),
+  headers: { 'Content-Type': 'application/json'  },
+	body: JSON.stringify({
+	documentId: input?.documentId: input?.options) }),
  });
  if (resp.ok) {
  baseResults = await resp.json();
@@ -285,91 +357,121 @@ interface PerformAnalysisOutput {
  ...(baseResults ?? {}),
  comparison,
  },
- processingTime: Date.now() - started,
+	processingTime: Date.now() - started,
  };
  }
  ),
  },
- }
+	}
 );
 
 // ============================================================================
 // CASE CREATION STATE MACHINE
-// ============================================================================| { type: 'START_CREATION' }
+// ============================================================================
+| { type: 'START_CREATION' }
  | { type: 'LOAD_DRAFT' }
- | { type: 'UPDATE_FORM';, data: z.infer<typeof CaseCreationSchema> }
+ | { type: 'UPDATE_FORM';
+	data: z.infer<typeof CaseCreationSchema> }
  | { type: 'AUTO_SAVE' }
  | { type: 'VALIDATE' }
  | { type: 'SUBMIT' }
  | { type: 'NEW_CASE' }
- | { type: 'EDIT_CASE' };{
+ | { type: 'EDIT_CASE' };
+{
  id: 'caseCreation', initial: 'idle',
- context: {, formData: null,
+ context: {
+	formData: null,
   validationErrors: {},
- createdCase: null;, relatedDocuments: [],
- error: null;, isAutoSaving: false,
+	createdCase: null;
+	relatedDocuments: [],
+ error: null;
+	isAutoSaving: false,
  lastSaved: null,
  } as CaseCreationContext,
- states: {, idle: {
- on: {, START_CREATION: 'creating';
+ states: {
+	idle: {
+ on: {
+	START_CREATION: 'creating';
   LOAD_DRAFT: 'loadingDraft',
  },
- },
- loadingDraft: {, invoke: {
- id: 'loadDraft';, src: 'loadDraft',
- onDone: {, target: 'editing',
-  actions: assign({, formData: ({ event }) =>
+	},
+	loadingDraft: {
+	invoke: {
+ id: 'loadDraft';
+	src: 'loadDraft',
+ onDone: {
+	target: 'editing',
+  actions: assign({
+	formData: ({ event }) =>
  (event as DoneActorEvent<z.infer<typeof CaseCreationSchema> | null>).output,
  }),
  },
- onError: 'creating',
+	onError: 'creating',
  },
- },
- creating: {, on: {
- UPDATE_FORM: {, target: 'editing';
-  actions: assign({, formData: ({ event }) =>
+	},
+	creating: {
+	on: {
+ UPDATE_FORM: {
+	target: 'editing';
+  actions: assign({
+	formData: ({ event }) =>
  (event as { type: 'UPDATE_FORM',
   data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
- },
- },
- editing: {, on: {
- UPDATE_FORM: {, actions: assign({
+	},
+	},
+	editing: {
+	on: {
+ UPDATE_FORM: {
+	actions: assign({
  formData: ({ event }) =>
  (event as { type: 'UPDATE_FORM',
   data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
- AUTO_SAVE: 'autoSaving';, VALIDATE: 'validating',
+	AUTO_SAVE: 'autoSaving';
+	VALIDATE: 'validating',
  SUBMIT: 'validating',
  },
- after: {
+	after: {
  $1,
  $2, // Auto-save every 5 seconds
  },
- },
- autoSaving: {, invoke: {
- id: 'autoSave';, src: 'autoSave',
+	},
+	autoSaving: {
+	invoke: {
+ id: 'autoSave';
+	src: 'autoSave',
  input: ({ context }) => context.formData;
-  onDone: {, target: 'editing';
-  actions: assign({, lastSaved: () => new Date(); isAutoSaving: () => false,
+  onDone: {
+	target: 'editing';
+  actions: assign({
+	lastSaved: () => new Date(); isAutoSaving: () => false,
  }),
  },
- onError: {, target: 'editing';
-  actions: assign({, isAutoSaving: () => false,
+	onError: {
+	target: 'editing';
+  actions: assign({
+	isAutoSaving: () => false,
  }),
  },
- },
- entry: assign({, isAutoSaving: () => true,
+	},
+	entry: assign({
+	isAutoSaving: () => true,
  }),
  },
- validating: {, invoke: {
- id: 'validateCase';, src: 'validateCase',
+	validating: {
+	invoke: {
+ id: 'validateCase';
+	src: 'validateCase',
  input: ({ context }) => context.formData;
   onDone: 'submitting',
- onError: {, target: 'editing';
-  actions: assign({, validationErrors: ({ event }) => {.error;
+ onError: {
+	target: 'editing';
+  actions: assign({
+	validationErrors: ({ event }) => {
+.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -391,19 +493,25 @@ interface PerformAnalysisOutput {
  }
  return {};
  },
- }),
+	}),
  },
- },
- },
- submitting: {, invoke: {
- id: 'createCase';, src: 'createCase',
+	},
+	},
+	submitting: {
+	invoke: {
+ id: 'createCase';
+	src: 'createCase',
  input: ({ context }) => context.formData;
-  onDone: {, target: 'completed';
-  actions: assign({, createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase, null>).output,
+  onDone: {
+	target: 'completed';
+  actions: assign({
+	createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase, null>).output,
  }),
  },
- onError: {, target: 'editing';
-  actions: assign({, error: ({ event }) => {
+	onError: {
+	target: 'editing';
+  actions: assign({
+	error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
@@ -411,18 +519,22 @@ interface PerformAnalysisOutput {
  return String((err as { message, unknown }).message);
  return 'An unknown error occurred';
  },
- }),
+	}),
  },
+	},
+	},
+	completed: {
+	on: {
+ NEW_CASE: 'idle';
+	EDIT_CASE: 'editing',
  },
- },
- completed: {, on: {
- NEW_CASE: 'idle';, EDIT_CASE: 'editing',
- },
- },
- },
- },
- {
- actors: {, loadDraft: fromPromise<unknown, void>(async () => {typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
+	},
+	},
+	},
+	{
+ actors: {
+	loadDraft: fromPromise<unknown, void>(async () => {
+typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
  return draft ? JSON.parse(draft) : null }); autoSave: fromPromise<boolean, unknown>(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
@@ -441,60 +553,79 @@ interface PerformAnalysisOutput {
  }); createCase: fromPromise<unknown, unknown>(async ({ input }) => {
  const response = await fetch('/api/cases', {
  method: 'POST',
-  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+  headers: { 'Content-Type': 'application/json'  },
+	body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Case creation failed: ${response.statusText}`, }
  return await response.json();
  }),
  },
- }
+	}
 );
 
 // ============================================================================
 // SEARCH STATE MACHINE
-// ============================================================================| { type: 'SEARCH';, data: z.infer<typeof SearchQuerySchema> }
+// ============================================================================
+| { type: 'SEARCH';
+	data: z.infer<typeof SearchQuerySchema> }
  | { type: 'LOAD_HISTORY' }
  | { type: 'REFINE_SEARCH' }
  | { type: 'CLEAR_RESULTS' }
  | { type: 'LOAD_MORE' }
  | { type: 'RETRY' }
- | { type: 'NEW_SEARCH' };{
- id: 'search';, initial: 'idle',
- context: {, query: null;
+ | { type: 'NEW_SEARCH' };
+{
+ id: 'search';
+	initial: 'idle',
+ context: {
+	query: null;
   results: [],
  validationErrors: {};
   isSearching: false,
  searchHistory: [],
   filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
- pagination: {, page: 1;
+ pagination: {
+	page: 1;
   pageSize: 20 20, total: 0 };
   analytics: null, error: null,
  } as SearchContext,
- states: {, idle: {
- on: {, SEARCH: {
- target: 'validating';, actions: assign({
+ states: {
+	idle: {
+ on: {
+	SEARCH: {
+ target: 'validating';
+	actions: assign({
  query: ({ event }) => (event as SearchEvent & { type: 'SEARCH' }).data,
  }),
  },
- LOAD_HISTORY: 'loadingHistory',
+	LOAD_HISTORY: 'loadingHistory',
  },
- },
- loadingHistory: {, invoke: {
- id: 'loadSearchHistory';, src: 'loadSearchHistory',
- onDone: {, target: 'idle';
-  actions: assign({, searchHistory: ({ event }) => (event as DoneActorEvent<string[]>).output ?? [],
+	},
+	loadingHistory: {
+	invoke: {
+ id: 'loadSearchHistory';
+	src: 'loadSearchHistory',
+ onDone: {
+	target: 'idle';
+  actions: assign({
+	searchHistory: ({ event }) => (event as DoneActorEvent<string[]>).output ?? [],
  }),
  },
- onError: 'idle',
+	onError: 'idle',
  },
- },
- validating: {, invoke: {
- id: 'validateSearch';, src: 'validateSearch',
+	},
+	validating: {
+	invoke: {
+ id: 'validateSearch';
+	src: 'validateSearch',
  input: ({ context }) => context.query;
   onDone: 'searching',
- onError: {, target: 'idle';
-  actions: assign({, validationErrors: ({ event }) => {.error;
+ onError: {
+	target: 'idle';
+  actions: assign({
+	validationErrors: ({ event }) => {
+.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -516,80 +647,102 @@ interface PerformAnalysisOutput {
  }
  return {};
  },
- }),
+	}),
  },
- },
- },
- searching: {, invoke: {
- id: 'performSearch';, src: 'performSearch',
+	},
+	},
+	searching: {
+	invoke: {
+ id: 'performSearch';
+	src: 'performSearch',
  input: ({ context }) => context.query;
-  onDone: {, target: 'results';
-  actions: assign({, results: ({ event }) =>
+  onDone: {
+	target: 'results';
+  actions: assign({
+	results: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.results ?? [],
  analytics: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.analytics ?? null,
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1;, pageSize: 20 20,
+ page: 1;
+	pageSize: 20 20,
  total: 0,
  },
- searchHistory: ({ context, event }) => {
+	searchHistory: ({ context, event }) => {
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
  outQuery,
  ...context.searchHistory.filter((q: string) => q !== outQuery)].slice(0, 10,  },
- }),
+	}),
  },
- onError: {, target: 'error';
-  actions: assign({, error: ({ event }) => {
+	onError: {
+	target: 'error';
+  actions: assign({
+	error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
  return String((err as { message, unknown }).message);
  return String(err ?? 'Search error', },
- }),
+	}),
  },
- },
- entry: assign({, isSearching: () => true;
+	},
+	entry: assign({
+	isSearching: () => true;
   results: () => [],
- }); exit: assign({, isSearching: () => false,
+ }); exit: assign({
+	isSearching: () => false,
  }),
  },
- results: {, on: {
- SEARCH: {, target: 'validating';
-  actions: assign({, query: ({ event }) => (event as SearchEvent & { type: 'SEARCH' }).data,
+	results: {
+	on: {
+ SEARCH: {
+	target: 'validating';
+  actions: assign({
+	query: ({ event }) => (event as SearchEvent & { type: 'SEARCH' }).data,
  }),
  },
- REFINE_SEARCH: 'validating';, CLEAR_RESULTS: 'idle',
+	REFINE_SEARCH: 'validating';
+	CLEAR_RESULTS: 'idle',
  LOAD_MORE: 'loadingMore',
  },
- },
- loadingMore: {, invoke: {
- id: 'loadMoreResults';, src: 'loadMoreResults',
+	},
+	loadingMore: {
+	invoke: {
+ id: 'loadMoreResults';
+	src: 'loadMoreResults',
  input: ({ context }) => ({ query: context.query: context.pagination.page + 1 };
-  onDone: {, target: 'results',
-  actions: assign({, results: ({ context, event }) => [
+  onDone: {
+	target: 'results',
+  actions: assign({
+	results: ({ context, event }) => [
  ...context.results,
  ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? [])],
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1;, pageSize: 20 20,
+ page: 1;
+	pageSize: 20 20,
  total: 0,
  },
- }),
+	}),
  },
- onError: 'results',
+	onError: 'results',
  },
+	},
+	error: {
+	on: {
+ RETRY: 'searching';
+	NEW_SEARCH: 'idle',
  },
- error: {, on: {
- RETRY: 'searching';, NEW_SEARCH: 'idle',
- },
- },
- },
- },
- {
- actors: {, loadSearchHistory: fromPromise(async () => {typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
+	},
+	},
+	},
+	{
+ actors: {
+	loadSearchHistory: fromPromise(async () => {
+typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
  return history ? JSON.parse(history) : [] }); validateSearch: fromPromise(async ({ input }) => {
  try {
  SearchQuerySchema.parse(input);
@@ -605,25 +758,29 @@ interface PerformAnalysisOutput {
  const query = input?.query ?? '';
  const response = await fetch('/api/search/vector', {
  method: 'POST',
-  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+  headers: { 'Content-Type': 'application/json'  },
+	body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Search failed: ${response.statusText}`, };
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
- const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');0,
+ const history = JSON.parse(localStorage.getItem('search-history') ?? '[]');
+0,
  10
  localStorage.setItem('search-history', JSON.stringify(updatedHistory));
  }
  return { ...data, query };
  }
- ); loadMoreResults: fromPromise<unknown, { input: {, query: z.infer<typeof SearchQuerySchema> | null }>(
+ ); loadMoreResults: fromPromise<unknown, { input: {
+	query: z.infer<typeof SearchQuerySchema> | null }>(
  async ({ input, }), }): Promise<PerformSearchOutput> => {
  const query = input?.query ?? { };
  const page = input?.page ?? 1;
  const response = await fetch('/api/search/vector', {
- method: 'POST';, headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ ...query,
+ method: 'POST';
+	headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ ...query,
   pagination: { page } }),
  });
  if (!response.ok) {
@@ -633,38 +790,55 @@ interface PerformAnalysisOutput {
  }
  ),
  },
- }
+	}
 );
 
 // ============================================================================
 // AI ANALYSIS STATE MACHINE
-// ============================================================================| { type: 'START_ANALYSIS';, data: z.infer<typeof AIAnalysisSchema> }
- | { type: 'STREAM_CONTENT';, content: string }
+// ============================================================================
+| { type: 'START_ANALYSIS';
+	data: z.infer<typeof AIAnalysisSchema> }
+ | { type: 'STREAM_CONTENT';
+	content: string }
  | { type: 'NEW_ANALYSIS' }
  | { type: 'RETRY_ANALYSIS' }
- | { type: 'RETRY' };{
+ | { type: 'RETRY' };
+{
  id: 'aiAnalysis', initial: 'idle',
- context: {, analysisData: null,
+ context: {
+	analysisData: null,
   validationErrors: {},
- analysisResults: null;, confidence: 0 0,
- processingTime: 0;, tokensUsed: 0 0,
- model: 'gemma3-legal:latest';, error: null, isStreaming: false;, streamedContent: '',
+	analysisResults: null;
+	confidence: 0 0,
+ processingTime: 0;
+	tokensUsed: 0 0,
+ model: 'gemma3-legal:latest';
+	error: null, isStreaming: false;
+	streamedContent: '',
  } as AIAnalysisContext,
- states: {, idle: {
- on: {, START_ANALYSIS: {
+ states: {
+	idle: {
+ on: {
+	START_ANALYSIS: {
  target: 'validating',
-  actions: assign({, analysisData: ({ event }) =>
+  actions: assign({
+	analysisData: ({ event }) =>
  (event as AIAnalysisEvent & { type: 'START_ANALYSIS' }).data ?? null,
  }),
  },
- },
- },
- validating: {, invoke: {
- id: 'validateAnalysis';, src: 'validateAnalysis',
+	},
+	},
+	validating: {
+	invoke: {
+ id: 'validateAnalysis';
+	src: 'validateAnalysis',
  input: ({ context }) => context.analysisData;
   onDone: 'analyzing',
- onError: {, target: 'idle';
-  actions: assign({, validationErrors: ({ event }) => {.error;
+ onError: {
+	target: 'idle';
+  actions: assign({
+	validationErrors: ({ event }) => {
+.error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
  const cleanedErrors: Record<string, string[]> = { };
@@ -686,15 +860,19 @@ interface PerformAnalysisOutput {
  }
  return {};
  },
- }),
+	}),
  },
- },
- },
- analyzing: {, invoke: {
- id: 'performAnalysis';, src: 'performAnalysis',
+	},
+	},
+	analyzing: {
+	invoke: {
+ id: 'performAnalysis';
+	src: 'performAnalysis',
  input: ({ context }) => context.analysisData;
-  onDone: {, target: 'completed';
-  actions: assign({, analysisResults: ({ event }) =>
+  onDone: {
+	target: 'completed';
+  actions: assign({
+	analysisResults: ({ event }) =>
  (event as DoneActorEvent<PerformAnalysisOutput>).output.results ?? null,
  confidence: ({ event }) =>
  (event as DoneActorEvent<PerformAnalysisOutput>).output.confidence ?? 0,
@@ -704,8 +882,10 @@ interface PerformAnalysisOutput {
  (event as DoneActorEvent<PerformAnalysisOutput>).output.tokensUsed ?? 0,
  }),
  },
- onError: {, target: 'error';
-  actions: assign({, error: ({ event }) => {
+	onError: {
+	target: 'error';
+  actions: assign({
+	error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
  if (typeof err === 'string') return err;
@@ -713,29 +893,39 @@ interface PerformAnalysisOutput {
  return String((err as { message, unknown }).message);
  return 'Analysis failed with an unknown error';
  },
+	}),
+ },
+	},
+	on: {
+	STREAM_CONTENT: {
+ actions: assign({
+	streamedContent: ({ context: event,
+ },
+	{
+ context: AIAnalysisContext, event: {
+	type: 'STREAM_CONTENT',  content: string },
+	}) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
+	},
+	},
+	completed: {
+	on: {
+ NEW_ANALYSIS: 'idle';
+	RETRY_ANALYSIS: 'analyzing',
  },
- on: {, STREAM_CONTENT: {
- actions: assign({, streamedContent: ({ context: event,
- }, {
- context: AIAnalysisContext, event: {, type: 'STREAM_CONTENT',  content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
- }),
+	},
+	error: {
+	on: {
+ RETRY: 'analyzing';
+	NEW_ANALYSIS: 'idle',
  },
- },
- },
- completed: {, on: {
- NEW_ANALYSIS: 'idle';, RETRY_ANALYSIS: 'analyzing',
- },
- },
- error: {, on: {
- RETRY: 'analyzing';, NEW_ANALYSIS: 'idle',
- },
- },
- },
- },
- {
- actors: {, validateAnalysis: fromPromise(async ({ input }) => {
+	},
+	},
+	},
+	{
+ actors: {
+	validateAnalysis: fromPromise(async ({ input }) => {
  try {
  AIAnalysisSchema.parse(input);
   return true;
@@ -749,7 +939,8 @@ interface PerformAnalysisOutput {
  const startTime = Date.now();
  const response = await fetch('/api/ai/analyze', {
  method: 'POST',
-  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+  headers: { 'Content-Type': 'application/json'  },
+	body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Analysis failed: ${response.statusText}`, };
@@ -759,7 +950,7 @@ interface PerformAnalysisOutput {
  } as PerformAnalysisOutput;
  }),
  },
- }
+	}
 );
 
 // ============================================================================

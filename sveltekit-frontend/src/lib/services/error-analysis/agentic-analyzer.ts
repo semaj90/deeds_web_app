@@ -78,7 +78,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  // Error details
  sections.push('## Error Details');
  sections.push(`- File: ${error.file}`);
- sections.push(`- Line: ${error.line}, Column: ${error.column}`);
+ sections.push(`- Line: ${error.line},
+	Column: ${error.column}`);
  sections.push(`- Type: ${error.type}`);
  sections.push(`- Message: ${error.message}`);
  if (error.code) {
@@ -149,7 +150,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const res = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: this.llmModel,
+	body: JSON.stringify({
+	model: this.llmModel,
  prompt,
  stream: false,
  temperature: 0.7,
@@ -219,7 +221,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const text = response.text;
 
  // Extract root cause
- const rootCauseMatch = text.match(/## Root Cause\n([\s\S]*?)(?:##|$)/);? rootCauseMatch[1].trim()
+ const rootCauseMatch = text.match(/## Root Cause\n([\s\S]*?)(?:##|$)/);
+? rootCauseMatch[1].trim()
  : 'Unable to determine root cause';
 
  // Extract suggested fix
@@ -232,7 +235,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
 
  // Extract related errors
  const relatedMatch = text.match(/## Related Errors\n([\s\S]*?)(?:##|$)/);
- const relatedText = relatedMatch ? relatedMatch[1].trim() : '';.split(',')
+ const relatedText = relatedMatch ? relatedMatch[1].trim() : '';
+.split(',')
  .map((e: any) => e.trim())
  .filter((e: any) => e.length > 0);
 
@@ -265,7 +269,8 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
 
  sections.push('## Error Details');
  sections.push(`- File: ${error.file}`);
- sections.push(`- Line: ${error.line}, Column: ${error.column}`);
+ sections.push(`- Line: ${error.line},
+	Column: ${error.column}`);
  sections.push(`- Type: ${error.type}`);
  sections.push(`- Message: ${error.message}`);
  sections.push('');

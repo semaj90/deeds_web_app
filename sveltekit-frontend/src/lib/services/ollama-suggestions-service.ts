@@ -7,7 +7,8 @@
 // ===== Types =====
 
 export interface OllamaSuggestionRequest {
-	content: string;, reportType: string;
+	content: string;
+	reportType: string;
 	context?: {
 		caseId?: string;
 		evidenceIds?: string[];
@@ -18,10 +19,13 @@ export interface OllamaSuggestionRequest {
 }
 
 export interface OllamaSuggestion {
-	content: string;, type: string;
-	confidence: number;, reasoning: string;
+	content: string;
+	type: string;
+	confidence: number;
+	reasoning: string;
 	metadata: {
-		keywords?: string[];, category: string;
+		keywords?: string[];
+	category: string;
 		urgency?: number;
 		sources?: string[];
 		aiGenerated?: boolean;
@@ -107,7 +111,8 @@ export class OllamaSuggestionsService {
 				top_p: 0.9,
 				top_k: 40
 			})) {
-				// Parse each chunk and yield suggestionschunk: request.reportType,
+				// Parse each chunk and yield suggestions
+chunk: request.reportType,
 					request.maxSuggestions ?? 5
 				);
 
@@ -199,7 +204,7 @@ export class OllamaSuggestionsService {
 			const response = await fetch(`${this.baseUrl}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+	body: JSON.stringify(payload),
 				signal: controller.signal
 			});
 
@@ -241,7 +246,7 @@ export class OllamaSuggestionsService {
 			const response = await fetch(`${this.baseUrl}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+	body: JSON.stringify(payload),
 				signal: controller.signal
 			});
 
@@ -328,7 +333,8 @@ export class OllamaSuggestionsService {
 			return (suggestionsData as unknown[])
 				.slice(0, maxSuggestions)
 				.map((item, index) => {
-					const obj = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};typeof obj[k] === 'string' ? (obj[k] as string) : fallback;
+					const obj = typeof item === 'object' && item !== null ? (item as Record<string, unknown>) : {};
+typeof obj[k] === 'string' ? (obj[k] as string) : fallback;
 
 					const getNumber = (k: string, fallback = 0): number => {
 						const v = obj[k];
@@ -338,7 +344,8 @@ export class OllamaSuggestionsService {
 							return Number.isFinite(n) ? n : fallback;
 						}
 						return fallback;
-					};typeof obj['metadata'] === 'object' && obj['metadata'] !== null
+					};
+typeof obj['metadata'] === 'object' && obj['metadata'] !== null
 							? (obj['metadata'] as Record<string, unknown>)
 							: {};
 
@@ -347,7 +354,8 @@ export class OllamaSuggestionsService {
 						type: getString('type', 'general_improvement'),
 						confidence: Math.min(Math.max(getNumber('confidence', 0.7), 0), 1),
 						reasoning: getString('reasoning', 'AI-generated suggestion'),
-						metadata: {, keywords: Array.isArray(metadataObj['keywords'])
+						metadata: {
+	keywords: Array.isArray(metadataObj['keywords'])
 								? (metadataObj['keywords'] as string[]).filter((k) => typeof k === 'string')
 								: [],
 							category:
@@ -386,7 +394,8 @@ export class OllamaSuggestionsService {
 	): OllamaSuggestion[] {
 		const suggestions: OllamaSuggestion[] = [];
 
-		// Split by numbered items or bullet points.split(/\d+[.)]\s+|\*\s+|-\s+/)
+		// Split by numbered items or bullet points
+.split(/\d+[.)]\s+|\*\s+|-\s+/)
 			.map((p) => p.trim())
 			.filter(Boolean);
 
@@ -399,7 +408,8 @@ export class OllamaSuggestionsService {
 				type: this.inferSuggestionType(part, reportType),
 				confidence: 0.75,
 				reasoning: 'Extracted from AI response text',
-				metadata: {, category: 'ai_generated',
+				metadata: {
+	category: 'ai_generated',
 					urgency: 2,
 					aiGenerated: true,
 					model: this.model,
@@ -493,7 +503,9 @@ export class OllamaSuggestionsService {
 	/**
 	 * Get service configuration
 	 */
-	public getConfig(): {, baseUrl: string; model: string;, timeout: number } {
+	public getConfig(): {
+	baseUrl: string; model: string;
+	timeout: number } {
 		return {
 			baseUrl: this.baseUrl,
 			model: this.model,
@@ -529,8 +541,10 @@ export async function generateOllamaSuggestions(
 /**
  * Test function to verify Ollama integration
  */
-export async function testOllamaIntegration(): Promise<{, success: boolean;
-	model: string;, availableModels: string[];
+export async function testOllamaIntegration(): Promise<{
+	success: boolean;
+	model: string;
+	availableModels: string[];
 	testSuggestions?: OllamaSuggestion[];
 	error?: string;
 }> {

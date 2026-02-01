@@ -3,8 +3,8 @@
 
 	const commands = [
 		{ id: 'board', label: 'Go to Evidence Board', hint: 'B' },
-		{ id: 'graph', label: 'Open Evidence Graph Analyzer', hint: 'G' },
-		{ id: 'chat', label: 'Focus AI Transcript', hint: 'C' }
+	{ id: 'graph', label: 'Open Evidence Graph Analyzer', hint: 'G' },
+	{ id: 'chat', label: 'Focus AI Transcript', hint: 'C' }
 	] as const;
 
 	function runCommand(id: (typeof commands)[number]['id']) {

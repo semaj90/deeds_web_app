@@ -5,9 +5,12 @@
 import { writable } from 'svelte/store';
 
 export interface FocusSettings {
- dimOpacity: number;, transitionDuration: string;
- hideElements: string[];, exemptElements: string[];
- enableFullscreen: boolean;, enableZenMode: boolean;
+ dimOpacity: number;
+	transitionDuration: string;
+ hideElements: string[];
+	exemptElements: string[];
+ enableFullscreen: boolean;
+	enableZenMode: boolean;
 }
 
 export const defaultFocusSettings: FocusSettings = {
@@ -195,11 +198,13 @@ export class FocusManager {
  return false;
  }
 
- // Dim elements that are not content areas'.editor-content',
+ // Dim elements that are not content areas
+'.editor-content',
  '[contenteditable="true"]',
  'textarea',
  'input[type="text"]',
- '.writing-area'];(selector) => element.matches(selector) || element.closest(selector)
+ '.writing-area'];
+(selector) => element.matches(selector) || element.closest(selector)
  );
  return !isContentElement && !this.shouldExemptElement(element);
  }
@@ -290,15 +295,17 @@ export function focusModeAction(node: HTMLElement, enabled: boolean = false) {
  destroy() {
  manager.deactivate();
  },
- };
+	};
 }
 
-// CSS classes for focus mode styling$1;$2.focus-mode-active {
+// CSS classes for focus mode styling
+$1;$2.focus-mode-active {
  --focus-dim-opacity: 0.3;
  --focus-transition: opacity 0.3s ease;
 }
 .focus-mode-active .focus-dim {
- opacity: var(--focus-dim-opacity);, transition: var(--focus-transition);
+ opacity: var(--focus-dim-opacity);
+	transition: var(--focus-transition);
 }
 .focus-mode-active .focus-dim:hover {
  opacity: 1;
@@ -316,7 +323,8 @@ export function focusModeAction(node: HTMLElement, enabled: boolean = false) {
 .focus-mode-active.zen-mode .status-bar,
 .focus-mode-active.zen-mode .header-actions {
  opacity: 0;
- pointer-events: none;, transition: opacity 0.3s ease;
+ pointer-events: none;
+	transition: opacity 0.3s ease;
 }
 .focus-mode-active.zen-mode .toolbar:hover,
 .focus-mode-active.zen-mode .sidebar:hover,
@@ -361,14 +369,18 @@ export function setupFocusModeShortcut(manager: FocusManager = globalFocusManage
 
 // Presets for different focus levels
 export const focusPresets = {
- minimal: {, dimOpacity: 0.7, enableZenMode: hideElements: [] },
- moderate: {, dimOpacity: 0.5, enableZenMode: hideElements: ['.sidebar'] },
- intense: {, dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
+ minimal: {
+	dimOpacity: 0.7, enableZenMode: hideElements: [] },
+	moderate: {
+	dimOpacity: 0.5, enableZenMode: hideElements: ['.sidebar'] },
+	intense: {
+	dimOpacity: 0.3, enableZenMode: hideElements: ['.toolbar', '.sidebar', '.status-bar'],
  },
- zen: {, dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
+	zen: {
+	dimOpacity: 0.1, enableZenMode: true, enableFullscreen: true,
  hideElements: ['.toolbar', '.sidebar', '.status-bar', '.header-actions'],
  },
-};
+	};
 
 
 

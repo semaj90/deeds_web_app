@@ -12,10 +12,11 @@ export function compareUI(domSemantics: UISemanticSnapshot[], specs: UISpec[]): 
  contradictions.push({
  route: ui.route,
  type: 'UI Non-Compliance',
- details: {, expected: spec, actual: ui,
+ details: {
+	expected: spec, actual: ui,
  message: `Compliance score ${ui.complianceScore ?? 0} < required ${minimumScore}`,
  },
- });
+	});
  }
  }
 

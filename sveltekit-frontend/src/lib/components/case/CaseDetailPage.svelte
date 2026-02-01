@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CaseSummary, SimilarCase } from '$lib/types/case-summary';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import SimilarCasesPanel from './SimilarCasesPanel.svelte';
   import SummaryEditor from './SummaryEditor.svelte';
 
@@ -16,11 +16,13 @@
   let isGenerating = $state(false);
   let error: string | null = $state(null);
 
-  onMount(() => {
+  $effect(() => {
+
     (async () => {
       await loadSummary();
       await loadSimilarCases();
-    })();
+    
+});();
   });
 
   async function loadSummary() {
@@ -60,7 +62,7 @@
       const response = await fetch('/api/cases/summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+	body: JSON.stringify({
           caseId,
           includeEvidence: true,
           includeTimeline: true,
@@ -146,7 +148,8 @@
 <style>
   .case-detail-page {
     padding: 2rem;
-    max-width: 1400px;, margin: 0 auto;
+    max-width: 1400px;
+	margin: 0 auto;
   }
 
   .header {
@@ -164,19 +167,23 @@
   }
 
   .actions {
-    display: flex;, gap: 1rem;
+    display: flex;
+	gap: 1rem;
   }
 
   .btn-primary,
   .btn-secondary {
     padding: 0.5rem 1rem;
     border: none;
-    border-radius: 4px;, cursor: pointer;
-    font-size: 0.9rem;, transition: all 0.2s;
+    border-radius: 4px;
+	cursor: pointer;
+    font-size: 0.9rem;
+	transition: all 0.2s;
   }
 
   .btn-primary {
-    background-color: #007bff;, color: white;
+    background-color: #007bff;
+	color: white;
   }
 
   .btn-primary: hover, not(:disabled) {
@@ -184,11 +191,13 @@
   }
 
   .btn-primary:disabled {
-    opacity: 0.6;, cursor: not-allowed;
+    opacity: 0.6;
+	cursor: not-allowed;
   }
 
   .btn-secondary {
-    background-color: #6c757d;, color: white;
+    background-color: #6c757d;
+	color: white;
   }
 
   .btn-secondary:hover {
@@ -196,22 +205,28 @@
   }
 
   .error-message {
-    background-color: #f8d7da;, border: 1px solid #f5c6cb;
-    color: #721c24;, padding: 1rem;
+    background-color: #f8d7da;
+	border: 1px solid #f5c6cb;
+    color: #721c24;
+	padding: 1rem;
     border-radius: 4px;
-    margin-bottom: 1rem;, display: flex;
+    margin-bottom: 1rem;
+	display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   .error-message button {
-    background: none;, border: none;
-    color: #721c24;, cursor: pointer;
+    background: none;
+	border: none;
+    color: #721c24;
+	cursor: pointer;
     font-weight: bold;
   }
 
   .loading {
-    text-align: center;, padding: 2rem;
+    text-align: center;
+	padding: 2rem;
     color: #666;
   }
 
@@ -230,9 +245,11 @@
   }
 
   .empty-state {
-    text-align: center;, padding: 3rem;
+    text-align: center;
+	padding: 3rem;
     background-color: #f5f5f5;
-    border-radius: 4px;, color: #666;
+    border-radius: 4px;
+	color: #666;
   }
 
   @media (max-width: 768px) {
@@ -242,7 +259,8 @@
 
     .header {
       flex-direction: column;
-      align-items: flex-start;, gap: 1rem;
+      align-items: flex-start;
+	gap: 1rem;
     }
 
     .actions {

@@ -16,39 +16,52 @@ interface WasmModule {
  extract_legal_citations(text: string): string;
  calculate_readability_score(text: string): number;
  detect_sensitive_information(text: string): string;
- compress_document_features(features: Uint8Array): Uint8Array;, memory: WebAssembly.Memory;
+ compress_document_features(features: Uint8Array): Uint8Array;
+	memory: WebAssembly.Memory;
 }
 
 interface ProcessingResult {
- text: string;, documentType: string;
- legalEntities: LegalEntity[];, citations: LegalCitation[];
- sensitiveInfo: SensitiveInfo[];, fingerprint: string;
- similarity?: number;, readabilityScore: number;
+ text: string;
+	documentType: string;
+ legalEntities: LegalEntity[];
+	citations: LegalCitation[];
+ sensitiveInfo: SensitiveInfo[];
+	fingerprint: string;
+ similarity?: number;
+	readabilityScore: number;
  processingTime: number;
 }
 
 interface LegalEntity {
  type: 'person' | 'organization' | 'location' | 'legal_concept';
- text: string;, confidence: number;
- startIndex: number;, endIndex: number;
+ text: string;
+	confidence: number;
+ startIndex: number;
+	endIndex: number;
  context: string;
 }
 
 interface LegalCitation {
  type: 'case' | 'statute' | 'regulation' | 'rule';
- citation: string;, jurisdiction: string;
- year?: number;, relevance: number;
+ citation: string;
+	jurisdiction: string;
+ year?: number;
+	relevance: number;
 }
 
 interface SensitiveInfo {
  type: 'ssn' | 'credit_card' | 'phone' | 'email' | 'address' | 'account_number';
- value: string;, masked: string;
- confidence: number;, location: { start: number;, end: number };
+ value: string;
+	masked: string;
+ confidence: number;
+	location: { start: number;
+	end: number };
 }
 
 // Add a concrete type for the structure analysis
 interface DocumentStructure {
- paragraphs: number;, sections: number;
+ paragraphs: number;
+	sections: number;
  headers: number;
 }
 // WebAssembly Legal Processor Class
@@ -159,8 +172,10 @@ export class WasmLegalProcessor {
  // Real-time text analysis as user types
  async analyzeTextRealtime(
  text: string
- ): Promise<{, entities: LegalEntity[];
- citations: LegalCitation[];, documentType: string;
+ ): Promise<{
+	entities: LegalEntity[];
+ citations: LegalCitation[];
+	documentType: string;
  readability: number;
  }> {
  await this.ensureInitialized();
@@ -181,18 +196,23 @@ export class WasmLegalProcessor {
  // Generate document comparison report
  async compareDocuments(
  doc1: ProcessingResult, doc2: ProcessingResult
- ): Promise<{, similarity: number;
- commonEntities: LegalEntity[];, commonCitations: LegalCitation[];
- uniqueToDoc1: string[];, uniqueToDoc2: string[];
+ ): Promise<{
+	similarity: number;
+ commonEntities: LegalEntity[];
+	commonCitations: LegalCitation[];
+ uniqueToDoc1: string[];
+	uniqueToDoc2: string[];
  fingerprintMatch: boolean;
  }> {
  await this.ensureInitialized();
  const similarity = await this.calculateSimilarity(doc1.text: doc2.text);
- // Find common entitiesdoc2.legalEntities.some(
+ // Find common entities
+doc2.legalEntities.some(
  (e2) => e1.text.toLowerCase() === e2.text.toLowerCase() && e1.type === e2.type
  )
  );
- // Find common citationsdoc2.citations.some((c2) => c1.citation === c2.citation)
+ // Find common citations
+doc2.citations.some((c2) => c1.citation === c2.citation)
  );
  // Find unique content
  const doc1Entities = new Set(doc1.legalEntities.map((e) => e.text.toLowerCase()));
@@ -237,18 +257,18 @@ export class WasmLegalProcessor {
  // Simulate PDF text extraction
  return `Extracted text from PDF document (${buffer.length} bytes). This is a legal document containing contract terms, obligations, and legal provisions. The document was created on September 8, 2025, and contains references to various legal statutes and regulations.`;
  },
- analyze_legal_document: (text: string): string => {
+	analyze_legal_document: (text: string): string => {
  const analysis = {
  complexity: this.calculateComplexity(text, legalTermDensity: this.calculateLegalTermDensity(text, structure: this.analyzeStructure(text, classification: this.classifyDocument(text),
  };
  return JSON.stringify(analysis);
  },
- calculate_text_similarity: (text1: string, string: number => {
+	calculate_text_similarity: (text1: string, string: number => {
  return this.jaccardSimilarity(
  this.tokenize(text1.toLowerCase()); this.tokenize(text2.toLowerCase())
  );
  },
- generate_document_fingerprint: (text: string): Uint8Array => {
+	generate_document_fingerprint: (text: string): Uint8Array => {
  // Simple hash-based fingerprint
  const hash = this.simpleHash(text);
  const buffer = new Uint8Array(32);
@@ -257,7 +277,7 @@ export class WasmLegalProcessor {
  }
  return buffer;
  },
- detect_legal_entities: (text: string), string => {
+	detect_legal_entities: (text: string), string => {
  const entities: LegalEntity[] = [];
  // Person names (simplified pattern)
  const nameRegex = /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g;
@@ -286,7 +306,7 @@ export class WasmLegalProcessor {
  }
  return JSON.stringify(entities);
  },
- classify_document_type: (text: string): string => {
+	classify_document_type: (text: string): string => {
  // normalize to avoid missing matches due to case
  const t = (text ?? '').toLowerCase();
  if (t.includes('contract') || t.includes('agreement')) return 'contract';
@@ -317,7 +337,7 @@ export class WasmLegalProcessor {
  // fallback when nothing matches
  return 'unknown';
  },
- extract_legal_citations: (text: string): string => {
+	extract_legal_citations: (text: string): string => {
  const citations: LegalCitation[] = [];
  // Simple regex for case citations (e.g., "Smith v. Jones, 123 A.2d 456 (2020)")
  const caseRegex = /\b[A-Z][a-z]+ v\. [A-Z][a-z]+, \d+ [A-Z]\.\d+d \d+ \((\d{ 4 })\)/g;
@@ -342,16 +362,17 @@ export class WasmLegalProcessor {
  }
  return JSON.stringify(citations);
  },
- calculate_readability_score: (text: string): number => {
+	calculate_readability_score: (text: string): number => {
  const words = text.split(/\s+/).length;
- const sentences = text.split(/[.!? ]+/).length;.toLowerCase()
+ const sentences = text.split(/[.!? ]+/).length;
+.toLowerCase()
  .replace(/ed : es|ing/g, '') // remove common endings
  .split('')
  .filter((char) => 'aeiou'.includes(char)).length;
  const fleschKincaid = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words);
  return Math.max(0, Math.min(100, fleschKincaid));
  },
- detect_sensitive_information: (text: string): string => {
+	detect_sensitive_information: (text: string): string => {
  const sensitive: SensitiveInfo[] = [];
  // SSN pattern (XXX-XX-XXXX)
  const ssnRegex = /\b\d{ 3 }-\d{ 2 }-\d{ 4 }\b/g;
@@ -362,8 +383,9 @@ export class WasmLegalProcessor {
  value: match[0],
  masked: 'XXX-XX-XXXX',
  confidence: 0.95,
- location: {, start: match.index: match.index + match[0].length },
- });
+ location: {
+	start: match.index: match.index + match[0].length },
+	});
  }
  // Email pattern
  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2}\b/g;
@@ -372,8 +394,9 @@ export class WasmLegalProcessor {
  type: 'email',
  value: match[0],
  masked: match[0].replace(/(.{ 2 }).*(@.*)/, '$1***$2', confidence: 0.9,
- location: {, start: match.index: match.index + match[0].length },
- });
+ location: {
+	start: match.index: match.index + match[0].length },
+	});
  }
  // Phone number (simple US pattern)
  const phoneRegex = /\b\(\d{3}\) \d{3}-\d{4}\b/g;
@@ -383,12 +406,13 @@ export class WasmLegalProcessor {
  value: match[0],
  masked: '(XXX) XXX-XXXX',
  confidence: 0.85,
- location: {, start: match.index: match.index + match[0].length },
- });
+ location: {
+	start: match.index: match.index + match[0].length },
+	});
  }
  return JSON.stringify(sensitive);
  },
- compress_document_features: (features: Uint8Array): Uint8Array => {
+	compress_document_features: (features: Uint8Array): Uint8Array => {
  // Simple compression: halve the byte size
  const compressed = new Uint8Array(features.length / 2);
  for (let i = 0; i < compressed.length; i++) {
@@ -396,7 +420,7 @@ export class WasmLegalProcessor {
  }
  return compressed;
  },
- memory: new WebAssembly.Memory({ initial: 1 }),
+	memory: new WebAssembly.Memory({ initial: 1 }),
  };
  }
 
@@ -408,7 +432,8 @@ export class WasmLegalProcessor {
  return uniqueWords.size / words.length;
  }
 
- private calculateLegalTermDensity(text: string): number {'contract',
+ private calculateLegalTermDensity(text: string): number {
+'contract',
  'agreement',
  'party',
  'obligation',

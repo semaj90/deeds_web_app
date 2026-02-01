@@ -49,7 +49,8 @@ export async function initHybridLayer(opts: HybridInitOptions = {}): Promise<voi
     if (refreshIntervalMs > 0) {
         setInterval(() => {
             void refreshRemote({ maxDocs });
-        }, refreshIntervalMs);
+        },
+	refreshIntervalMs);
     }
 }
 
@@ -114,7 +115,7 @@ export async function reRankWithPgVector(
         const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+	body: JSON.stringify(payload),
         });
 
         if (!res.ok) return current;

@@ -114,9 +114,11 @@ export class DiffGenerator extends BaseService implements IDiffGenerator {
  async formatDiff(diff: Diff): Promise<string> {
  this.validateInput(diff, 'diff');
 
- return this.retry(async () => {$1;$2--- ${diff.file}:${diff.lineStart}
+ return this.retry(async () => {
+$1;$2--- ${diff.file}:${diff.lineStart}
 +++ ${diff.file}:${diff.lineEnd}
-@@ -${diff.lineStart},${diff.lineEnd - diff.lineStart + 1} @@
+@@ -${diff.lineStart},
+	${diff.lineEnd - diff.lineStart + 1} @@
 
 Context:
 ${diff.context}

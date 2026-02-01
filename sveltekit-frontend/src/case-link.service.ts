@@ -11,22 +11,29 @@ import { redis } from '$lib/server/redis';
 let graphService: any;
 try {
   // @ts-ignore
-  import('./graph.service.js').then(m => graphService = m.graphService).catch(() => {});
+  import('./graph.service.js').then((m) => (graphService = m.graphService)).catch(() => {});
 } catch (e) {}
 
 let auditService: any;
 try {
   // @ts-ignore
-  import('./audit.service.js').then(m => auditService = m.auditService).catch(() => {});
+  import('./audit.service.js').then((m) => (auditService = m.auditService)).catch(() => {});
 } catch (e) {}
 
 export interface CaseStatuteLink {
-  id: string;, case_id: string;, statute_code: string;, linked_by: string;, link_type: string;
-  notes?: string;, created_at: Date;, updated_at: Date;
+  id: string;
+  case_id: string;
+  statute_code: string;
+  linked_by: string;
+  link_type: string;
+  notes?: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface LinkCaseStatuteRequest {
-  statute_code: string;, link_type: string;
+  statute_code: string;
+  link_type: string;
   notes?: string;
 }
 
@@ -49,7 +56,7 @@ class CaseLinkService {
       link_type: data.link_type,
       notes: data.notes,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     // Save to database
@@ -62,7 +69,9 @@ class CaseLinkService {
 
     // Create Neo4j relationship
     if (graphService?.createCaseStatuteRelationship) {
-      await graphService.createCaseStatuteRelationship(caseId, data.statute_code, link.link_type).catch(console.warn);
+      await graphService
+        .createCaseStatuteRelationship(caseId, data.statute_code, link.link_type)
+        .catch(console.warn);
     }
 
     // Invalidate cache
@@ -70,13 +79,15 @@ class CaseLinkService {
 
     // Log audit event
     if (auditService?.logSummaryOperation) {
-      await auditService.logSummaryOperation(
-        userId,
-        caseId,
-        'retrieve',
-        { statute_code: data.statute_code, link_type: data.link_type },
-        true
-      ).catch(console.warn);
+      await auditService
+        .logSummaryOperation(
+          userId,
+          caseId,
+          'retrieve',
+          { statute_code: data.statute_code, link_type: data.link_type },
+          true
+        )
+        .catch(console.warn);
     }
 
     return link;
@@ -119,13 +130,15 @@ class CaseLinkService {
 
     // Log audit event
     if (auditService?.logSummaryOperation) {
-      await auditService.logSummaryOperation(
-        userId,
-        caseId,
-        'retrieve',
-        { statute_code: statuteCode, action: 'unlink' },
-        true
-      ).catch(console.warn);
+      await auditService
+        .logSummaryOperation(
+          userId,
+          caseId,
+          'retrieve',
+          { statute_code: statuteCode, action: 'unlink' },
+          true
+        )
+        .catch(console.warn);
     }
   }
 
@@ -135,7 +148,7 @@ class CaseLinkService {
   async updateLinkMetadata(
     caseId: string,
     statuteCode: string,
-    data: { link_type?: string, notes?: string },
+    data: { link_type?: string; notes?: string },
     userId: string
   ): Promise<CaseStatuteLink> {
     const existing = await this.getLinkDetail(caseId, statuteCode);
@@ -158,13 +171,15 @@ class CaseLinkService {
 
     // Log audit event
     if (auditService?.logSummaryOperation) {
-      await auditService.logSummaryOperation(
-        userId,
-        caseId,
-        'retrieve',
-        { statute_code: statuteCode, action: 'update' },
-        true
-      ).catch(console.warn);
+      await auditService
+        .logSummaryOperation(
+          userId,
+          caseId,
+          'retrieve',
+          { statute_code: statuteCode, action: 'update' },
+          true
+        )
+        .catch(console.warn);
     }
 
     return updatedLink;
@@ -191,7 +206,9 @@ class CaseLinkService {
   /**
    * Get link statistics
    */
-  async getLinkStats(caseId: string): Promise<{, total: number;, byLinkType: Record<string, number> }> {
+  async getLinkStats(
+    caseId: string
+  ): Promise<{ total: number; byLinkType: Record<string, number> }> {
     const total = await this.getLinkCount(caseId);
     const byLinkTypeResult = await sql`
       SELECT link_type, COUNT(*) as count
@@ -201,13 +218,12 @@ class CaseLinkService {
     `;
 
     const byLinkType: Record<string, number> = {};
-    for (const row of (byLinkTypeResult as any)) {
+    for (const row of byLinkTypeResult as any) {
       byLinkType[row.link_type] = parseInt(row.count);
     }
 
     return { total, byLinkType };
   }
-
 
   /**
    * Invalidate case cache
@@ -224,7 +240,3 @@ class CaseLinkService {
 
 // Export singleton instance
 export const caseLinkService = new CaseLinkService();
-
-
-
-

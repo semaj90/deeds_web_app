@@ -16,52 +16,69 @@ export type ErrorBrainEventType =
     | 'run.completed';
 
 export interface ErrorBrainEventBase {
-    type: ErrorBrainEventType;, runId: string;
+    type: ErrorBrainEventType;
+	runId: string;
     ts: number;
 }
 
 export interface RunStartedEvent extends ErrorBrainEventBase {
-    type: 'run.started';, config: {
-        dryRun: boolean;, maxPatchSize: number;
+    type: 'run.started';
+	config: {
+        dryRun: boolean;
+	maxPatchSize: number;
         confidenceThreshold: number;
     };
 }
 
 export interface RunProgressEvent extends ErrorBrainEventBase {
-    type: 'run.progress';, step: string;
-    pct: number;, counters: {
-        filesScanned: number;, errorsFound: number;
+    type: 'run.progress';
+	step: string;
+    pct: number;
+	counters: {
+        filesScanned: number;
+	errorsFound: number;
         patchesProposed: number;
     };
 }
 
 export interface PatchProposedEvent extends ErrorBrainEventBase {
-    type: 'run.patch.proposed';, file: string;
-    reason: string;, confidence: number;
-    additions: number;, deletions: number;
+    type: 'run.patch.proposed';
+	file: string;
+    reason: string;
+	confidence: number;
+    additions: number;
+	deletions: number;
 }
 
 export interface PatchAppliedEvent extends ErrorBrainEventBase {
-    type: 'run.patch.applied';, file: string;
+    type: 'run.patch.applied';
+	file: string;
     success: boolean;
 }
 
 export interface PatchRejectedEvent extends ErrorBrainEventBase {
-    type: 'run.patch.rejected';, file: string;
+    type: 'run.patch.rejected';
+	file: string;
     reason: string;
 }
 
 export interface RunFailedEvent extends ErrorBrainEventBase {
-    type: 'run.failed';, error: {
-        code: string;, message: string;
+    type: 'run.failed';
+	error: {
+        code: string;
+	message: string;
     };
 }
 
 export interface RunCompletedEvent extends ErrorBrainEventBase {
-    type: 'run.completed';, summary: {
-        filesScanned: number;, errorsFound: number;
-        patchesProposed: number;, patchesApplied: number;
-        patchesRejected: number;, elapsedSeconds: number;
+    type: 'run.completed';
+	summary: {
+        filesScanned: number;
+	errorsFound: number;
+        patchesProposed: number;
+	patchesApplied: number;
+        patchesRejected: number;
+	elapsedSeconds: number;
     };
 }
 

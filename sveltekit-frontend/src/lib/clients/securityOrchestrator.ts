@@ -24,15 +24,22 @@ export interface UserClient extends Record<string, unknown> {
 }
 
 export interface SecurityValidationRequestClient {
-    task: 'security_validation';, fingerprint: Fingerprint;, user: UserClient;
+    task: 'security_validation';
+	fingerprint: Fingerprint;
+	user: UserClient;
     context?: Record<string, unknown>;
 }
 
 export interface SecurityValidationResponseClient {
-    requestId: string;, riskScore: number;, securityScore: number;, verification: Record<string, unknown>;
+    requestId: string;
+	riskScore: number;
+	securityScore: number;
+	verification: Record<string, unknown>;
     signals: Array<Record<string, unknown>>;
     status: 'allow' | 'review' | 'deny';
-    modelVersion: string;, durationMs: number;, timestamp: string;
+    modelVersion: string;
+	durationMs: number;
+	timestamp: string;
 }
 
 // Validate security by calling the orchestrator (SvelteKit API route or external URL)
@@ -48,7 +55,8 @@ export async function validateSecurity(
     const body = {
         task: payload.task,
         fingerprint: payload.fingerprint,
-        user: {, email: user.email,
+        user: {
+	email: user.email,
             username: user.username,
             firstName,
             lastName,
@@ -59,8 +67,8 @@ export async function validateSecurity(
             badgeNumber: user.badgeNumber,
             deviceInfo: user.deviceInfo,
         },
-        context: payload.context ?? {},
-    };
+	context: payload.context ?? {},
+	};
 
     const url = BASE_URL
         ? `${BASE_URL.replace(/\/$/, '')}/api/security/validate`
@@ -69,7 +77,7 @@ export async function validateSecurity(
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
     });
 
     if (!res.ok) {
@@ -108,7 +116,8 @@ export async function validateSecurity(
         const maybeSignals = (ti as Record<string, unknown>)['signals'];
         if (Array.isArray(maybeSignals)) {
             signals = maybeSignals.map((s) =>
-                typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : {, value: s }
+                typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : {
+	value: s }
             );
         }
     }

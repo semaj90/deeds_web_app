@@ -1,10 +1,14 @@
 <script lang="ts"> /** * Adaptive Rendering Engine with Dynamic Upscaling * Implements NES â†’ SNES â†’ N64 quality scaling based on system performance *
-   * Features: * - Real-time FPS monitoring and quality adjustment * - Texture streaming and chunking for memory optimization * - WebGPU/WebGL compute shader integration * - CHR-ROM pattern caching with quality-based LOD * - Bitmap HMM-SOM prediction integration */ import { BitmapHMMSOMPredictor } from '$lib/ai/bitmap-hmm-som-predictor.js'; type BitmapHMMSOMPredictorType = InstanceType<typeof BitmapHMMSOMPredictor>; // Quality tier definitions export type QualityTier = '8-BIT_NES' | '16-BIT_SNES' | '64-BIT_N64'; export interface QualityConfig { tier: QualityTier, targetResolution: number, pixelScale: number, shaderComplexity: number, textureStreamingEnabled: boolean, chrRomCacheSize: number, antiAliasing: boolean, particleEffects: boolean;, advancedLighting: boolean}
-  export interface SystemMetrics { fps: number, frameTime: number, memoryUsage: number, cacheHitRate: number, gpuUtilization: number;, drawCalls: number}
+   * Features: * - Real-time FPS monitoring and quality adjustment * - Texture streaming and chunking for memory optimization * - WebGPU/WebGL compute shader integration * - CHR-ROM pattern caching with quality-based LOD * - Bitmap HMM-SOM prediction integration */ import { BitmapHMMSOMPredictor } from '$lib/ai/bitmap-hmm-som-predictor.js'; type BitmapHMMSOMPredictorType = InstanceType<typeof BitmapHMMSOMPredictor>; // Quality tier definitions export type QualityTier = '8-BIT_NES' | '16-BIT_SNES' | '64-BIT_N64'; export interface QualityConfig { tier: QualityTier, targetResolution: number, pixelScale: number, shaderComplexity: number, textureStreamingEnabled: boolean, chrRomCacheSize: number, antiAliasing: boolean, particleEffects: boolean;
+	advancedLighting: boolean}
+  export interface SystemMetrics { fps: number, frameTime: number, memoryUsage: number, cacheHitRate: number, gpuUtilization: number;
+	drawCalls: number}
 
 interface Props { content: unknown, assetType?: string; priority?: number; predictive?: boolean; className?: string}
-  let { content, assetType = 'general', priority = 50, predictive = false, className = '' }: Props = $props(); // Reactive state using Svelte, 5 runes let currentQuality = $state<QualityConfig>({ tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false;, advancedLighting: false });
-  let systemMetrics = $state<SystemMetrics>({ fps: 60, frameTime: 16.67, memoryUsage: 50, cacheHitRate: 80, gpuUtilization: 30;, drawCalls: 100 });
+  let { content, assetType = 'general', priority = 50, predictive = false, className = '' }: Props = $props(); // Reactive state using Svelte, 5 runes let currentQuality = $state<QualityConfig>({ tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false;
+	advancedLighting: false });
+  let systemMetrics = $state<SystemMetrics>({ fps: 60, frameTime: 16.67, memoryUsage: 50, cacheHitRate: 80, gpuUtilization: 30;
+	drawCalls: 100 });
   let isMonitoring = $state<boolean>(false);
    let canvasElement = $state<HTMLCanvasElement | undefined>(undefined);
    let renderContext = $state<CanvasRenderingContext2D | WebGLRenderingContext | null>(null);
@@ -25,10 +29,15 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   function calculateInitialQuality(): QualityConfig { // Detect device capabilities const isHighEnd = navigator.hardwareConcurrency > 4 && (navigator as unknown).deviceMemory > 4;
    const hasWebGPU = !!webgpuDevice; if (isHighEnd && hasWebGPU) { return create64BitConfig()} else if (isHighEnd || hasWebGPU) { return create16BitConfig()} else { return create8BitConfig()}
   }
-  function create8BitConfig(): QualityConfig { return { tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false;, advancedLighting: false }}
-  function create16BitConfig(): QualityConfig { return { tier: '16-BIT_SNES', targetResolution: 720, pixelScale: 1.5, shaderComplexity: 2, textureStreamingEnabled: true, chrRomCacheSize: 100, antiAliasing: true, particleEffects: true;, advancedLighting: false }}
-  function create64BitConfig(): QualityConfig { return { tier: '64-BIT_N64', targetResolution: 1080, pixelScale: 1.0, shaderComplexity: 3, textureStreamingEnabled: true, chrRomCacheSize: 200, antiAliasing: true, particleEffects: true;, advancedLighting: true }}
-  function startPerformanceMonitoring(): void { isMonitoring = true; // FPS monitoring monitoringInterval = setInterval(() => { updateSystemMetrics(); evaluateQualityAdjustment()}, 1000); // Quality adjustment check qualityAdjustmentTimer = setInterval(() => { adjustQualityBasedOnPerformance()}, 5000); // Check every, 5 seconds // Frame timing requestAnimationFrame(frameTimeCallback)}
+  function create8BitConfig(): QualityConfig { return { tier: '8-BIT_NES', targetResolution: 540, pixelScale: 2.0, shaderComplexity: 1, textureStreamingEnabled: false, chrRomCacheSize: 50, antiAliasing: false, particleEffects: false;
+	advancedLighting: false }}
+  function create16BitConfig(): QualityConfig { return { tier: '16-BIT_SNES', targetResolution: 720, pixelScale: 1.5, shaderComplexity: 2, textureStreamingEnabled: true, chrRomCacheSize: 100, antiAliasing: true, particleEffects: true;
+	advancedLighting: false }}
+  function create64BitConfig(): QualityConfig { return { tier: '64-BIT_N64', targetResolution: 1080, pixelScale: 1.0, shaderComplexity: 3, textureStreamingEnabled: true, chrRomCacheSize: 200, antiAliasing: true, particleEffects: true;
+	advancedLighting: true }}
+  function startPerformanceMonitoring(): void { isMonitoring = true; // FPS monitoring monitoringInterval = setInterval(() => { updateSystemMetrics(); evaluateQualityAdjustment()},
+	1000); // Quality adjustment check qualityAdjustmentTimer = setInterval(() => { adjustQualityBasedOnPerformance()},
+	5000); // Check every, 5 seconds // Frame timing requestAnimationFrame(frameTimeCallback)}
   function stopPerformanceMonitoring(): void { isMonitoring = false; if (monitoringInterval) clearInterval(monitoringInterval); if (qualityAdjustmentTimer) clearInterval(qualityAdjustmentTimer)}
   function frameTimeCallback(timestamp: number): void { if (lastFrameTime > 0) { const frameTime = timestamp - lastFrameTime;
    const fps = 1000 / frameTime; fpsHistory.push(fps); if (fpsHistory.length > 60) { // Keep last, 60 frames (1 second at 60fps) fpsHistory.shift()}
@@ -59,7 +68,9 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
 
     // Record interaction for HMM-SOM prediction if (hmmPredictor) { hmmPredictor.recordInteraction('quality_adjustment', { tier: currentQuality.tier, fps: systemMetrics.fps, memoryUsage: systemMetrics.memoryUsage, assetType })}
   }
-  function analyzePerformance(): {, shouldUpgrade: boolean; shouldDowngrade: boolean;, confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+  function analyzePerformance(): {
+	shouldUpgrade: boolean; shouldDowngrade: boolean;
+	confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
    const stableFps = fpsHistory.every(fps => fps > 55);
    const lowMemory = systemMetrics.memoryUsage < 70;
    const goodCache = systemMetrics.cacheHitRate > 80;
@@ -86,8 +97,10 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   // Texture streaming for memory optimization async function streamTexture(assetKey: string), Promise<string> { if (!currentQuality.textureStreamingEnabled) { return loadFullTexture(assetKey)}
 
     // Load texture in chunks based on quality const chunkSize = currentQuality.tier === '64-BIT_N64' ? 1024: currentQuality.tier === '16-BIT_SNES' ?, 512: 256; return loadTextureChunks(assetKey, chunkSize)}
-  async function loadFullTexture(assetKey: string): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_full_${ assetKey }`)}, 10)})}
-  async function loadTextureChunks(assetKey: string, chunkSize: number): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_chunk_${ assetKey }_${ chunkSize }`)}, 50)})}
+  async function loadFullTexture(assetKey: string): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_full_${ assetKey }`)},
+	10)})}
+  async function loadTextureChunks(assetKey: string, chunkSize: number): Promise<string> { return new Promise(resolve => { setTimeout(() => { resolve(`texture_chunk_${ assetKey }_${ chunkSize }`)},
+	50)})}
 
   // Reactive updates // Performance metrics for external monitoring function getPerformanceMetrics() { return { systemMetrics, currentQuality, isMonitoring }}
 
@@ -95,17 +108,25 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
     applyQualityChanges()}
 
   // Expose methods via props for parent component access let api = $derived({ getPerformanceMetrics: setQuality }); // Initialize on mount $effect(() => { (async () => { await initializeRenderingEngine(); startPerformanceMonitoring()})()}); </script> <div class="adaptive-rendering-container { className }"> <canvas bind:this={ canvasElement } class="rendering-canvas {currentQuality.tier.toLowerCase().replace(/_/g"
-  ></canvas> <!-- Quality, Indicator --> {#if isMonitoring} <div class="quality-indicator"> <div class="tier-badge {currentQuality.tier.toLowerCase().replace(/_/g"> {currentQuality.tier.replace(/_/g, ' ')} </div> <div class="performance-stats"> <span class="fps">FPS: {systemMetrics.fps}</span> <span class="memory">MEM: {systemMetrics.memoryUsage}%</span> <span class="cache">CACHE: {systemMetrics.cacheHitRate.toFixed(0)}%</span> </div> {/if} <!-- WebGPU, Status --> {#if webgpuDevice} <div class="webgpu-indicator">âš¡ WebGPU{/if} </div> <style> .adaptive-rendering-container { position: relative, display: inline-block, border-radius: 4px;, overflow: hidden}
-  .rendering-canvas.\38 -bit-nes { image-rendering: pixelated; image-rendering: -moz-crisp-edge, image-rendering: crisp-edge;, filter: contrast(1.1) saturate(1.2)}
+  ></canvas> <!-- Quality, Indicator --> {#if isMonitoring} <div class="quality-indicator"> <div class="tier-badge {currentQuality.tier.toLowerCase().replace(/_/g"> {currentQuality.tier.replace(/_/g, ' ')} </div> <div class="performance-stats"> <span class="fps">FPS: {systemMetrics.fps}</span> <span class="memory">MEM: {systemMetrics.memoryUsage}%</span> <span class="cache">CACHE: {systemMetrics.cacheHitRate.toFixed(0)}%</span> </div> {/if} <!-- WebGPU, Status --> {#if webgpuDevice} <div class="webgpu-indicator">âš¡ WebGPU{/if} </div> <style> .adaptive-rendering-container { position: relative, display: inline-block, border-radius: 4px;
+	overflow: hidden}
+  .rendering-canvas.\38 -bit-nes { image-rendering: pixelated; image-rendering: -moz-crisp-edge, image-rendering: crisp-edge;
+	filter: contrast(1.1) saturate(1.2)}
   .rendering-canvas.\31 6-bit-snes { filter: contrast(1.05) saturate(1.1)}
   .rendering-canvas.\36 4-bit-n64 { filter: none}
-  .quality-indicator { position: absolute;, top: 4px; right: 4px, display: flex; flex-direction: column, gap: 2px; pointer-events: none}
-  .tier-badge { padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; text-align: center;, color: white; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
+  .quality-indicator { position: absolute;
+	top: 4px; right: 4px, display: flex; flex-direction: column, gap: 2px; pointer-events: none}
+  .tier-badge { padding: 2px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; text-align: center;
+	color: white; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
   .tier-badge.\38 -bit-nes { background: linear-gradient(45deg, #ff4444, #ff6666)}
   .tier-badge.\31 6-bit-snes { background: linear-gradient(45deg, #4444ff, #6666ff)}
   .tier-badge.\36 4-bit-n64 { background: linear-gradient(45deg, #44ff44, #66ff66)}
-  .performance-stats { display: flex;, gap: 4px, font-size: 6px;, color: rgba(255, 255, 255, 0.8); text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
-  .webgpu-indicator { position: absolute;, bottom: 4px; left: 4px; font-size: 8px;, color: #ffff00; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8); pointer-events: none}
+  .performance-stats { display: flex;
+	gap: 4px, font-size: 6px;
+	color: rgba(255, 255, 255, 0.8); text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8)}
+  .webgpu-indicator { position: absolute;
+	bottom: 4px; left: 4px; font-size: 8px;
+	color: #ffff00; text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8); pointer-events: none}
   /* Quality-specific animations */ .\38 -bit-nes { animation: pixel-flicker 0.1s infinite}
   .\31 6-bit-snes { animation: smooth-glow 2s ease-in-out infinite alternate}
   .\36 4-bit-n64 { animation: premium-shine 3s ease-in-out infinite}

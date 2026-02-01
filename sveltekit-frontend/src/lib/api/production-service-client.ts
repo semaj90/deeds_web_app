@@ -50,7 +50,7 @@ class ProductionServiceClient {
         const fetchOptions: RequestInit = {
             method: options.method,
             headers: { 'Content-Type': 'application/json', ...(options.headers ?? {}) },
-        };
+	};
 
         if (options.body !== undefined) {
             fetchOptions.body =
@@ -88,7 +88,7 @@ class ProductionServiceClient {
                 data: parsed as unknown,
                 status: response.status ?? 0,
                 headers: response.headers ? Object.fromEntries(response.headers.entries()) : {},
-                protocol: extractProtocolFromResponse(response),
+	protocol: extractProtocolFromResponse(response),
                 service: this.extractServiceFromEndpoint(endpoint),
                 latency,
             };
@@ -100,10 +100,11 @@ class ProductionServiceClient {
             const name = err instanceof Error ? err.name : 'Error';
 
             const fallback: Partial<ServiceResponse> = {
-                data: {, error: message, type: name },
-                status: 0,
+                data: {
+	error: message, type: name },
+	status: 0,
                 headers: {},
-                protocol: 'unknown',
+	protocol: 'unknown',
                 service: this.extractServiceFromEndpoint(endpoint),
                 latency,
             };
@@ -215,7 +216,12 @@ class ProductionServiceClient {
         endpoint: string,
         options: IntegrationServiceRequest,
         iterations = 5
-    ): Promise<{, averageLatency: number;, minLatency: number;, maxLatency: number;, successRate: number;, results: ServiceResponse[];
+    ): Promise<{
+	averageLatency: number;
+	minLatency: number;
+	maxLatency: number;
+	successRate: number;
+	results: ServiceResponse[];
     }> {
         const results: ServiceResponse[] = [];
         let successCount = 0;

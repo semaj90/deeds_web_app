@@ -1,6 +1,6 @@
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  // 1. Define Law interface
  interface Law {
@@ -19,7 +19,8 @@
  let searchQuery = $state <string>('');
 
  // 3. Fix data fetching with onMount
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  const response = await fetch('/api/v1/laws'); // Assuming /api/v1/laws is the endpoint
@@ -34,7 +35,8 @@
  } finally {
  loading = false;
  }
- })();
+ 
+});();
  });
  let filteredLaws = $derived (
  laws.filter(

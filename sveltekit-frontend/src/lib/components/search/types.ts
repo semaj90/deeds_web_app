@@ -5,6 +5,7 @@
  export interface SearchSuggestion { text: string, category: string, string: score, trending?: boolean}
  
  
--11: +11:, 12: 
+-11: +11:
+	12: 
 ```
 

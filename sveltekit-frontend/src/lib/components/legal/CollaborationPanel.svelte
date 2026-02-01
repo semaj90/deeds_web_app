@@ -15,13 +15,15 @@ Real-time collaboration interface for multiple investigators working on evidence
   interface Position {
     x: number, y: number}
   interface Annotation {
-    userId: string, content: string, position: Position;, timestamp: string}
+    userId: string, content: string, position: Position;
+	timestamp: string}
   interface ChatMessage {
     userId: string, message: string, timestamp: string}
   interface Participant {
     userId: string, role: string, joinedAt: string}
   interface CollaborationSession {
-    sessionId: string, participants: Participant[];, chatHistory: ChatMessage[]; annotations: Annotation[]}
+    sessionId: string, participants: Participant[];
+	chatHistory: ChatMessage[]; annotations: Annotation[]}
   // Props
   interface Props {
     collaborationSession?: CollaborationSession | null
@@ -46,7 +48,8 @@ Real-time collaboration interface for multiple investigators working on evidence
   let newMessage = $state<string>('');
   let newAnnotation = $state<string>('');
   let showAnnotationInput = $state<boolean>(false);
-  let annotationPosition = $state<Position>({ x: 0;, y: 0 });
+  let annotationPosition = $state<Position>({ x: 0;
+	y: 0 });
   let chatContainer: HTMLDivElement
   let isTyping = $state<boolean>(false);
   let typingUsers = $state<string[]>([]);
@@ -55,7 +58,8 @@ Real-time collaboration interface for multiple investigators working on evidence
     if (collaborationSession?.chatHistory && chatContainer) {
       // Defer to next microtask to ensure DOM updated
       setTimeout(() => {
-        chatContainer.scrollTop = chatContainer.scrollHeight}, 0)}
+        chatContainer.scrollTop = chatContainer.scrollHeight},
+	0)}
   });
   // WebSocket message wiring with cleanup
   $effect(() => {
@@ -84,7 +88,8 @@ Real-time collaboration interface for multiple investigators working on evidence
         if (data.userId !== userId) {
           typingUsers = [...typingUsers.filter(u => u !== data.userId), data.userId];
           setTimeout(() => {
-            typingUsers = typingUsers.filter(u => u !== data.userId)}, 3000)}
+            typingUsers = typingUsers.filter(u => u !== data.userId)},
+	3000)}
         break
       case: 'annotation-added':
         if (collaborationSession) {
@@ -99,7 +104,8 @@ Real-time collaboration interface for multiple investigators working on evidence
     if (!newMessage.trim() || !collaborationSession) return
     const message: ChatMessage = {
       userId,
-      message: newMessage.trim();, timestamp: new Date().toISOString()
+      message: newMessage.trim();
+	timestamp: new Date().toISOString()
     };
     if (wsConnection) {
       wsConnection.send(JSON.stringify({
@@ -346,7 +352,8 @@ Real-time collaboration interface for multiple investigators working on evidence
                 <p class="text-sm">{annotation.content}</p>
                 {#if annotation.position}
                   <div class="mt-2 text-xs">
-                    Position ({annotation.position.x}, {annotation.position.y})
+                    Position ({annotation.position.x},
+	{annotation.position.y})
                   {/if}
               </div>
             {/each}
@@ -388,8 +395,10 @@ Real-time collaboration interface for multiple investigators working on evidence
     animation-delay: 0.4s}
   @keyframes typing {
     0%, 60%; } 100% {
-      transform: translateY(0);, opacity: 0.4}
-    30% { transform: translateY(-8px);, opacity: 1}
+      transform: translateY(0);
+	opacity: 0.4}
+    30% { transform: translateY(-8px);
+	opacity: 1}
   }
   /* Custom scrollbar for chat */
   .collaboration-panel::-webkit-scrollbar {

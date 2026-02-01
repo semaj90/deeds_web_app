@@ -2,7 +2,8 @@
 <script lang="ts">
 
   interface DataPoint {
-    label: string;, value: number;
+    label: string;
+	value: number;
     color?: string;
     status?: 'active' | 'pending' | 'completed' | 'failed';
   }
@@ -38,7 +39,7 @@
           }
         });
       },
-      { threshold: 0.3 }
+	{ threshold: 0.3 }
     );
     observer.observe(chartRef);
     return () => observer.disconnect();
@@ -205,7 +206,8 @@
     border: 2px solid var(--yorha-text-muted, #808080);
     font-family: var(--yorha-font-primary, 'JetBrains Mono', monospace);
     color: var(--yorha-text-primary, #e0e0e0);
-    overflow: hidden;, width: 100%;
+    overflow: hidden;
+	width: 100%;
     margin-bottom: 1rem;
   }
 
@@ -214,7 +216,8 @@
     border-bottom: 2px solid var(--yorha-secondary, #ffd700);
     display: flex;
     align-items: center;
-    justify-content: space-between;, padding: 12px 16px;
+    justify-content: space-between;
+	padding: 12px 16px;
   }
 
   .chart-title {
@@ -222,80 +225,103 @@
     font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;, margin: 0;
+    letter-spacing: 2px;
+	margin: 0;
   }
 
   .chart-indicators {
-    display: flex;, gap: 12px;
+    display: flex;
+	gap: 12px;
   }
 
   .indicator {
     display: flex;
-    align-items: center;, gap: 6px;
+    align-items: center;
+	gap: 6px;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;, color: var(--yorha-accent, #00ff41);
+    letter-spacing: 1px;
+	color: var(--yorha-accent, #00ff41);
   }
 
   .indicator-dot {
-    width: 6px;, height: 6px;
-    background: currentColor;, animation: pulse 2s infinite;
+    width: 6px;
+	height: 6px;
+    background: currentColor;
+	animation: pulse 2s infinite;
   }
 
   .chart-container {
-    position: relative;, padding: 16px;
+    position: relative;
+	padding: 16px;
     overflow: hidden;
   }
 
   /* Grid System */
   .grid-overlay {
-    position: absolute;, top: 16px;
-    left: 60px;, right: 16px;
+    position: absolute;
+	top: 16px;
+    left: 60px;
+	right: 16px;
     bottom: 40px;
     pointer-events: none;
   }
 
   .grid-line {
-    position: absolute;, left: 0;
-    right: 0;, height: 1px;
+    position: absolute;
+	left: 0;
+    right: 0;
+	height: 1px;
     background: var(--yorha-text-muted, #808080);
     opacity: 0.3;
   }
 
   .grid-labels {
-    position: absolute;, left: -50px;
-    top: 0;, bottom: 0;
+    position: absolute;
+	left: -50px;
+    top: 0;
+	bottom: 0;
     width: 40px;
   }
 
   .grid-label {
-    position: absolute;, right: 0;
-    font-size: 10px;, color: var(--yorha-text-muted, #808080);
+    position: absolute;
+	right: 0;
+    font-size: 10px;
+	color: var(--yorha-text-muted, #808080);
     text-transform: uppercase;
     letter-spacing: 1px;
-    line-height: 1;, transform: translateY(50%);
+    line-height: 1;
+	transform: translateY(50%);
   }
 
   /* Bar Chart */
   .bar-chart {
     display: flex;
-    align-items: flex-end;, gap: 12px;
-    height: 100%;, padding: 0 0 24px 60px;
+    align-items: flex-end;
+	gap: 12px;
+    height: 100%;
+	padding: 0 0 24px 60px;
   }
 
   .bar-container {
-    flex: 1;, display: flex;
+    flex: 1;
+	display: flex;
     flex-direction: column;
-    align-items: center;, height: 100%;
+    align-items: center;
+	height: 100%;
     justify-content: flex-end;
     min-width: 0;
   }
 
   .bar {
-    position: relative;, width: 100%;
-    max-width: 40px;, transition: all 0.3s ease;
-    transform-origin: bottom;, transform: scaleY(0);
+    position: relative;
+	width: 100%;
+    max-width: 40px;
+	transition: all 0.3s ease;
+    transform-origin: bottom;
+	transform: scaleY(0);
   }
 
   .bar.animated {
@@ -307,11 +333,15 @@
   }
 
   .bar-value {
-    position: absolute;, top: -20px;
-    left: 50%;, transform: translateX(-50%);
+    position: absolute;
+	top: -20px;
+    left: 50%;
+	transform: translateX(-50%);
     font-size: 10px;
-    font-weight: 600;, color: var(--yorha-text-primary, #e0e0e0);
-    opacity: 0;, transition: opacity 0.2s;
+    font-weight: 600;
+	color: var(--yorha-text-primary, #e0e0e0);
+    opacity: 0;
+	transition: opacity 0.2s;
   }
 
   .bar:hover .bar-value {
@@ -319,9 +349,12 @@
   }
 
   .bar-glow {
-    position: absolute;, top: 0;
-    left: 0;, right: 0;
-    bottom: 0;, opacity: 0.3;
+    position: absolute;
+	top: 0;
+    left: 0;
+	right: 0;
+    bottom: 0;
+	opacity: 0.3;
     filter: blur(4px);
   }
 
@@ -331,7 +364,8 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-align: center;, width: 100%;
+    text-align: center;
+	width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -340,14 +374,17 @@
   /* Progress Chart */
   .progress-chart {
     display: flex;
-    flex-direction: column;, gap: 16px;
-    padding: 16px;, height: 100%;
+    flex-direction: column;
+	gap: 16px;
+    padding: 16px;
+	height: 100%;
     overflow-y: auto;
   }
 
   .progress-item {
     display: flex;
-    flex-direction: column;, gap: 8px;
+    flex-direction: column;
+	gap: 8px;
   }
 
   .progress-header {
@@ -365,19 +402,23 @@
 
   .progress-value {
     font-size: 12px;
-    font-weight: 700;, color: var(--yorha-secondary, #ffd700);
+    font-weight: 700;
+	color: var(--yorha-secondary, #ffd700);
   }
 
   .progress-bar {
-    position: relative;, height: 12px;
+    position: relative;
+	height: 12px;
     background: var(--yorha-bg-primary, #0a0a0a);
     border: 1px solid var(--yorha-text-muted, #808080);
     overflow: hidden;
   }
 
   .progress-fill {
-    height: 100%;, position: relative;
-    width: 0;, transition: width 0.3s ease;
+    height: 100%;
+	position: relative;
+    width: 0;
+	transition: width 0.3s ease;
   }
 
   .progress-fill.animated {
@@ -385,26 +426,34 @@
   }
 
   .progress-glow {
-    position: absolute;, top: 0;
-    right: -10px;, width: 20px;
-    height: 100%;, background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+    position: absolute;
+	top: 0;
+    right: -10px;
+	width: 20px;
+    height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
   }
 
   /* Status Chart */
   .status-chart {
     display: flex;
-    flex-direction: column;, gap: 12px;
-    padding: 16px;, height: 100%;
+    flex-direction: column;
+	gap: 12px;
+    padding: 16px;
+	height: 100%;
     overflow-y: auto;
   }
 
   .status-item {
     display: flex;
-    align-items: center;, gap: 12px;
-    padding: 12px;, background: var(--yorha-bg-primary, #0a0a0a);
+    align-items: center;
+	gap: 12px;
+    padding: 12px;
+	background: var(--yorha-bg-primary, #0a0a0a);
     border: 1px solid var(--yorha-text-muted, #808080);
     transition: all 0.3s ease;
-    opacity: 0;, transform: translateX(-20px);
+    opacity: 0;
+	transform: translateX(-20px);
   }
 
   .status-item.animated {
@@ -417,20 +466,25 @@
   }
 
   .status-indicator {
-    position: relative;, width: 16px;
+    position: relative;
+	width: 16px;
     height: 16px;
-    flex-shrink: 0;, background: currentColor;
+    flex-shrink: 0;
+	background: currentColor;
     border-radius: 50%;
   }
 
   .indicator-pulse {
-    position: absolute;, inset: -4px;
-    border-radius: 50%;, opacity: 0.3;
+    position: absolute;
+	inset: -4px;
+    border-radius: 50%;
+	opacity: 0.3;
     animation: pulse 2s infinite;
   }
 
   .status-content {
-    flex: 1;, display: flex;
+    flex: 1;
+	display: flex;
     justify-content: space-between;
     align-items: center;
   }
@@ -444,7 +498,8 @@
 
   .status-badge {
     font-size: 10px;
-    font-weight: 700;, padding: 2px 8px;
+    font-weight: 700;
+	padding: 2px 8px;
     border: 1px solid currentColor;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -457,19 +512,24 @@
 
   /* Timeline Chart */
   .timeline-chart {
-    position: relative;, height: 100%;
+    position: relative;
+	height: 100%;
     padding: 40px 16px;
   }
 
   .timeline-axis {
-    position: absolute;, top: 50%;
-    left: 16px;, right: 16px;
-    height: 2px;, background: var(--yorha-text-muted, #808080);
+    position: absolute;
+	top: 50%;
+    left: 16px;
+	right: 16px;
+    height: 2px;
+	background: var(--yorha-text-muted, #808080);
     transform: translateY(-50%);
   }
 
   .timeline-item {
-    position: absolute;, top: 50%;
+    position: absolute;
+	top: 50%;
     transform: translate(-50%, -50%) translateY(10px);
     opacity: 0;
   }
@@ -479,14 +539,19 @@
   }
 
   .timeline-node {
-    width: 12px;, height: 12px;
-    position: relative;, margin: 0 auto 8px;
-    transform: rotate(45deg);, border: 2px solid var(--yorha-bg-primary, #0a0a0a);
+    width: 12px;
+	height: 12px;
+    position: relative;
+	margin: 0 auto 8px;
+    transform: rotate(45deg);
+	border: 2px solid var(--yorha-bg-primary, #0a0a0a);
   }
 
   .node-pulse {
-    position: absolute;, inset: -4px;
-    background: currentColor;, opacity: 0.3;
+    position: absolute;
+	inset: -4px;
+    background: currentColor;
+	opacity: 0.3;
     animation: pulse 2s infinite;
   }
 
@@ -496,8 +561,10 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: center;
-    white-space: nowrap;, position: absolute;
-    top: 20px;, left: 50%;
+    white-space: nowrap;
+	position: absolute;
+    top: 20px;
+	left: 50%;
     transform: translateX(-50%);
   }
 
@@ -509,24 +576,28 @@
   }
 
   .summary-stats {
-    display: flex;, gap: 24px;
+    display: flex;
+	gap: 24px;
   }
 
   .stat {
     display: flex;
-    flex-direction: column;, gap: 2px;
+    flex-direction: column;
+	gap: 2px;
   }
 
   .stat-label {
     font-size: 10px;
-    font-weight: 600;, color: var(--yorha-text-muted, #808080);
+    font-weight: 600;
+	color: var(--yorha-text-muted, #808080);
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
   .stat-value {
     font-size: 12px;
-    font-weight: 700;, color: var(--yorha-secondary, #ffd700);
+    font-weight: 700;
+	color: var(--yorha-secondary, #ffd700);
   }
 
   /* Animations */
@@ -541,8 +612,10 @@
   }
 
   @keyframes slideIn {
-    from { transform: translateX(-20px);, opacity: 0; }
-    to { transform: translateX(0);, opacity: 1; }
+    from { transform: translateX(-20px);
+	opacity: 0; }
+    to { transform: translateX(0);
+	opacity: 1; }
   }
 
   @keyframes fadeInUp {

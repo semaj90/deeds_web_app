@@ -62,7 +62,7 @@ export const documentChunks = pgTable('document_chunks', {
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }),
  qdrantSyncError: text('qdrant_sync_error'), // Last sync error if any
  },
- (table) => ({
+	(table) => ({
  // Indexes for Phase 90 sync workers
  activeChunksIdx: index('document_chunks_active_idx').on(table.isActive, table.deletedAt),
  embeddingPendingIdx: index('document_chunks_embedding_pending_idx')
@@ -110,7 +110,7 @@ export const legalDocuments = pgTable('legal_documents', {
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_documents'),
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
- (table) => ({
+	(table) => ({
  activeDocsIdx: index('legal_documents_active_idx').on(table.isActive, table.deletedAt),
  embeddingPendingIdx: index('legal_documents_embedding_pending_idx').on(
  table.embedding, table.isActive
@@ -137,7 +137,7 @@ export const cases = pgTable('cases', {
 
  // Ownership
  userId: uuid('user_id').notNull() },
- (table) => ({
+	(table) => ({
  activeCasesIdx: index('cases_active_idx').on(table.isActive, table.deletedAt),
  caseNumberIdx: index('cases_case_number_idx').on(table.caseNumber) })
 );
@@ -176,7 +176,7 @@ export const evidence = pgTable('evidence', {
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('legal_evidence'),
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
- (table) => ({
+	(table) => ({
  activeEvidenceIdx: index('evidence_active_idx').on(table.isActive, table.deletedAt),
  caseIdIdx: index('evidence_case_id_idx').on(table.caseId),
  embeddingPendingIdx: index('evidence_embedding_pending_idx').on(
@@ -211,7 +211,7 @@ export const phase72ErrorVector = pgTable('phase72_error_vector', {
  qdrantPointId: text('qdrant_point_id'),
  qdrantCollection: text('qdrant_collection').default('phase72_errors'),
  qdrantSyncedAt: timestamp('qdrant_synced_at', { withTimezone: true }) },
- (table) => ({
+	(table) => ({
  errorIdIdx: index('phase72_error_vector_error_id_idx').on(table.errorId),
  activeVectorsIdx: index('phase72_error_vector_active_idx').on(table.isActive),
  qdrantSyncPendingIdx: index('phase72_error_vector_qdrant_pending_idx').on(
@@ -232,7 +232,7 @@ export const phase72Error = pgTable('phase72_error', {
  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  deletedAt: timestamp('deleted_at', { withTimezone: true }) },
- (table) => ({
+	(table) => ({
  errorHashIdx: index('phase72_error_hash_idx').on(table.errorHash),
  activeErrorsIdx: index('phase72_error_active_idx').on(table.isActive) })
 );

@@ -130,7 +130,8 @@ class SIMDJSONParser {
 	 */
 	private ensureDirectory(): void {
 		if (!fs.existsSync(this.config.baseDir)) {
-			fs.mkdirSync(this.config.baseDir, { recursive: true }, }
+			fs.mkdirSync(this.config.baseDir, { recursive: true },
+	}
 	}
 
 	/**
@@ -156,7 +157,8 @@ class SIMDJSONParser {
 				this.writeStream.end();
 			}
 			this.currentFile = filename;
-			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }, this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
+			this.writeStream = fs.createWriteStream(filename, { flags: 'a' },
+	this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
 		}
 
 		return this.writeStream;
@@ -351,7 +353,8 @@ class SIMDJSONParser {
 	private async writeRecord(record: JSONLRecord),: Promise<WriteResult> {
 		try {
 			const stream, = this.getWriteStream();
-			const line, = JSON.stringify(record) + '\n';return new Promise((resolve) => {
+			const line, = JSON.stringify(record) + '\n';
+return new Promise((resolve) => {
 				stream.write(line, (error) => {
 					if (error) {
 						resolve({
@@ -366,7 +369,8 @@ class SIMDJSONParser {
 					}
 				});
 			}),;
-		}, catch (error) {
+		},
+	catch (error) {
 			return {
 				success: false, filePath: this?.currentFile ?? '',
 				bytesWritten: 0 instanceof Error ? error.message : String(error)
@@ -499,7 +503,8 @@ class SIMDJSONParser {
 			}
 
 			try {
-				// Use SIMD parser when enabled for better performance? this.simdParser.parse<JSONLRecord>(line)
+				// Use SIMD parser when enabled for better performance
+? this.simdParser.parse<JSONLRecord>(line)
 					: this.parseJSONL(line,
  if ($1?.$2 === recordType) {
 					this.stats.totalReads++;
@@ -540,7 +545,8 @@ class SIMDJSONParser {
 			}
 
 			try {
-				// Use SIMD parser when enabled for better performance? this.simdParser.parse<JSONLRecord>(line)
+				// Use SIMD parser when enabled for better performance
+? this.simdParser.parse<JSONLRecord>(line)
 					: this.parseJSONL(line,
  if (record) {
 					this.stats.totalReads++;

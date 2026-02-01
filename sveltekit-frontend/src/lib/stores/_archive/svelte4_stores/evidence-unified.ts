@@ -3,7 +3,8 @@ import type { Evidence } from '../types/api.js';
 
 type EvidenceState = {
  /* primary shape used by consumers */
- evidence: Evidence[];, isLoading: boolean;
+ evidence: Evidence[];
+	isLoading: boolean;
  error: unknown | null;
  [k: string]: unknown;
 };
@@ -26,19 +27,19 @@ export const evidenceStore = {
  add(item: Evidence) {
  update((s) => ({ ...s, evidence: [...(s?.evidence|| []), item] }));
  },
- removeById(id: string) {
+	removeById(id: string) {
  update((s) => ({ ...s, evidence: (s?.evidence|| []).filter((e) => (e as any).id !== id) }));
  },
- clear() {
+	clear() {
  set(initialState);
  },
- setLoading(v: boolean) {
+	setLoading(v: boolean) {
  update((s) => ({ ...s, isLoading: v }));
  },
- setError(err: any) {
+	setError(err: any) {
  update((s) => ({ ...s, error: err }));
  },
-};
+	};
 
 
 

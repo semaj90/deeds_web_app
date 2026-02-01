@@ -48,7 +48,8 @@ export function withValidationAndRate(
           // Use Redis-backed token-bucket
           const service = RedisCacheService; // Use the exported service directly
 
-          const raw = (await service.get(key)) as { tokens: number;, last: number } | null;
+          const raw = (await service.get(key)) as { tokens: number;
+	last: number } | null;
           const now = Date.now() / 1000;
 
           let tokens = capacity;
@@ -66,7 +67,8 @@ export function withValidationAndRate(
             tokens = tokens - 1;
             // Expiry: enough time to refill to capacity
             const ttlSeconds = Math.ceil((capacity / refillPerSecond) * 2);
-            await service.set(key, { tokens, last }, ttlSeconds);
+            await service.set(key, { tokens, last },
+	ttlSeconds);
           } else {
             const retryAfter = Math.ceil((1 - tokens) / refillPerSecond);
             return new Response(
@@ -81,7 +83,7 @@ export function withValidationAndRate(
                   'Content-Type': 'application/json',
                   'Retry-After': String(retryAfter),
                 },
-              }
+	}
             );
           }
         } catch (err) {

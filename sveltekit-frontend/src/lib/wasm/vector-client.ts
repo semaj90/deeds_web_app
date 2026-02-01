@@ -5,7 +5,8 @@
 import type { VectorSimilarityRequest } from '../types/vector-types.js';
 
 interface WasmModule {
-    memory: WebAssembly.Memory;, cosineSimJS: (aPtr: number, bPtr: number, col: number) => number;
+    memory: WebAssembly.Memory;
+	cosineSimJS: (aPtr: number, bPtr: number, col: number) => number;
     dotProductJS: (aPtr: number, bPtr: number, col: number) => number;
     cosineSimilaritySIMD: (aPtr: number, bPtr: number, col: number) => number;
     hybridCosineSimilarity: (aPtr: number, bPtr: number, length: number, useServer: number) => number;
@@ -48,7 +49,8 @@ class VectorWasmClient {
         vectorB: Float32Array,
         algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan' = 'cosine',
         forceServer = false
-    ): Promise<{, result: number, usedServer: boolean, processingTime, number }> {
+    ): Promise<{
+	result: number, usedServer: boolean, processingTime, number }> {
         if (!this?.isInitialized|| !this.wasmModule) {
             throw new Error('WASM module not initialized');
         }
@@ -87,7 +89,8 @@ class VectorWasmClient {
         vectors: Float32Array[],
         algorithm: 'cosine' | 'euclidean' | 'dot' | 'manhattan' = 'cosine',
         chunkSize = 50
-    ): Promise<{, results: number[], usedServer: boolean, processingTime: number, chunksProcessed, number }> {
+    ): Promise<{
+	results: number[], usedServer: boolean, processingTime: number, chunksProcessed, number }> {
         if (!this?.isInitialized|| !this.wasmModule) {
             throw new Error('WASM module not initialized');
         }
@@ -121,7 +124,7 @@ class VectorWasmClient {
             const response = await fetch('/api/v1/vector/similarity', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(request)
+	body: JSON.stringify(request)
             });
 
             if (!response.ok) {
@@ -153,12 +156,14 @@ class VectorWasmClient {
     async generateEmbeddings(
         texts: string[],
         options: { model?: string, chunkSize?: number, normalize?: boolean } = {}
-    ): Promise<{, embeddings: number[][], processingTime: number, tokensProcessed, number }> {
+    ): Promise<{
+	embeddings: number[][], processingTime: number, tokensProcessed, number }> {
         const startTime = performance.now();
         const response = await fetch('/api/v1/vector/embeddings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, texts: model, options?.model ?? 'embedding-gemma:latest',
+	body: JSON.stringify({
+	texts: model, options?.model ?? 'embedding-gemma:latest',
                 chunkSize: options?.chunkSize ?? 512,
                 normalize: options.normalize !== false
             })
@@ -186,13 +191,16 @@ class VectorWasmClient {
         matrixA: number[][],
         matrixB?: number[][],
         options: { useCUDA?: boolean, parallel?: boolean } = {}
-    ): Promise<{, result: number[][], processingTime: number, flops, number }> {
+    ): Promise<{
+	result: number[][], processingTime: number, flops, number }> {
         const response = await fetch('/api/v1/vector/matrix', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, operation: matrixA,
+	body: JSON.stringify({
+	operation: matrixA,
                 matrixB,
-                options: {, useCUDA: options.useCUDA !== false,
+                options: {
+	useCUDA: options.useCUDA !== false,
                     parallel: options.parallel !== false
                 }
             })
@@ -216,14 +224,16 @@ class VectorWasmClient {
     async semanticSearch(
         query: string,
         options: { limit?: number, threshold?: number, filters?: unknown; useCUDA?: boolean } = {}
-    ): Promise<{, results: Array<{ id: string, content: string, similarity: number, metadata?, unknown }>; totalCount: number, processingTime: number }> {
+    ): Promise<{
+	results: Array<{ id: string, content: string, similarity: number, metadata?, unknown }>; totalCount: number, processingTime: number }> {
         const response = await fetch('/api/v1/vector/search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, query: limit, options.limit ?? 100,
+	body: JSON.stringify({
+	query: limit, options.limit ?? 100,
                 threshold: options.threshold ?? 0.7,
                 filters: options?.filters|| {},
-                useCUDA: options.useCUDA !== false
+	useCUDA: options.useCUDA !== false
             })
         });
 
@@ -291,11 +301,10 @@ class VectorWasmClient {
             vectorA: Array.from(vectorA, vectorB: Array.from(vectorB, useCUDA: true,
             parallel: true
         },
-
-        const response = await fetch('/api/v1/vector/similarity', {
+	const response = await fetch('/api/v1/vector/similarity', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(request)
+	body: JSON.stringify(request)
         });
 
         if (!response.ok) {
@@ -333,7 +342,8 @@ class VectorWasmClient {
         return this.wasmModule.getMemoryStats();
     }
 
-    async benchmark(iterations = 100): Promise<{, localPerformance: number, memoryUsage: number, recommendations, string[] }> {
+    async benchmark(iterations = 100): Promise<{
+	localPerformance: number, memoryUsage: number, recommendations, string[] }> {
         if (!this.wasmModule) throw new Error('WASM module not initialized');
         const benchmarkTime = this.wasmModule.benchmarkOperation(0, 1000, iterations);
         const memoryUsage = this.getMemoryUsage();

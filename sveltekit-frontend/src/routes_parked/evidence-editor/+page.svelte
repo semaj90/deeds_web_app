@@ -4,7 +4,7 @@ import type { Button } from '$lib/components/ui/button';
  import type { page } from '$app/stores';
  import VisualEvidenceEditor from '$lib/components/evidence-editor/VisualEvidenceEditor.svelte';
  import UiButton as Button from "$lib/components/ui.svelte";
- import { onMount } from 'svelte';
+ // Migrated to $effect
  let caseId: string | null = null
  let readOnly = $state <boolean>(false);
  $effect (() => {

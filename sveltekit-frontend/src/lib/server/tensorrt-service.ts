@@ -10,8 +10,10 @@ export interface LegalAIRequest {
 }
 
 export interface LegalAIResponse {
-    text: string;, tokens: number;
-    inference_time: number;, model_used: string;
+    text: string;
+	tokens: number;
+    inference_time: number;
+	model_used: string;
 }
 
 class TensorRTLegalAI {

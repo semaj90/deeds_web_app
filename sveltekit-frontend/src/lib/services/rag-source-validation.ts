@@ -38,7 +38,7 @@ export async function searchKnowledgeBase(
     const response = await fetch(`${API_BASE}/retrieve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request)
+	body: JSON.stringify(request)
     });
 
     if (!response.ok) {
@@ -58,7 +58,7 @@ export async function validateSources(
     const response = await fetch(`${API_BASE}/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request)
+	body: JSON.stringify(request)
     });
 
     if (!response.ok) {
@@ -78,7 +78,7 @@ export async function generateAnswer(
     const response = await fetch(`${API_BASE}/answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request)
+	body: JSON.stringify(request)
     });
 
     if (!response.ok) {

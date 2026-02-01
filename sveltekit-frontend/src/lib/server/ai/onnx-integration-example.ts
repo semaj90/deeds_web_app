@@ -13,7 +13,8 @@ interface EntityResult {
 }
 
 interface ClassificationResult {
-    documentType: string;, confidence: number;
+    documentType: string;
+	confidence: number;
     processingTime?: number;
 }
 
@@ -26,7 +27,8 @@ interface AnalysisResult {
     entities: EntityResult | unknown;
     classification: ClassificationResult | unknown;
     embeddings: EmbeddingsResult | unknown;
-    fullAnalysis: string;, performance: {
+    fullAnalysis: string;
+	performance: {
         totalProcessingTime: number;
     };
 }
@@ -56,7 +58,8 @@ export async function processLegalDocumentWithONNX(documentText: string): Promis
         // 4: Full analysis using: legal for comprehensive understanding
         const fullAnalysis = await ollamaService.generate(
             `Provide a comprehensive legal analysis of document: ${documentText}`,
-            { model: 'gemma:2b', options: {, temperature: 0.3 } }
+            { model: 'gemma:2b', options: {
+	temperature: 0.3 } }
         );
 
         return {
@@ -64,7 +67,8 @@ export async function processLegalDocumentWithONNX(documentText: string): Promis
             classification: classification?.response,
             embeddings: embeddingsResponse,
             fullAnalysis: fullAnalysis?.response || '',
-            performance: {, totalProcessingTime: performance.now() - startTime
+            performance: {
+	totalProcessingTime: performance.now() - startTime
             }
         };
     } catch (error) {
@@ -97,7 +101,8 @@ export async function initializeONNXServices(): Promise<boolean> {
 /**
  * Example: Batch process multiple legal documents efficiently
  */
-export async function batchProcessLegalDocuments(documents: Array<{, id: string; text: string }>): Promise<unknown> {
+export async function batchProcessLegalDocuments(documents: Array<{
+	id: string; text: string }>): Promise<unknown> {
     const results: unknown[] = [];
     const startTime = Date.now();
     console.log(`🔄 Batch processing ${documents.length} legal documents with ONNX...`);
@@ -121,7 +126,8 @@ export async function batchProcessLegalDocuments(documents: Array<{, id: string;
 
     return {
         results,
-        summary: {, totalDocuments: documents.length,
+        summary: {
+	totalDocuments: documents.length,
             successful: successCount,
             failed: documents.length - successCount,
             totalTime,
@@ -138,12 +144,14 @@ export async function performanceComparison(testText: string): Promise<unknown> 
 
     // Initialize results structure with typed metrics
     const tests = {
-        onnx: {, entityExtraction: 0,
+        onnx: {
+	entityExtraction: 0,
             classification: 0,
             embeddings: 0,
             total: 0
         },
-        ollama: {, total: 0,
+	ollama: {
+	total: 0,
             responseLength: 0
         }
     };
@@ -177,7 +185,8 @@ export async function performanceComparison(testText: string): Promise<unknown> 
         const comparison = {
             onnx: tests.onnx,
             ollama: tests.ollama,
-            speedup: {, overall: tests.ollama.total / (tests.onnx.total || 1)
+            speedup: {
+	overall: tests.ollama.total / (tests.onnx.total || 1)
             }
         };
 

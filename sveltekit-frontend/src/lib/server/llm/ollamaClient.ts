@@ -6,7 +6,8 @@
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
 
 export interface OllamaChatOptions {
-	model: string;, system: string;
+	model: string;
+	system: string;
 	prompt: string;
 	temperature?: number;
 }
@@ -25,13 +26,13 @@ export async function ollamaChat({
 	const response = await fetch(`${base}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
+	body: JSON.stringify({
 			model,
 			stream: false,
 			options: { temperature },
-			messages: [
+	messages: [
 				{ role: 'system', content: system },
-				{ role: 'user', content: prompt }
+	{ role: 'user', content: prompt }
 			]
 		})
 	});
@@ -112,7 +113,9 @@ Write:
  * Generate a court-ready legal memo from structured case notes
  */
 export async function generateLegalMemoFromNotes(
-	caseNotes: Array<{ title?: string;, content: string; isPinned?: boolean;, createdAt: string }>
+	caseNotes: Array<{ title?: string;
+	content: string; isPinned?: boolean;
+	createdAt: string }>
 ): Promise<string> {
 	// Sort notes: pinned first, then by creation date (newest first)
 	const sortedNotes = caseNotes.sort((a, b) => {
@@ -169,7 +172,9 @@ Focus on creating a prosecution-ready document that analyzes the evidence, legal
  * Generate a summary for PDF export from structured case notes
  */
 export async function generatePDFSummaryFromNotes(
-	caseNotes: Array<{ title?: string;, content: string; isPinned?: boolean;, createdAt: string }>
+	caseNotes: Array<{ title?: string;
+	content: string; isPinned?: boolean;
+	createdAt: string }>
 ): Promise<string> {
 	const sortedNotes = caseNotes.sort((a, b) => {
 		if (a.isPinned && !b.isPinned) return -1;

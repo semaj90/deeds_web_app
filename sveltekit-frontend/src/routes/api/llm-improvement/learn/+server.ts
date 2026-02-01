@@ -19,12 +19,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const pipeline = getLearningPipeline();
 
-		// Force update or run normal cycle? await pipeline.forceUpdate()
+		// Force update or run normal cycle
+? await pipeline.forceUpdate()
 			: await pipeline.runUpdateCycle();
 
 		return json({
 			success: result.success,
-			result: {, version: result.version,
+			result: { version: result.version,
 				message: result.message,
 				validationScore: result.validationScore,
 				rollback: result.rollback
@@ -52,7 +53,7 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			pipeline: {, status: pipeline.getStatus(),
+			pipeline: { status: pipeline.getStatus(),
 				stats: pipeline.getStats()
 			},
 			experiences: recorder.getStats()

@@ -125,22 +125,24 @@ export class WebGPUEvidenceGraph {
                     {
                         arrayStride: 32, // 3 floats pos + 4 floats color + 1 float size = 8 floats * 4 bytes
                         attributes: [
-                            { shaderLocation: 0, offset: 0, format: 'float32x3' },  // position
-                            { shaderLocation: 1, offset: 12, format: 'float32x4' }, // color
+                            { shaderLocation: 0, offset: 0, format: 'float32x3' },
+	// position
+                            { shaderLocation: 1, offset: 12, format: 'float32x4' },
+	// color
                             { shaderLocation: 2, offset: 28, format: 'float32' }    // size
                         ]
                     }
                 ]
             },
-            fragment: {
+	fragment: {
                 module: fragmentModule,
                 entryPoint: 'main',
                 targets: [{ format }]
             },
-            primitive: {
+	primitive: {
                 topology: 'point-list',
             },
-            depthStencil: {
+	depthStencil: {
                 depthWriteEnabled: true,
                 depthCompare: 'less',
                 format: 'depth24plus',
@@ -164,8 +166,8 @@ export class WebGPUEvidenceGraph {
                     resource: {
                         buffer: this.uniformBuffer,
                     },
-                },
-            ],
+	},
+	],
         });
     }
 
@@ -247,17 +249,17 @@ export class WebGPUEvidenceGraph {
                 {
                     view: textureView,
                     clearValue: { r: 0.05, g: 0.05, b: 0.1, a: 1.0 },
-                    loadOp: 'clear',
+	loadOp: 'clear',
                     storeOp: 'store',
                 },
-            ],
+	],
             depthStencilAttachment: {
                 view: depthTexture.createView(),
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'store',
             },
-        };
+	};
 
         const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
         passEncoder.setPipeline(this.pipeline);

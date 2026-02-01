@@ -50,7 +50,7 @@
  const res = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+	body: JSON.stringify({
  title,
  description: narrative + `\n\nWHO: ${who}\nWHAT: ${what}\nWHEN: ${when}\nWHERE: ${where}\nWHY: ${why}\nHOW: ${how}`,
  status: 'open',
@@ -277,8 +277,10 @@
 
 <style>
  .intake-container {
- background: var(--yorha-bg);, color: var(--yorha-ink);
- font-family: var(--yorha-font);, padding: 2rem;
+ background: var(--yorha-bg);
+	color: var(--yorha-ink);
+ font-family: var(--yorha-font);
+	padding: 2rem;
  min-height: 100vh;
  }
 
@@ -290,7 +292,8 @@
 
  .intake-header h1 {
  margin: 0;
- font-size: 2rem;, color: var(--yorha-crimson);
+ font-size: 2rem;
+	color: var(--yorha-crimson);
  font-weight: bold;
  }
 
@@ -301,18 +304,22 @@
  }
 
  .intake-form {
- max-width: 900px;, margin: 0 auto;
+ max-width: 900px;
+	margin: 0 auto;
  }
 
  .form-section {
- background: var(--yorha-paper);, border: 2px solid var(--yorha-ink);
- border-radius: 4px;, padding: 1.5rem;
+ background: var(--yorha-paper);
+	border: 2px solid var(--yorha-ink);
+ border-radius: 4px;
+	padding: 1.5rem;
  margin-bottom: 1.5rem;
  }
 
  .form-section h2 {
  margin: 0 0 0.5rem 0;
- font-size: 1.25rem;, color: var(--yorha-ink);
+ font-size: 1.25rem;
+	color: var(--yorha-ink);
  }
 
  .form-section p {
@@ -322,12 +329,14 @@
  }
 
  .narrative-box {
- width: 100%;, padding: 1rem;
+ width: 100%;
+	padding: 1rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
  font-size: 0.95rem;
- line-height: 1.6;, resize: vertical;
+ line-height: 1.6;
+	resize: vertical;
  color: var(--yorha-ink);
  }
 
@@ -338,11 +347,13 @@
  }
 
  .title-input {
- width: 100%;, padding: 0.75rem;
+ width: 100%;
+	padding: 0.75rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
- font-size: 1rem;, color: var(--yorha-ink);
+ font-size: 1rem;
+	color: var(--yorha-ink);
  font-weight: 500;
  }
 
@@ -353,19 +364,24 @@
  }
 
  .file-drop-zone {
- margin-top: 1rem;, padding: 2rem;
+ margin-top: 1rem;
+	padding: 2rem;
  border: 2px dashed #ccc;
  border-radius: 4px;
- text-align: center;, background: #f9f9f9;
- cursor: pointer;, transition: all 0.2s ease;
+ text-align: center;
+	background: #f9f9f9;
+ cursor: pointer;
+	transition: all 0.2s ease;
  }
 
  .file-drop-zone:hover {
- border-color: var(--yorha-crimson);, background: #fff5f5;
+ border-color: var(--yorha-crimson);
+	background: #fff5f5;
  }
 
  .file-drop-zone p {
- margin: 0;, color: #666;
+ margin: 0;
+	color: #666;
  }
 
  .file-input {
@@ -373,7 +389,8 @@
  }
 
  .uploaded-files {
- margin-top: 1rem;, padding: 1rem;
+ margin-top: 1rem;
+	padding: 1rem;
  background: #f0f0f0;
  border-radius: 3px;
  }
@@ -384,14 +401,16 @@
  }
 
  .uploaded-files ul {
- list-style: none;, padding: 0;
+ list-style: none;
+	padding: 0;
  margin: 0;
  }
 
  .uploaded-files li {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.5rem;
+ align-items: center;
+	padding: 0.5rem;
  background: white;
  border-radius: 3px;
  margin-bottom: 0.5rem;
@@ -399,8 +418,10 @@
  }
 
  .uploaded-files button {
- background: none;, border: none;
- color: var(--yorha-crimson);, cursor: pointer;
+ background: none;
+	border: none;
+ color: var(--yorha-crimson);
+	cursor: pointer;
  font-weight: bold;
  }
 
@@ -415,7 +436,8 @@
  .prompt-group label {
  display: block;
  margin-bottom: 0.5rem;
- font-size: 0.9rem;, color: var(--yorha-ink);
+ font-size: 0.9rem;
+	color: var(--yorha-ink);
  }
 
  .prompt-group strong {
@@ -423,11 +445,13 @@
  }
 
  .prompt-group input {
- width: 100%;, padding: 0.75rem;
+ width: 100%;
+	padding: 0.75rem;
  border: 1px solid #ddd;
  border-radius: 3px;
  font-family: var(--yorha-font);
- font-size: 0.9rem;, color: var(--yorha-ink);
+ font-size: 0.9rem;
+	color: var(--yorha-ink);
  }
 
  .prompt-group input:focus {
@@ -437,9 +461,12 @@
  }
 
  .error-message {
- background: #ffe6e6;, border: 2px solid var(--yorha-crimson);
- border-radius: 4px;, padding: 1rem;
- margin-bottom: 1rem;, color: var(--yorha-ink);
+ background: #ffe6e6;
+	border: 2px solid var(--yorha-crimson);
+ border-radius: 4px;
+	padding: 1rem;
+ margin-bottom: 1rem;
+	color: var(--yorha-ink);
  font-size: 0.9rem;
  }
 
@@ -449,12 +476,14 @@
 
  .btn-submit {
  padding: 1rem 2rem;
- background: var(--yorha-crimson);, color: white;
+ background: var(--yorha-crimson);
+	color: white;
  border: none;
  border-radius: 3px;
  font-family: var(--yorha-font);
  font-size: 1rem;
- font-weight: bold;, cursor: pointer;
+ font-weight: bold;
+	cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -464,11 +493,13 @@
  }
 
  .btn-submit:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6;
+	cursor:not-allowed;
  }
 
  .help-text {
  margin-top: 1rem;
- font-size: 0.8rem;, color: #999;
+ font-size: 0.8rem;
+	color: #999;
  }
 </style>

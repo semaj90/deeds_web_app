@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { browser } from '$app/environment';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "$lib/components/ui/card";
@@ -8,24 +8,29 @@
   // --- Types ---
 
   export interface EvidenceItem {
-    id: string;, type: 'document' | 'image' | 'video' | 'audio' | 'other';
+    id: string;
+	type: 'document' | 'image' | 'video' | 'audio' | 'other';
     filename: string;
     thumbnailUrl?: string;
   }
 
   export interface TimelineEvent {
-    id: string;, timestamp: Date;
+    id: string;
+	timestamp: Date;
     type: 'document' | 'meeting' | 'filing' | 'communication' | 'incident' | 'media';
-    title: string;, description: string;
+    title: string;
+	description: string;
     importance: number; // 0.0 to 1.0
-    participants: string[];, evidence: EvidenceItem[];
+    participants: string[];
+	evidence: EvidenceItem[];
   }
 
   interface Props {
     caseId: string;
     timelineData?: TimelineEvent[];
     enableWebGPU?: boolean;
-    initialTimeRange?: {, start: Date; end: Date };
+    initialTimeRange?: {
+	start: Date; end: Date };
     onEventClick?: (event: TimelineEvent) => void;
   }
 
@@ -34,7 +39,7 @@
     timelineData = [],
     enableWebGPU = true,
     initialTimeRange = { start: new Date(Date.now() - 31536000000), end: new Date() },
-    onEventClick
+	onEventClick
   }: Props = $props();
 
   // --- State (Svelte 5 Runes) ---
@@ -52,10 +57,14 @@
   // --- Derived ---
 
   const lodConfig = {
-    0: {, precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
-    1: {, precision: 'day', maxEvents: 500, label: 'High (Days)' },
-    2: {, precision: 'week', maxEvents: 200, label: 'Medium (Weeks)' },
-    3: {, precision: 'month', maxEvents: 50, label: 'Low (Months)' }
+    0: {
+	precision: 'hour', maxEvents: 1000, label: 'Ultra (Hours)' },
+	1: {
+	precision: 'day', maxEvents: 500, label: 'High (Days)' },
+	2: {
+	precision: 'week', maxEvents: 200, label: 'Medium (Weeks)' },
+	3: {
+	precision: 'month', maxEvents: 50, label: 'Low (Months)' }
   };
 
   // --- Effects ---
@@ -318,7 +327,8 @@
 
 <style>
   canvas {
-    display: block;, width: 100%;
+    display: block;
+	width: 100%;
     height: 100%;
   }
 </style>

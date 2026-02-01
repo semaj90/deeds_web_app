@@ -2,10 +2,11 @@
 	let isLoading = $state<any>(undefined);
 	let charge = $state<any>(undefined);
 
- import { createEventDispatcher, onMount } from 'svelte';
+ // Migrated to $effect
 
  interface RelatedCase {
- id: string;, caseNumber: string;
+ id: string;
+	caseNumber: string;
  title: string;
  charges?: string[];
  outcome?: string;
@@ -23,12 +24,14 @@
  let cases: RelatedCase[] = [];
  let error: string | null = null;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  if (statuteCode) {
  await loadRelatedCases();
  }
- })();
+ 
+});();
  });
 
  async function loadRelatedCases() {
@@ -135,9 +138,11 @@
 <style>
  .related-cases-panel {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column;
+	gap: 1rem;
  padding: 1.5rem;
- background-color: white;, border: 2px solid #d4a574;
+ background-color: white;
+	border: 2px solid #d4a574;
  border-radius: 8px;
  }
 
@@ -151,13 +156,17 @@
 
  .panel-header h3 {
  margin: 0;
- font-size: 1.1rem;, color: #2c2c2c;
+ font-size: 1.1rem;
+	color: #2c2c2c;
  }
 
  .refresh-btn {
- background: none;, border: none;
- font-size: 1.2rem;, cursor: pointer;
- padding: 0;, transition: transform 0.2s;
+ background: none;
+	border: none;
+ font-size: 1.2rem;
+	cursor: pointer;
+ padding: 0;
+	transition: transform 0.2s;
  }
 
  .refresh-btn:hover, not(disabled) {
@@ -165,7 +174,8 @@
  }
 
  .refresh-btn:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6;
+	cursor:not-allowed;
  }
 
  .panel-content {
@@ -179,15 +189,18 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 200px;, gap: 1rem;
+ min-height: 200px;
+	gap: 1rem;
  color: #666;
  }
 
  .spinner {
- width: 30px;, height: 30px;
+ width: 30px;
+	height: 30px;
  border: 3px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%;
+	animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -198,14 +211,17 @@
 
  .cases-list {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .case-card {
  padding: 1rem;
- background-color: #f5f1e8;, border: 1px solid #e0d5c7;
+ background-color: #f5f1e8;
+	border: 1px solid #e0d5c7;
  border-radius: 6px;
- text-align: left;, cursor: pointer;
+ text-align: left;
+	cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -224,24 +240,28 @@
  .case-number {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.85rem;
- font-weight: 600;, color: #8b4513;
+ font-weight: 600;
+	color: #8b4513;
  }
 
  .relevance {
  padding: 0.2rem 0.5rem;
  border-radius: 3px;
  font-size: 0.7rem;
- font-weight: 600;, color: white;
+ font-weight: 600;
+	color: white;
  }
 
  .case-title {
- font-size: 0.9rem;, color: #333;
+ font-size: 0.9rem;
+	color: #333;
  margin-bottom: 0.5rem;
  line-height: 1.3;
  }
 
  .charges {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  flex-wrap: wrap;
  margin-bottom: 0.5rem;
  }
@@ -251,16 +271,19 @@
  background-color: #d4a574;
  border-radius: 3px;
  font-size: 0.7rem;
- font-weight: 600;, color: white;
+ font-weight: 600;
+	color: white;
  }
 
  .outcome {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  font-size: 0.8rem;
  }
 
  .label {
- font-weight: 600;, color: #666;
+ font-weight: 600;
+	color: #666;
  }
 
  .value {

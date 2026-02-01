@@ -6,19 +6,40 @@
 import { browser } from '$app/environment';
 
 export interface CacheEntry<T = unknown> {
-  key: string;, data: T;, timestamp: number;, ttl: number;, version: string;
+  key: string;
+	data: T;
+	timestamp: number;
+	ttl: number;
+	version: string;
   embedding?: Float32Array;
-  metadata?: {, size: number;, hits: number;, lastAccess: number;, source: 'server' | 'client' | 'hybrid';
+  metadata?: {
+	size: number;
+	hits: number;
+	lastAccess: number;
+	source: 'server' | 'client' | 'hybrid';
     computeCost: number;
   };
 }
 
 export interface CacheStrategy {
-  memory: boolean;, indexeddb: boolean;, localStorage: boolean;, lru: boolean;, semantic: boolean;, cost: boolean;, syncWithRedis: boolean;, conflictResolution: 'client' | 'server' | 'merge';
+  memory: boolean;
+	indexeddb: boolean;
+	localStorage: boolean;
+	lru: boolean;
+	semantic: boolean;
+	cost: boolean;
+	syncWithRedis: boolean;
+	conflictResolution: 'client' | 'server' | 'merge';
 }
 
 export interface CacheConfig {
-  maxMemorySize: number;, maxIndexedDBSize: number;, maxLocalStorageSize: number;, defaultTTL: number;, embeddingDimensions: number;, syncInterval: number;, strategy: CacheStrategy;
+  maxMemorySize: number;
+	maxIndexedDBSize: number;
+	maxLocalStorageSize: number;
+	defaultTTL: number;
+	embeddingDimensions: number;
+	syncInterval: number;
+	strategy: CacheStrategy;
 }
 
 export class HeadlessUICache {
@@ -38,7 +59,8 @@ export class HeadlessUICache {
       defaultTTL: 30 * 60 * 1000,
       embeddingDimensions: 256,
       syncInterval: 5 * 60 * 1000,
-      strategy: {, memory: true,
+      strategy: {
+	memory: true,
         indexeddb: true,
         localStorage: false,
         lru: true,
@@ -47,7 +69,7 @@ export class HeadlessUICache {
         syncWithRedis: true,
         conflictResolution: 'server',
       },
-      ...config,
+	...config,
     };
     this.initialize();
   }
@@ -146,13 +168,14 @@ export class HeadlessUICache {
       timestamp: Date.now(),
       ttl: ttl || this.config.defaultTTL,
       version: this.generateVersion(),
-      metadata: {, size: this.estimateSize(data),
+      metadata: {
+	size: this.estimateSize(data),
         hits: 0,
         lastAccess: Date.now(),
         source,
         computeCost: this.estimateComputeCost(data),
       },
-    };
+	};
 
     // Store in memory cache
     if (this.config.strategy.memory) {
@@ -226,7 +249,7 @@ export class HeadlessUICache {
       const response = await fetch('/api/cache/manifest', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-      });
+	});
       if (!response.ok) return;
       const serverManifest = await response.json();
 
@@ -249,7 +272,7 @@ export class HeadlessUICache {
       const response = await fetch(`/api/cache/${encodeURIComponent(key)}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-      });
+	});
       if (!response.ok) return null;
       const data = await response.json();
       return data.value as T;
@@ -268,7 +291,7 @@ export class HeadlessUICache {
       await fetch('/api/cache', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+	body: JSON.stringify({
           key,
           data: entry.data,
           ttl: entry.ttl,
@@ -285,7 +308,8 @@ export class HeadlessUICache {
     if (this.syncTimer) clearInterval(this.syncTimer);
     this.syncTimer = setInterval(() => {
       this.syncWithServer();
-    }, this.config.syncInterval);
+    },
+	this.config.syncInterval);
   }
 
   private isValidEntry(entry: CacheEntry): boolean {

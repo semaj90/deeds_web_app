@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         .limit(limit)
         .offset(offset);
     },
-    [] // Fallback to empty array if database unavailable
+	[] // Fallback to empty array if database unavailable
   );
 
   // Log database errors but don't crash the page
@@ -69,12 +69,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       offset,
       hasMore: userCases.length === limit,
     },
-    filters: { status, priority, search },
-    // Pass database status to UI for graceful degradation
-    databaseStatus: {, available: !fromFallback,
+	filters: { status, priority, search },
+	// Pass database status to UI for graceful degradation
+    databaseStatus: {
+	available: !fromFallback,
       error: dbError,
     },
-  };
+	};
 };
 
 /**
@@ -146,7 +147,6 @@ export const actions: Actions = {
 			});
 		}
 	},
-
 	/**
 	 * Update case status (bulk action)
 	 * Usage: <form method="POST" action="?/updateStatus">
@@ -190,7 +190,6 @@ export const actions: Actions = {
 			return fail(500, { error: 'Failed to update cases' });
 		}
 	},
-
 	/**
 	 * Archive cases (soft delete)
 	 * Usage: <form method="POST" action="?/archive">

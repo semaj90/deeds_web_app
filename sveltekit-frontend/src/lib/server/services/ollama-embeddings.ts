@@ -9,7 +9,8 @@ export const OllamaEmbeddingService: IOllamaEmbeddingService = {
         const res = await fetch(`${API_URL}/api/embeddings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, model: MODEL, prompt: text })
+	body: JSON.stringify({
+	model: MODEL, prompt: text })
         });
 
         if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
@@ -17,7 +18,7 @@ export const OllamaEmbeddingService: IOllamaEmbeddingService = {
         // Ollama embedding response shape may vary: try multiple fields
         return data.embedding ?? data.data?.[0]?.embedding ?? data[0]?.embedding ?? [];
     },
-    async embedBatch(texts: string[]) {
+	async embedBatch(texts: string[]) {
         return Promise.all(texts.map((t) => this.embedText(t)));
     }
 };

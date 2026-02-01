@@ -8,7 +8,8 @@ export type SearchScope = 'cases' | 'evidence' | 'documents' | 'poi' | 'citation
 export type SearchMode = 'full-text' | 'vector' | 'hybrid';
 
 export interface SearchFilters {
-    dateRange?: {, start: number | null; end: number | null };
+    dateRange?: {
+	start: number | null; end: number | null };
     caseIds?: string[];
     entityTypes?: string[];
     jurisdictions?: string[];
@@ -18,9 +19,12 @@ export interface SearchFilters {
 }
 
 export interface SavedSearch {
-    id: string;, name: string;
-    query: string;, filters: SearchFilters;
-    scope: SearchScope[];, mode: SearchMode;
+    id: string;
+	name: string;
+    query: string;
+	filters: SearchFilters;
+    scope: SearchScope[];
+	mode: SearchMode;
     createdAt: number;
 }
 
@@ -28,14 +32,20 @@ export interface SavedSearch {
  * Search Store State
  */
 interface SearchStoreState {
-    query: string;, searchMode: SearchMode;
-    searchScope: SearchScope[];, results: SearchResult[];
+    query: string;
+	searchMode: SearchMode;
+    searchScope: SearchScope[];
+	results: SearchResult[];
     resultsByType: Map<SearchScope, SearchResult[]>;
-    totalResults: number;, filters: SearchFilters;
-    activeFilters: string[];, searchTime: number;
+    totalResults: number;
+	filters: SearchFilters;
+    activeFilters: string[];
+	searchTime: number;
     cachedResults: Map<string, SearchResult[]>;
-    lastSearchQuery: string;, savedSearches: SavedSearch[];
-    isSearching: boolean;, error: string | null;
+    lastSearchQuery: string;
+	savedSearches: SavedSearch[];
+    isSearching: boolean;
+	error: string | null;
     lastUpdated: number;
 }
 
@@ -47,7 +57,7 @@ const initialState: SearchStoreState = {
     resultsByType: new Map(),
     totalResults: 0,
     filters: {},
-    activeFilters: [],
+	activeFilters: [],
     searchTime: 0,
     cachedResults: new Map(),
     lastSearchQuery: '',
@@ -101,7 +111,7 @@ function createSearchStore() {
                 const response = await fetch('/api/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query, mode, scope, filters: {} })
+	body: JSON.stringify({ query, mode, scope, filters: {} })
                 });
 
                 if (response.ok) {
@@ -134,8 +144,7 @@ function createSearchStore() {
                 update(s => ({ ...s, isSearching: false, error: errorMsg }));
             }
         },
-
-        /**
+	/**
          * Vector search (semantic)
          */
         async vectorSearch(embedding: number[], threshold: number = 0.7) {
@@ -144,7 +153,7 @@ function createSearchStore() {
                 const response = await fetch('/api/search/vector', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ embedding, threshold })
+	body: JSON.stringify({ embedding, threshold })
                 });
 
                 if (response.ok) {
@@ -166,8 +175,7 @@ function createSearchStore() {
             }
             return [];
         },
-
-        // ========== FILTERING ==========
+	// ========== FILTERING ==========
 
         filter<K extends keyof SearchFilters>(filterType: K, value: SearchFilters[K]) {
             update(s => {
@@ -180,12 +188,11 @@ function createSearchStore() {
                 };
             });
         },
-
-        clearFilters() {
-            update(s => ({ ...s, filters: {}, activeFilters: [] }));
+	clearFilters() {
+            update(s => ({ ...s, filters: {},
+	activeFilters: [] }));
         },
-
-        clearFilter(filterType: keyof SearchFilters) {
+	clearFilter(filterType: keyof SearchFilters) {
             update(s => {
                 const newFilters = { ...s.filters };
                 delete newFilters[filterType];
@@ -196,28 +203,23 @@ function createSearchStore() {
                 };
             });
         },
-
-        // ========== SCOPE/MODE ==========
+	// ========== SCOPE/MODE ==========
 
         setSearchScope(scope: SearchScope[]) {
             update(s => ({ ...s, searchScope: scope }));
         },
-
-        setSearchMode(mode: SearchMode) {
+	setSearchMode(mode: SearchMode) {
             update(s => ({ ...s, searchMode: mode }));
         },
-
-        // ========== EXPORT ==========
+	// ========== EXPORT ==========
 
         async exportResults(format: 'csv' | 'json' | 'pdf') {
             // Implementation skipped for brevity in this fix iteration, assuming standard fetch
         },
-
-        clearCache() {
+	clearCache() {
             update(s => ({ ...s, cachedResults: new Map(), lastSearchQuery: '' }));
         },
-
-        // ========== HELPERS ==========
+	// ========== HELPERS ==========
 
         _groupByType(results: SearchResult[]) {
             const map = new Map<SearchScope, SearchResult[]>();
@@ -228,15 +230,13 @@ function createSearchStore() {
             });
             return map;
         },
-
-        _filterResults(results: SearchResult[], filters: SearchFilters) {
+	_filterResults(results: SearchResult[], filters: SearchFilters) {
             return results.filter(r => {
                 // strict logic placeholder
                 return true;
             });
         },
-
-        _getActiveFilterLabels(filters: SearchFilters): string[] {
+	_getActiveFilterLabels(filters: SearchFilters): string[] {
             return Object.keys(filters).filter(k => !!filters[k as keyof SearchFilters]);
         }
     };

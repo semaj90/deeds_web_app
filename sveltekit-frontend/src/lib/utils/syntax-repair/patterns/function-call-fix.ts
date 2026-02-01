@@ -22,9 +22,10 @@ export const simpleFunctionCallPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `${funcName}(${arg1.trim()}, ${arg2.trim()})`;
+    return `${funcName}(${arg1.trim()},
+	${arg2.trim()})`;
   },
-  {
+	{
     priority: 30,
   }
 );
@@ -41,9 +42,10 @@ export const methodCallPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `.${methodName}(${arg1.trim()}, ${arg2.trim()})`;
+    return `.${methodName}(${arg1.trim()},
+	${arg2.trim()})`;
   },
-  {
+	{
     priority: 32,
   }
 );
@@ -73,9 +75,10 @@ export const drizzleAndPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `and(${arg1.trim()}, ${arg2.trim()})`;
+    return `and(${arg1.trim()},
+	${arg2.trim()})`;
   },
-  {
+	{
     priority: 26,
   }
 );
@@ -91,9 +94,10 @@ export const drizzleOrPattern: PatternMatcher = createPattern(
     if (isTypeAnnotation(arg1, arg2)) {
       return match;
     }
-    return `or(${arg1.trim()}, ${arg2.trim()})`;
+    return `or(${arg1.trim()},
+	${arg2.trim()})`;
   },
-  {
+	{
     priority: 27,
   }
 );
@@ -107,9 +111,10 @@ export const nestedCallPattern: PatternMatcher = createPattern(
   'Fix nested function calls with corrupted arguments',
   /(\w+)\((\w+)\(([^()]+?):\s*([^()]+?)\):\s*([^()]+?)\)/g,
   (match, outer, inner, arg1, arg2, arg3) => {
-    return `${outer}(${inner}(${arg1.trim()}, ${arg2.trim()}), ${arg3.trim()})`;
+    return `${outer}(${inner}(${arg1.trim()},
+	${arg2.trim()}), ${arg3.trim()})`;
   },
-  {
+	{
     priority: 35,
   }
 );
@@ -122,9 +127,10 @@ export const chainedCallPattern: PatternMatcher = createPattern(
   'Fix chained method calls with corrupted arguments',
   /\.(\w+)\(([^()]+?)\)\.(\w+)\(([^()]+?):\s*([^()]+?)\)/g,
   (match, method1, args1, method2, arg2a, arg2b) => {
-    return `.${method1}(${args1}).${method2}(${arg2a.trim()}, ${arg2b.trim()})`;
+    return `.${method1}(${args1}).${method2}(${arg2a.trim()},
+	${arg2b.trim()})`;
   },
-  {
+	{
     priority: 38,
   }
 );
@@ -187,7 +193,8 @@ export function getFunctionCallPatterns(): PatternMatcher[] {
 /**
  * Apply function call fixes to content
  */
-export function fixFunctionCalls(content: string): {, result: string; fixCount: number } {
+export function fixFunctionCalls(content: string): {
+	result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

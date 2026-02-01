@@ -31,7 +31,9 @@ export interface QdrantOptions {
     url?: string;
 }
 
-export async function upsertToQdrant(item: DocumentItem & { id: string | number }, opts: QdrantOptions = {}): Promise<{, ok: boolean }> {
+export async function upsertToQdrant(item: DocumentItem & { id: string | number },
+	opts: QdrantOptions = {}): Promise<{
+	ok: boolean }> {
     const client = opts.url ? new QdrantClient({ url: opts.url }) : qdrantClient;
 
     const maybeEmb = item.embeddings;
@@ -91,10 +93,12 @@ export async function searchQdrantFiltered(
     try {
         const must: any[] = [];
         if (options?.tags && options.tags.length > 0) {
-            must.push({ key: 'tags', match: {, any: options.tags } });
+            must.push({ key: 'tags', match: {
+	any: options.tags } });
         }
         if (options?.caseId) {
-            must.push({ key: 'caseId', match: {, value: options.caseId } });
+            must.push({ key: 'caseId', match: {
+	value: options.caseId } });
         }
 
         const filter = must.length > 0 ? { must } : undefined;

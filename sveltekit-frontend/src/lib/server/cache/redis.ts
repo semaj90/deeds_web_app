@@ -34,7 +34,7 @@ export const cache = {
             return null;
         }
     },
-    set: async (key: string, value: any, ttlSeconds?: number) => {
+	set: async (key: string, value: any, ttlSeconds?: number) => {
         const client = await getRedisClient();
         if (!client) return;
         const str = JSON.stringify(value);
@@ -44,7 +44,7 @@ export const cache = {
             await client.set(key, str);
         }
     },
-    del: async (key: string) => {
+	del: async (key: string) => {
         const client = await getRedisClient();
         await client?.del(key);
     }

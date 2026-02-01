@@ -1,4 +1,4 @@
-<!-- Legal AI Chat Component - Svelte, 5 with: TensorRT, integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+<!-- Legal AI Chat Component - Svelte, 5 with: TensorRT, integration --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { Button } from '$lib/components/ui/enhanced-bits';
  import  Card: CardContent: CardHeader, CardTitle  from "$lib/components/ui/Card.svelte"; interface LegalQuery { id?: number,prompt: string, response?: string; model_used?: string; tokens?: number; inference_time?: number; total_time?: number; similar_documents_found?: number; timestamp?: Date}
 
@@ -17,10 +17,13 @@
     "Evaluate intellectual property clauses in a partnership contract"
   ]; async function submitQuery(): Promise<any> { if (!canSubmit) return; isLoading = true; error = null; currentResponse = null; try { const response = await fetch('/api/legal-ai', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ prompt, context: context || undefined, max_tokens: 512, temperature: 0.3, use_vector_search: useVectorSearch}) });
-   const data = await response.json(); if (data.success) { const newQuery: LegalQuery = { id: data.result.query_id, prompt, response: data.result.response, model_used: data.result.model_used, tokens: data.result.tokens, inference_time: data.result.inference_time, total_time: data.result.total_time, similar_documents_found: data.result.similar_documents_found;, timestamp: new Date() }
+        },
+	body: JSON.stringify({ prompt, context: context || undefined, max_tokens: 512, temperature: 0.3, use_vector_search: useVectorSearch}) });
+   const data = await response.json(); if (data.success) { const newQuery: LegalQuery = { id: data.result.query_id, prompt, response: data.result.response, model_used: data.result.model_used, tokens: data.result.tokens, inference_time: data.result.inference_time, total_time: data.result.total_time, similar_documents_found: data.result.similar_documents_found;
+	timestamp: new Date() }
         queries = [newQuery, ...queries]; currentResponse = newQuery; // Clear form prompt = ''; context = ''} else { error = data.error || 'Failed to process legal query'}
-    } catch (err) { error = 'Network error: Failed to connect to legal AI service'; console.error('Legal AI, error:', err)} finally { isLoading = false}'
+    } catch (err) { error = 'Network error: Failed to connect to legal AI service'; console.error('Legal AI, error:', err)} finally { isLoading = false}
+'
   }
   function useSamplePrompt(sample: string) { prompt = sampl}
   function formatDuration(ms: number): string { if (ms < 1000) return `${ ms }ms`; return `${(ms / 1000).toFixed(2)}s`}
@@ -106,7 +109,8 @@
   </div> {/each}
   </div> </CardContent> </Card> {/if}
   </div>
- <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;, overflow: hidden}
+ <style> .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+	overflow: hidden}
   .prose { line-height: 1.6}
 </style>
 

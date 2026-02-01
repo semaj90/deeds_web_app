@@ -34,8 +34,8 @@
 
 	const context: DrawerContext = {
 		get open() { return open; },
-		get side() { return side; },
-		setOpen,
+	get side() { return side; },
+	setOpen,
 		close,
 	};
 

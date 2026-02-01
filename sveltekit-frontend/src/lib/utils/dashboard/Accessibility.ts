@@ -6,7 +6,8 @@ export class AccessibilityUtils {
  /**
  * Check if browser supports required features
  */
- static checkBrowserCompatibility(): {, supported: boolean, issues: string[];
+ static checkBrowserCompatibility(): {
+	supported: boolean, issues: string[];
  } {
  const issues: string[] = [];
 
@@ -68,7 +69,8 @@ export class AccessibilityUtils {
  // Remove after announcement
  setTimeout(() => {
  document.body.removeChild(announcement);
- }, 1000);
+ },
+	1000);
  }
 
  /**
@@ -149,7 +151,9 @@ export class AccessibilityUtils {
  */
  static checkColorContrast(
  foreground: string, background: string
- ): {, ratio: number, wcagAA: boolean;, wcagAAA: boolean;
+ ): {
+	ratio: number, wcagAA: boolean;
+	wcagAAA: boolean;
  } {
  const fgLuminance = this.getLuminance(foreground);
  const bgLuminance = this.getLuminance(background);
@@ -222,7 +226,8 @@ export class AccessibilityUtils {
  /**
  * Validate WCAG compliance
  */
- static validateWCAGCompliance(): {, compliant: boolean, issues: string[];
+ static validateWCAGCompliance(): {
+	compliant: boolean, issues: string[];
  } {
  const issues: string[] = [];
 

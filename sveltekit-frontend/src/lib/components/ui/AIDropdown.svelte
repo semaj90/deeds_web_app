@@ -7,7 +7,7 @@
   import Keyboard from "lucide-svelte/icons/keyboard";
   import Sparkles from "lucide-svelte/icons/sparkles";
   import Wand2 from "lucide-svelte/icons/wand-2";
-  import { onMount } from "svelte";
+  // Migrated to $effect
   import { fly } from "svelte/transition";
 
   interface Props {
@@ -23,9 +23,9 @@
   let {
     disabled = false,
     onReportGenerate = () => {},
-    onSummarize = () => {},
-    onAnalyze = () => {},
-    hasContent = false,
+	onSummarize = () => {},
+	onAnalyze = () => {},
+	hasContent = false,
     isGenerating = false
   }: Props = $props();
 
@@ -40,21 +40,21 @@
       shortcut: "Ctrl+Shift+C",
       description: "Comprehensive case overview and analysis",
     },
-    {
+	{
       id: "evidence-analysis",
       name: "Evidence Analysis",
       icon: Brain,
       shortcut: "Ctrl+Shift+E",
       description: "Detailed evidence evaluation and admissibility",
     },
-    {
+	{
       id: "legal-brief",
       name: "Legal Brief",
       icon: Wand2,
       shortcut: "Ctrl+Shift+L",
       description: "Structured legal arguments with precedents",
     },
-    {
+	{
       id: "investigation-report",
       name: "Investigation Report",
       icon: Sparkles,
@@ -71,7 +71,7 @@
       description: "Generate AI summary of current content",
       requiresContent: true,
     },
-    {
+	{
       id: "analyze",
       name: "Analyze Report",
       icon: Brain,
@@ -122,10 +122,12 @@
     open = false;
   }
 
-  onMount(() => {
+  $effect(() => {
+
     document.addEventListener("keydown", handleKeydown);
     return () => document.removeEventListener("keydown", handleKeydown);
-  });
+  
+});
 </script>
 
 <DropdownMenu.Root bind:open>

@@ -14,7 +14,8 @@ export interface VectorIndexConfig {
 }
 /** * Vector Document for Indexing */
 export interface VectorDocument {
- id: string, content: string;, embedding: number[], documentId: string;
+ id: string, content: string;
+	embedding: number[], documentId: string;
  chunkId?: string, embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
  metadata?: {
  caseId?: string;
@@ -31,14 +32,17 @@ export interface VectorDocument {
 }
 /** * Vector Search Result */
 export interface VectorSearchResult {
- id: string, content: string;, documentId: string;
- chunkId?: string, similarity: number;, distance: number, rank: number;
+ id: string, content: string;
+	documentId: string;
+ chunkId?: string, similarity: number;
+	distance: number, rank: number;
  metadata?: Record<string, unknown>;
  embeddingType?: string;
 }
 /** * Batch Upsert Result */
 export interface BatchUpsertResult {
- inserted: number, updated: number;, deleted: number, totalProcessingTime: number;
+ inserted: number, updated: number;
+	deleted: number, totalProcessingTime: number;
 }
 /** * PgVector Indexing Service */
 export class PgVectorIndexingService {
@@ -61,25 +65,40 @@ export class PgVectorIndexingService {
  // Validate embedding dimensions
  if (doc.embedding.length !== this.dimensions) {
  throw new Error(
- `Embedding dimension mismatch, expected ${this.dimensions}, got ${doc.embedding.length}`
+ `Embedding dimension mismatch, expected ${this.dimensions},
+	got ${doc.embedding.length}`
  }
  // Upsert using raw SQL for pgvector support
  await this.db.execute(sql`
 INSERT INTO document_chunks (
  id, content, metadata, document_id, title, confidentiality_level, embedding_model, embedding_dimension, created_at, updated_at
 ) VALUES (
- ${doc.id}, ${doc.content}, ${JSON.stringify(doc?.metadata|| {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc?.modelUsed ?? 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
+ ${doc.id},
+	${doc.content},
+	${JSON.stringify(doc?.metadata|| {})},
+	${doc.documentId},
+	${doc.metadata?.documentType ?? null},
+	${doc.metadata?.confidentialityLevel ?? 'public'},
+	${doc?.modelUsed ?? 'embeddinggemma:latest'},
+	${this.dimensions},
+	NOW(), NOW()
 ) ON CONFLICT (id) DO UPDATE SET
  content = ${doc.content},
- metadata = ${JSON.stringify(doc?.metadata|| {})},
- updated_at = NOW()
+	metadata = ${JSON.stringify(doc?.metadata|| {})},
+	updated_at = NOW()
 `);
  // Store embedding in vector table
  await this.db.execute(sql`
 INSERT INTO embeddings (
  id, content, vector, document_id, chunk_id, embedding_type, model_used, metadata, created_at
 ) VALUES (
- gen_random_uuid(), ${doc.content}, ${this.vectorToString(doc.embedding)}::vector, ${doc.documentId}, ${doc?.chunkId|| doc.id}, ${doc.embeddingType}, ${doc?.modelUsed ?? 'embeddinggemma:latest'}, ${JSON.stringify(doc?.metadata|| {})}, NOW()
+ gen_random_uuid(), ${doc.content},
+	${this.vectorToString(doc.embedding)}::vector, ${doc.documentId},
+	${doc?.chunkId|| doc.id},
+	${doc.embeddingType},
+	${doc?.modelUsed ?? 'embeddinggemma:latest'},
+	${JSON.stringify(doc?.metadata|| {})},
+	NOW()
 ) ON CONFLICT DO NOTHING
 `);
  return doc.id;
@@ -96,13 +115,16 @@ INSERT INTO embeddings (
  for (const doc of docs) {
  if (doc.embedding.length !== this.dimensions) {
  throw new Error(
- `Document ${doc.id} embedding dimension mismatch (expected ${this.dimensions}, got ${doc.embedding.length})`
+ `Document ${doc.id} embedding dimension mismatch (expected ${this.dimensions},
+	got ${doc.embedding.length})`
  );
  }
  }
- // Batch insert document chunks.map(
+ // Batch insert document chunks
+.map(
  (doc) =>
- `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed ?? 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
+ `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc?.modelUsed ?? 'embeddinggemma:latest')}', ${this.dimensions},
+	NOW(), NOW())`
  )
  .join(',',
  if (chunksValues) {
@@ -119,7 +141,8 @@ ON CONFLICT (id) DO UPDATE SET
  );
  }
 
- // Batch insert embeddings.map(
+ // Batch insert embeddings
+.map(
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc?.chunkId|| doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc?.modelUsed ?? 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc?.metadata|| {}))}', NOW())`
  )
@@ -154,11 +177,13 @@ ON CONFLICT DO NOTHING
  try {
  if (embedding.length !== this.dimensions) {
  throw new Error(
- `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
+ `Embedding dimension mismatch, expected ${this.dimensions},
+	got ${embedding.length}`
  };
  const limit = options?.limit|| this.maxResults;
  const threshold = options?.threshold ?? 0.5;
- const vectorStr = this.vectorToString(embedding);$1;$2SELECT
+ const vectorStr = this.vectorToString(embedding);
+$1;$2SELECT
  e.id: e.content: e.document_id as "documentId",
  e.chunk_id as "chunkId",
  (1 - (e.vector <-> '${vectorStr}'::vector)) as similarity,
@@ -200,9 +225,11 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
 
  if (embedding.length !== this.dimensions) {
  throw new Error(
- `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
+ `Embedding dimension mismatch, expected ${this.dimensions},
+	got ${embedding.length}`
  };
- const vectorStr = this.vectorToString(embedding);$1;$2SELECT
+ const vectorStr = this.vectorToString(embedding);
+$1;$2SELECT
  e.id: e.content: e.document_id as "documentId",
  e.chunk_id as "chunkId",
  (
@@ -230,7 +257,8 @@ WHERE 1=1
  /** * Delete document and its embeddings */
  async deleteDocument(documentId: string): Promise<number> {
  try {
- // Delete from embeddings tablesql`DELETE FROM embeddings WHERE document_id = ${documentId}`
+ // Delete from embeddings table
+sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
  ); // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
@@ -239,10 +267,13 @@ WHERE 1=1
  }
  }
  /** * Get document statistics */
- async getStats(): Promise<{, totalDocuments: number, totalChunks: number;, totalEmbeddings: number, averageEmbeddingDimension: number;
+ async getStats(): Promise<{
+	totalDocuments: number, totalChunks: number;
+	totalEmbeddings: number, averageEmbeddingDimension: number;
  indexSize?: string;
  }> {
- try {sql.raw(`
+ try {
+sql.raw(`
 SELECT
  (SELECT COUNT(DISTINCT document_id) FROM document_chunks) as total_documents,
  (SELECT COUNT(*) FROM document_chunks) as total_chunks,
@@ -251,7 +282,8 @@ SELECT
 `)
  );
  const row = (stats as unknown[])[0] as {
- total_documents: number, total_chunks: number;, total_embeddings: number, avg_dimension: number;
+ total_documents: number, total_chunks: number;
+	total_embeddings: number, avg_dimension: number;
  };
  return {
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,
@@ -261,7 +293,7 @@ SELECT
  return {
  totalDocuments: 0, totalChunks: 0, totalEmbeddings: 0, averageEmbeddingDimension: 0
  },
- }
+	}
  }
  /** * Create or rebuild HNSW index for fast search */
  async createHNSWIndex(): Promise<void> {

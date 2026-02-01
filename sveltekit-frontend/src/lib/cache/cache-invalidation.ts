@@ -46,7 +46,6 @@ export const CacheInvalidation = {
 		]);
 		console.log('🗑️ Invalidated all case caches');
 	},
-
 	/**
 	 * Invalidate caches for a specific case
 	 */
@@ -60,7 +59,6 @@ export const CacheInvalidation = {
 		]);
 		console.log(`🗑️ Invalidated caches for case ${caseId}`);
 	},
-
 	/**
 	 * Invalidate evidence-related caches
 	 */
@@ -72,7 +70,6 @@ export const CacheInvalidation = {
 		]);
 		console.log(`🗑️ Invalidated evidence caches for case ${caseId}`);
 	},
-
 	/**
 	 * Invalidate user-related caches
 	 */
@@ -83,7 +80,6 @@ export const CacheInvalidation = {
 		]);
 		console.log(`🗑️ Invalidated user caches for ${userId}`);
 	},
-
 	/**
 	 * Invalidate dashboard caches
 	 */
@@ -94,7 +90,6 @@ export const CacheInvalidation = {
 		]);
 		console.log('🗑️ Invalidated dashboard caches');
 	},
-
 	/**
 	 * Invalidate search caches
 	 */
@@ -141,7 +136,6 @@ export const CacheWarming = {
 			console.error('Failed to warm dashboard cache:', error);
 		}
 	},
-
 	/**
 	 * Warm up case list cache
 	 */
@@ -170,14 +164,12 @@ export const CacheMonitoring = {
 	async getHealth() {
 		return await cache.health();
 	},
-
 	/**
 	 * Get cache statistics
 	 */
 	getStats() {
 		return cache.getStats();
 	},
-
 	/**
 	 * Log cache performance metrics
 	 */

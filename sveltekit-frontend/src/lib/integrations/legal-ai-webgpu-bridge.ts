@@ -17,11 +17,15 @@ export interface LegalDocumentProcessingOptions {
 }
 
 export interface LegalAIProcessingResult {
-    buffer: GPUBuffer;, compressionStats: {
-        originalSize: number;, compressedSize: number;
-        compressionRatio: number;, spaceSavings: string;
+    buffer: GPUBuffer;
+	compressionStats: {
+        originalSize: number;
+	compressedSize: number;
+        compressionRatio: number;
+	spaceSavings: string;
     };
-    processingTime: number;, profile: LegalAIProfile;
+    processingTime: number;
+	profile: LegalAIProfile;
     cached: boolean;
 }
 
@@ -105,12 +109,13 @@ export class LegalAIWebGPUBridge {
 
         return {
             buffer: uploadResult.buffer,
-            compressionStats: {, originalSize: uploadResult.uploadStats.originalSize,
+            compressionStats: {
+	originalSize: uploadResult.uploadStats.originalSize,
                 compressedSize: uploadResult.uploadStats.uploadedSize,
                 compressionRatio: uploadResult.uploadStats.compressionRatio,
                 spaceSavings: `${(((uploadResult.uploadStats.originalSize - uploadResult.uploadStats.uploadedSize) / uploadResult.uploadStats.originalSize) * 100).toFixed(1)}%`
             },
-            processingTime,
+	processingTime,
             profile,
             cached: false // TODO: Implement cache hit detection if supported by uploader return
         };
@@ -120,7 +125,8 @@ export class LegalAIWebGPUBridge {
      * Batch process multiple legal documents with optimal resource management
      */
     async batchProcessLegalDocuments(
-        documents: Array<{, embeddings: Float32Array | number[] | ArrayBuffer; type?: string; priority?: string }>,
+        documents: Array<{
+	embeddings: Float32Array | number[] | ArrayBuffer; type?: string; priority?: string }>,
         globalOptions: LegalDocumentProcessingOptions = {}
     ): Promise<LegalAIProcessingResult[]> {
         if (!this.isInitialized || !this.uploader) {
@@ -186,7 +192,8 @@ export class LegalAIWebGPUBridge {
         // For now, returning mock/placeholder
         return {
             results: [],
-            stats: {, searchTime: 0
+            stats: {
+	searchTime: 0
             }
         };
     }

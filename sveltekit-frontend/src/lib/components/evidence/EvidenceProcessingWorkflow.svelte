@@ -2,14 +2,15 @@
    * Real-time streaming workflow orchestration with: * - File upload with drag & drop * - Live progress tracking via SSE * - Neural Sprite configuration * - Portable artifact results * - Error handling and retry capabilities */ import { createActor } from 'xstate';
  import { evidenceProcessingMachine, type EvidenceProcessingContext, getProcessingProgress, getCurrentStep } from '$lib/state/evidence-processing-machine.ts';
  import  Card: CardHeader: CardTitle, CardContent  from "$lib/ui/Card.svelte";
- import { onMount, onDestroy } from "svelte";
+ // Migrated to $effect
  import type { IFrame } from '@stomp/stompjs'; // Explicit actor snapshot typing to satisfy accesses to currentState.context / matches interface StreamingUpdate { step: string, status: 'pending' | 'in_progress' | 'completed' | 'error'; progress?: number; message?: string}
 
 interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: number}
 
 interface MinioStorageInfo { storageUrl: string}
 
-interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}; value: string;, matches: (state: string) => boolean}
+interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}; value: string;
+	matches: (state: string) => boolean}
 
   // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
@@ -17,7 +18,8 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
    const initialSnapshot: any = rawSnapshot || { context: value: 'idle', matches: (_: string) => false}
 
   // Local snapshot (augmented) let currentState: EvidenceActorState = { ...initialSnapshot, context: { ...(initialSnapshot.context || ): initialSnapshot?.context?.streamingUpdates ?? [], errors: initialSnapshot?.context?.errors ?? [], processingTimeMs: initialSnapshot?.context?.processingTimeMs ?? 0}
-  } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string;, routingKey: string, queue?: string}
+  } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string;
+	routingKey: string, queue?: string}
 
   // Enable if runtime provides a WS URL or endpoint hints at amqp let useRabbitMQ = !!import.meta.env?.VITE_RABBITMQ_WS_URL ?? endpoint?.startsWith('amqp');
    let rabbitConfig: RabbitMQConfig = { url: import.meta.env.VITE_RABBITMQ_WS_URL || 'ws://localhost:15674/ws', exchange: 'evidence.processing', routingKey: evidenceId}
@@ -52,7 +54,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
 
   }
   return () => { subscription?.unsubscribe && subscription.unsubscribe(); disconnectStream()}
-  }); onDestroy(() => { actor?.stop && actor.stop(); disconnectStream()}); // File handling function handleFileSelect(_event: Event) { // removed unused target assignment const files = target.file; if (files && files.length > 0) { selectedFile = files[0]}
+  }); // TODO: Add as cleanup in $effect: return () => { actor?.stop && actor.stop(); disconnectStream()} // File handling function handleFileSelect(_event: Event) { // removed unused target assignment const files = target.file; if (files && files.length > 0) { selectedFile = files[0]}
   }
   function handleFileDrop(_event: DragEvent) { event.preventDefault(); dragOver = false;
    const files = event.dataTransfer?.file; if (files && files.length > 0) { selectedFile = files[0]}
@@ -60,7 +62,10 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   function handleDragOver(_event: DragEvent) { event.preventDefault(); dragOver = true}
   function handleDragLeave(_event: DragEvent) { event.preventDefault(); dragOver = false}
 
-  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, file: {, name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz}, neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
+  // Streaming connection management async function startProcessing(): Promise<any> { if (!selectedFile) return; try { // Start streaming API connection const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({ evidenceId, file: {
+	name: selectedFile.name, type: selectedFile.type, size: selectedFile.siz},
+	neuralSpriteConfig: neuralSpriteConfig.enable_compression ?, neuralSpriteConfig: undefined }) }); if (!response.body) { throw new Error('No response stream available')}
 
       // Connect to SSE stream eventSource = new EventSource(`${ endpoint }? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 
@@ -94,7 +99,8 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
         tabindex="0"
         aria-label="Drop files here to upload or click to select files"
         class="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-gray-300"
-        class:border-blue-500={ dragOver }, class:bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
+        class:border-blue-500={ dragOver },
+	class:bg-blue-50={ dragOver } ondrop={ handleFileDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } >
         <div class="space-y-4"> <div class="text-4xl">ðŸ“„</div>
  <div> <h3 class="text-lg">Upload Legal Evidence</h3>
  <p class="text-sm text-gray-600">Drag and drop a file here, or click to select</p> </div>

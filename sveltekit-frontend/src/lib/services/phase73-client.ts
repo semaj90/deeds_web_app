@@ -9,7 +9,8 @@ import type { string } from "fast-check";
 import { Record } from "neo4j-driver";
 
 export interface ClusterData {
- clusterId: string;, clusterType: string;
+ clusterId: string;
+	clusterType: string;
  documents: string[];
  centroid?: number[];
  density?: number;
@@ -17,21 +18,26 @@ export interface ClusterData {
 }
 
 export interface RankingScore {
- documentId: string;, score: number;
+ documentId: string;
+	score: number;
  reason: string;
 }
 
 export interface Phase73SearchResult {
- documentId: string;, title: string;
- content: string;, relevance: number;
+ documentId: string;
+	title: string;
+ content: string;
+	relevance: number;
  cluster?: ClusterData;
  rankingScores?: RankingScore[];
  metadata?: Record<string, any>;
 }
 
 export interface Phase73SearchResponse {
- query: string;, results: Phase73SearchResult[];
- clusters: ClusterData[];, executionTime: number;
+ query: string;
+	results: Phase73SearchResult[];
+ clusters: ClusterData[];
+	executionTime: number;
  totalResults: number;
 }
 
@@ -103,8 +109,10 @@ export class Phase73Client {
  /**
  * Get backend health status
  */
- async getHealth(): Promise<{, status: 'healthy' | 'degraded' | 'unhealthy';
- version: string;, uptime: number;
+ async getHealth(): Promise<{
+	status: 'healthy' | 'degraded' | 'unhealthy';
+ version: string;
+	uptime: number;
  services: Record<string, boolean>;
  }> {
  return this.makeRequest('/api/health', 'GET');
@@ -157,7 +165,8 @@ export class Phase73Client {
  }
  }
 
- throw new Error(`HTTP ${response.status}, ${response.statusText}`);
+ throw new Error(`HTTP ${response.status},
+	${response.statusText}`);
  }
 
  const data = await response.json();

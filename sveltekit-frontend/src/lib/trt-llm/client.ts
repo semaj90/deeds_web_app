@@ -9,7 +9,8 @@ export interface TRTLLMRequest {
 }
 
 export interface TRTLLMResponse {
- id: string;, text: string;
+ id: string;
+	text: string;
  done: boolean;
  error?: string;
  tokens?: number;
@@ -17,7 +18,8 @@ export interface TRTLLMResponse {
 }
 
 export interface TRTLLMHealth {
- status: string;, endpoint: string;
+ status: string;
+	endpoint: string;
  model_loaded?: boolean;
  batch_size?: number;
  seq_len?: number;
@@ -37,7 +39,7 @@ export class TRTLLMClient {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify(request),
+	body: JSON.stringify(request),
  });
 
  if (!response.ok) {
@@ -54,7 +56,7 @@ export class TRTLLMClient {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify(request),
+	body: JSON.stringify(request),
  });
 
  if (!response.ok) {

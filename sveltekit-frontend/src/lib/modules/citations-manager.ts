@@ -5,9 +5,12 @@
  */
 
 export interface Citation {
-    id: string;, title: string;
-    citation: string;, court: string;
-    year: string;, category: string;
+    id: string;
+	title: string;
+    citation: string;
+	court: string;
+    year: string;
+	category: string;
     relevance: 'low' | 'medium' | 'high' | 'critical';
     keyPoints: string[];
     fullText?: string;
@@ -19,27 +22,35 @@ export interface Citation {
 }
 
 export interface SavedCitation extends Citation {
-    savedAt: Date;, userId: string;
+    savedAt: Date;
+	userId: string;
     collection?: string;
     isPrivate?: boolean;
 }
 
 export interface CitationCollection {
-    id: string;, name: string;
-    description?: string;, citations: string[]; // Citation IDs
-    userId: string;, createdAt: Date;
-    updatedAt: Date;, isShared: boolean;
+    id: string;
+	name: string;
+    description?: string;
+	citations: string[]; // Citation IDs
+    userId: string;
+	createdAt: Date;
+    updatedAt: Date;
+	isShared: boolean;
 }
 
 export interface AuthUser {
-    id: string;, email: string;
-    name: string;, role: 'attorney' | 'paralegal' | 'clerk' | 'admin' | 'judge';
+    id: string;
+	email: string;
+    name: string;
+	role: 'attorney' | 'paralegal' | 'clerk' | 'admin' | 'judge';
     isAuthenticated: boolean;
 }
 
 export interface CitationImportOptions {
     format: 'bluebook' | 'apa' | 'mla' | 'custom';
-    includeKeyPoints: boolean;, includeSummary: boolean;
+    includeKeyPoints: boolean;
+	includeSummary: boolean;
     includeNotes?: boolean;
 }
 
@@ -314,7 +325,8 @@ export class CitationsManager {
 
     // Private helper methods
     private formatBluebook(citation: Citation, options: CitationImportOptions): string {
-        let formatted = `${citation.title}, ${citation.citation} (${citation.year}).`;
+        let formatted = `${citation.title},
+	${citation.citation} (${citation.year}).`;
         if (options.includeKeyPoints && citation.keyPoints && citation.keyPoints.length > 0) {
             formatted += `\n\nKey Points: ${citation.keyPoints.join(', ')}.`;
         }
@@ -342,7 +354,8 @@ export class CitationsManager {
     }
 
     private formatMLA(citation: Citation, options: CitationImportOptions): string {
-        let formatted = `"${citation.title}." ${citation.citation}, ${citation.year}.`;
+        let formatted = `"${citation.title}." ${citation.citation},
+	${citation.year}.`;
         if (options.includeKeyPoints && citation.keyPoints && citation.keyPoints.length > 0) {
             formatted += `\n\nKey Points: ${citation.keyPoints.join(', ')}.`;
         }

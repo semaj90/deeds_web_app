@@ -42,14 +42,16 @@ export interface QdrantUpsertRequest {
 }
 
 export interface QdrantCollectionInfo {
-    status: string;, vectors_count: number;
+    status: string;
+	vectors_count: number;
     indexed_vectors_count?: number;
     points_count?: number;
 }
 
 /** HTTP client implementation (fallback) */
 export class QdrantHTTPClient {
-    baseUrl: string;, collectionName: string;
+    baseUrl: string;
+	collectionName: string;
 
     constructor(baseUrl = QDRANT_HTTP_URL, collectionName = QDRANT_COLLECTION) {
         this.baseUrl = baseUrl.replace(/\/$/, '');
@@ -74,7 +76,7 @@ export class QdrantHTTPClient {
         const resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+	body: JSON.stringify(body),
         });
         if (!resp.ok) throw new Error(`Qdrant HTTP search failed, ${resp.status}`);
         const data = await resp.json();
@@ -88,12 +90,14 @@ export class QdrantHTTPClient {
         }));
     }
 
-    async upsert(req: QdrantUpsertRequest): Promise<{, status: string }> {
+    async upsert(req: QdrantUpsertRequest): Promise<{
+	status: string }> {
         const url = `${this.collectionPath()}/points`;
         const resp = await fetch(url, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, points: req.points }),
+	body: JSON.stringify({
+	points: req.points }),
         });
         if (!resp.ok) throw new Error(`Qdrant HTTP upsert failed, ${resp.status}`);
         const data = await resp.json();
@@ -106,13 +110,15 @@ export class QdrantHTTPClient {
         if (check.ok) return;
 
         const body = {
-            vectors: {, size: VECTOR_DIMENSIONS, distance: 'Cosine' },
-            optimizers_config: {, default_segment_number: 4 },
-        };
+            vectors: {
+	size: VECTOR_DIMENSIONS, distance: 'Cosine' },
+	optimizers_config: {
+	default_segment_number: 4 },
+	};
         const create = await fetch(url, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+	body: JSON.stringify(body),
         });
         if (!create.ok) throw new Error(`Failed to create collection, ${create.status}`);
     }
@@ -141,7 +147,8 @@ export class QdrantHTTPClient {
  * this is a graceful fallback that logs and defers to the HTTP client.
  */
 export class QdrantQUICClient {
-    quicUrl: string;, collectionName: string;
+    quicUrl: string;
+	collectionName: string;
     transport: WebTransport | null = null;
 
     constructor(quicUrl = QDRANT_QUIC_URL, collectionName = QDRANT_COLLECTION) {
@@ -181,7 +188,8 @@ export class QdrantQUICClient {
 
 /** Protocol-selecting wrapper */
 export class QdrantClient {
-    httpClient: QdrantHTTPClient;, quicClient: QdrantQUICClient;
+    httpClient: QdrantHTTPClient;
+	quicClient: QdrantQUICClient;
     preferred: 'http' | 'quic' | 'grpc';
 
     constructor(preferred: 'http' | 'quic' | 'grpc' = 'http') {

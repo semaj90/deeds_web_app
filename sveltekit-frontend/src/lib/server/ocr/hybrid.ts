@@ -5,7 +5,8 @@ import { createWorker } from 'tesseract.js';
 import os from 'os';
 
 export interface OcrResult {
-    text: string;, method: 'native' | 'tesseractjs' | 'fallback';
+    text: string;
+	method: 'native' | 'tesseractjs' | 'fallback';
     error?: string;
 }
 
@@ -47,7 +48,7 @@ export async function extractTextHybrid(imageBuffer: Buffer, filename: string): 
         const worker = await createWorker('eng');
         const {
             data: { text },
-        } = await worker.recognize(tempFile);
+	} = await worker.recognize(tempFile);
         await worker.terminate();
 
         // Clean up temp file

@@ -26,7 +26,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const res = await fetch(`${baseUrl}/api/embeddings`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({, model: DEFAULT_EMBED_MODEL,
+	body: JSON.stringify({
+	model: DEFAULT_EMBED_MODEL,
                 prompt: text,
             }),
             signal: controller.signal,
@@ -54,7 +55,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const expectedDim = Number(process.env.EMBEDDING_DIM ?? 768);
         if (!Array.isArray(embedding) || embedding.length !== expectedDim) {
              // Warn but don't fail, maybe model changed
-             console.warn(`Warning: Embedding size mismatch. Expected ${expectedDim}, got ${embedding?.length}`);
+             console.warn(`Warning: Embedding size mismatch. Expected ${expectedDim},
+	got ${embedding?.length}`);
         }
 
         console.log(`✅ Embedding generated: ${embedding.length} dimensions`);

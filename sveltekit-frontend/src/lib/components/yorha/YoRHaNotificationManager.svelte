@@ -22,7 +22,8 @@
 
 <div class="notification-group notification-group-top-right">
   {#each notifications as n (n.id)}
-    <div animate: flip={{, duration: 300 }} class="pointer-events-auto">
+    <div animate: flip={{
+	duration: 300 }} class="pointer-events-auto">
       <YoRHaNotification
         id={n.id}
         type={n.type}
@@ -39,8 +40,10 @@
 <style>
   .notification-group {
     position: fixed;
-    z-index: 9999;, display: flex;
-    flex-direction: column;, gap: 12px;
+    z-index: 9999;
+	display: flex;
+    flex-direction: column;
+	gap: 12px;
     pointer-events: none;
   }
   .notification-group > :global(.yorha-notification) {
@@ -48,12 +51,14 @@
   }
   /* Position-specific stacking */
   .notification-group-top-right {
-    top: 20px;, right: 20px;
+    top: 20px;
+	right: 20px;
   }
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .notification-group-top-right {
-      top: 10px;, right: 10px;
+      top: 10px;
+	right: 10px;
       left: 10px;
     }
   }

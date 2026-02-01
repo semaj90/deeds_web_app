@@ -8,13 +8,16 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import {
-  toolRegistry: ScanRepoRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
+  toolRegistry: ScanRepoRequestSchema,
+$1;$2$1;$2$1;$2} from '../registry.js';
 
 const execAsync = promisify(exec);
 
 interface RipgrepMatch {
-  file: string;, line: number;
-  column?: number;, content: string;
+  file: string;
+	line: number;
+  column?: number;
+	content: string;
   pattern_name?: string;
   context?: string[];
 }
@@ -22,8 +25,11 @@ interface RipgrepMatch {
 async function runRipgrep(
   pattern: string,
   paths: string[],
-  options: {, caseSensitive: boolean,
-    maxResults: number, includeLineNumbers: boolean;, includeContext: number; excludes: string[];, isRegex: boolean;
+  options: {
+	caseSensitive: boolean,
+    maxResults: number, includeLineNumbers: boolean;
+	includeContext: number; excludes: string[];
+	isRegex: boolean;
   }
 ): Promise<RipgrepMatch[]> {
   const args: string[] = ['--json'];
@@ -101,7 +107,8 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     excludes: request.excludes ?? ['node_modules', '.git', 'dist']
   };
 
-  for (const patternDef of request.patterns) {patternDef.pattern: request.paths,
+  for (const patternDef of request.patterns) {
+patternDef.pattern: request.paths,
       {
         ...options,
         isRegex: patternDef.type === 'regex'
@@ -121,11 +128,12 @@ async function scanRepoHandler(request: ScanRepoRequest): Promise<ToolResult<Sca
     success: true,
     run_id: request.run_id,
     tool: 'scan_repo',
-    data: {, matches: allMatches,
+    data: {
+	matches: allMatches,
       total_matches: allMatches.length,
       files_scanned: filesScanned.size
     },
-    duration_ms: 0, // Will be set by registry
+	duration_ms: 0, // Will be set by registry
     timestamp: new Date().toISOString()
   };
 }

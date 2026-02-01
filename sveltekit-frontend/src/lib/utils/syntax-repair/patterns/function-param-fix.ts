@@ -11,7 +11,8 @@ import { createPattern, type PatternMatcher } from '../pattern-matcher';
 
 /**
  * Pattern to fix parameter lists with double colons
- * Detects: param:, Type: NextType and converts to param: Type, nextParam: NextType
+ * Detects: param:
+	Type: NextType and converts to param: Type, nextParam: NextType
  */
 export const doubleColonParamPattern: PatternMatcher = createPattern(
   'double-colon-param',
@@ -20,9 +21,10 @@ export const doubleColonParamPattern: PatternMatcher = createPattern(
   (match, param1, type1, type2) => {
     // Generate a parameter name based on the type
     const paramName = generateParamName(type2);
-    return `${param1}: ${type1.trim()}, ${paramName}: ${type2}`;
+    return `${param1}: ${type1.trim()},
+	${paramName}: ${type2}`;
   },
-  {
+	{
     priority: 20,
   }
 );
@@ -50,9 +52,10 @@ export const asyncFunctionParamPattern: PatternMatcher = createPattern(
   /async\s+(\w+)\s*\(([^)]*?):\s*([A-Z][\w<>]*)\s*:\s*([A-Z][\w<>]*)/g,
   (match, funcName, params, type1, type2) => {
     const paramName = generateParamName(type2);
-    return `async ${funcName}(${params}: ${type1}, ${paramName}: ${type2}`;
+    return `async ${funcName}(${params}: ${type1},
+	${paramName}: ${type2}`;
   },
-  {
+	{
     priority: 15,
   }
 );
@@ -66,9 +69,10 @@ export const arrowFunctionParamPattern: PatternMatcher = createPattern(
   /\(([^)]*?):\s*([\w<>\[\]|&\s]+?)\s*:\s*([\w<>\[\]|&]+)\s*\)\s*=>/g,
   (match, params, type1, type2) => {
     const paramName = generateParamName(type2);
-    return `(${params}: ${type1.trim()}, ${paramName}: ${type2}) =>`;
+    return `(${params}: ${type1.trim()},
+	${paramName}: ${type2}) =>`;
   },
-  {
+	{
     priority: 18,
   }
 );
@@ -125,7 +129,8 @@ export function getFunctionParamPatterns(): PatternMatcher[] {
 /**
  * Apply function parameter fixes to content
  */
-export function fixFunctionParams(content: string): {, result: string; fixCount: number } {
+export function fixFunctionParams(content: string): {
+	result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 

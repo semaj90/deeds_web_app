@@ -167,7 +167,7 @@ Be concise and actionable.`;
 		const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'gemma3-legal:latest',
+			body: JSON.stringify({ model: 'gemma3-legal:latest',
 				messages: [
 					{
 						role: 'system',
@@ -180,7 +180,7 @@ Be concise and actionable.`;
 					}
 				],
 				stream: false,
-				options: {, temperature: 0.4, num_predict: 500 }
+				options: { temperature: 0.4, num_predict: 500 }
 			})
 		});
 
@@ -228,7 +228,7 @@ async function generateEnhancedTag(filePath: string, analysis: any) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'nomic-embed-text:latest', // Changed to a common embedding model
+			body: JSON.stringify({ model: 'nomic-embed-text:latest', // Changed to a common embedding model
 				prompt: analysis.summary
 			})
 		});

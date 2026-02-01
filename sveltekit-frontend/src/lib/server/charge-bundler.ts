@@ -3,14 +3,18 @@
 import { type RequestEvent } from "@sveltejs/kit";
 
 export interface BundledCharge {
-	statuteCode: string;, title: string;
-	reason: string;, confidence: number;
+	statuteCode: string;
+	title: string;
+	reason: string;
+	confidence: number;
 	frequency: number; // How often filed together (0-1)
 }
 
 export interface ChargeBundle {
-	victimClass: string;, penaltyLevel: string;
-	suggestedBundles: BundledCharge[];, confidence: number;
+	victimClass: string;
+	penaltyLevel: string;
+	suggestedBundles: BundledCharge[];
+	confidence: number;
 }
 
 // Penalty classification patterns (HMM-inspired states)
@@ -80,21 +84,21 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
 			confidence: 0.95,
 			frequency: 0.85
 		},
-		{
+	{
 			statuteCode: '368',
 			title: 'Abuse of Dependent Adult/Elder',
 			reason: 'Common companion - similar victim protection',
 			confidence: 0.7,
 			frequency: 0.45
 		},
-		{
+	{
 			statuteCode: '11165.7',
 			title: 'Failure to Report Child Abuse',
 			reason: 'Enhancement - mandatory reporting violation',
 			confidence: 0.8,
 			frequency: 0.6
 		},
-		{
+	{
 			statuteCode: '148',
 			title: 'Resisting Arrest',
 			reason: 'Common companion - arrest resistance',
@@ -111,21 +115,21 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
 			confidence: 0.9,
 			frequency: 0.7
 		},
-		{
+	{
 			statuteCode: '148',
 			title: 'Resisting Arrest',
 			reason: 'Common companion - arrest resistance',
 			confidence: 0.7,
 			frequency: 0.5
 		},
-		{
+	{
 			statuteCode: '182',
 			title: 'Conspiracy',
 			reason: 'Enhancement - group crime',
 			confidence: 0.6,
 			frequency: 0.4
 		},
-		{
+	{
 			statuteCode: '12022.5',
 			title: 'Personal Use of Firearm',
 			reason: 'Enhancement - weapon allegation',
@@ -142,21 +146,21 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
 			confidence: 0.85,
 			frequency: 0.65
 		},
-		{
+	{
 			statuteCode: '148',
 			title: 'Resisting Arrest',
 			reason: 'Common companion - arrest resistance',
 			confidence: 0.6,
 			frequency: 0.35
 		},
-		{
+	{
 			statuteCode: '192',
 			title: 'Vehicular Manslaughter',
 			reason: 'Enhancement - if death results',
 			confidence: 0.4,
 			frequency: 0.15
 		},
-		{
+	{
 			statuteCode: '12022.7',
 			title: 'Great Bodily Injury Enhancement',
 			reason: 'Enhancement - serious injury',

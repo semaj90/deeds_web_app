@@ -33,7 +33,7 @@ export const GET: RequestHandler = async () => {
       // Send initial connection message
       try {
         controller.enqueue(
-          `data: ${JSON.stringify({, type: 'connected', timestamp: new Date().toISOString() })}\n\n`
+          `data: ${JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() })}\n\n`
         );
       } catch (error) {
         console.error('[SSE] Error sending connection message:', error);
@@ -78,11 +78,11 @@ export const GET: RequestHandler = async () => {
  *
  * @param data - Health change event data
  */
-export function _broadcastHealthChange(data: {, routeId: string,
-  oldStatus: string, newStatus: string;, timestamp: string;
+export function _broadcastHealthChange(data: { routeId: string,
+  oldStatus: string, newStatus: string; timestamp: string;
   reason?: string;
 }) {
-  const message = `data: ${JSON.stringify({, type: 'health_change',
+  const message = `data: ${JSON.stringify({ type: 'health_change',
     ...data,
   })}\n\n`;
 
@@ -112,12 +112,12 @@ export function _broadcastHealthChange(data: {, routeId: string,
  *
  * @param data - Error count change event data
  */
-export function _broadcastErrorCountChange(data: {, routeId: string,
+export function _broadcastErrorCountChange(data: { routeId: string,
   errorCount: number,
   warningCount?: number;
-  infoCount?: number;, timestamp: string;
+  infoCount?: number; timestamp: string;
 }) {
-  const message = `data: ${JSON.stringify({, type: 'error_count_change',
+  const message = `data: ${JSON.stringify({ type: 'error_count_change',
     ...data,
   })}\n\n`;
 

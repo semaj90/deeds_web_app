@@ -42,7 +42,8 @@ describe('DiffGenerator', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2line 2
+ };
+$1;$2line 2
 line 3
 line 4
 line 5 - ERROR
@@ -77,7 +78,8 @@ line 9`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2line 2
+ };
+$1;$2line 2
 line 3`;
 
  const fix = 'line 1 - FIXED';
@@ -99,7 +101,8 @@ line 3`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2line 2
+ };
+$1;$2line 2
 line 3 - ERROR`;
 
  const fix = 'line 3 - FIXED';
@@ -121,7 +124,8 @@ line 3 - ERROR`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2line 2
+ };
+$1;$2line 2
 line 3
 line 4
 line 5 - ERROR
@@ -146,7 +150,8 @@ line 7`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };$1;$2line 2
+ };
+$1;$2line 2
 line 3
 line 4
 line 5 - ERROR
@@ -286,7 +291,8 @@ line 7`;
  });
 
  it('should split large diffs', async () => {
- const largeContext = Array.from({ length: 100 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
+ const largeContext = Array.from({ length: 100 },
+	(_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff: Diff = {
  id: 'diff-1',
@@ -308,7 +314,8 @@ line 7`;
  });
 
  it('should preserve diff information when splitting', async () => {
- const largeContext = Array.from({ length: 100 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
+ const largeContext = Array.from({ length: 100 },
+	(_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff: Diff = {
  id: 'diff-1',
@@ -409,7 +416,16 @@ line 7`;
  'should generate valid diffs for any error and fix',
  fc.asyncProperty(
  fc.record({
- errorId: fc.string(file: fc.string(, line: fc.integer({, min: 1, max: 100 }, message: fc.string(errorId: fc.string({, minLength: 1 }, file: fc.string({, minLength: 1 }, line: fc.integer({, min: 1, max: 10 }, message: fc.string({, minLength: 1 }),
+ errorId: fc.string(file: fc.string(, line: fc.integer({
+	min: 1, max: 100 },
+	message: fc.string(errorId: fc.string({
+	minLength: 1 },
+	file: fc.string({
+	minLength: 1 },
+	line: fc.integer({
+	min: 1, max: 10 },
+	message: fc.string({
+	minLength: 1 }),
  }),
  fc.string(),
  fc.string({ minLength: 1 }),
@@ -424,7 +440,8 @@ line 7`;
  createdAt: new Date( updatedAt: new Date(),
  };
 
- const originalCode = Array.from({ length: 10 }, (_: any, i: any) => `line ${i + 1}`).join('\n');
+ const originalCode = Array.from({ length: 10 },
+	(_: any, i: any) => `line ${i + 1}`).join('\n');
 
  const diff = await generator.generateDiff(error, fix, originalCode);
 
@@ -445,7 +462,18 @@ line 7`;
  'should preserve diff information when formatting',
  fc.asyncProperty(
  fc.record({
- id: fc.string(errorId: fc.string(, file: fc.string(original: fc.string(, modified: fc.string(explanation: fc.string(, id: fc.string({, minLength: 1 }, errorId: fc.string({, minLength: 1 }, file: fc.string({, minLength: 1 }, original: fc.string({, minLength: 1 }, modified: fc.string({, minLength: 1 }, explanation: fc.string({, minLength: 1 }),
+ id: fc.string(errorId: fc.string(, file: fc.string(original: fc.string(, modified: fc.string(explanation: fc.string(, id: fc.string({
+	minLength: 1 },
+	errorId: fc.string({
+	minLength: 1 },
+	file: fc.string({
+	minLength: 1 },
+	original: fc.string({
+	minLength: 1 },
+	modified: fc.string({
+	minLength: 1 },
+	explanation: fc.string({
+	minLength: 1 }),
  }),
  async (diffData: any) => {
  const diff: Diff = {

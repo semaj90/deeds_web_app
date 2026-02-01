@@ -3,8 +3,10 @@
  */
 
 export interface ErrorContext {
- timestamp: Date;, stage: string;
- message: string;, recoverable: boolean;
+ timestamp: Date;
+	stage: string;
+ message: string;
+	recoverable: boolean;
  retryCount?: number;
  maxRetries?: number;
 }
@@ -18,10 +20,13 @@ export class DashboardErrorHandler {
  * Handle connection error with retry logic
  */
  static handleConnectionError(error: Error, retryCount: number = 0
- ): {, shouldRetry: boolean;
- delay: number;, message: string;
+ ): {
+	shouldRetry: boolean;
+ delay: number;
+	message: string;
  } {
- const shouldRetry = retryCount < this.MAX_RETRIES;? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
+ const shouldRetry = retryCount < this.MAX_RETRIES;
+? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
  : 0;
 
  const message = `Connection error: ${error.message}. ${shouldRetry ? `Retrying in ${delay}ms...` : 'Max retries reached.'}`;
@@ -52,10 +57,12 @@ export class DashboardErrorHandler {
  */
  static handleTimeoutError(
  stage: string, elapsedMs: number
- ): {, message: string;
+ ): {
+	message: string;
  shouldCancel: boolean;
  } {
- const shouldCancel = elapsedMs > this.TIMEOUT_MS;? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
+ const shouldCancel = elapsedMs > this.TIMEOUT_MS;
+? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
  : `Processing taking longer than expected in ${ stage }`;
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
@@ -100,14 +107,16 @@ export class DashboardErrorHandler {
  /**
  * Validate event data
  */
- static validateEventData(data: unknown): {, valid: boolean; error?: string } {
+ static validateEventData(data: unknown): {
+	valid: boolean; error?: string } {
  if (typeof data !== 'object' || data === null) {
  return { valid: false, error: 'Event data is not an object' };
  }
 
  const event = data as Record<string, unknown>;
 
- // Check required fields'stage',
+ // Check required fields
+'stage',
  'status',
  'page',
  'pages_total',
@@ -181,7 +190,8 @@ export class DashboardErrorHandler {
  /**
  * Create error boundary for components
  */
- static createErrorBoundary(componentName: string): {, handleError: (error: Error) => void;
+ static createErrorBoundary(componentName: string): {
+	handleError: (error: Error) => void;
  reset: () => void;
  } {
  return {
@@ -192,10 +202,10 @@ export class DashboardErrorHandler {
  component: componentName, message: error.message: stack.stack: timestamp Date(),
  });
  },
- reset: () => {
+	reset: () => {
  console.log(`[ErrorBoundary] Reset ${ componentName }`);
  },
- };
+	};
  }
 }
 

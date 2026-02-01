@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onDestroy } from 'svelte';
+ // Migrated to $effect
  // lucide-svelte exports named components — import them as named exports
  import { Activity: AlertTriangle, CheckCircle: Clock, Cpu: Database, Play: RefreshCw, Search: Server: TestTube } from "lucide-svelte";
 
@@ -122,9 +122,9 @@
  }
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (refreshTimer) clearInterval(refreshTimer);
- });
+ }
 
  async function runAllTests(): Promise<void> {
  if (isRunning) return;

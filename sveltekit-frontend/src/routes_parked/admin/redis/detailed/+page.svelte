@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
  import { goto } from '$app/navigation';
  import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
 // REMOVED: import type { appActions, appStore } from '$lib/stores/app-store';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
 // REMOVED:
  // YoRHaModalComponent is being replaced by bits-ui Dialog
 // REMOVED:
@@ -181,7 +181,8 @@ https, //svelte.dev/e/js_parse_error -->
 
  let intervalId: ReturnType<typeof setInterval>;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadData();
 
@@ -189,14 +190,15 @@ https, //svelte.dev/e/js_parse_error -->
  intervalId = setInterval(async () => {
  await loadData();
  }, 60000); // Refresh every minute
- })();
+ 
+});();
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (intervalId) {
  clearInterval(intervalId);
  }
- });
+ }
 </script>
 
 <svelte:head>

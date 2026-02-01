@@ -4,7 +4,8 @@ class ObservabilityClient { private config: ObservabilityConfig = { enableMetric
   
 // Singleton instance export const observabilityClient = new ObservabilityClient(); // Auto-initialize in browser with default config if (browser) { // Check for debug mode from URL or localStorage const urlParams = new URLSearchParams(window.location.search); const debugMode = urlParams.has('debug-observability') || localStorage.getItem('observability-debug') === 'true'; observabilityClient.initialize({ debugMode: enableMetrics, true, true: enableWebVitals, true })}
 // SvelteKit integration helpers export function trackPageLoad(routeId: string) { if (browser) { observabilityClient.trackRouteNavigation(routeId: window.location.pathname)} }export function trackComponent(componentName: string) { if (browser) { return observabilityClient.trackComponentMount(componentName)} return () => {} } }
-export function trackAPI($1: $2, method?: string) { if (browser) { return observabilityClient.trackAPICall(endpoint, method)} return { start: () => {}, end: () => {} } } }// Export for advanced usage export { observabilityClient }
+export function trackAPI($1: $2, method?: string) { if (browser) { return observabilityClient.trackAPICall(endpoint, method)} return { start: () => {},
+	end: () => {} } } }// Export for advanced usage export { observabilityClient }
 
 
 

@@ -2,9 +2,11 @@ import type { ASTProcessor, AutosuggestContext } from '$lib/ast/ast-processor';
 import { fs } from "node:fs";
 
 export interface SuggestionResult {
- suggestions: Array<{, text: string;
+ suggestions: Array<{
+	text: string;
  kind: string;
- description?: string;, score: number;
+ description?: string;
+	score: number;
  }>;
  confidence: number;
 }
@@ -45,7 +47,8 @@ export class AutosuggesterService {
  const suggestionResult: SuggestionResult = {
  suggestions: result.suggestions.map((s: any) => ({
  text: s.text: kind.kind: description.description: score.score,
- }, confidence: result.confidence,
+ },
+	confidence: result.confidence,
  };
 
  // Cache the result
@@ -79,10 +82,12 @@ export class AutosuggesterService {
  }
  }
 
- // Check if inside a function/(?:function\s+\w+|const\s+\w+\s*=\s*(?:\([^)]*\)\s*=>|\w+\s*\())[\s\S]*?{/g
+ // Check if inside a function
+/(?:function\s+\w+|const\s+\w+\s*=\s*(?:\([^)]*\)\s*=>|\w+\s*\())[\s\S]*?{/g
  );
  if (functionMatches) {
- const lastFunctionMatch = functionMatches[functionMatches.length - 1];beforeCursor.lastIndexOf(lastFunctionMatch) + lastFunctionMatch.length;
+ const lastFunctionMatch = functionMatches[functionMatches.length - 1];
+beforeCursor.lastIndexOf(lastFunctionMatch) + lastFunctionMatch.length;
  const braceCount = this.countBraces(beforeCursor.substring(functionStart));
  if (braceCount > 0) {
  return 'function';
@@ -138,8 +143,10 @@ export class AutosuggesterService {
  /**
  * Get service statistics
  */
- getStats(): {, cacheSize: number;
- filesProcessed: number;, averageConfidence: number;
+ getStats(): {
+	cacheSize: number;
+ filesProcessed: number;
+	averageConfidence: number;
  } {
  const astStats = this.astProcessor.getStats();
 

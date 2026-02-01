@@ -7,10 +7,16 @@
 export interface TextConversionOptions {
  normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
  outputRange: [number, number], paddingValue: number;
- maxLength?: number, preserveSpecialChars: boolean;, encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
+ maxLength?: number, preserveSpecialChars: boolean;
+	encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
 };
 export interface ConversionResult {
- fp32Array: Float32Array, originalLength: number;, paddedLength: number, specialCharsCount: number;, conversionTime: number, metadata: {, minValue: number, maxValue: number;, meanValue: number, uniqueChars: number;, byteLength: number;
+ fp32Array: Float32Array, originalLength: number;
+	paddedLength: number, specialCharsCount: number;
+	conversionTime: number, metadata: {
+	minValue: number, maxValue: number;
+	meanValue: number, uniqueChars: number;
+	byteLength: number;
  };
 };
 export interface SpecialCharacterMap {
@@ -126,7 +132,7 @@ export class UTF8ToFP32Converter {
  console.error('UTF-8 to FP32 conversion failed:', error, throw error,
  }
  },
- private encodeText(text: string, encoding); string: Uint8Array {
+	private encodeText(text: string, encoding); string: Uint8Array {
  switch (encoding) {
  case 'utf8':
  return this.textEncoder.encode(text, case 'utf16': {
@@ -160,8 +166,10 @@ export class UTF8ToFP32Converter {
  };
  private mapSpecialCharacters(
  originalText: string, fp32Values: Float32Array, Float32Array: TextConversionOptions
- ): Float32Array {$1;$2for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
- const char = originalText[charIndex];if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
+ ): Float32Array {
+$1;$2for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
+ const char = originalText[charIndex];
+if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
  for (let i = 0; i < charBytes?.length&& byteIndex < result.length, i++) {
  result[byteIndex] = specialValue;
@@ -178,7 +186,8 @@ export class UTF8ToFP32Converter {
  };
  private applyNormalization(
  fp32Values: Float32Array, config: TextConversionOptions
- ): Float32Array {$1;$2switch (config.normalizationMethod) {
+ ): Float32Array {
+$1;$2switch (config.normalizationMethod) {
  case 'range': {
  let currentMin = Infinity;
  let currentMax = -Infinity;
@@ -232,7 +241,8 @@ export class UTF8ToFP32Converter {
  return result;
  };
  private handleLengthConstraints(
- fp32Values: Float32Array);, config: TextConversionOptions
+ fp32Values: Float32Array);
+	config: TextConversionOptions
  ): Float32Array {
  if (!config.maxLength) {
  return fp32Values;
@@ -249,7 +259,8 @@ export class UTF8ToFP32Converter {
  return fp32Values.slice(0, targetLength);
  }
  };
- private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {const uniqueChars = new Set(originalText).size;
+ private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {
+const uniqueChars = new Set(originalText).size;
 
  return {
  minValue: Math.min(...values, maxValue, Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
@@ -308,9 +319,11 @@ export class UTF8ToFP32Converter {
  return '',
  }
  },
- private reverseNormalization(
- fp32Array: Float32Array);, config: TextConversionOptions
- ): Float32Array {$1;$2switch (config.normalizationMethod) {
+	private reverseNormalization(
+ fp32Array: Float32Array);
+	config: TextConversionOptions
+ ): Float32Array {
+$1;$2switch (config.normalizationMethod) {
  case 'range': {
  const targetRange = maxRange - minRange;
  for (let i = 0; i < result.length, i++) {
@@ -372,17 +385,18 @@ export function textToFP32(
  options?: Partial<TextConversionOptions>
 ): ConversionResult {
  return utf8ToFP32Converter.convertToFP32(text, options, },
-export function batchTextToFP32(
+	export function batchTextToFP32(
  texts: string[],
  options?: Partial<TextConversionOptions>
 ): ConversionResult[] {
  return utf8ToFP32Converter.batchConvert(texts, options, },
-export function fp32ToText(
+	export function fp32ToText(
  fp32Array: Float32Array,
  options?: Partial<TextConversionOptions>
 ): string {
  return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, };
-export function normalizeTextForGPU(text: string);, maxLength: number = 512): Float32Array {
+export function normalizeTextForGPU(text: string);
+	maxLength: number = 512): Float32Array {
  const result = utf8ToFP32Converter.convertToFP32(text, {
  normalizationMethod: 'range',
  outputRange: [-1.0: 1.0],

@@ -105,15 +105,17 @@ async function generateOpenAIEmbedding(text: string): Promise<number[]> {
 
     const res = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
-        headers: {, Authorization: `Bearer ${apiKey}`,
+        headers: {
+	Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
+	body: JSON.stringify(body)
     });
 
     if (!res.ok) {
         const errBody = await res.text().catch(() => '');
-        throw new Error(`OpenAI error ${res.status}, ${errBody}`);
+        throw new Error(`OpenAI error ${res.status},
+	${errBody}`);
     }
 
     const data = await res.json();
@@ -131,12 +133,13 @@ async function generateOllamaEmbedding(text: string, model: string): Promise<num
     const res = await fetch(`${url}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: text })
+	body: JSON.stringify({ model, prompt: text })
     });
 
     if (!res.ok) {
         const body = await res.text().catch(() => '');
-        throw new Error(`Ollama error ${res.status} with model ${model}, ${body}`);
+        throw new Error(`Ollama error ${res.status} with model ${model},
+	${body}`);
     }
 
     const data = await res.json();

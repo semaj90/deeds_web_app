@@ -8,10 +8,14 @@ import { aiRerank } from '$lib/server/ai/rerank-gemma';
 import { webEmbeddings, webPages } from '$lib/server/db/schema-web';
 
 export interface SearchResult {
-    id: string;, url: string;
-    title: string;, content: string;
-    source: string;, vectorScore: number;
-    bm25Score: number;, combinedScore: number;
+    id: string;
+	url: string;
+    title: string;
+	content: string;
+    source: string;
+	vectorScore: number;
+    bm25Score: number;
+	combinedScore: number;
     createdAt: Date;
 }
 
@@ -19,10 +23,12 @@ export async function cosineSearchWeb({
     query,
     topK = 20,
     scope,
-}: {, query: string;
+}: {
+	query: string;
     topK?: number;
     scope?: string;
-}): Promise<{, docs: SearchResult[] }> {
+}): Promise<{
+	docs: SearchResult[] }> {
     const embedding = await generateEmbedding(query, {});
     const embeddingString = `[${embedding.join(',')}]`;
 

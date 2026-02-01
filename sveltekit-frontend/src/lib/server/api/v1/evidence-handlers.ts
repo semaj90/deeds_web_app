@@ -9,8 +9,10 @@ import * as schema from '$lib/server/db/schema-postgres';
 import ollamaService from '$lib/server/services/ollama-service'; // Placeholder import
 
 interface UserType {
-	id: string;, email: string;
-	firstName: string;, lastName: string;
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
 	role: string;
 }
 
@@ -34,7 +36,8 @@ export async function getEvidence(user: UserType, request: Request, _deps: any):
 		return json({ success: true, data: evidenceItems });
 	} catch (error) {
 		console.error('Error fetching evidence:', error);
-		return json({ success: false, error: 'Failed to fetch evidence' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch evidence' },
+	{ status: 500 });
 	}
 }
 
@@ -50,13 +53,14 @@ export async function getEvidenceItem(user: UserType, evidenceId: string, _deps:
 		if (!evidenceItem) {
 			return json(
 				{ success: false, error: 'Evidence item not found or unauthorized' },
-				{ status: 404 }
+	{ status: 404 }
 			);
 		}
 		return json({ success: true, data: evidenceItem });
 	} catch (error) {
 		console.error('Error fetching evidence item:', error);
-		return json({ success: false, error: 'Failed to fetch evidence item' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch evidence item' },
+	{ status: 500 });
 	}
 }
 
@@ -64,7 +68,8 @@ export async function handleCreateEvidence(user: UserType, request: Request, _de
 	try {
 		const { title, description, fileName, mimeType, fileSize, caseId } = await request.json();
 		if (!title || !fileName) {
-			return json({ success: false, error: 'Title and filename are required' }, { status: 400 });
+			return json({ success: false, error: 'Title and filename are required' },
+	{ status: 400 });
 		}
 		const drizzleDb = db;
 
@@ -81,18 +86,20 @@ export async function handleCreateEvidence(user: UserType, request: Request, _de
 				tags: [],
 				chainOfCustody: [],
 				labAnalysis: {},
-				aiAnalysis: {},
-				aiTags: [],
+	aiAnalysis: {},
+	aiTags: [],
                 status: 'pending',
                 createdAt: new Date(),
                 updatedAt: new Date()
 			})
 			.returning();
 
-		return json({ success: true, data: newEvidence }, { status: 201 });
+		return json({ success: true, data: newEvidence },
+	{ status: 201 });
 	} catch (error) {
 		console.error('Error creating evidence:', error);
-		return json({ success: false, error: 'Failed to create evidence' }, { status: 500 });
+		return json({ success: false, error: 'Failed to create evidence' },
+	{ status: 500 });
 	}
 }
 
@@ -104,17 +111,19 @@ export async function handleEvidenceDetective(
 	try {
 		const { evidenceId, query } = await request.json();
 		if (!evidenceId || !query) {
-			return json({ success: false, error: 'Evidence ID and query are required' }, { status: 400 });
+			return json({ success: false, error: 'Evidence ID and query are required' },
+	{ status: 400 });
 		}
 		// Placeholder for evidence detective service
 		// const result = await evidenceDetectiveService.analyzeEvidence(evidenceId, query);
 		return json({
 			success: true,
 			data: { evidenceId, query, analysis: 'Placeholder detective analysis' },
-		});
+	});
 	} catch (error) {
 		console.error('Error running evidence detective:', error);
-		return json({ success: false, error: 'Failed to run evidence detective' }, { status: 500 });
+		return json({ success: false, error: 'Failed to run evidence detective' },
+	{ status: 500 });
 	}
 }
 

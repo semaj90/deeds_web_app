@@ -10,19 +10,25 @@ export enum LogLevel {
 }
 
 interface LogEntry {
-    timestamp: string;, level: LogLevel;
-    message: string;, component: string;
+    timestamp: string;
+	level: LogLevel;
+    message: string;
+	component: string;
     userId?: string;
     conversationId?: string;
     requestId?: string;
     metadata?: { [key: string]: any };
-    error?: {, name: string; message: string; stack?: string };
-    performance?: {, duration: number; memoryUsage: number };
+    error?: {
+	name: string; message: string; stack?: string };
+    performance?: {
+	duration: number; memoryUsage: number };
 }
 
 interface LoggerConfig {
-    level: LogLevel;, enableConsole: boolean;
-    enableFile: boolean;, enableDatabase: boolean;
+    level: LogLevel;
+	enableConsole: boolean;
+    enableFile: boolean;
+	enableDatabase: boolean;
     maxRetries: number;
 }
 
@@ -44,7 +50,8 @@ class Logger {
         // Process logs periodically
         setInterval(() => {
             this.processLogQueue();
-        }, 5000);
+        },
+	5000);
 
         // Process logs on exit
         if (typeof process !== 'undefined') {
@@ -102,11 +109,16 @@ class Logger {
                             timestamp, level, message, component, user_id,
                             conversation_id, request_id, metadata, error_data, performance_data
                         ) VALUES (
-                            ${log.timestamp}, ${log.level}, ${log.message}, ${log.component},
-                            ${log?.userId ?? null}, ${log?.conversationId ?? null},
-                            ${log?.requestId ?? null}, ${JSON.stringify(log?.metadata || {})},
-                            ${log.error ? JSON.stringify(log.error) : null},
-                            ${log.performance ? JSON.stringify(log.performance) : null}
+                            ${log.timestamp},
+	${log.level},
+	${log.message},
+	${log.component},
+	${log?.userId ?? null},
+	${log?.conversationId ?? null},
+	${log?.requestId ?? null},
+	${JSON.stringify(log?.metadata || {})},
+	${log.error ? JSON.stringify(log.error) : null},
+	${log.performance ? JSON.stringify(log.performance) : null}
                         )`
                     );
                 } catch (dbError) {
@@ -237,7 +249,7 @@ class Logger {
             message,
             component,
             metadata: { ...metadata },
-            error: error
+	error: error
                 ? {
                       name: error.name,
                       message: error.message,
@@ -263,7 +275,7 @@ class Logger {
             message,
             component,
             metadata: { ...metadata },
-            error: error
+	error: error
                 ? {
                       name: error.name,
                       message: error.message,

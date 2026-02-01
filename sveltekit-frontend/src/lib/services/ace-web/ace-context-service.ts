@@ -19,42 +19,56 @@ export interface ContextFilters {
 }
 
 export interface ScoredChunk {
-  id: string;, text: string;
-  docId: string;, score: number;
-  metadata: {, url: string;
+  id: string;
+	text: string;
+  docId: string;
+	score: number;
+  metadata: {
+	url: string;
     title?: string;
-    heading?: string;, fetchedAt: string;
+    heading?: string;
+	fetchedAt: string;
     domain: string;
     tags?: string[];
   };
-  scoring?: {, cosine: number;
-    freshness: number;, graph: number;
+  scoring?: {
+	cosine: number;
+    freshness: number;
+	graph: number;
   };
 }
 
 export interface ContextBundle {
-  chunks: ScoredChunk[];, entities: Array<{
-    entity: string;, type: string;
+  chunks: ScoredChunk[];
+	entities: Array<{
+    entity: string;
+	type: string;
     docId: string;
   }>;
-  edges: Array<{, src: string;
-    rel: string;, dst: string;
+  edges: Array<{
+	src: string;
+    rel: string;
+	dst: string;
     weight: number;
   }>;
-  summary: string;, totalResults: number;
+  summary: string;
+	totalResults: number;
 }
 
 export interface ToolAction {
-  tool: string;, params: Record<string, unknown>;
+  tool: string;
+	params: Record<string, unknown>;
   reason: string;
 }
 
 export interface ToolPlan {
-  actions: ToolAction[];, shouldProceed: boolean;
+  actions: ToolAction[];
+	shouldProceed: boolean;
 }
 
 export interface PromptParams {
-  query: string;, bundle: ContextBundle;
+  query: string;
+	bundle: ContextBundle;
   plan: ToolPlan;
   systemRules?: string;
   projectRules?: string;
@@ -96,11 +110,13 @@ export class AceContextService {
    * Build context bundle with RAG + KAG
    * Implements hybrid scoring: 0.65*cosine + 0.10*freshness + 0.05*graph
    */
-  async buildContextBundle(params: {, query: string,
+  async buildContextBundle(params: {
+	query: string,
     filters?: ContextFilters,
     limit?: number;
   }): Promise<ContextBundle> {
-    const { query, filters = {}, limit = 10 } = params;
+    const { query, filters = {},
+	limit = 10 } = params;
 
     console.log(`[AceContextService] Building context bundle for query: "${query}"`);
 
@@ -212,7 +228,8 @@ export class AceContextService {
       // User formula: 0.65*cosine + 0.10*freshness + 0.05*graph.
       // Assuming components are 0-1 range.
       // The weights sum to 0.8. Maybe missing text match weight?
-      // I'll stick to provided formula logic.this.COSINE_WEIGHT * cosineSim +
+      // I'll stick to provided formula logic.
+this.COSINE_WEIGHT * cosineSim +
         this.FRESHNESS_WEIGHT * freshnessBoost +
         this.GRAPH_WEIGHT * graphBoost;
 
@@ -221,18 +238,20 @@ export class AceContextService {
         text: chunk.text,
         docId: chunk.docId,
         score: finalScore,
-        metadata: {, url: metadata?.url ?? '',
+        metadata: {
+	url: metadata?.url ?? '',
           title: metadata.title,
           heading: metadata.heading,
           fetchedAt: metadata?.fetchedAt|| now.toISOString(),
           domain: metadata?.domain ?? 'unknown',
           tags: metadata.tags
         },
-        scoring: {, cosine: cosineSim,
+	scoring: {
+	cosine: cosineSim,
           freshness: freshnessBoost,
           graph: graphBoost,
         },
-      };
+	};
     });
   }
 
@@ -254,7 +273,7 @@ export class AceContextService {
       actions.push({
         tool: 'web_search',
         params: { query },
-        reason: `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
+	reason: `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
       });
     }
 
@@ -265,8 +284,9 @@ export class AceContextService {
         // Only trigger search if we really lack content
         actions.push({
             tool: 'web_search',
-            params: {, query: this.refineQuery(query) },
-            reason: `Insufficient relevant context found (${relevantChunks.length}/${this.MIN_RELEVANT_CHUNKS} required)`,
+            params: {
+	query: this.refineQuery(query) },
+	reason: `Insufficient relevant context found (${relevantChunks.length}/${this.MIN_RELEVANT_CHUNKS} required)`,
         });
     }
 
@@ -275,11 +295,12 @@ export class AceContextService {
       actions.push({
         tool: 'web_search',
         params: { query },
-        reason: 'No context found in knowledge base',
+	reason: 'No context found in knowledge base',
       });
     }
 
-    // De-duplicate actions based on tool and queryindex === self.findIndex((a: any) => (
+    // De-duplicate actions based on tool and query
+index === self.findIndex((a: any) => (
             a.tool === action?.tool&&
             JSON.stringify(a.params) === JSON.stringify(action.params)
         ))
@@ -328,7 +349,9 @@ export class AceContextService {
       sections.push(`**Relevance:** ${(chunk.score * 100).toFixed(1)}%`);
       if (chunk.scoring) {
         sections.push(
-          `**Scoring:** Cosine=${chunk.scoring.cosine.toFixed(2)}, Freshness=${chunk.scoring.freshness.toFixed(2)}, Graph=${chunk.scoring.graph.toFixed(2)}`
+          `**Scoring:** Cosine=${chunk.scoring.cosine.toFixed(2)},
+	Freshness=${chunk.scoring.freshness.toFixed(2)},
+	Graph=${chunk.scoring.graph.toFixed(2)}`
         );
       }
       sections.push(`\`\`\`\n${chunk.text}\n\`\`\`\n`);
@@ -377,29 +400,33 @@ export class AceContextService {
     if (filters.domain) {
       conditions.push({
         key: 'domain',
-        match: {, value: filters.domain },
-      });
+        match: {
+	value: filters.domain },
+	});
     }
 
     if (filters.dateFrom) {
       conditions.push({
         key: 'fetchedAt',
-        range: {, gte: filters.dateFrom.toISOString() },
-      });
+        range: {
+	gte: filters.dateFrom.toISOString() },
+	});
     }
 
     if (filters.dateTo) {
       conditions.push({
         key: 'fetchedAt',
-        range: {, lte: filters.dateTo.toISOString() },
-      });
+        range: {
+	lte: filters.dateTo.toISOString() },
+	});
     }
 
     if (filters?.tags&& filters.tags.length > 0) {
       conditions.push({
         key: 'tags',
-        match: {, any: filters.tags },
-      });
+        match: {
+	any: filters.tags },
+	});
     }
 
     return conditions.length > 0 ? { must, conditions } : undefined;
@@ -434,7 +461,8 @@ export class AceContextService {
         );
       }
 
-      // Query with vector similarity.select({
+      // Query with vector similarity
+.select({
           id: aceChunks.id,
           score: sql<number>`1 - (${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector)`,
           payload: aceChunks.metadata,
@@ -457,7 +485,8 @@ export class AceContextService {
       }
 
       // Order by similarity and limit
-      // Note: <=> is distance, so order by distance ASC.orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
+      // Note: <=> is distance, so order by distance ASC
+.orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
         .limit(limit);
 
       console.log(`[AceContextService] pgvector returned ${results.length} results`);
@@ -481,7 +510,8 @@ export class AceContextService {
       return [];
     }
 
-    try {.select({
+    try {
+.select({
           entity: aceEntities.entity,
           type: aceEntities.entityType,
           docId: aceEntities.docId,
@@ -511,7 +541,8 @@ export class AceContextService {
         return [];
       }
 
-      // Find edges where source or destination matches query entities.select({
+      // Find edges where source or destination matches query entities
+.select({
           src: aceEdges.srcEntity,
           rel: aceEdges.rel,
           dst: aceEdges.dstEntity,
@@ -542,7 +573,8 @@ export class AceContextService {
    */
   private extractEntities(text: string): string[] {
     // Split on spaces and filter for meaningful words (>3 chars)
-    // Remove punctuation.split(/\s+/)
+    // Remove punctuation
+.split(/\s+/)
       .map((w: any) => w.replace(/[^a-zA-Z0-9]/g, ''))
       .filter((w: any) => w.length > 3);
 

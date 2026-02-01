@@ -16,22 +16,26 @@ export interface TransactionOptions {
 }
 
 export interface TransactionContext {
-	transactionId: string;, startTime: Date;
+	transactionId: string;
+	startTime: Date;
 	userId?: string;
-	sessionId?: string;, locks: LockRecord[];
+	sessionId?: string;
+	locks: LockRecord[];
 	metadata?: Record<string, unknown>;
 }
 
 // Typed representation of locks tracked by the transaction manager
 export type LockRecord = {
-	entityType: LockType;, entityId: string;
+	entityType: LockType;
+	entityId: string;
 	mode: LockMode;
 };
 
 // Health check return type
 export interface HealthCheckResult {
 	activeTransactions: number;
-	oldestTransaction?: {, id: string; age: number };
+	oldestTransaction?: {
+	id: string; age: number };
 	locksHeld: number;
 }
 
@@ -117,7 +121,8 @@ export class TransactionManager {
 					console.warn(`Warning, releaseLock failed for ${entityType}:${entityId}: `, err);
 				}
 			}
-		}, options);
+		},
+	options);
 	}
 
     // ... [Rest of methods preserved but simplified for brevity in this fix if they were correct]

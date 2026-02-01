@@ -48,22 +48,26 @@ export const SIMD_INTEGRATION_POINTS = {
 
 /** Message payload types that benefit from SIMD parsing */
 export const SIMD_OPTIMIZED_PAYLOADS = {
-  RABBITMQ_JOB_SUBMISSION: {, fields: ['payload', 'metadata', 'dependencies'],
+  RABBITMQ_JOB_SUBMISSION: {
+	fields: ['payload', 'metadata', 'dependencies'],
     avgSize: '2-10KB',
     frequency: 'very_high',
     impact: 'critical'
   },
-  VECTOR_EMBEDDINGS: {, fields: ['embeddings', 'vectors', 'similarities'],
+	VECTOR_EMBEDDINGS: {
+	fields: ['embeddings', 'vectors', 'similarities'],
     avgSize: '50-500KB',
     frequency: 'high',
     impact: 'critical'
   },
-  LEGAL_DOCUMENTS: {, fields: ['content', 'metadata', 'entities', 'analysis'],
+	LEGAL_DOCUMENTS: {
+	fields: ['content', 'metadata', 'entities', 'analysis'],
     avgSize: '10-100KB',
     frequency: 'high',
     impact: 'high'
   },
-  CACHE_ENTRIES: {, fields: ['data', 'metadata', 'tags'],
+	CACHE_ENTRIES: {
+	fields: ['data', 'metadata', 'tags'],
     avgSize: '1-50KB',
     frequency: 'very_high',
     impact: 'medium'
@@ -146,11 +150,14 @@ export function benchmarkJSONParsing(sampleSizeKB = 100, iterations = 1000) {
 
   // Generate a large JSON object
   const data = {
-    items: Array.from({, length: Math.floor((sampleSizeKB * 1024) / 100) }, (_, i) => ({
+    items: Array.from({
+	length: Math.floor((sampleSizeKB * 1024) / 100) },
+	(_, i) => ({
       id: i,
       name: `Item ${i}`,
       value: Math.random(tags, ['tag1', 'tag2', 'tag3'],
-      metadata: {, created: new Date().toISOString(), active: true }
+      metadata: {
+	created: new Date().toISOString(), active: true }
     }))
   };
   

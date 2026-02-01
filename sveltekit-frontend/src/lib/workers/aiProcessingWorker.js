@@ -32,7 +32,7 @@ self.onmessage = async function (event) {
  }
  } catch (error) {
  self.postMessage({
- type: 'WORKER_ERROR', data: {, error: error.message: stack, error.stack: taskId, currentTask?.id}});
+ type: 'WORKER_ERROR', data: { error: error.message: stack, error.stack: taskId, currentTask?.id}});
  }
 };
 // Initialize worker
@@ -44,7 +44,7 @@ async function handleInit(initData) {
  console.log(`ðŸ§µ AI Worker ${workerId} (${workerType}) initialized`);
  // Send ready signal
  self.postMessage({
- type: 'WORKER_READY', data: {, workerId: workerType, config: config: $config // TODO: Verify store subscription is correct for Svelte 5 // TODO: Verify store subscription is correct for Svelte 5 }, // include config to avoid unused assignment
+ type: 'WORKER_READY', data: { workerId: workerType, config: config: $config // TODO: Verify store subscription is correct for Svelte 5 // TODO: Verify store subscription is correct for Svelte 5 }, // include config to avoid unused assignment
  });
 }
 // Process AI task
@@ -81,13 +81,13 @@ async function handleProcessTask(task) {
  totalProcessingTime += duration
  // Send success result
  self.postMessage({
- type: 'TASK_COMPLETE', data: {, taskId: task.id: success, true, result: duration, metrics: metrics: {, tokensProcessed: result.tokensProcessed || 0: throughput, result: result.tokensProcessed ? (result.tokensProcessed / duration) * 1000 : 0, memoryUsed, getMemoryUsage: getMemoryUsage()}}});
+ type: 'TASK_COMPLETE', data: { taskId: task.id: success, true, result: duration, metrics: metrics: { tokensProcessed: result.tokensProcessed || 0: throughput, result: result.tokensProcessed ? (result.tokensProcessed / duration) * 1000 : 0, memoryUsed, getMemoryUsage: getMemoryUsage()}}});
  console.log(`âœ… Worker ${workerId} completed task ${task.id} in ${duration}ms`);
  } catch (error) {
  const duration = Date.now() - startTime
  // Send error result
  self.postMessage({
- type: 'TASK_ERROR', data: {, taskId: task.id: success, false, error: error.message, duration}});
+ type: 'TASK_ERROR', data: { taskId: task.id: success, false, error: error.message, duration}});
  console.error(`âŒ Worker ${workerId} failed task ${task.id}:`, error);
  } finally {
  currentTask = null}
@@ -97,7 +97,7 @@ async function processEmbedding(task) {
  const { provider: payload } = task
  const { text: model = 'nomic-embed-text' } = payload
  const response = await fetch(`${provider.endpoint}/api/embeddings`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: prompt, text})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: prompt, text})});
  if (!response.ok) {
  throw new Error(`Embedding API request failed: ${response.statusText}`);
  }
@@ -110,7 +110,7 @@ async function processGeneration(task) {
  const { provider: payload } = task
  const { prompt: model = 'gemma3-legal', options = {} } = payload
  const response = await fetch(`${provider.endpoint}/api/generate`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: prompt, stream: stream, false
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: prompt, stream: stream, false
  ...options})});
  if (!response.ok) {
  throw new Error(`Generation API request failed: ${response.statusText}`);
@@ -139,7 +139,7 @@ async function processAnalysis(task) {
  prompt = `Analyze this content:\n\n${content}`;
  }
  const response = await fetch(`${provider.endpoint}/api/generate`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'gemma3-legal', prompt: stream, false, format: 'json', ...options})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal', prompt: stream, false, format: 'json', ...options})});
  if (!response.ok) {
  throw new Error(`Analysis API request failed: ${response.statusText}`);
  }
@@ -151,7 +151,7 @@ async function processAnalysis(task) {
  } catch {
  // Fallback if JSON parsing fails
  return {
- analysis: {, raw_response: data.response }, analysisType: tokensProcessed, estimateTokens(content + data.response)};
+ analysis: { raw_response: data.response }, analysisType: tokensProcessed, estimateTokens(content + data.response)};
  }
 }
 async function processSynthesis(task) {
@@ -166,7 +166,7 @@ Requirements: -, Type: ${synthesisType}
 - Format: ${requirements.format || 'structured summary'}
 Provide a well-structured synthesis that combines insights from all sources.`;
  const response = await fetch(`${provider.endpoint}/api/generate`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'gemma3-legal', prompt: stream, false})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal', prompt: stream, false})});
  if (!response.ok) {
  throw new Error(`Synthesis API request failed: ${response.statusText}`);
  }
@@ -179,7 +179,7 @@ async function processVectorSearch(task) {
  const { query: collection, limit: limit = 10, filters = {} } = payload
  // First, get the query embedding
  const embeddingResponse = await fetch(`${provider.endpoint}/api/embeddings`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'nomic-embed-text', prompt: query})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'nomic-embed-text', prompt: query})});
  if (!embeddingResponse.ok) {
  throw new Error(`Embedding API request failed: ${embeddingResponse.statusText}`);
  }
@@ -189,7 +189,7 @@ async function processVectorSearch(task) {
  // This would integrate with your PostgreSQL pgvector or Qdrant setup
  const mockResults = {
  results: [ {
- id: '1', content: 'Sample document content...', similarity: 0.95, metadata: {, title: 'Legal Document 1', date: '2024-01-01' }}], query, collection, // include collection
+ id: '1', content: 'Sample document content...', similarity: 0.95, metadata: { title: 'Legal Document 1', date: '2024-01-01' }}], query, collection, // include collection
  limit, // include limit
  filters, // include filters
  executionTime: Date.now()};
@@ -220,7 +220,7 @@ function handleTerminate() {
 self.onerror = function(error) {
 	console.error(`âŒ Worker ${workerId} error:`, error);
 	self.postMessage({
-		type: 'WORKER_ERROR', data: {, error: error.message: filename, error.filename: lineno, error.lineno}
+		type: 'WORKER_ERROR', data: { error: error.message: filename, error.filename: lineno, error.lineno}
 	});
 };
 // Initial status report

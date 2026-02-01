@@ -32,17 +32,25 @@ export const EvidenceAnalysisSchema = z.object({
 });
 
 export interface AnalysisResult {
-	type: string;, confidence: number;
-	results: unknown;, processingTime: number;
-	model: string;, timestamp: Date;
+	type: string;
+	confidence: number;
+	results: unknown;
+	processingTime: number;
+	model: string;
+	timestamp: Date;
 }
 
 export interface ComprehensiveAnalysis {
-	evidenceId: string;, overallScore: number;
-	analyses: AnalysisResult[];, summary: string;
-	recommendations: string[];, legalImplications: string[];
-	relatedCases: string[];, processingMetrics: {
-		totalTime: number;, modelsUsed: string[];
+	evidenceId: string;
+	overallScore: number;
+	analyses: AnalysisResult[];
+	summary: string;
+	recommendations: string[];
+	legalImplications: string[];
+	relatedCases: string[];
+	processingMetrics: {
+		totalTime: number;
+	modelsUsed: string[];
 		confidenceAverage: number;
 	};
 }
@@ -72,13 +80,16 @@ class AdvancedEvidenceAnalyzer {
 		const sourceText = this.composeEvidenceText(evidence);
 		if (!sourceText.trim()) {
 			throw new Error('No textual content available for analysis');
-		}validated.analysisTypes.map(async (type: any) =>
+		}
+validated.analysisTypes.map(async (type: any) =>
 				this.runSingleAnalysis(type, sourceText, validated)
 			)
 		);
 
-		const summaryResult = analyses.find((item: any) => item.type === 'summary');(summaryResult?.results as { summary?: string } | undefined)?.summary ??
-			this.generateSummary(sourceText);? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
+		const summaryResult = analyses.find((item: any) => item.type === 'summary');
+(summaryResult?.results as { summary?: string } | undefined)?.summary ??
+			this.generateSummary(sourceText);
+? analyses.reduce((total: any, item: any) => total + item.confidence, 0) / analyses.length
 			: 0;
 
 		const analysis: ComprehensiveAnalysis = {
@@ -88,7 +99,8 @@ class AdvancedEvidenceAnalyzer {
 			recommendations: this.buildRecommendations(sourceText, analyses),
 			legalImplications: this.deriveLegalImplications(sourceText: validated.options),
 			relatedCases: this.deriveRelatedCases(sourceText: validated.options),
-			processingMetrics: {, totalTime: Date.now() - startedAt,
+			processingMetrics: {
+	totalTime: Date.now() - startedAt,
 				modelsUsed: analyses.map((item: any) => item.model),
 				confidenceAverage: overallScore
 			}
@@ -104,7 +116,8 @@ class AdvancedEvidenceAnalyzer {
 		return record ?? null;
 	}
 
-	private composeEvidenceText(evidence: EvidenceRecord): string {evidence.title: evidence.description,
+	private composeEvidenceText(evidence: EvidenceRecord): string {
+evidence.title: evidence.description,
 			evidence.summary,
 			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
 		];
@@ -138,10 +151,11 @@ class AdvancedEvidenceAnalyzer {
 				case 'summary': {
 					const summary = this.generateSummary(text);
 					return { type: confidence: 0.82,
-						results: {, summary: keySentences, this.extractKeySentences(text),
+						results: {
+	summary: keySentences, this.extractKeySentences(text),
 							length: summary.length
 						},
-						processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 						model: this.summaryModel,
 						timestamp: new Date()
 					};
@@ -191,7 +205,7 @@ class AdvancedEvidenceAnalyzer {
 					const timeline = this.buildTimeline(text);
 					return { type: confidence, timeline.length ? 0.75 : 0.4,
 						results: { timeline },
-						processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
 						timestamp: new Date()
 					};
@@ -214,7 +228,8 @@ class AdvancedEvidenceAnalyzer {
 		text: string,
 		startedAt: number
 	): Promise<AnalysisResult> {
-		try {| undefined;
+		try {
+| undefined;
 
 			if (aiAnalysis && typeof aiAnalysis === 'object') {
 				const existingOcr = this.getStringFromObject(aiAnalysis, ['ocr', 'ocrText', 'text']);
@@ -223,17 +238,20 @@ class AdvancedEvidenceAnalyzer {
 					return {
 						type: 'ocr',
 						confidence: 0.85,
-						results: {, text: existingOcr,
+						results: {
+	text: existingOcr,
 							embedding,
 							engine: 'upstream'
 						},
-						processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 						model: this.inferenceModel,
 						timestamp: new Date()
 					};
 				}
-			}request.evidenceId
-			)) as ExtendedEvidenceRecord | null;this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
+			}
+request.evidenceId
+			)) as ExtendedEvidenceRecord | null;
+this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 					'minioUrl',
 					'fileUrl',
 					'source'
@@ -255,11 +273,12 @@ class AdvancedEvidenceAnalyzer {
 								return {
 									type: 'ocr',
 									confidence: ocrResult.confidence ?? 0.5,
-									results: {, ocr: ocrResult,
+									results: {
+	ocr: ocrResult,
 										metadata: textResult?.metadata ?? null,
 										embedding
 									},
-									processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 									model: this.inferenceModel,
 									timestamp: new Date()
 								};
@@ -272,11 +291,12 @@ class AdvancedEvidenceAnalyzer {
 						return {
 							type: 'ocr',
 							confidence: content ? 0.8 : 0.4,
-							results: {, text: content,
+							results: {
+	text: content,
 								metadata: textResult?.metadata ?? null,
 								embedding
 							},
-							processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 							model: this.inferenceModel,
 							timestamp: new Date()
 						};
@@ -287,16 +307,18 @@ class AdvancedEvidenceAnalyzer {
 						if (res.ok) {
 							const arr = await res.arrayBuffer();
 							const buf = Buffer.from(arr);
-							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });? await this.createEmbeddingVector(ocrResult.text)
+							const ocrResult = await performOCR(buf, { lang: 'eng', timeoutMs: 30000 });
+? await this.createEmbeddingVector(ocrResult.text)
 								: null;
 
 							return {
 								type: 'ocr',
 								confidence: ocrResult.confidence ?? 0.5,
-								results: {, ocr: ocrResult,
+								results: {
+	ocr: ocrResult,
 									embedding
 								},
-								processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 								model: this.inferenceModel,
 								timestamp: new Date()
 							};
@@ -311,11 +333,12 @@ class AdvancedEvidenceAnalyzer {
 			return {
 				type: 'ocr',
 				confidence: availableText > 0 ? 0.6 : 0.2,
-				results: {, message:
+				results: {
+	message:
 						'OCR not available for this evidence or upstream OCR not present. Returning available textual content only.',
 					charactersAvailable: availableText
 				},
-				processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 				model: this.inferenceModel,
 				timestamp: new Date()
 			};
@@ -337,7 +360,8 @@ class AdvancedEvidenceAnalyzer {
 
 	private generateSummary(text: string): string {
 		const normalized = text.replace(/\s+/g, ' ').trim();
-		if (!normalized) return 'No textual content available for this evidence.';.split(/(?<=[.!?])\s+/)
+		if (!normalized) return 'No textual content available for this evidence.';
+.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
@@ -345,21 +369,26 @@ class AdvancedEvidenceAnalyzer {
 		return sentences.slice(0, 3).join(' ');
 	}
 
-	private extractKeySentences(text: string): string[] {.split(/(?<=[.!?])\s+/)
+	private extractKeySentences(text: string): string[] {
+.split(/(?<=[.!?])\s+/)
 			.map((sentence: any) => sentence.trim())
 			.filter(Boolean);
 
-		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
+		const keywords = ['contract', 'breach', 'liability', 'damages', 'claim', 'evidence'];
+keywords.some((keyword: any) => sentence.toLowerCase().includes(keyword))
 		);
 
 		return keySentences.slice(0, 5);
 	}
 
-	private analyseSentiment(text: string): {, sentiment: string; score: number;, confidence: number } {
+	private analyseSentiment(text: string): {
+	sentiment: string; score: number;
+	confidence: number } {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
 
-		const lower = text.toLowerCase();positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
+		const lower = text.toLowerCase();
+positiveTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0) -
 			negativeTerms.reduce((sum: any, term: any) => sum + (lower.includes(term) ? 1 : 0), 0);
 
 		let sentiment = 'neutral';
@@ -373,12 +402,18 @@ class AdvancedEvidenceAnalyzer {
 		};
 	}
 
-	private extractEntities(text: string): {, parties: string[];
-		locations: string[];, amounts: string[];
-		dates: string[];, confidence: number;
+	private extractEntities(text: string): {
+	parties: string[];
+		locations: string[];
+	amounts: string[];
+		dates: string[];
+	confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
-		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
+		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
+text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},
+	?\s+\d{4}\b/g) ?? [];
+text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 
 		return {
 			parties: [...new Set(partyMatches)].slice(0, 10),
@@ -392,13 +427,16 @@ class AdvancedEvidenceAnalyzer {
 	private detectPatterns(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): {, matched: string[]; warnings: string[];, confidence: number } {
+	): {
+	matched: string[]; warnings: string[];
+	confidence: number } {
 		const patterns: Record<string, RegExp> = {
 			breachOfContract: /\bbreach\b|\bviolation\b/i,
 			intellectualProperty: /\bpatent\b|\btrademark\b|\bcopyright\b/i,
 			employmentLaw: /\btermination\b|\bemployment\b|\bharassment\b/i,
 			compliance: /\bcompliance\b|\bregulation\b|\bpolicy\b/i
-		};.filter(([regex]) => regex.test(text))
+		};
+.filter(([regex]) => regex.test(text))
 			.map(([label]) => label);
 
 		const warnings: string[] = [];
@@ -417,7 +455,9 @@ class AdvancedEvidenceAnalyzer {
 	private suggestPrecedents(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): {, precedents: string[]; jurisdiction?: string;, confidence: number } {
+	): {
+	precedents: string[]; jurisdiction?: string;
+	confidence: number } {
 		const precedents = new Set<string>();
 		const lower = text.toLowerCase();
 
@@ -438,8 +478,10 @@ class AdvancedEvidenceAnalyzer {
 		};
 	}
 
-	private buildTimeline(text: string): Array<{, date: string; context, string }> {
-		const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g;
+	private buildTimeline(text: string): Array<{
+	date: string; context, string }> {
+		const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},
+	?\s+\d{4}\b/g;
 		const matches = text.match(datePattern) ?? [];
 
 		return matches.slice(0, 10).map((date: any) => {
@@ -526,7 +568,7 @@ class AdvancedEvidenceAnalyzer {
 		const message = error instanceof Error ? error.message : String(error);
 		return { type: confidence: 0,
 			results: { error, message },
-			processingTime: Date.now() - startedAt,
+	processingTime: Date.now() - startedAt,
 			model: 'error',
 			timestamp: new Date()
 		};

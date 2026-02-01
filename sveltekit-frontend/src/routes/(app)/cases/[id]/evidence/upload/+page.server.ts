@@ -75,4 +75,4 @@ export const actions: Actions = {
  throw error(500, 'Upload failed');
  }
  },
-};
+	};

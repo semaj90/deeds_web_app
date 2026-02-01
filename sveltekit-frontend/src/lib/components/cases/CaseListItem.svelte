@@ -9,8 +9,10 @@
   import User from "lucide-svelte/icons/user";
 
   interface CaseData {
-    id: string;, title: string;
-    caseNumber: string;, status: 'open' | 'in_progress' | 'closed' | 'archived';
+    id: string;
+	title: string;
+    caseNumber: string;
+	status: 'open' | 'in_progress' | 'closed' | 'archived';
     priority: 'low' | 'medium' | 'high' | 'urgent';
     openedAt: string | Date;
     defendantName?: string;

@@ -1,7 +1,7 @@
 <!-- YoRHa System Status Bar, Component -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
 
   let { systemLoad = 42, gpuUtilization = 15, memoryUsage = 33, networkLatency = 24 } = $props();
 
@@ -19,7 +19,8 @@
   });
 
   let interval: any;
-  onMount(() => {
+  $effect(() => {
+
     interval = setInterval(() => {
       currentTime = new Date();
       uptime += 1;
@@ -28,19 +29,21 @@
       cpuTemp = Math.max(60, Math.min(85, cpuTemp + (Math.random() - 0.5) * 2));
       diskUsage = Math.max(40, Math.min(60, diskUsage + (Math.random() - 0.5) * 1));
       activeConnections = Math.max(8, Math.min(20, activeConnections + Math.floor((Math.random() - 0.5) * 3)));
-    }, 1000);
+    },
+	1000);
 
     return () => {
       if (interval) clearInterval(interval);
     }
-  });
+  
+});
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (interval) {
       clearInterval(interval);
       interval = null;
     }
-  });
+  }
 
   function formatUptime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);

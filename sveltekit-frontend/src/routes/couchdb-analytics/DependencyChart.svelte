@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as d3Import from 'd3';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const d3 = d3Import as any;
@@ -129,9 +129,11 @@
 			.text('Import Count');
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadDependencies();
-	});
+	
+});
 
 	$effect(() => {
 		if (chartContainer && dependencies.length > 0) {

@@ -9,16 +9,16 @@
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'review', label: 'Under Review' },
-    { value: 'closed', label: 'Closed' }
+	{ value: 'active', label: 'Active' },
+	{ value: 'review', label: 'Under Review' },
+	{ value: 'closed', label: 'Closed' }
   ];
 
   const priorityOptions = [
     { value: 'all', label: 'All Priority' },
-    { value: 'high', label: 'High' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'low', label: 'Low' }
+	{ value: 'high', label: 'High' },
+	{ value: 'medium', label: 'Medium' },
+	{ value: 'low', label: 'Low' }
   ];
 
   function applyFilters() {

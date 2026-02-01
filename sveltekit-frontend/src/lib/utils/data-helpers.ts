@@ -87,7 +87,8 @@ export class ApiClient {
         }
     }
 
-    async request<T = unknown>(endpoint: string, options?: RequestInit & ApiOptions): Promise<{, data: T | null, success: boolean, error?: string }> {
+    async request<T = unknown>(endpoint: string, options?: RequestInit & ApiOptions): Promise<{
+	data: T | null, success: boolean, error?: string }> {
         const { useCache = false, cacheTtl = 5 * 60 * 1000, retries = 1, timeout = 10000, signal, ...fetchOptions } = options || {};
         const url = `${this.baseUrl}${endpoint}`;
         const method = (fetchOptions.method as string) ?? 'GET';
@@ -142,19 +143,23 @@ export class ApiClient {
         return { data: null, success: false, error: (lastError as Error)?.message ?? 'Request failed' };
     }
 
-    async get<T = unknown>(endpoint: string, options?: ApiOptions): Promise<{, data: T | null, success: boolean, error?: string }> {
+    async get<T = unknown>(endpoint: string, options?: ApiOptions): Promise<{
+	data: T | null, success: boolean, error?: string }> {
         return this.request<T>(endpoint, { method: 'GET', ...(options as RequestInit & ApiOptions) });
     }
 
-    async post<T = unknown>(endpoint: string, body?: unknown, options?: ApiOptions): Promise<{, data: T | null, success: boolean, error?: string }> {
+    async post<T = unknown>(endpoint: string, body?: unknown, options?: ApiOptions): Promise<{
+	data: T | null, success: boolean, error?: string }> {
         return this.request<T>(endpoint, { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body), ...(options as RequestInit & ApiOptions) });
     }
 
-    async put<T = unknown>(endpoint: string, body?: unknown, options?: ApiOptions): Promise<{, data: T | null, success: boolean, error?: string }> {
+    async put<T = unknown>(endpoint: string, body?: unknown, options?: ApiOptions): Promise<{
+	data: T | null, success: boolean, error?: string }> {
         return this.request<T>(endpoint, { method: 'PUT', body: typeof body === 'string' ? body : JSON.stringify(body), ...(options as RequestInit & ApiOptions) });
     }
 
-    async delete<T = unknown>(endpoint: string, options?: ApiOptions): Promise<{, data: T | null, success: boolean, error?: string }> {
+    async delete<T = unknown>(endpoint: string, options?: ApiOptions): Promise<{
+	data: T | null, success: boolean, error?: string }> {
         return this.request<T>(endpoint, { method: 'DELETE', ...(options as RequestInit & ApiOptions) });
     }
 }
@@ -175,7 +180,8 @@ export interface ValidationSchema {
 }
 
 export interface ValidationResult {
-    isValid: boolean;, errors: Record<string, string>;
+    isValid: boolean;
+	errors: Record<string, string>;
 }
 
 export function validateData(data: Record<string, unknown>, schema: ValidationSchema): ValidationResult {
@@ -213,26 +219,39 @@ export function validateData(data: Record<string, unknown>, schema: ValidationSc
 
 // Common validation schemas
 export const validationSchemas = {
-    case: {, title: { required: true, minLength: 3, maxLength: 200 },
-        description: {, maxLength: 2000 },
-        category: {, required: true },
-        priority: {, required: true }
+    case: {
+	title: { required: true, minLength: 3, maxLength: 200 },
+	description: {
+	maxLength: 2000 },
+	category: {
+	required: true },
+	priority: {
+	required: true }
     } as ValidationSchema,
-    evidence: {, title: { required: true, minLength: 3, maxLength: 200 },
-        type: {, required: true },
-        caseId: {, required: true }
+    evidence: {
+	title: { required: true, minLength: 3, maxLength: 200 },
+	type: {
+	required: true },
+	caseId: {
+	required: true }
     } as ValidationSchema,
-    report: {, title: { required: true, minLength: 3, maxLength: 200 },
-        type: {, required: true },
-        content: {, required: true, minLength: 10 }
+    report: {
+	title: { required: true, minLength: 3, maxLength: 200 },
+	type: {
+	required: true },
+	content: {
+	required: true, minLength: 10 }
     } as ValidationSchema,
-    user: {, email: {
+    user: {
+	email: {
             required: true,
             pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             custom: (value: unknown) => (String(value).includes('@')) || 'Invalid email format'
         },
-        name: {, minLength: 2, maxLength: 100 },
-        role: {, required: true }
+	name: {
+	minLength: 2, maxLength: 100 },
+	role: {
+	required: true }
     } as ValidationSchema
 };
 
@@ -248,7 +267,7 @@ export const storage = {
             return defaultValue ?? null;
         }
     },
-    set(key: string, value: unknown): boolean {
+	set(key: string, value: unknown): boolean {
         if (!browser) return false;
         try {
             localStorage.setItem(key, JSON.stringify(value));
@@ -258,7 +277,7 @@ export const storage = {
             return false;
         }
     },
-    remove(key: string): boolean {
+	remove(key: string): boolean {
         if (!browser) return false;
         try {
             localStorage.removeItem(key);
@@ -268,7 +287,7 @@ export const storage = {
             return false;
         }
     },
-    clear(): boolean {
+	clear(): boolean {
         if (!browser) return false;
         try {
             localStorage.clear();
@@ -363,8 +382,10 @@ export function parseQueryString(search: string): Record<string, string | string
 
 // Error handling utilities
 export interface AppError {
-    code: string;, message: string;
-    details?: unknown;, timestamp: Date;
+    code: string;
+	message: string;
+    details?: unknown;
+	timestamp: Date;
 }
 
 export function createError(code: string, message: string, details?: unknown): AppError {

@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { Case } from '$lib/types';
- import { onMount, onDestroy } from 'svelte';
+ // Migrated to $effect
  import type { Report } from '$lib/data/types'; // Corrected import path for Report
  import TauriAPI from '$lib/tauri';
 
@@ -38,7 +38,8 @@ https, //svelte.dev/e/js_parse_error -->
  let reportsUnsub: (() => void) | null = null;
  let unsubActive: (() => void) | null = null;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  loading = true;
  try {
@@ -59,7 +60,8 @@ https, //svelte.dev/e/js_parse_error -->
  status: (it as any)?.status ?? 'draft',
  tags: Array.isArray((it as any)?.tags) ? (it as any).tags : [],
  content: it?.content ?? '',
- }));
+ 
+}););
  })();
  });
   
@@ -88,14 +90,14 @@ https, //svelte.dev/e/js_parse_error -->
  }
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (reportsUnsub) reportsUnsub();
  if (unsubActive) unsubActive();
  if (hoverSaveTimeout) {
  clearTimeout(hoverSaveTimeout);
  hoverSaveTimeout = null;
  }
- });
+ }
   
  function handleHoverStart() {
  if (hoverSaveTimeout) clearTimeout(hoverSaveTimeout);

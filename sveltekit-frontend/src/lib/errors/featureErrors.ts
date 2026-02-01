@@ -19,9 +19,11 @@ export type FeatureErrorType =
  * Feature error response
  */
 export interface FeatureErrorResponse {
-	error: string;, errorType: FeatureErrorType;
+	error: string;
+	errorType: FeatureErrorType;
 	feature: 'errorBrain' | 'legalAi' | null;
-	status: number;, timestamp: string;
+	status: number;
+	timestamp: string;
 	details?: Record<string, unknown>;
 }
 
@@ -76,7 +78,7 @@ export class FeatureErrorHandler {
 				operation: 'feature_disabled_error',
 				userId,
 				details: { status, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		} else {
 			featureLogger.logLegalAi({
@@ -84,7 +86,7 @@ export class FeatureErrorHandler {
 				operation: 'feature_disabled_error',
 				userId,
 				details: { status, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		}
 
@@ -113,7 +115,7 @@ export class FeatureErrorHandler {
 				operation: 'auth_required_error',
 				userId,
 				details: { authType, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		} else {
 			featureLogger.logLegalAi({
@@ -121,7 +123,7 @@ export class FeatureErrorHandler {
 				operation: 'auth_required_error',
 				userId,
 				details: { authType, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		}
 
@@ -150,7 +152,7 @@ export class FeatureErrorHandler {
 				operation: 'data_access_denied_error',
 				userId,
 				details: { table, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		} else {
 			featureLogger.logLegalAi({
@@ -158,7 +160,7 @@ export class FeatureErrorHandler {
 				operation: 'data_access_denied_error',
 				userId,
 				details: { table, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		}
 
@@ -187,7 +189,7 @@ export class FeatureErrorHandler {
 				operation: 'invalid_input_error',
 				userId,
 				details: { ...details, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		} else {
 			featureLogger.logLegalAi({
@@ -195,7 +197,7 @@ export class FeatureErrorHandler {
 				operation: 'invalid_input_error',
 				userId,
 				details: { ...details, message },
-				level: 'warn'
+	level: 'warn'
 			});
 		}
 
@@ -224,16 +226,18 @@ export class FeatureErrorHandler {
 				timestamp: new Date(),
 				operation: 'internal_error',
 				userId,
-				details: {, errorMessage: error.message, stack: error.stack },
-				level: 'error'
+				details: {
+	errorMessage: error.message, stack: error.stack },
+	level: 'error'
 			});
 		} else {
 			featureLogger.logLegalAi({
 				timestamp: new Date(),
 				operation: 'internal_error',
 				userId,
-				details: {, errorMessage: error.message, stack: error.stack },
-				level: 'error'
+				details: {
+	errorMessage: error.message, stack: error.stack },
+	level: 'error'
 			});
 		}
 

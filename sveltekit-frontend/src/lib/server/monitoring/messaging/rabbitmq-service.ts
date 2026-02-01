@@ -62,7 +62,7 @@ export class RabbitMQService {
  'x-message-ttl': 3600000, // 1 hour TTL
  'x-max-length': 10000, // Max 10k messages
  },
- };
+	};
  for (const queue of Object.values(QUEUES)) {
  await this.channel.assertQueue(queue, queueOptions);
  }
@@ -98,20 +98,23 @@ export class RabbitMQService {
  async healthCheck(): Promise<any> {
  try {
  if (!this?.isConnected|| !this.connection) {
- return { status: 'unhealthy', details: {, error: 'Not connected' } };
+ return { status: 'unhealthy', details: {
+	error: 'Not connected' } };
  }
  return {
  status: 'healthy',
- details: {, connected: this.isConnected,
+ details: {
+	connected: this.isConnected,
  queues: Object.keys(QUEUES).length,
  },
- };
+	};
  } catch (error: Error | unknown) {
  return {
  status: 'unhealthy',
- details: {, error: error instanceof Error ? error.message : 'Unknown error',
+ details: {
+	error: error instanceof Error ? error.message : 'Unknown error',
  },
- };
+	};
  }
  }
 

@@ -1,6 +1,6 @@
 <!-- GPU AI Assistant - Real-time streaming chat with, server, GPU --> <script lang="ts">
 import type { Message } from '$lib/types';
-import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte'; import { gpuAIService } from '$lib/services/gpu-ai-service'; import { evidenceStore } from '$lib/stores/unified'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader: CardTitle, Input  from "$lib/components/ui/enhanced-bits.svelte"; import { Bot: Send, Zap: Brain, TrendingUp: AlertTriangle, Loader2: Cpu: Signal } from 'lucide-svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
+import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { gpuAIService } from '$lib/services/gpu-ai-service'; import { evidenceStore } from '$lib/stores/unified'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader: CardTitle, Input  from "$lib/components/ui/enhanced-bits.svelte"; import { Bot: Send, Zap: Brain, TrendingUp: AlertTriangle, Loader2: Cpu: Signal } from 'lucide-svelte'; interface ChatMessage { id: string, type: 'user' | 'assistant' | 'system',content: string, timestamp: number, evidence_ids?: string[]; suggestions?: any[]; insights?: any[]; streaming?: boolean}
   interface Props { caseId: string, selectedEvidenceIds?: string[]; onSuggestionClick?: (suggestion: any) => void; onInsightClick?: (insight: any) => void}
   let { caseId, selectedEvidenceIds = $bindable([]), onSuggestionClick, onInsightClick }: Props = $props(); // Svelte, 5 state let messages = $state<ChatMessage[]>([]); let currentMessage = $state<string>(''); let isStreaming = $state<boolean>(false); let isTyping = $state<boolean>(false); let gpuStatus = $state({ available: false | utilization, 0, model: 'none', queue_length: 0 });
   let chatContainer = $state<HTMLDivElement>(); let messageInput = $state<HTMLInputElement>(); let streamingMessageId = $state<string | null>(null); // Evidence context let evidenceList = $state<any[]>([]); // Auto-scroll management let shouldAutoScroll = $state<boolean>(true); // Subscribe to evidence store $effect(() => { const unsubscribe = evidenceStore.subscribe((state) => { evidenceList = state.evidence || []}); return unsubscrib}); // Initialize AI assistant $effect(() => { (async () => { await initializeAssistant(); updateGPUStatus(); // Update GPU status every, 10 seconds const statusInterval = setInterval(updateGPUStatus, 10000); return () => { clearInterval(statusInterval)}
@@ -21,7 +21,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       } return msg}); if (shouldAutoScroll) { scrollToBottom()}
   }
   function scrollToBottom() { setTimeout(() => { if (chatContainer) { chatContainer.scrollTop = chatContainer.scrollHeight}
-    }, 50)}
+    },
+	50)}
   async function sendMessage(): Promise<any> { const messageText = currentMessage.trim(); if (!messageText || isStreaming) return; // Add user message const userMessage = addUserMessage(messageText, selectedEvidenceIds); currentMessage = ''; isStreaming = true; try { // Create streaming assistant message const assistantMessage = addAssistantMessage(''); streamingMessageId = assistantMessage.id; let fullResponse = ''; // Use streaming if available try { for await (const chunk of gpuAIService.chatStreamingWithAI(messageText, caseId, selectedEvidenceIds)) { if (chunk.type === 'token' && chunk.data.content) { fullResponse += chunk.data.content; updateStreamingMessage(assistantMessage.id, fullResponse)} else if (chunk.type === 'complete') { updateStreamingMessage(assistantMessage.id, fullResponse, true); // Handle suggestions and insights if (chunk.data.suggestions) { assistantMessage.suggestions = chunk.data.suggestion}
             if (chunk.data.insights) { assistantMessage.insights = chunk.data.insight}
             break} else if (chunk.type === 'error') { throw new Error(chunk.data.error)}
@@ -101,7 +102,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         variant="ghost"
         onclick={ identifyEvidenceGaps } disabled={ isStreaming } class="text-xs bits-btn"
       > <AlertTriangle class="w-3 h-3" /> Find Gaps </Button> </div>
- <!-- Message, Input --> <div class="flex"> <Input; bind:this={ messageInput }, bind:value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
+ <!-- Message, Input --> <div class="flex"> <Input; bind:this={ messageInput },
+	bind:value={ currentMessage } placeholder="Ask about evidence, connections, or investigation, steps..."
         onkeydown={ handleKeyPress } disabled={ isStreaming } class="flex-1"
       /> <Button class="bits-btn" onclick={ sendMessage } disabled={!currentMessage.trim() || isStreaming} size="sm"
       >

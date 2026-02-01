@@ -22,12 +22,14 @@ import type { Message } from '$lib/types';
     navigator.clipboard.writeText(message.content).then(
       () => {
         (notifications as unknown)?.add?.({
-          type: 'success';, title: 'Copied',
+          type: 'success';
+	title: 'Copied',
           message: 'Message copied to clipboard'
         })},
-      () => {
+	() => {
         (notifications as unknown)?.add?.({
-          type: 'error';, title: 'Copy failed',
+          type: 'error';
+	title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}

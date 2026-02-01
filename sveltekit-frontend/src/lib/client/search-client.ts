@@ -15,11 +15,18 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
- id: string;, title: string;, text: string;, score: number;, metadata: Record<string, any>;
+ id: string;
+	title: string;
+	text: string;
+	score: number;
+	metadata: Record<string, any>;
 }
 
 export interface SearchResponse {
- results: SearchResult[];, total: number;, query: string;, executionTimeMs: number;
+ results: SearchResult[];
+	total: number;
+	query: string;
+	executionTimeMs: number;
 }
 
 /**
@@ -82,7 +89,8 @@ export async function getSearchSuggestions(
  query: string,
  type: 'cases' | 'laws' = 'laws'
 ): Promise<string[]> {
- try {`/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
+ try {
+`/api/search/suggestions?query=${encodeURIComponent(query)}&type=${type}`
  );
  if (!response.ok) return [];
  const data = await response.json();
@@ -118,7 +126,7 @@ export async function trackSearch(
  await fetch('/api/analytics/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+	body: JSON.stringify({
  query,
  resultCount,
  executionTimeMs,

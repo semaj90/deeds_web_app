@@ -21,7 +21,7 @@ async function seed() {
 				hashedPassword: demoPasswordHash,
 				isActive: true
 			},
-			{
+	{
 				email: 'prosecutor@legal.ai',
 				name: 'John Prosecutor',
 				firstName: 'John',
@@ -30,7 +30,7 @@ async function seed() {
 				hashedPassword: passwordHash,
 				isActive: true
 			},
-			{
+	{
 				email: 'detective@legal.ai',
 				name: 'Jane Detective',
 				firstName: 'Jane',
@@ -74,7 +74,7 @@ async function seed() {
 					aiSummary: 'High-priority financial fraud case',
 					aiTags: ['money_laundering', 'cryptocurrency']
 				},
-				{
+	{
 					caseNumber: 'CASE-2024-002',
 					title: 'Cybercrime Investigation',
 					description: 'Data breach and identity theft case',

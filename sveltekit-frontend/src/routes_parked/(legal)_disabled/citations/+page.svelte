@@ -2,7 +2,7 @@
 import type { Case } from '$lib/types';
  import Button from "$lib/components/ui/core.svelte";
  import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte";
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Citation {
  id: string, citationType: string, formattedCitation: string, quotedText: string, legalPrinciple: string, relevanceScore: string, isKeyAuthority: boolean
@@ -14,10 +14,12 @@ import type { Case } from '$lib/types';
  let searchQuery = $state <string>('');
  let citationType = $state <string>('all');
 
- onMount(() => {
+ $effect(() => {
+
 		(async () => {
 
- await loadCitations()		})();
+ await loadCitations()		
+});();
 	});
  async function loadCitations(): Promise<any> {
  try {

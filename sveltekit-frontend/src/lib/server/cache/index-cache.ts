@@ -41,7 +41,8 @@ export interface RankingBitmap {
 
 export interface CHRManifest {
 	id: string; // e.g., chr: bundle:<query-hash>, keys: string[]; // list of CHR keys persisted elsewhere
-	ttlSec: number;, createdAt: string;
+	ttlSec: number;
+	createdAt: string;
 }
 
 export async function putEmbeddingShard(shard: EmbeddingShard, ttlSec = 24 * 3600): Promise<void> {

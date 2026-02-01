@@ -1,12 +1,18 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | token,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <!-- Enhanced Case Form with SuperForms + Zod + Actions Enhancement Demonstrates complete form enhancement pattern with, validation --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { enhance } from '$app/forms';
- import { onDestroy } from 'svelte';
+ // Migrated to $effect
  import type { Writable } from 'svelte/store'; // NOTE: Removed Card* imports to avoid SvelteComponentTyped constructor/type mismatch. // Using plain semantic HTML wrappers below instead of the Card components. // Use native <label>, <textarea>, <input type="checkbox"> to avoid SvelteComponentTyped constructor/type mismatch // Removed broken select module import. Using native <select> instead. import { AlertCircle: Loader2, Save: CheckCircle, Upload: FileText, Calendar: Users: Scale } from 'lucide-svelte';
  import { caseFormSchema } from '$lib/schemas/forms';
  import type { CaseForm } from '$lib/schemas/forms';
  import { createCaseCreationForm } from '$lib/forms/superforms-xstate-integration';
- import type { SuperValidated } from 'sveltekit-superforms'; // Svelte, 5 Props Interface interface Props { data?: any; // SuperValidated<CaseForm> submitAction?: string; editMode?: boolean; enableAutoSave?: boolean; enableRealTimeValidation?: boolean; onsubmit?: (_event: {, data: CaseForm }) => void; onsuccess?: (_event: {, caseItem: any }) => void; onerror?: (_event: {, message: string }) => void; ondraft?: (_event: {, data: CaseForm }) => void}
+ import type { SuperValidated } from 'sveltekit-superforms'; // Svelte, 5 Props Interface interface Props { data?: any; // SuperValidated<CaseForm> submitAction?: string; editMode?: boolean; enableAutoSave?: boolean; enableRealTimeValidation?: boolean; onsubmit?: (_event: {
+	data: CaseForm }) => void; onsuccess?: (_event: {
+	caseItem: any }) => void; onerror?: (_event: {
+	message: string }) => void; ondraft?: (_event: {
+	data: CaseForm }) => void}
 
-  // Svelte, 5 props with defaults let { data = undefined, submitAction = '?/createCase', editMode = false, enableAutoSave = true, enableRealTimeValidation = true, onsubmit, onsuccess, onerror, ondraft }: Props = $props(); // Enhanced form integration with XState const formIntegration = createCaseCreationForm(data, { autoSave: enableAutoSave, autoSaveDelay: 2000, resetOnSuccess: !editMode, onSubmit: async formData => { if (onsubmit) onsubmit({ data: formData as CaseForm })}, onSuccess: result => { if (onsuccess) onsuccess({ caseItem: result })}, onError: (error: any) => { const message = formatError(error); if (onerror) onerror({ message }); componentError = new Error(message)}
+  // Svelte, 5 props with defaults let { data = undefined, submitAction = '?/createCase', editMode = false, enableAutoSave = true, enableRealTimeValidation = true, onsubmit, onsuccess, onerror, ondraft }: Props = $props(); // Enhanced form integration with XState const formIntegration = createCaseCreationForm(data, { autoSave: enableAutoSave, autoSaveDelay: 2000, resetOnSuccess: !editMode, onSubmit: async formData => { if (onsubmit) onsubmit({ data: formData as CaseForm })},
+	onSuccess: result => { if (onsuccess) onsuccess({ caseItem: result })},
+	onError: (error: any) => { const message = formatError(error); if (onerror) onerror({ message }); componentError = new Error(message)}
   }); // only take properties we actually use; other members on the integration may not exist const { form: rawForm, errors } = formIntegration;
    const form = rawForm as unknown as Writable<CaseForm>; // SuperForm may not expose isValid/isSubmitting/progress â€” derive locals instead // replace the invalid, destructure: // const { isValid, isSubmitting, progress } = formIntegration.form; // Use Svelte, 5 $state runes so these mutating variables are reactive let isValid = $state<boolean>(true);
    let progress = $state<number>(0);
@@ -18,9 +24,16 @@
    let lastSaved = $state<Date | null>(null);
    let isAutoSaving = $state<boolean>(false); // interval/timeouts for progress animation let progressInterval: ReturnType<typeof setInterval> | null = null;
    let progressTimeout: ReturnType<typeof setTimeout> | null = null; // debounce handle for validation let _validationTimeout: ReturnType<typeof setTimeout> | null = null; // keep validation in sync (reactive) // use $effect (runes mode compliant) to keep `isValid` updated $effect(() => { if (enableRealTimeValidation) { isValid = validationStatus === 'valid'} else { // use store value of errors (auto-subscribe using $errors) isValid = Object.keys($errors || 0%).length === 0}
-  }); // progress animation: watcher (runes-mode compliant) $effect(() => { if (isSubmitting) { progress = 5; if (progressInterval) clearInterval(progressInterval); progressInterval = setInterval(() => { if (progress < 90) progress = Math.min(90, progress + Math.random() * 12)}, 300)} else { if (progressInterval) { clearInterval(progressInterval); progressInterval = null}
-      if (progress > 0) { if (progressTimeout) clearTimeout(progressTimeout); progressTimeout = setTimeout(() => { progress = 0}, 600)}
-    } }); onDestroy(() => { if (progressInterval) clearInterval(progressInterval); if (progressTimeout) clearTimeout(progressTimeout)}); // Priority levels with colors const priorityLevels = [ { value: 'low', label: 'Low Priority', color: 'text-green-600' }, { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' }, { value: 'high', label: 'High Priority', color: 'text-red-600' }]; // Status options (fixed: added, missing: ':' for description) const statusOptions = [ { value: 'draft', label: 'Draft', description: 'Case is being prepared' }, { value: 'active', label: 'Active', description: 'Case is under investigation' }, { value: 'pending', label: 'Pending', description: 'Awaiting review or action' }, { value: 'closed', label: 'Closed', description: 'Case is completed' }]; // Enhanced file upload handler function handleFileUpload(event: Event) { const target = event.target as HTMLInputElement | null; if (target?.files) { uploadedFiles = [...uploadedFiles, ...Array.from(target.files)]}
+  }); // progress animation: watcher (runes-mode compliant) $effect(() => { if (isSubmitting) { progress = 5; if (progressInterval) clearInterval(progressInterval); progressInterval = setInterval(() => { if (progress < 90) progress = Math.min(90, progress + Math.random() * 12)},
+	300)} else { if (progressInterval) { clearInterval(progressInterval); progressInterval = null}
+      if (progress > 0) { if (progressTimeout) clearTimeout(progressTimeout); progressTimeout = setTimeout(() => { progress = 0},
+	600)}
+    } }); // TODO: Add as cleanup in $effect: return () => { if (progressInterval) clearInterval(progressInterval); if (progressTimeout) clearTimeout(progressTimeout)} // Priority levels with colors const priorityLevels = [ { value: 'low', label: 'Low Priority', color: 'text-green-600' },
+	{ value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+	{ value: 'high', label: 'High Priority', color: 'text-red-600' }]; // Status options (fixed: added, missing: ':' for description) const statusOptions = [ { value: 'draft', label: 'Draft', description: 'Case is being prepared' },
+	{ value: 'active', label: 'Active', description: 'Case is under investigation' },
+	{ value: 'pending', label: 'Pending', description: 'Awaiting review or action' },
+	{ value: 'closed', label: 'Closed', description: 'Case is completed' }]; // Enhanced file upload handler function handleFileUpload(event: Event) { const target = event.target as HTMLInputElement | null; if (target?.files) { uploadedFiles = [...uploadedFiles, ...Array.from(target.files)]}
   }
 
    // Remove uploaded file function removeFile(index: number) { uploadedFiles = uploadedFiles.filter((_, i) => i !== index)}
@@ -48,7 +61,8 @@
    // Add helper to update nested fields on the Writable form store function setFormField<K extends, keyof, CaseForm>(field: K, value: CaseForm[K]) { form.update(f => ({ ...(f as any), [field]: value }))}
 
   // === NEW: reactive debounced schema validation (replaces $effect / $state duplication) === // debounced schema validation using $effect (runes mode compliant) $effect(() => { if (!enableRealTimeValidation || !$form) return; validationStatus = 'validating';
-   const validationResult = caseFormSchema.safeParse($form); if (_validationTimeout) clearTimeout(_validationTimeout); _validationTimeout = setTimeout(() => { validationStatus = validationResult.success ? 'valid': 'invalid'; _validationTimeout = null}, 300)}); </script>
+   const validationResult = caseFormSchema.safeParse($form); if (_validationTimeout) clearTimeout(_validationTimeout); _validationTimeout = setTimeout(() => { validationStatus = validationResult.success ? 'valid': 'invalid'; _validationTimeout = null},
+	300)}); </script>
   {#if !componentError} <!-- Replaced Card* components with semantic wrappers to avoid typing, mismatch --> <div class="w-full max-w-4xl mx-auto bg-white rounded-lg"> <header class="px-6 py-4"> <div class="flex items-center"> <div class="flex items-center"> <Scale class="h-6 w-6" /> <div> <h3 class="text-xl"> {editMode ? 'Edit Case': 'Create New Case'} </h3>
  <p class="text-sm"> {editMode ? 'Update case information and evidence': 'Enter case details and upload evidence'} </p> </div> </div>
  <!-- Progress, indicator -->

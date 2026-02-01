@@ -13,8 +13,10 @@
     nodes: GraphNode[],
     edges: GraphEdge[],
     error?: string | null,
-    analysis?: {, evidenceId: string;
-      keyEntities: Entity[];, correlations: Correlation[];
+    analysis?: {
+	evidenceId: string;
+      keyEntities: Entity[];
+	correlations: Correlation[];
       timeline: TimelineEvent[];
     }
   }>();

@@ -8,8 +8,10 @@ import { MinIOService } from './minio-service.js';
 import { createHash } from 'crypto';
 
 export interface SearchResult {
-  url: string;, title: string;
-  snippet: string;, domain: string;
+  url: string;
+	title: string;
+  snippet: string;
+	domain: string;
   publishedDate?: string;
 }
 
@@ -21,8 +23,10 @@ export interface SearchOptions {
 }
 
 export interface SearchSnapshot {
-  query: string;, results: SearchResult[];
-  timestamp: string;, provider: string;
+  query: string;
+	results: SearchResult[];
+  timestamp: string;
+	provider: string;
   totalResults: number;
 }
 
@@ -86,7 +90,7 @@ export class WebSearchService {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible, ACE-Bot/1.0)',
       },
-    });
+	});
 
     if (!response.ok) {
       throw new Error(`DuckDuckGo search failed, ${response.status}`);
@@ -159,7 +163,7 @@ export class WebSearchService {
         'Accept': 'application/json',
         'X-Subscription-Token': this.braveApiKey,
       },
-    });
+	});
 
     if (!response.ok) {
       throw new Error(`Brave Search API failed, ${response.status}`);
@@ -197,14 +201,14 @@ export class WebSearchService {
           domain: 'svelte.dev',
           publishedDate: '2024-12-01',
         },
-        {
+	{
           url: 'https://svelte.dev/docs/svelte/overview',
           title: 'Svelte 5 Overview',
           snippet: 'Svelte 5 introduces runes, a new way to declare reactive state...',
           domain: 'svelte.dev',
           publishedDate: '2024-11-15',
         },
-        {
+	{
           url: 'https://kit.svelte.dev/docs/introduction',
           title: 'Introduction • SvelteKit',
           snippet: 'SvelteKit is a framework for building web applications...',
@@ -224,7 +228,7 @@ export class WebSearchService {
           domain: 'typescriptlang.org',
           publishedDate: '2024-12-05',
         },
-        {
+	{
           url: 'https://www.typescriptlang.org/docs/handbook/intro.html',
           title: 'The TypeScript Handbook',
           snippet: 'About this Handbook. The TypeScript Handbook is intended...',
@@ -244,7 +248,7 @@ export class WebSearchService {
           domain: 'stackoverflow.com',
           publishedDate: '2024-12-15',
         },
-        {
+	{
           url: 'https://github.com/sveltejs/svelte/issues/12345',
           title: 'TypeScript error with runes in Svelte 5',
           snippet: 'Discussion about TypeScript compatibility with Svelte 5 runes...',
@@ -264,7 +268,7 @@ export class WebSearchService {
           domain: 'developer.mozilla.org',
           publishedDate: '2024-12-01',
         },
-        {
+	{
           url: 'https://web.dev/',
           title: 'web.dev',
           snippet: 'Guidance to build modern web experiences...',

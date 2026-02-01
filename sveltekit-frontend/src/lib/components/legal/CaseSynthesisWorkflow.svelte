@@ -1,35 +1,78 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts">
-import type { Case } from '$lib/types'; interface Props { caseId: string, documents: CaseDocument[];, evidenceReports: EvidenceReport[]}
-  let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: {, dateCreated: string, author: string; // Added comma relevanceScore: number}}
+import type { Case } from '$lib/types'; interface Props { caseId: string, documents: CaseDocument[];
+	evidenceReports: EvidenceReport[]}
+  let { caseId, documents = [], evidenceReports = [] }: Props = $props(); import { createMachine, assign, interpret } from 'xstate'; import { readable, writable, derived } from 'svelte/store'; import { fly } from 'svelte/transition'; // <-- added missing, import interface CaseDocument { id: string, title: string, type: 'evidence' | 'report' | 'witness_statement' | 'expert_testimony' | 'legal_brief',content: string, metadata: {
+	dateCreated: string, author: string; // Added comma relevanceScore: number}}
   interface EvidenceReport { id: string; // Added comma title: string; // Added comma type: string; // Added comma status: string; // Added comma priority: string; // Added comma createdAt: string; // Added comma updatedAt: string; // Added comma analyst: any, evidence: any, methodology: any, findings: any; // Added comma legalImplications: any, attachments: any[]}
-  interface SynthesisContext { caseId: string,documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
-  interface CaseSynthesis { executiveSummary: string, timeline: TimelineEvent[], strengthAssessment: StrengthAssessment,legalStrategy: LegalStrategy,riskAnalysis: RiskAnalysis,recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
+  interface SynthesisContext { caseId: string
+,documents: CaseDocument[], evidenceReports: EvidenceReport[], selectedItems: string[], synthesisMode: 'chronological' | 'thematic' | 'evidence_strength' | 'legal_strategy',synthesisResult: CaseSynthesis | null,progressStage: 'selecting' | 'analyzing' | 'synthesizing' | 'reviewing' | 'complete',error: string | null,loading: boolean}
+  interface CaseSynthesis { executiveSummary: string, timeline: TimelineEvent[], strengthAssessment: StrengthAssessment
+,legalStrategy: LegalStrategy
+,riskAnalysis: RiskAnalysis
+,recommendations: Recommendation[], gaps: string[], nextSteps: string[]}
   interface TimelineEvent { date: string, event: string, sources: string[], significance: 'critical' | 'high' | 'medium' | 'low'}
-  interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: {, name: string, score: number, details: string}[]}
-  interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string,keyArguments: string[]}
-  interface RiskAnalysis { challengePoints: {, issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
+  interface StrengthAssessment { overall: number; // Added comma evidenceQuality: number; // Added comma legalBasis: number; // Added comma witnessCredibility: number; // Added comma expertOpinions: number, areas: {
+	name: string, score: number, details: string}[]}
+  interface LegalStrategy { primaryCharges: string[], supportingEvidence: string[], potentialDefenses: string[], prosecutionApproach: string
+,keyArguments: string[]}
+  interface RiskAnalysis { challengePoints: {
+	issue: string, likelihood: number, impact: number, mitigation: string; // Added colon }[]; overallRisk: number}
   interface Recommendation { priority: 'immediate' | 'high' | 'medium' | 'low',category: 'evidence' | 'legal' | 'procedural' | 'strategic',action: string; // Added colon rationale: string, timeline, string}
-  const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false }, states: {, idle: { on: { // Added colon SELECT_ITEMS: {, actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
-            }) }, START_SYNTHESIS: {, target: 'synthesizing', actions: assign({, loading: true, progressStage: 'synthesizing' }) }
-        } }, synthesizing: {, invoke: { src: 'performSynthesis', onDone: {, target: 'complete', actions: assign({, synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
-            }) }, onError: {, target: 'error', actions: assign({, error: ({ event }) => event.data.message, loading: false }) }
-        } }, complete: {, on: { // Added colon RESTART: {, target: 'idle', actions: assign({, selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
-        } }, error: {, on: { // Added colon RETRY: {, target: 'synthesizing', actions: assign({, error: null, loading: true }) }, RESTART: {, target: 'idle', actions: assign({, selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
+  const synthesisMachine = createMachine<SynthesisContext>({ id: 'synthesis', initial: 'idle', context: { caseId, documents, evidenceReports, selectedItems: [], synthesisMode: 'thematic', synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma loading: false },
+	states: {
+	idle: { on: { // Added colon SELECT_ITEMS: {
+	actions: assign({ selectedItems: ({ event }) => event.items, progressStage: 'analyzing'
+            }) },
+	START_SYNTHESIS: {
+	target: 'synthesizing', actions: assign({
+	loading: true, progressStage: 'synthesizing' }) }
+        } },
+	synthesizing: {
+	invoke: { src: 'performSynthesis', onDone: {
+	target: 'complete', actions: assign({
+	synthesisResult: ({ event }) => event.data, loading: false, // Added comma progressStage: 'complete'
+            }) },
+	onError: {
+	target: 'error', actions: assign({
+	error: ({ event }) => event.data.message, loading: false }) }
+        } },
+	complete: {
+	on: { // Added colon RESTART: {
+	target: 'idle', actions: assign({
+	selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
+        } },
+	error: {
+	on: { // Added colon RETRY: {
+	target: 'synthesizing', actions: assign({
+	error: null, loading: true }) },
+	RESTART: {
+	target: 'idle', actions: assign({
+	selectedItems: [], synthesisResult: null, // Added comma progressStage: 'selecting', error: null, // Added comma }) }
         } }
-    } }, { services: {, performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
-                }, {
+    } },
+	{ services: {
+	performSynthesis: async (context: SynthesisContext) => { // Mock comprehensive synthesis return new Promise<CaseSynthesis>((resolve) => { setTimeout(() => { resolve({ executiveSummary: "Comprehensive analysis of the case evidence reveals a strong foundation for prosecution with multiple corroborating sources. The digital forensics evidence provides clear proof of unauthorized access, supported by witness testimony and financial records showing systematic fraud over an 18-month period.", timeline: [ { date: "2023-01-15", event: "First unauthorized access detected in system logs", sources: ["Digital Forensics Report #001", "Server Log Analysis"], significance: "high"
+                },
+	{
                   date: "2023-03-22", event: "Large data transfer to external IP address", sources: ["Network Traffic Analysis", "Digital Forensics Report #002"], significance: "critical"
-                }, {
+                },
+	{
                   date: "2023-06-10", event: "Witness reports suspicious behavior from suspect", sources: ["Witness Statement - J. Smith", "Security Camera Footage"], significance: "medium"
-                }, {
+                },
+	{
                   date: "2023-08-15", event: "Financial irregularities discovered in company accounts", sources: ["Financial Analysis Report", "Accounting Records"], significance: "critical"
-                } ], strengthAssessment: {, overall: 0.85, evidenceQuality: 0.90, legalBasis: 0.88, witnessCredibility: 0.75, expertOpinions: 0.92, areas: [ { name: "Digital Evidence", score: 0.95, details: "Excellent chain of custody, forensically sound acquisition methods, expert analysis"
-                  }, {
+                } ], strengthAssessment: {
+	overall: 0.85, evidenceQuality: 0.90, legalBasis: 0.88, witnessCredibility: 0.75, expertOpinions: 0.92, areas: [ { name: "Digital Evidence", score: 0.95, details: "Excellent chain of custody, forensically sound acquisition methods, expert analysis"
+                  },
+	{
                     name: "Financial Evidence", score: 0.88, details: "Clear paper trail, professional accounting analysis, quantifiable damages"
-                  }, {
+                  },
+	{
                     name: "Witness Testimony", score: 0.72, details: "Multiple corroborating witnesses, some credibility concerns to address"
                   } ]
-              }, legalStrategy: {, primaryCharges: [
+              },
+	legalStrategy: {
+	primaryCharges: [
                   "Computer Fraud and Abuse Act (18 U.S.C. Â§ 1030)",
                   "Wire Fraud (18 U.S.C. Â§ 1343)",
                   "Money Laundering (18 U.S.C. Â§ 1956)"
@@ -46,13 +89,20 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
                   "Clear financial motive and quantifiable damages",
                   "Sophisticated methods indicating premeditation",
                   "Multiple independent sources of evidence"
-                ] }, riskAnalysis: {, challengePoints: [ { issue: "Technical complexity may confuse jury", likelihood: 0.6, impact: 0.7, mitigation: "Prepare clear visual aids and expert testimony in plain language", // Added colon }, {
-                    issue: "Defense may challenge digital evidence authenticity", likelihood: 0.8, impact: 0.8, mitigation: "Ensure robust chain of custody documentation and expert certification", // Added colon }, {
+                ] },
+	riskAnalysis: {
+	challengePoints: [ { issue: "Technical complexity may confuse jury", likelihood: 0.6, impact: 0.7, mitigation: "Prepare clear visual aids and expert testimony in plain language", // Added colon },
+	{
+                    issue: "Defense may challenge digital evidence authenticity", likelihood: 0.8, impact: 0.8, mitigation: "Ensure robust chain of custody documentation and expert certification", // Added colon },
+	{
                     issue: "Witness credibility concerns", likelihood: 0.4, impact: 0.6, mitigation: "Prepare witnesses thoroughly and focus on corroborating physical evidence", // Added colon }
-                ], overallRisk: 0.35 }, recommendations: [ { priority: "immediate", category: "evidence", action: "Conduct additional forensic analysis of backup systems", // Added colon rationale: "May reveal additional evidence of data destruction attempts", timeline: "Within, 2 weeks"
-                }, {
+                ], overallRisk: 0.35 },
+	recommendations: [ { priority: "immediate", category: "evidence", action: "Conduct additional forensic analysis of backup systems", // Added colon rationale: "May reveal additional evidence of data destruction attempts", timeline: "Within, 2 weeks"
+                },
+	{
                   priority: "high", category: "legal", action: "Prepare technical expert for jury testimony", // Added colon rationale: "Complex digital evidence requires clear expert explanation", timeline: "Before trial preparation"
-                }, {
+                },
+	{
                   priority: "medium", category: "strategic", action: "Consider plea negotiations based on cooperation", // Added colon rationale: "Defendant may provide information about broader criminal network", timeline: "After initial evidence presentation"
                 } ], gaps: [
                 "Need additional witness interviews to establish motive",
@@ -63,7 +113,8 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
                 "Coordinate with financial crimes unit for additional investigation",
                 "Prepare comprehensive trial presentation materials",
                 "Conduct mock trial with focus group for jury reactions"
-              ], // Added comma })}, 3000)})}
+              ], // Added comma })},
+	3000)})}
     } }); // Run machine via xstate interpret and expose as a Svelte readable store const service = interpret(synthesisMachine).start(); const state = readable(service.state, (set) => { const listener = (s: any) => set(s); service.onTransition(listener); return () => service.stop()}); const send = (event: any) => service.send(event); // Use Svelte stores for selection sets so updates are reactive const selectedDocuments = writable<Set<string>>(new Set()); const selectedReports = writable<Set<string>>(new Set()); // add local state for aggregated items (Svelte, 5 runes) let allItems = $state<any[]>([]); // <-- added // replace legacy reactive statement with $effect $effect(() => { allItems = [ ...documents.map(d => ({ id: d.id, type: 'document', title: d.title, data: d })), ...evidenceReports.map(r => ({ id: r.id, type: 'report', title: r.title, data: r })) ]}); // derived selected count const selectedCount = derived([selectedDocuments, selectedReports], ([$docs, $reps]) => $docs.size + $reps.size); function toggleSelection(id: string, type: 'document' | 'report') { if (type === 'document') { selectedDocuments.update(prev => { const s = new Set(prev); if (s.has(id)) s.delete(id); else s.add(id); return s})} else { selectedReports.update(prev => { const s = new Set(prev); if (s.has(id)) s.delete(id); else s.add(id); return s})}
   }
   function startSynthesis() { // read current sets, convert to arrays let items: string[] = []; selectedDocuments.subscribe(s => items = [...s])(); selectedReports.subscribe(s => items = [...items, ...s])(); send({ type: 'SELECT_ITEMS', items }); send({ type: 'START_SYNTHESIS' })}
@@ -161,7 +212,8 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
  <div class="space-y-4">
   {#each Array.isArray($state.context.synthesisResult.timeline) ? $state.context.synthesisResult.timeline: [] as event} <div class="flex"> <div class="flex-shrink-0 w-24 text-sm"> {new Date(event.date).toLocaleDateString()} </div>
  <div class="flex-shrink-0"> <div class="w-4 h-4 rounded-full"
-                  class:bg-red-500={event.significance === 'critical'}; class:bg-orange-500={event.significance === 'high'}; class:bg-yellow-500={event.significance === 'medium'}, class:bg-gray-500={event.significance === 'low'} ></div> </div>
+                  class:bg-red-500={event.significance === 'critical'}; class:bg-orange-500={event.significance === 'high'}; class:bg-yellow-500={event.significance === 'medium'},
+	class:bg-gray-500={event.significance === 'low'} ></div> </div>
  <div class="flex-1"> <p class="font-medium">{event.event}</p>
  <div class="text-sm text-gray-600"> Sources: {event.sources.join(', ')} </div> </div> </div> {/each}
   </div> </div>

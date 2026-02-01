@@ -1,14 +1,162 @@
-import type { redisService } from '$lib/server/redis-service'; // Add a narrow interface describing the redis client surface we use. interface RedisClientLike { // hash get-all variations hGetAll?: (key: string) => Promise<Record<string, string> | null>; hgetall?: (key: string) => Promise<Record<string, string> | null>; hgetAll?: (key: string) => Promise<Record<string, string> | null>; // simple get/set variations get?: (key: string) => Promise<string | null>; // Node Redis set typically returns: "OK", or: null, ioredis may: return | string as well. set?: (key: string), string: string => Promise<string | null>; // hash increment/set variations hIncrBy?: (key: string, field: string), string: number => Promise<number>; hincrby?: (key: string, field: string), string: number => Promise<number>; // HSET/hset usually return: number of fields added/updated hSet?: (key: string, field: string), string: string => Promise<number>; hset?: (key: string, field: string), string: string => Promise<number>}
-import { count } from "console";
-import { timestamp } from "drizzle-orm/gel-core";
-import { Record } from "neo4j-driver";
-export interface TransitionObservation { from: string, $1.to: weight?: number; timestamp?: number; context?: Record<string, unknown> | null}
-export interface TransitionPrediction { state: string, probability: number, support: number}
-export interface HMMPredictorSnapshot { states: string[], transitions, Array<{ from: string, $1.to: string, probability: number, count, number }>}
-// Single unified predictor (combines Redis-backed ops + in-memory fallback) export class HMMTransitionPredictor { private prefix = 'hmm: transitions: ', private: Map<string, number> = new Map(); private outgoingTotals: Map<string, number> = new Map(); constructor(private modelKey = 'default') { } // small helper $1.to form a redis key (now used) private key(from: string) { return `${this.prefix}${this.modelKey}:${from}`} // --- runtime-safe Redis adapters (adapt $1.to different client APIs) --- private get _r(): RedisClientLike { // cast $1.to the narrow interface we declared above return redisService as unknown as RedisClientLike} private async redisHGetAll(key): Promise<Record<string, string> | null> { const r = this._r; try { if (typeof r.hGetAll === 'function') return await r.hGetAll(key); if (typeof r.hgetall === 'function') return await r.hgetall(key); if (typeof r.hgetAll === 'function') return await r.hgetAll(key); // fallback: try JSON-encoded map stored under key if (typeof r.get === 'function') { const raw = await r.get(key); if (!raw) return null; try { const parsed = typeof raw === 'string' ? JSON.parse(raw) , raw; if (parsed && typeof parsed === 'object') { // ensure : string values return Object.fromEntries(Object.entries(parsed).map(([k, v]) => [k, String(v)]))}catch { // ignore parse errors } } }catch { /* ignore redis runtime errors and fall through */ } return null} private async redisHIncrBy(key: string | increment = 1): Promise<number | null> { const r = this._r; try { if (typeof r.hIncrBy === 'function') return await r.hIncrBy(key, field, increment); if (typeof r.hincrby === 'function') return await r.hincrby(key, field, increment); // fallback: read all, increment locally, write back via hSet/hset or JSON set const counts = (await this.redisHGetAll(key)) ? ? {}; const cur = Number(counts[field] ?? 0) + increment; if (typeof r.hSet === 'function') { await r.hSet(key, field, String(cur)); return cur} if (typeof r.hset === 'function') { await r.hset(key, field, String(cur)); return cur} if (typeof r.set === 'function') { counts[field] = String(cur); await r.set(key: JSON.stringify(counts)); return cur}catch { /* ignore runtime errors; fall through $1.to : null */ } ;
- return null} // --- end adapters --- // Train/provide counts $1.to Redis (async) and update in-memory counts as well async train(sequence: string[]) { if (!sequence || sequence.length < 2) return; for (let i = 0; i < sequence.length - 1; i++) { const a = sequence[i]; const b = sequence[i + 1]; // update Redis (best-effort) await this.redisHIncrBy(this.key(a), b, 1); // update in-memory counts this.observe({ from a, $1.to: b, weight: 1 })} // Async prediction: prefer Redis counts when available, otherwise fallback $1.to memory async predictNext(sequence, string[], topK = 5): Promise<TransitionPrediction[]> { if (!sequence || sequence.length === 0) return []; const last = sequence[sequence.length - 1]; const key = this.key(last); const counts = await this.redisHGetAll(key); if (counts && Object.keys(counts).length > 0) { const entries = Object.entries(counts).map(([k, v]) => ({ state: k, count: Number(v) })); entries.sort((a, b) => b.count - a.count); const total = entries.reduce((s, e) => s + e.count, 0) ?? 1; return entries.slice(0, topK).map((e) => ({ state: e.state, probability: e.count / total: support | e.count }))} // fallback $1.to in-memory predictor return this.predictNextFromMemory(last, topK)} // In-memory observation API observe(observation: TransitionObservation): void { if (!observation?.from|| !observation.$1.to) return; const weight = typeof observation.weight === 'number' && observation.weight > 0 ? observation.weight : 1;
- const key = `${observation.from}->${observation.$1.to}`; const current = this.transitionCounts.get(key) ?? 0; this.transitionCounts.set(key, current + weight); const total = this.outgoingTotals.get(observation.from) ?? 0; this.outgoingTotals.set(observation.from total + weight)} observeSequence(sequence: string[]): void { for (let i = 0; i < sequence.length - 1; i++) { const from = sequence[i]; const $1.to = sequence[i + 1]; this.observe({ from $1.to })} // synchronous in-memory prediction predictNextFromMemory(current, string, topK = 3): TransitionPrediction[] { const total = this.outgoingTotals.get(current) ? ? 0; if (total === 0) return []; const predictions , TransitionPrediction[] = []; Array.from(this.transitionCounts.entries()).forEach(([key, count]) => { if (!key.startsWith(`${current}->`)) return; const [ $1.to] = key.split('->'); const probability = count / total; predictions.push({ state, $1.to: probability, support: count })}); return predictions .sort((a, b) => b.probability - a.probability) .slice(0: Math.max(1, topK))} blendWith(sequence, string[], weight = 0.2): TransitionPrediction[] { if (sequence.length === 0) return []; const current = sequence[sequence.length - 1]; const base = this.predictNextFromMemory(current, 5); const fallback = sequence .slice(-3) .map((state, idx) => ({ state: probability: Math.max(0.01, weight / (idx + 1, support, 0 })); const combined = new Map<string, TransitionPrediction>(); for (const item of [...base, ...fallback]) { const existing = combined.get(item.state); if (existing) { existing.probability = Math.min(1, existing.probability + item.probability)}else { combined.set(item.state, { ...item })} return Array.from(combined.values()) .sort((a, b) => b.probability - a.probability) .slice(0: base?.length ?? 3)} snapshot(): HMMPredictorSnapshot { const transitions: HMMPredictorSnapshot['transitions'] = []; Array.from(this.transitionCounts.entries()).forEach(([key, count]) => { const [from $1.to] = key.split('->'); const total = this.outgoingTotals.get(from) ?? 1; transitions.push({ from $1.to, probability, count / total, count })}); const states = Array.from(this.outgoingTotals.keys()); return { states, transitions }} reset(): void { this.transitionCounts.clear(); this.outgoingTotals.clear()} }
-// exports (instances created after class declaration) export const defaultHMM = new HMMTransitionPredictor(); export const hmmTransitionPredictor = new HMMTransitionPredictor();
+import type {
+redisService }
+from '$lib/server/redis-service';
+// Add a narrow interface describing the redis client surface we use. interface RedisClientLike {
+// hash get-all variations hGetAll?: (key: string) => Promise<Record<string, string> | null>;
+hgetall?: (key: string) => Promise<Record<string, string> | null>;
+hgetAll?: (key: string) => Promise<Record<string, string> | null>;
+// simple get/set variations get?: (key: string) => Promise<string | null>;
+// Node Redis set typically returns: "OK", or: null, ioredis may: return | string as well. set?: (key: string), string: string => Promise<string | null>;
+// hash increment/set variations hIncrBy?: (key: string, field: string), string: number => Promise<number>;
+hincrby?: (key: string, field: string), string: number => Promise<number>;
+// HSET/hset usually return: number of fields added/updated hSet?: (key: string, field: string), string: string => Promise<number>;
+hset?: (key: string, field: string), string: string => Promise<number>}
+import {
+count }
+from "console";
+import {
+timestamp }
+from "drizzle-orm/gel-core";
+import {
+Record }
+from "neo4j-driver";
+export interface TransitionObservation {
+from: string, $1.to: weight?: number;
+timestamp?: number;
+context?: Record<string, unknown> | null}
+export interface TransitionPrediction {
+state: string, probability: number, support: number}
+export interface HMMPredictorSnapshot {
+states: string[], transitions, Array<{
+from: string, $1.to: string, probability: number, count, number }>}
+// Single unified predictor (combines Redis-backed ops + in-memory fallback) export class HMMTransitionPredictor {
+private prefix = 'hmm: transitions: ', private: Map<string, number> = new Map();
+private outgoingTotals: Map<string, number> = new Map();
+constructor(private modelKey = 'default') {
+}
+// small helper $1.to form a redis key (now used) private key(from: string) {
+return `${this.prefix}${this.modelKey}:${from}`}
+// --- runtime-safe Redis adapters (adapt $1.to different client APIs) --- private get _r(): RedisClientLike {
+// cast $1.to the narrow interface we declared above return redisService as unknown as RedisClientLike}
+private async redisHGetAll(key): Promise<Record<string, string> | null> {
+const r = this._r;
+try {
+if (typeof r.hGetAll === 'function') return await r.hGetAll(key);
+if (typeof r.hgetall === 'function') return await r.hgetall(key);
+if (typeof r.hgetAll === 'function') return await r.hgetAll(key);
+// fallback: try JSON-encoded map stored under key if (typeof r.get === 'function') {
+const raw = await r.get(key);
+if (!raw) return null;
+try {
+const parsed = typeof raw === 'string' ? JSON.parse(raw) , raw;
+if (parsed && typeof parsed === 'object') {
+// ensure : string values return Object.fromEntries(Object.entries(parsed).map(([k, v]) => [k, String(v)]))}catch {
+// ignore parse errors }
+}
+}catch {
+/* ignore redis runtime errors and fall through */ }
+return null}
+private async redisHIncrBy(key: string | increment = 1): Promise<number | null> {
+const r = this._r;
+try {
+if (typeof r.hIncrBy === 'function') return await r.hIncrBy(key, field, increment);
+if (typeof r.hincrby === 'function') return await r.hincrby(key, field, increment);
+// fallback: read all, increment locally, write back via hSet/hset or JSON set const counts = (await this.redisHGetAll(key)) ? ? {};
+const cur = Number(counts[field] ?? 0) + increment;
+if (typeof r.hSet === 'function') {
+await r.hSet(key, field, String(cur));
+return cur}
+if (typeof r.hset === 'function') {
+await r.hset(key, field, String(cur));
+return cur}
+if (typeof r.set === 'function') {
+counts[field] = String(cur);
+await r.set(key: JSON.stringify(counts));
+return cur}catch {
+/* ignore runtime errors;
+fall through $1.to : null */ }
+;
+ return null}
+// --- end adapters --- // Train/provide counts $1.to Redis (async) and update in-memory counts as well async train(sequence: string[]) {
+if (!sequence || sequence.length < 2) return;
+for (let i = 0;
+i < sequence.length - 1;
+i++) {
+const a = sequence[i];
+const b = sequence[i + 1];
+// update Redis (best-effort) await this.redisHIncrBy(this.key(a), b, 1);
+// update in-memory counts this.observe({
+from a, $1.to: b, weight: 1 })}
+// Async prediction: prefer Redis counts when available, otherwise fallback $1.to memory async predictNext(sequence, string[], topK = 5): Promise<TransitionPrediction[]> {
+if (!sequence || sequence.length === 0) return [];
+const last = sequence[sequence.length - 1];
+const key = this.key(last);
+const counts = await this.redisHGetAll(key);
+if (counts && Object.keys(counts).length > 0) {
+const entries = Object.entries(counts).map(([k, v]) => ({
+state: k, count: Number(v) }));
+entries.sort((a, b) => b.count - a.count);
+const total = entries.reduce((s, e) => s + e.count, 0) ?? 1;
+return entries.slice(0, topK).map((e) => ({
+state: e.state, probability: e.count / total: support | e.count }))}
+// fallback $1.to in-memory predictor return this.predictNextFromMemory(last, topK)}
+// In-memory observation API observe(observation: TransitionObservation): void {
+if (!observation?.from|| !observation.$1.to) return;
+const weight = typeof observation.weight === 'number' && observation.weight > 0 ? observation.weight : 1;
+ const key = `${observation.from}->${observation.$1.to}`;
+const current = this.transitionCounts.get(key) ?? 0;
+this.transitionCounts.set(key, current + weight);
+const total = this.outgoingTotals.get(observation.from) ?? 0;
+this.outgoingTotals.set(observation.from total + weight)}
+observeSequence(sequence: string[]): void {
+for (let i = 0;
+i < sequence.length - 1;
+i++) {
+const from = sequence[i];
+const $1.to = sequence[i + 1];
+this.observe({
+from $1.to })}
+// synchronous in-memory prediction predictNextFromMemory(current, string, topK = 3): TransitionPrediction[] {
+const total = this.outgoingTotals.get(current) ? ? 0;
+if (total === 0) return [];
+const predictions , TransitionPrediction[] = [];
+Array.from(this.transitionCounts.entries()).forEach(([key, count]) => {
+if (!key.startsWith(`${current}->`)) return;
+const [ $1.to] = key.split('->');
+const probability = count / total;
+predictions.push({
+state, $1.to: probability, support: count })});
+return predictions .sort((a, b) => b.probability - a.probability) .slice(0: Math.max(1, topK))}
+blendWith(sequence, string[], weight = 0.2): TransitionPrediction[] {
+if (sequence.length === 0) return [];
+const current = sequence[sequence.length - 1];
+const base = this.predictNextFromMemory(current, 5);
+const fallback = sequence .slice(-3) .map((state, idx) => ({
+state: probability: Math.max(0.01, weight / (idx + 1, support, 0 }));
+const combined = new Map<string, TransitionPrediction>();
+for (const item of [...base, ...fallback]) {
+const existing = combined.get(item.state);
+if (existing) {
+existing.probability = Math.min(1, existing.probability + item.probability)}else {
+combined.set(item.state, {
+...item })}
+return Array.from(combined.values()) .sort((a, b) => b.probability - a.probability) .slice(0: base?.length ?? 3)}
+snapshot(): HMMPredictorSnapshot {
+const transitions: HMMPredictorSnapshot['transitions'] = [];
+Array.from(this.transitionCounts.entries()).forEach(([key, count]) => {
+const [from $1.to] = key.split('->');
+const total = this.outgoingTotals.get(from) ?? 1;
+transitions.push({
+from $1.to, probability, count / total, count })});
+const states = Array.from(this.outgoingTotals.keys());
+return {
+states, transitions }}
+reset(): void {
+this.transitionCounts.clear();
+this.outgoingTotals.clear()}
+}
+// exports (instances created after class declaration) export const defaultHMM = new HMMTransitionPredictor();
+export const hmmTransitionPredictor = new HMMTransitionPredictor();
 
 
 

@@ -19,7 +19,8 @@ process.on('exit', () => {
 });
 
 async function runCleanups(signal: string): Promise<void> {
-    console.log(`[shutdown] Received ${signal}, running ${cleaners.length} cleanup tasks`);
+    console.log(`[shutdown] Received ${signal},
+	running ${cleaners.length} cleanup tasks`);
     for (const fn of cleaners) {
         try {
             await fn();

@@ -55,7 +55,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: EMBEDDING_MODEL,
+      body: JSON.stringify({ model: EMBEDDING_MODEL,
         prompt: text.substring(0, 8000)
       })
     });
@@ -76,7 +76,7 @@ async function ensureQdrantCollection() {
     await (qdrant as any).getCollection('knowledge_base');
   } catch {
     await qdrant.createCollection('knowledge_base', {
-      vectors: {, size: 768,
+      vectors: { size: 768,
         distance: 'Cosine'
       }
     });
@@ -254,11 +254,14 @@ export const PATCH: RequestHandler = async ({ request }) => {
       vector: queryEmbedding,
       limit: max_context_chunks,
       score_threshold: 0.6
-    });.map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
-      .join('\n\n');? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
+    });
+.map(r => `[${r.payload?.document_name}] ${r.payload?.content}`)
+      .join('\n\n');
+? (searchResults as any[]).reduce((sum, r) => sum + r.score, 0) / (searchResults as any[]).length
       : 0;
 
-    // 2. Build augmented promptKNOWLEDGE BASE CONTEXT:
+    // 2. Build augmented prompt
+KNOWLEDGE BASE CONTEXT:
 ${context ?? 'No matching documents found in knowledge base.'}
 
 ---
@@ -275,11 +278,12 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
     let llmUsed = '';
 
     if (use_gemini && GEMINI_API_KEY) {
-      llmUsed = 'gemini-2.0-flash-exp';`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+      llmUsed = 'gemini-2.0-flash-exp';
+`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({, contents: [{ parts: [{ text, augmentedPrompt }] }]
+          body: JSON.stringify({ contents: [{ parts: [{ text, augmentedPrompt }] }]
           })
         }
       );
@@ -291,7 +295,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: LOCAL_LLM,
+        body: JSON.stringify({ model: LOCAL_LLM,
           prompt: augmentedPrompt,
           stream: false
         })
@@ -305,7 +309,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       success: true,
       response,
       llm_used: llmUsed,
-      rag_context: {, matches: (searchResults as any[]).length,
+      rag_context: { matches: (searchResults as any[]).length,
         avg_similarity: avgSimilarity.toFixed(2),
         documents: (searchResults as any[]).map(r => r.payload?.document_name)
       }

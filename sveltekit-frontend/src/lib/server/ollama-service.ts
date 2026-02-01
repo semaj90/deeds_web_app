@@ -13,7 +13,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
             reject(
                 new DOMException(`The operation was aborted due to timeout (${ms}ms)`, 'TimeoutError')
             );
-        }, ms);
+        },
+	ms);
 
         promise
             .then((result) => {
@@ -30,7 +31,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export async function generateText(prompt: string): Promise<string> {
     const body = {
         model: CHAT_MODEL,
-        messages: [{, role: 'user', content: prompt }],
+        messages: [{
+	role: 'user', content: prompt }],
         stream: false,
     };
 
@@ -38,7 +40,7 @@ export async function generateText(prompt: string): Promise<string> {
         fetch(`${OLLAMA_BASE_URL}/api/chat`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(body),
+	body: JSON.stringify(body),
         }),
         REQUEST_TIMEOUT_MS
     );
@@ -50,7 +52,8 @@ export async function generateText(prompt: string): Promise<string> {
     }
 
     const data = (await res.json()) as {
-        message?: {, content: string };
+        message?: {
+	content: string };
     };
 
     return data.message?.content ?? '';
@@ -65,7 +68,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
         model: CHAT_MODEL,
         messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }],
+	{ role: 'user', content: userPrompt }],
         stream: false,
     };
 
@@ -76,7 +79,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
             fetch(`${OLLAMA_BASE_URL}/api/chat`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify(body),
+	body: JSON.stringify(body),
             }),
             REQUEST_TIMEOUT_MS
         );
@@ -91,7 +94,8 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
         }
 
         const data = (await res.json()) as {
-            message?: {, content: string };
+            message?: {
+	content: string };
         };
 
         const content = data.message?.content ?? '';

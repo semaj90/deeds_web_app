@@ -3,7 +3,7 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
   import { N64LODManager } from '$lib/services/n64-lod-manager';
   import  SSRWebGPULoader_  from "$lib/components/ui/enhanced-bits/SSRWebGPULoader.svelte";
   const SSRWebGPULoader = SSRWebGPULoader_ as unknown
@@ -15,7 +15,8 @@ import type { Document } from '$lib/types';
     documentImportance = 'medium',
     autoStream = true,
     debugMode = false
-  }: {, documentId: string
+  }: {
+	documentId: string
     readingMode?: 'active' | 'preview' | 'timeline' | 'overview';
     documentImportance?: 'critical' | 'high' | 'medium' | 'low';
     autoStream?: boolean
@@ -28,8 +29,10 @@ import type { Document } from '$lib/types';
   let isStreaming = $state<boolean>(false);
   let streamingProgress = $state<number>(0);
   let memoryStats = $state({
-    memoryUsage: 0;, maxMemory: 8192,
-    textureCount: 0;, activeBankId: 0
+    memoryUsage: 0;
+	maxMemory: 8192,
+    textureCount: 0;
+	activeBankId: 0
   });
   // Viewing context
   let viewerElement: HTMLElement
@@ -73,10 +76,10 @@ import type { Document } from '$lib/types';
       if (viewerElement) {
         setupScrollListener()}
     })()});
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (lodManager) {
       lodManager.cleanup()}
-  });
+  }
   async function generateSampleTexture(): Promise<void> {
     // Create a sample legal document texture
     const canvas = document.createElement('canvas');
@@ -159,7 +162,8 @@ import type { Document } from '$lib/types';
         // Re-evaluate LOD after scrolling stops
         if (autoStream && targetLOD() !== currentLOD) {
           streamSpecificLOD(targetLOD())}
-      }, 150)}
+      },
+	150)}
     viewerElement?.addEventListener('scroll', handleScroll)}
   function startPerformanceMonitoring(): void {
     let lastTime = performance.now();
@@ -180,7 +184,8 @@ import type { Document } from '$lib/types';
     setTimeout(() => {
       if (autoStream && targetLOD() !== currentLOD) {
         streamSpecificLOD(targetLOD())}
-      userInteracting = false}, 100)}
+      userInteracting = false},
+	100)}
 
   // Convert ArrayBuffer texture to displayable format
   function getTextureDisplayData(): string {
@@ -447,7 +452,8 @@ import type { Document } from '$lib/types';
     margin: 1rem 0
     overflow: hidden}
   .loading-progress {
-    height: 100%;, background: #22c55e, transition: width 0.3s ease}
+    height: 100%;
+	background: #22c55e, transition: width 0.3s ease}
   .texture-display {
     position: relative, display: flex
     align-items: center
@@ -464,7 +470,8 @@ import type { Document } from '$lib/types';
     display: flex
     flex-direction: column
     align-items: center
-    justify-content: center, height: 100%;, color: #666}
+    justify-content: center, height: 100%;
+	color: #666}
   .nes-icon {
     font-size: 3rem
     margin-bottom: 1rem}
@@ -492,11 +499,13 @@ import type { Document } from '$lib/types';
     margin: 0.25rem 0
     font-size: 0.75rem, color: #ccc}
   .memory-bar {
-    width: 100%;, height: 8px, background: #333, border: 1px solid #555
+    width: 100%;
+	height: 8px, background: #333, border: 1px solid #555
     margin: 0.5rem 0
     overflow: hidden}
   .memory-usage {
-    height: 100%;, background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+    height: 100%;
+	background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
     transition: width 0.3s ease}
   /* NES-style scrollbar */
   .texture-viewer::-webkit-scrollbar {

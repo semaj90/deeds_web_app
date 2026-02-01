@@ -58,7 +58,7 @@ const IngestRequestSchema = z.object({
 type IngestRequest = z.infer<typeof IngestRequestSchema>;
 
 interface IngestResponse {
-  success: boolean;, jobIds: string[];
+  success: boolean; jobIds: string[];
   message: string;
   errors?: string[];
 }
@@ -106,7 +106,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const errors: string[] = [];
 
     // 1. Check for existing sources in batch
-    let existingSources: {, id: string; canonicalUrl: string }[] = [];
+    let existingSources: { id: string; canonicalUrl: string }[] = [];
     try {
       existingSources = await db
         .select({
@@ -145,7 +145,8 @@ export const POST: RequestHandler = async ({ request }) => {
             sourceType: 'web' as const,
             crawlStatus: 'new' as const,
           };
-        });.insert(aceSources)
+        });
+.insert(aceSources)
           .values(values)
           .returning({
             id: aceSources.id,

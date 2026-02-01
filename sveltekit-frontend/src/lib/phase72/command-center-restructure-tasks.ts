@@ -6,21 +6,26 @@
  */
 
 interface TaskAction {
-  label: string;, command: string;
+  label: string;
+	command: string;
   expected: string;
 }
 
 interface TaskValidation {
   command?: string;
-  query?: string;, expectation: string;
+  query?: string;
+	expectation: string;
   threshold?: string;
   current_status?: string;
 }
 
 interface RestructureTask {
-  id: string;, tab: 'system' | 'evidence' | 'routes';
-  title: string;, description: string;
-  intent: string;, phase: number;
+  id: string;
+	tab: 'system' | 'evidence' | 'routes';
+  title: string;
+	description: string;
+  intent: string;
+	phase: number;
   priority: 'high' | 'medium' | 'active' | 'complete';
   tags: string[];
   actions?: TaskAction[];
@@ -54,22 +59,23 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
           'grep -r "export const POST" src/routes/api/yorha src/routes/api/ai src/routes/api/rag',
         expected: 'List of endpoints with shared DTOs',
       },
-      {
+	{
         label: 'Map DTO dependencies',
         command: 'node scripts/analyze-dto-usage.mjs',
         expected: 'Dependency graph showing shared types',
       },
-      {
+	{
         label: 'Merge into api/legal',
         command: 'node scripts/merge-api-routes.mjs --target api/legal --sources yorha,ai,rag',
         expected: 'Unified api/legal tree with feature flags',
       },
-    ],
-    validation: {, command: 'npm run phase6:core',
+	],
+    validation: {
+	command: 'npm run phase6:core',
       expectation: 'TypeScript check passes with reduced error count',
     },
-  },
-  {
+	},
+	{
     id: 'phase72-embeddings-active',
     tab: 'system',
     title: 'Phase 72 GPU Error Clustering',
@@ -79,36 +85,38 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 72,
     priority: 'active',
     tags: ['gpu', 'embeddings', 'clustering', 'phase72'],
-    status: {, addon_built: true,
+    status: {
+	addon_built: true,
       addon_path: 'build/Release/ast_error_vectorizer.node',
       fallback_model: 'embeddinggemma:latest',
       embedding_dimension: 384,
       database_ready: false,
     },
-    actions: [
+	actions: [
       {
         label: 'Apply database migration',
         command: 'psql -U postgres -d legal_ai_db -f drizzle/0013_phase72_embeddings.sql',
         expected: 'embedding vector(384) column added with IVFFlat index',
       },
-      {
+	{
         label: 'Test error capture',
         command:
           'curl -X POST http://localhost:5173/api/phase72/capture-error -d \'{"file_path":"test.ts","message":"Property foo does not exist"}\'',
         expected: 'Error stored with embedding',
       },
-      {
+	{
         label: 'Test similarity search',
         command:
           'curl -X POST http://localhost:5173/api/phase72/similar-errors -d \'{"message":"Property does not exist","threshold":0.85}\'',
         expected: 'List of similar errors with scores',
       },
-    ],
-    validation: {, query: 'SELECT COUNT(*) FROM phase72_error WHERE embedding IS NOT NULL',
+	],
+    validation: {
+	query: 'SELECT COUNT(*) FROM phase72_error WHERE embedding IS NOT NULL',
       expectation: 'All captured errors have embeddings (< 5% NULL rate)',
     },
-  },
-  {
+	},
+	{
     id: 'env-phase14-unified',
     tab: 'system',
     title: 'Phase 14 Environment Unification',
@@ -117,15 +125,15 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 14,
     priority: 'complete',
     tags: ['env', 'config', 'phase14'],
-    verified: {, OLLAMA_URL: 'http://localhost:11434',
+    verified: {
+	OLLAMA_URL: 'http://localhost:11434',
       DATABASE_URL: 'postgresql://legal_admin:*****@localhost:5434/legal_ai_db',
       QDRANT_URL: 'http://localhost:6333',
       AUTH_COOKIE_NAME: 'yorha_session',
       PHASE72_ENABLED: true,
     },
-  },
-
-  // Evidence Tab Tasks
+	},
+	// Evidence Tab Tasks
   {
     id: 'evidence-grid-unify',
     tab: 'evidence',
@@ -147,23 +155,24 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
         command: 'grep -r "RealTimeEvidenceGrid\\|EvidenceGrid" src/routes',
         expected: 'List of pages importing these components',
       },
-      {
+	{
         label: 'Migrate to YoRHa variant',
         command: 'node scripts/migrate-evidence-grids.mjs --target yorha',
         expected: 'All imports use src/lib/components/yorha/EvidenceGrid.svelte',
       },
-      {
+	{
         label: 'Remove legacy components',
         command:
           'rm src/lib/components/evidence/RealTimeEvidenceGrid.svelte src/lib/components/evidence/EvidenceGrid.svelte',
         expected: 'Only YoRHa variant remains',
       },
-    ],
-    validation: {, command: 'npm run check',
+	],
+    validation: {
+	command: 'npm run check',
       expectation: 'Svelte check passes with reduced warning count',
     },
-  },
-  {
+	},
+	{
     id: 'archive-trimming',
     tab: 'evidence',
     title: 'Archive Route Cleanup',
@@ -184,28 +193,28 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
           'Get-ChildItem -Recurse src/routes/archive -Filter "*.svelte" | Select-Object Name',
         expected: 'Enumeration of all archive routes',
       },
-      {
+	{
         label: 'Export to markdown',
         command: 'node scripts/export-archive-routes.mjs --output docs/archived-demos',
         expected: 'Markdown files in docs/archived-demos/',
       },
-      {
+	{
         label: 'Tag with intent',
         command: 'node scripts/tag-archive-intent.mjs',
         expected: 'Each route metadata includes archival reason',
       },
-      {
+	{
         label: 'Remove from manifest',
         command: 'rm -r src/routes/archive/demo-* src/routes/archive/test-*',
         expected: 'Only reference/legacy routes remain',
       },
-    ],
-    validation: {, command: 'npm run build -- --dry-run',
+	],
+    validation: {
+	command: 'npm run build -- --dry-run',
       expectation: 'Route manifest size reduced by >20%',
     },
-  },
-
-  // Routes Tab Tasks
+	},
+	// Routes Tab Tasks
   {
     id: 'route-consolidation-complete',
     tab: 'routes',
@@ -226,11 +235,12 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
       'src/routes/api/webgpu/**',
       'src/routes/routes/+page.server.ts',
     ],
-    validation: {, command: 'npm run build',
+    validation: {
+	command: 'npm run build',
       expectation: 'No route manifest conflicts',
     },
-  },
-  {
+	},
+	{
     id: 'phase6-validation-active',
     tab: 'routes',
     title: 'Phase 6 TypeScript/Svelte Validation',
@@ -240,19 +250,22 @@ export const phase6_72_restructure_tasks: RestructureTask[] = [
     phase: 6,
     priority: 'active',
     tags: ['typescript', 'svelte5', 'validation', 'phase6'],
-    checks: {, typescript: 'npx tsc --noEmit --skipLibCheck',
+    checks: {
+	typescript: 'npx tsc --noEmit --skipLibCheck',
       svelte: 'npx svelte-check --tsconfig tsconfig.json',
       core: 'npm run phase6:core',
     },
-    auto_fix: {, svelte5_syntax: 'node scripts/fix-svelte5-syntax.mjs',
+	auto_fix: {
+	svelte5_syntax: 'node scripts/fix-svelte5-syntax.mjs',
       components_fixed: ['src/lib/components/yorha/**', 'src/lib/filters/**', 'src/lib/search/**'],
     },
-    validation: {, threshold: '< 100 TypeScript errors',
+	validation: {
+	threshold: '< 100 TypeScript errors',
       current_status: 'Passing after route consolidation',
       expectation: 'TypeScript and Svelte checks pass',
     },
-  },
-];
+	},
+	];
 
 /**
  * Helper to format tasks for NES modal display

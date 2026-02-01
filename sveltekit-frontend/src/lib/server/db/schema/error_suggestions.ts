@@ -18,7 +18,7 @@ export const errorSuggestionsTable = pgTable('error_suggestions',
         clusterId: text('cluster_id'),
         applied: boolean('applied').default(false),
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: index('idx_error_suggestions_route').on(table.routePath),
         };

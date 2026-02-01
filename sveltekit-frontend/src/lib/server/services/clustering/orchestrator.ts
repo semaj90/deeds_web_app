@@ -8,8 +8,10 @@ import { clusteringMachineDef, type ClusteringContext, type ClusteringSnapshot }
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
-    jobId: string;, status: 'success' | 'failed' | 'timeout';
-    context: ClusteringContext;, executionTimeMs: number;
+    jobId: string;
+	status: 'success' | 'failed' | 'timeout';
+    context: ClusteringContext;
+	executionTimeMs: number;
     error?: Error;
 }
 
@@ -46,7 +48,7 @@ export async function runClusteringWorkflow(
                         currentLabels: snapshot.context.currentLabels
                             ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
                     },
-                    timestamp: new Date().toISOString(),
+	timestamp: new Date().toISOString(),
                 })
             );
 
@@ -78,7 +80,8 @@ export async function runClusteringWorkflow(
                 executionTimeMs: Date.now() - startTime,
                 error: new Error(`Clustering job timeout after ${timeoutMs}ms`),
             });
-        }, timeoutMs);
+        },
+	timeoutMs);
 
         // Start the machine
         actor.start();

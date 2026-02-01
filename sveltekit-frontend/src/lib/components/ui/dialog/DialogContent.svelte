@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { getContext, onDestroy, onMount } from 'svelte';
+	// Migrated to $effect
 	import { scale } from 'svelte/transition';
 	import type { DialogContentProps } from './types';
 
@@ -18,7 +18,8 @@
 		preventScroll = true,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean;, close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean;
+	close: () => void }>('dialog');
 
 let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;
@@ -38,7 +39,8 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		e.stopPropagation();
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		if (dialogContext?.open) {
 			previousActiveElement = document.activeElement;
 
@@ -52,9 +54,10 @@ let contentRef = $state<HTMLDivElement | null>(null);
 				contentRef.focus();
 			}
 		}
-	});
+	
+});
 
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		// Restore scroll
 		document.body.style.overflow = '';
 
@@ -62,7 +65,7 @@ let contentRef = $state<HTMLDivElement | null>(null);
 		if (previousActiveElement instanceof HTMLElement) {
 			previousActiveElement.focus();
 		}
-	});
+	}
 
 	const defaultClass = `
 		fixed left-1/2 top-1/2 z-50
@@ -79,7 +82,8 @@ let contentRef = $state<HTMLDivElement | null>(null);
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{, duration: 150, start: 0.95 }}
+		transition: scale={{
+	duration: 150, start: 0.95 }}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="dialog"

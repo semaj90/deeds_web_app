@@ -72,7 +72,8 @@ export async function initWebGPU(
     // Request device with features and limits
     const device = await adapter.requestDevice({
       requiredFeatures: options.requiredFeatures || [],
-      requiredLimits: {, maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+      requiredLimits: {
+	maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
         maxComputeWorkgroupsPerDimension: 65535,
         ...options.requiredLimits
       }
@@ -187,9 +188,11 @@ export function isWebGPUAvailable(): boolean {
 /**
  * Get WebGPU capabilities (SSR-safe)
  */
-export async function getWebGPUCapabilities(): Promise<{, available: boolean;
+export async function getWebGPUCapabilities(): Promise<{
+	available: boolean;
   adapter: GPUAdapter | null;
-  features: string[];, limits: Record<string, number>;
+  features: string[];
+	limits: Record<string, number>;
 } | null> {
   if (!isWebGPUAvailable()) {
     return {
@@ -215,7 +218,8 @@ export async function getWebGPUCapabilities(): Promise<{, available: boolean;
       available: true,
       adapter,
       features: Array.from(adapter.features),
-      limits: {, maxBufferSize: adapter.limits.maxBufferSize,
+      limits: {
+	maxBufferSize: adapter.limits.maxBufferSize,
         maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
         maxComputeWorkgroupsPerDimension: adapter.limits.maxComputeWorkgroupsPerDimension,
         maxComputeInvocationsPerWorkgroup: adapter.limits.maxComputeInvocationsPerWorkgroup

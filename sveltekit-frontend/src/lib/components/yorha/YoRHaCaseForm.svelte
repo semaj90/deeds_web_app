@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { enhancedCaseAPI, type CaseCreationRequest } from '$lib/api/enhanced-case-api';
   import { createCaseCreationForm, FORM_STORAGE_KEYS } from '$lib/forms/superforms-xstate-integration';
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
   import type { Readable } from 'svelte/store';
   import { get } from 'svelte/store';
   import { z } from 'zod';
@@ -38,17 +38,22 @@
   const { onDispatch, onsuccess, onerror, onclose } = $props<{
     onDispatch?: (payload: Record<string, unknown>) => void;
     onsuccess?: (result: unknown) => void;
-    onerror?: (error: {, message: string }) => void;
+    onerror?: (error: {
+	message: string }) => void;
     onclose?: () => void;
   }>();
 
   // Minimal typing for the form integration
   type Subscriber<T = unknown> = (value: T) => void;
   interface FormIntegrationType {
-    state: {, subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
-    context: {, subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
-    form: {, form: Readable<CaseCreationSchemaType>;
-      submitting: Readable<boolean>;, allErrors: Readable<string[]>;
+    state: {
+	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => string };
+    context: {
+	subscribe: (fn: Subscriber<unknown>) => () => void; get?: () => unknown };
+    form: {
+	form: Readable<CaseCreationSchemaType>;
+      submitting: Readable<boolean>;
+	allErrors: Readable<string[]>;
       errors: Readable<Record<string, string[]>>;
       enhance: (el: HTMLFormElement) => { destroy: () => void };
     };
@@ -82,7 +87,8 @@
 
 
 
-  onMount(() => {
+  $effect(() => {
+
     const savedData = formStatePersistence.load();
     const initialData = savedData || {
       title: '',
@@ -105,7 +111,8 @@
       onSuccess: handleFormSuccess,
       onError: handleFormError,
       onSubmit: handleEnhancedSubmit
-    }) as unknown as FormIntegrationType;
+    
+}); as unknown as FormIntegrationType;
 
     unsubscribe = formIntegration.state.subscribe((state: unknown) => {
        const s = String(state);
@@ -113,12 +120,12 @@
     });
   });
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (unsubscribe) unsubscribe();
     if (formIntegration) {
       formStatePersistence.save(get(formIntegration.form.form));
     }
-  });
+  }
 
   async function handleEnhancedSubmit(data: Record<string, any>): Promise<any> {
     try {

@@ -2,46 +2,49 @@ import { getAllStates, getAllTitles } from './law-mapping.js';
 
 interface LegalSuggestion {
   type: 'statute' | 'crime' | 'state' | 'title';
-  label: string;, value: string;
-  description?: string;, confidence: number;
+  label: string;
+  value: string;
+  description?: string;
+  confidence: number;
 }
 
 interface Crime {
-  name: string;, codes: string[];
+  name: string;
+  codes: string[];
   abbr: string[];
 }
 
 // Crime/offense database with abbreviations and aliases
 const crimes: Crime[] = [
   { name: 'child neglect', codes: ['273a', '273d'], abbr: ['cn'] },
-  { name: 'dui injury', codes: ['23153', '23154'], abbr: ['dui'] },
-  { name: 'assault', codes: ['240', '241', '242'], abbr: ['asl'] },
-  { name: 'battery', codes: ['242', '243'], abbr: ['bat'] },
-  { name: 'robbery', codes: ['211', '212'], abbr: ['rob'] },
-  { name: 'burglary', codes: ['459', '460'], abbr: ['burg'] },
-  { name: 'theft', codes: ['484', '485', '486'], abbr: ['theft'] },
-  { name: 'grand theft auto', codes: ['487', '488'], abbr: ['gta'] },
-  { name: 'drug possession', codes: ['11350', '11357'], abbr: ['dp'] },
-  { name: 'drug sales', codes: ['11352', '11359'], abbr: ['ds'] },
-  { name: 'murder', codes: ['187'], abbr: ['murder'] },
-  { name: 'manslaughter', codes: ['192'], abbr: ['ms'] },
-  { name: 'rape', codes: ['261', '262'], abbr: ['rape'] },
-  { name: 'sexual assault', codes: ['243.4', '261'], abbr: ['sa'] },
-  { name: 'kidnapping', codes: ['207', '208'], abbr: ['kid'] },
-  { name: 'arson', codes: ['451', '452'], abbr: ['arson'] },
-  { name: 'fraud', codes: ['530.5', '530.8'], abbr: ['fraud'] },
-  { name: 'forgery', codes: ['470', '471'], abbr: ['forg'] },
-  { name: 'embezzlement', codes: ['503', '504'], abbr: ['emb'] },
-  { name: 'extortion', codes: ['518', '519'], abbr: ['ext'] },
-  { name: 'stalking', codes: ['646.9'], abbr: ['stalk'] },
-  { name: 'harassment', codes: ['653.2'], abbr: ['har'] },
-  { name: 'trespassing', codes: ['602', '602.5'], abbr: ['tresp'] },
-  { name: 'vandalism', codes: ['594'], abbr: ['vand'] },
-  { name: 'disorderly conduct', codes: ['647'], abbr: ['dc'] },
-  { name: 'drunk in public', codes: ['647f'], abbr: ['dip'] },
-  { name: 'resisting arrest', codes: ['148', '149'], abbr: ['ra'] },
-  { name: 'probation violation', codes: ['1203.2'], abbr: ['pv'] },
-  { name: 'parole violation', codes: ['3000'], abbr: ['parv'] }
+	{ name: 'dui injury', codes: ['23153', '23154'], abbr: ['dui'] },
+	{ name: 'assault', codes: ['240', '241', '242'], abbr: ['asl'] },
+	{ name: 'battery', codes: ['242', '243'], abbr: ['bat'] },
+	{ name: 'robbery', codes: ['211', '212'], abbr: ['rob'] },
+	{ name: 'burglary', codes: ['459', '460'], abbr: ['burg'] },
+	{ name: 'theft', codes: ['484', '485', '486'], abbr: ['theft'] },
+	{ name: 'grand theft auto', codes: ['487', '488'], abbr: ['gta'] },
+	{ name: 'drug possession', codes: ['11350', '11357'], abbr: ['dp'] },
+	{ name: 'drug sales', codes: ['11352', '11359'], abbr: ['ds'] },
+	{ name: 'murder', codes: ['187'], abbr: ['murder'] },
+	{ name: 'manslaughter', codes: ['192'], abbr: ['ms'] },
+	{ name: 'rape', codes: ['261', '262'], abbr: ['rape'] },
+	{ name: 'sexual assault', codes: ['243.4', '261'], abbr: ['sa'] },
+	{ name: 'kidnapping', codes: ['207', '208'], abbr: ['kid'] },
+	{ name: 'arson', codes: ['451', '452'], abbr: ['arson'] },
+	{ name: 'fraud', codes: ['530.5', '530.8'], abbr: ['fraud'] },
+	{ name: 'forgery', codes: ['470', '471'], abbr: ['forg'] },
+	{ name: 'embezzlement', codes: ['503', '504'], abbr: ['emb'] },
+	{ name: 'extortion', codes: ['518', '519'], abbr: ['ext'] },
+	{ name: 'stalking', codes: ['646.9'], abbr: ['stalk'] },
+	{ name: 'harassment', codes: ['653.2'], abbr: ['har'] },
+	{ name: 'trespassing', codes: ['602', '602.5'], abbr: ['tresp'] },
+	{ name: 'vandalism', codes: ['594'], abbr: ['vand'] },
+	{ name: 'disorderly conduct', codes: ['647'], abbr: ['dc'] },
+	{ name: 'drunk in public', codes: ['647f'], abbr: ['dip'] },
+	{ name: 'resisting arrest', codes: ['148', '149'], abbr: ['ra'] },
+	{ name: 'probation violation', codes: ['1203.2'], abbr: ['pv'] },
+	{ name: 'parole violation', codes: ['3000'], abbr: ['parv'] }
 ];
 
 // Statute code patterns
@@ -274,4 +277,3 @@ export function getStateSuggestions(query: string, limit: number = 5): LegalSugg
 export function getTitleSuggestions(query: string, limit: number = 5): LegalSuggestion[] {
   return searchTitles(query).slice(0, limit);
 }
-

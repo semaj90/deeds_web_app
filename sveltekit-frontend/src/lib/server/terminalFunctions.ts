@@ -4,42 +4,57 @@
  */
 
 export interface SearchEvidenceResult {
-	query: string;, found: number;
-	results: Array<{, id: string;
-		title: string;, classification: string;
-		status: string;, relevance: number;
+	query: string;
+	found: number;
+	results: Array<{
+	id: string;
+		title: string;
+	classification: string;
+		status: string;
+	relevance: number;
 		snippet: string;
 	}>;
 }
 
 export interface ExtractHoldingsResult {
-	evidenceId: string;, holdings: Array<{
-		text: string;, confidence: number;
+	evidenceId: string;
+	holdings: Array<{
+		text: string;
+	confidence: number;
 		citations: string[];
 	}>;
 }
 
 export interface FindCitationsResult {
-	evidenceId: string;, citations: Array<{
+	evidenceId: string;
+	citations: Array<{
 		type: 'statute' | 'case' | 'regulation';
-		reference: string;, title: string;
+		reference: string;
+	title: string;
 		year?: number;
 	}>;
 }
 
 export interface AnalyzeRelationshipsResult {
-	evidenceIds: string[];, relationships: Array<{
-		source: string;, target: string;
+	evidenceIds: string[];
+	relationships: Array<{
+		source: string;
+	target: string;
 		type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
-		confidence: number;, reasoning: string;
+		confidence: number;
+	reasoning: string;
 	}>;
 }
 
 export interface GenerateSummaryResult {
-	caseId: string;, summary: {
-		title: string;, status: string;
-		totalEvidence: number;, keyFindings: string[];
-		timeline: string;, nextSteps: string[];
+	caseId: string;
+	summary: {
+		title: string;
+	status: string;
+		totalEvidence: number;
+	keyFindings: string[];
+		timeline: string;
+	nextSteps: string[];
 	};
 }
 
@@ -60,7 +75,7 @@ export async function searchEvidence(
 			relevance: 0.95,
 			snippet: 'The suspect was seen at the location on the night of the incident.'
 		},
-		{
+	{
 			id: 'ev-002',
 			title: 'Security Footage - Location A',
 			classification: 'confidential',
@@ -68,7 +83,7 @@ export async function searchEvidence(
 			relevance: 0.87,
 			snippet: 'Video shows individual matching suspect description entering building at 22:15 hours.'
 		},
-		{
+	{
 			id: 'ev-003',
 			title: 'Phone Records - Suspect',
 			classification: 'sealed',
@@ -90,21 +105,23 @@ export async function searchEvidence(
  */
 export async function extractHoldings(evidenceId: string): Promise<ExtractHoldingsResult> {
 	const holdingsMap: Record<string, ExtractHoldingsResult> = {
-		'ev-001': {, evidenceId: 'ev-001',
+		'ev-001': {
+	evidenceId: 'ev-001',
 			holdings: [
 				{
 					text: 'The defendant was present at the scene of the crime',
 					confidence: 0.98,
 					citations: ['USC 18-1001', 'State v. Johnson (2019)']
 				},
-				{
+	{
 					text: 'Witness testimony establishes timeline of events',
 					confidence: 0.92,
 					citations: ['FRE 602', 'State v. Martinez (2020)']
 				}
 			]
 		},
-		'ev-002': {, evidenceId: 'ev-002',
+	'ev-002': {
+	evidenceId: 'ev-002',
 			holdings: [
 				{
 					text: 'Video evidence corroborates witness testimony',
@@ -113,7 +130,8 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
 				}
 			]
 		},
-		'ev-003': {, evidenceId: 'ev-003',
+	'ev-003': {
+	evidenceId: 'ev-003',
 			holdings: [
 				{
 					text: 'Phone records establish communication with victim',
@@ -126,7 +144,8 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
 
 	return holdingsMap[evidenceId] || {
 		evidenceId,
-		holdings: [{, text: 'Evidence supports investigation findings', confidence: 0.8, citations: [] }]
+		holdings: [{
+	text: 'Evidence supports investigation findings', confidence: 0.8, citations: [] }]
 	};
 }
 
@@ -135,31 +154,35 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  */
 export async function findCitations(evidenceId: string): Promise<FindCitationsResult> {
 	const citationsMap: Record<string, FindCitationsResult> = {
-		'ev-001': {, evidenceId: 'ev-001',
+		'ev-001': {
+	evidenceId: 'ev-001',
 			citations: [
 				{ type: 'statute', reference: 'USC 18-1001', title: 'Fraud and False Statements' },
-				{ type: 'case', reference: 'State v. Johnson', title: 'Witness Credibility Standards', year: 2019 },
-				{ type: 'regulation', reference: 'FRE 602', title: 'Need for Personal Knowledge' }
+	{ type: 'case', reference: 'State v. Johnson', title: 'Witness Credibility Standards', year: 2019 },
+	{ type: 'regulation', reference: 'FRE 602', title: 'Need for Personal Knowledge' }
 			]
 		},
-		'ev-002': {, evidenceId: 'ev-002',
+	'ev-002': {
+	evidenceId: 'ev-002',
 			citations: [
 				{ type: 'statute', reference: 'USC 18-1519', title: 'Obstruction of Justice' },
-				{ type: 'case', reference: 'State v. Anderson', title: 'Video Evidence Authentication', year: 2021 },
-				{ type: 'regulation', reference: 'FRE 901', title: 'Authenticating or Identifying Evidence' }
+	{ type: 'case', reference: 'State v. Anderson', title: 'Video Evidence Authentication', year: 2021 },
+	{ type: 'regulation', reference: 'FRE 901', title: 'Authenticating or Identifying Evidence' }
 			]
 		},
-		'ev-003': {, evidenceId: 'ev-003',
+	'ev-003': {
+	evidenceId: 'ev-003',
 			citations: [
 				{ type: 'statute', reference: '18 USC 2703', title: 'Required Disclosure of Customer Communications' },
-				{ type: 'case', reference: 'Carpenter v. United States', title: 'Cell-Site Location Information Privacy', year: 2018 }
+	{ type: 'case', reference: 'Carpenter v. United States', title: 'Cell-Site Location Information Privacy', year: 2018 }
 			]
 		}
 	};
 
 	return citationsMap[evidenceId] || {
 		evidenceId,
-		citations: [{, type: 'statute', reference: 'USC 18-1001', title: 'General Fraud Statute' }]
+		citations: [{
+	type: 'statute', reference: 'USC 18-1001', title: 'General Fraud Statute' }]
 	};
 }
 
@@ -177,14 +200,14 @@ export async function analyzeRelationships(
 			confidence: 0.95,
 			reasoning: 'Witness statement corroborated by security footage showing same individual at same time'
 		},
-		{
+	{
 			source: 'ev-002',
 			target: 'ev-003',
 			type: 'mentions' as const,
 			confidence: 0.87,
 			reasoning: 'Video timestamp aligns with phone records showing communication with victim'
 		},
-		{
+	{
 			source: 'ev-003',
 			target: 'ev-001',
 			type: 'contradicts' as const,
@@ -207,7 +230,8 @@ export async function analyzeRelationships(
 export async function generateSummary(caseId: string): Promise<GenerateSummaryResult> {
 	return {
 		caseId,
-		summary: {, title: 'Investigation Summary - Case ' + caseId,
+		summary: {
+	title: 'Investigation Summary - Case ' + caseId,
 			status: 'Active Investigation',
 			totalEvidence: 12,
 			keyFindings: [
@@ -260,8 +284,10 @@ export async function executeTerminalFunction(
  */
 export function parseFunctionCalls(
 	response: string
-): Array<{, name: string; args: Record<string, any> }> {
-	const functionCalls: Array<{, name: string; args: Record<string, any> }> = [];
+): Array<{
+	name: string; args: Record<string, any> }> {
+	const functionCalls: Array<{
+	name: string; args: Record<string, any> }> = [];
 
 	// Match patterns like: search_evidence(query="test", caseId="123")
 	const functionCallRegex = /FUNCTION_CALL:\s*(\w+)\s*\((.*?)\)(?=\s|$|FUNCTION_CALL)/gs;

@@ -11,15 +11,19 @@ import { auditService } from './audit.service.js';
 import crypto from 'crypto';
 
 export interface CaseStatuteLink {
-	id: string;, case_id: string;
-	statute_code: string;, linked_by: string;
+	id: string;
+	case_id: string;
+	statute_code: string;
+	linked_by: string;
 	link_type: string;
-	notes?: string;, created_at: Date;
+	notes?: string;
+	created_at: Date;
 	updated_at: Date;
 }
 
 export interface LinkCaseStatuteRequest {
-	statute_code: string;, link_type: string;
+	statute_code: string;
+	link_type: string;
 	notes?: string;
 }
 
@@ -54,13 +58,13 @@ class CaseLinkService {
 				)
 				VALUES (
 					${link.id},
-					${link.case_id},
-					${link.statute_code},
-					${link.linked_by},
-					${link.link_type},
-					${link.notes ?? null},
-					${link.created_at.toISOString()},
-					${link.updated_at.toISOString()}
+	${link.case_id},
+	${link.statute_code},
+	${link.linked_by},
+	${link.link_type},
+	${link.notes ?? null},
+	${link.created_at.toISOString()},
+	${link.updated_at.toISOString()}
 				)
 			`);
 
@@ -82,7 +86,7 @@ class CaseLinkService {
 					caseId,
 					'create_link', // changed from 'retrieve' to more accurate 'create_link' or generic 'update'
 					{ statute_code: data.statute_code, link_type: data.link_type },
-					true
+	true
 				);
 			} catch (e) {
 				// Audit log failure shouldn't fail the operation
@@ -174,7 +178,7 @@ class CaseLinkService {
 					caseId,
 					'delete_link',
 					{ statute_code: statuteCode, action: 'unlink' },
-					true
+	true
 				);
 			} catch (e) {
 				console.error('Audit log failed', e);

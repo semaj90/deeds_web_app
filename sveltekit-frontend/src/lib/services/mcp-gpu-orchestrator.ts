@@ -40,8 +40,10 @@ export interface GPUTaskConfig {
 }
 
 export interface GPUTaskResult {
-    taskId: string;, success: boolean;
-    result: unknown;, metrics: {
+    taskId: string;
+	success: boolean;
+    result: unknown;
+	metrics: {
         processingTime: number;
         gpuUtilization?: number;
         memoryUsage?: number;
@@ -52,7 +54,8 @@ export interface GPUTaskResult {
     recommendations?: string[];
     riskScore?: number;
     securityScore?: number;
-    legalVerification?: {, verified: boolean;
+    legalVerification?: {
+	verified: boolean;
         confidence: number;
         details?: unknown;
     };
@@ -60,18 +63,25 @@ export interface GPUTaskResult {
 
 export interface ClusterMetrics {
     spawned: Record<string, number>;
-    deferredActive: number;, deferredTotal: number;
-    lastAllocation: {, type: string;
-        port: number;, timestamp: string;
+    deferredActive: number;
+	deferredTotal: number;
+    lastAllocation: {
+	type: string;
+        port: number;
+	timestamp: string;
     };
-    events: Array<any>;, workers: Array<any>;
+    events: Array<any>;
+	workers: Array<any>;
     deferredQueue: Array<any>;
 }
 
 export interface AutosolveContext {
-    errorCount: number;, errorTypes: string[];
-    clusterMetrics: ClusterMetrics;, threshold: number;
-    lastRun: string;, suggestedActions: string[];
+    errorCount: number;
+	errorTypes: string[];
+    clusterMetrics: ClusterMetrics;
+	threshold: number;
+    lastRun: string;
+	suggestedActions: string[];
 }
 
 class MCPGPUOrchestrator {
@@ -162,7 +172,7 @@ class MCPGPUOrchestrator {
                     protocol,
                     model: task.config?.model ?? 'unknown'
                 },
-                recommendations: await this.generateRecommendations(task, result),
+	recommendations: await this.generateRecommendations(task, result),
                 riskScore,
                 securityScore,
                 legalVerification: legalVerification as GPUTaskResult['legalVerification']
@@ -177,10 +187,11 @@ class MCPGPUOrchestrator {
                 taskId: task.id,
                 success: false,
                 result: null,
-                metrics: {, processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
+                metrics: {
+	processingTime: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime,
                     protocol: 'failed'
                 },
-                error: message
+	error: message
             };
         }
     }
@@ -235,7 +246,7 @@ class MCPGPUOrchestrator {
                 temperature: task.config?.temperature ?? 0.1,
                 maxTokens: task.config?.maxTokens ?? 2048
             },
-            {
+	{
                 preferredProtocol: task.config?.protocol ?? 'grpc',
                 timeout: task.config?.timeout ?? 30000
             }
@@ -253,7 +264,7 @@ class MCPGPUOrchestrator {
                 userId: task.context?.userId,
                 caseId: task.context?.caseId
             },
-            {
+	{
                 preferredProtocol: task.config?.protocol ?? 'http',
                 timeout: task.config?.timeout ?? 45000
             }
@@ -278,7 +289,7 @@ class MCPGPUOrchestrator {
                 model: task.config?.model ?? 'nomic-embed-text',
                 batch_size: task.config?.model === 'nomic-embed-text' ? 32 : 16
             },
-            {
+	{
                 preferredProtocol: 'http',
                 timeout: 30000
             }
@@ -294,7 +305,7 @@ class MCPGPUOrchestrator {
                 learning_rate: task.data.learningRate ?? 0.1,
                 iterations: task.data.iterations ?? 1000
             },
-            {
+	{
                 timeout: 60000
             }
         );
@@ -308,7 +319,7 @@ class MCPGPUOrchestrator {
                 model: task.config?.model ?? 'gemma3-legal',
                 layer_analysis: true
             },
-            {
+	{
                 preferredProtocol: 'grpc',
                 timeout: 45000
             }
@@ -335,7 +346,7 @@ class MCPGPUOrchestrator {
                 prompt: remediationPrompt,
                 includeCodeFix: true
             },
-            {
+	{
                 preferredProtocol: 'grpc',
                 timeout: 60000
             }
@@ -354,7 +365,7 @@ class MCPGPUOrchestrator {
                     fingerprint,
                     context: task.context
                 },
-                {
+	{
                     preferredProtocol: this.normalizeProtocol(task.config?.protocol),
                     timeout: task.config?.timeout ?? 10000
                 }
@@ -379,7 +390,7 @@ Respond JSON: {"riskScore": 0.0, "reasoning": "explanation", "recommendations": 
                             temperature: 0.1,
                             max_tokens: 512
                         },
-                        {
+	{
                             preferredProtocol: 'http',
                             timeout: 10000
                         }
@@ -415,24 +426,26 @@ Respond JSON: {"riskScore": 0.0, "reasoning": "explanation", "recommendations": 
 
             return {
                 success: true,
-                data: {, riskScore: compositeRiskScore,
+                data: {
+	riskScore: compositeRiskScore,
                     securityScore: Math.round((1 - compositeRiskScore) * 100),
                     analysis: this.getNested<unknown>(response, ['data', 'analysis'], () => true),
                     recommendations: this.getNested<Array<unknown>>(aiAnalysis, ['recommendations'], this.isArray) ?? [],
                     flags: this.getNested<Array<unknown>>(response, ['data', 'flags'], this.isArray) ?? []
                 },
-                protocol: this.getNested<string>(response, ['protocol'], this.isString) ?? 'http',
+	protocol: this.getNested<string>(response, ['protocol'], this.isString) ?? 'http',
                 latency: this.getNested<number>(response, ['latency'], this.isNumber) ?? 0
             } as unknown as ServiceResponse;
         } catch (error) {
             return {
                 success: false,
-                data: {, riskScore: 0.5,
+                data: {
+	riskScore: 0.5,
                     securityScore: 50,
                     analysis: 'Fallback security analysis',
                     error: error instanceof Error ? error.message : String(error)
                 },
-                protocol: 'fallback',
+	protocol: 'fallback',
                 latency: 0
             } as unknown as ServiceResponse;
         }
@@ -454,13 +467,14 @@ Respond JSON: {"riskScore": 0.0, "reasoning": "explanation", "recommendations": 
                     badgeNumber,
                     timestamp: new Date().toISOString()
                 },
-                {
+	{
                     preferredProtocol: this.normalizeProtocol(task.config?.protocol),
                     timeout: task.config?.timeout ?? 15000
                 }
             );
 
-            let legalVerification: {, verified: boolean; confidence: number; details?: unknown } = {
+            let legalVerification: {
+	verified: boolean; confidence: number; details?: unknown } = {
                 verified: false,
                 confidence: 0
             };
@@ -485,7 +499,7 @@ Respond with JSON: {"verified": true, "confidence": 0.0, "concerns": [], "recomm
                             temperature: 0.1,
                             max_tokens: 512
                         },
-                        {
+	{
                             preferredProtocol: 'http',
                             timeout: 10000
                         }
@@ -518,26 +532,29 @@ Respond with JSON: {"verified": true, "confidence": 0.0, "concerns": [], "recomm
 
             return {
                 success: true,
-                data: {, riskScore: Math.max(0, (100 - compositeScore) / 100),
+                data: {
+	riskScore: Math.max(0, (100 - compositeScore) / 100),
                     securityScore: compositeScore,
                     legalVerification,
                     validation: this.getNested<unknown>(validationResponse, ['data'], (v) => this.isObject(v)),
                     professionalVerification: legalVerification,
                     compositeScore
                 },
-                protocol: this.getNested<string>(validationResponse, ['protocol'], this.isString) ?? 'http',
+	protocol: this.getNested<string>(validationResponse, ['protocol'], this.isString) ?? 'http',
                 latency: this.getNested<number>(validationResponse, ['latency'], this.isNumber) ?? 0
             } as unknown as ServiceResponse;
         } catch (error) {
             return {
                 success: false,
-                data: {, riskScore: 0.8,
+                data: {
+	riskScore: 0.8,
                     securityScore: 20,
-                    legalVerification: {, verified: false, confidence: 0 },
-                    error: error instanceof Error ? error.message : 'Validation failed',
+                    legalVerification: {
+	verified: false, confidence: 0 },
+	error: error instanceof Error ? error.message : 'Validation failed',
                     fallback: true
                 },
-                protocol: 'fallback',
+	protocol: 'fallback',
                 latency: 0
             } as unknown as ServiceResponse;
         }
@@ -638,7 +655,8 @@ Provide a complete, working fix with explanation.`;
 
     private async getGPUUtilization(): Promise<number> {
         try {
-            const response = await productionServiceClient.callService('/api/gpu/metrics', {}, { timeout: 5000 });
+            const response = await productionServiceClient.callService('/api/gpu/metrics', {},
+	{ timeout: 5000 });
             return response?.success ? (response.data?.utilization ?? 0) : 0;
         } catch {
             return 0;
@@ -647,7 +665,8 @@ Provide a complete, working fix with explanation.`;
 
     private async getMemoryUsage(): Promise<number> {
         try {
-            const response = await productionServiceClient.callService('/api/gpu/memory-status', {}, { timeout: 5000 });
+            const response = await productionServiceClient.callService('/api/gpu/memory-status', {},
+	{ timeout: 5000 });
             return response?.success ? (response.data?.memory_used ?? 0) : 0;
         } catch {
             return 0;
@@ -674,10 +693,12 @@ Provide a complete, working fix with explanation.`;
             type: 'legal_analysis',
             priority: 'high',
             data: { document },
-            context: {, caseId: options.caseId,
+	context: {
+	caseId: options.caseId,
                 userId: options.userId
             },
-            config: {, useGPU: true,
+	config: {
+	useGPU: true,
                 useRAG: options.includeRAG !== false,
                 model: 'gemma3-legal',
                 protocol: 'grpc'
@@ -701,11 +722,13 @@ Provide a complete, working fix with explanation.`;
             id: `autosolve_${Date.now()}`,
             type: 'error_remediation',
             priority: 'critical',
-            data: {, threshold: options.threshold ?? 5,
+            data: {
+	threshold: options.threshold ?? 5,
                 clusterMetrics: options.includeClusterMetrics ? this.clusterMetrics : null,
                 forceRun: options.forceRun ?? false
             },
-            config: {, useGPU: false,
+	config: {
+	useGPU: false,
                 useContext7: true,
                 protocol: 'http'
             }
@@ -737,7 +760,8 @@ Provide a complete, working fix with explanation.`;
             type: taskType,
             priority: 'medium',
             data: context,
-            config: {, useGPU: true,
+            config: {
+	useGPU: true,
                 useRAG: true,
                 protocol: 'quic'
             }

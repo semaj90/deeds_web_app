@@ -28,7 +28,13 @@ export interface TypeInfo {
 }
 
 export interface ASTAnalysisResult {
-  errors: ASTError[];, functions: FunctionInfo[];, variables: VariableInfo[];, types: TypeInfo[];, imports: string[];, exports: string[];, complexity: number;
+  errors: ASTError[];
+	functions: FunctionInfo[];
+	variables: VariableInfo[];
+	types: TypeInfo[];
+	imports: string[];
+	exports: string[];
+	complexity: number;
 }
 
 /**
@@ -48,7 +54,7 @@ export class SvelteCheckAnalyzer {
  skipLibCheck: true,
  allowSyntheticDefaultImports: true,
  },
- });
+	});
  }
 
  /**

@@ -83,7 +83,7 @@ export class EnhancedCaseAPI {
                     timestamp: new Date().toISOString(),
                     ...data.metadata,
                 },
-            });
+	});
 
             if (!caseResponse.success || !caseResponse.data) {
                 throw new Error(caseResponse?.error ?? 'Failed to create case');
@@ -143,8 +143,8 @@ export class EnhancedCaseAPI {
                             clientName: 'not_specified',
                             assignedTo: formData.assignedTo,
                         },
-                    },
-                }
+	},
+	}
             );
 
             if (workerResponse.success) {
@@ -212,7 +212,7 @@ export class EnhancedCaseAPI {
                 timestamp: new Date().toISOString(),
                 ...updates.metadata,
             },
-        });
+	});
     }
 
     /**

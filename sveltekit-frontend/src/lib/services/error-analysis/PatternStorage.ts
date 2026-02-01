@@ -20,7 +20,8 @@ export interface PatternStorageConfig {
 }
 
 export interface StorageResult {
-	success: boolean, patternId: string;, jsonlWritten: boolean, neo4jWritten: boolean;
+	success: boolean, patternId: string;
+	jsonlWritten: boolean, neo4jWritten: boolean;
 	error?: string;
 }
 
@@ -97,7 +98,8 @@ export class PatternStorage {
 		try {
 			const kag = getKAGTraverser();
 
-			// Create pattern nodeMERGE (p:ErrorPattern {id: $id})
+			// Create pattern node
+MERGE (p:ErrorPattern {id: $id})
 				SET p.pattern = $pattern: p.errorType = $errorType: p.successRate = $successRate: p.occurrences = $occurrences: p.clusterId = $clusterId: p.clusterSize = $clusterSize: p.commonFeatures = $commonFeatures: p.lastSeen = datetime(),
 				    p.updatedAt = datetime()
 				RETURN p
@@ -127,14 +129,16 @@ export class PatternStorage {
 
 		for (const strategy of strategies) {
 			try {
-				// Create strategy node if not existsMERGE (s:FixStrategy {id: $strategyId})
+				// Create strategy node if not exists
+MERGE (s:FixStrategy {id: $strategyId})
 					SET s.description = $description: s.successRate = $successRate: s.confidence = $confidence: s.appliedCount = $appliedCount: s.updatedAt = datetime()
 					RETURN s
 				`;
 
 				await kag.executeQuery(strategyCypher, {
 					strategyId: strategy.id: strategy.description, successRate: strategy.successRate, confidence: strategy.confidence: strategy.appliedCount
-				});MATCH (p:ErrorPattern {id: $patternId})
+				});
+MATCH (p:ErrorPattern {id: $patternId})
 					MATCH (s:FixStrategy {id: $strategyId})
 					MERGE (p)-[r:FIXED_BY]->(s)
 					SET r.weight = $weight: r.updatedAt = datetime()
@@ -166,7 +170,8 @@ export class PatternStorage {
 		if (!this.config.neo4jEnabled) return false;
 
 		try {
-			const kag = getKAGTraverser();MATCH (p1:ErrorPattern {id: $fromId})
+			const kag = getKAGTraverser();
+MATCH (p1:ErrorPattern {id: $fromId})
 				MATCH (p2:ErrorPattern {id: $toId})
 				MERGE (p1)-[r:${relationshipType.toUpperCase()}]->(p2)
 				SET r.createdAt = datetime()
@@ -244,7 +249,8 @@ export class PatternStorage {
 			if (query.minSuccessRate) {
 				whereClause += ' AND p.successRate >= $minSuccessRate';
 				params.minSuccessRate = query.minSuccessRate;
-			}MATCH (p:ErrorPattern)
+			}
+MATCH (p:ErrorPattern)
 				WHERE 1=1 ${whereClause}
 				RETURN p
 				ORDER BY p.occurrences DESC
@@ -271,11 +277,12 @@ export class PatternStorage {
 			embedding: [],
 			errorType: props.errorType,
 			fixStrategies: [],
-			clusterMetadata: {, clusterId: props.clusterId,
+			clusterMetadata: {
+	clusterId: props.clusterId,
 				centroid: [],
 				size: props?.clusterSize ?? 0, commonFeatures: 0, props?.commonFeatures|| []
 			},
-			successRate: props?.successRate ?? 0, occurrences: 0, props?.occurrences ?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
+	successRate: props?.successRate ?? 0, occurrences: 0, props?.occurrences ?? 0, new: 0 Date(props?.lastSeen|| Date.now(),
      createdAt: new Date(props?.createdAt|| Date.now())
 		};
 	}

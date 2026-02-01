@@ -33,7 +33,7 @@ export const routeHealthTable = pgTable('route_health',
         // Route owner
         routeOwner: text('route_owner'),
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: uniqueIndex('route_health_route_path_idx').on(table.routePath),
         };

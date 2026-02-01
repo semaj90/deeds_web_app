@@ -14,39 +14,39 @@
 
  const typeOptions = [
  { value: 'all', label: 'All Types' },
- { value: 'document', label: 'Documents' },
- { value: 'email', label: 'Emails' },
- { value: 'spreadsheet', label: 'Spreadsheets' },
- { value: 'video', label: 'Videos' },
- { value: 'image', label: 'Images' }
+	{ value: 'document', label: 'Documents' },
+	{ value: 'email', label: 'Emails' },
+	{ value: 'spreadsheet', label: 'Spreadsheets' },
+	{ value: 'video', label: 'Videos' },
+	{ value: 'image', label: 'Images' }
  ];
 
  const statusOptions = [
  { value: 'all', label: 'All Status' },
- { value: 'processed', label: 'Processed' },
- { value: 'processing', label: 'Processing' },
- { value: 'pending', label: 'Pending' }
+	{ value: 'processed', label: 'Processed' },
+	{ value: 'processing', label: 'Processing' },
+	{ value: 'pending', label: 'Pending' }
  ];
 
  const caseOptions = [
  { value: 'all', label: 'All Cases' },
- { value: 'CASE-2024-001', label: 'CASE-2024-001' },
- { value: 'CASE-2024-002', label: 'CASE-2024-002' },
- { value: 'CASE-2024-003', label: 'CASE-2024-003' }
+	{ value: 'CASE-2024-001', label: 'CASE-2024-001' },
+	{ value: 'CASE-2024-002', label: 'CASE-2024-002' },
+	{ value: 'CASE-2024-003', label: 'CASE-2024-003' }
  ];
 
  const dateRangeOptions = [
  { value: 'all', label: 'All Time' },
- { value: 'today', label: 'Today' },
- { value: 'week', label: 'This Week' },
- { value: 'month', label: 'This Month' },
- { value: 'quarter', label: 'This Quarter' }
+	{ value: 'today', label: 'Today' },
+	{ value: 'week', label: 'This Week' },
+	{ value: 'month', label: 'This Month' },
+	{ value: 'quarter', label: 'This Quarter' }
  ];
 
  const aiAnalyzedOptions = [
  { value: 'all', label: 'All Items' },
- { value: 'analyzed', label: 'AI Analyzed' },
- { value: 'not_analyzed', label: 'Not Analyzed' }
+	{ value: 'analyzed', label: 'AI Analyzed' },
+	{ value: 'not_analyzed', label: 'Not Analyzed' }
  ];
 
  function applyFilters() {

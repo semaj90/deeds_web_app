@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -18,7 +18,8 @@
 	let showBulkActions = $derived(selectedCases.size > 0);
 
 	// Auto-open modal if ?create=true (for /cases/create and /cases/new redirects)
-	onMount(() => {
+	$effect(() => {
+
 		// Initialize filters from URL on mount
 		statusFilter = data.filters?.status ?? 'all';
 		priorityFilter = data.filters?.priority || '';
@@ -28,9 +29,11 @@
 		if (urlParams.get('create') === 'true') {
 			showNewCaseModal = true;
 			// Clean URL
-			window.history.replaceState({}, '', '/cases');
+			window.history.replaceState({},
+	'', '/cases');
 		}
-	});
+	
+});
 
 	function openNewCase() {
 		showNewCaseModal = true;
@@ -420,7 +423,8 @@
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
-		-webkit-box-orient: vertical;, overflow: hidden;
+		-webkit-box-orient: vertical;
+	overflow: hidden;
 	}
 </style>
 

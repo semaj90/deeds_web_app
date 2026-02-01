@@ -7,13 +7,15 @@ export interface RateLimitOptions {
 }
 
 export interface RateLimitResult {
-  allowed: boolean;, remaining: number;
+  allowed: boolean;
+	remaining: number;
   reset: number; // timestamp when window resets
   retryAfter?: number;
 }
 
 class InMemoryRateLimiter {
-  private store: Map<string, { count: number;, expires: number }> = new Map();
+  private store: Map<string, { count: number;
+	expires: number }> = new Map();
 
   async check(identifier: string, bucket: string, options: RateLimitOptions): Promise<RateLimitResult> {
     const key = `${bucket}:${identifier}`;

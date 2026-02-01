@@ -1,7 +1,7 @@
 <script lang="ts">
  import { loadChr97Cartridge } from '$lib/memory-palace/chr97Loader';
  import { MemoryPalaceScene } from '$lib/memory-palace/MemoryPalaceScene';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
 
  let container: HTMLDivElement = $state();
  let scene: MemoryPalaceScene, null = null;
@@ -13,7 +13,8 @@
  let timeline: any[] = $state([]);
  let selectedChunk: any = $state(null);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  scene = new MemoryPalaceScene(container);
 
@@ -27,12 +28,13 @@
 
  // Load user chat history for timeline
  loadTimeline();
- })();
+ 
+});();
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  scene?.destroy();
- });
+ }
 
  async function loadTimeline() {
  try {

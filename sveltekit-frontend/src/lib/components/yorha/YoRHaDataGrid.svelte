@@ -2,7 +2,8 @@
   import type { Snippet } from 'svelte';
 
   export interface GridColumn {
-    key: string;, title: string;
+    key: string;
+	title: string;
     formatter?: (value: any, row: any) => string;
   }
 
@@ -75,7 +76,8 @@
 
 <style>
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;, height: 6px;
+    width: 6px;
+	height: 6px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;

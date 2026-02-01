@@ -17,13 +17,15 @@ type NewDocumentChunk = InferInsertModel<typeof documentChunks>;
 type OllamaClient = {
   generateCompletion(
     prompt: string,
-    opts?: { systemPrompt?: string, temperature?: number, maxTokens?: number }
+    opts?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
   ): Promise<string>;
   generateEmbedding(text: string): Promise<number[]>;
 };
 
 export interface AIAnalysisResult {
-  summary: string;, tags: string[];, confidence: number;
+  summary: string;
+  tags: string[];
+  confidence: number;
   entities?: string[];
   keywords?: string[];
   recommendations?: string[];
@@ -38,19 +40,27 @@ export interface AIQueryOptions {
 }
 
 export interface VectorSearchResult {
-  content: string;, similarity: number;, metadata: Record<string, unknown>;
+  content: string;
+  similarity: number;
+  metadata: Record<string, unknown>;
   documentId: string;
 }
 
 // Local types for embedding cache
 type EmbeddingCacheRow = {
-  id: string;, textHash: string;, embedding: string | number[] | null;
+  id: string;
+  textHash: string;
+  embedding: string | number[] | null;
   model?: string | null;
   createdAt?: string | null;
 };
 
 type NewEmbeddingCache = {
-  id: string;, textHash: string;, embedding: string;, model: string;, createdAt: string;
+  id: string;
+  textHash: string;
+  embedding: string;
+  model: string;
+  createdAt: string;
 };
 
 export class AIService {
@@ -64,9 +74,15 @@ export class AIService {
   /**
    * Process AI query with context and logging
    */
-  async processQuery(query: string, userId: string,
-    caseId?: string, options: AIQueryOptions = {}
-  ): Promise<{, response: string;, confidence: number;, contextUsed: string[];
+  async processQuery(
+    query: string,
+    userId: string,
+    caseId?: string,
+    options: AIQueryOptions = {}
+  ): Promise<{
+    response: string;
+    confidence: number;
+    contextUsed: string[];
     queryId?: string;
   }> {
     const startTime = Date.now();
@@ -75,13 +91,14 @@ export class AIService {
       temperature = 0.7,
       maxTokens = 2000,
       includeContext = true,
-      saveQuery = true
+      saveQuery = true,
     } = options;
 
     try {
       // Get relevant context if requested
       let contextDocuments: VectorSearchResult[] = [];
-      let systemPrompt = 'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
+      let systemPrompt =
+        'You are a legal AI assistant specialized in prosecutor and detective workflows. Provide accurate, detailed, and actionable legal analysis.';
 
       if (includeContext && caseId) {
         const queryEmbedding = await this.ollama.generateEmbedding(query);
@@ -99,7 +116,7 @@ export class AIService {
       const response = await this.ollama.generateCompletion(query, {
         systemPrompt,
         temperature,
-        maxTokens
+        maxTokens,
       });
 
       const confidence = this.calculateConfidence(response, contextDocuments.length);
@@ -117,7 +134,7 @@ export class AIService {
           confidence,
           processingTime: Date.now() - startTime,
           contextUsed,
-          embedding: await this.ollama.generateEmbedding(query)
+          embedding: await this.ollama.generateEmbedding(query),
         });
       }
 
@@ -139,7 +156,7 @@ export class AIService {
             processingTime: Date.now() - startTime,
             contextUsed: [],
             isSuccessful: false,
-            errorMessage: msg
+            errorMessage: msg,
           });
         } catch (logErr: unknown) {
           const lmsg = logErr instanceof Error ? logErr.message : String(logErr);
@@ -153,7 +170,10 @@ export class AIService {
   /**
    * Analyze evidence and generate auto-tags
    */
-  async analyzeEvidence(evidenceId: string, content: string, evidenceType: string
+  async analyzeEvidence(
+    evidenceId: string,
+    content: string,
+    evidenceType: string
   ): Promise<AIAnalysisResult> {
     try {
       const systemPrompt = `Analyze the following ${evidenceType} evidence and provide:
@@ -176,7 +196,7 @@ Format your response as JSON with the structure:
       const response = await this.ollama.generateCompletion(content, {
         systemPrompt,
         temperature: 0.3,
-        maxTokens: 1000
+        maxTokens: 1000,
       });
 
       // Parse AI response
@@ -206,7 +226,8 @@ Format your response as JSON with the structure:
   /**
    * Find similar documents using vector search
    */
-  async findSimilarDocuments(queryEmbedding: number[],
+  async findSimilarDocuments(
+    queryEmbedding: number[],
     limit = 10,
     threshold = 0.7
   ): Promise<VectorSearchResult[]> {
@@ -214,8 +235,11 @@ Format your response as JSON with the structure:
       const rows = (await (db as any).execute(
         sql`SELECT id, document_id, content, metadata, embedding FROM document_chunks LIMIT ${limit}`
       )) as Array<{
-  id: string;, document_id: string;, content: string;, metadata: Record<string, unknown>;
-  embedding: string | number[] | null;
+        id: string;
+        document_id: string;
+        content: string;
+        metadata: Record<string, unknown>;
+        embedding: string | number[] | null;
       }>;
 
       const results: VectorSearchResult[] = [];
@@ -238,7 +262,7 @@ Format your response as JSON with the structure:
               content: row.content,
               similarity: sim,
               metadata: row.metadata ?? {},
-              documentId: row.document_id
+              documentId: row.document_id,
             });
           }
         } catch {
@@ -258,26 +282,37 @@ Format your response as JSON with the structure:
   /**
    * Find similar queries for smart suggestions
    */
-  async findSimilarQueries(_queryEmbedding: number[],
+  async findSimilarQueries(
+    _queryEmbedding: number[],
     userId?: string,
     limit = 5
-  ): Promise<Array<{, query: string;, response: string;, similarity: number }>> {
+  ): Promise<Array<{ query: string; response: string; similarity: number }>> {
     try {
       if (userId) {
         const rows = (await (db as any).execute(
           sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{
-          query: string;, response: string;, similarity: number;
+          query: string;
+          response: string;
+          similarity: number;
         }>;
-        return rows.map((r) => ({ query: r.query, response: r.response, similarity: r.similarity
+        return rows.map((r) => ({
+          query: r.query,
+          response: r.response,
+          similarity: r.similarity,
         }));
       } else {
         const rows = (await (db as any).execute(
           sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries ORDER BY created_at DESC LIMIT ${limit}`
         )) as Array<{
-          query: string;, response: string;, similarity: number;
+          query: string;
+          response: string;
+          similarity: number;
         }>;
-        return rows.map((r) => ({ query: r.query, response: r.response, similarity: r.similarity
+        return rows.map((r) => ({
+          query: r.query,
+          response: r.response,
+          similarity: r.similarity,
         }));
       }
     } catch (error: Error | unknown) {
@@ -300,7 +335,7 @@ Format your response as JSON with the structure:
           textHash: embeddingCache.textHash,
           embedding: embeddingCache.embedding,
           model: embeddingCache.model,
-          createdAt: embeddingCache.createdAt
+          createdAt: embeddingCache.createdAt,
         })
         .from(embeddingCache)
         .where(sql`${embeddingCache.textHash} = ${textHash}`)
@@ -324,7 +359,7 @@ Format your response as JSON with the structure:
         textHash,
         embedding: JSON.stringify(embedding),
         model: 'gemma-embedding:latest',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
       await (db as any).insert(embeddingCache).values(insertData);
 
@@ -339,8 +374,15 @@ Format your response as JSON with the structure:
   /**
    * Log AI query to database
    */
-  private async logQuery(data: {, userId: string;
-    caseId?: string;, query: string;, response: string;, model: string;, confidence: number;, processingTime: number;, contextUsed: string[];
+  private async logQuery(data: {
+    userId: string;
+    caseId?: string;
+    query: string;
+    response: string;
+    model: string;
+    confidence: number;
+    processingTime: number;
+    contextUsed: string[];
     embedding?: number[];
     isSuccessful?: boolean;
     errorMessage?: string;
@@ -360,11 +402,16 @@ Format your response as JSON with the structure:
         embedding: data.embedding ? JSON.stringify(data.embedding) : null,
         isSuccessful: data.isSuccessful !== false,
         errorMessage: data.errorMessage ?? null,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       } as unknown as NewUserAiQuery;
 
       const generatedId: string = queryData.id ?? generateIdFromEntropySize(10);
-      const inserted = (await (db as any).insert(userAiQueries).values(queryData).returning({ id: userAiQueries.id }))?.[0] as Pick<NewUserAiQuery, 'id'> | undefined;
+      const inserted = (
+        await (db as any)
+          .insert(userAiQueries)
+          .values(queryData)
+          .returning({ id: userAiQueries.id })
+      )?.[0] as Pick<NewUserAiQuery, 'id'> | undefined;
 
       const insertedId = inserted?.id;
       if (typeof insertedId === 'string' && insertedId.length > 0) {
@@ -381,7 +428,10 @@ Format your response as JSON with the structure:
   /**
    * Generate and store auto-tags
    */
-  private async generateAutoTags(entityId: string, entityType: string, tags: string[],
+  private async generateAutoTags(
+    entityId: string,
+    entityType: string,
+    tags: string[],
     confidence: number
   ): Promise<void> {
     try {
@@ -392,7 +442,7 @@ Format your response as JSON with the structure:
         tag: t,
         confidence: confidence,
         source: 'ai_analysis',
-        model: 'gemma3-legal:latest'
+        model: 'gemma3-legal:latest',
       }));
       await (db as any).insert(autoTags).values(tagData);
     } catch (error: Error | unknown) {
@@ -405,7 +455,11 @@ Format your response as JSON with the structure:
   /**
    * Store document chunk for vector search
    */
-  private async storeDocumentChunk(documentId: string, documentType: string, content: string, analysis: AIAnalysisResult
+  private async storeDocumentChunk(
+    documentId: string,
+    documentType: string,
+    content: string,
+    analysis: AIAnalysisResult
   ): Promise<void> {
     try {
       const embedding = await this.ollama.generateEmbedding(content);
@@ -421,8 +475,8 @@ Format your response as JSON with the structure:
         metadata: {
           analysis,
           contentLength: content.length,
-          generatedAt: new Date().toISOString()
-        }
+          generatedAt: new Date().toISOString(),
+        },
       } as NewDocumentChunk;
 
       await (db as any).insert(documentChunks).values(chunkData);
@@ -455,7 +509,7 @@ Format your response as JSON with the structure:
       confidence: 0.75,
       entities: this.extractEntities(response),
       keywords: this.extractKeywords(response),
-      recommendations: this.extractRecommendations(response)
+      recommendations: this.extractRecommendations(response),
     };
   }
 
@@ -526,7 +580,3 @@ Format your response as JSON with the structure:
 
 // Export singleton instance
 export const aiService = new AIService();
-
-
-
-

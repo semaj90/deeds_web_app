@@ -78,15 +78,18 @@ import type { Message } from '$lib/types';
 					embedding: simulateEmbedding,
 					summarize: simulateSummarization,
 					extract: simulateExtraction,
-					memory: {, allocate: simulateMemoryAllocate,
+					memory: {
+	allocate: simulateMemoryAllocate,
 						free: simulateMemoryFree,
 						usage: simulateMemoryUsage
 					},
-					gpu: {, initialize: simulateGPUInit,
+	gpu: {
+	initialize: simulateGPUInit,
 						transfer: simulateGPUTransfer,
 						compute: simulateGPUCompute
 					}
-				})}, 1500)})}
+				})},
+	1500)})}
   function checkBrowserCapabilities() {
 		// Check SharedArrayBuffer support
 		sharedMemorySupported = typeof (SharedArrayBuffer as unknown) !== 'undefined';
@@ -205,7 +208,7 @@ import type { Message } from '$lib/types';
 		return {
 			entities: result?.entities ?? [
 				{ type: 'person', value: 'John Doe', confidence: 0.9 },
-				{ type: 'organization', value: 'ABC Corp', confidence: 0.85 }
+	{ type: 'organization', value: 'ABC Corp', confidence: 0.85 }
 			],
 			relationships: result?.relationships ?? [],
 			model: 'gemma3-270m-extractor-wasm',
@@ -240,7 +243,8 @@ import type { Message } from '$lib/types';
   async function simulateExtraction(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 120));
 		return {
-			entities: [{, type: 'person', value: 'Client Entity', confidence: 0.9 }],
+			entities: [{
+	type: 'person', value: 'Client Entity', confidence: 0.9 }],
 			relationships: []
 		}}
   function simulateMemoryAllocate(_size: number) {

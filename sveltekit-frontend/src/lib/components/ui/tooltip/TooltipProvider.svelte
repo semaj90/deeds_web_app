@@ -17,7 +17,7 @@
 	// Provider-level context for shared delay settings
 	setContext('tooltip-provider', {
 		get delayDuration() { return delayDuration; },
-		get skipDelayDuration() { return skipDelayDuration; },
+	get skipDelayDuration() { return skipDelayDuration; },
 	});
 </script>
 

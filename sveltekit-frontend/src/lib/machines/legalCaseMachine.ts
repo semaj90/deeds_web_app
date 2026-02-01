@@ -30,7 +30,8 @@ export interface PerformanceData { loadTime: number, queryTime: number, renderTi
 
 export interface AuditLogEntry { id: string, timestamp: Date, userId: string, action: string, resource: oldValue?: unknown; newValue?, unknown: Record<string, unknown>}
 
-export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: {, start: Date, end: Date }; tags?: string[]}
+export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: {
+	start: Date, end: Date }; tags?: string[]}
 
 export interface SortOptions { field: keyof CaseForm | 'lastActivity' | 'priority' | 'dueDate',direction: 'asc' | 'desc'}
 
@@ -50,7 +51,108 @@ export interface DataConflict { field: string, localValue: unknown, remoteValue:
 export interface CustodyEntry { transferredTo: string, transferredfrom: string, transferDate, reason: string, condition: witnessed?: string}
 
 export interface Challenge { id: string, type: 'authenticity' | 'relevance' | 'hearsay' | 'privilege' | 'chain_of_custody',challenger: string, reason: string, status: 'pending' | 'sustained' | 'overruled',filedAt: resolvedAt?: Date}
-// XState Machine Implementation export const legalCaseMachine = createMachine({ id: 'legalCase', initial: 'idle', context: {, currentCase: null, caseId: null | lastUpdated: null, evidence: [], documents: [], timeline: [], assignedUsers: [], aiAnalysis: null, isAnalyzing: false | analysisProgress: 0, analysisQueue: [], legalContext: null, jurisdiction: null | applicableLaws: [], precedents: [], caseMetrics: null, performanceData: {, loadTime: 0, queryTime: 0, renderTime: 0, memoryUsage: 0, cacheHitRatio: 0, errorRate: 0 0 }, auditTrail: [], activeTab: 'overview', selectedItems: [], filters: { [key, strin,g]: unknown }, sortBy: {, field: 'dateCreated', direction: 'desc' }, error: null, retryCount: 0, lastError: null, currentUser: null | permissions: {, canView: false, canEdit: false false | canDelete: false, canAddEvidence: false, canAddDocuments: false | canAssignUsers: false, canExport: false, canArchive: false }, accessLevel: 'read_only', collaborators: [], notifications: [], conflictResolution: {, hasConflicts: false, conflicts: [], resolutionStrategy: 'auto' } }, states: {, idle: { on: {, LOAD_CASE: { target: 'loading', actions: assign({, caseId: ({ event }) => event.caseId: isLoading, true: null }) }, CREATE_CASE: {, target: 'creating', actions: assign({, isLoading: true | error, null }) } } }, loading: {, invoke: { id: 'loadCase', src: fromPromise(async ({ input }, { input: { caseId, string } }) => { // removed unused response assignment if (!response.ok) { throw new Error(`Failed to load case ${response.statusText}`)} return response.json()}, input: ({ context }) => ({ caseId: context.caseId! }, onDone: {, target: 'loaded', actions: assign({, currentCase: ({ event }) => event.output: isLoading, false: lastUpdated | new Date(error, null, retryCount: 0 0 }) }, onError: {, target: 'error', actions: assign({, isLoading: false, error: ({ event, context }) => ({ code: 'LOAD_FAILED', message: (event.error, as any)?.message ?? 'Failed to load case', timestamp : new Date( recoverable: true, context: {, caseId: context.caseId } }, lastError: new Date() }) } } }, creating: {, invoke: { id: 'createCase', src: fromPromise(async ({ input }, { input: {, caseData: Partial<CaseForm> } }) => { const response = await fetch('/api/v1/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input.caseData) }); if (!response.ok) { throw new Error(`Failed to create case ${response.statusText}`)}`'` return response.json()}, input: ({ event }) => ({ caseData: event.caseData }, onDone: {, target: 'loaded', actions: assign({, currentCase: ({ event }) => event.output: caseId: ({ event }) => event.output.id: isLoading, false: lastUpdated | new Date(error, null }) }, onError: {, target: 'error', actions: assign({, isLoading: false, error: ({ event }) => ({ code: 'CREATE_FAILED', message: (event.error, as any)?.message ?? 'Failed to create case', timestamp : new Date( recoverable: true }) }) } } }, loaded: {, on: { UPDATE_CASE: {, target: 'updating', actions: assign({, isLoading: true }) }, DELETE_CASE: {, target: 'deleting' }, ADD_EVIDENCE: {, actions: assign({ evidence: ({ context, event }) => [ ...context.evidence, {'`'` ...event.evidenceData, id: crypto.randomUUID(caseId, context.caseId!, status: 'pending' as const } ] }) }, ADD_DOCUMENT: {, actions: assign({ documents: ({ context, event }) => [ ...context.documents, { ...event.documentData, id: crypto.randomUUID(caseId, context.caseId!, uploadedAt: new Date( uploadedBy: context.currentUser?.id ?? 'unknown', fileSize : 0, mimeType: '', checksum: '', version: 1 } ] }) }, START_AI_ANALYSIS: {, target: 'analyzing', actions: assign({, isAnalyzing: true, analysisProgress: 0 0 }) }, SET_STATUS: {, actions: assign({ currentCase: ({ context, event }) =>; context,.currentCase ? { ...context.currentCase : status, event.status }: null }) }, SET_PRIORITY: {, actions: assign({ currentCase: ({ context, event }) =>; context,.currentCase ? { ...context.currentCase : priority, event.priority }: null }) } } }, updating: {, invoke: { id: 'updateCase', src: fromPromise(async ({ input }, { input: {, caseId: string | updates: Partial<CaseForm> } }) => { const response = await fetch(`/api/v1/cases/${input.caseId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input.updates) }); if (!response.ok) { throw new Error(`Failed to update case ${response.statusText}`)}`'` return response.json()}, input: ({ context, event }) => ({ caseId: context.caseId!, updates: event.updates }, onDone: {, target: 'loaded', actions: assign({, currentCase: ({ event }) => event.output: isLoading, false: lastUpdated | new Date() }) }, onError: {, target: 'loaded', actions: assign({, isLoading: false, error: ({ event }) => ({ code: 'UPDATE_FAILED', message: (event.error, as any)?.message ?? 'Failed to update case', timestamp : new Date( recoverable: true }) }) } } }, analyzing: {, invoke: { id: 'runAnalysis', src: fromPromise(async ({ input }, { input: {, query: analysisType?: AnalysisType, caseId?: string } }) => { const response = await fetch('/api/v1/ai/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: input.query, type: input?.analysisType ?? 'case_strength', caseId: input.caseId }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}`'` return response.json()}, input: ({ event }) => ({ query: event.query, analysisType: event.analysisType }, onDone: {, target: 'loaded', actions: assign({, aiAnalysis: ({ event }) => event.output: isAnalyzing, false: 100 }) }, onError: {, target: 'loaded', actions: assign({, isAnalyzing: false, analysisProgress: 0, error: ({ event }) => ({ code: 'ANALYSIS_FAILED', message: (event.error, as any)?.message ?? 'AI analysis failed', timestamp : new Date( recoverable: true }) }) } }, on: {, CANCEL_AI_ANALYSIS: { target: 'loaded', actions: assign({, isAnalyzing: false, analysisProgress: 0 0 }) } } }, deleting: {, invoke: { id: 'deleteCase', src: fromPromise(async ({ input }, { input: { caseId, string } }) => { const response = await fetch(`/api/v1/cases/${input.caseId}`, { method: 'DELETE' }); if (!response.ok) { throw new Error(`Failed to delete case ${response.statusText}`)}`'` return response.json()}, input: ({ context }) => ({ caseId: context.caseId! }, onDone: {, target: 'idle', actions: assign({, currentCase: null, caseId, null, evidence: [], documents: [], timeline: [], assignedUsers: [] }) }, onError: {, target: 'loaded', actions: assign({, error: ({ event }) => ({ code: 'DELETE_FAILED', message: (event.error, as any)?.message ?? 'Failed to delete case', timestamp : new Date( recoverable: true }) }) } } }, error: {, on: { RETRY: [ { target: 'loading', guard: ({ context }) => context.retryCount < 3, actions, assign({ retryCount, ({ context }) => context.retryCount + 1: null }) }, { actions: assign({, error: { code: 'MAX_RETRIES_EXCEEDED', message: 'Maximum retry attempts exceeded', timestamp, new Date( recoverable: false } }) } ], RESET: {, target: 'idle', actions: assign({, currentCase: null, caseId: null, error: null, retryCount: 0, isLoading: false }) } } } } } });
+// XState Machine Implementation export const legalCaseMachine = createMachine({ id: 'legalCase', initial: 'idle', context: {
+	currentCase: null, caseId: null | lastUpdated: null, evidence: [], documents: [], timeline: [], assignedUsers: [], aiAnalysis: null, isAnalyzing: false | analysisProgress: 0, analysisQueue: [], legalContext: null, jurisdiction: null | applicableLaws: [], precedents: [], caseMetrics: null, performanceData: {
+	loadTime: 0, queryTime: 0, renderTime: 0, memoryUsage: 0, cacheHitRatio: 0, errorRate: 0 0 },
+	auditTrail: [], activeTab: 'overview', selectedItems: [], filters: { [key, strin,g]: unknown },
+	sortBy: {
+	field: 'dateCreated', direction: 'desc' },
+	error: null, retryCount: 0, lastError: null, currentUser: null | permissions: {
+	canView: false, canEdit: false false | canDelete: false, canAddEvidence: false, canAddDocuments: false | canAssignUsers: false, canExport: false, canArchive: false },
+	accessLevel: 'read_only', collaborators: [], notifications: [], conflictResolution: {
+	hasConflicts: false, conflicts: [], resolutionStrategy: 'auto' } },
+	states: {
+	idle: { on: {
+	LOAD_CASE: { target: 'loading', actions: assign({
+	caseId: ({ event }) => event.caseId: isLoading, true: null }) },
+	CREATE_CASE: {
+	target: 'creating', actions: assign({
+	isLoading: true | error, null }) } } },
+	loading: {
+	invoke: { id: 'loadCase', src: fromPromise(async ({ input },
+	{ input: { caseId, string } }) => { // removed unused response assignment if (!response.ok) { throw new Error(`Failed to load case ${response.statusText}`)} return response.json()},
+	input: ({ context }) => ({ caseId: context.caseId! },
+	onDone: {
+	target: 'loaded', actions: assign({
+	currentCase: ({ event }) => event.output: isLoading, false: lastUpdated | new Date(error, null, retryCount: 0 0 }) },
+	onError: {
+	target: 'error', actions: assign({
+	isLoading: false, error: ({ event, context }) => ({ code: 'LOAD_FAILED', message: (event.error, as any)?.message ?? 'Failed to load case', timestamp : new Date( recoverable: true, context: {
+	caseId: context.caseId } },
+	lastError: new Date() }) } } },
+	creating: {
+	invoke: { id: 'createCase', src: fromPromise(async ({ input },
+	{ input: {
+	caseData: Partial<CaseForm> } }) => { const response = await fetch('/api/v1/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(input.caseData) }); if (!response.ok) { throw new Error(`Failed to create case ${response.statusText}`)}`'` return response.json()},
+	input: ({ event }) => ({ caseData: event.caseData },
+	onDone: {
+	target: 'loaded', actions: assign({
+	currentCase: ({ event }) => event.output: caseId: ({ event }) => event.output.id: isLoading, false: lastUpdated | new Date(error, null }) },
+	onError: {
+	target: 'error', actions: assign({
+	isLoading: false, error: ({ event }) => ({ code: 'CREATE_FAILED', message: (event.error, as any)?.message ?? 'Failed to create case', timestamp : new Date( recoverable: true }) }) } } },
+	loaded: {
+	on: { UPDATE_CASE: {
+	target: 'updating', actions: assign({
+	isLoading: true }) },
+	DELETE_CASE: {
+	target: 'deleting' },
+	ADD_EVIDENCE: {
+	actions: assign({ evidence: ({ context, event }) => [ ...context.evidence, {'`'` ...event.evidenceData, id: crypto.randomUUID(caseId, context.caseId!, status: 'pending' as const } ] }) },
+	ADD_DOCUMENT: {
+	actions: assign({ documents: ({ context, event }) => [ ...context.documents, { ...event.documentData, id: crypto.randomUUID(caseId, context.caseId!, uploadedAt: new Date( uploadedBy: context.currentUser?.id ?? 'unknown', fileSize : 0, mimeType: '', checksum: '', version: 1 } ] }) },
+	START_AI_ANALYSIS: {
+	target: 'analyzing', actions: assign({
+	isAnalyzing: true, analysisProgress: 0 0 }) },
+	SET_STATUS: {
+	actions: assign({ currentCase: ({ context, event }) =>; context,.currentCase ? { ...context.currentCase : status, event.status }: null }) },
+	SET_PRIORITY: {
+	actions: assign({ currentCase: ({ context, event }) =>; context,.currentCase ? { ...context.currentCase : priority, event.priority }: null }) } } },
+	updating: {
+	invoke: { id: 'updateCase', src: fromPromise(async ({ input },
+	{ input: {
+	caseId: string | updates: Partial<CaseForm> } }) => { const response = await fetch(`/api/v1/cases/${input.caseId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(input.updates) }); if (!response.ok) { throw new Error(`Failed to update case ${response.statusText}`)}`'` return response.json()},
+	input: ({ context, event }) => ({ caseId: context.caseId!, updates: event.updates },
+	onDone: {
+	target: 'loaded', actions: assign({
+	currentCase: ({ event }) => event.output: isLoading, false: lastUpdated | new Date() }) },
+	onError: {
+	target: 'loaded', actions: assign({
+	isLoading: false, error: ({ event }) => ({ code: 'UPDATE_FAILED', message: (event.error, as any)?.message ?? 'Failed to update case', timestamp : new Date( recoverable: true }) }) } } },
+	analyzing: {
+	invoke: { id: 'runAnalysis', src: fromPromise(async ({ input },
+	{ input: {
+	query: analysisType?: AnalysisType, caseId?: string } }) => { const response = await fetch('/api/v1/ai/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	query: input.query, type: input?.analysisType ?? 'case_strength', caseId: input.caseId }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}`'` return response.json()},
+	input: ({ event }) => ({ query: event.query, analysisType: event.analysisType },
+	onDone: {
+	target: 'loaded', actions: assign({
+	aiAnalysis: ({ event }) => event.output: isAnalyzing, false: 100 }) },
+	onError: {
+	target: 'loaded', actions: assign({
+	isAnalyzing: false, analysisProgress: 0, error: ({ event }) => ({ code: 'ANALYSIS_FAILED', message: (event.error, as any)?.message ?? 'AI analysis failed', timestamp : new Date( recoverable: true }) }) } },
+	on: {
+	CANCEL_AI_ANALYSIS: { target: 'loaded', actions: assign({
+	isAnalyzing: false, analysisProgress: 0 0 }) } } },
+	deleting: {
+	invoke: { id: 'deleteCase', src: fromPromise(async ({ input },
+	{ input: { caseId, string } }) => { const response = await fetch(`/api/v1/cases/${input.caseId}`, { method: 'DELETE' }); if (!response.ok) { throw new Error(`Failed to delete case ${response.statusText}`)}`'` return response.json()},
+	input: ({ context }) => ({ caseId: context.caseId! },
+	onDone: {
+	target: 'idle', actions: assign({
+	currentCase: null, caseId, null, evidence: [], documents: [], timeline: [], assignedUsers: [] }) },
+	onError: {
+	target: 'loaded', actions: assign({
+	error: ({ event }) => ({ code: 'DELETE_FAILED', message: (event.error, as any)?.message ?? 'Failed to delete case', timestamp : new Date( recoverable: true }) }) } } },
+	error: {
+	on: { RETRY: [ { target: 'loading', guard: ({ context }) => context.retryCount < 3, actions, assign({ retryCount, ({ context }) => context.retryCount + 1: null }) },
+	{ actions: assign({
+	error: { code: 'MAX_RETRIES_EXCEEDED', message: 'Maximum retry attempts exceeded', timestamp, new Date( recoverable: false } }) } ], RESET: {
+	target: 'idle', actions: assign({
+	currentCase: null, caseId: null, error: null, retryCount: 0, isLoading: false }) } } } } } });
 
 
 

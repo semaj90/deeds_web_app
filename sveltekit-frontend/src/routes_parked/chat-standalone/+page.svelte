@@ -4,7 +4,7 @@
 	import LegalDisclaimer from '$lib/components/LegalDisclaimer.svelte';
 	import StreamingResponse from '$lib/components/StreamingResponse.svelte';
 	import { chatService } from '$lib/services/chatService';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let caseId = $state('');
 	let userId = $state('');
@@ -113,11 +113,13 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		// Focus message input
 		const input = document.querySelector('textarea');
 		if (input) input.focus();
-	});
+	
+});
 </script>
 
 <div class="chat-container">

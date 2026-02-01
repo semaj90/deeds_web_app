@@ -9,7 +9,7 @@
  */
 
  import ContextConfirmModal from '$lib/components/ContextConfirmModal.svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  type CandidateContext = {
  context_id: string;, source: string;
@@ -34,7 +34,8 @@
 
  const sessionId = 'phase72:deeds-web-app:main'; // or derive from URL/store
 
- onMount(() => {
+ $effect(() => {
+
  // Initialize with a welcome message
  messages = [
  {
@@ -43,7 +44,8 @@
  timestamp: new Date().toISOString()
  }
  ];
- });
+ 
+});
 
  async function sendMessage() {
  if (!input.trim()) return;

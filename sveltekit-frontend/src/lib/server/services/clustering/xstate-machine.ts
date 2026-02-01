@@ -6,30 +6,38 @@
 import { setup, type SnapshotFrom } from 'xstate';
 
 export interface Statute {
-	id: string;, embedding: number[] | null;
-	text: string;, titleNumber: number;
+	id: string;
+	embedding: number[] | null;
+	text: string;
+	titleNumber: number;
 	section: string;
 }
 
 export interface SOMGrid {
-	width: number;, height: number;
-	neurons: Array<Array<{, weights: number[]; x: number;, y: number }>>;
+	width: number;
+	height: number;
+	neurons: Array<Array<{
+	weights: number[]; x: number;
+	y: number }>>;
 }
 
 export interface KMeansCluster {
-	id: number;, centroid: number[];
+	id: number;
+	centroid: number[];
 	members: string[];
 	label?: string;
 	avgConfidence?: number;
 }
 
 export interface ClusteringContext {
-	jobId: string;, statutes: Statute[];
+	jobId: string;
+	statutes: Statute[];
 	somGrid?: SOMGrid;
 	kmeansClusters?: KMeansCluster[];
 	previousLabels?: Map<string, string>;
 	currentLabels?: Map<string, string>;
-	changePercentage?: number;, version: number;
+	changePercentage?: number;
+	version: number;
 	retryCount: number;
 	error?: Error;
 }
@@ -41,35 +49,48 @@ export type ClusteringEvent =
 	| { type: 'TAG' }
 	| { type: 'INDEX' }
 	| { type: 'COMPLETE' }
-	| { type: 'ERROR';, error: Error };
+	| { type: 'ERROR';
+	error: Error };
 
 const MAX_RETRIES = 3;
 
 export const clusteringMachineDef = setup({
-	types: {, context: {} as ClusteringContext,
+	types: {
+	context: {} as ClusteringContext,
 		events: {} as ClusteringEvent
 	},
-	actions: {, incRetry: ({ context }: {, context: ClusteringContext }) => ({
+	actions: {
+	incRetry: ({ context }: {
+	context: ClusteringContext }) => ({
 			...context,
 			retryCount: context.retryCount + 1
 		}),
-		resetRetry: ({ context }: {, context: ClusteringContext }) => ({
+		resetRetry: ({ context }: {
+	context: ClusteringContext }) => ({
 			...context,
 			retryCount: 0
 		}),
-		setError: ({ context }: {, context: ClusteringContext }, params: {, error: Error }) => ({
+		setError: ({ context }: {
+	context: ClusteringContext },
+	params: {
+	error: Error }) => ({
 			...context,
 			error: params.error
 		})
 	},
-	guards: {, canRetry: ({ context }: {, context: ClusteringContext }) => context.retryCount < MAX_RETRIES
+	guards: {
+	canRetry: ({ context }: {
+	context: ClusteringContext }) => context.retryCount < MAX_RETRIES
 	},
-	actors: {, enqueueJobActor: async ({ context }: {, context: ClusteringContext }) => {
+	actors: {
+	enqueueJobActor: async ({ context }: {
+	context: ClusteringContext }) => {
 			// Publish to RabbitMQ
 			const response = await fetch('/api/clustering/enqueue', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, jobId: context.jobId,
+	body: JSON.stringify({
+	jobId: context.jobId,
 					statuteIds: context.statutes.map((s) => s.id)
 				})
 			});
@@ -77,8 +98,8 @@ export const clusteringMachineDef = setup({
 			if (!response.ok) throw new Error('Failed to enqueue job');
 			return context;
 		},
-
-		somActor: async ({ context }: {, context: ClusteringContext }) => {
+	somActor: async ({ context }: {
+	context: ClusteringContext }) => {
 			const embeddings = context.statutes
 				.filter((s) => s.embedding)
 				.map((s) => s.embedding as number[]);
@@ -90,7 +111,7 @@ export const clusteringMachineDef = setup({
 			const response = await fetch('/api/clustering/som-train', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
+	body: JSON.stringify({
 					embeddings,
 					width: 10,
 					height: 10,
@@ -103,14 +124,15 @@ export const clusteringMachineDef = setup({
 
 			return { ...context, somGrid };
 		},
-
-		kmeansActor: async ({ context }: {, context: ClusteringContext }) => {
+	kmeansActor: async ({ context }: {
+	context: ClusteringContext }) => {
 			if (!context.somGrid) throw new Error('SOM grid missing');
 
 			const response = await fetch('/api/clustering/kmeans-cluster', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, somGrid: context.somGrid,
+	body: JSON.stringify({
+	somGrid: context.somGrid,
 					statutes: context.statutes,
 					confidenceThreshold: 0.7
 				})
@@ -128,18 +150,19 @@ export const clusteringMachineDef = setup({
 				currentLabels: currentLabelsMap
 			};
 		},
-
-		indexingActor: async ({ context }: {, context: ClusteringContext }) => {
+	indexingActor: async ({ context }: {
+	context: ClusteringContext }) => {
 			if (!context.currentLabels) throw new Error('Current labels missing');
 
 			const response = await fetch('/api/clustering/index-update', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, jobId: context.jobId,
+	body: JSON.stringify({
+	jobId: context.jobId,
 					previousLabels: context.previousLabels
 						? Object.fromEntries(context.previousLabels)
 						: {},
-					currentLabels: Object.fromEntries(context.currentLabels),
+	currentLabels: Object.fromEntries(context.currentLabels),
 					version: context.version + 1
 				})
 			});
@@ -157,28 +180,32 @@ export const clusteringMachineDef = setup({
 }).createMachine({
 	id: 'legal-clustering',
 	initial: 'waiting',
-	context: ({ input }: {, input: ClusteringContext }) => ({
+	context: ({ input }: {
+	input: ClusteringContext }) => ({
 		...input,
 		retryCount: 0
 	}),
-	states: {, waiting: {
-			on: {, START: 'queue'
+	states: {
+	waiting: {
+			on: {
+	START: 'queue'
 			}
 		},
-
-		queue: {, invoke: {
+	queue: {
+	invoke: {
 				src: 'enqueueJobActor',
 				input: ({ context }) => ({ context }),
-				onDone: {, target: 'clustering',
+				onDone: {
+	target: 'clustering',
 					actions: 'resetRetry'
 				},
-				onError: [
+	onError: [
 					{
 						guard: 'canRetry',
 						target: 'queue',
 						actions: 'incRetry'
 					},
-					{
+	{
 						target: 'error',
 						actions: ({ event }) => ({
 							error: event.error
@@ -187,20 +214,21 @@ export const clusteringMachineDef = setup({
 				]
 			}
 		},
-
-		clustering: {, invoke: {
+	clustering: {
+	invoke: {
 				src: 'somActor',
 				input: ({ context }) => ({ context }),
-				onDone: {, target: 'tagging',
+				onDone: {
+	target: 'tagging',
 					actions: 'resetRetry'
 				},
-				onError: [
+	onError: [
 					{
 						guard: 'canRetry',
 						target: 'clustering',
 						actions: 'incRetry'
 					},
-					{
+	{
 						target: 'error',
 						actions: ({ event }) => ({
 							error: event.error
@@ -209,20 +237,21 @@ export const clusteringMachineDef = setup({
 				]
 			}
 		},
-
-		tagging: {, invoke: {
+	tagging: {
+	invoke: {
 				src: 'kmeansActor',
 				input: ({ context }) => ({ context }),
-				onDone: {, target: 'indexing',
+				onDone: {
+	target: 'indexing',
 					actions: 'resetRetry'
 				},
-				onError: [
+	onError: [
 					{
 						guard: 'canRetry',
 						target: 'tagging',
 						actions: 'incRetry'
 					},
-					{
+	{
 						target: 'error',
 						actions: ({ event }) => ({
 							error: event.error
@@ -231,20 +260,21 @@ export const clusteringMachineDef = setup({
 				]
 			}
 		},
-
-		indexing: {, invoke: {
+	indexing: {
+	invoke: {
 				src: 'indexingActor',
 				input: ({ context }) => ({ context }),
-				onDone: {, target: 'complete',
+				onDone: {
+	target: 'complete',
 					actions: 'resetRetry'
 				},
-				onError: [
+	onError: [
 					{
 						guard: 'canRetry',
 						target: 'indexing',
 						actions: 'incRetry'
 					},
-					{
+	{
 						target: 'error',
 						actions: ({ event }) => ({
 							error: event.error
@@ -253,11 +283,11 @@ export const clusteringMachineDef = setup({
 				]
 			}
 		},
-
-		complete: {, type: 'final'
+	complete: {
+	type: 'final'
 		},
-
-		error: {, type: 'final'
+	error: {
+	type: 'final'
 		}
 	}
 });

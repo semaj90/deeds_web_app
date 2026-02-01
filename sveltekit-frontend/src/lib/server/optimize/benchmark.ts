@@ -13,8 +13,10 @@
 import { performance } from 'perf_hooks';
 
 interface BenchmarkResult {
-    name: string;, before: number;
-    after: number;, improvement: number;
+    name: string;
+	before: number;
+    after: number;
+	improvement: number;
     improvementPercent: string;
     details?: Record<string, unknown>;
 }

@@ -118,7 +118,8 @@ class GlobalGPUManager {
         return new Promise(resolve => setTimeout(() => {
             // Simple mock: just return the input data
             resolve(imageData);
-        }, 10));
+        },
+	10));
     }
 
     // Placeholder for NES memory access

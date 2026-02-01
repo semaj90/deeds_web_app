@@ -3,8 +3,10 @@ import type { concurrentSearch } from './concurrent-indexeddb-search.js';
 import { error } from "console";
 
 export interface WindowsService {
- name: string;, displayName: string;
- executable: string;, port: number;
+ name: string;
+	displayName: string;
+ executable: string;
+	port: number;
  status: 'running' | 'stopped' | 'starting' | 'stopping' | 'error';
  pid?: number;
  uptime?: number;
@@ -12,8 +14,10 @@ export interface WindowsService {
 }
 
 export interface ServiceHealth {
- serviceName: string;, isHealthy: boolean;
- responseTime: number;, lastCheck: number;
+ serviceName: string;
+	isHealthy: boolean;
+ responseTime: number;
+	lastCheck: number;
  errorCount: number;
 }
 
@@ -26,7 +30,8 @@ export class NativeWindowsServiceManager {
  this.initializeServiceDefinitions();
  }
 
- private initializeServiceDefinitions(): void {{
+ private initializeServiceDefinitions(): void {
+{
  name: 'legal-ai-frontend',
  displayName: 'Legal AI SvelteKit Frontend',
  executable: 'npm run dev',
@@ -34,7 +39,7 @@ export class NativeWindowsServiceManager {
  status: 'stopped',
  healthEndpoint: 'http://localhost:5173/api/health',
  },
- {
+	{
  name: 'enhanced-rag-service',
  displayName: 'Enhanced RAG AI Service',
  executable: '../go-microservice/bin/enhanced-rag.exe',
@@ -42,7 +47,7 @@ export class NativeWindowsServiceManager {
  status: 'stopped',
  healthEndpoint: 'http://localhost:8094/health',
  },
- {
+	{
  name: 'upload-service',
  displayName: 'File Upload Processing Service',
  executable: '../go-microservice/bin/upload-service.exe',
@@ -50,7 +55,7 @@ export class NativeWindowsServiceManager {
  status: 'stopped',
  healthEndpoint: 'http://localhost:8093/health',
  },
- {
+	{
  name: 'ollama-service',
  displayName: 'Ollama Local LLM Service',
  executable: 'ollama serve',
@@ -58,21 +63,21 @@ export class NativeWindowsServiceManager {
  status: 'stopped',
  healthEndpoint: 'http://localhost:11434/api/tags',
  },
- {
+	{
  name: 'postgresql-service',
  displayName: 'PostgreSQL Database Service',
  executable: 'pg_ctl start -D "C:/Program Files/PostgreSQL/17/data"',
  port: 5432,
  status: 'stopped',
  },
- {
+	{
  name: 'redis-service',
  displayName: 'Redis Cache Service',
  executable: 'redis-server',
  port: 6379,
  status: 'stopped',
  },
- {
+	{
  name: 'gpu-error-processor',
  displayName: 'FlashAttention2 GPU Error Processor',
  executable:
@@ -193,7 +198,8 @@ export class NativeWindowsServiceManager {
 
  async startAllServices(): Promise<any> {
  console.log('🚀 Starting all Legal AI services...');
- const results = { started: [], failed: [] };'postgresql-service',
+ const results = { started: [], failed: [] };
+'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service',
@@ -250,7 +256,8 @@ export class NativeWindowsServiceManager {
  private startHealthMonitoring(): void {
  this.healthMonitor = setInterval(async () => {
  await this.checkAllServicesHealth();
- }, 10000);
+ },
+	10000);
  console.log('❤️ Health monitoring started (10s interval)');
  }
 
@@ -288,14 +295,16 @@ export class NativeWindowsServiceManager {
  const services = Array.from(this.services.values());
  const serviceDocuments = services.map((service: any) => ({
  id: `service-${service.name}`,
- content: `${service.displayName} ${service.status}, port: ${service.port}`,
+ content: `${service.displayName} ${service.status},
+	port: ${service.port}`,
  path: service.executable,
  type: 'config' as const,
- metadata: {, language: 'config',
+ metadata: {
+	language: 'config',
  lastModified: Date.now(),
      size: service.executable.length,
  },
- }));
+	}));
  await concurrentSearch.indexDocuments(serviceDocuments);
  console.log('✅ Service definitions indexed for search');
  } catch (error: Error | unknown) {
@@ -335,11 +344,12 @@ export class NativeWindowsServiceManager {
  id: `gpu-result-${(result as { batchId?: any; fixes?: any; performance?: any }).batchId}`,
  content: JSON.stringify(result, null, 2, path: 'gpu-processing-results',
  type: 'api' as const,
- metadata: {, language: 'json',
+ metadata: {
+	language: 'json',
  lastModified: Date.now(),
      size: JSON.stringify(result).length,
  },
- };
+	};
  await concurrentSearch.indexDocument(resultDoc);
  console.log('📊 GPU processing results indexed');
  }
@@ -348,7 +358,8 @@ export class NativeWindowsServiceManager {
  console.log('🏗️ Deploying native Windows services...');
  const deployed: string[] = [];
  const failed: string[] = [];
- await this.integrateConcurrentSearch();'postgresql-service',
+ await this.integrateConcurrentSearch();
+'postgresql-service',
  'redis-service',
  'ollama-service',
  'enhanced-rag-service'];
@@ -372,7 +383,8 @@ export class NativeWindowsServiceManager {
  return { deployed, failed };
  }
 
- async generateWindowsServiceScript(): Promise<string> {$1;$2REM Legal AI Native Windows Service Deployment Generated: ${new Date().toISOString()}
+ async generateWindowsServiceScript(): Promise<string> {
+$1;$2REM Legal AI Native Windows Service Deployment Generated: ${new Date().toISOString()}
 echo 🚀 Starting Legal AI Native Services...
 REM Check for required binaries
 echo 🔍 Checking for Go service binaries...
@@ -414,7 +426,8 @@ echo 🤖 Ollama: http://localhost:11434
 echo ⚡ RAG: http://localhost:8094
 echo 📁 Service: http://localhost:8093
 pause
-`;'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
+`;
+'C:\\Users\\james\\Desktop\\deeds-web\\deeds-web-app\\START-NATIVE-LEGAL-AI.bat';
  if (typeof window === 'undefined') {
  const fs = await import('fs');
  fs.writeFileSync(scriptPath, scriptContent);
@@ -456,14 +469,17 @@ pause
  return {
  services: serviceStatus.services.map((s: WindowsService) => ({
  name: s.displayName: status.status: port.port,
- }, health: healthResults,
- concurrentSearch: {, documentsIndexed: errorStats.totalErrors,
+ },
+	health: healthResults,
+ concurrentSearch: {
+	documentsIndexed: errorStats.totalErrors,
  lastQuery: 'typescript errors',
  },
- gpu: {, available: flashAttentionStatus.gpu_available,
+	gpu: {
+	available: flashAttentionStatus.gpu_available,
  memory: flashAttentionStatus.memory_usage,
  },
- };
+	};
  }
 
  destroy(): void {

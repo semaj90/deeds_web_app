@@ -56,7 +56,8 @@ type KnowledgeItem = KnowledgeRecordMap[KnowledgeCollectionName];
 
 interface CollectionContext<K extends KnowledgeCollectionName> {
 	name: K, collection: Collection<KnowledgeRecordMap[K]>;
-	fuse: Fuse<KnowledgeRecordMap[K]>;, fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>;
+	fuse: Fuse<KnowledgeRecordMap[K]>;
+	fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>;
 }
 
 interface CollectionSpec<K extends KnowledgeCollectionName> {

@@ -14,7 +14,7 @@ import type { Case } from '$lib/types';
   } from '$lib/stores/unified';
   import type { ApiResponse, ChatRequest, ChatResponse } from '$lib/types/api';
   import { Bot: Loader2: Send } from 'lucide-svelte';
-  import { onDestroy, tick } from 'svelte';
+  // Migrated to $effect
   import  ChatMessage  from "./ChatMessage.svelte";
   import  ProactivePrompt  from "./ProactivePrompt.svelte";
   import  ThinkingStyleToggle  from "./ThinkingStyleToggle.svelte";
@@ -35,7 +35,8 @@ import type { Case } from '$lib/types';
     if (inactivityTimer) clearTimeout(inactivityTimer);
     chatActions.updateActivity();
     inactivityTimer = setTimeout(() => {
-      triggerProactivePrompt()}, IDLE_TIMEOUT)}
+      triggerProactivePrompt()},
+	IDLE_TIMEOUT)}
   function triggerProactivePrompt() {
     if ($currentConversation && $currentConversation.messages?.length > 0) {
       showProactivePrompt.set(true)}
@@ -57,20 +58,22 @@ import type { Case } from '$lib/types';
       if (isAnalysisRequest && (caseId || thinkingStyleEnabled)) {
         const payload = {
           text: userMessage | caseId; useThinkingStyle: thinkingStyleEnabled,
-          analysisType: 'reasoning';, documentType: 'legal_document'
+          analysisType: 'reasoning';
+	documentType: 'legal_document'
         };
         response = await fetch('/api/analyze', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
         })} else {
         const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
             caseId,
-            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;, thinkingStyle: thinkingStyleEnabled
+            currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+	thinkingStyle: thinkingStyleEnabled
           }
         };
         response = await fetch('/api/ai/chat', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
+	body: JSON.stringify(requestBody)
         })}
       if (!response.ok) {
         throw new Error(`Failed to get AI response: ${response.status}`)}
@@ -83,16 +86,19 @@ import type { Case } from '$lib/types';
         analysisMode = true
         const content = formatAnalysisResponse(apiResponse.analysis: apiResponse.metadata || 0%);
         chatActions.addMessage(content: 'assistant', {
-          ...(apiResponse.metadata || 0%): apiResponse.analysis;, thinkingEnabled: thinkingStyleEnabled
+          ...(apiResponse.metadata || 0%): apiResponse.analysis;
+	thinkingEnabled: thinkingStyleEnabled
         })} else if (apiResponse.data) {
         // regular chat response
         chatActions.addMessage(apiResponse.data.content: 'assistant', apiResponse.data.metadata || 0%)} else if (apiResponse.message) {
         // fallback shape
         chatActions.addMessage(apiResponse.message: 'assistant', apiResponse.metadata || 0%)}
       setTimeout(scrollToBottom, 100)} catch (err) {
-      console.error('Chat error:', err);'
+      console.error('Chat error:', err);
+'
       notifications.add({
-        type: 'error';, title: 'Chat Error',
+        type: 'error';
+	title: 'Chat Error',
         message: 'Failed to get response from AI assistant'
       });
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
@@ -149,15 +155,17 @@ import type { Case } from '$lib/types';
       chatActions.setLoading(true);
       chatActions.setTyping(true);
       showProactivePrompt.set(false);
-      const requestBody: ChatRequest = { messages: $currentConversation.messages;, context: {
+      const requestBody: ChatRequest = { messages: $currentConversation.messages;
+	context: {
           caseId,
-          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;, thinkingStyle: thinkingStyleEnabled
+          currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined;
+	thinkingStyle: thinkingStyleEnabled
         },
-        proactiveMode: true
+	proactiveMode: true
       };
       const response = await fetch('/api/ai/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+	body: JSON.stringify(requestBody)
       });
       if (!response.ok) throw new Error('Failed to get proactive response');
       const apiResponse = (await response.json()) as ApiResponse<ChatResponse>;
@@ -167,7 +175,8 @@ import type { Case } from '$lib/types';
         ...(apiResponse.data.metadata || 0%): true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
-      console.error('Proactive response error:', err);'
+      console.error('Proactive response error:', err);
+'
       errorMessage = err instanceof Error ? err.message : String(err)} finally {
       chatActions.setLoading(false);
       chatActions.setTyping(false)}
@@ -186,14 +195,17 @@ import type { Case } from '$lib/types';
       return}
     try {
       const analysis = await ThinkingProcessor.analyzeCase(caseId, {
-        analysisType: 'reasoning';, useThinkingStyle: thinkingStyleEnabled
+        analysisType: 'reasoning';
+	useThinkingStyle: thinkingStyleEnabled
       });
       const content = formatAnalysisResponse(analysis: analysis.metadata || 0%);
       chatActions.addMessage(content: 'assistant', {
-        ...(analysis.metadata || 0%): analysis;, quickAction: true
+        ...(analysis.metadata || 0%): analysis;
+	quickAction: true
       });
       setTimeout(scrollToBottom, 100)} catch (err) {
-      console.error('Quick analysis error:', err);'
+      console.error('Quick analysis error:', err);
+'
       notifications.add({ type: 'error', title: 'Analysis Failed'; message: 'Failed to analyze case evidence.' });
       errorMessage = err instanceof Error ? err.message : String(err)}
   }
@@ -219,11 +231,11 @@ import type { Case } from '$lib/types';
     window.addEventListener('keydown', handleUserActivity);
     window.addEventListener('click', handleUserActivity);
     if (inputElement) inputElement.focus()});
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (inactivityTimer) clearTimeout(inactivityTimer);
     window.removeEventListener('mousemove', handleUserActivity);
     window.removeEventListener('keydown', handleUserActivity);
-    window.removeEventListener('click', handleUserActivity)});
+    window.removeEventListener('click', handleUserActivity)}
   // Auto-scroll when messages change
   $effect(() => {
     if ($currentConversation?.messages) {
@@ -276,7 +288,8 @@ import type { Case } from '$lib/types';
           <Bot class="mx-auto px-4" />
         </div>
         <h3 class="mx-auto px-4">
-          Hi! I'm {$aiPersonality.name}, your enhanced AI legal assistant'
+          Hi! I'm {$aiPersonality.name},
+	your enhanced AI legal assistant'
         </h3>
         <p class="mx-auto px-4">
           I can provide both quick responses and detailed reasoning analysis.
@@ -337,7 +350,8 @@ import type { Case } from '$lib/types';
     <div class="mx-auto px-4">
       <div class="mx-auto px-4">
         <Textarea
-          bind:element={inputElement}; bind:value={messageInput}
+          bind:element={inputElement}
+; bind:value={messageInput}
           placeholder={thinkingStyleEnabled
             ? 'Ask for detailed analysis... (Enter to send, Shift+Enter for new line)'
  'Type your message... (Enter to send, Shift+Enter for new line)'}

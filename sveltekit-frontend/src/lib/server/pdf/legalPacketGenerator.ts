@@ -2,13 +2,16 @@ import type { CaseSynthesis } from '$lib/server/cases/caseSynthesis';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 interface CaseData {
-    id: string;, title: string;
-    description?: string;, createdAt: Date;
+    id: string;
+	title: string;
+    description?: string;
+	createdAt: Date;
     updatedAt: Date;
 }
 
 interface PacketData {
-    caseData: CaseData;, synthesis: CaseSynthesis;
+    caseData: CaseData;
+	synthesis: CaseSynthesis;
 }
 
 /**

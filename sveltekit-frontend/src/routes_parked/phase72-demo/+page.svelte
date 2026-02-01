@@ -1,7 +1,7 @@
 <script lang="ts">
  import type { EvidenceNode } from '$lib/evidence-canvas/case-similarity-service';
  import EvidenceCanvas from '$lib/evidence-canvas/evidence-canvas.svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let caseId = $state('demo-case-001');
  let caseType = $state('contract-dispute');
@@ -10,10 +10,12 @@
  let demoNodes = $state<EvidenceNode[]>([]);
  let demoEdges = $state<any[]>([]);
 
- onMount(() => {
+ $effect(() => {
+
  // Generate demo data
  generateDemoData();
- });
+ 
+});
 
  function generateDemoData() {
  // Create sample evidence nodes

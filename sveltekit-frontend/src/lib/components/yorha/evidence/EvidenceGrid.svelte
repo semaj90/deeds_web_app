@@ -4,12 +4,17 @@
   let tag = $state<any>(undefined);
 
   interface EvidenceItem {
-    id: string;, title: string;
+    id: string;
+	title: string;
     type: 'document' | 'email' | 'video' | 'spreadsheet' | 'audio';
-    format: string;, size: string;
-    uploaded: Date;, case: string;
-    tags: string[];, aiAnalyzed: boolean;
-    confidence: number;, status: 'processed' | 'pending' | 'processing' | 'failed';
+    format: string;
+	size: string;
+    uploaded: Date;
+	case: string;
+    tags: string[];
+	aiAnalyzed: boolean;
+    confidence: number;
+	status: 'processed' | 'pending' | 'processing' | 'failed';
   }
 
   let evidence = $state<EvidenceItem[]>([
@@ -26,7 +31,7 @@
       confidence: 94,
       status: 'processed'
     },
-    {
+	{
       id: 'EVD-2024-002',
       title: 'Email Correspondence Chain',
       type: 'email',
@@ -39,7 +44,7 @@
       confidence: 87,
       status: 'processed'
     },
-    {
+	{
       id: 'EVD-2024-003',
       title: 'Contract Agreement - TechCorp',
       type: 'document',
@@ -52,7 +57,7 @@
       confidence: 0,
       status: 'pending'
     },
-    {
+	{
       id: 'EVD-2024-004',
       title: 'Security Camera Footage',
       type: 'video',
@@ -65,7 +70,7 @@
       confidence: 76,
       status: 'processing'
     },
-    {
+	{
       id: 'EVD-2024-005',
       title: 'Bank Transaction Records',
       type: 'spreadsheet',
@@ -78,7 +83,7 @@
       confidence: 91,
       status: 'processed'
     },
-    {
+	{
       id: 'EVD-2024-006',
       title: 'Witness Statement - John Doe',
       type: 'document',

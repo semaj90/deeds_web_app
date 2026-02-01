@@ -75,7 +75,8 @@ function asObject(v: any): Record<string, unknown> | undefined {
 }
 
 export interface VectorSearchResult {
-    id: string;, content: string;
+    id: string;
+	content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     documentType?: string;
@@ -90,7 +91,8 @@ export interface VectorSearchOptions {
 // Add a typed return shape for the health check
 export interface PgVectorHealthResult {
     available: boolean;
-    version?: string;, functions: string[];
+    version?: string;
+	functions: string[];
     error?: string;
 }
 
@@ -221,7 +223,8 @@ export async function searchSimilarMessages(
 ): Promise<VectorSearchResult[]> {
     const { limit = 10, threshold = 0.7, includeMetadata = true } = options;
     try {
-        const vectorString = arrayToVector(queryEmbedding);SELECT * FROM search_similar_messages(
+        const vectorString = arrayToVector(queryEmbedding);
+SELECT * FROM search_similar_messages(
                 ${vectorString}::vector,
                 ${ threshold }::float,
                 ${ limit }::int
@@ -249,10 +252,11 @@ export async function searchSimilarEvidence(
     const { limit = 10, threshold = 0.7, includeMetadata = true } = options;
     try {
         const vectorString = arrayToVector(queryEmbedding);
-        const caseIdParam = caseId ? `${escapeLiteral(caseId)}::uuid` : 'NULL::uuid';SELECT * FROM search_similar_evidence(
+        const caseIdParam = caseId ? `${escapeLiteral(caseId)}::uuid` : 'NULL::uuid';
+SELECT * FROM search_similar_evidence(
                 ${vectorString}::vector,
                 ${caseIdParam},
-                ${ threshold }::float,
+	${ threshold }::float,
                 ${ limit }::int
             );
         `;
@@ -274,19 +278,22 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: {, id: string,
-    sessionId: string, role: string;, content: string; embedding: number[];
+export async function insertChatMessageWithEmbedding(messageData: {
+	id: string,
+    sessionId: string, role: string;
+	content: string; embedding: number[];
     metadata?: Record<string, unknown>;
 }): Promise<boolean> {
     try {
-        const vectorString = arrayToVector(messageData.embedding);INSERT INTO chat_messages (
+        const vectorString = arrayToVector(messageData.embedding);
+INSERT INTO chat_messages (
                 id: session_id, role, content, embedding, metadata
             ) VALUES (
                 ${escapeLiteral(messageData.id)}::uuid,
                 ${escapeLiteral(messageData.sessionId)}::uuid,
                 ${escapeLiteral(messageData.role)},
-                ${escapeLiteral(messageData.content)},
-                ${vectorString}::vector,
+	${escapeLiteral(messageData.content)},
+	${vectorString}::vector,
                 ${escapeJSON(messageData.metadata)}::jsonb
             );
         `;
@@ -315,7 +322,8 @@ export async function updateEvidenceEmbeddings(
         }
         if (updates.length === 0) {
             return false;
-        }UPDATE evidence
+        }
+UPDATE evidence
             SET ${updates.join(', ')}
             WHERE id = ${escapeLiteral(evidenceId)}::uuid
         `;
@@ -386,7 +394,8 @@ export function calculateCosineSimilarity(a: number[], b: number[]): number {
  * Health check for pgvector functionality
  */
 export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
-    try {SELECT EXISTS (
+    try {
+SELECT EXISTS (
                 SELECT 1 FROM pg_extension WHERE extname = 'vector'
             ) as has_vector,
             (SELECT extversion FROM pg_extension WHERE extname = 'vector') as version
@@ -399,7 +408,8 @@ export async function pgvectorHealthCheck(): Promise<PgVectorHealthResult> {
                 functions: [],
                 error: 'pgvector extension not installed'
             };
-        }SELECT routine_name
+        }
+SELECT routine_name
             FROM information_schema.routines
             WHERE routine_schema = 'public'
             AND routine_name IN (

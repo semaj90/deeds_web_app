@@ -1,4 +1,5 @@
-export type Entity = { text: string;, label: string; start?: number; end?: number };
+export type Entity = { text: string;
+	label: string; start?: number; end?: number };
 
 export async function extractEntities(text: string): Promise<Entity[]> {
     try {

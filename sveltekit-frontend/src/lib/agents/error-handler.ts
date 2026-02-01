@@ -225,7 +225,8 @@ export async function withRetry<T>(
       if (attempt < maxAttempts) {
         const delay = ToolErrorHandler.getRetryDelay(attempt);
         console.warn(
-          `Attempt ${attempt} failed in ${context}, retrying in ${delay}ms...`,
+          `Attempt ${attempt} failed in ${context},
+	retrying in ${delay}ms...`,
           toolError.message
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -256,7 +257,8 @@ export async function withTimeout<T>(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {fn(),
+  try {
+fn(),
       new Promise<T>((_, reject) => {
         controller.signal.addEventListener('abort', () => {
           reject(

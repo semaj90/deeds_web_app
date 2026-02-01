@@ -229,9 +229,10 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  describe('validateRequests', () => {
- it('should validate multiple requests', () => {{ path: '/api/error-brain/analyze', method: 'POST' as const },
- { path: '/api/error-brain/status', method: 'GET' as const },
- { path: '/api/other/endpoint', method: 'GET' as const }];
+ it('should validate multiple requests', () => {
+{ path: '/api/error-brain/analyze', method: 'POST' as const },
+	{ path: '/api/error-brain/status', method: 'GET' as const },
+	{ path: '/api/other/endpoint', method: 'GET' as const }];
 
  const results = middleware.validateRequests(requests);
 
@@ -242,8 +243,9 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  it('should reject error-brain requests when disabled', () => {
- middleware.disableErrorBrain();{ path: '/api/error-brain/analyze', method: 'POST' as const },
- { path: '/api/other/endpoint', method: 'GET' as const }];
+ middleware.disableErrorBrain();
+{ path: '/api/error-brain/analyze', method: 'POST' as const },
+	{ path: '/api/other/endpoint', method: 'GET' as const }];
 
  const results = middleware.validateRequests(requests);
 
@@ -350,7 +352,8 @@ describe('ErrorBrainMiddleware', () => {
  });
 
  it('should handle multiple concurrent requests', () => {
- const requests = Array.from({ length: 10 }, (_: any, i: any) => ({
+ const requests = Array.from({ length: 10 },
+	(_: any, i: any) => ({
  path: `/api/error-brain/endpoint${i}`,
  method: 'GET' as const,
  }));

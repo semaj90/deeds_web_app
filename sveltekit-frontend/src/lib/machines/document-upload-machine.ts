@@ -2,7 +2,8 @@ import { assign, createMachine, fromPromise } from 'xstate';
 
 // Type definitions
 interface UploadedFile {
-  id: string;, name: string;
+  id: string;
+	name: string;
   size?: number;
   mimeType?: string;
   [key: string]: unknown;
@@ -15,22 +16,28 @@ interface AIProcessingResult {
 }
 
 interface ProcessingSummary {
-  totalFiles: number;, successfulProcessing: number;
+  totalFiles: number;
+	successfulProcessing: number;
   extractedTextLength: number;
 }
 
 export interface DocumentUploadContext {
-  files: File[];, uploadProgress: number;
-  processingProgress: number;, validationErrors: Record<string, string[]>;
-  uploadedFiles: UploadedFile[];, aiResults: {
-    processedFiles: AIProcessingResult[];, summary: ProcessingSummary;
+  files: File[];
+	uploadProgress: number;
+  processingProgress: number;
+	validationErrors: Record<string, string[]>;
+  uploadedFiles: UploadedFile[];
+	aiResults: {
+    processedFiles: AIProcessingResult[];
+	summary: ProcessingSummary;
   } | null;
   error: string | null;
   retryCount: number;
 }
 
 export type DocumentUploadEvent =
-  | { type: 'SELECT_FILES';, files: File[] }
+  | { type: 'SELECT_FILES';
+	files: File[] }
   | { type: 'SUBMIT' }
   | { type: 'RETRY' }
   | { type: 'RESET' };
@@ -77,43 +84,51 @@ function extractUploadedFilesFromInvoke(evt: any): UploadedFile[] {
 
 function extractAIResultsFromInvoke(
   evt: any
-): {, processedFiles: AIProcessingResult[]; summary: ProcessingSummary } | null {
+): {
+	processedFiles: AIProcessingResult[]; summary: ProcessingSummary } | null {
   const e = asRecord(evt);
   const maybe = (e.data ?? e.output) as unknown;
   if (typeof maybe === 'object' && maybe !== null) {
     const m = asRecord(maybe);
     if ('processedFiles' in m && 'summary' in m) {
-      return maybe as { processedFiles: AIProcessingResult[];, summary: ProcessingSummary };
+      return maybe as { processedFiles: AIProcessingResult[];
+	summary: ProcessingSummary };
     }
   }
   return null;
 }
 
 export const documentUploadMachine = createMachine({
-  types: {, context: {} as DocumentUploadContext,
+  types: {
+	context: {} as DocumentUploadContext,
     events: {} as DocumentUploadEvent,
   },
-  id: 'documentUpload',
+	id: 'documentUpload',
   initial: 'idle',
-  context: {, files: [],
+  context: {
+	files: [],
     uploadProgress: 0,
     processingProgress: 0,
     validationErrors: {},
-    uploadedFiles: [],
+	uploadedFiles: [],
     aiResults: null,
     error: null,
     retryCount: 0,
   },
-  states: {, idle: {
-      on: {, SELECT_FILES: {
+	states: {
+	idle: {
+      on: {
+	SELECT_FILES: {
           target: 'validating',
-          actions: assign({, files: ({ event }) => event.files,
+          actions: assign({
+	files: ({ event }) => event.files,
             error: () => null,
           }),
         },
-      },
-    },
-    validating: {, invoke: {
+	},
+	},
+	validating: {
+	invoke: {
         id: 'validateFiles',
         src: fromPromise<File[]>(async (params) => {
           const { input } = params as { input: DocumentUploadContext };
@@ -143,31 +158,40 @@ export const documentUploadMachine = createMachine({
           return input.files;
         }),
         input: ({ context }) => context,
-        onDone: {, target: 'validated',
-          actions: assign({, validationErrors: () => ({}),
+        onDone: {
+	target: 'validated',
+          actions: assign({
+	validationErrors: () => ({}),
             error: () => null,
           }),
         },
-        onError: {, target: 'idle',
-          actions: assign({, validationErrors: ({ event }) => extractValidationErrorsFromInvoke(event) ?? {},
-            error: () => 'File validation failed',
+	onError: {
+	target: 'idle',
+          actions: assign({
+	validationErrors: ({ event }) => extractValidationErrorsFromInvoke(event) ?? {},
+	error: () => 'File validation failed',
           }),
         },
-      },
-    },
-    validated: {, on: {
+	},
+	},
+	validated: {
+	on: {
         SUBMIT: 'uploading',
-        SELECT_FILES: {, target: 'validating',
-          actions: assign({, files: ({ event }) => event.files,
+        SELECT_FILES: {
+	target: 'validating',
+          actions: assign({
+	files: ({ event }) => event.files,
           }),
         },
-      },
-    },
-    uploading: {, entry: assign({
+	},
+	},
+	uploading: {
+	entry: assign({
         uploadProgress: () => 0,
         retryCount: ({ context }) => context.retryCount + 1,
       }),
-      invoke: {, id: 'uploadFiles',
+      invoke: {
+	id: 'uploadFiles',
         src: fromPromise<any>(async (params) => {
           const { input } = params as { input: DocumentUploadContext };
           const formData = new FormData();
@@ -187,31 +211,38 @@ export const documentUploadMachine = createMachine({
           return response.json();
         }),
         input: ({ context }) => context,
-        onDone: {, target: 'processing',
-          actions: assign({, uploadedFiles: ({ event }) => extractUploadedFilesFromInvoke(event),
+        onDone: {
+	target: 'processing',
+          actions: assign({
+	uploadedFiles: ({ event }) => extractUploadedFilesFromInvoke(event),
             uploadProgress: () => 100,
             error: () => null,
           }),
         },
-        onError: [
+	onError: [
           {
             guard: ({ context }) => context.retryCount < 3,
             target: 'retrying',
-            actions: assign({, error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed',
+            actions: assign({
+	error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Upload failed',
             }),
           },
-          {
+	{
             target: 'failed',
-            actions: assign({, error: ({ event }) =>
+            actions: assign({
+	error: ({ event }) =>
                 extractErrorMessageFromInvoke(event) ?? 'Upload failed after retries',
             }),
           },
-        ],
+	],
       },
-    },
-    processing: {, entry: assign({ processingProgress: () => 0 }),
-      invoke: {, id: 'processFiles',
-        src: fromPromise<{, processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(
+	},
+	processing: {
+	entry: assign({ processingProgress: () => 0 }),
+      invoke: {
+	id: 'processFiles',
+        src: fromPromise<{
+	processedFiles: AIProcessingResult[]; summary: ProcessingSummary }>(
           async (params) => {
             const { input } = params as { input: DocumentUploadContext };
             const processingResults: AIProcessingResult[] = [];
@@ -220,7 +251,8 @@ export const documentUploadMachine = createMachine({
               const response = await fetch('/api/ai/process-document', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, fileId: file.id, analysisType: 'full' }),
+	body: JSON.stringify({
+	fileId: file.id, analysisType: 'full' }),
               });
 
               if (!response.ok) {
@@ -232,39 +264,49 @@ export const documentUploadMachine = createMachine({
 
             return {
               processedFiles: processingResults,
-              summary: {, totalFiles: input.uploadedFiles.length,
+              summary: {
+	totalFiles: input.uploadedFiles.length,
                 successfulProcessing: processingResults.length,
                 extractedTextLength: processingResults.reduce(
                   (acc, r) => acc + (r.extractedText?.length ?? 0),
                   0
                 ),
               },
-            };
+	};
           }
         ),
         input: ({ context }) => context,
-        onDone: {, target: 'completed',
-          actions: assign({, aiResults: ({ event }) => extractAIResultsFromInvoke(event),
+        onDone: {
+	target: 'completed',
+          actions: assign({
+	aiResults: ({ event }) => extractAIResultsFromInvoke(event),
             processingProgress: () => 100,
             error: () => null,
           }),
         },
-        onError: {, target: 'failed',
-          actions: assign({, error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed',
+	onError: {
+	target: 'failed',
+          actions: assign({
+	error: ({ event }) => extractErrorMessageFromInvoke(event) ?? 'Processing failed',
           }),
         },
-      },
-    },
-    retrying: {, after: {
+	},
+	},
+	retrying: {
+	after: {
         2000: 'uploading',
       },
-      on: {, RETRY: 'uploading',
+	on: {
+	RETRY: 'uploading',
       },
-    },
-    completed: {, type: 'final',
-      on: {, RESET: {
+	},
+	completed: {
+	type: 'final',
+      on: {
+	RESET: {
           target: 'idle',
-          actions: assign({, files: () => [],
+          actions: assign({
+	files: () => [],
             uploadProgress: () => 0,
             processingProgress: () => 0,
             validationErrors: () => ({}),
@@ -274,19 +316,22 @@ export const documentUploadMachine = createMachine({
             retryCount: () => 0,
           }),
         },
-      },
-    },
-    failed: {, on: {
+	},
+	},
+	failed: {
+	on: {
         RETRY: 'uploading',
-        RESET: {, target: 'idle',
-          actions: assign({, error: () => null,
+        RESET: {
+	target: 'idle',
+          actions: assign({
+	error: () => null,
             retryCount: () => 0,
           }),
         },
-      },
-    },
-  },
-});
+	},
+	},
+	},
+	});
 
 export default documentUploadMachine;
 

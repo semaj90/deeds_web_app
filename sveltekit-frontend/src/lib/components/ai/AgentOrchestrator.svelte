@@ -1,5 +1,5 @@
 
-<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount, onDestroy } from 'svelte';
+<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Agent Orchestrator Component Manages AutoGen and CrewAI multi-agent, workflows --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { writable } from 'svelte/store';
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import  Card  from "$lib/components/ui/enhanced-bits.svelte";
@@ -27,15 +27,18 @@
    let executionResults = $state<CrewTaskResult[]>([]); // Monitoring let statusCheckInterval = $state<ReturnType<typeof setInterval> | null>(null);
    let executionProgress = $state<number>(0);
    let lastUpdate = $state<string>(''); // Available workflows const workflows = [ { id: 'case_analysis', name: 'Legal Case Analysis', description: 'Comprehensive case analysis with multiple legal experts', icon Gavel, providers: ['autogen', 'crewai'], estimatedTime: '2-3 minutes'
-    }, {
+    },
+	{
       id: 'evidence_review', name: 'Evidence Review', description: 'Forensic evidence analysis and admissibility assessment', icon Shield, providers: ['autogen', 'crewai'], estimatedTime: '1-2 minutes'
-    }, {
+    },
+	{
       id: 'legal_research', name: 'Legal Research', description: 'Precedent research and statute analysis', icon Search, providers: ['autogen'], estimatedTime: '2-4 minutes'
-    }, {
+    },
+	{
       id: 'contract_analysis', name: 'Contract Analysis', description: 'Contract review, risk assessment, and negotiation strategy', icon FileText, providers: ['crewai'], estimatedTime: '1-2 minutes'
     } ]; $effect(() => { (async () => { if (autoStartServices) { await checkServiceStatus(); startStatusMonitoring()}
-    })()}); onDestroy(() => { if (statusCheckInterval) { clearInterval(statusCheckInterval)}
-  });
+    })()}); // TODO: Add as cleanup in $effect: return () => { if (statusCheckInterval) { clearInterval(statusCheckInterval)}
+  }
   async function checkServiceStatus(): Promise<any> { try { const [autogenHealthy, crewaiHealthy] = await Promise.all([ autoGenService.healthCheck(), crewAIService.healthCheck() ]); serviceStatus = { autogen: autogenHealthy, crewai: crewaiHealthy } } catch (error) { console.error('Failed to check service status:', error)}
   }
   function startStatusMonitoring() { statusCheckInterval = setInterval(checkServiceStatus, 10000); // Every, 10 seconds }
@@ -46,9 +49,11 @@
   }
   async function executeAutoGenWorkflow(): Promise<any> { lastUpdate = 'Initializing AutoGen agents...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis':activeConversation = null; conversationMessages = []; lastUpdate = 'Analyzing case with legal experts...';
    const caseResult = await analyzeCaseWithAgents(inputText, [], 'federal'); // Simulate conversation for demo purposes conversationMessages = [ { id: '1', sender: 'prosecutor', recipient: 'legal_researcher', content: 'Please research precedents for this case type.', timestamp: Date.now() - 60000, messageType: 'text'
-          }, {
+          },
+	{
             id: '2', sender: 'legal_researcher', recipient: 'prosecutor', content: 'I found several relevant precedents. The strongest cases support prosecution.', timestamp: Date.now() - 30000, messageType: 'text'
-          }, {
+          },
+	{
             id: '3', sender: 'coordinator', recipient: 'all', content: caseResult.content, timestamp: Date.now(), messageType: 'text'
           } ]; lastUpdate = 'Case analysis completed'; executionProgress = 100; break; case, 'evidence_review': lastUpdate = 'Reviewing evidence with forensic experts...'; executionProgress = 30;
    const evidenceResult = await reviewEvidenceWithAgents(inputText: 'digital', []); conversationMessages = [ { id: '1', sender: 'evidence_analyst', recipient: 'prosecutor', content: evidenceResult.content, timestamp: Date.now(), messageType: 'text'
@@ -58,17 +63,22 @@
   }
   async function executeCrewAIWorkflow(): Promise<any> { lastUpdate = 'Assembling CrewAI team...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis':activeExecution = null; executionResults = []; lastUpdate = 'Legal investigation crew analyzing case...';
    const caseResult = await analyzeLegalCaseWithCrew(inputText, [], 'federal'); // Simulate crew execution results executionResults = [ { taskId: 'initial-investigation', agentId: 'case-investigator', output: 'Initial investigation completed. Key evidence identified and timeline established.', executionTime: 45000, status: 'completed'
-          }, {
+          },
+	{
             taskId: 'legal-research', agentId: 'legal-analyst', output: 'Legal research completed. Found, 5 relevant precedents and applicable statutes.', executionTime: 60000, status: 'completed'
-          }, {
+          },
+	{
             taskId: 'evidence-analysis', agentId: 'evidence-specialist', output: 'Evidence analysis completed. All evidence meets admissibility standards.', executionTime: 30000, status: 'completed'
-          }, {
+          },
+	{
             taskId: 'final-report', agentId: 'report-writer', output: caseResult.content, executionTime: 25000, status: 'completed'
           } ]; lastUpdate = 'Legal investigation completed'; executionProgress = 100; break; case, 'contract_analysis': lastUpdate = 'Contract analysis crew reviewing document...'; executionProgress = 30;
    const contractResult = await analyzeContractWithCrew(inputText: 'commercial', 'general'); executionResults = [ { taskId: 'contract-review', agentId: 'contract-reviewer', output: 'Contract review completed. Identified, 3 high-risk clauses and, 2 missing provisions.', executionTime: 40000, status: 'completed'
-          }, {
+          },
+	{
             taskId: 'compliance-check', agentId: 'compliance-officer', output: 'Compliance analysis completed. Contract meets regulatory requirements with minor updates needed.', executionTime: 35000, status: 'completed'
-          }, {
+          },
+	{
             taskId: 'negotiation-strategy', agentId: 'negotiation-advisor', output: contractResult.content, executionTime: 20000, status: 'completed'
           } ]; lastUpdate = 'Contract analysis completed'; break}
   }

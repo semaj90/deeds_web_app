@@ -3,7 +3,8 @@
   import { superForm } from 'sveltekit-superforms/client';
 
   interface Props {
-    data?: {, form: unknown };
+    data?: {
+	form: unknown };
     caseId?: string;
     onUploadComplete?: (result: UploadResult) => void;
     onUploadError?: (error: string) => void;
@@ -13,7 +14,7 @@
 
   let {
     data = { form: null },
-    caseId = '',
+	caseId = '',
     onUploadComplete,
     onUploadError,
     multiple = false,
@@ -21,8 +22,10 @@
   }: Props = $props();
 
   interface UploadResult {
-    success: boolean;, documentId: string;
-    url: string;, objectName: string;
+    success: boolean;
+	documentId: string;
+    url: string;
+	objectName: string;
     message: string;
   }
 
@@ -30,7 +33,8 @@
   const { form, errors, enhance, submitting, message } = superForm(data?.form, {
     dataType: 'form',
     multipleFiles: true,
-    validators: {, file: (value: unknown) => {
+    validators: {
+	file: (value: unknown) => {
         if (!value || !(value instanceof File)) return 'File is required';
         const maxSize = 100 * 1024 * 1024; // 100MB
         if (value.size > maxSize) return 'File must be less than 100MB';
@@ -49,7 +53,7 @@
         return null;
       }
     },
-    onResult: ({ result }) => {
+	onResult: ({ result }) => {
       if (result.type === 'success') {
         const uploadResult = (result as { data?: { uploadResult?: UploadResult } }).data?.uploadResult;
         if (uploadResult?.success) {
@@ -144,9 +148,11 @@
       if (uploadProgress < 90) {
         uploadProgress += Math.random() * 10;
       }
-    }, 200);
+    },
+	200);
 
-    return async ({ result }: {, result: unknown }) => {
+    return async ({ result }: {
+	result: unknown }) => {
       clearInterval(progressInterval);
       const typedResult = result as { type: string };
       if (typedResult.type === 'success') {
@@ -155,7 +161,8 @@
         setTimeout(() => {
           uploadStatus = 'completed';
           uploadProgress = 0;
-        }, 1000);
+        },
+	1000);
       } else {
         uploadStatus = 'error';
         uploadProgress = 0;
@@ -175,24 +182,24 @@
   // Document type options
   const documentTypes = [
     { value: 'contract', label: 'Contract' },
-    { value: 'evidence', label: 'Evidence' },
-    { value: 'pleading', label: 'Pleading' },
-    { value: 'motion', label: 'Motion' },
-    { value: 'brief', label: 'Brief' },
-    { value: 'correspondence', label: 'Correspondence' },
-    { value: 'exhibit', label: 'Exhibit' },
-    { value: 'transcript', label: 'Transcript' },
-    { value: 'discovery', label: 'Discovery' },
-    { value: 'expert_report', label: 'Expert Report' },
-    { value: 'forensic_analysis', label: 'Forensic Analysis' },
-    { value: 'other', label: 'Other' }
+	{ value: 'evidence', label: 'Evidence' },
+	{ value: 'pleading', label: 'Pleading' },
+	{ value: 'motion', label: 'Motion' },
+	{ value: 'brief', label: 'Brief' },
+	{ value: 'correspondence', label: 'Correspondence' },
+	{ value: 'exhibit', label: 'Exhibit' },
+	{ value: 'transcript', label: 'Transcript' },
+	{ value: 'discovery', label: 'Discovery' },
+	{ value: 'expert_report', label: 'Expert Report' },
+	{ value: 'forensic_analysis', label: 'Forensic Analysis' },
+	{ value: 'other', label: 'Other' }
   ];
 
   const priorityOptions = [
     { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
-    { value: 'urgent', label: 'Urgent' }
+	{ value: 'medium', label: 'Medium' },
+	{ value: 'high', label: 'High' },
+	{ value: 'urgent', label: 'Urgent' }
   ];
 </script>
 
@@ -392,9 +399,12 @@
 
 <style>
   .minio-upload-container {
-    max-width: 600px;, margin: 0 auto;
-    padding: 2rem;, background: var(--bg-secondary, #1a1a2e);
-    border-radius: 12px;, border: 1px solid var(--border-color, #333);
+    max-width: 600px;
+	margin: 0 auto;
+    padding: 2rem;
+	background: var(--bg-secondary, #1a1a2e);
+    border-radius: 12px;
+	border: 1px solid var(--border-color, #333);
   }
 
   .form-group {
@@ -404,17 +414,21 @@
   .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 600;, color: var(--text-primary, #fff);
+    font-weight: 600;
+	color: var(--text-primary, #fff);
   }
 
   .form-input,
   .form-select,
   .form-textarea {
-    width: 100%;, padding: 0.75rem;
+    width: 100%;
+	padding: 0.75rem;
     border: 1px solid var(--border-color, #333);
-    border-radius: 6px;, background: var(--bg-primary, #0f0f1a);
+    border-radius: 6px;
+	background: var(--bg-primary, #0f0f1a);
     color: var(--text-primary, #fff);
-    font-family: inherit;, transition: border-color 0.2s;
+    font-family: inherit;
+	transition: border-color 0.2s;
   }
 
   .form-input:focus,
@@ -431,8 +445,10 @@
 
   .file-upload-area {
     border: 2px dashed var(--border-color, #333);
-    border-radius: 8px;, padding: 2rem;
-    text-align: center;, cursor: pointer;
+    border-radius: 8px;
+	padding: 2rem;
+    text-align: center;
+	cursor: pointer;
     transition: all 0.2s;
     background: var(--bg-primary, #0f0f1a);
   }
@@ -451,11 +467,13 @@
   .upload-prompt {
     display: flex;
     flex-direction: column;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .upload-icon {
-    font-size: 3rem;, opacity: 0.6;
+    font-size: 3rem;
+	opacity: 0.6;
   }
 
   .upload-text {
@@ -463,27 +481,32 @@
   }
 
   .upload-hint {
-    font-size: 0.875rem;, opacity: 0.8;
+    font-size: 0.875rem;
+	opacity: 0.8;
   }
 
   .file-preview {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
     text-align: left;
   }
 
   .image-preview {
-    width: 80px;, height: 80px;
+    width: 80px;
+	height: 80px;
     object-fit: cover;
     border-radius: 6px;
   }
 
   .file-icon {
-    width: 80px;, height: 80px;
+    width: 80px;
+	height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;, background: var(--bg-secondary, #1a1a2e);
+    font-size: 2rem;
+	background: var(--bg-secondary, #1a1a2e);
     border-radius: 6px;
   }
 
@@ -502,10 +525,13 @@
   }
 
   .remove-file {
-    margin-top: 0.5rem;, padding: 0.25rem 0.5rem;
+    margin-top: 0.5rem;
+	padding: 0.25rem 0.5rem;
     border: 1px solid var(--error-color, #ff4444);
-    background: transparent;, color: var(--error-color, #ff4444);
-    border-radius: 4px;, cursor: pointer;
+    background: transparent;
+	color: var(--error-color, #ff4444);
+    border-radius: 4px;
+	cursor: pointer;
     font-size: 0.875rem;
   }
 
@@ -516,7 +542,8 @@
 
   .checkbox-label {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     cursor: pointer;
   }
 
@@ -525,20 +552,24 @@
   }
 
   .progress-bar {
-    width: 100%;, height: 8px;
+    width: 100%;
+	height: 8px;
     background: var(--bg-tertiary, #2a2a3e);
-    border-radius: 4px;, overflow: hidden;
+    border-radius: 4px;
+	overflow: hidden;
   }
 
   .progress-fill {
-    height: 100%;, background: var(--accent-primary, #00d4ff);
+    height: 100%;
+	background: var(--accent-primary, #00d4ff);
     transition: width 0.3s ease;
   }
 
   .progress-text {
     margin-top: 0.5rem;
     text-align: center;
-    font-size: 0.875rem;, color: var(--text-secondary, #888);
+    font-size: 0.875rem;
+	color: var(--text-secondary, #888);
   }
 
   .form-actions {
@@ -546,11 +577,14 @@
   }
 
   .submit-button {
-    width: 100%;, padding: 0.875rem;
+    width: 100%;
+	padding: 0.875rem;
     background: var(--accent-primary, #00d4ff);
-    color: white;, border: none;
+    color: white;
+	border: none;
     border-radius: 6px;
-    font-weight: 600;, cursor: pointer;
+    font-weight: 600;
+	cursor: pointer;
     transition: background-color 0.2s;
   }
 
@@ -559,7 +593,8 @@
   }
 
   .submit-button:disabled {
-    opacity: 0.6;, cursor: not-allowed;
+    opacity: 0.6;
+	cursor: not-allowed;
   }
 
   .error-message {
@@ -569,8 +604,10 @@
   }
 
   .form-message {
-    margin-top: 1rem;, padding: 0.75rem;
-    border-radius: 6px;, background: rgba(0, 255, 136, 0.2);
+    margin-top: 1rem;
+	padding: 0.75rem;
+    border-radius: 6px;
+	background: rgba(0, 255, 136, 0.2);
     color: var(--success-color, #00ff88);
     border: 1px solid var(--success-color, #00ff88);
   }

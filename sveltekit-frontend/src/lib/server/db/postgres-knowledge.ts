@@ -15,21 +15,25 @@ import { db } from '$lib/server/db/index-clean.js'; // Assuming this is where db
 import { sql } from 'drizzle-orm';
 
 export interface KnowledgeDocument {
-	id?: number;, title: string;
+	id?: number;
+	title: string;
 	content: string;
 	source_url?: string;
 	embedding?: number[]; // 384-dimensional vector
 	couchdb_id?: string;
 	qdrant_id?: number;
-	metadata?: {, type: 'concept' | 'document' | 'entity' | 'topic';
+	metadata?: {
+	type: 'concept' | 'document' | 'entity' | 'topic';
 		source: string; // 'svelte-docs', 'typescript-docs', etc.
 		tags?: string[];
 		importance?: number; // 0-1 score
 		language?: string;
 	};
 	blob_url?: string;
-	blob_metadata?: {, size: number;
-		mime_type: string;, uploaded_at: string;
+	blob_metadata?: {
+	size: number;
+		mime_type: string;
+	uploaded_at: string;
 	};
 	created_at?: Date;
 	updated_at?: Date;
@@ -49,14 +53,14 @@ export async function insertKnowledgeDocument(
                 title, content, source_url, embedding, couchdb_id, qdrant_id, metadata, blob_url, blob_metadata
             ) VALUES (
                 ${doc.title},
-                ${doc.content},
-                ${doc.source_url},
-                ${doc.embedding ? JSON.stringify(doc.embedding) : null /* Or ::vector syntax if raw client */},
-                ${doc.couchdb_id},
-                ${doc.qdrant_id},
-                ${JSON.stringify(doc.metadata)},
-                ${doc.blob_url},
-                ${JSON.stringify(doc.blob_metadata)}
+	${doc.content},
+	${doc.source_url},
+	${doc.embedding ? JSON.stringify(doc.embedding) : null /* Or ::vector syntax if raw client */},
+	${doc.couchdb_id},
+	${doc.qdrant_id},
+	${JSON.stringify(doc.metadata)},
+	${doc.blob_url},
+	${JSON.stringify(doc.blob_metadata)}
             )
             RETURNING id
         `);
@@ -220,7 +224,8 @@ export async function markDocumentSynced(id: number, qdrantId: number): Promise<
 	try {
         await db.execute(sql`
             UPDATE knowledge_documents
-            SET qdrant_id = ${qdrantId}, last_synced_to_qdrant = NOW()
+            SET qdrant_id = ${qdrantId},
+	last_synced_to_qdrant = NOW()
             WHERE id = ${id}
         `);
 
@@ -267,9 +272,14 @@ export async function createRelationship(
 	try {
         await db.execute(sql`
             INSERT INTO knowledge_relationships (from_id, to_id, relationship_type, weight, bidirectional)
-            VALUES (${fromId}, ${toId}, ${relationshipType}, ${weight}, ${bidirectional})
+            VALUES (${fromId},
+	${toId},
+	${relationshipType},
+	${weight},
+	${bidirectional})
             ON CONFLICT (from_id, to_id, relationship_type) DO UPDATE
-            SET weight = ${weight}, bidirectional = ${bidirectional}
+            SET weight = ${weight},
+	bidirectional = ${bidirectional}
         `);
 
 		console.log(`✅ Created relationship: ${fromId} --[${relationshipType}]--> ${toId}`);

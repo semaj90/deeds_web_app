@@ -1,12 +1,15 @@
 /** * Unified Types - Consolidates duplicate type exports across the application * Replaces scattered type definitions with single source of truth */ // ===== OLLAMA & AI TYPES =====
 export interface EmbeddingResponse {
- embedding: number[];, model: string;
+ embedding: number[];
+	model: string;
  prompt_tokens?: number;
  total_duration?: number;
 }
 export interface GenerateResponse {
- response: string;, model: string;
- created_at: string;, done: boolean;
+ response: string;
+	model: string;
+ created_at: string;
+	done: boolean;
  context?: number[];
  total_duration?: number;
  load_duration?: number;
@@ -16,10 +19,14 @@ export interface GenerateResponse {
  eval_duration?: number;
 }
 export interface OllamaModel {
- name: string;, size: number;
- digest: string;, details: {
- format: string;, family: string;
- families?: string[];, parameter_size: string;
+ name: string;
+	size: number;
+ digest: string;
+	details: {
+ format: string;
+	family: string;
+ families?: string[];
+	parameter_size: string;
  quantization_level: string;
  };
  modified_at: string;
@@ -27,7 +34,8 @@ export interface OllamaModel {
 }
 export interface OllamaHealthCheck {
  status: 'healthy' | 'unhealthy';
- embedModel: boolean;, llmModel: boolean;
+ embedModel: boolean;
+	llmModel: boolean;
  models: string[];
  error?: string;
 }
@@ -38,14 +46,17 @@ export interface RAGQuery {
  filters?: {
  documentType?: string;
  jurisdiction?: string;
- dateRange?: {, start: Date; end: Date };
+ dateRange?: {
+	start: Date; end: Date };
  };
  limit?: number;
  threshold?: number;
 }
 export interface RAGSource {
- id: string;, content: string;
- title: string;, documentType: 'contract' | 'evidence' | 'legal_brief' | 'correspondence' | 'case_law';
+ id: string;
+	content: string;
+ title: string;
+	documentType: 'contract' | 'evidence' | 'legal_brief' | 'correspondence' | 'case_law';
  embedding?: number[];
  metadata?: {
  caseId?: string;
@@ -57,32 +68,40 @@ export interface RAGSource {
  };
 }
 export interface RAGResult {
- source: RAGSource;, score: number;
+ source: RAGSource;
+	score: number;
  relevance: string;
  highlights?: string[];
 }
 export interface RAGSearchResponse {
- results: RAGResult[];, query: string;
- totalResults: number;, processingTime: number;
+ results: RAGResult[];
+	query: string;
+ totalResults: number;
+	processingTime: number;
  model: string;
 }
 // ===== LEGAL DOMAIN TYPES =====
 export interface LegalCase {
- id: string;, title: string;
- description: string;, status: 'active' | 'closed' | 'pending' | 'archived';
+ id: string;
+	title: string;
+ description: string;
+	status: 'active' | 'closed' | 'pending' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
  caseType: 'criminal' | 'civil' | 'family' | 'corporate' | 'regulatory';
  jurisdiction: 'federal' | 'state' | 'local' | 'international';
- createdAt: Date;, updatedAt: Date;
+ createdAt: Date;
+	updatedAt: Date;
  createdBy: string;
  assignedTo?: string[];
  dueDate?: Date;
  tags?: string[];
 }
 export interface Evidence {
- id: string;, caseId: string;
+ id: string;
+	caseId: string;
  title: string;
- description?: string;, type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital';
+ description?: string;
+	type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital';
  filename?: string;
  fileSize?: number;
  mimeType?: string;
@@ -96,12 +115,15 @@ export interface Evidence {
  tags?: string[];
  embeddingDimension?: number; // Added for clarity on embedding dimension in evidence
  };
- createdAt: Date;, createdBy: string;
+ createdAt: Date;
+	createdBy: string;
  chainOfCustody?: ChainOfCustodyEntry[];
 }
 export interface ChainOfCustodyEntry {
- id: string;, evidenceId: string;
- userId: string;, action: 'created' | 'accessed' | 'modified' | 'transferred' | 'analyzed';
+ id: string;
+	evidenceId: string;
+ userId: string;
+	action: 'created' | 'accessed' | 'modified' | 'transferred' | 'analyzed';
  timestamp: Date;
  location?: string;
  notes?: string;
@@ -109,22 +131,29 @@ export interface ChainOfCustodyEntry {
  userAgent?: string;
 }
 export interface LegalDocument {
- id: string;, caseId: string;
- evidenceId?: string;, title: string;
- content: string;, documentType: 'contract' | 'brief' | 'motion' | 'order' | 'correspondence' | 'evidence';
+ id: string;
+	caseId: string;
+ evidenceId?: string;
+	title: string;
+ content: string;
+	documentType: 'contract' | 'brief' | 'motion' | 'order' | 'correspondence' | 'evidence';
  extractedText?: string;
  embedding?: number[];
  entities?: LegalEntity[];
  clauses?: LegalClause[];
  riskScore?: number;
- confidenceScore?: number;, createdAt: Date;
+ confidenceScore?: number;
+	createdAt: Date;
  processedAt?: Date;
  embeddingDimension?: number; // Added for clarity on embedding dimension in legal documents
 }
 export interface LegalEntity {
- id: string;, type: 'person' | 'organization' | 'location' | 'date' | 'monetary' | 'legal_reference';
- text: string;, startPos: number;
- endPos: number;, confidence: number;
+ id: string;
+	type: 'person' | 'organization' | 'location' | 'date' | 'monetary' | 'legal_reference';
+ text: string;
+	startPos: number;
+ endPos: number;
+	confidence: number;
  metadata?: { [key: string]: unknown };
 }
 export interface LegalClause {
@@ -134,59 +163,82 @@ export interface LegalClause {
  | 'confidentiality'
  | 'payment'
  | 'dispute_resolution';
- text: string;, startPos: number;
- endPos: number;, riskLevel: 'low' | 'medium' | 'high';
+ text: string;
+	startPos: number;
+ endPos: number;
+	riskLevel: 'low' | 'medium' | 'high';
  analysis?: string;
 }
 // ===== USER & AUTHENTICATION TYPES =====
 export interface User {
- id: string;, email: string;
- username: string;, fullName: string;
+ id: string;
+	email: string;
+ username: string;
+	fullName: string;
  role: 'admin' | 'prosecutor' | 'detective' | 'legal_assistant' | 'user';
  department?: string;
- jurisdiction?: string;, permissions: Permission[];
- preferences?: UserPreferences;, createdAt: Date;
- lastLogin?: Date;, isActive: boolean;
+ jurisdiction?: string;
+	permissions: Permission[];
+ preferences?: UserPreferences;
+	createdAt: Date;
+ lastLogin?: Date;
+	isActive: boolean;
 }
 export interface Permission {
- resource: string;, actions: ('read' | 'write' | 'delete' | 'admin')[];
+ resource: string;
+	actions: ('read' | 'write' | 'delete' | 'admin')[];
 }
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'auto';
- language: string;, timezone: string;
- notifications: {, email: boolean; push: boolean;, sms: boolean };
- ui: {, density: 'compact' | 'comfortable' | 'spacious'; sidebarCollapsed: boolean };
+ language: string;
+	timezone: string;
+ notifications: {
+	email: boolean; push: boolean;
+	sms: boolean };
+ ui: {
+	density: 'compact' | 'comfortable' | 'spacious'; sidebarCollapsed: boolean };
 }
 export interface AuthSession {
- id: string;, userId: string;
+ id: string;
+	userId: string;
  token: string;
- refreshToken?: string;, expiresAt: Date;
+ refreshToken?: string;
+	expiresAt: Date;
  ipAddress?: string;
- userAgent?: string;, isActive: boolean;
+ userAgent?: string;
+	isActive: boolean;
 }
 // ===== API & RESPONSE TYPES =====
 export interface ApiResponse<T = unknown> {
  success: boolean;
  data?: T;
  error?: string;
- message?: string;, timestamp: string;
+ message?: string;
+	timestamp: string;
  requestId?: string;
 }
 export interface PaginatedResponse<T = unknown> {
- data: T[];, pagination: {
- page: number;, limit: number;
- total: number;, pages: number;
- hasNext: boolean;, hasPrev: boolean;
+ data: T[];
+	pagination: {
+ page: number;
+	limit: number;
+ total: number;
+	pages: number;
+ hasNext: boolean;
+	hasPrev: boolean;
  };
 }
 export interface ValidationError {
- field: string;, message: string;
+ field: string;
+	message: string;
  code: string;
  value?: unknown;
 }
 export interface ApiError {
- code: string;, message: string;
- details?: unknown;, timestamp: string;
+ code: string;
+	message: string;
+ details?: unknown;
+	timestamp: string;
  requestId?: string;
  validationErrors?: ValidationError[];
 }
@@ -194,8 +246,10 @@ export interface ApiError {
 export interface SearchOptions {
  query?: string;
  filters?: { [key: string]: unknown };
- sort?: {, field: string; direction: 'asc' | 'desc' };
- pagination?: {, page: number; limit: number };
+ sort?: {
+	field: string; direction: 'asc' | 'desc' };
+ pagination?: {
+	page: number; limit: number };
 }
 export interface SearchResult<T = unknown> {
  item: T;
@@ -204,7 +258,8 @@ export interface SearchResult<T = unknown> {
  metadata?: { [key: string]: unknown };
 }
 export interface SearchResponse<T = unknown> {
- results: SearchResult<T>[];, total: number;
+ results: SearchResult<T>[];
+	total: number;
  query: string;
  filters?: { [key: string]: unknown };
  processingTime: number;
@@ -212,32 +267,42 @@ export interface SearchResponse<T = unknown> {
 }
 // ===== CACHING & PERFORMANCE TYPES =====
 export interface CacheEntry<T = unknown> {
- key: string;, value: T;
- metadata: {, createdAt: Date;
- expiresAt?: Date;, accessCount: number;
- lastAccessed: Date;, size: number;
+ key: string;
+	value: T;
+ metadata: {
+	createdAt: Date;
+ expiresAt?: Date;
+	accessCount: number;
+ lastAccessed: Date;
+	size: number;
  tags?: string[];
  };
 }
 export interface CacheStats {
- totalEntries: number;, totalSize: number;
- hitRate: number;, missRate: number;
- evictionCount: number;, averageAccessTime: number;
+ totalEntries: number;
+	totalSize: number;
+ hitRate: number;
+	missRate: number;
+ evictionCount: number;
+	averageAccessTime: number;
 }
 // ===== AI ANALYSIS TYPES =====
 export interface AIAnalysisRequest {
- content: string;, type: 'summary' | 'entities' | 'sentiment' | 'classification' | 'risk_assessment';
+ content: string;
+	type: 'summary' | 'entities' | 'sentiment' | 'classification' | 'risk_assessment';
  context?: { caseId?: string; documentType?: string; jurisdiction?: string };
  options?: { model?: string; temperature?: number; maxTokens?: number };
 }
 export interface AIAnalysisResponse {
  result: string | object;
- confidence: number;, model: string;
+ confidence: number;
+	model: string;
  processingTime: number;
  tokensUsed?: number;
  metadata?: {
  entities?: LegalEntity[];
- sentiment?: {, score: number; label: 'positive' | 'negative' | 'neutral' };
+ sentiment?: {
+	score: number; label: 'positive' | 'negative' | 'neutral' };
  riskScore?: number;
  tags?: string[];
  embeddingDimension?: number; // Added for clarity on embedding dimension in AI analysis response
@@ -245,36 +310,45 @@ export interface AIAnalysisResponse {
 }
 // ===== XSTATE & WORKFLOW TYPES =====
 export interface WorkflowContext {
- caseId?: string;, userId: string;
- currentStep: string;, progress: number;
- errors: string[];, data: { [key: string]: unknown };
+ caseId?: string;
+	userId: string;
+ currentStep: string;
+	progress: number;
+ errors: string[];
+	data: { [key: string]: unknown };
  aiRecommendations?: string[];
  confidence?: number;
 }
 export interface WorkflowEvent {
  type: string;
- payload?: unknown;, timestamp: Date;
+ payload?: unknown;
+	timestamp: Date;
  userId: string;
 }
 // ===== MCP & INTEGRATION TYPES =====
 export interface MCPRequest {
- tool: string;, parameters: { [key: string]: unknown };
+ tool: string;
+	parameters: { [key: string]: unknown };
  context?: { [key: string]: unknown };
 }
 export interface MCPResponse<T = unknown> {
  success: boolean;
  result?: T;
  error?: string;
- metadata?: {, processingTime: number; model?: string; tokens?: number };
+ metadata?: {
+	processingTime: number; model?: string; tokens?: number };
 }
 export interface Context7Integration {
- stackAnalysis: boolean;, bestPractices: boolean;
- integrationSuggestions: boolean;, libraryDocs: boolean;
+ stackAnalysis: boolean;
+	bestPractices: boolean;
+ integrationSuggestions: boolean;
+	libraryDocs: boolean;
  performanceOptimization: boolean;
 }
 // ===== FORM & VALIDATION TYPES =====
 export interface FormField {
- name: string;, type: 'text' | 'email' | 'password' | 'number' | 'date' | 'select' | 'textarea' | 'file';
+ name: string;
+	type: 'text' | 'email' | 'password' | 'number' | 'date' | 'select' | 'textarea' | 'file';
  label: string;
  placeholder?: string;
  required?: boolean;
@@ -285,7 +359,8 @@ export interface FormField {
  minLength?: number;
  maxLength?: number;
  };
- options?: {, value: string; label: string };
+ options?: {
+	value: string; label: string };
 }
 export interface FormSchema {
  fields: FormField[];

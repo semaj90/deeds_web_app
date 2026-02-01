@@ -9,10 +9,14 @@
   // Props interface
   interface Props {
     currentUser?: User;
-    systemData?: {, activeCases: number;
-      evidenceItems: number;, personsOfInterest: number;
-      aiQueries: number;, systemLoad: number;
-      gpuUtilization: number;, memoryUsage: number;
+    systemData?: {
+	activeCases: number;
+      evidenceItems: number;
+	personsOfInterest: number;
+      aiQueries: number;
+	systemLoad: number;
+      gpuUtilization: number;
+	memoryUsage: number;
       networkLatency: number;
     };
   }
@@ -41,18 +45,18 @@
   // Navigation items
   const navigationItems = [
     { id: 'dashboard', label: 'COMMAND CENTER', icon: '⌘', active: true },
-    { id: 'evidence', label: 'EVIDENCE', icon: '📁', route: '/evidenceboard' },
-    { id: 'persons', label: 'PERSONS OF INTEREST', icon: '👤', route: '/yorha/persons' },
-    { id: 'analysis', label: 'ANALYSIS', icon: '📊', route: '/yorha/analysis' },
-    { id: 'search', label: 'GLOBAL SEARCH', icon: '🔎', route: '/yorha/search' },
-    { id: 'terminal', label: 'TERMINAL', icon: '💻', route: '/yorha/terminal' }
+	{ id: 'evidence', label: 'EVIDENCE', icon: '📁', route: '/evidenceboard' },
+	{ id: 'persons', label: 'PERSONS OF INTEREST', icon: '👤', route: '/yorha/persons' },
+	{ id: 'analysis', label: 'ANALYSIS', icon: '📊', route: '/yorha/analysis' },
+	{ id: 'search', label: 'GLOBAL SEARCH', icon: '🔎', route: '/yorha/search' },
+	{ id: 'terminal', label: 'TERMINAL', icon: '💻', route: '/yorha/terminal' }
   ];
 
   // Active cases data (mock)
   let activeCases = $state([
     { id: 'CASE-2024-087', title: 'Corporate Espionage Investigation', status: 'active', priority: 'high', lastUpdate: '2 hours ago' },
-    { id: 'CASE-2024-088', title: 'Missing Person Dr. Sarah Chen', status: 'active', priority: 'medium', lastUpdate: '4 hours ago' },
-    { id: 'CASE-2024-089', title: 'Financial Fraud Analysis', status: 'pending', priority: 'low', lastUpdate: '1 day ago' }
+	{ id: 'CASE-2024-088', title: 'Missing Person Dr. Sarah Chen', status: 'active', priority: 'medium', lastUpdate: '4 hours ago' },
+	{ id: 'CASE-2024-089', title: 'Financial Fraud Analysis', status: 'pending', priority: 'low', lastUpdate: '1 day ago' }
   ]);
 
   // Form fields for new case
@@ -64,7 +68,7 @@
       required: true,
       placeholder: 'e.g., The Missing Android'
     },
-    {
+	{
       name: 'description',
       label: 'CASE DESCRIPTION / SYNOPSIS',
       type: 'textarea',
@@ -72,15 +76,15 @@
       placeholder: 'Initial details of the investigation...',
       rows: 4
     },
-    {
+	{
       name: 'priority',
       label: 'PRIORITY LEVEL',
       type: 'select',
       required: true,
       options: [
         { value: 'low', label: 'Low' },
-        { value: 'medium', label: 'Medium' },
-        { value: 'high', label: 'High' }
+	{ value: 'medium', label: 'Medium' },
+	{ value: 'high', label: 'High' }
       ],
       defaultValue: 'medium'
     }
@@ -90,7 +94,8 @@
   $effect(() => {
     const timeInterval = setInterval(() => {
       currentTime = new Date();
-    }, 1000);
+    },
+	1000);
     return () => clearInterval(timeInterval);
   });
 
@@ -118,7 +123,8 @@
     notification = { show: true, message, type };
     setTimeout(() => {
       notification = { show: false, message: '', type: 'info' };
-    }, 3000);
+    },
+	3000);
   }
 
   function openNewCaseModal() {
@@ -136,7 +142,7 @@
       const response = await fetch('/api/yorha/cases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+	body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -449,12 +455,15 @@
     --yorha-dark: #3D3D3D;
     --yorha-dark-light: #5A5A5A;
     font-family: 'Roboto Mono', monospace;
-    background-color: var(--yorha-sand);, color: var(--yorha-dark);
+    background-color: var(--yorha-sand);
+	color: var(--yorha-dark);
   }
 
   .yorha-header {
-    position: fixed;, top: 0;
-    left: 0;, right: 0;
+    position: fixed;
+	top: 0;
+    left: 0;
+	right: 0;
     z-index: 30;
     background-color: var(--yorha-sand);
     border-bottom: 1px solid var(--yorha-sand-dark);
@@ -465,34 +474,42 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 100%;, margin: 0 auto;
+    max-width: 100%;
+	margin: 0 auto;
     padding: 1rem 1.5rem;
     gap: 1rem;
   }
 
   .command-center-title {
     font-size: 1.5rem;
-    font-weight: bold;, margin: 0;
+    font-weight: bold;
+	margin: 0;
   }
 
   .timestamp {
-    font-size: 0.875rem;, margin: 0;
+    font-size: 0.875rem;
+	margin: 0;
     opacity: 0.8;
   }
 
   .header-actions {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .header-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     border: 1px solid var(--yorha-sand-dark);
-    background-color: var(--yorha-sand-light);, padding: 0.5rem 1rem;
+    background-color: var(--yorha-sand-light);
+	padding: 0.5rem 1rem;
     font-size: 0.875rem;
-    font-weight: bold;, color: var(--yorha-dark);
-    cursor: pointer;, transition: all 0.2s ease;
+    font-weight: bold;
+	color: var(--yorha-dark);
+    cursor: pointer;
+	transition: all 0.2s ease;
     border-radius: 0;
   }
 
@@ -504,18 +521,22 @@
     display: grid;
     grid-template-columns: 1fr 3fr;
     gap: 1.5rem;
-    max-width: 100%;, margin: 0 auto;
+    max-width: 100%;
+	margin: 0 auto;
     padding: 1.5rem;
     margin-top: 4rem;
   }
 
   .dashboard-panel {
-    background-color: var(--yorha-sand-light);, border: 1px solid var(--yorha-sand-dark);
-    border-radius: 0;, padding: 1.5rem;
+    background-color: var(--yorha-sand-light);
+	border: 1px solid var(--yorha-sand-dark);
+    border-radius: 0;
+	padding: 1.5rem;
   }
 
   .yorha-sidebar {
-    position: sticky;, top: 5rem;
+    position: sticky;
+	top: 5rem;
     height: fit-content;
   }
 
@@ -527,17 +548,23 @@
 
   .sidebar-nav {
     display: flex;
-    flex-direction: column;, gap: 0.5rem;
+    flex-direction: column;
+	gap: 0.5rem;
   }
 
   .sidebar-link {
     display: flex;
-    align-items: center;, gap: 0.75rem;
-    width: 100%;, padding: 0.75rem;
+    align-items: center;
+	gap: 0.75rem;
+    width: 100%;
+	padding: 0.75rem;
     text-align: left;
-    font-weight: bold;, border: 1px solid transparent;
-    background: none;, color: var(--yorha-dark);
-    cursor: pointer;, transition: all 0.2s ease;
+    font-weight: bold;
+	border: 1px solid transparent;
+    background: none;
+	color: var(--yorha-dark);
+    cursor: pointer;
+	transition: all 0.2s ease;
     border-radius: 0;
   }
 
@@ -547,17 +574,20 @@
   }
 
   .sidebar-link.active {
-    background-color: var(--yorha-dark);, color: var(--yorha-sand-light);
+    background-color: var(--yorha-dark);
+	color: var(--yorha-sand-light);
   }
 
   .nav-icon {
-    font-size: 1rem;, width: 1.5rem;
+    font-size: 1rem;
+	width: 1.5rem;
     text-align: center;
   }
 
   .dashboard-content {
     display: flex;
-    flex-direction: column;, gap: 1.5rem;
+    flex-direction: column;
+	gap: 1.5rem;
   }
 
   .metrics-grid {
@@ -567,8 +597,10 @@
   }
 
   .metric-card {
-    background-color: var(--yorha-sand-light);, border: 1px solid var(--yorha-sand-dark);
-    border-radius: 0;, padding: 1rem;
+    background-color: var(--yorha-sand-light);
+	border: 1px solid var(--yorha-sand-dark);
+    border-radius: 0;
+	padding: 1rem;
     transition: all 0.3s ease;
   }
 
@@ -587,7 +619,8 @@
   .metric-label {
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;, opacity: 0.8;
+    letter-spacing: 0.05em;
+	opacity: 0.8;
   }
 
   .metric-icon {
@@ -612,13 +645,16 @@
 
   .cases-list {
     display: flex;
-    flex-direction: column;, gap: 1rem;
+    flex-direction: column;
+	gap: 1rem;
   }
 
   .case-item {
     border: 1px solid var(--yorha-sand-dark);
-    border-radius: 0;, padding: 1rem;
-    background-color: white;, transition: all 0.2s ease;
+    border-radius: 0;
+	padding: 1rem;
+    background-color: white;
+	transition: all 0.2s ease;
   }
 
   .case-item:hover {
@@ -654,17 +690,20 @@
   .case-meta {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;, opacity: 0.8;
+    font-size: 0.75rem;
+	opacity: 0.8;
   }
 
   .health-metrics {
     display: flex;
-    flex-direction: column;, gap: 1rem;
+    flex-direction: column;
+	gap: 1rem;
   }
 
   .health-metric {
     display: flex;
-    flex-direction: column;, gap: 0.5rem;
+    flex-direction: column;
+	gap: 0.5rem;
   }
 
   .health-label {
@@ -680,14 +719,18 @@
   }
 
   .health-bar {
-    width: 100%;, height: 0.5rem;
-    background-color: var(--yorha-sand);, border: 1px solid var(--yorha-sand-dark);
-    border-radius: 0;, overflow: hidden;
+    width: 100%;
+	height: 0.5rem;
+    background-color: var(--yorha-sand);
+	border: 1px solid var(--yorha-sand-dark);
+    border-radius: 0;
+	overflow: hidden;
   }
 
   .health-fill {
     height: 100%;
-    border-radius: 0;, transition: all 0.3s ease;
+    border-radius: 0;
+	transition: all 0.3s ease;
   }
 
   .health-fill.normal {
@@ -704,12 +747,15 @@
 
   .network-status {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
   }
 
   .network-indicator {
-    width: 0.5rem;, height: 0.5rem;
-    border-radius: 50%;, animation: pulse 2s infinite;
+    width: 0.5rem;
+	height: 0.5rem;
+    border-radius: 50%;
+	animation: pulse 2s infinite;
   }
 
   .network-indicator.excellent {
@@ -725,7 +771,8 @@
   }
 
   .network-label {
-    font-size: 0.75rem;, opacity: 0.8;
+    font-size: 0.75rem;
+	opacity: 0.8;
   }
 
   @keyframes pulse {
@@ -744,15 +791,19 @@
 
   .ai-status-section {
     display: flex;
-    align-items: center;, gap: 0.75rem;
-    padding: 1rem;, background: #F7F6F2;
+    align-items: center;
+	gap: 0.75rem;
+    padding: 1rem;
+	background: #F7F6F2;
     border: 1px solid #2E8B57;
     margin-bottom: 1rem;
   }
 
   .ai-status-indicator {
-    width: 8px;, height: 8px;
-    border-radius: 50%;, background: #FF6B6B;
+    width: 8px;
+	height: 8px;
+    border-radius: 50%;
+	background: #FF6B6B;
   }
 
   .ai-status-indicator.active {
@@ -762,7 +813,8 @@
   }
 
   .ai-status-text {
-    font-weight: bold;, color: #3D3D3D;
+    font-weight: bold;
+	color: #3D3D3D;
   }
 
   @keyframes ai-blink {
@@ -776,16 +828,20 @@
 
   .ai-capabilities {
     display: grid;
-    grid-template-columns: 1fr;, gap: 0.5rem;
+    grid-template-columns: 1fr;
+	gap: 0.5rem;
     margin-bottom: 1rem;
   }
 
   .ai-capability {
     display: flex;
-    align-items: center;, gap: 0.75rem;
-    padding: 0.75rem;, background: #F7F6F2;
+    align-items: center;
+	gap: 0.75rem;
+    padding: 0.75rem;
+	background: #F7F6F2;
     border: 1px solid #D1CFC7;
-    font-size: 0.875rem;, color: #3D3D3D;
+    font-size: 0.875rem;
+	color: #3D3D3D;
   }
 
   .ai-query-section {
@@ -795,16 +851,20 @@
   .ai-query-label {
     display: block;
     font-weight: bold;
-    margin-bottom: 0.5rem;, color: #3D3D3D;
+    margin-bottom: 0.5rem;
+	color: #3D3D3D;
     font-size: 0.875rem;
   }
 
   .ai-query-input {
-    width: 100%;, padding: 0.75rem;
-    background: white;, border: 1px solid #D1CFC7;
+    width: 100%;
+	padding: 0.75rem;
+    background: white;
+	border: 1px solid #D1CFC7;
     color: #3D3D3D;
     font-family: inherit;
-    font-size: 0.875rem;, resize: vertical;
+    font-size: 0.875rem;
+	resize: vertical;
   }
 
   .ai-query-input:focus {
@@ -822,8 +882,10 @@
   .yorha-btn {
     padding: 0.5rem 1rem;
     border: 1px solid var(--yorha-sand-dark);
-    background: var(--yorha-sand-light);, color: var(--yorha-dark);
-    font-weight: bold;, cursor: pointer;
+    background: var(--yorha-sand-light);
+	color: var(--yorha-dark);
+    font-weight: bold;
+	cursor: pointer;
     transition: all 0.2s ease;
   }
 
@@ -833,7 +895,8 @@
 
   .yorha-btn-primary {
     grid-column: span 2;
-    background: #2E8B57;, color: white;
+    background: #2E8B57;
+	color: white;
     border-color: #2E8B57;
   }
 
@@ -854,7 +917,8 @@
 
   @media (max-width: 768px) {
     .header-content {
-      flex-direction: column;, gap: 1rem;
+      flex-direction: column;
+	gap: 1rem;
     }
 
     .main-content {

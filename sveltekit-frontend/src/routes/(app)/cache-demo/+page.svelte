@@ -1,9 +1,14 @@
 <script lang="ts">
-	import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
 	import CacheMonitor from '$lib/components/cache/CacheMonitor.svelte';
-	import { Database, Zap, Trash2, Download, Upload, Activity } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
+	import Activity from 'lucide-svelte/icons/activity';
+	import Database from 'lucide-svelte/icons/database';
+	import Download from 'lucide-svelte/icons/download';
+	import Trash2 from 'lucide-svelte/icons/trash-2';
+	import Upload from 'lucide-svelte/icons/upload';
+	import Zap from 'lucide-svelte/icons/zap';
 
 	const cache = useCache();
 

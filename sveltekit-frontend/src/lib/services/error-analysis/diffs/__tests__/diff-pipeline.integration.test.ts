@@ -132,7 +132,8 @@ describe('Diff Pipeline Integration', () => {
  expect(events.some((e: any) => e.type === 'done')).toBe(true);
 
  runner.dispose();
- }, 60000); // 60s timeout
+ },
+	60000); // 60s timeout
 
  it('handles zero patches gracefully', async () => {
  const runner = new DiffRunner({
@@ -150,7 +151,8 @@ describe('Diff Pipeline Integration', () => {
 
  it('runs in dry-run mode without applying', async () => {
  const file = testFiles[0];
- const originalContent = await readFile(file, 'utf8');{
+ const originalContent = await readFile(file, 'utf8');
+{
  filePath: file,
  originalContent,
  proposedContent: 'const modified = true;\n',
@@ -175,8 +177,9 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Isolation - Concurrent Runs', () => {
- it('handles multiple concurrent runs', async () => {{ length: 3 },
- (_: any, i: any) =>
+ it('handles multiple concurrent runs', async () => {
+{ length: 3 },
+	(_: any, i: any) =>
  new DiffRunner({
  runId: `concurrent-run-${i}`,
  projectRoot: TEST_DIR, dryRun: true,
@@ -202,11 +205,13 @@ describe('Diff Pipeline Integration', () => {
 
  // Cleanup
  runners.forEach((r: any) => r.dispose());
- }, 60000);
+ },
+	60000);
  });
 
  describe('Error Recovery', () => {
- it('recovers from patch generation errors', async () => {{
+ it('recovers from patch generation errors', async () => {
+{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -214,7 +219,7 @@ describe('Diff Pipeline Integration', () => {
  confidence: 0.9,
  ruleId: 'test-rule',
  },
- {
+	{
  filePath: '/nonexistent/file.ts',
  originalContent: 'invalid',
  proposedContent: 'invalid',
@@ -222,7 +227,7 @@ describe('Diff Pipeline Integration', () => {
  confidence: 0.9,
  ruleId: 'test-rule',
  },
- {
+	{
  filePath: testFiles[1],
  originalContent: 'const y = 1;\n',
  proposedContent: 'const y = 2;\n',
@@ -266,7 +271,8 @@ describe('Diff Pipeline Integration', () => {
  expect(['done', 'failed']).toContain(tracker.getProgress().phase);
 
  runner.dispose();
- }, 5000);
+ },
+	5000);
  });
 
  describe('Redis Cache', () => {
@@ -358,7 +364,8 @@ describe('Diff Pipeline Integration', () => {
  });
 
  describe('Progress Tracking', () => {
- it('tracks all phases', async () => {{
+ it('tracks all phases', async () => {
+{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',
@@ -410,7 +417,8 @@ describe('Diff Pipeline Integration', () => {
  runner.dispose();
  });
 
- it('tracks duration', async () => {{
+ it('tracks duration', async () => {
+{
  filePath: testFiles[0],
  originalContent: 'const x = 1;\n',
  proposedContent: 'const x = 2;\n',

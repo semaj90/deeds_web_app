@@ -11,7 +11,7 @@ export const QdrantVectorService: IQdrantVectorService = {
             points: [{ id, vector, payload: metadata }]
         });
     },
-    async searchVector(query: number[], topK: number) {
+	async searchVector(query: number[], topK: number) {
         const res = await client.search(COLLECTION, {
             vector: query,
             limit: topK

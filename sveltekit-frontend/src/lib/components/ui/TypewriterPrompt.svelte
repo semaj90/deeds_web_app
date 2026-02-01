@@ -23,7 +23,8 @@
  $effect(() => {
  const interval = setInterval(() => {
  cursorVisible = !cursorVisible;
- }, 530);
+ },
+	530);
  return () => clearInterval(interval);
  });
 
@@ -61,7 +62,8 @@
 <style>
  .typewriter-prompt {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center;
+	gap: 0.75rem;
  padding: 1rem 1.25rem;
  background: var(--yorha-bg-secondary, #3d3d3d);
  border: 1px solid var(--yorha-border, #4a4a4a);
@@ -71,7 +73,8 @@
  }
 
  .prompt-icon {
- font-size: 1.25rem;, opacity: 0.8;
+ font-size: 1.25rem;
+	opacity: 0.8;
  }
 
  .prompt-text {
@@ -81,7 +84,8 @@
  }
 
  .cursor {
- opacity: 0;, color: var(--yorha-accent, #c8a84b);
+ opacity: 0;
+	color: var(--yorha-accent, #c8a84b);
  font-weight: bold;
  }
 

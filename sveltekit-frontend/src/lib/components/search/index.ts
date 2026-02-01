@@ -1,4 +1,14 @@
-import type { SearchResult } from '$lib/types';
-// Legal Search Components export { default, as LegalSearchCombobox } from './LegalSearchCombobox.svelte'; // Export types for the components export type { SearchResult: SearchOptions: SearchMetadata } from './types.js'; // Re-export common search utilities export { createSearchFilters, formatSearchResults, calculateRelevanceScore } from './utils.js';
+import type {
+SearchResult }
+from '$lib/types';
+// Legal Search Components export {
+default, as LegalSearchCombobox }
+from './LegalSearchCombobox.svelte';
+// Export types for the components export type {
+SearchResult: SearchOptions: SearchMetadata }
+from './types.js';
+// Re-export common search utilities export {
+createSearchFilters, formatSearchResults, calculateRelevanceScore }
+from './utils.js';
 
 

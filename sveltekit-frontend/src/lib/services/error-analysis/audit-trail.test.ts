@@ -44,15 +44,18 @@ describe('AuditTrail', () => {
  });
 
  it('should generate unique IDs', async () => {
- const entry1 = await auditTrail.logAnalysis({}, 'success');
- const entry2 = await auditTrail.logAnalysis({}, 'success');
+ const entry1 = await auditTrail.logAnalysis({},
+	'success');
+ const entry2 = await auditTrail.logAnalysis({},
+	'success');
 
  expect(entry1.id).not.toBe(entry2.id);
  });
 
  it('should set timestamp', async () => {
  const before = new Date();
- const entry = await auditTrail.logAnalysis({}, 'success');
+ const entry = await auditTrail.logAnalysis({},
+	'success');
  const after = new Date();
 
  const entryTime = new Date(entry.timestamp);
@@ -71,7 +74,8 @@ describe('AuditTrail', () => {
  });
 
  it('should log failed fix', async () => {
- const entry = await auditTrail.logFix({}, 'failure', 'Fix failed');
+ const entry = await auditTrail.logFix({},
+	'failure', 'Fix failed');
 
  expect(entry.status).toBe('failure');
  expect(entry.errorMessage).toBe('Fix failed');
@@ -117,10 +121,14 @@ describe('AuditTrail', () => {
 
  describe('queryHistory', () => {
  beforeEach(async () => {
- await auditTrail.logAnalysis({ count: 1 }, 'success');
- await auditTrail.logFix({ file: 'test.ts' }, 'success');
- await auditTrail.logValidation({ errors: 0 }, 'success');
- await auditTrail.logAnalysis({ count: 2 }, 'failure', 'Error');
+ await auditTrail.logAnalysis({ count: 1 },
+	'success');
+ await auditTrail.logFix({ file: 'test.ts' },
+	'success');
+ await auditTrail.logValidation({ errors: 0 },
+	'success');
+ await auditTrail.logAnalysis({ count: 2 },
+	'failure', 'Error');
  });
 
  it('should return all entries', async () => {
@@ -174,8 +182,10 @@ describe('AuditTrail', () => {
 
  describe('getAllEntries', () => {
  it('should return all entries', async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logFix({},
+	'success');
 
  const entries = await auditTrail.getAllEntries();
 
@@ -191,8 +201,10 @@ describe('AuditTrail', () => {
 
  describe('getEntryCount', () => {
  it('should return correct count', async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logFix({},
+	'success');
 
  const count = await auditTrail.getEntryCount();
 
@@ -208,8 +220,10 @@ describe('AuditTrail', () => {
 
  describe('clearEntries', () => {
  it('should clear all entries', async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logFix({},
+	'success');
 
  await auditTrail.clearEntries();
 
@@ -220,9 +234,12 @@ describe('AuditTrail', () => {
 
  describe('getEntriesByOperation', () => {
  beforeEach(async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logAnalysis({}, 'failure');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logAnalysis({},
+	'failure');
+ await auditTrail.logFix({},
+	'success');
  });
 
  it('should return entries for operation', async () => {
@@ -241,9 +258,12 @@ describe('AuditTrail', () => {
 
  describe('getEntriesByStatus', () => {
  beforeEach(async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logAnalysis({}, 'failure');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logAnalysis({},
+	'failure');
+ await auditTrail.logFix({},
+	'success');
  });
 
  it('should return successful entries', async () => {
@@ -263,8 +283,10 @@ describe('AuditTrail', () => {
 
  describe('getSuccessRate', () => {
  it('should return 100% for all successful', async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logFix({},
+	'success');
 
  const rate = await auditTrail.getSuccessRate();
 
@@ -272,8 +294,10 @@ describe('AuditTrail', () => {
  });
 
  it('should return 0% for all failed', async () => {
- await auditTrail.logAnalysis({}, 'failure');
- await auditTrail.logFix({}, 'failure');
+ await auditTrail.logAnalysis({},
+	'failure');
+ await auditTrail.logFix({},
+	'failure');
 
  const rate = await auditTrail.getSuccessRate();
 
@@ -281,8 +305,10 @@ describe('AuditTrail', () => {
  });
 
  it('should return 50% for mixed', async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logFix({}, 'failure');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logFix({},
+	'failure');
 
  const rate = await auditTrail.getSuccessRate();
 
@@ -298,9 +324,12 @@ describe('AuditTrail', () => {
 
  describe('getStatistics', () => {
  beforeEach(async () => {
- await auditTrail.logAnalysis({}, 'success');
- await auditTrail.logAnalysis({}, 'failure');
- await auditTrail.logFix({}, 'success');
+ await auditTrail.logAnalysis({},
+	'success');
+ await auditTrail.logAnalysis({},
+	'failure');
+ await auditTrail.logFix({},
+	'success');
  });
 
  it('should return correct statistics', async () => {
@@ -330,16 +359,20 @@ describe('AuditTrail', () => {
 
  switch (operation) {
  case 'analyze':
- entry = await auditTrail.logAnalysis({}, 'success');
+ entry = await auditTrail.logAnalysis({},
+	'success');
  break;
  case 'fix':
- entry = await auditTrail.logFix({}, 'success');
+ entry = await auditTrail.logFix({},
+	'success');
  break;
  case 'validate':
- entry = await auditTrail.logValidation({}, 'success');
+ entry = await auditTrail.logValidation({},
+	'success');
  break;
  case 'rollback':
- entry = await auditTrail.logRollback({}, 'success');
+ entry = await auditTrail.logRollback({},
+	'success');
  break;
  default:
  throw new Error(`Unknown operation: ${ operation }`);
@@ -388,7 +421,8 @@ describe('AuditTrail', () => {
  fc.array(fc.boolean(), { minLength: 1, maxLength: 20 }),
  async (statuses: any) => {
  for (const status of statuses) {
- await auditTrail.logAnalysis({}, status ? 'success' : 'failure');
+ await auditTrail.logAnalysis({},
+	status ? 'success' : 'failure');
  }
 
  const rate = await auditTrail.getSuccessRate();
@@ -402,15 +436,18 @@ describe('AuditTrail', () => {
  describe('Integration: Full Audit Workflow', () => {
  it('should handle complete audit workflow', async () => {
  // Log analysis
- const analysis = await auditTrail.logAnalysis({ errors: 5 }, 'success');
+ const analysis = await auditTrail.logAnalysis({ errors: 5 },
+	'success');
  expect(analysis.operation).toBe('analyze');
 
  // Log fix
- const fix = await auditTrail.logFix({ file: 'test.ts' }, 'success');
+ const fix = await auditTrail.logFix({ file: 'test.ts' },
+	'success');
  expect(fix.operation).toBe('fix');
 
  // Log validation
- const validation = await auditTrail.logValidation({ newErrors: 0 }, 'success');
+ const validation = await auditTrail.logValidation({ newErrors: 0 },
+	'success');
  expect(validation.operation).toBe('validate');
 
  // Query history

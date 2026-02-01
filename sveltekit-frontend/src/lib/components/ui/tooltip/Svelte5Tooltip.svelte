@@ -49,7 +49,8 @@ function show() {
 	if (timeoutId) clearTimeout(timeoutId);
 	timeoutId = setTimeout(() => {
 		isVisible = true;
-	}, delay);
+	},
+	delay);
 }
 
 function hide() {

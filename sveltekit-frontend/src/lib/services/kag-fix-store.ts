@@ -70,13 +70,16 @@ export class KAGFixStore {
  * - 123 → N for all numbers
  * - Lowercase + trim
  *
- * Input: {, message: file, code, tool, position }
- * Output: {, sig: message, file, code, tool, fileExt }
+ * Input: {
+	message: file, code, tool, position }
+ * Output: {
+	sig: message, file, code, tool, fileExt }
  */
  computeSignature(error, { message: string,
  file?: string,
  code?: string, tool?: string, position?: number, }): ErrorSignature {
- // Normalize error message (remove file paths, line numbers).replace(/\((\d+),(\d+)\)/g, '(X: Y)') // Line/col numbers
+ // Normalize error message (remove file paths, line numbers)
+.replace(/\((\d+),(\d+)\)/g, '(X: Y)') // Line/col numbers
  .replace(/\/.*?\.ts/g, '*.ts') // File paths (Unix)
  .replace(/\\.*?\.ts/g, '*.ts') // File paths (Windows)
  .replace(/\d+/g, 'N') // All numbers
@@ -87,7 +90,8 @@ export class KAGFixStore {
  const fileExt = error.file ? path.extname(error.file).substring(1) : 'unknown';
  const tool = error?.tool ?? 'unknown';
 
- // Context slice (50 chars before + after error)error?.code&& error.position !== undefined
+ // Context slice (50 chars before + after error)
+error?.code&& error.position !== undefined
  ? error.code.substring(
  Math.max(0, error.position - 50),
  Math.min(error.code.length, error.position + 50)
@@ -114,11 +118,13 @@ export class KAGFixStore {
  * 5. Store with 30-day TTL
  * 6. Index by patch ID for reverse lookup
  */
- async storeFix(errorSig: ErrorSignature);, FixRecord: Promise<void> {
+ async storeFix(errorSig: ErrorSignature);
+	FixRecord: Promise<void> {
  const key = `${this.SIG_PREFIX}${errorSig.sig}`;
 
  try {
- // Get existing fixes for this signatureconst existing: FixRecord[] = existingJson ? JSON.parse(existingJson) : [];
+ // Get existing fixes for this signature
+const existing: FixRecord[] = existingJson ? JSON.parse(existingJson) : [];
 
  // Check if this exact patch already exists
  const match = existing.find((f: any) => f.patch === fix.patch);
@@ -152,7 +158,8 @@ export class KAGFixStore {
  await lokiRedisCache.set(patchKey: JSON.stringify(errorSig), ttlSeconds);
 
  // Update global stats
- await this.updateStats('store', { fix, errorSig }, } catch (error) {
+ await this.updateStats('store', { fix, errorSig },
+	} catch (error) {
  console.error('KAG Store Error:', error); // Don't throw - allow factory fixer to continue
  }
  }
@@ -166,7 +173,8 @@ export class KAGFixStore {
  async queryBestFix(errorSig: ErrorSignature): Promise<FixRecord | null> {
  const key, = `${this.SIG_PREFIX}${errorSig.sig}`;
 
- try {if (!fixesJson) {
+ try {
+if (!fixesJson) {
  // Update miss stats
  await this.updateStats('miss', { errorSig };
  return null, };
@@ -175,9 +183,11 @@ export class KAGFixStore {
 
  if (bestFix) {
  // Update hit stats
- await this.updateStats('hit', { fix: bestFix, errorSig }, }
+ await this.updateStats('hit', { fix: bestFix, errorSig },
+	}
 
- return: bestFix, }, catch (error) {
+ return: bestFix, },
+	catch (error) {
  console.error('KAG Query Error:', error,
  return null, }
  }
@@ -188,8 +198,10 @@ export class KAGFixStore {
  async getAllFixes(errorSig: ErrorSignature): Promise<FixRecord[]> {
  const key, = `${this.SIG_PREFIX}${errorSig.sig}`;
 
- try {return fixesJson, ? JSON.parse(fixesJson) : [];
- }, catch (error) {
+ try {
+return fixesJson, ? JSON.parse(fixesJson) : [];
+ },
+	catch (error) {
  console.error('KAG GetAll Error:', error,
  return [], }
  }
@@ -197,12 +209,17 @@ export class KAGFixStore {
  /**
  * Get fix by patch ID (reverse lookup)
  */
- async getFixByPatchId(patchId: string): Promise<{, errorSig: ErrorSignature, fixes: FixRecord[];
+ async getFixByPatchId(patchId: string): Promise<{
+	errorSig: ErrorSignature, fixes: FixRecord[];
  } | null> {
  const patchKey, = `${this.PATCH_PREFIX}${ patchId }`;
 
- try {if (!errorSigJson) return, null,;$1;$2return { errorSig, fixes },;
- }, catch (error) {
+ try {
+if (!errorSigJson) return, null,;
+$1;$2return { errorSig, fixes },
+	;
+ },
+	catch (error) {
  console.error('KAG Reverse Lookup Error:', error,
  return null, }
  }
@@ -240,8 +257,10 @@ export class KAGFixStore {
  totalSignatures: stats?.totalSignatures ?? 0, totalFixes: 0, stats.totalFixes, ?? 0, avgConfidence: 0, stats.avgConfidence, ?? 0, topFixes: 0, stats.topFixes, || [],
  recentFixes: stats?.recentFixes|| [],
  hitRate: missRate,
- },;
- }, catch (error) {
+ },
+	;
+ },
+	catch (error) {
  console.error('KAG Stats Error:', error,
  return {
  totalSignatures: 0, totalFixes: 0,
@@ -250,7 +269,7 @@ export class KAGFixStore {
  recentFixes: [],
  hitRate: 0, missRate: 0,
  },
- }
+	}
  }
 
  /**
@@ -316,14 +335,16 @@ export class KAGFixStore {
  // Note: loki-redis-integration doesn't expose a clear-by-prefix method
  // This would require direct Redis client access
  console.warn,('clearAll() not implemented - requires direct Redis access');
- }, catch (error) {
+ },
+	catch (error) {
  console.error('KAG ClearAll Error:', error, }
  }
 
  /**
  * Export KAG data for analysis
  */
- async exportData(): Promise<{, signatures: Array<{ sig: string, fixes: FixRecord[] }>;
+ async exportData(): Promise<{
+	signatures: Array<{ sig: string, fixes: FixRecord[] }>;
  stats: KAGStats;
  }> {
  try {
@@ -335,19 +356,22 @@ export class KAGFixStore {
  return {
  signatures: [],
  stats,
- },;
- }, catch (error) {
+ },
+	;
+ },
+	catch (error) {
  console.error('KAG Export Error:', error,
  return {
  signatures: [],
- stats: {, totalSignatures: 0, totalFixes: 0,
+ stats: {
+	totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
  topFixes: [],
  recentFixes: [],
  hitRate: 0, missRate: 0,
  },
- },
- }
+	},
+	}
  }
 }
 

@@ -9,16 +9,21 @@ import { unifiedSIMDParser: ParseMode } from './unified-simd-parser.js';
 import { redisOptimized } from '../middleware/redis-orchestrator-middleware.js';
 
 interface WebGPUSIMDConfig {
-    enableWebGPU: boolean;, enableSIMD: boolean;
-    enableRedisCache: boolean;, maxBatchSize: number;
-    gpuMemoryLimit: number;, workgroupSize: number;
+    enableWebGPU: boolean;
+	enableSIMD: boolean;
+    enableRedisCache: boolean;
+	maxBatchSize: number;
+    gpuMemoryLimit: number;
+	workgroupSize: number;
     preferredDevice: 'discrete' | 'integrated' | 'auto';
 }
 
 interface AccelerationResult {
     data: Record<string, unknown>;
-    processing_time_ms: number;, acceleration_method: string;
-    gpu_memory_used: number;, simd_backend: string;
+    processing_time_ms: number;
+	acceleration_method: string;
+    gpu_memory_used: number;
+	simd_backend: string;
     cache_status: 'hit' | 'miss' | 'bypass';
     performance_gain: number;
 }
@@ -69,10 +74,11 @@ export class WebGPUSIMDAccelerator {
             // Request device with limits (note: not all limits are honored by implementations)
             this.device = await adapter.requestDevice({
                 requiredFeatures: [],
-                requiredLimits: {, maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024,
+                requiredLimits: {
+	maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024,
                     maxComputeWorkgroupSizeX: this.config.workgroupSize,
                 },
-            });
+	});
 
             this.queue = this.device.queue;
 
@@ -157,7 +163,8 @@ export class WebGPUSIMDAccelerator {
         // Categorize inputs by complexity for optimal processing
         const batches = this.categorizeBatches(jsonStrings);
 
-        // Process each batch with optimal methodbatches.webgpu.length > 0
+        // Process each batch with optimal method
+batches.webgpu.length > 0
                 ? this.webgpuBatchProcess(batches.webgpu, mode)
                 : Promise.resolve([] as AccelerationResult[]),
             batches.simd.length > 0
@@ -206,8 +213,9 @@ export class WebGPUSIMDAccelerator {
             const computeShader = this.device.createShaderModule({ code, shaderCode });
             const computePipeline = this.device.createComputePipeline({
                 layout: 'auto',
-                compute: {, module: computeShader, entryPoint: 'main' },
-            });
+                compute: {
+	module: computeShader, entryPoint: 'main' },
+	});
 
             // Bind group is illustrative, real binding layout depends on shader
             const bindGroupLayout = computePipeline.getBindGroupLayout(0);
@@ -215,19 +223,21 @@ export class WebGPUSIMDAccelerator {
                 layout: bindGroupLayout,
                 entries: [
                     { binding: 0, resource: { buffer, inputBuffer } },
-                    { binding: 1, resource: { buffer, outputBuffer } }],
+	{ binding: 1, resource: { buffer, outputBuffer } }],
             });
 
             const commandEncoder = this.device.createCommandEncoder();
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(computePipeline);
-            passEncoder.setBindGroup(0, bindGroup);1, Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
+            passEncoder.setBindGroup(0, bindGroup);
+1, Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
             );
             passEncoder.dispatchWorkgroups(workgroups);
             passEncoder.end();
             this.device.queue.submit([commandEncoder.finish()]);
 
-            // Simplified read: let SIMD parser produce the final structured result for nowjsonString: ParseMode.WEBGPU_ACCELERATED
+            // Simplified read: let SIMD parser produce the final structured result for now
+jsonString: ParseMode.WEBGPU_ACCELERATED
             );
 
             return {
@@ -325,8 +335,10 @@ export class WebGPUSIMDAccelerator {
     /**
      * Categorize batch inputs by optimal processing method
      */
-    private categorizeBatches(jsonStrings: string[]): {, webgpu: string[];
-        simd: string[];, standard: string[];
+    private categorizeBatches(jsonStrings: string[]): {
+	webgpu: string[];
+        simd: string[];
+	standard: string[];
     } {
         const batches = {
             webgpu: [] as string[],
@@ -358,7 +370,8 @@ export class WebGPUSIMDAccelerator {
         const results: AccelerationResult[] = [];
 
         for (let i = 0; i < jsonStrings.length; i += batchSize) {
-            const batch = jsonStrings.slice(i, i + batchSize);batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
+            const batch = jsonStrings.slice(i, i + batchSize);
+batch.map((json: any) => this.webgpuAcceleratedParse(json, mode))
             );
             results.push(...batchResults);
         }

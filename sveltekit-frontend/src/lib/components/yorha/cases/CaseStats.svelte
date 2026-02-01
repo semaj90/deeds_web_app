@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   let stats = $state({
     totalCases: 47,
@@ -20,14 +20,17 @@
     avgEvidencePerCase: 1247
   };
 
-  onMount(() => {
+  $effect(() => {
+
     const interval = setInterval(() => {
       stats.activeCases += Math.floor(Math.random() * 3) - 1;
       stats.activeCases = Math.max(0, Math.min(stats.totalCases, stats.activeCases));
-    }, 30000);
+    },
+	30000);
 
     return () => clearInterval(interval);
-  });
+  
+});
 
   function getTrendColor(value: number): string {
     if (value > 0) return 'text-green-400';

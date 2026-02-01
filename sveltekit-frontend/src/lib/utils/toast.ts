@@ -8,16 +8,16 @@ export const toast = {
  success: (message: string, options: ToastOptions = {}) => {
  showToast(message, 'success', options);
  },
- error: (message: string, options: ToastOptions = {}) => {
+	error: (message: string, options: ToastOptions = {}) => {
  showToast(message, 'error', options);
  },
- warning: (message: string, options: ToastOptions = {}) => {
+	warning: (message: string, options: ToastOptions = {}) => {
  showToast(message, 'warning', options);
  },
- info: (message: string, options: ToastOptions = {}) => {
+	info: (message: string, options: ToastOptions = {}) => {
  showToast(message, 'info', options);
  },
-};
+	};
 
 function showToast(message: string, type: string, options: ToastOptions = {}) {
  if (typeof document === 'undefined') return;
@@ -43,8 +43,10 @@ function showToast(message: string, type: string, options: ToastOptions = {}) {
  if (toastEl.parentNode) {
  document.body.removeChild(toastEl);
  }
- }, 300);
- }, options?.duration ?? 3000);
+ },
+	300);
+ },
+	options?.duration ?? 3000);
 }
 
 function getToastStyles(type: string): string {

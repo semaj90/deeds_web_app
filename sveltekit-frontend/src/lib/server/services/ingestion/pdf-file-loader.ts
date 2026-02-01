@@ -8,8 +8,10 @@ import * as path from 'path';
 import pdfParse from 'pdf-parse';
 
 export interface RawDocument {
-    id: string;, title: string;
-    text: string;, source: 'local' | 'minio';
+    id: string;
+	title: string;
+    text: string;
+	source: 'local' | 'minio';
     filePath?: string;
     bucketKey?: string;
     metadata?: Record<string, unknown>;
@@ -92,10 +94,11 @@ export class PDFFileLoader {
                 text: text, // Add text field required by interface
                 source: 'local',
                 filePath,
-                metadata: {, fileSize: buffer.length,
+                metadata: {
+	fileSize: buffer.length,
                     loadedAt: new Date().toISOString(),
                 },
-            };
+	};
         } catch (error) {
             console.error(`Error loading PDF ${filePath}:`, error);
             return null;
@@ -140,10 +143,11 @@ export class PDFFileLoader {
                             text: text, // Add text field
                             source: 'minio',
                             bucketKey,
-                            metadata: {, fileSize: fullBuffer.length,
+                            metadata: {
+	fileSize: fullBuffer.length,
                                 loadedAt: new Date().toISOString(),
                             },
-                        });
+	});
                     } catch (error) {
                         reject(error);
                     }
@@ -217,8 +221,10 @@ export class PDFFileLoader {
     /**
      * Get statistics about available documents
      */
-    getStats(): {, localPDFCount: number;
-        localPath: string;, minioConfigured: boolean;
+    getStats(): {
+	localPDFCount: number;
+        localPath: string;
+	minioConfigured: boolean;
     } {
         return {
             localPDFCount: this.getLocalPDFCount(),

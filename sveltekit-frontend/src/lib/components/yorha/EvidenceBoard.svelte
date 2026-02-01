@@ -1,14 +1,17 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   interface Node {
-    id: string;, title: string;
-    type: string;, x: number;
+    id: string;
+	title: string;
+    type: string;
+	x: number;
     y: number;
   }
 
   interface Connection {
-    id: string;, from_id: string;
+    id: string;
+	from_id: string;
     to_id: string;
   }
 
@@ -259,8 +262,10 @@
  }
 
  .inset-0 {
- top: 0;, right: 0;
- bottom: 0;, left: 0;
+ top: 0;
+	right: 0;
+ bottom: 0;
+	left: 0;
  }
 
  .flex-1 {

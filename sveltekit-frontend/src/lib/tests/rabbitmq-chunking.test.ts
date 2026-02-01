@@ -16,7 +16,8 @@ const TEST_CONFIG = {
 	maxLengthBytes: 1_000_000_000, // 1GB for testing
 	maxAge: '1D',
 	prefetchCount: 100
-};$1;$2PROSECUTION MEMORANDUM
+};
+$1;$2PROSECUTION MEMORANDUM
 
 CASE NO: 2024-CR-12345, DEFENDANT: John Doe
 CHARGES: Burglary in the Second Degree (RCW 9A.52.030)
@@ -121,9 +122,12 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			expect(reassembled).toBe(SAMPLE_LEGAL_DOCUMENT);
 		});
 
-		it('should handle edge cases (empty, single char, exact chunk size)', () => {{ text: '', expectedChunks: 1 }, // Empty becomes single chunk
+		it('should handle edge cases (empty, single char, exact chunk size)', () => {
+{ text: '', expectedChunks: 1 },
+	// Empty becomes single chunk
 				{ text: 'A', expectedChunks: 1 },
-				{ text: 'A'.repeat(500), expectedChunks: 1 }, // Exact chunk size
+	{ text: 'A'.repeat(500), expectedChunks: 1 },
+	// Exact chunk size
 				{ text: 'A'.repeat(501), expectedChunks: 2 }  // Just over
 			];
 
@@ -171,7 +175,8 @@ describe('RabbitMQ Chunking Pipeline', () => {
 
 			const endCount = streamActor.getSnapshot().context.publishedCount;
 			expect(endCount - startCount).toBe(chunks.length);
-		}, 30000); // 30s timeout for large batch
+		},
+	30000); // 30s timeout for large batch
 
 		it('should add correct metadata to messages', async () => {
 			const chunks = ['Test 1', 'Test 2'];
@@ -202,7 +207,8 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			// Publish one more message
 			streamActor.send({
 				type: 'PUBLISH',
-				message: {, id: 'test-msg-4',
+				message: {
+	id: 'test-msg-4',
 					type: 'offset-test',
 					data: 'Msg 4',
 					timestamp: Date.now()
@@ -214,7 +220,8 @@ describe('RabbitMQ Chunking Pipeline', () => {
 
 			const snapshot = streamActor.getSnapshot();
 			expect(snapshot.context.consumedCount).toBeGreaterThan(0);
-		}, 10000);
+		},
+	10000);
 
 		it('should respect prefetch limits', async () => {
 			const snapshot = streamActor.getSnapshot();
@@ -284,7 +291,8 @@ describe('RabbitMQ Chunking Pipeline', () => {
 
 	describe('Performance Benchmarks', () => {
 		it('should publish 1000 chunks within 10 seconds', async () => {
-			const chunks = Array.from({ length: 1000 }, (_, i) => `Test chunk ${i}`);
+			const chunks = Array.from({ length: 1000 },
+	(_, i) => `Test chunk ${i}`);
 
 			const startTime = Date.now();
 			await publishChunkedData(streamActor, chunks, 'benchmark', {});
@@ -294,10 +302,12 @@ describe('RabbitMQ Chunking Pipeline', () => {
 			expect(duration).toBeLessThan(10000); // 10 seconds
 
 			console.log(`Published 1000 chunks in ${duration}ms (${Math.round(1000 / (duration / 1000))} chunks/sec)`);
-		}, 15000);
+		},
+	15000);
 
 		it('should maintain throughput with large chunks', async () => {
-			const largeChunks = Array.from({ length: 100 }, (_, i) =>
+			const largeChunks = Array.from({ length: 100 },
+	(_, i) =>
 				`Large chunk ${i}: ${'X'.repeat(10000)}` // 10KB chunks
 			);
 
@@ -311,7 +321,8 @@ describe('RabbitMQ Chunking Pipeline', () => {
 
 			console.log(`Throughput: ${throughputMBps.toFixed(2)} MB/s`);
 			expect(throughputMBps).toBeGreaterThan(0.5); // At least 0.5 MB/s
-		}, 30000);
+		},
+	30000);
 	});
 });
 
@@ -329,7 +340,8 @@ function waitForState(
 		const timeoutId = setTimeout(() => {
 			subscription.unsubscribe();
 			reject(new Error(`Timeout waiting for state, ${targetState}`));
-		}, timeout);
+		},
+	timeout);
 
 		const subscription = actor.subscribe(snapshot => {
 			if (snapshot.matches(targetState)) {

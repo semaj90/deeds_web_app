@@ -6,8 +6,10 @@ export interface SplitterOptions {
 }
 
 export interface TextChunk {
-    index: number;, text: string;
-    startWord: number;, endWord: number;
+    index: number;
+	text: string;
+    startWord: number;
+	endWord: number;
     tokenEstimate: number; // Rough heuristic (words * 1.3)
 }
 

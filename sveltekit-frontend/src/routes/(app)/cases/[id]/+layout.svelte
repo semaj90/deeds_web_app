@@ -6,8 +6,8 @@
 
 	const tabs = [
 		{ slug: 'overview', label: 'Overview' },
-		{ slug: 'canvas', label: 'Evidence Canvas' },
-		{ slug: 'reports', label: 'Reports' }
+	{ slug: 'canvas', label: 'Evidence Canvas' },
+	{ slug: 'reports', label: 'Reports' }
 	];
 </script>
 

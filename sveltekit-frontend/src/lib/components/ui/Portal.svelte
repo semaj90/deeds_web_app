@@ -1,6 +1,6 @@
 <!-- Portal component for rendering modals outside the, component, tree -->
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import type { Snippet } from 'svelte';
   interface Props {
     children?: Snippet}
@@ -8,7 +8,8 @@
   // DOM refs (definite assignment for TS, defend at runtime)
   let portal!: HTMLDivElement
   let target: HTMLElement | null = null
-  onMount(() => {
+  $effect(() => {
+
     // Create portal target if it doesn't exist'
     target = document.getElementById('portal-target');
     if (!target) {
@@ -18,11 +19,12 @@
     // Only append if portal exists (bind:this guarantees this in onMount)
     if (portal && target) {
       target.appendChild(portal)}
-  });
-  onDestroy(() => {
+  
+});
+  // TODO: Add as cleanup in $effect: return () => {
     if (portal && portal.parentNode) {
       portal.parentNode.removeChild(portal)}
-  });
+  }
 </script>
 
 <div bind:this={portal} style="display: contents;">

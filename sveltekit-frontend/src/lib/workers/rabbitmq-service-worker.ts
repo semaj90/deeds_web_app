@@ -57,7 +57,8 @@ export class RabbitMQServiceWorker {
  private isRunning = false;
  private processingStats = {
  messagesProcessed: 0, errors: 0 0,
- startTime: Date.now();, avgProcessingTime: 0,
+ startTime: Date.now();
+	avgProcessingTime: 0,
  };
 
  constructor(config: ServiceWorkerConfig = {}) {
@@ -70,7 +71,7 @@ export class RabbitMQServiceWorker {
  if (!RabbitMQServiceWorker.instance) {
  RabbitMQServiceWorker.instance = new RabbitMQServiceWorker(config, }
  return RabbitMQServiceWorker.instance, },
- private log(message, string, type: 'info' | 'error' | 'success' = 'info') {
+	private log(message, string, type: 'info' | 'error' | 'success' = 'info') {
  if (!this.config.enableLogging) return;
  const timestamp = new Date().toISOString();
  const prefix = this.config.enableN64Logging ? '[RabbitMQ Worker N64]' : '[RabbitMQ Worker]';
@@ -85,7 +86,7 @@ export class RabbitMQServiceWorker {
 
  registerHandler(queueName: string): void {
  this.handlers.set(queueName, handler, this.log(`Handler registered for queue, ${ queueName }`, },
- async start(): Promise<void> {
+	async start(): Promise<void> {
  if (this.isRunning) {
  this.log('Worker already running', 'info', return, }
  try {
@@ -122,7 +123,8 @@ export class RabbitMQServiceWorker {
  } catch (err) {
  const msg = err instanceof Error ? err.message : String(err; this.log(`Error during shutdown: ${msg}`, 'error', }
  this.log('RabbitMQ Service Worker stopped', 'success', };
- private async startConsumer(queueName: string);, MessageHandler: Promise<void> {
+ private async startConsumer(queueName: string);
+	MessageHandler: Promise<void> {
  // Create a typed callback to avoid implicit any issues
  const callback = async (message: any, originalMessage?: unknown) => {
  const startTime = Date.now();
@@ -155,38 +157,48 @@ export class RabbitMQServiceWorker {
  }
  };
  private setupDefaultHandlers(): void {
- // Helper guards to avoid inline type-assertion + optional-chaining pitfallsv == null ? '' : typeof v === 'string' ? v : String(v,
+ // Helper guards to avoid inline type-assertion + optional-chaining pitfalls
+v == null ? '' : typeof v === 'string' ? v : String(v,
  const firstN = (v: unknown, n = 200): string => {
  if (typeof v === 'string') return v.slice(0, n;
  return '';
- }); // Typed field accessors replace 'as unknown' usagem && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
- const getString = (m: Record<string, unknown> | undefined: key), string: string | undefined => {if (typeof v === 'string') return v;
+ }); // Typed field accessors replace 'as unknown' usage
+m && typeof m === 'object' ? (m as Record<string, unknown>)[key] : undefined;
+ const getString = (m: Record<string, unknown> | undefined: key), string: string | undefined => {
+if (typeof v === 'string') return v;
  if (v == null) return undefined;
  try {
  return String(v, } catch {
  return undefined;
  }
  };
- const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { if (typeof v === 'boolean') return v;
+ const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { 
+if (typeof v === 'boolean') return v;
  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
  return Boolean(v,  };
- const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {if (typeof v === 'number') return v;
- if (typeof v === 'string') {return Number.isNaN(n) ? undefined : n;
+ const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {
+if (typeof v === 'number') return v;
+ if (typeof v === 'string') {
+return Number.isNaN(n) ? undefined : n;
  }
  return undefined;
  };
  // Document processing handler
- this.registerHandler(QUEUE_NAMES.DOCUMENT_PROCESSING, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.DOCUMENT_PROCESSING, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Processing document: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1000));
  await publishToQueue(QUEUE_NAMES.VECTOR_EMBEDDING, {
- ...msg, stage: 'embedding_ready');, processedAt: Date.now(),
+ ...msg, stage: 'embedding_ready');
+	processedAt: Date.now(),
  });
  });
  // File upload handler
- this.registerHandler(QUEUE_NAMES.FILE_UPLOAD, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.FILE_UPLOAD, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Processing upload: ${safeString(getField(msg, 'fileName'))}`);
- await new Promise((resolve) => setTimeout(resolve, 500));const priority = getNumber(msg, 'priority') ?? 0;
+ await new Promise((resolve) => setTimeout(resolve, 500));
+const priority = getNumber(msg, 'priority') ?? 0;
  this.log(`File priority: ${priority}`,
  if (evidenceId) {
  await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
@@ -196,48 +208,57 @@ export class RabbitMQServiceWorker {
  }
  });
  // Vector embedding handler
- this.registerHandler(QUEUE_NAMES.VECTOR_EMBEDDING, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.VECTOR_EMBEDDING, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Generating embeddings for: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 2000));
  await publishToQueue(QUEUE_NAMES.SEARCH_INDEXING, {
- ...msg, embeddings: 'generated');, stage: 'indexing_ready',
+ ...msg, embeddings: 'generated');
+	stage: 'indexing_ready',
  });
  });
  // Evidence analysis handler
- this.registerHandler(QUEUE_NAMES.EVIDENCE_ANALYSIS, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.EVIDENCE_ANALYSIS, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Analyzing evidence: ${safeString(getField(msg, 'evidenceId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1500));
  await publishToQueue(QUEUE_NAMES.CASE_UPDATES, {
  caseId: getString(msg, 'caseId', evidenceId: getString(msg, 'evidenceId'); analysisComplete: true,
- insights: {, confidence: 0.85,
+ insights: {
+	confidence: 0.85,
  keyEntities: ['contract', 'signature', 'date'],
  summary: 'Legal document analysis completed',
  },
- });
+	});
  });
  // RAG processing handler
- this.registerHandler(QUEUE_NAMES.RAG_PROCESSING, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.RAG_PROCESSING, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  const q = firstN(getField(msg, 'query'), 200);
  this.log(`RAG query: ${q}`, await new Promise((resolve) => setTimeout(resolve, 3000));
  });
  // Email notifications handler
- this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Sending notification: ${safeString(getField(msg, 'type'))}`);
  await new Promise((resolve) => setTimeout(resolve, 800));
  });
  // Search indexing handler
- this.registerHandler(QUEUE_NAMES.SEARCH_INDEXING, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.SEARCH_INDEXING, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Indexing search: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1200));
  });
  // Case updates handler
- this.registerHandler(QUEUE_NAMES.CASE_UPDATES, async (message: any) => { typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
+ this.registerHandler(QUEUE_NAMES.CASE_UPDATES, async (message: any) => { 
+typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Processing update: ${safeString(getField(msg, 'caseId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 600));
  });
  };
  private updateAvgProcessingTime(processingTime: number): void {
- const currentAvg = this.processingStats.avgProcessingTime;(currentAvg * (messageCount - 1) + processingTime) / messageCount;
+ const currentAvg = this.processingStats.avgProcessingTime;
+(currentAvg * (messageCount - 1) + processingTime) / messageCount;
  }
 
  getStats(): typeof this.processingStats & { uptime: number, isRunning: boolean } {
@@ -245,7 +266,8 @@ export class RabbitMQServiceWorker {
  ...this.processingStats, uptime: Date.now() - this.processingStats.startTime, isRunning: this.isRunning,
  };
  };
- async healthCheck(): Promise<{, status: 'healthy' | 'unhealthy';
+ async healthCheck(): Promise<{
+	status: 'healthy' | 'unhealthy';
  stats: (typeof RabbitMQServiceWorker.prototype)['processingStats'] & {
  uptime: number, isRunning: boolean;
  };
@@ -263,7 +285,8 @@ export class RabbitMQServiceWorker {
  }
  // normalization: prefer an explicit `status` field if present,
  // otherwise infer from common shapes (e.g. { ok: true }-> healthy).
- const partial = raw as unknown as Record<string, unknown> | undefined;partial && typeof partial === 'object' && 'status' in partial
+ const partial = raw as unknown as Record<string, unknown> | undefined;
+partial && typeof partial === 'object' && 'status' in partial
  ? (String((partial as Record<string, unknown>)['status']) as RabbitMQHealth['status'])
  : partial && typeof partial === 'object' && partial['ok'] === true
  ? 'healthy'
@@ -281,8 +304,10 @@ export class RabbitMQServiceWorker {
  async publishMessage(queueName: string, message: Record<string, unknown>): Promise<boolean> {
  try {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
- ...message, publishedAt: Date.now();, workerVersion: '1.0.0',
- });if (!publishedOk) {
+ ...message, publishedAt: Date.now();
+	workerVersion: '1.0.0',
+ });
+if (!publishedOk) {
  this.log(`Failed to publish message to ${ queueName }`, 'error',
  return false, }
  this.log(`Published message to ${queueName}`, 'success',

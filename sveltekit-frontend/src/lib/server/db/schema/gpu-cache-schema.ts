@@ -56,7 +56,8 @@ export const shaderCacheEntries = pgTable("shader_cache_entries", {
     createdBy: uuid("created_by"), // references users.id
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
-}, (table) => ({
+},
+	(table) => ({
     // Indexes for performance
     cacheKeyIdx: index("shader_cache_key_idx").on(table.cacheKey),
     shaderTypeIdx: index("shader_type_idx").on(table.shaderType),
@@ -70,20 +71,25 @@ export const shaderCacheEntries = pgTable("shader_cache_entries", {
 }));
 
 export interface ShaderPredictionContext {
-    userId: string;, currentWorkflow: string;
+    userId: string;
+	currentWorkflow: string;
     caseContext?: unknown;
     userHistory?: any[];
     sessionContext?: unknown;
 }
 
 export interface ReinforcementReward {
-    timestamp: number;, reward: number;
-    context: string;, performanceBonus: number;
+    timestamp: number;
+	reward: number;
+    context: string;
+	performanceBonus: number;
     userSatisfactionScore: number;
 }
 
 export interface PredictionResult {
-    shaderCacheId: string;, confidence: number;
-    model: string;, features: Record<string, any>;
+    shaderCacheId: string;
+	confidence: number;
+    model: string;
+	features: Record<string, any>;
     priority: number;
 }

@@ -5,7 +5,8 @@ import { writable, derived } from 'svelte/store';
 
 // Local base event interface used throughout pipeline events
 export interface PipelineEventBase {
- type: string;, ts: number;
+ type: string;
+	ts: number;
  raw: any;
  [k: string]: any;
 }
@@ -37,7 +38,8 @@ function createPipelineStore() {
  events.update((list) => [
  ...list,
  { type: 'system.open', ts: Date.now(),
-     raw: {, message: 'ws open' } }]);
+     raw: {
+	message: 'ws open' } }]);
  };
  socket.onmessage = (ev) => {
  try {
@@ -60,7 +62,8 @@ function createPipelineStore() {
  reconnectTimer = setTimeout(() => {
  reconnectTimer = null;
  connect();
- }, 2000);
+ },
+	2000);
  }
 
  connect();

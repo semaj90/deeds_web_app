@@ -7,8 +7,10 @@
 import { ingestStatuteWithChunks } from './statute-ingestion-service.js';
 
 export interface ScraperSource {
-    name: string;, url: string;
-    parser: (html: string) => Promise<Array<{ title: string;, content: string; section?: string }>>;
+    name: string;
+	url: string;
+    parser: (html: string) => Promise<Array<{ title: string;
+	content: string; section?: string }>>;
     jurisdiction: string;
     category?: string;
 }
@@ -22,7 +24,7 @@ async function fetchStatuteContent(url: string): Promise<string> {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             },
-        });
+	});
 
         if (!response.ok) {
             throw new Error(`Failed to fetch: ${response.statusText}`);
@@ -173,25 +175,28 @@ export async function batchScrapeStatutes(sources: ScraperSource[]) {
  * Predefined statute sources
  */
 export const STATUTE_SOURCES: Record<string, ScraperSource> = {
-    california_penal_code: {, name: 'California Penal Code',
+    california_penal_code: {
+	name: 'California Penal Code',
         url: 'https://leginfo.legislature.ca.gov/faces/codes_displayexpanded.xhtml?lawCode=PEN',
         parser: parseCaliforniaPenalCode,
         jurisdiction: 'CA',
         category: 'criminal',
     },
-    us_code_title_18: {, name: 'US Code Title 18 (Crimes)',
+	us_code_title_18: {
+	name: 'US Code Title 18 (Crimes)',
         url: 'https://www.congress.gov/uscode/text/18',
         parser: parseUSCode,
         jurisdiction: 'US',
         category: 'criminal',
     },
-    new_york_penal_law: {, name: 'New York Penal Law',
+	new_york_penal_law: {
+	name: 'New York Penal Law',
         url: 'https://www.nysenate.gov/legislation/laws/PL',
         parser: parseNewYorkPenalLaw,
         jurisdiction: 'NY',
         category: 'criminal',
     },
-};
+	};
 
 /**
  * Get available statute sources

@@ -42,7 +42,8 @@ export interface TabsContentProps {
 }
 
 export interface TabsContext {
-	readonly value: string;, setValue: (value: string) => void;
+	readonly value: string;
+	setValue: (value: string) => void;
 	readonly orientation: 'horizontal' | 'vertical';
 	registerTab: (value: string) => void;
 	readonly tabs: string[];

@@ -6,7 +6,8 @@
 export interface ClusterCategory {
  id: string; // e.g., "violent-crime"
  label: string; // e.g., "Violent Crime"
- description: string;, somClusterIds: number[]; // e.g., [11, 12, 13]
+ description: string;
+	somClusterIds: number[]; // e.g., [11, 12, 13]
  kmeansLabels: string[]; // e.g., ["Violent Crimes", "Kidnapping"]
  colorToken: 'violent' | 'fraud' | 'procedural' | 'civil' | 'other';
  avgConfidence: number; // 0-1
@@ -15,10 +16,13 @@ export interface ClusterCategory {
 }
 
 export interface StatuteClusterMetadata {
- statuteId: string;, clusterId: string; // matches ClusterCategory.id
- somClusterId: number;, kmeansLabel: string;
+ statuteId: string;
+	clusterId: string; // matches ClusterCategory.id
+ somClusterId: number;
+	kmeansLabel: string;
  clusterConfidence: number; // 0-1
- echoHits: number;, flaggedForReview: boolean;
+ echoHits: number;
+	flaggedForReview: boolean;
  clusterVersion: number;
 }
 
@@ -29,16 +33,22 @@ export interface ClusterSearchFilter {
 }
 
 export interface ClusterStatistics {
- totalStatutes: number;, totalClusters: number;
- avgConfidence: number;, flaggedCount: number;
- lastUpdated: Date;, version: number;
+ totalStatutes: number;
+	totalClusters: number;
+ avgConfidence: number;
+	flaggedCount: number;
+ lastUpdated: Date;
+	version: number;
 }
 
 export interface ClusterChangeEvent {
- timestamp: Date;, changePercentage: number;
- changedStatutes: string[];, newLabels: Map<string, string>;
+ timestamp: Date;
+	changePercentage: number;
+ changedStatutes: string[];
+	newLabels: Map<string, string>;
  previousLabels: Map<string, string>;
- shouldAlert: boolean;, alertMessage: string;
+ shouldAlert: boolean;
+	alertMessage: string;
 }
 
 // Color mapping for UI
@@ -63,7 +73,7 @@ export const DEFAULT_CATEGORIES: ClusterCategory[] = [
  statuteCount: 0,
  icon: '⚔️',
  },
- {
+	{
  id: 'property-crime',
  label: 'Property Crimes',
  description: 'Crimes involving theft or damage to property',
@@ -74,7 +84,7 @@ export const DEFAULT_CATEGORIES: ClusterCategory[] = [
  statuteCount: 0,
  icon: '💰',
  },
- {
+	{
  id: 'procedural',
  label: 'Procedural',
  description: 'Rules and procedures for legal proceedings',
@@ -85,7 +95,7 @@ export const DEFAULT_CATEGORIES: ClusterCategory[] = [
  statuteCount: 0,
  icon: '⚖️',
  },
- {
+	{
  id: 'civil',
  label: 'Civil Law',
  description: 'Non-criminal legal matters',

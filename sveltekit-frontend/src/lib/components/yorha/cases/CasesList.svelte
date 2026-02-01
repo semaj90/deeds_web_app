@@ -1,12 +1,16 @@
 <script lang="ts">
 
   interface Case {
-    id: string;, title: string;
+    id: string;
+	title: string;
     status: 'active' | 'review' | 'closed';
     priority: 'high' | 'medium' | 'low';
-    assignee: string;, created: Date;
-    updated: Date;, evidenceCount: number;
-    progress: number;, description: string;
+    assignee: string;
+	created: Date;
+    updated: Date;
+	evidenceCount: number;
+    progress: number;
+	description: string;
   }
 
   let cases = $state<Case[]>([
@@ -22,7 +26,7 @@
       progress: 75,
       description: 'Investigation into financial irregularities at TechCorp Inc.'
     },
-    {
+	{
       id: 'CASE-2024-02',
       title: 'Intellectual Property Dispute',
       status: 'active',
@@ -34,7 +38,7 @@
       progress: 45,
       description: 'Patent infringement case involving software algorithms.'
     },
-    {
+	{
       id: 'CASE-2024-03',
       title: 'Contract Breach Analysis',
       status: 'review',

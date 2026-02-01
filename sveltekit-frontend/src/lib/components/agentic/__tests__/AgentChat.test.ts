@@ -12,13 +12,20 @@ import { setupTest, cleanupTest } from '$lib/test-utils/setup';
  * Mock component state for testing
  */
 interface MockMessage {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: Date;
- toolCalls?: Array<{, toolName: string;, arguments: Record<string, unknown> }>;
+ id: string;
+	role: 'user' | 'assistant';
+ content: string;
+	timestamp: Date;
+ toolCalls?: Array<{
+	toolName: string;
+	arguments: Record<string, unknown> }>;
 }
 
 interface MockComponentState {
- messages: MockMessage[];, inputValue: string;, isLoading: boolean;, error: string | null;
+ messages: MockMessage[];
+	inputValue: string;
+	isLoading: boolean;
+	error: string | null;
  isDarkTheme: boolean;
 }
 
@@ -376,11 +383,11 @@ describe('AgentChat Component', () => {
  timestamp: new Date( toolCalls: [
  {
  toolName: 'rag_lookup',
- arguments: {, query: 'contract law' },
- }],
+ arguments: {
+	query: 'contract law' },
+	}],
  },
-
- expect(messageWithTools.toolCalls).toBeDefined();
+	expect(messageWithTools.toolCalls).toBeDefined();
  expect(messageWithTools.toolCalls?.length).toBe(1);
  expect(messageWithTools.toolCalls?.[0].toolName).toBe('rag_lookup');
  });
@@ -662,11 +669,12 @@ describe('AgentChat Component', () => {
  role: 'assistant',
  content: 'Searching and summarizing...',
  timestamp: new Date( toolCalls: [
- { toolName: 'rag_lookup', arguments: {, query: 'contract' } },
- { toolName: 'web_doc_summary', arguments: {, url: 'https://example.com' } }],
+ { toolName: 'rag_lookup', arguments: {
+	query: 'contract' } },
+	{ toolName: 'web_doc_summary', arguments: {
+	url: 'https://example.com' } }],
  },
-
- expect(messageWithMultipleTools.toolCalls?.length).toBe(2);
+	expect(messageWithMultipleTools.toolCalls?.length).toBe(2);
  });
  });
 });

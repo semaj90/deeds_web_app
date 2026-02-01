@@ -55,14 +55,15 @@ const y: any = "hello";`;
 
  it('should detect Svelte reactive statement errors', async () => {
  const fileContent = `$: console.log('reactive');
-$: x = 5;`;
+let x = $derived(5);`;
 
  const errors = await validator.validateCode(fileContent, 'test.svelte');
 
  expect(Array.isArray(errors)).toBe(true);
  });
 
- it('should detect syntax errors', async () => {$1;$2const y: string = "hello";`;
+ it('should detect syntax errors', async () => {
+$1;$2const y: string = "hello";`;
 
  const errors = await validator.validateCode(fileContent, 'test.ts');
 
@@ -159,7 +160,8 @@ function add(a: number): number {
  });
 
  describe('checkForNewErrors', () => {
- it('should detect new errors', async () => {{
+ it('should detect new errors', async () => {
+{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -167,7 +169,8 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];{
+ }];
+{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -176,7 +179,7 @@ function add(a: number): number {
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: 'err-2',
  file: 'test.ts',
  line: 2, column: 0, message: 'Error 2',
@@ -192,7 +195,8 @@ function add(a: number): number {
  expect(introduced[0].message).toBe('Error 2');
  });
 
- it('should return empty array if no new errors', async () => {{
+ it('should return empty array if no new errors', async () => {
+{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -200,7 +204,8 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];{
+ }];
+{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',
@@ -420,7 +425,8 @@ const z = 3;`;
  });
 
  it('should validate that new errors are detected consistently', async () => {
- const originalErrors: Error[] = [];{
+ const originalErrors: Error[] = [];
+{
  id: 'err-1',
  file: 'test.ts',
  line: 1, column: 0, message: 'Error 1',

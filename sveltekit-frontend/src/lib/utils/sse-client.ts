@@ -21,8 +21,10 @@
  */
 
 export interface ChatMessage {
-	id: string;, role: 'user' | 'assistant' | 'system';
-	content: string;, timestamp: string;
+	id: string;
+	role: 'user' | 'assistant' | 'system';
+	content: string;
+	timestamp: string;
 }
 
 export interface SSEEvent {
@@ -81,7 +83,8 @@ export class ChatSSEClient {
 					console.log('Attempting to reconnect...');
 					this.connect();
 				}
-			}, 3000);
+			},
+	3000);
 		});
 
 		// Handle ping (keep-alive)
@@ -104,7 +107,8 @@ export class ChatSSEClient {
 		const response = await fetch('/api/chat/stream', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, sessionId: this.sessionId,
+	body: JSON.stringify({
+	sessionId: this.sessionId,
 				message: content
 			})
 		});
@@ -179,9 +183,9 @@ export function createChatStream(sessionId: string) {
 
 	return {
 		get messages() { return messages; },
-		get error() { return error; },
-		get connected() { return connected; },
-		sendMessage: (content: string) => client.sendMessage(content),
+	get error() { return error; },
+	get connected() { return connected; },
+	sendMessage: (content: string) => client.sendMessage(content),
 		disconnect: () => client.disconnect()
 	};
 }

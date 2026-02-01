@@ -14,7 +14,11 @@ vi.mock('@aws-sdk/client-s3', () => {
   return {
     S3Client: vi.fn(() => ({
       send: mockSend,
-    }, PutObjectCommand: vi.fn((input: any) => ({ input }, GetObjectCommand: vi.fn((input: any) => ({ input }, HeadObjectCommand: vi.fn((input: any) => ({ input }, DeleteObjectCommand: vi.fn((input: any) => ({ input })),
+    },
+	PutObjectCommand: vi.fn((input: any) => ({ input },
+	GetObjectCommand: vi.fn((input: any) => ({ input },
+	HeadObjectCommand: vi.fn((input: any) => ({ input },
+	DeleteObjectCommand: vi.fn((input: any) => ({ input })),
   };
 });
 
@@ -116,7 +120,8 @@ describe('MinIOService', () => {
         title: 'Test Document',
         summary: 'This is a test summary',
         entities: ['Entity1', 'Entity2'],
-        relations: [{, src: 'Entity1', rel: 'relates_to', dst: 'Entity2' }],
+        relations: [{
+	src: 'Entity1', rel: 'relates_to', dst: 'Entity2' }],
       };
 
       const key = await service.storeSummary(docId, summary);
@@ -142,8 +147,11 @@ describe('MinIOService', () => {
     it('should store chunks successfully', async () => {
       mockSend.mockResolvedValueOnce({});
 
-      const docId = 'doc-456';{ text: 'Chunk 1 content', metadata: {, index: 0 } },
-        { text: 'Chunk 2 content', metadata: {, index: 1 } }];
+      const docId = 'doc-456';
+{ text: 'Chunk 1 content', metadata: {
+	index: 0 } },
+	{ text: 'Chunk 2 content', metadata: {
+	index: 1 } }];
 
       const key = await service.storeChunks(docId, chunks);
 
@@ -174,9 +182,10 @@ describe('MinIOService', () => {
     it('should retrieve object successfully', async () => {
       const mockContent = 'Test content';
       mockSend.mockResolvedValueOnce({
-        Body: {, transformToString: async () => mockContent,
+        Body: {
+	transformToString: async () => mockContent,
         },
-      });
+	});
 
       const content = await service.getObject('ace-web-raw', 'test-key');
 

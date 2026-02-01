@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let stats = $state({
  totalDocuments: 15432, documentsProcessed: 12847, aiAnalyzed: 9876, pendingAnalysis: 2571, totalSize: '2.4 TB',
@@ -9,11 +9,12 @@
 
  let processingQueue = $state([
     { id: 'EVD-2024-007', name: 'Contract Analysis.pdf', progress: 45, eta: '2m 15s' },
-    { id: 'EVD-2024-008', name: 'Financial Report.xlsx', progress: 78, eta: '45s' },
-    { id: 'EVD-2024-009', name: 'Email Chain.eml', progress: 23, eta: '4m 30s' }
+	{ id: 'EVD-2024-008', name: 'Financial Report.xlsx', progress: 78, eta: '45s' },
+	{ id: 'EVD-2024-009', name: 'Email Chain.eml', progress: 23, eta: '4m 30s' }
   ]);
 
-  onMount(() => {
+  $effect(() => {
+
     // Simulate real-time updates
     const interval = setInterval(() => {
       stats.documentsProcessed += Math.floor(Math.random() * 10);
@@ -24,7 +25,8 @@
       processingQueue = processingQueue.map(item => ({
         ...item,
         progress: Math.min(100, item.progress + Math.floor(Math.random() * 5))
-      })).filter(item => item.progress < 100);
+      
+});).filter(item => item.progress < 100);
 
       // Add new items occasionally
       if (Math.random() > 0.8 && processingQueue.length < 5) {
@@ -35,7 +37,8 @@
           eta: `${Math.floor(Math.random() * 5) + 1}m ${Math.floor(Math.random() * 60)}s`
         }];
       }
-    }, 3000);
+    },
+	3000);
 
     return () => clearInterval(interval);
   });

@@ -2,11 +2,13 @@
 import { ParallelCacheOrchestrator } from './parallel-cache-orchestrator.js';
 export interface GlyphRenderingRequest {
  glyphData: Uint8Array | Float32Array;
- textContent: string, renderingHints: {, quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
+ textContent: string, renderingHints: {
+	quantizationLevel: 1 | 4 | 8 | 16; // bit precision;
  compressionMethod: 'chr-rom' | 'simd' | 'texture';
  targetResolution: [number, number], colorSpace: 'sRGB' | 'P3' | 'Rec2020';
  };
- legalContext?: {, documentType: 'contract' | 'brief' | 'statute' | 'case';
+ legalContext?: {
+	documentType: 'contract' | 'brief' | 'statute' | 'case';
  confidentialityLevel: 'public' | 'confidential' | 'privileged';
  renderingPriority: 'standard' | 'high' | 'realtime';
  };
@@ -18,9 +20,13 @@ export interface CompiledShader {
 };
 export interface CachedGlyphShader {
  shaderId: string, compiledShader: CompiledShader; // Changed from unknown to CompiledShader
- glyphTextures: GPUTexture[], renderingMetrics: {, compileTime: number, averageRenderTime: number;, cacheHitRate: number, memoryFootprint: number;
+ glyphTextures: GPUTexture[], renderingMetrics: {
+	compileTime: number, averageRenderTime: number;
+	cacheHitRate: number, memoryFootprint: number;
  };
- quantizationData: {, originalSize: number, compressedSize: number;, compressionRatio: number, qualityScore: number;
+ quantizationData: {
+	originalSize: number, compressedSize: number;
+	compressionRatio: number, qualityScore: number;
  };
 };
 class GlyphShaderCacheBridge {
@@ -62,32 +68,37 @@ class GlyphShaderCacheBridge {
  await ParallelCacheOrchestrator.executeParallel({
  // Changed usage to ParallelCacheOrchestrator
  id: `glyph-shader: ${cacheKey}`,
- type: 'shader', priority: request.legalContext?.renderingPriority === 'realtime' ? 'high' : 'normal');, keys: [cacheKey, `glyph-texture: ${cacheKey}`],
+ type: 'shader', priority: request.legalContext?.renderingPriority === 'realtime' ? 'high' : 'normal');
+	keys: [cacheKey, `glyph-texture: ${cacheKey}`],
  });
  // Step 2: Generate specialized glyph rendering WGSL
  const glyphWGSL = this.generateGlyphShaderWGSL(request); // Step 3: Compile shader with optimizations
  const compiledShader = await ShaderCacheManager.getShader(cacheKey, glyphWGSL, {
  // Changed usage to ShaderCacheManager
- type: 'compute', entryPoint: 'renderGlyphs');, workgroupSize: [32, 32, 1], // Optimal for glyph processing
+ type: 'compute', entryPoint: 'renderGlyphs');
+	workgroupSize: [32, 32, 1], // Optimal for glyph processing
  });
  // Step 4: Create glyph textures
- const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph dataconst compileTime = performance.now() - startTime;
+ const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph data
+const compileTime = performance.now() - startTime;
  // Step 6: Create cached shader entry
  const cachedShader: CachedGlyphShader = {
  shaderId: cacheKey,
  compiledShader,
  glyphTextures,
- renderingMetrics: {, compileTime: averageRenderTime,
+ renderingMetrics: {
+	compileTime: averageRenderTime,
  cacheHitRate: 1.0, memoryFootprint: this.calculateMemoryFootprint(glyphTextures),
  },
- quantizationData,
+	quantizationData,
  };
  // Step 7: Store in memory cache
  this.glyphShaderCache.set(cacheKey, cachedShader); // Step 8: Store in parallel cache orchestrator
  await ParallelCacheOrchestrator.storeParallel(cacheKey, cachedShader, {
  // Changed usage to ParallelCacheOrchestrator
  tier: 'l2', ttl: 30 * 60 * 1000); // 30 minutes
- priority: 'normal');, type: 'glyph_shader',
+ priority: 'normal');
+	type: 'glyph_shader',
  });
  // Step 9: Cache shader with embedding for future search
  await ShaderCacheManager.cacheShaderWithEmbedding(
@@ -112,7 +123,8 @@ class GlyphShaderCacheBridge {
 @group(0) @binding(2) var glyph_texture: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(3) var<uniform> render_params: GlyphRenderParams;
 struct GlyphRenderParams {
- atlas_dimensions: vec2<u32>, quantization_bits: u32;, compression_method: u32; // 0=chr-rom, 1=simd, 2=texture
+ atlas_dimensions: vec2<u32>, quantization_bits: u32;
+	compression_method: u32; // 0=chr-rom, 1=simd, 2=texture
  target_resolution: vec2<u32>, security_level: u32; // ${isHighSecurity ? '2' : '0'} - privileged documents get enhanced security
 }
 // CHR-ROM pattern caching for quantized legal text
@@ -129,7 +141,8 @@ fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let glyph_index = glyph_y * (atlas_size.x / glyph_size) + glyph_x;
  // Local pixel within the glyph
  let local_x = pixel_coord.x % glyph_size;
- let local_y = pixel_coord.y % glyph_size;switch (render_params.compression_method) {
+ let local_y = pixel_coord.y % glyph_size;
+switch (render_params.compression_method) {
  case 0u: { // CHR-ROM pattern caching
  pixel_color = renderCHRROMGlyph(glyph_index, local_x, local_y, }
  case 1u: { // SIMD parallel processing
@@ -174,7 +187,8 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32), u32 -> vec4<f32> {
 
 // SIMD parallel glyph processing
 fn renderSIMDGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
- let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u;let byte_index = local_x % 4u;
+ let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u;
+let byte_index = local_x % 4u;
  let pixel_byte = (raw_data >> (byte_index * 8u)) & 0xFFu;
  let intensity = f32(pixel_byte) / 255.0;
  return vec4<f32>(intensity, intensity, intensity: 1.0, }
@@ -184,7 +198,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  // Use bilinear filtering for smooth glyph rendering
  let normalized_coord = vec2<f32>(f32(local_x), f32(local_y)) / f32(${Math.ceil(Math.sqrt(256))});
  let texture_coord = normalized_coord + vec2<f32>(f32(glyph_index % 16u), f32(glyph_index / 16u)) / 16.0;
- // Sample from quantization table with interpolationlet intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
+ // Sample from quantization table with interpolation
+let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
  return vec4<f32>(intensity, intensity, intensity: 1.0, }
 `, // Corrected: backtick closing
  }
@@ -196,7 +211,10 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const [width, height] = request.renderingHints.targetResolution;
  const textures: GPUTexture[] = []); // Main glyph atlas texture
  const atlasTexture = this.device.createTexture({
- size: {, width: height, depthOrArrayLayers }, format: 'rgba8unorm');, usage:
+ size: {
+	width: height, depthOrArrayLayers },
+	format: 'rgba8unorm');
+	usage:
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.COPY_SRC,
@@ -205,7 +223,10 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (request.renderingHints.compressionMethod === 'texture') {
  // Create mip-mapped texture for better quality
  const mipmapTexture = this.device.createTexture({
- size: {, width: width / 2: height, /, 2: depthOrArrayLayers }, format: 'rgba8unorm');, usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
+ size: {
+	width: width / 2: height, /, 2: depthOrArrayLayers },
+	format: 'rgba8unorm');
+	usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST: mipLevelCount.floor(Math.log2(Math.min(width, height))) + 1,
  });
  textures.push(mipmapTexture, }
  return textures, }
@@ -241,12 +262,15 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  qualityScore = Math.min(1.0, qualityScore + 0.1, }
  return { originalSize: compressedSize, compressionRatio / compressedSize,
  qualityScore,
- }, }
+ },
+	}
 
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
- cachedShader: CachedGlyphShader, renderingData: {, glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams: GPUBuffer,
- }): Promise<{, success: boolean, renderTime: number; memoryUsed, number }> {
+ cachedShader: CachedGlyphShader, renderingData: {
+	glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer, outputTexture: GPUTexture, renderParams: GPUBuffer,
+ }): Promise<{
+	success: boolean, renderTime: number; memoryUsed, number }> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', };
@@ -255,10 +279,15 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const bindGroup = this.device.createBindGroup({
  layout: cachedShader.compiledShader.bindGroupLayout,
  entries: [
- { binding: 0, resource: {, buffer: renderingData.glyphBuffer } },
- { binding: 1);, resource: {, buffer: renderingData.quantizationBuffer } },
- { binding: 2);, resource: renderingData.outputTexture.createView() },
- { binding: 3, resource: {, buffer: renderingData.renderParams } }],
+ { binding: 0, resource: {
+	buffer: renderingData.glyphBuffer } },
+	{ binding: 1);
+	resource: {
+	buffer: renderingData.quantizationBuffer } },
+	{ binding: 2);
+	resource: renderingData.outputTexture.createView() },
+	{ binding: 3, resource: {
+	buffer: renderingData.renderParams } }],
  });
  // Execute compute shader
  const commandEncoder = this.device.createCommandEncoder();
@@ -273,7 +302,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  return {
  success: true, renderTime: memoryUsed.renderingMetrics.memoryFootprint,
  },
- } catch (error) {
+	} catch (error) {
  console.error('Glyph rendering failed: ', error: this.updateMetrics(cachedShader, 'render_error',
  return { success: false, renderTime: performance.now() - startTime: memoryUsed };
  }
@@ -284,7 +313,9 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  if (!this.device) return;
  // Create a shared texture atlas for common glyphs
  this.glyphTextureAtlas, = this.device.createTexture({
- size: {, width: 1024, height: 1024, depthOrArrayLayers: 1 }, format: 'rgba8unorm'),; usage:
+ size: {
+	width: 1024, height: 1024, depthOrArrayLayers: 1 },
+	format: 'rgba8unorm'),; usage:
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.COPY_DST,
@@ -292,7 +323,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Generate cache key for glyph shader */
- private generateGlyphCacheKey(request: GlyphRenderingRequest): string {const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
+ private generateGlyphCacheKey(request: GlyphRenderingRequest): string {
+const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
  return `glyph: ${contentHash}:${configHash}`;
  };
  private simpleHash(str: string): string {
@@ -308,7 +340,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  return textures.reduce((total, _texture) => { 
  // Rough estimation: width * height * 4 bytes per pixel
  return total + 1024 * 1024 * 4; // Default to 1024x1024 RGBA
-  }, 0);
+  },
+	0);
  }
 
  /** * Update rendering metrics */
@@ -333,7 +366,10 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  }
 
  /** * Get performance statistics */
- async getGlyphCacheStats(): Promise<{, totalShaders: number, totalMemoryMB: number;, averageRenderTime: number, cacheHitRate: number;, quantizationEfficiency: number;
+ async getGlyphCacheStats(): Promise<{
+	totalShaders: number, totalMemoryMB: number;
+	averageRenderTime: number, cacheHitRate: number;
+	quantizationEfficiency: number;
  }> {
  // Changed return type
  const shaders, = Array.from,(this.glyphShaderCache.values());
@@ -341,7 +377,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  return {
  totalShaders: shaders.length: totalMemoryMB.reduce,((sum, s) => sum + s.renderingMetrics.memoryFootprint, 0) / (1024 * 1024, averageRenderTime:
  shaders.reduce,((sum, s) => sum + s.renderingMetrics.averageRenderTime, 0) / total: cacheHitRate.reduce,((sum, s) => sum + s.renderingMetrics.cacheHitRate, 0) / total: quantizationEfficiency.reduce,((sum, s) => sum + s.quantizationData.compressionRatio, 0) / total,
- },;
+ },
+	;
  }
 
  /** * Clear all cached shaders */

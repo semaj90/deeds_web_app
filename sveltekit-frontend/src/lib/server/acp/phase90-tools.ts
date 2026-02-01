@@ -24,7 +24,8 @@ interface QdrantClientExt extends QdrantClient {
 			filter?: unknown;
 			with_payload?: boolean;
 		}
-	): Promise<{, points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
+	): Promise<{
+	points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
 	getCollection(collection_name: string): Promise<{ points_count?: number }>;
 }
 
@@ -39,21 +40,29 @@ interface RedisClientExt {
 
 // Types
 interface GlyphData {
-	errorCode: string;, filePath: string;
-	line: number;, message: string;
-	clusterId: number;, tech: string[];
+	errorCode: string;
+	filePath: string;
+	line: number;
+	message: string;
+	clusterId: number;
+	tech: string[];
 }
 
 interface SearchResult {
-	score: number;, message: string;
-	file: string;, code: string;
-	line: number;, clusterId: number;
+	score: number;
+	message: string;
+	file: string;
+	code: string;
+	line: number;
+	clusterId: number;
 	tech: string[];
 }
 
 interface ClusterInfo {
-	clusterId: number;, errorCount: number;
-	topCodes: string[];, topFiles: string[];
+	clusterId: number;
+	errorCount: number;
+	topCodes: string[];
+	topFiles: string[];
 	summary?: string;
 }
 
@@ -82,73 +91,90 @@ const PHASE90_TOOLS = [
 	{
 		name: 'phase90_search_errors',
 		description: 'Semantic search for TypeScript errors using CUDA embeddings.',
-		parameters: {, type: 'object',
-			properties: {, query: {
+		parameters: {
+	type: 'object',
+			properties: {
+	query: {
 					type: 'string',
 					description: 'Error message or pattern to search for'
 				},
-				topK: {, type: 'integer',
+	topK: {
+	type: 'integer',
 					default: 10,
 					description: 'Number of results (1-100)'
 				},
-				clusterId: {, type: 'integer',
+	clusterId: {
+	type: 'integer',
 					description: 'Optional: filter to specific cluster (0-11)'
 				}
 			},
-			required: ['query']
+	required: ['query']
 		}
 	},
 	{
 		name: 'phase90_get_cluster',
 		description: 'Get detailed information about an error cluster.',
-		parameters: {, type: 'object',
-			properties: {, clusterId: {
+		parameters: {
+	type: 'object',
+			properties: {
+	clusterId: {
 					type: 'integer',
 					description: 'Cluster ID (0-11)'
 				}
 			},
-			required: ['clusterId']
+	required: ['clusterId']
 		}
 	},
 	{
 		name: 'phase90_get_fix_order',
 		description: 'Get priority-ordered list of clusters to fix.',
-		parameters: {, type: 'object',
+		parameters: {
+	type: 'object',
 			properties: {}
 		}
 	},
 	{
 		name: 'phase90_query_glyphs',
 		description: 'Query Redis glyph cache for compact error signatures.',
-		parameters: {, type: 'object',
-			properties: {, clusterId: { type: 'integer', description: 'Filter by cluster ID' },
-				errorCode: {, type: 'string', description: 'Filter by error code' },
-				limit: {, type: 'integer', default: 50, description: 'Max results' }
+		parameters: {
+	type: 'object',
+			properties: {
+	clusterId: { type: 'integer', description: 'Filter by cluster ID' },
+	errorCode: {
+	type: 'string', description: 'Filter by error code' },
+	limit: {
+	type: 'integer', default: 50, description: 'Max results' }
 			}
 		}
 	},
 	{
 		name: 'phase90_get_stats',
 		description: 'Get system statistics.',
-		parameters: {, type: 'object', properties: {} }
+		parameters: {
+	type: 'object', properties: {} }
 	},
 	{
 		name: 'phase90_get_file_errors',
 		description: 'Get all indexed errors for a specific file path.',
-		parameters: {, type: 'object',
-			properties: {, filePath: { type: 'string', description: 'File path (can be partial)' },
-				limit: {, type: 'integer', default: 50 }
+		parameters: {
+	type: 'object',
+			properties: {
+	filePath: { type: 'string', description: 'File path (can be partial)' },
+	limit: {
+	type: 'integer', default: 50 }
 			},
-			required: ['filePath']
+	required: ['filePath']
 		}
 	},
 	{
 		name: 'phase90_get_fix_recommendation',
 		description: 'Get LLM-generated fix recommendation for a cluster.',
-		parameters: {, type: 'object',
-			properties: {, clusterId: { type: 'integer', description: 'Cluster ID (0-11)' }
+		parameters: {
+	type: 'object',
+			properties: {
+	clusterId: { type: 'integer', description: 'Cluster ID (0-11)' }
 			},
-			required: ['clusterId']
+	required: ['clusterId']
 		}
 	}
 ];
@@ -162,7 +188,9 @@ export async function phase90_search_errors(
 	const client = await getQdrant();
 
 	const filter = clusterId !== undefined
-		? { must: [{, key: 'cluster_id', match: {, value: clusterId } }] }
+		? { must: [{
+	key: 'cluster_id', match: {
+	value: clusterId } }] }
 		: undefined;
 
 	const results = await client.scroll('phase90_cuda_embeddings', {
@@ -204,8 +232,10 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
 	if (!cluster) {
 		const errors = await client.scroll('phase90_cuda_embeddings', {
 			limit: 1000,
-			filter: {, must: [{ key: 'cluster_id', match: {, value: clusterId } }] },
-			with_payload: true
+			filter: {
+	must: [{ key: 'cluster_id', match: {
+	value: clusterId } }] },
+	with_payload: true
 		});
 
 		const codes: Record<string, number> = {};
@@ -242,7 +272,8 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
 }
 
 export async function phase90_get_fix_order(): Promise<
-	{ clusterId: number;, errorCount: number; priority: number }[]
+	{ clusterId: number;
+	errorCount: number; priority: number }[]
 > {
 	const client = await getQdrant();
 
@@ -303,8 +334,12 @@ export async function phase90_query_glyphs(
 	return glyphs;
 }
 
-export async function phase90_get_stats(): Promise<{, qdrant: { embeddings: number;, clusters: number; recommendations: number };
-	redis: {, totalKeys: number; glyphKeys: number;, embedKeys: number };
+export async function phase90_get_stats(): Promise<{
+	qdrant: { embeddings: number;
+	clusters: number; recommendations: number };
+	redis: {
+	totalKeys: number; glyphKeys: number;
+	embedKeys: number };
 }> {
 	const qdrantClient = await getQdrant();
 	const redisClient = await getRedis();
@@ -318,11 +353,12 @@ export async function phase90_get_stats(): Promise<{, qdrant: { embeddings: numb
 	const embedKeys = await redisClient.keys('embed:*');
 
 	return {
-		qdrant: {, embeddings: embeddings.points_count ?? 0,
+		qdrant: {
+	embeddings: embeddings.points_count ?? 0,
 			clusters: clusters.points_count ?? 0,
 			recommendations: recs.points_count ?? 0
 		},
-		redis: {
+	redis: {
 			totalKeys,
 			glyphKeys: glyphKeys.length,
 			embedKeys: embedKeys.length
@@ -360,8 +396,10 @@ export async function phase90_get_file_errors(
 	}));
 }
 
-export async function phase90_get_fix_recommendation(clusterId: number): Promise<{, clusterId: number;
-	recommendation: string;, priority: string;
+export async function phase90_get_fix_recommendation(clusterId: number): Promise<{
+	clusterId: number;
+	recommendation: string;
+	priority: string;
 	affectedFiles: string[];
 } | null> {
 	const client = await getQdrant();

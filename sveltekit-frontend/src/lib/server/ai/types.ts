@@ -5,36 +5,49 @@
 export interface OllamaConfig {
     baseUrl: string;
     endpoints?: Record<string, string>;
-    defaultModel: string;, embeddingModel: string;
+    defaultModel: string;
+	embeddingModel: string;
     fallbackModel?: string;
-    fallbackModels?: {, legal: string;
+    fallbackModels?: {
+	legal: string;
         general: string;
     };
-    timeout: number;, maxRetries: number;
-    streamEnabled: boolean;, gpu: GpuConfig;
-    performance: PerformanceConfig;, features: FeaturesConfig;
+    timeout: number;
+	maxRetries: number;
+    streamEnabled: boolean;
+	gpu: GpuConfig;
+    performance: PerformanceConfig;
+	features: FeaturesConfig;
 }
 
 export interface GpuConfig {
-    enabled: boolean;, layers: number;
-    mainGpu: number;, tensorSplit: number[] | null;
+    enabled: boolean;
+	layers: number;
+    mainGpu: number;
+	tensorSplit: number[] | null;
 }
 
 export interface PerformanceConfig {
-    batchSize: number;, parallelRequests: number;
-    cacheEnabled: boolean;, cacheTTL: number;
+    batchSize: number;
+	parallelRequests: number;
+    cacheEnabled: boolean;
+	cacheTTL: number;
 }
 
 export interface FeaturesConfig {
-    som: boolean;, proactiveCaching: boolean;
-    multiModalIndexing: boolean;, reinforcementLearning: boolean;
+    som: boolean;
+	proactiveCaching: boolean;
+    multiModalIndexing: boolean;
+	reinforcementLearning: boolean;
     webGpuAcceleration: boolean;
     intelligentFallback?: boolean;
 }
 
 export interface ModelConfig {
-    name: string;, type: 'local' | 'legal-fallback' | 'general-fallback' | 'embedding' | 'embedding-fallback' | 'fallback';
-    capabilities: string[];, contextWindow: number;
+    name: string;
+	type: 'local' | 'legal-fallback' | 'general-fallback' | 'embedding' | 'embedding-fallback' | 'fallback';
+    capabilities: string[];
+	contextWindow: number;
     embeddingDimension?: number;
     temperature?: number;
     topP?: number;
@@ -44,7 +57,8 @@ export interface ModelConfig {
 }
 
 export interface OllamaGenerateRequest {
-    model: string;, prompt: string;
+    model: string;
+	prompt: string;
     system?: string;
     template?: string;
     context?: number[];
@@ -65,12 +79,15 @@ export interface OllamaGenerateRequest {
 }
 
 export interface OllamaEmbeddingRequest {
-    model: string;, prompt: string;
+    model: string;
+	prompt: string;
 }
 
 export interface OllamaResponse {
-    model: string;, created_at: string;
-    response?: string;, done: boolean;
+    model: string;
+	created_at: string;
+    response?: string;
+	done: boolean;
     context?: number[];
     total_duration?: number;
     load_duration?: number;
@@ -87,10 +104,13 @@ export interface OllamaEmbeddingResponse {
 }
 
 export interface DocumentChunk {
-    id: string;, content: string;
-    metadata: {, source: string;
+    id: string;
+	content: string;
+    metadata: {
+	source: string;
         page?: number;
-        section?: string;, timestamp: Date;
+        section?: string;
+	timestamp: Date;
         documentType?: string;
     };
     embedding?: number[];
@@ -98,31 +118,43 @@ export interface DocumentChunk {
 }
 
 export interface SOMNode {
-    x: number;, y: number;
-    weight: number[];, documents: string[];
+    x: number;
+	y: number;
+    weight: number[];
+	documents: string[];
     topic?: string;
 }
 
 export interface ProcessingPipeline {
-    id: string;, status: 'pending' | 'processing' | 'completed' | 'failed';
-    stages: {, ingestion: boolean;
-        preprocessing: boolean;, embedding: boolean;
-        indexing: boolean;, somTraining: boolean;
+    id: string;
+	status: 'pending' | 'processing' | 'completed' | 'failed';
+    stages: {
+	ingestion: boolean;
+        preprocessing: boolean;
+	embedding: boolean;
+        indexing: boolean;
+	somTraining: boolean;
         caching: boolean;
     };
-    error?: string;, startTime: Date;
+    error?: string;
+	startTime: Date;
     endTime?: Date;
-    metrics?: {, documentsProcessed: number;
-        chunksGenerated: number;, embeddingsCreated: number;
+    metrics?: {
+	documentsProcessed: number;
+        chunksGenerated: number;
+	embeddingsCreated: number;
         processingTimeMs: number;
     };
 }
 
 export interface LegalDocument {
-    id: string;, title: string;
+    id: string;
+	title: string;
     type: 'contract' | 'case' | 'statute' | 'brief' | 'memo' | 'other';
-    content: string;, metadata: {
-        dateCreated: Date;, dateModified: Date;
+    content: string;
+	metadata: {
+        dateCreated: Date;
+	dateModified: Date;
         author?: string;
         jurisdiction?: string;
         court?: string;
@@ -132,21 +164,28 @@ export interface LegalDocument {
     };
     chunks: DocumentChunk[];
     embedding?: number[];
-    somCoordinates?: {, x: number; y: number };
+    somCoordinates?: {
+	x: number; y: number };
     relevanceScore?: number;
 }
 
 export interface AnalysisResult {
-    documentId: string;, summary: string;
-    keyPoints: string[];, entities: {
-        people: string[];, organizations: string[];
-        dates: string[];, locations: string[];
+    documentId: string;
+	summary: string;
+    keyPoints: string[];
+	entities: {
+        people: string[];
+	organizations: string[];
+        dates: string[];
+	locations: string[];
         legalConcepts: string[];
     };
     sentiment: 'positive' | 'negative' | 'neutral';
     riskFactors?: string[];
     recommendations?: string[];
-    citations?: Array<{, text: string; source: string;, confidence: number }>;
+    citations?: Array<{
+	text: string; source: string;
+	confidence: number }>;
     metadata?: {
         modelUsed?: string;
         timestamp?: string;
@@ -155,32 +194,45 @@ export interface AnalysisResult {
 }
 
 export interface UserQuery {
-    id: string;, userId: string;
-    query: string;, timestamp: Date;
+    id: string;
+	userId: string;
+    query: string;
+	timestamp: Date;
     context?: {
         previousQueries?: string[];
-        activeDocument?: string;, sessionId: string;
+        activeDocument?: string;
+	sessionId: string;
     };
-    response?: {, text: string;
-        sources: string[];, confidence: number;
+    response?: {
+	text: string;
+        sources: string[];
+	confidence: number;
         processingTimeMs: number;
     };
 }
 
 export interface CacheEntry {
-    key: string;, value: unknown;
-    ttl: number;, created: Date;
-    lastAccessed: Date;, accessCount: number;
+    key: string;
+	value: unknown;
+    ttl: number;
+	created: Date;
+    lastAccessed: Date;
+	accessCount: number;
     priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 // RAG Configuration
 export interface SimpleRAGConfiguration {
-    embeddingModel: string;, embeddingDimensions: number;
-    llmModel: string;, ollamaBaseUrl: string;
-    chunkSize: number;, chunkOverlap: number;
-    maxRetries: number;, timeoutMs: number;
-    cacheEnabled: boolean;, cacheTtl: number;
+    embeddingModel: string;
+	embeddingDimensions: number;
+    llmModel: string;
+	ollamaBaseUrl: string;
+    chunkSize: number;
+	chunkOverlap: number;
+    maxRetries: number;
+	timeoutMs: number;
+    cacheEnabled: boolean;
+	cacheTtl: number;
 }
 
 export type RAGConfiguration = SimpleRAGConfiguration; // compatibility alias for config.ts

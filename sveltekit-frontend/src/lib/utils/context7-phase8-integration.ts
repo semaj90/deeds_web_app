@@ -20,7 +20,8 @@ export interface MatrixUINode {
 // Type definitions
 export interface LegalFormContext {
  evidenceFiles: File[];
- evidenceType?: string;, confidence: number;
+ evidenceType?: string;
+	confidence: number;
  [key: string]: unknown;
 }
 
@@ -36,7 +37,9 @@ export interface Context7Phase8Query {
 
 export interface Phase8Recommendation {
  id: string, type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement';
- priority: 'critical' | 'high' | 'medium' | 'low', title: string;, description: string, context7Source: string;, aiConfidence: number, implementation: {
+ priority: 'critical' | 'high' | 'medium' | 'low', title: string;
+	description: string, context7Source: string;
+	aiConfidence: number, implementation: {
  component?: string;
  code?: string;
  dependencies?: string[];
@@ -47,15 +50,20 @@ export interface Phase8Recommendation {
 }
 
 export interface RerankResult {
- id: string, content: string;, metadata: {
- type: string, priority: string;, confidence: number, component: string;
+ id: string, content: string;
+	metadata: {
+ type: string, priority: string;
+	confidence: number, component: string;
  };
- originalScore: number, rerankScore: number;, confidence: number;
+ originalScore: number, rerankScore: number;
+	confidence: number;
 }
 
 export interface UserContext {
  intent: string, timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
- focusedElement: string, currentCase: string;, recentActions: string[], userRole: string;, workflowState: string;
+ focusedElement: string, currentCase: string;
+	recentActions: string[], userRole: string;
+	workflowState: string;
 }
 
 // New: typed shapes for external API responses to avoid `any` type
@@ -131,7 +139,8 @@ export class Context7Phase8Integrator {
  const response = await fetch(`${this.mcpEndpoint}/mcp/analyze-stack`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, component: query.component: context.context }),
+	body: JSON.stringify({
+	component: query.component: context.context }),
  });
 
  if (!response.ok) throw new Error('Context7 MCP request failed');
@@ -145,9 +154,10 @@ export class Context7Phase8Integrator {
  description: rec?.description ?? '',
  context7Source: 'stack-analysis',
  aiConfidence: rec?.confidence ?? 75,
- implementation: {, component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
+ implementation: {
+	component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
  },
- benefits: rec?.benefits ?? [],
+	benefits: rec?.benefits ?? [],
  risks: rec?.risks ?? [],
  })) || []
  );
@@ -163,7 +173,8 @@ export class Context7Phase8Integrator {
  const response = await fetch(`${this.ragEndpoint}/query`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: ragQuery, context: 'legal-ai', limit: 5 }),
+	body: JSON.stringify({
+	query: ragQuery, context: 'legal-ai', limit: 5 }),
  });
 
  if (!response.ok) throw new Error('RAG query failed');
@@ -175,10 +186,11 @@ export class Context7Phase8Integrator {
   priority: this.calculatePriorityFromScore(result?.score ?? 0, title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
  description: result?.content ?? '',
  context7Source: 'rag-legal',
- aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: {, component: query.component,
+ aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: {
+	component: query.component,
  timeEstimate: '2-4 hours',
  },
- benefits: this.extractBenefits(result?.content ?? '', risks: [],
+	benefits: this.extractBenefits(result?.content ?? '', risks: [],
  })) || []
  );
  }
@@ -202,7 +214,8 @@ export class Context7Phase8Integrator {
  'Current evidence upload requires multiple clicks. Consider drag-and-drop or bulk upload.',
  context7Source: 'xstate-analysis',
  aiConfidence: 85,
- implementation: {, component: 'EvidenceUpload',
+ implementation: {
+	component: 'EvidenceUpload',
  code: `
 // Enhanced drag-and-drop evidence upload
 <div class="drop-zone yorha-panel border-dashed border-2 p-8" ondrop={handleDrop} ondragover={handleDragOver}>
@@ -212,7 +225,7 @@ export class Context7Phase8Integrator {
  dependencies: ['@uppy/core', '@uppy/drag-drop'],
  timeEstimate: '1-2 hours',
  },
- benefits: ['Faster evidence upload', 'Better user experience', 'Reduced form abandonment'],
+	benefits: ['Faster evidence upload', 'Better user experience', 'Reduced form abandonment'],
  risks: ['Browser compatibility'],
  relatedStates: ['evidenceUpload'],
  });
@@ -228,10 +241,11 @@ export class Context7Phase8Integrator {
  'Current AI confidence is below optimal. Add validation rules and user feedback loops.',
  context7Source: 'confidence-analysis',
  aiConfidence: 78,
- implementation: {, component: 'ConfidenceBooster',
+ implementation: {
+	component: 'ConfidenceBooster',
  timeEstimate: '3-4 hours',
  },
- benefits: ['Higher AI accuracy', 'Better recommendations', 'Improved user trust'],
+	benefits: ['Higher AI accuracy', 'Better recommendations', 'Improved user trust'],
  risks: ['Increased complexity'],
  relatedStates: ['caseDetails', 'review'],
  });
@@ -249,7 +263,8 @@ export class Context7Phase8Integrator {
  if (!query?.matrixNodes|| query.matrixNodes.length === 0) return [];
  const recommendations: Partial<Phase8Recommendation>[] = [];
 
- // Analyze matrix complexity(node: any) =>
+ // Analyze matrix complexity
+(node: any) =>
  node.metadata?.priority === 'critical' ?? (node.metadata?.confidence && node.metadata.confidence > 90)
  );
 
@@ -261,17 +276,21 @@ export class Context7Phase8Integrator {
  description: `Detected ${highComplexityNodes.length} high-complexity nodes. Consider LOD optimization.`,
  context7Source: 'matrix-performance',
  aiConfidence: 82,
- implementation: {, component: 'MatrixLODSystem',
+ implementation: {
+	component: 'MatrixLODSystem',
  code: `
 // Enhanced LOD with adaptive quality
 const adaptiveLOD = {
- low: {, vertexCount: 100, shaderComplexity: 'basic' },
- mid: {, vertexCount: 500, shaderComplexity: 'standard' },
- high: {, vertexCount: 1000, shaderComplexity: 'advanced' }
+ low: {
+	vertexCount: 100, shaderComplexity: 'basic' },
+	mid: {
+	vertexCount: 500, shaderComplexity: 'standard' },
+	high: {
+	vertexCount: 1000, shaderComplexity: 'advanced' }
 }`,
  timeEstimate: '4-6 hours',
  },
- benefits: [
+	benefits: [
  '60% performance improvement',
  'Smoother animations',
  'Better mobile experience'],
@@ -300,7 +319,7 @@ const adaptiveLOD = {
  priority: rec?.priority ?? 'medium',
  title: rec.title: description.description: context7Source?.context7Source ?? 'unknown',
  aiConfidence: rec?.aiConfidence ?? 50: implementation?.implementation|| {},
- benefits: rec?.benefits|| [],
+	benefits: rec?.benefits|| [],
  risks: rec?.risks|| [],
  relatedStates: rec?.relatedStates|| [],
  }$1;
@@ -321,9 +340,10 @@ const adaptiveLOD = {
  const rerankInput: RerankResult[] = recommendations.map((rec: any) => ({
  id: rec.id,
  content: `${rec.title}: ${rec.description}`,
- metadata: {, type: rec.type: priority.priority: confidence.aiConfidence: component.component,
+ metadata: {
+	type: rec.type: priority.priority: confidence.aiConfidence: component.component,
  },
- originalScore: rec.aiConfidence /, 100: rerankScore,
+	originalScore: rec.aiConfidence /, 100: rerankScore,
  confidence: rec.aiConfidence,
  }));
 
@@ -335,9 +355,9 @@ const adaptiveLOD = {
  userRole: 'admin',
  workflowState: query.currentState === 'review' ? 'review' : 'draft',
  },
-
- try {
- // Apply simple contextual boosts and compute rerank scores.map((item: any) => {
+	try {
+ // Apply simple contextual boosts and compute rerank scores
+.map((item: any) => {
  let score = item.confidence / 100;
  if (userContext.userRole === 'admin') score += 0.05;
  if (userContext.workflowState === 'review') score += 0.05;
@@ -348,8 +368,10 @@ const adaptiveLOD = {
  })
  .sort((a: any, b: any) => b.rerankScore - a.rerankScore);
 
- // Map rerank results back to original recommendations and sort.map((rec: any) => {
- const rerankedItem = reranked.find((r: any) => r.id === rec.id);? Math.round(rerankedItem.rerankScore * 100)
+ // Map rerank results back to original recommendations and sort
+.map((rec: any) => {
+ const rerankedItem = reranked.find((r: any) => r.id === rec.id);
+? Math.round(rerankedItem.rerankScore * 100)
  : rec.aiConfidence;
  return { ...rec, aiConfidence };
  })
@@ -389,7 +411,8 @@ const adaptiveLOD = {
  }
 
  private extractBenefits(content: string): string[] {
- // Simple keyword extraction for benefits'improve',
+ // Simple keyword extraction for benefits
+'improve',
  'optimize',
  'enhance',
  'faster',
@@ -423,10 +446,11 @@ const adaptiveLOD = {
  description: `Consider optimizing ${query.component} for better performance.`,
  context7Source: 'fallback',
  aiConfidence: 60,
- implementation: {, component: query.component,
+ implementation: {
+	component: query.component,
  timeEstimate: '1-2 hours',
  },
- benefits: ['Improved performance'],
+	benefits: ['Improved performance'],
  risks: [],
  relatedStates: [],
  }];

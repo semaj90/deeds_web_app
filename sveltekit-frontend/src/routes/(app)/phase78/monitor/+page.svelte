@@ -1,22 +1,37 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface MonitoringStats {
- timestamp: string;, summary: {
- totalErrors: number;, totalRoutes: number;
- totalClusters: number;, totalSuggestions: number;
+ timestamp: string;
+summary: {
+ totalErrors: number;
+totalRoutes: number;
+ totalClusters: number;
+totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: {, bySeverity: Array<{ severity: string;, count: number }> };
- routes: {, byHealth: Array<{ state: string;, count: number }>;
- top: Array<{, routePath: string;
- errorState: string;, recentErrorCount: number;
+ errors: {
+bySeverity: Array<{ severity: string;
+count: number }> };
+ routes: {
+byHealth: Array<{ state: string;
+count: number }>;
+ top: Array<{
+routePath: string;
+ errorState: string;
+recentErrorCount: number;
  lastErrorAt: string;
  }>;
  };
- suggestions: {, byRisk: Array<{ level: string;, count: number }>; applied: number;, effectiveness: number };
- topErrors: Array<{, tsCode: string; count: number;, messages: string[] }>;
- errorVelocity: Array<{, date: string; count: number }>;
+ suggestions: {
+byRisk: Array<{ level: string;
+count: number }>; applied: number;
+effectiveness: number };
+ topErrors: Array<{
+tsCode: string; count: number;
+messages: string[] }>;
+ errorVelocity: Array<{
+date: string; count: number }>;
  }
 
 	let stats = $state<MonitoringStats | null>(null);
@@ -43,11 +58,13 @@
  }
 
  // Auto-refresh every 30 seconds
- onMount(() => {
+ $effect(() => {
+
  loadStats();
  const interval = setInterval(loadStats, 30000);
  return () => clearInterval(interval);
- });
+ 
+});
 
  const getSeverityIcon = (severity: string) => {
  const icons: Record<string, string> = {

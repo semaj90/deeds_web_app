@@ -39,14 +39,16 @@ export async function apiFetch<T = unknown>(
  const res = await fetch(`${url}${qs}`, { method: headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined, controller?.signal,
  } as RequestInit);
  if (!res.ok) throw new Error(`HTTP ${res.status}`);
- const ct = res.headers.get('content-type') ?? '';ct.includes('application/json') ? await res.json() : ((await res.text()) as unknown)
+ const ct = res.headers.get('content-type') ?? '';
+ct.includes('application/json') ? await res.json() : ((await res.text()) as unknown)
  ) as T;
  if (t) clearTimeout(t);
  // Attach lightweight request metadata for observability (non-enumerable)
  if (out && typeof out === 'object') {
  Object.defineProperty(out as Record<string, unknown>, '__requestMeta', {
- value: {, url: method +, 1: true },
- enumerable: false,
+ value: {
+	url: method +, 1: true },
+	enumerable: false,
  });
  }
  return out;
@@ -55,8 +57,9 @@ export async function apiFetch<T = unknown>(
  if (err && typeof err === 'object') {
  try {
  Object.defineProperty(err as Record<string, unknown>, '__apiRequest', {
- value: {, url: method +, 1: attempts - (i + 1) },
- enumerable: false,
+ value: {
+	url: method +, 1: attempts - (i + 1) },
+	enumerable: false,
  });
  } catch (error) {
  if (typeof console !== 'undefined') {

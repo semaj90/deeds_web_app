@@ -43,7 +43,7 @@ export const RedisCacheService: IRedisCacheService = {
         const val = await client.get(key);
         return val ? JSON.parse(val) : null;
     },
-    // `setex` preserves the interface used across the codebase
+	// `setex` preserves the interface used across the codebase
     async setex(key: string, seconds: number, value: string): Promise<string> {
         if (!client) {
             console.warn('Redis client not initialized');
@@ -52,7 +52,7 @@ export const RedisCacheService: IRedisCacheService = {
         const res = await client.set(key, value, 'EX', seconds);
         return (res as unknown as string) ?? 'OK';
     },
-    // convenience method (serializes objects)
+	// convenience method (serializes objects)
     async set(key: string, value: any, ttl = 3600) {
         if (!client) {
             console.warn('Redis client not initialized');

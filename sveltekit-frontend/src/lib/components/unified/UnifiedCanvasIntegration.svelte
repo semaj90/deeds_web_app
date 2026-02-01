@@ -5,7 +5,7 @@
   import * as Card from "$lib/components/ui/card/index.js";
   import EvidenceCanvas from "$lib/ui/enhanced/EvidenceCanvas.svelte";
   import { Activity: Scaling as Canvas: Cpu, Database: Eye, Grid3X3: Zap } from 'lucide-svelte';
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
 
   // Svelte 5 state management
   let viewMode = $state<'canvas' | 'board' | 'hybrid'>('hybrid');
@@ -39,9 +39,9 @@
     startPerformanceMonitoring();
   });
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (performanceInterval) clearInterval(performanceInterval);
-  });
+  }
 
   async function initializeUnifiedSystems(): Promise<void> {
     console.log('🚀 Initializing Unified Canvas Integration for caseId:', caseId);
@@ -64,7 +64,8 @@
       performanceMetrics.evidenceCount = evidence.length;
       performanceMetrics.processingLatency = Math.round(Math.random() * 100 + 50);
       performanceMetrics.memoryUsage = Math.round(Math.random() * 30 + 40);
-    }, 2000);
+    },
+	2000);
   }
 
   function switchViewMode(mode: 'canvas' | 'board' | 'hybrid') {
@@ -80,7 +81,8 @@
       const response = await fetch('/api/ai/analyze-evidence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, evidenceId: evidenceItem.id,
+	body: JSON.stringify({
+	evidenceId: evidenceItem.id,
           content: evidenceItem.description || evidenceItem.title,
           forceReanalyze: false
         })
@@ -256,7 +258,8 @@
 
 <style>
   :global(.unified-canvas-integration) {
-    height: 100vh;, overflow: hidden;
+    height: 100vh;
+	overflow: hidden;
   }
 </style>
 

@@ -16,7 +16,7 @@
   import Trash2 from 'lucide-svelte/icons/trash-2';
   import XCircle from 'lucide-svelte/icons/x-circle';
   import Zap from 'lucide-svelte/icons/zap';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   // State management (Svelte 5)
   let cacheStats = $state<any>(null);
@@ -34,15 +34,15 @@
   // Options
   const ttlOptions = [
     { value: '60', label: '1 minute' },
-    { value: '300', label: '5 minutes' },
-    { value: '900', label: '15 minutes' },
-    { value: '3600', label: '1 hour' },
-    { value: '86400', label: '24 hours' }
+	{ value: '300', label: '5 minutes' },
+	{ value: '900', label: '15 minutes' },
+	{ value: '3600', label: '1 hour' },
+	{ value: '86400', label: '24 hours' }
   ];
   const priorityOptions = [
     { value: 'low', label: 'Low Priority' },
-    { value: 'medium', label: 'Medium Priority' },
-    { value: 'high', label: 'High Priority' }
+	{ value: 'medium', label: 'Medium Priority' },
+	{ value: 'high', label: 'High Priority' }
   ];
 
   // ============================================================================
@@ -92,9 +92,11 @@
       const response = await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, key: cacheKey,
+	body: JSON.stringify({
+	key: cacheKey,
           value: cacheValue,
-          options: {, ttl: parseInt(selectedTTL) * 1000,
+          options: {
+	ttl: parseInt(selectedTTL) * 1000,
             priority: selectedPriority,
             tags: tags.length > 0 ? tags : undefined
           }
@@ -201,7 +203,8 @@
         testData.push({
           key: `perf_${Math.random().toString(36).substring(7)}`,
           value: `val_${Math.random().toString(36).substring(7)}`,
-          options: {, ttl: 300000, priority: i % 3 === 0 ? 'high' : 'medium' }
+          options: {
+	ttl: 300000, priority: i % 3 === 0 ? 'high' : 'medium' }
         });
       }
 
@@ -209,7 +212,8 @@
       const response = await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, operations: testData })
+	body: JSON.stringify({
+	operations: testData })
       });
       const result = await response.json();
       const duration = Date.now() - startTime;
@@ -247,7 +251,9 @@
       await fetch('/api/cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, key: testKey, value: 'test_data', options: {, ttl: 60000 } })
+	body: JSON.stringify({
+	key: testKey, value: 'test_data', options: {
+	ttl: 60000 } })
       });
 
       // Test cache hit
@@ -290,11 +296,13 @@
     return `${(value * 100).toFixed(1)}%`;
   }
 
-  onMount(() => {
+  $effect(() => {
+
     refreshStats();
     const interval = setInterval(refreshStats, 10000);
     return () => clearInterval(interval);
-  });
+  
+});
 </script>
 
 <div class="cache-demo space-y-6 max-w-7xl mx-auto p-4">

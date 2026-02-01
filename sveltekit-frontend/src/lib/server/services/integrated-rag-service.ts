@@ -28,8 +28,10 @@ const queryClient = postgres(DATABASE_URL);
 const db = drizzle(queryClient);
 
 interface LokiDocument {
-	id: string;, title: string;
-	content: string;, chunks: number;
+	id: string;
+	title: string;
+	content: string;
+	chunks: number;
 	timestamp: number;
 }
 
@@ -102,14 +104,16 @@ export async function initializeIntegratedRAG(): Promise<void> {
 
 				if (!exists) {
 					await qdrantClient.createCollection('legal-documents', {
-						vectors: {, size: 768, distance: 'Cosine' }
+						vectors: {
+	size: 768, distance: 'Cosine' }
 					});
 				}
 			} catch (err) {
 				// Fallback creation if check fails
 				try {
 					await qdrantClient.createCollection('legal-documents', {
-						vectors: {, size: 768, distance: 'Cosine' }
+						vectors: {
+	size: 768, distance: 'Cosine' }
 					});
 				} catch (createErr) {
 					// Ignore exists error
@@ -141,7 +145,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest', prompt: text })
+	body: JSON.stringify({
+	model: 'embeddinggemma:latest', prompt: text })
 		});
 
 		if (!response.ok) throw new Error(`Embedding failed: ${response.statusText}`);
@@ -162,8 +167,10 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 // Document Processing
 export async function processDocument(
-    file: {, name: string; type: string;, size: number; arrayBuffer: () => Promise<ArrayBuffer> },
-    content: string
+    file: {
+	name: string; type: string;
+	size: number; arrayBuffer: () => Promise<ArrayBuffer> },
+	content: string
 ): Promise<any> {
 	await initializeIntegratedRAG();
 
@@ -208,7 +215,8 @@ export async function processDocument(
 				file_type: file.type,
 				file_size: file.size,
 				embedding: sql`${JSON.stringify(embeddings[i])}::vector`,
-				metadata: {, source_file: filename, chunkIndex: i, totalChunks: chunks.length }
+				metadata: {
+	source_file: filename, chunkIndex: i, totalChunks: chunks.length }
 			});
 		} catch (e) {
 			console.error(`❌ Chunk ${i} insert failed`, e);
@@ -222,7 +230,8 @@ export async function processDocument(
 				id: `${documentId}_chunk_${i}`, // Qdrant usually wants UUID or int, skipping simple ID if strict
                 // Assuming string ID is enabled in config or using hash
 				vector: embeddings[i],
-				payload: {, content: chunk,
+				payload: {
+	content: chunk,
 					filename: filename,
 					chunkIndex: i,
 					tags: autoTagContent(chunk)
@@ -296,7 +305,8 @@ export async function searchSimilarDocuments(query: string, limit = 5): Promise<
             results = qdrantResults.map((r: any) => ({
 				content: (r.payload?.content as string) ?? '',
 				similarity: r.score,
-				metadata: {, source_file: r.payload?.filename,
+				metadata: {
+	source_file: r.payload?.filename,
 					chunkIndex: r.payload?.chunkIndex,
 					tags: r.payload?.tags
 				}

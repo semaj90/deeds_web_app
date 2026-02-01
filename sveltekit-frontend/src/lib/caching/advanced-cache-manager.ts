@@ -1,5 +1,8 @@
 export interface CacheConfiguration {
-    maxSize: number;, ttl: number;, compression: boolean;, persistence: boolean;
+    maxSize: number;
+	ttl: number;
+	compression: boolean;
+	persistence: boolean;
 }
 
 export interface CacheLayerInterface<T = unknown> {
@@ -63,7 +66,8 @@ export class AdvancedCacheManager<T = unknown> implements CacheLayerInterface<T>
         const g = globalThis as unknown as {
             btoa?: (input: string) => string;
             atob?: (input: string) => string;
-            Buffer?: {, from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
+            Buffer?: {
+	from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
         };
 
         const hasBrowserBase64 = typeof g.btoa === 'function' && typeof g.atob === 'function';
@@ -74,7 +78,8 @@ export class AdvancedCacheManager<T = unknown> implements CacheLayerInterface<T>
     private base64Encode(input: string): string {
         const g = globalThis as unknown as {
              btoa?: (input: string) => string;
-             Buffer?: {, from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
+             Buffer?: {
+	from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
         };
 
         if (typeof g.btoa === 'function') {
@@ -89,7 +94,8 @@ export class AdvancedCacheManager<T = unknown> implements CacheLayerInterface<T>
     private base64Decode(b64: string): string {
         const g = globalThis as unknown as {
              atob?: (input: string) => string;
-             Buffer?: {, from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
+             Buffer?: {
+	from: (input: string, enc?: string) => { toString: (enc?: string) => string } }
         };
 
         if (typeof g.atob === 'function') {

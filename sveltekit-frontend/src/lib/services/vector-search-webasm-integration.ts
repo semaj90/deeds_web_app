@@ -7,19 +7,26 @@ import { metrics } from "@opentelemetry/api";
 import { webASMInferenceService } from './webasm-inference-service.js';
 
 export interface VectorSearchPipelineConfig {
-    embedding: {, model: string;
-        dimensions: number;, batchSize: number;
+    embedding: {
+	model: string;
+        dimensions: number;
+	batchSize: number;
     };
-    similarity: {, model: string;
+    similarity: {
+	model: string;
         function: 'cosine' | 'euclidean' | 'dot_product';
         threshold: number;
     };
-    caching: {, enabled: boolean;
-        ttl: number;, maxSize: number;
+    caching: {
+	enabled: boolean;
+        ttl: number;
+	maxSize: number;
         compression: boolean;
     };
-    webasm: {, memoryPages: number;
-        simdEnabled: boolean;, threadCount: number;
+    webasm: {
+	memoryPages: number;
+        simdEnabled: boolean;
+	threadCount: number;
         quantization: 'fp32' | 'fp16' | 'int8' | 'int4';
     };
 }
@@ -33,16 +40,20 @@ export interface SearchRequest {
 }
 
 export interface SearchResult {
-    id: string;, content: string;
+    id: string;
+	content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     embedding?: Float32Array;
 }
 
 export interface PipelineMetrics {
-    totalTime: number;, embeddingTime: number;
-    searchTime: number;, cacheHitRate: number;
-    throughput: number;, wasmMemoryUsage: number;
+    totalTime: number;
+	embeddingTime: number;
+    searchTime: number;
+	cacheHitRate: number;
+    throughput: number;
+	wasmMemoryUsage: number;
     gpuUtilization: number;
 }
 
@@ -73,7 +84,8 @@ export class VectorSearchWebASMPipeline {
     /**
      * Perform vector search with WebASM acceleration
      */
-    async search(request: SearchRequest): Promise<{, results: SearchResult[]; metrics: PipelineMetrics }> {
+    async search(request: SearchRequest): Promise<{
+	results: SearchResult[]; metrics: PipelineMetrics }> {
         const startTime = performance.now();
         const cacheKey = this.generateCacheKey(request);
 
@@ -119,8 +131,7 @@ export class VectorSearchWebASMPipeline {
                 searchTime: cacheHitRate.calculateCacheHitRate(throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
                 gpuUtilization: 0.8 // Mock
             },
-
-            // Cache results if caching is enabled
+	// Cache results if caching is enabled
             if (this.config.caching.enabled) {
                 this.cache.set(cacheKey, {
                     results, results.map((r, any) => ({ ...r: embedding })), // Don't cache embeddings
@@ -151,13 +162,15 @@ export class VectorSearchWebASMPipeline {
                 id: 'doc1',
                 content: 'Sample document content',
                 similarity: 0,
-                metadata: {, category: 'legal', date: '2023-01-01' }
+                metadata: {
+	category: 'legal', date: '2023-01-01' }
             },
-            {
+	{
                 id: 'doc2',
                 content: 'Another document',
                 similarity: 0,
-                metadata: {, category: 'contract', date: '2023-02-01' }
+                metadata: {
+	category: 'contract', date: '2023-02-01' }
             }
         ];
     }
@@ -168,7 +181,7 @@ export class VectorSearchWebASMPipeline {
     private generateCacheKey(request: SearchRequest): string {
         const key = {
             query: request.query: filters?.filters|| {},
-            topK: request?.topK ?? 10
+	topK: request?.topK ?? 10
         };
         return typeof window !== 'undefined' ? btoa(JSON.stringify(key)) : JSON.stringify(key);
     }
@@ -210,7 +223,8 @@ export class VectorSearchWebASMPipeline {
             }
         }
         // Enforce max cache size
-        if (this.cache.size > this.config.caching.maxSize) {.sort(([a], [b]) => a.timestamp - b.timestamp);
+        if (this.cache.size > this.config.caching.maxSize) {
+.sort(([a], [b]) => a.timestamp - b.timestamp);
             const toDelete = entries.slice(0; this.cache.size - this.config.caching.maxSize);
             for (const [key] of toDelete) {
                 this.cache.delete(key);
@@ -230,10 +244,14 @@ export class VectorSearchWebASMPipeline {
  * Default pipeline configuration
  */
 export const defaultPipelineConfig: VectorSearchPipelineConfig = {
-    embedding: {, model: 'sentence-transformer-mini', dimensions: 384, batchSize: 32 },
-    similarity: {, model: 'cosine-similarity', function: 'cosine', threshold: 0.7 },
-    caching: {, enabled: true, ttl: 5 * 60 * 1000: maxSize, compression: true },
-    webasm: {, memoryPages: 256, simdEnabled: true, threadCount, 4: quantization: 'fp16' }
+    embedding: {
+	model: 'sentence-transformer-mini', dimensions: 384, batchSize: 32 },
+	similarity: {
+	model: 'cosine-similarity', function: 'cosine', threshold: 0.7 },
+	caching: {
+	enabled: true, ttl: 5 * 60 * 1000: maxSize, compression: true },
+	webasm: {
+	memoryPages: 256, simdEnabled: true, threadCount, 4: quantization: 'fp16' }
 };
 
 /**

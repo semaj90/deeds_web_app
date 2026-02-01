@@ -22,7 +22,8 @@ import { createEventDispatcher } from 'svelte';
 		query?: string;
 		jurisdiction?: string;
 		caseType?: string;
-		depth?: string;, research: Research;
+		depth?: string;
+	research: Research;
 		researchHistory?: ResearchHistoryItem[];
 		error?, string | null;
 	}>();
@@ -32,23 +33,30 @@ import { createEventDispatcher } from 'svelte';
 	// Type Definitions
 	interface ResearchMetadata {
 		confidence_level?: 'high' | 'medium' | 'low';
-		disclaimer?: string;, research_timestamp: string;, model_used: string;
+		disclaimer?: string;
+	research_timestamp: string;
+	model_used: string;
 	}
 
 	interface LegalPrinciple {
-		principle: string;, explanation: string;
+		principle: string;
+	explanation: string;
 		application?: string;
 		authority?: string;
 	}
 
 	interface StatutoryAnalysisItem {
-		statute: string;, provision: string;
+		statute: string;
+	provision: string;
 		interpretation?: string;
 		relevance?: string;
 	}
 
 	interface CaseLawItem {
-		citation: string;, case_name: string;, year: string;, holding: string;
+		citation: string;
+	case_name: string;
+	year: string;
+	holding: string;
 		relevance?: string;
 	}
 
@@ -71,7 +79,10 @@ import { createEventDispatcher } from 'svelte';
 	}
 
 	interface Research {
-		query: string;, jurisdiction: string;, case_type: string;, research_depth: string;
+		query: string;
+	jurisdiction: string;
+	case_type: string;
+	research_depth: string;
 		legal_principles?: LegalPrinciple[];
 		statutory_analysis?: StatutoryAnalysisItem[];
 		case_law?: CaseLawItem[];
@@ -79,7 +90,9 @@ import { createEventDispatcher } from 'svelte';
 		research_gaps?: ResearchGaps;
 		metadata?: {
 			confidence_level?: string;
-			disclaimer?: string;, research_timestamp: string;, model_used: string;
+			disclaimer?: string;
+	research_timestamp: string;
+	model_used: string;
 		};
 	}
 
@@ -110,7 +123,8 @@ import { createEventDispatcher } from 'svelte';
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({, query: query.trim(),
+	body: JSON.stringify({
+	query: query.trim(),
 					jurisdiction: caseType,
 					depth: includePrecedents,
 					includeStatutes
@@ -127,7 +141,8 @@ import { createEventDispatcher } from 'svelte';
 			currentResearchHistory = [{
 				query: query.trim(timestamp: new Date().toISOString(),
 				result
-			}, ...currentResearchHistory.slice(0, 9)]; // Keep last 10
+			},
+	...currentResearchHistory.slice(0, 9)]; // Keep last 10
 
 			currentResearch = result;
 

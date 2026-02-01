@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Input } from '$lib/components/ui/input';
   // Svelte, 5 runes are auto-imported
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
   import 
     Input
@@ -29,7 +29,9 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, messages: [{, role: 'user', content: 'Connection test' }]
+	body: JSON.stringify({
+	messages: [{
+	role: 'user', content: 'Connection test' }]
         })
       });
       if (response.ok) {
@@ -55,7 +57,9 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, messages: [{, role: 'user', content: currentInput }]
+	body: JSON.stringify({
+	messages: [{
+	role: 'user', content: currentInput }]
         })
       });
       const data = await response.json();
@@ -74,7 +78,8 @@
           timestamp: new Date().toLocaleTimeString()}
         messages = [...messages, errorMessage]}
     } catch (error) {
-      console.error('âŒ Chat error:', error);'
+      console.error('âŒ Chat error:', error);
+'
       const errorMessage = {
         role: 'assistant' as const content: `Network, error: ${error.message}`,
         timestamp: new Date().toLocaleTimeString()}

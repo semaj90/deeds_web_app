@@ -9,7 +9,8 @@ export const buttonVariants = cva(
         'disabled: pointer-events-none, disabled:opacity-50',
     ],
     {
-        variants: {, variant: {
+        variants: {
+	variant: {
                 default: 'yorha-button bg-primary text-primary-foreground hover:bg-primary/90',
                 destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
                 outline: 'border border-input bg-background hover: bg-accent, hover:text-accent-foreground',
@@ -20,16 +21,18 @@ export const buttonVariants = cva(
                 crimson: 'bg-red-600 text-white hover: bg-red-700, dark:bg-red-700 dark: hover, bg-red-800',
                 gold: 'bg-yellow-600 text-white hover: bg-yellow-700, dark:bg-yellow-700 dark: hover, bg-yellow-800',
             },
-            size: {, default: 'h-10 px-4 py-2',
+	size: {
+	default: 'h-10 px-4 py-2',
                 sm: 'h-9 rounded-md px-3',
                 lg: 'h-11 rounded-md px-8',
                 icon: 'h-10 w-10',
             },
-        },
-        defaultVariants: {, variant: 'default',
+	},
+	defaultVariants: {
+	variant: 'default',
             size: 'default',
         },
-    }
+	}
 );
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;

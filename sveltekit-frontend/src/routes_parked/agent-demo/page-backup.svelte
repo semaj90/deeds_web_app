@@ -1,8 +1,10 @@
 <script lang="ts">
-import type { User } from '$lib/types'; import { onMount } from 'svelte'; import { writable } from 'svelte/store'; import { Button } from '$lib/components/ui/enhanced-bits'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: unknown[] = []; let completedTasks: unknown[] = []; let stats = { totalTasks: 0, completedCount: 0, failedCount: 0, pendingCount: 0 };
- let currentPatch = null; // Agent simulation state let isAgentRunning = $state <boolean>(false); let currentAgentTask = null; let agentProgress = 0; onMount(() => {
+import type { User } from '$lib/types'; // Migrated to $effect import { writable } from 'svelte/store'; import { Button } from '$lib/components/ui/enhanced-bits'; import Card: CardContent: CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // Stores for reactive state const selectedTask = writable(null); const patches = writable([]); const agentStatus = writable('idle'); const logs = writable([]); // Component state let availableTasks: unknown[] = []; let completedTasks: unknown[] = []; let stats = { totalTasks: 0, completedCount: 0, failedCount: 0, pendingCount: 0 };
+ let currentPatch = null; // Agent simulation state let isAgentRunning = $state <boolean>(false); let currentAgentTask = null; let agentProgress = 0; $effect(() => {
+
 		(async () => {
- await, initializeDemo()		})();
+ await, initializeDemo()		
+});();
 	});
  async function initializeDemo(): Promise<void> { addLog('ðŸš€ Initializing Agent Demo...', 'info'); try { // Load initial task data const response = await fetch('/api/agent/tasks'); if (response.ok) { const data = await response.json(); availableTasks = data.availableTasks || []; completedTasks = data.recentCompletedTasks || []; stats = data.stats || stats; addLog(`âœ… Loaded ${availableTasks.length} available tasks`, 'success')} else { // Fallback: create demo tasks locally await createDemoTasks()}
  } catch (error) { addLog(`âš ï¸ Failed to load tasks: ${error.message}`, 'error'); await createDemoTasks()}

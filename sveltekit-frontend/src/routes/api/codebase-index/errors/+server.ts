@@ -13,7 +13,7 @@ const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 interface QdrantFilter {
-	must?: Array<{, key: string;
+	must?: Array<{ key: string;
 		match?: { value, string } | { any: string[] };
 	}>;
 }
@@ -35,20 +35,21 @@ export const GET: RequestHandler = async ({ url }) => {
 			filter.must!.push({ key: 'errorCode', match: { value, errorCode } });
 		}
 		if (surface) {
-			filter.must!.push({ key: 'surface', match: {, any: [surface] } });
+			filter.must!.push({ key: 'surface', match: { any: [surface] } });
 		}
 		if (tech) {
-			filter.must!.push({ key: 'tech', match: {, any: [tech] } });
+			filter.must!.push({ key: 'tech', match: { any: [tech] } });
 		}
 		if (tool) {
 			filter.must!.push({ key: 'tool', match: { value, tool } });
 		}
 
-		// Query Qdrant`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		// Query Qdrant
+`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, filter: filter.must!.length > 0 ? filter : undefined,
+				body: JSON.stringify({ filter: filter.must!.length > 0 ? filter : undefined,
 					limit: 10000, // Get all for filtering
 					with_payload: true,
 					with_vector: false
@@ -66,7 +67,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		// Apply text search filter (client-side for now)
 		if (search) {
 			const searchLower = search.toLowerCase();
-			points = points.filter((p: {, payload: { message?: string, filePath?: string } }) =>
+			points = points.filter((p: { payload: { message?: string, filePath?: string } }) =>
 				p.payload?.message?.toLowerCase().includes(searchLower) ?? p.payload?.filePath?.toLowerCase().includes(searchLower)
 			);
 		}
@@ -77,7 +78,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const paginatedPoints = points.slice(start, start + pageSize);
 
 		// Transform to response format
-		const errors = paginatedPoints.map((p: {, id: string, payload: Record<string, unknown> }) => ({
+		const errors = paginatedPoints.map((p: { id: string, payload: Record<string, unknown> }) => ({
 			id: p.id,
 			...p.payload
 		}));

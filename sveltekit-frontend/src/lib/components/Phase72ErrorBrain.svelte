@@ -7,7 +7,7 @@
 	 * Integrates with /all-routes Command Center
 	 */
 
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import { fade, fly } from 'svelte/transition';
 
 	const { routePath = null, onClose = () => {} } = $props<{
@@ -16,18 +16,25 @@
 	}>();
 
 	interface Phase72Error {
-		id: string;, error_hash: string;
-		error_code: string;, file_path: string;
-		line_num: number;, column_num: number;
-		occurrence_count: number;, message: string;
-		severity: string;, last_seen: string;
+		id: string;
+	error_hash: string;
+		error_code: string;
+	file_path: string;
+		line_num: number;
+	column_num: number;
+		occurrence_count: number;
+	message: string;
+		severity: string;
+	last_seen: string;
 		cycle?: number;
 		created_at?: string;
 	}
 
 	interface StatsSummary {
-		total_errors: number;, unique_codes: number;
-		affected_files: number;, total_occurrences: number;
+		total_errors: number;
+	unique_codes: number;
+		affected_files: number;
+	total_occurrences: number;
 	}
 
 	let errors: Phase72Error[] = [];
@@ -85,7 +92,8 @@
 			const response = await fetch('/api/phase72/similar', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, error_hash: errorHash, similar_errors: similarErrors, similarErrors,
+	body: JSON.stringify({
+	error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 					context: routePath ? `Route: ${ routePath }` : null
 				})
 			});
@@ -135,9 +143,11 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadErrors();
-	});
+	
+});
 </script>
 
 <div class="phase72-modal" transitionfade={{ duration, 200 }}>
@@ -232,7 +242,8 @@
 					<div class="detail-section nes-container is-dark">
 						<p><strong>Code:</strong> {selectedError.error_code}</p>
 						<p><strong>File:</strong> {selectedError.file_path}</p>
-						<p><strong>Location:</strong> Line {selectedError.line_num}, Column {selectedError.column_num}</p>
+						<p><strong>Location:</strong> Line {selectedError.line_num},
+	Column {selectedError.column_num}</p>
 						<p><strong>Occurrences:</strong> {selectedError.occurrence_count}</p>
 						<p><strong>Last Seen:</strong> {new Date(selectedError.last_seen).toLocaleString()}</p>
 					</div>
@@ -288,26 +299,35 @@
 
 <style>
 	.phase72-modal {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
+		position: fixed;
+	top: 0;
+		left: 0;
+	right: 0;
 		bottom: 0;
-		z-index: 9999;, display: flex;
+		z-index: 9999;
+	display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.modal-backdrop {
-		position: absolute;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(0, 0, 0, 0.8);
+		position: absolute;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
+	background: rgba(0, 0, 0, 0.8);
 	}
 
 	.modal-content {
-		position: relative;, width: 95vw;
+		position: relative;
+	width: 95vw;
 		max-width: 1400px;
-		max-height: 90vh;, background: #212529;
+		max-height: 90vh;
+	background: #212529;
 		border: 4px solid #fff;
-		overflow: hidden;, display: flex;
+		overflow: hidden;
+	display: flex;
 		flex-direction: column;
 	}
 
@@ -321,14 +341,16 @@
 	}
 
 	.close-btn {
-		width: 48px;, height: 48px;
+		width: 48px;
+	height: 48px;
 		padding: 0;
 		font-size: 2rem;
 		line-height: 1;
 	}
 
 	.route-info {
-		margin-bottom: 1rem;, padding: 0.5rem;
+		margin-bottom: 1rem;
+	padding: 0.5rem;
 		background: rgba(249, 168, 37, 0.1);
 		border-radius: 4px;
 	}
@@ -340,8 +362,10 @@
 	}
 
 	.stats-bar {
-		display: flex;, gap: 1rem;
-		margin-bottom: 1rem;, padding: 1rem;
+		display: flex;
+	gap: 1rem;
+		margin-bottom: 1rem;
+	padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
 	}
@@ -359,14 +383,17 @@
 
 	.stat .label {
 		display: block;
-		font-size: 0.8rem;, opacity: 0.7;
+		font-size: 0.8rem;
+	opacity: 0.7;
 		margin-top: 0.25rem;
 	}
 
 	.modal-body {
-		flex: 1;, display: grid;
+		flex: 1;
+	display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 1rem;, overflow: hidden;
+		gap: 1rem;
+	overflow: hidden;
 	}
 
 	.error-list {
@@ -376,20 +403,24 @@
 
 	.error-items {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.error-item {
 		width: 100%;
-		text-align: left;, padding: 0.75rem;
+		text-align: left;
+	padding: 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
-		cursor: pointer;, transition: all 0.2s;
+		cursor: pointer;
+	transition: all 0.2s;
 	}
 
 	.error-item:hover {
 		background: rgba(255, 255, 255, 0.1);
-		border-color: #fff;, transform: translateX(4px);
+		border-color: #fff;
+	transform: translateX(4px);
 	}
 
 	.error-item.selected {
@@ -399,7 +430,8 @@
 
 	.error-header {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -419,7 +451,8 @@
 	}
 
 	.occurrence-count {
-		margin-left: auto;, opacity: 0.6;
+		margin-left: auto;
+	opacity: 0.6;
 		font-size: 0.9rem;
 	}
 
@@ -430,7 +463,8 @@
 	}
 
 	.error-location {
-		font-size: 0.75rem;, opacity: 0.6;
+		font-size: 0.75rem;
+	opacity: 0.6;
 		font-family: 'Courier New', monospace;
 	}
 
@@ -449,7 +483,8 @@
 	}
 
 	.action-buttons {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		margin: 1rem 0;
 	}
 
@@ -459,22 +494,26 @@
 
 	.similar-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem;, background: rgba(249, 168, 37, 0.1);
+		padding: 0.75rem;
+	background: rgba(249, 168, 37, 0.1);
 	}
 
 	.similarity-score {
-		font-size: 0.8rem;, opacity: 0.8;
+		font-size: 0.8rem;
+	opacity: 0.8;
 		margin-bottom: 0.5rem;
 	}
 
 	.file-path {
-		font-size: 0.75rem;, opacity: 0.6;
+		font-size: 0.75rem;
+	opacity: 0.6;
 		font-family: 'Courier New', monospace;
 		margin-top: 0.25rem;
 	}
 
 	.ai-suggestion {
-		margin-top: 1rem;, padding: 1rem;
+		margin-top: 1rem;
+	padding: 1rem;
 		background: rgba(0, 200, 83, 0.1);
 		border: 2px solid #00c853;
 	}
@@ -486,11 +525,13 @@
 	}
 
 	.loading-spinner {
-		text-align: center;, padding: 2rem;
+		text-align: center;
+	padding: 2rem;
 	}
 
 	.no-errors {
-		text-align: center;, padding: 2rem;
+		text-align: center;
+	padding: 2rem;
 	}
 
 	/* Scrollbar styling */

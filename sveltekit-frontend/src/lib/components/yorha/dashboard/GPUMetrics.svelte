@@ -1,7 +1,7 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store';
   import { webgpu } from '$lib/webgpu/webgpu-init';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   let gpuMetrics = $state({
     utilization: 0,
@@ -12,7 +12,8 @@
     fanSpeed: 45
   });
 
-  let performanceHistory = $state(Array.from({ length: 20 }, () => ({
+  let performanceHistory = $state(Array.from({ length: 20 },
+	() => ({
     time: 0,
     utilization: 0,
     memory: 0
@@ -85,7 +86,8 @@
   }
 
 
-  onMount(() => {
+  $effect(() => {
+
     let interval: NodeJS.Timeout;
 
     (async () => {
@@ -100,13 +102,16 @@
       // Update metrics periodically
       interval = setInterval(async () => {
         await loadGPUMetrics();
-      }, 5000); // Update every 5 seconds
-    })();
+      },
+	5000); // Update every 5 seconds
+    
+});();
 
     return () => clearInterval(interval);
   });
 
-  function getMetricColor(value: number, thresholds: {, low: number, high: number }): string {
+  function getMetricColor(value: number, thresholds: {
+	low: number, high: number }): string {
     if (value >= thresholds.high) return 'text-red-400';
     if (value >= thresholds.low) return 'text-yellow-400';
     return 'text-green-400';

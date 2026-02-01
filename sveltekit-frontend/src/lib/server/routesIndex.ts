@@ -73,7 +73,7 @@ export function collectRoutes(): RouteEntry[] {
                 id,
                 path,
                 files: {},
-                methods: [],
+	methods: [],
                 tags: inferTags(path),
                 kind: 'page', // default
             });

@@ -24,18 +24,23 @@ import type { text } from "stream/consumers";
 import type { ErrorReport } from './types.js';
 
 export interface OllamaConfig {
-	url: string;, embeddingModel: string;
-	generationModel: string;, timeout: number;
-	maxRetries: number;, retryDelay: number;
+	url: string;
+	embeddingModel: string;
+	generationModel: string;
+	timeout: number;
+	maxRetries: number;
+	retryDelay: number;
 }
 
 export interface EmbeddingResult {
-	embedding: number[];, model: string;
+	embedding: number[];
+	model: string;
 	promptTokens?: number;
 }
 
 export interface GenerationResult {
-	response: string;, model: string;
+	response: string;
+	model: string;
 	totalDuration?: number;
 	promptTokens?: number;
 	responseTokens?: number;
@@ -164,14 +169,17 @@ export class OllamaService {
 				const response = await fetch(`${this.config.url}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, model: this.config.embeddingModel, text
-					}, signal: controller.signal
+	body: JSON.stringify({
+	model: this.config.embeddingModel, text
+					},
+	signal: controller.signal
 				});
 
 				clearTimeout(timeoutId);
 
 				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}, ${await response.text()}`);
+					throw new Error(`HTTP ${response.status},
+	${await response.text()}`);
 				}
 
 				const data = await response.json();
@@ -205,7 +213,8 @@ export class OllamaService {
 		const results: (number[] | null)[] = [];
 
 		for (let i = 0; i < texts.length; i += concurrency) {
-			const batch = texts.slice(i, i + concurrency);batch.map((text: any) => this.generateEmbedding(text))
+			const batch = texts.slice(i, i + concurrency);
+batch.map((text: any) => this.generateEmbedding(text))
 			);
 			results.push(...batchResults);
 
@@ -238,15 +247,18 @@ export class OllamaService {
 				const response = await fetch(`${this.config.url}/api/generate`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, model: this.config.generationModel,
+	body: JSON.stringify({
+	model: this.config.generationModel,
 						prompt: system
-					}, signal: controller.signal
+					},
+	signal: controller.signal
 				});
 
 				clearTimeout(timeoutId);
 
 				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}, ${await response.text()}`);
+					throw new Error(`HTTP ${response.status},
+	${await response.text()}`);
 				}
 
 				const data = await response.json();
@@ -276,10 +288,13 @@ export class OllamaService {
 	/**
 	 * Generate fix suggestion for an error using ACE prompting
 	 */
-	async generateFixSuggestion(error: ErrorReport, similarErrors: {, message: string, fix?: string }[] = []): Promise<string | null> {.filter((e: any) => e.fix)
+	async generateFixSuggestion(error: ErrorReport, similarErrors: {
+	message: string, fix?: string }[] = []): Promise<string | null> {
+.filter((e: any) => e.fix)
 			.slice(0, 3)
 			.map((e: any, i: any) => `Example ${i + 1}:\nError: ${e.message}\nFix: ${e.fix}`)
-			.join('\n\n');${fewShotExamples ? `Here are similar errors and their fixes:\n${fewShotExamples}\n\n` : ''}
+			.join('\n\n');
+${fewShotExamples ? `Here are similar errors and their fixes:\n${fewShotExamples}\n\n` : ''}
 Current Error:
 File: ${error.file}
 Line: ${error.line}
@@ -299,9 +314,10 @@ Provide a concise fix suggestion. Focus on the specific code change needed.`;
 	getStats() {
 		return {
 			available: this.available,
-			config: {, url: this.config.url; this.config.embeddingModel; this.config.generationModel
+			config: {
+	url: this.config.url; this.config.embeddingModel; this.config.generationModel
 			},
-			...this.stats, embeddingSuccessRate: this.stats.embeddingRequests > 0
+	...this.stats, embeddingSuccessRate: this.stats.embeddingRequests > 0
 				? ((this.stats.embeddingSuccesses / this.stats.embeddingRequests) * 100).toFixed(1) + '%'
 				: 'N/A',
 			generationSuccessRate: this.stats.generationRequests > 0

@@ -44,7 +44,8 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  const k = Math.min(this.DEFAULT_K, Math.ceil(Math.sqrt(errors.length)));
  this.log('info', `Using k=${k} clusters for ${errors.length} errors`);
 
- // Run K-means clusteringembeddings.map((e: any) => e.vector),
+ // Run K-means clustering
+embeddings.map((e: any) => e.vector),
  k
  );
 
@@ -63,13 +64,15 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- }, impact: await this.calculateImpact({
+ },
+	impact: await this.calculateImpact({
  id: '',
  errors: clusterErrors,
  rootCause: '',
  impact: 0,
  createdAt: new Date(),
- }, createdAt: new Date(),
+ },
+	createdAt: new Date(),
  };
  clusters.push(cluster);
  }
@@ -100,7 +103,8 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  // Initialize centroids randomly from data points
  let centroids: number[][] = [];
- const indices = Array.from({ length: embeddings.length }, (_: any, i: any) => i);
+ const indices = Array.from({ length: embeddings.length },
+	(_: any, i: any) => i);
  for (let i = 0; i < k; i++) {
  const randomIdx = indices[Math.floor(Math.random() * indices.length)];
  centroids.push([...embeddings[randomIdx]]);

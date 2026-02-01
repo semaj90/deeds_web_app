@@ -16,28 +16,34 @@ import type postgres from 'postgres';
 
 export interface ErrorContextChunk {
 	kind: 'log' | 'ast' | 'schema' | 'migration' | 'test';
-	text: string;, score: number;
+	text: string;
+	score: number;
 	source?: string;
 }
 
 export interface KagNode {
-	id: string;, label: string;
+	id: string;
+	label: string;
 	kind: 'route' | 'file' | 'table' | 'migration' | 'test';
 	metadata?: Record<string, unknown>;
 }
 
 export interface KagEdge {
-	from: string;, to: string;
+	from: string;
+	to: string;
 	label: string;
 }
 
 export interface KagGraph {
-	nodes: KagNode[];, edges: KagEdge[];
+	nodes: KagNode[];
+	edges: KagEdge[];
 }
 
 export interface RouteContext {
-	routePath: string;, ragChunks: ErrorContextChunk[];
-	kagGraph: KagGraph;, relatedTests: string[];
+	routePath: string;
+	ragChunks: ErrorContextChunk[];
+	kagGraph: KagGraph;
+	relatedTests: string[];
 	relatedMigrations: string[];
 }
 
@@ -373,11 +379,11 @@ export async function cacheRouteContext(
 				last_updated_at
 			) VALUES (
 				${context.routePath},
-				${JSON.stringify(context.ragChunks)},
-				${JSON.stringify(context.kagGraph)},
-				${JSON.stringify(context.relatedTests)},
-				${JSON.stringify(context.relatedMigrations)},
-				NOW()
+	${JSON.stringify(context.ragChunks)},
+	${JSON.stringify(context.kagGraph)},
+	${JSON.stringify(context.relatedTests)},
+	${JSON.stringify(context.relatedMigrations)},
+	NOW()
 			)
 			ON CONFLICT (route_path) DO UPDATE
 			SET

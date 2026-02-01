@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { createEventDispatcher, onMount } from 'svelte';
+	// Migrated to $effect
 	import { backOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
 	import Portal from './Portal.svelte';
@@ -40,7 +40,8 @@
 		fullscreen: 'max-w-full h-full'
 	};
 
-	onMount(() => {
+	$effect(() => {
+
 		if (diamondPattern && canvasElement) {
 			drawDiamondPattern();
 		}
@@ -49,7 +50,8 @@
 				cancelAnimationFrame(animationFrame);
 			}
 		};
-	});
+	
+});
 
 	function drawDiamondPattern() {
 		if (!canvasElement) return;
@@ -132,7 +134,8 @@
 	<Portal>
 		<div
 			class="modal-overlay"
-			transition: fade={{, duration: 200 }}
+			transition: fade={{
+	duration: 200 }}
 			onclick={closeModal}
 			onkeydown={handleKeydown}
 			role="button"
@@ -144,7 +147,8 @@
 				class:glass-effect={glassEffect}
 				onclick={(e) => e.stopPropagation()}
 				onkeydown={(e) => e.stopPropagation()}
-				transition: scale={{, duration: 300, easing: backOut }}
+				transition: scale={{
+	duration: 300, easing: backOut }}
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="modal-title"
@@ -199,28 +203,36 @@
 
 <style>
 	.modal-overlay {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(0, 0, 0, 0.7);
-		backdrop-filter: blur(4px);, display: flex;
+		position: fixed;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+		backdrop-filter: blur(4px);
+	display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 9999;, padding: 1rem;
+		z-index: 9999;
+	padding: 1rem;
 	}
 
 	.modal-container {
-		position: relative;, background: linear-gradient(
+		position: relative;
+	background: linear-gradient(
 			135deg,
 			rgba(16, 16, 32, 0.95),
 			rgba(32, 16, 48, 0.95),
 			rgba(16, 16, 32, 0.95)
 		);
-		border-radius: 16px;, border: 2px solid rgba(255, 255, 255, 0.2);
+		border-radius: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.2);
 		box-shadow:
 			0 24px 48px rgba(0, 0, 0, 0.5),
 			0 0 64px rgba(138, 43, 226, 0.2),
 			inset 0 0 32px rgba(255, 255, 255, 0.05);
-		overflow: hidden;, width: 100%;
+		overflow: hidden;
+	width: 100%;
 	}
 
 	.glass-effect {
@@ -234,16 +246,22 @@
 	}
 
 	.diamond-canvas {
-		position: absolute;, top: 0;
-		left: 0;, width: 100%;
-		height: 100%;, opacity: 0.3;
+		position: absolute;
+	top: 0;
+		left: 0;
+	width: 100%;
+		height: 100%;
+	opacity: 0.3;
 		pointer-events: none;
 	}
 
 	.gradient-overlay {
-		position: absolute;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background:
+		position: absolute;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
+	background:
 			radial-gradient(ellipse at top left, rgba(138, 43, 226, 0.2), transparent 40%),
 			radial-gradient(ellipse at bottom right, rgba(30, 144, 255, 0.2), transparent 40%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
@@ -252,7 +270,8 @@
 
 	.modal-content {
 		position: relative;
-		z-index: 1;, display: flex;
+		z-index: 1;
+	display: flex;
 		flex-direction: column;
 		min-height: 200px;
 		max-height: 85vh;
@@ -261,29 +280,34 @@
 	.modal-header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;, padding: 1.5rem;
+		justify-content: space-between;
+	padding: 1.5rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
 	}
 
 	.modal-title {
 		font-size: 1.5rem;
-		font-weight: bold;, color: #fff;
+		font-weight: bold;
+	color: #fff;
 		text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
-		margin: 0;, flex: 1;
+		margin: 0;
+	flex: 1;
 		text-align: center;
 	}
 
 	.modal-body {
 		padding: 2rem;
-		overflow-y: auto;, flex: 1;
+		overflow-y: auto;
+	flex: 1;
 		color: rgba(255, 255, 255, 0.9);
 	}
 
 	.modal-footer {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;, padding: 1rem 1.5rem;
+		justify-content: space-between;
+	padding: 1rem 1.5rem;
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
 	}
@@ -292,8 +316,10 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, width: 30px;
-		height: 40px;, color: rgba(255, 64, 64, 0.8);
+		justify-content: center;
+	width: 30px;
+		height: 40px;
+	color: rgba(255, 64, 64, 0.8);
 		font-family: 'Georgia', serif;
 	}
 
@@ -309,15 +335,20 @@
 	}
 
 	.modal-close {
-		position: absolute;, top: 1rem;
-		right: 1rem;, width: 32px;
+		position: absolute;
+	top: 1rem;
+		right: 1rem;
+	width: 32px;
 		height: 32px;
-		border-radius: 50%;, background: rgba(255, 255, 255, 0.1);
+		border-radius: 50%;
+	background: rgba(255, 255, 255, 0.1);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		color: #fff;
-		font-size: 1.2rem;, display: flex;
+		font-size: 1.2rem;
+	display: flex;
 		align-items: center;
-		justify-content: center;, cursor: pointer;
+		justify-content: center;
+	cursor: pointer;
 		transition: all 0.2s;
 		z-index: 2;
 	}
@@ -332,8 +363,10 @@
 		padding: 0.5rem 1.5rem;
 		background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(30, 144, 255, 0.3));
 		border: 1px solid rgba(255, 255, 255, 0.3);
-		border-radius: 8px;, color: #fff;
-		font-weight: 500;, cursor: pointer;
+		border-radius: 8px;
+	color: #fff;
+		font-weight: 500;
+	cursor: pointer;
 		transition: all 0.3s;
 	}
 

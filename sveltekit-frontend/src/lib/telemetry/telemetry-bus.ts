@@ -12,7 +12,8 @@ export type TelemetryEventType =
     | 'error';
 
 export interface TelemetryBaseEvent<T extends TelemetryEventType = TelemetryEventType> {
-    type: T;, ts: number;
+    type: T;
+	ts: number;
     meta?: Record<string, unknown>;
 }
 

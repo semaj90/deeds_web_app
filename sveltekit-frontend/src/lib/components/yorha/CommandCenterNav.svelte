@@ -9,49 +9,49 @@
  icon: '🏠',
  description: 'Main dashboard and system overview'
  },
- {
+	{
  name: 'Active Cases',
  path: '/active-cases',
  icon: '📋',
  description: 'Current investigations and case management'
  },
- {
+	{
  name: 'Evidence Library',
  path: '/evidence-library',
  icon: '📚',
  description: 'Document repository and evidence database'
  },
- {
+	{
  name: 'Persons of Interest',
  path: '/persons-of-interest',
  icon: '👤',
  description: 'Suspect and witness management'
  },
- {
+	{
  name: 'Analysis Center',
  path: '/analysis-center',
  icon: '🔍',
  description: 'AI-powered evidence analysis'
  },
- {
+	{
  name: 'Global Search',
  path: '/global-search',
  icon: '🔎',
  description: 'Cross-database search and correlation'
  },
- {
+	{
  name: 'Terminal',
  path: '/terminal',
  icon: '💻',
  description: 'AI chat interface and commands'
  },
- {
+	{
  name: 'System Config',
  path: '/system-configuration',
  icon: '⚙️',
  description: 'Platform settings and configuration'
  },
- {
+	{
  name: 'GPU Evidence Graph',
  path: '/gpu-evidence-graph',
  icon: '🖥️',

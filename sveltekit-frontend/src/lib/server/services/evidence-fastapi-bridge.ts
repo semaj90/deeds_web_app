@@ -15,7 +15,9 @@ export class EvidenceFastAPIBridge {
      */
     static async processEvidence(
         evidenceId: string,
-        fileData?: {, buffer: Buffer; filename: string;, mimeType: string }
+        fileData?: {
+	buffer: Buffer; filename: string;
+	mimeType: string }
     ) {
         try {
             console.log(`🔄 Processing evidence ${evidenceId} with FastAPI RAG pipeline`);
@@ -68,7 +70,9 @@ export class EvidenceFastAPIBridge {
      */
     private static async uploadToFastAPI(
         evidenceId: string,
-        fileData: {, buffer: Buffer; filename: string;, mimeType: string }
+        fileData: {
+	buffer: Buffer; filename: string;
+	mimeType: string }
     ) {
         const formData = new FormData();
         const file = new File([fileData.buffer], fileData.filename, { type: fileData.mimeType });
@@ -102,7 +106,7 @@ export class EvidenceFastAPIBridge {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: new URLSearchParams({ query }),
+	body: new URLSearchParams({ query }),
             });
 
             if (!response.ok) {
@@ -148,7 +152,7 @@ export const POST: RequestHandler = async ({ request }) => {
             return new Response(JSON.stringify({ error: 'Missing evidenceId' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
-            });
+	});
         }
 
         const result = await EvidenceFastAPIBridge.processEvidence(evidenceId);
@@ -156,13 +160,13 @@ export const POST: RequestHandler = async ({ request }) => {
         return new Response(JSON.stringify(result), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
-        });
+	});
     } catch (error: any) {
         console.error('Evidence processing API error:', error);
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
-        });
+	});
     }
 };
 
@@ -179,7 +183,7 @@ export const GET: RequestHandler = async ({ url }) => {
             return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
-            });
+	});
         }
 
         const result = await EvidenceFastAPIBridge.searchEvidence(query, limit);
@@ -187,12 +191,12 @@ export const GET: RequestHandler = async ({ url }) => {
         return new Response(JSON.stringify(result), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
-        });
+	});
     } catch (error: any) {
         console.error('Evidence search API error:', error);
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
-        });
+	});
     }
 };

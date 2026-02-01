@@ -4,24 +4,29 @@ import { QdrantClient as QdrantClientImpl } from '@qdrant/js-client-rest';
 // Correct dimensions for modern embeddings
 const VECTOR_CONFIG = {
     DIMENSIONS: 384, // e.g. for all-MiniLM-L6-v2 or similar
-    DISTANCE_METRIC: {, QDRANT: 'Cosine'
+    DISTANCE_METRIC: {
+	QDRANT: 'Cosine'
     },
-    INDEX: {, QDRANT_HNSW_M: 16,
+	INDEX: {
+	QDRANT_HNSW_M: 16,
         QDRANT_HNSW_EF: 100
     },
-    COLLECTIONS: {, LEGAL_DOCUMENTS: 'legal_documents',
+	COLLECTIONS: {
+	LEGAL_DOCUMENTS: 'legal_documents',
         CASE_EMBEDDINGS: 'legal_cases',
         EVIDENCE: 'evidence_items',
         RAG_DOCUMENTS: 'rag_documents',
         CHAT_MESSAGES: 'chat_messages',
         KNOWLEDGE_BASE: 'knowledge_base'
     },
-    DOCKER_SERVICES: {, QDRANT_URL: 'http://localhost:6333'
+	DOCKER_SERVICES: {
+	QDRANT_URL: 'http://localhost:6333'
     }
 };
 
 export interface CollectionConfig {
-    name: string;, description: string;
+    name: string;
+	description: string;
     onDisk: boolean;
     replicationFactor?: number;
 }
@@ -35,11 +40,11 @@ export function createQdrantClient(): QdrantClient {
 
 export const QDRANT_COLLECTIONS: CollectionConfig[] = [
     { name: VECTOR_CONFIG.COLLECTIONS.LEGAL_DOCUMENTS, description: 'Legal documents with 384-dimensional embeddings', onDisk: true, replicationFactor: 1 },
-    { name: VECTOR_CONFIG.COLLECTIONS.CASE_EMBEDDINGS, description: 'Case-specific embeddings for legal case management', onDisk: true, replicationFactor: 1 },
-    { name: VECTOR_CONFIG.COLLECTIONS.EVIDENCE, description: 'Evidence item embeddings for similarity search', onDisk: true, replicationFactor: 1 },
-    { name: VECTOR_CONFIG.COLLECTIONS.RAG_DOCUMENTS, description: 'RAG pipeline document embeddings', onDisk: true, replicationFactor: 1 },
-    { name: VECTOR_CONFIG.COLLECTIONS.CHAT_MESSAGES, description: 'Chat message embeddings for semantic search', onDisk: false, replicationFactor: 1 },
-    { name: VECTOR_CONFIG.COLLECTIONS.KNOWLEDGE_BASE, description: 'Knowledge base article embeddings', onDisk: true, replicationFactor: 1 }
+	{ name: VECTOR_CONFIG.COLLECTIONS.CASE_EMBEDDINGS, description: 'Case-specific embeddings for legal case management', onDisk: true, replicationFactor: 1 },
+	{ name: VECTOR_CONFIG.COLLECTIONS.EVIDENCE, description: 'Evidence item embeddings for similarity search', onDisk: true, replicationFactor: 1 },
+	{ name: VECTOR_CONFIG.COLLECTIONS.RAG_DOCUMENTS, description: 'RAG pipeline document embeddings', onDisk: true, replicationFactor: 1 },
+	{ name: VECTOR_CONFIG.COLLECTIONS.CHAT_MESSAGES, description: 'Chat message embeddings for semantic search', onDisk: false, replicationFactor: 1 },
+	{ name: VECTOR_CONFIG.COLLECTIONS.KNOWLEDGE_BASE, description: 'Knowledge base article embeddings', onDisk: true, replicationFactor: 1 }
 ];
 
 export async function createCollection(client: QdrantClient, config: CollectionConfig): Promise<boolean> {
@@ -54,7 +59,8 @@ export async function createCollection(client: QdrantClient, config: CollectionC
 
             if (vectorConfig && 'size' in vectorConfig) {
                  if (vectorConfig.size !== VECTOR_CONFIG.DIMENSIONS) {
-                     console.warn(`⚠️ Collection: "${config.name}" has dimension ${vectorConfig.size}, expected ${VECTOR_CONFIG.DIMENSIONS}`);
+                     console.warn(`⚠️ Collection: "${config.name}" has dimension ${vectorConfig.size},
+	expected ${VECTOR_CONFIG.DIMENSIONS}`);
                  } else {
                      console.log(` ✓ Dimensions: ${vectorConfig.size} (correct)`);
                  }
@@ -64,16 +70,19 @@ export async function createCollection(client: QdrantClient, config: CollectionC
 
         console.log(`📦 Creating collection: "${config.name}"...`);
         await client.createCollection(config.name, {
-            vectors: {, size: VECTOR_CONFIG.DIMENSIONS,
+            vectors: {
+	size: VECTOR_CONFIG.DIMENSIONS,
                 distance: VECTOR_CONFIG.DISTANCE_METRIC.QDRANT as any
             },
-            optimizers_config: {, indexing_threshold: 20000
+	optimizers_config: {
+	indexing_threshold: 20000
             },
-            hnsw_config: {, m: VECTOR_CONFIG.INDEX.QDRANT_HNSW_M,
+	hnsw_config: {
+	m: VECTOR_CONFIG.INDEX.QDRANT_HNSW_M,
                 ef_construct: VECTOR_CONFIG.INDEX.QDRANT_HNSW_EF,
                 on_disk: config.onDisk
             },
-            replication_factor: config.replicationFactor
+	replication_factor: config.replicationFactor
         });
 
         console.log(`✅ Collection: "${config.name}" created successfully`);
@@ -85,7 +94,9 @@ export async function createCollection(client: QdrantClient, config: CollectionC
     }
 }
 
-export async function initializeQdrantCollections(): Promise<{, success: boolean; created: string[];, failed: string[] }> {
+export async function initializeQdrantCollections(): Promise<{
+	success: boolean; created: string[];
+	failed: string[] }> {
     console.log('\n🎯 Qdrant Collection Initialization');
     const client = createQdrantClient();
     const created: string[] = [];

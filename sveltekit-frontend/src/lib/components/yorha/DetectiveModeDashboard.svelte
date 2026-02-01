@@ -14,7 +14,8 @@ https, //svelte.dev/e/js_parse_error -->
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
  interface Evidence {
- id: string;, title: string;
+ id: string;
+	title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -23,18 +24,22 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  interface Witness {
- id: string;, name: string;
+ id: string;
+	name: string;
  statement?: string;
  credibility?: number;
  }
 
  interface Case {
- id: string;, title: string;
- description?: string;, status: 'active' | 'closed' | 'pending';
+ id: string;
+	title: string;
+ description?: string;
+	status: 'active' | 'closed' | 'pending';
  createdAt: string;
  }
 
- let { currentCase = null }: {, currentCase: Case | null } = $props();
+ let { currentCase = null }: {
+	currentCase: Case | null } = $props();
 
  let activeModule = $state<'map' | 'police' | 'cross-exam' | 'judicial' | 'timeline'>('map');
  let caseEvidence = $state<Evidence[]>([]);
@@ -55,7 +60,7 @@ https, //svelte.dev/e/js_parse_error -->
  timestamp: '2024-01-15T20:30:00Z',
  source: 'Police Report'
  },
- {
+	{
  id: '2',
  title: 'Security Camera Footage',
  description: 'Street camera capturing incident',
@@ -63,7 +68,7 @@ https, //svelte.dev/e/js_parse_error -->
  timestamp: '2024-01-15T20:45:00Z',
  source: 'Security System'
  },
- {
+	{
  id: '3',
  title: 'Witness Testimony',
  description: 'Eyewitness account from neighbor',
@@ -80,7 +85,7 @@ https, //svelte.dev/e/js_parse_error -->
  statement: 'I was the victim in this incident. I reported it to police immediately.',
  credibility: 9
  },
- {
+	{
  id: 'w2',
  name: 'John Smith',
  statement: 'I witnessed the suspect fleeing the scene around 8:45 PM.',

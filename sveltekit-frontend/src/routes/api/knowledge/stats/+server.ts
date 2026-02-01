@@ -20,15 +20,15 @@ export const GET: RequestHandler = async () => {
     // Return stats
     return json({
       success: true,
-      stats: {, totalDocuments: stats.totalDocuments,
+      stats: { totalDocuments: stats.totalDocuments,
         indexedVectors: stats.indexedVectors,
-        collections: {, qdrant: {
+        collections: { qdrant: {
             points: stats.collections.qdrant.points,
             status: stats.collections.qdrant.status
           },
-          postgres: {, rows: stats.collections.postgres.rows
+          postgres: { rows: stats.collections.postgres.rows
           },
-          minio: {, objects: stats.collections.minio.objects,
+          minio: { objects: stats.collections.minio.objects,
             size: stats.collections.minio.size
           }
         },

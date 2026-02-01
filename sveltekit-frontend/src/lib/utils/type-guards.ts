@@ -8,13 +8,15 @@ import type { AITask, AITaskType, APIResponse, WorkerMessage, WorkerMessageType,
 export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
 
 export interface Evidence {
-    id: string;, type: string;
+    id: string;
+	type: string;
     content: string;
     metadata?: { [key: string]: any };
 }
 
 export interface LegalCase {
-    id: string;, title: string;
+    id: string;
+	title: string;
     status: string;
     description?: string;
 }
@@ -129,14 +131,18 @@ export function isRecord(value: unknown): value is Record<string, any> {
 
 // --- Enhanced Discrimination Helpers ---
 
-export function discriminateWorkerMessage(message: WorkerMessage): {, isAITask: boolean;
-    isWorkerStatus: boolean;, isAPIResponse: boolean;
+export function discriminateWorkerMessage(message: WorkerMessage): {
+	isAITask: boolean;
+    isWorkerStatus: boolean;
+	isAPIResponse: boolean;
     aiTask?: AITask;
     workerStatus?: WorkerStatus;
     apiResponse?: APIResponse<any>;
 } {
-    const result: {, isAITask: boolean;
-        isWorkerStatus: boolean;, isAPIResponse: boolean;
+    const result: {
+	isAITask: boolean;
+        isWorkerStatus: boolean;
+	isAPIResponse: boolean;
         aiTask?: AITask;
         workerStatus?: WorkerStatus;
         apiResponse?: APIResponse<any>;

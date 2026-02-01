@@ -8,7 +8,8 @@ import type { Actor, AnyStateMachine } from 'xstate';
 import { createActor } from 'xstate';
 
 type AnySnapshot = {
- value: any;, context: any;
+ value: any;
+	context: any;
  matches: (value: any) => boolean;
  can: (event: any) => boolean;
 };
@@ -57,15 +58,15 @@ export function useMachine<T extends AnyStateMachine>(
  const snapshot = actor.getSnapshot() as AnySnapshot;
  return snapshot.can({ type, transitionName });
  },
- isInState: (stateName: string) => {
+	isInState: (stateName: string) => {
  const snapshot = actor.getSnapshot() as AnySnapshot;
  return snapshot.matches(stateName);
  },
- getContext: () => {
+	getContext: () => {
  const snapshot = actor.getSnapshot() as AnySnapshot;
  return snapshot.context;
  },
- };
+	};
 }
 
 /**

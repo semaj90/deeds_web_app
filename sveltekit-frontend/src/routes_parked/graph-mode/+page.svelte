@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let canvas: HTMLCanvasElement = $state();
 	let ctx: CanvasRenderingContext2D;
@@ -44,7 +44,8 @@
 		background: '#d4c5b0'
 	};
 
-	onMount(() => {
+	$effect(() => {
+
  (async () => {
  		ctx = canvas.getContext('2d')!;
  		canvas.width = window.innerWidth;
@@ -66,7 +67,8 @@
  		// Auto-refresh every 5 seconds
  		const interval = setInterval(loadGraphData, 5000);
  		return () => clearInterval(interval);
- })();
+ 
+});();
  });
 
 	async function loadGraphData() {

@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import { LogOut } from "lucide-svelte";
 import { Smartphone } from "lucide-svelte";
 import { Monitor } from "lucide-svelte";
@@ -92,9 +92,11 @@ import { Monitor } from "lucide-svelte";
  return 'Unknown Browser';
  }
 
- onMount(() => {
+ $effect(() => {
+
  loadSessions();
- });
+ 
+});
 </script>
 
 <main class="page-sessions">

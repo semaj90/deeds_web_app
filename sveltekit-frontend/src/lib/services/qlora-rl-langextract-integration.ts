@@ -48,26 +48,33 @@ function getDocType(doc: LegalDocument): string {
 
 // Worker message types for RL agent
 interface RLActionSelection {
-	action: number;, temperature: number;
-	maxTokens: number;, probability: number;
+	action: number;
+	temperature: number;
+	maxTokens: number;
+	probability: number;
 	explorationBonus: number;
 }
 
 type RLWorkerOutboundMessage =
 	| { type: 'initialized' }
-	| { type: 'actionSelected';, data: RLActionSelection };
+	| { type: 'actionSelected';
+	data: RLActionSelection };
 
 // Trainer worker message types
 interface TrainingProgress {
-	progress: {, currentEpoch: number;
-		totalEpochs: number;, loss: number;
+	progress: {
+	currentEpoch: number;
+		totalEpochs: number;
+	loss: number;
 		accuracy: number;
 	};
 }
 
 interface TrainingCompleted {
-	finalLoss: number;, finalAccuracy: number;
-	trainingTime?: number;, modelData: string;
+	finalLoss: number;
+	finalAccuracy: number;
+	trainingTime?: number;
+	modelData: string;
 }
 
 interface TrainingError {
@@ -75,32 +82,44 @@ interface TrainingError {
 }
 
 interface RLUpdate {
-	action: string;, reward: number;
+	action: string;
+	reward: number;
 	qValue: number;
 }
 
 type TrainerWorkerOutboundMessage =
-	| { type: 'training_progress';, data: TrainingProgress }
-	| { type: 'training_completed';, data: TrainingCompleted }
-	| { type: 'training_error';, data: TrainingError }
-	| { type: 'reinforcement_update';, data: RLUpdate };
+	| { type: 'training_progress';
+	data: TrainingProgress }
+	| { type: 'training_completed';
+	data: TrainingCompleted }
+	| { type: 'training_error';
+	data: TrainingError }
+	| { type: 'reinforcement_update';
+	data: RLUpdate };
 
 export interface RLGuidedExtraction {
-	documentId: string;, extractionStrategy: string;
-	temperature: number;, maxTokens: number;
-	explorationBonus: number;, confidenceThreshold: number;
+	documentId: string;
+	extractionStrategy: string;
+	temperature: number;
+	maxTokens: number;
+	explorationBonus: number;
+	confidenceThreshold: number;
 	qloraFineTuningEnabled: boolean;
 }
 
 export interface NeuralSpriteLegalProcessing {
-	spriteId: string;, patternBuffer: ArrayBuffer;
-	vertexBuffer: Float32Array;, embeddingVector: Float32Array;
-	nametablePosition: number;, attributeData: number;
+	spriteId: string;
+	patternBuffer: ArrayBuffer;
+	vertexBuffer: Float32Array;
+	embeddingVector: Float32Array;
+	nametablePosition: number;
+	attributeData: number;
 }
 
 export interface IntegratedProcessingResult {
 	extractedData: Record<string, JsonValue>;
-	rlGuidance: RLGuidedExtraction;, neuralSprite: NeuralSpriteLegalProcessing;
+	rlGuidance: RLGuidedExtraction;
+	neuralSprite: NeuralSpriteLegalProcessing;
 	qloraJobId?: string;
 }
 
@@ -148,7 +167,8 @@ export class QLoRARLLangExtractIntegration {
 	async processLegalDocument(
 		document: LegalDocument,
 		extractionSchema: Record<string, unknown>,
-		userFeedback?: {, correct: boolean; comments?: string }
+		userFeedback?: {
+	correct: boolean; comments?: string }
 	): Promise<IntegratedProcessingResult> {
 		console.log(
 			`⚡ Processing legal document ${getDocId(document)} with RL+QLoRA integration`
@@ -248,7 +268,8 @@ export class QLoRARLLangExtractIntegration {
 			setTimeout(() => {
 				this.rlAgent?.removeEventListener('message', handler);
 				resolve(this.getDefaultStrategy(document));
-			}, 1000);
+			},
+	1000);
 		});
 	}
 
@@ -261,9 +282,11 @@ export class QLoRARLLangExtractIntegration {
 			const response = await fetch(`${this.langextractServiceUrl}/extract`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, text: `Legal Document: ${getDocId(document)}\nType: ${getDocType(document)}\nContent: [Document content would be here]`,
+	body: JSON.stringify({
+	text: `Legal Document: ${getDocId(document)}\nType: ${getDocType(document)}\nContent: [Document content would be here]`,
 					schema,
-					options: {, model: 'gpt-4o-mini',
+					options: {
+	model: 'gpt-4o-mini',
 						temperature: rlGuidance.temperature,
 						maxTokens: rlGuidance.maxTokens,
 						fromCache: true
@@ -346,7 +369,8 @@ export class QLoRARLLangExtractIntegration {
 
 	private calculateReward(
 		extractedData: Record<string, JsonValue>,
-		userFeedback?: {, correct: boolean }
+		userFeedback?: {
+	correct: boolean }
 	): number {
 		let reward = 0;
 		const keyCount = Object.keys(extractedData).length;
@@ -385,12 +409,13 @@ export class QLoRARLLangExtractIntegration {
 		this.qloraTrainer?.postMessage({
 			type: 'startTraining',
 			jobId,
-			config: {, model: 'gemma-2-2b-it',
+			config: {
+	model: 'gemma-2-2b-it',
 				lora_alpha: 16,
 				lora_dropout: 0.1,
 				target_modules: ['q_proj', 'v_proj']
 			},
-			dataset: [trainingData]
+	dataset: [trainingData]
 		});
 		return jobId;
 	}

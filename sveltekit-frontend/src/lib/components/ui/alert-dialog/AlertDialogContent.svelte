@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { getContext, onDestroy, onMount } from 'svelte';
+	// Migrated to $effect
 	import { scale } from 'svelte/transition';
 	import type { AlertDialogContentProps, AlertDialogContext } from './types';
 
@@ -28,18 +28,20 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		if (dialogContext?.open) {
 			// Prevent scroll
 			document.body.style.overflow = 'hidden';
 			// Focus the content
 			contentRef?.focus();
 		}
-	});
+	
+});
 
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		document.body.style.overflow = '';
-	});
+	}
 
 	const defaultClass = `
 		fixed left-1/2 top-1/2 z-50
@@ -56,7 +58,8 @@
 	<div
 		bind:this={contentRef}
 		class="{defaultClass} { className }"
-		transition: scale={{, duration: 150, start: 0.95 }}
+		transition: scale={{
+	duration: 150, start: 0.95 }}
 		onkeydown={ handleKeydown }
 		role="alertdialog"
 		aria-modal="true"

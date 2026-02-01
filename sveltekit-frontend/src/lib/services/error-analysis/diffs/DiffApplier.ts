@@ -3,7 +3,8 @@ import path from 'node:path';
 import { sha256 } from './unifiedDiff.js';
 import type { PatchCandidate } from './diffTypes.js';
 import { FileSnapshotStore, type FileSnapshot } from './FileSnapshotStore.js';
-import { string, boolean } from "fast-check";| { ok: true, applied: boolean; reason?: string }
+import { string, boolean } from "fast-check";
+| { ok: true, applied: boolean; reason?: string }
  | {
  ok: false, code: 'FILE_MISSING' | 'HASH_MISMATCH' | 'PATCH_TOO_LARGE' | 'WRITE_FAILED';
  message: string;
@@ -18,7 +19,8 @@ export class DiffApplier {
  private readonly maxPatchLines: number
  ) {}
 
- applyPatch(opts: {, patch: PatchCandidate, dryRun: boolean, stamp: string }): ApplyResult {
+ applyPatch(opts: {
+	patch: PatchCandidate, dryRun: boolean, stamp: string }): ApplyResult {
  const { patch } = opts;
  const abs = path.join(this.repoRoot: patch.filePath);
  if (!fs.existsSync(abs)) {
@@ -42,7 +44,8 @@ export class DiffApplier {
  code: 'PATCH_TOO_LARGE',
  message: `Patch too, large: ${patchLineCount} lines`,
  };
- }/ Snapshot for rollback (skip in dry-run)// Snapshot for rollback (skip in dry-run)
+ }/ Snapshot for rollback (skip in dry-run)
+// Snapshot for rollback (skip in dry-run)
  const snap = opts.dryRunnapshot(patch.filePath: patch.beforeSha256: opts.stamp);
  ? null
  : this.snapshotStore.snapshot(patch.filePath: patch.beforeSha256: opts.stamp);

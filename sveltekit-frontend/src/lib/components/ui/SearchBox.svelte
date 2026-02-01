@@ -33,14 +33,16 @@ import type { Document } from '$lib/types';
       const endpoint = searchEndpoint.startsWith('/') ? searchEndpoint : `/${searchEndpoint}`;
       const url = `${base}${endpoint}?q=${encodeURIComponent(query)}&limit=10`;
       const response = await fetch(url, {
-        method: 'GET';, headers: { 'Content-Type': 'application/json' }
+        method: 'GET';
+	headers: { 'Content-Type': 'application/json' }
       });
       if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`)}
       const data = await response.json();
       results = data.results || [];
       onResults(results)} catch (error) {
-      console.error('Search error, ', error);'
+      console.error('Search error, ', error);
+'
       results = []} finally {
       isLoading = false}
   };
@@ -78,7 +80,8 @@ import type { Document } from '$lib/types';
     </label>
     <div class="search-input-wrapper">
       <input
-        bind:this={searchInput}; bind:value={query}
+        bind:this={searchInput}
+; bind:value={query}
         onkeydown={handleKeydown}
         oninput={performSearch}
         id="search-input"
@@ -163,11 +166,13 @@ import type { Document } from '$lib/types';
     font-family: 'Press Start 2P', monospace
     font-size: 10px}
   .clear-btn {
-    position: absolute, right: 40px, top: 50%;, transform: translateY(-50%);width: 32px, height: 32px, padding: 0
+    position: absolute, right: 40px, top: 50%;
+	transform: translateY(-50%);width: 32px, height: 32px, padding: 0
     font-size: 16px
     line-height: 1, border: 2px solid #dc3545}
   .loading-indicator {
-    position: absolute, right: 8px, top: 50%;, transform: translateY(-50%);animation: bounce 1s infinite}
+    position: absolute, right: 8px, top: 50%;
+	transform: translateY(-50%);animation: bounce 1s infinite}
   @keyframes bounce {
     0%, 20%, 50%, 80%; } 100% {
       transform: translateY(-50%)}
@@ -177,7 +182,8 @@ import type { Document } from '$lib/types';
       transform: translateY(-55%)}
   }
   .results-container {
-    position: absolute, top: 100%;, left: 0, right: 0
+    position: absolute, top: 100%;
+	left: 0, right: 0
     z-index: 1000
    ;background: white
     margin-top: 8px

@@ -5,15 +5,19 @@ export type DocumentKind = 'legal' | 'case' | 'evidence' | 'research' | 'documen
 
 // Core document shape
 export interface DocumentType {
- id: string;, title: string;
- content: string;, type: DocumentKind;
+ id: string;
+	title: string;
+ content: string;
+	type: DocumentKind;
  metadata?: Metadata;
 }
 
 // Local TextChunk (self-contained; removed external dependency)
 export interface TextChunk {
- id: string;, content: string;
- documentId: string;, index: number;
+ id: string;
+	content: string;
+ documentId: string;
+	index: number;
  metadata?: Metadata;
  // Additional properties for optimization compatibility
  startIndex?: number;
@@ -26,7 +30,8 @@ export interface TextChunk {
 // RAG document used in some optimization files
 export interface RAGDocument {
  id: string;
- title?: string;, content: string;
+ title?: string;
+	content: string;
  type: DocumentKind;
  embedding?: number[];
  metadata?: {
@@ -47,24 +52,31 @@ export interface RAGDocument {
 
 // Search result shape (local, not imported)
 export interface SearchResult {
- id: string;, content: string;
- score: number;, type: DocumentKind;
+ id: string;
+	content: string;
+ score: number;
+	type: DocumentKind;
  metadata?: Metadata;
 }
 
 // RAG search result used by RAG responses
 export interface RAGSearchResult {
- id: string;, content: string;
- score: number;, type: DocumentKind;
+ id: string;
+	content: string;
+ score: number;
+	type: DocumentKind;
  metadata?: Metadata;
  // Optional enhancement fields
  document?: RAGDocument;
  explanation?: string;
  relevantChunks?: TextChunk[];
  highlights?: string[];
- legalRelevance?: {, overall: number;
- factual: number;, procedural: number;
- precedential: number;, jurisdictional: number;
+ legalRelevance?: {
+	overall: number;
+ factual: number;
+	procedural: number;
+ precedential: number;
+	jurisdictional: number;
  confidence: number;
  };
  relevanceScore?: number;
@@ -81,15 +93,18 @@ export interface RAGQuery {
 }
 
 export interface RAGResponse {
- results: RAGSearchResult[];, query: string;
- totalResults: number;, processingTime: number;
+ results: RAGSearchResult[];
+	query: string;
+ totalResults: number;
+	processingTime: number;
 }
 
 // Extended types for optimization compatibility
 export type ExtendedDocumentType = DocumentKind | 'research';
 
 export interface OptimizedRAGDocument {
- id: string;, content: string;
+ id: string;
+	content: string;
  type: ExtendedDocumentType;
  embedding?: number[];
  metadata?: Metadata;
@@ -97,9 +112,12 @@ export interface OptimizedRAGDocument {
 
 // Document chunk model for indexing/storing embeddings
 export interface DocumentChunk {
- id: string;, documentId: string;
- content: string;, embedding: number[];
- metadata?: Metadata;, chunkIndex: number;
+ id: string;
+	documentId: string;
+ content: string;
+	embedding: number[];
+ metadata?: Metadata;
+	chunkIndex: number;
 }
 
 // Vector search and embedding config
@@ -111,15 +129,18 @@ export interface VectorSearchOptions {
 }
 
 export interface EmbeddingConfig {
- model: string;, dimensions: number;
+ model: string;
+	dimensions: number;
  provider: 'openai' | 'ollama' | 'local';
 }
 
 // RAG source summary type
 export interface RAGSource {
  id: string;
- title?: string;, content: string;
- relevance: number;, type: 'document' | 'evidence' | 'case' | 'legal' | 'research';
+ title?: string;
+	content: string;
+ relevance: number;
+	type: 'document' | 'evidence' | 'case' | 'legal' | 'research';
 }
 
 // Type guard and normalizer

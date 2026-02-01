@@ -12,8 +12,10 @@ export interface LazyLoadOptions {
 }
 
 export interface LazyLoadEntry {
-  element: Element;, isIntersecting: boolean;
-  intersectionRatio: number;, target: Element;
+  element: Element;
+	isIntersecting: boolean;
+  intersectionRatio: number;
+	target: Element;
 }
 
 export type LazyLoadCallback = (entry: LazyLoadEntry) => void;
@@ -118,7 +120,8 @@ class LazyLoadManager {
           console.error('LazyLoadManager fallback callback error', err);
         }
         this.unobserve(element);
-      }, this.options.fallbackDelay);
+      },
+	this.options.fallbackDelay);
       this.fallbackTimeouts.set(element, timeoutId);
     } else {
       Promise.resolve().then(() => {
@@ -200,7 +203,8 @@ export function lazyLoad(element: Element, options: LazyLoadActionOptions) {
 }
 
 export interface LazyComponentState {
-  isVisible: boolean;, hasBeenVisible: boolean;
+  isVisible: boolean;
+	hasBeenVisible: boolean;
   intersectionRatio: number;
   isLoaded?: boolean;
 }
@@ -223,7 +227,7 @@ export function createLazyStore(initialState: Partial<LazyComponentState> = {}) 
         intersectionRatio
       }));
     },
-    reset: () => {
+	reset: () => {
       set({ isVisible: false, hasBeenVisible: false, intersectionRatio: 0 });
     }
   };
@@ -262,8 +266,10 @@ export function lazyLoadImage(
 }
 
 export interface LazyLoadMetrics {
-  totalObserved: number;, totalLoaded: number;
-  averageLoadTime: number;, loadTimes: number[];
+  totalObserved: number;
+	totalLoaded: number;
+  averageLoadTime: number;
+	loadTimes: number[];
 }
 
 class LazyLoadProfiler {
@@ -311,12 +317,18 @@ class LazyLoadProfiler {
 export const lazyLoadProfiler = new LazyLoadProfiler();
 
 export const LAZY_LOAD_PRESETS = {
-  EAGER: {, rootMargin: '100px', threshold: 0, once: true },
-  NORMAL: {, rootMargin: '50px', threshold: 0.1, once: true },
-  LAZY: {, rootMargin: '0px', threshold: 0.5, once: true },
-  HEAVY_COMPONENT: {, rootMargin: '200px', threshold: 0, once: true, fallbackDelay: 1000 },
-  MEDIA: {, rootMargin: '50px', threshold: 0, once: true },
-  CONTINUOUS: {, rootMargin: '0px', threshold: [0, 0.25, 0.5, 0.75, 1], once: false }
+  EAGER: {
+	rootMargin: '100px', threshold: 0, once: true },
+	NORMAL: {
+	rootMargin: '50px', threshold: 0.1, once: true },
+	LAZY: {
+	rootMargin: '0px', threshold: 0.5, once: true },
+	HEAVY_COMPONENT: {
+	rootMargin: '200px', threshold: 0, once: true, fallbackDelay: 1000 },
+	MEDIA: {
+	rootMargin: '50px', threshold: 0, once: true },
+	CONTINUOUS: {
+	rootMargin: '0px', threshold: [0, 0.25, 0.5, 0.75, 1], once: false }
 } as const;
 
 export type LazyLoadPreset = keyof typeof LAZY_LOAD_PRESETS;

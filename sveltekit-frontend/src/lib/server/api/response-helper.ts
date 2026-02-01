@@ -20,7 +20,7 @@ export function apiSuccess<T>(data: T, status = 200): Response {
 			data,
 			timestamp: Date.now()
 		},
-		{ status }
+	{ status }
 	);
 }
 
@@ -32,7 +32,7 @@ export function apiError(error: string | object, status = 500, requestId?: strin
 			timestamp: Date.now(),
 			requestId
 		},
-		{ status }
+	{ status }
 	);
 }
 
@@ -84,27 +84,34 @@ export const legalApiResponses = {
 	insufficientPermissions: (resource: string) => apiError(`Insufficient permissions to access ${resource}`, 403),
 
 	// Validation responses
-	invalidCaseData: (details: object) => apiError({ message: 'Invalid case data', details }, 422),
+	invalidCaseData: (details: object) => apiError({ message: 'Invalid case data', details },
+	422),
 	invalidEvidenceFormat: (format: string) => apiError(`Unsupported evidence format: ${format}`, 400),
 
 	// Success responses (made generic)
 	caseCreated: <T>(caseData: T) =>
-		apiSuccess<{ case: T;, message: string }>({
+		apiSuccess<{ case: T;
+	message: string }>({
 			case: caseData,
 			message: 'Case created successfully'
-		}, 201),
+		},
+	201),
 
 	evidenceProcessed: <T>(result: T) =>
-		apiSuccess<{ analysis: T;, message: string }>({
+		apiSuccess<{ analysis: T;
+	message: string }>({
 			analysis: result,
 			message: 'Evidence processed successfully'
-		}, 200),
+		},
+	200),
 
 	aiAnalysisComplete: <T>(analysis: T) =>
-		apiSuccess<{ analysis: T;, message: string }>({
+		apiSuccess<{ analysis: T;
+	message: string }>({
 			analysis,
 			message: 'AI analysis completed'
-		}, 200)
+		},
+	200)
 };
 
 /** * Middleware to wrap API handlers with standardized error handling */

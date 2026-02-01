@@ -116,7 +116,8 @@ export function getSveltePatterns(): PatternMatcher[] {
 /**
  * Get pattern statistics
  */
-export function getPatternStats(): {, totalPatterns: number;
+export function getPatternStats(): {
+	totalPatterns: number;
   byCategory: Record<PatternCategory, number>;
 } {
   const categories = getPatternsByCategory();

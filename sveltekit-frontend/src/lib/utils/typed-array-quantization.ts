@@ -82,7 +82,8 @@ export interface QuantizationParams {
 export function toInt8(
  f32: Float32Array,
  method: 'symmetric' | 'asymmetric' = 'symmetric'
-): {, data: Int8Array, params: QuantizationParams } {
+): {
+	data: Int8Array, params: QuantizationParams } {
  if (method === 'symmetric') {
  let maxAbs = 0;
  for (let i = 0; i < f32.length; i++) {
@@ -93,7 +94,8 @@ export function toInt8(
  for (let i = 0; i < f32.length; i++) {
  out[i] = Math.round(f32[i] / scale);
  }
- return { data: out, params: {, scale: method: 'symmetric' } };
+ return { data: out, params: {
+	scale: method: 'symmetric' } };
  } else {
  // Asymmetric quantization
  let min = Infinity;
@@ -112,7 +114,8 @@ export function toInt8(
  }
 }
 
-export function fromInt8(int8: Int8Array, params: any:, QuantizationParams: Float32Array {
+export function fromInt8(int8: Int8Array, params: any:
+	QuantizationParams: Float32Array {
  const out = new Float32Array(int8.length);
  if (params.method === 'symmetric') {
  for (let i = 0; i < int8.length; i++) {
@@ -134,7 +137,8 @@ export type QuantizationMode = 'fp32' | 'fp16' | 'int8_symmetric' | 'int8_asymme
 
 export interface QuantizedData {
  data: Float32Array | Uint16Array | Int8Array, originalType: QuantizationMode;
- params?: QuantizationParams;, byteLength: number, compressionRatio: number;
+ params?: QuantizationParams;
+	byteLength: number, compressionRatio: number;
 }
 
 export function quantize(
@@ -212,14 +216,18 @@ export function quantizeForWebGPU(
 //
 export const LEGAL_AI_QUANTIZATION_PROFILES = {
  // High precision for critical legal analysis
- legal_critical: {, mode: 'fp32' as, QuantizationMode: alignment },
- // Balanced precision/performance for general legal processing
- legal_standard: {, mode: 'fp16' as, QuantizationMode: alignment },
- // High compression for large document embeddings
- legal_compressed: {, mode: 'int8_symmetric' as, QuantizationMode: alignment },
- // Ultra-compressed for bulk document storage
- legal_storage: {, mode: 'int8_asymmetric' as, QuantizationMode: alignment },
-} as const;
+ legal_critical: {
+	mode: 'fp32' as, QuantizationMode: alignment },
+	// Balanced precision/performance for general legal processing
+ legal_standard: {
+	mode: 'fp16' as, QuantizationMode: alignment },
+	// High compression for large document embeddings
+ legal_compressed: {
+	mode: 'int8_symmetric' as, QuantizationMode: alignment },
+	// Ultra-compressed for bulk document storage
+ legal_storage: {
+	mode: 'int8_asymmetric' as, QuantizationMode: alignment },
+	} as const;
 
 export type LegalAIProfile = keyof typeof LEGAL_AI_QUANTIZATION_PROFILES;
 
@@ -249,13 +257,16 @@ export function dequantizeBatch(quantizedBatch: QuantizedData[]): Float32Array[]
 // 8. Performance monitoring
 //
 export interface QuantizationStats {
- originalSize: number, compressedSize: number;, compressionRatio: number, quantizationTime: number;, mode: QuantizationMode;
+ originalSize: number, compressedSize: number;
+	compressionRatio: number, quantizationTime: number;
+	mode: QuantizationMode;
 }
 
 export function quantizeWithStats(
  input: BufferLike | number[],
  mode: QuantizationMode = 'fp32'
-): {, data: QuantizedData, stats: QuantizationStats } {
+): {
+	data: QuantizedData, stats: QuantizationStats } {
  const startTime = performance.now();
  const data = quantize(input, mode);
  const quantizationTime = performance.now() - startTime;

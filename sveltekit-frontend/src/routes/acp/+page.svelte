@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	// State using Svelte 5 $state runes
 	let tools = $state<any[]>([]);
@@ -19,10 +19,14 @@
 			: tools.filter((t) => t.category === selectedCategory)
 	);
 
-	onMount(async () => {
+	$effect(() => {
+  (async () => {
+
 		await loadTools();
 		await checkHealth();
-	});
+	
+  })();
+});
 
 	async function loadTools() {
 		try {
@@ -40,7 +44,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: 'system:health', args: {} })
+	body: JSON.stringify({ tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services ?? {};
@@ -61,7 +65,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: selectedTool, args })
+	body: JSON.stringify({ tool: selectedTool, args })
 			});
 			const data = await res.json();
 			result = data;
@@ -79,13 +83,13 @@
 
 		// Set default args based on tool
 		const defaults: Record<string, any> = {
-			'knowledge:search': {, query: 'Svelte 5 runes', topK: 5 },
-			'llm:generate': {, prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
-			'llm:embed': {, text: 'Svelte 5 runes for state management' },
-			'vector:similarity': {, text: 'Svelte reactivity', topK: 5 },
-			'ast:analyze': {, filePath: 'src/lib/components/Example.svelte' },
-			'code:search': {, pattern: 'export let', path: 'src' },
-			'db:query': {, query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
+			'knowledge:search': { query: 'Svelte 5 runes', topK: 5 },
+	'llm:generate': { prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
+	'llm:embed': { text: 'Svelte 5 runes for state management' },
+	'vector:similarity': { text: 'Svelte reactivity', topK: 5 },
+	'ast:analyze': { filePath: 'src/lib/components/Example.svelte' },
+	'code:search': { pattern: 'export let', path: 'src' },
+	'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
 		};
 
 		if (defaults[toolName]) {
@@ -260,7 +264,8 @@
 
 <style>
 	.dashboard {
-		min-height: 100vh;, background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+		min-height: 100vh;
+		background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
 		color: #e0e0e0;
 		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
@@ -276,7 +281,8 @@
 
 	.header h1 {
 		margin: 0;
-		font-size: 1.8rem;, background: linear-gradient(135deg, #00d4ff, #00ff88);
+		font-size: 1.8rem;
+		background: linear-gradient(135deg, #00d4ff, #00ff88);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
@@ -289,7 +295,8 @@
 	}
 
 	.header-stats {
-		display: flex;, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 	}
 
 	.stat {
@@ -297,57 +304,62 @@
 		border: 1px solid rgba(0, 212, 255, 0.3);
 		padding: 0.5rem 1rem;
 		border-radius: 20px;
-		font-size: 0.85rem;, color: #00d4ff;
+		font-size: 0.85rem;
+		color: #00d4ff;
 	}
 
 	.health-panel {
-		background: rgba(255, 255, 255, 0.03);
-		padding: 1rem 2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		margin: 0 2rem 1rem;
 	}
 
 	.health-panel h2 {
 		margin: 0 0 1rem;
-		font-size: 1rem;, color: #888;
+		font-size: 1rem;
+		color: #888;
 	}
 
 	.health-grid {
-		display: flex;, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 		flex-wrap: wrap;
 	}
 
 	.health-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+		gap: 0.5rem;
 		background: rgba(255, 255, 255, 0.05);
 		padding: 0.5rem 1rem;
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.2s;
 	}
 
-	.health-item.healthy {
+	.healthy {
 		border-color: rgba(0, 255, 136, 0.3);
+		background: rgba(0, 255, 136, 0.05);
 	}
 
-	.health-item.offline {
-		border-color: rgba(255, 100, 100, 0.3);
-	}
-
-	.health-name {
-		font-weight: 500;
-		text-transform: capitalize;
+	.offline {
+		opacity: 0.5;
 	}
 
 	.health-status {
-		color: #666;
 		font-size: 0.8rem;
+		color: #888;
+		text-transform: capitalize;
 	}
 
 	.refresh-btn {
-		margin-top: 1rem;, background: transparent;
+		margin-top: 1rem;
+		background: transparent;
 		border: 1px solid rgba(0, 212, 255, 0.3);
-		color: #00d4ff;, padding: 0.4rem 0.8rem;
-		border-radius: 6px;, cursor: pointer;
+		color: #00d4ff;
+		padding: 0.4rem 0.8rem;
+		border-radius: 6px;
+		cursor: pointer;
 		font-size: 0.8rem;
+		transition: all 0.2s;
 	}
 
 	.refresh-btn:hover {
@@ -356,52 +368,62 @@
 
 	.main-layout {
 		display: grid;
-		grid-template-columns: 320px 1fr;
-		min-height: calc(100vh - 180px);
+		grid-template-columns: 300px 1fr;
+		gap: 0;
+		height: calc(100vh - 80px);
 	}
 
 	.tool-browser {
-		background: rgba(0, 0, 0, 0.3);
-		border-right: 1px solid rgba(255, 255, 255, 0.05);
+		background: rgba(0, 0, 0, 0.2);
+		border-right: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1rem;
 		overflow-y: auto;
 	}
 
 	.category-filter {
-		padding: 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		margin-bottom: 1.5rem;
 	}
 
 	.category-filter label {
 		display: block;
-		font-size: 0.8rem;, color: #888;
+		font-size: 0.8rem;
+		color: #888;
 		margin-bottom: 0.5rem;
 	}
 
 	.category-filter select {
-		width: 100%;, padding: 0.6rem;
+		width: 100%;
+		padding: 0.6rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;, color: #e0e0e0;
+		border-radius: 6px;
+		color: #e0e0e0;
 		font-size: 0.9rem;
 	}
 
 	.tool-list {
-		padding: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	.tool-item {
-		width: 100%;, display: flex;
-		align-items: flex-start;, gap: 0.75rem;
-		padding: 0.75rem;, background: transparent;
+		width: 100%;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		background: transparent;
 		border: 1px solid transparent;
-		border-radius: 8px;, cursor: pointer;
-		text-align: left;, color: #e0e0e0;
+		border-radius: 8px;
+		cursor: pointer;
+		text-align: left;
+		color: #e0e0e0;
 		transition: all 0.2s;
 	}
 
 	.tool-item:hover {
 		background: rgba(255, 255, 255, 0.05);
-		border-color: rgba(255, 255, 255, 0.1);
 	}
 
 	.tool-item.selected {
@@ -409,123 +431,133 @@
 		border-color: rgba(0, 212, 255, 0.3);
 	}
 
-	.tool-icon {
-		font-size: 1.2rem;
-		flex-shrink: 0;
-	}
-
 	.tool-info {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
 	.tool-name {
-		font-weight: 500;
-		font-size: 0.9rem;
+		font-weight: 600;
+		font-size: 0.95rem;
 	}
 
 	.tool-desc {
-		font-size: 0.75rem;, color: #888;
+		font-size: 0.75rem;
+		color: #888;
 		line-height: 1.3;
 	}
 
 	.execution-panel {
 		padding: 2rem;
+		overflow-y: auto;
+		background: rgba(0, 0, 0, 0.1);
 	}
 
 	.executor h2 {
 		margin: 0 0 0.5rem;
-		color: #00d4ff;
-		font-size: 1.4rem;
+		font-size: 1.5rem;
 	}
 
 	.tool-description {
-		color: #888;
-		margin-bottom: 1.5rem;
+		color: #aaa;
+		margin-bottom: 2rem;
+		line-height: 1.5;
 	}
 
 	.args-section {
-		margin-bottom: 1.5rem;
+		margin-bottom: 2rem;
 	}
 
 	.args-section label {
 		display: block;
-		font-size: 0.85rem;, color: #888;
+		font-size: 0.85rem;
+		color: #888;
 		margin-bottom: 0.5rem;
 	}
 
 	.args-section textarea {
-		width: 100%;, padding: 1rem;
+		width: 100%;
+		padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, color: #e0e0e0;
+		border-radius: 8px;
+		color: #e0e0e0;
 		font-family: 'Fira Code', monospace;
-		font-size: 0.9rem;, resize: vertical;
-	}
-
-	.args-section textarea:focus {
-		outline: none;
-		border-color: rgba(0, 212, 255, 0.5);
+		font-size: 0.9rem;
+		resize: vertical;
 	}
 
 	.execute-btn {
+		width: 100%;
 		background: linear-gradient(135deg, #00d4ff, #00ff88);
-		color: #000;, border: none;
+		color: #000;
+		border: none;
 		padding: 0.8rem 2rem;
 		border-radius: 8px;
 		font-weight: 600;
-		font-size: 1rem;, cursor: pointer;
+		font-size: 1rem;
+		cursor: pointer;
 		transition: all 0.2s;
 	}
 
-	.execute-btn: hover, not(:disabled) {
+	.execute-btn:hover:not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 	}
 
 	.execute-btn:disabled {
-		opacity: 0.6;, cursor: not-allowed;
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	.error-box {
-		margin-top: 1rem;, padding: 1rem;
+		margin-top: 1rem;
+		padding: 1rem;
 		background: rgba(255, 100, 100, 0.1);
 		border: 1px solid rgba(255, 100, 100, 0.3);
-		border-radius: 8px;, color: #ff6b6b;
+		border-radius: 8px;
+		color: #ff6b6b;
 	}
 
 	.result-box {
-		margin-top: 1.5rem;, background: rgba(0, 0, 0, 0.3);
+		margin-top: 1.5rem;
+		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, overflow: hidden;
+		border-radius: 8px;
+		overflow: hidden;
 	}
 
 	.result-box h3 {
-		margin: 0;, padding: 0.75rem 1rem;
+		margin: 0;
+		padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.05);
-		font-size: 0.9rem;, color: #888;
+		font-size: 0.9rem;
+		color: #888;
 	}
 
 	.result-meta {
-		display: flex;, gap: 1rem;
+		display: flex;
+		gap: 1rem;
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
-	.result-meta .success {
+	.success {
 		color: #00ff88;
 	}
 
-	.result-meta .failure {
+	.failure {
 		color: #ff6b6b;
 	}
 
-	.result-meta .duration {
+	.duration {
 		color: #888;
 	}
 
 	.result-json {
-		margin: 0;, padding: 1rem;
+		margin: 0;
+		padding: 1rem;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.85rem;
 		overflow-x: auto;
@@ -537,56 +569,55 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;
-		text-align: center;, color: #666;
+		justify-content: center;
+		height: 100%;
+		text-align: center;
+		color: #666;
 	}
 
 	.placeholder-icon {
 		font-size: 4rem;
-		margin-bottom: 1rem;, opacity: 0.5;
+		margin-bottom: 1rem;
+		opacity: 0.5;
 	}
 
 	.placeholder h2 {
-		margin: 0 0 0.5rem;
-		color: #888;
+		margin: 0;
+		font-size: 1.5rem;
+		color: #e0e0e0;
+	}
+
+	.placeholder p {
+		margin-bottom: 2rem;
 	}
 
 	.quick-actions {
-		margin-top: 2rem;
-		padding-top: 2rem;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.5rem;
+		max-width: 400px;
 	}
 
 	.quick-actions h3 {
-		font-size: 0.9rem;, color: #888;
+		grid-column: 1 / -1;
+		font-size: 0.9rem;
+		color: #888;
 		margin-bottom: 1rem;
 	}
 
 	.quick-actions button {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		color: #e0e0e0;, padding: 0.6rem 1rem;
-		border-radius: 6px;, margin: 0.25rem;
-		cursor: pointer;, transition: all 0.2s;
+		color: #e0e0e0;
+		padding: 0.6rem 1rem;
+		border-radius: 6px;
+		margin: 0.25rem;
+		cursor: pointer;
+		transition: all 0.2s;
 	}
 
 	.quick-actions button:hover {
-		background: rgba(0, 212, 255, 0.1);
+		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(0, 212, 255, 0.3);
 	}
-
-	@media (max-width: 768px) {
-		.main-layout {
-			grid-template-columns: 1fr;
-		}
-
-		.tool-browser {
-			max-height: 300px;
-		}
-	}
 </style>
-
-
-
-
-

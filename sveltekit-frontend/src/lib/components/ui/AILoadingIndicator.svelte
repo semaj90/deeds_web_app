@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AlertCircle, Brain, CheckCircle, Clock, Cpu, XCircle, Zap } from 'lucide-svelte';
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 
@@ -113,12 +113,12 @@
     }
   });
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (intervalId) {
       clearInterval(intervalId);
       intervalId = null;
     }
-  });
+  }
 </script>
 
 {#if isLoading || status !== 'loading'}
@@ -197,10 +197,12 @@
   }
 
   .ai-loading-component.overlay {
-    position: fixed;, inset: 0;
+    position: fixed;
+	inset: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
-    z-index: 50;, display: flex;
+    z-index: 50;
+	display: flex;
     align-items: center;
     justify-content: center;
   }

@@ -57,7 +57,8 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  expect(retrieved[0].id).toBe('pattern-1');
  });
 
- it('should store multiple patterns', async () => {{
+ it('should store multiple patterns', async () => {
+{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
@@ -65,7 +66,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
- {
+	{
  id: 'pattern-2',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -73,7 +74,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  errorType: 'type-mismatch',
  similarity: 0.92,
  },
- {
+	{
  id: 'pattern-3',
  filePath: 'test.svelte',
  lineNumber: 5,
@@ -388,7 +389,8 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  * For any query, results should be ranked by relevance
  */
  describe('Property: Query Ranking', () => {
- it('should rank results by relevance', async () => {{
+ it('should rank results by relevance', async () => {
+{
  id: 'pattern-1',
  filePath: 'test.ts',
  lineNumber: 10,
@@ -396,7 +398,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
- {
+	{
  id: 'pattern-2',
  filePath: 'test.ts',
  lineNumber: 20,
@@ -404,7 +406,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  errorType: 'syntax-error',
  similarity: 0.92,
  },
- {
+	{
  id: 'pattern-3',
  filePath: 'test.ts',
  lineNumber: 30,

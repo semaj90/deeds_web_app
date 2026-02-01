@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { Tooltip } from 'bits-ui';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	type GraphNode = {
-		id: string;, x: number;
-		y: number;, type: 'route' | 'error' | 'cluster';
+		id: string;
+	x: number;
+		y: number;
+	type: 'route' | 'error' | 'cluster';
 		label: string;
 		data?: any;
 	};
 
 	type GraphEdge = {
-		from: string;, to: string;
+		from: string;
+	to: string;
 		type: 'dependency' | 'error' | 'related';
 	};
 
@@ -19,7 +22,8 @@
 		edges = [],
 		width = 1200,
 		height = 800
-	}: {, nodes: GraphNode[];
+	}: {
+	nodes: GraphNode[];
 		edges: GraphEdge[];
 		width?: number;
 		height?: number;
@@ -43,7 +47,8 @@
 		border: '#000000'
 	};
 
-	onMount(() => {
+	$effect(() => {
+
 		if (!canvas) return;
 		ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -52,7 +57,8 @@
 		canvas.height = height;
 
 		renderGraph();
-	});
+	
+});
 
 	$effect(() => {
 		if (ctx) {
@@ -237,26 +243,32 @@
 
 <style>
 	.nes-graph-container {
-		position: relative;, width: 100%;
-		height: 100%;, background: #0f380f;
+		position: relative;
+	width: 100%;
+		height: 100%;
+	background: #0f380f;
 		border: 3px solid #000;
 		box-shadow: inset 0 0 0 2px #306230;
 	}
 
 	.nes-graph-canvas {
-		display: block;, cursor: crosshair;
+		display: block;
+	cursor: crosshair;
 		image-rendering: pixelated;
 	}
 
 	.tooltip-trigger {
 		position: fixed;
-		pointer-events: none;, width: 1px;
+		pointer-events: none;
+	width: 1px;
 		height: 1px;
 	}
 
 	.nes-tooltip {
-		background: #262017;, border: 2px solid #f3eddc;
-		padding: 8px;, color: #f3eddc;
+		background: #262017;
+	border: 2px solid #f3eddc;
+		padding: 8px;
+	color: #f3eddc;
 		font-family: 'Press Start 2P', monospace;
 		font-size: 8px;
 		z-index: 1000;
@@ -264,6 +276,7 @@
 
 	.nes-tooltip-content {
 		display: flex;
-		flex-direction: column;, gap: 4px;
+		flex-direction: column;
+	gap: 4px;
 	}
 </style>

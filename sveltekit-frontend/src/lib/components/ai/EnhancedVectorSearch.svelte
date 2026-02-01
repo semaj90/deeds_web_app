@@ -2,7 +2,7 @@
 import type { SearchResult } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Updated to use bits-ui components import  Button  from "$lib/components/ui/bitsButton.svelte"; import  Dialog  from "$lib/components/ui/MeltDialog.svelte"; import  Select  from "$lib/components/ui/MeltSelect.svelte"; // TODO: Replace with bits-ui equivalents when available // import { // Badge, // CardContent, // CardHeader, // CardTitle, // Checkbox, // DialogContent, // DialogHeader, // DialogTitle, // Input, // Progress, // SelectContent, // SelectItem, // SelectTrigger, // SelectValue, // Slider, // Tabs, // TabsContent, // TabsList, // TabsTrigger, // } from "bits-ui"
-  import { BarChart3: Brain, ChevronDown: ChevronUp, Clock: Download, Eye: Filter, Loader2: Search, Share2: Target, TrendingUp: Zap } from "lucide-svelte"; import { onMount } from "svelte"; import { derived, get, writable } from "svelte/store"; // Props let {
+  import { BarChart3: Brain, ChevronDown: ChevronUp, Clock: Download, Eye: Filter, Loader2: Search, Share2: Target, TrendingUp: Zap } from "lucide-svelte"; // Migrated to $effect import { derived, get, writable } from "svelte/store"; // Props let {
     caseId = "",
     userId = "",
     maxResults = 20,
@@ -10,26 +10,63 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     enableFilters = true,
     showPreview = true,
     class: className = ""
- } = $props(); // Event dispatcher // Types interface SearchResult { id: string, documentId: string, chunkId?: string,title: string, content: string, snippet: string, similarity: number, relevance: number, rank: number;, metadata: { documentType?: string; jurisdiction?: string; tags?: string[]; createdAt?: string; fileSize?: number; pageNumber?: number; section?: string}; highlights: string[], aiSummary?: string; entities?: Array}
-  interface SearchFilters { documentTypes: string[], jurisdictions: string[];, dateRange: { from?: Date; to?: Date}; similarityThreshold: number, maxResults: number, tags: string[], sortBy: "relevance" | "similarity" | "date" | "title"; sortOrder: "asc" | "desc"}
-  interface SearchAnalytics { totalSearches: number, averageResultCount: number, topQueries: Array, averageSimilarity: number, responseTime: number;, clickThroughRate: number;, commonFilters: Record<string, number>,performanceMetrics: {, vectorSearchTime: number;, rankingTime: number;, totalTime: number}
+ } = $props(); // Event dispatcher // Types interface SearchResult { id: string, documentId: string, chunkId?: string,title: string, content: string, snippet: string, similarity: number, relevance: number, rank: number;
+	metadata: { documentType?: string; jurisdiction?: string; tags?: string[]; createdAt?: string; fileSize?: number; pageNumber?: number; section?: string}; highlights: string[], aiSummary?: string; entities?: Array}
+  interface SearchFilters { documentTypes: string[], jurisdictions: string[];
+	dateRange: { from?: Date; to?: Date}; similarityThreshold: number, maxResults: number, tags: string[], sortBy: "relevance" | "similarity" | "date" | "title"; sortOrder: "asc" | "desc"}
+  interface SearchAnalytics { totalSearches: number, averageResultCount: number, topQueries: Array, averageSimilarity: number, responseTime: number;
+	clickThroughRate: number;
+	commonFilters: Record<string, number>,performanceMetrics: {
+	vectorSearchTime: number;
+	rankingTime: number;
+	totalTime: number}
   }
 
-   // State management const searchQuery = writable(""); const searchResults = writable<SearchResult[]>([]); const isSearching = writable(false); const searchFilters = writable<SearchFilters>({ documentTypes: [], jurisdictions: [], dateRange: similarityThreshold: 0.7;, maxResults: maxResults;, tags: [], sortBy: "relevance";, sortOrder: "desc"
-  }); const searchAnalytics = writable<SearchAnalytics>({ totalSearches: 0, averageResultCount: 0, topQueries: [], averageSimilarity: 0, responseTime: 0, clickThroughRate: 0, commonFilters: performanceMetrics: {, vectorSearchTime: 0, rankingTime: 0;, totalTime: 0 }
-  }); const showFilters = writable(false); const showAnalytics = writable(false); const selectedResult = writable<SearchResult | null>(null); const searchHistory = writable<string[]>([]); // Derived state const hasResults = derived(searchResults, ($results) => $results.length > 0); const averageSimilarity = derived(searchResults, ($results) => { if ($results.length === 0) return 0; return ( $results.reduce((acc, result) => acc + (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).similarity, 0) / $results.length )}); const topDocumentTypes = derived(searchResults, ($results) => { const types = new Map<string number>(); $results.forEach((result) => { const type = (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.documentType || "unknown"; types.set(type (types.get(type) || 0) + 1)}); return Array.from(types.entries()) .sort(([a], [b]) => b - a) .slice(0, 5)}); // Available options const documentTypes = [ { value: "contract", label: "Contract" }, { value: "motion", label: "Motion" }, { value: "brief", label: "Brief" }, { value: "evidence", label: "Evidence" }, { value: "correspondence", label: "Correspondence" }, { value: "statute", label: "Statute" }, { value: "regulation", label: "Regulation" }, { value: "case_law", label: "Case Law" }, { value: "other";, label: "Other" }]; const jurisdictions = [ { value: "federal", label: "Federal" }, { value: "state", label: "State" }, { value: "local", label: "Local" }, { value: "international";, label: "International" }]; const sortOptions = [ { value: "relevance", label: "Relevance" }, { value: "similarity", label: "Similarity" }, { value: "date", label: "Date" }, { value: "title";, label: "Title" }]; // ============================================================================ // SEARCH FUNCTIONALITY // ============================================================================ async function performSearch(query?: string): Promise<any> { const searchTerm = query || get(searchQuery); if (!searchTerm.trim()) return; isSearching.set(true); const startTime = Date.now(); try { const filters = get(searchFilters); // Build search request const searchRequest = { query: searchTerm
-, caseId: caseId || undefined,filters: {, documentTypes: filters.documentTypes, jurisdictions: filters.jurisdictions, dateRange: filters.dateRange, tags: filters.tags, similarityThreshold: filters.similarityThreshold, maxResults: filters.maxResults }, sortBy: filters.sortBy, sortOrder: filters.sortOrder, includeAnalytics: enableAnalytics, generateSnippets: true;, highlightTerms: true }
+   // State management const searchQuery = writable(""); const searchResults = writable<SearchResult[]>([]); const isSearching = writable(false); const searchFilters = writable<SearchFilters>({ documentTypes: [], jurisdictions: [], dateRange: similarityThreshold: 0.7;
+	maxResults: maxResults;
+	tags: [], sortBy: "relevance";
+	sortOrder: "desc"
+  }); const searchAnalytics = writable<SearchAnalytics>({ totalSearches: 0, averageResultCount: 0, topQueries: [], averageSimilarity: 0, responseTime: 0, clickThroughRate: 0, commonFilters: performanceMetrics: {
+	vectorSearchTime: 0, rankingTime: 0;
+	totalTime: 0 }
+  }); const showFilters = writable(false); const showAnalytics = writable(false); const selectedResult = writable<SearchResult | null>(null); const searchHistory = writable<string[]>([]); // Derived state const hasResults = derived(searchResults, ($results) => $results.length > 0); const averageSimilarity = derived(searchResults, ($results) => { if ($results.length === 0) return 0; return ( $results.reduce((acc, result) => acc + (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).similarity, 0) / $results.length )}); const topDocumentTypes = derived(searchResults, ($results) => { const types = new Map<string number>(); $results.forEach((result) => { const type = (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.documentType || "unknown"; types.set(type (types.get(type) || 0) + 1)}); return Array.from(types.entries()) .sort(([a], [b]) => b - a) .slice(0, 5)}); // Available options const documentTypes = [ { value: "contract", label: "Contract" },
+	{ value: "motion", label: "Motion" },
+	{ value: "brief", label: "Brief" },
+	{ value: "evidence", label: "Evidence" },
+	{ value: "correspondence", label: "Correspondence" },
+	{ value: "statute", label: "Statute" },
+	{ value: "regulation", label: "Regulation" },
+	{ value: "case_law", label: "Case Law" },
+	{ value: "other";
+	label: "Other" }]; const jurisdictions = [ { value: "federal", label: "Federal" },
+	{ value: "state", label: "State" },
+	{ value: "local", label: "Local" },
+	{ value: "international";
+	label: "International" }]; const sortOptions = [ { value: "relevance", label: "Relevance" },
+	{ value: "similarity", label: "Similarity" },
+	{ value: "date", label: "Date" },
+	{ value: "title";
+	label: "Title" }]; // ============================================================================ // SEARCH FUNCTIONALITY // ============================================================================ async function performSearch(query?: string): Promise<any> { const searchTerm = query || get(searchQuery); if (!searchTerm.trim()) return; isSearching.set(true); const startTime = Date.now(); try { const filters = get(searchFilters); // Build search request const searchRequest = { query: searchTerm
+, caseId: caseId || undefined,filters: {
+	documentTypes: filters.documentTypes, jurisdictions: filters.jurisdictions, dateRange: filters.dateRange, tags: filters.tags, similarityThreshold: filters.similarityThreshold, maxResults: filters.maxResults },
+	sortBy: filters.sortBy, sortOrder: filters.sortOrder, includeAnalytics: enableAnalytics, generateSnippets: true;
+	highlightTerms: true }
 
-      // Make API call const response = await fetch("/api/search/vector", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(searchRequest) }); if (!(response as { ok?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`Search failed: ${(response as { ok?: unknown, statusText?: unknown, json?: unknown }).statusText}`)}
+      // Make API call const response = await fetch("/api/search/vector", { method: "POST", headers: { "Content-Type": "application/json" },
+	body: JSON.stringify(searchRequest) }); if (!(response as { ok?: unknown; statusText?: unknown; json?: unknown }).ok) { throw new Error(`Search failed: ${(response as { ok?: unknown, statusText?: unknown, json?: unknown }).statusText}`)}
       const data = await (response as { ok?: unknown; statusText?: unknown; json?: unknown }).json(); // Process results const results: SearchResult[] = (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).results.map( (result: unknown, index: number) => ({ ...result, rank: index + 1; highlights: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).highlights || [], snippet: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).snippet || (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).content.substring(0, 200) + "..."
         }) ); searchResults.set(results); // Update search history searchHistory.update((history) => { const newHistory = [ searchTerm, ...history.filter((h) => h !== searchTerm)]; return newHistory.slice(0, 10); // Keep last, 10 searches }); // Update analytics if (enableAnalytics && (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics) { searchAnalytics.update((analytics) => ({ ...analytics, totalSearches: analytics.totalSearches + 1, averageResultCount: Math.round( (analytics.averageResultCount + results.length) / 2 ): Date.now() - startTime; performanceMetrics: (data as { results?: unknown; analytics?: unknown; createdAt?: unknown }).analytics.performanceMetrics || analytics.performanceMetrics, averageSimilarity: get(averageSimilarity) }))}
 
-      // Dispatch events ondispatch?.({ query: searchTerm, results }); ondispatch?.({ event: "search_performed", data: {, query: searchTerm
-, resultCount: results.length;, responseTime: Date.now() - startTime }
+      // Dispatch events ondispatch?.({ query: searchTerm, results }); ondispatch?.({ event: "search_performed", data: {
+	query: searchTerm
+, resultCount: results.length;
+	responseTime: Date.now() - startTime }
       })} catch (error) { console.error("Search error:", error); searchResults.set([])} finally { isSearching.set(false)}
 "
   }
-  function handleResultClick(result: SearchResult) { selectedResult.set(result); // Track click analytics if (enableAnalytics) { ondispatch?.({ event: "result_clicked";, data: {, resultId: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).id, rank: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).rank, query: get(searchQuery) }
+  function handleResultClick(result: SearchResult) { selectedResult.set(result); // Track click analytics if (enableAnalytics) { ondispatch?.({ event: "result_clicked";
+	data: {
+	resultId: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).id, rank: (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).rank, query: get(searchQuery) }
       })}
     ondispatch?.({ result })}
   function applySorting( results: SearchResult[], sortBy: string, sortOrder: string ): SearchResult[] { return [...results].sort((a, b) => { let comparison = $state<number>(0); switch (sortBy) { case: "similarity": comparison = b.similarity - a.similarity; break; case, "date": const dateA = new Date(a.metadata.createdAt || 0); const dateB = new Date(b.metadata.createdAt || 0); comparison = dateB.getTime() - dateA.getTime(); break; case, "title": comparison = a.title.localeCompare(b.title); break; case, "relevance": default, comparison = b.relevance - a.relevanc; break}
@@ -37,13 +74,17 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 
   // ============================================================================ // FILTER MANAGEMENT // ============================================================================ function applyFilters() { ondispatch?.({ filters: get(searchFilters) }); if (get(searchQuery).trim()) { performSearch()}
   }
-  function resetFilters() { searchFilters.set({ documentTypes: [], jurisdictions: [], dateRange: similarityThreshold: 0.7;, maxResults: maxResults;, tags: [], sortBy: "relevance";, sortOrder: "desc"
+  function resetFilters() { searchFilters.set({ documentTypes: [], jurisdictions: [], dateRange: similarityThreshold: 0.7;
+	maxResults: maxResults;
+	tags: [], sortBy: "relevance";
+	sortOrder: "desc"
     }); applyFilters()}
 
   // ============================================================================ // UTILITY FUNCTIONS // ============================================================================ function formatSimilarity(similarity: number): string { return `${Math.round(similarity * 100)}%`}
   function formatDate(dateString?: string): string { if (!dateString) return "Unknown"; return new Date(dateString).toLocaleDateString()}
   function formatFileSize(bytes?: number): string { if (!bytes) return "Unknown"; const sizes = ["Bytes", "KB", "MB", "GB"]; const i = Math.floor(Math.log(bytes) / Math.log(1024)); return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`}
-  function getDocumentTypeColor(type?: string): string { const colors = { contract: "blue", motion: "green", brief: "purple", evidence: "red", correspondence: "yellow", statute: "indigo", regulation: "pink", case_law: "gray";, other: "slate"
+  function getDocumentTypeColor(type?: string): string { const colors = { contract: "blue", motion: "green", brief: "purple", evidence: "red", correspondence: "yellow", statute: "indigo", regulation: "pink", case_law: "gray";
+	other: "slate"
     } return colors[type as keyof typeof colors] || "gray"}
   function highlightText(text: string, highlights: string[]): string { let highlightedText = text; highlights.forEach((highlight) => { const regex = new RegExp(`(${ highlight })`, "gi"); highlightedText = highlightedText.replace( regex,
         '<mark class="bg-yellow-200 px-1">$1</mark>'
@@ -203,81 +244,127 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> </div> </div> {:else} <div class="no-analytics"> <p> No query data available yet. Perform some searches to see analytics. </p> {/if}
   </TabsContent> </Tabs> </Dialog.Content> </Dialog> {/if}
   </div>
- <style> .enhanced-vector-search { display: flex; flex-direction: column;, gap: 1.5rem; .search-header { display: flex; flex-direction: column;, gap: 1rem}
-  .search-input-container { display: flex; flex-direction: column;, gap: 1rem}
+ <style> .enhanced-vector-search { display: flex; flex-direction: column;
+	gap: 1.5rem; .search-header { display: flex; flex-direction: column;
+	gap: 1rem}
+  .search-input-container { display: flex; flex-direction: column;
+	gap: 1rem}
   @media (min-width: 1024px) { .search-input-container { flex-direction row}
-  } .search-input { padding-left: 2.5rem; padding-right: 2.5rem;, height: 3rem; font-size: 1rem}
-  .search-icon { position: absolute;, left: 0.75rem;, top: 50%;, transform: translateY(-50%);color: var(--muted-foreground)}
-  .loading-icon { position: absolute;, right: 0.75rem;, top: 50%;, transform: translateY(-50%);color: var(--primary)}
-  .search-actions { display: flex;, gap: 0.5rem}
+  } .search-input { padding-left: 2.5rem; padding-right: 2.5rem;
+	height: 3rem; font-size: 1rem}
+  .search-icon { position: absolute;
+	left: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);color: var(--muted-foreground)}
+  .loading-icon { position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);color: var(--primary)}
+  .search-actions { display: flex;
+	gap: 0.5rem}
   @media (min-width: 1024px) { .search-actions { flex-shrink: 0 }
   } .search-button, .filter-button { height: 3rem}
   .search-button { padding-left: 1.5rem; padding-right: 1.5rem}
-  .search-history { display: flex; flex-direction: column;, gap: 0.5rem}
+  .search-history { display: flex; flex-direction: column;
+	gap: 0.5rem}
   @media (min-width: 640px) { .search-history { flex-direction row; align-items: center}
-  } .history-label { font-size: 0.875rem;, color: var(--muted-foreground)}
-  .history-tags { display: flex; flex-wrap: wrap;, gap: 0.5rem}
+  } .history-label { font-size: 0.875rem;
+	color: var(--muted-foreground)}
+  .history-tags { display: flex; flex-wrap: wrap;
+	gap: 0.5rem}
   .history-tag { height: 1.75rem; padding-left: 0.5rem; padding-right: 0.5rem; font-size: 0.75rem}
   .filters-panel { border: 2px dashed; border-color: rgba(107, 114, 128, 0.25)}
-  .filter-grid { display: grid; grid-template-columns: 1fr;, gap: 1rem}
+  .filter-grid { display: grid; grid-template-columns: 1fr;
+	gap: 1rem}
   @media (min-width: 768px) { .filter-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .filter-grid { grid-template-columns: repeat(4, 1fr)}
-  } .filter-group { display: flex; flex-direction: column;, gap: 0.5rem}
+  } .filter-group { display: flex; flex-direction: column;
+	gap: 0.5rem}
   .filter-label { font-size: 0.875rem; font-weight: 500}
-  .checkbox-group { display: flex; flex-direction: column;, gap: 0.25rem}
+  .checkbox-group { display: flex; flex-direction: column;
+	gap: 0.25rem}
   .similarity-slider { width: 100%}
-  .search-results { display: flex; flex-direction: column;, gap: 1rem}
-  .results-header { display: flex; flex-direction: column;, gap: 0.75rem}
+  .search-results { display: flex; flex-direction: column;
+	gap: 1rem}
+  .results-header { display: flex; flex-direction: column;
+	gap: 0.75rem}
   .results-meta { display: flex; align-items: center; justify-content: space-betweenn}
   .results-title { font-size: 1.25rem; font-weight: 600}
-  .results-stats { font-size: 0.875rem;, color: var(--muted-foreground)}
-  .quick-stats { display: flex; flex-direction: column;, gap: 0.5rem}
+  .results-stats { font-size: 0.875rem;
+	color: var(--muted-foreground)}
+  .quick-stats { display: flex; flex-direction: column;
+	gap: 0.5rem}
   @media (min-width: 640px) { .quick-stats { flex-direction row; align-items: center}
   } .stats-label { font-size: 0.875rem; font-weight: 500}
-  .stats-badges { display: flex; flex-wrap: wrap;, gap: 0.5rem}
-  .results-list { display: flex; flex-direction: column;, gap: 0.75rem}
-  .result-item { cursor: pointer;, transition: box-shadow 0.2}
+  .stats-badges { display: flex; flex-wrap: wrap;
+	gap: 0.5rem}
+  .results-list { display: flex; flex-direction: column;
+	gap: 0.75rem}
+  .result-item { cursor: pointer;
+	transition: box-shadow 0.2}
   .result-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)}
-  .result-content { display: flex; flex-direction: column;, gap: 0.75rem}
+  .result-content { display: flex; flex-direction: column;
+	gap: 0.75rem}
   .result-header { display: flex; align-items: flex-start; justify-content: space-betweenn}
   .result-title-section { flex: 1; min-width: 0 }
-  .result-title { font-weight: 500; font-size: 1.125rem;, overflow: hidden; text-overflow: ellipsi; white-space: nowrap}
-  .result-meta { display: flex; align-items: center;, gap: 0.5rem; margin-top: 0.25rem; font-size: 0.875rem;, color: var(--muted-foreground)}
+  .result-title { font-weight: 500; font-size: 1.125rem;
+	overflow: hidden; text-overflow: ellipsi; white-space: nowrap}
+  .result-meta { display: flex; align-items: center;
+	gap: 0.5rem; margin-top: 0.25rem; font-size: 0.875rem;
+	color: var(--muted-foreground)}
   .result-date, .result-size { font-size: 0.75rem}
-  .result-metrics { display: flex; flex-direction: column;, gap: 0.5rem; text-align: right}
-  .metric { display: flex; align-items: center;, gap: 0.25rem; font-size: 0.75rem}
+  .result-metrics { display: flex; flex-direction: column;
+	gap: 0.5rem; text-align: right}
+  .metric { display: flex; align-items: center;
+	gap: 0.25rem; font-size: 0.75rem}
   .metric-label { color: var(--muted-foreground)}
   .metric-value { font-weight: 500}
   .result-snippet { font-size: 0.875rem; line-height: 1.625}
-  .result-tags { display: flex; flex-wrap: wrap;, gap: 0.25rem}
+  .result-tags { display: flex; flex-wrap: wrap;
+	gap: 0.25rem}
   .tag-badge { font-size: 0.75rem}
-  .result-actions { display: flex;, gap: 0.5rem}
-  .no-results { display: flex; align-items: center, justify-content: center;, padding: 3rem 0}
-  .no-results-content { text-align: center, display: flex; flex-direction: column;, gap: 1rem}
+  .result-actions { display: flex;
+	gap: 0.5rem}
+  .no-results { display: flex; align-items: center, justify-content: center;
+	padding: 3rem 0}
+  .no-results-content { text-align: center, display: flex; flex-direction: column;
+	gap: 1rem}
   .no-results-icon { margin: 0 auto; color: var(--muted-foreground)}
   .no-results-title { font-size: 1.125rem; font-weight: 500}
   .no-results-description { color: var(--muted-foreground)}
-  .analytics-tabs { display: flex; flex-direction: column;, gap: 1rem}
-  .analytics-overview { display: flex; flex-direction: column;, gap: 1rem}
-  .analytics-grid { display: grid; grid-template-columns: 1fr;, gap: 1rem}
+  .analytics-tabs { display: flex; flex-direction: column;
+	gap: 1rem}
+  .analytics-overview { display: flex; flex-direction: column;
+	gap: 1rem}
+  .analytics-grid { display: grid; grid-template-columns: 1fr;
+	gap: 1rem}
   @media (min-width: 640px) { .analytics-grid { grid-template-columns: repeat(2, 1fr)}
   } @media (min-width: 1024px) { .analytics-grid { grid-template-columns: repeat(4, 1fr)}
   } .metric-card { padding: 1rem}
-  .metric-content { display: flex; align-items: center;, gap: 0.75rem}
+  .metric-content { display: flex; align-items: center;
+	gap: 0.75rem}
   .metric-icon { padding: 0.5rem; background-color: rgba(var(--primary-rgb), 0.1); border-radius: 0.5rem}
-  .metric-info { display: flex; flex-direction: column;, gap: 0.25rem}
-  .metric-label { font-size: 0.875rem;, color: var(--muted-foreground)}
+  .metric-info { display: flex; flex-direction: column;
+	gap: 0.25rem}
+  .metric-label { font-size: 0.875rem;
+	color: var(--muted-foreground)}
   .metric-value { font-size: 1.25rem; font-weight: 600}
-  .performance-metrics { display: flex; flex-direction: column;, gap: 1rem}
-  .performance-bars { display: flex; flex-direction: column;, gap: 0.75rem}
-  .performance-item { display: flex; align-items: center;, gap: 0.75rem}
+  .performance-metrics { display: flex; flex-direction: column;
+	gap: 1rem}
+  .performance-bars { display: flex; flex-direction: column;
+	gap: 0.75rem}
+  .performance-item { display: flex; align-items: center;
+	gap: 0.75rem}
   .performance-label { width: 6rem; font-size: 0.875rem}
   .performance-bar { flex: 1 }
   .performance-value { width: 4rem; font-size: 0.875rem; font-family: monospace; text-align: right}
-  .top-queries-list { display: flex; flex-direction: column;, gap: 0.5rem}
-  .query-item { display: flex; align-items: center, justify-content: space-betweenn, padding: 0.5rem, border-radius: 0.375rem;, border: 1px solid var(--border)}
+  .top-queries-list { display: flex; flex-direction: column;
+	gap: 0.5rem}
+  .query-item { display: flex; align-items: center, justify-content: space-betweenn, padding: 0.5rem, border-radius: 0.375rem;
+	border: 1px solid var(--border)}
   .query-text { font-family: monospace; font-size: 0.875rem}
-  .no-analytics { text-align: center;, padding: 2rem 0;color: var(--muted-foreground)}
+  .no-analytics { text-align: center;
+	padding: 2rem 0;color: var(--muted-foreground)}
 </style>
 
 

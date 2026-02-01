@@ -2,24 +2,36 @@ import { Project, SourceFile, SyntaxKind, Node, TypeChecker } from 'ts-morph';
 import { getOllamaEndpoint } from '$lib/utils/ollama-endpoints';
 
 export interface ASTNode {
-    id: string;, kind: SyntaxKind;, text: string;, start: number;, end: number;, children: ASTNode[];
+    id: string;
+	kind: SyntaxKind;
+	text: string;
+	start: number;
+	end: number;
+	children: ASTNode[];
     type?: string;
     symbol?: string;
 }
 
 export interface AutosuggestContext {
-    filePath: string;, position: number;, prefix: string;, scope: 'global' | 'class' | 'function' | 'method';
+    filePath: string;
+	position: number;
+	prefix: string;
+	scope: 'global' | 'class' | 'function' | 'method';
     contextNode?: ASTNode;
 }
 
 export interface AutosuggestResult {
-    suggestions: Autosuggestion[];, confidence: number;, context: AutosuggestContext;
+    suggestions: Autosuggestion[];
+	confidence: number;
+	context: AutosuggestContext;
 }
 
 export interface Autosuggestion {
-    text: string;, kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
+    text: string;
+	kind: 'variable' | 'function' | 'class' | 'interface' | 'import' | 'property';
     type?: string;
-    description?: string;, score: number;
+    description?: string;
+	score: number;
 }
 
 /**
@@ -341,28 +353,28 @@ export class ASTProcessor {
         // Common import suggestions based on project structure
         const commonImports = [
             { text: 'from "$lib/"', kind: 'import' as const, description: 'SvelteKit lib imports' },
-            { text: 'from "svelte/"', kind: 'import' as const, description: 'Svelte framework' },
-            {
+	{ text: 'from "svelte/"', kind: 'import' as const, description: 'Svelte framework' },
+	{
                 text: 'import { getOllamaEndpoint } from "$lib/utils/ollama-endpoints"',
                 kind: 'import' as const,
                 description: 'Ollama utilities',
             },
-            {
+	{
                 text: 'import type { OllamaEndpoints } from "$lib/utils/ollama-endpoints"',
                 kind: 'import' as const,
                 description: 'Ollama types',
             },
-            {
+	{
                 text: 'import { generateEmbeddings } from "$lib/utils/ollama-endpoints"',
                 kind: 'import' as const,
                 description: 'Embedding generation',
             },
-            {
+	{
                 text: 'import { generateLegalAnalysis } from "$lib/utils/ollama-endpoints"',
                 kind: 'import' as const,
                 description: 'Legal analysis',
             },
-        ];
+	];
 
         for (const imp of commonImports) {
             if (imp.text.toLowerCase().includes(prefix.toLowerCase())) {
@@ -385,18 +397,21 @@ export class ASTProcessor {
             const prompt = `Context: ${context.scope} scope, prefix: "${context.prefix}", File: ${context.filePath}
 
 Suggest 3 most likely completions in JSON format:
-[{"text": "completion1", "description": "reason1"}, {"text": "completion2", "description": "reason2"}]
+[{"text": "completion1", "description": "reason1"},
+	{"text": "completion2", "description": "reason2"}]
 
 Response:`;
 
             const response = await fetch(`${endpoints.primary}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
                     prompt,
                     format: 'json',
-                    options: {, temperature: 0.3, num_predict: 100 },
-                }),
+                    options: {
+	temperature: 0.3, num_predict: 100 },
+	}),
             });
 
             if (!response.ok) return [];

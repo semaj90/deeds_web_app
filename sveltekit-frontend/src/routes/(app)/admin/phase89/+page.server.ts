@@ -139,10 +139,10 @@ Analyze this error cluster (ID: ${clusterId}): Sample, Messages:
                 ) VALUES (
                     'cluster_analysis',
                     ${analysis.title},
-                    ${analysis.description},
-                    ${analysis.tags},
-                    ${JSON.stringify({ fix_strategy: analysis.fix_strategy, cluster_id: clusterId, provider: 'gemini' })},
-                    NOW()
+	${analysis.description},
+	${analysis.tags},
+	${JSON.stringify({ fix_strategy: analysis.fix_strategy, cluster_id: clusterId, provider: 'gemini' })},
+	NOW()
                 )
             `);
 

@@ -6,15 +6,18 @@
  */
 
 export interface EmbeddingRequest {
- model: string;, prompt: string;
+ model: string;
+	prompt: string;
 }
 
 export interface EmbeddingResponse {
- embedding: number[];, model: string;
+ embedding: number[];
+	model: string;
 }
 
 export interface BatchEmbeddingResponse {
- embeddings: number[][];, model: string;
+ embeddings: number[][];
+	model: string;
  count: number;
 }
 
@@ -28,7 +31,8 @@ export async function embedText(text: string, model = DEFAULT_MODEL): Promise<nu
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt, text,
+	body: JSON.stringify({
+	model: prompt, text,
  }),
  });
 
@@ -77,7 +81,8 @@ export async function embedTextsBatch(
 /**
  * Check Ollama health and model availability
  */
-export async function checkOllamaHealth(): Promise<{, healthy: boolean;
+export async function checkOllamaHealth(): Promise<{
+	healthy: boolean;
  models: string[];
  error?: string;
 }> {
@@ -114,7 +119,8 @@ export async function generateSummary(
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt,
+	body: JSON.stringify({
+	model: prompt,
  stream: false,
  }),
  });

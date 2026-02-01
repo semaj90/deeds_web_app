@@ -13,14 +13,17 @@ export interface WorkerPoolConfig {
 }
 
 export interface ProcessTask {
- id: string;, jsonData: string;
+ id: string;
+	jsonData: string;
  source: string;
  extractEntities?: boolean;
 }
 
 export interface ProcessResult {
- id: string;, summary: string;
- embedding: number[];, metadata: Record<string, unknown>;
+ id: string;
+	summary: string;
+ embedding: number[];
+	metadata: Record<string, unknown>;
  error?: string;
 }
 
@@ -70,12 +73,14 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: {, workerId: i,
- config: {, url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ data: {
+	workerId: i,
+ config: {
+	url: this.config?.ollamaUrl ?? 'http://localhost:11434',
  model: this.config?.model ?? 'gemma3-legal:latest',
  },
- },
- });
+	},
+	});
 
  workerPromises.push(initPromise);
  }
@@ -107,7 +112,8 @@ export class AnalyzerWorkerPool {
  this.listeners.delete(task.id);
  reject(new Error('Task timeout'));
  }
- }, 30000);
+ },
+	30000);
  });
  }
 
@@ -150,7 +156,7 @@ export class AnalyzerWorkerPool {
  this.workers[workerId].postMessage({
  type: 'PROCESS_BATCH',
  data: { batchId, chunks },
- });
+	});
 
  setTimeout(() => reject(new Error('Batch timeout')), 60000);
  });
@@ -225,11 +231,13 @@ export class AnalyzerWorkerPool {
 
  worker.postMessage({
  type: 'INIT',
- data: {, workerId: config: {, url: this.config?.ollamaUrl ?? 'http://localhost:11434',
+ data: {
+	workerId: config: {
+	url: this.config?.ollamaUrl ?? 'http://localhost:11434',
  model: this.config?.model ?? 'gemma3-legal:latest',
  },
- },
- });
+	},
+	});
  }
 
  /**
@@ -269,7 +277,8 @@ export class AnalyzerWorkerPool {
  setTimeout(() => {
  worker.terminate();
  resolve();
- }, 1000);
+ },
+	1000);
  });
  });
 

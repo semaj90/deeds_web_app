@@ -7,10 +7,10 @@ import type { Case } from '$lib/types';
   // Test data for dropdown
   const legalCaseTypes = [
     { value: 'contract', label: 'Contract Dispute' },
-    { value: 'personal-injury', label: 'Personal Injury' },
-    { value: 'criminal', label: 'Criminal Defense' },
-    { value: 'family', label: 'Family Law' },
-    { value: 'corporate', label: 'Corporate Law' }];
+	{ value: 'personal-injury', label: 'Personal Injury' },
+	{ value: 'criminal', label: 'Criminal Defense' },
+	{ value: 'family', label: 'Family Law' },
+	{ value: 'corporate', label: 'Corporate Law' }];
   // Component state
   let selectedCaseType = $state<string>('');
   let acceptTerms = $state<boolean>(false);

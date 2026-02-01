@@ -3,14 +3,17 @@
   import { page } from "$app/state";
 
   interface Route {
-    id: string;, route: string;
-    label: string;, icon: string;
+    id: string;
+	route: string;
+    label: string;
+	icon: string;
   }
 
   let {
     routes = [],
     collapsed = false
-  }: {, routes: Route[];
+  }: {
+	routes: Route[];
     collapsed: boolean;
   } = $props();
 

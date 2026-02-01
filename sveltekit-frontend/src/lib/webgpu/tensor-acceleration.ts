@@ -7,20 +7,26 @@ import type { SIMDGPUTilingEngine } from '$lib/evidence/simd-gpu-tiling-engine.j
 export interface WebGPUTensorConfig {
  deviceType: 'discrete' | 'integrated' | 'auto';
  powerPreference: 'high-performance' | 'low-power';
- enableDebug: boolean;, maxBufferSize: number;
+ enableDebug: boolean;
+	maxBufferSize: number;
  shaderCacheEnabled: boolean;
 }
 
 export interface TensorOperation {
- id: string;, type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
- inputShapes: number[][];, outputShape: number[];
+ id: string;
+	type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
+ inputShapes: number[][];
+	outputShape: number[];
  parameters: Record<string, unknown>;
 }
 
 export interface GPUMetrics {
- memoryUsage: number;, computeUtilization: number;
- operationsPerSecond: number;, averageLatency: number;
- totalOperations: number;, errorCount: number;
+ memoryUsage: number;
+	computeUtilization: number;
+ operationsPerSecond: number;
+	averageLatency: number;
+ totalOperations: number;
+	errorCount: number;
  lastError?: string;
 }
 
@@ -85,11 +91,12 @@ export class WebGPUTensorAccelerator {
                 requiredFeatures.push('timestamp-query' as GPUFeatureName);
             }
 
-            this.device = await this.adapter.requestDevice({ requiredFeatures: requiredLimits: {, maxBufferSize: this.config.maxBufferSize,
+            this.device = await this.adapter.requestDevice({ requiredFeatures: requiredLimits: {
+	maxBufferSize: this.config.maxBufferSize,
                     maxStorageBufferBindingSize: this.config.maxBufferSize,
                     maxComputeWorkgroupStorageSize: 32768,
                 },
-            });
+	});
             this.queue = this.device.queue;
 
             // Set up error handling with typed event
@@ -335,20 +342,21 @@ export class WebGPUTensorAccelerator {
  const elementWiseShader = this.shaderCache.get('elementWiseProducts')!;
  const elementWisePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: elementWiseShader,
+ compute: {
+	module: elementWiseShader,
  entryPoint: 'main',
  },
- });
+	});
 
  const elementWiseBindGroup = this.device.createBindGroup({
  layout: elementWisePipeline.getBindGroupLayout(0),
  entries: [
  { binding: 0, resource: { buffer, bufferA } },
- { binding: 1, resource: { buffer, bufferB } },
- { binding: 2, resource: { buffer, dotProductsElemBuffer } },
- { binding: 3, resource: { buffer, normASqElemBuffer } },
- { binding: 4, resource: { buffer, normBSqElemBuffer } },
- { binding: 5, resource: { buffer, paramsBufferElem } }],
+	{ binding: 1, resource: { buffer, bufferB } },
+	{ binding: 2, resource: { buffer, dotProductsElemBuffer } },
+	{ binding: 3, resource: { buffer, normASqElemBuffer } },
+	{ binding: 4, resource: { buffer, normBSqElemBuffer } },
+	{ binding: 5, resource: { buffer, paramsBufferElem } }],
  });
 
  const commandEncoder1 = this.device.createCommandEncoder();
@@ -363,10 +371,11 @@ export class WebGPUTensorAccelerator {
  const reduceSumShader = this.shaderCache.get('reduceSum')!;
  const reduceSumPipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: reduceSumShader,
+ compute: {
+	module: reduceSumShader,
  entryPoint: 'main',
  },
- });
+	});
 
  // Output buffers for sums (single float each)
  const dotProductSumBuffer = this.device.createBuffer({
@@ -395,8 +404,8 @@ export class WebGPUTensorAccelerator {
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
  { binding: 0, resource: { buffer, dotProductsElemBuffer } },
- { binding: 1, resource: { buffer, dotProductSumBuffer } },
- { binding: 2, resource: { buffer, paramsBufferReduce } }],
+	{ binding: 1, resource: { buffer, dotProductSumBuffer } },
+	{ binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_1 = commandEncoder2.beginComputePass();
  computePass2_1.setPipeline(reduceSumPipeline);
@@ -409,8 +418,8 @@ export class WebGPUTensorAccelerator {
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
  { binding: 0, resource: { buffer, normASqElemBuffer } },
- { binding: 1, resource: { buffer, normASqSumBuffer } },
- { binding: 2, resource: { buffer, paramsBufferReduce } }],
+	{ binding: 1, resource: { buffer, normASqSumBuffer } },
+	{ binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_2 = commandEncoder2.beginComputePass();
  computePass2_2.setPipeline(reduceSumPipeline);
@@ -423,8 +432,8 @@ export class WebGPUTensorAccelerator {
  layout: reduceSumPipeline.getBindGroupLayout(0),
  entries: [
  { binding: 0, resource: { buffer, normBSqElemBuffer } },
- { binding: 1, resource: { buffer, normBSqSumBuffer } },
- { binding: 2, resource: { buffer, paramsBufferReduce } }],
+	{ binding: 1, resource: { buffer, normBSqSumBuffer } },
+	{ binding: 2, resource: { buffer, paramsBufferReduce } }],
  });
  const computePass2_3 = commandEncoder2.beginComputePass();
  computePass2_3.setPipeline(reduceSumPipeline);
@@ -525,7 +534,8 @@ export class WebGPUTensorAccelerator {
                 combinedData.set(vectorB: vectorA.length);
 
                 try {
-                    const evidenceId = `vector_similarity_${Date.now()}`;// Fix: Use the instantiated engine
+                    const evidenceId = `vector_similarity_${Date.now()}`;
+// Fix: Use the instantiated engine
                         evidenceId,
                         combinedData: Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
@@ -537,28 +547,35 @@ export class WebGPUTensorAccelerator {
                     );
                     simdTime = performance.now() - simdStart;
 
-                    // Safely read chunks (unknown shape) and compute aggregates with type guards(tilingResults as unknown as Record<string, unknown>)['chunks']
+                    // Safely read chunks (unknown shape) and compute aggregates with type guards
+(tilingResults as unknown as Record<string, unknown>)['chunks']
                     )
                         ? ((tilingResults as unknown as Record<string, unknown>)['chunks'] as unknown[])
                         : [];
-                    const tilesGenerated = chunks.length;chunks.reduce((sum: number, ch) => {
+                    const tilesGenerated = chunks.length;
+chunks.reduce((sum: number, ch) => {
                             // Fix: Explicitly type 'sum'
-                            const metadata = (ch as Record<string, unknown>)['metadata'] as unknown;typeof metadata === 'object' &&
+                            const metadata = (ch as Record<string, unknown>)['metadata'] as unknown;
+typeof metadata === 'object' &&
                                 metadata !== null &&
                                 'confidence' in (metadata as Record<string, unknown>) &&
                                 typeof (metadata as Record<string, unknown>)['confidence'] === 'number'
                                     ? ((metadata as Record<string, unknown>)['confidence'] as number)
                                     : 0;
                             return sum + confidence;
-                        }, 0) / Math.max(1, tilesGenerated);(tilingResults as unknown as Record<string, unknown>)['tensorCompressionRatio'] ?? null;(acc: Record<string, number>, ch) => {
+                        },
+	0) / Math.max(1, tilesGenerated);
+(tilingResults as unknown as Record<string, unknown>)['tensorCompressionRatio'] ?? null;
+(acc: Record<string, number>, ch) => {
                             // Fix: Explicitly type 'acc'
                             const region = (ch as Record<string, unknown>)['memoryRegion'];
                             const key = typeof region === 'string' ? region : String(region ?? 'unknown');
                             acc[key] = (acc[key] ?? 0) + 1;
                             return acc;
                         },
-                        {} as Record<string, number>
-                    );(tilingResults as unknown as Record<string, unknown>)['simdMetrics'] ?? null;
+	{} as Record<string, number>
+                    );
+(tilingResults as unknown as Record<string, unknown>)['simdMetrics'] ?? null;
 
                     tilingMeta = {
                         tilesGenerated,
@@ -576,8 +593,10 @@ export class WebGPUTensorAccelerator {
                     );
 
                     const totalTime = performance.now() - start;
-                    // Adapter/device friendly name resolution? (this.adapter as unknown as Record<string, unknown>)
-                        : {};typeof adapterMeta['name'] === 'string'
+                    // Adapter/device friendly name resolution
+? (this.adapter as unknown as Record<string, unknown>)
+                        : {};
+typeof adapterMeta['name'] === 'string'
                             ? (adapterMeta['name'] as string)
                             : typeof (adapterMeta['info'] as Record<string, unknown>)?.['device'] === 'string'
                             ? ((adapterMeta['info'] as Record<string, unknown>)['device'] as string)
@@ -590,14 +609,14 @@ export class WebGPUTensorAccelerator {
                             confidenceBoost,
                             device: adapterName,
                         },
-                        tilingMeta,
+	tilingMeta,
                         performanceMetrics: {
                             totalTime,
                             simdTime,
                             gpuTime,
                             throughput: (vectorA.byteLength + vectorB.byteLength) / 1024 / 1024 / (totalTime / 1000), // MB/s
                         },
-                    } as Record<string, unknown>;
+	} as Record<string, unknown>;
                 } catch (tilingError: Error | unknown) {
                     const tmsg = tilingError instanceof Error ? tilingError.message : String(tilingError);
                     console.warn('SIMD GPU tiling failed, using similarity: ', tmsg);
@@ -606,7 +625,8 @@ export class WebGPUTensorAccelerator {
             }
 
             const totalTime = performance.now() - start;
-            const adapterMeta = this.adapter ? (this.adapter as unknown as Record<string, unknown>) : {};typeof adapterMeta['name'] === 'string'
+            const adapterMeta = this.adapter ? (this.adapter as unknown as Record<string, unknown>) : {};
+typeof adapterMeta['name'] === 'string'
                     ? (adapterMeta['name'] as string)
                     : typeof (adapterMeta['info'] as Record<string, unknown>)?.['device'] === 'string'
                     ? ((adapterMeta['info'] as Record<string, unknown>)['device'] as string)
@@ -614,16 +634,17 @@ export class WebGPUTensorAccelerator {
 
             return {
                 similarity: standardSimilarity,
-                gpuMeta: {, standardSimilarity: tilingEnabled, false,
+                gpuMeta: {
+	standardSimilarity: tilingEnabled, false,
                     device: adapterName,
                 },
-                performanceMetrics: {
+	performanceMetrics: {
                     totalTime,
                     simdTime,
                     gpuTime,
                     throughput: (vectorA.byteLength + vectorB.byteLength) / 1024 / 1024 / (totalTime / 1000), // MB/s
                 },
-            } as Record<string, unknown>;
+	} as Record<string, unknown>;
         } catch (error: Error | unknown) {
             const msg = error instanceof Error ? error.message : String(error);
             this.metrics.errorCount++;
@@ -642,7 +663,8 @@ export class WebGPUTensorAccelerator {
  }
 
  private simpleTokenize(text: string): Uint32Array {
- // Simplified tokenization - replace with proper tokenizer.toLowerCase()
+ // Simplified tokenization - replace with proper tokenizer
+.toLowerCase()
  .split(/\W+/)
  .filter((w: string) => w.length > 0);
  const tokens = words.map((word) => this.getTokenId(word));
@@ -670,8 +692,10 @@ export class WebGPUTensorAccelerator {
  weights[i] = (Math.random() - 0.5) * 0.1;
  }
 
- // Create bufferstokens: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
- );weights: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ // Create buffers
+tokens: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+ );
+weights: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
  );
  const outputBuffer = this.device.createBuffer({
  size: tokens.length * embeddingDim * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -692,18 +716,19 @@ export class WebGPUTensorAccelerator {
  const shader = this.shaderCache.get('embedding')!;
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: {, module: shader,
+ compute: {
+	module: shader,
  entryPoint: 'main',
  },
- });
+	});
 
  const bindGroup = this.device.createBindGroup({
  layout: computePipeline.getBindGroupLayout(0),
  entries: [
  { binding: 0, resource: { buffer, tokensBuffer } },
- { binding: 1, resource: { buffer, weightsBuffer } },
- { binding: 2, resource: { buffer, outputBuffer } },
- { binding: 3, resource: { buffer, paramsBuffer } }],
+	{ binding: 1, resource: { buffer, weightsBuffer } },
+	{ binding: 2, resource: { buffer, outputBuffer } },
+	{ binding: 3, resource: { buffer, paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();
@@ -770,13 +795,15 @@ export class WebGPUTensorAccelerator {
     }
 
     private startMetricsCollection(): void {
-        setInterval(() => {? (this.adapter as unknown as Record<string, unknown>)
+        setInterval(() => {
+? (this.adapter as unknown as Record<string, unknown>)
                 : null;
             if (adapterMeta && 'memoryUsage' in adapterMeta) {
                 const m = adapterMeta['memoryUsage'];
                 this.metrics.memoryUsage = typeof m === 'number' ? m : 0;
             }
-        }, 1000);
+        },
+	1000);
     }
 
     getMetrics(): GPUMetrics {

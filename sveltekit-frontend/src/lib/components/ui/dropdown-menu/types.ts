@@ -68,7 +68,8 @@ export interface DropdownMenuCheckboxItemProps extends DropdownMenuItemProps {
 }
 
 export interface DropdownMenuContext {
-	readonly open: boolean;, setOpen: (open: boolean) => void;
+	readonly open: boolean;
+	setOpen: (open: boolean) => void;
 	toggle: () => void;
 	close: () => void;
 }

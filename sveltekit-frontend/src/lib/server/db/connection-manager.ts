@@ -12,7 +12,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 // Minimal pool/client types
 type LocalClientLike = {
 	query: (, textOrConfig: string | { text: string; values?: any[] },
-		params?: any[]
+	params?: any[]
 	) => Promise<{ rows?: Record<string, unknown>[] }>;
 	release?: () => void;
 };
@@ -149,7 +149,8 @@ export async function executeQuery<T>(
 /**
  * Test database connectivity
  */
-export async function testDatabaseConnection(): Promise<{, success: boolean;
+export async function testDatabaseConnection(): Promise<{
+	success: boolean;
 	version?: string;
 	tables?: string[];
 	extensions?: string[];
@@ -248,10 +249,14 @@ export async function closeDatabaseConnections(): Promise<void> {
 /**
  * Health check for database connections
  */
-export async function getDatabaseHealth(): Promise<{, status: 'healthy' | 'unhealthy';
+export async function getDatabaseHealth(): Promise<{
+	status: 'healthy' | 'unhealthy';
 	config?: Record<string, unknown>;
-	connection?: {, success: boolean; version?: string; tables?: string[]; extensions?: string[] };
-	pools?: {, app: { totalCount: number;, idleCount: number; waitingCount: number } };
+	connection?: {
+	success: boolean; version?: string; tables?: string[]; extensions?: string[] };
+	pools?: {
+	app: { totalCount: number;
+	idleCount: number; waitingCount: number } };
 	errors?: string[];
 }> {
 	const config = getDatabaseConfig() as Record<string, unknown>;
@@ -269,14 +274,16 @@ export async function getDatabaseHealth(): Promise<{, status: 'healthy' | 'unhea
 
 		return {
 			status: connectionTest.success ? 'healthy' : 'unhealthy',
-			config: {, host: config.host,
+			config: {
+	host: config.host,
 				port: config.port,
 				database: config.database,
 				user: config.user,
 				ssl: config.ssl
 			},
-			connection: connectionTest,
-			pools: {, app: {
+	connection: connectionTest,
+			pools: {
+	app: {
 					totalCount: appPool?.totalCount ?? 0,
 					idleCount: appPool?.idleCount ?? 0,
 					waitingCount: appPool?.waitingCount ?? 0

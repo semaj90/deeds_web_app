@@ -8,7 +8,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
  import { FileText } from "lucide-svelte";
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  // Reactive state using Svelte 5 runes ($state )
  let submitting = $state (false);
@@ -146,10 +146,12 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  checkStatus();
  loadDocuments();
- });
+ 
+});
 </script>
 
 <main class="rag-page">

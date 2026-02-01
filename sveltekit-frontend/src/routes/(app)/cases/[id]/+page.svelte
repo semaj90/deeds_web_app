@@ -11,20 +11,23 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  // import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
  import NesModal from '$lib/components/nes/NesModal.svelte';
  import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  const cache = useCache();
 
  interface Evidence {
- id: string;, fileName: string;
- documentType: string;, inferenceConfidence: number;
+ id: string;
+	fileName: string;
+ documentType: string;
+	inferenceConfidence: number;
  status: 'pending' | 'approved' | 'rejected';
  createdAt: string;
  metadata?: Record<string, unknown>;
  }
 
  interface Case {
- id: string;, title: string;
+ id: string;
+	title: string;
  createdAt: string;
  }
 
@@ -43,11 +46,13 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
 
  const caseId = page.params.id;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadCase();
  await loadEvidence();
- })();
+ 
+});();
  });
 
  const loadCase = async () => {
@@ -183,7 +188,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  const response = await fetch(`/api/evidence/summary/${suggestedSummary.summaryId}/approve`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(data),
+	body: JSON.stringify(data),
  });
 
  if (!response.ok) throw new Error('Failed to approve summary');
@@ -204,7 +209,7 @@ import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svel
  const response = await fetch(`/api/evidence/${selectedEvidence.id}/approve`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
+	body: JSON.stringify({action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
  });
 
  if (!response.ok) throw new Error('Failed to reject evidence');

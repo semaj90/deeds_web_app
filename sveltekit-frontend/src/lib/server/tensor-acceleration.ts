@@ -5,7 +5,8 @@
  */
 
 interface GPUTensorConfig {
-	tileSize: number;, workgroupSize: [number, number, number];
+	tileSize: number;
+	workgroupSize: [number, number, number];
 	precision: 'fp16' | 'fp32';
 	memoryOptimized: boolean;
 }
@@ -19,21 +20,27 @@ export interface TensorAccelerationOptions {
 }
 
 interface GPUMeta {
-	gpuProcessed: boolean;, tileSize: number;
-	computeTime: number;, memoryUsage: number;
-	kernelType: string;, precision: string;
+	gpuProcessed: boolean;
+	tileSize: number;
+	computeTime: number;
+	memoryUsage: number;
+	kernelType: string;
+	precision: string;
 }
 
 export interface SimilarityResult {
-	similarity: number;, gpuMeta: GPUMeta;
+	similarity: number;
+	gpuMeta: GPUMeta;
 }
 
 export interface TransformResult {
-	transformed: Float32Array;, gpuMeta: GPUMeta;
+	transformed: Float32Array;
+	gpuMeta: GPUMeta;
 }
 
 export interface ImageAnalysisResult {
-	features: Float32Array;, gpuMeta: GPUMeta;
+	features: Float32Array;
+	gpuMeta: GPUMeta;
 }
 
 export class TensorAccelerator {
@@ -74,7 +81,8 @@ export class TensorAccelerator {
 
 			this.device = await adapter.requestDevice({
 				requiredFeatures: ['shader-f16'] as GPUFeatureName[],
-				requiredLimits: {, maxComputeWorkgroupSizeX: 256,
+				requiredLimits: {
+	maxComputeWorkgroupSizeX: 256,
 					maxComputeWorkgroupSizeY: 256,
 					maxComputeInvocationsPerWorkgroup: 256,
 					maxBufferSize: 2 * 1024 * 1024 * 1024
@@ -133,7 +141,8 @@ export class TensorAccelerator {
 
 		return {
 			similarity,
-			gpuMeta: {, gpuProcessed: false,
+			gpuMeta: {
+	gpuProcessed: false,
 				tileSize: 0,
 				computeTime: performance.now() - startTime,
 				memoryUsage: vectorA.byteLength + vectorB.byteLength,
@@ -179,7 +188,8 @@ export async function acceleratedSimilarity(
 
 	return {
 		similarity,
-		gpuMeta: {, gpuProcessed: false,
+		gpuMeta: {
+	gpuProcessed: false,
 			tileSize: 0,
 			computeTime: performance.now() - startTime,
 			memoryUsage: 0,
@@ -218,7 +228,8 @@ export async function acceleratedTransform(
 
 	return {
 		transformed,
-		gpuMeta: {, gpuProcessed: false,
+		gpuMeta: {
+	gpuProcessed: false,
 			tileSize: 0,
 			computeTime: performance.now() - startTime,
 			memoryUsage: 0,

@@ -32,7 +32,7 @@ export const errorBrainAnalysisTable = pgTable('error_brain_analysis',
         completedAt: timestamp('completed_at', { withTimezone: true }),
         updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: index('error_brain_analysis_route_path_idx').on(table.routePath),
             createdAtIdx: index('error_brain_analysis_created_at_idx').on(table.createdAt),

@@ -49,7 +49,7 @@ export async function ensureRedisInstance(): Promise<Redis> {
 				if (times > 3) return null; // Stop retrying
 				return Math.min(times * 50, 2000); // Exponential backoff
 			},
-			maxRetriesPerRequest: 3,
+	maxRetriesPerRequest: 3,
 			enableReadyCheck: true,
 			lazyConnect: false // Explicitly connect manually to handle errors
 		};
@@ -298,8 +298,10 @@ export async function healthCheckRabbitMQ(): Promise<boolean> {
  * Check health of all connections
  * Useful for QUIC health endpoints
  */
-export async function healthCheckAll(): Promise<{, redis: boolean;
-	qdrant: boolean;, neo4j: boolean;
+export async function healthCheckAll(): Promise<{
+	redis: boolean;
+	qdrant: boolean;
+	neo4j: boolean;
 	rabbitmq: boolean;
 }> {
 	const [redis, qdrant, neo4j, rabbitmq] = await Promise.allSettled([

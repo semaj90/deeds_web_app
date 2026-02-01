@@ -11,19 +11,23 @@ import type { UnifiedDocument } from './unified-search-service.js';
 // import neo4j from 'neo4j-driver'
 
 export interface Neo4jNode {
-    id: string;, labels: string[];
+    id: string;
+	labels: string[];
     properties: { [key: string]: any };
 }
 
 export interface Neo4jRelationship {
-    id: string;, type: string;
-    startNode: string;, endNode: string;
+    id: string;
+	type: string;
+    startNode: string;
+	endNode: string;
     properties: { [key: string]: any };
 }
 
 export interface GraphRecommendation {
     type: 'related_cases' | 'similar_precedents' | 'linked_entities' | 'citation_network';
-    documents: UnifiedDocument[];, confidence: number;
+    documents: UnifiedDocument[];
+	confidence: number;
     reasoning: string;
     graphPath?: Neo4jRelationship[];
     metadata?: {
@@ -35,9 +39,13 @@ export interface GraphRecommendation {
 }
 
 export interface LegalEntity {
-    id: string;, type: 'person' | 'organization' | 'case' | 'statute' | 'court' | 'jurisdiction';
-    name: string;, properties: { [key: string]: any };
-    connections: {, documents: string[]; relatedEntities: string[];, strength: number };
+    id: string;
+	type: 'person' | 'organization' | 'case' | 'statute' | 'court' | 'jurisdiction';
+    name: string;
+	properties: { [key: string]: any };
+    connections: {
+	documents: string[]; relatedEntities: string[];
+	strength: number };
 }
 
 class Neo4jService {
@@ -100,7 +108,8 @@ class Neo4jService {
                 lastSync: new Date().toISOString(),
                 entityCount: document.metadata.extractedEntities?.length ?? 0,
                 relationshipCount: await this.getDocumentRelationshipCount(nodeId)
-            }, 3600);
+            },
+	3600);
 
             return { success: true, nodeId };
         } catch (error) {
@@ -141,18 +150,23 @@ class Neo4jService {
         // Simple heuristics for entity classification
         // In production, use advanced NER models
         if (entityText.includes('v.') || entityText.includes('vs.')) {
-            return { type: 'CASE', properties: {, name: entityText } };
+            return { type: 'CASE', properties: {
+	name: entityText } };
         }
         if (/^\d+\s+(U\.S\.|F\.|S\.Ct\.)/.test(entityText)) {
-            return { type: 'CITATION', properties: {, citation: entityText } };
+            return { type: 'CITATION', properties: {
+	citation: entityText } };
         }
         if (/Court|Judge|Justice/.test(entityText)) {
-            return { type: 'COURT', properties: {, name: entityText } };
+            return { type: 'COURT', properties: {
+	name: entityText } };
         }
         if (/\d{4}/.test(entityText)) {
-            return { type: 'DATE', properties: {, year: entityText } };
+            return { type: 'DATE', properties: {
+	year: entityText } };
         }
-        return { type: 'ENTITY', properties: {, name: entityText } };
+        return { type: 'ENTITY', properties: {
+	name: entityText } };
     }
 
     private async getDocumentRelationshipCount(nodeId: string): Promise<number> {
@@ -203,7 +217,8 @@ class Neo4jService {
             documents: [], // Would populate from query results
             confidence: 0.85,
             reasoning: 'Documents share common citations and legal precedents',
-            metadata: {, commonEntities: ['Supreme Court', '14th Amendment', 'Due Process'],
+            metadata: {
+	commonEntities: ['Supreme Court', '14th Amendment', 'Due Process'],
                 sharedCitations: ['Brown v. Board', 'Plessy v. Ferguson'],
                 jurisdictionOverlap: ['Federal', 'Constitutional']
             }
@@ -217,7 +232,8 @@ class Neo4jService {
             documents: [],
             confidence: 0.78,
             reasoning: 'Legal precedent analysis via graph relationships and entity overlap',
-            metadata: {, commonEntities: ['Contract Law', 'Breach of Duty', 'Damages'],
+            metadata: {
+	commonEntities: ['Contract Law', 'Breach of Duty', 'Damages'],
                 temporalProximity: 0.7
             }
         };
@@ -241,7 +257,8 @@ class Neo4jService {
                 documents: [],
                 confidence: 0.6,
                 reasoning: 'Basic similarity analysis (Neo4j unavailable)',
-                metadata: {, commonEntities: documents.flatMap(d => d.metadata?.extractedEntities || []).slice(0, 5)
+                metadata: {
+	commonEntities: documents.flatMap(d => d.metadata?.extractedEntities || []).slice(0, 5)
                 }
             }
         ];
@@ -257,13 +274,15 @@ class Neo4jService {
                 centrality: documentIds.reduce((acc, id) => {
                     acc[id] = Math.random() * 0.8 + 0.2; // Simulate centrality scores
                     return acc;
-                }, {} as Record<string, number>),
+                },
+	{} as Record<string, number>),
                 clusters: [
                     documentIds.slice(0, Math.ceil(documentIds.length / 2)),
                     documentIds.slice(Math.ceil(documentIds.length / 2))
                 ],
                 influentialNodes: documentIds.slice(0, 3),
-                networkMetrics: {, density: 0.35,
+                networkMetrics: {
+	density: 0.35,
                     averageDegree: 4.2,
                     componentCount: 1
                 }
@@ -278,20 +297,24 @@ class Neo4jService {
         // Simulate entity graph retrieval
         console.log(`Getting legal entity graph for: ${entityName}`);
         return {
-            entity: {, id: `entity_${entityName.replace(/\s+/g, '_')}`,
+            entity: {
+	id: `entity_${entityName.replace(/\s+/g, '_')}`,
                 type: 'person', // Would be inferred
                 name: entityName,
-                properties: {, mentions: Math.floor(Math.random() * 50) + 10,
+                properties: {
+	mentions: Math.floor(Math.random() * 50) + 10,
                     importance: Math.random() * 0.8 + 0.2
                 },
-                connections: {, documents: [],
+	connections: {
+	documents: [],
                     relatedEntities: [],
                     strength: Math.random() * 0.9 + 0.1
                 }
             },
-            connectedDocuments: [],
+	connectedDocuments: [],
             relationshipTypes: ['MENTIONS', 'CITES', 'RELATES_TO'],
-            subgraph: {, nodes: [],
+            subgraph: {
+	nodes: [],
                 relationships: []
             }
         };

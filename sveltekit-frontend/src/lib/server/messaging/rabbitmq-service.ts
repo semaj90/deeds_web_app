@@ -23,9 +23,12 @@ type AmqpConnection = {
 
 // ConsumeMessage type
 export interface ConsumeMessage {
-    content: Buffer;, fields: {
-        deliveryTag: number;, redelivered: boolean;
-        exchange: string;, routingKey: string;
+    content: Buffer;
+	fields: {
+        deliveryTag: number;
+	redelivered: boolean;
+        exchange: string;
+	routingKey: string;
     };
     properties: {
         headers?: Record<string, unknown>;
@@ -36,9 +39,12 @@ export interface ConsumeMessage {
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
-    documentId: string;, s3Key: string;
-    s3Bucket: string;, originalName: string;
-    mimeType: string;, fileSize: number;
+    documentId: string;
+	s3Key: string;
+    s3Bucket: string;
+	originalName: string;
+    mimeType: string;
+	fileSize: number;
     processingType: 'ocr' | 'embedding' | 'summarization' | 'full_analysis';
     caseId?: string;
     userId?: string;
@@ -47,17 +53,22 @@ export interface DocumentProcessingJob {
 }
 
 export interface DLQMessage extends DocumentProcessingJob {
-    error: string;, retries: number;
+    error: string;
+	retries: number;
     timestamp: string;
 }
 
 export interface RabbitMQConfig {
-    url: string;, queues: {
-        documentProcessing: string;, ocrProcessing: string;
-        embeddingProcessing: string;, summarization: string;
+    url: string;
+	queues: {
+        documentProcessing: string;
+	ocrProcessing: string;
+        embeddingProcessing: string;
+	summarization: string;
         deadLetter: string;
     };
-    exchanges: {, documents: string;
+    exchanges: {
+	documents: string;
         deadLetter: string;
     };
 }
@@ -65,7 +76,8 @@ export interface RabbitMQConfig {
 export interface IRabbitMQService {
     initialize(retries?: number, delay?: number): Promise<void>;
     publishDocumentProcessingJob(job: DocumentProcessingJob): Promise<boolean>;
-    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }>;
+    publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
+	success: number; failed: number }>;
     purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean>;
     close(): Promise<void>;
     healthCheck(): Promise<any>;
@@ -82,7 +94,8 @@ class BrowserStub implements IRabbitMQService {
     }
     async initialize() { return; }
     async publishDocumentProcessingJob(): Promise<boolean> { this.makeError(); }
-    async publishBatchJobs(): Promise<{, success: number; failed: number }> { this.makeError(); }
+    async publishBatchJobs(): Promise<{
+	success: number; failed: number }> { this.makeError(); }
     async purgeQueue(): Promise<boolean> { this.makeError(); }
     async close() { return; }
     async healthCheck() { return { healthy: false, error: 'Client: RabbitMQService not available' }; }
@@ -103,13 +116,15 @@ class RabbitMQService implements IRabbitMQService {
         const rabbitUrl = env?.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
         this.config = {
             url: rabbitUrl,
-            queues: {, documentProcessing: 'doc_processing_queue',
+            queues: {
+	documentProcessing: 'doc_processing_queue',
                 ocrProcessing: 'ocr_processing_queue',
                 embeddingProcessing: 'embedding_processing_queue',
                 summarization: 'summarization_queue',
                 deadLetter: 'dead_letter_queue'
             },
-            exchanges: {, documents: 'documents_exchange',
+	exchanges: {
+	documents: 'documents_exchange',
                 deadLetter: 'dead_letter_exchange'
             }
         };
@@ -130,7 +145,8 @@ class RabbitMQService implements IRabbitMQService {
             try {
                 console.log(`Connecting to RabbitMQ (Attempt ${attempt}/${maxRetries})...`);
                 const amqp = await import('amqplib');
-                const amqpModule = amqp as { default?: {, connect: (url: string) => Promise<AmqpConnection> }; connect?: (url: string) => Promise<AmqpConnection> };
+                const amqpModule = amqp as { default?: {
+	connect: (url: string) => Promise<AmqpConnection> }; connect?: (url: string) => Promise<AmqpConnection> };
                 const connectFn = amqpModule.default?.connect ?? amqpModule.connect;
                 if (!connectFn) throw new Error('amqplib connect function not found');
                 this.connection = await connectFn(this.config.url);
@@ -201,7 +217,8 @@ class RabbitMQService implements IRabbitMQService {
         }
     }
 
-    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{, success: number; failed: number }> {
+    async publishBatchJobs(jobs: DocumentProcessingJob[]): Promise<{
+	success: number; failed: number }> {
         let success = 0;
         let failed = 0;
 

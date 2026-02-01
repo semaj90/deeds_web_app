@@ -50,8 +50,10 @@ describe('Phase 10.6: Message Batching', () => {
  // This test verifies the concept - actual implementation
  // would need to simulate message batching
  const maxHistory = 100;
- const messages: Array<{, type: 'health_update';
- route_path: string;, new_status: 'healthy';
+ const messages: Array<{
+	type: 'health_update';
+ route_path: string;
+	new_status: 'healthy';
  timestamp: string;
  }> = [];
 
@@ -165,10 +167,11 @@ describe('Phase 10.6: Message Batching', () => {
 
  it('should not lose messages during flush', () => {
  // Verify all messages are preserved during batch flush
- const messages: Array<{, type: 'health_update'; route_path, string }> = [
+ const messages: Array<{
+	type: 'health_update'; route_path, string }> = [
  { type: 'health_update', route_path: 'route-1' },
- { type: 'health_update', route_path: 'route-2' },
- { type: 'health_update', route_path: 'route-3' }];
+	{ type: 'health_update', route_path: 'route-2' },
+	{ type: 'health_update', route_path: 'route-3' }];
 
  expect(messages.length).toBe(3);
  });
@@ -185,9 +188,11 @@ describe('Phase 10.6: Message Batching', () => {
  });
 
  it('should maintain message order in batch', () => {
- // Verify messages maintain order within batch{ id: 1, timestamp: '2025-12-15T00Z' },
- { id: 2, timestamp: '2025-12-15T01Z' },
- { id: 3, timestamp: '2025-12-15T02Z' }];(a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+ // Verify messages maintain order within batch
+{ id: 1, timestamp: '2025-12-15T00Z' },
+	{ id: 2, timestamp: '2025-12-15T01Z' },
+	{ id: 3, timestamp: '2025-12-15T02Z' }];
+(a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
  );
 
  expect(sorted[0].id).toBe(1);

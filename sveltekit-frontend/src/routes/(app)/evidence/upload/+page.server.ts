@@ -23,21 +23,28 @@ type MetadataKind = 'PDF' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'TEXT' | 'LINK' | 'UNK
 
 // 1. Define the structure of the OCR service response
 interface OcrResultData {
-  filename: string;, pages: number;
-  averageConfidence: number;, legalConcepts: string[];
-  citations: string[];, text: string;
+  filename: string;
+	pages: number;
+  averageConfidence: number;
+	legalConcepts: string[];
+  citations: string[];
+	text: string;
 }
 
 // 2. Define processing options
 interface ProcessingOptions {
-  enableAiAnalysis: boolean;, enableOcr: boolean;
-  enableEmbeddings: boolean;, enableSummarization: boolean;
+  enableAiAnalysis: boolean;
+	enableOcr: boolean;
+  enableEmbeddings: boolean;
+	enableSummarization: boolean;
 }
 
 // 3. Define the structure for the `ocrResult` field within the final database metadata
 interface DbOcrResult {
-  extractedText: string;, confidence: number;
-  legalConcepts: string[];, citations: string[];
+  extractedText: string;
+	confidence: number;
+  legalConcepts: string[];
+	citations: string[];
   pageCount: number;
 }
 
@@ -50,19 +57,25 @@ interface GoServiceProcessingResult {
 
 // Define a more specific type for ChainOfCustody entries
 interface ChainOfCustodyEntry {
-  event: string;, timestamp: string;
+  event: string;
+	timestamp: string;
   actor: string;
   details?: Record<string, unknown>;
 }
 
 // 5. Define the comprehensive schema for the `metadata` column in the database
 interface FinalEvidenceMetadata {
-  kind: MetadataKind;, uploadedAt: string;
-  fileSize: number;, processingOptions: ProcessingOptions;
-  tags: string[];, confidentialityLevel: string;
-  isAdmissible: boolean;, collectedAt: string;
+  kind: MetadataKind;
+	uploadedAt: string;
+  fileSize: number;
+	processingOptions: ProcessingOptions;
+  tags: string[];
+	confidentialityLevel: string;
+  isAdmissible: boolean;
+	collectedAt: string;
   collectedBy: string;
-  location?: string;, chainOfCustody: ChainOfCustodyEntry[];
+  location?: string;
+	chainOfCustody: ChainOfCustodyEntry[];
   ocrResult: DbOcrResult | null;
   goServiceProcessing?: GoServiceProcessingResult;
   pageCount?: number;
@@ -72,7 +85,8 @@ interface FinalEvidenceMetadata {
   legalConcepts?: string[];
   citations?: string[];
   ocrConfidence?: number;
-  resolution?: {, width: number; height: number };
+  resolution?: {
+	width: number; height: number };
   format?: string;
   hasAlphaChannel?: boolean;
   durationSeconds?: number;
@@ -87,8 +101,10 @@ interface FinalEvidenceMetadata {
 
 // Define a type for the metadata object that ensures required fields are present
 type IntermediateEvidenceMetadata = {
-  kind: MetadataKind;, uploadedAt: string;
-  fileSize: number;, processingOptions: ProcessingOptions;
+  kind: MetadataKind;
+	uploadedAt: string;
+  fileSize: number;
+	processingOptions: ProcessingOptions;
 } & Partial<FinalEvidenceMetadata>;
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -126,7 +142,8 @@ export const actions: Actions = {
   upload: async ({ request, locals }) => {
     try {
       if (!locals.user) {
-        return fail(401, { form: {, errors: { _global: ['Unauthorized'] } } });
+        return fail(401, { form: {
+	errors: { _global: ['Unauthorized'] } } });
       }
       // 1) Parse incoming form data
       const formData = await request.formData();
@@ -134,14 +151,16 @@ export const actions: Actions = {
       // Accept generic form entry (server may provide a non-DOM File)
       const rawFile = formData.get('file');
       if (!rawFile) {
-        return fail(400, { form: {, errors: { file: ['No file provided'] } } });
+        return fail(400, { form: {
+	errors: { file: ['No file provided'] } } });
       }
 
       // Ensure the provided entry supports arrayBuffer (basic duck-typing)
       if (typeof (rawFile as any).arrayBuffer !== 'function') {
         return fail(400, {
-          form: {, errors: { file: ['Uploaded file is not readable on server'] } },
-        });
+          form: {
+	errors: { file: ['Uploaded file is not readable on server'] } },
+	});
       }
 
       // Normalize file fields safely for server-side processing
@@ -167,7 +186,8 @@ export const actions: Actions = {
       if (caseId) {
         const caseRecord = await db.select().from(cases).where(eq(cases.id, caseId)).limit(1);
         if (!caseRecord || caseRecord.length === 0) {
-          return fail(400, { form: {, errors: { case_id: ['Selected case not found'] } } });
+          return fail(400, { form: {
+	errors: { case_id: ['Selected case not found'] } } });
         }
       }
 
@@ -257,8 +277,9 @@ export const actions: Actions = {
           tempMetadata = {
             ...tempMetadata,
             kind: 'IMAGE',
-            resolution: {, width: 0, height: 0 },
-            format: fileType.split('/')[1] ?? 'unknown',
+            resolution: {
+	width: 0, height: 0 },
+	format: fileType.split('/')[1] ?? 'unknown',
             hasAlphaChannel: fileType === 'image/png',
             extractedText: ocrResult?.text ?? undefined,
             ocrConfidence: ocrResult?.averageConfidence ?? undefined,
@@ -333,7 +354,8 @@ export const actions: Actions = {
           fileName: fileName, // New: original filename
           uploadedBy: secureUserId, // New: uploader tracking
           uploadedAt: new Date().toISOString(), // New: upload timestamp
-          canvasPosition: {}, // New: canvas board position
+          canvasPosition: {},
+	// New: canvas board position
           subType: null, // New: evidence sub-classification
           criminalId: null, // New: link to criminal record
         })
@@ -344,11 +366,12 @@ export const actions: Actions = {
     } catch (error: unknown) {
       console.error('Evidence upload failed:', error);
       return fail(500, {
-        form: {, errors: { _global: ['Server error while uploading evidence'] } },
-      });
+        form: {
+	errors: { _global: ['Server error while uploading evidence'] } },
+	});
     }
   },
-};
+	};
 
 
 

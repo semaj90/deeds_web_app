@@ -1,14 +1,15 @@
 <script lang="ts">
 	let count = $state<any>(undefined);
 
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let stats = $state({ total: 0, pages: 0, endpoints: 0, layouts: 0 });
  let routes = $state<any[]>([]);
  let tagCounts = $state<Record<string, number>>({});
  let loading = $state(true);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  const res = await fetch('/api/routes/all');
@@ -21,7 +22,8 @@
  console.error('Failed to load routes:', e);
  loading = false;
  }
- })();
+ 
+});();
  });
 </script>
 

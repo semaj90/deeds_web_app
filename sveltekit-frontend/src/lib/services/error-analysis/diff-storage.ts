@@ -29,7 +29,8 @@ export interface DiffFilter {
 }
 
 export interface DiffHistoryEntry {
- id: string;, diffId: string;
+ id: string;
+	diffId: string;
  action: 'created' | 'applied' | 'validated' | 'failed' | 'rolled_back';
  timestamp: Date;
  details?: Record<string, any>;
@@ -232,7 +233,8 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  /**
  * Get statistics about diffs
  */
- async getDiffStatistics(): Promise<{, total: number;
+ async getDiffStatistics(): Promise<{
+	total: number;
  byStatus: Record<Diff['status'], number>;
  byFile: Record<string, number>;
  }> {

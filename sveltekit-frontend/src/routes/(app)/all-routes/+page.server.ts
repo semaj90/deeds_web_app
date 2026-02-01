@@ -7,7 +7,8 @@ import path from 'node:path';
 // ─────────────────────────────────────────────────────────
 
 export type RouteNode = {
-	id: string;, path: string;
+	id: string;
+	path: string;
 	url?: string;
 	href?: string;
 	file?: string;
@@ -31,9 +32,11 @@ export type RouteNode = {
 };
 
 export type RouteErrorCluster = {
-	id: string;, routeId: string;
+	id: string;
+	routeId: string;
 	tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string;
-	code: string;, message: string;
+	code: string;
+	message: string;
 	severity: 'info' | 'warning' | 'error' | string;
 	count: number;
 	lastSeen?: string;
@@ -213,7 +216,8 @@ async function readJsonFile<T = Record<string, unknown>>(filePath: string): Prom
 }
 
 export const load = async () => {
-	let astGraph: {, nodes: unknown[]; edges: unknown[] } = { nodes: [], edges: [] };
+	let astGraph: {
+	nodes: unknown[]; edges: unknown[] } = { nodes: [], edges: [] };
 	let routes: RouteNode[] = [];
 	let errorClusters: RouteErrorCluster[] = [];
 	let shieldData: ShieldData = null;
@@ -316,7 +320,8 @@ export const load = async () => {
 		errorClusters,
 		shieldData,
 		errorSummary,
-		stats: {, totalRoutes: routes.length,
+		stats: {
+	totalRoutes: routes.length,
 			totalClusters: errorClusters.length,
 			errorCount: errorClusters.filter((c) => c.severity === 'error').length,
 			warningCount: errorClusters.filter((c) => c.severity === 'warning').length

@@ -8,7 +8,8 @@ export * from './schema.js';
 
 // Additional unified types
 export interface UnifiedSchemaConfig {
-  enableVectors: boolean;, enableTimestamps: boolean;
+  enableVectors: boolean;
+	enableTimestamps: boolean;
   enableAuditLog: boolean;
 }
 

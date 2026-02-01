@@ -7,7 +7,7 @@
  * Usage:
  * ```svelte
  * <script lang="ts">
- *   import { onDestroy } from 'svelte';
+ *   // Migrated to $effect
  *   import { WorkflowEventStream } from '$lib/client/workflow-event-stream';
  *
  *   const sessionId = 'some-session-id';
@@ -193,7 +193,8 @@ export class WorkflowEventStream {
 
             setTimeout(() => {
                 this.connect();
-            }, delay);
+            },
+	delay);
         } else {
             console.error('[WorkflowEventStream] Max reconnect attempts reached');
             this.emit('SSE_ERROR', {
@@ -209,7 +210,9 @@ export class WorkflowEventStream {
  * Svelte store-based wrapper for reactive workflow events
  */
 export interface WorkflowState {
-    connected: boolean;, events: WorkflowEvent[];, lastEvent: WorkflowEvent | null;
+    connected: boolean;
+	events: WorkflowEvent[];
+	lastEvent: WorkflowEvent | null;
     errors: string[];
 }
 
@@ -274,14 +277,14 @@ export function createWorkflowStore(sessionId: string) {
 
             stream.connect();
         },
-        disconnect: () => {
+	disconnect: () => {
             if (stream) {
                 stream.disconnect();
                 stream = null;
             }
             update(state => ({ ...state, connected: false }));
         },
-        clear: () => {
+	clear: () => {
             set(initialState);
         }
     };

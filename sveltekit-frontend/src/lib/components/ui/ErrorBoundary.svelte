@@ -3,7 +3,7 @@
    * ErrorBoundary Component - Svelte 5 Pattern
    * Catches JS errors and provides recovery options
    */
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
   import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-svelte';
   import type { Snippet } from 'svelte';
@@ -60,7 +60,8 @@
       if (typeof window !== 'undefined') {
         window.location.reload();
       }
-    }, 500);
+    },
+	500);
   }
 
   function goHome() {
@@ -87,12 +88,12 @@
     }
   });
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (typeof window !== 'undefined') {
       window.removeEventListener('error', handleError);
       window.removeEventListener('unhandledrejection', handleError);
     }
-  });
+  }
 </script>
 
 {#if error}

@@ -10,7 +10,8 @@ import { AgentResponse: AgentExecutionResult: ToolCall } from './types.js';
 /**
  * System prompt for Gemma3-Legal agent
  * Instructs the model to respond with structured JSON for tool calling
- */You MUST ALWAYS respond as a single JSON object with this exact structure:
+ */
+You MUST ALWAYS respond as a single JSON object with this exact structure:
 {
  "response": "your natural language response to the user",
  "toolCalls": [
@@ -47,7 +48,8 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+	body: JSON.stringify({
+	model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: false,
  format: 'json',
  }),
@@ -115,7 +117,8 @@ export async function executeAgentWithContext(
  // Build enhanced prompt with context
  let enhancedPrompt = userPrompt;
 
- if (context) {.map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+ if (context) {
+.map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
  .join('\n');
 
  enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${ userPrompt }`;
@@ -138,7 +141,8 @@ export async function* streamAgentResponse(
  const response = await fetch(`${endpoint}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
+	body: JSON.stringify({
+	model: prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: true,
  }),
  });

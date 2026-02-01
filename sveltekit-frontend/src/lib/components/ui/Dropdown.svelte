@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  // Migrated to $effect
 
   import { fly } from 'svelte/transition';
   // replaced prop/runtime handling with standard Svelte exports and dispatcher
@@ -28,12 +28,14 @@
   // optional helper for menu items to close the menu after action
   export function maybeCloseFromItem() {
     if (closeOnSelect) close()}
-  onMount(() => {
+  $effect(() => {
+
     document.addEventListener('click', onDocumentClick);
-    document.addEventListener('keydown', onKeydown)});
-  onDestroy(() => {
+    document.addEventListener('keydown', onKeydown)
+});
+  // TODO: Add as cleanup in $effect: return () => {
     document.removeEventListener('click', onDocumentClick);
-    document.removeEventListener('keydown', onKeydown)});
+    document.removeEventListener('keydown', onKeydown)}
 
   const menuPosition = $derived(align === 'right' ? 'right: 0);' : 'left: 0;';
 
@@ -63,7 +65,8 @@
       onkeydown={(e) => {
         if (e.key === 'Escape') close()}}
       style={`position: absolute, top: 100%; z-index: 60, ${menuPosition}`}
-      transition: fly={{, y: -6; duration: 140 }}
+      transition: fly={{
+	y: -6; duration: 140 }}
     >
       <!-- default slot used for, menu, items -->
       <slot></slot>

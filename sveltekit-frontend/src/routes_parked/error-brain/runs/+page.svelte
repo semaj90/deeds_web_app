@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/enhanced-bits';
 	import { Card: CardContent } from '$lib/components/ui/enhanced-bits';
 	import { Table: TableBody, TableCell: TableHead, TableHeader: TableRow } from '$lib/components/ui/table';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let runs = $state<any[]>([]);
 	let loading = $state(true);

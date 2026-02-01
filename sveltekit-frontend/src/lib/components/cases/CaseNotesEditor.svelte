@@ -1,18 +1,24 @@
 <script lang="ts">
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface CaseNote {
- id: string;, caseId: string;
+ id: string;
+	caseId: string;
  title: string | null;
- content: string;, isAI: boolean;
- isPinned: boolean;, createdBy: string | null; // Changed from number to string for UUID
- createdAt: string;, updatedAt: string;
+ content: string;
+	isAI: boolean;
+ isPinned: boolean;
+	createdBy: string | null; // Changed from number to string for UUID
+ createdAt: string;
+	updatedAt: string;
  }
 
  interface EvidenceRef {
- id: string;, evidenceId: string;
- title: string;, evidenceType: string;
+ id: string;
+	evidenceId: string;
+ title: string;
+	evidenceType: string;
  fileName?: string;
  }
 
@@ -159,15 +165,18 @@
  if (isNewNote) return;
 
  if (noteContent.trim()) saveNote();
- }, 800);
+ },
+	800);
  });
 
- onMount(() => {
+ $effect(() => {
+
  loadNotes();
  return () => {
  if (saveTimeout) clearTimeout(saveTimeout);
  };
- });
+ 
+});
 
 	async function loadNotes() {
 		isLoading = true;
@@ -220,7 +229,8 @@
 				const response = await fetch(`/api/cases/${caseId}/notes`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, title:noteTitle.trim() || null,
+	body: JSON.stringify({
+	title:noteTitle.trim() || null,
 						content:noteContent.trim(),
 					}),
 				});
@@ -239,7 +249,8 @@
 				const response = await fetch(`/api/cases/${caseId}/notes/${selectedNote.id}`, {
 					method: 'PATCH',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, title:noteTitle.trim() || null,
+	body: JSON.stringify({
+	title:noteTitle.trim() || null,
 						content:noteContent.trim(),
 					}),
 				});
@@ -286,7 +297,8 @@
 			const response = await fetch(`/api/cases/${caseId}/notes/${note.id}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, isPinned: !note.isPinned })
+	body: JSON.stringify({
+	isPinned: !note.isPinned })
 			});
 
 			if (!response.ok) throw new Error('Failed to update note');
@@ -354,7 +366,8 @@
  <style>
  body { font-family: Arial, sans-serif, margin: 40px, line-height: 1.6; }
  h1 { color: #333; }
- pre { white-space: pre-wrap;, background: #f5f5f5; padding: 20px; border-radius: 5px; }
+ pre { white-space: pre-wrap;
+	background: #f5f5f5; padding: 20px; border-radius: 5px; }
  </style>
  </head>
  <body>
@@ -659,17 +672,20 @@
 <style>
  .case-notes-editor {
  display: flex;
- flex-direction: column;, height: 100%;
+ flex-direction: column;
+	height: 100%;
  background: var(--yorha-bg-primary, #0a0a0a);
  color: var(--yorha-text-primary, #e0e0e0);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 8px;, overflow: hidden;
+ border-radius: 8px;
+	overflow: hidden;
  }
 
  .notes-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
+ align-items: center;
+	padding: 1rem;
  background: var(--yorha-bg-secondary, #1a1a1a);
  border-bottom: 1px solid var(--yorha-border, #606060);
  }
@@ -681,14 +697,17 @@
  }
 
  .header-actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  }
 
  .btn-new {
  padding: 0.5rem 1rem;
  background: var(--yorha-accent, #3cbcfc);
- color: #000;, border: none;
- border-radius: 4px;, cursor: pointer;
+ color: #000;
+	border: none;
+ border-radius: 4px;
+	cursor: pointer;
  font-weight: 500;
  }
 
@@ -697,9 +716,11 @@
  background: var(--yorha-bg-secondary, #2a2a2a);
  color: var(--yorha-text-primary, #e0e0e0);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px;
+	cursor: pointer;
  font-size: 0.85rem;
- font-weight: 500;, transition: all 0.2s;
+ font-weight: 500;
+	transition: all 0.2s;
  }
 
 .btn-export: hover, not(:disabled) {
@@ -709,14 +730,17 @@
  }
 
  .btn-export:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5;
+	cursor:not-allowed;
  }
 
  .btn-close {
- padding: 0.5rem;, background: transparent;
+ padding: 0.5rem;
+	background: transparent;
  color: var(--yorha-text-secondary, #a0a0a0);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px;
+	cursor: pointer;
  }
 
 .error-banner {
@@ -727,30 +751,35 @@
  }
 
  .notes-content {
- display: flex;, flex: 1;
+ display: flex;
+	flex: 1;
  overflow: hidden;
  }
 
  .notes-list {
  width: 280px;
  border-right: 1px solid var(--yorha-border, #606060);
- overflow-y: auto;, background: var(--yorha-bg-secondary, #1a1a1a);
+ overflow-y: auto;
+	background: var(--yorha-bg-secondary, #1a1a1a);
  display: flex;
  flex-direction: column;
  }
 
 :global(.search-container) {
- position: relative;, padding: 0.75rem;
+ position: relative;
+	padding: 0.75rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
  background: var(--yorha-bg-secondary, #1a1a1a);
  flex-shrink: 0;
  }
 
 :global(.search-input) {
- width: 100%;, padding: 0.5rem;
+ width: 100%;
+	padding: 0.5rem;
  background: var(--yorha-bg-primary, #0a0a0a);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;, color: inherit;
+ border-radius: 4px;
+	color: inherit;
  font-size: 0.85rem;
  }
 
@@ -760,8 +789,10 @@
  }
 
 :global(.search-spinner) {
- position: absolute;, right: 1rem;
- top: 50%;, transform: translateY(-50%);
+ position: absolute;
+	right: 1rem;
+ top: 50%;
+	transform: translateY(-50%);
  animation: spin 1s linear infinite;
  color: var(--yorha-accent, #3cbcfc);
  }
@@ -774,10 +805,12 @@
 :global(.search-results-header) {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.5rem 1rem;
+ align-items: center;
+	padding: 0.5rem 1rem;
  background: rgba(60, 188, 252, 0.1);
  border-bottom: 1px solid var(--yorha-border, #606060);
- font-size: 0.8rem;, color: var(--yorha-text-secondary, #a0a0a0);
+ font-size: 0.8rem;
+	color: var(--yorha-text-secondary, #a0a0a0);
  flex-shrink: 0;
  }
 
@@ -787,8 +820,10 @@
 
 :global(.clear-search) {
  padding: 0.25rem 0.5rem;
- background: transparent;, border: 1px solid var(--yorha-border, #606060);
- border-radius: 3px;, cursor: pointer;
+ background: transparent;
+	border: 1px solid var(--yorha-border, #606060);
+ border-radius: 3px;
+	cursor: pointer;
  color: var(--yorha-text-secondary, #a0a0a0);
  font-size: 0.75rem;
  }
@@ -800,29 +835,37 @@
 
  .no-results {
  padding: 2rem 1rem;
- text-align: center;, color: var(--yorha-text-secondary, #a0a0a0);
+ text-align: center;
+	color: var(--yorha-text-secondary, #a0a0a0);
  font-size: 0.85rem;
  }
 
  .loading, .empty-state, .no-selection {
  padding: 2rem;
- text-align: center;, color: var(--yorha-text-secondary, #a0a0a0);
+ text-align: center;
+	color: var(--yorha-text-secondary, #a0a0a0);
  }
 
  .empty-state button {
- margin-top: 1rem;, padding: 0.5rem 1rem;
+ margin-top: 1rem;
+	padding: 0.5rem 1rem;
  background: var(--yorha-accent, #3cbcfc);
- color: #000;, border: none;
- border-radius: 4px;, cursor: pointer;
+ color: #000;
+	border: none;
+ border-radius: 4px;
+	cursor: pointer;
  }
 
  .note-item {
- display: block;, width: 100%;
+ display: block;
+	width: 100%;
  padding: 1rem;
- text-align: left;, background: transparent;
+ text-align: left;
+	background: transparent;
  border: none;
  border-bottom: 1px solid var(--yorha-border, #606060);
- cursor: pointer;, color: inherit;
+ cursor: pointer;
+	color: inherit;
  transition: background 0.2s;
  }
 
@@ -848,15 +891,19 @@
 
  .note-title {
  font-weight: 600;
- font-size: 0.9rem;, overflow: hidden;
+ font-size: 0.9rem;
+	overflow: hidden;
  text-overflow: ellipsis;
  white-space: nowrap;
  }
 
  .pin-btn {
- padding: 0.25rem;, background: transparent;
- border: none;, cursor: pointer;
- opacity: 0.5;, transition: opacity 0.2s;
+ padding: 0.25rem;
+	background: transparent;
+ border: none;
+	cursor: pointer;
+ opacity: 0.5;
+	transition: opacity 0.2s;
  }
 
  .pin-btn:hover, .pin-btn.active {
@@ -865,9 +912,12 @@
 
  .note-preview {
  margin: 0;
- font-size: 0.8rem;, color: var(--yorha-text-secondary, #a0a0a0);
- line-height: 1.4;, overflow: hidden;
- text-overflow: ellipsis;, display: -webkit-box;
+ font-size: 0.8rem;
+	color: var(--yorha-text-secondary, #a0a0a0);
+ line-height: 1.4;
+	overflow: hidden;
+ text-overflow: ellipsis;
+	display: -webkit-box;
  -webkit-line-clamp: 2;
  line-clamp: 2;
  -webkit-box-orient: vertical;
@@ -876,12 +926,14 @@
  .note-date {
  display: block;
  margin-top: 0.5rem;
- font-size: 0.7rem;, color: var(--yorha-text-tertiary, #707070);
+ font-size: 0.7rem;
+	color: var(--yorha-text-tertiary, #707070);
  }
 
  .ai-badge {
  display: inline-block;
- margin-top: 0.25rem;, padding: 0.125rem 0.375rem;
+ margin-top: 0.25rem;
+	padding: 0.125rem 0.375rem;
  background: var(--yorha-accent, #3cbcfc);
  color: #000;
  font-size: 0.65rem;
@@ -890,23 +942,28 @@
  }
 
  .editor-panel {
- flex: 1;, display: flex;
- flex-direction: column;, overflow: hidden;
+ flex: 1;
+	display: flex;
+ flex-direction: column;
+	overflow: hidden;
  }
 
  .editor-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
+ align-items: center;
+	padding: 1rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
  gap: 1rem;
  }
 
  .title-input {
- flex: 1;, padding: 0.5rem;
+ flex: 1;
+	padding: 0.5rem;
  background: var(--yorha-bg-secondary, #1a1a1a);
  border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;, color: inherit;
+ border-radius: 4px;
+	color: inherit;
  font-size: 1rem;
  }
 
@@ -916,25 +973,31 @@
  }
 
  .editor-actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  }
 
  .btn-save {
  padding: 0.5rem 1rem;
  background: var(--yorha-accent, #3cbcfc);
- color: #000;, border: none;
- border-radius: 4px;, cursor: pointer;
+ color: #000;
+	border: none;
+ border-radius: 4px;
+	cursor: pointer;
  font-weight: 500;
  }
 
  .btn-save:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5;
+	cursor:not-allowed;
  }
 
  .btn-delete {
- padding: 0.5rem;, background: transparent;
+ padding: 0.5rem;
+	background: transparent;
  border: 1px solid #ef4444;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px;
+	cursor: pointer;
  }
 
 .btn-delete:hover {
@@ -942,14 +1005,16 @@
  }
 
  .editor-body {
- flex: 1;, padding: 1rem;
+ flex: 1;
+	padding: 1rem;
  overflow: auto;
  }
 
  .editor-footer {
  padding: 0.5rem 1rem;
  border-top: 1px solid var(--yorha-border, #606060);
- font-size: 0.75rem;, color: var(--yorha-text-tertiary, #707070);
+ font-size: 0.75rem;
+	color: var(--yorha-text-tertiary, #707070);
  }
 
  /* Evidence References Styles */
@@ -959,20 +1024,24 @@
  }
 
  .evidence-refs h4 {
- margin: 0;, padding: 1rem;
+ margin: 0;
+	padding: 1rem;
  font-size: 0.9rem;
- font-weight: 600;, color: var(--yorha-text-primary, #e0e0e0);
+ font-weight: 600;
+	color: var(--yorha-text-primary, #e0e0e0);
  }
 
  .loading-refs, .no-refs {
  padding: 1rem;
- text-align: center;, color: var(--yorha-text-secondary, #a0a0a0);
+ text-align: center;
+	color: var(--yorha-text-secondary, #a0a0a0);
  font-size: 0.85rem;
  }
 
  .no-refs small {
  display: block;
- margin-top: 0.5rem;, color: var(--yorha-text-tertiary, #707070);
+ margin-top: 0.5rem;
+	color: var(--yorha-text-tertiary, #707070);
  }
 
  .refs-list {
@@ -983,7 +1052,8 @@
 .ref-item {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.75rem 1rem;
+ align-items: center;
+	padding: 0.75rem 1rem;
  border-bottom: 1px solid var(--yorha-border, #606060);
  background: rgba(60, 188, 252, 0.05);
  }
@@ -993,32 +1063,40 @@
  }
 
  .ref-info {
- flex: 1;, display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex: 1;
+	display: flex;
+ flex-direction: column;
+	gap: 0.25rem;
  }
 
  .ref-title {
  font-weight: 500;
- font-size: 0.9rem;, color: var(--yorha-text-primary, #e0e0e0);
+ font-size: 0.9rem;
+	color: var(--yorha-text-primary, #e0e0e0);
  }
 
  .ref-type {
- font-size: 0.75rem;, color: var(--yorha-accent, #3cbcfc);
+ font-size: 0.75rem;
+	color: var(--yorha-accent, #3cbcfc);
  text-transform: uppercase;
  font-weight: 600;
  }
 
  .ref-file {
- font-size: 0.75rem;, color: var(--yorha-text-secondary, #a0a0a0);
+ font-size: 0.75rem;
+	color: var(--yorha-text-secondary, #a0a0a0);
  font-style: italic;
  }
 
  .ref-remove {
- padding: 0.25rem;, background: transparent;
+ padding: 0.25rem;
+	background: transparent;
  border: 1px solid #ef4444;
- border-radius: 3px;, cursor: pointer;
+ border-radius: 3px;
+	cursor: pointer;
  color: #ef4444;
- font-size: 0.8rem;, transition: all 0.2s;
+ font-size: 0.8rem;
+	transition: all 0.2s;
  }
 
 .ref-remove:hover {

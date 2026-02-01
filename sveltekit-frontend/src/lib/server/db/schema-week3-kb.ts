@@ -16,7 +16,8 @@ export const autoApprovalRules = pgTable('auto_approval_rules', {
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
 	isActive: boolean('is_active').default(true),
-}, (table) => ({
+},
+	(table) => ({
 	activeIdx: index('idx_auto_approval_active').on(table.sourceType, table.isActive),
 }));
 
@@ -57,7 +58,8 @@ export const kbProvenanceGraph = pgTable('kb_provenance_graph', {
 	// Metadata
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
-}, (table) => ({
+},
+	(table) => ({
 	fileIdx: index('idx_kb_provenance_file').on(table.filePath),
 	appliedIdx: index('idx_kb_provenance_applied_at').on(table.appliedAt),
 	successIdx: index('idx_kb_provenance_success').on(table.success),
@@ -80,7 +82,8 @@ export const errorSessions = pgTable('error_sessions', {
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
 	expiresAt: timestamp('expires_at').default(sql`NOW() + INTERVAL '24 hours'`),
-}, (table) => ({
+},
+	(table) => ({
 	expiresIdx: index('idx_error_sessions_expires').on(table.expiresAt),
 }));
 
@@ -109,7 +112,8 @@ export const generatedFixes = pgTable('generated_fixes', {
 
 	// Timestamps
 	createdAt: timestamp('created_at').defaultNow(),
-}, (table) => ({
+},
+	(table) => ({
 	sessionIdx: index('idx_generated_fixes_session').on(table.sessionId),
 }));
 

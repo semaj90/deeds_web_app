@@ -9,15 +9,20 @@ import { citationService } from '$lib/server/services/citation.service';
 import { auditService } from '$lib/server/services/audit.service';
 
 export interface CitationExtractionJob {
-  documentId: string;, caseId: string;
-  content: string;, userId: string;
+  documentId: string;
+	caseId: string;
+  content: string;
+	userId: string;
 }
 
 export interface ExtractedCitation {
-  text: string;, type: 'statute' | 'case_law' | 'regulation' | 'contract';
+  text: string;
+	type: 'statute' | 'case_law' | 'regulation' | 'contract';
   jurisdiction?: string;
-  year?: number;, confidence: number;
-  startIndex: number;, endIndex: number;
+  year?: number;
+	confidence: number;
+  startIndex: number;
+	endIndex: number;
 }
 
 class CitationExtractionWorker {
@@ -98,31 +103,31 @@ class CitationExtractionWorker {
         type: 'statute' as const,
         jurisdiction: 'Federal',
       },
-      // California Code: Cal. Penal Code § 187
+	// California Code: Cal. Penal Code § 187
       {
         regex: /Cal\.?\s+(\w+\.?\s+)?Code\s*§?\s*(\d+)/gi,
         type: 'statute' as const,
         jurisdiction: 'CA',
       },
- // New York Code: N.Y. Penal Law § 155
+	// New York Code: N.Y. Penal Law § 155
  {
  regex: /N\.Y\.?\s+(\w+\.?\s+)?Law\s*§?\s*(\d+)/gi,
  type: 'statute' as const,
  jurisdiction: 'NY',
  },
- // Case citations: 123 F.3d 456 (9th Cir. 2000)
+	// Case citations: 123 F.3d 456 (9th Cir. 2000)
  {
  regex: /(\d+)\s+F\.?\s*(\d+d?)\s+(\d+)\s*\(([^)]+)\s+(\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'Federal',
  },
- // State case citations: 123 Cal.App.4th 456 (2000)
+	// State case citations: 123 Cal.App.4th 456 (2000)
  {
  regex: /(\d+)\s+Cal\.?\s*App\.?\s*(\d+\w*)\s+(\d+)\s*\((\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'CA',
  },
- // CFR citations: 29 C.F.R. § 1630.2
+	// CFR citations: 29 C.F.R. § 1630.2
  {
  regex: /(\d+)\s+C\.F\.R\.?\s*§?\s*([\d.]+)/gi,
  type: 'regulation' as const,
@@ -180,18 +185,21 @@ class CitationExtractionWorker {
  async enqueueJob(data: CitationExtractionJob): Promise<any> {
  return this.worker.add('extract', data, {
  attempts: 3,
- backoff: {, type: 'exponential',
+ backoff: {
+	type: 'exponential',
  delay: 2000,
  },
- removeOnComplete: true,
+	removeOnComplete: true,
  });
  }
 
  /**
  * Get extraction statistics
  */
- async getExtractionStats(): Promise<{, totalJobs: number;
- completedJobs: number;, failedJobs: number;
+ async getExtractionStats(): Promise<{
+	totalJobs: number;
+ completedJobs: number;
+	failedJobs: number;
  }> {
  try {
  const waiting = await this.worker.getWaiting();

@@ -20,7 +20,7 @@ export const canvasAutosaves = pgTable('canvas_autosaves', {
 		version: integer('version').default(1).notNull(),
 		createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 	},
- (table) => ([
+	(table) => ([
  index('canvas_autosaves_canvas_id_idx').on(table.canvasId),
  index('canvas_autosaves_canvas_created_idx').on(table.canvasId, table.createdAt),
  index('canvas_autosaves_user_id_idx').on(table.userId)])

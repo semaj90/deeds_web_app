@@ -43,19 +43,24 @@ describe('Colon-Chain Fix Patterns', () => {
   });
 
   describe('Basic colon-chain corruption fixes', () => {
-    it('should fix triple colon chain: {, key: value, next: prop }', () => {
-      const input = '{ key: value:, next: prop }';
+    it('should fix triple colon chain: {
+	key: value, next: prop }', () => {
+      const input = '{ key: value:
+	next: prop }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: value, next: prop }');
     });
 
-    it('should fix simple colon chain: {, a: b: c: d }', () => {
-      const input = '{ a: b:, c: d }';
+    it('should fix simple colon chain: {
+	a: b: c: d }', () => {
+      const input = '{ a: b:
+	c: d }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ a: b, c: d }');
     });
 
-    it('should fix double colon chain: {, key: value, next }', () => {
+    it('should fix double colon chain: {
+	key: value, next }', () => {
       const input = '{ key: value, next }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: value, next }');
@@ -63,16 +68,21 @@ describe('Colon-Chain Fix Patterns', () => {
   });
 
   describe('Nested object literal fixes', () => {
-    it('should fix nested colon chain: {, outer: { inner: value, next } }', () => {
-      const input = '{ outer: {, inner: value, next } }';
+    it('should fix nested colon chain: {
+	outer: { inner: value, next } }', () => {
+      const input = '{ outer: {
+	inner: value, next } }';
       const { result } = fixColonChains(input);
-      expect(result).toBe('{ outer: {, inner: value, next } }');
+      expect(result).toBe('{ outer: {
+	inner: value, next } }');
     });
 
     it('should fix deeply nested colon chain', () => {
-      const input = '{ a: {, b: { c: d: e } } }';
+      const input = '{ a: {
+	b: { c: d: e } } }';
       const { result } = fixColonChains(input);
-      expect(result).toBe('{ a: {, b: { c: d, e } } }');
+      expect(result).toBe('{ a: {
+	b: { c: d, e } } }');
     });
 
     it('should fix inner brace colon chain', () => {
@@ -89,8 +99,10 @@ describe('Colon-Chain Fix Patterns', () => {
       expect(result).toBe("import { A, B, C } from 'module'");
     });
 
-    it('should fix longer import colon chain: import { A: B:, C: D }', () => {
-      const input = "import { A: B:, C: D } from 'module'";
+    it('should fix longer import colon chain: import { A: B:
+	C: D }', () => {
+      const input = "import { A: B:
+	C: D } from 'module'";
       const { result } = fixColonChains(input);
       expect(result).toBe("import { A, B, C, D } from 'module'");
     });
@@ -98,19 +110,22 @@ describe('Colon-Chain Fix Patterns', () => {
 
   describe('Type annotation fixes', () => {
     it('should fix type annotation colon chain', () => {
-      const input = 'param: String:, another: Number';
+      const input = 'param: String:
+	another: Number';
       const { result } = fixColonChains(input);
       expect(result).toBe('param: String, another: Number');
     });
 
     it('should fix function parameter colon chain', () => {
-      const input = 'function foo(a: String:, b: Number) {}';
+      const input = 'function foo(a: String:
+	b: Number) {}';
       const { result } = fixColonChains(input);
       expect(result).toBe('function foo(a: String, b: Number) {}');
     });
 
     it('should fix arrow function parameter colon chain', () => {
-      const input = '(a: String:, b: Number) => {}';
+      const input = '(a: String:
+	b: Number) => {}';
       const { result } = fixColonChains(input);
       expect(result).toBe('(a: String, b: Number) => {}');
     });
@@ -118,25 +133,29 @@ describe('Colon-Chain Fix Patterns', () => {
 
   describe('Value type fixes', () => {
     it('should fix string value colon chain', () => {
-      const input = '{ key: "value":, next: "prop" }';
+      const input = '{ key: "value":
+	next: "prop" }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: "value", next: "prop" }');
     });
 
     it('should fix numeric value colon chain', () => {
-      const input = '{ key: 123:, next: 456 }';
+      const input = '{ key: 123:
+	next: 456 }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: 123, next: 456 }');
     });
 
     it('should fix boolean value colon chain', () => {
-      const input = '{ key: true:, next: false }';
+      const input = '{ key: true:
+	next: false }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: true, next: false }');
     });
 
     it('should fix nullish value colon chain', () => {
-      const input = '{ key: null:, next: undefined }';
+      const input = '{ key: null:
+	next: undefined }';
       const { result } = fixColonChains(input);
       expect(result).toBe('{ key: null, next: undefined }');
     });
@@ -145,7 +164,8 @@ describe('Colon-Chain Fix Patterns', () => {
   describe('Multi-pass repair', () => {
     it('should apply multiple passes for cascading fixes', () => {
       // This input has multiple corruption patterns that may need multiple passes
-      const input = '{ a: b:, c: d: e: f }';
+      const input = '{ a: b:
+	c: d: e: f }';
       const { result, passes } = fixColonChains(input);
       // Should fix to proper object literal format
       expect(result).not.toContain(': :');
@@ -161,7 +181,8 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('should track fixes by pattern name', () => {
-      const input = '{ a: b:, c: d }';
+      const input = '{ a: b:
+	c: d }';
       const { fixesByPattern } = fixColonChains(input);
       expect(Object.keys(fixesByPattern).length).toBeGreaterThan(0);
     });
@@ -169,7 +190,8 @@ describe('Colon-Chain Fix Patterns', () => {
 
   describe('Detection functions', () => {
     it('should detect colon-chain corruption', () => {
-      const input = '{ key: value:, next: prop }';
+      const input = '{ key: value:
+	next: prop }';
       const detection = detectColonChainCorruption(input);
       expect(detection.hasCorruption).toBe(true);
       expect(detection.totalMatches).toBeGreaterThan(0);
@@ -183,7 +205,8 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('should validate no corruption after fix', () => {
-      const input = '{ key: value:, next: prop }';
+      const input = '{ key: value:
+	next: prop }';
       const { result } = fixColonChains(input);
       expect(validateNoColonChainCorruption(result)).toBe(true);
     });
@@ -191,7 +214,8 @@ describe('Colon-Chain Fix Patterns', () => {
 
   describe('Individual pattern tests', () => {
     it('tripleColonChainPattern should match triple colon chains', () => {
-      const input = 'key: value:, next: prop';
+      const input = 'key: value:
+	next: prop';
       const matches = input.match(tripleColonChainPattern.pattern);
       expect(matches).not.toBeNull();
       expect(matches?.length).toBe(1);
@@ -204,7 +228,8 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('nestedObjectColonChainPattern should match nested patterns', () => {
-      const input = '{ outer: {, inner: value, next } }';
+      const input = '{ outer: {
+	inner: value, next } }';
       const matches = input.match(nestedObjectColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
@@ -222,25 +247,29 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('typeAnnotationColonChainPattern should match type annotations', () => {
-      const input = 'param: Type:, another: Type';
+      const input = 'param: Type:
+	another: Type';
       const matches = input.match(typeAnnotationColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
 
     it('stringValueColonChainPattern should match string values', () => {
-      const input = 'key: "value":, next: "prop"';
+      const input = 'key: "value":
+	next: "prop"';
       const matches = input.match(stringValueColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
 
     it('numericValueColonChainPattern should match numeric values', () => {
-      const input = 'key: 123:, next: 456';
+      const input = 'key: 123:
+	next: 456';
       const matches = input.match(numericValueColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
 
     it('booleanValueColonChainPattern should match boolean values', () => {
-      const input = 'key: true:, next: false';
+      const input = 'key: true:
+	next: false';
       const matches = input.match(booleanValueColonChainPattern.pattern);
       expect(matches).not.toBeNull();
     });
@@ -249,14 +278,16 @@ describe('Colon-Chain Fix Patterns', () => {
   describe('Real-world examples', () => {
     it('should fix corrupted Svelte component props', () => {
       const input = `const props = {
-        title: "Hello":, description: "World"
+        title: "Hello":
+	description: "World"
       }`;
       const { result } = fixColonChains(input);
       expect(result).toContain('title: "Hello", description: "World"');
     });
 
     it('should fix corrupted TypeScript interface', () => {
-      const input = 'interface Props { name: String:, age: Number }';
+      const input = 'interface Props { name: String:
+	age: Number }';
       const { result } = fixColonChains(input);
       // Note: The general pattern fixes to comma, which is also valid TypeScript
       // The interface-specific pattern would use semicolons but has lower priority
@@ -264,7 +295,8 @@ describe('Colon-Chain Fix Patterns', () => {
     });
 
     it('should fix corrupted type definition', () => {
-      const input = 'type Config = { host: String:, port: Number }';
+      const input = 'type Config = { host: String:
+	port: Number }';
       const { result } = fixColonChains(input);
       // Note: The general pattern fixes to comma, which is also valid TypeScript
       // The type-specific pattern would use semicolons but has lower priority
@@ -279,7 +311,8 @@ describe('Colon-Chain Fix Patterns', () => {
 
     it('should handle multiple corruptions in one file', () => {
       const input = `
-        const obj1 = { a: b:, c: d };
+        const obj1 = { a: b:
+	c: d };
         const obj2 = { x: y: z };
         import { A: B: C } from 'module';
       `;

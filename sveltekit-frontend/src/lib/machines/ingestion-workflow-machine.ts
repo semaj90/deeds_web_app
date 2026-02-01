@@ -9,35 +9,46 @@ import { getEmbedding } from '$lib/server/embedding-gateway.js';
 import { assign, fromPromise, setup } from 'xstate';
 
 export interface DocumentChunk {
-	id: string;, documentId: string;
-	chunkIndex: number;, text: string;
-	embedding?: number[];, metadata: Record<string, unknown>;
+	id: string;
+	documentId: string;
+	chunkIndex: number;
+	text: string;
+	embedding?: number[];
+	metadata: Record<string, unknown>;
 }
 
 export interface SimilarDocument {
-	id: string;, title: string;
+	id: string;
+	title: string;
 	score: number;
 }
 
 export interface IngestionJob {
-	id: string;, documentId: string;
-	chunks: string[];, metadata: {
-		fileName: string;, fileSize: number;
+	id: string;
+	documentId: string;
+	chunks: string[];
+	metadata: {
+		fileName: string;
+	fileSize: number;
 		mimeType: string;
-		caseId?: string;, userId: string;
+		caseId?: string;
+	userId: string;
 		priority: 'low' | 'medium' | 'high' | 'urgent';
 		tags?: string[];
 		confidenceThreshold?: number;
 		queueBackend?: 'rabbitmq' | 'redis' | 'direct';
 	};
 	state: 'queued' | 'processing' | 'chunking' | 'embedding' | 'storing' | 'caching' | 'completed' | 'failed';
-	progress: number;, retryCount: number;
+	progress: number;
+	retryCount: number;
 	maxRetries: number;
 	error?: string;
 	startedAt?: string;
 	completedAt?: string;
-	results?: {, embeddedChunks: number;
-		totalChunks: number;, averageConfidence: number;
+	results?: {
+	embeddedChunks: number;
+		totalChunks: number;
+	averageConfidence: number;
 		processingTime: number;
 		similarDocuments?: SimilarDocument[];
 	};
@@ -45,33 +56,48 @@ export interface IngestionJob {
 
 export interface IngestionContext {
 	currentJob: IngestionJob | null;
-	jobQueue: IngestionJob[];, completedJobs: IngestionJob[];
-	failedJobs: IngestionJob[];, currentChunk: number;
-	processedChunks: DocumentChunk[];, stats: {
-		totalJobs: number;, completedJobs: number;
-		failedJobs: number;, averageProcessingTime: number;
-		totalEmbeddings: number;, cacheHitRate: number;
+	jobQueue: IngestionJob[];
+	completedJobs: IngestionJob[];
+	failedJobs: IngestionJob[];
+	currentChunk: number;
+	processedChunks: DocumentChunk[];
+	stats: {
+		totalJobs: number;
+	completedJobs: number;
+		failedJobs: number;
+	averageProcessingTime: number;
+		totalEmbeddings: number;
+	cacheHitRate: number;
 	};
-	concurrency: number;, batchSize: number;
+	concurrency: number;
+	batchSize: number;
 	error: string | null;
 	isRetrying: boolean;
 }
 
 export type IngestionEvent =
-	| { type: 'QUEUE_JOB';, job: IngestionJob }
+	| { type: 'QUEUE_JOB';
+	job: IngestionJob }
 	| { type: 'PROCESS_NEXT_JOB' }
-	| { type: 'RETRY_FAILED_JOB';, jobId: string }
-	| { type: 'CANCEL_JOB';, jobId: string }
+	| { type: 'RETRY_FAILED_JOB';
+	jobId: string }
+	| { type: 'CANCEL_JOB';
+	jobId: string }
 	| { type: 'UPDATE_PROGRESS'; progress?: number; state?: IngestionJob['state'] }
-	| { type: 'CHUNK_COMPLETED';, chunk: DocumentChunk }
-	| { type: 'JOB_COMPLETED';, results: IngestionJob['results'] }
-	| { type: 'JOB_FAILED';, error: string }
+	| { type: 'CHUNK_COMPLETED';
+	chunk: DocumentChunk }
+	| { type: 'JOB_COMPLETED';
+	results: IngestionJob['results'] }
+	| { type: 'JOB_FAILED';
+	error: string }
 	| { type: 'CLEAR_COMPLETED' }
 	| { type: 'PAUSE_PROCESSING' }
 	| { type: 'RESUME_PROCESSING' }
-	| { type: 'SET_CONCURRENCY';, concurrency: number }
+	| { type: 'SET_CONCURRENCY';
+	concurrency: number }
 	| { type: 'RESET_STATS' }
-	| { type: 'UPDATE_STATS';, stats: Partial<IngestionContext['stats']> };
+	| { type: 'UPDATE_STATS';
+	stats: Partial<IngestionContext['stats']> };
 
 const initialContext: IngestionContext = {
 	currentJob: null,
@@ -80,7 +106,8 @@ const initialContext: IngestionContext = {
 	failedJobs: [],
 	currentChunk: 0,
 	processedChunks: [],
-	stats: {, totalJobs: 0,
+	stats: {
+	totalJobs: 0,
 		completedJobs: 0,
 		failedJobs: 0,
 		averageProcessingTime: 0,
@@ -94,11 +121,14 @@ const initialContext: IngestionContext = {
 };
 
 export const ingestionWorkflowMachine = setup({
-	types: {, context: {} as IngestionContext,
+	types: {
+	context: {} as IngestionContext,
 		events: {} as IngestionEvent,
-		input: {} as { job: IngestionJob;, batchSize: number }
+		input: {} as { job: IngestionJob;
+	batchSize: number }
 	},
-	actions: {, queueJob: assign(({ context, event }) => {
+	actions: {
+	queueJob: assign(({ context, event }) => {
 			if (event.type !== 'QUEUE_JOB') return {};
 			const job = { ...event.job, state: 'queued' as const };
 			return {
@@ -157,7 +187,7 @@ export const ingestionWorkflowMachine = setup({
 				currentJob: null,
 				failedJobs: [...context.failedJobs, failedJob],
 				stats: { ...context.stats, failedJobs: context.stats.failedJobs + 1 },
-				error: event.error
+	error: event.error
 			};
 		}),
 		addProcessedChunk: assign(({ context, event }) => {
@@ -180,7 +210,8 @@ export const ingestionWorkflowMachine = setup({
 		clearError: assign(() => ({ error: null, isRetrying: false })),
 		setRetrying: assign(() => ({ isRetrying: true }))
 	},
-	actors: {, processJob: fromPromise(async ({ input }) => {
+	actors: {
+	processJob: fromPromise(async ({ input }) => {
 			const { job, batchSize = 5 } = input;
 			console.log(`🚀 Starting job processing: ${job.id}`);
 			const chunks: DocumentChunk[] = [];
@@ -254,7 +285,9 @@ export const ingestionWorkflowMachine = setup({
 				averageConfidence: 0.95 // Mock
 			};
 		}),
-		storeChunks: fromPromise(async ({ input }: {, input: { chunks: DocumentChunk[];, jobId: string } }) => {
+		storeChunks: fromPromise(async ({ input }: {
+	input: { chunks: DocumentChunk[];
+	jobId: string } }) => {
 			const { chunks, jobId } = input;
 			console.log(`💾 Storing ${chunks.length} chunks for job ${jobId}`);
 
@@ -263,7 +296,8 @@ export const ingestionWorkflowMachine = setup({
 			const response = await fetch('/api/documents/chunks', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, chunks: chunks.map((chunk) => ({
+	body: JSON.stringify({
+	chunks: chunks.map((chunk) => ({
 						document_id: chunk.documentId,
 						chunk_index: chunk.chunkIndex,
 						chunk_text: chunk.text,
@@ -280,14 +314,16 @@ export const ingestionWorkflowMachine = setup({
 			const result = await response.json();
 			return { stored: result.inserted, errors: result.errors || [] };
 		}),
-		findSimilarDocuments: fromPromise(async ({ input }: {, input: { chunks: DocumentChunk[] } }) => {
+		findSimilarDocuments: fromPromise(async ({ input }: {
+	input: { chunks: DocumentChunk[] } }) => {
 			const { chunks } = input;
 			if (!chunks.length || !chunks[0].embedding) return [];
 
 			// Mock similar documents search
 			return [];
 		}),
-		publishToQueue: fromPromise(async ({ input }: {, input: { job: IngestionJob } }) => {
+		publishToQueue: fromPromise(async ({ input }: {
+	input: { job: IngestionJob } }) => {
 			const { job } = input;
 			try {
 				// Dynamic import to avoid build issues if rabbitmq isn't strictly available in all envs
@@ -307,72 +343,89 @@ export const ingestionWorkflowMachine = setup({
 	id: 'ingestionWorkflow',
 	initial: 'idle',
 	context: initialContext,
-	states: {, idle: {
-			on: {, QUEUE_JOB: {
+	states: {
+	idle: {
+			on: {
+	QUEUE_JOB: {
 					actions: 'queueJob',
 					target: 'checkingQueue'
 				},
-				PROCESS_NEXT_JOB: 'checkingQueue'
+	PROCESS_NEXT_JOB: 'checkingQueue'
 			}
 		},
-		checkingQueue: {, always: [
+	checkingQueue: {
+	always: [
 				{
 					guard: ({ context }) => context.jobQueue.length > 0,
 					target: 'processing',
 					actions: 'setCurrentJob'
 				},
-				{ target: 'idle' }
+	{ target: 'idle' }
 			]
 		},
-		processing: {, entry: { type: 'updateJobProgress', params: {, state: 'processing', progress: 0 } },
-			invoke: {, src: 'processJob',
+	processing: {
+	entry: { type: 'updateJobProgress', params: {
+	state: 'processing', progress: 0 } },
+	invoke: {
+	src: 'processJob',
 				input: ({ context }) => ({
 					job: context.currentJob!,
 					batchSize: context.batchSize
 				}),
-				onDone: {, target: 'storing',
+				onDone: {
+	target: 'storing',
 					actions: [
 						assign({
 							processedChunks: ({ event }) => event.output.chunks
 						}),
 						{
 							type: 'updateJobProgress',
-							params: {, state: 'storing', progress: 50 }
+							params: {
+	state: 'storing', progress: 50 }
 						}
 					]
 				},
-				onError: {, target: 'failed',
+	onError: {
+	target: 'failed',
 					actions: 'failJob'
 				}
 			}
 		},
-		storing: {, invoke: {
+	storing: {
+	invoke: {
 				src: 'storeChunks',
 				input: ({ context }) => ({
 					chunks: context.processedChunks,
 					jobId: context.currentJob!.id
 				}),
-				onDone: {, target: 'analyzing',
-					actions: {, type: 'updateJobProgress',
-						params: {, state: 'caching', progress: 75 }
+				onDone: {
+	target: 'analyzing',
+					actions: {
+	type: 'updateJobProgress',
+						params: {
+	state: 'caching', progress: 75 }
 					}
 				},
-				onError: {, target: 'failed',
+	onError: {
+	target: 'failed',
 					actions: 'failJob'
 				}
 			}
 		},
-		analyzing: {, invoke: {
+	analyzing: {
+	invoke: {
 				src: 'findSimilarDocuments',
 				input: ({ context }) => ({
 					chunks: context.processedChunks
 				}),
-				onDone: {, target: 'completed',
+				onDone: {
+	target: 'completed',
 					actions: [
 						{
 							type: 'completeJob',
 							params: ({ event }) => ({
-								results: {, embeddedChunks: 0, // Placeholder
+								results: {
+	embeddedChunks: 0, // Placeholder
 									totalChunks: 0, // Placeholder
 									averageConfidence: 1, // Placeholder
 									processingTime: 0, // Placeholder
@@ -382,11 +435,13 @@ export const ingestionWorkflowMachine = setup({
 						}
 					]
 				},
-				onError: {
+	onError: {
 					// Analyze failure doesn't fail the job, just completes without similar docs
 					target: 'completed',
-					actions: {, type: 'completeJob',
-						params: {, results: {
+					actions: {
+	type: 'completeJob',
+						params: {
+	results: {
 								embeddedChunks: 0,
 								totalChunks: 0,
 								averageConfidence: 1,
@@ -398,13 +453,16 @@ export const ingestionWorkflowMachine = setup({
 				}
 			}
 		},
-		completed: {, always: 'checkingQueue' // Move to next job immediately
+	completed: {
+	always: 'checkingQueue' // Move to next job immediately
 		},
-		failed: {, on: {
-				RETRY_FAILED_JOB: {, target: 'checkingQueue', // Simplified retry logic
+	failed: {
+	on: {
+				RETRY_FAILED_JOB: {
+	target: 'checkingQueue', // Simplified retry logic
 					actions: 'queueJob' // Re-queue it? Or just reset state.
 				},
-				PROCESS_NEXT_JOB: 'checkingQueue'
+	PROCESS_NEXT_JOB: 'checkingQueue'
 			}
 		}
 	}

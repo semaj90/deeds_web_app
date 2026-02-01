@@ -1,7 +1,7 @@
 <script lang="ts">
  import type { Document } from '$lib/types';
  import type { browserRAG } from '$lib/ai/browser-rag-chain';
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import { Database } from "lucide-svelte";
 import { Lock } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
@@ -46,7 +46,8 @@ import { AlertCircle } from "lucide-svelte";
  // Streaming
  let isStreaming = $state <boolean>(false);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  currentStep = 'Initializing Browser RAG (this may take 2-5 minutes on first load)...';
@@ -67,7 +68,8 @@ import { AlertCircle } from "lucide-svelte";
  } finally {
  isLoading = false;
  }
- })();
+ 
+});();
  });
  async function handleQuery(): Promise<any> {
  if (!query.trim() || !isInitialized) return;

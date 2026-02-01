@@ -1,16 +1,20 @@
 import { browser } from '$app/environment';
 
 export interface AuthUser {
-	id: string;, email: string;
+	id: string;
+	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	role: string;, avatarUrl: string | null;
+	role: string;
+	avatarUrl: string | null;
 }
 export interface Session {
-	id: string;, expiresAt: string;
+	id: string;
+	expiresAt: string;
 }
 export interface UserSession {
-	user: AuthUser;, session: Session;
+	user: AuthUser;
+	session: Session;
 }
 
 /**
@@ -78,7 +82,7 @@ class AuthStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }),
+	body: JSON.stringify({ email, password }),
 				credentials: 'include'
 			});
 
@@ -132,7 +136,8 @@ class AuthStore {
 	/**
 	 * Register new user
 	 */
-	async register(data: {, email: string,
+	async register(data: {
+	email: string,
 		password: string,
 		firstName?: string;
 		lastName?: string;
@@ -144,7 +149,7 @@ class AuthStore {
 			const response = await fetch('/api/auth/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data),
+	body: JSON.stringify(data),
 				credentials: 'include'
 			});
 
@@ -182,7 +187,7 @@ class AuthStore {
 			const response = await fetch('/api/auth/profile', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
 				credentials: 'include'
 			});
 

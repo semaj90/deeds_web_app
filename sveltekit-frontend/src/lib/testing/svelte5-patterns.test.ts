@@ -27,7 +27,8 @@ describe('Svelte 5 Runes Patterns', () => {
 		it('should handle array state types', () => {
 			interface Message {
 				role: 'user' | 'assistant';
-				content: string;, timestamp: Date;
+				content: string;
+	timestamp: Date;
 			}
 
 			const messages: Message[] = [];
@@ -44,8 +45,10 @@ describe('Svelte 5 Runes Patterns', () => {
 
 		it('should handle object state types', () => {
 			interface FormState {
-				title: string;, description: string;
-				tags: string[];, isSubmitting: boolean;
+				title: string;
+	description: string;
+				tags: string[];
+	isSubmitting: boolean;
 				errors: Record<string, string>;
 			}
 
@@ -70,7 +73,8 @@ describe('Svelte 5 Runes Patterns', () => {
 	describe('$props() patterns', () => {
 		it('should handle required props', () => {
 			interface ComponentProps {
-				caseId: string;, userId: string;
+				caseId: string;
+	userId: string;
 				mode: 'view' | 'edit';
 			}
 
@@ -131,8 +135,8 @@ describe('Svelte 5 Runes Patterns', () => {
 		it('should compute derived values', () => {
 			const items = [
 				{ id: '1', status: 'open' },
-				{ id: '2', status: 'closed' },
-				{ id: '3', status: 'open' }
+	{ id: '2', status: 'closed' },
+	{ id: '3', status: 'open' }
 			];
 
 			// Simulating $derived
@@ -147,14 +151,15 @@ describe('Svelte 5 Runes Patterns', () => {
 
 		it('should handle complex derived computations', () => {
 			interface Case {
-				id: string;, priority: 'low' | 'medium' | 'high' | 'urgent';
+				id: string;
+	priority: 'low' | 'medium' | 'high' | 'urgent';
 				status: 'open' | 'closed';
 			}
 
 			const cases: Case[] = [
 				{ id: '1', priority: 'urgent', status: 'open' },
-				{ id: '2', priority: 'high', status: 'open' },
-				{ id: '3', priority: 'low', status: 'closed' }
+	{ id: '2', priority: 'high', status: 'open' },
+	{ id: '3', priority: 'low', status: 'closed' }
 			];
 
 			const priorityStats = {
@@ -209,19 +214,22 @@ describe('SSR Compatibility', () => {
 
 	it('should have proper load function types', () => {
 		interface PageData {
-			cases: Array<{, id: string; title: string }>;
+			cases: Array<{
+	id: string; title: string }>;
 			totalCount: number;
 		}
 
 		interface LoadParams {
 			params: Record<string, string>;
-			url: URL;, fetch: typeof fetch;
+			url: URL;
+	fetch: typeof fetch;
 		}
 
 		// Mock load function
 		const load = async ({ params }: LoadParams): Promise<PageData> => {
 			return {
-				cases: [{, id: params.id || '1', title: 'Test Case' }],
+				cases: [{
+	id: params.id || '1', title: 'Test Case' }],
 				totalCount: 1
 			};
 		};
@@ -237,13 +245,15 @@ describe('SSR Compatibility', () => {
 		}
 
 		interface ActionInput {
-			request: Request;, params: Record<string, string>;
+			request: Request;
+	params: Record<string, string>;
 			locals: Record<string, unknown>;
 		}
 
 		// Mock server action
 		const submitAction = async (_input: ActionInput): Promise<ActionResult> => {
-			return { success: true, data: {, id: 'new-123' } };
+			return { success: true, data: {
+	id: 'new-123' } };
 		};
 
 		expect(typeof submitAction).toBe('function');
@@ -299,14 +309,15 @@ describe('bits-ui Svelte 5 Patterns', () => {
 		}
 
 		interface SelectOption {
-			value: string;, label: string;
+			value: string;
+	label: string;
 			disabled?: boolean;
 		}
 
 		const options: SelectOption[] = [
 			{ value: 'open', label: 'Open' },
-			{ value: 'closed', label: 'Closed' },
-			{ value: 'pending', label: 'Pending', disabled: true }
+	{ value: 'closed', label: 'Closed' },
+	{ value: 'pending', label: 'Pending', disabled: true }
 		];
 
 		const selectProps: SelectProps = {

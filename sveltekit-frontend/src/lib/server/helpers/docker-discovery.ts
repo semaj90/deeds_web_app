@@ -12,12 +12,15 @@ interface DiscoveryOptions {
 }
 
 interface DiscoveryResult {
-    host: string;, port: number;
-    url: string;, containerId: string;
+    host: string;
+	port: number;
+    url: string;
+	containerId: string;
     containerName: string;
 }
 
-const DISCOVERY_CACHE = new Map<string, { result: DiscoveryResult;, timestamp: number }>();
+const DISCOVERY_CACHE = new Map<string, { result: DiscoveryResult;
+	timestamp: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 let dockerClient: Docker | null = null;
@@ -37,7 +40,8 @@ function isDevEnvironment(): boolean {
     return process.env.NODE_ENV === 'development' || process.env.VITE_DEV === 'true';
 }
 
-function getPortMapping(container: Docker.ContainerInspectInfo, targetPort: number): {, host: string; port: number } | null {
+function getPortMapping(container: Docker.ContainerInspectInfo, targetPort: number): {
+	host: string; port: number } | null {
     try {
         const portKey = `${targetPort}/tcp`;
         const portBindings = container.NetworkSettings?.Ports?.[portKey];
@@ -147,7 +151,8 @@ export async function discoverServiceEndpoint(
 }
 
 export async function discoverMultipleServices(
-    services: Record<string, { fallbackUrl: string;, options: DiscoveryOptions }>
+    services: Record<string, { fallbackUrl: string;
+	options: DiscoveryOptions }>
 ): Promise<Record<string, string>> {
     const results: Record<string, string> = {};
     const promises = Object.entries(services).map(async ([envVarName, config]) => {

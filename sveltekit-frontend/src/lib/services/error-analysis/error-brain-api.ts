@@ -27,7 +27,8 @@ export class ErrorBrainAPI extends BaseService {
  * Analyzes errors and generates fixes
  * Requires error-brain feature flag to be enabled
  */
- async analyzeErrors(errors: AnalysisError[]): Promise<{, success: boolean;
+ async analyzeErrors(errors: AnalysisError[]): Promise<{
+	success: boolean;
  analyses: Analysis[];
  error?: string;
  }> {
@@ -109,8 +110,10 @@ export class ErrorBrainAPI extends BaseService {
  * GET /api/error-brain/status
  * Returns the status of the error-brain system
  */
- async getStatus(): Promise<{, enabled: boolean;
- status: string;, features: Record<string, boolean>;
+ async getStatus(): Promise<{
+	enabled: boolean;
+ status: string;
+	features: Record<string, boolean>;
  timestamp: string;
  }> {
  try {
@@ -130,7 +133,7 @@ export class ErrorBrainAPI extends BaseService {
  enabled: false,
  status: 'error',
  features: {},
- timestamp: new Date().toISOString(),
+	timestamp: new Date().toISOString(),
  };
  }
  }
@@ -139,7 +142,8 @@ export class ErrorBrainAPI extends BaseService {
  * POST /api/error-brain/enable
  * Enables the error-brain feature
  */
- async enableErrorBrain(): Promise<{, success: boolean;
+ async enableErrorBrain(): Promise<{
+	success: boolean;
  message: string;
  }> {
  try {
@@ -168,7 +172,8 @@ export class ErrorBrainAPI extends BaseService {
  * POST /api/error-brain/disable
  * Disables the error-brain feature
  */
- async disableErrorBrain(): Promise<{, success: boolean;
+ async disableErrorBrain(): Promise<{
+	success: boolean;
  message: string;
  }> {
  try {
@@ -196,7 +201,8 @@ export class ErrorBrainAPI extends BaseService {
  * GET /api/error-brain/features
  * Returns all available feature flags
  */
- async getFeatures(): Promise<{, features: Record<string, boolean>;
+ async getFeatures(): Promise<{
+	features: Record<string, boolean>;
  timestamp: string;
  }> {
  try {
@@ -212,7 +218,7 @@ export class ErrorBrainAPI extends BaseService {
  this.log('error', `Failed to get features: ${message}`);
  return {
  features: {},
- timestamp: new Date().toISOString(),
+	timestamp: new Date().toISOString(),
  };
  }
  }
@@ -223,13 +229,15 @@ export class ErrorBrainAPI extends BaseService {
  */
  async setFeature(
  flag: string, enabled: boolean
- ): Promise<{, success: boolean;
+ ): Promise<{
+	success: boolean;
  message: string;
  }> {
  try {
  this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
- // Validate flag name'error-brain',
+ // Validate flag name
+'error-brain',
  'diff-generation',
  'diff-application',
  'validation',

@@ -7,7 +7,8 @@
 
 // Tree-shaking utilities
 export interface ComponentModule {
-    default: any;, name: string;
+    default: any;
+	name: string;
     dependencies?: string[];
     size?: number;
 }
@@ -17,8 +18,10 @@ const componentRegistry = new Map<string, () => Promise<ComponentModule>>();
 
 // Performance metrics tracking
 export interface PerformanceMetrics {
-    componentLoadTime: number;, renderTime: number;
-    memoryUsage: number;, bundleSize: number;
+    componentLoadTime: number;
+	renderTime: number;
+    memoryUsage: number;
+	bundleSize: number;
     dependencies: string[];
 }
 
@@ -152,7 +155,9 @@ export class VirtualScrollManager {
         this.totalItems = count;
     }
 
-    getVisibleRange(): {, start: number; end: number;, offset: number } {
+    getVisibleRange(): {
+	start: number; end: number;
+	offset: number } {
         const { itemHeight, bufferSize, overscan } = this.options;
         const startIndex = Math.floor(this.scrollTop / itemHeight);
         const endIndex = Math.min(
@@ -197,7 +202,8 @@ export function createDebouncedSearch<T>(
                     currentPromise = null;
                     reject(error);
                 }
-            }, delay);
+            },
+	delay);
         });
     };
 }
@@ -333,8 +339,10 @@ export class ResourcePool<T> {
  * Bundle analyzer for component dependencies
  */
 export interface BundleAnalysis {
-    totalSize: number;, gzippedSize: number;
-    components: Array<any>;, duplicates: Array<any>;
+    totalSize: number;
+	gzippedSize: number;
+    components: Array<any>;
+	duplicates: Array<any>;
     recommendations: string[];
 }
 
@@ -351,32 +359,32 @@ export function analyzeBundleSize(): BundleAnalysis {
                 dependencies: ['bits-ui', 'lucide-svelte'],
                 critical: true,
             },
-            {
+	{
                 name: 'Dialog',
                 size: 18000,
                 dependencies: ['bits-ui', 'svelte/transition'],
                 critical: true,
             },
-            {
+	{
                 name: 'Select',
                 size: 15000,
                 dependencies: ['bits-ui', 'lucide-svelte'],
                 critical: false,
             },
-            {
+	{
                 name: 'VectorIntelligenceDemo',
                 size: 45000,
                 dependencies: ['Button', 'Select', 'Input', 'Card'],
                 critical: false,
             },
-        ],
+	],
         duplicates: [
             {
                 module: 'lucide-svelte',
                 count: 3,
                 size: 8000,
             },
-        ],
+	],
         recommendations: [
             'Consider lazy loading VectorIntelligenceDemo component',
             'Optimize lucide-svelte imports to reduce duplication',

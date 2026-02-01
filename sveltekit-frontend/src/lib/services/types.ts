@@ -23,9 +23,12 @@ export type EventType =
   | 'completion';
 
 export interface ProcessingEvent {
-  event_id: string;, job_id: string;
-  event_type: EventType;, stage: ProcessingStage;
-  timestamp: string;, percentage: number;
+  event_id: string;
+	job_id: string;
+  event_type: EventType;
+	stage: ProcessingStage;
+  timestamp: string;
+	percentage: number;
   eta_seconds: number | null;
   details: string;
   metrics?: {
@@ -44,12 +47,16 @@ export interface UploadState {
   jobId: string | null;
   filename: string | null;
   fileSize: number | null;
-  uploadProgress: number;, processingStage: ProcessingStage | null;
-  processingPercentage: number;, eta: number | null;
+  uploadProgress: number;
+	processingStage: ProcessingStage | null;
+  processingPercentage: number;
+	eta: number | null;
   status: 'idle' | 'uploading' | 'processing' | 'completed' | 'failed';
   error: string | null;
-  metrics: {, cpu: number;
-    memory: number;, gpu: number;
+  metrics: {
+	cpu: number;
+    memory: number;
+	gpu: number;
   };
 }
 
@@ -57,12 +64,16 @@ export interface CaseState {
   caseId: string | null;
   name: string | null;
   caseType: string | null;
-  description?: string;, createdAt: string | null;
+  description?: string;
+	createdAt: string | null;
   evidenceCount: number;
 }
 
 export interface Evidence {
-  id: string;, filename: string;
-  file_size: number;, processing_status: 'pending' | 'processing' | 'completed' | 'failed';
-  chunk_count: number;, created_at: string;
+  id: string;
+	filename: string;
+  file_size: number;
+	processing_status: 'pending' | 'processing' | 'completed' | 'failed';
+  chunk_count: number;
+	created_at: string;
 }

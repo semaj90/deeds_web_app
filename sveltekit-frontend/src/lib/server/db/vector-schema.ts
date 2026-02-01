@@ -13,7 +13,8 @@ export const documentEmbeddings = pgTable('document_embeddings', {
     modelUsed: text('model_used').default('nomic-embed-text'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow()
-}, (table) => ({
+},
+	(table) => ({
     embeddingIdx: index('idx_embedding_ivfflat').on(table.embedding),
     documentIdx: index('idx_document_lookup').on(table.documentId, table.documentType),
     createdAtIdx: index('idx_created_at').on(table.createdAt)
@@ -27,9 +28,11 @@ export const searchQueries = pgTable('search_queries', {
     queryEmbedding: vector('query_embedding', { dimensions: 384 }),
     searchType: text('search_type').notNull().default('semantic'),
     resultsCount: integer('results_count').default(0),
-    results: jsonb('results').default({, items: [], totalFound: 0, searchTime: 0 }),
+    results: jsonb('results').default({
+	items: [], totalFound: 0, searchTime: 0 }),
     createdAt: timestamp('created_at').defaultNow()
-}, (table) => ({
+},
+	(table) => ({
     userIdx: index('idx_search_user').on(table.userId),
     queryEmbeddingIdx: index('idx_query_embedding').on(table.queryEmbedding),
     createdAtIdx: index('idx_search_created').on(table.createdAt)
@@ -47,7 +50,8 @@ export const aiModels = pgTable('ai_models', {
     isActive: integer('is_active').notNull().default(1),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow()
-}, (table) => ({
+},
+	(table) => ({
     nameIdx: index('idx_model_name').on(table.name),
     providerTypeIdx: index('idx_provider_type').on(table.provider, table.modelType)
 }));

@@ -1,13 +1,25 @@
 <script lang="ts">
 
 	interface EvidenceFile {
-		id: string;, filename: string;, file_type: string;, file_size: number;, jurisdiction: string;, processing_status: string;, minio_path: string;, metadata: Record<string, any>;
-		created_at: string;, updated_at: string;, chunk_count: number;
+		id: string;
+	filename: string;
+	file_type: string;
+	file_size: number;
+	jurisdiction: string;
+	processing_status: string;
+	minio_path: string;
+	metadata: Record<string, any>;
+		created_at: string;
+	updated_at: string;
+	chunk_count: number;
 	}
 
 	interface DrawerProps {
-		isOpen: boolean;, data: EvidenceFile | null;
-		isLoading: boolean;, isSaving: boolean;, onClose: () => void;
+		isOpen: boolean;
+	data: EvidenceFile | null;
+		isLoading: boolean;
+	isSaving: boolean;
+	onClose: () => void;
 		onSave: (data: Partial<EvidenceFile>) => Promise<void>;
 		onDelete: (id: string) => Promise<void>;
 	}
@@ -18,8 +30,8 @@
 		isLoading = false,
 		isSaving = false,
 		onClose = () => {},
-		onSave = async () => {},
-		onDelete = async () => {}
+	onSave = async () => {},
+	onDelete = async () => {}
 	}: DrawerProps = $props();
 
 	let formData = $state<Partial<EvidenceFile>>({});
@@ -33,7 +45,8 @@
 	$effect(() => {
 		if (data) {
 			formData = { ...data };
-			metadataJson = JSON.stringify(data.metadata || {}, null, 2);
+			metadataJson = JSON.stringify(data.metadata || {},
+	null, 2);
 		}
 	});
 
@@ -288,9 +301,15 @@
 
 <style>
 	.drawer-overlay {
-		position: fixed;, top: 0;, right: 0;, bottom: 0;, left: 0;, background: rgba(0, 0, 0, 0.5);
+		position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
 		opacity: 0;
-		pointer-events: none;, transition: opacity 0.3s ease;
+		pointer-events: none;
+	transition: opacity 0.3s ease;
 		z-index: 1000;
 	}
 
@@ -300,10 +319,17 @@
 	}
 
 	.drawer {
-		position: fixed;, top: 0;, right: 0;, bottom: 0;, width: 500px;, background: #0d0d0f;
+		position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 500px;
+	background: #0d0d0f;
 		border-left: 1px solid #222;
 		display: flex;
-		flex-direction: column;, transform: translateX(100%);, transition: transform 0.3s ease;
+		flex-direction: column;
+	transform: translateX(100%);
+	transition: transform 0.3s ease;
 		z-index: 1001;
 		box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
 	}
@@ -315,7 +341,9 @@
 	.drawer-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1.5rem;, background: #111;
+		align-items: center;
+	padding: 1.5rem;
+	background: #111;
 		border-bottom: 1px solid #222;
 		flex-shrink: 0;
 	}
@@ -323,16 +351,27 @@
 	.drawer-header h2 {
 		margin: 0;
 		font-size: 1.25rem;
-		font-weight: 600;, color: #ddd;, overflow: hidden;
+		font-weight: 600;
+	color: #ddd;
+	overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;, flex: 1;
+		white-space: nowrap;
+	flex: 1;
 	}
 
 	.close-btn {
-		background: none;, border: none;, color: #999;
-		font-size: 1.5rem;, cursor: pointer;, padding: 0;, width: 32px;, height: 32px;, display: flex;
+		background: none;
+	border: none;
+	color: #999;
+		font-size: 1.5rem;
+	cursor: pointer;
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
 		align-items: center;
-		justify-content: center;, transition: color 0.2s ease;
+		justify-content: center;
+	transition: color 0.2s ease;
 		margin-left: 1rem;
 	}
 
@@ -341,25 +380,32 @@
 	}
 
 	.close-btn:disabled {
-		opacity: 0.5;, cursor: not-allowed;
+		opacity: 0.5;
+	cursor: not-allowed;
 	}
 
 	.drawer-content {
 		flex: 1;
-		overflow-y: auto;, padding: 1.5rem;
+		overflow-y: auto;
+	padding: 1.5rem;
 	}
 
 	.drawer-loading {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;, color: #666;
+		justify-content: center;
+	height: 100%;
+	color: #666;
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;, border: 3px solid #333;
+		width: 40px;
+	height: 40px;
+	border: 3px solid #333;
 		border-top-color: #9df;
-		border-radius: 50%;, animation: spin 0.8s linear infinite;
+		border-radius: 50%;
+	animation: spin 0.8s linear infinite;
 		margin-bottom: 1rem;
 	}
 
@@ -379,7 +425,8 @@
 	.form-section h3 {
 		margin: 0 0 1rem 0;
 		font-size: 1rem;
-		font-weight: 600;, color: #9df;
+		font-weight: 600;
+	color: #9df;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
@@ -393,11 +440,13 @@
 
 	.info-item {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column;
+	gap: 0.25rem;
 	}
 
 	.info-item label {
-		font-size: 0.8rem;, color: #999;
+		font-size: 0.8rem;
+	color: #999;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
@@ -410,14 +459,16 @@
 	}
 
 	.info-item code {
-		background: #16161a;, padding: 0.25rem 0.5rem;
+		background: #16161a;
+	padding: 0.25rem 0.5rem;
 		border-radius: 3px;
 		font-family: 'Courier New', monospace;
 		font-size: 0.85rem;
 	}
 
 	.info-item code.path {
-		display: block;, padding: 0.5rem;
+		display: block;
+	padding: 0.5rem;
 		margin-top: 0.25rem;
 		overflow-x: auto;
 	}
@@ -425,22 +476,28 @@
 	/* Form */
 	.form-group {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 		margin-bottom: 1.5rem;
 	}
 
 	.form-group label {
 		font-size: 0.9rem;
-		font-weight: 500;, color: #ddd;
+		font-weight: 500;
+	color: #ddd;
 	}
 
 	.form-input,
 	.form-select,
 	.form-textarea {
-		padding: 0.75rem;, background: #16161a;, border: 1px solid #333;
-		border-radius: 4px;, color: #ddd;
+		padding: 0.75rem;
+	background: #16161a;
+	border: 1px solid #333;
+		border-radius: 4px;
+	color: #ddd;
 		font-size: 0.9rem;
-		font-family: inherit;, transition: all 0.2s ease;
+		font-family: inherit;
+	transition: all 0.2s ease;
 	}
 
 	.form-input:focus,
@@ -454,7 +511,8 @@
 	.form-input:disabled,
 	.form-select:disabled,
 	.form-textarea:disabled {
-		opacity: 0.6;, cursor: not-allowed;
+		opacity: 0.6;
+	cursor: not-allowed;
 	}
 
 	.form-input.error,
@@ -470,16 +528,20 @@
 	}
 
 	.error-message {
-		font-size: 0.8rem;, color: #f44;
+		font-size: 0.8rem;
+	color: #f44;
 	}
 
 	/* Footer */
 	.drawer-footer {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1.5rem;, background: #111;
+		align-items: center;
+	padding: 1.5rem;
+	background: #111;
 		border-top: 1px solid #222;
-		flex-shrink: 0;, gap: 1rem;
+		flex-shrink: 0;
+	gap: 1rem;
 	}
 
 	.footer-actions {
@@ -487,7 +549,8 @@
 	}
 
 	.footer-buttons {
-		display: flex;, gap: 0.75rem;
+		display: flex;
+	gap: 0.75rem;
 	}
 
 	/* Buttons */
@@ -496,12 +559,15 @@
 		border: none;
 		border-radius: 4px;
 		font-size: 0.9rem;
-		font-weight: 500;, cursor: pointer;, transition: all 0.2s ease;
+		font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
 		white-space: nowrap;
 	}
 
 	.btn-primary {
-		background: #9df;, color: #000;
+		background: #9df;
+	color: #000;
 	}
 
 	.btn-primary: hover, not(:disabled) {
@@ -510,7 +576,8 @@
 	}
 
 	.btn-secondary {
-		background: #333;, color: #ddd;
+		background: #333;
+	color: #ddd;
 	}
 
 	.btn-secondary: hover, not(:disabled) {
@@ -518,7 +585,8 @@
 	}
 
 	.btn-danger {
-		background: #f44;, color: #fff;
+		background: #f44;
+	color: #fff;
 	}
 
 	.btn-danger: hover, not(:disabled) {
@@ -526,12 +594,18 @@
 	}
 
 	.btn:disabled {
-		opacity: 0.5;, cursor: not-allowed;
+		opacity: 0.5;
+	cursor: not-allowed;
 	}
 
 	/* Modal */
 	.modal-overlay {
-		position: absolute;, top: 0;, left: 0;, right: 0;, bottom: 0;, background: rgba(0, 0, 0, 0.7);
+		position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -539,15 +613,18 @@
 	}
 
 	.modal {
-		background: #111;, border: 1px solid #333;
-		border-radius: 8px;, padding: 2rem;
+		background: #111;
+	border: 1px solid #333;
+		border-radius: 8px;
+	padding: 2rem;
 		max-width: 400px;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
 	}
 
 	.modal h3 {
 		margin: 0 0 1rem 0;
-		font-size: 1.25rem;, color: #ddd;
+		font-size: 1.25rem;
+	color: #ddd;
 	}
 
 	.modal p {
@@ -557,7 +634,8 @@
 	}
 
 	.modal-buttons {
-		display: flex;, gap: 0.75rem;
+		display: flex;
+	gap: 0.75rem;
 		justify-content: flex-end;
 	}
 

@@ -8,10 +8,14 @@ import type { Case } from '$lib/types';
 // External Library Types declare module, '$lib/types' { // Duplicate removed: // Duplicate; removed, export type Case = any }
 declare global {
  type GGUFInferenceRequest = {
- prompt: string;, maxTokens: number;
- temperature: number;, topP: number;
- topK: number;, repeatPenalty: number;
- stopTokens: string[];, priority: unknown;
+ prompt: string;
+	maxTokens: number;
+ temperature: number;
+	topP: number;
+ topK: number;
+	repeatPenalty: number;
+ stopTokens: string[];
+	priority: unknown;
  };
 }
 // Row/Database result types declare global { interface RowList<T> { rows: T } }

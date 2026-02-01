@@ -5,29 +5,44 @@ export interface APIResponse<T = unknown> {
     success: boolean;
     data?: T;
     error?: string;
-    metadata?: {, timestamp: string;, version: string;, processing_time: number;
+    metadata?: {
+	timestamp: string;
+	version: string;
+	processing_time: number;
     };
 }
 
 export interface ClusteringConfig {
-    k: number;, maxIterations: number;, tolerance: number;, algorithm: 'kmeans' | 'som' | 'hierarchical';
+    k: number;
+	maxIterations: number;
+	tolerance: number;
+	algorithm: 'kmeans' | 'som' | 'hierarchical';
 }
 
 export interface KMeansConfig extends ClusteringConfig {
-    algorithm: 'kmeans';, distanceMetric: 'euclidean' | 'manhattan' | 'cosine';
+    algorithm: 'kmeans';
+	distanceMetric: 'euclidean' | 'manhattan' | 'cosine';
     initMethod?: 'random' | 'kmeans++';
 }
 
 export interface SOMConfig extends ClusteringConfig {
-    algorithm: 'som';, gridWidth: number;, gridHeight: number;, learningRate: number;
+    algorithm: 'som';
+	gridWidth: number;
+	gridHeight: number;
+	learningRate: number;
     // Add missing properties that SOM service expects
-    width: number;, height: number;, dimensions: number;
+    width: number;
+	height: number;
+	dimensions: number;
     radius?: number;
     iterations?: number; // Alias for maxIterations
 }
 
 export interface DocumentCluster {
-    id: string;, centroid: number[];, documents: string[];, size: number;
+    id: string;
+	centroid: number[];
+	documents: string[];
+	size: number;
     label?: string;
     // Additional properties for search results
     similarity?: number;
@@ -39,7 +54,11 @@ export interface DocumentCluster {
 }
 
 export interface ClusterResult {
-    clusters: DocumentCluster[];, clusterId: string;, silhouetteScore: number;, iterations: number;, converged: boolean;
+    clusters: DocumentCluster[];
+	clusterId: string;
+	silhouetteScore: number;
+	iterations: number;
+	converged: boolean;
 }
 
 export class EnhancedRESTClient {
@@ -49,7 +68,7 @@ export class EnhancedRESTClient {
         const response = await fetch(`${this.baseURL}${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
+	body: JSON.stringify(data),
         });
         return response.json();
     }
@@ -90,6 +109,10 @@ export class SelfOrganizingMap {
 }
 
 export interface ClusterResultDetails {
-    clusters: DocumentCluster[];, metrics: {, silhouetteScore: number;, inertia: number;, converged: boolean;
+    clusters: DocumentCluster[];
+	metrics: {
+	silhouetteScore: number;
+	inertia: number;
+	converged: boolean;
     };
 }

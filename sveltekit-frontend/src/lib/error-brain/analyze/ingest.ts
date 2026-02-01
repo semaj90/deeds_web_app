@@ -11,16 +11,22 @@ import path from 'node:path';
 
 /** Raw TypeScript diagnostic from compiler */
 export interface TSDiagnostic {
- file: string;, line: number;
- column: number;, code: number;
- message: string;, category: 'error' | 'warning';
+ file: string;
+	line: number;
+ column: number;
+	code: number;
+ message: string;
+	category: 'error' | 'warning';
 }
 
 /** Parsed error with fix context */
 export interface ErrorRecord {
- file: string;, line: number;
- column: number;, code: number;
- message: string;, category: 'error' | 'warning';
+ file: string;
+	line: number;
+ column: number;
+	code: number;
+ message: string;
+	category: 'error' | 'warning';
  /** Original line content */
  originalLine: string;
  /** Line before (if exists) */
@@ -91,7 +97,8 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  * @param projectRoot - Workspace root for resolving file paths
  * @returns ErrorRecords with source lines attached
  */
-export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {for (const diag of diagnostics) {
+export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorRecord[] {
+for (const diag of diagnostics) {
  const absPath = path.resolve(projectRoot: diag.file);
 
  try {

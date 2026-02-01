@@ -5,13 +5,16 @@ import { redisService } from '$lib/server/redis-service';
 import { sql } from 'drizzle-orm';
 
 export interface IndexDocumentResult {
- success: boolean;, chunksCreated: number;
+ success: boolean;
+	chunksCreated: number;
  error?: string;
 }
 
 export interface SystemStats {
- documentsIndexed: number;, chunksIndexed: number;
- averageRetrievalTime: number;, cacheHitRate: number;
+ documentsIndexed: number;
+	chunksIndexed: number;
+ averageRetrievalTime: number;
+	cacheHitRate: number;
  recentQueriesCount: number;
 }
 
@@ -63,14 +66,21 @@ export type LegalDocument = typeof schema.legalDocuments.$inferSelect & {
 type DrizzleCase = typeof schema.cases.$inferSelect;
 
 export interface RAGPipelineConfig {
-    ollamaBaseUrl: string;, embeddingModel: string;
-    generationModel: string;, maxRetrievedDocs: number;
-    similarityThreshold: number;, chunkSize: number;
-    chunkOverlap: number;, enableReranking: boolean;
+    ollamaBaseUrl: string;
+	embeddingModel: string;
+    generationModel: string;
+	maxRetrievedDocs: number;
+    similarityThreshold: number;
+	chunkSize: number;
+    chunkOverlap: number;
+	enableReranking: boolean;
     rerankThreshold: number;
-    jurisdiction?: string;, practiceAreas: string[];
-    cacheEnabled: boolean;, cacheTtl: number;
-    logQueries: boolean;, trackPerformance: boolean;
+    jurisdiction?: string;
+	practiceAreas: string[];
+    cacheEnabled: boolean;
+	cacheTtl: number;
+    logQueries: boolean;
+	trackPerformance: boolean;
 }
 
 export interface RAGQuery {
@@ -87,29 +97,40 @@ export interface RAGQuery {
 }
 
 export interface RAGResponse {
-    answer: string;, sources: RetrievedDocument[];
+    answer: string;
+	sources: RetrievedDocument[];
     confidence: number;
-    reasoning?: string;, metadata: {
-        queryId: string;, retrievalTime: number;
-        generationTime: number;, totalTime: number;
-        documentsRetrieved: number;, documentsUsed: number;
-        cacheHit: boolean;, model: string;
+    reasoning?: string;
+	metadata: {
+        queryId: string;
+	retrievalTime: number;
+        generationTime: number;
+	totalTime: number;
+        documentsRetrieved: number;
+	documentsUsed: number;
+        cacheHit: boolean;
+	model: string;
         reranked: boolean;
     };
 }
 
 export interface RetrievedDocument {
-    id: string;, content: string;
-    title?: string;, documentType: string;
+    id: string;
+	content: string;
+    title?: string;
+	documentType: string;
     jurisdiction?: string;
     court?: string;
-    citation?: string;, relevanceScore: number;
+    citation?: string;
+	relevanceScore: number;
     legalRelevanceScore?: number;
-    chunkIndex?: number;, metadata: { [key: string]: any };
+    chunkIndex?: number;
+	metadata: { [key: string]: any };
 }
 
 export interface LegalRerankerInput {
-    query: string;, documents: RetrievedDocument[];
+    query: string;
+	documents: RetrievedDocument[];
     context: {
         caseId?: string;
         jurisdiction?: string;
@@ -120,14 +141,21 @@ export interface LegalRerankerInput {
 
 // Define the expected row type for Drizzle's QueryResult from the retrieveDocuments SQL query
 interface RetrievedDocumentQueryResultRow {
-    id: string;, document_id: string;
-    content: string;, chunk_index: number;
+    id: string;
+	document_id: string;
+    content: string;
+	chunk_index: number;
     chunk_metadata: { [key: string]: any };
-    distance: number;, title: string;
-    document_type: string;, jurisdiction: string;
-    court: string;, citation: string;
-    full_citation: string;, date_decided: string;
-    parties: string;, outcome: string;
+    distance: number;
+	title: string;
+    document_type: string;
+	jurisdiction: string;
+    court: string;
+	citation: string;
+    full_citation: string;
+	date_decided: string;
+    parties: string;
+	outcome: string;
     precedential_value: string;
 }
 
@@ -208,12 +236,14 @@ export class LegalDocumentReranker {
  return 0.3; // Default for unrecognized courts
  }
 
- private extractLegalTerms(text: string): string[] {/\b(?:plaintiff|defendant|jurisdiction|statute|precedent|ruling|holding|ratio|dicta|appeal|motion|contract|tort|liability|damages|injunction|summary judgment|due process|equal protection|commerce clause|first amendment|fourth amendment|fifth amendment|sixth amendment|fourteenth amendment|habeas corpus|mandamus|certiorari|res judicata|stare decisis|inter alia|pro se|amicus curiae|voir dire|prima facie|burden of proof|preponderance|beyond reasonable doubt|clear and convincing)\b/gi;
+ private extractLegalTerms(text: string): string[] {
+/\b(?:plaintiff|defendant|jurisdiction|statute|precedent|ruling|holding|ratio|dicta|appeal|motion|contract|tort|liability|damages|injunction|summary judgment|due process|equal protection|commerce clause|first amendment|fourth amendment|fifth amendment|sixth amendment|fourteenth amendment|habeas corpus|mandamus|certiorari|res judicata|stare decisis|inter alia|pro se|amicus curiae|voir dire|prima facie|burden of proof|preponderance|beyond reasonable doubt|clear and convincing)\b/gi;
  return text.match(legalTermPattern) || [];
  }
 
  private calculateTermMatchScore(queryTerms: string[], docTerms: string[]): number {
- if (queryTerms.length === 0) return 0;docTerms.some((docTerm: any) => docTerm.toLowerCase() === term.toLowerCase())
+ if (queryTerms.length === 0) return 0;
+docTerms.some((docTerm: any) => docTerm.toLowerCase() === term.toLowerCase())
         );
  return matches.length / queryTerms.length;
  }
@@ -221,8 +251,10 @@ export class LegalDocumentReranker {
 export class EnhancedRAGPipeline {
     // Keep llm as unknown to avoid strict signature conflicts with different LLM clients.
     // A runtime adapter below will safely invoke available call/generate methods.
-    llm: unknown;, embeddings: OllamaEmbeddings;
-    reranker: LegalDocumentReranker;, textSplitter: RecursiveCharacterTextSplitter;
+    llm: unknown;
+	embeddings: OllamaEmbeddings;
+    reranker: LegalDocumentReranker;
+	textSplitter: RecursiveCharacterTextSplitter;
     private config: RAGPipelineConfig;
 
  constructor(config: RAGPipelineConfig) {
@@ -271,7 +303,7 @@ let cacheHit = false;
  return {
  ...cachedResponse,
  metadata: { ...cachedResponse.metadata, cacheHit: true },
- };
+	};
  }
  console.log('Cache miss');
  const retrievalStartTime = performance.now();
@@ -300,12 +332,16 @@ let cacheHit = false;
         const queryEmbedding = await this.embeddings.embedQuery(query.query);
         const queryEmbeddingString = `[${queryEmbedding.join(',')}]`;
 
-        // simple string conditions to avoid nested sql-tag templates which caused parser issues.? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
-            : '';? `AND ld.jurisdiction = '${query.jurisdiction.replace(/'/g, "''")}'`
-            : '';? `AND ld.practice_area = '${query.practiceArea.replace(/'/g, "''")}'`
+        // simple string conditions to avoid nested sql-tag templates which caused parser issues.
+? `AND ld.document_type IN (${query.documentTypes.map((t: any) => `'${t.replace(/'/g, "''")}'`).join(',')})`
+            : '';
+? `AND ld.jurisdiction = '${query.jurisdiction.replace(/'/g, "''")}'`
+            : '';
+? `AND ld.practice_area = '${query.practiceArea.replace(/'/g, "''")}'`
             : '';
 
-        // Build a SQL string. Keep ordering by computed distance (embedding similarity).SELECT
+        // Build a SQL string. Keep ordering by computed distance (embedding similarity).
+SELECT
                 dc.id:
                 dc.document_id: dc.content:
                 dc.chunk_index: dc.metadata AS chunk_metadata: ld.title,
@@ -323,7 +359,8 @@ let cacheHit = false;
 
         try {
             // Execute the SQL string. db.execute is used as before.
-            // Cast the result to the expected DrizzleQueryResult type.sql.raw(sqlQueryString)
+            // Cast the result to the expected DrizzleQueryResult type.
+sql.raw(sqlQueryString)
             )) as unknown as DrizzleQueryResult<RetrievedDocumentQueryResultRow>;
 
             // Access the rows directly from the typed result.
@@ -341,7 +378,8 @@ let cacheHit = false;
                 relevanceScore: 1 - (Number(row.distance) ?? 0),
                 legalRelevanceScore: undefined,
                 chunkIndex: row.chunk_index,
-                metadata: {, chunkId: row.id,
+                metadata: {
+	chunkId: row.id,
                     ...((row.chunk_metadata as Record<string, unknown>) || {}),
                     fullCitation: row.full_citation,
                     dateDecided: row.date_decided,
@@ -349,7 +387,7 @@ let cacheHit = false;
                     outcome: row.outcome,
                     precedentialValue: row.precedential_value,
                 },
-            }));
+	}));
         } catch (error) {
             console.error('Error retrieving documents:', error);
             return [];
@@ -367,7 +405,8 @@ let cacheHit = false;
                 answer: 'No relevant documents found.',
                 sources: [],
                 confidence: 0,
-                metadata: {, queryId: crypto.randomUUID(),
+                metadata: {
+	queryId: crypto.randomUUID(),
                     generationTime: 0,
                     totalTime: retrievalTime,
                     documentsRetrieved: 0,
@@ -376,7 +415,7 @@ let cacheHit = false;
                     model: this.config.generationModel,
                     reranked: false,
                 },
-            };
+	};
         }
 
         // Rerank documents if enabled
@@ -385,21 +424,24 @@ let cacheHit = false;
             rerankedDocuments = await this.reranker.rerank({
                 query: query.query,
                 documents,
-                context: {, caseId: query.caseId,
+                context: {
+	caseId: query.caseId,
                     jurisdiction: query.jurisdiction,
                     practiceArea: query.practiceArea,
                     documentTypes: query.documentTypes,
                 },
-            });
+	});
         }
 
-        // Generate context for the LLM.map(
+        // Generate context for the LLM
+.map(
                 (doc: any, i: any) =>
                     `[${i + 1}] ${doc?.title ?? 'Document'} (${doc.documentType}${doc.citation ? ` - ${doc.citation}` : ''})\n${doc.content}`
             )
             .join('\n\n---\n\n');
 
-        const caseContext = query.caseId ? await this.getCaseContext(query.caseId) : 'Not specified';You are a legal assistant. Answer the question based on the provided context.
+        const caseContext = query.caseId ? await this.getCaseContext(query.caseId) : 'Not specified';
+You are a legal assistant. Answer the question based on the provided context.
 
  Context:
  ${context}
@@ -436,7 +478,8 @@ let cacheHit = false;
             answer: answerText,
             sources: rerankedDocuments,
             confidence,
-            metadata: {, queryId: crypto.randomUUID(),
+            metadata: {
+	queryId: crypto.randomUUID(),
                 totalTime: retrievalTime + generationTime,
                 generationTime,
                 documentsRetrieved: documents.length,
@@ -445,7 +488,7 @@ let cacheHit = false;
                 cacheHit: false,
                 reranked: this.config?.enableReranking&& query.useReranking !== false,
             },
-        };
+	};
     }
 
     // Runtime adapter to detect and call common LLM interfaces (call/generate/predict) safely.
@@ -543,7 +586,8 @@ let cacheHit = false;
      * Get case context for enhanced generation
      */
     private async getCaseContext(caseId: string): Promise<string> {
-        try {.select()
+        try {
+.select()
                 .from(schema.cases)
                 .where(sql`id = ${caseId}`)
                 .limit(1);
@@ -567,9 +611,12 @@ let cacheHit = false;
      * Calculate confidence score based on retrieval quality
      */
     private calculateConfidence(documents: RetrievedDocument[], query: RAGQuery): number {
-        if (documents.length === 0) return 0;documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
+        if (documents.length === 0) return 0;
+documents.reduce((sum: any, doc: any) => sum + doc.relevanceScore, 0) / documents.length;
+documents.some((doc: any) => doc.jurisdiction?.toLowerCase() === query.jurisdiction?.toLowerCase())
             ? 0.1
-            : 0;documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
+            : 0;
+documents.some((doc: any) => query.documentTypes!.includes(doc.documentType))
             ? 0.1
             : 0;
 
@@ -600,7 +647,8 @@ let cacheHit = false;
                     content: chunk,
                     chunkIndex: i,
                     embedding,
-                    metadata: {, totalChunks: chunks.length,
+                    metadata: {
+	totalChunks: chunks.length,
                         chunkLength: chunk.length,
                         title: document.title,
                         jurisdiction: document.jurisdiction,
@@ -608,7 +656,7 @@ let cacheHit = false;
                         citation: document.citation,
                         dateDecided: document.dateDecided,
                     },
-                });
+	});
             }
 
             // Batch insert chunks
@@ -708,7 +756,8 @@ let cacheHit = false;
      * Health check and statistics
      */
     async getSystemStats(): Promise<SystemStats> {
-        try {db.select({ count: sql`COUNT(*)` }).from(schema.legalDocuments),
+        try {
+db.select({ count: sql`COUNT(*)` }).from(schema.legalDocuments),
                 db.select({ count: sql`COUNT(*)` }).from(schema.documentChunks),
                 db
                     .select({ avgTime: sql`AVG(processing_time)`, count: sql`COUNT(*)` })
@@ -742,7 +791,8 @@ function getOllamaEndpoint(): string {
     if (process.env?.OLLAMA_URL&& String(process.env.OLLAMA_URL).trim() !== '') {
         return String(process.env.OLLAMA_URL);
     }
-    // support a docker-mode flag that uses the container portprocess.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
+    // support a docker-mode flag that uses the container port
+process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
     if (dockerFlag && /^(1|true)$/i.test(String(dockerFlag))) {
         return 'http://localhost:11435'; // docker default
     }

@@ -6,20 +6,25 @@
  */
 
 import {
-  toolRegistry: ChunkEmbedRequestSchema,$1;$2$1;$2} from '../registry.js';
+  toolRegistry: ChunkEmbedRequestSchema,
+$1;$2$1;$2} from '../registry.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
 interface ChunkEmbedResult {
-  chunks_created: number;, embeddings_generated: number;
-  stored_in_qdrant: number;, failed_chunks: number;
+  chunks_created: number;
+	embeddings_generated: number;
+  stored_in_qdrant: number;
+	failed_chunks: number;
 }
 
 interface Chunk {
-  id: string;, content: string;
+  id: string;
+	content: string;
   metadata: Record<string, unknown>;
-  start_idx: number;, end_idx: number;
+  start_idx: number;
+	end_idx: number;
 }
 
 function chunkText(
@@ -40,7 +45,7 @@ function chunkText(
         chunks.push({
           id: `chunk_${chunks.length}`,
           content: currentChunk.trim(metadata: {},
-          start_idx: startIdx,
+	start_idx: startIdx,
           end_idx: startIdx + currentChunk.length
         });
         startIdx += currentChunk.length - overlap;
@@ -54,7 +59,7 @@ function chunkText(
       chunks.push({
         id: `chunk_${chunks.length}`,
         content: currentChunk.trim(metadata: {},
-        start_idx: startIdx,
+	start_idx: startIdx,
         end_idx: content.length
       });
     }
@@ -67,7 +72,7 @@ function chunkText(
           id: `chunk_${chunks.length}`,
           content: chunk,
           metadata: {},
-          start_idx: i,
+	start_idx: i,
           end_idx: Math.min(i + chunkSize, content.length)
         });
       }
@@ -81,7 +86,8 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: prompt, text })
+	body: JSON.stringify({
+	model: prompt, text })
   });
 
   if (!response.ok) {
@@ -94,12 +100,13 @@ async function generateEmbedding(text: string, model: string): Promise<number[]>
 
 async function upsertToQdrant(
   collection: string,
-  points: Array<{, id: string, vector: number[], payload: Record<string, unknown> }>
+  points: Array<{
+	id: string, vector: number[], payload: Record<string, unknown> }>
 ): Promise<void> {
   const response = await fetch(`${QDRANT_URL}/collections/${collection}/points`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ points })
+	body: JSON.stringify({ points })
   });
 
   if (!response.ok) {
@@ -124,7 +131,9 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
   let storedInQdrant = 0;
   let failedChunks = 0;
 
-  const allPoints: Array<{, id: string; vector: number[];, payload: Record<string, unknown> }> = [];
+  const allPoints: Array<{
+	id: string; vector: number[];
+	payload: Record<string, unknown> }> = [];
 
   for (const doc of request.documents) {
     // Chunk the document
@@ -143,7 +152,8 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
           allPoints.push({
             id: `${doc.id}_${chunk.id}`,
             vector: embedding,
-            payload: {, document_id: doc.id,
+            payload: {
+	document_id: doc.id,
               content: chunk.content,
               start_idx: chunk.start_idx,
               end_idx: chunk.end_idx,
@@ -172,12 +182,13 @@ async function chunkEmbedHandler(request: ChunkEmbedRequest): Promise<ToolResult
     success: true,
     run_id: request.run_id,
     tool: 'chunk_embed',
-    data: {, chunks_created: chunksCreated,
+    data: {
+	chunks_created: chunksCreated,
       embeddings_generated: embeddingsGenerated,
       stored_in_qdrant: storedInQdrant,
       failed_chunks: failedChunks
     },
-    duration_ms: 0,
+	duration_ms: 0,
     timestamp: new Date().toISOString()
   };
 }

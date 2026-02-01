@@ -6,8 +6,10 @@
 import { Client } from '@elastic/elasticsearch';
 
 export interface KeywordSearchResult {
-	id: string;, title: string;
-	chunk: string;, score: number;
+	id: string;
+	title: string;
+	chunk: string;
+	score: number;
 	metadata?: Record<string, unknown>;
 }
 
@@ -28,22 +30,31 @@ export class ElasticsearchSearch {
 			if (!exists) {
 				await this.client.indices.create({
 					index: this.indexName,
-					body: {, settings: {
+					body: {
+	settings: {
 							number_of_shards: 1,
 							number_of_replicas: 0,
-							analysis: {, analyzer: {
-									legal_analyzer: {, type: 'standard',
+							analysis: {
+	analyzer: {
+									legal_analyzer: {
+	type: 'standard',
 										stopwords: '_english_'
 									}
 								}
 							}
 						},
-						mappings: {, properties: {
-								document_id: {, type: 'keyword' },
-								title: {, type: 'text', analyzer: 'legal_analyzer' },
-								chunk: {, type: 'text', analyzer: 'legal_analyzer' },
-								metadata: {, type: 'object', enabled: false },
-								created_at: {, type: 'date' }
+	mappings: {
+	properties: {
+								document_id: {
+	type: 'keyword' },
+	title: {
+	type: 'text', analyzer: 'legal_analyzer' },
+	chunk: {
+	type: 'text', analyzer: 'legal_analyzer' },
+	metadata: {
+	type: 'object', enabled: false },
+	created_at: {
+	type: 'date' }
 							}
 						}
 					}
@@ -63,7 +74,8 @@ export class ElasticsearchSearch {
 	async indexChunks(
 		documentId: string,
 		title: string,
-		chunks: Array<{, text: string;
+		chunks: Array<{
+	text: string;
 			metadata?: Record<string, unknown>;
 		}>
 	): Promise<number> {
@@ -74,11 +86,12 @@ export class ElasticsearchSearch {
 				try {
 					await this.client.index({
 						index: this.indexName,
-						body: {, document_id: documentId,
+						body: {
+	document_id: documentId,
 							title: title,
 							chunk: chunk.text,
 							metadata: chunk.metadata || {},
-							created_at: new Date().toISOString()
+	created_at: new Date().toISOString()
 						}
 					});
 					indexed++;
@@ -104,14 +117,16 @@ export class ElasticsearchSearch {
 		try {
 			const result = await this.client.search({
 				index: this.indexName,
-				body: {, query: {
-						multi_match: {, query: query,
+				body: {
+	query: {
+						multi_match: {
+	query: query,
 							fields: ['title^2', 'chunk'],
 							type: 'best_fields',
 							operator: 'or'
 						}
 					},
-					size: limit,
+	size: limit,
 					_source: ['document_id', 'title', 'chunk', 'metadata']
 				}
 			});

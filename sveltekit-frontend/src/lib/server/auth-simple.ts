@@ -9,15 +9,18 @@ const { Client } = pkg;
 
 // Simple user type for authentication
 export interface SimpleUser {
-	id: string;, email: string;
+	id: string;
+	email: string;
 	first_name?: string;
-	last_name?: string;, role: string;
+	last_name?: string;
+	role: string;
 	is_active: boolean;
 }
 
 // User Record for simple auth function
 export interface UserRecord {
-    id: string;, email: string;
+    id: string;
+	email: string;
 }
 
 

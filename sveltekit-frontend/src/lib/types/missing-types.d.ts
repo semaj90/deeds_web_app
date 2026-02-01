@@ -15,31 +15,37 @@ declare class DockerResourceOptimizer {
 }
 // RAG/Search types
 declare interface RAGSearchResult {
- id: string;, content: string;
+ id: string;
+	content: string;
  score: number;
  metadata?: Record<string, unknown>;
 }
 declare interface TextChunk {
- text: string;, index: number;
+ text: string;
+	index: number;
  metadata?: Record<string, unknown>;
 }
 declare interface RAGDocument {
- id: string;, content: string;
+ id: string;
+	content: string;
  embedding?: number[];
  metadata?: Record<string, unknown>;
 }
 // Store types
-declare const enhancedRAGStore: {, search: (query: string) => Promise<RAGSearchResult[]>;
+declare const enhancedRAGStore: {
+	search: (query: string) => Promise<RAGSearchResult[]>;
  add: (doc: RAGDocument) => Promise<void>;
 };
 declare const documentVectors: unknown;
 // Routing types
 declare interface DynamicRouteConfig {
- path: string;, component: unknown;
+ path: string;
+	component: unknown;
  metadata?: Record<string, unknown>;
 }
 declare interface GeneratedRoute {
- path: string;, handler: unknown;
+ path: string;
+	handler: unknown;
 } // Assuming 'handler' is a property
 declare function registerDynamicRoute(config: DynamicRouteConfig): GeneratedRoute;
 // Document processing types
@@ -151,19 +157,26 @@ export function withRetry<T>(fn: () => Promise<T>, retries?: number): Promise<T>
 export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T>;
 // Production type definitions
 export interface GenericLegalAnalysisResult {
- score: number;, confidence: number;
- categories: string[];, entities: string[];
- sentiment: string;, complexity: number;
+ score: number;
+	confidence: number;
+ categories: string[];
+	entities: string[];
+ sentiment: string;
+	complexity: number;
  recommendations: string[];
  legalRelevance?: number;
 }
 export interface LegalEmbeddingResult {
- embedding: number[];, model: string;
- dimensions: number;, processingTime: number;
+ embedding: number[];
+	model: string;
+ dimensions: number;
+	processingTime: number;
 }
 export interface MetricData {
- id?: string;, metric: string;
- value: number;, timestamp: Date;
+ id?: string;
+	metric: string;
+ value: number;
+	timestamp: Date;
  labels?: Record<string, unknown>;
  source?: string;
  level?: string;

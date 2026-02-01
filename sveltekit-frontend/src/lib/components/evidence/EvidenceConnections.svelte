@@ -1,32 +1,43 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import type { Writable } from 'svelte/store';
 
  // Define types locally to avoid importing server schema in browser
  type EvidenceNodeType = {
- id: string;, caseId: string;
+ id: string;
+	caseId: string;
  title: string;
- description?: string;, evidenceType: string;
+ description?: string;
+	evidenceType: string;
  fileType?: string;
  fileName?: string;
- fileUrl?: string;, canvasPosition: { x: number;, y: number };
- uploadedBy?: number;, uploadedAt: string;
- updatedAt: string;, x: number;
+ fileUrl?: string;
+	canvasPosition: { x: number;
+	y: number };
+ uploadedBy?: number;
+	uploadedAt: string;
+ updatedAt: string;
+	x: number;
  y: number;
  };
 
  type EvidenceConnection = {
- id: string;, caseId: string;
- fromEvidenceId: string;, toEvidenceId: string;
+ id: string;
+	caseId: string;
+ fromEvidenceId: string;
+	toEvidenceId: string;
  connectionType: string;
  label?: string;
- notes?: string;, strength: number;
+ notes?: string;
+	strength: number;
  isVisible: boolean;
- createdBy?: number;, createdAt: string;
+ createdBy?: number;
+	createdAt: string;
  updatedAt: string;
  };
 
- let { nodes, connections }: {, nodes: Writable<EvidenceNodeType[]>;
+ let { nodes, connections }: {
+	nodes: Writable<EvidenceNodeType[]>;
  connections: Writable<EvidenceConnection[]>;
  } = $props();
 
@@ -129,14 +140,16 @@
  drawConnections();
  }
 
- onMount(() => {
+ $effect(() => {
+
  ctx = canvas.getContext('2d')!;
  resizeCanvas();
 
  // Redraw when nodes or connections change
  const unsubscribeNodes = nodes.subscribe(() => {
  setTimeout(drawConnections, 0); // Defer to next tick for DOM updates
- });
+ 
+});
 
  const unsubscribeConnections = connections.subscribe(() => {
  setTimeout(drawConnections, 0);
@@ -162,8 +175,10 @@
 
 <style>
  .connections-canvas {
- position: absolute;, top: 0;
- left: 0;, width: 100%;
+ position: absolute;
+	top: 0;
+ left: 0;
+	width: 100%;
  height: 100%;
  pointer-events: none;
  z-index: 5;

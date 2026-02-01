@@ -6,7 +6,8 @@ export interface ChatMessage {
 }
 
 export interface ChatCompletionRequest {
-	model?: string;, messages: ChatMessage[];
+	model?: string;
+	messages: ChatMessage[];
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -14,18 +15,23 @@ export interface ChatCompletionRequest {
 }
 
 export interface ChatCompletionResponse {
-	id: string;, object: string;
-	created: number;, model: string;
+	id: string;
+	object: string;
+	created: number;
+	model: string;
 	choices: Array<{
 		index?: number;
 		message?: { role?: string; content?: string };
 		finish_reason?: string;
 	}>;
-	usage?: {, prompt_tokens: number; completion_tokens: number;, total_tokens: number };
+	usage?: {
+	prompt_tokens: number; completion_tokens: number;
+	total_tokens: number };
 }
 
 export interface CompletionRequest {
-	model?: string;, prompt: string;
+	model?: string;
+	prompt: string;
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -33,10 +39,14 @@ export interface CompletionRequest {
 }
 
 export interface CompletionResponse {
-	id: string;, object: string;
-	created: number;, model: string;
+	id: string;
+	object: string;
+	created: number;
+	model: string;
 	choices: Array<{ index?: number; text?: string; finish_reason?: string }>;
-	usage?: {, prompt_tokens: number; completion_tokens: number;, total_tokens: number };
+	usage?: {
+	prompt_tokens: number; completion_tokens: number;
+	total_tokens: number };
 }
 
 export type ServerInfo = { backend?: string; version?: string; [k: string]: unknown };
@@ -94,7 +104,8 @@ export class Gemma3Client {
 		return json;
 	}
 
-	async listModels(): Promise<{, models: Array<{ id: string; name?: string; [k: string]: unknown }>;
+	async listModels(): Promise<{
+	models: Array<{ id: string; name?: string; [k: string]: unknown }>;
 	}> {
 		const res = await fetch(`${this.baseUrl}/v1/models`, {
 			method: 'GET',
@@ -105,7 +116,8 @@ export class Gemma3Client {
 		});
 		if (!res.ok) throw new Error(`List models request failed, ${res.status}`);
 		return (await res.json()) as {
-			models: Array<{, id: string; name?: string; [k: string]: unknown }>;
+			models: Array<{
+	id: string; name?: string; [k: string]: unknown }>;
 		};
 	}
 
@@ -121,7 +133,7 @@ export class Gemma3Client {
 		const res = await fetch(`${this.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload),
+	body: JSON.stringify(payload),
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(this.timeout)
@@ -146,7 +158,7 @@ export class Gemma3Client {
 		const res = await fetch(`${this.baseUrl}/v1/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload),
+	body: JSON.stringify(payload),
 			signal:
 				typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
 					? (AbortSignal as any).timeout(this.timeout)
@@ -168,7 +180,7 @@ export class Gemma3Client {
 					context ? `\n\nAdditional context: ${context}` : ''
 				}`
 			},
-			{ role: 'user', content: question }
+	{ role: 'user', content: question }
 		];
 		const resp = await this.createChatCompletion({
 			messages,
@@ -184,7 +196,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a Legal AI Assistant for document analysis. Focus on ${analysisType} analysis.`
 			},
-			{ role: 'user', content: `Please analyze this legal document:\n\n${documentText}` }
+	{ role: 'user', content: `Please analyze this legal document:\n\n${documentText}` }
 		];
 		const resp = await this.createChatCompletion({
 			messages,
@@ -202,7 +214,7 @@ export class Gemma3Client {
 					reviewFocus ? ` Focus particularly on: ${reviewFocus}` : ''
 				}`
 			},
-			{ role: 'user', content: `Please review this contract:\n\n${contractText}` }
+	{ role: 'user', content: `Please review this contract:\n\n${contractText}` }
 		];
 		const resp = await this.createChatCompletion({
 			messages,
@@ -215,7 +227,7 @@ export class Gemma3Client {
 	async createDocumentTemplate(documentType: string, requirements: string): Promise<string> {
 		const messages: ChatMessage[] = [
 			{ role: 'system', content: 'You are a Legal AI Assistant for document generation.' },
-			{
+	{
 				role: 'user',
 				content: `Generate a ${documentType} template with these requirements:\n\n${requirements}`
 			}
@@ -234,7 +246,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a Legal AI Assistant for summarization. Provide concise summaries focusing on ${type}.`
 			},
-			{ role: 'user', content: `Please summarize this content:\n\n${content}` }
+	{ role: 'user', content: `Please summarize this content:\n\n${content}` }
 		];
 		const resp = await this.createChatCompletion({
 			messages,
@@ -249,11 +261,12 @@ export class Gemma3Client {
 export const gemma3Client = new Gemma3Client();
 
 // Detect available server(s)
-export async function detectAvailableServer(): Promise<{, url: string; backend?: string } | null> {
+export async function detectAvailableServer(): Promise<{
+	url: string; backend?: string } | null> {
 	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';
 	const servers = [
 		{ url: getOllamaEndpoint(), name: 'Ollama' },
-		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }
+	{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }
 	];
 	for (const s of servers) {
 		const client = new Gemma3Client(s.url);
@@ -275,7 +288,7 @@ export function createGemma3Store() {
 	if (typeof window === 'undefined') {
 		return {
 			subscribe: (_cb: (s: null) => void) => () => {},
-			checkHealth: async () => false,
+	checkHealth: async () => false,
 			askQuestion: async (_q: string, _ctx?: string) => '',
 			analyzeDocument: async (_t: string) => '',
 			reviewContract: async (_t: string) => '',
@@ -291,7 +304,7 @@ export function createGemma3Store() {
 			cb(serverInfo);
 			return () => {};
 		},
-		async checkHealth() {
+	async checkHealth() {
 			const available = await detectAvailableServer();
 			if (available) {
 				client = new Gemma3Client(available.url);
@@ -301,16 +314,16 @@ export function createGemma3Store() {
 			serverInfo = null;
 			return false;
 		},
-		async askQuestion(question: string, context?: string) {
+	async askQuestion(question: string, context?: string) {
 			return client.askLegalQuestion(question, context);
 		},
-		async analyzeDocument(text: string, type?: string) {
+	async analyzeDocument(text: string, type?: string) {
 			return client.analyzeDocument(text, type);
 		},
-		async reviewContract(text: string, focus?: string) {
+	async reviewContract(text: string, focus?: string) {
 			return client.reviewContract(text, focus);
 		},
-		async generateTemplate(type: string, requirements: string) {
+	async generateTemplate(type: string, requirements: string) {
 			return client.createDocumentTemplate(type, requirements);
 		}
 	};

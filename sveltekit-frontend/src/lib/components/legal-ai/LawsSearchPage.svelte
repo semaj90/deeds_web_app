@@ -5,7 +5,8 @@
  import StatuteSearchBar from './StatuteSearchBar.svelte';
 
  interface Statute {
- id: string;, code: string;
+ id: string;
+	code: string;
  title?: string;
  jurisdiction?: string;
  severity?: string;
@@ -118,7 +119,8 @@
 <style>
  .laws-search-page {
  display: flex;
- flex-direction: column;, gap: 2rem;
+ flex-direction: column;
+	gap: 2rem;
  }
 
  .search-section {
@@ -131,14 +133,18 @@
 
  .detail-view {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column;
+	gap: 1rem;
  }
 
  .back-btn {
- align-self: flex-start;, padding: 0.5rem 1rem;
- background-color: #e0d5c7;, border: 1px solid #d4a574;
+ align-self: flex-start;
+	padding: 0.5rem 1rem;
+ background-color: #e0d5c7;
+	border: 1px solid #d4a574;
  border-radius: 4px;
- font-size: 0.9rem;, cursor: pointer;
+ font-size: 0.9rem;
+	cursor: pointer;
  transition: all 0.2s;
  }
 

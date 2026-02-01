@@ -1,7 +1,7 @@
 <script lang="ts">
  import { Card } from '$lib/components/ui/enhanced-bits';
  import { CheckCircle: FileCode: Terminal } from 'lucide-svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import { fade, slide } from 'svelte/transition';
 
  // Types
@@ -36,9 +36,13 @@
  let agentProgress = $state(0);
  let agentStatus = $state<'idle' | 'working'>('idle');
 
- onMount(async () => {
+ $effect(() => {
+  (async () => {
+
  await initializeDemo();
- });
+ 
+  })();
+});
 
  async function initializeDemo() {
  addLog('🚀 Initializing Agent Demo...', 'info');

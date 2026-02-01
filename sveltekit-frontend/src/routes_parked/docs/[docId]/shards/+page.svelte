@@ -1,7 +1,7 @@
 <script lang="ts">
  import { page } from '$app/state';
  import type { ShardNode } from '$lib/types/evidence-board';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let shards = $state<ShardNode[]>([]);
  let selectedShard = $state<ShardNode | null>(null);
@@ -10,7 +10,8 @@
 
  let docId = $derived(page.params.docId);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  const response = await fetch(`/api/docs/${docId}/shards`);
@@ -26,7 +27,8 @@
  } finally {
  loading = false;
  }
- })();
+ 
+});();
  });
 
  function selectShard(shard: ShardNode) {

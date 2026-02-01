@@ -7,8 +7,8 @@
 	let stats = $derived(data.stats || {
 		totalFiles: 0,
 		byRole: {},
-		byRisk: {},
-		bySurface: {}
+	byRisk: {},
+	bySurface: {}
 	});
 	let error = $derived(data.error);
 

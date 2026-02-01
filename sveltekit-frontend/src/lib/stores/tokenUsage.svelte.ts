@@ -138,7 +138,7 @@ export class TokenTracker {
 			requests: this.requestCount,
 			average: this.averageTokensPerRequest,
 			byModel: { ...this.tokensByModel },
-			lastReset: new Date(this.lastReset).toISOString(),
+	lastReset: new Date(this.lastReset).toISOString(),
 			status: this.isOverLimit ? 'over_limit' : this.isApproachingLimit ? 'warning' : 'ok'
 		};
 	}

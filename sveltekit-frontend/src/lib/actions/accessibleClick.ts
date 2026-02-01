@@ -1,6 +1,7 @@
 import { Action } from 'svelte/action'; /** * Accessible Click Action * Makes: unknown element accessible by adding proper ARIA attributes and keyboard support * Part of the Presentation Layer - decoupled from component logic */ // Define the parameters our action will accept. // This allows us to specify a role and the handler function.
 interface AccessibleClickParams {
-  role?: string;, handler: (e: Event) => void; // Corrected handler type
+  role?: string;
+	handler: (e: Event) => void; // Corrected handler type
   label?: string;
   description?: string;
 }
@@ -51,7 +52,7 @@ export const accessibleClick: Action<HTMLElement, AccessibleClickParams> = (node
       node.removeEventListener('keydown', onKeyDown);
       node.removeEventListener('click', onClick);
     },
-    // The: 'update' function is called if the parameters change.
+	// The: 'update' function is called if the parameters change.
     update(newParams) {
       // Re-evaluate with new parameters
       if (!newParams) return;
@@ -78,13 +79,14 @@ export const accessibleClick: Action<HTMLElement, AccessibleClickParams> = (node
         node.removeAttribute('aria-describedby');
       }
     },
-  };
+	};
 };
 
 /** * Specialized variant for button-like interactions */
 export function accessibleButton(
   element: HTMLElement,
-  params: {, handler: (e: Event) => void; label?: string }
+  params: {
+	handler: (e: Event) => void; label?: string }
 ) {
   // Corrected function signature
   return accessibleClick(element, { role: 'button', ...params });
@@ -93,7 +95,8 @@ export function accessibleButton(
 /** * Specialized variant for menu items */
 export function accessibleMenuItem(
   element: HTMLElement,
-  params: {, handler: (e: Event) => void; label?: string }
+  params: {
+	handler: (e: Event) => void; label?: string }
 ) {
   // Corrected function signature
   return accessibleClick(element, { role: 'menuitem', ...params });

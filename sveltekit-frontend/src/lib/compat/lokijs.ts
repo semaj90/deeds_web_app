@@ -69,7 +69,8 @@ interface LokiOptions {
 }
 
 class Loki {
-    filename: string;, options: LokiOptions;
+    filename: string;
+	options: LokiOptions;
     private collections = new Map<string, MemoryCollection<Doc>>();
 
     static LokiMemoryAdapter = LokiMemoryAdapter;

@@ -16,13 +16,15 @@
 	  GitBranch: RefreshCw,
 	  Search: X
 	} from 'lucide-svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	// Types
 	interface GraphNode {
-		id: string;, label: string;
+		id: string;
+	label: string;
 		type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-		errorCount: number;, filePath: string;
+		errorCount: number;
+	filePath: string;
 		cluster?: string;
 		imports?: string[];
 		exports?: string[];
@@ -30,7 +32,8 @@
 	}
 
 	interface GraphEdge {
-		source: string;, target: string;
+		source: string;
+	target: string;
 		type: 'import' | 'export' | 'dependency';
 	}
 
@@ -89,9 +92,13 @@
 		return edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
 	});
 
-	onMount(async () => {
+	$effect(() => {
+  (async () => {
+
 		await loadGraphData();
-	});
+	
+  })();
+});
 
 	async function loadGraphData() {
 		isLoading = true;
@@ -327,27 +334,33 @@
 <style>
 	.graph-page {
 		display: flex;
-		flex-direction: column;, height: 100vh;
-		padding: 1.5rem;, gap: 1rem;
+		flex-direction: column;
+	height: 100vh;
+		padding: 1.5rem;
+	gap: 1rem;
 	}
 
 	.page-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;, gap: 2rem;
+		align-items: flex-start;
+	gap: 2rem;
 	}
 
 	.header-left {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.back-link {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 		color: rgba(255, 255, 255, 0.5);
 		text-decoration: none;
-		font-size: 0.875rem;, transition: color 0.2s ease;
+		font-size: 0.875rem;
+	transition: color 0.2s ease;
 	}
 
 	.back-link:hover {
@@ -356,32 +369,39 @@
 
 	.page-title {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
+		align-items: center;
+	gap: 0.75rem;
 		font-size: 1.5rem;
-		font-weight: 600;, color: white;
+		font-weight: 600;
+	color: white;
 		margin: 0;
 	}
 
 	.header-actions {
-		display: flex;, gap: 0.75rem;
+		display: flex;
+	gap: 0.75rem;
 		align-items: center;
 	}
 
 	.search-box {
-		position: relative;, display: flex;
+		position: relative;
+	display: flex;
 		align-items: center;
 	}
 
 	.search-icon {
-		position: absolute;, left: 0.75rem;
+		position: absolute;
+	left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.search-input {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, padding: 0.5rem 2rem 0.5rem 2.5rem;
-		color: white;, width: 250px;
+		border-radius: 8px;
+	padding: 0.5rem 2rem 0.5rem 2.5rem;
+		color: white;
+	width: 250px;
 		font-size: 0.875rem;
 	}
 
@@ -395,16 +415,21 @@
 	}
 
 	.clear-search {
-		position: absolute;, right: 0.5rem;
-		background: transparent;, border: none;
+		position: absolute;
+	right: 0.5rem;
+		background: transparent;
+	border: none;
 		color: rgba(255, 255, 255, 0.5);
-		cursor: pointer;, padding: 0.25rem;
+		cursor: pointer;
+	padding: 0.25rem;
 	}
 
 	.filter-badge {
-		background: #00d4ff;, color: black;
+		background: #00d4ff;
+	color: black;
 		font-size: 0.7rem;
-		font-weight: 600;, padding: 0.1rem 0.4rem;
+		font-weight: 600;
+	padding: 0.1rem 0.4rem;
 		border-radius: 10px;
 		margin-left: 0.5rem;
 	}
@@ -416,31 +441,39 @@
 	}
 
 	.filter-content {
-		display: flex;, gap: 2rem;
-		align-items: flex-start;, padding: 1rem;
+		display: flex;
+	gap: 2rem;
+		align-items: flex-start;
+	padding: 1rem;
 	}
 
 	.filter-section {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.filter-label {
 		font-size: 0.75rem;
-		font-weight: 500;, color: rgba(255, 255, 255, 0.5);
+		font-weight: 500;
+	color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 
 	.filter-chips {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
 	.filter-chip {
-		font-size: 0.75rem;, padding: 0.25rem 0.75rem;
-		border-radius: 20px;, border: 1px solid;
-		cursor: pointer;, transition: all 0.2s ease;
+		font-size: 0.75rem;
+	padding: 0.25rem 0.75rem;
+		border-radius: 20px;
+	border: 1px solid;
+		cursor: pointer;
+	transition: all 0.2s ease;
 		opacity: 0.6;
 	}
 
@@ -454,8 +487,10 @@
 
 	.checkbox-label {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
-		font-size: 0.875rem;, color: rgba(255, 255, 255, 0.8);
+		align-items: center;
+	gap: 0.5rem;
+		font-size: 0.875rem;
+	color: rgba(255, 255, 255, 0.8);
 		cursor: pointer;
 	}
 
@@ -466,18 +501,21 @@
 	.filter-select {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;, padding: 0.5rem;
+		border-radius: 6px;
+	padding: 0.5rem;
 		color: white;
 		font-size: 0.875rem;
 	}
 
 	.filter-actions {
-		margin-left: auto;, display: flex;
+		margin-left: auto;
+	display: flex;
 		align-items: center;
 	}
 
 	.stats-bar {
-		display: flex;, gap: 2rem;
+		display: flex;
+	gap: 2rem;
 		padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.03);
 		border-radius: 8px;
@@ -485,64 +523,79 @@
 
 	.stat {
 		display: flex;
-		align-items: baseline;, gap: 0.5rem;
+		align-items: baseline;
+	gap: 0.5rem;
 	}
 
 	.stat-value {
 		font-size: 1.25rem;
-		font-weight: 600;, color: white;
+		font-weight: 600;
+	color: white;
 	}
 
 	.stat-label {
-		font-size: 0.875rem;, color: rgba(255, 255, 255, 0.5);
+		font-size: 0.875rem;
+	color: rgba(255, 255, 255, 0.5);
 	}
 
 	.graph-container {
-		flex: 1;, position: relative;
+		flex: 1;
+	position: relative;
 		background: rgba(0, 0, 0, 0.3);
-		border-radius: 12px;, overflow: hidden;
+		border-radius: 12px;
+	overflow: hidden;
 	}
 
 	.loading-state {
-		position: absolute;, inset: 0;
+		position: absolute;
+	inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, gap: 1rem;
+		justify-content: center;
+	gap: 1rem;
 		color: rgba(255, 255, 255, 0.6);
 	}
 
 	.detail-panel-container {
-		position: absolute;, top: 1rem;
+		position: absolute;
+	top: 1rem;
 		left: 1rem;
 		z-index: 20;
 	}
 
 	.hover-tooltip {
-		position: absolute;, bottom: 1rem;
-		left: 50%;, transform: translateX(-50%);
+		position: absolute;
+	bottom: 1rem;
+		left: 50%;
+	transform: translateX(-50%);
 		background: rgba(0, 0, 0, 0.9);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 8px;, padding: 0.75rem 1rem;
+		border-radius: 8px;
+	padding: 0.75rem 1rem;
 		z-index: 15;
 		min-width: 200px;
 	}
 
 	.tooltip-header {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 		margin-bottom: 0.25rem;
 	}
 
 	.type-badge {
 		font-size: 0.65rem;
-		font-weight: 500;, padding: 0.15rem 0.4rem;
-		border-radius: 4px;, border: 1px solid;
+		font-weight: 500;
+	padding: 0.15rem 0.4rem;
+		border-radius: 4px;
+	border: 1px solid;
 		text-transform: uppercase;
 	}
 
 	.tooltip-name {
-		font-weight: 500;, color: white;
+		font-weight: 500;
+	color: white;
 	}
 
 	.tooltip-path {
@@ -553,7 +606,8 @@
 	}
 
 	.tooltip-errors {
-		font-size: 0.75rem;, color: #f87171;
+		font-size: 0.75rem;
+	color: #f87171;
 	}
 </style>
 

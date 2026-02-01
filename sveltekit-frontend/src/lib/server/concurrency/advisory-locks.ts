@@ -38,8 +38,10 @@ export interface LockOptions {
 }
 
 export interface LockInfo {
-	lockId: string;, entityType: LockType;
-	entityId: string;, mode: LockMode;
+	lockId: string;
+	entityType: LockType;
+	entityId: string;
+	mode: LockMode;
 	userId?: string;
 	sessionId?: string;
 	expiresAt?: Date;

@@ -17,11 +17,11 @@ import postgres from 'postgres';
 
 // Configuration
 const CONFIG = {
-  qdrant: {, url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
+  qdrant: { url: process.env?.QDRANT_URL ?? 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  minio: {, endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
+  minio: { endpoint: process.env?.MINIO_ENDPOINT ?? 'localhost',
     port: parseInt(process.env?.MINIO_PORT ?? '9000'),
     accessKey: process.env?.MINIO_ACCESS_KEY ?? 'minioadmin',
     secretKey: process.env?.MINIO_SECRET_KEY ?? 'minioadmin',
@@ -29,10 +29,10 @@ const CONFIG = {
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
-  ollama: {, url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
+  ollama: { url: process.env?.OLLAMA_URL ?? 'http://localhost:11434',
     embeddingModel: 'embeddinggemma:latest'
   },
-  postgres: {, url: process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+  postgres: { url: process.env?.DATABASE_URL ?? 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
   }
 };
 
@@ -55,7 +55,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${CONFIG.ollama.url}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: CONFIG.ollama.embeddingModel,
+      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel,
         prompt: text.substring(0, 8000)
       })
     });
@@ -81,7 +81,7 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
     const createResponse = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, vectors: {
+      body: JSON.stringify({ vectors: {
           size: 768,
           distance: 'Cosine'
         }
@@ -94,14 +94,17 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
 }
 
 function extractFileMetadata(content: string, filePath: string): any {
-  const lines = content.split('\n');.filter(l => l.match(/^import\s+/))
+  const lines = content.split('\n');
+.filter(l => l.match(/^import\s+/))
     .slice(0, 10)
-    .map(l => l.trim());.filter(l => l.match(/^export\s+/))
+    .map(l => l.trim());
+.filter(l => l.match(/^export\s+/))
     .slice(0, 10)
     .map(l => l.trim());
 
   const typeCount = (content.match(/\b(type|interface)\s+/g) || []).length;
-  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;? 'svelte'
+  const functionCount = (content.match(/\b(function|async\s+function)\s+/g) || []).length;
+? 'svelte'
     : filePath.endsWith('.ts')
       ? 'typescript'
       : 'javascript';
@@ -197,7 +200,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const chunk = chunks[idx];
             const embedding = await generateEmbedding(chunk);
 
-            if (!embedding || embedding.length === 0) continue;parseInt(
+            if (!embedding || embedding.length === 0) continue;
+parseInt(
                 crypto.createHash('md5').update(`${filePath}_${idx}`).digest('hex').slice(0, 8),
                 16
               ) %
@@ -206,11 +210,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
             const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({, points: [
+              body: JSON.stringify({ points: [
                   {
                     id: pointId,
                     vector: Array.from(embedding),
-                    payload: {, file_path: relativePath,
+                    payload: { file_path: relativePath,
                       file_hash: fileHash,
                       chunk_index: idx,
                       chunk_count: chunks.length,
@@ -273,7 +277,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
         }
       }
 
-      // Fetch error clustersSELECT DISTINCT
+      // Fetch error clusters
+SELECT DISTINCT
           file_path: error_code,
           message,
           COUNT(*) as error_count
@@ -293,7 +298,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       for (const cluster of errorClusters) {
         try {
-          const { file_path, error_code, message, error_count } = cluster;$1;$2Error Code: ${ error_code }
+          const { file_path, error_code, message, error_count } = cluster;
+$1;$2Error Code: ${ error_code }
 File: ${ file_path }
 Message: ${ message }
 Occurrences: ${ error_count }
@@ -302,17 +308,18 @@ Phase: Phase 66-79 Error Analysis
 
           const embedding = await generateEmbedding(errorContext);
 
-          if (!embedding || embedding.length === 0) continue;parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
+          if (!embedding || embedding.length === 0) continue;
+parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
             (10 ** 8);
 
           const upsertResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, points: [
+            body: JSON.stringify({ points: [
                 {
                   id: pointId,
                   vector: Array.from(embedding),
-                  payload: {, error_code: file_path,
+                  payload: { error_code: file_path,
                     message: error_count,
                     phase: 'phase66-79',
                     indexed_at: new Date().toISOString()
@@ -377,7 +384,7 @@ Phase: Phase 66-79 Error Analysis
       const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, vector: Array.from(embedding),
+        body: JSON.stringify({ vector: Array.from(embedding),
           limit,
           with_payload: true
         })
@@ -426,7 +433,7 @@ Phase: Phase 66-79 Error Analysis
       const searchResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, vector: Array.from(embedding),
+        body: JSON.stringify({ vector: Array.from(embedding),
           limit,
           with_payload: true
         })
@@ -481,11 +488,11 @@ export const GET: RequestHandler = async ({ url }) => {
 
     return json({
       success: true,
-      collections: {, codebase: {
+      collections: { codebase: {
           points_count: codebaseCollection?.points_count ?? 0,
           vectors_size: codebaseCollection?.config?.params?.vectors?.size ?? 768
         },
-        errors: {, points_count: errorsCollection?.points_count ?? 0,
+        errors: { points_count: errorsCollection?.points_count ?? 0,
           vectors_size: errorsCollection?.config?.params?.vectors?.size ?? 768
         }
       },
@@ -495,8 +502,8 @@ export const GET: RequestHandler = async ({ url }) => {
     return json(
       {
         success: false, error: err.message,
-        collections: {, codebase: { points_count: 0 },
-          errors: {, points_count: 0 }
+        collections: { codebase: { points_count: 0 },
+          errors: { points_count: 0 }
         }
       },
       { status: 500 }

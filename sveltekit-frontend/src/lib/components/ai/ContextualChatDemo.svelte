@@ -10,7 +10,7 @@
 import type { User } from '$lib/types';
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import type { ContextualState, NextStepPrediction,
     LegalEntity, ConversationTurn } from '$lib/types/sharedTypes';
   // Props
@@ -62,7 +62,8 @@ import type { Document } from '$lib/types';
     try {
       const response = await fetch('/api/contextual/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, message: sessionId,
+	body: JSON.stringify({
+	message: sessionId,
           userId: enableFunctions
         })
       });
@@ -73,9 +74,12 @@ import type { Document } from '$lib/types';
         // Add to conversation history
         conversationHistory = [
           ...conversationHistory, {
-            userMessage: message;, agentResponse: result.data.response,
-            timestamp: Date.now();, intent: 'general_query',
-            entities: [];, hmmState: contextualState?.hmmState.currentState ?? 0
+            userMessage: message;
+	agentResponse: result.data.response,
+            timestamp: Date.now();
+	intent: 'general_query',
+            entities: [];
+	hmmState: contextualState?.hmmState.currentState ?? 0
           }
         ];
         // Clear input
@@ -87,7 +91,8 @@ import type { Document } from '$lib/types';
         throw new Error(result.error.message)}
     } catch (err) {
       error = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Send message error:', err);'
+      console.error('Send message error:', err);
+'
     } finally {
       isLoading = false}
   }
@@ -106,7 +111,8 @@ import type { Document } from '$lib/types';
         contextualState = result.data
         entities = result.data.extractedEntities}
     } catch (err) {
-      console.error('Fetch contextual state error:', err);'
+      console.error('Fetch contextual state error:', err);
+'
     }
   }
   /**
@@ -123,7 +129,8 @@ import type { Document } from '$lib/types';
       if (result.success) {
         predictions = result.data.predictions}
     } catch (err) {
-      console.error('Fetch predictions error:', err);'
+      console.error('Fetch predictions error:', err);
+'
     }
   }
   /**
@@ -140,7 +147,8 @@ import type { Document } from '$lib/types';
       if (result.success) {
         stats = result.data}
     } catch (err) {
-      console.error('Fetch stats error:', err);'
+      console.error('Fetch stats error:', err);
+'
     }
   }
   /**
@@ -163,7 +171,8 @@ import type { Document } from '$lib/types';
       message = '';
       error = null} catch (err) {
       error = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Clear conversation error:', err);'
+      console.error('Clear conversation error:', err);
+'
     }
   }
   /**
@@ -177,8 +186,10 @@ import type { Document } from '$lib/types';
   /**
    * Initialize on mount
    */
-  onMount(() => {
-    fetchContextualState()});
+  $effect(() => {
+
+    fetchContextualState()
+});
 </script>
 <div class="contextual-chat-demo">
   <div class="demo-header">
@@ -352,7 +363,8 @@ import type { Document } from '$lib/types';
   .demo-content {
     display: grid
     grid-template-columns: 1fr 400px
-    height: 100%;, overflow: hidden}
+    height: 100%;
+	overflow: hidden}
   /* Chat Panel */
   .chat-panel { display: flex
     flex-direction: column
@@ -397,7 +409,8 @@ import type { Document } from '$lib/types';
     border-radius: 4px
     font-size: 0.875rem}
   textarea {
-    width: 100%;, padding: 0.75rem
+    width: 100%;
+	padding: 0.75rem
    ; border: 1px solid var(--border, #e5e7eb);
     border-radius: 4px, resize: none
     font-family: inherit
@@ -421,7 +434,8 @@ import type { Document } from '$lib/types';
     border-radius: 4px
    ;background: var(--background, #ffffff); cursor: pointer
     font-size: 0.875rem
-    font-weight: 500, transition: all 0.2s}; buttonhover:not(disabled) {
+    font-weight: 500, transition: all 0.2s}
+; buttonhover:not(disabled) {
     background: var(--muted, #f9fafb)}
   buttondisabled {
     opacity: 0.5, cursor:not-allowed}
@@ -491,7 +505,8 @@ import type { Document } from '$lib/types';
    ;background: var(--muted, #f9fafb);
     border-radius: 2px, overflow: hidden}
   .prediction-fill {
-    height: 100%;, background: var(--primary, #3b82f6);
+    height: 100%;
+	background: var(--primary, #3b82f6);
     transition: width 0.3s ease}
   .entities-list {
     display: flex

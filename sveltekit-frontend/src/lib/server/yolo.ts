@@ -4,16 +4,22 @@ import * as path from 'path';
 import { tmpdir } from 'os';
 
 export interface YOLOResult {
-    text: string;, layout: {
-        regions: Array<{, type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature';
-            bbox: number[];, confidence: number;
+    text: string;
+	layout: {
+        regions: Array<{
+	type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature';
+            bbox: number[];
+	confidence: number;
             text?: string;
         }>;
     };
-    objects: Array<{, class: string;
-        bbox: number[];, confidence: number;
+    objects: Array<{
+	class: string;
+        bbox: number[];
+	confidence: number;
     }>;
-    processingTime: number;, method: 'yolo';
+    processingTime: number;
+	method: 'yolo';
 }
 
 export interface YOLOConfig {
@@ -62,9 +68,10 @@ export class YOLOService {
 
             return {
                 text: this.extractTextFromRegions(yoloData?.regions ?? []),
-                layout: {, regions: yoloData?.regions ?? []
+                layout: {
+	regions: yoloData?.regions ?? []
                 },
-                objects: yoloData?.objects ?? [],
+	objects: yoloData?.objects ?? [],
                 processingTime,
                 method: 'yolo'
             };
@@ -123,16 +130,20 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
     predictions = outputs[0][0]  # Remove batch dimension
 
     # Filter by confidence
-    conf_mask = predictions[:, 4] > conf_threshold
+    conf_mask = predictions[:
+	4] > conf_threshold
     predictions = predictions[conf_mask]
 
     if len(predictions) == 0:
         return [], [], []
 
     # Extract boxes, scores, class_ids
-    boxes = predictions[:, :4]
-    scores = predictions[:, 4]
-    class_ids = predictions[:, 5].astype(int)
+    boxes = predictions[:
+	:4]
+    scores = predictions[:
+	4]
+    class_ids = predictions[:
+	5].astype(int)
 
     # Convert from center-x, center-y, width, height to x1, y1, x2, y2
     boxes = xywh2xyxy(boxes)
@@ -140,8 +151,10 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
     # Scale boxes back to original image size
     scale_x = original_shape[1] / input_size[0]
     scale_y = original_shape[0] / input_size[1]
-    boxes[:, [0, 2]] *= scale_x
-    boxes[:, [1, 3]] *= scale_y
+    boxes[:
+	[0, 2]] *= scale_x
+    boxes[:
+	[1, 3]] *= scale_y
 
     # Apply NMS
     indices = nms(boxes, scores, iou_threshold)
@@ -150,7 +163,11 @@ def postprocess_detections(outputs, original_shape, input_size=(640, 640), conf_
 
 def xywh2xyxy(boxes):
     """Convert from xywh to xyxy format"""
-    x, y, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    x, y, w, h = boxes[:
+	0], boxes[:
+	1], boxes[:
+	2], boxes[:
+	3]
     x1 = x - w / 2
     y1 = y - h / 2
     x2 = x + w / 2
@@ -174,14 +191,22 @@ def nms(boxes, scores, iou_threshold):
 
 def compute_iou(box1, boxes):
     """Compute IoU between box1 and multiple boxes"""
-    x1 = np.maximum(box1[0], boxes[:, 0])
-    y1 = np.maximum(box1[1], boxes[:, 1])
-    x2 = np.minimum(box1[2], boxes[:, 2])
-    y2 = np.minimum(box1[3], boxes[:, 3])
+    x1 = np.maximum(box1[0], boxes[:
+	0])
+    y1 = np.maximum(box1[1], boxes[:
+	1])
+    x2 = np.minimum(box1[2], boxes[:
+	2])
+    y2 = np.minimum(box1[3], boxes[:
+	3])
 
     intersection = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
     area1 = (box1[2] - box1[0]) * (box1[3] - box1[1])
-    area2 = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+    area2 = (boxes[:
+	2] - boxes[:
+	0]) * (boxes[:
+	3] - boxes[:
+	1])
 
     union = area1 + area2 - intersection
     return intersection / union

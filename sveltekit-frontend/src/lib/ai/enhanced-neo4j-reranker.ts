@@ -7,37 +7,67 @@ type DocumentEmbedding = DocumentItem;
 
 export type UserContext = {
     user_id: string;
-    case_id?: string;, role: 'prosecutor' | 'detective' | 'admin';
+    case_id?: string;
+	role: 'prosecutor' | 'detective' | 'admin';
     search_intent: 'evidence' | 'precedent' | 'analysis';
 };
 
 export interface EntityRelationship {
-    source_entity: string;, target_entity: string;, relationship_type: 'references' | 'contradicts' | 'supports' | 'contains';
-    confidence: number;, legal_weight: number;, source_document: string;
+    source_entity: string;
+	target_entity: string;
+	relationship_type: 'references' | 'contradicts' | 'supports' | 'contains';
+    confidence: number;
+	legal_weight: number;
+	source_document: string;
 }
 
 export interface ConfidenceScores {
-    legal_relevance: number;, factual_accuracy: number;, chain_of_custody: number;, precedent_strength: number;, overall_confidence: number;
+    legal_relevance: number;
+	factual_accuracy: number;
+	chain_of_custody: number;
+	precedent_strength: number;
+	overall_confidence: number;
 }
 
 export interface AuditEntry {
-    timestamp: number;, action: 'query' | 'rerank' | 'search' | 'score_adjustment';
-    user_id: string;, query_hash: string;
+    timestamp: number;
+	action: 'query' | 'rerank' | 'search' | 'score_adjustment';
+    user_id: string;
+	query_hash: string;
     score_before?: number;
-    score_after?: number;, reasoning: string;
+    score_after?: number;
+	reasoning: string;
 }
 
 export interface Neo4jPathContext {
-    document_id: string;, case_id: string;, evidence_chain: string[];, legal_precedents: string[];, entity_relationships: EntityRelationship[];, confidence_scores: ConfidenceScores;, audit_trail: AuditEntry[];
+    document_id: string;
+	case_id: string;
+	evidence_chain: string[];
+	legal_precedents: string[];
+	entity_relationships: EntityRelationship[];
+	confidence_scores: ConfidenceScores;
+	audit_trail: AuditEntry[];
 }
 
 export interface EnhancedRerankerConfig {
-    enable_neo4j_paths: boolean;, enable_boolean_patterns: boolean;, accuracy_threshold: number;, max_path_depth: number;, legal_weight_multiplier: number;, audit_enabled: boolean;
+    enable_neo4j_paths: boolean;
+	enable_boolean_patterns: boolean;
+	accuracy_threshold: number;
+	max_path_depth: number;
+	legal_weight_multiplier: number;
+	audit_enabled: boolean;
     neo4j_bolt_url?: string;
 }
 
 export interface RerankingResult {
-    document_id: string;, original_score: number;, enhanced_score: number;, neo4j_boost: number;, boolean_pattern_match: boolean[][];, confidence_metrics: ConfidenceScores;, path_context: Neo4jPathContext;, explanation: string;
+    document_id: string;
+	original_score: number;
+	enhanced_score: number;
+	neo4j_boost: number;
+	boolean_pattern_match: boolean[][];
+	confidence_metrics: ConfidenceScores;
+	path_context: Neo4jPathContext;
+	explanation: string;
 }
 
 type SegmentLike = {

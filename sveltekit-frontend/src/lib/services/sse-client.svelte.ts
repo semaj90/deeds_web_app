@@ -13,7 +13,8 @@ import type { url } from "inspector";
 import { config, off, disconnect } from "process";
 
 export interface SSEMessage {
-  type: string;, data: unknown;
+  type: string;
+	data: unknown;
   timestamp: string;
 }
 
@@ -45,7 +46,7 @@ export class SSEClient {
     this.config = {
       reconnectDelay: 1000, maxReconnectAttempts: 5,
       headers: {},
-      withCredentials: true,
+	withCredentials: true,
       ...config
     };
   }
@@ -165,7 +166,8 @@ export class SSEClient {
     this.reconnectTimeout = window.setTimeout(() => {
       this.disconnect();
       this.connect();
-    }, delay);
+    },
+	delay);
   }
 }
 
@@ -199,9 +201,9 @@ export function createSSEClient(config: SSEConfig): SSEClient {
  * sseClient.connect();
  *
  * // In component cleanup
- * onDestroy(() => {
+ * // TODO: Add as cleanup in $effect: return () => {
  *   sseClient.disconnect();
- * });
+ * }
  */
 
 

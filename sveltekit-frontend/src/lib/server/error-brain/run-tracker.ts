@@ -22,24 +22,32 @@ export type RunState =
 	| 'failed';
 
 export interface RunCounters {
-	filesScanned: number;, errorsFound: number;
-	patchesProposed: number;, patchesApplied: number;
+	filesScanned: number;
+	errorsFound: number;
+	patchesProposed: number;
+	patchesApplied: number;
 	patchesRejected: number;
 }
 
 export interface ErrorBrainError {
-	code: string;, message: string;
+	code: string;
+	message: string;
 	cause?: string;
 	file?: string;
-	line?: number;, timestamp: string;
+	line?: number;
+	timestamp: string;
 }
 
 export interface RunMetadata {
-	runId: string;, state: RunState;
+	runId: string;
+	state: RunState;
 	startTime: string;
-	endTime?: string;, counters: RunCounters;
-	errors: ErrorBrainError[];, config: {
-		dryRun: boolean;, maxPatchSize: number;
+	endTime?: string;
+	counters: RunCounters;
+	errors: ErrorBrainError[];
+	config: {
+		dryRun: boolean;
+	maxPatchSize: number;
 		confidenceThreshold: number;
 	};
 	patches: string[]; // Paths to patch files
@@ -84,19 +92,21 @@ export class RunTracker {
 			runId: runId || generateRunId(),
 			state: 'queued',
 			startTime: new Date().toISOString(),
-			counters: {, filesScanned: 0,
+			counters: {
+	filesScanned: 0,
 				errorsFound: 0,
 				patchesProposed: 0,
 				patchesApplied: 0,
 				patchesRejected: 0
 			},
-			errors: [],
-			config: {, dryRun: true,
+	errors: [],
+			config: {
+	dryRun: true,
 				maxPatchSize: 100,
 				confidenceThreshold: 0.7,
 				...config
 			},
-			patches: []
+	patches: []
 		};
 
 		this.filePath = getRunFilePath(this.metadata.runId);

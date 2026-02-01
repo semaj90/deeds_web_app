@@ -28,7 +28,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (error: any) {
 		console.error('Failed to start pipeline:', error);
-		return json({ error: error.message }, { status: 500 });
+		return json({ error: error.message },
+	{ status: 500 });
 	}
 };
 

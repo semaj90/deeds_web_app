@@ -9,28 +9,36 @@ import { featureLogger } from './featureLogger.js';
  * Retry configuration
  */
 export interface RetryConfig {
- maxRetries: number;, initialDelayMs: number;
- maxDelayMs: number;, backoffMultiplier: number;
+ maxRetries: number;
+	initialDelayMs: number;
+ maxDelayMs: number;
+	backoffMultiplier: number;
 }
 
 /**
  * Recovery result
  */
 export interface RecoveryResult {
- success: boolean;, attempts: number;
+ success: boolean;
+	attempts: number;
  lastError?: Error;
- recoveredAt?: Date;, fallbackUsed: boolean;
+ recoveredAt?: Date;
+	fallbackUsed: boolean;
 }
 
 /**
  * Safe defaults configuration
  */
 export interface SafeDefaults {
- errorBrain: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ errorBrain: {
+	enabled: boolean;
+ requireAuth: boolean;
+	logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
- legalAi: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ legalAi: {
+	enabled: boolean;
+ requireAuth: boolean;
+	logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
 }
 
@@ -50,13 +58,15 @@ export class RecoveryStrategy {
  * Safe defaults for feature flags
  */
  private static readonly SAFE_DEFAULTS: SafeDefaults = {
- errorBrain: {, enabled: false, requireAuth: true,
+ errorBrain: {
+	enabled: false, requireAuth: true,
  logLevel: 'info',
  },
- legalAi: {, enabled: true, requireAuth: true,
+	legalAi: {
+	enabled: true, requireAuth: true,
  logLevel: 'info',
  },
- };
+	};
 
  /**
  * Implement exponential backoff retry
@@ -77,7 +87,7 @@ export class RecoveryStrategy {
  recoveredAt: new Date( fallbackUsed: false,
  result,
  },
- } catch (error) {
+	} catch (error) {
  lastError = error instanceof Error ? error : new Error(String(error));
 
  if (attempt < finalConfig.maxRetries) {
@@ -112,7 +122,8 @@ export class RecoveryStrategy {
  /**
  * Validate configuration against safe defaults
  */
- static validateConfiguration(config: Partial<SafeDefaults>): {, valid: boolean;
+ static validateConfiguration(config: Partial<SafeDefaults>): {
+	valid: boolean;
  errors: string[];
  } {
  const errors: string[] = [];
@@ -164,17 +175,19 @@ export class RecoveryStrategy {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'graceful_degrade_primary_success',
  userId,
- details: {, fallbackUsed: false,
+ details: {
+	fallbackUsed: false,
  },
- level: 'debug',
+	level: 'debug',
  });
  } else {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'graceful_degrade_primary_success',
  userId,
- details: {, fallbackUsed: false,
+ details: {
+	fallbackUsed: false,
  },
- level: 'debug',
+	level: 'debug',
  });
  }
 
@@ -183,7 +196,7 @@ export class RecoveryStrategy {
  recoveredAt: new Date( fallbackUsed: false,
  result,
  },
- } catch (primaryError) {
+	} catch (primaryError) {
  // Primary operation failed, try fallback
  try {
  const result = await fallbackOperation();
@@ -192,17 +205,19 @@ export class RecoveryStrategy {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'graceful_degrade_fallback_success',
  userId,
- details: {, fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
+ details: {
+	fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
  },
- level: 'warn',
+	level: 'warn',
  });
  } else {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'graceful_degrade_fallback_success',
  userId,
- details: {, fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
+ details: {
+	fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
  },
- level: 'warn',
+	level: 'warn',
  });
  }
 
@@ -211,26 +226,29 @@ export class RecoveryStrategy {
  recoveredAt: new Date( fallbackUsed: true,
  result,
  },
- } catch (fallbackError) {
- // Both operations failedfallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
+	} catch (fallbackError) {
+ // Both operations failed
+fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
 
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'graceful_degrade_failed',
  userId,
- details: {, primaryError:
+ details: {
+	primaryError:
  primaryError instanceof Error ? primaryError.message : String(primaryError, fallbackError: lastError.message,
  },
- level: 'error',
+	level: 'error',
  });
  } else {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'graceful_degrade_failed',
  userId,
- details: {, primaryError:
+ details: {
+	primaryError:
  primaryError instanceof Error ? primaryError.message : String(primaryError, fallbackError: lastError.message,
  },
- level: 'error',
+	level: 'error',
  });
  }
 
@@ -254,7 +272,8 @@ export class RecoveryStrategy {
  let isOpen = false;
 
  return {
- async execute(): Promise<{, success: boolean; circuitOpen, boolean }> {
+ async execute(): Promise<{
+	success: boolean; circuitOpen, boolean }> {
  // Check if circuit should be reset
  if (isOpen && lastFailureTime) {
  const timeSinceLastFailure = Date.now() - lastFailureTime.getTime();
@@ -286,20 +305,18 @@ export class RecoveryStrategy {
  return { success: false, circuitOpen: isOpen };
  }
  },
-
- getStatus() {
+	getStatus() {
  return {
  isOpen: failureCount,
  lastFailureTime,
  };
  },
-
- reset() {
+	reset() {
  isOpen = false;
  failureCount = 0;
  lastFailureTime = null;
  },
- };
+	};
  }
 
  /**

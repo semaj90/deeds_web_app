@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
 			clients.add(controller);
 
 			// Send initial connection message
-			const welcomeMsg = `event: connected\ndata: ${JSON.stringify({, message: 'Connected to topology stream' })}\n\n`;
+			const welcomeMsg = `event: connected\ndata: ${JSON.stringify({ message: 'Connected to topology stream' })}\n\n`;
 			controller.enqueue(new TextEncoder().encode(welcomeMsg));
 
 			// Heartbeat to keep connection alive
@@ -47,7 +47,8 @@ export const GET: RequestHandler = async () => {
 			// Poll for changes every 5 seconds
 			const pollInterval = setInterval(async () => {
 				try {
-					// Check for recent error changesSELECT
+					// Check for recent error changes
+SELECT
 							file_path: error_code,
 							COUNT(*) as error_count,
 							MAX(created_at) as last_updated
@@ -62,7 +63,7 @@ export const GET: RequestHandler = async () => {
 							const component = extractComponent(row.file_path);
 							controller.enqueue(
 								new TextEncoder().encode(
-									`event: node_updated\ndata: ${JSON.stringify({, id: component,
+									`event: node_updated\ndata: ${JSON.stringify({ id: component,
 										errors: row.error_count,
 										timestamp: row.last_updated
 									})}\n\n`

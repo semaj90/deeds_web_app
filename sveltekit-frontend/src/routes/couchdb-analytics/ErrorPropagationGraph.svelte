@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as d3Import from 'd3';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const d3 = d3Import as any;
@@ -178,9 +178,11 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadErrorPropagation();
-	});
+	
+});
 
 	$effect(() => {
 		if (graphContainer && errorFiles.length > 0) {

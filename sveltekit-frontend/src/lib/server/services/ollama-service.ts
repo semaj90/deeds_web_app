@@ -6,13 +6,13 @@ export default {
  return a default model; in production, implement logic to select based on availability or performance
  return 'gemma';
  },
-
- async queryOllama(prompt: string): Promise<string> {
+	async queryOllama(prompt: string): Promise<string> {
  try {
  const response = await fetch(`${env.OLLAMA_BASE_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma', prompt, stream: false }),
+	body: JSON.stringify({
+	model: 'gemma', prompt, stream: false }),
  });
  if (!response.ok) {
  throw new Error(`Ollama query failed: ${response.statusText}`);
@@ -24,7 +24,7 @@ export default {
  throw error;
  }
  },
-};
+	};
 
 
 

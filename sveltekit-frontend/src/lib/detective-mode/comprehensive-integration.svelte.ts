@@ -3,7 +3,8 @@ summaryEmbedding: number[], legalRelevanceScore: number, concepts: Array<KeyValu
 }
 
 export interface RAGQuery {
-query: context?: string; semantic : {, useEmbeddings: boolean, expandConcepts: boolean, includeRelated: boolean
+query: context?: string; semantic : {
+	useEmbeddings: boolean, expandConcepts: boolean, includeRelated: boolean
 }
 
 export interface RAGResult {
@@ -19,7 +20,8 @@ available: maxBufferSize?: number; maxTextureSize?: number
 }
 
 export interface SystemStatus {
-enhancedRAG: {, status: 'online' | 'offline' | 'degraded',lastChecked: Date, responseTime: number
+enhancedRAG: {
+	status: 'online' | 'offline' | 'degraded',lastChecked: Date, responseTime: number
 }
 
 export interface IntegratedQuery {
@@ -27,7 +29,8 @@ query: context?: string; options : { useWebGPU?: boolean; enableStreaming?: bool
 }
 
 export interface IntegratedResponse {
-query: string | semanticAnalysis, SemanticAnalysisResult | null: RAGResponse | null,webGPUMetrics: {, used: boolean, processingTime: number, speedup: number
+query: string | semanticAnalysis, SemanticAnalysisResult | null: RAGResponse | null,webGPUMetrics: {
+	used: boolean, processingTime: number, speedup: number
 }
 
 export interface Neo4jResultRow {
@@ -43,7 +46,8 @@ id: score? , number; payload? : Record<string, unknown>
 }
 
 export interface DatabaseOperations {
-postgresql: {, query: (sql: params?: unknown[]) => Promise<unknown[]>,insert: (table: string), KeyValue: KeyValue => Promise<string>,update: (table: string, id: string), string: KeyValue => Promise<boolean>
+postgresql: {
+	query: (sql: params?: unknown[]) => Promise<unknown[]>,insert: (table: string), KeyValue: KeyValue => Promise<string>,update: (table: string, id: string), string: KeyValue => Promise<boolean>
 }
 
 /**

@@ -36,8 +36,9 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
                             type: 'impossible-presence',
                             first,
                             second,
-                            details: {, travelTimeRequiredMs: travelTime, actualTimeDiffMs: Math.abs(first.time - second.time) },
-                        });
+                            details: {
+	travelTimeRequiredMs: travelTime, actualTimeDiffMs: Math.abs(first.time - second.time) },
+	});
                     }
                 }
             }

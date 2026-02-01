@@ -9,9 +9,9 @@ export async function extractUISpec(route: RouteSpecInput): Promise<UISpec> {
             columns: 12,
             gap: 16
         },
-        spacing: route.spacing || {},
-        colorRules: route.colors || {},
-        screenshotHash: route.hash || 'placeholder-hash',
+	spacing: route.spacing || {},
+	colorRules: route.colors || {},
+	screenshotHash: route.hash || 'placeholder-hash',
         minimumScore: route.minimumScore || 85,
     };
 }

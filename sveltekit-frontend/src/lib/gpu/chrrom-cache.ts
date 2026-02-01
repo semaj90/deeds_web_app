@@ -1,7 +1,9 @@
 // CHR-ROM Pattern Cache for YoRHa/NES Detective UI
 export type CHRPattern = {
-  id: string;, data: number[];
-  width: number;, height: number;
+  id: string;
+	data: number[];
+  width: number;
+	height: number;
   metadata?: Record<string, any>;
 };
 

@@ -271,7 +271,8 @@ export const CacheStrategies = {
 if (browser) {
 	setInterval(async () => {
 		await cache.persistMemorySnapshot();
-	}, 600000);
+	},
+	600000);
 
 	// Restore snapshot on load
 	cache.restoreMemorySnapshot();

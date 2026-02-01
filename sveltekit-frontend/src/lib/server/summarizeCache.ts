@@ -5,18 +5,24 @@ import crypto from 'crypto';
 // Provides LRU + TTL eviction and write-through to Redis if available.
 
 export interface CachePerformanceMeta {
-    duration: number;, tokens: number;
-    promptTokens: number;, tokensPerSecond: number | string;
-    modelUsed: string;, fallbackUsed: boolean;
+    duration: number;
+	tokens: number;
+    promptTokens: number;
+	tokensPerSecond: number | string;
+    modelUsed: string;
+	fallbackUsed: boolean;
 }
 
 export interface SummarizeCacheEntry {
     summary: string;
-    structured?: any;, model: string;
+    structured?: any;
+	model: string;
     mode?: string;
-    type?: string;, ts: number; // creation timestamp
+    type?: string;
+	ts: number; // creation timestamp
     lastAccess: number; // last access timestamp (for LRU)
-    perf: CachePerformanceMeta;, ttlMs: number; // ttl applied when stored
+    perf: CachePerformanceMeta;
+	ttlMs: number; // ttl applied when stored
 }
 
 const MAX_ITEMS = Number(
@@ -118,7 +124,8 @@ export async function writeThroughRedis(
 
 export async function getCache(
     key: string
-): Promise<{, entry: SummarizeCacheEntry | null; source: string }> {
+): Promise<{
+	entry: SummarizeCacheEntry | null; source: string }> {
     const mem = getFromMemory(key);
     if (mem) return { entry: mem, source: 'memory' };
     const red = await getFromRedis(key);

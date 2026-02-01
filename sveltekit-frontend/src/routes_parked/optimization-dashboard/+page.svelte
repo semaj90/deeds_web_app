@@ -3,7 +3,7 @@
 
 import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store.js';
 import type { WorkerStats } from '$lib/workers/specialized-worker-system.js';
-import { onMount } from 'svelte';
+// Migrated to $effect
 
  type PerfPoint = { time: Date;, value: number };
 
@@ -142,8 +142,10 @@ import { onMount } from 'svelte';
  isMonitoring = false}
 
  // start monitoring on mount to avoid unused import warnings and provide UX
- onMount(() => {
- startMonitoring()});
+ $effect(() => {
+
+ startMonitoring()
+});
   
  $effect (() => {
  updateSystemMetrics()});

@@ -1,15 +1,20 @@
 /**
  * Colon-Chain Corruption Fix Pattern
  *
- * Fixes corrupted syntax where `key: value:, key: value` patterns appear
+ * Fixes corrupted syntax where `key: value:
+	key: value` patterns appear
  * instead of proper object literals or function parameters.
  *
  * This is a multi-pass repair pattern that handles cascading fixes.
  *
  * Examples of corruption patterns fixed:
- * 1. `{ key: value:, next: prop }` → `{ key: value, next: prop }`
- * 2. `{ a: b:, c: d }` → `{ a: b, c: d }`
- * 3. Nested: `{, outer: { inner: value, next } }` → `{ outer: {, inner: value, next } }`
+ * 1. `{ key: value:
+	next: prop }` → `{ key: value, next: prop }`
+ * 2. `{ a: b:
+	c: d }` → `{ a: b, c: d }`
+ * 3. Nested: `{
+	outer: { inner: value, next } }` → `{ outer: {
+	inner: value, next } }`
  *
  * @requirements 1.5
  */
@@ -23,7 +28,8 @@ import type { PatternMatcher } from '../pattern-matcher';
 
 /**
  * Pattern to fix longer import colon chains
- * Before: import { A: B:, C: D } from
+ * Before: import { A: B:
+	C: D } from
  * After:  import { A, B, C, D } from
  */
 export const importLongColonChainPattern: PatternMatcher = createPattern(
@@ -57,8 +63,11 @@ export const importColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix quad colon chains in object literals
- * Before: {, key: value, next:, prop: final }
- * After: {, key: value, next: prop, final }
+ * Before: {
+	key: value, next:
+	prop: final }
+ * After: {
+	key: value, next: prop, final }
  */
 export const quadColonChainPattern: PatternMatcher = createPattern(
   'quad-colon-chain',
@@ -68,20 +77,26 @@ export const quadColonChainPattern: PatternMatcher = createPattern(
     // Determine if this looks like type annotations or object literals
     if (/^[A-Z]/.test(val1) && /^[A-Z]/.test(val2)) {
       // Type annotations: prop: Type, prop: Type, prop
-      return `${key1}: ${val1}, ${key2}: ${val2}, ${key3}`;
+      return `${key1}: ${val1},
+	${key2}: ${val2},
+	${key3}`;
     }
     // Object literal: key, value, key: value, key
-    return `${key1}: ${val1}, ${key2}: ${val2}, ${key3}`;
+    return `${key1}: ${val1},
+	${key2}: ${val2},
+	${key3}`;
   },
-  {
+	{
     priority: 0,
   }
 );
 
 /**
  * Pattern to fix triple colon chains in object literals
- * Before: {, key: value, key: value }
- * After: {, key: value, key: value }
+ * Before: {
+	key: value, key: value }
+ * After: {
+	key: value, key: value }
  */
 export const tripleColonChainPattern: PatternMatcher = createPattern(
   'triple-colon-chain',
@@ -91,20 +106,24 @@ export const tripleColonChainPattern: PatternMatcher = createPattern(
     // Determine if this is an object literal or type annotation
     // If val1 looks like a type (starts with uppercase), treat differently
     if (/^[A-Z]/.test(val1)) {
-      // This might be: prop:, Type: prop: Type -> prop: Type, prop: Type
-      return `${key1}: ${val1}, ${key2}: ${val2}`;
+      // This might be: prop:
+	Type: prop: Type -> prop: Type, prop: Type
+      return `${key1}: ${val1},
+	${key2}: ${val2}`;
     }
     // Otherwise treat as corrupted object literal
-    return `${key1}: ${val1}, ${key2}: ${val2}`;
+    return `${key1}: ${val1},
+	${key2}: ${val2}`;
   },
-  {
+	{
     priority: 1,
   }
 );
 
 /**
  * Pattern to fix double colon chains
- * Before: key:, value: nextKey
+ * Before: key:
+	value: nextKey
  * After: key, value, nextKey
  */
 export const doubleColonChainPattern: PatternMatcher = createPattern(
@@ -114,9 +133,10 @@ export const doubleColonChainPattern: PatternMatcher = createPattern(
   (_match: string, key1: string, val1: string, key2: string): string => {
     // Check if this looks like a valid type annotation
     // e.g., param: string, number should become param: string, number
-    return `${key1}: ${val1}, ${key2}`;
+    return `${key1}: ${val1},
+	${key2}`;
   },
-  {
+	{
     priority: 2,
   }
 );
@@ -127,7 +147,8 @@ export const doubleColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with type annotations
- * Before: param:, Type: param: Type
+ * Before: param:
+	Type: param: Type
  * After:  param: Type, param: Type
  */
 export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
@@ -142,7 +163,8 @@ export const typeAnnotationColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in function parameters
- * Before: function foo(a: string:, b: number)
+ * Before: function foo(a: string:
+	b: number)
  * After:  function foo(a: string, b: number)
  */
 export const functionParamColonChainPattern: PatternMatcher = createPattern(
@@ -157,7 +179,8 @@ export const functionParamColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in arrow function parameters
- * Before: (a:, string: b, number) =>
+ * Before: (a:
+	string: b, number) =>
  * After:  (a: string, b: number) =>
  */
 export const arrowFunctionColonChainPattern: PatternMatcher = createPattern(
@@ -176,8 +199,10 @@ export const arrowFunctionColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in interface definitions
- * Before: interface Foo { a: string:, b: number }
- * After:  interface Foo { a: string;, b: number }
+ * Before: interface Foo { a: string:
+	b: number }
+ * After:  interface Foo { a: string;
+	b: number }
  */
 export const interfaceColonChainPattern: PatternMatcher = createPattern(
   'interface-colon-chain',
@@ -191,8 +216,10 @@ export const interfaceColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in type definitions
- * Before: type Foo = { a: string:, b: number }
- * After:  type Foo = { a: string;, b: number }
+ * Before: type Foo = { a: string:
+	b: number }
+ * After:  type Foo = { a: string;
+	b: number }
  */
 export const typeDefColonChainPattern: PatternMatcher = createPattern(
   'type-def-colon-chain',
@@ -225,8 +252,10 @@ export const destructuringColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in return type objects
- * Before: ): {, a: Type: b: Type }
- * After:  ): {, a: Type; b: Type }
+ * Before: ): {
+	a: Type: b: Type }
+ * After:  ): {
+	a: Type; b: Type }
  */
 export const returnTypeColonChainPattern: PatternMatcher = createPattern(
   'return-type-colon-chain',
@@ -240,8 +269,10 @@ export const returnTypeColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix generic colon chains
- * Before: Promise<{, a: Type: b: Type }>
- * After: Promise<{, a: Type; b: Type }>
+ * Before: Promise<{
+	a: Type: b: Type }>
+ * After: Promise<{
+	a: Type; b: Type }>
  */
 export const genericColonChainPattern: PatternMatcher = createPattern(
   'generic-colon-chain',
@@ -259,8 +290,10 @@ export const genericColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains inside nested object literals
- * Before: {, outer: { inner: value, next } }
- * After: {, outer: { inner: value, next } }
+ * Before: {
+	outer: { inner: value, next } }
+ * After: {
+	outer: { inner: value, next } }
  */
 export const nestedObjectColonChainPattern: PatternMatcher = createPattern(
   'nested-object-colon-chain',
@@ -274,8 +307,12 @@ export const nestedObjectColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix deeply nested colon chains
- * Before: {, a: { b: {, c: d: e } } }
- * After: {, a: { b: {, c: d, e } } }
+ * Before: {
+	a: { b: {
+	c: d: e } } }
+ * After: {
+	a: { b: {
+	c: d, e } } }
  */
 export const deepNestedColonChainPattern: PatternMatcher = createPattern(
   'deep-nested-colon-chain',
@@ -289,8 +326,10 @@ export const deepNestedColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with nested braces (general case)
- * Handles: {, inner: value, next }
- * After: {, inner: value, next }
+ * Handles: {
+	inner: value, next }
+ * After: {
+	inner: value, next }
  */
 export const innerBraceColonChainPattern: PatternMatcher = createPattern(
   'inner-brace-colon-chain',
@@ -308,7 +347,8 @@ export const innerBraceColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in object property assignments
- * Before: obj = { prop: value:, another: thing }
+ * Before: obj = { prop: value:
+	another: thing }
  * After:  obj = { prop: value, another: thing }
  */
 export const objectPropertyColonChainPattern: PatternMatcher = createPattern(
@@ -342,8 +382,10 @@ export const spreadColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in Svelte $props() destructuring
- * Before: let { prop: Type:, another: Type } = $props()
- * After:  let { prop, another }: {, prop: Type; another: Type } = $props()
+ * Before: let { prop: Type:
+	another: Type } = $props()
+ * After:  let { prop, another }: {
+	prop: Type; another: Type } = $props()
  */
 export const sveltePropsColonChainPattern: PatternMatcher = createPattern(
   'svelte-props-colon-chain',
@@ -358,8 +400,9 @@ export const sveltePropsColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains in Svelte reactive statements
- * Before: $:, result: value, computed
- * After:  $: result = value, computed
+ * Before: $:
+	result: value, computed
+ * After:  let result = $derived(value, computed
  */
 export const svelteReactiveColonChainPattern: PatternMatcher = createPattern(
   'svelte-reactive-colon-chain',
@@ -370,7 +413,7 @@ export const svelteReactiveColonChainPattern: PatternMatcher = createPattern(
     priority: 17,
     fileFilter: (path: string) => path.endsWith('.svelte'),
   }
-);
+));
 
 // ============================================================================
 // EDGE CASE PATTERNS
@@ -378,8 +421,10 @@ export const svelteReactiveColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with string values
- * Before: {, key: "value": next: "prop" }
- * After: {, key: "value", next: "prop" }
+ * Before: {
+	key: "value": next: "prop" }
+ * After: {
+	key: "value", next: "prop" }
  */
 export const stringValueColonChainPattern: PatternMatcher = createPattern(
   'string-value-colon-chain',
@@ -393,8 +438,10 @@ export const stringValueColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with numeric values
- * Before: {, key: 123, next: 456 }
- * After: {, key: 123, next: 456 }
+ * Before: {
+	key: 123, next: 456 }
+ * After: {
+	key: 123, next: 456 }
  */
 export const numericValueColonChainPattern: PatternMatcher = createPattern(
   'numeric-value-colon-chain',
@@ -408,8 +455,10 @@ export const numericValueColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with boolean values
- * Before: {, key: true, next: false }
- * After: {, key: true, next: false }
+ * Before: {
+	key: true, next: false }
+ * After: {
+	key: true, next: false }
  */
 export const booleanValueColonChainPattern: PatternMatcher = createPattern(
   'boolean-value-colon-chain',
@@ -423,8 +472,10 @@ export const booleanValueColonChainPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix colon chains with null/undefined values
- * Before: {, key: null, next: undefined }
- * After: {, key: null, next: undefined }
+ * Before: {
+	key: null, next: undefined }
+ * After: {
+	key: null, next: undefined }
  */
 export const nullishValueColonChainPattern: PatternMatcher = createPattern(
   'nullish-value-colon-chain',
@@ -560,7 +611,8 @@ export function fixColonChains(
  * @param content - The source code content to check
  * @returns Object containing detection results
  */
-export function detectColonChainCorruption(content: string): {, hasCorruption: boolean;
+export function detectColonChainCorruption(content: string): {
+	hasCorruption: boolean;
   patternMatches: Record<string, number>;
   totalMatches: number;
 } {

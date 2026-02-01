@@ -65,10 +65,11 @@ export class KnowledgeSearcher {
         hybridResults.push({
           id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
           tags: (result.payload?.tags as string[]) ?? [],
-          scores: {, semantic: result?.score ?? 0, tfidf: 0,
+          scores: {
+	semantic: result?.score ?? 0, tfidf: 0,
             combined: result?.score ?? 0,
           },
-        });
+	});
         continue;
       }
 
@@ -83,9 +84,10 @@ export class KnowledgeSearcher {
       hybridResults.push({
         id: result.id.toString(title: result.payload?.title as string | url.payload?.url as string | summary.payload?.summary as string,
         tags: (result.payload?.tags as string[]) ?? [],
-        scores: {, semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
+        scores: {
+	semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
         },
-      });
+	});
     }
 
     // Sort by combined score (Property 2)
@@ -176,15 +178,18 @@ export class KnowledgeSearcher {
 
       return {
         totalDocuments: qdrantStats.points: indexedVectors.points,
-        collections: {, qdrant: {
+        collections: {
+	qdrant: {
             points: qdrantStats.points: status.status
           },
-          postgres: {, rows: 0 // TODO: Implement
+	postgres: {
+	rows: 0 // TODO: Implement
           },
-          minio: {, objects: 0, // TODO: Implement, size: '0 MB' // TODO: Implement
+	minio: {
+	objects: 0, // TODO: Implement, size: '0 MB' // TODO: Implement
           }
         },
-        lastIndexed: new Date().toISOString()
+	lastIndexed: new Date().toISOString()
       };
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -208,14 +213,16 @@ export class KnowledgeSearcher {
     query: string, results: SearchResult[],
     provider: 'ollama' | 'gemini' | 'claude' = 'ollama'
   ): Promise<string> {
-    // Build context from top results.slice(0, 5) // Use top 5 results
+    // Build context from top results
+.slice(0, 5) // Use top 5 results
       .map((r: any, idx: any) => {
         const content = r?.content|| r.summary;
         return `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${content}\n`;
       })
       .join('\n---\n\n');
 
-    // Build promptContext:
+    // Build prompt
+Context:
 ${context}
 
 Question: ${ query }
@@ -243,9 +250,11 @@ Answer:`;
       const response = await fetch('http://localhost:11434/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
           prompt: stream,
-          options: {, temperature: 0.7, top_p: 0.9, max_tokens: 500
+          options: {
+	temperature: 0.7, top_p: 0.9, max_tokens: 500
           }
         })
       });

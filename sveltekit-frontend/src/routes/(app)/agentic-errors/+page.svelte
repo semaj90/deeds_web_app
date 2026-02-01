@@ -1,22 +1,27 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface Cluster {
-		id: number;, error_count: number;
-		tags: string[];, summary: string;
+		id: number;
+error_count: number;
+		tags: string[];
+summary: string;
 		error_ids: number[];
 		centroid?: number[];
 	}
 
 	interface GraphNode {
-		id: string;, file_path: string;
-		error_count: number;, dependencies: string[];
+		id: string;
+file_path: string;
+		error_count: number;
+dependencies: string[];
 	}
 
 	interface VectorSearchResult {
-		id: string;, score: number;
+		id: string;
+score: number;
 		payload: any;
 	}
 
@@ -90,7 +95,8 @@
 			const res = await fetch('/api/phase89/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: searchQuery,
+	body: JSON.stringify({
+query: searchQuery,
 					top_k: 10,
 					similarity: 'cosine'
 				})
@@ -111,7 +117,8 @@
 			const res = await fetch('/api/phase89/pipeline', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, action: 'cluster' })
+	body: JSON.stringify({
+action: 'cluster' })
 			});
 			const data = await res.json();
 			if (data.success) {
@@ -125,11 +132,13 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		fetchStatus();
 		fetchClusters();
 		fetchGraph();
-	});
+	
+});
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white p-8">
@@ -402,7 +411,8 @@
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
-		-webkit-box-orient: vertical;, overflow: hidden;
+		-webkit-box-orient: vertical;
+overflow: hidden;
 	}
 </style>
 

@@ -42,8 +42,10 @@ export type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'f
 
 // Health updates service state
 export interface HealthUpdatesState {
- connectionState: ConnectionState;, lastUpdateTime: Date | null;
- reconnectionAttempts: number;, isUsingSSE: boolean;
+ connectionState: ConnectionState;
+	lastUpdateTime: Date | null;
+ reconnectionAttempts: number;
+	isUsingSSE: boolean;
 }
 
 /**
@@ -136,7 +138,8 @@ function addMessageToBatch(message: HealthUpdateMessage): void {
  if (!batchFlushTimeout) {
  batchFlushTimeout = setTimeout(() => {
  flushMessageBatch();
- }, MESSAGE_BATCH_TIMEOUT);
+ },
+	MESSAGE_BATCH_TIMEOUT);
  }
 }
 
@@ -172,7 +175,8 @@ function handleMessage(message: HealthUpdateMessage): void {
  console.warn('[Phase 10.3] Heartbeat timeout - no message received in 60 seconds');
  disconnect();
  reconnect();
- }, 60000);
+ },
+	60000);
 }
 
 /**
@@ -188,7 +192,8 @@ function handlePong(): void {
  console.warn('[Phase 10.3] Heartbeat timeout');
  disconnect();
  reconnect();
- }, 60000);
+ },
+	60000);
 }
 
 /**
@@ -267,7 +272,8 @@ async function connectWebSocket(): Promise<boolean> {
  connection.close();
  resolve(false);
  }
- }, 5000);
+ },
+	5000);
  } catch (error) {
  console.error('[Phase 10.3] Error creating WebSocket:', error);
  resolve(false);
@@ -336,7 +342,8 @@ async function connectSSE(): Promise<boolean> {
  connection.close();
  resolve(false);
  }
- }, 5000);
+ },
+	5000);
  } catch (error) {
  console.error('[Phase 10.3] Error creating SSE connection:', error);
  resolve(false);

@@ -15,11 +15,13 @@ export const INDICES = {
  * Case chunk document for Elasticsearch
  */
 export interface CaseChunkDocument {
-	text: string;, section_type: string;
+	text: string;
+	section_type: string;
 	section_subtype?: string;
 	crime_code?: string;
 	crime_category?: string;
-	crime_classification?: string;, jurisdiction: string;
+	crime_classification?: string;
+	jurisdiction: string;
 	court_name?: string;
 	decision_year?: number;
 	sentencing_year?: number;
@@ -29,7 +31,8 @@ export interface CaseChunkDocument {
 		statute?: string[];
 		judge?: string[];
 	};
-	case_id: string;, chunk_id: string;
+	case_id: string;
+	chunk_id: string;
 	created_at?: string;
 }
 
@@ -37,10 +40,13 @@ export interface CaseChunkDocument {
  * Law section document for Elasticsearch
  */
 export interface LawSectionDocument {
-	text: string;, jurisdiction: string;
-	code_abbrev: string;, section_number: string;
+	text: string;
+	jurisdiction: string;
+	code_abbrev: string;
+	section_number: string;
 	full_citation: string;
-	heading?: string;, law_id: string;
+	heading?: string;
+	law_id: string;
 	section_id: string;
 	created_at?: string;
 }
@@ -77,17 +83,20 @@ export async function createIndex(indexName: string, mapping: Record<string, any
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({, settings: {
+	body: JSON.stringify({
+	settings: {
 					number_of_shards: 1,
 					number_of_replicas: 0,
-					analysis: {, analyzer: {
-							legal_analyzer: {, type: 'standard',
+					analysis: {
+	analyzer: {
+							legal_analyzer: {
+	type: 'standard',
 								stopwords: '_english_'
 							}
 						}
 					}
 				},
-				mappings: mapping
+	mappings: mapping
 			})
 		});
 
@@ -112,40 +121,60 @@ export async function createIndex(indexName: string, mapping: Record<string, any
  */
 function getCaseChunksMapping(): Record<string, any> {
 	return {
-		properties: {, text: {
+		properties: {
+	text: {
 				type: 'text',
 				analyzer: 'legal_analyzer',
-				fields: {, keyword: {
+				fields: {
+	keyword: {
 						type: 'keyword',
 						ignore_above: 256
 					}
 				}
 			},
-			section_type: {, type: 'keyword' },
-			section_subtype: {, type: 'keyword' },
-			crime_code: {, type: 'keyword' },
-			crime_category: {, type: 'keyword' },
-			crime_classification: {, type: 'keyword' },
-			jurisdiction: {, type: 'keyword' },
-			court_name: {, type: 'text',
-				fields: {, keyword: {
+	section_type: {
+	type: 'keyword' },
+	section_subtype: {
+	type: 'keyword' },
+	crime_code: {
+	type: 'keyword' },
+	crime_category: {
+	type: 'keyword' },
+	crime_classification: {
+	type: 'keyword' },
+	jurisdiction: {
+	type: 'keyword' },
+	court_name: {
+	type: 'text',
+				fields: {
+	keyword: {
 						type: 'keyword',
 						ignore_above: 256
 					}
 				}
 			},
-			decision_year: {, type: 'integer' },
-			sentencing_year: {, type: 'integer' },
-			sentence_length_months: {, type: 'integer' },
-			entities: {, type: 'object',
-				properties: {, party: { type: 'keyword' },
-					statute: {, type: 'keyword' },
-					judge: {, type: 'keyword' }
+	decision_year: {
+	type: 'integer' },
+	sentencing_year: {
+	type: 'integer' },
+	sentence_length_months: {
+	type: 'integer' },
+	entities: {
+	type: 'object',
+				properties: {
+	party: { type: 'keyword' },
+	statute: {
+	type: 'keyword' },
+	judge: {
+	type: 'keyword' }
 				}
 			},
-			case_id: {, type: 'keyword' },
-			chunk_id: {, type: 'keyword' },
-			created_at: {, type: 'date' }
+	case_id: {
+	type: 'keyword' },
+	chunk_id: {
+	type: 'keyword' },
+	created_at: {
+	type: 'date' }
 		}
 	};
 }
@@ -155,29 +184,40 @@ function getCaseChunksMapping(): Record<string, any> {
  */
 function getLawSectionsMapping(): Record<string, any> {
 	return {
-		properties: {, text: {
+		properties: {
+	text: {
 				type: 'text',
 				analyzer: 'legal_analyzer',
-				fields: {, keyword: {
+				fields: {
+	keyword: {
 						type: 'keyword',
 						ignore_above: 256
 					}
 				}
 			},
-			jurisdiction: {, type: 'keyword' },
-			code_abbrev: {, type: 'keyword' },
-			section_number: {, type: 'keyword' },
-			full_citation: {, type: 'keyword' },
-			heading: {, type: 'text',
-				fields: {, keyword: {
+	jurisdiction: {
+	type: 'keyword' },
+	code_abbrev: {
+	type: 'keyword' },
+	section_number: {
+	type: 'keyword' },
+	full_citation: {
+	type: 'keyword' },
+	heading: {
+	type: 'text',
+				fields: {
+	keyword: {
 						type: 'keyword',
 						ignore_above: 256
 					}
 				}
 			},
-			law_id: {, type: 'keyword' },
-			section_id: {, type: 'keyword' },
-			created_at: {, type: 'date' }
+	law_id: {
+	type: 'keyword' },
+	section_id: {
+	type: 'keyword' },
+	created_at: {
+	type: 'date' }
 		}
 	};
 }
@@ -194,7 +234,7 @@ export async function indexCaseChunk(chunkId: string, document: CaseChunkDocumen
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
+	body: JSON.stringify({
 				...document,
 				created_at: new Date().toISOString()
 			})
@@ -226,7 +266,7 @@ export async function indexLawSection(
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
+	body: JSON.stringify({
 				...document,
 				created_at: new Date().toISOString()
 			})
@@ -247,7 +287,8 @@ export async function indexLawSection(
  * Batch index case chunks
  */
 export async function batchIndexCaseChunks(
-	documents: Array<{, id: string; document: CaseChunkDocument }>,
+	documents: Array<{
+	id: string; document: CaseChunkDocument }>,
 	batchSize: number = 100
 ): Promise<void> {
 	try {
@@ -260,7 +301,8 @@ export async function batchIndexCaseChunks(
 			const bulkBody = batch
 				.map((doc) => [
 					JSON.stringify({
-						index: {, _index: INDICES.CASE_CHUNKS,
+						index: {
+	_index: INDICES.CASE_CHUNKS,
 							_id: doc.id
 						}
 					}),
@@ -277,7 +319,7 @@ export async function batchIndexCaseChunks(
 				headers: {
 					'Content-Type': 'application/x-ndjson'
 				},
-				body: bulkBody + '\n'
+	body: bulkBody + '\n'
 			});
 
 			if (!response.ok) {
@@ -305,7 +347,8 @@ export async function batchIndexCaseChunks(
  * Batch index law sections
  */
 export async function batchIndexLawSections(
-	documents: Array<{, id: string; document: LawSectionDocument }>,
+	documents: Array<{
+	id: string; document: LawSectionDocument }>,
 	batchSize: number = 100
 ): Promise<void> {
 	try {
@@ -318,7 +361,8 @@ export async function batchIndexLawSections(
 			const bulkBody = batch
 				.map((doc) => [
 					JSON.stringify({
-						index: {, _index: INDICES.LAW_SECTIONS,
+						index: {
+	_index: INDICES.LAW_SECTIONS,
 							_id: doc.id
 						}
 					}),
@@ -335,7 +379,7 @@ export async function batchIndexLawSections(
 				headers: {
 					'Content-Type': 'application/x-ndjson'
 				},
-				body: bulkBody + '\n'
+	body: bulkBody + '\n'
 			});
 
 			if (!response.ok) {
@@ -368,7 +412,8 @@ export async function searchCaseChunks(
 	limit: number = 10
 ): Promise<
 	Array<{
-		id: string;, score: number;
+		id: string;
+	score: number;
 		document: CaseChunkDocument;
 	}>
 > {
@@ -377,7 +422,8 @@ export async function searchCaseChunks(
 
 		const must: any[] = [
 			{
-				multi_match: {, query: query,
+				multi_match: {
+	query: query,
 					fields: ['text', 'court_name', 'crime_code'],
 					fuzziness: 'AUTO'
 				}
@@ -388,22 +434,26 @@ export async function searchCaseChunks(
 		if (filters) {
 			if (filters.crime_category) {
 				must.push({
-					term: {, crime_category: filters.crime_category }
+					term: {
+	crime_category: filters.crime_category }
 				});
 			}
 			if (filters.crime_classification) {
 				must.push({
-					term: {, crime_classification: filters.crime_classification }
+					term: {
+	crime_classification: filters.crime_classification }
 				});
 			}
 			if (filters.jurisdiction) {
 				must.push({
-					term: {, jurisdiction: filters.jurisdiction }
+					term: {
+	jurisdiction: filters.jurisdiction }
 				});
 			}
 			if (filters.section_type) {
 				must.push({
-					term: {, section_type: filters.section_type }
+					term: {
+	section_type: filters.section_type }
 				});
 			}
 		}
@@ -413,10 +463,11 @@ export async function searchCaseChunks(
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({, query: {
+	body: JSON.stringify({
+	query: {
 					bool: { must }
 				},
-				size: limit,
+	size: limit,
 				_source: true
 			})
 		});
@@ -426,8 +477,10 @@ export async function searchCaseChunks(
 		}
 
 		const result = (await response.json()) as {
-			hits: {, hits: Array<{
-					_id: string;, _score: number;
+			hits: {
+	hits: Array<{
+					_id: string;
+	_score: number;
 					_source: CaseChunkDocument;
 				}>;
 			};
@@ -456,7 +509,8 @@ export async function searchLawSections(
 	limit: number = 10
 ): Promise<
 	Array<{
-		id: string;, score: number;
+		id: string;
+	score: number;
 		document: LawSectionDocument;
 	}>
 > {
@@ -465,7 +519,8 @@ export async function searchLawSections(
 
 		const must: any[] = [
 			{
-				multi_match: {, query: query,
+				multi_match: {
+	query: query,
 					fields: ['text', 'heading', 'full_citation'],
 					fuzziness: 'AUTO'
 				}
@@ -476,12 +531,14 @@ export async function searchLawSections(
 		if (filters) {
 			if (filters.jurisdiction) {
 				must.push({
-					term: {, jurisdiction: filters.jurisdiction }
+					term: {
+	jurisdiction: filters.jurisdiction }
 				});
 			}
 			if (filters.code_abbrev) {
 				must.push({
-					term: {, code_abbrev: filters.code_abbrev }
+					term: {
+	code_abbrev: filters.code_abbrev }
 				});
 			}
 		}
@@ -491,10 +548,11 @@ export async function searchLawSections(
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({, query: {
+	body: JSON.stringify({
+	query: {
 					bool: { must }
 				},
-				size: limit,
+	size: limit,
 				_source: true
 			})
 		});
@@ -504,8 +562,10 @@ export async function searchLawSections(
 		}
 
 		const result = (await response.json()) as {
-			hits: {, hits: Array<{
-					_id: string;, _score: number;
+			hits: {
+	hits: Array<{
+					_id: string;
+	_score: number;
 					_source: LawSectionDocument;
 				}>;
 			};

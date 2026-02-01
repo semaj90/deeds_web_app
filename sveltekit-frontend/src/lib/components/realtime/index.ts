@@ -8,7 +8,9 @@ export { default as MeltUIDemo } from './MeltUIDemo.svelte';
 export type RealtimeEventType = 'data-update' | 'user-action' | 'system-event' | 'error';
 
 export interface RealtimeEvent {
-    id: string;, type: RealtimeEventType;
-    payload: any;, timestamp: Date;
+    id: string;
+	type: RealtimeEventType;
+    payload: any;
+	timestamp: Date;
     source?: string;
 }

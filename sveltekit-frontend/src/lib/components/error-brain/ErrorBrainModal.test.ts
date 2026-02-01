@@ -37,9 +37,10 @@ describe('ErrorBrainModal Component', () => {
  describe('Rendering', () => {
  it('should render modal with route path', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  const modal = screen.getByText(/Error Brain Analysis/i);
  expect(modal).toBeDefined();
@@ -50,9 +51,10 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render phase indicator', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  expect(screen.getByText('Analyzing')).toBeDefined();
  expect(screen.getByText('Suggesting')).toBeDefined();
@@ -62,9 +64,10 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render close button', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  const closeButton = screen.getByRole('button', { name: /×/i });
  expect(closeButton).toBeDefined();
@@ -72,9 +75,10 @@ describe('ErrorBrainModal Component', () => {
 
  it('should render analysis list section', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  expect(screen.getByText(/Analysis History/i)).toBeDefined();
  });
@@ -83,9 +87,10 @@ describe('ErrorBrainModal Component', () => {
  describe('Loading State', () => {
  it('should show loading spinner initially', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  expect(screen.getByText(/Loading analyses/i)).toBeDefined();
  });
@@ -99,9 +104,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.queryByText(/Loading analyses/i)).toBeNull();
@@ -116,9 +122,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.getByText(/Failed to load analyses/i)).toBeDefined();
@@ -129,9 +136,10 @@ describe('ErrorBrainModal Component', () => {
  (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.getByText(/Network error/i)).toBeDefined();
@@ -149,26 +157,30 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.getByText(/No analyses yet/i)).toBeDefined();
  });
  });
 
- it('should display analyses in list format', async () => {{
+ it('should display analyses in list format', async () => {
+{
  id: '1',
  route_path: TEST_ROUTE_PATH,
- suggestions: [{, title: 'Fix 1', description: 'Desc 1' }],
+ suggestions: [{
+	title: 'Fix 1', description: 'Desc 1' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(), patches: [],
  },
- {
+	{
  id: '2',
  route_path: TEST_ROUTE_PATH,
- suggestions: [{, title: 'Fix 2', description: 'Desc 2' }],
+ suggestions: [{
+	title: 'Fix 2', description: 'Desc 2' }],
  phase: 'verifying',
  created_at: new Date().toISOString(), patches: [],
  }];
@@ -180,9 +192,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.getByText(/1 suggestions/i)).toBeDefined();
@@ -190,10 +203,12 @@ describe('ErrorBrainModal Component', () => {
  });
  });
 
- it('should display patch count for each analysis', async () => {{
+ it('should display patch count for each analysis', async () => {
+{
  id: '1',
  route_path: TEST_ROUTE_PATH,
- suggestions: [{, title: 'Fix', description: 'Desc' }],
+ suggestions: [{
+	title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(), patches: [
  {
@@ -201,7 +216,7 @@ describe('ErrorBrainModal Component', () => {
  file_path: 'src/test.ts',
  verification_status: 'passed',
  },
- {
+	{
  id: 'p2',
  file_path: 'src/test2.ts',
  verification_status: 'pending',
@@ -215,9 +230,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  expect(screen.getByText(/passed/i)).toBeDefined();
@@ -227,7 +243,8 @@ describe('ErrorBrainModal Component', () => {
  });
 
  describe('Analysis Selection', () => {
- it('should display details when analysis is selected', async () => {{
+ it('should display details when analysis is selected', async () => {
+{
  id: '1',
  route_path: TEST_ROUTE_PATH,
  suggestions: [
@@ -248,9 +265,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const analysisItem = screen.getByText(/1 suggestions/i);
@@ -282,16 +300,18 @@ describe('ErrorBrainModal Component', () => {
  ok: true, json: async () => ({
  id: 'analysis-1',
  route_path: TEST_ROUTE_PATH,
- suggestions: [{, title: 'Fix', description: 'Desc' }],
+ suggestions: [{
+	title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(),
  }),
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const saveButton = screen.getByText(/Save Analysis/i);
@@ -324,9 +344,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const saveButton = screen.getByText(/Save Analysis/i);
@@ -363,9 +384,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const savePatchButton = screen.getByText(/Save Patch/i);
@@ -398,9 +420,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const savePatchButton = screen.getByText(/Save Patch/i);
@@ -434,9 +457,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const verifyButton = screen.getByText(/Verify Patch/i);
@@ -477,9 +501,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
 
  await waitFor(() => {
  const verifyButton = screen.getByText(/Verify Patch/i);
@@ -515,10 +540,11 @@ describe('ErrorBrainModal Component', () => {
  });
 
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH,
+ props: {
+	routePath: TEST_ROUTE_PATH,
  onClose,
  },
- });
+	});
 
  await waitFor(() => {
  const closeButton = screen.getByRole('button', { name: /×/i });
@@ -542,10 +568,11 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH,
+ props: {
+	routePath: TEST_ROUTE_PATH,
  onClose,
  },
- });
+	});
 
  await waitFor(() => {
  const backdrop = container.querySelector('.modal-backdrop');
@@ -569,9 +596,10 @@ describe('ErrorBrainModal Component', () => {
  });
 
  const { container } = render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
   
  expect(container.querySelector('.error-brain-modal')).toBeDefined();
 
@@ -583,9 +611,10 @@ describe('ErrorBrainModal Component', () => {
 
  it('should use $props for component props', () => {
  render(ErrorBrainModal, {
- props: {, routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
+ props: {
+	routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
- });
+	});
   
  const routeInfo = screen.getByText(new RegExp(TEST_ROUTE_PATH));
  expect(routeInfo).toBeDefined();

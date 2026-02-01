@@ -6,15 +6,20 @@ import type { ensureRedisReady } from '$lib/server/redis-client';
 import { createClient, type RedisClientType } from 'redis';
 
 interface CacheMetrics {
-	hits: number;, misses: number;
-	sets: number;, deletes: number;
-	errors: number;, totalRequests: number;
-	hitRate: number;, averageGetTime: number;
+	hits: number;
+	misses: number;
+	sets: number;
+	deletes: number;
+	errors: number;
+	totalRequests: number;
+	hitRate: number;
+	averageGetTime: number;
 	averageSetTime: number;
 }
 
 interface OperationTiming {
-	operation: string;, duration: number;
+	operation: string;
+	duration: number;
 	timestamp: number;
 }
 
@@ -41,7 +46,8 @@ export class RedisMetricsCache {
 	private readonly MAX_TIMING_SAMPLES = 1000;
 
 	// Key pattern tracking for insights
-	private keyPatterns: Map<string, { hits: number;, misses: number }> = new Map();
+	private keyPatterns: Map<string, { hits: number;
+	misses: number }> = new Map();
 
 	constructor(private url: string) { }
 
@@ -295,7 +301,9 @@ export class RedisMetricsCache {
 	/**
 	 * Get key pattern statistics
 	 */
-	getKeyPatternStats(): Array<{, pattern: string; hits: number;, misses: number; hitRate: number }> {
+	getKeyPatternStats(): Array<{
+	pattern: string; hits: number;
+	misses: number; hitRate: number }> {
 		return Array.from(this.keyPatterns.entries())
 			.map(([pattern, stats]) => ({
 				pattern,
@@ -314,17 +322,19 @@ export class RedisMetricsCache {
 		const patterns = this.getKeyPatternStats();
 
 		return {
-			overall: {, hitRate: metrics.hitRate.toFixed(2) + '%',
+			overall: {
+	hitRate: metrics.hitRate.toFixed(2) + '%',
 				totalRequests: metrics.totalRequests,
 				hits: metrics.hits,
 				misses: metrics.misses,
 				errors: metrics.errors,
 				errorRate: ((metrics.errors / metrics.totalRequests) * 100).toFixed(2) + '%'
 			},
-			performance: {, averageGetTime: metrics.averageGetTime.toFixed(2) + 'ms',
+	performance: {
+	averageGetTime: metrics.averageGetTime.toFixed(2) + 'ms',
 				averageSetTime: metrics.averageSetTime.toFixed(2) + 'ms'
 			},
-			topPatterns: patterns.slice(0, 10),
+	topPatterns: patterns.slice(0, 10),
 			recommendations: this.generateRecommendations(metrics, patterns)
 		};
 	}

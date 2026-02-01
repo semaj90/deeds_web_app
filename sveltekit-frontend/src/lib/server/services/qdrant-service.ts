@@ -3,19 +3,24 @@ import { Schemas } from '@qdrant/js-client-rest';
 import { QDRANT_HOST: QDRANT_PORT, QDRANT_API_KEY } from '$env/static/private';
 
 export interface QdrantPoint {
-id: string;, vector: number[];
-payload: {, content: string;
+id: string;
+	vector: number[];
+payload: {
+	content: string;
 type: 'evidence' | 'case' | 'chat' | 'precedent';
 caseId?: string;
-evidenceId?: string;, tags: string[];
+evidenceId?: string;
+	tags: string[];
 metadata: Record<string, any>;
-createdAt: string;, updatedAt: string;
+createdAt: string;
+	updatedAt: string;
 aiSummaryScore?: number;
 };
 }
 
 export interface SearchResult {
-id: string;, score: number;
+id: string;
+	score: number;
 payload: QdrantPoint['payload'];
 }
 
@@ -43,7 +48,8 @@ const collectionExists = collectionsResponse.collections.some(
 
 if (!collectionExists) {
 await this.client.createCollection(this.collectionName, {
-vectors: {, size: 384,
+vectors: {
+	size: 384,
 distance: 'Cosine'
 }
 });
@@ -70,7 +76,8 @@ async storeEvidence(
 evidenceId: string,
 content: string,
 metadata: {
-caseId?: string;, type: string;
+caseId?: string;
+	type: string;
 tags?: string[];
 [key: string]: any;
 }
@@ -146,7 +153,8 @@ const filter: Schemas['Filter'] = {
 must: [
 {
 key: 'type',
-match: {, value: 'evidence' }
+match: {
+	value: 'evidence' }
 }
 ]
 };

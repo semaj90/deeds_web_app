@@ -9,11 +9,13 @@ const STREAM_TTL_MS = 5 * 60 * 1000; // 5 minutes
 let lastSweep = Date.now();
 
 export interface ActiveStream {
-    id: string;, createdAt: number;
+    id: string;
+	createdAt: number;
     controller: AbortController; // to cancel upstream model/provider
     tokens: string[]; // accumulated tokens for optional summarization
     interrupted?: boolean;
-    summarySent?: boolean;, lastActivity: number;
+    summarySent?: boolean;
+	lastActivity: number;
 }
 
 const streams = new Map<string, ActiveStream>();

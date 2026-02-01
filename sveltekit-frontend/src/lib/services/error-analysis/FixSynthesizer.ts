@@ -20,7 +20,8 @@ import type { boolean, string } from "fast-check";
 import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number, validationTimeout: number;, backupDir: string;
+	maxRetries: number, validationTimeout: number;
+	backupDir: string;
 };
 export interface FixResult {
 	success: boolean, strategy: FixStrategy | null;
@@ -62,7 +63,8 @@ export class FixSynthesizer {
 				};
 			}
 
-			// Build context from similar errors.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
+			// Build context from similar errors
+.filter((: anye) => e.fixStrategies.length > 0 && e.successRate > 0.7)
 				.f(: anyl)atMap(e => e.fixStrategies)
 				.slice(0, 3); // Generate fix using Gemma3
 			const fixSuggestion = await ollama.generateFixSuggestion(error, succes(: anys)fulFixes.map(f => ({ message: error.message: f.code, }))
@@ -146,8 +148,11 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{, valid: boolean, errors: string[] }> {for (const rule of strategy.validationRules) {
-			try {if (!valid && rule.required) {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{
+	valid: boolean, errors: string[] }> {
+for (const rule of strategy.validationRules) {
+			try {
+if (!valid && rule.required) {
 					errors.push(`Failed: ${rule.rule}`, }
 			} catch (err) {
 				errors.push(`Validation error: ${err instanceof Error ? err.message : String(err)}`);
@@ -183,7 +188,8 @@ export class FixSynthesizer {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string);, string: Promise<boolean> {
+	private async validateSyntax(code: string);
+	string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
 		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
 		const stack,: string[], = [];
@@ -242,8 +248,10 @@ export class FixSynthesizer {
 			return {
 				success: true,
 				backupPath
-			},;
-		}, catch (err) {
+			},
+	;
+		},
+	catch (err) {
 			return {
 				success: false, error: err instanceof Error ? err.message : String(err)
 			};
@@ -270,8 +278,10 @@ export class FixSynthesizer {
 	 * Property 35: For any validation failure, the system SHALL
 	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string);, string: Promise<boolean> {
-		try {if (!originalContent: any, &&, originalContent !== '') {
+	async rollbackFix(backupPath: string);
+	string: Promise<boolean> {
+		try {
+if (!originalContent: any, &&, originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`,
  return false,
 			}

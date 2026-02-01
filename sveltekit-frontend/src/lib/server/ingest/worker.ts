@@ -15,14 +15,16 @@ if (!parentPort) {
 }
 
 interface WorkerJobData {
-    id: string;, type: 'ocr' | 'audio_extract' | 'video_frames' | 'json_parse' | 'embed' | 'image_process';
+    id: string;
+	type: 'ocr' | 'audio_extract' | 'video_frames' | 'json_parse' | 'embed' | 'image_process';
     payload: any;
 }
 
 interface WorkerJobResult {
     success: boolean;
     result?: any;
-    error?: string;, processingTime: number;
+    error?: string;
+	processingTime: number;
     workerId: string;
 }
 
@@ -73,7 +75,8 @@ parentPort.on('message', async (jobData: WorkerJobData) => {
     }
 });
 
-async function handleOCR(payload: {, buffer: Uint8Array; contentType?: string }) {
+async function handleOCR(payload: {
+	buffer: Uint8Array; contentType?: string }) {
     const buffer = Buffer.from(payload.buffer);
     if (payload.contentType === 'application/pdf') {
         return await extractTextFromPDF(buffer);
@@ -82,21 +85,25 @@ async function handleOCR(payload: {, buffer: Uint8Array; contentType?: string })
     }
 }
 
-async function handleAudioExtraction(payload: {, buffer: Uint8Array; filename: string }) {
+async function handleAudioExtraction(payload: {
+	buffer: Uint8Array; filename: string }) {
     const buffer = Buffer.from(payload.buffer);
     return await extractAudioFromBuffer(buffer, payload.filename);
 }
 
-async function handleVideoFrames(payload: {, buffer: Uint8Array; filename: string }) {
+async function handleVideoFrames(payload: {
+	buffer: Uint8Array; filename: string }) {
     const buffer = Buffer.from(payload.buffer);
     return await sampleFramesFromVideo(buffer, payload.filename);
 }
 
-async function handleJsonParsing(payload: {, jsonText: string }) {
+async function handleJsonParsing(payload: {
+	jsonText: string }) {
     return await parseJsonWithSimd(payload.jsonText);
 }
 
-async function handleEmbedding(payload: {, content: string | Uint8Array; contentType: string }) {
+async function handleEmbedding(payload: {
+	content: string | Uint8Array; contentType: string }) {
     if (typeof payload.content === 'string') {
         return await embedText(payload.content);
     } else {
@@ -105,7 +112,8 @@ async function handleEmbedding(payload: {, content: string | Uint8Array; content
     }
 }
 
-async function handleImageProcessing(payload: {, buffer: Uint8Array; operations: any[] }) {
+async function handleImageProcessing(payload: {
+	buffer: Uint8Array; operations: any[] }) {
     // Stub
     return { success: true };
 }

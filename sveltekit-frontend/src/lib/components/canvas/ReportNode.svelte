@@ -3,7 +3,7 @@
   interface Props {
     report: Report}
   let { report }: Props = $props();
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import type { Report } from '$lib/data/types';
   // UI Components
   import * as ContextMenu from '$lib/components/ui/context-menu.svelte';

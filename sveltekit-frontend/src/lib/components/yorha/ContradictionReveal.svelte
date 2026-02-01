@@ -21,7 +21,8 @@
    if (show && autoHide) {
      timeoutId = setTimeout(() => {
        onhide?.();
-     }, duration);
+     },
+	duration);
    }
 
    return () => {
@@ -83,7 +84,8 @@
 
  @keyframes bounce-in {
  0% {
- transform: scale(0.3);, opacity: 0;
+ transform: scale(0.3);
+	opacity: 0;
  }
  50% {
  transform: scale(1.05);
@@ -92,7 +94,8 @@
  transform: scale(0.9);
  }
  100% {
- transform: scale(1);, opacity: 1;
+ transform: scale(1);
+	opacity: 1;
  }
  }
 
@@ -111,7 +114,8 @@
 
  .animate-typing {
  overflow: hidden;
- white-space: nowrap;, animation: typing 2s steps(10, end);
+ white-space: nowrap;
+	animation: typing 2s steps(10, end);
  }
 </style>
 

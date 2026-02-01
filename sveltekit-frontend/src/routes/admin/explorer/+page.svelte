@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import { writable } from 'svelte/store';
 
 	interface RouteNode {
@@ -40,10 +40,14 @@
 	let searchQuery = $state('');
 	let expandedPaths = $state(new Set<string>());
 
-	onMount(async () => {
+	$effect(() => {
+  (async () => {
+
 		await loadRoutes();
 		startSSE();
-	});
+	
+  })();
+});
 
 	async function loadRoutes() {
 		try {
@@ -104,7 +108,7 @@
 			const response = await fetch('/api/admin/agent/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
+	body: JSON.stringify({
                     file_path: route.path,
 					error_count: route.errors
 				})
@@ -143,7 +147,7 @@
 						name: part,
 						path: parts.slice(0, idx + 1).join('/'),
                         children: {},
-						routes: []
+	routes: []
 					};
 				}
 

@@ -64,14 +64,14 @@ const safeJobMachine = (() => {
         async createJob(id, ctx) {
             console.warn(`jobMachine.createJob stub called for ${id}`);
         },
-        async startJob(id) {
+	async startJob(id) {
             console.warn(`jobMachine.startJob stub called for ${id}`);
             return true;
         },
-        async completeJob(id) {
+	async completeJob(id) {
             console.warn(`jobMachine.completeJob stub called for ${id}`);
         },
-        async failJob(id, err, retry) {
+	async failJob(id, err, retry) {
             console.warn(`jobMachine.failJob stub called for ${id} -`, err);
         }
     };
@@ -142,7 +142,8 @@ async function processJob(job) {
                 chunk_text: job.text,
                 chunk_index: 0,
                 embedding: emb,
-                metadata: {, source: 'pipeline',
+                metadata: {
+	source: 'pipeline',
                     jobId: job.id,
                     model: result?.model ?? 'unknown',
                     backend: result.backend
@@ -150,7 +151,8 @@ async function processJob(job) {
             })
             .onConflictDoNothing({
                 target: sql`(metadata->>'jobId')`
-            });.select({ count: sql`count(*)` })
+            });
+.select({ count: sql`count(*)` })
             .from(document_chunks)
             .where(sql`(metadata->>'jobId') = ${job.id}`);
 

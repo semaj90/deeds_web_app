@@ -52,7 +52,7 @@ export const GET: RequestHandler = async () => {
 			clients.add(controller);
 
 			// Welcome message
-			const welcomeMsg = `event: connected\ndata: ${JSON.stringify({, message: 'Connected to route explorer stream' })}\n\n`;
+			const welcomeMsg = `event: connected\ndata: ${JSON.stringify({ message: 'Connected to route explorer stream' })}\n\n`;
 			controller.enqueue(new TextEncoder().encode(welcomeMsg));
 
 			// Heartbeat
@@ -68,7 +68,8 @@ export const GET: RequestHandler = async () => {
 			// Monitor for changes
 			const monitor = setInterval(async () => {
 				try {
-					// Check for recent file changesSELECT
+					// Check for recent file changes
+SELECT
 							file_path,
 							COUNT(*) as error_count,
 							MAX(created_at) as last_updated
@@ -82,7 +83,7 @@ export const GET: RequestHandler = async () => {
 						for (const row of result.rows) {
 							controller.enqueue(
 								new TextEncoder().encode(
-									`event: route_updated\ndata: ${JSON.stringify({, id: row.file_path,
+									`event: route_updated\ndata: ${JSON.stringify({ id: row.file_path,
 										path: row.file_path,
 										errors: parseInt(row.error_count),
 										timestamp: row.last_updated

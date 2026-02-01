@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import ClusterInspector from './ClusterInspector.svelte';
 	import DependencyChart from './DependencyChart.svelte';
 	import ErrorPropagationGraph from './ErrorPropagationGraph.svelte';
@@ -33,9 +33,11 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		loadStats();
-	});
+	
+});
 </script>
 
 <svelte:head>

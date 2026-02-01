@@ -9,7 +9,8 @@ import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 
 // Mock cacheService module
 vi.mock('../cache.service', () => ({
- cacheService: {, getOrSet: vi.fn( invalidate: vi.fn(),
+ cacheService: {
+	getOrSet: vi.fn( invalidate: vi.fn(),
  }
 }));
 
@@ -81,8 +82,7 @@ describe('Performance Tests', () => {
  version: 1, createdAt: new Date( createdBy: 'user-123',
  isCurrent: true,
  },
-
- (cacheService.getOrSet as any).mockResolvedValue(cachedSummary);
+	(cacheService.getOrSet as any).mockResolvedValue(cachedSummary);
 
  const startTime = Date.now();
 
@@ -94,7 +94,8 @@ describe('Performance Tests', () => {
  expect(elapsed).toBeLessThan(100);
  });
 
- it('should retrieve multiple cached items efficiently', async () => {.fill(0)
+ it('should retrieve multiple cached items efficiently', async () => {
+.fill(0)
  .map((_, i) => `case-${i}`);
 
  (cacheService.getOrSet as any).mockResolvedValue({
@@ -135,9 +136,10 @@ describe('Performance Tests', () => {
  expect(elapsed).toBeLessThan(5000);
  });
 
- it('should handle parallel RAG queries efficiently', async () => {{ query: 'negligence', jurisdiction: 'CA' },
- { query: 'contract', jurisdiction: 'NY' },
- { query: 'property', jurisdiction: 'TX' }];
+ it('should handle parallel RAG queries efficiently', async () => {
+{ query: 'negligence', jurisdiction: 'CA' },
+	{ query: 'contract', jurisdiction: 'NY' },
+	{ query: 'property', jurisdiction: 'TX' }];
 
  vi.mocked(cacheService.getOrSet).mockResolvedValue([]);
 
@@ -153,7 +155,8 @@ describe('Performance Tests', () => {
  });
 
  describe('Throughput performance', () => {
- it('should handle 10 concurrent summary retrievals', async () => {.fill(0)
+ it('should handle 10 concurrent summary retrievals', async () => {
+.fill(0)
  .map((_, i) => `case-${i}`);
 
  vi.mocked(cacheService.getOrSet).mockResolvedValue({

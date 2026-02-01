@@ -15,7 +15,9 @@ async function upsertCitationTag(
     jurisdiction?: string | null
 ): Promise<string | undefined> {
     const rows = await sql`
-        SELECT upsert_citation_tag(${namespace}, ${name}, ${jurisdiction}) AS id
+        SELECT upsert_citation_tag(${namespace},
+	${name},
+	${jurisdiction}) AS id
     `;
     return rows?.[0]?.id as string | undefined;
 }
@@ -26,7 +28,9 @@ async function upsertCitationTag(
 async function linkChunkTag(chunkId: string, tagId: string, source: LinkSource = 'ai'): Promise<void> {
     await sql`
         INSERT INTO chunk_tag_links (chunk_id, tag_id, source)
-        VALUES (${chunkId}, ${tagId}, ${source})
+        VALUES (${chunkId},
+	${tagId},
+	${source})
         ON CONFLICT DO NOTHING
     `;
 }
@@ -34,7 +38,8 @@ async function linkChunkTag(chunkId: string, tagId: string, source: LinkSource =
 /**
  * Extract tags from text and persist them with links to the chunk
  */
-export async function upsertAndLinkChunkTags(opts: {, chunkId: string;
+export async function upsertAndLinkChunkTags(opts: {
+	chunkId: string;
     jurisdiction?: string | null;
     tags: ExtractedLegalTags;
     source?: LinkSource;

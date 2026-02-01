@@ -1,16 +1,20 @@
 <script lang="ts">
-	import { useCache, CacheStrategies } from '$lib/cache/cache-service.svelte';
-	import { onMount } from 'svelte';
+	import { CacheStrategies, useCache } from '$lib/cache/cache-service.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { Save, Trash2, AlertCircle } from 'lucide-svelte';
+	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card/index';
+	import AlertCircle from 'lucide-svelte/icons/alert-circle';
+	import Save from 'lucide-svelte/icons/save';
+	import Trash2 from 'lucide-svelte/icons/trash-2';
+	// Migrated to $effect
 
 	const cache = useCache();
 
 	interface CaseFormData {
-		title: string;, description: string;
+		title: string;
+	description: string;
 		priority: 'low' | 'medium' | 'high' | 'critical';
-		caseType: string;, assignedTo: string;
+		caseType: string;
+	assignedTo: string;
 	}
 
 	let formData = $state<CaseFormData>({
@@ -33,7 +37,8 @@
 		if (autoSaveEnabled && (formData.title || formData.description)) {
 			const timeoutId = setTimeout(async () => {
 				await saveDraft();
-			}, 1000); // Debounce 1 second
+			},
+	1000); // Debounce 1 second
 
 			return () => clearTimeout(timeoutId);
 		}
@@ -86,7 +91,7 @@
 			const response = await fetch('/api/cases', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(formData)
+	body: JSON.stringify(formData)
 			});
 
 			if (response.ok) {

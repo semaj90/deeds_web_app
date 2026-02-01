@@ -1,6 +1,6 @@
 <script lang="ts">
  import { appStore } from '$lib/stores/app-store';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let stats = $state({
  totalDocuments: 15432,
@@ -12,8 +12,8 @@
 
  let chartData = $derived([
  { label: 'Documents', value: stats.totalDocuments, color: 'bg-cyan-400' },
- { label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
- { label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
+	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
+	{ label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
  ]);
 
  let loading = $state(true);
@@ -50,8 +50,8 @@
 
  chartData = [
  { label: 'Documents', value: stats.totalDocuments, color: 'bg-cyan-400' },
- { label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
- { label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
+	{ label: 'AI Analyzed', value: stats.aiAnalyzed, color: 'bg-green-400' },
+	{ label: 'Pending', value: stats.pendingReview, color: 'bg-yellow-400' }
  ];
 
  } catch (err) {
@@ -64,16 +64,19 @@
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  loadEvidenceStats();
 
  // Update stats periodically
  const interval = setInterval(async () => {
  await loadEvidenceStats();
- }, 60000); // Update every minute
+ },
+	60000); // Update every minute
 
  return () => clearInterval(interval);
- });
+ 
+});
 </script>
 
 <div class="bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700/50">

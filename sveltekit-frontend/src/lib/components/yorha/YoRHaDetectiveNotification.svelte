@@ -1,7 +1,8 @@
 <!-- YoRHa Detective Notification Component -->
 <script lang="ts">
   interface Props {
-    message: string;, type: 'success' | 'error' | 'info' | 'warning';
+    message: string;
+	type: 'success' | 'error' | 'info' | 'warning';
     show: boolean;
     duration?: number;
   }
@@ -35,7 +36,8 @@
     if (show && duration && duration > 0) {
         const timer = setTimeout(() => {
             show = false;
-        }, duration);
+        },
+	duration);
         return () => clearTimeout(timer);
     }
   });
@@ -53,21 +55,25 @@
 
 <style>
   .notification-container {
-    position: fixed;, bottom: 1.25rem;
+    position: fixed;
+	bottom: 1.25rem;
     right: 1.25rem;
-    max-width: 24rem;, padding: 1rem;
+    max-width: 24rem;
+	padding: 1rem;
     border: 1px solid;
     border-radius: 0;
     font-family: 'Roboto Mono', monospace;
     font-weight: bold;
     font-size: 0.875rem;
-    z-index: 1050;, animation: slideInRight 0.3s ease-in-out;
+    z-index: 1050;
+	animation: slideInRight 0.3s ease-in-out;
     backdrop-filter: blur(8px);
   }
 
   .notification-content {
     display: flex;
-    align-items: center;, gap: 0.75rem;
+    align-items: center;
+	gap: 0.75rem;
   }
 
   .notification-icon {
@@ -106,25 +112,31 @@
 
   @keyframes slideInRight {
     from {
-      transform: translateX(100%);, opacity: 0;
+      transform: translateX(100%);
+	opacity: 0;
     }
     to {
-      transform: translateX(0);, opacity: 1;
+      transform: translateX(0);
+	opacity: 1;
     }
   }
 
   /* Responsive */
   @media (max-width: 640px) {
     .notification-container {
-      left: 1rem;, right: 1rem;
-      max-width: none;, bottom: 1rem;
+      left: 1rem;
+	right: 1rem;
+      max-width: none;
+	bottom: 1rem;
     }
     @keyframes slideInRight {
       from {
-        transform: translateY(100%);, opacity: 0;
+        transform: translateY(100%);
+	opacity: 0;
       }
       to {
-        transform: translateY(0);, opacity: 1;
+        transform: translateY(0);
+	opacity: 1;
       }
     }
   }

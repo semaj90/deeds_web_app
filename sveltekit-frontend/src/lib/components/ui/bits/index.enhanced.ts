@@ -123,25 +123,31 @@ export const EnhancedBitsFonts = {
  * Academic prestige meets technological aesthetic
  */
 export const EnhancedBitsColors = {
-    background: {, primary: '#0d0d0d',   // Deep space black
+    background: {
+	primary: '#0d0d0d',   // Deep space black
         secondary: '#1a0f0f', // Harvard crimson shadow
         tertiary: '#2a1515',  // Warm dark crimson
     },
-    text: {, primary: '#f5f5f5',   // Pristine white (academic papers)
+	text: {
+	primary: '#f5f5f5',   // Pristine white (academic papers)
         secondary: '#d4af8c', // Harvard gold accent
         muted: '#9d7b6b',     // Muted crimson-brown
     },
-    accent: {, primary: '#c41e3a',   // Harvard Crimson
+	accent: {
+	primary: '#c41e3a',   // Harvard Crimson
         secondary: '#ffd700', // Harvard Gold
     },
-    border: {, default: '#4a2c2c',   // Dark crimson border
+	border: {
+	default: '#4a2c2c',   // Dark crimson border
         hover: '#c41e3a',     // Harvard crimson hover
     },
-    status: {, success: '#2d5a27',   // Dark academic green
+	status: {
+	success: '#2d5a27',   // Dark academic green
         warning: '#b8860b',   // Dark gold warning
         danger: '#8b0000',    // Deep crimson danger
     },
-    gaming: {, matrixGreen: '#00ff41',   // Classic matrix green
+	gaming: {
+	matrixGreen: '#00ff41',   // Classic matrix green
         cyberBlue: '#00d4ff',     // Cyberpunk blue
         warningAmber: '#ffaa00',  // Warning amber
     }

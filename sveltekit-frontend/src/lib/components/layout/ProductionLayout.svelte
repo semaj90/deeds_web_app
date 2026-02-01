@@ -49,18 +49,18 @@
   // Navigation items
   const mainNavItems = [
     { id: 'dashboard', href: '/', label: 'Dashboard', icon: Home, description: 'Overview and metrics' },
-    { id: 'cases', href: '/cases', label: 'Cases', icon: Folder, description: 'Case management' },
-    { id: 'evidence', href: '/evidenceboard', label: 'Evidence', icon: Eye, description: 'Evidence analysis' },
-    { id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Research', icon: Search, description: 'Legal research' },
-    { id: 'chat', href: '/chat', label: 'AI Assistant', icon: MessageSquare, description: 'AI consultation' },
-    { id: 'analytics', href: '/analysis', label: 'Analytics', icon: BarChart3, description: 'Data insights' }
+	{ id: 'cases', href: '/cases', label: 'Cases', icon: Folder, description: 'Case management' },
+	{ id: 'evidence', href: '/evidenceboard', label: 'Evidence', icon: Eye, description: 'Evidence analysis' },
+	{ id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Research', icon: Search, description: 'Legal research' },
+	{ id: 'chat', href: '/chat', label: 'AI Assistant', icon: MessageSquare, description: 'AI consultation' },
+	{ id: 'analytics', href: '/analysis', label: 'Analytics', icon: BarChart3, description: 'Data insights' }
   ];
 
   const toolsNavItems = [
     { id: 'command', href: '/yorha-command-center', label: 'Command Center', icon: Terminal, description: 'System controls' },
-    { id: 'gpu', href: '/demo/gpu-inference', label: 'GPU Processing', icon: Zap, description: 'AI inference' },
-    { id: 'settings', href: '/settings', label: 'Settings', icon: Settings, description: 'Configuration' },
-    { id: 'admin', href: '/admin', label: 'Admin', icon: Database, description: 'Administration' }
+	{ id: 'gpu', href: '/demo/gpu-inference', label: 'GPU Processing', icon: Zap, description: 'AI inference' },
+	{ id: 'settings', href: '/settings', label: 'Settings', icon: Settings, description: 'Configuration' },
+	{ id: 'admin', href: '/admin', label: 'Admin', icon: Database, description: 'Administration' }
   ];
 
   // State using Svelte 5 runes
@@ -102,7 +102,8 @@
   $effect(() => {
     const timer = setInterval(() => {
       currentTime = new Date();
-    }, 1000);
+    },
+	1000);
 
     return () => clearInterval(timer);
   });

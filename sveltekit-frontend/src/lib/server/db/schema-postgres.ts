@@ -96,7 +96,7 @@ export const sessions = pgTable('sessions',
  userId: uuid('user_id').notNull(),
  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
@@ -113,7 +113,7 @@ export const emailVerificationCodes = pgTable('email_verification_codes',
  code: varchar('code', { length: 8 }).notNull(),
  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
@@ -129,7 +129,7 @@ export const passwordResetTokens = pgTable('password_reset_tokens',
  userId: uuid('user_id').notNull(),
  expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
@@ -171,7 +171,7 @@ export const cases = pgTable('cases',
  .defaultNow(),
  status: caseStatusEnum('status').notNull(), // Using enum directly
  },
- (table) => ({
+	(table) => ({
  indexes: [
  index('idx_cases_created_at').on(table.createdAt),
  index('idx_cases_status_priority').on(table.status, table.priority),
@@ -220,7 +220,7 @@ export const criminals = pgTable('criminals',
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  indexes: [
  index('criminals_first_name_idx').on(table.firstName),
  index('criminals_last_name_idx').on(table.lastName),
@@ -285,7 +285,7 @@ export const evidenceRelationships = pgTable('evidence_relationships',
  strength: varchar('strength', { length: 20 }).default('medium').notNull(),
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  indexes: [
  index('evidence_relationships_case_id_idx').on(table.caseId),
  index('evidence_relationships_from_idx').on(table.fromEvidenceId),
@@ -371,7 +371,7 @@ export const legalDocuments = pgTable('legal_documents',
  .defaultNow()
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  indexes: [
  index('idx_legal_documents_case_id').on(table.caseId),
  index('idx_legal_documents_user_id').on(table.userId),
@@ -421,7 +421,7 @@ export const storageFiles = pgTable('storage_files',
  mime: text('mime'),
  uploadedAt: timestamp('uploaded_at').defaultNow().notNull(), // Changed to uploadedAt for consistency
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
@@ -445,7 +445,7 @@ export const vectorMetadata = pgTable('vector_metadata',
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow(),
  },
- (table) => [unique('vector_metadata_document_id_unique').on(table.documentId)]
+	(table) => [unique('vector_metadata_document_id_unique').on(table.documentId)]
 );
 
 // === CASE SCORING SYSTEM ===
@@ -466,7 +466,7 @@ export const caseScores = pgTable('case_scores',
  calculatedAt: timestamp('calculated_at', { mode: 'string' }).defaultNow().notNull(),
  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
  },
- (table) => [
+	(table) => [
  foreignKey({
  columns: [table.caseId],
  foreignColumns: [cases.id],
@@ -491,7 +491,7 @@ export const embeddingCache = pgTable('embedding_cache',
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  embedding: text('embedding').notNull(), // Vector stored as text, converted in service layer
  },
- (table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
+	(table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
 );
 
 // === USER AI QUERIES ===
@@ -512,7 +512,7 @@ export const userAiQueries = pgTable('user_ai_queries',
  contextUsed: jsonb('context_used').default([]).$type<string[]>(),
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.userId],
@@ -545,7 +545,7 @@ export const autoTags = pgTable('auto_tags',
  confirmedAt: timestamp('confirmed_at', { mode: 'string' }),
  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.confirmedBy],
@@ -743,34 +743,38 @@ export const personsOfInterest = pgTable('persons', {
  lastLocation: text('last_location'),
  cases: jsonb('cases').$type<string[]>().default([]),
  // Multiple photos with forensic metadata
- photos: jsonb('photos')
- .$type<
- {
- id: string;, url: string;
- filename: string;, uploadedAt: string;
- metadata: {
- exif?: Record<string, any>;
- gps?: {, lat: number; lng: number };
- timestamp?: string;
- deviceModel?: string;
- resolution?: {, width: number; height: number };
- };
- ai: {
- faceEmbedding?: number[]; // Face recognition vector
- quality: number; // Photo quality score
- landmarks?: number[][]; // Facial landmarks
- };
- }[]
- >()
- .default([]),
- // Legacy single photo URL for backward compatibility
- photoUrl: text('photo_url'),
- ai: jsonb('ai')
- .$type<{
- riskScore: number;, patterns: string[];
- recommendations: string[];, lastUpdated: string;
- }>()
- .default(null),
+  photos: jsonb('photos')
+    .$type<
+      {
+        id: string;
+        url: string;
+        filename: string;
+        uploadedAt: string;
+        metadata: {
+          exif?: Record<string, any>;
+          gps?: { lat: number; lng: number };
+          timestamp?: string;
+          deviceModel?: string;
+          resolution?: { width: number; height: number };
+        };
+        ai: {
+          faceEmbedding?: number[]; // Face recognition vector
+          quality: number; // Photo quality score
+          landmarks?: number[][]; // Facial landmarks
+        };
+      }[]
+    >()
+    .default([]),
+  // Legacy single photo URL for backward compatibility
+  photoUrl: text('photo_url'),
+  ai: jsonb('ai')
+    .$type<{
+      riskScore: number;
+      patterns: string[];
+      recommendations: string[];
+      lastUpdated: string;
+    }>()
+    .default(null),
  createdAt: timestamp('created_at').defaultNow(),
  updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -797,7 +801,7 @@ export const poiPhotos = pgTable('poi_photos',
  faceEmbedding: text('face_embedding'), // Store vector as text for now
  uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  foreignKeys: [
  foreignKey({
  columns: [table.poiId],
@@ -938,7 +942,7 @@ export const statuteChunks = pgTable('statute_chunks',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  statuteIdIdx: index('statute_chunks_statute_id_idx').on(table.statuteId),
  chunkIndexIdx: index('statute_chunks_chunk_index_idx').on(table.chunkIndex),
  })
@@ -1266,7 +1270,7 @@ export const evidenceBoardConnections = pgTable('evidence_board_connections',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  caseIdIdx: index('evidence_board_connections_case_id_idx').on(table.caseId),
  fromEvidenceIdIdx: index('evidence_board_connections_from_evidence_id_idx').on(
  table.fromEvidenceId
@@ -1299,7 +1303,7 @@ export const caseNotes = pgTable('case_notes',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  caseIdIdx: index('case_notes_case_id_idx').on(table.caseId),
  isPinnedIdx: index('case_notes_is_pinned_idx').on(table.isPinned),
  createdAtIdx: index('case_notes_created_at_idx').on(table.createdAt),
@@ -1324,7 +1328,7 @@ export const caseNoteEvidenceRefs = pgTable('case_note_evidence_refs',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  noteIdIdx: index('case_note_refs_note_id_idx').on(table.noteId),
  evidenceIdIdx: index('case_note_refs_evidence_id_idx').on(table.evidenceId),
  uniqueRef: unique('case_note_refs_unique').on(table.noteId, table.evidenceId),
@@ -1350,7 +1354,7 @@ export const workspaces = pgTable('workspaces',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  caseIdIdx: index('workspaces_case_id_idx').on(table.caseId),
  createdByIdx: index('workspaces_created_by_idx').on(table.createdBy),
  })
@@ -1373,7 +1377,7 @@ export const workspaceSessions = pgTable('workspace_sessions',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  workspaceIdIdx: index('workspace_sessions_workspace_id_idx').on(table.workspaceId),
  sessionIdIdx: index('workspace_sessions_session_id_idx').on(table.sessionId),
  })
@@ -1398,7 +1402,7 @@ export const workspaceEvidence = pgTable('workspace_evidence',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  workspaceIdIdx: index('workspace_evidence_workspace_id_idx').on(table.workspaceId),
  evidenceIdIdx: index('workspace_evidence_evidence_id_idx').on(table.evidenceId),
  })
@@ -1422,7 +1426,7 @@ export const workspaceStatutes = pgTable('workspace_statutes',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  workspaceIdIdx: index('workspace_statutes_workspace_id_idx').on(table.workspaceId),
  statuteIdIdx: index('workspace_statutes_statute_id_idx').on(table.statuteId),
  })
@@ -1449,7 +1453,7 @@ export const workspaceNotes = pgTable('workspace_notes',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  workspaceIdIdx: index('workspace_notes_workspace_id_idx').on(table.workspaceId),
  isAIIdx: index('workspace_notes_is_ai_idx').on(table.isAI),
  })
@@ -1473,7 +1477,7 @@ export const workspaceCitations = pgTable('workspace_citations',
  .default(sql`now()`)
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  workspaceIdIdx: index('workspace_citations_workspace_id_idx').on(table.workspaceId),
  messageIdIdx: index('workspace_citations_message_id_idx').on(table.messageId),
  })
@@ -1667,7 +1671,7 @@ export const yorhaCases = pgTable('yorha_cases',
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_number_idx: index('yorha_cases_case_number_idx').on(table.case_number),
  created_by_idx: index('yorha_cases_created_by_idx').on(table.created_by),
  status_idx: index('yorha_cases_status_idx').on(table.status),
@@ -1702,7 +1706,7 @@ export const yorhaEvidenceNodes = pgTable('yorha_evidence_nodes',
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_evidence_nodes_case_id_idx').on(table.case_id),
  evidence_type_idx: index('yorha_evidence_nodes_type_idx').on(table.evidence_type),
  created_by_idx: index('yorha_evidence_nodes_created_by_idx').on(table.created_by),
@@ -1727,7 +1731,7 @@ export const yorhaEvidenceConnections = pgTable('yorha_evidence_connections',
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_evidence_connections_case_id_idx').on(table.case_id),
  source_node_idx: index('yorha_evidence_connections_source_idx').on(table.source_node_id),
  target_node_idx: index('yorha_evidence_connections_target_idx').on(table.target_node_id),
@@ -1752,7 +1756,7 @@ export const yorhaChatSessions = pgTable('yorha_chat_sessions',
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  last_message_at: timestamp('last_message_at', { withTimezone: true }),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_chat_sessions_case_id_idx').on(table.case_id),
  user_id_idx: index('yorha_chat_sessions_user_id_idx').on(table.user_id),
  status_idx: index('yorha_chat_sessions_status_idx').on(table.status),
@@ -1775,7 +1779,7 @@ export const yorhaChatMessages = pgTable('yorha_chat_messages',
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  session_id_idx: index('yorha_chat_messages_session_id_idx').on(table.session_id),
  role_idx: index('yorha_chat_messages_role_idx').on(table.role),
  created_at_idx: index('yorha_chat_messages_created_at_idx').on(table.created_at),
@@ -1806,7 +1810,7 @@ export const yorhaSystemMetrics = pgTable('yorha_system_metrics',
  active_sessions: integer('active_sessions').default(0),
  recorded_at: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  recorded_at_idx: index('yorha_system_metrics_recorded_at_idx').on(table.recorded_at),
  })
 );
@@ -1911,7 +1915,7 @@ export const routeHealth = pgTable('route_health',
  updatedAt: timestamp('updated_at').notNull().defaultNow(),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxRoutePath: index('idx_route_health_path').on(table.routePath),
  idxState: index('idx_route_health_state').on(table.state),
  idxUpdatedAt: index('idx_route_health_updated').on(table.updatedAt),
@@ -1938,7 +1942,7 @@ export const errorEvents = pgTable('error_events',
  collectedAt: timestamp('collected_at').notNull().defaultNow(),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxRoutePath: index('idx_error_events_route').on(table.routePath),
  idxKind: index('idx_error_events_kind').on(table.kind),
  idxClusterId: index('idx_error_events_cluster').on(table.clusterId),
@@ -1961,7 +1965,7 @@ export const errorClusters = pgTable('error_clusters',
  lastUpdated: timestamp('last_updated').notNull().defaultNow(),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxKind: index('idx_error_clusters_kind').on(table.kind),
  idxSeverity: index('idx_error_clusters_severity').on(table.severity),
  })
@@ -1986,7 +1990,7 @@ export const errorSuggestions = pgTable('error_suggestions',
  successCount: integer('success_count').notNull().default(0),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxClusterId: index('idx_error_suggestions_cluster').on(table.clusterId),
  })
 );
@@ -2015,7 +2019,7 @@ export const routeErrorPatches = pgTable('route_error_patches',
  createdAt: timestamp('created_at').notNull().defaultNow(),
  updatedAt: timestamp('updated_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxRoutePath: index('idx_route_patches_route').on(table.routePath),
  idxStatus: index('idx_route_patches_status').on(table.status),
  idxErrorCode: index('idx_route_patches_error_code').on(table.errorCode),
@@ -2035,7 +2039,7 @@ export const errorTimeline = pgTable('error_timeline',
  occurredAt: timestamp('occurred_at').notNull().defaultNow(),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxRoutePath: index('idx_error_timeline_route').on(table.routePath),
  idxEventType: index('idx_error_timeline_event').on(table.eventType),
  })
@@ -2056,7 +2060,7 @@ export const errorSuggestionStates = pgTable('error_suggestion_states',
  createdAt: timestamp('created_at').notNull().defaultNow(),
  updatedAt: timestamp('updated_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxSuggestionRoute: index('idx_error_suggestion_states_suggestion_route').on(
  table.suggestionId, table.routePath
  ),
@@ -2083,7 +2087,7 @@ export const errorFeedback = pgTable('error_feedback',
  feedback: text('feedback'),
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
- (table) => ({
+	(table) => ({
  idxSuggestionId: index('idx_error_feedback_suggestion').on(table.suggestionId),
  idxRoutePath: index('idx_error_feedback_route').on(table.routePath),
  })

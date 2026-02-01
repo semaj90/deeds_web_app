@@ -23,7 +23,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Missing error report' }, { status: 400 });
 		}
 
-		const escalation = getEscalationService();error,
+		const escalation = getEscalationService();
+error,
 			attemptedStrategies || [],
 			confidence ?? 0,
 			toolResults || [],
@@ -66,7 +67,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			success: true,
 			tickets: tickets.map(t => ({
 				id: t.id,
-				error: {, code: t.errorReport.code,
+				error: { code: t.errorReport.code,
 					message: t.errorReport.message,
 					file: t.errorReport.file
 				},

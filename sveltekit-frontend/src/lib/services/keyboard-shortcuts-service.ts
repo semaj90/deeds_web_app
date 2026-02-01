@@ -7,27 +7,33 @@ import { browser } from '$app/environment';
 import { writable, type Writable } from 'svelte/store';
 
 export interface KeyboardShortcut {
-    id: string;, key: string;
+    id: string;
+	key: string;
     ctrl?: boolean;
     alt?: boolean;
     shift?: boolean;
-    meta?: boolean;, description: string;
+    meta?: boolean;
+	description: string;
     category: 'navigation' | 'ai' | 'cases' | 'evidence' | 'system' | 'remote';
-    context?: string[];, action: () => void | Promise<void>;
+    context?: string[];
+	action: () => void | Promise<void>;
     enabled?: boolean;
     remote?: boolean; // Can be triggered remotely
 }
 
 export interface RemoteCommand {
-    id: string;, command: string;
+    id: string;
+	command: string;
     args?: { [key: string]: any };
     source: 'keyboard' | 'api' | 'websocket' | 'voice';
     timestamp: number;
 }
 
 export interface ShortcutCategory {
-    id: string;, name: string;
-    shortcuts: KeyboardShortcut[];, enabled: boolean;
+    id: string;
+	name: string;
+    shortcuts: KeyboardShortcut[];
+	enabled: boolean;
 }
 
 class KeyboardShortcutsService {
@@ -54,27 +60,27 @@ class KeyboardShortcutsService {
         const defaultShortcuts: KeyboardShortcut[] = [
             // Navigation shortcuts
             { id: 'nav-home', key: 'h', ctrl: true, description: 'Navigate to home', category: 'navigation', action: () => this.navigate('/') },
-            { id: 'nav-cases', key: 'c', ctrl: true, description: 'Navigate to cases', category: 'navigation', action: () => this.navigate('/cases') },
-            { id: 'nav-evidence', key: 'e', ctrl: true, description: 'Navigate to evidence', category: 'navigation', action: () => this.navigate('/evidence') },
-            { id: 'nav-ai', key: 'a', ctrl: true, description: 'Navigate to AI assistant', category: 'navigation', action: () => this.navigate('/ai') },
-            // AI shortcuts
+	{ id: 'nav-cases', key: 'c', ctrl: true, description: 'Navigate to cases', category: 'navigation', action: () => this.navigate('/cases') },
+	{ id: 'nav-evidence', key: 'e', ctrl: true, description: 'Navigate to evidence', category: 'navigation', action: () => this.navigate('/evidence') },
+	{ id: 'nav-ai', key: 'a', ctrl: true, description: 'Navigate to AI assistant', category: 'navigation', action: () => this.navigate('/ai') },
+	// AI shortcuts
             { id: 'ai-chat-toggle', key: 'space', ctrl: true, shift: true, description: 'Toggle AI chat', category: 'ai', remote: true, action: () => this.toggleAIChat() },
-            { id: 'ai-analyze', key: 'r', ctrl: true, description: 'Analyze current document with AI', category: 'ai', context: ['evidence', 'document'], remote: true, action: () => this.analyzeWithAI() },
-            { id: 'ai-summarize', key: 's', ctrl: true, shift: true, description: 'Summarize current content', category: 'ai', remote: true, action: () => this.summarizeContent() },
-            // Case management shortcuts
+	{ id: 'ai-analyze', key: 'r', ctrl: true, description: 'Analyze current document with AI', category: 'ai', context: ['evidence', 'document'], remote: true, action: () => this.analyzeWithAI() },
+	{ id: 'ai-summarize', key: 's', ctrl: true, shift: true, description: 'Summarize current content', category: 'ai', remote: true, action: () => this.summarizeContent() },
+	// Case management shortcuts
             { id: 'case-new', key: 'n', ctrl: true, description: 'Create new case', category: 'cases', context: ['cases'], action: () => this.createNewCase() },
-            { id: 'case-search', key: 'f', ctrl: true, description: 'Search cases', category: 'cases', action: () => this.openCaseSearch() },
-            // Evidence shortcuts
+	{ id: 'case-search', key: 'f', ctrl: true, description: 'Search cases', category: 'cases', action: () => this.openCaseSearch() },
+	// Evidence shortcuts
             { id: 'evidence-upload', key: 'u', ctrl: true, description: 'Upload evidence', category: 'evidence', context: ['evidence', 'cases'], action: () => this.uploadEvidence() },
-            { id: 'evidence-tag', key: 't', ctrl: true, description: 'Tag evidence', category: 'evidence', context: ['evidence'], action: () => this.tagEvidence() },
-            // System shortcuts
+	{ id: 'evidence-tag', key: 't', ctrl: true, description: 'Tag evidence', category: 'evidence', context: ['evidence'], action: () => this.tagEvidence() },
+	// System shortcuts
             { id: 'system-command-palette', key: 'p', ctrl: true, shift: true, description: 'Open command palette', category: 'system', action: () => this.openCommandPalette() },
-            { id: 'system-help', key: 'h', shift: true, description: 'Show keyboard shortcuts help', category: 'system', action: () => this.showHelp() },
-            { id: 'system-settings', key: 'comma', ctrl: true, description: 'Open settings', category: 'system', action: () => this.openSettings() },
-            // Remote control shortcuts
+	{ id: 'system-help', key: 'h', shift: true, description: 'Show keyboard shortcuts help', category: 'system', action: () => this.showHelp() },
+	{ id: 'system-settings', key: 'comma', ctrl: true, description: 'Open settings', category: 'system', action: () => this.openSettings() },
+	// Remote control shortcuts
             { id: 'remote-connect', key: 'r', ctrl: true, alt: true, description: 'Connect to remote control server', category: 'remote', remote: true, action: () => this.connectRemote() },
-            { id: 'remote-disconnect', key: 'd', ctrl: true, alt: true, description: 'Disconnect from remote control', category: 'remote', remote: true, action: () => this.disconnectRemote() },
-            { id: 'remote-status', key: 'i', ctrl: true, alt: true, description: 'Show remote connection status', category: 'remote', remote: true, action: () => this.showRemoteStatus() }
+	{ id: 'remote-disconnect', key: 'd', ctrl: true, alt: true, description: 'Disconnect from remote control', category: 'remote', remote: true, action: () => this.disconnectRemote() },
+	{ id: 'remote-status', key: 'i', ctrl: true, alt: true, description: 'Show remote connection status', category: 'remote', remote: true, action: () => this.showRemoteStatus() }
         ];
 
         // Register all shortcuts
@@ -171,8 +177,9 @@ class KeyboardShortcutsService {
             this.logRemoteCommand({
                 id: crypto.randomUUID(),
                 command: shortcut.id,
-                args: {, description: shortcut.description, category: shortcut.category },
-                source: source,
+                args: {
+	description: shortcut.description, category: shortcut.category },
+	source: source,
                 timestamp: Date.now()
             });
             await shortcut.action();

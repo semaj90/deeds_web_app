@@ -16,12 +16,13 @@ export async function handleFileUpload(request: Request): MinIOService {
  uploadUrl: 'placeholder-minio-presigned-url',
  message: 'File upload initiated',
  },
- },
- { status: 202 }
+	},
+	{ status: 202 }
  );
  } catch (error) {
  console.error('Error handling file upload:', error);
- return json({ success: false, error: 'Failed to handle file upload' }, { status: 500 });
+ return json({ success: false, error: 'Failed to handle file upload' },
+	{ status: 500 });
  }
 }
 

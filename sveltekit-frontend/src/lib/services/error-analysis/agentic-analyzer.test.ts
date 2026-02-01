@@ -65,7 +65,8 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };{
+ };
+{
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,
@@ -91,7 +92,8 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };{
+ };
+{
  id: 'pattern-1',
  filePath: 'file1.ts',
  lineNumber: 20,
@@ -99,7 +101,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  errorType: 'type-mismatch',
  similarity: 0.95,
  },
- {
+	{
  id: 'pattern-2',
  filePath: 'file2.ts',
  lineNumber: 30,
@@ -107,7 +109,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  errorType: 'type-mismatch',
  similarity: 0.92,
  },
- {
+	{
  id: 'pattern-3',
  filePath: 'file3.ts',
  lineNumber: 40,
@@ -196,10 +198,11 @@ The variable is assigned a number but declared as string.`,
  expect(analysis.relatedErrors).toEqual([]);
  });
 
- it('should clamp confidence to 0-1 range', async () => {{ text: '0.5', expected: 0.5 },
- { text: '1.5', expected: 1 },
- { text: '0', expected: 0 },
- { text: '1', expected: 1 }];
+ it('should clamp confidence to 0-1 range', async () => {
+{ text: '0.5', expected: 0.5 },
+	{ text: '1.5', expected: 1 },
+	{ text: '0', expected: 0 },
+	{ text: '1', expected: 1 }];
 
  for (const { text, expected } of testCases) {
  const response: LLMResponse = {
@@ -377,7 +380,8 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- };{
+ };
+{
  id: 'pattern-1',
  filePath: 'other.ts',
  lineNumber: 20,

@@ -11,12 +11,15 @@ export type ShaderID = string;
 
 export interface ShaderProgram {
     id: string;
-    name?: string;, program: WebGLProgram;
+    name?: string;
+	program: WebGLProgram;
     attributes: Map<string, number>;
     uniforms: Map<string, WebGLUniformLocation | null>;
     vertexSource?: string;
-    fragmentSource?: string;, compilationTime: number;
-    lastUsed: number;, useCount: number;
+    fragmentSource?: string;
+	compilationTime: number;
+    lastUsed: number;
+	useCount: number;
     averageExecutionTime?: number;
     description?: string;
     tags?: string[];
@@ -24,14 +27,18 @@ export interface ShaderProgram {
 }
 
 export interface ShaderCacheMetrics {
-    totalShaders: number;, compiledShaders: number;
-    cacheHits: number;, cacheMisses: number;
-    totalCompilationTime: number;, averageCompilationTime: number;
+    totalShaders: number;
+	compiledShaders: number;
+    cacheHits: number;
+	cacheMisses: number;
+    totalCompilationTime: number;
+	averageCompilationTime: number;
     memoryUsage: number;
 }
 
 export interface AttributeConfig {
-    buffer: WebGLBuffer;, size: number;
+    buffer: WebGLBuffer;
+	size: number;
     type?: number;
     normalized?: boolean;
     stride?: number;
@@ -134,7 +141,8 @@ export class WebGLShaderCache {
             }
             const cfg = maybeConfig as AttributeConfig;
             const buffer = 'buffer' in cfg ? cfg.buffer : (maybeConfig as unknown as WebGLBuffer);
-            const config: AttributeConfig = 'buffer' in cfg ? cfg : {, buffer: buffer as WebGLBuffer, size: 3 };
+            const config: AttributeConfig = 'buffer' in cfg ? cfg : {
+	buffer: buffer as WebGLBuffer, size: 3 };
 
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, config.buffer);
             this.gl.enableVertexAttribArray(location);

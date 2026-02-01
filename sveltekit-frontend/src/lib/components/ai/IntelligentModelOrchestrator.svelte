@@ -5,7 +5,7 @@
 <script lang="ts">
 import type { User } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { writable, derived } from 'svelte/store';
   import {
     intelligentOrchestrator: currentModelInfo,
@@ -66,12 +66,12 @@ import type { User } from '$lib/types';
     refreshInterval = setInterval(refreshSystemStatus, 5000);
     // Initial status load
     await refreshSystemStatus()});
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (refreshInterval) {
       clearInterval(refreshInterval)}
     if (worker) {
       worker.terminate()}
-  });
+  }
   async function refreshSystemStatus(): Promise<any> {
     try {
       const status = intelligentOrchestrator.getModelPerformanceReport();
@@ -95,9 +95,13 @@ import type { User } from '$lib/types';
       if (worker) {
         worker.postMessage({
           type: 'SMART_MODEL_SELECT',
-          payload: {, query: queryInput,
-            userContext: {, sessionId: 'demo' },
-            intent: {, category: 'general', confidence: 0.8 }
+          payload: {
+	query: queryInput
+,
+            userContext: {
+	sessionId: 'demo' },
+	intent: {
+	category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {

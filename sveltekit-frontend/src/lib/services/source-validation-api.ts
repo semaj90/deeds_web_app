@@ -65,14 +65,14 @@ export const sourceValidationAPI = {
 	async search(request: KBSearchRequest): Promise<KBSearchResponse> {
 		return fetchJSON<KBSearchResponse>(`${KB_API_PREFIX}/search`, {
 			method: 'POST',
-			body: JSON.stringify({, query: request.query,
+			body: JSON.stringify({
+	query: request.query,
 				top_k: request.top_k ?? 20,
 				filters: request.filters,
 				include_codebase: request.include_codebase ?? true
 			})
 		});
 	},
-
 	/**
 	 * Store human validation of sources
 	 * POST /api/kb/validate-sources
@@ -82,7 +82,8 @@ export const sourceValidationAPI = {
 	): Promise<SourceValidationResponse> {
 		return fetchJSON<SourceValidationResponse>(`${KB_API_PREFIX}/validate-sources`, {
 			method: 'POST',
-			body: JSON.stringify({, case_id: request.case_id,
+			body: JSON.stringify({
+	case_id: request.case_id,
 				query: request.query,
 				selected_chunk_ids: request.selected_chunk_ids,
 				rejected_chunk_ids: request.rejected_chunk_ids ?? [],
@@ -90,7 +91,6 @@ export const sourceValidationAPI = {
 			})
 		});
 	},
-
 	/**
 	 * Generate answer using validated sources
 	 * POST /api/kb/generate-answer
@@ -100,7 +100,8 @@ export const sourceValidationAPI = {
 	): Promise<AnswerGenerationResponse> {
 		return fetchJSON<AnswerGenerationResponse>(`${KB_API_PREFIX}/generate-answer`, {
 			method: 'POST',
-			body: JSON.stringify({, validation_id: request.validation_id,
+			body: JSON.stringify({
+	validation_id: request.validation_id,
 				case_id: request.case_id,
 				query: request.query,
 				llm_provider: request.llm_provider ?? 'gemma3-legal',
@@ -108,7 +109,6 @@ export const sourceValidationAPI = {
 			})
 		});
 	},
-
 	/**
 	 * Update knowledge graph with new entities/relationships
 	 * POST /api/kb/update-kag
@@ -116,13 +116,13 @@ export const sourceValidationAPI = {
 	async updateKAG(request: KAGUpdateRequest): Promise<KAGUpdateResponse> {
 		return fetchJSON<KAGUpdateResponse>(`${KB_API_PREFIX}/update-kag`, {
 			method: 'POST',
-			body: JSON.stringify({, validation_id: request.validation_id,
+			body: JSON.stringify({
+	validation_id: request.validation_id,
 				entities_extracted: request.entities_extracted,
 				relationships: request.relationships
 			})
 		});
 	},
-
 	/**
 	 * Check system health
 	 * GET /api/kb/health
@@ -148,8 +148,10 @@ export async function completeValidationWorkflow(
 	rejectedChunkIds: string[] = [],
 	validationNotes?: string,
 	llmProvider: string = 'gemma3-legal'
-): Promise<{, validationId: string;
-	answer: string;, citations: AnswerGenerationResponse['citations'];
+): Promise<{
+	validationId: string;
+	answer: string;
+	citations: AnswerGenerationResponse['citations'];
 	kagUpdate: KAGUpdateResponse;
 }> {
 	// Step 1: Validate sources
@@ -194,7 +196,8 @@ function extractEntities(text: string): string[] {
 	// Extract capitalized terms: Svelte concepts, code patterns
 	const entities = new Set<string>();
 
-	// Patterns for technical terms/\$state/g,
+	// Patterns for technical terms
+/\$state/g,
 		/\$derived/g,
 		/\$effect/g,
 		/\$props/g,
@@ -228,14 +231,19 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{, from: string; to: string;, type: string }> {
-	const relationships: Array<{, from: string; to: string;, type: string }> = [];
+): Array<{
+	from: string; to: string;
+	type: string }> {
+	const relationships: Array<{
+	from: string; to: string;
+	type: string }> = [];
 
-	// Pattern: "X uses Y", "X depends on Y", "X references Y"{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
-		{ regex: /(\w+)\s+depends?\s+on\s+(\w+)/gi, type: 'DEPENDS_ON' },
-		{ regex: /(\w+)\s+references?\s+(\w+)/gi, type: 'REFERENCES' },
-		{ regex: /(\w+)\s+extends?\s+(\w+)/gi, type: 'EXTENDS' },
-		{ regex: /(\w+)\s+implements?\s+(\w+)/gi, type: 'IMPLEMENTS' }
+	// Pattern: "X uses Y", "X depends on Y", "X references Y"
+{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
+	{ regex: /(\w+)\s+depends?\s+on\s+(\w+)/gi, type: 'DEPENDS_ON' },
+	{ regex: /(\w+)\s+references?\s+(\w+)/gi, type: 'REFERENCES' },
+	{ regex: /(\w+)\s+extends?\s+(\w+)/gi, type: 'EXTENDS' },
+	{ regex: /(\w+)\s+implements?\s+(\w+)/gi, type: 'IMPLEMENTS' }
 	];
 
 	patterns.forEach(({ regex, type }) => {

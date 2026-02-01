@@ -7,7 +7,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
 https, //svelte.dev/e/attribute_invalid_name -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
 	import UploadHistory from '$lib/components/UploadHistory.svelte';
 	import { uploadService } from '$lib/services/uploadService';
@@ -92,10 +92,12 @@ https, //svelte.dev/e/attribute_invalid_name -->
 		loadHistory();
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		const input = document.querySelector('input[type="text"]');
 		if (input) (input as HTMLInputElement).focus();
-	});
+	
+});
 </script>
 
 <div class="upload-container">

@@ -6,7 +6,8 @@
  */
 
 import {
-  toolRegistry: KBSearchRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
+  toolRegistry: KBSearchRequestSchema,
+$1;$2$1;$2$1;$2} from '../registry.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
@@ -15,7 +16,8 @@ async function generateEmbedding(text, string, model: string = 'embeddinggemma:l
   const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: prompt, text })
+	body: JSON.stringify({
+	model: prompt, text })
   });
 
   if (!response.ok) {
@@ -29,11 +31,14 @@ async function generateEmbedding(text, string, model: string = 'embeddinggemma:l
 async function searchQdrant(
   collection: string,
   embedding: number[],
-  options: {, limit: number,
+  options: {
+	limit: number,
     threshold: number,
     filters?: Record<string, unknown>;
   }
-): Promise<Array<{, id: string; score: number;, payload: Record<string, unknown> }>> {
+): Promise<Array<{
+	id: string; score: number;
+	payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
     vector: embedding,
     limit: options.limit,
@@ -54,14 +59,16 @@ async function searchQdrant(
   const response = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+	body: JSON.stringify(body)
   });
 
   if (!response.ok) {
     throw new Error(`Qdrant search failed, ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: Array<{, id: string; score: number;, payload: Record<string, unknown> }> };
+  const data = await response.json() as { result: Array<{
+	id: string; score: number;
+	payload: Record<string, unknown> }> };
   return data.result;
 }
 
@@ -87,7 +94,9 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
   }
 
   // Search all collections
-  const allResults: Array<{, id: string; score: number;, content: string; metadata?: Record<string, unknown> }> = [];
+  const allResults: Array<{
+	id: string; score: number;
+	content: string; metadata?: Record<string, unknown> }> = [];
 
   for (const collection of request.collections) {
     try {
@@ -112,10 +121,11 @@ async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBS
     success: true,
     run_id: request.run_id,
     tool: 'kb_search',
-    data: {, results: limitedResults,
+    data: {
+	results: limitedResults,
       total_results: limitedResults.length
     },
-    duration_ms: 0,
+	duration_ms: 0,
     timestamp: new Date().toISOString()
   };
 }

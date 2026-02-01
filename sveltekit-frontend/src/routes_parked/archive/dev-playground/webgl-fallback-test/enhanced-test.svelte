@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
 // Svelte, 5 runes are auto-imported
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import type { browser } from '$app/environment';
  // Svelte, 5 runes for reactive state
  let log = $state <string>('');

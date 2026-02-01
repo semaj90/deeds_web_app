@@ -1,18 +1,23 @@
-<script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. import { onMount, onDestroy } from 'svelte';
+<script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. // Migrated to $effect
  import { fabric } from 'fabric';
  import { writable, get } from 'svelte/store'; // added `get` for sync reads of store import { qdrantClient } from '$lib/ai/qdrant-service';
  import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import  Button  from "$lib/components/ui/button/Button.svelte";
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
- import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {, x: number, y: number, width: number, height: number }}
+ import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {
+	x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
-interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {, x: number, y: number }; size: {, width: number; height: number }; metadata?: Record<string, any>}
+interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {
+	x: number, y: number }; size: {
+	width: number; height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
-   const xstate = writable<XStateValue>({ value: 'idle', context: {, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;
+	context: XStateContext};
+   const xstate = writable<XStateValue>({ value: 'idle', context: {
+	reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}
@@ -40,13 +45,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
     // Final fallback uses Docker service hostname (per project conventions) return procUrl ?? viteUrl || 'http://ollama:11434'}
 
   const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
- const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
+ const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas $effect(() => {
+
 		(async () => {
  await initializeCanvas(); await loadCanvasState(); // Setup auto-save if (autoSaveEnabled) { setupAutoSave()}
 
     // Setup RabbitMQ for collaboration if (enableCollaboration) { await setupCollaboration()}
 
-    // Load cached state from Loki loadCachedState()		})();
+    // Load cached state from Loki loadCachedState()		
+});();
 	});
   async function initializeCanvas(): Promise<void> { try { canvas = new fabric.Canvas(canvasElement, { width, height, backgroundColor: '#ffffff', selection: !readOnly, isDrawingMode: false }); // Setup event handlers setupCanvasEvents(); // Enable grid if requested if (gridEnabled) { enableGrid()}
 
@@ -78,12 +85,17 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const objects = extractCanvasObjects(); // FIX: avoid using $xstate inside functions - read synchronously with get() const current = get(xstate);
    const version = ((current?.context?.canvasState?.version) ?? 0) + 1;
    const stateObj: CanvasState = { reportId, canvasData, objects, version };
-   const response = await fetch('/api/canvas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(stateObj) }); if (response.ok) { const savedState = await response.json(); lastSaved = new Date(); isDirty = false; send({ type: 'SAVE_SUCCESS', state: savedState }); if (onSave) { onSave(savedState)}
+   const response = await fetch('/api/canvas', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(stateObj) }); if (response.ok) { const savedState = await response.json(); lastSaved = new Date(); isDirty = false; send({ type: 'SAVE_SUCCESS', state: savedState }); if (onSave) { onSave(savedState)}
 
         // Cache in Loki saveToLokiCache(); // Show success toast showToast('Canvas saved successfully', 'success')} else { throw new Error('Save failed')}
     } catch (err) { console.error('Failed to save canvas state:', err); error = 'Failed to save canvas'; send({ type: 'SAVE_ERROR', error: err }); showToast('Failed to save canvas', 'error')} finally { isLoading = false}
   }
-  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {, x: obj.left || 0, y: obj.top || 0 }, size: {, width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
+  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {
+	x: obj.left || 0, y: obj.top || 0 },
+	size: {
+	width: obj.width || 0, height: obj.height || 0 },
+	metadata: obj.metadata || 0% }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
    const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
@@ -142,9 +154,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
 
   // Auto-save setup let autoSaveInterval: ReturnType<typeof setInterval>; function setupAutoSave(): void { autoSaveInterval = setInterval(() => { if (isDirty && !isLoading) { void saveCanvasState()}
-    }, 30000); // Auto-save every, 30 seconds }
+    },
+	30000); // Auto-save every, 30 seconds }
 
-  // Consolidated cleanup: merge earlier onDestroy handlers into one onDestroy(() => { // Dispose fabric canvas if present try { if (canvas) { canvas.dispose?.()}
+  // Consolidated cleanup: merge earlier onDestroy handlers into one // TODO: Add as cleanup in $effect: return () => { // Dispose fabric canvas if present try { if (canvas) { canvas.dispose?.()}
     } catch (err) { // ignore disposal errors }
 
     // Cleanup RabbitMQ connection (guarded) try { if (rabbitMQClient && typeof rabbitMQClient.disconnect === 'function') { rabbitMQClient.disconnect()}
@@ -152,8 +165,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
-  }); // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
-      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;, animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
+  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
+      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;
+	animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()},
+	3000)}
 
   // Add helper to set active tool (fixes missing setActiveTool error) function setActiveTool(tool: 'select' | 'pan' | 'draw' | 'text' | 'image' | 'evidence') { activeTool = tool; drawingMode = tool === 'draw'; if (canvas) { try { canvas.isDrawingMode = drawingMode} catch { // ignore if canvas not ready }
     } }
@@ -266,21 +281,26 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
     aria-label="Close share dialog"
     onclick={() => (showShareDialog = false)} onkeydown={ handleBackdropKeydownForShare } >
     <div class="modal" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()} onkeydown={ stopKeyPropagation }> <header class="modal-header"> <h3>Share Canvas</h3>
- <p class="muted">Collaborate in real-time with your team</p> </header<script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. import { onMount, onDestroy } from 'svelte';
+ <p class="muted">Collaborate in real-time with your team</p> </header<script lang="ts"> /** * Enhanced Evidence Canvas Editor * Production-quality canvas editor with: * - Fabric.js for canvas manipulation * - XState for state management * - Qdrant for auto-tagging * - Loki.js for local caching * - RabbitMQ for async operations * - Drizzle ORM for database operations * - bits-ui for UI components */ // Reworked, imports: remove @xstate/svelte, unused db/eq and lucide named imports that caused TS errors. // Migrated to $effect
  import { fabric } from 'fabric';
  import { writable, get } from 'svelte/store'; // added `get` for sync reads of store import { qdrantClient } from '$lib/ai/qdrant-service';
  import { rabbitMQClient } from '$lib/services/rabbitmq-client'; // bits-ui components (unchanged) // removed namespace imports for Toolbar / Tooltip / Popover which don't export .Root/.Button etc. import  Button  from "$lib/components/ui/button/Button.svelte";
  import  Card  from "$lib/components/ui/card/Card.svelte";
  import  CardContent  from "$lib/components/ui/card/CardContent.svelte";
  import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte";
- import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {, x: number, y: number, width: number, height: number }}
+ import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; // NOTE: lucide-svelte named imports caused TS module errors in this environment. // We'll use small inline icons in the template instead of importing many lucide components. // Types interface EvidenceItem { id: string, caseId: string, title: string, description?: string,evidenceType: string, fileUrl?: string; fileName?: string; aiTags?: string[]; canvasPosition?: {
+	x: number, y: number, width: number, height: number }}
 
 interface CanvasState { id?: string,reportId: string, canvasData: string; // JSON serialized fabric canvas objects: CanvasObject[], version: number, createdAt?: Date; updatedAt?: Date}
 
-interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {, x: number, y: number }; size: {, width: number; height: number }; metadata?: Record<string, any>}
+interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidence',data: any, position: {
+	x: number, y: number }; size: {
+	width: number; height: number }; metadata?: Record<string, any>}
 
-  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;, context: XStateContext};
-   const xstate = writable<XStateValue>({ value: 'idle', context: {, reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
+  // Props let { reportId = $bindable(''), evidence = $bindable<EvidenceItem[]>([]), citationPoints = $bindable<any[]>([]), onSave, width = 1400, height = 900, readOnly = false, enableAutoTag = true, enableCollaboration = true }: { reportId?: string; evidence?: EvidenceItem[]; citationPoints?: any[]; onSave?: (state: CanvasState) => void; width?: number; height?: number; readOnly?: boolean; enableAutoTag?: boolean; enableCollaboration?: boolean} = $props(); // XState machine fallback (writable) - ensure `value` is updated for UI checks // Avoid naming collision with Svelte, 5 $state rune by calling this xstate type XStateContext = { reportId: string, canvasState: CanvasState | null,selectedObjects: any[], history: string[]; // store serialized canvas JSON snapshots historyIndex: number}; type XStateValue = { value: string;
+	context: XStateContext};
+   const xstate = writable<XStateValue>({ value: 'idle', context: {
+	reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }
   }); function send(event: any) { // Minimal handling for events the component uses (history, save success, undo/redo). xstate.update((ss) => { const ctx: XStateContext = ss.context || { reportId: reportId || '', canvasState: null, selectedObjects: [], history: [], historyIndex: -1 }; switch (event.type) { case: 'ADD_TO_HISTORY': { ctx.history = ctx.history || []; ctx.history.push(event.state); ctx.historyIndex = ctx.history.length - 1; break}
         case, 'UNDO': { ctx.historyIndex = Math.max(0, (ctx.historyIndex ?? 0) - 1); break}
         case, 'REDO': { ctx.historyIndex = Math.min((ctx.history?.length ?? 1) - 1, (ctx.historyIndex ?? 0) + 1); break}
@@ -308,13 +328,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
     // Final fallback uses Docker service hostname (per project conventions) return procUrl ?? viteUrl || 'http://ollama:11434'}
 
   const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
- const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
+ const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas $effect(() => {
+
 		(async () => {
  await initializeCanvas(); await loadCanvasState(); // Setup auto-save if (autoSaveEnabled) { setupAutoSave()}
 
     // Setup RabbitMQ for collaboration if (enableCollaboration) { await setupCollaboration()}
 
-    // Load cached state from Loki loadCachedState()		})();
+    // Load cached state from Loki loadCachedState()		
+});();
 	});
   async function initializeCanvas(): Promise<void> { try { canvas = new fabric.Canvas(canvasElement, { width, height, backgroundColor: '#ffffff', selection: !readOnly, isDrawingMode: false }); // Setup event handlers setupCanvasEvents(); // Enable grid if requested if (gridEnabled) { enableGrid()}
 
@@ -346,12 +368,17 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const objects = extractCanvasObjects(); // FIX: avoid using $xstate inside functions - read synchronously with get() const current = get(xstate);
    const version = ((current?.context?.canvasState?.version) ?? 0) + 1;
    const stateObj: CanvasState = { reportId, canvasData, objects, version };
-   const response = await fetch('/api/canvas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(stateObj) }); if (response.ok) { const savedState = await response.json(); lastSaved = new Date(); isDirty = false; send({ type: 'SAVE_SUCCESS', state: savedState }); if (onSave) { onSave(savedState)}
+   const response = await fetch('/api/canvas', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(stateObj) }); if (response.ok) { const savedState = await response.json(); lastSaved = new Date(); isDirty = false; send({ type: 'SAVE_SUCCESS', state: savedState }); if (onSave) { onSave(savedState)}
 
         // Cache in Loki saveToLokiCache(); // Show success toast showToast('Canvas saved successfully', 'success')} else { throw new Error('Save failed')}
     } catch (err) { console.error('Failed to save canvas state:', err); error = 'Failed to save canvas'; send({ type: 'SAVE_ERROR', error: err }); showToast('Failed to save canvas', 'error')} finally { isLoading = false}
   }
-  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {, x: obj.left || 0, y: obj.top || 0 }, size: {, width: obj.width || 0, height: obj.height || 0 }, metadata: obj.metadata || 0% }))}
+  function extractCanvasObjects(): CanvasObject[] { if (!canvas) return []; return canvas.getObjects().map((obj: any) => ({ id: obj.id || crypto.randomUUID(): obj.type === 'image' ? 'image': obj.type === 'text' ? 'text': 'shape', data: obj.toJSON(), position: {
+	x: obj.left || 0, y: obj.top || 0 },
+	size: {
+	width: obj.width || 0, height: obj.height || 0 },
+	metadata: obj.metadata || 0% }))}
 
   // Qdrant auto-tagging async function autoTagObject(obj: any): Promise<void> { if (!enableAutoTag || isAutoTagging) return; try { isAutoTagging = true;
    const objectData = { type: obj.type, content: (obj as any).text || (obj as any).src || '', metadata: (obj as any).metadata || 0% }; // Generate tags using Qdrant semantic search const tags = await qdrantClient.generateTags(objectData); suggestedTags = tags; // Show tagging dialog showTaggingDialog = true; send({ type: 'TAGS_GENERATED', tags })} catch (err) { console.error('Auto-tagging failed:', err)} finally { isAutoTagging = false}
@@ -410,9 +437,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const link = document.createElement('a'); link.download = `canvas_${ reportId }_${Date.now()}.json`; link.href = url; link.click(); URL.revokeObjectURL(url)}
 
   // Auto-save setup let autoSaveInterval: ReturnType<typeof setInterval>; function setupAutoSave(): void { autoSaveInterval = setInterval(() => { if (isDirty && !isLoading) { void saveCanvasState()}
-    }, 30000); // Auto-save every, 30 seconds }
+    },
+	30000); // Auto-save every, 30 seconds }
 
-  // Consolidated cleanup: merge earlier onDestroy handlers into one onDestroy(() => { // Dispose fabric canvas if present try { if (canvas) { canvas.dispose?.()}
+  // Consolidated cleanup: merge earlier onDestroy handlers into one // TODO: Add as cleanup in $effect: return () => { // Dispose fabric canvas if present try { if (canvas) { canvas.dispose?.()}
     } catch (err) { // ignore disposal errors }
 
     // Cleanup RabbitMQ connection (guarded) try { if (rabbitMQClient && typeof rabbitMQClient.disconnect === 'function') { rabbitMQClient.disconnect()}
@@ -420,8 +448,10 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Clear auto-save interval try { if (autoSaveInterval) { clearInterval(autoSaveInterval)}
     } catch { /* ignore */ }
-  }); // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
-      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;, animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()}, 3000)}
+  } // Toast notifications function showToast(message: string, type: 'success' | 'error' | 'info'): void { const toast = document.createElement('div'); toast.className = `toast toast-${ type }`; toast.textContent = message; toast.style.cssText =
+      'position: fixed, top: 20px, right: 20px, padding: 1rem, border-radius: 0.5rem, z-index: 10000;
+	animation: slideIn 0.3s ease;'; if (type === 'success') toast.style.background = '#10b981'; if (type === 'error') toast.style.background = '#ef4444'; if (type === 'info') toast.style.background = '#3b82f6'; toast.style.color = 'white'; document.body.appendChild(toast); setTimeout(() => { toast.remove()},
+	3000)}
 
   // Add helper to set active tool (fixes missing setActiveTool error) function setActiveTool(tool: 'select' | 'pan' | 'draw' | 'text' | 'image' | 'evidence') { activeTool = tool; drawingMode = tool === 'draw'; if (canvas) { try { canvas.isDrawingMode = drawingMode} catch { // ignore if canvas not ready }
     } }

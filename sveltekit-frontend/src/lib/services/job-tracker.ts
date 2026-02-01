@@ -9,8 +9,10 @@ import type { IngestionJob } from '$lib/machines/ingestion-workflow-machine.js';
 interface JobRecord extends IngestionJob {
     // LokiJS metadata
     $loki?: number;
-    meta?: {, created: number;
-        revision: number;, updated: number;
+    meta?: {
+	created: number;
+        revision: number;
+	updated: number;
         version: number;
     };
     metadata: IngestionJob['metadata'] & {
@@ -21,9 +23,12 @@ interface JobRecord extends IngestionJob {
 }
 
 interface WorkerStats {
-    id: string;, startedAt: string;
-    totalProcessed: number;, averageTime: number;
-    currentLoad: number;, lastHeartbeat: string;
+    id: string;
+	startedAt: string;
+    totalProcessed: number;
+	averageTime: number;
+    currentLoad: number;
+	lastHeartbeat: string;
     status: 'active' | 'idle' | 'error' | 'offline';
     errors: Array<any>;
 }
@@ -148,10 +153,12 @@ class JobTracker {
             .data();
     }
 
-    getJobStats(): {, total: number;
+    getJobStats(): {
+	total: number;
         byState: Record<IngestionJob['state'], number>;
         byPriority: Record<string, number>;
-        averageProcessingTime: number;, successRate: number;
+        averageProcessingTime: number;
+	successRate: number;
     } {
         this.ensureInitialized();
         const allJobs = this.jobs.find();
@@ -161,14 +168,16 @@ class JobTracker {
         const byState = allJobs.reduce((acc, job) => {
             acc[job.state] = (acc[job.state] ?? 0) + 1;
             return acc;
-        }, {} as Record<IngestionJob['state'], number>);
+        },
+	{} as Record<IngestionJob['state'], number>);
 
         // Count by priority
         const byPriority = allJobs.reduce((acc, job) => {
             const priority = job.metadata?.priority || 'medium';
             acc[priority] = (acc[priority] ?? 0) + 1;
             return acc;
-        }, {} as Record<string, number>);
+        },
+	{} as Record<string, number>);
 
         // Calculate average processing time
         const completedJobs = allJobs.filter(job => job.state === 'completed' && job.results?.processingTime);

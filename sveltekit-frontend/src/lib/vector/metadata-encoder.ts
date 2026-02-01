@@ -16,8 +16,10 @@ type VectorDimensions = number;
 type QuantizationLevel = 'int8' | 'int4' | 'binary';
 
 interface VectorEncodingConfig {
-    dimensions: VectorDimensions;, quantization: QuantizationLevel;
-    compressionTarget: number;, adaptiveDimensions: boolean;
+    dimensions: VectorDimensions;
+	quantization: QuantizationLevel;
+    compressionTarget: number;
+	adaptiveDimensions: boolean;
     batchSize: number;
 }
 
@@ -27,17 +29,23 @@ interface HybridGPUContext {
 }
 
 interface ShaderBundle {
-    name: string;, backend: string;
-    compute: string;, entryPoint: string;
+    name: string;
+	backend: string;
+    compute: string;
+	entryPoint: string;
 }
 
 type AdaptiveScalingMode = 'balanced' | 'performance' | 'memory';
 
 interface GPUPerformanceMetrics {
-    renderTime: number;, memoryUsage: number;
-    gpuUtilization: number;, temperature: number;
-    powerConsumption: number;, contextSwitches: number;
-    frameRate: number;, lastMeasurement: number;
+    renderTime: number;
+	memoryUsage: number;
+    gpuUtilization: number;
+	temperature: number;
+    powerConsumption: number;
+	contextSwitches: number;
+    frameRate: number;
+	lastMeasurement: number;
 }
 
 // Stub functions
@@ -48,9 +56,13 @@ function validateVectorDimensions(dim: number): number {
 
 function adaptiveScalingDecision(
     avgMetrics: GPUPerformanceMetrics,
-    thresholds: {, maxRenderTime: number; maxMemoryUsage: number;, maxTemperature: number },
-    mode: AdaptiveScalingMode
-): {, shouldScale: boolean; recommendedDimensions: VectorDimensions;, recommendedQuantization: QuantizationLevel } {
+    thresholds: {
+	maxRenderTime: number; maxMemoryUsage: number;
+	maxTemperature: number },
+	mode: AdaptiveScalingMode
+): {
+	shouldScale: boolean; recommendedDimensions: VectorDimensions;
+	recommendedQuantization: QuantizationLevel } {
     // Simple decision logic
     const shouldScale =
         avgMetrics.memoryUsage > thresholds.maxMemoryUsage ||
@@ -79,7 +91,9 @@ const telemetryBus = {
         // Stub: do nothing or log
         console.log('Vector encoding metrics:', { dimensions, processingTime, compressionRatio, gpuAccelerated });
     },
-    emitGPUEvent: (event: {, type: string; gpuUtilization: number;, memoryUsed: number; temperature: number }) => {
+	emitGPUEvent: (event: {
+	type: string; gpuUtilization: number;
+	memoryUsed: number; temperature: number }) => {
         // Stub: do nothing or log
         console.log('GPU event:', event);
     }
@@ -106,23 +120,32 @@ async function measureAsync<T>(
 // --- END: Local type declarations and stubs ---
 
 export interface VectorMetadata {
-    id: string;, originalDimensions: number;
-    encodedDimensions: number;, quantization: QuantizationLevel;
-    compressionRatio: number;, encoding: Float32Array | Int8Array | Uint8Array;
-    timestamp: number;, processingTime: number;
+    id: string;
+	originalDimensions: number;
+    encodedDimensions: number;
+	quantization: QuantizationLevel;
+    compressionRatio: number;
+	encoding: Float32Array | Int8Array | Uint8Array;
+    timestamp: number;
+	processingTime: number;
     gpuAccelerated: boolean;
 }
 
 export interface EncodingBatch {
-    vectors: Float32Array[];, metadata: Array<Omit<VectorMetadata, 'encoding' | 'processingTime'>>;
+    vectors: Float32Array[];
+	metadata: Array<Omit<VectorMetadata, 'encoding' | 'processingTime'>>;
     totalSize: number;
 }
 
 export interface AdaptiveEncodingResult {
-    encoded: VectorMetadata[];, scalingApplied: boolean;
-    recommendedConfig: Partial<VectorEncodingConfig>;, metrics: {
-        totalTime: number;, avgCompressionRatio: number;
-        gpuUtilization: number;, memoryEfficiency: number;
+    encoded: VectorMetadata[];
+	scalingApplied: boolean;
+    recommendedConfig: Partial<VectorEncodingConfig>;
+	metrics: {
+        totalTime: number;
+	avgCompressionRatio: number;
+        gpuUtilization: number;
+	memoryEfficiency: number;
     };
 }
 
@@ -134,7 +157,7 @@ export class VectorMetadataEncoder {
 
     constructor(
         config: Partial<VectorEncodingConfig> = {},
-        scalingMode: AdaptiveScalingMode = 'balanced'
+	scalingMode: AdaptiveScalingMode = 'balanced'
     ) {
         this.config = {
             dimensions: validateVectorDimensions(config.dimensions || 768),
@@ -183,7 +206,7 @@ export class VectorMetadataEncoder {
                 const decision = adaptiveScalingDecision(
                     this.getAverageMetrics(),
                     { maxRenderTime: 16, maxMemoryUsage: 0.8, maxTemperature: 75 },
-                    this.scalingMode
+	this.scalingMode
                 );
 
                 if (decision.shouldScale) {
@@ -225,14 +248,16 @@ export class VectorMetadataEncoder {
                 processingTime,
                 gpuAccelerated: !!this.gpuContext
             };
-        }, 'VectorMetadataEncoder');
+        },
+	'VectorMetadataEncoder');
     }
 
     /**
      * Batch encode vectors with GPU acceleration
      */
     async encodeBatch(
-        batch: {, id: string; vector: number[] | Float32Array }[]
+        batch: {
+	id: string; vector: number[] | Float32Array }[]
     ): Promise<AdaptiveEncodingResult> {
         return measureAsync('encodeBatch', async () => {
             const startTime = performance.now();
@@ -257,7 +282,8 @@ export class VectorMetadataEncoder {
                     memoryEfficiency: 0.8 // Mock
                 }
             };
-        }, 'VectorMetadataEncoder');
+        },
+	'VectorMetadataEncoder');
     }
 
     // --- Private Encoding Implementations ---

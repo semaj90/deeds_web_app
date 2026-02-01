@@ -147,7 +147,8 @@
 			{#each nodes as node}
 				<g
 					class="node"
-					transform="translate({node.x || width / 2}, {node.y || height / 2})"
+					transform="translate({node.x || width / 2},
+	{node.y || height / 2})"
 					onclick={() => {
 						selectedNode = node;
 						onNodeClick(node);
@@ -187,18 +188,23 @@
 
 <style>
 	.knowledge-graph {
-		position: relative;, background: #1a1a2e;
-		border-radius: 8px;, overflow: hidden;
+		position: relative;
+	background: #1a1a2e;
+		border-radius: 8px;
+	overflow: hidden;
 	}
 
 	.controls {
-		display: flex;, gap: 1rem;
-		padding: 0.5rem;, background: rgba(0, 0, 0, 0.3);
+		display: flex;
+	gap: 1rem;
+		padding: 0.5rem;
+	background: rgba(0, 0, 0, 0.3);
 		align-items: center;
 	}
 
 	.filter-select {
-		background: #2d2d44;, color: #fff;
+		background: #2d2d44;
+	color: #fff;
 		border: 1px solid #4a4a6a;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
@@ -206,24 +212,31 @@
 
 	.zoom-controls {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 	}
 
 	.zoom-controls button {
-		background: #4f46e5;, color: white;
-		border: none;, width: 24px;
+		background: #4f46e5;
+	color: white;
+		border: none;
+	width: 24px;
 		height: 24px;
-		border-radius: 4px;, cursor: pointer;
+		border-radius: 4px;
+	cursor: pointer;
 	}
 
 	.stats {
-		margin-left: auto;, color: #9ca3af;
-		font-size: 0.875rem;, display: flex;
+		margin-left: auto;
+	color: #9ca3af;
+		font-size: 0.875rem;
+	display: flex;
 		gap: 1rem;
 	}
 
 	svg {
-		display: block;, transition: transform 0.2s;
+		display: block;
+	transition: transform 0.2s;
 	}
 
 	.link {
@@ -245,15 +258,19 @@
 	}
 
 	.node-label {
-		font-size: 10px;, fill: #9ca3af;
+		font-size: 10px;
+	fill: #9ca3af;
 		pointer-events: none;
 	}
 
 	.node-details {
-		position: absolute;, bottom: 1rem;
-		right: 1rem;, background: #2d2d44;
+		position: absolute;
+	bottom: 1rem;
+		right: 1rem;
+	background: #2d2d44;
 		padding: 1rem;
-		border-radius: 8px;, color: #fff;
+		border-radius: 8px;
+	color: #fff;
 		max-width: 300px;
 	}
 
@@ -268,10 +285,13 @@
 	}
 
 	.node-details button {
-		margin-top: 0.5rem;, background: #4f46e5;
-		color: white;, border: none;
+		margin-top: 0.5rem;
+	background: #4f46e5;
+		color: white;
+	border: none;
 		padding: 0.25rem 0.75rem;
-		border-radius: 4px;, cursor: pointer;
+		border-radius: 4px;
+	cursor: pointer;
 	}
 </style>
 

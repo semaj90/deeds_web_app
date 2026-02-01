@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { browser } from '$app/environment';
   import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
@@ -7,21 +7,29 @@
 
   // Types
   interface Legal3DEntity {
-    id: string;, type: 'person' | 'organization' | 'document' | 'location' | 'event';
-    position: {, x: number, y: number;, z: number };
+    id: string;
+	type: 'person' | 'organization' | 'document' | 'location' | 'event';
+    position: {
+	x: number, y: number;
+	z: number };
   }
 
   interface Camera3D {
-    position: {, x: number, y: number;, z: number };
-    target: {, x: number, y: number;, z: number };
-    fov: number;, near: number;
+    position: {
+	x: number, y: number;
+	z: number };
+    target: {
+	x: number, y: number;
+	z: number };
+    fov: number;
+	near: number;
     far: number;
   }
 
   let {
     caseId = 'CASE-001',
     sceneData = { entities: [], connections: [] },
-    enableWebGPU = false
+	enableWebGPU = false
   } = $props();
 
   // State
@@ -34,24 +42,30 @@
 
   // Constants
   const LOD_CONFIG = {
-    0: {, description: 'Full Mesh Detail (High Poly)', distance: 0 },
-    1: {, description: 'Balanced (Mid Poly)', distance: 15 },
-    2: {, description: 'Performance (Low Poly)', distance: 30 },
-    3: {, description: 'Retro N64 (Ultra Low Poly)', distance: 50 }
+    0: {
+	description: 'Full Mesh Detail (High Poly)', distance: 0 },
+	1: {
+	description: 'Balanced (Mid Poly)', distance: 15 },
+	2: {
+	description: 'Performance (Low Poly)', distance: 30 },
+	3: {
+	description: 'Retro N64 (Ultra Low Poly)', distance: 50 }
   };
 
-  onMount(() => {
+  $effect(() => {
+
     if (!browser) return;
     initScene();
     animate();
-  });
+  
+});
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     // Cleanup WebGL/WebGPU context
     if (browser) {
       // disposer logic here
     }
-  });
+  }
 
   function initScene() {
     isWebGPUActive = enableWebGPU && !!navigator.gpu;
@@ -130,7 +144,8 @@
 
 <style>
   .nes-container {
-    background: white;, position: relative;
+    background: white;
+	position: relative;
   }
   .canvas-container {
     border: 4px solid #000;

@@ -28,7 +28,8 @@ export function initTypingDetector(getSession: () => string, getUser?: () => str
             user_id: getUser?.(),
             ...data
         };
-        realtimeComm.sendMessage('user_activity', { telemetry: payload }, 'low').catch(() => {});
+        realtimeComm.sendMessage('user_activity', { telemetry: payload },
+	'low').catch(() => {});
     };
 
     const onInput = () => {
@@ -52,7 +53,8 @@ export function trackUserHint(hint: string, getSession: () => string) {
         session_id: getSession(),
         hints: [hint]
     };
-    realtimeComm.sendMessage('user_hint', { telemetry: payload }, 'normal').catch(() => {});
+    realtimeComm.sendMessage('user_hint', { telemetry: payload },
+	'normal').catch(() => {});
 }
 
 

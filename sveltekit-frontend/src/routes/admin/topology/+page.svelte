@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import { writable } from 'svelte/store';
 
 	interface TopologyNode {
@@ -50,7 +50,8 @@
 		'server-side': '#ec4899'
 	};
 
-	onMount(() => {
+	$effect(() => {
+
 		const init = async () => {
 			// Initialize canvas
 			const canvasContext = canvas.getContext('2d');
@@ -72,7 +73,8 @@
 			    window.removeEventListener('resize', resizeCanvas);
             }
 		};
-	});
+	
+});
 
 	async function loadTopology() {
 		try {
@@ -288,7 +290,8 @@
 	}
 
 	// SSE for real-time updates
-	onMount(() => {
+	$effect(() => {
+
 		const eventSource = new EventSource('/api/topology/stream');
 
 		eventSource.addEventListener('node_updated', (event) => {
@@ -299,7 +302,8 @@
 					Object.assign(node, update);
 				}
 				return t;
-			});
+			
+});
 		});
 
 		eventSource.addEventListener('error_fixed', (event) => {

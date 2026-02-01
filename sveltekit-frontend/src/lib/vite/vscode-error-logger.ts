@@ -48,7 +48,8 @@ interface ViteSocketPayload {
 type LogLevel = 'error' | 'warn' | 'info';
 
 interface LogEntry {
-    timestamp: string;, level: LogLevel;
+    timestamp: string;
+	level: LogLevel;
     message: string;
     stack?: string | null;
     file?: string;
@@ -62,7 +63,8 @@ interface LogEntry {
 }
 
 interface ErrorLog {
-    metadata: {, lastUpdated: string;
+    metadata: {
+	lastUpdated: string;
         version?: number;
     };
     errors: LogEntry[];
@@ -81,10 +83,11 @@ export function vscodeErrorLogger(options: VSCodeErrorLoggerOptions = {}) {
 
     let server: ViteDevServer | undefined = undefined;
     let errorLog: ErrorLog = {
-        metadata: {, lastUpdated: new Date().toISOString(),
+        metadata: {
+	lastUpdated: new Date().toISOString(),
             version: 1
         },
-        errors: []
+	errors: []
     };
 
     function loadLog() {
@@ -93,10 +96,11 @@ export function vscodeErrorLogger(options: VSCodeErrorLoggerOptions = {}) {
                 const raw = readFileSync(config.logFile, 'utf8');
                 const parsed = JSON.parse(raw) as Partial<ErrorLog> | null;
                 errorLog = {
-                    metadata: {, lastUpdated: parsed?.metadata?.lastUpdated ?? new Date().toISOString(),
+                    metadata: {
+	lastUpdated: parsed?.metadata?.lastUpdated ?? new Date().toISOString(),
                         version: parsed?.metadata?.version ?? 1
                     },
-                    errors: Array.isArray(parsed?.errors) ? (parsed!.errors as LogEntry[]) : []
+	errors: Array.isArray(parsed?.errors) ? (parsed!.errors as LogEntry[]) : []
                 };
             }
         } catch (_e: unknown) {
@@ -186,7 +190,7 @@ export function vscodeErrorLogger(options: VSCodeErrorLoggerOptions = {}) {
                 // ignore websocket attach errors
             }
         },
-        buildStart() {
+	buildStart() {
             pushEntry({
                 timestamp: new Date().toISOString(),
                 level: 'info',
@@ -194,7 +198,7 @@ export function vscodeErrorLogger(options: VSCodeErrorLoggerOptions = {}) {
                 buildPhase: 'build'
             });
         },
-        buildEnd(error: any) {
+	buildEnd(error: any) {
             if (error) {
                 // try to coerce to Error-like shape
                 const errObj = error as { message?: string; stack?: string } | string;

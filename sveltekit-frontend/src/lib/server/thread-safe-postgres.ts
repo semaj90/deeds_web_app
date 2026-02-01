@@ -24,7 +24,8 @@ connectionTimeoutMillis: 2000
 
 // Thread synchronization
 interface QueryLock {
-id: string;, acquired: boolean;
+id: string;
+	acquired: boolean;
 waitingQueries: Array<() => void>;
 lastAccessed: number;
 }
@@ -33,9 +34,12 @@ const queryLocks = new Map<string, QueryLock>();
 const activeTxs = new Map<string, PoolClient>();
 
 interface HealthCheckResult {
-connected: boolean;, activeConnections: number;
-activeLocks: number;, activeTransactions: number;
-performance: {, avgQueryTime: number;
+connected: boolean;
+	activeConnections: number;
+activeLocks: number;
+	activeTransactions: number;
+performance: {
+	avgQueryTime: number;
 totalQueries: number;
 };
 message?: string;
@@ -56,7 +60,8 @@ private async acquireQueryLock(queryId: string): Promise<() => void> {
 return new Promise((resolve, reject) => {
 const timeout = setTimeout(() => {
 reject(new Error(`Query lock timeout for ${queryId}`));
-}, this.lockTimeout);
+},
+	this.lockTimeout);
 
 const tryAcquire = () => {
 let lock = queryLocks.get(queryId);
@@ -158,7 +163,7 @@ operator?: '@>' | '@?' | '@@' | '->' | '->>';
 value?: unknown;
 conditions?: Record<string, unknown>;
 },
-options: {
+	options: {
 limit?: number;
 offset?: number;
 orderBy?: 'created_at' | 'updated_at' | 'relevance';
@@ -265,7 +270,8 @@ connected: true,
 activeConnections: (pool as any).totalCount ?? 0,
 activeLocks: queryLocks.size,
 activeTransactions: activeTxs.size,
-performance: {, avgQueryTime: 0,
+performance: {
+	avgQueryTime: 0,
 totalQueries: 0
 }
 };
@@ -278,10 +284,11 @@ connected: false,
 activeConnections: 0,
 activeLocks: queryLocks.size,
 activeTransactions: activeTxs.size,
-performance: {, avgQueryTime: 0,
+performance: {
+	avgQueryTime: 0,
 totalQueries: 0
 },
-message: error instanceof Error ? error.message : String(error)
+	message: error instanceof Error ? error.message : String(error)
 };
 }
 }
@@ -332,7 +339,7 @@ operator?: '@>' | '@?' | '@@' | '->' | '->>';
 value?: unknown;
 conditions?: Record<string, unknown>;
 },
-options?: {
+	options?: {
 limit?: number;
 offset?: number;
 orderBy?: 'created_at' | 'updated_at' | 'relevance';
@@ -346,5 +353,6 @@ return await threadSafePostgres.queryJsonbDocuments(table, jsonbQuery, options |
 if (typeof setInterval !== 'undefined') {
 setInterval(() => {
 threadSafePostgres.cleanup();
-}, 300000);
+},
+	300000);
 }

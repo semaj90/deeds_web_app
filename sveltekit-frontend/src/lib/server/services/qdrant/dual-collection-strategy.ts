@@ -7,15 +7,21 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 
 export interface DualEmbedding {
-	full768: number[];, small256: number[];
+	full768: number[];
+	small256: number[];
 }
 
 export interface QdrantPayload {
-	statute_id: string;, title_number: number;
-	section: string;, full_citation: string;
-	heading: string;, som_cluster_id: number;
-	kmeans_label: string;, cluster_confidence: number;
-	flagged_for_review: boolean;, echo_hits: number;
+	statute_id: string;
+	title_number: number;
+	section: string;
+	full_citation: string;
+	heading: string;
+	som_cluster_id: number;
+	kmeans_label: string;
+	cluster_confidence: number;
+	flagged_for_review: boolean;
+	echo_hits: number;
 	cluster_version: number;
 }
 
@@ -34,10 +40,12 @@ export class DualQdrantStrategy {
 	async initialize(): Promise<void> {
 		try {
 			await this.client.recreateCollection(this.collection768, {
-				vectors: {, size: 768,
+				vectors: {
+	size: 768,
 					distance: 'Cosine'
 				},
-				optimizers_config: {, default_segment_number: 2
+	optimizers_config: {
+	default_segment_number: 2
 				}
 			});
 			console.log(`✓ Created collection: ${this.collection768}`);
@@ -47,10 +55,12 @@ export class DualQdrantStrategy {
 
 		try {
 			await this.client.recreateCollection(this.collection256, {
-				vectors: {, size: 256,
+				vectors: {
+	size: 256,
 					distance: 'Cosine'
 				},
-				optimizers_config: {, default_segment_number: 2
+	optimizers_config: {
+	default_segment_number: 2
 				}
 			});
 			console.log(`✓ Created collection: ${this.collection256}`);
@@ -92,8 +102,10 @@ export class DualQdrantStrategy {
 	 * Batch upsert to both collections
 	 */
 	async batchUpsert(
-		points: Array<{, id: string | number;
-			embedding: DualEmbedding;, payload: QdrantPayload;
+		points: Array<{
+	id: string | number;
+			embedding: DualEmbedding;
+	payload: QdrantPayload;
 		}>
 	): Promise<void> {
 		const points768 = points.map((p) => ({
@@ -190,14 +202,15 @@ export class DualQdrantStrategy {
 			must: [
 				{
 					key: 'kmeans_label',
-					match: {, value: clusterLabel }
+					match: {
+	value: clusterLabel }
 				}
 			]
 		};
 
 		return await this.searchAccurate(
 			{ full768: new Array(768).fill(0), small256: new Array(256).fill(0) },
-			limit,
+	limit,
 			filter
 		);
 	}
@@ -235,7 +248,8 @@ export class DualQdrantStrategy {
 	/**
 	 * Get collection stats
 	 */
-	async getStats(): Promise<{, collection768: any; collection256: any }> {
+	async getStats(): Promise<{
+	collection768: any; collection256: any }> {
 		const [stats768, stats256] = await Promise.all([
 			this.client.getCollection(this.collection768),
 			this.client.getCollection(this.collection256)

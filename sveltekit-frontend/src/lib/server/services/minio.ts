@@ -17,7 +17,8 @@ import { getServiceDiscovery: COMMON_SERVICES } from '$lib/server/helpers/servic
 interface MinioS3ClientConfig {
     endpoint: string,
     region: string,
-    credentials: {, accessKeyId: string;
+    credentials: {
+	accessKeyId: string;
         secretAccessKey: string
     };
     forcePathStyle: boolean
@@ -65,7 +66,7 @@ export async function getMinioS3Client(): Promise<S3Client> {
         endpoint,
         region,
         credentials: { accessKeyId, secretAccessKey },
-        forcePathStyle: true
+	forcePathStyle: true
     });
 }
 
@@ -99,7 +100,8 @@ export async function streamToBuffer(stream: Readable): Promise<Buffer> {
 /**
  * Parse MinIO URL format: minio://bucket/key
  */
-export function parseMinioUrl(url: string): {, bucket: string; key: string } {
+export function parseMinioUrl(url: string): {
+	bucket: string; key: string } {
     const match = url.match(/^minio:\/\/([^\/]+)\/(.+)$/);
     if (!match) {
         throw new Error(`Invalid MinIO URL: ${url}`)
@@ -111,7 +113,8 @@ export function parseMinioUrl(url: string): {, bucket: string; key: string } {
 /**
  * Fetch object from MinIO using minio:// URL
  */
-export async function fetchMinioObject(url: string): Promise<{, buffer: Buffer; contentType: string | undefined; metadata: Record<string, string> | undefined; size: number | undefined }> {
+export async function fetchMinioObject(url: string): Promise<{
+	buffer: Buffer; contentType: string | undefined; metadata: Record<string, string> | undefined; size: number | undefined }> {
     const { bucket, key } = parseMinioUrl(url);
     try {
         const client = await getS3Client();
@@ -124,7 +127,8 @@ export async function fetchMinioObject(url: string): Promise<{, buffer: Buffer; 
             size: res.ContentLength
         }
     } catch (error) {
-        throw new Error(`Failed to fetch ${url}, ${error}`)
+        throw new Error(`Failed to fetch ${url},
+	${error}`)
     }
 }
 

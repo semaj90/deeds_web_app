@@ -5,7 +5,8 @@ import { error } from '@sveltejs/kit';
  * Local (minimal) types to avoid hard coupling to external shape.
  */
 export interface RouteDefinition {
- id: string;, route: string;
+ id: string;
+	route: string;
  category?: string;
  status?: string;
  tags?: string[];
@@ -16,7 +17,8 @@ export interface RouteDefinition {
 
 /** Pattern config used to generate routes */
 export interface DynamicRouteConfig {
- pattern: string;, template: string;
+ pattern: string;
+	template: string;
  component?: string;
  layout?: string;
  params?: Record<string, { optional?: boolean; type?, string }>;
@@ -27,14 +29,18 @@ export interface DynamicRouteConfig {
 
 /** Generated route shape */
 export interface GeneratedRoute {
- id: string;, path: string;
+ id: string;
+	path: string;
  component: string;
- layout?: string;, params: Record<string, { optional?: boolean; type?, string }>;
+ layout?: string;
+	params: Record<string, { optional?: boolean; type?, string }>;
  metadata: {
  category?: string;
  status?: string;
- tags?: string[];, preload: boolean;
- ssr: boolean;, hydrate: boolean;
+ tags?: string[];
+	preload: boolean;
+ ssr: boolean;
+	hydrate: boolean;
  label?: string;
  };
 }
@@ -112,7 +118,8 @@ export class DynamicRouteGenerator {
  id: routeConfig.id,
  path: component,
  layout: params,
- metadata: {, category: routeConfig.category,
+ metadata: {
+	category: routeConfig.category,
  status: routeConfig.status,
  tags: routeConfig.tags ?? [],
  preload: cfg?.preload ?? true,
@@ -120,7 +127,7 @@ export class DynamicRouteGenerator {
  hydrate: cfg?.hydrate ?? true,
  label: routeConfig.label,
  },
- };
+	};
  }
 
  private findMatchingPattern(routeConfig: RouteDefinition): string | null {
@@ -182,14 +189,15 @@ export class DynamicRouteGenerator {
  component: config.component!,
  layout: config.layout,
  params: config.params ?? this.extractParams(path),
- metadata: {, category: 'dynamic',
+ metadata: {
+	category: 'dynamic',
  status: 'active',
  tags: ['dynamic'],
  preload: Boolean(config.preload),
  ssr: Boolean(config.ssr),
  hydrate: Boolean(config.hydrate),
  },
- };
+	};
 
  this.routes.set(id, route);
  return route;
@@ -226,14 +234,19 @@ export class DynamicRouteGenerator {
  public getRouteManifest(): Record<
  string,
  {
- id: string;, component: string;
- layout?: string;, params: Record<string, { optional?: boolean; type?, string }>;
+ id: string;
+	component: string;
+ layout?: string;
+	params: Record<string, { optional?: boolean; type?, string }>;
  metadata: GeneratedRoute['metadata'];
  }
- > {string,
+ > {
+string,
  {
- id: string;, component: string;
- layout?: string;, params: Record<string, { optional?: boolean; type?, string }>;
+ id: string;
+	component: string;
+ layout?: string;
+	params: Record<string, { optional?: boolean; type?, string }>;
  metadata: GeneratedRoute['metadata'];
  }
  > = {};

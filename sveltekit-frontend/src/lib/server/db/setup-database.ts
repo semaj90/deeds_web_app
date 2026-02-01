@@ -6,7 +6,9 @@ import { sql } from 'drizzle-orm';
 import { db } from './unified-client.js';
 
 export interface DatabaseSetupResult {
-    success: boolean;, steps: Array<{ step: string;, success: boolean; error?: string }>;
+    success: boolean;
+	steps: Array<{ step: string;
+	success: boolean; error?: string }>;
     timestamp: string;
 }
 

@@ -32,7 +32,8 @@ export const chatMessages = pgTable('chat_messages', {
 	metadata: text('metadata'), // JSON string for additional data (model, tokens, etc.)
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-}, (table) => ({
+},
+	(table) => ({
 	chatIdIdx: index('idx_chat_messages_chat_id').on(table.chatId),
 	userIdIdx: index('idx_chat_messages_user_id').on(table.userId),
 	timestampIdx: index('idx_chat_messages_timestamp').on(table.timestamp),
@@ -58,7 +59,8 @@ export const chatMetadata = pgTable('chat_metadata', {
 	tags: text('tags'), // JSON array of tags
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
-}, (table) => ({
+},
+	(table) => ({
 	userIdIdx: index('idx_chat_metadata_user_id').on(table.userId),
 	caseIdIdx: index('idx_chat_metadata_case_id').on(table.caseId),
 	lastMessageIdx: index('idx_chat_metadata_last_message').on(table.lastMessageAt)

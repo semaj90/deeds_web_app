@@ -26,14 +26,16 @@ export interface EmbeddingCacheRow {
 }
 
 export interface UpsertEmbeddingOptions {
-	model: string;, textHash: string;
+	model: string;
+	textHash: string;
 	embedding: number[]; // raw float embedding
 	packMethod?: 'uint8-linear' | 'int8-symmetric';
 }
 
 export async function upsertEmbedding(
 	opts: UpsertEmbeddingOptions
-): Promise<{ created?: boolean; updated?: boolean;, method: string; scale?: number | null }> {
+): Promise<{ created?: boolean; updated?: boolean;
+	method: string; scale?: number | null }> {
 	const { model, textHash, embedding, packMethod = 'int8-symmetric' } = opts;
 
 	// packEmbedding returns { b64, scale, method }
@@ -43,7 +45,8 @@ export async function upsertEmbedding(
 		packResult = await Promise.resolve(packEmbedding(embedding, packMethod));
 	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : String(err);
-		throw new Error(`packEmbedding failed for textHash=${textHash}, ${message}`);
+		throw new Error(`packEmbedding failed for textHash=${textHash},
+	${message}`);
 	}
 
 	const { b64, scale, method } = packResult || {};
@@ -83,7 +86,8 @@ export async function upsertEmbedding(
 		}
 	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : String(err);
-		throw new Error(`upsertEmbedding failed for textHash=${textHash}, ${message}`);
+		throw new Error(`upsertEmbedding failed for textHash=${textHash},
+	${message}`);
 	}
 }
 

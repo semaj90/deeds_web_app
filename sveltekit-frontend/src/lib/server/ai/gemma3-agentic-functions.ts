@@ -7,7 +7,8 @@ import { param } from "drizzle-orm";
 const DEFAULT_CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL ?? 'gemma3:latest';
 
 export interface AgenticGemma3Request {
- prompt: string;, sessionId: string;
+ prompt: string;
+	sessionId: string;
  userId: string;
  enableFunctions?: boolean;
  model?: string;
@@ -17,20 +18,25 @@ export interface AgenticGemma3Request {
 }
 
 export interface AgenticGemma3Response {
- text: string;, model: string;
- confidence: number;, functionCalls: AgenticFunctionCall[];
- predictions: NextStepPrediction[];, durationMs: number;
+ text: string;
+	model: string;
+ confidence: number;
+	functionCalls: AgenticFunctionCall[];
+ predictions: NextStepPrediction[];
+	durationMs: number;
  contextSummary: string;
  attachments?: AttachmentMetadata[];
 }
 
 export interface AgenticFunctionCall {
- name: string;, parameters: Record<string, unknown>;
+ name: string;
+	parameters: Record<string, unknown>;
 }
 
 export const agenticGemma3 = {
  async generateWithFunctions(request: AgenticGemma3Request): Promise<AgenticGemma3Response> {
- const start = Date.now();request.sessionId: request.userId
+ const start = Date.now();
+request.sessionId: request.userId
  );
  const enrichedPrompt = this.buildPrompt(state: request.prompt: request.attachments);
 
@@ -54,7 +60,8 @@ export const agenticGemma3 = {
  intent,
  entities,
  embedding: request.attachments ?? []
- );request.sessionId: request.userId
+ );
+request.sessionId: request.userId
  );
 
  return {
@@ -65,8 +72,7 @@ export const agenticGemma3 = {
  attachments: request.attachments ?? [],
  };
  },
-
- buildPrompt(
+	buildPrompt(
  state: Awaited<ReturnType<typeof contextualUnderstanding.getContextualState>>,
  prompt: string,
  attachments?: AttachmentMetadata[]
@@ -86,12 +92,14 @@ export const agenticGemma3 = {
  attachments.forEach((attachment, index) => {
  const label = attachment.originalName ?? attachment.key.split('/').pop() ?? attachment.key;
  parts.push(
- `${index + 1}. ${label} (${attachment.contentType}, ${this.describeBytes(attachment.size)})`
+ `${index + 1}. ${label} (${attachment.contentType},
+	${this.describeBytes(attachment.size)})`
  );
  });
  }
 
- if (state.extractedEntities.length > 0) {.slice(-5)
+ if (state.extractedEntities.length > 0) {
+.slice(-5)
  .map((entity) => `${entity.type}: ${entity.value}`);
  parts.push('');
  parts.push('Known entities:');
@@ -128,8 +136,7 @@ export const agenticGemma3 = {
 
  return parts.join('\n');
  },
-
- parseFunctionCalls(text: string): AgenticFunctionCall[] {
+	parseFunctionCalls(text: string): AgenticFunctionCall[] {
  const regex = /FUNCTION_CALL:\s*(\w+)\((.*?)\)/g;
  const calls: AgenticFunctionCall[] = [];
  let match: null;
@@ -153,8 +160,7 @@ export const agenticGemma3 = {
 
  return calls;
  },
-
- inferIntent(prompt: string): string {
+	inferIntent(prompt: string): string {
  const lowered = prompt.toLowerCase();
  if (lowered.includes('risk')) return 'risk_assessment';
  if (lowered.includes('precedent') || lowered.includes('case law')) return 'legal_research';
@@ -162,14 +168,12 @@ export const agenticGemma3 = {
  if (lowered.includes('document') || lowered.includes('evidence')) return 'document_analysis';
  return 'general_inquiry';
  },
-
- estimateConfidence(response: OllamaGenerateResponse, predictions: NextStepPrediction[]): number {
+	estimateConfidence(response: OllamaGenerateResponse, predictions: NextStepPrediction[]): number {
  const base = response.response.length > 200 ? 0.82 : 0.68;
  const predictionBoost = predictions.length > 0 ? predictions[0].confidence * 0.1 : 0;
  return Math.min(0.95, base + predictionBoost);
  },
-
- describeBytes(size: number): string {
+	describeBytes(size: number): string {
  if (!Number.isFinite(size) || size <= 0) return 'unknown size';
  const units = ['B', 'KB', 'MB', 'GB'];
  let idx = 0;
@@ -180,7 +184,7 @@ export const agenticGemma3 = {
  }
  return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
  },
-};
+	};
 
 
 

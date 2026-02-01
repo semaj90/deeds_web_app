@@ -1,13 +1,20 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected, token --> <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { isOpen?: any,caseId: string | undefined ,evidenceId: string | undefined ; onAnalysisComplete: (analysis: any) }
-  let { isOpen = false, caseId = undefined, evidenceId = undefined, onAnalysisComplete = > void = () => } = $props(); import { onMount } from 'svelte'; import { writable } from 'svelte/store'; import  Dialog  from "$lib/components/Dialog.svelte"; interface LegalAnalysis { sessionId: string,analysis: string, confidence: number, sources: Array, recommendations: string[], processingTime: number }
-  let prompt = ''; let analysisType: 'case_analysis' | 'legal_research' | 'document_review' | 'precedent_search' = 'case_analysis'; let loading = $state<boolean>(false); let analysis: LegalAnalysis | null = null; let error = ''; const analysisTypes = [ { value: 'case_analysis', label: 'Case Analysis' }, { value: 'legal_research', label: 'Legal Research' }, { value: 'document_review', label: 'Document Review' }, { value: 'precedent_search', label: 'Precedent Search' } ]; async function performAnalysis(): Promise<any> { if (!prompt.trim()) { error = 'Please enter an analysis prompt'; return}
+  let { isOpen = false, caseId = undefined, evidenceId = undefined, onAnalysisComplete = > void = () => } = $props(); // Migrated to $effect import { writable } from 'svelte/store'; import  Dialog  from "$lib/components/Dialog.svelte"; interface LegalAnalysis { sessionId: string
+,analysis: string, confidence: number, sources: Array, recommendations: string[], processingTime: number }
+  let prompt = ''; let analysisType: 'case_analysis' | 'legal_research' | 'document_review' | 'precedent_search' = 'case_analysis'; let loading = $state<boolean>(false); let analysis: LegalAnalysis | null = null; let error = ''; const analysisTypes = [ { value: 'case_analysis', label: 'Case Analysis' },
+	{ value: 'legal_research', label: 'Legal Research' },
+	{ value: 'document_review', label: 'Document Review' },
+	{ value: 'precedent_search', label: 'Precedent Search' } ]; async function performAnalysis(): Promise<any> { if (!prompt.trim()) { error = 'Please enter an analysis prompt'; return}
     loading = true; error = ''; try { const response = await fetch('/api/legal/chat', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: {, caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
+        },
+	body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: {
+	caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
         }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
-      analysis = await response.json(); onAnalysisComplete(analysis)} catch (err) { error = err instanceof Error ? err.message: 'Analysis failed'; console.error('Legal analysis, error:', err)} finally { loading = false}'
+      analysis = await response.json(); onAnalysisComplete(analysis)} catch (err) { error = err instanceof Error ? err.message: 'Analysis failed'; console.error('Legal analysis, error:', err)} finally { loading = false}
+'
   }
   function resetDialog() { prompt = ''; analysis = null; error = ''; loading = false}
   function closeDialog() { isOpen = false; resetDialog()}

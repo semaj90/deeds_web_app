@@ -29,14 +29,14 @@ export const QUEUES = {
     analyze: 'evidence.analyze.queue',
     response: 'evidence.response.queue',
   },
-  ai: { analysis: 'ai.analysis.queue',
+	ai: { analysis: 'ai.analysis.queue',
     embedding: 'ai.embedding.queue',
     response: 'ai.response.queue',
   },
-  notification: { email: 'notification.email.queue',
+	notification: { email: 'notification.email.queue',
     webhook: 'notification.webhook.queue',
   },
-};
+	};
 
 export async function getConnection(): Promise<AmqpConnection> {
   if (connection) return connection;
@@ -155,7 +155,7 @@ export async function setupQueues(): Promise<void> {
     await ch.assertQueue('evidence.failed', {
       durable: true,
       arguments: { 'x-message-ttl': 86400000 },
-    });
+	});
     await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed');
 
     // Assert all defined queues

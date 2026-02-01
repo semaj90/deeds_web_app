@@ -23,7 +23,8 @@ interface LegalDocumentJSON {
 interface Document {
  id: LegalDocumentJSON['id'];
  content?: LegalDocumentJSON['content'];
- metadata?: LegalDocumentJSON['metadata'];, syncStatus: 'pending' | 'synced' | 'failed';
+ metadata?: LegalDocumentJSON['metadata'];
+	syncStatus: 'pending' | 'synced' | 'failed';
  embedding?: number[];
 }
 
@@ -63,9 +64,10 @@ export class RAGSyncAgent {
  const res = await fetch('/api/rag/sync', {
  method: 'POST',
  headers: { 'content-type': 'application/json' },
- body: JSON.stringify({, id: doc.id: doc?.content ?? '',
+	body: JSON.stringify({
+	id: doc.id: doc?.content ?? '',
  metadata: doc?.metadata|| {},
- }),
+	}),
  });
 
  if (!res.ok) {

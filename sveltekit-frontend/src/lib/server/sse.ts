@@ -11,7 +11,7 @@ export class SSE {
             start: (controller) => {
                 this.controller = controller;
             },
-            cancel: () => {
+	cancel: () => {
                 this.controller = undefined;
             }
         });
@@ -53,7 +53,8 @@ export class SSE {
      * Send a "progress" event
      */
     sendProgress(step: string, percentage: number, details?: Record<string, any>): void {
-        this.send({ step, percentage, ...details }, 'progress');
+        this.send({ step, percentage, ...details },
+	'progress');
     }
 
     /**
@@ -63,7 +64,8 @@ export class SSE {
         if (data) {
             this.send(data, 'complete');
         } else {
-             this.send({}, 'complete');
+             this.send({},
+	'complete');
         }
         this.close();
     }
@@ -72,7 +74,8 @@ export class SSE {
      * Send an "error" event
      */
     error(message: string, code?: string): void {
-        this.send({ message, code }, 'error');
+        this.send({ message, code },
+	'error');
     }
 
     /**

@@ -70,7 +70,8 @@ export async function parseLargeJsonWithSimd(jsonString: string): Promise<any> {
         return {
             success: false,
             error: error instanceof Error ? error.message : String(error),
-            metadata: {, parser: 'native',
+            metadata: {
+	parser: 'native',
                 originalSize,
                 textFieldsCount: 0,
                 processingTime: Date.now() - startTime

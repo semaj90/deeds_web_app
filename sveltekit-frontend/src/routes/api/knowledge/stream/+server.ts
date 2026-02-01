@@ -49,9 +49,11 @@ export const POST: RequestHandler = async ({ request }) => {
 							score: r.score,
 							url: r.url
 						}))
-					});.slice(0, topK)
+					});
+.slice(0, topK)
 						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r?.summary|| r.content?.slice(0, 500) ?? 'No content'}`)
-						.join('\n\n');Question: ${query}
+						.join('\n\n');
+Question: ${query}
 
 Context:
 ${context}
@@ -118,10 +120,10 @@ async function streamOllamaResponse(
 	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({, model: MODEL,
+		body: JSON.stringify({ model: MODEL,
 			prompt,
 			stream: true,
-			options: {, temperature: 0.3,
+			options: { temperature: 0.3,
 				num_predict: 2048
 			}
 		})

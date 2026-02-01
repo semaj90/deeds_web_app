@@ -3,7 +3,7 @@
   import { legalDB, type GraphVisualizationData } from '$lib/db/client-db';
   import { DimensionalTensorStore } from '$lib/webgpu/dimensional-tensor-store';
   import { WebGPULegalDocumentGraph } from '$lib/webgpu/legal-document-graph';
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
   import { derived, writable } from 'svelte/store';
 
   // ============================================================================
@@ -86,7 +86,7 @@
     })();
   });
 
-  onDestroy(() => { cleanup() });
+  // TODO: Add as cleanup in $effect: return () => { cleanup() }
 
   /**
    * Initialize WebGPU graph engine and tensor store
@@ -123,7 +123,8 @@
         chunks: 100,
         representations: 8,
         maxLOD: 4
-    }, {
+    },
+	{
         maxGPUMemory: 256 * 1024 * 1024, // 256MB
         streamingDistance: 100,
         preloadRadius: 50,
@@ -421,7 +422,8 @@
   export async function exportImage(): Promise<Blob | null> {
     if (!canvas) return null;
     return new Promise((resolve) => {
-        canvas?.toBlob((blob) => { resolve(blob) }, 'image/png');
+        canvas?.toBlob((blob) => { resolve(blob) },
+	'image/png');
     });
   }
 
@@ -447,9 +449,12 @@
             graphType: 'legal-entities',
             nodes: [], // Would get from engine
             edges: [], // Would get from engine
-            layout: {, algorithm: 'force-directed', parameters: {, dimensions: 3 } },
-            cameraPosition: {, x: $renderState.cameraPosition[0], y: $renderState.cameraPosition[1], z: $renderState.cameraPosition[2]},
-            createdAt: new Date(),
+            layout: {
+	algorithm: 'force-directed', parameters: {
+	dimensions: 3 } },
+	cameraPosition: {
+	x: $renderState.cameraPosition[0], y: $renderState.cameraPosition[1], z: $renderState.cameraPosition[2]},
+	createdAt: new Date(),
             computationTime: 0
         };
         await legalDB.graphVisualizationData.put(graphData);
@@ -597,12 +602,15 @@
 <!-- ============================================================================ -->
 <style>
   .legal-graph-viewer {
-    position: relative;, border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: 8px;, overflow: hidden;
+    position: relative;
+	border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+	overflow: hidden;
     background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
   }
   .graph-canvas {
-    width: 100%;, height: 100%;
+    width: 100%;
+	height: 100%;
     outline: none;
   }
   .graph-canvas.interactive {
@@ -613,20 +621,26 @@
   }
   .loading-overlay,
   .error-overlay {
-    position: absolute;, top: 0;
-    left: 0;, right: 0;
-    bottom: 0;, display: flex;
+    position: absolute;
+	top: 0;
+    left: 0;
+	right: 0;
+    bottom: 0;
+	display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;, background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+	background: rgba(0, 0, 0, 0.8);
     color: white;
     z-index: 10;
   }
   .loading-spinner {
-    width: 40px;, height: 40px;
+    width: 40px;
+	height: 40px;
     border: 3px solid rgba(255, 255, 255, 0.1);
     border-top: 3px solid #60a5fa;
-    border-radius: 50%;, animation: spin 1s linear infinite;
+    border-radius: 50%;
+	animation: spin 1s linear infinite;
     margin-bottom: 16px;
   }
   @keyframes spin {
@@ -649,23 +663,30 @@
     color: #ef4444;
   }
   .error-overlay button {
-    margin-top: 16px;, padding: 8px 16px;
-    background: #3b82f6;, color: white;
+    margin-top: 16px;
+	padding: 8px 16px;
+    background: #3b82f6;
+	color: white;
     border: none;
-    border-radius: 4px;, cursor: pointer;
+    border-radius: 4px;
+	cursor: pointer;
   }
   .performance-hud {
-    position: absolute;, top: 16px;
-    right: 16px;, background: rgba(0, 0, 0, 0.7);
+    position: absolute;
+	top: 16px;
+    right: 16px;
+	background: rgba(0, 0, 0, 0.7);
     padding: 12px;
-    border-radius: 8px;, color: #a3a3a3;
+    border-radius: 8px;
+	color: #a3a3a3;
     font-size: 12px;
     backdrop-filter: blur(4px);
     pointer-events: none;
   }
   .stat {
     display: flex;
-    justify-content: space-between;, gap: 12px;
+    justify-content: space-between;
+	gap: 12px;
     margin-bottom: 4px;
   }
   .stat:last-child {
@@ -677,30 +698,39 @@
     font-weight: bold;
   }
   .controls-panel {
-    position: absolute;, bottom: 16px;
-    left: 50%;, transform: translateX(-50%);
+    position: absolute;
+	bottom: 16px;
+    left: 50%;
+	transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.1);
     padding: 8px;
-    border-radius: 32px;, display: flex;
+    border-radius: 32px;
+	display: flex;
     gap: 8px;
-    backdrop-filter: blur(8px);, border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .controls-panel button,
   .controls-panel select {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;, width: 40px;
+    color: white;
+	width: 40px;
     height: 40px;
-    border-radius: 50%;, display: flex;
+    border-radius: 50%;
+	display: flex;
     align-items: center;
-    justify-content: center;, cursor: pointer;
+    justify-content: center;
+	cursor: pointer;
     transition: all 0.2s;
     font-size: 18px;
   }
   .controls-panel select {
     width: auto;
-    border-radius: 20px;, padding: 0 16px;
-    font-size: 14px;, appearance: none;
+    border-radius: 20px;
+	padding: 0 16px;
+    font-size: 14px;
+	appearance: none;
   }
   .controls-panel button:hover,
   .controls-panel select:hover {
@@ -708,22 +738,27 @@
     transform: translateY(-2px);
   }
   .controls-panel button.active {
-    background: #3b82f6;, color: white;
+    background: #3b82f6;
+	color: white;
     border-color: #3b82f6;
     box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
   }
   .node-info-panel {
-    position: absolute;, top: 16px;
-    left: 16px;, background: rgba(255, 255, 255, 0.95);
+    position: absolute;
+	top: 16px;
+    left: 16px;
+	background: rgba(255, 255, 255, 0.95);
     padding: 16px;
-    border-radius: 8px;, width: 280px;
+    border-radius: 8px;
+	width: 280px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-left: 4px solid #3b82f6;
     color: #1f2937;
   }
   .node-info-panel h4 {
     margin: 0 0 12px 0;
-    font-size: 16px;, color: #111827;
+    font-size: 16px;
+	color: #111827;
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 8px;
   }
@@ -737,19 +772,32 @@
   .error-overlay { text-align: center; }
   .error-icon { font-size: 48px; margin-bottom: 16px; }
   .error-overlay h3 { margin: 0 0 8px 0; color: #ef4444; }
-  .error-overlay button { margin-top: 16px;, padding: 8px 16px; background: #3b82f6;, color: white; border: none; border-radius: 4px;, cursor: pointer; }
+  .error-overlay button { margin-top: 16px;
+	padding: 8px 16px; background: #3b82f6;
+	color: white; border: none; border-radius: 4px;
+	cursor: pointer; }
   .error-overlay button:hover { background: #2563eb; }
-  .performance-hud { position: absolute;, top: 12px; left: 12px;, background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 4px; font-size: 12px;, color: white; font-family: 'Courier New', monospace; z-index: 5; }
+  .performance-hud { position: absolute;
+	top: 12px; left: 12px;
+	background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 4px; font-size: 12px;
+	color: white; font-family: 'Courier New', monospace; z-index: 5; }
   .stat { display: flex; justify-content: space-between; min-width: 80px; margin-bottom: 2px; }
   .stat:last-child { margin-bottom: 0; }
   .label { opacity: 0.8; }
-  .value { font-weight: bold;, color: #60a5fa; }
+  .value { font-weight: bold;
+	color: #60a5fa; }
 </style>
-  .controls-panel { position: absolute;, top: 12px; right: 12px;, display: flex;gap: 8px; flex-wrap: wrap; z-index: 5 }
-  .controls-panel button, .controls-panel select { padding: 6px 10px; background: rgba(0, 0, 0, 0.7); color: white;, border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px, cursor: pointer, font-size: 14px;, transition: all 0.2}
+  .controls-panel { position: absolute;
+	top: 12px; right: 12px;
+	display: flex;gap: 8px; flex-wrap: wrap; z-index: 5 }
+  .controls-panel button, .controls-panel select { padding: 6px 10px; background: rgba(0, 0, 0, 0.7); color: white;
+	border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px, cursor: pointer, font-size: 14px;
+	transition: all 0.2}
   .controls-panel button hover .controls-panel select:hover { background: rgba(0, 0, 0, 0.9); border-color: rgba(255, 255, 255, 0.4)}
   .controls-panel button.active { background: rgba(96, 165, 250, 0.3); border-color: #60a5fa}
-  .node-info-panel { position: absolute;, bottom: 12px; left: 12px;, background: rgba(0, 0, 0, 0.8); color: white, padding: 12px; border-radius: 6px; min-width: 200px; max-width: 300px; z-index: 5 }
+  .node-info-panel { position: absolute;
+	bottom: 12px; left: 12px;
+	background: rgba(0, 0, 0, 0.8); color: white, padding: 12px; border-radius: 6px; min-width: 200px; max-width: 300px; z-index: 5 }
   .node-info-panel h4 { margin: 0, 0 8px 0; color: #60a5fa; font-size: 14px}
   .node-info-panel p { margin: 4px 0; font-size: 12px}
   /* Responsive design */ @media (max-width: 768px) { .performance-hud { font-size: 10px}

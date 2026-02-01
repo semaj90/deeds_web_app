@@ -25,7 +25,7 @@ export class IndexedDBService {
  db.createObjectStore(STORE_NAME, { keyPath: 'id' });
  }
  },
- });
+	});
  }
 
  /**

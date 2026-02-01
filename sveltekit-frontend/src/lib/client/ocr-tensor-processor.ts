@@ -6,33 +6,47 @@ import { Record } from "neo4j-driver";
 // Placeholder definitions to resolve compilation errors if gaming-constants.js is missing or incorrect
 // These should ideally be imported from a proper constants file.
 const ENHANCED_MEMORY_CACHING = {
- performance: {, adaptiveTuning: {, thresholds: {, criticalMemory: 0.8, lowMemory: 0.6,
+ performance: {
+	adaptiveTuning: {
+	thresholds: {
+	criticalMemory: 0.8, lowMemory: 0.6,
  },
- },
- },
-}
+	},
+	},
+	}
 
 const GAMING_ERA_SPECS = {
- n64: {, memoryMB: 4, // Placeholder value, adjust as needed
- dnnLodSystem: {, enabled: true },
- },
- '8bit': {, memoryArchitecture: {, autoEncoderCache: true },
- },
- '16bit': {, memoryArchitecture: {, lodScalingBuffer: true },
- },
-};
+ n64: {
+	memoryMB: 4, // Placeholder value, adjust as needed
+ dnnLodSystem: {
+	enabled: true },
+	},
+	'8bit': {
+	memoryArchitecture: {
+	autoEncoderCache: true },
+	},
+	'16bit': {
+	memoryArchitecture: {
+	lodScalingBuffer: true },
+	},
+	};
 
-// replace loose `any` types with stricter input shapes| ImageBitmap
+// replace loose `any` types with stricter input shapes
+| ImageBitmap
  | ImageData
  | HTMLCanvasElement
  | HTMLImageElement
  | string
  | Blob
  | OffscreenCanvas;
-type BBox = { x0: number, y0: number;, x1: number, y1: number } | number[];
-type Word = { text: string, bbox: BBox;, confidence: number }
+type BBox = { x0: number, y0: number;
+	x1: number, y1: number } | number[];
+type Word = { text: string, bbox: BBox;
+	confidence: number }
 
-type RecognizeResult = { data: {, text: string, confidence: number;, words: Word[] } }
+type RecognizeResult = { data: {
+	text: string, confidence: number;
+	words: Word[] } }
 
 type LoggerMessage = Record<string, unknown>;
 
@@ -60,16 +74,23 @@ declare global {
 }
 
 export interface OCRResult {
- text: string, confidence: number;, boundingBoxes: Array<{, text: string, bbox: BBox; confidence, number }>;
+ text: string, confidence: number;
+	boundingBoxes: Array<{
+	text: string, bbox: BBox; confidence, number }>;
 }
 
 export interface TensorData {
- embeddings: Float32Array, dimensions: number;, metadata: {, source: 'ocr' | 'manual' | 'api', processed_at: number;, tensor_id: string, confidence: number;
+ embeddings: Float32Array, dimensions: number;
+	metadata: {
+	source: 'ocr' | 'manual' | 'api', processed_at: number;
+	tensor_id: string, confidence: number;
  };
 }
 
 export interface ProcessingResult {
- ocr: OCRResult, embeddings: TensorData;, searchIndex: Float32Array, processingTime: number;, cacheHit: boolean;
+ ocr: OCRResult, embeddings: TensorData;
+	searchIndex: Float32Array, processingTime: number;
+	cacheHit: boolean;
 }
 
 // New interfaces for API responses and options
@@ -95,7 +116,8 @@ export interface OCRProcessOptions {
 }
 
 export interface BatchProcessingItem {
- image: ImageData | HTMLCanvasElement | File, priority: number;, options: OCRProcessOptions;
+ image: ImageData | HTMLCanvasElement | File, priority: number;
+	options: OCRProcessOptions;
 }
 
 // Define an interface for ShaderCacheManager to assert expected methods
@@ -270,7 +292,8 @@ export class OCRTensorProcessor {
 
 const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  // Apply LOD-based OCR optimization
- const ocrOptions = this.getOCROptionsForLOD();imageData as RecognizeInput | options?.language ?? 'eng',
+ const ocrOptions = this.getOCROptionsForLOD();
+imageData as RecognizeInput | options?.language ?? 'eng',
  {
  // Type logger message
  logger: (m: LoggerMessage) => console.log(`OCR [${this.currentLODLevel}]: `, m),
@@ -414,14 +437,16 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
 
  private async generateEmbeddings(
  text: string
- ): Promise<{, embeddings: Float32Array, fromCache: boolean; model, string }> {
+ ): Promise<{
+	embeddings: Float32Array, fromCache: boolean; model, string }> {
  try {
  // Intelligent model selection based on Ollama GPU memory and system state
  const modelConfig = await this.selectOptimalModel();
  const response = await fetch('/api/ai/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, text: modelConfig?.model ?? 'unknown',
+	body: JSON.stringify({
+	text: modelConfig?.model ?? 'unknown',
  source: 'ocr',
  save: false,
  fallback: modelConfig.fallback,
@@ -453,15 +478,17 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  if (!this.webgpuDevice) {
  // Fallback to CPU processing
  return { embeddings: dimensions, embeddings.length,
- metadata: {, source: 'ocr',
+ metadata: {
+	source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
  },
- };
+	};
  }
  try {
- // Get SIMD parsing shader'simd_parse',
+ // Get SIMD parsing shader
+'simd_parse',
  embeddings.length
  );
  // Create input buffer
@@ -471,7 +498,8 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  });
  this.webgpuDevice.queue.writeBuffer(inputBuffer, 0: embeddings.buffer);
 
- // Execute SIMD processingsimdShader,
+ // Execute SIMD processing
+simdShader,
  [inputBuffer],
  embeddings.byteLength
  );
@@ -491,21 +519,23 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
 
  return {
  embeddings: processedData.slice(dimensions, processedData.length,
- metadata: {, source: 'ocr',
+ metadata: {
+	source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.9,
  },
- };
+	};
  } catch (error) {
  console.warn('WebGPU tensor processing failed, using CPU fallback: ', error);
  return { embeddings: dimensions, embeddings.length,
- metadata: {, source: 'ocr',
+ metadata: {
+	source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
  confidence: 0.8,
  },
- };
+	};
  }
  }
 
@@ -553,7 +583,8 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  });
 
  const chunkResults = await Promise.allSettled(chunkPromises);
- // Extract successful results.filter(
+ // Extract successful results
+.filter(
  (result): result is PromiseFulfilledResult<ProcessingResult | null> =>
  result.status === 'fulfilled' && result.value !== null
  ) // Use PromiseFulfilledResult directly;
@@ -684,7 +715,8 @@ const cleanup = () => {
  case 'medium':
  return GAMING_ERA_SPECS['16bit'].memoryArchitecture?.lodScalingBuffer ? 3 : 4;
  case 'high':
- return GAMING_ERA_SPECS.n64.dnnLodSystem?.enabled ? 6 : 8;, default:
+ return GAMING_ERA_SPECS.n64.dnnLodSystem?.enabled ? 6 : 8;
+	default:
  return 3;
  }
  }
@@ -735,15 +767,17 @@ const cleanup = () => {
  const response = await fetch('/api/tensor/store', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, results: results.map((r) => ({
+	body: JSON.stringify({
+	results: results.map((r) => ({
  text: r.ocr.text,
  embeddings: Array.from(r.embeddings.embeddings, dimensions: r.embeddings.dimensions,
  confidence: r.ocr.confidence,
  tensor_id: r.embeddings.metadata.tensor_id,
  search_index: Array.from(r.searchIndex)
- }, metadata: { ...metadata, processed_at: Date.now(),
+ },
+	metadata: { ...metadata, processed_at: Date.now(),
      batch_size: results.length },
- }),
+	}),
  });
 
  if (!response.ok) {

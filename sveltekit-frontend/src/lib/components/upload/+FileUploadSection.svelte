@@ -55,14 +55,14 @@
 
   const caseOptions = [
     { value: 'case1', label: 'Case 2023-001' },
-    { value: 'case2', label: 'Case 2023-002' },
-    { value: 'case3', label: 'Case 2023-003' }
+	{ value: 'case2', label: 'Case 2023-002' },
+	{ value: 'case3', label: 'Case 2023-003' }
   ];
 
   const poiOptions = [
     { value: 'poi1', label: 'John Doe' },
-    { value: 'poi2', label: 'Jane Smith' },
-    { value: 'poi3', label: 'Criminal X' }
+	{ value: 'poi2', label: 'Jane Smith' },
+	{ value: 'poi3', label: 'Criminal X' }
   ];
 </script>
 

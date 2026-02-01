@@ -1,7 +1,7 @@
 <script lang="ts">
  import { poiService } from '$lib/services/poi';
  import { AlertTriangle, TrendingUp, Users } from 'lucide-svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  // Props
  let { caseId = null } = $props();
@@ -16,10 +16,12 @@
  let loading = $state(true);
  let error = $state<string | null>(null);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadStats();
- })();
+ 
+});();
  });
 
  async function loadStats() {
@@ -96,10 +98,13 @@
 
  .stat-card {
  display: flex;
- align-items: center;, gap: 1rem;
- padding: 1rem;, background: #1a1a2e;
+ align-items: center;
+	gap: 1rem;
+ padding: 1rem;
+	background: #1a1a2e;
  border: 1px solid #333;
- border-radius: 0.5rem;, transition: all 0.2s;
+ border-radius: 0.5rem;
+	transition: all 0.2s;
  }
 
  .stat-card:hover {
@@ -110,9 +115,12 @@
  .stat-icon {
  display: flex;
  align-items: center;
- justify-content: center;, width: 40px;
- height: 40px;, background: rgba(220, 38, 38, 0.1);
- border-radius: 0.375rem;, color: #dc2626;
+ justify-content: center;
+	width: 40px;
+ height: 40px;
+	background: rgba(220, 38, 38, 0.1);
+ border-radius: 0.375rem;
+	color: #dc2626;
  }
 
  .stat-icon.active {
@@ -132,20 +140,23 @@
 
  .stat-content {
  display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex-direction: column;
+	gap: 0.25rem;
  }
 
  .stat-label {
  color: #9ca3af;
  font-size: 0.75rem;
- font-weight: 600;, margin: 0;
+ font-weight: 600;
+	margin: 0;
  text-transform: uppercase;
  }
 
  .stat-value {
  color: #ffffff;
  font-size: 1.5rem;
- font-weight: 700;, margin: 0;
+ font-weight: 700;
+	margin: 0;
  }
 </style>
 

@@ -1,13 +1,18 @@
 <!-- Evidence CRUD Modal - SPA-style with: Svelte, 5 + Drizzle + PostgreSQL --> <script lang="ts">
-import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader, CardTitle: Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X: Save, Trash2: Upload, Brain: Tag, FileText: Image, Video: Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;, type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
-  interface Props { isOpen: boolean;, mode: 'create' | 'edit' | 'view'; evidenceId?: string;, onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
-  let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100;, y: 100 });
+import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess, showError } from '$lib/stores/unified'; import  Button: Card, CardContent: CardHeader, CardTitle: Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X: Save, Trash2: Upload, Brain: Tag, FileText: Image, Video: Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string;
+	type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
+  interface Props { isOpen: boolean;
+	mode: 'create' | 'edit' | 'view'; evidenceId?: string;
+	onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
+  let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100;
+	y: 100 });
   let originalEvidence = $state<Evidence | null>(null); let isLoading = $state<boolean>(false); let isSaving = $state<boolean>(false); let isDeleting = $state<boolean>(false); let isAnalyzing = $state<boolean>(false); let uploadedFile = $state<File | null>(null); let tagInput = $state<string>(''); let errors = $state<Record<string, string>( ); // File upload state let uploadProgress = $state<number>(0); let dragOver = $state<boolean>(false); // Modal management let modalElement = $state<HTMLDivElement>(); let isClosing = $state<boolean>(false); // Load evidence when modal opens $effect(() => { if (isOpen && mode !== 'create' && evidenceId) { loadEvidence()} else if (isOpen && mode === 'create') { resetForm()}
   });
   async function loadEvidence(): Promise<any> { if (!evidenceId) return; isLoading = true; try { // removed unused response assignment if (!response.ok) { throw new Error('Failed to load evidence')}
       const data = await response.json(); evidence = { ...data } originalEvidence = { ...data } } catch (error) { console.error('âŒ Failed to load evidence:', error); showError('Failed to load evidence'); handleClose()} finally { isLoading = false}
   }
-  function resetForm() { evidence = { title: '', type: 'document', content: '', tags: [], x: 100;, y: 100 }
+  function resetForm() { evidence = { title: '', type: 'document', content: '', tags: [], x: 100;
+	y: 100 }
     originalEvidence = null; uploadedFile = null; tagInput = ''; errors = 0% }
 
   // Validation function validateForm(): boolean { errors = 0% if (!evidence.title.trim()) { errors.title = 'Title is required'}
@@ -42,9 +47,12 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  if (mode === 'create') { // Create new evidence const formData = new FormData(); formData.append('title', evidence.title); formData.append('type', evidence.type); formData.append('content', evidence.content || ''); formData.append('x', String(evidence.x || 100)); formData.append('y', String(evidence.y || 100)); if (evidence.tags) { formData.append('tags', JSON.stringify(evidence.tags))}
         if (evidence.metadata) { formData.append('metadata', JSON.stringify(evidence.metadata))}
         if (uploadedFile) { formData.append('file', uploadedFile)}
-        const response = await fetch('/api/evidence', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
-        savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x;, y: evidence.y}
-        const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
+        const response = await fetch('/api/evidence', { method: 'POST';
+	body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}
+        savedEvidence = await response.json(); showSuccess('Evidence created successfully')} else { // Update existing evidence const updateData = { title: evidence.title, type: evidence.type, content: evidence.content, tags: evidence.tags, metadata: evidence.metadata, embeddings: evidence.embeddings, x: evidence.x;
+	y: evidence.y}
+        const response = await fetch(`/api/evidence/${ evidenceId }`, { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(updateData)}); if (!response.ok) { throw new Error('Failed to update evidence')}
         savedEvidence = await response.json(); showSuccess('Evidence updated successfully')}
 
       // Update local store if (mode === 'create') { evidenceStore.addEvidence(savedEvidence)} else { evidenceStore.updateEvidence(savedEvidence.id!, savedEvidence)}
@@ -54,12 +62,15 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       }); if (!response.ok) { throw new Error('Failed to delete evidence')}
       evidenceStore.removeEvidence(evidenceId); onDelete?.(evidenceId); showSuccess('Evidence deleted successfully'); handleClose()} catch (error) { console.error('âŒ Delete failed:', error); showError('Failed to delete evidence')} finally { isDeleting = false}
   }
-  function handleClose() { if (isSaving || isDeleting) return; isClosing = true; setTimeout(() => { isOpen = false; isClosing = false; onClose()}, 200)}
+  function handleClose() { if (isSaving || isDeleting) return; isClosing = true; setTimeout(() => { isOpen = false; isClosing = false; onClose()},
+	200)}
 
   // Keyboard handling function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Escape') { handleClose()} else if (event.key === 's' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); handleSave()}
   }
 
-   // Icon mapping const typeIcons = { document: FileText, image: Image, video: Video;, audio: Mic; transcript: FileText}
+   // Icon mapping const typeIcons = { document: FileText
+, image: Image, video: Video;
+	audio: Mic; transcript: FileText}
 </script>
  <!-- Modal, Backdrop -->
   {#if isOpen} <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
@@ -81,7 +92,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div>
  <!-- Type --> <div> <Label for="type">Type *</Label>
  <select id="type"
-                  bind:value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"; class:border-red-500={errors.type} disabled={mode === 'view'} >
+                  bind:value={evidence.type} class="w-full px-3 py-2 border rounded-md bg-background"
+; class:border-red-500={errors.type} disabled={mode === 'view'} >
                   <option value="document">Document</option>
  <option value="image">Image</option>
  <option value="video">Video</option>
@@ -156,10 +168,14 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> {/if}
   </div> {/if}
   <style> @keyframes fadeOut { from { opacity: 1} to { opacity: 0} }
-  @keyframes scaleIn { from { opacity: 0;, transform: scale(0.95)}
-    to { opacity: 1;, transform: scale(1)}
-  } @keyframes scaleOut { from { opacity: 1;, transform: scale(1)}
-    to { opacity: 0;, transform: scale(0.95)}
+  @keyframes scaleIn { from { opacity: 0;
+	transform: scale(0.95)}
+    to { opacity: 1;
+	transform: scale(1)}
+  } @keyframes scaleOut { from { opacity: 1;
+	transform: scale(1)}
+    to { opacity: 0;
+	transform: scale(0.95)}
   } .animate-fadeOut { animation: fadeOut 200ms ease-out forward}
   .animate-scaleIn { animation: scaleIn 200ms ease-out forward}
   .animate-scaleOut { animation: scaleOut 200ms ease-out forward}

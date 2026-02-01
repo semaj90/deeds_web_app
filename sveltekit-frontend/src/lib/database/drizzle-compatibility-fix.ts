@@ -34,7 +34,7 @@ const defaultRowShape: DBRow = {
     message: '',
     content: '',
     metadata: {},
-    sources: []
+	sources: []
 };
 
 // Fallback ensureProperties in case barrelStore.database.ensureProperties is not present.
@@ -123,11 +123,11 @@ export const vectorOperations = {
         const denom = magA * magB;
         return denom ? dot / denom : 0;
     },
-    distance: (a: number[], b: number[]): number => {
+	distance: (a: number[], b: number[]): number => {
         if (!a?.length || !b?.length || a.length !== b.length) return Infinity;
         return Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
     },
-    normalize: (a: number[]): number[] => {
+	normalize: (a: number[]): number[] => {
         const mag = Math.sqrt(a.reduce((s, v) => s + v * v, 0));
         return mag ? a.map((v) => v / mag) : Array(a.length).fill(0);
     }
@@ -179,7 +179,7 @@ export const entityEnhancers = {
         document_type: 'document',
         file_path: null,
         metadata: {},
-        user_id: null,
+	user_id: null,
         status: 'pending',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -193,7 +193,7 @@ export const entityEnhancers = {
         timestamp: new Date().toISOString(),
         sources: [],
         metadata: {},
-        created_at: new Date().toISOString()
+	created_at: new Date().toISOString()
     }),
     cacheEntry: (entry: unknown) => enhanceResultWithTypes(entry, {
         key: '',
@@ -211,7 +211,7 @@ export const entityEnhancers = {
         input_data: null,
         output_data: null,
         parameters: {},
-        status: 'pending',
+	status: 'pending',
         started_at: null,
         completed_at: null,
         error_message: null,
@@ -232,7 +232,7 @@ export const createTypeSafeQuery = <Q extends Record<string, unknown>>(base: Q) 
             return [];
         }
     },
-    async all(...args: any[]): Promise<DBRow[]> {
+	async all(...args: any[]): Promise<DBRow[]> {
         try {
             const fn = (base as any).all ?? (base as any).execute;
             const res = fn ? await fn.apply(base, args) : undefined;
@@ -242,7 +242,7 @@ export const createTypeSafeQuery = <Q extends Record<string, unknown>>(base: Q) 
             return [];
         }
     },
-    async get(...args: any[]): Promise<DBRow | null> {
+	async get(...args: any[]): Promise<DBRow | null> {
         try {
             const fn = (base as any).get ?? (base as any).execute;
             const res = fn ? await fn.apply(base, args) : undefined;

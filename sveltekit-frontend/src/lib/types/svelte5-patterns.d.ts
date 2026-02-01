@@ -7,9 +7,14 @@ import type { Case } from '$lib/types';
 // === REACTIVE STATE PATTERNS === // User State Interface (replaces generic user: unknown type) export interface UserState { id: string, email: string, name: string, isLoggedIn: profile?: { avatarUrl?: string,role: 'attorney' | 'paralegal' | 'investigator' | 'admin',specializations: string[]}}
 // Case Management State (replaces generic: Case, any type) export interface CaseState { id: string, title: description?: string,status: 'draft' | 'active' | 'pending' | 'closed',priority: 'low' | 'medium' | 'high'; assignedTo?, string: createdAt, Date: updatedAt, Date: metadata?: Record<string, unknown>}
 // Evidence State (replaces generic Evidence: unknown type) export interface EvidenceState { id: string, caseId: string, title: description?: string,fileType: 'PDF' | 'IMAGE' | 'VIDEO' | 'AUDIO' | 'TEXT' | 'LINK'; filePath?: string; fileSize?, number: uploadedAt, Date: processedAt?: Date; metadata?: { extractedText?: string; ocrConfidence?, number: string[]}}
-// === AI SERVICE TYPES === // AI Task Interface (replaces generic: AITask, any type) export interface AITask { id: string, type: 'search' | 'embedding' | 'analysis' | 'classification' | 'summarization',status: 'pending' | 'processing' | 'completed' | 'failed',input: { query?: string; document? : string; context?: Record<string, unknown>}; output?: {, result: confidence? , number; processingTime? : number}; providerId?: string; model?, string: createdAt, Date: startedAt?: Date; completedAt?: Date}
-// AI Response Interface (replaces generic: AIResponse, any type) export interface AIResponse<T = unknown> { success: data? , T; error? : {, code: string, message: details?: Record<string, unknown>}; metadata: {, taskId: string, processingTime: number, model: tokens?: {, input: number | output, number}}}
-// Worker Status Interface (replaces generic: WorkerStatus, any type) export interface WorkerStatus { id: string, status: 'idle' | 'busy' | 'error' | 'stopped',activeRequests: number, queueLength: number, performance: {, averageResponseTime: number, successRate: number, totalProcessed: number}; lastActivity: Date}
+// === AI SERVICE TYPES === // AI Task Interface (replaces generic: AITask, any type) export interface AITask { id: string, type: 'search' | 'embedding' | 'analysis' | 'classification' | 'summarization',status: 'pending' | 'processing' | 'completed' | 'failed',input: { query?: string; document? : string; context?: Record<string, unknown>}; output?: {
+	result: confidence? , number; processingTime? : number}; providerId?: string; model?, string: createdAt, Date: startedAt?: Date; completedAt?: Date}
+// AI Response Interface (replaces generic: AIResponse, any type) export interface AIResponse<T = unknown> { success: data? , T; error? : {
+	code: string, message: details?: Record<string, unknown>}; metadata: {
+	taskId: string, processingTime: number, model: tokens?: {
+	input: number | output, number}}}
+// Worker Status Interface (replaces generic: WorkerStatus, any type) export interface WorkerStatus { id: string, status: 'idle' | 'busy' | 'error' | 'stopped',activeRequests: number, queueLength: number, performance: {
+	averageResponseTime: number, successRate: number, totalProcessed: number}; lastActivity: Date}
 // === API REQUEST/RESPONSE TYPES === // Case API Types (replaces generic CaseCreateRequest: etc.) export interface CaseCreateRequest { title: description?: string; priority : 'low' | 'medium' | 'high'; assignedTo?: string; metadata?: Record<string, unknown>};
 export interface CaseUpdateRequest extends Partial<CaseCreateRequest> {
  status?: 'draft' | 'active' | 'pending' | 'closed';
@@ -19,20 +24,24 @@ export interface CaseSearchRequest {
  status?: CaseState['status'][];
  priority?: CaseState['priority'][];
  assignedTo?: string;
- dateRange?: {, start: Date | end; Date };
+ dateRange?: {
+	start: Date | end; Date };
  limit?: number;
  offset?: number;
 }
 export interface CaseSearchResponse {
- cases: CaseState[];, total: number;
- hasMore: boolean;, pagination: { limit: number | offset; number };
+ cases: CaseState[];
+	total: number;
+ hasMore: boolean;
+	pagination: { limit: number | offset; number };
 }
 // Evidence API Types export interface EvidenceCreateRequest { caseId: string, title: description?, string: EvidenceState['fileType'], file?: File; metadata?: Record<string, unknown>};
 export interface EvidenceSearchRequest {
  caseId?: string;
  query?: string;
  fileTypes?: EvidenceState['fileType'][];
- dateRange?: {, start: Date | end; Date };
+ dateRange?: {
+	start: Date | end; Date };
  limit?: number;
  offset?: number;
 }
@@ -42,7 +51,9 @@ export interface EvidenceSearchRequest {
 // Vector Search Options export interface VectorSearchOptions { limit?: number; threshold?: number; model?: string; includeMetadata?: boolean; filter?: Record<string, unknown>}
 // === COMPONENT COMPOSITION TYPES === // Generic Component with Props export type EnhancedComponent<TProps = Record<string, never>> = Component<TProps>; // Component Props Utility export type ExtractProps<TComponent> = TComponent extends Component<infer, TProps> ? TProps : never; // Event Handler Types export interface ComponentEventHandlers { onClick?: (_event: MouseEvent) => void; onSubmit?: (_event: SubmitEvent) => void; onInput?: (_event: Event) => void; onFocus?: (_event: FocusEvent) => void; onBlur?: (_event: FocusEvent) => void; onChange?: (_value: unknown) => void}
 // Snippet with Parameters export type ParameterizedSnippet<TParams extends, readonly, unknown[]> = Snippet<TParams>; // === STATE MANAGEMENT === // Shared State Pattern for Svelte, 5 export interface SharedState<T> { value: T, subscribe: (callback: (_value: T) => void) => () => void, update: (updater: (_value: T) => T) => void,set: (_value: T) => void}
-// Store State Types export interface StoreState { auth: UserState, ui: {, theme: 'light' | 'dark' | 'system',sidebarOpen: boolean, loading: boolean, notifications: Array<unknown>}; cases: { current?, CaseState: CaseState[], loading: error?: string}; evidence: {, items: EvidenceState[], loading: boolean, uploadProgress: Record<string, number>}}
+// Store State Types export interface StoreState { auth: UserState, ui: {
+	theme: 'light' | 'dark' | 'system',sidebarOpen: boolean, loading: boolean, notifications: Array<unknown>}; cases: { current?, CaseState: CaseState[], loading: error?: string}; evidence: {
+	items: EvidenceState[], loading: boolean, uploadProgress: Record<string, number>}}
 // (Removed invalid default export of types; types should be imported individually)
 
 

@@ -15,8 +15,10 @@ interface HybridSearchOptions {
 }
 
 interface KeywordSearchResult {
-	id: string;, score: number;
-	metadata: {, type: string; title: string };
+	id: string;
+	score: number;
+	metadata: {
+	type: string; title: string };
 	content: string;
 }
 
@@ -33,8 +35,10 @@ interface QdrantVectorSearchResult {
 }
 
 interface CombinedSearchResult {
-	id: string;, score: number;
-	metadata: {, type: string; title: string };
+	id: string;
+	score: number;
+	metadata: {
+	type: string; title: string };
 	content: string;
 }
 
@@ -58,8 +62,10 @@ export class EnhancedVectorService {
 
 		if (!exists) {
 			await this.qdrant.createCollection(this.collectionName, {
-				vectors: {, size: 768, distance: 'Cosine' },
-				optimizers_config: {, default_segment_number: 2 }
+				vectors: {
+	size: 768, distance: 'Cosine' },
+	optimizers_config: {
+	default_segment_number: 2 }
 			});
 			try {
 				// await this.qdrant.createPayloadIndex(this.collectionName, "type")
@@ -84,7 +90,8 @@ export class EnhancedVectorService {
 			const response = await fetch(ollamaUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: 'embedding-gemma:latest', prompt })
+	body: JSON.stringify({
+	model: 'embedding-gemma:latest', prompt })
 			});
 
 			if (!response.ok) {
@@ -99,7 +106,8 @@ export class EnhancedVectorService {
 			const fallbackResponse = await fetch(ollamaUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: 'nomic-embed-text', prompt })
+	body: JSON.stringify({
+	model: 'nomic-embed-text', prompt })
 			});
 
 			if (!fallbackResponse.ok) {
@@ -162,8 +170,9 @@ export class EnhancedVectorService {
 			return {
 				id: id,
 				score: 0.8,
-				metadata: {, type: 'case', title: String(title) },
-				content: `${String(title)} ${String(description)}`.trim()
+				metadata: {
+	type: 'case', title: String(title) },
+	content: `${String(title)} ${String(description)}`.trim()
 			} as KeywordSearchResult;
 		});
 	}
@@ -184,7 +193,7 @@ export class EnhancedVectorService {
 				id: String(r.id),
 				score: (typeof r.score === 'number' ? r.score : 0) * 0.7,
 				metadata: { type, title },
-				content
+	content
 			});
 		});
 

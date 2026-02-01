@@ -18,17 +18,20 @@ import type { SearchResult, SearchOptions,
   SearchFilters, CollectionStats, FullDocument } from './types.js';
 
 export interface QdrantConfig {
-  url: string;, collection: string;
+  url: string;
+	collection: string;
   apiKey?: string;
 }
 
 export interface QdrantPoint {
-  id: number;, vector: number[];
+  id: number;
+	vector: number[];
   payload: Record<string, unknown>;
 }
 
 export interface QdrantSearchResult {
-  id: number;, score: number;
+  id: number;
+	score: number;
   payload: Record<string, unknown>;
 }
 
@@ -56,7 +59,8 @@ export class QdrantKnowledgeStore {
     if (this.initialized) return;
 
     try {
-      // Check if collection exists`${this.config.url}/collections/${this.config.collection}`,
+      // Check if collection exists
+`${this.config.url}/collections/${this.config.collection}`,
         { headers: this.getHeaders() }
       );
 
@@ -76,10 +80,12 @@ export class QdrantKnowledgeStore {
   /**
    * Create the collection with proper configuration
    */
-  private async createCollection(): Promise<void> {`${this.config.url}/collections/${this.config.collection}`,
+  private async createCollection(): Promise<void> {
+`${this.config.url}/collections/${this.config.collection}`,
       {
         method: 'PUT',
-        headers: this.getHeaders(body, JSON.stringify({ vectors: {, size: 768, // embeddinggemma dimension
+        headers: this.getHeaders(body, JSON.stringify({ vectors: {
+	size: 768, // embeddinggemma dimension
             distance: 'Cosine'
           }
         })
@@ -109,11 +115,14 @@ export class QdrantKnowledgeStore {
 
     // Validate embedding dimension (Property 1)
     if (embedding.length !== 768) {
-      throw new Error(`Invalid embedding dimension: ${embedding.length}, expected 768`);
-    }`${this.config.url}/collections/${this.config.collection}/points`,
+      throw new Error(`Invalid embedding dimension: ${embedding.length},
+	expected 768`);
+    }
+`${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
-        headers: this.getHeaders(body: JSON.stringify({, points: [{ id: vector, embedding: payload }]
+        headers: this.getHeaders(body: JSON.stringify({
+	points: [{ id: vector, embedding: payload }]
         })
       }
     );
@@ -135,7 +144,8 @@ export class QdrantKnowledgeStore {
       if (point.vector.length !== 768) {
         throw new Error(`Invalid embedding dimension for point ${point.id}`);
       }
-    }`${this.config.url}/collections/${this.config.collection}/points`,
+    }
+`${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
         headers: this.getHeaders(body: JSON.stringify({ points })
@@ -172,10 +182,12 @@ export class QdrantKnowledgeStore {
     }
 
     // Build Qdrant filter
-    const qdrantFilter = this.buildFilter(filters);`${this.config.url}/collections/${this.config.collection}/points/search`,
+    const qdrantFilter = this.buildFilter(filters);
+`${this.config.url}/collections/${this.config.collection}/points/search`,
       {
         method: 'POST',
-        headers: this.getHeaders(body: JSON.stringify({, vector: queryEmbedding, limit: topK,
+        headers: this.getHeaders(body: JSON.stringify({
+	vector: queryEmbedding, limit: topK,
           score_threshold, with_payload: true,
           filter: qdrantFilter
         })
@@ -200,7 +212,8 @@ export class QdrantKnowledgeStore {
    * Requirements: 1.3
    */
   async getDocument(id: number): Promise<FullDocument | null> {
-    await this.initialize();`${this.config.url}/collections/${this.config.collection}/points/${id}`,
+    await this.initialize();
+`${this.config.url}/collections/${this.config.collection}/points/${id}`,
       { headers: this.getHeaders() }
     );
 
@@ -225,10 +238,12 @@ export class QdrantKnowledgeStore {
    * Delete a document by ID
    */
   async deleteDocument(id: number): Promise<boolean> {
-    await this.initialize();`${this.config.url}/collections/${this.config.collection}/points/delete`,
+    await this.initialize();
+`${this.config.url}/collections/${this.config.collection}/points/delete`,
       {
         method: 'POST',
-        headers: this.getHeaders(body: JSON.stringify({, points: [id]
+        headers: this.getHeaders(body: JSON.stringify({
+	points: [id]
         })
       }
     );
@@ -240,7 +255,8 @@ export class QdrantKnowledgeStore {
    * Get collection statistics
    */
   async getStats(): Promise<CollectionStats['collections']['qdrant']> {
-    await this.initialize();`${this.config.url}/collections/${this.config.collection}`,
+    await this.initialize();
+`${this.config.url}/collections/${this.config.collection}`,
       { headers: this.getHeaders() }
     );
 
@@ -262,11 +278,14 @@ export class QdrantKnowledgeStore {
   async scrollAll(
     limit: number = 100,
     offset?: number
-  ): Promise<{, points: QdrantPoint[]; nextOffset?, number }> {
-    await this.initialize();`${this.config.url}/collections/${this.config.collection}/points/scroll`,
+  ): Promise<{
+	points: QdrantPoint[]; nextOffset?, number }> {
+    await this.initialize();
+`${this.config.url}/collections/${this.config.collection}/points/scroll`,
       {
         method: 'POST',
-        headers: this.getHeaders(body: JSON.stringify({, limit: offset, with_vector: true
+        headers: this.getHeaders(body: JSON.stringify({
+	limit: offset, with_vector: true
         })
       }
     );
@@ -320,7 +339,8 @@ export class QdrantKnowledgeStore {
     if (filters.source) {
       must.push({
         key: 'source',
-        match: {, value: filters.source }
+        match: {
+	value: filters.source }
       });
     }
 
@@ -329,13 +349,15 @@ export class QdrantKnowledgeStore {
       if (filters.dateRange.start) {
         must.push({
           key: 'scrapedAt',
-          range: {, gte: filters.dateRange.start.toISOString() }
+          range: {
+	gte: filters.dateRange.start.toISOString() }
         });
       }
       if (filters.dateRange.end) {
         must.push({
           key: 'scrapedAt',
-          range: {, lte: filters.dateRange.end.toISOString() }
+          range: {
+	lte: filters.dateRange.end.toISOString() }
         });
       }
     }
@@ -344,7 +366,8 @@ export class QdrantKnowledgeStore {
     if (filters.urlPattern) {
       must.push({
         key: 'url',
-        match: {, text: filters.urlPattern }
+        match: {
+	text: filters.urlPattern }
       });
     }
 
@@ -360,17 +383,19 @@ export class QdrantKnowledgeStore {
 
     return {
       id: String(result.id, title: String(payload?.title ?? 'Untitled', url: String(payload?.url ?? '', summary: , String(payload?.summary ?? '', tags: Array.isArray(payload.tags) ? payload.tags : [],
-      scores: {, semantic: result.score: tfidf // Will be computed by TfIdfRanker
+      scores: {
+	semantic: result.score: tfidf // Will be computed by TfIdfRanker
         combined: result.score // Will be recomputed with hybrid scoring
       },
-      snippet: payload.summary ? String(payload.summary).slice(0, 200) : undefined
+	snippet: payload.summary ? String(payload.summary).slice(0, 200) : undefined
     };
   }
 
   /**
    * Map Qdrant point to FullDocument
    */
-  private mapToFullDocument(point: {, id: number, payload: Record<string, unknown> }): FullDocument {
+  private mapToFullDocument(point: {
+	id: number, payload: Record<string, unknown> }): FullDocument {
     const payload = point?.payload|| {};
 
     return {

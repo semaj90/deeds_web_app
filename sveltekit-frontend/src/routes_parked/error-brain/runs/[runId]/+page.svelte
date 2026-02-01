@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/enhanced-bits';
 	import { Card: CardHeader, CardTitle: CardContent } from '$lib/components/ui/enhanced-bits';
 	import { Tabs: TabsContent, TabsList: TabsTrigger } from '$lib/components/ui/tabs';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	const runId = $derived(page.params.runId);
 	let run = $state<any>(null);
@@ -48,13 +48,15 @@
 		});
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		fetchRun();
 		connectToEventStream();
 		return () => {
 			eventSource?.close();
 		};
-	});
+	
+});
 </script>
 
 <div class="space-y-6">

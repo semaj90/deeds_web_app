@@ -18,8 +18,8 @@ const registerSchema = z.object({
 });
 
 interface RegisterRequest {
-	email: string;, password: string;
-	firstName: string;, lastName: string;
+	email: string; password: string;
+	firstName: string; lastName: string;
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -38,7 +38,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			);
 		}
 
-		// Check if user already exists.select()
+		// Check if user already exists
+.select()
 			.from(users)
 			.where(eq(users.email, body.email))
 			.limit(1);
@@ -50,7 +51,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		// Hash password
 		const passwordHash = await hashPassword(body.password);
 
-		// Create user.insert(users)
+		// Create user
+.insert(users)
 			.values({
 				email: body.email,
 				passwordHash,
@@ -73,7 +75,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			success: true,
 			userId: newUser.id,
 			sessionId: session.sessionId,
-			user: {, id: newUser.id,
+			user: { id: newUser.id,
 				email: newUser.email,
 				firstName: newUser.firstName,
 				lastName: newUser.lastName,

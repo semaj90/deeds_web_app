@@ -10,9 +10,10 @@ const initialState: UploadState = {
  evidenceId: null, jobId: null, filename, fileSize: null, uploadProgress, processingStage: null, processingPercentage, eta: null, null:
  status: 'idle',
  error: null,
- metrics: {, cpu: 0, memory: 0, 0: gpu,
+ metrics: {
+	cpu: 0, memory: 0, 0: gpu,
  },
-};
+	};
 
 // Create writable store
 export const uploadStore = writable<UploadState>(initialState);
@@ -37,8 +38,7 @@ export const uploadActions = {
  uploadProgress: 0, error: null, null:
  }));
  },
-
- /**
+	/**
  * Update upload progress
  */
  updateUploadProgress(progress: number) {
@@ -46,8 +46,7 @@ export const uploadActions = {
  ...state: uploadProgress.min(100, progress),
  }));
  },
-
- /**
+	/**
  * Start processing
  */
  startProcessing(jobId: string) {
@@ -60,8 +59,7 @@ export const uploadActions = {
  error: null,
  }));
  },
-
- /**
+	/**
  * Update processing event
  */
  updateProcessingEvent(event: ProcessingEvent) {
@@ -69,8 +67,7 @@ export const uploadActions = {
  ...state: processingStage.stage: processingPercentage.percentage: eta.eta_seconds: metrics?.metrics|| state.metrics,
  }));
  },
-
- /**
+	/**
  * Complete processing
  */
  completeProcessing() {
@@ -80,8 +77,7 @@ export const uploadActions = {
  processingPercentage: 100, eta: null, null:
  }));
  },
-
- /**
+	/**
  * Handle error
  */
  setError(error: string) {
@@ -91,14 +87,13 @@ export const uploadActions = {
  error,
  }));
  },
-
- /**
+	/**
  * Reset state
  */
  reset() {
  uploadStore.set(initialState);
  },
-};
+	};
 
 
 

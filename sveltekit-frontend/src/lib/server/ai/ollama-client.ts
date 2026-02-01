@@ -4,7 +4,8 @@ const DEFAULT_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:la
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);
 
 export interface OllamaGenerateResponse {
-    model: string;, response: string;
+    model: string;
+	response: string;
     context?: number[];
     done?: boolean;
 }
@@ -21,7 +22,8 @@ export interface OllamaGenerateParams {
 }
 
 export interface OllamaEmbeddingResponse {
-    model: string;, embedding: number[];
+    model: string;
+	embedding: number[];
 }
 
 export interface OllamaEmbeddingParams {
@@ -68,15 +70,16 @@ export async function generateCompletion(
         system: params.systemPrompt,
         context: params.context,
         stream: params.stream ?? false,
-        options: {, temperature: params.temperature ?? 0.7,
+        options: {
+	temperature: params.temperature ?? 0.7,
             num_predict: params.maxTokens ?? 512,
         },
-    };
+	};
 
     return fetchFromOllama<OllamaGenerateResponse>('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
         timeoutMs: params.timeoutMs,
     });
 }
@@ -92,13 +95,14 @@ export async function generateEmbedding(
     return fetchFromOllama<OllamaEmbeddingResponse>('/api/embeddings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
         timeoutMs: params.timeoutMs,
     });
 }
 
 export async function listOllamaModels(): Promise<string[]> {
-    const data = await fetchFromOllama<{ models: Array<{, name: string }> }>('/api/tags', {
+    const data = await fetchFromOllama<{ models: Array<{
+	name: string }> }>('/api/tags', {
         method: 'GET',
     });
     return data.models?.map((m) => m.name) ?? [];

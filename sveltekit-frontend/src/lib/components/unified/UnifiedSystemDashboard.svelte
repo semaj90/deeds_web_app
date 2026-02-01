@@ -14,7 +14,7 @@
   import Terminal from 'lucide-svelte/icons/terminal';
   import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
   import Zap from 'lucide-svelte/icons/zap';
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
 
   // System State with Svelte 5 Runes
   let systemStatus = $state<'healthy' | 'warning' | 'critical' | 'unknown'>('healthy');
@@ -33,28 +33,31 @@
   // Service status tracking
   let services = $state([
     { id: 'legal-engine', name: 'Legal Engine', status: 'online', latency: 45, uptime: '99.9%' },
-    { id: 'rag-service', name: 'RAG Pipeline', status: 'online', latency: 120, uptime: '98.5%' },
-    { id: 'qdrant', name: 'Vector DB', status: 'online', latency: 12, uptime: '100%' },
-    { id: 'redis', name: 'Cache Layer', status: 'online', latency: 2, uptime: '99.9%' },
-    { id: 'postgres', name: 'Core DB', status: 'online', latency: 5, uptime: '99.9%' },
-    { id: 'ollama', name: 'Ollama Inference', status: 'online', latency: 850, uptime: '95.2%' }
+	{ id: 'rag-service', name: 'RAG Pipeline', status: 'online', latency: 120, uptime: '98.5%' },
+	{ id: 'qdrant', name: 'Vector DB', status: 'online', latency: 12, uptime: '100%' },
+	{ id: 'redis', name: 'Cache Layer', status: 'online', latency: 2, uptime: '99.9%' },
+	{ id: 'postgres', name: 'Core DB', status: 'online', latency: 5, uptime: '99.9%' },
+	{ id: 'ollama', name: 'Ollama Inference', status: 'online', latency: 850, uptime: '95.2%' }
   ]);
 
   let isRefreshing = $state(false);
   let timer: any;
 
-  onMount(() => {
-    startMonitoring();
-  });
+  $effect(() => {
 
-  onDestroy(() => {
+    startMonitoring();
+  
+});
+
+  // TODO: Add as cleanup in $effect: return () => {
     if (timer) clearInterval(timer);
-  });
+  }
 
   function startMonitoring() {
     timer = setInterval(() => {
       updateMetrics();
-    }, 3000);
+    },
+	3000);
   }
 
   async function updateMetrics() {

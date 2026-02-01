@@ -140,7 +140,9 @@ export class WebGPUBufferUtils {
     /**
      * Prepare data for WebGPU buffer upload
      */
-    static prepareForUpload(data: BufferLike): {, buffer: ArrayBuffer; byteLength: number;, elementCount: number } {
+    static prepareForUpload(data: BufferLike): {
+	buffer: ArrayBuffer; byteLength: number;
+	elementCount: number } {
         const buffer = toArrayBuffer(data);
         const byteLength = buffer.byteLength;
         const elementCount = data instanceof Float32Array ? data.length : byteLength / 4;
@@ -171,7 +173,7 @@ export const BufferTypeGuards = {
             data instanceof Uint32Array
         );
     },
-    isBufferLike: (data: any): data is BufferLike => {
+	isBufferLike: (data: any): data is BufferLike => {
         return data instanceof ArrayBuffer || BufferTypeGuards.isTypedArray(data) || Array.isArray(data);
     }
 };
@@ -183,7 +185,9 @@ export const BufferDebugUtils = {
     /**
      * Get detailed info about a buffer
      */
-    inspectBuffer(data: BufferLike): {, type: string; byteLength: number; elementCount?: number;, alignment: number } {
+    inspectBuffer(data: BufferLike): {
+	type: string; byteLength: number; elementCount?: number;
+	alignment: number } {
         const type = data.constructor.name;
         let byteLength: number;
         let elementCount: number | undefined;
@@ -203,8 +207,7 @@ export const BufferDebugUtils = {
         const alignment = byteLength % 4;
         return { type, byteLength, elementCount, alignment };
     },
-
-    /**
+	/**
      * Log buffer info for debugging
      */
     logBuffer(data: BufferLike, label = 'Buffer'): void {
@@ -257,8 +260,10 @@ export class WebGPUBufferUtils_Advanced {
     static prepareForUploadAdvanced(
         data: BufferLike,
         options: { alignment?: number; quantizationHint?: 'precision' | 'performance' | 'storage' } = {}
-    ): {, buffer: ArrayBuffer;
-        byteLength: number;, elementCount: number;
+    ): {
+	buffer: ArrayBuffer;
+        byteLength: number;
+	elementCount: number;
         recommendedQuantization: 'fp32' | 'fp16' | 'int8_symmetric';
     } {
         const buffer = toArrayBuffer(data);

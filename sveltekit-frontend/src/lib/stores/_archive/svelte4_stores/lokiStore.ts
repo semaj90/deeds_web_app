@@ -28,13 +28,16 @@ export interface RefreshableCollection {
 type CollectionType = 'evidence' | 'notes' | 'canvasStates';
 
 // --- Global reactive store --- //
-export const lokiStore = writable<{ evidence: Item[];, notes: Item[]; canvasStates: Item[] }>({
+export const lokiStore = writable<{ evidence: Item[];
+	notes: Item[]; canvasStates: Item[] }>({
  evidence: [],
  notes: [],
  canvasStates: [],
 });
   
-function createMockData(): {, evidence: Item[]; notes: Item[];, canvasStates: Item[] } {
+function createMockData(): {
+	evidence: Item[]; notes: Item[];
+	canvasStates: Item[] } {
  return {
  evidence: [
  {
@@ -43,8 +46,8 @@ function createMockData(): {, evidence: Item[]; notes: Item[];, canvasStates: It
  description: 'Legal contract',
  tags: ['legal', 'pdf'],
  },
- { id: 'ev2', fileName: 'photo.png', description: 'Evidence photo', tags: ['image'] },
- {
+	{ id: 'ev2', fileName: 'photo.png', description: 'Evidence photo', tags: ['image'] },
+	{
  id: 'ev3',
  fileName: 'email.txt',
  description: 'Client email thread',
@@ -52,10 +55,10 @@ function createMockData(): {, evidence: Item[]; notes: Item[];, canvasStates: It
  }],
  notes: [
  { id: 'n1', title: 'Case summary', content: 'Important points...', tags: ['summary'] },
- { id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] }],
+	{ id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] }],
  canvasStates: [
  { id: 'c1', title: 'Scene Diagram', content: 'Canvas layout v1', tags: ['canvas'] },
- { id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] }],
+	{ id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] }],
  };
 }
 
@@ -68,25 +71,25 @@ function makeCollection(type: CollectionType): RefreshableCollection {
  lokiStore.set(mock);
  console.info(`[lokiStore] refreshed ${type}`);
  },
- add(item: Item) {
+	add(item: Item) {
  lokiStore.update((state) => {
  state[type] = [...state[type], item];
  return state;
  });
  },
- getAll() {
+	getAll() {
  return get(lokiStore)[type];
  },
- getByCaseId(caseId: string) {
+	getByCaseId(caseId: string) {
  return get(lokiStore)[type].filter((i) => i.caseId === caseId);
  },
- search(query: string) {
+	search(query: string) {
  const q = query.toLowerCase();
  return get(lokiStore)[type].filter((i) =>
  Object.values(i).join(' ').toLowerCase().includes(q)
  );
  },
- };
+	};
 }
 
 // --- Stub service with three collections --- //
@@ -96,7 +99,7 @@ export const loki = {
  lokiStore.set(mock);
  console.log('[loki] initialized mock data');
  },
- evidence: makeCollection('evidence', notes: makeCollection('notes', canvasStates: makeCollection('canvasStates'),
+	evidence: makeCollection('evidence', notes: makeCollection('notes', canvasStates: makeCollection('canvasStates'),
 };
 
 

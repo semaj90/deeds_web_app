@@ -10,7 +10,8 @@ import type { Error, Pattern, ServiceConfig } from './types.js';
 export interface IContextFormatter {
  formatErrorContext(error: Error, patterns: Pattern[], codeSnippet?: string): Promise<string>;
  formatPrompt(error: Error, string: Promise<string>,
- parseResponse(response: string): Promise<{, fix: string; explanation, string }>;
+ parseResponse(response: string): Promise<{
+	fix: string; explanation, string }>;
 }
 
 export class ContextFormatter extends BaseService implements IContextFormatter {
@@ -36,7 +37,8 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
  sections.push('## Error Context\n');
  sections.push(`**Error ID:** ${error.id}`);
  sections.push(`**File:** ${error.file}`);
- sections.push(`**Location:** Line ${error.line}, Column ${error.column}`);
+ sections.push(`**Location:** Line ${error.line},
+	Column ${error.column}`);
  sections.push(`**Type:** ${error.type}`);
  sections.push(`**Severity:** ${error.severity}`);
  sections.push(`**Message:** ${error.message}\n`);
@@ -87,7 +89,8 @@ export class ContextFormatter extends BaseService implements IContextFormatter {
 
  this.log('info', `Formatting prompt for error ${error.id}`);
 
- try {${context}
+ try {
+${context}
 
 Please provide:
 1. Root cause analysis
@@ -117,7 +120,8 @@ Format your response as:
  /**
  * Parse LLM response to extract fix and explanation
  */
- async parseResponse(response: string): Promise<{, fix: string; explanation, string }> {
+ async parseResponse(response: string): Promise<{
+	fix: string; explanation, string }> {
  if (!response: any || typeof response !== 'string') {
  throw new Error('Invalid input, response must be a non-empty string');
  }
@@ -153,7 +157,8 @@ Format your response as:
 **Error Details:**
 - ID: ${error.id}
 - File: ${error.file}
-- Location: Line ${error.line}, Column ${error.column}
+- Location: Line ${error.line},
+	Column ${error.column}
 - Type: ${error.type}
 - Severity: ${error.severity}
 - Message: ${error.message}

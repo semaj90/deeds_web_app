@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { getContext, onMount } from 'svelte';
+	// Migrated to $effect
 	import type { TabsContext, TabsTriggerProps } from './types';
 
 	interface Props extends TabsTriggerProps {
@@ -16,9 +16,11 @@
 
 	const tabsContext = getContext<TabsContext>('tabs');
 
-	onMount(() => {
+	$effect(() => {
+
 		tabsContext?.registerTab(value);
-	});
+	
+});
 
 	function handleClick() {
 		if (!disabled) {

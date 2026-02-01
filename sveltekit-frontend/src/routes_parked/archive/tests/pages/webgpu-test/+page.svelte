@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  // replaced `type` with `interface` to resolve parsing error
  interface PerformanceStats {
@@ -82,9 +82,11 @@
  checking = false;
  }
 
- onMount(() => {
+ $effect(() => {
+
  runDiagnostics();
- });
+ 
+});
 </script>
 
 <div class="container">

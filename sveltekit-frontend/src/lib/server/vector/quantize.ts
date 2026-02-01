@@ -2,8 +2,10 @@
  * Quantize a Float32Array to Uint8Array for optimized storage
  * Uses min-max normalization to map floats to 0-255 range
  */
-export function quantizeFloat32ToUint8(vector: number[] | Float32Array): {, bytes: Uint8Array;
-    min: number;, max: number;
+export function quantizeFloat32ToUint8(vector: number[] | Float32Array): {
+	bytes: Uint8Array;
+    min: number;
+	max: number;
 } {
     const arr = Array.isArray(vector) ? vector : Array.from(vector);
     

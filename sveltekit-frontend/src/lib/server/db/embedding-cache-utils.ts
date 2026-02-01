@@ -31,7 +31,8 @@ export function unpackUint8ToFloat32(packed: Uint8Array, min: number, max: numbe
 	return out;
 }
 
-export function quantizeInt8Symmetric(vec: Float32Array): {, data: Int8Array; scale: number } {
+export function quantizeInt8Symmetric(vec: Float32Array): {
+	data: Int8Array; scale: number } {
 	let maxAbs = 0;
 	for (let i = 0; i < vec.length; i++) {
 		const a = Math.abs(vec[i]);
@@ -64,7 +65,9 @@ export function decodeBase64(b64: string): Uint8Array {
 export function packEmbedding(
 	vec: number[] | Float32Array,
 	method: 'uint8-linear' | 'int8-symmetric' = 'int8-symmetric'
-): {, b64: string; scale?: number;, method: 'uint8-linear' | 'int8-symmetric' } {
+): {
+	b64: string; scale?: number;
+	method: 'uint8-linear' | 'int8-symmetric' } {
 	const arr = vec instanceof Float32Array ? vec : new Float32Array(vec);
 
 	if (method === 'uint8-linear') {

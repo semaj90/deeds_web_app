@@ -101,7 +101,8 @@ export async function ensureCollection(dim: number): Promise<void> {
         if (!exists) {
             console.log(`[Qdrant] Creating collection ${COLLECTION_NAME} (${dim} dims)`);
             await qdrantClient.createCollection(COLLECTION_NAME, {
-                vectors: {, size: dim,
+                vectors: {
+	size: dim,
                     distance: 'Cosine'
                 }
             });
@@ -176,7 +177,8 @@ export async function semanticSearch(
     query: string,
     options: { topK?: number; filter?: Record<string, unknown>; useCache?: boolean } = {}
 ): Promise<QdrantPoint[]> {
-    const { topK = DEFAULT_TOP_K, filter = {}, useCache = true } = options;
+    const { topK = DEFAULT_TOP_K, filter = {},
+	useCache = true } = options;
 
     try {
         // Step 1: Embed query text
@@ -255,7 +257,7 @@ export async function embedAndUpsertText(
     id: string,
     text: string,
     payload: Record<string, unknown> = {},
-    model: string = EMBEDDING_MODEL
+	model: string = EMBEDDING_MODEL
 ): Promise<number[]> {
     try {
         // produce or fetch embedding

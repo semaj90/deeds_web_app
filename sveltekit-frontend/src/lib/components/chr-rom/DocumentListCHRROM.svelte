@@ -88,9 +88,11 @@
 
       for (const result of batchResults) {
         const typedResult = result as {
-          docId: string;, patternType: string;
+          docId: string;
+	patternType: string;
           pattern: CHRROMPattern | null;
-          source: string;, latency: number;
+          source: string;
+	latency: number;
         };
 
         if (!documentPatterns.has(typedResult.docId)) {
@@ -120,7 +122,8 @@
   function startPerformanceMonitoring(): void {
     setInterval(() => {
       performanceStats = chrROMCacheReader.getPerformanceStats();
-    }, 5000);
+    },
+	5000);
   }
 
   function getPattern(docId: string, patternType: string): CHRROMPattern | null {
@@ -313,8 +316,10 @@
 
   /* Performance Panel */
   .performance-panel {
-    background: #f8fafc;, border: 1px solid #e2e8f0;
-    border-radius: 8px;, padding: 1rem;
+    background: #f8fafc;
+	border: 1px solid #e2e8f0;
+    border-radius: 8px;
+	padding: 1rem;
     margin-bottom: 1.5rem;
   }
 
@@ -332,9 +337,11 @@
 
   .metric {
     display: flex;
-    justify-content: space-between;, padding: 0.5rem;
+    justify-content: space-between;
+	padding: 0.5rem;
     background: white;
-    border-radius: 4px;, border: 1px solid #e5e7eb;
+    border-radius: 4px;
+	border: 1px solid #e5e7eb;
   }
 
   .metric .label {
@@ -343,7 +350,8 @@
   }
 
   .metric .value {
-    font-weight: 600;, color: #374151;
+    font-weight: 600;
+	color: #374151;
   }
 
   .metric .value.excellent {
@@ -351,9 +359,12 @@
   }
 
   .refresh-btn {
-    background: #3b82f6;, color: white;
-    border: none;, padding: 0.5rem 1rem;
-    border-radius: 4px;, cursor: pointer;
+    background: #3b82f6;
+	color: white;
+    border: none;
+	padding: 0.5rem 1rem;
+    border-radius: 4px;
+	cursor: pointer;
     font-size: 0.875rem;
   }
 
@@ -370,10 +381,13 @@
 
   /* Document Cards with Instant CHR-ROM Rendering */
   .document-card {
-    background: white;, border: 1px solid #e5e7eb;
+    background: white;
+	border: 1px solid #e5e7eb;
     border-left: 4px solid #6b7280;
-    border-radius: 8px;, padding: 1rem;
-    cursor: pointer;, transition: all 0.15s ease;
+    border-radius: 8px;
+	padding: 1rem;
+    cursor: pointer;
+	transition: all 0.15s ease;
   }
 
   .document-card:hover {
@@ -383,19 +397,22 @@
 
   .document-header {
     display: flex;
-    align-items: center;, gap: 0.75rem;
+    align-items: center;
+	gap: 0.75rem;
     margin-bottom: 0.75rem;
   }
 
   .document-icon {
-    flex-shrink: 0;, width: 24px;
+    flex-shrink: 0;
+	width: 24px;
     height: 24px;
   }
 
   .document-title h3 {
     margin: 0;
     font-size: 1rem;
-    font-weight: 600;, color: #111827;
+    font-weight: 600;
+	color: #111827;
     line-height: 1.25;
   }
 
@@ -406,17 +423,20 @@
 
   .document-metadata {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
     margin-bottom: 0.5rem;
   }
 
   .risk-gauge {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
   }
 
   .risk-gauge .label {
-    font-size: 0.75rem;, color: #6b7280;
+    font-size: 0.75rem;
+	color: #6b7280;
     font-weight: 500;
   }
 
@@ -424,19 +444,22 @@
   .hover-details {
     padding-top: 0.75rem;
     border-top: 1px solid #f3f4f6;
-    display: flex;, gap: 1rem;
+    display: flex;
+	gap: 1rem;
     align-items: center;
   }
 
   .entity-heatmap,
   .similarity-graph {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
   }
 
   .entity-heatmap .label,
   .similarity-graph .label {
-    font-size: 0.75rem;, color: #6b7280;
+    font-size: 0.75rem;
+	color: #6b7280;
     font-weight: 500;
   }
 
@@ -454,7 +477,8 @@
 
   /* Zero State */
   .zero-state {
-    text-align: center;, padding: 3rem;
+    text-align: center;
+	padding: 3rem;
     color: #6b7280;
   }
 
@@ -480,7 +504,8 @@
 
     .hover-details {
       flex-direction: column;
-      align-items: flex-start;, gap: 0.5rem;
+      align-items: flex-start;
+	gap: 0.5rem;
     }
   }
 </style>

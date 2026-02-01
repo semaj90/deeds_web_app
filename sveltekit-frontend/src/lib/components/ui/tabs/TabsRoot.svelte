@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { onMount, setContext } from 'svelte';
+	// Migrated to $effect
 	import type { TabsContext, TabsRootProps } from './types';
 
 	interface Props extends TabsRootProps {
@@ -17,11 +17,13 @@
 	}: Props = $props();
 
 	// Initialize with defaultValue if no value provided (in onMount to avoid state reference warning)
-	onMount(() => {
+	$effect(() => {
+
 		if (!value && defaultValue) {
 			value = defaultValue;
 		}
-	});
+	
+});
 
 	let tabs = $state<string[]>([]);
 
@@ -34,12 +36,12 @@
 	// Create context with getter pattern for reactivity
 	setContext<TabsContext>('tabs', {
 		get value() { return value; },
-		setValue: (newValue: string) => {
+	setValue: (newValue: string) => {
 			value = newValue;
 			onValueChange?.(newValue);
 		},
-		get orientation() { return orientation; },
-		registerTab,
+	get orientation() { return orientation; },
+	registerTab,
 		get tabs() { return tabs; },
 	});
 </script>
@@ -58,7 +60,8 @@
 <style>
 	.tabs-root {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 	.tabs-root[data-orientation="vertical"] {
 		flex-direction: row;

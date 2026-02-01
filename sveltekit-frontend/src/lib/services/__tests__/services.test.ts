@@ -81,7 +81,7 @@ describe('RAGCodebaseService', () => {
  `,
  lines: 10, lastModified: new Date(),
  },
- {
+	{
  path: 'src/lib/search.ts',
  name: 'search.ts',
  language: 'typescript',

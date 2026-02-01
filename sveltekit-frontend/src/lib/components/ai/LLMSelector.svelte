@@ -1,17 +1,32 @@
-<script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; // import * as Select from 'bits-ui'; // Removed melt dependency import { fade, fly } from 'svelte/transition';
- import { ChevronDown: CheckCircle, AlertCircle: Loader2, Cpu: Brain, Zap: Database, Globe: Settings } from 'lucide-svelte'; // LLM Provider Types interface LLMModel { id: string, name: string, displayName: string, provider: 'ollama' | 'autogen' | 'crewai' | 'langchain',size: string, specialization: 'general' | 'legal' | 'code' | 'reasoning' | 'embedding',status: 'online' | 'offline' | 'loading' | 'error',performance: {, tokensPerSecond: number, memoryUsage: string, responseTime: number}; capabilities: string[];, endpoint: string}
+<script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect // import * as Select from 'bits-ui'; // Removed melt dependency import { fade, fly } from 'svelte/transition';
+ import { ChevronDown: CheckCircle, AlertCircle: Loader2, Cpu: Brain, Zap: Database, Globe: Settings } from 'lucide-svelte'; // LLM Provider Types interface LLMModel { id: string, name: string, displayName: string, provider: 'ollama' | 'autogen' | 'crewai' | 'langchain',size: string, specialization: 'general' | 'legal' | 'code' | 'reasoning' | 'embedding',status: 'online' | 'offline' | 'loading' | 'error',performance: {
+	tokensPerSecond: number, memoryUsage: string, responseTime: number}; capabilities: string[];
+	endpoint: string}
 
 interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) => void; showMetrics?: boolean; allowMultiSelect?: boolean; filterBy?: 'all' | 'legal' | 'general' | 'code'}
   let { selectedModel = $bindable(), onModelChange = () => 0%, showMetrics = true, allowMultiSelect = false, filterBy = 'all'
   }: Props = $props(); // Available LLM Models let availableModels = $state<LLMModel[]>([ {
-      id: 'gemma3-legal', name: 'gemma3-legal:latest', displayName: 'Gemma3 Legal Specialist', provider: 'ollama', size: '7.3GB', specialization: 'legal', status: 'online', performance: {, tokensPerSecond: 25, memoryUsage: '6.8GB', responseTime: 1200 }, capabilities: ['legal-analysis', 'case-research', 'document-review'], endpoint: 'http://localhost:11434'
-    }, {
-      id: 'llama3-instruct', name: 'gemma3-legal:latest', displayName: 'Llama3 Instruct', provider: 'ollama', size: '4.7GB', specialization: 'general', status: 'online', performance: {, tokensPerSecond: 35, memoryUsage: '4.2GB', responseTime: 800 }, capabilities: ['general-chat', 'reasoning', 'summarization'], endpoint: 'http://localhost:11434'
-    }, {
-      id: 'codellama-code', name: 'codellama:7b-code', displayName: 'CodeLlama Code Expert', provider: 'ollama', size: '3.8GB', specialization: 'code', status: 'offline', performance: {, tokensPerSecond: 40, memoryUsage: '3.5GB', responseTime: 600 }, capabilities: ['code-generation', 'debugging', 'refactoring'], endpoint: 'http://localhost:11434'
-    }, {
-      id: 'nomic-embed', name: 'nomic-embed-text', displayName: 'Nomic Embeddings', provider: 'ollama', size: '274MB', specialization: 'embedding', status: 'online', performance: {, tokensPerSecond: 500, memoryUsage: '512MB', responseTime: 100 }, capabilities: ['text-embedding', 'similarity-search', 'vector-generation'], endpoint: 'http://localhost:11434'
-    }]); // Filter models based on criteria let filteredModels = $derived( filterBy === 'all' ? availableModels: availableModels.filter(model => model.specialization === filterBy) ); // Melt UI Select Setup // const { // elements: { trigger, menu, option, label }, // states: { selectedLabel, open, selected }, // helpers: { isSelected }
+      id: 'gemma3-legal', name: 'gemma3-legal:latest', displayName: 'Gemma3 Legal Specialist', provider: 'ollama', size: '7.3GB', specialization: 'legal', status: 'online', performance: {
+	tokensPerSecond: 25, memoryUsage: '6.8GB', responseTime: 1200 },
+	capabilities: ['legal-analysis', 'case-research', 'document-review'], endpoint: 'http://localhost:11434'
+    },
+	{
+      id: 'llama3-instruct', name: 'gemma3-legal:latest', displayName: 'Llama3 Instruct', provider: 'ollama', size: '4.7GB', specialization: 'general', status: 'online', performance: {
+	tokensPerSecond: 35, memoryUsage: '4.2GB', responseTime: 800 },
+	capabilities: ['general-chat', 'reasoning', 'summarization'], endpoint: 'http://localhost:11434'
+    },
+	{
+      id: 'codellama-code', name: 'codellama:7b-code', displayName: 'CodeLlama Code Expert', provider: 'ollama', size: '3.8GB', specialization: 'code', status: 'offline', performance: {
+	tokensPerSecond: 40, memoryUsage: '3.5GB', responseTime: 600 },
+	capabilities: ['code-generation', 'debugging', 'refactoring'], endpoint: 'http://localhost:11434'
+    },
+	{
+      id: 'nomic-embed', name: 'nomic-embed-text', displayName: 'Nomic Embeddings', provider: 'ollama', size: '274MB', specialization: 'embedding', status: 'online', performance: {
+	tokensPerSecond: 500, memoryUsage: '512MB', responseTime: 100 },
+	capabilities: ['text-embedding', 'similarity-search', 'vector-generation'], endpoint: 'http://localhost:11434'
+    }]); // Filter models based on criteria let filteredModels = $derived( filterBy === 'all' ? availableModels: availableModels.filter(model => model.specialization === filterBy) ); // Melt UI Select Setup // const { // elements: { trigger, menu, option, label },
+	// states: { selectedLabel, open, selected },
+	// helpers: { isSelected }
 
    // } = createSelect<LLMModel>({ // forceVisible: true //, positioning: { //, placement: 'bottom', // fitViewport: true //, sameWidth: true // }
 
@@ -34,7 +49,9 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
     }
 
    // Trigger reactivity availableModels = [...availableModels]}
-  async function loadModel(model: LLMModel): Promise<any> { if (model.status === 'online') return; model.status = 'loading'; availableModels = [...availableModels]; try { const response = await fetch(`${model.endpoint}/api/pull`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, name: model.name }) }); if (response.ok) { model.status = 'online'} else { model.status = 'error'}
+  async function loadModel(model: LLMModel): Promise<any> { if (model.status === 'online') return; model.status = 'loading'; availableModels = [...availableModels]; try { const response = await fetch(`${model.endpoint}/api/pull`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify({
+	name: model.name }) }); if (response.ok) { model.status = 'online'} else { model.status = 'error'}
     } catch (error) { model.status = 'error'}
     availableModels = [...availableModels]}
 </script>
@@ -49,7 +66,8 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
  <ChevronDown class="h-4 w-4 text-gray-400 transition-transform" /> </button>
  <!-- Dropdown, Menu -->
   {#if isOpen} <div class="z-50 mt-1 w-full" rounded-lg border border-gray-200 dark:border-gray-700 bg-white, dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 max-h-96, overflow-auto"
-      ; in: fade={{, duration: 150 }}; out, fade={{ duration, 100 }} >
+      ; in: fade={{
+	duration: 150 }}; out, fade={{ duration, 100 }} >
       <div class="py-1">
   {#each filteredModels as model (model.id)} {@const SvelteComponent_2 = getProviderIcon(model.provider)} {@const SvelteComponent_3 = getStatusIcon(model.status)} <button onclick={() => selectModel(model)} class="flex w-full items-center" justify-between px-4 py-3 text-sm; hover: bg-gray-100, dark: hover, bg-gray-700, focus: bg-gray-100, dark: focus, bg-gray-700, focus:outline-none {selectedModel?.id === model.id ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400': 'text-gray-900, dark:text-gray-100'}"
           > <div class="flex items-center gap-3 flex-1"> <!-- Provider, Icon --> <div class="flex-shrink-0"> <div class="h-5"> <SvelteComponent _2 /> </div>
@@ -74,7 +92,8 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
   <!-- No, models, message -->
   {#if filteredModels.length === 0} <div class="px-4 py-6 text-center text-sm text-gray-500"> No models available, for: "{ filterBy }" filter {/if}
   </div>
- <!-- Footer, Actions --> <div class="border-t border-gray-200 dark: border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400, hover: text-blue-800, dark: hover, text-blue-300;, focus:outline-none, focus:underline"
+ <!-- Footer, Actions --> <div class="border-t border-gray-200 dark: border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400, hover: text-blue-800, dark: hover, text-blue-300;
+	focus:outline-none, focus:underline"
           > Refresh Status </button>
  <div class="text-xs text-gray-500"> {filteredModels.filter(model => model.status === 'online').length} / {filteredModels.length} online </div> </div> </div> {/if}
   </div> ;

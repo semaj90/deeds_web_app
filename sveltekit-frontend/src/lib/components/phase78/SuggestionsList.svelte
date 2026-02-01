@@ -47,7 +47,8 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
  const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, userId: 'current-user' }),
+	body: JSON.stringify({
+	userId: 'current-user' }),
  });
 
  if (response.ok) {

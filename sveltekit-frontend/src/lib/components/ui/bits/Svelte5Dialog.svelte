@@ -91,7 +91,8 @@ function handleOpenChange(newOpen: boolean) {
 			open = newOpen;
 			isAnimating = false;
 			onOpenChange?.(newOpen);
-		}, 150);
+		},
+	150);
 	}
 }
 
@@ -182,9 +183,11 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 <style>
 	/* NES.css dialog fallback styles */
 	:global(.nes-dialog) {
-		position: fixed;, padding: 1.5rem;
+		position: fixed;
+	padding: 1.5rem;
 		border: 4px solid #fff;
-		background: #212529;, color: #fff;
+		background: #212529;
+	color: #fff;
 		image-rendering: pixelated;
 	}
 
@@ -196,7 +199,8 @@ function handleEscapeKeyDown(e: KeyboardEvent) {
 	/* Glass morphism variant */
 	:global(.glass-dialog) {
 		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px);, border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 1rem;
 	}
 </style>

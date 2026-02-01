@@ -10,7 +10,8 @@
    let searchResults = $state<any>(null);
    let selectedPipeline = $state<PipelineType>('optimized');
    let cacheKey = $state<string>('demo_legal_documents'); // Performance metrics let metrics = $state({ totalOperations: 0, averageTime: 0, successRate: 0, lastUpdate: new Date() }); // Pipeline execution with XState management async function executePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log(`ðŸš€ Starting ${ selectedPipeline } pipeline execution`);
-   const result = await pipelineManager.executePipeline(cacheKey, { type: selectedPipeline, enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
+   const result = await pipelineManager.executePipeline(cacheKey, { type: selectedPipeline
+, enableGPU: true, enableConcurrency: true enableMemoryOptimization true }); results = [result, ...results.slice(0, 9)]; // Keep last, 10 results updateMetrics()} catch (error) { console.error('Pipeline execution failed:', error)} finally { isProcessing = false}
   }
 
    // Auto-select optimal pipeline async function autoExecutePipeline(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ§  Auto-selecting optimal pipeline');
@@ -18,7 +19,12 @@
   }
 
    // Batch processing demo async function batchProcess(): Promise<any> { if (isProcessing) return; isProcessing = true; try { console.log('ðŸ“¦ Starting batch processing');
-   const batchRequests = [ { cacheKey: 'contracts_batch', config: {, type: 'optimized' as PipelineType } }, { cacheKey: 'evidence_batch', config: {, type: 'advanced' as PipelineType } }, { cacheKey: 'cases_batch', config: {, type: 'end-to-end' as PipelineType } } ];
+   const batchRequests = [ { cacheKey: 'contracts_batch', config: {
+	type: 'optimized' as PipelineType } },
+	{ cacheKey: 'evidence_batch', config: {
+	type: 'advanced' as PipelineType } },
+	{ cacheKey: 'cases_batch', config: {
+	type: 'end-to-end' as PipelineType } } ];
    const batchResults = await pipelineManager.batchProcess(batchRequests); results = [...batchResults, ...results.slice(0, 7)]; updateMetrics()} catch (error) { console.error('Batch processing failed:', error)} finally { isProcessing = false}
   }
 

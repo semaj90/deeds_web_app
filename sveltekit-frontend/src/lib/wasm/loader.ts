@@ -27,7 +27,7 @@ export class WasmLoader {
 
  async load<T = any>(
  path: string, imports: WebAssembly.Imports = {},
- options: WasmLoadOptions = {}
+	options: WasmLoadOptions = {}
  ): Promise<T> {
  if (!browser) {
  throw new Error('WASM modules can only be loaded in browser');
@@ -51,7 +51,8 @@ export class WasmLoader {
  clearTimeout(timeoutId);
 
  if (!response.ok) {
- throw new Error(`HTTP ${response.status}, ${response.statusText}`);
+ throw new Error(`HTTP ${response.status},
+	${response.statusText}`);
  }
 
  const buffer = await response.arrayBuffer();
@@ -70,7 +71,8 @@ export class WasmLoader {
  }
  }
 
- throw new Error(`Failed to load WASM module ${path}, ${lastError?.message}`);
+ throw new Error(`Failed to load WASM module ${path},
+	${lastError?.message}`);
  }
 
  clearCache(path?: string) {

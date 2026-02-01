@@ -36,30 +36,35 @@ export const LegalMetadataSchema = z.object({
 	retentionPeriod: z.number().int().positive().optional(),
 
 	// Legal Parties
-	parties: z.array(z.object({, name: z.string(),
+	parties: z.array(z.object({
+	name: z.string(),
 		role: z.enum(['plaintiff', 'defendant', 'witness', 'counsel', 'judge', 'expert', 'third_party']),
 		entityType: z.enum(['individual', 'corporation', 'government', 'organization']).optional()
 	})).optional(),
 
 	// Citations and References
-	citations: z.array(z.object({, type: z.enum(['case_law', 'statute', 'regulation', 'treaty', 'secondary_source']),
+	citations: z.array(z.object({
+	type: z.enum(['case_law', 'statute', 'regulation', 'treaty', 'secondary_source']),
 		citation: z.string(),
 		relevance: z.number().min(0).max(1).optional(),
 		pinpoint: z.string().optional()
 	})).optional(),
 
 	// Semantic Analysis
-	semantics: z.object({, keyTerms: z.array(z.string()).optional(),
+	semantics: z.object({
+	keyTerms: z.array(z.string()).optional(),
 		legalConcepts: z.array(z.string()).optional(),
 		precedentStrength: z.number().min(0).max(1).optional(),
-		argumentStructure: z.array(z.object({, type: z.enum(['premise', 'conclusion', 'evidence', 'counterargument']),
+		argumentStructure: z.array(z.object({
+	type: z.enum(['premise', 'conclusion', 'evidence', 'counterargument']),
 			text: z.string(),
 			confidence: z.number().min(0).max(1)
 		})).optional()
 	}).optional(),
 
 	// AI Processing
-	aiMetadata: z.object({, modelVersion: z.string().optional(),
+	aiMetadata: z.object({
+	modelVersion: z.string().optional(),
 		processingTimestamp: z.string().datetime().optional(),
 		confidence: z.number().min(0).max(1).optional(),
 		reviewStatus: z.enum(['pending', 'reviewed', 'approved', 'rejected']).default('pending'),
@@ -75,13 +80,16 @@ export const CaseMetadataSchema = z.object({
 	caseNumber: z.string(),
 	filingDate: z.string().datetime().optional(),
 	status: z.enum(['active', 'pending', 'closed', 'on_hold', 'appealed']),
-	timeline: z.array(z.object({, date: z.string().datetime(),
+	timeline: z.array(z.object({
+	date: z.string().datetime(),
 		event: z.string(),
 		significance: z.enum(['low', 'medium', 'high', 'critical']).default('medium')
 	})).optional(),
-	strategy: z.object({, approach: z.string().optional(),
+	strategy: z.object({
+	approach: z.string().optional(),
 		objectives: z.array(z.string()).optional(),
-		risks: z.array(z.object({, description: z.string(),
+		risks: z.array(z.object({
+	description: z.string(),
 			probability: z.number().min(0).max(1),
 			impact: z.enum(['low', 'medium', 'high', 'critical'])
 		})).optional()
@@ -93,22 +101,26 @@ export const EvidenceMetadataSchema = z.object({
 	evidenceType: z.enum([
 		'document', 'physical', 'digital', 'testimony', 'expert_opinion', 'demonstrative'
 	]),
-	authenticity: z.object({, verified: z.boolean().default(false),
+	authenticity: z.object({
+	verified: z.boolean().default(false),
 		method: z.string().optional(),
 		verifier: z.string().optional(),
 		verificationDate: z.string().datetime().optional()
 	}).optional(),
-	chainOfCustody: z.array(z.object({, timestamp: z.string().datetime(),
+	chainOfCustody: z.array(z.object({
+	timestamp: z.string().datetime(),
 		custodian: z.string(),
 		action: z.enum(['collected', 'transferred', 'analyzed', 'stored', 'retrieved']),
 		location: z.string().optional(),
 		condition: z.string().optional()
 	})).optional(),
-	relevance: z.object({, score: z.number().min(0).max(1),
+	relevance: z.object({
+	score: z.number().min(0).max(1),
 		reasoning: z.string().optional(),
 		relatedEvidence: z.array(z.string()).optional()
 	}).optional(),
-	admissibility: z.object({, status: z.enum(['admissible', 'inadmissible', 'conditional', 'pending']),
+	admissibility: z.object({
+	status: z.enum(['admissible', 'inadmissible', 'conditional', 'pending']),
 		basis: z.string().optional(),
 		objections: z.array(z.string()).optional()
 	}).optional()

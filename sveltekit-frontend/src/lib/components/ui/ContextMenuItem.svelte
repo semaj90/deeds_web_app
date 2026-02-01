@@ -2,7 +2,8 @@
   interface Props {
     onselect?: (event?: any) => void;
   }
-  let { class_ = '', disabled = false }: Props = $props(); // Replaced melt with bits-ui components const contextMenu = (getContext("contextMenu") as any) || { elements: {, item: { subscribe: () => , set: () => } } }
+  let { class_ = '', disabled = false }: Props = $props(); // Replaced melt with bits-ui components const contextMenu = (getContext("contextMenu") as any) || { elements: {
+	item: { subscribe: () => , set: () => } } }
   const { elements } = contextMenu;
   const { item } = element;
   function handleSelect() {

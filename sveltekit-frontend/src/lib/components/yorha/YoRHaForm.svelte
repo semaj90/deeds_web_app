@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   export interface FormField {
-    id: string;, label: string;
+    id: string;
+	label: string;
     type: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox' | 'number' | 'date';
     value?: any;
     placeholder?: string;
     required?: boolean;
     disabled?: boolean;
-    options?: {, label: string; value: any }[];
+    options?: {
+	label: string; value: any }[];
     validation?: {
       pattern?: string;
       min?: number;
@@ -27,10 +29,11 @@
     loading = false,
     showCancel = true,
     onsubmit = (data: any) => { },
-    oncancel = () => { }
+	oncancel = () => { }
   }: {
     title?: string;
-    subtitle?: string;, fields: FormField[];
+    subtitle?: string;
+	fields: FormField[];
     submitLabel?: string;
     cancelLabel?: string;
     loading?: boolean;
@@ -44,11 +47,13 @@
   let touched = $state<Record<string, boolean>>({});
 
   // Initialize form data
-  onMount(() => {
+  $effect(() => {
+
     const initial: Record<string, any> = {};
     fields.forEach(f => {
       initial[f.id] = f.value !== undefined ? f.value : (f.type === 'checkbox' ? false : '');
-    });
+    
+});
     formData = initial;
   });
 

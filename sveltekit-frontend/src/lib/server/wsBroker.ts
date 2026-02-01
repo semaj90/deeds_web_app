@@ -247,7 +247,8 @@ export function broadcastToAllSessions(msg: ProgressMsg): void {
 }
 
 // Health check
-export function wsHealthCheck(): {, local: number; redis: boolean } {
+export function wsHealthCheck(): {
+	local: number; redis: boolean } {
     const localConnections = Array.from(sessions.values()).reduce(
         (total, set) => total + set.size,
         0

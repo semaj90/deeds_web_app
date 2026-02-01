@@ -42,7 +42,7 @@ export const routeErrorPatchesTable = pgTable('route_error_patches',
         createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
         updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: index('route_error_patches_route_path_idx').on(table.routePath),
             clusterIdIdx: index('route_error_patches_cluster_id_idx').on(table.clusterId),

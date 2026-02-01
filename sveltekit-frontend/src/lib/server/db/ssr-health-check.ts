@@ -7,8 +7,10 @@
 import { appPool, adminPool } from './connections.js';
 
 export interface HealthCheckResult {
-	healthy: boolean;, timestamp: string;
-	database: {, connected: boolean;
+	healthy: boolean;
+	timestamp: string;
+	database: {
+	connected: boolean;
 		version?: string;
 		tableCount?: number;
 		error?: string;
@@ -25,7 +27,8 @@ export async function checkDatabaseHealth(): Promise<HealthCheckResult> {
 	const result: HealthCheckResult = {
 		healthy: false,
 		timestamp: new Date().toISOString(),
-		database: {, connected: false
+		database: {
+	connected: false
 		}
 	};
 
@@ -77,7 +80,9 @@ export async function checkDatabaseHealth(): Promise<HealthCheckResult> {
 export async function verifySSRDatabaseConnection<T>(
 	queryFn: () => Promise<T>,
 	fallback: T
-): Promise<{, data: T; error?: string;, fromFallback: boolean }> {
+): Promise<{
+	data: T; error?: string;
+	fromFallback: boolean }> {
 	try {
 		const data = await queryFn();
 		return { data, fromFallback: false };
@@ -95,8 +100,10 @@ export async function verifySSRDatabaseConnection<T>(
 /**
  * Check if essential tables exist for the application
  */
-export async function checkEssentialTables(): Promise<{, exists: boolean;
-	missing: string[];, found: string[];
+export async function checkEssentialTables(): Promise<{
+	exists: boolean;
+	missing: string[];
+	found: string[];
 }> {
 	const essentialTables = [
 		'users',
@@ -125,7 +132,8 @@ export async function checkEssentialTables(): Promise<{, exists: boolean;
 			AND table_name = ANY($1)
 		`, [essentialTables]);
 
-		const foundTables = tableQuery.rows.map((r: {, table_name: string }) => r.table_name);
+		const foundTables = tableQuery.rows.map((r: {
+	table_name: string }) => r.table_name);
 		result.found = foundTables;
 		result.missing = essentialTables.filter(t => !foundTables.includes(t));
 		result.exists = result.missing.length === 0;
@@ -146,7 +154,8 @@ export async function checkEssentialTables(): Promise<{, exists: boolean;
 /**
  * Get database connection status for API endpoints
  */
-export async function getDatabaseStatus(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable';
+export async function getDatabaseStatus(): Promise<{
+	status: 'healthy' | 'degraded' | 'unavailable';
 	details: HealthCheckResult;
 }> {
 	const health = await checkDatabaseHealth();

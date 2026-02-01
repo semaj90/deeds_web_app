@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   export interface CaseFile {
-    id: string;, title: string;
+    id: string;
+	title: string;
     description?: string;
     evidenceType?: string;
     status?: string;
@@ -33,12 +34,14 @@
   let ctx: CanvasRenderingContext2D | null = null;
   let hoveredId = $state<string | null>(null);
 
-  onMount(() => {
+  $effect(() => {
+
     if (canvas) {
       ctx = canvas.getContext('2d');
       // Initialization logic...
     }
-  });
+  
+});
 
   // Placeholder for the complex rendering logic
   function render() {

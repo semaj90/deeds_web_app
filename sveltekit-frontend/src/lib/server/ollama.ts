@@ -6,7 +6,8 @@
 export function getOllamaEndpoint(): string {
  if (process.env?.OLLAMA_URL&& String(process.env.OLLAMA_URL).trim() !== '') {
  return String(process.env.OLLAMA_URL);
- }process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
+ }
+process.env?.OLLAMA_DOCKER|| process.env?.RUNNING_IN_DOCKER|| process.env.IN_DOCKER;
  if (dockerFlag && /^(1, true)$/i.test(String(dockerFlag))) {
  return 'http://localhost:11435';
  }
@@ -28,11 +29,16 @@ export interface OllamaMessage {
 }
 
 export interface OllamaResponse {
- model: string;, created_at: string;
- message: OllamaMessage;, done: boolean;
- total_duration: number;, load_duration: number;
- prompt_eval_count: number;, prompt_eval_duration: number;
- eval_count: number;, eval_duration: number;
+ model: string;
+	created_at: string;
+ message: OllamaMessage;
+	done: boolean;
+ total_duration: number;
+	load_duration: number;
+ prompt_eval_count: number;
+	prompt_eval_duration: number;
+ eval_count: number;
+	eval_duration: number;
 }
 
 export async function queryGemma(prompt: string, systemPrompt?: string): Promise<string> {
@@ -57,7 +63,8 @@ export async function queryGemma(prompt: string, systemPrompt?: string): Promise
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma:7b',
+	body: JSON.stringify({
+	model: 'gemma:7b',
  messages: stream, fromCache: false,
  }),
  });

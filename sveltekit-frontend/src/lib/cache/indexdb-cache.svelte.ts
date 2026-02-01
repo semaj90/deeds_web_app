@@ -7,11 +7,15 @@ import { browser } from '$app/environment';
 import { clear, del, get, keys, set } from 'idb-keyval';
 
 interface CacheEntry<T> {
-	data: T;, timestamp: number;, ttl: number; // Time to live in milliseconds
+	data: T;
+	timestamp: number;
+	ttl: number; // Time to live in milliseconds
 }
 
 interface CacheStats {
-	hits: number;, misses: number;, size: number;
+	hits: number;
+	misses: number;
+	size: number;
 }
 
 class IndexedDBCache {

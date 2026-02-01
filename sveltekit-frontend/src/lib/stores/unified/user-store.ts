@@ -12,8 +12,8 @@
  * import { userStore } from '$lib/stores/unified';
  *
  * // Subscribe to user state
- * $: user = $userStore.currentUser;
- * $: isAuthenticated = $userStore.isAuthenticated;
+ * let user = $derived($userStore.currentUser);
+ * let isAuthenticated = $derived($userStore.isAuthenticated);
  *
  * // Call methods
  * await userStore.login(email, password);
@@ -29,7 +29,8 @@ import { derived, writable } from 'svelte/store';
  */
 interface UserStoreState {
  currentUser: User | null;
- isAuthenticated: boolean;, isLoading: boolean;
+ isAuthenticated: boolean;
+	isLoading: boolean;
  sessionToken: string | null;
  error: string | null;
  lastUpdated: number;
@@ -63,7 +64,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/me', {
  credentials: 'include',
  headers: { 'Content-Type': 'application/json' },
- });
+	});
  if (response.ok) {
  const data = await response.json();
  update((s) => ({
@@ -86,8 +87,7 @@ function createUserStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-
- /**
+	/**
  * Login with email and password
  */
  async login(email: string, password: string) {
@@ -96,7 +96,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ email, password }),
+	body: JSON.stringify({ email, password }),
  credentials: 'include',
  });
  const data = await response.json();
@@ -121,8 +121,7 @@ function createUserStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-
- /**
+	/**
  * Register new user
  */
  async register(email: string, password: string, name?: string) {
@@ -131,7 +130,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/register', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ email, password, name }),
+	body: JSON.stringify({ email, password, name }),
  credentials: 'include',
  });
  const data = await response.json();
@@ -156,8 +155,7 @@ function createUserStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-
- /**
+	/**
  * Logout user
  */
  async logout() {
@@ -172,8 +170,7 @@ function createUserStore() {
  set(initialState);
  }
  },
-
- /**
+	/**
  * Update user profile
  */
  async updateProfile(updates: Partial<User>) {
@@ -182,7 +179,7 @@ function createUserStore() {
  const response = await fetch('/api/user/profile', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
  credentials: 'include',
  });
  const data = await response.json();
@@ -205,8 +202,7 @@ function createUserStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-
- /**
+	/**
  * Update user preferences
  */
  async updatePreferences(preferences: Record<string, unknown>) {
@@ -215,7 +211,7 @@ function createUserStore() {
  const response = await fetch('/api/user/preferences', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(preferences),
+	body: JSON.stringify(preferences),
  credentials: 'include',
  });
  if (response.ok) {
@@ -239,15 +235,13 @@ function createUserStore() {
  update((s) => ({ ...s, isLoading: false }));
  }
  },
-
- /**
+	/**
  * Clear error message
  */
  clearError() {
  update((s) => ({ ...s, error: null }));
  },
-
- // ========== GETTERS & DERIVED STORES ==========
+	// ========== GETTERS & DERIVED STORES ==========
 
  /**
  * Get current user synchronously
@@ -259,8 +253,7 @@ function createUserStore() {
  })();
  return current;
  },
-
- /**
+	/**
  * Get authentication status synchronously
  */
  getIsAuthenticated(): boolean {
@@ -270,8 +263,7 @@ function createUserStore() {
  })();
  return authed;
  },
-
- /**
+	/**
  * Get loading state synchronously
  */
  getIsLoading(): boolean {
@@ -281,7 +273,7 @@ function createUserStore() {
  })();
  return loading;
  },
- };
+	};
 }
 
 /**

@@ -29,7 +29,8 @@ interface QdrantClientLike {
   delete(collection: string, params: Record<string, unknown>): Promise<unknown>;
   updatePoints(collection: string, params: Record<string, unknown>): Promise<unknown>;
   getCollection(collection: string): Promise<Record<string, unknown> | undefined>;
-  getCollections(): Promise<{ collections?: Array<{, name: string }> }>;
+  getCollections(): Promise<{ collections?: Array<{
+	name: string }> }>;
   createCollection(name: string, params: Record<string, unknown>): Promise<unknown>;
   updateCollection(name: string, params: Record<string, unknown>): Promise<unknown>;
   createSnapshot(collection: string): Promise<Record<string, unknown>>;
@@ -37,7 +38,8 @@ interface QdrantClientLike {
 
 // Simplified types for QdrantService
 export interface VectorSearchResult {
-  id: string;, score: number;
+  id: string;
+	score: number;
   payload?: Record<string, unknown>;
   vector?: number[];
   similarity?: number;
@@ -51,7 +53,8 @@ export interface VectorSearchResult {
 }
 
 export interface DocumentVector {
-  id?: string;, vector: number[];
+  id?: string;
+	vector: number[];
   content?: string;
   title?: string;
   type?: string;
@@ -78,7 +81,8 @@ export interface CollectionInfo {
 }
 
 export interface BatchUpsertResult {
-  operation_id: string;, status: string;
+  operation_id: string;
+	status: string;
   successful?: boolean;
 }
 
@@ -112,16 +116,18 @@ export class QdrantService {
             onDisk: false,
             shardNumber: key === 'documents' ? 2 : 1,
             replicationFactor: 1,
-            optimizersConfig: {, indexingThreshold: 20000,
+            optimizersConfig: {
+	indexingThreshold: 20000,
               memmapThreshold: 50000,
               maxOptimizationThreads: 2,
             },
-            hnswConfig: {, m: 16,
+	hnswConfig: {
+	m: 16,
               efConstruct: 200,
               fullScanThreshold: 10000,
               maxIndexingThreads: 4,
             },
-          });
+	});
           logger.info(`Created collection: ${collectionName}`);
         } else {
           // Verify dimensions
@@ -148,22 +154,24 @@ export class QdrantService {
     try {
       if (!Array.isArray(document.vector) || document.vector.length !== this.VECTOR_SIZE) {
         throw new Error(
-          `Invalid vector size, expected ${this.VECTOR_SIZE}, got ${document.vector?.length}`
+          `Invalid vector size, expected ${this.VECTOR_SIZE},
+	got ${document.vector?.length}`
         );
       }
 
       const point = {
         id: document.id ?? crypto.randomUUID(),
         vector: document.vector,
-        payload: {, content: document.content ?? '',
+        payload: {
+	content: document.content ?? '',
           title: document.title ?? '',
           type: document.type ?? 'document',
           metadata: document.metadata ?? {},
-          created_at: new Date().toISOString(),
+	created_at: new Date().toISOString(),
           case_id: document.case_id ?? null,
           relevance_score: document.relevance_score ?? 1.0,
         },
-      };
+	};
 
       await this.client.upsert(this.DEFAULT_COLLECTION, {
         points: [point],
@@ -193,15 +201,16 @@ export class QdrantService {
       const points = documents.map((doc) => ({
         id: doc?.id || crypto.randomUUID(),
         vector: doc.vector,
-        payload: {, content: doc.content ?? '',
+        payload: {
+	content: doc.content ?? '',
           title: doc.title ?? '',
           type: doc.type ?? 'document',
           metadata: doc.metadata ?? {},
-          created_at: new Date().toISOString(),
+	created_at: new Date().toISOString(),
           case_id: doc.case_id ?? null,
           relevance_score: doc.relevance_score ?? 1.0,
         },
-      }));
+	}));
 
       await this.client.upsert(this.DEFAULT_COLLECTION, {
         points,
@@ -230,7 +239,8 @@ export class QdrantService {
     try {
       if (!Array.isArray(queryVector) || queryVector.length !== this.VECTOR_SIZE) {
         throw new Error(
-          `Invalid query vector size, expected ${this.VECTOR_SIZE}, got ${queryVector?.length}`
+          `Invalid query vector size, expected ${this.VECTOR_SIZE},
+	got ${queryVector?.length}`
         );
       }
 
@@ -238,7 +248,7 @@ export class QdrantService {
         limit = 10,
         threshold = 0.7,
         filter = {},
-        collection = this.DEFAULT_COLLECTION,
+	collection = this.DEFAULT_COLLECTION,
         includePayload = true,
         includeVector = false,
       } = options;
@@ -250,16 +260,18 @@ export class QdrantService {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'case_id',
-          match: {, value: filterRecord['case_id'] },
-        });
+          match: {
+	value: filterRecord['case_id'] },
+	});
       }
 
       if (filterRecord['type']) {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'type',
-          match: {, value: filterRecord['type'] },
-        });
+          match: {
+	value: filterRecord['type'] },
+	});
       }
 
       if (filterRecord['date_range'] && typeof filterRecord['date_range'] === 'object') {
@@ -267,8 +279,9 @@ export class QdrantService {
         if (!qdrantFilter.must) qdrantFilter.must = [];
         qdrantFilter.must.push({
           key: 'created_at',
-          range: {, gte: dr['start'], lte: dr['end'] },
-        });
+          range: {
+	gte: dr['start'], lte: dr['end'] },
+	});
       }
 
       const searchParams: Record<string, unknown> = {
@@ -297,7 +310,7 @@ export class QdrantService {
           title: String(payload['title'] ?? ''),
           type: String(payload['type'] ?? 'document'),
           metadata: (payload['metadata'] as Record<string, unknown> | undefined) ?? {},
-          case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
+	case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
           created_at: payload['created_at'] as string | undefined,
           relevance_score: Number(payload['relevance_score'] ?? res['score']),
         } as VectorSearchResult;
@@ -336,7 +349,7 @@ export class QdrantService {
         title: String(payload['title'] ?? ''),
         type: String(payload['type'] ?? 'document'),
         metadata: (payload['metadata'] as Record<string, unknown> | undefined) ?? {},
-        case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
+	case_id: payload['case_id'] ? String(payload['case_id']) : undefined,
         relevance_score: payload['relevance_score']
           ? Number(payload['relevance_score'])
           : undefined,
@@ -415,10 +428,11 @@ export class QdrantService {
   async optimizeCollection(collection: string = this.DEFAULT_COLLECTION): Promise<void> {
     try {
       await this.client.updateCollection(collection, {
-        optimizers_config: {, indexing_threshold: 20000,
+        optimizers_config: {
+	indexing_threshold: 20000,
           max_optimization_threads: 4,
         },
-      });
+	});
       logger.info(`Optimized collection: ${collection}`);
     } catch (error) {
       logger.error('Failed to optimize collection', error);
@@ -459,11 +473,12 @@ export class QdrantService {
   private async createCollection(name: string, config: Record<string, unknown>): Promise<void> {
     try {
       await this.client.createCollection(name, {
-        vectors: {, size: config['vectorSize'],
+        vectors: {
+	size: config['vectorSize'],
           distance: config['distance'],
           on_disk: config['onDisk'],
         },
-        shard_number: config['shardNumber'],
+	shard_number: config['shardNumber'],
         replication_factor: config['replicationFactor'],
         optimizers_config: config['optimizersConfig'],
         hnsw_config: config['hnswConfig'],

@@ -10,7 +10,8 @@ import { auditService } from './audit.service.js';
 import { eq, like, and, or, desc, sql } from 'drizzle-orm';
 
 export interface Citation {
-	id: string;, userId: string;
+	id: string;
+	userId: string;
 	caseId?: string | null;
 	statuteCode: string;
 	statuteTitle?: string | null;
@@ -20,7 +21,8 @@ export interface Citation {
 	sourceType: 'manual' | 'auto_extracted' | string;
 	highlightedText?: string | null;
 	notes?: string | null;
-	createdAt: Date;, updatedAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface SaveCitationRequest {
@@ -78,7 +80,7 @@ class CitationService {
 				data?.caseId ?? 'unknown',
 				'retrieve',
 				{ citation_id: citation.id, source_type: citation.sourceType },
-				true
+	true
 			);
 
 			return citation as Citation;
@@ -247,7 +249,7 @@ class CitationService {
 				'unknown',
 				'retrieve',
 				{ citation_id: id, action: 'delete' },
-				true
+	true
 			);
 		} catch (error) {
 			console.error('Error deleting citation:', error);
@@ -275,7 +277,8 @@ class CitationService {
 	/**
 	 * Get citation statistics
 	 */
-	async getCitationStats(userId: string): Promise<{, total: number;
+	async getCitationStats(userId: string): Promise<{
+	total: number;
 		byJurisdiction: Record<string, number>;
 		bySeverity: Record<string, number>;
 		bySourceType: Record<string, number>;
@@ -327,8 +330,8 @@ class CitationService {
 			return {
 				total: 0,
 				byJurisdiction: {},
-				bySeverity: {},
-				bySourceType: {}
+	bySeverity: {},
+	bySourceType: {}
 			};
 		}
 	}

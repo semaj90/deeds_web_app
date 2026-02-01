@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Svelte, 5 runes are auto-imported
-	import { onMount, onDestroy } from 'svelte';
+	// Migrated to $effect
 
 	import { writable } from 'svelte/store';
 
@@ -103,7 +103,8 @@
 	function autoHideTimer() {
 		if (autoHide && isVisible) {
 			setTimeout(() => {
-				isVisible = false}, 10000)}
+				isVisible = false},
+	10000)}
 	}
 
 	// Setup effect: start observer + interval + keyboard listener
@@ -130,14 +131,14 @@
 				clearInterval(intervalId);
 				intervalId = undefined}
 		}});
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		if (intervalId) {
 			clearInterval(intervalId);
 			intervalId = undefined}
 		if (performanceObserver) {
 			performanceObserver.disconnect();
 			performanceObserver = null}
-	});
+	}
 	// Color coding for metrics
 	function getStatusColor(value: number, type: 'fps' | 'memory' | 'cpu' | 'gpu'): string {
 		switch (type) {

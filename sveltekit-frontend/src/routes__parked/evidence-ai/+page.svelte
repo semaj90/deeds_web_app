@@ -6,7 +6,7 @@
 import { browser } from '$app/environment';
 import { xstateIntegration } from '$lib/services/xstate-integration';
 import * as Button from 'bits-ui/components/button';
-import { onMount } from 'svelte';
+// Migrated to $effect
 
  // ======================
  // SVELTE, 5 RUNES STATE
@@ -431,7 +431,8 @@ import { onMount } from 'svelte';
  };
  });
   
- onMount(() => {
+ $effect(() => {
+
  let mounted = true;
  (async () => {
  try {
@@ -453,7 +454,8 @@ import { onMount } from 'svelte';
  console.error('Health check failed:', error);
  backendStatus = { ...backendStatus, pythonAI: false, false };
  }
- })();
+ 
+});();
 
  const heartbeat = setInterval(() => {
  if (ws && wsConnected && ws.readyState === WebSocket.OPEN) {

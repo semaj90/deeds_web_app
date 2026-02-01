@@ -90,7 +90,8 @@ async function generateEmbeddingViaOllama(text: string): Promise<number[]> {
  const response = await fetch(`${ollamaUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt, text }),
+	body: JSON.stringify({
+	model: prompt, text }),
  });
 
  if (!response.ok) {
@@ -187,7 +188,8 @@ let _defaultVectorizer: null = null;
  */
 export function getPhase72Vectorizer(): Phase72Vectorizer {
  if (!_defaultVectorizer) {
- // Try to load model from standard location (optional)process.env?.PHASE72_MODEL_PATH||
+ // Try to load model from standard location (optional)
+process.env?.PHASE72_MODEL_PATH||
  path.join(process.cwd(), 'static', 'models', 'bert_error_encoder.pt');
 
  _defaultVectorizer = new Phase72Vectorizer({

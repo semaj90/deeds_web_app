@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { CacheMonitoring } from '$lib/cache/cache-invalidation';
 	import { cache } from '$lib/cache/cache-service.svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	type CacheHealth = {
-		isHealthy: boolean;, memoryReady: boolean;
-		persistentReady: boolean;, lastCheck: number;
+		isHealthy: boolean;
+	memoryReady: boolean;
+		persistentReady: boolean;
+	lastCheck: number;
 	};
 
 	let health = $state<CacheHealth>({
@@ -19,7 +21,8 @@
 	let autoRefresh = $state(true);
 	let refreshInterval: ReturnType<typeof setInterval> | undefined;
 
-	onMount(() => {
+	$effect(() => {
+
 		updateHealth();
 
 		if (autoRefresh) {
@@ -29,7 +32,8 @@
 		return () => {
 			if (refreshInterval) clearInterval(refreshInterval);
 		};
-	});
+	
+});
 
 	async function updateHealth() {
 		health = await CacheMonitoring.getHealth();
@@ -150,8 +154,10 @@
 
 <style>
 	.cache-monitor {
-		padding: 1.5rem;, background: var(--bg-secondary, #f9fafb);
-		border-radius: 0.5rem;, border: 1px solid var(--border-color, #e5e7eb);
+		padding: 1.5rem;
+	background: var(--bg-secondary, #f9fafb);
+		border-radius: 0.5rem;
+	border: 1px solid var(--border-color, #e5e7eb);
 	}
 
 	.header {
@@ -168,16 +174,19 @@
 	}
 
 	.actions {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 	}
 
 	.btn-secondary,
 	.btn-danger {
 		padding: 0.5rem 1rem;
 		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;, background: white;
+		border-radius: 0.375rem;
+	background: white;
 		cursor: pointer;
-		font-size: 0.875rem;, transition: all 0.2s;
+		font-size: 0.875rem;
+	transition: all 0.2s;
 	}
 
 	.btn-secondary:hover {
@@ -185,7 +194,8 @@
 	}
 
 	.btn-danger {
-		border-color: #ef4444;, color: #ef4444;
+		border-color: #ef4444;
+	color: #ef4444;
 	}
 
 	.btn-danger:hover {
@@ -193,7 +203,8 @@
 	}
 
 	.health-card {
-		background: white;, padding: 1rem;
+		background: white;
+	padding: 1rem;
 		border-radius: 0.375rem;
 		margin-bottom: 1rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -206,7 +217,8 @@
 	}
 
 	.health-status {
-		display: grid;, gap: 0.75rem;
+		display: grid;
+	gap: 0.75rem;
 	}
 
 	.status-item {
@@ -216,7 +228,8 @@
 	}
 
 	.label {
-		font-weight: 500;, color: #6b7280;
+		font-weight: 500;
+	color: #6b7280;
 	}
 
 	.badge {
@@ -227,15 +240,18 @@
 	}
 
 	.badge-success {
-		background: #d1fae5;, color: #065f46;
+		background: #d1fae5;
+	color: #065f46;
 	}
 
 	.badge-error {
-		background: #fee2e2;, color: #991b1b;
+		background: #fee2e2;
+	color: #991b1b;
 	}
 
 	.badge-warning {
-		background: #fef3c7;, color: #92400e;
+		background: #fef3c7;
+	color: #92400e;
 	}
 
 	.stats-grid {
@@ -246,13 +262,15 @@
 	}
 
 	.stat-card {
-		background: white;, padding: 1rem;
+		background: white;
+	padding: 1rem;
 		border-radius: 0.375rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 
 	.stat-label {
-		font-size: 0.875rem;, color: #6b7280;
+		font-size: 0.875rem;
+	color: #6b7280;
 		margin-bottom: 0.5rem;
 	}
 
@@ -271,13 +289,16 @@
 	}
 
 	.progress-bar {
-		width: 100%;, height: 8px;
+		width: 100%;
+	height: 8px;
 		background: #e5e7eb;
-		border-radius: 9999px;, overflow: hidden;
+		border-radius: 9999px;
+	overflow: hidden;
 	}
 
 	.progress-fill {
-		height: 100%;, background: linear-gradient(90deg, #10b981, #3b82f6);
+		height: 100%;
+	background: linear-gradient(90deg, #10b981, #3b82f6);
 		transition: width 0.3s;
 	}
 
@@ -288,7 +309,8 @@
 	}
 
 	.storage-card {
-		background: white;, padding: 1rem;
+		background: white;
+	padding: 1rem;
 		border-radius: 0.375rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
@@ -296,11 +318,13 @@
 	.storage-card h5 {
 		margin: 0 0 1rem 0;
 		font-size: 0.875rem;
-		font-weight: 600;, color: #374151;
+		font-weight: 600;
+	color: #374151;
 	}
 
 	.storage-stats {
-		display: grid;, gap: 0.5rem;
+		display: grid;
+	gap: 0.5rem;
 	}
 
 	.stat-row {
@@ -310,6 +334,7 @@
 	}
 
 	.text-sm {
-		font-size: 0.875rem;, color: #6b7280;
+		font-size: 0.875rem;
+	color: #6b7280;
 	}
 </style>

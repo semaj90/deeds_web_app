@@ -18,28 +18,34 @@ export class QdrantManager {
         const collectionConfigs = [
             {
                 name: this.collections.documents,
-                vectors: {, content: { size: 1536, distance: 'Cosine' },
-                    summary: {, size: 768, distance: 'Cosine' }
+                vectors: {
+	content: { size: 1536, distance: 'Cosine' },
+	summary: {
+	size: 768, distance: 'Cosine' }
                 }
             },
-            {
+	{
                 name: this.collections.cases,
-                vectors: {, description: { size: 1536, distance: 'Cosine' }
+                vectors: {
+	description: { size: 1536, distance: 'Cosine' }
                 }
             },
-            {
+	{
                 name: this.collections.evidence,
-                vectors: {, content: { size: 1536, distance: 'Cosine' }
+                vectors: {
+	content: { size: 1536, distance: 'Cosine' }
                 }
             },
-            {
+	{
                 name: this.collections.chat_history,
-                vectors: {, message: { size: 768, distance: 'Cosine' }
+                vectors: {
+	message: { size: 768, distance: 'Cosine' }
                 }
             },
-            {
+	{
                 name: this.collections.embeddings_cache,
-                vectors: {, embedding: { size: 1536, distance: 'Cosine' }
+                vectors: {
+	embedding: { size: 1536, distance: 'Cosine' }
                 }
             }
         ];
@@ -56,12 +62,15 @@ export class QdrantManager {
         }
     }
 
-    async hybridSearch(params: {, query: string; queryEmbedding: number[];, collection: keyof typeof this.collections; filters?: any; limit?: number; scoreThreshold?: number }) {
+    async hybridSearch(params: {
+	query: string; queryEmbedding: number[];
+	collection: keyof typeof this.collections; filters?: any; limit?: number; scoreThreshold?: number }) {
         const startTime = Date.now();
         try {
             const searchRequest: any = {
-                vector: {, name: 'content', vector: params.queryEmbedding },
-                limit: params.limit ?? 10,
+                vector: {
+	name: 'content', vector: params.queryEmbedding },
+	limit: params.limit ?? 10,
                 score_threshold: params.scoreThreshold ?? 0.7,
                 with_payload: true,
                 with_vector: false
@@ -82,7 +91,8 @@ export class QdrantManager {
                     score: result.score,
                     payload: result.payload
                 })),
-                metadata: {, query: params.query,
+                metadata: {
+	query: params.query,
                     collection: params.collection,
                     responseTime,
                     total_results: results.length
@@ -94,18 +104,23 @@ export class QdrantManager {
         }
     }
 
-    async searchChatContext(params: {, userEmbedding: number[]; userId: string; sessionId?: string; limit?: number }) {
+    async searchChatContext(params: {
+	userEmbedding: number[]; userId: string; sessionId?: string; limit?: number }) {
         const filters: any = {
-            must: [{, key: 'user_id', match: {, value: params.userId } }]
+            must: [{
+	key: 'user_id', match: {
+	value: params.userId } }]
         };
 
         if (params.sessionId) {
-            filters.must.push({ key: 'session_id', match: {, value: params.sessionId } });
+            filters.must.push({ key: 'session_id', match: {
+	value: params.sessionId } });
         }
 
         const searchRequest: any = {
-            vector: {, name: 'message', vector: params.userEmbedding },
-            limit: params.limit ?? 5,
+            vector: {
+	name: 'message', vector: params.userEmbedding },
+	limit: params.limit ?? 5,
             score_threshold: 0.6,
             filter: filters,
             with_payload: true
@@ -120,7 +135,8 @@ export class QdrantManager {
         }));
     }
 
-    async batchUpsert(params: {, collection: keyof typeof this.collections; points: any[]; batchSize?: number }) {
+    async batchUpsert(params: {
+	collection: keyof typeof this.collections; points: any[]; batchSize?: number }) {
         const batchSize = params.batchSize ?? 100;
         const collectionName = this.collections[params.collection];
         const batches = this.chunkArray(params.points, batchSize);
@@ -138,13 +154,18 @@ export class QdrantManager {
         return { totalUpserted };
     }
 
-    async storeDocument(document: {, id: string; title: string;, content: string; contentEmbedding: number[]; summaryEmbedding?: number[];, metadata: Record<string, unknown> }) {
+    async storeDocument(document: {
+	id: string; title: string;
+	content: string; contentEmbedding: number[]; summaryEmbedding?: number[];
+	metadata: Record<string, unknown> }) {
         const point: any = {
             id: document.id,
-            vector: {, content: document.contentEmbedding,
+            vector: {
+	content: document.contentEmbedding,
                 ...(document.summaryEmbedding && { summary: document.summaryEmbedding })
             },
-            payload: {, title: document.title,
+	payload: {
+	title: document.title,
                 content_preview: document.content.substring(0, 500),
                 document_type: document.metadata.document_type,
                 case_id: document.metadata.case_id,
@@ -157,12 +178,15 @@ export class QdrantManager {
 
     async findRelatedEvidence(evidenceId: string, embedding: number[], limit = 5) {
         const searchRequest: any = {
-            vector: {, name: 'content', vector: embedding },
-            limit: limit + 1, // Exclude self
+            vector: {
+	name: 'content', vector: embedding },
+	limit: limit + 1, // Exclude self
             score_threshold: 0.75,
-            filter: {, must_not: [{ key: 'evidence_id', match: {, value: evidenceId } }]
+            filter: {
+	must_not: [{ key: 'evidence_id', match: {
+	value: evidenceId } }]
             },
-            with_payload: true
+	with_payload: true
         };
 
         const results = await this.client.search(this.collections.evidence, searchRequest);
@@ -181,7 +205,8 @@ export class QdrantManager {
         const point: any = {
             id: key,
             vector: { embedding },
-            payload: {, cache_key: key,
+	payload: {
+	cache_key: key,
                 cached_at: Date.now(),
                 expires_at: Date.now() + 24 * 60 * 60 * 1000
             }
@@ -196,11 +221,15 @@ export class QdrantManager {
     async getCachedEmbedding(key: string) {
         try {
             const results = await this.client.search(this.collections.embeddings_cache, {
-                vector: {, name: 'embedding', vector: new Array(1536).fill(0) },
-                limit: 1,
-                filter: {, must: [
-                        { key: 'cache_key', match: {, value: key } },
-                        { key: 'expires_at', range: {, gt: Date.now() } }
+                vector: {
+	name: 'embedding', vector: new Array(1536).fill(0) },
+	limit: 1,
+                filter: {
+	must: [
+                        { key: 'cache_key', match: {
+	value: key } },
+	{ key: 'expires_at', range: {
+	gt: Date.now() } }
                     ]
                 }
             });
@@ -247,7 +276,8 @@ export class QdrantManager {
         const conditions: any[] = [];
         for (const [key, value] of Object.entries(filters)) {
             if (Array.isArray(value)) {
-                conditions.push({ key, match: {, any: value } });
+                conditions.push({ key, match: {
+	any: value } });
             } else {
                 conditions.push({ key, match: { value } });
             }

@@ -1,17 +1,23 @@
 import type { RequestEvent } from '@sveltejs/kit';
 
 export interface AuthRequest {
-    email: string;, password: string;
+    email: string;
+	password: string;
     ipAddress?: string;
     userAgent?: string;
 }
 
 export interface UserProfile {
-    userId: string;, email: string;
-    firstName: string;, lastName: string;
-    organization?: string;, role: string;
-    createdAt: number;, updatedAt: number;
-    preferences?: {, theme: 'light' | 'dark' | 'auto';
+    userId: string;
+	email: string;
+    firstName: string;
+	lastName: string;
+    organization?: string;
+	role: string;
+    createdAt: number;
+	updatedAt: number;
+    preferences?: {
+	theme: 'light' | 'dark' | 'auto';
         language: string;
     };
 }

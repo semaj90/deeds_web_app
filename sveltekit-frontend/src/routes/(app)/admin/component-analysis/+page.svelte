@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+  let { data }: { data: PageData } = $props();
+
+	// Migrated to $effect
 	import type { PageData } from './$types';
 
-	// TODO: Convert to $props - // TODO: Convert to $props - export let data: PageData;
+	// TODO: Convert to $props - // TODO: Convert to $props - 
 
 	// State
 	let components = $state<ComponentUnit[]>([]);
@@ -27,24 +29,34 @@
 	});
 
 	interface ComponentUnit {
-		unit_id: string;, file_path: string;
-		component_name: string;, unit_kind: 'component' | 'page' | 'layout' | 'endpoint' | 'module';
-		route_id?: string;, feature_tags: string[];
-		uses: string[];, children: string[];
-		imports_count: number;, exports_count: number;
-		error_count: number;, last_modified: string;
-		indexed_at: string;, signature_text: string;
+		unit_id: string;
+	file_path: string;
+		component_name: string;
+	unit_kind: 'component' | 'page' | 'layout' | 'endpoint' | 'module';
+		route_id?: string;
+	feature_tags: string[];
+		uses: string[];
+	children: string[];
+		imports_count: number;
+	exports_count: number;
+		error_count: number;
+	last_modified: string;
+		indexed_at: string;
+	signature_text: string;
 		diff_status: 'clean' | 'modified' | 'new' | 'deleted';
 	}
 
 	interface ActivityItem {
-		id: string;, type: 'fix' | 'index' | 'cluster' | 'embed';
-		message: string;, timestamp: string;
+		id: string;
+	type: 'fix' | 'index' | 'cluster' | 'embed';
+		message: string;
+	timestamp: string;
 		file?: string;
 	}
 
 	interface RelatedFile {
-		path: string;, similarity: number;
+		path: string;
+	similarity: number;
 		shared_imports: string[];
 	}
 
@@ -70,7 +82,7 @@
 			const res = await fetch('http://localhost:8765/retrieve', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query, k: 10, mode: 'hybrid' })
+	body: JSON.stringify({ query, k: 10, mode: 'hybrid' })
 			});
 			if (res.ok) {
 				return await res.json();
@@ -99,7 +111,8 @@
 			const res = await fetch('/api/phase89/fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, file: component.file_path,
+	body: JSON.stringify({
+	file: component.file_path,
 					component_name: component.component_name,
 					ace_context: true
 				})
@@ -109,7 +122,8 @@
 					id: crypto.randomUUID(type: 'fix',
 					message: `Started fix for ${component.component_name}`,
 					timestamp: new Date().toISOString(), file: component.file_path
-				}, ...recentActivity.slice(0, 19)];
+				},
+	...recentActivity.slice(0, 19)];
 			}
 		} catch (e) {
 			console.error('Fix trigger failed:', e);
@@ -173,14 +187,16 @@
 		});
 	});
 
-	onMount(() => {
+	$effect(() => {
+
 		fetchComponents();
 		connectSSE();
-	});
+	
+});
 
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		eventSource?.close();
-	});
+	}
 
 	function formatRelativeTime(dateStr: string): string {
 		const date = new Date(dateStr);
@@ -414,8 +430,10 @@
 
 <style>
 	.container {
-		min-height: 100vh;, background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
-		color: #e0e0e0;, padding: 1.5rem;
+		min-height: 100vh;
+	background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+		color: #e0e0e0;
+	padding: 1.5rem;
 		font-family: 'Inter', system-ui, -apple-system, sans-serif;
 	}
 
@@ -430,7 +448,8 @@
 
 	.header h1 {
 		font-size: 1.75rem;
-		font-weight: 700;, margin: 0;
+		font-weight: 700;
+	margin: 0;
 		background: linear-gradient(135deg, #00d4ff, #7c3aed);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -438,17 +457,20 @@
 	}
 
 	.subtitle {
-		font-size: 0.875rem;, color: #888;
+		font-size: 0.875rem;
+	color: #888;
 	}
 
 	.header-right {
-		display: flex;, gap: 1rem;
+		display: flex;
+	gap: 1rem;
 	}
 
 	.stat-badge {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;, padding: 0.5rem 1rem;
+		border-radius: 12px;
+	padding: 0.5rem 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -469,17 +491,21 @@
 	}
 
 	.stat-label {
-		font-size: 0.75rem;, color: #888;
+		font-size: 0.75rem;
+	color: #888;
 	}
 
 	.toolbar {
-		display: flex;, gap: 1rem;
+		display: flex;
+	gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
 	.search-input {
-		flex: 1;, padding: 0.75rem 1rem;
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		flex: 1;
+	padding: 0.75rem 1rem;
+		border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		font-size: 0.875rem;
@@ -492,7 +518,8 @@
 
 	.filter-select {
 		padding: 0.75rem 1rem;
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		font-size: 0.875rem;
@@ -500,10 +527,12 @@
 
 	.action-btn {
 		padding: 0.75rem 1.5rem;
-		border-radius: 8px;, border: none;
+		border-radius: 8px;
+	border: none;
 		background: linear-gradient(135deg, #7c3aed, #00d4ff);
 		color: #fff;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600;
+	cursor: pointer;
 		transition: transform 0.2s, box-shadow 0.2s;
 	}
 
@@ -515,20 +544,26 @@
 	.main-content {
 		display: grid;
 		grid-template-columns: 350px 1fr 280px;
-		gap: 1.5rem;, height: calc(100vh - 200px);
+		gap: 1.5rem;
+	height: calc(100vh - 200px);
 	}
 
 	.component-list {
-		overflow-y: auto;, display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		overflow-y: auto;
+	display: flex;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.component-card {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;, padding: 1rem;
-		cursor: pointer;, transition: all 0.2s;
-		text-align: left;, color: inherit;
+		border-radius: 12px;
+	padding: 1rem;
+		cursor: pointer;
+	transition: all 0.2s;
+		text-align: left;
+	color: inherit;
 	}
 
 	.component-card:hover {
@@ -537,7 +572,8 @@
 	}
 
 	.component-card.selected {
-		border-color: #00d4ff;, background: rgba(0, 212, 255, 0.1);
+		border-color: #00d4ff;
+	background: rgba(0, 212, 255, 0.1);
 	}
 
 	.component-card.has-errors {
@@ -561,21 +597,25 @@
 	}
 
 	.kind-badge {
-		font-size: 0.625rem;, padding: 0.125rem 0.5rem;
+		font-size: 0.625rem;
+	padding: 0.125rem 0.5rem;
 		background: rgba(124, 58, 237, 0.3);
 		border-radius: 4px;
 		text-transform: uppercase;
 	}
 
 	.card-path {
-		font-size: 0.75rem;, color: #888;
-		margin-bottom: 0.5rem;, overflow: hidden;
+		font-size: 0.75rem;
+	color: #888;
+		margin-bottom: 0.5rem;
+	overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.card-meta {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		flex-wrap: wrap;
 		align-items: center;
 		font-size: 0.75rem;
@@ -595,24 +635,29 @@
 	}
 
 	.tags {
-		display: flex;, gap: 0.25rem;
+		display: flex;
+	gap: 0.25rem;
 		margin-top: 0.5rem;
 	}
 
 	.tag {
-		font-size: 0.625rem;, padding: 0.125rem 0.375rem;
+		font-size: 0.625rem;
+	padding: 0.125rem 0.375rem;
 		background: rgba(0, 212, 255, 0.2);
-		border-radius: 4px;, color: #00d4ff;
+		border-radius: 4px;
+	color: #00d4ff;
 	}
 
 	.tag.large {
-		font-size: 0.75rem;, padding: 0.25rem 0.5rem;
+		font-size: 0.75rem;
+	padding: 0.25rem 0.5rem;
 	}
 
 	.detail-panel {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;, padding: 1.5rem;
+		border-radius: 12px;
+	padding: 1.5rem;
 		overflow-y: auto;
 	}
 
@@ -626,17 +671,21 @@
 	}
 
 	.detail-header h2 {
-		font-size: 1.25rem;, margin: 0;
+		font-size: 1.25rem;
+	margin: 0;
 	}
 
 	.detail-actions {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 	}
 
 	.fix-btn, .edit-btn {
 		padding: 0.5rem 1rem;
-		border-radius: 6px;, border: none;
-		font-weight: 600;, cursor: pointer;
+		border-radius: 6px;
+	border: none;
+		font-weight: 600;
+	cursor: pointer;
 		text-decoration: none;
 		font-size: 0.875rem;
 	}
@@ -656,7 +705,8 @@
 	}
 
 	.detail-section h3 {
-		font-size: 0.875rem;, color: #888;
+		font-size: 0.875rem;
+	color: #888;
 		margin-bottom: 0.75rem;
 	}
 
@@ -683,7 +733,8 @@
 
 	.use-list {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 	}
 
 	.use-badge {
@@ -701,14 +752,16 @@
 
 	.children-list {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 	}
 
 	.child-link {
 		padding: 0.25rem 0.5rem;
 		background: rgba(0, 212, 255, 0.1);
 		border: 1px solid rgba(0, 212, 255, 0.3);
-		border-radius: 4px;, color: #00d4ff;
+		border-radius: 4px;
+	color: #00d4ff;
 		cursor: pointer;
 		font-size: 0.75rem;
 	}
@@ -719,7 +772,8 @@
 
 	.tag-list {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 	}
 
 	.signature-preview {
@@ -736,14 +790,16 @@
 	.no-selection {
 		display: flex;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center;
+	height: 100%;
 		color: #888;
 	}
 
 	.activity-panel {
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;, padding: 1rem;
+		border-radius: 12px;
+	padding: 1rem;
 		overflow-y: auto;
 	}
 
@@ -754,13 +810,16 @@
 
 	.activity-list {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.activity-item {
-		padding: 0.5rem;, background: rgba(255, 255, 255, 0.05);
+		padding: 0.5rem;
+	background: rgba(255, 255, 255, 0.05);
 		border-radius: 6px;
-		font-size: 0.75rem;, display: flex;
+		font-size: 0.75rem;
+	display: flex;
 		gap: 0.5rem;
 		align-items: center;
 	}
@@ -771,7 +830,8 @@
 	.activity-item.embed { border-left: 2px solid #ffc107; }
 
 	.activity-message {
-		flex: 1;, overflow: hidden;
+		flex: 1;
+	overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
@@ -791,15 +851,18 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 200px;
+		justify-content: center;
+	height: 200px;
 		color: #888;
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;
+		width: 40px;
+	height: 40px;
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
-		border-radius: 50%;, animation: spin 1s linear infinite;
+		border-radius: 50%;
+	animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {

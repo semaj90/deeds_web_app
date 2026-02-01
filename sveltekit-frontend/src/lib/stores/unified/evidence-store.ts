@@ -4,10 +4,14 @@ export type EvidenceType = 'document' | 'image' | 'video' | 'audio' | 'email' | 
 export type AnalysisStatus = 'pending' | 'processing' | 'complete' | 'error';
 
 export interface EvidenceFile {
-    id: string;, name: string;
-    type: EvidenceType;, mimeType: string;
-    size: number;, caseId: string;
-    hash: string;, uploadedBy: string;
+    id: string;
+	name: string;
+    type: EvidenceType;
+	mimeType: string;
+    size: number;
+	caseId: string;
+    hash: string;
+	uploadedBy: string;
     uploadedAt: number;
     tags?: string[];
     description?: string;
@@ -15,32 +19,43 @@ export interface EvidenceFile {
 }
 
 export interface ChainOfCustodyEntry {
-    id: string;, evidenceId: string;
-    handledBy: string;, receivedAt: number;
+    id: string;
+	evidenceId: string;
+    handledBy: string;
+	receivedAt: number;
     releasedAt?: number;
-    location?: string;, action: string;
+    location?: string;
+	action: string;
     notes?: string;
 }
 
 export interface AnalysisResult {
-    id: string;, evidenceId: string;
-    analysisType: string;, status: AnalysisStatus;
+    id: string;
+	evidenceId: string;
+    analysisType: string;
+	status: AnalysisStatus;
     result?: unknown;
-    error?: string;, startedAt: number;
+    error?: string;
+	startedAt: number;
     completedAt?: number;
 }
 
 interface EvidenceStoreState {
-    evidence: EvidenceFile[];, filteredEvidence: EvidenceFile[];
+    evidence: EvidenceFile[];
+	filteredEvidence: EvidenceFile[];
     activeCaseId: string | null;
     selectedEvidenceId: string | null;
     uploadProgress: Map<string, number>;
-    uploadingFiles: File[];, isUploading: boolean;
+    uploadingFiles: File[];
+	isUploading: boolean;
     analysisResults: Map<string, AnalysisResult>;
     analysisStatus: Map<string, AnalysisStatus>;
-    isAnalyzing: boolean;, chainOfCustody: Map<string, ChainOfCustodyEntry[]>;
-    typeFilter: EvidenceType[];, searchQuery: string;
-    totalEvidence: number;, isLoading: boolean;
+    isAnalyzing: boolean;
+	chainOfCustody: Map<string, ChainOfCustodyEntry[]>;
+    typeFilter: EvidenceType[];
+	searchQuery: string;
+    totalEvidence: number;
+	isLoading: boolean;
     error: string | null;
     lastUpdated: number;
 }
@@ -93,7 +108,8 @@ function createEvidenceStore() {
                 update(s => ({ ...s, error: errorMsg, isLoading: false }));
             }
         },
-        uploadEvidence: async (file: File, metadata: {, caseId: string; type: EvidenceType; tags?: string[]; description?: string }) => {
+	uploadEvidence: async (file: File, metadata: {
+	caseId: string; type: EvidenceType; tags?: string[]; description?: string }) => {
             const fileId = `ev-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             update(s => ({
                 ...s,
@@ -131,7 +147,7 @@ function createEvidenceStore() {
                 throw new Error(errorMsg);
             }
         },
-        searchEvidence: (query: string) => {
+	searchEvidence: (query: string) => {
             update(s => {
                 const lowerQuery = query.toLowerCase();
                 const filtered = s.evidence.filter(e =>
@@ -142,7 +158,7 @@ function createEvidenceStore() {
                 return { ...s, searchQuery: query, filteredEvidence: filtered };
             });
         },
-        clearFilters: () => {
+	clearFilters: () => {
             update(s => ({ ...s, typeFilter: [], searchQuery: '', filteredEvidence: s.evidence }));
         }
     };

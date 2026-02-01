@@ -17,7 +17,8 @@ type UserRow = {
 };
 
 type SessionRow = {
-	id: string;, userId: string; // Changed from user_id to userId, assumption based on schema
+	id: string;
+	userId: string; // Changed from user_id to userId, assumption based on schema
 	expiresAt: Date; // Changed from expires_at to expiresAt
 };
 
@@ -94,18 +95,19 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
 				attributes: {
 					// Add attributes if your schema supports them and you want to expose them
 				},
-			};
+	};
 
 			const databaseUser: DatabaseUser = {
 				id: user.id,
-				attributes: {, email: user.email ?? null,
+				attributes: {
+	email: user.email ?? null,
 					firstName: user.first_name ?? null,
 					lastName: user.last_name ?? null,
 					role: user.role ?? 'user',
 					isActive: user.is_active ?? true,
 					avatarUrl: user.avatar_url ?? null,
 				},
-			};
+	};
 
 			return [databaseSession, databaseUser];
 		} catch (error) {
@@ -126,7 +128,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
 				userId: s.userId,
 				expiresAt: s.expiresAt ?? new Date(),
 				attributes: {},
-			}));
+	}));
 		} catch (error) {
 			console.error('[AUTH] Error fetching user sessions : ', error);
 			return [];

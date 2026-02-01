@@ -3,8 +3,10 @@ import type { EmbeddingService } from '$lib/server/embeddings';
 import type { OllamaService } from '$lib/server/ollama';
 
 interface UserType {
-	id: string;, email: string;
-	firstName: string;, lastName: string;
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
 	role: string;
 }
 
@@ -16,7 +18,8 @@ export async function handleEmbed(
 	try {
 		const { text } = await request.json();
 		if (!text) {
-			return json({ success: false, error: 'Text is required for embedding' }, { status: 400 });
+			return json({ success: false, error: 'Text is required for embedding' },
+	{ status: 400 });
 		}
 		// Placeholder for embedding service
 		// const embedding = await embeddingService.generateEmbedding(text);
@@ -29,7 +32,8 @@ export async function handleEmbed(
 		});
 	} catch (error) {
 		console.error('Error generating embedding:', error);
-		return json({ success: false, error: 'Failed to generate embedding' }, { status: 500 });
+		return json({ success: false, error: 'Failed to generate embedding' },
+	{ status: 500 });
 	}
 }
 
@@ -43,7 +47,7 @@ export async function handleAnalyze(
 		if (!documentId || !prompt) {
 			return json(
 				{ success: false, error: 'Document ID and prompt are required for analysis' },
-				{ status: 400 }
+	{ status: 400 }
 			);
 		}
 		// Placeholder for Ollama analysis
@@ -51,10 +55,11 @@ export async function handleAnalyze(
 		return json({
 			success: true,
 			data: { documentId, prompt, analysis: 'Placeholder AI analysis result' },
-		});
+	});
 	} catch (error) {
 		console.error('Error performing AI analysis:', error);
-		return json({ success: false, error: 'Failed to perform AI analysis' }, { status: 500 });
+		return json({ success: false, error: 'Failed to perform AI analysis' },
+	{ status: 500 });
 	}
 }
 

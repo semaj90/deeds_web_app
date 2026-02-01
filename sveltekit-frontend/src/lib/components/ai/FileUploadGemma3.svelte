@@ -42,7 +42,7 @@
 
 <div
   class="upload-zone"
-  class: dragging, on:drop={handleDrop}; on:dragover={handleDragOver}; on, dragleave={handleDragLeave}
+  class: dragging, ondrop={handleDrop}; ondragover={handleDragOver}; on, dragleave={handleDragLeave}
   role="button"
   tabindex="0"
   aria-label="File Upload Drop Zone"
@@ -71,8 +71,10 @@
 <style>
   .upload-zone {
     border: 2px dashed #ccc;
-    border-radius: 8px;, padding: 2rem;
-    text-align: center;, transition: all 0.2s;
+    border-radius: 8px;
+	padding: 2rem;
+    text-align: center;
+	transition: all 0.2s;
   }
   .upload-zone.dragging {
     border-color: var(--primary, blue);

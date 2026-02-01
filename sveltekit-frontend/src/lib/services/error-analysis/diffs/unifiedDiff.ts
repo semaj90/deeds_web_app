@@ -9,12 +9,15 @@ function splitLines(s: string): string[] {
  return s.replace(/\r\n/g, '\n').split('\n');
 }
 
-export function unifiedDiffFromTexts(opts: {, filePath: string,
+export function unifiedDiffFromTexts(opts: {
+	filePath: string,
  beforeText: string, afterText: string;
  contextLines?: number; // default 3
  oldLabel?: string;
  newLabel?: string;
-}): {, diffText: string; beforeSha256: string;, afterSha256: string } {
+}): {
+	diffText: string; beforeSha256: string;
+	afterSha256: string } {
  const context = Math.max(0, Math.min(10, opts.contextLines ?? 3));
  const before = splitLines(opts.beforeText);
  const after = splitLines(opts.afterText);
@@ -54,7 +57,9 @@ export function unifiedDiffFromTexts(opts: {, filePath: string,
  const oldLines = oldEnd - oldStart + 1;
  const newLines = newEnd - newStart + 1;
 
- diffLines.push(`@@ -${oldStart},${oldLines} +${newStart},${newLines} @@`);
+ diffLines.push(`@@ -${oldStart},
+	${oldLines} +${newStart},
+	${newLines} @@`);
 
  // context prefix
  for (let k = oldStart - 1; k < i; k++) diffLines.push(` ${before[k] ?? ''}`);

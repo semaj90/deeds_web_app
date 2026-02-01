@@ -1,9 +1,9 @@
 <script lang="ts">
  const statusGroups = [
  { label: 'FastAPI core', status: 'wired' },
- { label: 'YoRHa SvelteKit core', status: 'wired' },
- { label: 'Chat / Upload DSN', status: 'wired' },
- { label: 'Search routes mount', status: 'wired' }
+	{ label: 'YoRHa SvelteKit core', status: 'wired' },
+	{ label: 'Chat / Upload DSN', status: 'wired' },
+	{ label: 'Search routes mount', status: 'wired' }
  ];
 </script>
 

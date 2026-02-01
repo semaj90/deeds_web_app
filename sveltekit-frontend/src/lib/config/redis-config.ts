@@ -60,7 +60,7 @@ export const REDIS_PROD_CONFIG: RedisOptions = {
         console.log(`Redis: Retrying connection in ${delay}ms (attempt ${times})`);
         return delay;
     },
-    // Production connection pooling
+	// Production connection pooling
     lazyConnect: false,
     enableAutoPipelining: true
 };
@@ -90,28 +90,28 @@ export const SERVICE_CONFIGS = {
         db: REDIS_DATABASES.CACHE,
         keyPrefix: 'legal_ai:'
     },
-    // Rate limiting service (redisRateLimit.ts)
+	// Rate limiting service (redisRateLimit.ts)
     RATE_LIMIT: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.RATE_LIMITING,
         keyPrefix: 'rate:',
         maxRetriesPerRequest: 1, // Fast fail for rate limiting
     },
-    // Loki.js integration (loki-redis-integration.ts)
+	// Loki.js integration (loki-redis-integration.ts)
     LOKI_INTEGRATION: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.LOKI_CACHE,
         keyPrefix: 'loki:',
         enableAutoPipelining: true
     },
-    // GPU cache orchestration
+	// GPU cache orchestration
     GPU_ORCHESTRATOR: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.GPU_CACHE,
         keyPrefix: 'gpu:',
         commandTimeout: 15000, // Longer timeout for GPU operations
     },
-    // Worker queues
+	// Worker queues
     WORKER_QUEUE: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.WORKER_QUEUE,
@@ -119,14 +119,14 @@ export const SERVICE_CONFIGS = {
         enableReadyCheck: true,
         maxLoadingTimeout: 10000
     },
-    // Pub/Sub for real-time features
+	// Pub/Sub for real-time features
     PUBSUB: {
         ...REDIS_BASE_CONFIG,
         db: 0, // Pub/Sub uses db 0
         lazyConnect: false, // Immediate connection for pub/sub
         enableOfflineQueue: false
     },
-    // TensorRT-LLM caching
+	// TensorRT-LLM caching
     TENSORRT_LLM: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.TENSORRT_CACHE,
@@ -134,7 +134,7 @@ export const SERVICE_CONFIGS = {
         commandTimeout: 30000, // Longer timeout for model operations
         maxLoadingTimeout: 60000
     },
-    // Gemma embeddings caching
+	// Gemma embeddings caching
     GEMMA_EMBEDDINGS: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.GEMMA_EMBEDDINGS,
@@ -142,7 +142,7 @@ export const SERVICE_CONFIGS = {
         commandTimeout: 20000, // Optimized for embedding operations
         enableAutoPipelining: true
     },
-    // PostgreSQL vector cache
+	// PostgreSQL vector cache
     PGVECTOR_CACHE: {
         ...REDIS_BASE_CONFIG,
         db: REDIS_DATABASES.PGVECTOR_CACHE,
@@ -232,7 +232,8 @@ export const KEY_PATTERNS = {
 // Connection pool configuration
 export const POOL_CONFIG = {
     // Development pool (smaller)
-    development: {, min: 2,
+    development: {
+	min: 2,
         max: 10,
         acquireTimeoutMillis: 30000,
         createTimeoutMillis: 30000,
@@ -241,8 +242,9 @@ export const POOL_CONFIG = {
         createRetryIntervalMillis: 200,
         maxRetries: 3
     },
-    // Production pool (larger)
-    production: {, min: 5,
+	// Production pool (larger)
+    production: {
+	min: 5,
         max: 50,
         acquireTimeoutMillis: 60000,
         createTimeoutMillis: 30000,
@@ -268,7 +270,8 @@ export const MONITORING_CONFIG = {
     slowLogThreshold: 10000,        // 10ms
     enableLatencyMonitoring: true,
     enableMemoryMonitoring: true,
-    alertThresholds: {, memoryUsage: 0.85,     // 85% memory usage alert
+    alertThresholds: {
+	memoryUsage: 0.85,     // 85% memory usage alert
         connectionCount: 0.9,  // 90% max connections alert
         slowQueries: 100,      // Alert if > 100 slow queries/min
         responseTime: 1000,    // Alert if > 1000ms average response time

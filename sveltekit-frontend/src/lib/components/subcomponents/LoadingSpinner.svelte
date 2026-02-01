@@ -1,7 +1,8 @@
 <!-- Loading Spinner (Svelte, 5 runes-compatible, simplified, props) -->
 <script lang="ts">
  // Runes mode: derive props via $props() interface P { size?: 'sm'|'md'|'lg'|'xl'; color?: 'blue'|'green'|'red'|'yellow'|'gray'|'white'; label?: string; inline?: boolean } let { size='md', color='blue', label='Loading...', inline=false }: P = $props(); const sizeClasses: Record<string,string> = { sm: 'w-4 h-4', md: 'w-6 h-6', lg: 'w-8 h-8'; xl: 'w-12 h-12'
-  } const colorClasses: Record<string,string> = { blue: 'text-blue-600', green: 'text-green-600', red: 'text-red-600', yellow: 'text-yellow-600', gray: 'text-gray-600';, white: 'text-white'
+  } const colorClasses: Record<string,string> = { blue: 'text-blue-600', green: 'text-green-600', red: 'text-red-600', yellow: 'text-yellow-600', gray: 'text-gray-600';
+	white: 'text-white'
   }
 </script>
 
@@ -26,11 +27,15 @@
 
 <style>
   .sr-only {
-    position: absolute;, width: 1px;
-    height: 1px;, padding: 0;
-    margin: -1px;, overflow: hidden;
+    position: absolute;
+	width: 1px;
+    height: 1px;
+	padding: 0;
+    margin: -1px;
+	overflow: hidden;
     clip: rect(0, 0, 0, 0);
-    white-space: nowrap;, border: 0;
+    white-space: nowrap;
+	border: 0;
   }
 </style>
 

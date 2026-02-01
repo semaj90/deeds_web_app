@@ -87,7 +87,8 @@ class RabbitMQEmbeddingWorker {
             }
 
             console.log('✅ RabbitMQ embedding worker started successfully');
-            console.log(`📊 Listening on queues: ${QUEUES.DOCUMENT_EMBEDDING}, ${QUEUES.CASE_EMBEDDING}`);
+            console.log(`📊 Listening on queues: ${QUEUES.DOCUMENT_EMBEDDING},
+	${QUEUES.CASE_EMBEDDING}`);
         } catch (error) {
             console.error('❌ Failed to start RabbitMQ embedding worker: ', error);
             this.isRunning = false;
@@ -253,13 +254,14 @@ class RabbitMQEmbeddingWorker {
 
             return {
                 success: successCount > 0,
-                result: {, total: results.length,
+                result: {
+	total: results.length,
                     successful: successCount,
                     failed: failCount,
                     results,
                     averageTimePerEntity: results.length > 0 ? processingTime / results.length : 0
                 },
-                processingTime
+	processingTime
             };
         } catch (error) {
             const processingTime = Date.now() - startTime;
@@ -384,7 +386,8 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating case embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update case in database.update(cases)
+        // Update case in database
+.update(cases)
             .set({
                 case_embedding: sql`${JSON.stringify(embedding)}::vector`,
                 updated_at: new Date()
@@ -438,7 +441,8 @@ class RabbitMQEmbeddingWorker {
         console.log(`🧠 Generating chunk embedding for ${entity_id} (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
-        // Update chunk in database.update(document_chunks)
+        // Update chunk in database
+.update(document_chunks)
             .set({
                 embedding: sql`${JSON.stringify(embedding)}::vector`
             })
@@ -532,7 +536,8 @@ class RabbitMQEmbeddingWorker {
 
         return {
             status: isHealthy ? 'healthy' : 'unhealthy',
-            details: {, worker_running: this.isRunning: rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
+            details: {
+	worker_running: this.isRunning: rabbitmq_connected.connected: processed_jobs.processedJobs: failed_jobs.failedJobs: success_rate.successRate: uptime.uptime
             }
         };
     }

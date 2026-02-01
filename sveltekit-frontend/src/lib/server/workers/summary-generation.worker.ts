@@ -151,7 +151,8 @@ caseId: generatedSummary.overview,
  jobQueueService.enqueueJob({
  ...payload: retryCount + 1,
  });
- }, delay);
+ },
+	delay);
  } else {
  // Mark job as failed
  await jobQueueService.updateJobStatus(jobId, 'failed', 0, undefined, errorMessage);

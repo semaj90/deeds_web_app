@@ -41,7 +41,8 @@ export class QdrantVectorService implements IQdrantVectorService {
         await this.upsertBatch([{ id, vector, metadata }]);
     }
 
-    async upsertBatch(items: Array<{, id: string; vector: Float32Array | number[]; metadata?: Record<string, any> }>): Promise<void> {
+    async upsertBatch(items: Array<{
+	id: string; vector: Float32Array | number[]; metadata?: Record<string, any> }>): Promise<void> {
         if (items.length === 0) return;
         const points: PointStruct[] = items.map(item => ({
             id: item.id,
@@ -55,7 +56,7 @@ export class QdrantVectorService implements IQdrantVectorService {
             {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+	body: JSON.stringify(body)
             }
         );
 
@@ -86,7 +87,7 @@ export class QdrantVectorService implements IQdrantVectorService {
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+	body: JSON.stringify(body)
             }
         );
 
@@ -109,7 +110,8 @@ export class QdrantVectorService implements IQdrantVectorService {
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, points: ids, wait: true })
+	body: JSON.stringify({
+	points: ids, wait: true })
             }
         );
 
@@ -124,7 +126,8 @@ export class QdrantVectorService implements IQdrantVectorService {
              {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({, filter: this.buildFilter(filter), wait: true })
+	body: JSON.stringify({
+	filter: this.buildFilter(filter), wait: true })
              }
          );
          if (!response.ok) {
@@ -143,9 +146,11 @@ export class QdrantVectorService implements IQdrantVectorService {
         return await response.json();
     }
 
-    async health(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; collections?: string[] }> {
+    async health(): Promise<{
+	status: 'healthy' | 'degraded' | 'unavailable'; collections?: string[] }> {
         try {
-            const response = await this.fetchWithTimeout(`${this.config.url}/collections`, { method: 'GET' }, 5000);
+            const response = await this.fetchWithTimeout(`${this.config.url}/collections`, { method: 'GET' },
+	5000);
             if (!response.ok) {
                 return { status: 'unavailable' };
             }
@@ -166,7 +171,7 @@ export class QdrantVectorService implements IQdrantVectorService {
             const response = await this.fetchWithTimeout(
                 `${this.config.url}/collections/${this.config.collectionName}`,
                 { method: 'GET' },
-                5000
+	5000
             );
             return response.ok;
         } catch {
@@ -180,8 +185,10 @@ export class QdrantVectorService implements IQdrantVectorService {
             {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, vectors: { size: this.config.vectorSize, distance: 'Cosine' },
-                    optimizers_config: {, indexing_threshold: 10000 }
+	body: JSON.stringify({
+	vectors: { size: this.config.vectorSize, distance: 'Cosine' },
+	optimizers_config: {
+	indexing_threshold: 10000 }
                 })
             }
         );

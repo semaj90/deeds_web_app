@@ -7,8 +7,10 @@
 import { getOllamaUrl, generateText } from '$lib/server/config/ollama';
 
 export interface LegalSummary {
-	issue: string;, holding: string;
-	reasoning: string;, citations: string[];
+	issue: string;
+	holding: string;
+	reasoning: string;
+	citations: string[];
 	confidence: number;
 }
 

@@ -31,7 +31,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({, model: EMBEDDING_MODEL,
+	body: JSON.stringify({
+	model: EMBEDDING_MODEL,
                 input: text,
             }),
         });
@@ -58,7 +59,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         // Validate embedding dimension
         if (embedding.length !== EMBEDDING_DIMENSION) {
             console.warn(
-                `[Embedding] Embedding dimension mismatch: expected ${EMBEDDING_DIMENSION}, got ${embedding.length}`
+                `[Embedding] Embedding dimension mismatch: expected ${EMBEDDING_DIMENSION},
+	got ${embedding.length}`
             );
         }
 
@@ -83,7 +85,8 @@ export async function generateEmbeddingsBatch(
     console.log(`[Embedding] Batch generating embeddings for ${texts.length} texts`);
 
     const embeddings: number[][] = new Array(texts.length);
-    const errors: Array<{, index: number; error: any }> = [];
+    const errors: Array<{
+	index: number; error: any }> = [];
 
     // Process texts with concurrency limit
     for (let i = 0; i < texts.length; i += concurrency) {
@@ -162,7 +165,8 @@ export async function storeLawSectionEmbedding(
  * Generate and store embeddings for case chunks
  */
 export async function embedAndStoreCaseChunks(
-    chunks: Array<{, id: string, text: string }>,
+    chunks: Array<{
+	id: string, text: string }>,
     concurrency: number = 5
 ): Promise<void> {
     try {
@@ -187,7 +191,8 @@ export async function embedAndStoreCaseChunks(
  * Generate and store embeddings for law sections
  */
 export async function embedAndStoreLawSections(
-    sections: Array<{, id: string, text: string }>,
+    sections: Array<{
+	id: string, text: string }>,
     concurrency: number = 5
 ): Promise<void> {
     try {
@@ -264,7 +269,8 @@ export async function listOllamaModels(): Promise<string[]> {
         }
 
         const result = (await response.json()) as {
-            models?: Array<{, name: string }>;
+            models?: Array<{
+	name: string }>;
         };
 
         if (!result.models) {

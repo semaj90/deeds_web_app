@@ -6,8 +6,10 @@
 import localStorageFiles from './localStorage-file-fallback.js';
 
 export interface UploadResponse {
-	success: boolean;, fileName: string;
-	size: number;, storageType: 'server' | 'localStorage';
+	success: boolean;
+	fileName: string;
+	size: number;
+	storageType: 'server' | 'localStorage';
 	fallbackUsed: boolean;
 	fileId?: string;
 	url?: string;
@@ -22,21 +24,27 @@ export interface UploadOptions {
 }
 
 export interface LocalFileRecord {
-	id: string;, fileName: string;
-	size: number;, type: string;
+	id: string;
+	fileName: string;
+	size: number;
+	type: string;
 	data: string;
 	caseId?: string;
-	description?: string;, tags: string[];
+	description?: string;
+	tags: string[];
 	uploadedAt: string;
 }
 
 export interface ServerFileDetails {
-	fileId: string;, fileName: string;
-	size: number;, type: string;
+	fileId: string;
+	fileName: string;
+	size: number;
+	type: string;
 	url: string;
 	caseId?: string;
 	description?: string;
-	tags?: string[];, uploadedAt: string;
+	tags?: string[];
+	uploadedAt: string;
 }
 
 export type RetrievedFile = LocalFileRecord | ServerFileDetails;
@@ -48,7 +56,7 @@ class EnhancedFileUpload {
 	async uploadFiles(
 		files: File[],
 		options: UploadOptions = {},
-		progressCallback?: (completed: number, total: number, fileName: string) => void
+	progressCallback?: (completed: number, total: number, fileName: string) => void
 	): Promise<UploadResponse[]> {
 		const results: UploadResponse[] = [];
 		const totalFiles = files.length;
@@ -107,7 +115,8 @@ class EnhancedFileUpload {
 			} catch (localError) {
 				const se = serverError instanceof Error ? serverError.message : String(serverError);
 				const le = localError instanceof Error ? localError.message : String(localError);
-				throw new Error(`Both uploads failed: server=${se}, local=${le}`);
+				throw new Error(`Both uploads failed: server=${se},
+	local=${le}`);
 			}
 		}
 	}

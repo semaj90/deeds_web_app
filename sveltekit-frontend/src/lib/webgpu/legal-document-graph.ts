@@ -155,7 +155,7 @@ export class WebGPULegalDocumentGraph {
       requiredLimits: {
         maxStorageBufferBindingSize: 134217728,
       },
-    });
+	});
 
     this.context = this.canvas.getContext('webgpu') as unknown as GPUCanvasContext;
     if (!this.context) throw new Error('Failed to get WebGPU context');

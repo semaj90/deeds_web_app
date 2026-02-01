@@ -3,8 +3,10 @@
  import Tag from './Tag.svelte';
 
  type TimelineEvent = {
- id: string;, timestamp: Date;
- title: string;, description: string;
+ id: string;
+	timestamp: Date;
+ title: string;
+	description: string;
  type: 'evidence' | 'person' | 'location' | 'action';
  evidenceIds?: string[];
  personIds?: string[];
@@ -25,7 +27,7 @@
  type: 'evidence',
  evidenceIds: ['EV-001'],
  },
- {
+	{
  id: 'T-002',
  timestamp: new Date('2024-12-05T21:15:00'),
  title: 'Badge Access to Server Room',
@@ -33,7 +35,7 @@
  type: 'action',
  evidenceIds: ['EV-003'],
  },
- {
+	{
  id: 'T-003',
  timestamp: new Date('2024-12-05T21:34:00'),
  title: 'Physical Evidence Created',
@@ -41,7 +43,7 @@
  type: 'evidence',
  evidenceIds: ['EV-004'],
  },
- {
+	{
  id: 'T-004',
  timestamp: new Date('2024-12-05T21:45:00'),
  title: 'Witness Observation',
@@ -49,7 +51,7 @@
  type: 'person',
  personIds: ['POI-002'],
  },
- {
+	{
  id: 'T-005',
  timestamp: new Date('2024-12-05T22:10:00'),
  title: 'Suspect Exits Building',

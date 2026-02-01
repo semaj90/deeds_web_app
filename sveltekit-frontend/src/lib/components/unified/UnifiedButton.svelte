@@ -10,7 +10,7 @@
 <script lang="ts">
   // Svelte 5 runes are auto-imported
   import type { Snippet } from 'svelte';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import { spring } from 'svelte/motion';
 
   interface Props {
@@ -94,9 +94,11 @@
     };
   });
 
-  onMount(() => {
+  $effect(() => {
+
     // nothing else required here; $effect handles lifecycle
-  });
+  
+});
 
   function initWebGL() {
     if (!canvas) return;
@@ -300,27 +302,34 @@
 <style>
   /* minimal styling + CSS fallback glow when WebGL not available */
   .unified-button-wrapper {
-    position: relative;, display: inline-block;
+    position: relative;
+	display: inline-block;
   }
   .canvas-layer {
-    position: absolute;, inset: 0;
+    position: absolute;
+	inset: 0;
     pointer-events: none;
     z-index: 0;
   }
   .gl-canvas {
-    width: 100%;, height: 100%;
+    width: 100%;
+	height: 100%;
     display: block;
   }
   .unified-btn {
     position: relative;
-    z-index: 1;, padding: 0.5rem 1rem;
-    border-radius: 0.5rem;, border: 1px solid var(--border, #cbd5e1);
+    z-index: 1;
+	padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+	border: 1px solid var(--border, #cbd5e1);
     background: var(--btn-bg, #0f172a);
     color: var(--btn-text, #fff);
-    cursor: pointer;, overflow: hidden;
+    cursor: pointer;
+	overflow: hidden;
     display: inline-flex;
     align-items: center;
-    justify-content: center;, gap: 0.5rem;
+    justify-content: center;
+	gap: 0.5rem;
   }
   .unified-btn.is-disabled {
     opacity: 0.5;
@@ -345,7 +354,8 @@
   }
   /* GPU animation: performance optimizations */
   canvas {
-    will-change: transform;, transform: translateZ(0);
+    will-change: transform;
+	transform: translateZ(0);
   }
   /* NES-style font rendering */
   .font-mono {

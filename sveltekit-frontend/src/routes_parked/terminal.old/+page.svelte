@@ -1,6 +1,6 @@
 <script lang="ts">
  import TerminalWindow from '$lib/components/terminal/TerminalWindow.svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Query {
  id: string;, query: string;
@@ -13,12 +13,14 @@
  let isLoading = $state(false);
  let error = $state('');
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  // Load case ID from URL params if available
  const params = new URLSearchParams(window.location.search);
  caseId = params.get('caseId') || '';
- })();
+ 
+});();
  });
 
  const handleQuery = async (query: string) => {

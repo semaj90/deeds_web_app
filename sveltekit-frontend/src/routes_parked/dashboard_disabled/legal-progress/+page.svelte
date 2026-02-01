@@ -14,19 +14,21 @@ https, //svelte.dev/e/js_parse_error -->
  import { GrpcStatusAdapter } from '$lib/stores/dashboard/GrpcStatusAdapter';
  import type { ProcessingEvent } from '$lib/stores/dashboard/SSEStatusStore';
  import { connectionStatus, isConnected, sseStatusStore } from '$lib/stores/dashboard/SSEStatusStore';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
 
  let connectionStatusText = 'Disconnected';
  let isConnectedValue = false;
  let showLoadingState = true;
  let errorMessage: string | null = null;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  // Subscribe to connection status
  const unsubscribeStatus = connectionStatus.subscribe((value) => {
  connectionStatusText = value;
- })();
+ 
+});();
  });
 
  const unsubscribeConnected = isConnected.subscribe((value) => {
@@ -81,9 +83,9 @@ https, //svelte.dev/e/js_parse_error -->
  };
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  sseStatusStore.disconnect();
- });
+ }
 </script>
 
 <svelte:head>

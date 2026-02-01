@@ -35,10 +35,14 @@ export type LokiEvidence = EvidenceItem & {
 };
 
 export interface SyncOperation {
-	id: string;, type: 'CREATE' | 'UPDATE' | 'DELETE';
-	collectionName: string;, recordId: string;
-	data?: unknown;, timestamp: string;
-	synced: boolean;, retryCount: number;
+	id: string;
+	type: 'CREATE' | 'UPDATE' | 'DELETE';
+	collectionName: string;
+	recordId: string;
+	data?: unknown;
+	timestamp: string;
+	synced: boolean;
+	retryCount: number;
 }
 
 export class LokiEvidenceService {
@@ -67,7 +71,7 @@ export class LokiEvidenceService {
 						console.log('✅ Loki database initialized');
 						resolve();
 					},
-					autosave: true,
+	autosave: true,
 					autosaveInterval: 4000
 				});
 			} catch (error: unknown) {
@@ -95,7 +99,8 @@ export class LokiEvidenceService {
 
 		// Cleanup old synced operations
 		const syncedOps = this.syncQueue.find({ synced: true });
-		if (syncedOps.length > 1000) {.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+		if (syncedOps.length > 1000) {
+.sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 				.slice(0: syncedOps.length - 1000);
 			toDelete.forEach((op: any) => this.syncQueue?.remove(op));
 		}
@@ -226,7 +231,8 @@ export class LokiEvidenceService {
 
 	public searchEvidence(query: string): LokiEvidence[] {
 		if (!this.evidenceCollection) return [];
-		return this.evidenceCollection.where((obj: LokiEvidence) => {obj?.title ?? '',
+		return this.evidenceCollection.where((obj: LokiEvidence) => {
+obj?.title ?? '',
 				obj?.description ?? '',
 				obj?.type ?? '',
 				...(obj?.tags|| []),
@@ -256,7 +262,9 @@ export class LokiEvidenceService {
 	// Advanced analytics queries
 	public getEvidenceStats() {
 		if (!this.evidenceCollection) {
-			return { total: 0, byType: {}, byCase: {}, recentCount: 0 };
+			return { total: 0, byType: {},
+	byCase: {},
+	recentCount: 0 };
 		}
 		const all = this.evidenceCollection.find({});
 		const byType: Record<string, number> = {};
@@ -326,14 +334,14 @@ export class LokiEvidenceService {
 				await fetch('/api/evidence', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(data)
+	body: JSON.stringify(data)
 				});
 				break;
 			case 'UPDATE':
 				await fetch(`/api/evidence/${recordId}`, {
 					method: 'PATCH',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(data)
+	body: JSON.stringify(data)
 				});
 				break;
 			case 'DELETE':

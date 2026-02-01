@@ -180,13 +180,15 @@ declare module '$lib/utils/webgpu-array-utils' {
 }
 declare module './webgpu-rag-service' {
  export interface GPUSearchMetrics {
- searchTime: number;, resultCount: number;
+ searchTime: number;
+	resultCount: number;
  }
 }
 // Also provide a $lib alias for the same service (covers different import forms)
 declare module '$lib/services/webgpu-rag-service' {
  export interface GPUSearchMetrics {
- searchTime: number;, resultCount: number;
+ searchTime: number;
+	resultCount: number;
  }
 }
 export {};

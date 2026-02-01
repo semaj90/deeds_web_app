@@ -1,6 +1,6 @@
 <!-- Dynamic Demo Page - Showcase: Individual, Demos -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import { page } from '$app/stores';
 	import type { SvelteComponent } from 'svelte';
 

@@ -1,15 +1,20 @@
 // types/progress.ts
 
 export type ProgressMsg =
-    | { type: 'upload-progress';, fileId: string; progress: number }
+    | { type: 'upload-progress';
+	fileId: string; progress: number }
     | {
-          type: 'processing-step';, fileId: string;
+          type: 'processing-step';
+	fileId: string;
           step: 'ocr' | 'embedding' | 'rag' | 'analysis' | string;
           stepProgress?: number;
           fragment?: unknown;
       }
-    | { type: 'processing-complete';, fileId: string; finalResult?: unknown }
-    | { type: 'error';, fileId: string; error: {, message: string; code?: string; meta?: unknown } };
+    | { type: 'processing-complete';
+	fileId: string; finalResult?: unknown }
+    | { type: 'error';
+	fileId: string; error: {
+	message: string; code?: string; meta?: unknown } };
 
 export interface EvidenceProcessRequest {
     evidenceId: string;
@@ -18,8 +23,10 @@ export interface EvidenceProcessRequest {
 }
 
 export interface EvidenceProcessSession {
-    id: string;, evidence_id: string;
-    requested_by: string;, steps: string;
+    id: string;
+	evidence_id: string;
+    requested_by: string;
+	steps: string;
     status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
     created_at: Date;
     started_at?: Date;
@@ -28,18 +35,21 @@ export interface EvidenceProcessSession {
 }
 
 export interface OcrResult {
-    text: string;, confidence: number;
+    text: string;
+	confidence: number;
     metadata?: unknown;
 }
 
 export interface EmbeddingResult {
-    model: string;, dim: number;
+    model: string;
+	dim: number;
     vector: number[];
     metadata?: unknown;
 }
 
 export interface RagResult {
-    summary: string;, snippets: string[];
+    summary: string;
+	snippets: string[];
     relevantDocs: RelevantDoc[];
 }
 

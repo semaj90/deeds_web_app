@@ -1,6 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import { Button } from '$lib/components/ui/button';
   import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
@@ -8,9 +8,13 @@
 
   // Types
   interface GraphVisualizationResult {
-    id: string;, url: string;
-    algorithm: string;, timestamp: number;
-    metrics: {, nodes: number; edges: number;, density: number };
+    id: string;
+	url: string;
+    algorithm: string;
+	timestamp: number;
+    metrics: {
+	nodes: number; edges: number;
+	density: number };
   }
 
   // Stores
@@ -33,7 +37,8 @@
     // Simulation
     setTimeout(() => {
       isGenerating.set(false);
-    }, 2000);
+    },
+	2000);
   }
 </script>
 

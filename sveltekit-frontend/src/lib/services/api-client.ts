@@ -12,84 +12,119 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  metadata?: {, timestamp: string;
+  metadata?: {
+	timestamp: string;
     requestId: string;
     duration?: number;
   };
 }
 
 export interface PaginatedResponse<T> {
-  items: T[];, total: number;
-  page: number;, pageSize: number;
+  items: T[];
+	total: number;
+  page: number;
+	pageSize: number;
   hasMore: boolean;
 }
 
 // Entity Types
 export interface Case {
-  id: string;, title: string;
-  description: string;, status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
+  id: string;
+	title: string;
+  description: string;
+	status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
   priority: 'low' | 'medium' | 'high' | 'critical';
-  createdAt: string;, updatedAt: string;
-  assignedTo?: string;, tags: string[];
-  evidenceCount: number;, poiCount: number;
+  createdAt: string;
+	updatedAt: string;
+  assignedTo?: string;
+	tags: string[];
+  evidenceCount: number;
+	poiCount: number;
 }
 
 export interface CaseStats {
-  total: number;, open: number;
-  investigating: number;, pending: number;
-  closed: number;, critical: number;
-  high: number;, medium: number;
+  total: number;
+	open: number;
+  investigating: number;
+	pending: number;
+  closed: number;
+	critical: number;
+  high: number;
+	medium: number;
   low: number;
 }
 
 export interface Evidence {
-  id: string;, title: string;
-  description: string;, type: 'document' | 'image' | 'video' | 'audio' | 'other';
+  id: string;
+	title: string;
+  description: string;
+	type: 'document' | 'image' | 'video' | 'audio' | 'other';
   status: 'pending' | 'processing' | 'analyzed' | 'archived';
-  fileSize: number;, mimeType: string;
+  fileSize: number;
+	mimeType: string;
   uploadedAt: string;
-  analyzedAt?: string;, tags: string[];
+  analyzedAt?: string;
+	tags: string[];
   metadata: Record<string, any>;
   caseId?: string;
   confidence?: number;
 }
 
 export interface EvidenceStats {
-  total: number;, documents: number;
-  images: number;, videos: number;
-  audio: number;, pending: number;
-  processing: number;, analyzed: number;
+  total: number;
+	documents: number;
+  images: number;
+	videos: number;
+  audio: number;
+	pending: number;
+  processing: number;
+	analyzed: number;
 }
 
 export interface PersonOfInterest {
-  id: string;, name: string;
-  aliases: string[];, description: string;
+  id: string;
+	name: string;
+  aliases: string[];
+	description: string;
   threatLevel: 'low' | 'medium' | 'high' | 'critical';
   status: 'active' | 'inactive' | 'archived';
   createdAt: string;
-  lastSeen?: string;, associatedCases: string[];
-  tags: string[];, metadata: Record<string, any>;
+  lastSeen?: string;
+	associatedCases: string[];
+  tags: string[];
+	metadata: Record<string, any>;
 }
 
 export interface SearchResult {
-  id: string;, title: string;
-  content: string;, type: 'case' | 'evidence' | 'poi' | 'document';
-  relevance: number;, tags: string[];
+  id: string;
+	title: string;
+  content: string;
+	type: 'case' | 'evidence' | 'poi' | 'document';
+  relevance: number;
+	tags: string[];
   metadata: Record<string, any>;
 }
 
 export interface SystemMetrics {
-  cpu: {, usage: number; cores: number; temperature?: number };
-  memory: {, used: number; total: number;, percentage: number };
-  gpu?: {, usage: number; memoryUsed: number;, memoryTotal: number; temperature?: number };
-  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy'; uptime: number;, responseTime: number }>;
+  cpu: {
+	usage: number; cores: number; temperature?: number };
+  memory: {
+	used: number; total: number;
+	percentage: number };
+  gpu?: {
+	usage: number; memoryUsed: number;
+	memoryTotal: number; temperature?: number };
+  services: Record<string, { status: 'healthy' | 'degraded' | 'unhealthy'; uptime: number;
+	responseTime: number }>;
   timestamp: string;
 }
 
 // AI Analysis Types
 export interface AnalysisResult {
-  id: string;, type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
-  confidence: number;, result: any;
+  id: string;
+	type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
+  confidence: number;
+	result: any;
   metadata: Record<string, any>;
   timestamp: string;
 }
@@ -109,7 +144,7 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
-    retryCount = 0
+	retryCount = 0
   ): Promise<ApiResponse<T>> {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`;
     const controller = new AbortController();
@@ -123,7 +158,7 @@ class ApiClient {
           'Content-Type': 'application/json',
           ...options.headers,
         },
-      });
+	});
 
       clearTimeout(timeoutId);
 
@@ -140,7 +175,8 @@ class ApiClient {
       return {
         success: true,
         data: data.data || data, // Handle both wrapped and unwrapped data
-        metadata: {, timestamp: new Date().toISOString(),
+        metadata: {
+	timestamp: new Date().toISOString(),
           requestId: Math.random().toString(36).substring(2, 15)
         }
       };
@@ -156,7 +192,8 @@ class ApiClient {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        metadata: {, timestamp: new Date().toISOString(),
+        metadata: {
+	timestamp: new Date().toISOString(),
           requestId: Math.random().toString(36).substring(2, 15)
         }
       };
@@ -218,7 +255,7 @@ export const evidenceApi = {
     if (!response.ok) throw new Error(`Upload failed: ${response.statusText}`);
     return { success: true, data: await response.json() } as ApiResponse<Evidence>;
   },
-  analyzeEvidence: (id: string) => apiClient.post<AnalysisResult>(`/api/evidence/${id}/analyze`),
+	analyzeEvidence: (id: string) => apiClient.post<AnalysisResult>(`/api/evidence/${id}/analyze`),
   getEvidenceStats: () => apiClient.get<EvidenceStats>('/api/evidence/stats'),
 };
 

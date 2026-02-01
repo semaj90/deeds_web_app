@@ -9,21 +9,28 @@ import { auditService } from './audit.service.js';
 import { sql } from 'drizzle-orm';
 
 export interface CitationCollection {
-	id: string;, user_id: string;
+	id: string;
+	user_id: string;
 	name: string;
-	description?: string;, is_public: boolean;
-	citation_count?: number;, created_at: Date;
+	description?: string;
+	is_public: boolean;
+	citation_count?: number;
+	created_at: Date;
 	updated_at: Date;
 }
 
 export interface CollectionCitation {
-	id: string;, collection_id: string;
-	citation_id: string;, added_at: Date;
+	id: string;
+	collection_id: string;
+	citation_id: string;
+	added_at: Date;
 }
 
 export interface CitationTag {
-	id: string;, citation_id: string;
-	tag: string;, created_at: Date;
+	id: string;
+	citation_id: string;
+	tag: string;
+	created_at: Date;
 }
 
 export interface CreateCollectionRequest {
@@ -56,7 +63,13 @@ class CitationLibraryService {
 
 			await db.execute(sql`
 				INSERT INTO citation_collections (id, user_id, name, description, is_public, created_at, updated_at)
-				VALUES (${collection.id}, ${collection.user_id}, ${collection.name}, ${collection.description ?? null}, ${collection.is_public}, ${collection.created_at}, ${collection.updated_at})
+				VALUES (${collection.id},
+	${collection.user_id},
+	${collection.name},
+	${collection.description ?? null},
+	${collection.is_public},
+	${collection.created_at},
+	${collection.updated_at})
 			`);
 
 			// Log audit event
@@ -65,7 +78,7 @@ class CitationLibraryService {
 				'unknown',
 				'retrieve',
 				{ collection_id: collection.id, action: 'create' },
-				true
+	true
 			);
 
 			return collection;
@@ -153,7 +166,10 @@ class CitationLibraryService {
 
 			await db.execute(sql`
 				INSERT INTO collection_citations (id, collection_id, citation_id, added_at)
-				VALUES (${link.id}, ${link.collection_id}, ${link.citation_id}, ${link.added_at})
+				VALUES (${link.id},
+	${link.collection_id},
+	${link.citation_id},
+	${link.added_at})
 			`);
 
 			// Invalidate cache
@@ -165,7 +181,7 @@ class CitationLibraryService {
 				'unknown',
 				'retrieve',
 				{ collection_id: collectionId, citation_id: citationId, action: 'add' },
-				true
+	true
 			);
 
 			return link;
@@ -197,7 +213,7 @@ class CitationLibraryService {
 				'unknown',
 				'retrieve',
 				{ collection_id: collectionId, citation_id: citationId, action: 'remove' },
-				true
+	true
 			);
 		} catch (error) {
 			console.error('Error removing citation from collection:', error);
@@ -219,7 +235,10 @@ class CitationLibraryService {
 
 			await db.execute(sql`
 				INSERT INTO citation_tags (id, citation_id, tag, created_at)
-				VALUES (${citationTag.id}, ${citationTag.citation_id}, ${citationTag.tag}, ${citationTag.created_at})
+				VALUES (${citationTag.id},
+	${citationTag.citation_id},
+	${citationTag.tag},
+	${citationTag.created_at})
 			`);
 
 			// Log audit event
@@ -228,7 +247,7 @@ class CitationLibraryService {
 				'unknown',
 				'retrieve',
 				{ citation_id: citationId, tag, action: 'add_tag' },
-				true
+	true
 			);
 
 			return citationTag;
@@ -253,7 +272,7 @@ class CitationLibraryService {
 				'unknown',
 				'retrieve',
 				{ citation_id: citationId, tag, action: 'remove_tag' },
-				true
+	true
 			);
 		} catch (error) {
 			console.error('Error removing tag:', error);
@@ -300,7 +319,8 @@ class CitationLibraryService {
 	/**
 	 * Get popular tags
 	 */
-	async getPopularTags(limit: number = 20): Promise<{, tag: string; count: number }[]> {
+	async getPopularTags(limit: number = 20): Promise<{
+	tag: string; count: number }[]> {
 		try {
 			const tags = await db.execute(sql`
 				SELECT tag, COUNT(*) as count
@@ -310,7 +330,8 @@ class CitationLibraryService {
 				LIMIT ${limit}
 			`);
 
-			return tags as unknown as { tag: string;, count: number }[];
+			return tags as unknown as { tag: string;
+	count: number }[];
 		} catch (error) {
 			console.error('Error getting popular tags:', error);
 			return [];

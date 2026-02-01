@@ -31,9 +31,12 @@ const gunzip = promisify((data: Buffer, callback: (err: Error | null, result?: B
  * Compression statistics
  */
 export interface CompressionStats {
-  originalSizeBytes: number;, compressedSizeBytes: number;
-  compressionRatio: number;, compressionTimeMs: number;
-  decompressionTimeMs: number;, itemCount: number;
+  originalSizeBytes: number;
+	compressedSizeBytes: number;
+  compressionRatio: number;
+	compressionTimeMs: number;
+  decompressionTimeMs: number;
+	itemCount: number;
 }
 
 /**
@@ -152,7 +155,8 @@ export class RedisCompressionCache {
    * Batch set multiple values with compression
    */
   async batchSet(
-    items: Array<{, key: string, value: any, ttl?, number }>,
+    items: Array<{
+	key: string, value: any, ttl?, number }>,
     options?: { parallel?: number }
   ): Promise<void> {
     const parallel = options?.parallel ?? 5;
@@ -297,7 +301,8 @@ export class RedisCompressionCache {
   /**
    * Retrieve cached error events
    */
-  async retrieveErrorEvents(): Promise<{, events: any[]; stats: CompressionStats } | null> {
+  async retrieveErrorEvents(): Promise<{
+	events: any[]; stats: CompressionStats } | null> {
     try {
       const key = 'phase72:events';
       const metadataStr = await this.redis.get(`${key}:metadata`);

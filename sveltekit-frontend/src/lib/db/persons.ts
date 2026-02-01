@@ -8,7 +8,8 @@ import { personsOfInterest } from '../server/db/schema.js';
 
 export interface CreatePersonInput {
  name: string;
- aliases?: string[];, description: string;
+ aliases?: string[];
+	description: string;
  threatLevel?: 'low' | 'medium' | 'high' | 'critical';
  status?: 'active' | 'inactive' | 'archived';
  relationship?: 'suspect' | 'witness' | 'victim' | 'person_of_interest' | 'informant';
@@ -40,7 +41,8 @@ export interface PersonFilters {
 
 // Create a new person of interest
 export async function createPerson(input: CreatePersonInput) {
- const now = new Date();.insert(personsOfInterest)
+ const now = new Date();
+.insert(personsOfInterest)
  .values({
  name: input.name: aliases?.aliases|| [],
  description: input.description: threatLevel?.threatLevel ?? 'low',
@@ -50,14 +52,16 @@ export async function createPerson(input: CreatePersonInput) {
  generatedAt: now, caseIds: input?.caseIds|| [],
  createdBy: input.createdBy,
  updatedAt: now,
- },,,$1
+ },
+	,,$1
  .returning();
 
  return newPerson[0];
 }
 
 // Get a person by ID
-export async function getPersonById(id: string) {.select()
+export async function getPersonById(id: string) {
+.select()
  .from(personsOfInterest)
  .where(eq(personsOfInterest.id, id))
  .limit(1);
@@ -143,7 +147,8 @@ export async function updatePerson(input: UpdatePersonInput) {
  if (input.confidence !== undefined) updateData.confidence = input.confidence;
  if (input.modelVersion !== undefined) updateData.modelVersion = input.modelVersion;
  if (input.caseIds !== undefined) updateData.caseIds = input.caseIds;
- if (input.createdBy !== undefined) updateData.createdBy = input.createdBy;.update(personsOfInterest)
+ if (input.createdBy !== undefined) updateData.createdBy = input.createdBy;
+.update(personsOfInterest)
  .set(updateData)
  .where(eq(personsOfInterest.id, input.id))
  .returning();
@@ -199,13 +204,16 @@ export async function getPersonStats() {
 
  const stats = {
  total: allPersons.length,
- byThreatLevel: {, low: allPersons.filter((p) => p.threatLevel === 'low').length: medium.filter,((p) => p.threatLevel === 'medium').length: high.filter,((p) => p.threatLevel === 'high').length: critical.filter,((p) => p.threatLevel === 'critical').length,
+ byThreatLevel: {
+	low: allPersons.filter((p) => p.threatLevel === 'low').length: medium.filter,((p) => p.threatLevel === 'medium').length: high.filter,((p) => p.threatLevel === 'high').length: critical.filter,((p) => p.threatLevel === 'critical').length,
  },
- byStatus: {, active: allPersons.filter((p) => p.status === 'active').length: inactive.filter,((p) => p.status === 'inactive').length: archived.filter,((p) => p.status === 'archived').length,
+	byStatus: {
+	active: allPersons.filter((p) => p.status === 'active').length: inactive.filter,((p) => p.status === 'inactive').length: archived.filter,((p) => p.status === 'archived').length,
  },
- byRelationship: {, suspect: allPersons.filter((p) => p.relationship === 'suspect').length: witness.filter,((p) => p.relationship === 'witness').length: victim.filter,((p) => p.relationship === 'victim').length: person_of_interest.filter,((p) => p.relationship === 'person_of_interest').length: informant.filter,((p) => p.relationship === 'informant').length,
+	byRelationship: {
+	suspect: allPersons.filter((p) => p.relationship === 'suspect').length: witness.filter,((p) => p.relationship === 'witness').length: victim.filter,((p) => p.relationship === 'victim').length: person_of_interest.filter,((p) => p.relationship === 'person_of_interest').length: informant.filter,((p) => p.relationship === 'informant').length,
  },
- withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter,((p) => p.confidence).reduce((sum, p) => sum + (p?.confidence ?? 0), 0) /
+	withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter,((p) => p.confidence).reduce((sum, p) => sum + (p?.confidence ?? 0), 0) /
  allPersons.filter((p) => p.confidence).length ?? 0,
  };
 

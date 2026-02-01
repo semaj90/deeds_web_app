@@ -21,7 +21,8 @@
       password: '',
       confirmPassword: '',
       termsAccepted: false
-    }, {
+    },
+	{
       // cast the schema to ZodTypeAny to avoid the adapter's strict generic requirement'
       validators: zod(registerSchema as unknown as ZodTypeAny),
       onUpdate({ form: f }) {

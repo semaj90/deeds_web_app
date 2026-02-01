@@ -3,7 +3,8 @@ import type { User } from '$lib/types';
 import { goto } from '$app/navigation';
 
 export interface LoginCredentials {
- email: string;, password: string;
+ email: string;
+	password: string;
  rememberMe?: boolean;
 }
 
@@ -13,13 +14,18 @@ export interface RegisterData extends LoginCredentials {
 }
 
 export interface AuthUser {
- id: string;, email: string;, name: string;, role: string;
+ id: string;
+	email: string;
+	name: string;
+	role: string;
  preferences?: Record<string, unknown>;
 }
 
 export interface AuthResponse {
- user: AuthUser;, token: string;
- refreshToken?: string;, expiresAt: string;
+ user: AuthUser;
+	token: string;
+ refreshToken?: string;
+	expiresAt: string;
 }
 
 // JWT Token Management
@@ -82,7 +88,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(credentials),
+	body: JSON.stringify(credentials),
  });
 
  if (!response.ok) {
@@ -116,8 +122,9 @@ export async function logout(): Promise<void> {
  // Notify server of logout
  await fetch('/api/auth/logout', {
  method: 'POST',
- headers: {, Authorization: `Bearer ${token}` },
- });
+ headers: {
+	Authorization: `Bearer ${token}` },
+	});
  }
 
  // Clear local storage
@@ -142,7 +149,7 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
  const response = await fetch('/api/auth/register', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(data),
+	body: JSON.stringify(data),
  });
 
  if (!response.ok) {
@@ -191,7 +198,7 @@ export async function refreshTokenIfNeeded(): Promise<boolean> {
  const response = await fetch('/api/auth/refresh', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ refreshToken }),
+	body: JSON.stringify({ refreshToken }),
  });
 
  if (!response.ok) {

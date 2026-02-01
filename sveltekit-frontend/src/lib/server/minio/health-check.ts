@@ -8,12 +8,15 @@ import { env } from '$lib/env';
 import { Client } from 'minio';
 
 export interface MinioHealthResult {
-	healthy: boolean;, timestamp: string;
-	connection: {, connected: boolean;
+	healthy: boolean;
+	timestamp: string;
+	connection: {
+	connected: boolean;
 		endpoint?: string;
 		error?: string;
 	};
-	buckets: {, evidence: boolean;
+	buckets: {
+	evidence: boolean;
 		chatImages: boolean;
 	};
 	latency?: number;
@@ -50,9 +53,11 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 	const result: MinioHealthResult = {
 		healthy: false,
 		timestamp: new Date().toISOString(),
-		connection: {, connected: false
+		connection: {
+	connected: false
 		},
-		buckets: {, evidence: false,
+	buckets: {
+	evidence: false,
 			chatImages: false
 		}
 	};
@@ -72,7 +77,8 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 		result.connection.connected = true;
 
 		// Check if required buckets exist
-		const bucketNames = buckets.map((b: {, name: string }) => b.name);
+		const bucketNames = buckets.map((b: {
+	name: string }) => b.name);
 		result.buckets.evidence = bucketNames.includes(EVIDENCE_BUCKET);
 		result.buckets.chatImages = bucketNames.includes(AI_CHAT_IMAGES_BUCKET);
 
@@ -93,7 +99,8 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 /**
  * Verify file upload capability
  */
-export async function verifyUploadCapability(): Promise<{, canUpload: boolean;
+export async function verifyUploadCapability(): Promise<{
+	canUpload: boolean;
 	error?: string;
 }> {
 	try {
@@ -133,7 +140,8 @@ export async function verifyUploadCapability(): Promise<{, canUpload: boolean;
 export async function verifyRetrievalCapability(
 	bucket: string,
 	objectName: string
-): Promise<{, canRetrieve: boolean;
+): Promise<{
+	canRetrieve: boolean;
 	error?: string;
 }> {
 	try {
@@ -158,7 +166,8 @@ export async function verifyRetrievalCapability(
 /**
  * Get MinIO storage status for API endpoints
  */
-export async function getMinioStatus(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable';
+export async function getMinioStatus(): Promise<{
+	status: 'healthy' | 'degraded' | 'unavailable';
 	details: MinioHealthResult;
 }> {
 	const health = await checkMinioHealth();
@@ -182,7 +191,8 @@ export async function safeUploadFile(
 	objectName: string,
 	buffer: Buffer,
 	contentType: string = 'application/octet-stream'
-): Promise<{, success: boolean;
+): Promise<{
+	success: boolean;
 	objectName?: string;
 	error?: string;
 }> {

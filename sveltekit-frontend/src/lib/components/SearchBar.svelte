@@ -14,7 +14,8 @@
  clearTimeout(searchTimeout);
  searchTimeout = setTimeout(() => {
  dispatch('search', value);
- }, 300); // Debounce search by 300ms
+ },
+	300); // Debounce search by 300ms
  }
 
  function handleKeydown(event: KeyboardEvent) {
@@ -35,10 +36,10 @@
  }
 
  // Cleanup timeout on destroy
- import { onDestroy } from 'svelte';
- onDestroy(() => {
+ // Migrated to $effect
+ // TODO: Add as cleanup in $effect: return () => {
  clearTimeout(searchTimeout);
- });
+ }
 </script>
 
 <div class="search-bar">
@@ -71,23 +72,28 @@
  }
 
  .search-input-container {
- position: relative;, display: flex;
+ position: relative;
+	display: flex;
  align-items: center;
  }
 
  .search-icon {
- position: absolute;, left: 1rem;
+ position: absolute;
+	left: 1rem;
  color: #888;
  font-size: 1rem;
  z-index: 1;
  }
 
  .search-input {
- width: 100%;, padding: 0.75rem 1rem 0.75rem 3rem;
+ width: 100%;
+	padding: 0.75rem 1rem 0.75rem 3rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 25px;, color: #e0e0e0;
- font-size: 0.9rem;, transition: all 0.2s ease;
+ border-radius: 25px;
+	color: #e0e0e0;
+ font-size: 0.9rem;
+	transition: all 0.2s ease;
  }
 
  .search-input:focus {
@@ -102,12 +108,16 @@
  }
 
  .clear-btn {
- position: absolute;, right: 1rem;
- background: none;, border: none;
+ position: absolute;
+	right: 1rem;
+ background: none;
+	border: none;
  color: #888;
- font-size: 1rem;, cursor: pointer;
+ font-size: 1rem;
+	cursor: pointer;
  padding: 0.25rem;
- border-radius: 50%;, transition: all 0.2s ease;
+ border-radius: 50%;
+	transition: all 0.2s ease;
  display: flex;
  align-items: center;
  justify-content: center;

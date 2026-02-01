@@ -1,27 +1,31 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Network, Layers, ZoomOut, Maximize2 } from 'lucide-svelte';
 
   // Explicitly typing $props to avoid interface merge issues on single lines
   interface GraphNode {
-    id: string;, label: string;
+    id: string;
+	label: string;
     type: string;
     x?: number;
-    y?: number;, connections: string[];
+    y?: number;
+	connections: string[];
     importance: number;
   }
 
   interface GraphEdge {
-    source: string;, target: string;
+    source: string;
+	target: string;
     value: number;
   }
 
   interface Props {
     caseId: string;
-    graphData?: {, nodes: GraphNode[]; edges: GraphEdge[] };
+    graphData?: {
+	nodes: GraphNode[]; edges: GraphEdge[] };
     enableWebGPU?: boolean;
     maxNodes?: number;
   }
@@ -29,7 +33,7 @@
   let {
     caseId,
     graphData = { nodes: [], edges: [] },
-    enableWebGPU = true,
+	enableWebGPU = true,
     maxNodes = 1000
   }: Props = $props();
 
@@ -42,9 +46,12 @@
   let frameId: number;
 
   const lodConfig = {
-    0: {, maxNodes: 500, label: 'High' },
-    1: {, maxNodes: 200, label: 'Medium' },
-    2: {, maxNodes: 50, label: 'Low' }
+    0: {
+	maxNodes: 500, label: 'High' },
+	1: {
+	maxNodes: 200, label: 'Medium' },
+	2: {
+	maxNodes: 50, label: 'Low' }
   };
 
   $effect(() => {
@@ -148,9 +155,9 @@
     });
   }
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (browser && frameId) cancelAnimationFrame(frameId);
-  });
+  }
 
 </script>
 

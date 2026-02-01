@@ -4,14 +4,19 @@ import Redis from 'ioredis';
 export type LegalDocumentJSON = Record<string, unknown>;
 
 export interface CHRROMPattern {
-	id: string;, patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
+	id: string;
+	patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
 	bankId: number; // 0-7, like NES CHR-ROM banks
 	tileData: Uint8Array; // 8x8 pixel patterns like NES tiles
-	metadata: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+	metadata: {
+	documentType: 'contract' | 'evidence' | 'brief' | 'citation';
 		riskLevel: 'low' | 'medium' | 'high' | 'critical';
-		cacheHits: number;, lastAccessed: number;, compressionRatio: number;
+		cacheHits: number;
+	lastAccessed: number;
+	compressionRatio: number;
 	};
-	renderData?: {, colors: [number, number, number, number][]; // RGBA colors
+	renderData?: {
+	colors: [number, number, number, number][]; // RGBA colors
 		positions: [number, number][]; // Tile positions
 		attributes: number[]; // Sprite attributes
 	};
@@ -20,7 +25,12 @@ export interface CHRROMPattern {
 export interface CHRROMCache {
 	patterns: Map<string, CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
 	hotPatterns: string[]; // Most frequently accessed patterns
-	metrics: {, cacheHits: number;, cacheMisses: number;, totalRequests: number;, averageResponseTime: number;, bankUtilization: number[];
+	metrics: {
+	cacheHits: number;
+	cacheMisses: number;
+	totalRequests: number;
+	averageResponseTime: number;
+	bankUtilization: number[];
 	};
 }
 
@@ -54,13 +64,14 @@ export class CHRROMPatternCache {
 				.fill(null)
 				.map(() => new ArrayBuffer(this.BANK_SIZE)),
 			hotPatterns: [],
-			metrics: {, cacheHits: 0,
+			metrics: {
+	cacheHits: 0,
 				cacheMisses: 0,
 				totalRequests: 0,
 				averageResponseTime: 0,
 				bankUtilization: Array(this.MAX_BANKS).fill(0),
 			},
-		};
+	};
 		this.initializeBanks();
 		this.startMetricsCollection();
 	}
@@ -178,13 +189,14 @@ export class CHRROMPatternCache {
 				patternType: this.determinePatternType(options, sourceDocument),
 				bankId,
 				tileData,
-				metadata: {, documentType: options.documentType,
+				metadata: {
+	documentType: options.documentType,
 					riskLevel: options.riskLevel,
 					cacheHits: 0,
 					lastAccessed: Date.now(),
 					compressionRatio: this.calculateCompressionRatio(tileData),
 				},
-				renderData,
+	renderData,
 			};
 
 			// Store in CHR-ROM bank
@@ -343,7 +355,8 @@ export class CHRROMPatternCache {
 		return pattern; // Simplified for now
 	}
 
-	private generateRenderData(tileData: Uint8Array, options: PatternGenerationOptions): {, colors: [number, number, number, number][]; positions: [number, number][]; attributes: number[] } {
+	private generateRenderData(tileData: Uint8Array, options: PatternGenerationOptions): {
+	colors: [number, number, number, number][]; positions: [number, number][]; attributes: number[] } {
 		// Generate render data for WebGPU visualization
 		const colors: [number, number, number, number][] = [];
 		const positions: [number, number][] = [];
@@ -454,7 +467,8 @@ export class CHRROMPatternCache {
 		// Collect and log metrics every 30 seconds
 		setInterval(() => {
 			this.logMetrics();
-		}, 30000);
+		},
+	30000);
 	}
 
 	private logMetrics(): void {

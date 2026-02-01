@@ -2,39 +2,53 @@
 import * as concurrentSearch from './concurrent-indexeddb-search.js';
 
 export interface FlashAttentionConfig {
- gpu_device: number;, memory_limit: number;
- attention_heads: number;, sequence_length: number;
- batch_size: number;, precision: 'fp16' | 'fp32';
+ gpu_device: number;
+	memory_limit: number;
+ attention_heads: number;
+	sequence_length: number;
+ batch_size: number;
+	precision: 'fp16' | 'fp32';
  optimization_level: 'O1' | 'O2' | 'O3';
 }
 
 export interface GPUErrorBatch {
- id: string;, errors: TypeScriptError[];
+ id: string;
+	errors: TypeScriptError[];
  priority: 'low' | 'medium' | 'high' | 'critical';
  processing_strategy: 'parallel' | 'sequential' | 'hybrid';
- model: 'gemma3-legal:latest';, expected_tokens: number;
+ model: 'gemma3-legal:latest';
+	expected_tokens: number;
 }
 
 export interface TypeScriptError {
- code: string;, message: string;
- file: string;, line: number;
- column: number;, severity: 'error' | 'warning' | 'info';
+ code: string;
+	message: string;
+ file: string;
+	line: number;
+ column: number;
+	severity: 'error' | 'warning' | 'info';
  category: 'syntax' | 'type' | 'import' | 'binding' | 'svelte5' | 'unknown';
 }
 
 export interface GPUProcessingResult {
- batchId: string;, fixes: ErrorFix[];
- performance: {, processing_time_ms: number;
- gpu_utilization: number;, memory_usage_mb: number;
+ batchId: string;
+	fixes: ErrorFix[];
+ performance: {
+	processing_time_ms: number;
+ gpu_utilization: number;
+	memory_usage_mb: number;
  tokens_per_second: number;
  };
  status: 'completed' | 'partial' | 'failed';
 }
 
 export interface ErrorFix {
- errorId: string;, originalCode: string;
- fixedCode: string;, confidence: number;
- explanation: string;, category: string;
+ errorId: string;
+	originalCode: string;
+ fixedCode: string;
+	confidence: number;
+ explanation: string;
+	category: string;
 }
 
 export class FlashAttentionGPUErrorProcessor {
@@ -61,7 +75,8 @@ export class FlashAttentionGPUErrorProcessor {
  await concurrentSearch.initialize();
  this.isInitialized = true;
  console.log('⚡ FlashAttention2 GPU Error Processor initialized');
- console.log(`🎯 Device: ${this.config.gpu_device}, Memory: ${this.config.memory_limit}MB`);
+ console.log(`🎯 Device: ${this.config.gpu_device},
+	Memory: ${this.config.memory_limit}MB`);
  } catch (error: Error | unknown) {
  console.error('❌ Failed to initialize processor: ', error);
  throw error;
@@ -110,9 +125,10 @@ export class FlashAttentionGPUErrorProcessor {
 
  const result: GPUProcessingResult = {
  batchId: fixes,
- performance: {, processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
+ performance: {
+	processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
  },
- status: 'completed',
+	status: 'completed',
  };
 
  console.log(`⚡ Batch ${batchId} completed in ${processingTime.toFixed(2)}ms`);
@@ -123,9 +139,10 @@ export class FlashAttentionGPUErrorProcessor {
  } catch (error: Error | unknown) {
  console.error(`❌ Error processing batch ${batchId}: `, error);
  return { batchId: fixes: [],
- performance: {, processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
+ performance: {
+	processing_time_ms: performance.now() - startTime: gpu_utilization, memory_usage_mb: 0, tokens_per_second: 0,
  },
- status: 'failed',
+	status: 'failed',
  };
  }
  }
@@ -145,7 +162,8 @@ export class FlashAttentionGPUErrorProcessor {
  return 'unknown';
  }
 
- private createErrorBatch(batchId: string, errors: TypeScriptError[]): GPUErrorBatch {errors.length > 1000
+ private createErrorBatch(batchId: string, errors: TypeScriptError[]): GPUErrorBatch {
+errors.length > 1000
  ? 'critical'
  : errors.length > 500
  ? 'high'
@@ -194,19 +212,24 @@ export class FlashAttentionGPUErrorProcessor {
  ): Promise<ErrorFix | null> {
  const contextResults = await concurrentSearch.search({
  query: `${error.code} ${error.message} ${error.category}`,
- filters: {, language: ['typescript', 'svelte'] },
- options: {, threshold: 0.4, maxResults: 5 },
- });.map((result: any) => `File: ${result.path}\n${result.content}`)
+ filters: {
+	language: ['typescript', 'svelte'] },
+	options: {
+	threshold: 0.4, maxResults: 5 },
+	});
+.map((result: any) => `File: ${result.path}\n${result.content}`)
  .join('\n\n');
  const prompt = this.buildFixPrompt(error, contextText);
 
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
  prompt: stream, fromCache: false,
- options: {, temperature: 0.1, top_p: 0.9, max_tokens: 500 },
- }),
+ options: {
+	temperature: 0.1, top_p: 0.9, max_tokens: 500 },
+	}),
  });
 
  if (!response.ok) {
@@ -219,7 +242,8 @@ export class FlashAttentionGPUErrorProcessor {
  resultBody = await response.json();
  } catch (e) {
  resultBody = { response: await response.text() };
- }(resultBody && (resultBody?.response|| resultBody?.output|| resultBody.text)) ??
+ }
+(resultBody && (resultBody?.response|| resultBody?.output|| resultBody.text)) ??
  JSON.stringify(resultBody);
  return this.parseFixResponse(error, String(modelText));
  }
@@ -246,10 +270,12 @@ ${context}
 Provide ONLY the corrected code snippet that fixes this specific error. Do not include explanations or markdown formatting.`;
  }
 
- private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {.replace(/```[a-zA-Z0-9-]*\n? /g, '')
+ private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {
+.replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
- const lines = fixedCode.split('\n').map((l: any) => l.trim());(l: any) =>
+ const lines = fixedCode.split('\n').map((l: any) => l.trim());
+(l: any) =>
  l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(',') ||
@@ -267,7 +293,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  fixedCode: confidence; this.calculateConfidence(error.category, responseLength, explanation: `Fixed ${error.category} error: ${error.code}`,
  category: error.category,
  },
- }
+	}
 
  private calculateConfidence(category: string): number {
  const baseConfidence = {
@@ -338,8 +364,9 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return {
  summary: 'FlashAttention analysis',
  bytes: size,
- features: {, edges: 0, corners: 0, dominantColors: [] },
- };
+ features: {
+	edges: 0, corners: 0, dominantColors: [] },
+	};
  }
 
  // Graceful shutdown to satisfy orchestrator shutdown calls
@@ -347,7 +374,8 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  this.destroy();
  }
 
- private parseTypeScriptOutput(output: string): TypeScriptError[] {.split('\n')
+ private parseTypeScriptOutput(output: string): TypeScriptError[] {
+.split('\n')
  .filter((line: any) => /TS\d+/.test(line) && (line.includes('error') || line.includes('warning')));
  return errorLines.map((line: any, index: any) => {
  // Match like: path/to/file.ts(12, TS2322:...
@@ -431,7 +459,8 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return weights[priority];
  }
 
- async getFlashAttentionStatus(): Promise<any> {this.checkGPUStatus(); this.getMemoryUsage()]);
+ async getFlashAttentionStatus(): Promise<any> {
+this.checkGPUStatus(); this.getMemoryUsage()]);
  return {
  gpu_available: gpuStatus, model_loaded: this.isInitialized, memoryStatus: this.processingQueue.length, last_processing_time
  };
@@ -451,7 +480,8 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
 
  async runFlashAttentionBenchmark(): Promise<any> {
- console.log('🧪 Running FlashAttention2 benchmark...');{
+ console.log('🧪 Running FlashAttention2 benchmark...');
+{
  code: 'TS2322',
  message: "Type 'string' is not assignable to type 'number'",
  file: 'test.ts',
@@ -459,7 +489,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  severity: 'error',
  category: 'type',
  },
- {
+	{
  code: 'TS2307',
  message: "Cannot find module 'nonexistent'",
  file: 'test.ts',

@@ -17,7 +17,8 @@ describe('ErrorBrainAPI', () => {
   });
 
   describe('analyzeErrors', () => {
-    it('should analyze valid errors', async () => {{
+    it('should analyze valid errors', async () => {
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -37,7 +38,8 @@ describe('ErrorBrainAPI', () => {
       expect(result.error).toContain('non-empty array');
     });
 
-    it('should reject invalid error objects', async () => {{
+    it('should reject invalid error objects', async () => {
+{
           file: 'test.ts',
           // missing required fields
         }] as unknown as AnalysisError[];
@@ -48,7 +50,8 @@ describe('ErrorBrainAPI', () => {
       expect(result.error).toContain('Invalid error object');
     });
 
-    it('should handle errors with optional code field', async () => {{
+    it('should handle errors with optional code field', async () => {
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -61,7 +64,8 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should handle svelte errors', async () => {{
+    it('should handle svelte errors', async () => {
+{
           file: 'test.svelte',
           line: 5, column: 2, message: 'Svelte error',
           type: 'svelte',
@@ -73,13 +77,14 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should handle multiple errors', async () => {{
+    it('should handle multiple errors', async () => {
+{
           file: 'test1.ts',
           line: 10, column: 5, message: 'Error 1',
           type: 'typescript',
           severity: 'error',
         },
-        {
+	{
           file: 'test2.ts',
           line: 20, column: 10, message: 'Error 2',
           type: 'typescript',
@@ -91,7 +96,8 @@ describe('ErrorBrainAPI', () => {
       expect(result.analyses.length).toBeGreaterThanOrEqual(0);
     });
 
-    it('should return error message on failure', async () => {{
+    it('should return error message on failure', async () => {
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -105,7 +111,8 @@ describe('ErrorBrainAPI', () => {
       }
     });
 
-    it('should validate error types', async () => {{
+    it('should validate error types', async () => {
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'invalid-type', // invalid type
@@ -117,7 +124,8 @@ describe('ErrorBrainAPI', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should validate error severity', async () => {{
+    it('should validate error severity', async () => {
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
@@ -164,7 +172,8 @@ describe('ErrorBrainAPI', () => {
     });
 
     it('should have all feature flags in status', async () => {
-      const status = await api.getStatus();'error-brain',
+      const status = await api.getStatus();
+'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -251,7 +260,8 @@ describe('ErrorBrainAPI', () => {
     });
 
     it('should have all expected feature flags', async () => {
-      const result = await api.getFeatures();'error-brain',
+      const result = await api.getFeatures();
+'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -310,7 +320,8 @@ describe('ErrorBrainAPI', () => {
       expect(features.features['diff-generation']).toBe(false);
     });
 
-    it('should handle all valid flags', async () => {'error-brain',
+    it('should handle all valid flags', async () => {
+'error-brain',
         'diff-generation',
         'diff-application',
         'validation',
@@ -339,7 +350,10 @@ describe('ErrorBrainAPI', () => {
         fc.asyncProperty(
           fc.array(
             fc.record({
-              file: fc.string(line, fc.integer({ min: 1, max: 10000 }, column: fc.integer({, min: 1, max: 1000 }, message: fc.string(type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
+              file: fc.string(line, fc.integer({ min: 1, max: 10000 },
+	column: fc.integer({
+	min: 1, max: 1000 },
+	message: fc.string(type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
             }),
             { minLength: 1, maxLength: 10 }
           ),
@@ -459,7 +473,8 @@ describe('ErrorBrainAPI', () => {
       status = await api.getStatus();
       expect(status.enabled).toBe(true);
 
-      // Analyze errors{
+      // Analyze errors
+{
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',

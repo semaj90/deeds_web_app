@@ -8,14 +8,16 @@ import { readFile } from 'node:fs/promises';
 import { MAX_PATCH_LINES } from '../config.js';
 import type { PatchCandidate } from '../types.js';
 
-export type GuardResult = { ok: true } | { ok: false;, reason: string; code: string };
+export type GuardResult = { ok: true } | { ok: false;
+	reason: string; code: string };
 
 /**
  * Type guard: check if GuardResult is a failure
  */
 export function isGuardFailure(
  result: GuardResult
-): result is { ok: false;, reason: string; code: string } {
+): result is { ok: false;
+	reason: string; code: string } {
  return result.ok === false;
 }
 
@@ -49,7 +51,8 @@ export async function guardHashMatch(filePath, string, expectedHash, string: Pro
  if (actualHash !== expectedHash) {
  return {
  ok: false,
- reason: `Hash, mismatch: expected ${ expectedHash }, got ${actualHash}`,
+ reason: `Hash, mismatch: expected ${ expectedHash },
+	got ${actualHash}`,
  code: 'HASH_MISMATCH',
  };
  }

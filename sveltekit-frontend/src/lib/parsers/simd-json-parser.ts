@@ -14,10 +14,13 @@ export interface SIMDParseOptions {
 
 export interface ParsedLegalDocument {
     id: string;
-    caseNumber?: string;, documentType: string;
-    content: string;, metadata: { [key: string]: any };
+    caseNumber?: string;
+	documentType: string;
+    content: string;
+	metadata: { [key: string]: any };
     embeddings?: Float32Array;
-    chunks?: TextChunk[];, parseTime: number;
+    chunks?: TextChunk[];
+	parseTime: number;
     size: number;
 }
 
@@ -119,7 +122,7 @@ export class SIMDJSONParser {
             documentType: rawData?.document_type || rawData?.type || "legal_document",
             content: rawData?.content || rawData?.text || "",
             metadata: rawData?.metadata || {},
-            parseTime: 0,
+	parseTime: 0,
             size: 0
         };
 
@@ -188,7 +191,8 @@ export class SIMDJSONParser {
                     text: chunkText,
                     startIndex: chunkStart,
                     endIndex: chunkEnd,
-                    metadata: {, index: chunkIndex,
+                    metadata: {
+	index: chunkIndex,
                         wordCount: chunkText.split(/\s+/).length,
                         charCount: chunkText.length
                     }
@@ -245,7 +249,8 @@ export class SIMDJSONParser {
                 text: chunkText,
                 startIndex: position,
                 endIndex: end,
-                metadata: {, streamChunk: true,
+                metadata: {
+	streamChunk: true,
                     index: chunkIndex
                 }
             });
@@ -349,8 +354,9 @@ export class SIMDJSONParser {
             id: idMatch?.[1] ?? `fallback_${Date.now()}`,
             documentType: typeMatch?.[1] ?? "unknown",
             content: contentMatch?.[1] ?? "",
-            metadata: {, parsedWithFallback: true },
-            parseTime: performance.now() - startTime,
+            metadata: {
+	parsedWithFallback: true },
+	parseTime: performance.now() - startTime,
             size: jsonString.length
         };
     }
@@ -360,11 +366,13 @@ export class SIMDJSONParser {
      */
     getStats() {
         return {
-            bufferSizes: {, text: this.textBuffer.length,
+            bufferSizes: {
+	text: this.textBuffer.length,
                 embeddings: this.embeddingBuffer.length,
                 indices: this.chunkIndices.length
             },
-            configuration: {, batchSize: this.batchSize,
+	configuration: {
+	batchSize: this.batchSize,
                 enableSIMD: this.enableSIMD,
                 memoryLimit: this.memoryLimit,
                 parallelChunks: this.parallelChunks

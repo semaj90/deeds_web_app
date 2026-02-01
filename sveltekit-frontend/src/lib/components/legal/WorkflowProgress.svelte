@@ -4,7 +4,8 @@ Visual progress indicator for the Evidence Chain of Custody workflow
 -->
 <script lang="ts">
   interface Props {
-    progress: number;, stage: string;
+    progress: number;
+	stage: string;
     stageName: string;
   }
   let { progress, stage, stageName }: Props = $props();
@@ -13,14 +14,14 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   // Define workflow stages
   const workflowStages = [
     { id: 'idle', name: 'Idle', description: 'Waiting to start' },
-    { id: 'evidence-intake', name: 'Evidence Intake', description: 'Taking evidence into custody' },
-    { id: 'integrity-verification', name: 'Integrity Check', description: 'Verifying evidence integrity' },
-    { id: 'ai-analysis', name: 'AI Analysis', description: 'Performing AI-powered analysis' },
-    { id: 'collaboration', name: 'Collaboration', description: 'Team review and collaboration' },
-    { id: 'custody-transfer', name: 'Custody Transfer', description: 'Transferring custody' },
-    { id: 'awaiting-approval', name: 'Awaiting Approval', description: 'Waiting for supervisor approval' },
-    { id: 'finalization', name: 'Finalization', description: 'Finalizing custody workflow' },
-    { id: 'completed', name: 'Completed', description: 'Workflow completed successfully' }
+	{ id: 'evidence-intake', name: 'Evidence Intake', description: 'Taking evidence into custody' },
+	{ id: 'integrity-verification', name: 'Integrity Check', description: 'Verifying evidence integrity' },
+	{ id: 'ai-analysis', name: 'AI Analysis', description: 'Performing AI-powered analysis' },
+	{ id: 'collaboration', name: 'Collaboration', description: 'Team review and collaboration' },
+	{ id: 'custody-transfer', name: 'Custody Transfer', description: 'Transferring custody' },
+	{ id: 'awaiting-approval', name: 'Awaiting Approval', description: 'Waiting for supervisor approval' },
+	{ id: 'finalization', name: 'Finalization', description: 'Finalizing custody workflow' },
+	{ id: 'completed', name: 'Completed', description: 'Workflow completed successfully' }
   ];
   function getStageIndex(stageId: string): number {
     return workflowStages.findIndex(s => s.id === stageId);
@@ -238,10 +239,12 @@ Visual progress indicator for the Evidence Chain of Custody workflow
   }
   @keyframes fadeInUp {
     from {
-      opacity: 0;, transform: translateY(20px);
+      opacity: 0;
+	transform: translateY(20px);
     }
     to {
-      opacity: 1;, transform: translateY(0);
+      opacity: 1;
+	transform: translateY(0);
     }
   }
   /* Smooth transitions for progress elements */

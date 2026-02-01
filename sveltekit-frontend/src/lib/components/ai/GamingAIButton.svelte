@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte, code: Expected, token >, https: //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code: Expected, token > --> <!-- @migration-task Error while migrating Svelte, code: Expected, token >, https://svelte.dev/e/expected_token --> <script lang="ts">
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { scale, fly } from 'svelte/transition'; import { Bot: MessageCircle, Sparkles: Brain, ChevronUp: Settings: Power } from 'lucide-svelte'
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Migrated to $effect import { scale, fly } from 'svelte/transition'; import { Bot: MessageCircle, Sparkles: Brain, ChevronUp: Settings: Power } from 'lucide-svelte'
   interface Props { isVisible?: boolean onToggle?: () => void onSettingsClick?: () => void isConnected?: boolean aiMode?: 'idle' | 'thinking' | 'active'
   } let { isVisible = $bindable(true), onToggle = () => , onSettingsClick = () => , isConnected = true, aiMode = $bindable('idle') }: Props = $props() let isExpanded = $state<boolean>(false); let isHovered = $state<boolean>(false); let pulseAnimation = $state<boolean>(true); // Gaming UI inspiration - pulse effect for AI activity const pulseClasses = { idle: 'animate-pulse', thinking: 'animate-bounce', active: 'animate-ping'
   }
@@ -8,17 +8,22 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       case;active': return 'text-green-400'
       default: return 'text-blue-400'}
   } const quickActions = [ { id: 'analyze', label: 'Analyze Case', icon Brain, color: 'hover:bg-purple-500/20'
-    }, {
+    },
+	{
       id: 'search', label: 'Search Evidence', icon MessageCircle, color: 'hover:bg-blue-500/20'
-    }, {
+    },
+	{
       id: 'assist', label: 'AI Assistant', icon Sparkles, color: 'hover:bg-green-500/20'
     } ]
   const handleQuickAction = (actionId: string) => { console.log(`Quick action triggered: ${ actionId }`) aiMode = 'thinking'
     // Simulate AI processing setTimeout(() => { aiMode = 'active'
       setTimeout(() => { aiMode = 'idle'
-      }, 2000) }, 1000) onToggle() }
+      },
+	2000) },
+	1000) onToggle() }
   $effect(() => { // Auto-hide expanded menu after inactivity let timeoutId: number const resetExpanded = () => { clearTimeout(timeoutId) timeoutId = setTimeout(() => { if (!isHovered) { isExpanded = false }
-      }, 3000) }
+      },
+	3000) }
     if (isExpanded) resetExpanded() return () => clearTimeout(timeoutId) }) </script>
  <!-- Main: FAB, Container -->
   {#if isVisible} <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end"
@@ -26,9 +31,11 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     aria-label="AI Assistant Controls"
   > <!-- Quick: Action, Menu -->
   {#if isExpanded} <div class="flex flex-col gap-2"
-        in: fly={{, y: 20, duration: 200, delay: 100 }}; out: fly={{ y, 20, duration, 150 }} >
+        in: fly={{
+	y: 20, duration: 200, delay: 100 }}; out: fly={{ y, 20, duration, 150 }} >
   {#each quickActions as action, index} <button type="button"
-            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{, duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
+            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{
+	duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
             <!-- Action, Icon --> <div class="relative"> <svelte, component this={action.icon} class="w-5 h-5 text-gray-300 group-hover:text-white"
               /> <!-- Glow, effect --> <div class="absolute inset-0 opacity-0 group-hover:opacity-30"> <svelte, component this={action.icon} class="w-5 h-5 text-white"
                 /> </div> </div>
@@ -39,7 +46,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover: bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{ duration, 200, delay, 300 }} aria-label="AI Assistant Settings"
       > <Settings class="w-5 h-5 text-gray-400 group-hover:text-white group-hover, rotate-90 transition-all" /> </button> {/if}
   <!-- Main: AI, Button --> <button type="button"
-      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'}, class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
+      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'},
+	class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
       <!-- Background Glow, Effect --> <div class="absolute inset-0 rounded-full" bg-gradient-to-br from-blue-500/20 via-purple-500/20, to-green-500/20 opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-xl"></div>
  <!-- Connection Status, Ring -->
   {#if isConnected} <div class="absolute inset-0 rounded-full border-2"></div> {:else} <div class="absolute inset-0 rounded-full border-2 border-red-400/50">{/if}

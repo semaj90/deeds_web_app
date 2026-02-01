@@ -1,17 +1,24 @@
 <script lang="ts">
  type StatsType = {
- total: number;, active: number;
- highRisk: number;, aiGenerated: number;
- byPriority: {, low: number;
- medium: number;, high: number;
+ total: number;
+	active: number;
+ highRisk: number;
+	aiGenerated: number;
+ byPriority: {
+	low: number;
+ medium: number;
+	high: number;
  critical: number;
  };
- byStatus: {, active: number;
- inactive: number;, archived: number;
+ byStatus: {
+	active: number;
+ inactive: number;
+	archived: number;
  };
  };
 
- let { stats }: {, stats: StatsType } = $props();
+ let { stats }: {
+	stats: StatsType } = $props();
 
  let showDetails = $state(false);
 
@@ -24,16 +31,16 @@
  // Priority distribution
  let priorityData = $derived([
  { label: 'Critical', count: stats.byPriority.critical, color: '#ff4444' },
- { label: 'High', count: stats.byPriority.high, color: '#ff8844' },
- { label: 'Medium', count: stats.byPriority.medium, color: '#ffdd44' },
- { label: 'Low', count: stats.byPriority.low, color: '#44ff88' }
+	{ label: 'High', count: stats.byPriority.high, color: '#ff8844' },
+	{ label: 'Medium', count: stats.byPriority.medium, color: '#ffdd44' },
+	{ label: 'Low', count: stats.byPriority.low, color: '#44ff88' }
  ]);
 
  // Status distribution
  let statusData = $derived([
  { label: 'Active', count: stats.byStatus.active, color: '#00d4ff' },
- { label: 'Inactive', count: stats.byStatus.inactive, color: '#888888' },
- { label: 'Archived', count: stats.byStatus.archived, color: '#444444' }
+	{ label: 'Inactive', count: stats.byStatus.inactive, color: '#888888' },
+	{ label: 'Archived', count: stats.byStatus.archived, color: '#444444' }
  ]);
 </script>
 
@@ -176,7 +183,8 @@
  .stats-panel {
  background: rgba(26, 26, 46, 0.8);
  border: 1px solid rgba(255, 255, 255, 0.1);
- border-radius: 12px;, padding: 1.5rem;
+ border-radius: 12px;
+	padding: 1.5rem;
  margin-bottom: 2rem;
  }
 
@@ -190,15 +198,18 @@
  .stats-header h3 {
  margin: 0;
  font-size: 1.2rem;
- font-weight: 600;, color: #e0e0e0;
+ font-weight: 600;
+	color: #e0e0e0;
  }
 
  .toggle-details {
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 6px;, color: #b0b0b0;
+ border-radius: 6px;
+	color: #b0b0b0;
  padding: 0.4rem 0.8rem;
- font-size: 0.8rem;, cursor: pointer;
+ font-size: 0.8rem;
+	cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -217,9 +228,11 @@
  .stat-card {
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid rgba(255, 255, 255, 0.1);
- border-radius: 8px;, padding: 1rem;
+ border-radius: 8px;
+	padding: 1rem;
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center;
+	gap: 1rem;
  transition: all 0.2s ease;
  }
 
@@ -249,7 +262,8 @@
  }
 
  .stat-icon {
- font-size: 1.5rem;, opacity: 0.8;
+ font-size: 1.5rem;
+	opacity: 0.8;
  }
 
  .stat-content {
@@ -258,17 +272,20 @@
 
  .stat-value {
  font-size: 1.8rem;
- font-weight: 700;, color: #e0e0e0;
+ font-weight: 700;
+	color: #e0e0e0;
  line-height: 1;
  }
 
  .stat-label {
- font-size: 0.85rem;, color: #b0b0b0;
+ font-size: 0.85rem;
+	color: #b0b0b0;
  margin-top: 0.25rem;
  }
 
  .stat-percent {
- font-size: 0.75rem;, color: #00d4ff;
+ font-size: 0.75rem;
+	color: #00d4ff;
  font-weight: 600;
  margin-top: 0.25rem;
  }
@@ -286,40 +303,48 @@
  .chart-section h4 {
  margin: 0 0 1rem 0;
  font-size: 1rem;
- font-weight: 600;, color: #e0e0e0;
+ font-weight: 600;
+	color: #e0e0e0;
  }
 
  .chart-container {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .chart-bar {
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center;
+	gap: 1rem;
  }
 
  .bar-label {
  min-width: 80px;
- font-size: 0.85rem;, color: #b0b0b0;
+ font-size: 0.85rem;
+	color: #b0b0b0;
  font-weight: 500;
  }
 
  .bar-container {
- flex: 1;, height: 24px;
+ flex: 1;
+	height: 24px;
  background: rgba(255, 255, 255, 0.1);
- border-radius: 12px;, overflow: hidden;
+ border-radius: 12px;
+	overflow: hidden;
  }
 
  .bar-fill {
  height: 100%;
- border-radius: 12px;, transition: width 0.5s ease;
+ border-radius: 12px;
+	transition: width 0.5s ease;
  }
 
  .bar-value {
  min-width: 40px;
  text-align: right;
- font-size: 0.85rem;, color: #e0e0e0;
+ font-size: 0.85rem;
+	color: #e0e0e0;
  font-weight: 600;
  }
 
@@ -330,7 +355,8 @@
  .insights-section h4 {
  margin: 0 0 1rem 0;
  font-size: 1rem;
- font-weight: 600;, color: #e0e0e0;
+ font-weight: 600;
+	color: #e0e0e0;
  }
 
  .insights-grid {
@@ -342,13 +368,16 @@
  .insight-card {
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid rgba(255, 255, 255, 0.1);
- border-radius: 8px;, padding: 1rem;
+ border-radius: 8px;
+	padding: 1rem;
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center;
+	gap: 0.75rem;
  }
 
  .insight-icon {
- font-size: 1.2rem;, opacity: 0.8;
+ font-size: 1.2rem;
+	opacity: 0.8;
  }
 
  .insight-content {
@@ -357,11 +386,13 @@
 
  .insight-value {
  font-size: 1.2rem;
- font-weight: 700;, color: #00d4ff;
+ font-weight: 700;
+	color: #00d4ff;
  }
 
  .insight-label {
- font-size: 0.8rem;, color: #b0b0b0;
+ font-size: 0.8rem;
+	color: #b0b0b0;
  margin-top: 0.25rem;
  }
 

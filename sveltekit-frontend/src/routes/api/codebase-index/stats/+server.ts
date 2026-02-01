@@ -35,11 +35,12 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			console.warn('FastAPI backend not available, falling back to Qdrant:', backendError);
 		}
 
-		// Fallback: Get error cards count and stats directly from Qdrant`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+		// Fallback: Get error cards count and stats directly from Qdrant
+`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, limit: 10000,
+				body: JSON.stringify({ limit: 10000,
 					with_payload: true,
 					with_vector: false
 				})
@@ -47,7 +48,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		);
 
 		let totalErrors = 0;
-		let topErrorCodes: Array<{, code: string; count, number }> = [];
+		let topErrorCodes: Array<{ code: string; count, number }> = [];
 		let surfaceBreakdown: Record<string, number> = {};
 		let techBreakdown: Record<string, number> = {};
 		let lastIndexed: string | null = null;
@@ -59,7 +60,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 			// Calculate error code histogram
 			const codeCount: Record<string, number> = {};
-			points.forEach((p: {, payload: { errorCode?: string, surface?: string[], tech?: string[], timestamp?: string } }) => {
+			points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[], timestamp?: string } }) => {
 				const code = p.payload?.errorCode ?? 'UNKNOWN';
 				codeCount[code] = (codeCount[code] ?? 0) + 1;
 
@@ -82,7 +83,8 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				.sort((a, b) => b.count - a.count);
 		}
 
-		// Get cluster count`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
+		// Get cluster count
+`${QDRANT_URL}/collections/${CLUSTER_COLLECTION}/points/count`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

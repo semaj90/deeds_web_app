@@ -19,7 +19,8 @@ type SearchHit = {
 };
 
 type CollectionsListResponse = {
-  collections?: Array<{, name: string }>;
+  collections?: Array<{
+	name: string }>;
 };
 
 type PayloadIndexBody = {
@@ -30,7 +31,8 @@ type PayloadIndexBody = {
 };
 
 type CreateCollectionBody = {
-  vectors: {, size: number;
+  vectors: {
+	size: number;
     distance?: 'Cosine' | 'Dot' | 'Euclid';
   };
   [k: string]: unknown;
@@ -153,7 +155,7 @@ async function httpCreatePayloadIndex(
       const res = await f(ep, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getApiKeyHeader() },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
       } as unknown as RequestInit);
       if (res.ok) return await res.json();
     } catch {
@@ -203,8 +205,7 @@ const qdrant = {
     }
     return await httpGetCollections();
   },
-
-  async createCollection(collectionName: string, body: CreateCollectionBody): Promise<any> {
+	async createCollection(collectionName: string, body: CreateCollectionBody): Promise<any> {
     const sdk = await tryCreateSdkClient();
     if (sdk) {
       try {
@@ -218,8 +219,7 @@ const qdrant = {
     }
     return await httpCreateCollection(collectionName, body);
   },
-
-  async createPayloadIndex(collectionName: string, body: PayloadIndexBody): Promise<any> {
+	async createPayloadIndex(collectionName: string, body: PayloadIndexBody): Promise<any> {
     const sdk = await tryCreateSdkClient();
     if (sdk) {
       try {
@@ -241,8 +241,7 @@ const qdrant = {
     }
     return await httpCreatePayloadIndex(collectionName, body);
   },
-
-  async search(collectionName: string, body: SearchRequestBody): Promise<SearchHit[]> {
+	async search(collectionName: string, body: SearchRequestBody): Promise<SearchHit[]> {
     const sdk = await tryCreateSdkClient();
     if (sdk) {
       try {
@@ -261,8 +260,7 @@ const qdrant = {
     }
     return await httpSearch(collectionName, body);
   },
-
-  async upsert(collectionName: string, points: Array<Record<string, unknown>>): Promise<any> {
+	async upsert(collectionName: string, points: Array<Record<string, unknown>>): Promise<any> {
     const sdk = await tryCreateSdkClient();
     if (sdk) {
       try {
@@ -281,8 +279,7 @@ const qdrant = {
     }
     return await httpUpsert(collectionName, points);
   },
-
-  async delete(collectionName: string, ids: (string | number)[]): Promise<any> {
+	async delete(collectionName: string, ids: (string | number)[]): Promise<any> {
     const sdk = await tryCreateSdkClient();
     if (sdk) {
       try {
@@ -301,7 +298,7 @@ const qdrant = {
     }
     return await httpDelete(collectionName, ids);
   },
-};
+	};
 
 async function qdrantHealthCheck(): Promise<boolean> {
   try {
@@ -332,7 +329,8 @@ async function waitForQdrantReady(maxRetries = 15, delayMs = 2000): Promise<bool
 
 async function initQdrantIndexes(
   collectionName = process.env?.QDRANT_COLLECTION ?? 'documents'
-): Promise<{, ok: boolean; error?: string }> {
+): Promise<{
+	ok: boolean; error?: string }> {
   try {
     const cols = await qdrant.getCollections();
     const exists = cols?.collections?.some((c: any) => c.name === collectionName);
@@ -340,8 +338,9 @@ async function initQdrantIndexes(
     if (!exists) {
       const vectorSize = Number(process.env.EMBED_DIM ?? '1536');
       await qdrant.createCollection(collectionName, {
-        vectors: {, size: vectorSize, distance: 'Cosine' },
-      });
+        vectors: {
+	size: vectorSize, distance: 'Cosine' },
+	});
       console.log(`✅ Created collection: ${collectionName}`);
     }
 

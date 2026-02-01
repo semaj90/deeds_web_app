@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	// State using Svelte 5 runes
 	let selectedSection = $state('command-center');
@@ -18,10 +18,10 @@
 
 	const sections = [
 		{ id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
-		{ id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
-		{ id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
-		{ id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
-		{ id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }
+	{ id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
+	{ id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
+	{ id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+	{ id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }
 	];
 
 	async function loadCases() {
@@ -83,7 +83,7 @@
 			console.error('Failed to load evidence insights:', err);
 			evidenceInsights = [
 				{ id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
-				{ id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }
+	{ id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }
 			];
 		}
 	}
@@ -103,7 +103,7 @@
 			const response = await fetch('/api/cases', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(newCaseData)
+	body: JSON.stringify(newCaseData)
 			});
 			if (response.ok) {
 				cancelNewCase();
@@ -128,9 +128,11 @@
 		await goto(`/cases/${ caseId }`);
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		Promise.all([loadCases(), loadEvidenceInsights()]);
-	});
+	
+});
 </script>
 
 <svelte:head>

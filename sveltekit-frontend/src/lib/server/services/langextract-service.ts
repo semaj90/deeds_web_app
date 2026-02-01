@@ -4,7 +4,8 @@ const LANGEXTRACT_API_URL = env?.LANGEXTRACT_API_URL ?? 'http://localhost:8000';
 
 /**
  * Section types for legal documents
- */| 'facts'
+ */
+| 'facts'
   | 'issues'
   | 'reasoning'
   | 'holding'
@@ -21,8 +22,10 @@ const LANGEXTRACT_API_URL = env?.LANGEXTRACT_API_URL ?? 'http://localhost:8000';
  */
 export interface LangExtractSection {
   section_type: SectionType;
-  section_subtype?: string;, text: string;
-  start_offset: number;, end_offset: number;
+  section_subtype?: string;
+	text: string;
+  start_offset: number;
+	end_offset: number;
   confidence?: number;
 }
 
@@ -43,7 +46,8 @@ export interface CrimeMetadata {
  * LangExtract API response
  */
 export interface LangExtractOutput {
-  doc_id: string;, sections: LangExtractSection[];
+  doc_id: string;
+	sections: LangExtractSection[];
   metadata: CrimeMetadata;
   language?: string;
   language_confidence?: number;
@@ -59,14 +63,16 @@ export async function extractSectionsFromText(
   documentType: 'statute' | 'case' = 'case'
 ): Promise<LangExtractOutput> {
   try {
-    console.log(`[LangExtract] Extracting sections from document: ${documentId}`);documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
+    console.log(`[LangExtract] Extracting sections from document: ${documentId}`);
+documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
 
     const response = await fetch(`${LANGEXTRACT_API_URL}/extract`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({, text: documentText,
+	body: JSON.stringify({
+	text: documentText,
         doc_id: documentId,
         prompt,
         extract_metadata: true,
@@ -165,14 +171,15 @@ export function detectSectionsHeuristic(
     doc_id: documentId,
     sections,
     metadata: {},
-    extraction_confidence: 0.6,
+	extraction_confidence: 0.6,
   };
 }
 
 /**
  * Validate section types
  */
-export function isValidSectionType(value: string): value is SectionType {'facts',
+export function isValidSectionType(value: string): value is SectionType {
+'facts',
     'issues',
     'reasoning',
     'holding',
@@ -249,23 +256,27 @@ Return the result as a JSON object with sections array.`;
  * Batch extract sections from multiple documents
  */
 export async function extractSectionsBatch(
-  documents: Array<{, id: string; text: string; type?: 'statute' | 'case' }>,
+  documents: Array<{
+	id: string; text: string; type?: 'statute' | 'case' }>,
   concurrency: number = 3
 ): Promise<LangExtractOutput[]> {
   console.log(`[LangExtract] Batch extracting sections from ${documents.length} documents`);
 
   const results: LangExtractOutput[] = [];
-  const errors: Array<{, docId: string; error: string }> = [];
+  const errors: Array<{
+	docId: string; error: string }> = [];
 
   // Process documents with concurrency limit
   for (let i = 0; i < documents.length; i += concurrency) {
-    const batch = documents.slice(i, i + concurrency);extractSectionsFromText(doc.text, doc.id, doc?.type ?? 'case')
+    const batch = documents.slice(i, i + concurrency);
+extractSectionsFromText(doc.text, doc.id, doc?.type ?? 'case')
         .then((result) => {
           results.push(result);
         })
         .catch((error) => {
           console.warn(
-            `[LangExtract] Error extracting document ${doc.id}, using heuristic fallback`
+            `[LangExtract] Error extracting document ${doc.id},
+	using heuristic fallback`
           );
           // Fallback to heuristic detection
           results.push(detectSectionsHeuristic(doc.text, doc.id));

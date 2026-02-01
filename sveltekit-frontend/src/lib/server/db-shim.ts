@@ -14,13 +14,15 @@ export type QueryResult = { rows: QueryResultRow[] };
 
 // Minimal client/pool interfaces to reduce widespread `any` usage when migrating from node-postgres
 export interface ClientLike {
-    query: (textOrConfig: string | { text: string; values?: any[] }, params?: unknown[]) => Promise<QueryResult>;
+    query: (textOrConfig: string | { text: string; values?: any[] },
+	params?: unknown[]) => Promise<QueryResult>;
     release?: () => void;
 }
 
 export interface PoolLike {
     connect: () => Promise<ClientLike>;
-    query: (textOrConfig: string | { text: string; values?: any[] }, params?: unknown[]) => Promise<QueryResult>;
+    query: (textOrConfig: string | { text: string; values?: any[] },
+	params?: unknown[]) => Promise<QueryResult>;
     end?: () => Promise<void>;
 }
 
@@ -34,7 +36,7 @@ const sqlClient = sql as ReturnType<typeof postgres> & SqlWithClose;
 // Shared query normalization logic to DRY up code
 async function runQuery(
     textOrConfig: string | { text: string; values?: any[] },
-    params?: unknown[]
+	params?: unknown[]
 ): Promise<QueryResult> {
     const text = typeof textOrConfig === 'string' ? textOrConfig : textOrConfig.text;
     const values = typeof textOrConfig === 'string' ? params : textOrConfig.values;
@@ -79,7 +81,7 @@ export const poolShim: PoolLike = {
             }
         } as ClientLike;
     },
-    query: runQuery,
+	query: runQuery,
     async end() {
         if (typeof sqlClient.end === 'function') {
             await sqlClient.end!();

@@ -18,11 +18,11 @@
 	// Using a getter pattern to avoid stale closure issues
 	setContext('dialog', {
 		get open() { return open; },
-		setOpen: (value: boolean) => {
+	setOpen: (value: boolean) => {
 			open = value;
 			onOpenChange?.(value);
 		},
-		close: () => {
+	close: () => {
 			open = false;
 			onOpenChange?.(false);
 		}

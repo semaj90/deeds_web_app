@@ -17,7 +17,8 @@ interface RouteDescriptor {
 }
 interface RouteRegistryShape {
  getRoute: (id: string) => RouteDescriptor | undefined;
-}RouteRegistryModule as unknown as {
+}
+RouteRegistryModule as unknown as {
  routeRegistry?: RouteRegistryShape;
  RouteRegistry?: RouteRegistryShape;
  default?: RouteRegistryShape;
@@ -42,21 +43,27 @@ interface RouteRegistryShape {
 
 // Short, correct type definitions (kept local and simple)
 export interface NavigationHistoryEntry {
- path: string;, timestamp: number;
+ path: string;
+	timestamp: number;
  routeId?: string;
  params?: Record<string, string>;
  state?: unknown;
 }
 
 export interface BreadcrumbItem {
- label: string;, path: string;
- routeId?: string;, isActive: boolean;
+ label: string;
+	path: string;
+ routeId?: string;
+	isActive: boolean;
 }
 
 export interface NavigationState {
- currentPath: string;, previousPath: string | null;
- navigationHistory: NavigationHistoryEntry[];, breadcrumbs: BreadcrumbItem[];
- canGoBack: boolean;, canGoForward: boolean;
+ currentPath: string;
+	previousPath: string | null;
+ navigationHistory: NavigationHistoryEntry[];
+	breadcrumbs: BreadcrumbItem[];
+ canGoBack: boolean;
+	canGoForward: boolean;
  isNavigating: boolean;
 }
 
@@ -71,7 +78,8 @@ export interface NavigationOptions {
 }
 
 export interface NavigationGuard {
- name: string;, condition: (to: string), string: string => boolean | Promise<boolean>;
+ name: string;
+	condition: (to: string), string: string => boolean | Promise<boolean>;
  action?: 'prevent' | 'redirect' | 'confirm';
  redirectTo?: string;
  message?: string;
@@ -161,7 +169,7 @@ export class DynamicNavigation {
  /** Navigate to a named route (uses routeRegistry) */
  public async navigateToRoute(
  routeId: string, params: Record<string, string> = {},
- options: NavigationOptions = {}
+	options: NavigationOptions = {}
  ): Promise<void> {
  const route = routeRegistry.getRoute(routeId);
  if (!route) {
@@ -225,7 +233,8 @@ export class DynamicNavigation {
  /** Internal: check all guards for a transition */
  private async checkNavigationGuards(
  to: string, from: string
- ): Promise<{, allowed: boolean; redirectTo?, string }> {
+ ): Promise<{
+	allowed: boolean; redirectTo?, string }> {
  for (const guard of this.guards.values()) {
  try {
  const allowed = await Promise.resolve(guard.condition(to, from));
@@ -253,7 +262,7 @@ export class DynamicNavigation {
  /** Update current path and navigation-related state */
  private updateCurrentPath(
  path: string, params: Record<string, string> = {},
- routeId?: string
+	routeId?: string
  ): void {
  this.state.update((state) => {
  const prev = state.currentPath;
@@ -304,7 +313,8 @@ export class DynamicNavigation {
  let currentPath = '';
  for (let i = 0; i < segments.length; i++) {
  currentPath += `/${segments[i]}`;
- const isActive = i === segments.length - 1;.split('-')
+ const isActive = i === segments.length - 1;
+.split('-')
  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
  .join(' ');
  // attempt to use route metadata for label if available
@@ -432,13 +442,15 @@ export function clearNavigationGuards(): void {
 /** Higher-order helper for route-aware navigation */
 export function createRouteAwareNavigation(routeId: string) {
  return {
- navigate: (params: Record<string, string> = {}, options?: NavigationOptions) =>
+ navigate: (params: Record<string, string> = {},
+	options?: NavigationOptions) =>
  navigateToRoute(routeId, params, options, isActive: derived([currentPath], ([path]) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return false;
  const routePath = route.route ?? route.path ?? '';
  return path === routePath ?? path.startsWith(routePath + '/');
- }, href: derived(navigationState, (_nav) => {
+ },
+	href: derived(navigationState, (_nav) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return '#';
  return route.route ?? route.path ?? '#';

@@ -8,15 +8,22 @@ import type { Citation } from '$lib/types/case-summary';
 import { verificationService } from './verification.service.js';
 
 interface SummaryContext {
-  caseId: string;, charges: string[];
-  evidence: string;, statutes: Array<{ code: string;, jurisdiction: string; title: string }>;
-  caseLaw: Array<{, title: string; summary: string }>;
+  caseId: string;
+	charges: string[];
+  evidence: string;
+	statutes: Array<{ code: string;
+	jurisdiction: string; title: string }>;
+  caseLaw: Array<{
+	title: string; summary: string }>;
 }
 
 interface GeneratedSummary {
-  overview: string;, issueStatement: string;
-  holding: string;, ruleExtraction: string;
-  keyTerms: string[];, citations: Citation[];
+  overview: string;
+	issueStatement: string;
+  holding: string;
+	ruleExtraction: string;
+  keyTerms: string[];
+	citations: Citation[];
 }
 
 export class LLMService {
@@ -135,7 +142,7 @@ Generate a structured summary with the following JSON format:
   "keyTerms": ["term1", "term2", ...],
   "citations": [
     {"code": "PC 273a", "jurisdiction": "CA", "title": "Child Endangerment"},
-    ...
+	...
   ]
 }
 
@@ -150,14 +157,16 @@ Return only valid JSON.`;
       const response = await fetch(`${this.ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: this.model,
+	body: JSON.stringify({
+	model: this.model,
           prompt: prompt,
           stream: false,
-          options: {, temperature: 0.3,
+          options: {
+	temperature: 0.3,
             top_p: 0.9,
             top_k: 40,
           },
-        }),
+	}),
       });
 
       if (!response.ok) {

@@ -8,11 +8,12 @@ export async function parseJSONHTTP(payload: string): Promise<unknown> {
  const response = await fetch(DEFAULT_ACCELERATOR_URL, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: payload,
+	body: payload,
  });
 
  if (!response.ok) {
- const detail = await safeReadText(response);`HTTP accelerator error: ${response.status} ${response.statusText}` +
+ const detail = await safeReadText(response);
+`HTTP accelerator error: ${response.status} ${response.statusText}` +
  (detail ? ` — ${detail}` : '');
  throw new Error(message);
  }

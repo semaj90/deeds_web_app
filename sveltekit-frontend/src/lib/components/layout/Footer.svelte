@@ -19,15 +19,15 @@
 
 	const quickLinks = [
 		{ path: '/help', label: 'Help', icon: '❓' },
-		{ path: '/privacy', label: 'Privacy', icon: '🔒' },
-		{ path: '/terms', label: 'Terms', icon: '📄' },
-		{ path: '/contact', label: 'Contact', icon: '📧' }
+	{ path: '/privacy', label: 'Privacy', icon: '🔒' },
+	{ path: '/terms', label: 'Terms', icon: '📄' },
+	{ path: '/contact', label: 'Contact', icon: '📧' }
 	];
 
 	const socialLinks = [
 		{ href: '#', label: 'GitHub', icon: '🔗' },
-		{ href: '#', label: 'Documentation', icon: '📚' },
-		{ href: '#', label: 'Community', icon: '👥' }
+	{ href: '#', label: 'Documentation', icon: '📚' },
+	{ href: '#', label: 'Community', icon: '👥' }
 	];
 </script>
 
@@ -145,7 +145,8 @@
 
 <style>
 	.app-footer {
-		margin-top: auto;, background: linear-gradient(
+		margin-top: auto;
+	background: linear-gradient(
 			135deg,
 			var(--nier-bg-secondary, #1e293b),
 			var(--nier-bg-tertiary, #0f1419)
@@ -155,7 +156,8 @@
 	}
 
 	.footer-content {
-		max-width: 1200px;, margin: 0 auto;
+		max-width: 1200px;
+	margin: 0 auto;
 		padding: 1rem 0.5rem 0.5rem;
 	}
 
@@ -168,7 +170,8 @@
 
 	.footer-section {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.footer-title {
@@ -188,13 +191,16 @@
 	}
 
 	.footer-description {
-		font-size: 0.5rem;, color: var(--nier-text-secondary, #94a3b8);
-		line-height: 1.3;, margin: 0;
+		font-size: 0.5rem;
+	color: var(--nier-text-secondary, #94a3b8);
+		line-height: 1.3;
+	margin: 0;
 	}
 
 	.gaming-badges {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 	}
 
 	.badge {
@@ -203,7 +209,8 @@
 
 	.footer-nav {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.link-icon {
@@ -217,12 +224,14 @@
 
 	.status-indicators {
 		display: flex;
-		flex-direction: column;, gap: 0.75rem;
+		flex-direction: column;
+	gap: 0.75rem;
 	}
 
 	.status-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 	}
 
 	.status-dot {
@@ -235,12 +244,14 @@
 	}
 
 	.status-label {
-		font-size: 0.5rem;, color: var(--nier-text-secondary, #94a3b8);
+		font-size: 0.5rem;
+	color: var(--nier-text-secondary, #94a3b8);
 	}
 
 	.resource-links {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.resource-link {
@@ -265,7 +276,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-between;
-		align-items: center;, gap: 0.5rem;
+		align-items: center;
+	gap: 0.5rem;
 		padding-top: 0.5rem;
 		border-top: 1px solid var(--n64-secondary, #7ed321);
 	}
@@ -279,7 +291,8 @@
 
 	.tech-stack {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 	}
 
 	.tech-badge {
@@ -290,14 +303,16 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap;
+	gap: 0.5rem;
 		padding: 0.5rem 0;
 		font-size: 0.5rem !important;
 		margin: 0 !important;
 	}
 
 	.minimal-links {
-		display: flex;, gap: 1rem;
+		display: flex;
+	gap: 1rem;
 	}
 
 	.demo-footer {
@@ -317,25 +332,29 @@
 
 	.demo-info {
 		display: flex;
-		flex-direction: column;, gap: 1rem;
+		flex-direction: column;
+	gap: 1rem;
 		align-items: center;
 	}
 
 	.demo-text {
 		font-size: 0.5rem !important;
-		text-align: center;, margin: 0 !important;
+		text-align: center;
+	margin: 0 !important;
 		color: white !important;
 	}
 
 	.demo-actions {
-		display: flex;, gap: 1rem;
+		display: flex;
+	gap: 1rem;
 		flex-wrap: wrap;
 		justify-content: center;
 	}
 
 	@media (max-width: 768px) {
 		.footer-sections {
-			grid-template-columns: 1fr;, gap: 1.5rem;
+			grid-template-columns: 1fr;
+	gap: 1.5rem;
 		}
 
 		.footer-bottom {
@@ -353,7 +372,8 @@
 		}
 
 		.demo-actions {
-			flex-direction: column;, width: 100%;
+			flex-direction: column;
+	width: 100%;
 		}
 	}
 

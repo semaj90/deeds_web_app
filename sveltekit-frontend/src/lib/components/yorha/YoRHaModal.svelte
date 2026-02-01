@@ -27,8 +27,8 @@
     persistent = false,
     type = "default",
     onClose = () => {},
-    onConfirm = () => {},
-    children,
+	onConfirm = () => {},
+	children,
     footer
   }: ModalProps = $props();
 
@@ -72,7 +72,8 @@
   class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
   onclick={handleBackdropClick}
   onkeydown={handleKeydown}
-  transition: fade={{, duration: 200 }}
+  transition: fade={{
+	duration: 200 }}
   role="dialog"
   aria-modal="true"
   tabindex="-1"
@@ -80,7 +81,8 @@
   <div
     bind:this={modalElement}
     class="bg-slate-900 border-2 border-slate-700 shadow-2xl flex flex-col overflow-hidden relative {sizeClasses[size]} {type === 'system' ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(34,211,238,0.1)]' : ''}"
-    transition: scale={{, duration: 300, easing: quintOut, start: 0.95 }}
+    transition: scale={{
+	duration: 300, easing: quintOut, start: 0.95 }}
     tabindex="-1"
   >
     <!-- Header -->
@@ -152,23 +154,29 @@
 {/if}
 <style>
   .yorha-modal-backdrop {
-    position: fixed;, top: 0;
-    left: 0;, right: 0;
+    position: fixed;
+	top: 0;
+    left: 0;
+	right: 0;
     bottom: 0;
-    z-index: 10000;, display: flex;
+    z-index: 10000;
+	display: flex;
     align-items: center;
-    justify-content: center;, background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+	background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(2px);
   }
 
   .yorha-modal {
-    position: relative;, background: var(--yorha-bg-secondary, #1a1a1a);
+    position: relative;
+	background: var(--yorha-bg-secondary, #1a1a1a);
     border: 2px solid var(--yorha-text-muted, #808080);
     font-family: var(--yorha-font-primary, "JetBrains Mono", monospace);
     color: var(--yorha-text-primary, #e0e0e0);
     max-height: calc(100vh - 2rem);
     display: flex;
-    flex-direction: column;, overflow: hidden;
+    flex-direction: column;
+	overflow: hidden;
     box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 20px 80px rgba(0, 0, 0, 0.9);
   }
 
@@ -193,7 +201,8 @@
     padding: 16px 20px;
     display: flex;
     align-items: flex-start;
-    justify-content: space-between;, position: relative;
+    justify-content: space-between;
+	position: relative;
   }
 
   .header-content {
@@ -206,47 +215,57 @@
     font-size: 16px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;, margin: 0 0 4px 0;
+    letter-spacing: 2px;
+	margin: 0 0 4px 0;
   }
 
   .modal-subtitle {
     color: var(--yorha-text-muted, #808080);
-    font-size: 12px;, margin: 0;
+    font-size: 12px;
+	margin: 0;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
   .system-status {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center;
+	gap: 8px;
     margin-right: 16px;
   }
 
   .status-indicator {
-    position: relative;, width: 12px;
+    position: relative;
+	width: 12px;
     height: 12px;
   }
 
   .status-pulse {
-    width: 100%;, height: 100%;
+    width: 100%;
+	height: 100%;
     background: var(--yorha-secondary, #ffd700);
     animation: systemPulse 1.5s infinite;
   }
 
   .status-text {
     font-size: 10px;
-    font-weight: 600;, color: var(--yorha-secondary, #ffd700);
+    font-weight: 600;
+	color: var(--yorha-secondary, #ffd700);
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
   .modal-close {
-    width: 32px;, height: 32px;
-    background: transparent;, border: 2px solid var(--yorha-text-muted, #808080);
+    width: 32px;
+	height: 32px;
+    background: transparent;
+	border: 2px solid var(--yorha-text-muted, #808080);
     color: var(--yorha-text-muted, #808080);
-    cursor: pointer;, display: flex;
+    cursor: pointer;
+	display: flex;
     align-items: center;
-    justify-content: center;, transition: all 0.2s ease;
+    justify-content: center;
+	transition: all 0.2s ease;
     flex-shrink: 0;
   }
 
@@ -264,7 +283,8 @@
 
   /* Content */
   .modal-content {
-    padding: 20px;, flex: 1;
+    padding: 20px;
+	flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--yorha-secondary, #ffd700) var(--yorha-bg-primary, #0a0a0a);
@@ -292,12 +312,14 @@
 
   .modal-actions {
     display: flex;
-    justify-content: flex-end;, gap: 12px;
+    justify-content: flex-end;
+	gap: 12px;
   }
 
   .modal-button {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center;
+	gap: 8px;
     padding: 10px 16px;
     background: var(--yorha-bg-secondary, #1a1a1a);
     border: 2px solid var(--yorha-text-muted, #808080);
@@ -306,7 +328,8 @@
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;, cursor: pointer;
+    letter-spacing: 1px;
+	cursor: pointer;
     transition: all 0.2s ease;
   }
 
@@ -351,8 +374,10 @@
 
   /* Terminal Border Effect */
   .terminal-borders {
-    position: absolute;, inset: 0;
-    pointer-events: none;, overflow: hidden;
+    position: absolute;
+	inset: 0;
+    pointer-events: none;
+	overflow: hidden;
   }
 
   @keyframes systemPulse {
@@ -390,14 +415,16 @@
     .modal-header {
       padding: 12px 16px;
       flex-direction: column;
-      align-items: flex-start;, gap: 8px;
+      align-items: flex-start;
+	gap: 8px;
     }
     .system-status {
       margin-right: 0;
       margin-bottom: 8px;
     }
     .modal-close {
-      position: absolute;, top: 8px;
+      position: absolute;
+	top: 8px;
       right: 8px;
     }
     .modal-content {

@@ -9,7 +9,7 @@ export default {
  // DNS operations (no-ops for browser)
  lookup: noop, resolve: noop, reverse: noop, resolveSrv: noop, resolveTxt: noop, resolveMx: noop
  // Async versions
- promises: {, lookup: noopAsync
+ promises: { lookup: noopAsync
  resolve: noopAsync, reverse: noopAsync, resolveSrv: noopAsync, resolveTxt: noopAsync, resolveMx: noopAsync
  }
 };

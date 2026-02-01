@@ -4,8 +4,10 @@
  */
 
 export interface BitsUITestResult {
- component: string;, status: 'pass' | 'fail' | 'warning';
- message: string;, timestamp: number;
+ component: string;
+	status: 'pass' | 'fail' | 'warning';
+ message: string;
+	timestamp: number;
 }
 
 export class BitsUIIntegrationTester {
@@ -147,7 +149,8 @@ export class BitsUIIntegrationTester {
  } else {
  this.addResult('Performance', 'fail', `Slow render time: ${renderTime.toFixed(2)}ms`);
  }
- }, 10);
+ },
+	10);
  } catch (error: any) {
  this.addResult('Performance', 'fail', `Performance test failed: ${error.message}`);
  }

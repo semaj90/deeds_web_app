@@ -11,16 +11,19 @@ export interface ConversationContext {
 }
 
 export interface Conversation {
-    id: string;, userId: string;
+    id: string;
+	userId: string;
     title: string;
     caseId?: string;
-    context?: ConversationContext;, createdAt: Date;
+    context?: ConversationContext;
+	createdAt: Date;
     updatedAt: Date;
     isArchived?: boolean;
 }
 
 export interface ChatMessage {
-    id: string;, conversationId: string;
+    id: string;
+	conversationId: string;
     role: 'user' | 'assistant' | 'system';
     content: string;
     metadata?: Record<string, unknown>;
@@ -28,13 +31,15 @@ export interface ChatMessage {
 }
 
 export interface CreateConversationData {
-    userId: string;, title: string;
+    userId: string;
+	title: string;
     caseId?: string;
     context?: ConversationContext;
 }
 
 export interface AddMessageData {
-    conversationId: string;, role: 'user' | 'assistant' | 'system';
+    conversationId: string;
+	role: 'user' | 'assistant' | 'system';
     content: string;
     metadata?: Record<string, unknown>;
 }
@@ -110,7 +115,8 @@ class ConversationService {
     }
 
     /** Retrieve a conversation with its messages */
-    async getConversationWithMessages( conversationId: string ): Promise<{, conversation: Conversation | null; messages: ChatMessage[] }> {
+    async getConversationWithMessages( conversationId: string ): Promise<{
+	conversation: Conversation | null; messages: ChatMessage[] }> {
         let conversation = this.conversations.get(conversationId) ?? null;
         let messages = this.messages.get(conversationId) ?? [];
 
@@ -130,7 +136,8 @@ class ConversationService {
     }
 
     /** Convert messages to chat-friendly format */
-    convertToChatMessages(messages: ChatMessage[]) : Array<{, role: ChatMessage['role'], content: string }> {
+    convertToChatMessages(messages: ChatMessage[]) : Array<{
+	role: ChatMessage['role'], content: string }> {
         return messages.map(msg => ({ role: msg.role, content: msg.content }));
     }
 
@@ -155,7 +162,8 @@ class ConversationService {
     }
 
     /** Simple statistics about stored conversations */
-    async getStats(): Promise<{, totalConversations: number, totalMessages: number, averageMessagesPerConversation: number }> {
+    async getStats(): Promise<{
+	totalConversations: number, totalMessages: number, averageMessagesPerConversation: number }> {
         const totalConversations = this.conversations.size;
         const totalMessages = Array.from(this.messages.values()).reduce((sum, list) => sum + list.length, 0);
         const averageMessagesPerConversation = totalConversations > 0 ? Math.round((totalMessages / totalConversations) * 100) / 100 : 0;
@@ -230,7 +238,8 @@ class ConversationService {
             const raw = await getFn.call(client, this.conversationKey(conversationId));
             if (!raw) return null;
 
-            const parsed = JSON.parse(raw) as Omit<Conversation, 'createdAt' | 'updatedAt'> & { createdAt: string;, updatedAt: string };
+            const parsed = JSON.parse(raw) as Omit<Conversation, 'createdAt' | 'updatedAt'> & { createdAt: string;
+	updatedAt: string };
             return {
                 ...parsed,
                 createdAt: new Date(parsed.createdAt),

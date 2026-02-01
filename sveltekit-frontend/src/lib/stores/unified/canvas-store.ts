@@ -11,7 +11,7 @@
  * import { canvasStore } from '$lib/stores/unified';
  *
  * canvasStore.addElement('node', { x: 100, y: 100 });
- * $: canvas = $canvasStore.canvasData;
+ * let canvas = $derived($canvasStore.canvasData);
  */
 
 import { derived, writable } from 'svelte/store';
@@ -22,9 +22,12 @@ import { derived, writable } from 'svelte/store';
 export type ElementType = 'node' | 'connection' | 'label' | 'image' | 'annotation';
 
 export interface CanvasElement {
-    id: string;, type: ElementType;
-    x: number;, y: number;
-    width: number;, height: number;
+    id: string;
+	type: ElementType;
+    x: number;
+	y: number;
+    width: number;
+	height: number;
     data?: Record<string, unknown>;
     style?: Record<string, unknown>;
     locked?: boolean;
@@ -32,27 +35,37 @@ export interface CanvasElement {
 }
 
 export interface CanvasConnection {
-    id: string;, fromId: string;
-    toId: string;, type: string;
+    id: string;
+	fromId: string;
+    toId: string;
+	type: string;
     label?: string;
     style?: Record<string, unknown>;
 }
 
 export interface CanvasState {
-    id: string;, elements: CanvasElement[];
-    connections: CanvasConnection[];, version: number;
-    createdAt: number;, updatedAt: number;
+    id: string;
+	elements: CanvasElement[];
+    connections: CanvasConnection[];
+	version: number;
+    createdAt: number;
+	updatedAt: number;
 }
 
 export interface CollaboratorCursor {
-    userId: string;, name: string;
-    x: number;, y: number;
-    color: string;, timestamp: number;
+    userId: string;
+	name: string;
+    x: number;
+	y: number;
+    color: string;
+	timestamp: number;
 }
 
 export interface CanvasHistoryEntry {
-    version: number;, action: string;
-    timestamp: number;, userId: string;
+    version: number;
+	action: string;
+    timestamp: number;
+	userId: string;
     changes: unknown;
 }
 
@@ -63,22 +76,28 @@ interface CanvasStoreState {
     // Canvas data
     canvasId: string | null;
     canvasData: CanvasState | null;
-    elements: CanvasElement[];, connections: CanvasConnection[];
+    elements: CanvasElement[];
+	connections: CanvasConnection[];
     // Selection
     selectedElementId: string | null;
     selectedElementIds: string[];
     // Collaboration
-    collaborators: CollaboratorCursor[];, locks: Map<string, string>; // element ID -> user ID
+    collaborators: CollaboratorCursor[];
+	locks: Map<string, string>; // element ID -> user ID
     // Undo/Redo
-    history: CanvasHistoryEntry[];, historyIndex: number;
+    history: CanvasHistoryEntry[];
+	historyIndex: number;
     isDirty: boolean;
     // WebSocket state
-    isConnected: boolean;, isSyncing: boolean;
+    isConnected: boolean;
+	isSyncing: boolean;
     // UI state
-    zoomLevel: number;, panX: number;
+    zoomLevel: number;
+	panX: number;
     panY: number;
     // Metadata
-    isLoading: boolean;, error: string | null;
+    isLoading: boolean;
+	error: string | null;
     lastUpdated: number;
 }
 
@@ -247,7 +266,9 @@ class CanvasStore {
 
     // ========== SAVE & SYNC ==========
     saveCanvas = async () => {
-        let stateSnapshot: {, canvasId: string | null; elements: CanvasElement[];, connections: CanvasConnection[] } = {
+        let stateSnapshot: {
+	canvasId: string | null; elements: CanvasElement[];
+	connections: CanvasConnection[] } = {
             canvasId: null,
             elements: [],
             connections: []
@@ -267,7 +288,8 @@ class CanvasStore {
             const response = await fetch(`/api/canvas/${stateSnapshot.canvasId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, elements: stateSnapshot.elements,
+	body: JSON.stringify({
+	elements: stateSnapshot.elements,
                     connections: stateSnapshot.connections
                 })
             });
@@ -346,7 +368,8 @@ class CanvasStore {
                 action,
                 timestamp: Date.now(),
                 userId: 'current-user', // Should get from context
-                changes: {, elements: s.elements, connections: s.connections }
+                changes: {
+	elements: s.elements, connections: s.connections }
             };
             const newHistory = [...s.history.slice(0, s.historyIndex + 1), entry];
             return {

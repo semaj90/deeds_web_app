@@ -4,20 +4,36 @@ import type { Document } from '$lib/types';
 import { getAuthHeaders } from './auth-service.js';
 
 export interface LegalCase {
- id: string;, title: string;
- description?: string;, status: 'active' | 'closed' | 'pending' | 'archived';
+ id: string;
+	title: string;
+ description?: string;
+	status: 'active' | 'closed' | 'pending' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
- practiceArea: string;, clientId: string;, clientName: string;, assignedLawyers: string[];, createdAt: string;, updatedAt: string;
+ practiceArea: string;
+	clientId: string;
+	clientName: string;
+	assignedLawyers: string[];
+	createdAt: string;
+	updatedAt: string;
  dueDate?: string;
- estimatedValue?: number;, riskLevel: 'low' | 'medium' | 'high' | 'critical';
- tags: string[];, documents: CaseDocument[];
+ estimatedValue?: number;
+	riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ tags: string[];
+	documents: CaseDocument[];
  metadata?: { [key: string]: any };
 }
 
 export interface CaseDocument {
- id: string;, caseId: string;, filename: string;, type: 'contract' | 'evidence' | 'brief' | 'correspondence' | 'other';
- uploadedAt: string;, uploadedBy: string;, size: number;, processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
- aiAnalysisCompleted: boolean;, tags: string[] }
+ id: string;
+	caseId: string;
+	filename: string;
+	type: 'contract' | 'evidence' | 'brief' | 'correspondence' | 'other';
+ uploadedAt: string;
+	uploadedBy: string;
+	size: number;
+	processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+ aiAnalysisCompleted: boolean;
+	tags: string[] }
 
 export interface CaseListOptions {
  status?: LegalCase['status'];
@@ -33,7 +49,9 @@ export interface CaseListOptions {
 
 export interface CreateCaseData {
  title: string;
- description?: string;, practiceArea: string;, clientId: string;
+ description?: string;
+	practiceArea: string;
+	clientId: string;
  priority?: LegalCase['priority'];
  dueDate?: string;
  estimatedValue?: number;
@@ -53,7 +71,11 @@ export interface UpdateCaseData {
 }
 
 export interface CaseListResponse {
- cases: LegalCase[];, total: number;, limit: number;, offset: number;, hasMore: boolean }
+ cases: LegalCase[];
+	total: number;
+	limit: number;
+	offset: number;
+	hasMore: boolean }
 
 // Core Case Management Functions
 export async function listCases(options: CaseListOptions = {}): Promise<CaseListResponse> {
@@ -74,7 +96,7 @@ export async function listCases(options: CaseListOptions = {}): Promise<CaseList
  const response = await fetch(`/api/cases?${queryParams}`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -96,7 +118,7 @@ export async function getCaseById(caseId: string): Promise<LegalCase> {
  const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -118,7 +140,7 @@ export async function createCase(caseData: CreateCaseData): Promise<LegalCase> {
  const response = await fetch('/api/cases', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(caseData),
+	body: JSON.stringify(caseData),
  });
 
  if (!response.ok) {
@@ -141,7 +163,7 @@ export async function updateCase(caseId, string, updates: UpdateCaseData: Promis
  const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'PUT', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
  });
 
  if (!response.ok) {
@@ -164,7 +186,7 @@ export async function deleteCase(caseId: string): Promise<void> {
  const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'DELETE', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -185,7 +207,7 @@ export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> 
  const response = await fetch(`/api/cases/${ caseId }/documents`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -206,7 +228,7 @@ export async function assignLawyer(caseId, string, lawyerId, string: Promise<voi
  const response = await fetch(`/api/cases/${caseId}/assign`, {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ lawyerId }),
+	body: JSON.stringify({ lawyerId }),
  });
 
  if (!response.ok) {
@@ -238,7 +260,7 @@ export async function getCasesByClient(
  const response = await fetch(`/api/clients/${clientId}/cases`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -260,7 +282,7 @@ export async function getCaseAnalytics(caseId: string): Promise<any> {
  const response = await fetch(`/api/cases/${caseId}/analytics`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();

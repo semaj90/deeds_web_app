@@ -2,8 +2,10 @@ import { EventEmitter } from 'events';
 import { Buffer } from 'buffer';
 
 interface QueueMessage {
-	id: string;, data: Record<string, unknown>;
-	timestamp: number;, attempts: number;
+	id: string;
+	data: Record<string, unknown>;
+	timestamp: number;
+	attempts: number;
 	maxAttempts: number;
 }
 
@@ -17,7 +19,8 @@ class InMemoryQueue extends EventEmitter {
 	private messages: Map<string, QueueMessage[]> = new Map();
 	private processing: Set<string> = new Set();
 	private deadLetter: Map<string, QueueMessage[]> = new Map();
-	private stats: Map<string, { processed: number;, failed: number }> = new Map();
+	private stats: Map<string, { processed: number;
+	failed: number }> = new Map();
 
 	constructor(protected options: QueueOptions = {}) {
 		super();
@@ -86,7 +89,8 @@ class InMemoryQueue extends EventEmitter {
 					// Timeout after specified seconds
 					const timeoutId = setTimeout(() => {
 						resolve(null);
-					}, timeout * 1000);
+					},
+	timeout * 1000);
 
 					const listener = (name: string) => {
 						if (name === queueName) {
@@ -121,8 +125,10 @@ class InMemoryQueue extends EventEmitter {
 
 	async consume(
 		queueName: string,
-		callback: (msg: {, content: Buffer;
-			fields: {, deliveryTag: number };
+		callback: (msg: {
+	content: Buffer;
+			fields: {
+	deliveryTag: number };
 			properties: Record<string, unknown>;
 			ack: () => void;
 			nack: () => void;
@@ -154,9 +160,10 @@ class InMemoryQueue extends EventEmitter {
 
 					await callback({
 						content: Buffer.from(raw),
-						fields: {, deliveryTag: Date.now() },
-						properties: {},
-						ack: () => this.ack(queueName),
+						fields: {
+	deliveryTag: Date.now() },
+	properties: {},
+	ack: () => this.ack(queueName),
 						nack: () => this.nack(queueName)
 					});
 
@@ -235,7 +242,8 @@ export const cache = {
 
 // RabbitMQ-compatible interface
 export const rabbit = {
-	async connect(): Promise<{, createChannel: () => { publish: typeof messageQueue.publish; consume: typeof messageQueue.consume } }> {
+	async connect(): Promise<{
+	createChannel: () => { publish: typeof messageQueue.publish; consume: typeof messageQueue.consume } }> {
 		console.log('🐇 RabbitMQ (in-memory) connected');
 		return {
 			createChannel: () => ({
@@ -253,13 +261,16 @@ export const rabbit = {
 
 // Enhanced message queue with workflow support
 export class WorkflowQueue extends InMemoryQueue {
-	private workflows: Map<string, { id: string;, state: unknown; history: {, state: unknown; timestamp: number }[]; status: string }> = new Map();
+	private workflows: Map<string, { id: string;
+	state: unknown; history: {
+	state: unknown; timestamp: number }[]; status: string }> = new Map();
 
 	async startWorkflow(workflowId: string, initialState: unknown): Promise<void> {
 		this.workflows.set(workflowId, {
 			id: workflowId,
 			state: initialState,
-			history: [{, state: initialState, timestamp: Date.now() }],
+			history: [{
+	state: initialState, timestamp: Date.now() }],
 			status: 'active'
 		});
 		await this.rpush(

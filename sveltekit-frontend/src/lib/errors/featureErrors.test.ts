@@ -12,9 +12,10 @@ import {
 
 // Mock the feature logger
 vi.mock('../services/featureLogger', () => ({
- featureLogger: {, logErrorBrain: vi.fn( logLegalAi: vi.fn(),
+ featureLogger: {
+	logErrorBrain: vi.fn( logLegalAi: vi.fn(),
  },
-}));
+	}));
 
 import { featureLogger } from '../services/featureLogger.js';
 
@@ -126,7 +127,8 @@ describe('Feature Error Handlers', () => {
  });
 
  describe('FeatureErrorHandler.handleDataAccessDenied', () => {
- it('should handle data access denied for error-brain', () => {'errorBrain',
+ it('should handle data access denied for error-brain', () => {
+'errorBrain',
  'user-123',
  'error_brain_analyses'
  );
@@ -144,7 +146,8 @@ describe('Feature Error Handlers', () => {
  );
  });
 
- it('should handle data access denied for legal-ai', () => {'legalAi',
+ it('should handle data access denied for legal-ai', () => {
+'legalAi',
  'user-123',
  'legal_ai_citations'
  );
@@ -164,7 +167,8 @@ describe('Feature Error Handlers', () => {
  });
 
  describe('FeatureErrorHandler.handleInvalidInput', () => {
- it('should handle invalid input with field and reason', () => {'errorBrain',
+ it('should handle invalid input with field and reason', () => {
+'errorBrain',
  'user-123',
  'errorMessage',
  'Field is required'

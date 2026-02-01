@@ -10,11 +10,13 @@ export interface VSCodeCommand {
 }
 
 export interface VSCodeAction {
-  title: string;, command: VSCodeCommand;
+  title: string;
+	command: VSCodeCommand;
 }
 
 export interface VSCodeNotification {
-  message: string;, type: 'error' | 'warning' | 'info';
+  message: string;
+	type: 'error' | 'warning' | 'info';
   actions?: VSCodeAction[];
 }
 
@@ -52,7 +54,8 @@ export class VSCodeIntegration {
       return;
     }
     this.isWatching = true;
-    watchFile(this.logFile, { interval: 1000 }, () => {
+    watchFile(this.logFile, { interval: 1000 },
+	() => {
       this.handleLogUpdate();
     });
     console.log(`📡 VS Code integration started - watching ${this.logFile}`);
@@ -110,7 +113,8 @@ export class VSCodeIntegration {
         message: `Vite: ${errorCount} error(s) detected`,
         type: 'error',
         actions: [
-          { title: 'View Errors', command: {, command: 'workbench.action.tasks.runTask', args: ['View Vite Errors'] } }
+          { title: 'View Errors', command: {
+	command: 'workbench.action.tasks.runTask', args: ['View Vite Errors'] } }
         ]
       });
     } else if (warningCount > 0) {

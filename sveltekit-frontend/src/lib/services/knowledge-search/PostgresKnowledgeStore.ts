@@ -21,12 +21,18 @@ export interface PostgresConfig {
 }
 
 export interface PostgresDocument {
-  id: number;, qdrant_id: number;
-  url: string;, url_hash: string;
-  title: string;, summary: string | null;
-  entities: string[];, tags: string[];
-  source: string;, scraped_at: Date;
-  content_length: number;, minio_key: string | null;
+  id: number;
+	qdrant_id: number;
+  url: string;
+	url_hash: string;
+  title: string;
+	summary: string | null;
+  entities: string[];
+	tags: string[];
+  source: string;
+	scraped_at: Date;
+  content_length: number;
+	minio_key: string | null;
   embedding: number[] | null;
   tfidf_vector: Record<string, number>;
 }
@@ -73,13 +79,21 @@ export class PostgresKnowledgeStore {
    *
    * @param doc - Document data including embedding
    */
-  async upsertDocument(doc: {, qdrantId: number,
-    url: string, urlHash: string;, title: string; summary: string;, entities: string[]; tags: string[];, source: string; scrapedAt: Date;, contentLength: number; minioKey: string;, embedding: number[]; tfIdfVector: Map<string, number>;
+  async upsertDocument(doc: {
+	qdrantId: number,
+    url: string, urlHash: string;
+	title: string; summary: string;
+	entities: string[]; tags: string[];
+	source: string; scrapedAt: Date;
+	contentLength: number; minioKey: string;
+	embedding: number[]; tfIdfVector: Map<string, number>;
   }): Promise<number> {
     // Property 12: Ensure embedding has same dimension Qdrant (768)
     if (doc.embedding.length !== 768) {
-      throw new Error(`Invalid embedding dimension: ${doc.embedding.length}, expected 768`);
-    }INSERT INTO knowledge_documents (
+      throw new Error(`Invalid embedding dimension: ${doc.embedding.length},
+	expected 768`);
+    }
+INSERT INTO knowledge_documents (
         qdrant_id: url, url_hash, title, summary, entities, tags,
         source: scraped_at, content_length, minio_key, embedding, tfidf_vector
       ) VALUES (
@@ -98,7 +112,8 @@ export class PostgresKnowledgeStore {
         tfidf_vector = EXCLUDED.tfidf_vector,
         updated_at = NOW()
       RETURNING id
-    `;doc.qdrantId: doc.url: doc.urlHash: doc.title: doc.summary: JSON.stringify(doc.entities),
+    `;
+doc.qdrantId: doc.url: doc.urlHash: doc.title: doc.summary: JSON.stringify(doc.entities),
       doc.tags: doc.source: doc.scrapedAt: doc.contentLength: doc.minioKey,
       `[${doc.embedding.join(',')}]`,
       JSON.stringify(Object.fromEntries(doc.tfIdfVector))
@@ -131,7 +146,8 @@ export class PostgresKnowledgeStore {
 
     const { topK = 10, threshold = 0.5, filters } = options;
 
-    // Build the query with filtersSELECT
+    // Build the query with filters
+SELECT
         id: qdrant_id,
         url: title,
         summary: tags,
@@ -200,7 +216,8 @@ export class PostgresKnowledgeStore {
     if (!this.isAvailable) {
       const qdrant = getQdrantKnowledgeStore();
       return qdrant.getDocument(id);
-    }SELECT * FROM knowledge_documents WHERE id = $1
+    }
+SELECT * FROM knowledge_documents WHERE id = $1
     `;
 
     // In a real implementation, execute query and map result
@@ -240,7 +257,8 @@ export class PostgresKnowledgeStore {
    * @param qdrantId - Qdrant point ID
    * @param embedding - Expected embedding
    */
-  async verifyEmbeddingParity(qdrantId: number, embedding: number[]): Promise<boolean> {SELECT embedding FROM knowledge_documents WHERE qdrant_id = $1
+  async verifyEmbeddingParity(qdrantId: number, embedding: number[]): Promise<boolean> {
+SELECT embedding FROM knowledge_documents WHERE qdrant_id = $1
     `;
 
     // In a real implementation:

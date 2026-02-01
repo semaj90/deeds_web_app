@@ -19,7 +19,8 @@ export interface QueryFilters {
 }
 
 export interface PaginationParams {
- page: number, limit: number;, offset: number;
+ page: number, limit: number;
+	offset: number;
 }
 
 // Minimal typed aliases to: avoid | any/SQL usage and satisfy lint rules
@@ -137,7 +138,9 @@ export class QueryBuilder {
 		baseQuery: QueryLike,
 		filters: QueryFilters,
 		table: TableLike
-	): Promise<{, data: T; total: number;, pagination: PaginationParams }> {
+	): Promise<{
+	data: T; total: number;
+	pagination: PaginationParams }> {
 		const conditions = this.buildFilters(table, filters);
 		const whereClause = this.applyFilters(conditions);
 		const pagination = this.getPaginationParams(filters.page, filters.limit);

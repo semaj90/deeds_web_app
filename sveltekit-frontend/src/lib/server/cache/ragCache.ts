@@ -1,8 +1,10 @@
 import { getRedisClient } from '../redis/client.js';
 
 interface RAGCacheEntry {
-	query: string;, response: any;
-	timestamp: number;, ttl: number;
+	query: string;
+	response: any;
+	timestamp: number;
+	ttl: number;
 }
 
 export class RAGCache {

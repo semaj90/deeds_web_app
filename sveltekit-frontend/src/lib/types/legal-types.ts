@@ -3,13 +3,16 @@
 
 // Additional Evidence Types
 export interface Evidence {
-    id: string;, title: string;
+    id: string;
+	title: string;
     description?: string;
     fileName?: string;
     filePath?: string;
     fileSize?: number;
-    mimeType?: string;, evidenceType: 'document' | 'image' | 'video' | 'audio' | 'digital' | 'physical' | 'testimony' | 'other';
-    caseId: string;, uploadedAt: Date;
+    mimeType?: string;
+	evidenceType: 'document' | 'image' | 'video' | 'audio' | 'digital' | 'physical' | 'testimony' | 'other';
+    caseId: string;
+	uploadedAt: Date;
     uploadedBy: string;
     location?: string;
     aiTags?: string[];
@@ -23,26 +26,32 @@ export interface Evidence {
 }
 
 export interface ChainOfCustodyEntry {
-    id: string;, evidenceId: string;
+    id: string;
+	evidenceId: string;
     action: 'collected' | 'transferred' | 'analyzed' | 'stored' | 'accessed';
-    performedBy: string;, timestamp: Date;
+    performedBy: string;
+	timestamp: Date;
     location?: string;
     notes?: string;
     signature?: string;
 }
 
 export interface AIAnalysis {
-    id: string;, evidenceId: string;
+    id: string;
+	evidenceId: string;
     analysisType: 'content_extraction' | 'sentiment_analysis' | 'entity_recognition' | 'classification' | 'similarity';
     results: { [key: string]: any };
-    confidence: number;, processingTime: number;
-    model: string;, version: string;
+    confidence: number;
+	processingTime: number;
+    model: string;
+	version: string;
     timestamp: Date;
 }
 
 // Extended Legal Document Interface
 export interface LegalDocument {
-    id: string;, title: string;
+    id: string;
+	title: string;
     fullText?: string; // Complete document content
     content: string; // Processed/summarized content
     summary?: string;
@@ -52,8 +61,10 @@ export interface LegalDocument {
     fileName?: string;
     fileSize?: number;
     mimeType?: string;
-    lastModified?: Date;, createdAt: Date;
-    updatedAt: Date;, confidentialityLevel: number;
+    lastModified?: Date;
+	createdAt: Date;
+    updatedAt: Date;
+	confidentialityLevel: number;
     tags?: string[];
     topics?: string[];
     jurisdiction?: string;
@@ -65,16 +76,22 @@ export interface LegalDocument {
 
 // API Response Types
 export interface DocumentSearchResult {
-    id: string;, title: string;
-    excerpt: string;, relevanceScore: number;
+    id: string;
+	title: string;
+    excerpt: string;
+	relevanceScore: number;
     documentType: string;
-    caseId?: string;, lastModified: string;
+    caseId?: string;
+	lastModified: string;
 }
 
 export interface EvidenceSearchResult {
-    id: string;, title: string;
-    description?: string;, evidenceType: string;
-    caseId: string;, relevanceScore: number;
+    id: string;
+	title: string;
+    description?: string;
+	evidenceType: string;
+    caseId: string;
+	relevanceScore: number;
     uploadedAt: Date;
     aiSummary?: string;
 }
@@ -90,8 +107,10 @@ export interface VectorSearchOptions {
 }
 
 export interface VectorSearchResult {
-    id: string;, score: number;
-    content: string;, metadata: { [key: string]: any };
+    id: string;
+	score: number;
+    content: string;
+	metadata: { [key: string]: any };
     type: 'document' | 'evidence' | 'case';
 }
 

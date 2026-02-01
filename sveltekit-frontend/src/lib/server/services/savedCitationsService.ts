@@ -1,11 +1,15 @@
 import pool from '$lib/server/db/drizzle';
 
 export type Citation = {
-    id: string;, title: string;
-    content: string;, source: string;
-    tags: string[];, category: string;
+    id: string;
+	title: string;
+    content: string;
+	source: string;
+    tags: string[];
+	category: string;
     isFavorite: boolean;
-    notes?: string;, savedAt: string; // ISO
+    notes?: string;
+	savedAt: string; // ISO
     contextData?: Record<string, string>;
 };
 

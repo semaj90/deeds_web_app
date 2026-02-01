@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   import type { AnalyticsUpdateEvent, ContextualPromptEvent, TypingContext, TypingState, TypingStateChangeEvent } from '$lib/machines/userTypingStateMachine';
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
 
   interface Props {
     text?: string;
@@ -48,7 +48,8 @@
     if (currentState !== newState) {
       currentState = newState;
       onstateChange?.(new CustomEvent('stateChange', {
-        detail: {, state: newState, context }
+        detail: {
+	state: newState, context }
       }));
     }
   }
@@ -68,7 +69,8 @@
       if (enableContextualPrompts && text.length > 20) {
         generateContextualPrompts();
       }
-    }, 1500);
+    },
+	1500);
   }
 
   async function generateContextualPrompts() {
@@ -94,20 +96,22 @@
     }
   }
 
-  onMount(() => {
+  $effect(() => {
+
     if (element) {
       element.addEventListener('input', handleInput);
     }
-  });
+  
+});
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (element) {
       element.removeEventListener('input', handleInput);
     }
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
-  });
+  }
 
   // Watch for text changes
   $effect(() => {

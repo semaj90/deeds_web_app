@@ -2,8 +2,10 @@
 // In production, replace with RabbitMQ/NATS
 
 interface QueueJob {
-    id: string;, queueName: string;
-    payload: any;, timestamp: number;
+    id: string;
+	queueName: string;
+    payload: any;
+	timestamp: number;
 }
 
 const jobQueue: QueueJob[] = [];
@@ -48,7 +50,8 @@ async function processJob(job: QueueJob): Promise<void> {
 
 async function processRagIndexingJob(payload: any): Promise<void> {
     const { caseId, chatTurnId, message, objects, processedFiles } = payload;
-    console.log(`[RAG Worker] Processing evidence for case ${caseId}, turn ${chatTurnId}`);
+    console.log(`[RAG Worker] Processing evidence for case ${caseId},
+	turn ${chatTurnId}`);
 
     // Stub setup for dynamic imports to avoid circular dependencies or heavy load on init
 

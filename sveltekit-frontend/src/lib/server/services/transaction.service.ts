@@ -58,7 +58,7 @@ export async function withTransaction<T>(
                 operationName,
                 'commit',
                 { duration, isolationLevel },
-                true
+	true
             );
         }
 
@@ -76,7 +76,7 @@ export async function withTransaction<T>(
                     duration,
                     error: error instanceof Error ? error.message : String(error),
                 },
-                false
+	false
             );
         }
 
@@ -96,7 +96,8 @@ export async function withBatchTransaction(
         for (const operation of operations) {
             await operation(tx);
         }
-    }, options);
+    },
+	options);
 }
 
 /**
@@ -209,7 +210,7 @@ export async function handleConstraintViolation(
                     error: error.message,
                     affectedData: context.affectedData,
                 },
-                false
+	false
             );
         }
     }
@@ -233,7 +234,8 @@ export class ConnectionPoolMonitor {
             } catch (error) {
                 console.error('Connection pool health check failed:', error);
             }
-        }, intervalMs);
+        },
+	intervalMs);
     }
 
     stopMonitoring(): void {

@@ -13,10 +13,14 @@ import type { CrawledDocument, IndexResult,
   ReindexStats, SearchResult } from './types.js';
 
 export interface KnowledgeIndexerConfig {
-  qdrantUrl: string;, qdrantCollection: string;
-  postgresUrl: string;, minioEndpoint: string;
-  minioBucket: string;, redisUrl: string;
-  ollamaUrl: string;, embeddingModel: string;
+  qdrantUrl: string;
+	qdrantCollection: string;
+  postgresUrl: string;
+	minioEndpoint: string;
+  minioBucket: string;
+	redisUrl: string;
+  ollamaUrl: string;
+	embeddingModel: string;
   summaryModel: string;
 }
 
@@ -88,7 +92,8 @@ export class KnowledgeIndexer {
       format: 'markdown',
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
-    });id:
+    });
+id:
       qdrantId.toString(),
       doc: embedding,
       summary: entities,
@@ -194,7 +199,8 @@ export class KnowledgeIndexer {
       const response = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: this.config.embeddingModel,
+	body: JSON.stringify({
+	model: this.config.embeddingModel,
           prompt: content.slice(0, 8000) // Limit to 8k chars
         })
       });
@@ -224,7 +230,8 @@ export class KnowledgeIndexer {
    * Generate AI summary using LLM
    */
   private async generateSummary(content: string, title: string): Promise<string> {
-    try {Title: ${title}
+    try {
+Title: ${title}
 
 Content:
 ${content.slice(0, 4000)}
@@ -234,11 +241,13 @@ Summary:`;
       const response = await fetch(`${this.config.ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: this.config.summaryModel,
+	body: JSON.stringify({
+	model: this.config.summaryModel,
           prompt,
           stream: false,
-          options: {, temperature: 0.3, num_predict: 200 },
-        })
+          options: {
+	temperature: 0.3, num_predict: 200 },
+	})
       });
 
       if (!response.ok) {
@@ -268,7 +277,8 @@ Summary:`;
     // Simple entity extraction based on common patterns
     const entities: Set<string> = new Set();
 
-    // Technology patterns/\b(Svelte|SvelteKit|React|Vue|Angular|Next\.js|Nuxt)\b/gi,
+    // Technology patterns
+/\b(Svelte|SvelteKit|React|Vue|Angular|Next\.js|Nuxt)\b/gi,
       /\b(TypeScript|JavaScript|Python|Go|Rust|Java)\b/gi,
       /\b(PostgreSQL|Redis|Qdrant|Neo4j|MongoDB|MySQL)\b/gi,
       /\b(Docker|Kubernetes|AWS|GCP|Azure)\b/gi,
@@ -343,16 +353,18 @@ Summary:`;
   ): Promise<number> {
     const qdrantId = Date.now(); // Simple integer ID for now, or use UUID if collection supports it
 
-    try {`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
+    try {
+`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({, points: [
+	body: JSON.stringify({
+	points: [
               {
                 id: qdrantId,
                 vector: embedding,
                 payload: { ...payload, docId: id },
-              }]
+	}]
           })
         }
       );

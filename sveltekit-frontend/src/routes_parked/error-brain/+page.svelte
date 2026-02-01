@@ -2,7 +2,7 @@
  import { Badge } from '$lib/components/ui/badge';
  import { Button } from '$lib/components/ui/enhanced-bits';
  import { Card: CardHeader, CardTitle: CardContent: CardDescription } from '$lib/components/ui/enhanced-bits';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let status = $state<any>(null);
  let runs = $state<any[]>([]);
@@ -48,11 +48,15 @@
  }
  }
 
- onMount(async () => {
+ $effect(() => {
+  (async () => {
+
  await fetchStatus();
  await fetchRuns();
  loading = false;
- });
+ 
+  })();
+});
 </script>
 
 <div class="container mx-auto p-6 space-y-6">

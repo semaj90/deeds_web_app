@@ -10,16 +10,21 @@ import { minioService } from '$lib/server/storage/minio-service.js';
 // import { embeddingService } from '$lib/services/embedding-service.js'; // Not used directly, using fetch
 
 interface EvidenceFile {
-    id: number;, title: string;
-    description?: string;, storage_bucket: string;
-    object_name: string;, mime_type: string;
+    id: number;
+	title: string;
+    description?: string;
+	storage_bucket: string;
+    object_name: string;
+	mime_type: string;
     file_type: string;
     case_id?: string;
 }
 
 interface BackfillResult {
-    processed: number;, success: number;
-    failed: number;, errors: Array<any>;
+    processed: number;
+	success: number;
+    failed: number;
+	errors: Array<any>;
 }
 
 export class EmbeddingBackfillWorker {
@@ -90,7 +95,9 @@ export class EmbeddingBackfillWorker {
                 }
             }
 
-            console.log(`🎉 Backfill complete! Processed: ${result.processed}, Success: ${result.success}, Failed: ${result.failed}`);
+            console.log(`🎉 Backfill complete! Processed: ${result.processed},
+	Success: ${result.success},
+	Failed: ${result.failed}`);
             return result;
         } finally {
             this.isRunning = false;
@@ -190,7 +197,8 @@ export class EmbeddingBackfillWorker {
         const response = await fetch('http://localhost:5174/api/ai/embed', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, text: text.substring(0, 50000), // Limit text length
+	body: JSON.stringify({
+	text: text.substring(0, 50000), // Limit text length
                 model: 'mock', // Use mock for testing - change to 'openai' or 'nomic' when ready
                 dimensions: 768
             })

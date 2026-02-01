@@ -22,28 +22,37 @@ export interface KnowledgeNode {
     _rev?: string; // CouchDB revision
     type: 'concept' | 'document' | 'entity' | 'topic';
     postgres_id: number;
-    qdrant_id?: string;, title: string;
-    content?: string;, connected_to: string[]; // Array of node IDs this connects to
+    qdrant_id?: string;
+	title: string;
+    content?: string;
+	connected_to: string[]; // Array of node IDs this connects to
     parent_id?: string; // For hierarchical relationships
-    metadata: {, created_at: string;
-        updated_at: string;, source: string; // 'svelte-docs', 'typescript-docs', etc.
+    metadata: {
+	created_at: string;
+        updated_at: string;
+	source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score for graph ranking
     };
-    embeddings_metadata?: {, model: string;
-        dimensions: number;, synced_at: string;
+    embeddings_metadata?: {
+	model: string;
+        dimensions: number;
+	synced_at: string;
     };
 }
 
 export interface KnowledgeEdge {
-    _id: string; // Format: "edge:{from_id},{to_id}"
-    _rev?: string;, type: 'edge';
+    _id: string; // Format: "edge:{from_id},
+	{to_id}"
+    _rev?: string;
+	type: 'edge';
     from_id: string; // node:{id}
     to_id: string;   // node:{id}
     relationship: 'related_to' | 'parent_of' | 'references' | 'implements' | 'extends';
     weight?: number; // 0-1 strength of connection
     bidirectional?: boolean;
-    metadata?: {, created_at: string;
+    metadata?: {
+	created_at: string;
         inferred?: boolean; // AI-generated vs explicit
     };
 }
@@ -78,7 +87,8 @@ async function createGraphViews() {
         _id: '_design/graph',
         views: {
             // View 1: Get all children of a node
-            children: {, map: `function(doc) {
+            children: {
+	map: `function(doc) {
                     if (doc.parent_id) {
                         emit(doc.parent_id, {
                             _id: doc._id,
@@ -88,8 +98,9 @@ async function createGraphViews() {
                     }
                 }`.trim()
             },
-            // View 2: Get all neighbors (connected nodes)
-            neighbors: {, map: `function(doc) {
+	// View 2: Get all neighbors (connected nodes)
+            neighbors: {
+	map: `function(doc) {
                     if (doc.type !== 'edge' && doc.connected_to) {
                         doc.connected_to.forEach(function(neighbor_id) {
                             emit(doc._id, neighbor_id);
@@ -97,8 +108,9 @@ async function createGraphViews() {
                     }
                 }`.trim()
             },
-            // View 3: Get edges by relationship type
-            edges_by_type: {, map: `function(doc) {
+	// View 3: Get edges by relationship type
+            edges_by_type: {
+	map: `function(doc) {
                     if (doc.type === 'edge') {
                         emit([doc.relationship, doc.from_id], {
                             to: doc.to_id,
@@ -107,8 +119,9 @@ async function createGraphViews() {
                     }
                 }`.trim()
             },
-            // View 4: Get nodes by source (e.g., all Svelte docs)
-            by_source: {, map: `function(doc) {
+	// View 4: Get nodes by source (e.g., all Svelte docs)
+            by_source: {
+	map: `function(doc) {
                     if (doc.type !== 'edge' && doc.metadata && doc.metadata.source) {
                         emit(doc.metadata.source, {
                             _id: doc._id,
@@ -118,8 +131,9 @@ async function createGraphViews() {
                     }
                 }`.trim()
             },
-            // View 5: Get high-importance nodes (for graph ranking)
-            by_importance: {, map: `function(doc) {
+	// View 5: Get high-importance nodes (for graph ranking)
+            by_importance: {
+	map: `function(doc) {
                     if (doc.metadata && doc.metadata.importance) {
                         emit(doc.metadata.importance, {
                             _id: doc._id,
@@ -135,7 +149,7 @@ async function createGraphViews() {
     await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(designDoc)
+	body: JSON.stringify(designDoc)
     }).catch(() => {
         // Design doc may already exist
     });
@@ -159,7 +173,7 @@ export async function upsertNode(node: Omit<KnowledgeNode, '_rev'>): Promise<Kno
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${node._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...node, _rev })
+	body: JSON.stringify({ ...node, _rev })
         });
 
         if (!response.ok) {
@@ -182,7 +196,7 @@ export async function createEdge(edge: Omit<KnowledgeEdge, '_rev'>): Promise<Kno
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/${edge._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(edge)
+	body: JSON.stringify(edge)
         });
 
         if (!response.ok) {
@@ -278,7 +292,8 @@ export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Pro
         const response = await fetch(`${COUCHDB_URL}/${KNOWLEDGE_DB}/_bulk_docs`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, docs: nodes })
+	body: JSON.stringify({
+	docs: nodes })
         });
 
         if (!response.ok) {
@@ -306,10 +321,13 @@ export async function bulkInsertNodes(nodes: Omit<KnowledgeNode, '_rev'>[]): Pro
 export async function traverseGraph(
     startNodeId: string,
     maxDepth: number = 2
-): Promise<Array<{, node: KnowledgeNode; depth: number }>> {
+): Promise<Array<{
+	node: KnowledgeNode; depth: number }>> {
     const visited = new Set<string>();
-    const queue: Array<{, id: string; depth: number }> = [{ id: startNodeId, depth: 0 }];
-    const results: Array<{, node: KnowledgeNode; depth: number }> = [];
+    const queue: Array<{
+	id: string; depth: number }> = [{ id: startNodeId, depth: 0 }];
+    const results: Array<{
+	node: KnowledgeNode; depth: number }> = [];
 
     while (queue.length > 0) {
         const { id, depth } = queue.shift()!;

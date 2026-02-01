@@ -57,7 +57,7 @@ export const documents = pgTable(
         updatedAt: timestamp('updated_at').defaultNow(),
         lastAccessedAt: timestamp('last_accessed_at'),
     },
-    (table) => ({
+	(table) => ({
         // Indexes for performance
         embeddingIndex: index('embedding_idx').using('ivfflat', table.embedding),
         documentTypeIndex: index('document_type_idx').on(table.documentType),
@@ -97,7 +97,7 @@ export const vectorSimilarityQueries = pgTable(
 
         timestamp: timestamp('timestamp').defaultNow()
     },
-    (table) => ({
+	(table) => ({
         userIdIndex: index('user_id_idx').on(table.userId),
         sessionIdIndex: index('session_id_idx').on(table.sessionId),
         timestampIndex: index('timestamp_idx').on(table.timestamp),
@@ -134,7 +134,7 @@ export const legalAnalysisCache = pgTable(
         expiresAt: timestamp('expires_at'),
         createdAt: timestamp('created_at').defaultNow()
     },
-    (table) => ({
+	(table) => ({
         inputHashIndex: index('input_hash_idx').on(table.inputHash),
         analysisTypeIndex: index('analysis_type_idx').on(table.analysisType),
         lastAccessedIndex: index('last_accessed_idx').on(table.lastAccessedAt),
@@ -195,7 +195,7 @@ export const ragDocuments = pgTable(
         processedAt: timestamp('processed_at').defaultNow(),
         createdAt: timestamp('created_at').defaultNow()
     },
-    (table) => ({
+	(table) => ({
         embeddingIndex: index('rag_embedding_idx').using('ivfflat', table.embedding).with({ lists: 100 }),
         contentHashIndex: index('rag_content_hash_idx').on(table.contentHash)
     })
@@ -214,7 +214,7 @@ export const knowledgeBase = pgTable(
         sourceFile: text('source_file'),
         createdAt: timestamp('created_at').defaultNow()
     },
-    (table) => ({
+	(table) => ({
         embeddingIndex: index('kb_embedding_idx').using('ivfflat', table.embedding).with({ lists: 100 }),
         chunkTypeIndex: index('kb_chunk_type_idx').on(table.chunkType),
         sourceFileIndex: index('kb_source_file_idx').on(table.sourceFile)
@@ -235,7 +235,7 @@ export const codeEmbeddings = pgTable(
         confidenceScore: real('confidence_score'),
         lastUpdated: timestamp('last_updated').defaultNow()
     },
-    (table) => ({
+	(table) => ({
         embeddingIndex: index('code_embedding_idx').using('ivfflat', table.embedding).with({ lists: 100 }),
         pathIndex: index('code_path_idx').on(table.path),
         contentHashIndex: index('code_content_hash_idx').on(table.contentHash)
@@ -343,7 +343,7 @@ export const personsOfInterest = pgTable(
         createdAt: timestamp('created_at').defaultNow().notNull(),
         updatedAt: timestamp('updated_at').defaultNow().notNull(),
     },
-    (table) => ({
+	(table) => ({
         nameIndex: index('poi_name_idx').on(table.name),
         threatLevelIndex: index('poi_threat_level_idx').on(table.threatLevel),
         statusIndex: index('poi_status_idx').on(table.status),

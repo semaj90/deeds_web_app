@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ComponentType } from 'svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface Props {
 		icon: ComponentType;
@@ -21,7 +21,8 @@
 
 	let containerRef: HTMLElement;
 
-	onMount(() => {
+	$effect(() => {
+
 		if (containerRef) {
 			const style = document.createElement('style');
 			style.textContent = `
@@ -31,7 +32,8 @@
 			`;
 			document.head.appendChild(style);
 		}
-	});
+	
+});
 </script>
 
 <div bind:this={containerRef} class="icon-container icon-container-{size} {sizeClasses[size]} {className}">

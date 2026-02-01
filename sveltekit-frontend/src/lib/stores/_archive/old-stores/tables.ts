@@ -7,15 +7,19 @@ export interface TableState {
  sortColumn: string | null;
  sortDirection: 'asc' | 'desc';
  selectedRows: Set<string | number>;
- currentPage: number;, pageSize: number;
- searchQuery: string;, columnFilters: Map<string, string>;
+ currentPage: number;
+	pageSize: number;
+ searchQuery: string;
+	columnFilters: Map<string, string>;
  columnWidths: Map<string, number>;
  expandedRows: Set<string | number>;
 }
 
 export interface TableNotification {
- id: string;, type: 'info' | 'success' | 'warning' | 'error';
- title?: string;, message: string;
+ id: string;
+	type: 'info' | 'success' | 'warning' | 'error';
+ title?: string;
+	message: string;
  timestamp: Date;
  duration?: number;
  persistent?: boolean;
@@ -58,7 +62,8 @@ class TableManager {
  updateSort(tableId, string, column: string, direction?: 'asc' | 'desc') {
  const table = this.getTable(tableId);
  if (!table) return; // Added return to prevent error on null table
- table.update((state) => {direction ||
+ table.update((state) => {
+direction ||
  (state.sortColumn === column && state.sortDirection === 'asc' ? 'desc' : 'asc');
  return {
  ...state, sortColumn: column,
@@ -178,7 +183,8 @@ class TableManager {
  const duration = notification?.duration ?? 5000;
  setTimeout(() => {
  this.removeNotification(id);
- }, duration);
+ },
+	duration);
  }
  return id;
  }
@@ -260,12 +266,17 @@ export function createTableStats(tableId: string) {
 // Export types and utilities // TableState and TableNotification are already exported as interfaces above
 // Legal AI specific table configurations
 export const legalAITableConfigs = {
- cases: {, pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
- evidence: {, pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
- documents: {, pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
- users: {, pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
- auditLog: {, pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
-};
+ cases: {
+	pageSize: 25, sortColumn: 'created_at', sortDirection: 'desc' as const },
+	evidence: {
+	pageSize: 50, sortColumn: 'date_collected', sortDirection: 'desc' as const },
+	documents: {
+	pageSize: 20, sortColumn: 'upload_date', sortDirection: 'desc' as const },
+	users: {
+	pageSize: 30, sortColumn: 'last_login', sortDirection: 'desc' as const },
+	auditLog: {
+	pageSize: 100, sortColumn: 'timestamp', sortDirection: 'desc' as const },
+	};
 
 // Utility functions
 export function formatTableData(data: any[], columns: string[]): any[] {
@@ -300,7 +311,8 @@ export function exportTableData(data: any[], filename?: string): void {
 function convertToCSV(data: any[]): string {
  if (data.length === 0) return '';
  const headers = Object.keys(data[0]);
- const csvHeaders = headers.join(',');headers
+ const csvHeaders = headers.join(',');
+headers
  .map((header) => {
  const value = row[header];
  const stringValue = typeof value === 'string' ? value : String(value ?? ''); // Fixed comma operator

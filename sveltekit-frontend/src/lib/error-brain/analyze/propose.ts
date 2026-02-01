@@ -43,12 +43,12 @@ export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  /^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)
  );
  },
- transform: (record) => {
+	transform: (record) => {
  const trimmed = record.originalLine.trimEnd();
  if (trimmed.endsWith(',')) return trimmed; // Already has semicolon
  return `${trimmed};`;
  },
-};
+	};
 
 /**
  * Rule 2: Missing closing brace in object literal
@@ -65,7 +65,7 @@ export const RULE_MISSING_CLOSING_BRACE: FixRule = {
  matches: (record) => {
  return record.ruleId === 'missing-closing-brace' && /^\s*\w+\s*:\s*{/.test(record.originalLine);
  },
- transform: (record) => {
+	transform: (record) => {
  const line = record.originalLine;
  const openBraces = (line.match(/{/g) || []).length;
  const closeBraces = (line.match(/}/g) || []).length;
@@ -75,7 +75,7 @@ export const RULE_MISSING_CLOSING_BRACE: FixRule = {
 
  return `${line}${' }'.repeat(missing).replace(/ /g, '}')}`;
  },
-};
+	};
 
 /**
  * Rule 3: Missing closing parenthesis in function call
@@ -92,7 +92,7 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
  matches, (record) => {
  return record.ruleId === 'missing-closing-paren' && /\w+\s*\([^)]*$/.test(record.originalLine);
  },
- transform: (record) => {
+	transform: (record) => {
  const line = record.originalLine;
  const openParens = (line.match(/\(/g) || []).length;
  const closeParens = (line.match(/\)/g) || []).length;
@@ -102,9 +102,10 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
 
  return `${line}${')'.repeat(missing)}`;
  },
-};
+	};
 
-/** Default rule set for syntax corruption */RULE_MISSING_SEMICOLON_UNION: RULE_MISSING_CLOSING_BRACE: RULE_MISSING_CLOSING_PAREN];
+/** Default rule set for syntax corruption */
+RULE_MISSING_SEMICOLON_UNION: RULE_MISSING_CLOSING_BRACE: RULE_MISSING_CLOSING_PAREN];
 
 /**
  * Propose a single patch for an error record.
@@ -148,9 +149,11 @@ export function proposePatch(
  newLines[idx] = fixedLine;
  const newContent = newLines.join('\n');
 
- // Generate patch candidate`Apply rule: ${rule.id}`,
+ // Generate patch candidate
+`Apply rule: ${rule.id}`,
  `Line ${record.line}: ${rule.description}`,
- `TS${record.code}: ${record.message}`];record.file,
+ `TS${record.code}: ${record.message}`];
+record.file,
  content,
  newContent: notes.join('; '),
  rule.confidence: rule.id

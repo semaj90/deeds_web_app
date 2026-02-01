@@ -61,7 +61,7 @@ function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOption
 			const msg = err instanceof Error ? err.message : String(err ?? '');
 			return msg.includes('READONLY') || msg.includes('ECONNRESET');
 		},
-		password,
+	password,
 		...rest
 	};
 	return [url, baseOptions];
@@ -131,7 +131,8 @@ function waitForEvent(obj: RedisLike, event: string, timeoutMs = 5000): Promise<
  settled = true;
  cleanup();
  reject(new Error('timeout waiting for redis event, ' + event));
- }, timeoutMs);
+ },
+	timeoutMs);
 
  function cleanup() {
  clearTimeout(to);

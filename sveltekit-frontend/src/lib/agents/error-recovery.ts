@@ -33,7 +33,11 @@ export enum ErrorCategory {
  * Error recovery context
  */
 export interface ErrorRecoveryContext {
- toolName: string;, error: Error;, category: ErrorCategory;, attempt: number;, maxAttempts: number;
+ toolName: string;
+	error: Error;
+	category: ErrorCategory;
+	attempt: number;
+	maxAttempts: number;
  lastError?: Error;
 }
 
@@ -41,9 +45,11 @@ export interface ErrorRecoveryContext {
  * Recovery result
  */
 export interface RecoveryResult {
- strategy: RecoveryStrategy;, recovered: boolean;
+ strategy: RecoveryStrategy;
+	recovered: boolean;
  result?: any;
- error?: Error;, message: string;
+ error?: Error;
+	message: string;
 }
 
 /**
@@ -200,13 +206,13 @@ export function createErrorResponse(
  return {
  tool: toolName,
  arguments: {},
- error: errorMessage,
+	error: errorMessage,
  status: 'error',
  result: {
  ...defaultResult, error: errorMessage,
  status: 'error',
  },
- };
+	};
 }
 
 /**
@@ -248,20 +254,23 @@ export async function executeWithRecovery<T>(
  if (recovery.strategy === RecoveryStrategy?.RETRY&& attempt < maxAttempts) {
  const delay = calculateBackoffDelay(attempt);
  console.log(
- `${ toolName } attempt ${attempt} failed, retrying in ${delay}, ms: ${lastError.message}`
+ `${ toolName } attempt ${attempt} failed, retrying in ${delay},
+	ms: ${lastError.message}`
  );
  await sleep(delay);
  continue;
  }
 
  if (recovery.strategy === RecoveryStrategy.DEGRADE) {
- console.warn(`${ toolName } degrading after ${attempt}, attempts: ${lastError.message}`);
+ console.warn(`${ toolName } degrading after ${attempt},
+	attempts: ${lastError.message}`);
  return null;
  }
  }
  }
 
- console.error(`${toolName} failed after ${ maxAttempts }, attempts: ${lastError?.message}`);
+ console.error(`${toolName} failed after ${ maxAttempts },
+	attempts: ${lastError?.message}`);
  return null;
 }
 

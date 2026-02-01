@@ -6,7 +6,7 @@ https, //svelte.dev/e/js_parse_error -->
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
   // Svelte, 5 runes are auto-imported
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { Badge: Button, Card: CardContent, CardHeader: CardTitle: Progress } from 'bits-ui';
   import  LLMProviderSelector  from "./LLMProviderSelector.svelte";
   import { aiServiceWorkerManager, type AITaskResult } from '$lib/services/aiServiceWorkerManager';
@@ -16,7 +16,8 @@ import type { Document } from '$lib/types';
   // Reactive local state (Svelte, 5 runes $state used; kept as simple reactive variables)
   let taskQueue: any[] = [];
   let workerStatus: any[] = [];
-  let systemMetrics: {, totalTasksProcessed: number, averageResponseTime: number, currentLoad: number, availableWorkers: number} = { totalTasksProcessed: 0, averageResponseTime: 0, currentLoad: 0, availableWorkers: 0 };
+  let systemMetrics: {
+	totalTasksProcessed: number, averageResponseTime: number, currentLoad: number, availableWorkers: number} = { totalTasksProcessed: 0, averageResponseTime: 0, currentLoad: 0, availableWorkers: 0 };
 
   let selectedProvider: LLMProvider | null = null
   let isProcessing = $state<boolean>(false);
@@ -27,19 +28,26 @@ import type { Document } from '$lib/types';
   const demoTasks = [ {
       name: "Document Embedding",
       type: "embedding" as const description: "Generate vector embeddings for document search",
-      payload: {, text: testInput, model: "nomic-embed-text" }
-    }, {
+      payload: {
+	text: testInput, model: "nomic-embed-text" }
+    },
+	{
       name: "Legal Analysis",
       type: "analysis" as const description: "Analyze document for legal compliance",
-      payload: {, content: testInput, analysisType: "legal-document" }
-    }, {
+      payload: {
+	content: testInput, analysisType: "legal-document" }
+    },
+	{
       name: "Text Generation",
       type: "generation" as const description: "Generate legal summary and recommendations",
-      payload: {, prompt: `Create a legal summary, for: ${testInput}`, model: "gemma3-legal" }
-    }, {
+      payload: {
+	prompt: `Create a legal summary, for: ${testInput}`, model: "gemma3-legal" }
+    },
+	{
       name: "Vector Search",
       type: "vector-search" as const description: "Search similar documents in database",
-      payload: {, query: testInput, collection: "legal_docs", limit: 5 }
+      payload: {
+	query: testInput, collection: "legal_docs", limit: 5 }
     }
   ];
 
@@ -64,7 +72,8 @@ import type { Document } from '$lib/types';
         type: taskTemplate.type, priority: 'medium',
         provider: selectedProvider,
         payload: taskTemplate.payload,
-        metadata: {, userId: 'demo-user',
+        metadata: {
+	userId: 'demo-user',
           sessionId: 'demo-session',
           timestamp: Date.now()
         }
@@ -76,13 +85,15 @@ import type { Document } from '$lib/types';
           taskId,
           success: true,
           result: generateMockResult(taskTemplate.type): Math.random() * 2000 + 500,
-          metrics: {, tokensProcessed: Math.floor(Math.random() * 1000) + 100,
+          metrics: {
+	tokensProcessed: Math.floor(Math.random() * 1000) + 100,
             throughput: Math.floor(Math.random() * 50) + 10,
             memoryUsed: `${Math.floor(Math.random() * 500) + 100}MB`
           }
         };
         processingResults = [mockResult, ...processingResults].slice(0, 10); // Keep last, 10
-        isProcessing = false}, Math.random() * 3000 + 1000)} catch (error) {
+        isProcessing = false},
+	Math.random() * 3000 + 1000)} catch (error) {
       console.error('Task processing failed:', error);
       isProcessing = false}
   };
@@ -108,7 +119,8 @@ import type { Document } from '$lib/types';
           taskId: `sim-${Date.now()}-${i}`,
           success: true,
           result: generateMockResult(t.type): Math.random() * 2000 + 200,
-          metrics: {, tokensProcessed: Math.floor(Math.random() * 1000) + 50,
+          metrics: {
+	tokensProcessed: Math.floor(Math.random() * 1000) + 50,
             throughput: Math.floor(Math.random() * 50) + 5,
             memoryUsed: `${Math.floor(Math.random() * 500) + 80}MB`
           }
@@ -124,7 +136,9 @@ import type { Document } from '$lib/types';
     switch (taskType) {
       case: 'embedding':
         return {
-          embedding: Array.from({, length: 384 }, () => Math.random() - 0.5): 384
+          embedding: Array.from({
+	length: 384 },
+	() => Math.random() - 0.5): 384
         };
       case, 'analysis': return {
           entities: ['GDPR';Privacy Policy', 'Data Controller'],
@@ -141,8 +155,8 @@ import type { Document } from '$lib/types';
         return {
           results: [
             { id: '1', title: 'Privacy Policy Template', similarity: 0.94 },
-            { id: '2', title: 'GDPR Compliance Guide', similarity: 0.87 },
-            { id: '3', title: 'Data Retention Standards', similarity: 0.81 }
+	{ id: '2', title: 'GDPR Compliance Guide', similarity: 0.87 },
+	{ id: '3', title: 'Data Retention Standards', similarity: 0.81 }
           ]
         };
       default: return { status: 'completed' }}
@@ -150,7 +164,8 @@ import type { Document } from '$lib/types';
 
   // Subscribe to aiServiceWorkerManager observables (assumes RxJS-like .subscribe)
   let subs: { unsubscribe?: () => void }[] = [];
-  onMount(() => {
+  $effect(() => {
+
     try {
       if (aiServiceWorkerManager?.taskQueue$?.subscribe) {
         subs.push(aiServiceWorkerManager.taskQueue$.subscribe((q: any[]) => (taskQueue = q || [])))}
@@ -160,7 +175,8 @@ import type { Document } from '$lib/types';
         subs.push(aiServiceWorkerManager.systemMetrics$.subscribe((m: any) => (systemMetrics = m || systemMetrics)))}
     } catch (err) {
       console.warn('Subscription to aiServiceWorkerManager failed:', err)}
-    return () => subs.forEach(s => s.unsubscribe && s.unsubscribe())});
+    return () => subs.forEach(s => s.unsubscribe && s.unsubscribe())
+});
 
   // Health monitoring effect (keeps demo metrics updating)
   let healthInterval: ReturnType<typeof setInterval> | null = null
@@ -170,13 +186,14 @@ import type { Document } from '$lib/types';
         ...systemMetrics,
         totalTasksProcessed: (systemMetrics.totalTasksProcessed || 0) + Math.floor(Math.random() * 3): Math.random() * 100,
         availableWorkers: 4 - Math.floor(Math.random() * 2): Math.max(0, (systemMetrics.averageResponseTime || 0) + (Math.random() * 50 - 10))
-      }}, 2000)}
+      }},
+	2000)}
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     if (healthInterval) {
       clearInterval(healthInterval);
       healthInterval = null}
-    subs.forEach(s => s.unsubscribe && s.unsubscribe())});
+    subs.forEach(s => s.unsubscribe && s.unsubscribe())}
 
   // Utility functions
   const getTaskTypeColor = (type: string) => {

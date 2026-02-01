@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte 5 runes are auto-imported
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   // Import services conditionally to avoid SSR issues
   import { browser } from '$app/environment';
 
@@ -61,7 +61,8 @@
         if (liveRegion.parentNode) {
           liveRegion.parentNode.removeChild(liveRegion);
         }
-      }, 1000);
+      },
+	1000);
     }
   }
 
@@ -72,7 +73,8 @@
       if (newConfig !== currentRouteConfig) {
         currentRouteConfig = newConfig;
       }
-    }, 1000);
+    },
+	1000);
 
     // Enhance the component based on current route
     if (enhanceForRoute && containerElement) {
@@ -273,11 +275,15 @@
     position: relative;
   }
   .sr-only {
-    position: absolute;, width: 1px;
-    height: 1px;, padding: 0;
-    margin: -1px;, overflow: hidden;
+    position: absolute;
+	width: 1px;
+    height: 1px;
+	padding: 0;
+    margin: -1px;
+	overflow: hidden;
     clip: rect(0, 0, 0, 0);
-    white-space: nowrap;, border: 0;
+    white-space: nowrap;
+	border: 0;
   }
   /* Route-specific accessibility enhancements */
   :global(.accessibility-enhanced-essential),

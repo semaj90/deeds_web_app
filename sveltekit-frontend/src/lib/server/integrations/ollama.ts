@@ -51,7 +51,8 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({, model: attemptModel,
+	body: JSON.stringify({
+	model: attemptModel,
                             prompt: options?.truncateTo ? text.slice(0, options.truncateTo) : text
                         })
                     }
@@ -94,8 +95,9 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
         // Stub implementation
         return {
             id: 'stub',
-            message: {, role: 'assistant', content: 'Stub response' },
-            model: this.config.chatModel
+            message: {
+	role: 'assistant', content: 'Stub response' },
+	model: this.config.chatModel
         };
     }
 
@@ -107,13 +109,14 @@ export class OllamaService implements IOllamaEmbeddingService, IOllamaChatServic
     /**
      * Health check
      */
-    async health(): Promise<{, status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }> {
+    async health(): Promise<{
+	status: 'healthy' | 'degraded' | 'unavailable'; latencyMs?: number }> {
         const startTime = Date.now();
         try {
             const response = await this.fetchWithTimeout(
                 `${this.config.baseUrl}/api/tags`,
                 { method: 'GET' },
-                5000
+	5000
             );
             if (!response.ok) {
                 return { status: 'unavailable', latencyMs: Date.now() - startTime };

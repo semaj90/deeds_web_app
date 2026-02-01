@@ -17,7 +17,8 @@ export interface QueryResult<T> {
 
 export interface ListQueryResult<T> {
   success: boolean;
-  data?: T[];, count: number;
+  data?: T[];
+	count: number;
   total?: number;
   offset?: number;
   limit?: number;
@@ -28,8 +29,10 @@ export interface ListQueryResult<T> {
 }
 
 export interface PaginationInfo {
-  page: number;, pageSize: number;
-  total: number;, pages: number;
+  page: number;
+	pageSize: number;
+  total: number;
+	pages: number;
   hasMore: boolean;
 }
 
@@ -42,7 +45,8 @@ export interface UpdateQueryResult<T> extends QueryResult<T> {
 }
 
 export interface DeleteQueryResult {
-  success: boolean;, deleted: boolean;
+  success: boolean;
+	deleted: boolean;
   error?: string;
   timestamp?: string;
 }
@@ -52,8 +56,10 @@ export interface DeleteQueryResult {
 // ============================================================================
 
 export interface DatabaseHealthResponse {
-  healthy: boolean;, database: string;
-  version: string;, timestamp: string;
+  healthy: boolean;
+	database: string;
+  version: string;
+	timestamp: string;
   message: string;
 }
 
@@ -64,10 +70,13 @@ export type { DatabaseHealthResponse as HealthCheck };
 // ============================================================================
 
 export interface User {
-  id: string;, email: string;
-  name: string;, firstName: string | null;
+  id: string;
+	email: string;
+  name: string;
+	firstName: string | null;
   lastName: string | null;
-  role: string;, isActive: boolean;
+  role: string;
+	isActive: boolean;
   avatarUrl: string | null;
   createdAt: Date | string;
   updatedAt?: Date | string;
@@ -75,11 +84,14 @@ export interface User {
 
 // NOTE: Renamed to avoid duplicate identifier collisions across the workspace.
 export interface DBCase {
-  id: string;, title: string;
+  id: string;
+	title: string;
   description: string | null;
-  createdBy: string;, createdAt: Date | string;
+  createdBy: string;
+	createdAt: Date | string;
   updatedAt: Date | string;
-  status: string;, metadata: CaseMetadata | null;
+  status: string;
+	metadata: CaseMetadata | null;
 }
 
 // Alias for convenience/backward compatibility
@@ -87,7 +99,9 @@ export type Case = DBCase;
 
 export interface CaseMetadata {
   jurisdiction?: string;
-  parties?: Array<{, role: string; name: string;, type: string }>;
+  parties?: Array<{
+	role: string; name: string;
+	type: string }>;
   courtLevel?: 'district' | 'appellate' | 'supreme';
   caseNumber?: string;
   datesFiled?: string[];
@@ -97,8 +111,10 @@ export interface CaseMetadata {
 
 // NOTE: Renamed to avoid duplicate identifier collisions across the workspace.
 export interface DBEvidence {
-  id: string;, caseId: string;
-  title: string;, description: string | null;
+  id: string;
+	caseId: string;
+  title: string;
+	description: string | null;
   evidenceType: string;
   subType?: string | null;
   summary?: string | null;
@@ -141,15 +157,18 @@ export interface EvidenceMetadata {
 }
 
 export interface ChainOfCustodyRecord {
-  id: string;, evidenceId: string;
+  id: string;
+	evidenceId: string;
   timestamp: string | Date;
-  handler: string;, action: string;
+  handler: string;
+	action: string;
   location?: string;
   notes?: string;
 }
 
 export interface Document {
-  id: string;, userId: string;
+  id: string;
+	userId: string;
   content: string | null;
   embedding?: number[] | null;
   createdAt: Date | string;
@@ -157,9 +176,12 @@ export interface Document {
 }
 
 export interface ChatMessage {
-  id: string;, userId: string;
-  content: string;, timestamp: Date | string;
-  sessionId: string;, messageType: 'user' | 'assistant' | 'system';
+  id: string;
+	userId: string;
+  content: string;
+	timestamp: Date | string;
+  sessionId: string;
+	messageType: 'user' | 'assistant' | 'system';
   metadata?: ChatMessageMetadata | null;
 }
 
@@ -172,10 +194,13 @@ export interface ChatMessageMetadata {
 }
 
 export interface AnalysisResult {
-  analysisId: string;, evidenceId: string;
+  analysisId: string;
+	evidenceId: string;
   results: Record<string, unknown>;
-  analysisTypes: string[];, confidence: number;
-  processingTime: number;, createdAt: Date | string;
+  analysisTypes: string[];
+	confidence: number;
+  processingTime: number;
+	createdAt: Date | string;
   updatedAt: Date | string;
 }
 
@@ -201,8 +226,10 @@ export interface AnalysisResultListResult extends ListQueryResult<AnalysisResult
 // ============================================================================
 
 export interface DBVectorSearchResult {
-  id: string;, title: string;
-  content: string;, similarity: number;
+  id: string;
+	title: string;
+  content: string;
+	similarity: number;
   embedding?: number[];
   metadata?: Record<string, unknown>;
 }
@@ -212,8 +239,10 @@ export type VectorSearchResult = DBVectorSearchResult;
 
 export interface VectorSearchQueryResult {
   success: boolean;
-  results?: DBVectorSearchResult[];, query: string;
-  queryEmbedding?: number[];, totalResults: number;
+  results?: DBVectorSearchResult[];
+	query: string;
+  queryEmbedding?: number[];
+	totalResults: number;
   error?: string;
 }
 
@@ -222,19 +251,25 @@ export interface VectorSearchQueryResult {
 // ============================================================================
 
 export interface BatchQueryResult<T> {
-  success: boolean;, results: Array<{
-    id: string;, success: boolean;
+  success: boolean;
+	results: Array<{
+    id: string;
+	success: boolean;
     data?: T;
     error?: string;
   }>;
-  successCount: number;, failureCount: number;
+  successCount: number;
+	failureCount: number;
   error?: string;
 }
 
 export interface Transaction {
-  id: string;, status: 'pending' | 'committed' | 'rolled_back';
-  operations: Array<{, type: 'insert' | 'update' | 'delete';
-    table: string;, data: Record<string, unknown>;
+  id: string;
+	status: 'pending' | 'committed' | 'rolled_back';
+  operations: Array<{
+	type: 'insert' | 'update' | 'delete';
+    table: string;
+	data: Record<string, unknown>;
   }>;
   createdAt: Date | string;
   completedAt?: Date | string;

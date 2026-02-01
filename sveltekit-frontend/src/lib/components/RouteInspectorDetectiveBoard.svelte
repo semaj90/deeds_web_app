@@ -2,8 +2,10 @@
 	let pkg = $state<any>(undefined);
 
 	type RouteDetail = {
-		path: string;, kind: 'page' | 'layout' | 'endpoint';
-		file: string;, summary: string;
+		path: string;
+	kind: 'page' | 'layout' | 'endpoint';
+		file: string;
+	summary: string;
 		category?: string;
 		version?: string;
 		requiredPackages?: string[];
@@ -16,15 +18,18 @@
 
 	type Phase72Status = {
 		errorCount: number;
-		lastError?: {, code: string;
-			message: string;, count: number;
+		lastError?: {
+	code: string;
+			message: string;
+	count: number;
 			lastSeen: string;
 		};
 	};
 
 	type Phase82Status = {
 		status: 'not_started' | 'in_progress' | 'complete';
-		filesUpgraded: number;, totalFiles: number;
+		filesUpgraded: number;
+	totalFiles: number;
 		lastRun?: string;
 	};
 
@@ -83,7 +88,8 @@
 			await fetch('/api/phase72/suggest-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+	body: JSON.stringify({
+	route: route.path })
 			});
 		} finally {
 			actionInProgress = null;
@@ -97,7 +103,8 @@
 			const res = await fetch('/api/phase82/upgrade-route', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+	body: JSON.stringify({
+	route: route.path })
 			});
 			if (res.ok) {
 				const data = await res.json();
@@ -128,7 +135,8 @@
 			await fetch('/api/phase78/playwright-check', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+	body: JSON.stringify({
+	route: route.path })
 			});
 		} finally {
 			actionInProgress = null;

@@ -1,7 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let title = $state<any>(undefined);
-
 /**
  * Svelte 5 Alert Component
  * Accessible alert/notification with Svelte 5 runes
@@ -25,7 +22,8 @@ let {
 	dismissible = false,
 	icon = true,
 	class: className = '',
-	ondismiss: children,
+	ondismiss,
+	children,
 	action
 }: Props = $props();
 

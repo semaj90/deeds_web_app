@@ -7,7 +7,8 @@
 export type OllamaEndpoint = 'generate' | 'chat' | 'embeddings' | 'models' | 'health' | 'pull' | 'version';
 
 export interface ModelConfig {
-    name: string;, type: 'local' | 'embedding' | 'remote';
+    name: string;
+	type: 'local' | 'embedding' | 'remote';
     capabilities: string[];
     contextWindow?: number;
     embeddingDimension?: number;
@@ -19,23 +20,33 @@ export interface ModelConfig {
 }
 
 export interface OllamaConfig {
-    baseUrl: string;, endpoints: Record<OllamaEndpoint, string>;
-    defaultModel: string;, embeddingModel: string;
+    baseUrl: string;
+	endpoints: Record<OllamaEndpoint, string>;
+    defaultModel: string;
+	embeddingModel: string;
     fallbackModel: string;
     fallbackModels?: Record<string, string>;
-    timeout: number;, maxRetries: number;
+    timeout: number;
+	maxRetries: number;
     streamEnabled: boolean;
-    gpu?: {, enabled: boolean;
-        layers: number;, mainGpu: number;
+    gpu?: {
+	enabled: boolean;
+        layers: number;
+	mainGpu: number;
         tensorSplit: null | number[];
     };
-    performance?: {, batchSize: number;
-        parallelRequests: number;, cacheEnabled: boolean;
+    performance?: {
+	batchSize: number;
+        parallelRequests: number;
+	cacheEnabled: boolean;
         cacheTTL: number;
     };
-    features?: {, som: boolean;
-        proactiveCaching: boolean;, multiModalIndexing: boolean;
-        reinforcementLearning: boolean;, webGpuAcceleration: boolean;
+    features?: {
+	som: boolean;
+        proactiveCaching: boolean;
+	multiModalIndexing: boolean;
+        reinforcementLearning: boolean;
+	webGpuAcceleration: boolean;
         intelligentFallback: boolean;
     };
 }
@@ -110,7 +121,7 @@ export const OLLAMA_ENDPOINTS: Record<OllamaEndpoint, string> = (Object.keys(FAL
         acc[key] = explicit ?? `${BASE_URL}${FALLBACK_PATHS[key]}`;
         return acc;
     },
-    {} as Record<OllamaEndpoint, string>
+	{} as Record<OllamaEndpoint, string>
 );
 
 BACKENDS.set('ollama', BASE_URL);
@@ -143,7 +154,8 @@ export function getBackend(name = 'ollama'): string {
 
 // Model configurations aligned with the blueprint architecture
 export const MODELS: Record<string, ModelConfig> = {
-    'gemma3-legal:latest': {, name: 'gemma3-legal:latest',
+    'gemma3-legal:latest': {
+	name: 'gemma3-legal:latest',
         type: 'local',
         capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
         contextWindow: 8192,
@@ -152,20 +164,23 @@ export const MODELS: Record<string, ModelConfig> = {
         topP: 0.9,
         topK: 40,
         systemPrompt: `You are a sophisticated legal AI assistant powered by Gemma3, specialized in legal document analysis, contract review, and case law research. You provide accurate, context-aware legal insights while maintaining strict confidentiality and professional standards.`,
-        options: {, num_gpu: 1,
+        options: {
+	num_gpu: 1,
             num_thread: 8,
             repeat_penalty: 1.1,
             seed: 42,
             stop: ['User:', 'Human:', '\n\n\n']
         }
     },
-    'nomic-embed-text': {, name: 'nomic-embed-text',
+	'nomic-embed-text': {
+	name: 'nomic-embed-text',
         type: 'embedding',
         capabilities: ['embeddings'],
         embeddingDimension: 768,
         contextWindow: 8192
     },
-    'embeddinggemma': {, name: 'embeddinggemma',
+	'embeddinggemma': {
+	name: 'embeddinggemma',
         type: 'embedding',
         capabilities: ['embeddings'],
         embeddingDimension: 768,
@@ -188,23 +203,27 @@ export const OLLAMA_CONFIG: OllamaConfig = {
     defaultModel: 'gemma3-legal:latest',
     embeddingModel: 'embeddinggemma',
     fallbackModel: 'gemma3-legal:latest',
-    fallbackModels: {, legal: 'gemma3-legal:latest',
+    fallbackModels: {
+	legal: 'gemma3-legal:latest',
         general: 'gemma3-legal:latest'
     },
-    timeout: 60000,
+	timeout: 60000,
     maxRetries: 3,
     streamEnabled: true,
-    gpu: {, enabled: true,
+    gpu: {
+	enabled: true,
         layers: 35,
         mainGpu: 0,
         tensorSplit: null
     },
-    performance: {, batchSize: 32,
+	performance: {
+	batchSize: 32,
         parallelRequests: 4,
         cacheEnabled: true,
         cacheTTL: 3600
     },
-    features: {, som: true,
+	features: {
+	som: true,
         proactiveCaching: true,
         multiModalIndexing: true,
         reinforcementLearning: false,

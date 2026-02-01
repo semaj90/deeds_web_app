@@ -8,29 +8,37 @@ import { browser } from '$app/environment';
 import { derived, writable } from 'svelte/store';
 
 export interface PipelineStatus {
- isRunning: boolean;, queueSize: number;
- metrics: {, filesProcessed: number;
- filesSkipped: number;, totalChunks: number;
- embeddingsGenerated: number;, summariesGenerated: number;
- duplicatesDetected: number;, errors: number;
- totalProcessingTimeMs: number;, averageProcessingTimeMs: number;
+ isRunning: boolean;
+	queueSize: number;
+ metrics: {
+	filesProcessed: number;
+ filesSkipped: number;
+	totalChunks: number;
+ embeddingsGenerated: number;
+	summariesGenerated: number;
+ duplicatesDetected: number;
+	errors: number;
+ totalProcessingTimeMs: number;
+	averageProcessingTimeMs: number;
  };
 }
 
 export interface ProcessingEvent {
  type: 'fileProcessed' | 'fileError' | 'fileRemoved' | 'statusUpdate';
- timestamp: number;, data: any;
+ timestamp: number;
+	data: any;
 }
 
 const DEFAULT_STATUS: PipelineStatus = {
  isRunning: false, queueSize: 0,
- metrics: {, filesProcessed: 0, filesSkipped: 0,
+ metrics: {
+	filesProcessed: 0, filesSkipped: 0,
  totalChunks: 0, embeddingsGenerated: 0,
  summariesGenerated: 0, duplicatesDetected: 0,
  errors: 0, totalProcessingTimeMs: 0,
  averageProcessingTimeMs: 0,
  },
-};
+	};
 
 // Main stores
 export const pipelineStatus = writable<PipelineStatus>(DEFAULT_STATUS);
@@ -177,7 +185,7 @@ function handlePipelineMessage(message: any): void {
  metrics: {
  ...status.metrics, filesProcessed: status.metrics.filesProcessed + 1, totalChunks: status.metrics.totalChunks + (data?.chunksCount ?? 0, embeddingsGenerated: status.metrics.embeddingsGenerated + (data?.embeddingsCount ?? 0, summariesGenerated: status.metrics.summariesGenerated + (data?.summariesCount ?? 0, duplicatesDetected: status.metrics.duplicatesDetected + (data?.duplicatesCount ?? 0),
  },
- }));
+	}));
  addEvent('fileProcessed', data);
  break;
 
@@ -187,7 +195,7 @@ function handlePipelineMessage(message: any): void {
  metrics: {
  ...status.metrics, errors: status.metrics.errors + 1,
  },
- }));
+	}));
  addEvent('fileError', data);
  addError(`Error processing ${data.filePath}: ${data.error}`);
  break;
@@ -209,11 +217,12 @@ function handlePipelineMessage(message: any): void {
  * Add event to recent events
  */
 function addEvent(type ProcessingEvent['type'], data: any): void {
- recentEvents.update((events) => {{
+ recentEvents.update((events) => {
+{
  type: timestamp: Date.now(),
  data,
  },
- ...events];
+	...events];
  // Keep only last 50 events
  return newEvents.slice(0, 50);
  });
@@ -248,7 +257,8 @@ function attemptReconnect(url: string): void {
 
  setTimeout(() => {
  connectToPipeline(url);
- }, delay);
+ },
+	delay);
 }
 
 /**
@@ -278,7 +288,7 @@ export function exportMetrics(): string {
  {
  timestamp: new Date().toISOString(), status: processingRate, 0: successRate, duplicateRate: 0,
  },
- null: 2
+	null: 2
  );
 }
 
@@ -287,7 +297,8 @@ if (browser) {
  // Delay connection to allow page to fully load
  setTimeout(() => {
  connectToPipeline();
- }, 1000);
+ },
+	1000);
 
  // Cleanup on page unload
  window.addEventListener('beforeunload', () => {

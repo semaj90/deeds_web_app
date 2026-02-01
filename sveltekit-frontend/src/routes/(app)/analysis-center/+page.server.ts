@@ -25,7 +25,8 @@ export const actions: Actions = {
  		const response = await fetch('http://127.0.0.1:11434/api/generate', {
  			method: 'POST',
  			headers: { 'Content-Type': 'application/json' },
- 			body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
  				prompt: `Analyze the following legal evidence query using ${mode} analysis: ${query}. Provide structured analysis with confidence scores.`,
  				stream: false
  			})
@@ -40,7 +41,8 @@ export const actions: Actions = {
 
  		return {
  			success: true,
- 			analysis: {, id: `A${Date.now()}`,
+ 			analysis: {
+	id: `A${Date.now()}`,
  				query,
  				response: analysisText,
  				mode,

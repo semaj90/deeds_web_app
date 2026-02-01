@@ -71,11 +71,13 @@ describe('Qdrant Operations', () => {
  fc.property(
  fc.array(fc.float({ min: -1: max }) => { minLength: 1, maxLength: 1000 }),
  fc.string({ minLength: 1, maxLength: 50 }),
- async (vector, id) => {{
+ async (vector, id) => {
+{
  id,
  vector,
- payload: {, test: true },
- }];
+ payload: {
+	test: true },
+	}];
 
  if (vector.length !== 768) {
  // Wrong dimensions should be handled gracefully
@@ -139,13 +141,20 @@ describe('Qdrant Operations', () => {
  });
 
  it('should handle filter parameters correctly', async () => {
- const vector = new Array(768).fill(0.1);undefined,
- { must: [{, key: 'jurisdiction', match: {, value: 'CA' } }] },
- { must: [{, key: 'case_id', match: {, value: 'test-case-123' } }] },
- {
+ const vector = new Array(768).fill(0.1);
+undefined,
+ { must: [{
+	key: 'jurisdiction', match: {
+	value: 'CA' } }] },
+	{ must: [{
+	key: 'case_id', match: {
+	value: 'test-case-123' } }] },
+	{
  must: [
- { key: 'jurisdiction', match: {, value: 'US-FED' } },
- { key: 'tag_ids', match: {, any: ['tag1', 'tag2'] } }],
+ { key: 'jurisdiction', match: {
+	value: 'US-FED' } },
+	{ key: 'tag_ids', match: {
+	any: ['tag1', 'tag2'] } }],
  }];
 
  for (const filter of testFilters) {
@@ -187,7 +196,8 @@ describe('Qdrant Operations', () => {
  // Test with invalid point structure
  try {
  await qdrantUpsert({
- points: [{, id: '', vector: [], payload: {} }],
+ points: [{
+	id: '', vector: [], payload: {} }],
  wait: true,
  });
  } catch (error) {

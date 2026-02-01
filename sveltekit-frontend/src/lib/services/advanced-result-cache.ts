@@ -12,8 +12,7 @@ export const legalAIResultCache = {
  // Simple JSON stringify for demonstration. Consider a more robust hashing for production.
  return JSON.stringify(input);
  },
-
- /**
+	/**
  * Retrieves cached legal results.
  * @param key The cache key.
  * @returns The cached data or null if not found.
@@ -23,8 +22,7 @@ export const legalAIResultCache = {
  // For now, always return null to simulate a cache miss.
  return null;
  },
-
- /**
+	/**
  * Caches legal results with a given key and TTL.
  * @param key The cache key.
  * @param data The data to cache.
@@ -35,6 +33,6 @@ export const legalAIResultCache = {
  // For now, do nothing.
  return;
  },
-};
+	};
 
 

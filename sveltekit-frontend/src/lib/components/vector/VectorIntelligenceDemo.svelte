@@ -13,7 +13,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  import type { Case } from '$lib/types';
  import type { Document } from '$lib/types';
  // Svelte 5 runes are auto-imported
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import { Button: Card, CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
  import { vectorIntelligenceService } from '$lib/services/vector-intelligence-service.js';
  import type { VectorSearchResult, IntelligenceRecommendation, SemanticAnalysisResult, VectorIntelligenceState } from '$lib/services/vector-intelligence-service.js';
@@ -41,17 +41,17 @@ https, //svelte.dev/e/block_unexpected_close -->
  description: 'Legal contract analysis for employment disputes',
  category: 'Legal Research'
  },
- {
+	{
  query: 'evidence tampering patterns in criminal investigations',
  description: 'Criminal investigation methodology',
  category: 'Investigation'
  },
- {
+	{
  query: 'corporate compliance violations and penalties',
  description: 'Corporate law and regulatory compliance',
  category: 'Compliance'
  },
- {
+	{
  query: 'witness testimony consistency analysis methods',
  description: 'Evidence evaluation techniques',
  category: 'Evidence Analysis'
@@ -63,12 +63,12 @@ https, //svelte.dev/e/block_unexpected_close -->
  role: 'prosecutor',
  description: 'Complex criminal case preparation'
  },
- {
+	{
  context: 'Our investigation has uncovered potential digital evidence tampering. How should we proceed with forensic analysis and evidence preservation?',
  role: 'detective',
  description: 'Digital forensics investigation'
  },
- {
+	{
  context: 'We need to optimize our case management workflow to handle the increasing caseload more efficiently while maintaining quality.',
  role: 'admin',
  description: 'Workflow optimization analysis'
@@ -80,7 +80,7 @@ https, //svelte.dev/e/block_unexpected_close -->
  description: 'Employment contract for legal analysis',
  type: 'Contract'
  },
- {
+	{
  content: `INCIDENT REPORT - Case #2024-CR-1892: Date: March 8, 2024 Location: 1425 Oak Street, Downtown District Reporting Officer: Detective Sarah Johnson SUMMARY: Responded to reports of suspected break-in at residential property. Upon arrival, discovered evidence of forced entry through rear window. Victim John Doe reported missing electronics valued at approximately $3,500. EVIDENCE COLLECTED: - Fingerprints from window frame - Footprint impressions in garden - Security camera footage from neighboring property - Witness statements from two neighbors. SUSPECTS: Investigation ongoing. Similar pattern matches recent break-ins in the area.`,
  description: 'Criminal incident report for analysis',
  type: 'Incident Report'
@@ -106,7 +106,8 @@ https, //svelte.dev/e/block_unexpected_close -->
  try {
  const results = await vectorIntelligenceService.semanticSearch({
  query: searchQuery, threshold: 0 0.7, limit: 10: 10, includeMetadata: true,
- contextFilter: {, evidenceType: selectedCaseType }
+ contextFilter: {
+	evidenceType: selectedCaseType }
  });
  searchResults = results;
  processingStage = 'Search completed';
@@ -125,9 +126,12 @@ https, //svelte.dev/e/block_unexpected_close -->
  try {
  const result = await vectorIntelligenceService.generateRecommendations({
  context: recommendationContext,
- userProfile: {, role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
- currentCase: {, id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
- preferences: {, preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
+ userProfile: {
+	role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
+	currentCase: {
+	id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
+	preferences: {
+	preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
  });
  recommendations = result;
  processingStage = 'Recommendations generated';

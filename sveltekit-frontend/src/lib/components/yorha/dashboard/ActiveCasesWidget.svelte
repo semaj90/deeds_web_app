@@ -1,6 +1,6 @@
 <script lang="ts">
   import { appStore } from '$lib/stores/app-store';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   let activeCases: any[] = $state([]);
   let loading = $state(true);
@@ -44,7 +44,7 @@
           lastActivity: '2 hours ago',
           evidenceCount: 1247
         },
-        {
+	{
           id: 'CASE-2024-002',
           title: 'Intellectual Property Dispute',
           status: 'active',
@@ -53,7 +53,7 @@
           lastActivity: '1 day ago',
           evidenceCount: 892
         },
-        {
+	{
           id: 'CASE-2024-003',
           title: 'Contract Breach Analysis',
           status: 'review',
@@ -68,16 +68,19 @@
     }
   }
 
-  onMount(() => {
+  $effect(() => {
+
     loadActiveCases();
 
     // Refresh cases periodically
     const interval = setInterval(() => {
       loadActiveCases();
-    }, 60000); // Refresh every minute
+    },
+	60000); // Refresh every minute
 
     return () => clearInterval(interval);
-  });
+  
+});
 
   function getStatusColor(status: string): string {
     switch (status) {

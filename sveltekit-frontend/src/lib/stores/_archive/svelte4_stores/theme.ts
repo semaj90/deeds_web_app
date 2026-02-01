@@ -1,12 +1,18 @@
 import { writable } from 'svelte/store';
 
 export interface YoRHaTheme {
- primary: string;, secondary: string;
- accent: string;, background: string;
- surface: string;, text: string;
- textSecondary: string;, border: string;
- success: string;, warning: string;
- error: string;, info: string;
+ primary: string;
+	secondary: string;
+ accent: string;
+	background: string;
+ surface: string;
+	text: string;
+ textSecondary: string;
+	border: string;
+ success: string;
+	warning: string;
+ error: string;
+	info: string;
 }
 
 export const yorhaTheme: YoRHaTheme = {
@@ -23,19 +29,19 @@ export const terminalThemes = {
  background: '#000000',
  text: '#00ff00',
  },
- analysis: {
+	analysis: {
  ...yorhaTheme,
  primary: '#f59e0b',
  background: '#1a1a1a',
  text: '#ffffff',
  },
- alert: {
+	alert: {
  ...yorhaTheme,
  primary: '#ef4444',
  background: '#2d1b1b',
  text: '#ffcccc',
  },
-};
+	};
 
 export function setTerminalTheme(mode, 'command' | 'analysis' | 'alert') {
  theme.set(terminalThemes[mode]);

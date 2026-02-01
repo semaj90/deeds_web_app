@@ -41,10 +41,10 @@ export function useModal(initialOpen = false) {
 		get isOpen() {
 			return isOpen;
 		},
-		get data() {
+	get data() {
 			return data;
 		},
-		open,
+	open,
 		close,
 		confirm,
 		cancel,
@@ -54,16 +54,19 @@ export function useModal(initialOpen = false) {
 
 // Toast/Notification state management
 interface Toast {
-	id: string;, type: 'success' | 'error' | 'warning' | 'info';
+	id: string;
+	type: 'success' | 'error' | 'warning' | 'info';
 	title: string;
 	message?: string;
-	duration?: number;, createdAt: number;
+	duration?: number;
+	createdAt: number;
 }
 
 export function useToast() {
 	let toasts = $state<Toast[]>([]);
 
-	// Derive active toasts from current toasts arraytoasts.filter((t) => {
+	// Derive active toasts from current toasts array
+toasts.filter((t) => {
 			const now = Date.now();
 			const duration = t?.duration ?? 5000;
 			return now - t.createdAt < duration;
@@ -89,7 +92,8 @@ export function useToast() {
 		// Auto-remove toast after duration
 		setTimeout(() => {
 			removeToast(id);
-		}, toast.duration);
+		},
+	toast.duration);
 
 		return id;
 	}
@@ -102,16 +106,20 @@ export function useToast() {
 		toasts = [];
 	}
 
-	// Convenience methodsaddToast('success', title, message, duration);addToast('error', title, message, duration);addToast('warning', title, message, duration);addToast('info', title, message, duration);
+	// Convenience methods
+addToast('success', title, message, duration);
+addToast('error', title, message, duration);
+addToast('warning', title, message, duration);
+addToast('info', title, message, duration);
 
 	return {
 		get toasts() {
 			return toasts;
 		},
-		get activeToasts() {
+	get activeToasts() {
 			return activeToasts;
 		},
-		addToast,
+	addToast,
 		removeToast,
 		clearAll,
 		success,
@@ -128,7 +136,8 @@ export function useForm<T extends Record<string, any>>(initialValues: T) {
 	let touched = $state<Partial<Record<keyof T, boolean>>>({});
 	let isSubmitting = $state<boolean>(false);
 
-	let isValid = $derived(Object.keys(errors).length === 0);Object.keys(values).some((key) => (values as any)[key] !== (initialValues as any)[key])
+	let isValid = $derived(Object.keys(errors).length === 0);
+Object.keys(values).some((key) => (values as any)[key] !== (initialValues as any)[key])
 	);
 
 	function setValue<K extends keyof T>(field: K, value: T[K]): void {
@@ -209,22 +218,22 @@ export function useForm<T extends Record<string, any>>(initialValues: T) {
 		get values() {
 			return values;
 		},
-		get errors() {
+	get errors() {
 			return errors;
 		},
-		get touched() {
+	get touched() {
 			return touched;
 		},
-		get isSubmitting() {
+	get isSubmitting() {
 			return isSubmitting;
 		},
-		get isValid() {
+	get isValid() {
 			return isValid;
 		},
-		get isDirty() {
+	get isDirty() {
 			return isDirty;
 		},
-		setValue,
+	setValue,
 		setError,
 		clearError,
 		clearAllErrors,
@@ -266,10 +275,10 @@ export function useLoading(initialState = false) {
 		get isLoading() {
 			return isLoading;
 		},
-		get message() {
+	get message() {
 			return loadingMessage;
 		},
-		start,
+	start,
 		stop,
 		wrap,
 	};
@@ -307,19 +316,19 @@ export function usePagination(totalItems: number, itemsPerPage = 10) {
 		get currentPage() {
 			return currentPage;
 		},
-		get perPage() {
+	get perPage() {
 			return perPage;
 		},
-		get totalPages() {
+	get totalPages() {
 			return totalPages;
 		},
-		get startIndex() {
+	get startIndex() {
 			return startIndex;
 		},
-		get endIndex() {
+	get endIndex() {
 			return endIndex;
 		},
-		setPage,
+	setPage,
 		nextPage,
 		prevPage,
 		setItemsPerPage,

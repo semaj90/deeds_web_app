@@ -15,8 +15,8 @@
  // Search scopes
  const searchScopes = [
  { id: 'all', label: 'ALL RECORDS', icon: '🔍' },
- { id: 'recent', label: 'RECENT (7 DAYS)', icon: '🕐' },
- { id: 'archived', label: 'ARCHIVED', icon: '📦' }
+	{ id: 'recent', label: 'RECENT (7 DAYS)', icon: '🕐' },
+	{ id: 'archived', label: 'ARCHIVED', icon: '📦' }
  ] as const;
 
  // Mock search data
@@ -31,7 +31,7 @@
  category: 'financial-crime',
  status: 'active'
  },
- {
+	{
  id: 'E001',
  type: 'evidence',
  title: 'Financial Transaction Log',
@@ -41,7 +41,7 @@
  category: 'document',
  status: 'verified'
  },
- {
+	{
  id: 'P001',
  type: 'person',
  title: 'John Doe - POI',
@@ -51,7 +51,7 @@
  category: 'suspect',
  status: 'wanted'
  },
- {
+	{
  id: 'D001',
  type: 'document',
  title: 'Legal Contract Analysis',
@@ -61,7 +61,7 @@
  category: 'legal-document',
  status: 'analyzed'
  },
- {
+	{
  id: 'M001',
  type: 'communication',
  title: 'Intercepted Email',
@@ -116,7 +116,8 @@
 					const response = await fetch(`${endpoint}/api/embeddings`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({, model: 'embeddinggemma:latest',
+	body: JSON.stringify({
+model: 'embeddinggemma:latest',
 							prompt: `${searchQuery} ${record.content}`
 						})
 					});
@@ -393,15 +394,19 @@
 <style>
  .global-search {
  background: linear-gradient(135deg, #0d1117, #161b22);
- min-height: 100vh;, color: #f0f6fc;
+ min-height: 100vh;
+color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
  position: relative;
  }
 
  .global-search::before {
- content: '';, position: fixed;
- top: 0;, left: 0;
- width: 100%;, height: 100%;
+ content: '';
+position: fixed;
+ top: 0;
+left: 0;
+ width: 100%;
+height: 100%;
  background:
  linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
  linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
@@ -420,7 +425,8 @@
  .header-title h1 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 2rem;, margin: 0;
+ font-size: 2rem;
+margin: 0;
  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
  }
 
@@ -436,12 +442,14 @@
  }
 
  .status-indicator.active {
- background: #10b981;, color: #0d1117;
+ background: #10b981;
+color: #0d1117;
  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
  }
 
  .status-indicator.inactive {
- background: #6b7280;, color: #f9fafb;
+ background: #6b7280;
+color: #f9fafb;
  }
 
  .search-controls {
@@ -449,17 +457,20 @@
  }
 
  .scope-selector {
- display: flex;, gap: 0.5rem;
+ display: flex;
+gap: 0.5rem;
  }
 
  .scope-btn {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center;
+gap: 0.5rem;
  padding: 0.75rem 1rem;
  background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
- border-radius: 8px;, cursor: pointer;
+ border-radius: 8px;
+cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -477,7 +488,8 @@
  .search-layout {
  display: grid;
  grid-template-columns: 400px 1fr 350px;
- gap: 1rem;, height: calc(100vh - 140px);
+ gap: 1rem;
+height: calc(100vh - 140px);
  padding: 1rem;
  }
 
@@ -486,7 +498,8 @@
  .detail-panel {
  background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
- border-radius: 8px;, padding: 1rem;
+ border-radius: 8px;
+padding: 1rem;
  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  }
 
@@ -495,14 +508,17 @@
  }
 
  .search-input-container {
- display: flex;, gap: 0.5rem;
+ display: flex;
+gap: 0.5rem;
  }
 
  .search-input {
- flex: 1;, padding: 0.75rem;
+ flex: 1;
+padding: 0.75rem;
  background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
- border-radius: 4px;, color: #f0f6fc;
+ border-radius: 4px;
+color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
  font-size: 1rem;
  }
@@ -517,8 +533,10 @@
  padding: 0.75rem 1.5rem;
  background: linear-gradient(90deg, #10b981, #34d399);
  border: none;
- border-radius: 4px;, color: #0d1117;
- font-weight: bold;, cursor: pointer;
+ border-radius: 4px;
+color: #0d1117;
+ font-weight: bold;
+cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -528,7 +546,8 @@
  }
 
  .search-btn:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6;
+cursor:not-allowed;
  }
 
  .search-btn.searching {
@@ -536,10 +555,13 @@
  }
 
  .loading-spinner {
- display: inline-block;, width: 16px;
- height: 16px;, border: 2px solid #0d1117;
+ display: inline-block;
+width: 16px;
+ height: 16px;
+border: 2px solid #0d1117;
  border-radius: 50%;
- border-top-color: transparent;, animation: spin 1s ease-in-out infinite;
+ border-top-color: transparent;
+animation: spin 1s ease-in-out infinite;
  margin-right: 0.5rem;
  }
 
@@ -550,7 +572,8 @@
  .filters-section h3 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 0.875rem;, margin: 0 0 1rem 0;
+ font-size: 0.875rem;
+margin: 0 0 1rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
@@ -562,7 +585,8 @@
 
  .filter-item {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center;
+gap: 0.5rem;
  cursor: pointer;
  }
 
@@ -578,7 +602,8 @@
  .results-header h2 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 1rem;, margin: 0 0 1rem 0;
+ font-size: 1rem;
+margin: 0 0 1rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
@@ -593,11 +618,14 @@
  }
 
  .result-item {
- display: flex;, gap: 1rem;
- padding: 1rem;, background: rgba(30, 41, 59, 0.5);
+ display: flex;
+gap: 1rem;
+ padding: 1rem;
+background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
  border-radius: 8px;
- margin-bottom: 0.75rem;, cursor: pointer;
+ margin-bottom: 0.75rem;
+cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -610,8 +638,10 @@
  .result-icon {
  display: flex;
  align-items: center;
- justify-content: center;, width: 40px;
- height: 40px;, background: rgba(16, 185, 129, 0.2);
+ justify-content: center;
+width: 40px;
+ height: 40px;
+background: rgba(16, 185, 129, 0.2);
  border-radius: 8px;
  }
 
@@ -632,12 +662,14 @@
 
  .result-title {
  color: #f0f6fc;
- font-size: 1rem;, margin: 0;
+ font-size: 1rem;
+margin: 0;
  font-weight: bold;
  }
 
  .result-meta {
- display: flex;, gap: 0.75rem;
+ display: flex;
+gap: 0.75rem;
  font-size: 0.75rem;
  }
 
@@ -652,7 +684,8 @@
 
  .result-status {
  padding: 0.125rem 0.375rem;
- border-radius: 3px;, color: #0d1117;
+ border-radius: 3px;
+color: #0d1117;
  font-weight: bold;
  font-size: 0.625rem;
  }
@@ -689,20 +722,24 @@
  .detail-header h2 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 1rem;, margin: 0;
+ font-size: 1rem;
+margin: 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .detail-actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+gap: 0.5rem;
  }
 
  .action-btn {
  padding: 0.5rem 0.75rem;
- border-radius: 4px;, border: 1px solid transparent;
+ border-radius: 4px;
+border: 1px solid transparent;
  cursor: pointer;
  font-size: 0.75rem;
- font-weight: bold;, transition: all 0.3s ease;
+ font-weight: bold;
+transition: all 0.3s ease;
  }
 
  .action-btn.primary {
@@ -716,7 +753,8 @@
  }
 
  .action-btn.ghost {
- background: transparent;, color: #10b981;
+ background: transparent;
+color: #10b981;
  border: 1px dashed rgba(16, 185, 129, 0.25);
  }
 
@@ -736,16 +774,19 @@
  .detail-section h3 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 0.75rem;, margin: 0 0 0.75rem 0;
+ font-size: 0.75rem;
+margin: 0 0 0.75rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
  .detail-grid {
- display: grid;, gap: 0.5rem;
+ display: grid;
+gap: 0.5rem;
  }
 
  .detail-row {
- display: flex;, gap: 0.5rem;
+ display: flex;
+gap: 0.5rem;
  }
 
  .detail-label {
@@ -765,7 +806,8 @@
  .content-preview {
  color: #e5e7eb;
  font-size: 0.875rem;
- line-height: 1.5;, background: rgba(30, 41, 59, 0.5);
+ line-height: 1.5;
+background: rgba(30, 41, 59, 0.5);
  padding: 0.75rem;
  border-radius: 4px;
  }
@@ -773,31 +815,36 @@
  .profile-info p,
  .case-info p {
  color: #e5e7eb;
- font-size: 0.875rem;, margin: 0.25rem 0;
+ font-size: 0.875rem;
+margin: 0.25rem 0;
  }
 
  .detail-placeholder {
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;, height: 400px;
+ justify-content: center;
+height: 400px;
  text-align: center;
  }
 
  .placeholder-icon {
  font-size: 3rem;
- margin-bottom: 1rem;, opacity: 0.5;
+ margin-bottom: 1rem;
+opacity: 0.5;
  }
 
  .detail-placeholder h3 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 1rem;, margin: 0 0 0.5rem 0;
+ font-size: 1rem;
+margin: 0 0 0.5rem 0;
  }
 
  .detail-placeholder p {
  color: #9ca3af;
- font-size: 0.875rem;, margin: 0;
+ font-size: 0.875rem;
+margin: 0;
  }
 </style>
 

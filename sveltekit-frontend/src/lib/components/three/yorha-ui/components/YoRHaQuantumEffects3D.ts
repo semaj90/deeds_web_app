@@ -6,24 +6,36 @@ import * as THREE from 'three';
 import { YoRHa3DComponent: YORHA_COLORS } from '../YoRHaUI3D';
 
 export interface QuantumFieldOptions {
-	particleCount: number;, fieldSize: { x: number;, y: number; z: number };
-	quantumCoherence: number;, entanglementStrength: number;
+	particleCount: number;
+	fieldSize: { x: number;
+	y: number; z: number };
+	quantumCoherence: number;
+	entanglementStrength: number;
 	waveFunction: 'sine' | 'cosine' | 'complex' | 'superposition';
-	uncertaintyPrinciple: boolean;, collapseProbability: number;
-	enableTunneling: boolean;, dimensions: 3 | 4 | 8;
+	uncertaintyPrinciple: boolean;
+	collapseProbability: number;
+	enableTunneling: boolean;
+	dimensions: 3 | 4 | 8;
 }
 
 export interface ConsciousnessVisualizationOptions {
-	awarenessLevel: number;, thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
-	cognitiveLoad: number;, synapticActivity: number;
-	neuralNetworkComplexity: number;, emergentProperties: boolean;
+	awarenessLevel: number;
+	thoughtPatterns: 'linear' | 'circular' | 'fractal' | 'chaotic';
+	cognitiveLoad: number;
+	synapticActivity: number;
+	neuralNetworkComplexity: number;
+	emergentProperties: boolean;
 	selfAwareness: boolean;
 }
 
 export interface RealityDistortionOptions {
-	matrixGlitchIntensity: number;, temporalDistortion: number;
-	spatialWarp: {, x: number; y: number;, z: number };
-	causalityLoop: boolean;, paradoxResolution: 'ignore' | 'branch' | 'collapse';
+	matrixGlitchIntensity: number;
+	temporalDistortion: number;
+	spatialWarp: {
+	x: number; y: number;
+	z: number };
+	causalityLoop: boolean;
+	paradoxResolution: 'ignore' | 'branch' | 'collapse';
 	realityStability: number;
 }
 
@@ -41,18 +53,28 @@ export class Complex {
 }
 
 interface QuantumParticle {
-	position: {, x: number; y: number;, z: number };
-	waveFunction: Complex;, entangled: boolean;
-	entanglementPartner?: number;, probability: number;
-	collapsed: boolean;, spin: number;
+	position: {
+	x: number; y: number;
+	z: number };
+	waveFunction: Complex;
+	entangled: boolean;
+	entanglementPartner?: number;
+	probability: number;
+	collapsed: boolean;
+	spin: number;
 	phase: number;
 }
 
 interface ConsciousnessNode {
-	position: {, x: number; y: number;, z: number };
-	activation: number;, connections: number[];
-	thought: string;, awareness: number;
-	firing: boolean;, lastFired: number;
+	position: {
+	x: number; y: number;
+	z: number };
+	activation: number;
+	connections: number[];
+	thought: string;
+	awareness: number;
+	firing: boolean;
+	lastFired: number;
 }
 
 export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
@@ -81,8 +103,9 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 
 		this.quantumOptions = {
 			particleCount: 1000,
-			fieldSize: {, x: 10, y: 8, z: 10 },
-			quantumCoherence: 0.8,
+			fieldSize: {
+	x: 10, y: 8, z: 10 },
+	quantumCoherence: 0.8,
 			entanglementStrength: 0.5,
 			waveFunction: 'superposition',
 			uncertaintyPrinciple: true,
@@ -106,8 +129,9 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		this.realityOptions = {
 			matrixGlitchIntensity: 0.2,
 			temporalDistortion: 0.1,
-			spatialWarp: {, x: 0, y: 0, z: 0 },
-			causalityLoop: false,
+			spatialWarp: {
+	x: 0, y: 0, z: 0 },
+	causalityLoop: false,
 			paradoxResolution: 'branch',
 			realityStability: 0.85,
 			...(options?.reality|| {})
@@ -154,11 +178,12 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 
 		for (let i = 0; i < this.quantumOptions.particleCount; i++) {
 			const particle: QuantumParticle = {
-				position: {, x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x,
+				position: {
+	x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x,
 					y: (Math.random() - 0.5) * this.quantumOptions.fieldSize.y,
 					z: (Math.random() - 0.5) * this.quantumOptions.fieldSize.z
 				},
-				waveFunction: new Complex(Math.random(), Math.random()),
+	waveFunction: new Complex(Math.random(), Math.random()),
 				entangled: Math.random() < this.quantumOptions.entanglementStrength,
 				probability: Math.random(),
 				collapsed: false,
@@ -191,10 +216,12 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
 		const material = new THREE.ShaderMaterial({
-			uniforms: {, time: { value: 0 },
-				quantumCoherence: {, value: this.quantumOptions.quantumCoherence }
+			uniforms: {
+	time: { value: 0 },
+	quantumCoherence: {
+	value: this.quantumOptions.quantumCoherence }
 			},
-			vertexShader: this.getQuantumVertexShader(),
+	vertexShader: this.getQuantumVertexShader(),
 			fragmentShader: this.getQuantumFragmentShader(),
 			transparent: true,
 			vertexColors: true,
@@ -211,11 +238,12 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 
 		for (let i = 0; i < nodeCount; i++) {
 			const node: ConsciousnessNode = {
-				position: {, x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x * 0.8,
+				position: {
+	x: (Math.random() - 0.5) * this.quantumOptions.fieldSize.x * 0.8,
 					y: (Math.random() - 0.5) * this.quantumOptions.fieldSize.y * 0.8,
 					z: (Math.random() - 0.5) * this.quantumOptions.fieldSize.z * 0.8
 				},
-				activation: Math.random() * this.consciousnessOptions.awarenessLevel,
+	activation: Math.random() * this.consciousnessOptions.awarenessLevel,
 				connections: [],
 				thought: 'Simulation...',
 				awareness: Math.random() * this.consciousnessOptions.awarenessLevel,
@@ -252,10 +280,12 @@ export class YoRHaQuantumEffects3D extends YoRHa3DComponent {
 		for (let i = 0; i < streamCount; i++) {
 			const streamGeometry = new THREE.PlaneGeometry(0.1, 4);
 			const streamMaterial = new THREE.ShaderMaterial({
-				uniforms: {, time: { value: 0 },
-					glitchIntensity: {, value: this.realityOptions.matrixGlitchIntensity }
+				uniforms: {
+	time: { value: 0 },
+	glitchIntensity: {
+	value: this.realityOptions.matrixGlitchIntensity }
 				},
-				vertexShader: this.getMatrixVertexShader(),
+	vertexShader: this.getMatrixVertexShader(),
 				fragmentShader: this.getMatrixFragmentShader(),
 				transparent: true,
 				side: THREE.DoubleSide

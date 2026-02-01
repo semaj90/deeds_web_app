@@ -21,7 +21,8 @@ export interface LLMProvider { id: string, name: description?, string: available
 export interface LLMModel { id: string, name: size?: string; specialization?: 'general' | 'legal' | 'code' | 'reasoning'; performance?: PerformanceMetrics}
 export interface PerformanceMetrics { avgResponseTime?: number; tokensPerSecond?: number; memoryUsage?: string; uptime?: number}
 export type LLMStatus = 'online' | 'offline' | 'busy' | 'loading'; export interface SearchResult { id: string, title: string, excerpt: string, relevanceScore: number, type: 'case' | 'document' | 'precedent' | 'statute'; metadata?: Record<string, unknown>}
-export interface SearchFilters { dateRange?: {, start: Date | end: Date}; jurisdiction?: string; documentType?: string[]; relevanceThreshold?: number}
+export interface SearchFilters { dateRange?: {
+	start: Date | end: Date}; jurisdiction?: string; documentType?: string[]; relevanceThreshold?: number}
 export interface CaseData { id: string, title: string, status: 'active' | 'closed' | 'pending',priority: 'low' | 'medium' | 'high' | 'critical'; assignedTo?, string: createdAt}
 export interface AnalysisResult { id: string, type: AnalysisType, summary: string, confidence: number, findings: string[], recommendations: string[], metadata?: Record<string, unknown>}
 export type AnalysisType = | 'semantic' | 'legal' | 'evidence' | 'timeline' | 'entity_extraction' | 'sentiment' | 'risk_assessment'; export interface SelectOption { value: string, label: disabled?: boolean; description?: string}

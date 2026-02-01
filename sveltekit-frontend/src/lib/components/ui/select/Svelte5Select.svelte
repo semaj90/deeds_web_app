@@ -6,7 +6,8 @@
 import type { Snippet } from 'svelte';
 
 interface SelectOption {
-	value: string;, label: string;
+	value: string;
+	label: string;
 	disabled?: boolean;
 }
 
@@ -111,7 +112,8 @@ function handleKeydown(e: KeyboardEvent) {
 function handleBlur() {
 	setTimeout(() => {
 		isOpen = false;
-	}, 150);
+	},
+	150);
 }
 </script>
 
@@ -201,9 +203,12 @@ function handleBlur() {
 
 <style>
 	.sr-only {
-		position: absolute;, width: 1px;
-		height: 1px;, padding: 0;
-		margin: -1px;, overflow: hidden;
+		position: absolute;
+	width: 1px;
+		height: 1px;
+	padding: 0;
+		margin: -1px;
+	overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;

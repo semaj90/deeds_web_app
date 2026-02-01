@@ -104,28 +104,32 @@ export function restoreTestEnv(): void {
 export async function initializeQdrantMocks(): Promise<void> {
   // Create codemod_memories collection (used by rag_lookup tool)
   await mockQdrant.createCollection('codemod_memories', {
-    vectors: {, size: 384 },
-  });
+    vectors: {
+	size: 384 },
+	});
 
   await mockQdrant.createCollection('error_patterns', {
-    vectors: {, size: 384 },
-  });
+    vectors: {
+	size: 384 },
+	});
 
   await mockQdrant.upsert('codemod_memories', {
     points: [
       {
         id: 1,
         vector: Array(384).fill(0.5),
-        payload: {, title: 'Svelte 5 Runes',
+        payload: {
+	title: 'Svelte 5 Runes',
           content: '$state and $derived are the new reactive primitives',
           url: 'https://svelte.dev/docs/runes',
           tags: ['svelte5', 'runes'],
         }
       },
-      {
+	{
         id: 2,
         vector: Array(384).fill(0.6),
-        payload: {, title: 'Svelte 5 Migration',
+        payload: {
+	title: 'Svelte 5 Migration',
           content: 'Replace export let with $props()',
           url: 'https://svelte.dev/docs/migration',
           tags: ['svelte5', 'migration'],
@@ -179,7 +183,7 @@ export async function initializePostgreSQLMocks(): Promise<void> {
       status: 'active',
       created_at: new Date().toISOString(),
     },
-    {
+	{
       id: 2,
       title: 'Test Case 2',
       status: 'closed',
@@ -218,52 +222,59 @@ export function initializeFetchMocks(): void {
   // Qdrant search endpoint - dynamically query mockQdrant
   mockFetch.setResponse('localhost:6333/collections', {
     status: 200,
-    data: {}, // Will be populated dynamically
+    data: {},
+	// Will be populated dynamically
   });
 
   mockFetch.setResponse('localhost:3004/invoke', {
     status: 200,
-    data: {, result: {
+    data: {
+	result: {
         results: [
           { title: 'Result 1', score: 0.9 },
-          { title: 'Result 2', score: 0.8 }
+	{ title: 'Result 2', score: 0.8 }
         ],
         synthesized: 'This is a synthesized response',
       },
-    },
-  });
+	},
+	});
 
   mockFetch.setResponse('localhost:3002/function-call', {
     status: 200,
-    data: {, errors: [],
+    data: {
+	errors: [],
       warnings: [],
     },
-  });
+	});
 
   mockFetch.setResponse('localhost:3005/a2a/', {
     status: 200,
-    data: {, agents: [{ id: 'agent1', name: 'Test Agent 1', capabilities: ['search'] }],
+    data: {
+	agents: [{ id: 'agent1', name: 'Test Agent 1', capabilities: ['search'] }],
     },
-  });
+	});
 
   // /api/embed endpoint (used by EmbeddingService) - returns { embeddings: [[...]] }
   mockFetch.setResponse('localhost:11434/api/embed', {
     status: 200,
-    data: {, embeddings: [Array(384).fill(0.5)],
+    data: {
+	embeddings: [Array(384).fill(0.5)],
     },
-  });
+	});
 
   mockFetch.setResponse('localhost:11434/api/embeddings', {
     status: 200,
-    data: {, embedding: Array(384).fill(0.5),
+    data: {
+	embedding: Array(384).fill(0.5),
     },
-  });
+	});
 
   mockFetch.setResponse('localhost:11434/api/generate', {
     status: 200,
-    data: {, response: 'Mock LLM response',
+    data: {
+	response: 'Mock LLM response',
     },
-  });
+	});
 
   global.fetch = mockFetch.getMockFetch();
 }
@@ -395,7 +406,8 @@ export function createTestSearchResult(overrides: Partial<any> = {}): any {
  * Create test embedding vector
  */
 export function createTestEmbedding(dimension: number = 384): number[] {
-	return Array.from({ length: dimension }, () => Math.random());
+	return Array.from({ length: dimension },
+	() => Math.random());
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -410,7 +422,8 @@ export function assertValidEmbedding(embedding: any, expectedDimension: number =
 		throw new Error('Embedding must be an array');
 	}
 	if (embedding.length !== expectedDimension) {
-		throw new Error(`Embedding dimension mismatch: expected ${ expectedDimension }, got ${embedding.length}`);
+		throw new Error(`Embedding dimension mismatch: expected ${ expectedDimension },
+	got ${embedding.length}`);
 	}
 	if (!embedding.every(v => typeof v === 'number')) {
 		throw new Error('Embedding must contain only numbers');

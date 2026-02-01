@@ -130,18 +130,19 @@ export class EmbeddingsService {
       const timeoutId = setTimeout(() => {
         this.pendingRequests.delete(id);
         reject(new Error(`Request timeout after ${this.requestTimeout}ms`));
-      }, this.requestTimeout);
+      },
+	this.requestTimeout);
 
       this.pendingRequests.set(id, {
         resolve: (value) => {
           clearTimeout(timeoutId);
           resolve(value as T);
         },
-        reject: (error) => {
+	reject: (error) => {
           clearTimeout(timeoutId);
           reject(error);
         },
-        timestamp: Date.now(),
+	timestamp: Date.now(),
       });
 
       try {
@@ -149,7 +150,7 @@ export class EmbeddingsService {
           type,
           id,
           data: { ...((data as Record<string, unknown>) || {}), startTime },
-        });
+	});
       } catch (err) {
         clearTimeout(timeoutId);
         this.pendingRequests.delete(id);
@@ -174,8 +175,10 @@ export class EmbeddingsService {
     return this.sendWorkerMessage<EmbeddingResponse>(worker, 'generate_embedding', request);
   }
 
-  async generateBatchEmbeddings(texts: string[]): Promise<{, embeddings: number[][];
-    count: number;, dimension: number;
+  async generateBatchEmbeddings(texts: string[]): Promise<{
+	embeddings: number[][];
+    count: number;
+	dimension: number;
     processingTime: number;
   }> {
     if (!this.isInitialized) {
@@ -226,10 +229,14 @@ export class EmbeddingsService {
     };
   }
 
-  async preprocessText(text: string): Promise<{, cleanText: string;
-    tokens: string[];, metadata: {
-      originalLength: number;, cleanedLength: number;
-      tokenCount: number;, hasSpecialChars: boolean;
+  async preprocessText(text: string): Promise<{
+	cleanText: string;
+    tokens: string[];
+	metadata: {
+      originalLength: number;
+	cleanedLength: number;
+      tokenCount: number;
+	hasSpecialChars: boolean;
     };
   }> {
     if (!this.isInitialized) {
@@ -237,9 +244,12 @@ export class EmbeddingsService {
     }
     const worker = this.getNextWorker();
     return this.sendWorkerMessage<{
-      cleanText: string;, tokens: string[];
-      metadata: {, originalLength: number;
-        cleanedLength: number;, tokenCount: number;
+      cleanText: string;
+	tokens: string[];
+      metadata: {
+	originalLength: number;
+        cleanedLength: number;
+	tokenCount: number;
         hasSpecialChars: boolean;
       };
     }>(worker, 'preprocess_text', { text });
@@ -255,7 +265,8 @@ export class EmbeddingsService {
           const timeoutId = setTimeout(() => {
             worker.removeEventListener('message', messageHandler);
             resolve(false);
-          }, 5000);
+          },
+	5000);
 
           const messageHandler = (event: MessageEvent) => {
             const payload = event?.data as WorkerMessage | undefined;
@@ -291,8 +302,10 @@ export class EmbeddingsService {
     }
   }
 
-  getWorkerStats(): {, totalWorkers: number;
-    pendingRequests: number;, initialized: boolean;
+  getWorkerStats(): {
+	totalWorkers: number;
+    pendingRequests: number;
+	initialized: boolean;
   } {
     return {
       totalWorkers: this.workers.length,

@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json'
 			},
-			body: JSON.stringify({, force: options.force
+			body: JSON.stringify({ force: options.force
 			}),
 			signal: AbortSignal.timeout(60000) // 60s timeout for full reindex
 		});
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json'
 						},
-						body: JSON.stringify({, k: 10, generate_summaries: true }),
+						body: JSON.stringify({ k: 10, generate_summaries: true }),
 						signal: AbortSignal.timeout(30000)
 					});
 

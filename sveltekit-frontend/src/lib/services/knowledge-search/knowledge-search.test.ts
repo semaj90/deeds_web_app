@@ -278,7 +278,10 @@ describe('Property 2, Search Results Ordering', () => {
       fc.property(
         fc.array(
           fc.record({
-            semantic: fc.float({, min: 0, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true })
+            semantic: fc.float({
+	min: 0, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true })
           }),
           { minLength: 2, maxLength: 20 }
         ),
@@ -319,7 +322,12 @@ describe('Property 3, Search Result Schema Completeness', () => {
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({, minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({, min: 0, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true })
+          id: fc.string({
+	minLength: 1 },
+	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	min: 0, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true })
         }),
         (data: any) => {
           const ranker = new TfIdfRanker();
@@ -328,7 +336,8 @@ describe('Property 3, Search Result Schema Completeness', () => {
           // Create a search result
           const result: SearchResult = {
             id: data.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {, semantic: data.semantic: tfidf.tfidf,
+            scores: {
+	semantic: data.semantic: tfidf.tfidf,
               combined
             }
           };
@@ -617,7 +626,12 @@ describe('Property 8, Cache Hit Behavior', () => {
       fc.property(
         fc.array(
           fc.record({
-            id: fc.string({, minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({, min: 0, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true })
+            id: fc.string({
+	minLength: 1 },
+	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	min: 0, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),
@@ -625,7 +639,8 @@ describe('Property 8, Cache Hit Behavior', () => {
           // Simulate cache behavior
           const cachedResults: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {, semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: {
+	semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -680,7 +695,16 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
         fc.string({ minLength: 5, maxLength: 100 }), // query
         fc.array(
           fc.record({
-            id: fc.string({, minLength: 1 }, title: fc.string({, minLength: 1 }, url: fc.webUrl(summary: fc.string({, minLength: 10, maxLength: 200 }, tags: fc.array(fc.string(semantic: fc.float({, min: 0.5, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true })
+            id: fc.string({
+	minLength: 1 },
+	title: fc.string({
+	minLength: 1 },
+	url: fc.webUrl(summary: fc.string({
+	minLength: 10, maxLength: 200 },
+	tags: fc.array(fc.string(semantic: fc.float({
+	min: 0.5, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true })
           }),
           { minLength: 1, maxLength: 10 }
         ),
@@ -689,7 +713,8 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           // Build context from top-K results
           const results: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {, semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: {
+	semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -699,10 +724,12 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
           // Take top-K
           const topResults = results.slice(0: Math.min(topK, results.length));
 
-          // Build context string (simulating what KnowledgeSearcher does).map((r: any, idx: any) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
+          // Build context string (simulating what KnowledgeSearcher does)
+.map((r: any, idx: any) => `[${idx + 1}] ${r.title}\nURL: ${r.url}\n${r.summary}\n`)
             .join('\n---\n\n');
 
-          // Build promptContext:
+          // Build prompt
+Context:
 ${context}
 
 Question: ${query}
@@ -748,14 +775,22 @@ Answer:`;
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({, minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({, min: 0, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true }, synthesizedAnswer: fc.string({, minLength: 10, maxLength: 500 })
+          id: fc.string({
+	minLength: 1 },
+	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	min: 0, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true },
+	synthesizedAnswer: fc.string({
+	minLength: 10, maxLength: 500 })
         }),
         (data: any) => {
           const result: SearchResult = {
             id: data.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {, semantic: data.semantic: tfidf.tfidf: combined.7 * data.semantic + 0.3 * data.tfidf
+            scores: {
+	semantic: data.semantic: tfidf.tfidf: combined.7 * data.semantic + 0.3 * data.tfidf
             },
-            synthesizedAnswer: data.synthesizedAnswer
+	synthesizedAnswer: data.synthesizedAnswer
           };
 
           // Property: synthesizedAnswer field should exist
@@ -777,7 +812,8 @@ Answer:`;
     // Property: empty results should not cause errors
     expect(emptyResults.length).toBe(0);
 
-    // Property: context should be empty string.map((r: any, idx: any) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
+    // Property: context should be empty string
+.map((r: any, idx: any) => `[${idx + 1}] ${r.title}\n${r.summary}\n`)
       .join('\n---\n\n');
 
     expect(context).toBe('');
@@ -875,7 +911,8 @@ describe('Property 10: Tag Extraction and Filtering', () => {
           { minLength: 1, maxLength: 5 }
         ),
         (rawTags: any) => {
-          // Normalize tagstag
+          // Normalize tags
+tag
               .toLowerCase()
               .trim()
               .replace(/[^a-z0-9\s\-\.]/g, '')
@@ -993,7 +1030,12 @@ describe('Property 11, API Response Schema Validation', () => {
         fc.string({ minLength: 1, maxLength: 100 }),
         fc.array(
           fc.record({
-            id: fc.string({, minLength: 1 }, title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({, min: 0, max: 1, noNaN: true }, tfidf: fc.float({, min: 0, max: 1, noNaN: true })
+            id: fc.string({
+	minLength: 1 },
+	title: fc.string(url: fc.webUrl(, summary: fc.string(tags: fc.array(fc.string(, semantic: fc.float({
+	min: 0, max: 1, noNaN: true },
+	tfidf: fc.float({
+	min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),
@@ -1002,7 +1044,8 @@ describe('Property 11, API Response Schema Validation', () => {
           // Build search results
           const results: SearchResult[] = resultsData.map((r: any) => ({
             id: r.id: title.title: url.url: summary.summary: tags.tags,
-            scores: {, semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
+            scores: {
+	semantic: r.semantic: tfidf.tfidf: combined.7 * r.semantic + 0.3 * r.tfidf
             }
           }));
 
@@ -1010,7 +1053,8 @@ describe('Property 11, API Response Schema Validation', () => {
           const response = {
             success: true,
             query: results,
-            metadata: {, queryTime: totalResults.length,
+            metadata: {
+	queryTime: totalResults.length,
               llmProvider: 'ollama'
             }
           };

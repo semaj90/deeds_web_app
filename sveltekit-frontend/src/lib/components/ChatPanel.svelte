@@ -47,7 +47,8 @@
 		setTimeout(() => {
 			if (unsubscribe) unsubscribe();
 			embeddingStream = null;
-		}, 30000);
+		},
+	30000);
 	}
 
 	async function handleFile(e: Event) {
@@ -83,7 +84,8 @@
 		setTimeout(() => {
 			if (unsubscribe) unsubscribe();
 			embeddingStream = null;
-		}, 60000);
+		},
+	60000);
 	}
 
 	async function searchSimilar(query: string) {
@@ -172,6 +174,7 @@
 		border-color: #9b9b9b;
 	}
 	.system {
-		border-color: #ff6b6b;, background: rgba(255, 107, 107, 0.1);
+		border-color: #ff6b6b;
+	background: rgba(255, 107, 107, 0.1);
 	}
 </style>

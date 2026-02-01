@@ -11,36 +11,47 @@
 // Types
 // ========================================
 export interface UserSession {
-	user: {, id: string;
-		email: string;, firstName: string | null;
+	user: {
+	id: string;
+		email: string;
+	firstName: string | null;
 		lastName: string | null;
-		role: string;, avatarUrl: string | null;
+		role: string;
+	avatarUrl: string | null;
 	};
-	session: {, id: string;
+	session: {
+	id: string;
 		expiresAt: string;
 	};
 }
 
 export interface Case {
-	id: string;, title: string;
+	id: string;
+	title: string;
 	status: 'active' | 'closed' | 'pending';
-	createdAt: Date;, updatedAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
 	description?: string;
 	assignedTo?: string;
 }
 
 export interface AIMessage {
-	id: string;, role: 'user' | 'assistant' | 'system';
-	content: string;, timestamp: string;
+	id: string;
+	role: 'user' | 'assistant' | 'system';
+	content: string;
+	timestamp: string;
 	confidence?: number;
 	citations?: string[];
 	warnings?: string[];
 }
 
 export interface ChatMetadata {
-	id: string;, title: string;
-	caseId?: string;, createdAt: Date;
-	lastMessageAt: Date;, messageCount: number;
+	id: string;
+	title: string;
+	caseId?: string;
+	createdAt: Date;
+	lastMessageAt: Date;
+	messageCount: number;
 }
 
 // ========================================
@@ -65,23 +76,22 @@ export const authStore = (() => {
 		get session() {
 			return session;
 		},
-		get isAuthenticated() {
+	get isAuthenticated() {
 			return isAuthenticated;
 		},
-		get displayName() {
+	get displayName() {
 			return displayName;
 		},
-		get userRole() {
+	get userRole() {
 			return userRole;
 		},
-		get isLoading() {
+	get isLoading() {
 			return isLoading;
 		},
-		get error() {
+	get error() {
 			return error;
 		},
-
-		// Actions
+	// Actions
 		async loadSession() {
 			isLoading = true;
 			error = null;
@@ -100,8 +110,7 @@ export const authStore = (() => {
 				isLoading = false;
 			}
 		},
-
-		async logout() {
+	async logout() {
 			try {
 				await fetch('/api/auth/logout', { method: 'POST' });
 				session = null;
@@ -109,8 +118,7 @@ export const authStore = (() => {
 				console.error('Logout failed:', err);
 			}
 		},
-
-		clearError() {
+	clearError() {
 			error = null;
 		}
 	};
@@ -135,26 +143,25 @@ export const caseStore = (() => {
 		get cases() {
 			return cases;
 		},
-		get selectedCase() {
+	get selectedCase() {
 			return selectedCase;
 		},
-		get isLoading() {
+	get isLoading() {
 			return isLoading;
 		},
-		get error() {
+	get error() {
 			return error;
 		},
-		get caseCount() {
+	get caseCount() {
 			return caseCount;
 		},
-		get activeCases() {
+	get activeCases() {
 			return activeCases;
 		},
-		get closedCases() {
+	get closedCases() {
 			return closedCases;
 		},
-
-		// Actions
+	// Actions
 		async loadCases() {
 			isLoading = true;
 			error = null;
@@ -172,12 +179,10 @@ export const caseStore = (() => {
 				isLoading = false;
 			}
 		},
-
-		selectCase(caseId: string) {
+	selectCase(caseId: string) {
 			selectedCase = cases.find((c) => c.id === caseId) ?? null;
 		},
-
-		clearSelection() {
+	clearSelection() {
 			selectedCase = null;
 		}
 	};
@@ -207,23 +212,22 @@ export const aiStore = (() => {
 		get messages() {
 			return messages;
 		},
-		get currentMessage() {
+	get currentMessage() {
 			return currentMessage;
 		},
-		get isStreaming() {
+	get isStreaming() {
 			return isStreaming;
 		},
-		get lastConfidence() {
+	get lastConfidence() {
 			return lastConfidence;
 		},
-		get messageCount() {
+	get messageCount() {
 			return messageCount;
 		},
-		get averageConfidence() {
+	get averageConfidence() {
 			return averageConfidence();
 		},
-
-		// Actions
+	// Actions
 		startMessage(role: 'user' | 'assistant', content: string) {
 			const message: AIMessage = {
 				id: `msg-${Date.now()}`,
@@ -236,14 +240,12 @@ export const aiStore = (() => {
 			currentMessage = message;
 			isStreaming = role === 'assistant';
 		},
-
-		appendToCurrentMessage(chunk: string) {
+	appendToCurrentMessage(chunk: string) {
 			if (currentMessage) {
 				currentMessage.content += chunk;
 			}
 		},
-
-		endMessage(confidence?: number, citations?: string[], warnings?: string[]) {
+	endMessage(confidence?: number, citations?: string[], warnings?: string[]) {
 			if (currentMessage) {
 				currentMessage.confidence = confidence;
 				currentMessage.citations = citations;
@@ -257,8 +259,7 @@ export const aiStore = (() => {
 				isStreaming = false;
 			}
 		},
-
-		clearMessages() {
+	clearMessages() {
 			messages = [];
 			currentMessage = null;
 			isStreaming = false;
@@ -287,20 +288,19 @@ export const chatStore = (() => {
 		get chats() {
 			return chats;
 		},
-		get activeChat() {
+	get activeChat() {
 			return activeChat;
 		},
-		get activeChatMetadata() {
+	get activeChatMetadata() {
 			return activeChatMetadata;
 		},
-		get chatCount() {
+	get chatCount() {
 			return chatCount;
 		},
-		get recentChats() {
+	get recentChats() {
 			return recentChats;
 		},
-
-		// Actions
+	// Actions
 		async loadChats() {
 			try {
 				const response = await fetch('/api/chats');
@@ -311,16 +311,14 @@ export const chatStore = (() => {
 				console.error('Failed to load chats:', err);
 			}
 		},
-
-		setActiveChat(chatId: string) {
+	setActiveChat(chatId: string) {
 			activeChat = chatId;
 		},
-
-		async createChat(title: string, caseId?: string): Promise<string> {
+	async createChat(title: string, caseId?: string): Promise<string> {
 			const response = await fetch('/api/chats', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ title, caseId })
+	body: JSON.stringify({ title, caseId })
 			});
 
 			if (response.ok) {
@@ -332,8 +330,7 @@ export const chatStore = (() => {
 
 			throw new Error('Failed to create chat');
 		},
-
-		updateChatMetadata(chatId: string, updates: Partial<ChatMetadata>) {
+	updateChatMetadata(chatId: string, updates: Partial<ChatMetadata>) {
 			const chat = chats.find((c) => c.id === chatId);
 			if (chat) {
 				Object.assign(chat, updates);
@@ -361,12 +358,10 @@ export const themeStore = (() => {
 		get theme() {
 			return theme;
 		},
-
-		setTheme(newTheme: 'light' | 'dark' | 'nier') {
+	setTheme(newTheme: 'light' | 'dark' | 'nier') {
 			theme = newTheme;
 		},
-
-		toggleTheme() {
+	toggleTheme() {
 			theme = theme === 'dark' ? 'light' : 'dark';
 		}
 	};

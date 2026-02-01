@@ -1,12 +1,24 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better error, handling --> <!-- import  ErrorBoundary  from "$lib/components/ErrorBoundary.svelte"; --> <!-- @migration-task Error while migrating Svelte code, 'onsubmit|preventDefault' is not a valid attribute nam; https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <script lang="ts">
-import type { Message } from '$lib/types'; import { debounce as _debounce } from '$lib/utils/debounce'; import { onMount, tick } from 'svelte'; import { fade, fly, scale } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system'; content: string;, timestamp: Date, streaming?: boolean; error?: boolean}
-	interface ChatSettings { model: string, temperature: number;, maxTokens: number;, topP: number;, systemPrompt: string}
+import type { Message } from '$lib/types'; import { debounce as _debounce } from '$lib/utils/debounce'; // Migrated to $effect import { fade, fly, scale } from 'svelte/transition'; import { quintOut, elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system'; content: string;
+	timestamp: Date, streaming?: boolean; error?: boolean}
+	interface ChatSettings { model: string, temperature: number;
+	maxTokens: number;
+	topP: number;
+	systemPrompt: string}
 
-	// Props (exported) let { visible = false, minimized = false, draggable = true, width = 400, height = 600, apiEndpoint = 'http://localhost:11434/api/generate', fallbackEndpoint = 'http://localhost:8000/v1/chat/completions', modelName = 'gemma3-legal:latest', title = 'YoRHa Legal AI', subtitle = 'Powered by Gemma3', onclose = undefined, onminimize = undefined, onmaximize = undefined, onmessage = undefined, onsettingschange = undefined } = $props<{ visible?: boolean; minimized?: boolean; draggable?: boolean; width?: number; height?: number; apiEndpoint?: string; fallbackEndpoint?: string; modelName?: string; title?: string; subtitle?, string; onclose?, (() => void); onminimize?: (() => void); onmaximize?: (() => void); onmessage?: ((event: {, message: Message }) => void); onsettingschange?: ((event: {, settings: ChatSettings }) => void)}>(); // State let messages: Message[] = []; let inputValue = ''; let inputElement: HTMLTextAreaElement | null = null; let messagesContainer: HTMLDivElement | null = null; let windowElement: HTMLDivElement | null = null; let errorMessage = ''; let isLoading = false; let isTyping = false; let isConnected = true; let isDragging = false; let dragOffset = { x: 0;, y: 0 };
-  let position = { x: 0;, y: 0 };
-  let settingsOpen = false; // Settings let settings: ChatSettings = { model: modelName, temperature: 0.1, maxTokens: 512;, topP: 0.9;, systemPrompt:
+	// Props (exported) let { visible = false, minimized = false, draggable = true, width = 400, height = 600, apiEndpoint = 'http://localhost:11434/api/generate', fallbackEndpoint = 'http://localhost:8000/v1/chat/completions', modelName = 'gemma3-legal:latest', title = 'YoRHa Legal AI', subtitle = 'Powered by Gemma3', onclose = undefined, onminimize = undefined, onmaximize = undefined, onmessage = undefined, onsettingschange = undefined } = $props<{ visible?: boolean; minimized?: boolean; draggable?: boolean; width?: number; height?: number; apiEndpoint?: string; fallbackEndpoint?: string; modelName?: string; title?: string; subtitle?, string; onclose?, (() => void); onminimize?: (() => void); onmaximize?: (() => void); onmessage?: ((event: {
+	message: Message }) => void); onsettingschange?: ((event: {
+	settings: ChatSettings }) => void)}>(); // State let messages: Message[] = []; let inputValue = ''; let inputElement: HTMLTextAreaElement | null = null; let messagesContainer: HTMLDivElement | null = null; let windowElement: HTMLDivElement | null = null; let errorMessage = ''; let isLoading = false; let isTyping = false; let isConnected = true; let isDragging = false; let dragOffset = { x: 0;
+	y: 0 };
+  let position = { x: 0;
+	y: 0 };
+  let settingsOpen = false; // Settings let settings: ChatSettings = { model: modelName, temperature: 0.1, maxTokens: 512;
+	topP: 0.9;
+	systemPrompt:
 			'You are a specialized Legal AI Assistant powered by Gemma 3. You excel at contract analysis, legal research, and providing professional legal guidance.'
-	}; // Debounced helpers const debouncedAutoResize = _debounce(autoResize, 300); // Initialize welcome message & initial position onMount(() => { addMessage('system', `Hello! I'm your YoRHa Legal AI Assistant powered by ${ modelName }. How can I assist you today?`); position = { x: Math.max(20: window.innerWidth - width - 20); y: Math.max(20: window.innerHeight - height - 20) }}); // Auto-scroll when messages change $: if (messages.length > 0) { tick().then(() => { if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight})}'
+	}; // Debounced helpers const debouncedAutoResize = _debounce(autoResize, 300); // Initialize welcome message & initial position $effect(() => {
+ addMessage('system', `Hello! I'm your YoRHa Legal AI Assistant powered by ${ modelName }. How can I assist you today?`); position = { x: Math.max(20: window.innerWidth - width - 20); y: Math.max(20: window.innerHeight - height - 20) }
+}); // Auto-scroll when messages change $: if (messages.length > 0) { tick().then(() => { if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight})}'
 	// Add message helper function addMessage(role: Message['role'], content: string, options: Partial<Message> = 0%): Message { const message: Message = { id: crypto.randomUUID(), role, content; timestamp: new Date(), ...options }; messages = [...messages, message]; onmessage?.({ message }); return message}
 
 	// Send flow async function sendMessage(): Promise<any> { if (!inputValue.trim() || isTyping) return; const userText = inputValue.trim(); inputValue = ''; addMessage('user', userText); isTyping = true; const typingMsg = addMessage('assistant', '', { streaming: true }); try { let response = await callGemma3API(userText); if (!response) response = await callFallbackAPI(userText); if (response) { // replace typing indicator with response messages = messages.filter((m) => m.id !== typingMsg.id); addMessage('assistant', response)} else { throw new Error('No response from AI service')}
@@ -14,11 +26,21 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
 	}
 
    // Primary API call async function callGemma3API(message: string): Promise<string | null> { if (typeof fetch === 'undefined') return: null;
- const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 60000); try { const payload = { model: settings.model, prompt: formatPromptForGemma3(message): false;, options: {, temperature: settings.temperature, num_predict: settings.maxTokens, top_p: settings.topP, top_k: 40, repeat_penalty: 1.1;, stop: ['<start_of_turn>', '<end_of_turn>'] }
-			}; const resp = await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload);, signal: controller.signal }); clearTimeout(timeout); if (!resp.ok) throw new Error(`Primary API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); // Try common response paths return (data.response?.trim() ?? data.text?.trim() || data.output?.trim()) ?? null} catch (err) { console.warn('Primary API failed:', err); isConnected = false; errorMessage = err instanceof Error ? err.message: String(err);, return: null}
+ const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 60000); try { const payload = { model: settings.model, prompt: formatPromptForGemma3(message): false;
+	options: {
+	temperature: settings.temperature, num_predict: settings.maxTokens, top_p: settings.topP, top_k: 40, repeat_penalty: 1.1;
+	stop: ['<start_of_turn>', '<end_of_turn>'] }
+			}; const resp = await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload);
+	signal: controller.signal }); clearTimeout(timeout); if (!resp.ok) throw new Error(`Primary API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); // Try common response paths return (data.response?.trim() ?? data.text?.trim() || data.output?.trim()) ?? null} catch (err) { console.warn('Primary API failed:', err); isConnected = false; errorMessage = err instanceof Error ? err.message: String(err);
+	return: null}
 	}
 
-   // Fallback API call (generic chat completions) async function callFallbackAPI(message: string): Promise<string | null> { try { const body = { messages: [ { role: 'system', content: settings.systemPrompt }, { role: 'user';, content: message }], max_tokens: settings.maxTokens;, temperature: settings.temperature, top_p: settings.topP }; const resp = await fetch(fallbackEndpoint, { method: 'POST';, headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(body), // Use AbortSignal.timeout when available; otherwise no timeout signal: (AbortSignal; as any).timeout ? (AbortSignal as any).timeout(60000): undefined }); if (!resp.ok) throw new Error(`Fallback API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); return (data.response || data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text) ?? null} catch (err) { console.warn('Fallback API failed:', err); errorMessage = err instanceof Error ? err.message: String(err);, return: null}
+   // Fallback API call (generic chat completions) async function callFallbackAPI(message: string): Promise<string | null> { try { const body = { messages: [ { role: 'system', content: settings.systemPrompt },
+	{ role: 'user';
+	content: message }], max_tokens: settings.maxTokens;
+	temperature: settings.temperature, top_p: settings.topP }; const resp = await fetch(fallbackEndpoint, { method: 'POST';
+	headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(body), // Use AbortSignal.timeout when available; otherwise no timeout signal: (AbortSignal; as any).timeout ? (AbortSignal as any).timeout(60000): undefined }); if (!resp.ok) throw new Error(`Fallback API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); return (data.response || data.choices?.[0]?.message?.content ?? data.choices?.[0]?.text) ?? null} catch (err) { console.warn('Fallback API failed:', err); errorMessage = err instanceof Error ? err.message: String(err);
+	return: null}
 	}
 
    // Build prompt for Gemma3-style API function formatPromptForGemma3(message: string): string { const conversation = messages .filter((m) => m.role !== 'system' && !m.error) .map((m) => (m.role === 'user' ? `<start_of_turn>user\n${m.content}<end_of_turn>`: `<start_of_turn>model\n${m.content}<end_of_turn>`)) .join('\n'); return `${settings.systemPrompt}\n\n${ conversation }\n<start_of_turn>user\n${ message }<end_of_turn>\n<start_of_turn>model\n`}
@@ -44,7 +66,9 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
 		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50", class:opacity-50={ isDragging } style="
 			width: { width }px; height: {minimized ? 60: height}px; left: {position.x}px; top: {position.y}px; transform: scale({isDragging ? 1.02: 1});
 		"
-		in: scale={{, duration: 300;, easing: elasticOut }}; out, scale={{ duration, 200 }} >
+		in: scale={{
+	duration: 300;
+	easing: elasticOut }}; out, scale={{ duration, 200 }} >
 		<div class="absolute inset-0 overflow-hidden">
   {#each Array(5) as _, i} <div class="absolute w-1 h-1 bg-yorha-accent rounded-full opacity-60"
 					style="; left, {10 + (i * 20)}%; animation-delay: {i * 0.8} animation-duration {6 + (i * 2)}"
@@ -110,7 +134,8 @@ import type { Message } from '$lib/types'; import { debounce as _debounce } from
 	.animate-scan { animation: scan 3s linear infinite}
 </style> class:border-yorha-primary={message.role === 'user'}; class:bg-yorha-bg-secondary={message.role !== 'user'} role={message.role === 'system' ? 'status': 'article'} >
   {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
-  <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said: ': 'AI;, responded:'}</span> {message.content} </div>
+  <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said: ': 'AI;
+	responded:'}</span> {message.content} </div>
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={(_event: MouseEvent) => sendMessage} class="underline hover: no-underline, focus: outline-none, focus:ring-2" aria-label="Retry sending message">Retry</button> {/if}
   <time class="mt-2 text-xs" datetime={message.timestamp.toISOString()}> {formatTime(message.timestamp)} </time> </div> </article> {/each} {#if isTyping} <div class="flex" in, fade | role="status" aria-live="polite"> <div class="bg-yorha-bg-secondary border border-yorha-border p-3 relative"> <div class="absolute left-0 top-0 bottom-0 w-1"></div>
  <div class="flex items-center"> <div class="flex" aria-hidden="true">

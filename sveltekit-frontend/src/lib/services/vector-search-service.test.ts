@@ -16,7 +16,8 @@ interface VectorSearchConfig {
 }
 
 interface CollectionStatus {
-  vectorDimension: number;, documentCount: number;
+  vectorDimension: number;
+	documentCount: number;
 }
 
 // Mock service implementation
@@ -32,10 +33,13 @@ class MockVectorSearchService {
   async initialize() {
     this.initialized = true;
     return {
-      qdrant: {, status: 'connected' },
-      postgres: {, status: 'connected' },
-      redis: {, status: 'connected' },
-    };
+      qdrant: {
+	status: 'connected' },
+	postgres: {
+	status: 'connected' },
+	redis: {
+	status: 'connected' },
+	};
   }
 
   async search(embedding: number[], limit: number, threshold?: number): Promise<SearchResult[]> {
@@ -48,9 +52,10 @@ class MockVectorSearchService {
       return this.searchCache.get(cacheKey)!;
     }
 
-    // Mock results{ documentId: 'doc1', similarity: 0.95, source: 'qdrant' as const },
-      { documentId: 'doc2', similarity: 0.87, source: 'postgres' as const },
-      { documentId: 'doc3', similarity: 0.82, source: 'qdrant' as const }]
+    // Mock results
+{ documentId: 'doc1', similarity: 0.95, source: 'qdrant' as const },
+	{ documentId: 'doc2', similarity: 0.87, source: 'postgres' as const },
+	{ documentId: 'doc3', similarity: 0.82, source: 'qdrant' as const }]
       .filter((r: any) => !threshold || r.similarity >= threshold)
       .slice(0, limit);
 
@@ -94,9 +99,11 @@ class MockVectorSearchService {
 
   async ensureCollections() {
     return {
-      qdrant: {, name: 'legal_documents', vectorSize: 384 },
-      postgres: {, name: 'embeddings', vectorSize: 384 },
-    };
+      qdrant: {
+	name: 'legal_documents', vectorSize: 384 },
+	postgres: {
+	name: 'embeddings', vectorSize: 384 },
+	};
   }
 
   async getCollections(): Promise<string[]> {
@@ -234,9 +241,11 @@ describe('VectorSearchService (Integration)', () => {
       });
     });
 
-    it('should merge results from multiple sources using Reciprocal Rank Fusion', async () => {{ documentId: 'doc1', similarity: 0.95, source: 'qdrant' },
-        { documentId: 'doc2', similarity: 0.85, source: 'qdrant' }];{ documentId: 'doc2', similarity: 0.87, source: 'postgres' },
-        { documentId: 'doc3', similarity: 0.8, source: 'postgres' }];
+    it('should merge results from multiple sources using Reciprocal Rank Fusion', async () => {
+{ documentId: 'doc1', similarity: 0.95, source: 'qdrant' },
+	{ documentId: 'doc2', similarity: 0.85, source: 'qdrant' }];
+{ documentId: 'doc2', similarity: 0.87, source: 'postgres' },
+	{ documentId: 'doc3', similarity: 0.8, source: 'postgres' }];
 
       const merged = await vectorSearch.mergeResults(qdrantResults, pgResults);
 

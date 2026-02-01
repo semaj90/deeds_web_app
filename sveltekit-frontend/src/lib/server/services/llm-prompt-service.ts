@@ -16,7 +16,8 @@ export interface ILLMPromptService {
 	retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;
 	updatePrompt(promptId: string, updates: Partial<LLMPrompt>): Promise<LLMPrompt>;
 	deletePrompt(promptId: string): Promise<void>;
-	getPromptStats(): Promise<{, total: number; byModel: Record<string, number> }>;
+	getPromptStats(): Promise<{
+	total: number; byModel: Record<string, number> }>;
 }
 
 export class LLMPromptService extends BaseService implements ILLMPromptService {
@@ -139,7 +140,8 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 			throw new Error('Invalid input: offset must be non-negative');
 		}
 
-		this.log('info', `Retrieving prompt history (limit: ${limit}, offset: ${offset})`);
+		this.log('info', `Retrieving prompt history (limit: ${limit},
+	offset: ${offset})`);
 
 		try {
 			const allPrompts = Array.from(this.prompts.values());
@@ -232,7 +234,8 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 	/**
 	 * Get statistics about stored prompts
 	 */
-	async getPromptStats(): Promise<{, total: number; byModel: Record<string, number> }> {
+	async getPromptStats(): Promise<{
+	total: number; byModel: Record<string, number> }> {
 		this.log('info', 'Calculating prompt statistics');
 
 		try {

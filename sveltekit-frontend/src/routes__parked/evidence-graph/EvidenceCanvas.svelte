@@ -12,7 +12,7 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  import EvidenceCanvas from '$lib/evidence-canvas/EvidenceCanvas.svelte';
  import GraphControlPanel from '$lib/evidence-canvas/GraphControlPanel.svelte';
  import type { initialize } from '$lib/evidence-canvas/webgpu-init';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
 
  import fetchEvidence from '$lib/api/evidence';
  import analyzeCaseSimilarity from '$lib/server/case-similarity';
@@ -69,7 +69,8 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  let metadataNode = $state <EvidenceNode, null>(null);
  let pinnedNodeIds = $state <string[]>([]);
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  await initializeCanvas();
@@ -80,23 +81,26 @@ https, //svelte.dev/e/attribute_invalid_event_handler -->
  } finally {
  isLoading = false;
  }
- })();
+ 
+});();
  });
 
- onMount(() => {
+ $effect(() => {
+
  if (typeof window === 'undefined') return;
  const handler = () => {
  contextMenu = { ...contextMenu, visible: false, false };
  };
  window.addEventListener('click', handler);
  return () => window.removeEventListener('click', handler);
- });
+ 
+});
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (eventSource) {
  eventSource.close();
  }
- });
+ }
 
  async function initializeCanvas() {
  console.log('🚀 Initializing WebGPU Evidence Canvas...');

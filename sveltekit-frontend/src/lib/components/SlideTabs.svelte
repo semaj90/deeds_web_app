@@ -4,12 +4,12 @@
 
   const tabs = [
     { key: 'cases', label: 'Cases', icon: Home },
-    { key: 'persons', label: 'Persons', icon: Users },
-    { key: 'evidence', label: 'Evidence', icon: Library },
-    { key: 'laws', label: 'Laws', icon: FileText },
-    { key: 'analysis', label: 'Analysis', icon: BarChart },
-    { key: 'ai', label: 'AI Chat', icon: Bot },
-    { key: 'terminal', label: 'Terminal', icon: Terminal }
+	{ key: 'persons', label: 'Persons', icon: Users },
+	{ key: 'evidence', label: 'Evidence', icon: Library },
+	{ key: 'laws', label: 'Laws', icon: FileText },
+	{ key: 'analysis', label: 'Analysis', icon: BarChart },
+	{ key: 'ai', label: 'AI Chat', icon: Bot },
+	{ key: 'terminal', label: 'Terminal', icon: Terminal }
   ];
 </script>
 

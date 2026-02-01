@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  type RegistryServer = {
  name: string;
@@ -51,11 +51,13 @@
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  await loadServers();
  await fetchMcp();
- })();
+ 
+});();
  });
 </script>
 

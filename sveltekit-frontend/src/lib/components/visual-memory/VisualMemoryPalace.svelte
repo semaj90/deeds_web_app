@@ -4,18 +4,25 @@
 	import yorhaMipmapShaders from '$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte';
 	import { calculateDocumentPriority } from '$lib/config/legal-priorities';
 	import { componentTextureRegistry } from '$lib/registry/texture-component-registry';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface MemoryGlyph {
-		id: string;, data: Uint8Array;
-		latent: number[];, position: { x: number;, y: number; z: number };
-		documentId: string;, priority: number;
-		timestamp: number;, semantic: string;
+		id: string;
+	data: Uint8Array;
+		latent: number[];
+	position: { x: number;
+	y: number; z: number };
+		documentId: string;
+	priority: number;
+		timestamp: number;
+	semantic: string;
 	}
 
 	interface MemoryPalaceRoom {
-		id: string;, name: string;
-		glyphs: MemoryGlyph[];, theme: 'evidence' | 'contracts' | 'cases' | 'research';
+		id: string;
+	name: string;
+		glyphs: MemoryGlyph[];
+	theme: 'evidence' | 'contracts' | 'cases' | 'research';
 		capacity: number;
 	}
 
@@ -32,11 +39,13 @@
 	const LATENT_SIZE = 32;
 	const MAX_GLYPHS_PER_ROOM = 128;
 
-	onMount(() => {
+	$effect(() => {
+
 		(async () => {
 			await initializeMemoryPalace();
 			startVisualization();
-		})();
+		
+});();
 
 		return () => {
 			if (animationFrame) {
@@ -67,21 +76,21 @@
 				theme: 'evidence',
 				capacity: MAX_GLYPHS_PER_ROOM
 			},
-			{
+	{
 				id: 'contracts-room',
 				name: 'Contract Archive',
 				glyphs: [],
 				theme: 'contracts',
 				capacity: MAX_GLYPHS_PER_ROOM
 			},
-			{
+	{
 				id: 'cases-room',
 				name: 'Case Gallery',
 				glyphs: [],
 				theme: 'cases',
 				capacity: MAX_GLYPHS_PER_ROOM
 			},
-			{
+	{
 				id: 'research-room',
 				name: 'Research Lab',
 				glyphs: [],
@@ -137,7 +146,9 @@
 	function calculateSpatialPosition(
 		latent: number[],
 		priority: number
-	): {, x: number; y: number;, z: number } {
+	): {
+	x: number; y: number;
+	z: number } {
 		const x = latent[0] * 200 - 100;
 		const y = (priority / 255) * 100;
 		const z = latent[1] * 200 - 100;
@@ -258,10 +269,12 @@
 
 				ctx.save();
 				ctx.globalAlpha = perspective;
-				ctx.shadowColor = `hsl(${glyph.priority + 180}, 100%, 50%)`;
+				ctx.shadowColor = `hsl(${glyph.priority + 180},
+	100%, 50%)`;
 				ctx.shadowBlur = 10 * perspective;
 				ctx.drawImage(tempCanvas, x - size / 2, y - size / 2, size, size);
-				ctx.strokeStyle = `hsl(${240 - glyph.priority}, 70%, 50%)`;
+				ctx.strokeStyle = `hsl(${240 - glyph.priority},
+	70%, 50%)`;
 				ctx.lineWidth = 2 * perspective;
 				ctx.strokeRect(x - size / 2, y - size / 2, size, size);
 				ctx.restore();
@@ -346,7 +359,8 @@
 	.visual-memory-palace {
 		display: grid;
 		grid-template-columns: 200px 1fr 200px;
-		gap: 1rem;, height: 100%;
+		gap: 1rem;
+	height: 100%;
 		background: linear-gradient(180deg, #0a0a1f, #1a0a2f);
 		padding: 1rem;
 		border-radius: 8px;
@@ -354,16 +368,21 @@
 
 	.room-selector {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.room-btn {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
-		padding: 0.75rem;, background: rgba(255, 255, 255, 0.05);
+		align-items: center;
+	gap: 0.5rem;
+		padding: 0.75rem;
+	background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, color: rgba(255, 255, 255, 0.8);
-		cursor: pointer;, transition: all 0.2s;
+		border-radius: 8px;
+	color: rgba(255, 255, 255, 0.8);
+		cursor: pointer;
+	transition: all 0.2s;
 	}
 
 	.room-btn:hover {
@@ -389,14 +408,18 @@
 	}
 
 	.room-capacity {
-		font-size: 0.75rem;, opacity: 0.7;
+		font-size: 0.75rem;
+	opacity: 0.7;
 	}
 
 	.palace-viewport {
-		position: relative;, display: flex;
+		position: relative;
+	display: flex;
 		align-items: center;
-		justify-content: center;, background: rgba(0, 0, 0, 0.3);
-		border-radius: 8px;, overflow: hidden;
+		justify-content: center;
+	background: rgba(0, 0, 0, 0.3);
+		border-radius: 8px;
+	overflow: hidden;
 	}
 
 	.palace-canvas {
@@ -406,19 +429,25 @@
 	}
 
 	.palace-controls {
-		position: absolute;, bottom: 1rem;
-		right: 1rem;, display: flex;
+		position: absolute;
+	bottom: 1rem;
+		right: 1rem;
+	display: flex;
 		gap: 0.5rem;
 	}
 
 	.control-btn {
-		width: 40px;, height: 40px;
-		border-radius: 50%;, background: rgba(0, 0, 0, 0.7);
+		width: 40px;
+	height: 40px;
+		border-radius: 50%;
+	background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		color: #fff;
-		font-size: 1.2rem;, display: flex;
+		font-size: 1.2rem;
+	display: flex;
 		align-items: center;
-		justify-content: center;, cursor: pointer;
+		justify-content: center;
+	cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -428,20 +457,25 @@
 	}
 
 	.glyph-info {
-		padding: 1rem;, background: rgba(255, 255, 255, 0.05);
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1rem;
+	background: rgba(255, 255, 255, 0.05);
+		border-radius: 8px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.glyph-info h3 {
 		margin: 0 0 1rem 0;
-		font-size: 1rem;, color: rgba(255, 255, 255, 0.9);
+		font-size: 1rem;
+	color: rgba(255, 255, 255, 0.9);
 	}
 
 	.info-stat {
 		display: flex;
-		justify-content: space-between;, padding: 0.5rem 0;
+		justify-content: space-between;
+	padding: 0.5rem 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-		font-size: 0.85rem;, color: rgba(255, 255, 255, 0.7);
+		font-size: 0.85rem;
+	color: rgba(255, 255, 255, 0.7);
 	}
 
 	.info-stat .stat-value {

@@ -7,9 +7,12 @@ import type { RequestHandler } from '@sveltejs/kit';
 
 // Types
 export interface SSRResponse<T = unknown> {
-	success: boolean;, data: T | null;
-	meta: {, timestamp: string;
-		cached: boolean;, source: 'ssr' | 'api';
+	success: boolean;
+	data: T | null;
+	meta: {
+	timestamp: string;
+		cached: boolean;
+	source: 'ssr' | 'api';
 	};
 	error?: string;
 }
@@ -67,7 +70,8 @@ export async function createSSRResponse<T = unknown>(
 	const responseObj: SSRResponse<T> = {
 		success: true,
 		data: sanitizedData as T,
-		meta: {, timestamp: new Date().toISOString(),
+		meta: {
+	timestamp: new Date().toISOString(),
 			cached: !!options?.cached,
 			source: 'ssr'
 		}
@@ -95,11 +99,12 @@ export function createSSRErrorResponse(
 	const response: SSRResponse = {
 		success: false,
 		data: data ?? null,
-		meta: {, timestamp: new Date().toISOString(),
+		meta: {
+	timestamp: new Date().toISOString(),
 			cached: false,
 			source: 'ssr'
 		},
-		error: errorMessage
+	error: errorMessage
 	};
 
 	return new Response(JSON.stringify(response), {
@@ -214,11 +219,15 @@ export async function batchSSRRequestsGPU<T extends Record<string, unknown>>(
 /** System health check */
 export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
 	return {
-		postgres: {, connected: true },
-		cognitive_cache: {, threadSafe: true },
-		serializer: {, activeWorkers: 0 },
-		gpu_coordinator: {, gpuAvailable: false },
-		overall_status: 'healthy'
+		postgres: {
+	connected: true },
+	cognitive_cache: {
+	threadSafe: true },
+	serializer: {
+	activeWorkers: 0 },
+	gpu_coordinator: {
+	gpuAvailable: false },
+	overall_status: 'healthy'
 	};
 }
 

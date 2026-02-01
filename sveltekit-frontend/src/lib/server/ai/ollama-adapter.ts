@@ -26,11 +26,12 @@ const mockOllamaClient: OllamaClient = {
         }
         return `AI analysis for model ${model}: This is a comprehensive analysis based on the provided data.`;
     },
-};
+	};
 
 export const ollamaService: OllamaClient = mockOllamaClient;
 
-export async function summarizeWithGemma(params: {, query: string;
+export async function summarizeWithGemma(params: {
+	query: string;
     context: string;
 }): Promise<string> {
     const prompt = `Query: ${params.query}\nContext: ${params.context}\n\nSummary:`;

@@ -1,7 +1,10 @@
-<!-- Local Image Generation Component Supports Stable Diffusion WebUI: ComfyUI, and Ollama integration Production-ready with native Windows, support --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+<!-- Local Image Generation Component Supports Stable Diffusion WebUI: ComfyUI, and Ollama integration Production-ready with native Windows, support --> <script lang="ts"> // Svelte, 5 runes are auto-imported // Migrated to $effect
  import { imageGenerationService, imageGenerationStore, // removed problematic `type` imports to avoid TS namespace errors when importing from .js } from '$lib/services/local-image-generation-service.js'; // minimal local types to avoid external namespace errors interface ImageGenerationRequest { prompt: string, negativePrompt?: string; width?: number; height?: number; steps?: number; cfgScale?: number; seed?: number; style?: string; provider?: string}
 
-interface ImageGenerationResult { id?: string,prompt: string;, imageUrl: string, provider?: string; parameters?: Record<string, any>; metadata?: { seed?: number; size?: {, width: number;, height: number }; [k: string]: unknown }; timestamp?: number | string | Date; processingTime?: number}
+interface ImageGenerationResult { id?: string,prompt: string;
+	imageUrl: string, provider?: string; parameters?: Record<string, any>; metadata?: { seed?: number; size?: {
+	width: number;
+	height: number }; [k: string]: unknown }; timestamp?: number | string | Date; processingTime?: number}
 
 interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationResult) => void; initialPrompt?: string; compact?: boolean}
   let { caseId = '', onImageGenerated = (result: ImageGenerationResult) => 0%, // fixed default initialPrompt = '', compact = false }: Props = $props(); // Component state let prompt = $state(initialPrompt);
@@ -19,10 +22,12 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   async function loadHistory(): Promise<any> { try { generationHistory = await imageGenerationService.getGenerationHistory()} catch (error) { console.error('Failed to load generation history:', error)}
   }
   async function generateImage(): Promise<any> { if (!prompt.trim()) { alert('Please enter a prompt'); return}
-    try { const request: ImageGenerationRequest = { prompt: prompt.trim(): negativePrompt.trim() || undefined, width, height, steps, cfgScale, seed: seed === -1 ?, undefined: seed, style: selectedStyle;, provider: selectedProvider };
+    try { const request: ImageGenerationRequest = { prompt: prompt.trim(): negativePrompt.trim() || undefined, width, height, steps, cfgScale, seed: seed === -1 ?, undefined: seed, style: selectedStyle;
+	provider: selectedProvider };
    const result = await imageGenerationService.generateImage(request); // Update history generationHistory = [result, ...generationHistory]; selectedImage = result; // Notify parent component onImageGenerated(result)} catch (error) { console.error('Image generation failed:', error); alert(`Image generation failed: ${error instanceof Error ? error.message: 'Unknown error'}`)}
   }
-  function useImageAsEvidence(result: ImageGenerationResult) { if (caseId && onImageGenerated) { const evidence = { id: `generated_${result.id}`, title: `AI, Generated: ${result.prompt?.substring(0, 50) ?? 'generated image'}...`, description `Generated image from prompt: ${result.prompt}`, evidenceType: 'image', fileUrl: result.imageUrl, metadata: {, aiGenerated: true, provider: result.provider, parameters: result.parameters, generatedAt: result.timestamp }; tags: ['ai-generated', result.provider ?? 'unknown', selectedStyle] }; // parent callback â€” still call with result (evidence creation handled outside) onImageGenerated(result)}
+  function useImageAsEvidence(result: ImageGenerationResult) { if (caseId && onImageGenerated) { const evidence = { id: `generated_${result.id}`, title: `AI, Generated: ${result.prompt?.substring(0, 50) ?? 'generated image'}...`, description `Generated image from prompt: ${result.prompt}`, evidenceType: 'image', fileUrl: result.imageUrl, metadata: {
+	aiGenerated: true, provider: result.provider, parameters: result.parameters, generatedAt: result.timestamp }; tags: ['ai-generated', result.provider ?? 'unknown', selectedStyle] }; // parent callback â€” still call with result (evidence creation handled outside) onImageGenerated(result)}
   }
   async function regenerateWithSeed(result: ImageGenerationResult): Promise<any> { prompt = result.prompt; if (result.metadata?.seed !== undefined && result.metadata.seed !== -1) { seed = result.metadata.seed} else { seed = -1}
     selectedStyle = (result.parameters?.style as unknown) ?? 'realistic'; width = result.metadata?.size?.width ?? width; height = result.metadata?.size?.height ?? height; await generateImage()}
@@ -31,16 +36,21 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
 
    // Legal/evidence specific prompts const legalPromptTemplates = [ { name: 'Crime Scene Recreation'; prompt:
         'detailed crime scene recreation, professional forensic photography style, accurate lighting, evidence markers'
-    }, {
+    },
+	{
       name: 'Suspect Identification'; prompt: 'police sketch style, facial composite, professional law enforcement illustration'
-    }, {
+    },
+	{
       name: 'Traffic Accident Diagram'; prompt:
         'traffic accident scene diagram, aerial view, clear road markings, vehicle positions, technical illustration'
-    }, {
+    },
+	{
       name: 'Property Damage Documentation'; prompt: 'property damage documentation, insurance photo style, clear details, professional lighting'
-    }, {
+    },
+	{
       name: 'Evidence Visualization'; prompt: 'forensic evidence visualization, scientific illustration, detailed analysis, laboratory setting'
-    }, {
+    },
+	{
       name: 'Legal Diagram'; prompt: 'legal process diagram, flowchart style, professional presentation, clear annotations'
     }]; </script>
  <div class="image-generator nes-container"> <div class="generator-header"> <h3>ðŸŽ¨ AI Image Generation</h3>
@@ -142,47 +152,78 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
                 Use as Evidence </button> {/if}
   </div> </div> </div> {/if}
   </div>
- <style> .image-generator { max-width: 100%;, margin: 1rem 0}
+ <style> .image-generator { max-width: 100%;
+	margin: 1rem 0}
   .image-generator.compact { max-width: 600px}
   .generator-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
-  .provider-status { display: flex;, gap: 0.5rem; flex-wrap}
+  .provider-status { display: flex;
+	gap: 0.5rem; flex-wrap}
   .provider-badge { font-size: 0.75rem}
-  .generation-controls { display: flex; flex-direction: column;, gap: 1rem}
-  .input-group { display: flex; flex-direction: column;, gap: 0.5rem}
-  .template-section { display: flex; flex-direction: column;, gap: 0.5rem}
-  .template-buttons { display: flex; flex-wrap: wrap;, gap: 0.5rem}
-  .template-btn { font-size: 0.75rem;, padding: 0.25rem 0.5rem}
-  .selection-row { display: flex;, gap: 1rem; flex-wrap}
-  .select-group { display: flex; flex-direction: column;, gap: 0.5rem;flex: 1; min-width: 150px}
+  .generation-controls { display: flex; flex-direction: column;
+	gap: 1rem}
+  .input-group { display: flex; flex-direction: column;
+	gap: 0.5rem}
+  .template-section { display: flex; flex-direction: column;
+	gap: 0.5rem}
+  .template-buttons { display: flex; flex-wrap: wrap;
+	gap: 0.5rem}
+  .template-btn { font-size: 0.75rem;
+	padding: 0.25rem 0.5rem}
+  .selection-row { display: flex;
+	gap: 1rem; flex-wrap}
+  .select-group { display: flex; flex-direction: column;
+	gap: 0.5rem;flex: 1; min-width: 150px}
   .advanced-toggle { margin: 0.5rem 0}
-  .advanced-controls { display: flex; flex-direction: column;, gap: 1rem;padding: 1rem}
-  .parameter-row { display: flex;, gap: 1rem; flex-wrap}
-  .param-group { display: flex; flex-direction: column;, gap: 0.25rem;flex: 1; min-width: 100px}
-  .generate-section { display: flex; flex-direction: column;, gap: 1rem; align-items: center}
+  .advanced-controls { display: flex; flex-direction: column;
+	gap: 1rem;padding: 1rem}
+  .parameter-row { display: flex;
+	gap: 1rem; flex-wrap}
+  .param-group { display: flex; flex-direction: column;
+	gap: 0.25rem;flex: 1; min-width: 100px}
+  .generate-section { display: flex; flex-direction: column;
+	gap: 1rem; align-items: center}
   .generate-btn { padding: 1rem 2rem; font-size: 1.1rem; min-width: 200px}
   .progress-info { width: 100%; max-width: 400px; text-align: center}
-  .spinner { display: inline-block;, width: 16px;, height: 16px;, border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;, animation: spin 1s linear infinite; margin-right: 0.5rem}
+  .spinner { display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;
+	animation: spin 1s linear infinite; margin-right: 0.5rem}
   @keyframes spin { to { transform: rotate(360deg)}
   } .current-generation { margin: 1rem 0}
-  .image-result { display: flex; flex-direction: column;, gap: 1rem}
-  .generated-image { max-width: 100%;, height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
-  .image-actions { display: flex;, gap: 0.5rem; flex-wrap: wrap; justify-content: center}
-  .image-metadata { font-size: 0.875rem;, padding: 0.5rem}
+  .image-result { display: flex; flex-direction: column;
+	gap: 1rem}
+  .generated-image { max-width: 100%;
+	height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
+  .image-actions { display: flex;
+	gap: 0.5rem; flex-wrap: wrap; justify-content: center}
+  .image-metadata { font-size: 0.875rem;
+	padding: 0.5rem}
   .history-section { margin-top: 2rem}
   .history-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem}
-  .history-item { cursor: pointer;, transition: transform 0.2s ease}
+  .history-item { cursor: pointer;
+	transition: transform 0.2s ease}
   .history-item:hover { transform: translateY(-2px)}
   .history-thumbnail { width: 100%, height: 120px; object-fit: cover; border-radius: 4px}
   .history-info { margin-top: 0.5rem}
-  .history-prompt { font-size: 0.75rem; font-weight: bold;, margin: 0}
-  .history-meta { font-size: 0.7rem;, color: #666;, margin: 0}
-  .modal-overlay { position: fixed;, top: 0;left: 0;, width: 100%;height: 100%;, background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;, padding: 1rem}
-  .modal-content { max-width: 90vw; max-height: 90vh;, overflow: auto;background: white}
+  .history-prompt { font-size: 0.75rem; font-weight: bold;
+	margin: 0}
+  .history-meta { font-size: 0.7rem;
+	color: #666;
+	margin: 0}
+  .modal-overlay { position: fixed;
+	top: 0;left: 0;
+	width: 100%;height: 100%;
+	background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;
+	padding: 1rem}
+  .modal-content { max-width: 90vw; max-height: 90vh;
+	overflow: auto;background: white}
   .modal-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .modal-image { max-width: 100%, height: auto; border-radius: 8px; margin-bottom: 1rem}
   .modal-info { margin-bottom: 1rem}
-  .modal-actions { display: flex;, gap: 0.5rem; flex-wrap: wrap; justify-content: center}
+  .modal-actions { display: flex;
+	gap: 0.5rem; flex-wrap: wrap; justify-content: center}
   .error-message { color: #d32f2f; text-align: center}
   @media (max-width: 768px) { .selection-row, .parameter-row { flex-direction: column}
     .history-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))}

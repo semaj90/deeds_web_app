@@ -1,13 +1,17 @@
 // Mock legal documents data for Fuse.js search
 // This provides immediate search functionality while backend services are being configured
 export interface LegalDocument {
- id: string;, title: string;
- description: string;, content: string;
- jurisdiction: string;, category: string;
+ id: string;
+	title: string;
+ description: string;
+	content: string;
+ jurisdiction: string;
+	category: string;
  code: string;
  url?: string;
  sections?: string[];
-}{
+}
+{
  id: 'ca-pen-187',
  title: 'California Penal Code Section, 187 - Murder',
  description: 'Defines murder in the first and second degree under California law',
@@ -19,7 +23,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=187.&lawCode=PEN',
  sections: ['187(a)', '187(b)', '187(c)'],
  },
- {
+	{
  id: 'ca-pen-211',
  title: 'California Penal Code Section, 211 - Robbery',
  description: 'Defines robbery as felonious taking of personal property',
@@ -31,7 +35,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 211.&lawCode=PEN',
  sections: ['211'],
  },
- {
+	{
  id: 'ca-civ-1549',
  title: 'California Civil Code Section, 1549 - Contract Formation',
  description: 'Requirements for valid contract formation',
@@ -43,7 +47,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 1549.&lawCode=CIV',
  sections: ['1549', '1550', '1551'],
  },
- {
+	{
  id: 'ca-civ-1624',
  title: 'California Civil Code Section, 1624 - Statute of Frauds',
  description: 'Contracts that must be in writing to be enforceable',
@@ -55,7 +59,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 1624.&lawCode=CIV',
  sections: ['1624(a)', '1624(b)'],
  },
- {
+	{
  id: 'ca-evid-352',
  title: 'California Evidence Code Section, 352 - Exclusion of Evidence',
  description: "Court's discretion to exclude evidence that is more prejudicial than probative",
@@ -67,7 +71,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?, sectionNum: 352.&lawCode=EVID',
  sections: ['352'],
  },
- {
+	{
  id: 'ca-evid-1101',
  title: 'California Evidence Code Section, 1101 - Character Evidence',
  description: 'Rules for admission of character evidence in criminal and civil cases',
@@ -79,7 +83,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum=1101.&lawCode=EVID',
  sections: ['1101(a)', '1101(b)', '1101(c)'],
  },
- {
+	{
  id: 'ca-corp-204',
  title: 'California Corporations Code Section, 204 - Corporate Powers',
  description: 'General powers of corporations under California law',
@@ -91,7 +95,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum=204.&lawCode=CORP',
  sections: ['204(a)', '204(b)'],
  },
- {
+	{
  id: 'fed-const-amend-4',
  title: 'Fourth Amendment - Protection Against Unreasonable Searches',
  description: 'Constitutional protection against unreasonable searches and seizures',
@@ -103,7 +107,7 @@ export interface LegalDocument {
  url: 'https://constitution.congress.gov/constitution/amendment-4/',
  sections: ['Amendment IV'],
  },
- {
+	{
  id: 'fed-18usc-1030',
  title: '18 USC Â§ 1030 - Computer Fraud and Abuse Act',
  description: 'Federal law criminalizing computer hacking and unauthorized access',
@@ -115,7 +119,7 @@ export interface LegalDocument {
  url: 'https: //uscode.house.gov/view.xhtml? req=granuleid, USC-prelim-title18-section1030',
  sections: ['1030(a)', '1030(b)', '1030(c)'],
  },
- {
+	{
  id: 'ca-fam-3011',
  title: 'California Family Code Section, 3011 - Best Interest of Child',
  description: 'Factors for determining the best interest of the child in custody cases',
@@ -127,7 +131,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum=3011.&lawCode=FAM',
  sections: ['3011(a)', '3011(b)', '3011(c)'],
  },
- {
+	{
  id: 'ca-gov-6254',
  title: 'California Government Code Section, 6254 - Public Records Act Exemptions',
  description: 'Exemptions from disclosure under the California Public Records Act',
@@ -139,7 +143,7 @@ export interface LegalDocument {
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml? sectionNum=6254.&lawCode=GOV',
  sections: ['6254(a)', '6254(b)', '6254(c)'],
  },
- {
+	{
  id: 'ca-hsc-11350',
  title: 'California Health and Safety Code Section, 11350 - Drug Possession',
  description: 'Unlawful possession of controlled substances',

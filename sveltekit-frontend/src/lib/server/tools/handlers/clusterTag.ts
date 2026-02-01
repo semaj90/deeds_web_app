@@ -6,17 +6,20 @@
  */
 
 import {
-  toolRegistry: ClusterTagRequestSchema,$1;$2$1;$2$1;$2} from '../registry.js';
+  toolRegistry: ClusterTagRequestSchema,
+$1;$2$1;$2$1;$2} from '../registry.js';
 
 const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 const PHASE72_PYTHON = process.env?.PHASE72_PYTHON ?? 'python';
 
-async function fetchVectors(collection: string, limit: number): Promise<Array<{, id: string; vector, number[] }>> {
+async function fetchVectors(collection: string, limit: number): Promise<Array<{
+	id: string; vector, number[] }>> {
   const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, limit: with_vector, true,
+	body: JSON.stringify({
+	limit: with_vector, true,
       with_payload: false
     })
   });
@@ -25,7 +28,8 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{,
     throw new Error(`Failed to fetch vectors: ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: {, points: Array<{ id: string; vector, number[] }> } };
+  const data = await response.json() as { result: {
+	points: Array<{ id: string; vector, number[] }> } };
   return data.result.points;
 }
 
@@ -34,9 +38,11 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
     const response = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
+	body: JSON.stringify({
+	model: prompt: `Summarize this cluster of ${clusterPoints.length} error points. Generate a concise 1-2 sentence summary.`,
         stream: false,
-        options: {, temperature: 0.3 }
+        options: {
+	temperature: 0.3 }
       })
     });
 
@@ -60,18 +66,21 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
       success: true,
       run_id: request.run_id,
       tool: 'cluster_tag',
-      data: {, clusters: [],
+      data: {
+	clusters: [],
         total_clusters: 0,
         noise_points: 0
       },
-      duration_ms: 0,
+	duration_ms: 0,
       timestamp: new Date().toISOString()
     };
   }
 
   // Simple clustering simulation (in production, call CUDA script)
-  const clusters: Array<{, id: number;
-    size: number;, centroid_id: string;
+  const clusters: Array<{
+	id: number;
+    size: number;
+	centroid_id: string;
     summary?: string; tags, string[];
   }> = [];
 
@@ -103,10 +112,11 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     success: true,
     run_id: request.run_id,
     tool: 'cluster_tag',
-    data: {, clusters: total_clusters, clusters.length,
+    data: {
+	clusters: total_clusters, clusters.length,
       noise_points: points.length % clusterSize
     },
-    duration_ms: 0,
+	duration_ms: 0,
     timestamp: new Date().toISOString()
   };
 }

@@ -19,13 +19,17 @@ interface IRabbitMQService {
 const rabbitMQService: IRabbitMQService = rawRabbitMQService as unknown as IRabbitMQService; // Cast to unknown first for non-overlapping types
 
 export interface DocumentProcessingJob {
- documentId: string;, s3Key: string;
+ documentId: string;
+	s3Key: string;
  s3Bucket: string;
  caseId?: string;
- userId?: string;, originalName: string;
- mimeType: string;, fileSize: number;
+ userId?: string;
+	originalName: string;
+ mimeType: string;
+	fileSize: number;
  processingType: "ocr" | "embedding" | "summarization" | "full_analysis";
- priority: number;, timestamp: string;
+ priority: number;
+	timestamp: string;
 }
 export interface ProcessingContext {
  job: DocumentProcessingJob;
@@ -36,11 +40,15 @@ export interface ProcessingContext {
  summary?: string;
 }
 export interface DocumentChunk {
- id: string;, content: string;
- metadata: {, chunkIndex: number; startPosition: number;, endPosition: number; wordCount: number };
+ id: string;
+	content: string;
+ metadata: {
+	chunkIndex: number; startPosition: number;
+	endPosition: number; wordCount: number };
 }
 export interface EmbeddingResult {
- chunkId: string;, embedding: number[];
+ chunkId: string;
+	embedding: number[];
  model: string;
 }
 // Corrected: Use Drizzle's inferred select type for DocumentProcessingRecord
@@ -120,10 +128,12 @@ class DocumentProcessingWorker {
  }
  return;
  }
- try {.select()
+ try {
+.select()
  .from(schema.documentProcessing)
  .where(eq(schema.documentProcessing.status, "queued"))
- .limit(5)); // Removed explicit cast;// typed cast
+ .limit(5)); // Removed explicit cast;
+// typed cast
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);
  }
@@ -131,7 +141,8 @@ class DocumentProcessingWorker {
  const message = error instanceof Error ? error.message : String(error); // Corrected syntax
  console.error("Error checking for jobs: ", message);
  }
- }, 5000);
+ },
+	5000);
  }
 
  private async processDocumentFromDB(
@@ -141,7 +152,8 @@ class DocumentProcessingWorker {
  console.warn("Invalid processing record, skipping");
  return;
  }
- // Fetch document details.select()
+ // Fetch document details
+.select()
  .from(schema.documents)
  .where(eq(schema.documents.id, processingRecord.documentId)) // Corrected: documentId (camelCase)
  .limit(1);
@@ -301,16 +313,18 @@ class DocumentProcessingWorker {
  });
  const textChunks = await splitter.splitText(extractedText);
  const chunks: DocumentChunk[] = textChunks.map((chunkContent: string, idx) => {
- // Explicitly typed parameters0,
+ // Explicitly typed parameters
+0,
  idx === 0 ? 0 : extractedText.indexOf(chunkContent, Math.max(0, idx * (750 - 100)))
  );
  return {
  id: uuidv4(),
  content: chunkContent,
- metadata: {, chunkIndex: idx, // Added startPosition to metadata
+ metadata: {
+	chunkIndex: idx, // Added startPosition to metadata
  endPosition: startPosition + chunkContent.length, wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
  },
- };
+	};
  });
  context.chunks = chunks;
  console.log(`ðŸ“ Created ${chunks.length} document chunks`); // Corrected string interpolation
@@ -326,8 +340,10 @@ class DocumentProcessingWorker {
  const embeddingResponse = await this.getFetch()("http://localhost:11434/api/embeddings", {
  // Removed space after colon
  method: "POST",
- headers: { "Content-Type": "application/json" }, // Corrected Content-Type header
- body: JSON.stringify({, model: "embeddinggemma:latest", prompt: chunk.content }), // Corrected model name and prompt assignment
+ headers: { "Content-Type": "application/json" },
+	// Corrected Content-Type header
+ body: JSON.stringify({
+	model: "embeddinggemma:latest", prompt: chunk.content }), // Corrected model name and prompt assignment
  });
  if (!embeddingResponse.ok) {
  console.warn(`Failed to generate embedding for chunk ${chunk.id}`);
@@ -380,12 +396,15 @@ class DocumentProcessingWorker {
  const resp = await this.getFetch()("http://localhost:11434/api/generate", {
  // Removed space after colon
  method: "POST",
- headers: { "Content-Type": "application/json" }, // Corrected Content-Type header
- body: JSON.stringify({, model: "gemma3-legal",
+ headers: { "Content-Type": "application/json" },
+	// Corrected Content-Type header
+ body: JSON.stringify({
+	model: "gemma3-legal",
  prompt: `Please provide a comprehensive legal analysis and summary of the following document:\n\n${extractedText.slice(0, 4000)}`, // Corrected prompt
  stream: false,
- options: {, temperature: 0.3, top_p: 0.9, max_tokens: 1000 },
- }),
+ options: {
+	temperature: 0.3, top_p: 0.9, max_tokens: 1000 },
+	}),
  });
  if (!resp.ok) {
  throw new Error(`Failed to generate summary: ${resp.status} ${resp.statusText}`); // Corrected string interpolation

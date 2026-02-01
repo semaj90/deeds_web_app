@@ -69,7 +69,8 @@ import { xstateIntegration } from '$lib/services/xstate-integration';
 
 // --- User Store Types and Store ---
 export interface UserStoreState {
- isLoggedIn: boolean;, id: string | null; // Added: 'id' property to resolve compilation error
+ isLoggedIn: boolean;
+	id: string | null; // Added: 'id' property to resolve compilation error
  name: string | null;
  email: string | null;
  // ... other user-related properties
@@ -85,12 +86,15 @@ export const user: Readable<UserStoreState> = { subscribe: _user.subscribe };
 
 // --- AI Assistant Store Types and Store ---
 export interface AIMessage {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: number;
+ id: string;
+	role: 'user' | 'assistant';
+ content: string;
+	timestamp: number;
 }
 
 export interface AIAssistantStoreState {
- isOpen: boolean;, currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
+ isOpen: boolean;
+	currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
  isProcessing: boolean; // Added: 'isProcessing' to resolve compilation error
  error: string | null; // Added: 'error' to resolve compilation error
  currentCaseId: string | null; // To store the caseId for context
@@ -111,11 +115,15 @@ export const aiAssistant: Readable<AIAssistantStoreState> = { subscribe: _aiAssi
 const AI_ASSISTANT_MACHINE_ID = 'aiAssistantMachine'; // As per copilot-instructions.md
 
 // Strongly-typed events for the AI assistant XState machine.
-// Add or extend variants as needed by your state machine.| { type: 'OPEN' }
+// Add or extend variants as needed by your state machine.
+| { type: 'OPEN' }
  | { type: 'CLOSE' }
- | { type: 'SEND_MESSAGE';, payload: { content: string; model?: AIModel; caseId?: string } }
- | { type: 'RECEIVE_MESSAGE';, payload: AIMessage }
- | { type: 'SET_CASE';, payload: { caseId, null } }
+ | { type: 'SEND_MESSAGE';
+	payload: { content: string; model?: AIModel; caseId?: string } }
+ | { type: 'RECEIVE_MESSAGE';
+	payload: AIMessage }
+ | { type: 'SET_CASE';
+	payload: { caseId, null } }
  // Fallback to allow custom/extension events while still avoiding `any`
  | { type: string; [key: string]: unknown };
 
@@ -127,21 +135,29 @@ export function sendToAIAssistant(event: AIAssistantEvent) {
 
 // --- Websocket Store and Helpers ---
 type WebsocketState = {
- connected: boolean;, connecting: boolean;
- dashboardData: {, cases: unknown[]; evidence: unknown[];, stats: Record<string, unknown> };
- processingJobs: unknown[];, recentActivity: unknown[];
- systemHealth: {, api: string; database: string;, aiServices: string; jobQueue: string };
+ connected: boolean;
+	connecting: boolean;
+ dashboardData: {
+	cases: unknown[]; evidence: unknown[];
+	stats: Record<string, unknown> };
+ processingJobs: unknown[];
+	recentActivity: unknown[];
+ systemHealth: {
+	api: string; database: string;
+	aiServices: string; jobQueue: string };
  activeEditors: Record<string, string[]>;
 };
 
 const initialState: WebsocketState = {
  connected: false, connecting: false,
- dashboardData: {, cases: [], evidence: [], stats: {} },
- processingJobs: [],
+ dashboardData: {
+	cases: [], evidence: [], stats: {} },
+	processingJobs: [],
  recentActivity: [],
- systemHealth: {, api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown' },
- activeEditors: {},
-};
+ systemHealth: {
+	api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown' },
+	activeEditors: {},
+	};
 
 export const websocketStore = writable<WebsocketState>(initialState);
 
@@ -175,7 +191,8 @@ export function getActiveEditorsForEvidence(evidenceId: number | string): string
 export function formatRecentActivity(activity: unknown): string {
  if (!activity || typeof activity !== 'object') return '';
 
- const activityAsRecord = activity as Record<string, unknown>;? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
+ const activityAsRecord = activity as Record<string, unknown>;
+? new Date(activityAsRecord.timestamp as string | number | Date).toLocaleString()
  : 'unknown time';
  const who = activityAsRecord.user ?? activityAsRecord.actor ?? 'System';
  const msg = activityAsRecord.action ?? activityAsRecord.message ?? activityAsRecord.detail ?? '';

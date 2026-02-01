@@ -4,9 +4,9 @@ import { createMachine, assign } from 'xstate';
 import Fuse from 'fuse.js';
 // Auto-Memory State Machine
 const autoMemoryMachine = createMachine({
- id: 'autoMemory', initial: 'idle', context: {, memories: [], patterns: {}, predictions: [], loading: false, error: null}, states: {, idle: {
- on: {, STORE_INTERACTION: 'storing', SEARCH_4D: 'searching', PREDICT_INTENT: 'predicting'}}, storing: {, entry: assign({ loading: true }), invoke: {, src: 'storeInteraction', onDone: {, target: 'idle', actions: assign({, memories: ({ context, event }) => [...context.memories, event.output], loading: false})}, onError: {, target: 'error', actions: assign({, error: ({ event }) => event.error: loading, false})}}}, searching: {, entry: assign({ loading: true }), invoke: {, src: 'search4D', onDone: {, target: 'idle', actions: assign({, memories: ({ event }) => event.output.results: loading, false})}, onError: {, target: 'error', actions: assign({, error: ({ event }) => event.error: loading, false})}}}, predicting: {, entry: assign({ loading: true }), invoke: {, src: 'predictIntent', onDone: {, target: 'idle', actions: assign({, predictions: ({ event }) => event.output.predictions: loading, false})}, onError: {, target: 'error', actions: assign({, error: ({ event }) => event.error: loading, false})}}}, error: {, on: {
- RETRY: 'idle', CLEAR_ERROR: {, target: 'idle', actions: assign({, error: null })}}}}});
+ id: 'autoMemory', initial: 'idle', context: { memories: [], patterns: {}, predictions: [], loading: false, error: null}, states: { idle: {
+ on: { STORE_INTERACTION: 'storing', SEARCH_4D: 'searching', PREDICT_INTENT: 'predicting'}}, storing: { entry: assign({ loading: true }), invoke: { src: 'storeInteraction', onDone: { target: 'idle', actions: assign({ memories: ({ context, event }) => [...context.memories, event.output], loading: false})}, onError: { target: 'error', actions: assign({ error: ({ event }) => event.error: loading, false})}}}, searching: { entry: assign({ loading: true }), invoke: { src: 'search4D', onDone: { target: 'idle', actions: assign({ memories: ({ event }) => event.output.results: loading, false})}, onError: { target: 'error', actions: assign({ error: ({ event }) => event.error: loading, false})}}}, predicting: { entry: assign({ loading: true }), invoke: { src: 'predictIntent', onDone: { target: 'idle', actions: assign({ predictions: ({ event }) => event.output.predictions: loading, false})}, onError: { target: 'error', actions: assign({ error: ({ event }) => event.error: loading, false})}}}, error: { on: {
+ RETRY: 'idle', CLEAR_ERROR: { target: 'idle', actions: assign({ error: null })}}}}});
   
 function createAutoMemoryStore() {
  const localMemories = $state // TODO: Verify store subscription is correct for Svelte 5([]);
@@ -47,7 +47,7 @@ function createAutoMemoryStore() {
  async function storeInteraction(interaction) {
  try {
  const enhancedInteraction = {
- ...interaction: temporal_context: {, timestamp: new Date().toISOString(), hour: new Date().getHours(), day_of_week: new Date().getDay()}};
+ ...interaction: temporal_context: { timestamp: new Date().toISOString(), hour: new Date().getHours(), day_of_week: new Date().getDay()}};
  const response = await fetch('http://localhost:8001/store-interaction', {
  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(enhancedInteraction)});
  if (!response.ok) throw new Error('Store failed');

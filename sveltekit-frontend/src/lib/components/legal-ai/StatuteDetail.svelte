@@ -1,10 +1,11 @@
 <script lang="ts">
 	let item = $state<any>(undefined);
 
- import { createEventDispatcher, onMount } from 'svelte';
+ // Migrated to $effect
 
  interface Statute {
- id: string;, code: string;
+ id: string;
+	code: string;
  title?: string;
  full_text?: string;
  jurisdiction?: string;
@@ -25,12 +26,14 @@
  let relatedCases: any[] = [];
  let contextLoading = false;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  if (statute) {
  await loadContext();
  }
- })();
+ 
+});();
  });
 
  async function loadContext() {
@@ -165,16 +168,19 @@
 <style>
  .statute-detail {
  display: flex;
- flex-direction: column;, gap: 1.5rem;
+ flex-direction: column;
+	gap: 1.5rem;
  padding: 1.5rem;
- background-color: white;, border: 2px solid #d4a574;
+ background-color: white;
+	border: 2px solid #d4a574;
  border-radius: 8px;
  }
 
  .detail-header {
  display: flex;
  justify-content: space-between;
- align-items: flex-start;, gap: 1rem;
+ align-items: flex-start;
+	gap: 1rem;
  padding-bottom: 1rem;
  border-bottom: 1px solid #e0d5c7;
  }
@@ -187,17 +193,20 @@
  margin: 0;
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 1.3rem;
- font-weight: 600;, color: #8b4513;
+ font-weight: 600;
+	color: #8b4513;
  }
 
  .statute-title {
  margin: 0.5rem 0 0 0;
  font-size: 1rem;
- font-weight: 500;, color: #333;
+ font-weight: 500;
+	color: #333;
  }
 
  .header-actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  }
 
  .btn-save,
@@ -205,13 +214,15 @@
  padding: 0.5rem 1rem;
  border: none;
  border-radius: 4px;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500;
+	cursor: pointer;
  transition: all 0.2s;
  white-space: nowrap;
  }
 
  .btn-save {
- background-color: #e0d5c7;, color: #2c2c2c;
+ background-color: #e0d5c7;
+	color: #2c2c2c;
  }
 
  .btn-save:hover {
@@ -219,7 +230,8 @@
  }
 
  .btn-attach {
- background-color: #8b4513;, color: #f5f1e8;
+ background-color: #8b4513;
+	color: #f5f1e8;
  }
 
  .btn-attach:hover {
@@ -228,39 +240,46 @@
 
  .detail-content {
  display: flex;
- flex-direction: column;, gap: 1.5rem;
+ flex-direction: column;
+	gap: 1.5rem;
  }
 
  .metadata {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;, padding: 1rem;
+ gap: 1rem;
+	padding: 1rem;
  background-color: #f5f1e8;
  border-radius: 6px;
  }
 
  .meta-item {
  display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex-direction: column;
+	gap: 0.25rem;
  }
 
  .label {
  font-size: 0.8rem;
- font-weight: 600;, color: #666;
+ font-weight: 600;
+	color: #666;
  }
 
  .value {
- font-size: 0.95rem;, color: #333;
+ font-size: 0.95rem;
+	color: #333;
  }
 
  .section {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .section h4 {
  margin: 0;
- font-size: 1rem;, color: #2c2c2c;
+ font-size: 1rem;
+	color: #2c2c2c;
  padding-bottom: 0.5rem;
  border-bottom: 1px solid #e0d5c7;
  }
@@ -270,14 +289,16 @@
  background-color: #f9f7f4;
  border-left: 3px solid #d4a574;
  border-radius: 4px;
- line-height: 1.6;, color: #333;
+ line-height: 1.6;
+	color: #333;
  white-space: pre-wrap;
  word-wrap: break-word;
  }
 
  .context-list {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .context-item {
@@ -289,13 +310,15 @@
 
  .context-item p {
  margin: 0;
- font-size: 0.9rem;, color: #333;
+ font-size: 0.9rem;
+	color: #333;
  line-height: 1.5;
  }
 
  .cases-list {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .case-item {
@@ -308,30 +331,37 @@
  .case-number {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.85rem;
- font-weight: 600;, color: #8b4513;
+ font-weight: 600;
+	color: #8b4513;
  }
 
  .case-title {
- font-size: 0.9rem;, color: #333;
+ font-size: 0.9rem;
+	color: #333;
  margin: 0.25rem 0;
  }
 
  .relevance {
- font-size: 0.75rem;, color: #666;
+ font-size: 0.75rem;
+	color: #666;
  }
 
  .loading {
  display: flex;
  flex-direction: column;
- align-items: center;, gap: 1rem;
- padding: 2rem;, color: #666;
+ align-items: center;
+	gap: 1rem;
+ padding: 2rem;
+	color: #666;
  }
 
  .spinner {
- width: 30px;, height: 30px;
+ width: 30px;
+	height: 30px;
  border: 3px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%;
+	animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -344,7 +374,8 @@
  display: flex;
  align-items: center;
  justify-content: center;
- min-height: 300px;, color: #999;
+ min-height: 300px;
+	color: #999;
  }
 </style>
 

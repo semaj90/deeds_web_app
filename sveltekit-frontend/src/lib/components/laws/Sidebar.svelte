@@ -2,8 +2,11 @@
  import { page } from '$app/state';
 
  interface Title {
- id: string;, number: string;
- name: string;, sections: Array<{ id: string;, number: string; title: string }>;
+ id: string;
+	number: string;
+ name: string;
+	sections: Array<{ id: string;
+	number: string; title: string }>;
  }
 
  let titles: Title[] = [
@@ -13,17 +16,17 @@
  name: 'Crimes & Criminal Procedure',
  sections: [
  { id: '1201', number: '1201', title: 'Kidnapping' },
- { id: '1202', number: '1202', title: 'Ransom money' },
- { id: '1203', number: '1203', title: 'Ransom and reward' }],
+	{ id: '1202', number: '1202', title: 'Ransom money' },
+	{ id: '1203', number: '1203', title: 'Ransom and reward' }],
  },
- {
+	{
  id: '28',
  number: '28',
  name: 'Judiciary & Judicial Procedure',
  sections: [
  { id: '1', number: '1', title: 'Supreme Court' },
- { id: '2', number: '2', title: 'Courts of appeals' },
- { id: '3', number: '3', title: 'District courts' }],
+	{ id: '2', number: '2', title: 'Courts of appeals' },
+	{ id: '3', number: '3', title: 'District courts' }],
  }];
 
  let expandedTitle = $state<string | null>(null);
@@ -98,12 +101,14 @@
  .sidebar-header h2 {
  margin: 0;
  font-size: 0.95rem;
- font-weight: 600;, color: #333;
+ font-weight: 600;
+	color: #333;
  }
 
  .sidebar-content {
  flex: 1;
- overflow-y: auto;, padding: 0.5rem 0;
+ overflow-y: auto;
+	padding: 0.5rem 0;
  }
 
  .title-group {
@@ -111,12 +116,17 @@
  }
 
  .title-button {
- width: 100%;, padding: 0.75rem 1rem;
- background: none;, border: none;
- text-align: left;, cursor: pointer;
+ width: 100%;
+	padding: 0.75rem 1rem;
+ background: none;
+	border: none;
+ text-align: left;
+	cursor: pointer;
  display: flex;
- align-items: center;, gap: 0.5rem;
- font-size: 0.85rem;, color: #444;
+ align-items: center;
+	gap: 0.5rem;
+ font-size: 0.85rem;
+	color: #444;
  transition: background-color 0.15s ease;
  }
 
@@ -130,17 +140,20 @@
  }
 
  .title-number {
- font-weight: 700;, color: #222;
+ font-weight: 700;
+	color: #222;
  min-width: 50px;
  }
 
  .title-name {
  flex: 1;
- font-size: 0.8rem;, color: #666;
+ font-size: 0.8rem;
+	color: #666;
  }
 
  .expand-icon {
- font-size: 0.7rem;, color: #999;
+ font-size: 0.7rem;
+	color: #999;
  transition: transform 0.15s ease;
  }
 
@@ -152,39 +165,47 @@
 
  .section-item {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center;
+	gap: 0.5rem;
  padding: 0.5rem 1rem;
  margin: 0.25rem 0;
- text-decoration: none;, color: #555;
- font-size: 0.8rem;, transition: all 0.15s ease;
+ text-decoration: none;
+	color: #555;
+ font-size: 0.8rem;
+	transition: all 0.15s ease;
  border-left: 3px solid transparent;
  }
 
  .section-item:hover {
- background-color: #f0f0f0;, color: #222;
+ background-color: #f0f0f0;
+	color: #222;
  }
 
  .section-item.active {
  background-color: #fff;
- border-left-color: #faf1a0;, color: #222;
+ border-left-color: #faf1a0;
+	color: #222;
  font-weight: 600;
  }
 
  .section-number {
- font-weight: 700;, color: #333;
+ font-weight: 700;
+	color: #333;
  min-width: 45px;
  }
 
  .section-title {
  flex: 1;
- font-size: 0.75rem;, color: #666;
+ font-size: 0.75rem;
+	color: #666;
  }
 
  .sidebar-footer {
  padding: 0.75rem 1rem;
  border-top: 1px solid #e0e0e0;
  background-color: #fff;
- text-align: center;, color: #999;
+ text-align: center;
+	color: #999;
  font-size: 0.75rem;
  }
 

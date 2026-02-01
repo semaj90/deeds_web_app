@@ -9,10 +9,12 @@
 
 	const { children, caseId, caseTitle = null }: Props = $props();
 
-	const views: {, id: CommandCenterView; label: string;, icon: string }[] = [
+	const views: {
+	id: CommandCenterView; label: string;
+	icon: string }[] = [
 		{ id: 'board', icon: '📁', label: 'Evidence' },
-		{ id: 'graph', icon: '📊', label: 'Graph' },
-		{ id: 'chat', icon: '🤖', label: 'AI Chat' }
+	{ id: 'graph', icon: '📊', label: 'Graph' },
+	{ id: 'chat', icon: '🤖', label: 'AI Chat' }
 	];
 </script>
 

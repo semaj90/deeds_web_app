@@ -36,13 +36,13 @@ export const inlineTypeToTypeImportPattern: PatternMatcher = createPattern(
       .filter((t) => t.length > 0);
     return `import type { ${typeNames.join(', ')} } from ${source}`;
   },
-  {
+	{
     priority: 1,
     validate: (before, after) => {
       // Ensure we converted inline type imports to type-only imports
       return !after.match(/import\s*\{\s*type\s+[A-Z]/);
     },
-  }
+	}
 );
 
 /**
@@ -96,7 +96,7 @@ export const mixedImportSplitPattern: PatternMatcher = createPattern(
 
     return `${valueImport}\n${typeImport}`;
   },
-  {
+	{
     priority: 3,
   }
 );
@@ -130,7 +130,7 @@ export const typeFirstMixedImportPattern: PatternMatcher = createPattern(
 
     return `${valueImport}\n${typeImport}`;
   },
-  {
+	{
     priority: 4,
   }
 );
@@ -188,7 +188,7 @@ export const complexMixedImportPattern: PatternMatcher = createPattern(
 
     return results.join('\n');
   },
-  {
+	{
     priority: 5,
   }
 );
@@ -228,7 +228,7 @@ export const importBlockTypeCommaPattern: PatternMatcher = createPattern(
     const fixed = imports.replace(/type,\s*([A-Z])/g, 'type $1');
     return `import {${fixed}} from`;
   },
-  {
+	{
     priority: 11,
     validate: (before, after) => {
       // Ensure no `type,` patterns remain in imports
@@ -236,7 +236,7 @@ export const importBlockTypeCommaPattern: PatternMatcher = createPattern(
       if (!importMatch) return true;
       return !importMatch.some((imp) => imp.includes('type,'));
     },
-  }
+	}
 );
 
 /**
@@ -571,7 +571,8 @@ export function fixImportTypes(
  * @param content - The source code content to check
  * @returns Object containing detection results
  */
-export function detectImportIssues(content: string): {, hasIssues: boolean;
+export function detectImportIssues(content: string): {
+	hasIssues: boolean;
   patternMatches: Record<string, number>;
   totalMatches: number;
 } {

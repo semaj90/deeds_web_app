@@ -7,8 +7,10 @@
 
   // Define the structure for the AI analysis results
   export interface AnalysisResult {
-    summary: string;, key_points: string[];
-    recommendations: string[];, confidence_score: number;
+    summary: string;
+	key_points: string[];
+    recommendations: string[];
+	confidence_score: number;
   }
 
   // Define a more specific metadata interface
@@ -60,7 +62,7 @@
           'Content-Type': 'application/json',
           'x-test-mode': 'true' // For development testing
         },
-        body: JSON.stringify(item)
+	body: JSON.stringify(item)
       });
 
       if (!response.ok) {

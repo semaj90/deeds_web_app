@@ -49,7 +49,7 @@ export const citationTags = pgTable('citation_tags', {
 			createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 			updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  // Unique constraint on (name, jurisdiction)
  uniqueNameJurisdiction: unique('citation_tags_name_jurisdiction_unique').on(
  table.name, table.jurisdiction
@@ -71,9 +71,10 @@ export const evidenceTags = pgTable('evidence_tags', {
  .defaultNow()
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  // Composite primary key
- pk: primaryKey({, columns: [table.evidenceId, table.tagId]  }),
+ pk: primaryKey({
+	columns: [table.evidenceId, table.tagId]  }),
  // Index for evidence lookup
  evidenceIdx: index('evidence_tags_evidence_id_idx').on(table.evidenceId),
  // Index for tag lookup
@@ -101,7 +102,7 @@ export const ragIndexMetadata = pgTable('rag_index_metadata', {
  .defaultNow()
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  // Index for chunk lookup
  chunkIdx: index('rag_index_metadata_chunk_id_idx').on(table.chunkId),
  // Index for evidence lookup
@@ -128,7 +129,7 @@ export const auditLog = pgTable('audit_log',
  .defaultNow()
  .notNull(),
  },
- (table) => ({
+	(table) => ({
  // Index for resource queries
  resourceIdx: index('audit_log_resource_idx').on(table.resourceType, table.resourceId),
  // Index for user queries

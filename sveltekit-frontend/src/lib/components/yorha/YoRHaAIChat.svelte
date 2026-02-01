@@ -3,7 +3,7 @@
   import Activity from 'lucide-svelte/icons/activity';
   import BotIcon from 'lucide-svelte/icons/bot';
   import SendIcon from 'lucide-svelte/icons/send';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   // Svelte 5 state management
   let messages = $state<any[]>([]);
@@ -28,9 +28,11 @@
 
   const RAG_SERVICE_URL = 'http://localhost:8093';
 
-  onMount(() => {
+  $effect(() => {
+
     initializeChat();
-  });
+  
+});
 
   async function initializeChat() {
     try {
@@ -116,7 +118,8 @@
       const ragResponse = await fetch(`${RAG_SERVICE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, message: trimmed, history: messages })
+	body: JSON.stringify({
+	message: trimmed, history: messages })
       }).catch(() => null);
 
       if (ragResponse && ragResponse.ok) {
@@ -127,7 +130,7 @@
         const ollamaResponse = await fetch(`${ollamaUrl}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
         });
 
         if (ollamaResponse.ok) {
@@ -186,7 +189,8 @@
   function scrollToBottom() {
     setTimeout(() => {
       if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-    }, 50);
+    },
+	50);
   }
 
   function handleKeydown(e: KeyboardEvent) {

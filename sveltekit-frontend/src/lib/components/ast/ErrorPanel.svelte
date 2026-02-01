@@ -94,7 +94,8 @@
                     {error.code}
                   </span>
                   <span class="text-xs text-gray-400 dark:text-gray-500">
-                    Ln {error.line}, Col {error.column}
+                    Ln {error.line},
+	Col {error.column}
                   </span>
                 </div>
                 <p class="text-sm text-gray-800 dark:text-gray-200 break-words">

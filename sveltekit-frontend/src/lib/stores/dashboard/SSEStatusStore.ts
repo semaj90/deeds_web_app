@@ -1,18 +1,23 @@
 import { writable, derived } from 'svelte/store';
 
 export interface SSEConnectionState {
-  isConnected: boolean;, isConnecting: boolean;
+  isConnected: boolean;
+	isConnecting: boolean;
   error: string | null;
   lastMessageTime: Date | null;
-  reconnectAttempts: number;, maxReconnectAttempts: number;
+  reconnectAttempts: number;
+	maxReconnectAttempts: number;
   reconnectDelay: number;
 }
 
 export interface ProcessingEvent {
   stage: 'imagemagick' | 'esrgan' | 'sam' | 'granite_docling' | 'tesseract_fallback';
-  status: string;, page: number;
-  pages_total: number;, percent: number;
-  eta: number;, details: string;
+  status: string;
+	page: number;
+  pages_total: number;
+	percent: number;
+  eta: number;
+	details: string;
   timestamp: string;
   confidence?: number;
 }
@@ -51,7 +56,8 @@ function createSSEStatusStore() {
         store.connect(endpoint, token).catch((error) => {
           console.error('[SSE] Reconnection failed:', error);
         });
-      }, delay);
+      },
+	delay);
 
       return {
         ...state,
@@ -103,8 +109,7 @@ function createSSEStatusStore() {
         throw error;
       }
     },
-
-    on: (eventType: string, callback: (event: ProcessingEvent) => void) => {
+	on: (eventType: string, callback: (event: ProcessingEvent) => void) => {
       if (!eventSource) {
         console.warn('[SSE] EventSource not initialized');
         return;
@@ -121,8 +126,7 @@ function createSSEStatusStore() {
         }
       });
     },
-
-    onMessage: (callback: (event: ProcessingEvent) => void) => {
+	onMessage: (callback: (event: ProcessingEvent) => void) => {
       if (!eventSource) {
         console.warn('[SSE] EventSource not initialized');
         return;
@@ -139,8 +143,7 @@ function createSSEStatusStore() {
         }
       });
     },
-
-    disconnect: () => {
+	disconnect: () => {
       if (eventSource) {
         eventSource.close();
         eventSource = null;
@@ -157,15 +160,13 @@ function createSSEStatusStore() {
       }));
       console.log('[SSE] Disconnected from stream');
     },
-
-    clearError: () => {
+	clearError: () => {
       update((state) => ({ ...state, error: null }));
     },
-
-    reset: () => {
+	reset: () => {
       set(initialState);
     },
-  };
+	};
 }
 
 export const sseStatusStore = createSSEStatusStore();

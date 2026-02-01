@@ -7,8 +7,10 @@ import type { Redis } from 'ioredis';
 import { getRedisClient } from './redis-helper.js';
 
 export interface RAGCacheEntry {
- query: string;, results: any[];
- timestamp: number;, ttl: number;
+ query: string;
+	results: any[];
+ timestamp: number;
+	ttl: number;
  metadata?: {
  model?: string;
  confidence?: number;
@@ -18,7 +20,8 @@ export interface RAGCacheEntry {
 
 export interface CacheConfig {
  defaultTTL: number; // seconds
- maxEntries: number;, keyPrefix: string;
+ maxEntries: number;
+	keyPrefix: string;
 }
 
 const DEFAULT_CONFIG: CacheConfig = {
@@ -140,7 +143,8 @@ export class RedisRAGCache {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{, totalEntries: number;
+ async getStats(): Promise<{
+	totalEntries: number;
  hitRate?: number;
  oldestEntry?: number;
  newestEntry?: number;
@@ -186,7 +190,8 @@ export class RedisRAGCache {
 
  if (keys.length > this.config.maxEntries) {
  // Get entries with their timestamps
- const entries: Array<{, key: string; timestamp, number }> = [];
+ const entries: Array<{
+	key: string; timestamp, number }> = [];
 
  for (const key of keys) {
  const data = await this.redis.get(key);

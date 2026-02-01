@@ -1,8 +1,10 @@
 import { poolShim as pool } from '$lib/server/db-shim';
 
 export type EmbeddingRow = {
-	id: string;, document_id: string;
-	embedding: number[];, metadata: Record<string, unknown>;
+	id: string;
+	document_id: string;
+	embedding: number[];
+	metadata: Record<string, unknown>;
 	created_at: string;
 };
 
@@ -57,7 +59,7 @@ export async function findSimilar(
 				document_id: String(row.document_id),
 				embedding: (row.embedding as number[]) ?? [],
 				metadata: (row.metadata as Record<string, unknown>) ?? {},
-				created_at: String(row.created_at)
+	created_at: String(row.created_at)
 			} as EmbeddingRow;
 		});
 	} finally {

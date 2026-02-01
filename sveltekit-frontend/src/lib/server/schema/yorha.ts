@@ -18,7 +18,8 @@ import {
 
 /**
  * Cases table - stores detective cases
- */'yorha_cases',
+ */
+'yorha_cases',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_number: varchar('case_number', { length: 100 }).notNull().unique(),
@@ -44,7 +45,7 @@ import {
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_number_idx: index('yorha_cases_case_number_idx').on(table.case_number),
  created_by_idx: index('yorha_cases_created_by_idx').on(table.created_by),
  status_idx: index('yorha_cases_status_idx').on(table.status),
@@ -53,7 +54,8 @@ import {
 
 /**
  * Evidence nodes table - stores evidence items on the evidence board
- */'yorha_evidence_nodes',
+ */
+'yorha_evidence_nodes',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -92,7 +94,7 @@ import {
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_evidence_nodes_case_id_idx').on(table.case_id),
  evidence_type_idx: index('yorha_evidence_nodes_type_idx').on(table.evidence_type),
  created_by_idx: index('yorha_evidence_nodes_created_by_idx').on(table.created_by),
@@ -101,7 +103,8 @@ import {
 
 /**
  * Evidence connections table - stores relationships between evidence nodes
- */'yorha_evidence_connections',
+ */
+'yorha_evidence_connections',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -122,7 +125,7 @@ import {
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_evidence_connections_case_id_idx').on(table.case_id),
  source_node_idx: index('yorha_evidence_connections_source_idx').on(table.source_node_id),
  target_node_idx: index('yorha_evidence_connections_target_idx').on(table.target_node_id),
@@ -132,7 +135,8 @@ import {
 
 /**
  * Chat sessions table - stores conversation sessions
- */'yorha_chat_sessions',
+ */
+'yorha_chat_sessions',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  case_id: uuid('case_id').notNull(),
@@ -154,7 +158,7 @@ import {
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  last_message_at: timestamp('last_message_at', { withTimezone: true }),
  },
- (table) => ({
+	(table) => ({
  case_id_idx: index('yorha_chat_sessions_case_id_idx').on(table.case_id),
  user_id_idx: index('yorha_chat_sessions_user_id_idx').on(table.user_id),
  status_idx: index('yorha_chat_sessions_status_idx').on(table.status),
@@ -163,7 +167,8 @@ import {
 
 /**
  * Chat messages table - stores individual messages in chat sessions
- */'yorha_chat_messages',
+ */
+'yorha_chat_messages',
  {
  id: uuid('id').primaryKey().defaultRandom(),
  session_id: uuid('session_id').notNull(),
@@ -186,7 +191,7 @@ import {
  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  session_id_idx: index('yorha_chat_messages_session_id_idx').on(table.session_id),
  role_idx: index('yorha_chat_messages_role_idx').on(table.role),
  created_at_idx: index('yorha_chat_messages_created_at_idx').on(table.created_at),
@@ -195,7 +200,8 @@ import {
 
 /**
  * System metrics table - stores historical system metrics
- */'yorha_system_metrics',
+ */
+'yorha_system_metrics',
  {
  id: serial('id').primaryKey(),
 
@@ -225,7 +231,7 @@ import {
  // Timestamp
  recorded_at: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
  },
- (table) => ({
+	(table) => ({
  recorded_at_idx: index('yorha_system_metrics_recorded_at_idx').on(table.recorded_at),
  })
 );

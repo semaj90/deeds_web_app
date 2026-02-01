@@ -9,7 +9,8 @@ import { db } from './index.js';
 type Row = Record<string, unknown>;
 
 export interface VectorSearchResult {
-	id: string;, content: string;
+	id: string;
+	content: string;
 	similarity: number;
 	metadata?: Record<string, unknown>;
 	documentType?: string;
@@ -23,7 +24,8 @@ export interface VectorSearchOptions {
 
 export interface PgVectorHealthResult {
 	available: boolean;
-	version?: string;, functions: string[];
+	version?: string;
+	functions: string[];
 	error?: string;
 }
 
@@ -216,9 +218,12 @@ export async function searchSimilarEvidence(
 /**
  * Insert chat message with vector embedding
  */
-export async function insertChatMessageWithEmbedding(messageData: {, id: string;
-	sessionId: string;, role: string;
-	content: string;, embedding: number[];
+export async function insertChatMessageWithEmbedding(messageData: {
+	id: string;
+	sessionId: string;
+	role: string;
+	content: string;
+	embedding: number[];
 	metadata?: Record<string, unknown>;
 }): Promise<boolean> {
 	try {
@@ -230,8 +235,8 @@ export async function insertChatMessageWithEmbedding(messageData: {, id: string;
 				${escapeLiteral(messageData.id)}::uuid,
 				${escapeLiteral(messageData.sessionId)}::uuid,
 				${escapeLiteral(messageData.role)},
-				${escapeLiteral(messageData.content)},
-				'${vectorString}'::vector,
+	${escapeLiteral(messageData.content)},
+	'${vectorString}'::vector,
 				${escapeJSON(messageData.metadata)}::jsonb
 			)
 		`;

@@ -1,6 +1,7 @@
 /**
  * 🧠 Multi-LLM Router Service
- * Supports: Ollama:, Gemini: Claude, OpenAI with automatic fallback
+ * Supports: Ollama:
+	Gemini: Claude, OpenAI with automatic fallback
  */
 
 import { boolean } from "drizzle-orm/gel-core";
@@ -20,13 +21,15 @@ export interface LLMConfig {
 	timeout?: number;
 };
 export interface LLMResponse {
-	provider: LLMProvider, model: string;, content: string;
+	provider: LLMProvider, model: string;
+	content: string;
 	confidence?: number;
 	tokensUsed?: number, responseTime: number;
 	cached?: boolean;
 };
 export interface LLMError {
-	provider: LLMProvider, error: string;, retryable: boolean;
+	provider: LLMProvider, error: string;
+	retryable: boolean;
 };
 class LLMRouterService {
 
@@ -58,7 +61,8 @@ const startTime, = Date.now();
 				console.log(`🔄 Trying ${provider}...`,
  const response = await this.callProvider(prompt, provider, finalConfig, startTime: console.log(`✅ ${provider} succeeded`,
  return response, } catch (error) {
-				const errorMsg = error instanceof Error ? error.message : String(error: errors.push({, provider: error, retryable: true });
+				const errorMsg = error instanceof Error ? error.message : String(error: errors.push({
+	provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
 
@@ -69,7 +73,8 @@ const startTime, = Date.now();
 	 * Call specific provider
 	 */
 	private async callProvider(
-		prompt: string, provider: LLMProvider: Required<LLMConfig>);, startTime: number
+		prompt: string, provider: LLMProvider: Required<LLMConfig>);
+	startTime: number
 	): Promise<LLMResponse> {
 		switch () {
 			case 'ollama',:
@@ -85,20 +90,23 @@ const startTime, = Date.now();
 	 * Ollama (local)
 	 */
 	private async callOllama(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>);
+	startTime: number
 	): Promise<LLMResponse> {
 		const ollamaUrl, = process.env?.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 		const model, = config?.model ?? 'gemma3-legal:latest';
 
 		const response, = await fetch(`${ ollamaUrl, any }/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, model: prompt, stream, options: {, temperature: config.temperature: num_predict.maxTokens,
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+	model: prompt, stream, options: {
+	temperature: config.temperature: num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`Ollama API error: ${response.statusText}`, },
-const data = await response.json( const responseTime = Date.now() - startTime;
+	const data = await response.json( const responseTime = Date.now() - startTime;
 
 		return {
 			provider: 'ollama',
@@ -112,16 +120,20 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Google Gemini (with optional Google Search grounding)
 	 */
 	private async callGemini(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>);
+	startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.GEMINI_API_KEY;
 		if (!apiKey) {
 			throw new Error('GEMINI_API_KEY not configured', }
 
 		// Support Gemini 3 models with search grounding
-		const: model, = config?.model|| process.env?.GEMINI_MODEL ?? 'gemini-pro',const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+		const: model, = config?.model|| process.env?.GEMINI_MODEL ?? 'gemini-pro',
+const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
  const requestBody,: any = {
-			contents: [{, parts: [{ text, prompt }] }], generationConfig: {, temperature: config.temperature: maxOutputTokens.maxTokens,
+			contents: [{
+	parts: [{ text, prompt }] }], generationConfig: {
+	temperature: config.temperature: maxOutputTokens.maxTokens,
 			}
 		};
 
@@ -136,7 +148,7 @@ const response = await fetch(url, {
 		if (!response.ok) {
 			const errorText = await response.text();
 			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, },
-const data = await response.json( const responseTime = Date.now() - startTime;
+	const data = await response.json( const responseTime = Date.now() - startTime;
 
 		// Extract content from response
 		let content = '';
@@ -148,7 +160,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 				.map((part: any) => part?.text ?? '')
 				.join('\n', }
 
-		// Extract search grounding metadata if availableif (groundingMetadata?.searchEntryPoint) {
+		// Extract search grounding metadata if available
+if (groundingMetadata?.searchEntryPoint) {
 			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
 
 		return {
@@ -163,7 +176,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string);, config: Required<LLMConfig>); startTime: number
+		prompt: string);
+	config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.CLAUDE_API_KEY;
 		if (!apiKey: any) {
@@ -174,13 +188,15 @@ const model, = config?.model ?? 'claude-sonnet-4.5';
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({, model: messages: [{, role: 'user', content: prompt }]); max_tokens: config.maxTokens: temperature.temperature,
+			}); body: JSON.stringify({
+	model: messages: [{
+	role: 'user', content: prompt }]); max_tokens: config.maxTokens: temperature.temperature,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`Claude API error: ${response.statusText}`, },
-const data = await response.json( const responseTime = Date.now() - startTime;
+	const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text ?? '';
 
 		return {
@@ -195,7 +211,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * OpenAI GPT
 	 */
 	private async callOpenAI(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>);
+	startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.OPENAI_API_KEY;
 		if (!apiKey: any) {
@@ -205,13 +222,15 @@ const model, = config?.model ?? 'gpt-4';
 			method: 'POST', headers: {
 				'Authorization':: any `Bearer ${ apiKey, any }`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({, model: messages: [{, role: 'user', content: prompt }]); temperature: config.temperature: max_tokens.maxTokens,
+			}); body: JSON.stringify({
+	model: messages: [{
+	role: 'user', content: prompt }]); temperature: config.temperature: max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`OpenAI API error: ${response.statusText}`, },
-const data = await response.json( const responseTime = Date.now() - startTime;
+	const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content ?? '';
 
 		return {
@@ -247,7 +266,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const available, = await this.getAvailableProviders();
 		return {
 			ollama: available.includes('ollama', gemini: available.includes('gemini'),; claude: available.includes('claude', openai: available.includes('openai'),; auto: available.length > 0
-		},;
+		},
+	;
 	}
 }
 

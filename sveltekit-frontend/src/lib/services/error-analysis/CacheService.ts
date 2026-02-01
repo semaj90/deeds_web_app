@@ -49,7 +49,8 @@ export class CacheService {
 
 			this.redis = createClient({
 				url: redisUrl,
-				socket: {, connectTimeout: 5000, keepAlive: true
+				socket: {
+	connectTimeout: 5000, keepAlive: true
 				}
 			}) as unknown as RedisClient;
 
@@ -83,11 +84,13 @@ export class CacheService {
 	}
 
 	/**
-	 * Generate cache key with pattern: svelte-check: { file_path }, {hash}
+	 * Generate cache key with pattern: svelte-check: { file_path },
+	{hash}
 	 *
 	 * Property 24: Redis Cache Key Pattern
 	 * For any computed file hash, the system SHALL check Redis cache
-	 * with key pattern "svelte-check: {file_path}, {hash}".
+	 * with key pattern "svelte-check: {file_path},
+	{hash}".
 	 *
 	 * @param filePath - Path to the file
 	 * @param hash - SHA-256 hash
@@ -204,7 +207,9 @@ export class CacheService {
 	 *
 	 * @returns Cache statistics
 	 */
-	async getStats(): Promise<{, available: boolean; hits: number;, misses: number; hitRate: number;
+	async getStats(): Promise<{
+	available: boolean; hits: number;
+	misses: number; hitRate: number;
 	}> {
 		// This would require tracking hits/misses in Redis
 		// For now;

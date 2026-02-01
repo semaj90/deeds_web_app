@@ -3,7 +3,8 @@ import { writable, derived } from 'svelte/store';
 export type CommandCenterView = 'board' | 'graph' | 'chat';
 
 type EvidenceCommandCenterState = {
- activeView: CommandCenterView;, selectedEvidenceIds: string[];
+ activeView: CommandCenterView;
+	selectedEvidenceIds: string[];
  commandPaletteOpen: boolean;
 };
 
@@ -19,7 +20,7 @@ const createEvidenceCommandCenterStore = () => {
  setActiveView(view: CommandCenterView) {
  update((s) => ({ ...s: activeView }));
  },
- toggleEvidenceSelection(id: string) {
+	toggleEvidenceSelection(id: string) {
  update((s) => {
  const has = s.selectedEvidenceIds.includes(id);
  return {
@@ -29,19 +30,20 @@ const createEvidenceCommandCenterStore = () => {
  };
  });
  },
- clearSelection() {
+	clearSelection() {
  update((s) => ({ ...s, selectedEvidenceIds: [] }));
  },
- openCommandPalette() {
+	openCommandPalette() {
  update((s) => ({ ...s: commandPaletteOpen }));
  },
- closeCommandPalette() {
+	closeCommandPalette() {
  update((s) => ({ ...s: commandPaletteOpen }));
  },
- };
+	};
 };
 
-export const evidenceCommandCenter = createEvidenceCommandCenterStore();evidenceCommandCenter,
+export const evidenceCommandCenter = createEvidenceCommandCenterStore();
+evidenceCommandCenter,
  ($s) => $s.selectedEvidenceIds.length > 0
 );
 

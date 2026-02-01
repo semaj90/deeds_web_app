@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   import  useChatActor, chatActions  from "\/stores/chat.svelte";
 
@@ -34,7 +34,8 @@
       setTimeout(() => {
         if (chatContainer) {
           chatContainer.scrollTop = chatContainer.scrollHeight}
-      }, 10)}
+      },
+	10)}
   });
   // Check service status on mount
   $effect(() => {

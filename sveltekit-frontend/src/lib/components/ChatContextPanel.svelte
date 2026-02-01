@@ -1,19 +1,22 @@
 <script lang="ts">
  import chatContextRaw from '$lib/stores/chat-context';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  // Define interfaces locally since they are not exported from chat-context
  interface TopicNode {
- clusterSize: number;, tags: string[];
+ clusterSize: number;
+	tags: string[];
  }
 
  interface ShardNode {
- chunkCount: number;, status: string;
+ chunkCount: number;
+	status: string;
  }
 
  const chatContext = chatContextRaw as any;
 
- onMount(() => {
+ $effect(() => {
+
  // Listen for topic/shard events from evidence board
  const handleTopicToChat = (event: CustomEvent) => {
  chatContext.addTopic(event.detail);
@@ -30,7 +33,8 @@
  window.removeEventListener('topicToChat', handleTopicToChat);
  window.removeEventListener('shardToChat', handleShardToChat);
  };
- });
+ 
+});
 
  function removeContext(id: string) {
  chatContext.remove(id);

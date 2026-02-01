@@ -7,21 +7,29 @@
 import { cacheService } from './cache.service.js';
 
 export interface Statute {
-	id: string;, code: string;
-	title: string;, text: string;
-	jurisdiction: string;, relevanceScore: number;
+	id: string;
+	code: string;
+	title: string;
+	text: string;
+	jurisdiction: string;
+	relevanceScore: number;
 }
 
 export interface CaseLaw {
-	id: string;, caseNumber: string;
-	title: string;, summary: string;
-	court: string;, year: number;
+	id: string;
+	caseNumber: string;
+	title: string;
+	summary: string;
+	court: string;
+	year: number;
 	relevanceScore: number;
 }
 
 export interface RAGResult {
-	statutes: Statute[];, caseLaw: CaseLaw[];
-	totalResults: number;, executionTimeMs: number;
+	statutes: Statute[];
+	caseLaw: CaseLaw[];
+	totalResults: number;
+	executionTimeMs: number;
 }
 
 export class RAGService {
@@ -74,7 +82,7 @@ export class RAGService {
 					// Query statute database or vector store
 					return this.queryStatutes(query, jurisdiction, limit);
 				},
-				{
+	{
 					namespace: 'statutes',
 					ttl: 24 * 60 * 60 // 24 hours
 				}
@@ -102,7 +110,7 @@ export class RAGService {
 					// Query case law database or vector store
 					return this.queryCaseLaw(query, jurisdiction, limit);
 				},
-				{
+	{
 					namespace: 'rag-results',
 					ttl: 24 * 60 * 60 // 24 hours
 				}
@@ -172,7 +180,7 @@ export class RAGService {
 					// Query pgvector for statute embeddings
 					return this.queryStatuteContext(code, limit);
 				},
-				{
+	{
 					namespace: 'statute-context',
 					ttl: 24 * 60 * 60 // 24 hours
 				}

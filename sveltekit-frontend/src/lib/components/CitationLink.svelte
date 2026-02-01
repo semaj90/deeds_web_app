@@ -17,9 +17,12 @@
 		let lastIndex = 0;
 
 		// Find all citations
-		const citations: Array<{, start: number;
-			end: number;, type: string;
-			content: string;, reference: string;
+		const citations: Array<{
+	start: number;
+			end: number;
+	type: string;
+			content: string;
+	reference: string;
 		}> = [];
 
 		// Find statutes
@@ -139,12 +142,16 @@
 	}
 
 	.citation-link {
-		background: none;, border: none;
-		padding: 0;, margin: 0;
+		background: none;
+	border: none;
+		padding: 0;
+	margin: 0;
 		font-size: inherit;
 		font-family: inherit;
-		line-height: inherit;, cursor: pointer;
-		text-decoration: underline;, transition: all 0.2s;
+		line-height: inherit;
+	cursor: pointer;
+		text-decoration: underline;
+	transition: all 0.2s;
 	}
 
 	.citation-link.statute {
@@ -154,7 +161,8 @@
 
 	.citation-link.statute:hover {
 		background: rgba(74, 95, 143, 0.1);
-		border-radius: 2px;, padding: 0 2px;
+		border-radius: 2px;
+	padding: 0 2px;
 	}
 
 	.citation-link.case {
@@ -164,7 +172,8 @@
 
 	.citation-link.case:hover {
 		background: rgba(139, 58, 58, 0.1);
-		border-radius: 2px;, padding: 0 2px;
+		border-radius: 2px;
+	padding: 0 2px;
 	}
 
 	.citation-link.evidence {
@@ -174,6 +183,7 @@
 
 	.citation-link.evidence:hover {
 		background: rgba(107, 142, 107, 0.1);
-		border-radius: 2px;, padding: 0 2px;
+		border-radius: 2px;
+	padding: 0 2px;
 	}
 </style>

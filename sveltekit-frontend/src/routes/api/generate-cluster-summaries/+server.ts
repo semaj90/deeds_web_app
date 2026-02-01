@@ -47,7 +47,7 @@ export async function POST() {
 		return json({
 			success: true,
 			summaries,
-			stats: {, totalClusters: summaries.length,
+			stats: { totalClusters: summaries.length,
 				cudaAccelerated: clusterAnalysis.cudaAccelerated,
 				redisCached: true,
 				neo4jSynced: true,
@@ -102,7 +102,8 @@ async function generateClusterSummaries(clusters: any) {
 	for (const [clusterId, errorIds] of Object.entries(clusters)) {
 		if (!Array.isArray(errorIds) || errorIds.length === 0) continue;
 
-		// Get error samples from PostgreSQLSELECT message, source, code, timestamp
+		// Get error samples from PostgreSQL
+SELECT message, source, code, timestamp
 			FROM raw_error_embeddings
 			WHERE id = ANY(${errorIds.slice(0, 10)})
 			LIMIT 10
@@ -130,7 +131,8 @@ async function generateClusterSummaries(clusters: any) {
 	return summaries;
 }
 
-async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {Cluster ID: ${ clusterId }
+async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {
+Cluster ID: ${ clusterId }
 Error Count: ${errors.length}
 
 Sample Errors:
@@ -146,7 +148,7 @@ Be concise and actionable.`;
 	const response = await fetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({, model: 'gemma3-legal:latest',
+		body: JSON.stringify({ model: 'gemma3-legal:latest',
 			messages: [
 				{
 					role: 'system',
@@ -158,7 +160,7 @@ Be concise and actionable.`;
 				}
 			],
 			stream: false,
-			options: {, temperature: 0.4, num_predict: 300 }
+			options: { temperature: 0.4, num_predict: 300 }
 		})
 	});
 
@@ -212,7 +214,7 @@ async function updateQdrantTags(summaries: any[]) {
 		const embedRes = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: 'embeddinggemma:latest',
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: summary.summary
 			})
 		});
@@ -227,7 +229,7 @@ async function updateQdrantTags(summaries: any[]) {
 				{
 					id: `cluster_${summary.id}_${Date.now()}`,
 					vector: embedding,
-					payload: {, cluster_id: summary.id,
+					payload: { cluster_id: summary.id,
 						summary: summary.summary,
 						tags: summary.tags,
 						error_count: summary.errorCount,

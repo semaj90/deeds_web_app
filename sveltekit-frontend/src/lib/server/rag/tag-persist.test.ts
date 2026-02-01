@@ -8,7 +8,8 @@ import { getChunkTagIds, getChunkTags, upsertAndLinkChunkTags } from './tag-pers
 // Mock sql with in-memory state
 vi.mock('$lib/server/db', () => {
     const tagsMap = new Map();
-    let links: Array<{, chunkId: string; tagId: string; source, string }> = [];
+    let links: Array<{
+	chunkId: string; tagId: string; source, string }> = [];
 
     const sqlMock: any = function(strings: TemplateStringsArray, ...values: any[]) {
         const queryRaw = strings.join('? ');

@@ -6,9 +6,12 @@
 import type { gpuGraphLayout } from './graph-layout-gpu.js';
 
 export interface EvidenceNode {
- id: string;, type: 'case' | 'evidence' | 'witness' | 'document';
- title: string;, content: string;
- embedding?: number[];, metadata: {
+ id: string;
+	type: 'case' | 'evidence' | 'witness' | 'document';
+ title: string;
+	content: string;
+ embedding?: number[];
+	metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -17,14 +20,17 @@ export interface EvidenceNode {
 }
 
 export interface SimilarityResult {
- sourceId: string;, targetId: string;
+ sourceId: string;
+	targetId: string;
  similarity: number;
  explanation?: string;
 }
 
 export interface CaseCluster {
- id: string;, nodes: EvidenceNode[];
- centroid: number[];, similarity: number;
+ id: string;
+	nodes: EvidenceNode[];
+ centroid: number[];
+	similarity: number;
  theme: string;
 }
 
@@ -38,7 +44,8 @@ export class CaseSimilarityService {
  }
 
  private getOllamaEndpoint(): string {
- // Try multiple possible endpoints'http://localhost:11434',
+ // Try multiple possible endpoints
+'http://localhost:11434',
  'http://127.0.0.1:11434',
  process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
@@ -75,7 +82,8 @@ export class CaseSimilarityService {
  console.log(`Generated embeddings for ${nodes.length} nodes`);
  }
 
- private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {(node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') ?? ''}`
+ private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {
+(node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') ?? ''}`
  );
 
  try {
@@ -84,10 +92,12 @@ export class CaseSimilarityService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'embeddinggemma:latest',
- prompt: texts.join('\n\n'), options: {, temperature: 0, num_predict: 0
+	body: JSON.stringify({
+	model: 'embeddinggemma:latest',
+ prompt: texts.join('\n\n'), options: {
+	temperature: 0, num_predict: 0
  },
- }),
+	}),
  });
 
  if (!response.ok) {
@@ -234,11 +244,13 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.3, num_predict: 100
+ options: {
+	temperature: 0.3, num_predict: 100
  },
- }),
+	}),
  });
 
  if (response.ok) {
@@ -267,7 +279,8 @@ Provide a brief explanation of their relationship.`;
  const clusterEmbeddings = [node?.embedding|| []];
  processed.add(node.id);
 
- // Find similar nodes(r) => (r.sourceId === node?.id|| r.targetId === node.id) && r.similarity > 0.7
+ // Find similar nodes
+(r) => (r.sourceId === node?.id|| r.targetId === node.id) && r.similarity > 0.7
  );
 
  for (const result of similarResults) {
@@ -330,11 +343,13 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.2, num_predict: 20
+ options: {
+	temperature: 0.2, num_predict: 20
  },
- }),
+	}),
  });
 
  if (response.ok) {

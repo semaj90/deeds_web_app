@@ -35,7 +35,8 @@ export interface AuditLogFilter {
 }
 
 export interface AuditLogResult {
-	entries: AuditLogEntry[];, total: number;
+	entries: AuditLogEntry[];
+	total: number;
 }
 
 // === AUDIT LOGGING FUNCTIONS ===
@@ -194,7 +195,9 @@ export async function getUserActivity(userId: string, limit = 50): Promise<Audit
 export function createValuesDiff(
 	oldValues: Record<string, unknown>,
 	newValues: Record<string, unknown>
-): {, changed: string[]; added: string[];, removed: string[] } {
+): {
+	changed: string[]; added: string[];
+	removed: string[] } {
 	const changed: string[] = [];
 	const added: string[] = [];
 	const removed: string[] = [];

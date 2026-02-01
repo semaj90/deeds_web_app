@@ -1,6 +1,7 @@
 <script lang="ts">
  let { caseId, initialContext } = $props<{
- caseId: string;, initialContext: string;
+ caseId: string;
+	initialContext: string;
  }>();
 
  let messages = $state <{ sender: 'user' | 'ai'; text: string }[]>([
@@ -66,9 +67,12 @@
 <style>
  .ai-chat-assistant {
  display: flex;
- flex-direction: column;, height: 500px;, border: 1px solid #eee;
+ flex-direction: column;
+	height: 500px;
+	border: 1px solid #eee;
  border-radius: 8px;
- background-color: #fff;, overflow: hidden;
+ background-color: #fff;
+	overflow: hidden;
  }
  .chat-header {
  padding: 10px 15px;
@@ -76,9 +80,12 @@
  border-bottom: 1px solid #eee;
  }
  .chat-messages {
- flex-grow: 1;, padding: 15px;
- overflow-y: auto;, display: flex;
- flex-direction: column;, gap: 10px;
+ flex-grow: 1;
+	padding: 15px;
+ overflow-y: auto;
+	display: flex;
+ flex-direction: column;
+	gap: 10px;
  }
  .message {
  padding: 8px 12px;
@@ -95,30 +102,39 @@
  align-self: flex-start;
  }
  .message.ai.thinking {
- font-style: italic;, color: #666;
+ font-style: italic;
+	color: #666;
  }
  .sender-label {
  font-weight: bold;
  margin-right: 5px;
  }
  .chat-input {
- display: flex;, padding: 10px 15px;
+ display: flex;
+	padding: 10px 15px;
  border-top: 1px solid #eee;
  gap: 10px;
  }
  .chat-input textarea {
- flex-grow: 1;, border: 1px solid #ddd;
- border-radius: 4px;, padding: 8px;
- font-family: inherit;, resize: vertical;
+ flex-grow: 1;
+	border: 1px solid #ddd;
+ border-radius: 4px;
+	padding: 8px;
+ font-family: inherit;
+	resize: vertical;
  min-height: 60px;
  }
  .chat-input button {
  padding: 8px 15px;
- background-color: #667eea;, color: white;, border: none;
- border-radius: 4px;, cursor: pointer;
+ background-color: #667eea;
+	color: white;
+	border: none;
+ border-radius: 4px;
+	cursor: pointer;
  }
  .chat-input button:disabled {
- background-color: #ccc;, cursor:not-allowed;
+ background-color: #ccc;
+	cursor:not-allowed;
  }
 </style>
 

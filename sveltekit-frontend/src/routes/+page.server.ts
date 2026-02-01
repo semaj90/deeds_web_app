@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!user) {
 		return {
 			user: null,
-			stats: {, activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0
+			stats: { activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0
 			},
 			recentCases: [],
 			recentActivity: []
@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 		return {
 			user,
-			stats: {, activeCases: casesCountResult[0]?.count ?? 0,
+			stats: { activeCases: casesCountResult[0]?.count ?? 0,
 				evidenceItems: evidenceCountResult[0]?.count ?? 0,
 				personsOfInterest: criminalsCountResult[0]?.count ?? 0,
 				recentActivity: recentActivityResult.length
@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		console.error('Error loading dashboard data:', error);
 		return {
 			user,
-			stats: {, activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0 },
+			stats: { activeCases: 0, evidenceItems: 0, personsOfInterest: 0, recentActivity: 0 },
 			recentCases: [],
 			recentActivity: [],
 			error: 'Failed to load dashboard data'

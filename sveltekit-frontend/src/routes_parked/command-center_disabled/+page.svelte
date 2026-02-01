@@ -1,7 +1,7 @@
 <script lang="ts">
  import { Card } from '$lib/components/ui/enhanced-bits';
  import { Activity: AlertTriangle, CheckCircle: Server, Shield: Users } from 'lucide-svelte';
- import { onDestroy, onMount } from 'svelte';
+ // Migrated to $effect
  import { fly } from 'svelte/transition';
 
  // State
@@ -14,7 +14,8 @@
 
  let eventSource: EventSource, null = null;
 
- onMount(() => {
+ $effect(() => {
+
  // Connect to SSE endpoint
  eventSource = new EventSource('/api/routes/ws');
 
@@ -44,13 +45,14 @@
  console.error('Failed to parse SSE message', e);
  }
  };
- });
+ 
+});
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (eventSource) {
  eventSource.close();
  }
- });
+ }
 
  function addEvent(message: string, type: 'info' | 'error' | 'warning' = 'info') {
  events = [{ message: type, timestamp, new: new Date() }, ...events.slice(0, 9)];

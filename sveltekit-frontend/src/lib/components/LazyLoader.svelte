@@ -45,7 +45,7 @@
 					}
 				}
 			},
-			{ rootMargin: '100px', threshold: 0.1 }
+	{ rootMargin: '100px', threshold: 0.1 }
 		);
 
 		observer.observe(containerRef);
@@ -102,28 +102,34 @@
 	.lazy-placeholder {
 		display: flex;
 		align-items: center;
-		justify-content: center;, background: rgba(0, 0, 0, 0.02);
+		justify-content: center;
+	background: rgba(0, 0, 0, 0.02);
 		border-radius: 8px;
 	}
 
 	.lazy-loading {
 		display: flex;
-		align-items: center;, gap: 8px;
+		align-items: center;
+	gap: 8px;
 		color: #666;
 	}
 
 	.spinner {
-		width: 20px;, height: 20px;
+		width: 20px;
+	height: 20px;
 		border: 2px solid #ddd;
 		border-top-color: #666;
-		border-radius: 50%;, animation: spin 1s linear infinite;
+		border-radius: 50%;
+	animation: spin 1s linear infinite;
 	}
 
 	.lazy-error {
 		display: flex;
 		align-items: center;
-		justify-content: center;, background: #fee;
-		border-radius: 8px;, color: #c00;
+		justify-content: center;
+	background: #fee;
+		border-radius: 8px;
+	color: #c00;
 	}
 
 	@keyframes spin {

@@ -15,14 +15,16 @@ export interface GlobalUserState {
  profile: UserProfile | null;
  preferences: UserPreferences;
  // AI & Chat State
- chatHistory: AIMessage[];, recommendations: RecommendationResult[];
+ chatHistory: AIMessage[];
+	recommendations: RecommendationResult[];
  analytics: ChatAnalytics | null;
  // Behavioral Analytics
  patterns: UserPattern | null;
  lastActivity: Date | null;
  sessionMetrics: SessionMetrics;
  // Vector & Search State
- recentEmbeddings: EmbeddingCache[];, searchHistory: SearchQuery[];
+ recentEmbeddings: EmbeddingCache[];
+	searchHistory: SearchQuery[];
  // Real-time Sync State
  syncStatus: 'idle' | 'syncing' | 'error' | 'offline';
  lastSync: Date | null;
@@ -30,56 +32,75 @@ export interface GlobalUserState {
 }
 
 export interface UserProfile {
- id: string;, email: string;
+ id: string;
+	email: string;
  firstName?: string;
  lastName?: string;
- name?: string;, role: string;
+ name?: string;
+	role: string;
  department?: string;
  jurisdiction?: string;
- avatarUrl?: string;, createdAt: Date;
+ avatarUrl?: string;
+	createdAt: Date;
  updatedAt: Date;
 }
 
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'yorha' | 'nes';
- language: string;, timezone: string;
- aiAssistant: {, model: string;
- temperature: number;, maxTokens: number;
- enableStreaming: boolean;, autoComplete: boolean;
+ language: string;
+	timezone: string;
+ aiAssistant: {
+	model: string;
+ temperature: number;
+	maxTokens: number;
+ enableStreaming: boolean;
+	autoComplete: boolean;
  };
- notifications: {, email: boolean;
- push: boolean;, desktop: boolean;
+ notifications: {
+	email: boolean;
+ push: boolean;
+	desktop: boolean;
  legal: boolean;
  };
- privacy: {, shareAnalytics: boolean;
- storeSearchHistory: boolean;, enableRecommendations: boolean;
+ privacy: {
+	shareAnalytics: boolean;
+ storeSearchHistory: boolean;
+	enableRecommendations: boolean;
  };
 }
 
 export interface AIMessage {
  id: string;
- sessionId?: string;, role: 'user' | 'assistant' | 'system';
+ sessionId?: string;
+	role: 'user' | 'assistant' | 'system';
  content: string;
  embedding?: number[];
  metadata?: { [key: string]: any };
- timestamp: Date;, isSuccessful: boolean;
+ timestamp: Date;
+	isSuccessful: boolean;
  processingTime?: number;
  tokensUsed?: number;
 }
 
 export interface SessionMetrics {
- startTime: Date;, duration: number;
- queriesCount: number;, successRate: number;
- averageResponseTime: number;, topTopics: string[];
+ startTime: Date;
+	duration: number;
+ queriesCount: number;
+	successRate: number;
+ averageResponseTime: number;
+	topTopics: string[];
 }
 
 export interface EmbeddingCache {
- textHash: string;, embedding: number[];
- model: string;, createdAt: Date;
+ textHash: string;
+	embedding: number[];
+ model: string;
+	createdAt: Date;
 }
 
 export interface SearchQuery {
- query: string;, results: number;
+ query: string;
+	results: number;
  timestamp: Date;
  context?: string;
 }
@@ -89,16 +110,19 @@ const defaultPreferences: UserPreferences = {
  theme: 'yorha',
  language: 'en',
  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
- aiAssistant: {, model: 'gemma3-legal',
+ aiAssistant: {
+	model: 'gemma3-legal',
  temperature: 0.7, maxTokens: 2048, enableStreaming: true, autoComplete: true,
  },
- notifications: {, email: true, push: false,
+	notifications: {
+	email: true, push: false,
  desktop: true, legal: true,
  },
- privacy: {, shareAnalytics: true, storeSearchHistory: true,
+	privacy: {
+	shareAnalytics: true, storeSearchHistory: true,
  enableRecommendations: true,
  },
-};
+	};
 
 const defaultState: GlobalUserState = {
  user: null, session: null,
@@ -108,14 +132,15 @@ const defaultState: GlobalUserState = {
  recommendations: [],
  analytics: null, patterns: null,
  lastActivity: null,
-  sessionMetrics: {, startTime: new Date(),
+  sessionMetrics: {
+	startTime: new Date(),
       duration: 0,
       queriesCount: 0,
       successRate: 0,
       averageResponseTime: 0,
       topTopics: [],
     },
- recentEmbeddings: [],
+	recentEmbeddings: [],
  searchHistory: [],
  syncStatus: 'idle',
  lastSync: null, pendingChanges: 0,
@@ -139,29 +164,28 @@ export const globalUserStore = {
  get state() {
  return globalUserState;
  },
- get user() {
+	get user() {
  return globalUserState.user;
  },
- get profile() {
+	get profile() {
  return globalUserState.profile;
  },
- get preferences() {
+	get preferences() {
  return globalUserState.preferences;
  },
- get isAuthenticated() {
+	get isAuthenticated() {
  return globalUserState.isAuthenticated;
  },
- get displayName() {
+	get displayName() {
  return userDisplayName;
  },
- get isOnline() {
+	get isOnline() {
  return isOnline;
  },
- get hasUnsynced() {
+	get hasUnsynced() {
  return hasUnsynced;
  },
-
- // ===== AUTHENTICATION ACTIONS =====
+	// ===== AUTHENTICATION ACTIONS =====
  async setUser(user: User, session): null {
  globalUserState.user = user;
  globalUserState.session = session;
@@ -175,8 +199,7 @@ export const globalUserStore = {
  }
  this.markForSync();
  },
-
- async loadUserProfile(userId: string) {
+	async loadUserProfile(userId: string) {
  try {
  const response = await fetch(`/api/v1/users/${ userId }/profile`);
  if (response.ok) {
@@ -187,8 +210,7 @@ export const globalUserStore = {
  console.error('Failed to load user profile:', error);
  }
  },
-
- async loadUserPreferences(userId: string) {
+	async loadUserPreferences(userId: string) {
  try {
  const response = await fetch(`/api/v1/users/${ userId }/preferences`);
  if (response.ok) {
@@ -199,8 +221,7 @@ export const globalUserStore = {
  console.error('Failed to load user preferences:', error);
  }
  },
-
- async updatePreferences(updates: Partial<UserPreferences>) {
+	async updatePreferences(updates: Partial<UserPreferences>) {
  globalUserState.preferences = { ...globalUserState.preferences, ...updates };
  this.markForSync();
  if (globalUserState.user?.id) {
@@ -208,7 +229,7 @@ export const globalUserStore = {
  await fetch(`/api/v1/users/${globalUserState.user.id}/preferences`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
  });
  await this.syncToDatabase();
  } catch (error: any) {
@@ -216,8 +237,7 @@ export const globalUserStore = {
  }
  }
  },
-
- // ===== CHAT & AI ACTIONS =====
+	// ===== CHAT & AI ACTIONS =====
  async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
     const aiMessage: AIMessage = {
       ...message,
@@ -236,13 +256,13 @@ export const globalUserStore = {
  this.markForSync();
  return aiMessage.id;
  },
-
- async storeAIMessageInDB(message: AIMessage) {
+	async storeAIMessageInDB(message: AIMessage) {
     try {
       await fetch('/api/v1/ai/chat-history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, userId: globalUserState.user?.id,
+	body: JSON.stringify({
+	userId: globalUserState.user?.id,
           sessionId: globalUserState.session?.id,
           query: message.role === 'user' ? message.content : '',
           response: message.role === 'assistant' ? message.content : '',
@@ -257,8 +277,7 @@ export const globalUserStore = {
       console.error('Failed to store AI message:', error);
     }
   },
-
-  updateSessionMetrics(message: AIMessage) {
+	updateSessionMetrics(message: AIMessage) {
     const metrics = globalUserState.sessionMetrics;
     // Update duration
     metrics.duration = Date.now() - metrics.startTime.getTime();
@@ -281,8 +300,7 @@ export const globalUserStore = {
       metrics.topTopics = [...new Set([...metrics.topTopics, ...topics])].slice(0, 10);
     }
   },
-
-  extractTopics(content: string): string[] {
+	extractTopics(content: string): string[] {
     const legalTerms = [
       'contract',
       'liability',
@@ -312,8 +330,7 @@ export const globalUserStore = {
     });
     return topics;
   },
-
-  // ===== RECOMMENDATIONS & ANALYTICS =====
+	// ===== RECOMMENDATIONS & ANALYTICS =====
  async loadRecommendations() {
  if (!globalUserState.user?.id) return;
  try {
@@ -326,8 +343,8 @@ export const globalUserStore = {
  console.error('Failed to load recommendations:', error);
  }
  },
-
- async loadAnalytics(timeRange?: {, from: Date, to: Date }) {
+	async loadAnalytics(timeRange?: {
+	from: Date, to: Date }) {
  if (!globalUserState.user?.id) return;
  try {
  const params = new URLSearchParams({ userId: globalUserState.user.id });
@@ -344,8 +361,7 @@ export const globalUserStore = {
  console.error('Failed to load analytics:', error);
  }
  },
-
- async loadUserPatterns() {
+	async loadUserPatterns() {
     if (!globalUserState.user?.id) return;
     try {
       const response = await fetch(`/api/v1/patterns?userId=${globalUserState.user.id}`);
@@ -357,8 +373,7 @@ export const globalUserStore = {
       console.error('Failed to load user patterns:', error);
     }
   },
-
-  // ===== VECTOR & SEARCH ACTIONS =====
+	// ===== VECTOR & SEARCH ACTIONS =====
 
   addEmbeddingToCache(textHash: string, embedding: number[]) {
     const cache: EmbeddingCache = {
@@ -373,8 +388,7 @@ export const globalUserStore = {
       globalUserState.recentEmbeddings = globalUserState.recentEmbeddings.slice(0, 100);
     }
   },
-
-  addSearchQuery(query: string, resultsCount: number, context?: string) {
+	addSearchQuery(query: string, resultsCount: number, context?: string) {
     const search: SearchQuery = {
       query,
       resultsCount,
@@ -388,14 +402,12 @@ export const globalUserStore = {
  }
  this.markForSync();
  },
-
- // ===== SYNC & PERSISTENCE =====
+	// ===== SYNC & PERSISTENCE =====
  markForSync() {
  globalUserState.pendingChanges++;
  globalUserState.syncStatus = 'syncing';
  },
-
-  async syncToDatabase() {
+	async syncToDatabase() {
     if (!globalUserState.user?.id || globalUserState.pendingChanges === 0) {
       return;
     }
@@ -410,7 +422,8 @@ export const globalUserStore = {
       const response = await fetch('/api/v1/sync/user-state', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, userId: globalUserState.user.id, syncData }),
+	body: JSON.stringify({
+	userId: globalUserState.user.id, syncData }),
       });
  if (response.ok) {
  globalUserState.pendingChanges = 0;
@@ -424,8 +437,7 @@ export const globalUserStore = {
  globalUserState.syncStatus = 'error';
  }
  },
-
-  // ===== SESSION MANAGEMENT =====
+	// ===== SESSION MANAGEMENT =====
   async startSession() {
     globalUserState.sessionMetrics = {
       startTime: new Date(),
@@ -443,7 +455,8 @@ export const globalUserStore = {
         this.loadUserPatterns(),
       ]);
     }
-  }, clearUserData() {
+  },
+	clearUserData() {
  globalUserState.user = null;
  globalUserState.session = null;
  globalUserState.isAuthenticated = false;
@@ -457,24 +470,21 @@ export const globalUserStore = {
  globalUserState.searchHistory = [];
  globalUserState.pendingChanges = 0;
  },
-
- // ===== UTILITY METHODS =====
+	// ===== UTILITY METHODS =====
  getChatHistoryForSession(sessionId?: string): AIMessage[] {
  return globalUserState.chatHistory.filter((message) =>
  sessionId ? message.sessionId === sessionId : true
  );
  },
-
- getSuccessfulInteractions(): AIMessage[] {
+	getSuccessfulInteractions(): AIMessage[] {
  return globalUserState.chatHistory.filter((message) => message.isSuccessful);
  },
-
- getRecommendationsByType(
+	getRecommendationsByType(
  type: 'query' | 'case' | 'document' | 'legal_precedent'
  ): RecommendationResult[] {
  return globalUserState.recommendations.filter((rec) => rec.type === type);
  },
-};
+	};
 
 // Auto-sync every 30 seconds if there are pending changes
 if (browser) {
@@ -482,7 +492,8 @@ if (browser) {
  if (globalUserStore.hasUnsynced) {
  globalUserStore.syncToDatabase();
  }
- }, 30000);
+ },
+	30000);
  // Sync on page unload
  window.addEventListener('beforeunload', () => {
  if (globalUserStore.hasUnsynced) {
@@ -491,8 +502,9 @@ if (browser) {
  '/api/v1/sync/user-state-beacon',
  JSON.stringify({
  userId: globalUserStore.user?.id,
- data: {, lastActivity: new Date() },
- })
+ data: {
+	lastActivity: new Date() },
+	})
  );
  }
  });

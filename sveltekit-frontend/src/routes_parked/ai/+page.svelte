@@ -7,12 +7,14 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import { onMount } from 'svelte'; import type { webAssemblyAIAdapter } from '$lib/adapters/webasm-ai-adapter'; import type { WebAssemblyAIResponse } from '$lib/adapters/webasm-ai-adapter'; let prompt = $state <string>(''); // Keep $state as per original user code and Svelte, 5 runes let output = $state <string>(''); // Keep $state as per original user code and Svelte, 5 runes let streaming = $state <boolean>(false); // Keep $state as per original user code and Svelte, 5 runes let adapterInitialized = $state <boolean>(false); // Use $state for component-local reactive state let adapterHealth = $state <ReturnType<typeof webAssemblyAIAdapter.getHealthStatus> | null>(null); // Use $state let lastResponseMetadata = $state <WebAssemblyAIResponse['metadata'] | null>(null); // Use $state onMount(() => {
+// Migrated to $effect import type { webAssemblyAIAdapter } from '$lib/adapters/webasm-ai-adapter'; import type { WebAssemblyAIResponse } from '$lib/adapters/webasm-ai-adapter'; let prompt = $state <string>(''); // Keep $state as per original user code and Svelte, 5 runes let output = $state <string>(''); // Keep $state as per original user code and Svelte, 5 runes let streaming = $state <boolean>(false); // Keep $state as per original user code and Svelte, 5 runes let adapterInitialized = $state <boolean>(false); // Use $state for component-local reactive state let adapterHealth = $state <ReturnType<typeof webAssemblyAIAdapter.getHealthStatus> | null>(null); // Use $state let lastResponseMetadata = $state <WebAssemblyAIResponse['metadata'] | null>(null); // Use $state $effect(() => {
+
 		(async () => {
 			adapterInitialized = await webAssemblyAIAdapter.initialize();
 			console.log('AI Adapter ready:', adapterInitialized);
 			adapterHealth = webAssemblyAIAdapter.getHealthStatus();
-		})();
+		
+});();
 	});
  async function send(): Promise<any> { if (!adapterInitialized) { console.error('AI Adapter not initialized.'); return}
 

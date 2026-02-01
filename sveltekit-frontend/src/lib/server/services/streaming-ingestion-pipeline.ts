@@ -19,7 +19,8 @@ import { eq, and, lt, sql } from 'drizzle-orm';
 import Redis from 'ioredis';
 
 export interface DocumentMetadata {
-	documentId: string;, documentType: 'contract' | 'evidence' | 'brief' | 'citation' | 'statute' | 'case_law';
+	documentId: string;
+	documentType: 'contract' | 'evidence' | 'brief' | 'citation' | 'statute' | 'case_law';
 	caseId?: string;
 	evidenceId?: string;
 	practiceArea?: string[];
@@ -28,14 +29,19 @@ export interface DocumentMetadata {
 }
 
 export interface ChunkingOptions {
-	maxTokens: number;, overlapTokens: number;
-	preserveSentences: boolean;, minChunkSize: number;
+	maxTokens: number;
+	overlapTokens: number;
+	preserveSentences: boolean;
+	minChunkSize: number;
 }
 
 export interface ProcessingResult {
-	documentId: string;, totalChunks: number;
-	totalTokens: number;, embeddingsGenerated: number;
-	cacheHits: number;, processingTimeMs: number;
+	documentId: string;
+	totalChunks: number;
+	totalTokens: number;
+	embeddingsGenerated: number;
+	cacheHits: number;
+	processingTimeMs: number;
 	errors: string[];
 }
 
@@ -209,7 +215,8 @@ export class StreamingIngestionPipeline {
 					embedding: c.embedding!,
 					textHash: c.textHash!,
 					model: c.model,
-					metadata: {, documentType: c.documentType,
+					metadata: {
+	documentType: c.documentType,
 						practiceArea: c.practiceArea,
 						jurisdiction: c.jurisdiction
 					}
@@ -227,7 +234,8 @@ export class StreamingIngestionPipeline {
 					embedding: c.embedding!,
 					textHash: c.textHash!,
 					model: c.model,
-					metadata: {, documentType: c.documentType,
+					metadata: {
+	documentType: c.documentType,
 						practiceArea: c.practiceArea,
 						jurisdiction: c.jurisdiction
 					}
@@ -238,7 +246,8 @@ export class StreamingIngestionPipeline {
 	}
 
 	// Cache operations
-	private async getCachedEmbedding(textHash: string): Promise<{, embedding: number[] } | null> {
+	private async getCachedEmbedding(textHash: string): Promise<{
+	embedding: number[] } | null> {
 		try {
 			const rows = await db
 				.select()
@@ -341,7 +350,8 @@ export class StreamingIngestionPipeline {
 
 // Supporting classes and interfaces
 interface DocumentChunk {
-	index: number;, text: string;
+	index: number;
+	text: string;
 	tokenCount: number;
 	pageNumber?: number;
 	entities?: unknown[];
@@ -358,7 +368,7 @@ class EmbeddingService {
 			const response = await fetch(`${this.serviceUrl}/embed`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text, model })
+	body: JSON.stringify({ text, model })
 			});
 
 			if (!response.ok) {

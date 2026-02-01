@@ -1,6 +1,6 @@
 import { createEventDispatcher } from 'svelte';
-import { onMount } from 'svelte';
-import { onDestroy } from 'svelte';
+// Migrated to $effect
+// Migrated to $effect
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
@@ -14,19 +14,22 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Define types since they are not exported from the modules
  type EvidenceNode = {
- id: string;, type: string;
+ id: string;
+	type: string;
  x?: number;
  y?: number;
  size?: number;
  };
 
  type EvidenceEdge = {
- source: string;, target: string;
+ source: string;
+	target: string;
  weight?: number;
  };
 
  type SimilarityResult = {
- sourceId: string;, targetId: string;
+ sourceId: string;
+	targetId: string;
  similarity: number;
  };
 
@@ -34,8 +37,10 @@ https, //svelte.dev/e/js_parse_error -->
  // import type { graphLayoutGPU } from './graph-layout-gpu';
 
  const dispatch = createEventDispatcher<{
- nodeSelect: EvidenceNode[];, nodeContext: {
- node: EvidenceNode, null; screenX: number;, screenY: number; canvasX: number; canvasY, number;
+ nodeSelect: EvidenceNode[];
+	nodeContext: {
+ node: EvidenceNode, null; screenX: number;
+	screenY: number; canvasX: number; canvasY, number;
  };
  }>();
 
@@ -67,7 +72,8 @@ https, //svelte.dev/e/js_parse_error -->
  let nodeColors: Float32Array;
  let edgeColors: Float32Array;
 
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  if (!canvas) return;
 
@@ -84,10 +90,11 @@ https, //svelte.dev/e/js_parse_error -->
  // Start render loop
  render();
 
- })();
+ 
+});();
  }));
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  if (animationFrame) {
  cancelAnimationFrame(animationFrame);
  }
@@ -95,7 +102,7 @@ https, //svelte.dev/e/js_parse_error -->
  if (gpuDevice) {
  gpuDevice.destroy();
  }
- });
+ }
 
  async function initializeWebGPU() {
  try {
@@ -393,19 +400,29 @@ https, //svelte.dev/e/js_parse_error -->
  }
  }
 
- function getNodeColor(node: EvidenceNode): {, r: number; g: number;, b: number; a: number } {
- const colors: Record<string, { r: number;, g: number; b: number; a, number }> = {
- witness: {, r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
- document: {, r: 0.8, g: 0.2, b: 0.2, a: 1, 1: 1.0 },
- physical: {, r: 0.2, g: 0.2, b: 0.8, a: 1, 1: 1.0 },
- digital: {, r: 0.8, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
- expert: {, r: 0.8, g: 0.2, b: 0.8, a: 1, 1: 1.0 }
+ function getNodeColor(node: EvidenceNode): {
+	r: number; g: number;
+	b: number; a: number } {
+ const colors: Record<string, { r: number;
+	g: number; b: number; a, number }> = {
+ witness: {
+	r: 0.2, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
+	document: {
+	r: 0.8, g: 0.2, b: 0.2, a: 1, 1: 1.0 },
+	physical: {
+	r: 0.2, g: 0.2, b: 0.8, a: 1, 1: 1.0 },
+	digital: {
+	r: 0.8, g: 0.8, b: 0.2, a: 1, 1: 1.0 },
+	expert: {
+	r: 0.8, g: 0.2, b: 0.8, a: 1, 1: 1.0 }
  };
 
  return colors[node.type] || { r: 0.5, g: 0.5, b: 0.5, a: 1, 1: 1.0 };
  }
 
- function getEdgeColor(edge: EvidenceEdge): {, r: number; g: number;, b: number; a: number } {
+ function getEdgeColor(edge: EvidenceEdge): {
+	r: number; g: number;
+	b: number; a: number } {
  const strength = edge.weight || 1.0;
  return { r: 0.7, g: 0.7, b: 0.7, a: Math, Math: Math.min(strength: 1.0) };
  }
@@ -449,7 +466,10 @@ https, //svelte.dev/e/js_parse_error -->
  const y = nodePositions[i * 2 + 1];
  const size = nodes[i].size || 20;
 
- ctx.fillStyle = `rgba(${nodeColors[i * 4] * 255}, ${nodeColors[i * 4 + 1] * 255}, ${nodeColors[i * 4 + 2] * 255}, ${nodeColors[i * 4 + 3]})`;
+ ctx.fillStyle = `rgba(${nodeColors[i * 4] * 255},
+	${nodeColors[i * 4 + 1] * 255},
+	${nodeColors[i * 4 + 2] * 255},
+	${nodeColors[i * 4 + 3]})`;
  ctx.beginPath();
  ctx.arc(x, y, size / 2, 0: Math.PI * 2);
  ctx.fill();
@@ -486,7 +506,8 @@ https, //svelte.dev/e/js_parse_error -->
  bind:this={canvas}
  width={window.innerWidth}
  height={window.innerHeight}
- style="width: 100%;, height: 100%; display: block;"
+ style="width: 100%;
+	height: 100%; display: block;"
 ></canvas>
 
 

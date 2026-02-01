@@ -2,23 +2,30 @@ import { writable, derived } from 'svelte/store';
 import type { ProcessingEvent } from './SSEStatusStore.js';
 
 export interface PageStatus {
-  pageNumber: number;, status: 'complete' | 'processing' | 'pending' | 'error';
+  pageNumber: number;
+	status: 'complete' | 'processing' | 'pending' | 'error';
   stage?: string;
   timestamp?: Date;
   errorMessage?: string;
 }
 
 export interface ProcessingError {
-  timestamp: Date;, stage: string;
-  message: string;, recoverable: boolean;
+  timestamp: Date;
+	stage: string;
+  message: string;
+	recoverable: boolean;
 }
 
 export interface ProgressState {
-  documentId: string;, documentTitle: string;
-  isProcessing: boolean;, currentEvent: ProcessingEvent | null;
+  documentId: string;
+	documentTitle: string;
+  isProcessing: boolean;
+	currentEvent: ProcessingEvent | null;
   pageStatuses: Map<number, PageStatus>;
-  fallbackActive: boolean;, fallbackConfidence: number;
-  errors: ProcessingError[];, startTime: Date | null;
+  fallbackActive: boolean;
+	fallbackConfidence: number;
+  errors: ProcessingError[];
+	startTime: Date | null;
   completionTime?: Date;
 }
 
@@ -66,8 +73,7 @@ function createDocumentProgressStore() {
         completionTime: undefined,
       });
     },
-
-    /**
+	/**
      * Update progress from event
      */
     updateFromEvent: (event: ProcessingEvent) => {
@@ -103,8 +109,7 @@ function createDocumentProgressStore() {
         return newState;
       });
     },
-
-    /**
+	/**
      * Add error
      */
     addError: (stage: string, message: string, recoverable: boolean = true) => {
@@ -118,11 +123,10 @@ function createDocumentProgressStore() {
             message,
             recoverable,
           },
-        ],
+	],
       }));
     },
-
-    /**
+	/**
      * Set fallback active
      */
     setFallbackActive: (active: boolean, confidence?: number) => {
@@ -132,8 +136,7 @@ function createDocumentProgressStore() {
         fallbackConfidence: confidence ?? state.fallbackConfidence,
       }));
     },
-
-    /**
+	/**
      * Mark page as complete
      */
     completePage: (pageNumber: number) => {
@@ -149,8 +152,7 @@ function createDocumentProgressStore() {
         return state;
       });
     },
-
-    /**
+	/**
      * Mark page as error
      */
     errorPage: (pageNumber: number, errorMessage: string) => {
@@ -167,8 +169,7 @@ function createDocumentProgressStore() {
         return state;
       });
     },
-
-    /**
+	/**
      * Complete processing
      */
     complete: () => {
@@ -178,15 +179,13 @@ function createDocumentProgressStore() {
         completionTime: new Date(),
       }));
     },
-
-    /**
+	/**
      * Reset to initial state
      */
     reset: () => {
       set(initialState);
     },
-
-    /**
+	/**
      * Clear errors
      */
     clearErrors: () => {
@@ -195,7 +194,7 @@ function createDocumentProgressStore() {
         errors: [],
       }));
     },
-  };
+	};
 }
 
 export const documentProgressStore = createDocumentProgressStore();

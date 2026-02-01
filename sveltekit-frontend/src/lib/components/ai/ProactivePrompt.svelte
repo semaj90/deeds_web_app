@@ -88,8 +88,10 @@
   /* @unocss-include */
   @keyframes slide-in-from-bottom {
     from {
-      transform: translateY(100%);, opacity: 0}
-    to { transform: translateY(0);, opacity: 1}
+      transform: translateY(100%);
+	opacity: 0}
+    to { transform: translateY(0);
+	opacity: 1}
   }
   .animate-in {
     animation-fill-mode: both}

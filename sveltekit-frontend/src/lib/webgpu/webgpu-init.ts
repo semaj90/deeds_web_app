@@ -1,12 +1,19 @@
 
 export interface WebGPUCapabilities {
-  hasWebGPU: boolean;, hasWebGL: boolean;
-  maxTextureSize: number;, maxComputeWorkgroupsPerDimension: number;
-  maxComputeWorkgroupSizeX: number;, maxComputeWorkgroupSizeY: number;
-  maxComputeWorkgroupSizeZ: number;, maxComputeInvocationsPerWorkgroup: number;
-  maxStorageBufferBindingSize: number;, maxUniformBufferBindingSize: number;
-  maxVertexAttributes: number;, maxVertexBuffers: number;
-  maxInterStageShaderComponents: number;, maxColorAttachments: number;
+  hasWebGPU: boolean;
+	hasWebGL: boolean;
+  maxTextureSize: number;
+	maxComputeWorkgroupsPerDimension: number;
+  maxComputeWorkgroupSizeX: number;
+	maxComputeWorkgroupSizeY: number;
+  maxComputeWorkgroupSizeZ: number;
+	maxComputeInvocationsPerWorkgroup: number;
+  maxStorageBufferBindingSize: number;
+	maxUniformBufferBindingSize: number;
+  maxVertexAttributes: number;
+	maxVertexBuffers: number;
+  maxInterStageShaderComponents: number;
+	maxColorAttachments: number;
   maxComputeWorkgroupStorageSize: number;
 }
 
@@ -58,7 +65,8 @@ export class WebGPUInit {
       // Request device
       this.device = await this.adapter.requestDevice({
         requiredFeatures: requestedFeatures,
-        requiredLimits: {, maxTextureDimension2D: 8192,
+        requiredLimits: {
+	maxTextureDimension2D: 8192,
           maxStorageBufferBindingSize: 268435456, // 256MB
           maxComputeWorkgroupSizeX: 256,
           maxComputeWorkgroupSizeY: 256,

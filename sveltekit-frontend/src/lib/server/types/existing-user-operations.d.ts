@@ -1,6 +1,7 @@
 declare module '$lib/server/db/existing-user-operations' {
     export interface ExistingUser {
-        id: string;, email: string;
+        id: string;
+	email: string;
         role?: string;
         first_name?: string;
         last_name?: string;
@@ -15,7 +16,8 @@ declare module '$lib/server/db/existing-user-operations' {
     }
 
     export interface ExistingSession {
-        id: string;, user_id: string;
+        id: string;
+	user_id: string;
         expires_at: Date;
         sessionId?: string;
         expiresAt?: Date;

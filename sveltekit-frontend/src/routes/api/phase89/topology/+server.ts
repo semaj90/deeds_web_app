@@ -13,7 +13,8 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 
 export const GET: RequestHandler = async () => {
   try {
-    // Get errors grouped by fileSELECT
+    // Get errors grouped by file
+SELECT
         COALESCE(
           SUBSTRING(raw_text FROM '^([^:(]+)'),
           'unknown'
@@ -42,7 +43,7 @@ export const GET: RequestHandler = async () => {
     }));
 
     // Build edges based on file paths (same directory = connected)
-    const edges: Array<{, from: string; to: string; type, string }> = [];
+    const edges: Array<{ from: string; to: string; type, string }> = [];
     const dirGroups = new Map<string, string[]>();
 
     for (const node of nodes) {
@@ -67,8 +68,8 @@ export const GET: RequestHandler = async () => {
     }
 
     return json({
-      topology: {, nodes: edges,
-        summary: {, totalFiles: nodes.length,
+      topology: { nodes: edges,
+        summary: { totalFiles: nodes.length,
           totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
           totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
@@ -77,9 +78,9 @@ export const GET: RequestHandler = async () => {
   } catch (error: any) {
     console.error('Topology error:', error);
     return json({
-      topology: {, nodes: [],
+      topology: { nodes: [],
         edges: [],
-        summary: {, totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
+        summary: { totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
       },
       error: error.message
     });

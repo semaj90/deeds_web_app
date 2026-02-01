@@ -1,6 +1,7 @@
 // replace import with a minimal local LegalDocument shape so this module compiles standalone
 // (keep this in sync with your canonical definition in nes-memory-architecture.ts)
-type LegalDocument = { id: string;, type: string; metadata?: Record<string, unknown> };
+type LegalDocument = { id: string;
+	type: string; metadata?: Record<string, unknown> };
 
 // Minimal typed shim for nesGPUBridge used by ultra-json-parser.
 // Replace with the real GPU/FlatBuffer implementation when available.
@@ -16,7 +17,7 @@ export const nesGPUBridge = {
             return new Uint8Array();
         }
     },
-    // accept Uint8Array | ArrayBuffer for wider compatibility
+	// accept Uint8Array | ArrayBuffer for wider compatibility
     parseFlatBufferToDocument(buffer: Uint8Array | ArrayBuffer): LegalDocument {
         // lightweight fallback: parse JSON bytes back to object
         try {

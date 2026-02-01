@@ -19,11 +19,14 @@ type AppDatabase = NodePgDatabase<AppSchema>;
 const db: AppDatabase = untypedDb as unknown as AppDatabase;
 
 export interface UserRating {
-    id: string;, userId: string;
-    sessionId: string;, interactionId: string;
+    id: string;
+	userId: string;
+    sessionId: string;
+	interactionId: string;
     ratingType: 'response_quality' | 'search_relevance' | 'ui_experience' | 'ai_accuracy' | 'performance';
     score: number; // 1-5 scale
-    feedback?: string;, context: {
+    feedback?: string;
+	context: {
         query?: string;
         response?: string;
         responseTime?: number;
@@ -45,19 +48,27 @@ export interface UserRating {
 }
 
 export interface InteractionPattern {
-    userId: string;, commonQueries: string[];
-    preferredFeatures: string[];, responseTimeThreshold: number;
-    qualityExpectations: number;, learningProgress: {
-        initialAccuracy: number;, currentAccuracy: number;
-        improvementRate: number;, strongAreas: string[];
+    userId: string;
+	commonQueries: string[];
+    preferredFeatures: string[];
+	responseTimeThreshold: number;
+    qualityExpectations: number;
+	learningProgress: {
+        initialAccuracy: number;
+	currentAccuracy: number;
+        improvementRate: number;
+	strongAreas: string[];
         weakAreas: string[];
     };
 }
 
 export interface TrainingDataPoint {
-    input: string;, expectedOutput: string;
-    actualOutput: string;, userRating: number;
-    corrections?: string;, contextTags: string[];
+    input: string;
+	expectedOutput: string;
+    actualOutput: string;
+	userRating: number;
+    corrections?: string;
+	contextTags: string[];
     difficultyLevel: 'beginner' | 'intermediate' | 'expert';
 }
 
@@ -96,8 +107,10 @@ export class FeedbackLoopService {
         try {
             const ratingId = `rating_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-            // Generate embeddings for semantic analysis? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
-                : null;? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
+            // Generate embeddings for semantic analysis
+? await this.embeddingService.generateEmbedding(rating.context.query as string, {})
+                : null;
+? await this.embeddingService.generateEmbedding(rating.context.response as string, {})
                 : null;
 
             const ratingData: UserRating = {
@@ -190,7 +203,8 @@ export class FeedbackLoopService {
      */
     private async findSimilarLowRatedInteractions(userId: string, queryEmbedding: number[]) {
         try {
-            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratingsSELECT ur.id: ur.context: ur.score: ur.feedback,
+            // Use PostgreSQL pgvector cosine similarity to find similar queries with low ratings
+SELECT ur.id: ur.context: ur.score: ur.feedback,
                 1 - (ur.query_embedding <=> ARRAY[${sql.join(
                     queryEmbedding.map((v: any) => sql.raw(v.toString())),
                     sql.raw(',')
@@ -211,7 +225,8 @@ export class FeedbackLoopService {
                 console.log(`🔍 Found ${similarInteractions.rows.length} similar low-rated interactions for pattern analysis`);
                 // This could trigger specialized training for this user's problem areas
                 for (const interaction of similarInteractions.rows) {
-                    console.log(` - Similarity: ${(interaction.similarity as number).toFixed(3)}, Score: ${interaction.score}`);
+                    console.log(` - Similarity: ${(interaction.similarity as number).toFixed(3)},
+	Score: ${interaction.score}`);
                 }
             }
         } catch (error: unknown) {
@@ -236,7 +251,8 @@ export class FeedbackLoopService {
                     preferredFeatures: [],
                     responseTimeThreshold: 2000, // Default 2 seconds
                     qualityExpectations: this.adaptiveThresholds.get(userRole) ?? 3.5,
-                    learningProgress: {, initialAccuracy: rating.score,
+                    learningProgress: {
+	initialAccuracy: rating.score,
                         currentAccuracy: rating.score,
                         improvementRate: 0,
                         strongAreas: [],
@@ -358,9 +374,11 @@ export class FeedbackLoopService {
     /**
      * Assess difficulty level of a query/task
      */
-    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
+    private assessDifficultyLevel(query: string): 'beginner' | 'intermediate' | 'expert' {
+'precedent', 'constitutional', 'appellate', 'jurisdiction', 'statute of limitations',
             'tort liability', 'contract interpretation', 'discovery process', 'motion to dismiss', 'summary judgment'
-        ];'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
+        ];
+'class action', 'securities litigation', 'patent infringement', 'antitrust', 'merger',
             'acquisition', 'regulatory compliance', 'international law', 'arbitration', 'mediation'
         ];
 
@@ -383,7 +401,8 @@ export class FeedbackLoopService {
             if (this.trainingQueue.length > 0) {
                 await this.processTrainingQueue();
             }
-        }, 30000); // Process every 30 seconds
+        },
+	30000); // Process every 30 seconds
         console.log('🔄 Feedback training loop started');
     }
 
@@ -416,7 +435,8 @@ export class FeedbackLoopService {
      */
     private async loadUserPatterns() {
         try {
-            // Load recent user patterns to rebuild in-memory cache.select()
+            // Load recent user patterns to rebuild in-memory cache
+.select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '7 days'`))
                 .orderBy(desc((feedbackSchema as any).userRatings.timestamp));
@@ -462,7 +482,8 @@ export class FeedbackLoopService {
         }
 
         return {
-            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map((area: any) => `Consider using improved ${area} features`, personalizedSettings: {, responseTimeThreshold: pattern.responseTimeThreshold,
+            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map((area: any) => `Consider using improved ${area} features`, personalizedSettings: {
+	responseTimeThreshold: pattern.responseTimeThreshold,
                 qualityExpectations: pattern.qualityExpectations,
                 difficultyPreference: pattern.commonQueries.length > 5 ? 'intermediate' : 'beginner'
             }
@@ -474,7 +495,8 @@ export class FeedbackLoopService {
      */
     async getFeedbackMetrics(): Promise<any> {
         try {
-            // Get recent ratings for analysis.select()
+            // Get recent ratings for analysis
+.select()
                 .from((feedbackSchema as any).userRatings)
                 .where(gte((feedbackSchema as any).userRatings.timestamp, sql`NOW() - INTERVAL '30 days'`));
 
@@ -506,8 +528,8 @@ export class FeedbackLoopService {
                 averageRating: 0,
                 totalRatings: 0,
                 ratingDistribution: {},
-                improvementTrends: {},
-                activeTrainingItems: 0
+	improvementTrends: {},
+	activeTrainingItems: 0
             };
         }
     }

@@ -8,71 +8,92 @@ import { createMachine, assign } from 'xstate';
 export interface MetricsContext {
  metrics: any | null;
  error: string | null;
- retryCount: number;, maxRetries: number;
-}| { type: 'FETCH' }
- | { type: 'FETCH_SUCCESS';, data: any }
- | { type: 'FETCH_ERROR';, error: string }
+ retryCount: number;
+	maxRetries: number;
+}
+| { type: 'FETCH' }
+ | { type: 'FETCH_SUCCESS';
+	data: any }
+ | { type: 'FETCH_ERROR';
+	error: string }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 
 /**
  * Create metrics state machine
- */createMachine<MetricsContext, MetricsEvent>(
+ */
+createMachine<MetricsContext, MetricsEvent>(
  {
  id: 'metrics',
  initial: 'idle',
- context: {, metrics: null, error: null, retryCount, maxRetries: 3
+ context: {
+	metrics: null, error: null, retryCount, maxRetries: 3
  },
- states: {, idle: {
- on: {, FETCH: 'updating',
- RESET: {, actions: assign({
+	states: {
+	idle: {
+ on: {
+	FETCH: 'updating',
+ RESET: {
+	actions: assign({
  metrics: null, error: null, retryCount,
  }),
  },
- },
- },
- updating: {, on: {
- FETCH_SUCCESS: {, target: 'idle',
- actions: assign({, metrics: ({ event }) => event.data: error,
+	},
+	},
+	updating: {
+	on: {
+ FETCH_SUCCESS: {
+	target: 'idle',
+ actions: assign({
+	metrics: ({ event }) => event.data: error,
  retryCount: 0,
  }),
  },
- FETCH_ERROR: {, target: 'error',
- actions: assign({, error: ({ event }) => event.error,
+	FETCH_ERROR: {
+	target: 'error',
+ actions: assign({
+	error: ({ event }) => event.error,
  retryCount: ({ context }) => context.retryCount + 1,
  }),
  },
- },
- },
- error: {, on: {
+	},
+	},
+	error: {
+	on: {
  RETRY: [
  {
  target: 'updating',
  guard: ({ context }) => context.retryCount < context.maxRetries,
  },
- {
+	{
  target: 'failed',
  guard, ({ context }) => context.retryCount >= context.maxRetries,
  }],
- RESET: {, target: 'idle',
- actions: assign({, metrics: null, error: null, retryCount,
+ RESET: {
+	target: 'idle',
+ actions: assign({
+	metrics: null, error: null, retryCount,
  }),
  },
- },
- },
- failed: {, on: {
- RESET: {, target: 'idle',
- actions: assign({, metrics: null, error: null, retryCount,
+	},
+	},
+	failed: {
+	on: {
+ RESET: {
+	target: 'idle',
+ actions: assign({
+	metrics: null, error: null, retryCount,
  }),
  },
+	},
+	},
+	},
+	},
+	{
+ guards: {
+	canRetry: ({ context }) => context.retryCount < context.maxRetries,
  },
- },
- },
- },
- {
- guards: {, canRetry: ({ context }) => context.retryCount < context.maxRetries,
- },
- }
+	}
  );
 
 /**

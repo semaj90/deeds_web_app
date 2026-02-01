@@ -55,8 +55,7 @@ export const goldenRatioUtils = {
     fontSize: (baseSize: number = 1, scale: number = 0): number => {
         return baseSize * Math.pow(GOLDEN_RATIO, scale);
     },
-
-    /**
+	/**
      * Calculate spacing value based on golden ratio scale
      * @param baseSpacing - Base spacing in rem
      * @param scale - Scale factor

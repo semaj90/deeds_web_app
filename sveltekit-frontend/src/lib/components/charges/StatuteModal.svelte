@@ -3,12 +3,15 @@
 	let code = $state<any>(undefined);
 
 	interface BundledCharge {
-		statuteCode: string;, title: string;
-		reason: string;, confidence: number;
+		statuteCode: string;
+	title: string;
+		reason: string;
+	confidence: number;
 		frequency: number;
 	}
 
-	let { isOpen = false, statute = null, caseId = '', onClose = () => {}, onAttach = (_charge: any) => {} } = $props<{
+	let { isOpen = false, statute = null, caseId = '', onClose = () => {},
+	onAttach = (_charge: any) => {} } = $props<{
 		isOpen?: boolean;
 		statute?: any;
 		caseId?: string;
@@ -29,7 +32,7 @@
 			const response = await fetch('/api/charges/add', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
+	body: JSON.stringify({
 					caseId,
 					statuteCode: statute.citation,
 					statuteTitle: statute.title,
@@ -197,10 +200,12 @@
 
 	@keyframes slideIn {
 		from {
-			transform: translateY(-20px);, opacity: 0;
+			transform: translateY(-20px);
+	opacity: 0;
 		}
 		to {
-			transform: translateY(0);, opacity: 1;
+			transform: translateY(0);
+	opacity: 1;
 		}
 	}
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from '$lib/components/ui/enhanced-bits/Button.svelte';
     import documentUploadMachine from '$lib/machines/document-upload-machine';
-    import { onMount } from 'svelte';
+    // Migrated to $effect
     import { fade, slide } from 'svelte/transition';
     import { createActor } from 'xstate';
 
@@ -10,10 +10,12 @@
     // Svelte 5 runes
     let snapshot = $state(actor.getSnapshot());
 
-    onMount(() => {
+    $effect(() => {
+
         const sub = actor.subscribe((s) => {
             snapshot = s;
-        });
+        
+});
         return () => {
             sub.unsubscribe();
             actor.stop();

@@ -7,13 +7,16 @@ import db from '$lib/server/db';
 import { auditLog } from '$lib/server/db/schema';
 
 export interface AuditLogEntry {
-    userId: string;, action: string;
-    resourceType: string;, resourceId: string;
+    userId: string;
+	action: string;
+    resourceType: string;
+	resourceId: string;
     details: Record<string, any>;
     success: boolean;
     error?: string;
     ipAddress?: string;
-    userAgent?: string;, timestamp: Date;
+    userAgent?: string;
+	timestamp: Date;
 }
 
 class AuditService {
@@ -25,7 +28,7 @@ class AuditService {
         caseId: string,
         action: 'generate' | 'retrieve' | 'retrieve_similar' | 'update' | 'delete',
         details: Record<string, any> = {},
-        success: boolean = true,
+	success: boolean = true,
         error?: string
     ): Promise<void> {
         try {
@@ -81,7 +84,7 @@ class AuditService {
         operationName: string,
         operationType: 'commit' | 'rollback' | 'constraint_violation',
         details: Record<string, any> = {},
-        success: boolean = true
+	success: boolean = true
     ): Promise<void> {
         try {
             await db.insert(auditLog).values({
@@ -167,7 +170,7 @@ class AuditService {
         eventType: string,
         severity: 'low' | 'medium' | 'high' | 'critical',
         details: Record<string, any> = {},
-        ipAddress?: string
+	ipAddress?: string
     ): Promise<void> {
         try {
             await db.insert(auditLog).values({
@@ -310,9 +313,12 @@ class AuditService {
     /**
      * Get audit statistics
      */
-    async getAuditStatistics(hoursBack: number = 24): Promise<{, totalOperations: number;
-        successfulOperations: number;, failedOperations: number;
-        successRate: number;, operationsByType: Record<string, number>;
+    async getAuditStatistics(hoursBack: number = 24): Promise<{
+	totalOperations: number;
+        successfulOperations: number;
+	failedOperations: number;
+        successRate: number;
+	operationsByType: Record<string, number>;
     }> {
         try {
             const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);

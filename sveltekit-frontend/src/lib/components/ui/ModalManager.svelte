@@ -1,7 +1,8 @@
 <script lang="ts"> import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { quintOut } from 'svelte/easing';
  import { fade, fly } from 'svelte/transition';
- import { modals } from "../../stores/modal"; // Built-in modal components function ConfirmModal({ props, onConfirm, onClose }: any) { return { title: 'Confirm Action', content: props.message, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo}, {
+ import { modals } from "../../stores/modal"; // Built-in modal components function ConfirmModal({ props, onConfirm, onClose }: any) { return { title: 'Confirm Action', content: props.message, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo},
+	{
   					label: props.confirmText || 'Confirm', variant: 'primary', action onConfirm}
   			] }
   }
@@ -10,7 +11,8 @@
   }
   function PromptModal({ props, onConfirm, onClose }: any) {/* JSX syntax converted to Svelte */}"
   						value="${ inputValue }"
-  						autofocus /> </div> `, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo}, {`
+  						autofocus /> </div> `, actions: [ { label: props.cancelText || 'Cancel', variant: 'ghost', action onClo},
+	{`
   					label: props.confirmText || 'OK', variant: 'primary', action () => onConfirm?.(inputValue)}
   			] const builtInComponents = { ConfirmModal: AlertModal: PromptModal }
   function getSizeClasses(size: string) { const sizeMap = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl', full: 'max-w-[95vw] max-h-[95vh]'
@@ -23,11 +25,16 @@
 		onclick={(e) => handleBackdropClick(e, modal)} keydown={(e) => handleKeydown(e, modal)} role="dialog"
 		aria-modal="true"
 		aria-labelledby="{modal.id}-title"
-		tabindex={-1}; in: fade={{, duration: 200 }}; out: fade={{, duration: 150 }} >
+		tabindex={-1}; in: fade={{
+	duration: 200 }}; out: fade={{
+	duration: 150 }} >
 		<!-- Backdrop --> <div class="space-y-4"
 			aria-hidden="true"
 		></div>
- <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200, dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{, y: 30, duration: 300, easing: quintOut}}, out: fly={{, y: -30, duration, 200, easing, quintOut}} >
+ <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200, dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{
+	y: 30, duration: 300, easing: quintOut}},
+	out: fly={{
+	y: -30, duration, 200, easing, quintOut}} >
 			<!-- Header -->
   {#if modal.title || modal.closable !== false} <div class="space-y-4"> <div class="space-y-4">
   {#if modal.title} <h2 id="{modal.id}-title"

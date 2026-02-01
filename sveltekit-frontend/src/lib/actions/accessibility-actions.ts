@@ -47,14 +47,16 @@ export interface ModalOptions {
 }
 
 export interface DropdownOptions {
- isOpen: boolean;, onToggle: () => void;
+ isOpen: boolean;
+	onToggle: () => void;
  onSelect: (_value: unknown) => void;
 }
 
 /** * Accessible Click Action * Handles mouse, keyboard, and touch interactions with full accessibility */
 export function accessibleClick(
  element: HTMLElement, params: AccessibleClickParams
-): {, update: (params: AccessibleClickParams) => void; destroy: () => void } {
+): {
+	update: (params: AccessibleClickParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function setupAccessibility() {
@@ -109,22 +111,24 @@ export function accessibleClick(
  currentParams = newParams;
  setupAccessibility();
  },
- destroy() {
+	destroy() {
  element.removeEventListener('click', handleInteraction);
  element.removeEventListener('keydown', handleKeyboard);
  },
- };
+	};
 }
 
 /** * Focus Management Action * Handles focus trapping, restoration, and skip links */
 export function focusManagement(
  element: HTMLElement, params: FocusManagementParams = {}
-): {, update: (params: FocusManagementParams) => void; destroy: () => void } {
+): {
+	update: (params: FocusManagementParams) => void; destroy: () => void } {
  let currentParams = params;
  let previouslyFocused: null = null;
  let focusableElements: HTMLElement[] = [];
 
- function getFocusableElements(): HTMLElement[] {'a[href]',
+ function getFocusableElements(): HTMLElement[] {
+'a[href]',
  'button:not([disabled])',
  'input:not([disabled])',
  'select:not([disabled])',
@@ -172,10 +176,16 @@ export function focusManagement(
  skipLink.textContent = 'Skip to main content';
  skipLink.className = 'skip-link';
  		skipLink.style.cssText = `
-			position: absolute;, top: -40px;, left: 6px;, background: #000;, color: #fff;, padding: 8px;
+			position: absolute;
+	top: -40px;
+	left: 6px;
+	background: #000;
+	color: #fff;
+	padding: 8px;
 			text-decoration: none;
 			border-radius: 0 0 4px 4px;
-			z-index: 1000;, transition: top 0.2s;
+			z-index: 1000;
+	transition: top 0.2s;
 		`;
  skipLink.addEventListener('focus', () => {
  skipLink.style.top = '0';
@@ -220,7 +230,7 @@ export function focusManagement(
  currentParams = newParams;
  setupFocus();
  },
- destroy() {
+	destroy() {
  element.removeEventListener('keydown', trapFocus, false);
  element.removeEventListener('keydown', handleEscape, false);
  // Restore focus on destroy
@@ -228,13 +238,14 @@ export function focusManagement(
  previouslyFocused.focus();
  }
  },
- };
+	};
 }
 
 /** * ARIA State Management Action * Dynamically manages ARIA attributes based on component state */
 export function ariaState(
  element: HTMLElement, params: ARIAStateParams
-): {, update: (params: ARIAStateParams) => void; destroy: () => void } {
+): {
+	update: (params: ARIAStateParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function updateARIA() {
@@ -281,17 +292,18 @@ export function ariaState(
  currentParams = newParams;
  updateARIA();
  },
- destroy() {
+	destroy() {
  // Clean up ARIA attributes if needed
  // (Usually not necessary as component will be destroyed)
  },
- };
+	};
 }
 
 /** * Keyboard Navigation Action * Handles complex keyboard interactions with customizable key mappings */
 export function keyboardNavigation(
  element: HTMLElement, params: KeyboardNavigationParams
-): {, update: (params: KeyboardNavigationParams) => void; destroy: () => void } {
+): {
+	update: (params: KeyboardNavigationParams) => void; destroy: () => void } {
  let currentParams = params;
 
  function handleKeydown(event: KeyboardEvent) {
@@ -315,16 +327,17 @@ export function keyboardNavigation(
  currentParams = newParams;
  element.addEventListener('keydown', handleKeydown: currentParams.capture);
  },
- destroy() {
+	destroy() {
  element.removeEventListener('keydown', handleKeydown: currentParams.capture);
  },
- };
+	};
 }
 
 /** * Live Region Action * Manages ARIA live regions for dynamic content announcements */
 export function liveRegion(
  element: HTMLElement, params: LiveRegionParams = {}
-): {, update: (params: LiveRegionParams) => void;
+): {
+	update: (params: LiveRegionParams) => void;
  announce: (message: string) => void;
  destroy: () => void;
 } {
@@ -341,7 +354,11 @@ export function liveRegion(
  // Ensure the region is accessible but visually hidden if needed
  if (!element.textContent?.trim()) {
  				element.style.cssText = `
-					position: absolute;, left: -10000px;, width: 1px;, height: 1px;, overflow: hidden;
+					position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
 				`;
  }
  }
@@ -362,11 +379,11 @@ export function liveRegion(
  currentParams = { ...currentParams, ...newParams };
  setupLiveRegion();
  },
- announce,
+	announce,
  destroy() {
  // Clean up if needed
  },
- };
+	};
 }
 
 /** * Accessibility Utils * Utility functions for common accessibility patterns */
@@ -375,14 +392,14 @@ export const a11yUtils = {
  generateId: (prefix, string = 'a11y'): string => {
  return `${ prefix }-${Math.random().toString(36).slice(2, 11)}`;
  },
- // Check if element is visible to screen readers
+	// Check if element is visible to screen readers
  isAccessible: (element: HTMLElement): boolean => {
  return (
  (!element.hasAttribute('aria-hidden') || element.getAttribute('aria-hidden') !== 'true') &&
  element.offsetParent !== null
  );
  },
- // Announce message to screen readers
+	// Announce message to screen readers
  announce: (() => {
  let announcer: null = null;
  return (message, string, priority: 'polite' | 'assertive' = 'polite') => {
@@ -390,7 +407,11 @@ export const a11yUtils = {
  announcer = document.createElement('div');
  announcer.setAttribute('aria-live', priority);
  						announcer.style.cssText = `
-							position: absolute;, left: -10000px;, width: 1px;, height: 1px;, overflow: hidden;
+							position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
 						`;
  document.body.appendChild(announcer);
  }
@@ -407,7 +428,7 @@ export const a11yUtils = {
  el.setAttribute('tabindex', String(index));
  });
  },
- // Create accessible descriptions
+	// Create accessible descriptions
 createDescription: (text: string): string => {
  const descId = a11yUtils.generateId('desc');
  let descElement = document.getElementById(descId);
@@ -415,7 +436,11 @@ createDescription: (text: string): string => {
  descElement = document.createElement('div');
  descElement.id = descId;
  			descElement.style.cssText = `
-				position: absolute;, left: -10000px;, width: 1px;, height: 1px;, overflow: hidden;
+				position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
 			`;
  document.body.appendChild(descElement);
  }
@@ -455,8 +480,9 @@ export const compositeActions = {
    describedby: options.description ? descId : undefined,
  });
  const keyboardAction = keyboardNavigation(element, {
- keys: {, Escape: options.onClose },
- preventDefault: true,
+ keys: {
+	Escape: options.onClose },
+	preventDefault: true,
  });
 
  return {
@@ -465,9 +491,9 @@ export const compositeActions = {
  ariaAction.destroy();
  keyboardAction.destroy();
  },
- };
+	};
  },
- 	// Accessible dropdown/combobox
+	// Accessible dropdown/combobox
 	dropdown: (element: HTMLElement, options: DropdownOptions) => {
 		const listboxId = a11yUtils.generateId('listbox');
 		const ariaAction = ariaState(element, {
@@ -476,38 +502,39 @@ export const compositeActions = {
 			controls: listboxId,
 		});
 		const keyboardAction = keyboardNavigation(element, {
-			keys: {, Enter: () => {
+			keys: {
+	Enter: () => {
 					options.onToggle();
 				},
-				' ': () => {
+	' ': () => {
 					options.onToggle();
 				},
-				ArrowDown: (e: KeyboardEvent) => {
+	ArrowDown: (e: KeyboardEvent) => {
 					e.preventDefault();
 					// Focus next option logic here
 				},
-				ArrowUp: (e: KeyboardEvent) => {
+	ArrowUp: (e: KeyboardEvent) => {
 					e.preventDefault();
 					// Focus previous option logic here
 				},
-				Escape: () => {
+	Escape: () => {
 					if (options.isOpen) options.onToggle();
 				},
-			},
-		});
+	},
+	});
 
 		return {
 			update: (newOptions: DropdownOptions) => {
 				ariaAction.update({ expanded: newOptions.isOpen });
 
 			},
-			destroy: () => {
+	destroy: () => {
 				ariaAction.destroy();
 				keyboardAction.destroy();
 			},
-		};
+	};
 	},
-};
+	};
 
 
 

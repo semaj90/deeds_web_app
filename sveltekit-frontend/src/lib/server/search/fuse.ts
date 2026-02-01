@@ -121,7 +121,8 @@ export class FuseSearchService<T = any> {
     /**
      * Get search statistics
      */
-    getStats(): {, totalItems: number;
+    getStats(): {
+	totalItems: number;
         // Update searchKeys type to match IFuseOptions<T>['keys']
         searchKeys: IFuseOptions<T>['keys']; // Changed Fuse.IFuseOptions to IFuseOptions
         // Update options type to IFuseOptions<T>
@@ -138,19 +139,23 @@ export class FuseSearchService<T = any> {
 // Legal-specific search configurations
 // These configurations are compatible with Fuse.IFuseOptions<any>
 export const LEGAL_SEARCH_CONFIGS = {
-    caseSearch: {, keys: ['title', 'description', 'caseNumber', 'tags'],
+    caseSearch: {
+	keys: ['title', 'description', 'caseNumber', 'tags'],
         threshold: 0.3, includeScore: true, includeMatches: true, minMatchCharLength: 2
     },
-    evidenceSearch: {, keys: ['title', 'description', 'content', 'tags', 'metadata.caseId'],
+	evidenceSearch: {
+	keys: ['title', 'description', 'content', 'tags', 'metadata.caseId'],
         threshold: 0.4, includeScore: true, includeMatches: true, minMatchCharLength: 3
     },
-    documentSearch: {, keys: ['title', 'content', 'summary', 'keywords', 'author'],
+	documentSearch: {
+	keys: ['title', 'content', 'summary', 'keywords', 'author'],
         threshold: 0.3, includeScore: true, includeMatches: true, minMatchCharLength: 2, tokenize: true,
     },
-    personSearch: {, keys: ['name', 'aliases', 'description', 'notes', 'caseIds'],
+	personSearch: {
+	keys: ['name', 'aliases', 'description', 'notes', 'caseIds'],
         threshold: 0.5, includeScore: true, includeMatches: true, minMatchCharLength: 2
     },
-} as const;
+	} as const;
 
 // Pre-configured search instances for common legal entities
 export class LegalSearchManager {

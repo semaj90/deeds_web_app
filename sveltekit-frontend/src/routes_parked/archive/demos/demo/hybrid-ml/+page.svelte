@@ -7,14 +7,16 @@ https, //svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import type { hybridEmbeddings } from '$lib/ai/hybrid-embeddings'; import { onMount } from 'svelte'; import { Activity } from "lucide-svelte";
+import type { hybridEmbeddings } from '$lib/ai/hybrid-embeddings'; // Migrated to $effect import { Activity } from "lucide-svelte";
 import { Cpu } from "lucide-svelte";
 import { Database } from "lucide-svelte";
 import { Lock } from "lucide-svelte";
-import { Zap } from "lucide-svelte"; let isInitialized = $state <boolean>(false); let status = $state <{ ollama: boolean;, browser: boolean; recommended, string } | null>(null); // Demo inputs let inputText = $state <string>('Contract for the sale of property located at, 123 Main Street'); let similarDocuments = $state([ { text: 'Real estate purchase agreement for, 456 Oak Avenue', metadata: {, type: 'contract' } }, { text: 'Employment contract for software engineer position', metadata: {, type: 'contract' } }, { text: 'Lease agreement for commercial property', metadata: {, type: 'lease' } }, { text: 'Witness testimony about property transaction', metadata: {, type: 'testimony' } }, { text: 'Bill of sale for residential real estate'; metadata: {, type: 'contract' } } ]); // Results let embeddingResult = $state <{ embedding: number[];, strategy: string; duration: number; model, string } | null>(null); let similarityResults = $state <Array<{ text: string;, score: number, metadata?, unknown }>>([]); let isProcessing = $state <boolean>(false); let error = $state <string | null>(null); // Strategy selection let selectedStrategy: 'auto' | 'ollama' | 'browser' = $state('auto'); let privacyMode = $state <boolean>(false); onMount(() => {
+import { Zap } from "lucide-svelte"; let isInitialized = $state <boolean>(false); let status = $state <{ ollama: boolean;, browser: boolean; recommended, string } | null>(null); // Demo inputs let inputText = $state <string>('Contract for the sale of property located at, 123 Main Street'); let similarDocuments = $state([ { text: 'Real estate purchase agreement for, 456 Oak Avenue', metadata: {, type: 'contract' } }, { text: 'Employment contract for software engineer position', metadata: {, type: 'contract' } }, { text: 'Lease agreement for commercial property', metadata: {, type: 'lease' } }, { text: 'Witness testimony about property transaction', metadata: {, type: 'testimony' } }, { text: 'Bill of sale for residential real estate'; metadata: {, type: 'contract' } } ]); // Results let embeddingResult = $state <{ embedding: number[];, strategy: string; duration: number; model, string } | null>(null); let similarityResults = $state <Array<{ text: string;, score: number, metadata?, unknown }>>([]); let isProcessing = $state <boolean>(false); let error = $state <string | null>(null); // Strategy selection let selectedStrategy: 'auto' | 'ollama' | 'browser' = $state('auto'); let privacyMode = $state <boolean>(false); $effect(() => {
+
 		(async () => {
  console.log('ðŸš€ Initializing Hybrid ML Demo...'); try { await: hybridEmbeddings.initialize(); status = await hybridEmbeddings.getStatus(); isInitialized = true; console.log('âœ… Hybrid ML Ready:', status)} catch (err) { error = `Initialization failed: ${ err }`; console.error('âŒ Hybrid ML Init: Error:', err)}
- 		})();
+ 		
+});();
 	});
  async function generateEmbedding(): Promise<any> { if (!inputText) { error = 'Please enter some text'; return}
 

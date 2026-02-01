@@ -19,7 +19,8 @@ type PoolLike = {
 type PostgresJsClient = ReturnType<typeof postgres>;
 
 interface Migration {
-	id: string;, filename: string;
+	id: string;
+	filename: string;
 	applied_at?: string | Date | null;
 }
 
@@ -108,7 +109,8 @@ async function runSqlMigrations(db: PostgresJsDatabase<any>, pool: PoolLike): Pr
 			const migrationId = migration.replace('.sql', '');
 			await db.execute(sql`
 				INSERT INTO migrations (id, filename)
-				VALUES (${migrationId}, ${migration})
+				VALUES (${migrationId},
+	${migration})
 				ON CONFLICT (id) DO UPDATE SET
 					filename = EXCLUDED.filename,
 					applied_at = CURRENT_TIMESTAMP

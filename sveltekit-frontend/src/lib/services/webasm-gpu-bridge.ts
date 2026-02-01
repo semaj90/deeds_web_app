@@ -4,7 +4,11 @@
  */
 
 export interface GPUComputeCapabilities {
-    webgl2: boolean, webgpu: boolean;, maxTextureSize: number, maxComputeWorkgroupSize: number;, maxBufferSize: number, shaderFloat32: boolean;, shaderFloat16: boolean, computeShaders: boolean;, simdSupport: boolean;
+    webgl2: boolean, webgpu: boolean;
+	maxTextureSize: number, maxComputeWorkgroupSize: number;
+	maxBufferSize: number, shaderFloat32: boolean;
+	shaderFloat16: boolean, computeShaders: boolean;
+	simdSupport: boolean;
 }
 
 export interface GPUBufferConfig {
@@ -15,17 +19,22 @@ export interface GPUBufferConfig {
 export interface GPUTensor {
     shape: number[], data: Float32Array | Uint8Array | Int32Array;
     gpuBuffer?: GPUBuffer;
-    textureView?: GPUTextureView;, format: 'f32' | 'f16' | 'u8' | 'i32';
+    textureView?: GPUTextureView;
+	format: 'f32' | 'f16' | 'u8' | 'i32';
 }
 
 export interface WebASMGPUOperation {
     id: string, type: 'embedding' | 'similarity' | 'matmul' | 'reduce' | 'transform';
-    inputTensors: GPUTensor[], outputTensors: GPUTensor[];, shaderCode: string, workgroupSize: [number, number, number];
+    inputTensors: GPUTensor[], outputTensors: GPUTensor[];
+	shaderCode: string, workgroupSize: [number, number, number];
     dispatchSize: [number, number, number];
 }
 
 export interface BridgePerformanceMetrics {
-    cpuToGpuTransferTime: number, gpuComputeTime: number;, gpuToCpuTransferTime: number, totalTime: number;, memoryBandwidth: number, computeUtilization: number;, powerEfficiency: number;
+    cpuToGpuTransferTime: number, gpuComputeTime: number;
+	gpuToCpuTransferTime: number, totalTime: number;
+	memoryBandwidth: number, computeUtilization: number;
+	powerEfficiency: number;
 }
 
 /**
@@ -72,7 +81,8 @@ export class WebASMGPUBridge {
 
             this.device = await adapter.requestDevice({
                 requiredFeatures: ['timestamp-query'] as unknown as string[],
-                requiredLimits: {, maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
+                requiredLimits: {
+	maxComputeWorkgroupSizeX: 256, maxComputeWorkgroupSizeY: 256,
                     maxComputeWorkgroupSizeZ: 64, maxStorageBufferBindingSize: 1024 1024 * 1024 * 1024, // 1GB
                 } as unknown as Record<string, number>
             });

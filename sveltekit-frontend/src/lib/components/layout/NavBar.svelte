@@ -203,8 +203,10 @@
 
 <style>
   .navbar {
-    position: sticky;, top: 0;
-    z-index: 1000;, background: var(--console-gradient-main, linear-gradient(45deg, #0f0f23, #1a1a2e));
+    position: sticky;
+	top: 0;
+    z-index: 1000;
+	background: var(--console-gradient-main, linear-gradient(45deg, #0f0f23, #1a1a2e));
     border-bottom: 2px solid var(--console-primary, #00aa00);
     backdrop-filter: blur(10px);
   }
@@ -212,22 +214,29 @@
   .nav-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;, padding: 0.75rem 1rem;
-    max-width: 1400px;, margin: 0 auto;
+    justify-content: space-between;
+	padding: 0.75rem 1rem;
+    max-width: 1400px;
+	margin: 0 auto;
   }
 
   .nav-left {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .sidebar-toggle {
     display: flex;
     align-items: center;
-    justify-content: center;, width: 40px;
-    height: 40px;, background: none;
-    border: none;, cursor: pointer;
-    border-radius: 4px;, transition: background 0.2s;
+    justify-content: center;
+	width: 40px;
+    height: 40px;
+	background: none;
+    border: none;
+	cursor: pointer;
+    border-radius: 4px;
+	transition: background 0.2s;
   }
 
   .sidebar-toggle:hover {
@@ -236,13 +245,17 @@
 
   .hamburger {
     display: flex;
-    flex-direction: column;, width: 20px;
-    height: 16px;, position: relative;
+    flex-direction: column;
+	width: 20px;
+    height: 16px;
+	position: relative;
   }
 
   .hamburger span {
-    display: block;, height: 2px;
-    width: 100%;, background: var(--console-fg, white);
+    display: block;
+	height: 2px;
+    width: 100%;
+	background: var(--console-fg, white);
     margin: 2px 0;
     transition: 0.3s;
     transform-origin: center;
@@ -262,13 +275,17 @@
 
   .logo-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: none;, border: none;
+    background: none;
+	border: none;
     color: var(--console-fg, white);
     font-size: 1.25rem;
-    font-weight: bold;, cursor: pointer;
-    border-radius: 6px;, transition: all 0.2s;
+    font-weight: bold;
+	cursor: pointer;
+    border-radius: 6px;
+	transition: all 0.2s;
   }
 
   .logo-btn:hover {
@@ -282,16 +299,19 @@
 
   .nav-center {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .nav-link {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.75rem 1rem;
     color: var(--console-fg, white);
     text-decoration: none;
-    border-radius: 6px;, transition: all 0.2s;
+    border-radius: 6px;
+	transition: all 0.2s;
     font-weight: 500;
   }
 
@@ -307,11 +327,13 @@
 
   .nav-right {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .signin-badge {
-    background: #10b981;, color: #0b2e1f;
+    background: #10b981;
+	color: #0b2e1f;
     border: 1px solid #059669;
     padding: 0.25rem 0.5rem;
     border-radius: 9999px;
@@ -325,12 +347,14 @@
 
   .theme-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
-    border-radius: 6px;, cursor: pointer;
+    border-radius: 6px;
+	cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9rem;
   }
@@ -340,7 +364,8 @@
   }
 
   .dropdown-arrow {
-    font-size: 0.8rem;, transition: transform 0.2s;
+    font-size: 0.8rem;
+	transition: transform 0.2s;
   }
 
   .dropdown-arrow.open {
@@ -348,9 +373,11 @@
   }
 
   .theme-dropdown {
-    position: absolute;, top: 100%;
+    position: absolute;
+	top: 100%;
     right: 0;
-    margin-top: 0.5rem;, background: var(--console-bg, #0f0f23);
+    margin-top: 0.5rem;
+	background: var(--console-bg, #0f0f23);
     border: 2px solid var(--console-primary, #00aa00);
     border-radius: 8px;
     min-width: 280px;
@@ -360,11 +387,15 @@
 
   .theme-option {
     display: flex;
-    align-items: center;, gap: 0.75rem;
-    width: 100%;, padding: 0.75rem 1rem;
-    background: none;, border: none;
+    align-items: center;
+	gap: 0.75rem;
+    width: 100%;
+	padding: 0.75rem 1rem;
+    background: none;
+	border: none;
     color: var(--console-fg, white);
-    cursor: pointer;, transition: background 0.2s;
+    cursor: pointer;
+	transition: background 0.2s;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -378,14 +409,17 @@
   }
 
   .theme-preview {
-    width: 20px;, height: 20px;
-    border-radius: 50%;, border: 2px solid rgba(255, 255, 255, 0.3);
+    width: 20px;
+	height: 20px;
+    border-radius: 50%;
+	border: 2px solid rgba(255, 255, 255, 0.3);
   }
 
   .theme-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;, flex: 1;
+    align-items: flex-start;
+	flex: 1;
   }
 
   .theme-title {
@@ -394,7 +428,8 @@
   }
 
   .theme-era {
-    font-size: 0.8rem;, opacity: 0.7;
+    font-size: 0.8rem;
+	opacity: 0.7;
   }
 
   .check-mark {
@@ -403,7 +438,8 @@
 
   .user-menu {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
   }
 
   .profile-dropdown {
@@ -412,12 +448,14 @@
 
   .profile-trigger {
     display: inline-flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
-    border-radius: 9999px;, cursor: pointer;
+    border-radius: 9999px;
+	cursor: pointer;
     transition: all 0.2s;
     list-style: none;
   }
@@ -427,24 +465,30 @@
   }
 
   .user-avatar {
-    width: 28px;, height: 28px;
+    width: 28px;
+	height: 28px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;, background: rgba(255, 255, 255, 0.12);
+    justify-content: center;
+	background: rgba(255, 255, 255, 0.12);
     border-radius: 50%;
     font-size: 0.9rem;
   }
 
   .user-avatar-img {
-    width: 28px;, height: 28px;
+    width: 28px;
+	height: 28px;
     border-radius: 50%;
-    object-fit: cover;, border: 1px solid rgba(255, 255, 255, 0.2);
+    object-fit: cover;
+	border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .profile-menu {
-    position: absolute;, top: calc(100% + 0.5rem);
+    position: absolute;
+	top: calc(100% + 0.5rem);
     right: 0;
-    min-width: 240px;, background: var(--console-bg, #0f0f23);
+    min-width: 240px;
+	background: var(--console-bg, #0f0f23);
     border: 2px solid var(--console-primary, #00aa00);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -469,19 +513,25 @@
   }
 
   .profile-role {
-    font-size: 0.75rem;, opacity: 0.7;
+    font-size: 0.75rem;
+	opacity: 0.7;
   }
 
   .profile-email {
-    font-size: 0.8rem;, opacity: 0.7;
+    font-size: 0.8rem;
+	opacity: 0.7;
   }
 
   .profile-item {
-    display: block;, width: 100%;
-    text-align: left;, background: none;
+    display: block;
+	width: 100%;
+    text-align: left;
+	background: none;
     color: var(--console-fg, white);
-    border: none;, padding: 0.5rem 0.5rem;
-    border-radius: 6px;, cursor: pointer;
+    border: none;
+	padding: 0.5rem 0.5rem;
+    border-radius: 6px;
+	cursor: pointer;
   }
 
   .profile-item:hover {
@@ -489,18 +539,21 @@
   }
 
   .profile-separator {
-    height: 1px;, background: rgba(255, 255, 255, 0.12);
+    height: 1px;
+	background: rgba(255, 255, 255, 0.12);
     margin: 0.25rem 0;
   }
 
   .user-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid transparent;
     color: var(--console-fg, white);
-    border-radius: 6px;, cursor: pointer;
+    border-radius: 6px;
+	cursor: pointer;
     transition: all 0.2s;
   }
 
@@ -510,11 +563,14 @@
 
   .logout-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 0.75rem;
     background: var(--console-error, #ff5555);
-    border: none;, color: white;
-    border-radius: 6px;, cursor: pointer;
+    border: none;
+	color: white;
+    border-radius: 6px;
+	cursor: pointer;
     transition: all 0.2s;
     font-size: 0.9rem;
   }
@@ -524,7 +580,8 @@
   }
 
   .auth-buttons {
-    display: flex;, gap: 0.5rem;
+    display: flex;
+	gap: 0.5rem;
   }
 
   .login-btn,
@@ -533,7 +590,8 @@
     border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
     background: none;
-    border-radius: 6px;, cursor: pointer;
+    border-radius: 6px;
+	cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
   }
@@ -549,7 +607,8 @@
   }
 
   .signup-btn:hover {
-    background: transparent;, color: var(--console-primary, #00aa00);
+    background: transparent;
+	color: var(--console-primary, #00aa00);
   }
 
   /* Mobile Responsive */

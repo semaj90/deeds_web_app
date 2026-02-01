@@ -54,7 +54,8 @@
   .animate-shimmer { animation: shimmer 2s infinite}
   /* minimal NES-like pattern for legal variant */
   .nes-progress.is-pattern::before {
-    content: '';, position: absolute;inset: 0
+    content: '';
+	position: absolute;inset: 0
     background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.06) 10px, rgba(255, 255, 255, 0.06) 20px);
     pointer-events: none}
 </style>

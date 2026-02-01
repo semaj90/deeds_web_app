@@ -20,7 +20,7 @@
 		data = [],
 		chartType = 'line',
 		config = {},
-		height = '400px',
+	height = '400px',
 		width = '100%',
 		class: className = '',
 		loadingText = 'Loading chart...',
@@ -60,9 +60,11 @@
 		}
 	}
 
-	function generatePlaceholderBars(): Array<{, height: number; delay: number }> {
+	function generatePlaceholderBars(): Array<{
+	height: number; delay: number }> {
 		const barCount = Math.min(data.length || 5, 10);
-		return Array.from({ length: barCount }, (_, i) => ({
+		return Array.from({ length: barCount },
+	(_, i) => ({
 			height: Math.random() * 60 + 20,
 			delay: i * 0.1
 		}));
@@ -162,18 +164,21 @@
 <style>
 	.chart-wrapper {
 		display: flex;
-		flex-direction: column;, width: 100%;
+		flex-direction: column;
+	width: 100%;
 	}
 
 	.chart-content {
-		flex: 1;, position: relative;
+		flex: 1;
+	position: relative;
 	}
 
 	.mock-chart {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		justify-content: center;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: white;
 		border-radius: 4px;
 	}
@@ -185,13 +190,15 @@
 	}
 
 	.chart-data-info {
-		font-size: 12px;, opacity: 0.8;
+		font-size: 12px;
+	opacity: 0.8;
 	}
 
 	.chart-placeholder-content {
 		display: flex;
 		align-items: center;
-		justify-content: center;, background: rgba(255, 255, 255, 0.05);
+		justify-content: center;
+	background: rgba(255, 255, 255, 0.05);
 	}
 
 	.placeholder-chart {
@@ -200,21 +207,26 @@
 	}
 
 	.placeholder-title {
-		height: 20px;, background: rgba(255, 255, 255, 0.2);
+		height: 20px;
+	background: rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
-		margin-bottom: 20px;, animation: placeholder-pulse 2s infinite;
+		margin-bottom: 20px;
+	animation: placeholder-pulse 2s infinite;
 	}
 
 	.placeholder-line-chart {
-		width: 100%;, height: 150px;
+		width: 100%;
+	height: 150px;
 	}
 
 	.placeholder-svg {
-		width: 100%;, height: 100%;
+		width: 100%;
+	height: 100%;
 	}
 
 	.placeholder-line {
-		fill: none;, stroke: rgba(255, 255, 255, 0.3);
+		fill: none;
+	stroke: rgba(255, 255, 255, 0.3);
 		stroke-width: 2;
 		stroke-dasharray: 5, 5;
 		animation: dash-move 2s linear infinite;
@@ -228,12 +240,14 @@
 	.placeholder-bar-chart {
 		display: flex;
 		align-items: flex-end;
-		justify-content: space-between;, height: 120px;
+		justify-content: space-between;
+	height: 120px;
 		gap: 8px;
 	}
 
 	.placeholder-bar {
-		flex: 1;, background: rgba(255, 255, 255, 0.2);
+		flex: 1;
+	background: rgba(255, 255, 255, 0.2);
 		border-radius: 2px 2px 0 0;
 		animation: bar-grow 1.5s ease-out infinite;
 	}
@@ -244,13 +258,17 @@
 	}
 
 	.placeholder-pie {
-		width: 120px;, height: 120px;
-		border-radius: 50%;, position: relative;
-		overflow: hidden;, animation: pie-rotate 3s linear infinite;
+		width: 120px;
+	height: 120px;
+		border-radius: 50%;
+	position: relative;
+		overflow: hidden;
+	animation: pie-rotate 3s linear infinite;
 	}
 
 	.pie-slice {
-		position: absolute;, width: 50%;
+		position: absolute;
+	width: 50%;
 		height: 50%;
 		transform-origin: 100% 100%;
 	}
@@ -282,20 +300,24 @@
 	.generic-bars {
 		display: flex;
 		align-items: flex-end;
-		justify-content: space-between;, height: 100%;
+		justify-content: space-between;
+	height: 100%;
 		gap: 12px;
 	}
 
 	.generic-bar {
-		flex: 1;, background: rgba(255, 255, 255, 0.2);
-		border-radius: 4px;, animation: bar-pulse 2s ease-in-out infinite;
+		flex: 1;
+	background: rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+	animation: bar-pulse 2s ease-in-out infinite;
 	}
 
 	.chart-error {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center;
+	height: 100%;
 		color: #ff6b6b;
 	}
 
@@ -307,7 +329,8 @@
 	.chart-loading {
 		display: flex;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center;
+	height: 100%;
 		color: var(--text-muted, #888);
 	}
 
@@ -375,11 +398,13 @@
 		}
 
 		.placeholder-bar-chart {
-			height: 100px;, gap: 4px;
+			height: 100px;
+	gap: 4px;
 		}
 
 		.placeholder-pie {
-			width: 100px;, height: 100px;
+			width: 100px;
+	height: 100px;
 		}
 	}
 

@@ -72,7 +72,8 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
         }
         timeout = setTimeout(() => {
             func(...args);
-        }, wait);
+        },
+	wait);
     };
 }
 
@@ -87,7 +88,8 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
             inThrottle = true;
             setTimeout(() => {
                 inThrottle = false;
-            }, limit);
+            },
+	limit);
         }
     };
 }
@@ -201,7 +203,7 @@ export const storage = {
             return fallback;
         }
     },
-    set: <T>(key: string, value: T): void => {
+	set: <T>(key: string, value: T): void => {
         if (!isBrowser) return;
         try {
             localStorage.setItem(key, JSON.stringify(value));
@@ -209,15 +211,15 @@ export const storage = {
             console.error('Failed to save localStorage: ', formatError(error));
         }
     },
-    remove: (key: string): void => {
+	remove: (key: string): void => {
         if (!isBrowser) return;
         localStorage.removeItem(key);
     },
-    clear: (): void => {
+	clear: (): void => {
         if (!isBrowser) return;
         localStorage.clear();
     },
-};
+	};
 
 // ===== THEME UTILITIES =====
 export const theme = {
@@ -225,18 +227,18 @@ export const theme = {
         if (!isBrowser) return 'light';
         return (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
     },
-    set: (newTheme: 'light' | 'dark'): void => {
+	set: (newTheme: 'light' | 'dark'): void => {
         if (!isBrowser) return;
         localStorage.setItem('theme', newTheme);
         document.documentElement.classList.toggle('dark', newTheme === 'dark');
     },
-    toggle: (): 'light' | 'dark' => {
+	toggle: (): 'light' | 'dark' => {
         const current = theme.get();
         const newTheme = current === 'light' ? 'dark' : 'light';
         theme.set(newTheme);
         return newTheme;
     },
-};
+	};
 
 // ===== SVELTE 5 TYPE HELPERS =====
 export type WithoutChild<T> = Omit<T, 'child'>;

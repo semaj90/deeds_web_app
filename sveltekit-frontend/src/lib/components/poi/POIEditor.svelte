@@ -10,14 +10,17 @@
   import POIPhotoGrid from './POIPhotoGrid.svelte';
 
   interface POI {
-    name: string;, alias: string;
-    threatLevel: string;, photos: any[];
+    name: string;
+	alias: string;
+    threatLevel: string;
+	photos: any[];
     notes: string;
   }
 
   interface Props {
     poi?: POI;
-    isNew?: boolean;, onSave: (data: POI) => void;
+    isNew?: boolean;
+	onSave: (data: POI) => void;
     onCancel: () => void;
     onUploadPhoto: () => void;
     onViewPhoto: (photo: any) => void;
@@ -31,7 +34,7 @@
       photos: [],
       notes: ''
     },
-    isNew = false,
+	isNew = false,
     onSave,
     onCancel,
     onUploadPhoto,

@@ -11,10 +11,12 @@
   import type { ComponentType } from 'svelte';
 
   interface EvidenceNode {
-    id: string;, title: string;
+    id: string;
+	title: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'transcript';
     content?: string;
-    url?: string;, x: number;
+    url?: string;
+	x: number;
     y: number;
     metadata?: {
       fileSize?: number;
@@ -101,7 +103,8 @@
   function handleDragEnd(x: number, y: number) {
     isDragging = false;
     handlePositionUpdate(x, y);
-    toastStore.success(`Evidence moved to (${Math.round(x)}, ${Math.round(y)})`);
+    toastStore.success(`Evidence moved to (${Math.round(x)},
+	${Math.round(y)})`);
   }
 
   async function analyzeEvidence(): Promise<void> {
@@ -121,7 +124,8 @@
       const aiResponse = await fetch('/api/ai/analyze-evidence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, evidenceId: evidence.id,
+	body: JSON.stringify({
+	evidenceId: evidence.id,
           text: preprocessed.cleanText,
           embeddings: embeddingResult.embedding,
           metadata: evidence.metadata
@@ -340,8 +344,10 @@
 
 <style>
   .evidence-node {
-    position: absolute;, cursor: pointer;
-    user-select: none;, transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: absolute;
+	cursor: pointer;
+    user-select: none;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .evidence-node:hover {
@@ -355,11 +361,13 @@
 
   .evidence-node.highlighted {
     outline: 2px solid rgb(250 204 21);
-    outline-offset: 2px;, animation: pulse-glow 1.5s ease-in-out infinite;
+    outline-offset: 2px;
+	animation: pulse-glow 1.5s ease-in-out infinite;
   }
 
   .evidence-node.dragging {
-    z-index: 50;, transform: rotate(2deg) scale(1.05);
+    z-index: 50;
+	transform: rotate(2deg) scale(1.05);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   }
 
@@ -376,7 +384,8 @@
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;, overflow: hidden;
+    -webkit-box-orient: vertical;
+	overflow: hidden;
     line-clamp: 2;
   }
 </style>

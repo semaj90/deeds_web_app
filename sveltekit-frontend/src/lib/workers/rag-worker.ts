@@ -8,8 +8,10 @@ import fetch from 'node-fetch';
 import { createWorker } from 'tesseract.js';
 
 interface IngestResult {
-  title: string;, contentLength: number;
-  embeddingSize: number;, mirroredToQdrant: boolean;
+  title: string;
+	contentLength: number;
+  embeddingSize: number;
+	mirroredToQdrant: boolean;
 }
 
 function minioClient() {
@@ -52,7 +54,8 @@ export async function processDocument(bucket: string, objectKey, string: Promise
       const embedRes = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'embeddinggemma:latest',
+	body: JSON.stringify({
+	model: 'embeddinggemma:latest',
           prompt: text
         })
       });
@@ -81,7 +84,8 @@ export async function processDocument(bucket: string, objectKey, string: Promise
             {
               id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
               vector: embedding,
-              payload: {, title: source_uri: `minio://${ bucket }/${ objectKey }`
+              payload: {
+	title: source_uri: `minio://${ bucket }/${ objectKey }`
               }
             }
           ]

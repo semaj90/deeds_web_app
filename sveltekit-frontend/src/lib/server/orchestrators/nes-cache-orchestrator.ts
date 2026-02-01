@@ -23,7 +23,8 @@ class NesCacheOrchestrator {
         this.store.delete(key);
     }
 
-    async getMemoryStats(): Promise<{, count: number }> {
+    async getMemoryStats(): Promise<{
+	count: number }> {
         return { count: this.store.size };
     }
 

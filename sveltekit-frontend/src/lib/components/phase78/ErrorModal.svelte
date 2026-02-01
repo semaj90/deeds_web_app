@@ -1,19 +1,23 @@
 <script lang="ts">
  // API Contract Types
  type ErrorEvent = {
- id: string;, routePath: string;
+ id: string;
+	routePath: string;
  file: string | null;
  kind: 'build' | 'runtime' | 'lint' | 'other';
  severity: 'info' | 'warn' | 'error' | 'fatal';
- message: string;, lineNumber: number | null;
+ message: string;
+	lineNumber: number | null;
  columnNumber: number | null;
  clusterId: string | null;
  collectedAt: string; // ISO
  };
 
  type ErrorSuggestion = {
- id: string;, clusterId: string;
- title: string;, explanation: string;
+ id: string;
+	clusterId: string;
+ title: string;
+	explanation: string;
  confidence: number | null;
  hints: string[] | null;
  };
@@ -21,7 +25,8 @@
  type SuggestionState = 'pending' | 'applied' | 'dismissed' | 'snoozed';
 
  // Props
- let { open = $bindable(false), routePath, onClose }: { open?: boolean;, routePath: string; onClose: () => void } = $props();
+ let { open = $bindable(false), routePath, onClose }: { open?: boolean;
+	routePath: string; onClose: () => void } = $props();
 
  // State
  let loading = $state(false);
@@ -50,7 +55,8 @@
  }
 
  const data = (await res.json()) as {
- events: ErrorEvent[];, suggestions: ErrorSuggestion[];
+ events: ErrorEvent[];
+	suggestions: ErrorSuggestion[];
  };
 
  events = data.events ?? [];
@@ -76,7 +82,7 @@
  const res = await fetch('/api/phase78/route-health', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+	body: JSON.stringify({
  routePath,
  filePath: '',
  errorState: 'healthy',
@@ -119,7 +125,8 @@
  const res = await fetch('/api/phase78/suggestion-state', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, routePath: suggestionId,
+	body: JSON.stringify({
+	routePath: suggestionId,
  state
  })
  });

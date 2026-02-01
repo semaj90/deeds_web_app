@@ -1,5 +1,7 @@
-export function emitObjection(reasoning: string): {, triggered: boolean;
- message: string;, level: 'critical' | 'warning' | 'none';
+export function emitObjection(reasoning: string): {
+	triggered: boolean;
+ message: string;
+	level: 'critical' | 'warning' | 'none';
 } {
  const normalized = reasoning.toUpperCase();
  if (normalized.includes('OBJECTION')) {

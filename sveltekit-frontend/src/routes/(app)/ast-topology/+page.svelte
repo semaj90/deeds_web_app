@@ -1,15 +1,17 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
 
   // Props from server load
   let { data } = $props<{ data: any }>();
 
   interface GraphNode {
-    id: string;, label: string;
+    id: string;
+	label: string;
     type: 'route' | 'component' | 'lib' | 'api' | 'error';
     status: 'normal' | 'error' | 'fixing' | 'fixed';
-    errorCount: number;, path: string;
+    errorCount: number;
+	path: string;
     x?: number;
     y?: number;
     fx?: number | null;
@@ -23,15 +25,19 @@
   }
 
   interface Activity {
-    id: string;, type: 'detecting' | 'fixing' | 'fixed' | 'learning';
-    title: string;, description: string;
+    id: string;
+	type: 'detecting' | 'fixing' | 'fixed' | 'learning';
+    title: string;
+	description: string;
     timestamp: Date;
     file?: string;
   }
 
   interface Stats {
-    totalErrors: number;, fixedToday: number;
-    inProgress: number;, confidence: number;
+    totalErrors: number;
+	fixedToday: number;
+    inProgress: number;
+	confidence: number;
     errorChange: number;
   }
 
@@ -181,15 +187,17 @@
     }
   }
 
-  onMount(() => {
+  $effect(() => {
+
     connectSSE();
     // Fetch initial topology
     fetchTopology();
-  });
+  
+});
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     eventSource?.close();
-  });
+  }
 
   async function fetchTopology() {
     try {
@@ -226,7 +234,8 @@
       const res = await fetch('/api/phase89/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, file: nodeId })
+	body: JSON.stringify({
+	file: nodeId })
       });
 
       if (res.ok) {
@@ -397,7 +406,8 @@
 <style>
   .topology-explorer {
     display: flex;
-    flex-direction: column;, height: 100vh;
+    flex-direction: column;
+	height: 100vh;
     background: var(--bg-primary, #0f0f0f);
     color: var(--text-primary, #e5e5e5);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -407,28 +417,33 @@
   .explorer-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;, padding: 1rem 1.5rem;
+    align-items: center;
+	padding: 1rem 1.5rem;
     background: var(--bg-secondary, #1a1a1a);
     border-bottom: 1px solid var(--border-color, #333);
   }
 
   .header-left {
     display: flex;
-    align-items: center;, gap: 1rem;
+    align-items: center;
+	gap: 1rem;
   }
 
   .header-left h1 {
     margin: 0;
     font-size: 1.5rem;
-    font-weight: 600;, background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    font-weight: 600;
+	background: linear-gradient(135deg, #60a5fa, #a78bfa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .connection-status {
-    font-size: 0.75rem;, padding: 0.25rem 0.5rem;
-    border-radius: 4px;, background: rgba(239, 68, 68, 0.2);
+    font-size: 0.75rem;
+	padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+	background: rgba(239, 68, 68, 0.2);
   }
 
   .connection-status.connected {
@@ -436,7 +451,8 @@
   }
 
   .header-controls {
-    display: flex;, gap: 0.75rem;
+    display: flex;
+	gap: 0.75rem;
     align-items: center;
   }
 
@@ -444,7 +460,8 @@
   .filter-select {
     padding: 0.5rem 1rem;
     border: 1px solid var(--border-color, #333);
-    border-radius: 6px;, background: var(--bg-tertiary, #252525);
+    border-radius: 6px;
+	background: var(--bg-tertiary, #252525);
     color: inherit;
     font-size: 0.875rem;
   }
@@ -456,17 +473,22 @@
   }
 
   .view-toggle {
-    display: flex;, gap: 2px;
+    display: flex;
+	gap: 2px;
     background: var(--bg-tertiary, #252525);
-    border-radius: 6px;, padding: 2px;
+    border-radius: 6px;
+	padding: 2px;
   }
 
   .view-toggle button {
     padding: 0.5rem 0.75rem;
-    border: none;, background: transparent;
+    border: none;
+	background: transparent;
     color: var(--text-muted, #888);
-    border-radius: 4px;, cursor: pointer;
-    font-size: 0.875rem;, transition: all 0.2s;
+    border-radius: 4px;
+	cursor: pointer;
+    font-size: 0.875rem;
+	transition: all 0.2s;
   }
 
   .view-toggle button:hover {
@@ -480,7 +502,8 @@
 
   /* Stats Bar */
   .stats-bar {
-    display: flex;, gap: 1rem;
+    display: flex;
+	gap: 1rem;
     padding: 1rem 1.5rem;
     background: var(--bg-secondary, #1a1a1a);
     border-bottom: 1px solid var(--border-color, #333);
@@ -488,7 +511,8 @@
 
   .stat-card {
     display: flex;
-    flex-direction: column;, padding: 0.75rem 1.5rem;
+    flex-direction: column;
+	padding: 0.75rem 1.5rem;
     background: var(--bg-tertiary, #252525);
     border-radius: 8px;
     min-width: 120px;
@@ -500,11 +524,13 @@
 
   .stat-value {
     font-size: 1.5rem;
-    font-weight: 700;, color: var(--text-primary);
+    font-weight: 700;
+	color: var(--text-primary);
   }
 
   .stat-label {
-    font-size: 0.75rem;, color: var(--text-muted, #888);
+    font-size: 0.75rem;
+	color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -513,28 +539,36 @@
   .explorer-content {
     display: grid;
     grid-template-columns: 1fr 320px;
-    flex: 1;, overflow: hidden;
+    flex: 1;
+	overflow: hidden;
   }
 
   .topology-view {
-    overflow-y: auto;, padding: 1rem;
+    overflow-y: auto;
+	padding: 1rem;
   }
 
   /* File Tree */
   .file-tree {
     display: flex;
-    flex-direction: column;, gap: 2px;
+    flex-direction: column;
+	gap: 2px;
   }
 
   .tree-node {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center;
+	gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    border: none;, background: transparent;
+    border: none;
+	background: transparent;
     color: var(--text-primary);
-    text-align: left;, cursor: pointer;
-    border-radius: 4px;, transition: background 0.15s;
-    font-size: 0.875rem;, width: 100%;
+    text-align: left;
+	cursor: pointer;
+    border-radius: 4px;
+	transition: background 0.15s;
+    font-size: 0.875rem;
+	width: 100%;
   }
 
   .tree-node:hover {
@@ -555,7 +589,8 @@
   }
 
   .node-label {
-    flex: 1;, overflow: hidden;
+    flex: 1;
+	overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -564,23 +599,27 @@
     padding: 0.125rem 0.375rem;
     border-radius: 10px;
     font-size: 0.75rem;
-    font-weight: 600;, color: white;
+    font-weight: 600;
+	color: white;
   }
 
   .node-status {
-    width: 8px;, height: 8px;
+    width: 8px;
+	height: 8px;
     border-radius: 50%;
   }
 
   /* Error List */
   .error-list {
     display: flex;
-    flex-direction: column;, gap: 0.5rem;
+    flex-direction: column;
+	gap: 0.5rem;
   }
 
   .error-item {
     background: var(--bg-tertiary, #252525);
-    border-radius: 8px;, overflow: hidden;
+    border-radius: 8px;
+	overflow: hidden;
     transition: all 0.2s;
   }
 
@@ -590,7 +629,8 @@
 
   .error-header {
     display: flex;
-    justify-content: space-between;, padding: 0.75rem 1rem;
+    justify-content: space-between;
+	padding: 0.75rem 1rem;
     cursor: pointer;
   }
 
@@ -604,16 +644,19 @@
   }
 
   .error-actions {
-    display: flex;, gap: 0.5rem;
+    display: flex;
+	gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-top: 1px solid var(--border-color, #333);
   }
 
   .action-btn {
-    flex: 1;, padding: 0.5rem 1rem;
+    flex: 1;
+	padding: 0.5rem 1rem;
     border: none;
     border-radius: 6px;
-    font-size: 0.875rem;, cursor: pointer;
+    font-size: 0.875rem;
+	cursor: pointer;
     transition: all 0.2s;
   }
 
@@ -636,29 +679,35 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;, height: 400px;
+    justify-content: center;
+	height: 400px;
     background: var(--bg-tertiary, #252525);
-    border-radius: 12px;, border: 2px dashed var(--border-color, #333);
+    border-radius: 12px;
+	border: 2px dashed var(--border-color, #333);
   }
 
   .graph-placeholder p {
-    margin: 0.5rem;, color: var(--text-muted);
+    margin: 0.5rem;
+	color: var(--text-muted);
   }
 
   .graph-placeholder .hint {
-    font-size: 0.875rem;, opacity: 0.7;
+    font-size: 0.875rem;
+	opacity: 0.7;
   }
 
   /* Activity Feed */
   .activity-feed {
     background: var(--bg-secondary, #1a1a1a);
     border-left: 1px solid var(--border-color, #333);
-    overflow: hidden;, display: flex;
+    overflow: hidden;
+	display: flex;
     flex-direction: column;
   }
 
   .activity-feed h2 {
-    margin: 0;, padding: 1rem;
+    margin: 0;
+	padding: 1rem;
     font-size: 1rem;
     font-weight: 600;
     border-bottom: 1px solid var(--border-color, #333);
@@ -666,23 +715,28 @@
 
   .activity-list {
     flex: 1;
-    overflow-y: auto;, padding: 0.5rem;
+    overflow-y: auto;
+	padding: 0.5rem;
   }
 
   .activity-item {
-    display: flex;, gap: 0.75rem;
+    display: flex;
+	gap: 0.75rem;
     padding: 0.75rem;
     border-radius: 6px;
-    margin-bottom: 0.5rem;, background: var(--bg-tertiary, #252525);
+    margin-bottom: 0.5rem;
+	background: var(--bg-tertiary, #252525);
     animation: slideIn 0.3s ease;
   }
 
   @keyframes slideIn {
     from {
-      opacity: 0;, transform: translateX(20px);
+      opacity: 0;
+	transform: translateX(20px);
     }
     to {
-      opacity: 1;, transform: translateX(0);
+      opacity: 1;
+	transform: translateX(0);
     }
   }
 
@@ -703,8 +757,10 @@
   }
 
   .activity-content {
-    flex: 1;, display: flex;
-    flex-direction: column;, gap: 0.25rem;
+    flex: 1;
+	display: flex;
+    flex-direction: column;
+	gap: 0.25rem;
   }
 
   .activity-message {
@@ -713,11 +769,13 @@
   }
 
   .activity-time {
-    font-size: 0.75rem;, color: var(--text-muted, #888);
+    font-size: 0.75rem;
+	color: var(--text-muted, #888);
   }
 
   .no-activity {
-    text-align: center;, color: var(--text-muted);
+    text-align: center;
+	color: var(--text-muted);
     padding: 2rem;
   }
 

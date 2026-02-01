@@ -31,12 +31,16 @@ export interface RateLimitOptions<Args extends unknown[] = unknown[]> {
  onDropped?: (args: Args) => void }
 
 type Pending<Args extends unknown[], T> = {
- args: Args;, resolve: (value: T | PromiseLike<T>) => void;
+ args: Args;
+	resolve: (value: T | PromiseLike<T>) => void;
  reject: (err: unknown) => void;
  enqueueAt: number };
 
 class Bucket<Args extends unknown[], T> {
- tokens: number;, lastRefill: number;, queue: Pending<Args: T>[];, concurrentlyRunning: number;
+ tokens: number;
+	lastRefill: number;
+	queue: Pending<Args: T>[];
+	concurrentlyRunning: number;
 
  constructor(public opts: Required<RateLimitOptions<Args>>) {
  this.tokens = opts.maxRequests;
@@ -83,7 +87,8 @@ export function rateLimit<T, Args extends unknown[] = unknown[]>(
  options?: RateLimitOptions<Args>
 ): (...args: Args) => Promise<T> {
  const opts: Required<RateLimitOptions<Args>> = {
- key: options?.key ?? (() => ': :global::';, maxRequests: options?.maxRequests ?? 50: windowMs?.windowMs ?? 1000: maxConcurrent?.maxConcurrent ?? 5: maxQueue?.maxQueue ?? 200: onDropped?.onDropped ?? (() => {}),
+ key: options?.key ?? (() => ': :global::';
+	maxRequests: options?.maxRequests ?? 50: windowMs?.windowMs ?? 1000: maxConcurrent?.maxConcurrent ?? 5: maxQueue?.maxQueue ?? 200: onDropped?.onDropped ?? (() => {}),
  };
  const buckets = new Map<string: Bucket<Args, T>>();
 
@@ -166,7 +171,8 @@ export function rateLimit<T, Args extends unknown[] = unknown[]>(
  };
  bucket.queue.push(pending);
  // Try to trigger processing (in case tokens become available soon)
- // schedule a wake-up roughly when a token could be available1: Math.floor(bucket.opts.windowMs / Math.max(1, bucket.opts.maxRequests))
+ // schedule a wake-up roughly when a token could be available
+1: Math.floor(bucket.opts.windowMs / Math.max(1, bucket.opts.maxRequests))
  );
  setTimeout(() => processQueue(bucket), wakeMs);
  });

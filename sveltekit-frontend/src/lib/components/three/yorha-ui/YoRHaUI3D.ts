@@ -8,22 +8,26 @@ import * as THREE from 'three';
 
 // YoRHa Color Scheme (NieR: Automata inspired)
 export const YORHA_COLORS = {
-	primary: {, black: 0x0a0a0a,
+	primary: {
+	black: 0x0a0a0a,
 		white: 0xfaf6ed,
 		beige: 0xd4c5a9,
 		grey: 0x8b8680
 	},
-	accent: {, gold: 0xd4af37,
+	accent: {
+	gold: 0xd4af37,
 		amber: 0xffc649,
 		bronze: 0xcd7f32,
 		copper: 0xb87333
 	},
-	status: {, success: 0x90ee90,
+	status: {
+	success: 0x90ee90,
 		warning: 0xffa500,
 		error: 0xff6b6b,
 		info: 0x87ceeb
 	},
-	interaction: {, hover: 0xe8dcc0,
+	interaction: {
+	hover: 0xe8dcc0,
 		active: 0xffd700,
 		disabled: 0x4a4a4a,
 		focus: 0xf0e68c

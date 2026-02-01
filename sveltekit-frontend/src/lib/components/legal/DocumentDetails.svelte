@@ -8,7 +8,7 @@
     documentId = '',
     isVisible = false,
     onClose = () => {},
-    relatedDocumentsLoaded = (e: any) => {}
+	relatedDocumentsLoaded = (e: any) => {}
   }: {
     documentId?: string;
     isVisible?: boolean;
@@ -131,7 +131,7 @@
         gpu_analysis: data.gpu_analysis ?? null,
         enhanced_metadata: data.enhanced_metadata ?? null,
       },
-      hash: doc.content_hash ?? `hash_${Date.now()}`,
+	hash: doc.content_hash ?? `hash_${Date.now()}`,
       lastAccessed: new Date().toISOString(),
       size: (doc.content && doc.content.length) || 0,
     };
@@ -167,7 +167,8 @@
     // Emit event for graph updates if we have related documents
     if (relDocs.length > 0 && relatedDocumentsLoaded) {
       // Create custom event compatible struct
-      relatedDocumentsLoaded({ detail: {, relatedDocuments: relDocs } });
+      relatedDocumentsLoaded({ detail: {
+	relatedDocuments: relDocs } });
     }
 
     if (meta.gpu_analysis) {
@@ -333,9 +334,12 @@
 <!-- ============================================================================ -->
 <style>
   .modal-backdrop {
-    position: fixed;, top: 0;
-    left: 0;, width: 100%;
-    height: 100%;, background: rgba(0, 0, 0, 0.75);
+    position: fixed;
+	top: 0;
+    left: 0;
+	width: 100%;
+    height: 100%;
+	background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -344,9 +348,12 @@
   }
 
   .modal-content {
-    background: #ffffff;, width: 90%;
-    max-width: 900px;, height: 85vh;
-    border-radius: 12px;, display: flex;
+    background: #ffffff;
+	width: 90%;
+    max-width: 900px;
+	height: 85vh;
+    border-radius: 12px;
+	display: flex;
     flex-direction: column;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     overflow: hidden;
@@ -357,28 +364,34 @@
     border-bottom: 1px solid #e5e7eb;
     display: flex;
     justify-content: space-between;
-    align-items: center;, background: #f9fafb;
+    align-items: center;
+	background: #f9fafb;
   }
 
   .modal-header h2 {
     margin: 0;
-    font-size: 1.25rem;, color: #111827;
+    font-size: 1.25rem;
+	color: #111827;
   }
 
   .close-btn {
-    background: none;, border: none;
-    font-size: 24px;, cursor: pointer;
+    background: none;
+	border: none;
+    font-size: 24px;
+	cursor: pointer;
     color: #6b7280;
   }
 
   .modal-body {
     flex: 1;
-    overflow-y: auto;, padding: 0;
+    overflow-y: auto;
+	padding: 0;
     background: #f3f4f6;
   }
 
   .metrics-banner {
-    display: flex;, gap: 20px;
+    display: flex;
+	gap: 20px;
     padding: 12px 24px;
     background: #ffffff;
     border-bottom: 1px solid #e5e7eb;
@@ -387,7 +400,8 @@
 
   .metric {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center;
+	gap: 8px;
   }
 
   .metric .label {
@@ -395,11 +409,13 @@
   }
 
   .metric .value {
-    font-weight: 600;, color: #111827;
+    font-weight: 600;
+	color: #111827;
   }
 
   .metric .tag {
-    background: #e0e7ff;, color: #4338ca;
+    background: #e0e7ff;
+	color: #4338ca;
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -409,41 +425,51 @@
   .details-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 24px;, padding: 24px;
+    gap: 24px;
+	padding: 24px;
   }
 
   .main-content, .sidebar {
     display: flex;
-    flex-direction: column;, gap: 24px;
+    flex-direction: column;
+	gap: 24px;
   }
 
   .content-preview, .gpu-analysis-section, .sidebar-section {
-    background: #ffffff;, padding: 20px;
-    border-radius: 8px;, border: 1px solid #e5e7eb;
+    background: #ffffff;
+	padding: 20px;
+    border-radius: 8px;
+	border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   }
 
   h3 {
     margin: 0 0 16px 0;
-    font-size: 1rem;, color: #374151;
-    font-weight: 600;, display: flex;
-    align-items: center;, gap: 8px;
+    font-size: 1rem;
+	color: #374151;
+    font-weight: 600;
+	display: flex;
+    align-items: center;
+	gap: 8px;
   }
 
   .text-content {
-    line-height: 1.6;, color: #4b5563;
+    line-height: 1.6;
+	color: #4b5563;
     white-space: pre-wrap;
   }
 
   .related-list, .case-list {
-    list-style: none;, padding: 0;
+    list-style: none;
+	padding: 0;
     margin: 0;
   }
 
   .related-item, .case-item {
     padding: 12px 0;
     border-bottom: 1px solid #f3f4f6;
-    display: flex;, gap: 12px;
+    display: flex;
+	gap: 12px;
     align-items: center;
   }
 
@@ -452,7 +478,8 @@
   }
 
   .t-score {
-    background: #ecfdf5;, color: #059669;
+    background: #ecfdf5;
+	color: #059669;
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -460,17 +487,22 @@
   }
 
   .t-title {
-    font-size: 0.875rem;, color: #1f2937;
-    white-space: nowrap;, overflow: hidden;
+    font-size: 0.875rem;
+	color: #1f2937;
+    white-space: nowrap;
+	overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .primary-btn {
-    width: 100%;, padding: 10px;
-    background: #2563eb;, color: white;
+    width: 100%;
+	padding: 10px;
+    background: #2563eb;
+	color: white;
     border: none;
     border-radius: 6px;
-    font-weight: 500;, cursor: pointer;
+    font-weight: 500;
+	cursor: pointer;
   }
 
   .primary-btn:hover {
@@ -481,15 +513,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;, height: 100%;
-    color: #6b7280;, gap: 16px;
+    justify-content: center;
+	height: 100%;
+    color: #6b7280;
+	gap: 16px;
   }
 
   .spinner {
-    width: 40px;, height: 40px;
+    width: 40px;
+	height: 40px;
     border: 3px solid #e5e7eb;
     border-top: 3px solid #3b82f6;
-    border-radius: 50%;, animation: spin 1s linear infinite;
+    border-radius: 50%;
+	animation: spin 1s linear infinite;
   }
 
   @keyframes spin {
@@ -647,7 +683,8 @@
                       onclick={toggleGPUAnalysis}
                       class="text-sm" {showGPUAnalysis
                         ? 'bg-purple-100 text-purple-700'
-                        , 'bg-gray-100'}, hover:bg-purple-200 px-3 py-1 rounded"
+                        , 'bg-gray-100'},
+	hover:bg-purple-200 px-3 py-1 rounded"
                     >
                       {showGPUAnalysis ? 'ðŸ§  GPU Active' : 'âš¡ GPU Analysis'}
                     </button>

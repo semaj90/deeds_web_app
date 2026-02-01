@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
         if (error.status && error.status >= 500) return true;
         return false;
     },
-};
+	};
 
 /**
  * Execute a function with retry logic and exponential backoff
@@ -85,7 +85,7 @@ export async function withTimeout<T>(fn: () => Promise<T>, timeoutMs: number): P
 export async function withRetryAndTimeout<T>(
     fn: () => Promise<T>,
     retryOptions: RetryOptions = {},
-    timeoutMs: number = 30000
+	timeoutMs: number = 30000
 ): Promise<T> {
     return withRetry(() => withTimeout(fn, timeoutMs), retryOptions);
 }

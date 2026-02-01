@@ -19,7 +19,8 @@ export interface ExtractionResult {
 	success: boolean;
 	extractedText?: string;
 	metadata?: Record<string, unknown>;
-	error?: string;, processingTime: number;
+	error?: string;
+	processingTime: number;
 }
 
 export interface FrameExtractionResult extends ExtractionResult {
@@ -51,12 +52,14 @@ type FFProbeResult = {
 };
 
 type AudioInfo = {
-	duration: number;, sampleRate: number;
+	duration: number;
+	sampleRate: number;
 	channels: number;
 };
 
 type VideoInfo = {
-	duration: number;, width: number;
+	duration: number;
+	width: number;
 	height: number;
 };
 
@@ -117,12 +120,13 @@ export async function extractTextFromImage(
 			return {
 				success: true,
 				extractedText: data.text.trim(),
-				metadata: {, confidence: data.confidence,
+				metadata: {
+	confidence: data.confidence,
 					wordCount: data.words?.length ?? 0,
 					language,
 					optimization: 'greyscale_sharpen'
 				},
-				processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 			};
 		} finally {
 			await worker.terminate();
@@ -215,13 +219,14 @@ export async function extractAudioFromBuffer(
 		return {
 			success: true,
 			audioPath: outputPath!,
-			metadata: {, originalFormat: extension,
+			metadata: {
+	originalFormat: extension,
 				extractedFormat: 'wav',
 				sampleRate: audioInfo.sampleRate,
 				duration: audioInfo.duration,
 				channels: audioInfo.channels
 			},
-			duration: audioInfo.duration,
+	duration: audioInfo.duration,
 			sampleRate: audioInfo.sampleRate,
 			processingTime: Date.now() - startTime
 		};
@@ -322,12 +327,13 @@ export async function sampleFramesFromVideo(
 			success: true,
 			frames: frameBuffers,
 			frameCount: frameBuffers.length,
-			metadata: {, originalFormat: extension,
+			metadata: {
+	originalFormat: extension,
 				videoDuration: duration,
 				frameTimestamps: timestamps,
 				frameResolution: '1280x720'
 			},
-			processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 		};
 	} catch (error) {
 		return {
@@ -359,11 +365,12 @@ export async function parseJsonWithSimd(jsonText: string): Promise<ExtractionRes
 				return {
 					success: true,
 					extractedText: JSON.stringify(parsed, null, 2),
-					metadata: {, parser: 'simdjson-wasm',
+					metadata: {
+	parser: 'simdjson-wasm',
 						originalSize: jsonText.length,
 						jsonKeys: typeof parsed === 'object' ? Object.keys(parsed ?? {}).length : 0
 					},
-					processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 				};
 			} catch (simdjsonError) {
 				console.warn('simdjson-wasm failed, falling back to JSON.parse:', simdjsonError);
@@ -376,11 +383,12 @@ export async function parseJsonWithSimd(jsonText: string): Promise<ExtractionRes
 		return {
 			success: true,
 			extractedText: JSON.stringify(parsed, null, 2),
-			metadata: {, parser: 'native',
+			metadata: {
+	parser: 'native',
 				originalSize: jsonText.length,
 				jsonKeys: typeof parsed === 'object' ? Object.keys(parsed ?? {}).length : 0
 			},
-			processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 		};
 	} catch (error) {
 		return {
@@ -499,10 +507,11 @@ export async function extractContent(
 			return {
 				success: true,
 				extractedText: text,
-				metadata: {, originalSize: buffer.length,
+				metadata: {
+	originalSize: buffer.length,
 					encoding: 'utf-8'
 				},
-				processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 			};
 		}
 
@@ -520,7 +529,7 @@ export async function extractContent(
 					size: buffer.length,
 					isMediaFile: true
 				},
-				processingTime: Date.now() - startTime
+	processingTime: Date.now() - startTime
 			};
 		}
 

@@ -47,7 +47,7 @@ export function useRedisAI() {
 		taskType: 'complex_legal' | 'document_analysis' | 'case_synthesis' | 'risk_assessment',
 		queryText: string,
 		metadata: Record<string, unknown> = {},
-		priority = 100
+	priority = 100
 	): Promise<string> {
 		isProcessing = true;
 		error = null;
@@ -69,13 +69,13 @@ export function useRedisAI() {
 		get isProcessing() {
 			return isProcessing;
 		},
-		get lastResult() {
+	get lastResult() {
 			return lastResult;
 		},
-		get error() {
+	get error() {
 			return error;
 		},
-		query: queueTask,
+	query: queueTask,
 		getTaskResult,
 		clearError() {
 			error = null;
@@ -109,10 +109,10 @@ export function useRedisMonitoring() {
 		get healthData() {
 			return healthData;
 		},
-		get isHealthy() {
+	get isHealthy() {
 			return get(isRedisHealthy);
 		},
-		refresh: clearCache
+	refresh: clearCache
 	};
 }
 
@@ -179,7 +179,7 @@ export function useRedisTaskQueue(defaultPollInterval = 5000) {
 		get isPolling() {
 			return isPolling;
 		},
-		startPolling: stopPolling,
+	startPolling: stopPolling,
 		pollOnce: getTask,
 		getAllTasks: getTasksByStatus,
 		getTasksForUser
@@ -227,7 +227,7 @@ export function useRedisComponentCache(componentName: string, config: ComponentC
 		get cacheStats() {
 			return getCacheStats();
 		},
-		queryWithCache: clearComponentCache
+	queryWithCache: clearComponentCache
 	};
 }
 
@@ -279,13 +279,13 @@ export function useRedisForm() {
 		get isSubmitting() {
 			return isSubmitting;
 		},
-		get submitError() {
+	get submitError() {
 			return submitError;
 		},
-		get lastSubmission() {
+	get lastSubmission() {
 			return lastSubmission;
 		},
-		submitForm
+	submitForm
 	};
 }
 

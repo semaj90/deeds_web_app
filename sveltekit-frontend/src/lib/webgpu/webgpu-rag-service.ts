@@ -9,14 +9,21 @@ interface WebGPUInitialization {
 }
 
 interface ProcessQueryResult {
-    query: string;, answer: string;
-    tokensUsed: number;, cacheHit: boolean;
-    webgpuAccelerated: boolean;, embeddingDimensions: number;
-    quantizationApplied: {, precision: string;
-        compressionRatio: number;, memorySavedMB: number;
+    query: string;
+	answer: string;
+    tokensUsed: number;
+	cacheHit: boolean;
+    webgpuAccelerated: boolean;
+	embeddingDimensions: number;
+    quantizationApplied: {
+	precision: string;
+        compressionRatio: number;
+	memorySavedMB: number;
     } | null;
-    profiling: {, ttfbMs: number;
-        totalMs: number;, gpuProcessingMs: number;
+    profiling: {
+	ttfbMs: number;
+        totalMs: number;
+	gpuProcessingMs: number;
     };
     fallbackReason?: string;
 }
@@ -54,7 +61,8 @@ export async function initializeWebGPU(): Promise<WebGPUInitialization> {
         if (!cachedDevice) {
             cachedDevice = await cachedAdapter.requestDevice({
                 requiredFeatures: [],
-                requiredLimits: {, maxStorageBufferBindingSize: 128 * 1024 * 1024, // 128MB for large legal documents
+                requiredLimits: {
+	maxStorageBufferBindingSize: 128 * 1024 * 1024, // 128MB for large legal documents
                     maxBufferSize: 128 * 1024 * 1024
                 }
             });
@@ -76,8 +84,9 @@ function fallbackProcessing(query: string, _options?: RAGServiceProcessQueryOpti
         cacheHit: false,
         webgpuAccelerated: false,
         fallbackReason: 'WebGPU unavailable',
-        profiling: {, ttfbMs: 20, totalMs: 45, gpuProcessingMs: 0 },
-        embeddingDimensions: 0,
+        profiling: {
+	ttfbMs: 20, totalMs: 45, gpuProcessingMs: 0 },
+	embeddingDimensions: 0,
         quantizationApplied: null
     };
 }
@@ -136,7 +145,8 @@ export async function processQuery(
                 compressionRatio: conversionResult.compressionRatio,
                 memorySavedMB: (conversionResult.originalSize - conversionResult.compressedSize) / (1024 * 1024)
             } : null,
-            profiling: {, ttfbMs: Math.round(processingTime * 0.3),
+            profiling: {
+	ttfbMs: Math.round(processingTime * 0.3),
                 totalMs: Math.round(processingTime),
                 gpuProcessingMs: Math.round(processingTime * 0.6)
             }
@@ -162,7 +172,9 @@ export const webgpuRAGService = {
 
         const result = await processQuery(query, {
             embeddings: mockEmbeddings,
-            quantization: {, precision: 'fp16' }, // Default to FP16 for legal AI
+            quantization: {
+	precision: 'fp16' },
+	// Default to FP16 for legal AI
             memoryBudgetMB: 512, // Default 512MB budget
         });
 
@@ -172,17 +184,18 @@ export const webgpuRAGService = {
                 ...(item as object),
                 score: Math.random()
             })),
-            performance: {, webgpuAccelerated: result.webgpuAccelerated,
+            performance: {
+	webgpuAccelerated: result.webgpuAccelerated,
                 processingTime: `${result.profiling.totalMs}ms`,
                 quantization: result.quantizationApplied
             },
-            embeddings: {, dimensions: result.embeddingDimensions,
+	embeddings: {
+	dimensions: result.embeddingDimensions,
                 quantized: !!result.quantizationApplied
             }
         };
     },
-
-    initializeWebGPU: async () => {
+	initializeWebGPU: async () => {
         console.log('🔥 WebGPU RAG service initialization');
         const result = await initializeWebGPU();
 
@@ -201,8 +214,7 @@ export const webgpuRAGService = {
             maxBufferSize: result.device ? '128MB' : '0MB'
         };
     },
-
-    releaseResources: () => {
+	releaseResources: () => {
         console.log('🧹 WebGPU resources released');
         if (cachedDevice) {
             cachedDevice.destroy();
@@ -210,8 +222,7 @@ export const webgpuRAGService = {
         }
         cachedAdapter = null;
     },
-
-    // New utility methods
+	// New utility methods
     processEmbeddings: async (embeddings: (Float32Array | number[])[]) => {
         const { device } = await initializeWebGPU();
         if (!device) return null;
@@ -238,8 +249,7 @@ export const webgpuRAGService = {
             success: true
         };
     },
-
-    getMemoryInfo: async () => {
+	getMemoryInfo: async () => {
         const { adapter } = await initializeWebGPU();
         if (!adapter) return null;
 

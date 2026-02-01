@@ -4,7 +4,8 @@
 // Future refactors: replace other duplicate declarations with imports from this file.
 
 export interface LegalDocumentUnified {
-    id: string;, title: string;
+    id: string;
+	title: string;
     content?: string;
     type?: string; // e.g. 'legal', 'contract', etc.
     summary?: string;

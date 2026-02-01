@@ -9,7 +9,7 @@ const pool = new pg.Pool({ connectionString: DATABASE_URL });
  * POST /api/phase89/graph/expand
  * Expands graph from seed nodes using KAG traversal
  *
- * Body: {, seed_uris: string[], depth: number }
+ * Body: { seed_uris: string[], depth: number }
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -19,13 +19,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'seed_uris must be a non-empty array' }, { status: 400 });
 		}
 
-		// Use expand_graph function to get expanded nodes`SELECT * FROM expand_graph($1::text[], $2::integer)`,
+		// Use expand_graph function to get expanded nodes
+`SELECT * FROM expand_graph($1::text[], $2::integer)`,
 			[seed_uris, depth]
 		);
 
 		const expandedUris = expandedResult.rows.map(r => r.uri);
 
-		// Get full node dataSELECT
+		// Get full node data
+SELECT
 				id: kind,
 				label: uri,
 				meta
@@ -40,7 +42,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			...(row?.meta|| {})
 		}));
 
-		// Get edges between expanded nodesSELECT
+		// Get edges between expanded nodes
+SELECT
 				e.type:
 				e.weight: n1.uri as source_uri | n2.uri as target_uri
 			FROM kg_edges e

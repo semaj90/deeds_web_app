@@ -53,9 +53,10 @@ describe('FixPattern Interface', () => {
       name: 'dynamic-replacement',
       regex: /(\w+):\s*(\w+):\s*(\w+)/g,
       replacement: (match: string, key1: string, val1: string, key2: string) => {
-        return `${key1}: ${val1}, ${key2}`;
+        return `${key1}: ${val1},
+	${key2}`;
       },
-    };
+	};
 
     const testContent = 'prop: value, next';
     const result = testContent.replace(pattern.regex, pattern.replacement as any);
@@ -266,7 +267,7 @@ describe('ErrorRemediationConfig interface', () => {
           regex: /test/g,
           replacement: 'fixed',
         },
-      ],
+	],
     };
 
     expect(config.targetDirectory).toBe('src');

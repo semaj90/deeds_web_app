@@ -29,7 +29,7 @@ export async function checkOllamaHealth(): Promise<boolean> {
  const response = await fetch(`${OLLAMA_ENDPOINTS.base}/api/tags`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json' },
- signal: AbortSignal.timeout(5000),
+	signal: AbortSignal.timeout(5000),
  });
 
  if (!response.ok) return false;
@@ -66,13 +66,16 @@ export async function generateWithGemma3Legal(
  const response = await fetch(getOllamaEndpoint('gemma3Legal'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: OLLAMA_ENDPOINTS.gemma3Legal,
+	body: JSON.stringify({
+	model: OLLAMA_ENDPOINTS.gemma3Legal,
  prompt: stream,
- options: {, num_predict: max_tokens,
+ options: {
+	num_predict: max_tokens,
  temperature,
  top_p: num_ctx,
  },
- }, signal: AbortSignal.timeout(30000),
+	},
+	signal: AbortSignal.timeout(30000),
  });
 
  if (!response.ok) {
@@ -96,9 +99,11 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
  const response = await fetch(getOllamaEndpoint('embeddingGemma'), {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: OLLAMA_ENDPOINTS.embeddingGemma,
+	body: JSON.stringify({
+	model: OLLAMA_ENDPOINTS.embeddingGemma,
  stream: false,
- }, signal: AbortSignal.timeout(10000),
+ },
+	signal: AbortSignal.timeout(10000),
  });
 
  if (!response.ok) {
@@ -126,9 +131,11 @@ async function fallbackToCudaService(
  const response = await fetch(`${cudaEndpoint}/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, prompt: max_length,
+	body: JSON.stringify({
+	prompt: max_length,
  temperature,
- }, signal: AbortSignal.timeout(15000),
+ },
+	signal: AbortSignal.timeout(15000),
  });
 
  if (!response.ok) {
@@ -151,7 +158,7 @@ export async function getAvailableModels(): Promise<string[]> {
  const response = await fetch(`${OLLAMA_ENDPOINTS.base}/api/tags`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json' },
- signal: AbortSignal.timeout(5000),
+	signal: AbortSignal.timeout(5000),
  });
 
  if (!response.ok) return [];
@@ -168,7 +175,8 @@ export async function getAvailableModels(): Promise<string[]> {
  * Contextual chat with robust fetch calls
  */
 export async function contextualChat(
- messages: Array<{, role: string, content, string }>,
+ messages: Array<{
+	role: string, content, string }>,
  context?: any
 ): Promise<string> {
  try {
@@ -176,7 +184,7 @@ export async function contextualChat(
  const contextResponse = await fetch('/api/contextual/state', {
  method: 'GET',
  headers: { 'Content-Type': 'application/json' },
- signal: AbortSignal.timeout(5000),
+	signal: AbortSignal.timeout(5000),
  });
 
  let contextState = {};
@@ -188,7 +196,8 @@ export async function contextualChat(
  const predictionsResponse = await fetch('/api/contextual/predictions', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ messages, context }, signal: AbortSignal.timeout(5000),
+	body: JSON.stringify({ messages, context },
+	signal: AbortSignal.timeout(5000),
  });
 
  let predictions = {};

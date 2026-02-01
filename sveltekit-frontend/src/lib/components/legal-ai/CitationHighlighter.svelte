@@ -2,7 +2,8 @@
 	import { createEventDispatcher } from 'svelte';
 
 	interface HighlightedCitation {
-		text: string;, startIndex: number;
+		text: string;
+	startIndex: number;
 		endIndex: number;
 	}
 
@@ -112,25 +113,31 @@
 <style>
 	.citation-highlighter {
 		display: flex;
-		flex-direction: column;, gap: 1rem;
+		flex-direction: column;
+	gap: 1rem;
 	}
 
 	.content {
 		padding: 1rem;
-		background-color: #f9f7f4;, border: 1px solid #d4a574;
+		background-color: #f9f7f4;
+	border: 1px solid #d4a574;
 		border-radius: 6px;
-		line-height: 1.6;, color: #333;
-		user-select: text;, cursor: text;
+		line-height: 1.6;
+	color: #333;
+		user-select: text;
+	cursor: text;
 	}
 
 	:global(.citation-highlight) {
-		background-color: #ffd700;, padding: 0.1rem 0.2rem;
+		background-color: #ffd700;
+	padding: 0.1rem 0.2rem;
 		border-radius: 2px;
 		font-weight: 500;
 	}
 
 	.save-button-container {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		padding: 0.75rem;
 		background-color: #f0ebe0;
 		border-radius: 4px;
@@ -139,10 +146,12 @@
 
 	.save-citation-btn {
 		padding: 0.5rem 1rem;
-		background-color: #8b4513;, color: #f5f1e8;
+		background-color: #8b4513;
+	color: #f5f1e8;
 		border: none;
 		border-radius: 4px;
-		font-weight: 500;, cursor: pointer;
+		font-weight: 500;
+	cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -152,9 +161,11 @@
 
 	.cancel-btn {
 		padding: 0.5rem 0.75rem;
-		background-color: #e0d5c7;, color: #2c2c2c;
+		background-color: #e0d5c7;
+	color: #2c2c2c;
 		border: none;
-		border-radius: 4px;, cursor: pointer;
+		border-radius: 4px;
+	cursor: pointer;
 		transition: all 0.2s;
 	}
 
@@ -170,33 +181,43 @@
 
 	.citations-list h4 {
 		margin: 0 0 0.75rem 0;
-		font-size: 0.95rem;, color: #2c2c2c;
+		font-size: 0.95rem;
+	color: #2c2c2c;
 	}
 
 	ul {
-		list-style: none;, padding: 0;
-		margin: 0;, display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		list-style: none;
+	padding: 0;
+		margin: 0;
+	display: flex;
+		flex-direction: column;
+	gap: 0.5rem;
 	}
 
 	.citation-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 0.5rem;
-		background-color: white;, border: 1px solid #d4a574;
+		align-items: center;
+	padding: 0.5rem;
+		background-color: white;
+	border: 1px solid #d4a574;
 		border-radius: 4px;
 	}
 
 	.citation-text {
 		font-family: 'Monaco', 'Courier New', monospace;
-		font-size: 0.85rem;, color: #8b4513;
+		font-size: 0.85rem;
+	color: #8b4513;
 		font-weight: 500;
 	}
 
 	.remove-btn {
-		background: none;, border: none;
-		color: #999;, cursor: pointer;
-		font-size: 1rem;, padding: 0;
+		background: none;
+	border: none;
+		color: #999;
+	cursor: pointer;
+		font-size: 1rem;
+	padding: 0;
 		transition: color 0.2s;
 	}
 

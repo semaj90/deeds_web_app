@@ -2,11 +2,15 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface JobStatus {
- jobId: string;, status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+ jobId: string;
+	status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
  progress: number; // 0-100
  result?: any;
- error?: string;, createdAt: string;, updatedAt: string;
- estimatedCompletionTime?: string;, priority: 'low' | 'normal' | 'high' | 'critical';
+ error?: string;
+	createdAt: string;
+	updatedAt: string;
+ estimatedCompletionTime?: string;
+	priority: 'low' | 'normal' | 'high' | 'critical';
  type: string;
 }
 
@@ -23,7 +27,7 @@ export async function getJobStatus(jobId: string): Promise<JobStatus> {
  const response = await fetch(`/api/jobs/${ jobId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -43,7 +47,7 @@ export async function cancelJob(jobId: string): Promise<void> {
  const response = await fetch(`/api/jobs/${ jobId }/cancel`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -62,7 +66,7 @@ export async function listActiveJobs(): Promise<JobStatus[]> {
  const response = await fetch('/api/jobs/active', {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -120,7 +124,7 @@ export async function clearJobCache(jobId: string): Promise<void> {
  const response = await fetch(`/api/jobs/${ jobId }/cache`, {
  method: 'DELETE',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();

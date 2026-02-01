@@ -194,7 +194,8 @@ export async function runMultiPassProcessor(
     // Stop if no fixes were found
     if (cfg.stopOnNoFixes && result.totalFixes === 0) {
       if (cfg.verbose) {
-        console.log(`No fixes found in pass ${passNum}, stopping.`);
+        console.log(`No fixes found in pass ${passNum},
+	stopping.`);
       }
       break;
     }
@@ -353,7 +354,8 @@ export async function runCategoryRemediation(
 
     if (cfg.stopOnNoFixes && result.totalFixes === 0) {
       if (cfg.verbose) {
-        console.log(`No fixes found in pass ${passNum}, stopping.`);
+        console.log(`No fixes found in pass ${passNum},
+	stopping.`);
       }
       break;
     }
@@ -399,10 +401,14 @@ export async function runCategoryRemediation(
 /**
  * Generate a human-readable summary of the multi-pass result
  */
-function generateSummary(data: {, passes: PassResult[];
-  totalFixes: number;, totalFilesFixed: number;
-  initialErrors: number;, finalErrors: number;
-  errorReduction: number;, totalDurationMs: number;
+function generateSummary(data: {
+	passes: PassResult[];
+  totalFixes: number;
+	totalFilesFixed: number;
+  initialErrors: number;
+	finalErrors: number;
+  errorReduction: number;
+	totalDurationMs: number;
   dryRun: boolean;
 }): string {
   const lines: string[] = [

@@ -4,17 +4,23 @@ import postgres from 'postgres';
 import { redisService } from './redis-service.js';
 
 interface DatabasePoolConfig {
-	host: string;, port: number;
-	database: string;, username: string;
-	password: string;, max: number;
-	idle_timeout: number;, connect_timeout: number;
+	host: string;
+	port: number;
+	database: string;
+	username: string;
+	password: string;
+	max: number;
+	idle_timeout: number;
+	connect_timeout: number;
 	prepare: boolean; // boolean in postgres options, simplified from 'require' | 'allow' | 'prefer'
     ssl: boolean | 'require' | 'prefer' | 'allow';
 }
 
 interface CachedQuery {
-	sql: string;, params: any[];
-	timestamp: number;, result: unknown;
+	sql: string;
+	params: any[];
+	timestamp: number;
+	result: unknown;
 	ttl: number; // seconds
 }
 
@@ -104,7 +110,8 @@ class DatabasePoolService {
 			ssl: this.config.ssl,
 			timeout: this.config.connect_timeout * 1000,
             idle_timeout: dynamicConfig.idle_timeout ?? this.config.idle_timeout,
-			onnotice: () => {}, // Suppress debug
+			onnotice: () => {},
+	// Suppress debug
 			debug: process.env.NODE_ENV === 'development'
 		} as any);
 

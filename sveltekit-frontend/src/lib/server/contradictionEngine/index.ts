@@ -53,7 +53,7 @@ export async function analyzeContradictions(
 				...(existing.metadata ?? {}),
                 ragDocs: ragDocs.map((doc) => doc.text), // Correctly structure metadata object
 			},
-		});
+	});
 	}
 
 	const factContradictions = [

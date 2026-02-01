@@ -30,7 +30,8 @@ Use dramatic tone but be precise.
     const response = await fetch(`${GEMMA_ENDPOINT}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
             prompt: prompt,
             stream: false
         }),

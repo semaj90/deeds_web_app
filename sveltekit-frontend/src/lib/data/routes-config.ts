@@ -3,7 +3,8 @@ import type { ComponentType } from 'svelte';
 /**
  * Complete Routes Configuration for YoRHa Navigation
  * Single source of truth for nav + route dashboards.
- */| 'main'
+ */
+| 'main'
 	| 'demo'
 	| 'admin'
 	| 'dev'
@@ -16,17 +17,21 @@ import type { ComponentType } from 'svelte';
 export type RouteStatus = 'active' | 'beta' | 'experimental' | 'deprecated' | 'development';
 
 export interface RouteDefinition {
-	id: string;, label: string;
+	id: string;
+	label: string;
 	route: string; // SvelteKit path (e.g. "/cases/[id]" is still "/cases/:id" in *your* UI, but keep consistent)
 	icon: string; // emoji / glyph
-	description: string;, category: RouteCategory;
-	status: RouteStatus;, tags: string[];
+	description: string;
+	category: RouteCategory;
+	status: RouteStatus;
+	tags: string[];
 }
 
 /**
  * NOTE: Keep this list readable. If you generate routes, generate into a separate file
  * and merge/dedupe at build time.
- */// === MAIN OPERATIONS ===
+ */
+// === MAIN OPERATIONS ===
 	{
 		id: 'command-center',
 		label: 'Command Center',
@@ -127,7 +132,6 @@ export interface RouteDefinition {
 		status: 'active',
 		tags: ['chat', 'ai', 'conversation']
 	},
-
 	// === DEMOS (trim or keep expanding; this is just a sample scaffold) ===
 	{
 		id: 'demo-overview',
@@ -149,7 +153,6 @@ export interface RouteDefinition {
 		status: 'active',
 		tags: ['vector', 'search', 'similarity']
 	},
-
 	// === ADMIN / DEV ===
 	{
 		id: 'routes-index',
@@ -213,18 +216,29 @@ export function getRoutesByTag(tag: string): RouteDefinition[] {
 	return allRoutes.filter((r) => r.tags.includes(tag));
 }
 
-/** ---------- categories metadata ---------- */RouteCategory,
-	{ label: string;, icon: string; description: string; color, string }
+/** ---------- categories metadata ---------- */
+RouteCategory,
+	{ label: string;
+	icon: string; description: string; color, string }
 > = {
-	main: {, label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },
-	demo: {, label: 'AI DEMONSTRATIONS', icon: '🎯', description: 'AI capabilities and technology showcases', color: '#00ff41' },
-	ai: {, label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
-	legal: {, label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
-	dev: {, label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
-	admin: {, label: 'ADMINISTRATION', icon: '⚙️', description: 'System administration and configuration', color: '#fb7185' },
-	utilities: {, label: 'UTILITIES', icon: '🧰', description: 'Utilities and helpers', color: '#60a5fa' },
-	auth: {, label: 'AUTH', icon: '🔐', description: 'Authentication and onboarding', color: '#f59e0b' },
-	system: {, label: 'SYSTEM', icon: '🧩', description: 'System internals and diagnostics', color: '#34d399' }
+	main: {
+	label: 'CORE OPERATIONS', icon: '⚡', description: 'Primary system operations and tools', color: '#ffbf00' },
+	demo: {
+	label: 'AI DEMONSTRATIONS', icon: '🎯', description: 'AI capabilities and technology showcases', color: '#00ff41' },
+	ai: {
+	label: 'AI SYSTEMS', icon: '🤖', description: 'Artificial intelligence tools and interfaces', color: '#ff6b6b' },
+	legal: {
+	label: 'LEGAL OPERATIONS', icon: '⚖️', description: 'Legal-specific tools and workflows', color: '#4ecdc4' },
+	dev: {
+	label: 'DEVELOPMENT TOOLS', icon: '🔧', description: 'Development and debugging utilities', color: '#a78bfa' },
+	admin: {
+	label: 'ADMINISTRATION', icon: '⚙️', description: 'System administration and configuration', color: '#fb7185' },
+	utilities: {
+	label: 'UTILITIES', icon: '🧰', description: 'Utilities and helpers', color: '#60a5fa' },
+	auth: {
+	label: 'AUTH', icon: '🔐', description: 'Authentication and onboarding', color: '#f59e0b' },
+	system: {
+	label: 'SYSTEM', icon: '🧩', description: 'System internals and diagnostics', color: '#34d399' }
 };
 
 /** ---------- stats ---------- */
@@ -239,7 +253,8 @@ export const routeStats = {
 	byCategory: (Object.keys(routeCategories) as RouteCategory[]).reduce((acc, c) => {
 		acc[c] = getRoutesByCategory(c).length;
 		return acc;
-	}, {} as Record<RouteCategory, number>)
+	},
+	{} as Record<RouteCategory, number>)
 };
 
 /** ---------- dynamic routes (optional) ---------- */
@@ -252,7 +267,8 @@ export interface DynamicRouteConfig {
 
 export interface GeneratedRoute {
 	path: string;
-	handler?: ComponentType;, config: DynamicRouteConfig;
+	handler?: ComponentType;
+	config: DynamicRouteConfig;
 }
 
 /**

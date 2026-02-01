@@ -27,7 +27,7 @@ export const errorEventsTable = pgTable('error_events',
         clusterId: text('cluster_id'),
         createdAt: timestamp('created_at').defaultNow(),
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: index('idx_error_events_route').on(table.routePath),
             clusterIdIdx: index('idx_error_events_cluster').on(table.clusterId),

@@ -3,7 +3,7 @@
  * These utilities expose a stable and well-typed interface that mirrors
  * the intent of the original implementation.
  */
-import { onMount, onDestroy } from 'svelte';
+// Migrated to $effect
 import { get } from 'svelte/store';
 import {
     redisOrchestratorClient,
@@ -102,9 +102,11 @@ export function useRedisMonitoring() {
         console.log('Cache cleared');
     }
 
-    onMount(() => {
+    $effect(() => {
+
         refresh();
-    });
+    
+});
 
     return {
         get stats() {
@@ -160,9 +162,9 @@ export function useRedisTaskQueue() {
         return tasks.filter((t) => t.userId === userId);
     }
 
-    onDestroy(() => {
+    // TODO: Add as cleanup in $effect: return () => {
         stopPolling();
-    });
+    }
 
     return {
         get isPolling() {

@@ -52,10 +52,12 @@
 
 <style>
   .loading-spinner {
-    width: 16px;, height: 16px;
+    width: 16px;
+	height: 16px;
     border: 2px solid currentColor;
     border-top-color: transparent;
-    border-radius: 50%;, animation: spin 0.6s linear infinite;
+    border-radius: 50%;
+	animation: spin 0.6s linear infinite;
   }
 
   @keyframes spin {

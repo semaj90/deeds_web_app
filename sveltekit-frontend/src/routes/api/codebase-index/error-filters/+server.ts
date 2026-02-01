@@ -13,11 +13,12 @@ const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const ERROR_CARDS_COLLECTION = 'phase90_error_cards';
 
 export const GET: RequestHandler = async () => {
-	try {`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
+	try {
+`${QDRANT_URL}/collections/${ERROR_CARDS_COLLECTION}/points/scroll`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, limit: 10000,
+				body: JSON.stringify({ limit: 10000,
 					with_payload: true,
 					with_vector: false
 				})
@@ -36,7 +37,7 @@ export const GET: RequestHandler = async () => {
 		const surfaces = new Set<string>();
 		const techs = new Set<string>();
 
-		points.forEach((p: {, payload: { errorCode?: string, surface?: string[], tech?: string[] } }) => {
+		points.forEach((p: { payload: { errorCode?: string, surface?: string[], tech?: string[] } }) => {
 			if (p.payload?.errorCode) {
 				errorCodes.add(p.payload.errorCode);
 			}

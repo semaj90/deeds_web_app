@@ -51,8 +51,9 @@ describe('IndexedDB Cache Service', () => {
 
 	it('should return null for expired entries', async () => {
 		const expiredEntry = {
-			data: {, name: 'Old Data' },
-			timestamp: Date.now() - 7200000, // 2 hours ago
+			data: {
+	name: 'Old Data' },
+	timestamp: Date.now() - 7200000, // 2 hours ago
 			ttl: 3600000 // 1 hour TTL
 		};
 
@@ -93,8 +94,9 @@ describe('IndexedDB Cache Service', () => {
 
 	it('should track statistics', async () => {
 		const cacheEntry = {
-			data: {, test: 'data' },
-			timestamp: Date.now(),
+			data: {
+	test: 'data' },
+	timestamp: Date.now(),
 			ttl: 3600000
 		};
 
@@ -125,7 +127,8 @@ describe('LokiJS Cache Service', () => {
 	it('should insert document into collection', async () => {
 		const { lokiCache } = await import('$lib/cache/loki-cache.svelte');
 
-		const doc = lokiCache.insert('test-collection', 'doc-1', { name: 'Test' }, { ttl: 3600000 });
+		const doc = lokiCache.insert('test-collection', 'doc-1', { name: 'Test' },
+	{ ttl: 3600000 });
 
 		expect(doc).toBeDefined();
 		expect(doc?.data).toEqual({ name: 'Test' });
@@ -144,7 +147,8 @@ describe('LokiJS Cache Service', () => {
 		const { lokiCache } = await import('$lib/cache/loki-cache.svelte');
 
 		// Insert with very short TTL
-		lokiCache.insert('test-collection', 'expire-me', { data: 'old' }, { ttl: -1000 });
+		lokiCache.insert('test-collection', 'expire-me', { data: 'old' },
+	{ ttl: -1000 });
 
 		// Should be expired
 		const result = lokiCache.findById('test-collection', 'expire-me');
@@ -276,8 +280,9 @@ describe('Unified Cache Service', () => {
 
 	it('should calculate hit rate correctly', async () => {
 		const cacheEntry = {
-			data: {, test: 'data' },
-			timestamp: Date.now(),
+			data: {
+	test: 'data' },
+	timestamp: Date.now(),
 			ttl: 3600000
 		};
 
@@ -366,7 +371,8 @@ describe('Offline Fetch Helper', () => {
 		await expect(
 			offlineMutate('/api/test', {
 				method: 'POST',
-				body: JSON.stringify({, test: 'data' })
+				body: JSON.stringify({
+	test: 'data' })
 			})
 		).rejects.toThrow('queued for sync');
 

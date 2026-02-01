@@ -49,7 +49,17 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({
+	minLength: 1, maxLength: 50 },
+	file: fc.string({
+	minLength: 1, maxLength: 100 },
+	line: fc.integer({
+	min: 1, max: 1000 },
+	column: fc.integer({
+	min: 1, max: 100 },
+	message: fc.string({
+	minLength: 1, maxLength: 200 },
+	type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 20 }
  ),
@@ -101,7 +111,8 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  });
 
  it('should assign errors to clusters based on similarity', async () => {
- // Create two groups of similar errors{
+ // Create two groups of similar errors
+{
  id: 'error-1',
  file: 'test.ts',
  line: 10, column: 5, message: 'Type, error: expected string',
@@ -110,7 +121,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: 'error-2',
  file: 'test.ts',
  line: 20, column: 10, message: 'Type, error: expected string',
@@ -118,7 +129,8 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- }];{
+ }];
+{
  id: 'error-3',
  file: 'test.svelte',
  line: 5, column: 2, message: 'Svelte component error',
@@ -173,7 +185,17 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  fc.asyncProperty(
  fc.array(
  fc.record({
- id: fc.string({, minLength: 1, maxLength: 50 }, file: fc.string({, minLength: 1, maxLength: 100 }, line: fc.integer({, min: 1, max: 1000 }, column: fc.integer({, min: 1, max: 100 }, message: fc.string({, minLength: 1, maxLength: 200 }, type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
+ id: fc.string({
+	minLength: 1, maxLength: 50 },
+	file: fc.string({
+	minLength: 1, maxLength: 100 },
+	line: fc.integer({
+	min: 1, max: 1000 },
+	column: fc.integer({
+	min: 1, max: 100 },
+	message: fc.string({
+	minLength: 1, maxLength: 200 },
+	type: fc.constantFrom('typescript' as const, 'svelte' as const, severity: fc.constantFrom('error' as const, 'warning' as const, status: fc.constantFrom('new' as const),
  }),
  { minLength: 1, maxLength: 10 }
  ),
@@ -204,7 +226,8 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  */
  describe('Property: Cluster Prioritization', () => {
  it('should prioritize clusters by impact descending', async () => {
- const errors: Error[] = Array.from({ length: 10 }, (_: any, i: any) => ({
+ const errors: Error[] = Array.from({ length: 10 },
+	(_: any, i: any) => ({
  id: `error-${i}`,
  file: 'test.ts',
  line: i, column: 1, message: `Error ${i}`,
@@ -227,7 +250,8 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  });
 
  it('should be idempotent', async () => {
- const errors: Error[] = Array.from({ length: 5 }, (_: any, i: any) => ({
+ const errors: Error[] = Array.from({ length: 5 },
+	(_: any, i: any) => ({
  id: `error-${i}`,
  file: 'test.ts',
  line: i, column: 1, message: `Error ${i}`,

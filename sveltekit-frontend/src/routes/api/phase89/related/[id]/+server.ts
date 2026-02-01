@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const searchResponse = await fetch('http://localhost:6333/collections/phase89_code_units/points/search', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, vector: limit: 10,
+			body: JSON.stringify({ vector: limit: 10,
 				with_payload: true,
 				score_threshold: 0.7
 			})
@@ -46,7 +46,8 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 		const searchData = await searchResponse.json();
 		const results = searchData?.result|| [];
 
-		// Filter out the original component and format results.filter((r: any) => r.id !== componentId)
+		// Filter out the original component and format results
+.filter((r: any) => r.id !== componentId)
 			.map((r: any) => ({
 				path: r.payload?.file_path ?? '',
 				similarity: r.score,

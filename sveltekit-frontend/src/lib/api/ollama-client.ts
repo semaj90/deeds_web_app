@@ -5,7 +5,8 @@
  * Supports: gemma3-legal: latest, embeddinggemma: latest
  */
 
-// Environment-based endpoint resolutionimport.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
+// Environment-based endpoint resolution
+import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
  (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ?? 'http://localhost:11434';
 
 const OLLAMA_DOCKER_HOST = 'http://ollama:11434';
@@ -115,12 +116,13 @@ export async function ollamaGenerate(
  return fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+	body: JSON.stringify({
  model,
  prompt,
  stream,
- options: {, temperature: top_p, num_predict },
- }),
+ options: {
+	temperature: top_p, num_predict },
+	}),
  });
 }
 
@@ -128,7 +130,8 @@ export async function ollamaGenerate(
  * Chat with Ollama
  */
 export async function ollamaChat(
- messages: Array<{, role: string, content, string }>,
+ messages: Array<{
+	role: string, content, string }>,
  options: {
  model?: string,
  context?: 'server' | 'client' | 'docker';
@@ -148,12 +151,12 @@ export async function ollamaChat(
  return fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+	body: JSON.stringify({
  model,
  messages,
  stream,
  options: { temperature },
- }),
+	}),
  });
 }
 
@@ -171,7 +174,8 @@ export async function ollamaEmbed(
  const response = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt[0] }), // Ollama expects single prompt for embeddings input
+	body: JSON.stringify({
+	model: prompt[0] }), // Ollama expects single prompt for embeddings input
  });
 
  if (!response.ok) {

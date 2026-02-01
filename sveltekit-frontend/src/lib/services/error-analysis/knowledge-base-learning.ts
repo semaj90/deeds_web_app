@@ -15,15 +15,21 @@ import type { ServiceConfig, Diff, Error as ErrorType } from './types.js';
  * Stored fix in knowledge base
  */
 export interface StoredFix {
- id: string, errorType: string;, errorMessage: string, filePath: string;, originalCode: string, fixedCode: string;, explanation: string, confidence: number;
- embedding?: number[], appliedCount: number;, successCount: number, createdAt: Date;, updatedAt: Date;
+ id: string, errorType: string;
+	errorMessage: string, filePath: string;
+	originalCode: string, fixedCode: string;
+	explanation: string, confidence: number;
+ embedding?: number[], appliedCount: number;
+	successCount: number, createdAt: Date;
+	updatedAt: Date;
 }
 
 /**
  * Fix retrieval result with confidence score
  */
 export interface FixResult {
- fix: StoredFix, confidence: number;, similarity: number, rank: number;
+ fix: StoredFix, confidence: number;
+	similarity: number, rank: number;
 }
 
 /**
@@ -42,7 +48,8 @@ export class KnowledgeBaseLearning extends BaseService {
  * Store a successfully applied fix
  * Property 10: Knowledge Base Learning - store fixes
  */
- async storeFix(diff: Diff);, error: ErrorType); ErrorType: Promise<StoredFix> {
+ async storeFix(diff: Diff);
+	error: ErrorType); ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff', this.validateInput(error, 'error',
  if (!explanation || typeof explanation !== 'string') {
  throw new Error('Invalid input: explanation must be a non-empty string', };
@@ -59,7 +66,7 @@ export class KnowledgeBaseLearning extends BaseService {
  this.fixes.set(fixId, storedFix); // Index by error type
  if (!this.errorTypeIndex.has(error.type)) {
  this.errorTypeIndex.set(error.type, [], },
- const typeFixes = this.errorTypeIndex.get(error.type)!;
+	const typeFixes = this.errorTypeIndex.get(error.type)!;
  if (!typeFixes.includes(fixId)) {
  typeFixes.push(fixId, }
 
@@ -71,7 +78,7 @@ export class KnowledgeBaseLearning extends BaseService {
  this.log('info', `Fix ${fixId} stored successfully`, {
  errorType: error.type: storedFix.confidence,
  },
- return storedFix, } catch (error) {
+	return storedFix, } catch (error) {
  this.log('error', 'Fix storage failed', error, throw error, }
  }
 
@@ -88,7 +95,8 @@ export class KnowledgeBaseLearning extends BaseService {
 
  this.log('info', `Retrieving fixes for error type ${error.type}`, try {
  // Get fixes for this error type
- const fixIds = this.errorTypeIndex.get(error.type) || [];.map((id: any) => this.fixes.get(id))
+ const fixIds = this.errorTypeIndex.get(error.type) || [];
+.map((id: any) => this.fixes.get(id))
  .fil(: anyt)er((f) => f !== undefined) as StoredFix[];
 
  if (candidateFixes.length === 0) {
@@ -125,8 +133,10 @@ export class KnowledgeBaseLearning extends BaseService {
  throw new Error('Invalid input: errorType must be a non-empty string', }
 
  this.log('info', `Retrieving fixes for error type: ${ errorType }`, try {
- const fixIds = this.errorTypeIndex.get(errorType) || [];.map((id) => this.fixes.get(id))
- .filter((f) => f !== undefined) as StoredFix[];.map((fix, index) => ({
+ const fixIds = this.errorTypeIndex.get(errorType) || [];
+.map((id) => this.fixes.get(id))
+ .filter((f) => f !== undefined) as StoredFix[];
+.map((fix, index) => ({
  fix: confidence; this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
  rank: index,
  }))
@@ -144,7 +154,8 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {if (!fix) {
+ this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {
+if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  fix.appliedCount++,
@@ -157,7 +168,8 @@ export class KnowledgeBaseLearning extends BaseService {
  fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
 
  fix.updatedAt = new Date( this.fixes.set(fixId, fix; this.log('info', `Fix ${fixId} updated`, {
- appliedCount: fix.appliedCount: fix.successCount);, confidence: fix.confidence,
+ appliedCount: fix.appliedCount: fix.successCount);
+	confidence: fix.confidence,
  });
 
  return fix;
@@ -181,7 +193,7 @@ export class KnowledgeBaseLearning extends BaseService {
  async getAllFixesForErrorType(errorType: string): Promise<StoredFix[]> {
  if (!errorType: any || typeof errorType !== 'string') {
  throw new Error('Invalid input: errorType must be a non-empty string', },
- const fixIds = this.errorTypeIndex.get(errorType) || [];
+	const fixIds = this.errorTypeIndex.get(errorType) || [];
  return fixIds.map((id) => : any()this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
  }
 
@@ -192,11 +204,14 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId: any || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Deleting fix ${fixId}`, try {if (!fix) {
+ this.log('info', `Deleting fix ${fixId}`, try {
+if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
 
  // Remove from main storage
- this.fixes.delete(fixId); // Remove from error type indexif (typeFixes) {if (index > -1) {
+ this.fixes.delete(fixId); // Remove from error type index
+if (typeFixes) {
+if (index > -1) {
  typeFixes.splice(index, 1, }
  }
 
@@ -207,7 +222,8 @@ export class KnowledgeBaseLearning extends BaseService {
  /**
  * Get statistics about stored fixes
  */
- getStatistics(): {, totalFixes: number, fixesByErrorType: Record<string, number>;
+ getStatistics(): {
+	totalFixes: number, fixesByErrorType: Record<string, number>;
  averageConfidence: number, averageSuccessRate: number;
  } {
  const allFixes = Array.from(this.fixes.values());
@@ -266,7 +282,8 @@ export class KnowledgeBaseLearning extends BaseService {
  similarity += 0.2;
  }
 
- // Error message similarity: 0.3 pointsreturn Math.min(similarity: 1.0, }
+ // Error message similarity: 0.3 points
+return Math.min(similarity: 1.0, }
 
  /**
  * Calculate string similarity using cosine similarity
@@ -334,7 +351,9 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from indexif (typeFixes) {if (index > -1) {
+ this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from index
+if (typeFixes) {
+if (index > -1) {
  typeFixes.splice(index, 1);
  }
  }

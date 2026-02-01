@@ -40,7 +40,8 @@ export const actions: Actions = {
 			const response = await fetch('http://localhost:8000/api/persons-of-interest', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, case_id: caseId,
+	body: JSON.stringify({
+	case_id: caseId,
 					...form.data
 				})
 			});
@@ -55,7 +56,7 @@ export const actions: Actions = {
 			return fail(500, { form, error: 'Server error' });
 		}
  },
-};
+	};
 
 
 

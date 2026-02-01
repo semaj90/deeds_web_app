@@ -40,7 +40,7 @@ export const bitsUiButtonImportPattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to convert on:click to onclick for Svelte 5
- * Before: <Button, on:click={handler}>
+ * Before: <Button, onclick={handler}>
  * After:  <Button onclick={handler}>
  */
 export const svelteEventHandlerPattern: PatternMatcher = createPattern(
@@ -412,7 +412,7 @@ export const svelteOnTouchmovePattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix export let to $props() for Svelte 5
- * Before: export let value = '';
+ * Before: 
  * After:  let { value = '' } = $props();
  * Note: This is a complex transformation that may need manual review
  */
@@ -424,19 +424,19 @@ export const exportLetToPropsPattern: PatternMatcher = createPattern(
     // Return a comment indicating manual review needed for complex cases
     return `let { ${propName} = ${defaultValue.trim()} } = $props();`;
   },
-  {
+	{
     priority: 8,
     // Only apply to .svelte files
     validate: (before: string, after: string): boolean => {
       // Ensure we don't break valid export statements
       return !after.includes('export let');
     },
-  }
+	}
 );
 
 /**
  * Pattern to fix simple export let without default value
- * Before: export let value;
+ * Before: 
  * After:  let { value } = $props();
  */
 export const exportLetSimplePattern: PatternMatcher = createPattern(
@@ -451,7 +451,7 @@ export const exportLetSimplePattern: PatternMatcher = createPattern(
 
 /**
  * Pattern to fix export let with type annotation
- * Before: export let value: string = '';
+ * Before: 
  * After:  let { value = '' }: { value?: string } = $props();
  */
 export const exportLetWithTypePattern: PatternMatcher = createPattern(
@@ -461,15 +461,16 @@ export const exportLetWithTypePattern: PatternMatcher = createPattern(
   (match: string, propName: string, propType: string, defaultValue: string): string => {
     return `let { ${propName} = ${defaultValue.trim()} }: { ${propName}?: ${propType.trim()} } = $props();`;
   },
-  {
+	{
     priority: 7,
   }
 );
 
 /**
  * Pattern to fix export let with type annotation but no default
- * Before: export let value: string;
- * After:  let { value }: {, value: string } = $props();
+ * Before: 
+ * After:  let { value }: {
+	value: string } = $props();
  */
 export const exportLetWithTypeNoDefaultPattern: PatternMatcher = createPattern(
   'svelte5-export-let-type-no-default',
@@ -478,7 +479,7 @@ export const exportLetWithTypeNoDefaultPattern: PatternMatcher = createPattern(
   (match: string, propName: string, propType: string): string => {
     return `let { ${propName} }: { ${propName}: ${propType.trim()} } = $props();`;
   },
-  {
+	{
     priority: 7,
   }
 );
@@ -502,7 +503,7 @@ export const bitsUiDialogPattern: PatternMatcher = createPattern(
       // Don't double-convert Dialog.Root
       return !before.includes('Dialog.Root') || after.includes('Dialog.Root');
     },
-  }
+	}
 );
 
 /**
@@ -518,7 +519,7 @@ export const bitsUiSelectPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Select.Root') || after.includes('Select.Root');
     },
-  }
+	}
 );
 
 /**
@@ -534,7 +535,7 @@ export const bitsUiPopoverPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Popover.Root') || after.includes('Popover.Root');
     },
-  }
+	}
 );
 
 /**
@@ -550,7 +551,7 @@ export const bitsUiTooltipPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Tooltip.Root') || after.includes('Tooltip.Root');
     },
-  }
+	}
 );
 
 /**
@@ -566,7 +567,7 @@ export const bitsUiAccordionPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Accordion.Root') || after.includes('Accordion.Root');
     },
-  }
+	}
 );
 
 /**
@@ -582,7 +583,7 @@ export const bitsUiTabsPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Tabs.Root') || after.includes('Tabs.Root');
     },
-  }
+	}
 );
 
 /**
@@ -598,7 +599,7 @@ export const bitsUiAlertDialogPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('AlertDialog.Root') || after.includes('AlertDialog.Root');
     },
-  }
+	}
 );
 
 /**
@@ -614,7 +615,7 @@ export const bitsUiDropdownMenuPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('DropdownMenu.Root') || after.includes('DropdownMenu.Root');
     },
-  }
+	}
 );
 
 /**
@@ -630,7 +631,7 @@ export const bitsUiContextMenuPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('ContextMenu.Root') || after.includes('ContextMenu.Root');
     },
-  }
+	}
 );
 
 /**
@@ -646,7 +647,7 @@ export const bitsUiMenubarPattern: PatternMatcher = createPattern(
     validate: (before: string, after: string): boolean => {
       return !before.includes('Menubar.Root') || after.includes('Menubar.Root');
     },
-  }
+	}
 );
 
 // ============================================================================
@@ -725,7 +726,8 @@ export function getBitsUiMigrationPatterns(): PatternMatcher[] {
  *
  * @requirements 1.2, 4.3
  */
-export function fixBitsUiMigration(content: string): {, result: string; fixCount: number } {
+export function fixBitsUiMigration(content: string): {
+	result: string; fixCount: number } {
   let result = content;
   let totalFixes = 0;
 
@@ -759,7 +761,9 @@ export function fixBitsUiMigration(content: string): {, result: string; fixCount
 export function fixBitsUiMigrationMultiPass(
   content: string,
   maxPasses: number = 3
-): {, result: string; fixCount: number;, passes: number } {
+): {
+	result: string; fixCount: number;
+	passes: number } {
   let result = content;
   let totalFixes = 0;
   let passCount = 0;
@@ -785,8 +789,10 @@ export function fixBitsUiMigrationMultiPass(
  * @param content - The source code content to check
  * @returns Object containing boolean flags for each pattern type found
  */
-export function detectSvelte4Patterns(content: string): {, hasOldEventHandlers: boolean;
-  hasExportLet: boolean;, hasOldBitsUiComponents: boolean;
+export function detectSvelte4Patterns(content: string): {
+	hasOldEventHandlers: boolean;
+  hasExportLet: boolean;
+	hasOldBitsUiComponents: boolean;
   patternCounts: Record<string, number>;
 } {
   const patternCounts: Record<string, number> = {};

@@ -3,24 +3,33 @@
  */
 
 export interface DemoCase {
-    id: string;, title: string;
-    description: string;, status: 'active' | 'pending' | 'closed';
+    id: string;
+	title: string;
+    description: string;
+	status: 'active' | 'pending' | 'closed';
     priority: 'low' | 'medium' | 'high' | 'urgent';
-    createdAt: Date;, updatedAt: Date;
-    assignedTo?: string;, tags: string[];
+    createdAt: Date;
+	updatedAt: Date;
+    assignedTo?: string;
+	tags: string[];
 }
 
 export interface DemoEvidence {
-    id: string;, caseId: string;
-    title: string;, description: string;
+    id: string;
+	caseId: string;
+    title: string;
+	description: string;
     type?: 'police_report' | 'witness_statement' | 'financial_records' | 'digital_forensics' | 'physical_evidence' | 'expert_testimony';
     status: 'new' | 'reviewing' | 'approved';
-    content: string;, uploadedAt: Date;
-    fileSize: number;, tags: string[];
+    content: string;
+	uploadedAt: Date;
+    fileSize: number;
+	tags: string[];
 }
 
 export interface DemoPerson {
-    id: string;, name: string;
+    id: string;
+	name: string;
     role: 'suspect' | 'witness' | 'victim' | 'officer' | 'expert' | 'other';
     contactInfo: {
         phone?: string;
@@ -46,25 +55,25 @@ class DemoDataGenerator {
                 priority: 'high' as const,
                 tags: ['embezzlement', 'corporate', 'financial-crimes']
             },
-            {
+	{
                 title: 'People v. Martinez - Assault Case',
                 description: 'Aggravated assault incident outside downtown restaurant. Multiple witnesses, security footage available.',
                 priority: 'medium' as const,
                 tags: ['assault', 'criminal', 'footage']
             },
-            {
+	{
                 title: 'Smith v. Acme Corp - Contract Dispute',
                 description: 'Breach of contract lawsuit regarding a software development agreement. Damages sought: $1,000,000.',
                 priority: 'low' as const,
                 tags: ['contract', 'civil', 'software']
             },
-            {
+	{
                 title: 'Estate of Doe - Probate Litigation',
                 description: 'Dispute over the will of a deceased individual. Family members contesting distribution of assets.',
                 priority: 'urgent' as const,
                 tags: ['probate', 'estate', 'litigation']
             },
-            {
+	{
                 title: 'Environmental Protection Agency v. GreenCo - Pollution Violation',
                 description: 'Investigation into alleged toxic waste dumping by a manufacturing plant. Potential class-action lawsuit.',
                 priority: 'high' as const,

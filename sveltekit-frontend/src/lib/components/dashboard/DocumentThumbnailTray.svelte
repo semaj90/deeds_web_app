@@ -2,17 +2,19 @@
 	import type { PageStatus } from '$lib/stores/dashboard/DocumentProgressStore';
 	import { pageStatusesArray } from '$lib/stores/dashboard/DocumentProgressStore';
 	import { getPageStatusIcon } from '$lib/stores/dashboard/GrpcStatusAdapter';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let pages: PageStatus[] = $state([]);
 	let selectedPage: number | null = $state(null);
 	let showErrorModal = $state(false);
 	let selectedPageError: PageStatus | null = $state(null);
 
-	onMount(() => {
+	$effect(() => {
+
 		const unsubscribe = pageStatusesArray.subscribe((value) => {
 			pages = value;
-		});
+		
+});
 
 		return unsubscribe;
 	});
@@ -46,7 +48,8 @@
 			class:selected={selectedPage === page.pageNumber}
 			onclick={() => handlePageClick(page)}
 			title="Page {page.pageNumber} - {page.status}"
-			aria-label="Page {page.pageNumber}, status: {page.status}"
+			aria-label="Page {page.pageNumber},
+	status: {page.status}"
 		>
 			<span class="page-thumbnail-status">{getPageStatusIcon(page.status)}</span>
 		</button>
@@ -82,8 +85,10 @@
 
 <style>
 	.thumbnail-tray {
-		display: flex;, gap: var(--space-sm);
-		padding: var(--space-md);, background: var(--beige);
+		display: flex;
+	gap: var(--space-sm);
+		padding: var(--space-md);
+	background: var(--beige);
 		border: var(--border-width) solid var(--bronze);
 		border-radius: var(--border-radius);
 		overflow-x: auto;
@@ -93,7 +98,8 @@
 	.thumbnail-tray-label {
 		font-family: var(--font-serif-heading);
 		font-size: 0.875rem;
-		font-weight: 600;, color: var(--noir);
+		font-weight: 600;
+	color: var(--noir);
 		white-space: nowrap;
 		margin-right: var(--space-md);
 	}
@@ -101,13 +107,17 @@
 	.page-thumbnail {
 		display: flex;
 		align-items: center;
-		justify-content: center;, width: 40px;
-		height: 40px;, background: var(--noir);
+		justify-content: center;
+	width: 40px;
+		height: 40px;
+	background: var(--noir);
 		border: var(--border-width) solid var(--bronze);
-		border-radius: var(--border-radius);, color: var(--beige);
+		border-radius: var(--border-radius);
+	color: var(--beige);
 		font-family: var(--font-mono-code);
 		font-size: 0.75rem;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600;
+	cursor: pointer;
 		transition: all 0.2s ease;
 		position: relative;
 		flex-shrink: 0;
@@ -126,7 +136,8 @@
 
 	.page-thumbnail.complete {
 		background: var(--status-complete);
-		border-color: var(--status-complete);, color: var(--beige);
+		border-color: var(--status-complete);
+	color: var(--beige);
 	}
 
 	.page-thumbnail.complete:hover {
@@ -136,19 +147,22 @@
 
 	.page-thumbnail.processing {
 		background: var(--status-processing);
-		border-color: var(--status-processing);, color: var(--noir);
+		border-color: var(--status-processing);
+	color: var(--noir);
 		animation: pulse-processing 1.5s ease-in-out infinite;
 	}
 
 	.page-thumbnail.pending {
 		background: var(--status-pending);
-		border-color: var(--status-pending);, color: var(--beige);
+		border-color: var(--status-pending);
+	color: var(--beige);
 		opacity: 0.6;
 	}
 
 	.page-thumbnail.error {
 		background: var(--status-error);
-		border-color: var(--status-error);, color: var(--beige);
+		border-color: var(--status-error);
+	color: var(--beige);
 	}
 
 	.page-thumbnail.error:hover {
@@ -172,9 +186,12 @@
 
 	/* Error Modal Styles */
 	.error-modal-overlay {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(26, 26, 26, 0.8);
+		position: fixed;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
+	background: rgba(26, 26, 26, 0.8);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -182,18 +199,23 @@
 	}
 
 	.error-modal {
-		background: var(--beige);, border: var(--border-width) solid var(--court-red);
+		background: var(--beige);
+	border: var(--border-width) solid var(--court-red);
 		border-radius: var(--border-radius);
-		max-width: 500px;, width: 90%;
-		box-shadow: var(--shadow-strong);, animation: slideIn 0.3s ease;
+		max-width: 500px;
+	width: 90%;
+		box-shadow: var(--shadow-strong);
+	animation: slideIn 0.3s ease;
 	}
 
 	@keyframes slideIn {
 		from {
-			transform: translateY(-20px);, opacity: 0;
+			transform: translateY(-20px);
+	opacity: 0;
 		}
 		to {
-			transform: translateY(0);, opacity: 1;
+			transform: translateY(0);
+	opacity: 1;
 		}
 	}
 
@@ -208,15 +230,19 @@
 	.error-modal-title {
 		font-family: var(--font-serif-heading);
 		font-size: 1.125rem;
-		font-weight: 600;, color: var(--court-red);
+		font-weight: 600;
+	color: var(--court-red);
 		margin: 0;
 	}
 
 	.error-modal-close {
-		background: none;, border: none;
-		color: var(--noir);, cursor: pointer;
+		background: none;
+	border: none;
+		color: var(--noir);
+	cursor: pointer;
 		font-size: 1.5rem;
-		line-height: 1;, transition: color 0.2s ease;
+		line-height: 1;
+	transition: color 0.2s ease;
 	}
 
 	.error-modal-close:hover {
@@ -232,17 +258,22 @@
 	}
 
 	.error-message {
-		font-size: 0.875rem;, color: var(--noir);
-		line-height: 1.6;, margin: 0 0 var(--space-md) 0;
+		font-size: 0.875rem;
+	color: var(--noir);
+		line-height: 1.6;
+	margin: 0 0 var(--space-md) 0;
 	}
 
 	.error-timestamp {
-		font-size: 0.75rem;, color: var(--noir);
-		opacity: 0.7;, margin: 0;
+		font-size: 0.75rem;
+	color: var(--noir);
+		opacity: 0.7;
+	margin: 0;
 	}
 
 	.error-modal-actions {
-		display: flex;, gap: var(--space-md);
+		display: flex;
+	gap: var(--space-md);
 		justify-content: flex-end;
 	}
 
@@ -251,13 +282,15 @@
 		border-radius: var(--border-radius);
 		font-family: var(--font-sans-body);
 		font-size: 0.875rem;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600;
+	cursor: pointer;
 		transition: all 0.2s ease;
 		border: var(--border-width) solid transparent;
 	}
 
 	.error-modal-button.retry {
-		background: var(--bronze);, color: var(--noir);
+		background: var(--bronze);
+	color: var(--noir);
 		border-color: var(--bronze);
 	}
 
@@ -267,7 +300,8 @@
 	}
 
 	.error-modal-button.close {
-		background: var(--noir);, color: var(--beige);
+		background: var(--noir);
+	color: var(--beige);
 		border-color: var(--noir);
 	}
 
@@ -278,7 +312,8 @@
 
 	@media (max-width: 768px) {
 		.thumbnail-tray {
-			gap: var(--space-xs);, padding: var(--space-sm);
+			gap: var(--space-xs);
+	padding: var(--space-sm);
 		}
 
 		.thumbnail-tray-label {
@@ -287,7 +322,8 @@
 		}
 
 		.page-thumbnail {
-			width: 36px;, height: 36px;
+			width: 36px;
+	height: 36px;
 			font-size: 0.7rem;
 		}
 

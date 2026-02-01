@@ -4,7 +4,8 @@ interface AutoGenService {
  executeLegalWorkflow?: (workflow: string, prompt: string, context?: unknown) => Promise<unknown>;
 }
 interface LegalTeam {
- analyzeCase?: (opts: {, query: string;
+ analyzeCase?: (opts: {
+	query: string;
  analysisType?: string;
  priority?: string;
  }) => Promise<unknown>;
@@ -33,16 +34,21 @@ try {
 // --- Type Definitions Export --- // Export all relevant interfaces for easy import in other files and for Copilot/agent visibility
 // --- Agent Orchestration Types ---
 export interface AgentResult {
- agent: string;, result: any;
+ agent: string;
+	result: any;
 } // Corrected syntax
 export interface MCPContextAnalysis {
- query: string;, context: unknown;
- suggestions: string[];, confidence: number;
+ query: string;
+	context: unknown;
+ suggestions: string[];
+	confidence: number;
 }
 export interface AutoMCPSuggestion {
  type: 'enhancement' | 'correction' | 'alternative';
- original: string;, suggested: string;
- reasoning: string;, confidence: number;
+ original: string;
+	suggested: string;
+ reasoning: string;
+	confidence: number;
 }
 // Add small typed shapes so agentResults is not: unknown
 export type AgentOutcome = {
@@ -84,7 +90,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  return { agent: 'autogen', result: `AutoGen agent error: ${msg}` }; // Corrected string
  }
  },
- crewai: async (prompt: string, _context?: unknown) => {
+	crewai: async (prompt: string, _context?: unknown) => {
  // Added types
  try {
  // guard legalTeam before invoking
@@ -105,7 +111,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  return { agent: 'crewai', result: `CrewAI agent error: ${msg}` }; // Corrected string
  }
  },
- copilot: async (prompt: string, _context?: unknown) => {
+	copilot: async (prompt: string, _context?: unknown) => {
  // Added types
  try {
  // use centralized endpoint helper
@@ -113,7 +119,8 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal-latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal-latest',
  prompt: `As a coding assistant, analyze and provide suggestions for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -128,14 +135,15 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  }; // Corrected string
  }
  },
- claude: async (prompt: string, _context?: unknown) => {
+	claude: async (prompt: string, _context?: unknown) => {
  // Added types
  try {
  const ollamaBase = getOllamaEndpoint();
  const response = await fetch(`${ollamaBase}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal-latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal-latest',
  prompt: `As a legal AI assistant, provide detailed analysis for: ${prompt}`,
  stream: false,
  }), // Corrected body syntax, model name, stream syntax
@@ -150,14 +158,16 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  }; // Corrected string
  }
  },
- rag: async (prompt: string, _context?: unknown) => {
+	rag: async (prompt: string, _context?: unknown) => {
  // Added types
  try {
- // leave RAG URL resolution as-is for now (could be centralized similarly)typeof window !== 'undefined' ? 'http://localhost:5173' : 'http://localhost:5173'; // Corrected URL string
+ // leave RAG URL resolution as-is for now (could be centralized similarly)
+typeof window !== 'undefined' ? 'http://localhost:5173' : 'http://localhost:5173'; // Corrected URL string
  const response = await fetch(`${ragUrl}/api/rag`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, action: 'query', query: prompt, context: _context }), // Corrected body syntax
+	body: JSON.stringify({
+	action: 'query', query: prompt, context: _context }), // Corrected body syntax
  });
  if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
  const data = (await response.json()) as Record<string, unknown>; // Corrected syntax
@@ -169,7 +179,7 @@ const agentRegistry: Record<string, (prompt: string, context?, unknown) => Promi
  }; // Corrected string
  }
  },
-};
+	};
 /** * Main Orchestration Wrapper * Now supports dynamic agent selection (autogen, crewai, copilot, claude, etc) */
 export async function copilotOrchestrator(
  prompt: string, options: OrchestrationOptions = {}
@@ -197,7 +207,8 @@ export async function copilotOrchestrator(
  results.directory = await mcpReadDirectory(options.directoryPath);
  }
  // Step 6: Multi-Agent Orchestration (dynamic agent registry)
- if (options?.useMultiAgent|| (options?.agents&& options.agents.length > 0)) {options?.agents&& options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
+ if (options?.useMultiAgent|| (options?.agents&& options.agents.length > 0)) {
+options?.agents&& options.agents.length > 0 ? options.agents : ['autogen', 'crewai'];
  results.agentResults = [] as AgentOutcome[];
  for (const agent of agentsToRun) {
  if (agentRegistry[agent]) {
@@ -284,9 +295,12 @@ export interface OrchestrationOptions {
 // centralized endpoint helper for Ollama (respects Vite and Node envs, falls back to localhost)
 export function getOllamaEndpoint(): string {
  /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config: import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
- type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };typeof import.meta !== 'undefined'
- ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntaxtypeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntaxtypeof process !== 'undefined' && typeof process.env !== 'undefined'
+ type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
+typeof import.meta !== 'undefined'
+ ? ((import.meta as ImportMeta & { env?: ViteEnvShape }).env ?? {}).VITE_OLLAMA_URL : undefined; // Corrected syntax
+typeof process !== 'undefined' && typeof process.env !== 'undefined'
+ ? (process.env as NodeJS.ProcessEnv).OLLAMA_URL : undefined; // Corrected syntax
+typeof process !== 'undefined' && typeof process.env !== 'undefined'
  ? (process.env as NodeJS.ProcessEnv).DOCKER_OLLAMA_URL : undefined; // Corrected syntax
  const dockerDefault = 'http://ollama:11434'; // Corrected URL string
  // prefer explicit config first
@@ -347,7 +361,8 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  }
 }
 /** * Validate MCP tool request */
-export function validateMCPRequest(request: MCPToolRequest): {, valid: boolean; errors: string[] } {
+export function validateMCPRequest(request: MCPToolRequest): {
+	valid: boolean; errors: string[] } {
  // Added type
  const errors: string[] = []; // Corrected syntax
  if (!request.tool) {
@@ -424,7 +439,8 @@ export const commonMCPQueries = {
  tool: 'analyze-stack',
  component: 'drizzle',
  context: 'legal-ai',
- }, analyzeUnoCSS: (): MCPToolRequest => ({
+ },
+	analyzeUnoCSS: (): MCPToolRequest => ({
  tool: 'analyze-stack',
  component: 'unocss',
  context: 'performance',
@@ -433,20 +449,25 @@ export const commonMCPQueries = {
  performanceBestPractices: (): MCPToolRequest => ({
  tool: 'generate-best-practices',
  area: 'performance',
- }, securityBestPractices: (): MCPToolRequest => ({
+ },
+	securityBestPractices: (): MCPToolRequest => ({
  tool: 'generate-best-practices',
  area: 'security',
- }, uiUxBestPractices: (): MCPToolRequest => ({ tool: 'generate-best-practices', area: 'ui-ux' }, unslothBestPractices: (): MCPToolRequest => ({ tool: 'unsloth-best-practices' }),
+ },
+	uiUxBestPractices: (): MCPToolRequest => ({ tool: 'generate-best-practices', area: 'ui-ux' },
+	unslothBestPractices: (): MCPToolRequest => ({ tool: 'unsloth-best-practices' }),
  // Integration Suggestions
  aiChatIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'AI chat component',
  requirements: 'legal compliance and audit trails',
- }, documentUploadIntegration: (): MCPToolRequest => ({
+ },
+	documentUploadIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'document upload system',
  requirements: 'security and virus scanning',
- }, gamingUIIntegration: (): MCPToolRequest => ({
+ },
+	gamingUIIntegration: (): MCPToolRequest => ({
  tool: 'suggest-integration',
  feature: 'gaming-style UI components',
  requirements: 'professional legal interface',
@@ -456,17 +477,20 @@ export const commonMCPQueries = {
  tool: 'get-library-docs',
  library: 'sveltekit',
  topic: 'routing',
- }, bitsUIDialog: (): MCPToolRequest => ({
+ },
+	bitsUIDialog: (): MCPToolRequest => ({
  tool: 'get-library-docs',
  library: 'bits-ui',
  topic: 'dialog',
- }, drizzleSchema: (): MCPToolRequest => ({
+ },
+	drizzleSchema: (): MCPToolRequest => ({
  tool: 'get-library-docs',
  library: 'drizzle',
  topic: 'schema',
  }),
  // RAG System Queries
- ragStats: (): MCPToolRequest => ({ tool: 'rag-get-stats' }, ragLegalQuery: (query: string, caseId?: string): MCPToolRequest => ({
+ ragStats: (): MCPToolRequest => ({ tool: 'rag-get-stats' },
+	ragLegalQuery: (query: string, caseId?: string): MCPToolRequest => ({
  tool: 'rag-query',
  query: caseId, confidenceThreshold: 0.7,
  documentTypes: ['contract', 'case_law', 'statute', 'evidence'],
@@ -489,7 +513,8 @@ export const commonMCPQueries = {
  ragApiIntegration: (): MCPToolRequest => ({
  tool: 'rag-integration-guide',
  integrationType: 'api-integration',
- }, ragComponentIntegration: (): MCPToolRequest => ({
+ },
+	ragComponentIntegration: (): MCPToolRequest => ({
  tool: 'rag-integration-guide',
  integrationType: 'component-integration',
  }), // Corrected backticks
@@ -535,7 +560,8 @@ function formatContentItem(item: any): string {
  if (textVal) return textVal;
  const contentVal = item['content'];
  if (typeof contentVal === 'string') return contentVal;
- if (isRecord(contentVal)) {tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
+ if (isRecord(contentVal)) {
+tryGetStringProp(contentVal, 'text') ?? tryGetStringProp(contentVal, 'content');
  if (innerText) return innerText;
  }
  // fallback to stringified : object
@@ -581,7 +607,7 @@ export async function semanticSearch(query: string): Promise<unknown[]> {
  // Corrected URL string
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query }), // Corrected body syntax
+	body: JSON.stringify({ query }), // Corrected body syntax
  });
  if (!response.ok) {
  throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -681,7 +707,8 @@ export async function mcpRankErrors(errorLog: any): Promise<unknown[]> {
  try {
  // If errorLog is an array, perform a simple severity-based sort
  if (Array.isArray(errorLog)) {
- const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a: any, b: any) => {e.severity === 'critical' ? 3 : e.severity === 'high' ? 2 : 1; // Corrected syntax
+ const ranked = (errorLog as Array<Record<string, unknown>>).slice().sort((a: any, b: any) => {
+e.severity === 'critical' ? 3 : e.severity === 'high' ? 2 : 1; // Corrected syntax
  return score(b as Record<string, unknown>) - score(a as Record<string, unknown>);
  });
  return ranked;
@@ -756,7 +783,8 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  original: 'mcpSuggestBestPractices failed',
  suggested: 'Check MCP connectivity and input results',
  reasoning: msg, confidence: 0 0.1,
- },];
+ },
+	];
  }
 }
 

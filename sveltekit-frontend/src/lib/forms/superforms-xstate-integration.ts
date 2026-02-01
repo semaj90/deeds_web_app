@@ -52,9 +52,12 @@ export interface FormOptions {
 
 export interface FormMachineIntegration<TActor extends AnyActorRef> {
   form: ReturnType<typeof superForm>;
-  actor: TActor;, state: Writable<string>;
-  context: Writable<unknown>;, isValid: Readable<boolean>;
-  isSubmitting: Readable<boolean>;, errors: Readable<Record<string, string[]>>;
+  actor: TActor;
+	state: Writable<string>;
+  context: Writable<unknown>;
+	isValid: Readable<boolean>;
+  isSubmitting: Readable<boolean>;
+	errors: Readable<Record<string, string[]>>;
   progress: Readable<number>;
 }
 
@@ -86,10 +89,11 @@ const AIAnalysisSchema = z.object({
 const createPlaceholderMachine = () => ({
   id: 'placeholder',
   initial: 'idle',
-  states: {, idle: {},
-    processing: {},
-    done: {},
-    error: {}
+  states: {
+	idle: {},
+	processing: {},
+	done: {},
+	error: {}
   }
 });
 
@@ -130,10 +134,11 @@ export function createDocumentUploadForm(
     delayMs: 500,
     timeoutMs: 8000,
     invalidateAll: false,
-    onUpdated: ({, form: _form }) => {
+    onUpdated: ({
+	form: _form }) => {
       // Handle form updates
     },
-    onSubmit: async ({ formData, cancel }) => {
+	onSubmit: async ({ formData, cancel }) => {
       if (options.onSubmit) {
         cancel();
         await options.onSubmit(formData);
@@ -194,10 +199,11 @@ export function createCaseCreationForm(
     delayMs: 500,
     timeoutMs: 10000,
     invalidateAll: true,
-    onUpdated: ({, form: _form }) => {
+    onUpdated: ({
+	form: _form }) => {
       // Handle form updates
     },
-    onSubmit: async ({ formData, cancel }) => {
+	onSubmit: async ({ formData, cancel }) => {
       if (options.onSubmit) {
         cancel();
         await options.onSubmit(formData);
@@ -260,10 +266,11 @@ export function createSearchForm(
     delayMs: 300,
     timeoutMs: 15000,
     invalidateAll: false,
-    onUpdated: ({, form: _form }) => {
+    onUpdated: ({
+	form: _form }) => {
       // Handle form updates
     },
-    onSubmit: async ({ formData, cancel }) => {
+	onSubmit: async ({ formData, cancel }) => {
       if (options.onSubmit) {
         cancel();
         await options.onSubmit(formData);
@@ -385,12 +392,12 @@ export function createFormValidator<T extends z.ZodType>(schema: T) {
     validate: (data: unknown): data is z.infer<T> => {
       return schema.safeParse(data).success;
     },
-    getErrors: (data: unknown): Record<string, string[]> => {
+	getErrors: (data: unknown): Record<string, string[]> => {
       const result = schema.safeParse(data);
       if (result.success) return {};
       return result.error.flatten().fieldErrors as Record<string, string[]>;
     },
-    validateAsync: async (data: unknown): Promise<z.infer<T>> => {
+	validateAsync: async (data: unknown): Promise<z.infer<T>> => {
       return schema.parseAsync(data);
     }
   };

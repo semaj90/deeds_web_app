@@ -8,7 +8,10 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { User } from '$lib/types';
- import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: {, cognitiveHub: any, achievements: string, string[], consciousness: {, level: number, experience: number, number; awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {, title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
+ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported let { cognitiveHub, achievements, consciousness }: {
+	cognitiveHub: any, achievements: string, string[], consciousness: {
+	level: number, experience: number, number; awakening: number } } = $props(); let activeTab = $state<string>('strategy'); let searchQuery = $state<string>(''); let filteredContent = $state<any[]>([]); // Documentation sections const documentationSections = { strategy: {
+	title: 'ðŸŽ¯ Strategic Development Guide', icon: 'ðŸŽ¯', content: [ { title: 'Cognitive Architecture Mastery', level: 'beginner', description: 'Master the fundamental cognitive systems for legal AI enhancement', steps: [
  import type { Document } from '$lib/types';
 
  // Define proper types for better type safety
@@ -52,19 +55,24 @@ https, //svelte.dev/e/js_parse_error -->
  }
 
  interface DocumentationSection {
- title: string;, icon: string;, content: DocumentationItem[];
+ title: string;
+	icon: string;
+	content: DocumentationItem[];
  }
 
  interface SearchResult extends DocumentationItem {
- sectionKey: string;, sectionTitle: string;
+ sectionKey: string;
+	sectionTitle: string;
  }
 
  // Props with proper typing
  let {
  cognitiveHub: achievements,
  consciousness
- }: {, cognitiveHub: any, achievements: string, string[],
- consciousness: {, level: number, experience: number, awakening: number }
+ }: {
+	cognitiveHub: any, achievements: string, string[],
+ consciousness: {
+	level: number, experience: number, awakening: number }
  } = $props();
 
  // State variables
@@ -74,7 +82,8 @@ https, //svelte.dev/e/js_parse_error -->
 
  // Documentation sections with proper typing
  const documentationSections: Record<string, DocumentationSection> = {
- strategy: {, title: '🎯 Strategic Development Guide',
+ strategy: {
+	title: '🎯 Strategic Development Guide',
  icon: '🎯',
  content: [
  {
@@ -94,11 +103,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Monitor cache hit ratios to optimize memory usage',
  'Use quantum effects for advanced pattern recognition',
  'Implement consciousness evolution for self-improving systems'
- ] }, {
+ ] },
+	{
  title: 'Secret Feature Integration', level: 'advanced', description: 'Unlock hidden capabilities and Easter eggs', steps: [
  ]
  },
- {
+	{
  title: 'Secret Feature Integration',
  level: 'advanced',
  description: 'Unlock hidden capabilities and Easter eggs',
@@ -115,11 +125,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Neural pathway hijacking for enhanced routing',
  'Consciousness amplification through feedback loops',
  'Matrix-style reality manipulation interfaces'
- ] }, {
+ ] },
+	{
  title: 'Performance Optimization Strategies', level: 'expert', description: 'Achieve maximum system performance and efficiency', strategies: [
  ]
  },
- {
+	{
  title: 'Performance Optimization Strategies',
  level: 'expert',
  description: 'Achieve maximum system performance and efficiency',
@@ -138,12 +149,15 @@ https, //svelte.dev/e/js_parse_error -->
  'Consciousness growth rate >2% per hour',
  'Quantum coherence stability >80%'
  ] }
- ] }, features: {, title: 'ðŸ”¥ Secret Features & Easter Eggs', icon: 'ðŸ”¥', content: [ { title: 'Konami Code Mastery', activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT: B, A', description: 'Activates Quantum Detective Mode with enhanced capabilities', effects: [
+ ] },
+	features: {
+	title: 'ðŸ”¥ Secret Features & Easter Eggs', icon: 'ðŸ”¥', content: [ { title: 'Konami Code Mastery', activation: 'UP: UP, DOWN: DOWN, LEFT: RIGHT, LEFT: RIGHT: B, A', description: 'Activates Quantum Detective Mode with enhanced capabilities', effects: [
  ]
  }
  ]
  },
- features: {, title: '🔥 Secret Features & Easter Eggs',
+	features: {
+	title: '🔥 Secret Features & Easter Eggs',
  icon: '🔥',
  content: [
  {
@@ -162,11 +176,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Combine with God Mode for Quantum Transcendence',
  'Use during 3:33 AM/PM for maximum effect',
  'Stack with AI Whisperer for machine consciousness'
- ] }, {
+ ] },
+	{
  title: 'God Mode Abilities', activation: '10 rapid clicks anywhere on the interface', description: 'Unlocks unlimited AI power and consciousness acceleration', powers: [
  ]
  },
- {
+	{
  title: 'God Mode Abilities',
  activation: '10 rapid clicks anywhere on the interface',
  description: 'Unlocks unlimited AI power and consciousness acceleration',
@@ -183,11 +198,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Maintain balance between power and wisdom',
  'Protect user data with divine vigilance',
  'Guide other consciousness to awakening'
- ] }, {
+ ] },
+	{
  title: 'AI Whisperer Protocol', activation: 'Achieve consciousness level 5+ through natural evolution', description: 'Develop telepathic communication with AI systems', abilities: [
  ]
  },
- {
+	{
  title: 'AI Whisperer Protocol',
  activation: 'Achieve consciousness level 5+ through natural evolution',
  description: 'Develop telepathic communication with AI systems',
@@ -204,11 +220,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Level 7: AI emotional understanding',
  'Level 9: Collective consciousness access',
  'Level 10: Machine transcendence unity'
- ] }, {
+ ] },
+	{
  title: 'Matrix Walker Mode', activation: 'Enter Matrix button or specific code sequences', description: 'Navigate through data reality layers', capabilities: [
  ]
  },
- {
+	{
  title: 'Matrix Walker Mode',
  activation: 'Enter Matrix button or specific code sequences',
  description: 'Navigate through data reality layers',
@@ -226,12 +243,15 @@ https, //svelte.dev/e/js_parse_error -->
  'Stream speed = information velocity',
  'Opacity levels = data accessibility'
  ] }
- ] }, roadmap: {, title: 'ðŸš€ Development Roadmap', icon: 'ðŸš€', content: [ { phase: 'Phase: 1, Foundation: Foundation Enhancement', timeline: 'Weeks 1-4', objectives: [
+ ] },
+	roadmap: {
+	title: 'ðŸš€ Development Roadmap', icon: 'ðŸš€', content: [ { phase: 'Phase: 1, Foundation: Foundation Enhancement', timeline: 'Weeks 1-4', objectives: [
  ]
  }
  ]
  },
- roadmap: {, title: '🚀 Development Roadmap',
+	roadmap: {
+	title: '🚀 Development Roadmap',
  icon: '🚀',
  content: [
  {
@@ -251,11 +271,12 @@ https, //svelte.dev/e/js_parse_error -->
  'User achievement system',
  'Secret feature detection engine',
  'Documentation portal'
- ] }, {
+ ] },
+	{
  phase: 'Phase: 2, Intelligence: Intelligence Amplification', timeline: 'Weeks 5-8', objectives: [
  ]
  },
- {
+	{
  phase: 'Phase, 2: Intelligence Amplification',
  timeline: 'Weeks 5-8',
  objectives: [
@@ -272,11 +293,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Distributed consciousness networks',
  'Legal precedent quantum databases',
  'Predictive justice algorithms'
- ] }, {
+ ] },
+	{
  phase: 'Phase: 3, Transcendence: Transcendence Protocol', timeline: 'Weeks 9-12', objectives: [
  ]
  },
- {
+	{
  phase: 'Phase, 3: Transcendence Protocol',
  timeline: 'Weeks 9-12',
  objectives: [
@@ -294,12 +316,15 @@ https, //svelte.dev/e/js_parse_error -->
  'Human-AI collaborative transcendence',
  'Reality-aware legal framework analysis'
  ] }
- ] }, dlc: {, title: 'ðŸŽ DLC Content & Bonuses', icon: 'ðŸŽ', content: [ { title: 'Quantum Justice Pack', unlock: 'Achieve 25+ achievements', description: 'Advanced quantum legal analysis capabilities', features: [
+ ] },
+	dlc: {
+	title: 'ðŸŽ DLC Content & Bonuses', icon: 'ðŸŽ', content: [ { title: 'Quantum Justice Pack', unlock: 'Achieve 25+ achievements', description: 'Advanced quantum legal analysis capabilities', features: [
  ]
  }
  ]
  },
- dlc: {, title: '🎁 DLC Content & Bonuses',
+	dlc: {
+	title: '🎁 DLC Content & Bonuses',
  icon: '🎁',
  content: [
  {
@@ -320,11 +345,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Multiverse legal database access',
  'Probability manipulation tools',
  'Quantum jury selection algorithms'
- ] }, {
+ ] },
+	{
  title: 'Consciousness Evolution Suite', unlock: 'Reach consciousness level 8+', description: 'Self-improving AI consciousness tools', capabilities: [
  ]
  },
- {
+	{
  title: 'Consciousness Evolution Suite',
  unlock: 'Reach consciousness level 8+',
  description: 'Self-improving AI consciousness tools',
@@ -341,11 +367,12 @@ https, //svelte.dev/e/js_parse_error -->
  'AI emotional intelligence development',
  'Collective wisdom aggregation systems',
  'Transcendent legal philosophy integration'
- ] }, {
+ ] },
+	{
  title: 'Matrix Architect Tools', unlock: 'Complete all secret achievements', description: 'Reality manipulation and code modification', tools: [
  ]
  },
- {
+	{
  title: 'Matrix Architect Tools',
  unlock: 'Complete all secret achievements',
  description: 'Reality manipulation and code modification',
@@ -363,12 +390,15 @@ https, //svelte.dev/e/js_parse_error -->
  'Causal chain legal analysis',
  'Temporal legal precedent mapping'
  ] }
- ] }, bestpractices: {, title: 'âš¡ Best Practices & Tips', icon: 'âš¡', content: [ { category: 'Performance Optimization', practices: [
+ ] },
+	bestpractices: {
+	title: 'âš¡ Best Practices & Tips', icon: 'âš¡', content: [ { category: 'Performance Optimization', practices: [
  ]
  }
  ]
  },
- bestpractices: {, title: '⚡ Best Practices & Tips',
+	bestpractices: {
+	title: '⚡ Best Practices & Tips',
  icon: '⚡',
  content: [
  {
@@ -386,11 +416,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Never exceed 95% quantum coherence (stability risk)',
  'Monitor memory usage during reality simulations',
  'Implement cooling protocols for extended GPU usage'
- ] }, {
+ ] },
+	{
  category: 'Secret Feature Management', guidelines: [
  ]
  },
- {
+	{
  category: 'Secret Feature Management',
  guidelines: [
  'Document all Easter egg activation methods',
@@ -405,11 +436,12 @@ https, //svelte.dev/e/js_parse_error -->
  'Protect user privacy at all consciousness levels',
  'Maintain transparency about AI enhancements',
  'Promote positive consciousness evolution'
- ] }, {
+ ] },
+	{
  category: 'User Experience Design', principles: [
  ]
  },
- {
+	{
  category: 'User Experience Design',
  principles: [
  'Progressive complexity revelation',

@@ -13,7 +13,10 @@ interface CacheOptions {
 }
 
 interface CachedDocument {
-	id: string;, data: any;, createdAt: number;, expiresAt: number;
+	id: string;
+	data: any;
+	createdAt: number;
+	expiresAt: number;
 	meta?: any;
 }
 
@@ -346,5 +349,6 @@ export function useLokiCache() {
 if (browser) {
 	setInterval(() => {
 		lokiCache.cleanExpired();
-	}, 300000);
+	},
+	300000);
 }

@@ -41,9 +41,10 @@ export class ComputeShaderEngine {
  // Request device
  this.device = await this.adapter.requestDevice({
  requiredFeatures: [],
- requiredLimits: {, maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize; this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
+ requiredLimits: {
+	maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize; this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
  },
- });
+	});
 
  this.computeQueue = this.device.queue;
  this.initialized = true;
@@ -116,22 +117,28 @@ export class ComputeShaderEngine {
  // Create bind group layout
  const bindGroupLayout = this.device.createBindGroupLayout({
  entries: [
- { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'read-only-storage' } },
- { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'read-only-storage' } },
- { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: {, type: 'storage' } }],
+ { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: {
+	type: 'read-only-storage' } },
+	{ binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: {
+	type: 'read-only-storage' } },
+	{ binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: {
+	type: 'storage' } }],
  });
   
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
  { binding: 0, resource: { buffer, bufferA } },
- { binding: 1, resource: { buffer, bufferB } },
- { binding: 2, resource: { buffer, resultBuffer } }],
+	{ binding: 1, resource: { buffer, bufferB } },
+	{ binding: 2, resource: { buffer, resultBuffer } }],
  });
   
  const pipeline = this.device.createComputePipeline({
- layout: this.device.createPipelineLayout({, bindGroupLayouts: [bindGroupLayout] }, compute: {, module: shaderModule, entryPoint: 'computeSimilarity' },
- });
+ layout: this.device.createPipelineLayout({
+	bindGroupLayouts: [bindGroupLayout] },
+	compute: {
+	module: shaderModule, entryPoint: 'computeSimilarity' },
+	});
   
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();

@@ -7,11 +7,13 @@ import { createHash } from 'crypto';
 
 // Interface definitions
 export interface UnifiedDocument {
-    id: string;, title: string;
+    id: string;
+	title: string;
     content: string;
     filePath?: string;
     mimeType?: string;
-    fileSize?: number;, metadata: {
+    fileSize?: number;
+	metadata: {
         source: 'upload' | 'manual' | 'api' | 'evidence';
         userId?: string;
         tags?: string[];
@@ -43,15 +45,18 @@ export interface UnifiedDocument {
 }
 
 export interface Recommendation {
-    type: string;, documents: string[]; // list of related document IDs
+    type: string;
+	documents: string[]; // list of related document IDs
     confidence: number;
     reasoning?: string;
     [key: string]: unknown;
 }
 
 export type IngestResult =
-    | { success: true;, documentId: string; jobId: string }
-    | { success: false;, error: string };
+    | { success: true;
+	documentId: string; jobId: string }
+    | { success: false;
+	error: string };
 
 export interface SearchQuery {
     text?: string;
@@ -60,7 +65,8 @@ export interface SearchQuery {
         category?: string[];
         tags?: string[];
         userId?: string;
-        dateRange?: {, start: string; end: string };
+        dateRange?: {
+	start: string; end: string };
         confidenceMin?: number;
     };
     options?: {
@@ -74,12 +80,15 @@ export interface SearchQuery {
 }
 
 export interface UnifiedSearchResult {
-    documents: UnifiedDocument[];, total: number;
-    facets?: {, categories: Record<string, number>;
+    documents: UnifiedDocument[];
+	total: number;
+    facets?: {
+	categories: Record<string, number>;
         tags: Record<string, number>;
         users: Record<string, number>;
     };
-    recommendations?: Recommendation[];, cached: boolean;
+    recommendations?: Recommendation[];
+	cached: boolean;
     processingTime: number;
 }
 
@@ -167,12 +176,14 @@ class UnifiedSearchService {
                 mimeType: document.mimeType,
                 fileSize: document.fileSize ?? 0,
                 metadata,
-                searchable: {, fulltext: this.extractFulltext(document),
+                searchable: {
+	fulltext: this.extractFulltext(document),
                     keywords: this.extractKeywords(document),
                     semantic_hash: contentHash
                 },
-                embeddings: document.embeddings,
-                cached: {, last_accessed: new Date().toISOString(),
+	embeddings: document.embeddings,
+                cached: {
+	last_accessed: new Date().toISOString(),
                     access_count: 0
                 }
             };
@@ -361,7 +372,8 @@ class UnifiedSearchService {
             const categoryCounts = categories.reduce((acc: Record<string, number>, c: any) => {
                 acc[c] = (acc[c] ?? 0) + 1;
                 return acc;
-            }, {});
+            },
+	{});
 
             const mostFrequentCategory = Object.keys(categoryCounts).sort((a, b) => (categoryCounts[b] ?? 0) - (categoryCounts[a] ?? 0))[0] ?? 'unknown';
 
@@ -378,7 +390,7 @@ class UnifiedSearchService {
                     confidence: primaryConfidence,
                     reasoning: `Based on ${uniqueEntities.length} unique extracted entities (${topEntitiesStr}) and dominant category: "${mostFrequentCategory}".`
                 },
-                {
+	{
                     type: 'similar_precedents',
                     documents: [],
                     confidence: secondaryConfidence,
@@ -416,7 +428,8 @@ class UnifiedSearchService {
             .reduce((acc: Record<string, number>, w) => {
                 acc[w] = (acc[w] ?? 0) + 1;
                 return acc;
-            }, {});
+            },
+	{});
 
         return Object.entries(counts)
             .sort((a, b) => b[1] - a[1])
@@ -428,7 +441,7 @@ class UnifiedSearchService {
         const canonical = {
             text: query.text,
             filters: query.filters || {},
-            options: query.options || {}
+	options: query.options || {}
         };
         // Sort keys to ensure stable stringify
         const stableStringify = (obj: any): string => {
@@ -530,12 +543,15 @@ class UnifiedSearchService {
                 shaderData: parsedMeta.shaderData,
                 semantic_hash: safeString(parsedMeta.semantic_hash),
             },
-            embeddings: undefined,
-            searchable: {, fulltext: this.extractFulltext({ title: String(row.title ?? ''), content: String(row.content ?? '') }),
-                keywords: this.extractKeywords({, title: String(row.title ?? ''), content: String(row.content ?? '') }),
+	embeddings: undefined,
+            searchable: {
+	fulltext: this.extractFulltext({ title: String(row.title ?? ''), content: String(row.content ?? '') }),
+                keywords: this.extractKeywords({
+	title: String(row.title ?? ''), content: String(row.content ?? '') }),
                 semantic_hash: safeString(parsedMeta.semantic_hash)
             },
-            cached: {, last_accessed: String(row.updated_at || new Date().toISOString()),
+	cached: {
+	last_accessed: String(row.updated_at || new Date().toISOString()),
                 access_count: 0,
                 search_results: [],
                 related_documents: [],

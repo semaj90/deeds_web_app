@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	interface Props {
 		apiBase: string;
@@ -53,9 +53,11 @@
 		)
 	);
 
-	onMount(() => {
+	$effect(() => {
+
 		loadSummaries();
-	});
+	
+});
 
 	function getProviderBadgeClass(provider: string) {
 		if (provider.includes('gemini')) return 'is-success';

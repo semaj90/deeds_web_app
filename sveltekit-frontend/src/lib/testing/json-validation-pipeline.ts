@@ -9,7 +9,8 @@ import { checkBackends, fastjson, type FastJSONResult } from '$lib/json/fastjson
 import { expect, test } from '@playwright/test';
 
 interface ValidationResult {
-    backend: string;, success: boolean;
+    backend: string;
+	success: boolean;
     performance: number;
     error?: string;
     metadata?: any;
@@ -107,7 +108,8 @@ class JSONValidationPipeline {
             const response = await fetch(this.mcpEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({, action: 'validate-json-parsing',
+	body: JSON.stringify({
+	action: 'validate-json-parsing',
                     results: results,
                     timestamp: new Date().toISOString(),
                     phase: 'Phase52',
@@ -126,7 +128,8 @@ class JSONValidationPipeline {
      * Generate performance report
      */
     generatePerformanceReport(results: ValidationResult[]): string {
-        const backendStats = new Map<string, { count: number;, totalTime: number; errors: number }>();
+        const backendStats = new Map<string, { count: number;
+	totalTime: number; errors: number }>();
 
         for (const result of results) {
             const stats = backendStats.get(result.backend) || { count: 0, totalTime: 0, errors: 0 };
@@ -161,12 +164,15 @@ const testJSONSamples = [
     '{"metadata": {"created": "2025-01-01", "tags": ["legal", "contract", "binding"]}}',
     // Large JSON for performance testing
     JSON.stringify({
-        documents: Array.from({, length: 100 }, (_, i) => ({
+        documents: Array.from({
+	length: 100 },
+	(_, i) => ({
             id: `DOC-${i}`,
             title: `Legal Document ${i}`,
             content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10),
-            metadata: {, size: Math.random() * 1000, type: 'contract' },
-        })),
+            metadata: {
+	size: Math.random() * 1000, type: 'contract' },
+	})),
     })
 ];
 
@@ -192,7 +198,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
     test('should report results to MCP', async () => {
         const mockResults: ValidationResult[] = [
             { backend: 'native', success: true, performance: 1.5, metadata: {} },
-            { backend: 'simdnode', success: true, performance: 0.8, metadata: {} }
+	{ backend: 'simdnode', success: true, performance: 0.8, metadata: {} }
         ];
 
         // Mock fetch for testing
@@ -217,9 +223,9 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
     test('should generate performance report', async () => {
         const results: ValidationResult[] = [
             { backend: 'native', success: true, performance: 2.0, metadata: {} },
-            { backend: 'native', success: true, performance: 1.5, metadata: {} },
-            { backend: 'simdnode', success: true, performance: 1.0, metadata: {} },
-            { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error', metadata: {} }
+	{ backend: 'native', success: true, performance: 1.5, metadata: {} },
+	{ backend: 'simdnode', success: true, performance: 1.0, metadata: {} },
+	{ backend: 'simdnode', success: false, performance: 0.5, error: 'parse error', metadata: {} }
         ];
 
         const report = pipeline.generatePerformanceReport(results);

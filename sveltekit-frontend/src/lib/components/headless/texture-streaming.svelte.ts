@@ -7,15 +7,20 @@
 // (The pipeline types are imported, but just in case of environment issues)
 
 export interface TextureStreamingConfig {
-    enableGPU: boolean;, maxChunkSize: number;
-    cacheSize: number;, adaptiveQuality: boolean;
+    enableGPU: boolean;
+	maxChunkSize: number;
+    cacheSize: number;
+	adaptiveQuality: boolean;
     compressionEnabled: boolean;
 }
 
 export interface StreamingStats {
-    chunksLoaded: number;, cacheHits: number;
-    renderTime: number;, qualityLevel: number;
-    hasWebGL: boolean;, hasWASM: boolean;
+    chunksLoaded: number;
+	cacheHits: number;
+    renderTime: number;
+	qualityLevel: number;
+    hasWebGL: boolean;
+	hasWASM: boolean;
 }
 
 // Explicit texture type union to avoid `any`
@@ -60,17 +65,15 @@ export function useLegalTextureStreaming(config: Partial<TextureStreamingConfig>
 
     return {
         get canvasElement() { return canvasElement; },
-        set canvasElement(el) { canvasElement = el; },
-
-        get loadedTextures() { return loadedTextures; },
-        get streamingProgress() { return streamingProgress; },
-        get currentDocument() { return currentDocument; },
-        get stats() { return stats; },
-        get isInitialized() { return isInitialized; },
-        get isLoading() { return isLoading; },
-        get error() { return error; },
-
-        // Actions
+	set canvasElement(el) { canvasElement = el; },
+	get loadedTextures() { return loadedTextures; },
+	get streamingProgress() { return streamingProgress; },
+	get currentDocument() { return currentDocument; },
+	get stats() { return stats; },
+	get isInitialized() { return isInitialized; },
+	get isLoading() { return isLoading; },
+	get error() { return error; },
+	// Actions
         initialize: async () => {
             if (isInitialized) return;
             isLoading = true;
@@ -91,8 +94,7 @@ export function useLegalTextureStreaming(config: Partial<TextureStreamingConfig>
                 isLoading = false;
             }
         },
-
-        loadTexture: async (id: string, src: string) => {
+	loadTexture: async (id: string, src: string) => {
             isLoading = true;
             try {
                 // Mock load

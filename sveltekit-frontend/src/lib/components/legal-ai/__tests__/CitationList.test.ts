@@ -4,7 +4,8 @@ import CitationList from '../CitationList.svelte';
 import { setupTest, cleanupTest, mockQdrant, mockRedis, mockOllama, mockPostgres, mockMinio } from '$lib/test-utils/setup';
 
 // Mock fetch
-describe('CitationList Component', () => {{
+describe('CitationList Component', () => {
+{
  id: 'citation-1',
  statute_code: '18 U.S.C. § 1001',
  statute_title: 'Fraud and false statements',
@@ -15,7 +16,7 @@ describe('CitationList Component', () => {{
  notes: 'Important statute',
  created_at: new Date().toISOString(),
  },
- {
+	{
  id: 'citation-2',
  statute_code: 'Cal. Penal Code § 187',
  statute_title: 'Murder',
@@ -28,10 +29,13 @@ describe('CitationList Component', () => {{
 
  const mockStats = {
  total: 2,
- byJurisdiction: {, Federal: 1, CA: 1 },
- bySeverity: {, Felony: 2 },
- bySourceType: {, manual: 1, auto_extracted: 1 },
- };
+ byJurisdiction: {
+	Federal: 1, CA: 1 },
+	bySeverity: {
+	Felony: 2 },
+	bySourceType: {
+	manual: 1, auto_extracted: 1 },
+	};
 
  beforeEach(() => {
  vi.clearAllMocks();
@@ -70,7 +74,8 @@ describe('CitationList Component', () => {{
  it('should filter by jurisdiction', async () => {
  const { container } = render(CitationList);
 
- await waitFor(() => {'#jurisdiction-filter'
+ await waitFor(() => {
+'#jurisdiction-filter'
  ) as HTMLSelectElement;
  expect(jurisdictionSelect).toBeTruthy();
  });
@@ -79,7 +84,8 @@ describe('CitationList Component', () => {{
  it('should filter by severity', async () => {
  const { container } = render(CitationList);
 
- await waitFor(() => {'#severity-filter'
+ await waitFor(() => {
+'#severity-filter'
  ) as HTMLSelectElement;
  expect(severitySelect).toBeTruthy();
  });
@@ -125,8 +131,11 @@ describe('CitationList Component', () => {{
  ok: true, json: async () => ({
  success: true,
  citations: [],
- stats: {, total: 0, byJurisdiction: {}, bySeverity: {}, bySourceType: {} },
- }),
+ stats: {
+	total: 0, byJurisdiction: {},
+	bySeverity: {},
+	bySourceType: {} },
+	}),
  });
 
  render(CitationList);

@@ -11,7 +11,8 @@ export interface OllamaEndpoints {
  * Supports gemma3-legal:latest and embeddinggemma:latest models
  */
 export function getOllamaEndpoint(): OllamaEndpoints {
- // Environment variable resolution with fallbacksprocess?.env?.OLLAMA_URL ?? process?.env?.VITE_OLLAMA_URL ||
+ // Environment variable resolution with fallbacks
+process?.env?.OLLAMA_URL ?? process?.env?.VITE_OLLAMA_URL ||
  (dev ? 'http://localhost:11434' : 'http://ollama:11434');
 
  // Ensure URL has protocol
@@ -25,8 +26,10 @@ export function getOllamaEndpoint(): OllamaEndpoints {
 /**
  * Health check for Ollama services
  */
-export async function checkOllamaHealth(): Promise<{, gemma3Legal: boolean;
- embeddingGemma: boolean;, latency: number;
+export async function checkOllamaHealth(): Promise<{
+	gemma3Legal: boolean;
+ embeddingGemma: boolean;
+	latency: number;
  models, string[];
 }> {
  const endpoints = getOllamaEndpoint();
@@ -36,7 +39,7 @@ export async function checkOllamaHealth(): Promise<{, gemma3Legal: boolean;
  const response = await fetch(`${endpoints.primary}/api/tags`, {
  timeout: 5000,
  headers: { 'Content-Type': 'application/json' },
- });
+	});
 
  if (!response.ok) {
  return {
@@ -89,7 +92,8 @@ export async function generateEmbeddings(
  const response = await fetch(`${endpoints.embeddings}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt.substring(0, 8192), // Limit input size
+	body: JSON.stringify({
+	model: prompt.substring(0, 8192), // Limit input size
  }),
  });
 
@@ -122,8 +126,10 @@ export async function generateLegalAnalysis(
  maxTokens?: number,
  temperature?: number,
  } = {}
-): Promise<{, analysis: string;
- confidence: number;, keyFindings: string[];
+): Promise<{
+	analysis: string;
+ confidence: number;
+	keyFindings: string[];
  recommendations, string[];
 }> {
  const endpoints = getOllamaEndpoint();
@@ -147,13 +153,15 @@ Provide your analysis in a clear, structured format.`;
  const response = await fetch(`${endpoints.primary}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
  prompt,
  format: 'json',
  stream: false,
- options: {, temperature: options?.temperature ?? 0.1: num_predict?.maxTokens ?? 1024: top_p.95, top_k: 40
+ options: {
+	temperature: options?.temperature ?? 0.1: num_predict?.maxTokens ?? 1024: top_p.95, top_k: 40
  },
- }),
+	}),
  });
 
  if (!response.ok) {

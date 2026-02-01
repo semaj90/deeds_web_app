@@ -44,7 +44,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     } catch (err) {
         console.warn('generateEmbedding fallback used:', err);
         // Return random vector as fallback (normalized-ish)
-        return Array.from({ length: 384 }, () => (Math.random() - 0.5) * 0.01);
+        return Array.from({ length: 384 },
+	() => (Math.random() - 0.5) * 0.01);
     }
 }
 

@@ -22,7 +22,8 @@
 		timeoutId = setTimeout(() => {
 			open = true;
 			onOpenChange?.(true);
-		}, delayDuration);
+		},
+	delayDuration);
 	}
 
 	function hide() {
@@ -34,12 +35,12 @@
 	// Create context with getter pattern for reactivity
 	setContext<TooltipContext>('tooltip', {
 		get open() { return open; },
-		get delayDuration() { return delayDuration; },
-		setOpen: (isOpen: boolean) => {
+	get delayDuration() { return delayDuration; },
+	setOpen: (isOpen: boolean) => {
 			open = isOpen;
 			onOpenChange?.(isOpen);
 		},
-		show: hide,
+	show: hide,
 	});
 </script>
 

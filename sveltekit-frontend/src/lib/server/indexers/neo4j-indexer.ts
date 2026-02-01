@@ -1,9 +1,12 @@
 import type { Document } from '$lib/types';
 
 // Minimal Neo4j indexer with lazy driver import
-export async function indexNeo4j(doc: {, id: string;
-    text: string;, embedding: number[];
-}): Promise<{, ok: boolean; error?: string }> {
+export async function indexNeo4j(doc: {
+	id: string;
+    text: string;
+	embedding: number[];
+}): Promise<{
+	ok: boolean; error?: string }> {
     try {
         const neo4j = await import('neo4j-driver');
         const url = process.env?.NEO4J_URL ?? 'bolt://localhost:7687';

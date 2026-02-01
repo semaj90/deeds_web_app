@@ -3,7 +3,8 @@ import type { Case } from '$lib/types';
 import { redis, ensureRedisReady } from '$lib/server/redis-client';
 
 export interface RedisConfig {
-    url: string;, retryDelayOnFailover: number;
+    url: string;
+	retryDelayOnFailover: number;
     maxRetriesPerRequest: number;
 }
 
@@ -114,7 +115,9 @@ class RedisService {
     }
 
     // Canvas Updates
-    public async publishCanvasNodeMoved(caseId: string, nodeId: string, position: {, x: number; y: number }, userId?: string) {
+    public async publishCanvasNodeMoved(caseId: string, nodeId: string, position: {
+	x: number; y: number },
+	userId?: string) {
         await this.publish('canvas_update', {
             type: 'CANVAS_NODE_MOVED',
             caseId,

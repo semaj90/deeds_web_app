@@ -16,24 +16,31 @@ const POOL: Pool = new pg.Pool({
 });
 
 export interface Party {
-	name: string;, role: string;
+	name: string;
+	role: string;
 	type: string;
 }
 
 export interface LegalCaseInfo {
-	id: string;, jurisdiction: string;
-	parties: Party[];, datesFiled: string[];
+	id: string;
+	jurisdiction: string;
+	parties: Party[];
+	datesFiled: string[];
 	courtLevel: 'district' | 'appellate' | 'supreme';
 }
 
 export interface LegalMetadata {
 	case?: LegalCaseInfo;
-	classification?: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
-		practiceArea: string[];, confidenceLevel: number;
+	classification?: {
+	documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+		practiceArea: string[];
+	confidenceLevel: number;
 		riskLevel: 'low' | 'medium' | 'high' | 'critical';
 	};
-	processing?: {, extractedEntities: string[];
-		keyTerms: string[];, sentiment: number;
+	processing?: {
+	extractedEntities: string[];
+		keyTerms: string[];
+	sentiment: number;
 		complexity: number;
 	};
 }
@@ -51,8 +58,10 @@ export interface VisionItem {
 }
 
 export interface SearchResult {
-	id: string;, score: number;
-	source: string;, snippet: string;
+	id: string;
+	score: number;
+	source: string;
+	snippet: string;
 	metadata: LegalMetadata;
 }
 
@@ -76,7 +85,8 @@ function isStringArray(v: unknown): v is string[] {
 /**
  * Upsert a document or vision item into the `embeddings` table.
  */
-export async function upsertToPGVector(item: DocumentItem | VisionItem): Promise<{, ok: boolean }> {
+export async function upsertToPGVector(item: DocumentItem | VisionItem): Promise<{
+	ok: boolean }> {
 	const id = item.id;
 	const vector = (item as DocumentItem).embeddings ?? (item as VisionItem).embeddings ?? [];
 	const doc = {
@@ -118,8 +128,10 @@ export async function searchPGVector(queryVector: number[], topK = 10): Promise<
 	};
 
 	type RowType = {
-		id: string;, doc: { source?: string; meta?: MetaShape } | null;
-		vector: number[];, score: number;
+		id: string;
+	doc: { source?: string; meta?: MetaShape } | null;
+		vector: number[];
+	score: number;
 	};
 
 	function normalizeLegalMetadata(meta?: MetaShape): LegalMetadata {

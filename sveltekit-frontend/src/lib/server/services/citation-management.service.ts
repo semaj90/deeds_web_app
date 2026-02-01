@@ -40,21 +40,21 @@ export class CitationManagementService {
 					notes, tags, created_by
 				) VALUES (
 					${userId},
-					${request.caseId ?? null},
-					${request.citationText},
-					${request.statuteCode ?? null},
-					${request.statuteTitle ?? null},
-					${request.statuteSection ?? null},
-					${request.statuteSubsection ?? null},
-					${request.statuteUrl ?? null},
-					${request.sourceType},
-					${request.sourceDocumentId ?? null},
-					${request.pageNumber ?? null},
-					${request.contextText ?? null},
-					${request.relevanceScore ?? 0},
-					${request.notes ?? null},
-					${JSON.stringify(request.tags || [])},
-					${userId}
+	${request.caseId ?? null},
+	${request.citationText},
+	${request.statuteCode ?? null},
+	${request.statuteTitle ?? null},
+	${request.statuteSection ?? null},
+	${request.statuteSubsection ?? null},
+	${request.statuteUrl ?? null},
+	${request.sourceType},
+	${request.sourceDocumentId ?? null},
+	${request.pageNumber ?? null},
+	${request.contextText ?? null},
+	${request.relevanceScore ?? 0},
+	${request.notes ?? null},
+	${JSON.stringify(request.tags || [])},
+	${userId}
 				)
 				RETURNING *
 			`);
@@ -114,12 +114,18 @@ export class CitationManagementService {
 			// Valid TypeScript fix for the massive corrupted block:
 			const result = await db.execute(sql`
 				UPDATE saved_citations SET
-					citation_text = COALESCE(${request.citationText}, citation_text),
-					notes = COALESCE(${request.notes}, notes),
-					tags = COALESCE(${request.tags ? JSON.stringify(request.tags) : null}, tags),
-					relevance_score = COALESCE(${request.relevanceScore}, relevance_score),
-					statute_code = COALESCE(${request.statuteCode}, statute_code),
-					statute_title = COALESCE(${request.statuteTitle}, statute_title),
+					citation_text = COALESCE(${request.citationText},
+	citation_text),
+					notes = COALESCE(${request.notes},
+	notes),
+					tags = COALESCE(${request.tags ? JSON.stringify(request.tags) : null},
+	tags),
+					relevance_score = COALESCE(${request.relevanceScore},
+	relevance_score),
+					statute_code = COALESCE(${request.statuteCode},
+	statute_code),
+					statute_title = COALESCE(${request.statuteTitle},
+	statute_title),
 					updated_at = NOW()
 				WHERE id = ${citationId}
 				RETURNING *
@@ -284,7 +290,8 @@ export class CitationManagementService {
 
 			await db.execute(sql`
 				INSERT INTO collection_citations (collection_id, citation_id)
-				VALUES (${collectionId}, ${citationId})
+				VALUES (${collectionId},
+	${citationId})
 				ON CONFLICT DO NOTHING
 			`);
 
@@ -343,7 +350,11 @@ export class CitationManagementService {
 				INSERT INTO statute_search_history (
 					user_id, search_query, statute_code, results_count, search_type
 				) VALUES (
-					${userId}, ${query}, ${statuteCode}, ${resultsCount}, ${searchType}
+					${userId},
+	${query},
+	${statuteCode},
+	${resultsCount},
+	${searchType}
 				)
 				RETURNING *
 			`);

@@ -5,7 +5,7 @@ export async function postAnalytics(event: any): Promise<any> {
     const res = await fetch(`${BASE}/analytics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(event)
+	body: JSON.stringify(event)
     });
     return res.json();
 }
@@ -26,6 +26,6 @@ export async function recordAnalytics(ev: UserAnalyticsEvent): Promise<void> {
     await fetch(`${ANALYTICS_API}/analytics`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+	body: JSON.stringify(payload)
     });
 }

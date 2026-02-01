@@ -7,7 +7,8 @@ interface IOllamaEmbeddingService {
 }
 
 // Default endpoints (Docker/Prod fallback)
-// prefer Docker service hostnames first, then local devprocess.env?.OLLAMA_API_URL||
+// prefer Docker service hostnames first, then local dev
+process.env?.OLLAMA_API_URL||
  process.env?.PUBLIC_OLLAMA_API_URL||
  process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 const EMBEDDING_MODEL = process.env?.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
@@ -18,14 +19,14 @@ export const OllamaEmbeddingService: IOllamaEmbeddingService = {
  if (helper) return helper.embedText(text);
  return fetchEmbeddingAPI(text);
  },
- async embedBatch(texts: string[]) {
+	async embedBatch(texts: string[]) {
  const helper = await loadLocalOllamaClient();
  if (helper) return helper.embedBatch(texts);
  const results: number[][] = [];
  for (const t of texts) results.push(await fetchEmbeddingAPI(t));
  return results;
  },
-};
+	};
 
 // Dynamically load optional local helper
 async function loadLocalOllamaClient(): Promise<IOllamaEmbeddingService | null> {
@@ -63,7 +64,8 @@ async function fetchEmbeddingAPI(text: string): Promise<number[]> {
  const res = await fetch(`${API_URL}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: EMBEDDING_MODEL, prompt: text }),
+	body: JSON.stringify({
+	model: EMBEDDING_MODEL, prompt: text }),
  });
  if (!res.ok) throw new Error(`Ollama embedding failed: ${res.statusText}`);
  const data = await res.json();

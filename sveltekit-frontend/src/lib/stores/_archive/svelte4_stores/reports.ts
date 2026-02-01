@@ -17,7 +17,7 @@ export async function saveReport(draft: ReportDraft): Promise<void> {
  const res = await fetch('/api/reports/save', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(draft),
+	body: JSON.stringify(draft),
  });
  if (!res.ok) throw new Error(await res.text());
  const saved = await res.json();

@@ -21,7 +21,8 @@ interface ErrorPayload {
 }
 // Minimal window shape for Redux DevTools availability check
 interface DevtoolsWindow extends Window {
- __REDUX_DEVTOOLS_EXTENSION__?: {, connect: (opts?: { name?: string; [key: string]: any }) => {
+ __REDUX_DEVTOOLS_EXTENSION__?: {
+	connect: (opts?: { name?: string; [key: string]: any }) => {
  send: (action: any, state?: unknown) => void;
  init: (state: unknown) => void;
  };
@@ -35,7 +36,8 @@ interface InspectionEvent {
 }
 // Store persistence interface
 export interface StoreState {
- appState: unknown, legalCaseState: unknown;, timestamp: number;
+ appState: unknown, legalCaseState: unknown;
+	timestamp: number;
 }
 // Configuration for store behavior
 export interface XStateStoreConfig {
@@ -90,7 +92,8 @@ class XStateStoreManager {
  // Periodic persistence (every 30 seconds)
  setInterval(() => {
  this.persistState();
- }, 30000);
+ },
+	30000);
  }
  // Set up online/offline detection
  window.addEventListener('online', () => {
@@ -103,7 +106,8 @@ class XStateStoreManager {
  this.setupPerformanceMonitoring();
  }
  /** * Initialize the application machine and store */
- public initializeApp(): {, appStore: Readable<unknown>, appActor: ActorRefFrom<typeof appMachine>;
+ public initializeApp(): {
+	appStore: Readable<unknown>, appActor: ActorRefFrom<typeof appMachine>;
  send: (_event: AppEvents) => void, selectors: typeof appSelectors;
  } {
  if (this.appActor) {
@@ -143,10 +147,12 @@ class XStateStoreManager {
  }
  this.appActor?.send(event);
  };
- return { appStore: { subscribe }, appActor: this.appActor, send };
+ return { appStore: { subscribe },
+	appActor: this.appActor, send };
  }
  /** * Initialize the legal case machine and store */
- public initializeLegalCase(): {, legalCaseStore: Readable<unknown>, legalCaseActor: ActorRefFrom<typeof legalCaseMachine>;
+ public initializeLegalCase(): {
+	legalCaseStore: Readable<unknown>, legalCaseActor: ActorRefFrom<typeof legalCaseMachine>;
  send: (_event: Event) => void, selectors: typeof legalCaseSelectors;
  } {
  if (this.legalCaseActor) {
@@ -191,7 +197,7 @@ class XStateStoreManager {
  };
  return {
  legalCaseStore: { subscribe, subscribeCase },
- legalCaseActor: this.legalCaseActor, sendCase: selectors,
+	legalCaseActor: this.legalCaseActor, sendCase: selectors,
  };
  }
  /** * Create derived stores for specific state slices */
@@ -251,43 +257,53 @@ class XStateStoreManager {
  public createUtilities(appSend: (_event: AppEvents) => void) {
  return {
  // Notification helpers
- notify: {, success: (title: string), string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: {, type: 'success', title, message } }),
+ notify: {
+	success: (title: string), string: string =>
+ appSend({ type: 'ADD_NOTIFICATION', notification: {
+	type: 'success', title, message } }),
  error: (title: string), string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: {, type: 'error', title, message } }),
+ appSend({ type: 'ADD_NOTIFICATION', notification: {
+	type: 'error', title, message } }),
  warning: (title: string), string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: {, type: 'warning', title, message } }),
+ appSend({ type: 'ADD_NOTIFICATION', notification: {
+	type: 'warning', title, message } }),
  info: (title: string), string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: {, type: 'info', title, message } }),
+ appSend({ type: 'ADD_NOTIFICATION', notification: {
+	type: 'info', title, message } }),
  dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
  },
- // Theme helpers
- theme: {, setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }),
+	// Theme helpers
+ theme: {
+	setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }),
  setDark: () => appSend({ type: 'SET_THEME', theme: 'dark' }),
  setAuto: () => appSend({ type: 'SET_THEME', theme: 'auto' }),
  },
- // Layout helpers
- layout: {, setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }),
+	// Layout helpers
+ layout: {
+	setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }),
  setTablet: () => appSend({ type: 'SET_LAYOUT', layout: 'tablet' }),
  setMobile: () => appSend({ type: 'SET_LAYOUT', layout: 'mobile' }),
  },
- // Error helpers (use explicit ErrorPayload type)
- error: {, set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
+	// Error helpers (use explicit ErrorPayload type)
+ error: {
+	set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
  clear: () => appSend({ type: 'CLEAR_ERROR' } as unknown as AppEvents),
  retry: () => appSend({ type: 'RETRY_FAILED_ACTION' } as unknown as AppEvents),
  },
- // Loading helpers
- loading: {, start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }),
+	// Loading helpers
+ loading: {
+	start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }),
  stop: () => appSend({ type: 'GLOBAL_LOADING_COMPLETE' }),
  },
- // Navigation helpers
+	// Navigation helpers
  navigate: (path: string, title?: string) => appSend({ type: 'NAVIGATE', path, title }),
  // Settings helpers (avoid direct AppContext['settings'] reference)
- settings: {, update: (settings: Partial<Record<string, unknown>>) =>
+ settings: {
+	update: (settings: Partial<Record<string, unknown>>) =>
  appSend({ type: 'UPDATE_SETTINGS', settings }),
  reset: () => appSend({ type: 'RESET_SETTINGS' }),
  },
- };
+	};
  }
  // Private helper methods
  private createDevtoolsInspector(machineId: string) {
@@ -357,8 +373,9 @@ class XStateStoreManager {
  const navEntry = entry as PerformanceNavigationTiming;
  this.appActor?.send({
  type: 'UPDATE_PERFORMANCE_METRICS',
- metrics: {, pageLoadTime: navEntry.loadEventEnd - navEntry.loadEventStart },
- } as unknown as AppEvents);
+ metrics: {
+	pageLoadTime: navEntry.loadEventEnd - navEntry.loadEventStart },
+	} as unknown as AppEvents);
  }
  }
  });
@@ -369,9 +386,11 @@ class XStateStoreManager {
  setInterval(() => {
  this.appActor?.send({
  type: 'UPDATE_PERFORMANCE_METRICS',
- metrics: {, memoryUsage: perfMem.usedJSHeapSize },
- } as unknown as AppEvents);
- }, 30000); // Every 30 seconds
+ metrics: {
+	memoryUsage: perfMem.usedJSHeapSize },
+	} as unknown as AppEvents);
+ },
+	30000); // Every 30 seconds
  }
  }
  }

@@ -4,7 +4,7 @@
 
 	import EvidenceCard from '$lib/components/EvidenceCard.svelte';
 	import EvidenceConnections from '$lib/components/EvidenceConnections.svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import type { PageData } from './$types';
 
 	let { data } = $props();
@@ -90,10 +90,12 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	});
+	
+});
 </script>
 
 <div class="evidence-board-container">

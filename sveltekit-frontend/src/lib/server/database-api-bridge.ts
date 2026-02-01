@@ -10,48 +10,69 @@ import { queryLegalDocumentsSSR, type SSRResponse } from './api-ssr-helpers.js';
 
 // Type definitions based on database schema
 export interface LegalDocument {
-	id: string;, title: string;
-	content: string;, document_type: 'contract' | 'brief' | 'evidence' | 'statute' | 'regulation' | 'case_law';
-	jurisdiction: string;, metadata: Record<string, any>;
-	embeddings?: number[];, created_at: Date;
+	id: string;
+	title: string;
+	content: string;
+	document_type: 'contract' | 'brief' | 'evidence' | 'statute' | 'regulation' | 'case_law';
+	jurisdiction: string;
+	metadata: Record<string, any>;
+	embeddings?: number[];
+	created_at: Date;
 	updated_at: Date;
 	case_id?: string;
-	client_id?: string;, status: 'active' | 'archived' | 'draft';
+	client_id?: string;
+	status: 'active' | 'archived' | 'draft';
 }
 
 export interface LegalCase {
-	id: string;, title: string;
-	description: string;, case_type: 'civil' | 'criminal' | 'corporate' | 'family' | 'intellectual_property';
-	jurisdiction: string;, status: 'active' | 'closed' | 'pending' | 'on_hold';
-	client_id: string;, created_at: Date;
-	updated_at: Date;, metadata: Record<string, any>;
+	id: string;
+	title: string;
+	description: string;
+	case_type: 'civil' | 'criminal' | 'corporate' | 'family' | 'intellectual_property';
+	jurisdiction: string;
+	status: 'active' | 'closed' | 'pending' | 'on_hold';
+	client_id: string;
+	created_at: Date;
+	updated_at: Date;
+	metadata: Record<string, any>;
 	priority: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 export interface EvidenceItem {
-	id: string;, title: string;
-	description: string;, evidence_type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_opinion';
-	file_path?: string;, metadata: Record<string, any>;
-	case_id: string;, relevance_score: number;
+	id: string;
+	title: string;
+	description: string;
+	evidence_type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_opinion';
+	file_path?: string;
+	metadata: Record<string, any>;
+	case_id: string;
+	relevance_score: number;
 	admissibility_status: 'unknown' | 'admissible' | 'inadmissible' | 'pending';
-	created_at: Date;, updated_at: Date;
+	created_at: Date;
+	updated_at: Date;
 }
 
 export interface ConversationRecord {
-	id: string;, user_id: string;
+	id: string;
+	user_id: string;
 	title: string;
-	case_id?: string;, context: Record<string, any>;
-	created_at: Date;, updated_at: Date;
-	message_count: number;, last_activity: Date;
+	case_id?: string;
+	context: Record<string, any>;
+	created_at: Date;
+	updated_at: Date;
+	message_count: number;
+	last_activity: Date;
 }
 
 export interface MessageRecord {
-	id: string;, conversation_id: string;
+	id: string;
+	conversation_id: string;
 	role: 'user' | 'assistant' | 'system';
 	content: string;
 	model?: string;
 	token_count?: number;
-	processing_time?: number;, metadata: Record<string, any>;
+	processing_time?: number;
+	metadata: Record<string, any>;
 	created_at: Date;
 }
 
@@ -80,7 +101,7 @@ export class LegalDatabaseBridge {
 			document_type: documentData.document_type ?? 'contract',
 			jurisdiction: documentData.jurisdiction ?? 'federal',
 			metadata: documentData.metadata || {},
-			created_at: now,
+	created_at: now,
 			updated_at: now,
 			case_id: documentData.case_id,
 			client_id: documentData.client_id,
@@ -126,7 +147,7 @@ export class LegalDatabaseBridge {
 
 	async searchLegalDocuments(
 		query: { searchTerm?: string; documentType?: string; jurisdiction?: string; caseId?: string; clientId?: string },
-		options: { limit?: number; offset?: number; useVector?: boolean } = {}
+	options: { limit?: number; offset?: number; useVector?: boolean } = {}
 	): Promise<LegalDocument[]> {
 		try {
 			const documents = await queryLegalDocumentsSSR(
@@ -134,13 +155,14 @@ export class LegalDatabaseBridge {
 					path: query.searchTerm ? 'title,content' : undefined,
 					operator: '@>', // Simplified placeholder logic
 					value: query.searchTerm ?? '',
-					conditions: {, document_type: query.documentType,
+					conditions: {
+	document_type: query.documentType,
 						jurisdiction: query.jurisdiction,
 						case_id: query.caseId,
 						client_id: query.clientId
 					}
 				},
-				{
+	{
 					limit: options.limit ?? 50,
 					offset: options.offset ?? 0,
 					useVector: options.useVector ?? false
@@ -163,7 +185,8 @@ export class LegalDatabaseBridge {
 
             // Add updated_at
             const updatedAt = new Date();
-            const setClauseWithTimestamp = `${setClause}, updated_at = $${values.length + 1}`;
+            const setClauseWithTimestamp = `${setClause},
+	updated_at = $${values.length + 1}`;
             values.push(updatedAt);
 
 			await this.executeQuery(
@@ -192,7 +215,7 @@ export class LegalDatabaseBridge {
 			created_at: now,
 			updated_at: now,
 			metadata: caseData.metadata || {},
-			priority: caseData.priority ?? 'medium'
+	priority: caseData.priority ?? 'medium'
 		};
 
 		try {
@@ -247,7 +270,7 @@ export class LegalDatabaseBridge {
 			evidence_type: evidenceData.evidence_type ?? 'document',
 			file_path: evidenceData.file_path,
 			metadata: evidenceData.metadata || {},
-			case_id: evidenceData.case_id ?? '',
+	case_id: evidenceData.case_id ?? '',
 			relevance_score: evidenceData.relevance_score ?? 0.5,
 			admissibility_status: evidenceData.admissibility_status ?? 'unknown',
 			created_at: now,
@@ -301,7 +324,7 @@ export class LegalDatabaseBridge {
 			title: conversationData.title ?? 'New Conversation',
 			case_id: conversationData.case_id,
 			context: conversationData.context || {},
-			created_at: now,
+	created_at: now,
 			updated_at: now,
 			message_count: 0,
 			last_activity: now
@@ -341,7 +364,7 @@ export class LegalDatabaseBridge {
 			token_count: messageData.token_count,
 			processing_time: messageData.processing_time,
 			metadata: messageData.metadata || {},
-			created_at: now
+	created_at: now
 		};
 
 		try {
@@ -485,7 +508,7 @@ export class LegalDatabaseBridge {
 					acc[table] = parseInt(result.rows?.[0]?.count ?? '0', 10);
 					return acc;
 				},
-				{} as Record<string, number>
+	{} as Record<string, number>
 			);
 		} catch (error) {
 			console.error('Failed to get stats: ', error);
@@ -504,14 +527,16 @@ export async function apiCreateDocument(documentData: Partial<LegalDocument>): P
 		return {
 			success: true,
 			data: document,
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	} catch (error) {
 		return {
 			success: false,
 			data: null, // As per generic expectation, likely null or undefined on failure, or handle generic better
             error: error instanceof Error ? error.message : 'Document creation failed',
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	}
 }
@@ -522,14 +547,16 @@ export async function apiCreateCase(caseData: Partial<LegalCase>): Promise<SSRRe
 		return {
 			success: true,
 			data: legalCase,
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	} catch (error) {
 		return {
 			success: false,
 			data: null,
             error: error instanceof Error ? error.message : 'Case creation failed',
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	}
 }
@@ -543,14 +570,16 @@ export async function apiSearchDocuments(
 		return {
 			success: true,
 			data: documents,
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	} catch (error) {
 		return {
 			success: false,
 			data: [],
             error: error instanceof Error ? error.message : 'Document search failed',
-			meta: {, timestamp: new Date().toISOString(), cached: false, source: 'api' }
+			meta: {
+	timestamp: new Date().toISOString(), cached: false, source: 'api' }
 		};
 	}
 }

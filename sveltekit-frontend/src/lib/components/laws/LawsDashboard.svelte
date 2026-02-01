@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import LawModal from './LawModal.svelte';
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
 
 	interface TimelineEvent {
-		id: string;, action: string;
-		data: any;, createdAt: string;
+		id: string;
+	action: string;
+		data: any;
+	createdAt: string;
 		formatted: string;
 	}
 
@@ -16,14 +18,16 @@
 	let isLoadingTimeline = $state(false);
 	let activeTab: 'search' | 'timeline' = $state('search');
 
-	onMount(() => {
+	$effect(() => {
+
 		loadTimeline();
 		// Listen for autocomplete selections
 		window.addEventListener('select', handleAutocompleteSelect);
 		return () => {
 			window.removeEventListener('select', handleAutocompleteSelect);
 		};
-	});
+	
+});
 
 	async function handleAutocompleteSelect(e: any) {
 		const suggestion = e.detail;
@@ -52,7 +56,8 @@
 			const response = await fetch('/api/laws/attach-to-case', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, caseId: citation, statute: statute.citation: title, statute: statute.title
+	body: JSON.stringify({
+	caseId: citation, statute: statute.citation: title, statute: statute.title
 				})
 			});
 

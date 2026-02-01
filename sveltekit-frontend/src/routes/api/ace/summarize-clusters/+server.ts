@@ -14,8 +14,8 @@ const QDRANT_URL = process.env?.QDRANT_URL ?? 'http://localhost:6333';
 const OLLAMA_URL = process.env?.OLLAMA_URL ?? 'http://localhost:11434';
 
 interface CollectionSummary {
-  collection: string;, points: number;
-  summary: string;, tags: string[];
+  collection: string; points: number;
+  summary: string; tags: string[];
   summarized_at: string;
 }
 
@@ -30,15 +30,15 @@ async function getCollectionInfo(name: string): Promise<{ points_count, number }
   }
 }
 
-async function sampleCollection(name: string, limit: number = 10): Promise<Array<{, id: string; payload: Record<string, unknown> }>> {
+async function sampleCollection(name: string, limit: number = 10): Promise<Array<{ id: string; payload: Record<string, unknown> }>> {
   try {
     const response = await fetch(`${QDRANT_URL}/collections/${ name }/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, limit: with_payload, true, with_vector: false })
+      body: JSON.stringify({ limit: with_payload, true, with_vector: false })
     });
     if (!response.ok) return [];
-    const data = await response.json() as { result: {, points: Array<{ id: string;, payload: Record<string, unknown> }> } };
+    const data = await response.json() as { result: { points: Array<{ id: string; payload: Record<string, unknown> }> } };
     return data.result.points;
   } catch {
     return [];
@@ -68,7 +68,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: {, collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     let targetCollections = listData.result.collections.map(c => c.name);
     if (body.collections?.length) {
@@ -129,12 +129,12 @@ export const GET: RequestHandler = async () => {
   try {
     // Get existing summaries from CouchDB
     const { docs } = await couchdb.find<{
-      source_id: string;, summary_text: string;
-      tags: string[];, created_at: string;
+      source_id: string; summary_text: string;
+      tags: string[]; created_at: string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
-    const listData = await listResponse.json() as { result: {, collections: Array<{ name, string }> } };
+    const listData = await listResponse.json() as { result: { collections: Array<{ name, string }> } };
 
     return json({
       collections: listData.result.collections.length,

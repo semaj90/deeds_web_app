@@ -65,10 +65,11 @@ export async function embedAndStore(docId, string, string: Promise<void> {
  points: [
  {
  id: docId, vector:
- payload: {, content: content.substring(0, 1000), // Store preview
+ payload: {
+	content: content.substring(0, 1000), // Store preview
  timestamp: new Date().toISOString(),
  },
- }],
+	}],
  });
  } catch (error) {
  console.error('Failed to embed and store document:', error);
@@ -122,17 +123,20 @@ export async function getCollectionInfo(): Promise<any> {
 
 // Batch operations for performance
 export async function batchEmbedAndStore(
- documents: Array<{, id: string, content, string }>
-): Promise<void> {documents.map(async (doc) => {
+ documents: Array<{
+	id: string, content, string }>
+): Promise<void> {
+documents.map(async (doc) => {
  const embedder = await pipeline('feature-extraction', 'Xenova/embeddinggemma');
  const output = await embedder(doc.content, { pooling: 'mean', normalize: true });
  const vector = Array.from(output.data);
 
  return {
  id: doc.id,
- payload: {, content: doc.content.substring(0, 1000, timestamp: new Date().toISOString(),
+ payload: {
+	content: doc.content.substring(0, 1000, timestamp: new Date().toISOString(),
  },
- };
+	};
  })
  );
 

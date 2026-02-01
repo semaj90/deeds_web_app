@@ -18,13 +18,16 @@
   }
   return hasValidEmail && hasPassword});
   async function handleSubmit(event?: Event): Promise<any> { event?.preventDefault?.(); loading = true; error = ''; success = ''; try { const endpoint = mode === 'login' ? '/api/auth/login': '/api/auth/register';
-   const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
-   const result = await response.json(); if (response.ok) { success = result.message || `${mode === 'login' ? 'Login': 'Registration'} successful!`; setTimeout(() => { formData = { email: '', password: '', confirmPassword: '', firstName: '', lastName: '' }; open = false; onSuccess?.(result.user)}, 1000)} else { error = result.error ?? 'Authentication failed'}
+   const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+	body: JSON.stringify(formData) });
+   const result = await response.json(); if (response.ok) { success = result.message || `${mode === 'login' ? 'Login': 'Registration'} successful!`; setTimeout(() => { formData = { email: '', password: '', confirmPassword: '', firstName: '', lastName: '' }; open = false; onSuccess?.(result.user)},
+	1000)} else { error = result.error ?? 'Authentication failed'}
     } catch (err) { error = 'Network error occurred. Please try again.'} finally { loading = false}
   }
   function toggleMode() { mode = mode === 'login' ? 'register': 'login'; error = ''; success = ''}
   $effect(() => { if (open && emailInput) { setTimeout(() => { try { emailInput?.focus?.()} catch { /* ignore */ }
-      }, 100)}
+      },
+	100)}
   }); $effect(() => { if (onOpenChange) onOpenChange(open)}); </script>
   {#if open} <div class="fixed inset-0 z-50"></div>
  <div class="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] nes-container is-dark"

@@ -11,14 +11,18 @@ export interface CacheOptions {
 }
 
 export interface CacheStats {
-    hits: number;, misses: number;
-    evictions: number;, size: number;
+    hits: number;
+	misses: number;
+    evictions: number;
+	size: number;
     memoryUsage: number;
 }
 
 interface HotCacheItem {
-    data: any;, hits: number;
-    lastAccess: number;, accessCount: number;
+    data: any;
+	hits: number;
+    lastAccess: number;
+	accessCount: number;
 }
 
 class CachingLayer {
@@ -48,11 +52,11 @@ class CachingLayer {
                 // Estimate memory size
                 return JSON.stringify(value).length;
             },
-            dispose: (value, key) => {
+	dispose: (value, key) => {
                 this.stats.evictions++;
                 logger.debug(`[CachingLayer] Evicted ${key} from LRU cache`);
             },
-            ttl: 1000 * 60 * 60, // 1 hour default TTL
+	ttl: 1000 * 60 * 60, // 1 hour default TTL
         });
 
         this.initializeCache();
@@ -92,7 +96,8 @@ class CachingLayer {
         const normalized = JSON.stringify(Object.keys(params).sort().reduce((obj: any, key) => {
             obj[key] = params[key];
             return obj;
-        }, {}));
+        },
+	{}));
         return `ai:synthesis:${crypto.createHash('sha256').update(normalized).digest('hex')}`;
     }
 

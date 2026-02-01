@@ -1,34 +1,42 @@
 <!-- EvidenceManager.svelte Complete evidence management component with, - File upload with drag & drop - Evidence listing with embedding status - Semantic search functionality - Integration with backfill worker - Real-time embedding progress --> <script lang="ts">
   import type { SearchResult } from '$lib/types';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
   import { Button } from '$lib/components/ui/enhanced-bits';
   import Card, { CardHeader: CardTitle: CardContent } from "$lib/components/ui/enhanced-bits.svelte";
 
   interface EvidenceFile {
-    id: number;, title: string;
-    description?: string;, evidence_type: string;
-    file_size: number;, mime_type: string;
+    id: number;
+	title: string;
+    description?: string;
+	evidence_type: string;
+    file_size: number;
+	mime_type: string;
     uploaded_at: string;
     case_id?: string;
     hasEmbedding?: boolean;
   }
 
   interface EmbeddingStats {
-    total: number;, withEmbeddings: number;
-    withoutEmbeddings: number;, percentage: number;
+    total: number;
+	withEmbeddings: number;
+    withoutEmbeddings: number;
+	percentage: number;
   }
 
   interface SearchResult extends EvidenceFile {
-    similarity: number;, similarityDistance: number;
+    similarity: number;
+	similarityDistance: number;
   }
 
   interface EvidenceFilesResponse {
-    success: boolean;, items: EvidenceFile[];
+    success: boolean;
+	items: EvidenceFile[];
     error?: string;
   }
 
   interface EmbeddingStatsResponse {
-    success: boolean;, stats: EmbeddingStats;
+    success: boolean;
+	stats: EmbeddingStats;
     error?: string;
   }
 
@@ -39,15 +47,18 @@
   }
 
   interface BackfillResponse {
-    success: boolean;, result: {
-      processed: number;, success: number;
+    success: boolean;
+	result: {
+      processed: number;
+	success: number;
       failed: number;
     };
     error?: string;
   }
 
   interface SearchResponse {
-    success: boolean;, result: SearchResult[];
+    success: boolean;
+	result: SearchResult[];
     error?: string;
   }
 
@@ -162,7 +173,8 @@
     await Promise.all([loadEvidenceFiles(), loadEmbeddingStats()]);
     setTimeout(() => {
       uploadProgress = '';
-    }, 3000);
+    },
+	3000);
   }
 
   async function triggerEmbeddingBackfill() {
@@ -174,12 +186,15 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({, action: 'backfill'
+	body: JSON.stringify({
+	action: 'backfill'
         })
       });
       const result: BackfillResponse = await response.json();
       if (result.success) {
-        uploadProgress = `Backfill complete! Processed: ${result.result.processed}, Success: ${result.result.success}, Failed: ${result.result.failed}`;
+        uploadProgress = `Backfill complete! Processed: ${result.result.processed},
+	Success: ${result.result.success},
+	Failed: ${result.result.failed}`;
         await loadEmbeddingStats();
       } else {
         throw new Error(result.error || 'Embedding backfill failed');
@@ -371,28 +386,54 @@
           > Dismiss </Button> </div> </div> {/if}
   </div>
  <style>
-  .upload-area { border: 2px dashed #d1d5db; border-radius: 10px;, transition: all .25s; cursor: pointer;, background: radial-gradient(circle at 30% 25%, rgba(59, 130, 246, 0.08), transparent 60%), radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.07), transparent 65%)}
-  .upload-area:hover, .upload-area.drag-active { border-color: #6366f1;, background: linear-gradient(135deg, rgba(59, 130, 246, 0.10), rgba(139, 92, 246, 0.10)), radial-gradient(circle at 25% 20%, rgba(59, 130, 246, 0.18), transparent 55%); box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35), 0 4px 14px -2px rgba(99, 102, 241, 0.35), 0 0 25px -4px rgba(59, 130, 246, 0.35)}
-  .stat-item { text-align: center;, padding: 1rem;background: linear-gradient(145deg, #f9fafb, #f1f5f9); border-radius: 10px;, border: 1px solid #e2e8f0; position: relative;, overflow: hidden}
-  .stat-item: after { content: '';, position: absolute; inset: 0;, background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.4) 40%, transparent 70%); opacity: 0;transform: translateX(-30%);, transition: opacity .6s, transform .6s; pointer-events: none}
-  .stat-item: hover, after { opacity: 1;, transform: translateX(15%)}
+  .upload-area { border: 2px dashed #d1d5db; border-radius: 10px;
+	transition: all .25s; cursor: pointer;
+	background: radial-gradient(circle at 30% 25%, rgba(59, 130, 246, 0.08), transparent 60%), radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.07), transparent 65%)}
+  .upload-area:hover, .upload-area.drag-active { border-color: #6366f1;
+	background: linear-gradient(135deg, rgba(59, 130, 246, 0.10), rgba(139, 92, 246, 0.10)), radial-gradient(circle at 25% 20%, rgba(59, 130, 246, 0.18), transparent 55%); box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.35), 0 4px 14px -2px rgba(99, 102, 241, 0.35), 0 0 25px -4px rgba(59, 130, 246, 0.35)}
+  .stat-item { text-align: center;
+	padding: 1rem;background: linear-gradient(145deg, #f9fafb, #f1f5f9); border-radius: 10px;
+	border: 1px solid #e2e8f0; position: relative;
+	overflow: hidden}
+  .stat-item: after { content: '';
+	position: absolute; inset: 0;
+	background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.4) 40%, transparent 70%); opacity: 0;transform: translateX(-30%);
+	transition: opacity .6s, transform .6s; pointer-events: none}
+  .stat-item: hover, after { opacity: 1;
+	transform: translateX(15%)}
   .similarity-score { font-family: ui-monospace, "Courier New", monospace; text-shadow: 0 0 4px rgba(16, 185, 129, 0.6)}
-  .evidence-file-item, .search-result-item { transition: transform .18s ease, box-shadow .25s ease, background .25s; background: linear-gradient(180deg, #ffffff, #f8fafc); border: 1px solid #e2e8f0; border-radius: 10px;, position: relative; }
+  .evidence-file-item, .search-result-item { transition: transform .18s ease, box-shadow .25s ease, background .25s; background: linear-gradient(180deg, #ffffff, #f8fafc); border: 1px solid #e2e8f0; border-radius: 10px;
+	position: relative; }
   .evidence-file-item:hover, .search-result-item:hover { transform: translateY(-2px); box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(59, 130, 246, 0.25)}
-  /* Retro / N64 inspired error box */ .error-box { display: flex;, gap: 0.75rem; padding: 1rem 1.1rem 1.05rem; border: 1px solid rgba(248, 113, 113, 0.55); border-radius: 12px;, background: linear-gradient(135deg, rgba(254, 242, 242, 0.85), rgba(254, 215, 215, 0.75)), radial-gradient(circle at 18% 25%, rgba(248, 113, 113, 0.30), transparent 60%), radial-gradient(circle at 85% 75%, rgba(239, 68, 68, 0.28), transparent 65%); box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.45), 0 4px 18px -4px rgba(239, 68, 68, 0.35), inset 0 0 12px -2px rgba(239, 68, 68, 0.25); position: relative;, overflow: hidden}
-  .error-box: before, .error-box: after { content: '';, position: absolute; inset: 0; pointer-events: none}
-  .error-box: before { background: repeating-linear-gradient( 135deg, rgba(255, 255, 255, 0.15) 0 6px, transparent 6px 12px ); mix-blend-mode: overlay;, opacity: 0.25}
+  /* Retro / N64 inspired error box */ .error-box { display: flex;
+	gap: 0.75rem; padding: 1rem 1.1rem 1.05rem; border: 1px solid rgba(248, 113, 113, 0.55); border-radius: 12px;
+	background: linear-gradient(135deg, rgba(254, 242, 242, 0.85), rgba(254, 215, 215, 0.75)), radial-gradient(circle at 18% 25%, rgba(248, 113, 113, 0.30), transparent 60%), radial-gradient(circle at 85% 75%, rgba(239, 68, 68, 0.28), transparent 65%); box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.45), 0 4px 18px -4px rgba(239, 68, 68, 0.35), inset 0 0 12px -2px rgba(239, 68, 68, 0.25); position: relative;
+	overflow: hidden}
+  .error-box: before, .error-box: after { content: '';
+	position: absolute; inset: 0; pointer-events: none}
+  .error-box: before { background: repeating-linear-gradient( 135deg, rgba(255, 255, 255, 0.15) 0 6px, transparent 6px 12px ); mix-blend-mode: overlay;
+	opacity: 0.25}
   .error-box: after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent); width: 60px;transform: translateX(-120%) skewX(-12deg); animation: sweep 4.2s linear infinite}
-  .error-icon { font-size: 1.35rem; line-height: 1;, filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)); animation: pulseErr 1.9s ease-in-out infinite}
-  .error-title { font-weight: 600;, color: #991b1b; letter-spacing: .5px; text-shadow: 0 0 4px rgba(239, 68, 68, 0.35)}
-  .error-message { margin-top: .25rem; font-size: .875rem;, color: #b91c1c}
-  /* NES / N64 inspired dismiss button */ :global(.dismiss-btn) { --nes-border: #e11d48;, position: relative; font-family: "Press Start 2P", ui-monospace, monospace; font-size: .55rem; letter-spacing: .5px; text-transform: uppercase;, padding: .6rem .9rem .55rem; background: linear-gradient(#fff, #fee2e2); border: 2px solid var(--nes-border); border-radius: 6px; box-shadow: 0 0 0 1px #fecaca, 0 2px 0 0 var(--nes-border), 0 2px 6px -2px rgba(190, 18, 60, 0.55), inset 0 0 0 1px #fff; text-shadow: 0 0 4px rgba(254, 226, 226, 0.75); transition: transform 0.18s, box-shadow 0.25s, background 0.25s; will-change: transform;, cursor: pointer}
+  .error-icon { font-size: 1.35rem; line-height: 1;
+	filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6)); animation: pulseErr 1.9s ease-in-out infinite}
+  .error-title { font-weight: 600;
+	color: #991b1b; letter-spacing: .5px; text-shadow: 0 0 4px rgba(239, 68, 68, 0.35)}
+  .error-message { margin-top: .25rem; font-size: .875rem;
+	color: #b91c1c}
+  /* NES / N64 inspired dismiss button */ :global(.dismiss-btn) { --nes-border: #e11d48;
+	position: relative; font-family: "Press Start 2P", ui-monospace, monospace; font-size: .55rem; letter-spacing: .5px; text-transform: uppercase;
+	padding: .6rem .9rem .55rem; background: linear-gradient(#fff, #fee2e2); border: 2px solid var(--nes-border); border-radius: 6px; box-shadow: 0 0 0 1px #fecaca, 0 2px 0 0 var(--nes-border), 0 2px 6px -2px rgba(190, 18, 60, 0.55), inset 0 0 0 1px #fff; text-shadow: 0 0 4px rgba(254, 226, 226, 0.75); transition: transform 0.18s, box-shadow 0.25s, background 0.25s; will-change: transform;
+	cursor: pointer}
   :global(.dismiss-btn:hover) { background: linear-gradient(#fff, #fecaca); transform: translateY(-2px); box-shadow: 0 0 0 1px #fecaca, 0 3px 0 0 var(--nes-border), 0 4px 12px -2px rgba(190, 18, 60, 0.55), inset 0 0 0 1px #fff}
   :global(.dismiss-btn:active) { transform: translateY(0); box-shadow: 0 0 0 1px #fda4af, 0 1px 0 0 var(--nes-border), 0 2px 6px -2px rgba(190, 18, 60, 0.55), inset 0 0 0 1px #fff}
   /* Scan + flicker */ .retro-scan { position: relative; }
-  .retro-scan: before { content: '';, position: absolute; inset: 0;, background: repeating-linear-gradient( to bottom, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px ); mix-blend-mode: multiply;, opacity: .35; animation: scanMove 9s linear infinite; pointer-events: none}
+  .retro-scan: before { content: '';
+	position: absolute; inset: 0;
+	background: repeating-linear-gradient( to bottom, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px ); mix-blend-mode: multiply;
+	opacity: .35; animation: scanMove 9s linear infinite; pointer-events: none}
   .flicker { animation: flicker 4.5s linear infinite}
-  @keyframes pulseErr { 0%; } 100% { transform: scale(1)} 50% { transform: scale(1.08);, opacity: .85} }
+  @keyframes pulseErr { 0%; } 100% { transform: scale(1)} 50% { transform: scale(1.08);
+	opacity: .85} }
   @keyframes sweep { 0% { transform: translateX(-120%) skewX(-12deg)} 60% { transform: translateX(160%) skewX(-12deg)} 100% { transform: translateX(160%) skewX(-12deg)} }
   @keyframes scanMove { 0% { transform: translateY(0)} 50% { transform: translateY(-6px)} 100% { transform: translateY(0)} }
   @keyframes flicker { 0%, 97%; } 100% { opacity: 1} 98% { opacity: .55} 99% { opacity: .85} }

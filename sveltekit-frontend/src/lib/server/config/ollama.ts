@@ -4,7 +4,8 @@
  */
 
 export interface OllamaConfig {
-	baseUrl: string;, model: string;
+	baseUrl: string;
+	model: string;
 	timeout: number;
 }
 
@@ -57,7 +58,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(getOllamaUrl('/api/embeddings'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: config.model,
+	body: JSON.stringify({
+	model: config.model,
 				prompt: text
 			})
 		});
@@ -92,7 +94,8 @@ export async function generateText(
 		const response = await fetch(getOllamaUrl('/api/generate'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: config.model,
+	body: JSON.stringify({
+	model: config.model,
 				prompt: prompt,
 				stream: false,
 				temperature: options?.temperature ?? 0.7,
@@ -131,7 +134,8 @@ export async function* streamText(
 		const response = await fetch(getOllamaUrl('/api/generate'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: config.model,
+	body: JSON.stringify({
+	model: config.model,
 				prompt: prompt,
 				stream: true,
 				temperature: options?.temperature ?? 0.7,

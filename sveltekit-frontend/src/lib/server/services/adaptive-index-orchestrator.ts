@@ -11,26 +11,38 @@ import { VectorSearchService } from '$lib/server/db/drizzle-vector-config';
 export type RoutingDecision = 'gpu' | 'quic' | 'cache' | 'cpu';
 
 export interface RouterInputFeatures {
-	queryLatencyMs: number;, userFeedbackScore: number;
-	embeddingCostUsd: number;, gpuLoadPercent: number;
-	similarityScoreVariance: number;, cacheHitRate: number;
-	fileSizeKb: number;, docType: 'document' | 'evidence' | 'query';
-	vectorDensity: number;, ragConfidence: number;
-	textLength: number;, caseId: string;
+	queryLatencyMs: number;
+	userFeedbackScore: number;
+	embeddingCostUsd: number;
+	gpuLoadPercent: number;
+	similarityScoreVariance: number;
+	cacheHitRate: number;
+	fileSizeKb: number;
+	docType: 'document' | 'evidence' | 'query';
+	vectorDensity: number;
+	ragConfidence: number;
+	textLength: number;
+	caseId: string;
 	currentVectorCount: number;
 }
 
 export interface RoutingLogits {
-	useGpu: number;, useCpu: number;
-	useQuic: number;, useRest: number;
-	cacheHit: number;, reindex: number;
-	useQdrantForStorage: number;, usePgVectorForStorage: number;
+	useGpu: number;
+	useCpu: number;
+	useQuic: number;
+	useRest: number;
+	cacheHit: number;
+	reindex: number;
+	useQdrantForStorage: number;
+	usePgVectorForStorage: number;
 }
 
 export interface EmbeddingOrchestrationPayload {
-	id: string;, caseId: string;
+	id: string;
+	caseId: string;
 	type: 'document' | 'evidence' | 'query';
-	text: string;, title: string;
+	text: string;
+	title: string;
 	metadata?: Record<string, unknown>;
 }
 
@@ -46,7 +58,8 @@ export class AdaptiveIndexOrchestrator {
 		this.webASMLlamaCppEngine = new WebASMLlamaCppEngine();
 	}
 
-	async decideRouting(context: {, caseId: string; fileSize: number }): Promise<RoutingDecision> {
+	async decideRouting(context: {
+	caseId: string; fileSize: number }): Promise<RoutingDecision> {
 		const metrics = await aiAnalyticsService.getSystemLoad();
 
         const features = {
@@ -149,7 +162,8 @@ export class AdaptiveIndexOrchestrator {
                 const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({, model: 'embeddinggemma:latest', prompt: item.text })
+	body: JSON.stringify({
+	model: 'embeddinggemma:latest', prompt: item.text })
                 });
 
                 if (res.ok) {

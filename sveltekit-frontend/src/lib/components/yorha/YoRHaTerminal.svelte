@@ -1,5 +1,5 @@
 <!-- YoRHa, Terminal/Console, Component --> <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  // Migrated to $effect
 
   interface Props {
     title?: string;
@@ -119,12 +119,15 @@
       processCommand(cmd);
       currentCommand = '';
       isProcessing = false;
-    }, 150);
+    },
+	150);
   }
 
-  onMount(() => {
+  $effect(() => {
+
     if (isActive) inputRef?.focus();
-  });
+  
+});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->

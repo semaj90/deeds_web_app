@@ -21,15 +21,20 @@ const DEFAULT_TTL = 3600; // 1 hour
  * Interface for cached search result
  */
 export interface CachedSearchResult {
-    query: string;, results: Array<{
-        id: string;, title: string;
-        content?: string;, score: number;
+    query: string;
+	results: Array<{
+        id: string;
+	title: string;
+        content?: string;
+	score: number;
         [key: string]: unknown;
     }>;
-    stats: {, totalResults: number;
+    stats: {
+	totalResults: number;
         processingTimeMs: number;
     };
-    timestamp: number;, ttl: number;
+    timestamp: number;
+	ttl: number;
 }
 
 /**
@@ -179,7 +184,9 @@ async function recordCacheHit(hit: boolean): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{, hits: number; misses: number;, hitRate: number }> {
+export async function getCacheStats(): Promise<{
+	hits: number; misses: number;
+	hitRate: number }> {
     try {
         const hitsStart = await redis.get(STATS_KEY_HITS);
         const missesStart = await redis.get(STATS_KEY_MISSES);

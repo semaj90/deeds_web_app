@@ -1,14 +1,19 @@
 import Tesseract from 'tesseract.js';
 
 export interface OcrBoundingBox {
-    text: string;, x: number;
-    y: number;, w: number;
-    h: number;, confidence: number;
+    text: string;
+	x: number;
+    y: number;
+	w: number;
+    h: number;
+	confidence: number;
 }
 
 export interface OcrResult {
-    text: string;, markdown: string;
-    bbox: OcrBoundingBox[];, confidence: number;
+    text: string;
+	markdown: string;
+    bbox: OcrBoundingBox[];
+	confidence: number;
     engine: 'tesseract' | 'paddleocr' | 'nvidia-trt';
 }
 
@@ -24,7 +29,7 @@ export async function extractTextFromImage(
     // @ts-ignore
     const result = await Tesseract.recognize(fileBuffer, lang, {
         logger: () => {},
-    });
+	});
 
     const text = result.data.text ?? '';
     const markdown = text.replace(/\n\n+/g, '\n\n');

@@ -26,10 +26,12 @@ export interface CustomComponentConfig {
 // ======================================================================
 
 export interface DesignSystem {
-    name: string;, tokens: {
+    name: string;
+	tokens: {
         colors: Record<string, string>;
         spacing: Record<string, string>;
-        typography: {, fontFamily: string;
+        typography: {
+	fontFamily: string;
             fontSize: Record<string, string>;
             lineHeight: Record<string, string>;
         };
@@ -37,18 +39,25 @@ export interface DesignSystem {
     };
     cssVariables: Record<string, string>;
     components: Record<string, CustomComponentConfig>;
-    animations: AnimationConfig;, breakpoints: BreakpointConfig;
+    animations: AnimationConfig;
+	breakpoints: BreakpointConfig;
 }
 
 export interface AnimationConfig {
-    duration: {, fast: string; normal: string;, slow: string };
-    easing: {, easeIn: string; easeOut: string;, easeInOut: string };
+    duration: {
+	fast: string; normal: string;
+	slow: string };
+    easing: {
+	easeIn: string; easeOut: string;
+	easeInOut: string };
     transitions: Record<string, string>;
 }
 
 export interface BreakpointConfig {
-    sm: string;, md: string;
-    lg: string;, xl: string;
+    sm: string;
+	md: string;
+    lg: string;
+	xl: string;
     '2xl': string;
 }
 
@@ -58,7 +67,8 @@ export interface BreakpointConfig {
 
 export const NESDesignSystem: DesignSystem = {
     name: 'NES Legal AI',
-    tokens: {, colors: {
+    tokens: {
+	colors: {
             primary: '#00ff41', // Matrix Green
             secondary: '#ff6b35', // Orange
             evidence: '#ffd700', // Gold
@@ -67,31 +77,36 @@ export const NESDesignSystem: DesignSystem = {
             warning: '#f18701', // Orange
             error: '#d00000', // Red
         },
-        spacing: {, xs: '0.25rem',
+	spacing: {
+	xs: '0.25rem',
             sm: '0.5rem',
             md: '1rem',
             lg: '1.5rem',
             xl: '3rem',
         },
-        typography: {, fontFamily: '"Courier New", monospace',
-            fontSize: {, xs: '0.75rem',
+	typography: {
+	fontFamily: '"Courier New", monospace',
+            fontSize: {
+	xs: '0.75rem',
                 sm: '0.875rem',
                 base: '1rem',
                 lg: '1.125rem',
                 xl: '1.25rem',
                 '2xl': '1.5rem',
             },
-            lineHeight: {, tight: '1.25',
+	lineHeight: {
+	tight: '1.25',
                 normal: '1.5',
                 relaxed: '1.75',
             },
-        },
-        nes: {, pixelSize: '2px',
+	},
+	nes: {
+	pixelSize: '2px',
             borderWidth: '4px',
             shadowDepth: '4px',
         },
-    },
-    cssVariables: {
+	},
+	cssVariables: {
         '--nes-primary': '#00ff41',
         '--nes-bg': '#212529',
         '--nes-border': '#ffffff',
@@ -100,30 +115,35 @@ export const NESDesignSystem: DesignSystem = {
         '--nes-border-radius': '0px',
         '--nes-font-family': '"Courier New", monospace',
     },
-    components: {},
-    animations: {, duration: { fast: '150ms', normal: '300ms', slow: '500ms' },
-        easing: {, easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+	components: {},
+	animations: {
+	duration: { fast: '150ms', normal: '300ms', slow: '500ms' },
+	easing: {
+	easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
             easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
             easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
         },
-        transitions: {, all: 'all 150ms ease-in-out',
+	transitions: {
+	all: 'all 150ms ease-in-out',
             colors: 'color 150ms ease-in-out, background-color 150ms ease-in-out, border-color 150ms ease-in-out',
             opacity: 'opacity 150ms ease-in-out',
             shadow: 'box-shadow 150ms ease-in-out',
             transform: 'transform 150ms ease-in-out',
         },
-    },
-    breakpoints: {, sm: '640px',
+	},
+	breakpoints: {
+	sm: '640px',
         md: '768px',
         lg: '1024px',
         xl: '1280px',
         '2xl': '1536px',
     },
-};
+	};
 
 export const MinimalDesignSystem: DesignSystem = {
     name: 'Minimal Clean',
-    tokens: {, colors: {
+    tokens: {
+	colors: {
             primary: '#3b82f6',
             secondary: '#64748b',
             evidence: '#f59e0b',
@@ -132,31 +152,36 @@ export const MinimalDesignSystem: DesignSystem = {
             warning: '#f59e0b',
             error: '#ef4444',
         },
-        spacing: {, xs: '0.125rem',
+	spacing: {
+	xs: '0.125rem',
             sm: '0.25rem',
             md: '0.5rem',
             lg: '1rem',
             xl: '2rem',
         },
-        typography: {, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            fontSize: {, xs: '0.75rem',
+	typography: {
+	fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: {
+	xs: '0.75rem',
                 sm: '0.875rem',
                 base: '1rem',
                 lg: '1.125rem',
                 xl: '1.25rem',
                 '2xl': '1.5rem',
             },
-            lineHeight: {, tight: '1.25',
+	lineHeight: {
+	tight: '1.25',
                 normal: '1.5',
                 relaxed: '1.75',
             },
-        },
-        nes: {, pixelSize: '1px',
+	},
+	nes: {
+	pixelSize: '1px',
             borderWidth: '1px',
             shadowDepth: '2px',
         },
-    },
-    cssVariables: {
+	},
+	cssVariables: {
         '--minimal-primary': '#3b82f6',
         '--minimal-bg': '#ffffff',
         '--minimal-border': '#e5e7eb',
@@ -165,26 +190,30 @@ export const MinimalDesignSystem: DesignSystem = {
         '--minimal-border-radius': '0.5rem',
         '--minimal-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     },
-    components: {},
-    animations: {, duration: { fast: '100ms', normal: '200ms', slow: '300ms' },
-        easing: {, easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+	components: {},
+	animations: {
+	duration: { fast: '100ms', normal: '200ms', slow: '300ms' },
+	easing: {
+	easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
             easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
             easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
         },
-        transitions: {, all: 'all 200ms ease-in-out',
+	transitions: {
+	all: 'all 200ms ease-in-out',
             colors: 'color 200ms ease-in-out, background-color 200ms ease-in-out',
             opacity: 'opacity 200ms ease-in-out',
             shadow: 'box-shadow 200ms ease-in-out',
             transform: 'transform 200ms ease-in-out',
         },
-    },
-    breakpoints: {, sm: '640px',
+	},
+	breakpoints: {
+	sm: '640px',
         md: '768px',
         lg: '1024px',
         xl: '1280px',
         '2xl': '1536px',
     },
-};
+	};
 
 // ======================================================================
 // DESIGN SYSTEM UTILITIES
@@ -193,7 +222,7 @@ export const MinimalDesignSystem: DesignSystem = {
 export function createDesignSystem(
     name: string,
     customTokens: Partial<CustomDesignTokens> = {},
-    options: {
+	options: {
         baseSystem?: DesignSystem;
         animations?: Partial<AnimationConfig>;
         breakpoints?: Partial<BreakpointConfig>;
@@ -208,20 +237,22 @@ export function createDesignSystem(
 
     return {
         name,
-        tokens: {, colors: { ...baseSystem.tokens.colors, ...(customTokens.colors ?? {}) },
-            spacing: { ...baseSystem.tokens.spacing, ...(customTokens.spacing ?? {}) },
-            typography: {, fontFamily: typographyOverride.fontFamily ?? baseSystem.tokens.typography.fontFamily,
+        tokens: {
+	colors: { ...baseSystem.tokens.colors, ...(customTokens.colors ?? {}) },
+	spacing: { ...baseSystem.tokens.spacing, ...(customTokens.spacing ?? {}) },
+	typography: {
+	fontFamily: typographyOverride.fontFamily ?? baseSystem.tokens.typography.fontFamily,
                 fontSize: { ...baseSystem.tokens.typography.fontSize, ...(typographyOverride.fontSize ?? {}) },
-                lineHeight: {
+	lineHeight: {
                     ...baseSystem.tokens.typography.lineHeight,
                     ...(typographyOverride.lineHeight ?? {}),
                 },
-            },
-            nes: { ...baseSystem.tokens.nes, ...(customTokens.nes ?? {}) },
-        },
-        cssVariables: { ...baseSystem.cssVariables, ...cssVarsOverride },
-        components: { ...baseSystem.components, ...componentsOverride },
-        animations: { ...baseSystem.animations, ...(options.animations ?? {}) } as AnimationConfig,
+	},
+	nes: { ...baseSystem.tokens.nes, ...(customTokens.nes ?? {}) },
+	},
+	cssVariables: { ...baseSystem.cssVariables, ...cssVarsOverride },
+	components: { ...baseSystem.components, ...componentsOverride },
+	animations: { ...baseSystem.animations, ...(options.animations ?? {}) } as AnimationConfig,
         breakpoints: { ...baseSystem.breakpoints, ...(options.breakpoints ?? {}) } as BreakpointConfig,
     };
 }
@@ -277,19 +308,21 @@ export function createComponentVariant(
     customStyles: Record<string, string> = {}
 ): Record<string, string> {
     const variantStyles = {
-        nes: {, border: 'var(--nes-border-width, 4px) solid var(--nes-border, #ffffff)',
+        nes: {
+	border: 'var(--nes-border-width, 4px) solid var(--nes-border, #ffffff)',
             fontFamily: 'var(--nes-font-family, "Courier New", monospace)',
             borderRadius: 'var(--nes-border-radius, 0px)',
             boxShadow: 'var(--nes-shadow, 4px 4px 0px rgba(0, 0, 0, 0.8))',
             imageRendering: 'pixelated',
         },
-        minimal: {, border: 'var(--minimal-border-width, 1px) solid var(--minimal-border, #e5e7eb)',
+	minimal: {
+	border: 'var(--minimal-border-width, 1px) solid var(--minimal-border, #e5e7eb)',
             fontFamily: 'var(--minimal-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
             borderRadius: 'var(--minimal-border-radius, 0.5rem)',
             boxShadow: 'var(--minimal-shadow, 0 1px 3px 0 rgba(0, 0, 0, 0.1))',
         },
-        custom: {},
-    };
+	custom: {},
+	};
 
     return { ...baseStyles, ...variantStyles[variant], ...customStyles };
 }
@@ -299,7 +332,8 @@ export function createComponentVariant(
 // ======================================================================
 
 export interface ThemeContext {
-    designSystem: DesignSystem;, isDarkMode: boolean;
+    designSystem: DesignSystem;
+	isDarkMode: boolean;
     toggleDarkMode: () => void;
     applyCustomTheme: (tokens: Partial<CustomDesignTokens>) => void;
 }
@@ -310,8 +344,8 @@ export function createThemeContext(initialSystem: DesignSystem = NESDesignSystem
 
     return {
         get designSystem() { return currentSystem; },
-        get isDarkMode() { return isDarkMode; },
-        toggleDarkMode() {
+	get isDarkMode() { return isDarkMode; },
+	toggleDarkMode() {
             isDarkMode = !isDarkMode;
             // Apply dark mode modifications
             const darkTokens = isDarkMode
@@ -321,18 +355,18 @@ export function createThemeContext(initialSystem: DesignSystem = NESDesignSystem
                           primary: '#00ff41',
                           secondary: '#ff6b35',
                       },
-                  }
+	}
                 : currentSystem.tokens;
             applyDesignSystemToDocument({ ...currentSystem, tokens: { ...currentSystem.tokens, ...darkTokens } as any });
         },
-        applyCustomTheme(tokens: Partial<CustomDesignTokens>) {
+	applyCustomTheme(tokens: Partial<CustomDesignTokens>) {
             currentSystem = {
                 ...currentSystem,
                 tokens: { ...currentSystem.tokens, ...(tokens as any) },
-            };
+	};
             applyDesignSystemToDocument(currentSystem);
         },
-    };
+	};
 }
 
 // Note: Components like Button, Card, Dialog, etc. should be imported

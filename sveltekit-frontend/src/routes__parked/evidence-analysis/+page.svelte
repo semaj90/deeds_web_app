@@ -12,7 +12,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Button } from '$lib/components/ui/enhanced-bits';
  import WebGPUEvidenceGraphVisualization from '$lib/components/visualizations/WebGPUEvidenceGraphVisualization.svelte';
  import * as Card from 'bits-ui/components/card';
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  let showWebGPUDemo = $state <boolean>(false);
  let webGPUSupported = $state <boolean>(false);
@@ -95,10 +95,12 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }],
  },
 
- onMount(() => {
+ $effect(() => {
+
  // Check WebGPU support
  webGPUSupported = !!navigator.gpu;
- });
+ 
+});
 
  function toggleWebGPUDemo() {
  showWebGPUDemo = !showWebGPUDemo;

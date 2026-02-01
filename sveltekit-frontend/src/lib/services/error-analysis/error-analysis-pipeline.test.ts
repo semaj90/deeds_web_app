@@ -34,7 +34,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property 1: Error Extraction Completeness', () => {
     it('should create ACE context for session', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -52,7 +53,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should retrieve session context', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -77,7 +79,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Pipeline Workflow', () => {
     it('should handle multiple errors', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error 1',
@@ -86,7 +89,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
         },
-        {
+	{
           id: 'error-2',
           file: 'test.ts',
           line: 20, column: 10, message: 'Type error 2',
@@ -95,7 +98,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
         },
-        {
+	{
           id: 'error-3',
           file: 'other.svelte',
           line: 5, column: 2, message: 'Svelte error',
@@ -112,7 +115,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should calculate metrics correctly', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -153,7 +157,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
       await expect(pipeline.analyzeError('session-1', null as any)).rejects.toThrow();
     });
 
-    it('should reject empty session ID in analyzeErrors', async () => {{
+    it('should reject empty session ID in analyzeErrors', async () => {
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -186,7 +191,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Context Persistence', () => {
     it('should persist context after analysis', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -205,7 +211,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
     });
 
     it('should maintain context state across retrievals', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',
@@ -231,7 +238,8 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
    */
   describe('Property: Analysis Completeness', () => {
     it('should have metrics in context', async () => {
-      const sessionId = 'session-1';{
+      const sessionId = 'session-1';
+{
           id: 'error-1',
           file: 'test.ts',
           line: 10, column: 5, message: 'Type error',

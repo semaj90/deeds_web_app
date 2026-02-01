@@ -15,7 +15,8 @@ export interface SearchQuery {
 }
 
 export interface SearchResult<T = any> {
-    data: T[];, count: number;
+    data: T[];
+	count: number;
     total: number;
     page?: number;
     limit?: number;
@@ -82,7 +83,7 @@ export class LokiSearchService {
     findPaginated<T extends object = any>(
         collectionName: string,
         query: SearchQuery = {},
-        page: number = 1,
+	page: number = 1,
         limit: number = 10
     ): SearchResult<T & any> {
         const collection = this.getCollection<T>(collectionName);
@@ -193,7 +194,8 @@ export class LokiSearchService {
 
     loadDatabase(): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.db.loadDatabase({}, (err) => {
+            this.db.loadDatabase({},
+	(err) => {
                 if (err) reject(err);
                 else resolve();
             });
@@ -206,24 +208,29 @@ export class LokiSearchService {
 }
 
 export const LEGAL_LOKI_CONFIGS = {
-    cases: {, collection: 'cases',
+    cases: {
+	collection: 'cases',
         indices: ['caseNumber', 'title', 'status', 'createdAt'],
         unique: ['caseNumber'],
     },
-    evidence: {, collection: 'evidence',
+	evidence: {
+	collection: 'evidence',
         indices: ['caseId', 'title', 'evidenceType', 'createdAt', 'tags'],
     },
-    documents: {, collection: 'documents',
+	documents: {
+	collection: 'documents',
         indices: ['caseId', 'title', 'documentType', 'createdAt', 'author'],
     },
-    persons: {, collection: 'persons',
+	persons: {
+	collection: 'persons',
         indices: ['name', 'aliases', 'caseIds', 'createdAt'],
         unique: ['name'],
     },
-    annotations: {, collection: 'annotations',
+	annotations: {
+	collection: 'annotations',
         indices: ['evidenceId', 'userId', 'createdAt', 'type'],
     },
-} as const;
+	} as const;
 
 export class LegalLokiManager {
     private static instance: LegalLokiManager;

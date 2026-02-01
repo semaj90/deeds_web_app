@@ -112,13 +112,14 @@ export async function getSystemHealth(): Promise<any> {
 
 	return {
 		overall: appHealth.status,
-		database: {, status: dbHealth.status,
+		database: {
+	status: dbHealth.status,
             // @ts-ignore
 			config: dbHealth.config,
 			connection: connectionTest,
 			pools: dbHealth.pools
 		},
-		application: appHealth,
+	application: appHealth,
 		timestamp: new Date().toISOString(),
 		version: '2.0.0-unified'
 	};
@@ -155,5 +156,6 @@ export async function runMigration(migrationName: string, migrationSql: string):
 			);
 			throw error;
 		}
-	}, true); // Use admin connection for migrations
+	},
+	true); // Use admin connection for migrations
 }

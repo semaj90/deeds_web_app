@@ -34,7 +34,8 @@
 		if (newToast.duration && newToast.duration > 0) {
 			setTimeout(() => {
 				removeToast(id);
-			}, newToast.duration);
+			},
+	newToast.duration);
 		}
 
 		return id;
@@ -50,7 +51,7 @@
 
 	const context: ToastContext = {
 		get toasts() { return toasts; },
-		addToast: removeToast,
+	addToast: removeToast,
 		clearAll,
 	};
 

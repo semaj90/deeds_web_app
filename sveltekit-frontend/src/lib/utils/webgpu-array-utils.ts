@@ -23,8 +23,10 @@ export interface QuantizationConfig {
 
 export interface ArrayConversionResult {
     // store as ArrayBufferView for simplicity and to cover all typed-array cases
-    data: ArrayBufferView;, originalSize: number;
-    compressedSize: number;, compressionRatio: number;
+    data: ArrayBufferView;
+	originalSize: number;
+    compressedSize: number;
+	compressionRatio: number;
     quantizationConfig?: QuantizationConfig;
 }
 
@@ -78,7 +80,8 @@ export function quantizeToFP16(input: Float32Array): ArrayConversionResult {
         originalSize: input.length * 4, // 32-bit floats
         compressedSize: fp16Data.length * 2, // 16-bit values
         compressionRatio: 2.0,
-        quantizationConfig: {, precision: 'fp16' }
+        quantizationConfig: {
+	precision: 'fp16' }
     };
 }
 
@@ -109,7 +112,8 @@ export function quantizeToINT8(input: Float32Array, config?: Partial<Quantizatio
         originalSize: input.length * 4,
         compressedSize: int8Data.length * 1,
         compressionRatio: 4.0,
-        quantizationConfig: {, precision: 'int8', scale: scale, zeroPoint: zeroPoint, minValue: minVal, maxValue: maxVal }
+        quantizationConfig: {
+	precision: 'int8', scale: scale, zeroPoint: zeroPoint, minValue: minVal, maxValue: maxVal }
     };
 }
 
@@ -150,7 +154,8 @@ export function createWebGPUBuffer(
     data: SupportedArrayTypes,
     usage: GPUBufferUsageFlags,
     quantization?: QuantizationConfig
-): {, buffer: GPUBuffer; conversionResult?: ArrayConversionResult } {
+): {
+	buffer: GPUBuffer; conversionResult?: ArrayConversionResult } {
     // Use a simple union for the processed payload (either raw ArrayBuffer or a typed-array view)
     let processedData: ArrayBuffer | ArrayBufferView;
     let conversionResult: ArrayConversionResult | undefined;
@@ -233,7 +238,9 @@ export function createWebGPUBuffer(
  */
 export function batchProcessArrays(
     device: GPUDevice,
-    arrays: {, name: string; data: SupportedArrayTypes;, usage: GPUBufferUsageFlags }[],
+    arrays: {
+	name: string; data: SupportedArrayTypes;
+	usage: GPUBufferUsageFlags }[],
     quantization?: QuantizationConfig
 ): Map<string, { buffer: GPUBuffer; conversionResult?: ArrayConversionResult }> {
     const results = new Map<string, { buffer: GPUBuffer; conversionResult?: ArrayConversionResult }>();
@@ -297,11 +304,13 @@ export function analyzeMemoryUsage(
     original: SupportedArrayTypes,
     quantizations: QuantizationConfig[] = [
         { precision: 'fp32' },
-        { precision: 'fp16' },
-        { precision: 'int8' },
-        { precision: 'uint8' }
+	{ precision: 'fp16' },
+	{ precision: 'int8' },
+	{ precision: 'uint8' }
     ]
-): Array<{, precision: string; sizeBytes: number;, compressionRatio: number; estimatedAccuracyLoss: number }> {
+): Array<{
+	precision: string; sizeBytes: number;
+	compressionRatio: number; estimatedAccuracyLoss: number }> {
     const float32Data = ensureFloat32Array(original);
     const originalSize = float32Data.length * 4;
 

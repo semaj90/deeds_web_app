@@ -2,7 +2,7 @@
 	import ResultDetail from '$lib/components/ResultDetail.svelte';
 	import SearchResults from '$lib/components/SearchResults.svelte';
 	import { searchService } from '$lib/services/searchService';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let query = $state('');
 	let filters = $state({
@@ -69,11 +69,13 @@
 		}
 	}
 
-	onMount(() => {
+	$effect(() => {
+
 		// Focus search input
 		const input = document.querySelector('input[type="text"]');
 		if (input) input.focus();
-	});
+	
+});
 </script>
 
 <div class="search-container">

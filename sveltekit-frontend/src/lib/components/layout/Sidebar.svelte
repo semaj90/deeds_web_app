@@ -35,8 +35,10 @@
 	let isAdmin = $derived(user?.role === 'admin');
 
 	interface NavigationItem {
-		name: string;, href: string;
-		icon: ComponentType;, current: boolean;
+		name: string;
+	href: string;
+		icon: ComponentType;
+	current: boolean;
 		badge?: string;
 	}
 
@@ -48,40 +50,40 @@
 			current: currentPath === '/' || currentPath === '/dashboard',
 			badge: 'HQ'
 		},
-		{
+	{
 			name: '⚖️ Case Management',
 			href: '/cases',
 			icon: Briefcase,
 			current: currentPath.startsWith('/cases'),
 			badge: 'ACTIVE'
 		},
-		{
+	{
 			name: '🗃️ Evidence Vault',
 			href: '/evidence',
 			icon: FileText,
 			current: currentPath.startsWith('/evidence'),
 			badge: '12 New'
 		},
-		{
+	{
 			name: '🤖 AI Counsel',
 			href: '/ai',
 			icon: Bot,
 			current: currentPath.startsWith('/ai'),
 			badge: 'AI'
 		},
-		{
+	{
 			name: '📋 Document Analysis',
 			href: '/documents',
 			icon: FileBarChart,
 			current: currentPath.startsWith('/documents')
 		},
-		{
+	{
 			name: '🔍 Legal Research',
 			href: '/research',
 			icon: Search,
 			current: currentPath.startsWith('/research')
 		},
-		{
+	{
 			name: '⏱️ Case Timeline',
 			href: '/timeline',
 			icon: Layers,
@@ -96,7 +98,7 @@
 			icon: BarChart3,
 			current: currentPath.startsWith('/analytics')
 		},
-		{
+	{
 			name: '📋 Reports',
 			href: '/reports',
 			icon: FileBarChart,

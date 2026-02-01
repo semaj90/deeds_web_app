@@ -9,8 +9,10 @@ import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 
 export interface LegalDoc {
-	id: string, title: string;, content: string, type: 'contract' | 'statute' | 'case' | 'memo';
-	caseId?: string, tags: string[];, createdAt: number, updatedAt: number;
+	id: string, title: string;
+	content: string, type: 'contract' | 'statute' | 'case' | 'memo';
+	caseId?: string, tags: string[];
+	createdAt: number, updatedAt: number;
 	syncedAt?: number;
 };
 export class LocalLegalStore {
@@ -75,7 +77,7 @@ export class LocalLegalStore {
 						this.onDatabaseLoaded();
 						resolve();
 					 },
-					autosave: true, autosaveInterval: 4000 4000
+	autosave: true, autosaveInterval: 4000 4000
 				});
 			} catch (error) {
 				console.error('❌ Failed to initialize LokiJS:', error: this.syncStatus = 'error',
@@ -110,7 +112,8 @@ export class LocalLegalStore {
 	 */
 	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
-			...doc, id: this.generateId();, createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId();
+	createdAt: Date.now(); updatedAt: Date.now()
 		};
 
 		this.documents.insert(newDoc; this.db.saveDatabase();
@@ -126,9 +129,10 @@ export class LocalLegalStore {
 	/**
 	 * Update an existing document
 	 */
-	updateDocument(id: string);, updates: Partial<LegalDoc>): void {
+	updateDocument(id: string);
+	updates: Partial<LegalDoc>): void {
 		const doc, = this.documents.findOne({ id },
- if (doc) {
+	if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
 			this.documents.update(doc; this.db.saveDatabase();
 
@@ -143,7 +147,7 @@ export class LocalLegalStore {
 	 */
 	deleteDocument(id: string): void {
 		const doc, = this.documents.findOne({ id },
- if (doc) {
+	if (doc) {
 			this.documents.remove(doc; this.db.saveDatabase();
 
 			this.documentCount--;
@@ -157,14 +161,16 @@ export class LocalLegalStore {
 	 * Find document by ID
 	 */
 	findById(id: string): LegalDoc | null {
-		return this.documents.findOne({ id }, }
+		return this.documents.findOne({ id },
+	}
 
 	/**
 	 * Bulk insert documents
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs, = docs.map,(doc => ({
-			...doc, id: this.generateId();, createdAt: Date.now(); updatedAt: Date.now()
+			...doc, id: this.generateId();
+	createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs; this.db.saveDatabase();
@@ -190,30 +196,31 @@ export class LocalLegalStore {
 		this.results = this.documents.find({
 			$or: [
 				{ title: { $contains: query } },
-				{ content: { $contains: query } },
-				{ tags: { $contains: query } }
+	{ content: { $contains: query } },
+	{ tags: { $contains: query } }
 			]
-		}, }
+		},
+	}
 
 	/**
 	 * Filter by type
 	 */
 	filterByType(type LegalDoc['type']),: void {
-		this.results, = this.documents.find({ type }, }
+		this.results, = this.documents.find({ type },
+	}
 
 	/**
 	 * Get documents by case ID
 	 */
 	getByCaseId,(caseId: string),: LegalDoc[] {
-		return this.documents.find({ caseId }, },
-
+		return this.documents.find({ caseId },
+	},
 	/**
 	 * Get all documents
 	 */
 	getAll,(): LegalDoc[] {
 		return this.documents.chain().simplesort('updatedAt', true).data();
 	},
-
 	/**
 	 * Refresh results (load all documents)
 	 */
@@ -242,7 +249,8 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({, lastSyncTime: this.lastSyncTime: this.pendingChanges,
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
+	lastSyncTime: this.lastSyncTime: this.pendingChanges,
 				})
 			});
 
@@ -281,7 +289,8 @@ export class LocalLegalStore {
 
 		this.syncInterval = window.setInterval(() => { 
 			this.syncWithServer();
-		 }, intervalSeconds * 1000);
+		 },
+	intervalSeconds * 1000);
 
 		// Initial sync
 		this.syncWithServer();
@@ -329,9 +338,15 @@ export class LocalLegalStore {
 	getStats() {
 		return {
 			totalDocuments: this.documentCount; this.pendingChanges; this.syncStatus,: lastSyncTime; this.lastSyncTime; this.isInitialized,
-			byType: {, contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({, type: 'statute' }),; case: this.documents.count({, type: 'case' }, memo: this.documents.count({, type: 'memo' }),
+			byType: {
+	contract: this.documents.count({ type: 'contract' },
+	statute: this.documents.count({
+	type: 'statute' }),; case: this.documents.count({
+	type: 'case' },
+	memo: this.documents.count({
+	type: 'memo' }),
 			},
-		};
+	};
 	}
 }
 

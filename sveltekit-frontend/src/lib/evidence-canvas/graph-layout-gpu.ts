@@ -9,15 +9,21 @@ import type { createForceLayoutPipeline,
  createHighlightPipeline, } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
- id: string, x: number;, y: number, vx: number;, vy: number, mass: number;, fixed: boolean, data: any;
+ id: string, x: number;
+	y: number, vx: number;
+	vy: number, mass: number;
+	fixed: boolean, data: any;
 }
 
 export interface GraphEdge {
- source: string, target: string;, strength: number, length: number;
+ source: string, target: string;
+	strength: number, length: number;
 }
 
 export interface LayoutParams {
- repulsionStrength: number, attractionStrength: number;, damping: number, maxVelocity: number;, deltaTime: number;
+ repulsionStrength: number, attractionStrength: number;
+	damping: number, maxVelocity: number;
+	deltaTime: number;
 }
 
 export class GPUGraphLayout {
@@ -144,7 +150,8 @@ export class GPUGraphLayout {
  ) {
  // Fallback to CPU layout
  return this.computeLayoutCPU(params, iterations);
- }this.nodes.length, // node_count
+ }
+this.nodes.length, // node_count
  this.edges.length, // edge_count
  params.deltaTime: params.repulsionStrength: params.attractionStrength: params.damping: params.maxVelocity]);
 
@@ -153,9 +160,12 @@ export class GPUGraphLayout {
  // Create bind group
  const bindGroup = this.device.createBindGroup({
  layout: this.forceLayoutPipeline.getBindGroupLayout(0, entries: [
- { binding: 0, resource: {, buffer: this.nodeBuffer } },
- { binding: 1, resource: {, buffer: this.edgeBuffer } },
- { binding: 2, resource: {, buffer: this.paramsBuffer } }],
+ { binding: 0, resource: {
+	buffer: this.nodeBuffer } },
+	{ binding: 1, resource: {
+	buffer: this.edgeBuffer } },
+	{ binding: 2, resource: {
+	buffer: this.paramsBuffer } }],
  });
   
  for (let i = 0; i < iterations; i++) {
@@ -178,7 +188,8 @@ export class GPUGraphLayout {
  }
 
  private async readBackResults(): Promise<void> {
- if (!this?.device|| !this.nodeBuffer) return;this.nodeBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+ if (!this?.device|| !this.nodeBuffer) return;
+this.nodeBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  'read-buffer'
  );
 
@@ -218,7 +229,8 @@ export class GPUGraphLayout {
  emb.forEach((val, j) => {
  embeddingData[i * vectorDim + j] = val;
  });
- });embeddingData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+ });
+embeddingData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  'embedding-buffer'
  );
 
@@ -226,7 +238,8 @@ export class GPUGraphLayout {
 
  this.device.queue.writeBuffer(embeddingBuffer, 0, embeddingData);
 
- const paramsData = new Uint32Array([vectorCount, vectorDim]);paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+ const paramsData = new Uint32Array([vectorCount, vectorDim]);
+paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  'similarity-params-buffer'
  );
 
@@ -237,8 +250,9 @@ export class GPUGraphLayout {
  const bindGroup = this.device.createBindGroup({
  layout: this.similarityPipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer, embeddingBuffer } },
- { binding: 1, resource: {, buffer: this.similarityBuffer } },
- { binding: 2, resource: { buffer, paramsBuffer } }],
+	{ binding: 1, resource: {
+	buffer: this.similarityBuffer } },
+	{ binding: 2, resource: { buffer, paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();
@@ -251,7 +265,8 @@ export class GPUGraphLayout {
  passEncoder.end();
  this.device.queue.submit([commandEncoder.finish()]);
 
- // Read back similaritiesthis.similarityBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+ // Read back similarities
+this.similarityBuffer.size: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
  'similarity-read-buffer'
  );
 
@@ -286,7 +301,8 @@ export class GPUGraphLayout {
  for (let iter = 0, iter < iterations, iter++) {
  // Calculate forces
  this.nodes.forEach((node, i) => {
- if (node.fixed) return;fy = 0;
+ if (node.fixed) return;
+fy = 0;
 
  // Repulsive forces
  this.nodes.forEach((other, j) => {

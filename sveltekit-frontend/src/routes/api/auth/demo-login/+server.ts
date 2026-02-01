@@ -24,13 +24,15 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.json();
 	const { email = 'demo@legal.ai.dev', role = 'prosecutor' } = body;
 
-	// Get or create demo user.select()
+	// Get or create demo user
+.select()
 		.from(users)
 		.where(eq(users.email, email))
 		.then((rows) => rows[0]);
 
 	if (!user) {
-		// Create demo user if it doesn't exist.insert(users)
+		// Create demo user if it doesn't exist
+.insert(users)
 			.values({ email: firstName, email.split('@')[0],
 				lastName: 'Demo',
 				isActive: true,
@@ -41,7 +43,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.returning();
 		user = newUser;
 	} else if (user.role !== role) {
-		// Update role if different.update(users)
+		// Update role if different
+.update(users)
 			.set({ role, role as any, updatedAt, new Date().toISOString() })
 			.where(eq(users.id, user.id))
 			.returning();
@@ -57,14 +60,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
  return json({
  success: true,
  message: `Logged in as ${ email } (${ role })`,
- user: {, id: user.id,
+ user: { id: user.id,
  email: user.email,
  firstName: user.firstName,
  lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },
- session: {, id: session.id, userId: session.userId },
+ session: { id: session.id, userId: session.userId },
  timestamp: new Date().toISOString(),
  });
  } catch (err) {

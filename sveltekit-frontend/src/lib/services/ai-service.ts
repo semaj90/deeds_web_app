@@ -38,7 +38,8 @@ type OllamaClient = {
 };
 
 export interface AIAnalysisResult {
-  summary: string;, tags: string[];
+  summary: string;
+	tags: string[];
   confidence: number;
   entities?: string[];
   keywords?: string[];
@@ -54,7 +55,8 @@ export interface AIQueryOptions {
 }
 
 export interface VectorSearchResult {
-  content: string;, similarity: number;
+  content: string;
+	similarity: number;
   metadata: Record<string, unknown>;
   documentId: string;
 }
@@ -62,9 +64,12 @@ export interface VectorSearchResult {
 type QueryLogInput = {
   userId?: string | undefined;
   caseId?: string | undefined;
-  query: string;, response: string;
-  model: string;, confidence: number;
-  processingTime: number;, contextUsed: string[];
+  query: string;
+	response: string;
+  model: string;
+	confidence: number;
+  processingTime: number;
+	contextUsed: string[];
   embedding?: number[] | undefined;
   isSuccessful?: boolean | undefined;
   errorMessage?: string | undefined;
@@ -82,7 +87,9 @@ export class AIService {
     userId?: string,
     caseId?: string,
     options: AIQueryOptions = {}
-  ): Promise<{, response: string; confidence: number;, contextUsed: string[]; queryId?: string | undefined }> {
+  ): Promise<{
+	response: string; confidence: number;
+	contextUsed: string[]; queryId?: string | undefined }> {
     const startTime = Date.now();
     const {
       model = 'gemma3-legal:latest',
@@ -201,8 +208,10 @@ export class AIService {
 
     try {
       const rows = normalizeRows<{
-        id: string;, document_id: string;
-        content: string;, metadata: Record<string, unknown> | null;
+        id: string;
+	document_id: string;
+        content: string;
+	metadata: Record<string, unknown> | null;
         embedding: string | number[] | null;
       }>(
         await db.execute(
@@ -225,7 +234,7 @@ export class AIService {
             content: row.content,
             similarity: sim,
             metadata: row.metadata ?? {},
-            documentId: row.document_id
+	documentId: row.document_id
           });
         }
       }
@@ -242,12 +251,15 @@ export class AIService {
     queryEmbedding: number[],
     userId?: string,
     limit = 5
-  ): Promise<Array<{, query: string; response: string;, similarity: number }>> {
+  ): Promise<Array<{
+	query: string; response: string;
+	similarity: number }>> {
     const db = await getDbClient();
     if (!db) return [];
 
     try {
-      const rows = normalizeRows<{ query: string;, response: string; similarity: number }>(
+      const rows = normalizeRows<{ query: string;
+	response: string; similarity: number }>(
         await db.execute(
           userId
             ? sql`SELECT query, response, 0.0 as similarity FROM user_ai_queries WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit}`
@@ -296,7 +308,10 @@ export class AIService {
       try {
         await db.execute(
           sql`INSERT INTO embedding_cache (id, text_hash, embedding, model, created_at)
-          VALUES (${generateIdFromEntropySize(10)}, ${textHash}, ${JSON.stringify(embedding)}, 'embeddinggemma:latest', ${new Date().toISOString()})
+          VALUES (${generateIdFromEntropySize(10)},
+	${textHash},
+	${JSON.stringify(embedding)},
+	'embeddinggemma:latest', ${new Date().toISOString()})
           ON CONFLICT (text_hash) DO UPDATE SET embedding = EXCLUDED.embedding, model = EXCLUDED.model, created_at = EXCLUDED.created_at`
         );
       } catch (error: unknown) {
@@ -319,18 +334,18 @@ export class AIService {
           (id, user_id, case_id, query, response, model, confidence, processing_time, context_used, embedding, is_successful, error_message, created_at)
           VALUES (
             ${id},
-            ${data.userId ?? null},
-            ${data.caseId ?? null},
-            ${data.query},
-            ${data.response},
-            ${data.model},
-            ${String(data.confidence)},
-            ${data.processingTime},
-            ${JSON.stringify(data.contextUsed)},
-            ${data.embedding ? JSON.stringify(data.embedding) : null},
-            ${data.isSuccessful !== false},
-            ${data.errorMessage ?? null},
-            ${new Date().toISOString()}
+	${data.userId ?? null},
+	${data.caseId ?? null},
+	${data.query},
+	${data.response},
+	${data.model},
+	${String(data.confidence)},
+	${data.processingTime},
+	${JSON.stringify(data.contextUsed)},
+	${data.embedding ? JSON.stringify(data.embedding) : null},
+	${data.isSuccessful !== false},
+	${data.errorMessage ?? null},
+	${new Date().toISOString()}
           )
         `
       );
@@ -357,11 +372,11 @@ export class AIService {
           sql`INSERT INTO auto_tags (id, entity_id, entity_type, tag, confidence, source, model, created_at)
           VALUES (
             ${generateIdFromEntropySize(10)},
-            ${entityId},
-            ${entityType},
-            ${tag},
-            ${String(confidence)},
-            'ai_analysis',
+	${entityId},
+	${entityType},
+	${tag},
+	${String(confidence)},
+	'ai_analysis',
             'gemma3-legal:latest',
             ${new Date().toISOString()}
           )
@@ -390,13 +405,13 @@ export class AIService {
         sql`INSERT INTO document_chunks (id, document_id, document_type, chunk_index, content, embedding, metadata, created_at)
         VALUES (
           ${generateIdFromEntropySize(10)},
-          ${documentId},
-          ${documentType},
-          ${0},
-          ${content.slice(0, 2000)},
-          ${embeddingString},
-          ${JSON.stringify({ analysis, contentLength: content.length, generatedAt: new Date().toISOString() })},
-          ${new Date().toISOString()}
+	${documentId},
+	${documentType},
+	${0},
+	${content.slice(0, 2000)},
+	${embeddingString},
+	${JSON.stringify({ analysis, contentLength: content.length, generatedAt: new Date().toISOString() })},
+	${new Date().toISOString()}
         )
         `
       );

@@ -1,10 +1,11 @@
 <script lang="ts">
- import { onMount } from 'svelte';
+ // Migrated to $effect
 
  import type { Snippet } from 'svelte';
 
  interface Props {
- open: boolean;, title: string;
+ open: boolean;
+	title: string;
  onClose: () => void;
  widthClass?: string;
  children?: Snippet;
@@ -28,11 +29,13 @@
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  if (open && modalElement) {
  modalElement.focus();
  }
- });
+ 
+});
 
  $effect(() => {
  if (open) {
@@ -83,7 +86,8 @@
 
 <style>
  .nes-modal-backdrop {
- position: fixed;, inset: 0;
+ position: fixed;
+	inset: 0;
  background: rgba(0, 0, 0, 0.7);
  display: flex;
  align-items: center;
@@ -99,23 +103,27 @@
  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
  display: flex;
  flex-direction: column;
- max-height: 90vh;, overflow: hidden;
+ max-height: 90vh;
+	overflow: hidden;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
  from {
- opacity: 0;, transform: scale(0.95);
+ opacity: 0;
+	transform: scale(0.95);
  }
  to {
- opacity: 1;, transform: scale(1);
+ opacity: 1;
+	transform: scale(1);
  }
  }
 
  .nes-modal-title-bar {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
+ align-items: center;
+	padding: 1rem;
  background: var(--yorha-bg-secondary, #1a1a1a);
  border-bottom: 1px solid var(--yorha-border, #606060);
  flex-shrink: 0;
@@ -123,17 +131,21 @@
 
  .nes-modal-title-text {
  font-size: 1.125rem;
- font-weight: 600;, color: var(--yorha-text-primary, #e0e0e0);
+ font-weight: 600;
+	color: var(--yorha-text-primary, #e0e0e0);
  letter-spacing: 0.05em;
  }
 
  .nes-modal-close-btn {
  padding: 0.25rem 0.5rem;
- background: transparent;, border: 1px solid var(--yorha-border, #606060);
- border-radius: 4px;, color: var(--yorha-text-secondary, #a0a0a0);
+ background: transparent;
+	border: 1px solid var(--yorha-border, #606060);
+ border-radius: 4px;
+	color: var(--yorha-text-secondary, #a0a0a0);
  cursor: pointer;
  font-size: 1rem;
- line-height: 1;, transition: all 0.2s;
+ line-height: 1;
+	transition: all 0.2s;
  }
 
  .nes-modal-close-btn:hover {
@@ -144,7 +156,8 @@
 
  .nes-modal-body {
  flex: 1;
- overflow-y: auto;, padding: 1rem;
+ overflow-y: auto;
+	padding: 1rem;
  color: var(--yorha-text-primary, #e0e0e0);
  }
 

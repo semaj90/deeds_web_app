@@ -73,7 +73,7 @@ export function createMediaQuery(query: string) {
  get matches() {
  return matches;
  },
- };
+	};
 }
 
 /**

@@ -8,9 +8,10 @@ import { graphService } from '../graph.service.js';
 
 // Mock Neo4j driver
 vi.mock('neo4j-driver', () => ({
- driver: vi.fn(auth: {, basic: vi.fn(),
+ driver: vi.fn(auth: {
+	basic: vi.fn(),
  },
-}));
+	}));
 
 describe('GraphService', () => {
   beforeEach(async () => {
@@ -27,8 +28,9 @@ describe('GraphService', () => {
 
  describe('createCaseStatuteRelationships', () => {
  it('should create relationships between case and statutes', async () => {
- const caseId = 'case-123';{ code: '42 U.S.C. § 1983', title: 'Civil Rights' },
- { code: 'Cal. Penal Code § 187', title: 'Murder' }];
+ const caseId = 'case-123';
+{ code: '42 U.S.C. § 1983', title: 'Civil Rights' },
+	{ code: 'Cal. Penal Code § 187', title: 'Murder' }];
 
  await graphService.createCaseStatuteRelationships(caseId, statutes);
 

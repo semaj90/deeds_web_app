@@ -2,7 +2,8 @@
   // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;, title: string;
+ id: string;
+	title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -10,18 +11,24 @@
 
  interface PoliceReport {
  id: string;
- caseId?: string;, generatedAt: string;
- type: string;, content: string;
- sections: Array<{, title: string; content: string }>;
- metadata: {, narrativeProvided: boolean;
- evidenceCount: number;, model: string;
+ caseId?: string;
+	generatedAt: string;
+ type: string;
+	content: string;
+ sections: Array<{
+	title: string; content: string }>;
+ metadata: {
+	narrativeProvided: boolean;
+ evidenceCount: number;
+	model: string;
  };
  }
 
  interface Props {
   caseId?: string | null;
   initialEvidence?: Evidence[];
-  onReportGenerated?: (data: {, report: PoliceReport }) => void;
+  onReportGenerated?: (data: {
+	report: PoliceReport }) => void;
  }
 
  let {
@@ -57,7 +64,8 @@
  headers: {
  'Content-Type': 'application/json'
  },
- body: JSON.stringify({, narrative: narrative.trim(),
+	body: JSON.stringify({
+	narrative: narrative.trim(),
    evidence: selectedEvidence,
    caseId
  })
@@ -121,7 +129,9 @@
  body { font-family: 'Times New Roman', serif, margin: 40px, line-height: 1.6; }
  h1 { color: #1f2937; border-bottom: 2px solid #1f2937; padding-bottom: 10px; }
  h2 { color: #374151; margin-top: 30px; }
- .metadata { background: #f3f4f6;, padding: 15px; border-radius: 5px;, margin: 20px 0; }
+ .metadata { background: #f3f4f6;
+	padding: 15px; border-radius: 5px;
+	margin: 20px 0; }
  .section { margin: 20px 0; }
  </style>
  </head>

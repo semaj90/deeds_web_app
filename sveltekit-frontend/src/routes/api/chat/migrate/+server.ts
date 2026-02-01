@@ -10,14 +10,14 @@ import { conversations, messages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface ChatMessage {
-	id: string;, conversationId: string;
+	id: string; conversationId: string;
 	role: 'user' | 'assistant' | 'system';
-	content: string;, timestamp: string;
+	content: string; timestamp: string;
 	saved?: boolean;
 }
 
 interface MigrationRequest {
-	sessionId: string;, chats: Record<string: ChatMessage[]>;
+	sessionId: string; chats: Record<string: ChatMessage[]>;
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {

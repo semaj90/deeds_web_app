@@ -28,7 +28,7 @@ export class ONNXApiClient {
  */
  async extractEntities(text: string, options: ONNXApiOptions = {}): Promise<any> {
  return this.makeRequest('/api/legal/onnx/extract-entities', { text: options: { ...this.defaultOptions, ...options },
- });
+	});
  }
 
  /**
@@ -36,7 +36,7 @@ export class ONNXApiClient {
  */
  async classifyDocument(text: string, options: ONNXApiOptions = {}): Promise<any> {
  return this.makeRequest('/api/legal/onnx/classify-document', { text: options: { ...this.defaultOptions, ...options },
- });
+	});
  }
 
  /**
@@ -44,7 +44,7 @@ export class ONNXApiClient {
  */
  async generateEmbeddings(text: string, options: ONNXApiOptions = {}): Promise<any> {
  return this.makeRequest('/api/legal/onnx/generate-embeddings', { text: options: { ...this.defaultOptions, ...options },
- });
+	});
  }
 
  /**
@@ -52,7 +52,7 @@ export class ONNXApiClient {
  */
  async batchProcess(tasks: Array<any>, options: ONNXApiOptions = {}): Promise<any> {
  return this.makeRequest('/api/legal/onnx/batch-process', { tasks: options: { ...this.defaultOptions, ...options },
- });
+	});
  }
 
  /**
@@ -101,34 +101,35 @@ export class ONNXApiClient {
  'Plaintiff respectfully submits this brief in support of motion for summary judgment. The legal precedent clearly establishes...',
  };
 
- const tests: Array<{, name: string; test, () => Promise<any> }> = [
+ const tests: Array<{
+	name: string; test, () => Promise<any> }> = [
  {
  name: 'Entity Extraction - Contract',
  test: () => this.extractEntities(testData.contractText),
  },
- {
+	{
  name: 'Entity Extraction - Court Decision',
  test: () => this.extractEntities(testData.courtDecision),
  },
- {
+	{
  name: 'Document Classification - Contract',
  test: () => this.classifyDocument(testData.contractText),
  },
- {
+	{
  name: 'Document Classification - Court Decision',
  test: () => this.classifyDocument(testData.courtDecision),
  },
- {
+	{
  name: 'Embeddings Generation - Legal Brief',
  test: () => this.generateEmbeddings(testData.legalBrief),
  },
- {
+	{
  name: 'Batch Processing',
  test: () =>
  this.batchProcess([
  { id: 'task1', type: 'extract-entities', text: testData.contractText },
- { id: 'task2', type: 'classify-document', text: testData.courtDecision },
- { id: 'task3', type: 'generate-embeddings', text: testData.legalBrief }]),
+	{ id: 'task2', type: 'classify-document', text: testData.courtDecision },
+	{ id: 'task3', type: 'generate-embeddings', text: testData.legalBrief }]),
  }];
 
  const results: Array<any> = [];
@@ -218,9 +219,8 @@ export class ONNXApiClient {
  min: Math.min(...times, max: Math.max(...times, average: sum / times.length,
  median,
  },
- },
-
- return { iterations: textLength, text.length,
+	},
+	return { iterations: textLength, text.length,
  entityExtraction: calculateStats(benchmarks.entityExtraction, classification: calculateStats(benchmarks.classification, embeddings, calculateStats(benchmarks.embeddings),
  };
  }
@@ -232,7 +232,8 @@ export class ONNXApiClient {
  try {
  const timeoutMs = this.defaultOptions.timeout ?? 30000;
 
- // AbortSignal.timeout may not exist in some environments, guard it if neededtypeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
+ // AbortSignal.timeout may not exist in some environments, guard it if needed
+typeof AbortSignal !== 'undefined' && (AbortSignal as any).timeout
  ? (AbortSignal as any).timeout(timeoutMs) : undefined;
 
  const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -240,12 +241,13 @@ export class ONNXApiClient {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify(body),
+	body: JSON.stringify(body),
  ...(signal ? { signal } : {}),
  });
 
  if (!response.ok) {
- throw new Error(`HTTP ${response.status}, ${response.statusText}`);
+ throw new Error(`HTTP ${response.status},
+	${response.statusText}`);
  }
 
  return await response.json();

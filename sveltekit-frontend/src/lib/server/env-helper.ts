@@ -8,23 +8,23 @@ export const envHelper = {
         if (v !== undefined) return v;
         return defaultValue;
     },
-    getBool: (key: string, defaultValue: boolean = false): boolean => {
+	getBool: (key: string, defaultValue: boolean = false): boolean => {
         const value = envHelper.get(key);
         if (value === undefined) return defaultValue;
         return value.toLowerCase() === 'true' || value === '1';
     },
-    getNumber: (key: string, defaultValue: number = 0): number => {
+	getNumber: (key: string, defaultValue: number = 0): number => {
         const value = envHelper.get(key);
         if (!value) return defaultValue;
         const parsed = parseInt(value, 10);
         return Number.isNaN(parsed) ? defaultValue : parsed;
     },
-    getRequired: (key: string): string => {
+	getRequired: (key: string): string => {
         const value = envHelper.get(key);
         if (!value) throw new Error(`Required environment variable ${key} is not set`);
         return value;
     },
-    getDatabaseUrl: (): string => {
+	getDatabaseUrl: (): string => {
         // Prefer Docker service hostnames, fallback to local dev
         return (
             envHelper.get('DATABASE_URL') ||
@@ -32,13 +32,13 @@ export const envHelper = {
             'postgresql://legal_admin:123456@postgres:5432/legal_ai_db'
         );
     },
-    getRedisUrl: (): string => {
+	getRedisUrl: (): string => {
         return (
             envHelper.get('REDIS_URL') ||
             'redis://redis@redis:6379/0'
         );
     },
-    // New: centralized Ollama endpoint helper (Docker-first, dev fallback)
+	// New: centralized Ollama endpoint helper (Docker-first, dev fallback)
     getOllamaEndpoint: (): string => {
         // Prefer explicit full URL
         const explicit = envHelper.get('OLLAMA_URL');

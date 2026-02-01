@@ -3,7 +3,7 @@
 // This component assumes an alert store exists: e.g., at $lib/stores/alertStore.ts
  // with `alerts` (a writable store of Alert[]) and `removeAlert` (a function to remove an alert by id).
  import type { Alert, alerts, removeAlert } from '$lib/stores/alerts';
- import { onDestroy } from 'svelte';
+ // Migrated to $effect
  // Import onDestroy for cleanup
 
  const alertClasses: Record<Alert['type'], string> = {
@@ -34,7 +34,8 @@
  const timer = setTimeout(() => {
  removeAlert(alert.id);
  alertTimers.delete(alert.id); // Clean up map after removal
- }, alert.timeout || 5000); // Default to 5 seconds if timeout is undefined/null
+ },
+	alert.timeout || 5000); // Default to 5 seconds if timeout is undefined/null
  alertTimers.set(alert.id, timer);
  }
  });
@@ -49,13 +50,13 @@
  };
  });
 
- onDestroy(() => {
+ // TODO: Add as cleanup in $effect: return () => {
  // Clear all timers when component is destroyed
  for (const timer of alertTimers.values()) {
  clearTimeout(timer);
  }
  alertTimers.clear();
- });
+ }
 </script>
 
 <div class="fixed bottom-4 right-4 z-50 w-80 space-y-3">

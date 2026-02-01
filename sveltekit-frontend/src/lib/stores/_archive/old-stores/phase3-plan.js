@@ -7,7 +7,7 @@
 export const phase3Plan = {
  title: 'AI Core Implementation',
  status: 'READY_TO_START',
- infrastructure: {, docker: 'âœ… All services running',
+ infrastructure: { docker: 'âœ… All services running',
  ollama: 'âœ… GPU-accelerated (RTX 3060 Ti 4GB)',
  qdrant: 'âœ… Vector database ready',
  redis: 'âœ… Caching layer active',
@@ -39,7 +39,7 @@ export const phase3Plan = {
  priority: 'MEDIUM',
  },
  ],
- dependencies: {, phase2: 'âœ… Unified stores ready',
+ dependencies: { phase2: 'âœ… Unified stores ready',
  realTime: 'âœ… WebSocket infrastructure',
  parsing: 'âœ… AI command system',
  uiComponents: 'âœ… Enhanced UI system',

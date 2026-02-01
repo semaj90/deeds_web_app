@@ -99,9 +99,7 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
 3. **Revert**: If error count INCREASES, revert the file immediately
 
 ### Current Progress
-### Current Progress
-### Current Progress
-- **Error Count**: 13,649 (Reduced from 15,785 this session)
+- **Error Count**: 29,375 (Baseline before recent fixes)
 - **Top Fixed Files** (Manual Rewrites):
   - `som-webgpu-cache.ts`: ✅ Fully Fixed (-197 errors)
   - `sveltekit-gpu-cache-integration.ts`: ✅ Fully Fixed (-232 errors)
@@ -120,10 +118,30 @@ We now use `scripts/smart-file-fixer.cjs` which employs a "Try-Verify-Revert" st
   - `evidenceProcessingMachine.ts`: ✅ Fully Fixed (-123 errors)
   - `src/lib/server/integrations/minio.ts`: ✅ Refactored & Typed (-123 errors)
 
-### Remaining Top Offenders (Est < 120 errors)
-1. `src/lib/server/services/search/pgvector-search.ts` (~120 errors)
-2. `src/lib/server/legal-autocomplete.ts` (~118 errors)
-3. `src/lib/server/webgpu-langchain-bridge.ts` (~118 errors)
+## 🛡️ Phase 107.2 - WebGPU & UI Hardening (January 31, 2026)
+
+### Major Corrupted Files Repaired
+Systematic regeneration of files with severe syntax corruption (comma/semicolon mixups, one-liner collapse):
+
+**Services & WebGPU Engines:**
+- `ai-evidence-analyzer.ts`: ✅ Regenerated (Was ~480 errors)
+- `webgpu-evidence-graph.ts`: ✅ Regenerated
+- `legal-document-graph.ts`: ✅ Regenerated
+- `dimensional-tensor-store.ts`: ✅ Regenerated
+- `webgpu-similarity-engine.ts`: ✅ Regenerated
+
+**Critical UI Components:**
+- `ProductionLayout.svelte`: ✅ Full rewrite (Svelte 5 + bits-ui)
+- `LegalCaseForm.svelte`: ✅ Fixed CSS corruption & derived state
+- `CanvasBoard.svelte`: ✅ Fixed types & reactivity
+- `AuthGuard.svelte`: ✅ Fixed CSS
+- `StatsCard.svelte`, `Textarea.svelte`, `ErrorPanel.svelte`: ✅ Expanded from one-liners
+- `Svelte5Alert.svelte`: ✅ Fixed syntax redundancy
+
+### Next Steps
+1. Re-run `svelte-check` to establish new baseline (Expect < 28k)
+2. Address remaining red components in `src/lib/components/ui`
+3. Verify WebGPU initialization in browser
 
 ### Next Actions
 1. Run automated validation loop on mid-tier error files (`smart-file-fixer`)

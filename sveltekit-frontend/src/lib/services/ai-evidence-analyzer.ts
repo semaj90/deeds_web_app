@@ -184,7 +184,7 @@ export class AIEvidenceAnalyzer {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: this.analysisModel, prompt, stream: false, temperature: 0.0 })
+	body: JSON.stringify({ model: this.analysisModel, prompt, stream: false, temperature: 0.0 })
             });
 
             if (!res.ok) {
@@ -231,7 +231,9 @@ export class AIEvidenceAnalyzer {
         const entitiesRaw = await this.callOllamaGenerate(entitiesPrompt);
         const keyEntities = await this.parseEntities(entitiesRaw);
 
-        const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: {, anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
+        const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: {
+	anger: fear, joy, sadness, surprise, trust },
+	subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
         const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt);
         const sentiment = await this.parseSentiment(sentimentRaw);
 
@@ -350,7 +352,7 @@ export class AIEvidenceAnalyzer {
             const resp = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model, prompt: texts[0] })
+	body: JSON.stringify({ model, prompt: texts[0] })
             });
             const data: any = await resp.json();
             if (data?.embedding && Array.isArray(data.embedding)) {
@@ -431,7 +433,8 @@ export class AIEvidenceAnalyzer {
     }
 
     private async parseSentiment(raw: string): Promise<SentimentAnalysis> {
-        const defaultSentiment: SentimentAnalysis = { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 }, subjectivity: 0, formality: 0 };
+        const defaultSentiment: SentimentAnalysis = { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 },
+	subjectivity: 0, formality: 0 };
         return await this.parseJsonSafe<SentimentAnalysis>(raw, defaultSentiment);
     }
 

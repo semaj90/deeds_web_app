@@ -1,13 +1,17 @@
 <script lang="ts">
   import type { DBCase } from '$lib/types/database';
   import type { YoRHaSystemMetrics } from '$lib/types/yorha-interface';
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   interface ClusterHealth {
-    timestamp: string;, metrics: YoRHaSystemMetrics;
-    thresholds: {, cpu_warning: number;
-      cpu_critical: number;, memory_warning: number;
-      memory_critical: number;, gpu_warning: number;
+    timestamp: string;
+	metrics: YoRHaSystemMetrics;
+    thresholds: {
+	cpu_warning: number;
+      cpu_critical: number;
+	memory_warning: number;
+      memory_critical: number;
+	gpu_warning: number;
       gpu_critical: number;
     };
   }
@@ -73,11 +77,13 @@
     return 'bg-cyan-500';
   }
 
-  onMount(() => {
+  $effect(() => {
+
     loadData();
     const refreshInterval = setInterval(fetchClusterHealth, 10000);
     return () => clearInterval(refreshInterval);
-  });
+  
+});
 </script>
 
 <div class="p-6 space-y-6 bg-slate-950 min-h-screen text-slate-200 font-mono">

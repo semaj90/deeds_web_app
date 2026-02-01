@@ -1,4 +1,3 @@
-
 /**
  * Dimensional Tensor Store - WebGPU Memory Management
  *
@@ -23,25 +22,34 @@ export interface TensorDimensions {
 
 export interface TensorSlice {
   axis: 1 | 2 | 3;
-  index: number;, lodLevel: number;
-  data: Float32Array;, metadata: TensorSliceMetadata;
+  index: number;
+  lodLevel: number;
+  data: Float32Array;
+  metadata: TensorSliceMetadata;
 }
 
 export interface TensorSliceMetadata {
-  timestamp: number;, hash: string;
-  size: number;, compressed: boolean;
-  accessCount: number;, lastAccessed: number;
+  timestamp: number;
+  hash: string;
+  size: number;
+  compressed: boolean;
+  accessCount: number;
+  lastAccessed: number;
 }
 
 export interface LODLevel {
-  level: number;, scale: number; // 1.0 = full res, 0.5 = half res, etc.
+  level: number;
+  scale: number; // 1.0 = full res, 0.5 = half res, etc.
   targetSize: number; // Target texture size
-  compressionRatio: number;, useGPUCompression: boolean;
+  compressionRatio: number;
+  useGPUCompression: boolean;
 }
 
 export interface TensorMemoryLayout {
-  baseAddress: number;, stride: [number, number, number]; // Strides for each axis
-  alignment: number;, totalSize: number;
+  baseAddress: number;
+  stride: [number, number, number]; // Strides for each axis
+  alignment: number;
+  totalSize: number;
   fragmentCount: number;
 }
 
@@ -132,10 +140,11 @@ class CompressionPipeline {
 
     this.compressShader = this.device.createComputePipeline({
       layout: 'auto',
-      compute: {, module: shaderModule,
+      compute: {
+        module: shaderModule,
         entryPoint: 'compress',
       },
-    });
+	});
   }
 
   /**
@@ -173,7 +182,7 @@ export class DimensionalTensorStore {
   private cpuCache: Map<string, TensorSlice> = new Map();
   private textureMetadata: Map<
     string,
-    { lastAccessed: number;, importance: number; position: [number, number, number] }
+    { lastAccessed: number; importance: number; position: [number, number, number] }
   > = new Map();
 
   // Streaming State
@@ -295,7 +304,7 @@ export class DimensionalTensorStore {
   private calculateTextureSize(
     axis: 1 | 2 | 3,
     scale: number
-  ): {, width: number; height: number;, depth: number } {
+  ): { width: number; height: number; depth: number } {
     const { documents, chunks, representations } = this.dimensions;
 
     switch (axis) {
@@ -438,9 +447,9 @@ export class DimensionalTensorStore {
     // In production, would adhere strictly to: bytesPerRow * rowsPerImage
     this.device.queue.writeTexture(
       { texture, origin },
-      data,
+	data,
       { bytesPerRow, rowsPerImage: copyHeight },
-      { width: copyWidth, height: copyHeight, depthOrArrayLayers: 1 }
+	{ width: copyWidth, height: copyHeight, depthOrArrayLayers: 1 }
     );
   }
 
@@ -457,7 +466,7 @@ export class DimensionalTensorStore {
           importance: 0,
           position: [0, 0, 0] as [number, number, number],
         },
-        memorySize: this.estimateTextureMemory(texture),
+	memorySize: this.estimateTextureMemory(texture),
       }))
       .sort((a, b) => {
         switch (this.streamingConfig.evictionStrategy) {
@@ -532,7 +541,7 @@ export class DimensionalTensorStore {
   }
 
   // Helper: defensively read texture dimensions
-  private getTextureDimensions(texture: GPUTexture): {, width: number; height: number } {
+  private getTextureDimensions(texture: GPUTexture): { width: number; height: number } {
     const w = (texture as unknown as { width?: number }).width;
     const h = (texture as unknown as { height?: number }).height;
     return {
@@ -568,7 +577,7 @@ export class DimensionalTensorStore {
           binding: 0,
           resource: texture.createView(),
         },
-      ],
+	],
     });
 
     this.bindGroupCache.set(cacheKey, bindGroup);
@@ -578,9 +587,12 @@ export class DimensionalTensorStore {
   /**
    * Get tensor statistics
    */
-  getStatistics(): {, allocatedMemory: number;
-    textureCount: number;, cacheHitRatio: number;
-    averageLOD: number;, streamingQueueSize: number;
+  getStatistics(): {
+    allocatedMemory: number;
+    textureCount: number;
+    cacheHitRatio: number;
+    averageLOD: number;
+    streamingQueueSize: number;
   } {
     const totalAccesses = this.textureMetadata.size;
     const cacheHits = this.cpuCache.size;
@@ -624,9 +636,3 @@ export class DimensionalTensorStore {
     console.log('[Tensor Store] All resources disposed');
   }
 }
-
-
-
-
-
-

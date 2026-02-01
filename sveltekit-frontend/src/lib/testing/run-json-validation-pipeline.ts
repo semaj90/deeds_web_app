@@ -13,8 +13,10 @@ import fs from 'fs/promises';
 import path from 'path';
 
 interface PipelineResult {
- success: boolean;, mcpServerStarted: boolean;
- playwrightTestsPassed: boolean;, simdMarkdownVerified: boolean;
+ success: boolean;
+	mcpServerStarted: boolean;
+ playwrightTestsPassed: boolean;
+	simdMarkdownVerified: boolean;
  performanceReport?: string;
  error?: string;
 }
@@ -127,7 +129,8 @@ class JSONValidationPipelineRunner {
  } else {
  resolve(true);
  }
- }, 30000);
+ },
+	30000);
  } catch (error) {
  console.error('Failed to start MCP Server:', error);
  resolve(false);

@@ -31,8 +31,10 @@ export interface RunConfig {
 }
 
 export interface DiffProposal {
- filePath: string;, originalContent: string;
- proposedContent: string;, reason: string;
+ filePath: string;
+	originalContent: string;
+ proposedContent: string;
+	reason: string;
  confidence: number;
  ruleId?: string;
 }
@@ -162,7 +164,8 @@ export class DiffRunner {
  }
 
  // Apply with validation
- this.tracker.startValidating(0); // TODO: Get actual error countpatches,
+ this.tracker.startValidating(0); // TODO: Get actual error count
+patches,
  contentMap: true // fast path - validate touched files only
  );
 
@@ -177,7 +180,8 @@ export class DiffRunner {
  }
  }
 
- // Update validation status? 'regression'
+ // Update validation status
+? 'regression'
  : result.validationResult.success
  ? 'passed'
  : 'failed';

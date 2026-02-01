@@ -15,7 +15,8 @@ export const POST: RequestHandler = async ({ request }) => {
  const file = form.get('file') as File;
  const caseId = (form.get('caseId') as string) ?? 'unknown';
 
- if (!file) return json({ success: false, error: 'No file' }, { status: 400 });
+ if (!file) return json({ success: false, error: 'No file' },
+	{ status: 400 });
 
  const buffer = Buffer.from(await file.arrayBuffer());
  const id = randomUUID();
@@ -34,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
  console.error('Evidence upload error', err);
  return json(
  { success: false, error: (err as any)?.message ?? 'upload error' },
- { status: 500 }
+	{ status: 500 }
  );
  }
 };

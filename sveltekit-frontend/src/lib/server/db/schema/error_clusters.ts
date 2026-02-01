@@ -30,7 +30,7 @@ export const errorClusterTable = pgTable('error_cluster',
         createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
         updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
     },
-    (table) => {
+	(table) => {
         return {
             clusterIdIdx: index('idx_error_cluster_id').on(table.clusterId),
             errorCodeIdx: index('idx_error_cluster_code').on(table.errorCode)

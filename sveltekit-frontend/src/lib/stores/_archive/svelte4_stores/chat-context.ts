@@ -2,8 +2,10 @@ import { writable } from 'svelte/store';
 import type { TopicNode, ShardNode } from '../types/evidence-board.js';
 
 export interface ChatContextItem {
- id: string;, type: 'topic' | 'shard';
- title: string;, data: TopicNode | ShardNode;
+ id: string;
+	type: 'topic' | 'shard';
+ title: string;
+	data: TopicNode | ShardNode;
  timestamp: Date;
 }
 
@@ -25,7 +27,7 @@ function createChatContextStore() {
  }];
  });
  },
- addShard: (shard: ShardNode) => {
+	addShard: (shard: ShardNode) => {
  update((items) => {
  // Remove any existing item with same ID
  const filtered = items.filter((item) => item.id !== shard.id);
@@ -40,10 +42,10 @@ function createChatContextStore() {
  }];
  });
  },
- remove: (id: string) => {
+	remove: (id: string) => {
  update((items) => items.filter((item) => item.id !== id));
  },
- clear: () => set([], getContextText: () => {
+	clear: () => set([], getContextText: () => {
  let context = '';
  subscribe((items) => {
  if (items.length === 0) return;
@@ -74,7 +76,7 @@ function createChatContextStore() {
 
  return context;
  },
- };
+	};
 }
 
 export const chatContext = createChatContextStore();

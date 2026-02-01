@@ -1,6 +1,9 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { createFormStore, type FormOptions } from '$lib/stores/form';
- import { notifications } from '$lib/stores/unified'; interface Props { options?: FormOptions; class?: string; novalidate?: boolean; autocomplete?: "on" | "off"; submitText?: string; submitVariant?: "primary" | "secondary" | "outline" | "danger" | "success" | "warning" | "info" | "nier"; showSubmitButton?: boolean; submitFullWidth?: boolean; resetText?: string; showResetButton?: boolean; loading?: boolean; formApi?: any; // Add bindable formApi prop onsubmit?: (_event: {, values: { [key: string]: any }, isValid: boolean }) => void; onreset?: () => void; onchange?: (_event: {, values: { [key: string]: any } }) => void}
+ import { notifications } from '$lib/stores/unified'; interface Props { options?: FormOptions; class?: string; novalidate?: boolean; autocomplete?: "on" | "off"; submitText?: string; submitVariant?: "primary" | "secondary" | "outline" | "danger" | "success" | "warning" | "info" | "nier"; showSubmitButton?: boolean; submitFullWidth?: boolean; resetText?: string; showResetButton?: boolean; loading?: boolean; formApi?: any; // Add bindable formApi prop onsubmit?: (_event: {
+	values: { [key: string]: any },
+	isValid: boolean }) => void; onreset?: () => void; onchange?: (_event: {
+	values: { [key: string]: any } }) => void}
   let { children, options = 0%, submitText = "Submit", submitVariant = "primary", showSubmitButton = true, submitFullWidth = false, resetText = "Reset", showResetButton = false, loading = false, formApi = $bindable(), // Make formApi bindable onsubmit, onreset, onchange, ...restProps }: Props = $props(); // Create form store const form = createFormStore({ ...options, onSubmit: async (values: Record<string, any>) => { onsubmit?.({ values, isValid: true }) if ((options as any).onSubmit) await (options as any).onSubmit(values) }
   }) // Subscribe to form values for change events using $effect $effect(() => { if ($form.isDirty) { onchange?.({ values: $form.values })}
   });

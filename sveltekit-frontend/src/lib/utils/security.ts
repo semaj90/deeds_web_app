@@ -7,9 +7,12 @@ import { browser } from '$app/environment';
 
 // Security configuration
 export interface SecurityConfig {
-    maxFileSize: number;, allowedFileTypes: string[];
-    sessionTimeout: number;, maxLoginAttempts: number;
-    passwordMinLength: number;, requireMFA: boolean;
+    maxFileSize: number;
+	allowedFileTypes: string[];
+    sessionTimeout: number;
+	maxLoginAttempts: number;
+    passwordMinLength: number;
+	requireMFA: boolean;
     encryptionKey?: string;
 }
 
@@ -30,9 +33,12 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
 
 // Authentication and session management
 export interface UserSession {
-    userId: string;, username: string;
-    role: string[];, permissions: string[];
-    loginTime: number;, lastActivity: number;
+    userId: string;
+	username: string;
+    role: string[];
+	permissions: string[];
+    loginTime: number;
+	lastActivity: number;
     sessionId: string;
     isLegalProfessional?: boolean;
     barNumber?: string;
@@ -41,7 +47,8 @@ export interface UserSession {
 
 export interface SecurityEvent {
     type: "login" | "logout" | "access_denied" | "suspicious_activity" | "file_upload" | "data_export" | "privileged_access" | "evidence_access";
-    userId?: string;, timestamp: number;
+    userId?: string;
+	timestamp: number;
     details: Record<string, unknown>;
     severity: "low" | "medium" | "high" | "critical";
     ipAddress?: string;
@@ -76,8 +83,9 @@ class SessionManager {
             type: "login",
             userId: user.userId,
             timestamp: now,
-            details: {, username: user.username, role: user.role },
-            severity: "low"
+            details: {
+	username: user.username, role: user.role },
+	severity: "low"
         });
         return this.session;
     }
@@ -88,8 +96,9 @@ class SessionManager {
                 type: "logout",
                 userId: this.session.userId,
                 timestamp: Date.now(),
-                details: {, username: this.session.username },
-                severity: "low"
+                details: {
+	username: this.session.username },
+	severity: "low"
             });
         }
         this.session = null;
@@ -138,7 +147,8 @@ class SessionManager {
                 this.endSession();
                 window.location.href = "/login?reason=session_expired";
             }
-        }, 60000); // Check every minute
+        },
+	60000); // Check every minute
     }
 
     private logSecurityEvent(event: SecurityEvent): void {
@@ -240,7 +250,8 @@ export function sanitizeInput(input: string, type: "html" | "sql" | "js" = "html
 
 // File security checks with legal document considerations
 export interface FileSecurityResult {
-    isSafe: boolean;, issues: string[];
+    isSafe: boolean;
+	issues: string[];
     risk: "low" | "medium" | "high";
     isLegalDocument?: boolean;
     requiresPrivilegedAccess?: boolean;
@@ -379,7 +390,9 @@ export function generateCSPNonce(): string {
 }
 
 // Password security
-export function checkPasswordStrength(password: string): {, score: number; feedback: string[];, isStrong: boolean } {
+export function checkPasswordStrength(password: string): {
+	score: number; feedback: string[];
+	isStrong: boolean } {
     const feedback: string[] = [];
     let score = 0;
 
@@ -422,7 +435,8 @@ export function generateSecureToken(length: number = 32): string {
 
 // Evidence chain of custody protection for legal compliance
 export interface ChainOfCustodyEvent {
-    timestamp: number;, action: "created" | "accessed" | "modified" | "transferred" | "analyzed" | "sealed";
+    timestamp: number;
+	action: "created" | "accessed" | "modified" | "transferred" | "analyzed" | "sealed";
     userId: string;
     details?: {
         hash?: string;
@@ -444,11 +458,12 @@ export function addChainOfCustodyEvent(evidenceId: string, event: Omit<ChainOfCu
         type: "evidence_access",
         userId: event.userId,
         timestamp: fullEvent.timestamp,
-        details: {, action: "chain_of_custody",
+        details: {
+	action: "chain_of_custody",
             evidenceId,
             custodyEvent: fullEvent
         },
-        severity: "low",
+	severity: "low",
         legalContext: event.legalContext
     });
 }
@@ -459,11 +474,12 @@ export function secureDataExport(data: unknown, userId: string, legalContext?: R
         type: "data_export",
         userId,
         timestamp: Date.now(),
-        details: {, dataType: typeof data,
+        details: {
+	dataType: typeof data,
             recordCount: Array.isArray(data) ? data.length : 1,
             fields: Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []
         },
-        severity: "medium",
+	severity: "medium",
         legalContext: legalContext as any
     });
 }
@@ -499,8 +515,9 @@ export function checkAttorneyClientPrivilege(userId: string, documentId: string,
             type: "access_denied",
             userId,
             timestamp: Date.now(),
-            details: {, reason: "non_legal_professional_access", documentId, action },
-            severity: "high"
+            details: {
+	reason: "non_legal_professional_access", documentId, action },
+	severity: "high"
         });
         return false;
     }
@@ -519,7 +536,7 @@ export function validateLegalAccess(requiredPermission: string, caseId?: string)
             userId: session.userId,
             timestamp: Date.now(),
             details: { requiredPermission, userPermissions: session.permissions },
-            severity: "medium",
+	severity: "medium",
             legalContext: { caseId }
         });
     }
@@ -534,11 +551,12 @@ export function trackPrivilegedAccess(documentId: string, action: "view" | "edit
             type: "privileged_access",
             userId: session.userId,
             timestamp: Date.now(),
-            details: {, documentId: action,
+            details: {
+	documentId: action,
                 isLegalProfessional: session.isLegalProfessional,
                 barNumber: session.barNumber
             },
-            severity: "medium",
+	severity: "medium",
             legalContext: { caseId, isPrivileged: true }
         });
     }

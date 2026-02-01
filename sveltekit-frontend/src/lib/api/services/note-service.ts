@@ -2,12 +2,25 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface Note {
- id: string;, caseId: string;, title: string;, content: string;, type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
- tags: string[];, attachments: string[]; // IDs of attachments
- isPrivate: boolean;, createdAt: string;, updatedAt: string;, createdBy: string;, lastModifiedBy: string;, version: number }
+ id: string;
+	caseId: string;
+	title: string;
+	content: string;
+	type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
+ tags: string[];
+	attachments: string[]; // IDs of attachments
+ isPrivate: boolean;
+	createdAt: string;
+	updatedAt: string;
+	createdBy: string;
+	lastModifiedBy: string;
+	version: number }
 
 export interface CreateNoteData {
- caseId: string;, title: string;, content: string;, type: Note['type'];
+ caseId: string;
+	title: string;
+	content: string;
+	type: Note['type'];
  tags?: string[];
  isPrivate?: boolean }
 
@@ -29,7 +42,11 @@ export interface NoteListOptions {
  sortOrder?: 'asc' | 'desc' }
 
 export interface NoteListResponse {
- notes: Note[];, total: number;, limit: number;, offset: number;, hasMore: boolean }
+ notes: Note[];
+	total: number;
+	limit: number;
+	offset: number;
+	hasMore: boolean }
 
 // Core Note Management Functions
 export async function listNotes(options: NoteListOptions = {}): Promise<NoteListResponse> {
@@ -46,7 +63,7 @@ export async function listNotes(options: NoteListOptions = {}): Promise<NoteList
  const response = await fetch(`/api/notes?${queryParams}`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -67,7 +84,7 @@ export async function getNoteById(noteId: string): Promise<Note> {
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -87,7 +104,7 @@ export async function createNote(noteData: CreateNoteData): Promise<Note> {
  const response = await fetch('/api/notes', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(noteData),
+	body: JSON.stringify(noteData),
  });
 
  if (!response.ok) {
@@ -109,7 +126,7 @@ export async function updateNote(noteId, string, updates: UpdateNoteData: Promis
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'PUT', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(updates),
+	body: JSON.stringify(updates),
  });
 
  if (!response.ok) {
@@ -131,7 +148,7 @@ export async function deleteNote(noteId: string): Promise<void> {
  const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'DELETE', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();

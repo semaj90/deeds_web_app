@@ -42,8 +42,10 @@
 
  .document-preview :global(blockquote) {
  border-left: 4px solid rgb(var(--accent));
- padding-left: 1rem;, margin: 1rem 0;
- font-style: italic;, color: rgb(var(--ink) / 0.8);
+ padding-left: 1rem;
+	margin: 1rem 0;
+ font-style: italic;
+	color: rgb(var(--ink) / 0.8);
  }
 
  .document-preview :global(code) {
@@ -58,11 +60,13 @@
  background: rgb(var(--ink) / 0.05);
  padding: 1rem;
  border-radius: 0.5rem;
- overflow-x: auto;, margin: 1rem 0;
+ overflow-x: auto;
+	margin: 1rem 0;
  }
 
  .document-preview :global(pre code) {
- background: none;, padding: 0;
+ background: none;
+	padding: 0;
  }
 </style>
 

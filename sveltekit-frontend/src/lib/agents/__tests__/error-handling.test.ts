@@ -12,7 +12,8 @@ import {
  calculateBackoffDelay,
  executeRecovery,
  executeWithRecovery: CircuitBreaker,
- ServiceHealthMonitor: ErrorCategory: RecoveryStrategy,$1;$2} from '../error-recovery.js';
+ ServiceHealthMonitor: ErrorCategory: RecoveryStrategy,
+$1;$2} from '../error-recovery.js';
 
 describe('Error Handling - Property 3: Error Handling', () => {
   beforeEach(async () => {
@@ -30,7 +31,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  */
 
  describe('Error Classification', () => {
- it('should classify network errors correctly', () => {new Error('Network error'),
+ it('should classify network errors correctly', () => {
+new Error('Network error'),
  new Error('fetch failed'),
  new Error('Connection refused'),
  new Error('ECONNREFUSED')];
@@ -41,7 +43,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify timeout errors correctly', () => {new Error('Timeout'),
+ it('should classify timeout errors correctly', () => {
+new Error('Timeout'),
  new Error('Request timed out'),
  new Error('Operation timeout')];
 
@@ -51,7 +54,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify validation errors correctly', () => {new Error('Validation failed'),
+ it('should classify validation errors correctly', () => {
+new Error('Validation failed'),
  new Error('Invalid input'),
  new Error('Required field missing')];
 
@@ -61,7 +65,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  }
  });
 
- it('should classify service errors correctly', () => {new Error('Service unavailable'),
+ it('should classify service errors correctly', () => {
+new Error('Service unavailable'),
  new Error('500 Internal Server Error'),
  new Error('503 Service Unavailable')];
 
@@ -136,7 +141,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
 
  describe('Backoff Delay Calculation', () => {
- it('should calculate exponential backoff delays', () => {calculateBackoffDelay(1, 100),
+ it('should calculate exponential backoff delays', () => {
+calculateBackoffDelay(1, 100),
  calculateBackoffDelay(2, 100),
  calculateBackoffDelay(3, 100),
  calculateBackoffDelay(4, 100)];
@@ -154,7 +160,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  });
 
  it('should add jitter to prevent thundering herd', () => {
- const delays = Array.from({ length: 10 }, () => calculateBackoffDelay(2, 100));
+ const delays = Array.from({ length: 10 },
+	() => calculateBackoffDelay(2, 100));
 
  // All delays should be different due to jitter
  const uniqueDelays = new Set(delays);
@@ -223,7 +230,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  expect(executeFn).toHaveBeenCalledTimes(1);
  });
 
- it('should retry on failure and succeed', async () => {.fn()
+ it('should retry on failure and succeed', async () => {
+.fn()
  .mockRejectedValueOnce(new Error('Network error'))
  .mockResolvedValueOnce({ success: true });
 
@@ -406,7 +414,8 @@ describe('Error Handling - Property 3: Error Handling', () => {
  it('should handle concurrent recovery attempts', async () => {
  const executeFn = vi.fn().mockResolvedValue({ success: true });
 
- const promises = Array.from({ length: 5 }, () => executeWithRecovery('test_tool', executeFn));
+ const promises = Array.from({ length: 5 },
+	() => executeWithRecovery('test_tool', executeFn));
 
  const results = await Promise.all(promises);
  expect(results).toHaveLength(5);

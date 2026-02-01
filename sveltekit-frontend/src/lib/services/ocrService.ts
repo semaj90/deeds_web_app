@@ -5,15 +5,21 @@ import { getOllamaEndpoint } from '$lib/services/get-ollama-endpoint';
 
 // Types
 export interface BoundingBox {
-  x: number;, y: number;
-  width: number;, height: number;
-  text: string;, confidence: number;
+  x: number;
+	y: number;
+  width: number;
+	height: number;
+  text: string;
+	confidence: number;
 }
 
 export interface ExtractedField {
-  fieldName: string;, value: string;
-  confidence: number;, boundingBox: BoundingBox;
-  fieldType: FieldType;, validationStatus: 'valid' | 'invalid' | 'needs_review';
+  fieldName: string;
+	value: string;
+  confidence: number;
+	boundingBox: BoundingBox;
+  fieldType: FieldType;
+	validationStatus: 'valid' | 'invalid' | 'needs_review';
 }
 
 export type FieldType =
@@ -31,31 +37,41 @@ export type FieldType =
   | 'text_block';
 
 export interface OCRMetadata {
-  filename: string;, fileSize: number;
-  dimensions: {, width: number; height: number };
-  pageCount: number;, language: string;
-  documentType: string;, processingDate: number;
+  filename: string;
+	fileSize: number;
+  dimensions: {
+	width: number; height: number };
+  pageCount: number;
+	language: string;
+  documentType: string;
+	processingDate: number;
 }
 
 export interface OCRResult {
-  id: string;, text: string;
-  confidence: number;, boundingBoxes: BoundingBox[];
-  extractedFields: ExtractedField[];, metadata: OCRMetadata;
+  id: string;
+	text: string;
+  confidence: number;
+	boundingBoxes: BoundingBox[];
+  extractedFields: ExtractedField[];
+	metadata: OCRMetadata;
   processingTime: number;
 }
 
 export interface FormField {
-  name: string;, type: FieldType;
+  name: string;
+	type: FieldType;
   label: string;
   value?: string;
-  confidence?: number;, required: boolean;
+  confidence?: number;
+	required: boolean;
   validation?: z.ZodSchema;
   suggestions?: string[];
 }
 
 // Field extraction patterns for different document types
 const FIELD_PATTERNS = {
-  legal_document: {, case_number: /case\s*(?:no\.?|number)?\s*:\s*([A-Z0-9-]+)/i,
+  legal_document: {
+	case_number: /case\s*(?:no\.?|number)?\s*:\s*([A-Z0-9-]+)/i,
     date: /(?:date|filed|executed):\s*(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})/i,
     jurisdiction: /(?:jurisdiction|court|county):\s*([^,\n]+)/i,
     plaintiff: /plaintiff:\s*([^,\n]+)/i,
@@ -63,7 +79,8 @@ const FIELD_PATTERNS = {
     attorney: /attorney\s*(?:for)?:\s*([^,\n]+)/i,
     amount: /(?:amount|damages?)\s*:\s*\$?([\d,]+\.?\d*)/i,
   },
-  contract: {, party_1: /(?:party|contractor)\s*(?:1|one|first)?:\s*([^,\n]+)/i,
+	contract: {
+	party_1: /(?:party|contractor)\s*(?:1|one|first)?:\s*([^,\n]+)/i,
     party_2: /(?:party|contractor)\s*(?:2|two|second)?:\s*([^,\n]+)/i,
     effective_date: /effective\s*date:\s*(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})/i,
     term: /term:\s*([^,\n]+)/i,
@@ -71,7 +88,8 @@ const FIELD_PATTERNS = {
     signature_1: /signature.*?([A-Za-z\s]{2,30})/i,
     signature_2: /signature.*?([A-Za-z\s]{2,30})/i,
   },
-  form: {, name: /(?:name|full\s*name):\s*([A-Za-z\s]{2,100})/i,
+	form: {
+	name: /(?:name|full\s*name):\s*([A-Za-z\s]{2,100})/i,
     address: /(?:address|street):\s*([^,\n]{5,200})/i,
     city: /city:\s*([A-Za-z\s]{2,50})/i,
     state: /state:\s*([A-Za-z]{2,20})/i,
@@ -80,7 +98,7 @@ const FIELD_PATTERNS = {
     email: /email:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i,
     ssn: /(?:ssn|social):\s*(\d{3}-?\d{2}-?\d{4})/i,
   },
-} as const;
+	} as const;
 
 export type DocumentType = keyof typeof FIELD_PATTERNS;
 
@@ -117,7 +135,7 @@ export class OCRService {
             this.progress$.set(Math.round(m.progress * 100));
           }
         },
-      });
+	});
 
       await this.worker.load();
       await this.worker.loadLanguage('eng');
@@ -179,15 +197,17 @@ export class OCRService {
         confidence: data.confidence || 0,
         boundingBoxes,
         extractedFields,
-        metadata: {, filename: file.name,
+        metadata: {
+	filename: file.name,
           fileSize: file.size,
-          dimensions: {, width: 0, height: 0 },
-          pageCount: 1,
+          dimensions: {
+	width: 0, height: 0 },
+	pageCount: 1,
           language: options.language || 'eng',
           documentType: detectedType,
           processingDate: Date.now(),
         },
-        processingTime: Date.now() - startTime,
+	processingTime: Date.now() - startTime,
       };
 
       this.currentResult$.set(result);
@@ -236,7 +256,7 @@ export class OCRService {
               resolve(file);
             }
           },
-          file.type || 'image/png',
+	file.type || 'image/png',
           0.92
         );
       };
@@ -279,7 +299,8 @@ Return only one of: legal_document, contract, form.`;
       const res = await fetch(`${base}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
           prompt,
           stream: false,
         }),
@@ -332,7 +353,7 @@ Return only one of: legal_document, contract, form.`;
             text: value,
             confidence: 0,
           },
-          fieldType,
+	fieldType,
           validationStatus: this.validateField(fieldType, value),
         });
       }
@@ -403,7 +424,8 @@ Return JSON array of objects with: fieldName, value, fieldType`;
       const res = await fetch(`${base}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, model: 'gemma3-legal:latest',
+	body: JSON.stringify({
+	model: 'gemma3-legal:latest',
           prompt,
           stream: false,
           format: 'json',
@@ -422,8 +444,9 @@ Return JSON array of objects with: fieldName, value, fieldType`;
               fieldName: item.fieldName,
               value: item.value,
               confidence: 0.6,
-              boundingBox: {, x: 0, y: 0, width: 0, height: 0, text: item.value, confidence: 0 },
-              fieldType: item.fieldType || 'text_block',
+              boundingBox: {
+	x: 0, y: 0, width: 0, height: 0, text: item.value, confidence: 0 },
+	fieldType: item.fieldType || 'text_block',
               validationStatus: 'needs_review',
             });
           }

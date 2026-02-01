@@ -8,14 +8,15 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import type { Case } from '$lib/types';
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import { get, writable } from 'svelte/store';
 
  // Dynamically-loaded component (runes-mode $state is available project-wide)
  let EnhancedMCPIntegration = $state <any>(null);
 
  // load component on client mount
- onMount(() => {
+ $effect(() => {
+
  (async () => {
  try {
  const mod = await import('$lib/components/ai/EnhancedMCPIntegration.svelte');
@@ -24,7 +25,8 @@ https, //svelte.dev/e/js_parse_error -->
  } catch (e) {
  console.warn('Failed to dynamically load EnhancedMCPIntegration (non-fatal)', e);
  }
- })();
+ 
+});();
  });
   
  const integrationStatus = writable({

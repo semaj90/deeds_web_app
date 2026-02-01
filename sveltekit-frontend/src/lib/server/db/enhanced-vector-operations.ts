@@ -2,13 +2,16 @@
 // Purpose: provide a syntactically-valid, safe fallback while migrating the project.
 
 export interface VectorSearchResult {
-	id: string;, content: string;
-	similarity: number;, metadata: unknown;
+	id: string;
+	content: string;
+	similarity: number;
+	metadata: unknown;
 	sourceType?: string;
 }
 
 export interface RAGContext {
-	query: string;, userId: string;
+	query: string;
+	userId: string;
 	caseId?: string;
 	limit?: number;
 	threshold?: number;
@@ -16,7 +19,8 @@ export interface RAGContext {
 }
 
 export class EnhancedVectorOperations {
-	async generateEmbedding(params: {, id: string; content: string }): Promise<void> {
+	async generateEmbedding(params: {
+	id: string; content: string }): Promise<void> {
 		// Stub implementation - in production this would generate real embeddings
 		// console.log('Generating embedding for: ', params.id, 'with content length: ', params.content.length);
 	}

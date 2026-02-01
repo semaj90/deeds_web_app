@@ -26,7 +26,7 @@ export function createFileUploader(url: string): MockUploader {
  }
  listeners[event]?.push(callback);
  },
- upload: async (file: File) => {
+	upload: async (file: File) => {
  console.log(`Mock uploading file: ${file.name} to ${ url }`);
  // Simulate upload progress
  for (let i = 0; i <= 100; i += 20) {
@@ -46,7 +46,7 @@ export function createFileUploader(url: string): MockUploader {
  listeners.error?.forEach((cb: any) => cb(error));
  }
  },
- };
+	};
 
  return mockUploader;
 }

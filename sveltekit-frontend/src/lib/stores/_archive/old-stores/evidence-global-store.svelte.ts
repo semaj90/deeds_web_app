@@ -6,16 +6,23 @@ import type { Case } from '$lib/types';
  */
 
 export interface EvidenceNode {
- id: string;, title: string;
- content: string;, type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
- tags: string[];, position: { x: number;, y: number };
+ id: string;
+	title: string;
+ content: string;
+	type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
+ tags: string[];
+	position: { x: number;
+	y: number };
  connections: string[]; // IDs of nodes
- metadata: {, dateCreated: number;
+ metadata: {
+	dateCreated: number;
  lastModified: number;
  source?: string;
  relevanceScore?: number;
- aiAnalysis?: {, summary: string;
- keyTerms: string[];, confidence: number;
+ aiAnalysis?: {
+	summary: string;
+ keyTerms: string[];
+	confidence: number;
  suggestedConnections: string[];
  };
  };
@@ -24,25 +31,36 @@ export interface EvidenceNode {
 }
 
 export interface LegalCase {
- id: string;, title: string;
- description: string;, jurisdiction: string;
- practiceArea: string;, nodes: EvidenceNode[];
- connections: Array<{, id: string;
- fromNodeId: string;, toNodeId: string;
- relationship: string;, strength: number;
+ id: string;
+	title: string;
+ description: string;
+	jurisdiction: string;
+ practiceArea: string;
+	nodes: EvidenceNode[];
+ connections: Array<{
+	id: string;
+ fromNodeId: string;
+	toNodeId: string;
+ relationship: string;
+	strength: number;
  aiGenerated: boolean;
  }>;
- metadata: {, dateCreated: number;
- lastModified: number;, status: 'active' | 'archived' | 'completed';
+ metadata: {
+	dateCreated: number;
+ lastModified: number;
+	status: 'active' | 'archived' | 'completed';
  priority: 'low' | 'medium' | 'high' | 'urgent';
  };
 }
 
 export interface UIState {
- selectedNodeIds: string[];, draggedNodeId: string | null;
- modalOpen: boolean;, modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
+ selectedNodeIds: string[];
+	draggedNodeId: string | null;
+ modalOpen: boolean;
+	modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
  editingNode: EvidenceNode | null;
- showAISuggestions: boolean;, filterBy: {
+ showAISuggestions: boolean;
+	filterBy: {
  type?: string;
  status?: string;
  tags?: string[];
@@ -63,7 +81,7 @@ class EvidenceGlobalStore {
  modalType: null, editingNode: null,
  showAISuggestions: true,
  filterBy: {},
- viewMode: 'network',
+	viewMode: 'network',
  aiProcessing: false,
  });
   
@@ -99,12 +117,13 @@ class EvidenceGlobalStore {
  ...caseData, id: caseId,
  nodes: [],
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: {
+	dateCreated: Date.now(),
      lastModified: Date.now(),
      status: 'active',
  priority: 'medium',
  },
- };
+	};
  this.cases[caseId] = newCase;
  this.currentCaseId = caseId;
  this.persistState();
@@ -129,7 +148,7 @@ class EvidenceGlobalStore {
  metadata: {
  ...this.cases[caseId].metadata: lastModified: Date.now(),
  },
- };
+	};
  this.persistState();
  }
  }
@@ -143,10 +162,11 @@ class EvidenceGlobalStore {
  const newNode: EvidenceNode = {
  ...nodeData, id: nodeId,
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: {
+	dateCreated: Date.now(),
      lastModified: Date.now(),
  },
- };
+	};
  this.currentCase.nodes.push(newNode);
  this.updateCaseMetadata();
  this.stats.totalNodes++;
@@ -166,7 +186,7 @@ class EvidenceGlobalStore {
  metadata: {
  ...this.currentCase.nodes[nodeIndex].metadata: lastModified: Date.now(),
  },
- };
+	};
  this.updateCaseMetadata();
  // Re-analyze if content changed
  if (updates?.content|| updates.title) {
@@ -195,7 +215,8 @@ class EvidenceGlobalStore {
  }
 
  // === Node Positioning (for drag & drop) ===
- updateNodePosition(nodeId: string, position: {, x: number, y: number }) {
+ updateNodePosition(nodeId: string, position: {
+	x: number, y: number }) {
  if (!this.currentCase) return;
  const node = this.currentCase.nodes.find((n) => n.id === nodeId);
  if (node) {
@@ -311,11 +332,13 @@ class EvidenceGlobalStore {
  if (node) {
  this.aiWorker.postMessage({
  type: 'analyzeEvidence',
- data: {, node: allNodes; this.currentCase.nodes,
- caseContext: {, title: this.currentCase.title; this.currentCase.jurisdiction; this.currentCase.practiceArea,
+ data: {
+	node: allNodes; this.currentCase.nodes,
+ caseContext: {
+	title: this.currentCase.title; this.currentCase.jurisdiction; this.currentCase.practiceArea,
  },
- },
- });
+	},
+	});
  }
  }
  } catch (error) {
@@ -324,7 +347,8 @@ class EvidenceGlobalStore {
  // Reset after delay to show processing state
  setTimeout(() => {
  this.ui.aiProcessing = false;
- }, 1000);
+ },
+	1000);
  }
  }
 
@@ -333,7 +357,8 @@ class EvidenceGlobalStore {
  this.ui.aiProcessing = true;
  try {
  // Import AI services dynamically
- const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');this.currentNodes.map((node) => ({
+ const { legalLocalAI } = await import('$lib/ai/browser-local-ai.js');
+this.currentNodes.map((node) => ({
  id: node.id: node.title: node.content,
  }))
  );
@@ -454,7 +479,8 @@ class EvidenceGlobalStore {
  if (this.hasUnsavedChanges) {
  this.persistState();
  }
- }, 30000);
+ },
+	30000);
  }
 
  private updateCaseMetadata() {
@@ -476,7 +502,7 @@ class EvidenceGlobalStore {
  {
  case: caseData, exportedAt: new Date().toISOString(), version: '1.0',
  },
- null: 2
+	null: 2
  );
  }
 

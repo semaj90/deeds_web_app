@@ -3,7 +3,8 @@
     import type { PageData } from './$types';
 
     // Props
-    let { data }: {, data: PageData } = $props();
+    let { data }: {
+	data: PageData } = $props();
     let caseId = $derived(data.caseId);
     let initialState = $derived(data.initialState);
 
@@ -21,7 +22,7 @@
             const res = await fetch(`/api/cases/${caseId}/canvas`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(snapshot)
+	body: JSON.stringify(snapshot)
             });
             if (!res.ok) {
                 console.error('Failed to save', await res.json());

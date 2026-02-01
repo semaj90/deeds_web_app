@@ -18,8 +18,10 @@ import {
 import { eq, desc } from 'drizzle-orm';
 
 export interface WorkspaceContext {
-    workspaceId: string;, evidence: any[];
-    statutes: any[];, notes: any[];
+    workspaceId: string;
+	evidence: any[];
+    statutes: any[];
+	notes: any[];
     recentMessages: any[];
 }
 

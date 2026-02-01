@@ -76,10 +76,11 @@ describe('CaseLinkService', () => {
  });
 
  describe('updateLinkMetadata', () => {
- it('should update link metadata', async () => {mockCaseId,
+ it('should update link metadata', async () => {
+mockCaseId,
  mockStatuteCode,
  { link_type: 'CITED_IN', notes: 'Updated notes' },
- mockUserId
+	mockUserId
  );
 
  expect(result).toBeDefined();

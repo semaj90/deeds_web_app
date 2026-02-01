@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
 
   interface PhoenixEvent {
     type: string;
     evidenceId?: string;
     fileName?: string;
-    caseId?: string;, message: string;
+    caseId?: string;
+	message: string;
     timestamp?: string;
     [key: string]: unknown;
   }
@@ -20,15 +21,17 @@
   let eventSource: EventSource | null = null;
   let isConnected = $state(false);
 
-  onMount(() => {
+  $effect(() => {
+
     if (show) {
       connectToEvents();
     }
-  });
+  
+});
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
     disconnectFromEvents();
-  });
+  }
 
   function connectToEvents() {
     try {

@@ -2,7 +2,8 @@
   import type { Snippet } from 'svelte';
 
   export interface TableColumn {
-    key: string;, title: string;
+    key: string;
+	title: string;
     sortable?: boolean;
     width?: string;
     align?: 'left' | 'center' | 'right';
@@ -26,7 +27,8 @@
     dense = false,
     actionsSnippet
   } = $props<{
-    columns: TableColumn[];, data: TableRow[];
+    columns: TableColumn[];
+	data: TableRow[];
     loading?: boolean;
     selectable?: boolean;
     sortable?: boolean;
@@ -100,7 +102,8 @@
       case 'date':
         return new Date(String(value)).toLocaleDateString();
       case 'number':
-        return typeof value === 'number' ? value.toLocaleString() : String(value);, default:
+        return typeof value === 'number' ? value.toLocaleString() : String(value);
+	default:
         return String(value);
     }
   }

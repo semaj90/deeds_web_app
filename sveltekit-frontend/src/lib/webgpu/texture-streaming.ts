@@ -23,19 +23,26 @@ const MEMORY_CONSTRAINTS = {
 } as const;
 
 export interface NESTexture {
-    id: string;, data: ArrayBuffer;
-    width: number;, height: number;
-    format: GPUTextureFormat;, size: number;
-    lastUsed: number;, priority: number;
+    id: string;
+	data: ArrayBuffer;
+    width: number;
+	height: number;
+    format: GPUTextureFormat;
+	size: number;
+    lastUsed: number;
+	priority: number;
     compressed: boolean;
-    legalContext?: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
-        confidenceLevel: number;, riskIndicator: boolean;
+    legalContext?: {
+	documentType: 'contract' | 'evidence' | 'brief' | 'citation';
+        confidenceLevel: number;
+	riskIndicator: boolean;
     };
 }
 
 export interface MemoryRegion {
     name: 'RAM' | 'CHR_ROM' | 'PRG_ROM';
-    size: number;, used: number;
+    size: number;
+	used: number;
     textures: Map<string, NESTexture>;
 }
 
@@ -316,7 +323,8 @@ export class WebGPUTextureStreamer {
         return new Promise((resolve, reject) => {
             const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
                 reject(new Error('Compression timeout'));
-            }, 5000);
+            },
+	5000);
 
             const handleMessage = (e: MessageEvent) => {
                 clearTimeout(timeout);
@@ -344,16 +352,17 @@ export class WebGPUTextureStreamer {
         if (!this.device) return;
 
         const texture = this.device.createTexture({
-            size: {, width: nesTexture.width, height: nesTexture.height },
-            format: nesTexture.format,
+            size: {
+	width: nesTexture.width, height: nesTexture.height },
+	format: nesTexture.format,
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
         });
 
         this.device.queue.writeTexture(
             { texture },
-            nesTexture.data,
+	nesTexture.data,
             { bytesPerRow: nesTexture.width * 4 },
-            { width: nesTexture.width, height: nesTexture.height }
+	{ width: nesTexture.width, height: nesTexture.height }
         );
 
         this.textureCache.set(nesTexture.id, texture);

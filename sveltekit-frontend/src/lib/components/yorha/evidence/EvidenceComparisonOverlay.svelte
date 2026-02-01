@@ -1,13 +1,15 @@
 <script lang="ts">
   interface EvidenceItem {
-    id: string;, fileName: string;
+    id: string;
+	fileName: string;
     extractedText: string;
     caseId?: string;
     timestamp?: string;
   }
 
   let { evidenceA, evidenceB, show = false, onDismiss } = $props<{
-    evidenceA: EvidenceItem;, evidenceB: EvidenceItem;
+    evidenceA: EvidenceItem;
+	evidenceB: EvidenceItem;
     show?: boolean;
     onDismiss?: () => void;
   }>();
@@ -55,7 +57,8 @@
  }
 
  .nes-container .title {
- background: #1e293b;, color: #f59e0b;
+ background: #1e293b;
+	color: #f59e0b;
  margin: -2px -2px 0 -2px;
  padding: 8px 12px;
  border-bottom: 2px solid #475569;

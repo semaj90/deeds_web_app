@@ -21,7 +21,7 @@ export const aceSources = pgTable('ace_sources', {
     etag: text('etag'),
     contentHash: text('content_hash'),
   },
-  (table) => ({
+	(table) => ({
     urlIdx: index('ace_sources_url_idx').on(table.canonicalUrl),
     domainIdx: index('ace_sources_domain_idx').on(table.domain),
     statusIdx: index('ace_sources_status_idx').on(table.crawlStatus),
@@ -43,7 +43,7 @@ export const aceSources = pgTable('ace_sources', {
     summary: text('summary'),
     summaryUpdatedAt: timestamp('summary_updated_at', { withTimezone: true }),
   },
-  (table) => ({
+	(table) => ({
     sourceIdx: index('ace_docs_source_idx').on(table.sourceId),
     fetchedIdx: index('ace_docs_fetched_idx').on(table.fetchedAt),
   })
@@ -69,7 +69,7 @@ export const aceChunks = pgTable('ace_chunks', {
       }>()
       .default(sql`'{}'::jsonb`),
   },
-  (table) => ({
+	(table) => ({
     docIdx: index('ace_chunks_doc_idx').on(table.docId, table.chunkIndex),
     // IVFFlat index for vector similarity (created in migration)
     embeddingIdx: index('ace_chunks_embedding_idx').using(
@@ -89,7 +89,7 @@ export const aceEntities = pgTable('ace_entities', {
     entityType: text('entity_type'), // 'TECH', 'PERSON', 'ORG', 'CONCEPT'
     data: jsonb('data').$type<Record<string, unknown>>().default(sql`'{}'::jsonb`),
   },
-  (table) => ({
+	(table) => ({
     docIdx: index('ace_entities_doc_idx').on(table.docId),
     entityIdx: index('ace_entities_entity_idx').on(table.entity),
     typeIdx: index('ace_entities_type_idx').on(table.entityType),
@@ -108,7 +108,7 @@ export const aceEdges = pgTable('ace_edges', {
     weight: real('weight').default(1.0),
     data: jsonb('data').$type<Record<string, unknown>>().default(sql`'{}'::jsonb`),
   },
-  (table) => ({
+	(table) => ({
     srcIdx: index('ace_edges_src_idx').on(table.srcEntity),
     dstIdx: index('ace_edges_dst_idx').on(table.dstEntity),
     relIdx: index('ace_edges_rel_idx').on(table.rel),

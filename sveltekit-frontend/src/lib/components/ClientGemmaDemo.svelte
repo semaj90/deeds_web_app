@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { clientGemmaInference } from '$lib/ai/client-gemma-inference';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 
 	let isInitialized = $state(false);
 	let isInitializing = $state(false);
@@ -11,10 +11,12 @@
 	let isGenerating = $state(false);
 
 	let embeddingText = $state('This is a sample legal document for testing embeddings.');
-	let embeddingResult = $state<{ embedding: number[];, dimensions: number } | null>(null);
+	let embeddingResult = $state<{ embedding: number[];
+	dimensions: number } | null>(null);
 	let isGeneratingEmbedding = $state(false);
 
-	onMount(() => {
+	$effect(() => {
+
 		(async () => {
 			isInitializing = true;
 			try {
@@ -27,7 +29,8 @@
 			} finally {
 				isInitializing = false;
 			}
-		})();
+		
+});();
 	});
 
 	async function generateText() {
@@ -130,7 +133,8 @@
 
 <style>
 	.client-gemma-demo {
-		max-width: 800px;, margin: 0 auto;
+		max-width: 800px;
+	margin: 0 auto;
 		padding: 20px;
 		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
@@ -143,36 +147,44 @@
 	}
 
 	.status.initializing {
-		background: #e3f2fd;, color: #1976d2;
+		background: #e3f2fd;
+	color: #1976d2;
 		border: 1px solid #bbdefb;
 	}
 
 	.status.success {
-		background: #e8f5e8;, color: #2e7d32;
+		background: #e8f5e8;
+	color: #2e7d32;
 		border: 1px solid #c8e6c9;
 	}
 
 	.status.error {
-		background: #ffebee;, color: #c62828;
+		background: #ffebee;
+	color: #c62828;
 		border: 1px solid #ffcdd2;
 	}
 
 	.inference-section {
-		margin-bottom: 30px;, padding: 20px;
+		margin-bottom: 30px;
+	padding: 20px;
 		border: 1px solid #e0e0e0;
-		border-radius: 8px;, background: #fafafa;
+		border-radius: 8px;
+	background: #fafafa;
 	}
 
 	.inference-section h3 {
-		margin-top: 0;, color: #333;
+		margin-top: 0;
+	color: #333;
 	}
 
 	textarea {
-		width: 100%;, padding: 12px;
+		width: 100%;
+	padding: 12px;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 		font-family: inherit;
-		font-size: 14px;, resize: vertical;
+		font-size: 14px;
+	resize: vertical;
 	}
 
 	.prompt-input {
@@ -188,16 +200,19 @@
 		border: none;
 		border-radius: 4px;
 		font-size: 14px;
-		font-weight: 500;, cursor: pointer;
+		font-weight: 500;
+	cursor: pointer;
 		transition: background-color 0.2s;
 	}
 
 	button:disabled {
-		opacity: 0.6;, cursor: not-allowed;
+		opacity: 0.6;
+	cursor: not-allowed;
 	}
 
 	.generate-btn {
-		background: #1976d2;, color: white;
+		background: #1976d2;
+	color: white;
 	}
 
 	.generate-btn: hover, not(:disabled) {
@@ -205,7 +220,8 @@
 	}
 
 	.embed-btn {
-		background: #7b1fa2;, color: white;
+		background: #7b1fa2;
+	color: white;
 	}
 
 	.embed-btn: hover, not(:disabled) {
@@ -214,18 +230,22 @@
 
 	.response,
 	.embedding-result {
-		margin-top: 16px;, padding: 12px;
-		background: white;, border: 1px solid #e0e0e0;
+		margin-top: 16px;
+	padding: 12px;
+		background: white;
+	border: 1px solid #e0e0e0;
 		border-radius: 4px;
 	}
 
 	.response h4,
 	.embedding-result h4 {
-		margin-top: 0;, color: #333;
+		margin-top: 0;
+	color: #333;
 	}
 
 	pre {
-		background: #f5f5f5;, padding: 8px;
+		background: #f5f5f5;
+	padding: 8px;
 		border-radius: 4px;
 		overflow-x: auto;
 		white-space: pre-wrap;

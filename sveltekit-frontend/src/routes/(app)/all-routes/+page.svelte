@@ -1,12 +1,13 @@
 <script lang="ts">
 	// @ts-nocheck
-	import { onDestroy, onMount } from 'svelte';
+	// Migrated to $effect
 	import type { PageData } from './$types';
 
 	// ─────────────────────────────────────
 	// Props & Data
 	// ─────────────────────────────────────
-	const { data }: {, data: PageData } = $props();
+	const { data }: {
+	data: PageData } = $props();
 
 	// Make routes reactive so SSE updates trigger re-renders
 	// Initialize from server data
@@ -30,7 +31,8 @@
 	 * Listen for 'message' events from SSE endpoint
 	 * Update route card health indicator in real-time
 	 */
-	onMount(() => {
+	$effect(() => {
+
 		// Connect to SSE endpoint
 		eventSource = new EventSource('/api/routes/events');
 
@@ -50,7 +52,8 @@
 			} catch (error) {
 				console.error('[SSE] Error parsing message:', error);
 			}
-		});
+		
+});
 
 		eventSource.addEventListener('error', (error) => {
 			console.error('[SSE] Connection error - will auto-reconnect:', error);
@@ -59,12 +62,12 @@
 		console.log('[SSE] EventSource connection established');
 	});
 
-	onDestroy(() => {
+	// TODO: Add as cleanup in $effect: return () => {
 		if (eventSource) {
 			eventSource.close();
 			console.log('[SSE] EventSource connection closed');
 		}
-	});
+	}
 
 	/**
 	 * Update route health status in real-time
@@ -142,7 +145,8 @@
 			const response = await fetch(`/api/routes/${encodeURIComponent(routeId)}/interactions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, interaction_type: interactionType,
+	body: JSON.stringify({
+	interaction_type: interactionType,
 					metadata: metadata || {}
 				})
 			});
@@ -281,7 +285,8 @@
 	.command-center {
 		padding: 2rem;
 		font-family: 'Courier New', monospace;
-		background: #000;, color: #0f0;
+		background: #000;
+	color: #0f0;
 		min-height: 100vh;
 	}
 
@@ -293,28 +298,33 @@
 	}
 
 	.debug-info {
-		background: #111;, padding: 1rem;
+		background: #111;
+	padding: 1rem;
 		border: 1px solid #0f0;
 		margin-bottom: 2rem;
 	}
 
 	.routes-list {
-		background: #111;, padding: 1rem;
+		background: #111;
+	padding: 1rem;
 		border: 1px solid #0f0;
 	}
 
 	.routes-list ul {
-		list-style: none;, padding: 0;
+		list-style: none;
+	padding: 0;
 	}
 
 	.route-item {
 		padding: 0;
 		border-bottom: 1px solid #333;
 		border-left: 3px solid transparent;
-		display: flex;, gap: 1rem;
+		display: flex;
+	gap: 1rem;
 		align-items: center;
 		justify-content: space-between;
-		list-style: none;, transition: border-left-color 0.2s;
+		list-style: none;
+	transition: border-left-color 0.2s;
 	}
 
 	/* Phase 8.2: Color-code route cards by health status */
@@ -323,10 +333,14 @@
 	}
 
 	.route-info-btn {
-		background: none;, border: none;
-		color: #0f0;, padding: 0.75rem;
-		cursor: pointer;, flex: 1;
-		text-align: left;, transition: background-color 0.2s;
+		background: none;
+	border: none;
+		color: #0f0;
+	padding: 0.75rem;
+		cursor: pointer;
+	flex: 1;
+		text-align: left;
+	transition: background-color 0.2s;
 		font-family: inherit;
 	}
 
@@ -340,14 +354,16 @@
 	}
 
 	.route-info {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		align-items: center;
 	}
 
 	/* Phase 8.3: Error details display */
 	.error-details {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column;
+	gap: 0.25rem;
 		margin-top: 0.5rem;
 		padding-top: 0.5rem;
 		border-top: 1px solid #333;
@@ -357,7 +373,8 @@
 	.error-message {
 		color: #f88;
 		font-style: italic;
-		max-width: 400px;, overflow: hidden;
+		max-width: 400px;
+	overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
@@ -368,12 +385,14 @@
 	}
 
 	.route-actions {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		align-items: center;
 	}
 
 	.kind {
-		background: #333;, padding: 0.2rem 0.5rem;
+		background: #333;
+	padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
 	}
@@ -384,12 +403,15 @@
 		font-size: 0.8rem;
 	}
 
-	.status.error { background: #f00;, color: #000; }
-	.status.warning { background: #ff0;, color: #000; }
+	.status.error { background: #f00;
+	color: #000; }
+	.status.warning { background: #ff0;
+	color: #000; }
 
 	/* Phase 8.1: Error count badge */
 	.error-badge {
-		background: #f00;, color: #000;
+		background: #f00;
+	color: #000;
 		padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
@@ -398,7 +420,8 @@
 
 	/* Phase 8.1: Warning count badge */
 	.warning-badge {
-		background: #ff0;, color: #000;
+		background: #ff0;
+	color: #000;
 		padding: 0.2rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
@@ -407,15 +430,19 @@
 
 	/* Phase 8.2: Health status indicator */
 	.health-indicator {
-		font-size: 1.2rem;, cursor: help;
+		font-size: 1.2rem;
+	cursor: help;
 	}
 
 	.action-btn {
-		background: #0f0;, color: #000;
-		border: none;, padding: 0.3rem 0.6rem;
+		background: #0f0;
+	color: #000;
+		border: none;
+	padding: 0.3rem 0.6rem;
 		border-radius: 3px;
 		font-size: 0.8rem;
-		font-weight: bold;, cursor: pointer;
+		font-weight: bold;
+	cursor: pointer;
 		transition: background-color 0.2s;
 	}
 

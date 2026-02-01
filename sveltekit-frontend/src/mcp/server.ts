@@ -11,7 +11,7 @@ const server = new Server(
     version: "1.0.0",
   },
   {
-    capabilities: {, tools: {},
+    capabilities: { tools: {},
     },
   }
 );
@@ -25,19 +25,19 @@ function setupToolHandlers() {
       {
         name: "cases:load",
         description: "Load legal cases with optional filtering",
-        inputSchema: {, type: "object",
-          properties: {, userId: { type: "string" },
-            limit: {, type: "number" },
-            query: {, type: "string" },
+        inputSchema: { type: "object",
+          properties: { userId: { type: "string" },
+            limit: { type: "number" },
+            query: { type: "string" },
           },
         },
       },
       {
         name: "rag:search",
         description: "Perform a semantic search across legal documents and web",
-        inputSchema: {, type: "object",
-          properties: {, query: { type: "string" },
-            topK: {, type: "number" },
+        inputSchema: { type: "object",
+          properties: { query: { type: "string" },
+            topK: { type: "number" },
           },
           required: ["query"],
         },
@@ -45,8 +45,8 @@ function setupToolHandlers() {
       {
         name: "rag:index_page",
         description: "Index a web page for RAG knowledge",
-        inputSchema: {, type: "object",
-          properties: {, url: { type: "string" },
+        inputSchema: { type: "object",
+          properties: { url: { type: "string" },
           },
           required: ["url"],
         },
@@ -54,11 +54,11 @@ function setupToolHandlers() {
       {
         name: "playwright:browser_action",
         description: "Execute a browser action using Playwright",
-        inputSchema: {, type: "object",
-          properties: {, action: { type: "enum", enum: ["goto", "click", "fill", "screenshot"] },
-            url: {, type: "string" },
-            selector: {, type: "string" },
-            value: {, type: "string" },
+        inputSchema: { type: "object",
+          properties: { action: { type: "enum", enum: ["goto", "click", "fill", "screenshot"] },
+            url: { type: "string" },
+            selector: { type: "string" },
+            value: { type: "string" },
           },
           required: ["action"],
         },
@@ -73,19 +73,19 @@ function setupToolHandlers() {
       switch (name) {
         case "cases:load": {
           const result = await mcpTools.cases.loadCases(args as any);
-          return { content: [{, type: "text", text: JSON.stringify(result) }] };
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 
         case "rag:search": {
           const { query, topK } = args as { query: string; topK?: number };
           const result = await mcpTools.rag.webSearch(query, { topK });
-          return { content: [{, type: "text", text: JSON.stringify(result) }] };
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 
         case "rag:index_page": {
           const { url } = args as { url: string };
           const result = await mcpTools.rag.indexWebPage(url);
-          return { content: [{, type: "text", text: JSON.stringify(result) }] };
+          return { content: [{ type: "text", text: JSON.stringify(result) }] };
         }
 
         case "playwright:browser_action": {
@@ -97,7 +97,7 @@ function setupToolHandlers() {
             timestamp: new Date().toISOString(),
             id: Math.random().toString(36).substring(7)
           };
-          return { content: [{, type: "text", text: JSON.stringify(mockResult) }] };
+          return { content: [{ type: "text", text: JSON.stringify(mockResult) }] };
         }
 
         default:
@@ -105,7 +105,7 @@ function setupToolHandlers() {
       }
     } catch (error: any) {
       return {
-        content: [{, type: "text", text: `Error: ${error.message}` }],
+        content: [{ type: "text", text: `Error: ${error.message}` }],
         isError: true,
       };
     }

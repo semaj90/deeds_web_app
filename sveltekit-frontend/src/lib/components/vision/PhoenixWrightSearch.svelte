@@ -4,42 +4,59 @@
 
  // Type definitions
  interface PhoenixWrightSearchRequest {
- caseId: string;, query: string;
- jurisdiction?: string;, detectContradictions: boolean;
- includeTestimony: boolean;, maxResults: number;
+ caseId: string;
+	query: string;
+ jurisdiction?: string;
+	detectContradictions: boolean;
+ includeTestimony: boolean;
+	maxResults: number;
  searchScope: string;
  }
 
  interface Precedent {
- title: string;, citation: string;
- court: string;, date: string;
- outcome: string;, relevanceScore: number;
+ title: string;
+	citation: string;
+ court: string;
+	date: string;
+ outcome: string;
+	relevanceScore: number;
  }
 
  interface Contradiction {
- type: string;, severity: string;
- description: string;, location: string;
+ type: string;
+	severity: string;
+ description: string;
+	location: string;
  parties: string[];
  }
 
  interface EvidenceMatch {
- type: string;, strength: string;
- description: string;, relevanceScore: number;
+ type: string;
+	strength: string;
+ description: string;
+	relevanceScore: number;
  legalWeight: number;
  }
 
  interface PhoenixWrightSearchResult {
  id: string;
  query?: string;
- jurisdiction?: string;, precedents: Precedent[];
- contradictions: Contradiction[];, evidenceMatches: EvidenceMatch[];
- confidence: number;, rankingExplanation: string;
+ jurisdiction?: string;
+	precedents: Precedent[];
+ contradictions: Contradiction[];
+	evidenceMatches: EvidenceMatch[];
+ confidence: number;
+	rankingExplanation: string;
  }
 
  const dispatch = createEventDispatcher<{
- search: PhoenixWrightSearchRequest;, result: PhoenixWrightSearchResult;
- persist: {, caseId: string; result: PhoenixWrightSearchResult };
- timeline: {, caseId: string; event: string;, data: any };
+ search: PhoenixWrightSearchRequest;
+	result: PhoenixWrightSearchResult;
+ persist: {
+	caseId: string; result: PhoenixWrightSearchResult };
+ timeline: {
+	caseId: string; event: string;
+	data: any };
  }>();
 
  let searchQuery = $state('');
@@ -101,7 +118,7 @@
  const response = await fetch('/api/legal/phoenix-wright-search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(request)
+	body: JSON.stringify(request)
  });
 
  if (!response.ok) {
@@ -129,7 +146,8 @@
 		dispatch('timeline', {
 			caseId,
 			event: 'phoenix_wright_search',
-			data: {, query: searchQuery,
+			data: {
+	query: searchQuery,
 				jurisdiction,
 				resultCount: result.precedents.length + result.contradictions.length + result.evidenceMatches.length,
 				confidence: result.confidence
@@ -183,7 +201,8 @@
 			const response = await fetch('/api/legal/phoenix-wright-export', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, caseId: searchResult,
+	body: JSON.stringify({
+	caseId: searchResult,
 					format: 'pdf'
 				})
 			}); if (!response.ok) {

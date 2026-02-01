@@ -8,9 +8,10 @@ import { setupTest, cleanupTest } from '$lib/test-utils/setup';
 
 // Mock the Ollama API
 vi.mock('$lib/server/ollama', () => ({
- ollamaClient: {, generate: vi.fn(),
+ ollamaClient: {
+	generate: vi.fn(),
  },
-}));
+	}));
 
 import { ollamaClient } from '$lib/server/ollama';
 
@@ -76,8 +77,10 @@ describe('LLMService', () => {
  describe('extractCitations', () => {
  it('should extract citations from text', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
- response: JSON.stringify([{, code: '42 U.S.C. § 1983', type: 'statute' }])
- });The defendant was charged under 42 U.S.C. § 1983 and Cal. Penal Code § 187.
+ response: JSON.stringify([{
+	code: '42 U.S.C. § 1983', type: 'statute' }])
+ });
+The defendant was charged under 42 U.S.C. § 1983 and Cal. Penal Code § 187.
  The court cited 123 F.3d 456 (9th Cir. 2000) as precedent.
  `;
 
@@ -90,7 +93,8 @@ describe('LLMService', () => {
 
  it('should identify citation types correctly', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
- response: JSON.stringify([{, code: '42 U.S.C. § 1983', type: 'statute' }])
+ response: JSON.stringify([{
+	code: '42 U.S.C. § 1983', type: 'statute' }])
  });
 
  const text = '42 U.S.C. § 1983 and Cal. Penal Code § 187';
@@ -118,7 +122,8 @@ describe('LLMService', () => {
  it('should extract holding statement from summary', async () => {
  (ollamaClient.generate as any).mockResolvedValue({
  response: 'Such violations require strict liability.'
- });The court found that the defendant violated the statute.
+ });
+The court found that the defendant violated the statute.
  The holding is that such violations require strict liability.
  Therefore, the defendant is guilty.
  `;
@@ -177,8 +182,10 @@ describe('LLMService', () => {
  const context = {
  caseId: 'case-123',
  charges: ['murder'],
- statutes: [{, code: 'Statute 1', title: 'Title', text: 'Text' }],
- caseLaw: [{, caseNumber: 'Case 1', title: 'Title', holding: 'Holding' }],
+ statutes: [{
+	code: 'Statute 1', title: 'Title', text: 'Text' }],
+ caseLaw: [{
+	caseNumber: 'Case 1', title: 'Title', holding: 'Holding' }],
  };
 
  const startTime = Date.now();

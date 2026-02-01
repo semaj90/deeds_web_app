@@ -23,8 +23,8 @@
     action = '/api/submit-form',
     method = 'POST',
     initialData = {},
-    config = {},
-    onsubmit = undefined,
+	config = {},
+	onsubmit = undefined,
     onsuccess = undefined,
     onerror = undefined,
     class: className = '',
@@ -457,7 +457,8 @@
 
 <style>
   .progressive-form {
-    max-width: 600px;, margin: 0 auto;
+    max-width: 600px;
+	margin: 0 auto;
     padding: 24px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
@@ -470,31 +471,40 @@
   .form-header h2 {
     margin: 0 0 8px 0;
     font-size: 24px;
-    font-weight: 600;, color: #1f2937;
+    font-weight: 600;
+	color: #1f2937;
   }
 
   .form-header p {
-    margin: 0;, color: #6b7280;
+    margin: 0;
+	color: #6b7280;
   }
 
   .sr-only {
-    position: absolute;, width: 1px;
-    height: 1px;, padding: 0;
-    margin: -1px;, overflow: hidden;
+    position: absolute;
+	width: 1px;
+    height: 1px;
+	padding: 0;
+    margin: -1px;
+	overflow: hidden;
     clip: rect(0, 0, 0, 0);
-    white-space: nowrap;, border: 0;
+    white-space: nowrap;
+	border: 0;
   }
 
   .error-summary {
-    background: #fef2f2;, border: 1px solid #fecaca;
-    border-radius: 8px;, padding: 16px;
+    background: #fef2f2;
+	border: 1px solid #fecaca;
+    border-radius: 8px;
+	padding: 16px;
     margin-bottom: 24px;
   }
 
   .error-summary h3 {
     margin: 0 0 12px 0;
     font-size: 16px;
-    font-weight: 600;, color: #dc2626;
+    font-weight: 600;
+	color: #dc2626;
   }
 
   .error-summary ul {
@@ -513,13 +523,15 @@
 
   .form-section {
     border: 1px solid #d1d5db;
-    border-radius: 8px;, padding: 24px;
+    border-radius: 8px;
+	padding: 24px;
     margin-bottom: 24px;
   }
 
   .form-section legend {
     font-size: 18px;
-    font-weight: 600;, color: #1f2937;
+    font-weight: 600;
+	color: #1f2937;
     padding: 0 8px;
   }
 
@@ -531,13 +543,15 @@
 
   .form-group {
     display: flex;
-    flex-direction: column;, gap: 8px;
+    flex-direction: column;
+	gap: 8px;
     margin-bottom: 20px;
   }
 
   .form-label {
     font-size: 14px;
-    font-weight: 500;, color: #374151;
+    font-weight: 500;
+	color: #374151;
   }
 
   .form-input {
@@ -545,7 +559,8 @@
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 16px;
-    line-height: 1.5;, transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    line-height: 1.5;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .form-input:focus {
@@ -565,18 +580,21 @@
 
   .checkbox-group {
     flex-direction: row;
-    align-items: flex-start;, gap: 12px;
+    align-items: flex-start;
+	gap: 12px;
   }
 
   .form-checkbox {
-    width: 18px;, height: 18px;
+    width: 18px;
+	height: 18px;
     margin-top: 2px;
     flex-shrink: 0;
   }
 
   .checkbox-label {
     font-size: 14px;
-    line-height: 1.5;, color: #374151;
+    line-height: 1.5;
+	color: #374151;
     margin: 0;
   }
 
@@ -586,16 +604,19 @@
   }
 
   .field-hint {
-    font-size: 12px;, color: #6b7280;
+    font-size: 12px;
+	color: #6b7280;
   }
 
   .field-error {
-    font-size: 12px;, color: #dc2626;
+    font-size: 12px;
+	color: #dc2626;
     font-weight: 500;
   }
 
   .form-actions {
-    display: flex;, gap: 16px;
+    display: flex;
+	gap: 16px;
     justify-content: center;
     margin-top: 32px;
   }
@@ -603,17 +624,20 @@
   .submit-button,
   .reset-button {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center;
+	gap: 8px;
     padding: 12px 24px;
     border-radius: 6px;
     font-size: 16px;
-    font-weight: 500;, cursor: pointer;
+    font-weight: 500;
+	cursor: pointer;
     transition: all 0.2s ease;
     border: none;
   }
 
   .submit-button.primary {
-    background: #3b82f6;, color: white;
+    background: #3b82f6;
+	color: white;
   }
 
   .submit-button.primary: hover, not(:disabled) {
@@ -621,11 +645,13 @@
   }
 
   .submit-button.primary:disabled {
-    background: #9ca3af;, cursor: not-allowed;
+    background: #9ca3af;
+	cursor: not-allowed;
   }
 
   .reset-button.secondary {
-    background: #f3f4f6;, color: #374151;
+    background: #f3f4f6;
+	color: #374151;
     border: 1px solid #d1d5db;
   }
 
@@ -634,30 +660,36 @@
   }
 
   .reset-button.secondary:disabled {
-    opacity: 0.5;, cursor: not-allowed;
+    opacity: 0.5;
+	cursor: not-allowed;
   }
 
   .loading-spinner {
-    width: 16px;, height: 16px;
+    width: 16px;
+	height: 16px;
     border: 2px solid transparent;
     border-top: 2px solid currentColor;
-    border-radius: 50%;, animation: spin 1s linear infinite;
+    border-radius: 50%;
+	animation: spin 1s linear infinite;
   }
 
   .submit-message {
-    margin-top: 16px;, padding: 12px;
+    margin-top: 16px;
+	padding: 12px;
     border-radius: 6px;
     text-align: center;
     font-weight: 500;
   }
 
   .submit-message.success {
-    background: #f0fdf4;, color: #166534;
+    background: #f0fdf4;
+	color: #166534;
     border: 1px solid #bbf7d0;
   }
 
   .submit-message.error {
-    background: #fef2f2;, color: #dc2626;
+    background: #fef2f2;
+	color: #dc2626;
     border: 1px solid #fecaca;
   }
 
@@ -677,7 +709,8 @@
     }
 
     .form-row {
-      grid-template-columns: 1fr;, gap: 0;
+      grid-template-columns: 1fr;
+	gap: 0;
     }
 
     .form-actions {
@@ -703,7 +736,8 @@
     }
 
     .loading-spinner {
-      animation: none;, border: 2px solid currentColor;
+      animation: none;
+	border: 2px solid currentColor;
       border-top-color: transparent;
     }
   }

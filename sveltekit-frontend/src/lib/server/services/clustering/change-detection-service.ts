@@ -5,17 +5,23 @@
  */
 
 export interface ChangeDetectionResult {
-    changePercentage: number;, changedStatutes: string[];
+    changePercentage: number;
+	changedStatutes: string[];
     newLabels: Map<string, string>;
     previousLabels: Map<string, string>;
-    shouldAlert: boolean;, alertMessage: string;
-    changedCount: number;, totalCount: number;
+    shouldAlert: boolean;
+	alertMessage: string;
+    changedCount: number;
+	totalCount: number;
 }
 
 export interface ChangeHistory {
-    timestamp: number;, version: number;
-    changePercentage: number;, changedCount: number;
-    totalCount: number;, alertTriggered: boolean;
+    timestamp: number;
+	version: number;
+    changePercentage: number;
+	changedCount: number;
+    totalCount: number;
+	alertTriggered: boolean;
 }
 
 /**
@@ -83,7 +89,8 @@ export async function emitOperatorAlert(result: ChangeDetectionResult): Promise<
         await fetch('/api/alerts/clustering', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, severity: 'warning',
+	body: JSON.stringify({
+	severity: 'warning',
                 title: 'Clustering Change Detected',
                 message: result.alertMessage,
                 changePercentage: result.changePercentage,
@@ -108,7 +115,7 @@ export async function storeChangeHistory(
         await fetch('/api/clustering/change-history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+	body: JSON.stringify({
                 jobId,
                 changePercentage: result.changePercentage,
                 changedCount: result.changedCount,
@@ -140,9 +147,12 @@ export async function getChangeHistory(limit: number = 100): Promise<ChangeHisto
 /**
  * Analyze change trends
  */
-export function analyzeChangeTrends(history: ChangeHistory[]): {, avgChangePercentage: number;
-    maxChangePercentage: number;, minChangePercentage: number;
-    alertFrequency: number;, trend: 'increasing' | 'decreasing' | 'stable';
+export function analyzeChangeTrends(history: ChangeHistory[]): {
+	avgChangePercentage: number;
+    maxChangePercentage: number;
+	minChangePercentage: number;
+    alertFrequency: number;
+	trend: 'increasing' | 'decreasing' | 'stable';
 } {
     if (history.length === 0) {
         return {
@@ -190,8 +200,10 @@ export function analyzeChangeTrends(history: ChangeHistory[]): {, avgChangePerce
 export function compareVersions(
     version1: Map<string, string>,
     version2: Map<string, string>
-): {, added: string[];
-    removed: string[];, changed: string[];
+): {
+	added: string[];
+    removed: string[];
+	changed: string[];
     unchanged: string[];
 } {
     const added: string[] = [];
@@ -274,7 +286,8 @@ export function exportChangeDataAsCSV(result: ChangeDetectionResult): string {
 /**
  * Validate change detection result
  */
-export function validateChangeDetectionResult(result: ChangeDetectionResult): {, valid: boolean;
+export function validateChangeDetectionResult(result: ChangeDetectionResult): {
+	valid: boolean;
     errors: string[];
 } {
     const errors: string[] = [];

@@ -32,7 +32,8 @@
 {#if menuContext?.open}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		transition: scale={{, duration: 100, start: 0.95 }}
+		transition: scale={{
+	duration: 100, start: 0.95 }}
 		class="{defaultClass} { className }"
 		style="left: {menuContext.position.x}px; top: {menuContext.position.y}px;"
 		onclick={ handleClick }

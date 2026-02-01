@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
 	import type { Component, Snippet } from 'svelte';
-	import { onMount } from 'svelte';
+	// Migrated to $effect
 	import { buttonVariants, type ButtonVariantProps } from './button-variants';
 
 	interface Props {
@@ -41,7 +41,9 @@
 
 	let BitsComponent = $state<Component | null>(null);
 
-	onMount(async () => {
+	$effect(() => {
+  (async () => {
+
 		if (useBits) {
 			try {
 				const { getBitsNamespace } = await import('$lib/utils/bits-ui-adapter');
@@ -51,7 +53,9 @@
 				BitsComponent = null;
 			}
 		}
-	});
+	
+  })();
+});
 
 	function handleClick(evt: MouseEvent) {
 		if (isDisabled) {
@@ -115,10 +119,13 @@
 <style>
 	.loader {
 		display: inline-block;
-		margin-right: 0.5rem;, width: 1rem;
-		height: 1rem;, border: 2px solid currentColor;
+		margin-right: 0.5rem;
+	width: 1rem;
+		height: 1rem;
+	border: 2px solid currentColor;
 		border-right-color: transparent;
-		border-radius: 50%;, animation: spin 0.8s linear infinite;
+		border-radius: 50%;
+	animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes spin {
@@ -128,6 +135,7 @@
 	}
 
 	:global([data-variant='yorha']) {
-		position: relative;, overflow: hidden;
+		position: relative;
+	overflow: hidden;
 	}
 </style>

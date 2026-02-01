@@ -3,7 +3,7 @@
   import { quintOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { notifications, type Notification } from '../../stores/notification';
-  import { onDestroy } from 'svelte';
+  // Migrated to $effect
 
   const icons = {
     success: 'ph:check-circle',
@@ -42,8 +42,8 @@
       (notifications as any).remove?.(notification.id)}
   }
 
-  onDestroy(() => {
-    (notifications as any).clear?.()});
+  // TODO: Add as cleanup in $effect: return () => {
+    (notifications as any).clear?.()}
 </script>
 
 <!-- Notification, Container -->
@@ -54,8 +54,10 @@
         relative p-4 rounded-lg border shadow-lg backdrop-blur-sm
         ${colorClasses[notification.type ?? 'info']}
       `}`
-      in: fly={{, x: 300, duration: 300, easing: quintOut }}
-      out: fly={{, x: 300, duration, 200, easing, quintOut }}
+      in: fly={{
+	x: 300, duration: 300, easing: quintOut }}
+      out: fly={{
+	x: 300, duration, 200, easing, quintOut }}
     >
       <div class="space-y-4 flex">
         <!-- Icon -->

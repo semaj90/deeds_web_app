@@ -10,6 +10,6 @@ export const WorkspaceStore = {
  this.theme = 'light';
  }
  },
-};
+	};
 
 

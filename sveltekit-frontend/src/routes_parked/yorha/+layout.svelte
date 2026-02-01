@@ -18,7 +18,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Search } from "lucide-svelte";
  import { Terminal } from "lucide-svelte";
  import type { SvelteComponent } from 'svelte';
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import '../../app.css';
  // Added: Top-level type import
 
@@ -140,7 +140,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  }
 
- onMount(() => {
+ $effect(() => {
+
  if (typeof window !== 'undefined') currentPath = window.location.pathname ?? '';
 
  afterNavigate((nav) => {
@@ -150,7 +151,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  } catch {
  currentPath = '';
  }
- });
+ 
+});
   
  (async () => {
  try {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  // Migrated to $effect
   import { browser } from '$app/environment';
   import * as THREE from 'three';
   import { Button } from "$lib/components/ui/button";
@@ -96,13 +96,13 @@
      }
   }
 
-  onDestroy(() => {
+  // TODO: Add as cleanup in $effect: return () => {
      if (browser) {
          window.removeEventListener('resize', onWindowResize);
          if (frameId) cancelAnimationFrame(frameId);
          if (renderer) renderer.dispose();
      }
-  });
+  }
 
 </script>
 

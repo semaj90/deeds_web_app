@@ -115,8 +115,10 @@
 
 <style>
  .summary-editor {
- background: white;, border: 1px solid #e0e0e0;
- border-radius: 4px;, padding: 1.5rem;
+ background: white;
+	border: 1px solid #e0e0e0;
+ border-radius: 4px;
+	padding: 1.5rem;
  }
 
  .header {
@@ -134,12 +136,15 @@
  }
 
  .meta {
- display: flex;, gap: 1rem;
- font-size: 0.85rem;, color: #666;
+ display: flex;
+	gap: 1rem;
+ font-size: 0.85rem;
+	color: #666;
  }
 
  .version {
- background-color: #f0f0f0;, padding: 0.25rem 0.5rem;
+ background-color: #f0f0f0;
+	padding: 0.25rem 0.5rem;
  border-radius: 3px;
  }
 
@@ -148,7 +153,8 @@
  }
 
  .text {
- line-height: 1.6;, color: #333;
+ line-height: 1.6;
+	color: #333;
  margin-bottom: 1.5rem;
  white-space: pre-wrap;
  word-wrap: break-word;
@@ -160,16 +166,19 @@
 
  .section h3 {
  margin: 0 0 0.5rem 0;
- font-size: 1rem;, color: #333;
+ font-size: 1rem;
+	color: #333;
  }
 
  .section p {
- margin: 0;, color: #666;
+ margin: 0;
+	color: #666;
  line-height: 1.5;
  }
 
  .citations {
- list-style: none;, padding: 0;
+ list-style: none;
+	padding: 0;
  margin: 0;
  }
 
@@ -194,22 +203,26 @@
 
  .citation-title {
  display: block;
- font-size: 0.85rem;, color: #666;
+ font-size: 0.85rem;
+	color: #666;
  margin-top: 0.25rem;
  }
 
  .editor {
  width: 100%;
- min-height: 300px;, padding: 1rem;
+ min-height: 300px;
+	padding: 1rem;
  border: 1px solid #ddd;
  border-radius: 4px;
  font-family: monospace;
- font-size: 0.9rem;, resize: vertical;
+ font-size: 0.9rem;
+	resize: vertical;
  }
 
  .editor-actions,
  .actions {
- display: flex;, gap: 0.5rem;
+ display: flex;
+	gap: 0.5rem;
  margin-top: 1rem;
  }
 
@@ -218,12 +231,15 @@
  .btn-edit {
  padding: 0.5rem 1rem;
  border: none;
- border-radius: 4px;, cursor: pointer;
- font-size: 0.9rem;, transition: all 0.2s;
+ border-radius: 4px;
+	cursor: pointer;
+ font-size: 0.9rem;
+	transition: all 0.2s;
  }
 
  .btn-save {
- background-color: #28a745;, color: white;
+ background-color: #28a745;
+	color: white;
  }
 
  .btn-save:hover {
@@ -231,7 +247,8 @@
  }
 
  .btn-cancel {
- background-color: #6c757d;, color: white;
+ background-color: #6c757d;
+	color: white;
  }
 
  .btn-cancel:hover {
@@ -239,7 +256,8 @@
  }
 
  .btn-edit {
- background-color: #007bff;, color: white;
+ background-color: #007bff;
+	color: white;
  }
 
  .btn-edit:hover {
@@ -247,7 +265,8 @@
  }
 
  .btn-citations {
- background-color: #8b4513;, color: white;
+ background-color: #8b4513;
+	color: white;
  }
 
  .btn-citations:hover {
@@ -255,28 +274,35 @@
  }
 
  .citation-panel {
- margin-top: 1.5rem;, border: 2px solid #d4a574;
+ margin-top: 1.5rem;
+	border: 2px solid #d4a574;
  border-radius: 6px;
- background-color: #f5f1e8;, overflow: hidden;
+ background-color: #f5f1e8;
+	overflow: hidden;
  }
 
  .citation-panel-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
+ align-items: center;
+	padding: 1rem;
  background-color: #e0d5c7;
  border-bottom: 1px solid #d4a574;
  }
 
  .citation-panel-header h3 {
  margin: 0;
- font-size: 1rem;, color: #2c2c2c;
+ font-size: 1rem;
+	color: #2c2c2c;
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.2rem;, cursor: pointer;
- color: #666;, padding: 0;
+ background: none;
+	border: none;
+ font-size: 1.2rem;
+	cursor: pointer;
+ color: #666;
+	padding: 0;
  }
 
  .close-btn:hover {
@@ -289,14 +315,18 @@
 
  .citation-detail-view {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column;
+	gap: 1rem;
  }
 
  .back-btn {
- align-self: flex-start;, padding: 0.4rem 0.8rem;
- background-color: #e0d5c7;, border: 1px solid #d4a574;
+ align-self: flex-start;
+	padding: 0.4rem 0.8rem;
+ background-color: #e0d5c7;
+	border: 1px solid #d4a574;
  border-radius: 4px;
- font-size: 0.85rem;, cursor: pointer;
+ font-size: 0.85rem;
+	cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -306,22 +336,26 @@
 
  .citation-list-view {
  display: flex;
- flex-direction: column;, gap: 1.5rem;
+ flex-direction: column;
+	gap: 1.5rem;
  }
 
  .search-section {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 
  .search-section h4 {
  margin: 0;
- font-size: 0.95rem;, color: #2c2c2c;
+ font-size: 0.95rem;
+	color: #2c2c2c;
  }
 
  .list-section {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column;
+	gap: 0.75rem;
  }
 </style>
 

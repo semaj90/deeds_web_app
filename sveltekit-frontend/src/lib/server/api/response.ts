@@ -5,7 +5,8 @@ import { z } from 'zod';
 const schema = z.any();
 
 export async function withApiHandler(
-	handler: (params: {, url: URL; locals: any; request?: Request }) => Promise<any>,
+	handler: (params: {
+	url: URL; locals: any; request?: Request }) => Promise<any>,
 	event: any
 ): Promise<Response> {
 	try {
@@ -15,7 +16,8 @@ export async function withApiHandler(
 		const result = await handler({ url, locals, request });
 		return json(result);
 	} catch (error: any) {
-		return json({ error: error?.message ?? 'Internal server error' }, { status: 500 });
+		return json({ error: error?.message ?? 'Internal server error' },
+	{ status: 500 });
 	}
 }
 
@@ -27,7 +29,8 @@ export async function parseRequestBody<T>(request: Request): Promise<T> {
 	return body as T;
 }
 
-export function createPagination(page: number, limit: number, total: number): {, page: number, limit: number, total: number, totalPages: number } {
+export function createPagination(page: number, limit: number, total: number): {
+	page: number, limit: number, total: number, totalPages: number } {
 	return {
 		page,
 		limit,

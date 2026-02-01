@@ -15,9 +15,12 @@ export type ErrorBrainTransport = 'none' | 'sse' | 'redis' | 'both';
 export type ErrorBrainApplyMode = 'off' | 'safe' | 'full';
 
 export interface ErrorBrainConfig {
-    enabled: boolean;, transport: ErrorBrainTransport;
-    applyMode: ErrorBrainApplyMode;, maxPatchSize: number;
-    confidenceThreshold: number;, dryRunDefault: boolean;
+    enabled: boolean;
+	transport: ErrorBrainTransport;
+    applyMode: ErrorBrainApplyMode;
+	maxPatchSize: number;
+    confidenceThreshold: number;
+	dryRunDefault: boolean;
 }
 
 /**
@@ -124,7 +127,8 @@ export function canApplyPatches(): boolean {
 export function isPatchSafe(
     confidence: number,
     linesChanged: number
-): {, safe: boolean; reason?: string } {
+): {
+	safe: boolean; reason?: string } {
     const config = getErrorBrainConfig();
 
     if (confidence < config.confidenceThreshold) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { browser } from '$app/environment';
 
   // D3 types are loose to avoid build issues
@@ -23,10 +23,12 @@
   const NODE_RADIUS = 5;
   const ATTRACTION_FORCE = 0.5;
 
-  onMount(() => {
+  $effect(() => {
+
     if (!browser) return;
     initD3();
-  });
+  
+});
 
   async function initD3() {
     // Dynamic import to support SSR

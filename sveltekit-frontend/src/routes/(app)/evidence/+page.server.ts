@@ -109,7 +109,6 @@ export const actions: Actions = {
 			};
 		}
 	},
-
 	// Delete evidence
 	delete: async ({ request, locals }) => {
 		if (!locals.user?.id) {
@@ -138,7 +137,6 @@ export const actions: Actions = {
 			};
 		}
 	},
-
 	// Update evidence metadata
 	update: async ({ request, locals }) => {
 		if (!locals.user?.id) {

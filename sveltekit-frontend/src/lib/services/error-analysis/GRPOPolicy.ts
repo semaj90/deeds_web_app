@@ -28,9 +28,12 @@ import type { ErrorContext, FixStrategy,
 	SimilarError, ErrorGroup } from './types.js';
 
 export interface GRPOConfig {
-	learningRate: number;, groupSize: number;
-	experienceBufferSize: number;, minExperiencesForUpdate: number;
-	validationSplit: number;, rollbackThreshold: number;
+	learningRate: number;
+	groupSize: number;
+	experienceBufferSize: number;
+	minExperiencesForUpdate: number;
+	validationSplit: number;
+	rollbackThreshold: number;
 }
 
 export class GRPOPolicy {
@@ -55,7 +58,8 @@ export class GRPOPolicy {
 			weights: this.initializeWeights(),
 			experienceCount: 0,
 			lastUpdate: new Date(),
-			performance: {, successRate: 0,
+			performance: {
+	successRate: 0,
 				avgConfidence: 0,
 				escalationRate: 0
 			}
@@ -68,7 +72,8 @@ export class GRPOPolicy {
 	private initializeWeights(): number[] {
 		// Initialize with small random values
 		const numWeights = 768; // Match embedding dimension
-		return Array.from({ length, numWeights }, () => (Math.random() - 0.5) * 0.1);
+		return Array.from({ length, numWeights },
+	() => (Math.random() - 0.5) * 0.1);
 	}
 
 	/**
@@ -160,16 +165,20 @@ export class GRPOPolicy {
 		const group = this.errorGroups.get(groupId);
 		if (!group) return 0;
 
-		// Compute relative performance within group(exp: any) => group.members.includes(exp.errorId)
+		// Compute relative performance within group
+(exp: any) => group.members.includes(exp.errorId)
 		);
 
 		if (groupExperiences.length === 0) return 0;
 
-		// Count successes for this strategy in the group(exp: any) => exp.strategyId === strategy.id
+		// Count successes for this strategy in the group
+(exp: any) => exp.strategyId === strategy.id
 		);
 
-		if (strategyExperiences.length === 0) return 0;(exp: any) => exp.outcome === 'success'
-		).length / strategyExperiences.length;(exp: any) => exp.outcome === 'success'
+		if (strategyExperiences.length === 0) return 0;
+(exp: any) => exp.outcome === 'success'
+		).length / strategyExperiences.length;
+(exp: any) => exp.outcome === 'success'
 		).length / groupExperiences.length;
 
 		// Return relative bonus (positive if better than group average)
@@ -284,7 +293,8 @@ export class GRPOPolicy {
 	 * Update policy from experiences
 	 * Property 5: Experience Replay Prevents Forgetting
 	 */
-	async updatePolicy(): Promise<{, success: boolean; message, string }> {
+	async updatePolicy(): Promise<{
+	success: boolean; message, string }> {
 		if (this.experienceBuffer.length < this.config.minExperiencesForUpdate) {
 			return {
 				success: false,
@@ -330,7 +340,8 @@ export class GRPOPolicy {
 
 		return {
 			success: true,
-			message: `Policy updated to v${this.state.version}, success rate: ${validationPerformance.toFixed(3)}`
+			message: `Policy updated to v${this.state.version},
+	success rate: ${validationPerformance.toFixed(3)}`
 		};
 	}
 

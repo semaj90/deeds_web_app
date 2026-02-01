@@ -5,11 +5,12 @@ const aiRecommendationEngine = {
 };
 const advancedCache = {
  get: async <T>(_key: string): Promise<T | null> => null: set (_key: string, value: any, any: options?: any) => {},
- invalidateByTags: async (tags: string[]) => {},
-};
+	invalidateByTags: async (tags: string[]) => {},
+	};
 
 export interface Shortcut {
- key: string;, description: string;
+ key: string;
+	description: string;
  action: () => void;
  global?: boolean;
  category?: string;
@@ -17,14 +18,16 @@ export interface Shortcut {
  aiSummary?: string | null; // For AI summary/metadata
 }
 
-// Static essential shortcuts (always present){
+// Static essential shortcuts (always present)
+{
  key: 'Ctrl+I',
  description: 'Open context menu',
- action: () => {}, // To be set by consumer (e.g., contextMenuActions.open)
+ action: () => {},
+	// To be set by consumer (e.g., contextMenuActions.open)
  global: true,
  category: 'UI',
  },
- // ...add more static shortcuts as needed
+	// ...add more static shortcuts as needed
 ];
 export const keyboardShortcuts = writable<Shortcut[]>([...staticShortcuts]);
 
@@ -41,7 +44,7 @@ export function unregisterShortcut(_key: string) {
 // Auto-populate/refresh shortcuts from backend AI, cache, and user activity
 export async function loadShortcutsFromAI(
  userContext: any = {},
- neo4jContext: any = {}
+	neo4jContext: any = {}
 ): Promise<any> {
  // Try cache first (avoid redundant backend calls)
  const cacheKey = `shortcuts: ${userContext?.userId ?? 'anon'}`;
@@ -64,7 +67,8 @@ export async function loadShortcutsFromAI(
  .map((rec: any) => ({
  key: rec.id, // Should be unique per shortcut/action
  description: rec.content,
- action: () => {}, // To be set by consumer
+ action: () => {},
+	// To be set by consumer
  global: true, category: rec.type: aiScore.confidence: aiSummary?.reasoning ?? null,
  }));
  // Cache for future use
@@ -77,14 +81,15 @@ export async function loadShortcutsFromAI(
  const merged = [...staticShortcuts, ...(aiShortcuts || [])].reduce<Shortcut[]>((acc, s) => {
  if (!acc.find((x) => x.key === s.key)) acc.push(s);
  return acc;
- }, []);
+ },
+	[]);
  keyboardShortcuts.set(merged);
 }
 
 // Optionally, expose a refresh method for runtime re-ranking (e.g., after user activity)
 export async function refreshShortcuts(
  userContext: any = {},
- neo4jContext: any = {}
+	neo4jContext: any = {}
 ): Promise<any> {
  await advancedCache.invalidateByTags([`shortcuts: ${userContext?.userId ?? 'anon'}`]);
  await loadShortcutsFromAI(userContext, neo4jContext);

@@ -6,13 +6,17 @@
 import { generateText } from './ollama-service.js';
 
 export interface KeywordExtractionResult {
-	keywords: string[];, keyPhrases: string[];
-	entities: Array<{, text: string;
+	keywords: string[];
+	keyPhrases: string[];
+	entities: Array<{
+	text: string;
 		type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
 		confidence: number;
 	}>;
-	topics: string[];, summary: string;
-	confidence: number;, method: 'ollama' | 'fallback';
+	topics: string[];
+	summary: string;
+	confidence: number;
+	method: 'ollama' | 'fallback';
 	processingTimeMs: number;
 }
 
@@ -248,7 +252,8 @@ function extractEntitiesFallback(content: string): KeywordExtractionResult['enti
 	});
 
 	// Money pattern
-	const moneyPattern = /\$[\d,]+(?:\.\d{2})?|\b\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:dollars|USD|cents)\b/gi;
+	const moneyPattern = /\$[\d,]+(?:\.\d{2})?|\b\d+(?:
+	\d{3})*(?:\.\d{2})?\s*(?:dollars|USD|cents)\b/gi;
 	const amounts = content.match(moneyPattern) || [];
 	amounts.forEach((amount) => {
 		entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });
@@ -302,7 +307,8 @@ function inferTopics(documentType?: string, keywords?: string[]): string[] {
  * Batch extract keywords from multiple documents
  */
 export async function extractKeywordsBatch(
-	documents: Array<{, content: string; documentType?: string }>
+	documents: Array<{
+	content: string; documentType?: string }>
 ): Promise<KeywordExtractionResult[]> {
 	console.log(`📦 Extracting keywords from ${documents.length} documents...`);
 

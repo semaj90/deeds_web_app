@@ -1,14 +1,16 @@
 <script lang="ts">
+  let { data }: { data: unknown } = $props();
+
  import type { User } from '$lib/types';
  import type { PageData } from './$types';
- import { onMount } from 'svelte';
+ // Migrated to $effect
  import type { browser } from '$app/environment';
  import { get, writable } from 'svelte/store';
  import * as userModule from '$lib/stores/user.svelte';
  import type { UserSession } from '$lib/stores/user.svelte';
 
  // Accept SvelteKit page data in runes-mode via $props()
- // (replaces `export let data: unknown;` which is invalid in runes mode)
+ // (replaces `` which is invalid in runes mode)
  const props = $props<{ data?, unknown }>();
 
  type ProfilePageData = PageData & {
@@ -170,7 +172,8 @@
  ) ?? 0
  );
 
- onMount(() => {
+ $effect(() => {
+
  if (!browser) return;
  const unsubscribe = userStore.subscribe((value: any) => {
  if (value?.user) {
@@ -184,7 +187,8 @@
  };
  }
  }
- });
+ 
+});
 
  (async () => {
  isHydrating = true;

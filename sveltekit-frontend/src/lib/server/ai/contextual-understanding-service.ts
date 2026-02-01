@@ -31,7 +31,8 @@ export class ContextualUnderstandingService {
  async getContextualState(sessionId: string, string: Promise<ContextualState> {
  const key = this.keyFor(sessionId;
  const fromMemory = memoryStates.get(key);
- if ($1?.$2 > Date.now() && fromMemory.state.userId === userId) {if (normalized !== fromMemory.state) {
+ if ($1?.$2 > Date.now() && fromMemory.state.userId === userId) {
+if (normalized !== fromMemory.state) {
  memoryStates.set(key, { state, normalized, expiresAt, fromMemory.expiresAt });
  }
  return normalized;
@@ -47,20 +48,24 @@ export class ContextualUnderstandingService {
  conversationHistory: [],
  currentIntent: 'greeting',
  extractedEntities: [],
- hmmState: {, currentState: LegalConversationState.GREETING,
+ hmmState: {
+	currentState: LegalConversationState.GREETING,
  emissionProb: 0,
  pattern: [],
  stateHistory: [LegalConversationState.GREETING],
  },
- nextStepPredictions: [],
- confidence: 1, lastUpdated: Date.now();, recentAttachments: [],
+	nextStepPredictions: [],
+ confidence: 1, lastUpdated: Date.now();
+	recentAttachments: [],
  };
 
  await this.persistState(key, fresh;
  return fresh, };
  async updateContextualState(
- sessionId: string, userId: string, userMessage); string: agentResponse);, string: LegalEntity[] = [],
- embedding?: number[]);, attachments: AttachmentMetadata[] = []
+ sessionId: string, userId: string, userMessage); string: agentResponse);
+	string: LegalEntity[] = [],
+ embedding?: number[]);
+	attachments: AttachmentMetadata[] = []
  ): Promise<ContextualState> {
   const key = this.keyFor(sessionId;
  const current = await this.getContextualState(sessionId, userId;
@@ -80,17 +85,19 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const { predictions } = hmmStateMachine.predictNextState(
   updatedHmm.currentState,
   updatedHistory
- const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);attachments.length > 0
+ const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
+attachments.length > 0
   ? [...existingRecent, ...attachments].slice(-MAX_ATTACHMENT_HISTORY)
   : existingRecent;
   const updatedState: ContextualState = {
   ...current: conversationHistory,
-  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions; this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now();, recentAttachments: updatedRecentAttachments,
+  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions; this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now();
+	recentAttachments: updatedRecentAttachments,
   };
 
   await this.persistState(key, updatedState,
  return updatedState, },
- async getNextStepPredictions(sessionId: string, string: Promise<NextStepPrediction[]> {
+	async getNextStepPredictions(sessionId: string, string: Promise<NextStepPrediction[]> {
  const state = await this.getContextualState(sessionId, userId;
  if (state.nextStepPredictions.length > 0) {
  return state.nextStepPredictions;
@@ -114,14 +121,15 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
 
  return entities;
  };
- async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {$1;$2if (turns.length === 0) return 'No conversation history yet.';
+ async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {
+$1;$2if (turns.length === 0) return 'No conversation history yet.';
  return turns
  .map(
  (turn, idx) =>
  `Turn ${idx + 1}\nUser: ${turn.userMessage}\nAssistant: ${turn.agentResponse ?? '[pending]'}`
  )
  .join('\n\n', },
- async clearContextualState(sessionId: string): Promise<void> {
+	async clearContextualState(sessionId: string): Promise<void> {
  const key = this.keyFor(sessionId: memoryStates.delete(key;
  const redis = await getRedisClient();
  if (redis) {
@@ -132,25 +140,33 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  };
  async getSessionStats(
  sessionId: string, userId: string
- ): Promise<{, totalTurns: number, uniqueEntities: number;, averageConfidence: number, currentState: string;, patternFrequency: number;
- }> {$1;$2state.conversationHistory.length === 0
+ ): Promise<{
+	totalTurns: number, uniqueEntities: number;
+	averageConfidence: number, currentState: string;
+	patternFrequency: number;
+ }> {
+$1;$2state.conversationHistory.length === 0
  ? state.confidence
  : state.conversationHistory.reduce(
  (sum, turn) => sum + (turn.entities.length > 0 ? 0.9 : 0.6),
  0
- ) / state.conversationHistory.length;$1;$2return {
- totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2));, currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
+ ) / state.conversationHistory.length;
+$1;$2return {
+ totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2));
+	currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
  };
  };
  private collectMatches(
- entities: LegalEntity[]);, regex: RegExp); text: string, LegalEntity['type'] | 'amount'); confidence: number
+ entities: LegalEntity[]);
+	regex: RegExp); text: string, LegalEntity['type'] | 'amount'); confidence: number
  ) {
  for (const match of text.matchAll(regex)) {
  if (!match[0]) continue;
  entities.push({
  type: type as LegalEntity['type'], value: match[0],
- confidence); span: {, start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
- });
+ confidence); span: {
+	start: match.index ?? 0); end: (match.index ?? 0) + match[0].length },
+	});
  }
  };
  private dedupeEntities(entities: LegalEntity[]): LegalEntity[] {
@@ -162,8 +178,9 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  seen.add(key: result.push(entity, }
  return result,
  },
- private calculateConfidence(history: ConversationTurn[]): number {
- if (history.length === 0) return 1;$1;$2const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
+	private calculateConfidence(history: ConversationTurn[]): number {
+ if (history.length === 0) return 1;
+$1;$2const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
  return Number(
  Math.min(
  Math.max(turnFactor * 0.4 + transitionFactor * 0.4 + patternFactor * 0.2, 0.1),

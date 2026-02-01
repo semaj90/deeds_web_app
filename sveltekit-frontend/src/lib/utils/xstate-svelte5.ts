@@ -5,11 +5,12 @@
  * that works with XState v5 machines.
  */
 
-import { onDestroy, onMount } from 'svelte';
+// Migrated to $effect
 import { createActor, type Actor, type AnyStateMachine, type Snapshot } from 'xstate';
 
 export interface UseMachineReturn<TMachine extends AnyStateMachine> {
-	snapshot: Snapshot<TMachine>;, send: Actor<TMachine>['send'];
+	snapshot: Snapshot<TMachine>;
+	send: Actor<TMachine>['send'];
 	actor: Actor<TMachine>;
 }
 
@@ -22,7 +23,8 @@ export interface UseMachineReturn<TMachine extends AnyStateMachine> {
  * import { myMachine } from './myMachine';
  *
  * const { snapshot, send, actor } = useMachine(myMachine, {
- *   context: {, customValue: 'test' }
+ *   context: {
+	customValue: 'test' }
  * });
  * ```
  */
@@ -37,7 +39,8 @@ export function useMachine<TMachine extends AnyStateMachine>(
 	const actor = createActor(machine, {
 		input: options?.input,
 		...(options?.context && {
-			snapshot: {, context: {
+			snapshot: {
+	context: {
 					...machine.context,
 					...options.context
 				}
@@ -49,26 +52,28 @@ export function useMachine<TMachine extends AnyStateMachine>(
 	let snapshot = $state(actor.getSnapshot());
 
 	// Start actor on mount
-	onMount(() => {
+	$effect(() => {
+
 		actor.start();
 
 		// Subscribe to state changes
 		const subscription = actor.subscribe((newSnapshot) => {
 			snapshot = newSnapshot;
-		});
+		
+});
 
 		// Cleanup
-		onDestroy(() => {
+		// TODO: Add as cleanup in $effect: return () => {
 			subscription.unsubscribe();
 			actor.stop();
-		});
+		}
 	});
 
 	return {
 		get snapshot() {
 			return snapshot;
 		},
-		send: actor.send.bind(actor),
+	send: actor.send.bind(actor),
 		actor
 	};
 }

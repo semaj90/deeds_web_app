@@ -5,8 +5,10 @@ import * as schema from '$lib/server/db/schema-postgres'; // Assuming this impor
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 interface UserType {
-	id: string;, email: string;
-	firstName: string;, lastName: string;
+	id: string;
+	email: string;
+	firstName: string;
+	lastName: string;
 	role: string;
 }
 
@@ -21,7 +23,8 @@ export async function getCases(user: UserType, request: Request, _dependencies: 
 		return json({ success: true, data: cases });
 	} catch (error) {
 		console.error('Error fetching cases:', error);
-		return json({ success: false, error: 'Failed to fetch cases' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch cases' },
+	{ status: 500 });
 	}
 }
 
@@ -32,12 +35,14 @@ export async function getCase(user: UserType, caseId: string, _dependencies: any
 			where: eq(schema.cases.id, caseId),
 		});
 		if (!caseItem || caseItem.userId !== user.id) {
-			return json({ success: false, error: 'Case not found or unauthorized' }, { status: 404 });
+			return json({ success: false, error: 'Case not found or unauthorized' },
+	{ status: 404 });
 		}
 		return json({ success: true, data: caseItem });
 	} catch (error) {
 		console.error('Error fetching case:', error);
-		return json({ success: false, error: 'Failed to fetch case' }, { status: 500 });
+		return json({ success: false, error: 'Failed to fetch case' },
+	{ status: 500 });
 	}
 }
 
@@ -45,7 +50,8 @@ export async function handleCreateCase(user: UserType, request: Request, _depend
 	try {
 		const { name, description } = await request.json();
 		if (!name) {
-			return json({ success: false, error: 'Case name is required' }, { status: 400 });
+			return json({ success: false, error: 'Case name is required' },
+	{ status: 400 });
 		}
 		const drizzleDb = db;
 
@@ -61,10 +67,12 @@ export async function handleCreateCase(user: UserType, request: Request, _depend
 			})
 			.returning();
 
-		return json({ success: true, data: newCase }, { status: 201 });
+		return json({ success: true, data: newCase },
+	{ status: 201 });
 	} catch (error) {
 		console.error('Error creating case:', error);
-		return json({ success: false, error: 'Failed to create case' }, { status: 500 });
+		return json({ success: false, error: 'Failed to create case' },
+	{ status: 500 });
 	}
 }
 

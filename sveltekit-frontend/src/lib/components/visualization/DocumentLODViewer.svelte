@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  // Migrated to $effect
   import { LoadingButton } from '$lib/headless';
   import Badge from "$lib/components/ui/badge/Badge.svelte";
   import { Card, CardContent } from "$lib/components/ui/card";
@@ -7,13 +7,17 @@
 
   // Types
   interface DocumentPage {
-    pageNumber: number;, textContent: string;
-    annotations: Annotation[];, currentLOD: number;
+    pageNumber: number;
+	textContent: string;
+    annotations: Annotation[];
+	currentLOD: number;
   }
 
   interface Annotation {
-    id: string;, type: 'highlight' | 'note' | 'redaction';
-    bounds: {, x: number, y: number, width: number, height: number };
+    id: string;
+	type: 'highlight' | 'note' | 'redaction';
+    bounds: {
+	x: number, y: number, width: number, height: number };
     content: string;
   }
 
@@ -31,12 +35,15 @@
   let currentLOD = $state(1); // 0=High, 1=Med, 2=Low
 
   // Mock loading
-  onMount(() => {
+  $effect(() => {
+
     setTimeout(() => {
       totalPages = 5;
       isLoading = false;
-    }, 1000);
-  });
+    },
+	1000);
+  
+});
 
   function handleZoom(delta: number) {
     zoomLevel = Math.max(0.5, Math.min(3.0, zoomLevel + delta));
@@ -81,7 +88,8 @@
     {:else}
       <div
         class="document-page shadow-lg bg-white transition-transform duration-200"
-        style="width: 600px;, height: 800px; transform: scale({zoomLevel}); transform-origin: center top;"
+        style="width: 600px;
+	height: 800px; transform: scale({zoomLevel}); transform-origin: center top;"
       >
         <!-- Page Content Placeholder -->
         <div class="p-8 text-black opacity-20">

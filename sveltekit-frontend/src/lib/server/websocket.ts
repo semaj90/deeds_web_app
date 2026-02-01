@@ -45,7 +45,8 @@ export function setupWebSocketServer(server: any) {
         activeUsers.get(caseId)!.add(user);
 
         // Broadcast user joined
-        broadcastToCase(caseId, { type: 'USER_JOINED', payload: user }, ws);
+        broadcastToCase(caseId, { type: 'USER_JOINED', payload: user },
+	ws);
 
         // Send current active users to new connection
         ws.send(
@@ -71,7 +72,8 @@ export function setupWebSocketServer(server: any) {
             activeUsers.get(caseId)?.delete(user);
 
             // Broadcast user left
-            broadcastToCase(caseId, { type: 'USER_LEFT', payload: user }, ws);
+            broadcastToCase(caseId, { type: 'USER_LEFT', payload: user },
+	ws);
 
             // Cleanup empty sets
             if (caseConnections.get(caseId)?.size === 0) {
@@ -86,9 +88,12 @@ export function setupWebSocketServer(server: any) {
 
 function handleWebSocketMessage(
     caseId: string,
-    message: {, type: string; payload?: any },
-    sender: any,
-    user: {, id: string; name: string;, email: string }
+    message: {
+	type: string; payload?: any },
+	sender: any,
+    user: {
+	id: string; name: string;
+	email: string }
 ) {
     switch (message.type) {
         case 'EVIDENCE_POSITION_UPDATE':
@@ -99,7 +104,7 @@ function handleWebSocketMessage(
                     type: 'EVIDENCE_POSITION_UPDATED',
                     payload: { ...message.payload, updatedBy: user }
                 },
-                sender
+	sender
             );
             break;
 
@@ -111,7 +116,7 @@ function handleWebSocketMessage(
                     type: 'EVIDENCE_UPDATED',
                     payload: { ...message.payload, updatedBy: user }
                 },
-                sender
+	sender
             );
             break;
 
@@ -123,7 +128,7 @@ function handleWebSocketMessage(
                     type: 'EVIDENCE_DELETED',
                     payload: { ...message.payload, deletedBy: user }
                 },
-                sender
+	sender
             );
             break;
 
@@ -135,7 +140,7 @@ function handleWebSocketMessage(
                     type: 'USER_CURSOR_UPDATED',
                     payload: { user, ...message.payload }
                 },
-                sender
+	sender
             );
             break;
 
@@ -151,8 +156,9 @@ function handleWebSocketMessage(
 
 function broadcastToCase(
     caseId: string,
-    message: {, type: string; payload?: any },
-    excludeConnection?: any
+    message: {
+	type: string; payload?: any },
+	excludeConnection?: any
 ) {
     const connections = caseConnections.get(caseId);
     if (!connections) return;

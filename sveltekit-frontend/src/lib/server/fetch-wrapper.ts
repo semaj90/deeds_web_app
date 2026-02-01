@@ -6,7 +6,8 @@ export interface FetchOptions extends RequestInit {
     expectedStatus?: number | number[];
 }
 
-export async function safeFetchJson<T = any>(url: string, options: FetchOptions = {}): Promise<{, ok: boolean, status: number, data?: T, error?: string }> {
+export async function safeFetchJson<T = any>(url: string, options: FetchOptions = {}): Promise<{
+	ok: boolean, status: number, data?: T, error?: string }> {
     const { timeoutMs = 10000, retries = 1, retryDelayMs = 250, expectedStatus } = options;
     let attempt = 0;
     let lastError: Error | unknown;

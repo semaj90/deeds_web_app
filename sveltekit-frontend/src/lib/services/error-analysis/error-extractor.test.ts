@@ -39,7 +39,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  * without missing any, maintaining completeness across different error types.
  */
  it('should extract all errors from codebase', async () => {
- // Mock errors that would be returned by svelte-check and tsc{
+ // Mock errors that would be returned by svelte-check and tsc
+{
  id: '1',
  file: 'src/routes/+page.svelte',
  line: 10, column: 5, message: 'Type, error: expected string',
@@ -49,7 +50,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: '2',
  file: 'src/lib/utils.ts',
  line: 25, column: 12, message: 'Cannot find name "foo"',
@@ -124,7 +125,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  /**
  * Property: Error extraction should handle both Svelte and TypeScript errors
  */
- it('should extract both Svelte and TypeScript errors', async () => {{
+ it('should extract both Svelte and TypeScript errors', async () => {
+{
  id: '1',
  file: 'src/App.svelte',
  line: 5, column: 10, message: 'Svelte error',
@@ -133,7 +135,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: '2',
  file: 'src/utils.ts',
  line: 20, column: 8, message: 'TypeScript error',
@@ -157,7 +159,8 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  /**
  * Property: Error extraction should handle both errors and warnings
  */
- it('should extract both errors and warnings', async () => {{
+ it('should extract both errors and warnings', async () => {
+{
  id: '1',
  file: 'src/test.ts',
  line: 10, column: 5, message: 'Error message',
@@ -166,7 +169,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
  },
- {
+	{
  id: '2',
  file: 'src/test.ts',
  line: 20, column: 5, message: 'Warning message',

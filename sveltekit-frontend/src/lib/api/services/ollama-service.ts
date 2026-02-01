@@ -2,11 +2,23 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface OllamaModel {
- name: string;, modified_at: string;, size: number;, digest: string;, details: {, format: string;, family: string;, families: string[];, parameter_size: string;, quantization_level: string };
+ name: string;
+	modified_at: string;
+	size: number;
+	digest: string;
+	details: {
+	format: string;
+	family: string;
+	families: string[];
+	parameter_size: string;
+	quantization_level: string };
 }
 
 export interface OllamaResponse {
- model: string;, created_at: string;, response: string;, done: boolean;
+ model: string;
+	created_at: string;
+	response: string;
+	done: boolean;
  context?: number[];
  total_duration?: number;
  load_duration?: number;
@@ -16,7 +28,11 @@ export interface OllamaResponse {
  eval_duration?: number }
 
 export interface OllamaChatResponse {
- model: string;, created_at: string;, message: {, role: string;, content: string;
+ model: string;
+	created_at: string;
+	message: {
+	role: string;
+	content: string;
  images?: string[] };
  done: boolean;
  total_duration?: number;
@@ -27,7 +43,8 @@ export interface OllamaChatResponse {
  eval_duration?: number }
 
 export interface OllamaGenerateOptions {
- model: string;, prompt: string;
+ model: string;
+	prompt: string;
  system?: string;
  template?: string;
  context?: number[];
@@ -45,7 +62,9 @@ export interface OllamaGenerateOptions {
 }
 
 export interface OllamaChatOptions {
- model: string;, messages: {, role: 'system' | 'user' | 'assistant';
+ model: string;
+	messages: {
+	role: 'system' | 'user' | 'assistant';
  content: string;
  images?: string[] }[];
  stream?: boolean;
@@ -65,7 +84,7 @@ export async function listModels(): Promise<OllamaModel[]> {
  const response = await fetch('/api/ollama/tags', {
  method: 'GET', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- });
+	});
 
  if (!response.ok) {
  const error = await response.json();
@@ -85,7 +104,7 @@ export async function generateCompletion(options: OllamaGenerateOptions): Promis
  const response = await fetch('/api/ollama/generate', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(options),
+	body: JSON.stringify(options),
  });
 
  if (!response.ok) {
@@ -108,7 +127,7 @@ export async function generateChatCompletion(
  const response = await fetch('/api/ollama/chat', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify(options),
+	body: JSON.stringify(options),
  });
 
  if (!response.ok) {
@@ -129,7 +148,7 @@ export async function pullModel(name: string): Promise<void> {
  const response = await fetch('/api/ollama/pull', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ name }),
+	body: JSON.stringify({ name }),
  });
 
  if (!response.ok) {
@@ -149,7 +168,7 @@ export async function deleteModel(name: string): Promise<void> {
  const response = await fetch('/api/ollama/delete', {
  method: 'DELETE', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ name }),
+	body: JSON.stringify({ name }),
  });
 
  if (!response.ok) {
@@ -169,7 +188,7 @@ export async function getEmbeddings(model, string, prompt, string: Promise<numbe
  const response = await fetch('/api/ollama/embeddings', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ model, prompt }),
+	body: JSON.stringify({ model, prompt }),
  });
 
  if (!response.ok) {

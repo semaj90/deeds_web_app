@@ -29,7 +29,8 @@ export interface GPUComputeDevice {
     adapter: GPUAdapter | null;
     device: GPUDevice | null;
     queue: GPUQueue | null;
-    isAvailable: boolean;, deviceName: string;
+    isAvailable: boolean;
+	deviceName: string;
     vendorName: 'nvidia' | 'amd' | 'intel' | 'apple' | 'unknown';
     vramMB: number;
 }
@@ -38,10 +39,14 @@ export interface GPUComputeDevice {
  * Error Pattern for GPU Processing
  */
 export interface GPUErrorPattern {
-    file: string;, line: number;
-    col: number;, code: string;
-    message: string;, errorType: 'syntax' | 'semantic' | 'type' | 'import' | 'unknown';
-    confidence: number;, context: string;
+    file: string;
+	line: number;
+    col: number;
+	code: string;
+    message: string;
+	errorType: 'syntax' | 'semantic' | 'type' | 'import' | 'unknown';
+    confidence: number;
+	context: string;
     suggestions: string[];
     embedding?: Float32Array;
 }
@@ -50,19 +55,25 @@ export interface GPUErrorPattern {
  * GPU Analysis Result
  */
 export interface GPUAnalysisResult {
-    patterns: GPUErrorPattern[];, clusters: ErrorCluster[];
-    summary: string;, processingTimeMs: number;
+    patterns: GPUErrorPattern[];
+	clusters: ErrorCluster[];
+    summary: string;
+	processingTimeMs: number;
     deviceUsed: 'webgpu' | 'cuda' | 'cpu';
-    estimatedFixableMajor: number;, estimatedFixableMinor: number;
+    estimatedFixableMajor: number;
+	estimatedFixableMinor: number;
 }
 
 /**
  * Error Cluster from GPU Analysis
  */
 export interface ErrorCluster {
-    id: string;, centroid: Float32Array;
-    patterns: GPUErrorPattern[];, category: string;
-    confidence: number;, suggestedFix: string;
+    id: string;
+	centroid: Float32Array;
+    patterns: GPUErrorPattern[];
+	category: string;
+    confidence: number;
+	suggestedFix: string;
 }
 
 /**

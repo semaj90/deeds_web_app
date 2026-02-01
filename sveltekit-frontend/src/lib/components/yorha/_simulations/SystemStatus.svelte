@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  // Migrated to $effect
 
   let { webgpuReady = false, cpuFallbackReady = false } = $props();
 
@@ -12,7 +12,8 @@
 
   let updateInterval: number | undefined;
 
-  onMount(() => {
+  $effect(() => {
+
     // Update system metrics every 5 seconds
     updateInterval = window.setInterval(async () => {
       try {
@@ -39,14 +40,16 @@
       } catch (error) {
         console.warn('Failed to update system metrics:', error);
       }
-    }, 5000);
+    },
+	5000);
 
     return () => {
       if (updateInterval) {
         clearInterval(updateInterval);
       }
     };
-  });
+  
+});
 
   function getStatusColor(value: number, inverse = false): string {
     if (inverse) {

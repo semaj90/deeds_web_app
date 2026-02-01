@@ -13,7 +13,8 @@ type DBRow = Record<string, unknown>;
 
 export interface SimilarityResult {
 	id: string;
-	title?: string;, content: string;
+	title?: string;
+	content: string;
 	similarity: number;
 	metadata?: Metadata;
 	cacheLayer?: 'hot' | 'warm' | 'cold';
@@ -33,7 +34,8 @@ function stringifyError(e: any): string {
  * Generate a sample embedding (replace with actual AI model in production)
  */
 export function generateSampleEmbedding(dimensions: number = 384): number[] {
-	return Array.from({ length: dimensions }, () => Math.random() * 2 - 1);
+	return Array.from({ length: dimensions },
+	() => Math.random() * 2 - 1);
 }
 
 /**
@@ -117,7 +119,11 @@ export async function storeAiQueryWithEmbedding(
 	try {
 		await db.execute(sql`
 			INSERT INTO user_ai_queries (user_id, case_id, query, response, embedding, metadata, is_successful)
-			VALUES (${userId}, ${caseId}, ${query}, ${response}, ${arrayToPgVector(embedding)}::vector, ${JSON.stringify(metadata)}::jsonb, true)
+			VALUES (${userId},
+	${caseId},
+	${query},
+	${response},
+	${arrayToPgVector(embedding)}::vector, ${JSON.stringify(metadata)}::jsonb, true)
 		`);
 	} catch (error) {
 		console.error('Failed to store AI query with embedding:', stringifyError(error));
@@ -125,7 +131,11 @@ export async function storeAiQueryWithEmbedding(
 		try {
 			await db.execute(sql`
 				INSERT INTO user_ai_queries (user_id, case_id, query, response, metadata, is_successful)
-				VALUES (${userId}, ${caseId}, ${query}, ${response}, ${JSON.stringify(metadata)}::jsonb, true)
+				VALUES (${userId},
+	${caseId},
+	${query},
+	${response},
+	${JSON.stringify(metadata)}::jsonb, true)
 			`);
 		} catch (err) {
 			console.error('Fallback store also failed:', stringifyError(err));
@@ -210,7 +220,8 @@ export async function hybridSearch(
 			title: typeof row.title === 'string' ? row.title : undefined,
 			content: typeof row.content === 'string' ? row.content : '',
 			similarity: Number(row.rank ?? 0) * 0.5,
-			metadata: {, searchType: 'text' }
+			metadata: {
+	searchType: 'text' }
 		}));
 
 		// Combine and deduplicate
@@ -243,8 +254,10 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 /**
  * Vector operations test function
  */
-export async function testVectorOperations(): Promise<{, pgvectorAvailable: boolean;
-	similaritySearchWorking: boolean;, embeddingCacheWorking: boolean;
+export async function testVectorOperations(): Promise<{
+	pgvectorAvailable: boolean;
+	similaritySearchWorking: boolean;
+	embeddingCacheWorking: boolean;
 }> {
 	const pgvectorAvailable = await checkPgVectorAvailable();
 	let similaritySearchWorking = false;

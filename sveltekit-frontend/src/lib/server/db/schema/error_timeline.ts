@@ -35,7 +35,7 @@ export const errorTimelineTable = pgTable('error_timeline',
         dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow(),
         notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
     },
-    (table) => {
+	(table) => {
         return {
             routePathIdx: index('error_timeline_route_path_idx').on(table.routePath),
             clusterIdIdx: index('error_timeline_cluster_id_idx').on(table.clusterId),

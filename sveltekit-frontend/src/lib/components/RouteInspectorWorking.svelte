@@ -1,6 +1,7 @@
 <script lang="ts">
 	type RouteInfo = {
-		path: string;, route: string;
+		path: string;
+	route: string;
 		file: string;
 		category?: string;
 		version?: string;
@@ -8,18 +9,22 @@
 	};
 
 	type Phase72ErrorSummary = {
-		code: string;, message: string;
-		count: number;, lastSeen: string;
+		code: string;
+	message: string;
+		count: number;
+	lastSeen: string;
 	};
 
 	type UpgradeStatus = {
-		label: string;, filesUpgraded: number;
+		label: string;
+	filesUpgraded: number;
 		totalFiles: number;
 		lastRun?: string;
 	};
 
 	interface Props {
-		open: boolean;, route: RouteInfo | null;
+		open: boolean;
+	route: RouteInfo | null;
 		onClose?: () => void;
 	}
 
@@ -83,7 +88,7 @@
 			const res = await fetch('/api/phase72/suggest-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(body)
+	body: JSON.stringify(body)
 			});
 
 			const data = await res.json();
@@ -111,7 +116,8 @@
 			const res = await fetch('/api/phase82/upgrade-route', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.route })
+	body: JSON.stringify({
+	route: route.route })
 			});
 
 			const data = await res.json();
@@ -151,7 +157,8 @@
 		await fetch('/api/playwright/run-health-check', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, route: route.route })
+	body: JSON.stringify({
+	route: route.route })
 		});
 		alert('Requested Playwright health check for ' + route.route);
 	}
@@ -260,9 +267,12 @@
 
 <style>
 	.route-modal-overlay {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(0, 0, 0, 0.6);
+		position: fixed;
+	top: 0;
+		left: 0;
+	right: 0;
+		bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -279,21 +289,25 @@
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 		width: 90%;
 		max-width: 900px;
-		max-height: 85vh;, display: flex;
-		flex-direction: column;, overflow: hidden;
+		max-height: 85vh;
+	display: flex;
+		flex-direction: column;
+	overflow: hidden;
 	}
 
 	.route-modal__header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1.5rem;
+		align-items: center;
+	padding: 1.5rem;
 		border-bottom: 2px solid var(--yorha-ink, #111);
 		background: linear-gradient(135deg, var(--yorha-paper, #faf8f3) 0%, var(--yorha-bg, #f5f1e8) 100%);
 	}
 
 	.route-modal__title {
 		display: flex;
-		align-items: center;, gap: 1rem;
+		align-items: center;
+	gap: 1rem;
 	}
 
 	.route-icon {
@@ -302,19 +316,22 @@
 
 	.route-path {
 		font-size: 1.3rem;
-		font-weight: bold;, color: var(--yorha-ink, #111);
+		font-weight: bold;
+	color: var(--yorha-ink, #111);
 		text-transform: uppercase;
 		letter-spacing: 1px;
 	}
 
 	.route-file {
-		font-size: 0.75rem;, color: #666;
+		font-size: 0.75rem;
+	color: #666;
 		font-family: 'Courier New', monospace;
 	}
 
 	.route-status {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
+		align-items: center;
+	gap: 0.75rem;
 	}
 
 	.badge {
@@ -333,7 +350,8 @@
 		font-size: 0.75rem;
 		font-weight: bold;
 		text-transform: uppercase;
-		letter-spacing: 1px;, color: white;
+		letter-spacing: 1px;
+	color: white;
 		border: 1px solid rgba(0, 0, 0, 0.2);
 	}
 
@@ -346,17 +364,20 @@
 	}
 
 	.badge--error {
-		background: #c41e3a;, color: white;
+		background: #c41e3a;
+	color: white;
 	}
 
 	.badge--upgrade {
-		background: #1976d2;, color: white;
+		background: #1976d2;
+	color: white;
 	}
 
 	.route-modal__body {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 0;, flex: 1;
+		gap: 0;
+	flex: 1;
 		overflow-y: auto;
 		border-bottom: 2px solid var(--yorha-ink, #111);
 	}
@@ -380,7 +401,8 @@
 		font-size: 0.7rem;
 		font-weight: bold;
 		text-transform: uppercase;
-		letter-spacing: 1px;, color: var(--yorha-ink, #111);
+		letter-spacing: 1px;
+	color: var(--yorha-ink, #111);
 		margin: 1rem 0 0.5rem 0;
 		padding: 0;
 		border-bottom: 1px solid var(--yorha-ink, #111);
@@ -401,54 +423,65 @@
 	.meta-label {
 		font-size: 0.7rem;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;, color: #666;
+		letter-spacing: 0.5px;
+	color: #666;
 	}
 
 	.meta-value {
 		font-size: 0.9rem;
-		font-weight: bold;, color: var(--yorha-ink, #111);
+		font-weight: bold;
+	color: var(--yorha-ink, #111);
 	}
 
 	.pill-row {
-		display: flex;, gap: 0.5rem;
+		display: flex;
+	gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-bottom: 1rem;
 	}
 
 	.pill {
-		display: inline-block;, padding: 0.4rem 0.8rem;
+		display: inline-block;
+	padding: 0.4rem 0.8rem;
 		background: var(--yorha-ink, #111);
 		color: var(--yorha-paper, #faf8f3);
 		font-size: 0.75rem;
-		border-radius: 0;, border: 1px solid var(--yorha-ink, #111);
+		border-radius: 0;
+	border: 1px solid var(--yorha-ink, #111);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
 	.status-card {
-		padding: 1rem;, border: 1px solid var(--yorha-ink, #111);
+		padding: 1rem;
+	border: 1px solid var(--yorha-ink, #111);
 		border-radius: 0;
-		margin-bottom: 1rem;, background: var(--yorha-paper, #faf8f3);
+		margin-bottom: 1rem;
+	background: var(--yorha-paper, #faf8f3);
 	}
 
 	.status-line {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
+		align-items: center;
+	gap: 0.75rem;
 		margin-bottom: 0.5rem;
 	}
 
 	.status-message {
-		font-size: 0.9rem;, color: var(--yorha-ink, #111);
+		font-size: 0.9rem;
+	color: var(--yorha-ink, #111);
 		flex: 1;
 	}
 
 	.status-meta {
-		font-size: 0.8rem;, color: #666;
+		font-size: 0.8rem;
+	color: #666;
 		margin-bottom: 0.75rem;
 	}
 
 	.route-modal__footer {
-		display: flex;, gap: 0.75rem;
+		display: flex;
+	gap: 0.75rem;
 		padding: 1rem 1.5rem;
 		border-top: 2px solid var(--yorha-ink, #111);
 		background: var(--yorha-paper, #faf8f3);
@@ -463,13 +496,15 @@
 		font-size: 0.85rem;
 		font-weight: bold;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;, cursor: pointer;
+		letter-spacing: 0.5px;
+	cursor: pointer;
 		transition: all 0.2s ease;
 		white-space: nowrap;
 	}
 
 	.btn:disabled {
-		opacity: 0.6;, cursor: not-allowed;
+		opacity: 0.6;
+	cursor: not-allowed;
 	}
 
 	.btn--primary {
@@ -483,7 +518,8 @@
 	}
 
 	.btn--secondary {
-		background: transparent;, color: var(--yorha-ink, #111);
+		background: transparent;
+	color: var(--yorha-ink, #111);
 	}
 
 	.btn--secondary: hover, not(:disabled) {
@@ -492,7 +528,8 @@
 	}
 
 	.btn--outline {
-		background: transparent;, color: var(--yorha-ink, #111);
+		background: transparent;
+	color: var(--yorha-ink, #111);
 		border-style: dashed;
 	}
 
@@ -503,7 +540,8 @@
 	}
 
 	.btn--ghost {
-		background: transparent;, color: var(--yorha-ink, #111);
+		background: transparent;
+	color: var(--yorha-ink, #111);
 		border: 1px solid #ccc;
 	}
 
@@ -512,7 +550,8 @@
 	}
 
 	.btn--neon {
-		background: #00ff00;, color: #000;
+		background: #00ff00;
+	color: #000;
 		border-color: #00ff00;
 		box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 	}
@@ -522,7 +561,8 @@
 	}
 
 	.btn--warning {
-		background: #f6b73c;, color: #111;
+		background: #f6b73c;
+	color: #111;
 		border-color: #f6b73c;
 	}
 

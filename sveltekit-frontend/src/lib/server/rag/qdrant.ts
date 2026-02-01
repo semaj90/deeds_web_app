@@ -4,14 +4,16 @@ const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION = process.env.QDRANT_COLLECTION ?? 'phase72_evidence_embeddings';
 
 export type QdrantHit = {
-    id: string;, score: number;
+    id: string;
+	score: number;
     payload?: Record<string, any>;
 };
 
 /**
  * Search vectors in Qdrant collection
  */
-export async function qdrantSearch(opts: {, vector: number[];
+export async function qdrantSearch(opts: {
+	vector: number[];
     limit: number;
     scoreThreshold?: number;
     filter?: any;
@@ -29,7 +31,7 @@ export async function qdrantSearch(opts: {, vector: number[];
     const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
     });
 
     if (!r.ok) {
@@ -44,7 +46,9 @@ export async function qdrantSearch(opts: {, vector: number[];
 /**
  * Upsert points to Qdrant collection
  */
-export async function qdrantUpsert(opts: {, points: Array<{ id: string;, vector: number[]; payload?: Record<string, any> }>;
+export async function qdrantUpsert(opts: {
+	points: Array<{ id: string;
+	vector: number[]; payload?: Record<string, any> }>;
     wait?: boolean;
 }): Promise<any> {
     const r = await fetch(
@@ -52,7 +56,8 @@ export async function qdrantUpsert(opts: {, points: Array<{ id: string;, vector:
         {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({, points: opts.points }),
+	body: JSON.stringify({
+	points: opts.points }),
         }
     );
 
@@ -98,7 +103,7 @@ export async function qdrantScroll(opts: {
     const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+	body: JSON.stringify(body),
     });
 
     if (!r.ok) {

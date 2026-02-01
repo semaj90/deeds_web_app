@@ -1,12 +1,18 @@
 import type { PageServerLoad } from './$types';
 
 interface FileProfile {
-	file_path: string;, role: string;
-	surface: string[];, dependencies: string[];
-	exports: string[];, imports: string[];
-	comments: string[];, risk: string;
-	change_frequency: string;, related_routes: string[];
-	tags: string[];, summary: string;
+	file_path: string;
+	role: string;
+	surface: string[];
+	dependencies: string[];
+	exports: string[];
+	imports: string[];
+	comments: string[];
+	risk: string;
+	change_frequency: string;
+	related_routes: string[];
+	tags: string[];
+	summary: string;
 	generated_at: string;
 }
 
@@ -44,12 +50,12 @@ export const load: PageServerLoad = async ({ params }) => {
 				description: 'Extracted hard-coded string to constants.js',
 				dateApplied: '2023-11-01'
 			},
-			{
+	{
 				type: 'bugfix',
 				description: 'Resolved undefined prop error in production',
 				dateApplied: '2023-10-28'
 			},
-			{
+	{
 				type: 'optimization',
 				description: 'Applied `{#key}` block for better reactivity',
 				dateApplied: '2023-10-25'

@@ -7,23 +7,30 @@
 import { generateText } from './ollama-service.js'; // Assuming this exists
 
 export interface VLMEmbeddingResult {
-	embedding: number[];, modality: 'text' | 'vision' | 'layout' | 'multimodal';
-	confidence: number;, metadata: {
-		model: string;, quantization: string;
-		dimension: number;, processingTimeMs: number;
+	embedding: number[];
+	modality: 'text' | 'vision' | 'layout' | 'multimodal';
+	confidence: number;
+	metadata: {
+		model: string;
+	quantization: string;
+		dimension: number;
+	processingTimeMs: number;
 	};
 }
 
 export interface MultimodalContent {
 	text?: string;
 	imageBase64?: string;
-	layoutBoxes?: Array<{, type: string;
+	layoutBoxes?: Array<{
+	type: string;
 		bbox: [number, number, number, number];
 		content: string;
 	}>;
 	ocrText?: string;
-	seals?: Array<{, type: string;
-		confidence: number;, bbox: [number, number, number, number];
+	seals?: Array<{
+	type: string;
+		confidence: number;
+	bbox: [number, number, number, number];
 	}>;
 }
 
@@ -44,7 +51,8 @@ export async function generateVLMEmbedding(content: MultimodalContent): Promise<
             embedding,
             modality: 'multimodal',
             confidence: 0.9,
-            metadata: {, model: VLM_MODEL,
+            metadata: {
+	model: VLM_MODEL,
                 quantization: 'hybrid_int8_nf4',
                 dimension: EMBEDDING_DIMENSION,
                 processingTimeMs: processingTime
@@ -56,7 +64,8 @@ export async function generateVLMEmbedding(content: MultimodalContent): Promise<
             embedding: new Array(EMBEDDING_DIMENSION).fill(0),
             modality: 'multimodal',
             confidence: 0,
-            metadata: {, model: 'fallback',
+            metadata: {
+	model: 'fallback',
                 quantization: 'none',
                 dimension: EMBEDDING_DIMENSION,
                 processingTimeMs: 0
@@ -72,7 +81,8 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
         embedding: new Array(EMBEDDING_DIMENSION).fill(0),
         modality: 'text',
         confidence: 0.95,
-        metadata: {, model: 'embeddinggemma:latest',
+        metadata: {
+	model: 'embeddinggemma:latest',
             quantization: 'int8',
             dimension: EMBEDDING_DIMENSION,
             processingTimeMs: Date.now() - startTime

@@ -3,8 +3,10 @@ import { get as idbGet, set as idbSet } from 'idb-keyval';
 import { browser } from '$app/environment';
 
 export interface LocalLegalDoc {
-    id: string;, title: string;
-    content: string;, type: string;
+    id: string;
+	title: string;
+    content: string;
+	type: string;
     status: string;
     metadata?: Record<string, any>;
 }
@@ -17,9 +19,9 @@ const cacheKey = 'yorha-local-doc-index-v1';
 const options: IFuseOptions<LocalLegalDoc> = {
     keys: [
         { name: 'title', weight: 0.4 },
-        { name: 'content', weight: 0.3 },
-        { name: 'metadata.summary', weight: 0.2 },
-        { name: 'type', weight: 0.1 }
+	{ name: 'content', weight: 0.3 },
+	{ name: 'metadata.summary', weight: 0.2 },
+	{ name: 'type', weight: 0.1 }
     ],
     includeScore: true,
     threshold: 0.38,

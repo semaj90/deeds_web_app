@@ -23,7 +23,8 @@ export interface LLMOptions {
 }
 
 export interface LLMResponse {
-    content: string;, model: string;
+    content: string;
+	model: string;
     totalDuration?: number;
     promptEvalCount?: number;
     evalCount?: number;
@@ -41,16 +42,17 @@ export async function generateCompletion(
     const response = await fetch(`${DEFAULT_URL}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+	body: JSON.stringify({
             model,
             prompt,
             stream: false,
-            options: {, temperature: options.temperature ?? 0.7,
+            options: {
+	temperature: options.temperature ?? 0.7,
                 num_predict: options.maxTokens ?? 2048,
                 top_p: options.topP ?? 0.9,
                 top_k: options.topK ?? 40,
             },
-        }),
+	}),
     });
 
     if (!response.ok) {
@@ -81,16 +83,17 @@ export async function chatCompletion(
     const response = await fetch(`${DEFAULT_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+	body: JSON.stringify({
             model,
             messages,
             stream: false,
-            options: {, temperature: options.temperature ?? 0.7,
+            options: {
+	temperature: options.temperature ?? 0.7,
                 num_predict: options.maxTokens ?? 2048,
                 top_p: options.topP ?? 0.9,
                 top_k: options.topK ?? 40,
             },
-        }),
+	}),
     });
 
     if (!response.ok) {
@@ -114,7 +117,9 @@ export async function chatCompletion(
  */
 export function buildLegalRAGPrompt(
     question: string,
-    sources: Array<{, text: string; filename?: string; page?: number;, n: number }>
+    sources: Array<{
+	text: string; filename?: string; page?: number;
+	n: number }>
 ): string {
     const sourcesBlock = sources
         .map((s) => {
@@ -144,8 +149,12 @@ ANSWER:`;
  * Relationship suggestion prompt for Evidence Board
  */
 export function buildRelationshipPrompt(
-    evidenceA: {, text: string; filename: string;, tags: string[] },
-    evidenceB: {, text: string; filename: string;, tags: string[] }
+    evidenceA: {
+	text: string; filename: string;
+	tags: string[] },
+	evidenceB: {
+	text: string; filename: string;
+	tags: string[] }
 ): string {
     return `You are a legal analyst examining two pieces of evidence for potential relationships.
 
@@ -175,7 +184,8 @@ JSON:`;
 /**
  * Check if Ollama is available
  */
-export async function checkOllamaHealth(): Promise<{, available: boolean;
+export async function checkOllamaHealth(): Promise<{
+	available: boolean;
     models?: string[];
     error?: string;
 }> {

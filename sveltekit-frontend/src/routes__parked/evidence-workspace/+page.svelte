@@ -8,7 +8,7 @@ https, //svelte.dev/e/js_parse_error -->
 https, //svelte.dev/e/js_parse_error -->
 <!-- Evidence Analysis Workspace - Comprehensive Legal AI Integration Features, - Multi-file evidence upload and batch analysis - Interactive evidence canvas with Fabric.js - Timeline extraction and visualization - Legal citations discovery and verification - Cross-document relationship mapping - Real-time AI analysis with GPU, acceleration --> <script lang="ts"> import type { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '$lib/components/ui/card';
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import { onMount } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
+import type { Document } from '$lib/types'; // Migrated to $effect import { Button } from '$lib/components/ui/enhanced-bits'; import * as Card from '$lib/components/ui/Card.svelte'; import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte'; import { Upload } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
 import { Clock } from "lucide-svelte";
 import { Link } from "lucide-svelte";
@@ -54,8 +54,10 @@ import { Network } from "lucide-svelte"; // Reactive state let currentTab = $sta
  // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(), files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData, canvas: canvasData }, const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
  }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `evidence-analysis-${ caseId }-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
- onMount(() => { // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}
- }); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus:ring-2"
+ $effect(() => {
+ // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}
+ 
+}); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus:ring-2"
  placeholder="Enter case ID"
  /> </div>
  {#if batchAnalysisResults} <Button class="bits-btn" onclick={ exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}

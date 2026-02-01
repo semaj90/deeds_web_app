@@ -64,7 +64,7 @@ export const labelFollowedByInputPattern: PatternMatcher = createPattern(
     const id = generateIdFromLabel(labelText);
     return `<label for="${id}"${labelAttrs}>${labelText}</label>\n<input id="${id}"${inputAttrs}>`;
   },
-  {
+	{
     priority: 50,
     fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.html'),
   }
@@ -88,7 +88,7 @@ export const labelFollowedBySelfClosingInputPattern: PatternMatcher = createPatt
     const id = generateIdFromLabel(labelText);
     return `<label for="${id}"${labelAttrs}>${labelText}</label>\n<input id="${id}"${inputAttrs} />`;
   },
-  {
+	{
     priority: 51,
     fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.html'),
   }
@@ -132,7 +132,7 @@ export const labelFollowedBySelectPattern: PatternMatcher = createPattern(
     const id = generateIdFromLabel(labelText);
     return `<label for="${id}"${labelAttrs}>${labelText}</label>\n<select id="${id}"${selectAttrs}>`;
   },
-  {
+	{
     priority: 53,
     fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.html'),
   }
@@ -160,7 +160,7 @@ export const labelFollowedByTextareaPattern: PatternMatcher = createPattern(
     const id = generateIdFromLabel(labelText);
     return `<label for="${id}"${labelAttrs}>${labelText}</label>\n<textarea id="${id}"${textareaAttrs}>`;
   },
-  {
+	{
     priority: 54,
     fileFilter: (path: string) => path.endsWith('.svelte') || path.endsWith('.html'),
   }
@@ -214,7 +214,7 @@ export const selectWithoutLabelPattern: PatternMatcher = createPattern(
   (_match: string, attrs: string): string => {
     return `<select aria-label="Select option"${attrs}>`;
   },
-  {
+	{
     priority: 70,
   }
 );
@@ -229,7 +229,7 @@ export const textareaWithoutLabelPattern: PatternMatcher = createPattern(
   (_match: string, attrs: string): string => {
     return `<textarea aria-label="Text input"${attrs}>`;
   },
-  {
+	{
     priority: 71,
   }
 );
@@ -274,7 +274,7 @@ export const iconButtonSvgPattern: PatternMatcher = createPattern(
   (_match: string, attrs: string): string => {
     return _match.replace('<button', '<button aria-label="Icon button"');
   },
-  {
+	{
     priority: 73,
   }
 );
@@ -289,7 +289,7 @@ export const iconButtonClassPattern: PatternMatcher = createPattern(
   (_match: string, attrs: string): string => {
     return _match.replace('<button', '<button aria-label="Icon button"');
   },
-  {
+	{
     priority: 74,
   }
 );
@@ -339,7 +339,7 @@ export const bitsUiLabelPattern: PatternMatcher = createPattern(
     const id = generateUniqueId('bits-input');
     return `<Label.Root for="${id}"${attrs}>`;
   },
-  {
+	{
     priority: 58,
     fileFilter: (path: string) => path.endsWith('.svelte'),
   }
@@ -380,7 +380,7 @@ export const svelteBindInputPattern: PatternMatcher = createPattern(
     const label = bindVar.replace(/[A-Z]/g, ' $&').trim().toLowerCase();
     return `<input aria-label="${label}"${before}bind:value={${bindVar}}${after}>`;
   },
-  {
+	{
     priority: 67,
     fileFilter: (path: string) => path.endsWith('.svelte'),
   }
@@ -486,7 +486,8 @@ export function fixA11yLabels(content: string): A11yLabelFixResult {
  * @param content - The source code content to check
  * @returns Object containing detection results
  */
-export function detectA11yLabelIssues(content: string): {, hasIssues: boolean;
+export function detectA11yLabelIssues(content: string): {
+	hasIssues: boolean;
   patternMatches: Record<string, number>;
   totalMatches: number;
 } {

@@ -42,11 +42,13 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  const embedding = await this.embeddingService.generateEmbedding(error.message);
 
  // Query Qdrant for similar patterns
- const response = await this.retry(async () => {`${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points/search`,
+ const response = await this.retry(async () => {
+`${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points/search`,
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, vector: embedding, limit: topK, with_payload, true:
+	body: JSON.stringify({
+	vector: embedding, limit: topK, with_payload, true:
  }),
  }
  );
@@ -140,16 +142,19 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  }
 
  // Store in Qdrant
- await this.retry(async () => {`${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points`,
+ await this.retry(async () => {
+`${this.config.qdrantUrl}/collections/${this.COLLECTION_NAME}/points`,
  {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, points: [
+	body: JSON.stringify({
+	points: [
  {
  id: pattern.id,
- payload: {, filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
+ payload: {
+	filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
  },
- }],
+	}],
  }),
  }
  );

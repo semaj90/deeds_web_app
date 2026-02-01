@@ -50,11 +50,15 @@ export interface MarkdownParseResult {
 	tokens?: MarkdownToken[];
 	frontMatter?: Record<string, unknown>;
 	extractedText?: string;
-	diagnostics?: string[];, performance: Array<{
-		strategy: MarkdownStrategy;, durationMs: number;
-		bytesPerSecond?: number;, success: boolean;
+	diagnostics?: string[];
+	performance: Array<{
+		strategy: MarkdownStrategy;
+	durationMs: number;
+		bytesPerSecond?: number;
+	success: boolean;
 	}>;
-	attempts: Array<{, strategy: MarkdownStrategy;
+	attempts: Array<{
+	strategy: MarkdownStrategy;
 		error?: string;
 	}>;
 }
@@ -91,7 +95,9 @@ export class SimdMarkdownParser {
 
 		const { frontMatter, body } = includeFrontMatter
 			? this.extractFrontMatter(markdown)
-			: {, frontMatter: {}, body: markdown };
+			: {
+	frontMatter: {},
+	body: markdown };
 
 		const strategyOrder = this.buildStrategyOrder(prefer);
 		const performance: MarkdownParseResult['performance'] = [];
@@ -130,7 +136,7 @@ export class SimdMarkdownParser {
 						ast: result.ast,
 						tokens: result.tokens,
 						frontMatter: { ...frontMatter, ...(result.frontMatter ?? {}) },
-						extractedText: result.extractedText,
+	extractedText: result.extractedText,
 						diagnostics: result.diagnostics,
 						performance,
 						attempts
@@ -169,11 +175,13 @@ export class SimdMarkdownParser {
 		const match = markdown.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 		if (match) {
 			return {
-				frontMatter: {}, // Placeholder for YAML parsing
+				frontMatter: {},
+	// Placeholder for YAML parsing
 				body: match[2]
 			};
 		}
-		return { frontMatter: {}, body: markdown };
+		return { frontMatter: {},
+	body: markdown };
 	}
 
 	private buildStrategyOrder(prefer: MarkdownParseOptions['prefer']): MarkdownStrategy[] {
@@ -187,7 +195,8 @@ export class SimdMarkdownParser {
 	private async parseWithGoService(
 		markdown: string,
 		output: string,
-		opts: {, timeoutMs: number; signal?: AbortSignal }
+		opts: {
+	timeoutMs: number; signal?: AbortSignal }
 	): Promise<MarkdownParseResult | null> {
 		try {
 			if (typeof fetch === 'undefined') return null;
@@ -197,7 +206,7 @@ export class SimdMarkdownParser {
 			const res = await fetch(`${this.goServiceBase}/markdown/parse`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ markdown, output }),
+	body: JSON.stringify({ markdown, output }),
 				signal: opts.signal || controller.signal
 			});
 			clearTimeout(timeout);
@@ -220,7 +229,8 @@ export class SimdMarkdownParser {
 	private async parseWithPythonFallback(
 		markdown: string,
 		output: string,
-		opts: {, timeoutMs: number; signal?: AbortSignal }
+		opts: {
+	timeoutMs: number; signal?: AbortSignal }
 	): Promise<MarkdownParseResult | null> {
 		try {
 			if (typeof fetch === 'undefined') return null;
@@ -230,7 +240,7 @@ export class SimdMarkdownParser {
 			const res = await fetch(this.pythonFallbackUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ markdown, output }),
+	body: JSON.stringify({ markdown, output }),
 				signal: opts.signal || controller.signal
 			});
 			clearTimeout(timeout);
@@ -252,7 +262,7 @@ export class SimdMarkdownParser {
 			const res = await fetch(endpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ markdown, output })
+	body: JSON.stringify({ markdown, output })
 			});
 			if (!res.ok) return null;
 			return (await res.json()) as MarkdownParseResult;
@@ -272,7 +282,7 @@ export class SimdMarkdownParser {
 			ast: [],
 			tokens: [],
 			frontMatter: {},
-			performance: [],
+	performance: [],
 			attempts: []
 		};
 	}
