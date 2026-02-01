@@ -82,12 +82,14 @@
 <style>
     .chat-window {
         border: 1px solid #ccc;
-        padding: 1rem;, height: 300px;
+        padding: 1rem;
+        height: 300px;
         overflow-y: auto;
         margin-bottom: 1rem;
     }
     .msg {
-        margin-bottom: 0.5rem;, padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
         border-radius: 4px;
     }
     .msg.user {
@@ -99,28 +101,35 @@
         text-align: left;
     }
     .loading {
-        font-style: italic;, color: #666;
+        font-style: italic;
+        color: #666;
     }
     .confidence {
         display: block;
-        font-size: 0.8em;, color: #666;
+        font-size: 0.8em;
+        color: #666;
         margin-top: 5px;
     }
     .citations {
         font-size: 0.85em;
-        margin-top: 8px;, padding: 5px;
+        margin-top: 8px;
+        padding: 5px;
         background: #f5f5f5;
         border-radius: 4px;
     }
     .citation {
-        display: inline-block;, margin: 2px 5px;
+        display: inline-block;
+        margin: 2px 5px;
         padding: 2px 6px;
         background: #e0e0e0;
         border-radius: 3px;
     }
     .warning {
-        margin-top: 8px;, padding: 8px;
-        background: #fff3cd;, border: 1px solid #ffc107;
-        border-radius: 4px;, color: #856404;
+        margin-top: 8px;
+        padding: 8px;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        color: #856404;
     }
 </style>

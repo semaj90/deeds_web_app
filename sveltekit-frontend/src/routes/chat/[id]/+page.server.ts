@@ -88,7 +88,8 @@ export const actions: Actions = {
 					role: 'assistant',
 					content: aiResponse.content,
 					timestamp: new Date().toISOString(),
-					metadata: {, confidence: aiResponse.confidence,
+					metadata: {
+						confidence: aiResponse.confidence,
 						citations: aiResponse.citations,
 						warnings: aiResponse.warnings
 					}
@@ -147,8 +148,10 @@ export const actions: Actions = {
 async function streamOllamaResponse(
 	message: string,
 	channel: string
-): Promise<{, content: string;
-	confidence: number;, citations: string[];
+): Promise<{
+	content: string;
+	confidence: number;
+	citations: string[];
 	warnings: string[];
 }> {
 	let fullContent = '';
@@ -157,10 +160,12 @@ async function streamOllamaResponse(
 		const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, model: OLLAMA_MODEL,
+			body: JSON.stringify({
+				model: OLLAMA_MODEL,
 				prompt: `You are a legal AI assistant. Answer the following question professionally and accurately:\n\n${message}`,
 				stream: true,
-				options: {, temperature: 0.7,
+				options: {
+					temperature: 0.7,
 					top_p: 0.9
 				}
 			})
