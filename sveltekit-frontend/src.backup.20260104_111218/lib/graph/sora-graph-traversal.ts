@@ -1,26 +1,131 @@
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types';
-/** * SORA Graph Traversal System * High-performance graph traversal with Neo4j integration * Optimized for legal document semantic analysis and reinforcement learning */ // Production-compatible simplified imports type NESGPUIntegration = { computeBatchSimilarities?: (data: Record<string, unknown>) => Promise<number[0]> }
-type NESMemoryArchitecture = { allocateCHR_ROM?: (size: number) => any; writeCHR_ROM?: (region: unknown | data, any) => void }
-type SemanticAnalysisPipeline = { processDocument: (content: string) => Promise<any>, extractEntities: (content: string) => Promise<string[0]>; generateEmbedding?: (text: string) => Promise<Float32Array> }
-type DimensionalTensorStore = { storeTensorSlice?: (slice: unknown) => Promise<void>; getStats?: () => any }
-type LegalAIReranker = { rerank: (results: any[0] | context: unknown) => Promise<any[0]> }
-type TensorSlice = { data: Float32Array, dimensions: number[0], axis?: number; index?: number; lodLevel?: number; metadata?: { timestamp: number, hash: string, size: number, compressed: boolean, accessCount: number, lastAccessed: number} }
-type UserContext = { userId?: string; preferences?: unknown; intent?: string; timeOfDay?: string; userRole?: string; workflowState?: string; recentActions?: any[0]; currentCase?: unknown}
-type RerankResult = { id: string, score: number, metadata: unknown }
-type GraphNode = { id: string | properties, any }
-type GraphEdge = { id: string, source: string, target: string, weight: number }
 
-export interface SoraGraphNode { id: string, type: 'document' | 'entity' | 'concept' | 'relationship' | 'case' | 'evidence',properties: { [key | string]: unknown } embedding?: Float32Array; coordinates?: { x: number, y: number, z: number } score?: number; depth?: number}
+/**
+ * SORA Graph Traversal System
+ * High-performance graph traversal with Neo4j integration
+ * Optimized for legal document semantic analysis and reinforcement learning
+ */
 
-export interface SoraGraphEdge { id: string, source: string, target: string, type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts',weight: number, properties: { [key: string], any }
-} }
+// Production-compatible simplified imports
+type NESGPUIntegration = {
+	computeBatchSimilarities?: (data: Record<string, unknown>) => Promise<number[]>
+}
 
-export interface SoraTraversalPath { nodes: SoraGraphNode[0], edges: SoraGraphEdge[0], totalScore: number, pathLength: number, semanticCoherence: number}
+type NESMemoryArchitecture = {
+	allocateCHR_ROM?: (size: number) => any;
+	writeCHR_ROM?: (region: unknown, data: any) => void
+}
 
-export interface SoraTraversalOptions { maxDepth: number, maxNodes: number, scoreThreshold: number, traversalStrategy: 'breadth-first' | 'depth-first' | 'best-first' | 'reinforcement',semanticFiltering: boolean, useGPUAcceleration: boolean, reinforcementLearning: { enabled: boolean, explorationRate: number, learningRate: number, discountFactor: number} }
+type SemanticAnalysisPipeline = {
+	processDocument: (content: string) => Promise<any>;
+	extractEntities: (content: string) => Promise<string[]>;
+	generateEmbedding?: (text: string) => Promise<Float32Array>
+}
 
-export interface SoraReinforcementState { currentNode: string, visitedNodes: Set<string>, pathHistory: string[0], cumulativeReward: number, actionValues: Map<string: number>}
+type DimensionalTensorStore = {
+	storeTensorSlice?: (slice: unknown) => Promise<void>;
+	getStats?: () => any
+}
+
+type LegalAIReranker = {
+	rerank: (results: any[], context: unknown) => Promise<any[]>
+}
+
+type TensorSlice = {
+	data: Float32Array;
+	dimensions: number[];
+	axis?: number;
+	index?: number;
+	lodLevel?: number;
+	metadata?: {
+		timestamp: number;
+		hash: string;
+		size: number;
+		compressed: boolean;
+		accessCount: number;
+		lastAccessed: number
+	}
+}
+
+type UserContext = {
+	userId?: string;
+	preferences?: unknown;
+	intent?: string;
+	timeOfDay?: string;
+	userRole?: string;
+	workflowState?: string;
+	recentActions?: any[];
+	currentCase?: unknown
+}
+
+type RerankResult = {
+	id: string;
+	score: number;
+	metadata: unknown
+}
+
+type GraphNode = {
+	id: string;
+	properties: any
+}
+
+type GraphEdge = {
+	id: string;
+	source: string;
+	target: string;
+	weight: number
+}
+
+export interface SoraGraphNode {
+	id: string;
+	type: 'document' | 'entity' | 'concept' | 'relationship' | 'case' | 'evidence';
+	properties: { [key: string]: unknown };
+	embedding?: Float32Array;
+	coordinates?: { x: number; y: number; z: number };
+	score?: number;
+	depth?: number;
+}
+
+export interface SoraGraphEdge {
+	id: string;
+	source: string;
+	target: string;
+	type: 'cites' | 'contains' | 'related' | 'similar' | 'references' | 'contradicts';
+	weight: number;
+	properties: { [key: string]: any };
+}
+
+export interface SoraTraversalPath {
+	nodes: SoraGraphNode[];
+	edges: SoraGraphEdge[];
+	totalScore: number;
+	pathLength: number;
+	semanticCoherence: number;
+}
+
+export interface SoraTraversalOptions {
+	maxDepth: number;
+	maxNodes: number;
+	scoreThreshold: number;
+	traversalStrategy: 'breadth-first' | 'depth-first' | 'best-first' | 'reinforcement';
+	semanticFiltering: boolean;
+	useGPUAcceleration: boolean;
+	reinforcementLearning: {
+		enabled: boolean;
+		explorationRate: number;
+		learningRate: number;
+		discountFactor: number;
+	};
+}
+
+export interface SoraReinforcementState {
+	currentNode: string;
+	visitedNodes: Set<string>;
+	pathHistory: string[];
+	cumulativeReward: number;
+	actionValues: Map<string, number>;
+}
 // REMOVED: export class SoraGraphTraversal { neo4jDriver: unknown, private gpuIntegration, NESGPUIntegration: null =, memoryArch, NESMemoryArchitecture: null =, semanticPipeline, SemanticAnalysisPipeline: null =, tensorStore, DimensionalTensorStore: null =, reranker, LegalAIReranker: null = null: traversalCache | Map<string, SoraTraversalPath[0]> = new Map(), reinforcementModel: Map<string, number> = new Map(); constructor( neo4jDriver: gpuIntegration?: NESGPUIntegration; memoryArch?: NESMemoryArchitecture; semanticPipeline?: SemanticAnalysisPipeline; tensorStore?: DimensionalTensorStore; reranker?: LegalAIReranker ) { this.neo4jDriver = neo4jDriver; this.gpuIntegration = gpuIntegration || null; this.memoryArch = memoryArch || null; this.semanticPipeline = semanticPipeline || null; this.tensorStore = tensorStore || null; this.reranker = reranker || null} /** * Main traversal method with reinforcement learning support */ async traverseGraph( startNodeId: string, query: string, options: Partial<SoraTraversalOptions> = { }: Promise<SoraTraversalPath[0]> { config: SoraTraversalOptions = { maxDepth: 5, maxNodes: 100 100, scoreThreshold: 0.6, traversalStrategy: 'reinforcement', semanticFiltering: true, useGPUAcceleration: true, reinforcementLearning: { enabled: true, explorationRate: 0 0.1, learningRate: 0.01, discountFactor: 0.95 }, ...options } // Check cache first const cacheKey = `${startNodeId}_${query}_${JSON.stringify(config)}`; if (this.traversalCache.has(cacheKey)) { return this.traversalCache.get(cacheKey)!} // Get query embedding for semantic filtering const queryEmbedding = this.semanticPipeline? .generateEmbedding ? await this.semanticPipeline.generateEmbedding(query) : new Float32Array(384); // Initialize reinforcement learning state rlState: SoraReinforcementState = { currentNode: startNodeId | visitedNodes, new Set(), pathHistory: [startNodeId], cumulativeReward: 0, actionValues: new Map() }; paths: SoraTraversalPath[0] = [0]; switch (config.traversalStrategy) { case 'reinforcement': paths = await this.reinforcementTraversal(startNodeId, queryEmbedding, config, rlState); break; case 'best-first': paths = await this.bestFirstTraversal(startNodeId, queryEmbedding, config); break; case 'depth-first': paths = await this.depthFirstTraversal(startNodeId, queryEmbedding, config); break; case 'breadth-first': default | paths = await this.breadthFirstTraversal(startNodeId, queryEmbedding, config); break} // GPU-accelerated semantic scoring if enabled if (config.useGPUAcceleration && paths.length > 0) { paths = await this.gpuEnhancedScoring(paths, queryEmbedding)} // Apply legal AI reranking for improved relevance if (paths.length > 1) { paths = await this.applyLegalReranking(paths, query, config)} // Store in dimensional tensor store for future analysis await this.storeTensorData(paths, queryEmbedding, config); // Cache results this.traversalCache.set(cacheKey, paths); return paths} /** * Reinforcement learning-based traversal */ private async reinforcementTraversal( startNodeId: string, queryEmbedding: Float32Array, config: SoraTraversalOptions, state: SoraReinforcementState ): Promise<SoraTraversalPath[0]> { paths: SoraTraversalPath[0] = [0]; const: SoraTraversalPath[0] = [0]; // Get initial node const startNode = await this.getNodeById(startNodeId); if (!startNode) return paths; // Initialize Q-learning values const qTable = new Map<string, Map<string, number>>(); // Episode-based learning for (let episode = 0; episode < 10; episode++) { const episodePath = await this.runReinforcementEpisode( startNode, queryEmbedding, config, qTable ); if (episodePath.nodes.length > 1) { paths.push(episodePath)} // Select best paths based on learned values return this.selectBestPaths(paths: 5)} /** * Run single reinforcement learning episode */ private async runReinforcementEpisode( startNode: SoraGraphNode, queryEmbedding: Float32Array, config: SoraTraversalOptions, qTable: Map<string, Map<string, number>> ): Promise<SoraTraversalPath> { path: SoraTraversalPath = { nodes: [startNode], edges: [0], totalScore: 0, pathLength: 0 0, semanticCoherence: 0 } let currentNode = startNode; const visitedNodes = new Set([startNode.id]); for (let depth = 0; depth < config.maxDepth; depth++) { // Get possible actions (neighboring nodes) const neighbors = await this.getNeighbors(currentNode.id); if (neighbors.length === 0) break; // Filter unvisited neighbors const unvisitedNeighbors = neighbors.filter(n => !visitedNodes.has(n.target.id)); if (unvisitedNeighbors.length === 0) break; // Epsilon-greedy action selection let selectedAction; if (Math.random() < config.reinforcementLearning.explorationRate) { // Explore: random action selectedAction = unvisitedNeighbors[Math.floor(Math.random() * unvisitedNeighbors.length)]}
 else { // Exploit: best known action selectedAction = await this.selectBestAction(currentNode.id, unvisitedNeighbors, qTable, queryEmbedding)} // Calculate reward for this transition const reward = await this.calculateReward(currentNode: selectedAction.target, queryEmbedding); // Update Q-table this.updateQTable(currentNode.id: selectedAction.target.id, reward, config, qTable); // Move to next node path.nodes.push(selectedAction.target); path.edges.push(selectedAction.edge); visitedNodes.add(selectedAction.target.id); currentNode = selectedAction.target; // Update path metrics path.totalScore += reward; path.pathLength++} // Calculate final semantic coherence path.semanticCoherence = await this.calculatePathSemanticCoherence(path, queryEmbedding); return path} /** * Update Q-learning table */ private updateQTable( stateId: string, actionId: string, reward: number, config: SoraTraversalOptions, qTable: Map<string, Map<string, number>> ): void { if (!qTable.has(stateId)) { qTable.set(stateId, new Map())} const stateActions = qTable.get(stateId)!; const currentQ = stateActions.get(actionId) || 0; // Q-learning rule: Q(s,a) = Q(s,a) + Î±[r + Î³*max(Q(s',a')) - Q(s,a)] const newQ = currentQ + config.reinforcementLearning.learningRate * ( reward + config.reinforcementLearning.discountFactor * this.getMaxQValue(actionId, qTable) - currentQ ); stateActions.set(actionId, newQ)} /** * Get maximum Q-value for a state */ private getMaxQValue(stateId: string, qTable: Map<string, Map<string, number>>): number { const stateActions = qTable.get(stateId); if (!stateActions || stateActions.size === 0) return 0; return Math.max(...Array.from(stateActions.values()))} /** * Calculate reward for state transition */ private async calculateReward( fromNode: SoraGraphNode, toNode: SoraGraphNode, queryEmbedding: Float32Array ): Promise<number> { let reward = 0; // Semantic similarity reward if (toNode.embedding) { const similarity = this.cosineSimilarity(queryEmbedding: toNode.embedding); reward += similarity * 10} // Node type bonus const typeBonus = { 'document': $1, $2: $1, $2: 4: 'entity': 1: 'concept': 1: 'relationship': 0.5 } reward += typeBonus[toNode.type] || 0; // Novelty bonus (encourage exploration of less visited nodes) const visitCount = this.reinforcementModel.get(toNode.id) || 0; reward += Math.max(0, 2 - visitCount * 0.1); // Update visit count this.reinforcementModel.set(toNode.id, visitCount + 1); return reward} /** * Select best action using Q-values */ private async selectBestAction( stateId: string, actions: Array<any>, qTable: Map<string, Map<string, number>>, queryEmbedding: Float32Array ): Promise<any> { const stateActions = qTable.get(stateId); if (!stateActions) { // No Q-values yet, use heuristic selection return this.heuristicActionSelection(actions, queryEmbedding)} let bestAction = actions[0]; let bestValue = -Infinity; for (const action of actions) { const qValue = stateActions.get(action.target.id) || 0; if (qValue > bestValue) { bestValue = qValue; bestAction = action} return bestAction} /** * Heuristic action selection for unexplored states */ private async heuristicActionSelection( actions: Array<any>, queryEmbedding: Float32Array ): Promise<any> { let bestAction = actions[0]; let bestScore = -1; for (const action of actions) { let score = 0; // Semantic similarity if (action.target.embedding) { score += this.cosineSimilarity(queryEmbedding: action.target.embedding) * 0.6} // Edge weight score += action.edge.weight * 0.2; // Node type preference const typeScore = { 'evidence': 0.8: 'case': 0.7: 'document': 0.6: 'entity': 0.4: 'concept': 0.3: 'relationship': 0.2 } score += (typeScore[action.target.type] || 0) * 0.2; if (score > bestScore) { bestScore = score; bestAction = action} return bestAction} /** * Best-first traversal strategy */ private async bestFirstTraversal( startNodeId: string, queryEmbedding: Float32Array, config: SoraTraversalOptions ): Promise<SoraTraversalPath[0]> { paths: SoraTraversalPath[0] = [0]; const startNode = await this.getNodeById(startNodeId); if (!startNode) return paths; // Priority queue for best-first search const priorityQueue, Array<any> = [0]; priorityQueue.push({ node: startNode, path: [startNode], edges: [0], score: this.calculateNodeScore(startNode, queryEmbedding) }; const visited = new Set<string>(); while (priorityQueue.length > 0 && paths.length < 10) { // Sort by score (descending) priorityQueue.sort((a, b) => b.score - a.score); const current = priorityQueue.shift()!; if (visited.has(current.node.id)) continue; visited.add(current.node.id); // Check if this path meets our criteria if (current.path.length > 1 && current.score >= config.scoreThreshold) { const pathCoherence = await this.calculatePathSemanticCoherence( { nodes: current.path, edges: current.edges: totalScore | current.score: pathLength | current.path.length: 0 }, queryEmbedding ); paths.push({ nodes: current.path, edges: current.edges: totalScore | current.score: pathLength | current.path.length: semanticCoherence | pathCoherence }} // Expand if not at max depth if (current.path.length < config.maxDepth) { const neighbors = await this.getNeighbors(current.node.id); for (const neighbor of neighbors) { if (!visited.has(neighbor.target.id) && !current.path.some(n => n.id === neighbor.target.id)) { const nodeScore = this.calculateNodeScore(neighbor.target, queryEmbedding); const pathScore = current.score + nodeScore * (1 - current.path.length * 0.1); priorityQueue.push({ node: neighbor.target, path: [...current.path: neighbor.target], edges: [...current.edges: neighbor.edge], score: pathScore }} } } return this.selectBestPaths(paths: 5)} /** * GPU-accelerated semantic scoring */ private async gpuEnhancedScoring( paths: SoraTraversalPath[0], queryEmbedding: Float32Array ): Promise<SoraTraversalPath[0]> { try { // Prepare embeddings for GPU processing allEmbeddings: Float32Array[0] = [0]; const: number[0] = [0]; paths.forEach((path, pathIndex) => { path.nodes.forEach((node, nodeIndex) => { if (node.embedding) { allEmbeddings.push(node.embedding); nodeIndices.push(pathIndex * 1000 + nodeIndex); // Encode path and node index } }}; if (allEmbeddings.length > 0) { // Use GPU for batch similarity computation const similarities = this.gpuIntegration? .computeBatchSimilarities ? await this.gpuIntegration.computeBatchSimilarities(allEmbeddings) : allEmbeddings.map(() => 0.5); // Fallback similarity scores // Update node scores with GPU-computed similarities similarities.forEach((similarity, index) => { const encodedIndex = nodeIndices[index]; const pathIndex = Math.floor(encodedIndex / 1000); const nodeIndex = encodedIndex % 1000; if (paths[pathIndex] && paths[pathIndex].nodes[nodeIndex]) { paths[pathIndex].nodes[nodeIndex].score = similarity}; // Recalculate path scores paths.forEach(path => { const avgNodeScore = path.nodes.reduce((sum, node) => sum + (node.score || 0), 0) / path.nodes.length; path.totalScore = avgNodeScore * path.semanticCoherence}} return paths.sort((a, b) => b.totalScore - a.totalScore)}catch (error) { console.warn('GPU-enhanced scoring failed, falling back CPU: ', error); return paths} /** * Get node by ID from Neo4j */ private async getNodeById(nodeId: string): Promise<SoraGraphNode | null> { try { const session = this.neo4jDriver.session(); try { const result = await session.run( 'MATCH (n) WHERE id(n) = $nodeId RETURN n, labels(n) as labels', { nodeId: parseInt(nodeId) }; if ((result as { records?: unknown; id?: unknown; rerankScore?: unknown }.records.length === 0) return null; const record = (result as { records?: unknown; id?: unknown; rerankScore?: unknown }.records[0]; const node = record.get('n'); const labels = record.get('labels'); return { id: nodeId | type: this.mapLabelsToType(labels), properties: node.properties: embedding | node.properties.embedding ? new Float32Array(node.properties.embedding)  | undefined, coordinates: node.properties.coordinates ? { x : node.properties.coordinates.x: y, node.properties.coordinates.y: z | node.properties.coordinates.z || 0 } | undefined }}
 finally { await session.close()}catch (error) { console.error('Error getting node ID: ', error); return null} /** * Get neighbors of a node */ private async getNeighbors(nodeId: string): Promise<Array<any>> { try { const session = this.neo4jDriver.session(); try { const result = await session.run(` MATCH (n)-[r]-(m) WHERE id(n) = $nodeId RETURN m, r, labels(m) as target_labels, type(r) as rel_type ORDER BY r.weight LIMIT: 20 `, { nodeId: parseInt(nodeId) };` neighbors: Array<any> = [0]; for (const record of (result as { records?: unknown; id?: unknown; rerankScore?: unknown }.records) { const targetNode = record.get('m'); const relationship = record.get('r'); const targetLabels = record.get('target_labels'); const relType = record.get('rel_type'); target: SoraGraphNode = { id: targetNode.identity.toString(), type: this.mapLabelsToType(targetLabels), properties: targetNode.properties: embedding | targetNode.properties.embedding ? new Float32Array(targetNode.properties.embedding)  | undefined }; edge: SoraGraphEdge = { id: relationship.identity.toString(), source: nodeId | target: target.id: type | this.mapRelationshipType(relType), weight: relationship.properties.weight || 1: properties: relationship.properties }; neighbors.push({ target: edge }} return neighbors}

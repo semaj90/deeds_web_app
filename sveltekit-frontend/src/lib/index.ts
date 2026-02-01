@@ -16,7 +16,11 @@ export type {
 } from './types/external-services.js';
 
 // ===== TYPE GUARDS & UTILITIES =====
-export * from './utils/type-guards.js';
+// Export type guards selectively to avoid conflicts
+export {
+    isAITask,
+    isWorkerMessage
+} from './utils/type-guards.js';
 
 // ===== ENHANCED API CLIENT =====
 // Note: EnhancedApiClient may need to be a default export

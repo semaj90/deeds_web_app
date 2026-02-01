@@ -1,17 +1,14 @@
 <script lang="ts">
 	// Migrated to $effect
-	import { createActor } from 'xstate';
 	import {
-		comprehensiveUploadAnalyticsMachine,
-		generateUserInsights,
-		calculateUserEngagementScore,
-		getContextualPromptsByTiming,
-		type UploadContext,
-		type UserAnalytics
+	  calculateUserEngagementScore,
+	  comprehensiveUploadAnalyticsMachine,
+	  generateUserInsights,
+	  getContextualPromptsByTiming,
+	  type UploadContext,
+	  type UserAnalytics
 	} from '$lib/machines/enhanced-legal-upload-analytics-machine.js';
-	import type { UploadResult } from '$lib/machines/enhanced-legal-upload-analytics-machine.js';
-import type { DrizzleTypes } from '$lib/types/enhanced-svelte5-types';
-import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+	import { createActor } from 'xstate';
 
 	interface Props {
 		caseId?: string;
@@ -41,7 +38,7 @@ import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 	let selectedFiles = $state<File[]>([]);
 
 	// Derived State
-	let context = $derived(machineState?.context as UploadContext : undefined);
+	let context = $derived((machineState?.context as UploadContext) ?? undefined);
 	let contextualPrompts = $derived(context?.contextualPrompts ?? []);
 	let beforeUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'before-upload') : []);
 	let duringUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'during-upload') : []);

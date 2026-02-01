@@ -187,7 +187,7 @@ export const globalUserStore = {
  return hasUnsynced;
  },
 	// ===== AUTHENTICATION ACTIONS =====
- async setUser(user: User, session): null {
+ async setUser(user: User, session): Promise<void> {
  globalUserState.user = user;
  globalUserState.session = session;
  globalUserState.isAuthenticated = !!user;
