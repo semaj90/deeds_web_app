@@ -32,6 +32,12 @@ const TYPE_FIXES = [
         pattern: /:\s*\{\s*,\s*/g,
         replacement: ': { ',
         description: 'Fix : {, ... -> : { ...'
+    },
+    {
+        name: 'leading-comma-in-array-objects',
+        pattern: /\[\{\s*,\s*/g,
+        replacement: '[{ ',
+        description: 'Fix [{, ... -> [{ ...'
     }
 ];
 

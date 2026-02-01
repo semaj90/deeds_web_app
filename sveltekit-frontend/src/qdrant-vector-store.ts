@@ -185,7 +185,7 @@ export class QdrantVectorStore {
 
     await this.client.upsert(COLLECTIONS.ENTITIES, {
       wait: true,
-      points: [{, id: pointId, vector: embedding, payload }],
+      points: [{ id: pointId, vector: embedding, payload }],
     });
 
     return pointId;
@@ -217,7 +217,7 @@ export class QdrantVectorStore {
 
     await this.client.upsert(COLLECTIONS.SUMMARIES, {
       wait: true,
-      points: [{, id: pointId, vector: embedding, payload }],
+      points: [{ id: pointId, vector: embedding, payload }],
     });
 
     return pointId;
